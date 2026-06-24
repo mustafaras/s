@@ -46,8 +46,8 @@
 </style>
 </head>
 <body>
-<div id="root" data-theme="light" style="min-height:100dvh;width:100%;display:flex;justify-content:center;background:var(--page);">
-  <div id="app" style="width:100%;max-width:460px;min-height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;"></div>
+<div id="root" data-theme="light" style="min-height:100dvh;height:100dvh;width:100%;display:flex;justify-content:center;background:var(--page);overflow:hidden;">
+  <div id="app" style="width:100%;max-width:460px;min-height:100dvh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;"></div>
 </div>
 <script>
 (function(){
@@ -60,8 +60,10 @@ var HABITS=[
   {key:'walked20',icon:'🚶‍♀️',title:'En az 20 dk yürüdüm',sub:'Kısa yürüyüş de sayılır. Sistem çalışıyor.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
   {key:'protein',icon:'🍳',title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
   {key:'water',icon:'💧',title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
+  {key:'vitaminD',icon:'☀️',title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti ☀️'},
   {key:'selfKind',icon:'🫶',title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
 ];
+var HABIT_TOTAL=HABITS.length;
 var MOODS=[
   {id:'cok-iyi',label:'Çok iyi ☀️',short:'Çok iyi',emoji:'☀️',resp:'Bugün ışık saçıyoruz anlaşılan ☀️'},
   {id:'iyi',label:'İyi 🌼',short:'İyi',emoji:'🌼',resp:'Gayet güzel. Ritim kuruluyor 🌼'},
@@ -136,8 +138,9 @@ function addDays(s,n){ var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]
 function diffDays(a,b){ var pa=a.split('-').map(Number),pb=b.split('-').map(Number); var da=new Date(pa[0],pa[1]-1,pa[2]),db=new Date(pb[0],pb[1]-1,pb[2]); return Math.round((db-da)/86400000); }
 function shortDate(s){ var p=s.split('-'); return p[2]+'.'+p[1]; }
 function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
-function countRec(rec){ return rec?Object.keys(rec.habits).filter(function(k){return rec.habits[k];}).length:0; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:{sweetManaged:false,eveningControl:false,walked20:false,protein:false,water:false,selfKind:false},mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null}; return d.days[date]; }
+function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
+function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null}; else { if(!d.days[date].habits) d.days[date].habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in d.days[date].habits)) d.days[date].habits[h.key]=false; }); } return d.days[date]; }
 function allDays(){ var out=[],s=data.startDate; for(var i=1;i<=21;i++){ var date=addDays(s,i-1); out.push({i:i,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
 function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=moods[x];k=x;} } var o=k?find(MOODS,'id',k):null; return o?o.label:'—'; }
@@ -156,12 +159,12 @@ function interp(sweet,walk,evening){
 }
 function weekBlock(w,days){
   var slice=days.slice(w*7,w*7+7);
-  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['selfKind','Kendime iyi davrandım']];
+  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['selfKind','Kendime iyi davrandım']];
   var cnt=function(k){ return slice.reduce(function(a,o){return a+(o.rec&&o.rec.habits[k]?1:0);},0); };
   var rows=defs.map(function(d){ return {label:d[1],val:cnt(d[0])+'/7'}; });
   var totalC=slice.reduce(function(a,o){return a+countRec(o.rec);},0);
   var moods={}; slice.forEach(function(o){ if(o.rec&&o.rec.mood) moods[o.rec.mood]=(moods[o.rec.mood]||0)+1; });
-  return {title:'Gün '+(w*7+1)+'-'+(w*7+7),rows:rows,avg:(totalC/7).toFixed(1)+'/6',best:bestStreak(slice)+' gün',mood:topMood(moods),interp:interp(cnt('sweetManaged'),cnt('walked20'),cnt('eveningControl'))};
+  return {title:'Gün '+(w*7+1)+'-'+(w*7+7),rows:rows,avg:(totalC/7).toFixed(1)+'/'+HABIT_TOTAL,best:bestStreak(slice)+' gün',mood:topMood(moods),interp:interp(cnt('sweetManaged'),cnt('walked20'),cnt('eveningControl'))};
 }
 
 // ---------- toast & confetti ----------
@@ -191,7 +194,7 @@ App.toggleHabit=function(key){
   ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   var msg='Kaydedildi ✨'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
   commit(msg);
-  if(after===6&&before<6){ confetti(); setTimeout(function(){ toast('Bugün 6/6. Şeyma hanım kontrolü ele aldı 👑',2600); },250); }
+  if(after===HABIT_TOTAL&&before<HABIT_TOTAL){ confetti(); setTimeout(function(){ toast('Bugün '+HABIT_TOTAL+'/'+HABIT_TOTAL+'. Şeyma hanım kontrolü ele aldı 👑',2600); },250); }
   else if(day.habits[key]){ maybeStreak(); }
 };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor ✨',7:'7 gün. Bu artık tesadüf değil ☀️',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir 🍫',21:'21 gün. Şeyma reseti tamamladı 👑'}; if(m[s]){ if(s===7||s===14||s===21) confetti(); setTimeout(function(){ toast(m[s],2600); },300); } }
@@ -213,7 +216,7 @@ App.emergencyNote=function(){ ui.emergency=false; ui.tab='bugun'; render(); setT
 App.openDay=function(i){
   var days=allDays(); var o=days[i-1]; var rec=o.rec;
   var habits=HABITS.map(function(h){ return {label:h.title.replace(' 🍫','').replace(' 🌙',''),mark:(rec&&rec.habits[h.key])?'✅':'⚪'}; });
-  var cnt=countRec(rec); var status='Zor gün'; if(cnt>=6)status='Kraliçe günü 👑'; else if(cnt>=4)status='Güzel gün'; else if(cnt>=2)status='İdare eder';
+  var cnt=countRec(rec); var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34); var status='Zor gün'; if(cnt>=HABIT_TOTAL)status='Kraliçe günü 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
   var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null;
   ui.dayDetail={title:'Gün '+i,dateLabel:shortDate(o.date),status:status,habits:habits,moodLabel:mood?mood.label:'—',sosCount:rec?(rec.cravingSOSCount||0):0,note:(rec&&rec.note)||'',hasNote:!!(rec&&rec.note)};
   render();
@@ -245,7 +248,7 @@ function reportHTML(){
   h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
   h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
   h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Özet</div>';
-  var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
+  var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['D vitamini günü',st.tot.vitaminD],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;">';
   stats.forEach(function(s){ h+='<div style="flex:1 1 30%;min-width:150px;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:12px 14px;"><div style="font-size:12px;color:#9C8C92;">'+esc(s[0])+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+esc(s[1])+'</div></div>'; });
   h+='</div>';
@@ -256,7 +259,7 @@ function reportHTML(){
   h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
   ['Gün','Tarih','Tik','Mod','Tatlı SOS','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
   h+='</tr></thead><tbody>';
-  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/6</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
+  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+HABIT_TOTAL+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
   h+='</tbody></table>';
   h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:15px;font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
   return h;
@@ -338,9 +341,10 @@ function bugunHTML(){
   var completed=countRec(rec);
   var circ=2*Math.PI*42;
   var badge='Bugün nazlı başladı 🌧️';
-  if(completed>=6) badge='Kraliçe günü 👑'; else if(completed>=4) badge='Raydasın ☀️'; else if(completed>=2) badge='Toparlanıyor 🌤️';
-  var pct=Math.round(completed/6*100);
-  var off=circ*(1-completed/6);
+  var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34);
+  if(completed>=HABIT_TOTAL) badge='Kraliçe günü 👑'; else if(completed>=strong) badge='Raydasın ☀️'; else if(completed>=medium) badge='Toparlanıyor 🌤️';
+  var pct=Math.round(completed/HABIT_TOTAL*100);
+  var off=circ*(1-completed/HABIT_TOTAL);
 
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   // hero
@@ -442,16 +446,17 @@ function haritaHTML(){
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
   allDays().forEach(function(o){
     var cnt=countRec(o.rec); var locked=diffDays(today,o.date)<0; var isToday=o.date===today;
-    var status='Zor gün'; if(cnt>=6)status='Kraliçe 👑'; else if(cnt>=4)status='Güzel gün'; else if(cnt>=2)status='İdare eder';
+    var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34);
+    var status='Zor gün'; if(cnt>=HABIT_TOTAL)status='Kraliçe 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
     var style='background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
     if(locked) style+='opacity:0.5;';
-    if(cnt>=6&&!locked) style='background:'+(dark?'linear-gradient(135deg,rgba(255,232,163,0.22),rgba(247,221,229,0.2))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)')+';border:1px solid var(--card-bd);color:'+(dark?'var(--text)':'#5A2E2A')+';';
+    if(cnt>=HABIT_TOTAL&&!locked) style='background:'+(dark?'linear-gradient(135deg,rgba(255,232,163,0.22),rgba(247,221,229,0.2))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)')+';border:1px solid var(--card-bd);color:'+(dark?'var(--text)':'#5A2E2A')+';';
     if(isToday) style+='border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.35);';
     var onclick=locked?'':'onclick="App.openDay('+o.i+')"';
     var cur=locked?'default':'pointer';
     h+='<button '+onclick+' style="border-radius:18px;padding:11px;display:flex;flex-direction:column;gap:5px;cursor:'+cur+';min-height:78px;transition:all .2s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);'+style+'">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;width:100%;"><span style="font-size:12px;font-weight:700;color:var(--faint);">G'+o.i+'</span><span style="font-size:15px;">'+((o.rec&&o.rec.mood)?moodEmoji(o.rec.mood):'')+'</span></div>';
-    h+='<div style="font-size:18px;font-weight:800;align-self:flex-start;">'+(locked?'✨':(cnt+'/6'))+'</div>';
+    h+='<div style="font-size:18px;font-weight:800;align-self:flex-start;">'+(locked?'✨':(cnt+'/'+HABIT_TOTAL))+'</div>';
     h+='<div style="font-size:11px;font-weight:600;color:var(--muted);align-self:flex-start;line-height:1.2;">'+(locked?'Yakında':status)+'</div></button>';
   });
   h+='</div></div>';
@@ -477,7 +482,7 @@ function raporHTML(){
   h+='<button onclick="App.anotherNote()" style="border:none;cursor:pointer;align-self:center;padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;color:var(--choc);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.08);">Başka not göster ✨</button>';
   h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;">Minik Kurallar 🌿</div></div>';
   h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
-  [['🌿','Aç kalmak yok.'],['🍫','Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],['🌙','Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],['🍳','Her öğüne protein eklemek krizleri sakinleştirir.'],['💪','Bir gün zor geçti diye sistem bitmez.'],['🚶‍♀️','Yürüyüş kısa da olsa sayılır.'],['🫶','Kendine kötü konuşmak yok.'],['☀️','Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span>'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
+  [['🌿','Aç kalmak yok.'],['🍫','Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],['🌙','Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],['🍳','Her öğüne protein eklemek krizleri sakinleştirir.'],['☀️','D vitamini de küçük ritmin bir parçası.'],['💪','Bir gün zor geçti diye sistem bitmez.'],['🚶‍♀️','Yürüyüş kısa da olsa sayılır.'],['🫶','Kendine kötü konuşmak yok.'],['☀️','Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span>'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
   h+='</div>';
   h+='<button onclick="App.printReport()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6B4A3A,#A07A52);box-shadow:0 10px 22px rgba(107,74,58,0.3);margin-top:4px;">Rapor Oluştur / PDF 📄</button>';
   h+='</div>';

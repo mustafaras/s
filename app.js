@@ -79,6 +79,12 @@ var MEALS=[
   {key:'snack',icon:'🍓',label:'Ara öğün',ph:'örn. meyve, kuruyemiş, bitter…'}
 ];
 var SLEEP_Q=[{id:'good',emoji:'😴',label:'Dinç'},{id:'ok',emoji:'🙂',label:'İdare'},{id:'bad',emoji:'😵‍💫',label:'Yorgun'}];
+var WIND_DOWN_STEPS=[
+  {key:'light',icon:'🕯️',label:'Işığı kıs',note:'Melatonin baskılanmasını azaltır.'},
+  {key:'breath',icon:'🫁',label:'4-7-8 nefes',note:'Parasempatik sistemi aktive eder.'},
+  {key:'dump',icon:'📝',label:'Zihin boşalt',note:'Yarın notu, ruminasyonu düşürür.'},
+  {key:'cool',icon:'🌙',label:'Odayı serinlet',note:'18-20°C aralığı dalmayı destekler.'}
+];
 var FLOW=[{id:'spot',emoji:'🩸',label:'Leke'},{id:'light',emoji:'🌸',label:'Hafif'},{id:'medium',emoji:'🌺',label:'Orta'},{id:'heavy',emoji:'🌹',label:'Yoğun'}];
 var SYMPTOMS=[{id:'kramp',emoji:'🤕',label:'Kramp'},{id:'bas',emoji:'🤯',label:'Baş ağrısı'},{id:'siskinlik',emoji:'🎈',label:'Şişkinlik'},{id:'yorgun',emoji:'🥱',label:'Yorgunluk'},{id:'duygu',emoji:'🥲',label:'Duygusal'},{id:'istah',emoji:'🍫',label:'İştah'},{id:'sanci',emoji:'⚡',label:'Sancı'},{id:'cilt',emoji:'🌋',label:'Cilt'}];
 // 4 menstrüel faz — kısa bilimsel notlar (tıbbi tavsiye değildir)
@@ -109,8 +115,8 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false};
-var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0};
+var sosInterval=null, sleepRitualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -128,7 +134,8 @@ function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
 function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null}; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
+function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,cool:false},lastMinutes:null,lastDoneAt:null}; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null,windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null,windDown:emptyWindDown()}; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
@@ -204,6 +211,61 @@ App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function()
 // ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
 App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; day.savedAt=new Date().toISOString(); save(); }); };
 App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
+App.toggleWindDownStep=function(key){
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var wd=day.sleep.windDown||emptyWindDown();
+  if(!wd.steps) wd.steps=emptyWindDown().steps;
+  if(!(key in wd.steps)) return;
+  wd.steps[key]=!wd.steps[key];
+  var allDone=WIND_DOWN_STEPS.every(function(s){ return !!wd.steps[s.key]; });
+  if(allDone) wd.lastDoneAt=new Date().toISOString();
+  day.sleep.windDown=wd;
+  day.savedAt=new Date().toISOString();
+  commit(wd.steps[key]?'Ritüel adımı tamamlandı ✨':undefined);
+};
+App.startWindDown=function(minutes){
+  var m=Math.max(5,Math.min(30,Number(minutes)||10));
+  clearInterval(sleepRitualInterval);
+  ui.sleepRitualTiming=true;
+  ui.sleepRitualLeft=m*60;
+  ui.sleepRitualTotal=m*60;
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!day.sleep.windDown) day.sleep.windDown=emptyWindDown();
+  day.sleep.windDown.lastMinutes=m;
+  day.savedAt=new Date().toISOString();
+  save();
+  render();
+  sleepRitualInterval=setInterval(function(){
+    ui.sleepRitualLeft--;
+    if(ui.sleepRitualLeft<=0){
+      clearInterval(sleepRitualInterval);
+      ui.sleepRitualLeft=0;
+      ui.sleepRitualTiming=false;
+      var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
+      if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
+      d.sleep.windDown.lastDoneAt=new Date().toISOString();
+      d.savedAt=new Date().toISOString();
+      save();
+      render();
+      toast('Uyku ritüeli tamamlandı. İyi geceler 🌙',2600);
+    } else {
+      updateWindDownTimer();
+    }
+  },1000);
+};
+App.stopWindDown=function(){
+  clearInterval(sleepRitualInterval);
+  ui.sleepRitualTiming=false;
+  ui.sleepRitualLeft=0;
+  ui.sleepRitualTotal=0;
+  render();
+};
+function updateWindDownTimer(){
+  var clock=document.getElementById('sleep-ritual-clock');
+  if(clock) clock.textContent=pad(Math.floor(ui.sleepRitualLeft/60))+':'+pad(ui.sleepRitualLeft%60);
+  var bar=document.getElementById('sleep-ritual-fill');
+  if(bar){ var pct=ui.sleepRitualTotal?Math.max(0,Math.min(100,Math.round((1-ui.sleepRitualLeft/ui.sleepRitualTotal)*100))):0; bar.style.width=pct+'%'; }
+}
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); day.savedAt=new Date().toISOString(); save(); }); };
 App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.minutes!=null&&day.walk.minutes>=20&&!day.habits.walked20){ day.habits.walked20=true; toast('20 dk yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
 
@@ -243,6 +305,10 @@ App.setFlow=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())
 App.toggleSymptom=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var i=day.symptoms.indexOf(id); if(i>=0) day.symptoms.splice(i,1); else day.symptoms.push(id); day.savedAt=new Date().toISOString(); commit(); };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 App.goSos=function(){ App.go('sos'); };
+App.quickSleepRitual=function(){
+  App.go('saglik');
+  setTimeout(function(){ App.startWindDown(10); },120);
+};
 
 App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
 App.startSosTimer=function(){ clearInterval(sosInterval); ui.sosTiming=true; ui.sosLeft=600; render(); sosInterval=setInterval(function(){ ui.sosLeft--; if(ui.sosLeft<=0){ clearInterval(sosInterval); ui.sosLeft=0; ui.sosTiming=false; render(); toast('10 dakika doldu. Şimdi kararı sen ver ✨',2600); } else { updateSosTimer(); } },1000); };
@@ -425,6 +491,7 @@ function bugunHTML(){
 
   // SOS button
   h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi 🍫🚨</button>';
+  h+='<button onclick="App.quickSleepRitual()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Gece ritüelini başlat 🌙✨</span></button>';
 
   // habits
   h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">BUGÜNÜN TİKLERİ</div>';
@@ -682,9 +749,28 @@ function sparkCard(){
   return h;
 }
 
+function sleepReadiness(rec){
+  var sl=rec&&rec.sleep?rec.sleep:{};
+  var wd=sl.windDown&&sl.windDown.steps?sl.windDown.steps:emptyWindDown().steps;
+  var completed=WIND_DOWN_STEPS.reduce(function(a,s){ return a+(wd[s.key]?1:0); },0);
+  var score=35+(completed*10);
+  var hours=num(sl.hours);
+  if(hours!=null){ var diff=Math.abs(7.5-hours); score+=Math.max(0,28-Math.round(diff*10)); }
+  if(sl.quality==='good') score+=14;
+  else if(sl.quality==='ok') score+=8;
+  score=Math.max(0,Math.min(100,score));
+  var tier='Rahat';
+  if(score>=85) tier='Mükemmel';
+  else if(score>=70) tier='Güçlü';
+  else if(score>=55) tier='Dengeli';
+  return {score:score,tier:tier,completed:completed};
+}
+
 function saglikHTML(){
   var today=todayStr(); var rec=data.days[today]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
+  var wd=sl.windDown||emptyWindDown();
+  var readiness=sleepReadiness(rec);
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;">Sağlık 🌸</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Uyku, yürüyüş ve döngü — küçük veriler, büyük resim.</div></div>';
   h+=activityRings(rec);
@@ -693,7 +779,17 @@ function saglikHTML(){
   h+='<div style="display:flex;align-items:center;gap:10px;"><input type="number" inputmode="decimal" step="0.5" min="0" max="24" value="'+(sl.hours!=null?esc(sl.hours):'')+'" oninput="App.setSleepHours(this)" placeholder="7.5" style="width:92px;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:14px;color:var(--muted);">saat uyudum</span></div>';
   h+='<div style="display:flex;gap:8px;">';
   SLEEP_Q.forEach(function(q){ var sel=sl.quality===q.id; h+='<button onclick="App.setSleepQuality(\''+q.id+'\')" style="flex:1;padding:10px 4px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#F7E9F1);border:1px solid #B89BD9;color:#4A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:20px;">'+q.emoji+'</span><span style="font-size:11px;font-weight:600;">'+q.label+'</span></button>'; });
-  h+='</div></div>';
+  h+='</div>';
+  h+='<div style="border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(138,117,200,0.2),rgba(233,175,193,0.16));border:1px solid rgba(155,127,201,0.3);display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+readiness.completed+'/4 adım</div></div>';
+  h+='<div style="display:flex;flex-direction:column;gap:7px;">';
+  WIND_DOWN_STEPS.forEach(function(s){ var done=!!(wd.steps&&wd.steps[s.key]); h+='<button onclick="App.toggleWindDownStep(\''+s.key+'\')" style="border-radius:12px;padding:9px 11px;cursor:pointer;display:flex;align-items:center;gap:9px;text-align:left;'+(done?'background:linear-gradient(135deg,rgba(239,228,255,0.85),rgba(251,227,232,0.9));border:1px solid rgba(184,155,217,0.9);':'background:rgba(255,255,255,0.45);border:1px solid rgba(155,127,201,0.22);')+'"><span style="font-size:17px;">'+s.icon+'</span><span style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;"><span style="font-size:13px;font-weight:700;color:var(--text);">'+s.label+'</span><span style="font-size:11px;color:var(--muted);">'+s.note+'</span></span><span style="font-size:15px;color:'+(done?'#7B57B4':'var(--faint)')+';">'+(done?'✓':'○')+'</span></button>'; });
+  h+='</div>';
+  h+='<div style="display:flex;gap:7px;">'+[10,15,20].map(function(m){ return '<button onclick="App.startWindDown('+m+')" style="flex:1;border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:9px;border-radius:12px;font-size:12.5px;font-weight:700;color:#5A457A;background:rgba(255,255,255,0.62);">'+m+' dk</button>'; }).join('')+'</div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><div id="sleep-ritual-clock" style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);min-width:66px;">'+(ui.sleepRitualTiming?(pad(Math.floor(ui.sleepRitualLeft/60))+':'+pad(ui.sleepRitualLeft%60)):'00:00')+'</div><div style="flex:1;height:8px;border-radius:999px;background:rgba(90,69,122,0.18);overflow:hidden;"><div id="sleep-ritual-fill" style="height:100%;width:'+(ui.sleepRitualTiming?(Math.round((1-ui.sleepRitualLeft/(ui.sleepRitualTotal||1))*100)):0)+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);transition:width .35s ease;"></div></div>'+(ui.sleepRitualTiming?'<button onclick="App.stopWindDown()" style="border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:700;color:#5A457A;background:rgba(255,255,255,0.72);">Durdur</button>':'')+'</div>';
+  h+='<div style="font-size:11.5px;line-height:1.45;color:var(--muted);">Ritüel sırası: ışık → nefes → zihni boşaltma → serin/karanlık oda. Düzenli tekrar, uykuya dalma süresini kısaltmaya yardımcı olur.</div>';
+  h+='</div>';
+  h+='</div>';
   // yürüyüş
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Yürüyüş 🚶‍♀️</div>';
   h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Adım</div><input type="number" inputmode="numeric" min="0" value="'+(wk.steps!=null?esc(wk.steps):'')+'" oninput="App.setWalkSteps(this)" placeholder="6200" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div>';

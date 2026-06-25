@@ -7,17 +7,20 @@
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;color:#2C2426;background:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);min-height:100vh;}
-  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px;}
+  .wrap{max-width:980px;margin:0 auto;padding:18px 16px 60px;}
   .glass{background:rgba(255,255,255,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.75);border-radius:20px;}
   .muted{color:#7A6B70;} .faint{color:#9C8C92;} .accent{color:#C77D93;}
   h1{font-size:26px;margin:0;font-weight:800;}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
   .chip{padding:13px;border-radius:16px;}
   .bar{height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;}
   .barfill{height:100%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);}
   button{font:inherit;cursor:pointer;}
   a{color:#C77D93;}
+  .alert{border-radius:14px;padding:11px 12px;font-size:12.5px;line-height:1.45;}
+  @media(max-width:760px){ .grid3{grid-template-columns:1fr;} }
   @media(max-width:520px){ .grid4{grid-template-columns:repeat(2,1fr);} }
 </style>
 </head>
@@ -85,22 +88,63 @@ function cycleStats(){
 
 function card(inner,pad){return '<div class="glass" style="padding:'+(pad||16)+'px;">'+inner+'</div>';}
 function bars(days,valFn,grad){var max=1;days.forEach(function(o){max=Math.max(max,valFn(o));});var h='<div style="display:flex;align-items:flex-end;gap:2px;height:50px;">';days.forEach(function(o){var v=valFn(o);var hh=v?Math.max(4,Math.round(v/max*50)):2;h+='<div style="flex:1;height:'+hh+'px;border-radius:3px;background:'+grad+';opacity:'+(v?1:0.22)+';"></div>';});return h+'</div>';}
+function completion(rec){return Math.round((countRec(rec)/HT)*100);}
+function consistency(days,minPct){var ok=0;days.forEach(function(o){if(completion(o.rec)>=minPct)ok++;});return days.length?Math.round((ok/days.length)*100):0;}
+function avgTicks(days){if(!days.length)return 0;return (days.reduce(function(a,o){return a+countRec(o.rec);},0)/days.length);}
+function avgSteps(days){var n=0,s=0;days.forEach(function(o){var v=o.rec&&o.rec.walk?o.rec.walk.steps:null;if(v!=null){n++;s+=Number(v)||0;}});return n?Math.round(s/n):null;}
+function avgSleep(days){var n=0,s=0;days.forEach(function(o){var v=o.rec&&o.rec.sleep?o.rec.sleep.hours:null;if(v!=null){n++;s+=Number(v)||0;}});return n?Math.round((s/n)*10)/10:null;}
+function toughMoodCount(days){var n=0;days.forEach(function(o){var m=o.rec&&o.rec.mood;if(m==='zorlandim'||m==='cok-zorlandim')n++;});return n;}
+function freshness(savedAt){
+  if(!savedAt) return {label:'Kayıt yok',color:'#C0605F',bg:'rgba(192,96,95,0.12)'};
+  var mins=Math.max(0,Math.round((Date.now()-new Date(savedAt).getTime())/60000));
+  if(mins<=180) return {label:'Canlı (son 3 saat)',color:'#3F8A4F',bg:'rgba(143,191,138,0.18)'};
+  if(mins<=1440) return {label:'Bugün güncellendi',color:'#7A6B70',bg:'rgba(155,127,201,0.12)'};
+  return {label:'Güncelleme gecikmiş',color:'#C0605F',bg:'rgba(192,96,95,0.12)'};
+}
+function trendBadge(now,prev){
+  var d=now-prev;
+  if(Math.abs(d)<0.05) return {txt:'Sabit',c:'#7A6B70'};
+  return d>0?{txt:'↑ İyileşiyor',c:'#3F8A4F'}:{txt:'↓ Düşüş var',c:'#C0605F'};
+}
+function riskLevel(last7,savedAt){
+  var score=0, avg=avgTicks(last7), tough=toughMoodCount(last7);
+  if(avg<2.5) score+=2; else if(avg<3.5) score+=1;
+  if(tough>=3) score+=2; else if(tough>=2) score+=1;
+  var stale=!savedAt || (Date.now()-new Date(savedAt).getTime())>36*60*60*1000;
+  if(stale) score+=2;
+  if(score<=1) return {label:'Düşük risk',color:'#3F8A4F',bg:'rgba(143,191,138,0.18)'};
+  if(score<=3) return {label:'Orta risk',color:'#B87D1E',bg:'rgba(232,165,60,0.16)'};
+  return {label:'Yakın takip',color:'#C0605F',bg:'rgba(192,96,95,0.14)'};
+}
 
 function lastSavedAt(){ var best=null; for(var d in D.days){ var s=D.days[d]&&D.days[d].savedAt; if(s&&(!best||s>best)) best=s; } return best; }
 function render(){
   var savedAt=lastSavedAt();
   var t=today();var rec=D.days[t]||null;
   var cur=currentStreak(),best=bestStreak(allDays()),trk=tracked(),todayTicks=countRec(rec);
-  var last30=lastN(30),last7=lastN(7),last14=lastN(14);
+  var last30=lastN(30),last14=lastN(14),last7=last30.slice(23),prev7=last30.slice(16,23);
+  var fresh=freshness(savedAt), risk=riskLevel(last7,savedAt);
+  var avg7=avgTicks(last7), avgPrev7=avgTicks(prev7), trend=trendBadge(avg7,avgPrev7);
+  var c85=consistency(last30,85), c55=consistency(last30,55), st7=avgSteps(last7), sl7=avgSleep(last7);
   var h='';
   // header
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;">';
-  h+='<div><h1>Şeyma 🦩 <span class="faint" style="font-size:15px;font-weight:600;">Panel</span></h1><div class="faint" style="font-size:13px;margin-top:2px;">Son kayıt: '+(savedAt?new Date(savedAt).toLocaleString('tr-TR'):'—')+'</div></div>';
+  h+='<div><h1>Şeyma 🦩 <span class="faint" style="font-size:15px;font-weight:600;">Uzaktan İzlem Paneli</span></h1><div class="faint" style="font-size:13px;margin-top:2px;">Son kayıt: '+(savedAt?new Date(savedAt).toLocaleString('tr-TR'):'—')+'</div></div>';
   h+='<button onclick="location.reload()" class="glass" style="border:none;padding:10px 14px;border-radius:14px;font-weight:700;color:#6B4A3A;">Yenile ⟳</button></div>';
+  // executive summary
+  h+='<div class="grid3" style="margin-bottom:12px;">';
+  h+='<div class="alert glass" style="background:'+fresh.bg+';color:'+fresh.color+';"><b>Veri durumu:</b> '+fresh.label+'</div>';
+  h+='<div class="alert glass" style="background:'+risk.bg+';color:'+risk.color+';"><b>Durum:</b> '+risk.label+'</div>';
+  h+='<div class="alert glass" style="background:rgba(201,184,255,0.14);color:'+trend.c+';"><b>7g trend:</b> '+trend.txt+' · '+avg7.toFixed(1)+'/'+HT+'</div>';
+  h+='</div>';
   // chips
   h+='<div class="grid4" style="margin-bottom:12px;">';
   [['🔥 Seri',cur+' g'],['🏆 En iyi',best+' g'],['🗓️ Takip',trk+' g'],['✅ Bugün',todayTicks+'/'+HT]].forEach(function(c){ h+='<div class="glass chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
+  [['📈 Son 7g ort.',avg7.toFixed(1)+'/'+HT],['🎯 %85+ gün',c85+'%'],['🧭 %55+ gün',c55+'%'],['🩺 Zor mod (7g)',toughMoodCount(last7)+' gün']].forEach(function(c){ h+='<div class="glass chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
+  [['👟 Adım ort. (7g)',(st7!=null?st7:'—')],['😴 Uyku ort. (7g)',(sl7!=null?sl7+' sa':'—')],['🔁 Haftalık fark',(avg7-avgPrev7>=0?'+':'')+(avg7-avgPrev7).toFixed(1)],['🧮 Veri kaydı',Object.keys(D.days||{}).length+' gün']].forEach(function(c){ h+='<div class="glass chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
   h+='</div>';
+  // compare windows
+  h+=card('<div style="font-weight:700;margin-bottom:8px;">Haftalık karşılaştırma (Son 7 gün vs Önceki 7)</div><div class="grid3"><div class="chip" style="background:rgba(233,137,159,0.11);"><div class="faint" style="font-size:11px;">Tik ortalaması</div><div style="font-size:17px;font-weight:800;">'+avg7.toFixed(1)+' vs '+avgPrev7.toFixed(1)+'</div></div><div class="chip" style="background:rgba(143,191,138,0.11);"><div class="faint" style="font-size:11px;">Zor mod günü</div><div style="font-size:17px;font-weight:800;">'+toughMoodCount(last7)+' vs '+toughMoodCount(prev7)+'</div></div><div class="chip" style="background:rgba(155,127,201,0.12);"><div class="faint" style="font-size:11px;">Tutarlılık (%55+)</div><div style="font-size:17px;font-weight:800;">'+consistency(last7,55)+'% vs '+consistency(prev7,55)+'%</div></div></div>')+'<div style="height:12px;"></div>';
   // 14 day grid
   h+=card('<div style="font-weight:700;margin-bottom:10px;">Son 14 gün</div><div style="display:flex;gap:5px;">'+last14.map(function(o){var c=countRec(o.rec);var f=c/HT;var bg=f>=1?'#E8A53C':f>0?'rgba(233,137,159,'+(0.3+f*0.6)+')':'rgba(150,110,120,0.12)';var me=o.rec&&o.rec.mood&&MOODS[o.rec.mood]?MOODS[o.rec.mood][0]:'';return '<div style="flex:1;text-align:center;"><div style="aspect-ratio:1;border-radius:9px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:12px;">'+me+'</div><div class="faint" style="font-size:9px;margin-top:3px;">'+o.date.slice(8)+'</div></div>';}).join('')+'</div>')+'<div style="height:12px;"></div>';
   // 30 day trend + habit rates

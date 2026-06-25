@@ -78,6 +78,27 @@ function recOf(d){ return D.days[d]||null; }
 function cnt(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h[0]]?1:0);},0):0; }
 function avg(days,fn){ if(!days.length) return 0; return days.reduce(function(a,d){return a+fn(d);},0)/days.length; }
 function sum(days,fn){ return days.reduce(function(a,d){return a+fn(d);},0); }
+function formatMins(s){ var m=Math.round(s/60); return m+"d"; }
+function formatDuration(sec){
+  if(sec<60) return sec+"s";
+  if(sec<3600) return Math.round(sec/60)+"d";
+  var h=Math.floor(sec/3600), m=Math.round((sec%3600)/60);
+  return h+"s "+m+"d";
+}
+function sessionStats(days){
+  var totalActive=0, totalOpen=0, sessionCount=0;
+  days.forEach(function(d){
+    var rec=recOf(d);
+    if(rec&&Array.isArray(rec.sessions)){
+      rec.sessions.forEach(function(s){
+        sessionCount++;
+        if(s.activeSeconds) totalActive+=s.activeSeconds;
+        if(s.start&&s.end) totalOpen+=(s.end-s.start)/1000;
+      });
+    }
+  });
+  return {sessionCount:sessionCount,totalActive:totalActive,totalOpen:totalOpen,avgActive:sessionCount?Math.round(totalActive/sessionCount):0};
+}
 function spanEnd(){ var e=today(); for(var k in D.days){ if(diff(k,e)>0) e=k; } return e; }
 function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
@@ -150,12 +171,15 @@ function render(){
     '<div class="chip"><div class="faint" style="font-size:11px;">Adim ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+Math.round(curSteps)+'</div><div class="faint" style="font-size:11px;">Onceki: '+Math.round(prevSteps)+'</div></div>'+
     '<div class="chip"><div class="faint" style="font-size:11px;">Uyku ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+(Math.round(curSleep*10)/10).toFixed(1)+' sa</div><div class="faint" style="font-size:11px;">Onceki: '+(Math.round(prevSleep*10)/10).toFixed(1)+' sa</div></div>'+
     '</div>';
+  var curSess=sessionStats(cur), prevSess=sessionStats(prev);
+  h+='<div class="chip" style="padding:12px;margin-bottom:10px;"><div class="faint" style="font-size:11px;">Aralik kullanim suresi</div><div class="mono" style="font-size:19px;font-weight:800;">'+formatDuration(curSess.totalActive)+'</div><div class="faint" style="font-size:11px;margin-top:2px;">'+curSess.sessionCount+' oturum · Ort. '+formatDuration(curSess.avgActive)+' / oturum</div></div>';
   h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Gunluk tik trendi</div>'+lineChart(cur,function(d){return cnt(recOf(d));},HT,"#8c6f2d")+'</div>';
   h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tatli krizi (SOS) grafigi</div>'+barChart(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#b15a4a")+'</div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Mod dagilimi</div><div class="grid2">'+Object.keys(moodDist).map(function(k){var c=moodDist[k];return '<div class="chip" style="padding:10px;"><div class="faint" style="font-size:11px;">'+(MOOD_EMOJI[k]||"")+" "+k+'</div><div class="mono" style="font-size:20px;font-weight:800;">'+c+'</div></div>';}).join("")+'</div></div></div>';
   var habitsHtml=HABITS.map(function(h){ var ok=!!(srec.habits&&srec.habits[h[0]]); return '<div style="font-size:13px;line-height:1.55;">'+(ok?'✅':'⬜')+' '+h[1]+'</div>'; }).join("");
   var opts=(srec.cravingOptionsUsed||[]).map(function(x){return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:4px 8px;border-radius:999px;background:#f4efe7;font-size:11px;">'+esc(x)+'</span>';}).join("");
   var syms=(srec.symptoms||[]).map(function(x){return SYM[x]||x;}).join(", ");
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Secili gun detay ('+shortD(selected)+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Tik: <b>'+cnt(srec)+'/'+HT+'</b> · Mod: <b>'+(MOOD_EMOJI[srec.mood]||"-")+'</b> · SOS: <b>'+(srec.cravingSOSCount||0)+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Adim: <b>'+(srec.walk&&srec.walk.steps!=null?srec.walk.steps:"-")+'</b> · Dakika: <b>'+(srec.walk&&srec.walk.minutes!=null?srec.walk.minutes:"-")+'</b> · Uyku: <b>'+(srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+" sa":"-")+'</b> ('+(SLEEP_Q[srec.sleep&&srec.sleep.quality]||"-")+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Akim: <b>'+(FLOW[srec.flow]||"-")+'</b> · Belirtiler: <b>'+(syms||"-")+'</b></div><div style="margin-top:8px;">'+habitsHtml+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Kahvalti: '+esc(srec.meals&&srec.meals.breakfast?srec.meals.breakfast:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ogle: '+esc(srec.meals&&srec.meals.lunch?srec.meals.lunch:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Aksam: '+esc(srec.meals&&srec.meals.dinner?srec.meals.dinner:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ara: '+esc(srec.meals&&srec.meals.snack?srec.meals.snack:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Not: '+esc(srec.note||"-")+'</div><div class="muted" style="font-size:12px;line-height:1.5;margin-top:8px;">Kriz aksiyonlari: '+(opts||"-")+'</div></div>';
+  var curDaySessions=sessionStats([selected]);
+  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Secili gun detay ('+shortD(selected)+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Tik: <b>'+cnt(srec)+'/'+HT+'</b> · Mod: <b>'+(MOOD_EMOJI[srec.mood]||"-")+'</b> · SOS: <b>'+(srec.cravingSOSCount||0)+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Adim: <b>'+(srec.walk&&srec.walk.steps!=null?srec.walk.steps:"-")+'</b> · Dakika: <b>'+(srec.walk&&srec.walk.minutes!=null?srec.walk.minutes:"-")+'</b> · Uyku: <b>'+(srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+" sa":"-")+'</b> ('+(SLEEP_Q[srec.sleep&&srec.sleep.quality]||"-")+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Akim: <b>'+(FLOW[srec.flow]||"-")+'</b> · Belirtiler: <b>'+(syms||"-")+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Kullanim: <b>'+curDaySessions.sessionCount+' oturum</b> · Aktif: <b>'+formatDuration(curDaySessions.totalActive)+'</b></div><div style="margin-top:8px;">'+habitsHtml+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Kahvalti: '+esc(srec.meals&&srec.meals.breakfast?srec.meals.breakfast:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ogle: '+esc(srec.meals&&srec.meals.lunch?srec.meals.lunch:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Aksam: '+esc(srec.meals&&srec.meals.dinner?srec.meals.dinner:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ara: '+esc(srec.meals&&srec.meals.snack?srec.meals.snack:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Not: '+esc(srec.note||"-")+'</div><div class="muted" style="font-size:12px;line-height:1.5;margin-top:8px;">Kriz aksiyonlari: '+(opts||"-")+'</div></div>';
   var monthHead=['Pzt','Sal','Car','Per','Cum','Cmt','Paz'].map(function(x){return '<div class="faint" style="font-size:11px;text-align:center;font-weight:700;padding:4px 0;">'+x+'</div>';}).join("");
   var daysHtml=monthGrid.map(function(d){
     if(!d) return '<div class="d empty"></div>';

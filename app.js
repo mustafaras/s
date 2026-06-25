@@ -128,7 +128,7 @@ function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
 function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null},walk:{steps:null,minutes:null},flow:null,symptoms:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null}; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null}; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
@@ -818,5 +818,38 @@ function modalsHTML(){
 // boot
 if(data){ data.lastOpenedDate=todayStr(); save(); }
 window.App=App;
+
+// Session tracking
+var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,activeMs:0};
+function recordSession(){
+  if(!data) return;
+  var today=todayStr();
+  var rec=getDay(data,today,diffDays(data.startDate,today));
+  if(!Array.isArray(rec.sessions)) rec.sessions=[];
+  var now=Date.now();
+  var activeSec=Math.max(0,(now-sessionState.start-sessionState.idleMs)/1000);
+  rec.sessions.push({start:sessionState.start,end:now,activeSeconds:Math.round(activeSec)});
+  save();
+}
+function onUserActivity(){
+  sessionState.lastActivity=Date.now();
+}
+document.addEventListener('click',onUserActivity,true);
+document.addEventListener('input',onUserActivity,true);
+document.addEventListener('keydown',onUserActivity,true);
+document.addEventListener('scroll',onUserActivity,true);
+var idleCheckInterval=setInterval(function(){
+  var now=Date.now();
+  var inactiveSince=now-sessionState.lastActivity;
+  if(inactiveSince>300000 && inactiveSince-sessionState.idleMs>60000){
+    sessionState.idleMs+=60000;
+  }
+},60000);
+window.addEventListener('beforeunload',recordSession);
+window.addEventListener('visibilitychange',function(){
+  if(document.hidden) recordSession();
+  else sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,activeMs:0};
+});
+
 render();
 })();

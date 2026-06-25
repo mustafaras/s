@@ -3,35 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Seyma · Observer Panel</title>
+<title>Seyma · Observer Dashboard</title>
 <style>
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;color:#1f2329;background:linear-gradient(165deg,#f7f5f2 0%,#f4f1ee 55%,#efece9 100%);min-height:100vh;}
-  .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 56px;}
-  .card{background:#fff;border:1px solid #ece7e1;border-radius:16px;box-shadow:0 10px 24px rgba(28,24,20,0.06);}
-  .muted{color:#69645d;} .faint{color:#8b847d;} .gold{color:#9b7a2f;}
-  h1{font-size:26px;line-height:1.2;margin:0;font-weight:800;letter-spacing:.2px;}
-  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
-  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
-  .chip{padding:13px;border-radius:14px;border:1px solid #efe9e2;background:#fff;}
-  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-  .seg button{border:1px solid #ded7cf;background:#fff;color:#4b443d;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer;}
-  .seg button.active{border-color:#b79a60;background:#f8f2e5;color:#6c531c;}
-  .btn{border:1px solid #ddd4cb;background:#fff;color:#433d36;padding:10px 13px;border-radius:11px;font-weight:700;cursor:pointer;}
-  .btn-primary{border:none;color:#fff;background:linear-gradient(135deg,#8c6f2d,#b79a60);}
-  .status{padding:10px 12px;border-radius:12px;font-size:12.5px;font-weight:700;}
-  .ok{background:#e9f5eb;color:#2f6f3a;border:1px solid #c8e4cf;}
-  .warn{background:#fff4e4;color:#8b5a15;border:1px solid #f0d7ad;}
-  .danger{background:#fdecec;color:#9a3e3e;border:1px solid #f1c5c5;}
-  .chart{width:100%;height:180px;display:block;}
-  .row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #ece7e1;cursor:pointer;}
-  .row:hover{background:#faf8f5;}
-  .row.active{background:#f4efe7;border-radius:10px;padding:8px;}
-  .mono{font-variant-numeric:tabular-nums;}
-  input[type="date"],input[type="password"]{border:1px solid #ddd4cb;border-radius:11px;padding:10px 12px;font:inherit;outline:none;background:#fff;}
-  @media(max-width:980px){ .grid4{grid-template-columns:repeat(2,minmax(0,1fr));} .grid3{grid-template-columns:1fr;} }
-  @media(max-width:680px){ .grid2{grid-template-columns:1fr;} }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;color:#1f2329;background:linear-gradient(165deg,#f7f5f2 0%,#f4f1ee 55%,#efece9 100%);min-height:100vh}
+  .wrap{max-width:1220px;margin:0 auto;padding:20px 16px 56px}
+  .card{background:#fff;border:1px solid #ece7e1;border-radius:16px;box-shadow:0 10px 24px rgba(28,24,20,.06)}
+  .muted{color:#69645d}.faint{color:#8b847d}.gold{color:#9b7a2f}
+  h1{font-size:27px;line-height:1.2;margin:0;font-weight:800;letter-spacing:.2px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+  .chip{padding:13px;border-radius:14px;border:1px solid #efe9e2;background:#fff}
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg button{border:1px solid #ded7cf;background:#fff;color:#4b443d;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+  .seg button.active{border-color:#b79a60;background:#f8f2e5;color:#6c531c}
+  .btn{border:1px solid #ddd4cb;background:#fff;color:#433d36;padding:10px 13px;border-radius:11px;font-weight:700;cursor:pointer}
+  .btn-primary{border:none;color:#fff;background:linear-gradient(135deg,#8c6f2d,#b79a60)}
+  .status{padding:10px 12px;border-radius:12px;font-size:12.5px;font-weight:700}
+  .ok{background:#e9f5eb;color:#2f6f3a;border:1px solid #c8e4cf}
+  .warn{background:#fff4e4;color:#8b5a15;border:1px solid #f0d7ad}
+  .danger{background:#fdecec;color:#9a3e3e;border:1px solid #f1c5c5}
+  .chart{width:100%;height:180px;display:block}
+  .mono{font-variant-numeric:tabular-nums}
+  .row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #ece7e1;cursor:pointer}
+  .row:hover{background:#faf8f5}
+  .row.active{background:#f4efe7;border-radius:10px;padding:8px}
+  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+  .d{position:relative;border:1px solid #efe9e2;border-radius:10px;padding:7px 6px;min-height:58px;background:#fff;cursor:pointer}
+  .d.active{border-color:#b79a60;background:#f8f2e5}
+  .d.empty{visibility:hidden}
+  .dm{font-size:11px;font-weight:700}
+  .dl{position:absolute;right:6px;top:6px;font-size:10px;color:#7b746c}
+  .db{position:absolute;left:6px;bottom:6px;font-size:10px;font-weight:700;border-radius:999px;padding:2px 6px}
+  .k0{background:#f0eeeb;color:#8b847d}.k1{background:#fef3da;color:#8c6418}.k2{background:#fce2c5;color:#8c4e17}.k3{background:#f7ccb7;color:#8f3c2f}
+  input[type="date"],input[type="month"],input[type="password"]{border:1px solid #ddd4cb;border-radius:11px;padding:10px 12px;font:inherit;outline:none;background:#fff}
+  @media(max-width:1120px){.grid6{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:980px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr}}
+  @media(max-width:680px){.grid2{grid-template-columns:1fr}.grid6{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -46,10 +56,13 @@ var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
 var PTOKEN="";
 var D=null;
-var UI={range:30,selectedDate:null};
-var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D"],["selfKind","Nazik"]];
+var UI={range:30,selectedDate:null,month:null};
+var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["selfKind","Kendine iyi"]];
 var HT=HABITS.length;
-var MOODS={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"🌧️","cok-zorlandim":"🫧"};
+var MOOD_EMOJI={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"🌧️","cok-zorlandim":"🫧"};
+var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
+var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
+var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -59,96 +72,101 @@ function addDays(s,n){ var p=s.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2
 function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number); return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000); }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function shortD(s){ var p=s.split("-"); return p[2]+"."+p[1]; }
-function cnt(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h[0]]?1:0);},0):0; }
+function monthKey(d){ return d.slice(0,7); }
+function monthLabel(ym){ var p=ym.split("-").map(Number),m=["Ocak","Subat","Mart","Nisan","Mayis","Haziran","Temmuz","Agustos","Eylul","Ekim","Kasim","Aralik"]; return m[p[1]-1]+" "+p[0]; }
 function recOf(d){ return D.days[d]||null; }
+function cnt(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h[0]]?1:0);},0):0; }
 function avg(days,fn){ if(!days.length) return 0; return days.reduce(function(a,d){return a+fn(d);},0)/days.length; }
+function sum(days,fn){ return days.reduce(function(a,d){return a+fn(d);},0); }
 function spanEnd(){ var e=today(); for(var k in D.days){ if(diff(k,e)>0) e=k; } return e; }
-function allDays(){
-  var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000;
-  for(var i=0;i<n;i++){ var d=addDays(D.startDate,i); out.push(d); } return out;
-}
-function windowDays(n,endDate){
-  var out=[],end=endDate||today();
-  for(var i=n-1;i>=0;i--) out.push(addDays(end,-i));
-  return out;
-}
-function currentStreak(){
-  var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1);
-  while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1); } else break; }
-  return c;
-}
-function bestStreak(days){
-  var b=0,c=0;
-  days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else c=0; });
-  return b;
-}
-function lastSavedAt(){
-  var best=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!best||s>best)) best=s; }
-  return best;
-}
-function freshness(saved){
-  if(!saved) return {klass:"warn",txt:"Baglanti var ama kayit bekleniyor"};
-  var mins=Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000));
-  if(mins<=180) return {klass:"ok",txt:"Canli takip aktif"};
-  if(mins<=1440) return {klass:"warn",txt:"Bugun guncellendi"};
-  return {klass:"danger",txt:"Guncelleme gecikmis"};
+function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
+function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
+function currentStreak(){ var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1);} else break; } return c; }
+function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else c=0;}); return b; }
+function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
+function freshness(saved){ if(!saved) return {klass:"warn",txt:"Baglanti var ama kayit bekleniyor"}; var mins=Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)); if(mins<=180) return {klass:"ok",txt:"Canli takip aktif"}; if(mins<=1440) return {klass:"warn",txt:"Bugun guncellendi"}; return {klass:"danger",txt:"Guncelleme gecikmis"}; }
+function trend(now,prev){ var d=now-prev; if(Math.abs(d)<0.01) return "↔ "+d.toFixed(1); return (d>=0?"↑ ":"↓ ")+Math.abs(d).toFixed(1); }
+function risk(days,saved){
+  var a=avg(days,function(d){return cnt(recOf(d));});
+  var s=sum(days,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;});
+  var m=sum(days,function(d){var r=recOf(d);return r&&(r.mood==="zorlandim"||r.mood==="cok-zorlandim")?1:0;});
+  var stale=!saved||(Date.now()-new Date(saved).getTime())>36*60*60*1000;
+  var score=0; if(a<2.5)score+=2; else if(a<3.5)score+=1; if(s>=4)score+=2; else if(s>=2)score+=1; if(m>=3)score+=1; if(stale)score+=2;
+  if(score<=1) return {klass:"ok",txt:"Dusuk risk"}; if(score<=3) return {klass:"warn",txt:"Orta risk"}; return {klass:"danger",txt:"Yakin takip"};
 }
 function lineChart(days,valFn,max,color){
-  var w=760,h=180,p=18,innerW=w-p*2,innerH=h-p*2;
-  var m=max||1,pts=days.map(function(d,i){
-    var x=p+(days.length<=1?0:(i/(days.length-1))*innerW);
-    var y=p+innerH-(Math.max(0,valFn(d))/m)*innerH;
-    return [x,y];
-  });
-  var poly=pts.map(function(a){ return a[0].toFixed(1)+","+a[1].toFixed(1); }).join(" ");
-  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+innerW+'" height="'+innerH+'" fill="#faf7f3" stroke="#eee6dc"/><polyline fill="none" stroke="'+color+'" stroke-width="3" points="'+poly+'"/>'+pts.map(function(a){return '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="2.7" fill="'+color+'"/>';}).join("")+'</svg>';
+  var w=760,h=180,p=18,iw=w-p*2,ih=h-p*2,m=max||1;
+  var pts=days.map(function(d,i){ var x=p+(days.length<=1?0:(i/(days.length-1))*iw), y=p+ih-(Math.max(0,valFn(d))/m)*ih; return [x,y]; });
+  var poly=pts.map(function(a){return a[0].toFixed(1)+","+a[1].toFixed(1);}).join(" ");
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#faf7f3" stroke="#eee6dc"/><polyline fill="none" stroke="'+color+'" stroke-width="3" points="'+poly+'"/>'+pts.map(function(a){return '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="2.6" fill="'+color+'"/>';}).join("")+'</svg>';
 }
 function barChart(days,valFn,max,color){
-  var w=760,h=120,p=12,innerW=w-p*2,innerH=h-p*2,bw=Math.max(2,innerW/days.length-2),m=max||1;
-  var bars=days.map(function(d,i){
-    var v=Math.max(0,valFn(d)),bh=(v/m)*innerH,x=p+i*(innerW/days.length)+1,y=p+innerH-bh;
-    return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(2,bh).toFixed(1)+'" rx="2" fill="'+color+'" opacity="'+(v?0.88:0.2)+'"/>';
-  }).join("");
-  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+innerW+'" height="'+innerH+'" fill="#faf7f3" stroke="#eee6dc"/>'+bars+'</svg>';
+  var w=760,h=120,p=12,iw=w-p*2,ih=h-p*2,bw=Math.max(2,iw/days.length-2),m=max||1;
+  var bars=days.map(function(d,i){ var v=Math.max(0,valFn(d)),bh=(v/m)*ih,x=p+i*(iw/days.length)+1,y=p+ih-bh; return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(2,bh).toFixed(1)+'" rx="2" fill="'+color+'" opacity="'+(v?0.88:0.22)+'"/>'; }).join("");
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#faf7f3" stroke="#eee6dc"/>'+bars+'</svg>';
 }
-function setRange(n){ UI.range=n; render(); }
-function setSelectedDate(v){ UI.selectedDate=v||today(); render(); }
-function pickDay(d){ UI.selectedDate=d; render(); }
-window.setRange=setRange; window.setSelectedDate=setSelectedDate; window.pickDay=pickDay;
+function monthDays(ym){
+  var p=ym.split("-").map(Number),f=new Date(p[0],p[1]-1,1),l=new Date(p[0],p[1],0),out=[];
+  var firstDow=(f.getDay()+6)%7; for(var i=0;i<firstDow;i++) out.push(null);
+  for(var d=1;d<=l.getDate();d++) out.push(p[0]+"-"+pad(p[1])+"-"+pad(d));
+  while(out.length%7!==0) out.push(null); return out;
+}
+function monthSummary(all){
+  var map={}; all.forEach(function(d){ var k=monthKey(d),r=recOf(d); if(!map[k]) map[k]={days:0,ticks:0,sos:0}; map[k].days++; map[k].ticks+=cnt(r); map[k].sos+=(r&&r.cravingSOSCount?Number(r.cravingSOSCount):0); });
+  return Object.keys(map).sort().reverse().map(function(k){ var m=map[k]; m.month=k; m.avg=m.days?m.ticks/m.days:0; return m; });
+}
+
+function setRange(n){ UI.range=n; render(); } window.setRange=setRange;
+function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.selectedDate); render(); } window.setSelectedDate=setSelectedDate;
+function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
+function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
 
 function render(){
-  var saved=lastSavedAt(),fresh=freshness(saved),all=allDays();
-  var selected=UI.selectedDate&&D.days[UI.selectedDate]?UI.selectedDate:today();
+  var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
+  if(!UI.month) UI.month=monthKey(selected);
   UI.selectedDate=selected;
-  var srec=recOf(selected), st=windowDays(UI.range,today()), prev=windowDays(UI.range,addDays(today(),-UI.range));
-  var stAvg=avg(st,function(d){return cnt(recOf(d));}), pvAvg=avg(prev,function(d){return cnt(recOf(d));});
-  var stSteps=avg(st,function(d){ var r=recOf(d); return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0; });
-  var pvSteps=avg(prev,function(d){ var r=recOf(d); return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0; });
-  var stSleep=avg(st,function(d){ var r=recOf(d); return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0; });
-  var pvSleep=avg(prev,function(d){ var r=recOf(d); return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0; });
-  var trend=(stAvg-pvAvg)>=0?"↑":"↓";
+  var srec=recOf(selected)||{};
+  var cur=windowDays(UI.range,today()), prev=windowDays(UI.range,addDays(today(),-UI.range));
+  var curAvg=avg(cur,function(d){return cnt(recOf(d));}), prevAvg=avg(prev,function(d){return cnt(recOf(d));});
+  var curSos=sum(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;}), prevSos=sum(prev,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;});
+  var curSteps=avg(cur,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;}), prevSteps=avg(prev,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;});
+  var curSleep=avg(cur,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;}), prevSleep=avg(prev,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;});
+  var rsk=risk(cur,saved), months=monthSummary(all).slice(0,8), monthGrid=monthDays(UI.month);
+  var moodDist={"cok-iyi":0,"iyi":0,"normal":0,"zorlandim":0,"cok-zorlandim":0};
+  cur.forEach(function(d){var r=recOf(d); if(r&&r.mood&&moodDist[r.mood]!=null) moodDist[r.mood]++;});
+  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();}).slice(0,40);
+  var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;}).slice(0,40);
+
   var h="";
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;"><div><h1>Observer Panel</h1><div class="faint mono" style="font-size:13px;margin-top:3px;">Son senkron: '+(saved?new Date(saved).toLocaleString("tr-TR"):"-")+'</div></div><div class="toolbar"><button class="btn" onclick="location.reload()">Yenile</button><button class="btn" onclick="resetPanelToken()">Yeni anahtar</button></div></div>';
-  h+='<div class="status '+fresh.klass+'" style="margin-bottom:10px;">'+fresh.txt+'</div>';
-  h+='<div class="card" style="padding:12px;margin-bottom:10px;"><div class="toolbar"><span class="muted" style="font-weight:700;">Aralik</span><div class="seg">'+[7,14,30,90].map(function(n){return '<button class="'+(UI.range===n?'active':'')+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("")+'</div><span class="muted" style="font-weight:700;margin-left:8px;">Gun sec</span><input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)"></div></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;"><div><h1>Observer Dashboard</h1><div class="faint mono" style="font-size:13px;margin-top:3px;">Son senkron: '+(saved?new Date(saved).toLocaleString("tr-TR"):"-")+'</div></div><div class="toolbar"><button class="btn" onclick="location.reload()">Yenile</button><button class="btn" onclick="resetPanelToken()">Yeni anahtar</button></div></div>';
+  h+='<div class="status '+fresh.klass+'" style="margin-bottom:8px;">'+fresh.txt+'</div><div class="status '+rsk.klass+'" style="margin-bottom:10px;">Risk durumu: '+rsk.txt+'</div>';
+  h+='<div class="card" style="padding:12px;margin-bottom:10px;"><div class="toolbar"><span class="muted" style="font-weight:700;">Aralik</span><div class="seg">'+[7,14,30,90,365].map(function(n){return '<button class="'+(UI.range===n?'active':'')+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("")+'</div><span class="muted" style="font-weight:700;margin-left:8px;">Gun</span><input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)"><span class="muted" style="font-weight:700;">Ay</span><input type="month" value="'+esc(UI.month)+'" onchange="setMonth(this.value)"></div></div>';
+  h+='<div class="grid6" style="margin-bottom:10px;">'+
+    [['Aktif seri',currentStreak()+' g'],['En iyi seri',bestStreak(all)+' g'],['Takip gunu',Object.keys(D.days||{}).length+' g'],['Secili gun',shortD(selected)],['Aralik tik ort.',curAvg.toFixed(1)+' / '+HT],['Aralik SOS',curSos+'']].map(function(c){return '<div class="chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div class="mono" style="font-size:23px;font-weight:800;margin-top:4px;">'+c[1]+'</div></div>';}).join("")+
+    '</div>';
   h+='<div class="grid4" style="margin-bottom:10px;">'+
-    [['Aktif seri',currentStreak()+' g'],['En iyi seri',bestStreak(all)+' g'],['Takip gunu',Object.keys(D.days||{}).length+' g'],['Secili gun',shortD(selected)]].map(function(c){return '<div class="chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div class="mono" style="font-size:23px;font-weight:800;margin-top:4px;">'+c[1]+'</div></div>';}).join("")+
+    '<div class="chip"><div class="faint" style="font-size:11px;">Tik karsilastirma</div><div class="mono" style="font-size:20px;font-weight:800;">'+curAvg.toFixed(1)+' <span class="gold" style="font-size:12px;">'+trend(curAvg,prevAvg)+'</span></div><div class="faint" style="font-size:11px;">Onceki: '+prevAvg.toFixed(1)+'</div></div>'+
+    '<div class="chip"><div class="faint" style="font-size:11px;">SOS karsilastirma</div><div class="mono" style="font-size:20px;font-weight:800;">'+curSos+' <span class="gold" style="font-size:12px;">'+trend(curSos,prevSos)+'</span></div><div class="faint" style="font-size:11px;">Onceki: '+prevSos+'</div></div>'+
+    '<div class="chip"><div class="faint" style="font-size:11px;">Adim ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+Math.round(curSteps)+'</div><div class="faint" style="font-size:11px;">Onceki: '+Math.round(prevSteps)+'</div></div>'+
+    '<div class="chip"><div class="faint" style="font-size:11px;">Uyku ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+(Math.round(curSleep*10)/10).toFixed(1)+' sa</div><div class="faint" style="font-size:11px;">Onceki: '+(Math.round(prevSleep*10)/10).toFixed(1)+' sa</div></div>'+
     '</div>';
-  h+='<div class="grid3" style="margin-bottom:10px;">'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Tik ort. ('+UI.range+'g)</div><div class="mono" style="font-size:22px;font-weight:800;">'+stAvg.toFixed(1)+' / '+HT+' <span class="'+((stAvg-pvAvg)>=0?'gold':'muted')+'" style="font-size:13px;">'+trend+' '+(stAvg-pvAvg).toFixed(1)+'</span></div><div class="faint" style="font-size:11px;">Onceki '+UI.range+'g: '+pvAvg.toFixed(1)+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Adim ort.</div><div class="mono" style="font-size:22px;font-weight:800;">'+Math.round(stSteps)+'</div><div class="faint" style="font-size:11px;">Onceki: '+Math.round(pvSteps)+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Uyku ort.</div><div class="mono" style="font-size:22px;font-weight:800;">'+(Math.round(stSleep*10)/10).toFixed(1)+' sa</div><div class="faint" style="font-size:11px;">Onceki: '+(Math.round(pvSleep*10)/10).toFixed(1)+' sa</div></div>'+
-    '</div>';
-  h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Karsilastirmali tik trendi</div>'+lineChart(st,function(d){return cnt(recOf(d));},HT,"#8c6f2d")+'</div>';
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Adim grafigi</div>'+barChart(st,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;},12000,"#9b7a2f")+'</div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Uyku grafigi</div>'+barChart(st,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;},10,"#6f6a63")+'</div></div>';
-  var mood=srec&&srec.mood?MOODS[srec.mood]||"":"";
-  var meals=srec&&srec.meals?srec.meals:{};
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Secili gun detay ('+shortD(selected)+')</div><div class="muted" style="font-size:13px;line-height:1.6;">Tik: <b>'+cnt(srec)+'/'+HT+'</b> · Mod: <b>'+mood+'</b></div><div class="muted" style="font-size:13px;line-height:1.6;">Adim: <b>'+(srec&&srec.walk&&srec.walk.steps!=null?srec.walk.steps:"-")+'</b> · Uyku: <b>'+(srec&&srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+" sa":"-")+'</b></div><div class="muted" style="font-size:13px;line-height:1.6;">Kahvalti: '+esc(meals.breakfast||"-")+'</div><div class="muted" style="font-size:13px;line-height:1.6;">Ogle: '+esc(meals.lunch||"-")+'</div><div class="muted" style="font-size:13px;line-height:1.6;">Aksam: '+esc(meals.dinner||"-")+'</div><div class="muted" style="font-size:13px;line-height:1.6;">Not: '+esc(srec&&srec.note?srec.note:"-")+'</div></div>';
-  var rows=all.slice().reverse().map(function(d){
-    var r=recOf(d),active=d===selected?" active":"";
-    return '<div class="row'+active+'" onclick="pickDay(\''+d+'\')"><div style="min-width:78px;font-size:12px;font-weight:700;">'+shortD(d)+'</div><div style="min-width:52px;" class="mono faint">'+cnt(r)+'/'+HT+'</div><div style="min-width:26px;">'+(r&&r.mood?MOODS[r.mood]||"": "")+'</div><div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r&&r.note?String(r.note).slice(0,52):"")+'</div></div>';
+  h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Gunluk tik trendi</div>'+lineChart(cur,function(d){return cnt(recOf(d));},HT,"#8c6f2d")+'</div>';
+  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tatli krizi (SOS) grafigi</div>'+barChart(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#b15a4a")+'</div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Mod dagilimi</div><div class="grid2">'+Object.keys(moodDist).map(function(k){var c=moodDist[k];return '<div class="chip" style="padding:10px;"><div class="faint" style="font-size:11px;">'+(MOOD_EMOJI[k]||"")+" "+k+'</div><div class="mono" style="font-size:20px;font-weight:800;">'+c+'</div></div>';}).join("")+'</div></div></div>';
+  var habitsHtml=HABITS.map(function(h){ var ok=!!(srec.habits&&srec.habits[h[0]]); return '<div style="font-size:13px;line-height:1.55;">'+(ok?'✅':'⬜')+' '+h[1]+'</div>'; }).join("");
+  var opts=(srec.cravingOptionsUsed||[]).map(function(x){return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:4px 8px;border-radius:999px;background:#f4efe7;font-size:11px;">'+esc(x)+'</span>';}).join("");
+  var syms=(srec.symptoms||[]).map(function(x){return SYM[x]||x;}).join(", ");
+  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Secili gun detay ('+shortD(selected)+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Tik: <b>'+cnt(srec)+'/'+HT+'</b> · Mod: <b>'+(MOOD_EMOJI[srec.mood]||"-")+'</b> · SOS: <b>'+(srec.cravingSOSCount||0)+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Adim: <b>'+(srec.walk&&srec.walk.steps!=null?srec.walk.steps:"-")+'</b> · Dakika: <b>'+(srec.walk&&srec.walk.minutes!=null?srec.walk.minutes:"-")+'</b> · Uyku: <b>'+(srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+" sa":"-")+'</b> ('+(SLEEP_Q[srec.sleep&&srec.sleep.quality]||"-")+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Akim: <b>'+(FLOW[srec.flow]||"-")+'</b> · Belirtiler: <b>'+(syms||"-")+'</b></div><div style="margin-top:8px;">'+habitsHtml+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Kahvalti: '+esc(srec.meals&&srec.meals.breakfast?srec.meals.breakfast:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ogle: '+esc(srec.meals&&srec.meals.lunch?srec.meals.lunch:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Aksam: '+esc(srec.meals&&srec.meals.dinner?srec.meals.dinner:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ara: '+esc(srec.meals&&srec.meals.snack?srec.meals.snack:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Not: '+esc(srec.note||"-")+'</div><div class="muted" style="font-size:12px;line-height:1.5;margin-top:8px;">Kriz aksiyonlari: '+(opts||"-")+'</div></div>';
+  var monthHead=['Pzt','Sal','Car','Per','Cum','Cmt','Paz'].map(function(x){return '<div class="faint" style="font-size:11px;text-align:center;font-weight:700;padding:4px 0;">'+x+'</div>';}).join("");
+  var daysHtml=monthGrid.map(function(d){
+    if(!d) return '<div class="d empty"></div>';
+    var r=recOf(d),c=cnt(r),k=(c===0?0:c<=2?1:c<=4?2:3),s=(r&&r.cravingSOSCount?Number(r.cravingSOSCount):0),m=(r&&r.mood?MOOD_EMOJI[r.mood]||"":"");
+    return '<div class="d '+(d===selected?'active':'')+'" onclick="pickDay(\''+d+'\')"><div class="dm">'+d.slice(8)+'</div><div class="dl">'+m+'</div><div class="db k'+k+'">'+c+'/'+HT+(s?(' · SOS '+s):'')+'</div></div>';
   }).join("");
-  h+='<div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tum gunler</div><div style="max-height:340px;overflow:auto;padding-right:4px;">'+rows+'</div></div></div>';
+  h+='<div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Aylik takvim · '+monthLabel(UI.month)+'</div><div class="cal">'+monthHead+daysHtml+'</div><div class="faint" style="font-size:11px;margin-top:8px;">Kutu rengi tik seviyesini, etiket ise kriz sayisini gosterir.</div></div></div>';
+  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Notlar zaman cizelgesi</div><div style="max-height:250px;overflow:auto;padding-right:4px;">'+(noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="muted" style="font-size:12px;">'+esc(String(r.note).slice(0,120))+'</div></div>';}).join(""):'<div class="faint">Not kaydi yok</div>')+'</div></div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tatli krizi zaman cizelgesi</div><div style="max-height:250px;overflow:auto;padding-right:4px;">'+(sosRows.length?sosRows.map(function(d){var r=recOf(d),opts=(r.cravingOptionsUsed||[]).slice(0,3).join(", ");return '<div class="row" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="muted" style="font-size:12px;">SOS: <b>'+r.cravingSOSCount+'</b>'+(opts?(' · '+esc(opts)):'')+'</div></div>';}).join(""):'<div class="faint">Kriz kaydi yok</div>')+'</div></div></div>';
+  h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Aylik ozetler</div><div class="grid4">'+(months.length?months.map(function(m){return '<div class="chip"><div class="faint" style="font-size:11px;">'+monthLabel(m.month)+'</div><div class="mono" style="font-size:19px;font-weight:800;margin-top:2px;">'+m.avg.toFixed(1)+' / '+HT+'</div><div class="faint" style="font-size:11px;">SOS '+m.sos+' · '+m.days+' gun</div></div>';}).join(""):'<div class="faint">Aylik veri yok</div>')+'</div></div>';
+  var allRows=all.slice().reverse().map(function(d){ var r=recOf(d)||{},active=d===selected?" active":"",m=r.mood?MOOD_EMOJI[r.mood]||"":""; return '<div class="row'+active+'" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="mono faint" style="min-width:42px;">'+cnt(r)+'/'+HT+'</div><div style="min-width:24px;">'+m+'</div><div class="mono faint" style="min-width:42px;">SOS '+(r.cravingSOSCount||0)+'</div><div class="mono faint" style="min-width:52px;">'+(r.walk&&r.walk.steps!=null?r.walk.steps:"-")+'</div><div class="mono faint" style="min-width:52px;">'+(r.sleep&&r.sleep.hours!=null?r.sleep.hours:"-")+'</div><div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.note?String(r.note).slice(0,84):"")+'</div></div>'; }).join("");
+  h+='<div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tum gunler detayi</div><div style="max-height:320px;overflow:auto;padding-right:4px;">'+allRows+'</div></div>';
   h+='<div class="faint" style="text-align:center;font-size:11px;margin-top:16px;">Canli izleme aktif · otomatik 5 dakikada bir yenilenir</div>';
   document.getElementById("app").innerHTML=h;
 }
@@ -157,20 +175,16 @@ function fail(msg){
   document.getElementById("app").innerHTML='<div class="card" style="padding:24px;max-width:760px;margin:30px auto;"><div style="font-weight:800;font-size:21px;margin-bottom:6px;">Panel baglantisi bekleniyor</div><div class="muted" style="font-size:14px;line-height:1.6;">Veri henuz okunamadi. Tekrar dene veya yeni anahtar gir.</div><div class="toolbar" style="margin-top:12px;"><button class="btn btn-primary" onclick="load()">Tekrar dene</button><button class="btn" onclick="resetPanelToken()">Yeni anahtar gir</button></div><div class="faint mono" style="font-size:11px;margin-top:10px;">'+esc(msg)+'</div></div>';
 }
 window.savePanelToken=function(){
-  var v=normalizeToken((document.getElementById("ptok")||{}).value||"");
-  if(!v) return;
-  PTOKEN=v;
-  try{ localStorage.setItem(PTKEY,v); }catch(e){}
-  document.getElementById("app").innerHTML='<div class="card" style="padding:18px;text-align:center;">Yukleniyor…</div>';
-  load();
+  var v=normalizeToken((document.getElementById("ptok")||{}).value||""); if(!v) return;
+  PTOKEN=v; try{ localStorage.setItem(PTKEY,v); }catch(e){}
+  document.getElementById("app").innerHTML='<div class="card" style="padding:18px;text-align:center;">Yukleniyor…</div>'; load();
 };
-window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY); }catch(e){} PTOKEN=""; tokenPrompt(); };
+window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY);}catch(e){} PTOKEN=""; tokenPrompt(); };
 function tokenPrompt(msg){
   document.getElementById("app").innerHTML='<div class="card" style="padding:22px;max-width:520px;margin:40px auto;"><div style="font-weight:800;font-size:22px;margin-bottom:6px;">Gozlemci girisi</div><div class="muted" style="font-size:13.5px;line-height:1.6;margin-bottom:12px;">Bir kez anahtar girildiginde panel otomatik canli takibe gecer.</div>'+(msg?'<div class="status warn" style="margin-bottom:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_... (Contents: Read)" style="width:100%;margin-bottom:10px;"><button class="btn btn-primary" onclick="savePanelToken()" style="width:100%;">Canli izlemeyi baslat</button></div>';
 }
 function fetchLatest(repo,branch){
-  var p=repo.split("/");
-  if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
+  var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
   var api="https://api.github.com/repos/"+p[0]+"/"+p[1]+"/contents/data/latest.json?ref="+branch+"&t="+Date.now();
   return fetch(api,{headers:{"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"}})
     .then(function(r){
@@ -181,14 +195,13 @@ function fetchLatest(repo,branch){
     });
 }
 function load(){
-  PTOKEN=normalizeToken(PTOKEN);
-  if(!PTOKEN){ tokenPrompt(); return; }
+  PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   fetchLatest(REPO,BRANCH)
-    .catch(function(e){
-      if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH); }
-      throw e;
+    .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
+    .then(function(j){
+      D=j; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
+      if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate); render();
     })
-    .then(function(j){ D=j; if(!UI.selectedDate) UI.selectedDate=today(); render(); })
     .catch(function(e){
       var m=String(e&&e.message||e);
       if(/headers.+RequestInit|non ISO-8859-1|String contains/i.test(m)){ tokenPrompt("Anahtar bicimi hatali, yeniden yapistir."); return; }

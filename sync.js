@@ -17,7 +17,11 @@ function settings(){
 function cfg(){
   var s=settings();
   var tok=(s.ghToken||'').trim(), repo=(s.ghRepo||'').trim();
-  if(tok && repo.indexOf('/')>0){ var p=repo.split('/'); return {token:tok, owner:p[0].trim(), repo:p[1].trim(), branch:(s.ghBranch||'data').trim()||'data'}; }
+  if(tok && repo.indexOf('/')>0){
+    var p=repo.split('/');
+    if(p.length!==2 || !p[0].trim() || !p[1].trim()) return null;
+    return {token:tok, owner:p[0].trim(), repo:p[1].trim(), branch:(s.ghBranch||'main').trim()||'main'};
+  }
   return null;
 }
 function pad(n){ return (n<10?'0':'')+n; }
@@ -48,18 +52,39 @@ function ghPut(c, path, contentStr){
       return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)}); })
     .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+' '+t.slice(0,160)); }); });
 }
+function isMissingRefError(err){
+  var m=String((err&&err.message)||err||'').toLowerCase();
+  return m.indexOf('no commit found for the ref')>=0 || m.indexOf('invalid request')>=0 || m.indexOf('reference does not exist')>=0 || m.indexOf('couldn\'t find remote ref')>=0;
+}
+function persistBranch(branch){
+  try{
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    var d=JSON.parse(raw); if(!d||!d.settings) return;
+    d.settings.ghBranch=branch;
+    localStorage.setItem(KEY,JSON.stringify(d));
+  }catch(e){}
+}
+function pushWithCfg(c, data){
+  var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
+  var latest=JSON.stringify(data,null,2);
+  var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:data},null,2);
+  return ghPut(c,'data/latest.json',latest).then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
+}
 // repoya yazmadan önce hassas alanları (token) çıkar — public repoya sızmasın
 function sanitize(data){ var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; } if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; } return c; }
 function doPush(data){
   var c=cfg(); if(!c){ setStatus('idle'); return; }
   setStatus('saving');
   var safe=sanitize(data);
-  var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
-  var latest=JSON.stringify(safe,null,2);
-  var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:safe},null,2);
-  ghPut(c,'data/latest.json',latest)
-    .then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); })
+  pushWithCfg(c,safe)
     .then(function(){ setStatus('ok'); })
+    .catch(function(e){
+      if(c.branch!=='main' && isMissingRefError(e)){
+        var c2={token:c.token, owner:c.owner, repo:c.repo, branch:'main'};
+        return pushWithCfg(c2,safe).then(function(){ persistBranch('main'); setStatus('ok'); });
+      }
+      throw e;
+    })
     .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
 }
 

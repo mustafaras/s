@@ -99,6 +99,8 @@ function migrate(d){
   if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
   if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
   if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
+  if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
+  if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;

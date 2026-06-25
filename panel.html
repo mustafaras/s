@@ -78,12 +78,11 @@ function recOf(d){ return D.days[d]||null; }
 function cnt(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h[0]]?1:0);},0):0; }
 function avg(days,fn){ if(!days.length) return 0; return days.reduce(function(a,d){return a+fn(d);},0)/days.length; }
 function sum(days,fn){ return days.reduce(function(a,d){return a+fn(d);},0); }
-function formatMins(s){ var m=Math.round(s/60); return m+"d"; }
 function formatDuration(sec){
-  if(sec<60) return sec+"s";
-  if(sec<3600) return Math.round(sec/60)+"d";
+  if(sec<60) return sec+" sn";
+  if(sec<3600) return Math.round(sec/60)+" dk";
   var h=Math.floor(sec/3600), m=Math.round((sec%3600)/60);
-  return h+"s "+m+"d";
+  return h+" sa "+m+" dk";
 }
 function sessionStats(days){
   var totalActive=0, totalOpen=0, sessionCount=0;
@@ -95,6 +94,13 @@ function sessionStats(days){
         if(s.activeSeconds) totalActive+=s.activeSeconds;
         if(s.start&&s.end) totalOpen+=(s.end-s.start)/1000;
       });
+    }
+    if(rec&&rec.liveSession&&rec.liveSession.activeSeconds){
+      sessionCount++;
+      totalActive+=Number(rec.liveSession.activeSeconds)||0;
+      if(rec.liveSession.start&&rec.liveSession.lastSeen){
+        totalOpen+=Math.max(0,(Number(rec.liveSession.lastSeen)-Number(rec.liveSession.start))/1000);
+      }
     }
   });
   return {sessionCount:sessionCount,totalActive:totalActive,totalOpen:totalOpen,avgActive:sessionCount?Math.round(totalActive/sessionCount):0};

@@ -820,36 +820,54 @@ if(data){ data.lastOpenedDate=todayStr(); save(); }
 window.App=App;
 
 // Session tracking
-var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,activeMs:0};
-function recordSession(){
-  if(!data) return;
+var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};
+function nowMs(){ return Date.now(); }
+function currentActiveSeconds(ts){
+  var now=ts||nowMs();
+  var idle=sessionState.idleMs;
+  var inactiveFor=now-sessionState.lastActivity;
+  if(inactiveFor>300000) idle+=inactiveFor-300000;
+  return Math.max(0,Math.round((now-sessionState.start-idle)/1000));
+}
+function updateLiveSession(){
+  if(!data || sessionState.closed) return;
+  var today=todayStr();
+  var rec=getDay(data,today,diffDays(data.startDate,today));
+  rec.liveSession={start:sessionState.start,lastSeen:nowMs(),activeSeconds:currentActiveSeconds()};
+  save();
+}
+function finalizeSession(){
+  if(!data || sessionState.closed) return;
   var today=todayStr();
   var rec=getDay(data,today,diffDays(data.startDate,today));
   if(!Array.isArray(rec.sessions)) rec.sessions=[];
-  var now=Date.now();
-  var activeSec=Math.max(0,(now-sessionState.start-sessionState.idleMs)/1000);
-  rec.sessions.push({start:sessionState.start,end:now,activeSeconds:Math.round(activeSec)});
+  rec.sessions.push({start:sessionState.start,end:nowMs(),activeSeconds:currentActiveSeconds()});
+  delete rec.liveSession;
+  sessionState.closed=true;
   save();
 }
-function onUserActivity(){
-  sessionState.lastActivity=Date.now();
+function resetSession(){
+  sessionState={start:nowMs(),lastActivity:nowMs(),idleMs:0,closed:false};
+  updateLiveSession();
 }
+function onUserActivity(){ sessionState.lastActivity=nowMs(); }
 document.addEventListener('click',onUserActivity,true);
 document.addEventListener('input',onUserActivity,true);
 document.addEventListener('keydown',onUserActivity,true);
 document.addEventListener('scroll',onUserActivity,true);
-var idleCheckInterval=setInterval(function(){
-  var now=Date.now();
+setInterval(function(){
+  var now=nowMs();
   var inactiveSince=now-sessionState.lastActivity;
-  if(inactiveSince>300000 && inactiveSince-sessionState.idleMs>60000){
-    sessionState.idleMs+=60000;
-  }
+  if(inactiveSince>300000) sessionState.idleMs=Math.max(sessionState.idleMs,inactiveSince-300000);
+  updateLiveSession();
 },60000);
-window.addEventListener('beforeunload',recordSession);
+window.addEventListener('beforeunload',finalizeSession);
+window.addEventListener('pagehide',finalizeSession);
 window.addEventListener('visibilitychange',function(){
-  if(document.hidden) recordSession();
-  else sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,activeMs:0};
+  if(document.hidden) finalizeSession();
+  else resetSession();
 });
+updateLiveSession();
 
 render();
 })();

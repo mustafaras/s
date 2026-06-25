@@ -141,7 +141,7 @@ function migrate(d){
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
 var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
-var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,lastSpokenLine:null};
+var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -230,28 +230,54 @@ function ritualGuideText(info){
   return lines[idx];
 }
 function speechAvailable(){ return typeof window!=='undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'; }
+var ritualVoices=[];
+function ritualWarmVoices(){
+  if(!speechAvailable()) return;
+  try{
+    ritualVoices=window.speechSynthesis.getVoices()||[];
+    window.speechSynthesis.onvoiceschanged=function(){ try{ ritualVoices=window.speechSynthesis.getVoices()||[]; }catch(e){} };
+  }catch(e){}
+}
 function ritualPickVoice(){
   if(!speechAvailable()) return null;
   try{
-    var vs=window.speechSynthesis.getVoices()||[];
-    var tr=null;
-    for(var i=0;i<vs.length;i++){ if(/tr(-|_)?/i.test(vs[i].lang||'')){ tr=vs[i]; break; } }
-    return tr;
+    var vs=(ritualVoices&&ritualVoices.length)?ritualVoices:(window.speechSynthesis.getVoices()||[]);
+    var tr=null,trTR=null;
+    for(var i=0;i<vs.length;i++){ var lg=(vs[i].lang||'').toLowerCase(); if(lg==='tr-tr'||lg==='tr_tr'){ trTR=vs[i]; break; } if(!tr && /^tr(-|_|$)/.test(lg)) tr=vs[i]; }
+    return trTR||tr||null;
   }catch(e){ return null; }
+}
+function ritualSpeechUnlock(){
+  if(!speechAvailable()) return;
+  try{
+    var synth=window.speechSynthesis;
+    try{ synth.resume(); }catch(e){}
+    ritualVoices=synth.getVoices()||ritualVoices;
+    if(!ritualAudio.speechUnlocked){
+      var u=new SpeechSynthesisUtterance('\u00a0');
+      u.volume=0.02; u.rate=1; u.lang='tr-TR';
+      var v0=ritualPickVoice(); if(v0) u.voice=v0;
+      synth.speak(u);
+      ritualAudio.speechUnlocked=true;
+    }
+  }catch(e){}
 }
 function ritualSpeak(text,opts){
   if(!speechAvailable() || ui.ritualSoundMode!=='guided' || !ui.ritualRunning || !text) return;
   opts=opts||{};
   try{
     var synth=window.speechSynthesis;
-    if(opts.interrupt) synth.cancel();
+    try{ synth.resume(); }catch(e){}
+    if(opts.interrupt && ritualAudio.speechUnlocked) synth.cancel();
     var u=new SpeechSynthesisUtterance(text);
-    u.lang='tr-TR';
-    var v=ritualPickVoice(); if(v) u.voice=v;
+    var v=ritualPickVoice();
+    if(v){ u.voice=v; u.lang=v.lang||'tr-TR'; } else { u.lang='tr-TR'; }
     u.rate=opts.rate||0.84;
     u.pitch=opts.pitch||0.92;
-    u.volume=opts.volume!=null?opts.volume:0.92;
+    u.volume=opts.volume!=null?opts.volume:1;
+    ritualAudio.speechUnlocked=true;
     synth.speak(u);
+    setTimeout(function(){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} },180);
   }catch(e){}
 }
 function ritualSpeechStop(){ if(speechAvailable()){ try{ window.speechSynthesis.cancel(); }catch(e){} } ritualAudio.lastSpokenLine=null; }
@@ -364,6 +390,7 @@ function ritualAudioSync(forceCue){
   if(!ui.ritualRunning){ ritualAudioSetTargets('silent',info.stage.key); ritualAudio.running=false; ritualAudio.breathPhase=null; return; }
   ritualAudioSetTargets(ui.ritualSoundMode,info.stage.key);
   ritualAudio.running=true;
+  if(ui.ritualSoundMode==='guided' && speechAvailable()){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} }
   if(forceCue && ui.ritualSoundMode==='guided') ritualCue(528,0.30,0.075);
   if(info.stage.key!==ritualAudio.stageKey){
     ritualAudio.stageKey=info.stage.key;
@@ -563,6 +590,7 @@ App.quickSleepRitual=function(){
 };
 App.openRitual=function(){
   clearInterval(ritualInterval);
+  ritualWarmVoices();
   ui.ritualOpen=true;
   ui.ritualRunning=false;
   ui.ritualDone=false;
@@ -590,6 +618,7 @@ App.setRitualSoundMode=function(mode){
   if(['silent','ambient','guided'].indexOf(mode)<0) return;
   ui.ritualSoundMode=mode;
   if(mode!=='guided'){ ritualSpeechStop(); }
+  else { ritualSpeechUnlock(); }
   ritualAudio.stageKey=null;
   ritualAudio.breathPhase=null;
   ritualAudioSync(true);
@@ -612,6 +641,7 @@ App.startRitual=function(){
   if(ui.ritualRunning) return;
   if(!ui.ritualStartedAt) ui.ritualStartedAt=new Date().toISOString();
   ui.ritualRunning=true;
+  if(ui.ritualSoundMode==='guided') ritualSpeechUnlock();
   clearInterval(ritualInterval);
   ritualAudioSync(true);
   trackRitualEvent('start');
@@ -1321,6 +1351,7 @@ function modalsHTML(){
       for(var vw=0;vw<7;vw++){ h+='<span style="width:3px;height:18px;border-radius:2px;background:#F3C6D3;transform-origin:bottom;'+(running?'animation:seyVoiceWave '+(0.8+(vw%3)*0.18)+'s ease-in-out infinite;animation-delay:'+(vw*0.09)+'s;':'opacity:.45;')+'"></span>'; }
       h+='</span></div>';
       h+='<div style="margin-top:9px;font-size:14.5px;line-height:1.45;color:#fff;font-weight:600;min-height:21px;">'+esc(running?('“'+guideLine+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.')+'</div>';
+      h+='<div style="margin-top:7px;font-size:10.5px;line-height:1.4;color:rgba(243,233,237,0.7);">🔈 Sesi duymuyorsan: telefonun yan <b>sessiz düğmesini kapat</b> ve ses seviyesini aç.</div>';
       h+='</div>';
     } else if(mode==='ambient'){
       h+='<div style="border:1px solid rgba(124,196,214,0.45);background:linear-gradient(135deg,rgba(86,150,196,0.22),rgba(124,196,214,0.12));border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
@@ -1394,6 +1425,7 @@ function modalsHTML(){
 // boot
 if(data){ data.lastOpenedDate=todayStr(); save(); }
 window.App=App;
+ritualWarmVoices();
 
 // Session tracking
 var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};

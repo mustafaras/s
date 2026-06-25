@@ -109,7 +109,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null};
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
@@ -117,6 +117,7 @@ function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=set
 // ---------- helpers ----------
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function normalizeToken(v){ return String(v||'').replace(/[^\x20-\x7E]/g,'').trim(); }
 function pad(n){ return String(n).padStart(2,'0'); }
 function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
 function todayStr(){ return fmt(new Date()); }
@@ -144,7 +145,7 @@ function saveBanner(){
   return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="font-size:22px;">📌</span><div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:12px;color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:13px;padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
-window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); };
+window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
 function commit(msg){ save(); render(); if(msg) toast(msg); }
 
@@ -284,11 +285,13 @@ App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=
 App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render(); };
 App.printReport=function(){ openReport(); };
 function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
-App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=normalizeToken(el.value||''); save(); syncFieldUpdate(); };
 App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
 App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); save(); if(!syncConfigured()){ toast('Önce Ayarlar\'dan repoya bağlan'); App.go('ayarlar'); return; } if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } };
+App.enableKeyEdit=function(){ ui.keyEdit=true; render(); };
+App.cancelKeyEdit=function(){ ui.keyEdit=false; render(); };
 
 // ---------- report (print -> Safari "PDF olarak kaydet") ----------
 function reportHTML(){
@@ -616,11 +619,18 @@ function ayarlarHTML(){
   // Doğrudan GitHub bağlantısı
   var connected=syncConfigured();
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Repoya bağlan '+(connected?'<span style="font-size:12px;font-weight:700;color:#3F8A4F;background:rgba(143,191,138,0.2);padding:2px 9px;border-radius:999px;">bağlı ✓</span>':'')+'</div>';
-  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Bir kez GitHub token gir; uygulama veriyi <b>doğrudan</b> repoya kaydeder ve her gün otomatik gönderir. Token yalnızca bu cihazın tarayıcısında saklanır, repoya/sayfaya yazılmaz.</div>';
-  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghToken||'')+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
-  h+='<div style="display:flex;gap:8px;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghRepo||'mustafaras/seyma-data')+'" oninput="App.setGhRepo(this)" placeholder="kullanıcı/repo" style="flex:2;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghBranch||'main')+'" oninput="App.setGhBranch(this)" placeholder="branch" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"></div>';
-  h+='<button onclick="App.syncNow()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button>';
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Token üret: GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → repo <b>mustafaras/seyma-data</b> (özel) → izin <b>Contents: Read and write</b>. Token yalnızca bu cihazda saklanır. Detay: <b>REPO_KAYIT.md</b></div></div>';
+  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Günlük kayıtlar her günün tarihine yazılır; aynı gün içindeki değişiklikler o günün kaydını günceller. Tüm günler korunur ve izlenir.</div>';
+  if(!connected || ui.keyEdit){
+    h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(ui.keyEdit?'':(sg.ghToken||''))+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+    h+='<div style="display:flex;gap:8px;">';
+    h+='<button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Bağla ve kaydet ⬆️</button>';
+    if(connected) h+='<button onclick="App.cancelKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">İptal</button>';
+    h+='</div>';
+  } else {
+    h+='<div style="font-size:12.5px;color:#3F8A4F;background:rgba(143,191,138,0.12);border:1px solid rgba(143,191,138,0.35);padding:10px 12px;border-radius:12px;">Bağlantı doğrulandı. Kayıtlar otomatik devam ediyor.</div>';
+    h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
+  }
+  h+='</div>';
   h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span>🗑️</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön','🔄');
   // add to home guide

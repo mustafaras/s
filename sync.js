@@ -28,12 +28,11 @@ function pad(n){ return (n<10?'0':'')+n; }
 function timeStr(iso){ try{ var d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }catch(e){ return ''; } }
 function statusText(){
   var c=cfg();
-  if(!c) return 'Bağlı değil — veriler bu cihazda saklanıyor.';
-  var where=c.owner+'/'+c.repo+'@'+c.branch;
-  if(state.status==='saving') return 'Kaydediliyor… ('+where+')';
-  if(state.status==='ok') return 'Repoya kaydedildi ✓ '+timeStr(state.last)+' · '+where;
+  if(!c) return 'Bağlı değil';
+  if(state.status==='saving') return 'Kaydediliyor…';
+  if(state.status==='ok') return 'Bağlantı aktif ✓ Son kayıt '+timeStr(state.last);
   if(state.status==='error') return 'Hata: '+(state.error||'bilinmiyor');
-  return 'Hazır · '+where;
+  return 'Bağlantı hazır';
 }
 function paint(){ var el=document.getElementById('sey-sync-status'); if(el) el.textContent=statusText(); }
 function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().toISOString(); state.error=null; if(window.SeyOnSynced){ try{ window.SeyOnSynced(); }catch(e){} } } if(s==='error') state.error=err||'bilinmiyor'; paint(); }
@@ -42,7 +41,8 @@ function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().t
 function b64(str){ var bytes=new TextEncoder().encode(str); var bin=''; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
 
 function ghHeaders(c){ return {'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}; }
-function ghPut(c, path, contentStr){
+function ghPut(c, path, contentStr, attempt){
+  attempt=attempt||0;
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path;
   var H=ghHeaders(c);
   return fetch(api+'?ref='+encodeURIComponent(c.branch),{headers:H})
@@ -50,7 +50,13 @@ function ghPut(c, path, contentStr){
     .then(function(sha){ var body={message:'sync: '+path, content:b64(contentStr), branch:c.branch}; if(sha) body.sha=sha;
       var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
       return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)}); })
-    .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+' '+t.slice(0,160)); }); });
+    .then(function(r){
+      if(r.ok) return;
+      return r.text().then(function(t){
+        if((r.status===409||r.status===422) && attempt<3) return ghPut(c,path,contentStr,attempt+1);
+        throw new Error(r.status+' '+t.slice(0,160));
+      });
+    });
 }
 function isMissingRefError(err){
   var m=String((err&&err.message)||err||'').toLowerCase();

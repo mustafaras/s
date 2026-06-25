@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Şeyma 🦩 · Panel</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;color:#2C2426;background:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);min-height:100vh;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px;}
+  .glass{background:rgba(255,255,255,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.75);border-radius:20px;}
+  .muted{color:#7A6B70;} .faint{color:#9C8C92;} .accent{color:#C77D93;}
+  h1{font-size:26px;margin:0;font-weight:800;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .chip{padding:13px;border-radius:16px;}
+  .bar{height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;}
+  .barfill{height:100%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);}
+  button{font:inherit;cursor:pointer;}
+  a{color:#C77D93;}
+  @media(max-width:520px){ .grid4{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="glass" style="padding:18px;text-align:center;">Yükleniyor…</div>
+</div>
+<script>
+(function(){
+"use strict";
+var qs=new URLSearchParams(location.search);
+var REPO=qs.get('repo')||'mustafaras/s';
+var BRANCH=qs.get('branch')||'data';
+var HABITS=[['sweetManaged','🍫','Tatlı kontrolü'],['eveningControl','🌙','Akşam kontrolü'],['walked20','🚶‍♀️','Yürüyüş'],['protein','🍳','Protein'],['water','💧','Su'],['vitaminD','☀️','D vitamini'],['selfKind','🫶','Kendine iyi']];
+var HT=HABITS.length;
+var MOODS={'cok-iyi':['☀️','Çok iyi','#FFD37A'],'iyi':['🌼','İyi','#F2B65A'],'normal':['🌿','Normal','#8FBF8A'],'zorlandim':['🌧️','Zor','#9BB0D9'],'cok-zorlandim':['🫧','Çok zor','#B89BD9']};
+var MEALS=[['breakfast','🌅','Kahvaltı'],['lunch','☀️','Öğle'],['dinner','🌙','Akşam'],['snack','🍓','Ara']];
+var FLOW={'spot':'Leke','light':'Hafif','medium':'Orta','heavy':'Yoğun'};
+var PHASES={menstrual:['🩸','Menstrüel','#E58B9B'],follicular:['🌱','Foliküler','#8FBF8A'],ovulation:['🌟','Ovülasyon','#E8A53C'],luteal:['🌙','Luteal','#9B7FC9']};
+
+function pad(n){return(n<10?'0':'')+n;}
+function fmt(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function today(){return fmt(new Date());}
+function addDays(s,n){var p=s.split('-').map(Number);var dt=new Date(p[0],p[1]-1,p[2]);dt.setDate(dt.getDate()+n);return fmt(dt);}
+function diff(a,b){var pa=a.split('-').map(Number),pb=b.split('-').map(Number);return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shortD(s){var p=s.split('-');return p[2]+'.'+p[1];}
+function moNm(m){return['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][m-1];}
+function fmtTR(s){if(!s)return'—';var p=s.split('-');return Number(p[2])+' '+moNm(Number(p[1]));}
+
+var D=null; // data
+
+function countRec(r){return r&&r.habits?HABITS.reduce(function(a,h){return a+(r.habits[h[0]]?1:0);},0):0;}
+function currentStreak(){var c=0,date=today();if(countRec(D.days[date])<4)date=addDays(date,-1);while(diff(D.startDate,date)>=0){if(countRec(D.days[date])>=4){c++;date=addDays(date,-1);}else break;}return c;}
+function spanEnd(){var e=today();for(var d in D.days){if(diff(d,e)<0)e=d;}return e;}
+function allDays(){var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1);if(n>3000)n=3000;for(var i=0;i<n;i++){var dt=addDays(D.startDate,i);out.push({date:dt,rec:D.days[dt]||null});}return out;}
+function bestStreak(days){var b=0,c=0;days.forEach(function(o){if(countRec(o.rec)>=4){c++;b=Math.max(b,c);}else c=0;});return b;}
+function tracked(){var n=0;for(var d in D.days){var r=D.days[d];if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack)))n++;}return n;}
+function lastN(n){var out=[],t=today();for(var i=n-1;i>=0;i--){var d=addDays(t,-i);out.push({date:d,rec:D.days[d]||null});}return out;}
+function habitRate(days,key){var dn=0;days.forEach(function(o){if(o.rec&&o.rec.habits&&o.rec.habits[key])dn++;});return days.length?Math.round(dn/days.length*100):0;}
+
+function cycleStats(){
+  var ps=((D.cycle&&D.cycle.periods)||[]).filter(function(p){return p&&p.start;}).slice().sort(function(a,b){return a.start<b.start?-1:1;});
+  var starts=ps.map(function(p){return p.start;}),lens=[];
+  for(var i=1;i<starts.length;i++){var dl=diff(starts[i-1],starts[i]);if(dl>=15&&dl<=60)lens.push(dl);}
+  var ac=lens.length?Math.round(lens.reduce(function(a,b){return a+b;},0)/lens.length):((D.cycle&&D.cycle.avgCycle)||28);ac=Math.max(21,Math.min(40,ac));
+  var last=starts.length?starts[starts.length-1]:null,next=null,ovu=null,fS=null,fE=null,dayIn=null,phase=null;
+  if(last){var since=diff(last,today());if(since>=0)dayIn=(since%ac)+1;next=addDays(last,ac);var g=0;while(diff(next,today())>0&&g<60){next=addDays(next,ac);g++;}ovu=addDays(next,-14);fS=addDays(ovu,-5);fE=addDays(ovu,1);
+    var od=ac-14;if(dayIn<=((D.cycle&&D.cycle.avgPeriod)||5))phase='menstrual';else if(dayIn<od-1)phase='follicular';else if(dayIn<=od+1)phase='ovulation';else phase='luteal';}
+  return {last:last,next:next,ovu:ovu,fS:fS,fE:fE,dayIn:dayIn,phase:phase,ac:ac};
+}
+
+function card(inner,pad){return '<div class="glass" style="padding:'+(pad||16)+'px;">'+inner+'</div>';}
+function bars(days,valFn,grad){var max=1;days.forEach(function(o){max=Math.max(max,valFn(o));});var h='<div style="display:flex;align-items:flex-end;gap:2px;height:50px;">';days.forEach(function(o){var v=valFn(o);var hh=v?Math.max(4,Math.round(v/max*50)):2;h+='<div style="flex:1;height:'+hh+'px;border-radius:3px;background:'+grad+';opacity:'+(v?1:0.22)+';"></div>';});return h+'</div>';}
+
+function lastSavedAt(){ var best=null; for(var d in D.days){ var s=D.days[d]&&D.days[d].savedAt; if(s&&(!best||s>best)) best=s; } return best; }
+function render(){
+  var savedAt=lastSavedAt();
+  var t=today();var rec=D.days[t]||null;
+  var cur=currentStreak(),best=bestStreak(allDays()),trk=tracked(),todayTicks=countRec(rec);
+  var last30=lastN(30),last7=lastN(7),last14=lastN(14);
+  var h='';
+  // header
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;">';
+  h+='<div><h1>Şeyma 🦩 <span class="faint" style="font-size:15px;font-weight:600;">Panel</span></h1><div class="faint" style="font-size:13px;margin-top:2px;">Son kayıt: '+(savedAt?new Date(savedAt).toLocaleString('tr-TR'):'—')+'</div></div>';
+  h+='<button onclick="location.reload()" class="glass" style="border:none;padding:10px 14px;border-radius:14px;font-weight:700;color:#6B4A3A;">Yenile ⟳</button></div>';
+  // chips
+  h+='<div class="grid4" style="margin-bottom:12px;">';
+  [['🔥 Seri',cur+' g'],['🏆 En iyi',best+' g'],['🗓️ Takip',trk+' g'],['✅ Bugün',todayTicks+'/'+HT]].forEach(function(c){ h+='<div class="glass chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
+  h+='</div>';
+  // 14 day grid
+  h+=card('<div style="font-weight:700;margin-bottom:10px;">Son 14 gün</div><div style="display:flex;gap:5px;">'+last14.map(function(o){var c=countRec(o.rec);var f=c/HT;var bg=f>=1?'#E8A53C':f>0?'rgba(233,137,159,'+(0.3+f*0.6)+')':'rgba(150,110,120,0.12)';var me=o.rec&&o.rec.mood&&MOODS[o.rec.mood]?MOODS[o.rec.mood][0]:'';return '<div style="flex:1;text-align:center;"><div style="aspect-ratio:1;border-radius:9px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:12px;">'+me+'</div><div class="faint" style="font-size:9px;margin-top:3px;">'+o.date.slice(8)+'</div></div>';}).join('')+'</div>')+'<div style="height:12px;"></div>';
+  // 30 day trend + habit rates
+  var avg30=(last30.reduce(function(a,o){return a+countRec(o.rec);},0)/30).toFixed(1);
+  h+=card('<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;"><div style="font-weight:700;">Son 30 gün — günlük tik</div><div class="faint" style="font-size:12px;">ort. '+avg30+'/'+HT+'</div></div>'+bars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)'))+'<div style="height:12px;"></div>';
+  var hr='<div style="font-weight:700;margin-bottom:10px;">Alışkanlık oranları (30 gün)</div>';
+  HABITS.forEach(function(hb){var pct=habitRate(last30,hb[0]);hr+='<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;"><span>'+hb[1]+' '+hb[2]+'</span><span class="accent" style="font-weight:700;">%'+pct+'</span></div><div class="bar"><div class="barfill" style="width:'+pct+'%;"></div></div></div>';});
+  h+=card(hr)+'<div style="height:12px;"></div>';
+  // health
+  var steps=rec&&rec.walk&&rec.walk.steps!=null?rec.walk.steps:null;
+  var sleep=rec&&rec.sleep&&rec.sleep.hours!=null?rec.sleep.hours:null;
+  var hh='<div style="font-weight:700;margin-bottom:10px;">Sağlık (bugün)</div><div class="grid2" style="margin-bottom:12px;"><div class="chip" style="background:rgba(233,137,159,0.12);"><div class="faint" style="font-size:11px;">Adım</div><div style="font-size:19px;font-weight:800;">'+(steps!=null?steps:'—')+'</div></div><div class="chip" style="background:rgba(155,127,201,0.12);"><div class="faint" style="font-size:11px;">Uyku</div><div style="font-size:19px;font-weight:800;">'+(sleep!=null?sleep+' sa':'—')+'</div></div></div>';
+  hh+='<div class="faint" style="font-size:12px;margin-bottom:6px;">7 günlük adım</div>'+bars(last7,function(o){return o.rec&&o.rec.walk?(o.rec.walk.steps||0):0;},'linear-gradient(180deg,#E9899F,#C9B8FF)');
+  hh+='<div class="faint" style="font-size:12px;margin:8px 0 6px;">7 günlük uyku</div>'+bars(last7,function(o){return o.rec&&o.rec.sleep?(o.rec.sleep.hours||0):0;},'linear-gradient(180deg,#9B7FC9,#B8A0E0)');
+  h+=card(hh)+'<div style="height:12px;"></div>';
+  // cycle
+  var cs=cycleStats();var ph=cs.phase?PHASES[cs.phase]:null;
+  var cc='<div style="font-weight:700;margin-bottom:8px;">Menstrüasyon döngüsü 🌸</div>';
+  if(cs.last){cc+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'+(ph?'<span style="font-weight:800;color:'+ph[2]+';">'+ph[0]+' '+ph[1]+' faz</span>':'')+(cs.dayIn?'<span class="faint">· döngü günü '+cs.dayIn+'</span>':'')+'</div>';
+    cc+='<div class="grid2"><div class="chip" style="background:rgba(229,139,155,0.1);"><div class="faint" style="font-size:11px;">Sonraki regl</div><div style="font-size:16px;font-weight:800;">'+fmtTR(cs.next)+'</div></div><div class="chip" style="background:rgba(232,165,60,0.1);"><div class="faint" style="font-size:11px;">Doğurganlık penceresi</div><div style="font-size:14px;font-weight:800;">'+fmtTR(cs.fS)+' – '+fmtTR(cs.fE)+'</div></div></div>';
+  } else cc+='<div class="faint" style="font-size:13px;">Henüz regl kaydı yok.</div>';
+  h+=card(cc)+'<div style="height:12px;"></div>';
+  // today detail (meals, mood, note)
+  var td='<div style="font-weight:700;margin-bottom:10px;">Bugün ('+shortD(t)+')</div>';
+  var mood=rec&&rec.mood&&MOODS[rec.mood]?MOODS[rec.mood]:null;
+  td+='<div style="font-size:13px;margin-bottom:8px;">Mod: <b>'+(mood?mood[0]+' '+mood[1]:'—')+'</b>'+(rec&&rec.flow&&FLOW[rec.flow]?' · Akış: <b>'+FLOW[rec.flow]+'</b>':'')+'</div>';
+  var anyMeal=false;
+  MEALS.forEach(function(m){var v=rec&&rec.meals?rec.meals[m[0]]:'';if(v&&String(v).trim()){anyMeal=true;td+='<div style="font-size:13px;line-height:1.5;margin-bottom:3px;">'+m[1]+' <b>'+m[2]+':</b> '+esc(v)+'</div>';}});
+  if(!anyMeal)td+='<div class="faint" style="font-size:13px;">Bugün öğün kaydı yok.</div>';
+  if(rec&&rec.note)td+='<div style="margin-top:10px;font-size:13px;line-height:1.5;background:rgba(255,232,163,0.28);border-radius:12px;padding:11px;">📝 '+esc(rec.note)+'</div>';
+  h+=card(td);
+  h+='<div class="faint" style="text-align:center;font-size:11px;margin-top:20px;">Salt-okunur panel · '+esc(REPO)+'@'+esc(BRANCH)+' · otomatik 5 dk\'da bir yenilenir</div>';
+  document.getElementById('app').innerHTML=h;
+}
+
+function fail(msg){
+  document.getElementById('app').innerHTML='<div class="glass" style="padding:20px;"><div style="font-weight:800;font-size:18px;margin-bottom:8px;">Veri okunamadı</div><div class="muted" style="font-size:14px;line-height:1.6;">'+esc(msg)+'</div><div class="faint" style="font-size:12.5px;margin-top:12px;line-height:1.6;">Uygulamada en az bir kez "Kaydet" yapılmış ve <b>'+esc(BRANCH)+'</b> branch\'inde <b>data/latest.json</b> oluşmuş olmalı. Farklı repo için: <code>?repo=kullanıcı/repo&amp;branch=dal</code></div></div>';
+}
+
+function load(){
+  var p=REPO.split('/');
+  var raw='https://raw.githubusercontent.com/'+p[0]+'/'+p[1]+'/'+BRANCH+'/data/latest.json?t='+Date.now();
+  fetch(raw).then(function(r){ if(!r.ok) throw new Error('raw '+r.status); return r.json(); })
+    .then(function(j){ D=j; safeRender(); })
+    .catch(function(){ // fallback: GitHub API
+      var api='https://api.github.com/repos/'+p[0]+'/'+p[1]+'/contents/data/latest.json?ref='+BRANCH+'&t='+Date.now();
+      fetch(api,{headers:{'Accept':'application/vnd.github.raw'}}).then(function(r){ if(!r.ok) throw new Error('api '+r.status); return r.json(); })
+        .then(function(j){ D=j; safeRender(); })
+        .catch(function(e){ fail(String(e.message||e)); });
+    });
+}
+function safeRender(){ try{ if(!D||!D.days||!D.startDate) throw new Error('Beklenen veri yapısı yok.'); render(); }catch(e){ fail(String(e.message||e)); } }
+load();
+setTimeout(function(){ location.reload(); }, 300000);
+})();
+</script>
+</body>
+</html>

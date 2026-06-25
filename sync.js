@@ -1,10 +1,7 @@
-// sync.js — Şeyma 🦩 repo senkron katmanı
-// İki yöntem destekler:
-//   1) Doğrudan GitHub: settings.ghToken + ghRepo (+ ghBranch) varsa, veriyi
-//      tarayıcıdan doğrudan GitHub Contents API ile repoya yazar. Worker gerekmez.
-//   2) Cloudflare Worker: settings.syncUrl varsa, veriyi o endpoint'e POST eder.
-// Token YALNIZCA bu cihazın localStorage'ında durur; repoya/sayfaya yazılmaz.
-// Hiçbiri tanımlı değilse sessizce devre dışı kalır (yalnızca yerel kayıt).
+// sync.js — Şeyma 🦩 repo senkron katmanı (yalnızca doğrudan GitHub)
+// settings.ghToken + ghRepo (+ ghBranch) tanımlıysa, veriyi tarayıcıdan
+// doğrudan GitHub Contents API ile repoya yazar. Token YALNIZCA bu cihazın
+// localStorage'ında durur; repoya/sayfaya yazılmaz. Tanımlı değilse devre dışı.
 (function(){
 "use strict";
 var KEY='seyma-reset-v1';
@@ -20,24 +17,22 @@ function settings(){
 function cfg(){
   var s=settings();
   var tok=(s.ghToken||'').trim(), repo=(s.ghRepo||'').trim();
-  if(tok && repo.indexOf('/')>0){ var p=repo.split('/'); return {mode:'github', token:tok, owner:p[0].trim(), repo:p[1].trim(), branch:(s.ghBranch||'data').trim()||'data'}; }
-  var url=(s.syncUrl||'').trim();
-  if(url) return {mode:'worker', url:url};
+  if(tok && repo.indexOf('/')>0){ var p=repo.split('/'); return {token:tok, owner:p[0].trim(), repo:p[1].trim(), branch:(s.ghBranch||'data').trim()||'data'}; }
   return null;
 }
 function pad(n){ return (n<10?'0':'')+n; }
 function timeStr(iso){ try{ var d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }catch(e){ return ''; } }
 function statusText(){
   var c=cfg();
-  if(!c) return 'Sync kapalı — veriler bu cihazda saklanıyor.';
-  var where=c.mode==='github'?('GitHub · '+c.owner+'/'+c.repo+'@'+c.branch):'Worker';
+  if(!c) return 'Bağlı değil — veriler bu cihazda saklanıyor.';
+  var where=c.owner+'/'+c.repo+'@'+c.branch;
   if(state.status==='saving') return 'Kaydediliyor… ('+where+')';
   if(state.status==='ok') return 'Repoya kaydedildi ✓ '+timeStr(state.last)+' · '+where;
-  if(state.status==='error') return 'Sync hatası: '+(state.error||'bilinmiyor');
+  if(state.status==='error') return 'Hata: '+(state.error||'bilinmiyor');
   return 'Hazır · '+where;
 }
 function paint(){ var el=document.getElementById('sey-sync-status'); if(el) el.textContent=statusText(); }
-function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().toISOString(); state.error=null; } if(s==='error') state.error=err||'bilinmiyor'; paint(); }
+function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().toISOString(); state.error=null; if(window.SeyOnSynced){ try{ window.SeyOnSynced(); }catch(e){} } } if(s==='error') state.error=err||'bilinmiyor'; paint(); }
 
 // unicode-safe base64 (büyük JSON için döngülü)
 function b64(str){ var bytes=new TextEncoder().encode(str); var bin=''; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
@@ -53,26 +48,20 @@ function ghPut(c, path, contentStr){
       return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)}); })
     .then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+' '+t.slice(0,160)); }); });
 }
-function pushGithub(c, data){
+// repoya yazmadan önce hassas alanları (token) çıkar — public repoya sızmasın
+function sanitize(data){ var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; } if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; } return c; }
+function doPush(data){
+  var c=cfg(); if(!c){ setStatus('idle'); return; }
   setStatus('saving');
+  var safe=sanitize(data);
   var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
-  var latest=JSON.stringify(data,null,2);
-  var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:data},null,2);
+  var latest=JSON.stringify(safe,null,2);
+  var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:safe},null,2);
   ghPut(c,'data/latest.json',latest)
-    .then(function(){ return ghPut(c,'data/seyma-'+today+'.json',snap); })
+    .then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); })
     .then(function(){ setStatus('ok'); })
     .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
 }
-function pushWorker(c, data){
-  setStatus('saving');
-  var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
-  var body=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:data});
-  fetch(c.url,{method:'POST',headers:{'Content-Type':'application/json'},body:body})
-    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text().catch(function(){return '';}); })
-    .then(function(){ setStatus('ok'); })
-    .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
-}
-function doPush(data){ var c=cfg(); if(!c){ setStatus('idle'); return; } if(c.mode==='github') pushGithub(c,data); else pushWorker(c,data); }
 
 window.SeySync={
   schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },

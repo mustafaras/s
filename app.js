@@ -88,21 +88,22 @@ var WIND_DOWN_STEPS=[
 ];
 var RITUAL_STAGES=[
   {key:'transition',label:'Geceye geçiş',hint:'Işık düşsün, tempo yavaşlasın.',secs:60,
-    voice:'Geceye geçiyoruz. Işıkları kıs, telefonu bırakmaya hazırlan. Omuzlarını indir.',
-    lines:['Işığı kıs, ekran parlaklığını azalt.','Omuzlarını yavaşça aşağı bırak.','Çeneni gevşet, dilini damağından ayır.']},
+    voice:'Hoş geldin. Şimdi yavaşça geceye geçiyoruz. Acele yok. Işıkları biraz kıs, telefonu bırakmaya hazırlan ve omuzlarını usulca aşağı indir.',
+    lines:['Işığı yumuşat, ekranı biraz daha kıs.','Omuzlarını yavaşça aşağı bırak.','Çeneni gevşet, dilini damağından ayır.','Hiçbir yere yetişmen gerekmiyor; sadece buradasın.','Bir sonraki nefesinle biraz daha yavaşla.']},
   {key:'breath',label:'Nefes senkronu',hint:'4 sn al · 6 sn ver.',secs:180,
-    voice:'Şimdi nefesini yavaşlatıyoruz. Burnundan dört saniye al, ağzından altı saniye ver.',
-    lines:['Burnundan yavaşça nefes al.','Karnını şişir, göğsün sakin kalsın.','Verirken tüm gerginliği bırak.']},
+    voice:'Şimdi nefesini yavaşça uzatıyoruz. Burnundan dört sayarak yumuşacık al… ve ağzından altı sayarak uzun uzun bırak.',
+    lines:['Nefesini zorlama, kendi akışında bıraksın.','Verirken gün içindeki gerginliği de bırak.','Her nefeste biraz daha ağırlaşıyorsun.','Karnın yumuşakça inip kalksın.']},
   {key:'body',label:'Body scan',hint:'Çene, omuz, göğüs, bacak gevşet.',secs:120,
-    voice:'Bedenini tarıyoruz. Dikkatini yavaşça yukarıdan aşağıya indir ve her bölgeyi gevşet.',
-    lines:['Yüzünü ve çeneni yumuşat.','Omuz ve boynunu serbest bırak.','Bacaklarını yatağa ağırlaştır.']},
+    voice:'Şimdi bedenini yumuşacık tarıyoruz. Dikkatini hiç acele etmeden yukarıdan aşağıya indir ve dokunduğun her yeri bırak.',
+    lines:['Alnını ve gözlerinin çevresini yumuşat.','Çeneni ve dilini serbest bırak.','Omuzların yatağa doğru eriyip dağılsın.','Göğsün ve karnın gevşesin.','Bacakların ağırlaşsın, yatağa bıraksın kendini.']},
   {key:'offload',label:'Zihni boşalt',hint:'Yarına tek not bırak ve bırak.',secs:120,
-    voice:'Aklındaki yarına ait tek bir şeyi yaz ve bırak. Zihnini gece için boşalt.',
-    lines:['Yarın için tek bir not bırak.','Düşünce gelirse "yarın" de, geç.','Zihnini bu gece için boşalt.']},
+    voice:'Şimdi zihnini hafifletiyoruz. Aklında dönen yarına ait tek bir şeyi düşün, onu bir kenara yaz ve gece boyunca tutmana gerek yok.',
+    lines:['Yarın için tek bir not bırak, gerisini sabaha sakla.','Bir düşünce gelirse, yumuşakça "yarın" de ve geç.','Zihnin bir göl gibi durulsun.','Tutmaya çalıştığın her şeyi nefesinle bırak.']},
   {key:'descent',label:'Uykuya iniş',hint:'Ekran sadeleşsin, sadece ritim kalsın.',secs:120,
-    voice:'Artık uykuya iniyoruz. Sadece nefesini izle. Ekranı bırakabilirsin.',
-    lines:['Sadece nefesini izle.','Bedenin gittikçe ağırlaşıyor.','Ekranı bırak, uykuya bırak kendini.']}
+    voice:'Artık yavaşça uykuya iniyoruz. Yapacak bir şey kalmadı. Sadece nefesini izle ve istediğin an ekranı bırakabilirsin.',
+    lines:['Sadece nefesini izle, gerisi kendiliğinden olacak.','Bedenin gittikçe ağırlaşıyor, yatağa gömülüyor.','Düşünceler gelip geçsin, sen sadece izle.','Ekranı bırak, kendini uykuya bırak. İyi geceler.']}
 ];
+var BREATH_LINES=['Burnundan yavaşça al… ve uzun uzun ver.','Çok güzel. Aynı ritimde devam et.','Her nefeste biraz daha gevşiyorsun.','Acele yok; nefes seni taşısın.'];
 var BODY_SCAN_POINTS=[
   {label:'Çene ve yüz',cue:'Dişlerini sıkma, yüzü yumuşat.'},
   {label:'Omuz ve boyun',cue:'Omuzları aşağı bırak, çeneyi serbest bırak.'},
@@ -141,7 +142,7 @@ function migrate(d){
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
 var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
-var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null};
+var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null,lineStamp:0,lineCursor:0};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -263,7 +264,7 @@ function ritualSpeechUnlock(){
   }catch(e){}
 }
 function ritualSpeak(text,opts){
-  if(!speechAvailable() || ui.ritualSoundMode!=='guided' || !ui.ritualRunning || !text) return;
+  if(!speechAvailable() || (ui.ritualSoundMode!=='guided' && !(opts&&opts.force)) || (!ui.ritualRunning && !(opts&&opts.force)) || !text) return;
   opts=opts||{};
   try{
     var synth=window.speechSynthesis;
@@ -272,9 +273,9 @@ function ritualSpeak(text,opts){
     var u=new SpeechSynthesisUtterance(text);
     var v=ritualPickVoice();
     if(v){ u.voice=v; u.lang=v.lang||'tr-TR'; } else { u.lang='tr-TR'; }
-    u.rate=opts.rate||0.84;
-    u.pitch=opts.pitch||0.92;
-    u.volume=opts.volume!=null?opts.volume:1;
+    u.rate=opts.rate||0.70;
+    u.pitch=opts.pitch||0.80;
+    u.volume=opts.volume!=null?opts.volume:0.95;
     ritualAudio.speechUnlocked=true;
     synth.speak(u);
     setTimeout(function(){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} },180);
@@ -355,15 +356,17 @@ function ensureRitualAudio(){
 }
 function ritualCue(freq,dur,vol){
   var ctx=ensureRitualAudio(); if(!ctx || ui.ritualSoundMode!=='guided') return;
-  var o=ctx.createOscillator(); var g=ctx.createGain();
-  o.type='sine'; o.frequency.value=freq||420; g.gain.value=0;
-  o.connect(g); g.connect(ritualAudio.master);
-  var t=ctx.currentTime;
-  g.gain.cancelScheduledValues(t);
-  g.gain.setValueAtTime(0,t);
-  g.gain.linearRampToValueAtTime(vol||0.05,t+0.06);
-  g.gain.exponentialRampToValueAtTime(0.001,t+(dur||0.35));
-  o.start(t); o.stop(t+(dur||0.35)+0.03);
+  var o=ctx.createOscillator(); var g=ctx.createGain(); var lp=ctx.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value=Math.min(900,(freq||300)*2.0); lp.Q.value=0.5;
+  o.type='sine'; o.frequency.value=freq||300; g.gain.value=0;
+  o.connect(lp); lp.connect(g); g.connect(ritualAudio.master);
+  var t=ctx.currentTime; var D=dur||1.4; var V=vol||0.035;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.linearRampToValueAtTime(V,t+0.32);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+D);
+  o.frequency.setValueAtTime(freq||300,t);
+  o.frequency.linearRampToValueAtTime((freq||300)*0.96,t+D);
+  o.start(t); o.stop(t+D+0.06);
 }
 function ritualAudioSetTargets(mode,stageKey){
   var ctx=ensureRitualAudio(); if(!ctx || !ritualAudio.master) return;
@@ -391,24 +394,41 @@ function ritualAudioSync(forceCue){
   ritualAudioSetTargets(ui.ritualSoundMode,info.stage.key);
   ritualAudio.running=true;
   if(ui.ritualSoundMode==='guided' && speechAvailable()){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} }
-  if(forceCue && ui.ritualSoundMode==='guided') ritualCue(528,0.30,0.075);
+  if(forceCue && ui.ritualSoundMode==='guided') ritualCue(300,1.6,0.03);
+  var gm=ui.ritualSoundMode==='guided';
   if(info.stage.key!==ritualAudio.stageKey){
     ritualAudio.stageKey=info.stage.key;
     ritualAudio.breathPhase=null;
-    if(ui.ritualSoundMode==='guided'){
-      var f=info.stage.key==='breath'?432:(info.stage.key==='descent'?312:520);
-      ritualCue(f,0.45,0.08);
+    ritualAudio.lineStamp=info.elapsedInStage;
+    ritualAudio.lineCursor=0;
+    if(gm){
+      var f=info.stage.key==='breath'?300:(info.stage.key==='descent'?232:288);
+      ritualCue(f,1.8,0.032);
       ritualSpeak(info.stage.voice,{interrupt:true});
     }
   }
-  if(ui.ritualSoundMode==='guided' && info.stage.key==='breath'){
+  if(gm && info.stage.key==='breath'){
     var c=info.elapsedInStage%10;
     var ph=c<4?'in':'out';
     if(ph!==ritualAudio.breathPhase){
       ritualAudio.breathPhase=ph;
-      if(ph==='in') ritualCue(440,0.55,0.085);
-      else ritualCue(294,0.85,0.075);
-      if(info.elapsedInStage>9) ritualSpeak(ph==='in'?'Al':'Ver',{interrupt:true,rate:0.9,volume:0.85});
+      if(ph==='in') ritualCue(264,3.4,0.03);
+      else ritualCue(198,5.2,0.028);
+      if(info.elapsedInStage>11){
+        var cyc=Math.floor(info.elapsedInStage/10);
+        if(cyc%4===0){
+          if(ph==='in') ritualSpeak(BREATH_LINES[(cyc/4)%BREATH_LINES.length],{interrupt:true,rate:0.66,pitch:0.80});
+        } else {
+          ritualSpeak(ph==='in'?'Nefes al':'Nefes ver',{interrupt:true,rate:0.64,pitch:0.80,volume:0.9});
+        }
+      }
+    }
+  } else if(gm){
+    ritualAudio.breathPhase=null;
+    if(info.stage.lines && info.stage.lines.length && (info.elapsedInStage-(ritualAudio.lineStamp||0))>=21){
+      ritualAudio.lineStamp=info.elapsedInStage;
+      ritualAudio.lineCursor=(ritualAudio.lineCursor||0)+1;
+      ritualSpeak(info.stage.lines[ritualAudio.lineCursor%info.stage.lines.length],{interrupt:false,rate:0.68,pitch:0.80});
     }
   } else {
     ritualAudio.breathPhase=null;
@@ -662,8 +682,10 @@ App.startRitual=function(){
       save();
       logRitualSession(true);
       ui.ritualStartedAt=null;
+      var wasGuided=ui.ritualSoundMode==='guided';
       ritualSpeechStop();
       ritualAudioSync(false);
+      if(wasGuided) ritualSpeak('Çok güzel. Ritüel tamamlandı. Ekranı bırak ve kendini uykuya bırak. İyi geceler.',{force:true,interrupt:true,rate:0.66,pitch:0.80});
       trackRitualEvent('complete');
       render();
       toast('Ritüel tamamlandı. İyi geceler 🌙',2600);

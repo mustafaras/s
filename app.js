@@ -85,6 +85,19 @@ var WIND_DOWN_STEPS=[
   {key:'dump',icon:'📝',label:'Zihin boşalt',note:'Yarın notu, ruminasyonu düşürür.'},
   {key:'cool',icon:'🌙',label:'Odayı serinlet',note:'18-20°C aralığı dalmayı destekler.'}
 ];
+var RITUAL_STAGES=[
+  {key:'transition',label:'Geceye geçiş',hint:'Işık düşsün, tempo yavaşlasın.',secs:60},
+  {key:'breath',label:'Nefes senkronu',hint:'4 sn al · 6 sn ver.',secs:180},
+  {key:'body',label:'Body scan',hint:'Çene, omuz, göğüs, bacak gevşet.',secs:120},
+  {key:'offload',label:'Zihni boşalt',hint:'Yarına tek not bırak ve bırak.',secs:120},
+  {key:'descent',label:'Uykuya iniş',hint:'Ekran sadeleşsin, sadece ritim kalsın.',secs:120}
+];
+var BODY_SCAN_POINTS=[
+  {label:'Çene ve yüz',cue:'Dişlerini sıkma, yüzü yumuşat.'},
+  {label:'Omuz ve boyun',cue:'Omuzları aşağı bırak, çeneyi serbest bırak.'},
+  {label:'Göğüs ve karın',cue:'Nefes verirken karnı gevşet.'},
+  {label:'Kalça ve bacak',cue:'Bacakları yatağa ağırlaştır, bırak gitsin.'}
+];
 var FLOW=[{id:'spot',emoji:'🩸',label:'Leke'},{id:'light',emoji:'🌸',label:'Hafif'},{id:'medium',emoji:'🌺',label:'Orta'},{id:'heavy',emoji:'🌹',label:'Yoğun'}];
 var SYMPTOMS=[{id:'kramp',emoji:'🤕',label:'Kramp'},{id:'bas',emoji:'🤯',label:'Baş ağrısı'},{id:'siskinlik',emoji:'🎈',label:'Şişkinlik'},{id:'yorgun',emoji:'🥱',label:'Yorgunluk'},{id:'duygu',emoji:'🥲',label:'Duygusal'},{id:'istah',emoji:'🍫',label:'İştah'},{id:'sanci',emoji:'⚡',label:'Sancı'},{id:'cilt',emoji:'🌋',label:'Cilt'}];
 // 4 menstrüel faz — kısa bilimsel notlar (tıbbi tavsiye değildir)
@@ -115,8 +128,9 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0};
-var sosInterval=null, sleepRitualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient'};
+var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -134,8 +148,122 @@ function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
 function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
-function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,cool:false},lastMinutes:null,lastDoneAt:null}; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null,windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null,windDown:emptyWindDown()}; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
+function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,cool:false},lastMinutes:null,lastDoneAt:null,offloadNote:'',events:[]}; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null,windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null,windDown:emptyWindDown()}; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
+function ritualStageInfo(){
+  var elapsed=Math.max(0,ui.ritualTotal-ui.ritualLeft);
+  var sum=0;
+  for(var i=0;i<RITUAL_STAGES.length;i++){
+    var st=RITUAL_STAGES[i];
+    var end=sum+st.secs;
+    if(elapsed<end || i===RITUAL_STAGES.length-1){
+      return {index:i,stage:st,elapsedInStage:Math.max(0,elapsed-sum),leftInStage:Math.max(0,end-elapsed),sumBefore:sum};
+    }
+    sum=end;
+  }
+  return {index:0,stage:RITUAL_STAGES[0],elapsedInStage:0,leftInStage:RITUAL_STAGES[0].secs,sumBefore:0};
+}
+function ritualOrbScale(){
+  var info=ritualStageInfo();
+  if(info.stage.key!=='breath') return 1;
+  var t=info.elapsedInStage%10;
+  if(t<4) return (0.82+(t/4)*0.22).toFixed(3);
+  return (1.04-((t-4)/6)*0.24).toFixed(3);
+}
+function ritualBodyPoint(info){
+  var idx=Math.min(BODY_SCAN_POINTS.length-1,Math.floor(info.elapsedInStage/30));
+  return BODY_SCAN_POINTS[Math.max(0,idx)];
+}
+function ritualBreathPrompt(info){
+  var t=info.elapsedInStage%10;
+  if(t<4) return {label:'Nefes al',sub:'4 saniye'};
+  return {label:'Nefes ver',sub:'6 saniye'};
+}
+function trackRitualEvent(type,meta){
+  var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
+  if(!Array.isArray(d.sleep.windDown.events)) d.sleep.windDown.events=[];
+  d.sleep.windDown.events.push({type:type,at:new Date().toISOString(),left:ui.ritualLeft,stage:ritualStageInfo().stage.key,mode:ui.ritualSoundMode,meta:meta||null});
+  if(d.sleep.windDown.events.length>80) d.sleep.windDown.events=d.sleep.windDown.events.slice(-80);
+  d.savedAt=new Date().toISOString();
+  save();
+}
+function ritualAudioAvailable(){ return typeof window!=='undefined' && !!(window.AudioContext||window.webkitAudioContext); }
+function ensureRitualAudio(){
+  if(!ritualAudioAvailable()) return null;
+  if(ritualAudio.ctx) return ritualAudio.ctx;
+  var Ctor=window.AudioContext||window.webkitAudioContext;
+  var ctx=new Ctor();
+  var master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
+  var noiseGain=ctx.createGain(); noiseGain.gain.value=0;
+  var noiseBuffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
+  var ch=noiseBuffer.getChannelData(0);
+  var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(var i=0;i<ch.length;i++){
+    var white=Math.random()*2-1;
+    b0=0.99886*b0+white*0.0555179;
+    b1=0.99332*b1+white*0.0750759;
+    b2=0.96900*b2+white*0.1538520;
+    b3=0.86650*b3+white*0.3104856;
+    b4=0.55000*b4+white*0.5329522;
+    b5=-0.7616*b5-white*0.0168980;
+    ch[i]=(b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;
+    b6=white*0.115926;
+  }
+  var noiseSource=ctx.createBufferSource();
+  noiseSource.buffer=noiseBuffer; noiseSource.loop=true;
+  var lowpass=ctx.createBiquadFilter(); lowpass.type='lowpass'; lowpass.frequency.value=900;
+  noiseSource.connect(lowpass); lowpass.connect(noiseGain); noiseGain.connect(master); noiseSource.start();
+  var padOsc=ctx.createOscillator(); padOsc.type='sine'; padOsc.frequency.value=126;
+  var padGain=ctx.createGain(); padGain.gain.value=0;
+  var padFilter=ctx.createBiquadFilter(); padFilter.type='lowpass'; padFilter.frequency.value=420;
+  padOsc.connect(padFilter); padFilter.connect(padGain); padGain.connect(master); padOsc.start();
+  ritualAudio.ctx=ctx; ritualAudio.master=master; ritualAudio.noiseSource=noiseSource; ritualAudio.noiseGain=noiseGain; ritualAudio.padOsc=padOsc; ritualAudio.padGain=padGain;
+  return ctx;
+}
+function ritualCue(freq,dur,vol){
+  var ctx=ensureRitualAudio(); if(!ctx || ui.ritualSoundMode!=='guided') return;
+  var o=ctx.createOscillator(); var g=ctx.createGain();
+  o.type='sine'; o.frequency.value=freq||420; g.gain.value=0;
+  o.connect(g); g.connect(ritualAudio.master);
+  var t=ctx.currentTime;
+  g.gain.cancelScheduledValues(t);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol||0.05,t+0.06);
+  g.gain.exponentialRampToValueAtTime(0.001,t+(dur||0.35));
+  o.start(t); o.stop(t+(dur||0.35)+0.03);
+}
+function ritualAudioSetTargets(mode,stageKey){
+  var ctx=ensureRitualAudio(); if(!ctx || !ritualAudio.master) return;
+  if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+  var t=ctx.currentTime;
+  var master=0,noise=0,pad=0,padFreq=126;
+  if(mode==='ambient'){ master=0.16; noise=0.14; pad=0.055; }
+  else if(mode==='guided'){ master=0.2; noise=0.12; pad=0.065; }
+  if(stageKey==='transition'){ padFreq=132; }
+  else if(stageKey==='breath'){ padFreq=120; pad+=0.018; }
+  else if(stageKey==='body'){ padFreq=112; }
+  else if(stageKey==='offload'){ padFreq=104; noise*=0.8; }
+  else if(stageKey==='descent'){ padFreq=98; noise*=0.68; pad*=0.7; }
+  ritualAudio.master.gain.setTargetAtTime(master,t,0.7);
+  ritualAudio.noiseGain.gain.setTargetAtTime(noise,t,0.9);
+  ritualAudio.padGain.gain.setTargetAtTime(pad,t,0.9);
+  ritualAudio.padOsc.frequency.setTargetAtTime(padFreq,t,1.2);
+}
+function ritualAudioSync(forceCue){
+  var info=ritualStageInfo();
+  if(!ui.ritualRunning){ ritualAudioSetTargets('silent',info.stage.key); ritualAudio.running=false; return; }
+  ritualAudioSetTargets(ui.ritualSoundMode,info.stage.key);
+  ritualAudio.running=true;
+  if(forceCue && ui.ritualSoundMode==='guided') ritualCue(520,0.28,0.045);
+  if(info.stage.key!==ritualAudio.stageKey){
+    ritualAudio.stageKey=info.stage.key;
+    if(ui.ritualSoundMode==='guided'){
+      var f=info.stage.key==='breath'?430:(info.stage.key==='descent'?320:500);
+      ritualCue(f,0.33,0.05);
+    }
+  }
+}
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
@@ -306,8 +434,95 @@ App.toggleSymptom=function(id){ var day=getDay(data,todayStr(),dayIndexFor(today
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 App.goSos=function(){ App.go('sos'); };
 App.quickSleepRitual=function(){
-  App.go('saglik');
-  setTimeout(function(){ App.startWindDown(10); },120);
+  App.openRitual();
+};
+App.openRitual=function(){
+  clearInterval(ritualInterval);
+  ui.ritualOpen=true;
+  ui.ritualRunning=false;
+  ui.ritualDone=false;
+  ui.ritualTotal=600;
+  ui.ritualLeft=600;
+  ritualAudio.stageKey=null;
+  ritualAudioSync(false);
+  trackRitualEvent('open');
+  render();
+};
+App.closeRitual=function(){
+  clearInterval(ritualInterval);
+  ui.ritualOpen=false;
+  ui.ritualRunning=false;
+  ui.ritualDone=false;
+  ritualAudioSync(false);
+  trackRitualEvent('close');
+  render();
+};
+App.setRitualSoundMode=function(mode){
+  if(['silent','ambient','guided'].indexOf(mode)<0) return;
+  ui.ritualSoundMode=mode;
+  ritualAudioSync(true);
+  trackRitualEvent('sound-mode',{mode:mode});
+  render();
+};
+App.onRitualOffload=function(el){
+  var v=el.value;
+  debounceSave('ritual-offload',function(){
+    var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
+    if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
+    d.sleep.windDown.offloadNote=v;
+    d.savedAt=new Date().toISOString();
+    save();
+  },300);
+};
+App.startRitual=function(){
+  if(ui.ritualDone){ ui.ritualLeft=ui.ritualTotal; ui.ritualDone=false; }
+  if(ui.ritualRunning) return;
+  ui.ritualRunning=true;
+  clearInterval(ritualInterval);
+  ritualAudioSync(true);
+  trackRitualEvent('start');
+  render();
+  ritualInterval=setInterval(function(){
+    ui.ritualLeft--;
+    if(ui.ritualLeft<=0){
+      clearInterval(ritualInterval);
+      ui.ritualLeft=0;
+      ui.ritualRunning=false;
+      ui.ritualDone=true;
+      var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
+      if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
+      d.sleep.windDown.lastMinutes=10;
+      d.sleep.windDown.lastDoneAt=new Date().toISOString();
+      WIND_DOWN_STEPS.forEach(function(s){ d.sleep.windDown.steps[s.key]=true; });
+      d.savedAt=new Date().toISOString();
+      save();
+      ritualAudioSync(false);
+      trackRitualEvent('complete');
+      render();
+      toast('Ritüel tamamlandı. İyi geceler 🌙',2600);
+    } else {
+      ritualAudioSync(false);
+      render();
+    }
+  },1000);
+};
+App.pauseRitual=function(){
+  if(!ui.ritualRunning) return;
+  clearInterval(ritualInterval);
+  ui.ritualRunning=false;
+  ritualAudioSync(false);
+  trackRitualEvent('pause');
+  render();
+};
+App.resetRitual=function(){
+  clearInterval(ritualInterval);
+  ui.ritualRunning=false;
+  ui.ritualDone=false;
+  ui.ritualLeft=ui.ritualTotal;
+  ritualAudio.stageKey=null;
+  ritualAudioSync(false);
+  trackRitualEvent('reset');
+  render();
 };
 
 App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
@@ -751,13 +966,16 @@ function sparkCard(){
 
 function sleepReadiness(rec){
   var sl=rec&&rec.sleep?rec.sleep:{};
-  var wd=sl.windDown&&sl.windDown.steps?sl.windDown.steps:emptyWindDown().steps;
+  var wind=sl.windDown||emptyWindDown();
+  var wd=wind.steps?wind.steps:emptyWindDown().steps;
   var completed=WIND_DOWN_STEPS.reduce(function(a,s){ return a+(wd[s.key]?1:0); },0);
   var score=35+(completed*10);
   var hours=num(sl.hours);
   if(hours!=null){ var diff=Math.abs(7.5-hours); score+=Math.max(0,28-Math.round(diff*10)); }
   if(sl.quality==='good') score+=14;
   else if(sl.quality==='ok') score+=8;
+  if(wind.lastDoneAt&&String(wind.lastDoneAt).slice(0,10)===todayStr()) score+=10;
+  if(wind.offloadNote&&String(wind.offloadNote).trim()) score+=3;
   score=Math.max(0,Math.min(100,score));
   var tier='Rahat';
   if(score>=85) tier='Mükemmel';
@@ -884,6 +1102,50 @@ function navHTML(){
 
 function modalsHTML(){
   var h='';
+  if(ui.ritualOpen){
+    var info=ritualStageInfo();
+    var stage=info.stage;
+    var phasePct=Math.round((ui.ritualTotal-ui.ritualLeft)/ui.ritualTotal*100);
+    var orbScale=ritualOrbScale();
+    var dRec=getDay(data,todayStr(),dayIndexFor(todayStr()));
+    var dWind=(dRec&&dRec.sleep&&dRec.sleep.windDown)?dRec.sleep.windDown:emptyWindDown();
+    h+='<div style="position:fixed;inset:0;z-index:380;background:radial-gradient(120% 100% at 50% 0%,#3A2C62 0%,#211733 42%,#14111D 100%);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 18px);animation:seyFade .25s ease;">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;"><button onclick="App.closeRitual()" style="border:1px solid rgba(255,255,255,0.25);cursor:pointer;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,0.08);color:#F3E9ED;font-size:12.5px;font-weight:700;">Kapat</button><div style="font-size:13px;color:rgba(255,255,255,0.86);font-weight:700;">10 dk Gece Ritüeli</div><div style="font-size:13px;color:#E9AFC1;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
+    h+='<div style="font-size:24px;font-weight:800;line-height:1.2;color:#fff;text-align:center;margin-top:2px;">'+esc(stage.label)+'</div>';
+    h+='<div style="font-size:13.5px;line-height:1.5;color:rgba(243,233,237,0.84);text-align:center;margin-top:6px;">'+esc(stage.hint)+'</div>';
+    h+='<div style="display:flex;gap:7px;margin-top:12px;">';
+    [['silent','Sessiz','🌑'],['ambient','Ambience','🌙'],['guided','Rehberli','🫧']].forEach(function(m){ var active=ui.ritualSoundMode===m[0]; h+='<button onclick="App.setRitualSoundMode(\''+m[0]+'\')" style="flex:1;border:'+(active?'1px solid rgba(233,175,193,0.78)':'1px solid rgba(255,255,255,0.18)')+';cursor:pointer;padding:8px 6px;border-radius:12px;background:'+(active?'linear-gradient(135deg,rgba(155,127,201,0.45),rgba(233,175,193,0.28))':'rgba(255,255,255,0.06)')+';color:#F3E9ED;font-size:12px;font-weight:'+(active?'800':'650')+';"><span style="margin-right:5px;">'+m[2]+'</span>'+m[1]+'</button>'; });
+    h+='</div>';
+    h+='<div style="flex:1;display:flex;align-items:center;justify-content:center;"><div style="position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center;">';
+    h+='<div style="position:absolute;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle at 50% 35%,rgba(233,175,193,0.38),rgba(155,127,201,0.12) 56%,rgba(0,0,0,0));filter:blur(0.2px);"></div>';
+    h+='<div style="position:absolute;width:176px;height:176px;border-radius:50%;border:1px solid rgba(255,255,255,0.23);background:linear-gradient(160deg,rgba(255,255,255,0.18),rgba(255,255,255,0.03));transform:scale('+orbScale+');transition:transform 900ms ease-in-out;"></div>';
+    h+='<div style="position:absolute;width:126px;height:126px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.86;box-shadow:0 14px 40px rgba(155,127,201,0.42);"></div>';
+    h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:33px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11.5px;opacity:0.9;margin-top:4px;">faz kalan</div></div>';
+    h+='</div></div>';
+    if(stage.key==='body'){
+      var bp=ritualBodyPoint(info);
+      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:11px 12px;text-align:center;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div style="font-size:15px;font-weight:800;color:#fff;margin-top:2px;">'+esc(bp.label)+'</div><div style="font-size:12px;color:rgba(243,233,237,0.86);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
+    } else if(stage.key==='breath'){
+      var bpr=ritualBreathPrompt(info);
+      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px;text-align:center;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;">NEFES RİTMİ</div><div style="font-size:16px;font-weight:800;color:#fff;margin-top:2px;">'+esc(bpr.label)+'</div><div style="font-size:12px;color:rgba(243,233,237,0.86);margin-top:3px;">'+esc(bpr.sub)+'</div></div>';
+    } else if(stage.key==='offload'){
+      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:10px 10px 9px;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;margin-bottom:6px;">YARINA BIRAK</div><textarea oninput="App.onRitualOffload(this)" rows="2" placeholder="Yarın için tek not: örn. 09:30 toplantı" style="width:100%;border:1px solid rgba(255,255,255,0.24);background:rgba(20,17,29,0.46);color:#F3E9ED;border-radius:10px;padding:9px 10px;font-size:13px;outline:none;resize:none;line-height:1.4;">'+esc(dWind.offloadNote||'')+'</textarea></div>';
+    } else if(stage.key==='descent'){
+      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;text-align:center;font-size:12.5px;color:rgba(243,233,237,0.88);line-height:1.45;">Bu fazda sadece nefesi izleyip ekranı bırakmaya hazırlan. Uyarıcı düşünce gelirse “yarın” diyerek geç.</div>';
+    }
+    h+='<div style="display:flex;gap:6px;margin-bottom:10px;">';
+    RITUAL_STAGES.forEach(function(s,idx){ var active=idx===info.index; var done=idx<info.index; h+='<div style="flex:1;height:8px;border-radius:999px;background:'+(done?'linear-gradient(90deg,#E9AFC1,#9B7FC9)':(active?'rgba(233,175,193,0.5)':'rgba(255,255,255,0.14)'))+';box-shadow:'+(active?'0 0 0 1px rgba(233,175,193,0.42) inset':'none')+';"></div>'; });
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.78);margin-bottom:14px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span>%'+phasePct+' tamamlandı</span></div>';
+    h+='<div style="display:flex;gap:8px;">';
+    if(!ui.ritualRunning&&ui.ritualLeft===ui.ritualTotal&&!ui.ritualDone) h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Ritüeli başlat</button>';
+    else if(ui.ritualRunning) h+='<button onclick="App.pauseRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Duraklat</button>';
+    else h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Devam et</button>';
+    h+='<button onclick="App.resetRitual()" style="border:1px solid rgba(255,255,255,0.24);cursor:pointer;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.08);color:#F3E9ED;font-size:13px;font-weight:700;">Sıfırla</button>';
+    h+='</div>';
+    if(ui.ritualDone) h+='<div style="margin-top:10px;text-align:center;font-size:12.5px;color:#E9AFC1;">Ritüel tamamlandı. Ekranı bırakıp uykuya geçebilirsin.</div>';
+    h+='</div>';
+  }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Tamam, devam ✨</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';

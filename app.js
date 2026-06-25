@@ -1,0 +1,765 @@
+(function(){
+"use strict";
+var KEY='seyma-reset-v1', TKEY='seyma-theme';
+
+var HABITS=[
+  {key:'sweetManaged',icon:'🍫',title:'Tatlı krizini yönettim',sub:'Tatlı seni değil, sen tatlıyı yönettin.',msg:'Tatlı lobisi bugün hafif geriledi. Şeyma 1 - Tatlı 0.'},
+  {key:'eveningControl',icon:'🌙',title:"Akşam 7'den sonra gereksiz atıştırmadım",sub:'Gerçek açlık başka, dolapla duygusal bağ başka.',msg:'Mutfak seferi iptal. Operasyon başarılı.'},
+  {key:'walked20',icon:'🚶‍♀️',title:'En az 20 dk yürüdüm',sub:'Kısa yürüyüş de sayılır. Sistem çalışıyor.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
+  {key:'protein',icon:'🍳',title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
+  {key:'water',icon:'💧',title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
+  {key:'vitaminD',icon:'☀️',title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti ☀️'},
+  {key:'selfKind',icon:'🫶',title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
+];
+var HABIT_TOTAL=HABITS.length;
+var MOODS=[
+  {id:'cok-iyi',label:'Çok iyi ☀️',short:'Çok iyi',emoji:'☀️',resp:'Bugün ışık saçıyoruz anlaşılan ☀️'},
+  {id:'iyi',label:'İyi 🌼',short:'İyi',emoji:'🌼',resp:'Gayet güzel. Ritim kuruluyor 🌼'},
+  {id:'normal',label:'Normal 🌿',short:'Normal',emoji:'🌿',resp:'Normal de olur. Her gün festival değil 🌿'},
+  {id:'zorlandim',label:'Zorlandım 🌧️',short:'Zor',emoji:'🌧️',resp:'Zor günler oyundan düşürmez Sevgili Günışığı 🌧️'},
+  {id:'cok-zorlandim',label:'Çok zorlandım 🫧',short:'Çok zor',emoji:'🫧',resp:'Bugün sadece kendine yüklenmemek bile yeter 🫧'}
+];
+var SOS_OPTS=['Su içtim 💧','Kahve/çay yaptım ☕','Yoğurt + tarçın denedim 🥣','Meyve + yoğurt yaptım 🍓','1-2 kare bitterle kapattım 🍫','Hâlâ istiyorum ama kontrollü yiyeceğim 🤝'];
+var DAILY=[
+  "Bugün tek görevin başlamak. Gerisi kendiliğinden gelir ☀️",
+  "Tatlıyı silmiyoruz; sadece patronun sen olduğunu hatırlatıyoruz.",
+  "Tok bir Şeyma, sakin bir Şeyma. Bugün öğünleri atlamıyoruz.",
+  "Akşam mutfağı bugün kısa ziyaret saatleriyle çalışıyor 🌙",
+  "Bir lokma planı bozmaz; bırakmak bozar, o da bugün yok.",
+  "Kısacık bir yürüyüş bile bugünü senin lehine çevirir 🚶‍♀️",
+  "Bir hafta tamam. Bu küçük bir şey değil, bayağı iş.",
+  "Kriz gelirse plan hazır: önce su, sonra nefes, sonra karar.",
+  "Bugün düzen günü. Sürpriz yok, sadece sakin bir ritim.",
+  "Yarı yola az kaldı; akıllı seçimler sessizce birikiyor.",
+  "Hamur işiyle bugün medeni bir mesafe: selamlaşırız, sarılmayız 🥐",
+  "Akşamki o istek çoğu zaman açlık değil. Bir bak bakalım.",
+  "Su artı yürüyüş, bugünün sessiz kahramanları 💧",
+  "İki hafta geride. Kontrol da keyif de sende.",
+  "Bugünün hedefi sade: rayda kal, gerisi gelir.",
+  "Tatlı çekti mi? Önce üç soru: aç mıyım, sıkkın mıyım, yorgun muyum?",
+  "Protein masada olunca krizler sesini kısıyor 🍳",
+  "Mutfakla bugün laubali değil, ölçülü bir ilişki.",
+  "Küçük seçimler toplanıyor; sen de gayet güzel toplanıyorsun.",
+  "Son düzlük. Bu bir yarış değil, sadece bir prova.",
+  "Şeyma 🦩 tamamlandı. Tatlıya saygı, kendine daha çok saygı 👑"
+];
+var NOTES=[
+  "Sevgili Günışığı, mükemmel olmana gerek yok; ben zaten senden yanayım.",
+  "Bugün bir şeyi iyi yaptıysan o gün kazanılmıştır, gerisi teferruat.",
+  "Aç kalma sakın; aç kalınca sen değil, içindeki kurabiye lobisi konuşuyor 🍪",
+  "Nutella'yı yargılamıyorum ama onu da fazla ciddiye almıyoruz, anlaştık mı?",
+  "Tatlı krizi geldiğinde panikleme; ekip hazır, kaptan sensin.",
+  "Bir lokma yüzünden koca günü yargılamak yok. Kraliçe sakinliğiyle devam.",
+  "Akşam dolabın önünde durduğunda bana bir mesaj at, krizini birlikte dağıtalım.",
+  "Sen bir flamingo gibisin Sevgili Günışığı: dengede dururken bile zarif 🦩",
+  "Bugün sadece su içip yürüdüysen bile 'kendime baktım' demektir, gerisi bonus.",
+  "Tatlıyla aranı açmak küslük değil; sadece medeni bir sınır koymak.",
+  "Sen koca bir kraliçesin, o minik bir kurabiye. Denge hep sende 👑",
+  "Zor bir gün mü oldu? Olur. Yarın seni bekleyen tertemiz bir sayfa var.",
+  "Gülümsediğinde tatlı listesi bir alt sıraya kayıyor, fark ettin mi?",
+  "Bugün kendine kibar davran; sen senin en sadık takım arkadaşınsın 💛",
+  "Bir bardak su, bir derin nefes, bir 'ben hallederim'. Tüm formül bu.",
+  "Ben buradayım Sevgili Günışığı. Kötü bir an olursa önce bana yaz, sonra dolaba değil.",
+  "Akşam yürüyüşünde şehir senin podyumun; baş model sensin.",
+  "Küçük zaferlerini küçümseme; birikince koca bir 'aferin' oluyorlar.",
+  "Bugün ters giden bir şey olduysa bile ben yine seninle gurur duyuyorum.",
+  "Tatlıyı sevmek suç değil; sadece her duyguyu tatlıyla çözmemeyi deniyoruz.",
+  "Yorulduğunda mola vermek de plana dahil. Dur, nefeslen, sonra devam et.",
+  "Bu oyunda da oyun dışında da takımın hep senden yana, Sevgili Günışığı."
+];
+var PHONE='+905066020098';
+var WA='https://wa.me/905066020098?text='+encodeURIComponent('Raşit, sana bir mesajım var 💌');
+var TEL='tel:'+PHONE;
+
+// ---------- meal / sleep / cycle defs ----------
+var MEALS=[
+  {key:'breakfast',icon:'🌅',label:'Kahvaltı',ph:'örn. yumurta, peynir, zeytin, çay…'},
+  {key:'lunch',icon:'☀️',label:'Öğle',ph:'örn. tavuk, salata, bulgur…'},
+  {key:'dinner',icon:'🌙',label:'Akşam',ph:'örn. çorba, sebze, yoğurt…'},
+  {key:'snack',icon:'🍓',label:'Ara öğün',ph:'örn. meyve, kuruyemiş, bitter…'}
+];
+var SLEEP_Q=[{id:'good',emoji:'😴',label:'Dinç'},{id:'ok',emoji:'🙂',label:'İdare'},{id:'bad',emoji:'😵‍💫',label:'Yorgun'}];
+var FLOW=[{id:'spot',emoji:'🩸',label:'Leke'},{id:'light',emoji:'🌸',label:'Hafif'},{id:'medium',emoji:'🌺',label:'Orta'},{id:'heavy',emoji:'🌹',label:'Yoğun'}];
+var SYMPTOMS=[{id:'kramp',emoji:'🤕',label:'Kramp'},{id:'bas',emoji:'🤯',label:'Baş ağrısı'},{id:'siskinlik',emoji:'🎈',label:'Şişkinlik'},{id:'yorgun',emoji:'🥱',label:'Yorgunluk'},{id:'duygu',emoji:'🥲',label:'Duygusal'},{id:'istah',emoji:'🍫',label:'İştah'},{id:'sanci',emoji:'⚡',label:'Sancı'},{id:'cilt',emoji:'🌋',label:'Cilt'}];
+// 4 menstrüel faz — kısa bilimsel notlar (tıbbi tavsiye değildir)
+var PHASES={
+  menstrual:{label:'Menstrüel faz',emoji:'🩸',color:'#E58B9B',note:'Regl günleri. Östrojen ve progesteron düşük. Demir açısından zengin beslenme ve nazik hareket iyi gelir.'},
+  follicular:{label:'Foliküler faz',emoji:'🌱',color:'#8FBF8A',note:'Östrojen yükselişte. Enerji ve ruh hali genelde toparlanır; antrenmana en açık dönem.'},
+  ovulation:{label:'Ovülasyon',emoji:'🌟',color:'#E8A53C',note:'Yumurtlama civarı, doğurganlık en yüksek. Hafif tek taraflı sancı (mittelschmerz) normal olabilir.'},
+  luteal:{label:'Luteal faz',emoji:'🌙',color:'#9B7FC9',note:'Progesteron yükselir; regl öncesi (PMS) belirtileri bu dönemde olur. Magnezyum ve düzenli uyku destekler.'}
+};
+
+// ---------- state ----------
+var data=null;
+try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
+if(data) data=migrate(data);
+function migrate(d){
+  if(!d) return d;
+  if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false};
+  if(typeof d.settings.syncUrl!=='string') d.settings.syncUrl='';
+  if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
+  if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
+  if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
+  if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
+  if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
+  if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
+  if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
+  d.version=2;
+  return d;
+}
+var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null};
+var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var fieldTimers={};
+function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
+
+// ---------- helpers ----------
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function todayStr(){ return fmt(new Date()); }
+function addDays(s,n){ var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); dt.setDate(dt.getDate()+n); return fmt(dt); }
+function diffDays(a,b){ var pa=a.split('-').map(Number),pb=b.split('-').map(Number); var da=new Date(pa[0],pa[1]-1,pa[2]),db=new Date(pb[0],pb[1]-1,pb[2]); return Math.round((db-da)/86400000); }
+function shortDate(s){ var p=s.split('-'); return p[2]+'.'+p[1]; }
+function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
+function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
+function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
+function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null},walk:{steps:null,minutes:null},flow:null,symptoms:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null}; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; } return d.days[date]; }
+function allDays(){ var out=[],s=data.startDate; for(var i=1;i<=21;i++){ var date=addDays(s,i-1); out.push({i:i,date:date,rec:data.days[date]||null}); } return out; }
+function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
+function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=moods[x];k=x;} } var o=k?find(MOODS,'id',k):null; return o?o.label:'—'; }
+function moodEmoji(id){ var o=find(MOODS,'id',id); return o?o.emoji:''; }
+function find(arr,key,val){ for(var i=0;i<arr.length;i++){ if(arr[i][key]===val) return arr[i]; } return null; }
+function currentStreak(){ var days=allDays(); var ci=Math.min(dayIndexFor(todayStr()),21); var c=0; for(var i=ci;i>=1;i--){ if(countRec(days[i-1].rec)>=4) c++; else break; } return c; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
+function commit(msg){ save(); render(); if(msg) toast(msg); }
+
+function interp(sweet,walk,evening){
+  if(sweet>=5) return 'Tatlı kontrolünde ritim oluşuyor. Kavga değil, yönetim.';
+  if(evening>=5) return 'Akşam atıştırması azaldıkça sabah daha hafif başlar.';
+  if(walk>=4) return 'Yürüyüş günleri artmış. Bu Şeyma hanımın lehine delildir.';
+  if(sweet+walk+evening>=3) return 'Zor günler var ama sistem devam ediyor. Olay bu.';
+  return 'Bir haftada birkaç küçük hamle bile gayet iş yapar.';
+}
+function weekBlock(w,days){
+  var slice=days.slice(w*7,w*7+7);
+  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['selfKind','Kendime iyi davrandım']];
+  var cnt=function(k){ return slice.reduce(function(a,o){return a+(o.rec&&o.rec.habits[k]?1:0);},0); };
+  var rows=defs.map(function(d){ return {label:d[1],val:cnt(d[0])+'/7'}; });
+  var totalC=slice.reduce(function(a,o){return a+countRec(o.rec);},0);
+  var moods={}; slice.forEach(function(o){ if(o.rec&&o.rec.mood) moods[o.rec.mood]=(moods[o.rec.mood]||0)+1; });
+  return {title:'Gün '+(w*7+1)+'-'+(w*7+7),rows:rows,avg:(totalC/7).toFixed(1)+'/'+HABIT_TOTAL,best:bestStreak(slice)+' gün',mood:topMood(moods),interp:interp(cnt('sweetManaged'),cnt('walked20'),cnt('eveningControl'))};
+}
+
+// ---------- toast & confetti ----------
+function toast(msg,ms){
+  var ex=document.getElementById('sey-toast'); if(ex) ex.remove();
+  var t=document.createElement('div'); t.id='sey-toast';
+  t.style.cssText='position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:400;background:rgba(44,36,38,0.92);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.25);animation:seyToast .25s ease;max-width:88vw;text-align:center;';
+  t.textContent=msg; document.body.appendChild(t);
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ if(t.parentNode) t.remove(); }, ms||1600);
+}
+function confetti(){
+  var colors=['#E9AFC1','#C9B8FF','#FFE8A3','#F7DDE5','#6B4A3A'];
+  var wrap=document.createElement('div'); wrap.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+  for(var i=0;i<48;i++){ var p=document.createElement('div'); var c=colors[i%colors.length]; var sz=6+Math.random()*8; p.style.cssText='position:absolute;top:-16px;left:'+(Math.random()*100)+'%;width:'+sz+'px;height:'+(sz*0.6)+'px;background:'+c+';border-radius:2px;opacity:0.9;animation:seyConfetti '+(2+Math.random()*1.6)+'s '+(Math.random()*0.35)+'s ease-in forwards;'; wrap.appendChild(p); }
+  document.body.appendChild(wrap); setTimeout(function(){ wrap.remove(); },4400);
+}
+
+// ---------- actions (exposed) ----------
+var App={};
+App.start=function(){ var t=todayStr(); data={version:2,startDate:t,lastOpenedDate:t,days:{},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,syncUrl:''},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
+App.toggleTheme=function(){ App.setTheme(!dark); };
+App.toggleHabit=function(key){
+  var date=todayStr(), idx=dayIndexFor(date), day=getDay(data,date,idx);
+  var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day);
+  ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
+  var msg='Kaydedildi ✨'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
+  commit(msg);
+  if(after===HABIT_TOTAL&&before<HABIT_TOTAL){ confetti(); setTimeout(function(){ toast('Bugün '+HABIT_TOTAL+'/'+HABIT_TOTAL+'. Şeyma hanım kontrolü ele aldı 👑',2600); },250); }
+  else if(day.habits[key]){ maybeStreak(); }
+};
+function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor ✨',7:'7 gün. Bu artık tesadüf değil ☀️',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir 🍫',21:'21 gün. Şeyma reseti tamamladı 👑'}; if(m[s]){ if(s===7||s===14||s===21) confetti(); setTimeout(function(){ toast(m[s],2600); },300); } }
+App.setMood=function(id){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); commit(); };
+App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.note=v; save(); },500); };
+App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); save(); },500); };
+
+// ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
+App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; day.savedAt=new Date().toISOString(); save(); }); };
+App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
+App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); day.savedAt=new Date().toISOString(); save(); }); };
+App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.minutes!=null&&day.walk.minutes>=20&&!day.habits.walked20){ day.habits.walked20=true; toast('20 dk yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
+
+// ---- Apple Health import ----
+App.importHealthClick=function(){ var f=document.getElementById('sey-health-file'); if(f) f.click(); };
+App.importHealthFile=function(el){ var file=el.files&&el.files[0]; el.value=''; if(!file) return; var st=document.getElementById('sey-health-status'); var name=(file.name||'').toLowerCase();
+  if(name.indexOf('.zip')>=0){ if(st) st.textContent='Zip doğrudan açılamıyor; lütfen zip içindeki export.xml dosyasını seç.'; return; }
+  if(st) st.textContent='Okunuyor…';
+  var r=new FileReader();
+  r.onload=function(){ try{ parseHealthXML(String(r.result)); }catch(e){ if(st) st.textContent='Dosya okunamadı.'; } };
+  r.onerror=function(){ if(st) st.textContent='Dosya okunamadı.'; };
+  r.readAsText(file);
+};
+function parseHealthXML(xml){
+  var st=document.getElementById('sey-health-status'); var today=todayStr();
+  var steps=0,sleepMs=0,found=false; var recRe=/<Record\b[^>]*>/g, rm;
+  while((rm=recRe.exec(xml))){ var tag=rm[0];
+    var type=(tag.match(/type="([^"]+)"/)||[])[1]; if(!type) continue;
+    if(type.indexOf('StepCount')<0 && type.indexOf('SleepAnalysis')<0) continue;
+    var sd=(tag.match(/startDate="([^"]+)"/)||[])[1]; var ed=(tag.match(/endDate="([^"]+)"/)||[])[1]; var val=(tag.match(/value="([^"]*)"/)||[])[1];
+    if(!sd||sd.slice(0,10)!==today) continue; found=true;
+    if(type.indexOf('StepCount')>=0){ steps+=Number(val)||0; }
+    else if(type.indexOf('SleepAnalysis')>=0 && /Asleep/i.test(val||'')){ var t1=Date.parse(sd),t2=Date.parse(ed); if(t1&&t2&&t2>t1) sleepMs+=(t2-t1); }
+  }
+  var d=getDay(data,today,dayIndexFor(today)); var msgs=[];
+  if(steps>0){ d.walk.steps=Math.round(steps); msgs.push(Math.round(steps)+' adım'); }
+  if(sleepMs>0){ var hrs=Math.round(sleepMs/3600000*10)/10; d.sleep.hours=hrs; msgs.push(hrs+' sa uyku'); }
+  if(steps>0||sleepMs>0){ d.savedAt=new Date().toISOString(); save(); render(); }
+  if(st) st.textContent=(steps>0||sleepMs>0)?('İçe aktarıldı: '+msgs.join(' · ')+' ✅'):(found?'Bugün için adım/uyku verisi bulunamadı.':'Bugüne ait kayıt yok. Dosya güncel mi?');
+}
+
+// ---- cycle actions ----
+App.logPeriodToday=function(){ var t=todayStr(); if(data.cycle.periods.some(function(p){return p.start===t;})){ toast('Bugün zaten kayıtlı'); return; } data.cycle.periods.push({start:t,end:null}); recalcCycle(); commit('Regl başlangıcı eklendi 🩸'); };
+App.setPeriodField=function(idx,which,el){ var p=data.cycle.periods[idx]; if(!p) return; p[which]=el.value||null; recalcCycle(); commit(); };
+App.removePeriod=function(idx){ if(data.cycle.periods[idx]){ data.cycle.periods.splice(idx,1); recalcCycle(); commit('Kayıt silindi'); } };
+App.setFlow=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.flow=(day.flow===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
+App.toggleSymptom=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var i=day.symptoms.indexOf(id); if(i>=0) day.symptoms.splice(i,1); else day.symptoms.push(id); day.savedAt=new Date().toISOString(); commit(); };
+function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
+App.goSos=function(){ App.go('sos'); };
+
+App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
+App.startSosTimer=function(){ clearInterval(sosInterval); ui.sosTiming=true; ui.sosLeft=600; render(); sosInterval=setInterval(function(){ ui.sosLeft--; if(ui.sosLeft<=0){ clearInterval(sosInterval); ui.sosLeft=0; ui.sosTiming=false; render(); toast('10 dakika doldu. Şimdi kararı sen ver ✨',2600); } else { updateSosTimer(); } },1000); };
+function updateSosTimer(){ var el=document.getElementById('sos-clock'); if(el){ el.textContent=pad(Math.floor(ui.sosLeft/60))+':'+pad(ui.sosLeft%60); } }
+App.completeSos=function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; ui.sosOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); day.habits.sweetManaged=true; day.savedAt=new Date().toISOString(); clearInterval(sosInterval); ui.sosTiming=false; ui.sosDone=true; commit('Krizi yönettin ✨'); };
+App.resetSos=function(){ clearInterval(sosInterval); ui.sosOpts=[]; ui.sosLeft=600; ui.sosTiming=false; ui.sosDone=false; render(); };
+
+App.openEmergency=function(){ ui.emergency=true; render(); };
+App.closeEmergency=function(){ ui.emergency=false; render(); };
+App.continueEmergency=function(){ ui.emergency=false; render(); toast('İşte bu. Reset dediğin bazen sadece bir sonraki doğru hamledir.',3000); };
+App.emergencyNote=function(){ ui.emergency=false; ui.tab='bugun'; render(); setTimeout(function(){ var ta=document.querySelector('textarea'); if(ta) ta.focus(); },150); };
+
+App.openDay=function(i){
+  var days=allDays(); var o=days[i-1]; var rec=o.rec;
+  var habits=HABITS.map(function(h){ return {label:h.title.replace(' 🍫','').replace(' 🌙',''),mark:(rec&&rec.habits[h.key])?'✅':'⚪'}; });
+  var cnt=countRec(rec); var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34); var status='Zor gün'; if(cnt>=HABIT_TOTAL)status='Kraliçe günü 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
+  var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null;
+  var sl=rec&&rec.sleep?rec.sleep:{}, wk=rec&&rec.walk?rec.walk:{};
+  var mealsList=[]; if(rec&&rec.meals){ MEALS.forEach(function(m){ if(rec.meals[m.key]&&String(rec.meals[m.key]).trim()) mealsList.push({label:m.label,icon:m.icon,text:String(rec.meals[m.key])}); }); }
+  var flowO=rec&&rec.flow?find(FLOW,'id',rec.flow):null;
+  var symsList=(rec&&rec.symptoms||[]).map(function(id){ var s=find(SYMPTOMS,'id',id); return s?s.emoji+' '+s.label:id; });
+  ui.dayDetail={title:'Gün '+i,dateLabel:shortDate(o.date),status:status,habits:habits,moodLabel:mood?mood.label:'—',sosCount:rec?(rec.cravingSOSCount||0):0,note:(rec&&rec.note)||'',hasNote:!!(rec&&rec.note),
+    sleepH:(sl.hours!=null?sl.hours:null),steps:(wk.steps!=null?wk.steps:null),mins:(wk.minutes!=null?wk.minutes:null),meals:mealsList,flow:flowO?flowO.label:null,syms:symsList};
+  render();
+};
+App.closeDetail=function(){ ui.dayDetail=null; render(); };
+
+App.exportJson=function(){ var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); download(blob,'seyma-yedek.json'); toast('Yedek indirildi 💾'); };
+function download(blob,name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },1500); }
+App.importClick=function(){ var f=document.getElementById('sey-file'); if(f) f.click(); };
+App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ try{ var d=JSON.parse(r.result); if(d&&d.version&&d.days&&d.startDate){ data=d; ui.tab='bugun'; commit('Yedek yüklendi 🔁'); } else toast('Dosya okunamadı'); }catch(err){ toast('Dosya okunamadı'); } }; r.readAsText(f); el.value=''; };
+
+App.askReset=function(){ ui.resetStep=1; render(); };
+App.cancelReset=function(){ ui.resetStep=0; render(); };
+App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} data=null; ui.resetStep=0; ui.tab='bugun'; render(); };
+App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
+App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
+
+App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render(); };
+App.printReport=function(){ openReport(); };
+function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
+App.setSyncUrl=function(el){ if(!data.settings) data.settings={}; data.settings.syncUrl=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
+
+// ---------- report (print -> Safari "PDF olarak kaydet") ----------
+function reportHTML(){
+  var st=getStats(); var days=allDays();
+  var range=shortDate(data.startDate)+' – '+shortDate(addDays(data.startDate,20));
+  var h='';
+  h+='<div style="text-align:center;padding:30px 0 24px;border-bottom:2px solid #F2E1DA;margin-bottom:26px;">';
+  h+='<div style="font-size:34px;font-weight:800;">Şeyma 🦩</div>';
+  h+='<div style="font-size:16px;color:#7A6B70;margin-top:6px;">21 Günlük Minik Denge Oyunu</div>';
+  h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
+  h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
+  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Özet</div>';
+  var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['D vitamini günü',st.tot.vitaminD],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
+  h+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;">';
+  stats.forEach(function(s){ h+='<div style="flex:1 1 30%;min-width:150px;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:12px 14px;"><div style="font-size:12px;color:#9C8C92;">'+esc(s[0])+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+esc(s[1])+'</div></div>'; });
+  h+='</div>';
+  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Haftalık Özet</div><div style="display:flex;gap:12px;margin-bottom:26px;">';
+  [0,1,2].forEach(function(w){ var b=weekBlock(w,days); h+='<div style="flex:1;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:14px;"><div style="font-size:15px;font-weight:800;margin-bottom:8px;">'+esc(b.title)+'</div>'; b.rows.forEach(function(r){ h+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:#5A4D52;">'+esc(r.label)+'</span><b>'+esc(r.val)+'</b></div>'; }); h+='<div style="font-size:11px;color:#7A6B70;margin-top:6px;border-top:1px solid #F2E1DA;padding-top:6px;">Ort. '+esc(b.avg)+' · Seri '+esc(b.best)+'</div></div>'; });
+  h+='</div>';
+  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">21 Günlük Tablo</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
+  ['Gün','Tarih','Tik','Mod','Adım','Uyku','SOS','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
+  h+='</tr></thead><tbody>';
+  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var st=(rec&&rec.walk&&rec.walk.steps!=null)?rec.walk.steps:'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+HABIT_TOTAL+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
+  h+='</tbody></table>';
+  h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:15px;font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
+  return h;
+}
+function getStats(){
+  var days=allDays(); var keys=HABITS.map(function(h){return h.key;}); var tot={}; keys.forEach(function(k){tot[k]=0;});
+  var total=0; var moods={};
+  days.forEach(function(d){ if(d.rec){ keys.forEach(function(k){ if(d.rec.habits[k]) tot[k]++; }); total+=countRec(d.rec); if(d.rec.mood) moods[d.rec.mood]=(moods[d.rec.mood]||0)+1; } });
+  return {tot:tot,total:total,best:bestStreak(days),mood:topMood(moods),days:days};
+}
+function openReport(){
+  var w=window.open('','_blank');
+  if(!w){
+    // Quick Look / pop-up engelli: aynı sayfada yazdırılabilir katman
+    inlinePrint(); return;
+  }
+  var doc='<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Şeyma 🦩 Rapor</title>'
+    +'<style>@page{margin:14mm;}body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#2C2426;margin:0;padding:24px;}@media print{.noprint{display:none;}}</style></head><body>'
+    +'<div class="noprint" style="text-align:center;margin-bottom:18px;"><button onclick="window.print()" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;cursor:pointer;">Yazdır / PDF kaydet</button></div>'
+    +reportHTML()+'</body></html>';
+  w.document.open(); w.document.write(doc); w.document.close();
+  setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} },500);
+}
+function inlinePrint(){
+  var ov=document.getElementById('sey-print'); if(ov) ov.remove();
+  var ov2=document.createElement('div'); ov2.id='sey-print';
+  ov2.innerHTML='<style>@media print{body *{visibility:hidden;}#sey-print,#sey-print *{visibility:visible;}#sey-print{position:absolute;left:0;top:0;width:100%;}#sey-print .pbar{display:none;}}</style>'
+    +'<div class="pbar" style="position:sticky;top:0;display:flex;gap:10px;justify-content:center;padding:12px;background:#fff;border-bottom:1px solid #eee;">'
+    +'<button id="sey-print-do" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;">Yazdır / PDF kaydet</button>'
+    +'<button id="sey-print-close" style="border:1px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:15px;padding:12px 18px;border-radius:12px;">Kapat</button></div>'
+    +'<div style="max-width:780px;margin:0 auto;padding:24px;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#2C2426;">'+reportHTML()+'</div>';
+  ov2.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;';
+  document.body.appendChild(ov2);
+  document.getElementById('sey-print-do').onclick=function(){ window.print(); };
+  document.getElementById('sey-print-close').onclick=function(){ ov2.remove(); };
+}
+
+// ---------- render ----------
+function el(html){ var d=document.createElement('div'); d.innerHTML=html; return d; }
+
+function render(){
+  var root=document.getElementById('root');
+  root.setAttribute('data-theme', dark?'dark':'light');
+  var app=document.getElementById('app');
+
+  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); return; }
+
+  var html='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px;display:flex;flex-direction:column;gap:14px;">';
+  if(ui.tab==='bugun') html+=bugunHTML();
+  else if(ui.tab==='sos') html+=sosHTML();
+  else if(ui.tab==='saglik') html+=saglikHTML();
+  else if(ui.tab==='harita') html+=haritaHTML();
+  else if(ui.tab==='rapor') html+=raporHTML();
+  else if(ui.tab==='ayarlar') html+=ayarlarHTML();
+  html+='</div>';
+  html+=navHTML();
+  html+=modalsHTML();
+  app.innerHTML=html;
+}
+
+function onboardingHTML(){
+  return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 28px);gap:22px;animation:seyFade .3s ease;">'
+   +'<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">'
+   +'<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 12px 30px rgba(233,175,193,0.4);">🦩</div>'
+   +'<h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.5px;">Şeyma 🦩</h1>'
+   +'<div style="font-size:16px;color:var(--muted);">21 Günlük Minik Denge Oyunu</div></div>'
+   +'<div class="glass" style="border-radius:26px;padding:24px;box-shadow:0 10px 30px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:14px;">'
+   +'<p style="margin:0;font-size:19px;font-weight:700;">Hoş geldin Sevgili Günışığı ☀️</p>'
+   +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Burası diyet kampı değil. Burası tatlı krizlerinin hafifçe hizaya geldiği, akşam mutfağının biraz daha az ziyaret edildiği, senin de kendine daha iyi davrandığın minik bir alan.</p>'
+   +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">21 gün boyunca mükemmel olmaya çalışmıyoruz. Sadece küçük küçük kontrolü geri alıyoruz.</p></div>'
+   +'<button onclick="App.start()" style="border:none;cursor:pointer;width:100%;padding:18px;border-radius:20px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);">Tamam Raşit, başlayalım ✨</button>'
+   +'<p style="margin:0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--faint);">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p></div>';
+}
+
+function bugunHTML(){
+  var today=todayStr();
+  var curRaw=dayIndexFor(today);
+  var curIdx=Math.max(1,Math.min(curRaw,21));
+  var rec=data.days[today]||null;
+  var completed=countRec(rec);
+  var circ=2*Math.PI*42;
+  var badge='Bugün nazlı başladı 🌧️';
+  var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34);
+  if(completed>=HABIT_TOTAL) badge='Kraliçe günü 👑'; else if(completed>=strong) badge='Raydasın ☀️'; else if(completed>=medium) badge='Toparlanıyor 🌤️';
+  var pct=Math.round(completed/HABIT_TOTAL*100);
+  var off=circ*(1-completed/HABIT_TOTAL);
+
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  // hero
+  h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
+  h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">21 Günlük Minik Denge Oyunu</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><button onclick="App.toggleTheme()" aria-label="Tema" style="border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(201,184,255,0.22);color:var(--choc);">'+(dark?'☀️':'🌙')+'</button>';
+  h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;white-space:nowrap;">Gün '+curIdx+' / 21</div></div></div>';
+  h+='<div style="display:flex;align-items:center;gap:18px;">';
+  h+='<div style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
+  h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:25px;font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:11px;color:var(--faint);margin-top:2px;">bugün</div></div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--faint);margin-bottom:6px;">Bugünün havası</div><div style="font-size:19px;font-weight:800;line-height:1.25;">'+esc(badge)+'</div></div></div></div>';
+
+  // daily banner (distinct)
+  h+='<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#FFE19A,#FFC9A3 55%,#F7B7C9);border-radius:24px;padding:22px 22px 20px;box-shadow:0 12px 28px rgba(255,180,140,0.32);">';
+  h+='<div style="position:absolute;top:-26px;right:10px;font-size:130px;line-height:1;font-weight:800;color:#fff;opacity:0.22;">\u201d</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="font-size:16px;">☀️</span><span style="font-size:11.5px;letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
+  h+='<div style="position:relative;font-size:19px;font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[curIdx-1])+'</div></div>';
+
+  // SOS button
+  h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi 🍫🚨</button>';
+
+  // habits
+  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">BUGÜNÜN TİKLERİ</div>';
+  HABITS.forEach(function(hb){
+    var done=!!(rec&&rec.habits[hb.key]); var pulsing=ui.pulse===hb.key;
+    var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):'var(--card)';
+    var bd=done?'rgba(233,175,193,0.9)':'var(--card-bd)';
+    var sh=done?'0 10px 26px rgba(233,175,193,0.4)':'0 6px 16px rgba(108,74,58,0.06)';
+    h+='<button onclick="App.toggleHabit(\''+hb.key+'\')" style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">';
+    h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;background:var(--icon);">'+hb.icon+'</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;">'+esc(hb.title)+'</div>';
+    h+=done?'<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>':'<div style="font-size:13px;color:var(--faint);margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
+    h+='</div>';
+    h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:'+(done?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(done?'none':'2px solid var(--field-bd)')+';">'+(done?'✓':'')+'</div></button>';
+  });
+
+  // öğünler (3 öğün + ara)
+  var meals=(rec&&rec.meals)?rec.meals:{};
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Bugün ne yedim? 🍽️</div><div style="font-size:12px;color:var(--faint);">otomatik kaydolur</div></div>';
+  MEALS.forEach(function(m){
+    h+='<div style="display:flex;gap:10px;align-items:flex-start;">';
+    h+='<div style="width:38px;height:38px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--icon);margin-top:2px;">'+m.icon+'</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:4px;">'+m.label+'</div>';
+    h+='<textarea oninput="App.onMeal(\''+m.key+'\',this)" placeholder="'+esc(m.ph)+'" rows="1" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:9px 11px;font-size:14px;resize:none;outline:none;line-height:1.4;min-height:38px;">'+esc(meals[m.key]||'')+'</textarea></div></div>';
+  });
+  h+='</div>';
+
+  // mood
+  var curMood=rec?rec.mood:null;
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Bugünün modu nasıl? 🌤️</div><div style="display:flex;gap:6px;">';
+  MOODS.forEach(function(m){
+    var sel=curMood===m.id;
+    var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.4);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+    h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="font-size:22px;">'+m.emoji+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
+  });
+  h+='</div>';
+  if(curMood){ var mo=find(MOODS,'id',curMood); h+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo.resp)+'</div>'; }
+  h+='</div>';
+
+  // Raşit chat bubble
+  h+='<div style="display:flex;align-items:flex-end;gap:10px;margin:2px 0;">';
+  h+='<div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:23px;background:linear-gradient(135deg,#C9B8FF,#E9AFC1);box-shadow:0 6px 16px rgba(201,184,255,0.5);">🦩</div>';
+  h+='<div style="position:relative;flex:1;min-width:0;background:linear-gradient(135deg,#EFE8FF,#F7E9F1);border:1px solid rgba(201,184,255,0.45);border-radius:20px 20px 20px 5px;padding:13px 16px;box-shadow:0 6px 16px rgba(201,184,255,0.22);"><div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:#7C5CC4;margin-bottom:5px;">RAŞİT 💌</div><div style="font-size:15px;line-height:1.5;color:#3F3142;">'+esc(NOTES[(curIdx-1)%NOTES.length])+'</div></div></div>';
+
+  // Raşit aksiyonları (yaz + ara) — eşit iki buton
+  h+='<div style="display:flex;gap:10px;">';
+  h+='<a href="'+WA+'" target="_blank" rel="noopener" style="position:relative;overflow:hidden;text-decoration:none;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 10px;border-radius:20px;background:linear-gradient(135deg,#7C5CC4,#E9899F);box-shadow:0 12px 26px rgba(150,100,170,0.4);color:#fff;">';
+  h+='<div style="position:absolute;top:0;bottom:0;left:0;width:36%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.5),transparent);animation:seyShine 3.4s ease-in-out infinite;pointer-events:none;"></div>';
+  h+='<div style="position:relative;font-size:24px;line-height:1;">💬</div><div style="position:relative;font-size:14.5px;font-weight:800;">Raşit\'e yaz</div><div style="position:relative;font-size:11px;opacity:0.9;">WhatsApp 💌</div></a>';
+  h+='<a href="'+TEL+'" style="text-decoration:none;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 10px;border-radius:20px;background:linear-gradient(135deg,#E8A53C,#E9899F);box-shadow:0 12px 26px rgba(220,150,120,0.4);color:#fff;">';
+  h+='<div style="font-size:24px;line-height:1;">📞</div><div style="font-size:14.5px;font-weight:800;">Raşit\'i ara</div><div style="font-size:11px;opacity:0.9;">Hemen ara ☎️</div></a>';
+  h+='</div>';
+
+  // note
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Bugün kendime notum…</div>';
+  h+='<textarea oninput="App.onNote(this)" placeholder="Bugün kendime notum…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;">'+esc(rec?rec.note:'')+'</textarea>';
+  h+='<div style="font-size:12px;color:var(--faint);line-height:1.5;">örn. \u201cTatlı isteği akşam geldi.\u201d \u00b7 \u201cYürüyüş iyi hissettirdi.\u201d \u00b7 \u201cBugün biraz zorlandım ama devam.\u201d</div></div>';
+
+  // dağıldı
+  h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:15px;font-weight:600;color:var(--muted);">Bugün biraz dağıldı 🫠</button>';
+  h+='</div>';
+  return h;
+}
+
+function sosHTML(){
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="text-align:center;padding:6px 0 2px;"><div style="font-size:24px;font-weight:800;">10 Dakika Kuralı 🍫</div></div>';
+  h+='<div class="glass" style="border-radius:22px;padding:18px;box-shadow:0 8px 22px rgba(108,74,58,0.07);"><p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Tamam Sevgili Günışığı, panik yok. Tatlı şu an seni çağırıyor olabilir ama karar merci sensin. Önce 10 dakika bekliyoruz. Sonra hâlâ istiyorsan daha kontrollü karar veriyoruz.</p></div>';
+  h+='<div style="background:linear-gradient(135deg,rgba(201,184,255,0.35),rgba(247,221,229,0.5));border:1px solid var(--card-bd);border-radius:22px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;">';
+  h+='<div id="sos-clock" style="font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text);">'+pad(Math.floor(ui.sosLeft/60))+':'+pad(ui.sosLeft%60)+'</div>';
+  h+='<button onclick="App.startSosTimer()" style="border:none;cursor:pointer;padding:13px 24px;border-radius:16px;font-size:15px;font-weight:700;color:#6B4A3A;background:#FFE8A3;box-shadow:0 6px 16px rgba(255,200,120,0.4);">'+(ui.sosTiming?'Sayaç çalışıyor…':'10 dakikayı başlat ⏱️')+'</button></div>';
+  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px;">ŞU AN NE DENEDİN?</div><div style="display:flex;flex-direction:column;gap:8px;">';
+  SOS_OPTS.forEach(function(o){
+    var sel=ui.sosOpts.indexOf(o)>=0;
+    var style=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.7));border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.3);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+    h+='<button onclick="App.toggleSosOpt(\''+o.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .2s;'+style+'"><span style="flex:1;text-align:left;font-size:15px;font-weight:600;">'+esc(o)+'</span><span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?'✓':'')+'</span></button>';
+  });
+  h+='</div>';
+  h+='<button onclick="App.completeSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 26px rgba(233,175,193,0.45);">Krizi yönettim ✨</button>';
+  if(ui.sosDone){
+    h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid var(--card-bd);border-radius:22px;padding:18px;text-align:center;animation:seyPop .3s ease;"><div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text);">İşte bu. 👑</div><p style="margin:0;font-size:15px;line-height:1.55;color:var(--text2);">Tatlı seni değil, sen tatlıyı yönettin. Küçük zafer, büyük kontrol.</p><button onclick="App.resetSos()" style="margin-top:12px;border:none;background:var(--card);cursor:pointer;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:600;color:var(--muted);">Yeni kriz / sıfırla</button></div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function haritaHTML(){
+  var today=todayStr();
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;">21 Günlük Harita 🗺️</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Bir güne dokun, detayını gör.</div></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
+  allDays().forEach(function(o){
+    var cnt=countRec(o.rec); var locked=diffDays(today,o.date)<0; var isToday=o.date===today;
+    var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34);
+    var status='Zor gün'; if(cnt>=HABIT_TOTAL)status='Kraliçe 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
+    var style='background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+    if(locked) style+='opacity:0.5;';
+    if(cnt>=HABIT_TOTAL&&!locked) style='background:'+(dark?'linear-gradient(135deg,rgba(255,232,163,0.22),rgba(247,221,229,0.2))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)')+';border:1px solid var(--card-bd);color:'+(dark?'var(--text)':'#5A2E2A')+';';
+    if(isToday) style+='border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.35);';
+    var onclick=locked?'':'onclick="App.openDay('+o.i+')"';
+    var cur=locked?'default':'pointer';
+    h+='<button '+onclick+' style="border-radius:18px;padding:11px;display:flex;flex-direction:column;gap:5px;cursor:'+cur+';min-height:78px;transition:all .2s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);'+style+'">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;width:100%;"><span style="font-size:12px;font-weight:700;color:var(--faint);">G'+o.i+'</span><span style="font-size:15px;">'+((o.rec&&o.rec.mood)?moodEmoji(o.rec.mood):'')+'</span></div>';
+    h+='<div style="font-size:18px;font-weight:800;align-self:flex-start;">'+(locked?'✨':(cnt+'/'+HABIT_TOTAL))+'</div>';
+    h+='<div style="font-size:11px;font-weight:600;color:var(--muted);align-self:flex-start;line-height:1.2;">'+(locked?'Yakında':status)+'</div></button>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
+function raporHTML(){
+  var days=allDays(); var curRaw=dayIndexFor(todayStr());
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  if(curRaw>=21){
+    h+='<div style="background:linear-gradient(160deg,#FFE8A3,#F7DDE5 60%,#C9B8FF);border-radius:26px;padding:22px;box-shadow:0 14px 34px rgba(233,175,193,0.4);"><div style="font-size:24px;font-weight:800;margin-bottom:8px;color:#3A2E33;">Şeyma 🦩 tamamlandı 👑</div><p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#4A3D42;">21 gündür kendini tartıyla, yasakla, cezayla değil; küçük seçimlerle takip ettin. En güzeli bu. Tatlı hâlâ hayatta, sen de kontrolü biraz daha eline aldın.</p><div style="background:rgba(255,255,255,0.6);border-radius:16px;padding:12px;font-size:14px;line-height:1.5;font-style:italic;color:#4A3D42;">\u201cBen zaten iyi göründüğünü düşünüyordum ama kendini daha iyi hissetmen için bu oyunda da senden tarafım.\u201d — Raşit</div></div>';
+  }
+  h+='<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;">Haftalık Mini Rapor 📊</div></div>';
+  [0,1,2].forEach(function(w){
+    var b=weekBlock(w,days);
+    h+='<div class="glass" style="border-radius:22px;padding:18px;box-shadow:0 8px 20px rgba(108,74,58,0.06);display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:16px;font-weight:800;">'+esc(b.title)+'</div><div style="font-size:13px;color:var(--faint);">Ort. '+esc(b.avg)+'</div></div>';
+    b.rows.forEach(function(r){ h+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;"><span style="color:var(--text2);">'+esc(r.label)+'</span><span style="font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">'+esc(r.val)+'</span></div>'; });
+    h+='<div style="display:flex;gap:8px;font-size:12.5px;color:var(--muted);padding-top:4px;border-top:1px solid rgba(150,110,120,0.15);"><span>En iyi seri: <b>'+esc(b.best)+'</b></span><span>\u00b7</span><span>En sık mod: <b>'+esc(b.mood)+'</b></span></div>';
+    h+='<div style="font-size:13.5px;line-height:1.5;color:var(--choc);background:rgba(255,232,163,0.28);border-radius:12px;padding:9px 11px;">'+esc(b.interp)+'</div></div>';
+  });
+  h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;">Raşit\'ten Notlar 💌</div></div>';
+  h+='<div style="background:linear-gradient(135deg,rgba(201,184,255,0.3),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:22px;padding:20px;min-height:96px;display:flex;align-items:center;"><div style="font-size:16px;line-height:1.55;font-weight:600;color:var(--text);">'+esc(NOTES[ui.noteIndex%NOTES.length])+'</div></div>';
+  h+='<button onclick="App.anotherNote()" style="border:none;cursor:pointer;align-self:center;padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;color:var(--choc);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.08);">Başka not göster ✨</button>';
+  h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;">Minik Kurallar 🌿</div></div>';
+  h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
+  [['🌿','Aç kalmak yok.'],['🍫','Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],['🌙','Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],['🍳','Her öğüne protein eklemek krizleri sakinleştirir.'],['☀️','D vitamini de küçük ritmin bir parçası.'],['💪','Bir gün zor geçti diye sistem bitmez.'],['🚶‍♀️','Yürüyüş kısa da olsa sayılır.'],['🫶','Kendine kötü konuşmak yok.'],['☀️','Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span>'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
+  h+='</div>';
+  h+='<button onclick="App.printReport()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6B4A3A,#A07A52);box-shadow:0 10px 22px rgba(107,74,58,0.3);margin-top:4px;">Rapor Oluştur / PDF 📄</button>';
+  h+='</div>';
+  return h;
+}
+
+function ayarlarHTML(){
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;">Ayarlar ⚙️</div></div>';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
+  // appearance
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
+  var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
+  var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
+  h+='<button onclick="App.setTheme(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(dark?offS:onS)+'">☀️ Açık</button>';
+  h+='<button onclick="App.setTheme(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(dark?onS:offS)+'">🌙 Koyu</button></div></div>';
+  h+=settingsBtn('App.printReport()','Rapor oluştur / PDF','📄');
+  h+=settingsBtn('App.exportJson()','Yedek indir','💾');
+  h+=settingsBtn('App.importClick()','Yedek yükle','🔁');
+  h+='<input type="file" id="sey-file" accept="application/json,.json" onchange="App.importJson(this)" style="display:none;">';
+  h+='<div style="font-size:12.5px;color:var(--faint);line-height:1.5;padding:0 4px;">Yedek dosyanı saklarsan telefon/tarayıcı değişse bile kayıtlarını geri alabilirsin.</div>';
+  // repoya otomatik kayıt — ortak durum
+  var sg=data.settings||{};
+  h+='<div style="padding:6px 4px 0;"><div style="font-size:16px;font-weight:800;">Repoya otomatik kayıt 💾</div></div>';
+  h+='<div id="sey-sync-status" style="font-size:12.5px;color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
+  // YÖNTEM 1: Doğrudan GitHub (Worker yok)
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;">Doğrudan GitHub (Worker yok) ⭐</div>';
+  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Sadece bir GitHub token gir; uygulama veriyi <b>doğrudan</b> repoya kaydeder. Token bu sayfada/repoda değil, yalnızca bu cihazın tarayıcısında saklanır.</div>';
+  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghToken||'')+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+  h+='<div style="display:flex;gap:8px;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghRepo||'mustafaras/s')+'" oninput="App.setGhRepo(this)" placeholder="kullanıcı/repo" style="flex:2;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghBranch||'data')+'" oninput="App.setGhBranch(this)" placeholder="branch" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"></div>';
+  h+='<button onclick="App.syncNow()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button>';
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Token üret: GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → repo <b>mustafaras/s</b> → izin <b>Contents: Read and write</b>. Token sızarsa bu repoya yazılabilir; sadece bu repoya yetkili token kullan.</div></div>';
+  // YÖNTEM 2: Cloudflare Worker (gelişmiş)
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:14.5px;font-weight:700;color:var(--muted);">Alternatif: Cloudflare Worker ☁️</div>';
+  h+='<div style="font-size:12px;line-height:1.5;color:var(--faint);">Token\'ı cihazda değil sunucuda tutmak istersen Worker adresini gir (kurulum: WORKER_SETUP.md). Yukarıdaki token doluysa o öncelikli olur.</div>';
+  h+='<input type="url" inputmode="url" value="'+esc(sg.syncUrl||'')+'" oninput="App.setSyncUrl(this)" placeholder="https://...workers.dev" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"></div>';
+  h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span>🗑️</span></button>';
+  h+=settingsBtn('App.goStart()','Başlangıç ekranına dön','🔄');
+  // add to home guide
+  h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;">Ana ekrana ekleme rehberi 📲</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;">🔒 Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Bu app giriş istemez. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
+  h+='</div>';
+  return h;
+}
+function settingsBtn(onclick,label,icon){
+  return '<button onclick="'+onclick+'" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:var(--text);background:var(--card);text-align:left;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);"><span>'+esc(label)+'</span><span>'+icon+'</span></button>';
+}
+
+// ================= SAĞLIK & DÖNGÜ =================
+function num(v){ return (v===null||v===undefined||v==='')?null:Number(v); }
+function ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w){ if(lenFrac<=0) return ''; return '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="'+w+'" stroke-dasharray="'+(lenFrac*C).toFixed(2)+' '+(C-lenFrac*C).toFixed(2)+'" stroke-dashoffset="'+(-startFrac*C).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>'; }
+
+function activityRings(rec){
+  var steps=rec&&rec.walk?num(rec.walk.steps):null;
+  var mins=rec&&rec.walk?num(rec.walk.minutes):null;
+  var sleep=rec&&rec.sleep?num(rec.sleep.hours):null;
+  var mealCount=0; if(rec&&rec.meals){ ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(rec.meals[k]&&String(rec.meals[k]).trim()) mealCount++; }); }
+  var rings=[{label:'Adım',val:steps,goal:8000,color:'#E9899F',unit:''},{label:'Hareket',val:mins,goal:30,color:'#8FBF8A',unit:' dk'},{label:'Uyku',val:sleep,goal:7.5,color:'#9B7FC9',unit:' sa'}];
+  var size=120,cx=60,cy=60,radii=[50,38,26],w=10;
+  var svg='<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">';
+  rings.forEach(function(r,i){ var R=radii[i],C=2*Math.PI*R,f=Math.max(0,Math.min(1,(r.val||0)/r.goal));
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="rgba(150,110,120,0.14)" stroke-width="'+w+'"></circle>';
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+r.color+'" stroke-width="'+w+'" stroke-linecap="round" stroke-dasharray="'+C.toFixed(2)+'" stroke-dashoffset="'+(C*(1-f)).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')" style="transition:stroke-dashoffset .6s ease"></circle>';
+  });
+  svg+='</svg>';
+  var legend='<div style="flex:1;display:flex;flex-direction:column;gap:8px;">';
+  rings.forEach(function(r){ legend+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:10px;height:10px;border-radius:50%;background:'+r.color+';display:inline-block;flex-shrink:0;"></span><span style="color:var(--muted);">'+r.label+'</span><b style="margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums;">'+(r.val!=null?r.val+r.unit:'—')+'</b></div>'; });
+  legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün kaydı</div></div>';
+  return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:16px;"><div style="flex-shrink:0;">'+svg+'</div>'+legend+'</div>';
+}
+
+function sparkCard(){
+  var today=todayStr(); var arr=[]; for(var i=6;i>=0;i--){ var dd=addDays(today,-i); var rec=data.days[dd]; arr.push({d:dd,steps:rec&&rec.walk?num(rec.walk.steps):null,sleep:rec&&rec.sleep?num(rec.sleep.hours):null}); }
+  var maxS=Math.max.apply(null,[8000].concat(arr.map(function(a){return a.steps||0;})));
+  var maxSl=Math.max.apply(null,[8].concat(arr.map(function(a){return a.sleep||0;})));
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Son 7 gün 📈</div>';
+  h+='<div><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Adım</div><div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
+  arr.forEach(function(a){ var hh=a.steps?Math.max(6,Math.round(a.steps/maxS*46)):3; h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:46px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,#E9899F,#C9B8FF);opacity:'+(a.steps?1:0.3)+';"></div></div>'; });
+  h+='</div></div>';
+  h+='<div><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Uyku (saat)</div><div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
+  arr.forEach(function(a){ var hh=a.sleep?Math.max(6,Math.round(a.sleep/maxSl*46)):3; h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:46px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,#9B7FC9,#B8A0E0);opacity:'+(a.sleep?1:0.3)+';"></div></div>'; });
+  h+='</div></div>';
+  h+='<div style="display:flex;gap:5px;">'; arr.forEach(function(a){ h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--faint);">'+a.d.slice(8)+'</div>'; }); h+='</div>';
+  h+='</div>';
+  return h;
+}
+
+function saglikHTML(){
+  var today=todayStr(); var rec=data.days[today]||null;
+  var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;">Sağlık 🌸</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Uyku, yürüyüş ve döngü — küçük veriler, büyük resim.</div></div>';
+  h+=activityRings(rec);
+  // uyku
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Uyku 😴</div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><input type="number" inputmode="decimal" step="0.5" min="0" max="24" value="'+(sl.hours!=null?esc(sl.hours):'')+'" oninput="App.setSleepHours(this)" placeholder="7.5" style="width:92px;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:14px;color:var(--muted);">saat uyudum</span></div>';
+  h+='<div style="display:flex;gap:8px;">';
+  SLEEP_Q.forEach(function(q){ var sel=sl.quality===q.id; h+='<button onclick="App.setSleepQuality(\''+q.id+'\')" style="flex:1;padding:10px 4px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#F7E9F1);border:1px solid #B89BD9;color:#4A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:20px;">'+q.emoji+'</span><span style="font-size:11px;font-weight:600;">'+q.label+'</span></button>'; });
+  h+='</div></div>';
+  // yürüyüş
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Yürüyüş 🚶‍♀️</div>';
+  h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Adım</div><input type="number" inputmode="numeric" min="0" value="'+(wk.steps!=null?esc(wk.steps):'')+'" oninput="App.setWalkSteps(this)" placeholder="6200" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div>';
+  h+='<div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(wk.minutes!=null?esc(wk.minutes):'')+'" oninput="App.setWalkMinutes(this)" placeholder="25" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div></div>';
+  h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">20 dk ve üzeri yürüyüş, Bugün ekranındaki yürüyüş tikini otomatik işaretler ✨</div></div>';
+  h+=sparkCard();
+  // Apple Health
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Apple Sağlık\'tan içe aktar 🍎</div>';
+  h+='<div style="font-size:13px;line-height:1.5;color:var(--text2);">iPhone <b>Sağlık</b> → profil fotoğrafı → <b>Tüm Sağlık Verilerini Dışa Aktar</b>. Oluşan <b>export.zip</b> içindeki <b>export.xml</b> dosyasını seç; bugünün adımı ve uykusu otomatik dolsun.</div>';
+  h+='<button onclick="App.importHealthClick()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:16px;font-size:15px;font-weight:700;color:var(--text);background:var(--card);">export.xml seç 📥</button>';
+  h+='<input type="file" id="sey-health-file" accept=".xml,text/xml,application/xml,.zip" onchange="App.importHealthFile(this)" style="display:none;">';
+  h+='<div id="sey-health-status" style="font-size:12.5px;color:var(--faint);min-height:16px;"></div></div>';
+  h+=cycleHTML();
+  h+='</div>';
+  return h;
+}
+
+// ---- cycle math (takvim/ortalama yöntemi, luteal ~14 gün) ----
+function sortedPeriods(){ return (data.cycle.periods||[]).filter(function(p){return p&&p.start;}).slice().sort(function(a,b){return a.start<b.start?-1:(a.start>b.start?1:0);}); }
+function cycleStats(){
+  var ps=sortedPeriods(); var starts=ps.map(function(p){return p.start;});
+  var lens=[]; for(var i=1;i<starts.length;i++){ var dl=diffDays(starts[i-1],starts[i]); if(dl>=15&&dl<=60) lens.push(dl); }
+  var avgCycle=lens.length?Math.round(lens.reduce(function(a,b){return a+b;},0)/lens.length):(data.cycle.avgCycle||28); avgCycle=Math.max(21,Math.min(40,avgCycle));
+  var plens=[]; ps.forEach(function(p){ if(p.start&&p.end){ var d=diffDays(p.start,p.end)+1; if(d>0&&d<15) plens.push(d); } });
+  var avgPeriod=plens.length?Math.round(plens.reduce(function(a,b){return a+b;},0)/plens.length):(data.cycle.avgPeriod||5); avgPeriod=Math.max(2,Math.min(10,avgPeriod));
+  var last=starts.length?starts[starts.length-1]:null; var today=todayStr();
+  var next=null,ovu=null,fS=null,fE=null,dayInCycle=null,phase=null;
+  if(last){ var since=diffDays(last,today); if(since>=0) dayInCycle=(since%avgCycle)+1;
+    next=addDays(last,avgCycle); var guard=0; while(diffDays(next,today)>0&&guard<60){ next=addDays(next,avgCycle); guard++; }
+    ovu=addDays(next,-14); fS=addDays(ovu,-5); fE=addDays(ovu,1);
+    if(dayInCycle){ var ovuDay=avgCycle-14; if(dayInCycle<=avgPeriod) phase='menstrual'; else if(dayInCycle<ovuDay-1) phase='follicular'; else if(dayInCycle<=ovuDay+1) phase='ovulation'; else phase='luteal'; }
+  }
+  return {ps:ps,avgCycle:avgCycle,avgPeriod:avgPeriod,last:last,next:next,ovu:ovu,fertileStart:fS,fertileEnd:fE,dayInCycle:dayInCycle,phase:phase,sampleCount:lens.length};
+}
+function fmtTR(s){ if(!s) return '—'; var p=s.split('-'); var mo=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara']; return Number(p[2])+' '+mo[Number(p[1])-1]; }
+function cycleWheel(st){
+  var size=140,cx=70,cy=70,R=54,C=2*Math.PI*R,w=14; var ac=st.avgCycle,ap=st.avgPeriod,ovuDay=ac-14;
+  var fMen=ap/ac, fOvuStart=(ovuDay-1.5)/ac, fOvu=3/ac, fFollStart=fMen, fFoll=fOvuStart-fMen, fLutStart=fOvuStart+fOvu, fLut=1-fLutStart;
+  var svg='<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="rgba(150,110,120,0.12)" stroke-width="'+w+'"></circle>';
+  svg+=ringSeg(cx,cy,R,C,PHASES.menstrual.color,0,fMen,w);
+  svg+=ringSeg(cx,cy,R,C,PHASES.follicular.color,fFollStart,Math.max(0,fFoll),w);
+  svg+=ringSeg(cx,cy,R,C,PHASES.ovulation.color,fOvuStart,fOvu,w);
+  svg+=ringSeg(cx,cy,R,C,PHASES.luteal.color,fLutStart,Math.max(0,fLut),w);
+  if(st.dayInCycle){ var frac=(st.dayInCycle-0.5)/ac, ang=frac*2*Math.PI-Math.PI/2, mx=cx+R*Math.cos(ang), my=cy+R*Math.sin(ang); svg+='<circle cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="7" fill="#fff" stroke="#3A2E33" stroke-width="2"></circle>'; }
+  var ph=st.phase?PHASES[st.phase]:null;
+  svg+='<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" font-size="21" font-weight="800" style="fill:var(--text);">'+(st.dayInCycle?('G'+st.dayInCycle):'—')+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+15)+'" text-anchor="middle" font-size="10.5" style="fill:var(--faint);">'+(ph?esc(ph.label):'döngü')+'</text>';
+  svg+='</svg>'; return svg;
+}
+function cycleHTML(){
+  var st=cycleStats(); var today=todayStr(); var rec=data.days[today]||null; var curFlow=rec?rec.flow:null; var curSym=(rec&&rec.symptoms)?rec.symptoms:[]; var ph=st.phase?PHASES[st.phase]:null;
+  var h='<div style="padding:10px 4px 0;"><div style="font-size:20px;font-weight:800;">Menstrüasyon Döngüsü 🌸</div><div style="font-size:12.5px;color:var(--faint);margin-top:2px;">Bilimsel takip · tahmindir, tıbbi tavsiye değildir</div></div>';
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:14px;"><div style="flex-shrink:0;">'+cycleWheel(st)+'</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;">';
+  if(ph){ h+='<div style="display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:800;color:'+ph.color+';">'+ph.emoji+' '+esc(ph.label)+'</div><div style="font-size:12.5px;line-height:1.45;color:var(--text2);">'+esc(ph.note)+'</div>'; }
+  else { h+='<div style="font-size:13px;color:var(--muted);line-height:1.5;">Henüz regl kaydı yok. Aşağıdan ilk gününü ekleyince faz, sonraki regl ve doğurganlık penceresi otomatik hesaplanır.</div>'; }
+  h+='</div></div>';
+  if(st.last){ var rows=[['Sonraki regl (tahmini)',fmtTR(st.next)],['Doğurganlık penceresi',fmtTR(st.fertileStart)+' – '+fmtTR(st.fertileEnd)],['Ovülasyon (tahmini)',fmtTR(st.ovu)],['Ortalama döngü',st.avgCycle+' gün'],['Ortalama regl süresi',st.avgPeriod+' gün'],['Son regl başlangıcı',fmtTR(st.last)]];
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">'; rows.forEach(function(r){ h+='<div class="glass" style="border-radius:16px;padding:12px;"><div style="font-size:11.5px;color:var(--faint);line-height:1.3;">'+esc(r[0])+'</div><div style="font-size:15px;font-weight:800;margin-top:4px;">'+esc(r[1])+'</div></div>'; }); h+='</div>';
+    if(st.sampleCount<1) h+='<div style="font-size:12px;color:var(--faint);padding:0 4px;line-height:1.4;">Şimdilik tek kayıt var; tahminler 28 günlük ortalamaya göre. Her yeni kayıt tahmini daha isabetli yapar.</div>';
+  }
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Bugün</div>';
+  h+='<div><div style="font-size:12.5px;color:var(--muted);margin-bottom:6px;">Akış</div><div style="display:flex;gap:7px;">';
+  FLOW.forEach(function(f){ var sel=curFlow===f.id; h+='<button onclick="App.setFlow(\''+f.id+'\')" style="flex:1;padding:9px 3px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#FBE3E8,#F7DDE5);border:1px solid #E58B9B;color:#7A2E3A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+f.emoji+'</span><span style="font-size:10.5px;font-weight:600;">'+f.label+'</span></button>'; });
+  h+='</div></div>';
+  h+='<div><div style="font-size:12.5px;color:var(--muted);margin-bottom:6px;">Belirtiler</div><div style="display:flex;flex-wrap:wrap;gap:7px;">';
+  SYMPTOMS.forEach(function(s){ var sel=curSym.indexOf(s.id)>=0; h+='<button onclick="App.toggleSymptom(\''+s.id+'\')" style="padding:8px 11px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#FBE3E8);border:1px solid #B89BD9;color:#5A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text2);')+'"><span>'+s.emoji+'</span><span>'+s.label+'</span></button>'; });
+  h+='</div></div></div>';
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Regl kayıtları</div><button onclick="App.logPeriodToday()" style="border:none;cursor:pointer;padding:8px 13px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E58B9B,#C9B8FF);">Bugün başladı 🩸</button></div>';
+  var ps=st.ps; if(!ps.length){ h+='<div style="font-size:13px;color:var(--faint);line-height:1.5;">Henüz kayıt yok. "Bugün başladı" ile ilk reglini ekle; tarihleri sonra düzenleyebilirsin.</div>'; }
+  ps.slice().reverse().forEach(function(p){ var ri=data.cycle.periods.indexOf(p); h+='<div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(150,110,120,0.12);padding-top:10px;">';
+    h+='<div style="flex:1;min-width:115px;"><div style="font-size:11px;color:var(--faint);margin-bottom:3px;">Başlangıç</div><input type="date" value="'+esc(p.start||'')+'" max="'+today+'" onchange="App.setPeriodField('+ri+',\'start\',this)" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:8px;font-size:13px;outline:none;"></div>';
+    h+='<div style="flex:1;min-width:115px;"><div style="font-size:11px;color:var(--faint);margin-bottom:3px;">Bitiş</div><input type="date" value="'+esc(p.end||'')+'" max="'+today+'" onchange="App.setPeriodField('+ri+',\'end\',this)" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:8px;font-size:13px;outline:none;"></div>';
+    h+='<button onclick="App.removePeriod('+ri+')" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:36px;height:36px;border-radius:10px;font-size:14px;">🗑️</button></div>'; });
+  h+='</div>';
+  h+='<div class="glass" style="border-radius:18px;padding:14px;"><div style="font-size:13.5px;font-weight:700;margin-bottom:8px;">4 Faz kısaca 🔬</div>';
+  ['menstrual','follicular','ovulation','luteal'].forEach(function(k){ var p=PHASES[k]; h+='<div style="display:flex;gap:8px;margin-bottom:7px;font-size:12.5px;line-height:1.4;"><span style="flex-shrink:0;">'+p.emoji+'</span><span><b style="color:'+p.color+';">'+esc(p.label)+'</b> — '+esc(p.note)+'</span></div>'; });
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;margin-top:6px;border-top:1px solid rgba(150,110,120,0.12);padding-top:8px;">Hesaplamalar takvim/ortalama yöntemine dayanır (luteal faz ~14 gün kabulü). Gerçek ovülasyon kişiden kişiye değişir; gebelikten korunma veya tıbbi karar için tek başına kullanılmamalıdır.</div></div>';
+  return h;
+}
+
+function navHTML(){
+  var defs=[['bugun','☀️','Bugün'],['saglik','🌸','Sağlık'],['sos','🍫','SOS'],['harita','🗺️','Harita'],['rapor','📊','Rapor'],['ayarlar','⚙️','Ayarlar']];
+  var h='<nav style="flex-shrink:0;display:flex;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(150,110,120,0.15);padding:8px 4px calc(env(safe-area-inset-bottom) + 8px);">';
+  defs.forEach(function(n){
+    var active=ui.tab===n[0];
+    h+='<button onclick="App.go(\''+n[0]+'\')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;background:none;border:none;cursor:pointer;font-size:10.5px;color:'+(active?'var(--accent)':'var(--faint)')+';font-weight:'+(active?'700':'500')+';transition:color .2s;"><span style="font-size:21px;line-height:1;">'+n[1]+'</span><span style="line-height:1;">'+n[2]+'</span></button>';
+  });
+  h+='</nav>';
+  return h;
+}
+
+function modalsHTML(){
+  var h='';
+  if(ui.emergency){
+    h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Tamam, devam ✨</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
+  }
+  if(ui.dayDetail){
+    var d=ui.dayDetail;
+    h+='<div onclick="App.closeDetail()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:80vh;overflow-y:auto;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:20px;font-weight:800;">'+esc(d.title)+'</div><div style="font-size:13px;color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);">\u2715</button></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
+    d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:14.5px;"><span style="font-size:17px;">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
+    h+='</div><div style="display:flex;gap:14px;font-size:14px;color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Tatlı SOS: <b>'+d.sosCount+'</b></span></div>';
+    var hl=[]; if(d.steps!=null) hl.push('🚶‍♀️ '+d.steps+' adım'); if(d.mins!=null) hl.push('⏱️ '+d.mins+' dk'); if(d.sleepH!=null) hl.push('😴 '+d.sleepH+' sa'); if(d.flow) hl.push('🩸 '+d.flow);
+    if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:12.5px;background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);">'+esc(x)+'</span>';}).join('')+'</div>';
+    if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:12.5px;color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
+    if(d.meals&&d.meals.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">'; d.meals.forEach(function(m){ h+='<div style="font-size:13.5px;line-height:1.4;"><span>'+m.icon+'</span> <b style="color:var(--text2);">'+esc(m.label)+':</b> <span style="color:var(--muted);">'+esc(m.text)+'</span></div>'; }); h+='</div>'; }
+    if(d.hasNote) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
+    h+='</div></div>';
+  }
+  if(ui.resetStep>0){
+    var two=ui.resetStep===2;
+    h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:19px;font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:14.5px;line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+  }
+  return h;
+}
+
+// boot
+if(data){ data.lastOpenedDate=todayStr(); save(); }
+window.App=App;
+render();
+})();

@@ -1,28 +1,35 @@
-# Repoya otomatik kayıt + uzaktan panel
+# Repoya otomatik kayıt + uzaktan panel (özel/private veri)
 
-Şeyma 🦩 verileri varsayılan olarak yalnızca cihazın tarayıcısında tutulur.
-Aşağıdaki **2 adımlık** kurulumla her gün otomatik olarak GitHub repoya yazılır
-ve sen uzaktan izleyebilirsin. **Cloudflare/Worker gerekmez.**
+Veriler **özel (private)** bir repoda saklanır; böylece öğün/mod/menstrüasyon
+gibi kişisel kayıtlar **kimseye açık olmaz**. Uygulama (Pages) public kalır, o
+yüzden **ek ücret yok** — private repodan Pages yayınlamıyoruz, sadece veri
+saklıyoruz (private repolar GitHub'da ücretsiz). **Cloudflare/Worker gerekmez.**
 
-## Kurulum (2 adım)
+## Kurulum
 
-**1) Token üret (1 dk)**
+### 0) Özel veri reposunu oluştur (1 kez)
+GitHub → **New repository** → ad: `seyma-data` → **Private** seç →
+**Add a README** işaretle → **Create**. (Boş private repo; Pages açmana gerek yok.)
+
+### 1) Token üret (1 dk)
 GitHub → **Settings** → **Developer settings** → **Personal access tokens** →
 **Fine-grained tokens** → **Generate new token**:
-- Repository access → *Only select repositories* → `mustafaras/s`
+- Repository access → *Only select repositories* → `mustafaras/seyma-data`
 - Permissions → Repository permissions → **Contents** → **Read and write**
 - Oluştur, token'ı kopyala (`github_pat_...`).
 
-**2) Uygulamaya bir kez gir**
+> Aynı token hem uygulamada (yazma) hem panelde (okuma) kullanılabilir.
+
+### 2) Uygulamaya bir kez gir (yazma)
 Uygulama → **Ayarlar** → **Repoya bağlan**:
-- Token kutusuna yapıştır (repo `mustafaras/s`, branch `data` hazır gelir)
+- Token'ı yapıştır (repo `mustafaras/seyma-data`, branch `main` hazır gelir)
 - **Şimdi kaydet** → durum **"Repoya kaydedildi ✓"** olmalı.
 
-Artık her değişiklik otomatik kaydolur. Şeyma token'ı hiç görmez; sen bir kez
-girersin, gerisi otomatiktir. Token **yalnızca o cihazın tarayıcısında** saklanır,
-repoya/sayfaya **yazılmaz** (token gibi hassas alanlar kayıttan otomatik çıkarılır).
+Artık her değişiklik otomatik kaydolur. Şeyma token'ı hiç görmez. Token
+**yalnızca o cihazın tarayıcısında** saklanır; repoya/sayfaya **yazılmaz**
+(token gibi hassas alanlar kayıttan otomatik çıkarılır).
 
-Yazılan dosyalar (`data` branch'i):
+Yazılan dosyalar (`main` branch'i):
 - `data/latest.json` — en güncel tam veri
 - `data/gunluk/YYYY-AA-GG.json` — o güne ait anlık kayıt
 
@@ -32,19 +39,17 @@ Yayındaki panel:
 
 > **https://mustafaras.github.io/s/panel.html**
 
-Bu salt-okunur sayfa `data/latest.json`'ı okuyup Şeyma'nın **streak'ini, son 14
-gününü, 30 günlük trendlerini, alışkanlık oranlarını, mod dağılımını, adım/uyku
-grafiğini, döngü & sonraki regl tahminini ve bugünün öğün/mod/notunu** gösterir.
-5 dakikada bir otomatik yenilenir. Telefonundan açıp uzaktan izleyebilirsin.
+Veri özel repoda olduğundan panel ilk açılışta **okuma token'ı** ister (yukarıdaki
+token'ı kullanabilirsin). Token **senin tarayıcında** saklanır. Panel; streak, son
+14 gün, 30 günlük trendler, alışkanlık oranları, mod dağılımı, adım/uyku grafiği,
+döngü & sonraki regl tahmini ve bugünün öğün/mod/notunu gösterir; 5 dakikada bir
+otomatik yenilenir.
 
 Farklı repo/branch için: `panel.html?repo=kullanıcı/repo&branch=dal`
 
-## Güvenlik & gizlilik notu
-
-- Repo **herkese açık** olduğundan `data/` içindeki kayıtlar (öğün, mod,
-  menstrüasyon vb.) **herkesçe okunabilir**. Gizli kalmasını istersen veriyi
-  ayrı bir **private repoya** taşıyabiliriz (Ayarlar'daki repo alanını değiştirip
-  o repoya yetkili bir token kullanmak yeterli).
-- Token sızarsa yalnızca yetkilendirdiğin repoya yazılabilir; bu yüzden token'ı
-  **sadece tek repoya + Contents iznine** scope'la. Token'ı bir yerde paylaştıysan
-  GitHub'dan **Revoke** edip yenisini üret.
+## Notlar
+- Token sızarsa yalnızca `seyma-data` reposuna erişilir (uygulama kodu/siten ayrı
+  public repoda). Token'ı bir yerde paylaştıysan GitHub'dan **Revoke** edip
+  yenisini üret.
+- Veriyi tekrar public yapmak istersen Ayarlar'daki repo alanını public bir repoya
+  çevirmen yeterli (panel o durumda token istemeden de okuyabilir).

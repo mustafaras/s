@@ -234,6 +234,7 @@ function logRitualSession(completed){
   d.savedAt=new Date().toISOString();
   save();
 }
+function ritualAudioAvailable(){ return typeof window!=='undefined' && !!(window.AudioContext||window.webkitAudioContext); }
 function ensureRitualAudio(){
   if(!ritualAudioAvailable()) return null;
   if(ritualAudio.ctx) return ritualAudio.ctx;

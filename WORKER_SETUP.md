@@ -1,16 +1,50 @@
-# Repoya otomatik kayıt — Cloudflare Worker kurulumu ☁️
+# Repoya otomatik kayıt 💾
 
-Şeyma 🦩 uygulaması verileri varsayılan olarak yalnızca cihazın tarayıcısında
-(`localStorage`) tutar. Aşağıdaki kurulumu yaparsan, her değişiklik birkaç saniye
-içinde **GitHub repoya JSON dosyası olarak** otomatik kaydedilir. Böylece:
+Şeyma 🦩 verileri varsayılan olarak yalnızca cihazın tarayıcısında (`localStorage`)
+tutar. Aşağıdaki yöntemlerden biriyle her değişiklik birkaç saniye içinde
+**GitHub repoya JSON dosyası olarak** otomatik kaydedilir:
 
-- Veriler `data/` klasöründe birikir — sen (tasarımcı) GitHub'dan takip edebilirsin.
-- Telefon/tarayıcı değişse bile kayıtlar güvende olur.
-- Kimlik bilgisi (token) **uygulamada değil, Worker'da gizli** kalır — güvenli.
+- `data/latest.json` — her zaman en güncel tam veri
+- `data/seyma-YYYY-AA-GG.json` — o güne ait anlık kayıt
 
-Yazılan dosyalar (seçtiğin branch'te):
-- `data/latest.json` — her zaman en güncel tam veri.
-- `data/seyma-YYYY-AA-GG.json` — o güne ait anlık kayıt.
+İki yöntem var. **Çoğu kişi için Yöntem A yeterli ve çok daha kolay.**
+
+---
+
+## ⭐ Yöntem A — Doğrudan GitHub (Worker YOK, 2 adım)
+
+Uygulama veriyi tarayıcıdan **doğrudan** GitHub'a yazar. Cloudflare gerekmez.
+
+**1) Token üret (1 dk):**
+GitHub → **Settings** → **Developer settings** → **Personal access tokens** →
+**Fine-grained tokens** → **Generate new token**.
+- Repository access → *Only select repositories* → `mustafaras/s`
+- Permissions → Repository permissions → **Contents** → **Read and write**
+- Oluştur, token'ı kopyala (`github_pat_...`).
+
+**2) Uygulamaya gir:**
+Uygulama → **Ayarlar** → **Doğrudan GitHub (Worker yok)** kartı:
+- Token kutusuna token'ı yapıştır
+- Repo: `mustafaras/s` (hazır gelir) · Branch: `data` (hazır gelir)
+- **Şimdi kaydet ⬆️** → durum **"Repoya kaydedildi ✓"** olmalı.
+
+Bundan sonra her değişiklik otomatik kaydolur. Verileri görmek için:
+GitHub repo → branch **`data`** → `data/latest.json`.
+
+> **Güvenlik notu:** Token yalnızca **bu cihazın tarayıcısında** saklanır; repoya
+> veya sayfaya yazılmaz, kimseyle paylaşılmaz. Yine de token sızarsa bu repoya
+> yazılabilir — bu yüzden **sadece `mustafaras/s` reposuna ve sadece Contents
+> iznine** sahip fine-grained token kullan. Token'ı tamamen sunucuda gizlemek
+> istersen Yöntem B'ye geç.
+
+---
+
+## ☁️ Yöntem B — Cloudflare Worker (token'ı sunucuda gizler)
+
+Token'ın cihazda bile durmasını istemiyorsan, araya küçük bir Worker koyarsın;
+token Cloudflare'de secret olarak kalır. Aşağıdaki adımlar bunun içindir.
+
+Kimlik bilgisi (token) **uygulamada değil, Worker'da gizli** kalır.
 
 ---
 

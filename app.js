@@ -97,6 +97,9 @@ function migrate(d){
   if(!d) return d;
   if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false};
   if(typeof d.settings.syncUrl!=='string') d.settings.syncUrl='';
+  if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
+  if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
+  if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
@@ -267,8 +270,12 @@ App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=
 
 App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render(); };
 App.printReport=function(){ openReport(); };
-App.setSyncUrl=function(el){ if(!data.settings) data.settings={}; data.settings.syncUrl=(el.value||'').trim(); save(); var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); };
-App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); } else { toast('Sync hazır değil'); } };
+function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
+App.setSyncUrl=function(el){ if(!data.settings) data.settings={}; data.settings.syncUrl=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
 
 // ---------- report (print -> Safari "PDF olarak kaydet") ----------
 function reportHTML(){
@@ -552,13 +559,21 @@ function ayarlarHTML(){
   h+=settingsBtn('App.importClick()','Yedek yükle','🔁');
   h+='<input type="file" id="sey-file" accept="application/json,.json" onchange="App.importJson(this)" style="display:none;">';
   h+='<div style="font-size:12.5px;color:var(--faint);line-height:1.5;padding:0 4px;">Yedek dosyanı saklarsan telefon/tarayıcı değişse bile kayıtlarını geri alabilirsin.</div>';
-  // repo/bulut senkron
-  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;">Repoya otomatik kayıt ☁️</div>';
-  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Bir senkron adresi (Cloudflare Worker) girersen her değişiklik birkaç saniye sonra repoya JSON olarak kaydedilir. Boş bırakırsan veriler sadece bu cihazda kalır.</div>';
-  h+='<input type="url" inputmode="url" value="'+esc((data.settings&&data.settings.syncUrl)||'')+'" oninput="App.setSyncUrl(this)" placeholder="https://...workers.dev/sync" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:14px;outline:none;">';
-  h+='<div id="sey-sync-status" style="font-size:12px;color:var(--faint);min-height:15px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
-  h+='<button onclick="App.syncNow()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:var(--text);background:var(--card);">Şimdi gönder ⬆️</button>';
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Kurulum rehberi depodaki <b>WORKER_SETUP.md</b> dosyasında. Token Worker\'da gizli tutulur, bu sayfada saklanmaz.</div></div>';
+  // repoya otomatik kayıt — ortak durum
+  var sg=data.settings||{};
+  h+='<div style="padding:6px 4px 0;"><div style="font-size:16px;font-weight:800;">Repoya otomatik kayıt 💾</div></div>';
+  h+='<div id="sey-sync-status" style="font-size:12.5px;color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
+  // YÖNTEM 1: Doğrudan GitHub (Worker yok)
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;">Doğrudan GitHub (Worker yok) ⭐</div>';
+  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Sadece bir GitHub token gir; uygulama veriyi <b>doğrudan</b> repoya kaydeder. Token bu sayfada/repoda değil, yalnızca bu cihazın tarayıcısında saklanır.</div>';
+  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghToken||'')+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+  h+='<div style="display:flex;gap:8px;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghRepo||'mustafaras/s')+'" oninput="App.setGhRepo(this)" placeholder="kullanıcı/repo" style="flex:2;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"><input type="text" autocapitalize="off" spellcheck="false" value="'+esc(sg.ghBranch||'data')+'" oninput="App.setGhBranch(this)" placeholder="branch" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"></div>';
+  h+='<button onclick="App.syncNow()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button>';
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Token üret: GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → repo <b>mustafaras/s</b> → izin <b>Contents: Read and write</b>. Token sızarsa bu repoya yazılabilir; sadece bu repoya yetkili token kullan.</div></div>';
+  // YÖNTEM 2: Cloudflare Worker (gelişmiş)
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:14.5px;font-weight:700;color:var(--muted);">Alternatif: Cloudflare Worker ☁️</div>';
+  h+='<div style="font-size:12px;line-height:1.5;color:var(--faint);">Token\'ı cihazda değil sunucuda tutmak istersen Worker adresini gir (kurulum: WORKER_SETUP.md). Yukarıdaki token doluysa o öncelikli olur.</div>';
+  h+='<input type="url" inputmode="url" value="'+esc(sg.syncUrl||'')+'" oninput="App.setSyncUrl(this)" placeholder="https://...workers.dev" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;"></div>';
   h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span>🗑️</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön','🔄');
   // add to home guide

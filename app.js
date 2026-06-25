@@ -87,11 +87,21 @@ var WIND_DOWN_STEPS=[
   {key:'cool',icon:'🌙',label:'Odayı serinlet',note:'18-20°C aralığı dalmayı destekler.'}
 ];
 var RITUAL_STAGES=[
-  {key:'transition',label:'Geceye geçiş',hint:'Işık düşsün, tempo yavaşlasın.',secs:60},
-  {key:'breath',label:'Nefes senkronu',hint:'4 sn al · 6 sn ver.',secs:180},
-  {key:'body',label:'Body scan',hint:'Çene, omuz, göğüs, bacak gevşet.',secs:120},
-  {key:'offload',label:'Zihni boşalt',hint:'Yarına tek not bırak ve bırak.',secs:120},
-  {key:'descent',label:'Uykuya iniş',hint:'Ekran sadeleşsin, sadece ritim kalsın.',secs:120}
+  {key:'transition',label:'Geceye geçiş',hint:'Işık düşsün, tempo yavaşlasın.',secs:60,
+    voice:'Geceye geçiyoruz. Işıkları kıs, telefonu bırakmaya hazırlan. Omuzlarını indir.',
+    lines:['Işığı kıs, ekran parlaklığını azalt.','Omuzlarını yavaşça aşağı bırak.','Çeneni gevşet, dilini damağından ayır.']},
+  {key:'breath',label:'Nefes senkronu',hint:'4 sn al · 6 sn ver.',secs:180,
+    voice:'Şimdi nefesini yavaşlatıyoruz. Burnundan dört saniye al, ağzından altı saniye ver.',
+    lines:['Burnundan yavaşça nefes al.','Karnını şişir, göğsün sakin kalsın.','Verirken tüm gerginliği bırak.']},
+  {key:'body',label:'Body scan',hint:'Çene, omuz, göğüs, bacak gevşet.',secs:120,
+    voice:'Bedenini tarıyoruz. Dikkatini yavaşça yukarıdan aşağıya indir ve her bölgeyi gevşet.',
+    lines:['Yüzünü ve çeneni yumuşat.','Omuz ve boynunu serbest bırak.','Bacaklarını yatağa ağırlaştır.']},
+  {key:'offload',label:'Zihni boşalt',hint:'Yarına tek not bırak ve bırak.',secs:120,
+    voice:'Aklındaki yarına ait tek bir şeyi yaz ve bırak. Zihnini gece için boşalt.',
+    lines:['Yarın için tek bir not bırak.','Düşünce gelirse "yarın" de, geç.','Zihnini bu gece için boşalt.']},
+  {key:'descent',label:'Uykuya iniş',hint:'Ekran sadeleşsin, sadece ritim kalsın.',secs:120,
+    voice:'Artık uykuya iniyoruz. Sadece nefesini izle. Ekranı bırakabilirsin.',
+    lines:['Sadece nefesini izle.','Bedenin gittikçe ağırlaşıyor.','Ekranı bırak, uykuya bırak kendini.']}
 ];
 var BODY_SCAN_POINTS=[
   {label:'Çene ve yüz',cue:'Dişlerini sıkma, yüzü yumuşat.'},
@@ -131,7 +141,7 @@ function migrate(d){
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
 var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
-var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false};
+var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,lastSpokenLine:null};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -202,6 +212,49 @@ function ritualBreathPrompt(info){
   if(t<4) return {label:'Nefes al',sub:'4 saniye'};
   return {label:'Nefes ver',sub:'6 saniye'};
 }
+function ritualBreathState(info){
+  var c=info.elapsedInStage%10;
+  if(c<4) return {phase:'in',label:'Al',count:Math.max(1,4-Math.floor(c)),total:4,pct:c/4};
+  return {phase:'out',label:'Ver',count:Math.max(1,6-Math.floor(c-4)),total:6,pct:(c-4)/6};
+}
+function ritualModeMeta(mode){
+  if(mode==='guided') return {label:'Rehberli',icon:'🗣️',desc:'Sesli koç + nefes yönlendirmesi'};
+  if(mode==='ambient') return {label:'Ambiyans',icon:'🌊',desc:'Sözsüz, sarmalayan ses ortamı'};
+  return {label:'Sessiz',icon:'🌑',desc:'Yalnızca görsel rehber'};
+}
+function ritualGuideText(info){
+  var st=info.stage;
+  if(st.key==='breath'){ var b=ritualBreathState(info); return b.phase==='in'?'Burnundan yavaşça nefes al…':'Ağzından uzun uzun ver…'; }
+  var lines=st.lines||[st.hint];
+  var idx=Math.floor(info.elapsedInStage/14)%lines.length;
+  return lines[idx];
+}
+function speechAvailable(){ return typeof window!=='undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'; }
+function ritualPickVoice(){
+  if(!speechAvailable()) return null;
+  try{
+    var vs=window.speechSynthesis.getVoices()||[];
+    var tr=null;
+    for(var i=0;i<vs.length;i++){ if(/tr(-|_)?/i.test(vs[i].lang||'')){ tr=vs[i]; break; } }
+    return tr;
+  }catch(e){ return null; }
+}
+function ritualSpeak(text,opts){
+  if(!speechAvailable() || ui.ritualSoundMode!=='guided' || !ui.ritualRunning || !text) return;
+  opts=opts||{};
+  try{
+    var synth=window.speechSynthesis;
+    if(opts.interrupt) synth.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang='tr-TR';
+    var v=ritualPickVoice(); if(v) u.voice=v;
+    u.rate=opts.rate||0.84;
+    u.pitch=opts.pitch||0.92;
+    u.volume=opts.volume!=null?opts.volume:0.92;
+    synth.speak(u);
+  }catch(e){}
+}
+function ritualSpeechStop(){ if(speechAvailable()){ try{ window.speechSynthesis.cancel(); }catch(e){} } ritualAudio.lastSpokenLine=null; }
 function trackRitualEvent(type,meta){
   var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
@@ -268,7 +321,10 @@ function ensureRitualAudio(){
   var padGain2=ctx.createGain(); padGain2.gain.value=0;
   var padFilter2=ctx.createBiquadFilter(); padFilter2.type='lowpass'; padFilter2.frequency.value=620;
   padOsc2.connect(padFilter2); padFilter2.connect(padGain2); padGain2.connect(master); padOsc2.start();
-  ritualAudio.ctx=ctx; ritualAudio.master=master; ritualAudio.noiseSource=noiseSource; ritualAudio.noiseGain=noiseGain; ritualAudio.padOsc=padOsc; ritualAudio.padGain=padGain; ritualAudio.padOsc2=padOsc2; ritualAudio.padGain2=padGain2;
+  var lfoOsc=ctx.createOscillator(); lfoOsc.type='sine'; lfoOsc.frequency.value=0.07;
+  var lfoGain=ctx.createGain(); lfoGain.gain.value=0;
+  lfoOsc.connect(lfoGain); lfoGain.connect(padGain2.gain); lfoOsc.start();
+  ritualAudio.ctx=ctx; ritualAudio.master=master; ritualAudio.noiseSource=noiseSource; ritualAudio.noiseGain=noiseGain; ritualAudio.padOsc=padOsc; ritualAudio.padGain=padGain; ritualAudio.padOsc2=padOsc2; ritualAudio.padGain2=padGain2; ritualAudio.lfoOsc=lfoOsc; ritualAudio.lfoGain=lfoGain;
   return ctx;
 }
 function ritualCue(freq,dur,vol){
@@ -288,8 +344,8 @@ function ritualAudioSetTargets(mode,stageKey){
   if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
   var t=ctx.currentTime;
   var master=0,noise=0,pad=0,pad2=0,padFreq=126;
-  if(mode==='ambient'){ master=0.40; noise=0.26; pad=0.12; pad2=0.05; }
-  else if(mode==='guided'){ master=0.34; noise=0.16; pad=0.09; pad2=0.018; }
+  if(mode==='ambient'){ master=0.62; noise=0.34; pad=0.17; pad2=0.07; }
+  else if(mode==='guided'){ master=0.52; noise=0.20; pad=0.12; pad2=0.03; }
   if(stageKey==='transition'){ padFreq=132; }
   else if(stageKey==='breath'){ padFreq=120; pad+=0.02; }
   else if(stageKey==='body'){ padFreq=112; }
@@ -301,6 +357,7 @@ function ritualAudioSetTargets(mode,stageKey){
   ritualAudio.padOsc.frequency.setTargetAtTime(padFreq,t,1.2);
   if(ritualAudio.padGain2) ritualAudio.padGain2.gain.setTargetAtTime(pad2,t,1.1);
   if(ritualAudio.padOsc2) ritualAudio.padOsc2.frequency.setTargetAtTime(padFreq*1.5,t,1.4);
+  if(ritualAudio.lfoGain) ritualAudio.lfoGain.gain.setTargetAtTime(mode==='ambient'?0.05:0,t,1.2);
 }
 function ritualAudioSync(forceCue){
   var info=ritualStageInfo();
@@ -314,6 +371,7 @@ function ritualAudioSync(forceCue){
     if(ui.ritualSoundMode==='guided'){
       var f=info.stage.key==='breath'?432:(info.stage.key==='descent'?312:520);
       ritualCue(f,0.45,0.08);
+      ritualSpeak(info.stage.voice,{interrupt:true});
     }
   }
   if(ui.ritualSoundMode==='guided' && info.stage.key==='breath'){
@@ -323,6 +381,7 @@ function ritualAudioSync(forceCue){
       ritualAudio.breathPhase=ph;
       if(ph==='in') ritualCue(440,0.55,0.085);
       else ritualCue(294,0.85,0.075);
+      if(info.elapsedInStage>9) ritualSpeak(ph==='in'?'Al':'Ver',{interrupt:true,rate:0.9,volume:0.85});
     }
   } else {
     ritualAudio.breathPhase=null;
@@ -522,6 +581,7 @@ App.closeRitual=function(){
   ui.ritualOpen=false;
   ui.ritualRunning=false;
   ui.ritualDone=false;
+  ritualSpeechStop();
   ritualAudioSync(false);
   trackRitualEvent('close');
   render();
@@ -529,7 +589,11 @@ App.closeRitual=function(){
 App.setRitualSoundMode=function(mode){
   if(['silent','ambient','guided'].indexOf(mode)<0) return;
   ui.ritualSoundMode=mode;
+  if(mode!=='guided'){ ritualSpeechStop(); }
+  ritualAudio.stageKey=null;
+  ritualAudio.breathPhase=null;
   ritualAudioSync(true);
+  if(mode==='guided' && ui.ritualRunning){ var info=ritualStageInfo(); ritualSpeak(info.stage.voice,{interrupt:true}); ritualAudio.stageKey=info.stage.key; }
   trackRitualEvent('sound-mode',{mode:mode});
   render();
 };
@@ -568,6 +632,7 @@ App.startRitual=function(){
       save();
       logRitualSession(true);
       ui.ritualStartedAt=null;
+      ritualSpeechStop();
       ritualAudioSync(false);
       trackRitualEvent('complete');
       render();
@@ -582,6 +647,7 @@ App.pauseRitual=function(){
   if(!ui.ritualRunning) return;
   clearInterval(ritualInterval);
   ui.ritualRunning=false;
+  ritualSpeechStop();
   ritualAudioSync(false);
   trackRitualEvent('pause');
   render();
@@ -594,6 +660,7 @@ App.resetRitual=function(){
   ui.ritualDone=false;
   ui.ritualLeft=ui.ritualTotal;
   ritualAudio.stageKey=null;
+  ritualSpeechStop();
   ritualAudioSync(false);
   trackRitualEvent('reset');
   render();
@@ -1214,45 +1281,88 @@ function modalsHTML(){
     var orb=ritualOrbScale();
     var dRec=getDay(data,todayStr(),dayIndexFor(todayStr()));
     var dWind=(dRec&&dRec.sleep&&dRec.sleep.windDown)?dRec.sleep.windDown:emptyWindDown();
-    h+='<div style="position:fixed;inset:0;z-index:380;display:flex;justify-content:center;background:#0C0A12;animation:seyFade .25s ease;">';
-    h+='<div style="position:relative;width:100%;max-width:460px;display:flex;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#3A2C62 0%,#211733 44%,#14111D 100%);padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 18px);box-shadow:0 0 60px rgba(0,0,0,0.5);">';
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;"><button onclick="App.closeRitual()" style="border:1px solid rgba(255,255,255,0.25);cursor:pointer;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,0.08);color:#F3E9ED;font-size:12.5px;font-weight:700;">Kapat</button><div style="font-size:13px;color:rgba(255,255,255,0.86);font-weight:700;">10 dk Gece Ritüeli</div><div style="font-size:13px;color:#E9AFC1;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
-    h+='<div style="font-size:24px;font-weight:800;line-height:1.2;color:#fff;text-align:center;margin-top:2px;">'+esc(stage.label)+'</div>';
-    h+='<div style="font-size:13.5px;line-height:1.5;color:rgba(243,233,237,0.84);text-align:center;margin-top:6px;">'+esc(stage.hint)+'</div>';
-    h+='<div style="display:flex;gap:7px;margin-top:12px;">';
-    [['silent','Sessiz','🌑'],['ambient','Ambience','🌙'],['guided','Rehberli','🫧']].forEach(function(m){ var active=ui.ritualSoundMode===m[0]; h+='<button onclick="App.setRitualSoundMode(\''+m[0]+'\')" style="flex:1;border:'+(active?'1px solid rgba(233,175,193,0.78)':'1px solid rgba(255,255,255,0.18)')+';cursor:pointer;padding:8px 6px;border-radius:12px;background:'+(active?'linear-gradient(135deg,rgba(155,127,201,0.45),rgba(233,175,193,0.28))':'rgba(255,255,255,0.06)')+';color:#F3E9ED;font-size:12px;font-weight:'+(active?'800':'650')+';"><span style="margin-right:5px;">'+m[2]+'</span>'+m[1]+'</button>'; });
+    var mode=ui.ritualSoundMode;
+    var breath=ritualBreathState(info);
+    var guideLine=ritualGuideText(info);
+    var running=ui.ritualRunning;
+    h+='<div style="position:fixed;inset:0;z-index:380;display:flex;justify-content:center;background:#07060C;animation:seyFade .3s ease;">';
+    h+='<div style="position:relative;width:100%;max-width:460px;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(125% 78% at 50% -8%,#3B2D66 0%,#241A3B 46%,#120E1B 100%);">';
+    // animated aurora + star layers (decorative, behind content)
+    h+='<div style="position:absolute;inset:-20% -10%;pointer-events:none;background:radial-gradient(40% 32% at 28% 22%,rgba(155,127,201,0.42),rgba(0,0,0,0) 70%),radial-gradient(44% 36% at 76% 30%,rgba(233,175,193,0.30),rgba(0,0,0,0) 72%);animation:seyAurora 18s ease-in-out infinite;"></div>';
+    h+='<div style="position:absolute;inset:0;pointer-events:none;">';
+    var stars=[[12,16],[24,9],[38,22],[52,12],[68,18],[80,10],[88,26],[18,32],[60,30],[34,38],[74,40],[46,44]];
+    stars.forEach(function(s,i){ h+='<span style="position:absolute;left:'+s[0]+'%;top:'+s[1]+'%;width:'+(i%3===0?3:2)+'px;height:'+(i%3===0?3:2)+'px;border-radius:50%;background:#fff;opacity:.4;animation:seyTwinkle '+(2.4+(i%5)*0.6)+'s ease-in-out infinite;animation-delay:'+(i*0.3)+'s;"></span>'; });
     h+='</div>';
-    var modeHint=ui.ritualSoundMode==='guided'?'Rehberli: nefes al/ver anlarında yumuşak ton + faz geçiş sesi.':(ui.ritualSoundMode==='ambient'?'Ambience: katmanlı, kesintisiz pembe gürültü + sıcak drone. İpucu yok.':'Sessiz: yalnızca görsel rehber.');
-    h+='<div style="font-size:11px;color:rgba(243,233,237,0.66);text-align:center;margin-top:7px;line-height:1.4;">'+esc(modeHint)+'</div>';
-    h+='<div style="flex:1;display:flex;align-items:center;justify-content:center;"><div style="position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center;">';
-    h+='<div style="position:absolute;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle at 50% 35%,rgba(233,175,193,'+(orb.glow*1.0).toFixed(3)+'),rgba(155,127,201,'+(orb.glow*0.32).toFixed(3)+') 56%,rgba(0,0,0,0));filter:blur(0.2px);opacity:'+(0.55+orb.glow*0.8).toFixed(3)+';transition:opacity '+orb.dur+'ms ease-in-out;transform:scale('+(1+ (orb.scale-1)*0.5).toFixed(3)+');"></div>';
-    h+='<div style="position:absolute;width:176px;height:176px;border-radius:50%;border:1px solid rgba(255,255,255,0.23);background:linear-gradient(160deg,rgba(255,255,255,0.18),rgba(255,255,255,0.03));transform:scale('+orb.scale+');transition:transform '+orb.dur+'ms ease-in-out;"></div>';
-    h+='<div style="position:absolute;width:126px;height:126px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.86;box-shadow:0 14px 40px rgba(155,127,201,0.42);"></div>';
-    h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:33px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11.5px;opacity:0.9;margin-top:4px;">faz kalan</div></div>';
+    h+='<div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto;">';
+    // header
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">';
+    h+='<button onclick="App.closeRitual()" style="border:1px solid rgba(255,255,255,0.2);cursor:pointer;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);color:#F3E9ED;font-size:16px;font-weight:700;line-height:1;">‹</button>';
+    h+='<div style="text-align:center;"><div style="font-size:11px;letter-spacing:1.5px;color:rgba(233,175,193,0.9);font-weight:800;">GECE RİTÜELİ</div><div style="font-size:11px;color:rgba(243,233,237,0.6);margin-top:1px;">10 dakikalık uykuya geçiş</div></div>';
+    h+='<div style="min-width:38px;text-align:right;font-size:15px;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
+    // stage title
+    h+='<div style="text-align:center;margin-top:14px;"><div style="font-size:26px;font-weight:800;line-height:1.15;color:#fff;">'+esc(stage.label)+'</div><div style="font-size:13px;line-height:1.5;color:rgba(243,233,237,0.78);margin-top:5px;">'+esc(stage.hint)+'</div></div>';
+    // ---- ORB ----
+    h+='<div style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;margin:16px 0 6px;"><div style="position:relative;width:248px;height:248px;display:flex;align-items:center;justify-content:center;">';
+    if(running){ h+='<div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(233,175,193,0.4);animation:seyRingPulse 4s ease-out infinite;"></div><div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(155,127,201,0.4);animation:seyRingPulse 4s ease-out infinite;animation-delay:2s;"></div>'; }
+    h+='<div style="position:absolute;width:248px;height:248px;border-radius:50%;background:radial-gradient(circle at 50% 36%,rgba(233,175,193,'+(orb.glow*1.05).toFixed(3)+'),rgba(155,127,201,'+(orb.glow*0.3).toFixed(3)+') 58%,rgba(0,0,0,0));opacity:'+(0.5+orb.glow*0.8).toFixed(3)+';transition:opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out;transform:scale('+(1+(orb.scale-1)*0.5).toFixed(3)+');"></div>';
+    h+='<div style="position:absolute;width:188px;height:188px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02));transform:scale('+orb.scale+');transition:transform '+orb.dur+'ms ease-in-out;"></div>';
+    h+='<div style="position:absolute;width:132px;height:132px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.9;box-shadow:0 16px 46px rgba(155,127,201,0.5);transform:scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+');transition:transform '+orb.dur+'ms ease-in-out;"></div>';
+    if(stage.key==='breath' && running){
+      h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:40px;font-weight:800;line-height:1;">'+esc(breath.label)+'</div><div style="font-size:30px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums;opacity:0.92;">'+breath.count+'</div></div>';
+    } else {
+      h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11px;opacity:0.85;margin-top:5px;letter-spacing:.5px;">FAZ KALAN</div></div>';
+    }
     h+='</div></div>';
+    // ---- MODE STATUS BANNER (the differentiator) ----
+    if(mode==='guided'){
+      h+='<div style="border:1px solid rgba(233,175,193,0.5);background:linear-gradient(135deg,rgba(233,175,193,0.22),rgba(155,127,201,0.16));border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
+      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:rgba(233,175,193,0.32);border-radius:999px;padding:4px 10px;">🔊 SESLİ REHBER AKTİF</span>';
+      h+='<span style="display:inline-flex;align-items:flex-end;gap:2px;height:18px;">';
+      for(var vw=0;vw<7;vw++){ h+='<span style="width:3px;height:18px;border-radius:2px;background:#F3C6D3;transform-origin:bottom;'+(running?'animation:seyVoiceWave '+(0.8+(vw%3)*0.18)+'s ease-in-out infinite;animation-delay:'+(vw*0.09)+'s;':'opacity:.45;')+'"></span>'; }
+      h+='</span></div>';
+      h+='<div style="margin-top:9px;font-size:14.5px;line-height:1.45;color:#fff;font-weight:600;min-height:21px;">'+esc(running?('“'+guideLine+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.')+'</div>';
+      h+='</div>';
+    } else if(mode==='ambient'){
+      h+='<div style="border:1px solid rgba(124,196,214,0.45);background:linear-gradient(135deg,rgba(86,150,196,0.22),rgba(124,196,214,0.12));border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
+      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:rgba(124,196,214,0.3);border-radius:999px;padding:4px 10px;">🌊 AMBİYANS ÇALIYOR</span>';
+      h+='<span style="display:inline-flex;align-items:flex-end;gap:3px;height:22px;">';
+      for(var eq=0;eq<9;eq++){ h+='<span style="width:4px;height:22px;border-radius:2px;background:linear-gradient(180deg,#BFE9F2,#5E9FD0);transform-origin:bottom;'+(running?'animation:seyEq '+(0.9+(eq%4)*0.22)+'s ease-in-out infinite;animation-delay:'+(eq*0.08)+'s;':'opacity:.4;transform:scaleY(.5);')+'"></span>'; }
+      h+='</span></div>';
+      h+='<div style="margin-top:9px;font-size:13px;line-height:1.45;color:rgba(243,247,250,0.86);">Sözsüz, kesintisiz ses ortamı: yumuşak pembe gürültü + sıcak drone yavaşça kabarıp iniyor. Konuşma yok.</div>';
+      h+='</div>';
+    } else {
+      h+='<div style="border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
+      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:rgba(243,233,237,0.85);background:rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;">🌑 SESSİZ MOD</span><span style="font-size:12.5px;color:rgba(243,233,237,0.6);">Ses yok</span></div>';
+      h+='<div style="margin-top:9px;font-size:13px;line-height:1.45;color:rgba(243,233,237,0.78);">Yalnızca görsel rehber: nefes küresini ve faz yönergelerini izle. Tam sessizlik.</div>';
+      h+='</div>';
+    }
+    // ---- MODE SELECTOR (3 cards) ----
+    h+='<div style="display:flex;gap:8px;margin-top:12px;">';
+    ['silent','ambient','guided'].forEach(function(mk){ var meta=ritualModeMeta(mk); var active=mode===mk; h+='<button onclick="App.setRitualSoundMode(\''+mk+'\')" style="flex:1;text-align:left;border:'+(active?'1px solid rgba(233,175,193,0.8)':'1px solid rgba(255,255,255,0.14)')+';cursor:pointer;padding:10px 9px;border-radius:14px;background:'+(active?'linear-gradient(135deg,rgba(155,127,201,0.5),rgba(233,175,193,0.3))':'rgba(255,255,255,0.05)')+';color:#F3E9ED;box-shadow:'+(active?'0 6px 18px rgba(155,127,201,0.35)':'none')+';transition:all .2s;"><div style="font-size:17px;line-height:1;">'+meta.icon+'</div><div style="font-size:12.5px;font-weight:'+(active?'800':'650')+';margin-top:5px;">'+meta.label+'</div><div style="font-size:9.5px;line-height:1.25;color:rgba(243,233,237,0.62);margin-top:2px;">'+esc(meta.desc)+'</div></button>'; });
+    h+='</div>';
+    // ---- stage-specific helper cards ----
     if(stage.key==='body'){
       var bp=ritualBodyPoint(info);
-      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:11px 12px;text-align:center;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div style="font-size:15px;font-weight:800;color:#fff;margin-top:2px;">'+esc(bp.label)+'</div><div style="font-size:12px;color:rgba(243,233,237,0.86);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
-    } else if(stage.key==='breath'){
-      var bpr=ritualBreathPrompt(info);
-      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px;text-align:center;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;">NEFES RİTMİ</div><div style="font-size:16px;font-weight:800;color:#fff;margin-top:2px;">'+esc(bpr.label)+'</div><div style="font-size:12px;color:rgba(243,233,237,0.86);margin-top:3px;">'+esc(bpr.sub)+'</div></div>';
+      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 13px;text-align:center;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div style="font-size:15.5px;font-weight:800;color:#fff;margin-top:3px;">'+esc(bp.label)+'</div><div style="font-size:12.5px;color:rgba(243,233,237,0.82);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
     } else if(stage.key==='offload'){
-      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);border-radius:14px;padding:10px 10px 9px;"><div style="font-size:11.5px;color:rgba(233,175,193,0.95);font-weight:800;margin-bottom:6px;">YARINA BIRAK</div><textarea oninput="App.onRitualOffload(this)" rows="2" placeholder="Yarın için tek not: örn. 09:30 toplantı" style="width:100%;border:1px solid rgba(255,255,255,0.24);background:rgba(20,17,29,0.46);color:#F3E9ED;border-radius:10px;padding:9px 10px;font-size:13px;outline:none;resize:none;line-height:1.4;">'+esc(dWind.offloadNote||'')+'</textarea></div>';
+      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 12px 10px;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;margin-bottom:7px;">YARINA BIRAK</div><textarea oninput="App.onRitualOffload(this)" rows="2" placeholder="Yarın için tek not: örn. 09:30 toplantı" style="width:100%;border:1px solid rgba(255,255,255,0.22);background:rgba(18,14,27,0.5);color:#F3E9ED;border-radius:11px;padding:9px 11px;font-size:13px;outline:none;resize:none;line-height:1.4;">'+esc(dWind.offloadNote||'')+'</textarea></div>';
     } else if(stage.key==='descent'){
-      h+='<div style="margin-bottom:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;text-align:center;font-size:12.5px;color:rgba(243,233,237,0.88);line-height:1.45;">Bu fazda sadece nefesi izleyip ekranı bırakmaya hazırlan. Uyarıcı düşünce gelirse “yarın” diyerek geç.</div>';
+      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);border-radius:14px;padding:11px 13px;text-align:center;font-size:12.5px;color:rgba(243,233,237,0.84);line-height:1.5;">Sadece nefesi izle, ekranı bırakmaya hazırlan. Uyarıcı düşünce gelirse “yarın” deyip geç.</div>';
     }
-    h+='<div style="display:flex;gap:6px;margin-bottom:10px;">';
-    RITUAL_STAGES.forEach(function(s,idx){ var active=idx===info.index; var done=idx<info.index; h+='<div style="flex:1;height:8px;border-radius:999px;background:'+(done?'linear-gradient(90deg,#E9AFC1,#9B7FC9)':(active?'rgba(233,175,193,0.5)':'rgba(255,255,255,0.14)'))+';box-shadow:'+(active?'0 0 0 1px rgba(233,175,193,0.42) inset':'none')+';"></div>'; });
+    // ---- progress dots with labels ----
+    h+='<div style="display:flex;gap:6px;margin-top:14px;">';
+    RITUAL_STAGES.forEach(function(s,idx){ var active=idx===info.index; var done=idx<info.index; h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;height:5px;border-radius:999px;background:'+(done?'linear-gradient(90deg,#E9AFC1,#9B7FC9)':(active?'rgba(233,175,193,0.55)':'rgba(255,255,255,0.12)'))+';box-shadow:'+(active?'0 0 0 1px rgba(233,175,193,0.45) inset':'none')+';"></div><span style="font-size:8.5px;color:'+(active?'#E9AFC1':'rgba(243,233,237,0.42)')+';font-weight:'+(active?'800':'500')+';white-space:nowrap;">'+esc(s.label.split(' ')[0])+'</span></div>'; });
     h+='</div>';
-    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.78);margin-bottom:14px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span>%'+phasePct+' tamamlandı</span></div>';
-    h+='<div style="display:flex;gap:8px;">';
-    if(!ui.ritualRunning&&ui.ritualLeft===ui.ritualTotal&&!ui.ritualDone) h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Ritüeli başlat</button>';
-    else if(ui.ritualRunning) h+='<button onclick="App.pauseRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Duraklat</button>';
-    else h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14px;font-weight:800;">Devam et</button>';
-    h+='<button onclick="App.resetRitual()" style="border:1px solid rgba(255,255,255,0.24);cursor:pointer;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.08);color:#F3E9ED;font-size:13px;font-weight:700;">Sıfırla</button>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.72);margin-top:8px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span>%'+phasePct+' tamamlandı</span></div>';
+    // ---- controls ----
+    h+='<div style="display:flex;gap:8px;margin-top:14px;">';
+    if(!running&&ui.ritualLeft===ui.ritualTotal&&!ui.ritualDone) h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Ritüeli başlat</button>';
+    else if(running) h+='<button onclick="App.pauseRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Duraklat</button>';
+    else h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Devam et</button>';
+    h+='<button onclick="App.resetRitual()" style="border:1px solid rgba(255,255,255,0.2);cursor:pointer;padding:15px 17px;border-radius:15px;background:rgba(255,255,255,0.07);color:#F3E9ED;font-size:13px;font-weight:700;">Sıfırla</button>';
     h+='</div>';
-    if(ui.ritualDone) h+='<div style="margin-top:10px;text-align:center;font-size:12.5px;color:#E9AFC1;">Ritüel tamamlandı. Ekranı bırakıp uykuya geçebilirsin.</div>';
-    h+='</div></div>';
+    if(ui.ritualDone) h+='<div style="margin-top:12px;text-align:center;font-size:13px;color:#E9AFC1;font-weight:600;">Ritüel tamamlandı 🌙 Ekranı bırakıp uykuya geçebilirsin.</div>';
+    h+='</div></div></div>';
   }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';

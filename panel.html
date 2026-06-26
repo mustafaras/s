@@ -215,6 +215,7 @@ var MOOD_EMOJI={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"�
 var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
 var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
 var WIND_KEYS=["light","breath","dump","cool"];
+var WIND_DOWN={light:{icon:"🕯️",label:"Işığı kıs"},breath:{icon:"🫁",label:"4-7-8 nefes"},dump:{icon:"📝",label:"Zihin boşalt"},cool:{icon:"🌙",label:"Odayı serinlet"}};
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
 var SLEEPQ={good:"Dinç",ok:"İdare",bad:"Yorgun"};
 var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
@@ -712,6 +713,17 @@ function render(){
   if(wkBits.length) exRows+=exRow("🚶‍♀️ Yürüyüş", wkBits.join(" · "));
   if(srec.flow&&FLOW[srec.flow]) exRows+=exRow("🩸 Regl", FLOW[srec.flow]);
   if(Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length) exRows+=exRow("🛟 SOS", srec.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · "));
+  // Uyku ritüeli (windDown): işaretlenen adımlar + rehberli ritüel oturumu
+  var wind=sl.windDown||{};
+  var wsteps=wind.steps||{};
+  var doneSteps=WIND_KEYS.filter(function(k){return wsteps[k];});
+  if(doneSteps.length) exRows+=exRow("🌙 Ritüel", doneSteps.map(function(k){var s=WIND_DOWN[k];return s?(s.icon+" "+esc(s.label)):esc(k);}).join(" · "));
+  var ritBits=[];
+  if(wind.lastMinutes!=null&&wind.lastMinutes!=="") ritBits.push(esc(String(wind.lastMinutes))+" dk");
+  var sessDone=Array.isArray(wind.sessions)?wind.sessions.filter(function(s){return s&&s.completed;}).length:0;
+  if(sessDone>0) ritBits.push("✓ "+sessDone+" tam oturum");
+  if(wind.lastDoneAt){ var dt=new Date(wind.lastDoneAt); if(!isNaN(dt.getTime())) ritBits.push(dt.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})); }
+  if(ritBits.length) exRows+=exRow("🧘‍♀️ Rehberli", ritBits.join(" · "));
   var off=(sl.windDown&&sl.windDown.offloadNote)?String(sl.windDown.offloadNote).trim():"";
   if(off) exRows+=exRow("📌 Yarına", esc(off));
   if(exRows){ h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>'; }

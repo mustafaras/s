@@ -130,6 +130,10 @@ function migrate(d){
   if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
   if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
   if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
+  if(typeof d.settings.openaiKey!=='string') d.settings.openaiKey='';
+  if(!d.luna||typeof d.luna!=='object') d.luna={qa:[],lastAskDate:null};
+  if(!Array.isArray(d.luna.qa)) d.luna.qa=[];
+  if(typeof d.luna.lastAskDate!=='string'&&d.luna.lastAskDate!==null) d.luna.lastAskDate=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
@@ -143,7 +147,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null};
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', lunaAsking:false, lunaQuestion:'', lunaError:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null,lineStamp:0,lineCursor:0};
 var fieldTimers={};
@@ -491,7 +495,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main'},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:''},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -763,6 +767,7 @@ App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render()
 App.printReport=function(){ openReport(); };
 function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
 App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=normalizeToken(el.value||''); save(); syncFieldUpdate(); };
+App.setOpenaiKey=function(el){ var v=el.value; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); save(); },500); };
 App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
@@ -1110,6 +1115,13 @@ function ayarlarHTML(){
     h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
   }
   h+='</div>';
+  // Luna · kişisel asistan (OpenAI anahtarı)
+  var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan 🌙 '+(hasOaKey?'<span style="font-size:12px;font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;">bağlı ✓</span>':'')+'</div>';
+  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 1 soru hakkın olur — Luna olabildiğince detaylı yanıtlar. 💜</div>';
+  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.openaiKey||'')+'" oninput="App.setOpenaiKey(this)" placeholder="sk-… (OpenAI API anahtarı)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+  h+='<div style="font-size:11.5px;color:var(--faint);">platform.openai.com → API keys bölümünden alınır. Model: gpt-4o-mini (hızlı & ekonomik).</div>';
+  h+='</div>';
   h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span>🗑️</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön','🔄');
   // add to home guide
@@ -1318,7 +1330,7 @@ function cycleHTML(){
 }
 
 function navHTML(){
-  var defs=[['bugun','☀️','Bugün'],['saglik','🌸','Sağlık'],['sos','🍫','SOS'],['mesaj','💌','Mesaj'],['harita','🗺️','Harita'],['rapor','📊','Rapor'],['ayarlar','⚙️','Ayarlar']];
+  var defs=[['bugun','☀️','Bugün'],['saglik','🌸','Sağlık'],['sos','🍫','SOS'],['mesaj','🌙','Luna'],['harita','🗺️','Harita'],['rapor','📊','Rapor'],['ayarlar','⚙️','Ayarlar']];
   var unread=unreadNotifCount();
   var h='<nav style="flex-shrink:0;display:flex;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(150,110,120,0.15);padding:8px 2px calc(env(safe-area-inset-bottom) + 8px);">';
   defs.forEach(function(n){
@@ -1583,13 +1595,13 @@ function showInboxPopup(){
   inner+='<div style="position:relative;overflow:hidden;border-radius:20px;padding:15px 16px 14px;background:linear-gradient(135deg,#FBE9EF 0%,#F0E7FF 100%);border:1px solid rgba(201,184,255,0.5);box-shadow:0 18px 44px rgba(150,110,170,0.35),0 2px 8px rgba(0,0,0,0.06);">';
   inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 90% -10%,rgba(233,137,159,0.18),transparent 60%);"></div>';
   inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
-  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#E9899F,#C9B8FF);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 6px 16px rgba(201,150,180,0.45);">💌</div>';
+  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 6px 16px rgba(155,127,201,0.45);">🌙</div>';
   inner+='<div style="flex:1;min-width:0;">';
-  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;color:#7A4A66;">Observer’dan mesaj</span>'+(when?'<span style="font-size:11px;color:#A88;margin-left:auto;font-weight:600;">'+esc(when)+'</span>':'')+'</div>';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;color:#7A4A66;">Luna’dan mesaj</span>'+(when?'<span style="font-size:11px;color:#A88;margin-left:auto;font-weight:600;">'+esc(when)+'</span>':'')+'</div>';
   inner+='<div style="font-size:14px;line-height:1.45;color:#4A3A44;margin-top:4px;word-break:break-word;">'+esc(txt)+(latest.text&&latest.text.length>150?'…':'')+'</div>';
   if(more>0) inner+='<div style="font-size:11.5px;color:#9A7;margin-top:5px;font-weight:700;">+'+more+' yeni mesaj daha</div>';
   inner+='<div style="display:flex;gap:8px;margin-top:12px;">';
-  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#E9899F,#C9B8FF);color:#fff;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(220,140,170,0.4);">Bildirimleri gör</button>';
+  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(155,127,201,0.4);">Luna’ya git</button>';
   inner+='<button onclick="App.dismissPopup()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
   inner+='</div></div>';
   inner+='<button onclick="App.dismissPopup()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;font-size:17px;line-height:1;font-weight:700;">✕</button>';
@@ -1597,29 +1609,120 @@ function showInboxPopup(){
   pop.innerHTML=inner;
   document.body.appendChild(pop);
 }
+var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişisel sağlık ve yaşam yoldaşı. '
++'Şeyma sana günde yalnızca BİR soru sorabiliyor, bu yüzden bu soru çok kıymetli. '
++'Bu tek soruya elinden gelen en içten, en kapsamlı ve en güzel cevabı ver: sıcak bir selamla başla, '
++'sonra net, somut, uygulanabilir ve şefkatli bir yanıt sun; gerektiğinde küçük başlıklar veya maddelerle düzenle; '
++'sonunda nazik, güç veren bir kapanış cümlesi ekle. Aşağıdaki kişisel kayıtlardan yararlan ve mümkün olduğunca '
++'bu veriye dayan; bilmediğin şeyi uydurma. Tıbbi teşhis veya tedavi verme; ciddi bir durum sezersen nazikçe '
++'bir uzmana danışmasını öner. Asla yargılama, suçlama veya utandırma; umut veren, güçlendiren bir dille konuş. Her zaman Türkçe yaz.';
+function lunaContext(){
+  var today=todayStr(), rec=data.days[today], lines=[];
+  lines.push('Bugünün tarihi: '+today);
+  var mealStr='kayıt yok';
+  if(rec&&rec.meals){ var ms=MEALS.map(function(m){ var v=rec.meals[m.key]; return (v&&String(v).trim())?(m.label+': '+String(v).trim()):null; }).filter(Boolean); if(ms.length) mealStr=ms.join(' · '); }
+  lines.push('Bugün yedikleri: '+mealStr);
+  var moodO=rec&&rec.mood?find(MOODS,'id',rec.mood):null;
+  lines.push('Bugünkü mod: '+(moodO?moodO.short:'—'));
+  if(rec&&rec.sleep&&rec.sleep.hours!=null) lines.push('Bugünkü uyku: '+rec.sleep.hours+' saat'+(rec.sleep.quality?(' ('+rec.sleep.quality+')'):''));
+  lines.push('Bugünkü alışkanlık tikleri: '+(rec?countRec(rec):0)+'/'+HABIT_TOTAL);
+  if(rec&&rec.cravingSOSCount) lines.push('Bugün tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
+  if(rec&&Array.isArray(rec.symptoms)&&rec.symptoms.length) lines.push('Bugünkü belirtiler: '+rec.symptoms.join(', '));
+  if(rec&&rec.note&&String(rec.note).trim()) lines.push('Bugünkü not: '+String(rec.note).trim());
+  var sleepVals=[],sosSum=0,tikSum=0,dayCount=0;
+  for(var i=0;i<7;i++){ var d=addDays(today,-i), r=data.days[d]; if(!r) continue; dayCount++; if(r.sleep&&r.sleep.hours!=null) sleepVals.push(Number(r.sleep.hours)); if(r.cravingSOSCount) sosSum+=Number(r.cravingSOSCount); tikSum+=countRec(r); }
+  if(sleepVals.length){ var sa=sleepVals.reduce(function(a,b){return a+b;},0)/sleepVals.length; lines.push('Son 7 gün uyku ortalaması: '+(Math.round(sa*10)/10)+' saat'); }
+  lines.push('Son 7 gün SOS toplamı: '+sosSum);
+  if(dayCount) lines.push('Son 7 gün tik ortalaması: '+(Math.round(tikSum/dayCount*10)/10)+'/'+HABIT_TOTAL);
+  lines.push('Aktif seri: '+currentStreak()+' gün');
+  if(data.cycle){ lines.push('Ortalama döngü: '+data.cycle.avgCycle+' gün, ortalama regl süresi: '+data.cycle.avgPeriod+' gün'); if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start) lines.push('Son regl başlangıcı: '+last.start); } }
+  return 'Şeyma hakkında bildiklerin (gizli kişisel kayıtlar):\n'+lines.join('\n');
+}
+function finishLuna(question,answer){
+  if(!answer||!answer.trim()){ ui.lunaAsking=false; ui.lunaError='Luna şu an yanıt veremedi. Birazdan tekrar dene.'; render(); return; }
+  if(!data.luna) data.luna={qa:[],lastAskDate:null};
+  data.luna.qa.push({date:todayStr(),question:question,answer:answer,ts:new Date().toISOString()});
+  data.luna.lastAskDate=todayStr();
+  ui.lunaAsking=false; ui.lunaQuestion=''; ui.lunaDraft=''; ui.lunaError=null;
+  save(); render();
+}
+function streamLuna(question){
+  var key=(data.settings&&data.settings.openaiKey)?String(data.settings.openaiKey).trim():'';
+  if(!key){ toast('Önce Ayarlar’dan Luna için OpenAI anahtarı gir 🌙',2600); App.go('ayarlar'); return; }
+  if(data.luna&&data.luna.lastAskDate===todayStr()){ toast('Bugünün soru hakkını kullandın 🌙'); return; }
+  ui.lunaAsking=true; ui.lunaQuestion=question; ui.lunaError=null; ui.lunaDraft=''; render();
+  var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;
+  var sys=LUNA_SYSTEM+'\n\n'+lunaContext(), acc='';
+  fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4o-mini',stream:true,temperature:0.85,max_tokens:1400,messages:[{role:'system',content:sys},{role:'user',content:question}]})})
+  .then(function(r){
+    if(!r.ok||!r.body) return r.text().then(function(t){ throw new Error('OpenAI '+r.status+(t?(': '+t.slice(0,140)):'')); });
+    var reader=r.body.getReader(), dec=new TextDecoder(), buf='';
+    function pump(){
+      return reader.read().then(function(res){
+        if(res.done){ finishLuna(question,acc); return; }
+        buf+=dec.decode(res.value,{stream:true});
+        var parts=buf.split('\n'); buf=parts.pop();
+        for(var i=0;i<parts.length;i++){ var line=parts[i].trim(); if(!line||line.slice(0,5)!=='data:') continue; var payload=line.slice(5).trim(); if(payload==='[DONE]') continue; try{ var j=JSON.parse(payload); var ch=j.choices&&j.choices[0]; var dd=ch&&ch.delta&&ch.delta.content; if(dd){ acc+=dd; var el=document.getElementById('luna-answer'); if(el) el.textContent=acc; var s2=document.querySelector('[data-scroll]'); if(s2) s2.scrollTop=s2.scrollHeight; } }catch(e){} }
+        return pump();
+      });
+    }
+    return pump();
+  })
+  .catch(function(e){ ui.lunaAsking=false; ui.lunaError=String(e&&e.message||e); render(); });
+}
+App.onLunaDraft=function(el){ ui.lunaDraft=el.value; };
+App.askLuna=function(){ var el=document.getElementById('luna-input'); var t=el?el.value.trim():String(ui.lunaDraft||'').trim(); if(!t){ toast('Önce sorunu yaz 🌙'); return; } if(t.length>600) t=t.slice(0,600); ui.lunaDraft=t; streamLuna(t); };
+function notifCardHTML(n){
+  var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
+  var unread=!n.read, s='';
+  s+='<div style="position:relative;background:var(--card);border:1px solid '+(unread?'rgba(155,127,201,0.5)':'rgba(150,110,120,0.14)')+';border-radius:18px;padding:13px 14px;box-shadow:0 4px 14px rgba(150,110,120,0.08);margin-bottom:9px;'+(unread?'border-left:3px solid #9B7FC9;':'')+'">';
+  s+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+  s+='<span style="font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);border-radius:999px;padding:3px 10px;">🌙 Luna</span>';
+  if(unread) s+='<span style="width:8px;height:8px;border-radius:50%;background:#E9576F;box-shadow:0 0 7px #E9576F;"></span>';
+  s+='<span style="font-size:11.5px;color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span></div>';
+  s+='<div style="font-size:14.5px;line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
+  s+='<div style="display:flex;align-items:center;margin-top:10px;"><span style="font-size:11px;color:var(--faint);font-weight:600;">'+(n.read?'✓✓ Okundu':'• Yeni')+'</span>';
+  s+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:10px;">🗑 Sil</button></div></div>';
+  return s;
+}
 function mesajHTML(){
-  var list=notifList().filter(function(n){ return n&&!n.deleted; }).slice().sort(function(a,b){ return String(b.ts||b.receivedAt||'').localeCompare(String(a.ts||a.receivedAt||'')); });
-  var h='<div style="display:flex;align-items:center;gap:10px;margin:2px 2px 4px;"><div style="width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#E9899F,#C9B8FF);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 16px rgba(201,150,180,0.4);">💌</div><div><div style="font-size:19px;font-weight:800;color:var(--text);">Bildirimler</div><div style="font-size:12.5px;color:var(--faint);">Observer’dan gelen mesajlar</div></div></div>';
-  if(!list.length){
-    h+='<div style="text-align:center;padding:48px 18px;color:var(--faint);"><div style="font-size:42px;opacity:0.45;margin-bottom:10px;">📭</div><div style="font-size:14.5px;font-weight:600;">Henüz bildirim yok</div><div style="font-size:12.5px;margin-top:4px;">Observer sana mesaj gönderdiğinde burada görünecek.</div></div>';
-    return h;
+  var luna=data.luna||{qa:[],lastAskDate:null};
+  var canAsk=luna.lastAskDate!==todayStr();
+  var hasKey=!!(data.settings&&data.settings.openaiKey&&String(data.settings.openaiKey).trim());
+  var notifs=notifList().filter(function(n){ return n&&!n.deleted; }).slice().sort(function(a,b){ return String(b.ts||b.receivedAt||'').localeCompare(String(a.ts||a.receivedAt||'')); });
+  var h='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 6px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 20px rgba(155,127,201,0.4);">🌙</div><div><div style="font-size:20px;font-weight:800;color:var(--text);">Luna</div><div style="font-size:12.5px;color:var(--faint);">kişisel yoldaşın · günde 1 soru</div></div></div>';
+  if(ui.lunaAsking){
+    h+='<div style="background:linear-gradient(160deg,rgba(155,127,201,0.10),rgba(233,175,193,0.10));border:1px solid rgba(155,127,201,0.3);border-radius:22px;padding:16px;">';
+    h+='<div style="font-size:13px;font-weight:800;color:#7A5AA0;margin-bottom:8px;">🌙 Bugünün Sorusu</div>';
+    h+='<div style="background:var(--card);border-radius:14px;padding:11px 13px;font-size:14.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;"><b style="color:#7A5AA0;">Sen:</b> '+esc(ui.lunaQuestion)+'</div>';
+    h+='<div style="font-size:12.5px;color:#7A5AA0;font-weight:700;margin-bottom:6px;">Luna düşünüyor… 🌙</div>';
+    h+='<div id="luna-answer" style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"></div></div>';
+  } else if(canAsk){
+    h+='<div style="background:linear-gradient(160deg,rgba(155,127,201,0.12),rgba(233,175,193,0.12));border:1px solid rgba(155,127,201,0.32);border-radius:22px;padding:16px;box-shadow:0 8px 22px rgba(155,127,201,0.12);">';
+    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;"><span style="font-size:13px;font-weight:800;color:#7A5AA0;">🌙 Bugünün Sorusu</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);padding:3px 9px;border-radius:999px;">1 hakkın var</span></div>';
+    h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;">Luna’ya günde yalnızca bir soru sorabilirsin — bu yüzden onu özenle seç. Sorduğunda olabildiğince derin ve içten bir yanıt alırsın. 💜</div>';
+    if(ui.lunaError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:10px;">'+esc(ui.lunaError)+'</div>';
+    h+='<textarea id="luna-input" oninput="App.onLunaDraft(this)" placeholder="Bugün Luna’ya ne sormak istersin?" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:14.5px;resize:none;outline:none;line-height:1.5;margin-bottom:10px;">'+esc(ui.lunaDraft||'')+'</textarea>';
+    if(!hasKey) h+='<div style="font-size:12px;color:#B5852A;background:rgba(255,225,150,0.25);border:1px solid rgba(220,180,90,0.4);border-radius:12px;padding:9px 11px;margin-bottom:10px;">Luna’nın yanıt verebilmesi için Ayarlar’dan OpenAI anahtarı gir.</div>';
+    h+='<button onclick="App.askLuna()" style="width:100%;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 10px 24px rgba(155,127,201,0.4);">Luna’ya Sor 🌙</button></div>';
+  } else {
+    h+='<div style="background:rgba(155,127,201,0.08);border:1px solid rgba(155,127,201,0.22);border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">🌙</span><div style="font-size:13px;color:var(--text2);line-height:1.45;">Bugünün sorusunu sordun. Yarın yeni bir soru hakkın olacak — Luna seni bekliyor. 💜</div></div>';
   }
-  list.forEach(function(n){
-    var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
-    var unread=!n.read;
-    h+='<div style="position:relative;background:var(--card);border:1px solid '+(unread?'rgba(201,184,255,0.55)':'rgba(150,110,120,0.14)')+';border-radius:18px;padding:13px 14px;box-shadow:0 4px 14px rgba(150,110,120,0.08);'+(unread?'border-left:3px solid #C9B8FF;':'')+'">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-    h+='<span style="font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:999px;padding:3px 10px;">Observer</span>';
-    if(unread) h+='<span style="width:8px;height:8px;border-radius:50%;background:#E9576F;box-shadow:0 0 7px #E9576F;"></span>';
-    h+='<span style="font-size:11.5px;color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span>';
-    h+='</div>';
-    h+='<div style="font-size:14.5px;line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
-    h+='<div style="display:flex;align-items:center;margin-top:10px;">';
-    h+='<span style="font-size:11px;color:var(--faint);font-weight:600;">'+(n.read?'✓✓ Okundu':'• Yeni')+'</span>';
-    h+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:10px;">🗑 Sil</button>';
-    h+='</div>';
-    h+='</div>';
-  });
+  if(notifs.length){
+    h+='<div style="font-size:12px;font-weight:800;color:var(--faint);letter-spacing:.5px;margin:18px 2px 6px;">LUNA’DAN MESAJLAR</div>';
+    notifs.forEach(function(n){ h+=notifCardHTML(n); });
+  }
+  var qa=luna.qa.slice().reverse();
+  if(qa.length){
+    h+='<div style="font-size:12px;font-weight:800;color:var(--faint);letter-spacing:.5px;margin:18px 2px 6px;">GEÇMİŞ SORULAR</div>';
+    qa.forEach(function(x){
+      var dl=''; try{ dl=new Date(x.ts||x.date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(e){ dl=x.date; }
+      h+='<div style="background:var(--card);border:1px solid rgba(150,110,120,0.14);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(150,110,120,0.07);margin-bottom:10px;">';
+      h+='<div style="font-size:11px;color:var(--faint);font-weight:700;margin-bottom:8px;">'+esc(dl)+'</div>';
+      h+='<div style="background:rgba(155,127,201,0.08);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:8px;"><b style="color:#7A5AA0;">Sen:</b> '+esc(x.question)+'</div>';
+      h+='<div style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"><b style="color:#7A5AA0;">🌙 Luna:</b> '+esc(x.answer)+'</div></div>';
+    });
+  }
   return h;
 }
 App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };

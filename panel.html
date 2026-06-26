@@ -7,37 +7,95 @@
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
   :root{
-    --bg:#060609;--s1:#0d0d14;--s2:#14141d;--s3:#1a1a25;
-    --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.05);
-    --t1:#f5f0ea;--t2:#d4cdc4;--t3:#8a847c;
-    --gold:#d4af37;--ga:rgba(212,175,55,.10);--gb:rgba(212,175,55,.20);
-    --green:#34d399;--gra:rgba(52,211,153,.08);--grb:rgba(52,211,153,.18);
-    --amber:#fbbf24;--aa:rgba(251,191,36,.08);--ab:rgba(251,191,36,.18);
-    --red:#fb7185;--ra:rgba(251,113,133,.08);--rb:rgba(251,113,133,.18);
-    --pink:#f472b6;--purple:#a78bfa;
-    --r:10px;
+    /* ── surfaces ── */
+    --bg:#070709;--s1:#101019;--s2:#171722;--s3:#20202d;
+    --glass:linear-gradient(160deg,rgba(28,28,40,.72),rgba(16,16,24,.86));
+    --glass-hi:linear-gradient(160deg,rgba(36,36,52,.82),rgba(20,20,30,.9));
+    --bd:rgba(255,255,255,0.09);--bd2:rgba(255,255,255,0.055);--bd-gold:rgba(212,175,55,.28);
+    /* ── text ── */
+    --t1:#f6f1ea;--t2:#cfc8bf;--t3:#9a948b;--t4:#6c665e;
+    /* ── accent: gold ── */
+    --gold:#e6c15a;--gold2:#d4af37;--gold-d:#a8842a;
+    --ggrad:linear-gradient(135deg,#f3d77a,#d4af37 55%,#b8902c);
+    --ga:rgba(212,175,55,.10);--gb:rgba(212,175,55,.22);
+    /* ── status ── */
+    --green:#4ade80;--gra:rgba(74,222,128,.10);--grb:rgba(74,222,128,.22);
+    --amber:#fbbf24;--aa:rgba(251,191,36,.10);--ab:rgba(251,191,36,.22);
+    --red:#fb7185;--ra:rgba(251,113,133,.10);--rb:rgba(251,113,133,.22);
+    --purple:#a78bfa;--pa:rgba(167,139,250,.10);--pb:rgba(167,139,250,.22);
+    --pink:#f472b6;
+    /* ── type scale ── */
+    --fk:38px;   /* kpi number */
+    --f6:25px;   /* big value */
+    --f5:20px;   /* value */
+    --f4:17px;   /* body */
+    --f3:15px;   /* small body */
+    --f2:13px;   /* label */
+    --f1:11.5px; /* micro */
+    /* ── rhythm ── */
+    --sp1:4px;--sp2:8px;--sp3:12px;--sp4:16px;
+    --r:14px;--r-sm:9px;--r-xs:6px;
+    --sh:0 1px 2px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.28);
+    --sh-lg:0 10px 30px rgba(0,0,0,.5);
+    --topH:58px;
   }
-  html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter",system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
-  .topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(6,6,9,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between}
-  .page{position:fixed;top:52px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:10px 12px 16px}
-  .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r)}
-  .btn{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 11px;border-radius:7px;font-weight:600;font-size:22px;cursor:pointer;transition:all .15s}
-  .btn:hover{background:var(--s3);color:var(--t1)}
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:20px;font-weight:700;letter-spacing:.2px}
+  html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter",system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;letter-spacing:.1px}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+     radial-gradient(900px 500px at 88% -8%,rgba(212,175,55,.10),transparent 60%),
+     radial-gradient(800px 520px at 6% 4%,rgba(167,139,250,.07),transparent 62%),
+     radial-gradient(700px 600px at 50% 120%,rgba(74,222,128,.05),transparent 60%)}
+  .mono{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+  /* ── command bar ── */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,12,0.82);backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--bd);padding:0 18px;height:var(--topH);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand-mark{width:30px;height:30px;border-radius:9px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 10px rgba(212,175,55,.4);flex-shrink:0}
+  .brand-name{font-size:21px;font-weight:800;letter-spacing:-.3px;background:linear-gradient(180deg,#fff,#cfc8bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .tb-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+  .tb-meta{display:flex;align-items:center;gap:14px;margin-left:auto}
+  .meta{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
+  .meta b{font-size:var(--f3);font-weight:800;color:var(--t1)}
+  .meta span{font-size:var(--f1);color:var(--t4);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .tb-actions{display:flex;gap:6px}
+
+  .page{position:fixed;top:var(--topH);left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:14px 16px 18px}
+
+  /* ── card ── */
+  .card{position:relative;background:var(--glass);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+  .card:hover{border-color:rgba(255,255,255,.14)}
+  .card.lift:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
+  .pad{padding:13px 15px}
+
+  /* ── buttons / inputs ── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;background:var(--s2);border:1px solid var(--bd);color:var(--t2);min-width:34px;height:34px;padding:0 11px;border-radius:9px;font-weight:700;font-size:var(--f4);cursor:pointer;transition:all .15s}
+  .btn:hover{background:var(--s3);color:var(--t1);border-color:rgba(255,255,255,.18)}
+  .seg{display:inline-flex;gap:3px;padding:3px;background:var(--s1);border:1px solid var(--bd2);border-radius:11px}
+  .seg button{background:transparent;border:none;color:var(--t3);padding:5px 12px;border-radius:8px;font-weight:800;font-size:var(--f3);cursor:pointer;transition:all .15s}
+  .seg button.active{background:var(--ggrad);color:#1a1404;box-shadow:0 2px 8px rgba(212,175,55,.3)}
+  .seg button:hover:not(.active){color:var(--t1)}
+  input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:9px;padding:6px 10px;font:inherit;font-weight:700;outline:none;font-size:var(--f3);color-scheme:dark}
+  input[type="date"]:focus,input[type="password"]:focus{border-color:var(--bd-gold)}
+
+  /* ── badges ── */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:var(--f2);font-weight:800;letter-spacing:.2px;white-space:nowrap}
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+  .badge.nodot::before{display:none}
   .b-ok{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
   .b-warn{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
   .b-danger{background:var(--ra);color:var(--red);border:1px solid var(--rb)}
   .b-gold{background:var(--ga);color:var(--gold);border:1px solid var(--gb)}
-  .b-dim{background:rgba(255,255,255,0.03);color:var(--t3);border:1px solid var(--bd)}
-  .seg{display:flex;gap:3px}
-  .seg button{background:var(--s2);border:1px solid var(--bd2);color:var(--t3);padding:3px 8px;border-radius:6px;font-weight:700;font-size:20px;cursor:pointer;transition:all .15s}
-  .seg button.active{border-color:var(--gb);background:var(--ga);color:var(--gold)}
-  .seg button:hover:not(.active){color:var(--t2)}
-  .mono{font-variant-numeric:tabular-nums}
-  .chart{width:100%;display:block}
+  .b-dim{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
+  .pulse::before{animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
 
-  /* Bento Grid */
-  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
+  /* ── labels ── */
+  .lbl{display:flex;align-items:center;gap:7px;font-size:var(--f2);font-weight:800;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;margin-bottom:9px}
+  .lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
+  .divider{height:1px;background:var(--bd2);margin:10px 0}
+
+  /* ── bento grid ── */
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+  .bento>.span-2{grid-column:span 2}
   .bento>.span-3{grid-column:span 3}
   .bento>.span-4{grid-column:span 4}
   .bento>.span-5{grid-column:span 5}
@@ -46,65 +104,92 @@
   .bento>.span-8{grid-column:span 8}
   .bento>.span-12{grid-column:span 12}
 
-  /* Metric tile */
-  .mtile{padding:10px 12px}
-  .mtile .mv{font-size:44px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
-  .mtile .ml{font-size:18px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+  /* ── KPI hero ── */
+  .kpi{position:relative;padding:13px 15px 14px;overflow:hidden}
+  .kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--gold));opacity:.85;border-radius:3px}
+  .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .kpi-l{font-size:var(--f2);font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.6px}
+  .kpi-v{font-size:var(--fk);font-weight:800;line-height:1;letter-spacing:-1px;color:var(--accent,var(--gold))}
+  .kpi-v small{font-size:var(--f4);font-weight:700;color:var(--t3);letter-spacing:0}
+  .kpi-spark{margin-top:8px;height:30px}
+  .tchip{font-size:var(--f1);font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.2px}
+  .tchip.up{background:var(--gra);color:var(--green)}
+  .tchip.dn{background:var(--ra);color:var(--red)}
+  .tchip.fl{background:rgba(255,255,255,.05);color:var(--t3)}
 
-  .lbl{font-size:18px;font-weight:700;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
-  .divider{height:1px;background:var(--bd2);margin:6px 0}
+  /* ── stat rows ── */
+  .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd2)}
+  .srow:last-child{border-bottom:none}
+  .srow .k{font-size:var(--f3);color:var(--t3);font-weight:600}
+  .srow .v{font-size:var(--f4);font-weight:800;color:var(--t1)}
 
-  input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:6px;padding:4px 8px;font:inherit;outline:none;font-size:22px;color-scheme:dark}
+  /* ── selected-day mini stats ── */
+  .dstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:11px}
+  .dstat{background:var(--s2);border:1px solid var(--bd2);border-radius:10px;padding:9px 4px;text-align:center}
+  .dstat .dv{font-size:var(--f6);font-weight:800;line-height:1}
+  .dstat .dl{font-size:var(--f1);color:var(--t3);font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-top:4px}
 
-  #loc-map{height:100%;min-height:180px;border-radius:8px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
+  /* ── habit chips ── */
+  .habits{display:flex;flex-wrap:wrap;gap:6px}
+  .hchip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:var(--f3);font-weight:700;border:1px solid var(--bd2);background:var(--s2);color:var(--t3)}
+  .hchip.on{background:var(--gra);border-color:var(--grb);color:var(--t1)}
+  .habit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.14)}
+  .hchip.on .habit-dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+
+  /* ── mood segment bar ── */
+  .moodseg{display:flex;height:24px;border-radius:999px;overflow:hidden;border:1px solid var(--bd2);background:var(--s2)}
+  .moodseg>span{display:flex;align-items:center;justify-content:center;font-size:var(--f2);min-width:0;transition:flex .3s ease}
+  .moodlegend{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:9px}
+  .mlg{display:flex;align-items:center;gap:5px;font-size:var(--f3);color:var(--t2);font-weight:600}
+  .mlg b{color:var(--t1);font-weight:800}
+  .mdot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+
+  /* ── list rows ── */
+  .row{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:9px;cursor:pointer;font-size:var(--f3);transition:background .12s}
+  .row:hover{background:var(--s2)}
+  .row .rd{min-width:38px;font-weight:800;color:var(--t3);font-size:var(--f2)}
+  .scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
+  .scroll::-webkit-scrollbar{width:6px}
+  .scroll::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+
+  .chart{width:100%;display:block}
+  #loc-map{height:100%;min-height:180px;border-radius:11px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
   .loc-live{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
   .loc-old{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
-  .loc-none{background:rgba(255,255,255,0.03);color:var(--t3);border:1px solid var(--bd)}
+  .loc-none{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
 
-  .habit-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-  .row{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:6px;cursor:pointer;font-size:22px}
-  .row:hover{background:var(--s2)}
+  /* ── empty / skeleton ── */
+  .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t4);font-size:var(--f3);text-align:center;padding:18px}
+  .empty .ei{font-size:30px;opacity:.5}
+  .skel{position:relative;overflow:hidden;background:var(--s2);border-radius:8px}
+  .skel::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:shimmer 1.4s infinite}
+  @keyframes shimmer{100%{transform:translateX(100%)}}
 
   @media(max-width:1100px){
-    .bento>.span-3{grid-column:span 4}
+    .bento>.span-2{grid-column:span 4}
+    .bento>.span-3{grid-column:span 6}
     .bento>.span-5,.bento>.span-7{grid-column:span 6}
     .bento>.span-8{grid-column:span 12}
+    .bento>.span-4{grid-column:span 6}
   }
   @media(max-width:768px){
-    .topbar{padding:6px 8px;height:74px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4px}
-    .topbar>div{width:100%;display:flex!important;align-items:center;gap:4px;flex-wrap:wrap}
-    .topbar>div:last-child{justify-content:flex-start}
-    .topbar>div:first-child>span:first-child{font-size:18px!important}
-    .topbar>div:first-child .badge{font-size:12px;padding:2px 6px}
-    .topbar>div:first-child>span:last-child{font-size:12px!important}
-    .topbar>div:last-child>span{font-size:11px!important}
-    .topbar>div:last-child>span:last-of-type{display:none}
-    .page{top:74px;padding:8px 8px 14px}
-    .page>div:first-child{flex-wrap:wrap!important;gap:6px!important}
-    .page>div:first-child input[type="date"]{margin-left:0!important;width:100%}
-    .bento{gap:6px}
-    .card{border-radius:8px}
-    .btn{font-size:14px;padding:4px 8px}
-    .seg button{font-size:13px;padding:4px 7px}
-    .mtile .mv{font-size:24px}
-    .mtile .ml,.lbl{font-size:11px}
-    input[type="date"],input[type="month"],input[type="password"]{font-size:14px}
-    .row{font-size:13px}
-    #loc-map{min-height:150px}
+    :root{--fk:30px;--f6:21px;--f5:17px;--f4:15px;--f3:13.5px;--f2:12px;--f1:11px;--topH:auto}
+    .topbar{flex-direction:column;align-items:stretch;gap:7px;padding:9px 12px}
+    .brand{justify-content:flex-start}
+    .tb-chips{justify-content:flex-start}
+    .tb-meta{margin-left:0;justify-content:space-between;width:100%}
+    .meta{align-items:flex-start}
+    .tb-actions{margin-left:auto}
+    .page{top:0;position:static;height:auto;padding:12px 12px 18px}
+    html,body{overflow:auto}
+    .bento{gap:8px}
+    .bento>.span-2{grid-column:span 6}
     .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8{grid-column:span 12}
-    .page [style*="font-size:30px"]{font-size:20px!important}
-    .page [style*="font-size:26px"]{font-size:18px!important}
-    .page [style*="font-size:24px"]{font-size:16px!important}
-    .page [style*="font-size:22px"]{font-size:15px!important}
-    .page [style*="font-size:20px"]{font-size:14px!important}
-    .page [style*="font-size:19px"]{font-size:13px!important}
-    .page [style*="font-size:18px"]{font-size:13px!important}
-    .page [style*="font-size:16px"]{font-size:12px!important}
+    .kpi-v{letter-spacing:-.5px}
+    #loc-map{min-height:160px}
   }
-  @media(max-width:420px){
-    .topbar{height:80px}
-    .topbar>div:first-child .badge:nth-child(n+3){display:none}
-    .page{top:80px}
+  @media(max-width:440px){
+    .bento>.span-2{grid-column:span 6}
   }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -295,18 +380,34 @@ function locationSummary(hist){
   var accAvg=accVals.length?accVals.reduce(function(a,b){return a+b;},0)/accVals.length:null;
   return {recentCount:recent.length,zoneCount:Object.keys(zones).length,distanceKm:dist,avgAcc:accAvg};
 }
+function smoothPath(pts){
+  if(pts.length<2) return pts.length?("M"+pts[0][0]+","+pts[0][1]):"";
+  var d="M"+pts[0][0].toFixed(1)+","+pts[0][1].toFixed(1);
+  for(var i=0;i<pts.length-1;i++){
+    var p0=pts[i>0?i-1:0],p1=pts[i],p2=pts[i+1],p3=pts[i+2<pts.length?i+2:i+1];
+    var c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6;
+    var c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=" C"+c1x.toFixed(1)+","+c1y.toFixed(1)+" "+c2x.toFixed(1)+","+c2y.toFixed(1)+" "+p2[0].toFixed(1)+","+p2[1].toFixed(1);
+  }
+  return d;
+}
 function sparkLine(days,valFn,max,color,h){
-  var w=320,ht=h||60,p=4,iw=w-p*2,ih=ht-p*2,m=max||1;
-  var pts=days.map(function(d,i){ var x=p+(days.length<=1?0:(i/(days.length-1))*iw), y=p+ih-(Math.max(0,valFn(d))/m)*ih; return [x,y]; });
-  var poly=pts.map(function(a){return a[0].toFixed(1)+","+a[1].toFixed(1);}).join(" ");
-  var area=pts.map(function(a){return a[0].toFixed(1)+","+a[1].toFixed(1);}).join(" ")+' '+(p+iw).toFixed(1)+','+(p+ih).toFixed(1)+' '+p+','+(p+ih).toFixed(1);
+  var w=340,ht=h||64,pl=4,pt=6,pb=6,iw=w-pl*2,ih=ht-pt-pb,m=max||1;
+  var pts=days.map(function(d,i){ var x=pl+(days.length<=1?iw/2:(i/(days.length-1))*iw), y=pt+ih-(Math.max(0,valFn(d))/m)*ih; return [x,y]; });
+  var line=smoothPath(pts);
+  var area=line+" L"+(pl+iw).toFixed(1)+","+(pt+ih).toFixed(1)+" L"+pl.toFixed(1)+","+(pt+ih).toFixed(1)+" Z";
   var uid='sg'+Math.random().toString(36).slice(2,8);
-  return '<svg viewBox="0 0 '+w+' '+ht+'" class="chart" preserveAspectRatio="none" style="border-radius:6px;"><defs><linearGradient id="'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity=".22"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs><polygon points="'+area+'" fill="url(#'+uid+')"/><polyline fill="none" stroke="'+color+'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="'+poly+'"/></svg>';
+  var last=pts[pts.length-1];
+  // mid baseline + top guide
+  var g='';
+  [0.5].forEach(function(f){ var gy=pt+ih*f; g+='<line x1="'+pl+'" y1="'+gy.toFixed(1)+'" x2="'+(pl+iw)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,.05)" stroke-width="1"/>'; });
+  return '<svg viewBox="0 0 '+w+' '+ht+'" class="chart" preserveAspectRatio="none" style="border-radius:8px;"><defs><linearGradient id="'+uid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity=".30"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+g+'<path d="'+area+'" fill="url(#'+uid+')"/><path d="'+line+'" fill="none" stroke="'+color+'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/><circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="3.4" fill="'+color+'" stroke="#0b0b12" stroke-width="2"/></svg>';
 }
 function sparkBar(days,valFn,max,color,h){
-  var w=320,ht=h||50,p=2,iw=w-p*2,ih=ht-p*2,bw=Math.max(2,iw/days.length-1.5),m=max||1;
-  var bars=days.map(function(d,i){ var v=Math.max(0,valFn(d)),bh=Math.max(1,(v/m)*ih),x=p+i*(iw/days.length)+.5,y=p+ih-bh; return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="1.5" fill="'+color+'" opacity="'+(v?0.85:0.15)+'"/>'; }).join("");
-  return '<svg viewBox="0 0 '+w+' '+ht+'" class="chart" preserveAspectRatio="none" style="border-radius:6px;">'+bars+'</svg>';
+  var w=340,ht=h||52,p=3,iw=w-p*2,ih=ht-p*2,step=iw/Math.max(1,days.length),bw=Math.max(2.5,step-2),m=max||1;
+  var g='<line x1="'+p+'" y1="'+(p+ih).toFixed(1)+'" x2="'+(p+iw)+'" y2="'+(p+ih).toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+  var bars=days.map(function(d,i){ var v=Math.max(0,valFn(d)),bh=v?Math.max(2,(v/m)*ih):0,x=p+i*step+(step-bw)/2,y=p+ih-bh; if(!bh) return ''; return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="2" fill="'+color+'" opacity="0.9"/>'; }).join("");
+  return '<svg viewBox="0 0 '+w+' '+ht+'" class="chart" preserveAspectRatio="none" style="border-radius:8px;">'+g+bars+'</svg>';
 }
 function monthDays(ym){
   var p=ym.split("-").map(Number),f=new Date(p[0],p[1]-1,1),l=new Date(p[0],p[1],0),out=[];
@@ -365,202 +466,206 @@ function render(){
 
   var h="";
 
-  // ── TOPBAR ──────────────────────────────────────────────────
+  // trend-chip helper
+  function tc(now,prev,goodUp){
+    var d=now-prev, a=Math.abs(d);
+    if(a<0.05) return '<span class="tchip fl">→ 0</span>';
+    var good=(d>0)===(goodUp!==false), cls=good?"up":"dn", arr=d>0?"↑":"↓";
+    return '<span class="tchip '+cls+'">'+arr+' '+a.toFixed(1)+'</span>';
+  }
+
+  // ── COMMAND BAR ─────────────────────────────────────────────
   h+='<div class="topbar">';
-  h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<span style="font-size:26px;font-weight:800;letter-spacing:-.3px;">Observer</span>';
-  h+='<span class="badge '+freshClass+'">'+fresh.txt+'</span>';
-  h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
-  h+='<span class="'+locBadgeClass+'" style="font-size:19px;">📍 '+locBadgeTxt+'</span>';
+  h+='<div class="brand">';
+  h+='<span class="brand-mark">🦩</span>';
+  h+='<span class="brand-name">Observer</span>';
   h+='</div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;">';
-  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(opened?"Son açılış "+new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}):"Son açılış -")+'</span>';
-  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(saved?"Kayıt "+new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"Kayıt -")+'</span>';
-  h+='<button class="btn" onclick="location.reload()">↺</button>';
-  h+='<button class="btn" onclick="resetPanelToken()">⚿</button>';
+  h+='<div class="tb-chips">';
+  h+='<span class="badge '+freshClass+(fresh.klass==="ok"?" pulse":"")+'">'+fresh.txt+'</span>';
+  h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
+  h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'">📍 '+locBadgeTxt+'</span>';
+  h+='</div>';
+  h+='<div class="tb-meta">';
+  h+='<div class="meta"><b class="mono">'+(opened?new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}):"—")+'</b><span>Son açılış</span></div>';
+  h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"—")+'</b><span>Son kayıt</span></div>';
+  h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()">↺</button><button class="btn" title="Çıkış" onclick="resetPanelToken()">⚿</button></div>';
   h+='</div></div>';
 
   // ── PAGE ────────────────────────────────────────────────────
   h+='<div class="page">';
 
   // toolbar
-  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">';
   h+='<div class="seg">';
   h+=[7,14,30,90].map(function(n){return '<button class="'+(UI.range===n?"active":"")+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("");
   h+='</div>';
+  h+='<span style="font-size:var(--f2);color:var(--t4);font-weight:700;letter-spacing:.4px;text-transform:uppercase;">'+UI.range+' günlük pencere</span>';
   h+='<input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)" style="margin-left:auto;">';
   h+='</div>';
 
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
 
-  // ROW 1: 6 metric tiles (each span-2 = we use 6 cards across 12 cols)
-  var metrics=[
-    [currentStreak()+'<small style="font-size:24px;font-weight:600;">g</small>','Aktif Seri','var(--gold)'],
-    [bestStreak(all)+'<small style="font-size:24px;font-weight:600;">g</small>','En İyi Seri','var(--gold)'],
-    [curAvg.toFixed(1)+'<small style="font-size:24px;font-weight:600;">/'+HT+'</small>','Tik Ort','var(--green)'],
-    [curSos,'SOS','var(--red)'],
-    [(Math.round(curSleep*10)/10).toFixed(1)+'<small style="font-size:24px;font-weight:600;">sa</small>','Uyku Ort','var(--purple)'],
-    [formatDuration(curSess.totalActive),'Kullanım','var(--t2)']
-  ];
-  metrics.forEach(function(m){
-    h+='<div class="card mtile" style="grid-column:span 2;">';
-    h+='<div class="mv mono" style="color:'+m[2]+';">'+m[0]+'</div>';
-    h+='<div class="ml">'+m[1]+'</div>';
-    h+='</div>';
-  });
+  // ROW 1: 6 KPI hero tiles (span-2 each)
+  function kpi(label,val,accent,extra,spark){
+    var s='<div class="card lift kpi span-2" style="--accent:'+accent+';">';
+    s+='<div class="kpi-top"><span class="kpi-l">'+label+'</span>'+(extra||'')+'</div>';
+    s+='<div class="kpi-v mono">'+val+'</div>';
+    if(spark) s+='<div class="kpi-spark">'+spark+'</div>';
+    return s+'</div>';
+  }
+  h+=kpi('Aktif Seri',currentStreak()+'<small>g</small>','var(--gold)','<span class="tchip fl">en iyi '+bestStreak(all)+'g</span>');
+  h+=kpi('Tik Ort',curAvg.toFixed(1)+'<small>/'+HT+'</small>','var(--green)',tc(curAvg,prevAvg,true),sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#4ade80",30));
+  h+=kpi('SOS',String(curSos),'var(--red)',tc(curSos,prevSos,false),sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",30));
+  h+=kpi('Uyku Ort',(Math.round(curSleep*10)/10).toFixed(1)+'<small>sa</small>','var(--purple)',tc(curSleep,prevSleep,true),sparkLine(cur,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;},10,"#a78bfa",30));
+  h+=kpi('Adım Ort',Math.round(curSteps).toLocaleString("tr-TR"),'var(--amber)','<span class="tchip fl">günlük</span>',sparkBar(cur,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;},Math.max(1,curSteps*1.4),"#fbbf24",30));
+  h+=kpi('Kullanım',formatDuration(curSess.totalActive),'var(--gold)','<span class="tchip fl">'+curSess.sessionCount+' oturum</span>');
 
   // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
 
   // Map card
-  h+='<div class="card span-5" style="padding:10px;min-height:220px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">';
-  h+='<span style="font-size:22px;font-weight:700;">📍 Konum</span>';
+  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="margin-bottom:10px;">📍 Canlı Konum';
   if(loc){
     var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
-    h+='<a href="'+mapsUrl+'" target="_blank" style="font-size:18px;color:var(--gold);text-decoration:none;font-weight:700;">Maps →</a>';
+    h+='<a href="'+mapsUrl+'" target="_blank" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:800;letter-spacing:.3px;">Google Maps →</a>';
   }
   h+='</div>';
   if(loc){
-    h+='<div id="loc-map" style="height:calc(100% - 54px);"></div>';
-    h+='<div id="loc-address" style="font-size:20px;color:var(--t3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Adres yükleniyor…</div>';
+    h+='<div id="loc-map" style="flex:1;min-height:170px;"></div>';
+    h+='<div id="loc-address" style="font-size:var(--f3);color:var(--t3);margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">Adres çözümleniyor…</div>';
   } else {
-    h+='<div style="display:flex;align-items:center;justify-content:center;height:calc(100% - 30px);color:var(--t3);font-size:22px;opacity:.5;">Konum verisi bekleniyor</div>';
+    h+='<div class="empty" style="flex:1;"><span class="ei">🛰️</span>Konum verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıldığında otomatik gelir</span></div>';
   }
   h+='</div>';
 
   // Selected day card
-  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="card lift span-4 pad">';
   h+='<div class="lbl">'+shortD(selected)+' · Seçili Gün</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:8px;">';
+  h+='<div class="dstats">';
   [
-    [cnt(srec)+'/'+HT,'Tik','var(--gold)'],
+    [cnt(srec)+'<small style="font-size:var(--f3);color:var(--t3);">/'+HT+'</small>','Tik','var(--gold)'],
     [MOOD_EMOJI[srec.mood]||'—','Mod','var(--t1)'],
-    [(srec.cravingSOSCount||0),'SOS','var(--red)'],
-    [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'sa':'—','Uyku','var(--purple)']
+    [String(srec.cravingSOSCount||0),'SOS','var(--red)'],
+    [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'<small style="font-size:var(--f3);color:var(--t3);">sa</small>':'—','Uyku','var(--purple)']
   ].forEach(function(d){
-    h+='<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:7px;padding:6px 3px;text-align:center;">';
-    h+='<div class="mono" style="font-size:30px;font-weight:800;color:'+d[2]+';">'+d[0]+'</div>';
-    h+='<div style="font-size:16px;color:var(--t3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:2px;">'+d[1]+'</div>';
-    h+='</div>';
+    h+='<div class="dstat"><div class="dv mono" style="color:'+d[2]+';">'+d[0]+'</div><div class="dl">'+d[1]+'</div></div>';
   });
   h+='</div>';
-  // habit list compact
+  // habit chips
+  h+='<div class="habits">';
   HABITS.forEach(function(hb){
     var ok=!!(srec.habits&&srec.habits[hb[0]]);
-    h+='<div style="display:flex;align-items:center;gap:6px;padding:2px 0;">';
-    h+='<span class="habit-dot" style="background:'+(ok?"var(--green)":"rgba(255,255,255,.1)")+';"></span>';
-    h+='<span style="font-size:22px;color:'+(ok?"var(--t1)":"var(--t3)")+';">'+hb[1]+'</span>';
-    h+='</div>';
+    h+='<span class="hchip'+(ok?' on':'')+'"><span class="habit-dot"></span>'+hb[1]+'</span>';
   });
-  if(syms) h+='<div style="font-size:19px;color:var(--t3);margin-top:4px;">'+esc(syms)+'</div>';
+  h+='</div>';
+  if(syms) h+='<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🩹 '+esc(syms)+'</div>';
   if(srec.note&&String(srec.note).trim()){
-    h+='<div style="margin-top:6px;padding:6px 8px;border-radius:6px;background:var(--s2);font-size:20px;color:var(--t2);line-height:1.4;border:1px solid var(--bd2);">'+esc(String(srec.note).slice(0,80))+'</div>';
+    h+='<div style="margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);">'+esc(String(srec.note).slice(0,100))+'</div>';
   }
   h+='</div>';
 
   // Mood + Ritual card
-  h+='<div class="card span-3" style="padding:10px;">';
-  h+='<div class="lbl">Mod · '+UI.range+'g</div>';
+  h+='<div class="card lift span-3 pad">';
+  h+='<div class="lbl">Mod Dağılımı · '+UI.range+'g</div>';
+  var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
+  var moodTotal=Object.keys(moodDist).reduce(function(a,k){return a+moodDist[k];},0);
+  h+='<div class="moodseg">';
+  if(moodTotal){
+    Object.keys(moodDist).forEach(function(k){
+      if(!moodDist[k]) return;
+      var pct=moodDist[k]/moodTotal*100;
+      h+='<span style="flex:'+moodDist[k]+';background:'+moodColor[k]+';" title="'+k+': '+moodDist[k]+'">'+(pct>=14?(MOOD_EMOJI[k]||""):"")+'</span>';
+    });
+  } else {
+    h+='<span style="flex:1;background:var(--s3);color:var(--t4);">veri yok</span>';
+  }
+  h+='</div>';
+  h+='<div class="moodlegend">';
   Object.keys(moodDist).forEach(function(k){
-    var c=moodDist[k],total=cur.length,pct=total?Math.round(c/total*100):0;
-    h+='<div style="display:flex;align-items:center;gap:5px;padding:2px 0;">';
-    h+='<span style="font-size:22px;width:28px;text-align:center;">'+(MOOD_EMOJI[k]||"")+'</span>';
-    h+='<div style="flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:var(--gold);border-radius:2px;"></div></div>';
-    h+='<span class="mono" style="font-size:20px;font-weight:700;min-width:24px;text-align:right;color:var(--t2);">'+c+'</span>';
-    h+='</div>';
+    h+='<span class="mlg"><span class="mdot" style="background:'+moodColor[k]+';"></span>'+(MOOD_EMOJI[k]||"")+' <b class="mono">'+moodDist[k]+'</b></span>';
   });
+  h+='</div>';
   h+='<div class="divider"></div>';
-  h+='<div class="lbl">Ritüel & Uyku</div>';
+  h+='<div class="lbl">Ritüel & Hazırlık</div>';
   [
-    ['Ritüel', srPr.ritualDone?"✓":"—"],
-    ['Hazırlık', srPr.score+'/100'],
+    ['Bugün ritüel', srPr.ritualDone?'<span style="color:var(--green);">✓ Tamam</span>':'<span style="color:var(--t3);">—</span>'],
+    ['Hazırlık skoru', srPr.score+'<span style="color:var(--t3);font-size:var(--f2);">/100</span>'],
     ['İlaç', srMed||"—"],
-    ['Ritüel/'+UI.range+'g', curRit.doneDays+'g'],
-    ['Haz. ort.', curRit.avgScore+'/100']
+    ['Ritüel · '+UI.range+'g', curRit.doneDays+' gün'],
+    ['Haz. ortalama', curRit.avgScore+'<span style="color:var(--t3);font-size:var(--f2);">/100</span>']
   ].forEach(function(x){
-    h+='<div style="display:flex;justify-content:space-between;padding:2px 0;">';
-    h+='<span style="font-size:20px;color:var(--t3);">'+x[0]+'</span>';
-    h+='<span class="mono" style="font-size:20px;font-weight:700;">'+x[1]+'</span>';
-    h+='</div>';
+    h+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>';
   });
   h+='</div>';
 
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
-  h+='<div class="card span-8" style="padding:10px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">';
-  h+='<span class="lbl" style="margin:0;">Tik Trendi · '+UI.range+'g</span>';
-  h+='<span class="mono" style="font-size:20px;color:var(--t3);">ort '+curAvg.toFixed(1)+' → '+trend(curAvg,prevAvg)+'</span>';
-  h+='</div>';
-  h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#d4af37",64);
+  h+='<div class="card lift span-8 pad">';
+  h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
+  h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);
   h+='</div>';
 
-  h+='<div class="card span-4" style="padding:10px;">';
-  h+='<div class="lbl">Dönem · '+UI.range+'g</div>';
+  h+='<div class="card lift span-4 pad">';
+  h+='<div class="lbl">Dönem Özeti · '+UI.range+'g</div>';
   [
-    ['Tik ort.',     curAvg.toFixed(1)+' → '+trend(curAvg,prevAvg)],
-    ['SOS',          curSos+' (önceki '+prevSos+')'],
-    ['Adım ort.',    Math.round(curSteps)+''],
-    ['Uyku ort.',    (Math.round(curSleep*10)/10).toFixed(1)+' sa'],
-    ['Kullanım',     curSess.sessionCount+' oturum'],
-    ['Ritüel',       curRit.doneDays+' gün']
+    ['Tik ortalama',  curAvg.toFixed(1)+' '+trend(curAvg,prevAvg)],
+    ['SOS toplam',    curSos+' <span style="color:var(--t3);font-size:var(--f2);">(önce '+prevSos+')</span>'],
+    ['Adım ortalama', Math.round(curSteps).toLocaleString("tr-TR")],
+    ['Uyku ortalama', (Math.round(curSleep*10)/10).toFixed(1)+' sa'],
+    ['Oturum',        curSess.sessionCount+' kez'],
+    ['Ritüel günü',   curRit.doneDays+' gün']
   ].forEach(function(x){
-    h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);">';
-    h+='<span style="font-size:20px;color:var(--t3);">'+x[0]+'</span>';
-    h+='<span class="mono" style="font-size:20px;font-weight:700;">'+x[1]+'</span>';
-    h+='</div>';
+    h+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>';
   });
   h+='</div>';
 
   // ROW 4: SOS chart (span-4) + Notes (span-4) + SOS list (span-4)
-  h+='<div class="card span-4" style="padding:10px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">';
-  h+='<span class="lbl" style="margin:0;">SOS · '+UI.range+'g</span>';
-  h+='<span class="mono" style="font-size:20px;color:var(--red);">'+curSos+' toplam</span>';
-  h+='</div>';
-  h+=sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",48);
+  h+='<div class="card lift span-4 pad">';
+  h+='<div class="lbl">SOS Yoğunluğu · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+curSos+' toplam</span></div>';
+  h+=sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",62);
   h+='</div>';
 
-  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="card lift span-4 pad">';
   h+='<div class="lbl">Son Notlar</div>';
-  h+='<div style="max-height:80px;overflow-y:auto;">';
-  h+=noteRows.length?noteRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:20px;">'+shortD(d)+'</span><span style="color:var(--t2);font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(String(r.note).slice(0,50))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:20px;">Not yok</div>';
+  h+='<div class="scroll" style="max-height:96px;">';
+  h+=noteRows.length?noteRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span class="rd mono">'+shortD(d)+'</span><span style="color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">'+esc(String(r.note).slice(0,60))+'</span></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
   h+='</div></div>';
 
-  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="card lift span-4 pad">';
   h+='<div class="lbl">SOS Geçmişi</div>';
-  h+='<div style="max-height:80px;overflow-y:auto;">';
-  h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:20px;">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;font-size:20px;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:20px;">Kriz yok</div>';
+  h+='<div class="scroll" style="max-height:96px;">';
+  h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span class="rd mono">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
   // ROW 5: Pro insights
-  h+='<div class="card span-4" style="padding:10px;">';
-  h+='<div class="lbl">Kullanım Paterni</div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Yoğun saat</span><span class="mono" style="font-size:20px;font-weight:700;">'+(usePat.peakHour==null?"-":pad(usePat.peakHour)+':00-'+pad((usePat.peakHour+1)%24)+':00')+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Akşam payı</span><span class="mono" style="font-size:20px;font-weight:700;">%'+usePat.eveningPct+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Ort. oturum</span><span class="mono" style="font-size:20px;font-weight:700;">'+formatDuration(curSess.avgActive||0)+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Boşta süresi</span><span class="mono" style="font-size:20px;font-weight:700;">'+(idleMin==null?"-":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa'))+'</span></div>';
-  h+='</div>';
-
-  h+='<div class="card span-4" style="padding:10px;">';
-  h+='<div class="lbl">Konum Özeti · 24s</div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Nokta</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.recentCount+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Farklı bölge</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.zoneCount+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Yaklaşık hareket</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.distanceKm.toFixed(1)+' km</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Doğruluk ort.</span><span class="mono" style="font-size:20px;font-weight:700;">'+(locSum.avgAcc==null?"-":"±"+Math.round(locSum.avgAcc)+" m")+'</span></div>';
-  h+='</div>';
-
-  h+='<div class="card span-4" style="padding:10px;">';
-  h+='<div class="lbl">Risk & Güvenilirlik</div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Risk trendi</span><span class="mono" style="font-size:16px;font-weight:700;text-align:right;max-width:65%;">7g '+risk7.txt+' · 14g '+risk14.txt+' · 30g '+risk30.txt+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Ritüel başarı</span><span class="mono" style="font-size:20px;font-weight:700;">%'+ritualRate+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Sync gecikmesi</span><span class="mono" style="font-size:20px;font-weight:700;">'+(syncLagMin==null?"-":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa"))+'</span></div>';
-  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Eksik gün</span><span class="mono" style="font-size:20px;font-weight:700;">'+missingInRange+'/'+cur.length+'</span></div>';
-  h+='</div>';
+  function insight(title,rows){
+    var s='<div class="card lift span-4 pad"><div class="lbl">'+title+'</div>';
+    rows.forEach(function(x){ s+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>'; });
+    return s+'</div>';
+  }
+  h+=insight('Kullanım Paterni',[
+    ['Yoğun saat', usePat.peakHour==null?"—":pad(usePat.peakHour)+':00–'+pad((usePat.peakHour+1)%24)+':00'],
+    ['Akşam payı', '%'+usePat.eveningPct],
+    ['Ort. oturum', formatDuration(curSess.avgActive||0)],
+    ['Boşta süresi', idleMin==null?"—":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa')]
+  ]);
+  h+=insight('Konum Özeti · 24s',[
+    ['Nokta sayısı', String(locSum.recentCount)],
+    ['Farklı bölge', String(locSum.zoneCount)],
+    ['Yaklaşık hareket', locSum.distanceKm.toFixed(1)+' km'],
+    ['Doğruluk ort.', locSum.avgAcc==null?"—":"±"+Math.round(locSum.avgAcc)+" m"]
+  ]);
+  var rkc=function(r){return r.klass==="ok"?"var(--green)":r.klass==="warn"?"var(--amber)":"var(--red)";};
+  h+=insight('Risk & Güvenilirlik',[
+    ['Risk trendi','<span style="color:'+rkc(risk7)+'">7g</span> · <span style="color:'+rkc(risk14)+'">14g</span> · <span style="color:'+rkc(risk30)+'">30g</span>'],
+    ['Ritüel başarı', '%'+ritualRate],
+    ['Sync gecikmesi', syncLagMin==null?"—":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa")],
+    ['Eksik gün', missingInRange+'/'+cur.length]
+  ]);
 
   h+='</div>'; // end bento
 
-  h+='<div style="text-align:center;font-size:18px;color:var(--t3);padding:8px 0 2px;opacity:.6;">Canlı izleme · 5dk yenileme</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>CANLI İZLEME · 5 DAKİKADA BİR YENİLENİR</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;

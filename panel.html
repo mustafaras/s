@@ -216,6 +216,7 @@ var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
 var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
 var WIND_KEYS=["light","breath","dump","cool"];
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
+var SLEEPQ={good:"Dinç",ok:"İdare",bad:"Yorgun"};
 var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
 var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
 
@@ -554,8 +555,8 @@ function render(){
   var rsk=risk(cur,saved);
   var moodDist={"cok-iyi":0,"iyi":0,"normal":0,"zorlandim":0,"cok-zorlandim":0};
   cur.forEach(function(d){var r=recOf(d); if(r&&r.mood&&moodDist[r.mood]!=null) moodDist[r.mood]++;});
-  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();}).slice(0,20);
-  var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;}).slice(0,15);
+  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();});
+  var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;});
   var curSess=sessionStats(cur);
   var curRit=ritualStats(cur);
   var srPr=panelReadiness(srec);
@@ -696,8 +697,26 @@ function render(){
   h+=mealRows?'<div style="display:flex;flex-direction:column;gap:7px;">'+mealRows+'</div>'
             :'<div style="font-size:var(--f3);color:var(--t4);font-weight:600;">Bu güne öğün kaydı yok</div>';
   if(syms) h+='<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🩹 '+esc(syms)+'</div>';
+  // ── Şeyma'nın diğer girdileri (eksiksiz, girdiği şekliyle) ──
+  var exRows="";
+  function exRow(label,val){ return '<div style="display:flex;gap:8px;align-items:baseline;font-size:var(--f3);line-height:1.45;"><b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+label+'</b><span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;white-space:pre-wrap;">'+val+'</span></div>'; }
+  var sl=srec.sleep||{};
+  var sleepBits=[];
+  if(sl.hours!=null&&sl.hours!=="") sleepBits.push(esc(String(sl.hours))+' sa');
+  if(sl.quality&&SLEEPQ[sl.quality]) sleepBits.push(SLEEPQ[sl.quality]);
+  if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push("💊 "+esc(ml)); }
+  if(sleepBits.length) exRows+=exRow("😴 Uyku", sleepBits.join(" · "));
+  var wk=srec.walk||{}, wkBits=[];
+  if(wk.steps!=null&&wk.steps!=="") wkBits.push(Number(wk.steps).toLocaleString("tr-TR")+" adım");
+  if(wk.minutes!=null&&wk.minutes!=="") wkBits.push(esc(String(wk.minutes))+" dk");
+  if(wkBits.length) exRows+=exRow("🚶‍♀️ Yürüyüş", wkBits.join(" · "));
+  if(srec.flow&&FLOW[srec.flow]) exRows+=exRow("🩸 Regl", FLOW[srec.flow]);
+  if(Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length) exRows+=exRow("🛟 SOS", srec.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · "));
+  var off=(sl.windDown&&sl.windDown.offloadNote)?String(sl.windDown.offloadNote).trim():"";
+  if(off) exRows+=exRow("📌 Yarına", esc(off));
+  if(exRows){ h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>'; }
   if(srec.note&&String(srec.note).trim()){
-    h+='<div style="margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);">'+esc(String(srec.note).slice(0,100))+'</div>';
+    h+='<div style="margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
   }
   h+='</div>';
 
@@ -762,15 +781,15 @@ function render(){
   h+='</div>';
 
   h+='<div class="card lift span-4 pad">';
-  h+='<div class="lbl">Son Notlar</div>';
-  h+='<div class="scroll" style="max-height:96px;">';
-  h+=noteRows.length?noteRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span class="rd mono">'+shortD(d)+'</span><span style="color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">'+esc(String(r.note).slice(0,60))+'</span></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
+  h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
+  h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
+  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
   h+='</div></div>';
 
   h+='<div class="card lift span-4 pad">';
-  h+='<div class="lbl">SOS Geçmişi</div>';
-  h+='<div class="scroll" style="max-height:96px;">';
-  h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span class="rd mono">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
+  h+='<div class="lbl">SOS Geçmişi'+(sosRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+sosRows.length+' gün</span>':'')+'</div>';
+  h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
+  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
   // ROW 5: Pro insights

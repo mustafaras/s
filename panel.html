@@ -435,9 +435,9 @@ function msgCardHTML(){
   var inbox=OBSINBOX.slice().sort(function(a,b){ return String(b.ts||"").localeCompare(String(a.ts||"")); });
   var unreadDelivered=inbox.reduce(function(a,m){ var n=nm[m.id]; return a+((n&&!n.deleted&&!n.read)?1:0); },0);
   var s='<div class="card span-6 pad">';
-  s+='<div class="lbl">🌙 Luna’dan Mesaj Gönder & Bildirim Durumu'+(unreadDelivered?'<span style="margin-left:auto;font-size:var(--f2);color:var(--amber);font-weight:800;letter-spacing:0;text-transform:none;">'+unreadDelivered+' okunmadı</span>':'')+'</div>';
+  s+='<div class="lbl">⬡ ÆON’dan Mesaj Gönder & Bildirim Durumu'+(unreadDelivered?'<span style="margin-left:auto;font-size:var(--f2);color:var(--amber);font-weight:800;letter-spacing:0;text-transform:none;">'+unreadDelivered+' okunmadı</span>':'')+'</div>';
   s+='<div style="display:flex;gap:9px;align-items:stretch;flex-wrap:wrap;">';
-  s+='<textarea id="obs-msg" oninput="obsDraft(this.value)" placeholder="Luna olarak Şeyma’ya bir mesaj yaz — uygulamayı açtığında popup olarak görür…" rows="2" style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:11px;padding:10px 12px;font:inherit;font-size:var(--f3);resize:vertical;outline:none;line-height:1.45;">'+esc(UI.msgDraft||"")+'</textarea>';
+  s+='<textarea id="obs-msg" oninput="obsDraft(this.value)" placeholder="ÆON olarak Şeyma’ya bir mesaj yaz — uygulamada ÆON adıyla popup olarak belirir…" rows="2" style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:11px;padding:10px 12px;font:inherit;font-size:var(--f3);resize:vertical;outline:none;line-height:1.45;">'+esc(UI.msgDraft||"")+'</textarea>';
   s+='<button onclick="sendObserverMsg()"'+(UI.msgSending?' disabled':'')+' style="flex-shrink:0;align-self:stretch;min-width:104px;border:none;cursor:'+(UI.msgSending?'default':'pointer')+';border-radius:11px;padding:0 18px;font-weight:800;font-size:var(--f3);color:#1a1404;background:'+(UI.msgSending?'var(--s3)':'var(--ggrad)')+';box-shadow:0 4px 12px rgba(212,175,55,.28);">'+(UI.msgSending?'Gönderiliyor…':'Gönder')+'</button>';
   s+='</div>';
   s+='<div class="divider"></div>';

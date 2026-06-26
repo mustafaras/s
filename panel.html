@@ -216,6 +216,7 @@ var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
 var WIND_KEYS=["light","breath","dump","cool"];
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
 var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
+var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -559,6 +560,20 @@ function render(){
     h+='<span class="hchip'+(ok?' on':'')+'"><span class="habit-dot"></span>'+hb[1]+'</span>';
   });
   h+='</div>';
+  // ── Ne yedi? (öğün içerikleri) ──
+  var mealRows="";
+  MEALS.forEach(function(m){
+    var v=srec.meals&&srec.meals[m[0]]!=null?String(srec.meals[m[0]]).trim():"";
+    if(!v) return;
+    mealRows+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.45;">'
+      +'<span style="flex-shrink:0;">'+m[1]+'</span>'
+      +'<b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+m[2]+'</b>'
+      +'<span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;">'+esc(v)+'</span></div>';
+  });
+  h+='<div class="divider"></div>';
+  h+='<div class="lbl">🍽️ Ne Yedi</div>';
+  h+=mealRows?'<div style="display:flex;flex-direction:column;gap:7px;">'+mealRows+'</div>'
+            :'<div style="font-size:var(--f3);color:var(--t4);font-weight:600;">Bu güne öğün kaydı yok</div>';
   if(syms) h+='<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🩹 '+esc(syms)+'</div>';
   if(srec.note&&String(srec.note).trim()){
     h+='<div style="margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);">'+esc(String(srec.note).slice(0,100))+'</div>';

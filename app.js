@@ -136,6 +136,7 @@ function migrate(d){
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
   if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
+  if(!d.locationHistory) d.locationHistory=[];
   d.version=2;
   return d;
 }
@@ -1448,6 +1449,29 @@ function modalsHTML(){
 if(data){ data.lastOpenedDate=todayStr(); save(); }
 window.App=App;
 ritualWarmVoices();
+
+// ---------- konum takibi (gözlemci için, 12 saatte bir günceller) ----------
+(function tryGetLocation(){
+  if(!data) return;
+  if(!navigator.geolocation) return;
+  var INTERVAL_MS=12*60*60*1000; // 12 saat
+  var last=data.locationLastTs?new Date(data.locationLastTs).getTime():0;
+  if(Date.now()-last < INTERVAL_MS) return;
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      if(!data) return;
+      var entry={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:Math.round(pos.coords.accuracy),ts:new Date().toISOString()};
+      data.location=entry;
+      data.locationLastTs=entry.ts;
+      if(!Array.isArray(data.locationHistory)) data.locationHistory=[];
+      data.locationHistory.push(entry);
+      if(data.locationHistory.length>30) data.locationHistory=data.locationHistory.slice(-30);
+      save();
+    },
+    function(){}, // izin reddedilirse sessizce geç
+    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+  );
+})();
 
 // Session tracking
 var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};

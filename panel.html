@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Luna · Şeyma Paneli</title>
+<title>ÆON · Orchestration Core</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
   :root{
@@ -486,7 +486,7 @@ function coreStripHTML(){
   var s='<div class="card pad" style="margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
   s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
   s+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
-  s+='<div style="line-height:1.18;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);letter-spacing:.3px;">LUNA · Orchestration Core</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Operatör · ATLAS <span style="color:var(--t4);">— Raşit</span></div></div>';
+  s+='<div style="line-height:1.2;"><div style="font-size:var(--f4);font-weight:800;color:var(--t1);letter-spacing:2px;">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Orchestration Core · Luna’yı yöneten üst zekâ</div></div>';
   s+='</div>';
   s+='<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;">';
   mods.forEach(function(m){ s+='<span class="badge '+(m.on?"b-ok pulse":"b-dim")+'" style="padding:4px 9px;font-size:var(--f1);" title="'+(m.on?"çevrimiçi":"bekliyor")+'">'+esc(m.k)+'</span>'; });
@@ -578,8 +578,8 @@ function render(){
   // ── COMMAND BAR ─────────────────────────────────────────────
   h+='<div class="topbar">';
   h+='<div class="brand">';
-  h+='<span class="brand-mark">🌙</span>';
-  h+='<span class="brand-name">Luna</span>';
+  h+='<span class="brand-mark" style="color:#1a1404;font-weight:800;">⬡</span>';
+  h+='<span class="brand-name">ÆON</span>';
   h+='</div>';
   h+='<div class="tb-chips">';
   h+='<span class="badge '+freshClass+(fresh.klass==="ok"?" pulse":"")+'">'+fresh.txt+'</span>';
@@ -787,7 +787,7 @@ function render(){
 
   h+='</div>'; // end bento
 
-  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ATLAS ÇEKİRDEĞİ · CANLI · 5 DK&#39;DA BİR EŞİTLENİR</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ÆON ÇEKİRDEĞİ · CANLI · 5 DK&#39;DA BİR EŞİTLENİR</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;
@@ -868,7 +868,7 @@ window.savePanelToken=function(){
 };
 window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY);}catch(e){} PTOKEN=""; tokenPrompt(); };
 function tokenPrompt(msg){
-  document.getElementById("app").innerHTML='<div style="max-width:380px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-size:17px;font-weight:800;margin-bottom:4px;">Luna · Giriş</div><div style="font-size:11px;line-height:1.5;color:var(--t2);margin-bottom:12px;">GitHub token gir — panel canlı takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:10px;border-radius:7px;padding:6px 10px;font-size:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_…" style="width:100%;margin-bottom:8px;padding:9px 10px;font-size:12px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Başlat</button></div></div>';
+  document.getElementById("app").innerHTML='<div style="max-width:380px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-size:17px;font-weight:800;margin-bottom:4px;">ÆON · Giriş</div><div style="font-size:11px;line-height:1.5;color:var(--t2);margin-bottom:12px;">GitHub token gir — panel canlı takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:10px;border-radius:7px;padding:6px 10px;font-size:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_…" style="width:100%;margin-bottom:8px;padding:9px 10px;font-size:12px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Başlat</button></div></div>';
 }
 function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");

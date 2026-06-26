@@ -8,16 +8,16 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
   :root{
     --bg:#09090f;--s1:#111119;--s2:#18181f;--s3:#1e1e27;
-    --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.04);
-    --t1:#e2ddd7;--t2:#7a756e;--t3:#3d3a36;
+    --bd:rgba(255,255,255,0.10);--bd2:rgba(255,255,255,0.06);
+    --t1:#f1ece5;--t2:#c6bfb7;--t3:#9d958c;
     --gold:#c8a84b;--ga:rgba(200,168,75,.12);--gb:rgba(200,168,75,.22);
     --green:#4ade80;--gra:rgba(74,222,128,.08);--grb:rgba(74,222,128,.2);
     --amber:#fbbf24;--aa:rgba(251,191,36,.08);--ab:rgba(251,191,36,.2);
     --red:#f87171;--ra:rgba(248,113,113,.08);--rb:rgba(248,113,113,.2);
     --pink:#f472b6;--purple:#a78bfa;
   }
-  html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif}
-  .wrap{max-width:1320px;margin:0 auto;padding:0 16px 48px}
+  html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;overflow:hidden}
+  .wrap{width:100vw;max-width:none;margin:0;padding:0 12px 10px;height:calc(100vh - 58px);overflow:hidden}
   .hdr{position:sticky;top:0;z-index:200;background:rgba(9,9,15,0.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .card{background:var(--s1);border:1px solid var(--bd);border-radius:14px}
   .chip{background:var(--s2);border:1px solid var(--bd2);border-radius:11px;padding:11px 13px}
@@ -32,7 +32,8 @@
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-  .main-grid{display:grid;grid-template-columns:320px 1fr;gap:12px;margin-top:12px}
+  .main-grid{display:grid;grid-template-columns:320px 1fr;gap:12px;margin-top:10px;height:calc(100% - 44px);min-height:0}
+  .right-col{display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto;padding-right:2px}
   .mono{font-variant-numeric:tabular-nums}
   .chart{width:100%;display:block}
   input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:8px;padding:5px 10px;font:inherit;outline:none;font-size:12.5px;color-scheme:dark}
@@ -53,7 +54,7 @@
   .loc-live{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
   .loc-old{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
   .loc-none{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
-  .lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+  .lbl{font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
   .divider{height:1px;background:var(--bd2);margin:8px 0}
   @media(max-width:1100px){.main-grid{grid-template-columns:1fr}}
   @media(max-width:860px){.g6{grid-template-columns:repeat(3,1fr)}}
@@ -170,12 +171,15 @@ function lineChart(days,valFn,max,color){
   var w=760,h=180,p=18,iw=w-p*2,ih=h-p*2,m=max||1;
   var pts=days.map(function(d,i){ var x=p+(days.length<=1?0:(i/(days.length-1))*iw), y=p+ih-(Math.max(0,valFn(d))/m)*ih; return [x,y]; });
   var poly=pts.map(function(a){return a[0].toFixed(1)+","+a[1].toFixed(1);}).join(" ");
-  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#faf7f3" stroke="#eee6dc"/><polyline fill="none" stroke="'+color+'" stroke-width="3" points="'+poly+'"/>'+pts.map(function(a){return '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="2.6" fill="'+color+'"/>';}).join("")+'</svg>';
+  var grid='';
+  for(var g=0;g<=4;g++){ var y=(p+(ih/4)*g).toFixed(1); grid+='<line x1="'+p+'" y1="'+y+'" x2="'+(p+iw).toFixed(1)+'" y2="'+y+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>'; }
+  var area=''+pts.map(function(a){return a[0].toFixed(1)+","+a[1].toFixed(1);}).join(" ")+' '+(p+iw).toFixed(1)+','+(p+ih).toFixed(1)+' '+p+','+(p+ih).toFixed(1);
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><defs><linearGradient id="lineGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity=".30"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#111119" stroke="rgba(255,255,255,.08)"/>'+grid+'<polygon points="'+area+'" fill="url(#lineGlow)"/><polyline fill="none" stroke="'+color+'" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" points="'+poly+'"/>'+pts.map(function(a){return '<circle cx="'+a[0].toFixed(1)+'" cy="'+a[1].toFixed(1)+'" r="2.8" fill="'+color+'" stroke="#111119" stroke-width="1.2"/>';}).join("")+'</svg>';
 }
 function barChart(days,valFn,max,color){
   var w=760,h=120,p=12,iw=w-p*2,ih=h-p*2,bw=Math.max(2,iw/days.length-2),m=max||1;
   var bars=days.map(function(d,i){ var v=Math.max(0,valFn(d)),bh=(v/m)*ih,x=p+i*(iw/days.length)+1,y=p+ih-bh; return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(2,bh).toFixed(1)+'" rx="2" fill="'+color+'" opacity="'+(v?0.88:0.22)+'"/>'; }).join("");
-  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#faf7f3" stroke="#eee6dc"/>'+bars+'</svg>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart" preserveAspectRatio="none"><rect x="'+p+'" y="'+p+'" width="'+iw+'" height="'+ih+'" fill="#111119" stroke="rgba(255,255,255,.08)"/>'+bars+'</svg>';
 }
 function monthDays(ym){
   var p=ym.split("-").map(Number),f=new Date(p[0],p[1]-1,1),l=new Date(p[0],p[1],0),out=[];
@@ -253,7 +257,7 @@ function render(){
   h+='<div class="main-grid">';
 
   // ── SOL: Konum Kartı ─────────────────────────────────────────
-  h+='<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
   h+='<span style="font-size:12.5px;font-weight:700;">📍 Konum</span>';
   h+='<span class="'+locBadgeClass+'" style="font-size:10.5px;">'+locBadgeTxt+'</span>';
@@ -282,7 +286,7 @@ function render(){
   h+='</div>'; // end sol kart
 
   // ── SAĞ: Her şey ─────────────────────────────────────────────
-  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  h+='<div class="right-col">';
 
   // Metrik chipsleri (6'lı)
   h+='<div class="g6">';
@@ -392,79 +396,18 @@ function render(){
   h+='</div>'; // end sağ kolon
   h+='</div>'; // end main-grid
 
-  // ── TAKVIM + NOTLAR ──────────────────────────────────────────
-  h+='<div class="g2" style="margin-top:10px;">';
-
-  // Takvim
-  h+='<div class="card" style="padding:13px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">';
-  h+='<span class="lbl" style="margin-bottom:0;">'+monthLabel(UI.month)+'</span>';
-  h+='<div style="display:flex;gap:4px;">';
-  var pm=function(ym){var p=ym.split("-"),d=new Date(+p[0],+p[1]-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1);};
-  var nm=function(ym){var p=ym.split("-"),d=new Date(+p[0],+p[1],1);return d.getFullYear()+"-"+pad(d.getMonth()+1);};
-  h+='<button class="btn" style="padding:3px 9px;font-size:12px;" onclick="setMonth(\''+pm(UI.month)+'\')">‹</button>';
-  h+='<button class="btn" style="padding:3px 9px;font-size:12px;" onclick="setMonth(\''+nm(UI.month)+'\')">›</button>';
-  h+='</div></div>';
-  var monthHead=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].map(function(x){return '<div style="font-size:9.5px;font-weight:700;color:var(--t3);text-align:center;padding:2px 0;">'+x+'</div>';}).join("");
-  var daysHtml=monthGrid.map(function(d){
-    if(!d) return '<div class="d empty"></div>';
-    var r=recOf(d),c=cnt(r),k=(c===0?0:c<=2?1:c<=4?2:3),s=(r&&r.cravingSOSCount?Number(r.cravingSOSCount):0),m=(r&&r.mood?MOOD_EMOJI[r.mood]||"":"");
-    return '<div class="d '+(d===selected?"active":"")+'" onclick="pickDay(\''+d+'\')"><div class="dm">'+d.slice(8)+'</div><div class="dl">'+m+'</div><div class="db k'+k+'">'+c+(s?" ·"+s:"")+'</div></div>';
-  }).join("");
-  h+='<div class="cal">'+monthHead+daysHtml+'</div>';
+  h+='<div class="card" style="padding:11px;">';
+  h+='<div class="lbl">Hızlı Notlar & SOS</div>';
+  h+='<div class="g2">';
+  h+='<div style="max-height:110px;overflow-y:auto;border:1px solid var(--bd2);border-radius:9px;padding:8px;">';
+  h+=noteRows.length?noteRows.slice(0,8).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--t2);">'+esc(String(r.note).slice(0,64))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Not yok</div>';
   h+='</div>';
+  h+='<div style="max-height:110px;overflow-y:auto;border:1px solid var(--bd2);border-radius:9px;padding:8px;">';
+  h+=sosRows.length?sosRows.slice(0,8).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;">SOS '+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Kriz yok</div>';
+  h+='</div>';
+  h+='</div></div>';
 
-  // Notlar + SOS
-  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  h+='<div class="card" style="padding:13px;">';
-  h+='<div class="lbl">Son Notlar</div>';
-  h+='<div style="max-height:165px;overflow-y:auto;">';
-  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--t2);">'+esc(String(r.note).slice(0,90))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Not yok</div>';
-  h+='</div></div>';
-  h+='<div class="card" style="padding:13px;">';
-  h+='<div class="lbl">SOS Geçmişi</div>';
-  h+='<div style="max-height:120px;overflow-y:auto;">';
-  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;">SOS '+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Kriz yok</div>';
-  h+='</div></div>';
-  h+='</div>'; // end notlar col
-  h+='</div>'; // end calendar g2
-
-  // ── AYLIK ÖZET + TÜM GÜNLER ──────────────────────────────────
-  h+='<div class="g2" style="margin-top:10px;">';
-  h+='<div class="card" style="padding:13px;">';
-  h+='<div class="lbl">Aylık Özetler</div>';
-  h+='<div style="display:flex;flex-direction:column;gap:4px;">';
-  if(months.length){
-    months.slice(0,6).forEach(function(m){
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd2);">';
-      h+='<span style="font-size:12px;color:var(--t2);">'+monthLabel(m.month)+'</span>';
-      h+='<div style="display:flex;gap:12px;">';
-      h+='<span class="mono" style="font-size:13px;font-weight:800;">'+m.avg.toFixed(1)+'/'+HT+'</span>';
-      h+='<span style="font-size:11px;color:var(--t3);">SOS '+m.sos+'</span>';
-      h+='</div></div>';
-    });
-  } else {
-    h+='<span style="color:var(--t3);font-size:12px;">Veri yok</span>';
-  }
-  h+='</div></div>';
-  h+='<div class="card" style="padding:13px;">';
-  h+='<div class="lbl">Tüm Günler (son 50)</div>';
-  h+='<div style="max-height:200px;overflow-y:auto;">';
-  var allRows=all.slice().reverse().slice(0,50).map(function(d){
-    var r=recOf(d)||{},isSelected=d===selected,m=r.mood?MOOD_EMOJI[r.mood]||"":"";
-    return '<div class="row" style="'+(isSelected?"background:var(--ga);":"")+'" onclick="pickDay(\''+d+'\')">'
-      +'<span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span>'
-      +'<span class="mono" style="min-width:28px;font-weight:700;color:var(--t1);">'+cnt(r)+'/'+HT+'</span>'
-      +'<span style="min-width:18px;">'+m+'</span>'
-      +'<span style="min-width:32px;color:var(--t3);font-size:11px;">SOS '+(r.cravingSOSCount||0)+'</span>'
-      +'<span style="color:var(--t2);font-size:11px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+esc(r.note?String(r.note).slice(0,55):"")+'</span>'
-    +'</div>';
-  }).join("");
-  h+=allRows||'<div style="color:var(--t3);font-size:12px;">Gün yok</div>';
-  h+='</div></div>';
-  h+='</div>'; // end g2
-
-  h+='<div style="text-align:center;font-size:10.5px;color:var(--t3);padding:14px 0 4px;">Canlı izleme · 5dk\'da bir yenilenir</div>';
+  h+='<div style="text-align:center;font-size:10.5px;color:var(--t3);padding:10px 0 2px;">Canlı izleme · 5dk\'da bir yenilenir</div>';
   h+='</div>'; // end wrap
 
   document.getElementById("app").innerHTML=h;

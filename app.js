@@ -150,7 +150,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null};
+var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null,lineStamp:0,lineCursor:0};
 var fieldTimers={};
@@ -770,7 +770,22 @@ App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render()
 App.printReport=function(){ openReport(); };
 function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
 App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=normalizeToken(el.value||''); save(); syncFieldUpdate(); };
-App.setOpenaiKey=function(el){ var v=el.value; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); save(); },500); };
+App.setOpenaiKey=function(el){ var v=el.value; if(ui.openaiKeyState&&ui.openaiKeyState!=='checking') ui.openaiKeyState=null; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); save(); },500); };
+App.saveOpenaiKey=function(){
+  var inp=document.querySelector('input[oninput*="setOpenaiKey"]');
+  var key=inp?String(inp.value||'').trim():String((data.settings&&data.settings.openaiKey)||'').trim();
+  if(!data.settings) data.settings={};
+  data.settings.openaiKey=key; save();
+  if(!key){ ui.openaiKeyState=null; render(); toast('Anahtar temizlendi'); return; }
+  ui.openaiKeyState='checking'; render();
+  fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}})
+    .then(function(r){
+      if(r.ok){ ui.openaiKeyState='valid'; render(); toast('Anahtar doğrulandı ✓'); }
+      else if(r.status===401){ ui.openaiKeyState='invalid'; render(); toast('API key hatalı'); }
+      else { ui.openaiKeyState=null; render(); toast('Kaydedildi (doğrulanamadı, '+r.status+')'); }
+    })
+    .catch(function(){ ui.openaiKeyState=null; render(); toast('Kaydedildi (ağ doğrulaması yapılamadı)'); });
+};
 App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
@@ -1120,9 +1135,16 @@ function ayarlarHTML(){
   h+='</div>';
   // Luna · kişisel asistan (OpenAI anahtarı)
   var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());
-  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan 🌙 '+(hasOaKey?'<span style="font-size:12px;font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;">bağlı ✓</span>':'')+'</div>';
+  var oaBadge='';
+  if(ui.openaiKeyState==='checking') oaBadge='<span style="font-size:12px;font-weight:700;color:#8A6A2A;background:rgba(220,180,90,0.2);padding:2px 9px;border-radius:999px;">doğrulanıyor…</span>';
+  else if(ui.openaiKeyState==='invalid') oaBadge='<span style="font-size:12px;font-weight:700;color:#fff;background:#D9534F;padding:2px 9px;border-radius:999px;">API key hatalı ✕</span>';
+  else if(ui.openaiKeyState==='valid') oaBadge='<span style="font-size:12px;font-weight:700;color:#fff;background:#3F8A4F;padding:2px 9px;border-radius:999px;">bağlı ✓</span>';
+  else if(hasOaKey) oaBadge='<span style="font-size:12px;font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;">bağlı ✓</span>';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan 🌙 '+oaBadge+'</div>';
   h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 1 soru hakkın olur — Luna olabildiğince detaylı yanıtlar. 💜</div>';
   h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.openaiKey||'')+'" oninput="App.setOpenaiKey(this)" placeholder="sk-… (OpenAI API anahtarı)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+  if(ui.openaiKeyState==='invalid') h+='<div style="font-size:12px;color:#C0605F;background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.3);border-radius:12px;padding:9px 11px;">Anahtar geçersiz görünüyor. platform.openai.com’dan doğru anahtarı yapıştırıp tekrar kaydet.</div>';
+  h+='<button onclick="App.saveOpenaiKey()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 8px 18px rgba(155,127,201,0.35);">Kaydet ve doğrula ✓</button>';
   h+='<div style="font-size:11.5px;color:var(--faint);">platform.openai.com → API keys bölümünden alınır.</div>';
   h+='</div>';
   h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span>🗑️</span></button>';
@@ -1565,18 +1587,27 @@ function fetchObserverInbox(){
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];
+  if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
+  if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
   var seenId={}; data.notifications.forEach(function(n){ if(n&&n.id) seenId[n.id]=1; });
-  var nowIso=new Date().toISOString(), added=0;
+  var nowIso=new Date().toISOString(), added=0, answeredCount=0, answeredText=null;
   msgs.forEach(function(m){
-    if(!m||!m.id||seenId[m.id]) return;
+    if(!m||!m.id) return;
+    if(m.replyTo){
+      var q=null, qa=data.aeon.qa; for(var i=0;i<qa.length;i++){ if(qa[i]&&qa[i].id===m.replyTo){ q=qa[i]; break; } }
+      if(q){ if(q.answerMsgId!==m.id){ q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; answeredCount++; answeredText=q.answer; } return; }
+      // eşleşen soru yoksa normal mesaj gibi işle
+    }
+    if(seenId[m.id]) return;
     data.notifications.push({id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false});
     added++;
   });
-  if(added>0){
-    save(); // latest.json'a yaz → observer "iletildi" görür
+  if(added>0||answeredCount>0){
+    save(); // latest.json'a yaz → durum geri yansır
     if(ui.tab==='mesaj'){ markNotifsRead(); }
     render();
-    showInboxPopup();
+    if(added>0) showInboxPopup();
+    if(answeredCount>0) showAeonAnswerPopup(answeredText,answeredCount);
   }
 }
 function markNotifsRead(){
@@ -1608,6 +1639,29 @@ function showInboxPopup(){
   inner+='<button onclick="App.dismissPopup()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
   inner+='</div></div>';
   inner+='<button onclick="App.dismissPopup()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;font-size:17px;line-height:1;font-weight:700;">✕</button>';
+  inner+='</div>';
+  pop.innerHTML=inner;
+  document.body.appendChild(pop);
+}
+function showAeonAnswerPopup(text,count){
+  var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
+  var pop=document.createElement('div'); pop.id='sey-inbox-pop';
+  pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
+  var txt=String(text||'').slice(0,150);
+  var inner='';
+  inner+='<div style="position:relative;overflow:hidden;border-radius:20px;padding:15px 16px 14px;background:linear-gradient(135deg,#FBF4DF 0%,#F3ECFF 100%);border:1px solid rgba(201,160,60,0.5);box-shadow:0 18px 44px rgba(160,130,60,0.32),0 2px 8px rgba(0,0,0,0.06);">';
+  inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 90% -10%,rgba(212,175,55,0.18),transparent 60%);"></div>';
+  inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
+  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;font-size:20px;color:#1a1404;font-weight:800;box-shadow:0 6px 16px rgba(201,160,60,0.45);">⬡</div>';
+  inner+='<div style="flex:1;min-width:0;">';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;letter-spacing:1px;color:#6A4FA0;">ÆON</span><span style="font-size:10px;color:#A88;font-weight:700;">·&nbsp;yanıt</span></div>';
+  inner+='<div style="font-size:14px;line-height:1.45;color:#4A3A44;margin-top:4px;word-break:break-word;">'+esc(txt)+(text&&text.length>150?'…':'')+'</div>';
+  if(count>1) inner+='<div style="font-size:11.5px;color:#9A7;margin-top:5px;font-weight:700;">+'+(count-1)+' yanıt daha</div>';
+  inner+='<div style="display:flex;gap:8px;margin-top:12px;">';
+  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(201,160,60,0.4);">Gör</button>';
+  inner+='<button onclick="App.closeAeonPop()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
+  inner+='</div></div>';
+  inner+='<button onclick="App.closeAeonPop()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;font-size:17px;line-height:1;font-weight:700;">✕</button>';
   inner+='</div>';
   pop.innerHTML=inner;
   document.body.appendChild(pop);
@@ -1710,12 +1764,22 @@ function streamAsk(kind,question){
     }
     return pump();
   })
-  .catch(function(e){ ui.askKind=null; setAskError(kind,String(e&&e.message||e)); render(); });
+  .catch(function(e){ var m=String(e&&e.message||e); if(/\b401\b|invalid_api_key|Incorrect API key/i.test(m)) ui.openaiKeyState='invalid'; ui.askKind=null; setAskError(kind,m); render(); });
+}
+function submitAeonQuestion(question){
+  if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
+  if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
+  data.aeon.qa.push({id:'q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),question:question,ts:new Date().toISOString(),answer:null,answeredAt:null});
+  data.aeon.lastAskDate=todayStr();
+  ui.aeonDraft=''; ui.aeonError=null;
+  save(); render();
+  var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;
+  toast('ÆON sorunu aldı, yanıtını hazırlıyor ⬡',2400);
 }
 App.onLunaDraft=function(el){ ui.lunaDraft=el.value; };
 App.onAeonDraft=function(el){ ui.aeonDraft=el.value; };
 App.askLuna=function(){ var el=document.getElementById('luna-input'); var t=el?el.value.trim():String(ui.lunaDraft||'').trim(); if(!t){ toast('Önce sorunu yaz 🌙'); return; } if(t.length>600) t=t.slice(0,600); ui.lunaDraft=t; streamAsk('luna',t); };
-App.askAeon=function(){ var el=document.getElementById('aeon-input'); var t=el?el.value.trim():String(ui.aeonDraft||'').trim(); if(!t){ toast('Önce sorunu yaz ⬡'); return; } if(t.length>600) t=t.slice(0,600); ui.aeonDraft=t; streamAsk('aeon',t); };
+App.askAeon=function(){ var el=document.getElementById('aeon-input'); var t=el?el.value.trim():String(ui.aeonDraft||'').trim(); if(!t){ toast('Önce sorunu yaz ⬡'); return; } if(t.length>600) t=t.slice(0,600); submitAeonQuestion(t); };
 function notifCardHTML(n){
   var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
   var unread=!n.read, s='';
@@ -1755,7 +1819,7 @@ function askBlockHTML(kind){
     h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;">'+cfg.desc+'</div>';
     if(cfg.err) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:10px;">'+esc(cfg.err)+'</div>';
     h+='<textarea id="'+cfg.inputId+'" oninput="'+cfg.onDraft+'(this)" placeholder="Bugün '+cfg.name+'’a ne sormak istersin?" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:14.5px;resize:none;outline:none;line-height:1.5;margin-bottom:10px;">'+esc(cfg.draft||'')+'</textarea>';
-    if(!hasKey) h+='<div style="font-size:12px;color:#B5852A;background:rgba(255,225,150,0.25);border:1px solid rgba(220,180,90,0.4);border-radius:12px;padding:9px 11px;margin-bottom:10px;">Yanıt verebilmesi için Ayarlar’dan OpenAI anahtarı gir.</div>';
+    if(!aeon && !hasKey) h+='<div style="font-size:12px;color:#B5852A;background:rgba(255,225,150,0.25);border:1px solid rgba(220,180,90,0.4);border-radius:12px;padding:9px 11px;margin-bottom:10px;">Yanıt verebilmesi için Ayarlar’dan OpenAI anahtarı gir.</div>';
     h+='<button onclick="'+cfg.onAsk+'()" style="width:100%;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15.5px;font-weight:800;color:'+cfg.btnColor+';background:linear-gradient(135deg,'+cfg.grad+');box-shadow:0 10px 24px rgba('+cfg.soft+',0.4);">'+cfg.btn+'</button></div>';
   } else {
     h+='<div style="background:rgba('+cfg.soft+',0.08);border:1px solid rgba('+cfg.soft+',0.22);border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">'+cfg.mark+'</span><div style="font-size:13px;color:var(--text2);line-height:1.45;">'+cfg.used+'</div></div>';
@@ -1768,7 +1832,8 @@ function askBlockHTML(kind){
       h+='<div style="background:var(--card);border:1px solid rgba(150,110,120,0.14);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(150,110,120,0.07);margin-bottom:10px;">';
       h+='<div style="font-size:11px;color:var(--faint);font-weight:700;margin-bottom:8px;">'+esc(dl)+'</div>';
       h+='<div style="background:rgba('+cfg.soft+',0.08);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:8px;"><b style="color:'+cfg.accent+';">Sen:</b> '+esc(x.question)+'</div>';
-      h+='<div style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"><b style="color:'+cfg.accent+';">'+cfg.mark+' '+cfg.name+':</b> '+esc(x.answer)+'</div></div>';
+      var ansHtml=x.answer?esc(x.answer):'<span style="color:var(--faint);font-style:italic;">ÆON yanıtını hazırlıyor… ⬡</span>';
+      h+='<div style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"><b style="color:'+cfg.accent+';">'+cfg.mark+' '+cfg.name+':</b> '+ansHtml+'</div></div>';
     });
   }
   return h;
@@ -1781,6 +1846,7 @@ function mesajHTML(){
 }
 App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
 App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
+App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
 
 setTimeout(fetchObserverInbox,1500);

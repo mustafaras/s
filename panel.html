@@ -171,6 +171,23 @@ function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i
 function currentStreak(){ var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1);} else break; } return c; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else c=0;}); return b; }
 function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
+function lastOpenedAt(){
+  var best=0;
+  function up(v){
+    if(!v) return;
+    var t=typeof v==="number"?v:new Date(v).getTime();
+    if(!isNaN(t)&&t>best) best=t;
+  }
+  if(D&&D.lastOpenedAt) up(D.lastOpenedAt);
+  if(D&&D.days){
+    for(var k in D.days){
+      var r=D.days[k]||{};
+      if(r.liveSession&&r.liveSession.start) up(r.liveSession.start);
+      if(Array.isArray(r.sessions)) r.sessions.forEach(function(s){ if(s&&s.start) up(s.start); });
+    }
+  }
+  return best?new Date(best).toISOString():null;
+}
 function freshness(saved){ if(!saved) return {klass:"warn",txt:"Baglanti var ama kayit bekleniyor"}; var mins=Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)); if(mins<=180) return {klass:"ok",txt:"Canli takip aktif"}; if(mins<=1440) return {klass:"warn",txt:"Bugun guncellendi"}; return {klass:"danger",txt:"Guncelleme gecikmis"}; }
 function trend(now,prev){ var d=now-prev; if(Math.abs(d)<0.01) return "↔ "+d.toFixed(1); return (d>=0?"↑ ":"↓ ")+Math.abs(d).toFixed(1); }
 function risk(days,saved){
@@ -180,6 +197,70 @@ function risk(days,saved){
   var stale=!saved||(Date.now()-new Date(saved).getTime())>36*60*60*1000;
   var score=0; if(a<2.5)score+=2; else if(a<3.5)score+=1; if(s>=4)score+=2; else if(s>=2)score+=1; if(m>=3)score+=1; if(stale)score+=2;
   if(score<=1) return {klass:"ok",txt:"Dusuk risk"}; if(score<=3) return {klass:"warn",txt:"Orta risk"}; return {klass:"danger",txt:"Yakin takip"};
+}
+function toMs(v){
+  if(v==null) return 0;
+  if(typeof v==="number") return v;
+  var t=new Date(v).getTime();
+  return isNaN(t)?0:t;
+}
+function haversineKm(a,b){
+  var R=6371;
+  var dLat=(b.lat-a.lat)*Math.PI/180;
+  var dLng=(b.lng-a.lng)*Math.PI/180;
+  var sa=Math.sin(dLat/2), sb=Math.sin(dLng/2);
+  var q=sa*sa+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*sb*sb;
+  return 2*R*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
+}
+function usagePattern(days){
+  var hours=new Array(24), totalActive=0, eveningActive=0;
+  for(var i=0;i<24;i++) hours[i]=0;
+  days.forEach(function(d){
+    var rec=recOf(d)||{};
+    var sessions=[];
+    if(Array.isArray(rec.sessions)) sessions=sessions.concat(rec.sessions);
+    if(rec.liveSession) sessions.push(rec.liveSession);
+    sessions.forEach(function(s){
+      var st=toMs(s&&s.start);
+      if(!st) return;
+      var h=new Date(st).getHours();
+      var act=Math.max(0,Number(s.activeSeconds)||0);
+      hours[h]+=act||1;
+      totalActive+=act;
+      if(h>=18&&h<=23) eveningActive+=act;
+    });
+  });
+  var peakHour=0, peakVal=hours[0];
+  for(var j=1;j<24;j++){ if(hours[j]>peakVal){ peakVal=hours[j]; peakHour=j; } }
+  return {peakHour:peakVal>0?peakHour:null,eveningPct:totalActive?Math.round((eveningActive/totalActive)*100):0};
+}
+function latestActivityAt(days){
+  var best=0;
+  days.forEach(function(d){
+    var rec=recOf(d)||{};
+    best=Math.max(best,toMs(rec.savedAt));
+    if(rec.liveSession) best=Math.max(best,toMs(rec.liveSession.lastSeen)||toMs(rec.liveSession.start));
+    if(Array.isArray(rec.sessions)) rec.sessions.forEach(function(s){ best=Math.max(best,toMs(s&&s.end)||toMs(s&&s.start)); });
+  });
+  return best?new Date(best).toISOString():null;
+}
+function missingDays(days){
+  var m=0;
+  days.forEach(function(d){ var r=recOf(d); if(!r||!r.savedAt) m++; });
+  return m;
+}
+function locationSummary(hist){
+  var points=(Array.isArray(hist)?hist:[]).filter(function(p){ return p&&typeof p.lat==="number"&&typeof p.lng==="number"; });
+  points.sort(function(a,b){ return toMs(a.ts)-toMs(b.ts); });
+  var now=Date.now(), dayAgo=now-24*60*60*1000;
+  var recent=points.filter(function(p){ return toMs(p.ts)>=dayAgo; });
+  var dist=0;
+  for(var i=1;i<recent.length;i++) dist+=haversineKm(recent[i-1],recent[i]);
+  var zones={};
+  recent.forEach(function(p){ zones[p.lat.toFixed(3)+","+p.lng.toFixed(3)]=1; });
+  var accVals=points.map(function(p){ return Number(p.acc)||0; }).filter(function(v){ return v>0; });
+  var accAvg=accVals.length?accVals.reduce(function(a,b){return a+b;},0)/accVals.length:null;
+  return {recentCount:recent.length,zoneCount:Object.keys(zones).length,distanceKm:dist,avgAcc:accAvg};
 }
 function sparkLine(days,valFn,max,color,h){
   var w=320,ht=h||60,p=4,iw=w-p*2,ih=ht-p*2,m=max||1;
@@ -212,6 +293,7 @@ function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); rend
 
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
+  var opened=lastOpenedAt();
   if(!UI.month) UI.month=monthKey(selected);
   UI.selectedDate=selected;
   var srec=recOf(selected)||{};
@@ -237,6 +319,16 @@ function render(){
   var locBadgeTxt=!loc?"Konum yok":locAgeMin<60?locAgeMin+"dk önce":locAgeMin<1440?Math.round(locAgeMin/60)+"sa önce":Math.round(locAgeMin/1440)+"g önce";
   var freshClass=fresh.klass==="ok"?"b-ok":fresh.klass==="warn"?"b-warn":"b-danger";
   var rskClass=rsk.klass==="ok"?"b-ok":rsk.klass==="warn"?"b-warn":"b-danger";
+  var usePat=usagePattern(cur);
+  var lastAct=latestActivityAt(cur);
+  var idleMin=lastAct?Math.max(0,Math.round((Date.now()-new Date(lastAct).getTime())/60000)):null;
+  var locSum=locationSummary(locHist);
+  var risk7=risk(windowDays(7,today()),saved);
+  var risk14=risk(windowDays(14,today()),saved);
+  var risk30=risk(windowDays(30,today()),saved);
+  var ritualRate=cur.length?Math.round((curRit.doneDays/cur.length)*100):0;
+  var syncLagMin=saved?Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)):null;
+  var missingInRange=missingDays(cur);
 
   var h="";
 
@@ -249,7 +341,8 @@ function render(){
   h+='<span class="'+locBadgeClass+'" style="font-size:19px;">📍 '+locBadgeTxt+'</span>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;gap:5px;">';
-  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"-")+'</span>';
+  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(opened?"Son açılış "+new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}):"Son açılış -")+'</span>';
+  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(saved?"Kayıt "+new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"Kayıt -")+'</span>';
   h+='<button class="btn" onclick="location.reload()">↺</button>';
   h+='<button class="btn" onclick="resetPanelToken()">⚿</button>';
   h+='</div></div>';
@@ -406,6 +499,31 @@ function render(){
   h+='<div style="max-height:80px;overflow-y:auto;">';
   h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:20px;">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;font-size:20px;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:20px;">Kriz yok</div>';
   h+='</div></div>';
+
+  // ROW 5: Pro insights
+  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="lbl">Kullanım Paterni</div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Yoğun saat</span><span class="mono" style="font-size:20px;font-weight:700;">'+(usePat.peakHour==null?"-":pad(usePat.peakHour)+':00-'+pad((usePat.peakHour+1)%24)+':00')+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Akşam payı</span><span class="mono" style="font-size:20px;font-weight:700;">%'+usePat.eveningPct+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Ort. oturum</span><span class="mono" style="font-size:20px;font-weight:700;">'+formatDuration(curSess.avgActive||0)+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Boşta süresi</span><span class="mono" style="font-size:20px;font-weight:700;">'+(idleMin==null?"-":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa'))+'</span></div>';
+  h+='</div>';
+
+  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="lbl">Konum Özeti · 24s</div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Nokta</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.recentCount+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Farklı bölge</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.zoneCount+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Yaklaşık hareket</span><span class="mono" style="font-size:20px;font-weight:700;">'+locSum.distanceKm.toFixed(1)+' km</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Doğruluk ort.</span><span class="mono" style="font-size:20px;font-weight:700;">'+(locSum.avgAcc==null?"-":"±"+Math.round(locSum.avgAcc)+" m")+'</span></div>';
+  h+='</div>';
+
+  h+='<div class="card span-4" style="padding:10px;">';
+  h+='<div class="lbl">Risk & Güvenilirlik</div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Risk trendi</span><span class="mono" style="font-size:16px;font-weight:700;text-align:right;max-width:65%;">7g '+risk7.txt+' · 14g '+risk14.txt+' · 30g '+risk30.txt+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Ritüel başarı</span><span class="mono" style="font-size:20px;font-weight:700;">%'+ritualRate+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);"><span style="font-size:20px;color:var(--t3);">Sync gecikmesi</span><span class="mono" style="font-size:20px;font-weight:700;">'+(syncLagMin==null?"-":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa"))+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="font-size:20px;color:var(--t3);">Eksik gün</span><span class="mono" style="font-size:20px;font-weight:700;">'+missingInRange+'/'+cur.length+'</span></div>';
+  h+='</div>';
 
   h+='</div>'; // end bento
 

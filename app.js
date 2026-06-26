@@ -137,6 +137,7 @@ function migrate(d){
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
   if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
   if(!d.locationHistory) d.locationHistory=[];
+  if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   d.version=2;
   return d;
 }
@@ -489,7 +490,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(); data={version:2,startDate:t,lastOpenedDate:t,days:{},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main'},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main'},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -1446,7 +1447,7 @@ function modalsHTML(){
 }
 
 // boot
-if(data){ data.lastOpenedDate=todayStr(); save(); }
+if(data){ data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save(); }
 window.App=App;
 ritualWarmVoices();
 

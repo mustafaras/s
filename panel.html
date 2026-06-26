@@ -499,21 +499,27 @@ function coreStripHTML(){
   return s;
 }
 function lunaCardHTML(){
-  var luna=(D&&D.luna)?D.luna:null;
-  var qa=(luna&&Array.isArray(luna.qa))?luna.qa.slice():[];
-  qa.sort(function(a,b){ return String(b.ts||b.date||"").localeCompare(String(a.ts||a.date||"")); });
-  var askedToday=luna&&luna.lastAskDate===today();
+  var luna=(D&&D.luna)?D.luna:null, aeon=(D&&D.aeon)?D.aeon:null;
+  var all=[];
+  if(luna&&Array.isArray(luna.qa)) luna.qa.forEach(function(x){ all.push({who:'luna',x:x}); });
+  if(aeon&&Array.isArray(aeon.qa)) aeon.qa.forEach(function(x){ all.push({who:'aeon',x:x}); });
+  all.sort(function(a,b){ return String(b.x.ts||b.x.date||"").localeCompare(String(a.x.ts||a.x.date||"")); });
+  var lunaT=!!(luna&&luna.lastAskDate===today()), aeonT=!!(aeon&&aeon.lastAskDate===today());
+  var todayTag=(lunaT&&aeonT)?'Luna + ÆON bugün soruldu':(lunaT?'Luna bugün soruldu':(aeonT?'ÆON bugün soruldu':'bugün henüz yok'));
   var s='<div class="card span-6 pad">';
-  s+='<div class="lbl">🌙 Luna’ya Sorulanlar'+(askedToday?'<span style="margin-left:auto;font-size:var(--f2);color:var(--green);font-weight:800;letter-spacing:0;text-transform:none;">bugün soruldu</span>':'<span style="margin-left:auto;font-size:var(--f2);color:var(--t4);font-weight:700;letter-spacing:0;text-transform:none;">bugün henüz yok</span>')+'</div>';
-  if(!qa.length){
-    s+='<div class="empty" style="padding:18px;"><span class="ei">🌙</span>Şeyma henüz Luna’ya soru sormadı</div>';
+  s+='<div class="lbl">💬 Tüm Konuşmalar · Luna + ÆON<span style="margin-left:auto;font-size:var(--f2);color:'+((lunaT||aeonT)?'var(--green)':'var(--t4)')+';font-weight:800;letter-spacing:0;text-transform:none;">'+esc(todayTag)+'</span></div>';
+  if(!all.length){
+    s+='<div class="empty" style="padding:18px;"><span class="ei">💬</span>Şeyma henüz soru sormadı</div>';
   } else {
-    s+='<div class="scroll" style="max-height:300px;display:flex;flex-direction:column;gap:10px;">';
-    qa.forEach(function(x){
-      s+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;">';
-      s+='<div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:6px;">'+esc(tsShort(x.ts||x.date))+'</div>';
+    s+='<div class="scroll" style="max-height:320px;display:flex;flex-direction:column;gap:10px;">';
+    all.forEach(function(it){
+      var aeonW=it.who==='aeon', x=it.x;
+      var badge=aeonW?'<span style="font-size:var(--f1);font-weight:800;color:#1a1404;background:var(--ggrad);border-radius:999px;padding:2px 8px;">⬡ ÆON</span>':'<span style="font-size:var(--f1);font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);border-radius:999px;padding:2px 8px;">🌙 Luna</span>';
+      var ansLabel=aeonW?'⬡ ÆON:':'🌙 Luna:';
+      s+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;'+(aeonW?'border-left:3px solid var(--gold);':'border-left:3px solid #9B7FC9;')+'">';
+      s+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">'+badge+'<span style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-left:auto;">'+esc(tsShort(x.ts||x.date))+'</span></div>';
       s+='<div style="font-size:var(--f3);color:var(--t1);line-height:1.45;margin-bottom:7px;"><b style="color:var(--gold);">Şeyma:</b> '+esc(String(x.question||""))+'</div>';
-      s+='<div style="font-size:var(--f3);color:var(--t2);line-height:1.55;white-space:pre-wrap;word-break:break-word;border-top:1px solid var(--bd2);padding-top:7px;"><b style="color:var(--gold);">🌙 Luna:</b> '+esc(String(x.answer||""))+'</div>';
+      s+='<div style="font-size:var(--f3);color:var(--t2);line-height:1.55;white-space:pre-wrap;word-break:break-word;border-top:1px solid var(--bd2);padding-top:7px;"><b style="color:var(--gold);">'+ansLabel+'</b> '+esc(String(x.answer||""))+'</div>';
       s+='</div>';
     });
     s+='</div>';

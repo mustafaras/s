@@ -196,7 +196,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
 <body>
-<div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Yükleniyor…</div></div>
+<div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
 <script>
 (function(){
 "use strict";
@@ -462,6 +462,42 @@ function msgCardHTML(){
   s+='</div>';
   return s;
 }
+function coreModules(){
+  var loc=D&&D.location?D.location:null;
+  var locAgeH=loc?((Date.now()-new Date(loc.ts).getTime())/3600000):null;
+  var dayCount=0; for(var k in (D&&D.days||{})) dayCount++;
+  var luna=(D&&D.luna&&Array.isArray(D.luna.qa))?D.luna.qa.length:0;
+  var presence=false; for(var k2 in (D&&D.days||{})){ var r=D.days[k2]; if(r&&(r.liveSession||(Array.isArray(r.sessions)&&r.sessions.length))){ presence=true; break; } }
+  var sv=lastSavedAt(); var cont=!!(sv&&(Date.now()-new Date(sv).getTime()<36*3600*1000));
+  var cyc=!!(D&&D.cycle&&((Array.isArray(D.cycle.periods)&&D.cycle.periods.length)||D.cycle.avgCycle));
+  return [
+    {k:"Sensorium",on:!!(loc&&locAgeH!=null&&locAgeH<48)},
+    {k:"Vitals",on:dayCount>0},
+    {k:"Dialogue",on:luna>0},
+    {k:"Presence",on:presence},
+    {k:"Continuity",on:cont},
+    {k:"Cycle",on:cyc}
+  ];
+}
+function coreStripHTML(){
+  var mods=coreModules();
+  var online=mods.reduce(function(a,m){return a+(m.on?1:0);},0);
+  var up=Math.max(1,diff(D.startDate,today())+1);
+  var s='<div class="card pad" style="margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
+  s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
+  s+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
+  s+='<div style="line-height:1.18;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);letter-spacing:.3px;">LUNA · Orchestration Core</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Operatör · ATLAS <span style="color:var(--t4);">— Raşit</span></div></div>';
+  s+='</div>';
+  s+='<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;">';
+  mods.forEach(function(m){ s+='<span class="badge '+(m.on?"b-ok pulse":"b-dim")+'" style="padding:4px 9px;font-size:var(--f1);" title="'+(m.on?"çevrimiçi":"bekliyor")+'">'+esc(m.k)+'</span>'; });
+  s+='</div>';
+  s+='<div style="display:flex;align-items:center;gap:16px;margin-left:auto;">';
+  s+='<div class="meta"><b class="mono">'+online+'/6</b><span>Modül</span></div>';
+  s+='<div class="meta"><b class="mono">'+up+'g</b><span>Uptime</span></div>';
+  s+='</div>';
+  s+='</div>';
+  return s;
+}
 function lunaCardHTML(){
   var luna=(D&&D.luna)?D.luna:null;
   var qa=(luna&&Array.isArray(luna.qa))?luna.qa.slice():[];
@@ -558,6 +594,9 @@ function render(){
 
   // ── PAGE ────────────────────────────────────────────────────
   h+='<div class="page">';
+
+  // ── ORCHESTRATION CORE şeridi ──
+  h+=coreStripHTML();
 
   // toolbar
   h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">';
@@ -748,7 +787,7 @@ function render(){
 
   h+='</div>'; // end bento
 
-  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>CANLI İZLEME · 5 DAKİKADA BİR YENİLENİR</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ATLAS ÇEKİRDEĞİ · CANLI · 5 DK&#39;DA BİR EŞİTLENİR</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;

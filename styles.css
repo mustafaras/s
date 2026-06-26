@@ -6,6 +6,7 @@
   @keyframes seyConfetti{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(540deg);opacity:.15;}}
   @keyframes seyPop{0%{transform:scale(.96);opacity:0;}100%{transform:scale(1);opacity:1;}}
   @keyframes seyToast{0%{transform:translate(-50%,10px);opacity:0;}100%{transform:translate(-50%,0);opacity:1;}}
+  @keyframes seyInboxPop{0%{transform:translate(-50%,-22px) scale(.94);opacity:0;}100%{transform:translate(-50%,0) scale(1);opacity:1;}}
   @keyframes seyFade{from{opacity:0;}to{opacity:1;}}
   @keyframes seyShine{0%{transform:translateX(-130%);}55%,100%{transform:translateX(400%);}}
   @keyframes seyAurora{0%{transform:translate(-8%,-6%) scale(1.1);}50%{transform:translate(6%,4%) scale(1.25);}100%{transform:translate(-8%,-6%) scale(1.1);}}

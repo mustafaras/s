@@ -5,50 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Seyma · Observer Dashboard</title>
 <style>
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif;color:#1f2329;background:linear-gradient(165deg,#f7f5f2 0%,#f4f1ee 55%,#efece9 100%);min-height:100vh}
-  .wrap{max-width:1220px;margin:0 auto;padding:20px 16px 56px}
-  .card{background:#fff;border:1px solid #ece7e1;border-radius:16px;box-shadow:0 10px 24px rgba(28,24,20,.06)}
-  .muted{color:#69645d}.faint{color:#8b847d}.gold{color:#9b7a2f}
-  h1{font-size:27px;line-height:1.2;margin:0;font-weight:800;letter-spacing:.2px}
-  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-  .grid6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-  .chip{padding:13px;border-radius:14px;border:1px solid #efe9e2;background:#fff}
-  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .seg button{border:1px solid #ded7cf;background:#fff;color:#4b443d;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
-  .seg button.active{border-color:#b79a60;background:#f8f2e5;color:#6c531c}
-  .btn{border:1px solid #ddd4cb;background:#fff;color:#433d36;padding:10px 13px;border-radius:11px;font-weight:700;cursor:pointer}
-  .btn-primary{border:none;color:#fff;background:linear-gradient(135deg,#8c6f2d,#b79a60)}
-  .status{padding:10px 12px;border-radius:12px;font-size:12.5px;font-weight:700}
-  .ok{background:#e9f5eb;color:#2f6f3a;border:1px solid #c8e4cf}
-  .warn{background:#fff4e4;color:#8b5a15;border:1px solid #f0d7ad}
-  .danger{background:#fdecec;color:#9a3e3e;border:1px solid #f1c5c5}
-  .chart{width:100%;height:180px;display:block}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  :root{
+    --bg:#09090f;--s1:#111119;--s2:#18181f;--s3:#1e1e27;
+    --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.04);
+    --t1:#e2ddd7;--t2:#7a756e;--t3:#3d3a36;
+    --gold:#c8a84b;--ga:rgba(200,168,75,.12);--gb:rgba(200,168,75,.22);
+    --green:#4ade80;--gra:rgba(74,222,128,.08);--grb:rgba(74,222,128,.2);
+    --amber:#fbbf24;--aa:rgba(251,191,36,.08);--ab:rgba(251,191,36,.2);
+    --red:#f87171;--ra:rgba(248,113,113,.08);--rb:rgba(248,113,113,.2);
+    --pink:#f472b6;--purple:#a78bfa;
+  }
+  html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 16px 48px}
+  .hdr{position:sticky;top:0;z-index:200;background:rgba(9,9,15,0.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card{background:var(--s1);border:1px solid var(--bd);border-radius:14px}
+  .chip{background:var(--s2);border:1px solid var(--bd2);border-radius:11px;padding:11px 13px}
+  .btn{background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:6px 13px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--s3)}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.1px}
+  .b-ok{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
+  .b-warn{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
+  .b-danger{background:var(--ra);color:var(--red);border:1px solid var(--rb)}
+  .b-gold{background:var(--ga);color:var(--gold);border:1px solid var(--gb)}
+  .b-dim{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .g6{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+  .main-grid{display:grid;grid-template-columns:320px 1fr;gap:12px;margin-top:12px}
   .mono{font-variant-numeric:tabular-nums}
-  .row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #ece7e1;cursor:pointer}
-  .row:hover{background:#faf8f5}
-  .row.active{background:#f4efe7;border-radius:10px;padding:8px}
-  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-  .d{position:relative;border:1px solid #efe9e2;border-radius:10px;padding:7px 6px;min-height:58px;background:#fff;cursor:pointer}
-  .d.active{border-color:#b79a60;background:#f8f2e5}
+  .chart{width:100%;display:block}
+  input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:8px;padding:5px 10px;font:inherit;outline:none;font-size:12.5px;color-scheme:dark}
+  .row{display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:7px;cursor:pointer;font-size:12px}
+  .row:hover{background:var(--s2)}
+  .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  .d{position:relative;border:1px solid var(--bd2);border-radius:8px;padding:5px;min-height:50px;background:var(--s2);cursor:pointer;transition:border-color .15s}
+  .d:hover{border-color:var(--bd)}
+  .d.active{border-color:var(--gold)!important;background:var(--ga)}
   .d.empty{visibility:hidden}
-  .dm{font-size:11px;font-weight:700}
-  .dl{position:absolute;right:6px;top:6px;font-size:10px;color:#7b746c}
-  .db{position:absolute;left:6px;bottom:6px;font-size:10px;font-weight:700;border-radius:999px;padding:2px 6px}
-  .k0{background:#f0eeeb;color:#8b847d}.k1{background:#fef3da;color:#8c6418}.k2{background:#fce2c5;color:#8c4e17}.k3{background:#f7ccb7;color:#8f3c2f}
-  input[type="date"],input[type="month"],input[type="password"]{border:1px solid #ddd4cb;border-radius:11px;padding:10px 12px;font:inherit;outline:none;background:#fff}
-  @media(max-width:1120px){.grid6{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  @media(max-width:980px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr}}
-  @media(max-width:680px){.grid2{grid-template-columns:1fr}.grid6{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  /* harita */
-  #loc-map{height:340px;border-radius:14px;overflow:hidden;border:1px solid #ece7e1;background:#f0ede8}
-  .loc-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700}
-  .loc-live{background:#e6f4ea;color:#2e7d32;border:1px solid #c8e6c9}
-  .loc-old{background:#fff8e1;color:#795548;border:1px solid #ffe082}
-  .loc-none{background:#f5f5f5;color:#9e9e9e;border:1px solid #e0e0e0}
-  .loc-hist-dot{width:9px;height:9px;border-radius:50%;background:#b79a60;opacity:0.55;display:inline-block}
+  .dm{font-size:10px;font-weight:700;color:var(--t2)}
+  .dl{position:absolute;right:4px;top:4px;font-size:9px}
+  .db{position:absolute;left:4px;bottom:4px;font-size:9.5px;font-weight:700;border-radius:999px;padding:1px 5px}
+  .k0{background:rgba(255,255,255,0.05);color:var(--t3)}.k1{background:var(--ga);color:var(--gold)}.k2{background:rgba(251,146,60,.14);color:#fb923c}.k3{background:rgba(74,222,128,.12);color:var(--green)}
+  .seg button{background:var(--s2);border:1px solid var(--bd2);color:var(--t2);padding:4px 9px;border-radius:7px;font-weight:700;font-size:12px;cursor:pointer}
+  .seg button.active{border-color:var(--gb);background:var(--ga);color:var(--gold)}
+  #loc-map{height:270px;border-radius:11px;overflow:hidden;border:1px solid var(--bd);background:#0c0c14}
+  .loc-live{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
+  .loc-old{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
+  .loc-none{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
+  .lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+  .divider{height:1px;background:var(--bd2);margin:8px 0}
+  @media(max-width:1100px){.main-grid{grid-template-columns:1fr}}
+  @media(max-width:860px){.g6{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){.g2{grid-template-columns:1fr}.g6{grid-template-columns:repeat(2,1fr)}}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -192,90 +201,272 @@ function render(){
   var cur=windowDays(UI.range,today()), prev=windowDays(UI.range,addDays(today(),-UI.range));
   var curAvg=avg(cur,function(d){return cnt(recOf(d));}), prevAvg=avg(prev,function(d){return cnt(recOf(d));});
   var curSos=sum(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;}), prevSos=sum(prev,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;});
-  var curSteps=avg(cur,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;}), prevSteps=avg(prev,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;});
+  var curSteps=avg(cur,function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;});
   var curSleep=avg(cur,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;}), prevSleep=avg(prev,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;});
   var rsk=risk(cur,saved), months=monthSummary(all).slice(0,8), monthGrid=monthDays(UI.month);
   var moodDist={"cok-iyi":0,"iyi":0,"normal":0,"zorlandim":0,"cok-zorlandim":0};
   cur.forEach(function(d){var r=recOf(d); if(r&&r.mood&&moodDist[r.mood]!=null) moodDist[r.mood]++;});
-  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();}).slice(0,40);
-  var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;}).slice(0,40);
-
-  var h="";
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;"><div><h1>Observer Dashboard</h1><div class="faint mono" style="font-size:13px;margin-top:3px;">Son senkron: '+(saved?new Date(saved).toLocaleString("tr-TR"):"-")+'</div></div><div class="toolbar"><button class="btn" onclick="location.reload()">Yenile</button><button class="btn" onclick="resetPanelToken()">Yeni anahtar</button></div></div>';
-  h+='<div class="status '+fresh.klass+'" style="margin-bottom:8px;">'+fresh.txt+'</div><div class="status '+rsk.klass+'" style="margin-bottom:10px;">Risk durumu: '+rsk.txt+'</div>';
-  h+='<div class="card" style="padding:12px;margin-bottom:10px;"><div class="toolbar"><span class="muted" style="font-weight:700;">Aralik</span><div class="seg">'+[7,14,30,90,365].map(function(n){return '<button class="'+(UI.range===n?'active':'')+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("")+'</div><span class="muted" style="font-weight:700;margin-left:8px;">Gun</span><input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)"><span class="muted" style="font-weight:700;">Ay</span><input type="month" value="'+esc(UI.month)+'" onchange="setMonth(this.value)"></div></div>';
-  h+='<div class="grid6" style="margin-bottom:10px;">'+
-    [['Aktif seri',currentStreak()+' g'],['En iyi seri',bestStreak(all)+' g'],['Takip gunu',Object.keys(D.days||{}).length+' g'],['Secili gun',shortD(selected)],['Aralik tik ort.',curAvg.toFixed(1)+' / '+HT],['Aralik SOS',curSos+'']].map(function(c){return '<div class="chip"><div class="faint" style="font-size:11px;">'+c[0]+'</div><div class="mono" style="font-size:23px;font-weight:800;margin-top:4px;">'+c[1]+'</div></div>';}).join("")+
-    '</div>';
-  h+='<div class="grid4" style="margin-bottom:10px;">'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Tik karsilastirma</div><div class="mono" style="font-size:20px;font-weight:800;">'+curAvg.toFixed(1)+' <span class="gold" style="font-size:12px;">'+trend(curAvg,prevAvg)+'</span></div><div class="faint" style="font-size:11px;">Onceki: '+prevAvg.toFixed(1)+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">SOS karsilastirma</div><div class="mono" style="font-size:20px;font-weight:800;">'+curSos+' <span class="gold" style="font-size:12px;">'+trend(curSos,prevSos)+'</span></div><div class="faint" style="font-size:11px;">Onceki: '+prevSos+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Adim ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+Math.round(curSteps)+'</div><div class="faint" style="font-size:11px;">Onceki: '+Math.round(prevSteps)+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Uyku ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+(Math.round(curSleep*10)/10).toFixed(1)+' sa</div><div class="faint" style="font-size:11px;">Onceki: '+(Math.round(prevSleep*10)/10).toFixed(1)+' sa</div></div>'+
-    '</div>';
-  var curSess=sessionStats(cur), prevSess=sessionStats(prev);
-  h+='<div class="chip" style="padding:12px;margin-bottom:10px;"><div class="faint" style="font-size:11px;">Aralik kullanim suresi</div><div class="mono" style="font-size:19px;font-weight:800;">'+formatDuration(curSess.totalActive)+'</div><div class="faint" style="font-size:11px;margin-top:2px;">'+curSess.sessionCount+' oturum · Ort. '+formatDuration(curSess.avgActive)+' / oturum</div></div>';
+  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();}).slice(0,25);
+  var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;}).slice(0,20);
+  var curSess=sessionStats(cur);
   var curRit=ritualStats(cur), prevRit=ritualStats(prev);
-  h+='<div class="grid4" style="margin-bottom:10px;">'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Ritüel tamamlanan gun</div><div class="mono" style="font-size:20px;font-weight:800;">'+curRit.doneDays+'</div><div class="faint" style="font-size:11px;">Onceki: '+prevRit.doneDays+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Ritüel oturum</div><div class="mono" style="font-size:20px;font-weight:800;">'+curRit.sessTotal+'</div><div class="faint" style="font-size:11px;">Onceki: '+prevRit.sessTotal+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Hazirlik skoru ort.</div><div class="mono" style="font-size:20px;font-weight:800;">'+curRit.avgScore+' <span class="gold" style="font-size:12px;">'+trend(curRit.avgScore,prevRit.avgScore)+'</span></div><div class="faint" style="font-size:11px;">Onceki: '+prevRit.avgScore+'</div></div>'+
-    '<div class="chip"><div class="faint" style="font-size:11px;">Uyku ilaci/takviye gun</div><div class="mono" style="font-size:20px;font-weight:800;">'+curRit.medDays+'</div><div class="faint" style="font-size:11px;">Onceki: '+prevRit.medDays+'</div></div>'+
-    '</div>';
-  // konum kartı (Leaflet haritası)
+  var srPr=panelReadiness(srec);
+  var srWind=(srec.sleep&&srec.sleep.windDown)?srec.sleep.windDown:{};
+  var srMed=(srec.sleep&&srec.sleep.med&&srec.sleep.med.type)?(SLEEP_MED[srec.sleep.med.type]||srec.sleep.med.type):null;
+  var syms=(srec.symptoms||[]).map(function(x){return SYM[x]||x;}).join(" · ");
   var loc=D&&D.location?D.location:null;
   var locHist=D&&Array.isArray(D.locationHistory)?D.locationHistory:[];
   var locAgeMin=loc?Math.round((Date.now()-new Date(loc.ts).getTime())/60000):null;
-  var locBadge=loc?(locAgeMin<120?'<span class="loc-badge loc-live">🟢 Az önce — '+locAgeMin+' dk</span>':locAgeMin<1440?'<span class="loc-badge loc-old">🟡 '+Math.round(locAgeMin/60)+' saat önce</span>':'<span class="loc-badge loc-old">🟠 '+Math.round(locAgeMin/1440)+' gün önce</span>'):'<span class="loc-badge loc-none">📍 Konum verisi yok</span>';
-  var locMeta='';
-  if(loc){
-    locMeta+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">';
-    locMeta+='<div style="flex:1;min-width:140px;background:#faf7f3;border:1px solid #ece7e1;border-radius:12px;padding:10px 12px;"><div style="font-size:11px;color:#8b847d;font-weight:700;margin-bottom:3px;">Enlem</div><div style="font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;">'+loc.lat.toFixed(5)+'</div></div>';
-    locMeta+='<div style="flex:1;min-width:140px;background:#faf7f3;border:1px solid #ece7e1;border-radius:12px;padding:10px 12px;"><div style="font-size:11px;color:#8b847d;font-weight:700;margin-bottom:3px;">Boylam</div><div style="font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;">'+loc.lng.toFixed(5)+'</div></div>';
-    locMeta+='<div style="flex:1;min-width:140px;background:#faf7f3;border:1px solid #ece7e1;border-radius:12px;padding:10px 12px;"><div style="font-size:11px;color:#8b847d;font-weight:700;margin-bottom:3px;">Doğruluk</div><div style="font-size:15px;font-weight:800;">±'+loc.acc+' m</div></div>';
-    locMeta+='<div style="flex:1;min-width:140px;background:#faf7f3;border:1px solid #ece7e1;border-radius:12px;padding:10px 12px;"><div style="font-size:11px;color:#8b847d;font-weight:700;margin-bottom:3px;">Geçmiş</div><div style="font-size:15px;font-weight:800;">'+locHist.length+' kayıt</div></div>';
-    locMeta+='</div>';
-    locMeta+='<div id="loc-address" style="margin-top:8px;font-size:13px;color:#69645d;min-height:20px;">📍 Adres yükleniyor…</div>';
-    var mapsUrl='https://maps.google.com/?q='+loc.lat+','+loc.lng;
-    locMeta+='<div style="margin-top:10px;display:flex;gap:8px;"><a href="'+mapsUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#8c6f2d,#b79a60);color:#fff;font-weight:700;font-size:13px;text-decoration:none;">Google Maps\'ta Aç 🗺️</a></div>';
-  }
-  h+='<div class="card" style="padding:18px;margin-bottom:10px;">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
-  h+='<div style="font-weight:800;font-size:16px;letter-spacing:.1px;">📍 Son Konum</div>';
-  h+=locBadge;
+  var locBadgeClass=!loc?"b-dim badge":locAgeMin<120?"badge loc-live":locAgeMin<1440?"badge loc-old":"badge loc-old";
+  var locBadgeTxt=!loc?"Konum yok":locAgeMin<60?locAgeMin+"dk önce":locAgeMin<1440?Math.round(locAgeMin/60)+"sa önce":Math.round(locAgeMin/1440)+"g önce";
+  var freshClass=fresh.klass==="ok"?"b-ok":fresh.klass==="warn"?"b-warn":"b-danger";
+  var rskClass=rsk.klass==="ok"?"b-ok":rsk.klass==="warn"?"b-warn":"b-danger";
+
+  var h="";
+
+  // ── STICKY HEADER ─────────────────────────────────────────────
+  h+='<div class="hdr">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<span style="font-size:16px;font-weight:800;letter-spacing:-.4px;">Observer</span>';
+  h+='<span class="badge '+freshClass+'" style="font-size:10.5px;">'+fresh.txt+'</span>';
+  h+='<span class="badge '+rskClass+'" style="font-size:10.5px;">'+rsk.txt+'</span>';
+  h+='</div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;">';
+  h+='<span style="font-size:11px;color:var(--t3);">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})+" · "+new Date(saved).toLocaleDateString("tr-TR"):"-")+'</span>';
+  h+='<button class="btn" onclick="location.reload()">↺</button>';
+  h+='<button class="btn" onclick="resetPanelToken()">Anahtar</button>';
+  h+='</div></div>';
+
+  // ── WRAP ──────────────────────────────────────────────────────
+  h+='<div class="wrap">';
+
+  // toolbar
+  h+='<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 0 10px;">';
+  h+='<div class="seg">';
+  h+=[7,14,30,90,365].map(function(n){return '<button class="'+(UI.range===n?"active":"")+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("");
+  h+='</div>';
+  h+='<input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)">';
+  h+='<input type="month" value="'+esc(UI.month)+'" onchange="setMonth(this.value)">';
+  h+='</div>';
+
+  // ── MAIN GRID (harita sol | metrikler sağ) ──────────────────
+  h+='<div class="main-grid">';
+
+  // ── SOL: Konum Kartı ─────────────────────────────────────────
+  h+='<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
+  h+='<span style="font-size:12.5px;font-weight:700;">📍 Konum</span>';
+  h+='<span class="'+locBadgeClass+'" style="font-size:10.5px;">'+locBadgeTxt+'</span>';
   h+='</div>';
   if(loc){
     h+='<div id="loc-map"></div>';
-    h+=locMeta;
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+    h+='<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;">';
+    h+='<div style="font-size:9.5px;color:var(--t3);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px;">Koordinat</div>';
+    h+='<div style="font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.5;">'+loc.lat.toFixed(5)+'<br>'+loc.lng.toFixed(5)+'</div>';
+    h+='</div>';
+    h+='<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:9px;padding:8px 10px;">';
+    h+='<div style="font-size:9.5px;color:var(--t3);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px;">Doğruluk / Kayıt</div>';
+    h+='<div style="font-size:12px;font-weight:700;line-height:1.5;">±'+loc.acc+' m<br><span style="color:var(--t3);">'+locHist.length+' nokta</span></div>';
+    h+='</div>';
+    h+='</div>';
+    h+='<div id="loc-address" style="font-size:11.5px;color:var(--t2);min-height:16px;">Adres yükleniyor…</div>';
+    var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
+    h+='<a href="'+mapsUrl+'" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:9px;background:var(--ga);border:1px solid var(--gb);color:var(--gold);font-weight:700;font-size:12.5px;text-decoration:none;">Google Maps\'ta Aç 🗺️</a>';
   } else {
-    h+='<div style="padding:32px;text-align:center;color:#8b847d;font-size:14px;background:#faf7f3;border-radius:14px;border:1px dashed #ddd4cb;">Uygulama açıldığında konum izni verilirse burada görünür.</div>';
+    h+='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:36px 0;color:var(--t3);text-align:center;">';
+    h+='<div style="font-size:28px;opacity:.4;">📍</div>';
+    h+='<div style="font-size:12px;line-height:1.5;max-width:180px;">Uygulama açılıp konum izni verilince burada görünür.</div>';
+    h+='</div>';
+  }
+  h+='</div>'; // end sol kart
+
+  // ── SAĞ: Her şey ─────────────────────────────────────────────
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+
+  // Metrik chipsleri (6'lı)
+  h+='<div class="g6">';
+  [
+    ['Aktif Seri', currentStreak()+'g'],
+    ['En İyi',     bestStreak(all)+'g'],
+    ['Tik Ort.',   curAvg.toFixed(1)+'/'+HT],
+    ['SOS',        curSos+''],
+    ['Uyku',       (Math.round(curSleep*10)/10).toFixed(1)+' sa'],
+    ['Kullanım',   formatDuration(curSess.totalActive)]
+  ].forEach(function(c){
+    h+='<div class="chip"><div class="lbl">'+c[0]+'</div><div class="mono" style="font-size:18px;font-weight:800;">'+c[1]+'</div></div>';
+  });
+  h+='</div>';
+
+  // Bugün detay + Mod 2-col
+  h+='<div class="g2">';
+
+  // Bugün detay
+  var habList=HABITS.map(function(hb){
+    var ok=!!(srec.habits&&srec.habits[hb[0]]);
+    return '<div style="display:flex;align-items:center;gap:7px;padding:3px 0;">'
+      +'<span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(ok?"var(--green)":"var(--t3)")+';"></span>'
+      +'<span style="font-size:12px;color:'+(ok?"var(--t1)":"var(--t3)")+';">'+hb[1]+'</span>'
+    +'</div>';
+  }).join("");
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">'+shortD(selected)+' · Seçili Gün</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;">';
+  [
+    [cnt(srec)+'/'+HT,'Tik'],
+    [MOOD_EMOJI[srec.mood]||'—','Mod'],
+    [(srec.cravingSOSCount||0),'SOS'],
+    [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'sa':'—','Uyku']
+  ].forEach(function(d){
+    h+='<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:8px;padding:7px 4px;text-align:center;">';
+    h+='<div class="mono" style="font-size:15px;font-weight:800;">'+d[0]+'</div>';
+    h+='<div style="font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:2px;">'+d[1]+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  h+=habList;
+  if(syms) h+='<div style="font-size:10.5px;color:var(--t3);margin-top:6px;">'+esc(syms)+'</div>';
+  if(srec.note&&String(srec.note).trim()){
+    h+='<div style="margin-top:8px;padding:8px;border-radius:8px;background:var(--s2);font-size:11.5px;color:var(--t2);line-height:1.4;border:1px solid var(--bd2);">'+esc(String(srec.note).slice(0,100))+'</div>';
   }
   h+='</div>';
 
-  h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Gunluk tik trendi</div>'+lineChart(cur,function(d){return cnt(recOf(d));},HT,"#8c6f2d")+'</div>';
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tatli krizi (SOS) grafigi</div>'+barChart(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#b15a4a")+'</div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Mod dagilimi</div><div class="grid2">'+Object.keys(moodDist).map(function(k){var c=moodDist[k];return '<div class="chip" style="padding:10px;"><div class="faint" style="font-size:11px;">'+(MOOD_EMOJI[k]||"")+" "+k+'</div><div class="mono" style="font-size:20px;font-weight:800;">'+c+'</div></div>';}).join("")+'</div></div></div>';
-  var habitsHtml=HABITS.map(function(h){ var ok=!!(srec.habits&&srec.habits[h[0]]); return '<div style="font-size:13px;line-height:1.55;">'+(ok?'✅':'⬜')+' '+h[1]+'</div>'; }).join("");
-  var opts=(srec.cravingOptionsUsed||[]).map(function(x){return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:4px 8px;border-radius:999px;background:#f4efe7;font-size:11px;">'+esc(x)+'</span>';}).join("");
-  var syms=(srec.symptoms||[]).map(function(x){return SYM[x]||x;}).join(", ");
-  var curDaySessions=sessionStats([selected]);
-  var srPr=panelReadiness(srec);
-  var srWind=(srec.sleep&&srec.sleep.windDown)?srec.sleep.windDown:{};
-  var srMed=(srec.sleep&&srec.sleep.med&&srec.sleep.med.type)?(SLEEP_MED[srec.sleep.med.type]||srec.sleep.med.type)+(srec.sleep.med.note?(" · "+esc(srec.sleep.med.note)):""):"-";
-  var ritualLine='Ritüel: <b>'+(srPr.ritualDone?"Tamamlandi ✅":(srPr.partial?"Yarim kaldi":"Yok"))+'</b> · Oturum: <b>'+srPr.sessions+'</b> · Hazirlik skoru: <b>'+srPr.score+'/100</b>';
-  if(srWind.offloadNote&&String(srWind.offloadNote).trim()) ritualLine+=' · Not: <b>'+esc(String(srWind.offloadNote).slice(0,60))+'</b>';
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Secili gun detay ('+shortD(selected)+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Tik: <b>'+cnt(srec)+'/'+HT+'</b> · Mod: <b>'+(MOOD_EMOJI[srec.mood]||"-")+'</b> · SOS: <b>'+(srec.cravingSOSCount||0)+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Adim: <b>'+(srec.walk&&srec.walk.steps!=null?srec.walk.steps:"-")+'</b> · Dakika: <b>'+(srec.walk&&srec.walk.minutes!=null?srec.walk.minutes:"-")+'</b> · Uyku: <b>'+(srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+" sa":"-")+'</b> ('+(SLEEP_Q[srec.sleep&&srec.sleep.quality]||"-")+')</div><div class="muted" style="font-size:13px;line-height:1.55;">Uyku ilaci: <b>'+srMed+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">'+ritualLine+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Akim: <b>'+(FLOW[srec.flow]||"-")+'</b> · Belirtiler: <b>'+(syms||"-")+'</b></div><div class="muted" style="font-size:13px;line-height:1.55;">Kullanim: <b>'+curDaySessions.sessionCount+' oturum</b> · Aktif: <b>'+formatDuration(curDaySessions.totalActive)+'</b></div><div style="margin-top:8px;">'+habitsHtml+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Kahvalti: '+esc(srec.meals&&srec.meals.breakfast?srec.meals.breakfast:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ogle: '+esc(srec.meals&&srec.meals.lunch?srec.meals.lunch:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Aksam: '+esc(srec.meals&&srec.meals.dinner?srec.meals.dinner:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;">Ara: '+esc(srec.meals&&srec.meals.snack?srec.meals.snack:"-")+'</div><div class="muted" style="font-size:13px;line-height:1.55;margin-top:8px;">Not: '+esc(srec.note||"-")+'</div><div class="muted" style="font-size:12px;line-height:1.5;margin-top:8px;">Kriz aksiyonlari: '+(opts||"-")+'</div></div>';
-  var monthHead=['Pzt','Sal','Car','Per','Cum','Cmt','Paz'].map(function(x){return '<div class="faint" style="font-size:11px;text-align:center;font-weight:700;padding:4px 0;">'+x+'</div>';}).join("");
+  // Mod + Ritüel
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">Mod Dağılımı · '+UI.range+'g</div>';
+  Object.keys(moodDist).forEach(function(k){
+    var c=moodDist[k];
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">';
+    h+='<span style="font-size:12px;color:var(--t2);flex:1;">'+(MOOD_EMOJI[k]||"")+" "+k+'</span>';
+    h+='<span class="mono" style="font-size:13px;font-weight:800;min-width:20px;text-align:right;">'+c+'</span>';
+    h+='</div>';
+  });
+  h+='<div class="divider"></div>';
+  h+='<div class="lbl" style="margin-top:6px;">Ritüel & Uyku</div>';
+  [
+    ['Ritüel bugün', srPr.ritualDone?"✓ Tamam":(srPr.partial?"Yarım":"—")],
+    ['Hazırlık skoru', srPr.score+'/100'],
+    ['İlaç/takviye', srMed||"—"],
+    ['Ritüel gun/'+UI.range+'g', curRit.doneDays+''],
+    ['Hazırlık ort.', curRit.avgScore+'/100']
+  ].forEach(function(x){
+    h+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--bd2);">';
+    h+='<span style="font-size:11.5px;color:var(--t2);">'+x[0]+'</span>';
+    h+='<span class="mono" style="font-size:12px;font-weight:700;color:var(--t1);">'+x[1]+'</span>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  h+='</div>'; // end g2
+
+  // Tik trend chart
+  h+='<div class="card" style="padding:11px;">';
+  h+='<div class="lbl">Tik Trendi · '+UI.range+'g</div>';
+  h+=lineChart(cur,function(d){return cnt(recOf(d));},HT,"#c8a84b");
+  h+='</div>';
+
+  // SOS chart + özet stat 2-col
+  h+='<div class="g2">';
+  h+='<div class="card" style="padding:11px;">';
+  h+='<div class="lbl">SOS Grafik</div>';
+  h+=barChart(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#f87171");
+  h+='</div>';
+  h+='<div class="card" style="padding:11px;">';
+  h+='<div class="lbl">Dönem Özeti · '+UI.range+'g</div>';
+  [
+    ['Tik ort.',     curAvg.toFixed(1)+' → '+trend(curAvg,prevAvg)],
+    ['SOS toplam',   curSos+' → önceki '+prevSos],
+    ['Adım ort.',    Math.round(curSteps)+''],
+    ['Uyku ort.',    (Math.round(curSleep*10)/10).toFixed(1)+' sa → önceki '+(Math.round(prevSleep*10)/10).toFixed(1)],
+    ['Kullanım',     curSess.sessionCount+' oturum · '+formatDuration(curSess.totalActive)],
+    ['Ritüel',       curRit.doneDays+' gün · ort. '+curRit.avgScore+'/100']
+  ].forEach(function(x){
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd2);">';
+    h+='<span style="font-size:11px;color:var(--t2);">'+x[0]+'</span>';
+    h+='<span class="mono" style="font-size:11.5px;font-weight:700;color:var(--t1);text-align:right;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+x[1]+'</span>';
+    h+='</div>';
+  });
+  h+='</div>';
+  h+='</div>'; // end g2 charts
+
+  h+='</div>'; // end sağ kolon
+  h+='</div>'; // end main-grid
+
+  // ── TAKVIM + NOTLAR ──────────────────────────────────────────
+  h+='<div class="g2" style="margin-top:10px;">';
+
+  // Takvim
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">';
+  h+='<span class="lbl" style="margin-bottom:0;">'+monthLabel(UI.month)+'</span>';
+  h+='<div style="display:flex;gap:4px;">';
+  var pm=function(ym){var p=ym.split("-"),d=new Date(+p[0],+p[1]-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1);};
+  var nm=function(ym){var p=ym.split("-"),d=new Date(+p[0],+p[1],1);return d.getFullYear()+"-"+pad(d.getMonth()+1);};
+  h+='<button class="btn" style="padding:3px 9px;font-size:12px;" onclick="setMonth(\''+pm(UI.month)+'\')">‹</button>';
+  h+='<button class="btn" style="padding:3px 9px;font-size:12px;" onclick="setMonth(\''+nm(UI.month)+'\')">›</button>';
+  h+='</div></div>';
+  var monthHead=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].map(function(x){return '<div style="font-size:9.5px;font-weight:700;color:var(--t3);text-align:center;padding:2px 0;">'+x+'</div>';}).join("");
   var daysHtml=monthGrid.map(function(d){
     if(!d) return '<div class="d empty"></div>';
     var r=recOf(d),c=cnt(r),k=(c===0?0:c<=2?1:c<=4?2:3),s=(r&&r.cravingSOSCount?Number(r.cravingSOSCount):0),m=(r&&r.mood?MOOD_EMOJI[r.mood]||"":"");
-    return '<div class="d '+(d===selected?'active':'')+'" onclick="pickDay(\''+d+'\')"><div class="dm">'+d.slice(8)+'</div><div class="dl">'+m+'</div><div class="db k'+k+'">'+c+'/'+HT+(s?(' · SOS '+s):'')+'</div></div>';
+    return '<div class="d '+(d===selected?"active":"")+'" onclick="pickDay(\''+d+'\')"><div class="dm">'+d.slice(8)+'</div><div class="dl">'+m+'</div><div class="db k'+k+'">'+c+(s?" ·"+s:"")+'</div></div>';
   }).join("");
-  h+='<div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Aylik takvim · '+monthLabel(UI.month)+'</div><div class="cal">'+monthHead+daysHtml+'</div><div class="faint" style="font-size:11px;margin-top:8px;">Kutu rengi tik seviyesini, etiket ise kriz sayisini gosterir.</div></div></div>';
-  h+='<div class="grid2" style="margin-bottom:10px;"><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Notlar zaman cizelgesi</div><div style="max-height:250px;overflow:auto;padding-right:4px;">'+(noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="muted" style="font-size:12px;">'+esc(String(r.note).slice(0,120))+'</div></div>';}).join(""):'<div class="faint">Not kaydi yok</div>')+'</div></div><div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tatli krizi zaman cizelgesi</div><div style="max-height:250px;overflow:auto;padding-right:4px;">'+(sosRows.length?sosRows.map(function(d){var r=recOf(d),opts=(r.cravingOptionsUsed||[]).slice(0,3).join(", ");return '<div class="row" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="muted" style="font-size:12px;">SOS: <b>'+r.cravingSOSCount+'</b>'+(opts?(' · '+esc(opts)):'')+'</div></div>';}).join(""):'<div class="faint">Kriz kaydi yok</div>')+'</div></div></div>';
-  h+='<div class="card" style="padding:14px;margin-bottom:10px;"><div style="font-weight:800;margin-bottom:8px;">Aylik ozetler</div><div class="grid4">'+(months.length?months.map(function(m){return '<div class="chip"><div class="faint" style="font-size:11px;">'+monthLabel(m.month)+'</div><div class="mono" style="font-size:19px;font-weight:800;margin-top:2px;">'+m.avg.toFixed(1)+' / '+HT+'</div><div class="faint" style="font-size:11px;">SOS '+m.sos+' · '+m.days+' gun</div></div>';}).join(""):'<div class="faint">Aylik veri yok</div>')+'</div></div>';
-  var allRows=all.slice().reverse().map(function(d){ var r=recOf(d)||{},active=d===selected?" active":"",m=r.mood?MOOD_EMOJI[r.mood]||"":""; return '<div class="row'+active+'" onclick="pickDay(\''+d+'\')"><div style="min-width:72px;font-weight:700;font-size:12px;">'+shortD(d)+'</div><div class="mono faint" style="min-width:42px;">'+cnt(r)+'/'+HT+'</div><div style="min-width:24px;">'+m+'</div><div class="mono faint" style="min-width:42px;">SOS '+(r.cravingSOSCount||0)+'</div><div class="mono faint" style="min-width:52px;">'+(r.walk&&r.walk.steps!=null?r.walk.steps:"-")+'</div><div class="mono faint" style="min-width:52px;">'+(r.sleep&&r.sleep.hours!=null?r.sleep.hours:"-")+'</div><div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r.note?String(r.note).slice(0,84):"")+'</div></div>'; }).join("");
-  h+='<div class="card" style="padding:14px;"><div style="font-weight:800;margin-bottom:8px;">Tum gunler detayi</div><div style="max-height:320px;overflow:auto;padding-right:4px;">'+allRows+'</div></div>';
-  h+='<div class="faint" style="text-align:center;font-size:11px;margin-top:16px;">Canli izleme aktif · otomatik 5 dakikada bir yenilenir</div>';
+  h+='<div class="cal">'+monthHead+daysHtml+'</div>';
+  h+='</div>';
+
+  // Notlar + SOS
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">Son Notlar</div>';
+  h+='<div style="max-height:165px;overflow-y:auto;">';
+  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--t2);">'+esc(String(r.note).slice(0,90))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Not yok</div>';
+  h+='</div></div>';
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">SOS Geçmişi</div>';
+  h+='<div style="max-height:120px;overflow-y:auto;">';
+  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;">SOS '+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:12px;">Kriz yok</div>';
+  h+='</div></div>';
+  h+='</div>'; // end notlar col
+  h+='</div>'; // end calendar g2
+
+  // ── AYLIK ÖZET + TÜM GÜNLER ──────────────────────────────────
+  h+='<div class="g2" style="margin-top:10px;">';
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">Aylık Özetler</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:4px;">';
+  if(months.length){
+    months.slice(0,6).forEach(function(m){
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd2);">';
+      h+='<span style="font-size:12px;color:var(--t2);">'+monthLabel(m.month)+'</span>';
+      h+='<div style="display:flex;gap:12px;">';
+      h+='<span class="mono" style="font-size:13px;font-weight:800;">'+m.avg.toFixed(1)+'/'+HT+'</span>';
+      h+='<span style="font-size:11px;color:var(--t3);">SOS '+m.sos+'</span>';
+      h+='</div></div>';
+    });
+  } else {
+    h+='<span style="color:var(--t3);font-size:12px;">Veri yok</span>';
+  }
+  h+='</div></div>';
+  h+='<div class="card" style="padding:13px;">';
+  h+='<div class="lbl">Tüm Günler (son 50)</div>';
+  h+='<div style="max-height:200px;overflow-y:auto;">';
+  var allRows=all.slice().reverse().slice(0,50).map(function(d){
+    var r=recOf(d)||{},isSelected=d===selected,m=r.mood?MOOD_EMOJI[r.mood]||"":"";
+    return '<div class="row" style="'+(isSelected?"background:var(--ga);":"")+'" onclick="pickDay(\''+d+'\')">'
+      +'<span style="min-width:40px;font-weight:700;color:var(--t3);">'+shortD(d)+'</span>'
+      +'<span class="mono" style="min-width:28px;font-weight:700;color:var(--t1);">'+cnt(r)+'/'+HT+'</span>'
+      +'<span style="min-width:18px;">'+m+'</span>'
+      +'<span style="min-width:32px;color:var(--t3);font-size:11px;">SOS '+(r.cravingSOSCount||0)+'</span>'
+      +'<span style="color:var(--t2);font-size:11px;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">'+esc(r.note?String(r.note).slice(0,55):"")+'</span>'
+    +'</div>';
+  }).join("");
+  h+=allRows||'<div style="color:var(--t3);font-size:12px;">Gün yok</div>';
+  h+='</div></div>';
+  h+='</div>'; // end g2
+
+  h+='<div style="text-align:center;font-size:10.5px;color:var(--t3);padding:14px 0 4px;">Canlı izleme · 5dk\'da bir yenilenir</div>';
+  h+='</div>'; // end wrap
+
   document.getElementById("app").innerHTML=h;
   setTimeout(initLocMap,0);
 }
@@ -296,7 +487,7 @@ function initLocMap(){
 
   if(!_locMap){
     _locMap=L.map(container,{zoomControl:true,attributionControl:true});
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(_locMap);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(_locMap);
   }
 
   _locMap.setView([loc.lat,loc.lng],15);
@@ -345,7 +536,7 @@ function initLocMap(){
 }
 
 function fail(msg){
-  document.getElementById("app").innerHTML='<div class="card" style="padding:24px;max-width:760px;margin:30px auto;"><div style="font-weight:800;font-size:21px;margin-bottom:6px;">Panel baglantisi bekleniyor</div><div class="muted" style="font-size:14px;line-height:1.6;">Veri henuz okunamadi. Tekrar dene veya yeni anahtar gir.</div><div class="toolbar" style="margin-top:12px;"><button class="btn btn-primary" onclick="load()">Tekrar dene</button><button class="btn" onclick="resetPanelToken()">Yeni anahtar gir</button></div><div class="faint mono" style="font-size:11px;margin-top:10px;">'+esc(msg)+'</div></div>';
+  document.getElementById("app").innerHTML='<div style="max-width:700px;margin:60px auto;padding:0 16px;"><div class="card" style="padding:28px;"><div style="font-weight:800;font-size:20px;margin-bottom:8px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:14px;line-height:1.6;color:var(--t2);margin-bottom:16px;">Veri okunamadı. Tekrar dene veya yeni anahtar gir.</div><div style="display:flex;gap:8px;"><button class="btn" onclick="load()" style="padding:9px 18px;font-size:13px;background:linear-gradient(135deg,#6b4e13,#c8a84b);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:9px 18px;font-size:13px;">Yeni Anahtar</button></div><div style="font-size:10.5px;color:var(--t3);margin-top:12px;font-variant-numeric:tabular-nums;">'+esc(msg)+'</div></div></div>';
 }
 window.savePanelToken=function(){
   var v=normalizeToken((document.getElementById("ptok")||{}).value||""); if(!v) return;
@@ -354,7 +545,7 @@ window.savePanelToken=function(){
 };
 window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY);}catch(e){} PTOKEN=""; tokenPrompt(); };
 function tokenPrompt(msg){
-  document.getElementById("app").innerHTML='<div class="card" style="padding:22px;max-width:520px;margin:40px auto;"><div style="font-weight:800;font-size:22px;margin-bottom:6px;">Gozlemci girisi</div><div class="muted" style="font-size:13.5px;line-height:1.6;margin-bottom:12px;">Bir kez anahtar girildiginde panel otomatik canli takibe gecer.</div>'+(msg?'<div class="status warn" style="margin-bottom:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_... (Contents: Read)" style="width:100%;margin-bottom:10px;"><button class="btn btn-primary" onclick="savePanelToken()" style="width:100%;">Canli izlemeyi baslat</button></div>';
+  document.getElementById("app").innerHTML='<div style="max-width:480px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:28px;"><div style="font-size:20px;font-weight:800;margin-bottom:6px;">Observer Girişi</div><div style="font-size:13px;line-height:1.6;color:var(--t2);margin-bottom:14px;">GitHub token gir — panel otomatik canlı takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:12px;border-radius:9px;padding:8px 12px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_… (Contents: Read)" style="width:100%;margin-bottom:10px;padding:10px 12px;font-size:13px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:11px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#c8a84b);border:none;color:#fff;border-radius:9px;cursor:pointer;">Canlı İzlemeyi Başlat</button></div></div>';
 }
 function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");

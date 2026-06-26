@@ -136,6 +136,7 @@ function migrate(d){
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
   if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
+  if(!Array.isArray(d.notifications)) d.notifications=[];
   if(!d.locationHistory) d.locationHistory=[];
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   d.version=2;
@@ -490,7 +491,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main'},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main'},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -845,6 +846,7 @@ function render(){
   else if(ui.tab==='saglik') html+=saglikHTML();
   else if(ui.tab==='harita') html+=haritaHTML();
   else if(ui.tab==='rapor') html+=raporHTML();
+  else if(ui.tab==='mesaj') html+=mesajHTML();
   else if(ui.tab==='ayarlar') html+=ayarlarHTML();
   html+='</div>';
   html+=navHTML();
@@ -1316,11 +1318,14 @@ function cycleHTML(){
 }
 
 function navHTML(){
-  var defs=[['bugun','☀️','Bugün'],['saglik','🌸','Sağlık'],['sos','🍫','SOS'],['harita','🗺️','Harita'],['rapor','📊','Rapor'],['ayarlar','⚙️','Ayarlar']];
-  var h='<nav style="flex-shrink:0;display:flex;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(150,110,120,0.15);padding:8px 4px calc(env(safe-area-inset-bottom) + 8px);">';
+  var defs=[['bugun','☀️','Bugün'],['saglik','🌸','Sağlık'],['sos','🍫','SOS'],['mesaj','💌','Mesaj'],['harita','🗺️','Harita'],['rapor','📊','Rapor'],['ayarlar','⚙️','Ayarlar']];
+  var unread=unreadNotifCount();
+  var h='<nav style="flex-shrink:0;display:flex;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(150,110,120,0.15);padding:8px 2px calc(env(safe-area-inset-bottom) + 8px);">';
   defs.forEach(function(n){
     var active=ui.tab===n[0];
-    h+='<button onclick="App.go(\''+n[0]+'\')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;background:none;border:none;cursor:pointer;font-size:10.5px;color:'+(active?'var(--accent)':'var(--faint)')+';font-weight:'+(active?'700':'500')+';transition:color .2s;"><span style="font-size:21px;line-height:1;">'+n[1]+'</span><span style="line-height:1;">'+n[2]+'</span></button>';
+    var badge=(n[0]==='mesaj'&&unread>0)?'<span style="position:absolute;top:-3px;right:50%;transform:translateX(15px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#E9576F;color:#fff;font-size:10px;font-weight:800;line-height:16px;text-align:center;box-shadow:0 2px 6px rgba(233,87,111,0.5);">'+(unread>9?'9+':unread)+'</span>':'';
+    var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
+    h+='<button onclick="'+clickFn+'" style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 1px;background:none;border:none;cursor:pointer;font-size:10px;color:'+(active?'var(--accent)':'var(--faint)')+';font-weight:'+(active?'700':'500')+';transition:color .2s;"><span style="position:relative;font-size:20px;line-height:1;">'+n[1]+badge+'</span><span style="line-height:1;">'+n[2]+'</span></button>';
   });
   h+='</nav>';
   return h;
@@ -1523,6 +1528,107 @@ window.addEventListener('visibilitychange',function(){
   else resetSession();
 });
 updateLiveSession();
+
+// ---------- observer mesajları / bildirimler ----------
+function notifList(){ return (data&&Array.isArray(data.notifications))?data.notifications:[]; }
+function unreadNotifCount(){ return notifList().filter(function(n){ return n&&!n.deleted&&!n.read; }).length; }
+function ghCfgApp(){
+  var s=(data&&data.settings)?data.settings:{};
+  var tok=normalizeToken(s.ghToken||''), repo=String(s.ghRepo||'').trim();
+  if(!tok||repo.indexOf('/')<1) return null;
+  var p=repo.split('/'); if(p.length!==2||!p[0].trim()||!p[1].trim()) return null;
+  return {token:tok,owner:p[0].trim(),repo:p[1].trim(),branch:String(s.ghBranch||'main').trim()||'main'};
+}
+function fetchObserverInbox(){
+  var c=ghCfgApp(); if(!c) return;
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/observer-inbox.json?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
+  fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(function(r){ if(r.status===404) return null; if(!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function(j){ if(j&&Array.isArray(j.messages)) mergeInbox(j.messages); })
+    .catch(function(){});
+}
+function mergeInbox(msgs){
+  if(!data) return;
+  if(!Array.isArray(data.notifications)) data.notifications=[];
+  var seenId={}; data.notifications.forEach(function(n){ if(n&&n.id) seenId[n.id]=1; });
+  var nowIso=new Date().toISOString(), added=0;
+  msgs.forEach(function(m){
+    if(!m||!m.id||seenId[m.id]) return;
+    data.notifications.push({id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false});
+    added++;
+  });
+  if(added>0){
+    save(); // latest.json'a yaz → observer "iletildi" görür
+    if(ui.tab==='mesaj'){ markNotifsRead(); }
+    render();
+    showInboxPopup();
+  }
+}
+function markNotifsRead(){
+  var changed=false, nowIso=new Date().toISOString();
+  notifList().forEach(function(n){ if(n&&!n.deleted&&!n.read){ n.read=true; n.readAt=nowIso; n.seen=true; changed=true; } });
+  if(changed) save();
+}
+function showInboxPopup(){
+  var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
+  if(!pend.length) return;
+  var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
+  var latest=pend[pend.length-1];
+  var more=pend.length-1;
+  var when=''; try{ when=new Date(latest.ts).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
+  var txt=String(latest.text||'').slice(0,150);
+  var pop=document.createElement('div'); pop.id='sey-inbox-pop';
+  pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
+  var inner='';
+  inner+='<div style="position:relative;overflow:hidden;border-radius:20px;padding:15px 16px 14px;background:linear-gradient(135deg,#FBE9EF 0%,#F0E7FF 100%);border:1px solid rgba(201,184,255,0.5);box-shadow:0 18px 44px rgba(150,110,170,0.35),0 2px 8px rgba(0,0,0,0.06);">';
+  inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 90% -10%,rgba(233,137,159,0.18),transparent 60%);"></div>';
+  inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
+  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#E9899F,#C9B8FF);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 6px 16px rgba(201,150,180,0.45);">💌</div>';
+  inner+='<div style="flex:1;min-width:0;">';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;color:#7A4A66;">Observer’dan mesaj</span>'+(when?'<span style="font-size:11px;color:#A88;margin-left:auto;font-weight:600;">'+esc(when)+'</span>':'')+'</div>';
+  inner+='<div style="font-size:14px;line-height:1.45;color:#4A3A44;margin-top:4px;word-break:break-word;">'+esc(txt)+(latest.text&&latest.text.length>150?'…':'')+'</div>';
+  if(more>0) inner+='<div style="font-size:11.5px;color:#9A7;margin-top:5px;font-weight:700;">+'+more+' yeni mesaj daha</div>';
+  inner+='<div style="display:flex;gap:8px;margin-top:12px;">';
+  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#E9899F,#C9B8FF);color:#fff;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(220,140,170,0.4);">Bildirimleri gör</button>';
+  inner+='<button onclick="App.dismissPopup()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
+  inner+='</div></div>';
+  inner+='<button onclick="App.dismissPopup()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;font-size:17px;line-height:1;font-weight:700;">✕</button>';
+  inner+='</div>';
+  pop.innerHTML=inner;
+  document.body.appendChild(pop);
+}
+function mesajHTML(){
+  var list=notifList().filter(function(n){ return n&&!n.deleted; }).slice().sort(function(a,b){ return String(b.ts||b.receivedAt||'').localeCompare(String(a.ts||a.receivedAt||'')); });
+  var h='<div style="display:flex;align-items:center;gap:10px;margin:2px 2px 4px;"><div style="width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#E9899F,#C9B8FF);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 16px rgba(201,150,180,0.4);">💌</div><div><div style="font-size:19px;font-weight:800;color:var(--text);">Bildirimler</div><div style="font-size:12.5px;color:var(--faint);">Observer’dan gelen mesajlar</div></div></div>';
+  if(!list.length){
+    h+='<div style="text-align:center;padding:48px 18px;color:var(--faint);"><div style="font-size:42px;opacity:0.45;margin-bottom:10px;">📭</div><div style="font-size:14.5px;font-weight:600;">Henüz bildirim yok</div><div style="font-size:12.5px;margin-top:4px;">Observer sana mesaj gönderdiğinde burada görünecek.</div></div>';
+    return h;
+  }
+  list.forEach(function(n){
+    var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
+    var unread=!n.read;
+    h+='<div style="position:relative;background:var(--card);border:1px solid '+(unread?'rgba(201,184,255,0.55)':'rgba(150,110,120,0.14)')+';border-radius:18px;padding:13px 14px;box-shadow:0 4px 14px rgba(150,110,120,0.08);'+(unread?'border-left:3px solid #C9B8FF;':'')+'">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    h+='<span style="font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:999px;padding:3px 10px;">Observer</span>';
+    if(unread) h+='<span style="width:8px;height:8px;border-radius:50%;background:#E9576F;box-shadow:0 0 7px #E9576F;"></span>';
+    h+='<span style="font-size:11.5px;color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span>';
+    h+='</div>';
+    h+='<div style="font-size:14.5px;line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
+    h+='<div style="display:flex;align-items:center;margin-top:10px;">';
+    h+='<span style="font-size:11px;color:var(--faint);font-weight:600;">'+(n.read?'✓✓ Okundu':'• Yeni')+'</span>';
+    h+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:10px;">🗑 Sil</button>';
+    h+='</div>';
+    h+='</div>';
+  });
+  return h;
+}
+App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
+App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
+
+setTimeout(fetchObserverInbox,1500);
+setInterval(fetchObserverInbox,240000);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) fetchObserverInbox(); });
 
 render();
 })();

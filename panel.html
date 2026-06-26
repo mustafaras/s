@@ -966,6 +966,7 @@ function load(){
       fail(m);
     });
 }
+window.load=load;
 try{
   PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");
   var raw=localStorage.getItem(APPKEY);

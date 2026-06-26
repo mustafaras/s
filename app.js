@@ -1616,27 +1616,53 @@ var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişis
 +'sonunda nazik, güç veren bir kapanış cümlesi ekle. Aşağıdaki kişisel kayıtlardan yararlan ve mümkün olduğunca '
 +'bu veriye dayan; bilmediğin şeyi uydurma. Tıbbi teşhis veya tedavi verme; ciddi bir durum sezersen nazikçe '
 +'bir uzmana danışmasını öner. Asla yargılama, suçlama veya utandırma; umut veren, güçlendiren bir dille konuş. Her zaman Türkçe yaz.';
+function lunaDayLine(d,r){
+  var parts=[];
+  parts.push(countRec(r)+'/'+HABIT_TOTAL+' tik');
+  if(r.mood){ var mo=find(MOODS,'id',r.mood); parts.push('mod:'+(mo?mo.short:r.mood)); }
+  if(r.sleep&&r.sleep.hours!=null) parts.push('uyku:'+r.sleep.hours+'sa'+(r.sleep.quality?('('+r.sleep.quality+')'):''));
+  if(r.cravingSOSCount) parts.push('SOS:'+r.cravingSOSCount);
+  if(r.walk&&r.walk.steps!=null) parts.push('adım:'+r.walk.steps);
+  var meals=[]; if(r.meals){ ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(r.meals[k]&&String(r.meals[k]).trim()) meals.push(String(r.meals[k]).trim()); }); }
+  if(meals.length) parts.push('yemek:'+meals.join(' / '));
+  if(Array.isArray(r.symptoms)&&r.symptoms.length) parts.push('belirti:'+r.symptoms.join(','));
+  if(r.flow) parts.push('regl:'+r.flow);
+  if(r.note&&String(r.note).trim()) parts.push('not:"'+String(r.note).trim()+'"');
+  return d+' → '+parts.join(' · ');
+}
 function lunaContext(){
   var today=todayStr(), rec=data.days[today], lines=[];
+  var dates=Object.keys(data.days||{}).filter(function(d){ return data.days[d]; }).sort();
+  // ── profil / özet ──
   lines.push('Bugünün tarihi: '+today);
+  lines.push('Takip başlangıcı: '+data.startDate+' · Kayıtlı gün sayısı: '+dates.length+' · Aktif seri: '+currentStreak()+' gün');
+  // ── bugün detay ──
   var mealStr='kayıt yok';
   if(rec&&rec.meals){ var ms=MEALS.map(function(m){ var v=rec.meals[m.key]; return (v&&String(v).trim())?(m.label+': '+String(v).trim()):null; }).filter(Boolean); if(ms.length) mealStr=ms.join(' · '); }
-  lines.push('Bugün yedikleri: '+mealStr);
   var moodO=rec&&rec.mood?find(MOODS,'id',rec.mood):null;
-  lines.push('Bugünkü mod: '+(moodO?moodO.short:'—'));
-  if(rec&&rec.sleep&&rec.sleep.hours!=null) lines.push('Bugünkü uyku: '+rec.sleep.hours+' saat'+(rec.sleep.quality?(' ('+rec.sleep.quality+')'):''));
-  lines.push('Bugünkü alışkanlık tikleri: '+(rec?countRec(rec):0)+'/'+HABIT_TOTAL);
-  if(rec&&rec.cravingSOSCount) lines.push('Bugün tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
-  if(rec&&Array.isArray(rec.symptoms)&&rec.symptoms.length) lines.push('Bugünkü belirtiler: '+rec.symptoms.join(', '));
-  if(rec&&rec.note&&String(rec.note).trim()) lines.push('Bugünkü not: '+String(rec.note).trim());
-  var sleepVals=[],sosSum=0,tikSum=0,dayCount=0;
-  for(var i=0;i<7;i++){ var d=addDays(today,-i), r=data.days[d]; if(!r) continue; dayCount++; if(r.sleep&&r.sleep.hours!=null) sleepVals.push(Number(r.sleep.hours)); if(r.cravingSOSCount) sosSum+=Number(r.cravingSOSCount); tikSum+=countRec(r); }
-  if(sleepVals.length){ var sa=sleepVals.reduce(function(a,b){return a+b;},0)/sleepVals.length; lines.push('Son 7 gün uyku ortalaması: '+(Math.round(sa*10)/10)+' saat'); }
-  lines.push('Son 7 gün SOS toplamı: '+sosSum);
-  if(dayCount) lines.push('Son 7 gün tik ortalaması: '+(Math.round(tikSum/dayCount*10)/10)+'/'+HABIT_TOTAL);
-  lines.push('Aktif seri: '+currentStreak()+' gün');
-  if(data.cycle){ lines.push('Ortalama döngü: '+data.cycle.avgCycle+' gün, ortalama regl süresi: '+data.cycle.avgPeriod+' gün'); if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start) lines.push('Son regl başlangıcı: '+last.start); } }
-  return 'Şeyma hakkında bildiklerin (gizli kişisel kayıtlar):\n'+lines.join('\n');
+  lines.push('');
+  lines.push('--- Bugün ---');
+  lines.push('Yedikleri: '+mealStr);
+  lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+HABIT_TOTAL+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
+  if(rec&&rec.cravingSOSCount) lines.push('Tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
+  if(rec&&Array.isArray(rec.symptoms)&&rec.symptoms.length) lines.push('Belirtiler: '+rec.symptoms.join(', '));
+  if(rec&&rec.note&&String(rec.note).trim()) lines.push('Not: '+String(rec.note).trim());
+  // ── 7 ve 30 günlük ortalamalar ──
+  function agg(n){ var sv=[],sos=0,tik=0,c=0; for(var i=0;i<n;i++){ var d=addDays(today,-i),r=data.days[d]; if(!r) continue; c++; if(r.sleep&&r.sleep.hours!=null) sv.push(Number(r.sleep.hours)); if(r.cravingSOSCount) sos+=Number(r.cravingSOSCount); tik+=countRec(r); } var sa=sv.length?(Math.round(sv.reduce(function(a,b){return a+b;},0)/sv.length*10)/10):null; return {days:c,sleepAvg:sa,sos:sos,tikAvg:c?(Math.round(tik/c*10)/10):0}; }
+  var a7=agg(7),a30=agg(30);
+  lines.push('');
+  lines.push('--- Ortalamalar ---');
+  lines.push('Son 7 gün: uyku '+(a7.sleepAvg!=null?a7.sleepAvg+' sa':'—')+' · SOS '+a7.sos+' · tik '+a7.tikAvg+'/'+HABIT_TOTAL);
+  lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+HABIT_TOTAL);
+  // ── döngü ──
+  if(data.cycle){ var cl='Döngü: ort '+data.cycle.avgCycle+' gün, regl ort '+data.cycle.avgPeriod+' gün'; if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start){ cl+=' · son regl başlangıcı '+last.start; var nx=addDays(last.start,data.cycle.avgCycle); cl+=' · tahmini sonraki ~'+nx; } } lines.push(''); lines.push(cl); }
+  // ── tüm günlük kayıtlar (en yeni en üstte) ──
+  if(dates.length){
+    lines.push('');
+    lines.push('--- Tüm günlük kayıtlar ('+dates.length+' gün) ---');
+    dates.slice().reverse().forEach(function(d){ lines.push(lunaDayLine(d,data.days[d])); });
+  }
+  return 'Şeyma hakkında bildiğin HER ŞEY (yalnızca Şeyma’ya ait gizli kişisel kayıtlar — tümünü okuyabilir ve bütününe bakarak yanıt verebilirsin):\n'+lines.join('\n');
 }
 function finishLuna(question,answer){
   if(!answer||!answer.trim()){ ui.lunaAsking=false; ui.lunaError='Luna şu an yanıt veremedi. Birazdan tekrar dene.'; render(); return; }

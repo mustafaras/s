@@ -18,19 +18,19 @@
     --r:10px;
   }
   html,body{height:100%;background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter",system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
-  .topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(6,6,9,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 16px;height:44px;display:flex;align-items:center;justify-content:space-between}
-  .page{position:fixed;top:44px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:10px 12px 16px}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(6,6,9,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between}
+  .page{position:fixed;top:52px;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;padding:10px 12px 16px}
   .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r)}
-  .btn{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 11px;border-radius:7px;font-weight:600;font-size:11px;cursor:pointer;transition:all .15s}
+  .btn{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 11px;border-radius:7px;font-weight:600;font-size:22px;cursor:pointer;transition:all .15s}
   .btn:hover{background:var(--s3);color:var(--t1)}
-  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.2px}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:20px;font-weight:700;letter-spacing:.2px}
   .b-ok{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
   .b-warn{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
   .b-danger{background:var(--ra);color:var(--red);border:1px solid var(--rb)}
   .b-gold{background:var(--ga);color:var(--gold);border:1px solid var(--gb)}
   .b-dim{background:rgba(255,255,255,0.03);color:var(--t3);border:1px solid var(--bd)}
   .seg{display:flex;gap:3px}
-  .seg button{background:var(--s2);border:1px solid var(--bd2);color:var(--t3);padding:3px 8px;border-radius:6px;font-weight:700;font-size:10px;cursor:pointer;transition:all .15s}
+  .seg button{background:var(--s2);border:1px solid var(--bd2);color:var(--t3);padding:3px 8px;border-radius:6px;font-weight:700;font-size:20px;cursor:pointer;transition:all .15s}
   .seg button.active{border-color:var(--gb);background:var(--ga);color:var(--gold)}
   .seg button:hover:not(.active){color:var(--t2)}
   .mono{font-variant-numeric:tabular-nums}
@@ -48,13 +48,13 @@
 
   /* Metric tile */
   .mtile{padding:10px 12px}
-  .mtile .mv{font-size:22px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
-  .mtile .ml{font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+  .mtile .mv{font-size:44px;font-weight:800;line-height:1.1;letter-spacing:-.5px}
+  .mtile .ml{font-size:18px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
 
-  .lbl{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+  .lbl{font-size:18px;font-weight:700;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
   .divider{height:1px;background:var(--bd2);margin:6px 0}
 
-  input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:6px;padding:4px 8px;font:inherit;outline:none;font-size:11px;color-scheme:dark}
+  input[type="date"],input[type="month"],input[type="password"]{background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:6px;padding:4px 8px;font:inherit;outline:none;font-size:22px;color-scheme:dark}
 
   #loc-map{height:100%;min-height:180px;border-radius:8px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
   .loc-live{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
@@ -62,7 +62,7 @@
   .loc-none{background:rgba(255,255,255,0.03);color:var(--t3);border:1px solid var(--bd)}
 
   .habit-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-  .row{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:6px;cursor:pointer;font-size:11px}
+  .row{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:6px;cursor:pointer;font-size:22px}
   .row:hover{background:var(--s2)}
 
   @media(max-width:1100px){
@@ -243,13 +243,13 @@ function render(){
   // ── TOPBAR ──────────────────────────────────────────────────
   h+='<div class="topbar">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<span style="font-size:13px;font-weight:800;letter-spacing:-.3px;">Observer</span>';
+  h+='<span style="font-size:26px;font-weight:800;letter-spacing:-.3px;">Observer</span>';
   h+='<span class="badge '+freshClass+'">'+fresh.txt+'</span>';
   h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
-  h+='<span class="'+locBadgeClass+'" style="font-size:9.5px;">📍 '+locBadgeTxt+'</span>';
+  h+='<span class="'+locBadgeClass+'" style="font-size:19px;">📍 '+locBadgeTxt+'</span>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;gap:5px;">';
-  h+='<span style="font-size:10px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"-")+'</span>';
+  h+='<span style="font-size:20px;color:var(--t3);font-variant-numeric:tabular-nums;">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"-")+'</span>';
   h+='<button class="btn" onclick="location.reload()">↺</button>';
   h+='<button class="btn" onclick="resetPanelToken()">⚿</button>';
   h+='</div></div>';
@@ -270,11 +270,11 @@ function render(){
 
   // ROW 1: 6 metric tiles (each span-2 = we use 6 cards across 12 cols)
   var metrics=[
-    [currentStreak()+'<small style="font-size:12px;font-weight:600;">g</small>','Aktif Seri','var(--gold)'],
-    [bestStreak(all)+'<small style="font-size:12px;font-weight:600;">g</small>','En İyi Seri','var(--gold)'],
-    [curAvg.toFixed(1)+'<small style="font-size:12px;font-weight:600;">/'+HT+'</small>','Tik Ort','var(--green)'],
+    [currentStreak()+'<small style="font-size:24px;font-weight:600;">g</small>','Aktif Seri','var(--gold)'],
+    [bestStreak(all)+'<small style="font-size:24px;font-weight:600;">g</small>','En İyi Seri','var(--gold)'],
+    [curAvg.toFixed(1)+'<small style="font-size:24px;font-weight:600;">/'+HT+'</small>','Tik Ort','var(--green)'],
     [curSos,'SOS','var(--red)'],
-    [(Math.round(curSleep*10)/10).toFixed(1)+'<small style="font-size:12px;font-weight:600;">sa</small>','Uyku Ort','var(--purple)'],
+    [(Math.round(curSleep*10)/10).toFixed(1)+'<small style="font-size:24px;font-weight:600;">sa</small>','Uyku Ort','var(--purple)'],
     [formatDuration(curSess.totalActive),'Kullanım','var(--t2)']
   ];
   metrics.forEach(function(m){
@@ -289,17 +289,17 @@ function render(){
   // Map card
   h+='<div class="card span-5" style="padding:10px;min-height:220px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">';
-  h+='<span style="font-size:11px;font-weight:700;">📍 Konum</span>';
+  h+='<span style="font-size:22px;font-weight:700;">📍 Konum</span>';
   if(loc){
     var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
-    h+='<a href="'+mapsUrl+'" target="_blank" style="font-size:9px;color:var(--gold);text-decoration:none;font-weight:700;">Maps →</a>';
+    h+='<a href="'+mapsUrl+'" target="_blank" style="font-size:18px;color:var(--gold);text-decoration:none;font-weight:700;">Maps →</a>';
   }
   h+='</div>';
   if(loc){
     h+='<div id="loc-map" style="height:calc(100% - 54px);"></div>';
-    h+='<div id="loc-address" style="font-size:10px;color:var(--t3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Adres yükleniyor…</div>';
+    h+='<div id="loc-address" style="font-size:20px;color:var(--t3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Adres yükleniyor…</div>';
   } else {
-    h+='<div style="display:flex;align-items:center;justify-content:center;height:calc(100% - 30px);color:var(--t3);font-size:11px;opacity:.5;">Konum verisi bekleniyor</div>';
+    h+='<div style="display:flex;align-items:center;justify-content:center;height:calc(100% - 30px);color:var(--t3);font-size:22px;opacity:.5;">Konum verisi bekleniyor</div>';
   }
   h+='</div>';
 
@@ -314,8 +314,8 @@ function render(){
     [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'sa':'—','Uyku','var(--purple)']
   ].forEach(function(d){
     h+='<div style="background:var(--s2);border:1px solid var(--bd2);border-radius:7px;padding:6px 3px;text-align:center;">';
-    h+='<div class="mono" style="font-size:15px;font-weight:800;color:'+d[2]+';">'+d[0]+'</div>';
-    h+='<div style="font-size:8px;color:var(--t3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:2px;">'+d[1]+'</div>';
+    h+='<div class="mono" style="font-size:30px;font-weight:800;color:'+d[2]+';">'+d[0]+'</div>';
+    h+='<div style="font-size:16px;color:var(--t3);font-weight:700;letter-spacing:.3px;text-transform:uppercase;margin-top:2px;">'+d[1]+'</div>';
     h+='</div>';
   });
   h+='</div>';
@@ -324,12 +324,12 @@ function render(){
     var ok=!!(srec.habits&&srec.habits[hb[0]]);
     h+='<div style="display:flex;align-items:center;gap:6px;padding:2px 0;">';
     h+='<span class="habit-dot" style="background:'+(ok?"var(--green)":"rgba(255,255,255,.1)")+';"></span>';
-    h+='<span style="font-size:11px;color:'+(ok?"var(--t1)":"var(--t3)")+';">'+hb[1]+'</span>';
+    h+='<span style="font-size:22px;color:'+(ok?"var(--t1)":"var(--t3)")+';">'+hb[1]+'</span>';
     h+='</div>';
   });
-  if(syms) h+='<div style="font-size:9.5px;color:var(--t3);margin-top:4px;">'+esc(syms)+'</div>';
+  if(syms) h+='<div style="font-size:19px;color:var(--t3);margin-top:4px;">'+esc(syms)+'</div>';
   if(srec.note&&String(srec.note).trim()){
-    h+='<div style="margin-top:6px;padding:6px 8px;border-radius:6px;background:var(--s2);font-size:10px;color:var(--t2);line-height:1.4;border:1px solid var(--bd2);">'+esc(String(srec.note).slice(0,80))+'</div>';
+    h+='<div style="margin-top:6px;padding:6px 8px;border-radius:6px;background:var(--s2);font-size:20px;color:var(--t2);line-height:1.4;border:1px solid var(--bd2);">'+esc(String(srec.note).slice(0,80))+'</div>';
   }
   h+='</div>';
 
@@ -339,9 +339,9 @@ function render(){
   Object.keys(moodDist).forEach(function(k){
     var c=moodDist[k],total=cur.length,pct=total?Math.round(c/total*100):0;
     h+='<div style="display:flex;align-items:center;gap:5px;padding:2px 0;">';
-    h+='<span style="font-size:11px;width:18px;text-align:center;">'+(MOOD_EMOJI[k]||"")+'</span>';
+    h+='<span style="font-size:22px;width:28px;text-align:center;">'+(MOOD_EMOJI[k]||"")+'</span>';
     h+='<div style="flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:var(--gold);border-radius:2px;"></div></div>';
-    h+='<span class="mono" style="font-size:10px;font-weight:700;min-width:18px;text-align:right;color:var(--t2);">'+c+'</span>';
+    h+='<span class="mono" style="font-size:20px;font-weight:700;min-width:24px;text-align:right;color:var(--t2);">'+c+'</span>';
     h+='</div>';
   });
   h+='<div class="divider"></div>';
@@ -354,8 +354,8 @@ function render(){
     ['Haz. ort.', curRit.avgScore+'/100']
   ].forEach(function(x){
     h+='<div style="display:flex;justify-content:space-between;padding:2px 0;">';
-    h+='<span style="font-size:10px;color:var(--t3);">'+x[0]+'</span>';
-    h+='<span class="mono" style="font-size:10px;font-weight:700;">'+x[1]+'</span>';
+    h+='<span style="font-size:20px;color:var(--t3);">'+x[0]+'</span>';
+    h+='<span class="mono" style="font-size:20px;font-weight:700;">'+x[1]+'</span>';
     h+='</div>';
   });
   h+='</div>';
@@ -364,7 +364,7 @@ function render(){
   h+='<div class="card span-8" style="padding:10px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">';
   h+='<span class="lbl" style="margin:0;">Tik Trendi · '+UI.range+'g</span>';
-  h+='<span class="mono" style="font-size:10px;color:var(--t3);">ort '+curAvg.toFixed(1)+' → '+trend(curAvg,prevAvg)+'</span>';
+  h+='<span class="mono" style="font-size:20px;color:var(--t3);">ort '+curAvg.toFixed(1)+' → '+trend(curAvg,prevAvg)+'</span>';
   h+='</div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#d4af37",64);
   h+='</div>';
@@ -380,8 +380,8 @@ function render(){
     ['Ritüel',       curRit.doneDays+' gün']
   ].forEach(function(x){
     h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd2);">';
-    h+='<span style="font-size:10px;color:var(--t3);">'+x[0]+'</span>';
-    h+='<span class="mono" style="font-size:10px;font-weight:700;">'+x[1]+'</span>';
+    h+='<span style="font-size:20px;color:var(--t3);">'+x[0]+'</span>';
+    h+='<span class="mono" style="font-size:20px;font-weight:700;">'+x[1]+'</span>';
     h+='</div>';
   });
   h+='</div>';
@@ -390,7 +390,7 @@ function render(){
   h+='<div class="card span-4" style="padding:10px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">';
   h+='<span class="lbl" style="margin:0;">SOS · '+UI.range+'g</span>';
-  h+='<span class="mono" style="font-size:10px;color:var(--red);">'+curSos+' toplam</span>';
+  h+='<span class="mono" style="font-size:20px;color:var(--red);">'+curSos+' toplam</span>';
   h+='</div>';
   h+=sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",48);
   h+='</div>';
@@ -398,18 +398,18 @@ function render(){
   h+='<div class="card span-4" style="padding:10px;">';
   h+='<div class="lbl">Son Notlar</div>';
   h+='<div style="max-height:80px;overflow-y:auto;">';
-  h+=noteRows.length?noteRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:10px;">'+shortD(d)+'</span><span style="color:var(--t2);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(String(r.note).slice(0,50))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:10px;">Not yok</div>';
+  h+=noteRows.length?noteRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:20px;">'+shortD(d)+'</span><span style="color:var(--t2);font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(String(r.note).slice(0,50))+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:20px;">Not yok</div>';
   h+='</div></div>';
 
   h+='<div class="card span-4" style="padding:10px;">';
   h+='<div class="lbl">SOS Geçmişi</div>';
   h+='<div style="max-height:80px;overflow-y:auto;">';
-  h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:10px;">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;font-size:10px;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:10px;">Kriz yok</div>';
+  h+=sosRows.length?sosRows.slice(0,6).map(function(d){var r=recOf(d);return '<div class="row" onclick="pickDay(\''+d+'\')"><span style="min-width:32px;font-weight:700;color:var(--t3);font-size:20px;">'+shortD(d)+'</span><span style="color:var(--red);font-weight:700;font-size:20px;">SOS ×'+r.cravingSOSCount+'</span></div>';}).join(""):'<div style="color:var(--t3);font-size:20px;">Kriz yok</div>';
   h+='</div></div>';
 
   h+='</div>'; // end bento
 
-  h+='<div style="text-align:center;font-size:9px;color:var(--t3);padding:8px 0 2px;opacity:.6;">Canlı izleme · 5dk yenileme</div>';
+  h+='<div style="text-align:center;font-size:18px;color:var(--t3);padding:8px 0 2px;opacity:.6;">Canlı izleme · 5dk yenileme</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;

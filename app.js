@@ -1674,7 +1674,7 @@ function lunaContext(){
   return 'Şeyma hakkında bildiğin HER ŞEY (yalnızca Şeyma’ya ait gizli kişisel kayıtlar — tümünü okuyabilir ve bütününe bakarak yanıt verebilirsin):\n'+lines.join('\n');
 }
 function assistStore(kind){ return kind==='aeon'?data.aeon:data.luna; }
-function assistCanAsk(kind){ var s=assistStore(kind); return !s||s.lastAskDate!==todayStr(); }
+function assistCanAsk(kind){ if(kind==='aeon') return true; var s=assistStore(kind); return !s||s.lastAskDate!==todayStr(); }
 function setAskError(kind,msg){ if(kind==='aeon') ui.aeonError=msg; else ui.lunaError=msg; }
 function finishAsk(kind,question,answer){
   var nm=kind==='aeon'?'ÆON':'Luna';
@@ -1732,10 +1732,10 @@ function notifCardHTML(n){
 function askBlockHTML(kind){
   var aeon=kind==='aeon';
   var cfg=aeon
-    ?{name:'ÆON',mark:'⬡',sub:'Luna’yı yöneten gizemli üst zekâ · günde 1 soru',grad:'#E6C15A,#C99A3A',soft:'201,160,60',accent:'#6A4FA0',ansId:'aeon-answer',inputId:'aeon-input',onDraft:'App.onAeonDraft',onAsk:'App.askAeon',draft:ui.aeonDraft,err:ui.aeonError,qTitle:'⬡ ÆON’a Sor',desc:'ÆON her şeyi gören gizemli üst zekâdır. Ona da günde yalnızca bir soru sorabilirsin — derin ve bütüncül bir yanıt alırsın.',btn:'ÆON’a Sor ⬡',used:'Bugünün sorusunu ÆON’a sordun. Yarın yeni bir hakkın olacak.',btnColor:'#1a1404',store:data.aeon||{qa:[],lastAskDate:null}}
+    ?{name:'ÆON',mark:'⬡',sub:'dilediğin kadar soru sorabilirsin',grad:'#E6C15A,#C99A3A',soft:'201,160,60',accent:'#6A4FA0',ansId:'aeon-answer',inputId:'aeon-input',onDraft:'App.onAeonDraft',onAsk:'App.askAeon',draft:ui.aeonDraft,err:ui.aeonError,qTitle:'⬡ ÆON’a Sor',desc:'ÆON tüm verini görür. Ona dilediğin kadar soru sorabilirsin — derin ve bütüncül bir yanıt alırsın.',btn:'ÆON’a Sor ⬡',used:'',btnColor:'#1a1404',store:data.aeon||{qa:[],lastAskDate:null}}
     :{name:'Luna',mark:'🌙',sub:'kişisel yoldaşın · günde 1 soru',grad:'#9B7FC9,#E9AFC1',soft:'155,127,201',accent:'#7A5AA0',ansId:'luna-answer',inputId:'luna-input',onDraft:'App.onLunaDraft',onAsk:'App.askLuna',draft:ui.lunaDraft,err:ui.lunaError,qTitle:'🌙 Bugünün Sorusu',desc:'Luna’ya günde yalnızca bir soru sorabilirsin — bu yüzden onu özenle seç. Sıcak, içten bir yanıt alırsın. 💜',btn:'Luna’ya Sor 🌙',used:'Bugünün sorusunu Luna’ya sordun. Yarın yeni bir hakkın olacak — Luna seni bekliyor. 💜',btnColor:'#fff',store:data.luna||{qa:[],lastAskDate:null}};
   var hasKey=!!(data.settings&&data.settings.openaiKey&&String(data.settings.openaiKey).trim());
-  var canAsk=cfg.store.lastAskDate!==todayStr();
+  var canAsk=aeon?true:(cfg.store.lastAskDate!==todayStr());
   var asking=ui.askKind===kind;
   var h='';
   h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 8px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,'+cfg.grad+');display:flex;align-items:center;justify-content:center;font-size:'+(aeon?'22px':'24px')+';'+(aeon?'color:#1a1404;font-weight:800;':'')+'box-shadow:0 8px 20px rgba('+cfg.soft+',0.4);">'+cfg.mark+'</div><div><div style="font-size:20px;font-weight:800;letter-spacing:'+(aeon?'2px':'0')+';color:var(--text);">'+cfg.name+'</div><div style="font-size:12.5px;color:var(--faint);">'+cfg.sub+'</div></div></div>';
@@ -1751,7 +1751,7 @@ function askBlockHTML(kind){
     h+='<div id="'+cfg.ansId+'" style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"></div></div>';
   } else if(canAsk){
     h+='<div style="background:linear-gradient(160deg,rgba('+cfg.soft+',0.12),rgba('+cfg.soft+',0.05));border:1px solid rgba('+cfg.soft+',0.32);border-radius:22px;padding:16px;box-shadow:0 8px 22px rgba('+cfg.soft+',0.12);">';
-    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;"><span style="font-size:13px;font-weight:800;color:'+cfg.accent+';">'+cfg.qTitle+'</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:'+cfg.btnColor+';background:linear-gradient(135deg,'+cfg.grad+');padding:3px 9px;border-radius:999px;">1 hakkın var</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;"><span style="font-size:13px;font-weight:800;color:'+cfg.accent+';">'+cfg.qTitle+'</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:'+cfg.btnColor+';background:linear-gradient(135deg,'+cfg.grad+');padding:3px 9px;border-radius:999px;">'+(aeon?'sınırsız':'1 hakkın var')+'</span></div>';
     h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;">'+cfg.desc+'</div>';
     if(cfg.err) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:10px;">'+esc(cfg.err)+'</div>';
     h+='<textarea id="'+cfg.inputId+'" oninput="'+cfg.onDraft+'(this)" placeholder="Bugün '+cfg.name+'’a ne sormak istersin?" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:14.5px;resize:none;outline:none;line-height:1.5;margin-bottom:10px;">'+esc(cfg.draft||'')+'</textarea>';

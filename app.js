@@ -20,6 +20,7 @@ var MOODS=[
   {id:'cok-zorlandim',label:'Çok zorlandım 🫧',short:'Çok zor',emoji:'🫧',resp:'Bugün sadece kendine yüklenmemek bile yeter 🫧'}
 ];
 var SOS_OPTS=['Su içtim 💧','Kahve/çay yaptım ☕','Yoğurt + tarçın denedim 🥣','Meyve + yoğurt yaptım 🍓','1-2 kare bitterle kapattım 🍫','Hâlâ istiyorum ama kontrollü yiyeceğim 🤝'];
+var SOS_TRIGGERS=[{id:'tired',emoji:'🥱',label:'Yorgunum'},{id:'bored',emoji:'😶‍🌫️',label:'Sıkıldım'},{id:'hungry',emoji:'🍽️',label:'Gerçekten açım'},{id:'stress',emoji:'🌀',label:'Stresliyim'},{id:'habit',emoji:'🔁',label:'Alışkanlık'}];
 var DAILY=[
   "Bugün tek görevin başlamak. Gerisi kendiliğinden gelir ☀️",
   "Tatlıyı silmiyoruz; sadece patronun sen olduğunu hatırlatıyoruz.",
@@ -150,8 +151,10 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var lastRenderTab=null;
+var ritualRenderedStage=-1;
 var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null,lineStamp:0,lineCursor:0};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
@@ -170,8 +173,53 @@ function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
 function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
+function emptyMealItems(){ return {breakfast:[],lunch:[],dinner:[],snack:[]}; }
 function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,cool:false},lastMinutes:null,lastDoneAt:null,offloadNote:'',events:[],sessions:[]}; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],note:'',savedAt:null,meals:emptyMeals(),sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
+
+// ---------- besin tahmini (kaba; tıbbi/kesin değer değil) ----------
+// per 100g => p: protein(g), c: kalori(kcal); piece: 1 adet ~gram; plate: 1 tabak ~gram
+var FOOD_DB=[
+  {k:['yumurta'],p:13,c:155,piece:50,plate:150},
+  {k:['tavuk','piliç','hindi'],p:27,c:165,piece:120,plate:150},
+  {k:['köfte','dana','biftek','kırmızı et','kebap','et '],p:26,c:250,piece:30,plate:150},
+  {k:['somon','levrek','hamsi','balık','ton balığı'],p:22,c:200,piece:120,plate:150},
+  {k:['peynir','lor','çökelek'],p:18,c:280,piece:30,plate:80},
+  {k:['yoğurt','yogurt','cacık'],p:5,c:60,piece:150,plate:200},
+  {k:['süt','ayran','kefir'],p:3.4,c:55,piece:200,plate:200},
+  {k:['mercimek','nohut','fasulye','baklagil','barbunya'],p:9,c:120,piece:30,plate:200},
+  {k:['bulgur','pilav','pirinç','makarna','erişte','kuskus'],p:4,c:140,piece:30,plate:180},
+  {k:['ekmek','tost','simit','poğaça','börek'],p:8,c:265,piece:30,plate:60},
+  {k:['salata','marul','domates','salatalık','brokoli','sebze','ıspanak'],p:2,c:30,piece:50,plate:150},
+  {k:['çorba'],p:3,c:55,piece:200,plate:250},
+  {k:['muz','elma','portakal','çilek','üzüm','meyve','armut','kayısı'],p:1,c:60,piece:120,plate:150},
+  {k:['badem','ceviz','fındık','fıstık','kuruyemiş','antep'],p:20,c:600,piece:5,plate:40},
+  {k:['zeytin'],p:1,c:115,piece:4,plate:40},
+  {k:['çikolata','bitter','kek','kurabiye','tatlı','baklava','dondurma'],p:6,c:480,piece:20,plate:90},
+  {k:['protein tozu','whey','shake','protein bar'],p:22,c:120,piece:30,plate:30},
+  {k:['patates','kızartma','cips'],p:2,c:90,piece:120,plate:180},
+  {k:['bal','reçel','pekmez'],p:0.5,c:300,piece:20,plate:40}
+];
+var FOOD_FALLBACK={p:7,c:150,piece:60,plate:200};
+var MEAL_UNITS=[{id:'tabak',label:'tabak'},{id:'gr',label:'gr'},{id:'adet',label:'adet'}];
+var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8;
+function foodLookup(name){
+  var n=String(name||'').toLowerCase().trim(); if(!n) return null;
+  for(var i=0;i<FOOD_DB.length;i++){ var f=FOOD_DB[i]; for(var j=0;j<f.k.length;j++){ if(n.indexOf(f.k[j])>=0) return f; } }
+  return null;
+}
+function mealItemNutr(it){
+  if(!it||!it.name||!String(it.name).trim()) return {grams:0,protein:0,calories:0,known:false};
+  var f=foodLookup(it.name), known=!!f; if(!f) f=FOOD_FALLBACK;
+  var q=Number(it.qty); if(isNaN(q)||q<0) q=0;
+  var g; if(it.unit==='gr') g=q; else if(it.unit==='adet') g=q*(f.piece||FOOD_FALLBACK.piece); else g=q*(f.plate||FOOD_FALLBACK.plate);
+  return {grams:g, protein:g*(f.p||0)/100, calories:g*(f.c||0)/100, known:known};
+}
+function mealNutr(rec,key){ var arr=(rec&&rec.mealItems&&rec.mealItems[key])||[]; var P=0,C=0,n=0; arr.forEach(function(it){ if(!it||!it.name||!String(it.name).trim())return; var nu=mealItemNutr(it); P+=nu.protein; C+=nu.calories; n++; }); return {protein:P,calories:C,items:n}; }
+function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snack'].forEach(function(k){ var m=mealNutr(rec,k); P+=m.protein; C+=m.calories; n+=m.items; }); return {protein:Math.round(P), calories:Math.round(C), items:n}; }
+function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
+function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
+function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
 function ritualStageInfo(){
   var elapsed=Math.max(0,ui.ritualTotal-ui.ritualLeft);
   var sum=0;
@@ -516,6 +564,24 @@ App.setMood=function(id){ var date=todayStr(), day=getDay(data,date,dayIndexFor(
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.note=v; save(); },500); };
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); save(); },500); };
 
+// ---- öğün detay (tabak/gr/adet) ----
+App.addMealItem=function(key){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.mealItems[key]) day.mealItems[key]=[]; day.mealItems[key].push({name:'',qty:1,unit:'tabak'}); day.savedAt=new Date().toISOString(); commit(); setTimeout(function(){ var inp=document.querySelector('[data-meal="'+key+'"][data-idx="'+(day.mealItems[key].length-1)+'"]'); if(inp) inp.focus(); },40); };
+App.removeMealItem=function(key,idx){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.mealItems[key]&&day.mealItems[key][idx]!=null){ day.mealItems[key].splice(idx,1); syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); } };
+App.setMealItemName=function(key,idx,el){ var v=el.value; debounceSave('mi-'+key+'-'+idx,function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.name=v; syncMealText(day,key); day.savedAt=new Date().toISOString(); save(); var sub=document.getElementById('meal-sub-'+key); if(sub){ var m=mealNutr(day,key); sub.textContent=Math.round(m.protein)+'g protein'; } var tot=document.getElementById('nutri-live'); if(tot){ updateNutriLive(day); } },350); };
+App.setMealItemQty=function(key,idx,el){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; var v=el.value===''?'':Number(el.value); it.qty=(v===''||isNaN(v))?'':v; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
+App.setMealItemUnit=function(key,idx,el){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
+
+// ---- su ----
+App.waterAdd=function(n){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); if(day.water>=WATER_GOAL&&!day.habits.water){ day.habits.water=true; toast('Su tiki işaretlendi 💧'); } day.savedAt=new Date().toISOString(); commit(); };
+
+// ---- enerji / stres ----
+App.setEnergy=function(v){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); commit(); };
+App.setStress=function(v){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.stress=(day.stress===v?null:v); day.savedAt=new Date().toISOString(); commit(); };
+
+// ---- kafein ----
+App.setCaffeineTime=function(el){ var v=el.value; var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.caffeine) day.caffeine={last:null,cups:null}; day.caffeine.last=v||null; day.savedAt=new Date().toISOString(); commit(); };
+App.caffeineCups=function(n){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.caffeine) day.caffeine={last:null,cups:null}; var v=(Number(day.caffeine.cups)||0)+n; day.caffeine.cups=Math.max(0,Math.min(15,v)); day.savedAt=new Date().toISOString(); commit(); };
+
 // ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
 App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; day.savedAt=new Date().toISOString(); save(); }); };
 App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
@@ -701,7 +767,7 @@ App.startRitual=function(){
       toast('Ritüel tamamlandı. İyi geceler 🌙',2600);
     } else {
       ritualAudioSync(false);
-      render();
+      updateRitualTick();
     }
   },1000);
 };
@@ -729,10 +795,11 @@ App.resetRitual=function(){
 };
 
 App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
+App.toggleSosTrigger=function(id){ var i=ui.sosTriggers.indexOf(id); if(i>=0) ui.sosTriggers.splice(i,1); else ui.sosTriggers.push(id); render(); };
 App.startSosTimer=function(){ clearInterval(sosInterval); ui.sosTiming=true; ui.sosLeft=600; render(); sosInterval=setInterval(function(){ ui.sosLeft--; if(ui.sosLeft<=0){ clearInterval(sosInterval); ui.sosLeft=0; ui.sosTiming=false; render(); toast('10 dakika doldu. Şimdi kararı sen ver ✨',2600); } else { updateSosTimer(); } },1000); };
 function updateSosTimer(){ var el=document.getElementById('sos-clock'); if(el){ el.textContent=pad(Math.floor(ui.sosLeft/60))+':'+pad(ui.sosLeft%60); } }
-App.completeSos=function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; ui.sosOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); day.habits.sweetManaged=true; day.savedAt=new Date().toISOString(); clearInterval(sosInterval); ui.sosTiming=false; ui.sosDone=true; commit('Krizi yönettin ✨'); };
-App.resetSos=function(){ clearInterval(sosInterval); ui.sosOpts=[]; ui.sosLeft=600; ui.sosTiming=false; ui.sosDone=false; render(); };
+App.completeSos=function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; ui.sosOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); if(!Array.isArray(day.cravingTriggers)) day.cravingTriggers=[]; var nowIso=new Date().toISOString(); ui.sosTriggers.forEach(function(tg){ day.cravingTriggers.push({trigger:tg,ts:nowIso}); }); day.habits.sweetManaged=true; day.savedAt=nowIso; clearInterval(sosInterval); ui.sosTiming=false; ui.sosDone=true; commit('Krizi yönettin ✨'); };
+App.resetSos=function(){ clearInterval(sosInterval); ui.sosOpts=[]; ui.sosTriggers=[]; ui.sosLeft=600; ui.sosTiming=false; ui.sosDone=false; render(); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
@@ -861,7 +928,11 @@ function render(){
   root.setAttribute('data-theme', dark?'dark':'light');
   var app=document.getElementById('app');
 
-  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); return; }
+  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; return; }
+
+  var prevScroll=document.querySelector('[data-scroll]');
+  var prevTop=prevScroll?prevScroll.scrollTop:0;
+  var sameTab=(lastRenderTab===ui.tab);
 
   var html='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px;display:flex;flex-direction:column;gap:14px;">';
   if(ui.tab==='bugun') html+=bugunHTML();
@@ -875,6 +946,41 @@ function render(){
   html+=navHTML();
   html+=modalsHTML();
   app.innerHTML=html;
+
+  var newScroll=document.querySelector('[data-scroll]');
+  if(newScroll && sameTab){
+    // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve giriş animasyonunu tekrar oynatma (titremeyi önler)
+    var firstEl=newScroll.firstElementChild;
+    if(firstEl){ firstEl.style.animation='none'; }
+    newScroll.scrollTop=prevTop;
+  }
+  lastRenderTab=ui.tab;
+  if(ui.ritualOpen) ritualRenderedStage=ritualStageInfo().index; else ritualRenderedStage=-1;
+}
+
+// Gece ritüeli sayacı: her saniye tüm uygulamayı yeniden çizmek yerine yalnızca değişen
+// öğeleri günceller — dekoratif animasyonların (aurora, yıldızlar, ses dalgaları) yeniden
+// başlamasını ve titremeyi önler. Aşama değiştiğinde tam render yapılır.
+function updateRitualTick(){
+  if(!ui.ritualOpen){ render(); return; }
+  var info=ritualStageInfo();
+  if(info.index!==ritualRenderedStage){ render(); return; }
+  function setTxt(id,t){ var e=document.getElementById(id); if(e&&e.textContent!==t) e.textContent=t; }
+  setTxt('ritual-clk-head', pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60));
+  if(info.stage.key==='breath' && ui.ritualRunning){
+    var breath=ritualBreathState(info);
+    setTxt('ritual-breath-label', breath.label);
+    setTxt('ritual-breath-count', String(breath.count));
+  } else {
+    setTxt('ritual-clk-phase', pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60));
+  }
+  var orb=ritualOrbScale();
+  var g=document.getElementById('ritual-orb-glow'); if(g){ g.style.opacity=(0.5+orb.glow*0.8).toFixed(3); g.style.transition='opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out'; g.style.transform='scale('+(1+(orb.scale-1)*0.5).toFixed(3)+')'; }
+  var gl=document.getElementById('ritual-orb-glass'); if(gl){ gl.style.transition='transform '+orb.dur+'ms ease-in-out'; gl.style.transform='scale('+orb.scale+')'; }
+  var co=document.getElementById('ritual-orb-core'); if(co){ co.style.transition='transform '+orb.dur+'ms ease-in-out'; co.style.transform='scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+')'; }
+  if(ui.ritualSoundMode==='guided') setTxt('ritual-guide', ui.ritualRunning?('“'+ritualGuideText(info)+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.');
+  if(info.stage.key==='body'){ var bp=ritualBodyPoint(info); setTxt('ritual-body-label', bp.label); setTxt('ritual-body-cue', bp.cue); }
+  setTxt('ritual-progress', '%'+Math.round((ui.ritualTotal-ui.ritualLeft)/ui.ritualTotal*100)+' tamamlandı');
 }
 
 function onboardingHTML(){
@@ -889,6 +995,87 @@ function onboardingHTML(){
    +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Mükemmel olmaya çalışmıyoruz. Her gün küçük küçük kontrolü geri alıyoruz — süresiz, kendi ritminde.</p></div>'
    +'<button onclick="App.start()" style="border:none;cursor:pointer;width:100%;padding:18px;border-radius:20px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);">Tamam Raşit, başlayalım ✨</button>'
    +'<p style="margin:0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--faint);">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p></div>';
+}
+
+function nutritionSummaryCard(rec){
+  var nu=dayNutrition(rec);
+  var pct=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100));
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Beslenme özeti 🍽️</div><div style="font-size:11.5px;color:var(--faint);">tabak · gr · adet ile hesaplanır</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:14px;">';
+  h+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:12px;color:var(--muted);">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:12px;color:var(--faint);">/ '+PROTEIN_GOAL+'g</span></div>';
+  h+='<div style="height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:6px;"><div id="nutri-bar" style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
+  h+='<div style="text-align:center;flex-shrink:0;padding-left:6px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);">kcal (tah.)</div></div>';
+  h+='</div>';
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Değerler kaba tahmindir; protein hedefini takip etmen için yeterli. Detay arttıkça isabet artar.</div>';
+  h+='</div>';
+  return h;
+}
+function mealEditorCard(rec){
+  var mi=(rec&&rec.mealItems)?rec.mealItems:emptyMealItems();
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Bugün ne yedim?</div><div style="font-size:12px;color:var(--faint);">otomatik kaydolur</div></div>';
+  MEALS.forEach(function(m){
+    var items=Array.isArray(mi[m.key])?mi[m.key]:[];
+    var sub=mealNutr(rec,m.key);
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    h+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);">'+Math.round(sub.protein)+'g protein</div></div>';
+    items.forEach(function(it,idx){
+      var known=!!foodLookup(it.name);
+      h+='<div style="display:flex;gap:6px;align-items:center;">';
+      h+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:13.5px;outline:none;">';
+      h+='<input type="number" inputmode="decimal" min="0" step="0.5" value="'+(it.qty===''||it.qty==null?'':esc(it.qty))+'" onchange="App.setMealItemQty(\''+m.key+'\','+idx+',this)" style="width:52px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:13.5px;text-align:center;outline:none;">';
+      h+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:62px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:12.5px;outline:none;color:var(--text);">';
+      MEAL_UNITS.forEach(function(u){ h+='<option value="'+u.id+'"'+(it.unit===u.id?' selected':'')+'>'+u.label+'</option>'; });
+      h+='</select>';
+      h+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">×</button>';
+      h+='</div>';
+    });
+    h+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function waterCard(rec){
+  var w=rec&&typeof rec.water==='number'?rec.water:0;
+  var pct=Math.min(100,Math.round(w/WATER_GOAL*100));
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Su 💧</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent);font-size:16px;">'+w+'</b> / '+WATER_GOAL+' bardak</div></div>';
+  h+='<div style="display:flex;gap:5px;">';
+  for(var i=0;i<WATER_GOAL;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?'💧':'')+'</div>'; }
+  h+='</div>';
+  if(w>WATER_GOAL){ h+='<div style="font-size:11.5px;color:var(--faint);">+'+(w-WATER_GOAL)+' bardak ekstra, harika 💪</div>'; }
+  h+='<div style="display:flex;gap:9px;">';
+  h+='<button onclick="App.waterAdd(-1)" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:18px;font-weight:800;color:var(--muted);background:var(--card);">−</button>';
+  h+='<button onclick="App.waterAdd(1)" style="flex:2;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7FB3E8,#9B7FC9);box-shadow:0 8px 18px rgba(120,160,220,0.35);">+1 bardak içtim 💧</button>';
+  h+='</div></div>';
+  return h;
+}
+function energyStressBlock(rec){
+  var en=rec?rec.energy:null, st=rec?rec.stress:null;
+  function row(label,emoji,cur,fn){
+    var s='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:12.5px;font-weight:700;color:var(--muted);width:62px;flex-shrink:0;">'+emoji+' '+label+'</span><div style="display:flex;gap:5px;flex:1;">';
+    for(var v=1;v<=5;v++){ var on=cur!=null&&v<=cur; var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:26px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:800;'+(on?'background:linear-gradient(135deg,#FFD37A,#E9AFC1);border:1px solid #E9AFC1;color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+(sel?'box-shadow:0 4px 10px rgba(233,175,193,0.4);':'')+'">'+v+'</button>'; }
+    s+='</div></div>'; return s;
+  }
+  var h='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="font-size:12px;color:var(--faint);">Bugün enerjin ve stresin (1 düşük · 5 yüksek)</div>';
+  h+=row('Enerji','⚡',en,'setEnergy');
+  h+=row('Stres','🌀',st,'setStress');
+  h+='</div>';
+  return h;
+}
+function eveningNudge(rec){
+  var hr=new Date().getHours();
+  if(hr<20&&hr>4) return '';
+  var wind=rec&&rec.sleep?rec.sleep.windDown:null;
+  var ritualDone=!!(wind&&wind.lastDoneAt&&String(wind.lastDoneAt).slice(0,10)===todayStr());
+  if(ritualDone) return '';
+  return '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);border-radius:20px;padding:15px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 26px rgba(110,85,191,0.35);">'
+    +'<span style="font-size:26px;">🌙</span>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:12px;color:rgba(255,255,255,0.9);line-height:1.35;">Bir ritüel, uykuya dalmanı kolaylaştırır. 10 dakikan var mı?</div></div>'
+    +'<button onclick="App.quickSleepRitual()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:13px;padding:9px 14px;border-radius:12px;">Başlat</button></div>';
 }
 
 function bugunHTML(){
@@ -928,6 +1115,9 @@ function bugunHTML(){
   h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi 🍫🚨</button>';
   h+='<button onclick="App.quickSleepRitual()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Gece ritüelini başlat 🌙✨</span></button>';
 
+  // akşam nudge (yalnızca gece, ritüel yapılmadıysa)
+  h+=eveningNudge(rec);
+
   // habits
   h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">BUGÜNÜN TİKLERİ</div>';
   HABITS.forEach(function(hb){
@@ -943,17 +1133,12 @@ function bugunHTML(){
     h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:'+(done?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(done?'none':'2px solid var(--field-bd)')+';">'+(done?'✓':'')+'</div></button>';
   });
 
-  // öğünler (3 öğün + ara)
-  var meals=(rec&&rec.meals)?rec.meals:{};
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Bugün ne yedim? 🍽️</div><div style="font-size:12px;color:var(--faint);">otomatik kaydolur</div></div>';
-  MEALS.forEach(function(m){
-    h+='<div style="display:flex;gap:10px;align-items:flex-start;">';
-    h+='<div style="width:38px;height:38px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--icon);margin-top:2px;">'+m.icon+'</div>';
-    h+='<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:4px;">'+m.label+'</div>';
-    h+='<textarea oninput="App.onMeal(\''+m.key+'\',this)" placeholder="'+esc(m.ph)+'" rows="1" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:9px 11px;font-size:14px;resize:none;outline:none;line-height:1.4;min-height:38px;">'+esc(meals[m.key]||'')+'</textarea></div></div>';
-  });
-  h+='</div>';
+  // öğünler — detaylı (tabak/gr/adet) + protein özeti
+  h+=nutritionSummaryCard(rec);
+  h+=mealEditorCard(rec);
+
+  // su
+  h+=waterCard(rec);
 
   // mood
   var curMood=rec?rec.mood:null;
@@ -965,6 +1150,7 @@ function bugunHTML(){
   });
   h+='</div>';
   if(curMood){ var mo=find(MOODS,'id',curMood); h+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo.resp)+'</div>'; }
+  h+=energyStressBlock(rec);
   h+='</div>';
 
   // Raşit chat bubble
@@ -1005,6 +1191,15 @@ function sosHTML(){
     var style=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.7));border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.3);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
     h+='<button onclick="App.toggleSosOpt(\''+o.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .2s;'+style+'"><span style="flex:1;text-align:left;font-size:15px;font-weight:600;">'+esc(o)+'</span><span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?'✓':'')+'</span></button>';
   });
+  h+='</div>';
+  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px;">BU İSTEĞİ NE TETİKLEDİ?</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+  SOS_TRIGGERS.forEach(function(t){
+    var sel=ui.sosTriggers.indexOf(t.id)>=0;
+    var style=sel?'background:linear-gradient(135deg,rgba(201,184,255,0.55),rgba(247,221,229,0.6));border:1px solid #C9B8FF;color:#4A3A6A;box-shadow:0 4px 12px rgba(201,184,255,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text2);';
+    h+='<button onclick="App.toggleSosTrigger(\''+t.id+'\')" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;'+style+'"><span>'+t.emoji+'</span>'+esc(t.label)+'</button>';
+  });
+  h+='<div style="font-size:11.5px;color:var(--faint);width:100%;line-height:1.5;margin-top:2px;">Tetikleyiciyi işaretlersen Rapor’da örüntünü çıkarırım — neyin gerçekten açlık, neyin alışkanlık olduğunu birlikte görürüz.</div>';
   h+='</div>';
   h+='<button onclick="App.completeSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 26px rgba(233,175,193,0.45);">Krizi yönettim ✨</button>';
   if(ui.sosDone){
@@ -1058,6 +1253,70 @@ function monthlySummary(){ var map={}; for(var d in data.days){ var mo=d.slice(0
 function trendBars(days,valFn,grad){ var max=1; days.forEach(function(o){ max=Math.max(max,valFn(o)); }); var h='<div style="display:flex;align-items:flex-end;gap:2px;height:52px;">'; days.forEach(function(o){ var v=valFn(o); var hh=v?Math.max(4,Math.round(v/max*52)):2; h+='<div style="flex:1;height:'+hh+'px;border-radius:3px;background:'+grad+';opacity:'+(v?1:0.22)+';"></div>'; }); h+='</div>'; return h; }
 function nextMilestone(streak){ var ms=[7,21,30,50,100,200,365,500,1000]; for(var i=0;i<ms.length;i++){ if(streak<ms[i]) return {target:ms[i],pct:Math.round(streak/ms[i]*100)}; } return null; }
 
+function moodScoreOf(rec){ var m={'cok-iyi':5,'iyi':4,'normal':3,'zorlandim':2,'cok-zorlandim':1}; return rec&&rec.mood&&m[rec.mood]?m[rec.mood]:null; }
+function avgOf(a){ return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null; }
+function weekSelfCard(){
+  var days=lastNDays(7); var recorded=days.filter(function(o){return o.rec;});
+  if(recorded.length<2) return '';
+  var best=null; days.forEach(function(o){ if(o.rec){ var c=countRec(o.rec); if(!best||c>best.c) best={date:o.date,c:c,rec:o.rec}; } });
+  var bestHabit=null,bestPct=-1; HABITS.forEach(function(hb){ var p=habitRate(days,hb.key); if(p>bestPct){bestPct=p;bestHabit=hb;} });
+  var sleeps=[],waters=[],prots=[],medFree=0;
+  recorded.forEach(function(o){ var r=o.rec; if(r.sleep&&r.sleep.hours!=null) sleeps.push(Number(r.sleep.hours)); if(typeof r.water==='number'&&r.water>0) waters.push(r.water); var pr=dayNutrition(r).protein; if(pr>0) prots.push(pr); if(r.sleep&&r.sleep.med&&r.sleep.med.type==='none') medFree++; });
+  var sa=avgOf(sleeps),wa=avgOf(waters),pa=avgOf(prots);
+  var moodLink=''; var gm=[],bm=[]; recorded.forEach(function(o){ var ms=moodScoreOf(o.rec),sh=(o.rec.sleep&&o.rec.sleep.hours!=null)?Number(o.rec.sleep.hours):null; if(ms==null||sh==null) return; (sh>=7?gm:bm).push(ms); });
+  if(gm.length&&bm.length&&avgOf(gm)-avgOf(bm)>=0.4) moodLink='İyi uyuduğun günler modunu da yukarı çekmiş 🌙';
+  var rows=[];
+  if(best) rows.push(['🌟','En parlak günün', shortDate(best.date)+' · '+best.c+'/'+HABIT_TOTAL+' tik']);
+  if(bestHabit&&bestPct>0) rows.push([bestHabit.icon,'En güçlü alışkanlığın', esc(bestHabit.title)+' · %'+bestPct]);
+  if(sa!=null) rows.push(['😴','Ortalama uyku', sa.toFixed(1)+' saat']);
+  if(wa!=null) rows.push(['💧','Ortalama su', wa.toFixed(1)+' bardak']);
+  if(pa!=null) rows.push(['🍳','Ortalama protein', Math.round(pa)+' g']);
+  if(medFree>0) rows.push(['🌙','İlaçsız gece', medFree+' gece']);
+  var h='<div style="background:linear-gradient(135deg,rgba(255,225,154,0.4),rgba(247,221,229,0.55));border:1px solid var(--card-bd);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="font-size:17px;font-weight:800;color:var(--text);">Bu hafta sen ✨</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:9px;">';
+  rows.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:11px;"><span style="font-size:18px;width:24px;text-align:center;">'+r[0]+'</span><span style="flex:1;font-size:13.5px;color:var(--text2);">'+r[1]+'</span><span style="font-size:14px;font-weight:800;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
+  h+='</div>';
+  if(moodLink) h+='<div style="font-size:13px;font-weight:600;color:var(--accent);background:var(--card);border-radius:14px;padding:11px 13px;">'+moodLink+'</div>';
+  h+='</div>';
+  return h;
+}
+function corrInsights(){
+  var days=lastNDays(30).filter(function(o){return o.rec;});
+  if(days.length<6) return [];
+  var out=[];
+  function gavg(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;}
+  var gm=[],bm=[]; days.forEach(function(o){ var ms=moodScoreOf(o.rec),sh=(o.rec.sleep&&o.rec.sleep.hours!=null)?Number(o.rec.sleep.hours):null; if(ms==null||sh==null) return; if(sh>=7) gm.push(ms); else if(sh<6) bm.push(ms); });
+  if(gm.length>=3&&bm.length>=3&&gavg(gm)-gavg(bm)>=0.4) out.push(['🌙','7+ saat uyuduğun günlerde modun belirgin daha iyi. Uyku senin gizli süper gücün.']);
+  var ws=[],ns=[]; days.forEach(function(o){ var sos=Number(o.rec.cravingSOSCount||0); ((o.rec.habits&&o.rec.habits.walked20)?ws:ns).push(sos); });
+  if(ws.length>=3&&ns.length>=3&&gavg(ns)-gavg(ws)>=0.3) out.push(['🚶‍♀️','Yürüdüğün günlerde tatlı krizi sayın daha düşük. Ayaklar çalışınca tatlı lobisi sus pus.']);
+  var hp=[],lp=[]; days.forEach(function(o){ var pr=dayNutrition(o.rec).protein,sos=Number(o.rec.cravingSOSCount||0); if(pr>=PROTEIN_GOAL*0.8) hp.push(sos); else if(pr>0) lp.push(sos); });
+  if(hp.length>=3&&lp.length>=3&&gavg(lp)-gavg(hp)>=0.3) out.push(['🍳','Proteini tutturduğun günlerde kriz daha az. Tokluk ekibi sahada.']);
+  var he=[],le=[]; days.forEach(function(o){ var w=(typeof o.rec.water==='number')?o.rec.water:null,e=o.rec.energy; if(w==null||e==null) return; (w>=WATER_GOAL?he:le).push(Number(e)); });
+  if(he.length>=3&&le.length>=3&&gavg(he)-gavg(le)>=0.3) out.push(['💧','Su hedefini tutturduğun günlerde enerjin daha yüksek. Beden susuz çalışmıyor.']);
+  return out;
+}
+function badgesGrid(){
+  var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
+  var waterGoal=0,proteinGoal=0,perfect=0,ritualNights=0;
+  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=HABIT_TOTAL) perfect++; if(r.sleep&&r.sleep.windDown&&r.sleep.windDown.lastDoneAt) ritualNights++; });
+  var badges=[
+    {e:'🔥',l:'7 gün seri',done:best>=7,sub:best>=7?'tamam':best+'/7'},
+    {e:'🏆',l:'30 gün seri',done:best>=30,sub:best>=30?'tamam':best+'/30'},
+    {e:'💯',l:'100 gün seri',done:best>=100,sub:best>=100?'tamam':best+'/100'},
+    {e:'🌙',l:'7 gece ilaçsız',done:medStreak>=7,sub:medStreak>=7?'tamam':medStreak+'/7'},
+    {e:'💧',l:'Su hedefi',done:waterGoal>=1,sub:waterGoal>0?waterGoal+' gün':'henüz yok'},
+    {e:'🍳',l:'Protein hedefi',done:proteinGoal>=1,sub:proteinGoal>0?proteinGoal+' gün':'henüz yok'},
+    {e:'🧘',l:'Ritüel ustası',done:ritualNights>=7,sub:ritualNights>=7?'tamam':ritualNights+'/7'},
+    {e:'👑',l:'7/7 mükemmel',done:perfect>=1,sub:perfect>0?perfect+' gün':'henüz yok'}
+  ];
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Rozetler 🏅</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">';
+  badges.forEach(function(b){ var on=b.done; h+='<div style="display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;'+(on?'background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid #E9AFC1;':'background:var(--card);border:1px solid var(--card-bd);opacity:0.62;')+'"><span style="font-size:22px;'+(on?'':'filter:grayscale(1);')+'">'+b.e+'</span><div style="min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+esc(b.l)+'</div><div style="font-size:10.5px;color:var(--faint);">'+esc(b.sub)+'</div></div></div>'; });
+  h+='</div></div>';
+  return h;
+}
+
 function raporHTML(){
   var all=allDays(); var last30=lastNDays(30);
   var totalTicks=0; all.forEach(function(o){ totalTicks+=countRec(o.rec); });
@@ -1069,12 +1328,26 @@ function raporHTML(){
   chips.forEach(function(c){ h+='<div class="glass" style="border-radius:16px;padding:13px;"><div style="font-size:11.5px;color:var(--faint);">'+c[0]+'</div><div style="font-size:21px;font-weight:800;margin-top:3px;">'+esc(c[1])+'</div></div>'; });
   h+='</div>';
   var msx=nextMilestone(cur); if(msx) h+='<div style="background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:16px;padding:12px 15px;font-size:13px;font-weight:700;color:#7A4A2E;">🎯 Sonraki kilometre taşı: '+msx.target+' gün · yolun %'+msx.pct+'</div>';
+  h+=weekSelfCard();
   var avg30=(last30.reduce(function(a,o){return a+countRec(o.rec);},0)/30).toFixed(1);
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+HABIT_TOTAL+'</div></div>';
   h+=trendBars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)')+'</div>';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Alışkanlık oranları (30 gün)</div>';
   HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
   h+='</div>';
+  var pAvg=avgOf(last30.filter(function(o){return o.rec;}).map(function(o){return dayNutrition(o.rec).protein;}).filter(function(v){return v>0;}));
+  var wAvg=avgOf(last30.filter(function(o){return o.rec&&typeof o.rec.water==='number'&&o.rec.water>0;}).map(function(o){return o.rec.water;}));
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">🍳 Protein trendi (30 gün)</div><div style="font-size:12px;color:var(--faint);">ort. '+(pAvg!=null?Math.round(pAvg)+' g':'—')+'</div></div>';
+  h+=trendBars(last30,function(o){return o.rec?dayNutrition(o.rec).protein:0;},'linear-gradient(180deg,#F2B65A,#E9899F)');
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">💧 Su trendi (30 gün)</div><div style="font-size:12px;color:var(--faint);">ort. '+(wAvg!=null?(Math.round(wAvg*10)/10)+' bardak':'—')+'</div></div>';
+  h+=trendBars(last30,function(o){return o.rec&&typeof o.rec.water==='number'?o.rec.water:0;},'linear-gradient(180deg,#7FC9E9,#C9B8FF)');
+  h+='</div>';
+  var ins=corrInsights();
+  if(ins.length){ h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Senin örüntülerin 🔎</div>';
+    ins.forEach(function(c){ h+='<div style="display:flex;gap:11px;align-items:flex-start;background:var(--card);border-radius:14px;padding:12px 13px;"><span style="font-size:18px;">'+c[0]+'</span><span style="flex:1;font-size:13.5px;line-height:1.5;color:var(--text2);">'+esc(c[1])+'</span></div>'; });
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Bunlar senin kayıtlarından çıkan eğilimler; tıbbi tavsiye değil, küçük ipuçları.</div></div>';
+  }
   var md=moodDist(last30); var mtot=0; for(var mkk in md) mtot+=md[mkk];
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Mod dağılımı (30 gün)</div>';
   if(mtot){ var mcol={'cok-iyi':'#FFD37A','iyi':'#F2B65A','normal':'#8FBF8A','zorlandim':'#9BB0D9','cok-zorlandim':'#B89BD9'};
@@ -1082,6 +1355,7 @@ function raporHTML(){
     h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span>'+m.emoji+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
   } else h+='<div style="font-size:13px;color:var(--faint);">Bu dönemde mod kaydı yok.</div>';
   h+='</div>';
+  h+=badgesGrid();
   var months=monthlySummary();
   if(months.length){ var moN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
     h+='<div style="padding:4px 4px 0;"><div style="font-size:17px;font-weight:800;">Aylık özet</div></div>';
@@ -1178,7 +1452,7 @@ function activityRings(rec){
   svg+='</svg>';
   var legend='<div style="flex:1;display:flex;flex-direction:column;gap:8px;">';
   rings.forEach(function(r){ legend+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:10px;height:10px;border-radius:50%;background:'+r.color+';display:inline-block;flex-shrink:0;"></span><span style="color:var(--muted);">'+r.label+'</span><b style="margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums;">'+(r.val!=null?r.val+r.unit:'—')+'</b></div>'; });
-  legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün kaydı</div></div>';
+  legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün · '+dayNutrition(rec).protein+'g protein</div></div>';
   return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:16px;"><div style="flex-shrink:0;">'+svg+'</div>'+legend+'</div>';
 }
 
@@ -1232,6 +1506,25 @@ function sleepReadiness(rec){
   return {score:score,tier:tier,completed:completed,factors:factors,ritualDoneToday:ritualDoneToday,medType:medType};
 }
 
+function medFreeBadge(){
+  var s=medFreeStreak();
+  if(s<1) return '';
+  return '<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(143,191,138,0.22),rgba(155,127,201,0.16));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 13px;"><span style="font-size:22px;">🌙</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">'+s+' gecedir ilaçsız</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(s>=7?'Bir haftayı geçtin — beden kendi sistemini öğreniyor.':'Hedef: uyku ilacına ihtiyacı azaltmak. Düzenli ritüel bunu büyütür.')+'</div></div></div>';
+}
+function caffeineBlock(rec){
+  var caf=(rec&&rec.caffeine&&typeof rec.caffeine==='object')?rec.caffeine:{last:null,cups:null};
+  var late=!!(caf.last&&caf.last>='15:00');
+  var h='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);">Kafein (kahve/çay) — uykuyu etkiler ☕</div>';
+  h+='<div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;">';
+  h+='<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:11px;color:var(--faint);">Son kafein saati</span><input type="time" value="'+esc(caf.last||'')+'" onchange="App.setCaffeineTime(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px 10px;font-size:14px;outline:none;color:var(--text);"></div>';
+  h+='<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:11px;color:var(--faint);">Bugün kaç fincan</span><div style="display:flex;align-items:center;gap:7px;"><button onclick="App.caffeineCups(-1)" style="border:1px solid var(--field-bd);cursor:pointer;width:32px;height:32px;border-radius:9px;font-size:16px;font-weight:800;color:var(--muted);background:var(--card);">−</button><span style="font-size:17px;font-weight:800;min-width:18px;text-align:center;">'+(caf.cups||0)+'</span><button onclick="App.caffeineCups(1)" style="border:1px solid var(--field-bd);cursor:pointer;width:32px;height:32px;border-radius:9px;font-size:16px;font-weight:800;color:var(--muted);background:var(--card);">+</button></div></div>';
+  h+='</div>';
+  if(late) h+='<div style="font-size:11.5px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:11px;padding:8px 11px;line-height:1.4;">Kafein 15:00 sonrası uykuya geçişi zorlaştırabilir. Yarın biraz erkene çekmeyi denemeye değer 🌙</div>';
+  h+='</div>';
+  return h;
+}
+
 function saglikHTML(){
   var today=todayStr(); var rec=data.days[today]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
@@ -1257,6 +1550,8 @@ function saglikHTML(){
     h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. İlaç kullanımıyla ilgili kararları hekiminle birlikte ver.</div>';
   }
   h+='</div>';
+  h+=caffeineBlock(rec);
+  h+=medFreeBadge();
   h+='<div style="border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(138,117,200,0.2),rgba(233,175,193,0.16));border:1px solid rgba(155,127,201,0.3);display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+readiness.completed+'/4 adım</div></div>';
   var rf=readiness.factors||{};
@@ -1394,19 +1689,19 @@ function modalsHTML(){
     h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">';
     h+='<button onclick="App.closeRitual()" style="border:1px solid rgba(255,255,255,0.2);cursor:pointer;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);color:#F3E9ED;font-size:16px;font-weight:700;line-height:1;">‹</button>';
     h+='<div style="text-align:center;"><div style="font-size:11px;letter-spacing:1.5px;color:rgba(233,175,193,0.9);font-weight:800;">GECE RİTÜELİ</div><div style="font-size:11px;color:rgba(243,233,237,0.6);margin-top:1px;">10 dakikalık uykuya geçiş</div></div>';
-    h+='<div style="min-width:38px;text-align:right;font-size:15px;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
+    h+='<div id="ritual-clk-head" style="min-width:38px;text-align:right;font-size:15px;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
     // stage title
     h+='<div style="text-align:center;margin-top:14px;"><div style="font-size:26px;font-weight:800;line-height:1.15;color:#fff;">'+esc(stage.label)+'</div><div style="font-size:13px;line-height:1.5;color:rgba(243,233,237,0.78);margin-top:5px;">'+esc(stage.hint)+'</div></div>';
     // ---- ORB ----
     h+='<div style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;margin:16px 0 6px;"><div style="position:relative;width:248px;height:248px;display:flex;align-items:center;justify-content:center;">';
     if(running){ h+='<div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(233,175,193,0.4);animation:seyRingPulse 4s ease-out infinite;"></div><div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(155,127,201,0.4);animation:seyRingPulse 4s ease-out infinite;animation-delay:2s;"></div>'; }
-    h+='<div style="position:absolute;width:248px;height:248px;border-radius:50%;background:radial-gradient(circle at 50% 36%,rgba(233,175,193,'+(orb.glow*1.05).toFixed(3)+'),rgba(155,127,201,'+(orb.glow*0.3).toFixed(3)+') 58%,rgba(0,0,0,0));opacity:'+(0.5+orb.glow*0.8).toFixed(3)+';transition:opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out;transform:scale('+(1+(orb.scale-1)*0.5).toFixed(3)+');"></div>';
-    h+='<div style="position:absolute;width:188px;height:188px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02));transform:scale('+orb.scale+');transition:transform '+orb.dur+'ms ease-in-out;"></div>';
-    h+='<div style="position:absolute;width:132px;height:132px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.9;box-shadow:0 16px 46px rgba(155,127,201,0.5);transform:scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+');transition:transform '+orb.dur+'ms ease-in-out;"></div>';
+    h+='<div style="position:absolute;width:248px;height:248px;border-radius:50%;background:radial-gradient(circle at 50% 36%,rgba(233,175,193,'+(orb.glow*1.05).toFixed(3)+'),rgba(155,127,201,'+(orb.glow*0.3).toFixed(3)+') 58%,rgba(0,0,0,0));opacity:'+(0.5+orb.glow*0.8).toFixed(3)+';transition:opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out;transform:scale('+(1+(orb.scale-1)*0.5).toFixed(3)+');" id="ritual-orb-glow"></div>';
+    h+='<div style="position:absolute;width:188px;height:188px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02));transform:scale('+orb.scale+');transition:transform '+orb.dur+'ms ease-in-out;" id="ritual-orb-glass"></div>';
+    h+='<div style="position:absolute;width:132px;height:132px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.9;box-shadow:0 16px 46px rgba(155,127,201,0.5);transform:scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+');transition:transform '+orb.dur+'ms ease-in-out;" id="ritual-orb-core"></div>';
     if(stage.key==='breath' && running){
-      h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:40px;font-weight:800;line-height:1;">'+esc(breath.label)+'</div><div style="font-size:30px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums;opacity:0.92;">'+breath.count+'</div></div>';
+      h+='<div style="position:relative;text-align:center;color:#fff;"><div id="ritual-breath-label" style="font-size:40px;font-weight:800;line-height:1;">'+esc(breath.label)+'</div><div id="ritual-breath-count" style="font-size:30px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums;opacity:0.92;">'+breath.count+'</div></div>';
     } else {
-      h+='<div style="position:relative;text-align:center;color:#fff;"><div style="font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11px;opacity:0.85;margin-top:5px;letter-spacing:.5px;">FAZ KALAN</div></div>';
+      h+='<div style="position:relative;text-align:center;color:#fff;"><div id="ritual-clk-phase" style="font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11px;opacity:0.85;margin-top:5px;letter-spacing:.5px;">FAZ KALAN</div></div>';
     }
     h+='</div></div>';
     // ---- MODE STATUS BANNER (the differentiator) ----
@@ -1416,7 +1711,7 @@ function modalsHTML(){
       h+='<span style="display:inline-flex;align-items:flex-end;gap:2px;height:18px;">';
       for(var vw=0;vw<7;vw++){ h+='<span style="width:3px;height:18px;border-radius:2px;background:#F3C6D3;transform-origin:bottom;'+(running?'animation:seyVoiceWave '+(0.8+(vw%3)*0.18)+'s ease-in-out infinite;animation-delay:'+(vw*0.09)+'s;':'opacity:.45;')+'"></span>'; }
       h+='</span></div>';
-      h+='<div style="margin-top:9px;font-size:14.5px;line-height:1.45;color:#fff;font-weight:600;min-height:21px;">'+esc(running?('“'+guideLine+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.')+'</div>';
+      h+='<div id="ritual-guide" style="margin-top:9px;font-size:14.5px;line-height:1.45;color:#fff;font-weight:600;min-height:21px;">'+esc(running?('“'+guideLine+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.')+'</div>';
       h+='<div style="margin-top:7px;font-size:10.5px;line-height:1.4;color:rgba(243,233,237,0.7);">🔈 Sesi duymuyorsan: telefonun yan <b>sessiz düğmesini kapat</b> ve ses seviyesini aç.</div>';
       h+='</div>';
     } else if(mode==='ambient'){
@@ -1440,7 +1735,7 @@ function modalsHTML(){
     // ---- stage-specific helper cards ----
     if(stage.key==='body'){
       var bp=ritualBodyPoint(info);
-      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 13px;text-align:center;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div style="font-size:15.5px;font-weight:800;color:#fff;margin-top:3px;">'+esc(bp.label)+'</div><div style="font-size:12.5px;color:rgba(243,233,237,0.82);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
+      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 13px;text-align:center;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div id="ritual-body-label" style="font-size:15.5px;font-weight:800;color:#fff;margin-top:3px;">'+esc(bp.label)+'</div><div id="ritual-body-cue" style="font-size:12.5px;color:rgba(243,233,237,0.82);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
     } else if(stage.key==='offload'){
       h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 12px 10px;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;margin-bottom:7px;">YARINA BIRAK</div><textarea oninput="App.onRitualOffload(this)" rows="2" placeholder="Yarın için tek not: örn. 09:30 toplantı" style="width:100%;border:1px solid rgba(255,255,255,0.22);background:rgba(18,14,27,0.5);color:#F3E9ED;border-radius:11px;padding:9px 11px;font-size:13px;outline:none;resize:none;line-height:1.4;">'+esc(dWind.offloadNote||'')+'</textarea></div>';
     } else if(stage.key==='descent'){
@@ -1450,7 +1745,7 @@ function modalsHTML(){
     h+='<div style="display:flex;gap:6px;margin-top:14px;">';
     RITUAL_STAGES.forEach(function(s,idx){ var active=idx===info.index; var done=idx<info.index; h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;height:5px;border-radius:999px;background:'+(done?'linear-gradient(90deg,#E9AFC1,#9B7FC9)':(active?'rgba(233,175,193,0.55)':'rgba(255,255,255,0.12)'))+';box-shadow:'+(active?'0 0 0 1px rgba(233,175,193,0.45) inset':'none')+';"></div><span style="font-size:8.5px;color:'+(active?'#E9AFC1':'rgba(243,233,237,0.42)')+';font-weight:'+(active?'800':'500')+';white-space:nowrap;">'+esc(s.label.split(' ')[0])+'</span></div>'; });
     h+='</div>';
-    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.72);margin-top:8px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span>%'+phasePct+' tamamlandı</span></div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.72);margin-top:8px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span id="ritual-progress">%'+phasePct+' tamamlandı</span></div>';
     // ---- controls ----
     h+='<div style="display:flex;gap:8px;margin-top:14px;">';
     if(!running&&ui.ritualLeft===ui.ritualTotal&&!ui.ritualDone) h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Ritüeli başlat</button>';
@@ -1684,6 +1979,12 @@ function lunaDayLine(d,r){
   parts.push(countRec(r)+'/'+HABIT_TOTAL+' tik');
   if(r.mood){ var mo=find(MOODS,'id',r.mood); parts.push('mod:'+(mo?mo.short:r.mood)); }
   if(r.sleep&&r.sleep.hours!=null) parts.push('uyku:'+r.sleep.hours+'sa'+(r.sleep.quality?('('+r.sleep.quality+')'):''));
+  if(r.sleep&&r.sleep.med&&r.sleep.med.type&&r.sleep.med.type!=='none') parts.push('uyku-ilacı:'+r.sleep.med.type); else if(r.sleep&&r.sleep.med&&r.sleep.med.type==='none') parts.push('ilaçsız');
+  var _nu=dayNutrition(r); if(_nu.protein>0) parts.push('protein:'+_nu.protein+'g');
+  if(typeof r.water==='number'&&r.water>0) parts.push('su:'+r.water+'bardak');
+  if(r.energy!=null) parts.push('enerji:'+r.energy+'/5'); if(r.stress!=null) parts.push('stres:'+r.stress+'/5');
+  if(r.caffeine&&r.caffeine.last) parts.push('son-kafein:'+r.caffeine.last);
+  if(Array.isArray(r.cravingTriggers)&&r.cravingTriggers.length){ var _tg={tired:'yorgun',bored:'sıkkın',hungry:'açlık',stress:'stres',habit:'alışkanlık'}; parts.push('SOS-tetik:'+r.cravingTriggers.map(function(t){return _tg[t.trigger]||t.trigger;}).join(',')); }
   if(r.cravingSOSCount) parts.push('SOS:'+r.cravingSOSCount);
   if(r.walk&&r.walk.steps!=null) parts.push('adım:'+r.walk.steps);
   var meals=[]; if(r.meals){ ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(r.meals[k]&&String(r.meals[k]).trim()) meals.push(String(r.meals[k]).trim()); }); }
@@ -1707,16 +2008,19 @@ function lunaContext(){
   lines.push('--- Bugün ---');
   lines.push('Yedikleri: '+mealStr);
   lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+HABIT_TOTAL+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
+  if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+PROTEIN_GOAL+' g / '+CAL_GOAL+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
+  var mfs=medFreeStreak(); if(mfs>0) lines.push('İlaçsız gece serisi: '+mfs+' gece');
   if(rec&&rec.cravingSOSCount) lines.push('Tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
+  if(rec&&Array.isArray(rec.cravingTriggers)&&rec.cravingTriggers.length){ var tgm={tired:'yorgunluk',bored:'sıkkınlık',hungry:'gerçek açlık',stress:'stres',habit:'alışkanlık'}; lines.push('SOS tetikleyicileri: '+rec.cravingTriggers.map(function(t){return tgm[t.trigger]||t.trigger;}).join(', ')); }
   if(rec&&Array.isArray(rec.symptoms)&&rec.symptoms.length) lines.push('Belirtiler: '+rec.symptoms.join(', '));
   if(rec&&rec.note&&String(rec.note).trim()) lines.push('Not: '+String(rec.note).trim());
   // ── 7 ve 30 günlük ortalamalar ──
-  function agg(n){ var sv=[],sos=0,tik=0,c=0; for(var i=0;i<n;i++){ var d=addDays(today,-i),r=data.days[d]; if(!r) continue; c++; if(r.sleep&&r.sleep.hours!=null) sv.push(Number(r.sleep.hours)); if(r.cravingSOSCount) sos+=Number(r.cravingSOSCount); tik+=countRec(r); } var sa=sv.length?(Math.round(sv.reduce(function(a,b){return a+b;},0)/sv.length*10)/10):null; return {days:c,sleepAvg:sa,sos:sos,tikAvg:c?(Math.round(tik/c*10)/10):0}; }
+  function agg(n){ var sv=[],wv=[],pv=[],ev=[],sos=0,tik=0,c=0,mf=0; for(var i=0;i<n;i++){ var d=addDays(today,-i),r=data.days[d]; if(!r) continue; c++; if(r.sleep&&r.sleep.hours!=null) sv.push(Number(r.sleep.hours)); if(typeof r.water==='number'&&r.water>0) wv.push(r.water); var pr=dayNutrition(r).protein; if(pr>0) pv.push(pr); if(r.energy!=null) ev.push(Number(r.energy)); if(r.sleep&&r.sleep.med&&r.sleep.med.type==='none') mf++; if(r.cravingSOSCount) sos+=Number(r.cravingSOSCount); tik+=countRec(r); } function av(a){return a.length?(Math.round(a.reduce(function(x,y){return x+y;},0)/a.length*10)/10):null;} return {days:c,sleepAvg:av(sv),waterAvg:av(wv),proteinAvg:pv.length?Math.round(av(pv)):null,energyAvg:av(ev),medFree:mf,sos:sos,tikAvg:c?(Math.round(tik/c*10)/10):0}; }
   var a7=agg(7),a30=agg(30);
   lines.push('');
   lines.push('--- Ortalamalar ---');
-  lines.push('Son 7 gün: uyku '+(a7.sleepAvg!=null?a7.sleepAvg+' sa':'—')+' · SOS '+a7.sos+' · tik '+a7.tikAvg+'/'+HABIT_TOTAL);
-  lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+HABIT_TOTAL);
+  lines.push('Son 7 gün: uyku '+(a7.sleepAvg!=null?a7.sleepAvg+' sa':'—')+' · su '+(a7.waterAvg!=null?a7.waterAvg+' bardak':'—')+' · protein '+(a7.proteinAvg!=null?a7.proteinAvg+' g':'—')+' · enerji '+(a7.energyAvg!=null?a7.energyAvg+'/5':'—')+' · ilaçsız '+a7.medFree+' gece · SOS '+a7.sos+' · tik '+a7.tikAvg+'/'+HABIT_TOTAL);
+  lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · su '+(a30.waterAvg!=null?a30.waterAvg+' bardak':'—')+' · protein '+(a30.proteinAvg!=null?a30.proteinAvg+' g':'—')+' · enerji '+(a30.energyAvg!=null?a30.energyAvg+'/5':'—')+' · ilaçsız '+a30.medFree+' gece · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+HABIT_TOTAL);
   // ── döngü ──
   if(data.cycle){ var cl='Döngü: ort '+data.cycle.avgCycle+' gün, regl ort '+data.cycle.avgPeriod+' gün'; if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start){ cl+=' · son regl başlangıcı '+last.start; var nx=addDays(last.start,data.cycle.avgCycle); cl+=' · tahmini sonraki ~'+nx; } } lines.push(''); lines.push(cl); }
   // ── tüm günlük kayıtlar (en yeni en üstte) ──

@@ -1654,7 +1654,7 @@ function discomfortCard(rec){
   ['front','back'].forEach(function(v){ var on=view===v; h+='<button onclick="App.setBodyView(\''+v+'\')" style="border:none;cursor:pointer;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;'+(on?'background:linear-gradient(135deg,#E9AFC1,#C9B8FF);color:#fff;':'background:transparent;color:var(--muted);')+'">'+(v==='front'?'Ön':'Arka')+'</button>'; });
   h+='</div></div>';
   h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">Bölgeye dokun, şiddeti ayarla: <b style="color:#F4C152;">1 hafif</b> · <b style="color:#F0892F;">2 orta</b> · <b style="color:#E25B6A;">3 şiddetli</b>. Tekrar dokununca artar, dolunca sıfırlanır.</div>';
-  h+='<div style="display:flex;justify-content:center;"><svg viewBox="0 0 200 470" width="180" height="auto" style="max-width:100%;height:auto;">';
+  h+='<div style="display:flex;justify-content:center;"><svg viewBox="0 0 200 470" width="180" height="423" style="max-width:100%;height:auto;">';
   h+=DZ_SILHOUETTE;
   active.forEach(function(r){
     var lv=(regions[r.id]&&regions[r.id].level)||0; var col=dzColor(lv);

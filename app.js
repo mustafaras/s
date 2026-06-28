@@ -597,7 +597,7 @@ App.toggleWindDownStep=function(key){
   if(allDone) wd.lastDoneAt=new Date().toISOString();
   day.sleep.windDown=wd;
   day.savedAt=new Date().toISOString();
-  commit(wd.steps[key]?'Ritüel adımı tamamlandı ✨':undefined);
+  commit(wd.steps[key]?'Ritüel maddesi tamamlandı ✨':undefined);
 };
 App.startWindDown=function(minutes){
   var m=Math.max(5,Math.min(30,Number(minutes)||10));
@@ -1483,7 +1483,7 @@ function sleepReadiness(rec){
   if(hours!=null){ fDur=Math.round(28*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))); }
   // 2) Öznel kalite — maks 16
   var fQual=sl.quality==='good'?16:(sl.quality==='ok'?9:(sl.quality==='bad'?3:0));
-  // 3) Wind-down adımları (uyku hijyeni/uyaran kontrolü) — maks 20
+  // 3) Wind-down maddeleri (uyku hijyeni/uyaran kontrolü) — maks 20
   var fSteps=Math.round(20*(completed/WIND_DOWN_STEPS.length));
   // 4) Ritüel tamamlama — maks 20
   var ritualDoneToday=!!(wind.lastDoneAt&&String(wind.lastDoneAt).slice(0,10)===today);
@@ -1553,12 +1553,12 @@ function saglikHTML(){
   h+=caffeineBlock(rec);
   h+=medFreeBadge();
   h+='<div style="border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(138,117,200,0.2),rgba(233,175,193,0.16));border:1px solid rgba(155,127,201,0.3);display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+readiness.completed+'/4 adım</div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+readiness.completed+'/4 madde</div></div>';
   var rf=readiness.factors||{};
-  var fdefs=[['Uyku süresi',rf.duration||0,28],['Kalite',rf.quality||0,16],['Hazırlık adımları',rf.steps||0,20],['Ritüel',rf.ritual||0,20],['Zihni boşaltma',rf.offload||0,8],['İlaçsızlık',rf.medication||0,8]];
+  var fdefs=[['Uyku süresi',rf.duration||0,28],['Kalite',rf.quality||0,16],['Hazırlık maddeleri',rf.steps||0,20],['Ritüel',rf.ritual||0,20],['Zihni boşaltma',rf.offload||0,8],['İlaçsızlık',rf.medication||0,8]];
   h+='<div style="display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
   fdefs.forEach(function(f){ var pct=Math.round(f[1]/f[2]*100); h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);width:104px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:6px;border-radius:999px;background:rgba(90,69,122,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);"></div></div><div style="font-size:10.5px;color:var(--faint);width:34px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
-  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:3px;">Hedef ~7.5-8.5 sa uyku, tamamlanmış ritüel ve uyku hijyeni adımları skoru yükseltir. (CBT-I temelli ağırlıklandırma.)</div>';
+  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:3px;">Hedef ~7.5-8.5 sa uyku, tamamlanmış ritüel ve uyku hijyeni maddeleri skoru yükseltir. (CBT-I temelli ağırlıklandırma.)</div>';
   h+='</div>';
   h+='<div style="display:flex;flex-direction:column;gap:7px;">';
   WIND_DOWN_STEPS.forEach(function(s){ var done=!!(wd.steps&&wd.steps[s.key]); h+='<button onclick="App.toggleWindDownStep(\''+s.key+'\')" style="border-radius:12px;padding:9px 11px;cursor:pointer;display:flex;align-items:center;gap:9px;text-align:left;'+(done?'background:linear-gradient(135deg,rgba(239,228,255,0.85),rgba(251,227,232,0.9));border:1px solid rgba(184,155,217,0.9);':'background:rgba(255,255,255,0.45);border:1px solid rgba(155,127,201,0.22);')+'"><span style="font-size:17px;">'+s.icon+'</span><span style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;"><span style="font-size:13px;font-weight:700;color:var(--text);">'+s.label+'</span><span style="font-size:11px;color:var(--muted);">'+s.note+'</span></span><span style="font-size:15px;color:'+(done?'#7B57B4':'var(--faint)')+';">'+(done?'✓':'○')+'</span></button>'; });

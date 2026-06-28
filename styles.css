@@ -15,6 +15,9 @@
   @keyframes seyVoiceWave{0%,100%{transform:scaleY(0.4);opacity:.7;}50%{transform:scaleY(1);opacity:1;}}
   @keyframes seyRingPulse{0%{transform:scale(.92);opacity:.5;}70%{transform:scale(1.18);opacity:0;}100%{transform:scale(1.18);opacity:0;}}
   @keyframes seyFloatIn{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:translateY(0);}}
+  @keyframes dzPulse{0%,100%{transform:scale(1);opacity:.92;}50%{transform:scale(1.13);opacity:1;}}
+  .dz-region{cursor:pointer;transition:fill .25s ease,opacity .25s ease;}
+  .dz-on{animation:dzPulse 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
   #root{
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);

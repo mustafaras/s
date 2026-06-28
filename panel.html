@@ -209,8 +209,9 @@ var PTOKEN="";
 var D=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{}};
 var OBSINBOX=[], OBSSHA=null;
-var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["selfKind","Kendine iyi"]];
+var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["sleepReg","Uyku","2026-06-28"],["veggie","Sebze/lif","2026-06-28"],["mobility","Germe/nefes","2026-06-28"],["selfKind","Kendine iyi"]];
 var HT=HABITS.length;
+function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
 var MOOD_EMOJI={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"🌧️","cok-zorlandim":"🫧"};
 var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
 var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
@@ -219,6 +220,11 @@ var WIND_DOWN={light:{icon:"🕯️",label:"Işığı kıs"},breath:{icon:"🫁"
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
 var SLEEPQ={good:"Dinç",ok:"İdare",bad:"Yorgun"};
 var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
+var DZLEVEL=[{label:"Hafif",color:"#F4C152"},{label:"Orta",color:"#F0892F"},{label:"Şiddetli",color:"#E25B6A"}];
+function dzCol(n){ return n>=3?"#E25B6A":(n===2?"#F0892F":(n>=1?"#F4C152":"#888")); }
+var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz",gogus:"Göğüs",karin:"Karın","kol-sol":"Sol kol","kol-sag":"Sağ kol","el-sol":"Sol el/bilek","el-sag":"Sağ el/bilek",kalca:"Kasık/kalça","diz-sol":"Sol diz","diz-sag":"Sağ diz","bacak-sol":"Sol bacak","bacak-sag":"Sağ bacak","ayak-sol":"Sol ayak","ayak-sag":"Sağ ayak",ense:"Ense","omuz-arka-sol":"Sol omuz (arka)","omuz-arka-sag":"Sağ omuz (arka)","sirt-ust":"Üst sırt",bel:"Bel","kalca-arka":"Kalça","kol-arka-sol":"Sol kol (arka)","kol-arka-sag":"Sağ kol (arka)","bacak-arka-sol":"Sol bacak (arka)","bacak-arka-sag":"Sağ bacak (arka)"};
+function dzRegLabel(id){ return DZREG[id]||id; }
+function isAnalgesic(name){ if(!name) return false; var s=String(name).toLowerCase(); return ["parol","parasetamol","ibuprofen","ibuprofin","nurofen","brufen","apranax","naproksen","naproxen","aspirin","majezik","flurbiprofen","novalgin","metamizol","voltaren","diklofenak","diclofenac","minoset","gripin","arveles","deksketoprofen","dolorex"].some(function(k){return s.indexOf(k)>=0;}); }
 var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
@@ -566,6 +572,13 @@ function render(){
   var lastStepDate=null; for(var sIdx=cur.length-1;sIdx>=0;sIdx--){ if(stepFn(cur[sIdx])>0){ lastStepDate=cur[sIdx]; break; } }
   var lastStepVal=lastStepDate?stepFn(lastStepDate):0;
   var curSleep=avg(cur,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;}), prevSleep=avg(prev,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;});
+  function avgWhere(days,valFn){ var s=0,c=0; days.forEach(function(d){ var v=valFn(recOf(d)); if(v!=null&&!isNaN(v)){ s+=v; c++; } }); return c?s/c:0; }
+  var waterVal=function(r){ return r&&typeof r.water==='number'&&r.water>0?Number(r.water):null; };
+  var energyVal=function(r){ return r&&r.energy!=null?Number(r.energy):null; };
+  var curWater=avgWhere(cur,waterVal), prevWater=avgWhere(prev,waterVal);
+  var waterDays=cur.filter(function(d){return waterVal(recOf(d))!=null;}).length;
+  var curEnergy=avgWhere(cur,energyVal), prevEnergy=avgWhere(prev,energyVal);
+  var energyDays=cur.filter(function(d){return energyVal(recOf(d))!=null;}).length;
   var rsk=risk(cur,saved);
   var moodDist={"cok-iyi":0,"iyi":0,"normal":0,"zorlandim":0,"cok-zorlandim":0};
   cur.forEach(function(d){var r=recOf(d); if(r&&r.mood&&moodDist[r.mood]!=null) moodDist[r.mood]++;});
@@ -593,6 +606,7 @@ function render(){
   var ritualRate=cur.length?Math.round((curRit.doneDays/cur.length)*100):0;
   var syncLagMin=saved?Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)):null;
   var missingInRange=missingDays(cur);
+  var dzMohDays=windowDays(30,today()).reduce(function(a,d){ var r=recOf(d); var ms=r&&r.discomfort&&Array.isArray(r.discomfort.meds)?r.discomfort.meds:[]; return a+(ms.some(function(m){return m&&isAnalgesic(m.name);})?1:0); },0);
 
   var h="";
 
@@ -658,6 +672,8 @@ function render(){
   if(lastStepVal>0) stepCap+='<span>Son <b style="color:var(--t2);">'+Math.round(lastStepVal).toLocaleString("tr-TR")+'</b> · '+shortD(lastStepDate)+'</span>';
   h+=kpi('Adım Ort',Math.round(curSteps).toLocaleString("tr-TR"),'var(--amber)',stepExtra,sparkBar(cur,stepFn,Math.max(1,stepPeak),"#fbbf24",30),stepCap);
   h+=kpi('Kullanım',formatDuration(curSess.totalActive),'var(--gold)','<span class="tchip fl">'+curSess.sessionCount+' oturum</span>');
+  h+=kpi('Su Ort',(Math.round(curWater*10)/10).toFixed(1)+'<small>/8</small>','#6Fb1e8',tc(curWater,prevWater,true),sparkBar(cur,function(d){var v=waterVal(recOf(d));return v||0;},8,"#6Fb1e8",30),'<span>'+waterDays+'/'+cur.length+' gün</span>');
+  h+=kpi('Enerji Ort',curEnergy>0?(Math.round(curEnergy*10)/10).toFixed(1)+'<small>/5</small>':'—','#E0A93C',tc(curEnergy,prevEnergy,true),sparkLine(cur,function(d){var v=energyVal(recOf(d));return v||0;},5,"#E0A93C",30),'<span>'+energyDays+'/'+cur.length+' gün</span>');
 
   // ROW 1.5: Luna mesaj kanalı + Luna’ya sorulanlar
   h+=msgCardHTML();
@@ -686,10 +702,13 @@ function render(){
   h+='<div class="lbl">'+shortD(selected)+' · Seçili Gün</div>';
   h+='<div class="dstats">';
   [
-    [cnt(srec)+'<small style="font-size:var(--f3);color:var(--t3);">/'+HT+'</small>','Tik','var(--gold)'],
+    [cnt(srec)+'<small style="font-size:var(--f3);color:var(--t3);">/'+htOn(selected)+'</small>','Tik','var(--gold)'],
     [MOOD_EMOJI[srec.mood]||'—','Mod','var(--t1)'],
     [String(srec.cravingSOSCount||0),'SOS','var(--red)'],
-    [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'<small style="font-size:var(--f3);color:var(--t3);">sa</small>':'—','Uyku','var(--purple)']
+    [srec.sleep&&srec.sleep.hours!=null?srec.sleep.hours+'<small style="font-size:var(--f3);color:var(--t3);">sa</small>':'—','Uyku','var(--purple)'],
+    [(typeof srec.water==='number'&&srec.water>0)?srec.water+'<small style="font-size:var(--f3);color:var(--t3);">/8</small>':'—','Su','#6Fb1e8'],
+    [srec.energy!=null?srec.energy+'<small style="font-size:var(--f3);color:var(--t3);">/5</small>':'—','Enerji','#E0A93C'],
+    [srec.stress!=null?srec.stress+'<small style="font-size:var(--f3);color:var(--t3);">/5</small>':'—','Stres','#C77FB0']
   ].forEach(function(d){
     h+='<div class="dstat"><div class="dv mono" style="color:'+d[2]+';">'+d[0]+'</div><div class="dl">'+d[1]+'</div></div>';
   });
@@ -715,7 +734,7 @@ function render(){
   h+='<div class="lbl">🍽️ Ne Yedi</div>';
   h+=mealRows?'<div style="display:flex;flex-direction:column;gap:7px;">'+mealRows+'</div>'
             :'<div style="font-size:var(--f3);color:var(--t4);font-weight:600;">Bu güne öğün kaydı yok</div>';
-  if(syms) h+='<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🩹 '+esc(syms)+'</div>';
+  if(syms) h+='<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🌸 '+esc(syms)+'</div>';
   // ── Şeyma'nın diğer girdileri (eksiksiz, girdiği şekliyle) ──
   var exRows="";
   function exRow(label,val){ return '<div style="display:flex;gap:8px;align-items:baseline;font-size:var(--f3);line-height:1.45;"><b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+label+'</b><span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;white-space:pre-wrap;">'+val+'</span></div>'; }
@@ -745,6 +764,34 @@ function render(){
   var off=(sl.windDown&&sl.windDown.offloadNote)?String(sl.windDown.offloadNote).trim():"";
   if(off) exRows+=exRow("📌 Yarına", esc(off));
   if(exRows){ h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>'; }
+  // ── Fiziksel rahatsızlık (gün) ──
+  var dz=(srec.discomfort&&typeof srec.discomfort==='object')?srec.discomfort:null;
+  var dzRegs=dz&&dz.regions?Object.keys(dz.regions).filter(function(k){return dz.regions[k]&&dz.regions[k].level>0;}):[];
+  var dzMeds=dz&&Array.isArray(dz.meds)?dz.meds.filter(function(m){return m&&(m.name||m.dose||m.time);}):[];
+  var dzNote=dz&&dz.note?String(dz.note).trim():"";
+  if(dzRegs.length||dzMeds.length||dzNote){
+    h+='<div class="divider"></div><div class="lbl">🩹 Fiziksel Rahatsızlık</div>';
+    if(dzRegs.length){
+      h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;">';
+      dzRegs.sort(function(a,b){return dz.regions[b].level-dz.regions[a].level;}).forEach(function(k){
+        var lv=dz.regions[k].level, col=dzCol(lv);
+        h+='<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:var(--f3);font-weight:700;background:'+col+'22;border:1px solid '+col+';color:var(--t1);"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';"></span>'+esc(dzRegLabel(k))+' · '+(DZLEVEL[lv-1]?DZLEVEL[lv-1].label:lv)+'</span>';
+      });
+      h+='</div>';
+    }
+    if(dzNote) h+='<div style="font-size:var(--f3);color:var(--t2);margin-top:8px;line-height:1.45;white-space:pre-wrap;word-break:break-word;">📝 '+esc(dzNote)+'</div>';
+    if(dzMeds.length){
+      h+='<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">';
+      dzMeds.forEach(function(m){
+        var bits=[]; if(m.dose&&String(m.dose).trim()) bits.push(esc(String(m.dose).trim())); if(m.time&&String(m.time).trim()) bits.push(esc(String(m.time).trim()));
+        h+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.4;"><span style="flex-shrink:0;">💊</span><b style="color:var(--t1);font-weight:800;">'+esc(String(m.name||'İlaç').trim())+'</b>'+(bits.length?'<span style="color:var(--t3);font-weight:600;">'+bits.join(' · ')+'</span>':'')+'</div>';
+      });
+      h+='</div>';
+    }
+    if(dzMohDays>=10){
+      h+='<div style="margin-top:9px;padding:8px 11px;border-radius:10px;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.4);font-size:var(--f2);color:#E58B96;line-height:1.45;font-weight:600;">⚠️ Son 30 günde '+dzMohDays+' gün ağrı kesici kaydı var. Sık kullanım (ayda 10-15+ gün) ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekime danışmak iyi olur.</div>';
+    }
+  }
   if(srec.note&&String(srec.note).trim()){
     h+='<div style="margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
   }

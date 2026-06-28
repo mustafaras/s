@@ -9,9 +9,15 @@ var HABITS=[
   {key:'protein',icon:'🍳',title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
   {key:'water',icon:'💧',title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
   {key:'vitaminD',icon:'☀️',title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti ☀️'},
+  {key:'sleepReg',icon:'🛌',title:'Yeterli uyudum (7+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor 🌙',since:'2026-06-28'},
+  {key:'veggie',icon:'🥦',title:'Sebze/lif aldım',sub:'Tabağa renk, tokluğa destek.',msg:'Lif geldi; tokluk ve bağırsak ekibi sahada 🥦',since:'2026-06-28'},
+  {key:'mobility',icon:'🧘',title:'Germe/nefes molası verdim',sub:'Boyun ve bel rahatlar, zihin yumuşar.',msg:'Germe/nefes tamam. Boyun ve bel "oh" dedi 🧘',since:'2026-06-28'},
   {key:'selfKind',icon:'🫶',title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
 ];
 var HABIT_TOTAL=HABITS.length;
+function habitCountOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i].since; if(!s||(date&&date>=s)) n++; } return n; }
+function htToday(){ return habitCountOn(todayStr()); }
+function emptyDiscomfort(){ return {regions:{},note:'',meds:[]}; }
 var MOODS=[
   {id:'cok-iyi',label:'Çok iyi ☀️',short:'Çok iyi',emoji:'☀️',resp:'Bugün ışık saçıyoruz anlaşılan ☀️'},
   {id:'iyi',label:'İyi 🌼',short:'İyi',emoji:'🌼',resp:'Gayet güzel. Ritim kuruluyor 🌼'},
@@ -113,6 +119,52 @@ var BODY_SCAN_POINTS=[
 ];
 var FLOW=[{id:'spot',emoji:'🩸',label:'Leke'},{id:'light',emoji:'🌸',label:'Hafif'},{id:'medium',emoji:'🌺',label:'Orta'},{id:'heavy',emoji:'🌹',label:'Yoğun'}];
 var SYMPTOMS=[{id:'kramp',emoji:'🤕',label:'Kramp'},{id:'bas',emoji:'🤯',label:'Baş ağrısı'},{id:'siskinlik',emoji:'🎈',label:'Şişkinlik'},{id:'yorgun',emoji:'🥱',label:'Yorgunluk'},{id:'duygu',emoji:'🥲',label:'Duygusal'},{id:'istah',emoji:'🍫',label:'İştah'},{id:'sanci',emoji:'⚡',label:'Sancı'},{id:'cilt',emoji:'🌋',label:'Cilt'}];
+var DLEVELS=[{n:1,label:'Hafif',color:'#F4C152'},{n:2,label:'Orta',color:'#F0892F'},{n:3,label:'Şiddetli',color:'#E25B6A'}];
+function dzColor(n){ return n>=3?'#E25B6A':(n===2?'#F0892F':(n>=1?'#F4C152':null)); }
+var DMEDS=['Parasetamol (Parol)','İbuprofen (Nurofen/Brufen)','Naproksen (Apranax)','Aspirin','Flurbiprofen (Majezik)','Metamizol (Novalgin)','Diklofenak (Voltaren)'];
+var BODY_REGIONS=[
+  {id:'bas',label:'Baş',view:'front',s:'ellipse',cx:100,cy:38,rx:23,ry:27},
+  {id:'boyun',label:'Boyun',view:'front',s:'rect',x:89,y:62,w:22,h:17,r:7},
+  {id:'omuz-sol',label:'Sol omuz',view:'front',s:'ellipse',cx:62,cy:93,rx:17,ry:13},
+  {id:'omuz-sag',label:'Sağ omuz',view:'front',s:'ellipse',cx:138,cy:93,rx:17,ry:13},
+  {id:'gogus',label:'Göğüs',view:'front',s:'rect',x:72,y:86,w:56,h:46,r:16},
+  {id:'karin',label:'Karın',view:'front',s:'rect',x:74,y:135,w:52,h:52,r:16},
+  {id:'kol-sol',label:'Sol kol',view:'front',s:'rect',x:45,y:92,w:15,h:96,r:11},
+  {id:'kol-sag',label:'Sağ kol',view:'front',s:'rect',x:140,y:92,w:15,h:96,r:11},
+  {id:'el-sol',label:'Sol el / bilek',view:'front',s:'ellipse',cx:52,cy:197,rx:11,ry:13},
+  {id:'el-sag',label:'Sağ el / bilek',view:'front',s:'ellipse',cx:148,cy:197,rx:11,ry:13},
+  {id:'kalca',label:'Kasık / kalça',view:'front',s:'rect',x:75,y:189,w:50,h:34,r:14},
+  {id:'diz-sol',label:'Sol diz',view:'front',s:'ellipse',cx:89,cy:300,rx:12,ry:14},
+  {id:'diz-sag',label:'Sağ diz',view:'front',s:'ellipse',cx:111,cy:300,rx:12,ry:14},
+  {id:'bacak-sol',label:'Sol bacak',view:'front',s:'rect',x:79,y:226,w:20,h:158,r:13},
+  {id:'bacak-sag',label:'Sağ bacak',view:'front',s:'rect',x:101,y:226,w:20,h:158,r:13},
+  {id:'ayak-sol',label:'Sol ayak',view:'front',s:'ellipse',cx:89,cy:396,rx:13,ry:12},
+  {id:'ayak-sag',label:'Sağ ayak',view:'front',s:'ellipse',cx:111,cy:396,rx:13,ry:12},
+  {id:'ense',label:'Ense',view:'back',s:'rect',x:89,y:62,w:22,h:17,r:7},
+  {id:'omuz-arka-sol',label:'Sol omuz (arka)',view:'back',s:'ellipse',cx:62,cy:93,rx:17,ry:13},
+  {id:'omuz-arka-sag',label:'Sağ omuz (arka)',view:'back',s:'ellipse',cx:138,cy:93,rx:17,ry:13},
+  {id:'sirt-ust',label:'Üst sırt',view:'back',s:'rect',x:72,y:86,w:56,h:46,r:16},
+  {id:'bel',label:'Bel',view:'back',s:'rect',x:74,y:135,w:52,h:52,r:16},
+  {id:'kalca-arka',label:'Kalça',view:'back',s:'rect',x:75,y:189,w:50,h:34,r:14},
+  {id:'kol-arka-sol',label:'Sol kol (arka)',view:'back',s:'rect',x:45,y:92,w:15,h:96,r:11},
+  {id:'kol-arka-sag',label:'Sağ kol (arka)',view:'back',s:'rect',x:140,y:92,w:15,h:96,r:11},
+  {id:'bacak-arka-sol',label:'Sol bacak (arka)',view:'back',s:'rect',x:79,y:226,w:20,h:158,r:13},
+  {id:'bacak-arka-sag',label:'Sağ bacak (arka)',view:'back',s:'rect',x:101,y:226,w:20,h:158,r:13}
+];
+function findRegion(id){ for(var i=0;i<BODY_REGIONS.length;i++){ if(BODY_REGIONS[i].id===id) return BODY_REGIONS[i]; } return null; }
+var DZ_SILHOUETTE='<g pointer-events="none" fill="rgba(150,120,180,0.12)" stroke="rgba(150,120,180,0.26)" stroke-width="1">'
++'<ellipse cx="100" cy="38" rx="23" ry="27"></ellipse>'
++'<rect x="89" y="60" width="22" height="20" rx="7"></rect>'
++'<path d="M64 92 Q100 78 136 92 L130 196 Q100 210 70 196 Z"></path>'
++'<rect x="45" y="92" width="15" height="100" rx="11"></rect>'
++'<rect x="140" y="92" width="15" height="100" rx="11"></rect>'
++'<ellipse cx="52" cy="198" rx="11" ry="13"></ellipse>'
++'<ellipse cx="148" cy="198" rx="11" ry="13"></ellipse>'
++'<rect x="78" y="200" width="20" height="186" rx="13"></rect>'
++'<rect x="102" y="200" width="20" height="186" rx="13"></rect>'
++'<ellipse cx="88" cy="396" rx="13" ry="12"></ellipse>'
++'<ellipse cx="112" cy="396" rx="13" ry="12"></ellipse>'
++'</g>';
 // 4 menstrüel faz — kısa bilimsel notlar (tıbbi tavsiye değildir)
 var PHASES={
   menstrual:{label:'Menstrüel faz',emoji:'🩸',color:'#E58B9B',note:'Regl günleri. Östrojen ve progesteron düşük. Demir açısından zengin beslenme ve nazik hareket iyi gelir.'},
@@ -151,7 +203,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front'};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var ritualRenderedStage=-1;
@@ -219,7 +271,7 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
 function ritualStageInfo(){
   var elapsed=Math.max(0,ui.ritualTotal-ui.ritualLeft);
   var sum=0;
@@ -521,12 +573,12 @@ function interp(sweet,walk,evening){
 }
 function weekBlock(w,days){
   var slice=days.slice(w*7,w*7+7);
-  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['selfKind','Kendime iyi davrandım']];
+  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['sleepReg','Uyku düzeni'],['veggie','Sebze/lif'],['mobility','Germe/nefes'],['selfKind','Kendime iyi davrandım']];
   var cnt=function(k){ return slice.reduce(function(a,o){return a+(o.rec&&o.rec.habits[k]?1:0);},0); };
   var rows=defs.map(function(d){ return {label:d[1],val:cnt(d[0])+'/7'}; });
   var totalC=slice.reduce(function(a,o){return a+countRec(o.rec);},0);
   var moods={}; slice.forEach(function(o){ if(o.rec&&o.rec.mood) moods[o.rec.mood]=(moods[o.rec.mood]||0)+1; });
-  return {title:'Gün '+(w*7+1)+'-'+(w*7+7),rows:rows,avg:(totalC/7).toFixed(1)+'/'+HABIT_TOTAL,best:bestStreak(slice)+' gün',mood:topMood(moods),interp:interp(cnt('sweetManaged'),cnt('walked20'),cnt('eveningControl'))};
+  return {title:'Gün '+(w*7+1)+'-'+(w*7+7),rows:rows,avg:(totalC/7).toFixed(1)+'/'+htToday(),best:bestStreak(slice)+' gün',mood:topMood(moods),interp:interp(cnt('sweetManaged'),cnt('walked20'),cnt('eveningControl'))};
 }
 
 // ---------- toast & confetti ----------
@@ -556,7 +608,7 @@ App.toggleHabit=function(key){
   ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   var msg='Kaydedildi ✨'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
   commit(msg);
-  if(after===HABIT_TOTAL&&before<HABIT_TOTAL){ confetti(); setTimeout(function(){ toast('Bugün '+HABIT_TOTAL+'/'+HABIT_TOTAL+'. Şeyma hanım kontrolü ele aldı 👑',2600); },250); }
+  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı 👑',2600); },250); }
   else if(day.habits[key]){ maybeStreak(); }
 };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor ✨',7:'7 gün. Bu artık tesadüf değil ☀️',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir 🍫',21:'21 gün! İlk büyük eşik 👑',30:'30 gün. Bir ay kesintisiz, bu ciddi iş 🌟',50:'50 gün. Yarım yüz, tam disiplin 💪',100:'100 gün! Üç haneye geçtin 🏆',200:'200 gün. Efsane modu 🔥',365:'365 gün. Tam bir yıl 👑✨'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
@@ -583,7 +635,7 @@ App.setCaffeineTime=function(el){ var v=el.value; var day=getDay(data,todayStr()
 App.caffeineCups=function(n){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.caffeine) day.caffeine={last:null,cups:null}; var v=(Number(day.caffeine.cups)||0)+n; day.caffeine.cups=Math.max(0,Math.min(15,v)); day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
-App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; day.savedAt=new Date().toISOString(); save(); }); };
+App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; if(day.sleep.hours!=null&&day.sleep.hours>=7&&!day.habits.sleepReg){ day.habits.sleepReg=true; toast('Uyku tiki işaretlendi 🛌'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMed=function(type){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
@@ -671,7 +723,7 @@ function parseHealthXML(xml){
   }
   var d=getDay(data,today,dayIndexFor(today)); var msgs=[];
   if(steps>0){ d.walk.steps=Math.round(steps); msgs.push(Math.round(steps)+' adım'); if(d.walk.steps>=STEP_TICK_MIN&&!d.habits.walked20){ d.habits.walked20=true; msgs.push('yürüyüş tiki ✨'); } }
-  if(sleepMs>0){ var hrs=Math.round(sleepMs/3600000*10)/10; d.sleep.hours=hrs; msgs.push(hrs+' sa uyku'); }
+  if(sleepMs>0){ var hrs=Math.round(sleepMs/3600000*10)/10; d.sleep.hours=hrs; msgs.push(hrs+' sa uyku'); if(hrs>=7&&!d.habits.sleepReg){ d.habits.sleepReg=true; msgs.push('uyku tiki 🛌'); } }
   if(steps>0||sleepMs>0){ d.savedAt=new Date().toISOString(); save(); render(); }
   if(st) st.textContent=(steps>0||sleepMs>0)?('İçe aktarıldı: '+msgs.join(' · ')+' ✅'):(found?'Bugün için adım/uyku verisi bulunamadı.':'Bugüne ait kayıt yok. Dosya güncel mi?');
 }
@@ -682,6 +734,13 @@ App.setPeriodField=function(idx,which,el){ var p=data.cycle.periods[idx]; if(!p)
 App.removePeriod=function(idx){ if(data.cycle.periods[idx]){ data.cycle.periods.splice(idx,1); recalcCycle(); commit('Kayıt silindi'); } };
 App.setFlow=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.flow=(day.flow===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.toggleSymptom=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var i=day.symptoms.indexOf(id); if(i>=0) day.symptoms.splice(i,1); else day.symptoms.push(id); day.savedAt=new Date().toISOString(); commit(); };
+App.setBodyView=function(v){ ui.bodyView=(v==='back'?'back':'front'); render(); };
+App.cycleDiscomfort=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.discomfort) day.discomfort=emptyDiscomfort(); var reg=day.discomfort.regions||(day.discomfort.regions={}); var cur=(reg[id]&&reg[id].level)||0; var nx=(cur+1)%4; if(nx===0) delete reg[id]; else reg[id]={level:nx}; day.savedAt=new Date().toISOString(); commit(); };
+App.setDiscomfortNote=function(el){ var v=el.value; debounceSave('dzNote',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.discomfort) day.discomfort=emptyDiscomfort(); day.discomfort.note=v; day.savedAt=new Date().toISOString(); save(); },400); };
+App.addDiscomfortMed=function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.discomfort) day.discomfort=emptyDiscomfort(); if(!Array.isArray(day.discomfort.meds)) day.discomfort.meds=[]; day.discomfort.meds.push({name:'',dose:'',time:'',note:''}); day.savedAt=new Date().toISOString(); commit(); };
+App.quickDiscomfortMed=function(i){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.discomfort) day.discomfort=emptyDiscomfort(); if(!Array.isArray(day.discomfort.meds)) day.discomfort.meds=[]; var nm=(DMEDS[i]||'').split(' (')[0]; day.discomfort.meds.push({name:nm,dose:'',time:'',note:''}); day.savedAt=new Date().toISOString(); commit(); };
+App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed-'+idx+'-'+field,function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var m=day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]; if(!m) return; m[field]=v; day.savedAt=new Date().toISOString(); save(); },350); };
+App.removeDiscomfortMed=function(idx){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 App.goSos=function(){ App.go('sos'); };
 App.quickSleepRitual=function(){
@@ -812,7 +871,7 @@ App.emergencyNote=function(){ ui.emergency=false; ui.tab='bugun'; render(); setT
 App.openDate=function(date){
   var rec=data.days[date]||null; var idx=dayIndexFor(date);
   var habits=HABITS.map(function(h){ return {label:h.title.replace(' 🍫','').replace(' 🌙',''),mark:(rec&&rec.habits[h.key])?'✅':'⚪'}; });
-  var cnt=countRec(rec); var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34); var status='Zor gün'; if(cnt>=HABIT_TOTAL)status='Kraliçe günü 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
+  var cnt=countRec(rec); var ht=habitCountOn(date); var strong=Math.ceil(ht*0.66), medium=Math.ceil(ht*0.34); var status='Zor gün'; if(cnt>=ht)status='Kraliçe günü 👑'; else if(cnt>=strong)status='Güzel gün'; else if(cnt>=medium)status='İdare eder';
   var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null;
   var sl=rec&&rec.sleep?rec.sleep:{}, wk=rec&&rec.walk?rec.walk:{};
   var mealsList=[]; if(rec&&rec.meals){ MEALS.forEach(function(m){ if(rec.meals[m.key]&&String(rec.meals[m.key]).trim()) mealsList.push({label:m.label,icon:m.icon,text:String(rec.meals[m.key])}); }); }
@@ -885,7 +944,7 @@ function reportHTML(){
   h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
   ['Gün','Tarih','Tik','Mod','Adım','Uyku','SOS','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
   h+='</tr></thead><tbody>';
-  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var st=(rec&&rec.walk&&rec.walk.steps!=null)?rec.walk.steps:'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+HABIT_TOTAL+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
+  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var st=(rec&&rec.walk&&rec.walk.steps!=null)?rec.walk.steps:'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+habitCountOn(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
   h+='</tbody></table>';
   h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:15px;font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
   return h;
@@ -1109,10 +1168,11 @@ function bugunHTML(){
   var completed=countRec(rec);
   var circ=2*Math.PI*42;
   var badge='Bugün nazlı başladı 🌧️';
-  var strong=Math.ceil(HABIT_TOTAL*0.66), medium=Math.ceil(HABIT_TOTAL*0.34);
-  if(completed>=HABIT_TOTAL) badge='Kraliçe günü 👑'; else if(completed>=strong) badge='Raydasın ☀️'; else if(completed>=medium) badge='Toparlanıyor 🌤️';
-  var pct=Math.round(completed/HABIT_TOTAL*100);
-  var off=circ*(1-completed/HABIT_TOTAL);
+  var ht=habitCountOn(today);
+  var strong=Math.ceil(ht*0.66), medium=Math.ceil(ht*0.34);
+  if(completed>=ht) badge='Kraliçe günü 👑'; else if(completed>=strong) badge='Raydasın ☀️'; else if(completed>=medium) badge='Toparlanıyor 🌤️';
+  var pct=Math.round(completed/ht*100);
+  var off=circ*(1-completed/ht);
 
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+=saveBanner();
@@ -1241,7 +1301,6 @@ function haritaHTML(){
   var firstDow=(new Date(Y,M-1,1).getDay()+6)%7; // Pzt=0
   var daysInMonth=new Date(Y,M,0).getDate();
   var monthNames=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  var strong=Math.ceil(HABIT_TOTAL*0.66);
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;">Takvim 🗺️</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Bir güne dokun, detayını gör.</div></div>';
   h+='<div class="glass" style="border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:12px;">';
@@ -1251,17 +1310,17 @@ function haritaHTML(){
   for(var b=0;b<firstDow;b++){ h+='<div></div>'; }
   for(var dnum=1;dnum<=daysInMonth;dnum++){
     var date=Y+'-'+pad(M)+'-'+pad(dnum);
-    var rec=data.days[date]||null; var cnt=countRec(rec);
+    var rec=data.days[date]||null; var cnt=countRec(rec); var htc=habitCountOn(date); var strongC=Math.ceil(htc*0.66);
     var future=diffDays(today,date)<0; var before=diffDays(data.startDate,date)<0; var isToday=date===today;
     var moodE=(rec&&rec.mood)?moodEmoji(rec.mood):'';
     var tint='var(--card)';
-    if(cnt>=HABIT_TOTAL) tint=dark?'linear-gradient(135deg,rgba(255,232,163,0.25),rgba(247,221,229,0.22))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)';
-    else if(cnt>=strong) tint=dark?'rgba(233,137,159,0.2)':'rgba(247,221,229,0.7)';
+    if(cnt>=htc) tint=dark?'linear-gradient(135deg,rgba(255,232,163,0.25),rgba(247,221,229,0.22))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)';
+    else if(cnt>=strongC) tint=dark?'rgba(233,137,159,0.2)':'rgba(247,221,229,0.7)';
     else if(cnt>0) tint=dark?'rgba(201,184,255,0.12)':'rgba(247,221,229,0.32)';
     var clickable=!future;
     h+='<button '+(clickable?'onclick="App.openDate(\''+date+'\')"':'')+' style="position:relative;aspect-ratio:1;border-radius:12px;border:1px solid var(--card-bd);background:'+tint+';color:var(--text);cursor:'+(clickable?'pointer':'default')+';opacity:'+((future||before)?'0.4':'1')+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;'+(isToday?'box-shadow:0 0 0 2px #E9AFC1;':'')+'">';
     h+='<div style="font-size:12.5px;font-weight:700;line-height:1;">'+dnum+'</div>';
-    h+='<div style="font-size:12px;height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:9.5px;color:var(--muted);font-weight:700;">'+cnt+'/'+HABIT_TOTAL+'</span>':''))+'</div>';
+    h+='<div style="font-size:12px;height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:9.5px;color:var(--muted);font-weight:700;">'+cnt+'/'+htc+'</span>':''))+'</div>';
     h+='</button>';
   }
   h+='</div>';
@@ -1291,7 +1350,7 @@ function weekSelfCard(){
   var moodLink=''; var gm=[],bm=[]; recorded.forEach(function(o){ var ms=moodScoreOf(o.rec),sh=(o.rec.sleep&&o.rec.sleep.hours!=null)?Number(o.rec.sleep.hours):null; if(ms==null||sh==null) return; (sh>=7?gm:bm).push(ms); });
   if(gm.length&&bm.length&&avgOf(gm)-avgOf(bm)>=0.4) moodLink='İyi uyuduğun günler modunu da yukarı çekmiş 🌙';
   var rows=[];
-  if(best) rows.push(['🌟','En parlak günün', shortDate(best.date)+' · '+best.c+'/'+HABIT_TOTAL+' tik']);
+  if(best) rows.push(['🌟','En parlak günün', shortDate(best.date)+' · '+best.c+'/'+habitCountOn(best.date)+' tik']);
   if(bestHabit&&bestPct>0) rows.push([bestHabit.icon,'En güçlü alışkanlığın', esc(bestHabit.title)+' · %'+bestPct]);
   if(sa!=null) rows.push(['😴','Ortalama uyku', sa.toFixed(1)+' saat']);
   if(wa!=null) rows.push(['💧','Ortalama su', wa.toFixed(1)+' bardak']);
@@ -1324,7 +1383,7 @@ function corrInsights(){
 function badgesGrid(){
   var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
   var waterGoal=0,proteinGoal=0,perfect=0,ritualNights=0;
-  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=HABIT_TOTAL) perfect++; if(r.sleep&&r.sleep.windDown&&r.sleep.windDown.lastDoneAt) ritualNights++; });
+  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.sleep&&r.sleep.windDown&&r.sleep.windDown.lastDoneAt) ritualNights++; });
   var badges=[
     {e:'🔥',l:'7 gün seri',done:best>=7,sub:best>=7?'tamam':best+'/7'},
     {e:'🏆',l:'30 gün seri',done:best>=30,sub:best>=30?'tamam':best+'/30'},
@@ -1387,7 +1446,7 @@ function raporHTML(){
   h+=weekSelfCard();
   h+=weeklyStepRecap();
   var avg30=(last30.reduce(function(a,o){return a+countRec(o.rec);},0)/30).toFixed(1);
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+HABIT_TOTAL+'</div></div>';
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+htToday()+'</div></div>';
   h+=trendBars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)')+'</div>';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Alışkanlık oranları (30 gün)</div>';
   HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
@@ -1416,7 +1475,7 @@ function raporHTML(){
   var months=monthlySummary();
   if(months.length){ var moN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
     h+='<div style="padding:4px 4px 0;"><div style="font-size:17px;font-weight:800;">Aylık özet</div></div>';
-    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="glass" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+HABIT_TOTAL+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
+    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="glass" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
   }
   h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;">Raşit\'ten Notlar 💌</div></div>';
   h+='<div style="background:linear-gradient(135deg,rgba(201,184,255,0.3),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:22px;padding:20px;min-height:96px;display:flex;align-items:center;"><div style="font-size:16px;line-height:1.55;font-weight:600;color:var(--text);">'+esc(NOTES[ui.noteIndex%NOTES.length])+'</div></div>';
@@ -1582,6 +1641,59 @@ function caffeineBlock(rec){
   return h;
 }
 
+function discomfortCard(rec){
+  var dz=(rec&&rec.discomfort&&typeof rec.discomfort==='object')?rec.discomfort:{regions:{},note:'',meds:[]};
+  var regions=dz.regions||{};
+  var meds=Array.isArray(dz.meds)?dz.meds:[];
+  var view=ui.bodyView||'front';
+  var active=BODY_REGIONS.filter(function(r){return r.view===view;});
+  var selList=Object.keys(regions).filter(function(k){return regions[k]&&regions[k].level>0;});
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:15.5px;font-weight:700;">Fiziksel Rahatsızlık 🩹</div>';
+  h+='<div style="margin-left:auto;display:flex;gap:4px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:3px;">';
+  ['front','back'].forEach(function(v){ var on=view===v; h+='<button onclick="App.setBodyView(\''+v+'\')" style="border:none;cursor:pointer;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;'+(on?'background:linear-gradient(135deg,#E9AFC1,#C9B8FF);color:#fff;':'background:transparent;color:var(--muted);')+'">'+(v==='front'?'Ön':'Arka')+'</button>'; });
+  h+='</div></div>';
+  h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">Bölgeye dokun, şiddeti ayarla: <b style="color:#F4C152;">1 hafif</b> · <b style="color:#F0892F;">2 orta</b> · <b style="color:#E25B6A;">3 şiddetli</b>. Tekrar dokununca artar, dolunca sıfırlanır.</div>';
+  h+='<div style="display:flex;justify-content:center;"><svg viewBox="0 0 200 470" width="180" height="auto" style="max-width:100%;height:auto;">';
+  h+=DZ_SILHOUETTE;
+  active.forEach(function(r){
+    var lv=(regions[r.id]&&regions[r.id].level)||0; var col=dzColor(lv);
+    var fill=col||'rgba(155,127,201,0.16)';
+    var op=col?'1':'0.5';
+    var cls='dz-region'+(lv>0?' dz-on':'');
+    var common='class="'+cls+'" onclick="App.cycleDiscomfort(\''+r.id+'\')" fill="'+fill+'" stroke="'+(col||'rgba(120,100,150,0.5)')+'" stroke-width="'+(lv>0?'1.6':'1')+'" opacity="'+op+'"';
+    if(r.s==='ellipse') h+='<ellipse cx="'+r.cx+'" cy="'+r.cy+'" rx="'+r.rx+'" ry="'+r.ry+'" '+common+'></ellipse>';
+    else h+='<rect x="'+r.x+'" y="'+r.y+'" width="'+r.w+'" height="'+r.h+'" rx="'+r.r+'" '+common+'></rect>';
+    if(lv>0){ var lx=(r.s==='ellipse')?r.cx:(r.x+r.w/2), ly=(r.s==='ellipse')?r.cy:(r.y+r.h/2); h+='<text x="'+lx+'" y="'+(ly+4.5)+'" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" style="pointer-events:none;">'+lv+'</text>'; }
+  });
+  h+='</svg></div>';
+  if(selList.length){
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    selList.forEach(function(k){ var rc=findRegion(k); var lv=regions[k].level; var col=dzColor(lv); h+='<button onclick="App.cycleDiscomfort(\''+k+'\')" style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;background:'+col+'22;border:1px solid '+col+';color:var(--text);"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';"></span>'+esc(rc?rc.label:k)+' · '+esc(DLEVELS[lv-1].label)+'</button>'; });
+    h+='</div>';
+  } else {
+    h+='<div style="font-size:12.5px;color:var(--faint);">Bugün için işaretli bölge yok. Bir şikâyetin varsa bedenden seç.</div>';
+  }
+  h+='<div style="display:flex;flex-direction:column;gap:6px;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);">Başka bir rahatsızlık / not</div>';
+  h+='<textarea oninput="App.setDiscomfortNote(this)" placeholder="Örn. sabah migren, sağ bilekte zonklama, mide ekşimesi..." rows="2" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;resize:vertical;font-family:inherit;color:var(--text);">'+(dz.note?esc(dz.note):'')+'</textarea></div>';
+  h+='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:13px;font-weight:700;color:var(--muted);">💊 Kullandığın ilaç</div><button onclick="App.addDiscomfortMed()" style="margin-left:auto;border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:5px 12px;border-radius:999px;">+ Ekle</button></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">'; DMEDS.forEach(function(m,i){ h+='<button onclick="App.quickDiscomfortMed('+i+')" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:600;font-size:11.5px;padding:5px 10px;border-radius:999px;">+ '+esc(m.split(' (')[0])+'</button>'; }); h+='</div>';
+  h+='<datalist id="dz-med-list">'; DMEDS.forEach(function(m){ h+='<option value="'+esc(m)+'"></option>'; }); h+='</datalist>';
+  meds.forEach(function(m,idx){
+    h+='<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:8px;">';
+    h+='<input list="dz-med-list" value="'+(m.name?esc(m.name):'')+'" oninput="App.setDiscomfortMed('+idx+',\'name\',this)" placeholder="İlaç adı" style="flex:2;min-width:120px;border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:8px;font-size:13px;outline:none;color:var(--text);">';
+    h+='<input value="'+(m.dose?esc(m.dose):'')+'" oninput="App.setDiscomfortMed('+idx+',\'dose\',this)" placeholder="Doz (400 mg)" style="flex:1;min-width:78px;border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:8px;font-size:13px;outline:none;color:var(--text);">';
+    h+='<input type="time" value="'+(m.time?esc(m.time):'')+'" onchange="App.setDiscomfortMed('+idx+',\'time\',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:9px;padding:7px;font-size:13px;outline:none;color:var(--text);">';
+    h+='<button onclick="App.removeDiscomfortMed('+idx+')" aria-label="Sil" style="border:none;cursor:pointer;background:rgba(220,120,120,0.1);color:#C0605F;width:32px;height:32px;border-radius:9px;font-size:13px;">🗑️</button>';
+    h+='</div>';
+  });
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. Ağrı kesiciyi sık (ayda 10-15+ gün) kullanıyorsan, ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekimine danış.</div>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+
 function saglikHTML(){
   var today=todayStr(); var rec=data.days[today]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
@@ -1639,6 +1751,7 @@ function saglikHTML(){
   }
   h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥20 dk <b>veya</b> ≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini otomatik işaretler ✨</div></div>';
   h+=sparkCard();
+  h+=discomfortCard(rec);
   // Apple Health
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Apple Sağlık\'tan içe aktar 🍎</div>';
   h+='<div style="font-size:13px;line-height:1.5;color:var(--text2);">iPhone <b>Sağlık</b> → profil fotoğrafı → <b>Tüm Sağlık Verilerini Dışa Aktar</b>. Oluşan <b>export.zip</b> içindeki <b>export.xml</b> dosyasını seç; bugünün adımı ve uykusu otomatik dolsun.</div>';
@@ -2041,7 +2154,7 @@ var AEON_SYSTEM='Sen ÆON’sun — Şeyma’nın hayatındaki her veriyi gören
 +'Tıbbi teşhis/tedavi verme; ciddi bir durum sezersen nazikçe bir uzmana yönlendir. Asla yargılama; koruyucu, yükselten bir dille konuş. Her zaman Türkçe yaz.';
 function lunaDayLine(d,r){
   var parts=[];
-  parts.push(countRec(r)+'/'+HABIT_TOTAL+' tik');
+  parts.push(countRec(r)+'/'+habitCountOn(d)+' tik');
   if(r.mood){ var mo=find(MOODS,'id',r.mood); parts.push('mod:'+(mo?mo.short:r.mood)); }
   if(r.sleep&&r.sleep.hours!=null) parts.push('uyku:'+r.sleep.hours+'sa'+(r.sleep.quality?('('+r.sleep.quality+')'):''));
   if(r.sleep&&r.sleep.med&&r.sleep.med.type&&r.sleep.med.type!=='none') parts.push('uyku-ilacı:'+r.sleep.med.type); else if(r.sleep&&r.sleep.med&&r.sleep.med.type==='none') parts.push('ilaçsız');
@@ -2072,7 +2185,7 @@ function lunaContext(){
   lines.push('');
   lines.push('--- Bugün ---');
   lines.push('Yedikleri: '+mealStr);
-  lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+HABIT_TOTAL+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
+  lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+htToday()+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
   if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+PROTEIN_GOAL+' g / '+CAL_GOAL+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
   var mfs=medFreeStreak(); if(mfs>0) lines.push('İlaçsız gece serisi: '+mfs+' gece');
   if(rec&&rec.cravingSOSCount) lines.push('Tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
@@ -2084,8 +2197,8 @@ function lunaContext(){
   var a7=agg(7),a30=agg(30);
   lines.push('');
   lines.push('--- Ortalamalar ---');
-  lines.push('Son 7 gün: uyku '+(a7.sleepAvg!=null?a7.sleepAvg+' sa':'—')+' · su '+(a7.waterAvg!=null?a7.waterAvg+' bardak':'—')+' · protein '+(a7.proteinAvg!=null?a7.proteinAvg+' g':'—')+' · enerji '+(a7.energyAvg!=null?a7.energyAvg+'/5':'—')+' · ilaçsız '+a7.medFree+' gece · SOS '+a7.sos+' · tik '+a7.tikAvg+'/'+HABIT_TOTAL);
-  lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · su '+(a30.waterAvg!=null?a30.waterAvg+' bardak':'—')+' · protein '+(a30.proteinAvg!=null?a30.proteinAvg+' g':'—')+' · enerji '+(a30.energyAvg!=null?a30.energyAvg+'/5':'—')+' · ilaçsız '+a30.medFree+' gece · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+HABIT_TOTAL);
+  lines.push('Son 7 gün: uyku '+(a7.sleepAvg!=null?a7.sleepAvg+' sa':'—')+' · su '+(a7.waterAvg!=null?a7.waterAvg+' bardak':'—')+' · protein '+(a7.proteinAvg!=null?a7.proteinAvg+' g':'—')+' · enerji '+(a7.energyAvg!=null?a7.energyAvg+'/5':'—')+' · ilaçsız '+a7.medFree+' gece · SOS '+a7.sos+' · tik '+a7.tikAvg+'/'+htToday());
+  lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · su '+(a30.waterAvg!=null?a30.waterAvg+' bardak':'—')+' · protein '+(a30.proteinAvg!=null?a30.proteinAvg+' g':'—')+' · enerji '+(a30.energyAvg!=null?a30.energyAvg+'/5':'—')+' · ilaçsız '+a30.medFree+' gece · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+htToday());
   // ── döngü ──
   if(data.cycle){ var cl='Döngü: ort '+data.cycle.avgCycle+' gün, regl ort '+data.cycle.avgPeriod+' gün'; if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start){ cl+=' · son regl başlangıcı '+last.start; var nx=addDays(last.start,data.cycle.avgCycle); cl+=' · tahmini sonraki ~'+nx; } } lines.push(''); lines.push(cl); }
   // ── tüm günlük kayıtlar (en yeni en üstte) ──

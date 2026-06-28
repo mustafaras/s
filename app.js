@@ -151,7 +151,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var ritualRenderedStage=-1;
@@ -645,6 +645,7 @@ function updateWindDownTimer(){
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.steps!=null&&day.walk.steps>=STEP_TICK_MIN&&!day.habits.walked20){ day.habits.walked20=true; toast('Adımınla yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
 App.hideStepRemind=function(){ ui.stepRemindHidden=true; render(); };
+App.hideWaterNudge=function(){ ui.waterNudgeHidden=true; render(); };
 App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.minutes!=null&&day.walk.minutes>=20&&!day.habits.walked20){ day.habits.walked20=true; toast('20 dk yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
 
 // ---- Apple Health import ----
@@ -1048,6 +1049,13 @@ function waterCard(rec){
   for(var i=0;i<WATER_GOAL;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?'💧':'')+'</div>'; }
   h+='</div>';
   if(w>WATER_GOAL){ h+='<div style="font-size:11.5px;color:var(--faint);">+'+(w-WATER_GOAL)+' bardak ekstra, harika 💪</div>'; }
+  var waterTicked=!!(rec&&rec.habits&&rec.habits.water);
+  if(waterTicked&&w<WATER_GOAL&&!ui.waterNudgeHidden){
+    h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(127,179,232,0.16),rgba(155,127,201,0.12));border:1px solid rgba(127,179,232,0.4);border-radius:14px;padding:11px 12px;">';
+    h+='<span style="font-size:18px;line-height:1.2;">💧</span>';
+    h+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Su tikin işaretli 👏 Kaç bardak içtiğini de girersen takibin daha net olur. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
+    h+='<button onclick="App.hideWaterNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);font-size:15px;font-weight:700;line-height:1;">✕</button></div>';
+  }
   h+='<div style="display:flex;gap:9px;">';
   h+='<button onclick="App.waterAdd(-1)" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:18px;font-weight:800;color:var(--muted);background:var(--card);">−</button>';
   h+='<button onclick="App.waterAdd(1)" style="flex:2;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7FB3E8,#9B7FC9);box-shadow:0 8px 18px rgba(120,160,220,0.35);">+1 bardak içtim 💧</button>';

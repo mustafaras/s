@@ -215,8 +215,6 @@ function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][
 var MOOD_EMOJI={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"🌧️","cok-zorlandim":"🫧"};
 var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
 var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
-var WIND_KEYS=["light","breath","dump","cool"];
-var WIND_DOWN={light:{icon:"🕯️",label:"Işığı kıs"},breath:{icon:"🫁",label:"4-7-8 nefes"},dump:{icon:"📝",label:"Zihin boşalt"},cool:{icon:"🌙",label:"Odayı serinlet"}};
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
 var SLEEPQ={good:"Dinç",ok:"İdare",bad:"Yorgun"};
 var SYM={kramp:"Kramp",bas:"Bas agrisi",siskinlik:"Siskinlik",yorgun:"Yorgunluk",duygu:"Duygusal",istah:"Istah",sanci:"Sanci",cilt:"Cilt"};
@@ -236,28 +234,21 @@ function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number);
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function panelReadiness(rec){
   var sl=rec&&rec.sleep?rec.sleep:{};
-  var wind=sl.windDown||{};
-  var steps=wind.steps||{};
-  var completed=WIND_KEYS.reduce(function(a,k){ return a+(steps[k]?1:0); },0);
+  var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[];
+  var pages=0; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) pages+=p; });
   var hours=(sl.hours!=null&&!isNaN(Number(sl.hours)))?Number(sl.hours):null;
-  var fDur=hours!=null?Math.round(28*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))):0;
-  var fQual=sl.quality==="good"?16:(sl.quality==="ok"?9:(sl.quality==="bad"?3:0));
-  var fSteps=Math.round(20*(completed/WIND_KEYS.length));
-  var sessions=(wind.sessions&&wind.sessions.length)?wind.sessions:[];
-  var done=false,partial=false;
-  for(var i=0;i<sessions.length;i++){ if(sessions[i].completed) done=true; else partial=true; }
-  if(!done&&wind.lastDoneAt) done=true;
-  var fRit=done?20:(partial?10:0);
-  var fOff=(wind.offloadNote&&String(wind.offloadNote).trim())?8:0;
+  var fDur=hours!=null?Math.round(34*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))):0;
+  var fQual=sl.quality==="good"?22:(sl.quality==="ok"?12:(sl.quality==="bad"?4:0));
   var medType=(sl.med&&sl.med.type)?sl.med.type:null;
-  var fMed=medType==="none"?8:(medType==="herbal"?5:(medType==="rx"?2:4));
-  var score=Math.max(0,Math.min(100,fDur+fQual+fSteps+fRit+fOff+fMed));
-  return {score:score,completed:completed,ritualDone:done,partial:partial,medType:medType,sessions:sessions.length};
+  var fMed=medType==="none"?10:(medType==="herbal"?6:(medType==="rx"?3:5));
+  var fReading=en.length>0?Math.min(34,16+Math.min(18,pages)):0;
+  var score=Math.max(0,Math.min(100,fDur+fQual+fMed+fReading));
+  return {score:score,readCount:en.length,readPages:pages,medType:medType};
 }
-function ritualStats(dates){
-  var doneDays=0,sessTotal=0,scoreSum=0,scoreDays=0,medDays=0;
-  dates.forEach(function(d){ var r=recOf(d); if(!r||!r.sleep) return; var pr=panelReadiness(r); if(pr.ritualDone) doneDays++; sessTotal+=pr.sessions; if(r.sleep.hours!=null||r.sleep.quality||pr.completed>0||pr.sessions>0){ scoreSum+=pr.score; scoreDays++; } if(pr.medType&&pr.medType!=="none") medDays++; });
-  return {doneDays:doneDays,sessTotal:sessTotal,avgScore:scoreDays?Math.round(scoreSum/scoreDays):0,medDays:medDays,scoreDays:scoreDays};
+function readingRecap(dates){
+  var readDays=0,totalPages=0,scoreSum=0,scoreDays=0,medDays=0;
+  dates.forEach(function(d){ var r=recOf(d); if(!r) return; var en=(r.reading&&Array.isArray(r.reading.entries))?r.reading.entries:[]; if(en.length>0){ readDays++; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) totalPages+=p; }); } var pr=panelReadiness(r); if((r.sleep&&(r.sleep.hours!=null||r.sleep.quality))||en.length>0){ scoreSum+=pr.score; scoreDays++; } if(pr.medType&&pr.medType!=="none") medDays++; });
+  return {readDays:readDays,totalPages:totalPages,avgScore:scoreDays?Math.round(scoreSum/scoreDays):0,medDays:medDays,scoreDays:scoreDays};
 }
 function shortD(s){ var p=s.split("-"); return p[2]+"."+p[1]; }
 function monthKey(d){ return d.slice(0,7); }
@@ -340,6 +331,9 @@ function haversineKm(a,b){
   var q=sa*sa+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*sb*sb;
   return 2*R*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
 }
+function fmtKmM(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+" m":(m/1000).toFixed(2)+" km"; }
+function trackedStepsP(r){ var w=(r&&r.movement&&r.movement.walkM>0)?r.movement.walkM:0; return w>0?Math.round(w/0.72):0; }
+function effStepsP(r){ var manual=(r&&r.walk&&r.walk.steps!=null&&r.walk.steps!=="")?Number(r.walk.steps):null; if(manual!=null&&!isNaN(manual)) return {steps:manual,source:"manual"}; var tr=trackedStepsP(r); if(tr>0) return {steps:tr,source:"tracked"}; return {steps:0,source:"none"}; }
 function usagePattern(days){
   var hours=new Array(24), totalActive=0, eveningActive=0;
   for(var i=0;i<24;i++) hours[i]=0;
@@ -514,14 +508,20 @@ function lunaCardHTML(){
   if(aeon&&Array.isArray(aeon.qa)) aeon.qa.forEach(function(x){ all.push({who:'aeon',x:x}); });
   all.sort(function(a,b){ return String(b.x.ts||b.x.date||"").localeCompare(String(a.x.ts||a.x.date||"")); });
   var lunaT=!!(luna&&luna.lastAskDate===today()), aeonT=!!(aeon&&aeon.lastAskDate===today());
+  var lunaConn=!!(D&&D.settings&&D.settings.lunaConnected);
+  var lunaTodayN=(luna&&Array.isArray(luna.qa))?luna.qa.filter(function(x){ return x&&x.date===today(); }).length:0;
   var todayTag=(lunaT&&aeonT)?'Luna + ÆON bugün soruldu':(lunaT?'Luna bugün soruldu':(aeonT?'ÆON bugün soruldu':'bugün henüz yok'));
   var s='<div class="card span-6 pad">';
   s+='<div class="lbl">💬 Tüm Konuşmalar · Luna + ÆON<span style="margin-left:auto;font-size:var(--f2);color:'+((lunaT||aeonT)?'var(--green)':'var(--t4)')+';font-weight:800;letter-spacing:0;text-transform:none;">'+esc(todayTag)+'</span></div>';
+  s+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+  s+='<span style="font-size:var(--f1);font-weight:800;letter-spacing:0;text-transform:none;border-radius:999px;padding:3px 10px;'+(lunaConn?'color:#0a2a18;background:var(--green);':'color:var(--t3);background:var(--s2);border:1px solid var(--bd2);')+'">🌙 Luna '+(lunaConn?'bağlı ✓':'bağlı değil')+'</span>';
+  s+='<span style="font-size:var(--f1);font-weight:800;letter-spacing:0;text-transform:none;border-radius:999px;padding:3px 10px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);">bugün '+lunaTodayN+'/5 soru</span>';
+  s+='</div>';
   var lunaCount=(luna&&Array.isArray(luna.qa))?luna.qa.length:0;
   if(lunaCount===0){
     s+='<div style="display:flex;gap:8px;align-items:flex-start;background:rgba(155,127,201,0.08);border:1px solid rgba(155,127,201,0.28);border-radius:11px;padding:9px 11px;margin-bottom:10px;">';
     s+='<span style="font-size:14px;line-height:1.2;">🌙</span>';
-    s+='<span style="font-size:var(--f2);color:var(--t3);line-height:1.5;font-weight:600;">Luna’dan henüz kayıt yok. Luna yalnızca uygulamada <b style="color:var(--t2);">OpenAI anahtarı</b> girildiğinde ve <b style="color:var(--t2);">günde 1 soru</b> ile çalışır — boş olması kullanılmadığı anlamına gelmez. (ÆON anahtarsız ve sınırsızdır.)</span>';
+    s+='<span style="font-size:var(--f2);color:var(--t3);line-height:1.5;font-weight:600;">Luna’dan henüz kayıt yok. Luna yalnızca uygulamada <b style="color:var(--t2);">OpenAI anahtarı</b> girildiğinde ve <b style="color:var(--t2);">günde 5 soru</b> ile çalışır — boş olması kullanılmadığı anlamına gelmez. (ÆON anahtarsız ve sınırsızdır.)</span>';
     s+='</div>';
   }
   if(!all.length){
@@ -565,7 +565,7 @@ function render(){
   var cur=windowDays(UI.range,today()), prev=windowDays(UI.range,addDays(today(),-UI.range));
   var curAvg=avg(cur,function(d){return cnt(recOf(d));}), prevAvg=avg(prev,function(d){return cnt(recOf(d));});
   var curSos=sum(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;}), prevSos=sum(prev,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;});
-  var stepFn=function(d){var r=recOf(d);return r&&r.walk&&r.walk.steps?Number(r.walk.steps):0;};
+  var stepFn=function(d){var r=recOf(d);return effStepsP(r).steps;};
   var stepDays=cur.filter(function(d){return stepFn(d)>0;});
   var curSteps=stepDays.length?stepDays.reduce(function(a,d){return a+stepFn(d);},0)/stepDays.length:0;
   var stepPeak=cur.reduce(function(m,d){return Math.max(m,stepFn(d));},0);
@@ -585,7 +585,7 @@ function render(){
   var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();});
   var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;});
   var curSess=sessionStats(cur);
-  var curRit=ritualStats(cur);
+  var curRit=readingRecap(cur);
   var srPr=panelReadiness(srec);
   var srMed=(srec.sleep&&srec.sleep.med&&srec.sleep.med.type)?(SLEEP_MED[srec.sleep.med.type]||srec.sleep.med.type):null;
   var syms=(srec.symptoms||[]).map(function(x){return SYM[x]||x;}).join(" · ");
@@ -600,10 +600,13 @@ function render(){
   var lastAct=latestActivityAt(cur);
   var idleMin=lastAct?Math.max(0,Math.round((Date.now()-new Date(lastAct).getTime())/60000)):null;
   var locSum=locationSummary(locHist);
+  var todayRec=(D&&D.days)?D.days[today()]:null;
+  var mv=todayRec&&todayRec.movement?todayRec.movement:null;
+  var mvMode=(D&&D.settings&&D.settings.locationMode)?D.settings.locationMode:'auto';
   var risk7=risk(windowDays(7,today()),saved);
   var risk14=risk(windowDays(14,today()),saved);
   var risk30=risk(windowDays(30,today()),saved);
-  var ritualRate=cur.length?Math.round((curRit.doneDays/cur.length)*100):0;
+  var readingRate=cur.length?Math.round((curRit.readDays/cur.length)*100):0;
   var syncLagMin=saved?Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)):null;
   var missingInRange=missingDays(cur);
   var dzMohDays=windowDays(30,today()).reduce(function(a,d){ var r=recOf(d); var ms=r&&r.discomfort&&Array.isArray(r.discomfort.meds)?r.discomfort.meds:[]; return a+(ms.some(function(m){return m&&isAnalgesic(m.name);})?1:0); },0);
@@ -674,6 +677,11 @@ function render(){
   h+=kpi('Kullanım',formatDuration(curSess.totalActive),'var(--gold)','<span class="tchip fl">'+curSess.sessionCount+' oturum</span>');
   h+=kpi('Su Ort',(Math.round(curWater*10)/10).toFixed(1)+'<small>/8</small>','#6Fb1e8',tc(curWater,prevWater,true),sparkBar(cur,function(d){var v=waterVal(recOf(d));return v||0;},8,"#6Fb1e8",30),'<span>'+waterDays+'/'+cur.length+' gün</span>');
   h+=kpi('Enerji Ort',curEnergy>0?(Math.round(curEnergy*10)/10).toFixed(1)+'<small>/5</small>':'—','#E0A93C',tc(curEnergy,prevEnergy,true),sparkLine(cur,function(d){var v=energyVal(recOf(d));return v||0;},5,"#E0A93C",30),'<span>'+energyDays+'/'+cur.length+' gün</span>');
+  var mvFn=function(d){var r=recOf(d);return r&&r.movement?Number(r.movement.totalM||0)/1000:0;};
+  var mvDays=cur.filter(function(d){return mvFn(d)>0;});
+  var mvMax=Math.max.apply(null,[0.5].concat(cur.map(mvFn)));
+  var mvTodayKm=mv?Number(mv.totalM||0)/1000:0;
+  h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span>🚶 '+fmtKmM(mv.walkM)+'</span><span>🚗 '+fmtKmM(mv.vehicleM)+'</span>'):''));
 
   // ROW 1.5: Luna mesaj kanalı + Luna’ya sorulanlar
   h+=msgCardHTML();
@@ -748,7 +756,8 @@ function render(){
   if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push("💊 "+esc(ml)); }
   exRows+=exRowAlways("😴 Uyku", sleepBits.join(" · "));
   var wk=srec.walk||{}, wkBits=[];
-  if(wk.steps!=null&&wk.steps!=="") wkBits.push(Number(wk.steps).toLocaleString("tr-TR")+" adım");
+  var esP=effStepsP(srec);
+  if(esP.steps>0) wkBits.push(esP.steps.toLocaleString("tr-TR")+" adım"+(esP.source==="tracked"?"~":""));
   if(wk.minutes!=null&&wk.minutes!=="") wkBits.push(esc(String(wk.minutes))+" dk");
   exRows+=exRowAlways("🚶‍♀️ Yürüyüş", wkBits.join(" · "));
   exRows+=exRowAlways("🩸 Regl", (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
@@ -759,19 +768,17 @@ function render(){
   var TRIG={tired:"Yorgun",bored:"Sıkıldı",hungry:"Aç",stress:"Stres",habit:"Alışkanlık"};
   var trg=(Array.isArray(srec.cravingTriggers))?srec.cravingTriggers.map(function(x){var k=(x&&x.trigger)?x.trigger:x;return TRIG[k]||esc(String(k));}).filter(Boolean):[];
   exRows+=exRowAlways("⚡ Tetik", trg.join(" · "));
-  // Uyku ritüeli (windDown): işaretlenen maddeler + rehberli ritüel oturumu
-  var wind=sl.windDown||{};
-  var wsteps=wind.steps||{};
-  var doneSteps=WIND_KEYS.filter(function(k){return wsteps[k];});
-  exRows+=exRowAlways("🌙 Ritüel", doneSteps.length?doneSteps.map(function(k){var s=WIND_DOWN[k];return s?(s.icon+" "+esc(s.label)):esc(k);}).join(" · "):"");
-  var ritBits=[];
-  if(wind.lastMinutes!=null&&wind.lastMinutes!=="") ritBits.push(esc(String(wind.lastMinutes))+" dk");
-  var sessDone=Array.isArray(wind.sessions)?wind.sessions.filter(function(s){return s&&s.completed;}).length:0;
-  if(sessDone>0) ritBits.push("✓ "+sessDone+" tam oturum");
-  if(wind.lastDoneAt){ var dt=new Date(wind.lastDoneAt); if(!isNaN(dt.getTime())) ritBits.push(dt.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})); }
-  exRows+=exRowAlways("🧘‍♀️ Rehberli", ritBits.join(" · "));
-  var off=(sl.windDown&&sl.windDown.offloadNote)?String(sl.windDown.offloadNote).trim():"";
-  exRows+=exRowAlways("📌 Yarına", off?esc(off):"");
+  // Okuma (reading): bugün okunan kitaplar + toplam sayfa/süre
+  var rdEn=(srec.reading&&Array.isArray(srec.reading.entries))?srec.reading.entries:[];
+  var rdTitles=rdEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; return e&&e.author?(esc(t)+" — "+esc(String(e.author).trim())):esc(t); }).filter(Boolean);
+  exRows+=exRowAlways("📖 Okuma", rdTitles.join(" · "));
+  var rdBits=[];
+  var rdPages=rdEn.reduce(function(a,e){ var p=Number(e&&e.pages); return a+((!isNaN(p)&&p>0)?p:0); },0);
+  var rdMins=rdEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
+  if(rdEn.length>0) rdBits.push(rdEn.length+" kitap");
+  if(rdPages>0) rdBits.push(rdPages+" sayfa");
+  if(rdMins>0) rdBits.push(rdMins+" dk");
+  exRows+=exRowAlways("📄 Sayfa", rdBits.join(" · "));
   h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>';
   // ── Fiziksel rahatsızlık (gün) — veri olmasa da her zaman görünür ──
   var dz=(srec.discomfort&&typeof srec.discomfort==='object')?srec.discomfort:null;
@@ -807,7 +814,7 @@ function render(){
   } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:4px;">Not yazılmadı</div>'; }
   h+='</div>';
 
-  // Mood + Ritual card
+  // Mood + Reading card
   h+='<div class="card lift span-3 pad">';
   h+='<div class="lbl">Mod Dağılımı · '+UI.range+'g</div>';
   var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
@@ -829,13 +836,14 @@ function render(){
   });
   h+='</div>';
   h+='<div class="divider"></div>';
-  h+='<div class="lbl">Ritüel & Hazırlık</div>';
+  h+='<div class="lbl">Okuma & Hazırlık</div>';
   [
-    ['Bugün ritüel', srPr.ritualDone?'<span style="color:var(--green);">✓ Tamam</span>':'<span style="color:var(--t3);">—</span>'],
+    ['Bugün okuma', srPr.readCount>0?'<span style="color:var(--green);">✓ '+srPr.readCount+' kitap</span>':'<span style="color:var(--t3);">—</span>'],
+    ['Bugün sayfa', srPr.readPages>0?(srPr.readPages+' sayfa'):'—'],
     ['Hazırlık skoru', srPr.score+'<span style="color:var(--t3);font-size:var(--f2);">/100</span>'],
     ['İlaç', srMed||"—"],
-    ['Ritüel · '+UI.range+'g', curRit.doneDays+' gün'],
-    ['Haz. ortalama', curRit.avgScore+'<span style="color:var(--t3);font-size:var(--f2);">/100</span>']
+    ['Okuma · '+UI.range+'g', curRit.readDays+' gün'],
+    ['Sayfa · '+UI.range+'g', curRit.totalPages.toLocaleString("tr-TR")]
   ].forEach(function(x){
     h+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>';
   });
@@ -855,7 +863,7 @@ function render(){
     ['Adım ortalama', Math.round(curSteps).toLocaleString("tr-TR")],
     ['Uyku ortalama', (Math.round(curSleep*10)/10).toFixed(1)+' sa'],
     ['Oturum',        curSess.sessionCount+' kez'],
-    ['Ritüel günü',   curRit.doneDays+' gün']
+    ['Okuma günü',   curRit.readDays+' gün']
   ].forEach(function(x){
     h+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>';
   });
@@ -897,10 +905,17 @@ function render(){
     ['Yaklaşık hareket', locSum.distanceKm.toFixed(1)+' km'],
     ['Doğruluk ort.', locSum.avgAcc==null?"—":"±"+Math.round(locSum.avgAcc)+" m"]
   ]);
+  h+=insight('Bugün Hareket',[
+    ['Toplam', mv?fmtKmM(mv.totalM):'—'],
+    ['🚶 Yürüyüş', mv?fmtKmM(mv.walkM):'—'],
+    ['🚗 Araç', mv?fmtKmM(mv.vehicleM):'—'],
+    ['Maks hız', mv&&mv.maxSpeed?Math.round(mv.maxSpeed*3.6)+' km/sa':'—'],
+    ['Seçili mod', mvMode==='walk'?'🚶 Yürüyüş':mvMode==='vehicle'?'🚗 Araç':'✨ Oto']
+  ]);
   var rkc=function(r){return r.klass==="ok"?"var(--green)":r.klass==="warn"?"var(--amber)":"var(--red)";};
   h+=insight('Risk & Güvenilirlik',[
     ['Risk trendi','<span style="color:'+rkc(risk7)+'">7g</span> · <span style="color:'+rkc(risk14)+'">14g</span> · <span style="color:'+rkc(risk30)+'">30g</span>'],
-    ['Ritüel başarı', '%'+ritualRate],
+    ['Okuma oranı', '%'+readingRate],
     ['Sync gecikmesi', syncLagMin==null?"—":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa")],
     ['Eksik gün', missingInRange+'/'+cur.length]
   ]);
@@ -945,6 +960,13 @@ function initLocMap(){
   hist.slice(0,-1).forEach(function(p){
     L.circleMarker([p.lat,p.lng],{radius:5,fillColor:"#b79a60",color:"#8c6f2d",weight:1.5,fillOpacity:0.55}).addTo(histGroup);
   });
+  // bugünün hareket rotası (moda göre renkli segmentler)
+  var mvTrk=(D&&D.days&&D.days[today()]&&D.days[today()].movement&&Array.isArray(D.days[today()].movement.track))?D.days[today()].movement.track:[];
+  for(var ti=1;ti<mvTrk.length;ti++){
+    if(typeof mvTrk[ti].lat!=="number"||typeof mvTrk[ti-1].lat!=="number") continue;
+    var segCol=mvTrk[ti].mode==="vehicle"?"#B39DDB":"#7DD389";
+    L.polyline([[mvTrk[ti-1].lat,mvTrk[ti-1].lng],[mvTrk[ti].lat,mvTrk[ti].lng]],{color:segCol,weight:4,opacity:0.85,lineJoin:"round"}).addTo(histGroup);
+  }
   histGroup.addTo(_locMap);
   _locHistLayer=histGroup;
 

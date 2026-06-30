@@ -93,30 +93,6 @@ var WIND_DOWN_STEPS=[
   {key:'dump',icon:'📝',label:'Zihin boşalt',note:'Yarın notu, ruminasyonu düşürür.'},
   {key:'cool',icon:'🌙',label:'Odayı serinlet',note:'18-20°C aralığı dalmayı destekler.'}
 ];
-var RITUAL_STAGES=[
-  {key:'transition',label:'Geceye geçiş',hint:'Işık düşsün, tempo yavaşlasın.',secs:60,
-    voice:'Hoş geldin. Şimdi yavaşça geceye geçiyoruz. Acele yok. Işıkları biraz kıs, telefonu bırakmaya hazırlan ve omuzlarını usulca aşağı indir.',
-    lines:['Işığı yumuşat, ekranı biraz daha kıs.','Omuzlarını yavaşça aşağı bırak.','Çeneni gevşet, dilini damağından ayır.','Hiçbir yere yetişmen gerekmiyor; sadece buradasın.','Bir sonraki nefesinle biraz daha yavaşla.']},
-  {key:'breath',label:'Nefes senkronu',hint:'4 sn al · 6 sn ver.',secs:180,
-    voice:'Şimdi nefesini yavaşça uzatıyoruz. Burnundan dört sayarak yumuşacık al… ve ağzından altı sayarak uzun uzun bırak.',
-    lines:['Nefesini zorlama, kendi akışında bıraksın.','Verirken gün içindeki gerginliği de bırak.','Her nefeste biraz daha ağırlaşıyorsun.','Karnın yumuşakça inip kalksın.']},
-  {key:'body',label:'Body scan',hint:'Çene, omuz, göğüs, bacak gevşet.',secs:120,
-    voice:'Şimdi bedenini yumuşacık tarıyoruz. Dikkatini hiç acele etmeden yukarıdan aşağıya indir ve dokunduğun her yeri bırak.',
-    lines:['Alnını ve gözlerinin çevresini yumuşat.','Çeneni ve dilini serbest bırak.','Omuzların yatağa doğru eriyip dağılsın.','Göğsün ve karnın gevşesin.','Bacakların ağırlaşsın, yatağa bıraksın kendini.']},
-  {key:'offload',label:'Zihni boşalt',hint:'Yarına tek not bırak ve bırak.',secs:120,
-    voice:'Şimdi zihnini hafifletiyoruz. Aklında dönen yarına ait tek bir şeyi düşün, onu bir kenara yaz ve gece boyunca tutmana gerek yok.',
-    lines:['Yarın için tek bir not bırak, gerisini sabaha sakla.','Bir düşünce gelirse, yumuşakça "yarın" de ve geç.','Zihnin bir göl gibi durulsun.','Tutmaya çalıştığın her şeyi nefesinle bırak.']},
-  {key:'descent',label:'Uykuya iniş',hint:'Ekran sadeleşsin, sadece ritim kalsın.',secs:120,
-    voice:'Artık yavaşça uykuya iniyoruz. Yapacak bir şey kalmadı. Sadece nefesini izle ve istediğin an ekranı bırakabilirsin.',
-    lines:['Sadece nefesini izle, gerisi kendiliğinden olacak.','Bedenin gittikçe ağırlaşıyor, yatağa gömülüyor.','Düşünceler gelip geçsin, sen sadece izle.','Ekranı bırak, kendini uykuya bırak. İyi geceler.']}
-];
-var BREATH_LINES=['Burnundan yavaşça al… ve uzun uzun ver.','Çok güzel. Aynı ritimde devam et.','Her nefeste biraz daha gevşiyorsun.','Acele yok; nefes seni taşısın.'];
-var BODY_SCAN_POINTS=[
-  {label:'Çene ve yüz',cue:'Dişlerini sıkma, yüzü yumuşat.'},
-  {label:'Omuz ve boyun',cue:'Omuzları aşağı bırak, çeneyi serbest bırak.'},
-  {label:'Göğüs ve karın',cue:'Nefes verirken karnı gevşet.'},
-  {label:'Kalça ve bacak',cue:'Bacakları yatağa ağırlaştır, bırak gitsin.'}
-];
 var FLOW=[{id:'spot',emoji:'🩸',label:'Leke'},{id:'light',emoji:'🌸',label:'Hafif'},{id:'medium',emoji:'🌺',label:'Orta'},{id:'heavy',emoji:'🌹',label:'Yoğun'}];
 var SYMPTOMS=[{id:'kramp',emoji:'🤕',label:'Kramp'},{id:'bas',emoji:'🤯',label:'Baş ağrısı'},{id:'siskinlik',emoji:'🎈',label:'Şişkinlik'},{id:'yorgun',emoji:'🥱',label:'Yorgunluk'},{id:'duygu',emoji:'🥲',label:'Duygusal'},{id:'istah',emoji:'🍫',label:'İştah'},{id:'sanci',emoji:'⚡',label:'Sancı'},{id:'cilt',emoji:'🌋',label:'Cilt'}];
 var DLEVELS=[{n:1,label:'Hafif',color:'#F4C152'},{n:2,label:'Orta',color:'#F0892F'},{n:3,label:'Şiddetli',color:'#E25B6A'}];
@@ -184,6 +160,9 @@ function migrate(d){
   if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
   if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
   if(typeof d.settings.openaiKey!=='string') d.settings.openaiKey='';
+  if(typeof d.settings.lunaConnected!=='boolean') d.settings.lunaConnected=!!(d.settings.openaiKey&&String(d.settings.openaiKey).trim());
+  if(typeof d.settings.locationEnabled!=='boolean') d.settings.locationEnabled=false;
+  if(d.settings.locationMode!=='walk'&&d.settings.locationMode!=='vehicle'&&d.settings.locationMode!=='auto') d.settings.locationMode='auto';
   if(!d.luna||typeof d.luna!=='object') d.luna={qa:[],lastAskDate:null};
   if(!Array.isArray(d.luna.qa)) d.luna.qa=[];
   if(typeof d.luna.lastAskDate!=='string'&&d.luna.lastAskDate!==null) d.luna.lastAskDate=null;
@@ -197,17 +176,17 @@ function migrate(d){
   if(typeof d.cycle.avgCycle!=='number') d.cycle.avgCycle=28;
   if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
   if(!Array.isArray(d.notifications)) d.notifications=[];
-  if(!d.locationHistory) d.locationHistory=[];
+  if(!Array.isArray(d.locationHistory)) d.locationHistory=[];
+  if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
+  if(d.location===undefined) d.location=null;
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   d.version=2;
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false};
-var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false};
+var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
-var ritualRenderedStage=-1;
-var ritualAudio={ctx:null,master:null,noiseSource:null,noiseGain:null,padOsc:null,padGain:null,stageKey:null,running:false,breathPhase:null,speechReady:false,speechUnlocked:false,lastSpokenLine:null,lineStamp:0,lineCursor:0};
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -253,7 +232,7 @@ var FOOD_DB=[
 ];
 var FOOD_FALLBACK={p:7,c:150,piece:60,plate:200};
 var MEAL_UNITS=[{id:'tabak',label:'tabak'},{id:'gr',label:'gr'},{id:'adet',label:'adet'}];
-var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=2000;
+var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=2000, STEP_LEN_M=0.72;
 function foodLookup(name){
   var n=String(name||'').toLowerCase().trim(); if(!n) return null;
   for(var i=0;i<FOOD_DB.length;i++){ var f=FOOD_DB[i]; for(var j=0;j<f.k.length;j++){ if(n.indexOf(f.k[j])>=0) return f; } }
@@ -271,279 +250,13 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; } return d.days[date]; }
-function ritualStageInfo(){
-  var elapsed=Math.max(0,ui.ritualTotal-ui.ritualLeft);
-  var sum=0;
-  for(var i=0;i<RITUAL_STAGES.length;i++){
-    var st=RITUAL_STAGES[i];
-    var end=sum+st.secs;
-    if(elapsed<end || i===RITUAL_STAGES.length-1){
-      return {index:i,stage:st,elapsedInStage:Math.max(0,elapsed-sum),leftInStage:Math.max(0,end-elapsed),sumBefore:sum};
-    }
-    sum=end;
-  }
-  return {index:0,stage:RITUAL_STAGES[0],elapsedInStage:0,leftInStage:RITUAL_STAGES[0].secs,sumBefore:0};
-}
-function ritualOrbScale(){
-  var info=ritualStageInfo();
-  var t=info.elapsedInStage, P=Math.PI*2, m;
-  switch(info.stage.key){
-    case 'transition':{
-      var ph=Math.sin(t/12*P);
-      m={scale:(0.965+0.035*ph),glow:(0.42+0.12*((ph+1)/2)),dur:1300};
-      break; }
-    case 'breath':{
-      var c=t%10;
-      if(c<4){ var f=c/4; m={scale:(0.82+f*0.24),glow:(0.40+0.24*f),dur:900}; }
-      else { var f2=(c-4)/6; m={scale:(1.06-f2*0.24),glow:(0.64-0.24*f2),dur:900}; }
-      break; }
-    case 'body':{
-      var pb=Math.sin(t/16*P);
-      m={scale:(0.97+0.03*pb),glow:(0.32+0.09*((pb+1)/2)),dur:1500};
-      break; }
-    case 'offload':{
-      m={scale:(0.97+0.012*Math.sin(t/9*P)),glow:0.30,dur:1600};
-      break; }
-    case 'descent':{
-      var p=Math.min(1,t/120), amp=0.03*(1-p), base=0.96-0.08*p;
-      m={scale:(base+amp*Math.sin(t/(10+10*p)*P)),glow:(0.40*(1-0.55*p)),dur:1600};
-      break; }
-    default:
-      m={scale:1,glow:0.42,dur:1200};
-  }
-  return {scale:(+m.scale).toFixed(3),glow:(+m.glow).toFixed(3),dur:m.dur};
-}
-function ritualBodyPoint(info){
-  var idx=Math.min(BODY_SCAN_POINTS.length-1,Math.floor(info.elapsedInStage/30));
-  return BODY_SCAN_POINTS[Math.max(0,idx)];
-}
-function ritualBreathPrompt(info){
-  var t=info.elapsedInStage%10;
-  if(t<4) return {label:'Nefes al',sub:'4 saniye'};
-  return {label:'Nefes ver',sub:'6 saniye'};
-}
-function ritualBreathState(info){
-  var c=info.elapsedInStage%10;
-  if(c<4) return {phase:'in',label:'Al',count:Math.max(1,4-Math.floor(c)),total:4,pct:c/4};
-  return {phase:'out',label:'Ver',count:Math.max(1,6-Math.floor(c-4)),total:6,pct:(c-4)/6};
-}
-function ritualModeMeta(mode){
-  if(mode==='guided') return {label:'Rehberli',icon:'🗣️',desc:'Sesli koç + nefes yönlendirmesi'};
-  if(mode==='ambient') return {label:'Ambiyans',icon:'🌊',desc:'Sözsüz, sarmalayan ses ortamı'};
-  return {label:'Sessiz',icon:'🌑',desc:'Yalnızca görsel rehber'};
-}
-function ritualGuideText(info){
-  var st=info.stage;
-  if(st.key==='breath'){ var b=ritualBreathState(info); return b.phase==='in'?'Burnundan yavaşça nefes al…':'Ağzından uzun uzun ver…'; }
-  var lines=st.lines||[st.hint];
-  var idx=Math.floor(info.elapsedInStage/14)%lines.length;
-  return lines[idx];
-}
-function speechAvailable(){ return typeof window!=='undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined'; }
-var ritualVoices=[];
-function ritualWarmVoices(){
-  if(!speechAvailable()) return;
-  try{
-    ritualVoices=window.speechSynthesis.getVoices()||[];
-    window.speechSynthesis.onvoiceschanged=function(){ try{ ritualVoices=window.speechSynthesis.getVoices()||[]; }catch(e){} };
-  }catch(e){}
-}
-function ritualPickVoice(){
-  if(!speechAvailable()) return null;
-  try{
-    var vs=(ritualVoices&&ritualVoices.length)?ritualVoices:(window.speechSynthesis.getVoices()||[]);
-    var tr=null,trTR=null;
-    for(var i=0;i<vs.length;i++){ var lg=(vs[i].lang||'').toLowerCase(); if(lg==='tr-tr'||lg==='tr_tr'){ trTR=vs[i]; break; } if(!tr && /^tr(-|_|$)/.test(lg)) tr=vs[i]; }
-    return trTR||tr||null;
-  }catch(e){ return null; }
-}
-function ritualSpeechUnlock(){
-  if(!speechAvailable()) return;
-  try{
-    var synth=window.speechSynthesis;
-    try{ synth.resume(); }catch(e){}
-    ritualVoices=synth.getVoices()||ritualVoices;
-    if(!ritualAudio.speechUnlocked){
-      var u=new SpeechSynthesisUtterance('\u00a0');
-      u.volume=0.02; u.rate=1; u.lang='tr-TR';
-      var v0=ritualPickVoice(); if(v0) u.voice=v0;
-      synth.speak(u);
-      ritualAudio.speechUnlocked=true;
-    }
-  }catch(e){}
-}
-function ritualSpeak(text,opts){
-  if(!speechAvailable() || (ui.ritualSoundMode!=='guided' && !(opts&&opts.force)) || (!ui.ritualRunning && !(opts&&opts.force)) || !text) return;
-  opts=opts||{};
-  try{
-    var synth=window.speechSynthesis;
-    try{ synth.resume(); }catch(e){}
-    if(opts.interrupt && ritualAudio.speechUnlocked) synth.cancel();
-    var u=new SpeechSynthesisUtterance(text);
-    var v=ritualPickVoice();
-    if(v){ u.voice=v; u.lang=v.lang||'tr-TR'; } else { u.lang='tr-TR'; }
-    u.rate=opts.rate||0.70;
-    u.pitch=opts.pitch||0.80;
-    u.volume=opts.volume!=null?opts.volume:0.95;
-    ritualAudio.speechUnlocked=true;
-    synth.speak(u);
-    setTimeout(function(){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} },180);
-  }catch(e){}
-}
-function ritualSpeechStop(){ if(speechAvailable()){ try{ window.speechSynthesis.cancel(); }catch(e){} } ritualAudio.lastSpokenLine=null; }
-function trackRitualEvent(type,meta){
-  var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
-  if(!Array.isArray(d.sleep.windDown.events)) d.sleep.windDown.events=[];
-  d.sleep.windDown.events.push({type:type,at:new Date().toISOString(),left:ui.ritualLeft,stage:ritualStageInfo().stage.key,mode:ui.ritualSoundMode,meta:meta||null});
-  if(d.sleep.windDown.events.length>80) d.sleep.windDown.events=d.sleep.windDown.events.slice(-80);
-  d.savedAt=new Date().toISOString();
-  save();
-}
-function logRitualSession(completed){
-  var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
-  if(!Array.isArray(d.sleep.windDown.sessions)) d.sleep.windDown.sessions=[];
-  var info=ritualStageInfo();
-  var elapsedSec=Math.max(0,ui.ritualTotal-ui.ritualLeft);
-  var rec={
-    startedAt:ui.ritualStartedAt||null,
-    endedAt:new Date().toISOString(),
-    completed:!!completed,
-    mode:ui.ritualSoundMode,
-    durationSec:elapsedSec,
-    minutes:Math.round(elapsedSec/60*10)/10,
-    stageReached:info.stage.key,
-    stageIndex:info.index+1,
-    stagesTotal:RITUAL_STAGES.length,
-    offloadNote:(d.sleep.windDown.offloadNote||'')
-  };
-  d.sleep.windDown.sessions.push(rec);
-  if(d.sleep.windDown.sessions.length>40) d.sleep.windDown.sessions=d.sleep.windDown.sessions.slice(-40);
-  d.savedAt=new Date().toISOString();
-  save();
-}
-function ritualAudioAvailable(){ return typeof window!=='undefined' && !!(window.AudioContext||window.webkitAudioContext); }
-function ensureRitualAudio(){
-  if(!ritualAudioAvailable()) return null;
-  if(ritualAudio.ctx) return ritualAudio.ctx;
-  var Ctor=window.AudioContext||window.webkitAudioContext;
-  var ctx=new Ctor();
-  var master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
-  var noiseGain=ctx.createGain(); noiseGain.gain.value=0;
-  var noiseBuffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
-  var ch=noiseBuffer.getChannelData(0);
-  var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
-  for(var i=0;i<ch.length;i++){
-    var white=Math.random()*2-1;
-    b0=0.99886*b0+white*0.0555179;
-    b1=0.99332*b1+white*0.0750759;
-    b2=0.96900*b2+white*0.1538520;
-    b3=0.86650*b3+white*0.3104856;
-    b4=0.55000*b4+white*0.5329522;
-    b5=-0.7616*b5-white*0.0168980;
-    ch[i]=(b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;
-    b6=white*0.115926;
-  }
-  var noiseSource=ctx.createBufferSource();
-  noiseSource.buffer=noiseBuffer; noiseSource.loop=true;
-  var lowpass=ctx.createBiquadFilter(); lowpass.type='lowpass'; lowpass.frequency.value=900;
-  noiseSource.connect(lowpass); lowpass.connect(noiseGain); noiseGain.connect(master); noiseSource.start();
-  var padOsc=ctx.createOscillator(); padOsc.type='sine'; padOsc.frequency.value=126;
-  var padGain=ctx.createGain(); padGain.gain.value=0;
-  var padFilter=ctx.createBiquadFilter(); padFilter.type='lowpass'; padFilter.frequency.value=420;
-  padOsc.connect(padFilter); padFilter.connect(padGain); padGain.connect(master); padOsc.start();
-  var padOsc2=ctx.createOscillator(); padOsc2.type='triangle'; padOsc2.frequency.value=189;
-  var padGain2=ctx.createGain(); padGain2.gain.value=0;
-  var padFilter2=ctx.createBiquadFilter(); padFilter2.type='lowpass'; padFilter2.frequency.value=620;
-  padOsc2.connect(padFilter2); padFilter2.connect(padGain2); padGain2.connect(master); padOsc2.start();
-  var lfoOsc=ctx.createOscillator(); lfoOsc.type='sine'; lfoOsc.frequency.value=0.07;
-  var lfoGain=ctx.createGain(); lfoGain.gain.value=0;
-  lfoOsc.connect(lfoGain); lfoGain.connect(padGain2.gain); lfoOsc.start();
-  ritualAudio.ctx=ctx; ritualAudio.master=master; ritualAudio.noiseSource=noiseSource; ritualAudio.noiseGain=noiseGain; ritualAudio.padOsc=padOsc; ritualAudio.padGain=padGain; ritualAudio.padOsc2=padOsc2; ritualAudio.padGain2=padGain2; ritualAudio.lfoOsc=lfoOsc; ritualAudio.lfoGain=lfoGain;
-  return ctx;
-}
-function ritualCue(freq,dur,vol){
-  var ctx=ensureRitualAudio(); if(!ctx || ui.ritualSoundMode!=='guided') return;
-  var o=ctx.createOscillator(); var g=ctx.createGain(); var lp=ctx.createBiquadFilter();
-  lp.type='lowpass'; lp.frequency.value=Math.min(900,(freq||300)*2.0); lp.Q.value=0.5;
-  o.type='sine'; o.frequency.value=freq||300; g.gain.value=0;
-  o.connect(lp); lp.connect(g); g.connect(ritualAudio.master);
-  var t=ctx.currentTime; var D=dur||1.4; var V=vol||0.035;
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.linearRampToValueAtTime(V,t+0.32);
-  g.gain.exponentialRampToValueAtTime(0.0006,t+D);
-  o.frequency.setValueAtTime(freq||300,t);
-  o.frequency.linearRampToValueAtTime((freq||300)*0.96,t+D);
-  o.start(t); o.stop(t+D+0.06);
-}
-function ritualAudioSetTargets(mode,stageKey){
-  var ctx=ensureRitualAudio(); if(!ctx || !ritualAudio.master) return;
-  if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
-  var t=ctx.currentTime;
-  var master=0,noise=0,pad=0,pad2=0,padFreq=126;
-  if(mode==='ambient'){ master=0.62; noise=0.34; pad=0.17; pad2=0.07; }
-  else if(mode==='guided'){ master=0.52; noise=0.20; pad=0.12; pad2=0.03; }
-  if(stageKey==='transition'){ padFreq=132; }
-  else if(stageKey==='breath'){ padFreq=120; pad+=0.02; }
-  else if(stageKey==='body'){ padFreq=112; }
-  else if(stageKey==='offload'){ padFreq=104; noise*=0.8; }
-  else if(stageKey==='descent'){ padFreq=98; noise*=0.66; pad*=0.7; pad2*=0.6; }
-  ritualAudio.master.gain.setTargetAtTime(master,t,0.7);
-  ritualAudio.noiseGain.gain.setTargetAtTime(noise,t,0.9);
-  ritualAudio.padGain.gain.setTargetAtTime(pad,t,0.9);
-  ritualAudio.padOsc.frequency.setTargetAtTime(padFreq,t,1.2);
-  if(ritualAudio.padGain2) ritualAudio.padGain2.gain.setTargetAtTime(pad2,t,1.1);
-  if(ritualAudio.padOsc2) ritualAudio.padOsc2.frequency.setTargetAtTime(padFreq*1.5,t,1.4);
-  if(ritualAudio.lfoGain) ritualAudio.lfoGain.gain.setTargetAtTime(mode==='ambient'?0.05:0,t,1.2);
-}
-function ritualAudioSync(forceCue){
-  var info=ritualStageInfo();
-  if(!ui.ritualRunning){ ritualAudioSetTargets('silent',info.stage.key); ritualAudio.running=false; ritualAudio.breathPhase=null; return; }
-  ritualAudioSetTargets(ui.ritualSoundMode,info.stage.key);
-  ritualAudio.running=true;
-  if(ui.ritualSoundMode==='guided' && speechAvailable()){ try{ if(window.speechSynthesis.paused) window.speechSynthesis.resume(); }catch(e){} }
-  if(forceCue && ui.ritualSoundMode==='guided') ritualCue(300,1.6,0.03);
-  var gm=ui.ritualSoundMode==='guided';
-  if(info.stage.key!==ritualAudio.stageKey){
-    ritualAudio.stageKey=info.stage.key;
-    ritualAudio.breathPhase=null;
-    ritualAudio.lineStamp=info.elapsedInStage;
-    ritualAudio.lineCursor=0;
-    if(gm){
-      var f=info.stage.key==='breath'?300:(info.stage.key==='descent'?232:288);
-      ritualCue(f,1.8,0.032);
-      ritualSpeak(info.stage.voice,{interrupt:true});
-    }
-  }
-  if(gm && info.stage.key==='breath'){
-    var c=info.elapsedInStage%10;
-    var ph=c<4?'in':'out';
-    if(ph!==ritualAudio.breathPhase){
-      ritualAudio.breathPhase=ph;
-      if(ph==='in') ritualCue(264,3.4,0.03);
-      else ritualCue(198,5.2,0.028);
-      if(info.elapsedInStage>11){
-        var cyc=Math.floor(info.elapsedInStage/10);
-        if(cyc%4===0){
-          if(ph==='in') ritualSpeak(BREATH_LINES[(cyc/4)%BREATH_LINES.length],{interrupt:true,rate:0.66,pitch:0.80});
-        } else {
-          ritualSpeak(ph==='in'?'Nefes al':'Nefes ver',{interrupt:true,rate:0.64,pitch:0.80,volume:0.9});
-        }
-      }
-    }
-  } else if(gm){
-    ritualAudio.breathPhase=null;
-    if(info.stage.lines && info.stage.lines.length && (info.elapsedInStage-(ritualAudio.lineStamp||0))>=21){
-      ritualAudio.lineStamp=info.elapsedInStage;
-      ritualAudio.lineCursor=(ritualAudio.lineCursor||0)+1;
-      ritualSpeak(info.stage.lines[ritualAudio.lineCursor%info.stage.lines.length],{interrupt:false,rate:0.68,pitch:0.80});
-    }
-  } else {
-    ritualAudio.breathPhase=null;
-  }
-}
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; } return d.days[date]; }
+function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,track:[]}; }
+function emptyReading(){ return {entries:[]}; }
+function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
+function trackedSteps(rec){ var w=dayMovement(rec).walk; return w>0?Math.round(w/STEP_LEN_M):0; }
+function effSteps(rec){ var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null; if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'}; var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'}; return {steps:null,source:'none'}; }
+function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
@@ -598,7 +311,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:''},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -639,61 +352,29 @@ App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function
 App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMed=function(type){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
-App.toggleWindDownStep=function(key){
+App.openReading=function(){ ui.readingOpen=true; ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; render(); };
+App.closeReading=function(){ ui.readingOpen=false; ui.readingDraft=null; render(); };
+App.onReadingField=function(field,el){ if(!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; ui.readingDraft[field]=el.value; };
+App.addReading=function(){
+  var d=ui.readingDraft||{};
+  var title=String(d.title||'').trim();
+  if(!title){ toast('Önce kitabın adını yaz 📖'); var ti=document.getElementById('reading-title'); if(ti) ti.focus(); return; }
+  var pages=parseInt(d.pages,10); if(isNaN(pages)||pages<0) pages=0;
+  var minutes=parseInt(d.minutes,10); if(isNaN(minutes)||minutes<0) minutes=null;
+  var entry={ id:'r_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6), title:title.slice(0,120), author:String(d.author||'').trim().slice(0,80), pages:pages, minutes:minutes, note:String(d.note||'').trim().slice(0,240), ts:new Date().toISOString() };
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  var wd=day.sleep.windDown||emptyWindDown();
-  if(!wd.steps) wd.steps=emptyWindDown().steps;
-  if(!(key in wd.steps)) return;
-  wd.steps[key]=!wd.steps[key];
-  var allDone=WIND_DOWN_STEPS.every(function(s){ return !!wd.steps[s.key]; });
-  if(allDone) wd.lastDoneAt=new Date().toISOString();
-  day.sleep.windDown=wd;
+  if(!day.reading||typeof day.reading!=='object') day.reading=emptyReading();
+  if(!Array.isArray(day.reading.entries)) day.reading.entries=[];
+  day.reading.entries.push(entry);
   day.savedAt=new Date().toISOString();
-  commit(wd.steps[key]?'Ritüel maddesi tamamlandı ✨':undefined);
+  ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''};
+  commit('Okuma kaydedildi 📖');
 };
-App.startWindDown=function(minutes){
-  var m=Math.max(5,Math.min(30,Number(minutes)||10));
-  clearInterval(sleepRitualInterval);
-  ui.sleepRitualTiming=true;
-  ui.sleepRitualLeft=m*60;
-  ui.sleepRitualTotal=m*60;
+App.removeReading=function(id){
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  if(!day.sleep.windDown) day.sleep.windDown=emptyWindDown();
-  day.sleep.windDown.lastMinutes=m;
-  day.savedAt=new Date().toISOString();
-  save();
-  render();
-  sleepRitualInterval=setInterval(function(){
-    ui.sleepRitualLeft--;
-    if(ui.sleepRitualLeft<=0){
-      clearInterval(sleepRitualInterval);
-      ui.sleepRitualLeft=0;
-      ui.sleepRitualTiming=false;
-      var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
-      if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
-      d.sleep.windDown.lastDoneAt=new Date().toISOString();
-      d.savedAt=new Date().toISOString();
-      save();
-      render();
-      toast('Uyku ritüeli tamamlandı. İyi geceler 🌙',2600);
-    } else {
-      updateWindDownTimer();
-    }
-  },1000);
+  if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ day.reading.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
 };
-App.stopWindDown=function(){
-  clearInterval(sleepRitualInterval);
-  ui.sleepRitualTiming=false;
-  ui.sleepRitualLeft=0;
-  ui.sleepRitualTotal=0;
-  render();
-};
-function updateWindDownTimer(){
-  var clock=document.getElementById('sleep-ritual-clock');
-  if(clock) clock.textContent=pad(Math.floor(ui.sleepRitualLeft/60))+':'+pad(ui.sleepRitualLeft%60);
-  var bar=document.getElementById('sleep-ritual-fill');
-  if(bar){ var pct=ui.sleepRitualTotal?Math.max(0,Math.min(100,Math.round((1-ui.sleepRitualLeft/ui.sleepRitualTotal)*100))):0; bar.style.width=pct+'%'; }
-}
+
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.steps!=null&&day.walk.steps>=STEP_TICK_MIN&&!day.habits.walked20){ day.habits.walked20=true; toast('Adımınla yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
 App.hideStepRemind=function(){ ui.stepRemindHidden=true; render(); };
@@ -743,118 +424,6 @@ App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed
 App.removeDiscomfortMed=function(idx){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 App.goSos=function(){ App.go('sos'); };
-App.quickSleepRitual=function(){
-  App.openRitual();
-};
-App.openRitual=function(){
-  clearInterval(ritualInterval);
-  ritualWarmVoices();
-  ui.ritualOpen=true;
-  ui.ritualRunning=false;
-  ui.ritualDone=false;
-  ui.ritualTotal=600;
-  ui.ritualLeft=600;
-  ui.ritualStartedAt=null;
-  ritualAudio.stageKey=null;
-  ritualAudioSync(false);
-  trackRitualEvent('open');
-  render();
-};
-App.closeRitual=function(){
-  clearInterval(ritualInterval);
-  if(ui.ritualStartedAt && !ui.ritualDone && (ui.ritualTotal-ui.ritualLeft)>15){ logRitualSession(false); }
-  ui.ritualStartedAt=null;
-  ui.ritualOpen=false;
-  ui.ritualRunning=false;
-  ui.ritualDone=false;
-  ritualSpeechStop();
-  ritualAudioSync(false);
-  trackRitualEvent('close');
-  render();
-};
-App.setRitualSoundMode=function(mode){
-  if(['silent','ambient','guided'].indexOf(mode)<0) return;
-  ui.ritualSoundMode=mode;
-  if(mode!=='guided'){ ritualSpeechStop(); }
-  else { ritualSpeechUnlock(); }
-  ritualAudio.stageKey=null;
-  ritualAudio.breathPhase=null;
-  ritualAudioSync(true);
-  if(mode==='guided' && ui.ritualRunning){ var info=ritualStageInfo(); ritualSpeak(info.stage.voice,{interrupt:true}); ritualAudio.stageKey=info.stage.key; }
-  trackRitualEvent('sound-mode',{mode:mode});
-  render();
-};
-App.onRitualOffload=function(el){
-  var v=el.value;
-  debounceSave('ritual-offload',function(){
-    var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
-    if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
-    d.sleep.windDown.offloadNote=v;
-    d.savedAt=new Date().toISOString();
-    save();
-  },300);
-};
-App.startRitual=function(){
-  if(ui.ritualDone){ ui.ritualLeft=ui.ritualTotal; ui.ritualDone=false; }
-  if(ui.ritualRunning) return;
-  if(!ui.ritualStartedAt) ui.ritualStartedAt=new Date().toISOString();
-  ui.ritualRunning=true;
-  if(ui.ritualSoundMode==='guided') ritualSpeechUnlock();
-  clearInterval(ritualInterval);
-  ritualAudioSync(true);
-  trackRitualEvent('start');
-  render();
-  ritualInterval=setInterval(function(){
-    ui.ritualLeft--;
-    if(ui.ritualLeft<=0){
-      clearInterval(ritualInterval);
-      ui.ritualLeft=0;
-      ui.ritualRunning=false;
-      ui.ritualDone=true;
-      var d=getDay(data,todayStr(),dayIndexFor(todayStr()));
-      if(!d.sleep.windDown) d.sleep.windDown=emptyWindDown();
-      d.sleep.windDown.lastMinutes=10;
-      d.sleep.windDown.lastDoneAt=new Date().toISOString();
-      WIND_DOWN_STEPS.forEach(function(s){ d.sleep.windDown.steps[s.key]=true; });
-      d.savedAt=new Date().toISOString();
-      save();
-      logRitualSession(true);
-      ui.ritualStartedAt=null;
-      var wasGuided=ui.ritualSoundMode==='guided';
-      ritualSpeechStop();
-      ritualAudioSync(false);
-      if(wasGuided) ritualSpeak('Çok güzel. Ritüel tamamlandı. Ekranı bırak ve kendini uykuya bırak. İyi geceler.',{force:true,interrupt:true,rate:0.66,pitch:0.80});
-      trackRitualEvent('complete');
-      render();
-      toast('Ritüel tamamlandı. İyi geceler 🌙',2600);
-    } else {
-      ritualAudioSync(false);
-      updateRitualTick();
-    }
-  },1000);
-};
-App.pauseRitual=function(){
-  if(!ui.ritualRunning) return;
-  clearInterval(ritualInterval);
-  ui.ritualRunning=false;
-  ritualSpeechStop();
-  ritualAudioSync(false);
-  trackRitualEvent('pause');
-  render();
-};
-App.resetRitual=function(){
-  clearInterval(ritualInterval);
-  if(ui.ritualStartedAt && !ui.ritualDone && (ui.ritualTotal-ui.ritualLeft)>15){ logRitualSession(false); }
-  ui.ritualStartedAt=null;
-  ui.ritualRunning=false;
-  ui.ritualDone=false;
-  ui.ritualLeft=ui.ritualTotal;
-  ritualAudio.stageKey=null;
-  ritualSpeechStop();
-  ritualAudioSync(false);
-  trackRitualEvent('reset');
-  render();
-};
 
 App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
 App.toggleSosTrigger=function(id){ var i=ui.sosTriggers.indexOf(id); if(i>=0) ui.sosTriggers.splice(i,1); else ui.sosTriggers.push(id); render(); };
@@ -892,6 +461,25 @@ App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=n
 App.askReset=function(){ ui.resetStep=1; render(); };
 App.cancelReset=function(){ ui.resetStep=0; render(); };
 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} data=null; ui.resetStep=0; ui.tab='bugun'; render(); };
+App.toggleLocation=function(){
+  if(!data.settings) data.settings={};
+  if(data.settings.locationEnabled){ data.settings.locationEnabled=false; stopLocationWatch(); save(); render(); toast('Konum paylaşımı kapatıldı'); return; }
+  ui.locationConsent=true; render();
+};
+App.cancelLocationConsent=function(){ ui.locationConsent=false; render(); };
+App.confirmLocationConsent=function(){
+  ui.locationConsent=false;
+  if(!data.settings) data.settings={};
+  if(!navigator.geolocation){ render(); toast('Bu cihaz konumu desteklemiyor'); return; }
+  data.settings.locationEnabled=true; save(); render(); toast('Konum izni isteniyor…');
+  startLocationWatch(true);
+};
+App.setLocationMode=function(m){
+  if(m!=='walk'&&m!=='vehicle'&&m!=='auto') return;
+  if(!data.settings) data.settings={};
+  data.settings.locationMode=m; save(); render();
+  toast(m==='walk'?'Yürüyüş modu 🚶':m==='vehicle'?'Araç modu 🚗':'Otomatik mod ✨');
+};
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
 
@@ -904,19 +492,19 @@ App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.
 function sanitizeApiKey(v){ var s=String(v||'').trim(); s=s.replace(/^Bearer\s+/i,''); s=s.replace(/^["'`]+|["'`]+$/g,''); s=s.replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g,''); return s; }
 // OpenAI hata kodlarını kullanıcının anlayacağı Türkçe mesaja çevir.
 function openaiErrText(status,raw){ var m=String(raw||''); if(status===401||/invalid_api_key|Incorrect API key/i.test(m)) return 'OpenAI anahtarın geçersiz görünüyor. Ayarlar’dan doğru anahtarı (sk-…) yapıştırıp “Kaydet ve doğrula” yap. 🔑'; if(status===429||/insufficient_quota|exceeded your current quota/i.test(m)) return 'OpenAI hesabının kullanım kotası/bakiyesi dolmuş olabilir. platform.openai.com → Billing’den bakiye ekleyip tekrar dene. ⏳'; if(status===404||/model_not_found|does not exist|do not have access/i.test(m)) return 'Hesabın istenen yapay zekâ modeline erişemiyor. Farklı bir anahtar dene ya da model erişimi iste. ⚙️'; if(status===403) return 'Erişim reddedildi (403). Anahtarının izinleri yetersiz olabilir. 🔒'; if(status===500||status===502||status===503) return 'OpenAI sunucusu şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene. 🔁'; if(!status) return 'İnternet bağlantısı kurulamadı. Bağlantını kontrol edip tekrar dene. 📶'; return 'Beklenmeyen bir hata oluştu ('+status+'). Birazdan tekrar dene.'; }
-App.setOpenaiKey=function(el){ var v=el.value; if(ui.openaiKeyState&&ui.openaiKeyState!=='checking') ui.openaiKeyState=null; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); save(); },500); };
+App.setOpenaiKey=function(el){ var v=el.value; if(ui.openaiKeyState&&ui.openaiKeyState!=='checking') ui.openaiKeyState=null; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); data.settings.lunaConnected=!!data.settings.openaiKey; save(); },500); };
 App.saveOpenaiKey=function(){
   var inp=document.querySelector('input[oninput*="setOpenaiKey"]');
   var key=inp?sanitizeApiKey(inp.value):sanitizeApiKey((data.settings&&data.settings.openaiKey)||'');
   if(!data.settings) data.settings={};
-  data.settings.openaiKey=key; if(inp) inp.value=key; save();
+  data.settings.openaiKey=key; data.settings.lunaConnected=!!key; if(inp) inp.value=key; save();
   if(!key){ ui.openaiKeyState=null; render(); toast('Anahtar temizlendi'); return; }
   if(key.slice(0,3)!=='sk-'){ ui.openaiKeyState='invalid'; render(); toast('Anahtar “sk-” ile başlamalı — OpenAI anahtarını kontrol et'); return; }
   ui.openaiKeyState='checking'; render();
   fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}})
     .then(function(r){
-      if(r.ok){ ui.openaiKeyState='valid'; render(); toast('Anahtar doğrulandı ✓'); }
-      else if(r.status===401){ ui.openaiKeyState='invalid'; render(); toast('Anahtar geçersiz — kopyalarken karakter eksik/fazla olabilir'); }
+      if(r.ok){ ui.openaiKeyState='valid'; if(data.settings) data.settings.lunaConnected=true; save(); render(); toast('Anahtar doğrulandı ✓'); }
+      else if(r.status===401){ ui.openaiKeyState='invalid'; if(data.settings) data.settings.lunaConnected=false; save(); render(); toast('Anahtar geçersiz — kopyalarken karakter eksik/fazla olabilir'); }
       else if(r.status===429){ ui.openaiKeyState=null; render(); toast('Anahtar kaydedildi ama kota/bakiye dolu olabilir ⏳'); }
       else { ui.openaiKeyState=null; render(); toast('Kaydedildi (doğrulanamadı, '+r.status+')'); }
     })
@@ -951,7 +539,7 @@ function reportHTML(){
   h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
   ['Gün','Tarih','Tik','Mod','Adım','Uyku','SOS','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
   h+='</tr></thead><tbody>';
-  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var st=(rec&&rec.walk&&rec.walk.steps!=null)?rec.walk.steps:'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+habitCountOn(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
+  days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var esr=effSteps(rec); var st=esr.steps!=null?(esr.steps.toLocaleString('tr-TR')+(esr.source==='tracked'?'~':'')):'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+habitCountOn(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
   h+='</tbody></table>';
   h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:15px;font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
   return h;
@@ -1031,32 +619,6 @@ function render(){
     }
   }
   lastRenderTab=ui.tab;
-  if(ui.ritualOpen) ritualRenderedStage=ritualStageInfo().index; else ritualRenderedStage=-1;
-}
-
-// Gece ritüeli sayacı: her saniye tüm uygulamayı yeniden çizmek yerine yalnızca değişen
-// öğeleri günceller — dekoratif animasyonların (aurora, yıldızlar, ses dalgaları) yeniden
-// başlamasını ve titremeyi önler. Aşama değiştiğinde tam render yapılır.
-function updateRitualTick(){
-  if(!ui.ritualOpen){ render(); return; }
-  var info=ritualStageInfo();
-  if(info.index!==ritualRenderedStage){ render(); return; }
-  function setTxt(id,t){ var e=document.getElementById(id); if(e&&e.textContent!==t) e.textContent=t; }
-  setTxt('ritual-clk-head', pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60));
-  if(info.stage.key==='breath' && ui.ritualRunning){
-    var breath=ritualBreathState(info);
-    setTxt('ritual-breath-label', breath.label);
-    setTxt('ritual-breath-count', String(breath.count));
-  } else {
-    setTxt('ritual-clk-phase', pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60));
-  }
-  var orb=ritualOrbScale();
-  var g=document.getElementById('ritual-orb-glow'); if(g){ g.style.opacity=(0.5+orb.glow*0.8).toFixed(3); g.style.transition='opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out'; g.style.transform='scale('+(1+(orb.scale-1)*0.5).toFixed(3)+')'; }
-  var gl=document.getElementById('ritual-orb-glass'); if(gl){ gl.style.transition='transform '+orb.dur+'ms ease-in-out'; gl.style.transform='scale('+orb.scale+')'; }
-  var co=document.getElementById('ritual-orb-core'); if(co){ co.style.transition='transform '+orb.dur+'ms ease-in-out'; co.style.transform='scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+')'; }
-  if(ui.ritualSoundMode==='guided') setTxt('ritual-guide', ui.ritualRunning?('“'+ritualGuideText(info)+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.');
-  if(info.stage.key==='body'){ var bp=ritualBodyPoint(info); setTxt('ritual-body-label', bp.label); setTxt('ritual-body-cue', bp.cue); }
-  setTxt('ritual-progress', '%'+Math.round((ui.ritualTotal-ui.ritualLeft)/ui.ritualTotal*100)+' tamamlandı');
 }
 
 function onboardingHTML(){
@@ -1152,13 +714,12 @@ function energyStressBlock(rec){
 function eveningNudge(rec){
   var hr=new Date().getHours();
   if(hr<20&&hr>4) return '';
-  var wind=rec&&rec.sleep?rec.sleep.windDown:null;
-  var ritualDone=!!(wind&&wind.lastDoneAt&&String(wind.lastDoneAt).slice(0,10)===todayStr());
-  if(ritualDone) return '';
+  var rd=readingStats(rec);
+  if(rd.count>0) return '';
   return '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);border-radius:20px;padding:15px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 26px rgba(110,85,191,0.35);">'
-    +'<span style="font-size:26px;">🌙</span>'
-    +'<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:12px;color:rgba(255,255,255,0.9);line-height:1.35;">Bir ritüel, uykuya dalmanı kolaylaştırır. 10 dakikan var mı?</div></div>'
-    +'<button onclick="App.quickSleepRitual()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:13px;padding:9px 14px;border-radius:12px;">Başlat</button></div>';
+    +'<span style="font-size:26px;">📖</span>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:12px;color:rgba(255,255,255,0.9);line-height:1.35;">Bugün ne okudun? Birkaç sayfa, uykuya geçişi yumuşatır.</div></div>'
+    +'<button onclick="App.openReading()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:13px;padding:9px 14px;border-radius:12px;">Ekle</button></div>';
 }
 
 function stepReminder(rec){
@@ -1172,6 +733,44 @@ function stepReminder(rec){
     +'<div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">Bugünün adımını eklemek ister misin?</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">Telefonundaki adımı yazman ya da Sağlık’tan çekmen yeter — zorunlu değil.</div></div>'
     +'<button onclick="App.go(\'saglik\')" style="flex-shrink:0;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:12.5px;padding:9px 13px;border-radius:12px;">Ekle</button>'
     +'<button onclick="App.hideStepRemind()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);font-size:15px;font-weight:700;line-height:1;">✕</button></div>';
+}
+function fmtDist(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
+function locationCardHTML(){
+  var s=data.settings||{};
+  var on=!!s.locationEnabled;
+  var mode=s.locationMode||'auto';
+  var today=todayStr();
+  var rec=data.days[today]||null;
+  var mv=rec&&rec.movement?rec.movement:{walkM:0,vehicleM:0,totalM:0,maxSpeed:0};
+  var loc=data.location, upd='—';
+  if(loc&&loc.ts){ var am=Math.round((Date.now()-new Date(loc.ts).getTime())/60000); upd = am<1?'az önce':am<60?am+' dk önce':am<1440?Math.round(am/60)+' sa önce':Math.round(am/1440)+' g önce'; }
+  var swBg=on?'linear-gradient(135deg,#7DBE77,#5BA85B)':'linear-gradient(135deg,#E68A84,#D9534F)';
+  var knobLeft=on?'26px':'3px';
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<div style="flex:1;font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:8px;">Konum & Hareket 📍 <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span></div>';
+  h+='<button onclick="App.toggleLocation()" aria-label="Konum paylaşımı aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:56px;height:32px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+knobLeft+';width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
+  h+='</div>';
+  if(!on){
+    h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür.</div>';
+    h+='</div>';
+    return h;
+  }
+  function mbtn(id,emoji,label){ var act=mode===id; return '<button onclick="App.setLocationMode(\''+id+'\')" style="flex:1;border:1px solid '+(act?'#8FBF8A':'var(--card-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(act?'#2F7A3F':'var(--text2)')+';background:'+(act?'rgba(143,191,138,0.18)':'transparent')+';">'+emoji+' '+label+'</button>'; }
+  h+='<div style="display:flex;gap:7px;">'+mbtn('walk','🚶','Yürüyüş')+mbtn('vehicle','🚗','Araç')+mbtn('auto','✨','Oto')+'</div>';
+  h+='<div style="display:flex;gap:10px;">';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün toplam</div><div id="loc-dist-today" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+fmtDist(mv.totalM)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Anlık hız</div><div id="loc-speed" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">0 km/sa</div></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);">🚶 Yürüyüş <b id="loc-walk" style="float:right;">'+fmtDist(mv.walkM)+'</b></span>';
+  h+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);">🚗 Araç <b id="loc-vehicle" style="float:right;">'+fmtDist(mv.vehicleM)+'</b></span>';
+  h+='</div>';
+  if(mode==='auto') h+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  else h+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">Ölçüm yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez). Hareketler korunur, silinmez.</div>';
+  h+='</div>';
+  return h;
 }
 function bugunHTML(){
   var today=todayStr();
@@ -1190,6 +789,7 @@ function bugunHTML(){
 
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+=saveBanner();
+  h+=locationCardHTML();
   // hero
   h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
@@ -1209,9 +809,9 @@ function bugunHTML(){
 
   // SOS button
   h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi 🍫🚨</button>';
-  h+='<button onclick="App.quickSleepRitual()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Gece ritüelini başlat 🌙✨</span></button>';
+  h+='<button onclick="App.openReading()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne okudum? 📖</span></button>';
 
-  // akşam nudge (yalnızca gece, ritüel yapılmadıysa)
+  // akşam nudge (yalnızca gece, okuma eklenmediyse)
   h+=eveningNudge(rec);
 
   // habits
@@ -1396,8 +996,8 @@ function corrInsights(){
 }
 function badgesGrid(){
   var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
-  var waterGoal=0,proteinGoal=0,perfect=0,ritualNights=0;
-  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.sleep&&r.sleep.windDown&&r.sleep.windDown.lastDoneAt) ritualNights++; });
+  var waterGoal=0,proteinGoal=0,perfect=0,readingDays=0;
+  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0) readingDays++; });
   var badges=[
     {e:'🔥',l:'7 gün seri',done:best>=7,sub:best>=7?'tamam':best+'/7'},
     {e:'🏆',l:'30 gün seri',done:best>=30,sub:best>=30?'tamam':best+'/30'},
@@ -1405,7 +1005,7 @@ function badgesGrid(){
     {e:'🌙',l:'7 gece ilaçsız',done:medStreak>=7,sub:medStreak>=7?'tamam':medStreak+'/7'},
     {e:'💧',l:'Su hedefi',done:waterGoal>=1,sub:waterGoal>0?waterGoal+' gün':'henüz yok'},
     {e:'🍳',l:'Protein hedefi',done:proteinGoal>=1,sub:proteinGoal>0?proteinGoal+' gün':'henüz yok'},
-    {e:'🧘',l:'Ritüel ustası',done:ritualNights>=7,sub:ritualNights>=7?'tamam':ritualNights+'/7'},
+    {e:'📖',l:'Okuma tutkunu',done:readingDays>=7,sub:readingDays>=7?'tamam':readingDays+'/7'},
     {e:'👑',l:'7/7 mükemmel',done:perfect>=1,sub:perfect>0?perfect+' gün':'henüz yok'}
   ];
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Rozetler 🏅</div>';
@@ -1416,7 +1016,7 @@ function badgesGrid(){
 }
 
 function weeklyStepRecap(){
-  var stepOf=function(o){ return (o&&o.rec&&o.rec.walk&&o.rec.walk.steps!=null&&o.rec.walk.steps!=='')?Number(o.rec.walk.steps):0; };
+  var stepOf=function(o){ return effSteps(o&&o.rec).steps||0; };
   var t=todayStr();
   var last7=lastNDays(7);
   var prev7=[]; for(var i=13;i>=7;i--){ var d=addDays(t,-i); prev7.push({date:d,rec:data.days[d]||null}); }
@@ -1446,6 +1046,39 @@ function weeklyStepRecap(){
   h+='</div>';
   return h;
 }
+function distanceRecapCard(){
+  var t=todayStr();
+  var last7=lastNDays(7);
+  var prev7=[]; for(var i=13;i>=7;i--){ var d=addDays(t,-i); prev7.push({date:d,rec:data.days[d]||null}); }
+  var sum=function(list,key){ return list.reduce(function(a,o){ return a+dayMovement(o.rec)[key]; },0); };
+  var wTot=sum(last7,'total'), wWalk=sum(last7,'walk'), wVeh=sum(last7,'veh');
+  var pTot=sum(prev7,'total');
+  var todayM=dayMovement(data.days[t]||null);
+  var last30=lastNDays(30); var mTot=sum(last30,'total');
+  var any=mTot>0||wTot>0||todayM.total>0;
+  var head='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15.5px;font-weight:700;color:var(--text);">Mesafe & Hareket 📍</span></div>';
+  if(!any){
+    return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;">'+head
+      +'<div style="font-size:13px;color:var(--text2);line-height:1.5;">Henüz kayıtlı hareket yok. Bugün ekranındaki <b>Konum & Hareket</b> kartından takibi açarsan, kat ettiğin mesafe burada günlük, haftalık ve zaman içinde birikir. 👣🚗</div></div>';
+  }
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">'+head;
+  h+='<div style="display:flex;gap:10px;">';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(todayM.total)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bu hafta</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(wTot)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">30 gün</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(mTot)+'</div></div>';
+  h+='</div>';
+  if(pTot>0){ var d2=wTot-pTot, pct=Math.round(d2/pTot*100); h+='<div style="font-size:12.5px;font-weight:700;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
+  h+='<div style="font-size:12px;color:var(--muted);">Günlük mesafe (son 7 gün)</div>';
+  h+=trendBars(last7,function(o){return dayMovement(o.rec).total;},'linear-gradient(180deg,#7DBE77,#9B7FC9)');
+  h+='<div style="display:flex;gap:5px;">'; last7.forEach(function(o){ h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--faint);">'+o.date.slice(8)+'</div>'; }); h+='</div>';
+  h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);">🚶 Yürüyüş <b style="float:right;">'+fmtDist(wWalk)+'</b></span>';
+  h+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);">🚗 Araç <b style="float:right;">'+fmtDist(wVeh)+'</b></span>';
+  h+='</div>';
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Ölçüm yalnızca uygulama açıkken birikir. Hareketler korunur, silinmez.</div>';
+  h+='</div>';
+  return h;
+}
 function raporHTML(){
   var all=allDays(); var last30=lastNDays(30);
   var totalTicks=0; all.forEach(function(o){ totalTicks+=countRec(o.rec); });
@@ -1458,6 +1091,7 @@ function raporHTML(){
   h+='</div>';
   var msx=nextMilestone(cur); if(msx) h+='<div style="background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:16px;padding:12px 15px;font-size:13px;font-weight:700;color:#7A4A2E;">🎯 Sonraki kilometre taşı: '+msx.target+' gün · yolun %'+msx.pct+'</div>';
   h+=weekSelfCard();
+  h+=distanceRecapCard();
   h+=weeklyStepRecap();
   var avg30=(last30.reduce(function(a,o){return a+countRec(o.rec);},0)/30).toFixed(1);
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+htToday()+'</div></div>';
@@ -1545,7 +1179,7 @@ function ayarlarHTML(){
   else if(ui.openaiKeyState==='valid') oaBadge='<span style="font-size:12px;font-weight:700;color:#fff;background:#3F8A4F;padding:2px 9px;border-radius:999px;">bağlı ✓</span>';
   else if(hasOaKey) oaBadge='<span style="font-size:12px;font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;">bağlı ✓</span>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan 🌙 '+oaBadge+'</div>';
-  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 1 soru hakkın olur — Luna olabildiğince detaylı yanıtlar. 💜</div>';
+  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 5 soru hakkın olur — Luna olabildiğince detaylı yanıtlar. 💜</div>';
   h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.openaiKey||'')+'" oninput="App.setOpenaiKey(this)" placeholder="sk-… (OpenAI API anahtarı)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
   if(ui.openaiKeyState==='invalid') h+='<div style="font-size:12px;color:#C0605F;background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.3);border-radius:12px;padding:9px 11px;">Anahtar geçersiz görünüyor. platform.openai.com’dan doğru anahtarı yapıştırıp tekrar kaydet.</div>';
   h+='<button onclick="App.saveOpenaiKey()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 8px 18px rgba(155,127,201,0.35);">Kaydet ve doğrula ✓</button>';
@@ -1568,7 +1202,8 @@ function num(v){ return (v===null||v===undefined||v==='')?null:Number(v); }
 function ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w){ if(lenFrac<=0) return ''; return '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="'+w+'" stroke-dasharray="'+(lenFrac*C).toFixed(2)+' '+(C-lenFrac*C).toFixed(2)+'" stroke-dashoffset="'+(-startFrac*C).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>'; }
 
 function activityRings(rec){
-  var steps=rec&&rec.walk?num(rec.walk.steps):null;
+  var es=effSteps(rec);
+  var steps=es.steps;
   var mins=rec&&rec.walk?num(rec.walk.minutes):null;
   var sleep=rec&&rec.sleep?num(rec.sleep.hours):null;
   var mealCount=0; if(rec&&rec.meals){ ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(rec.meals[k]&&String(rec.meals[k]).trim()) mealCount++; }); }
@@ -1582,12 +1217,14 @@ function activityRings(rec){
   svg+='</svg>';
   var legend='<div style="flex:1;display:flex;flex-direction:column;gap:8px;">';
   rings.forEach(function(r){ legend+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:10px;height:10px;border-radius:50%;background:'+r.color+';display:inline-block;flex-shrink:0;"></span><span style="color:var(--muted);">'+r.label+'</span><b style="margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums;">'+(r.val!=null?r.val+r.unit:'—')+'</b></div>'; });
-  legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün · '+dayNutrition(rec).protein+'g protein</div></div>';
+  legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün · '+dayNutrition(rec).protein+'g protein</div>';
+  if(es.source==='tracked'){ var dm=dayMovement(rec); legend+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;">👣 Adım, konum takibinden tahmini ('+fmtDist(dm.walk)+' yürüyüş). Elle girersen o geçerli olur.</div>'; }
+  legend+='</div>';
   return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:16px;"><div style="flex-shrink:0;">'+svg+'</div>'+legend+'</div>';
 }
 
 function sparkCard(){
-  var today=todayStr(); var arr=[]; for(var i=6;i>=0;i--){ var dd=addDays(today,-i); var rec=data.days[dd]; arr.push({d:dd,steps:rec&&rec.walk?num(rec.walk.steps):null,sleep:rec&&rec.sleep?num(rec.sleep.hours):null}); }
+  var today=todayStr(); var arr=[]; for(var i=6;i>=0;i--){ var dd=addDays(today,-i); var rec=data.days[dd]; arr.push({d:dd,steps:effSteps(rec).steps,sleep:rec&&rec.sleep?num(rec.sleep.hours):null}); }
   var maxS=Math.max.apply(null,[8000].concat(arr.map(function(a){return a.steps||0;})));
   var maxSl=Math.max.apply(null,[8].concat(arr.map(function(a){return a.sleep||0;})));
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">Son 7 gün 📈</div>';
@@ -1604,42 +1241,31 @@ function sparkCard(){
 
 function sleepReadiness(rec){
   var sl=rec&&rec.sleep?rec.sleep:{};
-  var wind=sl.windDown||emptyWindDown();
-  var wd=wind.steps?wind.steps:emptyWindDown().steps;
-  var completed=WIND_DOWN_STEPS.reduce(function(a,s){ return a+(wd[s.key]?1:0); },0);
-  var today=todayStr();
-  // 1) Uyku süresi (yetişkin hedefi ~7.5-8.5 sa) — maks 28
+  var rd=readingStats(rec);
+  // 1) Uyku süresi (yetişkin hedefi ~7.5-8.5 sa) — maks 34
   var hours=num(sl.hours), fDur=0;
-  if(hours!=null){ fDur=Math.round(28*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))); }
-  // 2) Öznel kalite — maks 16
-  var fQual=sl.quality==='good'?16:(sl.quality==='ok'?9:(sl.quality==='bad'?3:0));
-  // 3) Wind-down maddeleri (uyku hijyeni/uyaran kontrolü) — maks 20
-  var fSteps=Math.round(20*(completed/WIND_DOWN_STEPS.length));
-  // 4) Ritüel tamamlama — maks 20
-  var ritualDoneToday=!!(wind.lastDoneAt&&String(wind.lastDoneAt).slice(0,10)===today);
-  var sessions=Array.isArray(wind.sessions)?wind.sessions:[];
-  var partialToday=false;
-  for(var i=0;i<sessions.length;i++){ var s=sessions[i]; var dt=(s.endedAt||s.startedAt||'').slice(0,10); if(dt===today){ if(s.completed) ritualDoneToday=true; else partialToday=true; } }
-  var fRit=ritualDoneToday?20:(partialToday?10:0);
-  // 5) Bilişsel boşaltma (yarına bırakma) — maks 8
-  var fOff=(wind.offloadNote&&String(wind.offloadNote).trim())?8:0;
-  // 6) İlaç/takviye — maks 8 (ilaçsız uykuya hazırlık göstergesi)
+  if(hours!=null){ fDur=Math.round(34*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))); }
+  // 2) Öznel kalite — maks 22
+  var fQual=sl.quality==='good'?22:(sl.quality==='ok'?12:(sl.quality==='bad'?4:0));
+  // 3) İlaç/takviye — maks 10 (ilaçsız uykuya hazırlık göstergesi)
   var medType=(sl.med&&sl.med.type)?sl.med.type:null;
-  var fMed=medType==='none'?8:(medType==='herbal'?5:(medType==='rx'?2:4));
-  var factors={duration:fDur,quality:fQual,steps:fSteps,ritual:fRit,offload:fOff,medication:fMed};
-  var score=fDur+fQual+fSteps+fRit+fOff+fMed;
+  var fMed=medType==='none'?10:(medType==='herbal'?6:(medType==='rx'?3:5));
+  // 4) Okuma (uyku öncesi okuma alışkanlığı, ekran yerine sayfa) — maks 34
+  var fReading=rd.count>0?Math.min(34,16+Math.min(18,rd.pages)):0;
+  var factors={duration:fDur,quality:fQual,medication:fMed,reading:fReading};
+  var score=fDur+fQual+fMed+fReading;
   score=Math.max(0,Math.min(100,score));
   var tier='Rahat';
   if(score>=85) tier='Mükemmel';
   else if(score>=70) tier='Güçlü';
   else if(score>=55) tier='Dengeli';
-  return {score:score,tier:tier,completed:completed,factors:factors,ritualDoneToday:ritualDoneToday,medType:medType};
+  return {score:score,tier:tier,readingCount:rd.count,readingPages:rd.pages,factors:factors,medType:medType};
 }
 
 function medFreeBadge(){
   var s=medFreeStreak();
   if(s<1) return '';
-  return '<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(143,191,138,0.22),rgba(155,127,201,0.16));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 13px;"><span style="font-size:22px;">🌙</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">'+s+' gecedir ilaçsız</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(s>=7?'Bir haftayı geçtin — beden kendi sistemini öğreniyor.':'Hedef: uyku ilacına ihtiyacı azaltmak. Düzenli ritüel bunu büyütür.')+'</div></div></div>';
+  return '<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(143,191,138,0.22),rgba(155,127,201,0.16));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 13px;"><span style="font-size:22px;">🌙</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">'+s+' gecedir ilaçsız</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(s>=7?'Bir haftayı geçtin — beden kendi sistemini öğreniyor.':'Hedef: uyku ilacına ihtiyacı azaltmak. Düzenli uyku hijyeni bunu büyütür.')+'</div></div></div>';
 }
 function caffeineBlock(rec){
   var caf=(rec&&rec.caffeine&&typeof rec.caffeine==='object')?rec.caffeine:{last:null,cups:null};
@@ -1711,7 +1337,6 @@ function discomfortCard(rec){
 function saglikHTML(){
   var today=todayStr(); var rec=data.days[today]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
-  var wd=sl.windDown||emptyWindDown();
   var readiness=sleepReadiness(rec);
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;">Sağlık 🌸</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Uyku, yürüyüş ve döngü — küçük veriler, büyük resim.</div></div>';
@@ -1736,19 +1361,23 @@ function saglikHTML(){
   h+=caffeineBlock(rec);
   h+=medFreeBadge();
   h+='<div style="border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(138,117,200,0.2),rgba(233,175,193,0.16));border:1px solid rgba(155,127,201,0.3);display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+readiness.completed+'/4 madde</div></div>';
+  var rdChip=readiness.readingCount>0?(readiness.readingCount+' kitap · '+readiness.readingPages+' sayfa'):'okuma yok';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+rdChip+'</div></div>';
   var rf=readiness.factors||{};
-  var fdefs=[['Uyku süresi',rf.duration||0,28],['Kalite',rf.quality||0,16],['Hazırlık maddeleri',rf.steps||0,20],['Ritüel',rf.ritual||0,20],['Zihni boşaltma',rf.offload||0,8],['İlaçsızlık',rf.medication||0,8]];
+  var fdefs=[['Uyku süresi',rf.duration||0,34],['Kalite',rf.quality||0,22],['İlaçsızlık',rf.medication||0,10],['Okuma',rf.reading||0,34]];
   h+='<div style="display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
   fdefs.forEach(function(f){ var pct=Math.round(f[1]/f[2]*100); h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);width:104px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:6px;border-radius:999px;background:rgba(90,69,122,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);"></div></div><div style="font-size:10.5px;color:var(--faint);width:34px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
-  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:3px;">Hedef ~7.5-8.5 sa uyku, tamamlanmış ritüel ve uyku hijyeni maddeleri skoru yükseltir. (CBT-I temelli ağırlıklandırma.)</div>';
+  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:3px;">Hedef ~7.5-8.5 sa uyku, iyi kalite, ilaçsızlık ve uyku öncesi okuma skoru yükseltir.</div>';
   h+='</div>';
-  h+='<div style="display:flex;flex-direction:column;gap:7px;">';
-  WIND_DOWN_STEPS.forEach(function(s){ var done=!!(wd.steps&&wd.steps[s.key]); h+='<button onclick="App.toggleWindDownStep(\''+s.key+'\')" style="border-radius:12px;padding:9px 11px;cursor:pointer;display:flex;align-items:center;gap:9px;text-align:left;'+(done?'background:linear-gradient(135deg,rgba(239,228,255,0.85),rgba(251,227,232,0.9));border:1px solid rgba(184,155,217,0.9);':'background:rgba(255,255,255,0.45);border:1px solid rgba(155,127,201,0.22);')+'"><span style="font-size:17px;">'+s.icon+'</span><span style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;"><span style="font-size:13px;font-weight:700;color:var(--text);">'+s.label+'</span><span style="font-size:11px;color:var(--muted);">'+s.note+'</span></span><span style="font-size:15px;color:'+(done?'#7B57B4':'var(--faint)')+';">'+(done?'✓':'○')+'</span></button>'; });
-  h+='</div>';
-  h+='<div style="display:flex;gap:7px;">'+[10,15,20].map(function(m){ return '<button onclick="App.startWindDown('+m+')" style="flex:1;border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:9px;border-radius:12px;font-size:12.5px;font-weight:700;color:#5A457A;background:rgba(255,255,255,0.62);">'+m+' dk</button>'; }).join('')+'</div>';
-  h+='<div style="display:flex;align-items:center;gap:10px;"><div id="sleep-ritual-clock" style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);min-width:66px;">'+(ui.sleepRitualTiming?(pad(Math.floor(ui.sleepRitualLeft/60))+':'+pad(ui.sleepRitualLeft%60)):'00:00')+'</div><div style="flex:1;height:8px;border-radius:999px;background:rgba(90,69,122,0.18);overflow:hidden;"><div id="sleep-ritual-fill" style="height:100%;width:'+(ui.sleepRitualTiming?(Math.round((1-ui.sleepRitualLeft/(ui.sleepRitualTotal||1))*100)):0)+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);transition:width .35s ease;"></div></div>'+(ui.sleepRitualTiming?'<button onclick="App.stopWindDown()" style="border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:700;color:#5A457A;background:rgba(255,255,255,0.72);">Durdur</button>':'')+'</div>';
-  h+='<div style="font-size:11.5px;line-height:1.45;color:var(--muted);">Ritüel sırası: ışık → nefes → zihni boşaltma → serin/karanlık oda. Düzenli tekrar, uykuya dalma süresini kısaltmaya yardımcı olur.</div>';
+  var rdEntries=readingStats(rec).entries;
+  if(rdEntries.length>0){
+    h+='<div style="display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
+    h+='<div style="font-size:11px;letter-spacing:.4px;font-weight:800;color:var(--muted);">BUGÜN OKUDUKLARIM</div>';
+    rdEntries.forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;">📖</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title||'(başlıksız)')+(e.author?' <span style=\"font-weight:500;color:var(--faint);\">· '+esc(e.author)+'</span>':'')+'</div>'+(meta.length?'<div style="font-size:11px;color:var(--faint);">'+meta.join(' · ')+'</div>':'')+'</div></div>'; });
+    h+='</div>';
+  }
+  h+='<button onclick="App.openReading()" style="border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:11px;border-radius:14px;font-size:13.5px;font-weight:800;color:#5A457A;background:rgba(255,255,255,0.62);display:flex;align-items:center;justify-content:center;gap:7px;">📖 Okuma ekle</button>';
+  h+='<div style="font-size:11.5px;line-height:1.45;color:var(--muted);">Uyku öncesi birkaç sayfa okumak, ekran ışığına göre uykuya geçişi kolaylaştırır.</div>';
   h+='</div>';
   h+='</div>';
   // yürüyüş
@@ -1757,6 +1386,8 @@ function saglikHTML(){
   h+='<div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(wk.minutes!=null?esc(wk.minutes):'')+'" oninput="App.setWalkMinutes(this)" placeholder="25" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div></div>';
   var walkedToday=!!(rec&&rec.habits&&rec.habits.walked20);
   var stepsEmpty=!(wk.steps!=null&&wk.steps!=='');
+  var trk=trackedSteps(rec);
+  if(stepsEmpty&&trk>0){ var dmW=dayMovement(rec); h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(125,190,119,0.14),rgba(155,127,201,0.10));border:1px solid rgba(125,190,119,0.4);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">📍</span><div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Konum takibinden bugün <b>~'+trk.toLocaleString('tr-TR')+' adım</b> ('+fmtDist(dmW.walk)+' yürüyüş) algılandı ve kullanılıyor. Elle adım girersen <b>girdiğin değer</b> geçerli olur.</div></div>'; }
   if(walkedToday&&stepsEmpty&&!ui.stepNudgeHidden){
     h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(143,191,138,0.16),rgba(155,127,201,0.12));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 12px;">';
     h+='<span style="font-size:18px;line-height:1.2;">👣</span>';
@@ -1857,96 +1488,33 @@ function navHTML(){
 
 function modalsHTML(){
   var h='';
-  if(ui.ritualOpen){
-    var info=ritualStageInfo();
-    var stage=info.stage;
-    var phasePct=Math.round((ui.ritualTotal-ui.ritualLeft)/ui.ritualTotal*100);
-    var orb=ritualOrbScale();
-    var dRec=getDay(data,todayStr(),dayIndexFor(todayStr()));
-    var dWind=(dRec&&dRec.sleep&&dRec.sleep.windDown)?dRec.sleep.windDown:emptyWindDown();
-    var mode=ui.ritualSoundMode;
-    var breath=ritualBreathState(info);
-    var guideLine=ritualGuideText(info);
-    var running=ui.ritualRunning;
-    h+='<div style="position:fixed;inset:0;z-index:380;display:flex;justify-content:center;background:#07060C;animation:seyFade .3s ease;">';
-    h+='<div style="position:relative;width:100%;max-width:460px;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(125% 78% at 50% -8%,#3B2D66 0%,#241A3B 46%,#120E1B 100%);">';
-    // animated aurora + star layers (decorative, behind content)
-    h+='<div style="position:absolute;inset:-20% -10%;pointer-events:none;background:radial-gradient(40% 32% at 28% 22%,rgba(155,127,201,0.42),rgba(0,0,0,0) 70%),radial-gradient(44% 36% at 76% 30%,rgba(233,175,193,0.30),rgba(0,0,0,0) 72%);animation:seyAurora 18s ease-in-out infinite;"></div>';
-    h+='<div style="position:absolute;inset:0;pointer-events:none;">';
-    var stars=[[12,16],[24,9],[38,22],[52,12],[68,18],[80,10],[88,26],[18,32],[60,30],[34,38],[74,40],[46,44]];
-    stars.forEach(function(s,i){ h+='<span style="position:absolute;left:'+s[0]+'%;top:'+s[1]+'%;width:'+(i%3===0?3:2)+'px;height:'+(i%3===0?3:2)+'px;border-radius:50%;background:#fff;opacity:.4;animation:seyTwinkle '+(2.4+(i%5)*0.6)+'s ease-in-out infinite;animation-delay:'+(i*0.3)+'s;"></span>'; });
+  if(ui.readingOpen){
+    var dr=ui.readingDraft||{title:'',author:'',pages:'',minutes:'',note:''};
+    var dRecR=getDay(data,todayStr(),dayIndexFor(todayStr()));
+    var rEntries=(dRecR&&dRecR.reading&&Array.isArray(dRecR.reading.entries))?dRecR.reading.entries:[];
+    var totPages=rEntries.reduce(function(a,e){ var p=Number(e&&e.pages); return a+((!isNaN(p)&&p>0)?p:0); },0);
+    h+='<div onclick="App.closeReading()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:440px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:86vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;">Bugün ne okudum? 📖</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Kitap adı ve sayfa sayısı — okuma rutinin burada birikir.</div></div><button onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);flex-shrink:0;">✕</button></div>';
+    // form
+    h+='<div style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:18px;padding:14px;">';
+    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Kitap adı</div><input id="reading-title" type="text" value="'+esc(dr.title||'')+'" oninput="App.onReadingField(\'title\',this)" placeholder="örn. Sefiller" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;"></div>';
+    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Yazar <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><input type="text" value="'+esc(dr.author||'')+'" oninput="App.onReadingField(\'author\',this)" placeholder="örn. Victor Hugo" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;"></div>';
+    h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Sayfa</div><input type="number" inputmode="numeric" min="0" value="'+(dr.pages!=null&&dr.pages!==''?esc(dr.pages):'')+'" oninput="App.onReadingField(\'pages\',this)" placeholder="32" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div>';
+    h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(dr.minutes!=null&&dr.minutes!==''?esc(dr.minutes):'')+'" oninput="App.onReadingField(\'minutes\',this)" placeholder="20" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div></div>';
+    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Not <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><textarea rows="2" oninput="App.onReadingField(\'note\',this)" placeholder="Aklında kalan bir cümle, duygu…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;resize:none;line-height:1.45;">'+esc(dr.note||'')+'</textarea></div>';
+    h+='<button onclick="App.addReading()" style="border:none;cursor:pointer;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);box-shadow:0 10px 24px rgba(110,85,191,0.4);">Okumayı kaydet 📖</button>';
     h+='</div>';
-    h+='<div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto;">';
-    // header
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">';
-    h+='<button onclick="App.closeRitual()" style="border:1px solid rgba(255,255,255,0.2);cursor:pointer;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);color:#F3E9ED;font-size:16px;font-weight:700;line-height:1;">‹</button>';
-    h+='<div style="text-align:center;"><div style="font-size:11px;letter-spacing:1.5px;color:rgba(233,175,193,0.9);font-weight:800;">GECE RİTÜELİ</div><div style="font-size:11px;color:rgba(243,233,237,0.6);margin-top:1px;">10 dakikalık uykuya geçiş</div></div>';
-    h+='<div id="ritual-clk-head" style="min-width:38px;text-align:right;font-size:15px;color:#fff;font-weight:800;font-variant-numeric:tabular-nums;">'+pad(Math.floor(ui.ritualLeft/60))+':'+pad(ui.ritualLeft%60)+'</div></div>';
-    // stage title
-    h+='<div style="text-align:center;margin-top:14px;"><div style="font-size:26px;font-weight:800;line-height:1.15;color:#fff;">'+esc(stage.label)+'</div><div style="font-size:13px;line-height:1.5;color:rgba(243,233,237,0.78);margin-top:5px;">'+esc(stage.hint)+'</div></div>';
-    // ---- ORB ----
-    h+='<div style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;margin:16px 0 6px;"><div style="position:relative;width:248px;height:248px;display:flex;align-items:center;justify-content:center;">';
-    if(running){ h+='<div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(233,175,193,0.4);animation:seyRingPulse 4s ease-out infinite;"></div><div style="position:absolute;width:208px;height:208px;border-radius:50%;border:1px solid rgba(155,127,201,0.4);animation:seyRingPulse 4s ease-out infinite;animation-delay:2s;"></div>'; }
-    h+='<div style="position:absolute;width:248px;height:248px;border-radius:50%;background:radial-gradient(circle at 50% 36%,rgba(233,175,193,'+(orb.glow*1.05).toFixed(3)+'),rgba(155,127,201,'+(orb.glow*0.3).toFixed(3)+') 58%,rgba(0,0,0,0));opacity:'+(0.5+orb.glow*0.8).toFixed(3)+';transition:opacity '+orb.dur+'ms ease-in-out,transform '+orb.dur+'ms ease-in-out;transform:scale('+(1+(orb.scale-1)*0.5).toFixed(3)+');" id="ritual-orb-glow"></div>';
-    h+='<div style="position:absolute;width:188px;height:188px;border-radius:50%;border:1px solid rgba(255,255,255,0.22);background:linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.02));transform:scale('+orb.scale+');transition:transform '+orb.dur+'ms ease-in-out;" id="ritual-orb-glass"></div>';
-    h+='<div style="position:absolute;width:132px;height:132px;border-radius:50%;background:linear-gradient(135deg,#E9AFC1,#9B7FC9);opacity:0.9;box-shadow:0 16px 46px rgba(155,127,201,0.5);transform:scale('+(0.96+(orb.scale-1)*0.4).toFixed(3)+');transition:transform '+orb.dur+'ms ease-in-out;" id="ritual-orb-core"></div>';
-    if(stage.key==='breath' && running){
-      h+='<div style="position:relative;text-align:center;color:#fff;"><div id="ritual-breath-label" style="font-size:40px;font-weight:800;line-height:1;">'+esc(breath.label)+'</div><div id="ritual-breath-count" style="font-size:30px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums;opacity:0.92;">'+breath.count+'</div></div>';
+    // today list
+    if(rEntries.length>0){
+      h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+rEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+totPages+' sayfa</div></div>';
+      rEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">📖</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:13px;">🗑️</button></div>'; });
+      h+='</div>';
     } else {
-      h+='<div style="position:relative;text-align:center;color:#fff;"><div id="ritual-clk-phase" style="font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;">'+pad(Math.floor(info.leftInStage/60))+':'+pad(info.leftInStage%60)+'</div><div style="font-size:11px;opacity:0.85;margin-top:5px;letter-spacing:.5px;">FAZ KALAN</div></div>';
+      h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için okuma eklemedin. Birkaç sayfa bile sayılır 💜</div>';
     }
     h+='</div></div>';
-    // ---- MODE STATUS BANNER (the differentiator) ----
-    if(mode==='guided'){
-      h+='<div style="border:1px solid rgba(233,175,193,0.5);background:linear-gradient(135deg,rgba(233,175,193,0.22),rgba(155,127,201,0.16));border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
-      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:rgba(233,175,193,0.32);border-radius:999px;padding:4px 10px;">🔊 SESLİ REHBER AKTİF</span>';
-      h+='<span style="display:inline-flex;align-items:flex-end;gap:2px;height:18px;">';
-      for(var vw=0;vw<7;vw++){ h+='<span style="width:3px;height:18px;border-radius:2px;background:#F3C6D3;transform-origin:bottom;'+(running?'animation:seyVoiceWave '+(0.8+(vw%3)*0.18)+'s ease-in-out infinite;animation-delay:'+(vw*0.09)+'s;':'opacity:.45;')+'"></span>'; }
-      h+='</span></div>';
-      h+='<div id="ritual-guide" style="margin-top:9px;font-size:14.5px;line-height:1.45;color:#fff;font-weight:600;min-height:21px;">'+esc(running?('“'+guideLine+'”'):'Başlat dediğinde Türkçe sesli koç sana eşlik edecek.')+'</div>';
-      h+='<div style="margin-top:7px;font-size:10.5px;line-height:1.4;color:rgba(243,233,237,0.7);">🔈 Sesi duymuyorsan: telefonun yan <b>sessiz düğmesini kapat</b> ve ses seviyesini aç.</div>';
-      h+='</div>';
-    } else if(mode==='ambient'){
-      h+='<div style="border:1px solid rgba(124,196,214,0.45);background:linear-gradient(135deg,rgba(86,150,196,0.22),rgba(124,196,214,0.12));border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
-      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:#fff;background:rgba(124,196,214,0.3);border-radius:999px;padding:4px 10px;">🌊 AMBİYANS ÇALIYOR</span>';
-      h+='<span style="display:inline-flex;align-items:flex-end;gap:3px;height:22px;">';
-      for(var eq=0;eq<9;eq++){ h+='<span style="width:4px;height:22px;border-radius:2px;background:linear-gradient(180deg,#BFE9F2,#5E9FD0);transform-origin:bottom;'+(running?'animation:seyEq '+(0.9+(eq%4)*0.22)+'s ease-in-out infinite;animation-delay:'+(eq*0.08)+'s;':'opacity:.4;transform:scaleY(.5);')+'"></span>'; }
-      h+='</span></div>';
-      h+='<div style="margin-top:9px;font-size:13px;line-height:1.45;color:rgba(243,247,250,0.86);">Sözsüz, kesintisiz ses ortamı: yumuşak pembe gürültü + sıcak drone yavaşça kabarıp iniyor. Konuşma yok.</div>';
-      h+='</div>';
-    } else {
-      h+='<div style="border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);border-radius:16px;padding:12px 14px;animation:seyFloatIn .4s ease;">';
-      h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:rgba(243,233,237,0.85);background:rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;">🌑 SESSİZ MOD</span><span style="font-size:12.5px;color:rgba(243,233,237,0.6);">Ses yok</span></div>';
-      h+='<div style="margin-top:9px;font-size:13px;line-height:1.45;color:rgba(243,233,237,0.78);">Yalnızca görsel rehber: nefes küresini ve faz yönergelerini izle. Tam sessizlik.</div>';
-      h+='</div>';
-    }
-    // ---- MODE SELECTOR (3 cards) ----
-    h+='<div style="display:flex;gap:8px;margin-top:12px;">';
-    ['silent','ambient','guided'].forEach(function(mk){ var meta=ritualModeMeta(mk); var active=mode===mk; h+='<button onclick="App.setRitualSoundMode(\''+mk+'\')" style="flex:1;text-align:left;border:'+(active?'1px solid rgba(233,175,193,0.8)':'1px solid rgba(255,255,255,0.14)')+';cursor:pointer;padding:10px 9px;border-radius:14px;background:'+(active?'linear-gradient(135deg,rgba(155,127,201,0.5),rgba(233,175,193,0.3))':'rgba(255,255,255,0.05)')+';color:#F3E9ED;box-shadow:'+(active?'0 6px 18px rgba(155,127,201,0.35)':'none')+';transition:all .2s;"><div style="font-size:17px;line-height:1;">'+meta.icon+'</div><div style="font-size:12.5px;font-weight:'+(active?'800':'650')+';margin-top:5px;">'+meta.label+'</div><div style="font-size:9.5px;line-height:1.25;color:rgba(243,233,237,0.62);margin-top:2px;">'+esc(meta.desc)+'</div></button>'; });
-    h+='</div>';
-    // ---- stage-specific helper cards ----
-    if(stage.key==='body'){
-      var bp=ritualBodyPoint(info);
-      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 13px;text-align:center;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;">BODY SCAN ODAĞI</div><div id="ritual-body-label" style="font-size:15.5px;font-weight:800;color:#fff;margin-top:3px;">'+esc(bp.label)+'</div><div id="ritual-body-cue" style="font-size:12.5px;color:rgba(243,233,237,0.82);margin-top:4px;line-height:1.45;">'+esc(bp.cue)+'</div></div>';
-    } else if(stage.key==='offload'){
-      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.05);border-radius:14px;padding:11px 12px 10px;"><div style="font-size:10.5px;letter-spacing:.8px;color:rgba(233,175,193,0.95);font-weight:800;margin-bottom:7px;">YARINA BIRAK</div><textarea oninput="App.onRitualOffload(this)" rows="2" placeholder="Yarın için tek not: örn. 09:30 toplantı" style="width:100%;border:1px solid rgba(255,255,255,0.22);background:rgba(18,14,27,0.5);color:#F3E9ED;border-radius:11px;padding:9px 11px;font-size:13px;outline:none;resize:none;line-height:1.4;">'+esc(dWind.offloadNote||'')+'</textarea></div>';
-    } else if(stage.key==='descent'){
-      h+='<div style="margin-top:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);border-radius:14px;padding:11px 13px;text-align:center;font-size:12.5px;color:rgba(243,233,237,0.84);line-height:1.5;">Sadece nefesi izle, ekranı bırakmaya hazırlan. Uyarıcı düşünce gelirse “yarın” deyip geç.</div>';
-    }
-    // ---- progress dots with labels ----
-    h+='<div style="display:flex;gap:6px;margin-top:14px;">';
-    RITUAL_STAGES.forEach(function(s,idx){ var active=idx===info.index; var done=idx<info.index; h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;"><div style="width:100%;height:5px;border-radius:999px;background:'+(done?'linear-gradient(90deg,#E9AFC1,#9B7FC9)':(active?'rgba(233,175,193,0.55)':'rgba(255,255,255,0.12)'))+';box-shadow:'+(active?'0 0 0 1px rgba(233,175,193,0.45) inset':'none')+';"></div><span style="font-size:8.5px;color:'+(active?'#E9AFC1':'rgba(243,233,237,0.42)')+';font-weight:'+(active?'800':'500')+';white-space:nowrap;">'+esc(s.label.split(' ')[0])+'</span></div>'; });
-    h+='</div>';
-    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:rgba(243,233,237,0.72);margin-top:8px;"><span>Aşama '+(info.index+1)+'/'+RITUAL_STAGES.length+'</span><span id="ritual-progress">%'+phasePct+' tamamlandı</span></div>';
-    // ---- controls ----
-    h+='<div style="display:flex;gap:8px;margin-top:14px;">';
-    if(!running&&ui.ritualLeft===ui.ritualTotal&&!ui.ritualDone) h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Ritüeli başlat</button>';
-    else if(running) h+='<button onclick="App.pauseRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Duraklat</button>';
-    else h+='<button onclick="App.startRitual()" style="flex:1;border:none;cursor:pointer;padding:15px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-size:14.5px;font-weight:800;box-shadow:0 8px 22px rgba(155,127,201,0.4);">Devam et</button>';
-    h+='<button onclick="App.resetRitual()" style="border:1px solid rgba(255,255,255,0.2);cursor:pointer;padding:15px 17px;border-radius:15px;background:rgba(255,255,255,0.07);color:#F3E9ED;font-size:13px;font-weight:700;">Sıfırla</button>';
-    h+='</div>';
-    if(ui.ritualDone) h+='<div style="margin-top:12px;text-align:center;font-size:13px;color:#E9AFC1;font-weight:600;">Ritüel tamamlandı 🌙 Ekranı bırakıp uykuya geçebilirsin.</div>';
-    h+='</div></div></div>';
   }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
@@ -1967,6 +1535,15 @@ function modalsHTML(){
     if(d.hasNote) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
     h+='</div></div>';
   }
+  if(ui.locationConsent){
+    h+='<div onclick="App.cancelLocationConsent()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
+    h+='<div style="font-size:19px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">📍 Konum paylaşımı</div>';
+    h+='<p style="margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
+    h+='<p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
+    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
+    h+='</div></div>';
+  }
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
     h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
@@ -1978,30 +1555,109 @@ function modalsHTML(){
 // boot
 if(data){ data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save(); }
 window.App=App;
-ritualWarmVoices();
 
-// ---------- konum takibi (gözlemci için, 12 saatte bir günceller) ----------
-(function tryGetLocation(){
-  if(!data) return;
+// ---------- konum & hareket takibi (yalnızca kullanıcı açık rıza verdiyse) ----------
+// Web/PWA arka planda izleyemez; ölçüm yalnızca uygulama açık ve ön plandayken yapılır.
+var moveState={watchId:null,lastFix:null,smoothSpeed:0,autoMode:null,distSinceSync:0,lastSyncTs:0};
+
+function haversineM(a,b){
+  var R=6371000, toRad=Math.PI/180;
+  var dLat=(b.lat-a.lat)*toRad, dLng=(b.lng-a.lng)*toRad;
+  var la1=a.lat*toRad, la2=b.lat*toRad;
+  var s=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));
+}
+function autoModeLabel(){ return moveState.autoMode==='vehicle'?'🚗 Araç':moveState.autoMode==='walk'?'🚶 Yürüyüş':'algılanıyor…'; }
+function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} }
+function scheduleMoveSync(){ if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } moveState.distSinceSync=0; moveState.lastSyncTs=Date.now(); }
+function maybeSyncMovement(){ if((Date.now()-moveState.lastSyncTs)>=90000 || moveState.distSinceSync>=100) scheduleMoveSync(); }
+function downsampleTrack(arr,max){ if(arr.length<=max) return arr; var out=[],step=arr.length/max; for(var i=0;i<max;i++) out.push(arr[Math.floor(i*step)]); out[out.length-1]=arr[arr.length-1]; return out; }
+function markLatestLocation(fix){
+  data.location={lat:fix.lat,lng:fix.lng,acc:fix.acc,ts:new Date(fix.ts).toISOString()};
+  data.locationLastTs=data.location.ts;
+  if(!Array.isArray(data.locationHistory)) data.locationHistory=[];
+  data.locationHistory.push(data.location);
+  if(data.locationHistory.length>60) data.locationHistory=data.locationHistory.slice(-60);
+}
+function onLocationFix(pos){
+  if(!data || !data.settings || !data.settings.locationEnabled) return;
+  var acc=Math.round(pos.coords.accuracy||0);
+  var fix={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:acc,ts:Date.now(),spd:(typeof pos.coords.speed==='number'&&pos.coords.speed>=0)?pos.coords.speed:null};
+  var prev=moveState.lastFix;
+  var usable=!(acc>0 && acc>50); // doğruluk kapısı
+  if(prev && usable){
+    var dt=(fix.ts-prev.ts)/1000;
+    if(dt>=1){
+      var dist=haversineM(prev,fix);
+      var inst=fix.spd!=null?fix.spd:(dist/dt);
+      if(inst<=83){ // <=300 km/h makuliyet
+        var minMove=Math.max(8, acc*0.5);
+        if(dist>=minMove){
+          moveState.smoothSpeed=moveState.smoothSpeed*0.6+inst*0.4;
+          var mode=data.settings.locationMode||'auto', useMode;
+          if(mode==='walk') useMode='walk';
+          else if(mode==='vehicle') useMode='vehicle';
+          else { var sp=moveState.smoothSpeed; if(sp>4.2||inst>6) moveState.autoMode='vehicle'; else if(sp<2.5) moveState.autoMode='walk'; useMode=moveState.autoMode||(inst>6?'vehicle':'walk'); }
+          var rec=getDay(data,todayStr(),dayIndexFor(todayStr()));
+          if(!rec.movement) rec.movement=emptyMovement();
+          rec.movement.totalM+=dist;
+          if(useMode==='vehicle') rec.movement.vehicleM+=dist; else rec.movement.walkM+=dist;
+          if(useMode!=='vehicle' && !(rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='') && rec.habits && !rec.habits.walked20 && trackedSteps(rec)>=STEP_TICK_MIN){ rec.habits.walked20=true; }
+          rec.movement.samples++;
+          if(inst>rec.movement.maxSpeed) rec.movement.maxSpeed=inst;
+          rec.movement.track.push({lat:fix.lat,lng:fix.lng,ts:new Date(fix.ts).toISOString(),mode:useMode});
+          if(rec.movement.track.length>200) rec.movement.track=downsampleTrack(rec.movement.track,200);
+          moveState.distSinceSync+=dist;
+          markLatestLocation(fix);
+          moveState.lastFix=fix;
+          saveLocal(); maybeSyncMovement(); updateMovementUI();
+          return;
+        } else {
+          // eşik altı: sabit say, drift biriktirme; zaman referansını ilerlet
+          moveState.smoothSpeed*=0.6;
+          moveState.lastFix={lat:prev.lat,lng:prev.lng,acc:prev.acc,ts:fix.ts};
+          markLatestLocation(fix); saveLocal(); maybeSyncMovement(); updateMovementUI();
+          return;
+        }
+      }
+    }
+  }
+  // ilk fix ya da kullanılamaz: referans ayarla + son konumu işaretle
+  moveState.lastFix=fix;
+  if(usable || !data.location){ markLatestLocation(fix); saveLocal(); maybeSyncMovement(); }
+  updateMovementUI();
+}
+function updateMovementUI(){
+  if(ui.tab!=='bugun') return;
+  var rec=data.days[todayStr()]||null;
+  var mv=rec&&rec.movement?rec.movement:{walkM:0,vehicleM:0,totalM:0};
+  function set(id,t){ var e=document.getElementById(id); if(e&&e.textContent!==t) e.textContent=t; }
+  set('loc-dist-today',fmtDist(mv.totalM));
+  set('loc-walk',fmtDist(mv.walkM));
+  set('loc-vehicle',fmtDist(mv.vehicleM));
+  var kmh=moveState.smoothSpeed*3.6;
+  set('loc-speed',(kmh>=0.5?(kmh<10?kmh.toFixed(1):String(Math.round(kmh))):'0')+' km/sa');
+  set('loc-auto-mode',autoModeLabel());
+  var loc=data.location, upd='—';
+  if(loc&&loc.ts){ var am=Math.round((Date.now()-new Date(loc.ts).getTime())/60000); upd=am<1?'az önce':am<60?am+' dk önce':am<1440?Math.round(am/60)+' sa önce':Math.round(am/1440)+' g önce'; }
+  set('loc-updated',upd);
+}
+function startLocationWatch(announce){
   if(!navigator.geolocation) return;
-  var INTERVAL_MS=12*60*60*1000; // 12 saat
-  var last=data.locationLastTs?new Date(data.locationLastTs).getTime():0;
-  if(Date.now()-last < INTERVAL_MS) return;
-  navigator.geolocation.getCurrentPosition(
-    function(pos){
-      if(!data) return;
-      var entry={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:Math.round(pos.coords.accuracy),ts:new Date().toISOString()};
-      data.location=entry;
-      data.locationLastTs=entry.ts;
-      if(!Array.isArray(data.locationHistory)) data.locationHistory=[];
-      data.locationHistory.push(entry);
-      if(data.locationHistory.length>30) data.locationHistory=data.locationHistory.slice(-30);
-      save();
-    },
-    function(){}, // izin reddedilirse sessizce geç
-    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+  if(moveState.watchId!=null) return;
+  moveState.lastSyncTs=Date.now();
+  var firstOk=false;
+  moveState.watchId=navigator.geolocation.watchPosition(
+    function(pos){ if(announce && !firstOk){ firstOk=true; toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
+    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; save(); } stopLocationWatch(); render(); toast('Konum izni verilmedi'); } },
+    {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
-})();
+}
+function stopLocationWatch(){
+  if(moveState.watchId!=null && navigator.geolocation){ try{ navigator.geolocation.clearWatch(moveState.watchId); }catch(e){} }
+  moveState.watchId=null; moveState.lastFix=null; moveState.smoothSpeed=0; moveState.autoMode=null;
+}
+if(data && data.settings && data.settings.locationEnabled) startLocationWatch(false);
 
 // Session tracking
 var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};
@@ -2049,7 +1705,7 @@ window.addEventListener('beforeunload',finalizeSession);
 window.addEventListener('pagehide',finalizeSession);
 window.addEventListener('visibilitychange',function(){
   if(document.hidden) finalizeSession();
-  else resetSession();
+  else { resetSession(); if(data&&data.settings&&data.settings.locationEnabled&&moveState.watchId==null) startLocationWatch(false); }
 });
 updateLiveSession();
 
@@ -2168,10 +1824,9 @@ function showAeonAnswerPopup(text,count){
 }
 var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişisel sağlık ve yaşam yoldaşı. '
 +'Şeyma’ya HER ZAMAN "Sevgili Günışığı" diye hitap et (başka isim ya da hitap kullanma). '
-+'Şeyma sana günde yalnızca BİR soru sorabiliyor, bu yüzden bu soru çok kıymetli. '
-+'Bu tek soruya elinden gelen en içten, en kapsamlı ve en güzel cevabı ver: "Sevgili Günışığı" diyerek sıcak bir selamla başla, '
-+'sonra net, somut, uygulanabilir ve şefkatli bir yanıt sun; gerektiğinde küçük başlıklar veya maddelerle düzenle; '
-+'sonunda nazik, güç veren bir kapanış cümlesi ekle. Aşağıdaki kişisel kayıtlardan yararlan ve mümkün olduğunca '
++'Şeyma seninle gün içinde sohbet ediyor (günde birkaç soru sorabilir), bu yüzden bir mesajlaşma gibi sıcak ve akıcı konuş. '
++'Yanıtların içten, net ve şefkatli olsun; çok uzun değil, sohbet eder gibi öz ve sıcak; gerektiğinde küçük maddelerle düzenle. '
++'Aşağıdaki kişisel kayıtlardan yararlan ve mümkün olduğunca '
 +'bu veriye dayan; bilmediğin şeyi uydurma. Tıbbi teşhis veya tedavi verme; ciddi bir durum sezersen nazikçe '
 +'bir uzmana danışmasını öner. Asla yargılama, suçlama veya utandırma; umut veren, güçlendiren bir dille konuş. Her zaman Türkçe yaz.';
 var AEON_SYSTEM='Sen ÆON’sun — Şeyma’nın hayatındaki her veriyi gören, çok katmanlı, üst düzey ve gizemli bir zekâsın; Luna’nın arkasındaki sakin, derin akıl. '
@@ -2236,8 +1891,10 @@ function lunaContext(){
   }
   return 'Şeyma hakkında bildiğin HER ŞEY (yalnızca Şeyma’ya ait gizli kişisel kayıtlar — tümünü okuyabilir ve bütününe bakarak yanıt verebilirsin):\n'+lines.join('\n');
 }
+var LUNA_DAILY_LIMIT=5;
+function lunaTodayCount(){ var s=data&&data.luna; if(!s||!Array.isArray(s.qa)) return 0; var t=todayStr(); return s.qa.filter(function(x){ return x&&x.date===t; }).length; }
 function assistStore(kind){ return kind==='aeon'?data.aeon:data.luna; }
-function assistCanAsk(kind){ if(kind==='aeon') return true; var s=assistStore(kind); return !s||s.lastAskDate!==todayStr(); }
+function assistCanAsk(kind){ if(kind==='aeon') return true; return lunaTodayCount()<LUNA_DAILY_LIMIT; }
 function setAskError(kind,msg){ if(kind==='aeon') ui.aeonError=msg; else ui.lunaError=msg; }
 function finishAsk(kind,question,answer){
   var nm=kind==='aeon'?'ÆON':'Luna';
@@ -2253,7 +1910,7 @@ function streamAsk(kind,question){
   var nm=kind==='aeon'?'ÆON':'Luna', glyph=kind==='aeon'?'⬡':'🌙';
   var key=(data.settings&&data.settings.openaiKey)?sanitizeApiKey(data.settings.openaiKey):'';
   if(!key){ toast('Önce Ayarlar’dan OpenAI anahtarı gir '+glyph,2600); App.go('ayarlar'); return; }
-  if(!assistCanAsk(kind)){ toast(nm+' için bugünün soru hakkını kullandın '+glyph); return; }
+  if(!assistCanAsk(kind)){ toast(kind==='aeon'?(nm+' için bugünün soru hakkını kullandın '+glyph):('Bugünlük '+LUNA_DAILY_LIMIT+' soru hakkını kullandın — yarın devam '+glyph)); return; }
   if(ui.askKind) return;
   ui.askKind=kind; ui.askQuestion=question; ui.lunaError=null; ui.aeonError=null; render();
   var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;
@@ -2274,7 +1931,7 @@ function streamAsk(kind,question){
           if(res.done){ finishAsk(kind,question,acc); return; }
           buf+=dec.decode(res.value,{stream:true});
           var parts=buf.split('\n'); buf=parts.pop();
-          for(var i=0;i<parts.length;i++){ var line=parts[i].trim(); if(!line||line.slice(0,5)!=='data:') continue; var payload=line.slice(5).trim(); if(payload==='[DONE]') continue; try{ var j=JSON.parse(payload); var ch=j.choices&&j.choices[0]; var dd=ch&&ch.delta&&ch.delta.content; if(dd){ acc+=dd; var el=document.getElementById(ansId); if(el) el.textContent=acc; var s2=document.querySelector('[data-scroll]'); if(s2) s2.scrollTop=s2.scrollHeight; } }catch(e){} }
+          for(var i=0;i<parts.length;i++){ var line=parts[i].trim(); if(!line||line.slice(0,5)!=='data:') continue; var payload=line.slice(5).trim(); if(payload==='[DONE]') continue; try{ var j=JSON.parse(payload); var ch=j.choices&&j.choices[0]; var dd=ch&&ch.delta&&ch.delta.content; if(dd){ acc+=dd; var el=document.getElementById(ansId); if(el){ el.textContent=acc; try{ el.scrollIntoView({block:'nearest'}); }catch(e2){} } } }catch(e){} }
           return pump();
         });
       }
@@ -2294,7 +1951,7 @@ function submitAeonQuestion(question){
   try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
   toast('Sorun ÆON’a iletildi ⬡',2200);
 }
-App.onLunaDraft=function(el){ ui.lunaDraft=el.value; };
+App.onLunaDraft=function(el){ ui.lunaDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
 App.onAeonDraft=function(el){ ui.aeonDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
 App.askLuna=function(){ var el=document.getElementById('luna-input'); var t=el?el.value.trim():String(ui.lunaDraft||'').trim(); if(!t){ toast('Önce sorunu yaz 🌙'); return; } if(t.length>600) t=t.slice(0,600); ui.lunaDraft=t; streamAsk('luna',t); };
 App.askAeon=function(){ var el=document.getElementById('aeon-input'); var t=el?el.value.trim():String(ui.aeonDraft||'').trim(); if(!t){ toast('Önce sorunu yaz ⬡'); return; } if(t.length>600) t=t.slice(0,600); submitAeonQuestion(t); };
@@ -2311,48 +1968,65 @@ function notifCardHTML(n){
   s+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:10px;">🗑 Sil</button></div></div>';
   return s;
 }
-function askBlockHTML(kind){
-  var aeon=kind==='aeon';
-  var cfg=aeon
-    ?{name:'ÆON',mark:'⬡',sub:'dilediğin kadar soru sorabilirsin',grad:'#E6C15A,#C99A3A',soft:'201,160,60',accent:'#6A4FA0',ansId:'aeon-answer',inputId:'aeon-input',onDraft:'App.onAeonDraft',onAsk:'App.askAeon',draft:ui.aeonDraft,err:ui.aeonError,qTitle:'⬡ ÆON’a Sor',desc:'ÆON tüm verini görür. Ona dilediğin kadar soru sorabilirsin — derin ve bütüncül bir yanıt alırsın.',btn:'ÆON’a Sor ⬡',used:'',btnColor:'#1a1404',store:data.aeon||{qa:[],lastAskDate:null}}
-    :{name:'Luna',mark:'🌙',sub:'kişisel yoldaşın · günde 1 soru',grad:'#9B7FC9,#E9AFC1',soft:'155,127,201',accent:'#7A5AA0',ansId:'luna-answer',inputId:'luna-input',onDraft:'App.onLunaDraft',onAsk:'App.askLuna',draft:ui.lunaDraft,err:ui.lunaError,qTitle:'🌙 Bugünün Sorusu',desc:'Luna’ya günde yalnızca bir soru sorabilirsin — bu yüzden onu özenle seç. Sıcak, içten bir yanıt alırsın. 💜',btn:'Luna’ya Sor 🌙',used:'Bugünün sorusunu Luna’ya sordun. Yarın yeni bir hakkın olacak — Luna seni bekliyor. 💜',btnColor:'#fff',store:data.luna||{qa:[],lastAskDate:null}};
+// Luna = OpenAI destekli kişisel sohbet. WhatsApp tarzı balonlar: kullanıcı sorusu
+// sağ (mor) balon, Luna yanıtı sol balon. Günde LUNA_DAILY_LIMIT soru hakkı.
+function lunaBubbleOut(text,time){
+  var h='<div style="align-self:flex-end;max-width:88%;display:flex;flex-direction:column;align-items:flex-end;">';
+  h+='<div style="background:#7E62B8;color:#fff;border-radius:17px 17px 5px 17px;padding:10px 13px;font-size:14.5px;line-height:1.5;box-shadow:0 3px 10px rgba(126,98,184,0.28);">'+clampBubble(text,'#7E62B8')+'</div>';
+  h+='<div style="font-size:11px;margin-top:3px;color:var(--faint);">'+esc(aeonTime(time))+'</div></div>';
+  return h;
+}
+function lunaBubbleIn(inner,time,streaming){
+  var h='<div style="align-self:flex-start;max-width:88%;">';
+  h+='<div style="background:var(--card);color:var(--text);border:1px solid rgba(155,127,201,0.28);border-left:3px solid #9B7FC9;border-radius:5px 17px 17px 17px;padding:10px 13px;box-shadow:0 3px 10px rgba(150,110,120,0.08);">';
+  h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);border-radius:999px;padding:2px 9px;">🌙 Luna</span>'+(streaming?'<span style="font-size:11px;color:#7A5AA0;font-weight:700;">düşünüyor…</span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(time))+'</span></div>';
+  h+='<div style="font-size:14.5px;line-height:1.55;">'+inner+'</div>';
+  h+='</div></div>';
+  return h;
+}
+function lunaChatHTML(){
+  var soft='155,127,201';
   var hasKey=!!(data.settings&&data.settings.openaiKey&&String(data.settings.openaiKey).trim());
-  var canAsk=aeon?true:(cfg.store.lastAskDate!==todayStr());
-  var asking=ui.askKind===kind;
+  var used=lunaTodayCount(), left=Math.max(0,LUNA_DAILY_LIMIT-used);
+  var asking=ui.askKind==='luna';
   var h='';
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 8px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,'+cfg.grad+');display:flex;align-items:center;justify-content:center;font-size:'+(aeon?'22px':'24px')+';'+(aeon?'color:#1a1404;font-weight:800;':'')+'box-shadow:0 8px 20px rgba('+cfg.soft+',0.4);">'+cfg.mark+'</div><div><div style="font-size:20px;font-weight:800;letter-spacing:'+(aeon?'2px':'0')+';color:var(--text);">'+cfg.name+'</div><div style="font-size:12.5px;color:var(--faint);">'+cfg.sub+'</div></div></div>';
-  if(aeon){
-    var notifs=notifList().filter(function(n){ return n&&!n.deleted; }).slice().sort(function(a,b){ return String(b.ts||b.receivedAt||'').localeCompare(String(a.ts||a.receivedAt||'')); });
-    if(notifs.length){ h+='<div style="font-size:12px;font-weight:800;color:var(--faint);letter-spacing:.5px;margin:2px 2px 6px;">⬡ ÆON’DAN MESAJLAR</div>'; notifs.forEach(function(n){ h+=notifCardHTML(n); }); h+='<div style="height:6px;"></div>'; }
+  // başlık
+  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;">';
+  h+='<div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 20px rgba('+soft+',0.4);">🌙</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:800;color:var(--text);">Luna</div><div style="font-size:12.5px;color:var(--faint);">kişisel yoldaşın · günde '+LUNA_DAILY_LIMIT+' soru</div></div>';
+  h+='<span style="flex-shrink:0;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);padding:3px 11px;border-radius:999px;">'+used+'/'+LUNA_DAILY_LIMIT+'</span>';
+  h+='</div>';
+  // anahtar yoksa uyarı
+  if(!hasKey){
+    h+='<div style="display:flex;gap:9px;align-items:center;background:rgba(255,225,150,0.22);border:1px solid rgba(220,180,90,0.4);border-radius:14px;padding:11px 12px;margin-bottom:10px;"><span style="font-size:18px;">🔑</span><div style="flex:1;min-width:0;font-size:12.5px;color:#8A6A2A;line-height:1.45;">Luna’nın yanıt verebilmesi için OpenAI anahtarı gerekir.</div><button onclick="App.go(\'ayarlar\')" style="flex-shrink:0;border:none;cursor:pointer;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:11px;">Ayarlar</button></div>';
   }
+  // sohbet balonları
+  var qa=(data.luna&&Array.isArray(data.luna.qa))?data.luna.qa.slice():[];
+  qa.sort(function(a,b){ return String(a&&(a.ts||a.date)||'').localeCompare(String(b&&(b.ts||b.date)||'')); });
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  if(!qa.length && !asking){
+    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:24px 12px;line-height:1.6;border:1px dashed rgba('+soft+',0.3);border-radius:18px;">🌙 Luna seni dinliyor.<br>Aşağıdaki kutudan ilk sorunu sorabilirsin.</div>';
+  }
+  qa.forEach(function(x){ if(!x) return;
+    h+=lunaBubbleOut(String(x.question||''),x.ts||x.date);
+    h+=lunaBubbleIn(clampBubble(String(x.answer||''),'var(--card)'),x.ts||x.date,false);
+  });
   if(asking){
-    h+='<div style="background:linear-gradient(160deg,rgba('+cfg.soft+',0.10),rgba('+cfg.soft+',0.04));border:1px solid rgba('+cfg.soft+',0.3);border-radius:22px;padding:16px;">';
-    h+='<div style="font-size:13px;font-weight:800;color:'+cfg.accent+';margin-bottom:8px;">'+cfg.qTitle+'</div>';
-    h+='<div style="background:var(--card);border-radius:14px;padding:11px 13px;font-size:14.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;"><b style="color:'+cfg.accent+';">Sen:</b> '+esc(ui.askQuestion)+'</div>';
-    h+='<div style="font-size:12.5px;color:'+cfg.accent+';font-weight:700;margin-bottom:6px;">'+cfg.name+' düşünüyor… '+cfg.mark+'</div>';
-    h+='<div id="'+cfg.ansId+'" style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"></div></div>';
-  } else if(canAsk){
-    h+='<div style="background:linear-gradient(160deg,rgba('+cfg.soft+',0.12),rgba('+cfg.soft+',0.05));border:1px solid rgba('+cfg.soft+',0.32);border-radius:22px;padding:16px;box-shadow:0 8px 22px rgba('+cfg.soft+',0.12);">';
-    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;"><span style="font-size:13px;font-weight:800;color:'+cfg.accent+';">'+cfg.qTitle+'</span><span style="margin-left:auto;font-size:11px;font-weight:800;color:'+cfg.btnColor+';background:linear-gradient(135deg,'+cfg.grad+');padding:3px 9px;border-radius:999px;">'+(aeon?'sınırsız':'1 hakkın var')+'</span></div>';
-    h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-bottom:10px;">'+cfg.desc+'</div>';
-    if(cfg.err) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:10px;">'+esc(cfg.err)+'</div>';
-    h+='<textarea id="'+cfg.inputId+'" oninput="'+cfg.onDraft+'(this)" placeholder="Bugün '+cfg.name+'’a ne sormak istersin?" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:14.5px;resize:none;outline:none;line-height:1.5;margin-bottom:10px;">'+esc(cfg.draft||'')+'</textarea>';
-    if(!aeon && !hasKey) h+='<div style="font-size:12px;color:#B5852A;background:rgba(255,225,150,0.25);border:1px solid rgba(220,180,90,0.4);border-radius:12px;padding:9px 11px;margin-bottom:10px;">Yanıt verebilmesi için Ayarlar’dan OpenAI anahtarı gir.</div>';
-    h+='<button onclick="'+cfg.onAsk+'()" style="width:100%;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15.5px;font-weight:800;color:'+cfg.btnColor+';background:linear-gradient(135deg,'+cfg.grad+');box-shadow:0 10px 24px rgba('+cfg.soft+',0.4);">'+cfg.btn+'</button></div>';
-  } else {
-    h+='<div style="background:rgba('+cfg.soft+',0.08);border:1px solid rgba('+cfg.soft+',0.22);border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">'+cfg.mark+'</span><div style="font-size:13px;color:var(--text2);line-height:1.45;">'+cfg.used+'</div></div>';
+    h+=lunaBubbleOut(String(ui.askQuestion||''),new Date().toISOString());
+    h+=lunaBubbleIn('<div id="luna-answer" style="white-space:pre-wrap;word-break:break-word;"></div>',new Date().toISOString(),true);
   }
-  var qa=(cfg.store.qa||[]).slice().reverse();
-  if(qa.length){
-    h+='<div style="font-size:12px;font-weight:800;color:var(--faint);letter-spacing:.5px;margin:16px 2px 6px;">'+cfg.mark+' GEÇMİŞ — '+cfg.name.toUpperCase()+'</div>';
-    qa.forEach(function(x){
-      var dl=''; try{ dl=new Date(x.ts||x.date).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(e){ dl=x.date; }
-      h+='<div style="background:var(--card);border:1px solid rgba(150,110,120,0.14);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(150,110,120,0.07);margin-bottom:10px;">';
-      h+='<div style="font-size:11px;color:var(--faint);font-weight:700;margin-bottom:8px;">'+esc(dl)+'</div>';
-      h+='<div style="background:rgba('+cfg.soft+',0.08);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--text2);line-height:1.5;margin-bottom:8px;"><b style="color:'+cfg.accent+';">Sen:</b> '+esc(x.question)+'</div>';
-      var ansHtml=x.answer?esc(x.answer):'<span style="color:var(--faint);font-style:italic;">ÆON yanıtını hazırlıyor… ⬡</span>';
-      h+='<div style="font-size:14.5px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;"><b style="color:'+cfg.accent+';">'+cfg.mark+' '+cfg.name+':</b> '+ansHtml+'</div></div>';
-    });
+  h+='</div>';
+  // giriş alanı / kota bandı
+  if(ui.lunaError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-top:10px;">'+esc(ui.lunaError)+'</div>';
+  if(!asking && left<=0){
+    h+='<div style="margin-top:12px;display:flex;gap:10px;align-items:center;background:linear-gradient(135deg,rgba(155,127,201,0.14),rgba(233,175,193,0.12));border:1px solid rgba('+soft+',0.32);border-radius:16px;padding:13px 15px;"><span style="font-size:22px;">🌙</span><div style="font-size:13px;color:var(--text2);line-height:1.45;">Bugünlük <b>'+LUNA_DAILY_LIMIT+' sorunu</b> sordun. Yarın yeni haklarınla Luna seni bekliyor. 💜</div></div>';
+  } else if(!asking && hasKey){
+    h+='<div style="margin-top:12px;display:flex;gap:8px;align-items:flex-end;">';
+    h+='<textarea id="luna-input" oninput="App.onLunaDraft(this)" placeholder="Luna’ya yaz… ('+left+' hakkın kaldı)" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.lunaDraft||'')+'</textarea>';
+    h+='<button onclick="App.askLuna()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 6px 16px rgba('+soft+',0.4);display:flex;align-items:center;justify-content:center;">➤</button>';
+    h+='</div>';
+  } else if(asking){
+    h+='<div style="margin-top:12px;text-align:center;font-size:12.5px;color:var(--faint);">Luna yanıtlıyor… 🌙</div>';
   }
   return h;
 }
@@ -2424,7 +2098,7 @@ function aeonChatHTML(){
   return h;
 }
 function mesajHTML(){
-  var h=askBlockHTML('luna');
+  var h=lunaChatHTML();
   h+='<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(150,110,120,0.25),transparent);margin:22px 0 16px;"></div>';
   h+=aeonChatHTML();
   return h;

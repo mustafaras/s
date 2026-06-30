@@ -899,18 +899,25 @@ App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render()
 App.printReport=function(){ openReport(); };
 function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
 App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=normalizeToken(el.value||''); save(); syncFieldUpdate(); };
+// Anahtarı kopyalama kaynaklı bozulmalardan temizle: "Bearer " öneki, tırnaklar,
+// boşluklar ve görünmez (zero-width) karakterler 401 hatasının başlıca sebebidir.
+function sanitizeApiKey(v){ var s=String(v||'').trim(); s=s.replace(/^Bearer\s+/i,''); s=s.replace(/^["'`]+|["'`]+$/g,''); s=s.replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g,''); return s; }
+// OpenAI hata kodlarını kullanıcının anlayacağı Türkçe mesaja çevir.
+function openaiErrText(status,raw){ var m=String(raw||''); if(status===401||/invalid_api_key|Incorrect API key/i.test(m)) return 'OpenAI anahtarın geçersiz görünüyor. Ayarlar’dan doğru anahtarı (sk-…) yapıştırıp “Kaydet ve doğrula” yap. 🔑'; if(status===429||/insufficient_quota|exceeded your current quota/i.test(m)) return 'OpenAI hesabının kullanım kotası/bakiyesi dolmuş olabilir. platform.openai.com → Billing’den bakiye ekleyip tekrar dene. ⏳'; if(status===404||/model_not_found|does not exist|do not have access/i.test(m)) return 'Hesabın istenen yapay zekâ modeline erişemiyor. Farklı bir anahtar dene ya da model erişimi iste. ⚙️'; if(status===403) return 'Erişim reddedildi (403). Anahtarının izinleri yetersiz olabilir. 🔒'; if(status===500||status===502||status===503) return 'OpenAI sunucusu şu an yanıt vermiyor. Birkaç dakika sonra tekrar dene. 🔁'; if(!status) return 'İnternet bağlantısı kurulamadı. Bağlantını kontrol edip tekrar dene. 📶'; return 'Beklenmeyen bir hata oluştu ('+status+'). Birazdan tekrar dene.'; }
 App.setOpenaiKey=function(el){ var v=el.value; if(ui.openaiKeyState&&ui.openaiKeyState!=='checking') ui.openaiKeyState=null; debounceSave('openaiKey',function(){ if(!data.settings) data.settings={}; data.settings.openaiKey=String(v||'').trim(); save(); },500); };
 App.saveOpenaiKey=function(){
   var inp=document.querySelector('input[oninput*="setOpenaiKey"]');
-  var key=inp?String(inp.value||'').trim():String((data.settings&&data.settings.openaiKey)||'').trim();
+  var key=inp?sanitizeApiKey(inp.value):sanitizeApiKey((data.settings&&data.settings.openaiKey)||'');
   if(!data.settings) data.settings={};
-  data.settings.openaiKey=key; save();
+  data.settings.openaiKey=key; if(inp) inp.value=key; save();
   if(!key){ ui.openaiKeyState=null; render(); toast('Anahtar temizlendi'); return; }
+  if(key.slice(0,3)!=='sk-'){ ui.openaiKeyState='invalid'; render(); toast('Anahtar “sk-” ile başlamalı — OpenAI anahtarını kontrol et'); return; }
   ui.openaiKeyState='checking'; render();
   fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}})
     .then(function(r){
       if(r.ok){ ui.openaiKeyState='valid'; render(); toast('Anahtar doğrulandı ✓'); }
-      else if(r.status===401){ ui.openaiKeyState='invalid'; render(); toast('API key hatalı'); }
+      else if(r.status===401){ ui.openaiKeyState='invalid'; render(); toast('Anahtar geçersiz — kopyalarken karakter eksik/fazla olabilir'); }
+      else if(r.status===429){ ui.openaiKeyState=null; render(); toast('Anahtar kaydedildi ama kota/bakiye dolu olabilir ⏳'); }
       else { ui.openaiKeyState=null; render(); toast('Kaydedildi (doğrulanamadı, '+r.status+')'); }
     })
     .catch(function(){ ui.openaiKeyState=null; render(); toast('Kaydedildi (ağ doğrulaması yapılamadı)'); });
@@ -2224,29 +2231,37 @@ function finishAsk(kind,question,answer){
 }
 function streamAsk(kind,question){
   var nm=kind==='aeon'?'ÆON':'Luna', glyph=kind==='aeon'?'⬡':'🌙';
-  var key=(data.settings&&data.settings.openaiKey)?String(data.settings.openaiKey).trim():'';
+  var key=(data.settings&&data.settings.openaiKey)?sanitizeApiKey(data.settings.openaiKey):'';
   if(!key){ toast('Önce Ayarlar’dan OpenAI anahtarı gir '+glyph,2600); App.go('ayarlar'); return; }
   if(!assistCanAsk(kind)){ toast(nm+' için bugünün soru hakkını kullandın '+glyph); return; }
   if(ui.askKind) return;
   ui.askKind=kind; ui.askQuestion=question; ui.lunaError=null; ui.aeonError=null; render();
   var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;
   var sys=(kind==='aeon'?AEON_SYSTEM:LUNA_SYSTEM)+'\n\n'+lunaContext(), acc='', ansId=kind==='aeon'?'aeon-answer':'luna-answer';
-  fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-5-mini',stream:true,max_completion_tokens:2000,messages:[{role:'system',content:sys},{role:'user',content:question}]})})
-  .then(function(r){
-    if(!r.ok||!r.body) return r.text().then(function(t){ throw new Error('OpenAI '+r.status+(t?(': '+t.slice(0,140)):'')); });
-    var reader=r.body.getReader(), dec=new TextDecoder(), buf='';
-    function pump(){
-      return reader.read().then(function(res){
-        if(res.done){ finishAsk(kind,question,acc); return; }
-        buf+=dec.decode(res.value,{stream:true});
-        var parts=buf.split('\n'); buf=parts.pop();
-        for(var i=0;i<parts.length;i++){ var line=parts[i].trim(); if(!line||line.slice(0,5)!=='data:') continue; var payload=line.slice(5).trim(); if(payload==='[DONE]') continue; try{ var j=JSON.parse(payload); var ch=j.choices&&j.choices[0]; var dd=ch&&ch.delta&&ch.delta.content; if(dd){ acc+=dd; var el=document.getElementById(ansId); if(el) el.textContent=acc; var s2=document.querySelector('[data-scroll]'); if(s2) s2.scrollTop=s2.scrollHeight; } }catch(e){} }
-        return pump();
-      });
-    }
-    return pump();
-  })
-  .catch(function(e){ var m=String(e&&e.message||e); if(/\b401\b|invalid_api_key|Incorrect API key/i.test(m)) ui.openaiKeyState='invalid'; ui.askKind=null; setAskError(kind,m); render(); });
+  // Hesap birinci modele erişemezse otomatik olarak yedek modele düş.
+  var models=['gpt-5-mini','gpt-4o-mini'];
+  function attempt(mi){
+    var model=models[mi];
+    return fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:model,stream:true,max_completion_tokens:2000,messages:[{role:'system',content:sys},{role:'user',content:question}]})})
+    .then(function(r){
+      if(!r.ok||!r.body){ return r.text().then(function(t){
+        if((r.status===404||/model_not_found|does not exist|do not have access/i.test(t))&&mi+1<models.length) return attempt(mi+1);
+        var e=new Error(openaiErrText(r.status,t)); e._status=r.status; throw e;
+      }); }
+      var reader=r.body.getReader(), dec=new TextDecoder(), buf='';
+      function pump(){
+        return reader.read().then(function(res){
+          if(res.done){ finishAsk(kind,question,acc); return; }
+          buf+=dec.decode(res.value,{stream:true});
+          var parts=buf.split('\n'); buf=parts.pop();
+          for(var i=0;i<parts.length;i++){ var line=parts[i].trim(); if(!line||line.slice(0,5)!=='data:') continue; var payload=line.slice(5).trim(); if(payload==='[DONE]') continue; try{ var j=JSON.parse(payload); var ch=j.choices&&j.choices[0]; var dd=ch&&ch.delta&&ch.delta.content; if(dd){ acc+=dd; var el=document.getElementById(ansId); if(el) el.textContent=acc; var s2=document.querySelector('[data-scroll]'); if(s2) s2.scrollTop=s2.scrollHeight; } }catch(e){} }
+          return pump();
+        });
+      }
+      return pump();
+    });
+  }
+  attempt(0).catch(function(e){ var status=e&&e._status; if(status===401){ ui.openaiKeyState='invalid'; } ui.askKind=null; var msg=(status!=null)?((e&&e.message)||'Bir hata oluştu.'):openaiErrText(null,String(e&&e.message||e)); setAskError(kind,msg); render(); });
 }
 function submitAeonQuestion(question){
   if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};

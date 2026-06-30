@@ -203,7 +203,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front'};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, sleepRitualTiming:false, sleepRitualLeft:0, sleepRitualTotal:0, ritualOpen:false, ritualRunning:false, ritualDone:false, ritualLeft:600, ritualTotal:600, ritualSoundMode:'ambient', ritualStartedAt:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false};
 var sosInterval=null, sleepRitualInterval=null, ritualInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var ritualRenderedStage=-1;
@@ -599,7 +599,7 @@ function confetti(){
 // ---------- actions (exposed) ----------
 var App={};
 App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:''},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
-App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
@@ -1017,11 +1017,18 @@ function render(){
   app.innerHTML=html;
 
   var newScroll=document.querySelector('[data-scroll]');
-  if(newScroll && sameTab){
-    // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve giriş animasyonunu tekrar oynatma (titremeyi önler)
-    var firstEl=newScroll.firstElementChild;
-    if(firstEl){ firstEl.style.animation='none'; }
-    newScroll.scrollTop=prevTop;
+  if(newScroll){
+    if(ui.tab==='mesaj' && (!sameTab || ui.aeonScrollBottom)){
+      // ÆON sohbeti: açılışta ve yeni mesaj/cevap sonrası en alta (en yeni mesaja) kaydır
+      var firstM=newScroll.firstElementChild; if(firstM){ firstM.style.animation='none'; }
+      newScroll.scrollTop=newScroll.scrollHeight;
+      ui.aeonScrollBottom=false;
+    } else if(sameTab){
+      // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve giriş animasyonunu tekrar oynatma (titremeyi önler)
+      var firstEl=newScroll.firstElementChild;
+      if(firstEl){ firstEl.style.animation='none'; }
+      newScroll.scrollTop=prevTop;
+    }
   }
   lastRenderTab=ui.tab;
   if(ui.ritualOpen) ritualRenderedStage=ritualStageInfo().index; else ritualRenderedStage=-1;
@@ -2061,7 +2068,7 @@ function fetchObserverInbox(){
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/observer-inbox.json?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
   fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
     .then(function(r){ if(r.status===404) return null; if(!r.ok) throw new Error(String(r.status)); return r.json(); })
-    .then(function(j){ if(j&&Array.isArray(j.messages)) mergeInbox(j.messages); })
+    .then(function(j){ if(j){ if(Array.isArray(j.messages)) mergeInbox(j.messages); applyReceipts(j.receipts); } })
     .catch(function(){});
 }
 function mergeInbox(msgs){
@@ -2084,7 +2091,7 @@ function mergeInbox(msgs){
   });
   if(added>0||answeredCount>0){
     save(); // latest.json'a yaz → durum geri yansır
-    if(ui.tab==='mesaj'){ markNotifsRead(); }
+    if(ui.tab==='mesaj'){ markNotifsRead(); ui.aeonScrollBottom=true; }
     render();
     if(added>0) showInboxPopup();
     if(answeredCount>0) showAeonAnswerPopup(answeredText,answeredCount);
@@ -2094,6 +2101,19 @@ function markNotifsRead(){
   var changed=false, nowIso=new Date().toISOString();
   notifList().forEach(function(n){ if(n&&!n.deleted&&!n.read){ n.read=true; n.readAt=nowIso; n.seen=true; changed=true; } });
   if(changed) save();
+}
+// Gözlemci, kullanıcının cevaplanmamış ÆON sorusunu panelde açtığında observer-inbox.json'a
+// receipts[qid]={status:'reviewing'} yazar. Burada onu okuyup soru balonunun altında
+// "⬡ AEON // EVALUATING INPUT…" durumunu göstermek için reviewingAt'i işaretleriz.
+function applyReceipts(rc){
+  if(!rc||typeof rc!=='object'||!data||!data.aeon||!Array.isArray(data.aeon.qa)) return;
+  var changed=false;
+  data.aeon.qa.forEach(function(x){
+    if(!x||!x.id||x.answer) return;
+    var r=rc[x.id];
+    if(r&&r.status==='reviewing'&&!x.reviewingAt){ x.reviewingAt=r.ts||new Date().toISOString(); changed=true; }
+  });
+  if(changed){ save(); render(); }
 }
 function showInboxPopup(){
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
@@ -2268,13 +2288,14 @@ function submitAeonQuestion(question){
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
   data.aeon.qa.push({id:'q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),question:question,ts:new Date().toISOString(),answer:null,answeredAt:null});
   data.aeon.lastAskDate=todayStr();
-  ui.aeonDraft=''; ui.aeonError=null;
+  ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true;
   save(); render();
-  var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;
-  toast('ÆON sorunu aldı, yanıtını hazırlıyor ⬡',2400);
+  // Soru anında panele iletilsin diye senkronu zorla (4 sn debounce'u beklemeden)
+  try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
+  toast('Sorun ÆON’a iletildi ⬡',2200);
 }
 App.onLunaDraft=function(el){ ui.lunaDraft=el.value; };
-App.onAeonDraft=function(el){ ui.aeonDraft=el.value; };
+App.onAeonDraft=function(el){ ui.aeonDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
 App.askLuna=function(){ var el=document.getElementById('luna-input'); var t=el?el.value.trim():String(ui.lunaDraft||'').trim(); if(!t){ toast('Önce sorunu yaz 🌙'); return; } if(t.length>600) t=t.slice(0,600); ui.lunaDraft=t; streamAsk('luna',t); };
 App.askAeon=function(){ var el=document.getElementById('aeon-input'); var t=el?el.value.trim():String(ui.aeonDraft||'').trim(); if(!t){ toast('Önce sorunu yaz ⬡'); return; } if(t.length>600) t=t.slice(0,600); submitAeonQuestion(t); };
 function notifCardHTML(n){
@@ -2335,13 +2356,80 @@ function askBlockHTML(kind){
   }
   return h;
 }
+function aeonTime(iso){ try{ var d=new Date(iso); if(isNaN(d.getTime())) return ''; return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+// Uzun mesajları kısalt: max-height ile kırp + alta yumuşak geçiş + "Devamını göster" düğmesi.
+// Tam render olmadan DOM üzerinden açılır/kapanır (kaydırma zıplamaz).
+function clampBubble(text,fadeColor){
+  var t=String(text==null?'':text);
+  var long=t.length>240||t.split('\n').length>7;
+  var safe=esc(t);
+  if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  var h='<div style="position:relative;">';
+  h+='<div data-clamp="140" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  h+='<div class="seyfade" style="position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(180deg,rgba(0,0,0,0),'+fadeColor+' 92%);pointer-events:none;"></div></div>';
+  h+='<button onclick="App.toggleMsg(this)" style="margin-top:5px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:800;color:inherit;opacity:.92;padding:2px 0;">Devamını göster ⌄</button>';
+  return h;
+}
+App.toggleMsg=function(btn){
+  var wrap=btn.previousElementSibling; if(!wrap) return;
+  var content=wrap.querySelector('[data-clamp]'), fade=wrap.querySelector('.seyfade'); if(!content) return;
+  if(content.getAttribute('data-exp')==='1'){ content.style.maxHeight=content.getAttribute('data-clamp')+'px'; content.setAttribute('data-exp','0'); if(fade) fade.style.display=''; btn.textContent='Devamını göster ⌄'; }
+  else { content.style.maxHeight='none'; content.setAttribute('data-exp','1'); if(fade) fade.style.display='none'; btn.textContent='Daha az göster ⌃'; }
+};
+// ÆON = insan-döngülü sohbet: kullanıcının soruları (sağ/giden balon) panele gider,
+// gözlemci ÆON adına yanıtlar (sol/gelen balon). Gözlemci mesajları da gelen balondur.
+// Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
+function aeonChatHTML(){
+  var soft='201,160,60';
+  var h='';
+  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px rgba('+soft+',0.4);">⬡</div><div><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">seninle ve gözlemcinle · sınırsız sohbet</div></div></div>';
+  var items=[];
+  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read}); });
+  var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
+  qa.forEach(function(x){ if(!x) return;
+    items.push({sort:String(x.ts||''),kind:'out',text:x.question,time:x.ts,answered:!!x.answer,reviewing:!!x.reviewingAt});
+    if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts});
+  });
+  items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  if(!items.length){
+    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:26px 12px;line-height:1.6;border:1px dashed rgba('+soft+',0.3);border-radius:18px;">⬡ Henüz mesaj yok.<br>ÆON’a aşağıdaki kutudan ilk sorunu sorabilirsin.</div>';
+  }
+  items.forEach(function(it){
+    if(it.kind==='out'){
+      h+='<div style="align-self:flex-end;max-width:88%;display:flex;flex-direction:column;align-items:flex-end;">';
+      h+='<div style="background:#7E62B8;color:#fff;border-radius:17px 17px 5px 17px;padding:10px 13px;font-size:14.5px;line-height:1.5;box-shadow:0 3px 10px rgba(126,98,184,0.28);">'+clampBubble(it.text,'#7E62B8')+'</div>';
+      var foot;
+      if(it.answered) foot='<span style="color:var(--faint);">✓✓ yanıtlandı</span>';
+      else if(it.reviewing) foot='<span style="color:#C99A3A;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.3px;">⬡ AEON // EVALUATING INPUT…</span>';
+      else foot='<span style="color:var(--faint);">✓ Gönderildi</span>';
+      h+='<div style="font-size:11px;margin-top:3px;display:flex;gap:7px;align-items:center;">'+foot+'<span style="color:var(--faint);">'+esc(aeonTime(it.time))+'</span></div></div>';
+    } else {
+      h+='<div style="align-self:flex-start;max-width:88%;">';
+      h+='<div style="background:var(--card);color:var(--text);border:1px solid rgba('+soft+',0.28);border-left:3px solid #D4AF37;border-radius:5px 17px 17px 17px;padding:10px 13px;box-shadow:0 3px 10px rgba(150,110,120,0.08);">';
+      h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:2px 9px;">⬡ ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
+      h+='<div style="font-size:14.5px;line-height:1.55;">'+clampBubble(it.text,'var(--card)')+'</div>';
+      if(it.observer&&it.id) h+='<div style="display:flex;margin-top:7px;"><button onclick="App.deleteNotif(\''+it.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:11.5px;padding:4px 10px;border-radius:9px;">🗑 Sil</button></div>';
+      h+='</div></div>';
+    }
+  });
+  h+='</div>';
+  // alta sabit yazı kutusu (opak zemin → akış altından geçerken okunur kalır)
+  h+='<div style="position:sticky;bottom:0;background:var(--modal);padding:10px 0 4px;margin-top:6px;border-top:1px solid rgba(150,110,120,0.14);z-index:5;">';
+  if(ui.aeonError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:8px;">'+esc(ui.aeonError)+'</div>';
+  h+='<div style="display:flex;gap:8px;align-items:flex-end;">';
+  h+='<textarea id="aeon-input" oninput="App.onAeonDraft(this)" placeholder="ÆON’a yaz…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
+  h+='<button onclick="App.askAeon()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);box-shadow:0 6px 16px rgba('+soft+',0.4);display:flex;align-items:center;justify-content:center;">➤</button>';
+  h+='</div></div>';
+  return h;
+}
 function mesajHTML(){
   var h=askBlockHTML('luna');
   h+='<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(150,110,120,0.25),transparent);margin:22px 0 16px;"></div>';
-  h+=askBlockHTML('aeon');
+  h+=aeonChatHTML();
   return h;
 }
-App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); ui.tab='mesaj'; ui.aeonScrollBottom=true; render(); };
 App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };

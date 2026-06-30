@@ -208,7 +208,7 @@ var APPKEY="seyma-reset-v1";
 var PTOKEN="";
 var D=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{}};
-var OBSINBOX=[], OBSSHA=null;
+var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["sleepReg","Uyku","2026-06-28"],["veggie","Sebze/lif","2026-06-28"],["mobility","Germe/nefes","2026-06-28"],["selfKind","Kendine iyi"]];
 var HT=HABITS.length;
 function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
@@ -912,6 +912,7 @@ function render(){
 
   document.getElementById("app").innerHTML=h;
   setTimeout(initLocMap,0);
+  try{ maybeMarkReviewing(); }catch(e){}
 }
 
 // ---------- Leaflet harita başlatma ----------
@@ -1009,13 +1010,14 @@ function ghJsonHeaders(){ return {"Authorization":"Bearer "+PTOKEN,"Accept":"app
 function loadInbox(){
   return fetch(inboxApi()+"?ref="+encodeURIComponent(BRANCH)+"&t="+Date.now(),{headers:ghJsonHeaders()})
     .then(function(r){
-      if(r.status===404) return {messages:[],sha:null};
+      if(r.status===404) return {messages:[],receipts:{},sha:null};
       if(!r.ok) throw new Error("inbox "+r.status);
-      return r.json().then(function(g){ var obj={messages:[]}; try{ obj=JSON.parse(b64dec(g.content)); }catch(e){} return {messages:Array.isArray(obj.messages)?obj.messages:[],sha:g.sha}; });
+      return r.json().then(function(g){ var obj={messages:[]}; try{ obj=JSON.parse(b64dec(g.content)); }catch(e){} return {messages:Array.isArray(obj.messages)?obj.messages:[],receipts:(obj.receipts&&typeof obj.receipts==="object")?obj.receipts:{},sha:g.sha}; });
     });
 }
-function putInbox(messages,sha){
-  var body={message:"observer: mesaj guncelle",content:b64enc(JSON.stringify({messages:messages},null,2)),branch:BRANCH};
+function putInbox(messages,sha,receipts){
+  var payload={messages:messages}; if(receipts&&typeof receipts==="object"&&Object.keys(receipts).length) payload.receipts=receipts;
+  var body={message:"observer: mesaj guncelle",content:b64enc(JSON.stringify(payload,null,2)),branch:BRANCH};
   if(sha) body.sha=sha;
   var H=ghJsonHeaders(); H["Content-Type"]="application/json";
   return fetch(inboxApi(),{method:"PUT",headers:H,body:JSON.stringify(body)}).then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+" "+t.slice(0,120)); }); });
@@ -1030,7 +1032,7 @@ window.sendObserverMsg=function(){
     .then(function(res){
       var msgs=(res.messages||[]).slice();
       msgs.push({id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:txt,ts:new Date().toISOString()});
-      return putInbox(msgs,res.sha);
+      return putInbox(msgs,res.sha,res.receipts);
     })
     .then(function(){ UI.msgDraft=""; UI.msgSending=false; return load(); })
     .catch(function(e){ UI.msgSending=false; render(); alert("Mesaj gonderilemedi: "+String(e&&e.message||e)); });
@@ -1040,7 +1042,7 @@ window.delObserverMsg=function(id){
   if(!confirm("Bu mesaji kanaldan kaldir? (Kullanicinin cihazinda kayitliysa orada kalir.)")) return;
   UI.msgSending=true; render();
   loadInbox()
-    .then(function(res){ var msgs=(res.messages||[]).filter(function(m){ return m&&m.id!==id; }); return putInbox(msgs,res.sha); })
+    .then(function(res){ var msgs=(res.messages||[]).filter(function(m){ return m&&m.id!==id; }); return putInbox(msgs,res.sha,res.receipts); })
     .then(function(){ UI.msgSending=false; return load(); })
     .catch(function(e){ UI.msgSending=false; render(); alert("Silinemedi: "+String(e&&e.message||e)); });
 };
@@ -1052,10 +1054,31 @@ window.aeonAnswer=function(id){
   if(!t) return;
   UI.msgSending=true; render();
   loadInbox()
-    .then(function(res){ var msgs=(res.messages||[]).slice(); msgs.push({id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:t,ts:new Date().toISOString(),replyTo:id}); return putInbox(msgs,res.sha); })
+    .then(function(res){ var msgs=(res.messages||[]).slice(); msgs.push({id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:t,ts:new Date().toISOString(),replyTo:id}); return putInbox(msgs,res.sha,res.receipts); })
     .then(function(){ UI.aeonReplies[id]=""; UI.msgSending=false; return load(); })
     .catch(function(e){ UI.msgSending=false; render(); alert("Gönderilemedi: "+String(e&&e.message||e)); });
 };
+// Gözlemci paneli açıp kullanıcının cevaplanmamış ÆON sorusunu gördüğünde, kullanıcı tarafında
+// "⬡ AEON // EVALUATING INPUT…" durumu görünsün diye observer-inbox.json'a okundu (receipt) yazarız.
+function markReviewWrite(ids){
+  if(!ids||!ids.length) return;
+  loadInbox().then(function(res){
+    var rc=res.receipts||{}, now=new Date().toISOString(), changed=false;
+    ids.forEach(function(id){ if(!rc[id]){ rc[id]={status:"reviewing",ts:now}; changed=true; } });
+    if(!changed){ OBSRECEIPTS=rc; return; }
+    return putInbox(res.messages||[],res.sha,rc).then(function(){ OBSRECEIPTS=rc; });
+  }).catch(function(){ ids.forEach(function(id){ delete MARKED_REVIEW[id]; }); });
+}
+function maybeMarkReviewing(){
+  if(!D||!D.aeon||!Array.isArray(D.aeon.qa)) return;
+  var pending=[];
+  D.aeon.qa.forEach(function(x){
+    if(!x||!x.id||x.answer) return;
+    if(OBSRECEIPTS[x.id]||MARKED_REVIEW[x.id]) return;
+    MARKED_REVIEW[x.id]=true; pending.push(x.id);
+  });
+  if(pending.length) markReviewWrite(pending);
+}
 function load(){
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
@@ -1063,7 +1086,7 @@ function load(){
     .then(function(j){
       D=j; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      loadInbox().then(function(res){ OBSINBOX=res.messages||[]; OBSSHA=res.sha; render(); }).catch(function(){ render(); });
+      loadInbox().then(function(res){ OBSINBOX=res.messages||[]; OBSSHA=res.sha; OBSRECEIPTS=res.receipts||{}; render(); }).catch(function(){ render(); });
     })
     .catch(function(e){
       var m=String(e&&e.message||e);

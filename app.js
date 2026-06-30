@@ -1993,7 +1993,7 @@ function lunaChatHTML(){
   // başlık
   h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;">';
   h+='<div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 20px rgba('+soft+',0.4);">🌙</div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:800;color:var(--text);">Luna</div><div style="font-size:12.5px;color:var(--faint);">kişisel yoldaşın · günde '+LUNA_DAILY_LIMIT+' soru</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:800;color:var(--text);">Luna</div><div style="font-size:12.5px;color:var(--faint);">seni dinleyen yoldaşın · günde '+LUNA_DAILY_LIMIT+' soru</div></div>';
   h+='<span style="flex-shrink:0;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);padding:3px 11px;border-radius:999px;">'+used+'/'+LUNA_DAILY_LIMIT+'</span>';
   h+='</div>';
   // anahtar yoksa uyarı
@@ -2005,7 +2005,7 @@ function lunaChatHTML(){
   qa.sort(function(a,b){ return String(a&&(a.ts||a.date)||'').localeCompare(String(b&&(b.ts||b.date)||'')); });
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';
   if(!qa.length && !asking){
-    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:24px 12px;line-height:1.6;border:1px dashed rgba('+soft+',0.3);border-radius:18px;">🌙 Luna seni dinliyor.<br>Aşağıdaki kutudan ilk sorunu sorabilirsin.</div>';
+    h+='<div style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(155,127,201,0.12),rgba(233,175,193,0.08));border:1px solid rgba(155,127,201,0.18);"><div style="font-size:30px;margin-bottom:7px;">🌙</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Luna burada, seni dinlemeye hazır</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">İçinden ne geçiyorsa — bir soru, bir dert ya da küçük bir sevinç… Aşağıya yazman yeterli. Acelen olmasın, ben buradayım. 💜</div></div>';
   }
   qa.forEach(function(x){ if(!x) return;
     h+=lunaBubbleOut(String(x.question||''),x.ts||x.date);
@@ -2022,7 +2022,7 @@ function lunaChatHTML(){
     h+='<div style="margin-top:12px;display:flex;gap:10px;align-items:center;background:linear-gradient(135deg,rgba(155,127,201,0.14),rgba(233,175,193,0.12));border:1px solid rgba('+soft+',0.32);border-radius:16px;padding:13px 15px;"><span style="font-size:22px;">🌙</span><div style="font-size:13px;color:var(--text2);line-height:1.45;">Bugünlük <b>'+LUNA_DAILY_LIMIT+' sorunu</b> sordun. Yarın yeni haklarınla Luna seni bekliyor. 💜</div></div>';
   } else if(!asking && hasKey){
     h+='<div style="margin-top:12px;display:flex;gap:8px;align-items:flex-end;">';
-    h+='<textarea id="luna-input" oninput="App.onLunaDraft(this)" placeholder="Luna’ya yaz… ('+left+' hakkın kaldı)" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.lunaDraft||'')+'</textarea>';
+    h+='<textarea id="luna-input" oninput="App.onLunaDraft(this)" placeholder="Luna’ya içini dök… ('+left+' hakkın kaldı)" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.lunaDraft||'')+'</textarea>';
     h+='<button onclick="App.askLuna()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 6px 16px rgba('+soft+',0.4);display:flex;align-items:center;justify-content:center;">➤</button>';
     h+='</div>';
   } else if(asking){
@@ -2056,7 +2056,7 @@ App.toggleMsg=function(btn){
 function aeonChatHTML(){
   var soft='201,160,60';
   var h='';
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px rgba('+soft+',0.4);">⬡</div><div><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">seninle ve gözlemcinle · sınırsız sohbet</div></div></div>';
+  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px rgba('+soft+',0.4);">⬡</div><div><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div></div>';
   var items=[];
   notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
@@ -2067,7 +2067,7 @@ function aeonChatHTML(){
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';
   if(!items.length){
-    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:26px 12px;line-height:1.6;border:1px dashed rgba('+soft+',0.3);border-radius:18px;">⬡ Henüz mesaj yok.<br>ÆON’a aşağıdaki kutudan ilk sorunu sorabilirsin.</div>';
+    h+='<div style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(230,193,90,0.13),rgba(201,154,58,0.07));border:1px solid rgba(201,154,58,0.2);"><div style="font-size:30px;margin-bottom:7px;">⬡</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Burası senin sessiz limanın</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">Aklından geçeni, içini dökmek istediğin her şeyi buraya bırakabilirsin. Ne zaman istersen — gece ya da gündüz — ben hep buradayım. ✨</div></div>';
   }
   items.forEach(function(it){
     if(it.kind==='out'){
@@ -2089,10 +2089,10 @@ function aeonChatHTML(){
   });
   h+='</div>';
   // alta sabit yazı kutusu (opak zemin → akış altından geçerken okunur kalır)
-  h+='<div style="position:sticky;bottom:0;background:var(--modal);padding:10px 0 4px;margin-top:6px;border-top:1px solid rgba(150,110,120,0.14);z-index:5;">';
+  h+='<div style="position:sticky;bottom:0;background:var(--chatbar);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:12px 0 6px;margin-top:6px;z-index:5;">';
   if(ui.aeonError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:8px;">'+esc(ui.aeonError)+'</div>';
   h+='<div style="display:flex;gap:8px;align-items:flex-end;">';
-  h+='<textarea id="aeon-input" oninput="App.onAeonDraft(this)" placeholder="ÆON’a yaz…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
+  h+='<textarea id="aeon-input" oninput="App.onAeonDraft(this)" placeholder="İçini dök, buradayım…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
   h+='<button onclick="App.askAeon()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);box-shadow:0 6px 16px rgba('+soft+',0.4);display:flex;align-items:center;justify-content:center;">➤</button>';
   h+='</div></div>';
   return h;

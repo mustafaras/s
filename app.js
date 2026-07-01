@@ -195,6 +195,8 @@ var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
 var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
+var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
+var lastOverlayView=null;  // o overlay'in aktif sekmesi — gorunum degismediyse scroll korunur
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -719,11 +721,18 @@ function render(){
   root.setAttribute('data-theme', dark?'dark':'light');
   var app=document.getElementById('app');
 
-  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; return; }
+  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
 
   var prevScroll=document.querySelector('[data-scroll]');
   var prevTop=prevScroll?prevScroll.scrollTop:0;
   var sameTab=(lastRenderTab===ui.tab);
+
+  // Hub overlay (Ne okudum / Ne izledim): sekme degistirirken tam DOM yeniden kurulur;
+  // acik kalan overlay'in scroll'unu yakala ki flash olmadan geri koyalim
+  var prevOvBody=document.getElementById('sey-ov-body');
+  var prevOvTop=prevOvBody?prevOvBody.scrollTop:0;
+  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':null);
+  var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):null);
 
   var html='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px;display:flex;flex-direction:column;gap:14px;">';
   if(ui.tab==='bugun') html+=bugunHTML();
@@ -752,6 +761,19 @@ function render(){
       newScroll.scrollTop=prevTop;
     }
   }
+
+  // Overlay ayni kaldiysa (sekme degisimi veya ic veri aksiyonu): giris animasyonunu tekrar oynatma -> flash yok
+  if(curOverlay && curOverlay===lastOverlay){
+    var ovBack=document.getElementById('sey-ov-back');
+    var ovCard=document.getElementById('sey-ov-card');
+    if(ovBack) ovBack.style.animation='none';
+    if(ovCard) ovCard.style.animation='none';
+    var ovBody=document.getElementById('sey-ov-body');
+    // Ayni sekmede kaldiysak scroll'u koru; sekme degistiyse en uste don
+    if(ovBody && curOverlayView===lastOverlayView) ovBody.scrollTop=prevOvTop;
+  }
+  lastOverlay=curOverlay;
+  lastOverlayView=curOverlayView;
   lastRenderTab=ui.tab;
 }
 
@@ -1623,10 +1645,11 @@ function navHTML(){
 }
 
 // ================= OKUMA HUB (overlay) =================
-function overlayShell(closeFn, inner, maxw){
-  var h='<div onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">';
-  h+=inner;
+function overlayShell(closeFn, sticky, body, maxw){
+  var h='<div id="sey-ov-back" onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div id="sey-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;height:86vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
+  h+='<div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+(sticky||'')+'</div>';
+  h+='<div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+(body||'')+'</div>';
   h+='</div></div>';
   return h;
 }
@@ -1640,7 +1663,7 @@ function readingOverlayHTML(){
   else if(view==='library') body=readingLibraryView();
   else if(view==='stats') body=readingStatsView();
   else if(view==='quotes') body=readingQuotesView();
-  var h=overlayShell('App.closeReading()', head+tabs+body);
+  var h=overlayShell('App.closeReading()', head+tabs, body);
   if(ui.bookEdit) h+=bookEditModal();
   if(ui.quoteDraft) h+=quoteAddModal();
   return h;
@@ -1768,7 +1791,7 @@ function watchOverlayHTML(){
   else if(view==='archive') body=watchArchiveView();
   else if(view==='stats') body=watchStatsView();
   else if(view==='quotes') body=watchQuotesView();
-  var h=overlayShell('App.closeWatching()', head+tabs+body);
+  var h=overlayShell('App.closeWatching()', head+tabs, body);
   if(ui.titleEdit) h+=titleEditModal();
   if(ui.replicaDraft) h+=replicaAddModal();
   return h;

@@ -779,7 +779,42 @@ function render(){
   if(rdPages>0) rdBits.push(rdPages+" sayfa");
   if(rdMins>0) rdBits.push(rdMins+" dk");
   exRows+=exRowAlways("📄 Sayfa", rdBits.join(" · "));
+  // İzleme (watching): bugün izlenen film/dizi + bölüm/dk
+  var wtEn=(srec.watching&&Array.isArray(srec.watching.entries))?srec.watching.entries:[];
+  var wtTitles=wtEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; var kind=(e&&e.kind==='dizi')?'Dizi':'Film'; return esc(t)+' <span style="color:var(--t4);font-weight:600;">('+kind+')</span>'; }).filter(Boolean);
+  exRows+=exRowAlways("🎬 İzleme", wtTitles.join(" · "));
+  var wtBits=[];
+  var wtEps=wtEn.reduce(function(a,e){ var p=Number(e&&e.episodes); return a+((!isNaN(p)&&p>0)?p:0); },0);
+  var wtMins=wtEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
+  if(wtEn.length>0) wtBits.push(wtEn.length+" kayıt");
+  if(wtEps>0) wtBits.push(wtEps+" bölüm");
+  if(wtMins>0) wtBits.push(wtMins+" dk");
+  exRows+=exRowAlways("⏱️ Süre", wtBits.join(" · "));
   h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>';
+  // ── Bugünün okuma & izleme kayıtları (not dahil tüm detay) ──
+  if(rdEn.length>0 || wtEn.length>0){
+    h+='<div class="divider"></div><div class="lbl">🎞️ Okuma & İzleme Kayıtları</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
+    rdEn.forEach(function(e){
+      var meta=[]; var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) meta.push(p+' sayfa'); var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
+      h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--purple);padding:8px 11px;">'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">📖</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +(e&&e.author?'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+esc(String(e.author).trim())+'</span>':'')
+        +(meta.length?'<span style="color:var(--purple);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
+        +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
+        +'</div>';
+    });
+    wtEn.forEach(function(e){
+      var kind=(e&&e.kind==='dizi')?'Dizi':'Film'; var meta=[]; var ep=Number(e&&e.episodes); if(!isNaN(ep)&&ep>0) meta.push(ep+' bölüm'); var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
+      h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--amber);padding:8px 11px;">'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">'+(kind==='Dizi'?'📺':'🎬')+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+kind+'</span>'
+        +(meta.length?'<span style="color:var(--amber);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
+        +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  }
   // ── Fiziksel rahatsızlık (gün) — veri olmasa da her zaman görünür ──
   var dz=(srec.discomfort&&typeof srec.discomfort==='object')?srec.discomfort:null;
   var dzRegs=dz&&dz.regions?Object.keys(dz.regions).filter(function(k){return dz.regions[k]&&dz.regions[k].level>0;}):[];
@@ -919,6 +954,114 @@ function render(){
     ['Sync gecikmesi', syncLagMin==null?"—":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa")],
     ['Eksik gün', missingInRange+'/'+cur.length]
   ]);
+
+  // ═════════ KÜTÜPHANE · İZLEME ARŞİVİ · ALINTILAR ═════════
+  (function(){
+    var LIB=(D&&D.library&&Array.isArray(D.library.books))?D.library.books:[];
+    var WL=(D&&D.watchlist&&Array.isArray(D.watchlist.items))?D.watchlist.items:[];
+    var LG=(D&&D.library&&D.library.goal)?D.library.goal:{};
+    var WG=(D&&D.watchlist&&D.watchlist.goal)?D.watchlist.goal:{};
+    var yr=new Date().getFullYear();
+    function pbar(pct,col){ pct=Math.max(0,Math.min(100,Math.round(pct||0))); return '<div style="height:6px;border-radius:999px;background:var(--s3);overflow:hidden;margin-top:6px;"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:999px;"></div></div>'; }
+    function chip(txt,col){ return '<span style="font-size:var(--f1);font-weight:800;padding:2px 8px;border-radius:999px;color:'+col+';background:'+col+'22;border:1px solid '+col+'44;white-space:nowrap;">'+txt+'</span>'; }
+    function stars(r){ if(!r) return ''; return '<span style="color:var(--gold);font-size:var(--f2);letter-spacing:1px;white-space:nowrap;">'+Array(r+1).join('★')+'<span style="color:var(--t4);">'+Array(6-r).join('★')+'</span></span>'; }
+    function finDate(iso){ if(!iso) return ''; try{ var d=new Date(iso); return shortD(fmt(d)); }catch(e){ return ''; } }
+
+    function bookRow(b){
+      var st={reading:['Okunuyor','var(--purple)'],finished:['Bitti','var(--green)'],dropped:['Ara verildi','var(--amber)']}[b.status]||['Okunuyor','var(--purple)'];
+      var total=Number(b.totalPages)||0, cur=Number(b.currentPage)||0;
+      var pct=b.status==='finished'?100:(total>0?(cur/total*100):0);
+      var meta=[]; if(b.author) meta.push(esc(String(b.author).trim())); if(b.genre) meta.push(esc(String(b.genre).trim()));
+      var qn=(Array.isArray(b.quotes)?b.quotes.length:0);
+      var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
+      s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
+      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(b.emoji||'📖')+'</span>';
+      s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(b.title||'').trim())+'</b>'+chip(st[0],st[1])+'</div>';
+      if(meta.length) s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      s+='</div>'+(b.rating?stars(b.rating):'')+'</div>';
+      if(b.status!=='finished'){
+        s+=pbar(pct,'linear-gradient(90deg,var(--purple),#e9afc1)');
+        s+='<div style="display:flex;justify-content:space-between;color:var(--t3);font-size:var(--f1);font-weight:700;margin-top:4px;"><span>'+cur+(total?' / '+total+' sf':' sf')+'</span><span>%'+Math.round(pct)+'</span></div>';
+      } else {
+        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;">🎉 '+(finDate(b.finishedAt)?finDate(b.finishedAt)+' tarihinde bitti':'Tamamlandı')+(total?' · '+total+' sayfa':'')+'</div>';
+      }
+      return s+'</div>';
+    }
+    function titleRow(t){
+      var st={watching:['İzleniyor','var(--amber)'],finished:['Bitti','var(--green)'],dropped:['Yarıda','var(--purple)']}[t.status]||['İzleniyor','var(--amber)'];
+      var total=Number(t.totalEp)||0, cur=Number(t.watchedEp)||0;
+      var pct=t.status==='finished'?100:(total>0?(cur/total*100):0);
+      var meta=[t.kind==='dizi'?'Dizi':'Film']; if(t.genre) meta.push(esc(String(t.genre).trim()));
+      var qn=(Array.isArray(t.quotes)?t.quotes.length:0);
+      var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
+      s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
+      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(t.emoji||'🎬')+'</span>';
+      s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(t.title||'').trim())+'</b>'+chip(st[0],st[1])+'</div>';
+      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      s+='</div>'+(t.rating?stars(t.rating):'')+'</div>';
+      if(t.status!=='finished' && t.kind==='dizi'){
+        s+=pbar(pct,'linear-gradient(90deg,var(--amber),#e9afc1)');
+        s+='<div style="display:flex;justify-content:space-between;color:var(--t3);font-size:var(--f1);font-weight:700;margin-top:4px;"><span>'+cur+(total?' / '+total+' bölüm':' bölüm')+'</span><span>%'+Math.round(pct)+'</span></div>';
+      } else if(t.status==='finished'){
+        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;">🎉 '+(finDate(t.finishedAt)?finDate(t.finishedAt)+' tarihinde bitti':'Tamamlandı')+'</div>';
+      }
+      return s+'</div>';
+    }
+    function orderBy(arr,key){ var o=key==='book'?{reading:0,finished:1,dropped:2}:{watching:0,finished:1,dropped:2}; return arr.slice().sort(function(a,b){ return (o[a.status]-o[b.status])||String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }); }
+
+    // ---- Kütüphane ----
+    var libFin=LIB.filter(function(b){return b.status==='finished';}).length;
+    var libRead=LIB.filter(function(b){return b.status==='reading';}).length;
+    var libFinYear=LIB.filter(function(b){return b.status==='finished'&&b.finishedAt&&new Date(b.finishedAt).getFullYear()===yr;}).length;
+    var libPages=0; for(var dk in D.days){ var rr=D.days[dk]; var en=(rr&&rr.reading&&Array.isArray(rr.reading.entries))?rr.reading.entries:[]; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) libPages+=p; }); }
+    var lh='<div class="card lift span-6 pad"><div class="lbl">📚 Kütüphane<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+LIB.length+' kitap</span></div>';
+    lh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+libRead+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Okunuyor</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+libFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+libPages.toLocaleString("tr-TR")+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Sayfa</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+libFinYear+(LG.yearlyBooks?'<span style="color:var(--t4);font-size:var(--f2);">/'+LG.yearlyBooks+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
+      +'</div>';
+    lh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    lh+= LIB.length? orderBy(LIB,'book').map(bookRow).join('') : '<div class="empty"><span class="ei">📚</span>Kitaplık boş</div>';
+    lh+='</div></div>';
+    h+=lh;
+
+    // ---- İzleme Arşivi ----
+    var wFin=WL.filter(function(t){return t.status==='finished';}).length;
+    var wWatch=WL.filter(function(t){return t.status==='watching';}).length;
+    var wFinYear=WL.filter(function(t){return t.status==='finished'&&t.finishedAt&&new Date(t.finishedAt).getFullYear()===yr;}).length;
+    var wMin=0; for(var dk2 in D.days){ var rr2=D.days[dk2]; var en2=(rr2&&rr2.watching&&Array.isArray(rr2.watching.entries))?rr2.watching.entries:[]; en2.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) wMin+=m; }); }
+    var wHours=wMin>=60?(Math.floor(wMin/60)+' sa'+(wMin%60?' '+(wMin%60)+' dk':'')):(wMin+' dk');
+    var wh='<div class="card lift span-6 pad"><div class="lbl">🎬 İzleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+WL.length+' yapım</span></div>';
+    wh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--amber);">'+wWatch+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">İzleniyor</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+wFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+esc(wHours)+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Süre</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+wFinYear+(WG.yearlyTitles?'<span style="color:var(--t4);font-size:var(--f2);">/'+WG.yearlyTitles+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
+      +'</div>';
+    wh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    wh+= WL.length? orderBy(WL,'title').map(titleRow).join('') : '<div class="empty"><span class="ei">🎬</span>Arşiv boş</div>';
+    wh+='</div></div>';
+    h+=wh;
+
+    // ---- Alıntılar & Replikler ----
+    var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',emoji:b.emoji||'📖',title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
+    var reps=[]; WL.forEach(function(t){ (Array.isArray(t.quotes)?t.quotes:[]).forEach(function(q){ reps.push({kind:'title',emoji:t.emoji||'🎬',title:t.title,text:q.text,ts:q.ts,col:'var(--amber)'}); }); });
+    var allq=quotes.concat(reps).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
+    if(allq.length){
+      var qh='<div class="card lift span-12 pad"><div class="lbl">💬 Alıntılar & Replikler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik</span></div>';
+      qh+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px;">';
+      allq.forEach(function(q){
+        qh+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'
+          +'<div style="position:absolute;top:-4px;right:8px;font-size:40px;color:'+q.col+';opacity:.14;line-height:1;font-weight:800;">”</div>'
+          +'<div style="font-size:var(--f3);color:var(--t1);line-height:1.5;font-style:italic;position:relative;word-break:break-word;">“'+esc(String(q.text||'').trim())+'”</div>'
+          +'<div style="font-size:var(--f1);color:var(--t3);font-weight:700;margin-top:7px;">'+q.emoji+' '+esc(String(q.title||'').trim())+(q.kind==='book'&&q.page?' · s.'+q.page:'')+'</div>'
+          +'</div>';
+      });
+      qh+='</div></div>';
+      h+=qh;
+    }
+  })();
 
   h+='</div>'; // end bento
 

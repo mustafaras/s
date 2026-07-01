@@ -26,6 +26,12 @@
     --field:rgba(255,248,243,0.7); --field-bd:rgba(108,74,58,0.15);
     --nav:rgba(255,255,255,0.85); --modal:#FFF8F3; --icon:rgba(255,248,243,0.8);
     --chatbar:rgba(252,247,250,0.28);
+    /* Okuma & İzleme hub accent'leri (açık tema) */
+    --read:#6E55BF; --read-bg:rgba(110,85,191,0.12);
+    --watch:#B5732E; --watch-bg:rgba(200,150,90,0.14);
+    --ok:#3F9A4F; --ok-bg:rgba(143,191,138,0.18);
+    --drop:#B0714E; --drop-bg:rgba(200,150,90,0.16);
+    --pause:#8A7BB0; --pause-bg:rgba(138,123,176,0.16);
     color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
   }
@@ -37,6 +43,12 @@
     --field:rgba(255,255,255,0.06); --field-bd:rgba(255,255,255,0.13);
     --nav:rgba(28,21,30,0.9); --modal:#201724; --icon:rgba(255,255,255,0.07);
     --chatbar:rgba(32,23,36,0.42);
+    /* Okuma & İzleme hub accent'leri (koyu tema — daha parlak) */
+    --read:#C3ABF5; --read-bg:rgba(167,139,250,0.22);
+    --watch:#ECB169; --watch-bg:rgba(236,177,105,0.20);
+    --ok:#7BD389; --ok-bg:rgba(123,211,137,0.20);
+    --drop:#E0A264; --drop-bg:rgba(224,162,100,0.20);
+    --pause:#B9A6E6; --pause-bg:rgba(185,166,230,0.20);
   }
   .glass{background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-bd);}
   .scroll{-webkit-overflow-scrolling:touch;}

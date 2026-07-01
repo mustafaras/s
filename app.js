@@ -180,11 +180,19 @@ function migrate(d){
   if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
   if(d.location===undefined) d.location=null;
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
+  if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
+  if(!Array.isArray(d.library.books)) d.library.books=[];
+  if(!d.library.goal||typeof d.library.goal!=='object') d.library.goal={dailyPages:20,yearlyBooks:null};
+  d.library.books=d.library.books.map(normBook).filter(Boolean);
+  if(!d.watchlist||typeof d.watchlist!=='object') d.watchlist=emptyWatchlist();
+  if(!Array.isArray(d.watchlist.items)) d.watchlist.items=[];
+  if(!d.watchlist.goal||typeof d.watchlist.goal!=='object') d.watchlist.goal={dailyMinutes:40,yearlyTitles:null};
+  d.watchlist.items=d.watchlist.items.map(normTitle).filter(Boolean);
   d.version=2;
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var fieldTimers={};
@@ -250,13 +258,54 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
 function trackedSteps(rec){ var w=dayMovement(rec).walk; return w>0?Math.round(w/STEP_LEN_M):0; }
 function effSteps(rec){ var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null; if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'}; var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'}; return {steps:null,source:'none'}; }
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
+
+// ---------- Kitaplık & İzleme (kalıcı arşiv) ----------
+function uid(p){ return (p||'id')+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6); }
+function emptyWatching(){ return {entries:[]}; }
+function emptyLibrary(){ return {books:[],goal:{dailyPages:20,yearlyBooks:null}}; }
+function emptyWatchlist(){ return {items:[],goal:{dailyMinutes:40,yearlyTitles:null}}; }
+var BOOK_EMOJI=['📖','📕','📗','📘','📙','📓','📔','📚','📜','🕮'];
+var BOOK_GENRES=['Roman','Klasik','Kişisel gelişim','Şiir','Öykü','Bilim','Tarih','Felsefe','Polisiye','Fantastik'];
+var TITLE_EMOJI=['🎬','🍿','📺','🎞️','🚀','🕵️','❤️','😂','👑','🧟','🐉','⚔️'];
+var TITLE_GENRES=['Dram','Komedi','Aksiyon','Bilimkurgu','Gerilim','Romantik','Belgesel','Fantastik','Animasyon','Suç'];
+function normBook(b){ if(!b||typeof b!=='object') return null; if(!b.id) b.id=uid('b'); b.title=String(b.title==null?'':b.title); b.author=String(b.author==null?'':b.author); b.genre=String(b.genre==null?'':b.genre); if(!b.emoji) b.emoji='📖'; b.totalPages=(b.totalPages==null||b.totalPages==='')?null:Math.max(0,Math.round(Number(b.totalPages)||0)); b.currentPage=Math.max(0,Math.round(Number(b.currentPage)||0)); if(['reading','finished','dropped'].indexOf(b.status)<0) b.status='reading'; b.rating=(b.rating==null||b.rating==='')?null:Math.max(1,Math.min(5,Math.round(Number(b.rating)||0))); if(typeof b.note!=='string') b.note=''; if(!Array.isArray(b.quotes)) b.quotes=[]; if(b.startedAt===undefined) b.startedAt=null; if(b.finishedAt===undefined) b.finishedAt=null; if(!b.createdAt) b.createdAt=new Date().toISOString(); return b; }
+function normTitle(t){ if(!t||typeof t!=='object') return null; if(!t.id) t.id=uid('w'); t.title=String(t.title==null?'':t.title); if(t.kind!=='film'&&t.kind!=='dizi') t.kind='film'; t.genre=String(t.genre==null?'':t.genre); if(!t.emoji) t.emoji=(t.kind==='dizi'?'📺':'🎬'); t.totalEp=(t.totalEp==null||t.totalEp==='')?null:Math.max(0,Math.round(Number(t.totalEp)||0)); t.watchedEp=Math.max(0,Math.round(Number(t.watchedEp)||0)); if(['watching','finished','dropped'].indexOf(t.status)<0) t.status='watching'; t.rating=(t.rating==null||t.rating==='')?null:Math.max(1,Math.min(5,Math.round(Number(t.rating)||0))); if(typeof t.note!=='string') t.note=''; if(!Array.isArray(t.quotes)) t.quotes=[]; if(t.startedAt===undefined) t.startedAt=null; if(t.finishedAt===undefined) t.finishedAt=null; if(!t.createdAt) t.createdAt=new Date().toISOString(); return t; }
+function ensureLibrary(){ if(!data.library||typeof data.library!=='object') data.library=emptyLibrary(); if(!Array.isArray(data.library.books)) data.library.books=[]; if(!data.library.goal||typeof data.library.goal!=='object') data.library.goal={dailyPages:20,yearlyBooks:null}; return data.library; }
+function ensureWatchlist(){ if(!data.watchlist||typeof data.watchlist!=='object') data.watchlist=emptyWatchlist(); if(!Array.isArray(data.watchlist.items)) data.watchlist.items=[]; if(!data.watchlist.goal||typeof data.watchlist.goal!=='object') data.watchlist.goal={dailyMinutes:40,yearlyTitles:null}; return data.watchlist; }
+function findBook(id){ var L=ensureLibrary(); for(var i=0;i<L.books.length;i++){ if(L.books[i]&&L.books[i].id===id) return L.books[i]; } return null; }
+function findTitle(id){ var W=ensureWatchlist(); for(var i=0;i<W.items.length;i++){ if(W.items[i]&&W.items[i].id===id) return W.items[i]; } return null; }
+function bookPct(b){ if(!b||!b.totalPages||b.totalPages<=0) return b&&b.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((b.currentPage/b.totalPages)*100))); }
+function titlePct(t){ if(!t) return 0; if(!t.totalEp||t.totalEp<=0) return t.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((t.watchedEp/t.totalEp)*100))); }
+// istatistik
+function libStats(){ var L=ensureLibrary(); var yr=new Date().getFullYear(),reading=0,finished=0,dropped=0,finYear=0; L.books.forEach(function(b){ if(b.status==='finished'){ finished++; if(b.finishedAt&&new Date(b.finishedAt).getFullYear()===yr) finYear++; } else if(b.status==='dropped') dropped++; else reading++; }); return {reading:reading,finished:finished,dropped:dropped,finYear:finYear,total:L.books.length}; }
+function readTotals(){ var pages=0,minutes=0,days=0; for(var d in data.days){ var st=readingStats(data.days[d]); if(st.count>0){ days++; pages+=st.pages; minutes+=st.minutes; } } return {pages:pages,minutes:minutes,days:days}; }
+function hasRead(date){ var r=data.days[date]; return !!(r&&r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0); }
+function readStreak(){ var c=todayStr(); if(!hasRead(c)) c=addDays(c,-1); var n=0,guard=0; while(hasRead(c)&&guard++<4000){ n++; c=addDays(c,-1); } return n; }
+function weekReading(){ var out=[],t=todayStr(); for(var i=6;i>=0;i--){ var d=addDays(t,-i); out.push({date:d,pages:readingStats(data.days[d]).pages,label:shortDate(d)}); } return out; }
+function todayReadPages(){ return readingStats(data.days[todayStr()]).pages; }
+function allQuotes(){ var L=ensureLibrary(),out=[]; L.books.forEach(function(b){ (b.quotes||[]).forEach(function(q){ out.push({bookId:b.id,title:b.title,emoji:b.emoji,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
+function watchStats(){ var W=ensureWatchlist(); var yr=new Date().getFullYear(),watching=0,finished=0,dropped=0,finYear=0; W.items.forEach(function(t){ if(t.status==='finished'){ finished++; if(t.finishedAt&&new Date(t.finishedAt).getFullYear()===yr) finYear++; } else if(t.status==='dropped') dropped++; else watching++; }); return {watching:watching,finished:finished,dropped:dropped,finYear:finYear,total:W.items.length}; }
+function watchDayStats(rec){ var en=(rec&&rec.watching&&Array.isArray(rec.watching.entries))?rec.watching.entries:[]; var minutes=0,eps=0; en.forEach(function(e){ if(!e) return; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; var ep=Number(e.episodes); if(!isNaN(ep)&&ep>0) eps+=ep; }); return {count:en.length,minutes:minutes,eps:eps,entries:en}; }
+function watchTotals(){ var minutes=0,eps=0,days=0; for(var d in data.days){ var st=watchDayStats(data.days[d]); if(st.count>0){ days++; minutes+=st.minutes; eps+=st.eps; } } return {minutes:minutes,eps:eps,days:days}; }
+function hasWatch(date){ var r=data.days[date]; return !!(r&&r.watching&&Array.isArray(r.watching.entries)&&r.watching.entries.length>0); }
+function watchStreak(){ var c=todayStr(); if(!hasWatch(c)) c=addDays(c,-1); var n=0,guard=0; while(hasWatch(c)&&guard++<4000){ n++; c=addDays(c,-1); } return n; }
+function weekWatch(){ var out=[],t=todayStr(); for(var i=6;i>=0;i--){ var d=addDays(t,-i); out.push({date:d,minutes:watchDayStats(data.days[d]).minutes,label:shortDate(d)}); } return out; }
+function todayWatchMin(){ return watchDayStats(data.days[todayStr()]).minutes; }
+function allReplicas(){ var W=ensureWatchlist(),out=[]; W.items.forEach(function(t){ (t.quotes||[]).forEach(function(q){ out.push({itemId:t.id,title:t.title,emoji:t.emoji,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
+function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) return min+' dk'; var h=Math.floor(min/60),m=min%60; return h+' sa'+(m?' '+m+' dk':''); }
+// ---------- ortak UI parçaları ----------
+function segTabs(defs,active,fn){ var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#6E55BF,#9B7FC9)':'transparent')+';box-shadow:'+(on?'0 6px 14px rgba(110,85,191,0.32)':'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
+function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
+function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;font-size:'+size+'px;line-height:1;filter:'+(on?'none':'grayscale(1)')+';opacity:'+(on?'1':'0.45')+';">⭐</button>'; } h+='</div>'; return h; }
+function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:9.5px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:9px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
+function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:10px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
@@ -311,7 +360,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5}}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -352,28 +401,113 @@ App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function
 App.setSleepQuality=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMed=function(type){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
-App.openReading=function(){ ui.readingOpen=true; ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; render(); };
-App.closeReading=function(){ ui.readingOpen=false; ui.readingDraft=null; render(); };
+App.openReading=function(){ ui.readingOpen=true; ui.readingView='today'; ui.logBookId=null; ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; render(); };
+App.closeReading=function(){ ui.readingOpen=false; ui.readingDraft=null; ui.bookEdit=null; ui.quoteDraft=null; ui.logBookId=null; render(); };
+App.setReadingView=function(v){ ui.readingView=v; ui.bookEdit=null; ui.quoteDraft=null; render(); };
 App.onReadingField=function(field,el){ if(!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; ui.readingDraft[field]=el.value; };
+App.pickLogBook=function(id){ var b=findBook(id); if(!b) return; ui.logBookId=(ui.logBookId===id?null:id); if(ui.logBookId){ if(!ui.readingDraft) ui.readingDraft={}; ui.readingDraft.title=b.title; ui.readingDraft.author=b.author; } render(); };
+function bumpBookProgress(book,addPages){ if(!book) return false; if(addPages>0){ book.currentPage=Math.max(0,book.currentPage+addPages); if(book.totalPages&&book.totalPages>0) book.currentPage=Math.min(book.currentPage,book.totalPages); } if(!book.startedAt) book.startedAt=new Date().toISOString(); if(book.status==='reading'&&book.totalPages&&book.totalPages>0&&book.currentPage>=book.totalPages){ book.status='finished'; book.finishedAt=new Date().toISOString(); return true; } return false; }
 App.addReading=function(){
   var d=ui.readingDraft||{};
   var title=String(d.title||'').trim();
   if(!title){ toast('Önce kitabın adını yaz 📖'); var ti=document.getElementById('reading-title'); if(ti) ti.focus(); return; }
   var pages=parseInt(d.pages,10); if(isNaN(pages)||pages<0) pages=0;
   var minutes=parseInt(d.minutes,10); if(isNaN(minutes)||minutes<0) minutes=null;
-  var entry={ id:'r_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6), title:title.slice(0,120), author:String(d.author||'').trim().slice(0,80), pages:pages, minutes:minutes, note:String(d.note||'').trim().slice(0,240), ts:new Date().toISOString() };
+  var bookId=ui.logBookId||null; var justFinished=false;
+  if(bookId){ var bk=findBook(bookId); if(bk){ justFinished=bumpBookProgress(bk,pages); } else bookId=null; }
+  var entry={ id:uid('r'), title:title.slice(0,120), author:String(d.author||'').trim().slice(0,80), pages:pages, minutes:minutes, note:String(d.note||'').trim().slice(0,240), bookId:bookId, ts:new Date().toISOString() };
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!day.reading||typeof day.reading!=='object') day.reading=emptyReading();
   if(!Array.isArray(day.reading.entries)) day.reading.entries=[];
   day.reading.entries.push(entry);
   day.savedAt=new Date().toISOString();
-  ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''};
-  commit('Okuma kaydedildi 📖');
+  ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; ui.logBookId=null;
+  if(justFinished){ commit(); toast('Kitabı bitirdin! 🎉'); confetti(); } else commit('Okuma kaydedildi 📖');
 };
 App.removeReading=function(id){
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ day.reading.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
+  if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.reading.entries[i]; if(e&&e.bookId&&e.pages>0){ var bk=findBook(e.bookId); if(bk){ bk.currentPage=Math.max(0,bk.currentPage-e.pages); if(bk.status==='finished'&&bk.totalPages&&bk.currentPage<bk.totalPages){ bk.status='reading'; bk.finishedAt=null; } } } day.reading.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
 };
+// ---- kitap CRUD ----
+App.openBookEdit=function(id){ ensureLibrary(); ui.bookEdit = id ? clone(findBook(id)||{}) : {id:'',title:'',author:'',genre:'',emoji:'📖',totalPages:'',currentPage:0,status:'reading',rating:null,quotes:[]}; render(); };
+App.closeBookEdit=function(){ ui.bookEdit=null; render(); };
+App.onBookEditField=function(field,el){ if(!ui.bookEdit) return; ui.bookEdit[field]=el.value; };
+App.pickBookEmoji=function(e){ if(!ui.bookEdit) return; ui.bookEdit.emoji=e; render(); };
+App.pickBookGenre=function(g){ if(!ui.bookEdit) return; ui.bookEdit.genre=(ui.bookEdit.genre===g?'':g); render(); };
+App.saveBook=function(){ if(!ui.bookEdit) return; var L=ensureLibrary(); var b=ui.bookEdit; var title=String(b.title||'').trim(); if(!title){ toast('Kitabın adını yaz 📖'); return; } if(b.id){ var ex=findBook(b.id); if(ex){ ex.title=title.slice(0,120); ex.author=String(b.author||'').trim().slice(0,80); ex.genre=String(b.genre||''); ex.emoji=b.emoji||'📖'; ex.totalPages=(b.totalPages===''||b.totalPages==null)?null:Math.max(0,Math.round(Number(b.totalPages)||0)); ex.status=b.status||'reading'; normBook(ex); if(ex.totalPages) ex.currentPage=Math.min(ex.currentPage,ex.totalPages); } } else { var nb=normBook({title:title,author:String(b.author||'').trim(),genre:String(b.genre||''),emoji:b.emoji||'📖',totalPages:b.totalPages,currentPage:0,status:b.status||'reading',startedAt:new Date().toISOString()}); L.books.unshift(nb); } ui.bookEdit=null; commit('Kitaplığa eklendi 📚'); };
+App.deleteBook=function(id){ var L=ensureLibrary(); var i=L.books.findIndex(function(b){ return b&&b.id===id; }); if(i>=0){ L.books.splice(i,1); } ui.bookEdit=null; commit('Kitap silindi'); };
+App.setBookStatus=function(id,st){ var b=findBook(id); if(!b) return; b.status=st; if(st==='finished'){ if(!b.finishedAt) b.finishedAt=new Date().toISOString(); if(b.totalPages) b.currentPage=b.totalPages; } else { b.finishedAt=null; } commit(); };
+App.rateBook=function(id,n){ var b=findBook(id); if(!b) return; b.rating=(b.rating===n?null:n); commit(); };
+App.advanceBook=function(id,delta){ var b=findBook(id); if(!b) return; var fin=bumpBookProgress(b,delta>0?delta:0); if(delta<0){ b.currentPage=Math.max(0,b.currentPage+delta); if(b.status==='finished'&&b.totalPages&&b.currentPage<b.totalPages){ b.status='reading'; b.finishedAt=null; } } if(fin){ commit(); toast('Kitabı bitirdin! 🎉'); confetti(); } else commit(); };
+App.setBookPage=function(id,el){ var b=findBook(id); if(!b) return; var raw=el.value; debounceSave('bookpage_'+id,function(){ var v=raw===''?0:Math.max(0,Math.round(Number(raw)||0)); if(b.totalPages) v=Math.min(v,b.totalPages); b.currentPage=v; if(b.status==='reading'&&b.totalPages&&v>=b.totalPages){ b.status='finished'; b.finishedAt=new Date().toISOString(); save(); render(); toast('Kitabı bitirdin! 🎉'); confetti(); return; } save(); render(); },500); };
+App.finishBook=function(id){ var b=findBook(id); if(!b) return; b.status='finished'; b.finishedAt=new Date().toISOString(); if(b.totalPages) b.currentPage=b.totalPages; if(!b.startedAt) b.startedAt=new Date().toISOString(); commit(); toast('Kitabı bitirdin! 🎉'); confetti(); };
+App.reopenBook=function(id){ var b=findBook(id); if(!b) return; b.status='reading'; b.finishedAt=null; commit(); };
+App.setReadGoal=function(field,el){ var L=ensureLibrary(); var raw=el.value; debounceSave('readgoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); L.goal[field]=v; save(); render(); },500); };
+// ---- alıntılar ----
+App.openQuoteAdd=function(bookId){ var L=ensureLibrary(); if(!bookId){ var reading=L.books.filter(function(b){return b.status!=='dropped';}); bookId=(reading[0]&&reading[0].id)||(L.books[0]&&L.books[0].id)||''; } ui.quoteDraft={bookId:bookId,text:'',page:''}; render(); };
+App.closeQuoteAdd=function(){ ui.quoteDraft=null; render(); };
+App.onQuoteField=function(field,el){ if(!ui.quoteDraft) return; ui.quoteDraft[field]=el.value; };
+App.pickQuoteBook=function(id){ if(!ui.quoteDraft) return; ui.quoteDraft.bookId=id; render(); };
+App.saveQuote=function(){ if(!ui.quoteDraft) return; var b=findBook(ui.quoteDraft.bookId); if(!b){ toast('Önce bir kitap seç 📖'); return; } var text=String(ui.quoteDraft.text||'').trim(); if(!text){ toast('Alıntıyı yaz 💬'); return; } var page=parseInt(ui.quoteDraft.page,10); if(isNaN(page)||page<0) page=null; if(!Array.isArray(b.quotes)) b.quotes=[]; b.quotes.push({id:uid('q'),text:text.slice(0,400),page:page,ts:new Date().toISOString()}); ui.quoteDraft=null; commit('Alıntı eklendi 💬'); };
+App.removeQuote=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var i=b.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ b.quotes.splice(i,1); commit('Alıntı silindi'); } };
+App.copyQuote=function(text){ try{ navigator.clipboard.writeText(text); toast('Kopyalandı 📋'); }catch(e){ toast('Kopyalanamadı'); } };
+App.copyQuoteById=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var q=b.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+b.title+(q.page?', s.'+q.page:''); App.copyQuote(txt); };
+App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var q=t.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+t.title; App.copyQuote(txt); };
+
+// ================= NE İZLEDİM =================
+App.openWatching=function(){ ui.watchOpen=true; ui.watchView='today'; ui.logItemId=null; ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; render(); };
+App.closeWatching=function(){ ui.watchOpen=false; ui.watchDraft=null; ui.titleEdit=null; ui.replicaDraft=null; ui.logItemId=null; render(); };
+App.setWatchView=function(v){ ui.watchView=v; ui.titleEdit=null; ui.replicaDraft=null; render(); };
+App.onWatchField=function(field,el){ if(!ui.watchDraft) ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; ui.watchDraft[field]=el.value; };
+App.setWatchDraftKind=function(k){ if(!ui.watchDraft) ui.watchDraft={}; ui.watchDraft.kind=k; render(); };
+App.pickLogTitle=function(id){ var t=findTitle(id); if(!t) return; ui.logItemId=(ui.logItemId===id?null:id); if(ui.logItemId){ if(!ui.watchDraft) ui.watchDraft={}; ui.watchDraft.title=t.title; ui.watchDraft.kind=t.kind; } render(); };
+function bumpTitleProgress(item,addEps){ if(!item) return false; if(item.kind==='dizi'){ if(addEps>0){ item.watchedEp=Math.max(0,item.watchedEp+addEps); if(item.totalEp&&item.totalEp>0) item.watchedEp=Math.min(item.watchedEp,item.totalEp); } } else { item.watchedEp=1; } if(!item.startedAt) item.startedAt=new Date().toISOString(); if(item.status==='watching'){ if(item.kind==='film'){ item.status='finished'; item.finishedAt=new Date().toISOString(); return true; } if(item.totalEp&&item.totalEp>0&&item.watchedEp>=item.totalEp){ item.status='finished'; item.finishedAt=new Date().toISOString(); return true; } } return false; }
+App.addWatching=function(){
+  var d=ui.watchDraft||{};
+  var title=String(d.title||'').trim();
+  if(!title){ toast('Önce yapımın adını yaz 🎬'); var ti=document.getElementById('watch-title'); if(ti) ti.focus(); return; }
+  var kind=(d.kind==='dizi')?'dizi':'film';
+  var episodes=parseInt(d.episodes,10); if(isNaN(episodes)||episodes<0) episodes=(kind==='dizi'?1:null);
+  var minutes=parseInt(d.minutes,10); if(isNaN(minutes)||minutes<0) minutes=null;
+  var itemId=ui.logItemId||null; var justFinished=false;
+  if(itemId){ var it=findTitle(itemId); if(it){ justFinished=bumpTitleProgress(it,episodes||0); } else itemId=null; }
+  var entry={ id:uid('we'), title:title.slice(0,120), kind:kind, episodes:episodes, minutes:minutes, note:String(d.note||'').trim().slice(0,240), itemId:itemId, ts:new Date().toISOString() };
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!day.watching||typeof day.watching!=='object') day.watching=emptyWatching();
+  if(!Array.isArray(day.watching.entries)) day.watching.entries=[];
+  day.watching.entries.push(entry);
+  day.savedAt=new Date().toISOString();
+  ui.watchDraft={title:'',kind:kind,episodes:'',minutes:'',note:''}; ui.logItemId=null;
+  if(justFinished){ commit(); toast('Bitirdin! 🎉'); confetti(); } else commit('İzleme kaydedildi 🎬');
+};
+App.removeWatching=function(id){
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(day.watching&&Array.isArray(day.watching.entries)){ var i=day.watching.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.watching.entries[i]; if(e&&e.itemId&&e.kind==='dizi'&&e.episodes>0){ var it=findTitle(e.itemId); if(it){ it.watchedEp=Math.max(0,it.watchedEp-e.episodes); if(it.status==='finished'&&it.totalEp&&it.watchedEp<it.totalEp){ it.status='watching'; it.finishedAt=null; } } } day.watching.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('İzleme kaydı silindi'); } }
+};
+// ---- yapım CRUD ----
+App.openTitleEdit=function(id){ ensureWatchlist(); ui.titleEdit = id ? clone(findTitle(id)||{}) : {id:'',title:'',kind:'film',genre:'',emoji:'🎬',totalEp:'',watchedEp:0,status:'watching',rating:null,quotes:[]}; render(); };
+App.closeTitleEdit=function(){ ui.titleEdit=null; render(); };
+App.onTitleEditField=function(field,el){ if(!ui.titleEdit) return; ui.titleEdit[field]=el.value; };
+App.pickTitleEmoji=function(e){ if(!ui.titleEdit) return; ui.titleEdit.emoji=e; render(); };
+App.setTitleEditKind=function(k){ if(!ui.titleEdit) return; ui.titleEdit.kind=k; if(!ui.titleEdit.emoji||ui.titleEdit.emoji==='🎬'||ui.titleEdit.emoji==='📺') ui.titleEdit.emoji=(k==='dizi'?'📺':'🎬'); render(); };
+App.pickTitleGenre=function(g){ if(!ui.titleEdit) return; ui.titleEdit.genre=(ui.titleEdit.genre===g?'':g); render(); };
+App.saveTitle=function(){ if(!ui.titleEdit) return; var W=ensureWatchlist(); var t=ui.titleEdit; var title=String(t.title||'').trim(); if(!title){ toast('Yapımın adını yaz 🎬'); return; } if(t.id){ var ex=findTitle(t.id); if(ex){ ex.title=title.slice(0,120); ex.kind=(t.kind==='dizi'?'dizi':'film'); ex.genre=String(t.genre||''); ex.emoji=t.emoji||'🎬'; ex.totalEp=(t.totalEp===''||t.totalEp==null)?null:Math.max(0,Math.round(Number(t.totalEp)||0)); ex.status=t.status||'watching'; normTitle(ex); if(ex.totalEp) ex.watchedEp=Math.min(ex.watchedEp,ex.totalEp); } } else { var nt=normTitle({title:title,kind:(t.kind==='dizi'?'dizi':'film'),genre:String(t.genre||''),emoji:t.emoji||(t.kind==='dizi'?'📺':'🎬'),totalEp:t.totalEp,watchedEp:0,status:t.status||'watching',startedAt:new Date().toISOString()}); W.items.unshift(nt); } ui.titleEdit=null; commit('Arşive eklendi 🎬'); };
+App.deleteTitle=function(id){ var W=ensureWatchlist(); var i=W.items.findIndex(function(t){ return t&&t.id===id; }); if(i>=0){ W.items.splice(i,1); } ui.titleEdit=null; commit('Yapım silindi'); };
+App.setTitleStatus=function(id,st){ var t=findTitle(id); if(!t) return; t.status=st; if(st==='finished'){ if(!t.finishedAt) t.finishedAt=new Date().toISOString(); if(t.totalEp) t.watchedEp=t.totalEp; } else { t.finishedAt=null; } commit(); };
+App.rateTitle=function(id,n){ var t=findTitle(id); if(!t) return; t.rating=(t.rating===n?null:n); commit(); };
+App.advanceTitle=function(id,delta){ var t=findTitle(id); if(!t) return; var fin=false; if(delta>0){ fin=bumpTitleProgress(t,delta); } else { t.watchedEp=Math.max(0,t.watchedEp+delta); if(t.status==='finished'&&t.totalEp&&t.watchedEp<t.totalEp){ t.status='watching'; t.finishedAt=null; } } if(fin){ commit(); toast('Diziyi bitirdin! 🎉'); confetti(); } else commit(); };
+App.setTitleEp=function(id,el){ var t=findTitle(id); if(!t) return; var raw=el.value; debounceSave('titleep_'+id,function(){ var v=raw===''?0:Math.max(0,Math.round(Number(raw)||0)); if(t.totalEp) v=Math.min(v,t.totalEp); t.watchedEp=v; if(t.status==='watching'&&t.totalEp&&v>=t.totalEp){ t.status='finished'; t.finishedAt=new Date().toISOString(); save(); render(); toast('Diziyi bitirdin! 🎉'); confetti(); return; } save(); render(); },500); };
+App.finishTitle=function(id){ var t=findTitle(id); if(!t) return; t.status='finished'; t.finishedAt=new Date().toISOString(); if(t.totalEp) t.watchedEp=t.totalEp; else if(t.kind==='film') t.watchedEp=1; if(!t.startedAt) t.startedAt=new Date().toISOString(); commit(); toast('Bitirdin! 🎉'); confetti(); };
+App.reopenTitle=function(id){ var t=findTitle(id); if(!t) return; t.status='watching'; t.finishedAt=null; commit(); };
+App.setWatchGoal=function(field,el){ var W=ensureWatchlist(); var raw=el.value; debounceSave('watchgoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); W.goal[field]=v; save(); render(); },500); };
+// ---- replikler ----
+App.openReplicaAdd=function(itemId){ var W=ensureWatchlist(); if(!itemId){ var act=W.items.filter(function(t){return t.status!=='dropped';}); itemId=(act[0]&&act[0].id)||(W.items[0]&&W.items[0].id)||''; } ui.replicaDraft={itemId:itemId,text:''}; render(); };
+App.closeReplicaAdd=function(){ ui.replicaDraft=null; render(); };
+App.onReplicaField=function(field,el){ if(!ui.replicaDraft) return; ui.replicaDraft[field]=el.value; };
+App.pickReplicaTitle=function(id){ if(!ui.replicaDraft) return; ui.replicaDraft.itemId=id; render(); };
+App.saveReplica=function(){ if(!ui.replicaDraft) return; var t=findTitle(ui.replicaDraft.itemId); if(!t){ toast('Önce bir yapım seç 🎬'); return; } var text=String(ui.replicaDraft.text||'').trim(); if(!text){ toast('Repliği yaz 💬'); return; } if(!Array.isArray(t.quotes)) t.quotes=[]; t.quotes.push({id:uid('wq'),text:text.slice(0,400),ts:new Date().toISOString()}); ui.replicaDraft=null; commit('Replik eklendi 💬'); };
+App.removeReplica=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var i=t.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ t.quotes.splice(i,1); commit('Replik silindi'); } };
+
 
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.steps!=null&&day.walk.steps>=STEP_TICK_MIN&&!day.habits.walked20){ day.habits.walked20=true; toast('Adımınla yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
@@ -810,6 +944,8 @@ function bugunHTML(){
   // SOS button
   h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi 🍫🚨</button>';
   h+='<button onclick="App.openReading()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne okudum? 📖</span></button>';
+
+  h+='<button onclick="App.openWatching()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#C88F4C,#E0B080 52%,#E9AFC1);box-shadow:0 14px 30px rgba(200,143,76,0.4);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne izledim? 🎬</span></button>';
 
   // akşam nudge (yalnızca gece, okuma eklenmediyse)
   h+=eveningNudge(rec);
@@ -1486,36 +1622,275 @@ function navHTML(){
   return h;
 }
 
+// ================= OKUMA HUB (overlay) =================
+function overlayShell(closeFn, inner, maxw){
+  var h='<div onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">';
+  h+=inner;
+  h+='</div></div>';
+  return h;
+}
+function bookStatusChip(st){ var m={reading:['Okunuyor','#6E55BF','rgba(110,85,191,0.14)'],finished:['Bitti','#3F9A4F','rgba(143,191,138,0.18)'],dropped:['Bırakıldı','#B0714E','rgba(200,150,90,0.16)']}; var c=m[st]||m.reading; return '<span style="font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
+function readingOverlayHTML(){
+  var view=ui.readingView||'today';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;">Ne okudum? 📖</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugünkü okuman, kitaplığın ve alıntıların tek yerde.</div></div><button onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);flex-shrink:0;">✕</button></div>';
+  var tabs=segTabs([['today','Bugün'],['library','📚 Kitaplık'],['stats','📊 İstatistik'],['quotes','💬 Alıntılar']],view,'App.setReadingView');
+  var body='';
+  if(view==='today') body=readingTodayView();
+  else if(view==='library') body=readingLibraryView();
+  else if(view==='stats') body=readingStatsView();
+  else if(view==='quotes') body=readingQuotesView();
+  var h=overlayShell('App.closeReading()', head+tabs+body);
+  if(ui.bookEdit) h+=bookEditModal();
+  if(ui.quoteDraft) h+=quoteAddModal();
+  return h;
+}
+function readingTodayView(){
+  var dr=ui.readingDraft||{title:'',author:'',pages:'',minutes:'',note:''};
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var rEntries=(day&&day.reading&&Array.isArray(day.reading.entries))?day.reading.entries:[];
+  var totPages=rEntries.reduce(function(a,e){ var p=Number(e&&e.pages); return a+((!isNaN(p)&&p>0)?p:0); },0);
+  var L=ensureLibrary();
+  var goalPg=(L.goal&&L.goal.dailyPages)||0;
+  var h='';
+  // daily goal ring
+  if(goalPg>0){ var gp=Math.min(100,Math.round(totPages/goalPg*100)); h+='<div style="display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(110,85,191,0.10),rgba(233,175,193,0.12));border:1px solid var(--card-bd);border-radius:18px;padding:13px 15px;">'; h+='<div style="position:relative;width:52px;height:52px;flex-shrink:0;"><svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="rgba(150,110,120,0.16)" stroke-width="6"></circle><circle cx="26" cy="26" r="22" fill="none" stroke="#6E55BF" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(2*Math.PI*22)+'" stroke-dashoffset="'+(2*Math.PI*22*(1-gp/100))+'" transform="rotate(-90 26 26)"></circle></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">'+gp+'%</div></div>'; h+='<div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:800;color:var(--text);">Günlük hedef · '+totPages+'/'+goalPg+' sayfa</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(totPages>=goalPg?'Bugünün hedefi tamam, harikasın 💜':'Hedefe '+(goalPg-totPages)+' sayfa kaldı.')+'</div></div></div>'; }
+  // quick pick from active books
+  var active=L.books.filter(function(b){ return b.status==='reading'; });
+  if(active.length){ h+='<div><div style="font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:6px;letter-spacing:.3px;">OKUDUĞUM KİTAP</div><div style="display:flex;gap:7px;flex-wrap:wrap;">'; active.forEach(function(b){ var on=ui.logBookId===b.id; h+='<button onclick="App.pickLogBook(\''+esc(b.id)+'\')" style="border:1px solid '+(on?'#6E55BF':'var(--card-bd)')+';cursor:pointer;padding:7px 11px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(on?'#fff':'var(--text2)')+';background:'+(on?'linear-gradient(135deg,#6E55BF,#9B7FC9)':'var(--card)')+';display:flex;align-items:center;gap:5px;">'+b.emoji+' '+esc(b.title.length>18?b.title.slice(0,17)+'…':b.title)+'</button>'; }); h+='</div></div>'; }
+  // form
+  h+='<div style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:18px;padding:14px;">';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Kitap adı</div><input id="reading-title" type="text" value="'+esc(dr.title||'')+'" oninput="App.onReadingField(\'title\',this)" placeholder="örn. Sefiller" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;"></div>';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Yazar <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><input type="text" value="'+esc(dr.author||'')+'" oninput="App.onReadingField(\'author\',this)" placeholder="örn. Victor Hugo" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;"></div>';
+  h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Sayfa</div><input type="number" inputmode="numeric" min="0" value="'+(dr.pages!=null&&dr.pages!==''?esc(dr.pages):'')+'" oninput="App.onReadingField(\'pages\',this)" placeholder="32" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div>';
+  h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(dr.minutes!=null&&dr.minutes!==''?esc(dr.minutes):'')+'" oninput="App.onReadingField(\'minutes\',this)" placeholder="20" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div></div>';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Not <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><textarea rows="2" oninput="App.onReadingField(\'note\',this)" placeholder="Aklında kalan bir cümle, duygu…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;resize:none;line-height:1.45;">'+esc(dr.note||'')+'</textarea></div>';
+  h+='<button onclick="App.addReading()" style="border:none;cursor:pointer;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);box-shadow:0 10px 24px rgba(110,85,191,0.4);">Okumayı kaydet 📖</button>';
+  h+='</div>';
+  if(rEntries.length>0){
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+rEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+totPages+' sayfa</div></div>';
+    rEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.bookId?findBook(e.bookId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">'+(linked?linked.emoji:'📖')+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:#6E55BF;font-weight:700;">· kitaplıkta</span>':'')+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:13px;">🗑️</button></div>'; });
+    h+='</div>';
+  } else {
+    h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için okuma eklemedin. Birkaç sayfa bile sayılır 💜</div>';
+  }
+  return h;
+}
+function bookCard(b){
+  var pct=bookPct(b); var meta=[]; if(b.author) meta.push(esc(b.author)); if(b.genre) meta.push(esc(b.genre));
+  var h='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="display:flex;align-items:flex-start;gap:11px;"><div style="width:44px;height:44px;border-radius:12px;background:var(--icon);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+b.emoji+'</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="font-size:14.5px;font-weight:800;color:var(--text);">'+esc(b.title)+'</span>'+bookStatusChip(b.status)+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+meta.join(' · ')+'</div>':'')+'</div>';
+  h+='<button onclick="App.openBookEdit(\''+esc(b.id)+'\')" aria-label="Düzenle" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:30px;height:30px;border-radius:9px;color:var(--muted);font-size:14px;">✏️</button></div>';
+  // progress
+  if(b.status!=='finished'){
+    h+='<div style="display:flex;align-items:center;gap:9px;">';
+    h+='<button onclick="App.advanceBook(\''+esc(b.id)+'\',-10)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:var(--muted);background:var(--card);flex-shrink:0;">−</button>';
+    h+='<div style="flex:1;min-width:0;">'+progBar(pct)+'<div style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;"><span>'+b.currentPage+(b.totalPages?' / '+b.totalPages+' sf':' sf')+'</span><span>%'+pct+'</span></div></div>';
+    h+='<button onclick="App.advanceBook(\''+esc(b.id)+'\',10)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:#6E55BF;background:var(--card);flex-shrink:0;">+</button>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:7px;"><button onclick="App.finishBook(\''+esc(b.id)+'\')" style="flex:1;border:none;cursor:pointer;padding:9px;border-radius:11px;font-size:12.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);">✓ Bitirdim</button>';
+    if(b.status==='reading') h+='<button onclick="App.setBookStatus(\''+esc(b.id)+'\',\'dropped\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--card);">Ara ver</button>';
+    else h+='<button onclick="App.setBookStatus(\''+esc(b.id)+'\',\'reading\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:#6E55BF;background:var(--card);">Devam et</button>';
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'+starRow(b.rating,'App.rateBook',b.id,17)+'<button onclick="App.reopenBook(\''+esc(b.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:7px 12px;border-radius:11px;font-size:12px;font-weight:700;color:#6E55BF;background:var(--card);">Yeniden oku</button></div>';
+    if(b.finishedAt) h+='<div style="font-size:11px;color:var(--faint);">🎉 '+esc(shortDate(fmt(new Date(b.finishedAt))))+' tarihinde bitti</div>';
+  }
+  return h+'</div>';
+}
+function readingLibraryView(){
+  var L=ensureLibrary();
+  var h='<button onclick="App.openBookEdit(\'\')" style="border:1px dashed #9B7FC9;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:#6E55BF;background:rgba(155,127,201,0.08);">＋ Kitap ekle</button>';
+  var order={reading:0,finished:1,dropped:2};
+  var books=L.books.slice().sort(function(a,b){ return (order[a.status]-order[b.status])||String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
+  if(!books.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Kitaplığın henüz boş 📚<br>Okumaya başladığın kitabı ekle, ilerlemen burada birer birer biriksin.</div>'; return h; }
+  var reading=books.filter(function(b){return b.status==='reading';}),finished=books.filter(function(b){return b.status==='finished';}),dropped=books.filter(function(b){return b.status==='dropped';});
+  function sec(title,arr){ if(!arr.length) return ''; var s='<div style="font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;margin:4px 2px 0;">'+title+' ('+arr.length+')</div>'; arr.forEach(function(b){ s+=bookCard(b); }); return s; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">'+sec('OKUYORUM',reading)+sec('BİTİRDİKLERİM',finished)+sec('ARA VERDİKLERİM',dropped)+'</div>';
+  return h;
+}
+function readingStatsView(){
+  var L=ensureLibrary(); var s=libStats(); var t=readTotals(); var streak=readStreak(); var week=weekReading();
+  var goalY=(L.goal&&L.goal.yearlyBooks)||0; var goalPg=(L.goal&&L.goal.dailyPages)||0;
+  var h='<div style="display:flex;gap:9px;">'+statTile('Bitirilen',s.finished,'kitap')+statTile('Okunuyor',s.reading)+statTile('Seri',streak,'gün 🔥')+'</div>';
+  h+='<div style="display:flex;gap:9px;">'+statTile('Toplam sayfa',t.pages)+statTile('Toplam süre',fmtDur(t.minutes))+statTile('Okuma günü',t.days)+'</div>';
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:10px;">Son 7 gün · sayfa</div>'+miniBars(week,'pages','sayfa')+'</div>';
+  // yearly goal
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);">🎯 Hedefler</div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Günlük sayfa hedefi</span><input type="number" inputmode="numeric" min="0" value="'+(goalPg||'')+'" oninput="App.setReadGoal(\'dailyPages\',this)" placeholder="20" style="width:74px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px;font-size:14px;text-align:center;outline:none;"></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Bu yıl kitap hedefi</span><input type="number" inputmode="numeric" min="0" value="'+(goalY||'')+'" oninput="App.setReadGoal(\'yearlyBooks\',this)" placeholder="24" style="width:74px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px;font-size:14px;text-align:center;outline:none;"></div>';
+  if(goalY>0){ var yp=Math.min(100,Math.round(s.finYear/goalY*100)); h+='<div>'+progBar(yp,'linear-gradient(90deg,#7DBE77,#E9AFC1)')+'<div style="font-size:11.5px;color:var(--muted);margin-top:5px;">'+new Date().getFullYear()+': '+s.finYear+'/'+goalY+' kitap · %'+yp+'</div></div>'; }
+  h+='</div>';
+  return h;
+}
+function readingQuotesView(){
+  var qs=allQuotes(); var L=ensureLibrary();
+  var h='<button onclick="App.openQuoteAdd(\'\')" '+(L.books.length?'':'disabled ')+'style="border:1px dashed #9B7FC9;cursor:'+(L.books.length?'pointer':'not-allowed')+';width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:#6E55BF;background:rgba(155,127,201,0.08);opacity:'+(L.books.length?'1':'0.5')+';">＋ Alıntı ekle</button>';
+  if(!L.books.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:16px 10px;">Alıntı eklemek için önce kitaplığına bir kitap ekle 📚</div>'; return h; }
+  if(!qs.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz alıntı yok 💬<br>Seni durduran o cümleyi buraya bırak.</div>'; return h; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(110,85,191,0.07),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:14px;line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:11.5px;color:var(--muted);flex:1;">'+o.emoji+' '+esc(o.title)+(q.page?' · s.'+q.page:'')+'</span>'; h+='<button onclick="App.copyQuoteById(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:12px;">📋</button>'; h+='<button onclick="App.removeQuote(\''+esc(o.bookId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:12px;">🗑️</button></div></div>'; });
+  h+='</div>';
+  return h;
+}
+function bookEditModal(){
+  var b=ui.bookEdit; var isNew=!b.id;
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">'+(isNew?'Kitap ekle 📚':'Kitabı düzenle')+'</div><button onclick="App.closeBookEdit()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; BOOK_EMOJI.forEach(function(e){ var on=b.emoji===e; inner+='<button onclick="App.pickBookEmoji(\''+e+'\')" style="border:1px solid '+(on?'#6E55BF':'var(--card-bd)')+';cursor:pointer;width:38px;height:38px;border-radius:11px;font-size:19px;background:'+(on?'rgba(110,85,191,0.14)':'var(--card)')+';">'+e+'</button>'; }); inner+='</div>';
+  inner+='<input type="text" value="'+esc(b.title||'')+'" oninput="App.onBookEditField(\'title\',this)" placeholder="Kitap adı" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;">';
+  inner+='<input type="text" value="'+esc(b.author||'')+'" oninput="App.onBookEditField(\'author\',this)" placeholder="Yazar" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;">';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; BOOK_GENRES.forEach(function(g){ var on=b.genre===g; inner+='<button onclick="App.pickBookGenre(\''+g+'\')" style="border:1px solid '+(on?'#6E55BF':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:11.5px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#6E55BF,#9B7FC9)':'var(--card)')+';">'+g+'</button>'; }); inner+='</div>';
+  inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Toplam sayfa <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(b.totalPages!=null&&b.totalPages!==''?esc(b.totalPages):'')+'" oninput="App.onBookEditField(\'totalPages\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:14px;text-align:center;outline:none;"></div>';
+  inner+='<button onclick="App.saveBook()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);">Kaydet</button>';
+  if(!isNew) inner+='<button onclick="App.deleteBook(\''+esc(b.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:13px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Kitabı sil</button>';
+  return '<div onclick="App.closeBookEdit()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+function quoteAddModal(){
+  var q=ui.quoteDraft; var L=ensureLibrary(); var books=L.books;
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">Alıntı ekle 💬</div><button onclick="App.closeQuoteAdd()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="font-size:12px;font-weight:700;color:var(--muted);">Kitap</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'; books.forEach(function(b){ var on=q.bookId===b.id; inner+='<button onclick="App.pickQuoteBook(\''+esc(b.id)+'\')" style="border:1px solid '+(on?'#6E55BF':'var(--card-bd)')+';cursor:pointer;padding:7px 10px;border-radius:11px;font-size:12px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#6E55BF,#9B7FC9)':'var(--card)')+';">'+b.emoji+' '+esc(b.title.length>16?b.title.slice(0,15)+'…':b.title)+'</button>'; }); inner+='</div>';
+  inner+='<textarea rows="3" oninput="App.onQuoteField(\'text\',this)" placeholder="Seni durduran o cümle…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;resize:none;line-height:1.5;">'+esc(q.text||'')+'</textarea>';
+  inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Sayfa <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(q.page!=null&&q.page!==''?esc(q.page):'')+'" oninput="App.onQuoteField(\'page\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:14px;text-align:center;outline:none;"></div>';
+  inner+='<button onclick="App.saveQuote()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);">Kaydet</button>';
+  return '<div onclick="App.closeQuoteAdd()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+
+// ================= NE İZLEDİM HUB (overlay) =================
+function titleStatusChip(st){ var m={watching:['İzleniyor','#B07636','rgba(200,150,90,0.16)'],finished:['Bitti','#3F9A4F','rgba(143,191,138,0.18)'],dropped:['Bırakıldı','#8A7BB0','rgba(138,123,176,0.16)']}; var c=m[st]||m.watching; return '<span style="font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
+function watchOverlayHTML(){
+  var view=ui.watchView||'today';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;">Ne izledim? 🎬</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugün izlediklerin, arşivin ve unutulmaz replikler.</div></div><button onclick="App.closeWatching()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);flex-shrink:0;">✕</button></div>';
+  var tabs=segTabs([['today','Bugün'],['archive','🎞️ Arşiv'],['stats','📊 İstatistik'],['quotes','💬 Replikler']],view,'App.setWatchView');
+  var body='';
+  if(view==='today') body=watchTodayView();
+  else if(view==='archive') body=watchArchiveView();
+  else if(view==='stats') body=watchStatsView();
+  else if(view==='quotes') body=watchQuotesView();
+  var h=overlayShell('App.closeWatching()', head+tabs+body);
+  if(ui.titleEdit) h+=titleEditModal();
+  if(ui.replicaDraft) h+=replicaAddModal();
+  return h;
+}
+function watchTodayView(){
+  var d=ui.watchDraft||{title:'',kind:'film',episodes:'',minutes:'',note:''};
+  var kind=(d.kind==='dizi')?'dizi':'film';
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var wEntries=(day&&day.watching&&Array.isArray(day.watching.entries))?day.watching.entries:[];
+  var totMin=wEntries.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
+  var W=ensureWatchlist();
+  var goalMin=(W.goal&&W.goal.dailyMinutes)||0;
+  var h='';
+  if(goalMin>0){ var gp=Math.min(100,Math.round(totMin/goalMin*100)); h+='<div style="display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(200,140,70,0.10),rgba(233,175,193,0.12));border:1px solid var(--card-bd);border-radius:18px;padding:13px 15px;">'; h+='<div style="position:relative;width:52px;height:52px;flex-shrink:0;"><svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="rgba(150,110,120,0.16)" stroke-width="6"></circle><circle cx="26" cy="26" r="22" fill="none" stroke="#C88F4C" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(2*Math.PI*22)+'" stroke-dashoffset="'+(2*Math.PI*22*(1-gp/100))+'" transform="rotate(-90 26 26)"></circle></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">'+gp+'%</div></div>'; h+='<div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:800;color:var(--text);">Günlük hedef · '+totMin+'/'+goalMin+' dk</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(totMin>=goalMin?'Bugünün keyfi tamam 🍿':'Keyfe '+(goalMin-totMin)+' dk kaldı.')+'</div></div></div>'; }
+  var active=W.items.filter(function(t){ return t.status==='watching'; });
+  if(active.length){ h+='<div><div style="font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:6px;letter-spacing:.3px;">İZLEDİĞİM YAPIM</div><div style="display:flex;gap:7px;flex-wrap:wrap;">'; active.forEach(function(t){ var on=ui.logItemId===t.id; h+='<button onclick="App.pickLogTitle(\''+esc(t.id)+'\')" style="border:1px solid '+(on?'#C88F4C':'var(--card-bd)')+';cursor:pointer;padding:7px 11px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(on?'#fff':'var(--text2)')+';background:'+(on?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--card)')+';display:flex;align-items:center;gap:5px;">'+t.emoji+' '+esc(t.title.length>18?t.title.slice(0,17)+'…':t.title)+'</button>'; }); h+='</div></div>'; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:18px;padding:14px;">';
+  h+='<div style="display:flex;gap:6px;">';
+  h+='<button onclick="App.setWatchDraftKind(\'film\')" style="flex:1;border:1px solid '+(kind==='film'?'#C88F4C':'var(--field-bd)')+';cursor:pointer;padding:9px;border-radius:12px;font-size:13px;font-weight:800;color:'+(kind==='film'?'#fff':'var(--muted)')+';background:'+(kind==='film'?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--field)')+';">🎬 Film</button>';
+  h+='<button onclick="App.setWatchDraftKind(\'dizi\')" style="flex:1;border:1px solid '+(kind==='dizi'?'#C88F4C':'var(--field-bd)')+';cursor:pointer;padding:9px;border-radius:12px;font-size:13px;font-weight:800;color:'+(kind==='dizi'?'#fff':'var(--muted)')+';background:'+(kind==='dizi'?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--field)')+';">📺 Dizi</button>';
+  h+='</div>';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">'+(kind==='dizi'?'Dizi adı':'Film adı')+'</div><input id="watch-title" type="text" value="'+esc(d.title||'')+'" oninput="App.onWatchField(\'title\',this)" placeholder="'+(kind==='dizi'?'örn. The Bear':'örn. Interstellar')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;"></div>';
+  h+='<div style="display:flex;gap:10px;">';
+  if(kind==='dizi') h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Bölüm</div><input type="number" inputmode="numeric" min="0" value="'+(d.episodes!=null&&d.episodes!==''?esc(d.episodes):'')+'" oninput="App.onWatchField(\'episodes\',this)" placeholder="2" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div>';
+  h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(d.minutes!=null&&d.minutes!==''?esc(d.minutes):'')+'" oninput="App.onWatchField(\'minutes\',this)" placeholder="'+(kind==='dizi'?'45':'120')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div>';
+  h+='</div>';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Not <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><textarea rows="2" oninput="App.onWatchField(\'note\',this)" placeholder="Aklında kalan sahne, duygu…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;resize:none;line-height:1.45;">'+esc(d.note||'')+'</textarea></div>';
+  h+='<button onclick="App.addWatching()" style="border:none;cursor:pointer;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);box-shadow:0 10px 24px rgba(200,143,76,0.38);">İzlemeyi kaydet 🎬</button>';
+  h+='</div>';
+  if(wEntries.length>0){
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+wEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
+    wEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">'+(linked?linked.emoji:(e.kind==='dizi'?'📺':'🎬'))+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:#C88F4C;font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:13px;">🗑️</button></div>'; });
+    h+='</div>';
+  } else {
+    h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için izleme eklemedin. Bir bölüm bile keyiftir 🍿</div>';
+  }
+  return h;
+}
+function titleCard(t){
+  var pct=titlePct(t); var meta=[]; meta.push(t.kind==='dizi'?'Dizi':'Film'); if(t.genre) meta.push(esc(t.genre));
+  var h='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="display:flex;align-items:flex-start;gap:11px;"><div style="width:44px;height:44px;border-radius:12px;background:var(--icon);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+t.emoji+'</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="font-size:14.5px;font-weight:800;color:var(--text);">'+esc(t.title)+'</span>'+titleStatusChip(t.status)+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+meta.join(' · ')+'</div></div>';
+  h+='<button onclick="App.openTitleEdit(\''+esc(t.id)+'\')" aria-label="Düzenle" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:30px;height:30px;border-radius:9px;color:var(--muted);font-size:14px;">✏️</button></div>';
+  if(t.status!=='finished'){
+    if(t.kind==='dizi'){
+      h+='<div style="display:flex;align-items:center;gap:9px;">';
+      h+='<button onclick="App.advanceTitle(\''+esc(t.id)+'\',-1)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:var(--muted);background:var(--card);flex-shrink:0;">−</button>';
+      h+='<div style="flex:1;min-width:0;">'+progBar(pct,'linear-gradient(90deg,#C88F4C,#E9AFC1)')+'<div style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;"><span>'+t.watchedEp+(t.totalEp?' / '+t.totalEp+' bölüm':' bölüm')+'</span><span>%'+pct+'</span></div></div>';
+      h+='<button onclick="App.advanceTitle(\''+esc(t.id)+'\',1)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:#C88F4C;background:var(--card);flex-shrink:0;">+</button>';
+      h+='</div>';
+    }
+    h+='<div style="display:flex;gap:7px;"><button onclick="App.finishTitle(\''+esc(t.id)+'\')" style="flex:1;border:none;cursor:pointer;padding:9px;border-radius:11px;font-size:12.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);">✓ Bitirdim</button>';
+    if(t.status==='watching') h+='<button onclick="App.setTitleStatus(\''+esc(t.id)+'\',\'dropped\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--card);">Yarıda bıraktım</button>';
+    else h+='<button onclick="App.setTitleStatus(\''+esc(t.id)+'\',\'watching\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:#C88F4C;background:var(--card);">Devam et</button>';
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'+starRow(t.rating,'App.rateTitle',t.id,17)+'<button onclick="App.reopenTitle(\''+esc(t.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:7px 12px;border-radius:11px;font-size:12px;font-weight:700;color:#C88F4C;background:var(--card);">Yeniden izle</button></div>';
+    if(t.finishedAt) h+='<div style="font-size:11px;color:var(--faint);">🎉 '+esc(shortDate(fmt(new Date(t.finishedAt))))+' tarihinde bitti</div>';
+  }
+  return h+'</div>';
+}
+function watchArchiveView(){
+  var W=ensureWatchlist();
+  var h='<button onclick="App.openTitleEdit(\'\')" style="border:1px dashed #E0B080;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:#C88F4C;background:rgba(224,176,128,0.10);">＋ Film / dizi ekle</button>';
+  var order={watching:0,finished:1,dropped:2};
+  var items=W.items.slice().sort(function(a,b){ return (order[a.status]-order[b.status])||String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
+  if(!items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Arşivin henüz boş 🎞️<br>İzlemeye başladığın yapımı ekle, ilerlemen burada birik.</div>'; return h; }
+  var watching=items.filter(function(t){return t.status==='watching';}),finished=items.filter(function(t){return t.status==='finished';}),dropped=items.filter(function(t){return t.status==='dropped';});
+  function sec(title,arr){ if(!arr.length) return ''; var s='<div style="font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;margin:4px 2px 0;">'+title+' ('+arr.length+')</div>'; arr.forEach(function(t){ s+=titleCard(t); }); return s; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">'+sec('İZLİYORUM',watching)+sec('BİTİRDİKLERİM',finished)+sec('YARIDA BIRAKTIKLARIM',dropped)+'</div>';
+  return h;
+}
+function watchStatsView(){
+  var W=ensureWatchlist(); var s=watchStats(); var t=watchTotals(); var streak=watchStreak(); var week=weekWatch();
+  var goalY=(W.goal&&W.goal.yearlyTitles)||0; var goalMin=(W.goal&&W.goal.dailyMinutes)||0;
+  var h='<div style="display:flex;gap:9px;">'+statTile('Bitirilen',s.finished,'yapım')+statTile('İzleniyor',s.watching)+statTile('Seri',streak,'gün 🔥')+'</div>';
+  h+='<div style="display:flex;gap:9px;">'+statTile('Toplam süre',fmtDur(t.minutes))+statTile('Toplam bölüm',t.eps)+statTile('İzleme günü',t.days)+'</div>';
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:10px;">Son 7 gün · dakika</div>'+miniBars(week,'minutes','dk','linear-gradient(180deg,#E0B080,#C88F4C)')+'</div>';
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);">🎯 Hedefler</div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Günlük dakika hedefi</span><input type="number" inputmode="numeric" min="0" value="'+(goalMin||'')+'" oninput="App.setWatchGoal(\'dailyMinutes\',this)" placeholder="40" style="width:74px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px;font-size:14px;text-align:center;outline:none;"></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Bu yıl yapım hedefi</span><input type="number" inputmode="numeric" min="0" value="'+(goalY||'')+'" oninput="App.setWatchGoal(\'yearlyTitles\',this)" placeholder="30" style="width:74px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px;font-size:14px;text-align:center;outline:none;"></div>';
+  if(goalY>0){ var yp=Math.min(100,Math.round(s.finYear/goalY*100)); h+='<div>'+progBar(yp,'linear-gradient(90deg,#C88F4C,#E9AFC1)')+'<div style="font-size:11.5px;color:var(--muted);margin-top:5px;">'+new Date().getFullYear()+': '+s.finYear+'/'+goalY+' yapım · %'+yp+'</div></div>'; }
+  h+='</div>';
+  return h;
+}
+function watchQuotesView(){
+  var qs=allReplicas(); var W=ensureWatchlist();
+  var h='<button onclick="App.openReplicaAdd(\'\')" '+(W.items.length?'':'disabled ')+'style="border:1px dashed #E0B080;cursor:'+(W.items.length?'pointer':'not-allowed')+';width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:#C88F4C;background:rgba(224,176,128,0.10);opacity:'+(W.items.length?'1':'0.5')+';">＋ Replik ekle</button>';
+  if(!W.items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:16px 10px;">Replik eklemek için önce arşivine bir yapım ekle 🎞️</div>'; return h; }
+  if(!qs.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz replik yok 💬<br>O unutamadığın repliği buraya bırak.</div>'; return h; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(200,143,76,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:14px;line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:11.5px;color:var(--muted);flex:1;">'+o.emoji+' '+esc(o.title)+'</span>'; h+='<button onclick="App.copyReplicaById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:12px;">📋</button>'; h+='<button onclick="App.removeReplica(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:12px;">🗑️</button></div></div>'; });
+  h+='</div>';
+  return h;
+}
+function titleEditModal(){
+  var t=ui.titleEdit; var isNew=!t.id; var kind=(t.kind==='dizi')?'dizi':'film';
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">'+(isNew?'Yapım ekle 🎬':'Yapımı düzenle')+'</div><button onclick="App.closeTitleEdit()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="display:flex;gap:6px;"><button onclick="App.setTitleEditKind(\'film\')" style="flex:1;border:1px solid '+(kind==='film'?'#C88F4C':'var(--field-bd)')+';cursor:pointer;padding:9px;border-radius:12px;font-size:13px;font-weight:800;color:'+(kind==='film'?'#fff':'var(--muted)')+';background:'+(kind==='film'?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--field)')+';">🎬 Film</button><button onclick="App.setTitleEditKind(\'dizi\')" style="flex:1;border:1px solid '+(kind==='dizi'?'#C88F4C':'var(--field-bd)')+';cursor:pointer;padding:9px;border-radius:12px;font-size:13px;font-weight:800;color:'+(kind==='dizi'?'#fff':'var(--muted)')+';background:'+(kind==='dizi'?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--field)')+';">📺 Dizi</button></div>';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; TITLE_EMOJI.forEach(function(e){ var on=t.emoji===e; inner+='<button onclick="App.pickTitleEmoji(\''+e+'\')" style="border:1px solid '+(on?'#C88F4C':'var(--card-bd)')+';cursor:pointer;width:38px;height:38px;border-radius:11px;font-size:19px;background:'+(on?'rgba(200,143,76,0.14)':'var(--card)')+';">'+e+'</button>'; }); inner+='</div>';
+  inner+='<input type="text" value="'+esc(t.title||'')+'" oninput="App.onTitleEditField(\'title\',this)" placeholder="Yapım adı" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;">';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; TITLE_GENRES.forEach(function(g){ var on=t.genre===g; inner+='<button onclick="App.pickTitleGenre(\''+g+'\')" style="border:1px solid '+(on?'#C88F4C':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:11.5px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--card)')+';">'+g+'</button>'; }); inner+='</div>';
+  if(kind==='dizi') inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Toplam bölüm <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(t.totalEp!=null&&t.totalEp!==''?esc(t.totalEp):'')+'" oninput="App.onTitleEditField(\'totalEp\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:14px;text-align:center;outline:none;"></div>';
+  inner+='<button onclick="App.saveTitle()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);">Kaydet</button>';
+  if(!isNew) inner+='<button onclick="App.deleteTitle(\''+esc(t.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:13px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Yapımı sil</button>';
+  return '<div onclick="App.closeTitleEdit()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+function replicaAddModal(){
+  var q=ui.replicaDraft; var W=ensureWatchlist(); var items=W.items;
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">Replik ekle 💬</div><button onclick="App.closeReplicaAdd()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="font-size:12px;font-weight:700;color:var(--muted);">Yapım</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'; items.forEach(function(t){ var on=q.itemId===t.id; inner+='<button onclick="App.pickReplicaTitle(\''+esc(t.id)+'\')" style="border:1px solid '+(on?'#C88F4C':'var(--card-bd)')+';cursor:pointer;padding:7px 10px;border-radius:11px;font-size:12px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--card)')+';">'+t.emoji+' '+esc(t.title.length>16?t.title.slice(0,15)+'…':t.title)+'</button>'; }); inner+='</div>';
+  inner+='<textarea rows="3" oninput="App.onReplicaField(\'text\',this)" placeholder="O unutamadığın replik…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;resize:none;line-height:1.5;">'+esc(q.text||'')+'</textarea>';
+  inner+='<button onclick="App.saveReplica()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);">Kaydet</button>';
+  return '<div onclick="App.closeReplicaAdd()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+
 function modalsHTML(){
   var h='';
-  if(ui.readingOpen){
-    var dr=ui.readingDraft||{title:'',author:'',pages:'',minutes:'',note:''};
-    var dRecR=getDay(data,todayStr(),dayIndexFor(todayStr()));
-    var rEntries=(dRecR&&dRecR.reading&&Array.isArray(dRecR.reading.entries))?dRecR.reading.entries:[];
-    var totPages=rEntries.reduce(function(a,e){ var p=Number(e&&e.pages); return a+((!isNaN(p)&&p>0)?p:0); },0);
-    h+='<div onclick="App.closeReading()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:440px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:86vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;">Bugün ne okudum? 📖</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Kitap adı ve sayfa sayısı — okuma rutinin burada birikir.</div></div><button onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);flex-shrink:0;">✕</button></div>';
-    // form
-    h+='<div style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:18px;padding:14px;">';
-    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Kitap adı</div><input id="reading-title" type="text" value="'+esc(dr.title||'')+'" oninput="App.onReadingField(\'title\',this)" placeholder="örn. Sefiller" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;"></div>';
-    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Yazar <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><input type="text" value="'+esc(dr.author||'')+'" oninput="App.onReadingField(\'author\',this)" placeholder="örn. Victor Hugo" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;"></div>';
-    h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Sayfa</div><input type="number" inputmode="numeric" min="0" value="'+(dr.pages!=null&&dr.pages!==''?esc(dr.pages):'')+'" oninput="App.onReadingField(\'pages\',this)" placeholder="32" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div>';
-    h+='<div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(dr.minutes!=null&&dr.minutes!==''?esc(dr.minutes):'')+'" oninput="App.onReadingField(\'minutes\',this)" placeholder="20" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div></div>';
-    h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Not <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><textarea rows="2" oninput="App.onReadingField(\'note\',this)" placeholder="Aklında kalan bir cümle, duygu…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;resize:none;line-height:1.45;">'+esc(dr.note||'')+'</textarea></div>';
-    h+='<button onclick="App.addReading()" style="border:none;cursor:pointer;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);box-shadow:0 10px 24px rgba(110,85,191,0.4);">Okumayı kaydet 📖</button>';
-    h+='</div>';
-    // today list
-    if(rEntries.length>0){
-      h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-      h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+rEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+totPages+' sayfa</div></div>';
-      rEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">📖</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:13px;">🗑️</button></div>'; });
-      h+='</div>';
-    } else {
-      h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için okuma eklemedin. Birkaç sayfa bile sayılır 💜</div>';
-    }
-    h+='</div></div>';
-  }
+  if(ui.readingOpen){ h+=readingOverlayHTML(); }
+  if(ui.watchOpen){ h+=watchOverlayHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Tamam, devam ✨</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';

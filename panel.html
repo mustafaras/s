@@ -135,6 +135,9 @@
   .hchip.on{background:var(--gra);border-color:var(--grb);color:var(--t1)}
   .habit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.14)}
   .hchip.on .habit-dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+  @keyframes hchipWarn{0%,100%{background:var(--ra);border-color:var(--red);box-shadow:0 0 0 rgba(251,113,133,0)}50%{background:var(--rb);border-color:var(--red);box-shadow:0 0 11px rgba(251,113,133,.6)}}
+  .hchip.warn{color:var(--red);border-color:var(--red);font-weight:800;animation:hchipWarn 1.15s ease-in-out infinite}
+  .hchip.warn .habit-dot{background:var(--red);box-shadow:0 0 8px var(--red);animation:hchipWarn 1.15s ease-in-out infinite}
 
   /* ── mood segment bar ── */
   .moodseg{display:flex;height:24px;border-radius:999px;overflow:hidden;border:1px solid var(--bd2);background:var(--s2)}
@@ -735,20 +738,30 @@ function render(){
   h+='</div>';
   // habit chips
   h+='<div class="habits">';
+  var CRIT={vitaminD:1,water:1,protein:1,sleepReg:1};
   HABITS.forEach(function(hb){
     var ok=!!(srec.habits&&srec.habits[hb[0]]);
-    h+='<span class="hchip'+(ok?' on':'')+'"><span class="habit-dot"></span>'+hb[1]+'</span>';
+    var warn=(!ok && CRIT[hb[0]] && selected===today());
+    h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':'')+'><span class="habit-dot"></span>'+hb[1]+'</span>';
   });
   h+='</div>';
   // ── Ne yedi? (öğün içerikleri) ──
   var mealRows="";
+  var mealIsToday=(selected===today());
   MEALS.forEach(function(m){
     var v=srec.meals&&srec.meals[m[0]]!=null?String(srec.meals[m[0]]).trim():"";
-    if(!v) return;
-    mealRows+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.45;">'
-      +'<span style="flex-shrink:0;">'+m[1]+'</span>'
-      +'<b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+m[2]+'</b>'
-      +'<span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;">'+esc(v)+'</span></div>';
+    if(v){
+      mealRows+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.45;">'
+        +'<span style="flex-shrink:0;">'+m[1]+'</span>'
+        +'<b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+m[2]+'</b>'
+        +'<span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;">'+esc(v)+'</span></div>';
+    } else {
+      var gapCol=mealIsToday?'var(--red)':'var(--t4)';
+      mealRows+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.45;opacity:.85;">'
+        +'<span style="flex-shrink:0;filter:grayscale(1);opacity:.55;">'+m[1]+'</span>'
+        +'<b style="color:var(--t4);font-weight:800;flex-shrink:0;">'+m[2]+'</b>'
+        +'<span style="color:'+gapCol+';font-weight:700;flex:1;">— girilmedi</span></div>';
+    }
   });
   h+='<div class="divider"></div>';
   h+='<div class="lbl">🍽️ Ne Yedi</div>';

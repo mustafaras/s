@@ -976,15 +976,16 @@ function bugunHTML(){
   h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">BUGÜNÜN TİKLERİ</div>';
   HABITS.forEach(function(hb){
     var done=!!(rec&&rec.habits[hb.key]); var pulsing=ui.pulse===hb.key;
+    var warn=(!done && (hb.key==='vitaminD'||hb.key==='water'||hb.key==='protein'||hb.key==='sleepReg'));
     var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):'var(--card)';
-    var bd=done?'rgba(233,175,193,0.9)':'var(--card-bd)';
+    var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':'var(--card-bd)');
     var sh=done?'0 10px 26px rgba(233,175,193,0.4)':'0 6px 16px rgba(108,74,58,0.06)';
-    h+='<button onclick="App.toggleHabit(\''+hb.key+'\')" style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">';
+    h+='<button onclick="App.toggleHabit(\''+hb.key+'\')"'+(warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">';
     h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;background:var(--icon);">'+hb.icon+'</div>';
     h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;">'+esc(hb.title)+'</div>';
-    h+=done?'<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>':'<div style="font-size:13px;color:var(--faint);margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
+    h+=done?'<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>':'<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
     h+='</div>';
-    h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:'+(done?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(done?'none':'2px solid var(--field-bd)')+';">'+(done?'✓':'')+'</div></button>';
+    h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:'+(done?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(done?'none':'2px solid '+(warn?'var(--warn)':'var(--field-bd)'))+';">'+(done?'✓':'')+'</div></button>';
   });
 
   // akşam adım hatırlatması (yalnızca akşam, bugünün adımı boşsa)

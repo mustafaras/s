@@ -432,6 +432,15 @@ function msgStatus(n){
   if(n.read) return {cls:"b-ok",txt:"✓✓ Okundu",sub:tsShort(n.readAt)};
   return {cls:"b-warn",txt:"✓ İletildi · okunmadı",sub:"kayıtlı · "+tsShort(n.receivedAt)};
 }
+// ÆON yanıtları (replyTo) cihazda notification değil, ilgili sorunun answer'ı olarak işlenir.
+// Bu yüzden durum notification'dan değil, eşleşen sorunun answerMsgId/answer alanından okunmalı;
+// aksi halde teslim edilmiş bir yanıt panelde sonsuza dek "cihaza inmedi" görünür.
+function replyStatus(m){
+  var q=null; if(D&&D.aeon&&Array.isArray(D.aeon.qa)){ for(var i=0;i<D.aeon.qa.length;i++){ if(D.aeon.qa[i]&&D.aeon.qa[i].id===m.replyTo){ q=D.aeon.qa[i]; break; } } }
+  if(q&&q.answerMsgId===m.id) return {cls:"b-ok",txt:"✓ Yanıt iletildi",sub:"cihaza indi · "+tsShort(q.answeredAt)};
+  if(q&&q.answer) return {cls:"b-ok",txt:"✓ Yanıt iletildi",sub:"cihaza indi"};
+  return {cls:"b-dim",txt:"↑ Gönderildi",sub:"cihaza henüz inmedi"};
+}
 function msgCardHTML(){
   var nm=notifMap();
   var inbox=OBSINBOX.slice().sort(function(a,b){ return String(b.ts||"").localeCompare(String(a.ts||"")); });
@@ -448,7 +457,7 @@ function msgCardHTML(){
   } else {
     s+='<div class="scroll" style="max-height:230px;display:flex;flex-direction:column;gap:8px;">';
     inbox.forEach(function(m){
-      var st=msgStatus(nm[m.id]);
+      var st=m.replyTo?replyStatus(m):msgStatus(nm[m.id]);
       s+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
       s+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
       s+='<span class="badge '+st.cls+' nodot" style="padding:3px 9px;">'+st.txt+'</span>';

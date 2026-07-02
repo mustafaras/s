@@ -324,7 +324,7 @@ function saveBanner(){
   return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="font-size:22px;">📌</span><div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:12px;color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:13px;padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
-window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
+window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; }); if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; }); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
 function commit(msg){ save(); render(); if(msg) toast(msg); }
 
@@ -2117,6 +2117,9 @@ function ghCfgApp(){
   var p=repo.split('/'); if(p.length!==2||!p[0].trim()||!p[1].trim()) return null;
   return {token:tok,owner:p[0].trim(),repo:p[1].trim(),branch:String(s.ghBranch||'main').trim()||'main'};
 }
+// Teslim/okundu makbuzunu 4sn debounce beklemeden hemen repoya yaz
+// (iOS, arka plana/kilit anında JS zamanlayıcılarını dondurduğu için debounce'lu push kaybolabiliyor)
+function receiptPushNow(){ try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){} }
 function fetchObserverInbox(){
   var c=ghCfgApp(); if(!c) return;
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/observer-inbox.json?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
@@ -2130,31 +2133,41 @@ function mergeInbox(msgs){
   if(!Array.isArray(data.notifications)) data.notifications=[];
   if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
-  var seenId={}; data.notifications.forEach(function(n){ if(n&&n.id) seenId[n.id]=1; });
-  var nowIso=new Date().toISOString(), added=0, answeredCount=0, answeredText=null;
+  var seen={}; data.notifications.forEach(function(n){ if(n&&n.id) seen[n.id]=n; });
+  var nowIso=new Date().toISOString(), added=0, answeredCount=0, answeredText=null, needPush=false;
   msgs.forEach(function(m){
     if(!m||!m.id) return;
     if(m.replyTo){
       var q=null, qa=data.aeon.qa; for(var i=0;i<qa.length;i++){ if(qa[i]&&qa[i].id===m.replyTo){ q=qa[i]; break; } }
-      if(q){ if(q.answerMsgId!==m.id){ q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; answeredCount++; answeredText=q.answer; } return; }
+      if(q){
+        if(q.answerMsgId!==m.id){ q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; q.answerSynced=false; answeredCount++; answeredText=q.answer; }
+        else if(q.answerSynced!==true){ needPush=true; } // yanıt cihaza indi ama repoya işlenmemişse tekrar dene
+        return;
+      }
       // eşleşen soru yoksa normal mesaj gibi işle
     }
-    if(seenId[m.id]) return;
-    data.notifications.push({id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false});
+    var ex=seen[m.id];
+    if(ex){ if(ex.synced!==true) needPush=true; return; } // cihazda var ama repoya işlenmemişse tekrar denenmeli
+    data.notifications.push({id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false,synced:false});
     added++;
   });
-  if(added>0||answeredCount>0){
-    save(); // latest.json'a yaz → durum geri yansır
-    if(ui.tab==='mesaj'){ markNotifsRead(); ui.aeonScrollBottom=true; }
-    render();
-    if(added>0) showInboxPopup();
-    if(answeredCount>0) showAeonAnswerPopup(answeredText,answeredCount);
+  if(added>0||answeredCount>0||needPush){
+    save(); // localStorage + sync kuyruğu
+    var pushed=false;
+    if((added>0||answeredCount>0) && ui.tab==='mesaj'){ ui.aeonScrollBottom=true; if(markNotifsRead()) pushed=true; }
+    if(!pushed) receiptPushNow(); // makbuzu debounce beklemeden hemen repoya yaz; onaylanınca (SeyOnSynced) synced=true olur
+    if(added>0||answeredCount>0){
+      render();
+      if(added>0) showInboxPopup();
+      if(answeredCount>0) showAeonAnswerPopup(answeredText,answeredCount);
+    }
   }
 }
 function markNotifsRead(){
   var changed=false, nowIso=new Date().toISOString();
-  notifList().forEach(function(n){ if(n&&!n.deleted&&!n.read){ n.read=true; n.readAt=nowIso; n.seen=true; changed=true; } });
-  if(changed) save();
+  notifList().forEach(function(n){ if(n&&!n.deleted&&!n.read){ n.read=true; n.readAt=nowIso; n.seen=true; n.synced=false; changed=true; } });
+  if(changed){ save(); receiptPushNow(); }
+  return changed;
 }
 // Gözlemci, kullanıcının cevaplanmamış ÆON sorusunu panelde açtığında observer-inbox.json'a
 // receipts[qid]={status:'reviewing'} yazar. Burada onu okuyup soru balonunun altında
@@ -2507,8 +2520,11 @@ App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
 
 setTimeout(fetchObserverInbox,1500);
-setInterval(fetchObserverInbox,240000);
+setInterval(fetchObserverInbox,60000); // ön planda ~1 dk'da bir kontrol (önceden 4 dk)
 document.addEventListener('visibilitychange',function(){ if(!document.hidden) fetchObserverInbox(); });
+window.addEventListener('focus',fetchObserverInbox);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',fetchObserverInbox); // bfcache'ten geri dönüşte
+window.addEventListener('online',fetchObserverInbox);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
 })();

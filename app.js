@@ -2159,7 +2159,7 @@ function mergeInbox(msgs){
     if(added>0||answeredCount>0){
       render();
       if(added>0) showInboxPopup();
-      if(answeredCount>0) showAeonAnswerPopup(answeredText,answeredCount);
+      if(answeredCount>0) replayAnswerPopup();
     }
   }
 }
@@ -2234,6 +2234,22 @@ function showAeonAnswerPopup(text,count){
   inner+='</div>';
   pop.innerHTML=inner;
   document.body.appendChild(pop);
+}
+// Önceki oturumda inmiş ama kullanıcıya henüz popup olarak gösterilmemiş ÆON yanıtlarını,
+// uygulama bir sonraki açıldığında otomatik popup yapar. Popup görünmesi = "görüldü" kabul edilir;
+// answerReadAt işaretlenip makbuz hemen repoya push edilir → panelde "✓✓ Görüldü" yanar.
+function replayAnswerPopup(){
+  if(!data||!data.aeon||!Array.isArray(data.aeon.qa)) return;
+  var changed=false, nowIso=new Date().toISOString(), pop=[];
+  data.aeon.qa.forEach(function(q){
+    if(!q||!q.answer||q.answerNotified) return;
+    q.answerNotified=true; changed=true;
+    if(!q.answerReadAt) pop.push(q); // yalnızca henüz görülmemiş yanıtları popup'la
+  });
+  if(!pop.length){ if(changed) save(); return; }
+  pop.forEach(function(q){ q.answerReadAt=nowIso; q.answerSynced=false; });
+  save(); receiptPushNow();
+  if(ui.tab!=='mesaj'){ var last=pop[pop.length-1]; showAeonAnswerPopup(last.answer,pop.length); }
 }
 var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişisel sağlık ve yaşam yoldaşı. '
 +'Şeyma’ya HER ZAMAN "Sevgili Günışığı" diye hitap et (başka isim ya da hitap kullanma). '
@@ -2529,4 +2545,5 @@ window.addEventListener('pageshow',fetchObserverInbox); // bfcache'ten geri dön
 window.addEventListener('online',fetchObserverInbox);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
+setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 })();

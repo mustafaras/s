@@ -437,8 +437,11 @@ function msgStatus(n){
 // aksi halde teslim edilmiş bir yanıt panelde sonsuza dek "cihaza inmedi" görünür.
 function replyStatus(m){
   var q=null; if(D&&D.aeon&&Array.isArray(D.aeon.qa)){ for(var i=0;i<D.aeon.qa.length;i++){ if(D.aeon.qa[i]&&D.aeon.qa[i].id===m.replyTo){ q=D.aeon.qa[i]; break; } } }
-  if(q&&q.answerMsgId===m.id) return {cls:"b-ok",txt:"✓ Yanıt iletildi",sub:"cihaza indi · "+tsShort(q.answeredAt)};
-  if(q&&q.answer) return {cls:"b-ok",txt:"✓ Yanıt iletildi",sub:"cihaza indi"};
+  var delivered=q&&(q.answerMsgId===m.id||q.answer);
+  if(delivered){
+    if(q.answerReadAt) return {cls:"b-ok",txt:"✓✓ Görüldü",sub:tsShort(q.answerReadAt)};
+    return {cls:"b-warn",txt:"✓ İletildi · görülmedi",sub:"cihaza indi · "+tsShort(q.answeredAt)};
+  }
   return {cls:"b-dim",txt:"↑ Gönderildi",sub:"cihaza henüz inmedi"};
 }
 function msgCardHTML(){

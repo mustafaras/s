@@ -2166,6 +2166,8 @@ function mergeInbox(msgs){
 function markNotifsRead(){
   var changed=false, nowIso=new Date().toISOString();
   notifList().forEach(function(n){ if(n&&!n.deleted&&!n.read){ n.read=true; n.readAt=nowIso; n.seen=true; n.synced=false; changed=true; } });
+  // ÆON yanıtlarını (soru cevapları) da "görüldü" işaretle → panelde "Görüldü" rozeti çıkabilsin
+  if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(q){ if(q&&q.answer&&!q.answerReadAt){ q.answerReadAt=nowIso; q.answerSynced=false; changed=true; } });
   if(changed){ save(); receiptPushNow(); }
   return changed;
 }

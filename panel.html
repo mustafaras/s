@@ -1273,7 +1273,12 @@ try{
   if(PTOKEN&&!localStorage.getItem(PTKEY)) localStorage.setItem(PTKEY,PTOKEN);
 }catch(e){}
 load();
-setInterval(function(){ if(PTOKEN) load(); },300000);
+// Panel otomatik yenileme: ~45 sn'de bir, ama gözlemci bir metin alanına yazarken
+// (ya da gönderim sürerken) o turu atla — yanıt yazarken imleç/taslak kesilmesin.
+function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
+setInterval(function(){ if(!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },45000);
+document.addEventListener("visibilitychange",function(){ if(!document.hidden&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
+window.addEventListener("focus",function(){ if(PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
 })();
 </script>
 </body>

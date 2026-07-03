@@ -248,6 +248,17 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-03** — **Günışığı hava durumu kartı — estetik + genişleyebilir**:
+  Üstteki Günışığı header'ı **dokunulabilir, genişleyebilir bir hava-durumu
+  kartına** dönüştü. Sağdaki 🦩 kaldırıldı; yerine anlık hava geldi. Konum
+  **kapalıyken** iki sabit nokta gösterilir: 🏠 **Ev · Kazan** ve
+  🏢 **İş · Altındağ**; konum **açıkken** canlı konumun (best-effort şehir adı).
+  Karta dokununca açılır: her nokta için sıcaklık/hissedilen/nem/rüzgâr/UV/
+  en-yüksek-düşük/gün doğumu-batımı + **hava-bazlı sağlık notları** (UV, sıcak/
+  soğuk, yağış+basınç→baş ağrısı, rüzgâr, nem) + **nüktedan pozitif söz**.
+  Veri: **Open-Meteo** (anahtarsız, CORS), 30 dk önbellek (`data.weather`).
+  Panele **"☀️ Günışığı · Hava"** kartı yansıtıldı. `.wxcard` CSS + cache-bust
+  `v=20260704d`. Harness ile açık+koyu, kapalı+açık ve panel doğrulandı; JS hatası yok.
 - **2026-07-04** — **Günışığı header (üst) — estetik**: Bugün ekranının **en
   üstüne** gün doğumu temalı yeni bir header eklendi (☀️ + "Günışığı" + saate
   göre selam + 🦩). Uygulama adı **"Şeyma 🦩"** olduğu gibi korundu

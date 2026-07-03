@@ -179,6 +179,7 @@ function migrate(d){
   if(!Array.isArray(d.locationHistory)) d.locationHistory=[];
   if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
   if(d.location===undefined) d.location=null;
+  if(d.weather===undefined) d.weather=null;
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
   if(!Array.isArray(d.library.books)) d.library.books=[];
@@ -196,7 +197,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
@@ -720,6 +721,7 @@ App.setLocationMode=function(m){
   data.settings.locationMode=m; save(); render();
   toast(m==='walk'?'Yürüyüş modu 🚶':m==='vehicle'?'Araç modu 🚗':'Otomatik mod ✨');
 };
+App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
 
@@ -851,6 +853,7 @@ function render(){
   html+=navHTML();
   html+=modalsHTML();
   app.innerHTML=html;
+  if(ui.tab==='bugun' && !editing()) maybeFetchWeather();
 
   var newScroll=document.querySelector('[data-scroll]');
   if(newScroll){
@@ -1033,6 +1036,160 @@ function locationCardHTML(){
   h+='</div>';
   return h;
 }
+// ---------- Günışığı hava durumu (Open-Meteo, anahtarsız) ----------
+var wxFetching=false;
+var WX_SPOTS_FIXED=[
+  {key:'ev', label:'Ev', place:'Kazan', emoji:'🏠', lat:40.23, lng:32.68},
+  {key:'is', label:'İş', place:'Altındağ', emoji:'🏢', lat:39.97, lng:32.92}
+];
+function wxMode(){ var s=(data&&data.settings)?data.settings:{}; return (s.locationEnabled && data.location && typeof data.location.lat==='number') ? 'live' : 'fixed'; }
+function weatherSpots(){
+  if(wxMode()==='live'){
+    var nm=(data.weather&&data.weather.liveName)||'';
+    return [{key:'live', label:'Konumun', place:nm, emoji:'📍', lat:data.location.lat, lng:data.location.lng}];
+  }
+  return WX_SPOTS_FIXED;
+}
+function wxStale(){
+  if(!data.weather||!data.weather.fetchedAt||!(data.weather.spots&&data.weather.spots.length)) return true;
+  if(data.weather.mode!==wxMode()) return true;
+  var age=Date.now()-new Date(data.weather.fetchedAt).getTime();
+  return !(age>=0 && age<30*60000);
+}
+function maybeFetchWeather(){ if(!data||editing()) return; if(wxFetching) return; if(!wxStale()) return; fetchWeather(); }
+function fetchWeather(){
+  if(wxFetching || typeof fetch!=='function') return;
+  var spots=weatherSpots(); if(!spots.length) return;
+  wxFetching=true;
+  var lats=spots.map(function(s){return s.lat;}).join(',');
+  var lngs=spots.map(function(s){return s.lng;}).join(',');
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+lats+'&longitude='+lngs
+    +'&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m'
+    +'&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max'
+    +'&timezone=auto&forecast_days=1';
+  fetch(url).then(function(r){ return r.ok?r.json():Promise.reject(r.status); }).then(function(j){
+    var arr=Array.isArray(j)?j:[j]; var out=[];
+    for(var i=0;i<spots.length;i++){
+      var w=arr[i]||arr[0]; if(!w||!w.current) continue; var dl=w.daily||{};
+      out.push({
+        key:spots[i].key, label:spots[i].label, place:spots[i].place, emoji:spots[i].emoji,
+        temp:Math.round(w.current.temperature_2m), feels:Math.round(w.current.apparent_temperature),
+        hum:w.current.relative_humidity_2m, wind:Math.round(w.current.wind_speed_10m),
+        precip:w.current.precipitation, code:w.current.weather_code, isDay:w.current.is_day===1,
+        hi:(dl.temperature_2m_max?Math.round(dl.temperature_2m_max[0]):null),
+        lo:(dl.temperature_2m_min?Math.round(dl.temperature_2m_min[0]):null),
+        uv:(dl.uv_index_max?Math.round(dl.uv_index_max[0]):null),
+        pop:(dl.precipitation_probability_max?dl.precipitation_probability_max[0]:null),
+        sunrise:(dl.sunrise?dl.sunrise[0]:null), sunset:(dl.sunset?dl.sunset[0]:null)
+      });
+    }
+    if(!out.length){ wxFetching=false; return; }
+    var keepName=(data.weather&&data.weather.liveName)||'';
+    data.weather={mode:wxMode(), fetchedAt:new Date().toISOString(), spots:out, liveName:keepName};
+    wxFetching=false; saveLocal();
+    if(wxMode()==='live' && !data.weather.liveName) reverseGeocodeLive(spots[0].lat, spots[0].lng);
+    if(ui.tab==='bugun') render();
+  }).catch(function(){ wxFetching=false; });
+}
+function reverseGeocodeLive(lat,lng){
+  if(typeof fetch!=='function') return;
+  fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lng+'&localityLanguage=tr')
+    .then(function(r){ return r.ok?r.json():Promise.reject(0); }).then(function(j){
+      var nm=j.locality||j.city||j.principalSubdivision||'';
+      if(nm && data.weather){ data.weather.liveName=nm; if(data.weather.spots&&data.weather.spots[0]) data.weather.spots[0].place=nm; saveLocal(); if(ui.tab==='bugun') render(); }
+    }).catch(function(){});
+}
+function wxMeta(code,isDay){
+  var c=code;
+  if(c===0) return {emoji:isDay?'☀️':'🌙', label:isDay?'Açık':'Açık gece', cat:'clear'};
+  if(c===1) return {emoji:isDay?'🌤️':'🌙', label:'Az bulutlu', cat:'clear'};
+  if(c===2) return {emoji:'⛅', label:'Parçalı bulutlu', cat:'cloud'};
+  if(c===3) return {emoji:'☁️', label:'Bulutlu', cat:'cloud'};
+  if(c===45||c===48) return {emoji:'🌫️', label:'Sisli', cat:'fog'};
+  if(c>=51&&c<=57) return {emoji:'🌦️', label:'Çiseli', cat:'rain'};
+  if(c>=61&&c<=67) return {emoji:'🌧️', label:'Yağmurlu', cat:'rain'};
+  if(c>=71&&c<=77) return {emoji:'❄️', label:'Karlı', cat:'snow'};
+  if(c>=80&&c<=82) return {emoji:'🌧️', label:'Sağanak', cat:'rain'};
+  if(c>=85&&c<=86) return {emoji:'🌨️', label:'Kar sağanağı', cat:'snow'};
+  if(c>=95) return {emoji:'⛈️', label:'Gök gürültülü', cat:'storm'};
+  return {emoji:'🌡️', label:'—', cat:'cloud'};
+}
+function wxAdvice(sp){
+  var a=[]; var t=(sp.feels!=null?sp.feels:sp.temp); var cat=wxMeta(sp.code,sp.isDay).cat;
+  if(sp.uv!=null && sp.uv>=6) a.push({i:'🧴', t:'UV yüksek ('+sp.uv+') — güneş kremi ve şapka ihmal etme'});
+  if(t>=30) a.push({i:'💧', t:'Sıcak — bol su iç, öğle güneşinden kaç, serinde kal'});
+  else if(t>=26) a.push({i:'💧', t:'Ilıman-sıcak — su şişeni yanına almayı unutma'});
+  if(t<=4) a.push({i:'🧣', t:'Soğuk — katmanlı giyin, eklemlerini üşütme'});
+  else if(t<=10) a.push({i:'🧥', t:'Serin — hafif bir mont bugün iyi gider'});
+  if(cat==='rain'||(sp.pop!=null&&sp.pop>=50)) a.push({i:'☔', t:'Yağış ihtimali — şemsiyeni al; basınç değişimi baş ağrısı tetikleyebilir'});
+  if(cat==='snow') a.push({i:'🧊', t:'Kar/buz — zemin kaygan, adımına dikkat et'});
+  if(cat==='storm') a.push({i:'⛈️', t:'Fırtına — mümkünse dışarıyı ertele, içeride kal'});
+  if(sp.wind!=null && sp.wind>=25) a.push({i:'💨', t:'Rüzgârlı ('+sp.wind+' km/sa) — saç/şal derdine hazırlıklı ol'});
+  if(sp.hum!=null && sp.hum>=75 && t>=24) a.push({i:'💦', t:'Nem yüksek — terleme artabilir, sıvı tüketmeyi ihmal etme'});
+  if(!a.length) a.push({i:'🌸', t:'Hava dengede — güzel bir gün için tam vaktinde 💛'});
+  return a.slice(0,3);
+}
+var WX_QUIPS={
+  clear:['Güneş bugün senin için çıktı Günışığı; gölgesi bile yakışıyor sana 🌻','Gökyüzü açık, niyetin de öyle olsun — bugün senin sahnendesin ☀️','Böyle güzel bir günde tek eksik senin gülüşündü, o da geldi işte 😄'],
+  cloud:['Bulutlar geçici, sen kalıcısın Günışığı ☁️→☀️','Bulutlu ama kasvetli değil; sen içeriden ışıldıyorsun zaten ✨','Gökyüzü biraz mahmur; kahveni al, ikiniz de uyanırsınız ☕'],
+  rain:['Yağmur toprağı, sen günü besliyorsun; ikiniz de bereketsiniz 🌧️🌱','Şemsiyen yanında olsun; ıslanmadan da dans edilir bu hayatta ☔💃','Yağmur camda ritim tutuyor, sen de kendi şarkını mırıldan 🎵'],
+  snow:['Kar sessizce yağar ama iz bırakır — tıpkı senin gibi ❄️','Dışarısı buz, içerisi sen: en sıcak yer neresi belli oldu 🧣','Kar tanesi kadar biriciksin Günışığı; üşüme sakın ☃️'],
+  fog:['Sis var ama yolunu sen zaten kalbinle biliyorsun 🌫️','Puslu bir sabah; net olan tek şey senin değerin 💛'],
+  storm:['Fırtına da geçer Günışığı; sen köklerinden eminsin ⛈️🌳','Gök gürlese de senin içindeki huzuru bastıramaz ⚡']
+};
+function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
+function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:13px;font-weight:800;color:#7A3E1E;line-height:1.35;"><span style="opacity:.85;">'+sp.emoji+'</span><span>'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxDetail(icon,label,val){ return '<div style="flex:1;min-width:0;background:rgba(255,255,255,0.45);border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:#A85E3C;font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:#7A3E1E;margin-top:2px;">'+val+'</div></div>'; }
+function weatherHeaderHTML(greet){
+  var open=!!ui.weatherOpen;
+  var wx=data.weather;
+  var spots=(wx&&wx.spots&&wx.spots.length)?wx.spots:null;
+  var live=!!(wx&&wx.mode==='live');
+  var primary=null;
+  if(spots){ primary=spots[0]; for(var i=1;i<spots.length;i++){ var b=spots[i]; var sv=(b.uv||0)+(b.feels!=null?b.feels:b.temp||0); var ps=(primary.uv||0)+(primary.feels!=null?primary.feels:primary.temp||0); if(sv>ps) primary=b; } }
+  var pm=primary?wxMeta(primary.code,primary.isDay):null;
+  var h='<div class="wxcard" onclick="App.toggleWeather()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;overflow:hidden;border-radius:24px;padding:15px 16px;background:linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7);box-shadow:0 12px 28px var(--sun-glow);">';
+  h+='<div style="position:absolute;top:-32px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.55),transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:absolute;bottom:-42px;left:30px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.28),transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
+  h+='<span style="font-size:30px;line-height:1;filter:drop-shadow(0 3px 7px rgba(240,150,70,0.55));">'+(pm?pm.emoji:'☀️')+'</span>';
+  var sub=greet+' ✨'; if(pm) sub+=' · '+pm.label;
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:900;letter-spacing:0.3px;color:#8A4426;line-height:1.12;">Günışığı</div><div style="font-size:12px;font-weight:700;color:#A85E3C;letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:9px;flex-shrink:0;">';
+  if(spots){
+    if(live){ h+='<div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#7A3E1E;line-height:1;">'+spots[0].temp+'°</div>'+(spots[0].place?'<div style="font-size:10.5px;font-weight:700;color:#A85E3C;margin-top:2px;">📍 '+esc(spots[0].place)+'</div>':'')+'</div>'; }
+    else { h+='<div style="display:flex;flex-direction:column;gap:3px;">'+wxSpotChip(spots[0])+wxSpotChip(spots[1]||spots[0])+'</div>'; }
+  } else { h+='<div style="font-size:11.5px;font-weight:700;color:#A85E3C;">hava…</div>'; }
+  h+='<span style="font-size:13px;color:#B5673A;transition:transform .2s;display:inline-block;transform:rotate('+(open?'180deg':'0deg')+');">▾</span>';
+  h+='</div></div>';
+  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:rgba(122,62,30,0.6);">detaylar için dokun ▾</div>'; }
+  if(open && spots){
+    h+='<div style="position:relative;margin-top:12px;animation:seyFade .25s ease;">';
+    for(var si=0; si<spots.length; si++){
+      var sp=spots[si]; var m=wxMeta(sp.code,sp.isDay);
+      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="font-size:20px;">'+sp.emoji+'</span>';
+      h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:900;color:#8A4426;">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:#A85E3C;">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:11.5px;font-weight:700;color:#A85E3C;">'+m.emoji+' '+m.label+'</div></div>';
+      h+='<div style="font-size:22px;font-weight:900;color:#7A3E1E;">'+sp.temp+'°</div></div>';
+      h+='<div style="display:flex;gap:6px;margin-bottom:6px;">'+wxDetail('🌡️','Hissedilen',sp.feels+'°')+wxDetail('💧','Nem','%'+sp.hum)+wxDetail('💨','Rüzgâr',sp.wind+' km/sa')+'</div>';
+      h+='<div style="display:flex;gap:6px;">'+wxDetail('🔆','UV',(sp.uv!=null?sp.uv:'—'))+wxDetail('↕️','En Y/D',(sp.hi!=null?sp.hi+'°/'+sp.lo+'°':'—'))+wxDetail('🌅','Doğ/Bat',wxHm(sp.sunrise)+'·'+wxHm(sp.sunset))+'</div>';
+      h+='</div>';
+    }
+    if(primary){
+      var adv=wxAdvice(primary);
+      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;margin-top:11px;"><div style="font-size:12.5px;font-weight:900;color:#8A4426;margin-bottom:7px;">💡 Sağlık notları</div>';
+      for(var ai=0; ai<adv.length; ai++){ h+='<div style="display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,0.42);border-radius:12px;padding:8px 10px;'+(ai>0?'margin-top:6px;':'')+'"><span style="font-size:15px;line-height:1.3;">'+adv[ai].i+'</span><span style="flex:1;font-size:12.5px;font-weight:600;color:#7A3E1E;line-height:1.4;">'+esc(adv[ai].t)+'</span></div>'; }
+      h+='</div>';
+      var q=wxQuip(pm?pm.cat:'clear');
+      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;margin-top:11px;font-size:12.5px;font-style:italic;font-weight:600;color:#8A4426;line-height:1.5;">❝ '+esc(q)+' ❞</div>';
+    }
+    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:10px;color:rgba(122,62,30,0.55);">Open-Meteo · '+us+'</div>'; }
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function bugunHTML(){
   var today=todayStr();
   var ed=editing();
@@ -1054,14 +1211,8 @@ function bugunHTML(){
 
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   if(!ed){
-    // Günışığı — gün doğumu temalı üst header
-    h+='<div style="position:relative;overflow:hidden;border-radius:24px;padding:15px 18px;background:linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7);box-shadow:0 12px 28px var(--sun-glow);display:flex;align-items:center;gap:13px;">';
-    h+='<div style="position:absolute;top:-32px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.55),transparent 70%);pointer-events:none;"></div>';
-    h+='<div style="position:absolute;bottom:-42px;left:30px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.28),transparent 70%);pointer-events:none;"></div>';
-    h+='<span style="position:relative;font-size:30px;line-height:1;filter:drop-shadow(0 3px 7px rgba(240,150,70,0.55));">☀️</span>';
-    h+='<div style="position:relative;flex:1;min-width:0;"><div style="font-size:21px;font-weight:900;letter-spacing:0.3px;color:#8A4426;line-height:1.12;">Günışığı</div><div style="font-size:12.5px;font-weight:700;color:#A85E3C;letter-spacing:.2px;margin-top:2px;">'+_greet+' ✨</div></div>';
-    h+='<span style="position:relative;font-size:20px;line-height:1;">🦩</span>';
-    h+='</div>';
+    // Günışığı — gün doğumu temalı, hava durumu içeren dokunulabilir header
+    h+=weatherHeaderHTML(_greet);
     h+=saveBanner(); h+=locationCardHTML();
   }
   // hero

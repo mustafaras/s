@@ -61,5 +61,8 @@
     --sun:#FFC15E; --sun2:#FF9D57; --sun-glow:rgba(255,180,95,0.30);
   }
   .glass{background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-bd);}
+  .wxcard{cursor:pointer;transition:transform .12s ease,box-shadow .2s ease;-webkit-tap-highlight-color:transparent;}
+  .wxcard:active{transform:scale(.985);}
+  .wxcard:hover{box-shadow:0 16px 34px var(--sun-glow);}
   .scroll{-webkit-overflow-scrolling:touch;}
   textarea,input{color:var(--text);}

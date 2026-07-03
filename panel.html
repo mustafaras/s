@@ -572,6 +572,49 @@ function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.se
 function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
 function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
 
+function wxP(code,isDay){
+  var c=Number(code);
+  if(c===0) return {e:isDay?'☀️':'🌙',l:isDay?'Açık':'Açık gece'};
+  if(c===1) return {e:isDay?'🌤️':'🌙',l:'Az bulutlu'};
+  if(c===2) return {e:'⛅',l:'Parçalı bulutlu'};
+  if(c===3) return {e:'☁️',l:'Bulutlu'};
+  if(c===45||c===48) return {e:'🌫️',l:'Sisli'};
+  if(c>=51&&c<=57) return {e:'🌦️',l:'Çiseli'};
+  if(c>=61&&c<=67) return {e:'🌧️',l:'Yağmurlu'};
+  if(c>=71&&c<=77) return {e:'❄️',l:'Karlı'};
+  if(c>=80&&c<=82) return {e:'🌧️',l:'Sağanak'};
+  if(c>=85&&c<=86) return {e:'🌨️',l:'Kar sağanağı'};
+  if(c>=95) return {e:'⛈️',l:'Gök gürültülü'};
+  return {e:'🌡️',l:'—'};
+}
+function weatherCardHTML(){
+  var wx=D&&D.weather?D.weather:null;
+  var spots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
+  var s='<div class="card lift span-12 pad">';
+  var upd='';
+  if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
+  s+='<div class="lbl">☀️ Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
+  if(!spots){ s+='<div class="empty" style="flex:1;"><span class="ei">🌤️</span>Hava verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama Bugün ekranında açıldığında gelir</span></div></div>'; return s; }
+  s+='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+  for(var i=0;i<spots.length;i++){
+    var sp=spots[i]; var m=wxP(sp.code,sp.isDay);
+    s+='<div style="flex:1;min-width:190px;background:var(--bd2);border:1px solid var(--bd);border-radius:14px;padding:13px 15px;">';
+    s+='<div style="display:flex;align-items:center;gap:9px;">';
+    s+='<span style="font-size:30px;line-height:1;">'+m.e+'</span>';
+    s+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f2);font-weight:800;color:var(--t2);">'+esc(sp.emoji+' '+sp.label)+(sp.place?' · '+esc(sp.place):'')+'</div><div style="font-size:var(--f3);color:var(--t3);font-weight:600;">'+esc(m.l)+'</div></div>';
+    s+='<div style="font-size:26px;font-weight:800;color:var(--gold);line-height:1;">'+(sp.temp!=null?sp.temp+'°':'—')+'</div>';
+    s+='</div>';
+    s+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:var(--f3);color:var(--t3);font-weight:600;">';
+    s+='<span>🌡️ '+(sp.feels!=null?sp.feels+'°':'—')+'</span>';
+    s+='<span>💧 %'+(sp.hum!=null?sp.hum:'—')+'</span>';
+    s+='<span>💨 '+(sp.wind!=null?sp.wind+' km/sa':'—')+'</span>';
+    s+='<span>🔆 UV '+(sp.uv!=null?sp.uv:'—')+'</span>';
+    if(sp.hi!=null) s+='<span>↕️ '+sp.hi+'°/'+sp.lo+'°</span>';
+    s+='</div></div>';
+  }
+  s+='</div></div>';
+  return s;
+}
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   var opened=lastOpenedAt();
@@ -702,6 +745,9 @@ function render(){
   // ROW 1.5: Luna mesaj kanalı + Luna’ya sorulanlar
   h+=msgCardHTML();
   h+=lunaCardHTML();
+
+  // Günışığı hava durumu (uygulama Bugün ekranından senkronlanır)
+  h+=weatherCardHTML();
 
   // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
 

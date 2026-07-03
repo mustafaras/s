@@ -31,6 +31,7 @@
     /* Okuma & İzleme hub accent'leri (açık tema) */
     --read:#6E55BF; --read-bg:rgba(110,85,191,0.12);
     --watch:#B5732E; --watch-bg:rgba(200,150,90,0.14);
+    --listen:#0E8F9C; --listen-bg:rgba(14,154,167,0.12);
     --ok:#3F9A4F; --ok-bg:rgba(143,191,138,0.18);
     --drop:#B0714E; --drop-bg:rgba(200,150,90,0.16);
     --pause:#8A7BB0; --pause-bg:rgba(138,123,176,0.16);
@@ -49,6 +50,7 @@
     /* Okuma & İzleme hub accent'leri (koyu tema — daha parlak) */
     --read:#C3ABF5; --read-bg:rgba(167,139,250,0.22);
     --watch:#ECB169; --watch-bg:rgba(236,177,105,0.20);
+    --listen:#5FD3DE; --listen-bg:rgba(95,211,222,0.20);
     --ok:#7BD389; --ok-bg:rgba(123,211,137,0.20);
     --drop:#E0A264; --drop-bg:rgba(224,162,100,0.20);
     --pause:#B9A6E6; --pause-bg:rgba(185,166,230,0.20);

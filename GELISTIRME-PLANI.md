@@ -18,13 +18,13 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-03 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
 | — | Altyapı (sync, panel, tema, Okuma/İzleme hub'ları) | 0 | ✅ | `sync.js`, `panel.html`, `styles.css`, hub deseni |
-| 1 | 🎵 Ne Dinledim | 1 | ❌ | `data.listening` yok |
-| 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ❌ | `gratitude` yok |
+| 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
+| 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |
 | 4 | 🗓️ Ruh hali ısı haritası | 1 | 🟡 | Harita takviminde günlük mod emoji + tik tonu var; GitHub-tarzı yıllık grid değil |
 | 5 | 🏅 Rozet & seri | 1 | ✅ | `badgesGrid()` + `currentStreak/maybeStreak/bestStreak` + kilometre taşları |
@@ -46,7 +46,7 @@ _Son güncelleme: 2026-07-03 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | 🟡 | Mikro animasyon var (confetti/seyFade/toast); `navigator.vibrate` yok |
 
-**Sayım:** ✅ 6 · 🟡 5 · ❌ 11 _(+ altyapı ✅)_
+**Sayım:** ✅ 8 · 🟡 5 · ❌ 9 _(+ altyapı ✅)_
 
 ---
 
@@ -83,7 +83,7 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 
 ## 🌟 Sürüm 1 — Başlangıç paketi (en yüksek değer / mimariye en uygun)
 
-### 1. 🎵 "Ne Dinledim" hub'ı — ❌ Yok
+### 1. 🎵 "Ne Dinledim" hub'ı — ✅ Uygulandı
 - **Ne:** Şarkı/albüm/podcast kaydı; sanatçı, tür, ruh haline göre çalma
   listesi, favori sözler, istatistik.
 - **Neden:** Okuma/İzleme üçlemesini tamamlar; günlük ruh haliyle güçlü bağ.
@@ -91,7 +91,7 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
   (items + günlük entries), yeni accent `--listen` (örn. yeşil/teal).
 - **Emek:** Orta. **Panel:** Yeni "🎧 Dinleme" bento kartı + gün-detayı satırı.
 
-### 2. 🙏 Şükran / "3 Güzel Şey" günlüğü — ❌ Yok
+### 2. 🙏 Şükran / "3 Güzel Şey" günlüğü — ✅ Uygulandı
 - **Ne:** Her güne 3 küçük iyi şey.
 - **Neden:** Ruh haline kanıtlı olumlu etki, çok hafif.
 - **Nasıl:** `data.days[date].gratitude = [..]`; `bugun` sekmesine kart.
@@ -248,6 +248,15 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-04** — **#1 Ne Dinledim ✅ + #2 Şükran ✅**: 🎵 "Ne Dinledim"
+  hub'ı (Bugün / Favoriler / İstatistik / Sözler) — `data.music` favorileri +
+  `data.days[].listening` günlük kayıtları, teal `--listen` accent (açık/koyu),
+  günlük hedef halkası, 7 günlük çubuk grafik. 🙏 "3 Güzel Şey" kartı Bugün
+  sekmesinde (`data.days[].gratitude`, ≤3; geçmiş günde de düzenlenebilir).
+  Panel yansıması: "🎧 Dinleme Arşivi" bento kartı + gün-detayında dinleme
+  kayıtları ve "3 güzel şey" bloğu + sözler "Alıntılar · Replikler · Sözler"
+  bölümüne katıldı. Harness ile açık/koyu temada doğrulandı (JS hatası yok);
+  cache-bust `v=20260704a`. Sayım: ✅ 8 · 🟡 5 · ❌ 9.
 - **2026-07-03** — Belge **yaşayan belge**ye çevrildi: canlı durum tablosu,
   rozetler ve tetikleyici notu eklendi. Mevcut durum denetlendi
   (✅ 6 · 🟡 5 · ❌ 11).

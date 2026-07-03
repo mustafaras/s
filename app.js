@@ -188,6 +188,10 @@ function migrate(d){
   if(!Array.isArray(d.watchlist.items)) d.watchlist.items=[];
   if(!d.watchlist.goal||typeof d.watchlist.goal!=='object') d.watchlist.goal={dailyMinutes:40,yearlyTitles:null};
   d.watchlist.items=d.watchlist.items.map(normTitle).filter(Boolean);
+  if(!d.music||typeof d.music!=='object') d.music=emptyMusic();
+  if(!Array.isArray(d.music.items)) d.music.items=[];
+  if(!d.music.goal||typeof d.music.goal!=='object') d.music.goal={dailyMinutes:30,yearlyTitles:null};
+  d.music.items=d.music.items.map(normTrack).filter(Boolean);
   d.version=2;
   return d;
 }
@@ -266,7 +270,7 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
@@ -279,6 +283,8 @@ function uid(p){ return (p||'id')+'_'+Date.now().toString(36)+'_'+Math.random().
 function emptyWatching(){ return {entries:[]}; }
 function emptyLibrary(){ return {books:[],goal:{dailyPages:20,yearlyBooks:null}}; }
 function emptyWatchlist(){ return {items:[],goal:{dailyMinutes:40,yearlyTitles:null}}; }
+function emptyListening(){ return {entries:[]}; }
+function emptyMusic(){ return {items:[],goal:{dailyMinutes:30,yearlyTitles:null}}; }
 var BOOK_EMOJI=['📖','📕','📗','📘','📙','📓','📔','📚','📜','🕮'];
 var BOOK_GENRES=['Roman','Klasik','Kişisel gelişim','Şiir','Öykü','Bilim','Tarih','Felsefe','Polisiye','Fantastik'];
 var TITLE_EMOJI=['🎬','🍿','📺','🎞️','🚀','🕵️','❤️','😂','👑','🧟','🐉','⚔️'];
@@ -289,6 +295,9 @@ function ensureLibrary(){ if(!data.library||typeof data.library!=='object') data
 function ensureWatchlist(){ if(!data.watchlist||typeof data.watchlist!=='object') data.watchlist=emptyWatchlist(); if(!Array.isArray(data.watchlist.items)) data.watchlist.items=[]; if(!data.watchlist.goal||typeof data.watchlist.goal!=='object') data.watchlist.goal={dailyMinutes:40,yearlyTitles:null}; return data.watchlist; }
 function findBook(id){ var L=ensureLibrary(); for(var i=0;i<L.books.length;i++){ if(L.books[i]&&L.books[i].id===id) return L.books[i]; } return null; }
 function findTitle(id){ var W=ensureWatchlist(); for(var i=0;i<W.items.length;i++){ if(W.items[i]&&W.items[i].id===id) return W.items[i]; } return null; }
+function normTrack(x){ if(!x||typeof x!=='object') return null; if(!x.id) x.id=uid('m'); x.title=String(x.title==null?'':x.title); x.artist=String(x.artist==null?'':x.artist); if(['sarki','album','podcast'].indexOf(x.kind)<0) x.kind='sarki'; x.genre=String(x.genre==null?'':x.genre); if(!x.emoji) x.emoji=(x.kind==='podcast'?'🎙️':(x.kind==='album'?'💿':'🎵')); x.rating=(x.rating==null||x.rating==='')?null:Math.max(1,Math.min(5,Math.round(Number(x.rating)||0))); if(!Array.isArray(x.quotes)) x.quotes=[]; if(!x.createdAt) x.createdAt=new Date().toISOString(); return x; }
+function ensureMusic(){ if(!data.music||typeof data.music!=='object') data.music=emptyMusic(); if(!Array.isArray(data.music.items)) data.music.items=[]; if(!data.music.goal||typeof data.music.goal!=='object') data.music.goal={dailyMinutes:30,yearlyTitles:null}; return data.music; }
+function findTrack(id){ var M=ensureMusic(); for(var i=0;i<M.items.length;i++){ if(M.items[i]&&M.items[i].id===id) return M.items[i]; } return null; }
 function bookPct(b){ if(!b||!b.totalPages||b.totalPages<=0) return b&&b.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((b.currentPage/b.totalPages)*100))); }
 function titlePct(t){ if(!t) return 0; if(!t.totalEp||t.totalEp<=0) return t.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((t.watchedEp/t.totalEp)*100))); }
 // istatistik
@@ -307,9 +316,16 @@ function watchStreak(){ var c=todayStr(); if(!hasWatch(c)) c=addDays(c,-1); var 
 function weekWatch(){ var out=[],t=todayStr(); for(var i=6;i>=0;i--){ var d=addDays(t,-i); out.push({date:d,minutes:watchDayStats(data.days[d]).minutes,label:shortDate(d)}); } return out; }
 function todayWatchMin(){ return watchDayStats(data.days[todayStr()]).minutes; }
 function allReplicas(){ var W=ensureWatchlist(),out=[]; W.items.forEach(function(t){ (t.quotes||[]).forEach(function(q){ out.push({itemId:t.id,title:t.title,emoji:t.emoji,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
+function listenDayStats(rec){ var en=(rec&&rec.listening&&Array.isArray(rec.listening.entries))?rec.listening.entries:[]; var minutes=0; en.forEach(function(e){ if(!e) return; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,minutes:minutes,entries:en}; }
+function listenTotals(){ var minutes=0,items=0,days=0; for(var d in data.days){ var st=listenDayStats(data.days[d]); if(st.count>0){ days++; minutes+=st.minutes; items+=st.count; } } return {minutes:minutes,items:items,days:days}; }
+function hasListen(date){ var r=data.days[date]; return !!(r&&r.listening&&Array.isArray(r.listening.entries)&&r.listening.entries.length>0); }
+function weekListen(){ var out=[],t=todayStr(); for(var i=6;i>=0;i--){ var d=addDays(t,-i); out.push({date:d,minutes:listenDayStats(data.days[d]).minutes,label:shortDate(d)}); } return out; }
+function listenStreak(){ var c=todayStr(); if(!hasListen(c)) c=addDays(c,-1); var n=0,guard=0; while(hasListen(c)&&guard++<4000){ n++; c=addDays(c,-1); } return n; }
+function musicStats(){ var M=ensureMusic(); var byKind={sarki:0,album:0,podcast:0}; M.items.forEach(function(x){ if(byKind[x.kind]!=null) byKind[x.kind]++; }); return {total:M.items.length,sarki:byKind.sarki,album:byKind.album,podcast:byKind.podcast}; }
+function allLyrics(){ var M=ensureMusic(),out=[]; M.items.forEach(function(x){ (x.quotes||[]).forEach(function(q){ out.push({itemId:x.id,title:x.title,emoji:x.emoji,artist:x.artist,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
 function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) return min+' dk'; var h=Math.floor(min/60),m=min%60; return h+' sa'+(m?' '+m+' dk':''); }
 // ---------- ortak UI parçaları ----------
-function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,#C88F4C,#E0B080)':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
+function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,#C88F4C,#E0B080)':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
 function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
 function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;font-size:'+size+'px;line-height:1;filter:'+(on?'none':'grayscale(1)')+';opacity:'+(on?'1':'0.45')+';">⭐</button>'; } h+='</div>'; return h; }
 function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:9.5px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:9px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
@@ -379,7 +395,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -527,6 +543,53 @@ App.onReplicaField=function(field,el){ if(!ui.replicaDraft) return; ui.replicaDr
 App.pickReplicaTitle=function(id){ if(!ui.replicaDraft) return; ui.replicaDraft.itemId=id; render(); };
 App.saveReplica=function(){ if(!ui.replicaDraft) return; var t=findTitle(ui.replicaDraft.itemId); if(!t){ toast('Önce bir yapım seç 🎬'); return; } var text=String(ui.replicaDraft.text||'').trim(); if(!text){ toast('Repliği yaz 💬'); return; } if(!Array.isArray(t.quotes)) t.quotes=[]; t.quotes.push({id:uid('wq'),text:text.slice(0,400),ts:new Date().toISOString()}); ui.replicaDraft=null; commit('Replik eklendi 💬'); };
 App.removeReplica=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var i=t.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ t.quotes.splice(i,1); commit('Replik silindi'); } };
+
+// ================= NE DİNLEDİM (🎧) =================
+App.openListening=function(){ ui.listeningOpen=true; ui.listeningView='today'; ui.logTrackId=null; ui.trackEdit=null; ui.lyricDraft=null; if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; render(); };
+App.closeListening=function(){ ui.listeningOpen=false; ui.listeningDraft=null; ui.trackEdit=null; ui.lyricDraft=null; ui.logTrackId=null; render(); };
+App.setListeningView=function(v){ ui.listeningView=v; ui.trackEdit=null; ui.lyricDraft=null; render(); };
+App.onListeningField=function(field,el){ if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; ui.listeningDraft[field]=el.value; };
+App.setListenDraftKind=function(k){ if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; ui.listeningDraft.kind=(['sarki','album','podcast'].indexOf(k)>=0)?k:'sarki'; render(); };
+App.pickLogTrack=function(id){ var x=findTrack(id); if(!x) return; if(ui.logTrackId===id){ ui.logTrackId=null; } else { ui.logTrackId=id; if(!ui.listeningDraft) ui.listeningDraft={}; ui.listeningDraft.title=x.title; ui.listeningDraft.artist=x.artist; ui.listeningDraft.kind=x.kind; } render(); };
+App.addListening=function(){
+  var d=ui.listeningDraft||{};
+  var title=String(d.title||'').trim();
+  if(!title){ toast('Önce ne dinlediğini yaz 🎧'); var ti=document.getElementById('listening-title'); if(ti) ti.focus(); return; }
+  var kind=(['sarki','album','podcast'].indexOf(d.kind)>=0)?d.kind:'sarki';
+  var minutes=parseInt(d.minutes,10); if(isNaN(minutes)||minutes<0) minutes=null;
+  var itemId=ui.logTrackId||null; if(itemId&&!findTrack(itemId)) itemId=null;
+  var entry={ id:uid('l'), title:title.slice(0,120), artist:String(d.artist||'').trim().slice(0,80), kind:kind, minutes:minutes, note:String(d.note||'').trim().slice(0,240), itemId:itemId, ts:new Date().toISOString() };
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!day.listening||typeof day.listening!=='object') day.listening=emptyListening();
+  if(!Array.isArray(day.listening.entries)) day.listening.entries=[];
+  day.listening.entries.push(entry);
+  day.savedAt=new Date().toISOString();
+  ui.listeningDraft={title:'',artist:'',kind:kind,minutes:'',note:''}; ui.logTrackId=null;
+  commit('Dinleme kaydedildi 🎧');
+};
+App.removeListening=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.listening&&Array.isArray(day.listening.entries)){ var i=day.listening.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ day.listening.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Dinleme kaydı silindi'); } } };
+// ---- favori CRUD ----
+App.openTrackEdit=function(id){ ensureMusic(); ui.trackEdit = id ? clone(findTrack(id)||{}) : {id:'',title:'',artist:'',kind:'sarki',genre:'',emoji:'🎵',rating:null,quotes:[]}; render(); };
+App.closeTrackEdit=function(){ ui.trackEdit=null; render(); };
+App.onTrackEditField=function(field,el){ if(!ui.trackEdit) return; ui.trackEdit[field]=el.value; };
+App.pickTrackEmoji=function(e){ if(!ui.trackEdit) return; ui.trackEdit.emoji=e; render(); };
+App.setTrackEditKind=function(k){ if(!ui.trackEdit) return; ui.trackEdit.kind=(['sarki','album','podcast'].indexOf(k)>=0)?k:'sarki'; if(!ui.trackEdit.emoji||['🎵','💿','🎙️'].indexOf(ui.trackEdit.emoji)>=0) ui.trackEdit.emoji=(k==='podcast'?'🎙️':(k==='album'?'💿':'🎵')); render(); };
+App.pickTrackGenre=function(g){ if(!ui.trackEdit) return; ui.trackEdit.genre=(ui.trackEdit.genre===g?'':g); render(); };
+App.saveTrack=function(){ if(!ui.trackEdit) return; var M=ensureMusic(); var x=ui.trackEdit; var title=String(x.title||'').trim(); if(!title){ toast('Adını yaz 🎵'); return; } if(x.id){ var ex=findTrack(x.id); if(ex){ ex.title=title.slice(0,120); ex.artist=String(x.artist||'').trim().slice(0,80); ex.kind=(['sarki','album','podcast'].indexOf(x.kind)>=0)?x.kind:'sarki'; ex.genre=String(x.genre||''); ex.emoji=x.emoji||'🎵'; normTrack(ex); } } else { var nx=normTrack({title:title,artist:String(x.artist||'').trim(),kind:x.kind,genre:String(x.genre||''),emoji:x.emoji}); M.items.unshift(nx); } ui.trackEdit=null; commit('Favorilere eklendi 🎵'); };
+App.deleteTrack=function(id){ var M=ensureMusic(); var i=M.items.findIndex(function(x){ return x&&x.id===id; }); if(i>=0){ M.items.splice(i,1); } ui.trackEdit=null; commit('Favori silindi'); };
+App.rateTrack=function(id,n){ var x=findTrack(id); if(!x) return; x.rating=(x.rating===n?null:n); commit(); };
+App.setListenGoal=function(field,el){ var M=ensureMusic(); var raw=el.value; debounceSave('listengoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); M.goal[field]=v; save(); render(); },500); };
+// ---- favori sözler ----
+App.openLyricAdd=function(itemId){ var M=ensureMusic(); if(!itemId){ itemId=(M.items[0]&&M.items[0].id)||''; } ui.lyricDraft={itemId:itemId,text:''}; render(); };
+App.closeLyricAdd=function(){ ui.lyricDraft=null; render(); };
+App.onLyricField=function(field,el){ if(!ui.lyricDraft) return; ui.lyricDraft[field]=el.value; };
+App.pickLyricTrack=function(id){ if(!ui.lyricDraft) return; ui.lyricDraft.itemId=id; render(); };
+App.saveLyric=function(){ if(!ui.lyricDraft) return; var x=findTrack(ui.lyricDraft.itemId); if(!x){ toast('Önce bir favori seç 🎵'); return; } var text=String(ui.lyricDraft.text||'').trim(); if(!text){ toast('Sözü yaz 💬'); return; } if(!Array.isArray(x.quotes)) x.quotes=[]; x.quotes.push({id:uid('lq'),text:text.slice(0,400),ts:new Date().toISOString()}); ui.lyricDraft=null; commit('Söz eklendi 💬'); };
+App.removeLyric=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var i=x.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ x.quotes.splice(i,1); commit('Söz silindi'); } };
+App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var q=x.quotes.find(function(z){return z&&z.id===qid;}); if(!q) return; App.copyQuote('“'+q.text+'”\n— '+x.title+(x.artist?', '+x.artist:'')); };
+
+// ================= ŞÜKRAN / 3 GÜZEL ŞEY (🙏) =================
+App.onGratitude=function(i,el){ var v=el.value; i=Number(i)||0; debounceSave('grat'+i,function(){ var day=curDay(); if(!Array.isArray(day.gratitude)) day.gratitude=[]; day.gratitude[i]=String(v||'').slice(0,160); day.savedAt=new Date().toISOString(); save(); },500); };
 
 
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.steps!=null&&day.walk.steps>=STEP_TICK_MIN&&!day.habits.walked20){ day.habits.walked20=true; toast('Adımınla yürüyüş tiki işaretlendi ✨'); } day.savedAt=new Date().toISOString(); save(); }); };
@@ -772,8 +835,8 @@ function render(){
   // acik kalan overlay'in scroll'unu yakala ki flash olmadan geri koyalim
   var prevOvBody=document.getElementById('sey-ov-body');
   var prevOvTop=prevOvBody?prevOvBody.scrollTop:0;
-  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':null);
-  var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):null);
+  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':null));
+  var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var html='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px;display:flex;flex-direction:column;gap:14px;">';
   if(editing()) html+=editBanner();
@@ -1013,6 +1076,8 @@ function bugunHTML(){
 
   h+='<button onclick="App.openWatching()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#C88F4C,#E0B080 52%,#E9AFC1);box-shadow:0 14px 30px rgba(200,143,76,0.4);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne izledim? 🎬</span></button>';
 
+  h+='<button onclick="App.openListening()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#0E9AA7,#2BC4C4 52%,#E9AFC1);box-shadow:0 14px 30px rgba(14,154,167,0.4);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne dinledim? 🎧</span></button>';
+
   // akşam nudge (yalnızca gece, okuma eklenmediyse)
   h+=eveningNudge(rec);
   }
@@ -1076,6 +1141,14 @@ function bugunHTML(){
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">'+(ed?'O gün kendine notun…':'Bugün kendime notum…')+'</div>';
   h+='<textarea oninput="App.onNote(this)" placeholder="Bugün kendime notum…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;">'+esc(rec?rec.note:'')+'</textarea>';
   h+='<div style="font-size:12px;color:var(--faint);line-height:1.5;">örn. \u201cTatlı isteği akşam geldi.\u201d \u00b7 \u201cYürüyüş iyi hissettirdi.\u201d \u00b7 \u201cBugün biraz zorlandım ama devam.\u201d</div></div>';
+
+  // şükran / 3 güzel şey
+  var gratArr=(rec&&Array.isArray(rec.gratitude))?rec.gratitude:[];
+  var gratPh=['örn. Sabah kahvem ☕','örn. Bir arkadaşın mesajı 💌','örn. Güneşli hava ☀️'];
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;background:linear-gradient(160deg,rgba(246,193,119,0.12),rgba(233,175,193,0.08));">';
+  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:22px;line-height:1;">🙏</span><div><div style="font-size:15.5px;font-weight:800;">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">Küçük de olsa minnet duyduğun 3 şey ✨</div></div></div>';
+  for(var gIdx=0;gIdx<3;gIdx++){ var gVal=(gratArr[gIdx]!=null)?gratArr[gIdx]:''; h+='<div style="display:flex;align-items:center;gap:9px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+(gIdx+1)+'</span><input type="text" value="'+esc(gVal)+'" oninput="App.onGratitude('+gIdx+',this)" placeholder="'+gratPh[gIdx]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14.5px;outline:none;"></div>'; }
+  h+='</div>';
 
   // dağıldı
   if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:15px;font-weight:600;color:var(--muted);">Bugün biraz dağıldı 🫠</button>';
@@ -1985,10 +2058,125 @@ function replicaAddModal(){
   return '<div onclick="App.closeReplicaAdd()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
 }
 
+// ================= NE DİNLEDİM HUB (overlay) =================
+var MUSIC_EMOJI=['🎵','💿','🎧','🎙️','🎸','🎹','🎤','🥁','🎻','🪕','🎺','🌙'];
+var MUSIC_GENRES=['Pop','Rock','Türkçe','Rap','Elektronik','Caz','Klasik','Akustik','Podcast','Film müziği'];
+var LISTEN_KINDS=[['sarki','🎵 Şarkı'],['album','💿 Albüm'],['podcast','🎙️ Podcast']];
+function listenKindMeta(k){ return (k==='podcast')?{label:'Podcast',emoji:'🎙️'}:(k==='album')?{label:'Albüm',emoji:'💿'}:{label:'Şarkı',emoji:'🎵'}; }
+function listeningOverlayHTML(){
+  var view=ui.listeningView||'today';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;">Ne dinledim? 🎧</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugün dinlediklerin, favorilerin ve akılda kalan sözler.</div></div><button onclick="App.closeListening()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);flex-shrink:0;">✕</button></div>';
+  var tabs=segTabs([['today','Bugün'],['favs','🎵 Favoriler'],['stats','📊 İstatistik'],['lyrics','💬 Sözler']],view,'App.setListeningView','listen');
+  var body='';
+  if(view==='today') body=listeningTodayView();
+  else if(view==='favs') body=listeningFavsView();
+  else if(view==='stats') body=listeningStatsView();
+  else if(view==='lyrics') body=listeningLyricsView();
+  var h=overlayShell('App.closeListening()', head+tabs, body);
+  if(ui.trackEdit) h+=trackEditModal();
+  if(ui.lyricDraft) h+=lyricAddModal();
+  return h;
+}
+function listeningTodayView(){
+  var d=ui.listeningDraft||{title:'',artist:'',kind:'sarki',minutes:'',note:''};
+  var kind=(['sarki','album','podcast'].indexOf(d.kind)>=0)?d.kind:'sarki';
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var lEntries=(day&&day.listening&&Array.isArray(day.listening.entries))?day.listening.entries:[];
+  var totMin=lEntries.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
+  var M=ensureMusic();
+  var goalMin=(M.goal&&M.goal.dailyMinutes)||0;
+  var h='';
+  if(goalMin>0){ var gp=Math.min(100,Math.round(totMin/goalMin*100)); h+='<div style="display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(14,154,167,0.10),rgba(233,175,193,0.12));border:1px solid var(--card-bd);border-radius:18px;padding:13px 15px;">'; h+='<div style="position:relative;width:52px;height:52px;flex-shrink:0;"><svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="rgba(150,110,120,0.16)" stroke-width="6"></circle><circle cx="26" cy="26" r="22" fill="none" stroke="#0E9AA7" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(2*Math.PI*22)+'" stroke-dashoffset="'+(2*Math.PI*22*(1-gp/100))+'" transform="rotate(-90 26 26)"></circle></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">'+gp+'%</div></div>'; h+='<div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:800;color:var(--text);">Günlük hedef · '+totMin+'/'+goalMin+' dk</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(totMin>=goalMin?'Bugünün müziği tamam 🎶':'Hedefe '+(goalMin-totMin)+' dk kaldı.')+'</div></div></div>'; }
+  var favs=M.items;
+  if(favs.length){ h+='<div><div style="font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:6px;letter-spacing:.3px;">FAVORİLERİMDEN</div><div style="display:flex;gap:7px;flex-wrap:wrap;">'; favs.slice(0,8).forEach(function(x){ var on=ui.logTrackId===x.id; h+='<button onclick="App.pickLogTrack(\''+esc(x.id)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:7px 11px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(on?'#fff':'var(--text2)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';display:flex;align-items:center;gap:5px;">'+x.emoji+' '+esc(x.title.length>18?x.title.slice(0,17)+'…':x.title)+'</button>'; }); h+='</div></div>'; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:18px;padding:14px;">';
+  h+='<div style="display:flex;gap:6px;">';
+  LISTEN_KINDS.forEach(function(kk){ var on=kind===kk[0]; h+='<button onclick="App.setListenDraftKind(\''+kk[0]+'\')" style="flex:1;border:1px solid '+(on?'var(--listen)':'var(--field-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:800;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--field)')+';">'+kk[1]+'</button>'; });
+  h+='</div>';
+  var titleLabel=kind==='podcast'?'Bölüm / podcast adı':(kind==='album'?'Albüm adı':'Şarkı adı');
+  var titlePh=kind==='podcast'?'örn. Söz Müzik #42':(kind==='album'?'örn. Random Access Memories':'örn. Bir Derdim Var');
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">'+titleLabel+'</div><input id="listening-title" type="text" value="'+esc(d.title||'')+'" oninput="App.onListeningField(\'title\',this)" placeholder="'+titlePh+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;"></div>';
+  h+='<div style="display:flex;gap:10px;"><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">'+(kind==='podcast'?'Yayıncı':'Sanatçı')+' <span style="color:var(--faint);font-weight:500;">(ops.)</span></div><input type="text" value="'+esc(d.artist||'')+'" oninput="App.onListeningField(\'artist\',this)" placeholder="'+(kind==='podcast'?'örn. Podbee':'örn. MFÖ')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;"></div>';
+  h+='<div style="width:104px;flex-shrink:0;"><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(d.minutes!=null&&d.minutes!==''?esc(d.minutes):'')+'" oninput="App.onListeningField(\'minutes\',this)" placeholder="'+(kind==='podcast'?'45':'20')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:15px;outline:none;text-align:center;"></div></div>';
+  h+='<div><div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;">Not <span style="color:var(--faint);font-weight:500;">(isteğe bağlı)</span></div><textarea rows="2" oninput="App.onListeningField(\'note\',this)" placeholder="Ruh hâline nasıl dokundu…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;resize:none;line-height:1.45;">'+esc(d.note||'')+'</textarea></div>';
+  h+='<button onclick="App.addListening()" style="border:none;cursor:pointer;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4 55%,#E9AFC1);box-shadow:0 10px 24px rgba(14,154,167,0.34);">Dinlemeyi kaydet 🎧</button>';
+  h+='</div>';
+  if(lEntries.length>0){
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+lEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
+    lEntries.slice().reverse().forEach(function(e){ var meta=[]; var km=listenKindMeta(e.kind); meta.push(km.label); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTrack(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:18px;line-height:1.2;">'+(linked?linked.emoji:km.emoji)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--listen);font-weight:700;">· favori</span>':'')+'</div>'+(e.artist?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.artist)+'</div>':'')+'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>'+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeListening(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:13px;">🗑️</button></div>'; });
+    h+='</div>';
+  } else {
+    h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için dinleme eklemedin. Bir şarkı bile sayılır 🎶</div>';
+  }
+  return h;
+}
+function trackCard(x){
+  var km=listenKindMeta(x.kind); var meta=[km.label]; if(x.artist) meta.push(esc(x.artist)); if(x.genre) meta.push(esc(x.genre));
+  var h='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="display:flex;align-items:flex-start;gap:11px;"><div style="width:44px;height:44px;border-radius:12px;background:var(--icon);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">'+x.emoji+'</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:var(--text);">'+esc(x.title)+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+meta.join(' · ')+'</div></div>';
+  h+='<button onclick="App.openTrackEdit(\''+esc(x.id)+'\')" aria-label="Düzenle" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:30px;height:30px;border-radius:9px;color:var(--muted);font-size:14px;">✏️</button></div>';
+  h+=starRow(x.rating,'App.rateTrack',x.id,17);
+  return h+'</div>';
+}
+function listeningFavsView(){
+  var M=ensureMusic();
+  var h='<button onclick="App.openTrackEdit(\'\')" style="border:1px dashed var(--listen);cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--listen);background:rgba(14,154,167,0.08);">＋ Favori ekle</button>';
+  var items=M.items.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
+  if(!items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Favori listen henüz boş 🎵<br>Sevdiğin şarkı, albüm ya da podcast’i ekle; burada birer birer birikssin.</div>'; return h; }
+  function sec(title,arr){ if(!arr.length) return ''; var s='<div style="font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;margin:4px 2px 0;">'+title+' ('+arr.length+')</div>'; arr.forEach(function(x){ s+=trackCard(x); }); return s; }
+  var sarki=items.filter(function(x){return x.kind==='sarki';}),album=items.filter(function(x){return x.kind==='album';}),pod=items.filter(function(x){return x.kind==='podcast';});
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">'+sec('ŞARKILAR',sarki)+sec('ALBÜMLER',album)+sec('PODCASTLER',pod)+'</div>';
+  return h;
+}
+function listeningStatsView(){
+  var M=ensureMusic(); var s=musicStats(); var t=listenTotals(); var streak=listenStreak(); var week=weekListen();
+  var goalMin=(M.goal&&M.goal.dailyMinutes)||0;
+  var h='<div style="display:flex;gap:9px;">'+statTile('Favori',s.total,'parça')+statTile('Dinleme günü',t.days)+statTile('Seri',streak,'gün 🔥')+'</div>';
+  h+='<div style="display:flex;gap:9px;">'+statTile('Toplam süre',fmtDur(t.minutes))+statTile('Kayıt',t.items)+statTile('Podcast',s.podcast)+'</div>';
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:10px;">Son 7 gün · dakika</div>'+miniBars(week,'minutes','dk','linear-gradient(180deg,#2BC4C4,#0E9AA7)')+'</div>';
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);">🎯 Hedef</div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--text2);flex:1;">Günlük dinleme hedefi (dk)</span><input type="number" inputmode="numeric" min="0" value="'+(goalMin||'')+'" oninput="App.setListenGoal(\'dailyMinutes\',this)" placeholder="30" style="width:74px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px;font-size:14px;text-align:center;outline:none;"></div>';
+  h+='</div>';
+  return h;
+}
+function listeningLyricsView(){
+  var qs=allLyrics(); var M=ensureMusic();
+  var h='<button onclick="App.openLyricAdd(\'\')" '+(M.items.length?'':'disabled ')+'style="border:1px dashed var(--listen);cursor:'+(M.items.length?'pointer':'not-allowed')+';width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--listen);background:rgba(14,154,167,0.08);opacity:'+(M.items.length?'1':'0.5')+';">＋ Söz ekle</button>';
+  if(!M.items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:16px 10px;">Söz eklemek için önce favorilerine bir parça ekle 🎵</div>'; return h; }
+  if(!qs.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz söz yok 💬<br>İçine işleyen o dizeyi buraya bırak.</div>'; return h; }
+  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  qs.forEach(function(o){ var q=o.q; h+='<div style="background:linear-gradient(135deg,rgba(14,154,167,0.08),rgba(233,175,193,0.09));border:1px solid var(--card-bd);border-radius:16px;padding:14px;position:relative;">'; h+='<div style="position:absolute;top:2px;right:12px;font-size:44px;color:var(--faint);opacity:0.25;line-height:1;">”</div>'; h+='<div style="font-size:14px;line-height:1.5;color:var(--text);font-style:italic;position:relative;">'+esc(q.text)+'</div>'; h+='<div style="display:flex;align-items:center;gap:8px;margin-top:9px;"><span style="font-size:11.5px;color:var(--muted);flex:1;">'+o.emoji+' '+esc(o.title)+(o.artist?' · '+esc(o.artist):'')+'</span>'; h+='<button onclick="App.copyLyricById(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--muted);font-size:12px;">📋</button>'; h+='<button onclick="App.removeLyric(\''+esc(o.itemId)+'\',\''+esc(q.id)+'\')" style="border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);font-size:12px;">🗑️</button></div></div>'; });
+  h+='</div>';
+  return h;
+}
+function trackEditModal(){
+  var x=ui.trackEdit; var isNew=!x.id; var kind=(['sarki','album','podcast'].indexOf(x.kind)>=0)?x.kind:'sarki';
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">'+(isNew?'Favori ekle 🎵':'Favoriyi düzenle')+'</div><button onclick="App.closeTrackEdit()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="display:flex;gap:6px;">'; LISTEN_KINDS.forEach(function(kk){ var on=kind===kk[0]; inner+='<button onclick="App.setTrackEditKind(\''+kk[0]+'\')" style="flex:1;border:1px solid '+(on?'var(--listen)':'var(--field-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:800;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--field)')+';">'+kk[1]+'</button>'; }); inner+='</div>';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; MUSIC_EMOJI.forEach(function(e){ var on=x.emoji===e; inner+='<button onclick="App.pickTrackEmoji(\''+e+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;width:38px;height:38px;border-radius:11px;font-size:19px;background:'+(on?'rgba(14,154,167,0.14)':'var(--card)')+';">'+e+'</button>'; }); inner+='</div>';
+  inner+='<input type="text" value="'+esc(x.title||'')+'" oninput="App.onTrackEditField(\'title\',this)" placeholder="Ad (şarkı / albüm / podcast)" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:15px;outline:none;">';
+  inner+='<input type="text" value="'+esc(x.artist||'')+'" oninput="App.onTrackEditField(\'artist\',this)" placeholder="Sanatçı / yayıncı" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;">';
+  inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; MUSIC_GENRES.forEach(function(g){ var on=x.genre===g; inner+='<button onclick="App.pickTrackGenre(\''+esc(g)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:11.5px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';">'+esc(g)+'</button>'; }); inner+='</div>';
+  inner+='<button onclick="App.saveTrack()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4);">Kaydet</button>';
+  if(!isNew) inner+='<button onclick="App.deleteTrack(\''+esc(x.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:13px;font-weight:700;color:var(--drop);background:var(--card);">Sil</button>';
+  return '<div onclick="App.closeTrackEdit()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+function lyricAddModal(){
+  var M=ensureMusic(); var dr=ui.lyricDraft||{itemId:'',text:''};
+  var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:17px;font-weight:800;">Söz ekle 💬</div><button onclick="App.closeLyricAdd()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);">✕</button></div>';
+  inner+='<div style="font-size:12px;font-weight:700;color:var(--muted);">Parça</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'; M.items.forEach(function(x){ var on=dr.itemId===x.id; inner+='<button onclick="App.pickLyricTrack(\''+esc(x.id)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:7px 10px;border-radius:11px;font-size:12px;font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';">'+x.emoji+' '+esc(x.title.length>16?x.title.slice(0,15)+'…':x.title)+'</button>'; }); inner+='</div>';
+  inner+='<textarea rows="4" oninput="App.onLyricField(\'text\',this)" placeholder="İçine işleyen o dize…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;resize:none;line-height:1.5;">'+esc(dr.text||'')+'</textarea>';
+  inner+='<button onclick="App.saveLyric()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4 55%,#E9AFC1);">Kaydet 💬</button>';
+  return '<div onclick="App.closeLyricAdd()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+}
+
 function modalsHTML(){
   var h='';
   if(ui.readingOpen){ h+=readingOverlayHTML(); }
   if(ui.watchOpen){ h+=watchOverlayHTML(); }
+  if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Tamam, devam ✨</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';

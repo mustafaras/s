@@ -23,6 +23,7 @@
     --amber:#fbbf24;--aa:rgba(251,191,36,.10);--ab:rgba(251,191,36,.22);
     --red:#fb7185;--ra:rgba(251,113,133,.10);--rb:rgba(251,113,133,.22);
     --purple:#a78bfa;--pa:rgba(167,139,250,.10);--pb:rgba(167,139,250,.22);
+    --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
     --fk:38px;   /* kpi number */
@@ -571,6 +572,49 @@ function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.se
 function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
 function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
 
+function wxP(code,isDay){
+  var c=Number(code);
+  if(c===0) return {e:isDay?'☀️':'🌙',l:isDay?'Açık':'Açık gece'};
+  if(c===1) return {e:isDay?'🌤️':'🌙',l:'Az bulutlu'};
+  if(c===2) return {e:'⛅',l:'Parçalı bulutlu'};
+  if(c===3) return {e:'☁️',l:'Bulutlu'};
+  if(c===45||c===48) return {e:'🌫️',l:'Sisli'};
+  if(c>=51&&c<=57) return {e:'🌦️',l:'Çiseli'};
+  if(c>=61&&c<=67) return {e:'🌧️',l:'Yağmurlu'};
+  if(c>=71&&c<=77) return {e:'❄️',l:'Karlı'};
+  if(c>=80&&c<=82) return {e:'🌧️',l:'Sağanak'};
+  if(c>=85&&c<=86) return {e:'🌨️',l:'Kar sağanağı'};
+  if(c>=95) return {e:'⛈️',l:'Gök gürültülü'};
+  return {e:'🌡️',l:'—'};
+}
+function weatherCardHTML(){
+  var wx=D&&D.weather?D.weather:null;
+  var spots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
+  var s='<div class="card lift span-12 pad">';
+  var upd='';
+  if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
+  s+='<div class="lbl">☀️ Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
+  if(!spots){ s+='<div class="empty" style="flex:1;"><span class="ei">🌤️</span>Hava verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama Bugün ekranında açıldığında gelir</span></div></div>'; return s; }
+  s+='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+  for(var i=0;i<spots.length;i++){
+    var sp=spots[i]; var m=wxP(sp.code,sp.isDay);
+    s+='<div style="flex:1;min-width:190px;background:var(--bd2);border:1px solid var(--bd);border-radius:14px;padding:13px 15px;">';
+    s+='<div style="display:flex;align-items:center;gap:9px;">';
+    s+='<span style="font-size:30px;line-height:1;">'+m.e+'</span>';
+    s+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f2);font-weight:800;color:var(--t2);">'+esc(sp.emoji+' '+sp.label)+(sp.place?' · '+esc(sp.place):'')+'</div><div style="font-size:var(--f3);color:var(--t3);font-weight:600;">'+esc(m.l)+'</div></div>';
+    s+='<div style="font-size:26px;font-weight:800;color:var(--gold);line-height:1;">'+(sp.temp!=null?sp.temp+'°':'—')+'</div>';
+    s+='</div>';
+    s+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:var(--f3);color:var(--t3);font-weight:600;">';
+    s+='<span>🌡️ '+(sp.feels!=null?sp.feels+'°':'—')+'</span>';
+    s+='<span>💧 %'+(sp.hum!=null?sp.hum:'—')+'</span>';
+    s+='<span>💨 '+(sp.wind!=null?sp.wind+' km/sa':'—')+'</span>';
+    s+='<span>🔆 UV '+(sp.uv!=null?sp.uv:'—')+'</span>';
+    if(sp.hi!=null) s+='<span>↕️ '+sp.hi+'°/'+sp.lo+'°</span>';
+    s+='</div></div>';
+  }
+  s+='</div></div>';
+  return s;
+}
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   var opened=lastOpenedAt();
@@ -702,6 +746,9 @@ function render(){
   h+=msgCardHTML();
   h+=lunaCardHTML();
 
+  // Günışığı hava durumu (uygulama Bugün ekranından senkronlanır)
+  h+=weatherCardHTML();
+
   // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
 
   // Map card
@@ -815,10 +862,23 @@ function render(){
   if(wtEps>0) wtBits.push(wtEps+" bölüm");
   if(wtMins>0) wtBits.push(wtMins+" dk");
   exRows+=exRowAlways("⏱️ Süre", wtBits.join(" · "));
+  // Dinleme (listening): bugün dinlenen şarkı/albüm/podcast + dk
+  var lsEn=(srec.listening&&Array.isArray(srec.listening.entries))?srec.listening.entries:[];
+  var LKIND={sarki:'Şarkı',album:'Albüm',podcast:'Podcast'};
+  var lsTitles=lsEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; var kind=LKIND[e&&e.kind]||'Şarkı'; return esc(t)+(e&&e.artist?' <span style="color:var(--t4);font-weight:600;">— '+esc(String(e.artist).trim())+'</span>':'')+' <span style="color:var(--t4);font-weight:600;">('+kind+')</span>'; }).filter(Boolean);
+  exRows+=exRowAlways("🎧 Dinleme", lsTitles.join(" · "));
+  var lsBits=[];
+  var lsMins=lsEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
+  if(lsEn.length>0) lsBits.push(lsEn.length+" kayıt");
+  if(lsMins>0) lsBits.push(lsMins+" dk");
+  exRows+=exRowAlways("🎵 Süre", lsBits.join(" · "));
+  // Şükran (gratitude): bugünün güzel şeyleri
+  var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
+  exRows+=exRowAlways("🙏 Şükran", grEn.map(function(g){return esc(g);}).join(" · "));
   h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>';
   // ── Bugünün okuma & izleme kayıtları (not dahil tüm detay) ──
-  if(rdEn.length>0 || wtEn.length>0){
-    h+='<div class="divider"></div><div class="lbl">🎞️ Okuma & İzleme Kayıtları</div>';
+  if(rdEn.length>0 || wtEn.length>0 || lsEn.length>0){
+    h+='<div class="divider"></div><div class="lbl">🎞️ Okuma & İzleme & Dinleme Kayıtları</div>';
     h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
     rdEn.forEach(function(e){
       var meta=[]; var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) meta.push(p+' sayfa'); var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
@@ -838,9 +898,29 @@ function render(){
         +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
         +'</div>';
     });
+    lsEn.forEach(function(e){
+      var kind=LKIND[e&&e.kind]||'Şarkı'; var kEmo=(e&&e.kind==='podcast')?'🎙️':((e&&e.kind==='album')?'💿':'🎵'); var meta=[]; var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
+      h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--teal);padding:8px 11px;">'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">'+kEmo+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +((e&&e.artist)?'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+esc(String(e.artist).trim())+'</span>':'')
+        +'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+kind+'</span>'
+        +(meta.length?'<span style="color:var(--teal);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
+        +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
+        +'</div>';
+    });
     h+='</div>';
   }
-  // ── Fiziksel rahatsızlık (gün) — veri olmasa da her zaman görünür ──
+  // ── Bugünün 3 güzel şeyi (şükran) ──
+  if(grEn.length>0){
+    h+='<div class="divider"></div><div class="lbl">🙏 Bugünün 3 Güzel Şeyi</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
+    grEn.forEach(function(g,i){
+      h+='<div style="display:flex;align-items:center;gap:9px;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--amber);padding:8px 11px;">'
+        +'<span style="width:20px;height:20px;flex-shrink:0;border-radius:50%;background:var(--amber);color:#3a2a10;font-size:var(--f1);font-weight:800;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span>'
+        +'<span style="color:var(--t1);font-size:var(--f3);line-height:1.4;word-break:break-word;">'+esc(g)+'</span></div>';
+    });
+    h+='</div>';
+  }
   var dz=(srec.discomfort&&typeof srec.discomfort==='object')?srec.discomfort:null;
   var dzRegs=dz&&dz.regions?Object.keys(dz.regions).filter(function(k){return dz.regions[k]&&dz.regions[k].level>0;}):[];
   var dzMeds=dz&&Array.isArray(dz.meds)?dz.meds.filter(function(m){return m&&(m.name||m.dose||m.time);}):[];
@@ -1069,12 +1149,44 @@ function render(){
     wh+='</div></div>';
     h+=wh;
 
+    // ---- Dinleme Arşivi (müzik favorileri) ----
+    var MUS=(D&&D.music&&Array.isArray(D.music.items))?D.music.items:[];
+    function trackRow(x){
+      var kindLbl={sarki:'Şarkı',album:'Albüm',podcast:'Podcast'}[x.kind]||'Şarkı';
+      var meta=[kindLbl]; if(x.artist) meta.push(esc(String(x.artist).trim())); if(x.genre) meta.push(esc(String(x.genre).trim()));
+      var qn=(Array.isArray(x.quotes)?x.quotes.length:0);
+      var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
+      s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
+      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(x.emoji||'🎵')+'</span>';
+      s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(x.title||'').trim())+'</b>'+chip(kindLbl,'var(--teal)')+'</div>';
+      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      s+='</div>'+(x.rating?stars(x.rating):'')+'</div>';
+      return s+'</div>';
+    }
+    var musSong=MUS.filter(function(x){return x.kind==='sarki';}).length;
+    var musAlbum=MUS.filter(function(x){return x.kind==='album';}).length;
+    var musPod=MUS.filter(function(x){return x.kind==='podcast';}).length;
+    var lMin=0; for(var dk3 in D.days){ var rr3=D.days[dk3]; var en3=(rr3&&rr3.listening&&Array.isArray(rr3.listening.entries))?rr3.listening.entries:[]; en3.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) lMin+=m; }); }
+    var lHours=lMin>=60?(Math.floor(lMin/60)+' sa'+(lMin%60?' '+(lMin%60)+' dk':'')):(lMin+' dk');
+    var mh='<div class="card lift span-6 pad"><div class="lbl">🎧 Dinleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+MUS.length+' parça</span></div>';
+    mh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--teal);">'+musSong+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Şarkı</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+musAlbum+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Albüm</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--pink);">'+musPod+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Podcast</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+esc(lHours)+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Süre</div></div>'
+      +'</div>';
+    mh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    mh+= MUS.length? MUS.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }).map(trackRow).join('') : '<div class="empty"><span class="ei">🎧</span>Dinleme arşivi boş</div>';
+    mh+='</div></div>';
+    h+=mh;
+
     // ---- Alıntılar & Replikler ----
     var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',emoji:b.emoji||'📖',title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
     var reps=[]; WL.forEach(function(t){ (Array.isArray(t.quotes)?t.quotes:[]).forEach(function(q){ reps.push({kind:'title',emoji:t.emoji||'🎬',title:t.title,text:q.text,ts:q.ts,col:'var(--amber)'}); }); });
-    var allq=quotes.concat(reps).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
+    var lyr=[]; MUS.forEach(function(x){ (Array.isArray(x.quotes)?x.quotes:[]).forEach(function(q){ lyr.push({kind:'track',emoji:x.emoji||'🎵',title:String(x.title||'').trim()+(x.artist?' — '+String(x.artist).trim():''),text:q.text,ts:q.ts,col:'var(--teal)'}); }); });
+    var allq=quotes.concat(reps).concat(lyr).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
     if(allq.length){
-      var qh='<div class="card lift span-12 pad"><div class="lbl">💬 Alıntılar & Replikler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik</span></div>';
+      var qh='<div class="card lift span-12 pad"><div class="lbl">💬 Alıntılar · Replikler · Sözler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span></div>';
       qh+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px;">';
       allq.forEach(function(q){
         qh+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'

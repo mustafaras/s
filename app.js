@@ -763,8 +763,8 @@ function reportHTML(){
   var range=shortDate(data.startDate)+' – '+shortDate(todayStr());
   var h='';
   h+='<div style="text-align:center;padding:30px 0 24px;border-bottom:2px solid #F2E1DA;margin-bottom:26px;">';
-  h+='<div style="font-size:34px;font-weight:800;">Şeyma 🦩</div>';
-  h+='<div style="font-size:16px;color:#7A6B70;margin-top:6px;">Minik Denge Günlüğü</div>';
+  h+='<div style="font-size:34px;font-weight:800;">Günışığı ☀️</div>';
+  h+='<div style="font-size:16px;color:#7A6B70;margin-top:6px;">Minik Denge Günlüğü 🦩</div>';
   h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
   h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
   h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Özet</div>';
@@ -885,9 +885,9 @@ function render(){
 function onboardingHTML(){
   return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 28px);gap:22px;animation:seyFade .3s ease;">'
    +'<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">'
-   +'<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 12px 30px rgba(233,175,193,0.4);">🦩</div>'
-   +'<h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.5px;">Şeyma 🦩</h1>'
-   +'<div style="font-size:16px;color:var(--muted);">Minik Denge Günlüğü</div></div>'
+   +'<div style="width:82px;height:82px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,var(--sun),#FFD98A 45%,#F7DDE5);box-shadow:0 14px 34px var(--sun-glow);">☀️</div>'
+   +'<h1 style="margin:0;font-size:34px;font-weight:900;letter-spacing:-0.3px;background:linear-gradient(120deg,var(--sun),var(--sun2) 55%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--sun2);">Günışığı</h1>'
+   +'<div style="font-size:16px;color:var(--muted);">Minik Denge Günlüğü 🦩</div></div>'
    +'<div class="glass" style="border-radius:26px;padding:24px;box-shadow:0 10px 30px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:14px;">'
    +'<p style="margin:0;font-size:19px;font-weight:700;">Hoş geldin Sevgili Günışığı ☀️</p>'
    +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Burası diyet kampı değil. Burası tatlı krizlerinin hafifçe hizaya geldiği, akşam mutfağının biraz daha az ziyaret edildiği, senin de kendine daha iyi davrandığın minik bir alan.</p>'
@@ -1053,9 +1053,10 @@ function bugunHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   if(!ed){ h+=saveBanner(); h+=locationCardHTML(); }
   // hero
-  h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-  h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
+  h+='<div class="glass" style="position:relative;overflow:hidden;border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
+  h+='<div style="position:absolute;top:-46px;right:-34px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 62% 42%,var(--sun-glow),transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:relative;display:flex;justify-content:space-between;align-items:flex-start;">';
+  h+='<div><div style="display:flex;align-items:center;gap:7px;"><span style="font-size:20px;line-height:1;filter:drop-shadow(0 2px 7px var(--sun-glow));">☀️</span><span style="font-size:22px;font-weight:900;letter-spacing:0.3px;background:linear-gradient(120deg,var(--sun),var(--sun2) 55%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--sun2);">Günışığı</span><span style="font-size:15px;line-height:1;">🦩</span></div><div style="font-size:13px;color:var(--muted);margin-top:4px;letter-spacing:.2px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:8px;"><button onclick="App.toggleTheme()" aria-label="Tema" style="border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(201,184,255,0.22);color:var(--choc);">'+(dark?'☀️':'🌙')+'</button>';
   h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;white-space:nowrap;">Gün '+curIdx+(!ed&&streak>1?' · 🔥'+streak:'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';

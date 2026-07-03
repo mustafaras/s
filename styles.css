@@ -36,6 +36,8 @@
     --drop:#B0714E; --drop-bg:rgba(200,150,90,0.16);
     --pause:#8A7BB0; --pause-bg:rgba(138,123,176,0.16);
     --warn:#E5484D; --warn-glow:rgba(229,72,77,0.5);
+    /* Günışığı (marka) teması — gün doğumu / sıcak ışık */
+    --sun:#F5A623; --sun2:#F5844E; --sun-glow:rgba(255,193,105,0.42);
     color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
   }
@@ -55,6 +57,8 @@
     --drop:#E0A264; --drop-bg:rgba(224,162,100,0.20);
     --pause:#B9A6E6; --pause-bg:rgba(185,166,230,0.20);
     --warn:#FF6B6B; --warn-glow:rgba(255,107,107,0.55);
+    /* Günışığı (marka) teması — koyu tema, daha sıcak parıltı */
+    --sun:#FFC15E; --sun2:#FF9D57; --sun-glow:rgba(255,180,95,0.30);
   }
   .glass{background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-bd);}
   .scroll{-webkit-overflow-scrolling:touch;}

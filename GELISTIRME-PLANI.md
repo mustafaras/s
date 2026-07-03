@@ -31,7 +31,7 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 6 | 🧠 Düşünce kaydı (CBT) | 2 | ❌ | `thoughts` yok |
 | 7 | 🌬️ Nefes / meditasyon | 2 | 🟡 | Veri modeli var (`WIND_DOWN_STEPS` "4-7-8 nefes", `emptyWindDown`); rehberli animasyon/UI bağlı değil |
 | 8 | ✍️ Serbest günlük | 2 | ❌ | Ayrı journaling yok; yalnızca günlük `note` alanı var |
-| 9 | 🎯 Günün niyeti | 2 | ❌ | `intention` yok |
+| 9 | 🎯 Günün niyeti | 2 | ✅ | `App.onIntention` + `data.days[].intention` (≤140); Bugün kartı "Bugünün niyeti" (geçmiş günde "O günün niyeti", düzenlenebilir); gün-detayı popup'ında "🎯 Niyet"; panel `exRowAlways("🎯 Niyet", …)`; `daysTracked` sinyali (2026-07-04) |
 | 10 | 🩸 Döngü tahmini & faz | 2 | ✅ | `cycleHTML` + faz hesabı + sonraki regl/ovülasyon/doğurganlık |
 | 11 | 💊 İlaç hatırlatıcı & uyum | 2 | 🟡 | Uyku ilacı türü + ağrı kesici log var; saatli liste + uyum % (`data.meds`) yok |
 | 12 | 🔔 PWA bildirimler | 3 | ❌ | service worker / Notification yok |
@@ -42,11 +42,11 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 17 | 📮 Haftalık özet | 3 | 🟡 | Rapor'da 3 haftalık blok/istatistik var; paylaşılabilir "bu hafta" kartı + panel bölümü yok |
 | 18 | 💌 "İyiyim" dokunuşu | 3 | ❌ | — |
 | 19 | 💬 Günün alıntısı | 3 | ❌ | "Günün Mesajı" (DAILY) var ama kütüphane alıntısı değil |
-| 20 | 🕯️ Bugün 1 yıl önce | 3 | ❌ | — |
+| 20 | 🕯️ Bugün 1 yıl önce | 3 | ✅ | `onThisDayCard()` → Bugün ekranında salt-okunur "Bugün, N yıl önce" kartı (mod/tik/niyet/not/şükran + "O günü aç →" → `App.openDate`); panel `exRowAlways("🕯️ Bir yıl önce", …)`; yeni veri yok, `data.days`'ten okur (2026-07-04) |
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
-| 22 | 📳 Haptik + mikro animasyon | 3 | 🟡 | Mikro animasyon var (confetti/seyFade/toast); `navigator.vibrate` yok |
+| 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
 
-**Sayım:** ✅ 8 · 🟡 4 · ❌ 10 _(+ altyapı ✅)_
+**Sayım:** ✅ 11 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 
@@ -249,6 +249,24 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-04** — **#9 🎯 Günün niyeti + #20 🕯️ Bugün 1 yıl önce + #22 📳 Haptik ✅** (üçü birlikte):
+  - **#9 Günün niyeti:** Bugün ekranında "Günün Mesajı"nın hemen altına warm cam kart
+    (`data.days[].intention`, ≤140 karakter, `App.onIntention` + `debounceSave`). Başlık
+    bugün "Bugünün niyeti" / geçmiş günde "O günün niyeti"; geçmiş gün güvenli düzenlemeye
+    bağlı (`curDay()`). Gün-detayı popup'ında "🎯 Niyet:" bloğu; `daysTracked` sinyaline
+    eklendi. Panel'de `exRowAlways("🎯 Niyet", …)` (gün-detayının ilk satırı).
+  - **#20 Bugün 1 yıl önce:** `onThisDayCard()` → Bugün ekranında salt-okunur nostalji kartı
+    ("Bugün, N yıl önce"): geçmiş yılların aynı gününden en yakını (mod/tik/niyet/not/şükran)
+    + "O günü aç →" (`App.openDate`). Yeni veri yok, `data.days`'ten okur. Panel'de
+    `exRowAlways("🕯️ Bir yıl önce", …)` (Şükran'ın altında).
+  - **#22 Haptik:** `haptic()` helper → `navigator.vibrate` (tik/mod/SOS dokunuşlarında);
+    Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık).
+    Panel yansıması yok (cihaza özel).
+  - index cache-bust `v=20260704f` → `v=20260704g`. Doğrulama: `files/feat-shot.js`
+    (60-66: bugun açık/koyu, niyet kartı + kalıcılık, on-this-day kartı, popup, Ayarlar
+    haptik) + `files/feat-panel.js` (67: panel Niyet/Bir yıl önce satırları) — niyet
+    yazılıp localStorage'a düştü, on-this-day + popup + panel satırları render oldu,
+    gerçek JS hatası yok (panelde yalnız benign 404).
 - **2026-07-04** — **#4 🗓️ Ruh hali ısı haritası ✅**: Rapor sekmesine "Mod dağılımı"nın
   hemen altına **GitHub-tarzı yıllık mod ısı haritası** eklendi (`moodHeatmapCard()`).
   ‹yıl› seçici (veri başlangıcı → bugün arası), yatay kaydırılabilir 7×hafta grid

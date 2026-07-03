@@ -155,7 +155,7 @@ try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e)
 if(data) data=migrate(data);
 function migrate(d){
   if(!d) return d;
-  if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false};
+  if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true};
   if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
   if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
   if(typeof d.settings.ghBranch!=='string') d.settings.ghBranch='';
@@ -271,7 +271,7 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
@@ -338,7 +338,7 @@ function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=m
 function moodEmoji(id){ var o=find(MOODS,'id',id); return o?o.emoji:''; }
 function find(arr,key,val){ for(var i=0;i<arr.length;i++){ if(arr[i][key]===val) return arr[i]; } return null; }
 function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<4) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ if(countRec(data.days[date])>=4){ c++; date=addDays(date,-1); } else break; } return c; }
-function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
+function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
 function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRepo); }
 function savedToday(){ return data.lastSyncDate===todayStr(); }
 function saveBanner(){
@@ -361,6 +361,8 @@ function editBanner(){
 window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; }); if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; }); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
 function commit(msg){ save(); render(); if(msg) toast(msg); }
+// Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
+function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
 
 function interp(sweet,walk,evening){
   if(sweet>=5) return 'Tatlı kontrolünde ritim oluşuyor. Kavga değil, yönetim.';
@@ -396,13 +398,13 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
   var date=activeDate(), idx=dayIndexFor(date), day=getDay(data,date,idx);
-  var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day);
+  var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day); haptic(14);
   ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   var msg='Kaydedildi ✨'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
   commit(msg);
@@ -411,8 +413,10 @@ App.toggleHabit=function(key){
   else if(day.habits[key]){ maybeStreak(); }
 };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor ✨',7:'7 gün. Bu artık tesadüf değil ☀️',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir 🍫',21:'21 gün! İlk büyük eşik 👑',30:'30 gün. Bir ay kesintisiz, bu ciddi iş 🌟',50:'50 gün. Yarım yüz, tam disiplin 💪',100:'100 gün! Üç haneye geçtin 🏆',200:'200 gün. Efsane modu 🔥',365:'365 gün. Tam bir yıl 👑✨'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
-App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); commit(); };
+App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); haptic(14); commit(); };
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; save(); },500); };
+App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(); },500); };
+App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.settings.haptics=!!on; if(on) haptic(18); save(); render(); };
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); save(); },500); };
 
 // ---- öğün detay (tabak/gr/adet) ----
@@ -641,7 +645,7 @@ App.quickDiscomfortMed=function(i){ var day=curDay(); if(!day.discomfort) day.di
 App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed-'+idx+'-'+field,function(){ var day=curDay(); var m=day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]; if(!m) return; m[field]=v; day.savedAt=new Date().toISOString(); save(); },350); };
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
-App.goSos=function(){ App.go('sos'); };
+App.goSos=function(){ haptic([16,40,16]); App.go('sos'); };
 
 App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
 App.toggleSosTrigger=function(id){ var i=ui.sosTriggers.indexOf(id); if(i>=0) ui.sosTriggers.splice(i,1); else ui.sosTriggers.push(id); render(); };
@@ -664,7 +668,7 @@ App.openDate=function(date){
   var mealsList=[]; if(rec&&rec.meals){ MEALS.forEach(function(m){ if(rec.meals[m.key]&&String(rec.meals[m.key]).trim()) mealsList.push({label:m.label,icon:m.icon,text:String(rec.meals[m.key])}); }); }
   var flowO=rec&&rec.flow?find(FLOW,'id',rec.flow):null;
   var symsList=(rec&&rec.symptoms||[]).map(function(id){ var s=find(SYMPTOMS,'id',id); return s?s.emoji+' '+s.label:id; });
-  ui.dayDetail={date:date,isToday:(date===todayStr()),title:(idx>=1?'Gün '+idx:shortDate(date)),dateLabel:shortDate(date),status:status,habits:habits,moodLabel:mood?mood.label:'—',sosCount:rec?(rec.cravingSOSCount||0):0,note:(rec&&rec.note)||'',hasNote:!!(rec&&rec.note),
+  ui.dayDetail={date:date,isToday:(date===todayStr()),title:(idx>=1?'Gün '+idx:shortDate(date)),dateLabel:shortDate(date),status:status,habits:habits,moodLabel:mood?mood.label:'—',sosCount:rec?(rec.cravingSOSCount||0):0,note:(rec&&rec.note)||'',hasNote:!!(rec&&rec.note),intention:(rec&&rec.intention)||'',hasIntention:!!(rec&&rec.intention&&String(rec.intention).trim()),gratitude:(rec&&Array.isArray(rec.gratitude))?rec.gratitude.filter(function(g){return String(g||'').trim();}):[],
     sleepH:(sl.hours!=null?sl.hours:null),steps:(wk.steps!=null?wk.steps:null),mins:(wk.minutes!=null?wk.minutes:null),meals:mealsList,flow:flowO?flowO.label:null,syms:symsList};
   render();
 };
@@ -1192,6 +1196,33 @@ function weatherHeaderHTML(greet){
   h+='</div>';
   return h;
 }
+function onThisDayCard(){
+  var today=todayStr(); var mmdd=today.slice(5); var curY=parseInt(today.slice(0,4),10);
+  var best=null;
+  for(var k in data.days){ if(String(k).slice(5)!==mmdd) continue; var y=parseInt(String(k).slice(0,4),10); if(isNaN(y)||y>=curY) continue; var r=data.days[k]; if(!r) continue;
+    var hasG=Array.isArray(r.gratitude)&&r.gratitude.some(function(g){return String(g||'').trim();});
+    var has=(countRec(r)>0)||r.mood||(r.note&&String(r.note).trim())||(r.intention&&String(r.intention).trim())||hasG;
+    if(!has) continue;
+    if(!best||k>best.date){ best={date:k,rec:r,year:y}; }
+  }
+  if(!best) return '';
+  var r=best.rec; var yearsAgo=curY-best.year;
+  var mo=r.mood?find(MOODS,'id',r.mood):null;
+  var cnt=countRec(r), tot=habitCountOn(best.date);
+  var h='<div class="glass" onclick="App.openDate(\''+best.date+'\')" style="cursor:pointer;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(160deg,rgba(201,184,255,0.16),rgba(255,225,154,0.10));">';
+  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:22px;line-height:1;">🕯️</span><div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;">Bugün, '+yearsAgo+' yıl önce</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+esc(dateLabelTR(best.date))+'</div></div><span style="font-size:16px;color:var(--faint);flex-shrink:0;">›</span></div>';
+  var chips='';
+  if(mo) chips+='<span style="font-size:12.5px;background:var(--field);border:1px solid var(--field-bd);border-radius:999px;padding:4px 10px;color:var(--text2);">'+mo.emoji+' '+esc(mo.short||mo.label)+'</span>';
+  chips+='<span style="font-size:12.5px;background:var(--field);border:1px solid var(--field-bd);border-radius:999px;padding:4px 10px;color:var(--text2);">✅ '+cnt+'/'+tot+'</span>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:7px;">'+chips+'</div>';
+  if(r.intention&&String(r.intention).trim()) h+='<div style="font-size:13.5px;color:var(--text2);line-height:1.5;">🎯 '+esc(String(r.intention).trim())+'</div>';
+  if(r.note&&String(r.note).trim()) h+='<div style="font-size:13.5px;color:var(--text2);line-height:1.5;background:rgba(255,232,163,0.22);border-radius:12px;padding:10px 12px;">'+esc(String(r.note).trim())+'</div>';
+  var gts=Array.isArray(r.gratitude)?r.gratitude.filter(function(g){return String(g||'').trim();}):[];
+  if(gts.length) h+='<div style="font-size:13px;color:var(--text2);line-height:1.6;">🙏 '+gts.map(function(g){return esc(String(g).trim());}).join(' · ')+'</div>';
+  h+='<div style="font-size:11px;color:var(--faint);text-align:right;">O günü aç →</div>';
+  h+='</div>';
+  return h;
+}
 function bugunHTML(){
   var today=todayStr();
   var ed=editing();
@@ -1233,6 +1264,12 @@ function bugunHTML(){
   h+='<div style="position:absolute;top:-26px;right:10px;font-size:130px;line-height:1;font-weight:800;color:#fff;opacity:0.22;">\u201d</div>';
   h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="font-size:16px;">☀️</span><span style="font-size:11.5px;letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
   h+='<div style="position:relative;font-size:19px;font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[(curIdx-1)%DAILY.length])+'</div></div>';
+
+  // günün niyeti — güne yön veren tek cümle (hem bugün hem geçmiş gün düzenlemesinde)
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;background:linear-gradient(160deg,rgba(255,225,154,0.18),rgba(201,184,255,0.10));">';
+  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:22px;line-height:1;">🎯</span><div><div style="font-size:15.5px;font-weight:800;">'+(ed?'O günün niyeti':'Bugünün niyeti')+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">Güne yön veren tek bir cümle ✨</div></div></div>';
+  h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="örn. Bugün kendime nazik olacağım 🌼" maxlength="140" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;color:var(--text);">';
+  h+='</div>';
 
   if(!ed){
   // SOS button
@@ -1316,6 +1353,7 @@ function bugunHTML(){
   h+='</div>';
 
   // dağıldı
+  if(!ed) h+=onThisDayCard();
   if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:15px;font-weight:600;color:var(--muted);">Bugün biraz dağıldı 🫠</button>';
   h+='</div>';
   return h;
@@ -1672,6 +1710,11 @@ function ayarlarHTML(){
   var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
   h+='<button onclick="App.setTheme(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(dark?offS:onS)+'">☀️ Açık</button>';
   h+='<button onclick="App.setTheme(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(dark?onS:offS)+'">🌙 Koyu</button></div></div>';
+  // titreşim / haptik geri bildirimi
+  var hapOn=!(data.settings&&data.settings.haptics===false);
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Titreşim geri bildirimi 📳</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve SOS dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(hapOn?onS:offS)+'">📳 Açık</button>';
+  h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;'+(hapOn?offS:onS)+'">🔕 Kapalı</button></div></div>';
   h+=settingsBtn('App.printReport()','Rapor oluştur / PDF','📄');
   h+=settingsBtn('App.exportJson()','Yedek indir','💾');
   h+=settingsBtn('App.importClick()','Yedek yükle','🔁');
@@ -2418,7 +2461,9 @@ function modalsHTML(){
     if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:12.5px;background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);">'+esc(x)+'</span>';}).join('')+'</div>';
     if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:12.5px;color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
     if(d.meals&&d.meals.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">'; d.meals.forEach(function(m){ h+='<div style="font-size:13.5px;line-height:1.4;"><span>'+m.icon+'</span> <b style="color:var(--text2);">'+esc(m.label)+':</b> <span style="color:var(--muted);">'+esc(m.text)+'</span></div>'; }); h+='</div>'; }
+    if(d.hasIntention) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:linear-gradient(160deg,rgba(255,225,154,0.24),rgba(201,184,255,0.14));border-radius:14px;padding:12px;">🎯 <b>Niyet:</b> '+esc(d.intention)+'</div>';
     if(d.hasNote) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
+    if(d.gratitude&&d.gratitude.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;">🙏 O günün güzel şeyleri</div><div style="display:flex;flex-direction:column;gap:5px;">'+d.gratitude.map(function(g,i){return '<div style="font-size:13.5px;line-height:1.45;color:var(--text2);">'+(i+1)+'. '+esc(String(g).trim())+'</div>';}).join('')+'</div></div>'; }
     var isTod=!!d.isToday;
     h+='<button onclick="App.editDay(\''+d.date+'\')" style="margin-top:16px;border:none;cursor:pointer;width:100%;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9A23C,#E9899F);box-shadow:0 10px 24px rgba(233,150,90,0.38);">'+(isTod?'Bugüne git ☀️':'✏️ Bu günü düzenle')+'</button>';
     if(!isTod) h+='<div style="margin-top:8px;font-size:11.5px;color:var(--faint);line-height:1.45;text-align:center;">Geçmiş günü düzenlerken üstte uyarı görürsün; işin bitince “Bugüne dön”e bas. Konum, oturum ve canlı veriler her zaman bugüne yazılır.</div>';

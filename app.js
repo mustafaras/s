@@ -177,6 +177,7 @@ function migrate(d){
   if(typeof d.cycle.avgPeriod!=='number') d.cycle.avgPeriod=5;
   if(!Array.isArray(d.notifications)) d.notifications=[];
   if(!Array.isArray(d.locationHistory)) d.locationHistory=[];
+  if(!d.locNudge||typeof d.locNudge!=='object') d.locNudge={};
   if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
   if(d.location===undefined) d.location=null;
   if(d.weather===undefined) d.weather=null;
@@ -197,7 +198,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[]};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
@@ -399,7 +400,7 @@ function confetti(){
 // ---------- actions (exposed) ----------
 var App={};
 App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
-App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; };
+App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
@@ -727,6 +728,92 @@ App.setLocationMode=function(m){
   data.settings.locationMode=m; save(); render();
   toast(m==='walk'?'Yürüyüş modu 🚶':m==='vehicle'?'Araç modu 🚗':'Otomatik mod ✨');
 };
+// ---------- Konum-açma nazik dürtme (sağlık-çerçeveli, dağınık aralıklı) ----------
+var LOC_BENEFITS=[
+  {i:'👣', t:'Adımların kendiliğinden sayılsın — elle uğraşmadan hareket hedefin dolsun.'},
+  {i:'🚶‍♀️', t:'Günün ne kadarı yürüyüş, ne kadarı koltukta? Konum açıkken ikisi ayrı görünür.'},
+  {i:'🩺', t:'Uzun süre aynı yerde kalınca dolaşım yavaşlar; kart sana minik molaları hatırlatır.'},
+  {i:'💪', t:'Aktivite halkaların tahminle değil, gerçek hareketinle dolsun.'},
+  {i:'🌿', t:'Kısa bir yürüyüş bile ruh hâline iyi gelir — ölçmek fark etmeyi kolaylaştırır.'},
+  {i:'🧭', t:'Hareketinin haritası çıkınca “bugün az kıpırdadım” günlerini kolayca yakalarsın.'},
+  {i:'🫀', t:'Kalbini en çok düzenli hareket mutlu eder; önce onu görünür kılalım.'},
+  {i:'☀️', t:'Güne ne kadar hareket kattığını görmek küçük ama gerçek bir motivasyon.'},
+  {i:'🚗', t:'Uzun yolculuklarda saatler otururken akıp gider; kart yalnızca hareket eden dakikalarını ayrı sayar.'},
+  {i:'⏱️', t:'Günün kaç saati yolda, kaç dakikası ayakta geçti? İkisini görünce dengeyi kurmak kolaylaşır.'},
+  {i:'🛣️', t:'Kat ettiğin yolun ne kadarı tekerlekte, ne kadarı adımlarında? Konum açıkken ikisi ayrılır.'},
+  {i:'🦵', t:'Uzun oturuşlarda bacak dolaşımı yavaşlar; kart minik mola vaktini nazikçe hatırlatır.'},
+  {i:'💺', t:'Koltukta geçen süre sessizce birikir; ölçünce kısa aralar güne kendiliğinden serpilir.'},
+  {i:'🚙', t:'Bugün kaç km yol yaptın? Mesafeni görmek arada bir esneme molasını hatırlatır.'},
+  {i:'🕰️', t:'Aynı pozisyonda geçen uzun dakikalar sırtı yorar; kart kıpırdama zamanını gösterir.'},
+  {i:'💧', t:'Uzun yolda su içmek ve birkaç adım dolaşımı korur; kart bu ritmi tutmana yardımcı olur.'},
+  {i:'🌊', t:'Uzun süre sabit kalınca ayaklarda şişlik olabilir; hareket dakikaların görününce dengelemek kolay.'},
+  {i:'🧠', t:'Yol yorgunluğu zihni de yorar; kısa bir yürüyüş molası odağını tazeler — kart anını yakalar.'},
+  {i:'🎯', t:'Adım hedefin yolda eriyorsa kart seni nazikçe uyarır; akşam küçük bir tur telafi eder.'},
+  {i:'🫁', t:'Derin bir nefes ve birkaç adım, uzun sürüşün gerginliğini alır; kart mola vaktini hatırlatır.'}
+];
+var LOC_NUDGE={ minGapH:6, maxPerDay:2, prob:0.60, delayMinMs:3000, delayMaxMs:7000, dwellMs:8000, laterH:8, dismissH:4, backoffH:2, backoffMaxH:24, stopAfter:8, whisperDays:3 };
+var locNudgeTimer=null;
+function ensureLocNudge(){
+  if(!data) return null;
+  if(!data.locNudge||typeof data.locNudge!=='object') data.locNudge={};
+  var ln=data.locNudge;
+  if(typeof ln.shownCount!=='number') ln.shownCount=0;
+  if(typeof ln.dismissCount!=='number') ln.dismissCount=0;
+  if(typeof ln.dismissStreak!=='number') ln.dismissStreak=0;
+  if(typeof ln.benefitIdx!=='number') ln.benefitIdx=0;
+  if(typeof ln.optedOut!=='boolean') ln.optedOut=false;
+  if(typeof ln.dayCount!=='number') ln.dayCount=0;
+  if(typeof ln.dayKey!=='string') ln.dayKey='';
+  if(typeof ln.lastShownAt!=='string') ln.lastShownAt='';
+  if(typeof ln.snoozeUntil!=='string') ln.snoozeUntil='';
+  return ln;
+}
+function locNudgeEligible(){
+  if(!data||!data.settings) return false;
+  if(data.settings.locationEnabled) return false;        // konum açıksa asla
+  if(ui.locNudgeOpen) return false;                      // zaten açık
+  if(ui.tab!=='bugun'&&ui.tab!=='saglik') return false;  // yalnız sağlıkla ilgili sekmeler
+  if(editing()) return false;
+  if(ui.locationConsent||ui.dayDetail||ui.emergency||ui.resetStep>0||ui.readingOpen||ui.watchOpen||ui.listeningOpen||ui.weatherOpen||ui.forceStart) return false;
+  var ln=ensureLocNudge(); if(!ln||ln.optedOut) return false;
+  var now=Date.now(), t=todayStr();
+  if(ln.dayKey!==t){ ln.dayKey=t; ln.dayCount=0; }
+  if(ln.dayCount>=LOC_NUDGE.maxPerDay) return false;
+  if(ln.snoozeUntil){ var su=new Date(ln.snoozeUntil).getTime(); if(!isNaN(su)&&now<su) return false; }
+  var gapH=(ln.dismissCount>=LOC_NUDGE.stopAfter)?(LOC_NUDGE.whisperDays*24):LOC_NUDGE.minGapH;
+  if(ln.lastShownAt){ var ls=new Date(ln.lastShownAt).getTime(); if(!isNaN(ls)&&(now-ls)<gapH*3600000) return false; }
+  return true;
+}
+function tryLocNudge(reason){
+  if(locNudgeTimer) return;
+  if(!locNudgeEligible()) return;
+  if(Math.random()>LOC_NUDGE.prob) return;               // dağınık his (her fırsatta değil)
+  var span=LOC_NUDGE.delayMaxMs-LOC_NUDGE.delayMinMs;
+  var delay=LOC_NUDGE.delayMinMs+Math.round(Math.random()*span);
+  locNudgeTimer=setTimeout(function(){ locNudgeTimer=null; openLocNudgeNow(); }, delay);
+}
+function openLocNudgeNow(){
+  if(!locNudgeEligible()) return;                        // gecikme sırasında koşul değiştiyse iptal
+  var ln=ensureLocNudge(); var n=LOC_BENEFITS.length;
+  var count=(Math.random()<0.5)?1:2, picks=[];
+  for(var i=0;i<count;i++){ picks.push(LOC_BENEFITS[(ln.benefitIdx+i)%n]); }
+  ln.benefitIdx=(ln.benefitIdx+count)%n;
+  ui.locNudgeShown=picks; ui.locNudgeOpen=true;
+  ln.lastShownAt=new Date().toISOString(); ln.shownCount++; ln.dayCount++;
+  save(); render();
+}
+function closeLocNudge(kind){
+  var ln=ensureLocNudge(); var now=Date.now();
+  ln.dismissCount++; ln.dismissStreak=(ln.dismissStreak||0)+1;
+  var baseH=(kind==='later')?LOC_NUDGE.laterH:LOC_NUDGE.dismissH;
+  var backoff=Math.min(LOC_NUDGE.backoffMaxH, ln.dismissStreak*LOC_NUDGE.backoffH);
+  ln.snoozeUntil=new Date(now+(baseH+backoff)*3600000).toISOString();
+  ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render();
+}
+App.locNudgeOpenConsent=function(){ ui.locNudgeOpen=false; ui.locNudgeShown=[]; ui.locationConsent=true; render(); };
+App.locNudgeSnooze=function(){ closeLocNudge('later'); };
+App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
+App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optedOut=true; ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Anladım, bir daha hatırlatmam 🌿'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
@@ -2478,6 +2565,24 @@ function modalsHTML(){
     h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
     h+='</div></div>';
   }
+  if(ui.locNudgeOpen){
+    var lnB=(ui.locNudgeShown&&ui.locNudgeShown.length)?ui.locNudgeShown:[LOC_BENEFITS[0]];
+    h+='<div onclick="App.locNudgeDismiss()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
+    h+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:2px;">';
+    h+='<div style="flex-shrink:0;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(135deg,#DFF5DA,#C9E8C4);box-shadow:0 6px 16px rgba(125,190,119,0.35);">📍</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:18.5px;font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:12.5px;color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir 🌿</div></div>';
+    h+='<button onclick="App.locNudgeDismiss()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:15px;color:var(--muted);line-height:1;">✕</button>';
+    h+='</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:9px;margin:14px 0 16px;">';
+    lnB.forEach(function(b){ h+='<div style="display:flex;gap:10px;align-items:flex-start;background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="font-size:19px;line-height:1.15;flex-shrink:0;">'+b.i+'</span><span style="font-size:13.5px;line-height:1.5;color:var(--text2);">'+esc(b.t)+'</span></div>'; });
+    h+='</div>';
+    h+='<button onclick="App.locNudgeOpenConsent()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);box-shadow:0 10px 24px rgba(111,179,106,0.4);display:flex;align-items:center;justify-content:center;gap:8px;">Konumu aç ✨</button>';
+    h+='<button onclick="App.locNudgeSnooze()" style="margin-top:9px;border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:14px;font-size:14.5px;font-weight:700;color:var(--text2);background:transparent;">Belki sonra</button>';
+    h+='<div style="text-align:center;margin-top:10px;"><button onclick="App.locNudgeOptOut()" style="border:none;background:none;cursor:pointer;color:var(--faint);font-size:12px;font-weight:600;text-decoration:underline;">Bir daha gösterme</button></div>';
+    h+='<div style="margin-top:10px;font-size:11px;color:var(--faint);line-height:1.45;text-align:center;">Ölçüm yalnızca uygulama açıkken yapılır; dilediğinde kapatırsın.</div>';
+    h+='</div></div>';
+  }
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
     h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
@@ -2592,6 +2697,7 @@ function stopLocationWatch(){
   moveState.watchId=null; moveState.lastFix=null; moveState.smoothSpeed=0; moveState.autoMode=null;
 }
 if(data && data.settings && data.settings.locationEnabled) startLocationWatch(false);
+try{ setTimeout(function(){ tryLocNudge('boot'); }, LOC_NUDGE.dwellMs); }catch(e){}
 
 // Session tracking
 var sessionState={start:Date.now(),lastActivity:Date.now(),idleMs:0,closed:false};
@@ -2646,6 +2752,7 @@ window.addEventListener('visibilitychange',function(){
     if(ui.editDate && editHiddenAt && (nowMs()-editHiddenAt)>120000) App.maybeAutoExitEdit('Bir süre uzaktaydın — bugüne döndük ☀️');
     editHiddenAt=0;
     if(data&&data.settings&&data.settings.locationEnabled&&moveState.watchId==null) startLocationWatch(false);
+    tryLocNudge('return');
   }
 });
 updateLiveSession();

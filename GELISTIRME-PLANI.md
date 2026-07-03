@@ -45,8 +45,9 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 20 | 🕯️ Bugün 1 yıl önce | 3 | ✅ | `onThisDayCard()` → Bugün ekranında salt-okunur "Bugün, N yıl önce" kartı (mod/tik/niyet/not/şükran + "O günü aç →" → `App.openDate`); panel `exRowAlways("🕯️ Bir yıl önce", …)`; yeni veri yok, `data.days`'ten okur (2026-07-04) |
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
+| 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, "Bir daha gösterme"→optOut; `data.locNudge` kalıcı sayaçlar; 8 reddten sonra fısıltı modu (2026-07-03) |
 
-**Sayım:** ✅ 11 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 12 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 
@@ -249,6 +250,26 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-03** — **#23 📍 Konum-açma dürtüsü (nudge) ✅**: Konum kapalıyken kullanıcıyı
+  konum paylaşımına nazikçe yönlendiren, sağlıkla ilişkilendirilmiş bir dürtü eklendi.
+  - **Nerede & ne zaman:** Yalnız `bugun`/`saglik` sekmesinde, başka modal açık değilken,
+    düzenleme modunda değilken çıkar. `App.go` (sekme), boot ve sekmeye geri dönüş
+    (`visibilitychange`) tetikler.
+  - **Ritim (rahatsız etmeyen):** `LOC_NUDGE` = min 6s ara · gün ≤2 · %60 olasılık ·
+    3-7s rastgele gecikme · 8s ekranda kalış. "Belki sonra" 8s, ✕/arka plan 4s snooze +
+    her reddte artan backoff (2s→maks 24s). 8 reddten sonra "fısıltı modu" (3 günde bir).
+  - **İçerik:** Her açılışta `LOC_BENEFITS`'ten sırayla 1-2 fayda; **20 madde**, çoğu araç
+    yolculuğu · kat edilen mesafe · yolda geçen süre · uzun oturuş–dolaşım ilişkisi çerçeveli
+    (🚗 uzun yol, ⏱️ yolda/ayakta süre, 🛣️ tekerlek vs adım, 🦵 bacak dolaşımı, 💺 koltuk
+    süresi, 🚙 km, 🕰️ sabit pozisyon, 💧 su+adım, 🌊 şişlik, 🧠 yol yorgunluğu, 🎯 hedef, 🫁 nefes).
+  - **Akış:** "Konumu aç ✨" → mevcut `ui.locationConsent` rıza modalı (tek gizlilik kaynağı) →
+    tarayıcı izni. "Bir daha gösterme" → `optedOut`. Kalıcı sayaçlar `data.locNudge`
+    (shownCount/dismissCount/dismissStreak/benefitIdx/dayCount/snoozeUntil…); sync'e zararsız
+    yansır (gizli alan yok). Panel yansıması yok (cihaz/etkileşim özelliği, haptik gibi).
+  - index cache-bust `v=20260704g` → `v=20260704h`. Doğrulama: `files/feat-locnudge.js`
+    (70 açık nudge, 71 "Konumu aç"→rıza modalı, 72 koyu nudge araç faydalarıyla) — konum
+    kapalıyken nudge çıkıyor + fayda dönüşümü/kalıcılığı, "Konumu aç"→rıza, "Belki sonra"→snooze,
+    **konum açıkken asla çıkmıyor**, gerçek JS hatası yok.
 - **2026-07-04** — **#9 🎯 Günün niyeti + #20 🕯️ Bugün 1 yıl önce + #22 📳 Haptik ✅** (üçü birlikte):
   - **#9 Günün niyeti:** Bugün ekranında "Günün Mesajı"nın hemen altına warm cam kart
     (`data.days[].intention`, ≤140 karakter, `App.onIntention` + `debounceSave`). Başlık

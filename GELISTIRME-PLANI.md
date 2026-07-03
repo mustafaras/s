@@ -248,6 +248,15 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-03** — **Günlük tikler yenilendi — 🥦 Sebze/lif + 🧘 Germe/nefes → 📝 Günlük notu + 🌿 Açık hava**:
+  Az kullanılan iki tik kaldırıldı; yerine takip edilmeyen iki güçlü alan eklendi:
+  📝 **Duygu/günlük notu yazdım** (zihni boşaltmak → kaygıyı düşürür) ve
+  🌿 **Açık havaya çıktım** (doğal ışık → ruh hâli, D vitamini ile sinerji).
+  Toplam tik sayısı **10** olarak korundu. Yeni tik'lerin `since` tarihi **bugün**
+  yapıldı → geçmiş günlerin yüzdesi bozulmaz; eski `veggie`/`mobility` verisi
+  zarar görmeden arşivde kalır. `HABITS` dizisi (app.js), haftalık özet etiketleri
+  ve panel eş dizisi (panel.html) senkron güncellendi; cache-bust `v=20260704e`.
+  Harness (habit-shot.js) ile açık+koyu doğrulandı; JS hatası yok.
 - **2026-07-03** — **Günışığı hava durumu kartı — estetik + genişleyebilir**:
   Üstteki Günışığı header'ı **dokunulabilir, genişleyebilir bir hava-durumu
   kartına** dönüştü. Sağdaki 🦩 kaldırıldı; yerine anlık hava geldi. Konum

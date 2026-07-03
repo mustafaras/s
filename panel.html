@@ -213,7 +213,7 @@ var PTOKEN="";
 var D=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{}};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
-var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["sleepReg","Uyku","2026-06-28"],["veggie","Sebze/lif","2026-06-28"],["mobility","Germe/nefes","2026-06-28"],["selfKind","Kendine iyi"]];
+var HABITS=[["sweetManaged","Tatlı"],["eveningControl","Aksam"],["walked20","Yuruyus"],["protein","Protein"],["water","Su"],["vitaminD","D vitamini"],["sleepReg","Uyku","2026-06-28"],["journaled","Günlük notu","2026-07-03"],["freshAir","Açık hava","2026-07-03"],["selfKind","Kendine iyi"]];
 var HT=HABITS.length;
 function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
 var MOOD_EMOJI={"cok-iyi":"☀️","iyi":"🌼","normal":"🌿","zorlandim":"🌧️","cok-zorlandim":"🫧"};

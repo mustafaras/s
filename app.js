@@ -10,8 +10,8 @@ var HABITS=[
   {key:'water',icon:'💧',title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
   {key:'vitaminD',icon:'☀️',title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti ☀️'},
   {key:'sleepReg',icon:'🛌',title:'Yeterli uyudum (7+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor 🌙',since:'2026-06-28'},
-  {key:'veggie',icon:'🥦',title:'Sebze/lif aldım',sub:'Tabağa renk, tokluğa destek.',msg:'Lif geldi; tokluk ve bağırsak ekibi sahada 🥦',since:'2026-06-28'},
-  {key:'mobility',icon:'🧘',title:'Germe/nefes molası verdim',sub:'Boyun ve bel rahatlar, zihin yumuşar.',msg:'Germe/nefes tamam. Boyun ve bel "oh" dedi 🧘',since:'2026-06-28'},
+  {key:'journaled',icon:'📝',title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı 📝',since:'2026-07-03'},
+  {key:'freshAir',icon:'🌿',title:'Açık havaya çıktım',sub:'Doğal ışık, ruh hâlini yukarı çeker.',msg:'Açık hava tamam. Güneş ve ruh hâlin selam gönderdi 🌿',since:'2026-07-03'},
   {key:'selfKind',icon:'🫶',title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
 ];
 var HABIT_TOTAL=HABITS.length;
@@ -371,7 +371,7 @@ function interp(sweet,walk,evening){
 }
 function weekBlock(w,days){
   var slice=days.slice(w*7,w*7+7);
-  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['sleepReg','Uyku düzeni'],['veggie','Sebze/lif'],['mobility','Germe/nefes'],['selfKind','Kendime iyi davrandım']];
+  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['sleepReg','Uyku düzeni'],['journaled','Günlük notu'],['freshAir','Açık hava'],['selfKind','Kendime iyi davrandım']];
   var cnt=function(k){ return slice.reduce(function(a,o){return a+(o.rec&&o.rec.habits[k]?1:0);},0); };
   var rows=defs.map(function(d){ return {label:d[1],val:cnt(d[0])+'/7'}; });
   var totalC=slice.reduce(function(a,o){return a+countRec(o.rec);},0);

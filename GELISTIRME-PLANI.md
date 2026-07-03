@@ -45,7 +45,7 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 20 | 🕯️ Bugün 1 yıl önce | 3 | ✅ | `onThisDayCard()` → Bugün ekranında salt-okunur "Bugün, N yıl önce" kartı (mod/tik/niyet/not/şükran + "O günü aç →" → `App.openDate`); panel `exRowAlways("🕯️ Bir yıl önce", …)`; yeni veri yok, `data.days`'ten okur (2026-07-04) |
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
-| 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, "Bir daha gösterme"→optOut; `data.locNudge` kalıcı sayaçlar; 8 reddten sonra fısıltı modu (2026-07-03) |
+| 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, **"Bugün gösterme"→o günlük sus (ertesi gün tekrar çıkar, `optOutDay`)**; konum AÇIK iken Bugün kartında gerçek veri: mesafe + **⏱️ süre** (`walkSec`/`vehicleSec`), panel "Bugün Hareket"e yansır; 8 reddten sonra fısıltı modu (2026-07-03) |
 
 **Sayım:** ✅ 12 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
@@ -250,6 +250,22 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-03** — **📍 Nudge iyileştirmeleri: süre verisi + günlük opt-out**:
+  - **Süre ölçümü:** Konum açıkken artık yalnız mesafe değil **süre** de tutulur —
+    `movement.walkSec` / `movement.vehicleSec` (`onLocationFix`'te fix'ler arası `dt`,
+    fix başına ≤30s biriktirilir). Bugün ekranı Konum kartına **⏱️ Ayakta** ve
+    **🕰️ Yolda** satırları eklendi (`fmtDur`; canlı `updateMovementUI`). Böylece
+    nudge'daki "kaç saati yolda, kaç dakikası ayakta" vaadi gerçekten gösteriliyor.
+  - **Panel yansıması:** `panel.html` "Bugün Hareket" bloğuna "⏱️ Ayakta süre" +
+    "🕰️ Yolda süre" satırları (`fmtDurP`). Mesafe + yürüyüş/araç zaten yansıyordu.
+  - **Günlük opt-out:** "Bir daha gösterme" → **"Bugün gösterme"** oldu. Kalıcı
+    `optedOut` yerine `optOutDay=bugün`; eligibility `optOutDay===bugün` ise susar,
+    **ertesi gün ve sonraki günler tekrar tetiklenir**. Toast: "Tamam, bugünlük
+    kapattım — yarın yine buradayım 🌿".
+  - **Fayda bankası 20 maddeye çıktı** (12 yeni; çoğu araç yolu·mesafe·süre·oturuş
+    sağlığı). index cache-bust `v=20260704h` → `v=20260704i`. Doğrulama:
+    `files/feat-locnudge.js` (73 konum-AÇIK kartı gerçek veriyle: 130.75 km / 🚶2.35 km /
+    🚗128.40 km / ⏱️35 dk / 🕰️2 sa; günlük opt-out bugün susar, ertesi gün çıkar) — JS hatası yok.
 - **2026-07-03** — **#23 📍 Konum-açma dürtüsü (nudge) ✅**: Konum kapalıyken kullanıcıyı
   konum paylaşımına nazikçe yönlendiren, sağlıkla ilişkilendirilmiş bir dürtü eklendi.
   - **Nerede & ne zaman:** Yalnız `bugun`/`saglik` sekmesinde, başka modal açık değilken,

@@ -248,11 +248,12 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
-- **2026-07-04** — **Marka + Günışığı teması**: uygulama adı **"Günışığı ☀️"**
-  oldu. Bugün sekmesi hero header'ı yeniden tasarlandı (gün doğumu ışıltısı +
-  gradyan başlık + 🦩), açılış (onboarding) ekranı ve rapor başlığı da yenilendi;
-  `--sun`/`--sun2`/`--sun-glow` değişkenleri (açık+koyu). Sayfa başlığı ve PWA
-  adı güncellendi; cache-bust `v=20260704b`. Harness ile açık+koyu doğrulandı.
+- **2026-07-04** — **Günışığı header (üst) — estetik**: Bugün ekranının **en
+  üstüne** gün doğumu temalı yeni bir header eklendi (☀️ + "Günışığı" + saate
+  göre selam + 🦩). Uygulama adı **"Şeyma 🦩"** olduğu gibi korundu
+  (hero/onboarding/rapor/sekme başlığı değişmedi). Sadece `--sun`/`--sun2`/
+  `--sun-glow` değişkenleri eklendi (açık+koyu); cache-bust `v=20260704c`.
+  Harness ile açık+koyu doğrulandı.
 - **2026-07-04** — **#1 Ne Dinledim ✅ + #2 Şükran ✅**: 🎵 "Ne Dinledim"
   hub'ı (Bugün / Favoriler / İstatistik / Sözler) — `data.music` favorileri +
   `data.days[].listening` günlük kayıtları, teal `--listen` accent (açık/koyu),

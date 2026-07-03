@@ -871,6 +871,7 @@ function render(){
   // Gözlemci: kullanıcının uygulamada gördüğü her başlık — veri olmasa da görünür (boş ise "—")
   var EMPTY='<span style="color:var(--t4);font-weight:600;">—</span>';
   function exRowAlways(label,val){ return exRow(label, val||EMPTY); }
+  exRows+=exRowAlways("🎯 Niyet", (srec.intention&&String(srec.intention).trim())?esc(String(srec.intention).trim()):"");
   var sl=srec.sleep||{};
   var sleepBits=[];
   if(sl.hours!=null&&sl.hours!=="") sleepBits.push(esc(String(sl.hours))+' sa');
@@ -925,6 +926,23 @@ function render(){
   // Şükran (gratitude): bugünün güzel şeyleri
   var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
   exRows+=exRowAlways("🙏 Şükran", grEn.map(function(g){return esc(g);}).join(" · "));
+  // 🕯️ Bir yıl önce — seçili günün geçmiş yıllardaki aynı gününden en yakını (salt-okunur nostalji)
+  (function(){
+    var selMMDD=String(selected).slice(5), selY=parseInt(String(selected).slice(0,4),10), best=null;
+    for(var k in D.days){ if(String(k).slice(5)!==selMMDD) continue; var y=parseInt(String(k).slice(0,4),10); if(isNaN(y)||y>=selY) continue; var r=D.days[k]; if(!r) continue;
+      var hasG=Array.isArray(r.gratitude)&&r.gratitude.some(function(g){return String(g||"").trim();});
+      var has=(cnt(r)>0)||r.mood||(r.note&&String(r.note).trim())||(r.intention&&String(r.intention).trim())||hasG;
+      if(!has) continue; if(!best||k>best) best=k;
+    }
+    var val="";
+    if(best){ var br=D.days[best], bits=[]; bits.push(shortD(best)+"."+String(best).slice(0,4));
+      if(br.mood&&MOOD_EMOJI[br.mood]) bits.push(MOOD_EMOJI[br.mood]);
+      bits.push("✅ "+cnt(br)+"/"+htOn(best));
+      if(br.intention&&String(br.intention).trim()) bits.push("🎯 "+esc(String(br.intention).trim()));
+      val=bits.join(" · ");
+    }
+    exRows+=exRowAlways("🕯️ Bir yıl önce", val);
+  })();
   h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>';
   // ── Bugünün okuma & izleme kayıtları (not dahil tüm detay) ──
   if(rdEn.length>0 || wtEn.length>0 || lsEn.length>0){

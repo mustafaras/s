@@ -248,6 +248,10 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-03** — **Panel — tik'ler tam isimleriyle**: Gözlemci panelinde (panel.html)
+  gün-detayı tik rozetleri artık kısaltma yerine **uygulamadaki tam başlıklarla**
+  görünüyor (ör. "Tatlı", "Aksam" → "Tatlı krizini yönettim", "Akşam 7'den sonra
+  gereksiz atıştırmadım"). panel-test.js ile doğrulandı; gerçek JS hatası yok.
 - **2026-07-03** — **Günlük tikler yenilendi — 🥦 Sebze/lif + 🧘 Germe/nefes → 📝 Günlük notu + 🌿 Açık hava**:
   Az kullanılan iki tik kaldırıldı; yerine takip edilmeyen iki güçlü alan eklendi:
   📝 **Duygu/günlük notu yazdım** (zihni boşaltmak → kaygıyı düşürür) ve

@@ -26,7 +26,7 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 1 | 🎵 Ne Dinledim | 1 | ✅ | `listeningOverlayHTML` hub (Bugün/Favoriler/İstatistik/Sözler) + `data.music` + `data.days[].listening`; `--listen` teal accent; panel "🎧 Dinleme Arşivi" (2026-07-04) |
 | 2 | 🙏 Şükran / 3 Güzel Şey | 1 | ✅ | `App.onGratitude` + `data.days[].gratitude` (≤3); Bugün kartı (geçmiş günde düzenlenebilir); panel gün-detayı bloğu (2026-07-04) |
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |
-| 4 | 🗓️ Ruh hali ısı haritası | 1 | 🟡 | Harita takviminde günlük mod emoji + tik tonu var; GitHub-tarzı yıllık grid değil |
+| 4 | 🗓️ Ruh hali ısı haritası | 1 | ✅ | `moodHeatmapCard()` → `rapor`'da GitHub-tarzı yıllık mod ısı haritası: ‹yıl› seçici, yatay kaydırılır 7×hafta grid, mod paleti, ay/gün etiketleri, hücreye dokun → `App.heatOpen` harita'da o günü açar; panel `moodHeatmapCardHTML()` salt-okunur ayna (2026-07-04) |
 | 5 | 🏅 Rozet & seri | 1 | ✅ | `badgesGrid()` + `currentStreak/maybeStreak/bestStreak` + kilometre taşları |
 | 6 | 🧠 Düşünce kaydı (CBT) | 2 | ❌ | `thoughts` yok |
 | 7 | 🌬️ Nefes / meditasyon | 2 | 🟡 | Veri modeli var (`WIND_DOWN_STEPS` "4-7-8 nefes", `emptyWindDown`); rehberli animasyon/UI bağlı değil |
@@ -46,7 +46,7 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | 🟡 | Mikro animasyon var (confetti/seyFade/toast); `navigator.vibrate` yok |
 
-**Sayım:** ✅ 8 · 🟡 5 · ❌ 9 _(+ altyapı ✅)_
+**Sayım:** ✅ 8 · 🟡 4 · ❌ 10 _(+ altyapı ✅)_
 
 ---
 
@@ -105,12 +105,13 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
   fonksiyonları (uyku↔mod, adım↔enerji, kafein↔uyku, regl fazı↔mod).
 - **Emek:** Orta. **Panel:** "Bu haftanın içgörüsü" kartı.
 
-### 4. 🗓️ Ruh hali ısı haritası (takvim) — 🟡 Kısmen
+### 4. 🗓️ Ruh hali ısı haritası (takvim) — ✅ Uygulandı (2026-07-04)
 - **Ne:** GitHub-benzeri yıllık grid; her gün ruh hali rengiyle.
 - **Neden:** Örüntüyü tek bakışta gösterir.
-- **Nasıl:** `rapor` içinde `data.days` üzerinden ay/yıl grid; renk = mod
-  değeri → CSS değişken tonları.
-- **Emek:** Orta. **Panel:** Aynı ısı haritası salt-okunur.
+- **Nasıl:** `rapor` içinde `moodHeatmapCard()` → `data.days` üzerinden yıllık 7×hafta
+  grid; renk = mod paleti; ‹yıl› seçici (`ui.heatYear`/`App.heatYear`); hücreye dokun →
+  `App.heatOpen` harita'da o günü açar (güvenli geçmiş-gün düzenleme akışına bağlı).
+- **Emek:** Orta. **Panel:** `moodHeatmapCardHTML()` salt-okunur ayna (tam yıl).
 
 ### 5. 🏅 Rozet & seri (streak) sistemi — ✅ Uygulandı
 - **Ne:** "7 gün su hedefi", "10 kitap", "30 gün kayıt" rozetleri + seriler.
@@ -248,6 +249,18 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-04** — **#4 🗓️ Ruh hali ısı haritası ✅**: Rapor sekmesine "Mod dağılımı"nın
+  hemen altına **GitHub-tarzı yıllık mod ısı haritası** eklendi (`moodHeatmapCard()`).
+  ‹yıl› seçici (veri başlangıcı → bugün arası), yatay kaydırılabilir 7×hafta grid
+  (Pzt başlangıç), ay/gün etiketleri, mod paletiyle renklendirilmiş hücreler; boş
+  günler soluk, gelecek günler pasif, bugün halkalı. Bir hücreye **dokununca**
+  `App.heatOpen` → harita sekmesinde o günü açar (gün-detayı + "Bu günü düzenle"),
+  böylece geçmiş gün güvenli düzenleme akışına bağlanır. Panel'e salt-okunur ayna
+  (`moodHeatmapCardHTML()`, tam yıl, panel mod paleti) eklendi. `ui.heatYear` +
+  `App.heatYear` yıl navigasyonu; index cache-bust `v=20260704f`.
+  Doğrulama: `files/heatmap-shot.js` (50-54: rapor açık/koyu, tap→harita, yıl nav,
+  panel) — 184 dokunulabilir hücre, tap gün-detayını açtı, yıl geri 2025'i gösterdi,
+  gerçek JS hatası yok.
 - **2026-07-03** — **Panel — tik'ler tam isimleriyle**: Gözlemci panelinde (panel.html)
   gün-detayı tik rozetleri artık kısaltma yerine **uygulamadaki tam başlıklarla**
   görünüyor (ör. "Tatlı", "Aksam" → "Tatlı krizini yönettim", "Akşam 7'den sonra

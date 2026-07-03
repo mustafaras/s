@@ -289,6 +289,56 @@ function sessionStats(days){
   return {sessionCount:sessionCount,totalActive:totalActive,totalOpen:totalOpen,avgActive:sessionCount?Math.round(totalActive/sessionCount):0};
 }
 function spanEnd(){ var e=today(); for(var k in D.days){ if(diff(k,e)>0) e=k; } return e; }
+function moodHeatmapCardHTML(){
+  var mcol={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
+  var tdy=today();
+  var years={}; for(var k in D.days){ if(D.days[k]) years[String(k).slice(0,4)]=1; } years[tdy.slice(0,4)]=1;
+  var yrList=Object.keys(years).sort(); var curY=+yrList[yrList.length-1];
+  var jan1=new Date(curY,0,1), dec31=new Date(curY,11,31);
+  var startDow=(jan1.getDay()+6)%7; var start=new Date(jan1); start.setDate(start.getDate()-startDow);
+  var CELL=13, GAP=3, STEP=CELL+GAP, DAYLABW=26;
+  var monN=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  var dayLab=["Pzt","","Çar","","Cum","",""];
+  var weeks=[], cur=new Date(start);
+  while(cur<=dec31){ var col=[]; for(var d=0; d<7; d++){ col.push(new Date(cur)); cur.setDate(cur.getDate()+1); } weeks.push(col); }
+  var nW=weeks.length;
+  var h='<div class="card lift span-12 pad">';
+  h+='<div class="lbl">Mod Isı Haritası · '+curY+'</div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
+  h+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
+  h+='<div style="position:relative;height:12px;margin-left:'+(DAYLABW+GAP)+'px;width:'+(nW*STEP)+'px;">';
+  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ h+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:9px;font-weight:700;color:var(--t3);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
+  h+='</div>';
+  h+='<div style="display:flex;gap:'+GAP+'px;">';
+  h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
+  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:8.5px;color:var(--t4);text-align:right;">'+dayLab[r]+'</div>'; }
+  h+='</div>';
+  var recDays=0;
+  for(var w2=0; w2<nW; w2++){
+    h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;">';
+    for(var r2=0; r2<7; r2++){
+      var dt=weeks[w2][r2]; var ds=dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate());
+      if(dt.getFullYear()!==curY){ h+='<div style="width:'+CELL+'px;height:'+CELL+'px;"></div>'; continue; }
+      var future=diff(tdy,ds)>0; var rec=D.days[ds]||null; var bg, tip=ds;
+      if(future){ bg='rgba(255,255,255,0.03)'; }
+      else if(rec && rec.mood){ bg=mcol[rec.mood]||'#a78bfa'; recDays++; tip+=' · '+(MOOD_EMOJI[rec.mood]||'')+' '+rec.mood; }
+      else if(rec){ bg='rgba(255,255,255,0.16)'; recDays++; tip+=' · kayıt var'; }
+      else { bg='rgba(255,255,255,0.06)'; tip+=' · kayıt yok'; }
+      var isT=ds===tdy;
+      h+='<div title="'+esc(tip)+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';'+(isT?'box-shadow:0 0 0 1.5px var(--gold);':'')+'"></div>';
+    }
+    h+='</div>';
+  }
+  h+='</div></div></div>';
+  h+='<div class="moodlegend" style="justify-content:space-between;">';
+  h+='<span style="display:flex;align-items:center;gap:5px;font-size:var(--f2);color:var(--t3);">zor';
+  ["cok-zorlandim","zorlandim","normal","iyi","cok-iyi"].forEach(function(mid){ h+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
+  h+='iyi</span>';
+  h+='<span style="font-size:var(--f2);color:var(--t3);"><b class="mono">'+recDays+'</b> gün kayıtlı</span>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
 function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
 function currentStreak(){ var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1);} else break; } return c; }
@@ -990,6 +1040,7 @@ function render(){
   h+='</div>';
 
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
+  h+=moodHeatmapCardHTML();
   h+='<div class="card lift span-8 pad">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);

@@ -197,7 +197,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
@@ -693,6 +693,8 @@ App.maybeAutoExitEdit=function(reason){
 };
 App.calMove=function(delta){ var ym=(ui.calMonth||todayStr().slice(0,7)).split('-'); var d=new Date(+ym[0],+ym[1]-1+delta,1); ui.calMonth=d.getFullYear()+'-'+pad(d.getMonth()+1); render(); };
 App.calToday=function(){ ui.calMonth=todayStr().slice(0,7); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.heatYear=function(delta){ var startY=+String(data.startDate).slice(0,4); var nowY=new Date().getFullYear(); var y=(+(ui.heatYear||nowY))+delta; if(y<startY)y=startY; if(y>nowY)y=nowY; ui.heatYear=y; render(); };
+App.heatOpen=function(date){ ui.tab='harita'; ui.calMonth=String(date).slice(0,7); App.openDate(date); };
 
 App.exportJson=function(){ var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); download(blob,'seyma-yedek.json'); toast('Yedek indirildi 💾'); };
 function download(blob,name){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },1500); }
@@ -1542,6 +1544,65 @@ function distanceRecapCard(){
   h+='</div>';
   return h;
 }
+function moodHeatmapCard(){
+  var mcol={'cok-iyi':'#FFD37A','iyi':'#F2B65A','normal':'#8FBF8A','zorlandim':'#9BB0D9','cok-zorlandim':'#B89BD9'};
+  var today=todayStr();
+  var startY=+String(data.startDate||today).slice(0,4);
+  var nowY=new Date().getFullYear();
+  var curY=+(ui.heatYear||nowY); if(curY<startY)curY=startY; if(curY>nowY)curY=nowY;
+  var jan1=new Date(curY,0,1), dec31=new Date(curY,11,31);
+  var startDow=(jan1.getDay()+6)%7; var start=new Date(jan1); start.setDate(start.getDate()-startDow);
+  var CELL=13, GAP=3, STEP=CELL+GAP, DAYLABW=24;
+  var monN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  var dayLab=['Pzt','','Çar','','Cum','',''];
+  var weeks=[], cur=new Date(start);
+  while(cur<=dec31){ var col=[]; for(var d=0; d<7; d++){ col.push(new Date(cur)); cur.setDate(cur.getDate()+1); } weeks.push(col); }
+  var nW=weeks.length;
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
+  h+='<div style="font-size:15.5px;font-weight:700;">Mod ısı haritası 🗓️</div>';
+  var prevOk=curY>startY, nextOk=curY<nowY;
+  h+='<div style="display:flex;align-items:center;gap:6px;">';
+  h+='<button '+(prevOk?'onclick="App.heatYear(-1)"':'disabled')+' style="border:none;cursor:'+(prevOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:16px;opacity:'+(prevOk?'1':'0.3')+';">‹</button>';
+  h+='<div style="font-size:14px;font-weight:800;min-width:46px;text-align:center;">'+curY+'</div>';
+  h+='<button '+(nextOk?'onclick="App.heatYear(1)"':'disabled')+' style="border:none;cursor:'+(nextOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:16px;opacity:'+(nextOk?'1':'0.3')+';">›</button>';
+  h+='</div></div>';
+  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
+  h+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
+  h+='<div style="position:relative;height:12px;margin-left:'+(DAYLABW+GAP)+'px;width:'+(nW*STEP)+'px;">';
+  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ h+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:9px;font-weight:700;color:var(--faint);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
+  h+='</div>';
+  h+='<div style="display:flex;gap:'+GAP+'px;">';
+  h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
+  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:8.5px;color:var(--faint);text-align:right;">'+dayLab[r]+'</div>'; }
+  h+='</div>';
+  var recDays=0;
+  for(var w2=0; w2<nW; w2++){
+    h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;">';
+    for(var r2=0; r2<7; r2++){
+      var dt=weeks[w2][r2]; var ds=dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());
+      if(dt.getFullYear()!==curY){ h+='<div style="width:'+CELL+'px;height:'+CELL+'px;"></div>'; continue; }
+      var future=diffDays(today,ds)>0; var rec=data.days[ds]||null; var bg, clk=false, tip=shortDate(ds)+'.'+curY;
+      if(future){ bg='rgba(150,110,120,0.06)'; }
+      else if(rec && rec.mood){ bg=mcol[rec.mood]||'#C9B8FF'; clk=true; recDays++; var mo=find(MOODS,'id',rec.mood); tip+=(mo?' · '+mo.emoji+' '+mo.short:''); }
+      else if(rec){ bg=dark?'rgba(233,175,193,0.30)':'rgba(150,110,120,0.24)'; clk=true; recDays++; tip+=' · kayıt var'; }
+      else { bg=dark?'rgba(255,255,255,0.05)':'rgba(150,110,120,0.10)'; clk=true; tip+=' · kayıt yok'; }
+      var isT=ds===today;
+      h+='<div '+(clk?'onclick="App.heatOpen(\''+ds+'\')" ':'')+'title="'+tip+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';cursor:'+(clk?'pointer':'default')+';'+(isT?'box-shadow:0 0 0 1.5px var(--accent);':'')+'"></div>';
+    }
+    h+='</div>';
+  }
+  h+='</div></div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">';
+  h+='<div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--faint);">zor';
+  ['cok-zorlandim','zorlandim','normal','iyi','cok-iyi'].forEach(function(mid){ h+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
+  h+='iyi</div>';
+  h+='<div style="font-size:11px;color:var(--faint);">'+recDays+' gün kayıtlı · dokun → düzenle</div>';
+  h+='</div>';
+  if(recDays===0) h+='<div style="font-size:12px;color:var(--faint);line-height:1.5;">'+curY+' için henüz mod kaydı yok. Bir kareye dokunup o günü açabilirsin.</div>';
+  h+='</div>';
+  return h;
+}
 function raporHTML(){
   var all=allDays(); var last30=lastNDays(30);
   var totalTicks=0; all.forEach(function(o){ totalTicks+=countRec(o.rec); });
@@ -1582,6 +1643,7 @@ function raporHTML(){
     h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span>'+m.emoji+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
   } else h+='<div style="font-size:13px;color:var(--faint);">Bu dönemde mod kaydı yok.</div>';
   h+='</div>';
+  h+=moodHeatmapCard();
   h+=badgesGrid();
   var months=monthlySummary();
   if(months.length){ var moN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];

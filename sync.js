@@ -94,9 +94,19 @@ function doPush(data){
     .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
 }
 
+// ÆON soru tetiği: yalnızca Şeyma ÆON'a soru gönderince yazılır. Küçük ve ayrı bir
+// dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir
+// (hareket/mod gibi sık latest.json push'larında boşuna çalışıp Actions dakikası yakmaz).
+function pushPing(item){
+  var c=cfg(); if(!c) return Promise.resolve();
+  var payload=JSON.stringify({type:'aeon-question',item:item,ts:new Date().toISOString()},null,2);
+  return ghPut(c,'data/aeon-outbox.json',payload).catch(function(){});
+}
+
 window.SeySync={
   schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
   pushNow:function(){ clearTimeout(timer); if(lastPayload){ doPush(lastPayload); return; } try{ var raw=localStorage.getItem(KEY); if(raw) doPush(JSON.parse(raw)); }catch(e){} },
+  pushPing:pushPing,
   statusText:statusText
 };
 })();

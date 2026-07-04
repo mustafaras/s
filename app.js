@@ -3080,7 +3080,8 @@ function submitAeonQuestion(question){
   if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
   var ts=new Date().toISOString();
-  data.aeon.qa.push({id:'q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),question:question,ts:ts,answer:null,answeredAt:null});
+  var qid='q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
+  data.aeon.qa.push({id:qid,question:question,ts:ts,answer:null,answeredAt:null});
   data.aeon.lastAskDate=todayStr();
   ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true; // appendAeonOutgoing render()'a düşerse de en alta insin
   haptic(14);
@@ -3090,6 +3091,9 @@ function submitAeonQuestion(question){
   try{ setTimeout(function(){ var el=document.getElementById('aeon-input'); if(el) el.focus(); },30); }catch(e){}
   // Soru anında panele iletilsin diye senkronu zorla (4 sn debounce'u beklemeden)
   try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
+  // Küçük tetik dosyası (data/aeon-outbox.json) — yalnızca soru gönderilince değişir;
+  // veri reposundaki GitHub Actions bunu görüp mustafarasit@gmail.com'a anlık mail atar.
+  try{ if(window.SeySync&&typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:question,ts:ts}); }catch(e){}
   toast('Sorun ÆON’a iletildi ⬡',2200);
 }
 App.onLunaDraft=function(el){ ui.lunaDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
@@ -3391,7 +3395,7 @@ App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
 
 setTimeout(fetchObserverInbox,1500);
-setInterval(fetchObserverInbox,60000); // ön planda ~1 dk'da bir kontrol (önceden 4 dk)
+setInterval(fetchObserverInbox,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları daha hızlı görünsün)
 document.addEventListener('visibilitychange',function(){ if(!document.hidden) fetchObserverInbox(); });
 window.addEventListener('focus',fetchObserverInbox);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
 window.addEventListener('pageshow',fetchObserverInbox); // bfcache'ten geri dönüşte

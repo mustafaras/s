@@ -94,16 +94,13 @@
   .lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
   .divider{height:1px;background:var(--bd2);margin:10px 0}
 
-  /* ── bento grid ── */
+  /* ── bento grid ──
+     Kücük KPI karoları (span-2) hariç tüm kartlar tam genişlikte, tek sütun halinde
+     alt alta akar — hem web hem mobilde derli toplu, öngörülebilir bir akış sağlar.
+     (Eskiden span-3..8 farklı genişliklerde yan yana paketlenip düzensiz görünüyordu.) */
   .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
   .bento>.span-2{grid-column:span 2}
-  .bento>.span-3{grid-column:span 3}
-  .bento>.span-4{grid-column:span 4}
-  .bento>.span-5{grid-column:span 5}
-  .bento>.span-6{grid-column:span 6}
-  .bento>.span-7{grid-column:span 7}
-  .bento>.span-8{grid-column:span 8}
-  .bento>.span-12{grid-column:span 12}
+  .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8,.bento>.span-12{grid-column:span 12}
 
   /* ── jump-nav (bölüm atlama şeridi) ── */
   .jumpnav{position:sticky;top:0;z-index:150;display:flex;gap:6px;padding:9px 2px 11px;margin:-2px 0 2px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;background:linear-gradient(var(--bg) 62%,transparent)}
@@ -184,10 +181,6 @@
 
   @media(max-width:1100px){
     .bento>.span-2{grid-column:span 4}
-    .bento>.span-3{grid-column:span 6}
-    .bento>.span-5,.bento>.span-7{grid-column:span 6}
-    .bento>.span-8{grid-column:span 12}
-    .bento>.span-4{grid-column:span 6}
   }
   @media(max-width:768px){
     :root{--fk:30px;--f6:21px;--f5:17px;--f4:15px;--f3:13.5px;--f2:12px;--f1:11px;--topH:auto}
@@ -201,7 +194,6 @@
     html,body{overflow:auto}
     .bento{gap:8px}
     .bento>.span-2{grid-column:span 6}
-    .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8{grid-column:span 12}
     .kpi-v{letter-spacing:-.5px}
     #loc-map{min-height:160px}
   }

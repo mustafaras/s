@@ -249,6 +249,7 @@
   }
   @media(max-width:440px){
     .bento>.span-2{grid-column:span 6}
+    .cyc-grid{grid-template-columns:repeat(2,1fr)!important}
   }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
@@ -283,12 +284,24 @@ var DZLEVEL=[{label:"Hafif",color:"#F4C152"},{label:"Orta",color:"#F0892F"},{lab
 function dzCol(n){ return n>=3?"#E25B6A":(n===2?"#F0892F":(n>=1?"#F4C152":"#888")); }
 var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz",gogus:"Göğüs",karin:"Karın","kol-sol":"Sol kol","kol-sag":"Sağ kol","el-sol":"Sol el/bilek","el-sag":"Sağ el/bilek",kalca:"Kasık/kalça","diz-sol":"Sol diz","diz-sag":"Sağ diz","bacak-sol":"Sol bacak","bacak-sag":"Sağ bacak","ayak-sol":"Sol ayak","ayak-sag":"Sağ ayak",ense:"Ense","omuz-arka-sol":"Sol omuz (arka)","omuz-arka-sag":"Sağ omuz (arka)","sirt-ust":"Üst sırt",bel:"Bel","kalca-arka":"Kalça","kol-arka-sol":"Sol kol (arka)","kol-arka-sag":"Sağ kol (arka)","bacak-arka-sol":"Sol bacak (arka)","bacak-arka-sag":"Sağ bacak (arka)"};
 function dzRegLabel(id){ return DZREG[id]||id; }
+// Menstrüel akış emojileri + 4 faz — uygulamadaki app.js tanımlarıyla birebir aynı (panelde salt-gösterim).
+var FLOWEMO={spot:"🩸",light:"🌸",medium:"🌺",heavy:"🌹"};
+var CYCPHASES={
+  menstrual:{label:"Menstrüel faz",emoji:"🩸",color:"#E58B9B",note:"Regl günleri. Östrojen ve progesteron düşük; demir açısından zengin beslenme ve nazik hareket iyi gelir."},
+  follicular:{label:"Foliküler faz",emoji:"🌱",color:"#8FBF8A",note:"Östrojen yükselişte. Enerji ve ruh hali genelde toparlanır; antrenmana en açık dönem."},
+  ovulation:{label:"Ovülasyon",emoji:"🌟",color:"#E8A53C",note:"Yumurtlama civarı, doğurganlık en yüksek. Hafif tek taraflı sancı (mittelschmerz) olabilir."},
+  luteal:{label:"Luteal faz",emoji:"🌙",color:"#9B7FC9",note:"Progesteron yükselir; regl öncesi (PMS) belirtileri bu dönemde. Magnezyum ve düzenli uyku destekler."}
+};
+var MONTH_TR=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+var DOW_TR=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
+function fmtTR(s){ if(!s) return "—"; var p=String(s).split("-"); if(p.length<3) return esc(String(s)); return Number(p[2])+" "+(MONTH_TR[Number(p[1])-1]||""); }
+function dowTR(s){ var p=String(s).split("-").map(Number); if(p.length<3) return ""; var d=new Date(p[0],p[1]-1,p[2]); return DOW_TR[d.getDay()]||""; }
 function isAnalgesic(name){ if(!name) return false; var s=String(name).toLowerCase(); return ["parol","parasetamol","ibuprofen","ibuprofin","nurofen","brufen","apranax","naproksen","naproxen","aspirin","majezik","flurbiprofen","novalgin","metamizol","voltaren","diklofenak","diclofenac","minoset","gripin","arveles","deksketoprofen","dolorex"].some(function(k){return s.indexOf(k)>=0;}); }
 var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
 // Panel'in 5 sabit bölümü — kartların DOM/veri sırası değişmez, yalnızca CSS "order" ile bu sıraya dizilirler (sıfır veri kaybı)
 var SECTIONS=[
   {id:"sec-today",ico:"🎯",title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
-  {id:"sec-mood",ico:"🌙",title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi",ord:20},
+  {id:"sec-mood",ico:"🌙",title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi · döngü",ord:20},
   {id:"sec-move",ico:"🚶",title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
   {id:"sec-risk",ico:"🧭",title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
   {id:"sec-arch",ico:"📚",title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
@@ -887,6 +900,104 @@ function weatherCardHTML(){
   s+='</div></div>';
   return s;
 }
+// ── Menstrüasyon Döngüsü kartı (salt-gözlem) ────────────────────────────────
+// Uygulamadaki cycleStats() ile birebir aynı hesap; panelde regl kayıtlarını
+// (başlangıç–bitiş), faz/tahminleri ve HER GÜNÜN akış+belirti dökümünü gösterir.
+function panelSortedPeriods(){
+  var ps=(D&&D.cycle&&Array.isArray(D.cycle.periods))?D.cycle.periods:[];
+  return ps.filter(function(p){return p&&p.start;}).slice().sort(function(a,b){return a.start<b.start?-1:(a.start>b.start?1:0);});
+}
+function panelCycleStats(){
+  var ps=panelSortedPeriods(); var starts=ps.map(function(p){return p.start;});
+  var lens=[]; for(var i=1;i<starts.length;i++){ var dl=diff(starts[i-1],starts[i]); if(dl>=15&&dl<=60) lens.push(dl); }
+  var storedC=(D&&D.cycle&&typeof D.cycle.avgCycle==="number")?D.cycle.avgCycle:28;
+  var avgCycle=lens.length?Math.round(lens.reduce(function(a,b){return a+b;},0)/lens.length):storedC; avgCycle=Math.max(21,Math.min(40,avgCycle));
+  var plens=[]; ps.forEach(function(p){ if(p.start&&p.end){ var d=diff(p.start,p.end)+1; if(d>0&&d<15) plens.push(d); } });
+  var storedP=(D&&D.cycle&&typeof D.cycle.avgPeriod==="number")?D.cycle.avgPeriod:5;
+  var avgPeriod=plens.length?Math.round(plens.reduce(function(a,b){return a+b;},0)/plens.length):storedP; avgPeriod=Math.max(2,Math.min(10,avgPeriod));
+  var last=starts.length?starts[starts.length-1]:null; var td=today();
+  var next=null,ovu=null,fS=null,fE=null,dayInCycle=null,phase=null;
+  if(last){ var since=diff(last,td); if(since>=0) dayInCycle=(since%avgCycle)+1;
+    next=addDays(last,avgCycle); var guard=0; while(diff(next,td)>0&&guard<60){ next=addDays(next,avgCycle); guard++; }
+    ovu=addDays(next,-14); fS=addDays(ovu,-5); fE=addDays(ovu,1);
+    if(dayInCycle){ var ovuDay=avgCycle-14; if(dayInCycle<=avgPeriod) phase="menstrual"; else if(dayInCycle<ovuDay-1) phase="follicular"; else if(dayInCycle<=ovuDay+1) phase="ovulation"; else phase="luteal"; }
+  }
+  return {ps:ps,avgCycle:avgCycle,avgPeriod:avgPeriod,last:last,next:next,ovu:ovu,fertileStart:fS,fertileEnd:fE,dayInCycle:dayInCycle,phase:phase,sampleCount:lens.length};
+}
+function cycleCardHTML(){
+  var st=panelCycleStats(); var hasAny=st.ps.length>0; var ph=st.phase?CYCPHASES[st.phase]:null; var td=today();
+  // ── Özet (her zaman görünür) ──
+  var sum;
+  if(hasAny){
+    var bits=[];
+    if(ph) bits.push('<span style="color:'+ph.color+';font-weight:800;">'+ph.emoji+' '+esc(ph.label)+'</span>');
+    if(st.dayInCycle) bits.push('Döngü <b style="color:var(--t1);">'+st.dayInCycle+'. gün</b>');
+    if(st.next) bits.push('Sonraki regl <b style="color:var(--t1);">~'+fmtTR(st.next)+'</b>');
+    bits.push('<span style="color:var(--t3);">'+st.ps.length+' kayıt</span>');
+    sum=bits.join(' · ');
+  } else {
+    sum='Henüz regl kaydı yok — Şeyma uygulamadan ilk gününü ekleyince faz, tahminler ve günlük akış burada belirir.';
+  }
+  // ── Detay ──
+  var det='';
+  if(ph){
+    det+='<div style="background:'+ph.color+'14;border:1px solid '+ph.color+'55;border-radius:12px;padding:12px 13px;margin-bottom:12px;">';
+    det+='<div style="font-size:var(--f4);font-weight:800;color:'+ph.color+';margin-bottom:3px;">'+ph.emoji+' '+esc(ph.label)+(st.dayInCycle?' · Döngü '+st.dayInCycle+'. gün':'')+'</div>';
+    det+='<div style="font-size:var(--f3);color:var(--t2);line-height:1.5;">'+esc(ph.note)+'</div></div>';
+  }
+  if(st.last){
+    var cells=[
+      ['Sonraki regl (tahmini)',fmtTR(st.next)],
+      ['Doğurganlık penceresi',fmtTR(st.fertileStart)+' – '+fmtTR(st.fertileEnd)],
+      ['Ovülasyon (tahmini)',fmtTR(st.ovu)],
+      ['Ortalama döngü',st.avgCycle+' gün'],
+      ['Ortalama regl süresi',st.avgPeriod+' gün'],
+      ['Son regl başlangıcı',fmtTR(st.last)]
+    ];
+    det+='<div class="cyc-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">';
+    cells.forEach(function(c){ det+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:11px;padding:10px 11px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;line-height:1.25;">'+esc(c[0])+'</div><div style="font-size:var(--f4);font-weight:800;color:var(--t1);margin-top:4px;">'+esc(c[1])+'</div></div>'; });
+    det+='</div>';
+    if(st.sampleCount<1) det+='<div style="font-size:var(--f2);color:var(--t4);line-height:1.4;margin:-6px 0 12px;">Şimdilik tek başlangıç var; tahminler '+st.avgCycle+' günlük ortalamaya göre. Her yeni kayıt tahmini daha isabetli yapar.</div>';
+  }
+  // ── Regl kayıtları (başlangıç – bitiş + süre) + günlük akış/belirti dökümü ──
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span>🩸 Regl Kayıtları</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">başlangıç · bitiş · günlük akış &amp; belirti</span></div>';
+  if(!hasAny){
+    det+='<div style="font-size:var(--f3);color:var(--t4);line-height:1.5;">Kayıt yok.</div>';
+  } else {
+    st.ps.slice().reverse().forEach(function(p){
+      var end=p.end||null;
+      var lastDay=end||td;
+      var lenDays=diff(p.start,lastDay)+1; if(lenDays<1) lenDays=1;
+      var ongoing=!end;
+      var head='<b style="color:var(--t1);">'+fmtTR(p.start)+' '+dowTR(p.start)+'</b> – '+(end?('<b style="color:var(--t1);">'+fmtTR(end)+' '+dowTR(end)+'</b>'):'<span style="color:var(--amber);font-weight:800;">sürüyor</span>');
+      det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:var(--s1);">';
+      det+='<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:var(--f3);"><span>'+head+'</span><span style="margin-left:auto;font-size:var(--f1);color:var(--t3);font-weight:800;">'+(ongoing?('~'+lenDays+'. gün'):(lenDays+' gün'))+'</span></div>';
+      var span=Math.min(lenDays,15); if(span<1) span=1;
+      var dayRows='';
+      for(var i=0;i<span;i++){
+        var ds=addDays(p.start,i);
+        var rec=(D&&D.days&&D.days[ds])?D.days[ds]:null;
+        var fl=(rec&&rec.flow)?rec.flow:null;
+        var sy=(rec&&Array.isArray(rec.symptoms))?rec.symptoms:[];
+        var flTxt=fl?((FLOWEMO[fl]||'')+' '+esc(FLOW[fl]||fl)):'<span style="color:var(--t4);font-weight:600;">akış girilmemiş</span>';
+        var syTxt=sy.length?sy.map(function(x){return esc(SYM[x]||x);}).join(', '):'';
+        dayRows+='<div style="display:flex;gap:8px;align-items:baseline;font-size:var(--f2);line-height:1.5;padding:4px 0;border-top:1px solid var(--bd);">';
+        dayRows+='<span style="flex-shrink:0;color:var(--t4);font-weight:800;min-width:70px;">G'+(i+1)+' · '+shortD(ds)+'</span>';
+        dayRows+='<span style="flex-shrink:0;color:var(--t1);font-weight:700;min-width:82px;">'+flTxt+'</span>';
+        dayRows+='<span style="color:var(--t3);font-weight:600;flex:1;min-width:0;word-break:break-word;">'+(syTxt?('🌸 '+syTxt):'')+'</span></div>';
+      }
+      det+='<div style="margin-top:8px;">'+dayRows+'</div>';
+      det+='</div>';
+    });
+  }
+  // ── 4 faz mini-lejant + uyarı ──
+  det+='<div style="border-top:1px solid var(--bd);margin-top:6px;padding-top:10px;">';
+  det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin-bottom:7px;">4 faz kısaca 🔬</div>';
+  ['menstrual','follicular','ovulation','luteal'].forEach(function(k){ var pp=CYCPHASES[k]; det+='<div style="display:flex;gap:7px;margin-bottom:5px;font-size:var(--f2);line-height:1.4;"><span style="flex-shrink:0;">'+pp.emoji+'</span><span><b style="color:'+pp.color+';">'+esc(pp.label)+'</b> — '+esc(pp.note)+'</span></div>'; });
+  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:6px;">Hesaplamalar takvim/ortalama yöntemine dayanır (luteal faz ~14 gün kabulü); tahmindir, tıbbi karar için tek başına kullanılmamalıdır.</div>';
+  det+='</div>';
+  return cardWrap({key:'cycle',icon:'🌸',title:'Menstrüasyon Döngüsü',span:12,order:20,summary:sum,details:det});
+}
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   var opened=lastOpenedAt();
@@ -1298,6 +1409,7 @@ function render(){
 
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
   h+=moodHeatmapCardHTML();
+  h+=cycleCardHTML();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);

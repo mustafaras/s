@@ -3121,6 +3121,51 @@ App.showAeonHistory=function(){
     if(thread && sc){ var top=thread.offsetTop||0; sc.scrollTop=Math.max(0,top-8); }
   }catch(e){}
 };
+App.toggleAeonSearch=function(){
+  var bar=document.getElementById('aeon-search-bar'); if(!bar) return;
+  var show=bar.style.display==='none';
+  bar.style.display=show?'block':'none';
+  if(show){ var inp=document.getElementById('aeon-search-input'); if(inp) inp.focus(); }
+  else App.clearAeonSearch();
+};
+App.clearAeonSearch=function(){
+  var inp=document.getElementById('aeon-search-input'); if(inp) inp.value='';
+  App.filterAeonSearch({value:''});
+};
+// Sohbet DOM'unu tam render() TETİKLEMEDEN filtreler — thread çocuklarını gün-gruplarına
+// ayırıp her mesajın metnini arama sorgusuyla karşılaştırır, eşleşmeyeni gizler; bir günün
+// TÜM mesajları gizliyse o günün ayırıcısı da gizlenir. Veri silinmez, yalnızca DOM'da saklanır.
+App.filterAeonSearch=function(el){
+  var q=String((el&&el.value)||'').trim().toLowerCase();
+  var thread=document.getElementById('aeon-thread'); if(!thread) return;
+  var groups=[], current=null, totalMatches=0;
+  Array.prototype.forEach.call(thread.children,function(node){
+    if(!node.classList) return;
+    if(node.classList.contains('msg-daydiv')){ current={div:node,rows:[]}; groups.push(current); }
+    else if(node.classList.contains('msg-row')){
+      if(!current){ current={div:null,rows:[]}; groups.push(current); }
+      current.rows.push(node);
+    }
+  });
+  groups.forEach(function(g){
+    var groupHasMatch=false;
+    g.rows.forEach(function(row){
+      var match=!q || row.textContent.toLowerCase().indexOf(q)!==-1;
+      row.style.display=match?'':'none';
+      if(match){ groupHasMatch=true; totalMatches++; }
+    });
+    if(g.div) g.div.style.display=groupHasMatch?'':'none';
+  });
+  var hint=document.getElementById('aeon-search-noresult');
+  if(q && totalMatches===0){
+    if(!hint){
+      hint=document.createElement('div'); hint.id='aeon-search-noresult';
+      hint.style.cssText='text-align:center;padding:16px 10px;color:var(--faint);font-size:13px;font-weight:600;';
+      hint.textContent='🔍 Eşleşen mesaj bulunamadı';
+      thread.appendChild(hint);
+    }
+  } else if(hint){ hint.remove(); }
+};
 function notifCardHTML(n){
   var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
   var unread=!n.read, s='';
@@ -3217,10 +3262,30 @@ function aeonDayDivider(iso){
 }
 // Uzun mesajları kısalt: max-height ile kırp + alta yumuşak geçiş + "Devamını göster" düğmesi.
 // Tam render olmadan DOM üzerinden açılır/kapanır (kaydırma zıplamaz).
+// Basit markdown-lite: **kalın**, *italik*/_italik_, otomatik link, "- "/"* " liste maddesi.
+// Girdi ÖNCE esc() ile HTML-kaçışlı olmalı (ham < > & zaten entity'ye çevrilmiş olur) —
+// bu fonksiyon yalnızca escape edilmiş metin üzerinde çalışır, asla ham kullanıcı girdisini
+// doğrudan HTML'e enjekte etmez.
+function mdLite(safe){
+  // Liste maddesi: satır başında "- " veya "* " → madde işareti (bold/italik'ten ÖNCE işlenir
+  // ki tek yıldızlı liste imi "*" italik regex'ine karışmasın)
+  safe=safe.replace(/^[ \t]*[-*][ \t]+(?=\S)/gm,'• ');
+  // Otomatik link: http(s):// ile başlayan URL'ler tıklanabilir olur (cümle sonu noktalama linke dahil edilmez)
+  safe=safe.replace(/(https?:\/\/[^\s<]+)/g,function(url){
+    var clean=url.replace(/[),.;:!?'"]+$/,''); var trail=url.slice(clean.length);
+    return '<a href="'+clean+'" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">'+clean+'</a>'+trail;
+  });
+  // Kalın: **metin**
+  safe=safe.replace(/\*\*([^\n*]+?)\*\*/g,'<b>$1</b>');
+  // İtalik: *metin* veya _metin_
+  safe=safe.replace(/(^|[^*])\*([^\n*]+?)\*(?!\*)/g,'$1<i>$2</i>');
+  safe=safe.replace(/(^|[^_])_([^\n_]+?)_(?!_)/g,'$1<i>$2</i>');
+  return safe;
+}
 function clampBubble(text,fadeColor){
   var t=String(text==null?'':text);
   var long=t.length>240||t.split('\n').length>7;
-  var safe=esc(t);
+  var safe=mdLite(esc(t));
   if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
   var h='<div style="position:relative;">';
   h+='<div data-clamp="140" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
@@ -3262,7 +3327,11 @@ function aeonItemHTML(it,enterCls){
 // Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
 function aeonChatHTML(){
   var h='';
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--aeon2),var(--aeon));display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px var(--aeon-glow);">⬡</div><div><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div></div>';
+  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--aeon2),var(--aeon));display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px var(--aeon-glow);">⬡</div><div style="flex:1;"><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div><button onclick="App.toggleAeonSearch()" title="Mesajlarda ara" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:12px;width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">🔍</button></div>';
+  h+='<div id="aeon-search-bar" style="display:none;margin:0 2px 12px;position:relative;">';
+  h+='<input id="aeon-search-input" type="text" oninput="App.filterAeonSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:10px 36px 10px 14px;font-size:14px;color:var(--text);outline:none;">';
+  h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);font-size:15px;line-height:1;padding:4px;">✕</button>';
+  h+='</div>';
   var items=[];
   notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];

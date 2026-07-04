@@ -124,6 +124,11 @@
   .pm-bubble.out-aeon a{color:#1a1404}
   .pm-bubble.out-luna{background:linear-gradient(135deg,#9B7FC9,#E9AFC1);color:#fff;border-radius:15px 15px 5px 15px}
   .pm-bubble.out-luna a{color:#fff}
+  .pm-msg{display:block}
+  .pm-clamp{white-space:pre-wrap;word-break:break-word}
+  .pm-clamp.pm-collapsed{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+  .pm-more{margin-top:5px;border:none;background:none;cursor:pointer;font:inherit;font-size:var(--f1);font-weight:800;color:inherit;opacity:.82;padding:2px 0;text-decoration:underline;text-underline-offset:2px}
+  .pm-more:hover{opacity:1}
   .pm-foot{font-size:var(--f1);margin-top:3px;color:var(--t4);font-weight:600;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .pm-foot .pm-del{border:1px solid var(--bd);background:var(--s2);color:var(--t3);cursor:pointer;border-radius:7px;width:22px;height:22px;font-size:11px;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0}
   .pm-enter{animation:pmBubbleIn .3s cubic-bezier(.16,1,.3,1)}
@@ -633,11 +638,19 @@ function pmMdLite(safe){
   safe=safe.replace(/(^|[^_])_([^\n_]+?)_(?!_)/g,"$1<i>$2</i>");
   return safe;
 }
+// Uzun mesajları 3 satırda kırp + "Tümünü göster" düğmesi. Kırpma CSS ile
+// (-webkit-line-clamp:3); render sonrası initClampButtons taşan balonlarda
+// düğmeyi görünür yapar. pmMdLite ÖNCE esc() edilmiş metin üzerinde çalışır.
+function pmClamp(text){
+  var safe=pmMdLite(esc(String(text==null?"":text)));
+  return '<div class="pm-msg"><div class="pm-clamp pm-collapsed">'+safe+'</div>'+
+    '<button class="pm-more" style="display:none" onclick="pmToggleMsg(this)">Tümünü göster ⌄</button></div>';
+}
 // Tek balon satırı — side:'in'(Şeyma sol) | 'out'(companion sağ), tone:'aeon'|'luna'
 function pmRow(side,tone,text,footHtml,enter){
   var cls=side==="out"?("out-"+(tone||"aeon")):"in";
   var h='<div class="pm-row '+side+(enter?" pm-enter":"")+'">';
-  h+='<div class="pm-bubble '+cls+'">'+pmMdLite(esc(String(text==null?"":text)))+'</div>';
+  h+='<div class="pm-bubble '+cls+'">'+pmClamp(text)+'</div>';
   if(footHtml) h+='<div class="pm-foot">'+footHtml+'</div>';
   h+='</div>';
   return h;
@@ -816,6 +829,20 @@ function pmBindThread(id,key){
   },{passive:true});
 }
 function initChatScroll(){ pmBindThread('pm-aeon-thread','aeon'); pmBindThread('pm-luna-thread','luna'); }
+// Uzun balon 3 satırı aşıyorsa "Tümünü göster" düğmesini görünür yap (taşma tespiti).
+function initClampButtons(){
+  var list=document.querySelectorAll('.pm-clamp');
+  for(var i=0;i<list.length;i++){
+    var el=list[i], btn=el.nextElementSibling;
+    if(!btn||!btn.classList||!btn.classList.contains('pm-more')) continue;
+    if(el.classList.contains('pm-collapsed')) btn.style.display=(el.scrollHeight-el.clientHeight>2)?'':'none';
+  }
+}
+window.pmToggleMsg=function(btn){
+  var wrap=btn.previousElementSibling; if(!wrap) return;
+  if(wrap.classList.contains('pm-collapsed')){ wrap.classList.remove('pm-collapsed'); btn.textContent='Daha az göster ⌃'; }
+  else { wrap.classList.add('pm-collapsed'); btn.textContent='Tümünü göster ⌄'; }
+};
 
 function wxP(code,isDay){
   var c=Number(code);
@@ -1503,13 +1530,14 @@ function render(){
 
   h+='</div>'; // end bento
 
-  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ÆON ÇEKİRDEĞİ · CANLI · 5 DK&#39;DA BİR EŞİTLENİR</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ÆON ÇEKİRDEĞİ · CANLI · OTOMATİK YENİLENİR</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;
   setTimeout(initLocMap,0);
   setTimeout(initSectionScrollSpy,0);
   setTimeout(initChatScroll,0);
+  setTimeout(initClampButtons,0);
   try{ maybeMarkReviewing(); }catch(e){}
 }
 
@@ -1696,7 +1724,14 @@ function load(){
     .then(function(j){
       D=j; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      loadInbox().then(function(res){ OBSINBOX=res.messages||[]; OBSSHA=res.sha; OBSRECEIPTS=res.receipts||{}; render(); }).catch(function(){ render(); });
+      loadInbox().then(function(res){
+        OBSINBOX=res.messages||[]; OBSSHA=res.sha; OBSRECEIPTS=res.receipts||{};
+        // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
+        // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
+        var sig=panelSig();
+        if(sig!==null && sig===LASTSIG) return;
+        LASTSIG=sig; render();
+      }).catch(function(){ render(); });
     })
     .catch(function(e){
       var m=String(e&&e.message||e);
@@ -1705,6 +1740,10 @@ function load(){
       fail(m);
     });
 }
+// Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
+// UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
+var LASTSIG=null;
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS); }catch(e){ return null; } }
 window.load=load;
 try{
   PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");
@@ -1722,10 +1761,11 @@ try{
   if(insRaw) UI.insightTab=insRaw;
 }catch(e){}
 load();
-// Panel otomatik yenileme: ~45 sn'de bir, ama gözlemci bir metin alanına yazarken
-// (ya da gönderim sürerken) o turu atla — yanıt yazarken imleç/taslak kesilmesin.
+// Panel otomatik yenileme: ~15 sn'de bir (mesajlar mümkün olduğunca anlık gelsin),
+// ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
+// yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
-setInterval(function(){ if(!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },45000);
+setInterval(function(){ if(!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },15000);
 document.addEventListener("visibilitychange",function(){ if(!document.hidden&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
 window.addEventListener("focus",function(){ if(PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
 })();

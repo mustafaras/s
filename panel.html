@@ -105,6 +105,19 @@
   .bento>.span-8{grid-column:span 8}
   .bento>.span-12{grid-column:span 12}
 
+  /* ── jump-nav (bölüm atlama şeridi) ── */
+  .jumpnav{position:sticky;top:0;z-index:150;display:flex;gap:6px;padding:9px 2px 11px;margin:-2px 0 2px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;background:linear-gradient(var(--bg) 62%,transparent)}
+  .jumpnav::-webkit-scrollbar{display:none}
+  .jumpnav button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--bd2);color:var(--t3);padding:7px 13px;border-radius:999px;font-weight:800;font-size:var(--f2);letter-spacing:.2px;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease}
+  .jumpnav button.active{background:var(--ggrad);color:#1a1404;border-color:transparent;box-shadow:0 3px 12px rgba(212,175,55,.35)}
+  .jumpnav button:hover:not(.active){color:var(--t1);border-color:rgba(255,255,255,.2)}
+
+  /* ── bölüm başlıkları (sticky, iOS-tarzı zincirleme yığılma) ── */
+  .section-header{grid-column:span 12;position:sticky;top:0;z-index:6;display:flex;align-items:baseline;gap:10px;padding:9px 14px;margin:2px 0 -1px;border-radius:12px;background:rgba(9,9,13,.86);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid var(--bd);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .section-header .sh-ico{font-size:15px;line-height:1}
+  .section-header .sh-title{font-size:var(--f3);font-weight:800;letter-spacing:.5px;color:var(--t1);text-transform:uppercase}
+  .section-header .sh-sub{font-size:var(--f1);color:var(--t4);font-weight:600}
+
   /* ── KPI hero ── */
   .kpi{position:relative;padding:13px 15px 14px;overflow:hidden}
   .kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--gold));opacity:.85;border-radius:3px}
@@ -228,6 +241,14 @@ var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz"
 function dzRegLabel(id){ return DZREG[id]||id; }
 function isAnalgesic(name){ if(!name) return false; var s=String(name).toLowerCase(); return ["parol","parasetamol","ibuprofen","ibuprofin","nurofen","brufen","apranax","naproksen","naproxen","aspirin","majezik","flurbiprofen","novalgin","metamizol","voltaren","diklofenak","diclofenac","minoset","gripin","arveles","deksketoprofen","dolorex"].some(function(k){return s.indexOf(k)>=0;}); }
 var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
+// Panel'in 5 sabit bölümü — kartların DOM/veri sırası değişmez, yalnızca CSS "order" ile bu sıraya dizilirler (sıfır veri kaybı)
+var SECTIONS=[
+  {id:"sec-today",ico:"🎯",title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
+  {id:"sec-mood",ico:"🌙",title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi",ord:20},
+  {id:"sec-move",ico:"🚶",title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
+  {id:"sec-risk",ico:"🧭",title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
+  {id:"sec-arch",ico:"📚",title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
+];
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -302,7 +323,7 @@ function moodHeatmapCardHTML(){
   var weeks=[], cur=new Date(start);
   while(cur<=dec31){ var col=[]; for(var d=0; d<7; d++){ col.push(new Date(cur)); cur.setDate(cur.getDate()+1); } weeks.push(col); }
   var nW=weeks.length;
-  var h='<div class="card lift span-12 pad">';
+  var h='<div class="card lift span-12 pad" style="order:20;">';
   h+='<div class="lbl">Mod Isı Haritası · '+curY+'</div>';
   h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
   h+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
@@ -503,7 +524,7 @@ function msgCardHTML(){
   var nm=notifMap();
   var inbox=OBSINBOX.slice().sort(function(a,b){ return String(b.ts||"").localeCompare(String(a.ts||"")); });
   var unreadDelivered=inbox.reduce(function(a,m){ var n=nm[m.id]; return a+((n&&!n.deleted&&!n.read)?1:0); },0);
-  var s='<div class="card span-6 pad">';
+  var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div class="lbl">⬡ ÆON’dan Mesaj Gönder & Bildirim Durumu'+(unreadDelivered?'<span style="margin-left:auto;font-size:var(--f2);color:var(--amber);font-weight:800;letter-spacing:0;text-transform:none;">'+unreadDelivered+' okunmadı</span>':'')+'</div>';
   s+='<div style="display:flex;gap:9px;align-items:stretch;flex-wrap:wrap;">';
   s+='<textarea id="obs-msg" oninput="obsDraft(this.value)" placeholder="ÆON olarak Şeyma’ya bir mesaj yaz — uygulamada ÆON adıyla popup olarak belirir…" rows="2" style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:11px;padding:10px 12px;font:inherit;font-size:var(--f3);resize:vertical;outline:none;line-height:1.45;">'+esc(UI.msgDraft||"")+'</textarea>';
@@ -578,7 +599,7 @@ function lunaCardHTML(){
   var lunaConn=!!(D&&D.settings&&D.settings.lunaConnected);
   var lunaTodayN=(luna&&Array.isArray(luna.qa))?luna.qa.filter(function(x){ return x&&x.date===today(); }).length:0;
   var todayTag=(lunaT&&aeonT)?'Luna + ÆON bugün soruldu':(lunaT?'Luna bugün soruldu':(aeonT?'ÆON bugün soruldu':'bugün henüz yok'));
-  var s='<div class="card span-6 pad">';
+  var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div class="lbl">💬 Tüm Konuşmalar · Luna + ÆON<span style="margin-left:auto;font-size:var(--f2);color:'+((lunaT||aeonT)?'var(--green)':'var(--t4)')+';font-weight:800;letter-spacing:0;text-transform:none;">'+esc(todayTag)+'</span></div>';
   s+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
   s+='<span style="font-size:var(--f1);font-weight:800;letter-spacing:0;text-transform:none;border-radius:999px;padding:3px 10px;'+(lunaConn?'color:#0a2a18;background:var(--green);':'color:var(--t3);background:var(--s2);border:1px solid var(--bd2);')+'">🌙 Luna '+(lunaConn?'bağlı ✓':'bağlı değil')+'</span>';
@@ -623,6 +644,28 @@ function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.se
 function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
 function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
 
+// ── Jump-nav: bölüme kaydır + scroll-spy (aktif bölümü şeritte vurgula) ──
+function jumpToSection(id){
+  var el=document.getElementById(id); if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+window.jumpToSection=jumpToSection;
+var _secSpyBound=null;
+function initSectionScrollSpy(){
+  var page=document.querySelector('.page'); var nav=document.getElementById('jumpnav');
+  if(!page||!nav) return;
+  var headers=SECTIONS.map(function(sec){ return document.getElementById(sec.id); }).filter(Boolean);
+  var btns=nav.querySelectorAll('button');
+  function update(){
+    var pageTop=page.getBoundingClientRect().top, activeId=headers.length?headers[0].id:null;
+    headers.forEach(function(hEl){ if(hEl.getBoundingClientRect().top-pageTop<=60) activeId=hEl.id; });
+    btns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-sec')===activeId); });
+  }
+  if(_secSpyBound) page.removeEventListener('scroll',_secSpyBound);
+  _secSpyBound=update; page.addEventListener('scroll',update,{passive:true});
+  update();
+}
+
 function wxP(code,isDay){
   var c=Number(code);
   if(c===0) return {e:isDay?'☀️':'🌙',l:isDay?'Açık':'Açık gece'};
@@ -641,7 +684,7 @@ function wxP(code,isDay){
 function weatherCardHTML(){
   var wx=D&&D.weather?D.weather:null;
   var spots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
-  var s='<div class="card lift span-12 pad">';
+  var s='<div class="card lift span-12 pad" style="order:10;">';
   var upd='';
   if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
   s+='<div class="lbl">☀️ Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
@@ -763,12 +806,21 @@ function render(){
   h+='<input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)" style="margin-left:auto;">';
   h+='</div>';
 
+  // ── JUMP-NAV: 5 bölüme atlama şeridi (scroll-spy ile aktif bölüm vurgulanır) ──
+  h+='<div class="jumpnav" id="jumpnav">';
+  SECTIONS.forEach(function(sec){ h+='<button data-sec="'+sec.id+'" onclick="jumpToSection(\''+sec.id+'\')">'+sec.ico+' '+sec.title+'</button>'; });
+  h+='</div>';
+
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
+  // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
+  SECTIONS.forEach(function(sec){
+    h+='<div class="section-header" id="'+sec.id+'" style="order:'+(sec.ord-1)+';top:0;"><span class="sh-ico">'+sec.ico+'</span><span class="sh-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';
+  });
 
   // ROW 1: 6 KPI hero tiles (span-2 each)
   function kpi(label,val,accent,extra,spark,caption){
-    var s='<div class="card lift kpi span-2" style="--accent:'+accent+';">';
+    var s='<div class="card lift kpi span-2" style="--accent:'+accent+';order:10;">';
     s+='<div class="kpi-top"><span class="kpi-l">'+label+'</span>'+(extra||'')+'</div>';
     s+='<div class="kpi-v mono">'+val+'</div>';
     if(spark) s+='<div class="kpi-spark">'+spark+'</div>';
@@ -803,7 +855,7 @@ function render(){
   // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
 
   // Map card
-  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;">';
+  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;order:30;">';
   h+='<div class="lbl" style="margin-bottom:10px;">📍 Canlı Konum';
   if(loc){
     var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
@@ -819,7 +871,7 @@ function render(){
   h+='</div>';
 
   // Selected day card
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:10;">';
   h+='<div class="lbl">'+shortD(selected)+' · Seçili Gün</div>';
   h+='<div class="dstats">';
   [
@@ -1024,7 +1076,7 @@ function render(){
   h+='</div>';
 
   // Mood + Reading card
-  h+='<div class="card lift span-3 pad">';
+  h+='<div class="card lift span-3 pad" style="order:20;">';
   h+='<div class="lbl">Mod Dağılımı · '+UI.range+'g</div>';
   var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
   var moodTotal=Object.keys(moodDist).reduce(function(a,k){return a+moodDist[k];},0);
@@ -1060,12 +1112,12 @@ function render(){
 
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
   h+=moodHeatmapCardHTML();
-  h+='<div class="card lift span-8 pad">';
+  h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);
   h+='</div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Dönem Özeti · '+UI.range+'g</div>';
   [
     ['Tik ortalama',  curAvg.toFixed(1)+' '+trend(curAvg,prevAvg)],
@@ -1080,26 +1132,26 @@ function render(){
   h+='</div>';
 
   // ROW 4: SOS chart (span-4) + Notes (span-4) + SOS list (span-4)
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Yoğunluğu · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+curSos+' toplam</span></div>';
   h+=sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",62);
   h+='</div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
   h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
   h+='</div></div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Geçmişi'+(sosRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+sosRows.length+' gün</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
   h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
   // ROW 5: Pro insights
-  function insight(title,rows){
-    var s='<div class="card lift span-4 pad"><div class="lbl">'+title+'</div>';
+  function insight(title,rows,ord){
+    var s='<div class="card lift span-4 pad" style="order:'+(ord||30)+';"><div class="lbl">'+title+'</div>';
     rows.forEach(function(x){ s+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>'; });
     return s+'</div>';
   }
@@ -1108,13 +1160,13 @@ function render(){
     ['Akşam payı', '%'+usePat.eveningPct],
     ['Ort. oturum', formatDuration(curSess.avgActive||0)],
     ['Boşta süresi', idleMin==null?"—":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa')]
-  ]);
+  ],30);
   h+=insight('Konum Özeti · 24s',[
     ['Nokta sayısı', String(locSum.recentCount)],
     ['Farklı bölge', String(locSum.zoneCount)],
     ['Yaklaşık hareket', locSum.distanceKm.toFixed(1)+' km'],
     ['Doğruluk ort.', locSum.avgAcc==null?"—":"±"+Math.round(locSum.avgAcc)+" m"]
-  ]);
+  ],30);
   h+=insight('Bugün Hareket',[
     ['Toplam', mv?fmtKmM(mv.totalM):'—'],
     ['🚶 Yürüyüş', mv?fmtKmM(mv.walkM):'—'],
@@ -1123,14 +1175,15 @@ function render(){
     ['🕰️ Yolda süre', mv?fmtDurP(mv.vehicleSec):'—'],
     ['Maks hız', mv&&mv.maxSpeed?Math.round(mv.maxSpeed*3.6)+' km/sa':'—'],
     ['Seçili mod', mvMode==='walk'?'🚶 Yürüyüş':mvMode==='vehicle'?'🚗 Araç':'✨ Oto']
-  ]);
+  ],30);
   var rkc=function(r){return r.klass==="ok"?"var(--green)":r.klass==="warn"?"var(--amber)":"var(--red)";};
   h+=insight('Risk & Güvenilirlik',[
     ['Risk trendi','<span style="color:'+rkc(risk7)+'">7g</span> · <span style="color:'+rkc(risk14)+'">14g</span> · <span style="color:'+rkc(risk30)+'">30g</span>'],
     ['Okuma oranı', '%'+readingRate],
     ['Sync gecikmesi', syncLagMin==null?"—":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa")],
     ['Eksik gün', missingInRange+'/'+cur.length]
-  ]);
+  ],40);
+
 
   // ═════════ KÜTÜPHANE · İZLEME ARŞİVİ · ALINTILAR ═════════
   (function(){
@@ -1191,7 +1244,7 @@ function render(){
     var libRead=LIB.filter(function(b){return b.status==='reading';}).length;
     var libFinYear=LIB.filter(function(b){return b.status==='finished'&&b.finishedAt&&new Date(b.finishedAt).getFullYear()===yr;}).length;
     var libPages=0; for(var dk in D.days){ var rr=D.days[dk]; var en=(rr&&rr.reading&&Array.isArray(rr.reading.entries))?rr.reading.entries:[]; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) libPages+=p; }); }
-    var lh='<div class="card lift span-6 pad"><div class="lbl">📚 Kütüphane<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+LIB.length+' kitap</span></div>';
+    var lh='<div class="card lift span-6 pad" style="order:50;"><div class="lbl">📚 Kütüphane<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+LIB.length+' kitap</span></div>';
     lh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+libRead+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Okunuyor</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+libFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
@@ -1209,7 +1262,7 @@ function render(){
     var wFinYear=WL.filter(function(t){return t.status==='finished'&&t.finishedAt&&new Date(t.finishedAt).getFullYear()===yr;}).length;
     var wMin=0; for(var dk2 in D.days){ var rr2=D.days[dk2]; var en2=(rr2&&rr2.watching&&Array.isArray(rr2.watching.entries))?rr2.watching.entries:[]; en2.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) wMin+=m; }); }
     var wHours=wMin>=60?(Math.floor(wMin/60)+' sa'+(wMin%60?' '+(wMin%60)+' dk':'')):(wMin+' dk');
-    var wh='<div class="card lift span-6 pad"><div class="lbl">🎬 İzleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+WL.length+' yapım</span></div>';
+    var wh='<div class="card lift span-6 pad" style="order:50;"><div class="lbl">🎬 İzleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+WL.length+' yapım</span></div>';
     wh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--amber);">'+wWatch+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">İzleniyor</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+wFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
@@ -1240,7 +1293,7 @@ function render(){
     var musPod=MUS.filter(function(x){return x.kind==='podcast';}).length;
     var lMin=0; for(var dk3 in D.days){ var rr3=D.days[dk3]; var en3=(rr3&&rr3.listening&&Array.isArray(rr3.listening.entries))?rr3.listening.entries:[]; en3.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) lMin+=m; }); }
     var lHours=lMin>=60?(Math.floor(lMin/60)+' sa'+(lMin%60?' '+(lMin%60)+' dk':'')):(lMin+' dk');
-    var mh='<div class="card lift span-6 pad"><div class="lbl">🎧 Dinleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+MUS.length+' parça</span></div>';
+    var mh='<div class="card lift span-6 pad" style="order:50;"><div class="lbl">🎧 Dinleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+MUS.length+' parça</span></div>';
     mh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--teal);">'+musSong+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Şarkı</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+musAlbum+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Albüm</div></div>'
@@ -1258,7 +1311,7 @@ function render(){
     var lyr=[]; MUS.forEach(function(x){ (Array.isArray(x.quotes)?x.quotes:[]).forEach(function(q){ lyr.push({kind:'track',emoji:x.emoji||'🎵',title:String(x.title||'').trim()+(x.artist?' — '+String(x.artist).trim():''),text:q.text,ts:q.ts,col:'var(--teal)'}); }); });
     var allq=quotes.concat(reps).concat(lyr).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
     if(allq.length){
-      var qh='<div class="card lift span-12 pad"><div class="lbl">💬 Alıntılar · Replikler · Sözler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span></div>';
+      var qh='<div class="card lift span-12 pad" style="order:50;"><div class="lbl">💬 Alıntılar · Replikler · Sözler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span></div>';
       qh+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px;">';
       allq.forEach(function(q){
         qh+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'
@@ -1279,6 +1332,7 @@ function render(){
 
   document.getElementById("app").innerHTML=h;
   setTimeout(initLocMap,0);
+  setTimeout(initSectionScrollSpy,0);
   try{ maybeMarkReviewing(); }catch(e){}
 }
 

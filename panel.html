@@ -94,16 +94,39 @@
   .lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
   .divider{height:1px;background:var(--bd2);margin:10px 0}
 
-  /* ── bento grid ── */
+  /* ── genişletilebilir kart (accordion, Faz 2) ──
+     Özet her zaman görünür; detay grid-template-rows 0fr→1fr ile gerçek yükseklik
+     animasyonuyla açılır (ani zıplama yok). Chevron 180° döner. */
+  .card-exp-head{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .card-exp-summary{font-size:var(--f3);color:var(--t3);font-weight:600;line-height:1.5}
+  .card-exp-chevron{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:var(--s2);border:1px solid var(--bd);color:var(--t3);font-size:11px;transition:transform .25s cubic-bezier(.16,1,.3,1),background .15s ease,color .15s ease}
+  .card-exp:hover .card-exp-chevron{color:var(--t1)}
+  .card-exp.is-open .card-exp-chevron{transform:rotate(180deg);color:var(--gold);background:var(--ga)}
+  .card-exp-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s cubic-bezier(.16,1,.3,1)}
+  .card-exp.is-open .card-exp-body{grid-template-rows:1fr}
+  .card-exp-body>div{overflow:hidden}
+  .card-exp-inner{padding-top:11px}
+
+  /* ── bento grid ──
+     Kücük KPI karoları (span-2) hariç tüm kartlar tam genişlikte, tek sütun halinde
+     alt alta akar — hem web hem mobilde derli toplu, öngörülebilir bir akış sağlar.
+     (Eskiden span-3..8 farklı genişliklerde yan yana paketlenip düzensiz görünüyordu.) */
   .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
   .bento>.span-2{grid-column:span 2}
-  .bento>.span-3{grid-column:span 3}
-  .bento>.span-4{grid-column:span 4}
-  .bento>.span-5{grid-column:span 5}
-  .bento>.span-6{grid-column:span 6}
-  .bento>.span-7{grid-column:span 7}
-  .bento>.span-8{grid-column:span 8}
-  .bento>.span-12{grid-column:span 12}
+  .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8,.bento>.span-12{grid-column:span 12}
+
+  /* ── jump-nav (bölüm atlama şeridi) ── */
+  .jumpnav{position:sticky;top:0;z-index:150;display:flex;gap:6px;padding:9px 2px 11px;margin:-2px 0 2px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;background:linear-gradient(var(--bg) 62%,transparent)}
+  .jumpnav::-webkit-scrollbar{display:none}
+  .jumpnav button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--bd2);color:var(--t3);padding:7px 13px;border-radius:999px;font-weight:800;font-size:var(--f2);letter-spacing:.2px;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease}
+  .jumpnav button.active{background:var(--ggrad);color:#1a1404;border-color:transparent;box-shadow:0 3px 12px rgba(212,175,55,.35)}
+  .jumpnav button:hover:not(.active){color:var(--t1);border-color:rgba(255,255,255,.2)}
+
+  /* ── bölüm başlıkları (sticky, iOS-tarzı zincirleme yığılma) ── */
+  .section-header{grid-column:span 12;position:sticky;top:0;z-index:6;display:flex;align-items:baseline;gap:10px;padding:9px 14px;margin:2px 0 -1px;border-radius:12px;background:rgba(9,9,13,.86);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid var(--bd);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  .section-header .sh-ico{font-size:15px;line-height:1}
+  .section-header .sh-title{font-size:var(--f3);font-weight:800;letter-spacing:.5px;color:var(--t1);text-transform:uppercase}
+  .section-header .sh-sub{font-size:var(--f1);color:var(--t4);font-weight:600}
 
   /* ── KPI hero ── */
   .kpi{position:relative;padding:13px 15px 14px;overflow:hidden}
@@ -171,10 +194,6 @@
 
   @media(max-width:1100px){
     .bento>.span-2{grid-column:span 4}
-    .bento>.span-3{grid-column:span 6}
-    .bento>.span-5,.bento>.span-7{grid-column:span 6}
-    .bento>.span-8{grid-column:span 12}
-    .bento>.span-4{grid-column:span 6}
   }
   @media(max-width:768px){
     :root{--fk:30px;--f6:21px;--f5:17px;--f4:15px;--f3:13.5px;--f2:12px;--f1:11px;--topH:auto}
@@ -188,7 +207,6 @@
     html,body{overflow:auto}
     .bento{gap:8px}
     .bento>.span-2{grid-column:span 6}
-    .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8{grid-column:span 12}
     .kpi-v{letter-spacing:-.5px}
     #loc-map{min-height:160px}
   }
@@ -209,9 +227,11 @@ var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
 var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
+var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların açık bırakıldığını hatırlar
+var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartında hangi sekmenin seçili kaldığını hatırlar
 var PTOKEN="";
 var D=null;
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{}};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage"};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 20 dk yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D vitaminimi aldım"],["sleepReg","Yeterli uyudum (7+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"]];
 var HT=HABITS.length;
@@ -228,6 +248,14 @@ var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz"
 function dzRegLabel(id){ return DZREG[id]||id; }
 function isAnalgesic(name){ if(!name) return false; var s=String(name).toLowerCase(); return ["parol","parasetamol","ibuprofen","ibuprofin","nurofen","brufen","apranax","naproksen","naproxen","aspirin","majezik","flurbiprofen","novalgin","metamizol","voltaren","diklofenak","diclofenac","minoset","gripin","arveles","deksketoprofen","dolorex"].some(function(k){return s.indexOf(k)>=0;}); }
 var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
+// Panel'in 5 sabit bölümü — kartların DOM/veri sırası değişmez, yalnızca CSS "order" ile bu sıraya dizilirler (sıfır veri kaybı)
+var SECTIONS=[
+  {id:"sec-today",ico:"🎯",title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
+  {id:"sec-mood",ico:"🌙",title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi",ord:20},
+  {id:"sec-move",ico:"🚶",title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
+  {id:"sec-risk",ico:"🧭",title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
+  {id:"sec-arch",ico:"📚",title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
+];
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
 function pad(n){ return (n<10?"0":"")+n; }
@@ -236,6 +264,52 @@ function today(){ return fmt(new Date()); }
 function addDays(s,n){ var p=s.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]); d.setDate(d.getDate()+n); return fmt(d); }
 function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number); return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000); }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ── Genişletilebilir kart şablonu (Faz 2) ──────────────────────────────────
+// Ortak cardWrap() tüm yoğun kartlar için tek merkezi kalıp: özet her zaman
+// görünür (veri gözlem kaybı yok), detay chevron ile grid-template-rows
+// accordion'u ile açılır/kapanır. toggleCard() tam render() TETİKLEMEZ — yalnızca
+// ilgili kartın DOM'unda bir class toggle eder, böylece CSS transition gerçek
+// bir yükseklik animasyonu olarak oynar (tam render olsaydı DOM yeniden
+// kurulacağı için animasyon atlanırdı) ve sayfa kaydırma konumu korunur.
+// Kullanıcının hangi kartları açık bıraktığı localStorage'da kalıcıdır.
+function toggleCard(key){
+  var open=!UI.expandedCards[key];
+  UI.expandedCards[key]=open;
+  try{ localStorage.setItem(CARDEXPKEY,JSON.stringify(UI.expandedCards)); }catch(e){}
+  var el=document.querySelector('[data-card-key="'+key+'"]');
+  if(el) el.classList.toggle('is-open',open);
+}
+window.toggleCard=toggleCard;
+function cardWrap(o){
+  // o: {key, icon, title, badge, summary, details, span, order, cls}
+  var key=o.key, open=!!UI.expandedCards[key];
+  var span=o.span||12, order=o.order||30;
+  var s='<div class="card lift span-'+span+' pad card-exp'+(open?' is-open':'')+(o.cls?' '+o.cls:'')+'" style="order:'+order+';" data-card-key="'+esc(key)+'">';
+  s+='<div class="card-exp-head" onclick="toggleCard(\''+key+'\')">';
+  s+='<div class="lbl" style="margin-bottom:0;flex:1;">'+(o.icon?o.icon+' ':'')+esc(o.title)+'</div>';
+  if(o.badge) s+=o.badge;
+  s+='<span class="card-exp-chevron">▾</span>';
+  s+='</div>';
+  if(o.summary) s+='<div class="card-exp-summary">'+o.summary+'</div>';
+  s+='<div class="card-exp-body"><div><div class="card-exp-inner">'+(o.details||'')+'</div></div></div>';
+  s+='</div>';
+  return s;
+}
+
+// "Gelişmiş İçgörüler" kartındaki .seg sekmelerini tam render() TETİKLEMEDEN değiştirir
+// (toggleCard ile aynı felsefe): yalnızca ilgili .ins-pane'lerin görünürlüğünü ve
+// aktif buton class'ını günceller, seçim localStorage'da kalıcı olur.
+function switchInsightPane(tab){
+  UI.insightTab=tab;
+  try{ localStorage.setItem(INSTABKEY,tab); }catch(e){}
+  var root=document.querySelector('[data-card-key="insights"]');
+  if(!root) return;
+  root.querySelectorAll('.ins-pane').forEach(function(p){ p.style.display=(p.getAttribute('data-ins')===tab)?'':'none'; });
+  root.querySelectorAll('.ins-seg button').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-ins-btn')===tab); });
+}
+window.switchInsightPane=switchInsightPane;
+
 function panelReadiness(rec){
   var sl=rec&&rec.sleep?rec.sleep:{};
   var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[];
@@ -302,42 +376,41 @@ function moodHeatmapCardHTML(){
   var weeks=[], cur=new Date(start);
   while(cur<=dec31){ var col=[]; for(var d=0; d<7; d++){ col.push(new Date(cur)); cur.setDate(cur.getDate()+1); } weeks.push(col); }
   var nW=weeks.length;
-  var h='<div class="card lift span-12 pad">';
-  h+='<div class="lbl">Mod Isı Haritası · '+curY+'</div>';
-  h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
-  h+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
-  h+='<div style="position:relative;height:12px;margin-left:'+(DAYLABW+GAP)+'px;width:'+(nW*STEP)+'px;">';
-  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ h+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:9px;font-weight:700;color:var(--t3);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
-  h+='</div>';
-  h+='<div style="display:flex;gap:'+GAP+'px;">';
-  h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
-  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:8.5px;color:var(--t4);text-align:right;">'+dayLab[r]+'</div>'; }
-  h+='</div>';
+  var det='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
+  det+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
+  det+='<div style="position:relative;height:12px;margin-left:'+(DAYLABW+GAP)+'px;width:'+(nW*STEP)+'px;">';
+  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ det+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:9px;font-weight:700;color:var(--t3);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
+  det+='</div>';
+  det+='<div style="display:flex;gap:'+GAP+'px;">';
+  det+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
+  for(var r=0; r<7; r++){ det+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:8.5px;color:var(--t4);text-align:right;">'+dayLab[r]+'</div>'; }
+  det+='</div>';
   var recDays=0;
   for(var w2=0; w2<nW; w2++){
-    h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;">';
+    det+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;">';
     for(var r2=0; r2<7; r2++){
       var dt=weeks[w2][r2]; var ds=dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate());
-      if(dt.getFullYear()!==curY){ h+='<div style="width:'+CELL+'px;height:'+CELL+'px;"></div>'; continue; }
+      if(dt.getFullYear()!==curY){ det+='<div style="width:'+CELL+'px;height:'+CELL+'px;"></div>'; continue; }
       var future=diff(tdy,ds)>0; var rec=D.days[ds]||null; var bg, tip=ds;
       if(future){ bg='rgba(255,255,255,0.03)'; }
       else if(rec && rec.mood){ bg=mcol[rec.mood]||'#a78bfa'; recDays++; tip+=' · '+(MOOD_EMOJI[rec.mood]||'')+' '+rec.mood; }
       else if(rec){ bg='rgba(255,255,255,0.16)'; recDays++; tip+=' · kayıt var'; }
       else { bg='rgba(255,255,255,0.06)'; tip+=' · kayıt yok'; }
       var isT=ds===tdy;
-      h+='<div title="'+esc(tip)+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';'+(isT?'box-shadow:0 0 0 1.5px var(--gold);':'')+'"></div>';
+      det+='<div title="'+esc(tip)+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';'+(isT?'box-shadow:0 0 0 1.5px var(--gold);':'')+'"></div>';
     }
-    h+='</div>';
+    det+='</div>';
   }
-  h+='</div></div></div>';
-  h+='<div class="moodlegend" style="justify-content:space-between;">';
-  h+='<span style="display:flex;align-items:center;gap:5px;font-size:var(--f2);color:var(--t3);">zor';
-  ["cok-zorlandim","zorlandim","normal","iyi","cok-iyi"].forEach(function(mid){ h+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
-  h+='iyi</span>';
-  h+='<span style="font-size:var(--f2);color:var(--t3);"><b class="mono">'+recDays+'</b> gün kayıtlı</span>';
-  h+='</div>';
-  h+='</div>';
-  return h;
+  det+='</div></div></div>';
+  det+='<div class="moodlegend" style="justify-content:space-between;">';
+  det+='<span style="display:flex;align-items:center;gap:5px;font-size:var(--f2);color:var(--t3);">zor';
+  ["cok-zorlandim","zorlandim","normal","iyi","cok-iyi"].forEach(function(mid){ det+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
+  det+='iyi</span>';
+  det+='<span style="font-size:var(--f2);color:var(--t3);"><b class="mono">'+recDays+'</b> gün kayıtlı</span>';
+  det+='</div>';
+  var totalD=diff(fmt(jan1),fmt(dec31))+1;
+  var sumLine='<b class="mono" style="color:var(--gold);">'+recDays+'</b>/'+totalD+' gün kayıtlı · '+curY+' yılı ısı haritası';
+  return cardWrap({key:'heatmap-'+curY,icon:'🌡️',title:'Mod Isı Haritası · '+curY,span:12,order:20,summary:sumLine,details:det});
 }
 function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
@@ -503,7 +576,7 @@ function msgCardHTML(){
   var nm=notifMap();
   var inbox=OBSINBOX.slice().sort(function(a,b){ return String(b.ts||"").localeCompare(String(a.ts||"")); });
   var unreadDelivered=inbox.reduce(function(a,m){ var n=nm[m.id]; return a+((n&&!n.deleted&&!n.read)?1:0); },0);
-  var s='<div class="card span-6 pad">';
+  var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div class="lbl">⬡ ÆON’dan Mesaj Gönder & Bildirim Durumu'+(unreadDelivered?'<span style="margin-left:auto;font-size:var(--f2);color:var(--amber);font-weight:800;letter-spacing:0;text-transform:none;">'+unreadDelivered+' okunmadı</span>':'')+'</div>';
   s+='<div style="display:flex;gap:9px;align-items:stretch;flex-wrap:wrap;">';
   s+='<textarea id="obs-msg" oninput="obsDraft(this.value)" placeholder="ÆON olarak Şeyma’ya bir mesaj yaz — uygulamada ÆON adıyla popup olarak belirir…" rows="2" style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:var(--t1);border-radius:11px;padding:10px 12px;font:inherit;font-size:var(--f3);resize:vertical;outline:none;line-height:1.45;">'+esc(UI.msgDraft||"")+'</textarea>';
@@ -578,7 +651,7 @@ function lunaCardHTML(){
   var lunaConn=!!(D&&D.settings&&D.settings.lunaConnected);
   var lunaTodayN=(luna&&Array.isArray(luna.qa))?luna.qa.filter(function(x){ return x&&x.date===today(); }).length:0;
   var todayTag=(lunaT&&aeonT)?'Luna + ÆON bugün soruldu':(lunaT?'Luna bugün soruldu':(aeonT?'ÆON bugün soruldu':'bugün henüz yok'));
-  var s='<div class="card span-6 pad">';
+  var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div class="lbl">💬 Tüm Konuşmalar · Luna + ÆON<span style="margin-left:auto;font-size:var(--f2);color:'+((lunaT||aeonT)?'var(--green)':'var(--t4)')+';font-weight:800;letter-spacing:0;text-transform:none;">'+esc(todayTag)+'</span></div>';
   s+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
   s+='<span style="font-size:var(--f1);font-weight:800;letter-spacing:0;text-transform:none;border-radius:999px;padding:3px 10px;'+(lunaConn?'color:#0a2a18;background:var(--green);':'color:var(--t3);background:var(--s2);border:1px solid var(--bd2);')+'">🌙 Luna '+(lunaConn?'bağlı ✓':'bağlı değil')+'</span>';
@@ -623,6 +696,28 @@ function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.se
 function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
 function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
 
+// ── Jump-nav: bölüme kaydır + scroll-spy (aktif bölümü şeritte vurgula) ──
+function jumpToSection(id){
+  var el=document.getElementById(id); if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+window.jumpToSection=jumpToSection;
+var _secSpyBound=null;
+function initSectionScrollSpy(){
+  var page=document.querySelector('.page'); var nav=document.getElementById('jumpnav');
+  if(!page||!nav) return;
+  var headers=SECTIONS.map(function(sec){ return document.getElementById(sec.id); }).filter(Boolean);
+  var btns=nav.querySelectorAll('button');
+  function update(){
+    var pageTop=page.getBoundingClientRect().top, activeId=headers.length?headers[0].id:null;
+    headers.forEach(function(hEl){ if(hEl.getBoundingClientRect().top-pageTop<=60) activeId=hEl.id; });
+    btns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-sec')===activeId); });
+  }
+  if(_secSpyBound) page.removeEventListener('scroll',_secSpyBound);
+  _secSpyBound=update; page.addEventListener('scroll',update,{passive:true});
+  update();
+}
+
 function wxP(code,isDay){
   var c=Number(code);
   if(c===0) return {e:isDay?'☀️':'🌙',l:isDay?'Açık':'Açık gece'};
@@ -641,7 +736,7 @@ function wxP(code,isDay){
 function weatherCardHTML(){
   var wx=D&&D.weather?D.weather:null;
   var spots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
-  var s='<div class="card lift span-12 pad">';
+  var s='<div class="card lift span-12 pad" style="order:10;">';
   var upd='';
   if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
   s+='<div class="lbl">☀️ Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
@@ -763,12 +858,21 @@ function render(){
   h+='<input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)" style="margin-left:auto;">';
   h+='</div>';
 
+  // ── JUMP-NAV: 5 bölüme atlama şeridi (scroll-spy ile aktif bölüm vurgulanır) ──
+  h+='<div class="jumpnav" id="jumpnav">';
+  SECTIONS.forEach(function(sec){ h+='<button data-sec="'+sec.id+'" onclick="jumpToSection(\''+sec.id+'\')">'+sec.ico+' '+sec.title+'</button>'; });
+  h+='</div>';
+
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
+  // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
+  SECTIONS.forEach(function(sec){
+    h+='<div class="section-header" id="'+sec.id+'" style="order:'+(sec.ord-1)+';top:0;"><span class="sh-ico">'+sec.ico+'</span><span class="sh-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';
+  });
 
   // ROW 1: 6 KPI hero tiles (span-2 each)
   function kpi(label,val,accent,extra,spark,caption){
-    var s='<div class="card lift kpi span-2" style="--accent:'+accent+';">';
+    var s='<div class="card lift kpi span-2" style="--accent:'+accent+';order:10;">';
     s+='<div class="kpi-top"><span class="kpi-l">'+label+'</span>'+(extra||'')+'</div>';
     s+='<div class="kpi-v mono">'+val+'</div>';
     if(spark) s+='<div class="kpi-spark">'+spark+'</div>';
@@ -803,7 +907,7 @@ function render(){
   // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
 
   // Map card
-  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;">';
+  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;order:30;">';
   h+='<div class="lbl" style="margin-bottom:10px;">📍 Canlı Konum';
   if(loc){
     var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
@@ -818,9 +922,11 @@ function render(){
   }
   h+='</div>';
 
-  // Selected day card
-  h+='<div class="card lift span-4 pad">';
-  h+='<div class="lbl">'+shortD(selected)+' · Seçili Gün</div>';
+  // Selected day card — cardWrap() ile özet (dstats+habit chip'leri) her zaman görünür,
+  // detay (öğün/semptom/kayıt/not blokları) chevron ile açılır. Üretim mantığı aynen
+  // korunur; h'ye eklenen parçalar sonradan slice ile ayrıştırılıp cardWrap'e sarılır —
+  // veri/gözlem kaybı yok, yalnızca varsayılan görünürlük değişir.
+  var sdMarkStart=h.length;
   h+='<div class="dstats">';
   [
     [cnt(srec)+'<small style="font-size:var(--f3);color:var(--t3);">/'+htOn(selected)+'</small>','Tik','var(--gold)'],
@@ -843,6 +949,7 @@ function render(){
     h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':'')+'><span class="habit-dot"></span>'+hb[1]+'</span>';
   });
   h+='</div>';
+  var sdSumEnd=h.length; // özet (dstats+chip) burada biter; bundan sonrası detay olarak sarılır
   // ── Ne yedi? (öğün içerikleri) ──
   var mealRows="";
   var mealIsToday=(selected===today());
@@ -1021,10 +1128,15 @@ function render(){
   if(srec.note&&String(srec.note).trim()){
     h+='<div style="margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
   } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:4px;">Not yazılmadı</div>'; }
-  h+='</div>';
+  (function(){
+    var sdSum=h.slice(sdMarkStart,sdSumEnd);
+    var sdDet=h.slice(sdSumEnd);
+    h=h.slice(0,sdMarkStart);
+    h+=cardWrap({key:'selected-day',icon:'📅',title:shortD(selected)+' · Seçili Gün',span:4,order:10,summary:sdSum,details:sdDet});
+  })();
 
   // Mood + Reading card
-  h+='<div class="card lift span-3 pad">';
+  h+='<div class="card lift span-3 pad" style="order:20;">';
   h+='<div class="lbl">Mod Dağılımı · '+UI.range+'g</div>';
   var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
   var moodTotal=Object.keys(moodDist).reduce(function(a,k){return a+moodDist[k];},0);
@@ -1060,12 +1172,12 @@ function render(){
 
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
   h+=moodHeatmapCardHTML();
-  h+='<div class="card lift span-8 pad">';
+  h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);
   h+='</div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Dönem Özeti · '+UI.range+'g</div>';
   [
     ['Tik ortalama',  curAvg.toFixed(1)+' '+trend(curAvg,prevAvg)],
@@ -1080,42 +1192,43 @@ function render(){
   h+='</div>';
 
   // ROW 4: SOS chart (span-4) + Notes (span-4) + SOS list (span-4)
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Yoğunluğu · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+curSos+' toplam</span></div>';
   h+=sparkBar(cur,function(d){var r=recOf(d);return r&&r.cravingSOSCount?Number(r.cravingSOSCount):0;},Math.max(1,curSos),"#fb7185",62);
   h+='</div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
   h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
   h+='</div></div>';
 
-  h+='<div class="card lift span-4 pad">';
+  h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Geçmişi'+(sosRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+sosRows.length+' gün</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
   h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
-  // ROW 5: Pro insights
-  function insight(title,rows){
-    var s='<div class="card lift span-4 pad"><div class="lbl">'+title+'</div>';
-    rows.forEach(function(x){ s+='<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>'; });
-    return s+'</div>';
+  // ROW 5: Pro insights — 4 ayrı kart (Kullanım/Konum/Hareket/Risk) tek "Gelişmiş
+  // İçgörüler" akordiyonunda birleşti (Faz 3). Veri kaybı yok: özet şeridi her
+  // kategoriden birer öne çıkan metrik gösterir; detayda .seg sekmeleriyle 4
+  // kategorinin TÜM satırlarına ulaşılır (render() tetiklemeden sekme değişimi).
+  function insRows(rows){
+    return rows.map(function(x){ return '<div class="srow"><span class="k">'+x[0]+'</span><span class="v mono">'+x[1]+'</span></div>'; }).join("");
   }
-  h+=insight('Kullanım Paterni',[
+  var usageRows=[
     ['Yoğun saat', usePat.peakHour==null?"—":pad(usePat.peakHour)+':00–'+pad((usePat.peakHour+1)%24)+':00'],
     ['Akşam payı', '%'+usePat.eveningPct],
     ['Ort. oturum', formatDuration(curSess.avgActive||0)],
     ['Boşta süresi', idleMin==null?"—":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa')]
-  ]);
-  h+=insight('Konum Özeti · 24s',[
+  ];
+  var locRows=[
     ['Nokta sayısı', String(locSum.recentCount)],
     ['Farklı bölge', String(locSum.zoneCount)],
     ['Yaklaşık hareket', locSum.distanceKm.toFixed(1)+' km'],
     ['Doğruluk ort.', locSum.avgAcc==null?"—":"±"+Math.round(locSum.avgAcc)+" m"]
-  ]);
-  h+=insight('Bugün Hareket',[
+  ];
+  var moveRows=[
     ['Toplam', mv?fmtKmM(mv.totalM):'—'],
     ['🚶 Yürüyüş', mv?fmtKmM(mv.walkM):'—'],
     ['🚗 Araç', mv?fmtKmM(mv.vehicleM):'—'],
@@ -1123,14 +1236,33 @@ function render(){
     ['🕰️ Yolda süre', mv?fmtDurP(mv.vehicleSec):'—'],
     ['Maks hız', mv&&mv.maxSpeed?Math.round(mv.maxSpeed*3.6)+' km/sa':'—'],
     ['Seçili mod', mvMode==='walk'?'🚶 Yürüyüş':mvMode==='vehicle'?'🚗 Araç':'✨ Oto']
-  ]);
+  ];
   var rkc=function(r){return r.klass==="ok"?"var(--green)":r.klass==="warn"?"var(--amber)":"var(--red)";};
-  h+=insight('Risk & Güvenilirlik',[
+  var riskRows=[
     ['Risk trendi','<span style="color:'+rkc(risk7)+'">7g</span> · <span style="color:'+rkc(risk14)+'">14g</span> · <span style="color:'+rkc(risk30)+'">30g</span>'],
     ['Okuma oranı', '%'+readingRate],
     ['Sync gecikmesi', syncLagMin==null?"—":(syncLagMin<60?syncLagMin+" dk":Math.round(syncLagMin/60)+" sa")],
     ['Eksik gün', missingInRange+'/'+cur.length]
-  ]);
+  ];
+  var insTabs=[
+    {key:'usage',ico:'⏱️',label:'Kullanım',rows:usageRows},
+    {key:'loc',ico:'📍',label:'Konum',rows:locRows},
+    {key:'move',ico:'🚶',label:'Hareket',rows:moveRows},
+    {key:'risk',ico:'🧭',label:'Risk',rows:riskRows}
+  ];
+  var insActive=UI.insightTab||'usage';
+  if(!insTabs.some(function(t){return t.key===insActive;})) insActive='usage';
+  var insSummary='<div style="display:flex;gap:18px;flex-wrap:wrap;">'+insTabs.map(function(t){
+    return '<div style="display:flex;flex-direction:column;gap:2px;min-width:90px;"><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+t.ico+' '+t.label+'</span><span class="mono" style="font-size:var(--f3);font-weight:800;">'+String(t.rows[0][1]).replace(/<[^>]+>/g,'')+'</span></div>';
+  }).join("")+'</div>';
+  var insDetails='<div class="seg ins-seg" style="margin-bottom:10px;">'+insTabs.map(function(t){
+    return '<button data-ins-btn="'+t.key+'" class="'+(t.key===insActive?'active':'')+'" onclick="switchInsightPane(\''+t.key+'\')">'+t.ico+' '+t.label+'</button>';
+  }).join("")+'</div>';
+  insDetails+=insTabs.map(function(t){
+    return '<div class="ins-pane" data-ins="'+t.key+'" style="'+(t.key===insActive?'':'display:none;')+'">'+insRows(t.rows)+'</div>';
+  }).join("");
+  h+=cardWrap({key:'insights',icon:'🔎',title:'Gelişmiş İçgörüler',span:12,order:30,summary:insSummary,details:insDetails});
+
 
   // ═════════ KÜTÜPHANE · İZLEME ARŞİVİ · ALINTILAR ═════════
   (function(){
@@ -1191,17 +1323,16 @@ function render(){
     var libRead=LIB.filter(function(b){return b.status==='reading';}).length;
     var libFinYear=LIB.filter(function(b){return b.status==='finished'&&b.finishedAt&&new Date(b.finishedAt).getFullYear()===yr;}).length;
     var libPages=0; for(var dk in D.days){ var rr=D.days[dk]; var en=(rr&&rr.reading&&Array.isArray(rr.reading.entries))?rr.reading.entries:[]; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) libPages+=p; }); }
-    var lh='<div class="card lift span-6 pad"><div class="lbl">📚 Kütüphane<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+LIB.length+' kitap</span></div>';
-    lh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+    var libSum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+libRead+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Okunuyor</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+libFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+libPages.toLocaleString("tr-TR")+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Sayfa</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+libFinYear+(LG.yearlyBooks?'<span style="color:var(--t4);font-size:var(--f2);">/'+LG.yearlyBooks+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
       +'</div>';
-    lh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    lh+= LIB.length? orderBy(LIB,'book').map(bookRow).join('') : '<div class="empty"><span class="ei">📚</span>Kitaplık boş</div>';
-    lh+='</div></div>';
-    h+=lh;
+    var libDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    libDet+= LIB.length? orderBy(LIB,'book').map(bookRow).join('') : '<div class="empty"><span class="ei">📚</span>Kitaplık boş</div>';
+    libDet+='</div>';
+    h+=cardWrap({key:'lib-archive',icon:'📚',title:'Kütüphane',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+LIB.length+' kitap</span>',span:6,order:50,summary:libSum,details:libDet});
 
     // ---- İzleme Arşivi ----
     var wFin=WL.filter(function(t){return t.status==='finished';}).length;
@@ -1209,17 +1340,16 @@ function render(){
     var wFinYear=WL.filter(function(t){return t.status==='finished'&&t.finishedAt&&new Date(t.finishedAt).getFullYear()===yr;}).length;
     var wMin=0; for(var dk2 in D.days){ var rr2=D.days[dk2]; var en2=(rr2&&rr2.watching&&Array.isArray(rr2.watching.entries))?rr2.watching.entries:[]; en2.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) wMin+=m; }); }
     var wHours=wMin>=60?(Math.floor(wMin/60)+' sa'+(wMin%60?' '+(wMin%60)+' dk':'')):(wMin+' dk');
-    var wh='<div class="card lift span-6 pad"><div class="lbl">🎬 İzleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+WL.length+' yapım</span></div>';
-    wh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+    var wSum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--amber);">'+wWatch+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">İzleniyor</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--green);">'+wFin+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Bitti</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+esc(wHours)+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Süre</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+wFinYear+(WG.yearlyTitles?'<span style="color:var(--t4);font-size:var(--f2);">/'+WG.yearlyTitles+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
       +'</div>';
-    wh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    wh+= WL.length? orderBy(WL,'title').map(titleRow).join('') : '<div class="empty"><span class="ei">🎬</span>Arşiv boş</div>';
-    wh+='</div></div>';
-    h+=wh;
+    var wDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    wDet+= WL.length? orderBy(WL,'title').map(titleRow).join('') : '<div class="empty"><span class="ei">🎬</span>Arşiv boş</div>';
+    wDet+='</div>';
+    h+=cardWrap({key:'watch-archive',icon:'🎬',title:'İzleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+WL.length+' yapım</span>',span:6,order:50,summary:wSum,details:wDet});
 
     // ---- Dinleme Arşivi (müzik favorileri) ----
     var MUS=(D&&D.music&&Array.isArray(D.music.items))?D.music.items:[];
@@ -1240,17 +1370,16 @@ function render(){
     var musPod=MUS.filter(function(x){return x.kind==='podcast';}).length;
     var lMin=0; for(var dk3 in D.days){ var rr3=D.days[dk3]; var en3=(rr3&&rr3.listening&&Array.isArray(rr3.listening.entries))?rr3.listening.entries:[]; en3.forEach(function(e){ var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) lMin+=m; }); }
     var lHours=lMin>=60?(Math.floor(lMin/60)+' sa'+(lMin%60?' '+(lMin%60)+' dk':'')):(lMin+' dk');
-    var mh='<div class="card lift span-6 pad"><div class="lbl">🎧 Dinleme Arşivi<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+MUS.length+' parça</span></div>';
-    mh+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);">'
+    var mSum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--teal);">'+musSong+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Şarkı</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--purple);">'+musAlbum+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Albüm</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--pink);">'+musPod+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Podcast</div></div>'
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+esc(lHours)+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Süre</div></div>'
       +'</div>';
-    mh+='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    mh+= MUS.length? MUS.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }).map(trackRow).join('') : '<div class="empty"><span class="ei">🎧</span>Dinleme arşivi boş</div>';
-    mh+='</div></div>';
-    h+=mh;
+    var mDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
+    mDet+= MUS.length? MUS.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }).map(trackRow).join('') : '<div class="empty"><span class="ei">🎧</span>Dinleme arşivi boş</div>';
+    mDet+='</div>';
+    h+=cardWrap({key:'music-archive',icon:'🎧',title:'Dinleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+MUS.length+' parça</span>',span:6,order:50,summary:mSum,details:mDet});
 
     // ---- Alıntılar & Replikler ----
     var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',emoji:b.emoji||'📖',title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
@@ -1258,19 +1387,20 @@ function render(){
     var lyr=[]; MUS.forEach(function(x){ (Array.isArray(x.quotes)?x.quotes:[]).forEach(function(q){ lyr.push({kind:'track',emoji:x.emoji||'🎵',title:String(x.title||'').trim()+(x.artist?' — '+String(x.artist).trim():''),text:q.text,ts:q.ts,col:'var(--teal)'}); }); });
     var allq=quotes.concat(reps).concat(lyr).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
     if(allq.length){
-      var qh='<div class="card lift span-12 pad"><div class="lbl">💬 Alıntılar · Replikler · Sözler<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span></div>';
-      qh+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px;">';
+      var qSum='<span>'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span>';
+      var qDet='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px;">';
       allq.forEach(function(q){
-        qh+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'
+        qDet+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'
           +'<div style="position:absolute;top:-4px;right:8px;font-size:40px;color:'+q.col+';opacity:.14;line-height:1;font-weight:800;">”</div>'
           +'<div style="font-size:var(--f3);color:var(--t1);line-height:1.5;font-style:italic;position:relative;word-break:break-word;">“'+esc(String(q.text||'').trim())+'”</div>'
           +'<div style="font-size:var(--f1);color:var(--t3);font-weight:700;margin-top:7px;">'+q.emoji+' '+esc(String(q.title||'').trim())+(q.kind==='book'&&q.page?' · s.'+q.page:'')+'</div>'
           +'</div>';
       });
-      qh+='</div></div>';
-      h+=qh;
+      qDet+='</div>';
+      h+=cardWrap({key:'quotes-archive',icon:'💬',title:'Alıntılar · Replikler · Sözler',span:12,order:50,summary:qSum,details:qDet});
     }
   })();
+
 
   h+='</div>'; // end bento
 
@@ -1279,6 +1409,7 @@ function render(){
 
   document.getElementById("app").innerHTML=h;
   setTimeout(initLocMap,0);
+  setTimeout(initSectionScrollSpy,0);
   try{ maybeMarkReviewing(); }catch(e){}
 }
 
@@ -1480,6 +1611,10 @@ try{
     if(!PTOKEN&&s.ghToken) PTOKEN=normalizeToken(s.ghToken);
   }
   if(PTOKEN&&!localStorage.getItem(PTKEY)) localStorage.setItem(PTKEY,PTOKEN);
+  var expRaw=localStorage.getItem(CARDEXPKEY);
+  if(expRaw) UI.expandedCards=JSON.parse(expRaw)||{};
+  var insRaw=localStorage.getItem(INSTABKEY);
+  if(insRaw) UI.insightTab=insRaw;
 }catch(e){}
 load();
 // Panel otomatik yenileme: ~45 sn'de bir, ama gözlemci bir metin alanına yazarken

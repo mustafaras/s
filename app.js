@@ -198,11 +198,14 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[]};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
 var lastOverlayView=null;  // o overlay'in aktif sekmesi — gorunum degismediyse scroll korunur
+var aeonLastSeenSort=null; // ÆON: son render'da görünen en yeni mesajın sort anahtarı — yalnızca YENİ mesaja giriş animasyonu oynatmak için
+var aeonLastRenderedDateStr=null; // ÆON: son gösterilen mesajın gün-etiketi — hızlı ekleme (appendAeonOutgoing) sırasında yeni gün ayırıcı gerekip gerekmediğini anlamak için
+var AEON_PAGE_SIZE=40; // ÆON: geçmiş çok uzadığında her tam render'da yalnızca son N öğeyi kur — "Daha eski mesajlar" ile tamamı açılabilir
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -962,6 +965,15 @@ function render(){
       var firstEl=newScroll.firstElementChild;
       if(firstEl){ firstEl.style.animation='none'; }
       newScroll.scrollTop=prevTop;
+    }
+    if(ui.tab==='mesaj'){
+      // Yukarı kaydırılınca beliren "en alta in" düğmesi (premium WhatsApp-tarzı FAB)
+      var aeonFab=document.getElementById('aeon-scroll-fab');
+      if(aeonFab){
+        var toggleAeonFab=function(){ var nb=(newScroll.scrollHeight-newScroll.scrollTop-newScroll.clientHeight)<160; aeonFab.style.display=nb?'none':'flex'; };
+        newScroll.addEventListener('scroll',toggleAeonFab,{passive:true});
+        toggleAeonFab();
+      }
     }
   }
 
@@ -2771,6 +2783,11 @@ updateLiveSession();
 // ---------- observer mesajları / bildirimler ----------
 function notifList(){ return (data&&Array.isArray(data.notifications))?data.notifications:[]; }
 function unreadNotifCount(){ return notifList().filter(function(n){ return n&&!n.deleted&&!n.read; }).length; }
+// ÆON sohbeti en altta mı (yaklaşık 140px tolerans) — arka planda yeni cevap gelince
+// kullanıcı geçmişi okurken alta zıplatmamak için kullanılır.
+function nearAeonBottom(){
+  try{ var sc=document.querySelector('[data-scroll]'); if(!sc) return true; return (sc.scrollHeight-sc.scrollTop-sc.clientHeight)<140; }catch(e){ return true; }
+}
 function ghCfgApp(){
   var s=(data&&data.settings)?data.settings:{};
   var tok=normalizeToken(s.ghToken||''), repo=String(s.ghRepo||'').trim();
@@ -2815,7 +2832,7 @@ function mergeInbox(msgs){
   if(added>0||answeredCount>0||needPush){
     save(); // localStorage + sync kuyruğu
     var pushed=false;
-    if((added>0||answeredCount>0) && ui.tab==='mesaj'){ ui.aeonScrollBottom=true; if(markNotifsRead()) pushed=true; }
+    if((added>0||answeredCount>0) && ui.tab==='mesaj'){ if(nearAeonBottom()) ui.aeonScrollBottom=true; if(markNotifsRead()) pushed=true; }
     if(!pushed) receiptPushNow(); // makbuzu debounce beklemeden hemen repoya yaz; onaylanınca (SeyOnSynced) synced=true olur
     if(added>0||answeredCount>0){
       render();
@@ -3030,21 +3047,125 @@ function streamAsk(kind,question){
   }
   attempt(0).catch(function(e){ var status=e&&e._status; if(status===401){ ui.openaiKeyState='invalid'; } ui.askKind=null; var msg=(status!=null)?((e&&e.message)||'Bir hata oluştu.'):openaiErrText(null,String(e&&e.message||e)); setAskError(kind,msg); render(); });
 }
+// Mesaj gönderiminde TAM render() çağırmadan yalnızca yeni giden balonu DOM'a ekler
+// (performans: her gönderimde onlarca eski balonu yeniden string'leyip yeniden DOM'a
+// basmak yerine yalnızca 1 yeni düğüm eklenir — WhatsApp'ın yaptığı gibi).
+// İplik DOM'da yoksa (ör. sekme henüz hiç 'mesaj' olarak render edilmediyse) güvenli
+// şekilde normal tam render'a düşer.
+function appendAeonOutgoing(item){
+  var thread=document.getElementById('aeon-thread');
+  if(!thread || ui.tab!=='mesaj'){ render(); return; }
+  var hint=thread.querySelector('.msg-empty-hint'); if(hint) hint.remove();
+  var ds=''; try{ var dd=new Date(item.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
+  var frag='';
+  if(ds && ds!==aeonLastRenderedDateStr){ frag+='<div class="msg-daydiv">'+esc(aeonDayDivider(item.time))+'</div>'; aeonLastRenderedDateStr=ds; }
+  frag+=aeonItemHTML(item,' msg-enter');
+  thread.insertAdjacentHTML('beforeend',frag);
+  aeonLastSeenSort=String(item.sort||item.time||aeonLastSeenSort);
+  // metin kutusu + karakter sayacı + gönder düğmesi durumunu tam render olmadan sıfırla
+  var ta=document.getElementById('aeon-input'); if(ta){ ta.value=''; ta.style.height='auto'; }
+  var btn=document.getElementById('aeon-send-btn'); if(btn) btn.classList.add('is-disabled');
+  var cnt=document.getElementById('aeon-char-count'); if(cnt) cnt.style.display='none';
+  if(ui.aeonError){ ui.aeonError=null; } // hata varsa görsel temizliği bir sonraki tam render'a bırak
+  // Kendi mesajını gönderince WhatsApp tarzı anında en alta in (animasyonlu değil —
+  // tam render'daki orijinal davranışla birebir aynı; smooth scroll yalnızca manuel
+  // "en alta in" FAB tıklamasında kullanılır, aksi halde ara scroll olayları FAB'ı
+  // kısa süreliğine tekrar gösterip titretir).
+  var sc=document.querySelector('[data-scroll]');
+  if(sc) sc.scrollTop=sc.scrollHeight;
+  var fab=document.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
+  ui.aeonScrollBottom=false; // hedefe ulaşıldı — bir sonraki tam render'da tekrar zıplamasın
+}
 function submitAeonQuestion(question){
   if(!data.aeon||typeof data.aeon!=='object') data.aeon={qa:[],lastAskDate:null};
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
-  data.aeon.qa.push({id:'q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),question:question,ts:new Date().toISOString(),answer:null,answeredAt:null});
+  var ts=new Date().toISOString();
+  data.aeon.qa.push({id:'q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6),question:question,ts:ts,answer:null,answeredAt:null});
   data.aeon.lastAskDate=todayStr();
-  ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true;
-  save(); render();
+  ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true; // appendAeonOutgoing render()'a düşerse de en alta insin
+  haptic(14);
+  save();
+  appendAeonOutgoing({sort:ts,kind:'out',text:question,time:ts,answered:false,reviewing:false});
+  // Gönderim sonrası odağı girdi kutusuna geri ver — sohbet akışı kesilmesin (WhatsApp-tarzı)
+  try{ setTimeout(function(){ var el=document.getElementById('aeon-input'); if(el) el.focus(); },30); }catch(e){}
   // Soru anında panele iletilsin diye senkronu zorla (4 sn debounce'u beklemeden)
   try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
   toast('Sorun ÆON’a iletildi ⬡',2200);
 }
 App.onLunaDraft=function(el){ ui.lunaDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
-App.onAeonDraft=function(el){ ui.aeonDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
+App.onAeonDraft=function(el){
+  ui.aeonDraft=el.value;
+  try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){}
+  // Tam render tetiklemeden gönder düğmesi/karakter sayacı durumunu hedefli güncelle (duyarlılık için)
+  try{
+    var btn=document.getElementById('aeon-send-btn');
+    if(btn){ if(el.value.trim().length) btn.classList.remove('is-disabled'); else btn.classList.add('is-disabled'); }
+    var cnt=document.getElementById('aeon-char-count'), left=600-el.value.length;
+    if(cnt){ cnt.style.display=left<100?'block':'none'; cnt.textContent=left+' karakter kaldı'; }
+  }catch(e){}
+};
 App.askLuna=function(){ var el=document.getElementById('luna-input'); var t=el?el.value.trim():String(ui.lunaDraft||'').trim(); if(!t){ toast('Önce sorunu yaz 🌙'); return; } if(t.length>600) t=t.slice(0,600); ui.lunaDraft=t; streamAsk('luna',t); };
 App.askAeon=function(){ var el=document.getElementById('aeon-input'); var t=el?el.value.trim():String(ui.aeonDraft||'').trim(); if(!t){ toast('Önce sorunu yaz ⬡'); return; } if(t.length>600) t=t.slice(0,600); submitAeonQuestion(t); };
+App.onAeonKeydown=function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); App.askAeon(); } };
+App.aeonScrollToBottom=function(){
+  var sc=document.querySelector('[data-scroll]'); if(!sc) return;
+  try{ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); }catch(e){ sc.scrollTop=sc.scrollHeight; }
+  var fab=document.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
+};
+App.showAeonHistory=function(){
+  ui.aeonShowAllHistory=true;
+  render();
+  // Yeni açılan eski mesajlar en üstte belirir; kullanıcıyı orada bırak (en alta zıplama yapma)
+  try{
+    var thread=document.getElementById('aeon-thread'), sc=document.querySelector('[data-scroll]');
+    if(thread && sc){ var top=thread.offsetTop||0; sc.scrollTop=Math.max(0,top-8); }
+  }catch(e){}
+};
+App.toggleAeonSearch=function(){
+  var bar=document.getElementById('aeon-search-bar'); if(!bar) return;
+  var show=bar.style.display==='none';
+  bar.style.display=show?'block':'none';
+  if(show){ var inp=document.getElementById('aeon-search-input'); if(inp) inp.focus(); }
+  else App.clearAeonSearch();
+};
+App.clearAeonSearch=function(){
+  var inp=document.getElementById('aeon-search-input'); if(inp) inp.value='';
+  App.filterAeonSearch({value:''});
+};
+// Sohbet DOM'unu tam render() TETİKLEMEDEN filtreler — thread çocuklarını gün-gruplarına
+// ayırıp her mesajın metnini arama sorgusuyla karşılaştırır, eşleşmeyeni gizler; bir günün
+// TÜM mesajları gizliyse o günün ayırıcısı da gizlenir. Veri silinmez, yalnızca DOM'da saklanır.
+App.filterAeonSearch=function(el){
+  var q=String((el&&el.value)||'').trim().toLowerCase();
+  var thread=document.getElementById('aeon-thread'); if(!thread) return;
+  var groups=[], current=null, totalMatches=0;
+  Array.prototype.forEach.call(thread.children,function(node){
+    if(!node.classList) return;
+    if(node.classList.contains('msg-daydiv')){ current={div:node,rows:[]}; groups.push(current); }
+    else if(node.classList.contains('msg-row')){
+      if(!current){ current={div:null,rows:[]}; groups.push(current); }
+      current.rows.push(node);
+    }
+  });
+  groups.forEach(function(g){
+    var groupHasMatch=false;
+    g.rows.forEach(function(row){
+      var match=!q || row.textContent.toLowerCase().indexOf(q)!==-1;
+      row.style.display=match?'':'none';
+      if(match){ groupHasMatch=true; totalMatches++; }
+    });
+    if(g.div) g.div.style.display=groupHasMatch?'':'none';
+  });
+  var hint=document.getElementById('aeon-search-noresult');
+  if(q && totalMatches===0){
+    if(!hint){
+      hint=document.createElement('div'); hint.id='aeon-search-noresult';
+      hint.style.cssText='text-align:center;padding:16px 10px;color:var(--faint);font-size:13px;font-weight:600;';
+      hint.textContent='🔍 Eşleşen mesaj bulunamadı';
+      thread.appendChild(hint);
+    }
+  } else if(hint){ hint.remove(); }
+};
 function notifCardHTML(n){
   var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
   var unread=!n.read, s='';
@@ -3120,13 +3241,51 @@ function lunaChatHTML(){
   }
   return h;
 }
-function aeonTime(iso){ try{ var d=new Date(iso); if(isNaN(d.getTime())) return ''; return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+function aeonTime(iso){
+  try{
+    var d=new Date(iso); if(isNaN(d.getTime())) return '';
+    var hm=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    if(fmt(d)===todayStr()) return hm;
+    return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' · '+hm;
+  }catch(e){ return ''; }
+}
+// Gün ayırıcı etiket ("Bugün / Dün / 3 Temmuz") — uzun sohbetlerde zaman çizelgesi netliği için.
+function aeonDayDivider(iso){
+  try{
+    var d=new Date(iso); if(isNaN(d.getTime())) return '';
+    var ds=fmt(d), t=todayStr(), y=addDays(t,-1);
+    if(ds===t) return 'Bugün';
+    if(ds===y) return 'Dün';
+    var sameYear=ds.slice(0,4)===t.slice(0,4);
+    return d.toLocaleDateString('tr-TR',sameYear?{day:'2-digit',month:'long'}:{day:'2-digit',month:'long',year:'numeric'});
+  }catch(e){ return ''; }
+}
 // Uzun mesajları kısalt: max-height ile kırp + alta yumuşak geçiş + "Devamını göster" düğmesi.
 // Tam render olmadan DOM üzerinden açılır/kapanır (kaydırma zıplamaz).
+// Basit markdown-lite: **kalın**, *italik*/_italik_, otomatik link, "- "/"* " liste maddesi.
+// Girdi ÖNCE esc() ile HTML-kaçışlı olmalı (ham < > & zaten entity'ye çevrilmiş olur) —
+// bu fonksiyon yalnızca escape edilmiş metin üzerinde çalışır, asla ham kullanıcı girdisini
+// doğrudan HTML'e enjekte etmez.
+function mdLite(safe){
+  // Liste maddesi: satır başında "- " veya "* " → madde işareti (bold/italik'ten ÖNCE işlenir
+  // ki tek yıldızlı liste imi "*" italik regex'ine karışmasın)
+  safe=safe.replace(/^[ \t]*[-*][ \t]+(?=\S)/gm,'• ');
+  // Otomatik link: http(s):// ile başlayan URL'ler tıklanabilir olur (cümle sonu noktalama linke dahil edilmez)
+  safe=safe.replace(/(https?:\/\/[^\s<]+)/g,function(url){
+    var clean=url.replace(/[),.;:!?'"]+$/,''); var trail=url.slice(clean.length);
+    return '<a href="'+clean+'" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">'+clean+'</a>'+trail;
+  });
+  // Kalın: **metin**
+  safe=safe.replace(/\*\*([^\n*]+?)\*\*/g,'<b>$1</b>');
+  // İtalik: *metin* veya _metin_
+  safe=safe.replace(/(^|[^*])\*([^\n*]+?)\*(?!\*)/g,'$1<i>$2</i>');
+  safe=safe.replace(/(^|[^_])_([^\n_]+?)_(?!_)/g,'$1<i>$2</i>');
+  return safe;
+}
 function clampBubble(text,fadeColor){
   var t=String(text==null?'':text);
   var long=t.length>240||t.split('\n').length>7;
-  var safe=esc(t);
+  var safe=mdLite(esc(t));
   if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
   var h='<div style="position:relative;">';
   h+='<div data-clamp="140" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
@@ -3140,13 +3299,39 @@ App.toggleMsg=function(btn){
   if(content.getAttribute('data-exp')==='1'){ content.style.maxHeight=content.getAttribute('data-clamp')+'px'; content.setAttribute('data-exp','0'); if(fade) fade.style.display=''; btn.textContent='Devamını göster ⌄'; }
   else { content.style.maxHeight='none'; content.setAttribute('data-exp','1'); if(fade) fade.style.display='none'; btn.textContent='Daha az göster ⌃'; }
 };
+// Tek bir ÆON sohbet balonu (giden soru ya da gelen yanıt/bildirim) için HTML üretir.
+// aeonChatHTML() tam listeyi bu yardımcıyla kurar; appendAeonOutgoing() ise tam render
+// yapmadan yalnızca YENİ mesajı DOM'a eklerken aynı markup'ı (sapma riski olmadan) tekrar kullanır.
+function aeonItemHTML(it,enterCls){
+  var h='';
+  if(it.kind==='out'){
+    h+='<div class="msg-row out'+enterCls+'">';
+    h+='<div class="msg-bubble out">'+clampBubble(it.text,'var(--user-bubble)')+'</div>';
+    var foot;
+    if(it.answered) foot='<span style="color:var(--faint);">✓✓ yanıtlandı</span>';
+    else if(it.reviewing) foot='<span class="aeon-typing-dots"><span></span><span></span><span></span></span><span style="color:var(--aeon);font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.3px;margin-left:5px;">ÆON inceliyor</span>';
+    else foot='<span style="color:var(--faint);">✓ Gönderildi</span>';
+    h+='<div style="font-size:11px;margin-top:3px;display:flex;gap:7px;align-items:center;">'+foot+'<span style="color:var(--faint);">'+esc(aeonTime(it.time))+'</span></div></div>';
+  } else {
+    h+='<div class="msg-row in'+enterCls+'">';
+    h+='<div class="msg-bubble in">';
+    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">⬡ ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
+    h+='<div style="font-size:14.5px;line-height:1.55;">'+clampBubble(it.text,'var(--card)')+'</div>';
+    if(it.observer&&it.id) h+='<div style="display:flex;margin-top:7px;"><button onclick="App.deleteNotif(\''+it.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:11.5px;padding:4px 10px;border-radius:9px;">🗑 Sil</button></div>';
+    h+='</div></div>';
+  }
+  return h;
+}
 // ÆON = insan-döngülü sohbet: kullanıcının soruları (sağ/giden balon) panele gider,
 // gözlemci ÆON adına yanıtlar (sol/gelen balon). Gözlemci mesajları da gelen balondur.
 // Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
 function aeonChatHTML(){
-  var soft='201,160,60';
   var h='';
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px rgba('+soft+',0.4);">⬡</div><div><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div></div>';
+  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--aeon2),var(--aeon));display:flex;align-items:center;justify-content:center;font-size:22px;color:#1a1404;font-weight:800;box-shadow:0 8px 20px var(--aeon-glow);">⬡</div><div style="flex:1;"><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div><button onclick="App.toggleAeonSearch()" title="Mesajlarda ara" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:12px;width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">🔍</button></div>';
+  h+='<div id="aeon-search-bar" style="display:none;margin:0 2px 12px;position:relative;">';
+  h+='<input id="aeon-search-input" type="text" oninput="App.filterAeonSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:10px 36px 10px 14px;font-size:14px;color:var(--text);outline:none;">';
+  h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);font-size:15px;line-height:1;padding:4px;">✕</button>';
+  h+='</div>';
   var items=[];
   notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
@@ -3155,35 +3340,42 @@ function aeonChatHTML(){
     if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts});
   });
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
-  h+='<div style="display:flex;flex-direction:column;gap:10px;">';
-  if(!items.length){
-    h+='<div style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(230,193,90,0.13),rgba(201,154,58,0.07));border:1px solid rgba(201,154,58,0.2);"><div style="font-size:30px;margin-bottom:7px;">⬡</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Burası senin sessiz limanın</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">Aklından geçeni, içini dökmek istediğin her şeyi buraya bırakabilirsin. Ne zaman istersen — gece ya da gündüz — ben hep buradayım. ✨</div></div>';
+  // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ
+  // yeniden kurmak yerine yalnızca son AEON_PAGE_SIZE öğeyi göster; üstte "daha eski
+  // mesajları göster" düğmesiyle kullanıcı isterse tam geçmişi açabilir (veri kaybı yok —
+  // data.aeon.qa/notifications'ta her şey saklı kalır, yalnızca render'da sınırlanır).
+  var totalItems=items.length, hiddenOlder=0, visibleItems=items;
+  if(totalItems>AEON_PAGE_SIZE && !ui.aeonShowAllHistory){
+    hiddenOlder=totalItems-AEON_PAGE_SIZE;
+    visibleItems=items.slice(hiddenOlder);
   }
-  items.forEach(function(it){
-    if(it.kind==='out'){
-      h+='<div style="align-self:flex-end;max-width:88%;display:flex;flex-direction:column;align-items:flex-end;">';
-      h+='<div style="background:#7E62B8;color:#fff;border-radius:17px 17px 5px 17px;padding:10px 13px;font-size:14.5px;line-height:1.5;box-shadow:0 3px 10px rgba(126,98,184,0.28);">'+clampBubble(it.text,'#7E62B8')+'</div>';
-      var foot;
-      if(it.answered) foot='<span style="color:var(--faint);">✓✓ yanıtlandı</span>';
-      else if(it.reviewing) foot='<span style="color:#C99A3A;font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.3px;">⬡ AEON // EVALUATING INPUT…</span>';
-      else foot='<span style="color:var(--faint);">✓ Gönderildi</span>';
-      h+='<div style="font-size:11px;margin-top:3px;display:flex;gap:7px;align-items:center;">'+foot+'<span style="color:var(--faint);">'+esc(aeonTime(it.time))+'</span></div></div>';
-    } else {
-      h+='<div style="align-self:flex-start;max-width:88%;">';
-      h+='<div style="background:var(--card);color:var(--text);border:1px solid rgba('+soft+',0.28);border-left:3px solid #D4AF37;border-radius:5px 17px 17px 17px;padding:10px 13px;box-shadow:0 3px 10px rgba(150,110,120,0.08);">';
-      h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:2px 9px;">⬡ ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
-      h+='<div style="font-size:14.5px;line-height:1.55;">'+clampBubble(it.text,'var(--card)')+'</div>';
-      if(it.observer&&it.id) h+='<div style="display:flex;margin-top:7px;"><button onclick="App.deleteNotif(\''+it.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;font-size:11.5px;padding:4px 10px;border-radius:9px;">🗑 Sil</button></div>';
-      h+='</div></div>';
-    }
+  h+='<div id="aeon-thread" style="display:flex;flex-direction:column;gap:10px;">';
+  if(hiddenOlder>0){
+    h+='<div style="display:flex;justify-content:center;margin:2px 0 4px;"><button onclick="App.showAeonHistory()" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:999px;padding:7px 16px;font-size:12px;font-weight:700;">↑ Daha eski '+hiddenOlder+' mesajı göster</button></div>';
+  }
+  if(!items.length){
+    h+='<div class="msg-empty-hint" style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(230,193,90,0.13),rgba(201,154,58,0.07));border:1px solid rgba(201,154,58,0.2);"><div style="font-size:30px;margin-bottom:7px;">⬡</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Burası senin sessiz limanın</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">Aklından geçeni, içini dökmek istediğin her şeyi buraya bırakabilirsin. Ne zaman istersen — gece ya da gündüz — ben hep buradayım. ✨</div></div>';
+  }
+  // Yalnızca son render'dan bu yana beliren mesajlara giriş animasyonu oynat (tüm geçmiş her seferinde titremesin)
+  var prevDateStr=null, newestSort=items.length?items[items.length-1].sort:null;
+  visibleItems.forEach(function(it){
+    var ds=''; try{ var dd=new Date(it.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
+    if(ds && ds!==prevDateStr){ h+='<div class="msg-daydiv">'+esc(aeonDayDivider(it.time))+'</div>'; prevDateStr=ds; }
+    var enterCls=(aeonLastSeenSort!=null && it.sort>aeonLastSeenSort)?' msg-enter':'';
+    h+=aeonItemHTML(it,enterCls);
   });
   h+='</div>';
+  aeonLastSeenSort=newestSort;
+  aeonLastRenderedDateStr=prevDateStr;
   // alta sabit yazı kutusu (opak zemin → akış altından geçerken okunur kalır)
-  h+='<div style="position:sticky;bottom:0;background:var(--chatbar);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:12px 0 6px;margin-top:6px;z-index:5;">';
+  h+='<div id="aeon-sticky-bar" style="position:sticky;bottom:0;background:var(--chatbar);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:12px 0 6px;margin-top:6px;z-index:5;">';
+  h+='<button id="aeon-scroll-fab" class="aeon-scrollfab" style="top:-52px;right:4px;" onclick="App.aeonScrollToBottom()" aria-label="En alta in">⌄</button>';
   if(ui.aeonError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:8px;">'+esc(ui.aeonError)+'</div>';
+  var draftLen=String(ui.aeonDraft||'').length, leftChars=600-draftLen;
+  h+='<div id="aeon-char-count" style="display:'+(leftChars<100?'block':'none')+';font-size:10.5px;color:var(--faint);text-align:right;margin-bottom:3px;">'+leftChars+' karakter kaldı</div>';
   h+='<div style="display:flex;gap:8px;align-items:flex-end;">';
-  h+='<textarea id="aeon-input" oninput="App.onAeonDraft(this)" placeholder="İçini dök, buradayım…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
-  h+='<button onclick="App.askAeon()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);box-shadow:0 6px 16px rgba('+soft+',0.4);display:flex;align-items:center;justify-content:center;">➤</button>';
+  h+='<textarea id="aeon-input" class="aeon-input-field" oninput="App.onAeonDraft(this)" onkeydown="App.onAeonKeydown(event)" placeholder="İçini dök, buradayım…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
+  h+='<button id="aeon-send-btn" class="aeon-send-btn'+(draftLen?'':' is-disabled')+'" onclick="App.askAeon()" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;font-size:18px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));box-shadow:0 6px 16px var(--aeon-glow);display:flex;align-items:center;justify-content:center;">➤</button>';
   h+='</div></div>';
   return h;
 }

@@ -198,13 +198,14 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[]};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
 var lastOverlayView=null;  // o overlay'in aktif sekmesi — gorunum degismediyse scroll korunur
 var aeonLastSeenSort=null; // ÆON: son render'da görünen en yeni mesajın sort anahtarı — yalnızca YENİ mesaja giriş animasyonu oynatmak için
 var aeonLastRenderedDateStr=null; // ÆON: son gösterilen mesajın gün-etiketi — hızlı ekleme (appendAeonOutgoing) sırasında yeni gün ayırıcı gerekip gerekmediğini anlamak için
+var AEON_PAGE_SIZE=40; // ÆON: geçmiş çok uzadığında her tam render'da yalnızca son N öğeyi kur — "Daha eski mesajlar" ile tamamı açılabilir
 var fieldTimers={};
 function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
 
@@ -3111,6 +3112,15 @@ App.aeonScrollToBottom=function(){
   try{ sc.scrollTo({top:sc.scrollHeight,behavior:'smooth'}); }catch(e){ sc.scrollTop=sc.scrollHeight; }
   var fab=document.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
 };
+App.showAeonHistory=function(){
+  ui.aeonShowAllHistory=true;
+  render();
+  // Yeni açılan eski mesajlar en üstte belirir; kullanıcıyı orada bırak (en alta zıplama yapma)
+  try{
+    var thread=document.getElementById('aeon-thread'), sc=document.querySelector('[data-scroll]');
+    if(thread && sc){ var top=thread.offsetTop||0; sc.scrollTop=Math.max(0,top-8); }
+  }catch(e){}
+};
 function notifCardHTML(n){
   var when=''; try{ when=new Date(n.ts||n.receivedAt).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
   var unread=!n.read, s='';
@@ -3261,13 +3271,25 @@ function aeonChatHTML(){
     if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts});
   });
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
+  // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ
+  // yeniden kurmak yerine yalnızca son AEON_PAGE_SIZE öğeyi göster; üstte "daha eski
+  // mesajları göster" düğmesiyle kullanıcı isterse tam geçmişi açabilir (veri kaybı yok —
+  // data.aeon.qa/notifications'ta her şey saklı kalır, yalnızca render'da sınırlanır).
+  var totalItems=items.length, hiddenOlder=0, visibleItems=items;
+  if(totalItems>AEON_PAGE_SIZE && !ui.aeonShowAllHistory){
+    hiddenOlder=totalItems-AEON_PAGE_SIZE;
+    visibleItems=items.slice(hiddenOlder);
+  }
   h+='<div id="aeon-thread" style="display:flex;flex-direction:column;gap:10px;">';
+  if(hiddenOlder>0){
+    h+='<div style="display:flex;justify-content:center;margin:2px 0 4px;"><button onclick="App.showAeonHistory()" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:999px;padding:7px 16px;font-size:12px;font-weight:700;">↑ Daha eski '+hiddenOlder+' mesajı göster</button></div>';
+  }
   if(!items.length){
     h+='<div class="msg-empty-hint" style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(230,193,90,0.13),rgba(201,154,58,0.07));border:1px solid rgba(201,154,58,0.2);"><div style="font-size:30px;margin-bottom:7px;">⬡</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Burası senin sessiz limanın</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">Aklından geçeni, içini dökmek istediğin her şeyi buraya bırakabilirsin. Ne zaman istersen — gece ya da gündüz — ben hep buradayım. ✨</div></div>';
   }
   // Yalnızca son render'dan bu yana beliren mesajlara giriş animasyonu oynat (tüm geçmiş her seferinde titremesin)
   var prevDateStr=null, newestSort=items.length?items[items.length-1].sort:null;
-  items.forEach(function(it){
+  visibleItems.forEach(function(it){
     var ds=''; try{ var dd=new Date(it.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
     if(ds && ds!==prevDateStr){ h+='<div class="msg-daydiv">'+esc(aeonDayDivider(it.time))+'</div>'; prevDateStr=ds; }
     var enterCls=(aeonLastSeenSort!=null && it.sort>aeonLastSeenSort)?' msg-enter':'';

@@ -998,6 +998,61 @@ function cycleCardHTML(){
   det+='</div>';
   return cardWrap({key:'cycle',icon:'🌸',title:'Menstrüasyon Döngüsü',span:12,order:20,summary:sum,details:det});
 }
+// ── Faz 7: Psikolojik Profil kartı — Şeyma'nın iki haftada bir doldurduğu anketin
+// tüm sonuçları + soru & cevapları (salt-gösterim). D.psych latest.json üzerinden senkron gelir.
+function psychCardHTML(){
+  var P=(D&&D.psych)?D.psych:null, done=P&&P.completedAt&&P.scores;
+  if(!done){
+    return cardWrap({key:'psych',icon:'🧠',title:'Psikolojik Profil',span:12,order:20,
+      summary:'Henüz tamamlanmadı — Şeyma tanıma anketini doldurunca dikkat, bağlanma/güven, kaygı, duygudurum, iyi oluş ve öz-şefkat profili ile tüm soru & cevapları burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Öz-bildirim tarama araçları: ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF. Klinik tanı değildir. İki haftada bir yenilenir.</div>'});
+  }
+  var sc=P.scores;
+  function col(tone){ return tone==='bad'?'#e08a8a':(tone==='mid'?'#e6c15a':'#6bbf7a'); }
+  function chip(txt,tone){ var c=col(tone); return '<span style="display:inline-block;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+c+'22;border:1px solid '+c+'66;color:'+c+';white-space:nowrap;">'+esc(txt)+'</span>'; }
+  function bar(pct,tone){ var c=col(tone); pct=Math.max(0,Math.min(100,pct)); return '<div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:999px;"></div></div>'; }
+  var at=sc.attention.band, atTone=at==='yüksek uyum'?'bad':(at==='sınırda'?'mid':'good');
+  var stl=sc.attachment.style, stTone=stl==='Güvenli'?'good':'mid';
+  var an=sc.anxiety.band, anTone=(an==='orta'||an==='yüksek')?'bad':(an==='hafif'?'mid':'good');
+  var dp=sc.depression.band, dpTone=(dp==='minimal')?'good':(dp==='hafif'?'mid':'bad');
+  var wb=sc.wellbeing.band, wbTone=wb==='iyi'?'good':(wb==='düşük'?'mid':'bad');
+  var scz=sc.selfCompassion.band, sczTone=scz==='yüksek'?'good':(scz==='orta'?'mid':'bad');
+  var sum='<div style="display:flex;flex-wrap:wrap;gap:6px;">'
+    +chip('🎯 Dikkat: '+at,atTone)+chip('🫂 '+stl,stTone)+chip('🌊 Kaygı: '+an,anTone)
+    +chip('🌧️ Duygudurum: '+dp,dpTone)+chip('☀️ İyi oluş: '+wb,wbTone)+chip('🕊️ Öz-şefkat: '+scz,sczTone)
+    +(sc.depression.alert?' <span style="display:inline-block;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:#e08a8a22;border:1px solid #e08a8a66;color:#e08a8a;">⚠️ dikkat</span>':'')
+    +'</div>';
+  function drow(icon,title,chipTxt,tone,valTxt,pct,desc){
+    var r='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:var(--s1);">';
+    r+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:var(--f4);">'+icon+'</span><span style="flex:1;font-size:var(--f3);font-weight:800;color:var(--t1);">'+esc(title)+'</span>'+chip(chipTxt,tone)+'</div>';
+    r+=bar(pct,tone);
+    r+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;gap:8px;"><span style="font-size:var(--f2);color:var(--t3);line-height:1.45;flex:1;">'+esc(desc)+'</span><span style="font-size:var(--f1);color:var(--t4);font-weight:800;white-space:nowrap;">'+esc(valTxt)+'</span></div></div>';
+    return r;
+  }
+  var det='';
+  det+=drow('🎯','Dikkat & Odaklanma',at,atTone,sc.attention.shaded+'/6 eşik',sc.attention.shaded/6*100,'ASRS-6 tarama: '+(at==='yüksek uyum'?'DEHB ile yüksek uyum':(at==='sınırda'?'sınırda':'düşük eğilim')));
+  det+=drow('🫂','Bağlanma & Güven',stl,stTone,'kaygı '+sc.attachment.anxiety+' · kaçınma '+sc.attachment.avoidance,Math.max(sc.attachment.anxiety,sc.attachment.avoidance)/7*100,'ECR: kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7');
+  det+=drow('🌊','Kaygı',an,anTone,sc.anxiety.sum+'/21',sc.anxiety.sum/21*100,'GAD-7 tarama puanı');
+  det+=drow('🌧️','Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey ⚠️':''));
+  det+=drow('☀️','İyi Oluş',wb,wbTone,sc.wellbeing.score+'/100',sc.wellbeing.score,'WHO-5 (yüksek daha iyidir)');
+  det+=drow('🕊️','Öz-Şefkat',scz,sczTone,sc.selfCompassion.mean+'/5',sc.selfCompassion.mean/5*100,'SCS-SF ortalaması');
+  // ── Tüm soru & cevaplar (denormalize edilmiş qa dizisi) ──
+  if(Array.isArray(P.qa)&&P.qa.length){
+    det+='<div style="border-top:1px solid var(--bd);margin-top:6px;padding-top:11px;">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span>📋 Tüm soru & cevaplar</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+P.qa.length+' madde</span></div>';
+    var curScale=null;
+    P.qa.forEach(function(item){
+      if(item.scale!==curScale){ curScale=item.scale; det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin:11px 0 4px;">'+esc(item.icon||'')+' '+esc(item.scale)+'</div>'; }
+      det+='<div style="display:flex;gap:9px;align-items:baseline;font-size:var(--f2);line-height:1.5;padding:5px 0;border-top:1px solid var(--bd);">';
+      det+='<span style="flex:1;color:var(--t2);min-width:0;word-break:break-word;">'+esc(item.q)+'</span>';
+      det+='<span style="flex-shrink:0;color:var(--t1);font-weight:800;white-space:normal;max-width:140px;text-align:right;">'+esc(item.a)+'</span></div>';
+    });
+    det+='</div>';
+  }
+  var nextTxt=''; try{ var t=Date.parse(P.completedAt); if(!isNaN(t)){ var nd=new Date(t+14*24*3600*1000); nextTxt=' · sonraki ~'+esc(nd.toISOString().slice(0,10)); } }catch(e){}
+  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Öz-bildirim TARAMA araçları (ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF); klinik tanı değildir. İki haftada bir yenilenir. Son tamamlanma: '+esc(String(P.completedAt).slice(0,10))+nextTxt+'.</div>';
+  return cardWrap({key:'psych',icon:'🧠',title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
+}
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   var opened=lastOpenedAt();
@@ -1410,6 +1465,7 @@ function render(){
   // ROW 3: Tik trend (span-8) + Dönem Özeti (span-4)
   h+=moodHeatmapCardHTML();
   h+=cycleCardHTML();
+  h+=psychCardHTML();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);

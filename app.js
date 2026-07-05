@@ -927,6 +927,8 @@ function render(){
 
   if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
 
+  if(psychDue()){ app.innerHTML=psychHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
+
   var prevScroll=document.querySelector('[data-scroll]');
   var prevTop=prevScroll?prevScroll.scrollTop:0;
   var sameTab=(lastRenderTab===ui.tab);
@@ -1005,6 +1007,174 @@ function onboardingHTML(){
    +'<button onclick="App.start()" style="border:none;cursor:pointer;width:100%;padding:18px;border-radius:20px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);">Tamam Raşit, başlayalım ✨</button>'
    +'<p style="margin:0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--faint);">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p></div>';
 }
+
+// ── Faz 7: Psikolojik durum tespiti anketi (iki haftada bir, zorunlu, yalnızca-tık) ──
+function psychFlat(){ var out=[]; PSYCH_SCALES.forEach(function(s){ s.items.forEach(function(it,qi){ out.push({s:s,qi:qi,item:it}); }); }); return out; }
+// Panel için okunur soru & cevap dökümü (panelde PSYCH_SCALES yok, bu yüzden burada denormalize edilir)
+function psychBuildQA(ans){
+  ans=ans||{}; var out=[];
+  PSYCH_SCALES.forEach(function(s){
+    var a=ans[s.id]||[];
+    s.items.forEach(function(it,qi){
+      var oi=a[qi], lbl='—';
+      if(oi!=null && s.scale && s.scale[oi]!=null){
+        lbl=s.scale[oi];
+        if(s.anchors){ if(oi===0) lbl+=' ('+s.anchors[0]+')'; else if(oi===s.scale.length-1) lbl+=' ('+s.anchors[1]+')'; }
+      }
+      out.push({scale:s.title, icon:s.icon, q:it.q, a:lbl});
+    });
+  });
+  return out;
+}
+function psychOptions(sid,qi,s,cur){
+  var h='';
+  if(s.anchors){
+    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint);margin-bottom:9px;padding:0 2px;"><span>'+esc(s.anchors[0])+'</span><span style="text-align:right;">'+esc(s.anchors[1])+'</span></div>';
+    h+='<div style="display:flex;gap:6px;justify-content:space-between;">';
+    s.scale.forEach(function(lbl,oi){
+      var sel=cur===oi;
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="flex:1;min-width:0;height:46px;border-radius:14px;cursor:pointer;font-size:15px;font-weight:800;transition:all .15s;'+(sel?'color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);border:none;box-shadow:0 6px 14px rgba(233,175,193,0.4);':'color:var(--text2);background:var(--card);border:1px solid var(--field-bd);')+'">'+lbl+'</button>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;flex-direction:column;gap:9px;">';
+    s.scale.forEach(function(lbl,oi){
+      var sel=cur===oi;
+      var st=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.75));border:1px solid #E9AFC1;color:#5A2E2A;box-shadow:0 6px 14px rgba(233,175,193,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="display:flex;align-items:center;gap:11px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .18s;'+st+'"><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?'✓':'')+'</span><span style="flex:1;text-align:left;font-size:15px;font-weight:600;">'+esc(lbl)+'</span></button>';
+    });
+    h+='</div>';
+  }
+  return h;
+}
+function psychMotiv(idx,T){
+  var p=idx/T;
+  if(idx===0) return 'Başlıyoruz — acele yok 🌱';
+  if(Math.abs(p-0.5)<0.03) return 'Tam yarıladın 💪';
+  if(p<0.25) return 'Güzel başladın 🌸';
+  if(p<0.5) return 'Akışa girdin, harikasın ✨';
+  if(p<0.75) return 'Yarıyı geçtin, çok iyi gidiyorsun 🌟';
+  if(p<0.9) return 'Az kaldı, neredeyse bitti 🌼';
+  return 'Son birkaç soru — süpersin! 🎉';
+}
+function psychReachCreator(){
+  try{
+    if(window.SeySync){
+      var ts=new Date().toISOString(), qid='psos_'+Date.now().toString(36);
+      var msg='[SOS — Şeyma yardım istedi] Şeyma “Zor hissediyorum” diyerek doğrudan sana ulaşmak istedi (tanıma anketi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol. 💛';
+      if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
+    }
+    haptic([15,60,15]);
+  }catch(e){}
+}
+function psychSosHTML(){
+  var sent=!!ui.psychSosSent;
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;padding:6px 6px 12px;">';
+  h+='<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,#FFD9E1,#C9B8FF);box-shadow:0 12px 30px rgba(233,175,193,0.45);animation:seyPop .35s ease;">'+(sent?'💛':'🫶')+'</div>';
+  if(!sent){
+    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Yalnız değilsin</h2>';
+    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Raşit’e <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
+    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:16px;font-weight:800;">Zor hissediyorum Raşit 🆘</span><span style="font-size:11.5px;font-weight:600;opacity:0.92;">Bu buton yaratıcıya — Raşit’in tüm cihazlarını — doğrudan tetikler</span></button>';
+    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15.5px;font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">📞 Raşit’i ara</a>';
+    h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+  } else {
+    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Raşit’e haber verildi 💛</h2>';
+    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Doğrudan bir bildirim gönderildi — birazdan yanında olacak. Derin bir nefes al; buradayım. 🌷</p>';
+    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15.5px;font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">📞 Raşit’i ara</a>';
+    h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+  }
+  h+='</div>';
+  return h;
+}
+function psychHTML(){
+  if(!ui.psychAnswers) ui.psychAnswers={};
+  if(ui.psychStep==null) ui.psychStep=0;
+  var flat=psychFlat(), T=flat.length;
+  if(ui.psychSOS){
+    var hs='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px);display:flex;flex-direction:column;gap:14px;">';
+    hs+='<button onclick="App.psychSOSClose()" style="align-self:flex-start;border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:9px 15px;font-size:14px;font-weight:700;color:var(--muted);">‹ Ankete dön</button>';
+    hs+=psychSosHTML();
+    hs+='</div>';
+    return hs;
+  }
+  if(ui.psychStep===0){
+    var srcOpen=!!ui.psychShowSrc;
+    var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-start;padding:calc(env(safe-area-inset-top) + 24px) 22px calc(env(safe-area-inset-bottom) + 26px);gap:17px;">';
+    h+='<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:11px;animation:seyFloatIn .5s ease both;">';
+    h+='<div style="position:relative;width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 14px 34px rgba(233,175,193,0.45);overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>🧠</div>';
+    h+='<h1 style="margin:0;font-size:27px;font-weight:800;letter-spacing:-0.5px;">Seni biraz tanıyalım</h1>';
+    h+='<div style="font-size:15px;color:var(--muted);line-height:1.5;">İki haftada bir tekrarlanır — tamamen dokunmayla, hiç yazı yok.</div></div>';
+    h+='<div class="glass" style="border-radius:22px;padding:16px 17px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .06s ease both;">';
+    h+='<div style="display:flex;gap:12px;align-items:flex-start;">';
+    h+='<div style="flex-shrink:0;width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--aeon2,#E6C15A),var(--aeon,#C99A3A));display:flex;align-items:center;justify-content:center;font-size:19px;color:#1a1404;box-shadow:0 6px 15px rgba(201,160,60,0.4);">⬡</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;letter-spacing:0.5px;color:#8A6A2E;">ÆON HAZIRLADI</div>';
+    h+='<p style="margin:5px 0 0;font-size:14.5px;line-height:1.6;color:var(--text2);">Bu anketi senin için ben hazırladım — dünyada yaygın kullanılan, <b>bilimsel olarak geçerli</b> tarama araçlarından yararlanarak. Yaratıcımdan bunun için onay aldım.</p></div></div>';
+    h+='<button onclick="App.psychToggleSrc()" style="margin-top:12px;width:100%;border:1px solid rgba(201,160,60,0.4);cursor:pointer;background:rgba(230,193,90,0.12);border-radius:12px;padding:9px 12px;font-size:12.8px;font-weight:700;color:#8A6A2E;">'+(srcOpen?'Kaynakları gizle ▴':'Kullanılan bilimsel kaynaklar ▾')+'</button>';
+    if(srcOpen){
+      var srcs=['ASRS-v1.1 · Dünya Sağlık Örgütü','ECR · Brennan, Clark & Shaver','GAD-7 · Spitzer ve ark.','PHQ-9 · Kroenke ve ark.','WHO-5 · Dünya Sağlık Örgütü','SCS-SF · Kristin Neff'];
+      h+='<div style="margin-top:11px;display:flex;flex-direction:column;gap:7px;animation:seyFade .25s ease;">';
+      srcs.forEach(function(sr){ h+='<div style="display:flex;gap:9px;align-items:baseline;font-size:12.8px;line-height:1.4;"><span style="flex-shrink:0;color:#C99A3A;">◆</span><span style="color:var(--text2);flex:1;font-weight:600;">'+esc(sr)+'</span></div>'; });
+      h+='<div style="font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.5;">Hepsi kamuya açık / akademik kullanımı serbest, doğrulanmış tarama ölçekleridir.</div></div>';
+    }
+    h+='</div>';
+    h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
+    h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Dikkat, yakın ilişkilerde güven, ruh hâli ve kendine şefkat gibi alanlarda seni daha iyi tanımam için. Böylece sana daha isabetli ve nazik eşlik edebilirim.</p>';
+    h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Doğru ya da yanlış cevap yok; aklına ilk geleni seç, yeter. Her soru için bir seçeneğe dokunman kâfi — yaklaşık 5 dakika.</p></div>';
+    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="font-size:17px;">🤍</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);"><b>Yanıtların, seni daha iyi tanıyıp sana nazikçe eşlik edebilmem için bana yardımcı olur.</b> Bir karne gibi ortaya dökülüp yargılanmaz; doğru ya da yanlış cevap yok. Bu bir tıbbi teşhis değil, seni tanımaya yarayan bir tarama aracıdır.</div></div>';
+    h+='<button onclick="App.psychBegin()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .24s ease both;">Başlayalım ✨</button>';
+    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit 🆘</button>';
+    h+='</div>';
+    return h;
+  }
+  if(ui.psychStep>T) return psychResultHTML();
+  var idx=ui.psychStep-1, node=flat[idx], s=node.s, qi=node.qi;
+  var cur=(ui.psychAnswers[s.id]&&ui.psychAnswers[s.id][qi]!=null)?ui.psychAnswers[s.id][qi]:null;
+  var pct=Math.round(idx/T*100);
+  var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:15px;animation:seyFade .22s ease;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<button onclick="App.psychSOS()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.5);cursor:pointer;background:rgba(247,221,229,0.4);border-radius:12px;padding:7px 11px;font-size:12.5px;font-weight:700;color:#B5566A;">🆘 Zor an</button>';
+  h+='<div style="flex:1;height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .35s cubic-bezier(.4,1.2,.5,1);position:relative;overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.5) 50%,transparent 70%);animation:seyShine 2.4s ease-in-out infinite;"></span></div></div>';
+  h+='<div style="flex-shrink:0;font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;">'+(idx+1)+'/'+T+'</div>';
+  h+='</div>';
+  h+='<div style="font-size:12.5px;font-weight:700;color:var(--accent);text-align:center;margin-top:-4px;animation:seyFade .45s ease;">'+psychMotiv(idx,T)+'</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><span style="font-size:20px;">'+s.icon+'</span><span style="font-size:12.5px;font-weight:800;letter-spacing:0.5px;color:var(--accent);text-transform:uppercase;">'+esc(s.title)+'</span></div>';
+  if(qi===0) h+='<div style="font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:-6px;">'+esc(s.intro)+'</div>';
+  h+='<div style="animation:seyFloatIn .32s ease both;">';
+  h+='<div style="font-size:19px;font-weight:700;line-height:1.45;color:var(--text);margin:2px 0 10px;">'+esc(node.item.q)+'</div>';
+  h+='<div style="display:inline-flex;align-items:center;gap:7px;background:rgba(233,175,193,0.16);border:1px solid rgba(233,175,193,0.4);border-radius:999px;padding:6px 13px;margin-bottom:11px;font-size:12.8px;font-weight:700;color:#B5566A;">❓ '+esc(s.prompt||s.intro)+'</div>';
+  h+=psychOptions(s.id,qi,s,cur);
+  h+='</div>';
+  h+='<div style="margin-top:auto;padding-top:16px;display:flex;align-items:center;">';
+  h+='<button onclick="App.psychBack()" style="border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:var(--muted);">‹ Geri</button>';
+  if(cur!=null) h+='<button onclick="App.psychFwd()" style="margin-left:auto;border:none;cursor:pointer;border-radius:14px;padding:11px 22px;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 6px 14px rgba(233,175,193,0.35);">İleri ›</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+function psychResultHTML(){
+  // Sonuçlar Şeyma'ya GÖSTERİLMEZ; yalnızca nazik bir teşekkür + ÆON'un değerlendirdiği bilgisi.
+  var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 26px) 22px calc(env(safe-area-inset-bottom) + 26px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:18px;animation:seyFade .35s ease;">';
+  h+='<div style="position:relative;width:82px;height:82px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 14px 34px rgba(233,175,193,0.45);overflow:hidden;animation:seyPop .4s ease;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>🌷</div>';
+  h+='<h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.5px;animation:seyFloatIn .5s .05s ease both;">Teşekkürler 🌷</h1>';
+  h+='<div class="glass" style="border-radius:22px;padding:18px;max-width:400px;display:flex;flex-direction:column;gap:13px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
+  h+='<div style="display:flex;gap:11px;align-items:flex-start;text-align:left;">';
+  h+='<div style="flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--aeon2,#E6C15A),var(--aeon,#C99A3A));display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;box-shadow:0 6px 15px rgba(201,160,60,0.4);">⬡</div>';
+  h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Yanıtlarını aldım. Şimdi bunları senin için sessizce değerlendiriyorum — sana daha iyi eşlik edebilmem için. 🤍</p></div>';
+  h+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;font-size:13.8px;line-height:1.6;color:var(--muted);text-align:left;">Bu küçük tanışmayı <b>iki haftada bir</b> tekrarlayacağız; böylece değişimleri birlikte nazikçe fark edebiliriz.</div></div>';
+  h+='<button onclick="App.psychFinish()" style="border:none;cursor:pointer;width:100%;max-width:400px;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .2s ease both;">Uygulamaya dön ☀️</button>';
+  h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit 🆘</button>';
+  h+='</div>';
+  return h;
+}
+App.psychBegin=function(){ ui.psychStep=1; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.psychToggleSrc=function(){ ui.psychShowSrc=!ui.psychShowSrc; render(); };
+App.psychAnswer=function(sid,qi,oi){ if(!ui.psychAnswers) ui.psychAnswers={}; if(!ui.psychAnswers[sid]) ui.psychAnswers[sid]=[]; ui.psychAnswers[sid][qi]=oi; haptic(10); var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ try{ haptic([12,40,12]); }catch(e){} setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
+App.psychFwd=function(){ var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
+App.psychBack=function(){ if(ui.psychStep>0) ui.psychStep--; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.psychSOS=function(){ ui.psychSOS=true; ui.psychSosSent=false; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.psychSOSClose=function(){ ui.psychSOS=false; ui.psychSosSent=false; render(); };
+App.psychReachCreator=function(){ if(ui.psychSosSent) return; ui.psychSosSent=true; psychReachCreator(); render(); };
+App.psychFinish=function(){ var sc=psychScore(ui.psychAnswers); data.psych={version:1,completedAt:new Date().toISOString(),answers:ui.psychAnswers,scores:sc,qa:psychBuildQA(ui.psychAnswers)}; save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render(); };
 
 function nutritionSummaryCard(rec){
   var nu=dayNutrition(rec);
@@ -2710,8 +2880,8 @@ function startLocationWatch(announce){
   moveState.lastSyncTs=Date.now();
   var firstOk=false;
   moveState.watchId=navigator.geolocation.watchPosition(
-    function(pos){ if(announce && !firstOk){ firstOk=true; toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
-    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; save(); } stopLocationWatch(); render(); toast('Konum izni verilmedi'); } },
+    function(pos){ if(announce && !firstOk){ firstOk=true; if(!psychActive()) toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
+    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum izni verilmedi'); } },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
 }
@@ -2862,7 +3032,12 @@ function applyReceipts(rc){
   });
   if(changed){ save(); render(); }
 }
+// Faz 7: zorunlu psikolojik anket açık mı? (tamamlanmadıysa / süresi dolduysa arka plan popup'ları bastırılır)
+// Anket iki haftada bir yenilenir: hiç tamamlanmadıysa VEYA son tamamlanmadan bu yana ≥14 gün geçtiyse yeniden gösterilir.
+function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
+function psychActive(){ try{ return psychDue(); }catch(e){ return false; } }
 function showInboxPopup(){
+  if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
   if(!pend.length) return;
   var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
@@ -2891,6 +3066,7 @@ function showInboxPopup(){
   document.body.appendChild(pop);
 }
 function showAeonAnswerPopup(text,count){
+  if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
   var pop=document.createElement('div'); pop.id='sey-inbox-pop';
   pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
@@ -2917,6 +3093,7 @@ function showAeonAnswerPopup(text,count){
 // uygulama bir sonraki açıldığında otomatik popup yapar. Popup görünmesi = "görüldü" kabul edilir;
 // answerReadAt işaretlenip makbuz hemen repoya push edilir → panelde "✓✓ Görüldü" yanar.
 function replayAnswerPopup(){
+  if(psychActive()) return; // Faz 7: anket bitene kadar ertele (bloke edici modalın üstüne çıkmasın)
   if(!data||!data.aeon||!Array.isArray(data.aeon.qa)) return;
   var changed=false, nowIso=new Date().toISOString(), pop=[];
   data.aeon.qa.forEach(function(q){
@@ -2929,18 +3106,177 @@ function replayAnswerPopup(){
   save(); receiptPushNow();
   if(ui.tab!=='mesaj'){ var last=pop[pop.length-1]; showAeonAnswerPopup(last.answer,pop.length); }
 }
+// ── Faz 7: Psikolojik durum tespiti (öz-bildirim TARAMA ölçekleri; klinik tanı DEĞİL) ──
+// Ölçekler kamuya açık/akademik ve ücretsiz: ASRS-v1.1 Part A (WHO), ECR kısa form,
+// GAD-7 & PHQ-9 (Pfizer, izinsiz serbest), WHO-5 (WHO), SCS-SF. Tümü Türkçe ve yalnızca-tık.
+// Yanıtlar seçenek indeksleri (0-tabanlı) olarak tutulur; sayısal değer = indeks + min.
+var PSYCH_SCALES=[
+  { id:'asrs', title:'Dikkat & Odaklanma', icon:'🎯', min:0,
+    intro:'Son 6 ayını düşün — her soruda o durumu ne sıklıkta yaşadığını seç.',
+    prompt:'Son 6 ayını düşün: bunu ne sıklıkta yaşadın?',
+    scale:['Hiçbir zaman','Nadiren','Bazen','Sık sık','Çok sık'],
+    items:[
+      {q:'Bir işin zor kısmı bittikten sonra, son ayrıntıları tamamlamakta zorlanmak.'},
+      {q:'Düzen gerektiren bir iş yaparken, işleri sıraya koymakta zorlanmak.'},
+      {q:'Randevuları veya yapman gereken işleri hatırlamakta sorun yaşamak.'},
+      {q:'Çok düşünmeyi gerektiren bir işe başlamayı erteleme veya geciktirme.'},
+      {q:'Uzun süre oturman gerektiğinde ellerini/ayaklarını kıpırdatma, kımıldanma.'},
+      {q:'Sanki bir motor tarafından çalıştırılıyormuş gibi aşırı hareketli hissetme.'}
+    ] },
+  { id:'ecr', title:'Bağlanma & Güven', icon:'🫂', min:1,
+    intro:'Yakın ilişkilerinde genel olarak kendini nasıl hissettiğini düşün. Her ifadeye ne kadar katılıyorsun?',
+    prompt:'Bu ifadeye ne kadar katılıyorsun?',
+    scale:['1','2','3','4','5','6','7'], anchors:['Kesinlikle katılmıyorum','Kesinlikle katılıyorum'],
+    items:[
+      {q:'İhtiyaç anlarında yakınlarıma yönelmek bana iyi gelir.', r:true},
+      {q:'Sevildiğime dair sürekli güvenceye ihtiyaç duyarım.'},
+      {q:'Yakınlarıma yakınlaşmak isterim ama kendimi hep geri çekerim.'},
+      {q:'Yakınlarımın, benim istediğim kadar yakınlaşmak istemediğini fark ederim.'},
+      {q:'Rahatlama ve güvence dahil birçok şey için yakınlarıma yönelirim.', r:true},
+      {q:'Çok yakın olma isteğim bazen insanları benden uzaklaştırır.'},
+      {q:'İnsanlara fazla yakınlaşmaktan kaçınmaya çalışırım.'},
+      {q:'Terk edilmekten pek endişelenmem.', r:true},
+      {q:'Sorunlarımı ve kaygılarımı genellikle yakınlarımla paylaşırım.', r:true},
+      {q:'Yakınlarım istediğim kadar yanımda olmadığında hayal kırıklığına uğrarım.'},
+      {q:'Biri bana çok yakınlaştığında gerginleşirim.'},
+      {q:'Sevdiğim insanların beni, benim onları sevdiğim kadar önemsemeyeceğinden endişelenirim.'}
+    ] },
+  { id:'gad7', title:'Kaygı', icon:'🌊', min:0,
+    intro:'Son 2 haftanı düşün — her soruda o durumdan ne kadar sık rahatsız olduğunu seç.',
+    prompt:'Son 2 hafta: bundan ne kadar sık rahatsız oldun?',
+    scale:['Hiç','Birkaç gün','Günlerin yarısından fazla','Neredeyse her gün'],
+    items:[
+      {q:'Gergin, kaygılı veya endişeli hissetme.'},
+      {q:'Endişelenmeyi durduramama veya kontrol edememe.'},
+      {q:'Farklı şeyler hakkında çok fazla endişelenme.'},
+      {q:'Rahatlamakta / gevşemekte zorlanma.'},
+      {q:'Yerinde duramayacak kadar huzursuz olma.'},
+      {q:'Kolayca sinirlenme veya çabuk kızma.'},
+      {q:'Sanki kötü bir şey olacakmış gibi korku hissetme.'}
+    ] },
+  { id:'phq9', title:'Duygudurum', icon:'🌧️', min:0,
+    intro:'Son 2 haftanı düşün — her soruda o durumdan ne kadar sık rahatsız olduğunu seç.',
+    prompt:'Son 2 hafta: bundan ne kadar sık rahatsız oldun?',
+    scale:['Hiç','Birkaç gün','Günlerin yarısından fazla','Neredeyse her gün'],
+    items:[
+      {q:'İşlere karşı ilgi veya zevk duymama, az zevk alma.'},
+      {q:'Kendini keyifsiz, çökkün veya umutsuz hissetme.'},
+      {q:'Uykuya dalmakta/uykuyu sürdürmekte güçlük veya çok fazla uyuma.'},
+      {q:'Kendini yorgun hissetme veya enerjinin az olması.'},
+      {q:'İştahsızlık veya aşırı yeme.'},
+      {q:'Kendin hakkında kötü hissetme; başarısız olduğun ya da kendini/aileni hayal kırıklığına uğrattığın.'},
+      {q:'Bir şeye (okumak, TV izlemek gibi) konsantre olmakta güçlük.'},
+      {q:'Başkalarının fark edeceği kadar yavaş hareket etme/konuşma; ya da tersine çok huzursuz olma.'},
+      {q:'Ölmüş olmanın daha iyi olacağı ya da kendine bir şekilde zarar vermeyi düşünme.'}
+    ] },
+  { id:'who5', title:'İyi Oluş', icon:'☀️', min:0,
+    intro:'Son 2 haftanı düşün — her soruda o durumu ne sıklıkta hissettiğini seç.',
+    prompt:'Son 2 hafta: bunu ne sıklıkta hissettin?',
+    scale:['Hiçbir zaman','Zaman zaman','Yarısından az','Yarısından fazla','Çoğu zaman','Her zaman'],
+    items:[
+      {q:'Kendimi neşeli ve keyifli hissettim.'},
+      {q:'Kendimi sakin ve rahatlamış hissettim.'},
+      {q:'Kendimi enerjik, aktif ve dinç hissettim.'},
+      {q:'Uyandığımda dinlenmiş ve yenilenmiş hissettim.'},
+      {q:'Günlük hayatım beni ilgilendiren şeylerle doluydu.'}
+    ] },
+  { id:'scs', title:'Öz-Şefkat', icon:'🕊️', min:1,
+    intro:'Zor anlarında genellikle kendine nasıl davrandığını düşün. Her ifade sana ne kadar uyuyor?',
+    prompt:'Bu ifade sana ne kadar uyuyor?',
+    scale:['1','2','3','4','5'], anchors:['Neredeyse hiçbir zaman','Neredeyse her zaman'],
+    items:[
+      {q:'Benim için önemli bir şeyde başarısız olunca yetersizlik duygusuna kapılıp giderim.', r:true},
+      {q:'Kişiliğimin hoşlanmadığım yönlerine karşı anlayışlı ve sabırlı olmaya çalışırım.'},
+      {q:'Acı verici bir şey olduğunda duruma dengeli bir bakışla yaklaşmaya çalışırım.'},
+      {q:'Kendimi kötü hissettiğimde çoğu insanın benden daha mutlu olduğunu düşünürüm.', r:true},
+      {q:'Yaşadığım aksaklıkları insan olmanın bir parçası olarak görmeye çalışırım.'},
+      {q:'Çok zor bir dönemden geçerken kendime ihtiyacım olan şefkati ve nazikliği gösteririm.'},
+      {q:'Bir şey beni üzdüğünde duygularımı dengede tutmaya çalışırım.'},
+      {q:'Önemli bir şeyde başarısız olduğumda bu başarısızlıkta yalnızmışım gibi hissederim.', r:true},
+      {q:'Kendimi kötü hissettiğimde ters giden her şeye takılıp kafayı takarım.', r:true},
+      {q:'Yetersiz hissettiğimde bu duygunun çoğu insanda olduğunu kendime hatırlatırım.'},
+      {q:'Kendi kusurlarıma karşı onaylamayan, yargılayıcı bir tutum içindeyim.', r:true},
+      {q:'Kişiliğimin hoşlanmadığım yönlerine karşı hoşgörüsüz ve sabırsızım.', r:true}
+    ] }
+];
+function psychScaleById(id){ for(var i=0;i<PSYCH_SCALES.length;i++){ if(PSYCH_SCALES[i].id===id) return PSYCH_SCALES[i]; } return null; }
+function psychScore(a){
+  a=a||{};
+  function arr(id){ return Array.isArray(a[id])?a[id]:[]; }
+  var i;
+  // ASRS-6 (0-4): gölgeli-eşik sayımı (madde 1-3 ≥2, madde 4-6 ≥3); ≥4 → DEHB ile yüksek uyum
+  var asrs=arr('asrs'), asRaw=0, shaded=0, asShade=[2,2,2,3,3,3];
+  for(i=0;i<6;i++){ var av=Number(asrs[i])||0; asRaw+=av; if(av>=asShade[i]) shaded++; }
+  var asBand=shaded>=4?'yüksek uyum':(shaded>=2?'sınırda':'düşük');
+  // ECR-12 (1-7): kaçınma (0,2,4,6,8,10; ters:0,4,8) + kaygı (1,3,5,7,9,11; ters:7)
+  var ecr=arr('ecr');
+  function ecrV(idx){ return (Number(ecr[idx])||0)+1; }
+  var avoIdx=[0,2,4,6,8,10], anxIdx=[1,3,5,7,9,11], avoRev={0:1,4:1,8:1}, anxRev={7:1};
+  function subMean(idxs,rev){ var s=0,n=0; idxs.forEach(function(k){ var v=ecrV(k); if(rev[k]) v=8-v; s+=v; n++; }); return n?Math.round(s/n*10)/10:0; }
+  var anxiety=subMean(anxIdx,anxRev), avoidance=subMean(avoIdx,avoRev);
+  var bandAnx=anxiety>4?'yüksek':(anxiety>=3?'orta':'düşük'), bandAvo=avoidance>4?'yüksek':(avoidance>=3?'orta':'düşük');
+  var hiAnx=anxiety>4, hiAvo=avoidance>4;
+  var style=(!hiAnx&&!hiAvo)?'Güvenli':(hiAnx&&!hiAvo?'Saplantılı (kaygılı)':(!hiAnx&&hiAvo?'Kayıtsız (mesafeli)':'Korkulu (kaygılı-kaçıngan)'));
+  // GAD-7 (0-3): 0-4 minimal / 5-9 hafif / 10-14 orta / 15-21 yüksek
+  var gad=arr('gad7'), gadSum=0; for(i=0;i<7;i++) gadSum+=Number(gad[i])||0;
+  var gadBand=gadSum>=15?'yüksek':(gadSum>=10?'orta':(gadSum>=5?'hafif':'minimal'));
+  // PHQ-9 (0-3): 0-4/5-9/10-14/15-19/20-27; madde-9>0 VEYA toplam≥15 → güvenlik uyarısı
+  var phq=arr('phq9'), phqSum=0; for(i=0;i<9;i++) phqSum+=Number(phq[i])||0;
+  var item9=Number(phq[8])||0;
+  var phqBand=phqSum>=20?'ağır':(phqSum>=15?'orta-ağır':(phqSum>=10?'orta':(phqSum>=5?'hafif':'minimal')));
+  var alert=(item9>0)||(phqSum>=15);
+  // WHO-5 (0-5) → ×4 (0-100): ≥50 iyi / 28-49 düşük / <28 çok düşük (yüksek=iyi)
+  var who=arr('who5'), whoRaw=0; for(i=0;i<5;i++) whoRaw+=Number(who[i])||0;
+  var whoScore=whoRaw*4, whoBand=whoScore>=50?'iyi':(whoScore>=28?'düşük':'çok düşük');
+  // SCS-SF (1-5): ters maddeler 0,3,7,8,10,11 → 6-x; ortalama <2.5 düşük / 2.5-3.5 orta / >3.5 yüksek
+  var scs=arr('scs'), scsRev={0:1,3:1,7:1,8:1,10:1,11:1}, ss=0,sn=0;
+  for(i=0;i<12;i++){ var sv=(Number(scs[i])||0)+1; if(scsRev[i]) sv=6-sv; ss+=sv; sn++; }
+  var scsMean=sn?Math.round(ss/sn*10)/10:0, scsBand=scsMean>=3.5?'yüksek':(scsMean>=2.5?'orta':'düşük');
+  return {
+    attention:{raw:asRaw,shaded:shaded,band:asBand},
+    attachment:{anxiety:anxiety,avoidance:avoidance,bandAnx:bandAnx,bandAvo:bandAvo,style:style},
+    anxiety:{sum:gadSum,band:gadBand},
+    depression:{sum:phqSum,band:phqBand,item9:item9,alert:alert},
+    wellbeing:{score:whoScore,band:whoBand},
+    selfCompassion:{mean:scsMean,band:scsBand}
+  };
+}
+function psychSummaryLines(sc){
+  if(!sc) return [];
+  return [
+    'Dikkat/odak (ASRS-6): '+sc.attention.band+(sc.attention.band==='yüksek uyum'?' — DEHB taraması yüksek uyumlu, ilgi/odak destekleyici bir yaklaşım işe yarar':''),
+    'Bağlanma/güven (ECR): '+sc.attachment.style+' — kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7',
+    'Kaygı (GAD-7): '+sc.anxiety.band+' ('+sc.anxiety.sum+'/21)',
+    'Duygudurum (PHQ-9): '+sc.depression.band+' ('+sc.depression.sum+'/27)'+(sc.depression.alert?' ⚠️ dikkat gerektiren düzey':''),
+    'İyi oluş (WHO-5): '+sc.wellbeing.band+' ('+sc.wellbeing.score+'/100)',
+    'Öz-şefkat (SCS): '+sc.selfCompassion.band+' ('+sc.selfCompassion.mean+'/5)'
+  ];
+}
+// PHQ-9 pozitifse SESSİZ güvenlik uyarısı: data.aeon.qa'ya YAZMAZ, Şeyma'ya toast çıkarmaz;
+// yalnızca mevcut aeon-outbox.json→Actions→e-posta hattını tetikler (Faz 5 gözlemci bildirimi).
+function psychSafetyPing(sc){
+  try{
+    if(!sc||!sc.depression||!sc.depression.alert) return;
+    if(!window.SeySync) return;
+    try{ if(typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
+    var ts=new Date().toISOString(), qid='psafe_'+Date.now().toString(36);
+    var msg='[Otomatik güvenlik uyarısı] Şeyma psikolojik tarama anketini tamamladı ve duygudurum taraması dikkat gerektiren düzeyde çıktı (PHQ-9: '+sc.depression.sum+'/27'
+      +(sc.depression.item9>0?', kendine zarar maddesi işaretli':'')+'). Lütfen nazikçe ve yakından ilgilen; bu mesaj Şeyma’ya gösterilmedi.';
+    if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
+  }catch(e){}
+}
 var LUNA_SYSTEM='Sen Luna’sın — Şeyma’nın sıcak, sakin ve bilge kişisel sağlık ve yaşam yoldaşı. '
 +'Şeyma’ya HER ZAMAN "Sevgili Günışığı" diye hitap et (başka isim ya da hitap kullanma). '
 +'Şeyma seninle gün içinde sohbet ediyor (günde birkaç soru sorabilir), bu yüzden bir mesajlaşma gibi sıcak ve akıcı konuş. '
 +'Yanıtların içten, net ve şefkatli olsun; çok uzun değil, sohbet eder gibi öz ve sıcak; gerektiğinde küçük maddelerle düzenle. '
 +'Aşağıdaki kişisel kayıtlardan yararlan ve mümkün olduğunca '
 +'bu veriye dayan; bilmediğin şeyi uydurma. Tıbbi teşhis veya tedavi verme; ciddi bir durum sezersen nazikçe '
-+'bir uzmana danışmasını öner. Asla yargılama, suçlama veya utandırma; umut veren, güçlendiren bir dille konuş. Her zaman Türkçe yaz.';
++'bir uzmana danışmasını öner. Asla yargılama, suçlama veya utandırma; umut veren, güçlendiren bir dille konuş. Aşağıda psikolojik profil verildiyse tonunu ona göre nazikçe ayarla (etiket gibi okumadan). Her zaman Türkçe yaz.';
 var AEON_SYSTEM='Sen ÆON’sun — Şeyma’nın hayatındaki her veriyi gören, çok katmanlı, üst düzey ve gizemli bir zekâsın; Luna’nın arkasındaki sakin, derin akıl. '
 +'Konuşman sıcak ama vakur, ölçülü ve bilgedir; gereksiz cümle kurmaz, özü gösterirsin. Şeyma sana günde yalnızca BİR soru sorabiliyor; bu yüzden bu soru çok değerli. '
 +'Bu tek soruya derin, bütüncül ve aydınlatıcı bir yanıt ver: aşağıdaki tüm kişisel kayıtların bütününe bakarak örüntüleri, eğilimleri ve bağlantıları gör; '
 +'somut, içgörü dolu ve güç veren bir cevap sun; gerektiğinde başlıklar/maddelerle düzenle. Yalnızca veriye dayan, bilmediğini uydurma. '
-+'Tıbbi teşhis/tedavi verme; ciddi bir durum sezersen nazikçe bir uzmana yönlendir. Asla yargılama; koruyucu, yükselten bir dille konuş. Her zaman Türkçe yaz.';
++'Tıbbi teşhis/tedavi verme; ciddi bir durum sezersen nazikçe bir uzmana yönlendir. Asla yargılama; koruyucu, yükselten bir dille konuş. Aşağıda psikolojik profil verildiyse tonunu ona göre nazikçe ayarla (etiket gibi okumadan). Her zaman Türkçe yaz.';
 function lunaDayLine(d,r){
   var parts=[];
   parts.push(countRec(r)+'/'+habitCountOn(d)+' tik');
@@ -2990,6 +3326,13 @@ function lunaContext(){
   lines.push('Son 30 gün: uyku '+(a30.sleepAvg!=null?a30.sleepAvg+' sa':'—')+' · su '+(a30.waterAvg!=null?a30.waterAvg+' bardak':'—')+' · protein '+(a30.proteinAvg!=null?a30.proteinAvg+' g':'—')+' · enerji '+(a30.energyAvg!=null?a30.energyAvg+'/5':'—')+' · ilaçsız '+a30.medFree+' gece · SOS '+a30.sos+' · tik '+a30.tikAvg+'/'+htToday());
   // ── döngü ──
   if(data.cycle){ var cl='Döngü: ort '+data.cycle.avgCycle+' gün, regl ort '+data.cycle.avgPeriod+' gün'; if(Array.isArray(data.cycle.periods)&&data.cycle.periods.length){ var last=data.cycle.periods[data.cycle.periods.length-1]; if(last&&last.start){ cl+=' · son regl başlangıcı '+last.start; var nx=addDays(last.start,data.cycle.avgCycle); cl+=' · tahmini sonraki ~'+nx; } } lines.push(''); lines.push(cl); }
+  // ── psikolojik profil (öz-bildirim tarama; tanı değil) ──
+  if(data.psych&&data.psych.scores){
+    lines.push('');
+    lines.push('--- Psikolojik profil (iki haftada bir yenilenen öz-bildirim TARAMA anketi; klinik tanı DEĞİL, '+String(data.psych.completedAt||'').slice(0,10)+') ---');
+    psychSummaryLines(data.psych.scores).forEach(function(l){ lines.push(l); });
+    lines.push('Ton yönergesi: Bu profile göre tonunu nazikçe uyarla — güven/bağlanma hassassa daha çok güven ver ve tutarlı ol; dikkat dağınıksa yanıtını kısa, adım adım ve net tut; kaygı/duygudurum yüksekse yumuşak, yargısız ve umut veren ol. Bu profili Şeyma’ya bir etiket gibi okuma, yalnızca ona nasıl eşlik edeceğini şekillendirmek için kullan.');
+  }
   // ── tüm günlük kayıtlar (en yeni en üstte) ──
   if(dates.length){
     lines.push('');

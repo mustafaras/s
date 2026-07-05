@@ -1057,11 +1057,11 @@ function psychSosHTML(){
   h+='<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,#FFD9E1,#C9B8FF);box-shadow:0 12px 30px rgba(233,175,193,0.45);animation:seyPop .35s ease;">'+(sent?'💛':'🫶')+'</div>';
   if(!sent){
     h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Yalnız değilsin</h2>';
-    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Mustafa’ya <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
-    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:16px;font-weight:800;">Zor hissediyorum — Mustafa’ya haber ver 🆘</span><span style="font-size:11.5px;font-weight:600;opacity:0.92;">Bu buton yaratıcına doğrudan bildirim gönderir</span></button>';
+    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Raşit’e <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
+    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:16px;font-weight:800;">Zor hissediyorum Raşit 🆘</span><span style="font-size:11.5px;font-weight:600;opacity:0.92;">Bu buton yaratıcıya — Raşit’in tüm cihazlarını — doğrudan tetikler</span></button>';
     h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
   } else {
-    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Mustafa’ya haber verildi 💛</h2>';
+    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Raşit’e haber verildi 💛</h2>';
     h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Doğrudan bir bildirim gönderildi — birazdan yanında olacak. Derin bir nefes al; buradayım. 🌷</p>';
     h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
   }
@@ -1090,21 +1090,21 @@ function psychHTML(){
     h+='<div style="display:flex;gap:12px;align-items:flex-start;">';
     h+='<div style="flex-shrink:0;width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--aeon2,#E6C15A),var(--aeon,#C99A3A));display:flex;align-items:center;justify-content:center;font-size:19px;color:#1a1404;box-shadow:0 6px 15px rgba(201,160,60,0.4);">⬡</div>';
     h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;letter-spacing:0.5px;color:#8A6A2E;">ÆON HAZIRLADI</div>';
-    h+='<p style="margin:5px 0 0;font-size:14.5px;line-height:1.6;color:var(--text2);">Bu anketi senin için ben hazırladım — dünyada yaygın kullanılan, <b>bilimsel olarak geçerli</b> tarama araçlarından yararlanarak. Yaratıcından bunun için onay aldım.</p></div></div>';
+    h+='<p style="margin:5px 0 0;font-size:14.5px;line-height:1.6;color:var(--text2);">Bu anketi senin için ben hazırladım — dünyada yaygın kullanılan, <b>bilimsel olarak geçerli</b> tarama araçlarından yararlanarak. Yaratıcımdan bunun için onay aldım.</p></div></div>';
     h+='<button onclick="App.psychToggleSrc()" style="margin-top:12px;width:100%;border:1px solid rgba(201,160,60,0.4);cursor:pointer;background:rgba(230,193,90,0.12);border-radius:12px;padding:9px 12px;font-size:12.8px;font-weight:700;color:#8A6A2E;">'+(srcOpen?'Kaynakları gizle ▴':'Kullanılan bilimsel kaynaklar ▾')+'</button>';
     if(srcOpen){
-      var srcs=[['🎯','Dikkat','ASRS-v1.1 · Dünya Sağlık Örgütü'],['🫂','Bağlanma','ECR — Yakın İlişkilerde Yaşantılar'],['🌊','Kaygı','GAD-7 · Spitzer ve ark.'],['🌧️','Duygudurum','PHQ-9 · Kroenke ve ark.'],['☀️','İyi oluş','WHO-5 İyi Oluş İndeksi'],['🕊️','Öz-şefkat','SCS-SF · Kristin Neff']];
-      h+='<div style="margin-top:11px;display:flex;flex-direction:column;gap:8px;animation:seyFade .25s ease;">';
-      srcs.forEach(function(sr){ h+='<div style="display:flex;gap:9px;align-items:baseline;font-size:12.5px;line-height:1.4;"><span style="flex-shrink:0;">'+sr[0]+'</span><span style="color:var(--faint);flex-shrink:0;width:70px;font-weight:700;">'+sr[1]+'</span><span style="color:var(--text2);flex:1;">'+esc(sr[2])+'</span></div>'; });
+      var srcs=['ASRS-v1.1 · Dünya Sağlık Örgütü','ECR · Brennan, Clark & Shaver','GAD-7 · Spitzer ve ark.','PHQ-9 · Kroenke ve ark.','WHO-5 · Dünya Sağlık Örgütü','SCS-SF · Kristin Neff'];
+      h+='<div style="margin-top:11px;display:flex;flex-direction:column;gap:7px;animation:seyFade .25s ease;">';
+      srcs.forEach(function(sr){ h+='<div style="display:flex;gap:9px;align-items:baseline;font-size:12.8px;line-height:1.4;"><span style="flex-shrink:0;color:#C99A3A;">◆</span><span style="color:var(--text2);flex:1;font-weight:600;">'+esc(sr)+'</span></div>'; });
       h+='<div style="font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.5;">Hepsi kamuya açık / akademik kullanımı serbest, doğrulanmış tarama ölçekleridir.</div></div>';
     }
     h+='</div>';
     h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
     h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Dikkat, yakın ilişkilerde güven, ruh hâli ve kendine şefkat gibi alanlarda seni daha iyi tanımam için. Böylece sana daha isabetli ve nazik eşlik edebilirim.</p>';
     h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Doğru ya da yanlış cevap yok; aklına ilk geleni seç, yeter. Her soru için bir seçeneğe dokunman kâfi — yaklaşık 5 dakika.</p></div>';
-    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="font-size:17px;">🔒</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);"><b>Yanıtların ve sonuçların yaratıcınla paylaşılmaz.</b> Hepsi yalnızca senin cihazında kalır; bir karne gibi ortaya dökülüp yargılanmaz. Tek istisna: yalnızca güvenliğinle ilgili ciddi bir durumda, sana daha iyi destek olunabilmesi için gereken en az bilgi paylaşılabilir. Bu bir tıbbi teşhis değil; seni tanımaya yarayan bir tarama aracıdır.</div></div>';
+    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="font-size:17px;">🔒</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);"><b>Yanıtların ve sonuçların yaratıcıyla paylaşılmaz.</b> Hepsi yalnızca senin cihazında kalır; bir karne gibi ortaya dökülüp yargılanmaz. Tek istisna: yalnızca güvenliğinle ilgili ciddi bir durumda, sana daha iyi destek olunabilmesi için gereken en az bilgi paylaşılabilir. Bu bir tıbbi teşhis değil; seni tanımaya yarayan bir tarama aracıdır.</div></div>';
     h+='<button onclick="App.psychBegin()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .24s ease both;">Başlayalım ✨</button>';
-    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum 🆘 · Mustafa’ya haber ver</button>';
+    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit 🆘</button>';
     h+='</div>';
     return h;
   }
@@ -1166,7 +1166,7 @@ function psychResultHTML(){
     h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.5),rgba(247,221,229,0.6));border:1px solid rgba(233,175,193,0.5);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;">';
     h+='<div style="font-size:15px;font-weight:800;color:var(--text);">Yanındayım 🤍</div>';
     h+='<p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Son zamanlarda zorlanıyor olabilirsin. Bunu tek başına taşımak zorunda değilsin — güvendiğin biriyle ya da bir uzmanla konuşmak çok değerli olur. Acil bir zorluk hissedersen 112’yi arayabilirsin.</p>';
-    h+='<button onclick="App.psychSOS()" style="align-self:flex-start;border:none;cursor:pointer;border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:#5A2E2A;background:#FFE8A3;box-shadow:0 6px 14px rgba(255,200,120,0.4);">Zor hissediyorum → Mustafa’ya haber ver 🆘</button>';
+    h+='<button onclick="App.psychSOS()" style="align-self:flex-start;border:none;cursor:pointer;border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:#5A2E2A;background:#FFE8A3;box-shadow:0 6px 14px rgba(255,200,120,0.4);">Zor hissediyorum Raşit 🆘</button>';
     h+='</div>';
   }
   h+='<button onclick="App.psychFinish()" style="margin-top:6px;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);">Uygulamaya başla ☀️</button>';

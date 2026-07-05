@@ -3062,7 +3062,7 @@ function replayAnswerPopup(){
 // Yanıtlar seçenek indeksleri (0-tabanlı) olarak tutulur; sayısal değer = indeks + min.
 var PSYCH_SCALES=[
   { id:'asrs', title:'Dikkat & Odaklanma', icon:'🎯', min:0,
-    intro:'Son 6 ay içinde aşağıdaki durumları ne sıklıkta yaşadın?',
+    intro:'Son 6 ayını düşün — her soruda o durumu ne sıklıkta yaşadığını seç.',
     scale:['Hiçbir zaman','Nadiren','Bazen','Sık sık','Çok sık'],
     items:[
       {q:'Bir işin zor kısmı bittikten sonra, son ayrıntıları tamamlamakta zorlanmak.'},
@@ -3090,7 +3090,7 @@ var PSYCH_SCALES=[
       {q:'Sevdiğim insanların beni, benim onları sevdiğim kadar önemsemeyeceğinden endişelenirim.'}
     ] },
   { id:'gad7', title:'Kaygı', icon:'🌊', min:0,
-    intro:'Son 2 hafta içinde aşağıdaki sorunlardan ne kadar sık rahatsız oldun?',
+    intro:'Son 2 haftanı düşün — her soruda o durumdan ne kadar sık rahatsız olduğunu seç.',
     scale:['Hiç','Birkaç gün','Günlerin yarısından fazla','Neredeyse her gün'],
     items:[
       {q:'Gergin, kaygılı veya endişeli hissetme.'},
@@ -3102,7 +3102,7 @@ var PSYCH_SCALES=[
       {q:'Sanki kötü bir şey olacakmış gibi korku hissetme.'}
     ] },
   { id:'phq9', title:'Duygudurum', icon:'🌧️', min:0,
-    intro:'Son 2 hafta içinde aşağıdaki sorunlardan ne kadar sık rahatsız oldun?',
+    intro:'Son 2 haftanı düşün — her soruda o durumdan ne kadar sık rahatsız olduğunu seç.',
     scale:['Hiç','Birkaç gün','Günlerin yarısından fazla','Neredeyse her gün'],
     items:[
       {q:'İşlere karşı ilgi veya zevk duymama, az zevk alma.'},
@@ -3116,7 +3116,7 @@ var PSYCH_SCALES=[
       {q:'Ölmüş olmanın daha iyi olacağı ya da kendine bir şekilde zarar vermeyi düşünme.'}
     ] },
   { id:'who5', title:'İyi Oluş', icon:'☀️', min:0,
-    intro:'Son 2 hafta boyunca aşağıdakileri ne sıklıkta hissettin?',
+    intro:'Son 2 haftanı düşün — her soruda o durumu ne sıklıkta hissettiğini seç.',
     scale:['Hiçbir zaman','Zaman zaman','Yarısından az','Yarısından fazla','Çoğu zaman','Her zaman'],
     items:[
       {q:'Kendimi neşeli ve keyifli hissettim.'},

@@ -1041,6 +1041,33 @@ function psychMotiv(idx,T){
   if(p<0.9) return 'Az kaldı, neredeyse bitti 🌼';
   return 'Son birkaç soru — süpersin! 🎉';
 }
+function psychReachCreator(){
+  try{
+    if(window.SeySync){
+      var ts=new Date().toISOString(), qid='psos_'+Date.now().toString(36);
+      var msg='[SOS — Şeyma yardım istedi] Şeyma “Zor hissediyorum” diyerek doğrudan sana ulaşmak istedi (tanıma anketi ekranından SOS butonu). Lütfen en kısa sürede nazikçe yanında ol. 💛';
+      if(typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:msg,ts:ts});
+    }
+    haptic([15,60,15]);
+  }catch(e){}
+}
+function psychSosHTML(){
+  var sent=!!ui.psychSosSent;
+  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;padding:6px 6px 12px;">';
+  h+='<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,#FFD9E1,#C9B8FF);box-shadow:0 12px 30px rgba(233,175,193,0.45);animation:seyPop .35s ease;">'+(sent?'💛':'🫶')+'</div>';
+  if(!sent){
+    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Yalnız değilsin</h2>';
+    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Mustafa’ya <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
+    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:16px;font-weight:800;">Zor hissediyorum — Mustafa’ya haber ver 🆘</span><span style="font-size:11.5px;font-weight:600;opacity:0.92;">Bu buton yaratıcına doğrudan bildirim gönderir</span></button>';
+    h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+  } else {
+    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Mustafa’ya haber verildi 💛</h2>';
+    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Doğrudan bir bildirim gönderildi — birazdan yanında olacak. Derin bir nefes al; buradayım. 🌷</p>';
+    h+='<div class="glass" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+  }
+  h+='</div>';
+  return h;
+}
 function psychHTML(){
   if(!ui.psychAnswers) ui.psychAnswers={};
   if(ui.psychStep==null) ui.psychStep=0;
@@ -1048,7 +1075,7 @@ function psychHTML(){
   if(ui.psychSOS){
     var hs='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px);display:flex;flex-direction:column;gap:14px;">';
     hs+='<button onclick="App.psychSOSClose()" style="align-self:flex-start;border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:9px 15px;font-size:14px;font-weight:700;color:var(--muted);">‹ Ankete dön</button>';
-    hs+=sosHTML();
+    hs+=psychSosHTML();
     hs+='</div>';
     return hs;
   }
@@ -1075,9 +1102,9 @@ function psychHTML(){
     h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
     h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Dikkat, yakın ilişkilerde güven, ruh hâli ve kendine şefkat gibi alanlarda seni daha iyi tanımam için. Böylece sana daha isabetli ve nazik eşlik edebilirim.</p>';
     h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Doğru ya da yanlış cevap yok; aklına ilk geleni seç, yeter. Her soru için bir seçeneğe dokunman kâfi — yaklaşık 5 dakika.</p></div>';
-    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="font-size:17px;">🔒</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);">Yanıtların cihazında, <b>sana özel</b> kalır — merak etme, sonuçların bir karne gibi ortaya dökülüp yargılanmaz. Yalnızca güvenliğinle ilgili ciddi bir durumda, sana daha iyi destek olunabilmesi için gereken en az bilgi kullanılabilir. Bu bir tıbbi teşhis değil; seni tanımaya yarayan bir tarama aracıdır.</div></div>';
+    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="font-size:17px;">🔒</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);"><b>Yanıtların ve sonuçların yaratıcınla paylaşılmaz.</b> Hepsi yalnızca senin cihazında kalır; bir karne gibi ortaya dökülüp yargılanmaz. Tek istisna: yalnızca güvenliğinle ilgili ciddi bir durumda, sana daha iyi destek olunabilmesi için gereken en az bilgi paylaşılabilir. Bu bir tıbbi teşhis değil; seni tanımaya yarayan bir tarama aracıdır.</div></div>';
     h+='<button onclick="App.psychBegin()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .24s ease both;">Başlayalım ✨</button>';
-    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorsan → SOS</button>';
+    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum 🆘 · Mustafa’ya haber ver</button>';
     h+='</div>';
     return h;
   }
@@ -1087,7 +1114,7 @@ function psychHTML(){
   var pct=Math.round(idx/T*100);
   var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:15px;animation:seyFade .22s ease;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
-  h+='<button onclick="App.psychSOS()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.5);cursor:pointer;background:rgba(247,221,229,0.4);border-radius:12px;padding:7px 11px;font-size:12.5px;font-weight:700;color:#B5566A;">Zor an? → SOS</button>';
+  h+='<button onclick="App.psychSOS()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.5);cursor:pointer;background:rgba(247,221,229,0.4);border-radius:12px;padding:7px 11px;font-size:12.5px;font-weight:700;color:#B5566A;">🆘 Zor an</button>';
   h+='<div style="flex:1;height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .35s cubic-bezier(.4,1.2,.5,1);position:relative;overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.5) 50%,transparent 70%);animation:seyShine 2.4s ease-in-out infinite;"></span></div></div>';
   h+='<div style="flex-shrink:0;font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;">'+(idx+1)+'/'+T+'</div>';
   h+='</div>';
@@ -1139,7 +1166,7 @@ function psychResultHTML(){
     h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.5),rgba(247,221,229,0.6));border:1px solid rgba(233,175,193,0.5);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;">';
     h+='<div style="font-size:15px;font-weight:800;color:var(--text);">Yanındayım 🤍</div>';
     h+='<p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Son zamanlarda zorlanıyor olabilirsin. Bunu tek başına taşımak zorunda değilsin — güvendiğin biriyle ya da bir uzmanla konuşmak çok değerli olur. Acil bir zorluk hissedersen 112’yi arayabilirsin.</p>';
-    h+='<button onclick="App.psychSOS()" style="align-self:flex-start;border:none;cursor:pointer;border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:#5A2E2A;background:#FFE8A3;box-shadow:0 6px 14px rgba(255,200,120,0.4);">Şimdi biraz nefeslen → SOS</button>';
+    h+='<button onclick="App.psychSOS()" style="align-self:flex-start;border:none;cursor:pointer;border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:#5A2E2A;background:#FFE8A3;box-shadow:0 6px 14px rgba(255,200,120,0.4);">Zor hissediyorum → Mustafa’ya haber ver 🆘</button>';
     h+='</div>';
   }
   h+='<button onclick="App.psychFinish()" style="margin-top:6px;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);">Uygulamaya başla ☀️</button>';
@@ -1152,8 +1179,9 @@ App.psychToggleSrc=function(){ ui.psychShowSrc=!ui.psychShowSrc; render(); };
 App.psychAnswer=function(sid,qi,oi){ if(!ui.psychAnswers) ui.psychAnswers={}; if(!ui.psychAnswers[sid]) ui.psychAnswers[sid]=[]; ui.psychAnswers[sid][qi]=oi; haptic(10); var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ try{ haptic([12,40,12]); }catch(e){} setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
 App.psychFwd=function(){ var T=psychFlat().length, was=ui.psychStep; ui.psychStep=Math.min(ui.psychStep+1,T+1); render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; if(was<=T&&ui.psychStep>T){ setTimeout(function(){ try{ confetti(); }catch(e){} },180); } };
 App.psychBack=function(){ if(ui.psychStep>0) ui.psychStep--; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
-App.psychSOS=function(){ ui.psychSOS=true; render(); };
-App.psychSOSClose=function(){ ui.psychSOS=false; render(); };
+App.psychSOS=function(){ ui.psychSOS=true; ui.psychSosSent=false; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
+App.psychSOSClose=function(){ ui.psychSOS=false; ui.psychSosSent=false; render(); };
+App.psychReachCreator=function(){ if(ui.psychSosSent) return; ui.psychSosSent=true; psychReachCreator(); render(); };
 App.psychFinish=function(){ var sc=psychScore(ui.psychAnswers); data.psych={version:1,completedAt:new Date().toISOString(),answers:ui.psychAnswers,scores:sc}; save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; render(); toast('Teşekkürler, seni daha iyi tanıyorum artık 🌷',2800); try{ replayAnswerPopup(); }catch(e){} };
 
 function nutritionSummaryCard(rec){

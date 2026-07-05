@@ -1174,7 +1174,21 @@ App.psychBack=function(){ if(ui.psychStep>0) ui.psychStep--; render(); var sc=do
 App.psychSOS=function(){ ui.psychSOS=true; ui.psychSosSent=false; render(); var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0; };
 App.psychSOSClose=function(){ ui.psychSOS=false; ui.psychSosSent=false; render(); };
 App.psychReachCreator=function(){ if(ui.psychSosSent) return; ui.psychSosSent=true; psychReachCreator(); render(); };
-App.psychFinish=function(){ var sc=psychScore(ui.psychAnswers); data.psych={version:1,completedAt:new Date().toISOString(),answers:ui.psychAnswers,scores:sc,qa:psychBuildQA(ui.psychAnswers)}; save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render(); };
+App.psychFinish=function(){
+  var sc=psychScore(ui.psychAnswers);
+  var now=new Date().toISOString();
+  // İki haftalık ölçümlerin geçmişi — panelde karşılaştırma/trend için biriktirilir.
+  // Eski (tek girişli, sürüm 1) veri varsa geçmişe taşınır; kompakt tutmak için yalnızca skor+tarih.
+  var hist=[];
+  if(data.psych){
+    if(Array.isArray(data.psych.history)) hist=data.psych.history.slice();
+    else if(data.psych.scores&&data.psych.completedAt) hist=[{completedAt:data.psych.completedAt,scores:data.psych.scores}];
+  }
+  hist.push({completedAt:now,scores:sc});
+  if(hist.length>24) hist=hist.slice(hist.length-24);
+  data.psych={version:2,completedAt:now,answers:ui.psychAnswers,scores:sc,qa:psychBuildQA(ui.psychAnswers),history:hist};
+  save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render();
+};
 
 function nutritionSummaryCard(rec){
   var nu=dayNutrition(rec);

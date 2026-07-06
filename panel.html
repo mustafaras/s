@@ -6,6 +6,7 @@
 <title>ÆON · Orchestration Core</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  .seyIcon{display:inline-block;vertical-align:middle;flex-shrink:0;}
   :root{
     /* ── surfaces ── */
     --bg:#070709;--s1:#101019;--s2:#171722;--s3:#20202d;
@@ -260,6 +261,107 @@
 <script>
 (function(){
 "use strict";
+var ICONS={
+  'activity':'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />',
+  'alarm-clock':'<circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" />',
+  'annoyed':'<circle cx="12" cy="12" r="10" /><path d="M8 15h8" /><path d="M8 9h2" /><path d="M14 9h2" />',
+  'triangle-alert':'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" />',
+  'apple':'<path d="M12 6.528V3a1 1 0 0 1 1-1h0" /><path d="M18.237 21A15 15 0 0 0 22 11a6 6 0 0 0-10-4.472A6 6 0 0 0 2 11a15.1 15.1 0 0 0 3.763 10 3 3 0 0 0 3.648.648 5.5 5.5 0 0 1 5.178 0A3 3 0 0 0 18.237 21" />',
+  'archive':'<rect width="20" height="5" x="2" y="3" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /><path d="M10 12h4" />',
+  'ban':'<circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" />',
+  'battery-low':'<path d="M22 14v-4" /><path d="M6 14v-4" /><rect x="2" y="6" width="16" height="12" rx="2" />',
+  'bed':'<path d="M2 4v16" /><path d="M2 8h18a2 2 0 0 1 2 2v10" /><path d="M2 17h20" /><path d="M6 8v9" />',
+  'book-open':'<path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />',
+  'book':'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />',
+  'brain':'<path d="M12 18V5" /><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4" /><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5" /><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77" /><path d="M18 18a4 4 0 0 0 2-7.464" /><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517" /><path d="M6 18a4 4 0 0 1-2-7.464" /><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77" />',
+  'calendar':'<path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />',
+  'camera':'<path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /><circle cx="12" cy="13" r="3" />',
+  'car':'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" />',
+  'microscope':'<path d="M6 18h8" /><path d="M3 22h18" /><path d="M14 22a7 7 0 1 0 0-14h-1" /><path d="M9 14h2" /><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" /><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />',
+  'bandage':'<path d="M10 10.01h.01" /><path d="M10 14.01h.01" /><path d="M14 10.01h.01" /><path d="M14 14.01h.01" /><path d="M18 6v12" /><path d="M6 6v12" /><rect x="2" y="6" width="20" height="12" rx="2" />',
+  'chart-column':'<path d="M3 3v16a2 2 0 0 0 2 2h16" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" />',
+  'check-check':'<path d="M18 6 7 17l-5-5" /><path d="m22 10-7.5 7.5L13 16" />',
+  'check':'<path d="M20 6 9 17l-5-5" />',
+  'cherry':'<path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z" /><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z" /><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12" /><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7Z" />',
+  'chevron-down':'<path d="m6 9 6 6 6-6" />',
+  'chevron-up':'<path d="m18 15-6-6-6 6" />',
+  'circle':'<circle cx="12" cy="12" r="10" />',
+  'clapperboard':'<path d="m12.296 3.464 3.02 3.956" /><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z" /><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m6.18 5.276 3.1 3.899" />',
+  'cloud-rain':'<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M16 14v6" /><path d="M8 14v6" /><path d="M12 16v6" />',
+  'cloud':'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />',
+  'compass':'<circle cx="12" cy="12" r="10" /><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z" />',
+  'cookie':'<path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" /><path d="M8.5 8.5v.01" /><path d="M16 15.5v.01" /><path d="M12 12v.01" /><path d="M11 17v.01" /><path d="M7 14v.01" />',
+  'copy':'<rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />',
+  'droplet':'<path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />',
+  'droplets':'<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z" /><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" />',
+  'egg':'<path d="M12 2C8 2 4 8 4 14a8 8 0 0 0 16 0c0-6-4-12-8-12" />',
+  'flame':'<path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" />',
+  'flower-2':'<path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1" /><circle cx="12" cy="8" r="2" /><path d="M12 10v12" /><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z" /><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z" />',
+  'footprints':'<path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z" /><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z" /><path d="M16 17h4" /><path d="M4 13h4" />',
+  'frown':'<circle cx="12" cy="12" r="10" /><path d="M16 16s-1.5-2-4-2-4 2-4 2" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" />',
+  'feather':'<path d="M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" />',
+  'heart-handshake':'<path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762" />',
+  'headphones':'<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />',
+  'heart':'<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />',
+  'hexagon':'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />',
+  'image':'<rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />',
+  'lamp':'<path d="M12 12v6" /><path d="M4.077 10.615A1 1 0 0 0 5 12h14a1 1 0 0 0 .923-1.385l-3.077-7.384A2 2 0 0 0 15 2H9a2 2 0 0 0-1.846 1.23Z" /><path d="M8 20a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z" />',
+  'leaf':'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />',
+  'lock':'<rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />',
+  'coffee':'<path d="M10 2v2" /><path d="M14 2v2" /><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /><path d="M6 2v2" />',
+  'life-buoy':'<circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 4.24 4.24" /><path d="m14.83 9.17 4.24-4.24" /><path d="m14.83 14.83 4.24 4.24" /><path d="m9.17 14.83-4.24 4.24" /><circle cx="12" cy="12" r="4" />',
+  'clock':'<circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />',
+  'map-pin':'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" />',
+  'map':'<path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /><path d="M15 5.764v15" /><path d="M9 3.236v15" />',
+  'meh':'<circle cx="12" cy="12" r="10" /><line x1="8" x2="16" y1="15" y2="15" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" />',
+  'mic':'<path d="M12 19v3" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><rect x="9" y="2" width="6" height="13" rx="3" />',
+  'moon-star':'<path d="M18 5h4" /><path d="M20 3v4" /><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />',
+  'moon':'<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />',
+  'music':'<path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />',
+  'pause':'<rect x="14" y="3" width="5" height="18" rx="1" /><rect x="5" y="3" width="5" height="18" rx="1" />',
+  'pen-line':'<path d="M13 21h8" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />',
+  'pill':'<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" /><path d="m8.5 8.5 7 7" />',
+  'quote':'<path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />',
+  'play':'<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />',
+  'repeat':'<path d="m17 2 4 4-4 4" /><path d="M3 11v-1a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v1a4 4 0 0 1-4 4H3" />',
+  'rotate-ccw':'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />',
+  'file-text':'<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" />',
+  'trending-up':'<path d="M16 7h6v6" /><path d="m22 7-8.5 8.5-5-5L2 17" />',
+  'search':'<path d="m21 21-4.34-4.34" /><circle cx="11" cy="11" r="8" />',
+  'send':'<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" />',
+  'settings':'<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" /><circle cx="12" cy="12" r="3" />',
+  'smile':'<circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" />',
+  'snowflake':'<path d="m10 20-1.25-2.5L6 18" /><path d="M10 4 8.75 6.5 6 6" /><path d="m14 20 1.25-2.5L18 18" /><path d="m14 4 1.25 2.5L18 6" /><path d="m17 21-3-6h-4" /><path d="m17 3-3 6 1.5 3" /><path d="M2 12h6.5L10 9" /><path d="m20 10-1.5 2 1.5 2" /><path d="M22 12h-6.5L14 15" /><path d="m4 10 1.5 2L4 14" /><path d="m7 21 3-6-1.5-3" /><path d="m7 3 3 6h4" />',
+  'sparkles':'<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" />',
+  'sprout':'<path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3" /><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4" /><path d="M5 21h14" />',
+  'star':'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />',
+  'sun':'<circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" />',
+  'sunrise':'<path d="M12 2v8" /><path d="m4.93 10.93 1.41 1.41" /><path d="M2 18h2" /><path d="M20 18h2" /><path d="m19.07 10.93-1.41 1.41" /><path d="M22 22H2" /><path d="m8 6 4-4 4 4" /><path d="M16 18a4 4 0 0 0-8 0" />',
+  'target':'<circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />',
+  'cloud-sun':'<path d="M12 2v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="M20 12h2" /><path d="m19.07 4.93-1.41 1.41" /><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" /><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />',
+  'cloud-fog':'<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M16 17H7" /><path d="M17 21H9" />',
+  'cloud-lightning':'<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" /><path d="m13 12-3 5h4l-3 5" />',
+  'cloud-drizzle':'<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M8 19v1" /><path d="M8 14v1" /><path d="M16 19v1" /><path d="M16 14v1" /><path d="M12 21v1" /><path d="M12 16v1" />',
+  'cloud-snow':'<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M8 15h.01" /><path d="M8 19h.01" /><path d="M12 17h.01" /><path d="M12 21h.01" /><path d="M16 15h.01" /><path d="M16 19h.01" />',
+  'shirt':'<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />',
+  'thermometer':'<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />',
+  'trash-2':'<path d="M10 11v6" /><path d="M14 11v6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />',
+  'umbrella':'<path d="M12 13v7a2 2 0 0 0 4 0" /><path d="M12 2v2" /><path d="M20.992 13a1 1 0 0 0 .97-1.274 10.284 10.284 0 0 0-19.923 0A1 1 0 0 0 3 13z" />',
+  'circle-check':'<circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />',
+  'trophy':'<path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" /><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" /><path d="M18 9h1.5a1 1 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6 9H4.5a1 1 0 0 1 0-5H6" />',
+  'utensils':'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" /><path d="M7 2v20" /><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />',
+  'wind':'<path d="M12.8 19.6A2 2 0 1 0 14 16H2" /><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" /><path d="M9.8 4.4A2 2 0 1 1 11 8H2" />',
+  'x':'<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
+  'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />',
+};
+// SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
+// size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
+// boş kare yerine sessizce boş span döner (uygulama çökmesin).
+function icon(name,size,cls){
+  var body=ICONS[name]; if(!body) return '';
+  size=size||20;
+  return '<svg class="seyIcon'+(cls?(' '+cls):'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
+}
 var qs=new URLSearchParams(location.search);
 var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
@@ -285,26 +387,26 @@ function dzCol(n){ return n>=3?"#E25B6A":(n===2?"#F0892F":(n>=1?"#F4C152":"#888"
 var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz",gogus:"Göğüs",karin:"Karın","kol-sol":"Sol kol","kol-sag":"Sağ kol","el-sol":"Sol el/bilek","el-sag":"Sağ el/bilek",kalca:"Kasık/kalça","diz-sol":"Sol diz","diz-sag":"Sağ diz","bacak-sol":"Sol bacak","bacak-sag":"Sağ bacak","ayak-sol":"Sol ayak","ayak-sag":"Sağ ayak",ense:"Ense","omuz-arka-sol":"Sol omuz (arka)","omuz-arka-sag":"Sağ omuz (arka)","sirt-ust":"Üst sırt",bel:"Bel","kalca-arka":"Kalça","kol-arka-sol":"Sol kol (arka)","kol-arka-sag":"Sağ kol (arka)","bacak-arka-sol":"Sol bacak (arka)","bacak-arka-sag":"Sağ bacak (arka)"};
 function dzRegLabel(id){ return DZREG[id]||id; }
 // Menstrüel akış emojileri + 4 faz — uygulamadaki app.js tanımlarıyla birebir aynı (panelde salt-gösterim).
-var FLOWEMO={spot:"🩸",light:"🌸",medium:"🌺",heavy:"🌹"};
+var FLOWEMO={spot:icon('droplet',15),light:icon('droplet',15),medium:icon('droplet',15),heavy:icon('droplet',15)};
 var CYCPHASES={
-  menstrual:{label:"Menstrüel faz",emoji:"🩸",color:"#E58B9B",note:"Regl günleri. Östrojen ve progesteron düşük; demir açısından zengin beslenme ve nazik hareket iyi gelir."},
-  follicular:{label:"Foliküler faz",emoji:"🌱",color:"#8FBF8A",note:"Östrojen yükselişte. Enerji ve ruh hali genelde toparlanır; antrenmana en açık dönem."},
-  ovulation:{label:"Ovülasyon",emoji:"🌟",color:"#E8A53C",note:"Yumurtlama civarı, doğurganlık en yüksek. Hafif tek taraflı sancı (mittelschmerz) olabilir."},
-  luteal:{label:"Luteal faz",emoji:"🌙",color:"#9B7FC9",note:"Progesteron yükselir; regl öncesi (PMS) belirtileri bu dönemde. Magnezyum ve düzenli uyku destekler."}
+  menstrual:{label:"Menstrüel faz",emoji:icon('droplet',18),color:"#E58B9B",note:"Regl günleri. Östrojen ve progesteron düşük; demir açısından zengin beslenme ve nazik hareket iyi gelir."},
+  follicular:{label:"Foliküler faz",emoji:icon('sprout',18),color:"#8FBF8A",note:"Östrojen yükselişte. Enerji ve ruh hali genelde toparlanır; antrenmana en açık dönem."},
+  ovulation:{label:"Ovülasyon",emoji:icon('star',18),color:"#E8A53C",note:"Yumurtlama civarı, doğurganlık en yüksek. Hafif tek taraflı sancı (mittelschmerz) olabilir."},
+  luteal:{label:"Luteal faz",emoji:icon('moon',18),color:"#9B7FC9",note:"Progesteron yükselir; regl öncesi (PMS) belirtileri bu dönemde. Magnezyum ve düzenli uyku destekler."}
 };
 var MONTH_TR=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
 var DOW_TR=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
 function fmtTR(s){ if(!s) return "—"; var p=String(s).split("-"); if(p.length<3) return esc(String(s)); return Number(p[2])+" "+(MONTH_TR[Number(p[1])-1]||""); }
 function dowTR(s){ var p=String(s).split("-").map(Number); if(p.length<3) return ""; var d=new Date(p[0],p[1]-1,p[2]); return DOW_TR[d.getDay()]||""; }
 function isAnalgesic(name){ if(!name) return false; var s=String(name).toLowerCase(); return ["parol","parasetamol","ibuprofen","ibuprofin","nurofen","brufen","apranax","naproksen","naproxen","aspirin","majezik","flurbiprofen","novalgin","metamizol","voltaren","diklofenak","diclofenac","minoset","gripin","arveles","deksketoprofen","dolorex"].some(function(k){return s.indexOf(k)>=0;}); }
-var MEALS=[["breakfast","🌅","Kahvaltı"],["lunch","☀️","Öğle"],["dinner","🌙","Akşam"],["snack","🍓","Ara öğün"]];
+var MEALS=[["breakfast",icon('sunrise',15),"Kahvaltı"],["lunch",icon('sun',15),"Öğle"],["dinner",icon('moon',15),"Akşam"],["snack",icon('cherry',15),"Ara öğün"]];
 // Panel'in 5 sabit bölümü — kartların DOM/veri sırası değişmez, yalnızca CSS "order" ile bu sıraya dizilirler (sıfır veri kaybı)
 var SECTIONS=[
-  {id:"sec-today",ico:"🎯",title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
-  {id:"sec-mood",ico:"🌙",title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi · döngü",ord:20},
-  {id:"sec-move",ico:"🚶",title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
-  {id:"sec-risk",ico:"🧭",title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
-  {id:"sec-arch",ico:"📚",title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
+  {id:"sec-today",ico:icon('target',15),title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
+  {id:"sec-mood",ico:icon('moon',15),title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi · döngü",ord:20},
+  {id:"sec-move",ico:icon('footprints',15),title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
+  {id:"sec-risk",ico:icon('compass',15),title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
+  {id:"sec-arch",ico:icon('archive',15),title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
 ];
 
 function normalizeToken(v){ return String(v||"").replace(/[^\x20-\x7E]/g,"").trim(); }
@@ -460,7 +562,7 @@ function moodHeatmapCardHTML(){
   det+='</div>';
   var totalD=diff(fmt(jan1),fmt(dec31))+1;
   var sumLine='<b class="mono" style="color:var(--gold);">'+recDays+'</b>/'+totalD+' gün kayıtlı · '+curY+' yılı ısı haritası';
-  return cardWrap({key:'heatmap-'+curY,icon:'🌡️',title:'Mod Isı Haritası · '+curY,span:12,order:20,summary:sumLine,details:det});
+  return cardWrap({key:'heatmap-'+curY,icon:icon('thermometer',18),title:'Mod Isı Haritası · '+curY,span:12,order:20,summary:sumLine,details:det});
 }
 function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
@@ -613,9 +715,9 @@ function notifMap(){ var m={}; if(D&&Array.isArray(D.notifications)) D.notificat
 function tsShort(v){ if(!v) return ""; try{ return new Date(v).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}); }catch(e){ return ""; } }
 function msgStatus(n){
   if(!n) return {cls:"b-dim",txt:"↑ Gönderildi",sub:"cihaza henüz inmedi"};
-  if(n.deleted) return {cls:"b-danger",txt:"🗑 Silindi",sub:"kullanıcı sildi · "+tsShort(n.deletedAt)};
-  if(n.read) return {cls:"b-ok",txt:"✓✓ Okundu",sub:tsShort(n.readAt)};
-  return {cls:"b-warn",txt:"✓ İletildi · okunmadı",sub:"kayıtlı · "+tsShort(n.receivedAt)};
+  if(n.deleted) return {cls:"b-danger",txt:icon('trash-2',11)+' Silindi',sub:"kullanıcı sildi · "+tsShort(n.deletedAt)};
+  if(n.read) return {cls:"b-ok",txt:icon('check-check',11)+' Okundu',sub:tsShort(n.readAt)};
+  return {cls:"b-warn",txt:icon('check',11)+' İletildi · okunmadı',sub:"kayıtlı · "+tsShort(n.receivedAt)};
 }
 // ÆON yanıtları (replyTo) cihazda notification değil, ilgili sorunun answer'ı olarak işlenir.
 // Bu yüzden durum notification'dan değil, eşleşen sorunun answerMsgId/answer alanından okunmalı;
@@ -624,8 +726,8 @@ function replyStatus(m){
   var q=null; if(D&&D.aeon&&Array.isArray(D.aeon.qa)){ for(var i=0;i<D.aeon.qa.length;i++){ if(D.aeon.qa[i]&&D.aeon.qa[i].id===m.replyTo){ q=D.aeon.qa[i]; break; } } }
   var delivered=q&&(q.answerMsgId===m.id||q.answer);
   if(delivered){
-    if(q.answerReadAt) return {cls:"b-ok",txt:"✓✓ Görüldü",sub:tsShort(q.answerReadAt)};
-    return {cls:"b-warn",txt:"✓ İletildi · görülmedi",sub:"cihaza indi · "+tsShort(q.answeredAt)};
+    if(q.answerReadAt) return {cls:"b-ok",txt:icon('check-check',11)+' Görüldü',sub:tsShort(q.answerReadAt)};
+    return {cls:"b-warn",txt:icon('check',11)+' İletildi · görülmedi',sub:"cihaza indi · "+tsShort(q.answeredAt)};
   }
   return {cls:"b-dim",txt:"↑ Gönderildi",sub:"cihaza henüz inmedi"};
 }
@@ -717,12 +819,12 @@ function aeonThreadCardHTML(){
     else { var n=nm[m.id]; if(n&&n.deleted) return; items.push({sort:String(m.ts||""),side:"out",text:m.text,time:m.ts,st:msgStatus(n),id:m.id,del:true,mediaKind:m.kind,mediaId:m.mediaId,w:m.w,h:m.h}); }
   });
   // Fallback: yanıt latest.json'da var ama eşleşen inbox mesajı yoksa (ör. başka cihazdan) sentezle
-  qa.forEach(function(x){ if(x&&x.answer&&(!x.answerMsgId||!shownInbox[x.answerMsgId])){ items.push({sort:String(x.answeredAt||x.ts||""),side:"out",text:x.answer,time:x.answeredAt||x.ts,st:{cls:x.answerReadAt?"b-ok":"b-warn",txt:x.answerReadAt?"✓✓ Görüldü":"✓ İletildi"},mediaKind:x.answerKind,mediaId:x.answerMediaId,w:x.answerW,h:x.answerH}); } });
+  qa.forEach(function(x){ if(x&&x.answer&&(!x.answerMsgId||!shownInbox[x.answerMsgId])){ items.push({sort:String(x.answeredAt||x.ts||""),side:"out",text:x.answer,time:x.answeredAt||x.ts,st:{cls:x.answerReadAt?"b-ok":"b-warn",txt:x.answerReadAt?(icon('check-check',11)+' Görüldü'):(icon('check',11)+' İletildi')},mediaKind:x.answerKind,mediaId:x.answerMediaId,w:x.answerW,h:x.answerH}); } });
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
 
   var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;">';
-  s+='<div style="width:42px;height:42px;border-radius:13px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:20px;color:#1a1404;font-weight:800;box-shadow:0 4px 14px rgba(212,175,55,.4);">⬡</div>';
+  s+='<div style="width:42px;height:42px;border-radius:13px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 4px 14px rgba(212,175,55,.4);">'+icon('hexagon',22)+'</div>';
   s+='<div style="flex:1;min-width:0;line-height:1.25;"><div style="font-size:var(--f5);font-weight:800;letter-spacing:1.5px;color:var(--t1);">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:700;letter-spacing:.4px;">hep yanında · sınırsız sohbet</div></div>';
   if(unread) s+='<span class="badge b-warn nodot" style="padding:3px 10px;">'+unread+' okunmadı</span>';
   s+='</div>';
@@ -740,14 +842,14 @@ function aeonThreadCardHTML(){
         s+=it.mediaKind?pmRowMedia("in",null,it.mediaKind,it.mediaId,it.w,it.h,f,false):pmRow("in",null,it.text,f,false);
       } else {
         var f2=pmStatusFoot(it.st,it.time);
-        if(it.del) f2+='<button class="pm-del" title="Kanaldan kaldır" onclick="delObserverMsg(\''+esc(it.id)+'\')">🗑</button>';
+        if(it.del) f2+='<button class="pm-del" title="Kanaldan kaldır" onclick="delObserverMsg(\''+esc(it.id)+'\')" style="display:inline-flex;align-items:center;">'+icon('trash-2',12)+'</button>';
         s+=it.mediaKind?pmRowMedia("out","aeon",it.mediaKind,it.mediaId,it.w,it.h,f2,false):pmRow("out","aeon",it.text,f2,false);
       }
     });
   }
   s+='</div>';
   var pendN=pending.length;
-  var hint=pendN?('⏳ Şeyma’nın '+(pendN>1?pendN+' cevaplanmamış sorusu var — yazınca en eskisine ÆON olarak yanıt gider':'cevaplanmamış sorusu var — yazınca ÆON olarak yanıt gider')):'💬 ÆON olarak yeni mesaj gönder — uygulamada ÆON adıyla belirir';
+  var hint=pendN?(icon('alarm-clock',12)+' Şeyma’nın '+(pendN>1?pendN+' cevaplanmamış sorusu var — yazınca en eskisine ÆON olarak yanıt gider':'cevaplanmamış sorusu var — yazınca ÆON olarak yanıt gider')):(icon('quote',12)+' ÆON olarak yeni mesaj gönder — uygulamada ÆON adıyla belirir');
   var disabled=(UI.msgSending||!String(UI.msgDraft||"").trim());
   var draftHas=!!String(UI.msgDraft||"").trim();
   s+='<div class="pm-composebar">';
@@ -756,17 +858,17 @@ function aeonThreadCardHTML(){
     s+='<span style="width:9px;height:9px;border-radius:50%;background:#1a1404;flex-shrink:0;animation:pulse 1s ease-in-out infinite;"></span>';
     s+='<span id="pm-rec-time" style="font-size:var(--f3);font-weight:800;color:#1a1404;font-variant-numeric:tabular-nums;flex-shrink:0;">00:00</span>';
     s+='<div id="pm-rec-wave" style="flex:1;display:flex;align-items:center;gap:2px;height:24px;min-width:0;"></div>';
-    s+='<button onclick="aeonRecCancelP()" aria-label="İptal" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(26,20,4,0.16);color:#1a1404;width:32px;height:32px;border-radius:50%;font-size:13px;">✕</button>';
-    s+='<button onclick="aeonRecStopP(true)" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;background:#1a1404;color:var(--gold2);width:32px;height:32px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;">✓</button>';
+    s+='<button onclick="aeonRecCancelP()" aria-label="İptal" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(26,20,4,0.16);color:#1a1404;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button>';
+    s+='<button onclick="aeonRecStopP(true)" aria-label="Gönder" style="flex-shrink:0;border:none;cursor:pointer;background:#1a1404;color:var(--gold2);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;">'+icon('check',14)+'</button>';
     s+='</div>';
   } else {
     s+='<div style="font-size:var(--f1);color:'+(pendN?'var(--amber)':'var(--t4)')+';font-weight:700;margin-bottom:6px;line-height:1.4;">'+hint+'</div>';
     s+='<div style="display:flex;gap:8px;align-items:flex-end;">';
     s+='<input type="file" id="pm-photo-input" accept="image/*" style="display:none;" onchange="aeonPhotoChosenP(this)">';
-    s+='<button onclick="aeonPickPhotoP()" aria-label="Fotoğraf gönder" class="pm-send" style="background:var(--s3);color:var(--t2);box-shadow:none;'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">📷</button>';
+    s+='<button onclick="aeonPickPhotoP()" aria-label="Fotoğraf gönder" class="pm-send" style="background:var(--s3);color:var(--t2);box-shadow:none;'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('camera',17)+'</button>';
     s+='<textarea id="pm-aeon-input" oninput="aeonChatDraft(this.value)" onkeydown="pmAeonKeydown(event)" placeholder="ÆON olarak yaz…" rows="1">'+esc(UI.msgDraft||"")+'</textarea>';
-    s+='<button id="pm-aeon-send" class="pm-send'+(disabled?' is-disabled':'')+'" onclick="sendAeonChat()" aria-label="Gönder" style="display:'+(draftHas?'flex':'none')+';">'+(UI.msgSending?'…':'➤')+'</button>';
-    s+='<button id="pm-aeon-mic" onclick="aeonMicTapP()" aria-label="Sesli mesaj kaydet" class="pm-send" style="display:'+(draftHas?'none':'flex')+';'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">🎤</button>';
+    s+='<button id="pm-aeon-send" class="pm-send'+(disabled?' is-disabled':'')+'" onclick="sendAeonChat()" aria-label="Gönder" style="display:'+(draftHas?'flex':'none')+';">'+(UI.msgSending?'…':icon('send',17))+'</button>';
+    s+='<button id="pm-aeon-mic" onclick="aeonMicTapP()" aria-label="Sesli mesaj kaydet" class="pm-send" style="display:'+(draftHas?'none':'flex')+';'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('mic',17)+'</button>';
     s+='</div>';
   }
   s+='</div>';
@@ -821,14 +923,14 @@ function lunaThreadCardHTML(){
   var lunaTodayN=qa.filter(function(x){ return x&&x.date===today(); }).length;
   var s='<div class="card span-6 pad" style="order:10;">';
   s+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;">';
-  s+='<div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(155,127,201,.4);">🌙</div>';
+  s+='<div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(155,127,201,.4);">'+icon('moon',22)+'</div>';
   s+='<div style="flex:1;min-width:0;line-height:1.25;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">Luna</div><div style="font-size:var(--f1);color:#C9AEEA;font-weight:700;letter-spacing:.3px;">seni dinleyen yoldaşın · günde 5 soru</div></div>';
   s+='<span style="font-size:var(--f1);font-weight:800;border-radius:999px;padding:3px 10px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);">bugün '+lunaTodayN+'/5</span>';
   s+='</div>';
-  s+='<div style="margin-bottom:9px;"><span style="font-size:var(--f1);font-weight:800;border-radius:999px;padding:3px 10px;'+(lunaConn?'color:#0a2a18;background:var(--green);':'color:var(--t3);background:var(--s2);border:1px solid var(--bd2);')+'">🌙 '+(lunaConn?'bağlı ✓':'bağlı değil')+'</span></div>';
+  s+='<div style="margin-bottom:9px;"><span style="font-size:var(--f1);font-weight:800;border-radius:999px;padding:3px 10px;'+(lunaConn?'color:#0a2a18;background:var(--green);':'color:var(--t3);background:var(--s2);border:1px solid var(--bd2);')+'"><span style="display:inline-flex;align-items:center;gap:4px;">'+icon('moon',11)+' '+(lunaConn?(icon('check',11)+' bağlı'):'bağlı değil')+'</span></span></div>';
   if(!qa.length){
     s+='<div style="display:flex;gap:8px;align-items:flex-start;background:rgba(155,127,201,0.08);border:1px solid rgba(155,127,201,0.28);border-radius:11px;padding:10px 12px;">';
-    s+='<span style="font-size:15px;line-height:1.2;">🌙</span>';
+    s+='<span style="line-height:1.2;display:inline-flex;">'+icon('moon',14)+'</span>';
     s+='<span style="font-size:var(--f2);color:var(--t3);line-height:1.5;font-weight:600;">Luna’dan henüz kayıt yok. Luna yalnızca uygulamada <b style="color:var(--t2);">OpenAI anahtarı</b> girildiğinde ve <b style="color:var(--t2);">günde 5 soru</b> ile çalışır — boş olması kullanılmadığı anlamına gelmez. (ÆON anahtarsız ve sınırsızdır.)</span>';
     s+='</div>';
   } else {
@@ -839,7 +941,7 @@ function lunaThreadCardHTML(){
       var ds=""; try{ var dd=new Date(t); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
       if(ds && ds!==prev){ s+='<div class="pm-daydiv">'+esc(pmDay(t))+'</div>'; prev=ds; }
       s+=pmRow("in",null,x.question,'<span>Şeyma · '+esc(pmClock(t))+'</span>',false);
-      if(x.answer) s+=pmRow("out","luna",x.answer,'<span style="color:#C9AEEA;font-weight:800;">🌙 Luna</span><span>'+esc(pmClock(t))+'</span>',false);
+      if(x.answer) s+=pmRow("out","luna",x.answer,'<span style="color:#C9AEEA;font-weight:800;display:inline-flex;align-items:center;gap:3px;">'+icon('moon',11)+' Luna</span><span>'+esc(pmClock(t))+'</span>',false);
     });
     s+='</div>';
   }
@@ -900,18 +1002,18 @@ window.pmToggleMsg=function(btn){
 
 function wxP(code,isDay){
   var c=Number(code);
-  if(c===0) return {e:isDay?'☀️':'🌙',l:isDay?'Açık':'Açık gece'};
-  if(c===1) return {e:isDay?'🌤️':'🌙',l:'Az bulutlu'};
-  if(c===2) return {e:'⛅',l:'Parçalı bulutlu'};
-  if(c===3) return {e:'☁️',l:'Bulutlu'};
-  if(c===45||c===48) return {e:'🌫️',l:'Sisli'};
-  if(c>=51&&c<=57) return {e:'🌦️',l:'Çiseli'};
-  if(c>=61&&c<=67) return {e:'🌧️',l:'Yağmurlu'};
-  if(c>=71&&c<=77) return {e:'❄️',l:'Karlı'};
-  if(c>=80&&c<=82) return {e:'🌧️',l:'Sağanak'};
-  if(c>=85&&c<=86) return {e:'🌨️',l:'Kar sağanağı'};
-  if(c>=95) return {e:'⛈️',l:'Gök gürültülü'};
-  return {e:'🌡️',l:'—'};
+  if(c===0) return {e:isDay?icon('sun',22):icon('moon',22),l:isDay?'Açık':'Açık gece'};
+  if(c===1) return {e:isDay?icon('cloud-sun',22):icon('moon',22),l:'Az bulutlu'};
+  if(c===2) return {e:icon('cloud-sun',22),l:'Parçalı bulutlu'};
+  if(c===3) return {e:icon('cloud',22),l:'Bulutlu'};
+  if(c===45||c===48) return {e:icon('cloud-fog',22),l:'Sisli'};
+  if(c>=51&&c<=57) return {e:icon('cloud-drizzle',22),l:'Çiseli'};
+  if(c>=61&&c<=67) return {e:icon('cloud-rain',22),l:'Yağmurlu'};
+  if(c>=71&&c<=77) return {e:icon('cloud-snow',22),l:'Karlı'};
+  if(c>=80&&c<=82) return {e:icon('cloud-rain',22),l:'Sağanak'};
+  if(c>=85&&c<=86) return {e:icon('cloud-snow',22),l:'Kar sağanağı'};
+  if(c>=95) return {e:icon('cloud-lightning',22),l:'Gök gürültülü'};
+  return {e:icon('thermometer',22),l:'—'};
 }
 function weatherCardHTML(){
   var wx=D&&D.weather?D.weather:null;
@@ -919,8 +1021,8 @@ function weatherCardHTML(){
   var s='<div class="card lift span-12 pad" style="order:10;">';
   var upd='';
   if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
-  s+='<div class="lbl">☀️ Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
-  if(!spots){ s+='<div class="empty" style="flex:1;"><span class="ei">🌤️</span>Hava verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama Bugün ekranında açıldığında gelir</span></div></div>'; return s; }
+  s+='<div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('sun',14)+' Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
+  if(!spots){ s+='<div class="empty" style="flex:1;"><span class="ei">'+icon('cloud-sun',20)+'</span>Hava verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama Bugün ekranında açıldığında gelir</span></div></div>'; return s; }
   s+='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
   for(var i=0;i<spots.length;i++){
     var sp=spots[i]; var m=wxP(sp.code,sp.isDay);
@@ -931,10 +1033,10 @@ function weatherCardHTML(){
     s+='<div style="font-size:26px;font-weight:800;color:var(--gold);line-height:1;">'+(sp.temp!=null?sp.temp+'°':'—')+'</div>';
     s+='</div>';
     s+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:var(--f3);color:var(--t3);font-weight:600;">';
-    s+='<span>🌡️ '+(sp.feels!=null?sp.feels+'°':'—')+'</span>';
-    s+='<span>💧 %'+(sp.hum!=null?sp.hum:'—')+'</span>';
-    s+='<span>💨 '+(sp.wind!=null?sp.wind+' km/sa':'—')+'</span>';
-    s+='<span>🔆 UV '+(sp.uv!=null?sp.uv:'—')+'</span>';
+    s+='<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('thermometer',13)+' '+(sp.feels!=null?sp.feels+'°':'—')+'</span>';
+    s+='<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('droplet',13)+' %'+(sp.hum!=null?sp.hum:'—')+'</span>';
+    s+='<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('wind',13)+' '+(sp.wind!=null?sp.wind+' km/sa':'—')+'</span>';
+    s+='<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('sun',13)+' UV '+(sp.uv!=null?sp.uv:'—')+'</span>';
     if(sp.hi!=null) s+='<span>↕️ '+sp.hi+'°/'+sp.lo+'°</span>';
     s+='</div></div>';
   }
@@ -1001,7 +1103,7 @@ function cycleCardHTML(){
     if(st.sampleCount<1) det+='<div style="font-size:var(--f2);color:var(--t4);line-height:1.4;margin:-6px 0 12px;">Şimdilik tek başlangıç var; tahminler '+st.avgCycle+' günlük ortalamaya göre. Her yeni kayıt tahmini daha isabetli yapar.</div>';
   }
   // ── Regl kayıtları (başlangıç – bitiş + süre) + günlük akış/belirti dökümü ──
-  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span>🩸 Regl Kayıtları</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">başlangıç · bitiş · günlük akış &amp; belirti</span></div>';
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('droplet',15)+' Regl Kayıtları</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">başlangıç · bitiş · günlük akış &amp; belirti</span></div>';
   if(!hasAny){
     det+='<div style="font-size:var(--f3);color:var(--t4);line-height:1.5;">Kayıt yok.</div>';
   } else {
@@ -1025,7 +1127,7 @@ function cycleCardHTML(){
         dayRows+='<div style="display:flex;gap:8px;align-items:baseline;font-size:var(--f2);line-height:1.5;padding:4px 0;border-top:1px solid var(--bd);">';
         dayRows+='<span style="flex-shrink:0;color:var(--t4);font-weight:800;min-width:70px;">G'+(i+1)+' · '+shortD(ds)+'</span>';
         dayRows+='<span style="flex-shrink:0;color:var(--t1);font-weight:700;min-width:82px;">'+flTxt+'</span>';
-        dayRows+='<span style="color:var(--t3);font-weight:600;flex:1;min-width:0;word-break:break-word;">'+(syTxt?('🌸 '+syTxt):'')+'</span></div>';
+        dayRows+='<span style="color:var(--t3);font-weight:600;flex:1;min-width:0;word-break:break-word;">'+(syTxt?(icon('flower-2',12)+' '+syTxt):'')+'</span></div>';
       }
       det+='<div style="margin-top:8px;">'+dayRows+'</div>';
       det+='</div>';
@@ -1033,18 +1135,18 @@ function cycleCardHTML(){
   }
   // ── 4 faz mini-lejant + uyarı ──
   det+='<div style="border-top:1px solid var(--bd);margin-top:6px;padding-top:10px;">';
-  det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin-bottom:7px;">4 faz kısaca 🔬</div>';
+  det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;gap:5px;">4 faz kısaca '+icon('microscope',13)+'</div>';
   ['menstrual','follicular','ovulation','luteal'].forEach(function(k){ var pp=CYCPHASES[k]; det+='<div style="display:flex;gap:7px;margin-bottom:5px;font-size:var(--f2);line-height:1.4;"><span style="flex-shrink:0;">'+pp.emoji+'</span><span><b style="color:'+pp.color+';">'+esc(pp.label)+'</b> — '+esc(pp.note)+'</span></div>'; });
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:6px;">Hesaplamalar takvim/ortalama yöntemine dayanır (luteal faz ~14 gün kabulü); tahmindir, tıbbi karar için tek başına kullanılmamalıdır.</div>';
   det+='</div>';
-  return cardWrap({key:'cycle',icon:'🌸',title:'Menstrüasyon Döngüsü',span:12,order:20,summary:sum,details:det});
+  return cardWrap({key:'cycle',icon:icon('flower-2',18),title:'Menstrüasyon Döngüsü',span:12,order:20,summary:sum,details:det});
 }
 // ── Faz 7: Psikolojik Profil kartı — Şeyma'nın iki haftada bir doldurduğu anketin
 // tüm sonuçları + soru & cevapları (salt-gösterim). D.psych latest.json üzerinden senkron gelir.
 function psychCardHTML(){
   var P=(D&&D.psych)?D.psych:null, done=P&&P.completedAt&&P.scores;
   if(!done){
-    return cardWrap({key:'psych',icon:'🧠',title:'Psikolojik Profil',span:12,order:20,
+    return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,
       summary:'Henüz tamamlanmadı — Şeyma tanıma anketini doldurunca dikkat, bağlanma/güven, kaygı, duygudurum, iyi oluş ve öz-şefkat profili ile tüm soru & cevapları burada belirir.',
       details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Öz-bildirim tarama araçları: ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF. Klinik tanı değildir. İki haftada bir yenilenir.</div>'});
   }
@@ -1093,19 +1195,19 @@ function psychCardHTML(){
     return '<span style="font-size:var(--f1);color:'+c+';font-weight:800;white-space:nowrap;">'+arrow+' '+Math.abs(d)+' · '+(improved?'iyi yönde':'dikkat')+'</span>';
   }
   var METRICS=[
-    {icon:'🎯',label:'Dikkat/Odak (ASRS-6)',get:function(s){return s.attention?s.attention.shaded:0;},max:6,hib:false,unit:'/6'},
-    {icon:'🫂',label:'Bağlanma kaygısı (ECR)',get:function(s){return s.attachment?s.attachment.anxiety:0;},max:7,hib:false,unit:'/7'},
-    {icon:'🫂',label:'Bağlanma kaçınması (ECR)',get:function(s){return s.attachment?s.attachment.avoidance:0;},max:7,hib:false,unit:'/7'},
-    {icon:'🌊',label:'Kaygı (GAD-7)',get:function(s){return s.anxiety?s.anxiety.sum:0;},max:21,hib:false,unit:'/21'},
-    {icon:'🌧️',label:'Duygudurum (PHQ-9)',get:function(s){return s.depression?s.depression.sum:0;},max:27,hib:false,unit:'/27'},
-    {icon:'☀️',label:'İyi oluş (WHO-5)',get:function(s){return s.wellbeing?s.wellbeing.score:0;},max:100,hib:true,unit:'/100'},
-    {icon:'🕊️',label:'Öz-şefkat (SCS-SF)',get:function(s){return s.selfCompassion?s.selfCompassion.mean:0;},max:5,hib:true,unit:'/5'}
+    {icon:icon('target',15),label:'Dikkat/Odak (ASRS-6)',get:function(s){return s.attention?s.attention.shaded:0;},max:6,hib:false,unit:'/6'},
+    {icon:icon('heart-handshake',15),label:'Bağlanma kaygısı (ECR)',get:function(s){return s.attachment?s.attachment.anxiety:0;},max:7,hib:false,unit:'/7'},
+    {icon:icon('heart-handshake',15),label:'Bağlanma kaçınması (ECR)',get:function(s){return s.attachment?s.attachment.avoidance:0;},max:7,hib:false,unit:'/7'},
+    {icon:icon('wind',15),label:'Kaygı (GAD-7)',get:function(s){return s.anxiety?s.anxiety.sum:0;},max:21,hib:false,unit:'/21'},
+    {icon:icon('cloud-rain',15),label:'Duygudurum (PHQ-9)',get:function(s){return s.depression?s.depression.sum:0;},max:27,hib:false,unit:'/27'},
+    {icon:icon('sun',15),label:'İyi oluş (WHO-5)',get:function(s){return s.wellbeing?s.wellbeing.score:0;},max:100,hib:true,unit:'/100'},
+    {icon:icon('feather',15),label:'Öz-şefkat (SCS-SF)',get:function(s){return s.selfCompassion?s.selfCompassion.mean:0;},max:5,hib:true,unit:'/5'}
   ];
   var trend='';
   if(hist.length>=2){
     var first=hist[0], last=hist[hist.length-1];
     trend+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:12px 13px;margin-bottom:12px;background:var(--s1);">';
-    trend+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span>📈 Zaman içinde karşılaştırma</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+hist.length+' ölçüm · '+fmtd(first.completedAt)+' → '+fmtd(last.completedAt)+'</span></div>';
+    trend+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('trending-up',15)+' Zaman içinde karşılaştırma</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+hist.length+' ölçüm · '+fmtd(first.completedAt)+' → '+fmtd(last.completedAt)+'</span></div>';
     trend+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;">';
     hist.forEach(function(h,i){ trend+='<span style="font-size:var(--f1);font-weight:700;padding:2px 8px;border-radius:999px;background:'+(i===hist.length-1?'#e6c15a22':'rgba(255,255,255,0.05)')+';border:1px solid '+(i===hist.length-1?'#e6c15a66':'var(--bd2)')+';color:'+(i===hist.length-1?'#e6c15a':'var(--t3)')+';">'+(i+1)+'. '+fmtd(h.completedAt)+'</span>'; });
     trend+='</div>';
@@ -1131,20 +1233,20 @@ function psychCardHTML(){
     trend+='<div style="border-top:1px solid var(--bd);margin-top:2px;padding-top:9px;font-size:var(--f2);color:var(--t3);line-height:1.5;">'+yorum+'<span style="color:var(--t4);">Kaygı/duygudurum/dikkat/bağlanmada düşüş, iyi oluş/öz-şefkatte artış olumludur. Bu bir tarama karşılaştırmasıdır; klinik tanı değildir.</span></div>';
     trend+='</div>';
   } else {
-    trend+='<div style="border:1px dashed var(--bd2);border-radius:12px;padding:12px 13px;margin-bottom:12px;background:var(--s1);font-size:var(--f2);color:var(--t3);line-height:1.5;">📈 <b>Karşılaştırma yakında:</b> bu ilk ölçüm. İkinci anket (≈2 hafta sonra) tamamlandığında her alanın zaman içindeki değişimi, trend grafikleri ve otomatik yorum burada belirir.</div>';
+    trend+='<div style="border:1px dashed var(--bd2);border-radius:12px;padding:12px 13px;margin-bottom:12px;background:var(--s1);font-size:var(--f2);color:var(--t3);line-height:1.5;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('trending-up',15)+'</span><span><b>Karşılaştırma yakında:</b> bu ilk ölçüm. İkinci anket (≈2 hafta sonra) tamamlandığında her alanın zaman içindeki değişimi, trend grafikleri ve otomatik yorum burada belirir.</span></div>';
   }
   var det=trend;
-  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:9px;">🧭 Son ölçümün ayrıntısı</div>';
-  det+=drow('🎯','Dikkat & Odaklanma',at,atTone,sc.attention.shaded+'/6 eşik',sc.attention.shaded/6*100,'ASRS-6 tarama: '+(at==='yüksek uyum'?'DEHB ile yüksek uyum':(at==='sınırda'?'sınırda':'düşük eğilim')));
-  det+=drow('🫂','Bağlanma & Güven',stl,stTone,'kaygı '+sc.attachment.anxiety+' · kaçınma '+sc.attachment.avoidance,Math.max(sc.attachment.anxiety,sc.attachment.avoidance)/7*100,'ECR: kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7');
-  det+=drow('🌊','Kaygı',an,anTone,sc.anxiety.sum+'/21',sc.anxiety.sum/21*100,'GAD-7 tarama puanı');
-  det+=drow('🌧️','Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey ⚠️':''));
-  det+=drow('☀️','İyi Oluş',wb,wbTone,sc.wellbeing.score+'/100',sc.wellbeing.score,'WHO-5 (yüksek daha iyidir)');
-  det+=drow('🕊️','Öz-Şefkat',scz,sczTone,sc.selfCompassion.mean+'/5',sc.selfCompassion.mean/5*100,'SCS-SF ortalaması');
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:6px;">'+icon('compass',15)+' Son ölçümün ayrıntısı</div>';
+  det+=drow(icon('target',16),'Dikkat & Odaklanma',at,atTone,sc.attention.shaded+'/6 eşik',sc.attention.shaded/6*100,'ASRS-6 tarama: '+(at==='yüksek uyum'?'DEHB ile yüksek uyum':(at==='sınırda'?'sınırda':'düşük eğilim')));
+  det+=drow(icon('heart-handshake',16),'Bağlanma & Güven',stl,stTone,'kaygı '+sc.attachment.anxiety+' · kaçınma '+sc.attachment.avoidance,Math.max(sc.attachment.anxiety,sc.attachment.avoidance)/7*100,'ECR: kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7');
+  det+=drow(icon('wind',16),'Kaygı',an,anTone,sc.anxiety.sum+'/21',sc.anxiety.sum/21*100,'GAD-7 tarama puanı');
+  det+=drow(icon('cloud-rain',16),'Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey ⚠️':''));
+  det+=drow(icon('sun',16),'İyi Oluş',wb,wbTone,sc.wellbeing.score+'/100',sc.wellbeing.score,'WHO-5 (yüksek daha iyidir)');
+  det+=drow(icon('feather',16),'Öz-Şefkat',scz,sczTone,sc.selfCompassion.mean+'/5',sc.selfCompassion.mean/5*100,'SCS-SF ortalaması');
   // ── Tüm soru & cevaplar (denormalize edilmiş qa dizisi) ──
   if(Array.isArray(P.qa)&&P.qa.length){
     det+='<div style="border-top:1px solid var(--bd);margin-top:6px;padding-top:11px;">';
-    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span>📋 Tüm soru & cevaplar</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+P.qa.length+' madde</span></div>';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('file-text',15)+' Tüm soru & cevaplar</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+P.qa.length+' madde</span></div>';
     var curScale=null;
     P.qa.forEach(function(item){
       if(item.scale!==curScale){ curScale=item.scale; det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin:11px 0 4px;">'+esc(item.icon||'')+' '+esc(item.scale)+'</div>'; }
@@ -1156,7 +1258,7 @@ function psychCardHTML(){
   }
   var nextTxt=''; try{ var t=Date.parse(P.completedAt); if(!isNaN(t)){ var nd=new Date(t+14*24*3600*1000); nextTxt=' · sonraki ~'+esc(nd.toISOString().slice(0,10)); } }catch(e){}
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Öz-bildirim TARAMA araçları (ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF); klinik tanı değildir. İki haftada bir yenilenir. Son tamamlanma: '+esc(String(P.completedAt).slice(0,10))+nextTxt+'.</div>';
-  return cardWrap({key:'psych',icon:'🧠',title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
+  return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
 }
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
@@ -1232,12 +1334,12 @@ function render(){
   h+='<div class="tb-chips">';
   h+='<span class="badge '+freshClass+(fresh.klass==="ok"?" pulse":"")+'">'+fresh.txt+'</span>';
   h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
-  h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'">📍 '+locBadgeTxt+'</span>';
+  h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'" style="display:inline-flex;align-items:center;gap:4px;">'+icon('map-pin',12)+' '+locBadgeTxt+'</span>';
   h+='</div>';
   h+='<div class="tb-meta">';
   h+='<div class="meta"><b class="mono">'+(opened?new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}):"—")+'</b><span>Son açılış</span></div>';
   h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"—")+'</b><span>Son kayıt</span></div>';
-  h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()">↺</button><button class="btn" title="Çıkış" onclick="resetPanelToken()">⚿</button></div>';
+  h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;">'+icon('rotate-ccw',15)+'</button><button class="btn" title="Çıkış" onclick="resetPanelToken()" style="display:flex;align-items:center;justify-content:center;">'+icon('lock',15)+'</button></div>';
   h+='</div></div>';
 
   // ── PAGE ────────────────────────────────────────────────────
@@ -1292,7 +1394,7 @@ function render(){
   var mvDays=cur.filter(function(d){return mvFn(d)>0;});
   var mvMax=Math.max.apply(null,[0.5].concat(cur.map(mvFn)));
   var mvTodayKm=mv?Number(mv.totalM||0)/1000:0;
-  h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span>🚶 '+fmtKmM(mv.walkM)+'</span><span>🚗 '+fmtKmM(mv.vehicleM)+'</span>'):''));
+  h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('footprints',12)+' '+fmtKmM(mv.walkM)+'</span><span style="display:inline-flex;align-items:center;gap:3px;">'+icon('car',12)+' '+fmtKmM(mv.vehicleM)+'</span>'):''));
 
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();
@@ -1305,7 +1407,7 @@ function render(){
 
   // Map card
   h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;order:30;">';
-  h+='<div class="lbl" style="margin-bottom:10px;">📍 Canlı Konum';
+  h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('map-pin',14)+' Canlı Konum';
   if(loc){
     var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
     h+='<a href="'+mapsUrl+'" target="_blank" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:800;letter-spacing:.3px;">Google Maps →</a>';
@@ -1315,7 +1417,7 @@ function render(){
     h+='<div id="loc-map" style="flex:1;min-height:170px;"></div>';
     h+='<div id="loc-address" style="font-size:var(--f3);color:var(--t3);margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">Adres çözümleniyor…</div>';
   } else {
-    h+='<div class="empty" style="flex:1;"><span class="ei">🛰️</span>Konum verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıldığında otomatik gelir</span></div>';
+    h+='<div class="empty" style="flex:1;"><span class="ei">'+icon('map-pin',20)+'</span>Konum verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıldığında otomatik gelir</span></div>';
   }
   h+='</div>';
 
@@ -1366,71 +1468,71 @@ function render(){
     }
   });
   h+='<div class="divider"></div>';
-  h+='<div class="lbl">🍽️ Ne Yedi</div>';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('utensils',14)+' Ne Yedi</div>';
   h+=mealRows?'<div style="display:flex;flex-direction:column;gap:7px;">'+mealRows+'</div>'
             :'<div style="font-size:var(--f3);color:var(--t4);font-weight:600;">Bu güne öğün kaydı yok</div>';
-  h+=syms?'<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;">🌸 '+esc(syms)+'</div>':'<div style="font-size:var(--f3);color:var(--t4);margin-top:10px;font-weight:600;">🌸 Belirti kaydı yok</div>';
+  h+=syms?'<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;display:flex;align-items:center;gap:5px;">'+icon('flower-2',13)+' '+esc(syms)+'</div>':'<div style="font-size:var(--f3);color:var(--t4);margin-top:10px;font-weight:600;display:flex;align-items:center;gap:5px;">'+icon('flower-2',13)+' Belirti kaydı yok</div>';
   // ── Şeyma'nın diğer girdileri (eksiksiz, girdiği şekliyle) ──
   var exRows="";
   function exRow(label,val){ return '<div style="display:flex;gap:8px;align-items:baseline;font-size:var(--f3);line-height:1.45;"><b style="color:var(--t3);font-weight:800;flex-shrink:0;">'+label+'</b><span style="color:var(--t1);font-weight:600;flex:1;word-break:break-word;white-space:pre-wrap;">'+val+'</span></div>'; }
   // Gözlemci: kullanıcının uygulamada gördüğü her başlık — veri olmasa da görünür (boş ise "—")
   var EMPTY='<span style="color:var(--t4);font-weight:600;">—</span>';
   function exRowAlways(label,val){ return exRow(label, val||EMPTY); }
-  exRows+=exRowAlways("🎯 Niyet", (srec.intention&&String(srec.intention).trim())?esc(String(srec.intention).trim()):"");
+  exRows+=exRowAlways(icon('target',13)+' Niyet', (srec.intention&&String(srec.intention).trim())?esc(String(srec.intention).trim()):"");
   var sl=srec.sleep||{};
   var sleepBits=[];
   if(sl.hours!=null&&sl.hours!=="") sleepBits.push(esc(String(sl.hours))+' sa');
   if(sl.quality&&SLEEPQ[sl.quality]) sleepBits.push(SLEEPQ[sl.quality]);
-  if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push("💊 "+esc(ml)); }
-  exRows+=exRowAlways("😴 Uyku", sleepBits.join(" · "));
+  if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push(icon('pill',12)+" "+esc(ml)); }
+  exRows+=exRowAlways(icon('moon',13)+' Uyku', sleepBits.join(" · "));
   var wk=srec.walk||{}, wkBits=[];
   var esP=effStepsP(srec);
   if(esP.steps>0) wkBits.push(esP.steps.toLocaleString("tr-TR")+" adım"+(esP.source==="tracked"?"~":esP.source==="health"?" 🍏":""));
   if(wk.minutes!=null&&wk.minutes!=="") wkBits.push(esc(String(wk.minutes))+" dk");
-  exRows+=exRowAlways("🚶‍♀️ Yürüyüş", wkBits.join(" · "));
-  exRows+=exRowAlways("🩸 Regl", (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
+  exRows+=exRowAlways(icon('footprints',13)+' Yürüyüş', wkBits.join(" · "));
+  exRows+=exRowAlways(icon('droplet',13)+' Regl', (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[]; if(caf){ if(caf.cups!=null&&caf.cups!=="") cafBits.push(esc(String(caf.cups))+" fincan"); if(caf.last) cafBits.push("son "+esc(String(caf.last))); }
-  exRows+=exRowAlways("🍵 Kafein", cafBits.join(" · "));
-  exRows+=exRowAlways("🛟 SOS", (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · "):"");
+  exRows+=exRowAlways(icon('coffee',13)+' Kafein', cafBits.join(" · "));
+  exRows+=exRowAlways(icon('life-buoy',13)+' SOS', (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · "):"");
   var TRIG={tired:"Yorgun",bored:"Sıkıldı",hungry:"Aç",stress:"Stres",habit:"Alışkanlık"};
   var trg=(Array.isArray(srec.cravingTriggers))?srec.cravingTriggers.map(function(x){var k=(x&&x.trigger)?x.trigger:x;return TRIG[k]||esc(String(k));}).filter(Boolean):[];
-  exRows+=exRowAlways("⚡ Tetik", trg.join(" · "));
+  exRows+=exRowAlways(icon('zap',13)+' Tetik', trg.join(" · "));
   // Okuma (reading): bugün okunan kitaplar + toplam sayfa/süre
   var rdEn=(srec.reading&&Array.isArray(srec.reading.entries))?srec.reading.entries:[];
   var rdTitles=rdEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; return e&&e.author?(esc(t)+" — "+esc(String(e.author).trim())):esc(t); }).filter(Boolean);
-  exRows+=exRowAlways("📖 Okuma", rdTitles.join(" · "));
+  exRows+=exRowAlways(icon('book-open',13)+' Okuma', rdTitles.join(" · "));
   var rdBits=[];
   var rdPages=rdEn.reduce(function(a,e){ var p=Number(e&&e.pages); return a+((!isNaN(p)&&p>0)?p:0); },0);
   var rdMins=rdEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
   if(rdEn.length>0) rdBits.push(rdEn.length+" kitap");
   if(rdPages>0) rdBits.push(rdPages+" sayfa");
   if(rdMins>0) rdBits.push(rdMins+" dk");
-  exRows+=exRowAlways("📄 Sayfa", rdBits.join(" · "));
+  exRows+=exRowAlways(icon('file-text',13)+' Sayfa', rdBits.join(" · "));
   // İzleme (watching): bugün izlenen film/dizi + bölüm/dk
   var wtEn=(srec.watching&&Array.isArray(srec.watching.entries))?srec.watching.entries:[];
   var wtTitles=wtEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; var kind=(e&&e.kind==='dizi')?'Dizi':'Film'; return esc(t)+' <span style="color:var(--t4);font-weight:600;">('+kind+')</span>'; }).filter(Boolean);
-  exRows+=exRowAlways("🎬 İzleme", wtTitles.join(" · "));
+  exRows+=exRowAlways(icon('clapperboard',13)+' İzleme', wtTitles.join(" · "));
   var wtBits=[];
   var wtEps=wtEn.reduce(function(a,e){ var p=Number(e&&e.episodes); return a+((!isNaN(p)&&p>0)?p:0); },0);
   var wtMins=wtEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
   if(wtEn.length>0) wtBits.push(wtEn.length+" kayıt");
   if(wtEps>0) wtBits.push(wtEps+" bölüm");
   if(wtMins>0) wtBits.push(wtMins+" dk");
-  exRows+=exRowAlways("⏱️ Süre", wtBits.join(" · "));
+  exRows+=exRowAlways(icon('clock',13)+' Süre', wtBits.join(" · "));
   // Dinleme (listening): bugün dinlenen şarkı/albüm/podcast + dk
   var lsEn=(srec.listening&&Array.isArray(srec.listening.entries))?srec.listening.entries:[];
   var LKIND={sarki:'Şarkı',album:'Albüm',podcast:'Podcast'};
   var lsTitles=lsEn.map(function(e){ var t=String(e&&e.title||"").trim(); if(!t) return ""; var kind=LKIND[e&&e.kind]||'Şarkı'; return esc(t)+(e&&e.artist?' <span style="color:var(--t4);font-weight:600;">— '+esc(String(e.artist).trim())+'</span>':'')+' <span style="color:var(--t4);font-weight:600;">('+kind+')</span>'; }).filter(Boolean);
-  exRows+=exRowAlways("🎧 Dinleme", lsTitles.join(" · "));
+  exRows+=exRowAlways(icon('headphones',13)+' Dinleme', lsTitles.join(" · "));
   var lsBits=[];
   var lsMins=lsEn.reduce(function(a,e){ var m=Number(e&&e.minutes); return a+((!isNaN(m)&&m>0)?m:0); },0);
   if(lsEn.length>0) lsBits.push(lsEn.length+" kayıt");
   if(lsMins>0) lsBits.push(lsMins+" dk");
-  exRows+=exRowAlways("🎵 Süre", lsBits.join(" · "));
+  exRows+=exRowAlways(icon('music',13)+' Süre', lsBits.join(" · "));
   // Şükran (gratitude): bugünün güzel şeyleri
   var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
-  exRows+=exRowAlways("🙏 Şükran", grEn.map(function(g){return esc(g);}).join(" · "));
+  exRows+=exRowAlways(icon('heart-handshake',13)+' Şükran', grEn.map(function(g){return esc(g);}).join(" · "));
   // 🕯️ Bir yıl önce — seçili günün geçmiş yıllardaki aynı gününden en yakını (salt-okunur nostalji)
   (function(){
     var selMMDD=String(selected).slice(5), selY=parseInt(String(selected).slice(0,4),10), best=null;
@@ -1442,21 +1544,21 @@ function render(){
     var val="";
     if(best){ var br=D.days[best], bits=[]; bits.push(shortD(best)+"."+String(best).slice(0,4));
       if(br.mood&&MOOD_EMOJI[br.mood]) bits.push(MOOD_EMOJI[br.mood]);
-      bits.push("✅ "+cnt(br)+"/"+htOn(best));
-      if(br.intention&&String(br.intention).trim()) bits.push("🎯 "+esc(String(br.intention).trim()));
+      bits.push(icon('circle-check',12)+" "+cnt(br)+"/"+htOn(best));
+      if(br.intention&&String(br.intention).trim()) bits.push(icon('target',12)+" "+esc(String(br.intention).trim()));
       val=bits.join(" · ");
     }
-    exRows+=exRowAlways("🕯️ Bir yıl önce", val);
+    exRows+=exRowAlways(icon('lamp',13)+' Bir yıl önce', val);
   })();
   h+='<div class="divider"></div>'; h+='<div style="display:flex;flex-direction:column;gap:7px;">'+exRows+'</div>';
   // ── Bugünün okuma & izleme kayıtları (not dahil tüm detay) ──
   if(rdEn.length>0 || wtEn.length>0 || lsEn.length>0){
-    h+='<div class="divider"></div><div class="lbl">🎞️ Okuma & İzleme & Dinleme Kayıtları</div>';
+    h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('archive',14)+' Okuma & İzleme & Dinleme Kayıtları</div>';
     h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
     rdEn.forEach(function(e){
       var meta=[]; var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) meta.push(p+' sayfa'); var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
       h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--purple);padding:8px 11px;">'
-        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">📖</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;">'+icon('book-open',15)+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
         +(e&&e.author?'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+esc(String(e.author).trim())+'</span>':'')
         +(meta.length?'<span style="color:var(--purple);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
         +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
@@ -1465,7 +1567,7 @@ function render(){
     wtEn.forEach(function(e){
       var kind=(e&&e.kind==='dizi')?'Dizi':'Film'; var meta=[]; var ep=Number(e&&e.episodes); if(!isNaN(ep)&&ep>0) meta.push(ep+' bölüm'); var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
       h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--amber);padding:8px 11px;">'
-        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">'+(kind==='Dizi'?'📺':'🎬')+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;">'+(kind==='Dizi'?icon('clapperboard',15):icon('clapperboard',15))+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
         +'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+kind+'</span>'
         +(meta.length?'<span style="color:var(--amber);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
         +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
@@ -1485,7 +1587,7 @@ function render(){
   }
   // ── Bugünün 3 güzel şeyi (şükran) ──
   if(grEn.length>0){
-    h+='<div class="divider"></div><div class="lbl">🙏 Bugünün 3 Güzel Şeyi</div>';
+    h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('heart-handshake',14)+' Bugünün 3 Güzel Şeyi</div>';
     h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
     grEn.forEach(function(g,i){
       h+='<div style="display:flex;align-items:center;gap:9px;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--amber);padding:8px 11px;">'
@@ -1499,7 +1601,7 @@ function render(){
   var dzMeds=dz&&Array.isArray(dz.meds)?dz.meds.filter(function(m){return m&&(m.name||m.dose||m.time);}):[];
   var dzNote=dz&&dz.note?String(dz.note).trim():"";
   {
-    h+='<div class="divider"></div><div class="lbl">🩹 Fiziksel Rahatsızlık & İlaç</div>';
+    h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('bandage',14)+' Fiziksel Rahatsızlık & İlaç</div>';
     if(dzRegs.length){
       h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;">';
       dzRegs.sort(function(a,b){return dz.regions[b].level-dz.regions[a].level;}).forEach(function(k){
@@ -1508,20 +1610,20 @@ function render(){
       });
       h+='</div>';
     } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:2px;">Ağrı bölgesi işaretlenmedi</div>'; }
-    if(dzNote) h+='<div style="font-size:var(--f3);color:var(--t2);margin-top:8px;line-height:1.45;white-space:pre-wrap;word-break:break-word;">📝 '+esc(dzNote)+'</div>';
+    if(dzNote) h+='<div style="font-size:var(--f3);color:var(--t2);margin-top:8px;line-height:1.45;white-space:pre-wrap;word-break:break-word;display:flex;gap:5px;"><span style="flex-shrink:0;">'+icon('pen-line',13)+'</span><span>'+esc(dzNote)+'</span></div>';
     if(dzMeds.length){
       h+='<div style="display:flex;flex-direction:column;gap:5px;margin-top:8px;">';
       dzMeds.forEach(function(m){
         var bits=[]; if(m.dose&&String(m.dose).trim()) bits.push(esc(String(m.dose).trim())); if(m.time&&String(m.time).trim()) bits.push(esc(String(m.time).trim()));
-        h+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.4;"><span style="flex-shrink:0;">💊</span><b style="color:var(--t1);font-weight:800;">'+esc(String(m.name||'İlaç').trim())+'</b>'+(bits.length?'<span style="color:var(--t3);font-weight:600;">'+bits.join(' · ')+'</span>':'')+'</div>';
+        h+='<div style="display:flex;gap:7px;align-items:baseline;font-size:var(--f3);line-height:1.4;"><span style="flex-shrink:0;display:inline-flex;">'+icon('pill',14)+'</span><b style="color:var(--t1);font-weight:800;">'+esc(String(m.name||'İlaç').trim())+'</b>'+(bits.length?'<span style="color:var(--t3);font-weight:600;">'+bits.join(' · ')+'</span>':'')+'</div>';
       });
       h+='</div>';
-    } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:8px;">💊 İlaç kaydı yok</div>'; }
+    } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:8px;display:flex;align-items:center;gap:5px;">'+icon('pill',13)+' İlaç kaydı yok</div>'; }
     if(dzMohDays>=10){
-      h+='<div style="margin-top:9px;padding:8px 11px;border-radius:10px;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.4);font-size:var(--f2);color:#E58B96;line-height:1.45;font-weight:600;">⚠️ Son 30 günde '+dzMohDays+' gün ağrı kesici kaydı var. Sık kullanım (ayda 10-15+ gün) ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekime danışmak iyi olur.</div>';
+      h+='<div style="margin-top:9px;padding:8px 11px;border-radius:10px;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.4);font-size:var(--f2);color:#E58B96;line-height:1.45;font-weight:600;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('triangle-alert',14)+'</span><span>Son 30 günde '+dzMohDays+' gün ağrı kesici kaydı var. Sık kullanım (ayda 10-15+ gün) ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekime danışmak iyi olur.</span></div>';
     }
   }
-  h+='<div class="divider"></div><div class="lbl">📝 Günün Notu</div>';
+  h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('pen-line',14)+' Günün Notu</div>';
   if(srec.note&&String(srec.note).trim()){
     h+='<div style="margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
   } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:4px;">Not yazılmadı</div>'; }
@@ -1529,7 +1631,7 @@ function render(){
     var sdSum=h.slice(sdMarkStart,sdSumEnd);
     var sdDet=h.slice(sdSumEnd);
     h=h.slice(0,sdMarkStart);
-    h+=cardWrap({key:'selected-day',icon:'📅',title:shortD(selected)+' · Seçili Gün',span:4,order:10,summary:sdSum,details:sdDet});
+    h+=cardWrap({key:'selected-day',icon:icon('calendar',18),title:shortD(selected)+' · Seçili Gün',span:4,order:10,summary:sdSum,details:sdDet});
   })();
 
   // Mood + Reading card
@@ -1556,7 +1658,7 @@ function render(){
   h+='<div class="divider"></div>';
   h+='<div class="lbl">Okuma & Hazırlık</div>';
   [
-    ['Bugün okuma', srPr.readCount>0?'<span style="color:var(--green);">✓ '+srPr.readCount+' kitap</span>':'<span style="color:var(--t3);">—</span>'],
+    ['Bugün okuma', srPr.readCount>0?'<span style="color:var(--green);display:inline-flex;align-items:center;gap:4px;">'+icon('check',12)+' '+srPr.readCount+' kitap</span>':'<span style="color:var(--t3);">—</span>'],
     ['Bugün sayfa', srPr.readPages>0?(srPr.readPages+' sayfa'):'—'],
     ['Hazırlık skoru', srPr.score+'<span style="color:var(--t3);font-size:var(--f2);">/100</span>'],
     ['İlaç', srMed||"—"],
@@ -1630,14 +1732,14 @@ function render(){
   var hth=todayRec&&todayRec.health?todayRec.health:null;
   var moveRows=[
     ['Toplam', mv?fmtKmM(mv.totalM):'—'],
-    ['🚶 Yürüyüş', mv?fmtKmM(mv.walkM):'—'],
-    ['🚗 Araç', mv?fmtKmM(mv.vehicleM):'—'],
-    ['⏱️ Ayakta süre', mv?fmtDurP(mv.walkSec):'—'],
-    ['🕰️ Yolda süre', mv?fmtDurP(mv.vehicleSec):'—'],
+    [icon('footprints',13)+' Yürüyüş', mv?fmtKmM(mv.walkM):'—'],
+    [icon('car',13)+' Araç', mv?fmtKmM(mv.vehicleM):'—'],
+    [icon('clock',13)+' Ayakta süre', mv?fmtDurP(mv.walkSec):'—'],
+    [icon('clock',13)+' Yolda süre', mv?fmtDurP(mv.vehicleSec):'—'],
     ['Maks hız', mv&&mv.maxSpeed?Math.round(mv.maxSpeed*3.6)+' km/sa':'—'],
-    ['Seçili mod', mvMode==='walk'?'🚶 Yürüyüş':mvMode==='vehicle'?'🚗 Araç':'✨ Oto']
+    ['Seçili mod', mvMode==='walk'?(icon('footprints',13)+' Yürüyüş'):mvMode==='vehicle'?(icon('car',13)+' Araç'):(icon('sparkles',13)+' Oto')]
   ];
-  if(hth&&(hth.steps>0||hth.walkM>0)) moveRows.push(['🍏 Sağlık senkronu', (hth.steps>0?hth.steps.toLocaleString("tr-TR")+' adım':'')+(hth.steps>0&&hth.walkM>0?' · ':'')+(hth.walkM>0?fmtKmM(hth.walkM):'')]);
+  if(hth&&(hth.steps>0||hth.walkM>0)) moveRows.push([icon('apple',13)+' Sağlık senkronu', (hth.steps>0?hth.steps.toLocaleString("tr-TR")+' adım':'')+(hth.steps>0&&hth.walkM>0?' · ':'')+(hth.walkM>0?fmtKmM(hth.walkM):'')]);
   var rkc=function(r){return r.klass==="ok"?"var(--green)":r.klass==="warn"?"var(--amber)":"var(--red)";};
   var riskRows=[
     ['Risk trendi','<span style="color:'+rkc(risk7)+'">7g</span> · <span style="color:'+rkc(risk14)+'">14g</span> · <span style="color:'+rkc(risk30)+'">30g</span>'],
@@ -1646,10 +1748,10 @@ function render(){
     ['Eksik gün', missingInRange+'/'+cur.length]
   ];
   var insTabs=[
-    {key:'usage',ico:'⏱️',label:'Kullanım',rows:usageRows},
-    {key:'loc',ico:'📍',label:'Konum',rows:locRows},
-    {key:'move',ico:'🚶',label:'Hareket',rows:moveRows},
-    {key:'risk',ico:'🧭',label:'Risk',rows:riskRows}
+    {key:'usage',ico:icon('clock',13),label:'Kullanım',rows:usageRows},
+    {key:'loc',ico:icon('map-pin',13),label:'Konum',rows:locRows},
+    {key:'move',ico:icon('footprints',13),label:'Hareket',rows:moveRows},
+    {key:'risk',ico:icon('compass',13),label:'Risk',rows:riskRows}
   ];
   var insActive=UI.insightTab||'usage';
   if(!insTabs.some(function(t){return t.key===insActive;})) insActive='usage';
@@ -1662,7 +1764,7 @@ function render(){
   insDetails+=insTabs.map(function(t){
     return '<div class="ins-pane" data-ins="'+t.key+'" style="'+(t.key===insActive?'':'display:none;')+'">'+insRows(t.rows)+'</div>';
   }).join("");
-  h+=cardWrap({key:'insights',icon:'🔎',title:'Gelişmiş İçgörüler',span:12,order:30,summary:insSummary,details:insDetails});
+  h+=cardWrap({key:'insights',icon:icon('search',18),title:'Gelişmiş İçgörüler',span:12,order:30,summary:insSummary,details:insDetails});
 
 
   // ═════════ KÜTÜPHANE · İZLEME ARŞİVİ · ALINTILAR ═════════
@@ -1731,9 +1833,9 @@ function render(){
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+libFinYear+(LG.yearlyBooks?'<span style="color:var(--t4);font-size:var(--f2);">/'+LG.yearlyBooks+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
       +'</div>';
     var libDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    libDet+= LIB.length? orderBy(LIB,'book').map(bookRow).join('') : '<div class="empty"><span class="ei">📚</span>Kitaplık boş</div>';
+    libDet+= LIB.length? orderBy(LIB,'book').map(bookRow).join('') : '<div class="empty"><span class="ei">'+icon('book',20)+'</span>Kitaplık boş</div>';
     libDet+='</div>';
-    h+=cardWrap({key:'lib-archive',icon:'📚',title:'Kütüphane',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+LIB.length+' kitap</span>',span:6,order:50,summary:libSum,details:libDet});
+    h+=cardWrap({key:'lib-archive',icon:icon('book',18),title:'Kütüphane',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+LIB.length+' kitap</span>',span:6,order:50,summary:libSum,details:libDet});
 
     // ---- İzleme Arşivi ----
     var wFin=WL.filter(function(t){return t.status==='finished';}).length;
@@ -1748,9 +1850,9 @@ function render(){
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--t1);">'+wFinYear+(WG.yearlyTitles?'<span style="color:var(--t4);font-size:var(--f2);">/'+WG.yearlyTitles+'</span>':'')+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+yr+'</div></div>'
       +'</div>';
     var wDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    wDet+= WL.length? orderBy(WL,'title').map(titleRow).join('') : '<div class="empty"><span class="ei">🎬</span>Arşiv boş</div>';
+    wDet+= WL.length? orderBy(WL,'title').map(titleRow).join('') : '<div class="empty"><span class="ei">'+icon('clapperboard',20)+'</span>Arşiv boş</div>';
     wDet+='</div>';
-    h+=cardWrap({key:'watch-archive',icon:'🎬',title:'İzleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+WL.length+' yapım</span>',span:6,order:50,summary:wSum,details:wDet});
+    h+=cardWrap({key:'watch-archive',icon:icon('clapperboard',18),title:'İzleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+WL.length+' yapım</span>',span:6,order:50,summary:wSum,details:wDet});
 
     // ---- Dinleme Arşivi (müzik favorileri) ----
     var MUS=(D&&D.music&&Array.isArray(D.music.items))?D.music.items:[];
@@ -1778,9 +1880,9 @@ function render(){
       +'<div style="text-align:center;"><div style="font-size:var(--f5);font-weight:800;color:var(--gold);">'+esc(lHours)+'</div><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">Süre</div></div>'
       +'</div>';
     var mDet='<div class="scroll" style="max-height:340px;display:flex;flex-direction:column;gap:8px;">';
-    mDet+= MUS.length? MUS.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }).map(trackRow).join('') : '<div class="empty"><span class="ei">🎧</span>Dinleme arşivi boş</div>';
+    mDet+= MUS.length? MUS.slice().sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); }).map(trackRow).join('') : '<div class="empty"><span class="ei">'+icon('headphones',20)+'</span>Dinleme arşivi boş</div>';
     mDet+='</div>';
-    h+=cardWrap({key:'music-archive',icon:'🎧',title:'Dinleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+MUS.length+' parça</span>',span:6,order:50,summary:mSum,details:mDet});
+    h+=cardWrap({key:'music-archive',icon:icon('headphones',18),title:'Dinleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+MUS.length+' parça</span>',span:6,order:50,summary:mSum,details:mDet});
 
     // ---- Alıntılar & Replikler ----
     var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',emoji:b.emoji||'📖',title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
@@ -1798,7 +1900,7 @@ function render(){
           +'</div>';
       });
       qDet+='</div>';
-      h+=cardWrap({key:'quotes-archive',icon:'💬',title:'Alıntılar · Replikler · Sözler',span:12,order:50,summary:qSum,details:qDet});
+      h+=cardWrap({key:'quotes-archive',icon:icon('quote',18),title:'Alıntılar · Replikler · Sözler',span:12,order:50,summary:qSum,details:qDet});
     }
   })();
 
@@ -1995,7 +2097,7 @@ function aeonRecTimeStrP(sec){ sec=Math.max(0,Math.round(Number(sec)||0)); var m
 function aeonEnsureMediaLoadedP(mediaId,kind,elId){
   var el=document.getElementById(elId); if(!el||!mediaId) return;
   function paint(m){
-    if(!m){ el.innerHTML='<span style="font-size:16px;opacity:.6;">⚠️</span>'; return; }
+    if(!m){ el.innerHTML='<span style="opacity:.6;display:inline-flex;">'+icon('triangle-alert',15)+'</span>'; return; }
     var uri="data:"+(m.mime||"")+";base64,"+m.data;
     if(kind==="image") el.innerHTML='<img src="'+uri+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
     else if(kind==="voice") aeonPaintVoicePlayerP(el,mediaId,m,uri);
@@ -2037,7 +2139,7 @@ window.aeonOpenImageP=function(mediaId){
   var d=document.createElement("div"); d.id="pm-lightbox";
   d.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(3,3,5,0.94);display:flex;align-items:center;justify-content:center;padding:20px;";
   d.innerHTML='<img src="'+uri+'" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">'
-    +'<button aria-label="Kapat" style="position:absolute;top:16px;right:16px;border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;font-size:17px;cursor:pointer;">✕</button>';
+    +'<button aria-label="Kapat" style="position:absolute;top:16px;right:16px;border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>';
   d.onclick=function(e){ if(e.target===d||e.target.tagName==="BUTTON") d.remove(); };
   document.body.appendChild(d);
 };

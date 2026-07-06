@@ -1933,8 +1933,10 @@ function putInbox(messages,sha,receipts){
 }
 window.aeonChatDraft=function(v){
   UI.msgDraft=v;
+  var hasText=!!String(v||"").trim();
   var btn=document.getElementById("pm-aeon-send");
-  if(btn){ var empty=!String(v||"").trim(); btn.className="pm-send"+(empty||UI.msgSending?" is-disabled":""); }
+  if(btn){ btn.className="pm-send"+((!hasText||UI.msgSending)?" is-disabled":""); btn.style.display=hasText?"flex":"none"; }
+  var mic=document.getElementById("pm-aeon-mic"); if(mic) mic.style.display=hasText?"none":"flex";
 };
 window.pmAeonKeydown=function(e){
   if(e && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); window.sendAeonChat(); }

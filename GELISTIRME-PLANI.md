@@ -250,6 +250,28 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **🍏 Sağlık senkronu: GitHub Gist'e geçiş (Kısayollar kurulumunu
+  sadeleştirme)**: Ana repodaki `data/health-sync.json` (Contents API) yerine bir
+  **GitHub Gist** kullanılıyor artık. Sebep: Contents API her güncellemede önce
+  dosyanın sha'sını çekip sonra içeriği base64'e çevirmeyi gerektiriyordu —
+  Kısayollar'da en kafa karıştırıcı, hataya en açık adımlar bunlardı. Gist'in
+  `PATCH` isteği düz metinle çalışır, sha istemez; Kısayol'daki eylem sayısı
+  6-7'den 4'e indi ve "sha"/"base64" gibi hiçbir teknik terim gerekmiyor.
+  - **Yeni ayar:** `data.settings.healthGistId` (Ayarlar'da değil, doğrudan
+    kurulum kartındaki bir alana yapıştırılıyor). `App.setHealthGistId`,
+    `migrate()`'te varsayılan `''`.
+  - **Okuma:** `fetchHealthSync()` artık `GET https://api.github.com/gists/{id}`
+    çekiyor, `files['health-sync.json'].content`'i `JSON.parse` edip
+    `applyHealthSync()`'e veriyor (repo/branch/sha kavramı yok).
+  - **Kart yeniden yazıldı** (`healthSetupCardHTML`): 3 bölüm — (1) tarayıcıda
+    gist.github.com'da tek seferlik "kutu" oluşturma (adım adım, numaralı
+    rozetler, kopyala çipleri: `App.copyHealthStarter`, Gist ID input'u), (2)
+    Kısayollar'da 4 eylem (kopya çipleri: `App.copyHealthUrl`,
+    `App.copyHealthAuth`, `App.copyHealthTemplate`), (3) otomasyona bağlama.
+    Jetonun **gist izni** gerektiği (ince ayarlı jetonlar desteklemiyor, classic
+    jeton gerekli) açıkça not edildi.
+  - Ayarlar'daki eski Contents-API talimatı zaten Bugün ekranına yönlendiriyordu;
+    değişmedi.
 - **2026-07-06** — **🍏 Sağlık senkronu kurulum kartı — genişletilebilir, avantajlı,
   kopyala-yapıştır**: Ayarlar'daki düz metin talimat, Bugün ekranındaki Konum &
   Hareket kartının hemen altına taşındı — kullanıcı GPS'in arka planda

@@ -170,6 +170,7 @@ function migrate(d){
   if(!Array.isArray(d.aeon.qa)) d.aeon.qa=[];
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
+  if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
@@ -412,7 +413,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -508,9 +509,10 @@ App.removeQuote=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isAr
 App.copyQuote=function(text){ try{ navigator.clipboard.writeText(text); toast('Kopyalandı 📋'); }catch(e){ toast('Kopyalanamadı'); } };
 App.toggleHealthSetup=function(){ ui.healthSetupOpen=!ui.healthSetupOpen; render(); };
 // Bearer jetonu ekrana hiç basılmadan (HTML'e gömülmeden), tıklanınca doğrudan panoya kopyalanır.
-App.copyHealthUrl=function(){ var sg=data.settings||{}; var repo=(sg.ghRepo||'').trim(); if(!repo){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } App.copyQuote('https://api.github.com/repos/'+repo+'/contents/data/health-sync.json'); };
+App.copyHealthStarter=function(){ App.copyQuote('{"date":"","steps":0,"walkM":0,"updatedAt":""}'); };
+App.copyHealthUrl=function(){ var sg=data.settings||{}; var gid=(sg.healthGistId||'').trim(); if(!gid){ toast('Önce yukarıya Gist ID\'yi yapıştır'); return; } App.copyQuote('https://api.github.com/gists/'+gid); };
 App.copyHealthAuth=function(){ var sg=data.settings||{}; if(!sg.ghToken){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } App.copyQuote('Bearer '+sg.ghToken); };
-App.copyHealthFields=function(){ App.copyQuote('date, steps, walkM, updatedAt'); };
+App.copyHealthTemplate=function(){ App.copyQuote('{"date":"[Şimdiki Tarih]","steps":[Adım Sayısı],"walkM":[Mesafe],"updatedAt":"[Şimdiki Tarih]"}'); };
 App.copyQuoteById=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var q=b.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+b.title+(q.page?', s.'+q.page:''); App.copyQuote(txt); };
 App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var q=t.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+t.title; App.copyQuote(txt); };
 
@@ -866,6 +868,7 @@ App.saveOpenaiKey=function(){
     .catch(function(){ ui.openaiKeyState=null; render(); toast('Kaydedildi (ağ doğrulaması yapılamadı)'); });
 };
 App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setHealthGistId=function(el){ if(!data.settings) data.settings={}; data.settings.healthGistId=normalizeToken(el.value||''); debounceSave('healthGistId',function(){ save(); },400); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
 App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); save(); if(!syncConfigured()){ toast('Önce Ayarlar\'dan repoya bağlan'); App.go('ayarlar'); return; } if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } };
@@ -1319,25 +1322,42 @@ function healthSetupCardHTML(connectedHealth){
   h+='<span style="font-size:13px;color:var(--faint);flex-shrink:0;">'+(open?'Gizle ▴':'Göster ▾')+'</span>';
   h+='</button>';
   if(open){
+    var sg=data.settings||{};
+    var gid=(sg.healthGistId||'').trim();
+    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:11px;">'+hint+'</span></span><span style="flex-shrink:0;font-size:14px;">📋</span></button>'; }
+    function step(n,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(143,191,138,0.3);color:#2F7A3F;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+n+'</span><span style="flex:1;font-size:12.5px;line-height:1.55;color:var(--text2);padding-top:2px;">'+text+'</span></div>'; }
     h+='<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:11px;">';
     h+='<div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--text2);line-height:1.4;">';
     h+='<div>🔋 <b>Pil dostu</b> — GPS\'i sürekli açık tutmaz, telefonun kendi adım sayacını kullanır.</div>';
     h+='<div>🌙 <b>Gerçekten arka planda</b> — uygulama kapalıyken, ekran kilitliyken bile veri toplanmaya devam eder.</div>';
     h+='<div>🎯 <b>Daha doğru</b> — Sağlık\'ın hassas pedometresi, GPS tahmininden daha güvenilir.</div>';
-    h+='<div>🔒 <b>Gizli kalır</b> — veriler doğrudan senin GitHub deponda tutulur, başka bir sunucuya gitmez.</div>';
+    h+='<div>🔒 <b>Gizli kalır</b> — veriler doğrudan senin GitHub hesabında tutulur, başka bir sunucuya gitmez.</div>';
     h+='</div>';
-    h+='<div style="font-size:12px;font-weight:800;color:var(--text);">Tek seferlik kurulum (yaklaşık 5 dk):</div>';
-    h+='<div style="font-size:12.5px;line-height:1.65;color:var(--text2);">';
-    h+='<b>1.</b> Kısayollar → Otomasyon → ➕ → Kişisel Otomasyon → <i>Saatin Zamanı</i> (günde birkaç kez tekrarlı) → "Çalıştırmadan Önce Sor" kapalı.<br>';
-    h+='<b>2.</b> Eylem ekle: <i>Sağlık Örneği Al</i> (Adım Sayısı, bugün, toplam) + <i>Sağlık Örneği Al</i> (Yürüme+Koşu Mesafesi, bugün, toplam).<br>';
-    h+='<b>3.</b> Eylem ekle: <i>URL İçeriğini Al</i> — yöntem PUT. Aşağıdaki değerleri yazmana gerek yok, dokun kopyalansın, Kısayollar\'a yapıştır.';
-    h+='</div>';
-    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:11px;">'+hint+'</span></span><span style="flex-shrink:0;font-size:14px;">📋</span></button>'; }
-    h+='<div style="display:flex;flex-direction:column;gap:7px;">';
-    h+=chip('copyHealthUrl','URL (PUT hedefi)','Dokun, panoya kopyalanır');
-    h+=chip('copyHealthAuth','Yetki (Authorization)','Dokun, jetonun panoya kopyalanır — ekranda görünmez');
-    h+=chip('copyHealthFields','Gövde alan adları','date, steps, walkM, updatedAt');
-    h+='</div>';
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);">Bölüm 1 — Küçük bir kutu oluştur (tarayıcıda, bir kere):</div>';
+    h+=step('1','<a href="https://gist.github.com" target="_blank" style="color:#2F7A3F;font-weight:700;">gist.github.com</a> adresini aç (GitHub hesabınla giriş yapmış ol).');
+    h+=step('2','"Filename" kutusuna yaz: <b>health-sync.json</b>');
+    h+=step('3','Büyük metin kutusuna aşağıdaki "Başlangıç içeriği" çipine dokunup yapıştır.');
+    h+=chip('copyHealthStarter','Başlangıç içeriği','Dokun, panoya kopyalanır');
+    h+=step('4','Yeşil <b>"Create secret gist"</b> butonuna bas.');
+    h+=step('5','Açılan sayfanın adres çubuğundaki son parçayı (uzun kod) kopyala, aşağıya yapıştır:');
+    h+='<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(gid)+'" oninput="App.setHealthGistId(this)" placeholder="Gist ID (adres çubuğunun sonundaki kod)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 2 — Kısayolu kur (Kısayollar uygulamasında, bir kere):</div>';
+    h+=step('1','Kısayollar → ➕ (yeni kısayol) → isim ver: <b>Şeyma Sağlık</b>');
+    h+=step('2','Eylem ekle: <i>Sağlık Örneği Al</i> → Adım Sayısı, bugün, toplam.');
+    h+=step('3','Eylem ekle: <i>Sağlık Örneği Al</i> → Yürüme + Koşu Mesafesi, bugün, toplam, birim metre.');
+    h+=step('4','Eylem ekle: <i>Metin</i> → aşağıdaki şablonu yapıştır, sonra köşeli parantez içindeki her ismi silip yerine bir önceki adımların mor sonucunu (dokunarak) koy.');
+    h+=chip('copyHealthTemplate','Metin şablonu','Dokun, panoya kopyalanır');
+    h+=step('5','Eylem ekle: <i>URL İçeriğini Al</i> → Yöntem: <b>PATCH</b>. Aşağıdaki URL ve Yetki değerlerini kopyala-yapıştır; İstek Gövdesi: JSON → Sözlük → anahtar <b>files</b> → içine anahtar <b>health-sync.json</b> → içine anahtar <b>content</b> → değer olarak 4. adımdaki Metin\'i seç.');
+    h+=chip('copyHealthUrl','URL','Dokun, panoya kopyalanır');
+    h+=chip('copyHealthAuth','Yetki (Authorization)','Dokun, jetonun panoya kopyalanır — ekranda hiç görünmez');
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 3 — Otomatik çalışsın (bir kere):</div>';
+    h+=step('1','Kısayollar → Otomasyon → ➕ → Kişisel Otomasyon → <i>Saatin Zamanı</i> (günde birkaç kez tekrarlı).');
+    h+=step('2','"Şeyma Sağlık" kısayolunu çalıştır olarak seç, <b>"Çalıştırmadan Önce Sor"u kapat</b>. Bitti — bundan sonra kimse hiçbir şey yapmaz.');
+
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.5;background:var(--field);border-radius:10px;padding:8px 10px;">Not: Bu jetonun "gist" iznine de sahip olması gerekir. İnce ayarlı (fine-grained) jetonlar Gist\'i desteklemiyor — Ayarlar\'da <b>classic</b> bir jeton (repo + gist izinli) kullan.</div>';
     h+='<a href="shortcuts://" style="text-align:center;text-decoration:none;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);">Kısayollar\'ı Aç 🔗</a>';
     h+='</div>';
   }
@@ -3070,9 +3090,12 @@ function fetchObserverInbox(){
     .catch(function(){});
 }
 // Telefonun Sağlık uygulamasından (iOS Kısayollar otomasyonu, arka planda kendi kendine
-// çalışır) data/health-sync.json'a düşen {date,steps,walkM,updatedAt} anlık görüntüsünü
-// çeker. Tarayıcı arka planda GPS izleyemediği için hareket verisinin asıl, güvenilir
-// kaynağı bu — konum kapalı olsa bile çalışır. Kullanıcı hiçbir şey yapmaz, otomatik akar.
+// çalışır) bir GitHub Gist'e düşen {date,steps,walkM,updatedAt} anlık görüntüsünü çeker.
+// Gist kullanıyoruz çünkü ana repodaki dosya güncellemesi (Contents API) her seferinde
+// önce sha çekip sonra base64 içerik göndermeyi gerektiriyor — Kısayollar'da en kafa
+// karıştırıcı adımlar bunlardı. Gist'in PATCH'i düz metinle çalışır, sha istemez; Kısayol
+// 4 basit eyleme iner. Tarayıcı arka planda GPS izleyemediği için hareket verisinin asıl,
+// güvenilir kaynağı bu — konum kapalı olsa bile çalışır. Kullanıcı hiçbir şey yapmaz.
 function applyHealthSync(h){
   if(!data||!h||typeof h!=='object'||!/^\d{4}-\d{2}-\d{2}$/.test(String(h.date||''))) return;
   var date=h.date, rec=getDay(data,date,dayIndexFor(date));
@@ -3087,11 +3110,18 @@ function applyHealthSync(h){
   }
 }
 function fetchHealthSync(){
-  var c=ghCfgApp(); if(!c) return;
-  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/health-sync.json?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
-  fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
-    .then(function(r){ if(r.status===404) return null; if(!r.ok) throw new Error(String(r.status)); return r.json(); })
-    .then(function(j){ if(j) applyHealthSync(j); })
+  var s=(data&&data.settings)?data.settings:{};
+  var tok=normalizeToken(s.ghToken||''), gid=String(s.healthGistId||'').trim();
+  if(!tok||!gid) return;
+  var api='https://api.github.com/gists/'+encodeURIComponent(gid)+'?t='+Date.now();
+  fetch(api,{headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(function(r){ if(!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function(j){
+      var f=j&&j.files&&j.files['health-sync.json'];
+      if(!f||!f.content) return;
+      var h; try{ h=JSON.parse(f.content); }catch(e){ return; }
+      applyHealthSync(h);
+    })
     .catch(function(){});
 }
 function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); }

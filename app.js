@@ -137,11 +137,11 @@ function habitCountOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HA
 function htToday(){ return habitCountOn(todayStr()); }
 function emptyDiscomfort(){ return {regions:{},note:'',meds:[]}; }
 var MOODS=[
-  {id:'cok-iyi',label:'Çok iyi ☀️',short:'Çok iyi',emoji:icon('sun',22),resp:'Bugün ışık saçıyoruz anlaşılan ☀️'},
-  {id:'iyi',label:'İyi 🌼',short:'İyi',emoji:icon('flower-2',22),resp:'Gayet güzel. Ritim kuruluyor 🌼'},
-  {id:'normal',label:'Normal 🌿',short:'Normal',emoji:icon('leaf',22),resp:'Normal de olur. Her gün festival değil 🌿'},
-  {id:'zorlandim',label:'Zorlandım 🌧️',short:'Zor',emoji:icon('cloud-rain',22),resp:'Zor günler oyundan düşürmez Sevgili Günışığı 🌧️'},
-  {id:'cok-zorlandim',label:'Çok zorlandım 🫧',short:'Çok zor',emoji:icon('droplets',22),resp:'Bugün sadece kendine yüklenmemek bile yeter 🫧'}
+  {id:'cok-iyi',label:'Çok iyi',short:'Çok iyi',icon:'sun',resp:'Bugün ışık saçıyoruz anlaşılan ☀️'},
+  {id:'iyi',label:'İyi',short:'İyi',icon:'flower-2',resp:'Gayet güzel. Ritim kuruluyor 🌼'},
+  {id:'normal',label:'Normal',short:'Normal',icon:'leaf',resp:'Normal de olur. Her gün festival değil 🌿'},
+  {id:'zorlandim',label:'Zorlandım',short:'Zor',icon:'cloud-rain',resp:'Zor günler oyundan düşürmez Sevgili Günışığı 🌧️'},
+  {id:'cok-zorlandim',label:'Çok zorlandım',short:'Çok zor',icon:'droplets',resp:'Bugün sadece kendine yüklenmemek bile yeter 🫧'}
 ];
 var SOS_OPTS=['Su içtim 💧','Kahve/çay yaptım ☕','Yoğurt + tarçın denedim 🥣','Meyve + yoğurt yaptım 🍓','1-2 kare bitterle kapattım 🍫','Hâlâ istiyorum ama kontrollü yiyeceğim 🤝'];
 var SOS_TRIGGERS=[{id:'tired',emoji:icon('battery-low',15),label:'Yorgunum'},{id:'bored',emoji:icon('cloud',15),label:'Sıkıldım'},{id:'hungry',emoji:icon('utensils',15),label:'Gerçekten açım'},{id:'stress',emoji:icon('wind',15),label:'Stresliyim'},{id:'habit',emoji:icon('repeat',15),label:'Alışkanlık'}];
@@ -461,14 +461,14 @@ function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) ret
 // ---------- ortak UI parçaları ----------
 function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,#C88F4C,#E0B080)':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
 function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
-function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;font-size:'+size+'px;line-height:1;filter:'+(on?'none':'grayscale(1)')+';opacity:'+(on?'1':'0.45')+';">⭐</button>'; } h+='</div>'; return h; }
+function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;color:'+(on?'#F2B65A':'var(--faint)')+';opacity:'+(on?'1':'0.45')+';display:inline-flex;">'+icon('star',size)+'</button>'; } h+='</div>'; return h; }
 function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:9.5px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:9px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
 function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:10px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
 function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=moods[x];k=x;} } var o=k?find(MOODS,'id',k):null; return o?o.label:'—'; }
-function moodEmoji(id){ var o=find(MOODS,'id',id); return o?o.emoji:''; }
+function moodEmoji(id,size){ var o=find(MOODS,'id',id); return o?icon(o.icon,size||22):''; }
 function find(arr,key,val){ for(var i=0;i<arr.length;i++){ if(arr[i][key]===val) return arr[i]; } return null; }
 function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<4) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ if(countRec(data.days[date])>=4){ c++; date=addDays(date,-1); } else break; } return c; }
 function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
@@ -1543,17 +1543,19 @@ function locationCardHTML(){
 // ---------- Günışığı hava durumu (Open-Meteo, anahtarsız) ----------
 var wxFetching=false;
 var WX_SPOTS_FIXED=[
-  {key:'ev', label:'Ev', place:'Kazan', emoji:icon('house',16), lat:40.23, lng:32.68},
-  {key:'is', label:'İş', place:'Altındağ', emoji:icon('building-2',16), lat:39.97, lng:32.92}
+  {key:'ev', label:'Ev', place:'Kazan', iconName:'house', lat:40.23, lng:32.68},
+  {key:'is', label:'İş', place:'Altındağ', iconName:'building-2', lat:39.97, lng:32.92}
 ];
 function wxMode(){ var s=(data&&data.settings)?data.settings:{}; return (s.locationEnabled && data.location && typeof data.location.lat==='number') ? 'live' : 'fixed'; }
 function weatherSpots(){
   if(wxMode()==='live'){
     var nm=(data.weather&&data.weather.liveName)||'';
-    return [{key:'live', label:'Konumun', place:nm, emoji:icon('map-pin',16), lat:data.location.lat, lng:data.location.lng}];
+    return [{key:'live', label:'Konumun', place:nm, iconName:'map-pin', lat:data.location.lat, lng:data.location.lng}];
   }
   return WX_SPOTS_FIXED;
 }
+function wxSpotIconName(sp){ return (sp&&sp.iconName)||(sp&&sp.key==='live'?'map-pin':(sp&&sp.key==='is'?'building-2':'house')); }
+function wxSpotIcon(sp,size){ return icon(wxSpotIconName(sp),size||16); }
 function wxStale(){
   if(!data.weather||!data.weather.fetchedAt||!(data.weather.spots&&data.weather.spots.length)) return true;
   if(data.weather.mode!==wxMode()) return true;
@@ -1576,7 +1578,7 @@ function fetchWeather(){
     for(var i=0;i<spots.length;i++){
       var w=arr[i]||arr[0]; if(!w||!w.current) continue; var dl=w.daily||{};
       out.push({
-        key:spots[i].key, label:spots[i].label, place:spots[i].place, emoji:spots[i].emoji,
+        key:spots[i].key, label:spots[i].label, place:spots[i].place, iconName:wxSpotIconName(spots[i]),
         temp:Math.round(w.current.temperature_2m), feels:Math.round(w.current.apparent_temperature),
         hum:w.current.relative_humidity_2m, wind:Math.round(w.current.wind_speed_10m),
         precip:w.current.precipitation, code:w.current.weather_code, isDay:w.current.is_day===1,
@@ -1643,7 +1645,7 @@ var WX_QUIPS={
 };
 function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
 function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
-function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:13px;font-weight:800;color:#7A3E1E;line-height:1.35;"><span style="opacity:.85;">'+sp.emoji+'</span><span>'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:13px;font-weight:800;color:#7A3E1E;line-height:1.35;"><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,16)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
 function wxDetail(icon,label,val){ return '<div style="flex:1;min-width:0;background:rgba(255,255,255,0.45);border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:#A85E3C;font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:#7A3E1E;margin-top:2px;">'+val+'</div></div>'; }
 function weatherHeaderHTML(greet){
   var open=!!ui.weatherOpen;
@@ -1673,7 +1675,7 @@ function weatherHeaderHTML(greet){
     for(var si=0; si<spots.length; si++){
       var sp=spots[si]; var m=wxMeta(sp.code,sp.isDay);
       h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="font-size:20px;">'+sp.emoji+'</span>';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;">'+wxSpotIcon(sp,20)+'</span>';
       h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:900;color:#8A4426;">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:#A85E3C;">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:11.5px;font-weight:700;color:#A85E3C;">'+m.emoji+' '+m.label+'</div></div>';
       h+='<div style="font-size:22px;font-weight:900;color:#7A3E1E;">'+sp.temp+'°</div></div>';
       h+='<div style="display:flex;gap:6px;margin-bottom:6px;">'+wxDetail(icon('thermometer',13),'Hissedilen',sp.feels+'°')+wxDetail(icon('droplet',13),'Nem','%'+sp.hum)+wxDetail(icon('wind',13),'Rüzgâr',sp.wind+' km/sa')+'</div>';
@@ -1814,7 +1816,7 @@ function bugunHTML(){
   MOODS.forEach(function(m){
     var sel=curMood===m.id;
     var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.4);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-    h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="font-size:22px;">'+m.emoji+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
+    h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,22)+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
   });
   h+='</div>';
   if(curMood){ var mo=find(MOODS,'id',curMood); h+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo.resp)+'</div>'; }
@@ -1906,7 +1908,7 @@ function haritaHTML(){
     var date=Y+'-'+pad(M)+'-'+pad(dnum);
     var rec=data.days[date]||null; var cnt=countRec(rec); var htc=habitCountOn(date); var strongC=Math.ceil(htc*0.66);
     var future=diffDays(today,date)>0; var before=diffDays(data.startDate,date)<0; var isToday=date===today;
-    var moodE=(rec&&rec.mood)?moodEmoji(rec.mood):'';
+    var moodE=(rec&&rec.mood)?moodEmoji(rec.mood,13):'';
     var tint='var(--card)';
     if(cnt>=htc) tint=dark?'linear-gradient(135deg,rgba(255,232,163,0.25),rgba(247,221,229,0.22))':'linear-gradient(135deg,#FFE8A3,#F7DDE5)';
     else if(cnt>=strongC) tint=dark?'rgba(233,137,159,0.2)':'rgba(247,221,229,0.7)';
@@ -1918,7 +1920,7 @@ function haritaHTML(){
     h+='</button>';
   }
   h+='</div>';
-  h+='<div style="display:flex;gap:13px;justify-content:center;font-size:11px;color:var(--faint);flex-wrap:wrap;padding-top:2px;"><span>🟡 tam gün</span><span>🌸 güçlü</span><span>○ bugün çerçeveli</span></div>';
+  h+='<div style="display:flex;gap:13px;justify-content:center;font-size:11px;color:var(--faint);flex-wrap:wrap;padding-top:2px;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid var(--card-bd);"></span> tam gün</span><span style="display:inline-flex;align-items:center;gap:4px;">'+icon('flower-2',12)+' güçlü</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #E9AFC1;"></span> bugün çerçeveli</span></div>';
   h+='</div>';
   // ay özeti
   var isCurMonth=(ui.calMonth===today.slice(0,7));
@@ -1929,14 +1931,14 @@ function haritaHTML(){
   var bStreak=bestStreak(mrecs.slice().sort(function(a,b){return a.date<b.date?-1:1;}));
   var md=moodDist(mrecs);
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:15.5px;font-weight:700;">'+monthNames[M-1]+' özeti</div>'+(isCurMonth?'':'<button onclick="App.calToday()" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px;">Bugüne git ☀️</button>')+'</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:15.5px;font-weight:700;">'+monthNames[M-1]+' özeti</div>'+(isCurMonth?'':'<button onclick="App.calToday()" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">Bugüne git '+icon('sun',13)+'</button>')+'</div>';
   if(recCount===0){ h+='<div style="font-size:13px;color:var(--faint);line-height:1.5;">Bu ayda henüz kayıt yok. Bir güne dokunup “Bu günü düzenle” ile geçmişe de ekleyebilirsin.</div>'; }
   else {
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
     var cells=[['Kayıtlı gün',recCount+' / '+daysInMonth],['Ortalama tik',avgPct+'%'],['En iyi seri',bStreak+' gün']];
     cells.forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 10px;text-align:center;"><div style="font-size:11px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:17px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
     h+='</div>';
-    var moodKeys=Object.keys(md); if(moodKeys.length){ h+='<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;"><span style="font-size:11.5px;color:var(--faint);">Mod dağılımı:</span>'; MOODS.forEach(function(m){ if(md[m.id]) h+='<span style="font-size:12.5px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:4px 10px;">'+m.emoji+' '+md[m.id]+'</span>'; }); h+='</div>'; }
+    var moodKeys=Object.keys(md); if(moodKeys.length){ h+='<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;"><span style="font-size:11.5px;color:var(--faint);">Mod dağılımı:</span>'; MOODS.forEach(function(m){ if(md[m.id]) h+='<span style="font-size:12.5px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+md[m.id]+'</span>'; }); h+='</div>'; }
   }
   h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;border-top:1px solid var(--card-bd);padding-top:10px;display:flex;gap:5px;">'+icon('lightbulb',13)+' Geçmiş bir güne dokun → “Bu günü düzenle” ile o günün verilerini düzeltebilirsin. Konum, oturum ve canlı ölçümler her zaman bugüne yazılır.</div>';
   h+='</div>';
@@ -2176,7 +2178,7 @@ function raporHTML(){
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Mod dağılımı (30 gün)</div>';
   if(mtot){ var mcol={'cok-iyi':'#FFD37A','iyi':'#F2B65A','normal':'#8FBF8A','zorlandim':'#9BB0D9','cok-zorlandim':'#B89BD9'};
     h+='<div style="display:flex;height:14px;border-radius:999px;overflow:hidden;">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<div style="width:'+(v/mtot*100)+'%;background:'+(mcol[m.id]||'#C9B8FF')+';"></div>'; }); h+='</div>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span>'+m.emoji+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span style="display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
   } else h+='<div style="font-size:13px;color:var(--faint);">Bu dönemde mod kaydı yok.</div>';
   h+='</div>';
   h+=moodHeatmapCard();

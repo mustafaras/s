@@ -275,12 +275,22 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[],health:emptyHealth()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
+// Sağlık uygulaması (iOS Health) senkronu — tarayıcı arka planda GPS izleyemediği için
+// telefonun kendi adım sayacından tek yönlü, otomatik (Kısayollar) beslenen alan.
+function emptyHealth(){ return {steps:0,walkM:0,updatedAt:null}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
 function trackedSteps(rec){ var w=dayMovement(rec).walk; return w>0?Math.round(w/STEP_LEN_M):0; }
-function effSteps(rec){ var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null; if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'}; var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'}; return {steps:null,source:'none'}; }
+function effSteps(rec){
+  var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null;
+  if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'};
+  var hs=(rec&&rec.health&&rec.health.steps>0)?rec.health.steps:0;
+  if(hs>0) return {steps:hs,source:'health'};
+  var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'};
+  return {steps:null,source:'none'};
+}
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
 
 // ---------- Kitaplık & İzleme (kalıcı arşiv) ----------
@@ -1302,12 +1312,25 @@ function locationCardHTML(){
   if(loc&&loc.ts){ var am=Math.round((Date.now()-new Date(loc.ts).getTime())/60000); upd = am<1?'az önce':am<60?am+' dk önce':am<1440?Math.round(am/60)+' sa önce':Math.round(am/1440)+' g önce'; }
   var swBg=on?'linear-gradient(135deg,#7DBE77,#5BA85B)':'linear-gradient(135deg,#E68A84,#D9534F)';
   var knobLeft=on?'26px':'3px';
+  var hs=rec&&rec.health?rec.health:null;
+  var hsBlock='';
+  if(hs&&(hs.steps>0||hs.walkM>0)){
+    var hsAge='';
+    if(hs.updatedAt){ var hm=Math.round((Date.now()-new Date(hs.updatedAt).getTime())/60000); hsAge=hm<1?'az önce':hm<60?hm+' dk önce':hm<1440?Math.round(hm/60)+' sa önce':Math.round(hm/1440)+' g önce'; }
+    hsBlock='<div style="display:flex;align-items:center;gap:10px;background:rgba(143,191,138,0.10);border:1px solid rgba(143,191,138,0.28);border-radius:14px;padding:10px 12px;">'
+      +'<span style="font-size:18px;flex-shrink:0;">🍏</span>'
+      +'<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu:</b> '
+      +(hs.steps>0?hs.steps.toLocaleString('tr-TR')+' adım':'')+(hs.steps>0&&hs.walkM>0?' · ':'')+(hs.walkM>0?fmtDist(hs.walkM):'')
+      +'<div style="font-size:11px;color:var(--faint);margin-top:1px;">Telefon arka planda topladı'+(hsAge?' · '+hsAge:'')+'</div></div>'
+      +'</div>';
+  }
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
   h+='<div style="flex:1;font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:8px;">Konum & Hareket 📍 <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span></div>';
   h+='<button onclick="App.toggleLocation()" aria-label="Konum paylaşımı aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:56px;height:32px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+knobLeft+';width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
   h+='</div>';
   if(!on){
+    h+=hsBlock;
     h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür.</div>';
     h+='</div>';
     return h;
@@ -1328,7 +1351,8 @@ function locationCardHTML(){
   h+='</div>';
   if(mode==='auto') h+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
   else h+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">Ölçüm yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez). Hareketler korunur, silinmez.</div>';
+  h+=hsBlock;
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez); Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
   h+='</div>';
   return h;
 }
@@ -2029,6 +2053,13 @@ function ayarlarHTML(){
     h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
   }
   h+='</div>';
+  // Sağlık senkronu (Kısayollar otomasyonu) — bilgilendirme, tek seferlik kurulum
+  if(connected){
+    h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Sağlık senkronu 🍏</div>';
+    h+='<div style="font-size:12.5px;line-height:1.6;color:var(--text2);">Tarayıcı, uygulama arka plandayken konumu izleyemez — bu yüzden adım/mesafe eksik kalabilir. Telefonunda <b>Kısayollar</b> uygulamasında bir kez kurulan sessiz bir otomasyon, Sağlık uygulamasındaki günlük adım ve yürüyüş mesafesini kendiliğinden buraya taşır. Kurulduktan sonra hiçbir şey yapmana gerek kalmaz.</div>';
+    h+='<div style="font-size:12px;line-height:1.6;color:var(--faint);background:var(--field);border-radius:12px;padding:10px 12px;">Kurulum: Kısayollar → Otomasyon → Kişisel Otomasyon → Saatin Zamanı (gün içinde birkaç kez tekrarlı) → "Çalıştırmadan Önce Sor" kapalı. Eylemler: Sağlık Örneği Al (Adım Sayısı, bugün, toplam) + Sağlık Örneği Al (Yürüme+Koşu Mesafesi, bugün, toplam) → URL İçeriğini Al: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;">PUT https://api.github.com/repos/'+esc(sg.ghRepo||'…')+'/contents/data/health-sync.json</span>, Authorization: Bearer (yukarıdaki anahtarın aynısı), gövde <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">{date, steps, walkM, updatedAt}</span> alanlarıyla base64 + mevcut dosyanın sha\'sı.</div>';
+    h+='</div>';
+  }
   // Luna · kişisel asistan (OpenAI anahtarı)
   var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());
   var oaBadge='';
@@ -2990,6 +3021,32 @@ function fetchObserverInbox(){
     .then(function(j){ if(j){ if(Array.isArray(j.messages)) mergeInbox(j.messages); applyReceipts(j.receipts); } })
     .catch(function(){});
 }
+// Telefonun Sağlık uygulamasından (iOS Kısayollar otomasyonu, arka planda kendi kendine
+// çalışır) data/health-sync.json'a düşen {date,steps,walkM,updatedAt} anlık görüntüsünü
+// çeker. Tarayıcı arka planda GPS izleyemediği için hareket verisinin asıl, güvenilir
+// kaynağı bu — konum kapalı olsa bile çalışır. Kullanıcı hiçbir şey yapmaz, otomatik akar.
+function applyHealthSync(h){
+  if(!data||!h||typeof h!=='object'||!/^\d{4}-\d{2}-\d{2}$/.test(String(h.date||''))) return;
+  var date=h.date, rec=getDay(data,date,dayIndexFor(date));
+  if(!rec.health) rec.health=emptyHealth();
+  var steps=Number(h.steps), walkM=Number(h.walkM), changed=false;
+  if(!isNaN(steps)&&steps>rec.health.steps){ rec.health.steps=Math.round(steps); changed=true; }
+  if(!isNaN(walkM)&&walkM>rec.health.walkM){ rec.health.walkM=Math.round(walkM); changed=true; }
+  if(changed){
+    rec.health.updatedAt=String(h.updatedAt||new Date().toISOString());
+    save();
+    if(ui.tab==='bugun'&&!editing()) render();
+  }
+}
+function fetchHealthSync(){
+  var c=ghCfgApp(); if(!c) return;
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/health-sync.json?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
+  fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(function(r){ if(r.status===404) return null; if(!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function(j){ if(j) applyHealthSync(j); })
+    .catch(function(){});
+}
+function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); }
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];
@@ -3751,12 +3808,12 @@ App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
 
-setTimeout(fetchObserverInbox,1500);
-setInterval(fetchObserverInbox,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları daha hızlı görünsün)
-document.addEventListener('visibilitychange',function(){ if(!document.hidden) fetchObserverInbox(); });
-window.addEventListener('focus',fetchObserverInbox);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',fetchObserverInbox); // bfcache'ten geri dönüşte
-window.addEventListener('online',fetchObserverInbox);   // bağlantı gelince bekleyen makbuzu da gönderir
+setTimeout(pollRemote,1500);
+setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) pollRemote(); });
+window.addEventListener('focus',pollRemote);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',pollRemote); // bfcache'ten geri dönüşte
+window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle

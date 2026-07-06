@@ -250,6 +250,26 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **🍏 Sağlık senkronu (arka plan hareket verisi)**: Tarayıcı,
+  uygulama arka plandayken GPS izleyemediği için (`watchPosition` yalnızca
+  foreground'da çalışır) kısa aktiflik sürelerinde mesafe/adım verisi eksik
+  kalıyordu. Çözüm: telefonun **Kısayollar** otomasyonu (kullanıcı tek seferlik
+  kurar, sonrasında sessizce/otomatik çalışır) günlük adım + yürüyüş mesafesini
+  Sağlık uygulamasından okuyup `data/health-sync.json`'a (`{date,steps,walkM,
+  updatedAt}`) yazar; bu, senkronun zaten kullandığı GitHub Contents API'siyle
+  aynı token/repo üzerinden yapılır.
+  - **Okuma:** `fetchHealthSync()` → `applyHealthSync()` (app.js), `data.days[date]
+    .health` alanına yazar (`emptyHealth()`); `pollRemote()` altında
+    `fetchObserverInbox()` ile aynı tetikleyicilerde (boot, 30s poll,
+    visibilitychange, focus, pageshow, online) — kullanıcı hiçbir şey yapmaz.
+  - **Öncelik sırası:** `effSteps()` artık manuel > 🍏 sağlık > GPS-izlenen adım
+    sırasını izliyor (panel.html'deki `effStepsP` birebir aynısı).
+  - **Panel yansıması:** Bugün kartında (`locationCardHTML`) ve panelin gün-detayı
+    + "Hareket" içgörü sekmesinde (`moveRows`) 🍏 satırı; GPS kapalıyken bile
+    görünür (sağlık senkronu konum iznine bağlı değil).
+  - **Ayarlar:** "Sağlık senkronu 🍏" kartı, Kısayollar kurulum adımlarını
+    (otomasyon tetikleyicisi + eylemler + hedef URL) tek seferlik referans
+    olarak gösteriyor. index cache-bust `v=20260705g` → `v=20260706a`.
 - **2026-07-03** — **📍 Nudge iyileştirmeleri: süre verisi + günlük opt-out**:
   - **Süre ölçümü:** Konum açıkken artık yalnız mesafe değil **süre** de tutulur —
     `movement.walkSec` / `movement.vehicleSec` (`onLocationFix`'te fix'ler arası `dt`,

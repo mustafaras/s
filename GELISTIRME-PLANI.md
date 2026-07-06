@@ -250,6 +250,31 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **⬡ ÆON sohbetine sesli mesaj + fotoğraf (iki yönlü)**: Hem Şeyma
+  (app.js) hem gözlemci (panel.html) artık ÆON sohbetinde WhatsApp tarzı sesli mesaj ve
+  fotoğraf gönderip alabiliyor. Video kapsam dışı bırakıldı (iOS Safari'de video
+  `MediaRecorder` desteği tutarsız).
+  - **Depolama:** Medya ana `data` senkronuna gömülmüyor — her ses/foto kendi
+    `data/aeon-media/<id>.json` dosyasında (yaz-bir-kez, sha gerekmez) duruyor; aksi
+    halde her küçük değişiklikte birikmiş tüm medya yeniden yüklenirdi.
+    `putAeonMedia`/`fetchAeonMedia` (app.js) ve `putAeonMediaP`/`fetchAeonMediaP`
+    (panel.html) — her iki taraf da kendi token/repo'sunu kullanır.
+  - **Ses:** `MediaRecorder` + `AnalyserNode` ile dokun-başlat/dokun-durdur kayıt,
+    canlı dalga formu, azami 120 sn. Balonlarda gerçek (kaydedilmiş) dalga formu +
+    oynat/duraklat + ilerleme süresi — sahte/rastgele çizim değil.
+  - **Fotoğraf:** Seç/çek → canvas ile ≤1280px + JPEG 0.72 sıkıştırma → yükle;
+    balonlarda en-boy oranı korunan küçük resim + tam ekran lightbox.
+  - **Veri modeli:** `data.aeon.qa[]` öğelerine `kind/mediaId/mediaMime/durationSec/
+    peaks/w/h` (soru tarafı) ve `answerKind/answerMediaId/…` (yanıt tarafı);
+    `data.notifications[]`'a aynı alanlar (proaktif gözlemci mesajları) —
+    `mergeInbox()` bunları `data/observer-inbox.json`'daki mesajlardan taşır.
+  - **Anlık görünürlük:** Kendi gönderdiğin medya, yükleme bitmeden
+    `aeonMediaCache`'e önceden konur — balon ağ turu beklemeden anında görünür;
+    gelen/geçmiş medya ilk görüntülemede çekilir, sonra önbellekte kalır.
+  - **Doğrulama:** Gerçek Chromium'da (`--use-fake-device-for-media-stream`) hem
+    app.js hem panel.html tarafında kayıt/iptal/gönder/oynat/fotoğraf akışları uçtan
+    uca test edildi (durum yönetimi doğru, sızıntı yok); gerçek cihazda (iOS Safari
+    mikrofon izni, gerçek Kısayollar/token) henüz denenmedi.
 - **2026-07-06** — **🍏 Sağlık senkronu: GitHub Gist'e geçiş (Kısayollar kurulumunu
   sadeleştirme)**: Ana repodaki `data/health-sync.json` (Contents API) yerine bir
   **GitHub Gist** kullanılıyor artık. Sebep: Contents API her güncellemede önce

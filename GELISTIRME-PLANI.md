@@ -250,6 +250,75 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **🍏 Sağlık senkronu: GitHub Gist'e geçiş (Kısayollar kurulumunu
+  sadeleştirme)**: Ana repodaki `data/health-sync.json` (Contents API) yerine bir
+  **GitHub Gist** kullanılıyor artık. Sebep: Contents API her güncellemede önce
+  dosyanın sha'sını çekip sonra içeriği base64'e çevirmeyi gerektiriyordu —
+  Kısayollar'da en kafa karıştırıcı, hataya en açık adımlar bunlardı. Gist'in
+  `PATCH` isteği düz metinle çalışır, sha istemez; Kısayol'daki eylem sayısı
+  6-7'den 4'e indi ve "sha"/"base64" gibi hiçbir teknik terim gerekmiyor.
+  - **Yeni ayar:** `data.settings.healthGistId` (Ayarlar'da değil, doğrudan
+    kurulum kartındaki bir alana yapıştırılıyor). `App.setHealthGistId`,
+    `migrate()`'te varsayılan `''`.
+  - **Okuma:** `fetchHealthSync()` artık `GET https://api.github.com/gists/{id}`
+    çekiyor, `files['health-sync.json'].content`'i `JSON.parse` edip
+    `applyHealthSync()`'e veriyor (repo/branch/sha kavramı yok).
+  - **Kart yeniden yazıldı** (`healthSetupCardHTML`): 3 bölüm — (1) tarayıcıda
+    gist.github.com'da tek seferlik "kutu" oluşturma (adım adım, numaralı
+    rozetler, kopyala çipleri: `App.copyHealthStarter`, Gist ID input'u), (2)
+    Kısayollar'da 4 eylem (kopya çipleri: `App.copyHealthUrl`,
+    `App.copyHealthAuth`, `App.copyHealthTemplate`), (3) otomasyona bağlama.
+    Jetonun **gist izni** gerektiği (ince ayarlı jetonlar desteklemiyor, classic
+    jeton gerekli) açıkça not edildi.
+  - Ayarlar'daki eski Contents-API talimatı zaten Bugün ekranına yönlendiriyordu;
+    değişmedi.
+- **2026-07-06** — **🍏 Sağlık senkronu kurulum kartı — genişletilebilir, avantajlı,
+  kopyala-yapıştır**: Ayarlar'daki düz metin talimat, Bugün ekranındaki Konum &
+  Hareket kartının hemen altına taşındı — kullanıcı GPS'in arka planda
+  çalışmadığını gördüğü anda gerçek çözümü de orada buluyor.
+  - `healthSetupCardHTML()`: `ui.healthSetupOpen` ile açılır/kapanır accordion
+    (`App.toggleHealthSetup`); daraltılmışken tek satır özet + "bağlı ✓" rozeti
+    (sağlık verisi geldiyse), genişleyince 4 maddelik avantaj listesi (pil dostu,
+    gerçekten arka planda, daha doğru, gizli kalır) + 3 adımlı kurulum + kopyala
+    çipleri.
+  - **Minimum hareket:** `App.copyHealthUrl` / `App.copyHealthAuth` /
+    `App.copyHealthFields` ile URL, Authorization jetonu ve gövde alan adları
+    tek dokunuşla panoya kopyalanıyor — jeton hiçbir zaman ekrana/HTML'e
+    basılmıyor, tıklanınca `data.settings.ghToken`'dan doğrudan okunup
+    kopyalanıyor. `shortcuts://` deep-link'i Kısayollar'ı doğrudan açıyor.
+  - Ayarlar'daki eski uzun blok kaldırıldı, yerine Bugün ekranına götüren kısa
+    bir yönlendirme kartı kondu (tek kaynak, iki yerde bakım yok).
+- **2026-07-06** — **🧠 Faz 7 anketinin zorunlu tetikleyicisi kaldırıldı**: İki
+  haftada bir `render()`'ı tam ekran bloke eden `psychDue()` kontrolü
+  kaldırıldı — anket artık hiç açılmadığı sürece kullanıcıyı uygulamaya
+  girişte durdurmuyor. `data.psych` (geçmiş/skorlar) ve panelin "Psikolojik
+  Profil" kartı bozulmadan korunuyor; sadece otomatik/zorunlu açılış
+  durduruldu. `psychActive()` artık her zaman `false` dönüyor ki eski
+  "zorunlu anket açıkken arka plan popup'ını bastır" korumaları (gelen kutusu
+  popup'ı, ÆON yanıt popup'ı) bir daha tetiklenmeyen anketin ardında kalıp
+  sonsuza dek susmasın. `psychHTML()`/`App.psychBegin` vb. anket ekranı kodu
+  dokunulmadan (ileride manuel/opsiyonel bir giriş noktasına bağlanabilir
+  şekilde) bırakıldı.
+- **2026-07-06** — **🍏 Sağlık senkronu (arka plan hareket verisi)**: Tarayıcı,
+  uygulama arka plandayken GPS izleyemediği için (`watchPosition` yalnızca
+  foreground'da çalışır) kısa aktiflik sürelerinde mesafe/adım verisi eksik
+  kalıyordu. Çözüm: telefonun **Kısayollar** otomasyonu (kullanıcı tek seferlik
+  kurar, sonrasında sessizce/otomatik çalışır) günlük adım + yürüyüş mesafesini
+  Sağlık uygulamasından okuyup `data/health-sync.json`'a (`{date,steps,walkM,
+  updatedAt}`) yazar; bu, senkronun zaten kullandığı GitHub Contents API'siyle
+  aynı token/repo üzerinden yapılır.
+  - **Okuma:** `fetchHealthSync()` → `applyHealthSync()` (app.js), `data.days[date]
+    .health` alanına yazar (`emptyHealth()`); `pollRemote()` altında
+    `fetchObserverInbox()` ile aynı tetikleyicilerde (boot, 30s poll,
+    visibilitychange, focus, pageshow, online) — kullanıcı hiçbir şey yapmaz.
+  - **Öncelik sırası:** `effSteps()` artık manuel > 🍏 sağlık > GPS-izlenen adım
+    sırasını izliyor (panel.html'deki `effStepsP` birebir aynısı).
+  - **Panel yansıması:** Bugün kartında (`locationCardHTML`) ve panelin gün-detayı
+    + "Hareket" içgörü sekmesinde (`moveRows`) 🍏 satırı; GPS kapalıyken bile
+    görünür (sağlık senkronu konum iznine bağlı değil).
+  - **Ayarlar:** "Sağlık senkronu 🍏" kartı, Kısayollar kurulum adımlarını
+    (otomasyon tetikleyicisi + eylemler + hedef URL) tek seferlik referans
+    olarak gösteriyor. index cache-bust `v=20260705g` → `v=20260706a`.
 - **2026-07-03** — **📍 Nudge iyileştirmeleri: süre verisi + günlük opt-out**:
   - **Süre ölçümü:** Konum açıkken artık yalnız mesafe değil **süre** de tutulur —
     `movement.walkSec` / `movement.vehicleSec` (`onLocationFix`'te fix'ler arası `dt`,

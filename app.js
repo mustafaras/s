@@ -170,6 +170,7 @@ function migrate(d){
   if(!Array.isArray(d.aeon.qa)) d.aeon.qa=[];
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
+  if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
@@ -198,7 +199,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
@@ -275,12 +276,22 @@ function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snac
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[]}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[],health:emptyHealth()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
+// Sağlık uygulaması (iOS Health) senkronu — tarayıcı arka planda GPS izleyemediği için
+// telefonun kendi adım sayacından tek yönlü, otomatik (Kısayollar) beslenen alan.
+function emptyHealth(){ return {steps:0,walkM:0,updatedAt:null}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
 function trackedSteps(rec){ var w=dayMovement(rec).walk; return w>0?Math.round(w/STEP_LEN_M):0; }
-function effSteps(rec){ var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null; if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'}; var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'}; return {steps:null,source:'none'}; }
+function effSteps(rec){
+  var manual=(rec&&rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='')?Number(rec.walk.steps):null;
+  if(manual!=null&&!isNaN(manual)) return {steps:manual,source:'manual'};
+  var hs=(rec&&rec.health&&rec.health.steps>0)?rec.health.steps:0;
+  if(hs>0) return {steps:hs,source:'health'};
+  var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'};
+  return {steps:null,source:'none'};
+}
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
 
 // ---------- Kitaplık & İzleme (kalıcı arşiv) ----------
@@ -402,7 +413,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım ☀️'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
@@ -496,6 +507,12 @@ App.pickQuoteBook=function(id){ if(!ui.quoteDraft) return; ui.quoteDraft.bookId=
 App.saveQuote=function(){ if(!ui.quoteDraft) return; var b=findBook(ui.quoteDraft.bookId); if(!b){ toast('Önce bir kitap seç 📖'); return; } var text=String(ui.quoteDraft.text||'').trim(); if(!text){ toast('Alıntıyı yaz 💬'); return; } var page=parseInt(ui.quoteDraft.page,10); if(isNaN(page)||page<0) page=null; if(!Array.isArray(b.quotes)) b.quotes=[]; b.quotes.push({id:uid('q'),text:text.slice(0,400),page:page,ts:new Date().toISOString()}); ui.quoteDraft=null; commit('Alıntı eklendi 💬'); };
 App.removeQuote=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var i=b.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ b.quotes.splice(i,1); commit('Alıntı silindi'); } };
 App.copyQuote=function(text){ try{ navigator.clipboard.writeText(text); toast('Kopyalandı 📋'); }catch(e){ toast('Kopyalanamadı'); } };
+App.toggleHealthSetup=function(){ ui.healthSetupOpen=!ui.healthSetupOpen; render(); };
+// Bearer jetonu ekrana hiç basılmadan (HTML'e gömülmeden), tıklanınca doğrudan panoya kopyalanır.
+App.copyHealthStarter=function(){ App.copyQuote('{"date":"","steps":0,"walkM":0,"updatedAt":""}'); };
+App.copyHealthUrl=function(){ var sg=data.settings||{}; var gid=(sg.healthGistId||'').trim(); if(!gid){ toast('Önce yukarıya Gist ID\'yi yapıştır'); return; } App.copyQuote('https://api.github.com/gists/'+gid); };
+App.copyHealthAuth=function(){ var sg=data.settings||{}; if(!sg.ghToken){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } App.copyQuote('Bearer '+sg.ghToken); };
+App.copyHealthTemplate=function(){ App.copyQuote('{"date":"[Şimdiki Tarih]","steps":[Adım Sayısı],"walkM":[Mesafe],"updatedAt":"[Şimdiki Tarih]"}'); };
 App.copyQuoteById=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var q=b.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+b.title+(q.page?', s.'+q.page:''); App.copyQuote(txt); };
 App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var q=t.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+t.title; App.copyQuote(txt); };
 
@@ -851,6 +868,7 @@ App.saveOpenaiKey=function(){
     .catch(function(){ ui.openaiKeyState=null; render(); toast('Kaydedildi (ağ doğrulaması yapılamadı)'); });
 };
 App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.ghRepo=(el.value||'').trim(); save(); syncFieldUpdate(); };
+App.setHealthGistId=function(el){ if(!data.settings) data.settings={}; data.settings.healthGistId=normalizeToken(el.value||''); debounceSave('healthGistId',function(){ save(); },400); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
 App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); save(); if(!syncConfigured()){ toast('Önce Ayarlar\'dan repoya bağlan'); App.go('ayarlar'); return; } if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } };
@@ -926,8 +944,6 @@ function render(){
   var app=document.getElementById('app');
 
   if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
-
-  if(psychDue()){ app.innerHTML=psychHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
 
   var prevScroll=document.querySelector('[data-scroll]');
   var prevTop=prevScroll?prevScroll.scrollTop:0;
@@ -1291,6 +1307,63 @@ function stepReminder(rec){
 }
 function fmtDist(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
 function fmtDur(sec){ sec=Math.max(0,Math.round(Number(sec)||0)); if(sec<60) return sec+' sn'; var m=Math.round(sec/60); if(m<60) return m+' dk'; var hh=Math.floor(m/60), mm=m%60; return hh+' sa'+(mm?(' '+mm+' dk'):''); }
+// Sağlık senkronu kurulum kartı — daraltılmış/genişletilmiş (accordion). Konum kartının
+// hemen altında yaşar ki kullanıcı GPS'in arka planda çalışmadığını gördüğü anda
+// gerçek çözümü de orada bulsun. Bağlandıysa kısa bir "bağlı" özetine döner.
+function healthSetupCardHTML(connectedHealth){
+  var open=!!ui.healthSetupOpen;
+  var h='<div style="border:1px solid rgba(143,191,138,0.32);border-radius:16px;overflow:hidden;background:rgba(143,191,138,0.05);">';
+  h+='<button onclick="App.toggleHealthSetup()" style="width:100%;border:none;cursor:pointer;background:none;display:flex;align-items:center;gap:10px;padding:12px;text-align:left;">';
+  h+='<span style="font-size:20px;flex-shrink:0;">🍏</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;">bağlı ✓</span>':'')+'</div>';
+  h+='<div style="font-size:11.5px;color:var(--muted);">'+(connectedHealth?'Kurulum adımlarını gör':'Arka planda çalışır · pil dostu · tek seferlik kurulum')+'</div>';
+  h+='</div>';
+  h+='<span style="font-size:13px;color:var(--faint);flex-shrink:0;">'+(open?'Gizle ▴':'Göster ▾')+'</span>';
+  h+='</button>';
+  if(open){
+    var sg=data.settings||{};
+    var gid=(sg.healthGistId||'').trim();
+    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:11px;">'+hint+'</span></span><span style="flex-shrink:0;font-size:14px;">📋</span></button>'; }
+    function step(n,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(143,191,138,0.3);color:#2F7A3F;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+n+'</span><span style="flex:1;font-size:12.5px;line-height:1.55;color:var(--text2);padding-top:2px;">'+text+'</span></div>'; }
+    h+='<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:11px;">';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--text2);line-height:1.4;">';
+    h+='<div>🔋 <b>Pil dostu</b> — GPS\'i sürekli açık tutmaz, telefonun kendi adım sayacını kullanır.</div>';
+    h+='<div>🌙 <b>Gerçekten arka planda</b> — uygulama kapalıyken, ekran kilitliyken bile veri toplanmaya devam eder.</div>';
+    h+='<div>🎯 <b>Daha doğru</b> — Sağlık\'ın hassas pedometresi, GPS tahmininden daha güvenilir.</div>';
+    h+='<div>🔒 <b>Gizli kalır</b> — veriler doğrudan senin GitHub hesabında tutulur, başka bir sunucuya gitmez.</div>';
+    h+='</div>';
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);">Bölüm 1 — Küçük bir kutu oluştur (tarayıcıda, bir kere):</div>';
+    h+=step('1','<a href="https://gist.github.com" target="_blank" style="color:#2F7A3F;font-weight:700;">gist.github.com</a> adresini aç (GitHub hesabınla giriş yapmış ol).');
+    h+=step('2','"Filename" kutusuna yaz: <b>health-sync.json</b>');
+    h+=step('3','Büyük metin kutusuna aşağıdaki "Başlangıç içeriği" çipine dokunup yapıştır.');
+    h+=chip('copyHealthStarter','Başlangıç içeriği','Dokun, panoya kopyalanır');
+    h+=step('4','Yeşil <b>"Create secret gist"</b> butonuna bas.');
+    h+=step('5','Açılan sayfanın adres çubuğundaki son parçayı (uzun kod) kopyala, aşağıya yapıştır:');
+    h+='<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(gid)+'" oninput="App.setHealthGistId(this)" placeholder="Gist ID (adres çubuğunun sonundaki kod)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 2 — Kısayolu kur (Kısayollar uygulamasında, bir kere):</div>';
+    h+=step('1','Kısayollar → ➕ (yeni kısayol) → isim ver: <b>Şeyma Sağlık</b>');
+    h+=step('2','Eylem ekle: <i>Sağlık Örneği Al</i> → Adım Sayısı, bugün, toplam.');
+    h+=step('3','Eylem ekle: <i>Sağlık Örneği Al</i> → Yürüme + Koşu Mesafesi, bugün, toplam, birim metre.');
+    h+=step('4','Eylem ekle: <i>Metin</i> → aşağıdaki şablonu yapıştır, sonra köşeli parantez içindeki her ismi silip yerine bir önceki adımların mor sonucunu (dokunarak) koy.');
+    h+=chip('copyHealthTemplate','Metin şablonu','Dokun, panoya kopyalanır');
+    h+=step('5','Eylem ekle: <i>URL İçeriğini Al</i> → Yöntem: <b>PATCH</b>. Aşağıdaki URL ve Yetki değerlerini kopyala-yapıştır; İstek Gövdesi: JSON → Sözlük → anahtar <b>files</b> → içine anahtar <b>health-sync.json</b> → içine anahtar <b>content</b> → değer olarak 4. adımdaki Metin\'i seç.');
+    h+=chip('copyHealthUrl','URL','Dokun, panoya kopyalanır');
+    h+=chip('copyHealthAuth','Yetki (Authorization)','Dokun, jetonun panoya kopyalanır — ekranda hiç görünmez');
+
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 3 — Otomatik çalışsın (bir kere):</div>';
+    h+=step('1','Kısayollar → Otomasyon → ➕ → Kişisel Otomasyon → <i>Saatin Zamanı</i> (günde birkaç kez tekrarlı).');
+    h+=step('2','"Şeyma Sağlık" kısayolunu çalıştır olarak seç, <b>"Çalıştırmadan Önce Sor"u kapat</b>. Bitti — bundan sonra kimse hiçbir şey yapmaz.');
+
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.5;background:var(--field);border-radius:10px;padding:8px 10px;">Not: Bu jetonun "gist" iznine de sahip olması gerekir. İnce ayarlı (fine-grained) jetonlar Gist\'i desteklemiyor — Ayarlar\'da <b>classic</b> bir jeton (repo + gist izinli) kullan.</div>';
+    h+='<a href="shortcuts://" style="text-align:center;text-decoration:none;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);">Kısayollar\'ı Aç 🔗</a>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function locationCardHTML(){
   var s=data.settings||{};
   var on=!!s.locationEnabled;
@@ -1302,13 +1375,27 @@ function locationCardHTML(){
   if(loc&&loc.ts){ var am=Math.round((Date.now()-new Date(loc.ts).getTime())/60000); upd = am<1?'az önce':am<60?am+' dk önce':am<1440?Math.round(am/60)+' sa önce':Math.round(am/1440)+' g önce'; }
   var swBg=on?'linear-gradient(135deg,#7DBE77,#5BA85B)':'linear-gradient(135deg,#E68A84,#D9534F)';
   var knobLeft=on?'26px':'3px';
+  var hs=rec&&rec.health?rec.health:null;
+  var hsBlock='';
+  if(hs&&(hs.steps>0||hs.walkM>0)){
+    var hsAge='';
+    if(hs.updatedAt){ var hm=Math.round((Date.now()-new Date(hs.updatedAt).getTime())/60000); hsAge=hm<1?'az önce':hm<60?hm+' dk önce':hm<1440?Math.round(hm/60)+' sa önce':Math.round(hm/1440)+' g önce'; }
+    hsBlock='<div style="display:flex;align-items:center;gap:10px;background:rgba(143,191,138,0.10);border:1px solid rgba(143,191,138,0.28);border-radius:14px;padding:10px 12px;">'
+      +'<span style="font-size:18px;flex-shrink:0;">🍏</span>'
+      +'<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu:</b> '
+      +(hs.steps>0?hs.steps.toLocaleString('tr-TR')+' adım':'')+(hs.steps>0&&hs.walkM>0?' · ':'')+(hs.walkM>0?fmtDist(hs.walkM):'')
+      +'<div style="font-size:11px;color:var(--faint);margin-top:1px;">Telefon arka planda topladı'+(hsAge?' · '+hsAge:'')+'</div></div>'
+      +'</div>';
+  }
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
   h+='<div style="flex:1;font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:8px;">Konum & Hareket 📍 <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span></div>';
   h+='<button onclick="App.toggleLocation()" aria-label="Konum paylaşımı aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:56px;height:32px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+knobLeft+';width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
   h+='</div>';
   if(!on){
+    h+=hsBlock;
     h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür.</div>';
+    h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
     h+='</div>';
     return h;
   }
@@ -1328,7 +1415,9 @@ function locationCardHTML(){
   h+='</div>';
   if(mode==='auto') h+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
   else h+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">Ölçüm yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez). Hareketler korunur, silinmez.</div>';
+  h+=hsBlock;
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez); Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
+  h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
   h+='</div>';
   return h;
 }
@@ -2029,6 +2118,16 @@ function ayarlarHTML(){
     h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
   }
   h+='</div>';
+  // Sağlık senkronu kurulumu artık Bugün ekranındaki Konum & Hareket kartında
+  // (tek kaynak — genişletilebilir kart, kopyala-yapıştır alanlarıyla). Burada
+  // tekrarlamak yerine oraya yönlendiriyoruz.
+  if(connected){
+    h+='<button onclick="App.go(\'bugun\')" style="text-align:left;border:1px solid rgba(143,191,138,0.32);cursor:pointer;background:rgba(143,191,138,0.06);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:10px;">';
+    h+='<span style="font-size:18px;flex-shrink:0;">🍏</span>';
+    h+='<span style="flex:1;font-size:12.5px;line-height:1.4;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu</b> kurulumu Bugün ekranındaki Konum & Hareket kartına taşındı.</span>';
+    h+='<span style="flex-shrink:0;color:var(--faint);font-size:14px;">›</span>';
+    h+='</button>';
+  }
   // Luna · kişisel asistan (OpenAI anahtarı)
   var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());
   var oaBadge='';
@@ -2990,6 +3089,42 @@ function fetchObserverInbox(){
     .then(function(j){ if(j){ if(Array.isArray(j.messages)) mergeInbox(j.messages); applyReceipts(j.receipts); } })
     .catch(function(){});
 }
+// Telefonun Sağlık uygulamasından (iOS Kısayollar otomasyonu, arka planda kendi kendine
+// çalışır) bir GitHub Gist'e düşen {date,steps,walkM,updatedAt} anlık görüntüsünü çeker.
+// Gist kullanıyoruz çünkü ana repodaki dosya güncellemesi (Contents API) her seferinde
+// önce sha çekip sonra base64 içerik göndermeyi gerektiriyor — Kısayollar'da en kafa
+// karıştırıcı adımlar bunlardı. Gist'in PATCH'i düz metinle çalışır, sha istemez; Kısayol
+// 4 basit eyleme iner. Tarayıcı arka planda GPS izleyemediği için hareket verisinin asıl,
+// güvenilir kaynağı bu — konum kapalı olsa bile çalışır. Kullanıcı hiçbir şey yapmaz.
+function applyHealthSync(h){
+  if(!data||!h||typeof h!=='object'||!/^\d{4}-\d{2}-\d{2}$/.test(String(h.date||''))) return;
+  var date=h.date, rec=getDay(data,date,dayIndexFor(date));
+  if(!rec.health) rec.health=emptyHealth();
+  var steps=Number(h.steps), walkM=Number(h.walkM), changed=false;
+  if(!isNaN(steps)&&steps>rec.health.steps){ rec.health.steps=Math.round(steps); changed=true; }
+  if(!isNaN(walkM)&&walkM>rec.health.walkM){ rec.health.walkM=Math.round(walkM); changed=true; }
+  if(changed){
+    rec.health.updatedAt=String(h.updatedAt||new Date().toISOString());
+    save();
+    if(ui.tab==='bugun'&&!editing()) render();
+  }
+}
+function fetchHealthSync(){
+  var s=(data&&data.settings)?data.settings:{};
+  var tok=normalizeToken(s.ghToken||''), gid=String(s.healthGistId||'').trim();
+  if(!tok||!gid) return;
+  var api='https://api.github.com/gists/'+encodeURIComponent(gid)+'?t='+Date.now();
+  fetch(api,{headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(function(r){ if(!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function(j){
+      var f=j&&j.files&&j.files['health-sync.json'];
+      if(!f||!f.content) return;
+      var h; try{ h=JSON.parse(f.content); }catch(e){ return; }
+      applyHealthSync(h);
+    })
+    .catch(function(){});
+}
+function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); }
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];
@@ -3046,10 +3181,13 @@ function applyReceipts(rc){
   });
   if(changed){ save(); render(); }
 }
-// Faz 7: zorunlu psikolojik anket açık mı? (tamamlanmadıysa / süresi dolduysa arka plan popup'ları bastırılır)
-// Anket iki haftada bir yenilenir: hiç tamamlanmadıysa VEYA son tamamlanmadan bu yana ≥14 gün geçtiyse yeniden gösterilir.
+// Faz 7 anketi artık otomatik/zorunlu tetiklenmiyor (render() bu bayrağı dinlemiyor);
+// data.psych (geçmiş/skorlar) ve panelin gösterimi bozulmadan korunuyor.
+// psychDue() bilgi amaçlı bırakıldı; psychActive() her zaman false döner ki eski
+// "zorunlu anket açıkken arka plan popup'ı bastır" korumaları artık popup'ları
+// sonsuza dek susturmasın.
 function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
-function psychActive(){ try{ return psychDue(); }catch(e){ return false; } }
+function psychActive(){ return false; }
 function showInboxPopup(){
   if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
@@ -3751,12 +3889,12 @@ App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
 
-setTimeout(fetchObserverInbox,1500);
-setInterval(fetchObserverInbox,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları daha hızlı görünsün)
-document.addEventListener('visibilitychange',function(){ if(!document.hidden) fetchObserverInbox(); });
-window.addEventListener('focus',fetchObserverInbox);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',fetchObserverInbox); // bfcache'ten geri dönüşte
-window.addEventListener('online',fetchObserverInbox);   // bağlantı gelince bekleyen makbuzu da gönderir
+setTimeout(pollRemote,1500);
+setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) pollRemote(); });
+window.addEventListener('focus',pollRemote);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',pollRemote); // bfcache'ten geri dönüşte
+window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle

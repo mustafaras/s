@@ -250,6 +250,22 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **🍏 Sağlık senkronu kurulum kartı — genişletilebilir, avantajlı,
+  kopyala-yapıştır**: Ayarlar'daki düz metin talimat, Bugün ekranındaki Konum &
+  Hareket kartının hemen altına taşındı — kullanıcı GPS'in arka planda
+  çalışmadığını gördüğü anda gerçek çözümü de orada buluyor.
+  - `healthSetupCardHTML()`: `ui.healthSetupOpen` ile açılır/kapanır accordion
+    (`App.toggleHealthSetup`); daraltılmışken tek satır özet + "bağlı ✓" rozeti
+    (sağlık verisi geldiyse), genişleyince 4 maddelik avantaj listesi (pil dostu,
+    gerçekten arka planda, daha doğru, gizli kalır) + 3 adımlı kurulum + kopyala
+    çipleri.
+  - **Minimum hareket:** `App.copyHealthUrl` / `App.copyHealthAuth` /
+    `App.copyHealthFields` ile URL, Authorization jetonu ve gövde alan adları
+    tek dokunuşla panoya kopyalanıyor — jeton hiçbir zaman ekrana/HTML'e
+    basılmıyor, tıklanınca `data.settings.ghToken`'dan doğrudan okunup
+    kopyalanıyor. `shortcuts://` deep-link'i Kısayollar'ı doğrudan açıyor.
+  - Ayarlar'daki eski uzun blok kaldırıldı, yerine Bugün ekranına götüren kısa
+    bir yönlendirme kartı kondu (tek kaynak, iki yerde bakım yok).
 - **2026-07-06** — **🧠 Faz 7 anketinin zorunlu tetikleyicisi kaldırıldı**: İki
   haftada bir `render()`'ı tam ekran bloke eden `psychDue()` kontrolü
   kaldırıldı — anket artık hiç açılmadığı sürece kullanıcıyı uygulamaya

@@ -198,7 +198,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false};
+var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false};
 var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
@@ -506,6 +506,11 @@ App.pickQuoteBook=function(id){ if(!ui.quoteDraft) return; ui.quoteDraft.bookId=
 App.saveQuote=function(){ if(!ui.quoteDraft) return; var b=findBook(ui.quoteDraft.bookId); if(!b){ toast('Önce bir kitap seç 📖'); return; } var text=String(ui.quoteDraft.text||'').trim(); if(!text){ toast('Alıntıyı yaz 💬'); return; } var page=parseInt(ui.quoteDraft.page,10); if(isNaN(page)||page<0) page=null; if(!Array.isArray(b.quotes)) b.quotes=[]; b.quotes.push({id:uid('q'),text:text.slice(0,400),page:page,ts:new Date().toISOString()}); ui.quoteDraft=null; commit('Alıntı eklendi 💬'); };
 App.removeQuote=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var i=b.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ b.quotes.splice(i,1); commit('Alıntı silindi'); } };
 App.copyQuote=function(text){ try{ navigator.clipboard.writeText(text); toast('Kopyalandı 📋'); }catch(e){ toast('Kopyalanamadı'); } };
+App.toggleHealthSetup=function(){ ui.healthSetupOpen=!ui.healthSetupOpen; render(); };
+// Bearer jetonu ekrana hiç basılmadan (HTML'e gömülmeden), tıklanınca doğrudan panoya kopyalanır.
+App.copyHealthUrl=function(){ var sg=data.settings||{}; var repo=(sg.ghRepo||'').trim(); if(!repo){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } App.copyQuote('https://api.github.com/repos/'+repo+'/contents/data/health-sync.json'); };
+App.copyHealthAuth=function(){ var sg=data.settings||{}; if(!sg.ghToken){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } App.copyQuote('Bearer '+sg.ghToken); };
+App.copyHealthFields=function(){ App.copyQuote('date, steps, walkM, updatedAt'); };
 App.copyQuoteById=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var q=b.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+b.title+(q.page?', s.'+q.page:''); App.copyQuote(txt); };
 App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var q=t.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+t.title; App.copyQuote(txt); };
 
@@ -1299,6 +1304,46 @@ function stepReminder(rec){
 }
 function fmtDist(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
 function fmtDur(sec){ sec=Math.max(0,Math.round(Number(sec)||0)); if(sec<60) return sec+' sn'; var m=Math.round(sec/60); if(m<60) return m+' dk'; var hh=Math.floor(m/60), mm=m%60; return hh+' sa'+(mm?(' '+mm+' dk'):''); }
+// Sağlık senkronu kurulum kartı — daraltılmış/genişletilmiş (accordion). Konum kartının
+// hemen altında yaşar ki kullanıcı GPS'in arka planda çalışmadığını gördüğü anda
+// gerçek çözümü de orada bulsun. Bağlandıysa kısa bir "bağlı" özetine döner.
+function healthSetupCardHTML(connectedHealth){
+  var open=!!ui.healthSetupOpen;
+  var h='<div style="border:1px solid rgba(143,191,138,0.32);border-radius:16px;overflow:hidden;background:rgba(143,191,138,0.05);">';
+  h+='<button onclick="App.toggleHealthSetup()" style="width:100%;border:none;cursor:pointer;background:none;display:flex;align-items:center;gap:10px;padding:12px;text-align:left;">';
+  h+='<span style="font-size:20px;flex-shrink:0;">🍏</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;">bağlı ✓</span>':'')+'</div>';
+  h+='<div style="font-size:11.5px;color:var(--muted);">'+(connectedHealth?'Kurulum adımlarını gör':'Arka planda çalışır · pil dostu · tek seferlik kurulum')+'</div>';
+  h+='</div>';
+  h+='<span style="font-size:13px;color:var(--faint);flex-shrink:0;">'+(open?'Gizle ▴':'Göster ▾')+'</span>';
+  h+='</button>';
+  if(open){
+    h+='<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:11px;">';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--text2);line-height:1.4;">';
+    h+='<div>🔋 <b>Pil dostu</b> — GPS\'i sürekli açık tutmaz, telefonun kendi adım sayacını kullanır.</div>';
+    h+='<div>🌙 <b>Gerçekten arka planda</b> — uygulama kapalıyken, ekran kilitliyken bile veri toplanmaya devam eder.</div>';
+    h+='<div>🎯 <b>Daha doğru</b> — Sağlık\'ın hassas pedometresi, GPS tahmininden daha güvenilir.</div>';
+    h+='<div>🔒 <b>Gizli kalır</b> — veriler doğrudan senin GitHub deponda tutulur, başka bir sunucuya gitmez.</div>';
+    h+='</div>';
+    h+='<div style="font-size:12px;font-weight:800;color:var(--text);">Tek seferlik kurulum (yaklaşık 5 dk):</div>';
+    h+='<div style="font-size:12.5px;line-height:1.65;color:var(--text2);">';
+    h+='<b>1.</b> Kısayollar → Otomasyon → ➕ → Kişisel Otomasyon → <i>Saatin Zamanı</i> (günde birkaç kez tekrarlı) → "Çalıştırmadan Önce Sor" kapalı.<br>';
+    h+='<b>2.</b> Eylem ekle: <i>Sağlık Örneği Al</i> (Adım Sayısı, bugün, toplam) + <i>Sağlık Örneği Al</i> (Yürüme+Koşu Mesafesi, bugün, toplam).<br>';
+    h+='<b>3.</b> Eylem ekle: <i>URL İçeriğini Al</i> — yöntem PUT. Aşağıdaki değerleri yazmana gerek yok, dokun kopyalansın, Kısayollar\'a yapıştır.';
+    h+='</div>';
+    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:11px;">'+hint+'</span></span><span style="flex-shrink:0;font-size:14px;">📋</span></button>'; }
+    h+='<div style="display:flex;flex-direction:column;gap:7px;">';
+    h+=chip('copyHealthUrl','URL (PUT hedefi)','Dokun, panoya kopyalanır');
+    h+=chip('copyHealthAuth','Yetki (Authorization)','Dokun, jetonun panoya kopyalanır — ekranda görünmez');
+    h+=chip('copyHealthFields','Gövde alan adları','date, steps, walkM, updatedAt');
+    h+='</div>';
+    h+='<a href="shortcuts://" style="text-align:center;text-decoration:none;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);">Kısayollar\'ı Aç 🔗</a>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function locationCardHTML(){
   var s=data.settings||{};
   var on=!!s.locationEnabled;
@@ -1330,6 +1375,7 @@ function locationCardHTML(){
   if(!on){
     h+=hsBlock;
     h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür.</div>';
+    h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
     h+='</div>';
     return h;
   }
@@ -1351,6 +1397,7 @@ function locationCardHTML(){
   else h+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
   h+=hsBlock;
   h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez); Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
+  h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
   h+='</div>';
   return h;
 }
@@ -2051,12 +2098,15 @@ function ayarlarHTML(){
     h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
   }
   h+='</div>';
-  // Sağlık senkronu (Kısayollar otomasyonu) — bilgilendirme, tek seferlik kurulum
+  // Sağlık senkronu kurulumu artık Bugün ekranındaki Konum & Hareket kartında
+  // (tek kaynak — genişletilebilir kart, kopyala-yapıştır alanlarıyla). Burada
+  // tekrarlamak yerine oraya yönlendiriyoruz.
   if(connected){
-    h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Sağlık senkronu 🍏</div>';
-    h+='<div style="font-size:12.5px;line-height:1.6;color:var(--text2);">Tarayıcı, uygulama arka plandayken konumu izleyemez — bu yüzden adım/mesafe eksik kalabilir. Telefonunda <b>Kısayollar</b> uygulamasında bir kez kurulan sessiz bir otomasyon, Sağlık uygulamasındaki günlük adım ve yürüyüş mesafesini kendiliğinden buraya taşır. Kurulduktan sonra hiçbir şey yapmana gerek kalmaz.</div>';
-    h+='<div style="font-size:12px;line-height:1.6;color:var(--faint);background:var(--field);border-radius:12px;padding:10px 12px;">Kurulum: Kısayollar → Otomasyon → Kişisel Otomasyon → Saatin Zamanı (gün içinde birkaç kez tekrarlı) → "Çalıştırmadan Önce Sor" kapalı. Eylemler: Sağlık Örneği Al (Adım Sayısı, bugün, toplam) + Sağlık Örneği Al (Yürüme+Koşu Mesafesi, bugün, toplam) → URL İçeriğini Al: <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;">PUT https://api.github.com/repos/'+esc(sg.ghRepo||'…')+'/contents/data/health-sync.json</span>, Authorization: Bearer (yukarıdaki anahtarın aynısı), gövde <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">{date, steps, walkM, updatedAt}</span> alanlarıyla base64 + mevcut dosyanın sha\'sı.</div>';
-    h+='</div>';
+    h+='<button onclick="App.go(\'bugun\')" style="text-align:left;border:1px solid rgba(143,191,138,0.32);cursor:pointer;background:rgba(143,191,138,0.06);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:10px;">';
+    h+='<span style="font-size:18px;flex-shrink:0;">🍏</span>';
+    h+='<span style="flex:1;font-size:12.5px;line-height:1.4;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu</b> kurulumu Bugün ekranındaki Konum & Hareket kartına taşındı.</span>';
+    h+='<span style="flex-shrink:0;color:var(--faint);font-size:14px;">›</span>';
+    h+='</button>';
   }
   // Luna · kişisel asistan (OpenAI anahtarı)
   var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());

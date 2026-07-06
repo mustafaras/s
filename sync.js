@@ -1,4 +1,4 @@
-// sync.js — Şeyma 🦩 repo senkron katmanı (yalnızca doğrudan GitHub)
+// sync.js — Şeyma repo senkron katmanı (yalnızca doğrudan GitHub)
 // settings.ghToken + ghRepo (+ ghBranch) tanımlıysa, veriyi tarayıcıdan
 // doğrudan GitHub Contents API ile repoya yazar. Token YALNIZCA bu cihazın
 // localStorage'ında durur; repoya/sayfaya yazılmaz. Tanımlı değilse devre dışı.
@@ -81,6 +81,9 @@ function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
   if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; delete c.settings.openaiKey; }
   if(c&&c.weather&&Array.isArray(c.weather.spots)){ c.weather.spots.forEach(function(sp){ if(sp&&typeof sp==="object") delete sp.emoji; }); }
+  if(c&&c.library&&Array.isArray(c.library.books)){ c.library.books.forEach(function(b){ if(b&&typeof b==="object") delete b.emoji; }); }
+  if(c&&c.watchlist&&Array.isArray(c.watchlist.items)){ c.watchlist.items.forEach(function(t){ if(t&&typeof t==="object") delete t.emoji; }); }
+  if(c&&c.music&&Array.isArray(c.music.items)){ c.music.items.forEach(function(m){ if(m&&typeof m==="object") delete m.emoji; }); }
   return c;
 }
 function doPush(data){

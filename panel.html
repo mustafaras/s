@@ -419,6 +419,12 @@ function today(){ return fmt(new Date()); }
 function addDays(s,n){ var p=s.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]); d.setDate(d.getDate()+n); return fmt(d); }
 function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number); return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000); }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function cleanEmojiText(s){
+  return String(s==null?"":s)
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?(?:\u200D[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?)*/gu,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
 
 // ── Genişletilebilir kart şablonu (Faz 2) ──────────────────────────────────
 // Ortak cardWrap() tüm yoğun kartlar için tek merkezi kalıp: özet her zaman
@@ -789,7 +795,7 @@ function pmMediaSlotHTML(mediaKind,mediaId,w,h){
     var ratio=(w&&h)?(w+"/"+h):"1/1";
     return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP(\''+mediaId+'\')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
   }
-  return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">🎤 Yükleniyor…</span></div>';
+  return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
 }
 function pmRowMedia(side,tone,mediaKind,mediaId,w,h,footHtml,enter){
   var cls=side==="out"?("out-"+(tone||"aeon")):"in";
@@ -1245,7 +1251,7 @@ function psychCardHTML(){
   det+=drow(icon('target',16),'Dikkat & Odaklanma',at,atTone,sc.attention.shaded+'/6 eşik',sc.attention.shaded/6*100,'ASRS-6 tarama: '+(at==='yüksek uyum'?'DEHB ile yüksek uyum':(at==='sınırda'?'sınırda':'düşük eğilim')));
   det+=drow(icon('heart-handshake',16),'Bağlanma & Güven',stl,stTone,'kaygı '+sc.attachment.anxiety+' · kaçınma '+sc.attachment.avoidance,Math.max(sc.attachment.anxiety,sc.attachment.avoidance)/7*100,'ECR: kaygı '+sc.attachment.anxiety+'/7, kaçınma '+sc.attachment.avoidance+'/7');
   det+=drow(icon('wind',16),'Kaygı',an,anTone,sc.anxiety.sum+'/21',sc.anxiety.sum/21*100,'GAD-7 tarama puanı');
-  det+=drow(icon('cloud-rain',16),'Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey ⚠️':''));
+  det+=drow(icon('cloud-rain',16),'Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey':''));
   det+=drow(icon('sun',16),'İyi Oluş',wb,wbTone,sc.wellbeing.score+'/100',sc.wellbeing.score,'WHO-5 (yüksek daha iyidir)');
   det+=drow(icon('feather',16),'Öz-Şefkat',scz,sczTone,sc.selfCompassion.mean+'/5',sc.selfCompassion.mean/5*100,'SCS-SF ortalaması');
   // ── Tüm soru & cevaplar (denormalize edilmiş qa dizisi) ──
@@ -1492,14 +1498,14 @@ function render(){
   exRows+=exRowAlways(icon('moon',13)+' Uyku', sleepBits.join(" · "));
   var wk=srec.walk||{}, wkBits=[];
   var esP=effStepsP(srec);
-  if(esP.steps>0) wkBits.push(esP.steps.toLocaleString("tr-TR")+" adım"+(esP.source==="tracked"?"~":esP.source==="health"?" 🍏":""));
+  if(esP.steps>0) wkBits.push(esP.steps.toLocaleString("tr-TR")+" adım"+(esP.source==="tracked"?"~":esP.source==="health"?" "+icon('apple',12):""));
   if(wk.minutes!=null&&wk.minutes!=="") wkBits.push(esc(String(wk.minutes))+" dk");
   exRows+=exRowAlways(icon('footprints',13)+' Yürüyüş', wkBits.join(" · "));
   exRows+=exRowAlways(icon('droplet',13)+' Regl', (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[]; if(caf){ if(caf.cups!=null&&caf.cups!=="") cafBits.push(esc(String(caf.cups))+" fincan"); if(caf.last) cafBits.push("son "+esc(String(caf.last))); }
   exRows+=exRowAlways(icon('coffee',13)+' Kafein', cafBits.join(" · "));
-  exRows+=exRowAlways(icon('life-buoy',13)+' SOS', (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · "):"");
+  exRows+=exRowAlways(icon('life-buoy',13)+' SOS', (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · "):"");
   var TRIG={tired:"Yorgun",bored:"Sıkıldı",hungry:"Aç",stress:"Stres",habit:"Alışkanlık"};
   var trg=(Array.isArray(srec.cravingTriggers))?srec.cravingTriggers.map(function(x){var k=(x&&x.trigger)?x.trigger:x;return TRIG[k]||esc(String(k));}).filter(Boolean):[];
   exRows+=exRowAlways(icon('zap',13)+' Tetik', trg.join(" · "));
@@ -1538,7 +1544,7 @@ function render(){
   // Şükran (gratitude): bugünün güzel şeyleri
   var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
   exRows+=exRowAlways(icon('heart-handshake',13)+' Şükran', grEn.map(function(g){return esc(g);}).join(" · "));
-  // 🕯️ Bir yıl önce — seçili günün geçmiş yıllardaki aynı gününden en yakını (salt-okunur nostalji)
+  // Bir yıl önce — seçili günün geçmiş yıllardaki aynı gününden en yakını (salt-okunur nostalji)
   (function(){
     var selMMDD=String(selected).slice(5), selY=parseInt(String(selected).slice(0,4),10), best=null;
     for(var k in D.days){ if(String(k).slice(5)!==selMMDD) continue; var y=parseInt(String(k).slice(0,4),10); if(isNaN(y)||y>=selY) continue; var r=D.days[k]; if(!r) continue;
@@ -1579,9 +1585,9 @@ function render(){
         +'</div>';
     });
     lsEn.forEach(function(e){
-      var kind=LKIND[e&&e.kind]||'Şarkı'; var kEmo=(e&&e.kind==='podcast')?'🎙️':((e&&e.kind==='album')?'💿':'🎵'); var meta=[]; var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
+      var kind=LKIND[e&&e.kind]||'Şarkı'; var kIco=(e&&e.kind==='podcast')?icon('mic',15):((e&&e.kind==='album')?icon('disc',15):icon('music',15)); var meta=[]; var m=Number(e&&e.minutes); if(!isNaN(m)&&m>0) meta.push(m+' dk');
       h+='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid var(--teal);padding:8px 11px;">'
-        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="font-size:var(--f3);">'+kEmo+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
+        +'<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;color:var(--teal);">'+kIco+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(e&&e.title||"(başlıksız)").trim())+'</b>'
         +((e&&e.artist)?'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+esc(String(e.artist).trim())+'</span>':'')
         +'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+kind+'</span>'
         +(meta.length?'<span style="color:var(--teal);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
@@ -1649,7 +1655,7 @@ function render(){
     Object.keys(moodDist).forEach(function(k){
       if(!moodDist[k]) return;
       var pct=moodDist[k]/moodTotal*100;
-      h+='<span style="flex:'+moodDist[k]+';background:'+moodColor[k]+';" title="'+(MOOD_LABEL[k]||k)+': '+moodDist[k]+'">'+(pct>=14?moodIcon(k,12):"")+'</span>';
+      h+='<span style="flex:'+moodDist[k]+';background:'+moodColor[k]+';" title="'+(MOOD_LABEL[k]||k)+': '+moodDist[k]+'">'+(pct>=18?'<b class="mono" style="font-size:var(--f1);color:rgba(7,7,9,.68);">'+moodDist[k]+'</b>':"")+'</span>';
     });
   } else {
     h+='<span style="flex:1;background:var(--s3);color:var(--t4);">veri yok</span>';
@@ -1657,7 +1663,7 @@ function render(){
   h+='</div>';
   h+='<div class="moodlegend">';
   Object.keys(moodDist).forEach(function(k){
-    h+='<span class="mlg"><span class="mdot" style="background:'+moodColor[k]+';"></span>'+moodIcon(k,13)+' <b class="mono">'+moodDist[k]+'</b></span>';
+    h+='<span class="mlg"><span class="mdot" style="background:'+moodColor[k]+';"></span><span style="font-size:var(--f1);color:var(--t3);font-weight:800;">'+esc(MOOD_LABEL[k]||k)+'</span> <b class="mono">'+moodDist[k]+'</b></span>';
   });
   h+='</div>';
   h+='<div class="divider"></div>';
@@ -1706,13 +1712,13 @@ function render(){
   h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
-  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">📝</span>Not yok</div>';
+  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Not yok</div>';
   h+='</div></div>';
 
   h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Geçmişi'+(sosRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+sosRows.length+' gün</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
-  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(String(x));}).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">🛟</span>Kriz kaydı yok</div>';
+  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">'+icon('life-buoy',20)+'</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
   // ROW 5: Pro insights — 4 ayrı kart (Kullanım/Konum/Hareket/Risk) tek "Gelişmiş
@@ -1792,15 +1798,15 @@ function render(){
       var qn=(Array.isArray(b.quotes)?b.quotes.length:0);
       var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
       s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
-      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(b.emoji||'📖')+'</span>';
+      s+='<span style="line-height:1.1;flex-shrink:0;display:inline-flex;color:var(--purple);">'+icon('book-open',20)+'</span>';
       s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(b.title||'').trim())+'</b>'+chip(st[0],st[1])+'</div>';
-      if(meta.length) s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      if(meta.length) s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · '+icon('quote',11)+' '+qn:'')+'</div>';
       s+='</div>'+(b.rating?stars(b.rating):'')+'</div>';
       if(b.status!=='finished'){
         s+=pbar(pct,'linear-gradient(90deg,var(--purple),#e9afc1)');
         s+='<div style="display:flex;justify-content:space-between;color:var(--t3);font-size:var(--f1);font-weight:700;margin-top:4px;"><span>'+cur+(total?' / '+total+' sf':' sf')+'</span><span>%'+Math.round(pct)+'</span></div>';
       } else {
-        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;">🎉 '+(finDate(b.finishedAt)?finDate(b.finishedAt)+' tarihinde bitti':'Tamamlandı')+(total?' · '+total+' sayfa':'')+'</div>';
+        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;display:flex;align-items:center;gap:4px;">'+icon('trophy',12)+' '+(finDate(b.finishedAt)?finDate(b.finishedAt)+' tarihinde bitti':'Tamamlandı')+(total?' · '+total+' sayfa':'')+'</div>';
       }
       return s+'</div>';
     }
@@ -1812,15 +1818,15 @@ function render(){
       var qn=(Array.isArray(t.quotes)?t.quotes.length:0);
       var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
       s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
-      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(t.emoji||'🎬')+'</span>';
+      s+='<span style="line-height:1.1;flex-shrink:0;display:inline-flex;color:var(--amber);">'+icon('clapperboard',20)+'</span>';
       s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(t.title||'').trim())+'</b>'+chip(st[0],st[1])+'</div>';
-      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · '+icon('quote',11)+' '+qn:'')+'</div>';
       s+='</div>'+(t.rating?stars(t.rating):'')+'</div>';
       if(t.status!=='finished' && t.kind==='dizi'){
         s+=pbar(pct,'linear-gradient(90deg,var(--amber),#e9afc1)');
         s+='<div style="display:flex;justify-content:space-between;color:var(--t3);font-size:var(--f1);font-weight:700;margin-top:4px;"><span>'+cur+(total?' / '+total+' bölüm':' bölüm')+'</span><span>%'+Math.round(pct)+'</span></div>';
       } else if(t.status==='finished'){
-        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;">🎉 '+(finDate(t.finishedAt)?finDate(t.finishedAt)+' tarihinde bitti':'Tamamlandı')+'</div>';
+        s+='<div style="color:var(--t4);font-size:var(--f1);font-weight:600;margin-top:5px;display:flex;align-items:center;gap:4px;">'+icon('trophy',12)+' '+(finDate(t.finishedAt)?finDate(t.finishedAt)+' tarihinde bitti':'Tamamlandı')+'</div>';
       }
       return s+'</div>';
     }
@@ -1867,9 +1873,9 @@ function render(){
       var qn=(Array.isArray(x.quotes)?x.quotes.length:0);
       var s='<div style="background:var(--s1);border:1px solid var(--bd2);border-radius:12px;padding:10px 12px;">';
       s+='<div style="display:flex;align-items:flex-start;gap:9px;">';
-      s+='<span style="font-size:21px;line-height:1.1;flex-shrink:0;">'+(x.emoji||'🎵')+'</span>';
+      s+='<span style="line-height:1.1;flex-shrink:0;display:inline-flex;color:var(--teal);">'+icon('music',20)+'</span>';
       s+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+esc(String(x.title||'').trim())+'</b>'+chip(kindLbl,'var(--teal)')+'</div>';
-      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · 💬 '+qn:'')+'</div>';
+      s+='<div style="color:var(--t3);font-size:var(--f1);margin-top:1px;">'+meta.join(' · ')+(qn?' · '+icon('quote',11)+' '+qn:'')+'</div>';
       s+='</div>'+(x.rating?stars(x.rating):'')+'</div>';
       return s+'</div>';
     }
@@ -1890,9 +1896,9 @@ function render(){
     h+=cardWrap({key:'music-archive',icon:icon('headphones',18),title:'Dinleme Arşivi',badge:'<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+MUS.length+' parça</span>',span:6,order:50,summary:mSum,details:mDet});
 
     // ---- Alıntılar & Replikler ----
-    var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',emoji:b.emoji||'📖',title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
-    var reps=[]; WL.forEach(function(t){ (Array.isArray(t.quotes)?t.quotes:[]).forEach(function(q){ reps.push({kind:'title',emoji:t.emoji||'🎬',title:t.title,text:q.text,ts:q.ts,col:'var(--amber)'}); }); });
-    var lyr=[]; MUS.forEach(function(x){ (Array.isArray(x.quotes)?x.quotes:[]).forEach(function(q){ lyr.push({kind:'track',emoji:x.emoji||'🎵',title:String(x.title||'').trim()+(x.artist?' — '+String(x.artist).trim():''),text:q.text,ts:q.ts,col:'var(--teal)'}); }); });
+    var quotes=[]; LIB.forEach(function(b){ (Array.isArray(b.quotes)?b.quotes:[]).forEach(function(q){ quotes.push({kind:'book',ico:icon('book-open',12),title:b.title,text:q.text,page:q.page,ts:q.ts,col:'var(--purple)'}); }); });
+    var reps=[]; WL.forEach(function(t){ (Array.isArray(t.quotes)?t.quotes:[]).forEach(function(q){ reps.push({kind:'title',ico:icon('clapperboard',12),title:t.title,text:q.text,ts:q.ts,col:'var(--amber)'}); }); });
+    var lyr=[]; MUS.forEach(function(x){ (Array.isArray(x.quotes)?x.quotes:[]).forEach(function(q){ lyr.push({kind:'track',ico:icon('music',12),title:String(x.title||'').trim()+(x.artist?' — '+String(x.artist).trim():''),text:q.text,ts:q.ts,col:'var(--teal)'}); }); });
     var allq=quotes.concat(reps).concat(lyr).sort(function(a,b){ return String(b.ts||'').localeCompare(String(a.ts||'')); });
     if(allq.length){
       var qSum='<span>'+quotes.length+' alıntı · '+reps.length+' replik · '+lyr.length+' söz</span>';
@@ -1901,7 +1907,7 @@ function render(){
         qDet+='<div style="background:var(--s1);border:1px solid var(--bd2);border-left:3px solid '+q.col+';border-radius:12px;padding:11px 13px;position:relative;overflow:hidden;">'
           +'<div style="position:absolute;top:-4px;right:8px;font-size:40px;color:'+q.col+';opacity:.14;line-height:1;font-weight:800;">”</div>'
           +'<div style="font-size:var(--f3);color:var(--t1);line-height:1.5;font-style:italic;position:relative;word-break:break-word;">“'+esc(String(q.text||'').trim())+'”</div>'
-          +'<div style="font-size:var(--f1);color:var(--t3);font-weight:700;margin-top:7px;">'+q.emoji+' '+esc(String(q.title||'').trim())+(q.kind==='book'&&q.page?' · s.'+q.page:'')+'</div>'
+          +'<div style="font-size:var(--f1);color:var(--t3);font-weight:700;margin-top:7px;display:flex;align-items:center;gap:4px;">'+q.ico+' '+esc(String(q.title||'').trim())+(q.kind==='book'&&q.page?' · s.'+q.page:'')+'</div>'
           +'</div>';
       });
       qDet+='</div>';
@@ -1967,14 +1973,14 @@ function initLocMap(){
   // son konum marker (flamingo pin)
   var flamingoIcon=L.divIcon({
     className:"",
-    html:'<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#E9899F,#C9B8FF);border:3px solid #fff;box-shadow:0 3px 12px rgba(180,100,140,0.45);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:16px;line-height:1;">🦩</span></div>',
+    html:'<div style="width:36px;height:36px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,#E9899F,#C9B8FF);border:3px solid #fff;box-shadow:0 3px 12px rgba(180,100,140,0.45);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:14px;line-height:1;color:#fff;font-weight:900;">S</span></div>',
     iconSize:[36,36],
     iconAnchor:[18,36],
     popupAnchor:[0,-38]
   });
   var ts=new Date(loc.ts).toLocaleString("tr-TR");
   _locMarker=L.marker([loc.lat,loc.lng],{icon:flamingoIcon})
-    .bindPopup('<div style="font-size:13px;font-weight:700;line-height:1.5;">Şeyma 🦩<br><span style="font-weight:400;color:#69645d;">'+ts+'</span><br><span style="font-weight:400;color:#8b847d;">±'+loc.acc+'m doğruluk</span></div>',{maxWidth:220})
+    .bindPopup('<div style="font-size:13px;font-weight:700;line-height:1.5;">Şeyma<br><span style="font-weight:400;color:#69645d;">'+ts+'</span><br><span style="font-weight:400;color:#8b847d;">±'+loc.acc+'m doğruluk</span></div>',{maxWidth:220})
     .addTo(_locMap);
 
   // doğruluk dairesi
@@ -1989,9 +1995,9 @@ function initLocMap(){
         if(!addrEl.isConnected) return;
         var a=geo&&geo.address?geo.address:{};
         var parts=[a.road||a.pedestrian,a.neighbourhood||a.suburb,a.town||a.city||a.village,a.state].filter(Boolean);
-        addrEl.textContent="📍 "+(parts.length?parts.join(", "):geo.display_name||"Adres bulunamadı");
+        addrEl.textContent=parts.length?parts.join(", "):(geo.display_name||"Adres bulunamadı");
       })
-      .catch(function(){ if(addrEl.isConnected) addrEl.textContent="📍 Adres çözümlenemedi"; });
+      .catch(function(){ if(addrEl.isConnected) addrEl.textContent="Adres çözümlenemedi"; });
   }
 }
 
@@ -2274,7 +2280,7 @@ window.sendAeonMediaP=function(kind,base64,mime,extra){
   putAeonMediaP(id,payload).then(function(){
     return loadInbox().then(function(res){
       var msgs=(res.messages||[]).slice();
-      var m={id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:(kind==="voice"?"🎤 Sesli mesaj":"📷 Fotoğraf"),ts:new Date().toISOString(),kind:kind,mediaId:id,mediaMime:mime};
+      var m={id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:(kind==="voice"?"Sesli mesaj":"Fotoğraf"),ts:new Date().toISOString(),kind:kind,mediaId:id,mediaMime:mime};
       if(extra){ if(extra.durationSec!=null) m.durationSec=extra.durationSec; if(extra.peaks) m.peaks=extra.peaks; if(extra.w) m.w=extra.w; if(extra.h) m.h=extra.h; }
       if(pending&&pending.id) m.replyTo=pending.id;
       msgs.push(m);

@@ -937,8 +937,6 @@ function render(){
 
   if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
 
-  if(psychDue()){ app.innerHTML=psychHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
-
   var prevScroll=document.querySelector('[data-scroll]');
   var prevTop=prevScroll?prevScroll.scrollTop:0;
   var sameTab=(lastRenderTab===ui.tab);
@@ -3103,10 +3101,13 @@ function applyReceipts(rc){
   });
   if(changed){ save(); render(); }
 }
-// Faz 7: zorunlu psikolojik anket açık mı? (tamamlanmadıysa / süresi dolduysa arka plan popup'ları bastırılır)
-// Anket iki haftada bir yenilenir: hiç tamamlanmadıysa VEYA son tamamlanmadan bu yana ≥14 gün geçtiyse yeniden gösterilir.
+// Faz 7 anketi artık otomatik/zorunlu tetiklenmiyor (render() bu bayrağı dinlemiyor);
+// data.psych (geçmiş/skorlar) ve panelin gösterimi bozulmadan korunuyor.
+// psychDue() bilgi amaçlı bırakıldı; psychActive() her zaman false döner ki eski
+// "zorunlu anket açıkken arka plan popup'ı bastır" korumaları artık popup'ları
+// sonsuza dek susturmasın.
 function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
-function psychActive(){ try{ return psychDue(); }catch(e){ return false; } }
+function psychActive(){ return false; }
 function showInboxPopup(){
   if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });

@@ -250,6 +250,17 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-06** — **🧠 Faz 7 anketinin zorunlu tetikleyicisi kaldırıldı**: İki
+  haftada bir `render()`'ı tam ekran bloke eden `psychDue()` kontrolü
+  kaldırıldı — anket artık hiç açılmadığı sürece kullanıcıyı uygulamaya
+  girişte durdurmuyor. `data.psych` (geçmiş/skorlar) ve panelin "Psikolojik
+  Profil" kartı bozulmadan korunuyor; sadece otomatik/zorunlu açılış
+  durduruldu. `psychActive()` artık her zaman `false` dönüyor ki eski
+  "zorunlu anket açıkken arka plan popup'ını bastır" korumaları (gelen kutusu
+  popup'ı, ÆON yanıt popup'ı) bir daha tetiklenmeyen anketin ardında kalıp
+  sonsuza dek susmasın. `psychHTML()`/`App.psychBegin` vb. anket ekranı kodu
+  dokunulmadan (ileride manuel/opsiyonel bir giriş noktasına bağlanabilir
+  şekilde) bırakıldı.
 - **2026-07-06** — **🍏 Sağlık senkronu (arka plan hareket verisi)**: Tarayıcı,
   uygulama arka plandayken GPS izleyemediği için (`watchPosition` yalnızca
   foreground'da çalışır) kısa aktiflik sürelerinde mesafe/adım verisi eksik

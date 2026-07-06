@@ -1004,7 +1004,7 @@ function reportHTML(){
   var range=shortDate(data.startDate)+' – '+shortDate(todayStr());
   var h='';
   h+='<div style="text-align:center;padding:30px 0 24px;border-bottom:2px solid #F2E1DA;margin-bottom:26px;">';
-  h+='<div style="font-size:34px;font-weight:800;display:flex;align-items:center;gap:8px;">Şeyma '+icon('heart',28)+'</div>';
+  h+='<div style="font-size:34px;font-weight:800;">Şeyma 🦩</div>';
   h+='<div style="font-size:16px;color:#7A6B70;margin-top:6px;">Minik Denge Günlüğü</div>';
   h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
   h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
@@ -1037,7 +1037,7 @@ function openReport(){
     // Quick Look / pop-up engelli: aynı sayfada yazdırılabilir katman
     inlinePrint(); return;
   }
-  var doc='<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Şeyma Rapor</title>'
+  var doc='<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Şeyma 🦩 Rapor</title>'
     +'<style>@page{margin:14mm;}body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#2C2426;margin:0;padding:24px;}@media print{.noprint{display:none;}}</style></head><body>'
     +'<div class="noprint" style="text-align:center;margin-bottom:18px;"><button onclick="window.print()" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;cursor:pointer;">Yazdır / PDF kaydet</button></div>'
     +reportHTML()+'</body></html>';
@@ -1138,7 +1138,7 @@ function onboardingHTML(){
   return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 28px);gap:22px;animation:seyFade .3s ease;">'
    +'<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">'
    +'<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#E9899F;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 12px 30px rgba(233,175,193,0.4);">'+icon('heart',38)+'</div>'
-   +'<h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;">Şeyma '+icon('heart',28)+'</h1>'
+   +'<h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.5px;">Şeyma 🦩</h1>'
    +'<div style="font-size:16px;color:var(--muted);">Minik Denge Günlüğü</div></div>'
    +'<div class="glass" style="border-radius:26px;padding:24px;box-shadow:0 10px 30px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:14px;">'
    +'<p style="margin:0;font-size:19px;font-weight:700;">Hoş geldin Sevgili Günışığı</p>'
@@ -1756,7 +1756,7 @@ function bugunHTML(){
   // hero
   h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-  h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;display:flex;align-items:center;gap:5px;">ŞEYMA '+icon('heart',14)+'</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
+  h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:8px;"><button onclick="App.toggleTheme()" aria-label="Tema" style="border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(201,184,255,0.22);color:var(--choc);">'+icon(dark?'sun':'moon',16)+'</button>';
   h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';
@@ -2272,7 +2272,7 @@ function ayarlarHTML(){
   h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span style="display:inline-flex;">'+icon('trash-2',16)+'</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön',icon('rotate-ccw',17));
   // add to home guide
-  h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma</b><br>5. Ekle</div></div>';
+  h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Bu app giriş istemez. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
   h+='</div>';
   return h;

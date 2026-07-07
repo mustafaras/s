@@ -25,7 +25,7 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 ```
 index.html      Thin HTML shell. Loads styles.css, app.js, sync.js with
                  cache-busting `?v=YYYYMMDDx` query strings.
-app.js           The entire Şeyma app (single IIFE, ~3.7k lines). Owns state,
+app.js           The entire Şeyma app (single IIFE, ~4.4k lines). Owns state,
                  rendering, and all feature logic.
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).

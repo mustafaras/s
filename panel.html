@@ -1045,14 +1045,74 @@ function wxP(code,isDay){
 }
 function weatherSpotIconName(sp){ return (sp&&sp.iconName)||(sp&&sp.key==="live"?"map-pin":(sp&&sp.key==="is"?"building-2":"house")); }
 function weatherSpotIcon(sp,size){ return icon(weatherSpotIconName(sp),size||16); }
+// Panel canlı hava durumu — senkron D.weather'a bağlı kalmadan, Şeyma'nın son GPS
+// konumundan (D.location) doğrudan Open-Meteo'dan çekilir. Böylece panel her zaman
+// kullanıcının bulunduğu yerin havasını gösterir; sabit "Ev/Kazan" verisine takılmaz.
+var PWX={coords:null,spot:null,fetchedAt:0,fetching:false,name:''};
+function pwxStale(lat,lng){
+  if(PWX.fetching) return false;
+  if(!PWX.spot||!PWX.coords) return true;
+  if(haversineKm(PWX.coords,{lat:lat,lng:lng})>2.5) return true;   // ~2.5 km oynadıysa tazele
+  return (Date.now()-PWX.fetchedAt)>30*60000;                      // ya da 30 dk geçtiyse
+}
+function pwxReverseGeocode(lat,lng){
+  if(typeof fetch!=="function") return;
+  fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lng+"&localityLanguage=tr")
+    .then(function(r){ return r.ok?r.json():Promise.reject(0); }).then(function(j){
+      var nm=j.locality||j.city||j.principalSubdivision||"";
+      if(nm){ PWX.name=nm; if(PWX.spot) PWX.spot.place=nm; render(); }
+    }).catch(function(){});
+}
+function fetchPanelWeather(lat,lng){
+  if(typeof fetch!=="function"||PWX.fetching) return;
+  PWX.fetching=true;
+  var far=(PWX.coords&&haversineKm(PWX.coords,{lat:lat,lng:lng})>2.5);
+  if(far) PWX.name="";   // yeni bölge → adı yeniden çöz
+  var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng
+    +"&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m"
+    +"&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max"
+    +"&timezone=auto&forecast_days=1";
+  fetch(url).then(function(r){ return r.ok?r.json():Promise.reject(r.status); }).then(function(w){
+    if(!w||!w.current){ PWX.fetching=false; return; }
+    var dl=w.daily||{};
+    PWX.spot={
+      key:"live", label:"Konumun", place:PWX.name||((D&&D.weather&&D.weather.liveName)||""), iconName:"map-pin",
+      temp:Math.round(w.current.temperature_2m), feels:Math.round(w.current.apparent_temperature),
+      hum:w.current.relative_humidity_2m, wind:Math.round(w.current.wind_speed_10m),
+      precip:w.current.precipitation, code:w.current.weather_code, isDay:w.current.is_day===1,
+      hi:(dl.temperature_2m_max?Math.round(dl.temperature_2m_max[0]):null),
+      lo:(dl.temperature_2m_min?Math.round(dl.temperature_2m_min[0]):null),
+      uv:(dl.uv_index_max?Math.round(dl.uv_index_max[0]):null),
+      pop:(dl.precipitation_probability_max?dl.precipitation_probability_max[0]:null),
+      sunrise:(dl.sunrise?dl.sunrise[0]:null), sunset:(dl.sunset?dl.sunset[0]:null)
+    };
+    PWX.coords={lat:lat,lng:lng}; PWX.fetchedAt=Date.now(); PWX.fetching=false;
+    if(!PWX.name) pwxReverseGeocode(lat,lng);
+    render();
+  }).catch(function(){ PWX.fetching=false; });
+}
+function ensurePanelWeather(loc){
+  if(!loc||typeof loc.lat!=="number"||typeof loc.lng!=="number") return;
+  if(pwxStale(loc.lat,loc.lng)) fetchPanelWeather(loc.lat,loc.lng);
+}
 function weatherCardHTML(){
+  var loc=(D&&D.location&&typeof D.location.lat==="number"&&typeof D.location.lng==="number")?D.location:null;
+  if(loc) ensurePanelWeather(loc);   // kullanıcının bulunduğu yerin havasını panelin kendisi çeker
   var wx=D&&D.weather?D.weather:null;
-  var spots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
+  var syncedSpots=(wx&&Array.isArray(wx.spots)&&wx.spots.length)?wx.spots:null;
+  // Öncelik: panelin canlı konumdan çektiği hava; yoksa uygulamanın senkron verisine düş.
+  var spots=null, fetchedAt=0;
+  if(loc && PWX.spot && PWX.coords){ spots=[PWX.spot]; fetchedAt=PWX.fetchedAt; }
+  else if(syncedSpots){ spots=syncedSpots; fetchedAt=(wx&&wx.fetchedAt)?new Date(wx.fetchedAt).getTime():0; }
   var s='<div class="card lift span-12 pad" style="order:10;">';
   var upd='';
-  if(wx&&wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
+  if(fetchedAt){ var am=Math.round((Date.now()-fetchedAt)/60000); upd=am<1?'az önce':am<60?am+'dk önce':am<1440?Math.round(am/60)+'sa önce':Math.round(am/1440)+'g önce'; }
   s+='<div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('sun',14)+' Günışığı · Hava'+(spots?'<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+esc(upd)+'</span>':'')+'</div>';
-  if(!spots){ s+='<div class="empty" style="flex:1;"><span class="ei">'+icon('cloud-sun',20)+'</span>Hava verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama Bugün ekranında açıldığında gelir</span></div></div>'; return s; }
+  if(!spots){
+    var wMsg=(loc&&PWX.fetching)?'Konumundan hava çekiliyor…':'Hava verisi bekleniyor';
+    var wSub=loc?'Şeyma’nın son konumundan güncelleniyor':'Uygulama Bugün ekranında açıldığında gelir';
+    s+='<div class="empty" style="flex:1;"><span class="ei">'+icon('cloud-sun',20)+'</span>'+wMsg+'<span style="font-size:var(--f2);color:var(--t4);">'+wSub+'</span></div></div>'; return s;
+  }
   s+='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
   for(var i=0;i<spots.length;i++){
     var sp=spots[i]; var m=wxP(sp.code,sp.isDay);

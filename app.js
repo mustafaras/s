@@ -1617,6 +1617,10 @@ function wxSpotIcon(sp,size){ return icon(wxSpotIconName(sp),size||16); }
 function wxStale(){
   if(!data.weather||!data.weather.fetchedAt||!(data.weather.spots&&data.weather.spots.length)) return true;
   if(data.weather.mode!==wxMode()) return true;
+  if(wxMode()==='live' && data.location && typeof data.location.lat==='number' && data.weather.coords){
+    var moved=haversineM({lat:data.weather.coords.lat,lng:data.weather.coords.lng},{lat:data.location.lat,lng:data.location.lng});
+    if(moved>3000) return true;   // ~3 km'den fazla oynadıysa konum havasını tazele
+  }
   var age=Date.now()-new Date(data.weather.fetchedAt).getTime();
   return !(age>=0 && age<30*60000);
 }
@@ -1648,10 +1652,14 @@ function fetchWeather(){
       });
     }
     if(!out.length){ wxFetching=false; return; }
+    var live=wxMode()==='live';
+    var prevCoords=(data.weather&&data.weather.coords)?data.weather.coords:null;
     var keepName=(data.weather&&data.weather.liveName)||'';
-    data.weather={mode:wxMode(), fetchedAt:new Date().toISOString(), spots:out, liveName:keepName};
+    var liveCoords=(live&&spots[0])?{lat:spots[0].lat,lng:spots[0].lng}:null;
+    if(live && prevCoords && liveCoords && haversineM(prevCoords,liveCoords)>3000) keepName=''; // yeni bölge → adı yeniden çöz
+    data.weather={mode:wxMode(), fetchedAt:new Date().toISOString(), spots:out, liveName:keepName, coords:liveCoords};
     wxFetching=false; saveLocal();
-    if(wxMode()==='live' && !data.weather.liveName) reverseGeocodeLive(spots[0].lat, spots[0].lng);
+    if(live && !data.weather.liveName) reverseGeocodeLive(spots[0].lat, spots[0].lng);
     if(ui.tab==='bugun') render();
   }).catch(function(){ wxFetching=false; });
 }

@@ -200,6 +200,9 @@
   @keyframes hchipWarn{0%,100%{background:var(--ra);border-color:var(--red);box-shadow:0 0 0 rgba(251,113,133,0)}50%{background:var(--rb);border-color:var(--red);box-shadow:0 0 11px rgba(251,113,133,.6)}}
   .hchip.warn{color:var(--red);border-color:var(--red);font-weight:800;animation:hchipWarn 1.15s ease-in-out infinite}
   .hchip.warn .habit-dot{background:var(--red);box-shadow:0 0 8px var(--red);animation:hchipWarn 1.15s ease-in-out infinite}
+  .hchip.auto{border-style:dashed;border-color:var(--bd2)}
+  .hchip.auto .habit-dot{background:rgba(255,255,255,.24)}
+  .hprog{margin-left:5px;font-size:var(--f1);font-weight:800;background:rgba(255,255,255,.06);border-radius:6px;padding:1px 6px;letter-spacing:.2px}
 
   /* ── mood segment bar ── */
   .moodseg{display:flex;height:24px;border-radius:999px;overflow:hidden;border:1px solid var(--bd2);background:var(--s2)}
@@ -374,12 +377,28 @@ var PTOKEN="";
 var D=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
-var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 20 dk yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D vitaminimi aldım"],["sleepReg","Yeterli uyudum (7+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"]];
+var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D vitaminimi aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"]];
 var HT=HABITS.length;
 function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
 var MOOD_ICON={"cok-iyi":"sun","iyi":"flower-2","normal":"leaf","zorlandim":"cloud-rain","cok-zorlandim":"droplets"};
 var MOOD_LABEL={"cok-iyi":"Çok iyi","iyi":"İyi","normal":"Normal","zorlandim":"Zorlandım","cok-zorlandim":"Çok zorlandım"};
 function moodIcon(id,size){ return MOOD_ICON[id]?icon(MOOD_ICON[id],size||14):""; }
+// ── Veri-güdümlü tikler (app ile aynı eşikler) — gözlemci ilerlemeyi de görsün ──
+var WATER_GOAL_P=8, SLEEP_TICK_MIN_P=7.5, STEP_TICK_MIN_P=4500;
+var DERIVED_P={water:1,sleepReg:1,walked20:1};
+var DERIVED_ACCENT_P={water:"#5EA9E6",sleepReg:"#B9A6E6",walked20:"#7DD389"};
+function habitProgP(rec,key){
+  if(key==="water"){ var w=(rec&&typeof rec.water==="number"&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL_P,cur:w,goal:WATER_GOAL_P}; }
+  if(key==="sleepReg"){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=="")?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN_P),cur:h,goal:SLEEP_TICK_MIN_P}; }
+  if(key==="walked20"){ var s=effStepsP(rec).steps||0; return {met:s>=STEP_TICK_MIN_P,cur:s,goal:STEP_TICK_MIN_P}; }
+  return null;
+}
+function habitProgLabel(key,p){
+  if(key==="water") return p.cur+"/"+WATER_GOAL_P;
+  if(key==="sleepReg") return (p.cur==null?"—":String(p.cur).replace(".",",")+" sa");
+  if(key==="walked20") return p.cur.toLocaleString("tr-TR")+"/4.500";
+  return "";
+}
 var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
 var SLEEP_MED={none:"Hayir",herbal:"Bitkisel/Melatonin",rx:"Receteli"};
 var FLOW={spot:"Leke",light:"Hafif",medium:"Orta",heavy:"Yogun"};
@@ -1455,8 +1474,12 @@ function render(){
   var CRIT={vitaminD:1,water:1,protein:1,sleepReg:1};
   HABITS.forEach(function(hb){
     var ok=!!(srec.habits&&srec.habits[hb[0]]);
-    var warn=(!ok && CRIT[hb[0]] && selected===today());
-    h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':'')+'><span class="habit-dot"></span>'+hb[1]+'</span>';
+    var derived=DERIVED_P[hb[0]];
+    // türetilmiş tikler (su/uyku/yürüyüş) kırmızı uyarı taşımaz — sakin, veri-güdümlü; ilerlemeyi gösterir
+    var warn=(!ok && CRIT[hb[0]] && !derived && selected===today());
+    var extra='';
+    if(derived && !ok){ var p=habitProgP(srec,hb[0]); var ac=DERIVED_ACCENT_P[hb[0]]; extra='<span class="hprog" style="color:'+ac+';">'+habitProgLabel(hb[0],p)+'</span>'; }
+    h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+(derived&&!ok?' auto':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':(derived&&!ok?' title="'+hb[1]+' — veri girildiğinde otomatik yeşillenir"':''))+'><span class="habit-dot"></span>'+hb[1]+extra+'</span>';
   });
   h+='</div>';
   var sdSumEnd=h.length; // özet (dstats+chip) burada biter; bundan sonrası detay olarak sarılır

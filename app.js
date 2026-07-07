@@ -123,11 +123,11 @@ function icon(name,size,cls){
 var HABITS=[
   {key:'sweetManaged',icon:icon('cookie',22),title:'Tatlı krizini yönettim',sub:'Tatlı seni değil, sen tatlıyı yönettin.',msg:'Tatlı lobisi bugün hafif geriledi. Şeyma 1 - Tatlı 0.'},
   {key:'eveningControl',icon:icon('moon',22),title:"Akşam 7'den sonra gereksiz atıştırmadım",sub:'Gerçek açlık başka, dolapla duygusal bağ başka.',msg:'Mutfak seferi iptal. Operasyon başarılı.'},
-  {key:'walked20',icon:icon('footprints',22),title:'En az 20 dk yürüdüm',sub:'Kısa yürüyüş de sayılır. Sistem çalışıyor.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
+  {key:'walked20',icon:icon('footprints',22),title:'En az 4.500 adım yürüdüm',sub:'Günlük 4.500 adım, bedenine tatlı bir eşik.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
   {key:'protein',icon:icon('egg',22),title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
   {key:'water',icon:icon('droplet',22),title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
   {key:'vitaminD',icon:icon('sun',22),title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti.'},
-  {key:'sleepReg',icon:icon('bed',22),title:'Yeterli uyudum (7+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor.',since:'2026-06-28'},
+  {key:'sleepReg',icon:icon('bed',22),title:'Yeterli uyudum (7,5+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor.',since:'2026-06-28'},
   {key:'journaled',icon:icon('pen-line',22),title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı.',since:'2026-07-03'},
   {key:'freshAir',icon:icon('leaf',22),title:'Açık havaya çıktım',sub:'Doğal ışık, ruh hâlini yukarı çeker.',msg:'Açık hava tamam. Güneş ve ruh hâlin selam gönderdi.',since:'2026-07-03'},
   {key:'selfKind',icon:icon('heart',22),title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
@@ -320,6 +320,8 @@ function migrate(d){
   if(!Array.isArray(d.music.items)) d.music.items=[];
   if(!d.music.goal||typeof d.music.goal!=='object') d.music.goal={dailyMinutes:30,yearlyTitles:null};
   d.music.items=d.music.items.map(normTrack).filter(Boolean);
+  // Veri-güdümlü tikleri bugüne göre bir kez hizala (geçmiş günlere dokunma — kayıt bütünlüğü).
+  try{ var _t=todayStr(); if(d.days&&d.days[_t]&&d.days[_t].habits) syncDerivedHabits(d.days[_t]); }catch(e){}
   d.version=2;
   return d;
 }
@@ -383,7 +385,7 @@ var FOOD_DB=[
 ];
 var FOOD_FALLBACK={p:7,c:150,piece:60,plate:200};
 var MEAL_UNITS=[{id:'tabak',label:'tabak'},{id:'gr',label:'gr'},{id:'adet',label:'adet'}];
-var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=2000, STEP_LEN_M=0.72;
+var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
 function foodLookup(name){
   var n=String(name||'').toLowerCase().trim(); if(!n) return null;
   for(var i=0;i<FOOD_DB.length;i++){ var f=FOOD_DB[i]; for(var j=0;j<f.k.length;j++){ if(n.indexOf(f.k[j])>=0) return f; } }
@@ -416,6 +418,33 @@ function effSteps(rec){
   if(hs>0) return {steps:hs,source:'health'};
   var tr=trackedSteps(rec); if(tr>0) return {steps:tr,source:'tracked'};
   return {steps:null,source:'none'};
+}
+// ── Veri-güdümlü tikler ──────────────────────────────────────────────────────
+// Su / uyku / yürüyüş tikleri elle işaretlenmez; yalnızca ilgili veri eşiği
+// tutunca kendiliğinden yeşillenir. habitProgress hem kapı (met) hem de premium
+// ilerleme metni/çubuğu için gereken her şeyi döndürür. Renkler her tik için ayrı.
+var DERIVED_HABITS={water:1,sleepReg:1,walked20:1};
+var DERIVED_ACCENT={water:'#5EA9E6',sleepReg:'#9B7FC9',walked20:'#5BA85B'};
+function habitProgress(rec,key){
+  if(key==='water'){ var w=(rec&&typeof rec.water==='number'&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL,cur:w,goal:WATER_GOAL,unit:'bardak',has:w>0}; }
+  if(key==='sleepReg'){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN),cur:h,goal:SLEEP_TICK_MIN,unit:'saat',has:h!=null}; }
+  if(key==='walked20'){ var e=effSteps(rec); var s=(e.steps!=null&&!isNaN(e.steps))?e.steps:0; return {met:s>=STEP_TICK_MIN,cur:s,goal:STEP_TICK_MIN,unit:'adım',has:s>0,source:e.source}; }
+  return null;
+}
+// day.habits[key]'i veriyle senkronlar; yeni yeşillenen anahtarları döndürür (kutlama için).
+function syncDerivedHabits(day){
+  if(!day||!day.habits) return [];
+  var newly=[];
+  for(var k in DERIVED_HABITS){ var p=habitProgress(day,k); if(!p) continue; if(p.met&&!day.habits[k]) newly.push(k); day.habits[k]=p.met; }
+  return newly;
+}
+function hexA(hex,a){ var s=String(hex).replace('#',''); if(s.length===3) s=s[0]+s[0]+s[1]+s[1]+s[2]+s[2]; var n=parseInt(s,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+// Türetilmiş tik'in (henüz tutmayan) kısa, kibar ilerleme metni.
+function derivedProgText(key,prog){
+  if(key==='water') return prog.cur<=0?'Su ekle · '+WATER_GOAL+' bardakta otomatik yeşil':prog.cur+'/'+WATER_GOAL+' bardak · dolunca otomatik yeşil';
+  if(key==='sleepReg') return prog.cur==null?'Uyku gir · 7,5 saatte otomatik yeşil':String(prog.cur).replace('.',',')+' saat · 7,5 saatte otomatik yeşil';
+  if(key==='walked20') return prog.cur<=0?'Adım gir · 4.500 adımda otomatik yeşil':prog.cur.toLocaleString('tr-TR')+' / 4.500 adım · otomatik yeşil';
+  return '';
 }
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
 
@@ -542,6 +571,8 @@ App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
   var date=activeDate(), idx=dayIndexFor(date), day=getDay(data,date,idx);
+  // Su / uyku / yürüyüş tikleri elle işaretlenmez — yalnızca veri eşiği tutunca yeşillenir.
+  if(DERIVED_HABITS[key]){ App.explainDerivedHabit(key,day); return; }
   var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day); haptic(14);
   ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   var msg='Kaydedildi'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
@@ -549,6 +580,27 @@ App.toggleHabit=function(key){
   if(editing()) return;
   var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
   else if(day.habits[key]){ maybeStreak(); }
+};
+// Türetilmiş tik'e dokunulduğunda: eşik tutuyorsa sıcak onay, tutmuyorsa ne yapılacağını kibarca anlat.
+App.explainDerivedHabit=function(key,day){
+  var p=habitProgress(day,key); if(!p) return; haptic(10);
+  if(p.met){
+    var ok={ water:'Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak. Bu tik otomatik, ellemene gerek yok.',
+             sleepReg:'Uyku tamam — 7,5+ saat. Bu tik kendiliğinden yeşil kalır.',
+             walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.' };
+    toast(ok[key]); return;
+  }
+  var msg;
+  if(key==='water'){ var w=p.cur; msg = w<=0
+      ? 'Su tiki otomatik: '+WATER_GOAL+' bardağı tamamlayınca kendiliğinden yeşillenir. Aşağıdaki “Su” kartından eklemeye başla.'
+      : 'Su tikine az kaldı — şu an '+w+'/'+WATER_GOAL+' bardak. '+(WATER_GOAL-w)+' bardak daha, kendiliğinden yeşillenecek.'; }
+  else if(key==='sleepReg'){ var h=p.cur; msg = h==null
+      ? 'Uyku tiki otomatik: Sağlık kartına 7,5 saat ve üzeri uyku girince kendiliğinden yeşillenir.'
+      : 'Uyku tiki 7,5 saatte yeşillenir — şu an '+String(h).replace('.',',')+' saat. Girişini güncelleyince otomatik dolar.'; }
+  else if(key==='walked20'){ var s=p.cur; msg = s<=0
+      ? 'Yürüyüş tiki otomatik: 4.500 adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'
+      : 'Yürüyüş tikine '+(STEP_TICK_MIN-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+STEP_TICK_MIN.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'; }
+  toast(msg,2800);
 };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
 App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); haptic(14); commit(); };
@@ -565,7 +617,7 @@ App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[
 App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- su ----
-App.waterAdd=function(n){ var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); if(day.water>=WATER_GOAL&&!day.habits.water){ day.habits.water=true; toast('Su tiki işaretlendi'); } day.savedAt=new Date().toISOString(); commit(); };
+App.waterAdd=function(n){ var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ haptic(16); toast('Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- enerji / stres ----
 App.setEnergy=function(v){ var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); commit(); };
@@ -576,7 +628,7 @@ App.setCaffeineTime=function(el){ var v=el.value; var day=curDay(); if(!day.caff
 App.caffeineCups=function(n){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null}; var v=(Number(day.caffeine.cups)||0)+n; day.caffeine.cups=Math.max(0,Math.min(15,v)); day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
-App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; if(day.sleep.hours!=null&&day.sleep.hours>=7&&!day.habits.sleepReg){ day.habits.sleepReg=true; toast('Uyku tiki işaretlendi'); } day.savedAt=new Date().toISOString(); save(); }); };
+App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; var nw=syncDerivedHabits(day); if(nw.indexOf('sleepReg')>=0){ haptic(16); toast('Uyku tiki kendiliğinden yeşillendi. 7,5+ saat, tam dinlenme.'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.setSleepQuality=function(id){ var day=curDay(); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMed=function(type){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
@@ -741,11 +793,11 @@ App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.i
 App.onGratitude=function(i,el){ var v=el.value; i=Number(i)||0; debounceSave('grat'+i,function(){ var day=curDay(); if(!Array.isArray(day.gratitude)) day.gratitude=[]; day.gratitude[i]=String(v||'').slice(0,160); day.savedAt=new Date().toISOString(); save(); },500); };
 
 
-App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.steps!=null&&day.walk.steps>=STEP_TICK_MIN&&!day.habits.walked20){ day.habits.walked20=true; toast('Adımınla yürüyüş tiki işaretlendi'); } day.savedAt=new Date().toISOString(); save(); }); };
+App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); var nw=syncDerivedHabits(day); if(nw.indexOf('walked20')>=0){ haptic(16); toast('Yürüyüş tiki kendiliğinden yeşillendi. 4.500+ adım, harika!'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
 App.hideStepRemind=function(){ ui.stepRemindHidden=true; render(); };
 App.hideWaterNudge=function(){ ui.waterNudgeHidden=true; render(); };
-App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); if(day.walk.minutes!=null&&day.walk.minutes>=20&&!day.habits.walked20){ day.habits.walked20=true; toast('20 dk yürüyüş tiki işaretlendi'); } day.savedAt=new Date().toISOString(); save(); }); };
+App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); day.savedAt=new Date().toISOString(); save(); }); };
 
 // ---- Apple Health import ----
 App.importHealthClick=function(){ var f=document.getElementById('sey-health-file'); if(f) f.click(); };
@@ -769,8 +821,9 @@ function parseHealthXML(xml){
     else if(type.indexOf('SleepAnalysis')>=0 && /Asleep/i.test(val||'')){ var t1=Date.parse(sd),t2=Date.parse(ed); if(t1&&t2&&t2>t1) sleepMs+=(t2-t1); }
   }
   var d=getDay(data,today,dayIndexFor(today)); var msgs=[];
-  if(steps>0){ d.walk.steps=Math.round(steps); msgs.push(Math.round(steps)+' adım'); if(d.walk.steps>=STEP_TICK_MIN&&!d.habits.walked20){ d.habits.walked20=true; msgs.push('yürüyüş tiki'); } }
-  if(sleepMs>0){ var hrs=Math.round(sleepMs/3600000*10)/10; d.sleep.hours=hrs; msgs.push(hrs+' sa uyku'); if(hrs>=7&&!d.habits.sleepReg){ d.habits.sleepReg=true; msgs.push('uyku tiki'); } }
+  if(steps>0){ d.walk.steps=Math.round(steps); msgs.push(Math.round(steps)+' adım'); }
+  if(sleepMs>0){ var hrs=Math.round(sleepMs/3600000*10)/10; d.sleep.hours=hrs; msgs.push(hrs+' sa uyku'); }
+  var nwH=syncDerivedHabits(d); if(nwH.indexOf('walked20')>=0) msgs.push('yürüyüş tiki'); if(nwH.indexOf('sleepReg')>=0) msgs.push('uyku tiki');
   if(steps>0||sleepMs>0){ d.savedAt=new Date().toISOString(); save(); render(); }
   if(st) st.textContent=(steps>0||sleepMs>0)?('İçe aktarıldı: '+msgs.join(' · ')):(found?'Bugün için adım/uyku verisi bulunamadı.':'Bugüne ait kayıt yok. Dosya güncel mi?');
 }
@@ -1736,6 +1789,7 @@ function bugunHTML(){
   var curIdx=Math.max(1,curRaw);
   var streak=currentStreak();
   var rec=data.days[viewDate]||null;
+  if(rec) syncDerivedHabits(rec); // türetilmiş tikleri, işlenen günün verisiyle görüntüden önce hizala
   var completed=countRec(rec);
   var circ=2*Math.PI*42;
   var badge='Bugün nazlı başladı';
@@ -1792,17 +1846,38 @@ function bugunHTML(){
   // habits
   h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">'+(ed?'O GÜNÜN TİKLERİ':'BUGÜNÜN TİKLERİ')+'</div>';
   HABITS.forEach(function(hb){
-    var done=!!(rec&&rec.habits[hb.key]); var pulsing=ui.pulse===hb.key;
-    var warn=(!done && (hb.key==='vitaminD'||hb.key==='water'||hb.key==='protein'||hb.key==='sleepReg'));
-    var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):'var(--card)';
-    var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':'var(--card-bd)');
-    var sh=done?'0 10px 26px rgba(233,175,193,0.4)':'0 6px 16px rgba(108,74,58,0.06)';
+    var derived=!!DERIVED_HABITS[hb.key];
+    var prog=derived?habitProgress(rec,hb.key):null;
+    var done=derived?!!(prog&&prog.met):!!(rec&&rec.habits[hb.key]);
+    var pulsing=ui.pulse===hb.key;
+    var accent=DERIVED_ACCENT[hb.key];
+    var locked=(derived&&!done);
+    // Kırmızı "kritik" uyarı yalnızca türetilmemiş kritik tikler için — türetilmişler sakin "otomatik" hissi taşır.
+    var warn=(!done && !derived && (hb.key==='vitaminD'||hb.key==='protein'));
+    var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(locked?hexA(accent,dark?0.07:0.05):'var(--card)');
+    var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':(locked?hexA(accent,0.4):'var(--card-bd)'));
+    var sh=done?'0 10px 26px rgba(233,175,193,0.4)':(locked?'0 6px 16px '+hexA(accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
     h+='<button onclick="App.toggleHabit(\''+hb.key+'\')"'+(warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">';
-    h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;background:var(--icon);">'+hb.icon+'</div>';
-    h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;">'+esc(hb.title)+'</div>';
-    h+=done?'<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>':'<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
+    h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(locked?hexA(accent,0.12):'var(--icon)')+';color:'+(locked?accent:'var(--text)')+';">'+hb.icon+'</div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(hb.title)+(derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(done?'#3F8A4F':accent)+';background:'+(done?'rgba(143,191,138,0.2)':hexA(accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
+    if(done){
+      h+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>';
+    } else if(locked){
+      var pct=Math.min(100,Math.max(0,Math.round(((prog.cur||0)/prog.goal)*100)));
+      h+='<div style="font-size:12.5px;color:'+accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(hb.key,prog))+'</div>';
+      h+='<div style="height:6px;border-radius:999px;background:'+hexA(accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(accent,0.65)+','+accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>';
+    } else {
+      h+='<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
+    }
     h+='</div>';
-    h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:'+(done?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(done?'none':'2px solid '+(warn?'var(--warn)':'var(--field-bd)'))+';">'+(done?'✓':'')+'</div></button>';
+    if(done){
+      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>';
+    } else if(locked){
+      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(accent,0.85)+';border:2px solid '+hexA(accent,0.4)+';background:'+hexA(accent,0.06)+';">'+icon('lock',12)+'</div>';
+    } else {
+      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:transparent;border:2px solid '+(warn?'var(--warn)':'var(--field-bd)')+';"></div>';
+    }
+    h+='</button>';
   });
 
   // akşam adım hatırlatması (yalnızca akşam, bugünün adımı boşsa)
@@ -2481,7 +2556,7 @@ function saglikHTML(){
     h+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Yürüyüşünü işaretledin, harika. İstersen adımını da ekle — ilerlemeni daha net görürüz. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
     h+='<button onclick="App.hideStepNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
   }
-  if(!ed) h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥20 dk <b>veya</b> ≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini otomatik işaretler.</div>';
+  if(!ed) h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini kendiliğinden yeşillendirir (süre yalnızca kayıt içindir)</div>';
   h+='</div>';
   if(!ed) h+=sparkCard();
   h+=discomfortCard(rec);
@@ -3068,7 +3143,7 @@ function onLocationFix(pos){
           if(useMode==='vehicle') rec.movement.vehicleM+=dist; else rec.movement.walkM+=dist;
           var addSec=Math.min(dt,30);
           if(useMode==='vehicle') rec.movement.vehicleSec=(rec.movement.vehicleSec||0)+addSec; else rec.movement.walkSec=(rec.movement.walkSec||0)+addSec;
-          if(useMode!=='vehicle' && !(rec.walk&&rec.walk.steps!=null&&rec.walk.steps!=='') && rec.habits && !rec.habits.walked20 && trackedSteps(rec)>=STEP_TICK_MIN){ rec.habits.walked20=true; }
+          syncDerivedHabits(rec);
           rec.movement.samples++;
           if(inst>rec.movement.maxSpeed) rec.movement.maxSpeed=inst;
           rec.movement.track.push({lat:fix.lat,lng:fix.lng,ts:new Date(fix.ts).toISOString(),mode:useMode});

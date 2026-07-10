@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-10 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
@@ -46,8 +46,9 @@ _Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
 | 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, **"Bugün gösterme"→o günlük sus (ertesi gün tekrar çıkar, `optOutDay`)**; konum AÇIK iken Bugün kartında gerçek veri: mesafe + **⏱️ süre** (`walkSec`/`vehicleSec`), panel "Bugün Hareket"e yansır; 8 reddten sonra fısıltı modu (2026-07-03) |
+| 24 | ☕ Kafein bilimsel takip + otomatik tik | 7 | ✅ | `CAFFEINE_TYPES` katalogu (türk/espresso/filtre/americano/cappuccino/latte/siyah çay/yeşil çay/enerji · mg/serving), `CAFFEINE_LIMITS` (standart 400/hassas 300/gebe 200), `caffeineTotalMg`/`caffeineResidueAt`/`caffeineCutoffTime`/`caffeineTimingOk`; Sağlık'ta premium kafein kartı (içecek chip'leri + günlük içim listesi + saat input + limit bar + tek sefer 200 mg / günlük limit / geç-kahve uyarıları + yatma saati kalıntı göstergesi + EFSA/FDA kaynak notu); `caffeineMode`/`targetBed` ayarları; 6-faktör `sleepReadiness` (süre 26/kalite 18/kafein 18/okuma 16/wind-down 14/ilaç 8); yeni **türetilmiş** "Günlük kafein limitini aşmadım" tiki (`caffeineOk`, elle tıklanmaz — miktar+saat sağlanınca otomatik yeşil); panel kafein satırı mg+kalıntı hesaplar (2026-07-10) |
 
-**Sayım:** ✅ 12 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 13 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 
@@ -250,6 +251,23 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-10** — **☕ Kafein bilimsel takip + 6-faktör uyku hazırlığı + otomatik kafein tiki**: Sağlık sekmesindeki
+  kafein takibi "kaç fincan" basitliğinden çıkarıldı; içecek türlerine göre **otomatik mg hesabı + günlük limit +
+  uyku zamanlaması** bağlantılı bilimsel sisteme çevrildi. `CAFFEINE_TYPES` katalogu (türk kahvesi 60 · espresso 60 ·
+  filtre 95 · americano 77 · cappuccino 63 · latte 63 · siyah çay 40 · yeşil çay 25 · enerji 80 mg/serving) ve
+  `CAFFEINE_LIMITS` (standart 400 / hassas 300 / gebe 200 mg — EFSA 2015 & FDA) sabitleri eklendi. `caffeineTotalMg` /
+  `caffeineResidueAt` (yarı ömür ~5 sa, `0.5^(dt/5)`) / `caffeineCutoffTime` (yatma − 6 sa) / `caffeineTimingOk`
+  fonksiyonları hesapları yapar. Sağlık'ta premium kafein kartı: içecek chip grid + günlük içim listesi (satır başına
+  saat input + sil) + limit bar (yeşil/sarı/kırmızı) + tek sefer 200 mg / günlük limit aşımı / geç-kahve uyarıları +
+  yatma saatindeki kalıntı göstergesi (<50 yeşil "dalmayı etkilemez" · 50-100 sarı · >100 kırmızı) + `targetBed` input
+  + EFSA/FDA kaynak notu. `settings.caffeineMode` (standart/hassas/gebe) + `settings.targetBed` migrate ile backfill
+  edildi; eski `cups`/`last` verisi `drinks`'e (türk) geriye uyumlu çevrilir — veri kaybı yok. **"Uykuya dalma hazırlığı"
+  kartı** 4-faktörden **6-faktöre** çıktı (süre 26 · kalite 18 · kafein 18 · okuma 16 · wind-down 14 · ilaç 8 = 100) —
+  kafein kalıntı/zamanlama ve wind-down hijyeni bilimsel faktör olarak eklendi. Yeni **türetilmiş** "Günlük kafein
+  limitini aşmadım" tiki (`caffeineOk`): elle tıklanmaz, kafein miktarı (≤ limit) + son içim saati (≤ cut-off)
+  sağlanınca otomatik yeşillenir; hiç kahve içilmeyen günlerde de yeşil (0 mg = limit aşılmadı). `coffeeManaged` tiki
+  (kriz/istek yönetimi) ayrı amaçla korundu. Panel kafein satırı drinks'ten mg + yatma kalıntısı hesaplar (eski
+  cups/last fallback'i korundu). jsdom test 31/31; cache-bust `v=20260710m`.
 - **2026-07-10** — **🆘 SOS sekmesi → üçlü "Raşit'in Kriz Odaları" (modal)**: Alttaki
   `sos` sekmesi kaldırıldı; tatlı krizi tek buton yerine **Bugün**'de üçlü, Raşit-temalı
   bir kart oldu: **Tatlı · Yemek · Kahve**. Her biri tıklanınca süreli, bilimsel bir

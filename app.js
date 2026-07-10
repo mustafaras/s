@@ -135,9 +135,53 @@ var HABITS=[
   {key:'journaled',icon:icon('pen-line',22),title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı.',since:'2026-07-03'},
   {key:'mediaFed',icon:icon('sparkles',22),title:'Zihnimi besledim',sub:'Okudum, izledim, dinledim ya da öğrendim.',msg:'Zihnine iyi bir şey kattın — küçük ama besleyici.',since:'2026-07-09'},
   {key:'freshAir',icon:icon('leaf',22),title:'Açık havaya çıktım',sub:'Doğal ışık, ruh hâlini yukarı çeker.',msg:'Açık hava tamam. Güneş ve ruh hâlin selam gönderdi.',since:'2026-07-03'},
-  {key:'selfKind',icon:icon('heart',22),title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
+  {key:'selfKind',icon:icon('heart',22),title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'},
+  {key:'caffeineOk',icon:icon('coffee',22),title:'Günlük kafein limitini aşmadım',sub:'Kafein saat ve miktarına bağlı — elle açılmaz.',msg:'Kafein limiti + zamanlama tamam. Uyku için de temiz bir gün.',since:'2026-07-10'}
 ];
 var HABIT_TOTAL=HABITS.length;
+
+// ---- Kafein — bilimsel takip (EFSA 2015 · FDA · Harvard Health) ----
+// mg değerleri bir serving (fincan/shot/kupa/bardak/kutu) başına ortalama; demleme/
+// çekirdek fark eder, kullanıcı karttan başına göre ayarlayabilir. Yarı ömür
+// ~5 saat (sağlıklı yetişkin). Son kahve yatmadan ~6 saat önce; bedtime kalıntısı
+// <50 mg uykuyu anlamlı etkilemez.
+var CAFFEINE_TYPES=[
+  {id:'turk',label:'Türk kahvesi',mg:60,unit:'fincan'},
+  {id:'espresso',label:'Espresso',mg:60,unit:'shot'},
+  {id:'filter',label:'Filtre kahve',mg:95,unit:'kupa'},
+  {id:'americano',label:'Americano',mg:77,unit:'kupa'},
+  {id:'cappuccino',label:'Cappuccino',mg:63,unit:'kupa'},
+  {id:'latte',label:'Latte',mg:63,unit:'kupa'},
+  {id:'black-tea',label:'Siyah çay',mg:40,unit:'bardak'},
+  {id:'green-tea',label:'Yeşil çay',mg:25,unit:'bardak'},
+  {id:'energy',label:'Enerji içeceği',mg:80,unit:'kutu'}
+];
+var CAFFEINE_LIMITS={standard:400,sensitive:300,pregnant:200};
+var CAFFEINE_SINGLE_DOSE=200;   // tek seferlik güvenli doz (mg) — EFSA
+var CAFFEINE_HALFLIFE_H=5;      // ortalama yarı ömür (saat)
+var CAFFEINE_SLEEP_SAFE_MG=50;  // bedtime kalıntı eşiği (mg)
+var CAFFEINE_CUTOFF_H=6;        // yatandan önceki önerilen kafein kesme (saat)
+var CAFFEINE_DEFAULT_BED='23:30';
+function caffeineType(id){ for(var i=0;i<CAFFEINE_TYPES.length;i++){ if(CAFFEINE_TYPES[i].id===id) return CAFFEINE_TYPES[i]; } return null; }
+function caffeineMode(){ var m=(data&&data.settings&&data.settings.caffeineMode)||'standard'; return (m==='sensitive'||m==='pregnant')?m:'standard'; }
+function caffeineLimit(){ return CAFFEINE_LIMITS[caffeineMode()]||400; }
+function caffeineTargetBed(){ var b=(data&&data.settings&&data.settings.targetBed)||CAFFEINE_DEFAULT_BED; return /^\d{2}:\d{2}$/.test(b)?b:CAFFEINE_DEFAULT_BED; }
+// "HH:MM" -> dakika
+function hhmmToMin(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(':'); return Number(p[0])*60+Number(p[1]); }
+function minToHHMM(m){ if(m==null||isNaN(m)) return ''; m=((m%1440)+1440)%1440; return pad(Math.floor(m/60))+':'+pad(m%60); }
+// drinks dizisinden türetilen değerler
+function caffeineDrinks(rec){ var c=(rec&&rec.caffeine&&Array.isArray(rec.caffeine.drinks))?rec.caffeine.drinks:[]; return c; }
+function caffeineTotalMg(rec){ var t=0; caffeineDrinks(rec).forEach(function(d){ var ty=caffeineType(d&&d.type); if(!ty) return; var q=Math.max(1,Number(d.qty)||1); t+=ty.mg*q; }); return Math.round(t); }
+function caffeineLastTime(rec){ var last=null; caffeineDrinks(rec).forEach(function(d){ if(d&&d.time&&/^\d{2}:\d{2}$/.test(d.time)){ if(!last||d.time>last) last=d.time; } }); return last; }
+function caffeineMaxSingle(rec){ var mx=0; caffeineDrinks(rec).forEach(function(d){ var ty=caffeineType(d&&d.type); if(!ty) return; var q=Math.max(1,Number(d.qty)||1); mx=Math.max(mx,ty.mg*q); }); return Math.round(mx); }
+// Yatma saatindeki kafein kalıntısı (mg) — her içim yarı ömür decay, topla.
+function caffeineResidueAt(rec,targetBed){
+  var bed=hhmmToMin(targetBed||caffeineTargetBed()); if(bed==null) return 0;
+  var total=0; caffeineDrinks(rec).forEach(function(d){ var ty=caffeineType(d&&d.type); if(!ty) return; var t=hhmmToMin(d&&d.time); if(t==null) return; var dt=(bed-t)/60; if(dt<0) dt+=24; if(dt<0) return; var q=Math.max(1,Number(d.qty)||1); var mg=ty.mg*q; total+=mg*Math.pow(0.5,dt/CAFFEINE_HALFLIFE_H); });
+  return Math.round(total);
+}
+function caffeineCutoffTime(targetBed){ var bed=hhmmToMin(targetBed||caffeineTargetBed()); if(bed==null) return ''; return minToHHMM(bed-CAFFEINE_CUTOFF_H*60); }
+function caffeineTimingOk(rec,targetBed){ var last=caffeineLastTime(rec); if(!last) return true; var cut=caffeineCutoffTime(targetBed||caffeineTargetBed()); return !!cut && last<=cut; }
 function habitCountOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i].since; if(!s||(date&&date>=s)) n++; } return n; }
 function htToday(){ return habitCountOn(todayStr()); }
 function emptyDiscomfort(){ return {regions:{},note:'',meds:[]}; }
@@ -511,6 +555,8 @@ function migrate(d){
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
   if(typeof d.settings.hideRepoBanner!=='boolean') d.settings.hideRepoBanner=false;
+  if(d.settings.caffeineMode!=='standard'&&d.settings.caffeineMode!=='sensitive'&&d.settings.caffeineMode!=='pregnant') d.settings.caffeineMode='standard';
+  if(typeof d.settings.targetBed!=='string'||!/^\d{2}:\d{2}$/.test(d.settings.targetBed)) d.settings.targetBed=CAFFEINE_DEFAULT_BED;
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
@@ -675,7 +721,7 @@ function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElem
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 // ---------- SAYGI · günün bilim ve sanat insanı ----------
@@ -838,8 +884,8 @@ function effSteps(rec){
 // Su / uyku / yürüyüş tikleri elle işaretlenmez; yalnızca ilgili veri eşiği
 // tutunca kendiliğinden yeşillenir. habitProgress hem kapı (met) hem de premium
 // ilerleme metni/çubuğu için gereken her şeyi döndürür. Renkler her tik için ayrı.
-var DERIVED_HABITS={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1};
-var DERIVED_ACCENT={water:'#5EA9E6',sleepReg:'#9B7FC9',walked20:'#5BA85B',journaled:'#E0A93C',sweetManaged:'#E9899F',foodManaged:'#E0A55E',coffeeManaged:'#A9805B',mediaFed:'#C77D93'};
+var DERIVED_HABITS={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1,caffeineOk:1};
+var DERIVED_ACCENT={water:'#5EA9E6',sleepReg:'#9B7FC9',walked20:'#5BA85B',journaled:'#E0A93C',sweetManaged:'#E9899F',foodManaged:'#E0A55E',coffeeManaged:'#A9805B',mediaFed:'#C77D93',caffeineOk:'#8A5A2B'};
 // Bugün okuma/izleme/dinleme/öğrenme hub'larından en az birine kayıt girildi mi? (mediaFed tiki)
 function hasAnyHubEntry(rec){
   if(!rec) return false;
@@ -856,6 +902,7 @@ function habitProgress(rec,key){
   if(key==='foodManaged'){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true,has:fd}; }
   if(key==='coffeeManaged'){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true,has:kd}; }
   if(key==='mediaFed'){ var any=hasAnyHubEntry(rec); return {met:any,cur:any?1:0,goal:1,binary:true,has:any}; }
+  if(key==='caffeineOk'){ var cafTotal=caffeineTotalMg(rec); var cafLimit=caffeineLimit(); var cafLast=caffeineLastTime(rec); var cafHas=caffeineDrinks(rec).length>0; var amountOk=cafTotal<=cafLimit; var timingOk=caffeineTimingOk(rec); var met=amountOk&&(cafHas?timingOk:true); return {met:met,cur:cafTotal,goal:cafLimit,unit:'mg',has:cafHas,amountOk:amountOk,timingOk:timingOk}; }
   return null;
 }
 // day.habits[key]'i veriyle senkronlar; yeni yeşillenen anahtarları döndürür (kutlama için).
@@ -876,6 +923,7 @@ function derivedProgText(key,prog){
   if(key==='foodManaged') return 'Yemek/açlık krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
   if(key==='coffeeManaged') return 'Kahve/kafein krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
   if(key==='mediaFed') return 'Okudum / izledim / dinledim / öğrendim\'den birini doldur → yeşillenir';
+  if(key==='caffeineOk'){ return prog.amountOk ? (prog.has ? 'Son kahve vaktinde, miktar temiz → otomatik yeşil' : 'Bugün kahve yok → otomatik yeşil') : 'Kafein limiti ('+prog.goal+' mg) aşıldı — azaltınca düzelir'; }
   return '';
 }
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
@@ -1094,7 +1142,8 @@ App.explainDerivedHabit=function(key,day){
              sweetManaged:'Tatlı krizini yönettin — bu tik kendiliğinden yeşil kaldı. Helal sana.',
              foodManaged:'Yemek/açlık krizini yönettin — bu tik kendiliğinden yeşil kaldı. Kaptan sensin.',
              coffeeManaged:'Kahve/kafein krizini yönettin — bu tik kendiliğinden yeşil kaldı. Net karar.',
-             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin. Bu tik otomatik yeşil.' };
+             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin. Bu tik otomatik yeşil.',
+             caffeineOk:'Kafein tiki temiz — günlük limit aşılmadı ve son kahve vaktinde. Otomatik yeşil.' };
     toast(ok[key]||'Bu tik otomatik — eşik tuttuğunda kendiliğinden yeşil kalır.'); return;
   }
   // Kriz tikleri: dokununca ilgili kriz odasını (modal) aç — en işlevlisi bu.
@@ -1113,6 +1162,7 @@ App.explainDerivedHabit=function(key,day){
       : 'Yürüyüş tikine '+(STEP_TICK_MIN-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+STEP_TICK_MIN.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'; }
   else if(key==='journaled'){ msg='Not tiki otomatik: “Günün yansıması” kartına bir cümle bile yazınca kendiliğinden yeşillenir.'; }
   else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim kutucuklarından birini doldur → yeşillenir.'; }
+  else if(key==='caffeineOk'){ if(!p.amountOk) msg='Kafein tiki otomatik: günlük limit ('+p.goal+' mg) aşıldı — içeceği azaltınca kendiliğinden düzelir.'; else if(!p.timingOk) msg='Kafein tiki otomatik: miktar tamam ama son kahve önerilen saatten geç. Sağlık kartından saatini erkene çekince yeşillenir.'; else msg='Kafein tiki otomatik: bugün temiz — kendiliğinden yeşil.'; }
   else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
 };
@@ -1138,8 +1188,15 @@ App.setEnergy=function(v){ var day=curDay(); day.energy=(day.energy===v?null:v);
 App.setStress=function(v){ var day=curDay(); day.stress=(day.stress===v?null:v); day.savedAt=new Date().toISOString(); haptic(10); save(); updateCardByKey('mood'); updateCardByKey('mental'); };
 
 // ---- kafein ----
-App.setCaffeineTime=function(el){ var v=el.value; var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null}; day.caffeine.last=v||null; day.savedAt=new Date().toISOString(); commit(); };
-App.caffeineCups=function(n){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null}; var v=(Number(day.caffeine.cups)||0)+n; day.caffeine.cups=Math.max(0,Math.min(15,v)); day.savedAt=new Date().toISOString(); commit(); };
+// ---- kafein (bilimsel takip: drinks dizisi) ----
+App.addCaffeineDrink=function(typeId){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(day.caffeine.drinks)) day.caffeine.drinks=[]; var now=new Date(); var t=pad(now.getHours())+':'+pad(now.getMinutes()); day.caffeine.drinks.push({type:typeId,time:t,qty:1}); day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.caffeine.cups=day.caffeine.drinks.length; var nw=syncDerivedHabits(day); if(nw.indexOf('caffeineOk')>=0){ haptic(16); toast('Kafein tiki kendiliğinden yeşillendi — limit ve saat tamam.'); } day.savedAt=new Date().toISOString(); commit(); };
+App.removeCaffeineDrink=function(i){ var day=curDay(); if(!day.caffeine||!Array.isArray(day.caffeine.drinks)) return; if(day.caffeine.drinks[i]==null) return; day.caffeine.drinks.splice(i,1); day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.caffeine.cups=day.caffeine.drinks.length; day.savedAt=new Date().toISOString(); commit(); };
+App.setCaffeineDrinkTime=function(i,el){ var day=curDay(); if(!day.caffeine||!Array.isArray(day.caffeine.drinks)) return; var d=day.caffeine.drinks[i]; if(!d) return; d.time=el.value||''; day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.savedAt=new Date().toISOString(); commit(); };
+App.setCaffeineMode=function(m){ if(!data.settings) data.settings={}; data.settings.caffeineMode=(m==='sensitive'||m==='pregnant')?m:'standard'; data.savedAt=new Date().toISOString(); haptic(10); commit(); };
+App.setTargetBed=function(el){ if(!data.settings) data.settings={}; var v=el.value||''; if(/^\d{2}:\d{2}$/.test(v)) data.settings.targetBed=v; data.savedAt=new Date().toISOString(); commit(); };
+// legacy (eski veri/panel uyumu için hâlâ çağrılabilir)
+App.setCaffeineTime=function(el){ var v=el.value; var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(day.caffeine.drinks)) day.caffeine.drinks=[]; if(day.caffeine.drinks.length){ var last=day.caffeine.drinks[day.caffeine.drinks.length-1]; last.time=v||null; } day.caffeine.last=v||null; day.savedAt=new Date().toISOString(); commit(); };
+App.caffeineCups=function(n){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(day.caffeine.drinks)) day.caffeine.drinks=[]; var v=(Number(day.caffeine.cups)||0)+n; v=Math.max(0,Math.min(15,v)); var cur=day.caffeine.drinks.length; if(v>cur){ for(var i=cur;i<v;i++){ day.caffeine.drinks.push({type:'turk',time:day.caffeine.last||'09:00',qty:1}); } } else if(v<cur){ day.caffeine.drinks.length=v; } day.caffeine.cups=v; day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- health (sleep / walk) actions: number inputs save without re-render to keep focus ----
 App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.sleep.hours=(v==null||isNaN(v))?null:v; var nw=syncDerivedHabits(day); if(nw.indexOf('sleepReg')>=0){ haptic(16); toast('Uyku tiki kendiliğinden yeşillendi. 7,5+ saat, tam dinlenme.'); } day.savedAt=new Date().toISOString(); save(); }); };
@@ -3844,24 +3901,39 @@ function sparkCard(){
 function sleepReadiness(rec){
   var sl=rec&&rec.sleep?rec.sleep:{};
   var rd=readingStats(rec);
-  // 1) Uyku süresi (yetişkin hedefi ~7.5-8.5 sa) — maks 34
+  // 1) Uyku süresi (yetişkin hedefi ~7.5-8.5 sa) — maks 26
   var hours=num(sl.hours), fDur=0;
-  if(hours!=null){ fDur=Math.round(34*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))); }
-  // 2) Öznel kalite — maks 22
-  var fQual=sl.quality==='good'?22:(sl.quality==='ok'?12:(sl.quality==='bad'?4:0));
-  // 3) İlaç/takviye — maks 10 (ilaçsız uykuya hazırlık göstergesi)
+  if(hours!=null){ fDur=Math.round(26*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))); }
+  // 2) Öznel kalite — maks 18
+  var fQual=sl.quality==='good'?18:(sl.quality==='ok'?10:(sl.quality==='bad'?3:0));
+  // 3) Kafein zamanlaması (bedtime kalıntı + cut-off uyumu) — maks 18
+  var residue=caffeineResidueAt(rec,caffeineTargetBed());
+  var timingOk=caffeineTimingOk(rec);
+  var lastCaf=caffeineLastTime(rec);
+  var hasCaf=caffeineDrinks(rec).length>0;
+  var fCaf=0;
+  if(!hasCaf){ fCaf=18; }
+  else if(residue<CAFFEINE_SLEEP_SAFE_MG&&timingOk){ fCaf=18; }
+  else if(residue<CAFFEINE_SLEEP_SAFE_MG){ fCaf=12; }
+  else if(residue<100){ fCaf=8; }
+  else { fCaf=3; }
+  // 4) Okuma (ekran yerine sayfa) — maks 16
+  var fReading=rd.count>0?Math.min(16,8+Math.min(8,rd.pages)):0;
+  // 5) Wind-down hijyeni (light/breath/dump/cool) — maks 14
+  var wdSteps=(sl.windDown&&Array.isArray(sl.windDown.steps))?sl.windDown.steps:[];
+  var wdDone=wdSteps.reduce(function(a,s){ return a+(s&&s.done?1:0); },0);
+  var fWind=Math.round(14*Math.min(1,wdDone/Math.max(1,WIND_DOWN_STEPS.length)));
+  // 6) İlaçsızlık — maks 8
   var medType=(sl.med&&sl.med.type)?sl.med.type:null;
-  var fMed=medType==='none'?10:(medType==='herbal'?6:(medType==='rx'?3:5));
-  // 4) Okuma (uyku öncesi okuma alışkanlığı, ekran yerine sayfa) — maks 34
-  var fReading=rd.count>0?Math.min(34,16+Math.min(18,rd.pages)):0;
-  var factors={duration:fDur,quality:fQual,medication:fMed,reading:fReading};
-  var score=fDur+fQual+fMed+fReading;
+  var fMed=medType==='none'?8:(medType==='herbal'?5:(medType==='rx'?2:4));
+  var factors={duration:fDur,quality:fQual,caffeine:fCaf,reading:fReading,winddown:fWind,medication:fMed};
+  var score=Math.round(fDur+fQual+fCaf+fReading+fWind+fMed);
   score=Math.max(0,Math.min(100,score));
   var tier='Rahat';
   if(score>=85) tier='Mükemmel';
   else if(score>=70) tier='Güçlü';
   else if(score>=55) tier='Dengeli';
-  return {score:score,tier:tier,readingCount:rd.count,readingPages:rd.pages,factors:factors,medType:medType};
+  return {score:score,tier:tier,readingCount:rd.count,readingPages:rd.pages,factors:factors,medType:medType,residue:residue,timingOk:timingOk,lastCaf:lastCaf,hasCaf:hasCaf,wdDone:wdDone};
 }
 
 function medFreeBadge(){
@@ -3870,16 +3942,42 @@ function medFreeBadge(){
   return '<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(143,191,138,0.22),rgba(155,127,201,0.16));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 13px;"><span style="color:#6E9C6A;display:inline-flex;">'+icon('moon',22)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">'+s+' gecedir ilaçsız</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(s>=7?'Bir haftayı geçtin — beden kendi sistemini öğreniyor.':'Hedef: uyku ilacına ihtiyacı azaltmak. Düzenli uyku hijyeni bunu büyütür.')+'</div></div></div>';
 }
 function caffeineBlock(rec){
-  var caf=(rec&&rec.caffeine&&typeof rec.caffeine==='object')?rec.caffeine:{last:null,cups:null};
-  var late=!!(caf.last&&caf.last>='15:00');
-  var h='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:9px;">';
-  h+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:5px;">'+icon('coffee',13)+' Kafein (kahve/çay) — uykuyu etkiler</div>';
-  h+='<div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;">';
-  h+='<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:11px;color:var(--faint);">Son kafein saati</span><input type="time" value="'+esc(caf.last||'')+'" onchange="App.setCaffeineTime(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:8px 10px;font-size:14px;outline:none;color:var(--text);"></div>';
-  h+='<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:11px;color:var(--faint);">Bugün kaç fincan</span><div style="display:flex;align-items:center;gap:7px;"><button onclick="App.caffeineCups(-1)" style="border:1px solid var(--field-bd);cursor:pointer;width:32px;height:32px;border-radius:9px;font-size:16px;font-weight:800;color:var(--muted);background:var(--card);">−</button><span style="font-size:17px;font-weight:800;min-width:18px;text-align:center;">'+(caf.cups||0)+'</span><button onclick="App.caffeineCups(1)" style="border:1px solid var(--field-bd);cursor:pointer;width:32px;height:32px;border-radius:9px;font-size:16px;font-weight:800;color:var(--muted);background:var(--card);">+</button></div></div>';
+  var drinks=caffeineDrinks(rec);
+  var total=caffeineTotalMg(rec);
+  var limit=caffeineLimit();
+  var mode=caffeineMode();
+  var maxSingle=caffeineMaxSingle(rec);
+  var lastCaf=caffeineLastTime(rec);
+  var cut=caffeineCutoffTime(caffeineTargetBed());
+  var residue=caffeineResidueAt(rec,caffeineTargetBed());
+  var timingOk=caffeineTimingOk(rec);
+  var bed=caffeineTargetBed();
+  var pct=Math.min(100,Math.round(total/limit*100));
+  var barCol = pct<60?'#5BA85B':(pct<=90?'#E0A93C':'#E25B6A');
+  var h='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:5px;">'+icon('coffee',13)+' Kafein — bilimsel takip (mg · limit · uyku)</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+  CAFFEINE_TYPES.forEach(function(t){ h+='<button onclick="App.addCaffeineDrink(\''+t.id+'\')" style="border:1px solid var(--field-bd);background:var(--card);border-radius:999px;padding:6px 10px;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">'+t.label+' <span style="color:var(--faint);font-weight:500;">'+t.mg+'mg</span></button>'; });
   h+='</div>';
-  if(late) h+='<div style="font-size:11.5px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:11px;padding:8px 11px;line-height:1.4;">Kafein 15:00 sonrası uykuya geçişi zorlaştırabilir. Yarın biraz erkene çekmeyi denemeye değer</div>';
+  if(drinks.length){
+    h+='<div style="display:flex;flex-direction:column;gap:5px;">';
+    drinks.forEach(function(d,i){ var ty=caffeineType(d.type); var mg=ty?ty.mg*Math.max(1,Number(d.qty)||1):0; h+='<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--card-bd);border-radius:11px;padding:7px 10px;"><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+(ty?ty.label:d.type)+' · <span style="color:var(--faint);font-weight:500;">'+Math.round(mg)+' mg</span></div><div style="display:flex;align-items:center;gap:5px;margin-top:3px;"><input type="time" value="'+esc(d.time||'')+'" onchange="App.setCaffeineDrinkTime('+i+',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:3px 6px;font-size:12px;color:var(--text);outline:none;">'+(d.qty>1?('<span style="font-size:11px;color:var(--faint);">×'+d.qty+'</span>'):'')+'</div></div><button onclick="App.removeCaffeineDrink('+i+')" style="border:none;background:transparent;color:#E25B6A;cursor:pointer;font-size:16px;font-weight:800;padding:4px;">×</button></div>'; });
+    h+='</div>';
+  } else {
+    h+='<div style="font-size:11.5px;color:var(--faint);background:var(--card);border:1px dashed var(--card-bd);border-radius:11px;padding:9px 11px;">Bugün henüz kafein eklenmedi. Yukarıdaki chip\'lerden bir başlat.</div>';
+  }
+  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;">';
+  h+='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+total+' <span style="font-size:11px;color:var(--faint);font-weight:500;">mg / '+limit+' mg</span></div><div style="font-size:11px;font-weight:700;color:'+barCol+';">%'+pct+'</div></div>';
+  h+='<div style="height:7px;border-radius:999px;background:rgba(120,100,150,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+barCol+';transition:width .3s;"></div></div>';
+  h+='<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"><span style="font-size:10.5px;color:var(--faint);">Profil:</span>';
+  [['standard','Standart 400'],['sensitive','Hassas 300'],['pregnant','Gebe 200']].forEach(function(m){ var on=mode===m[0]; h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?'#8A5A2B':'var(--field-bd)')+';background:'+(on?'rgba(138,90,43,0.12)':'var(--field)')+';color:'+(on?'#8A5A2B':'var(--muted)')+';border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:700;cursor:pointer;">'+m[1]+'</button>'; });
   h+='</div>';
+  if(total>limit){ h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Günlük kafein limiti aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+limit+' mg.</div>'; }
+  if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek seferlik doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg üstü. Aralara zaman koy.</div>'; }
+  if(lastCaf){ var lateLine = timingOk ? 'Son kahve '+lastCaf+' — önerilen kesme '+cut+' öncesi, uyumlu.' : 'Son kahve '+lastCaf+' — önerilen kesme '+cut+'. Bu saat uykuya geçişi zorlaştırabilir.'; h+='<div style="font-size:11px;color:'+(timingOk?'var(--faint)':'#9A6A2A')+';line-height:1.4;">'+icon('clock',11)+' '+lateLine+'</div>'; }
+  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--card-bd);padding-top:8px;"><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:10.5px;color:var(--faint);">Yatma saati</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div><div style="flex:1;min-width:120px;"><div style="font-size:10.5px;color:var(--faint);">Yatandaki kafein kalıntısı</div><div style="font-size:14px;font-weight:800;color:'+(residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(residue<100?'#E0A93C':'#E25B6A'))+';">'+residue+' mg</div><div style="font-size:10.5px;color:var(--faint);">'+(residue<CAFFEINE_SLEEP_SAFE_MG?'Uykuyu etkilemez (<50 mg)':'Uykuya dalışı geciktirebilir')+'</div></div></div>';
+  h+='<div style="font-size:9.5px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~5 sa. mg değerleri ortalama serving başına.</div>';
+  h+='</div></div>';
   return h;
 }
 
@@ -4038,10 +4136,12 @@ function saglikHTML(){
   var rdChip=readiness.readingCount>0?(readiness.readingCount+' kitap · '+readiness.readingPages+' sayfa'):'okuma yok';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+rdChip+'</div></div>';
   var rf=readiness.factors||{};
-  var fdefs=[['Uyku süresi',rf.duration||0,34],['Kalite',rf.quality||0,22],['İlaçsızlık',rf.medication||0,10],['Okuma',rf.reading||0,34]];
+  var fdefs=[['Uyku süresi',rf.duration||0,26],['Kalite',rf.quality||0,18],['Kafein',rf.caffeine||0,18],['Okuma',rf.reading||0,16],['Wind-down',rf.winddown||0,14],['İlaçsızlık',rf.medication||0,8]];
   h+='<div style="display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
   fdefs.forEach(function(f){ var pct=Math.round(f[1]/f[2]*100); h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);width:104px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:6px;border-radius:999px;background:rgba(90,69,122,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);"></div></div><div style="font-size:10.5px;color:var(--faint);width:34px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
-  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:3px;">Hedef ~7.5-8.5 sa uyku, iyi kalite, ilaçsızlık ve uyku öncesi okuma skoru yükseltir.</div>';
+  if(readiness.hasCaf){ var resCol=readiness.residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(readiness.residue<100?'#E0A93C':'#E25B6A'); h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:11px;"><span style="color:var(--faint);">Yatandaki kafein kalıntısı</span><span style="font-weight:800;color:'+resCol+';">'+readiness.residue+' mg · son kahve '+(readiness.lastCaf||'—')+'</span></div>'; }
+  var srTip = !readiness.hasCaf ? 'Kafeinsiz gün uykuyu kolaylaştırır.' : (readiness.residue<CAFFEINE_SLEEP_SAFE_MG ? 'Kafein temiz — uykuya hazırsın.' : 'Son kahveyi erkene çek, yarı ömür ~5 sa.');
+  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:4px;">Bu gece: '+srTip+' · kaynak EFSA/FDA.</div>';
   h+='</div>';
   var rdEntries=readingStats(rec).entries;
   if(rdEntries.length>0){

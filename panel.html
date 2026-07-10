@@ -1746,7 +1746,23 @@ function render(){
   exRows+=exRowAlways(icon('footprints',13)+' Yürüyüş', wkBits.join(" · "));
   exRows+=exRowAlways(icon('droplet',13)+' Regl', (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
-  var cafBits=[]; if(caf){ if(caf.cups!=null&&caf.cups!=="") cafBits.push(esc(String(caf.cups))+" fincan"); if(caf.last) cafBits.push("son "+esc(String(caf.last))); }
+  var cafBits=[];
+  if(caf){
+    var CAF_MG={turk:60,espresso:60,filter:95,americano:77,cappuccino:63,latte:63,'black-tea':40,'green-tea':25,energy:80};
+    var drinks=Array.isArray(caf.drinks)?caf.drinks:[];
+    var totalMg=0, lastCaf=null;
+    drinks.forEach(function(d){ var mg=CAF_MG[d&&d.type]||0; var q=Math.max(1,Number(d&&d.qty)||1); totalMg+=mg*q; if(d&&d.time&&/^\d{2}:\d{2}$/.test(d.time)){ if(!lastCaf||d.time>lastCaf) lastCaf=d.time; } });
+    if(!drinks.length && (Number(caf.cups)||0)>0){ totalMg=(Number(caf.cups)||0)*60; lastCaf=caf.last||null; }
+    if(totalMg>0) cafBits.push(Math.round(totalMg)+" mg");
+    if(lastCaf) cafBits.push("son "+esc(String(lastCaf)));
+    var bed=(D&&D.settings&&D.settings.targetBed)||'23:30';
+    if(/^\d{2}:\d{2}$/.test(bed) && drinks.length){
+      var bMin=Number(bed.slice(0,2))*60+Number(bed.slice(3,5)); var residue=0;
+      drinks.forEach(function(d){ var mg=CAF_MG[d&&d.type]||0; var q=Math.max(1,Number(d&&d.qty)||1); var t=d&&d.time; if(!t||!/^\d{2}:\d{2}$/.test(t)) return; var tMin=Number(t.slice(0,2))*60+Number(t.slice(3,5)); var dt=(bMin-tMin)/60; if(dt<0) dt+=24; residue+=mg*q*Math.pow(0.5,dt/5); });
+      residue=Math.round(residue); if(residue>0) cafBits.push("yat. kalıntı "+residue+" mg");
+    }
+    if(caf.cups!=null&&caf.cups!==""&&!drinks.length) cafBits.push(esc(String(caf.cups))+" fincan");
+  }
   exRows+=exRowAlways(icon('coffee',13)+' Kafein', cafBits.join(" · "));
   exRows+=exRowAlways(icon('life-buoy',13)+' Kriz (SOS)', (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · "):"");
   var TRIG={tired:"Yorgun",bored:"Sıkıldı",hungry:"Aç",stress:"Stres",habit:"Alışkanlık",emotional:"Duygusal",lowenergy:"Enerji dibi",social:"Keyif/sosyal"};

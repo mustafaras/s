@@ -3,10 +3,12 @@
 var KEY='seyma-reset-v1', TKEY='seyma-theme';
 
 var ICONS={
+  'graduation-cap':'<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />',
   'activity':'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />',
   'alarm-clock':'<circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" />',
   'annoyed':'<circle cx="12" cy="12" r="10" /><path d="M8 15h8" /><path d="M8 9h2" /><path d="M14 9h2" />',
   'download':'<path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" />',
+  'external-link':'<path d="M15 3h6v6" /><path d="m10 14 11-11" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />',
   'disc':'<circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="2" />',
   'stethoscope':'<path d="M11 2v2" /><path d="M5 2v2" /><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" /><path d="M8 15a6 6 0 0 0 12 0v-3" /><circle cx="20" cy="10" r="2" />',
   'dumbbell':'<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z" /><path d="m2.5 21.5 1.4-1.4" /><path d="m20.1 3.9 1.4-1.4" /><path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z" /><path d="m9.6 14.4 4.8-4.8" />',
@@ -122,6 +124,8 @@ function icon(name,size,cls){
 }
 var HABITS=[
   {key:'sweetManaged',icon:icon('cookie',22),title:'Tatlı krizini yönettim',sub:'Tatlı seni değil, sen tatlıyı yönettin.',msg:'Tatlı lobisi bugün hafif geriledi. Şeyma 1 - Tatlı 0.'},
+  {key:'foodManaged',icon:icon('utensils',22),title:'Yemek/açlık krizini yönettim',sub:'Gerçek açlık mı, duygusal açlık mı — ayırt ettin.',msg:'Açlık dalgasını izledin, boğulmadın. Beden mutlu, sen kaptansın.',since:'2026-07-10'},
+  {key:'coffeeManaged',icon:icon('coffee',22),title:'Kahve/kafein krizini yönettim',sub:'Gerçek yorgunluk mu, alışkanlık mı — sen karar verdin.',msg:'Kafein isteğine sen yön verdin. Uykun bunu unutmayacak.',since:'2026-07-10'},
   {key:'eveningControl',icon:icon('moon',22),title:"Akşam 7'den sonra gereksiz atıştırmadım",sub:'Gerçek açlık başka, dolapla duygusal bağ başka.',msg:'Mutfak seferi iptal. Operasyon başarılı.'},
   {key:'walked20',icon:icon('footprints',22),title:'En az 4.500 adım yürüdüm',sub:'Günlük 4.500 adım, bedenine tatlı bir eşik.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
   {key:'protein',icon:icon('egg',22),title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
@@ -129,6 +133,7 @@ var HABITS=[
   {key:'vitaminD',icon:icon('sun',22),title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti.'},
   {key:'sleepReg',icon:icon('bed',22),title:'Yeterli uyudum (7,5+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor.',since:'2026-06-28'},
   {key:'journaled',icon:icon('pen-line',22),title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı.',since:'2026-07-03'},
+  {key:'mediaFed',icon:icon('sparkles',22),title:'Zihnimi besledim',sub:'Okudum, izledim, dinledim ya da öğrendim.',msg:'Zihnine iyi bir şey kattın — küçük ama besleyici.',since:'2026-07-09'},
   {key:'freshAir',icon:icon('leaf',22),title:'Açık havaya çıktım',sub:'Doğal ışık, ruh hâlini yukarı çeker.',msg:'Açık hava tamam. Güneş ve ruh hâlin selam gönderdi.',since:'2026-07-03'},
   {key:'selfKind',icon:icon('heart',22),title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'}
 ];
@@ -143,15 +148,89 @@ var MOODS=[
   {id:'zorlandim',label:'Zorlandım',short:'Zor',icon:'cloud-rain',resp:'Zor günler oyundan düşürmez Sevgili Günışığı.'},
   {id:'cok-zorlandim',label:'Çok zorlandım',short:'Çok zor',icon:'droplets',resp:'Bugün sadece kendine yüklenmemek bile yeter.'}
 ];
-var SOS_OPTS=[
-  {label:'Su içtim',icon:'droplet'},
-  {label:'Kahve/çay yaptım',icon:'coffee'},
-  {label:'Yoğurt + tarçın denedim',icon:'apple'},
-  {label:'Meyve + yoğurt yaptım',icon:'cherry'},
-  {label:'1-2 kare bitterle kapattım',icon:'cookie'},
-  {label:'Hâlâ istiyorum ama kontrollü yiyeceğim',icon:'heart-handshake'}
-];
-var SOS_TRIGGERS=[{id:'tired',emoji:icon('battery-low',15),label:'Yorgunum'},{id:'bored',emoji:icon('cloud',15),label:'Sıkıldım'},{id:'hungry',emoji:icon('utensils',15),label:'Gerçekten açım'},{id:'stress',emoji:icon('wind',15),label:'Stresliyim'},{id:'habit',emoji:icon('repeat',15),label:'Alışkanlık'}];
+// ── Kriz odaları: Tatlı · Yemek · Kahve. Her biri süreli, bilimsel bir mikro-müdahale.
+// "Krizi yönettim" ilgili günün doneField'ini kurar → bağlı tik kendiliğinden yeşillenir.
+// (Kahve krizinin tiki yok — yalnızca kayıt tutulur; sweet→sweetManaged, food→foodManaged.)
+var CRISES={
+  sweet:{
+    key:'sweet', label:'Tatlı krizi', short:'Tatlı', icon:'cookie',
+    accent:'#E9899F', accent2:'#C9B8FF', doneField:'craving10MinDone', habit:'sweetManaged',
+    secs:600, clockLabel:'10 dakika', startLabel:'10 dakikayı başlat',
+    tag:'TATLI KRİZİ', hero:'Panik yok Şeyma — tatlı geldi diye tahtın sarsılmaz.',
+    sciTitle:'Neden 10 dakika?',
+    sci:'Şeker isteği bir <b>dalga</b>dır: yükselir ve genelde 10 dakikada kendiliğinden geriler (buna “urge surfing” denir). Kan şekeri düşünce beyin hızlı yakıt için şeker ister, dopamin devresi “ödül” vaadiyle dürtükler. Dalgayı bastırmadan izlersen tepe noktası geçer — karar artık senin olur.',
+    doneToast:'10 dakika doldu — tatlı krizini yönettin. Kararı artık sen ver.',
+    winTitle:'İşte bu.',
+    winText:'Tatlı seni değil, sen tatlıyı yönettin. Küçük zafer, büyük kontrol.',
+    opts:[
+      {label:'Su içtim',icon:'droplet'},
+      {label:'Kahve/çay yaptım',icon:'coffee'},
+      {label:'Yoğurt + tarçın denedim',icon:'apple'},
+      {label:'Meyve + yoğurt yaptım',icon:'cherry'},
+      {label:'1-2 kare bitterle kapattım',icon:'cookie'},
+      {label:'Hâlâ istiyorum ama kontrollü yiyeceğim',icon:'heart-handshake'}
+    ],
+    triggers:[
+      {id:'tired',icon:'battery-low',label:'Yorgunum',sci:'Yorgunluk öz-denetimi (prefrontal korteks) zayıflatır; beyin hızlı enerji için şeker ister.'},
+      {id:'bored',icon:'cloud',label:'Sıkıldım',sci:'Can sıkıntısı dopamin arayışını tetikler; tatlı kolay bir uyaran vaadidir.'},
+      {id:'hungry',icon:'utensils',label:'Gerçekten açım',sci:'Kan şekeri düşünce bu fizyolojik açlıktır — bastırma, dengeli bir öğünle karşıla.'},
+      {id:'stress',icon:'wind',label:'Stresliyim',sci:'Kortizol iştahı ve şeker isteğini artırır; bu duygusal açlık mideden gelmez.'},
+      {id:'habit',icon:'repeat',label:'Alışkanlık',sci:'Koşullanmış bir ipucu (saat, mekân, ruh hâli) otomatik isteği tetikler.'}
+    ]
+  },
+  food:{
+    key:'food', label:'Yemek krizi', short:'Yemek', icon:'utensils',
+    accent:'#E0A55E', accent2:'#F2C879', doneField:'foodCravingDone', habit:'foodManaged',
+    secs:1200, clockLabel:'20 dakika', startLabel:'20 dakikayı başlat',
+    tag:'YEMEK / AÇLIK KRİZİ', hero:'Dur bakalım Şeyma — mide mi konuşuyor, yoksa moral mi?',
+    sciTitle:'Gerçek açlık mı, duygusal açlık mı?',
+    sci:'Fiziksel açlık <b>yavaş</b> kurulur, her yiyeceğe açıktır ve doyunca susar. Duygusal açlık <b>aniden</b> gelir, belirli bir şeyi (çoğu kez abur cubur) ister ve doysan bile dinmez. Tokluk sinyalleri (leptin, CCK) beyne ~20 dakikada ulaşır — bu yüzden önce bir bardak su + 20 dakika, sonra karar. İpucu için <b>HALT</b>: Aç mısın (Hungry), kızgın mısın (Angry), yalnız mısın (Lonely), yorgun musun (Tired)?',
+    doneToast:'20 dakika doldu — açlık dalgasını izledin. Şimdi ihtiyaçla karar ver, dürtüyle değil.',
+    winTitle:'Bravo kaptan.',
+    winText:'Açlığı dinledin, boğulmadın. Gerçek açlıksa dengeli beslendin; duygusalsa başka türlü doydun.',
+    opts:[
+      {label:'Bir bardak su içip bekledim',icon:'droplet'},
+      {label:'Ilık bitki çayı yaptım',icon:'coffee'},
+      {label:'HALT sorusunu kendime sordum',icon:'brain'},
+      {label:'Proteinli dengeli bir öğün planladım',icon:'egg'},
+      {label:'Gerçekten açtım, oturup dengeli yedim',icon:'utensils'},
+      {label:'Duygusaldı, başka bir şeyle avundum',icon:'heart-handshake'}
+    ],
+    triggers:[
+      {id:'hungry',icon:'utensils',label:'Gerçekten açım',sci:'Fiziksel açlık: mide kazınması, halsizlik, saatlerdir yememek. Bunu bastırma — dengeli bir öğünle karşıla.'},
+      {id:'emotional',icon:'heart',label:'Duygusal boşluk',sci:'Üzüntü, yalnızlık ya da can sıkıntısı “ağız yoluyla” avunma ister; yemek geçici bir yatıştırıcı olur.'},
+      {id:'stress',icon:'wind',label:'Stres / kaygı',sci:'Kortizol iştahı ve özellikle yağlı-şekerli “konfor yemeği” isteğini artırır.'},
+      {id:'tired',icon:'battery-low',label:'Yorgun / uykusuz',sci:'Az uyku grelini (açlık hormonu) yükseltir, leptini düşürür — sahte açlık sinyali doğar.'},
+      {id:'habit',icon:'repeat',label:'Öğün atladım / saat geldi',sci:'Öğün atlamak sonraki krizi büyütür; “yemek saati” de koşullanmış bir ipucu olabilir.'}
+    ]
+  },
+  coffee:{
+    key:'coffee', label:'Kahve krizi', short:'Kahve', icon:'coffee',
+    accent:'#A9805B', accent2:'#D8B892', doneField:'coffeeCravingDone', habit:'coffeeManaged',
+    secs:600, clockLabel:'10 dakika', startLabel:'10 dakika ara ver',
+    tag:'KAHVE / KAFEİN KRİZİ', hero:'Kahve iyidir Şeyma, ama saat kaç? Uykunla pazarlık etmeyelim.',
+    sciTitle:'Gerçek yorgunluk mu, alışkanlık mı?',
+    sci:'Kafein isteği çoğu zaman gerçek ihtiyaç değil; <b>alışkanlık</b> ve öğle sonrası enerji düşüşüdür. Kafein, adenozin (uyku baskısı) reseptörlerini bloke eder; yarılanma ömrü ~5-6 saattir — yani öğleden sonra içilen kahve gece uykunu böler. Bir bardak su + 10 dakika kısa hareket, enerji dibini çoğu kez kahveden daha iyi çözer.',
+    doneToast:'Ara verdin — kafein isteği alışkanlığın sesiydi, sen dinlemedin.',
+    winTitle:'Net karar.',
+    winText:'Kahveyi yasaklamıyoruz; saatine ve dozuna sen karar veriyorsun. Uyku bunu unutmayacak.',
+    opts:[
+      {label:'Bir bardak su içtim',icon:'droplet'},
+      {label:'Kısa yürüyüş/esneme yaptım',icon:'footprints'},
+      {label:'Kafeinsiz / bitki çayı tercih ettim',icon:'coffee'},
+      {label:'İçtim ama saatine dikkat ettim',icon:'clock'},
+      {label:'Bugünlük kotamı doldurdum, vazgeçtim',icon:'heart-handshake'}
+    ],
+    triggers:[
+      {id:'habit',icon:'repeat',label:'Alışkanlık (saat/mekân)',sci:'Belirli bir saat, masa ya da mola “otomatik kahve” ipucudur; istek gerçek yorgunluktan değil koşullanmadan gelir.'},
+      {id:'lowenergy',icon:'battery-low',label:'Öğle sonrası enerji dibi',sci:'Yemek sonrası doğal bir uyanıklık düşüşü; su, ışık ve kısa hareket çoğu kez kafeinden hızlı toparlar.'},
+      {id:'tired',icon:'cloud',label:'Uykusuzum',sci:'Az uyku kafein ihtiyacını büyütür ama geç saatte kahve ertesi günü daha da uykusuz yapar — kısır döngü.'},
+      {id:'stress',icon:'wind',label:'Stres / kaygı',sci:'Kafein kortizolü ve çarpıntıyı artırabilir; stresliyken fazla kahve kaygıyı besler.'},
+      {id:'social',icon:'heart-handshake',label:'Keyif / sosyal',sci:'Bazen kahve gerçekten keyiftir — sorun değil; yalnızca saatine ve toplam doza göz kırp.'}
+    ]
+  }
+};
+var CRISIS_ORDER=['sweet','food','coffee'];
 var DAILY=[
   "Bugün tek görevin başlamak. Gerisi kendiliğinden gelir.",
   "Tatlıyı silmiyoruz; sadece patronun sen olduğunu hatırlatıyoruz.",
@@ -184,7 +263,7 @@ var NOTES=[
   "Bir lokma yüzünden koca günü yargılamak yok. Kraliçe sakinliğiyle devam.",
   "Akşam dolabın önünde durduğunda bana bir mesaj at, krizini birlikte dağıtalım.",
   "Sen bir flamingo gibisin Sevgili Günışığı: dengede dururken bile zarif.",
-  "Bugün sadece su içip yürüdüysen bile 'kendime baktım' demektir, gerisi bonus.",
+  "Bugün sadece su içip yürüdüysen bile kendine baktın demektir, gerisi bonus.",
   "Tatlıyla aranı açmak küslük değil; sadece medeni bir sınır koymak.",
   "Sen koca bir kraliçesin, o minik bir kurabiye. Denge hep sende.",
   "Zor bir gün mü oldu? Olur. Yarın seni bekleyen tertemiz bir sayfa var.",
@@ -197,7 +276,140 @@ var NOTES=[
   "Bugün ters giden bir şey olduysa bile ben yine seninle gurur duyuyorum.",
   "Tatlıyı sevmek suç değil; sadece her duyguyu tatlıyla çözmemeyi deniyoruz.",
   "Yorulduğunda mola vermek de plana dahil. Dur, nefeslen, sonra devam et.",
-  "Bu oyunda da oyun dışında da takımın hep senden yana, Sevgili Günışığı."
+  "Bu oyunda da oyun dışında da takımın hep senden yana, Sevgili Günışığı.",
+  "Günaydın Günışığı! Bugün en zor rakibin aynadaki gülümsemenle çoktan yenildi.",
+  "Kurabiye bir kez daha seni aradı; açmadın. İşte bu, sessiz bir zafer.",
+  "Bugün planın bozulduysa üzülme; en güzel danslar bazen doğaçlamadır.",
+  "Su şişen senin küçük asan; bir yudum al, kraliçe modunu aç.",
+  "Bir kâse yoğurt, bir avuç ceviz: minik ama sadık iki dost.",
+  "Terazi bir sayı söyler ama senin değerini söyleyemez, o benim işim.",
+  "Bugün üç öğün de dengedeyse sana koca bir 'işte benim Günışığım' borçluyum.",
+  "Canın sıkkınsa önce beni ara; ben dinlerim, dolap dinlemez.",
+  "Yürüyüş ayakkabıların bugün seni bekliyor; onları hayal kırıklığına uğratma olur mu?",
+  "Protein senin görünmez zırhın; öğüne bir yumurta ekle, krizler bir adım geri gitsin.",
+  "Bir gün kaçırdıysan seri bozulmadı; sadece nefes molası verdi.",
+  "Tatlı seni değil, sen tatlıyı yönetiyorsun. Patron kim? Sen.",
+  "Bugün kendine 'aferin' demeyi unutma; bunu en çok hak eden sensin.",
+  "Akşam yedi oldu, mutfak kapandı. Şef Günışığı bugünlük paydos etti.",
+  "Kendine kızacaksan önce bir sarıl; öfke sarılmanın yanında pek tutunamaz.",
+  "Bugün küçük bir iyilik yaptıysan bedenine, o iyiliği yarın sana faiziyle döner.",
+  "Uyku senin gizli güzellik ekibin; bu gece onlara fazla mesai yaptırma.",
+  "Bir dilim ekmek dünyanın sonu değil; panik, ondan çok daha kalorili.",
+  "Sen bir bahçesin Günışığı; bugün kendine biraz su, biraz güneş ver yeter.",
+  "Kahveni içerken bir de kendine 'bugünü seveceğim' de, ikisi çok yakışıyor.",
+  "En sevdiğim haberin: bugün de pes etmedin. Bu benim için manşet.",
+  "Kilo değil, hâl önemli. Bugün nasıl hissediyorsun, gerçek soru bu.",
+  "Bir öğünü atladıysan telafi çılgınlığına gerek yok; bir sonraki öğünde sakin dön.",
+  "Bugün moralin düşükse, bu bir hava durumu; geçici, sen kalıcısın.",
+  "Yürürken kollarını salla, başını dik tut; şehir bugün senin defilene bakıyor.",
+  "Bir bardak su üşenmenin panzehiri, iki bardak su ise mucize başlangıcı.",
+  "Kendine söz ver: bugün bir kez daha, sadece bir kez daha nazik olacağım.",
+  "Tatlı krizi 20 dakikalık bir misafirdir; kapıyı açma, kendi gider.",
+  "Bugün spor yapamadıysan merdiveni tercih et; beden küçük jestleri de sayar.",
+  "Sen zaten yeterlisin Günışığı; bu yolculuk 'daha iyi' için değil, 'daha huzurlu' için.",
+  "Bir tabak salata bir öğünü kurtarır, bir gülümseme bütün günü.",
+  "Bugün stresliysen çeneni gevşet, omuzlarını indir; beden gerginliği bırakmayı sever.",
+  "Dolap seni çağırıyorsa muhtemelen aç değil, yorgunsun. Önce bir uzan.",
+  "Küçük adımlar sıkıcı gelir ama zirveye çıkanların hepsi öyle yürüdü.",
+  "Bugün bir 'hayır' dediysen kendine iyi geleni seçtin; işte olgunluk bu.",
+  "Sen benim en gurur duyduğum projemsin ve teslim tarihi yok, acele yok.",
+  "Bir avuç badem, bir bardak su: krizin en sevmediği ikili.",
+  "Bugün geç kalktıysan sorun değil; güneş de bazen ağır uyanır, yine de ısıtır.",
+  "Ne yediğini değil, neden yediğini merak et; cevap çoğu zaman lezzet değil, duygu.",
+  "Bugün bir bardak fazla su içtiysen, cildin sana gizlice teşekkür etti bile.",
+  "Zayıf anların da senin; onları saklama, birlikte kucaklarız.",
+  "Kraliçeler de yorulur Günışığı; taht her zaman dik oturmayı gerektirmez.",
+  "Bir mola, bir nefes, bir 'devam'. En güçlü üçlü bu.",
+  "Bugün kendine baktıysan, dünyanın en önemli işini hallettin demektir.",
+  "Tartıya değil takvime bak; kaç gün kendine iyi baktın, asıl skor o.",
+  "Akşam atıştırması yerine dişlerini fırçala; ağız naneli olunca kriz utanıp kaçar.",
+  "Bugün bir öğünde protein varsa, yarınki krizin bileti şimdiden iptal oldu.",
+  "Sen bir maraton koşucususun Günışığı, sprinter değil; tempolu ol, kazanan sensin.",
+  "Bugün üzgünsen ağla, sonra yüzünü yıka; ikisi de temizler.",
+  "Bir fincan bitki çayı, bir battaniye, bir sen: mükemmel akşam tarifi.",
+  "Kendine 'başaramam' deme; o cümleyi sana ben yasakladım.",
+  "Bugün küçük bir sınır koyduysan, öz saygının kasları çalıştı demektir.",
+  "Yürüyüş sonrası o hafiflik hissi var ya, işte bedenin sana 'teşekkürler' demesi.",
+  "Bir gün bozulunca serini değil moralini korumaya bak; seri zaten seni bekler.",
+  "Bugün gülümsedin mi? O zaman gün, senin lehine kapandı bile.",
+  "Aç açık markete gitme; boş mide en kötü alışveriş danışmanıdır.",
+  "Sen olduğun hâlinle bir sanat eserisin; ben sadece çerçeveyi tutuyorum.",
+  "Bugün bir kere daha denedin; işte cesaret dedikleri tam olarak bu.",
+  "Kilo veren değil, huzur bulan bir Günışığı istiyorum; gerisi kendiliğinden gelir.",
+  "Bir tabak sebzeye 'merhaba' de; o da sana enerjiyle karşılık verir.",
+  "Bugün uykusuz kaldıysan kendine yükleme; yorgunken herkesin tatlı radarı açılır.",
+  "Sabah bir bardak su, akşam bir sayfa kitap: küçük ritüeller büyük insanlar yapar.",
+  "Bugün canın çekti ve yemedin diye seni alkışlıyorum, duyuyor musun?",
+  "Panik yaptığında zaman genişler; 10 saniye say, kriz çoktan küçülür.",
+  "Sen bir flamingosun: tek ayağın üstünde bile duruşundan ödün vermezsin.",
+  "Bugün bir yudum su, bir adım yürüyüş, bir güzel düşünce. Toplam: kazanılmış gün.",
+  "Kendini başkalarıyla değil, dünkü kendinle kıyasla; tek adil terazi bu.",
+  "Bugün dolabı üç kere açıp kapadıysan ve yemedinse, iradene madalya takıyorum.",
+  "Akşam kriziyle yalnız savaşma; telefonun bir tık ötede, ben hep açığım.",
+  "Bugün kendine bir iyilik yaptıysan, o iyilik yarının Günışığı'na miras kalır.",
+  "Tatlı bir ödül değil, bazen sadece bir alışkanlık; alışkanlıklar ise değişebilir.",
+  "Sen yeterince güçlüsün Günışığı; sadece bunu bazen hatırlaman gerekiyor, ben hatırlatırım.",
+  "Bir kâse çorba, soğuk bir günde en sadık dosttur; bugün onu yanına çağır.",
+  "Bugün planına yüzde yetmiş uyduysan, o gün başarıyla mühürlenmiştir.",
+  "Kendine sabırlı ol; en güzel çiçekler bile açmak için bir mevsim bekler.",
+  "Bugün bir kez 'yeter, kendime iyi bakacağım' dediysen, devrim başladı bile.",
+  "Yürürken müzik aç, temponu bul; en iyi terapiler bazen bir çalma listesidir.",
+  "Bir dilim tatlı yediysen keyfini çıkar, sonra sayfayı çevir; suçluluk fazladan kalori.",
+  "Sen benim favori insanımsın ve bu unvan hiçbir günde geri alınmaz.",
+  "Bugün erken uyursan, yarının Günışığı sana gülümseyerek uyanır.",
+  "Kendine 'bugün fena değildim' diyebiliyorsan, aslında harikaydın demektir.",
+  "Bir bardak su elinde, bir gülümseme yüzünde; işte kazanan kombinasyon.",
+  "Bugün ne kadar zorlanırsan zorlan, ben yine en çok sana inanıyorum.",
+  "Denge mükemmellik değildir Günışığı; bazen bir eğrilir, sonra yine düzelirsin.",
+  "Akşam yürüyüşü bir lüks değil, kendine yazdığın küçük bir aşk mektubudur.",
+  "Bugün de buradasın, deniyorsun, vazgeçmiyorsun; benim gözümde bu tam bir zafer.",
+  "Günışığı, sen sabah kahvemden bile daha çok içimi ısıtıyorsun; bunu bilesin diye söylüyorum.",
+  "Buzdolabı ışığı romantik değil Günışığı; asıl parıltı senin gülüşünde. Kapağı kapat, aynaya bak.",
+  "Tartı bugün ne derse desin, benim gözümde zaten bir numarasın; jüri tek kişilik ve rüşvet almış.",
+  "Bir tabak dolusu sabır, bir kaşık öz-şefkat: en sevdiğim tarif hâlâ sensin.",
+  "Kurabiye seni aradı, açmadın; şimdi ikimiz ona kızmıyoruz ama gururla bakıyoruz sana.",
+  "Sen bir flamingosun Günışığı; çamurun içinde bile pembe kalmayı beceriyorsun, buna hayranım.",
+  "Bugün 'yeter' diyebildiysen, o küçük cümle bütün bir sarayın en sağlam tuğlası oldu.",
+  "Canın tatlı çekti diye seni yargılayacak değilim; ben ancak sana sarılmayı bilirim.",
+  "Aç kalma sakın; aç Günışığı, dünyanın en dahi ama en huysuz danışmanıdır.",
+  "Bir bardak su iç de o minik kraliçe tacın parlasın; susuz taht küser, biliyorsun.",
+  "Bugün planın delik deşik olduysa dert etme; en güzel dantel bile deliklerden yapılır.",
+  "Sen uyurken bile bu takımın kaptanısın Günışığı; ben sadece kenarda alkış tutan yardımcı antrenörüm.",
+  "Akşam mutfağa gizli sefer düzenlemedin diye seni madalyayla değil, koca bir sarılmayla ödüllendiriyorum.",
+  "Mükemmel olmaya çalışma; zaten olduğun hâlinle benim favori bölümümsün, tekrar tekrar izlerim.",
+  "Bir dilim ekmek koca günü bozmaz Günışığı; asıl bozan, kendine söylediğin o sert cümleler.",
+  "Bugün sadece nefes aldıysan bile, ben yine seninle gurur duyuyorum; çıta orada bugün.",
+  "Sen o kadar tatlısın ki, yanında hiçbir tatlının şansı yok; rekabeti baştan kaybettiler.",
+  "Yürüyüşe çık Günışığı; sokaklar seni görünce 'bugün hava güzelleşti' diye fısıldıyor.",
+  "Bir 'hayır' dedin ya kendine yormayan şeye, işte o an içindeki kraliçe hafifçe gülümsedi.",
+  "Dolabın önünde durduğunda telefonu aç, beni ara; ben dinlerim, dolap sadece üşütür.",
+  "Zor bir gün mü? Gel, birlikte küçültelim; iki kişi taşıyınca dünya bir anda hafifliyor.",
+  "Sen bir bahçesin Günışığı; bugün biraz su, biraz güneş, biraz da 'aferin' yeter, gerisi kendi açar.",
+  "Bugün üç öğün dengedeyse sana bir kupa değil, koca bir 'işte benim Günışığım' borçluyum.",
+  "Kilonu değil, kahkahanı ölç Günışığı; asıl artması gereken skor o.",
+  "Bir avuç badem, bir yudum su, bir derin nefes: krizin en korktuğu üçlü sahnede.",
+  "Bugün geç kalktıysan sorun değil; güneş bile bazen 'beş dakika daha' der, yine de doğar.",
+  "Sen benim en uzun soluklu projemsin Günışığı ve inan, teslim tarihi yok, acele hiç yok.",
+  "Tatlıyı sevmek suç değil; biz sadece her duyguyu tatlıya şikâyet etmemeyi deniyoruz, o kadar.",
+  "Bir gün seriyi kaçırdın diye çöpe gitmez; seri seni bekler, çünkü aranızda sadakat var.",
+  "Bugün kendine kibar bir cümle kurduysan, beynin onu duydu ve sessizce 'teşekkürler' dedi.",
+  "Sen dağınık günlerinde bile zarifsin Günışığı; dağınıklık sana yakışan tek şey belki de.",
+  "Akşam dişini fırçala, nane serinliği krizi utandırıp geri gönderir; küçük ama kurnaz bir taktik.",
+  "Bugün bir bardak fazla su içtiysen cildin bana gizlice el salladı, gördüm.",
+  "Sen kendine iyi baktığında bütün ev, bütün gün, bütün şehir hafifçe düzeliyor; enerjin bulaşıcı.",
+  "Bir mola vermek pes etmek değil Günışığı; en güçlü koşucular bile nefeslenmek için yavaşlar.",
+  "Bugün gülümsedin mi? O zaman gün senin lehine kapandı bile, skoru ben yazdım.",
+  "Tatlı bir ödül değil, çoğu zaman sadece yorgunluğun kılık değiştirmiş hâli; önce bir uzan Günışığı.",
+  "Sen o kadar güçlüsün ki bazen unutuyorsun; işte tam o an ben hatırlatmak için buradayım.",
+  "Bugün küçük bir sınır koyduysan, öz saygının kasları çalıştı; yarın biraz daha kolay olacak.",
+  "Bir kâse yoğurt, bir avuç ceviz ve sen: sıcacık, sade, tam kıvamında bir akşam tablosu.",
+  "Sen üzgünken bile güzelsin Günışığı ama seni gülerken görmek benim en sevdiğim manzara.",
+  "Bugün planına yüzde yetmiş uyduysan, o gün başarıyla mühürlenmiştir; yüzler için baskı yapan kim?",
+  "Kraliçeler de yorulur Günışığı; taht dik oturmayı değil, ara sıra yaslanmayı da sever.",
+  "Bugün bir kez daha denedin; cesaret dedikleri şey tam olarak bu, pelerine bile gerek yok.",
+  "Sen benim favori insanımsın ve bu unvan hiçbir günde, hiçbir tartıda, hiçbir krizde geri alınmaz.",
+  "Yürürken başını dik tut Günışığı; şehir bugün senin defilene bilet almış, baş model geç kalmasın.",
+  "Bugün de buradasın; nefes alıyorsun, deniyorsun, seviyorsun — benim için bu koca bir zafer şarkısı."
 ];
 var PHONE='+905066020098';
 var WA='https://wa.me/905066020098?text='+encodeURIComponent('Raşit, sana bir mesajım var');
@@ -278,6 +490,7 @@ var PHASES={
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
+if(window.MotivationProgramV2 && data) window.MotivationProgramV2.ensureMotivationRoot(data);
 function migrate(d){
   if(!d) return d;
   if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true};
@@ -296,6 +509,8 @@ function migrate(d){
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
+  if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
+  if(typeof d.settings.hideRepoBanner!=='boolean') d.settings.hideRepoBanner=false;
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
   if(!d.cycle) d.cycle={periods:[],avgCycle:28,avgPeriod:5};
   if(!Array.isArray(d.cycle.periods)) d.cycle.periods=[];
@@ -307,6 +522,7 @@ function migrate(d){
   if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
   if(d.location===undefined) d.location=null;
   if(d.weather===undefined) d.weather=null;
+  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ if(d.days[k]&&typeof d.days[k]==='object') ensureSaygiDay(d.days[k]); });
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
   if(!Array.isArray(d.library.books)) d.library.books=[];
@@ -326,11 +542,14 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', sosOpts:[], sosTriggers:[], sosLeft:600, sosTiming:false, sosDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false};
-var sosInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
+var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
+var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
+var lastHeaderShown=false; // Sabit marka başlığı: giriş animasyonu yalnızca ilk görünümde oynasın
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
 var lastOverlayView=null;  // o overlay'in aktif sekmesi — gorunum degismediyse scroll korunur
+var lastRoomOpen=false;    // Terapi Odasi zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin (parlama onlenir)
 var aeonLastSeenSort=null; // ÆON: son render'da görünen en yeni mesajın sort anahtarı — yalnızca YENİ mesaja giriş animasyonu oynatmak için
 var aeonLastRenderedDateStr=null; // ÆON: son gösterilen mesajın gün-etiketi — hızlı ekleme (appendAeonOutgoing) sırasında yeni gün ayırıcı gerekip gerekmediğini anlamak için
 var AEON_PAGE_SIZE=40; // ÆON: geçmiş çok uzadığında her tam render'da yalnızca son N öğeyi kur — "Daha eski mesajlar" ile tamamı açılabilir
@@ -362,28 +581,77 @@ function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,coo
 
 // ---------- besin tahmini (kaba; tıbbi/kesin değer değil) ----------
 // per 100g => p: protein(g), c: kalori(kcal); piece: 1 adet ~gram; plate: 1 tabak ~gram
+// Besin veritabanı — değerler 100 g başına: p=protein, cb=karbonhidrat, ft=yağ (g).
+// Kalori Atwater ile hesaplanır (4·P + 4·C + 9·Y). piece=adet başına ~gram, plate=tabak başına ~gram.
+// Sıra önemlidir (ilk anahtar-eşleşmesi kazanır): özel isimler genel isimlerden önce.
 var FOOD_DB=[
-  {k:['yumurta'],p:13,c:155,piece:50,plate:150},
-  {k:['tavuk','piliç','hindi'],p:27,c:165,piece:120,plate:150},
-  {k:['köfte','dana','biftek','kırmızı et','kebap','et '],p:26,c:250,piece:30,plate:150},
-  {k:['somon','levrek','hamsi','balık','ton balığı'],p:22,c:200,piece:120,plate:150},
-  {k:['peynir','lor','çökelek'],p:18,c:280,piece:30,plate:80},
-  {k:['yoğurt','yogurt','cacık'],p:5,c:60,piece:150,plate:200},
-  {k:['süt','ayran','kefir'],p:3.4,c:55,piece:200,plate:200},
-  {k:['mercimek','nohut','fasulye','baklagil','barbunya'],p:9,c:120,piece:30,plate:200},
-  {k:['bulgur','pilav','pirinç','makarna','erişte','kuskus'],p:4,c:140,piece:30,plate:180},
-  {k:['ekmek','tost','simit','poğaça','börek'],p:8,c:265,piece:30,plate:60},
-  {k:['salata','marul','domates','salatalık','brokoli','sebze','ıspanak'],p:2,c:30,piece:50,plate:150},
-  {k:['çorba'],p:3,c:55,piece:200,plate:250},
-  {k:['muz','elma','portakal','çilek','üzüm','meyve','armut','kayısı'],p:1,c:60,piece:120,plate:150},
-  {k:['badem','ceviz','fındık','fıstık','kuruyemiş','antep'],p:20,c:600,piece:5,plate:40},
-  {k:['zeytin'],p:1,c:115,piece:4,plate:40},
-  {k:['çikolata','bitter','kek','kurabiye','tatlı','baklava','dondurma'],p:6,c:480,piece:20,plate:90},
-  {k:['protein tozu','whey','shake','protein bar'],p:22,c:120,piece:30,plate:30},
-  {k:['patates','kızartma','cips'],p:2,c:90,piece:120,plate:180},
-  {k:['bal','reçel','pekmez'],p:0.5,c:300,piece:20,plate:40}
+  // yumurta & süt ürünleri
+  {k:['haşlanmış yumurta','omlet','menemen','yumurta'],p:13,cb:1.1,ft:11,piece:50,plate:150},
+  {k:['süzme yoğurt','labne'],p:9,cb:4,ft:5,piece:150,plate:200},
+  {k:['yoğurt','yogurt','cacık'],p:5,cb:5,ft:3.3,piece:150,plate:200},
+  {k:['ayran'],p:1.7,cb:3,ft:1.5,piece:200,plate:250},
+  {k:['kefir'],p:3.3,cb:4,ft:1,piece:200,plate:250},
+  {k:['süt'],p:3.4,cb:5,ft:3.4,piece:200,plate:200},
+  {k:['beyaz peynir','kaşar','peynir'],p:18,cb:2,ft:23,piece:30,plate:80},
+  {k:['lor','çökelek'],p:11,cb:3,ft:5,piece:30,plate:120},
+  // et, tavuk, balık
+  {k:['tavuk göğsü','tavuk göğ','göğüs'],p:31,cb:0,ft:3.6,piece:120,plate:150},
+  {k:['tavuk','piliç','hindi'],p:25,cb:0,ft:9,piece:120,plate:150},
+  {k:['köfte','dana','biftek','kırmızı et','kebap','kavurma','et '],p:26,cb:1,ft:17,piece:30,plate:150},
+  {k:['kuzu','pirzola'],p:25,cb:0,ft:21,piece:40,plate:150},
+  {k:['sucuk','salam','sosis','pastırma'],p:20,cb:2,ft:30,piece:20,plate:60},
+  {k:['ton balığı','ton'],p:24,cb:0,ft:6,piece:80,plate:120},
+  {k:['somon'],p:20,cb:0,ft:13,piece:120,plate:150},
+  {k:['levrek','çipura','hamsi','uskumru','balık'],p:22,cb:0,ft:8,piece:120,plate:150},
+  // baklagiller & tahıllar
+  {k:['mercimek çorbası','mercimek'],p:9,cb:20,ft:0.4,piece:30,plate:200},
+  {k:['nohut','humus'],p:9,cb:27,ft:6,piece:30,plate:180},
+  {k:['fasulye','barbunya','baklagil','kuru fasulye'],p:9,cb:22,ft:0.5,piece:30,plate:200},
+  {k:['bulgur','pilav','pirinç'],p:3,cb:28,ft:0.5,piece:30,plate:180},
+  {k:['makarna','erişte','kuskus','spagetti'],p:5,cb:25,ft:1.1,piece:30,plate:200},
+  {k:['yulaf','granola','müsli'],p:13,cb:60,ft:7,piece:40,plate:60},
+  {k:['bulgur pilavı'],p:3,cb:28,ft:1,piece:30,plate:180},
+  // ekmek & hamur işleri
+  {k:['tam buğday ekmek','tam buğday'],p:9,cb:43,ft:3,piece:28,plate:60},
+  {k:['ekmek','tost'],p:8,cb:49,ft:1.5,piece:28,plate:56},
+  {k:['simit'],p:9,cb:52,ft:6,piece:100,plate:100},
+  {k:['poğaça','açma'],p:7,cb:42,ft:16,piece:70,plate:70},
+  {k:['börek'],p:8,cb:35,ft:16,piece:80,plate:120},
+  {k:['pide','lahmacun'],p:10,cb:35,ft:8,piece:150,plate:200},
+  {k:['pizza'],p:11,cb:30,ft:10,piece:120,plate:250},
+  {k:['döner','dürüm'],p:15,cb:20,ft:15,piece:150,plate:250},
+  {k:['mantı'],p:8,cb:30,ft:8,piece:60,plate:220},
+  {k:['hamburger'],p:12,cb:22,ft:14,piece:200,plate:220},
+  // sebze & çorba
+  {k:['salata','marul','domates','salatalık','brokoli','ıspanak','sebze','biber','kabak','patlıcan'],p:2,cb:5,ft:0.3,piece:50,plate:150},
+  {k:['zeytinyağlı','dolma','sarma'],p:3,cb:15,ft:8,piece:40,plate:180},
+  {k:['çorba'],p:3,cb:7,ft:2,piece:200,plate:250},
+  {k:['patates kızartması','kızartma','cips'],p:3,cb:35,ft:15,piece:100,plate:150},
+  {k:['patates','haşlama'],p:2,cb:17,ft:0.2,piece:120,plate:180},
+  // meyve
+  {k:['muz'],p:1.1,cb:23,ft:0.3,piece:120,plate:150},
+  {k:['hurma'],p:2,cb:75,ft:0.4,piece:8,plate:60},
+  {k:['kuru meyve','kuru üzüm','kuru kayısı'],p:3,cb:65,ft:0.5,piece:10,plate:50},
+  {k:['elma','armut','portakal','mandalina','şeftali','erik','kayısı'],p:0.6,cb:13,ft:0.2,piece:150,plate:180},
+  {k:['çilek','üzüm','kiraz','karpuz','kavun','meyve'],p:0.8,cb:12,ft:0.3,piece:100,plate:150},
+  {k:['avokado'],p:2,cb:9,ft:15,piece:150,plate:150},
+  // kuruyemiş & yağlar
+  {k:['badem','ceviz','fındık','antep fıstığı','fıstık','kuruyemiş','kaju'],p:20,cb:20,ft:50,piece:5,plate:40},
+  {k:['fıstık ezmesi','fındık ezmesi','tahin'],p:22,cb:20,ft:50,piece:15,plate:30},
+  {k:['zeytin'],p:1,cb:6,ft:11,piece:4,plate:40},
+  {k:['zeytinyağı','sıvı yağ','ayçiçek yağı'],p:0,cb:0,ft:100,piece:10,plate:15},
+  {k:['tereyağı','tereyağ'],p:0.9,cb:0.1,ft:81,piece:10,plate:20},
+  // tatlı & atıştırmalık
+  {k:['baklava','künefe','şerbetli'],p:6,cb:55,ft:25,piece:60,plate:120},
+  {k:['sütlaç','muhallebi','dondurma','puding'],p:4,cb:25,ft:6,piece:120,plate:150},
+  {k:['çikolata','bitter','gofret'],p:7,cb:55,ft:32,piece:20,plate:60},
+  {k:['kek','kurabiye','bisküvi','pasta','tatlı'],p:6,cb:55,ft:20,piece:25,plate:90},
+  {k:['bal','reçel','pekmez','marmelat'],p:0.4,cb:80,ft:0,piece:20,plate:40},
+  // içecek & takviye
+  {k:['protein tozu','whey','protein bar','protein shake'],p:75,cb:10,ft:6,piece:30,plate:30},
+  {k:['çay','kahve','maden suyu','su'],p:0,cb:0,ft:0,piece:200,plate:200}
 ];
-var FOOD_FALLBACK={p:7,c:150,piece:60,plate:200};
+var FOOD_FALLBACK={p:7,cb:18,ft:5,piece:60,plate:200};
 var MEAL_UNITS=[{id:'tabak',label:'tabak'},{id:'gr',label:'gr'},{id:'adet',label:'adet'}];
 var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
 function foodLookup(name){
@@ -392,20 +660,167 @@ function foodLookup(name){
   return null;
 }
 function mealItemNutr(it){
-  if(!it||!it.name||!String(it.name).trim()) return {grams:0,protein:0,calories:0,known:false};
+  if(!it||!it.name||!String(it.name).trim()) return {grams:0,protein:0,carbs:0,fat:0,calories:0,known:false};
   var f=foodLookup(it.name), known=!!f; if(!f) f=FOOD_FALLBACK;
   var q=Number(it.qty); if(isNaN(q)||q<0) q=0;
   var g; if(it.unit==='gr') g=q; else if(it.unit==='adet') g=q*(f.piece||FOOD_FALLBACK.piece); else g=q*(f.plate||FOOD_FALLBACK.plate);
-  return {grams:g, protein:g*(f.p||0)/100, calories:g*(f.c||0)/100, known:known};
+  var P=g*(f.p||0)/100, Cb=g*(f.cb||0)/100, Ft=g*(f.ft||0)/100;
+  // Kalori: makro varsa Atwater (4·P + 4·C + 9·Y); yoksa eski c alanına düş.
+  var cal=(f.cb!=null||f.ft!=null)?(4*P+4*Cb+9*Ft):(g*(f.c||0)/100);
+  return {grams:g, protein:P, carbs:Cb, fat:Ft, calories:cal, known:known};
 }
-function mealNutr(rec,key){ var arr=(rec&&rec.mealItems&&rec.mealItems[key])||[]; var P=0,C=0,n=0; arr.forEach(function(it){ if(!it||!it.name||!String(it.name).trim())return; var nu=mealItemNutr(it); P+=nu.protein; C+=nu.calories; n++; }); return {protein:P,calories:C,items:n}; }
-function dayNutrition(rec){ var P=0,C=0,n=0; ['breakfast','lunch','dinner','snack'].forEach(function(k){ var m=mealNutr(rec,k); P+=m.protein; C+=m.calories; n+=m.items; }); return {protein:Math.round(P), calories:Math.round(C), items:n}; }
-function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; }
-function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); }
+function mealNutr(rec,key){ var arr=(rec&&rec.mealItems&&rec.mealItems[key])||[]; var P=0,Cb=0,Ft=0,C=0,n=0; arr.forEach(function(it){ if(!it||!it.name||!String(it.name).trim())return; var nu=mealItemNutr(it); P+=nu.protein; Cb+=nu.carbs; Ft+=nu.fat; C+=nu.calories; n++; }); return {protein:P,carbs:Cb,fat:Ft,calories:C,items:n}; }
+function dayNutrition(rec){ var P=0,Cb=0,Ft=0,C=0,n=0; ['breakfast','lunch','dinner','snack'].forEach(function(k){ var m=mealNutr(rec,k); P+=m.protein; Cb+=m.carbs; Ft+=m.fat; C+=m.calories; n+=m.items; }); return {protein:Math.round(P), carbs:Math.round(Cb), fat:Math.round(Ft), calories:Math.round(C), items:n}; }
+function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; var lp=document.getElementById('nutri-lp'); if(lp) lp.textContent=nu.protein+'g'; var cb=document.getElementById('nutri-carb'); if(cb) cb.textContent=nu.carbs+'g'; var ft=document.getElementById('nutri-fat'); if(ft) ft.textContent=nu.fat+'g'; var sb=document.getElementById('nutri-subtitle'); if(sb) sb.textContent=nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ'; var bc=document.getElementById('nutri-badgecal'); if(bc) bc.textContent=nu.calories; var mbar=document.getElementById('nutri-macrobar'); if(mbar) mbar.innerHTML=macroBarHTML(nu); var ni=document.getElementById('nutri-insight'); if(ni) ni.innerHTML=nutriInsightHTML(day,nu); }
+// Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
+function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),gratitude:[],health:emptyHealth()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null}; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
+// ---------- SAYGI · günün bilim ve sanat insanı ----------
+// Wikipedia içeriği ağdan her gün yalnızca bir kişi için alınır; uzun metin kişisel
+// senkrona değil, cihazın localStorage önbelleğine yazılır. Böylece veri hafif,
+// kaynak güncel ve CC BY-SA atfı içerikle birlikte kalır.
+var SAYGI_EPOCH='2026-07-10', SAYGI_CACHE_PREFIX='seyma-saygi-v1:', saygiMemoryCache={}, saygiReadObserver=null;
+function emptySaygi(){ return {personId:null,readAt:null,readingEntryId:null}; }
+function ensureSaygiDay(day){
+  if(!day||typeof day!=='object') return emptySaygi();
+  if(!day.saygi||typeof day.saygi!=='object') day.saygi=emptySaygi();
+  if(typeof day.saygi.personId!=='string'&&day.saygi.personId!==null) day.saygi.personId=null;
+  if(typeof day.saygi.readAt!=='string'&&day.saygi.readAt!==null) day.saygi.readAt=null;
+  if(typeof day.saygi.readingEntryId!=='string'&&day.saygi.readingEntryId!==null) day.saygi.readingEntryId=null;
+  return day.saygi;
+}
+function saygiPeople(){ return (window.SaygiPeople&&Array.isArray(window.SaygiPeople))?window.SaygiPeople:[]; }
+function saygiPositiveMod(n,m){ return ((n%m)+m)%m; }
+function saygiPersonForDate(date){ var people=saygiPeople(); if(!people.length) return null; return people[saygiPositiveMod(diffDays(SAYGI_EPOCH,date||todayStr()),people.length)]; }
+function saygiCurrentPerson(){ return saygiPersonForDate(todayStr()); }
+function saygiDayKey(person){ return String(todayStr())+'|'+String(person&&person.id||''); }
+function saygiCacheKey(lang,canonical,revision){ return SAYGI_CACHE_PREFIX+String(lang||'tr')+':'+encodeURIComponent(String(canonical||''))+':'+String(revision||'current'); }
+function saygiReadCache(key){
+  if(saygiMemoryCache[key]) return saygiMemoryCache[key];
+  try{ var raw=localStorage.getItem(key), val=raw?JSON.parse(raw):null; if(val&&Array.isArray(val.blocks)){ saygiMemoryCache[key]=val; return val; } }catch(e){}
+  return null;
+}
+function saygiWriteCache(key,val){ try{ saygiMemoryCache[key]=val; localStorage.setItem(key,JSON.stringify(val)); }catch(e){} }
+function saygiSafeUrl(url,hosts){
+  try{
+    var u=new URL(String(url||''));
+    if(u.protocol!=='https:') return '';
+    if(hosts&&hosts.length){ var ok=false; for(var i=0;i<hosts.length;i++){ if(u.hostname===hosts[i]||u.hostname.slice(-(hosts[i].length+1))==='.'+hosts[i]){ ok=true; break; } } if(!ok) return ''; }
+    return u.href;
+  }catch(e){ return ''; }
+}
+function saygiFetchJSON(url,timeout){
+  if(typeof fetch!=='function') return Promise.reject(new Error('Tarayıcı ağ isteğini desteklemiyor'));
+  var ctrl=(typeof AbortController==='function')?new AbortController():null, timer=null;
+  if(ctrl) timer=setTimeout(function(){ try{ ctrl.abort(); }catch(e){} },timeout||18000);
+  var opts={headers:{'Accept':'application/json'},credentials:'omit'}; if(ctrl) opts.signal=ctrl.signal;
+  function clear(){ if(timer) clearTimeout(timer); }
+  return fetch(url,opts).then(function(res){ clear(); if(!res.ok){ var err=new Error('Wikipedia yanıtı '+res.status); err.status=res.status; return Promise.reject(err); } return res.json(); },function(err){ clear(); return Promise.reject(err); });
+}
+function saygiSummaryUrl(lang,title){ return 'https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(String(title||'').replace(/ /g,'_')); }
+function saygiHtmlUrl(lang,title){ return 'https://'+lang+'.wikipedia.org/w/rest.php/v1/page/'+encodeURIComponent(String(title||'').replace(/ /g,'_'))+'/with_html'; }
+function saygiFetchSummary(lang,title){
+  return saygiFetchJSON(saygiSummaryUrl(lang,title)).then(function(j){
+    if(!j||j.type==='disambiguation'||j.type==='no-extract'||!j.title) return Promise.reject(new Error('Uygun Wikipedia maddesi bulunamadı'));
+    j._saygiLang=lang; j._saygiRequestedTitle=title; return j;
+  });
+}
+function saygiLoadSummary(person){
+  return saygiFetchSummary('tr',person.trTitle||person.name).catch(function(){ return saygiFetchSummary('en',person.enTitle||person.name); });
+}
+function saygiPlainText(value){ return String(value==null?'':value).replace(/\[[^\]]{1,80}\]/g,' ').replace(/\s+/g,' ').trim(); }
+function saygiStopHeading(text){ return /^(kaynakça|kaynaklar|notlar|dipnotlar|dış bağlantılar|ayrıca bakınız|bibliyografya|referanslar|further reading|references|external links|notes)$/i.test(saygiPlainText(text)); }
+function saygiBioBlocks(html){
+  if(!html||!window.DOMParser) return [];
+  var doc,root;
+  try{ doc=new DOMParser().parseFromString(String(html),'text/html'); root=doc.querySelector('.mw-parser-output')||doc.body; }catch(e){ return []; }
+  if(!root) return [];
+  var remove=root.querySelectorAll('script,style,table,figure,figcaption,aside,nav,sup,.reference,.reflist,.mw-editsection,.infobox,.navbox,.vertical-navbox,.metadata,.noprint,.hatnote,.thumb,.toc,.mw-empty-elt');
+  for(var r=0;r<remove.length;r++) remove[r].remove();
+  var nodes=root.querySelectorAll('h2,h3,p,ul,ol'), out=[], chars=0, headings=0;
+  for(var i=0;i<nodes.length;i++){
+    var node=nodes[i], tag=String(node.tagName||'').toLowerCase(), text='';
+    if(tag==='ul'||tag==='ol'){
+      var lis; try{ lis=node.querySelectorAll(':scope > li'); }catch(e){ lis=node.children||[]; } if(!lis.length) lis=node.querySelectorAll('li');
+      var items=[]; for(var li=0;li<lis.length&&items.length<5;li++){ var item=saygiPlainText(lis[li].textContent); if(item.length>16) items.push(item); }
+      text=items.join(' · ');
+    } else text=saygiPlainText(node.textContent);
+    if(!text) continue;
+    if(tag==='h2'||tag==='h3'){
+      if(saygiStopHeading(text)) break;
+      if(text.length<3||headings>=5) continue;
+      headings++; out.push({type:'h',text:text}); continue;
+    }
+    if(text.length<(tag==='p'?70:38)) continue;
+    if(chars+text.length>8200) text=text.slice(0,Math.max(0,8200-chars)).replace(/\s+\S*$/,'')+'…';
+    if(text.length<24) break;
+    out.push({type:tag==='p'?'p':'list',text:text}); chars+=text.length;
+    if(out.length>=15||chars>=8200) break;
+  }
+  return out;
+}
+function saygiExternalLinks(lang,title){
+  var p=new URLSearchParams({action:'query',format:'json',formatversion:'2',origin:'*',prop:'extlinks',ellimit:'8',titles:String(title||'')});
+  return saygiFetchJSON('https://'+lang+'.wikipedia.org/w/api.php?'+p.toString(),14000).then(function(j){
+    var pages=j&&j.query&&j.query.pages, page=Array.isArray(pages)?pages[0]:null, list=page&&Array.isArray(page.extlinks)?page.extlinks:[], seen={}, out=[];
+    for(var i=0;i<list.length&&out.length<3;i++){
+      var raw=list[i]&&(list[i]['*']||list[i].url||list[i]), safe=saygiSafeUrl(raw); if(!safe||seen[safe]) continue;
+      try{ var host=new URL(safe).hostname.replace(/^www\./,''); if(/(?:wikipedia|wikimedia)\.org$/i.test(host)) continue; seen[safe]=true; out.push({url:safe,host:host}); }catch(e){}
+    }
+    return out;
+  }).catch(function(){ return []; });
+}
+function saygiArticleFrom(person,summary,full,links){
+  var lang=summary._saygiLang||'tr', canonical=(summary.titles&&summary.titles.canonical)||summary.title||summary._saygiRequestedTitle||person.name;
+  var blocks=saygiBioBlocks(full&&full.html);
+  if(!blocks.length&&summary.extract) blocks=[{type:'p',text:saygiPlainText(summary.extract)}];
+  var thumbnail=saygiSafeUrl(summary.thumbnail&&summary.thumbnail.source,['upload.wikimedia.org']);
+  var source=saygiSafeUrl(summary.content_urls&&summary.content_urls.desktop&&summary.content_urls.desktop.page,[lang+'.wikipedia.org'])||('https://'+lang+'.wikipedia.org/wiki/'+encodeURIComponent(canonical));
+  var license=(full&&full.license)||{}, licenseUrl=saygiSafeUrl(license.url)||'https://creativecommons.org/licenses/by-sa/4.0/deed.tr';
+  return {personId:person.id,dailyKey:saygiDayKey(person),lang:lang,title:String(summary.title||person.name),canonical:String(canonical),description:saygiPlainText(summary.description||person.field||''),lead:saygiPlainText(summary.extract||''),blocks:blocks,thumbnail:thumbnail,sourceUrl:source,licenseTitle:String(license.title||'Creative Commons Attribution-Share Alike 4.0'),licenseUrl:licenseUrl,revision:(full&&full.latest&&full.latest.id)||summary.revision||null,links:links||[],fetchedAt:new Date().toISOString()};
+}
+function saygiLoadArticle(person,force){
+  if(!person) return;
+  var dailyKey=saygiDayKey(person), requestId=(ui.saygiRequestId||0)+1;
+  ui.saygiRequestId=requestId; ui.saygiLoading=true; ui.saygiError=null;
+  saygiLoadSummary(person).then(function(summary){
+    var canonical=(summary.titles&&summary.titles.canonical)||summary.title||person.name, lang=summary._saygiLang||'tr', cacheKey=saygiCacheKey(lang,canonical,summary.revision||'current');
+    var cached=!force?saygiReadCache(cacheKey):null;
+    if(cached) return cached;
+    return saygiFetchJSON(saygiHtmlUrl(lang,canonical),20000).catch(function(){ return null; }).then(function(full){
+      return saygiExternalLinks(lang,canonical).then(function(links){ var article=saygiArticleFrom(person,summary,full,links); saygiWriteCache(cacheKey,article); return article; });
+    });
+  }).then(function(article){
+    if(requestId!==ui.saygiRequestId||dailyKey!==saygiDayKey(person)) return;
+    ui.saygiArticle=article; ui.saygiLoading=false; ui.saygiError=null;
+    if(ui.tab==='saygi') render();
+  }).catch(function(err){
+    if(requestId!==ui.saygiRequestId) return;
+    ui.saygiLoading=false; ui.saygiError='Biyografi şu an yüklenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.';
+    if(ui.tab==='saygi') render();
+  });
+}
+function saygiEnsureArticle(person){
+  var key=saygiDayKey(person);
+  if(ui.saygiKey!==key){ ui.saygiKey=key; ui.saygiArticle=null; ui.saygiLoading=false; ui.saygiError=null; ui.saygiReadReady=false; }
+  if(!ui.saygiArticle&&!ui.saygiLoading) saygiLoadArticle(person,false);
+}
+function saygiReadMinutes(article){ var text=(article&&article.blocks||[]).map(function(b){return b.text;}).join(' '); return Math.max(4,Math.min(18,Math.round(text.length/850)||4)); }
+function saygiReadingEntry(day,person){
+  var entries=day&&day.reading&&Array.isArray(day.reading.entries)?day.reading.entries:[];
+  for(var i=0;i<entries.length;i++){ var e=entries[i]; if(e&&e.source==='saygi'&&e.personId===person.id&&e.saygiDate===todayStr()) return e; }
+  return null;
+}
+function saygiHasRead(person){
+  var day=data&&data.days&&data.days[todayStr()]; if(!day||!person) return false;
+  var entry=saygiReadingEntry(day,person); if(!entry) return false;
+  var st=ensureSaygiDay(day); if(st.readingEntryId!==entry.id){ st.personId=person.id; st.readingEntryId=entry.id; st.readAt=entry.ts||st.readAt||new Date().toISOString(); }
+  return true;
+}
+function saygiDomainTone(host){ var colors=['#735F37','#4B6670','#76536A','#526753','#6B5B86','#8B6047']; var n=0,s=String(host||''); for(var i=0;i<s.length;i++) n=(n*31+s.charCodeAt(i))>>>0; return colors[n%colors.length]; }
 // Sağlık uygulaması (iOS Health) senkronu — tarayıcı arka planda GPS izleyemediği için
 // telefonun kendi adım sayacından tek yönlü, otomatik (Kısayollar) beslenen alan.
 function emptyHealth(){ return {steps:0,walkM:0,updatedAt:null}; }
@@ -423,12 +838,24 @@ function effSteps(rec){
 // Su / uyku / yürüyüş tikleri elle işaretlenmez; yalnızca ilgili veri eşiği
 // tutunca kendiliğinden yeşillenir. habitProgress hem kapı (met) hem de premium
 // ilerleme metni/çubuğu için gereken her şeyi döndürür. Renkler her tik için ayrı.
-var DERIVED_HABITS={water:1,sleepReg:1,walked20:1};
-var DERIVED_ACCENT={water:'#5EA9E6',sleepReg:'#9B7FC9',walked20:'#5BA85B'};
+var DERIVED_HABITS={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1};
+var DERIVED_ACCENT={water:'#5EA9E6',sleepReg:'#9B7FC9',walked20:'#5BA85B',journaled:'#E0A93C',sweetManaged:'#E9899F',foodManaged:'#E0A55E',coffeeManaged:'#A9805B',mediaFed:'#C77D93'};
+// Bugün okuma/izleme/dinleme/öğrenme hub'larından en az birine kayıt girildi mi? (mediaFed tiki)
+function hasAnyHubEntry(rec){
+  if(!rec) return false;
+  var keys=['reading','watching','listening','learning'];
+  for(var i=0;i<keys.length;i++){ var o=rec[keys[i]]; if(o&&Array.isArray(o.entries)&&o.entries.some(function(e){ return e&&((e.title&&String(e.title).trim())||(e.topic&&String(e.topic).trim())); })) return true; }
+  return false;
+}
 function habitProgress(rec,key){
   if(key==='water'){ var w=(rec&&typeof rec.water==='number'&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL,cur:w,goal:WATER_GOAL,unit:'bardak',has:w>0}; }
   if(key==='sleepReg'){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN),cur:h,goal:SLEEP_TICK_MIN,unit:'saat',has:h!=null}; }
   if(key==='walked20'){ var e=effSteps(rec); var s=(e.steps!=null&&!isNaN(e.steps))?e.steps:0; return {met:s>=STEP_TICK_MIN,cur:s,goal:STEP_TICK_MIN,unit:'adım',has:s>0,source:e.source}; }
+  if(key==='journaled'){ var nt=(rec&&rec.note&&String(rec.note).trim())?1:0; return {met:nt>0,cur:nt,goal:1,binary:true,has:nt>0}; }
+  if(key==='sweetManaged'){ var cd=!!(rec&&rec.craving10MinDone); return {met:cd,cur:cd?1:0,goal:1,binary:true,has:cd}; }
+  if(key==='foodManaged'){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true,has:fd}; }
+  if(key==='coffeeManaged'){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true,has:kd}; }
+  if(key==='mediaFed'){ var any=hasAnyHubEntry(rec); return {met:any,cur:any?1:0,goal:1,binary:true,has:any}; }
   return null;
 }
 // day.habits[key]'i veriyle senkronlar; yeni yeşillenen anahtarları döndürür (kutlama için).
@@ -444,6 +871,11 @@ function derivedProgText(key,prog){
   if(key==='water') return prog.cur<=0?'Su ekle · '+WATER_GOAL+' bardakta otomatik yeşil':prog.cur+'/'+WATER_GOAL+' bardak · dolunca otomatik yeşil';
   if(key==='sleepReg') return prog.cur==null?'Uyku gir · 7,5 saatte otomatik yeşil':String(prog.cur).replace('.',',')+' saat · 7,5 saatte otomatik yeşil';
   if(key==='walked20') return prog.cur<=0?'Adım gir · 4.500 adımda otomatik yeşil':prog.cur.toLocaleString('tr-TR')+' / 4.500 adım · otomatik yeşil';
+  if(key==='journaled') return 'Yansıma kartına bir not yaz → kendiliğinden yeşillenir';
+  if(key==='sweetManaged') return 'Tatlı krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
+  if(key==='foodManaged') return 'Yemek/açlık krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
+  if(key==='coffeeManaged') return 'Kahve/kafein krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
+  if(key==='mediaFed') return 'Okudum / izledim / dinledim / öğrendim\'den birini doldur → yeşillenir';
   return '';
 }
 function readingStats(rec){ var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[]; var pages=0,minutes=0; en.forEach(function(e){ if(!e) return; var p=Number(e.pages); if(!isNaN(p)&&p>0) pages+=p; var m=Number(e.minutes); if(!isNaN(m)&&m>0) minutes+=m; }); return {count:en.length,pages:pages,minutes:minutes,entries:en}; }
@@ -454,6 +886,7 @@ function emptyWatching(){ return {entries:[]}; }
 function emptyLibrary(){ return {books:[],goal:{dailyPages:20,yearlyBooks:null}}; }
 function emptyWatchlist(){ return {items:[],goal:{dailyMinutes:40,yearlyTitles:null}}; }
 function emptyListening(){ return {entries:[]}; }
+function emptyLearning(){ return {entries:[]}; }
 function emptyMusic(){ return {items:[],goal:{dailyMinutes:30,yearlyTitles:null}}; }
 var BOOK_GENRES=['Roman','Klasik','Kişisel gelişim','Şiir','Öykü','Bilim','Tarih','Felsefe','Polisiye','Fantastik'];
 var TITLE_GENRES=['Dram','Komedi','Aksiyon','Bilimkurgu','Gerilim','Romantik','Belgesel','Fantastik','Animasyon','Suç'];
@@ -508,12 +941,57 @@ function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<
 function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
 function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRepo); }
 function savedToday(){ return data.lastSyncDate===todayStr(); }
+// Estetik "Gizle" pill'i; gizlenen kart Bugün'de kaybolur, Ayarlar > "Gizlenen kartlar"dan geri gelir.
+function hidePill(which){
+  return '<button onclick="event.stopPropagation();App.hideBugunCard(\''+which+'\')" aria-label="Gizle" title="Gizle" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(150,110,120,0.12);color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.2px;padding:6px 12px;border-radius:999px;line-height:1;">Gizle</button>';
+}
 function saveBanner(){
-  if(!syncConfigured()) return '<div id="sey-save-banner" onclick="App.go(\'ayarlar\')" style="cursor:pointer;background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 8px 20px rgba(240,180,140,0.3);"><span style="display:inline-flex;">'+icon('link-2',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:#7A4A2E;">Repoya bağlan</div><div style="font-size:12px;color:#8A5A3E;line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div><span style="font-size:18px;color:#7A4A2E;">›</span></div>';
+  if(!syncConfigured()){
+    if(data.settings&&data.settings.hideRepoBanner) return '';
+    return '<div id="sey-save-banner" class="glass" onclick="App.go(\'ayarlar\')" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:12px;color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:20px;color:var(--warn);font-weight:700;line-height:1;">›</span></div>';
+  }
   if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:13px;font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
   return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:12px;color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:13px;padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
+
+// ---- Açılır/kapanır kart altyapısı: gereksiz tam render'lardan kaçınmak için
+// yalnızca ilgili kartı yerinde günceller (updateSaveBanner deseni). ----
+var CARD_BUILDERS={}; // key -> function(rec){ return html }
+// Akıllı varsayılan: kullanıcı elle dokunmadıysa def'e göre aç/kapa; sonra kullanıcı kontrol eder.
+function cardOpen(key, def){ if(ui.cards[key]===undefined) ui.cards[key]=false; return !!ui.cards[key]; }
+function updateCardByKey(key){
+  var el=document.querySelector('[data-cardkey="'+key+'"]');
+  if(!el) return;
+  var fn=CARD_BUILDERS[key]; if(!fn) return;
+  var rec=data.days[activeDate()]||null;
+  var t=document.createElement('div'); t.innerHTML=fn(rec);
+  if(t.firstChild) el.replaceWith(t.firstChild);
+}
+// Ortak açılır/kapanır kart kabuğu (hava/terapi kartı deseni).
+// title/subtitle/badge/body HTML olarak gelir; dinamik metni çağıran esc'ler.
+function collapsibleCardHTML(o){
+  var open=!!o.open, accent=o.accent||'var(--accent)';
+  // iOS 26 liquid-glass: hafif renk çerçeve (color-mix) + açık/kapalı hâl farkı (yükseklik/gölge).
+  var frame=open
+    ? 'border:1px solid color-mix(in srgb,'+accent+' 40%, var(--card-bd));box-shadow:0 16px 40px rgba(108,74,58,0.11),inset 0 1px 0 rgba(255,255,255,0.45);'
+    : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
+  var h='<div id="'+esc(o.id||('card-'+o.key))+'" class="glass sey-ccard" data-cardkey="'+esc(o.key)+'" data-open="'+(open?'1':'0')+'" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+(o.cardStyle||'')+'">';
+  h+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+accent+',transparent);"></span>';
+  h+='<div onclick="App.toggleCard(\''+esc(o.key)+'\')" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  if(o.icon) h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+o.icon+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
+  if(o.badge) h+='<div style="flex-shrink:0;">'+o.badge+'</div>';
+  h+='<span class="sey-collchev" style="color:'+accent+';display:inline-flex;flex-shrink:0;transition:transform .25s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
+  h+='</div>';
+  if(open){
+    h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
+  } else if(o.hint!==false){
+    h+='<div onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</div>';
+  }
+  h+='</div>';
+  return h;
+}
 // ---- geçmiş gün düzenleme: tarih etiketi + kalıcı uyarı şeridi ----
 function dateLabelTR(s){ if(!s) return ''; var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); var mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']; var wd=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']; return p[2]+' '+mo[p[1]-1]+' '+wd[dt.getDay()]; }
 function editBanner(){
@@ -526,7 +1004,7 @@ function editBanner(){
     +'</div>';
 }
 window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; }); if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; }); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
+function save(){ try{ var _d=data&&data.days&&data.days[activeDate()]; if(_d&&_d.habits) syncDerivedHabits(_d); }catch(e){} try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
 function commit(msg){ save(); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
 function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
@@ -552,9 +1030,9 @@ function weekBlock(w,days){
 function toast(msg,ms){
   var ex=document.getElementById('sey-toast'); if(ex) ex.remove();
   var t=document.createElement('div'); t.id='sey-toast';
-  t.style.cssText='position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:400;background:rgba(44,36,38,0.92);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,0.25);animation:seyToast .25s ease;max-width:88vw;text-align:center;';
+  t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:400;display:flex;align-items:center;justify-content:center;max-width:88vw;padding:12px 19px;border-radius:17px;background:rgba(28,22,30,0.62);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,0.16);color:#fff;font:600 14px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;box-shadow:0 16px 42px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.14);text-align:center;letter-spacing:.1px;animation:seyToast .32s cubic-bezier(.16,1,.3,1);';
   t.textContent=msg; document.body.appendChild(t);
-  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ if(t.parentNode) t.remove(); }, ms||1600);
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ if(t&&t.parentNode){ t.style.transition='opacity .28s ease,transform .28s ease'; t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px) scale(.97)'; setTimeout(function(){ if(t.parentNode) t.remove(); },300); } }, ms||1800);
 }
 function confetti(){
   var colors=['#E9AFC1','#C9B8FF','#FFE8A3','#F7DDE5','#6B4A3A'];
@@ -565,8 +1043,32 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); };
+App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; if(window.MotivationProgramV2) window.MotivationProgramV2.ensureMotivationRoot(data); ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); };
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
+App.refreshSaygi=function(){ var person=saygiCurrentPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
+App.openSaygiReading=function(){ App.openReading(); };
+App.markSaygiRead=function(){
+  var person=saygiCurrentPerson(), article=ui.saygiArticle;
+  if(!person||!article||article.dailyKey!==saygiDayKey(person)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
+  if(!ui.saygiReadReady&&!saygiHasRead(person)){ toast('Önce yazının sonuna kadar inelim; “Okudum” orada açılacak.'); return; }
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!day.reading||typeof day.reading!=='object') day.reading=emptyReading();
+  if(!Array.isArray(day.reading.entries)) day.reading.entries=[];
+  var existing=saygiReadingEntry(day,person), state=ensureSaygiDay(day);
+  if(existing){
+    state.personId=person.id; state.readingEntryId=existing.id; state.readAt=existing.ts||state.readAt||new Date().toISOString();
+    syncDerivedHabits(day); save(); render(); toast('Bu biyografi bugünün “Ne okudum?” kaydında zaten var.'); return;
+  }
+  var entry={
+    id:uid('saygi'), title:String(article.title||person.name).slice(0,120), author:'Wikipedia · Saygı', pages:0,
+    minutes:saygiReadMinutes(article), note:('Saygı seçkisi · '+String(person.field||person.kind||'')).slice(0,240),
+    source:'saygi', personId:person.id, saygiDate:todayStr(), sourceUrl:saygiSafeUrl(article.sourceUrl), sourceLabel:(article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia'), sourceImage:saygiSafeUrl(article.thumbnail,['upload.wikimedia.org']), ts:new Date().toISOString()
+  };
+  day.reading.entries.push(entry);
+  state.personId=person.id; state.readingEntryId=entry.id; state.readAt=entry.ts; day.savedAt=entry.ts;
+  syncDerivedHabits(day); save(); haptic([10,24,10]); render();
+  toast('Okudum kaydedildi · Zihnimi besledim tiki de seninle yeşerdi.',2800);
+};
 App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
@@ -587,9 +1089,18 @@ App.explainDerivedHabit=function(key,day){
   if(p.met){
     var ok={ water:'Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak. Bu tik otomatik, ellemene gerek yok.',
              sleepReg:'Uyku tamam — 7,5+ saat. Bu tik kendiliğinden yeşil kalır.',
-             walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.' };
-    toast(ok[key]); return;
+             walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.',
+             journaled:'Not tamam — bugün yazdın. Bu tik kendiliğinden yeşil kalır.',
+             sweetManaged:'Tatlı krizini yönettin — bu tik kendiliğinden yeşil kaldı. Helal sana.',
+             foodManaged:'Yemek/açlık krizini yönettin — bu tik kendiliğinden yeşil kaldı. Kaptan sensin.',
+             coffeeManaged:'Kahve/kafein krizini yönettin — bu tik kendiliğinden yeşil kaldı. Net karar.',
+             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin. Bu tik otomatik yeşil.' };
+    toast(ok[key]||'Bu tik otomatik — eşik tuttuğunda kendiliğinden yeşil kalır.'); return;
   }
+  // Kriz tikleri: dokununca ilgili kriz odasını (modal) aç — en işlevlisi bu.
+  if(key==='sweetManaged'){ App.openCrisis('sweet'); return; }
+  if(key==='foodManaged'){ App.openCrisis('food'); return; }
+  if(key==='coffeeManaged'){ App.openCrisis('coffee'); return; }
   var msg;
   if(key==='water'){ var w=p.cur; msg = w<=0
       ? 'Su tiki otomatik: '+WATER_GOAL+' bardağı tamamlayınca kendiliğinden yeşillenir. Aşağıdaki “Su” kartından eklemeye başla.'
@@ -600,11 +1111,14 @@ App.explainDerivedHabit=function(key,day){
   else if(key==='walked20'){ var s=p.cur; msg = s<=0
       ? 'Yürüyüş tiki otomatik: 4.500 adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'
       : 'Yürüyüş tikine '+(STEP_TICK_MIN-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+STEP_TICK_MIN.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'; }
+  else if(key==='journaled'){ msg='Not tiki otomatik: “Günün yansıması” kartına bir cümle bile yazınca kendiliğinden yeşillenir.'; }
+  else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim kutucuklarından birini doldur → yeşillenir.'; }
+  else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
 };
 function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
-App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); haptic(14); commit(); };
-App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; save(); },500); };
+App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); day.savedAt=new Date().toISOString(); haptic(14); save(); updateCardByKey('mood'); updateCardByKey('mental'); };
+App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(); },500); };
 App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.settings.haptics=!!on; if(on) haptic(18); save(); render(); };
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); save(); },500); };
@@ -612,7 +1126,7 @@ App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function()
 // ---- öğün detay (tabak/gr/adet) ----
 App.addMealItem=function(key){ var day=curDay(); if(!day.mealItems[key]) day.mealItems[key]=[]; day.mealItems[key].push({name:'',qty:1,unit:'tabak'}); day.savedAt=new Date().toISOString(); commit(); setTimeout(function(){ var inp=document.querySelector('[data-meal="'+key+'"][data-idx="'+(day.mealItems[key].length-1)+'"]'); if(inp) inp.focus(); },40); };
 App.removeMealItem=function(key,idx){ var day=curDay(); if(day.mealItems[key]&&day.mealItems[key][idx]!=null){ day.mealItems[key].splice(idx,1); syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); } };
-App.setMealItemName=function(key,idx,el){ var v=el.value; debounceSave('mi-'+key+'-'+idx,function(){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.name=v; syncMealText(day,key); day.savedAt=new Date().toISOString(); save(); var sub=document.getElementById('meal-sub-'+key); if(sub){ var m=mealNutr(day,key); sub.textContent=Math.round(m.protein)+'g protein'; } var tot=document.getElementById('nutri-live'); if(tot){ updateNutriLive(day); } },350); };
+App.setMealItemName=function(key,idx,el){ var v=el.value; debounceSave('mi-'+key+'-'+idx,function(){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.name=v; syncMealText(day,key); day.savedAt=new Date().toISOString(); save(); var sub=document.getElementById('meal-sub-'+key); if(sub){ var m=mealNutr(day,key); sub.textContent=Math.round(m.protein)+'g P · '+Math.round(m.calories)+' kcal'; } updateNutriLive(day); },350); };
 App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; var v=el.value===''?'':Number(el.value); it.qty=(v===''||isNaN(v))?'':v; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
 App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
 
@@ -620,8 +1134,8 @@ App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems
 App.waterAdd=function(n){ var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ haptic(16); toast('Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- enerji / stres ----
-App.setEnergy=function(v){ var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); commit(); };
-App.setStress=function(v){ var day=curDay(); day.stress=(day.stress===v?null:v); day.savedAt=new Date().toISOString(); commit(); };
+App.setEnergy=function(v){ var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); haptic(10); save(); updateCardByKey('mood'); updateCardByKey('mental'); };
+App.setStress=function(v){ var day=curDay(); day.stress=(day.stress===v?null:v); day.savedAt=new Date().toISOString(); haptic(10); save(); updateCardByKey('mood'); updateCardByKey('mental'); };
 
 // ---- kafein ----
 App.setCaffeineTime=function(el){ var v=el.value; var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null}; day.caffeine.last=v||null; day.savedAt=new Date().toISOString(); commit(); };
@@ -657,7 +1171,7 @@ App.addReading=function(){
 };
 App.removeReading=function(id){
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
-  if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.reading.entries[i]; if(e&&e.bookId&&e.pages>0){ var bk=findBook(e.bookId); if(bk){ bk.currentPage=Math.max(0,bk.currentPage-e.pages); if(bk.status==='finished'&&bk.totalPages&&bk.currentPage<bk.totalPages){ bk.status='reading'; bk.finishedAt=null; } } } day.reading.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
+  if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.reading.entries[i]; if(e&&e.bookId&&e.pages>0){ var bk=findBook(e.bookId); if(bk){ bk.currentPage=Math.max(0,bk.currentPage-e.pages); if(bk.status==='finished'&&bk.totalPages&&bk.currentPage<bk.totalPages){ bk.status='reading'; bk.finishedAt=null; } } } day.reading.entries.splice(i,1); if(e&&e.source==='saygi'&&day.saygi&&day.saygi.readingEntryId===id) day.saygi=emptySaygi(); syncDerivedHabits(day); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
 };
 // ---- kitap CRUD ----
 App.openBookEdit=function(id){ ensureLibrary(); ui.bookEdit = id ? clone(findBook(id)||{}) : {id:'',title:'',author:'',genre:'',emoji:'',totalPages:'',currentPage:0,status:'reading',rating:null,quotes:[]}; render(); };
@@ -789,12 +1303,34 @@ App.saveLyric=function(){ if(!ui.lyricDraft) return; var x=findTrack(ui.lyricDra
 App.removeLyric=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var i=x.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ x.quotes.splice(i,1); commit('Söz silindi'); } };
 App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var q=x.quotes.find(function(z){return z&&z.id===qid;}); if(!q) return; App.copyQuote('“'+q.text+'”\n— '+x.title+(x.artist?', '+x.artist:'')); };
 
+// ================= NE ÖĞRENDİM =================
+App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); };
+App.closeLearning=function(){ ui.learningOpen=false; ui.learningDraft=null; render(); };
+App.onLearningField=function(field,el){ if(!ui.learningDraft) ui.learningDraft={topic:'',source:'',note:''}; ui.learningDraft[field]=el.value; };
+App.addLearning=function(){
+  var d=ui.learningDraft||{};
+  var topic=String(d.topic||'').trim();
+  if(!topic){ toast('Önce ne öğrendiğini yaz'); var ti=document.getElementById('learning-topic'); if(ti) ti.focus(); return; }
+  var entry={ id:uid('ln'), topic:topic.slice(0,140), source:String(d.source||'').trim().slice(0,120), note:String(d.note||'').trim().slice(0,300), ts:new Date().toISOString() };
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!day.learning||typeof day.learning!=='object') day.learning=emptyLearning();
+  if(!Array.isArray(day.learning.entries)) day.learning.entries=[];
+  day.learning.entries.push(entry);
+  day.savedAt=new Date().toISOString();
+  ui.learningDraft={topic:'',source:'',note:''};
+  commit('Öğrenme kaydedildi');
+};
+App.removeLearning=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.learning&&Array.isArray(day.learning.entries)){ var i=day.learning.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ day.learning.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Öğrenme kaydı silindi'); } } };
+
 // ================= ŞÜKRAN / 3 GÜZEL ŞEY =================
 App.onGratitude=function(i,el){ var v=el.value; i=Number(i)||0; debounceSave('grat'+i,function(){ var day=curDay(); if(!Array.isArray(day.gratitude)) day.gratitude=[]; day.gratitude[i]=String(v||'').slice(0,160); day.savedAt=new Date().toISOString(); save(); },500); };
 
 
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); var nw=syncDerivedHabits(day); if(nw.indexOf('walked20')>=0){ haptic(16); toast('Yürüyüş tiki kendiliğinden yeşillendi. 4.500+ adım, harika!'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
+// Kalıcı kart gizleme/geri getirme (settings'te tutulur; Ayarlar > Gizlenen kartlar'dan geri gelir).
+App.hideBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location'){ data.settings.hideLocationCard=true; toast('Konum & Hareket gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='repo'){ data.settings.hideRepoBanner=true; toast('Repoya bağlan gizlendi · Ayarlar’dan geri getirebilirsin'); } haptic(10); save(); render(); };
+App.showBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location') data.settings.hideLocationCard=false; else if(which==='repo') data.settings.hideRepoBanner=false; haptic(10); save(); render(); };
 App.hideStepRemind=function(){ ui.stepRemindHidden=true; render(); };
 App.hideWaterNudge=function(){ ui.waterNudgeHidden=true; render(); };
 App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); day.savedAt=new Date().toISOString(); save(); }); };
@@ -842,14 +1378,17 @@ App.quickDiscomfortMed=function(i){ var day=curDay(); if(!day.discomfort) day.di
 App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed-'+idx+'-'+field,function(){ var day=curDay(); var m=day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]; if(!m) return; m[field]=v; day.savedAt=new Date().toISOString(); save(); },350); };
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
-App.goSos=function(){ haptic([16,40,16]); App.go('sos'); };
-
-App.toggleSosOpt=function(o){ var i=ui.sosOpts.indexOf(o); if(i>=0) ui.sosOpts.splice(i,1); else ui.sosOpts.push(o); render(); };
-App.toggleSosTrigger=function(id){ var i=ui.sosTriggers.indexOf(id); if(i>=0) ui.sosTriggers.splice(i,1); else ui.sosTriggers.push(id); render(); };
-App.startSosTimer=function(){ clearInterval(sosInterval); ui.sosTiming=true; ui.sosLeft=600; render(); sosInterval=setInterval(function(){ ui.sosLeft--; if(ui.sosLeft<=0){ clearInterval(sosInterval); ui.sosLeft=0; ui.sosTiming=false; render(); toast('10 dakika doldu. Şimdi kararı sen ver',2600); } else { updateSosTimer(); } },1000); };
-function updateSosTimer(){ var el=document.getElementById('sos-clock'); if(el){ el.textContent=pad(Math.floor(ui.sosLeft/60))+':'+pad(ui.sosLeft%60); } }
-App.completeSos=function(){ var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; ui.sosOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); if(!Array.isArray(day.cravingTriggers)) day.cravingTriggers=[]; var nowIso=new Date().toISOString(); ui.sosTriggers.forEach(function(tg){ day.cravingTriggers.push({trigger:tg,ts:nowIso}); }); day.habits.sweetManaged=true; day.savedAt=nowIso; clearInterval(sosInterval); ui.sosTiming=false; ui.sosDone=true; commit('Krizi yönettin'); };
-App.resetSos=function(){ clearInterval(sosInterval); ui.sosOpts=[]; ui.sosTriggers=[]; ui.sosLeft=600; ui.sosTiming=false; ui.sosDone=false; render(); };
+// ── Kriz odaları (modal): Tatlı · Yemek · Kahve ──
+App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); clearInterval(crisisInterval); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=CRISES[kind].secs; ui.crisisTiming=false; ui.crisisDone=false; ui.crisisTriedOpen=false; ui.crisisTrigOpen=false; lastCrisisKind=null; render(); };
+App.toggleCrisisSection=function(which){ if(which==='tried') ui.crisisTriedOpen=!ui.crisisTriedOpen; else ui.crisisTrigOpen=!ui.crisisTrigOpen; haptic(8); render(); };
+App.closeCrisis=function(){ clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisKind=null; render(); };
+App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); };
+App.toggleCrisisTrigger=function(id){ var i=ui.crisisTriggers.indexOf(id); if(i>=0) ui.crisisTriggers.splice(i,1); else ui.crisisTriggers.push(id); render(); };
+App.onCrisisNote=function(el){ ui.crisisNote=String(el.value||'').slice(0,200); };
+App.startCrisisTimer=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; clearInterval(crisisInterval); ui.crisisTiming=true; ui.crisisLeft=C.secs; render(); crisisInterval=setInterval(function(){ ui.crisisLeft--; if(ui.crisisLeft<=0){ clearInterval(crisisInterval); ui.crisisLeft=0; ui.crisisTiming=false; var CC=CRISES[ui.crisisKind]; var d=getDay(data,todayStr(),dayIndexFor(todayStr())); if(CC) d[CC.doneField]=true; syncDerivedHabits(d); d.savedAt=new Date().toISOString(); save(); render(); haptic([16,40,16]); if(CC) toast(CC.doneToast,3000); } else { updateCrisisTimer(); } },1000); };
+function updateCrisisTimer(){ var el=document.getElementById('crisis-clock'); if(el){ el.textContent=pad(Math.floor(ui.crisisLeft/60))+':'+pad(ui.crisisLeft%60); } }
+App.completeCrisis=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day[C.doneField]=true; if(!Array.isArray(day.cravingOptionsUsed)) day.cravingOptionsUsed=[]; ui.crisisOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); if(!Array.isArray(day.cravingTriggers)) day.cravingTriggers=[]; var nowIso=new Date().toISOString(); ui.crisisTriggers.forEach(function(tg){ day.cravingTriggers.push({trigger:tg,ts:nowIso,kind:C.key}); }); var tn=String(ui.crisisNote||'').trim().slice(0,200); if(tn) day.cravingTriggerNote=tn; syncDerivedHabits(day); day.savedAt=nowIso; clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisDone=true; commit('Krizi yönettin'); };
+App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; clearInterval(crisisInterval); ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=C?C.secs:600; ui.crisisTiming=false; ui.crisisDone=false; ui.crisisTriedOpen=false; ui.crisisTrigOpen=false; render(); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
@@ -971,7 +1510,7 @@ function locNudgeEligible(){
   if(ui.locNudgeOpen) return false;                      // zaten açık
   if(ui.tab!=='bugun'&&ui.tab!=='saglik') return false;  // yalnız sağlıkla ilgili sekmeler
   if(editing()) return false;
-  if(ui.locationConsent||ui.dayDetail||ui.emergency||ui.resetStep>0||ui.readingOpen||ui.watchOpen||ui.listeningOpen||ui.weatherOpen||ui.forceStart) return false;
+  if(ui.locationConsent||ui.dayDetail||ui.emergency||ui.resetStep>0||ui.readingOpen||ui.watchOpen||ui.listeningOpen||ui.learningOpen||ui.weatherOpen||ui.roomOpen||ui.forceStart) return false;
   var ln=ensureLocNudge(); if(!ln) return false;
   var now=Date.now(), t=todayStr();
   if(ln.dayKey!==t){ ln.dayKey=t; ln.dayCount=0; }
@@ -1013,10 +1552,97 @@ App.locNudgeSnooze=function(){ closeLocNudge('later'); };
 App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
 App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optOutDay=todayStr(); ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Tamam, bugünlük kapattım — yarın yine buradayım'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
+function prefersReducedMotion(){ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+// Premium akordeon: gövdeyi (.sey-collbody) ölçülmüş max-height ile yumuşakça aç/kapat.
+// Layout sıçraması yok; kapanınca DOM'u yeni (kapalı) hâle çevirir.
+function animateCardCollapse(el, done){
+  var body=el&&el.querySelector('.sey-collbody');
+  var chev=el&&el.querySelector('.sey-collchev');
+  if(chev) chev.style.transform='rotate(0deg)';
+  if(!body || prefersReducedMotion()){ done(); return; }
+  var hpx=body.scrollHeight+'px';
+  body.style.overflow='hidden'; body.style.maxHeight=hpx; body.style.opacity='1';
+  body.getBoundingClientRect(); // reflow
+  body.style.transition='max-height .26s var(--ease-premium,cubic-bezier(.33,1,.68,1)),opacity .2s ease';
+  body.style.maxHeight='0px'; body.style.opacity='0';
+  var fired=false, fin=function(){ if(fired) return; fired=true; done(); };
+  body.addEventListener('transitionend', fin, {once:true});
+  setTimeout(fin, 340);
+}
+function animateCardExpand(el){
+  var body=el&&el.querySelector('.sey-collbody');
+  if(!body || prefersReducedMotion()) return;
+  var hpx=body.scrollHeight+'px';
+  body.style.overflow='hidden'; body.style.maxHeight='0px'; body.style.opacity='0';
+  body.getBoundingClientRect(); // reflow
+  body.style.transition='max-height .3s var(--ease-premium,cubic-bezier(.33,1,.68,1)),opacity .26s ease';
+  body.style.maxHeight=hpx; body.style.opacity='1';
+  var clear=function(){ body.style.maxHeight=''; body.style.overflow=''; body.style.transition=''; body.style.opacity=''; };
+  body.addEventListener('transitionend', clear, {once:true});
+  setTimeout(clear, 380);
+}
+App.toggleCard=function(key){
+  if(!ui.cards) ui.cards={};
+  var willOpen=!ui.cards[key];
+  // Yerinde güncelleme yalnızca CARD_BUILDERS'ta kayıtlı kartlar için çalışır.
+  // Kayıtsız kartlar (ör. SOS "ne denedin"/"tetikleyici" kartları) eskiden yerinde
+  // yenilenemediği için aç/kapa tıklaması sessizce çalışmıyordu — bu güvenli yol,
+  // kayıtsız kartlarda durumu değiştirip tam render ederek kesin ve anlaşılır kılar.
+  if(!CARD_BUILDERS[key]){ ui.cards[key]=willOpen; haptic(8); render(); return; }
+  var el=document.querySelector('[data-cardkey="'+key+'"]');
+  if(!willOpen && el){
+    animateCardCollapse(el, function(){ ui.cards[key]=false; updateCardByKey(key); });
+    return;
+  }
+  ui.cards[key]=true;
+  updateCardByKey(key);
+  var el2=document.querySelector('[data-cardkey="'+key+'"]'); if(el2) animateCardExpand(el2);
+};
+function updateMotivationCard(){
+  // Terapi Odası açıkken içerik tam ekran overlay'de; küçültme vb. değişimlerde
+  // tüm ekranı yeniden çiz. Kapalıyken kompakt kartı yerinde güncelle.
+  if(ui.roomOpen){ render(); return; }
+  var el=document.getElementById('sey-motivation-card'); if(!el) return;
+  var t=document.createElement('div'); t.innerHTML=motivationTodayCardHTML();
+  if(t.firstChild) el.replaceWith(t.firstChild);
+}
+// Tam ekran Terapi Odası: dokununca animasyonlu açılır, kapanınca animasyonlu
+// İçsel Pusula kartına döner.
+App.openRoom=function(){
+  ui.roomOpen=true; ui.motivationMinimumOpen=false;
+  // Kaydedilmiş günü düzenleyebilmek için: bugünün kaydı varsa yansımayı input'a getir.
+  var M=window.MotivationProgramV2, stt=M?M.dayState(data,activeDate()):null;
+  var done=!!(stt&&(stt.status==='completed'||stt.status==='minimum_completed'));
+  if(done) ui.motivationReflectionDraft=String(stt.reflection||'');
+  haptic(12); render();
+};
+App.closeRoom=function(){
+  var ov=document.getElementById('sey-room-overlay'), sh=document.getElementById('sey-room-sheet');
+  if(ov&&sh&&!prefersReducedMotion()){
+    sh.style.transition='transform .26s var(--ease-premium,cubic-bezier(.16,1,.3,1)),opacity .24s ease';
+    sh.style.transform='scale(.965)'; sh.style.opacity='0';
+    ov.style.transition='opacity .24s ease'; ov.style.opacity='0';
+    setTimeout(function(){ ui.roomOpen=false; render(); },240);
+  } else { ui.roomOpen=false; render(); }
+  haptic(8);
+};
+// Geriye dönük uyumluluk (eski çağrılar tam ekran odayı açsın).
+App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
 
-App.anotherNote=function(){ ui.noteIndex=(ui.noteIndex+1)%NOTES.length; render(); };
+// Rastgele, bir öncekiyle asla aynı olmayan indeks seç.
+function randNoteIdx(n,cur){ if(n<2) return 0; var t; do{ t=Math.floor(Math.random()*n); }while(t===cur); return t; }
+App.anotherNote=function(){ var n=NOTES.length, cur=((ui.noteIndex%n)+n)%n; ui.noteIndex=randNoteIdx(n,cur); render(); };
+App.cycleRasit=function(){
+  var n=NOTES.length, base=Math.max(1,dayIndexFor(activeDate()))-1;
+  var curDisp=((base+(ui.noteIndex||0))%n+n)%n;
+  var target=randNoteIdx(n,curDisp);
+  ui.noteIndex=((target-base)%n+n)%n; // görüntülenen indeks tam olarak `target` olur
+  var el=document.getElementById('sey-rasit-note');
+  if(el){ el.style.opacity='0'; setTimeout(function(){ el.textContent=NOTES[target]; el.style.opacity='1'; },150); }
+  haptic(10); save();
+};
 App.printReport=function(){ openReport(); };
 function syncFieldUpdate(){ var s=document.getElementById('sey-sync-status'); if(s&&window.SeySync) s.textContent=window.SeySync.statusText(); }
 App.setGhToken=function(el){ if(!data.settings) data.settings={}; data.settings.ghToken=normalizeToken(el.value||''); save(); syncFieldUpdate(); };
@@ -1071,7 +1697,7 @@ function reportHTML(){
   h+='</div>';
   h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Günlük Tablo (tüm kayıt)</div>';
   h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
-  ['Gün','Tarih','Tik','Mod','Adım','Uyku','SOS','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
+  ['Gün','Tarih','Tik','Mod','Adım','Uyku','Kriz','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
   h+='</tr></thead><tbody>';
   days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var esr=effSteps(rec); var st=esr.steps!=null?(esr.steps.toLocaleString('tr-TR')+(esr.source==='tracked'?'~':'')):'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+habitCountOn(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
   h+='</tbody></table>';
@@ -1119,7 +1745,7 @@ function render(){
   root.setAttribute('data-theme', dark?'dark':'light');
   var app=document.getElementById('app');
 
-  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; return; }
+  if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false; return; }
 
   var prevScroll=document.querySelector('[data-scroll]');
   var prevTop=prevScroll?prevScroll.scrollTop:0;
@@ -1129,14 +1755,26 @@ function render(){
   // acik kalan overlay'in scroll'unu yakala ki flash olmadan geri koyalim
   var prevOvBody=document.getElementById('sey-ov-body');
   var prevOvTop=prevOvBody?prevOvBody.scrollTop:0;
-  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':null));
+  // Kriz modalı: etkileşimde (seçenek/tetik işaretleme) modal yeniden kurulur; gövde
+  // scroll'unu yakala ki flash olmadan geri koyalım.
+  var prevCrisisBody=document.getElementById('sey-crisis-body');
+  var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
+  if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
+  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
-  var html='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px 28px;display:flex;flex-direction:column;gap:14px;">';
+  var vtSupported=('startViewTransition' in document)&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var useVT=vtSupported&&!sameTab;
+  var _painted=false;
+  function paint(){
+    if(_painted) return; _painted=true;
+    app.classList.remove('sey-page-in');
+  var html=appHeaderHTML(); // başlangıç ekranı hariç her sekmenin en üstünde sabit marka başlığı
+  html+='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:14px 16px 28px;display:flex;flex-direction:column;gap:14px;">';
   if(editing()) html+=editBanner();
   if(ui.tab==='bugun') html+=bugunHTML();
-  else if(ui.tab==='sos') html+=sosHTML();
   else if(ui.tab==='saglik') html+=saglikHTML();
+  else if(ui.tab==='saygi') html+=saygiHTML();
   else if(ui.tab==='harita') html+=haritaHTML();
   else if(ui.tab==='rapor') html+=raporHTML();
   else if(ui.tab==='mesaj') html+=mesajHTML();
@@ -1150,15 +1788,32 @@ function render(){
 
   var newScroll=document.querySelector('[data-scroll]');
   if(newScroll){
+    wireAppHeaderScroll(newScroll);
+    if(ui.tab==='saygi') wireSaygiReadGate(newScroll);
     if(ui.tab==='mesaj' && (!sameTab || ui.aeonScrollBottom)){
       // ÆON sohbeti: açılışta ve yeni mesaj/cevap sonrası en alta (en yeni mesaja) kaydır
       var firstM=newScroll.firstElementChild; if(firstM){ firstM.style.animation='none'; }
       newScroll.scrollTop=newScroll.scrollHeight;
       ui.aeonScrollBottom=false;
+    } else if(useVT){
+      // Sekme geçişinde View Transition içerik akışını üstlensin — alt kartların
+      // teker teker float-in animasyonlarını sustur; sayfa düzeyinde tek premium akış kalsın.
+      try{
+        var ins=newScroll.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]');
+        for(var _i=0;_i<ins.length;_i++){ ins[_i].style.animation='none'; }
+      }catch(e){}
+      newScroll.scrollTop=0;
     } else if(sameTab){
-      // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve giriş animasyonunu tekrar oynatma (titremeyi önler)
+      // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve TÜM giriş animasyonlarını
+      // tekrar oynatma (tik/mod/yazı gibi kayıtlarda kartların "refresh" gibi titremesini önler).
+      // Ambient (sonsuz) animasyonlar seyShine/seyRoomGlow etkilenmez; yalnızca tek-seferlik
+      // seyFloatIn/seyFade/seyPop giriş animasyonları susturulur.
       var firstEl=newScroll.firstElementChild;
       if(firstEl){ firstEl.style.animation='none'; }
+      try{
+        var ins=newScroll.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]');
+        for(var _i=0;_i<ins.length;_i++){ ins[_i].style.animation='none'; }
+      }catch(e){}
       newScroll.scrollTop=prevTop;
     }
     if(ui.tab==='mesaj'){
@@ -1182,23 +1837,77 @@ function render(){
     // Ayni sekmede kaldiysak scroll'u koru; sekme degistiyse en uste don
     if(ovBody && curOverlayView===lastOverlayView) ovBody.scrollTop=prevOvTop;
   }
+  // Terapi Odası zaten açıkken yapılan etkileşim render'larında (ör. "Görevi küçült")
+  // tek-seferlik giriş animasyonlarını (seyPop/seyFloatIn/seyFade) sustur → parlama/flash yok.
+  // İlk açılışta (lastRoomOpen=false) animasyonlar normal oynar; sürekli seyShine parıltısı etkilenmez.
+  if(ui.roomOpen && lastRoomOpen){
+    var roomSheet=document.getElementById('sey-room-sheet');
+    var roomBack=document.getElementById('sey-room-overlay');
+    if(roomBack) roomBack.style.animation='none';
+    if(roomSheet){
+      roomSheet.style.animation='none';
+      try{ var rin=roomSheet.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]'); for(var _r=0;_r<rin.length;_r++){ rin[_r].style.animation='none'; } }catch(e){}
+    }
+  }
+  lastRoomOpen=ui.roomOpen;
+  // Kriz modalı zaten açıkken yapılan etkileşim render'larında giriş animasyonunu
+  // tekrar oynatma → flash yok; gövde scroll'unu koru.
+  if(ui.crisisKind && lastCrisisKind===ui.crisisKind){
+    var crBack=document.getElementById('sey-crisis-back');
+    var crCard=document.getElementById('sey-crisis-card');
+    if(crBack) crBack.style.animation='none';
+    if(crCard){ crCard.style.animation='none'; try{ var cin=crCard.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]'); for(var _c=0;_c<cin.length;_c++){ cin[_c].style.animation='none'; } }catch(e){} }
+    var crBody=document.getElementById('sey-crisis-body'); if(crBody) crBody.scrollTop=prevCrisisTop;
+  }
+  lastCrisisKind=ui.crisisKind;
+  // Sabit marka başlığı: giriş animasyonunu yalnızca ilk görünümde oynat (her render'da tekrar etmesin).
+  if(lastHeaderShown){ var _hdr=document.querySelector('.sey-appheader'); if(_hdr) _hdr.style.animation='none'; }
+  lastHeaderShown=true;
   lastOverlay=curOverlay;
   lastOverlayView=curOverlayView;
   lastRenderTab=ui.tab;
+  }
+  // Sekme değişiminde premium sayfa geçişi (View Transitions API); aynı sekmede
+  // veri güncellemelerinde VT kullanma — anlık render kalsın, geçiş yorgunluğu olmasın.
+  if(useVT){
+    try{ document.startViewTransition(function(){ paint(); }); }
+    catch(e){ paint(); }
+  } else {
+    paint();
+    // VT desteklenmeyen tarayıcılarda hafif sayfa-giriş fallback'i (yalnızca sekme değişiminde)
+    if(!sameTab){ var _app=document.getElementById('app'); if(_app){ _app.classList.remove('sey-page-in'); void _app.offsetWidth; _app.classList.add('sey-page-in'); } }
+  }
 }
 
 function onboardingHTML(){
-  return '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 28px);gap:22px;animation:seyFade .3s ease;">'
-   +'<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">'
-   +'<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#E9899F;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 12px 30px rgba(233,175,193,0.4);">'+icon('heart',38)+'</div>'
-   +'<h1 style="margin:0;font-size:34px;font-weight:800;letter-spacing:-0.5px;">Şeyma 🦩</h1>'
-   +'<div style="font-size:16px;color:var(--muted);">Minik Denge Günlüğü</div></div>'
-   +'<div class="glass" style="border-radius:26px;padding:24px;box-shadow:0 10px 30px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:14px;">'
-   +'<p style="margin:0;font-size:19px;font-weight:700;">Hoş geldin Sevgili Günışığı</p>'
-   +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Burası diyet kampı değil. Burası tatlı krizlerinin hafifçe hizaya geldiği, akşam mutfağının biraz daha az ziyaret edildiği, senin de kendine daha iyi davrandığın minik bir alan.</p>'
-   +'<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Mükemmel olmaya çalışmıyoruz. Her gün küçük küçük kontrolü geri alıyoruz — süresiz, kendi ritminde.</p></div>'
-   +'<button onclick="App.start()" style="border:none;cursor:pointer;width:100%;padding:18px;border-radius:20px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam Raşit, başlayalım '+icon('sparkles',15)+'</button>'
-   +'<p style="margin:0;text-align:center;font-size:12.5px;line-height:1.5;color:var(--faint);">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p></div>';
+  // v2.0 küçük geliştirme notları — dikkat çekmesin diye faint, minik satırlar.
+  var v2=[
+    [icon('compass',13),'İçsel Pusula, dokununca Terapi Odası’na dönüşüyor'],
+    [icon('flower-2',13),'Sağlık & ruh hâli takibi daha bilimsel, daha premium'],
+    [icon('sparkles',13),'Baştan sona yenilenmiş, yumuşak yeni tasarım']
+  ];
+  var h='<div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 30px) 22px calc(env(safe-area-inset-bottom) + 26px);gap:20px;animation:seyFade .35s ease;overflow:hidden;">';
+  h+='<div style="position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:min(440px,124%);height:340px;background:radial-gradient(60% 60% at 50% 38%,rgba(233,175,193,0.30),transparent 70%);pointer-events:none;"></div>';
+  // hero — flamingo korunur, iOS 27 liquid-glass rozet
+  h+='<div style="position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;">';
+  h+='<div style="position:relative;width:96px;height:96px;border-radius:30px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFE8A3,#F7DDE5 55%,#E9CBFF);box-shadow:0 20px 44px rgba(233,175,193,0.45),inset 0 1px 0 rgba(255,255,255,0.6);overflow:hidden;animation:seyPop .5s var(--ease-premium,ease) both;">';
+  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>';
+  h+='<span style="position:relative;font-size:52px;line-height:1;filter:drop-shadow(0 6px 12px rgba(190,108,139,0.35));">🦩</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;animation:seyFloatIn .5s .06s ease both;"><h1 style="margin:0;font-size:36px;font-weight:800;letter-spacing:-0.6px;">Şeyma</h1><span style="font-size:11.5px;font-weight:800;letter-spacing:.6px;color:var(--faint);border:1px solid var(--card-bd);border-radius:999px;padding:3px 9px;opacity:.75;">v2.0</span></div>';
+  h+='<div style="font-size:15.5px;color:var(--muted);animation:seyFloatIn .5s .1s ease both;">Minik Denge Günlüğü</div></div>';
+  // hoş geldin kartı
+  h+='<div class="glass" style="position:relative;border-radius:28px;padding:22px;box-shadow:0 16px 40px rgba(108,74,58,0.10),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;flex-direction:column;gap:13px;animation:seyFloatIn .5s .14s ease both;">';
+  h+='<p style="margin:0;font-size:19px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:7px;">Hoş geldin Sevgili Günışığı <span style="display:inline-flex;color:var(--room);">'+icon('heart',16)+'</span></p>';
+  h+='<p style="margin:0;font-size:15px;line-height:1.62;color:var(--text2);">Burası diyet kampı değil. Tatlı krizlerinin hafifçe hizaya geldiği, akşam mutfağının biraz daha az ziyaret edildiği, senin de kendine daha iyi davrandığın minik bir alan.</p>';
+  h+='<p style="margin:0;font-size:15px;line-height:1.62;color:var(--text2);">Mükemmel olmaya çalışmıyoruz. Her gün küçük küçük kontrolü geri alıyoruz — süresiz, kendi ritminde.</p>';
+  h+='<div style="margin-top:3px;border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:7px;">';
+  v2.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--faint);line-height:1.35;"><span style="display:inline-flex;flex-shrink:0;opacity:.7;">'+r[0]+'</span><span>'+r[1]+'</span></div>'; });
+  h+='</div></div>';
+  // başla
+  h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:18px;border-radius:22px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 16px 32px rgba(233,175,193,0.5);display:flex;align-items:center;justify-content:center;gap:7px;animation:seyFloatIn .5s .2s ease both;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.4) 50%,transparent 65%);animation:seyShine 4s ease-in-out infinite;"></span><span style="position:relative;display:inline-flex;align-items:center;gap:7px;">Tamam Raşit, başlayalım '+icon('sparkles',15)+'</span></button>';
+  h+='<p style="margin:0;text-align:center;font-size:12px;line-height:1.5;color:var(--faint);animation:seyFloatIn .5s .24s ease both;">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p>';
+  h+='</div>';
+  return h;
 }
 
 // ── Faz 7: Psikolojik durum tespiti anketi (iki haftada bir, zorunlu, yalnızca-tık) ──
@@ -1383,46 +2092,87 @@ App.psychFinish=function(){
   save(); psychSafetyPing(sc); ui.psychStep=0; ui.psychSOS=false; ui.psychSosSent=false; ui.psychAnswers={}; render();
 };
 
-function nutritionSummaryCard(rec){
-  var nu=dayNutrition(rec);
-  var pct=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100));
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Beslenme özeti '+icon('utensils',17)+'</div><div style="font-size:11.5px;color:var(--faint);">tabak · gr · adet ile hesaplanır</div></div>';
-  h+='<div style="display:flex;align-items:center;gap:14px;">';
-  h+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:12px;color:var(--muted);">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:12px;color:var(--faint);">/ '+PROTEIN_GOAL+'g</span></div>';
-  h+='<div style="height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:6px;"><div id="nutri-bar" style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
-  h+='<div style="text-align:center;flex-shrink:0;padding-left:6px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);">kcal (tah.)</div></div>';
-  h+='</div>';
-  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Değerler kaba tahmindir; protein hedefini takip etmen için yeterli. Detay arttıkça isabet artar.</div>';
+// Makro kalori dağılım çubuğu (protein/karbonhidrat/yağ — kalori payına göre).
+function macroBarHTML(nu){
+  var pCal=4*nu.protein, cCal=4*nu.carbs, fCal=9*nu.fat, tot=pCal+cCal+fCal;
+  function w(x){ return tot>0?(x/tot*100):0; }
+  var h='<div style="height:12px;border-radius:999px;overflow:hidden;display:flex;background:var(--icon);">';
+  if(tot>0){ h+='<div style="width:'+w(pCal)+'%;background:#E9899F;"></div><div style="width:'+w(cCal)+'%;background:#F6C177;"></div><div style="width:'+w(fCal)+'%;background:#9B7FC9;"></div>'; }
   h+='</div>';
   return h;
 }
-function mealEditorCard(rec){
+// Birleşik "Beslenme" kartı: özet (makro) + "ne yedim" öğün düzenleyici, açılır/kapanır.
+// Beslenme için veri-güdümlü, bilimsel premium değerlendirme. Öğün girişleriyle
+// canlı güncellenir (updateNutriLive). Lif ayrı takip edilmediğinden yönlendirici
+// (öneri) olarak geçer; protein/makro/glisemik okuması gerçek veriden hesaplanır.
+function nutriInsightHTML(rec,nu){
+  var items=nu.items||0;
+  var wrap=function(inner){ return '<div style="background:linear-gradient(160deg,rgba(201,184,255,0.10),transparent);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:11px;">'
+    +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('brain',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--accent);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
+  var row=function(ic,col,title,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;">'
+    +'<span style="width:26px;height:26px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%, var(--icon));">'+icon(ic,14)+'</span>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:800;color:var(--text);line-height:1.3;">'+title+'</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:1px;">'+text+'</div></div></div>'; };
+  if(items===0) return wrap(row('utensils','var(--accent)','Öğünlerini ekle, birlikte bakalım','Yediklerini yazınca protein, makro dengesi ve kan şekeri açısından kısa bilimsel bir okuma çıkarırım. Ölçmek, farkındalığın ilk adımıdır.'));
+  var inner='';
+  if(nu.protein>=PROTEIN_GOAL) inner+=row('activity','#3F8A4F','Protein hedefi tuttu · '+nu.protein+'g','Yeterli protein tokluk hormonlarını (GLP-1, PYY) artırır, kası korur ve kan şekerini dengeler — tatlı isteğini azaltan en güçlü kaldıraç.');
+  else inner+=row('activity','#E9899F','Protein '+(PROTEIN_GOAL-nu.protein)+'g eksik · '+nu.protein+'/'+PROTEIN_GOAL+'g','Her ana öğüne ~25-30g protein hedefle; tokluğu uzatır, kas sentezini destekler ve öğün sonrası tatlı krizini yatıştırır.');
+  var tot=nu.protein*4+nu.carbs*4+nu.fat*9;
+  var pP=tot>0?Math.round(nu.protein*4/tot*100):0, cP=tot>0?Math.round(nu.carbs*4/tot*100):0, fP=tot>0?Math.round(nu.fat*9/tot*100):0;
+  var balOk=(pP>=20&&cP<=60&&fP<=40);
+  inner+=row(balOk?'leaf':'triangle-alert', balOk?'#5BA85B':'#E8A53C','Makro dağılımı · P%'+pP+' K%'+cP+' Y%'+fP, balOk?'Dengeli tabak: proteinin kalori payı iyi. Bu oran kan şekeri ve tokluk için sürdürülebilir.':'Karbonhidrat/yağ ağırlıklı görünüyor; proteini biraz artırıp rafine karbonhidratı azaltmak kan şekeri dalgalanmasını yumuşatır.');
+  var pm=['breakfast','lunch','dinner'].filter(function(k){return Math.round(mealNutr(rec,k).protein)>=15;}).length;
+  inner+=row('sparkles','var(--accent)','Öğün ritmi & glisemik ipucu', (pm>=2?'Proteini öğünlere yaymışsın — kas sentezi ve tokluk için ideal. ':'Proteini kahvaltıya da yaymak sabah tokluğunu artırır. ')+'Tabakta önce protein + sebze, sonra karbonhidrat: öğün sonrası kan şekeri yükselişini (glisemik yanıt) belirgin azaltır.');
+  return wrap(inner);
+}
+function beslenmeCardHTML(rec){
+  var nu=dayNutrition(rec);
   var mi=(rec&&rec.mealItems)?rec.mealItems:emptyMealItems();
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;">Bugün ne yedim?</div><div style="font-size:12px;color:var(--faint);">otomatik kaydolur</div></div>';
+  var hasName=function(k){ return Array.isArray(mi[k])&&mi[k].some(function(it){return it&&it.name&&String(it.name).trim();}); };
+  var incomplete=!(hasName('breakfast')&&hasName('lunch')&&hasName('dinner'));
+  var open=cardOpen('beslenme', incomplete);
+  var pPct=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100));
+  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:9.5px;color:var(--faint);">kcal</div></div>';
+  var subtitle='<span id="nutri-subtitle">'+nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ</span>';
+  var b='';
+  // Makro özeti
+  b+='<div style="background:var(--icon);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px;">';
+  b+='<div style="display:flex;align-items:flex-end;gap:12px;">';
+  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11.5px;color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:11.5px;color:var(--faint);">/ '+PROTEIN_GOAL+'g</span></div>';
+  b+='<div style="height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:5px;"><div id="nutri-bar" style="height:100%;width:'+pPct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
+  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:10px;color:var(--faint);margin-top:2px;">/ '+CAL_GOAL+' kcal</div></div>';
+  b+='</div>';
+  b+='<div id="nutri-macrobar">'+macroBarHTML(nu)+'</div>';
+  b+='<div style="display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;">';
+  b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#E9899F;"></span>Protein <b id="nutri-lp" style="color:var(--text);">'+nu.protein+'g</b></span>';
+  b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#F6C177;"></span>Karbonhidrat <b id="nutri-carb" style="color:var(--text);">'+nu.carbs+'g</b></span>';
+  b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#9B7FC9;"></span>Yağ <b id="nutri-fat" style="color:var(--text);">'+nu.fat+'g</b></span>';
+  b+='</div>';
+  b+='<div style="font-size:10.5px;color:var(--faint);line-height:1.45;">Kalori, girdiğin yiyeceklerin makrolarından hesaplanır (protein & karbonhidrat ×4, yağ ×9 kcal). Değerler tahminidir; yiyecek adı ve miktar netleştikçe isabet artar.</div>';
+  b+='</div>';
+  // Bilimsel değerlendirme (protein · makro dengesi · glisemik) — canlı güncellenir
+  b+='<div id="nutri-insight">'+nutriInsightHTML(rec,nu)+'</div>';
+  // Öğün düzenleyici (tabak/gr/adet)
   MEALS.forEach(function(m){
     var items=Array.isArray(mi[m.key])?mi[m.key]:[];
     var sub=mealNutr(rec,m.key);
-    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-    h+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);">'+Math.round(sub.protein)+'g protein</div></div>';
+    b+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    b+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:11.5px;font-weight:700;color:var(--accent);">'+Math.round(sub.protein)+'g P · '+Math.round(sub.calories)+' kcal</div></div>';
     items.forEach(function(it,idx){
-      var known=!!foodLookup(it.name);
-      h+='<div style="display:flex;gap:6px;align-items:center;">';
-      h+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:13.5px;outline:none;">';
-      h+='<input type="number" inputmode="decimal" min="0" step="0.5" value="'+(it.qty===''||it.qty==null?'':esc(it.qty))+'" onchange="App.setMealItemQty(\''+m.key+'\','+idx+',this)" style="width:52px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:13.5px;text-align:center;outline:none;">';
-      h+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:62px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:12.5px;outline:none;color:var(--text);">';
-      MEAL_UNITS.forEach(function(u){ h+='<option value="'+u.id+'"'+(it.unit===u.id?' selected':'')+'>'+u.label+'</option>'; });
-      h+='</select>';
-      h+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">×</button>';
-      h+='</div>';
+      b+='<div style="display:flex;gap:6px;align-items:center;">';
+      b+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:13.5px;outline:none;">';
+      b+='<input type="number" inputmode="decimal" min="0" step="0.5" value="'+(it.qty===''||it.qty==null?'':esc(it.qty))+'" onchange="App.setMealItemQty(\''+m.key+'\','+idx+',this)" style="width:50px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:13.5px;text-align:center;outline:none;">';
+      b+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:60px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:12.5px;outline:none;color:var(--text);">';
+      MEAL_UNITS.forEach(function(u){ b+='<option value="'+u.id+'"'+(it.unit===u.id?' selected':'')+'>'+u.label+'</option>'; });
+      b+='</select>';
+      b+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">×</button>';
+      b+='</div>';
     });
-    h+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
-    h+='</div>';
+    b+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
+    b+='</div>';
   });
-  h+='</div>';
-  return h;
+  return collapsibleCardHTML({key:'beslenme', id:'card-beslenme', icon:icon('utensils',18), accent:'var(--watch)', title:'Beslenme', subtitle:subtitle, badge:badge, open:open, body:b, hint:'öğünleri gör / ekle'});
 }
+CARD_BUILDERS.beslenme=beslenmeCardHTML;
 function waterCard(rec){
   var w=rec&&typeof rec.water==='number'?rec.water:0;
   var pct=Math.min(100,Math.round(w/WATER_GOAL*100));
@@ -1445,20 +2195,135 @@ function waterCard(rec){
   h+='</div></div>';
   return h;
 }
+// Enerji & stres — belirgin, etiketli 1–5 skalaları (kullanıcı bunları kaçırmasın).
 function energyStressBlock(rec){
   var en=rec?rec.energy:null, st=rec?rec.stress:null;
-  function row(label,emoji,cur,fn){
-    var s='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:12.5px;font-weight:700;color:var(--muted);width:62px;flex-shrink:0;">'+emoji+' '+label+'</span><div style="display:flex;gap:5px;flex:1;">';
-    for(var v=1;v<=5;v++){ var on=cur!=null&&v<=cur; var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:26px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:800;'+(on?'background:linear-gradient(135deg,#FFD37A,#E9AFC1);border:1px solid #E9AFC1;color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+(sel?'box-shadow:0 4px 10px rgba(233,175,193,0.4);':'')+'">'+v+'</button>'; }
-    s+='</div></div>'; return s;
+  function scale(label,ic,cur,fn,lo,hi,grad){
+    var s='<div style="display:flex;flex-direction:column;gap:6px;">';
+    s+='<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--text);"><span style="display:inline-flex;color:var(--muted);">'+ic+'</span>'+label+(cur!=null?'<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent);">'+cur+'/5</span>':'')+'</div>';
+    s+='<div style="display:flex;gap:6px;">';
+    for(var v=1;v<=5;v++){ var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:38px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:800;transition:all .18s;'+(sel?'background:linear-gradient(135deg,'+grad+');border:1px solid transparent;color:#fff;box-shadow:0 6px 14px rgba(150,110,120,0.28);transform:translateY(-2px);':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+'">'+v+'</button>'; }
+    s+='</div>';
+    s+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--faint);"><span>'+lo+'</span><span>'+hi+'</span></div>';
+    s+='</div>';
+    return s;
   }
-  var h='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:12px;color:var(--faint);">Bugün enerjin ve stresin (1 düşük · 5 yüksek)</div>';
-  h+=row('Enerji',icon('zap',13),en,'setEnergy');
-  h+=row('Stres',icon('wind',13),st,'setStress');
+  var h='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:14px;">';
+  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.4;">Enerji ve stres, ruh hâlinin iki ayrı ekseni; ikisini de işaretlemek moduna daha net bakmanı sağlar.</div>';
+  h+=scale('Enerji',icon('zap',14),en,'setEnergy','tükenmiş','çok dinç','#FFD37A,#F5A623');
+  h+=scale('Stres',icon('wind',14),st,'setStress','sakin','çok gergin','#C9B8FF,#7C5CC4');
   h+='</div>';
   return h;
 }
+function moodInterp(mood,en,st){
+  if(st!=null&&en!=null){
+    if(st>=4&&en<=2) return 'Yüksek stres, düşük enerji: bugün küçük molalar, su ve nazik bir yürüyüş iyi gelebilir.';
+    if(en>=4&&st<=2) return 'Enerjin yüksek, stresin düşük — bu güzel ritmi bir yürüyüşle taçlandırabilirsin.';
+    if(st>=4) return 'Stres bugün yüksek; birkaç derin nefes ve tempolu bir mola dengeyi geri getirir.';
+    if(en<=2) return 'Enerji biraz düşük görünüyor; kendine yüklenme, küçük adımlar da bugün için yeterli.';
+  }
+  return '';
+}
+// Birleşik "mod" kartı: mod seçimi + belirgin enerji/stres + kısa yorum, açılır/kapanır.
+function moodCardHTML(rec){
+  var curMood=rec?rec.mood:null, en=rec?rec.energy:null, st=rec?rec.stress:null;
+  var allSet=!!(curMood&&en!=null&&st!=null);
+  var open=cardOpen('mood', !allSet);
+  var ed=editing();
+  var mo0=curMood?find(MOODS,'id',curMood):null;
+  var badge=mo0?('<span style="display:inline-flex;color:var(--accent);">'+icon(mo0.icon,22)+'</span>'):'';
+  var subParts=[];
+  if(mo0) subParts.push(esc(mo0.short));
+  if(en!=null) subParts.push('Enerji '+en);
+  if(st!=null) subParts.push('Stres '+st);
+  var subtitle=subParts.length?(subParts.join(' · ')+(allSet?'':' — tamamla')):'modunu, enerji ve stresini paylaş';
+  var b='<div style="display:flex;gap:6px;">';
+  MOODS.forEach(function(m){
+    var sel=curMood===m.id;
+    var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.4);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
+    b+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,22)+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
+  });
+  b+='</div>';
+  if(mo0) b+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo0.resp)+'</div>';
+  b+=energyStressBlock(rec);
+  var interp=moodInterp(curMood,en,st);
+  if(interp) b+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:linear-gradient(160deg,rgba(201,184,255,0.12),transparent);border-radius:12px;padding:10px 12px;display:flex;gap:7px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent);">'+icon('lightbulb',14)+'</span><span>'+esc(interp)+'</span></div>';
+  return collapsibleCardHTML({key:'mood', id:'card-mood', icon:icon('cloud-sun',18), accent:'var(--pause)', title:(ed?'O günün modu':'Bugünün modu'), subtitle:subtitle, badge:badge, open:open, body:b, hint:'modunu işaretle'});
+}
+CARD_BUILDERS.mood=moodCardHTML;
+// Birleşik "Günün yansıması" kartı: kendine not + 3 güzel şey, bilimsel çerçeve + rehber soru.
+var REFLECT_PROMPTS=[
+  'Bugün seni gülümseten en küçük an neydi?',
+  'Bugün kendinle gurur duyduğun bir şey oldu mu?',
+  'Bugün sana en çok iyi gelen neydi?',
+  'Zor bir anı bugün nasıl atlattın?',
+  'Bugün bedenine yaptığın bir iyilik neydi?',
+  'Yarının sana bir cümle bırak: ne hatırlamak istersin?',
+  'Bugün fark ettiğin küçük bir güzellik neydi?',
+  'Bugün kendine hangi konuda daha kibar davrandın?'
+];
+function reflectionCardHTML(rec){
+  var ed=editing();
+  var note=(rec&&rec.note)?rec.note:'';
+  var gratArr=(rec&&Array.isArray(rec.gratitude))?rec.gratitude:[];
+  var gratFilled=gratArr.filter(function(g){return String(g||'').trim();}).length;
+  var filled=(String(note).trim()?1:0)+gratFilled;
+  var open=cardOpen('reflection', filled===0);
+  var badge=filled>0?'<span style="font-size:11px;font-weight:800;color:var(--accent);">'+filled+'</span>':'';
+  var refParts=[]; if(String(note).trim()) refParts.push('not'); if(gratFilled>0) refParts.push(gratFilled+' güzel şey');
+  var refSub=refParts.length?refParts.join(' · '):'birkaç cümle bırak, kendine iyi gelsin';
+  var prompt=REFLECT_PROMPTS[(Math.max(1,dayIndexFor(activeDate()))-1)%REFLECT_PROMPTS.length]||REFLECT_PROMPTS[0];
+  var gratPh=['örn. Sabah kahvem','örn. Bir arkadaşın mesajı','örn. Güneşli hava'];
+  var b='';
+  b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Duyguları yazıya dökmek ve minnet, ruh hâlini toparlamanın en kanıtlı iki yoludur. Birkaç cümle bile bugüne iyi gelir.</div>';
+  b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent);">'+icon('feather',15)+'</span><div style="font-size:13px;color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
+  b+='<div><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;">'+(ed?'O gün kendine notun':'Bugün kendime notum')+'</div>';
+  b+='<textarea oninput="App.onNote(this)" placeholder="Aklından geçeni serbestçe yaz…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;color:var(--text);">'+esc(note)+'</textarea></div>';
+  b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:13px;font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11px;color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
+  for(var i=0;i<3;i++){ var gv=(gratArr[i]!=null)?gratArr[i]:''; b+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span><input type="text" value="'+esc(gv)+'" oninput="App.onGratitude('+i+',this)" placeholder="'+gratPh[i]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14.5px;outline:none;color:var(--text);"></div>'; }
+  b+='</div>';
+  return collapsibleCardHTML({key:'reflection', id:'card-reflection', icon:icon('pen-line',18), accent:'var(--sun)', title:(ed?'O günün yansıması':'Günün yansıması'), subtitle:refSub, badge:badge, open:open, body:b, hint:'yansımanı yaz', cardStyle:'background:linear-gradient(160deg,rgba(246,193,119,0.10),rgba(233,175,193,0.06));'});
+}
+CARD_BUILDERS.reflection=reflectionCardHTML;
+// "Bugünün tikleri" — açılır/kapanır kart; başlıkta ilerleme halkası + sayaç.
+function habitsCardHTML(rec){
+  var ed=editing();
+  var viewDate=activeDate();
+  var completed=countRec(rec);
+  var ht=habitCountOn(viewDate);
+  var allDone=ht>0&&completed>=ht;
+  var open=cardOpen('habits', !allDone);
+  var circ=2*Math.PI*11;
+  var off=circ*(1-(ht>0?completed/ht:0));
+  var ring='<div style="position:relative;width:30px;height:30px;flex-shrink:0;"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="3.5"></circle><circle cx="15" cy="15" r="11" fill="none" stroke="#E9AFC1" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"></circle></svg></div>';
+  var badge='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:13px;font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
+  var b='';
+  HABITS.forEach(function(hb){
+    var derived=!!DERIVED_HABITS[hb.key];
+    var prog=derived?habitProgress(rec,hb.key):null;
+    var done=derived?!!(prog&&prog.met):!!(rec&&rec.habits[hb.key]);
+    var pulsing=ui.pulse===hb.key;
+    var accent=DERIVED_ACCENT[hb.key];
+    var locked=(derived&&!done);
+    var warn=(!done && !derived && (hb.key==='vitaminD'||hb.key==='protein'));
+    var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(locked?hexA(accent,dark?0.07:0.05):'var(--card)');
+    var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':(locked?hexA(accent,0.4):'var(--card-bd)'));
+    var sh=done?'0 10px 26px rgba(233,175,193,0.4)':(locked?'0 6px 16px '+hexA(accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
+    b+='<button onclick="App.toggleHabit(\''+hb.key+'\')"'+(warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;">';
+    b+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(locked?hexA(accent,0.12):'var(--icon)')+';color:'+(locked?accent:'var(--text)')+';">'+hb.icon+'</div>';
+    b+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(hb.title)+(derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(done?'#3F8A4F':accent)+';background:'+(done?'rgba(143,191,138,0.2)':hexA(accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
+    if(done){ b+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>'; }
+    else if(locked){ var pct=Math.min(100,Math.max(0,Math.round(((prog.cur||0)/prog.goal)*100))); b+='<div style="font-size:12.5px;color:'+accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(hb.key,prog))+'</div>'; if(!prog.binary){ b+='<div style="height:6px;border-radius:999px;background:'+hexA(accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(accent,0.65)+','+accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
+    else { b+='<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>'; }
+    b+='</div>';
+    if(done){ b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>'; }
+    else if(locked){ b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(accent,0.85)+';border:2px solid '+hexA(accent,0.4)+';background:'+hexA(accent,0.06)+';">'+icon('lock',12)+'</div>'; }
+    else { b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:transparent;border:2px solid '+(warn?'var(--warn)':'var(--field-bd)')+';"></div>'; }
+    b+='</button>';
+  });
+  return collapsibleCardHTML({key:'habits', id:'card-habits', icon:icon('circle-check',18), accent:'var(--ok)', title:(ed?'O günün tikleri':'Bugünün tikleri'), subtitle:(allDone?'hepsi tamam, harika':completed+'/'+ht+' tamamlandı'), badge:badge, open:open, body:b, hint:'tikleri gör'});
+}
+CARD_BUILDERS.habits=habitsCardHTML;
 function eveningNudge(rec){
   var hr=new Date().getHours();
   if(hr<20&&hr>4) return '';
@@ -1543,6 +2408,7 @@ function healthSetupCardHTML(connectedHealth){
 }
 function locationCardHTML(){
   var s=data.settings||{};
+  if(s.hideLocationCard) return '';
   var on=!!s.locationEnabled;
   var mode=s.locationMode||'auto';
   var today=todayStr();
@@ -1564,59 +2430,65 @@ function locationCardHTML(){
       +'<div style="font-size:11px;color:var(--faint);margin-top:1px;">Telefon arka planda topladı'+(hsAge?' · '+hsAge:'')+'</div></div>'
       +'</div>';
   }
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;gap:10px;">';
-  h+='<div style="flex:1;font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:8px;">Konum & Hareket <span style="display:inline-flex;">'+icon('map-pin',16)+'</span> <span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span></div>';
-  h+='<button onclick="App.toggleLocation()" aria-label="Konum paylaşımı aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:56px;height:32px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+knobLeft+';width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
-  h+='</div>';
+  // Açık/kapalı anahtarı başlıkta rozet olarak; anahtara dokunmak kartı açmasın (stopPropagation).
+  var toggle='<button onclick="event.stopPropagation();App.toggleLocation()" aria-label="Konum aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:50px;height:28px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+(on?'25px':'3px')+';width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
+  var statusPill='<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span>';
+  var badge='<div style="display:flex;align-items:center;gap:8px;">'+hidePill('location')+statusPill+toggle+'</div>';
+  var subtitle=on?('Bugün '+fmtDist(mv.totalM)+' · ölçüm açık'):'GPS kapalı · açmak için sağdaki anahtar';
+  var open=cardOpen('location', on);
+  var b='';
   if(!on){
-    h+=hsBlock;
-    h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür.</div>';
-    h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
-    h+='</div>';
-    return h;
+    b+=hsBlock;
+    b+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür (yalnızca uygulama açıkken).</div>';
+    b+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
+    return collapsibleCardHTML({key:'location', id:'card-location', icon:icon('map-pin',18), accent:'#3F9A4F', title:'Konum & Hareket', subtitle:subtitle, badge:badge, open:open, body:b, hint:'ayrıntıları gör'});
   }
   function mbtn(id,emoji,label){ var act=mode===id; return '<button onclick="App.setLocationMode(\''+id+'\')" style="flex:1;border:1px solid '+(act?'#8FBF8A':'var(--card-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(act?'#2F7A3F':'var(--text2)')+';background:'+(act?'rgba(143,191,138,0.18)':'transparent')+';">'+emoji+' '+label+'</button>'; }
-  h+='<div style="display:flex;gap:7px;">'+mbtn('walk',icon('footprints',14),'Yürüyüş')+mbtn('vehicle',icon('car',14),'Araç')+mbtn('auto',icon('sparkles',14),'Oto')+'</div>';
-  h+='<div style="display:flex;gap:10px;">';
-  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün toplam</div><div id="loc-dist-today" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+fmtDist(mv.totalM)+'</div></div>';
-  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Anlık hız</div><div id="loc-speed" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">0 km/sa</div></div>';
-  h+='</div>';
-  h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
-  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('footprints',14)+' Yürüyüş <b id="loc-walk" style="margin-left:auto;">'+fmtDist(mv.walkM)+'</b></span>';
-  h+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('car',14)+' Araç <b id="loc-vehicle" style="margin-left:auto;">'+fmtDist(mv.vehicleM)+'</b></span>';
-  h+='</div>';
-  h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
-  h+='<span style="flex:1;background:rgba(143,191,138,0.10);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Ayakta <b id="loc-walk-dur" style="margin-left:auto;">'+fmtDur(mv.walkSec)+'</b></span>';
-  h+='<span style="flex:1;background:rgba(201,184,255,0.11);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Yolda <b id="loc-veh-dur" style="margin-left:auto;">'+fmtDur(mv.vehicleSec)+'</b></span>';
-  h+='</div>';
-  if(mode==='auto') h+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
-  else h+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
-  h+=hsBlock;
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır (tarayıcı arka planda izleyemez); Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
-  h+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
-  h+='</div>';
-  return h;
+  b+='<div style="display:flex;gap:7px;">'+mbtn('walk',icon('footprints',14),'Yürüyüş')+mbtn('vehicle',icon('car',14),'Araç')+mbtn('auto',icon('sparkles',14),'Oto')+'</div>';
+  b+='<div style="display:flex;gap:10px;">';
+  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün toplam</div><div id="loc-dist-today" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+fmtDist(mv.totalM)+'</div></div>';
+  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Anlık hız</div><div id="loc-speed" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">0 km/sa</div></div>';
+  b+='</div>';
+  b+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  b+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('footprints',14)+' Yürüyüş <b id="loc-walk" style="margin-left:auto;">'+fmtDist(mv.walkM)+'</b></span>';
+  b+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('car',14)+' Araç <b id="loc-vehicle" style="margin-left:auto;">'+fmtDist(mv.vehicleM)+'</b></span>';
+  b+='</div>';
+  b+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  b+='<span style="flex:1;background:rgba(143,191,138,0.10);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Ayakta <b id="loc-walk-dur" style="margin-left:auto;">'+fmtDur(mv.walkSec)+'</b></span>';
+  b+='<span style="flex:1;background:rgba(201,184,255,0.11);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Yolda <b id="loc-veh-dur" style="margin-left:auto;">'+fmtDur(mv.vehicleSec)+'</b></span>';
+  b+='</div>';
+  if(mode==='auto') b+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  else b+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  b+=hsBlock;
+  b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır; Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
+  b+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
+  return collapsibleCardHTML({key:'location', id:'card-location', icon:icon('map-pin',18), accent:'#3F9A4F', title:'Konum & Hareket', subtitle:subtitle, badge:badge, open:open, body:b, hint:'ayrıntıları gör'});
 }
+CARD_BUILDERS.location=locationCardHTML;
 // ---------- Günışığı hava durumu (Open-Meteo, anahtarsız) ----------
 var wxFetching=false;
 var WX_SPOTS_FIXED=[
   {key:'ev', label:'Ev', place:'Kazan', iconName:'house', lat:40.23, lng:32.68},
   {key:'is', label:'İş', place:'Altındağ', iconName:'building-2', lat:39.97, lng:32.92}
 ];
-function wxMode(){ var s=(data&&data.settings)?data.settings:{}; return (s.locationEnabled && data.location && typeof data.location.lat==='number') ? 'live' : 'fixed'; }
+function hasLiveLocation(){ return !!(data&&data.location&&typeof data.location.lat==='number'&&typeof data.location.lng==='number'); }
+function wxMode(){ var s=(data&&data.settings)?data.settings:{}; return (s.locationEnabled && hasLiveLocation()) ? 'live' : 'fixed'; }
 function weatherSpots(){
+  var fixed=WX_SPOTS_FIXED.slice();
   if(wxMode()==='live'){
     var nm=(data.weather&&data.weather.liveName)||'';
-    return [{key:'live', label:'Konumun', place:nm, iconName:'map-pin', lat:data.location.lat, lng:data.location.lng}];
+    return [{key:'live', label:'Konumun', place:nm, iconName:'map-pin', lat:data.location.lat, lng:data.location.lng}].concat(fixed);
   }
-  return WX_SPOTS_FIXED;
+  return fixed;
 }
 function wxSpotIconName(sp){ return (sp&&sp.iconName)||(sp&&sp.key==='live'?'map-pin':(sp&&sp.key==='is'?'building-2':'house')); }
 function wxSpotIcon(sp,size){ return icon(wxSpotIconName(sp),size||16); }
 function wxStale(){
+  var expected=weatherSpots();
   if(!data.weather||!data.weather.fetchedAt||!(data.weather.spots&&data.weather.spots.length)) return true;
   if(data.weather.mode!==wxMode()) return true;
+  if(data.weather.spots.length!==expected.length) return true;
+  for(var i=0;i<expected.length;i++){ if(!data.weather.spots[i]||data.weather.spots[i].key!==expected[i].key) return true; }
   if(wxMode()==='live' && data.location && typeof data.location.lat==='number' && data.weather.coords){
     var moved=haversineM({lat:data.weather.coords.lat,lng:data.weather.coords.lng},{lat:data.location.lat,lng:data.location.lng});
     if(moved>3000) return true;   // ~3 km'den fazla oynadıysa konum havasını tazele
@@ -1627,6 +2499,7 @@ function wxStale(){
 function maybeFetchWeather(){ if(!data||editing()) return; if(wxFetching) return; if(!wxStale()) return; fetchWeather(); }
 function fetchWeather(){
   if(wxFetching || typeof fetch!=='function') return;
+  var modeAtFetch=wxMode();
   var spots=weatherSpots(); if(!spots.length) return;
   wxFetching=true;
   var lats=spots.map(function(s){return s.lat;}).join(',');
@@ -1652,15 +2525,16 @@ function fetchWeather(){
       });
     }
     if(!out.length){ wxFetching=false; return; }
-    var live=wxMode()==='live';
+    var live=modeAtFetch==='live';
     var prevCoords=(data.weather&&data.weather.coords)?data.weather.coords:null;
     var keepName=(data.weather&&data.weather.liveName)||'';
     var liveCoords=(live&&spots[0])?{lat:spots[0].lat,lng:spots[0].lng}:null;
     if(live && prevCoords && liveCoords && haversineM(prevCoords,liveCoords)>3000) keepName=''; // yeni bölge → adı yeniden çöz
-    data.weather={mode:wxMode(), fetchedAt:new Date().toISOString(), spots:out, liveName:keepName, coords:liveCoords};
+    data.weather={mode:modeAtFetch, fetchedAt:new Date().toISOString(), spots:out, liveName:keepName, coords:liveCoords};
     wxFetching=false; saveLocal();
     if(live && !data.weather.liveName) reverseGeocodeLive(spots[0].lat, spots[0].lng);
     if(ui.tab==='bugun') render();
+    if(wxStale()) maybeFetchWeather();
   }).catch(function(){ wxFetching=false; });
 }
 function reverseGeocodeLive(lat,lng){
@@ -1711,13 +2585,18 @@ var WX_QUIPS={
 };
 function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
 function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
-function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:13px;font-weight:800;color:#7A3E1E;line-height:1.35;"><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,16)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:#7A3E1E;line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:900;color:#A85E3C;">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxLocationPendingChip(label){ return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11px;font-weight:800;color:#A85E3C;line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:0 0 0 3px rgba(199,119,73,.14);"></span></div>'; }
 function wxDetail(icon,label,val){ return '<div style="flex:1;min-width:0;background:rgba(255,255,255,0.45);border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:#A85E3C;font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:#7A3E1E;margin-top:2px;">'+val+'</div></div>'; }
 function weatherHeaderHTML(greet){
   var open=!!ui.weatherOpen;
   var wx=data.weather;
   var spots=(wx&&wx.spots&&wx.spots.length)?wx.spots:null;
   var live=!!(wx&&wx.mode==='live');
+  var locationOn=!!(data&&data.settings&&data.settings.locationEnabled);
+  var liveReady=!!(spots&&live&&spots[0]&&spots[0].key==='live');
+  var locationPending=locationOn&&!liveReady;
+  var locationPendingLabel=hasLiveLocation()?'Konum güncelleniyor…':'Konum bekleniyor…';
   var primary=null;
   if(spots){ primary=spots[0]; for(var i=1;i<spots.length;i++){ var b=spots[i]; var sv=(b.uv||0)+(b.feels!=null?b.feels:b.temp||0); var ps=(primary.uv||0)+(primary.feels!=null?primary.feels:primary.temp||0); if(sv>ps) primary=b; } }
   var pm=primary?wxMeta(primary.code,primary.isDay):null;
@@ -1729,15 +2608,20 @@ function weatherHeaderHTML(greet){
   var sub=greet; if(pm) sub+=' · '+pm.label;
   h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:900;letter-spacing:0.3px;color:#8A4426;line-height:1.12;">Günışığı</div><div style="font-size:12px;font-weight:700;color:#A85E3C;letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:9px;flex-shrink:0;">';
-  if(spots){
-    if(live){ h+='<div style="text-align:right;"><div style="font-size:20px;font-weight:900;color:#7A3E1E;line-height:1;">'+spots[0].temp+'°</div>'+(spots[0].place?'<div style="font-size:10.5px;font-weight:700;color:#A85E3C;margin-top:2px;display:flex;align-items:center;justify-content:flex-end;gap:3px;">'+icon('map-pin',11)+' '+esc(spots[0].place)+'</div>':'')+'</div>'; }
-    else { h+='<div style="display:flex;flex-direction:column;gap:3px;">'+wxSpotChip(spots[0])+wxSpotChip(spots[1]||spots[0])+'</div>'; }
+  if(spots||locationPending){
+    h+='<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;">';
+    if(locationPending) h+=wxLocationPendingChip(locationPendingLabel);
+    if(spots){ for(var ci=0; ci<Math.min(spots.length,locationPending?2:3); ci++){ h+=wxSpotChip(spots[ci]); } }
+    h+='</div>';
   } else { h+='<div style="font-size:11.5px;font-weight:700;color:#A85E3C;">hava…</div>'; }
   h+='<span style="color:#B5673A;transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</div></div>';
   if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:rgba(122,62,30,0.6);display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
   if(open && spots){
     h+='<div style="position:relative;margin-top:12px;animation:seyFade .25s ease;">';
+    if(locationPending){
+      h+='<div data-wx-location-pending style="display:flex;align-items:center;gap:8px;padding:10px 0 11px;color:#8A4426;font-size:12.5px;font-weight:800;">'+icon('map-pin',17)+' <span>'+esc(locationPendingLabel)+'</span></div>';
+    }
     for(var si=0; si<spots.length; si++){
       var sp=spots[si]; var m=wxMeta(sp.code,sp.isDay);
       h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
@@ -1789,6 +2673,454 @@ function onThisDayCard(){
   h+='</div>';
   return h;
 }
+// Motivasyon V2.1 kişiselleştirme yardımcıları — yalnızca gerçek app verisinden
+// (takma ad, gün/faz/alan, seri, cesaret kanıtı, dönüş sayısı, bugünün durumu)
+// üretilir; sahte yakınlık, teşhis veya boş övgü yok (bkz. prompt_25).
+function motivationIsCourageDomain(domain){
+  return domain==='destek'||domain==='sinir'||domain==='onarim'||domain==='yakinlik';
+}
+function motivationPersonalLine(mot,sum,state){
+  var doneToday=!!(state&&(state.status==='completed'||state.status==='minimum_completed'));
+  if(doneToday&&state.status==='minimum_completed') return 'Bugün minimum sürümü seçtin; bu da yolun içinde, pas geçmek değil.';
+  if(doneToday) return 'Bugünü kaydettin — bu, '+esc(mot.domainLabel)+' alanında somut bir kanıt.';
+  if(sum.returnCount>0&&sum.pathStreak<=1) return 'Ara verdikten sonra döndüğün günler de başarı verisi.';
+  if(motivationIsCourageDomain(mot.domain)) return 'Bu görev '+esc(mot.domainLabel)+' alanında; küçük bir adım da cesaret kanıtı sayılır.';
+  var name=(data.settings&&data.settings.nickname)?String(data.settings.nickname).trim():'';
+  return (name?esc(name)+', bugün':'Bugün')+' görev küçük olabilir; kayıt gerçek kalır.';
+}
+function motivationEvidenceLine(sum){
+  var bits=[];
+  if(sum.pathStreak>0) bits.push(sum.pathStreak+' günlük yol kaydı');
+  if(sum.courageEvidence>0) bits.push(sum.courageEvidence+' cesaret kanıtı');
+  if(sum.minimumTotal>0) bits.push(sum.minimumTotal+' minimum tamamlama');
+  if(!bits.length) return '';
+  return bits.join(' · ')+' — hepsi gerçek davranış verisi.';
+}
+function motivationNextStepLabel(state){
+  if(state&&state.status==='minimum_completed') return 'Minimum kaydedildi';
+  if(state&&state.status==='completed') return 'Bugün kaydedildi';
+  return 'Tamamladım';
+}
+// Motivasyon V2.1 — 120 günlük programın "Bugün" kartı. Yerleşim prompt_13'te yapılacak.
+// "Şeyma & Raşit'in Terapi Odası" -- Günışığı hava durumu kartıyla birebir aynı
+// aç/kapa deseni (ui.motivationCardOpen + App.toggleMotivationCard, bkz. weatherHeaderHTML).
+function motivationBadgeHTML(size){
+  size=size||40;
+  var isz=Math.round(size*0.5);
+  return '<div style="position:relative;flex-shrink:0;width:'+size+'px;height:'+size+'px;border-radius:'+Math.round(size*0.34)+'px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 8px 20px var(--room-glow);overflow:hidden;">'
+    +'<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:seyShine 3.4s ease-in-out infinite;"></span>'
+    +'<span style="position:relative;color:#fff;display:inline-flex;">'+icon('armchair',isz)+'</span></div>';
+}
+// El yazısı imza: "Şeyma" büyük, "& Raşit" daha küçük, ikisi de siyah (var(--text)).
+function motivationSignHTML(delay){
+  var anim=(delay!=null)?'animation:seyFloatIn .4s '+delay+'s ease both;':'';
+  var h='<div class="sey-room-sign" style="margin-top:4px;display:flex;align-items:center;gap:5px;'+anim+'">';
+  h+='<span style="display:inline-flex;color:var(--room);opacity:.8;">'+icon('feather',13)+'</span>';
+  h+='<span style="font-size:24px;">Şeyma</span>';
+  h+='<span style="font-size:16px;opacity:.9;">&amp; Raşit</span>';
+  h+='</div>';
+  return h;
+}
+function motivationQuoteBlockHTML(quote){
+  var h='<div style="position:relative;padding-top:2px;">';
+  h+='<span style="position:absolute;top:-22px;right:-4px;font-size:72px;line-height:1;font-weight:800;color:var(--room);opacity:0.11;pointer-events:none;">”</span>';
+  h+='<div style="position:relative;font-size:15.5px;line-height:1.55;color:var(--text);font-style:italic;display:flex;gap:8px;text-shadow:0 0 18px var(--room-bg);"><span style="flex-shrink:0;opacity:0.8;color:var(--room);">'+icon('quote',16)+'</span><span>'+esc(quote)+'</span></div>';
+  // Sözü Raşit bırakmış gibi -- doğrudan değil, elle atılmış bir "— R." imzasıyla ima.
+  h+='<div class="sey-room-sign" style="text-align:right;margin-top:7px;font-size:15px;color:var(--room);opacity:.9;">— R.</div>';
+  h+='</div>';
+  return h;
+}
+// Kompakt tetikleyici kart: her zaman "İçsel Pusula" formunda. Dokununca tam ekran
+// Terapi Odası açılır (App.openRoom); kapanınca yine animasyonlu İçsel Pusula'ya döner.
+function motivationTodayCardHTML(){
+  var M=window.MotivationProgramV2;
+  if(!M||!data) return '';
+  var root=M.ensureMotivationRoot(data);
+  if(!root) return '';
+  var mot=M.activeDay(data);
+  if(!mot) return '';
+  var sum=M.progressSummary(data);
+  var st=M.dayState(data,activeDate());
+  var doneToday=!!(st&&(st.status==='completed'||st.status==='minimum_completed'));
+  var pct=sum.programComplete?100:Math.max(2,sum.percent);
+  var pu=dark?'#B7A8F2':'#6E5FCB';
+  var h='<div id="sey-motivation-card" class="glass sey-room-card" onclick="App.openRoom()" role="button" aria-label="Terapi Odası\'nı aç" style="cursor:pointer;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
+  h+='<div style="display:flex;align-items:center;gap:11px;">';
+  h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('compass',19)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:15.5px;font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
+  h+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
+  h+='</div>';
+  if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
+  h+='<span style="color:'+pu+';font-size:20px;font-weight:700;line-height:1;flex-shrink:0;">›</span>';
+  h+='</div>';
+  var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
+  h+='<div style="display:flex;align-items:center;gap:8px;">';
+  h+='<div style="flex:1;min-width:0;font-size:13px;line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
+  h+='<div style="flex-shrink:0;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
+  h+='</div>';
+  h+='<div style="height:6px;border-radius:999px;background:var(--icon);overflow:hidden;position:relative;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
+  h+='<div style="text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
+  h+='</div>';
+  return h;
+}
+// Tam ekran "Terapi Odası" — dokununca animasyonlu açılır; el yazısı imza (büyük
+// Şeyma / küçük Raşit), parlayan başlık, GÜNE ÖZGÜ anlatı ve programın tüm zengin
+// metinleri (açıklama, mercek, yansıma sorusu, sabah/akşam/zor gün notları) burada.
+function roomStatsHTML(sum,fi){
+  var h='<div style="display:flex;gap:8px;font-size:11.5px;'+(fi?fi(0.22):'')+'">';
+  h+='<span style="flex:1;background:rgba(233,175,193,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('route',14)+' Yol <b style="margin-left:auto;">'+sum.pathStreak+'</b></span>';
+  h+='<span style="flex:1;background:rgba(201,184,255,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',14)+' Cesaret <b style="margin-left:auto;">'+sum.courageEvidence+'</b></span>';
+  h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:9px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('rotate-ccw',14)+' Dönüş <b style="margin-left:auto;">'+sum.returnCount+'</b></span>';
+  h+='</div>';
+  return h;
+}
+function roomOverlayHTML(){
+  var M=window.MotivationProgramV2;
+  if(!M||!data) return '';
+  var root=M.ensureMotivationRoot(data); if(!root) return '';
+  var mot=M.activeDay(data); if(!mot) return '';
+  var sum=M.progressSummary(data);
+  var st=M.dayState(data,activeDate());
+  var doneToday=!!(st&&(st.status==='completed'||st.status==='minimum_completed'));
+  var hasReflection=!!(String(ui.motivationReflectionDraft||'').trim());
+  var pct=sum.programComplete?100:Math.max(2,sum.percent);
+  var fi=function(delay){ return 'animation:seyFloatIn .45s '+delay+'s ease both;'; };
+  var nar=(window.MotivationNarratives&&window.MotivationNarratives.dayNarrative)?window.MotivationNarratives.dayNarrative(mot):null;
+  var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
+
+  var h='<div id="sey-room-overlay" onclick="App.closeRoom()" style="position:fixed;inset:0;z-index:360;background:rgba(30,22,30,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .22s ease;">';
+  h+='<div id="sey-room-sheet" onclick="event.stopPropagation()" style="width:100%;max-width:480px;height:100%;background:var(--modal);display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,0.4);animation:seyPop .34s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;transform-origin:center;overflow:hidden;">';
+  // ── Sticky başlık: parlayan "Terapi Odası" + el yazısı imza (geri geldi) ──
+  h+='<div style="flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid color-mix(in srgb,var(--room) 22%,var(--card-bd));background:linear-gradient(160deg,var(--room-bg),transparent);display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden;">';
+  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.10) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;pointer-events:none;"></span>';
+  h+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
+  h+='<span style="animation:seyPop .34s var(--ease-premium,ease) both;">'+motivationBadgeHTML(46)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div class="sey-room-title" style="font-size:22px;letter-spacing:2.5px;animation:seyFloatIn .4s .04s ease both;">Terapi Odası</div>';
+  h+=motivationSignHTML(0.12);
+  h+='</div>';
+  h+='<button onclick="App.closeRoom()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.16);cursor:pointer;width:36px;height:36px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='</div>';
+  h+='<div style="position:relative;display:flex;align-items:center;gap:8px;">';
+  h+='<div style="flex:1;min-width:0;font-size:12.5px;line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
+  h+='<div style="flex-shrink:0;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
+  h+='</div>';
+  h+='<div style="position:relative;height:6px;border-radius:999px;background:var(--icon);overflow:hidden;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
+  h+='</div>';
+  // ── Kaydırılabilir gövde ──
+  h+='<div class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:14px;">';
+
+  if(sum.programComplete){
+    h+='<div style="'+fi(0.04)+'">'+motivationQuoteBlockHTML(mot.quote)+'</div>';
+    h+='<div style="font-size:13px;color:var(--text2);line-height:1.6;'+fi(0.08)+'">120 günlük yol, bu odada birlikte yüründü. Elde ettiğin bir rozet değil; zor bir günde kendine dönebildiğin, güvenilir bir iç yol.</div>';
+    h+=roomStatsHTML(sum,fi);
+    h+='<div style="font-size:12px;color:var(--room);line-height:1.5;font-style:italic;display:flex;align-items:center;gap:6px;'+fi(0.14)+'">'+icon('heart',13)+' Bu oda, ikimizin — sana iyi gelsin diye.</div>';
+    h+='</div></div></div>';
+    return h;
+  }
+
+  // Söz
+  h+='<div style="'+fi(0.04)+'">'+motivationQuoteBlockHTML(mot.quote)+'</div>';
+  // GÜNE ÖZGÜ ANLATI
+  if(nar){
+    h+='<div style="'+fi(0.06)+'display:flex;flex-direction:column;gap:9px;background:linear-gradient(160deg,var(--room-bg),transparent);border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:18px;padding:15px;">';
+    h+='<div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;"><span style="display:inline-flex;">'+icon('feather',13)+'</span>'+esc(nar.phaseName)+' · Anlatı</div>';
+    h+='<div style="font-size:12.5px;color:var(--muted);font-style:italic;line-height:1.5;">'+esc(nar.phaseEssence)+'</div>';
+    nar.paragraphs.forEach(function(p){ h+='<div style="font-size:13.5px;line-height:1.62;color:var(--text2);">'+esc(p)+'</div>'; });
+    (nar.phaseArc||[]).forEach(function(p){ h+='<div style="font-size:12.5px;line-height:1.6;color:var(--muted);">'+esc(p)+'</div>'; });
+    h+='</div>';
+  }
+  // Mercek + açıklama + kişisel satır
+  h+='<div style="'+fi(0.08)+'display:flex;flex-direction:column;gap:6px;">';
+  h+='<div style="font-size:11.5px;font-weight:800;letter-spacing:.4px;color:var(--room);text-transform:uppercase;">Mercek · '+esc(mot.psychologicalLens)+'</div>';
+  if(mot.explanation) h+='<div style="font-size:13px;color:var(--text2);line-height:1.55;">'+esc(mot.explanation)+'</div>';
+  h+='<div style="font-size:12.5px;color:var(--muted);line-height:1.5;">'+esc(motivationPersonalLine(mot,sum,st))+'</div>';
+  h+='</div>';
+  // Bugünün sorusu (yansıma sorusu — artık görünür)
+  if(mot.reflectionQuestion) h+='<div style="'+fi(0.1)+'display:flex;gap:9px;align-items:flex-start;background:rgba(201,184,255,0.12);border:1px solid rgba(201,184,255,0.28);border-radius:14px;padding:12px 13px;"><span style="flex-shrink:0;color:var(--room);display:inline-flex;margin-top:1px;">'+icon('lightbulb',15)+'</span><div style="font-size:13px;line-height:1.55;color:var(--text2);"><b>Bugünün sorusu:</b> '+esc(mot.reflectionQuestion)+'</div></div>';
+  // Bugünkü görev + küçültme
+  var minMode=!doneToday&&!!ui.motivationMinimumOpen;
+  h+='<div style="border-left:3px solid var(--room);background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:0 14px 14px 0;padding:12px;display:flex;flex-direction:column;gap:6px;transition:opacity .25s ease;'+fi(0.12)+(minMode?'opacity:.5;':'')+'">';
+  h+='<div style="font-size:11px;font-weight:700;color:var(--muted);">Bugünkü görev</div>';
+  h+='<div style="font-size:14px;color:var(--text);line-height:1.45;">'+esc(mot.standardTask)+'</div>';
+  h+='</div>';
+  if(minMode){
+    h+='<div style="border:1px solid var(--room);background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 22px var(--room-glow);animation:seyFloatIn .32s var(--ease-premium,ease) both;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--room);"><span style="display:inline-flex;">'+icon('feather',12)+'</span>Küçültülmüş görev</div>';
+    h+='<div style="font-size:14px;color:var(--text);line-height:1.45;font-weight:600;">'+esc(mot.minimumTask)+'</div>';
+    h+='<div style="font-size:11.5px;color:var(--text2);line-height:1.5;">Görevi küçültüyorsun, pas geçmiyorsun — bu hâliyle de kayda geçer.</div>';
+    h+='</div>';
+  }
+  h+='<div style="'+fi(0.14)+'display:flex;flex-direction:column;gap:8px;">';
+  // Kaydedilmiş günde de yansıma görünür ve düzenlenebilir (önceden dolu gelir).
+  if(doneToday) h+='<div style="display:inline-flex;align-self:flex-start;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.16);padding:4px 11px;border-radius:999px;">'+icon('check',12)+(st&&st.status==='minimum_completed'?'Minimum kaydedildi · düzenleyebilirsin':'Bugün kaydedildi · düzenleyebilirsin')+'</div>';
+  h+='<input id="sey-mot-reflection-main" type="text" maxlength="280" value="'+esc(ui.motivationReflectionDraft||'')+'" oninput="App.setMotivationReflection(this)" placeholder="Bu odaya bugün ne bırakmak istersin?" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
+  h+='<div style="font-size:10.5px;color:var(--faint);margin-top:-3px;">'+(doneToday?'Kaydını dilediğin an düzenleyip güncelleyebilirsin.':'Kısa da olsa yeter — bu oda seni duyuyor.')+'</div>';
+  var pEnabled=hasReflection; // her zaman bir cümle iste → boşken buton pasif; "cümle yaz" uyarısı çıkmaz
+  var saveStatus=doneToday?((st&&st.status==='minimum_completed')?'minimum_completed':'completed'):'completed';
+  var pOnclick=minMode?"App.confirmMotivationMinimum()":("App.completeMotivationTask('"+saveStatus+"')");
+  var pLabel=minMode?'Minimum görevi tamamladım':(doneToday?'Kaydı güncelle':motivationNextStepLabel(st));
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<button id="sey-mot-complete-btn-main" onclick="'+pOnclick+'"'+(pEnabled?'':' disabled')+' style="position:relative;overflow:hidden;flex:1;min-width:0;border:none;cursor:'+(pEnabled?'pointer':'not-allowed')+';padding:13px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),#C9B8FF);opacity:'+(pEnabled?'1':'0.45')+';">'
+    +'<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.45) 50%,transparent 70%);animation:seyShine 3.2s ease-in-out infinite;"></span>'
+    +'<span style="position:relative;">'+esc(pLabel)+' '+icon('check',14)+'</span></button>';
+  if(minMode) h+='<button onclick="App.closeMotivationMinimum()" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">Vazgeç</button>';
+  else if(!doneToday) h+='<button onclick="App.openMotivationMinimum()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.4);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:12.5px;font-weight:700;color:var(--text2);background:rgba(233,175,193,0.10);">Görevi küçült</button>';
+  h+='</div></div>';
+  // Sabah / Akşam / Zor gün notları (programın zengin metinleri — artık görünür)
+  if(mot.appNudge&&(mot.appNudge.morning||mot.appNudge.evening||mot.appNudge.hardDay)){
+    var nudgeRow=function(ic,label,txt,col){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="width:28px;height:28px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%,var(--icon));">'+icon(ic,14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">'+label+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-top:1px;">'+esc(txt)+'</div></div></div>'; };
+    h+='<div style="'+fi(0.16)+'display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--card-bd);padding-top:13px;">';
+    h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--faint);">GÜN BOYU EŞLİK</div>';
+    if(mot.appNudge.morning) h+=nudgeRow('sunrise','SABAH',mot.appNudge.morning,'#E8A53C');
+    if(mot.appNudge.evening) h+=nudgeRow('moon','AKŞAM',mot.appNudge.evening,'#7C5CC4');
+    if(mot.appNudge.hardDay) h+=nudgeRow('triangle-alert','ZOR GÜN',mot.appNudge.hardDay,'#E9899F');
+    h+='</div>';
+  }
+  if(mot.eveningCheck) h+='<div style="'+fi(0.18)+'font-size:11.5px;color:var(--faint);line-height:1.5;">'+esc(mot.eveningCheck)+'</div>';
+  // İstatistikler
+  h+=roomStatsHTML(sum,fi);
+  var evLine=motivationEvidenceLine(sum);
+  h+='<div style="'+fi(0.2)+'display:flex;flex-direction:column;gap:5px;">';
+  if(evLine) h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">'+esc(evLine)+'</div>';
+  if(nar&&nar.closer) h+='<div style="font-size:12px;color:var(--room);font-style:italic;line-height:1.5;display:flex;align-items:center;gap:6px;">'+icon('heart',13)+' '+esc(nar.closer)+'</div>';
+  else h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;font-style:italic;display:flex;align-items:center;gap:5px;">'+icon('heart',12)+' Bu oda, ikimizin — sana iyi gelsin diye.</div>';
+  h+='</div>';
+  h+='</div></div></div>';
+  return h;
+}
+App.setMotivationReflection=function(el){
+  ui.motivationReflectionDraft=String(el.value||'').slice(0,280);
+  var has=!!ui.motivationReflectionDraft.trim();
+  var btn=document.getElementById('sey-mot-complete-btn-main');
+  if(btn){ btn.disabled=!has; btn.style.opacity=has?'1':'0.45'; btn.style.cursor=has?'pointer':'not-allowed'; }
+};
+// Bir cümle bırakmak zorunlu: hem standart hem minimum tamamlamada, kullanıcı
+// yazmadan devam edemez -- buton devre dışı bırakılır, burada da savunma amaçlı tekrar kontrol edilir.
+App.completeMotivationTask=function(status){
+  var M=window.MotivationProgramV2;
+  if(!M||!data) return;
+  var reflection=String(ui.motivationReflectionDraft||'').trim();
+  if(!reflection){ toast('Devam etmeden önce bir cümle yaz — kısa da olsa yeter.'); return; }
+  status=(status==='minimum_completed')?'minimum_completed':'completed';
+  var mot=M.activeDay(data);
+  var prev=M.dayState(data,activeDate());
+  var wasDone=!!(prev&&(prev.status==='completed'||prev.status==='minimum_completed'));
+  var courageBefore=M.progressSummary(data).courageEvidence;
+  M.record(data,activeDate(),status,reflection);
+  // Oda açıkken kaydı sonrası düzenlenebilir kalsın diye yansımayı input'ta tut.
+  ui.motivationReflectionDraft=ui.roomOpen?reflection:'';
+  var courageGained=M.progressSummary(data).courageEvidence>courageBefore;
+  save();
+  haptic([10,30,10]);
+  render();
+  var msg;
+  if(wasDone) msg='Kaydın güncellendi';
+  else msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi');
+  if(courageGained) msg+=' · bir cesaret kanıtı daha';
+  toast(msg);
+};
+// Görevi küçült akışı: yalnızca `ui`de geçici açık/kapalı durumu tutulur,
+// kullanıcı "Minimum görevi tamamladım"a basmadan `data`ya hiçbir şey yazılmaz.
+App.openMotivationMinimum=function(){
+  if(!window.MotivationProgramV2||!data) return;
+  ui.motivationMinimumOpen=true;
+  haptic(10);
+  updateMotivationCard();
+};
+App.closeMotivationMinimum=function(){
+  ui.motivationMinimumOpen=false;
+  updateMotivationCard();
+};
+App.confirmMotivationMinimum=function(){
+  ui.motivationMinimumOpen=false;
+  App.completeMotivationTask('minimum_completed');
+};
+// Kompakt hub kutucukları: okudum/izledim/dinledim — 3 tam-genişlik gradyan bar yerine
+// yan yana 3 hafif kutucuk (görsel gürültüyü azaltır, günlük log ailesiyle gruplanır).
+function hubTilesHTML(){
+  // "Zihnimi Besledim" — premium, vurgulu bir kart: dört kutucuktan biri dolunca
+  // üstünde onay rozeti belirir ve mediaFed tiki kendiliğinden yeşillenir.
+  var day=(data&&data.days)?data.days[todayStr()]:null;
+  var cnt=function(sec){ var e=(day&&day[sec]&&Array.isArray(day[sec].entries))?day[sec].entries:[]; return e.length; };
+  var tile=function(fn,label,ic,col,bg,n){
+    var done=n>0;
+    var badge=done?'<span style="position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+col+';box-shadow:0 2px 6px rgba(108,74,58,0.3);">'+(n>1?n:icon('check',10))+'</span>':'';
+    return '<button onclick="App.'+fn+'()" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 4px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:7px;background:'+bg+';border:1px solid color-mix(in srgb,'+col+' '+(done?'55':'26')+'%, transparent);box-shadow:'+(done?'0 8px 20px color-mix(in srgb,'+col+' 22%, transparent)':'0 4px 12px rgba(108,74,58,0.06)')+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">'
+      +badge
+      +'<span style="width:40px;height:40px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 17%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);">'+icon(ic,19)+'</span>'
+      +'<span style="font-size:11.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+col+';">'+label+'</span></button>';
+  };
+  var total=cnt('reading')+cnt('watching')+cnt('listening')+cnt('learning');
+  var filledN=(cnt('reading')>0?1:0)+(cnt('watching')>0?1:0)+(cnt('listening')>0?1:0)+(cnt('learning')>0?1:0);
+  var fed=total>0;
+  var mc='#C77D93';
+  var chip=fed
+    ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Zihin tiki yeşil</span>'
+    : '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,'+mc+' 24%, var(--card-bd));box-shadow:0 12px 30px color-mix(in srgb,'+mc+' 14%, transparent);">';
+  h+='<div style="display:flex;align-items:center;gap:11px;">';
+  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+mc+',#E9AFC1);box-shadow:0 6px 16px color-mix(in srgb,'+mc+' 34%, transparent);">'+icon('sparkles',19)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · izledim · dinledim · öğrendim — küçük besinler, büyük denge</div></div>';
+  h+='</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);">BUGÜN '+filledN+'/4 ALAN</span>'+chip+'</div>';
+  h+='<div style="display:flex;gap:9px;">';
+  h+=tile('openReading','Okudum','book-open','var(--read)','var(--read-bg)',cnt('reading'));
+  h+=tile('openWatching','İzledim','clapperboard','var(--watch)','var(--watch-bg)',cnt('watching'));
+  h+=tile('openListening','Dinledim','headphones','var(--listen)','var(--listen-bg)',cnt('listening'));
+  h+=tile('openLearning','Öğrendim','graduation-cap','var(--learn)','var(--learn-bg)',cnt('learning'));
+  h+='</div></div>';
+  return h;
+}
+// Raşit'in sözü — hemen Günışığı kartının altında; dokununca söz değişir (App.cycleRasit).
+function rasitNoteIdx(curIdx){ var n=NOTES.length; return (((curIdx-1)+(ui.noteIndex||0))%n+n)%n; }
+function rasitBubbleHTML(curIdx){
+  var h='<div onclick="App.cycleRasit()" role="button" aria-label="Raşit\'in sözü — dokun, değişsin" style="cursor:pointer;display:flex;align-items:flex-start;gap:11px;">';
+  h+='<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 6px 16px var(--room-glow);">'+icon('heart',20)+'</div>';
+  h+='<div class="glass" style="position:relative;flex:1;min-width:0;border-radius:6px 20px 20px 20px;padding:12px 15px;border:1px solid color-mix(in srgb,var(--room) 28%, var(--card-bd));box-shadow:0 8px 22px var(--room-glow);">';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:12px;">🦩</span><span style="margin-left:auto;font-size:10px;color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
+  h+='<div id="sey-rasit-note" style="font-size:14.5px;line-height:1.5;color:var(--text2);transition:opacity .18s ease;">'+esc(NOTES[rasitNoteIdx(curIdx)])+'</div>';
+  h+='</div></div>';
+  return h;
+}
+// ── Hero dashboard: kullanıcının bugünkü girdilerinin sakin, premium özeti ──
+// Dört kompakt kutucuk (Mod · Su · Uyku · Adım). Veri girildikçe canlanır,
+// eşik tutunca ilgili kutucuk yeşile döner — habits tikleriyle aynı dille.
+function heroStatTile(ic,val,label,accent,met){
+  var col=met?'#3F8A4F':accent;
+  var bg=met?'rgba(143,191,138,0.16)':'var(--icon)';
+  var filled=(val!=='—');
+  return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:15px;background:'+bg+';border:1px solid '+(met?'rgba(143,191,138,0.34)':'transparent')+';">'
+    +'<span style="display:inline-flex;color:'+(filled?col:'var(--faint)')+';">'+icon(ic,15)+'</span>'
+    +'<span style="font-size:13px;font-weight:800;line-height:1.05;color:'+(filled?'var(--text)':'var(--faint)')+';white-space:nowrap;">'+val+'</span>'
+    +'<span style="font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
+}
+function heroStatsHTML(rec){
+  var mo=(rec&&rec.mood)?find(MOODS,'id',rec.mood):null;
+  var water=rec?(Number(rec.water)||0):0;
+  var sh=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null;
+  var es=effSteps(rec);
+  var stepTxt='—';
+  if(es.steps!=null){ stepTxt=es.steps>=1000?((es.steps/1000).toFixed(es.steps%1000===0?0:1).replace('.',',')+'B'):String(es.steps); }
+  var h='<div style="display:flex;gap:7px;">';
+  h+=heroStatTile(mo?mo.icon:'smile', mo?esc(mo.short):'—', 'Mod', 'var(--accent)', false);
+  h+=heroStatTile('droplet', (water>0?water+'/'+WATER_GOAL:'—'), 'Su', '#5EA9E6', water>=WATER_GOAL);
+  h+=heroStatTile('moon', (sh!=null?(String(sh).replace('.',',')+'s'):'—'), 'Uyku', '#9B7FC9', sh!=null&&sh>=SLEEP_TICK_MIN);
+  h+=heroStatTile('footprints', stepTxt, 'Adım', '#5BA85B', es.steps!=null&&es.steps>=STEP_TICK_MIN);
+  h+='</div>';
+  return h;
+}
+// Kısa tik etiketleri (hero "en güçlü/zayıf" istatistiği için).
+var SHORT_HABIT={sweetManaged:'Tatlı',foodManaged:'Yemek',coffeeManaged:'Kahve',eveningControl:'Akşam',walked20:'Yürüyüş',protein:'Protein',water:'Su',vitaminD:'D vit.',sleepReg:'Uyku',journaled:'Not',mediaFed:'Zihin',freshAir:'Açık hava',selfKind:'Öz-şefkat'};
+// ── Premium istatistik şeridi: tek çerçevede seri · 7 günlük ritim · mod eğilimi
+// + son 14 günün en güçlü/destek isteyen tiki. Fazla kutu yerine tek panel + iç ayraçlar.
+function heroPremiumStatsHTML(viewDate){
+  // 7 günlük tamamlanma ritmi
+  var sum=0,max=0;
+  for(var i=0;i<7;i++){ var d=addDays(viewDate,-i); if(diffDays(data.startDate,d)<0) break; sum+=countRec(data.days[d]); max+=habitCountOn(d); }
+  var wpct=max>0?Math.round(sum/max*100):0;
+  var streak=currentStreak();
+  // mod eğilimi (son 7 gün, eski → yeni)
+  var moodDots='';
+  for(var j=6;j>=0;j--){ var dd=addDays(viewDate,-j); if(diffDays(data.startDate,dd)<0) continue; var r=data.days[dd]; var m=r&&r.mood?r.mood:null; if(m){ var moo=find(MOODS,'id',m); moodDots+='<span style="display:inline-flex;color:var(--accent);">'+icon(moo?moo.icon:'circle',13)+'</span>'; } else { moodDots+='<span style="width:6px;height:6px;border-radius:50%;background:var(--field-bd);display:inline-block;"></span>'; } }
+  if(!moodDots) moodDots='<span style="font-size:12px;color:var(--faint);">—</span>';
+  // son 14 günün tik başarımı → en güçlü / destek isteyen
+  var win=14,stt={};
+  for(var k=0;k<win;k++){ var d2=addDays(viewDate,-k); if(diffDays(data.startDate,d2)<0) break; var r2=data.days[d2]; HABITS.forEach(function(hb){ if(hb.since&&d2<hb.since) return; if(!stt[hb.key]) stt[hb.key]={done:0,act:0,icon:hb.icon}; stt[hb.key].act++; if(r2&&r2.habits&&r2.habits[hb.key]) stt[hb.key].done++; }); }
+  var best=null,worst=null;
+  for(var key in stt){ var s=stt[key]; if(s.act<1) continue; var rate=s.done/s.act; if(best===null||rate>best.rate||(rate===best.rate&&s.done>best.done)) best={key:key,rate:rate,done:s.done,icon:s.icon}; if(worst===null||rate<worst.rate||(rate===worst.rate&&s.done<worst.done)) worst={key:key,rate:rate,done:s.done,icon:s.icon}; }
+  var cell=function(ic,val,label,col){ return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;">'
+    +'<div style="display:flex;align-items:center;gap:4px;color:'+(col||'var(--text)')+';">'+(ic?'<span style="display:inline-flex;color:'+(col||'var(--muted)')+';">'+ic+'</span>':'')+'<span style="font-size:16px;font-weight:800;line-height:1;color:var(--text);white-space:nowrap;">'+val+'</span></div>'
+    +'<span style="font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>'; };
+  var vline='<span style="width:1px;align-self:stretch;background:var(--card-bd);margin:2px 0;"></span>';
+  var h='<div style="background:var(--icon);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;">';
+  h+=cell(icon('flame',14),streak+(streak===1?' gün':' gün'),'Seri','#E8894A');
+  h+=vline;
+  h+=cell(null,'%'+wpct,'7 Günlük ritim');
+  h+=vline;
+  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
+  h+='</div>';
+  if(best&&worst&&best.key!==worst.key){
+    h+='<div style="display:flex;gap:8px;border-top:1px solid var(--card-bd);padding-top:9px;font-size:11px;">';
+    h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:#3F8A4F;flex-shrink:0;">'+best.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[best.key]||best.key)+'</b> en güçlü <span style="color:#3F8A4F;font-weight:800;">%'+Math.round(best.rate*100)+'</span></span></div>';
+    h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:var(--accent);flex-shrink:0;">'+worst.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[worst.key]||worst.key)+'</b>\'e destek <span style="color:var(--accent);font-weight:800;">%'+Math.round(worst.rate*100)+'</span></span></div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+// Günün havası: tamamlanma seviyesine göre motive edici metin havuzu.
+// Güne (curIdx) göre deterministik seçim — gün içinde titremez, günler arası çeşitlenir.
+function gununHavasi(completed, ht, seed){
+  var strong=Math.ceil(ht*0.66), medium=Math.ceil(ht*0.34);
+  var lvl = completed>=ht?3 : completed>=strong?2 : completed>=medium?1 : 0;
+  var POOL=[
+    ['Bugün nazlı başladı','Yavaş da olsa buradasın','İlk adım en değerlisi','Nazikçe başlıyoruz','Her büyük gün küçük başlar'],
+    ['Toparlanıyorsun, güzel','Adım adım yükseliyor','İyi bir başlangıç, sürdür','Filizleniyorsun','Küçük zaferler birikiyor'],
+    ['Raydasın, harika gidiyor','İvme sende, momentum tam','Güçlü bir ritim yakaladın','Neredeyse zirvede','Denge sana yakışıyor'],
+    ['Kraliçe günü','Bugünü fethettin','Tam isabet, ışıl ışıl','Zirvedesin, tadını çıkar','Kusursuz bir denge kurdun']
+  ];
+  var arr=POOL[lvl];
+  var idx=((seed||0)%arr.length+arr.length)%arr.length;
+  return arr[idx];
+}
+// Veriye bağlı, tek cümlelik bilimsel mikro-bilgi (hafif, kutusuz — üstten ayraçla).
+function heroScienceLine(rec){
+  var sh=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null;
+  var water=rec?(Number(rec.water)||0):0;
+  var es=effSteps(rec);
+  var mood=rec&&rec.mood;
+  var txt;
+  if(sh!=null&&sh<SLEEP_TICK_MIN) txt='7,5+ saat uyku, açlık hormonlarını (leptin/grelin) dengeler — şeker isteğini düşürür.';
+  else if(water<WATER_GOAL) txt='Hafif susuzluk bile yorgunluk ve tatlı isteği gibi hissedilir; önce bir bardak su.';
+  else if(es.steps!=null&&es.steps<STEP_TICK_MIN) txt='Kısa bir yürüyüş bile kan şekerini ve ruh hâlini dengeler — 10 dakika yeter.';
+  else if(mood==='zorlandim'||mood==='cok-zorlandim') txt='Zor günlerde beyin hızlı dopamin arar; kendine nazik ol — küçük bir adım bile kayda geçer.';
+  else txt='Küçük ve tutarlı adımlar, güçlü iradeden daha kalıcıdır — beyin (nöroplastisite) böyle öğrenir.';
+  return '<div style="display:flex;align-items:flex-start;gap:8px;">'
+    +'<span style="flex-shrink:0;color:var(--accent);display:inline-flex;margin-top:1px;">'+icon('brain',14)+'</span>'
+    +'<span style="font-size:11.5px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>';
+}
+// Sayfalar arası tutarlı bilimsel mikro-bilgi rozeti (Rapor/Sağlık/Takvim vb.).
+function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:11px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
+// Ortak sayfa başlığı (bugün sayfası dışındaki sekmelerle görsel uyum için).
+function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:13px;color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
+// ── Raşit'in Kriz Odaları: üçlü, Raşit-temalı buton. Her biri süreli-bilimsel bir modal açar. ──
+function rasitActionsHTML(){
+  var day=(data&&data.days)?data.days[todayStr()]:null;
+  var doneOf={sweet:!!(day&&day.craving10MinDone), food:!!(day&&day.foodCravingDone), coffee:!!(day&&day.coffeeCravingDone)};
+  var tile=function(kind){
+    var C=CRISES[kind]; var done=doneOf[kind];
+    var badge=done?'<span style="position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:'+C.accent+';background:#fff;box-shadow:0 2px 6px rgba(108,74,58,0.3);">'+icon('check',11)+'</span>':'';
+    return '<button onclick="App.openCrisis(\''+kind+'\')" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 6px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;border:none;background:linear-gradient(135deg,'+C.accent+','+C.accent2+');box-shadow:0 10px 22px color-mix(in srgb,'+C.accent+' 42%, transparent);transition:transform .18s var(--ease-premium,ease);">'
+      +badge
+      +'<span style="width:38px;height:38px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,19)+'</span>'
+      +'<span style="font-size:12.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;">'+C.short+'</span>'
+      +'<span style="font-size:8.5px;font-weight:800;letter-spacing:.4px;opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
+  };
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,#E9899F 26%, var(--card-bd));box-shadow:0 12px 30px rgba(233,137,159,0.16);">';
+  h+='<div style="display:flex;align-items:center;gap:11px;">';
+  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 6px 16px rgba(233,137,159,0.4);">'+icon('heart-handshake',19)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Kriz mi geldi? Raşit yetişiyor <span style="font-size:14px;">🦩</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Süreli, bilimsel bir odaya gir — bastırma, yönet.</div></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:9px;">'+tile('sweet')+tile('food')+tile('coffee')+'</div>';
+  h+='</div>';
+  return h;
+}
+// ── Raşit'e ulaş: yaz / ara — "Raşit'ten Notlar" kartının hemen altında, premium ikili. ──
+function rasitContactHTML(){
+  var btn=function(href,attr,ic,label,sub){
+    return '<a href="'+href+'"'+attr+' style="text-decoration:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--room) 14%, var(--card)),color-mix(in srgb,var(--room) 6%, var(--card)));border:1px solid color-mix(in srgb,var(--room) 34%, var(--card-bd));box-shadow:0 8px 20px color-mix(in srgb,var(--room) 16%, transparent);color:var(--room);">'
+      +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 4px 12px var(--room-glow);">'+icon(ic,17)+'</span>'
+      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:10.5px;font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
+  };
+  var h='<div style="display:flex;gap:9px;margin-top:-4px;">';
+  h+=btn(WA,' target="_blank" rel="noopener"','send-horizontal','Raşit\'e yaz','WhatsApp\'tan mesaj');
+  h+=btn(TEL,'','phone','Raşit\'i ara','Bir tık uzağında');
+  h+='</div>';
+  return h;
+}
 function bugunHTML(){
   var today=todayStr();
   var ed=editing();
@@ -1800,145 +3132,91 @@ function bugunHTML(){
   if(rec) syncDerivedHabits(rec); // türetilmiş tikleri, işlenen günün verisiyle görüntüden önce hizala
   var completed=countRec(rec);
   var circ=2*Math.PI*42;
-  var badge='Bugün nazlı başladı';
   var ht=habitCountOn(viewDate);
-  var strong=Math.ceil(ht*0.66), medium=Math.ceil(ht*0.34);
-  if(completed>=ht) badge='Kraliçe günü'; else if(completed>=strong) badge='Raydasın'; else if(completed>=medium) badge='Toparlanıyor';
+  var badge=gununHavasi(completed, ht, curIdx);
   var pct=Math.round(completed/ht*100);
   var off=circ*(1-completed/ht);
   var _hr=new Date().getHours();
   var _greet=(_hr>=5&&_hr<11)?'Günaydın':(_hr<18)?'İyi günler':(_hr<22)?'İyi akşamlar':'İyi geceler';
 
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
+  // ── En üst: repoya bağlan şeridi → hava (Günışığı) → Raşit'in sözü → konum → hero ──
   if(!ed){
-    // Günışığı — gün doğumu temalı, hava durumu içeren dokunulabilir header
+    h+=saveBanner();
+    h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
     h+=weatherHeaderHTML(_greet);
-    h+=saveBanner(); h+=locationCardHTML();
+    h+=rasitBubbleHTML(curIdx);
+    h+=rasitContactHTML(); // Raşit'e yaz / ara — notlar kartının hemen altında (premium ikili)
   }
-  // hero
-  h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:16px;">';
+  // ── HERO: bugünün canlı özeti (dashboard) · niyet vurgulu ──
+  h+='<div class="glass" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:15px;">';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
   h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;"><button onclick="App.toggleTheme()" aria-label="Tema" style="border:none;cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(201,184,255,0.22);color:var(--choc);">'+icon(dark?'sun':'moon',16)+'</button>';
+  h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';
   h+='<div style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
   h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:25px;font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:11px;color:var(--faint);margin-top:2px;">'+(ed?'o gün':'bugün')+'</div></div></div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:19px;font-weight:800;line-height:1.25;">'+esc(badge)+'</div></div></div></div>';
-
-  // daily banner (distinct)
-  h+='<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#FFE19A,#FFC9A3 55%,#F7B7C9);border-radius:24px;padding:22px 22px 20px;box-shadow:0 12px 28px rgba(255,180,140,0.32);">';
-  h+='<div style="position:absolute;top:-26px;right:10px;font-size:130px;line-height:1;font-weight:800;color:#fff;opacity:0.22;">\u201d</div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="display:inline-flex;">'+icon('sun',16)+'</span><span style="font-size:11.5px;letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
-  h+='<div style="position:relative;font-size:19px;font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[(curIdx-1)%DAILY.length])+'</div></div>';
-
-  // günün niyeti — güne yön veren tek cümle (hem bugün hem geçmiş gün düzenlemesinde)
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;background:linear-gradient(160deg,rgba(255,225,154,0.18),rgba(201,184,255,0.10));">';
-  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="line-height:1;display:inline-flex;">'+icon('target',20)+'</span><div><div style="font-size:15.5px;font-weight:800;">'+(ed?'O günün niyeti':'Bugünün niyeti')+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">Güne yön veren tek bir cümle</div></div></div>';
-  h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="örn. Bugün kendime nazik olacağım" maxlength="140" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;color:var(--text);">';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:19px;font-weight:800;line-height:1.25;">'+esc(badge)+'</div><div style="font-size:12px;color:var(--muted);margin-top:5px;font-weight:600;">'+completed+'/'+ht+' tik bugün</div></div></div>';
+  // premium istatistik şeridi (seri · 7 günlük ritim · mod eğilimi · en güçlü/zayıf tik)
+  h+=heroPremiumStatsHTML(viewDate);
+  // bugünkü girdi özeti (Mod · Su · Uyku · Adım)
+  h+=heroStatsHTML(rec);
+  // ── Niyet + bilimsel mikro-bilgi — hafif, üstten ayraçlı (fazla çerçeve yok) ──
+  h+='<div style="border-top:1px solid var(--card-bd);padding-top:13px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;flex-direction:column;gap:7px;">';
+  h+='<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">'+(ed?'O GÜNÜN NİYETİ':'BUGÜNÜN NİYETİ')+'</span></div>';
+  h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="'+(ed?'O günün niyeti…':'örn. Bugün kendime nazik olacağım')+'" maxlength="140" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px 13px;font-size:15px;font-weight:700;outline:none;color:var(--text);">';
+  h+='</div>';
+  h+=heroScienceLine(rec);
+  h+='</div>';
   h+='</div>';
 
+  // Terapi Odası — hero'nun hemen altında
+  if(!ed){ h+=motivationTodayCardHTML(); }
+
+  // Raşit'in Kriz Odaları — üçlü buton (tatlı · yemek · kahve), her biri modal açar
+  if(!ed) h+=rasitActionsHTML();
+
+  // Zihnini besleyen hub kutucukları — bugünün modu kartının hemen üstünde
+  if(!ed) h+=hubTilesHTML();
+
+  // Bugünün modu
+  h+=moodCardHTML(rec);
+
+  // daily banner (distinct) — Motivasyon V2.1 devredeyken bu eski kart tekrar
+  // eden bir "gunun mesaji" olarak kafa karistirmasin diye gosterilmez; DAILY
+  // dizisi ve render kodu silinmedi, yalnizca V2 yokken devrede kalan bir
+  // yedek (fallback) haline geldi.
+  if(!window.MotivationProgramV2){
+    h+='<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#FFE19A,#FFC9A3 55%,#F7B7C9);border-radius:24px;padding:22px 22px 20px;box-shadow:0 12px 28px rgba(255,180,140,0.32);">';
+    h+='<div style="position:absolute;top:-26px;right:10px;font-size:130px;line-height:1;font-weight:800;color:#fff;opacity:0.22;">\u201d</div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="display:inline-flex;">'+icon('sun',16)+'</span><span style="font-size:11.5px;letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
+    h+='<div style="position:relative;font-size:19px;font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[(curIdx-1)%DAILY.length])+'</div></div>';
+  }
+
+  // günün niyeti artık hero kartının içinde (yukarıda).
+
+
   if(!ed){
-  // SOS button
-  h+='<button onclick="App.goSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 26px rgba(233,137,159,0.45);">Raşit, tatlı krizi geldi '+icon('cookie',17)+icon('triangle-alert',17)+'</button>';
-  h+='<button onclick="App.openReading()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#6E55BF,#9B7FC9 52%,#E9AFC1);box-shadow:0 14px 30px rgba(110,85,191,0.42);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne okudum? '+icon('book-open',17)+'</span></button>';
-
-  h+='<button onclick="App.openWatching()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#C88F4C,#E0B080 52%,#E9AFC1);box-shadow:0 14px 30px rgba(200,143,76,0.4);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne izledim? '+icon('clapperboard',17)+'</span></button>';
-
-  h+='<button onclick="App.openListening()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#0E9AA7,#2BC4C4 52%,#E9AFC1);box-shadow:0 14px 30px rgba(14,154,167,0.4);"><span style="position:absolute;top:0;bottom:0;left:0;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.55),transparent);animation:seyShine 3.2s ease-in-out infinite;pointer-events:none;"></span><span style="position:relative;">Bugün ne dinledim? '+icon('headphones',17)+'</span></button>';
-
   // akşam nudge (yalnızca gece, okuma eklenmediyse)
   h+=eveningNudge(rec);
   }
 
-  // habits
-  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px 4px 0;">'+(ed?'O GÜNÜN TİKLERİ':'BUGÜNÜN TİKLERİ')+'</div>';
-  HABITS.forEach(function(hb){
-    var derived=!!DERIVED_HABITS[hb.key];
-    var prog=derived?habitProgress(rec,hb.key):null;
-    var done=derived?!!(prog&&prog.met):!!(rec&&rec.habits[hb.key]);
-    var pulsing=ui.pulse===hb.key;
-    var accent=DERIVED_ACCENT[hb.key];
-    var locked=(derived&&!done);
-    // Kırmızı "kritik" uyarı yalnızca türetilmemiş kritik tikler için — türetilmişler sakin "otomatik" hissi taşır.
-    var warn=(!done && !derived && (hb.key==='vitaminD'||hb.key==='protein'));
-    var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(locked?hexA(accent,dark?0.07:0.05):'var(--card)');
-    var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':(locked?hexA(accent,0.4):'var(--card-bd)'));
-    var sh=done?'0 10px 26px rgba(233,175,193,0.4)':(locked?'0 6px 16px '+hexA(accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
-    h+='<button onclick="App.toggleHabit(\''+hb.key+'\')"'+(warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">';
-    h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(locked?hexA(accent,0.12):'var(--icon)')+';color:'+(locked?accent:'var(--text)')+';">'+hb.icon+'</div>';
-    h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(hb.title)+(derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(done?'#3F8A4F':accent)+';background:'+(done?'rgba(143,191,138,0.2)':hexA(accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
-    if(done){
-      h+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>';
-    } else if(locked){
-      var pct=Math.min(100,Math.max(0,Math.round(((prog.cur||0)/prog.goal)*100)));
-      h+='<div style="font-size:12.5px;color:'+accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(hb.key,prog))+'</div>';
-      h+='<div style="height:6px;border-radius:999px;background:'+hexA(accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(accent,0.65)+','+accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>';
-    } else {
-      h+='<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>';
-    }
-    h+='</div>';
-    if(done){
-      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>';
-    } else if(locked){
-      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(accent,0.85)+';border:2px solid '+hexA(accent,0.4)+';background:'+hexA(accent,0.06)+';">'+icon('lock',12)+'</div>';
-    } else {
-      h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:transparent;border:2px solid '+(warn?'var(--warn)':'var(--field-bd)')+';"></div>';
-    }
-    h+='</button>';
-  });
+  // Bugünün tikleri (açılır kart)
+  h+=habitsCardHTML(rec);
 
   // akşam adım hatırlatması (yalnızca akşam, bugünün adımı boşsa)
   if(!ed) h+=stepReminder(rec);
 
-  // öğünler — detaylı (tabak/gr/adet) + protein özeti
-  h+=nutritionSummaryCard(rec);
-  h+=mealEditorCard(rec);
+  // Beslenme — özet (makro) + "ne yedim" birleşik açılır kart
+  h+=beslenmeCardHTML(rec);
 
   // su
   h+=waterCard(rec);
 
-  // mood
-  var curMood=rec?rec.mood:null;
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">'+(ed?('O günün modu nasıldı? '+icon('cloud-sun',17)):('Bugünün modu nasıl? '+icon('cloud-sun',17)))+'</div><div style="display:flex;gap:6px;">';
-  MOODS.forEach(function(m){
-    var sel=curMood===m.id;
-    var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.4);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-    h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,22)+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
-  });
-  h+='</div>';
-  if(curMood){ var mo=find(MOODS,'id',curMood); h+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo.resp)+'</div>'; }
-  h+=energyStressBlock(rec);
-  h+='</div>';
-
-  if(!ed){
-  // Raşit chat bubble
-  h+='<div style="display:flex;align-items:flex-end;gap:10px;margin:2px 0;">';
-  h+='<div style="width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#7C5CC4;background:linear-gradient(135deg,#C9B8FF,#E9AFC1);box-shadow:0 6px 16px rgba(201,184,255,0.5);">'+icon('heart',22)+'</div>';
-  h+='<div style="position:relative;flex:1;min-width:0;background:linear-gradient(135deg,#EFE8FF,#F7E9F1);border:1px solid rgba(201,184,255,0.45);border-radius:20px 20px 20px 5px;padding:13px 16px;box-shadow:0 6px 16px rgba(201,184,255,0.22);"><div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:#7C5CC4;margin-bottom:5px;display:flex;align-items:center;gap:4px;">RAŞİT '+icon('mail',11)+'</div><div style="font-size:15px;line-height:1.5;color:#3F3142;">'+esc(NOTES[(curIdx-1)%NOTES.length])+'</div></div></div>';
-
-  // Raşit aksiyonları (yaz + ara) — eşit iki buton
-  h+='<div style="display:flex;gap:10px;">';
-  h+='<a href="'+WA+'" target="_blank" rel="noopener" style="position:relative;overflow:hidden;text-decoration:none;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 10px;border-radius:20px;background:linear-gradient(135deg,#7C5CC4,#E9899F);box-shadow:0 12px 26px rgba(150,100,170,0.4);color:#fff;">';
-  h+='<div style="position:absolute;top:0;bottom:0;left:0;width:36%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.5),transparent);animation:seyShine 3.4s ease-in-out infinite;pointer-events:none;"></div>';
-  h+='<div style="position:relative;line-height:1;display:inline-flex;">'+icon('send-horizontal',22)+'</div><div style="position:relative;font-size:14.5px;font-weight:800;">Raşit\'e yaz</div><div style="position:relative;font-size:11px;opacity:0.9;">WhatsApp</div></a>';
-  h+='<a href="'+TEL+'" style="text-decoration:none;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 10px;border-radius:20px;background:linear-gradient(135deg,#E8A53C,#E9899F);box-shadow:0 12px 26px rgba(220,150,120,0.4);color:#fff;">';
-  h+='<div style="line-height:1;display:inline-flex;">'+icon('phone',22)+'</div><div style="font-size:14.5px;font-weight:800;">Raşit\'i ara</div><div style="font-size:11px;opacity:0.9;">Hemen ara</div></a>';
-  h+='</div>';
-  } // /Raşit (geçmiş gün düzenlemesinde gizli)
-
-  // note
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">'+(ed?'O gün kendine notun…':'Bugün kendime notum…')+'</div>';
-  h+='<textarea oninput="App.onNote(this)" placeholder="Bugün kendime notum…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;">'+esc(rec?rec.note:'')+'</textarea>';
-  h+='<div style="font-size:12px;color:var(--faint);line-height:1.5;">örn. \u201cTatlı isteği akşam geldi.\u201d \u00b7 \u201cYürüyüş iyi hissettirdi.\u201d \u00b7 \u201cBugün biraz zorlandım ama devam.\u201d</div></div>';
-
-  // şükran / 3 güzel şey
-  var gratArr=(rec&&Array.isArray(rec.gratitude))?rec.gratitude:[];
-  var gratPh=['örn. Sabah kahvem','örn. Bir arkadaşın mesajı','örn. Güneşli hava'];
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;background:linear-gradient(160deg,rgba(246,193,119,0.12),rgba(233,175,193,0.08));">';
-  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="line-height:1;display:inline-flex;">'+icon('heart-handshake',20)+'</span><div><div style="font-size:15.5px;font-weight:800;">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
-  for(var gIdx=0;gIdx<3;gIdx++){ var gVal=(gratArr[gIdx]!=null)?gratArr[gIdx]:''; h+='<div style="display:flex;align-items:center;gap:9px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+(gIdx+1)+'</span><input type="text" value="'+esc(gVal)+'" oninput="App.onGratitude('+gIdx+',this)" placeholder="'+gratPh[gIdx]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14.5px;outline:none;"></div>'; }
-  h+='</div>';
+  // Günün yansıması — kendine not + 3 güzel şey, birleşik premium açılır kart
+  h+=reflectionCardHTML(rec);
 
   // dağıldı
   if(!ed) h+=onThisDayCard();
@@ -1947,35 +3225,96 @@ function bugunHTML(){
   return h;
 }
 
-function sosHTML(){
-  var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="text-align:center;padding:6px 0 2px;"><div style="font-size:24px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;">10 Dakika Kuralı '+icon('cookie',21)+'</div></div>';
-  h+='<div class="glass" style="border-radius:22px;padding:18px;box-shadow:0 8px 22px rgba(108,74,58,0.07);"><p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);">Tamam Sevgili Günışığı, panik yok. Tatlı şu an seni çağırıyor olabilir ama karar merci sensin. Önce 10 dakika bekliyoruz. Sonra hâlâ istiyorsan daha kontrollü karar veriyoruz.</p></div>';
-  h+='<div style="background:linear-gradient(135deg,rgba(201,184,255,0.35),rgba(247,221,229,0.5));border:1px solid var(--card-bd);border-radius:22px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;">';
-  h+='<div id="sos-clock" style="font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text);">'+pad(Math.floor(ui.sosLeft/60))+':'+pad(ui.sosLeft%60)+'</div>';
-  h+='<button onclick="App.startSosTimer()" style="border:none;cursor:pointer;padding:13px 24px;border-radius:16px;font-size:15px;font-weight:700;color:#6B4A3A;background:#FFE8A3;box-shadow:0 6px 16px rgba(255,200,120,0.4);display:flex;align-items:center;gap:7px;">'+(ui.sosTiming?'Sayaç çalışıyor…':('10 dakikayı başlat '+icon('clock',15)))+'</button></div>';
-  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px;">ŞU AN NE DENEDİN?</div><div style="display:flex;flex-direction:column;gap:8px;">';
-  SOS_OPTS.forEach(function(o){
-    var val=o.label;
-    var sel=ui.sosOpts.indexOf(val)>=0;
-    var style=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.7));border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.3);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-    h+='<button onclick="App.toggleSosOpt(\''+val.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;color:var(--accent);">'+icon(o.icon,16)+'</span><span style="flex:1;text-align:left;font-size:15px;font-weight:600;">'+esc(val)+'</span><span style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',14):'')+'</span></button>';
-  });
+// ── Kriz odası modalı: Tatlı · Yemek · Kahve. Süreli, bilimsel, işlevsel bir mikro-müdahale. ──
+function crisisModalHTML(){
+  var kind=ui.crisisKind; var C=CRISES[kind]; if(!C) return '';
+  var A=C.accent, A2=C.accent2, hr=new Date().getHours();
+  var tcap=(kind==='coffee'?'MOLASI':'KURALI');
+  var pill=function(n){ return '<span style="font-size:11px;font-weight:800;color:#fff;background:'+A+';border-radius:999px;min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;">'+n+'</span>'; };
+  // Premium açılır bölüm (expander): dokunulan başlık + oklu chevron + sığdırılmış gövde.
+  var expander=function(open,which,ic,title,sub,n,body){
+    var frame=open
+      ? 'border:1px solid color-mix(in srgb,'+A+' 42%, var(--card-bd));box-shadow:0 14px 34px color-mix(in srgb,'+A+' 15%, transparent),inset 0 1px 0 rgba(255,255,255,0.4);'
+      : 'border:1px solid color-mix(in srgb,'+A+' 20%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
+    var x='<div class="glass sey-ccard" style="border-radius:18px;padding:0;overflow:hidden;'+frame+'">';
+    x+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+A+',transparent);"></span>';
+    x+='<div onclick="App.toggleCrisisSection(\''+which+'\')" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px 14px;">';
+    x+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(ic,17)+'</span>';
+    x+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:var(--text);line-height:1.15;">'+title+'</div><div style="font-size:11px;color:var(--faint);margin-top:1px;line-height:1.3;">'+sub+'</div></div>';
+    if(n>0) x+='<div style="flex-shrink:0;">'+pill(n)+'</div>';
+    x+='<span style="color:'+A+';display:inline-flex;flex-shrink:0;transition:transform .28s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
+    x+='</div>';
+    if(open){ x+='<div style="padding:2px 14px 14px;display:flex;flex-direction:column;gap:9px;animation:seyFloatIn .3s var(--ease-premium,ease);">'+body+'</div>'; }
+    else { x+='<div onclick="App.toggleCrisisSection(\''+which+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);padding:0 0 12px;display:flex;align-items:center;justify-content:center;gap:4px;">'+(which==='tried'?'seçenekleri gör':'tetikleyicileri gör')+' '+icon('chevron-down',11)+'</div>'; }
+    x+='</div>';
+    return x;
+  };
+
+  var h='<div id="sey-crisis-back" onclick="App.closeCrisis()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.46);backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div id="sey-crisis-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;height:90vh;max-height:90vh;background:var(--modal);border-radius:26px;box-shadow:0 -10px 40px rgba(0,0,0,0.24);animation:seyPop .25s ease;display:flex;flex-direction:column;overflow:hidden;">';
+
+  // sticky header (gradient accent, Raşit branding)
+  h+='<div style="flex-shrink:0;position:relative;padding:17px 16px 15px;background:linear-gradient(135deg,'+A+','+A2+');color:#fff;box-shadow:0 6px 18px color-mix(in srgb,'+A+' 30%, transparent);">';
+  h+='<div style="display:flex;align-items:center;gap:12px;">';
+  h+='<span style="width:44px;height:44px;border-radius:14px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,22)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:12px;">🦩</span></div><div style="font-size:19px;font-weight:800;line-height:1.2;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
+  h+='<button onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:34px;height:34px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>';
+  h+='</div></div>';
+
+  // scrollable body
+  h+='<div id="sey-crisis-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:13px;">';
+
+  // Raşit intro bubble
+  h+='<div style="display:flex;align-items:flex-start;gap:10px;"><span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 5px 14px var(--room-glow);">'+icon('heart',17)+'</span><div class="glass" style="flex:1;min-width:0;border-radius:6px 18px 18px 18px;padding:12px 14px;border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));"><div style="font-size:10px;font-weight:800;letter-spacing:.8px;color:var(--room);margin-bottom:4px;">RAŞİT 🦩</div><div style="font-size:14px;line-height:1.5;color:var(--text2);">'+esc(C.hero)+'</div></div></div>';
+
+  // science box
+  h+='<div style="display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,'+A+' 9%, var(--card));border:1px solid color-mix(in srgb,'+A+' 26%, var(--card-bd));border-radius:16px;padding:13px 14px;"><span style="flex-shrink:0;color:'+A+';display:inline-flex;margin-top:1px;">'+icon('brain',18)+'</span><div style="font-size:12.5px;line-height:1.6;color:var(--text2);"><b style="color:var(--text);">'+esc(C.sciTitle)+'</b><br>'+C.sci+'</div></div>';
+
+  // coffee: saat-farkında uyku uyarısı
+  if(kind==='coffee' && hr>=14){ h+='<div style="display:flex;gap:9px;align-items:flex-start;background:rgba(155,127,201,0.12);border:1px solid rgba(155,127,201,0.32);border-radius:14px;padding:11px 13px;"><span style="flex-shrink:0;color:#8A75C8;display:inline-flex;">'+icon('moon',16)+'</span><div style="font-size:12px;line-height:1.55;color:var(--text2);"><b>Saat '+pad(hr)+':00 civarı.</b> Kafein ~5-6 saat kalıcıdır; şimdi içersen gece uykun bölünebilir. Bugünlük kafeinsize ya da suya ne dersin?</div></div>'; }
+
+  // timer block
+  h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 26%, transparent),color-mix(in srgb,'+A2+' 32%, transparent));border:1px solid color-mix(in srgb,'+A+' 26%, var(--card-bd));border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:11px;">';
+  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--muted);">'+esc(C.clockLabel.toLocaleUpperCase('tr-TR'))+' '+tcap+'</div>';
+  h+='<div id="crisis-clock" style="font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text);line-height:1;">'+pad(Math.floor(ui.crisisLeft/60))+':'+pad(ui.crisisLeft%60)+'</div>';
+  h+='<button onclick="App.startCrisisTimer()" style="border:none;cursor:pointer;padding:13px 24px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 8px 20px color-mix(in srgb,'+A+' 40%, transparent);display:flex;align-items:center;gap:7px;">'+(ui.crisisTiming?'Sayaç çalışıyor…':(esc(C.startLabel)+' '+icon('clock',15)))+'</button>';
   h+='</div>';
-  h+='<div style="font-size:13px;font-weight:700;color:var(--faint);letter-spacing:0.4px;padding:4px;">BU İSTEĞİ NE TETİKLEDİ?</div>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
-  SOS_TRIGGERS.forEach(function(t){
-    var sel=ui.sosTriggers.indexOf(t.id)>=0;
-    var style=sel?'background:linear-gradient(135deg,rgba(201,184,255,0.55),rgba(247,221,229,0.6));border:1px solid #C9B8FF;color:#4A3A6A;box-shadow:0 4px 12px rgba(201,184,255,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text2);';
-    h+='<button onclick="App.toggleSosTrigger(\''+t.id+'\')" style="display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;'+style+'"><span>'+t.emoji+'</span>'+esc(t.label)+'</button>';
+
+  // ── Şu an ne denedin? (premium expander) ──
+  var triedN=ui.crisisOpts.length;
+  var triedBody='';
+  C.opts.forEach(function(o){
+    var val=o.label, sel=ui.crisisOpts.indexOf(val)>=0;
+    var stl=sel?('background:color-mix(in srgb,'+A+' 14%, var(--card));border:1px solid '+A+';box-shadow:0 6px 14px color-mix(in srgb,'+A+' 24%, transparent);'):'background:var(--card);border:1px solid var(--card-bd);';
+    triedBody+='<button onclick="App.toggleCrisisOpt(\''+val.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;border-radius:15px;cursor:pointer;transition:all .18s;color:var(--text);'+stl+'"><span style="display:inline-flex;color:'+A+';">'+icon(o.icon,16)+'</span><span style="flex:1;text-align:left;font-size:14.5px;font-weight:600;">'+esc(val)+'</span><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(sel?'linear-gradient(135deg,'+A+','+A2+')':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span></button>';
   });
-  h+='<div style="font-size:11.5px;color:var(--faint);width:100%;line-height:1.5;margin-top:2px;">Tetikleyiciyi işaretlersen Rapor’da örüntünü çıkarırım — neyin gerçekten açlık, neyin alışkanlık olduğunu birlikte görürüz.</div>';
-  h+='</div>';
-  h+='<button onclick="App.completeSos()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 26px rgba(233,175,193,0.45);display:flex;align-items:center;justify-content:center;gap:6px;">Krizi yönettim '+icon('check',15)+'</button>';
-  if(ui.sosDone){
-    h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid var(--card-bd);border-radius:22px;padding:18px;text-align:center;animation:seyPop .3s ease;"><div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text);">İşte bu.</div><p style="margin:0;font-size:15px;line-height:1.55;color:var(--text2);">Tatlı seni değil, sen tatlıyı yönettin. Küçük zafer, büyük kontrol.</p><button onclick="App.resetSos()" style="margin-top:12px;border:none;background:var(--card);cursor:pointer;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:600;color:var(--muted);">Yeni kriz / sıfırla</button></div>';
+  h+=expander(ui.crisisTriedOpen,'tried','heart-handshake','Şu an ne denedin?',(triedN>0?triedN+' şey denedin — küçük ama değerli':'Denediğin bir şeyi işaretle'),triedN,triedBody);
+
+  // ── Bu isteği ne tetikledi? (premium expander) ──
+  var trigN=ui.crisisTriggers.length+((ui.crisisNote&&String(ui.crisisNote).trim())?1:0);
+  var trigBody='';
+  C.triggers.forEach(function(t){
+    var sel=ui.crisisTriggers.indexOf(t.id)>=0;
+    trigBody+='<button onclick="App.toggleCrisisTrigger(\''+t.id+'\')" style="display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:12px 13px;border-radius:15px;cursor:pointer;transition:all .18s;'+(sel?('background:color-mix(in srgb,'+A+' 12%, var(--card));border:1px solid '+A+';box-shadow:0 6px 14px color-mix(in srgb,'+A+' 22%, transparent);'):'background:var(--card);border:1px solid var(--card-bd);')+'">';
+    trigBody+='<span style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 12%, var(--icon));">'+icon(t.icon,16)+'</span>';
+    trigBody+='<span style="flex:1;min-width:0;"><span style="font-size:14px;font-weight:700;color:var(--text);display:block;">'+esc(t.label)+'</span><span style="font-size:11.5px;color:var(--muted);line-height:1.45;display:block;margin-top:2px;">'+esc(t.sci)+'</span></span>';
+    trigBody+='<span style="width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:4px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(sel?'linear-gradient(135deg,'+A+','+A2+')':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',12):'')+'</span>';
+    trigBody+='</button>';
+  });
+  trigBody+='<textarea oninput="App.onCrisisNote(this)" rows="2" placeholder="Başka bir şey mi tetikledi? örn. bir tartışma, yalnızlık, kendini ödüllendirme…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:13.5px;outline:none;resize:none;line-height:1.5;color:var(--text);">'+esc(ui.crisisNote||'')+'</textarea>';
+  trigBody+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Tetikleyiciyi işaretlersen Rapor’da örüntünü çıkarırım — neyin gerçek ihtiyaç, neyin duygusal/alışkanlık olduğunu birlikte görürüz.</div>';
+  h+=expander(ui.crisisTrigOpen,'trig','zap','Bu isteği ne tetikledi?','Bilimsel tetikleyiciler · örüntünü çıkaralım',trigN,trigBody);
+
+  // complete / done state
+  if(ui.crisisDone){
+    h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 22%, transparent),color-mix(in srgb,'+A2+' 26%, transparent));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:20px;padding:18px;text-align:center;animation:seyPop .3s ease;"><div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text);">'+esc(C.winTitle)+'</div><p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--text2);">'+esc(C.winText)+'</p>'+(C.habit?'<div style="margin-top:11px;font-size:12px;font-weight:800;color:#3F8A4F;display:inline-flex;align-items:center;gap:5px;background:rgba(143,191,138,0.18);border-radius:999px;padding:5px 12px;">'+icon('check',12)+' Bugünün tikine işlendi</div>':'')+'<div style="display:flex;gap:9px;margin-top:14px;"><button onclick="App.resetCrisis()" style="flex:1;border:1px solid var(--field-bd);background:var(--card);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--muted);">Yeni kriz / sıfırla</button><button onclick="App.closeCrisis()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');display:flex;align-items:center;justify-content:center;gap:5px;">Kapat '+icon('check',14)+'</button></div></div>';
+  } else {
+    h+='<button onclick="App.completeCrisis()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;">Krizi yönettim '+icon('check',16)+'</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;">“Krizi yönettim”e basınca '+(C.habit?'bugünün ilgili tiki kendiliğinden yeşillenir.':'kaydın Rapor’a işlenir.')+'</div>';
   }
-  h+='</div>';
+
+  h+='</div>'; // body
+  h+='</div></div>'; // card + back
   return h;
 }
 
@@ -1987,7 +3326,7 @@ function haritaHTML(){
   var daysInMonth=new Date(Y,M,0).getDate();
   var monthNames=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Takvim '+icon('map',20)+'</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">Bir güne dokun; detayını gör ve o günü düzenle.</div></div>';
+  h+=sciNote('Tutarlılık, mükemmellikten güçlüdür: aralıklı ama sürekli tekrar (spaced repetition), davranışı kalıcı kılan sinaptik pekişmeyi besler. Boş günler bir kusur değil, ritmin parçasıdır.');
   h+='<div class="glass" style="border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;"><button onclick="App.calMove(-1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:18px;">‹</button><div style="font-size:16px;font-weight:800;">'+monthNames[M-1]+' '+Y+'</div><button onclick="App.calMove(1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:18px;">›</button></div>';
   h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">';
@@ -2028,6 +3367,23 @@ function haritaHTML(){
     cells.forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 10px;text-align:center;"><div style="font-size:11px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:17px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
     h+='</div>';
     var moodKeys=Object.keys(md); if(moodKeys.length){ h+='<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;"><span style="font-size:11.5px;color:var(--faint);">Mod dağılımı:</span>'; MOODS.forEach(function(m){ if(md[m.id]) h+='<span style="font-size:12.5px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+md[m.id]+'</span>'; }); h+='</div>'; }
+    // ── Teknik detay: haftanın en tutarlı günü · geçen aya göre · faz ilerlemesi ──
+    var wdSum=[0,0,0,0,0,0,0], wdMax=[0,0,0,0,0,0,0];
+    mrecs.forEach(function(o){ var p=o.date.split('-').map(Number); var wd=(new Date(p[0],p[1]-1,p[2]).getDay()+6)%7; wdSum[wd]+=countRec(o.rec); wdMax[wd]+=habitCountOn(o.date); });
+    var wdNames=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+    var bestWd=-1,bestWdPct=-1; for(var wi=0;wi<7;wi++){ if(wdMax[wi]>0){ var wp=Math.round(wdSum[wi]/wdMax[wi]*100); if(wp>bestWdPct){bestWdPct=wp;bestWd=wi;} } }
+    var pmY=(M===1)?Y-1:Y, pmM=(M===1)?12:M-1, pmKey=pmY+'-'+pad(pmM), pmSum=0,pmMax=0;
+    for(var pk in data.days){ if(pk.slice(0,7)===pmKey){ pmSum+=countRec(data.days[pk]); pmMax+=habitCountOn(pk); } }
+    var pmPct=pmMax?Math.round(pmSum/pmMax*100):null, delta=(pmPct!=null)?(avgPct-pmPct):null;
+    var detail=[];
+    if(bestWd>=0) detail.push([icon('calendar',15),'En tutarlı günün','<b>'+wdNames[bestWd]+'</b> · %'+bestWdPct,'var(--accent)']);
+    if(delta!=null){ var dcol=delta>0?'#3F8A4F':(delta<0?'#E9899F':'var(--muted)'); var dtxt=(delta>0?'+':'')+delta+' puan'; detail.push([icon(delta>=0?'trending-up':'chart-column',15),'Geçen aya göre','<b style="color:'+dcol+';">'+dtxt+'</b>','var(--muted)']); }
+    if(window.MotivationProgramV2){ var _ms=window.MotivationProgramV2.progressSummary(data); detail.push([icon('compass',15),'İçsel Pusula','Gün '+_ms.currentProgramDay+'/'+_ms.totalDays+' · %'+_ms.percent,'#6E5FCB']); }
+    if(detail.length){
+      h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
+      detail.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;display:flex;justify-content:center;color:'+r[3]+';">'+r[0]+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+r[1]+'</span><span style="font-size:13.5px;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
+      h+='</div>';
+    }
   }
   h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;border-top:1px solid var(--card-bd);padding-top:10px;display:flex;gap:5px;">'+icon('lightbulb',13)+' Geçmiş bir güne dokun → “Bu günü düzenle” ile o günün verilerini düzeltebilirsin. Konum, oturum ve canlı ölçümler her zaman bugüne yazılır.</div>';
   h+='</div>';
@@ -2085,6 +3441,41 @@ function corrInsights(){
   var he=[],le=[]; days.forEach(function(o){ var w=(typeof o.rec.water==='number')?o.rec.water:null,e=o.rec.energy; if(w==null||e==null) return; (w>=WATER_GOAL?he:le).push(Number(e)); });
   if(he.length>=3&&le.length>=3&&gavg(he)-gavg(le)>=0.3) out.push([icon('droplet',18),'Su hedefini tutturduğun günlerde enerjin daha yüksek. Beden susuz çalışmıyor.']);
   return out;
+}
+// ── Rapor teknik detay: tutarlılık, momentum ve haftanın günleri örüntüsü ──
+function consistencyMomentumCard(){
+  var t=todayStr();
+  var d30=lastNDays(30);
+  var active30=d30.filter(function(o){return o.rec&&countRec(o.rec)>0;}).length;
+  var consist=Math.round(active30/30*100);
+  var cur7=[],prev7=[];
+  for(var i=0;i<7;i++){ var dk=addDays(t,-i); cur7.push(data.days[dk]?countRec(data.days[dk]):0); }
+  for(var j=7;j<14;j++){ var dk2=addDays(t,-j); prev7.push(data.days[dk2]?countRec(data.days[dk2]):0); }
+  var a7=avgOf(cur7), ap7=avgOf(prev7), momentum=(a7!=null&&ap7!=null)?(Math.round((a7-ap7)*10)/10):null;
+  // haftanın günleri (son 56 gün)
+  var wdSum=[0,0,0,0,0,0,0], wdMax=[0,0,0,0,0,0,0];
+  for(var k=0;k<56;k++){ var dk3=addDays(t,-k); var r=data.days[dk3]; if(!r) continue; var p=dk3.split('-').map(Number); var wd=(new Date(p[0],p[1]-1,p[2]).getDay()+6)%7; wdSum[wd]+=countRec(r); wdMax[wd]+=habitCountOn(dk3); }
+  var wdPct=[]; for(var w=0;w<7;w++){ wdPct.push(wdMax[w]>0?Math.round(wdSum[w]/wdMax[w]*100):null); }
+  var hasWd=wdPct.some(function(x){return x!=null;});
+  var wdLabels=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+  var momIcon=momentum==null?'minus':(momentum>0?'trending-up':(momentum<0?'chart-column':'minus'));
+  var momCol=momentum==null?'var(--muted)':(momentum>0?'#3F8A4F':(momentum<0?'#E9899F':'var(--muted)'));
+  var momTxt=momentum==null?'—':((momentum>0?'+':'')+String(momentum).replace('.',','));
+  var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:10px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
+  h+='<div style="display:flex;gap:8px;">'+tile('%'+consist,'Tutarlılık (30g)','var(--accent)')+tile(active30+'/30','Aktif gün','#5BA85B')+tile(momTxt,'Momentum (7g)',momCol)+'</div>';
+  if(hasWd){
+    h+='<div style="display:flex;flex-direction:column;gap:6px;"><div style="font-size:11.5px;font-weight:700;color:var(--muted);">Haftanın günleri (son 8 hafta)</div>';
+    h+='<div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
+    wdPct.forEach(function(pc){ var hh=pc!=null?Math.max(6,Math.round(pc/100*40)):4; var col=pc==null?'rgba(150,110,120,0.18)':(pc>=66?'#8FBF8A':(pc>=33?'#E9AFC1':'#C9B8FF')); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:20px;height:'+hh+'px;border-radius:5px;background:'+col+';"></div></div>'; });
+    h+='</div>';
+    h+='<div style="display:flex;gap:5px;">'; wdLabels.forEach(function(l){ h+='<div style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);font-weight:700;">'+l+'</div>'; }); h+='</div>';
+    h+='</div>';
+  }
+  h+=sciNote('Tutarlılık, tekil zirvelerden değerlidir: davranışın otomatikleşmesi (habit formation) tekrar sıklığına bağlıdır. Momentum, son 7 günün önceki 7 güne göre yönü — küçük pozitif ivme bile bileşik olarak birikir.');
+  h+='</div>';
+  return h;
 }
 function badgesGrid(){
   var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
@@ -2235,12 +3626,12 @@ function raporHTML(){
   var totalTicks=0; all.forEach(function(o){ totalTicks+=countRec(o.rec); });
   var cur=currentStreak(), best=bestStreak(all), tracked=daysTracked();
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Rapor '+icon('chart-column',20)+'</div></div>';
   var chips=[[icon('flame',13)+' Güncel seri',cur+' gün'],[icon('trophy',13)+' En iyi seri',best+' gün'],[icon('calendar',13)+' Takip günü',tracked],[icon('circle-check',13)+' Toplam tik',totalTicks]];
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">';
   chips.forEach(function(c){ h+='<div class="glass" style="border-radius:16px;padding:13px;"><div style="font-size:11.5px;color:var(--faint);display:flex;align-items:center;gap:4px;">'+c[0]+'</div><div style="font-size:21px;font-weight:800;margin-top:3px;">'+esc(c[1])+'</div></div>'; });
   h+='</div>';
   var msx=nextMilestone(cur); if(msx) h+='<div style="background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:16px;padding:12px 15px;font-size:13px;font-weight:700;color:#7A4A2E;display:flex;align-items:center;gap:7px;">'+icon('target',15)+' Sonraki kilometre taşı: '+msx.target+' gün · yolun %'+msx.pct+'</div>';
+  h+=consistencyMomentumCard();
   h+=weekSelfCard();
   h+=distanceRecapCard();
   h+=weeklyStepRecap();
@@ -2249,7 +3640,19 @@ function raporHTML(){
   h+=trendBars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)')+'</div>';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Alışkanlık oranları (30 gün)</div>';
   HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
+  h+=sciNote('Bir alışkanlık ne kadar sık tekrarlanırsa nöral yolu o kadar güçlenir (nöroplastisite); %60+ oran, davranışın otomatikleşmeye başladığını gösterir.');
   h+='</div>';
+  // ── Ruhsal eğilim (30 gün) — fiziksel trendlerin yanında zihinsel sağlık ──
+  var _mv=[],_ev=[],_sv=[];
+  last30.forEach(function(o){ if(!o.rec) return; var _ms=moodScore(o.rec.mood); if(_ms!=null) _mv.push(_ms); if(o.rec.energy!=null) _ev.push(Number(o.rec.energy)); if(o.rec.stress!=null) _sv.push(Number(o.rec.stress)); });
+  var _mA=avgOf(_mv),_eA=avgOf(_ev),_sA=avgOf(_sv);
+  if(_mA!=null||_eA!=null||_sA!=null){
+    var rtile=function(label,val,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+(val!=null?val.toFixed(1).replace('.',','):'—')+'</div><div style="font-size:10px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+    h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:#8A75C8;">'+icon('brain',16)+'</span>Ruhsal eğilim — 30 gün</div>';
+    h+='<div style="display:flex;gap:8px;">'+rtile('Mod /5',_mA,'#C97FA8')+rtile('Enerji /5',_eA,'#F5A623')+rtile('Stres /5',_sA,'#7C5CC4')+'</div>';
+    h+=sciNote('Ruh hâli fiziksel alışkanlıklardan bağımsız değil: iyi uyku ve düzenli hareket modu yükseltir, kronik stres ise iştahı ve şeker isteğini besler. Bu üç ekseni birlikte izlemek, bedeni ve zihni tek sistem olarak görmeni sağlar.');
+    h+='</div>';
+  }
   var pAvg=avgOf(last30.filter(function(o){return o.rec;}).map(function(o){return dayNutrition(o.rec).protein;}).filter(function(v){return v>0;}));
   var wAvg=avgOf(last30.filter(function(o){return o.rec&&typeof o.rec.water==='number'&&o.rec.water>0;}).map(function(o){return o.rec.water;}));
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;">';
@@ -2277,9 +3680,6 @@ function raporHTML(){
     h+='<div style="padding:4px 4px 0;"><div style="font-size:17px;font-weight:800;">Aylık özet</div></div>';
     months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="glass" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
   }
-  h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Raşit\'ten Notlar '+icon('mail',20)+'</div></div>';
-  h+='<div style="background:linear-gradient(135deg,rgba(201,184,255,0.3),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:22px;padding:20px;min-height:96px;display:flex;align-items:center;"><div style="font-size:16px;line-height:1.55;font-weight:600;color:var(--text);">'+esc(NOTES[ui.noteIndex%NOTES.length])+'</div></div>';
-  h+='<button onclick="App.anotherNote()" style="border:none;cursor:pointer;align-self:center;padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;color:var(--choc);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.08);display:flex;align-items:center;gap:6px;">Başka not göster '+icon('sparkles',14)+'</button>';
   h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Minik Kurallar '+icon('leaf',20)+'</div></div>';
   h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
   [[icon('leaf',17),'Aç kalmak yok.'],[icon('cookie',17),'Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],[icon('moon',17),'Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],[icon('egg',17),'Her öğüne protein eklemek krizleri sakinleştirir.'],[icon('sun',17),'D vitamini de küçük ritmin bir parçası.'],[icon('dumbbell',17),'Bir gün zor geçti diye sistem bitmez.'],[icon('footprints',17),'Yürüyüş kısa da olsa sayılır.'],[icon('heart',17),'Kendine kötü konuşmak yok.'],[icon('sun',17),'Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span style="display:inline-flex;flex-shrink:0;">'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
@@ -2291,7 +3691,26 @@ function raporHTML(){
 
 function ayarlarHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Ayarlar '+icon('settings',20)+'</div></div>';
+  // ── Veri & senkron özeti (teknik detay) ──
+  var _dtracked=daysTracked(), _totalTicks=0,_dayRecs=0;
+  for(var _dk in data.days){ _dayRecs++; _totalTicks+=countRec(data.days[_dk]); }
+  var _sizeKB=0; try{ _sizeKB=Math.round(JSON.stringify(data).length/1024); }catch(e){}
+  var _prog=window.MotivationProgramV2?window.MotivationProgramV2.progressSummary(data):null;
+  var _lastSync=data.lastSyncDate?(data.lastSyncDate===todayStr()?'bugün':esc(data.lastSyncDate)):'henüz yok';
+  var _conn=syncConfigured();
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
+  [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
+  h+='</div>';
+  var _srow=function(ic,label,val,col){ return '<div style="display:flex;align-items:center;gap:10px;"><span style="width:22px;display:flex;justify-content:center;color:'+(col||'var(--muted)')+';">'+icon(ic,14)+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+label+'</span><span style="font-size:13px;font-weight:700;text-align:right;">'+val+'</span></div>'; };
+  h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
+  h+=_srow(_conn?'circle-check':'link-2','Repo bağlantısı',(_conn?'<span style="color:#3F8A4F;">bağlı</span>':'<span style="color:#E9899F;">bağlı değil</span>'),_conn?'#3F8A4F':'#E9899F');
+  h+=_srow('save','Son repoya kayıt','<span style="color:var(--text);">'+_lastSync+'</span>');
+  if(_prog) h+=_srow('compass','İçsel Pusula','<span style="color:var(--text);">Gün '+_prog.currentProgramDay+'/'+_prog.totalDays+' · %'+_prog.percent+'</span>','#6E5FCB');
+  h+='</div>';
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
+  h+='</div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
   // appearance
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
@@ -2301,9 +3720,17 @@ function ayarlarHTML(){
   h+='<button onclick="App.setTheme(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(dark?onS:offS)+'">'+icon('moon',15)+' Koyu</button></div></div>';
   // titreşim / haptik geri bildirimi
   var hapOn=!(data.settings&&data.settings.haptics===false);
-  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve SOS dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
   h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
   h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
+  // Gizlenen kartlar — yalnızca kullanıcı bir kartı sakladıysa görünür (kilitlenme yok).
+  var sgh=data.settings||{};
+  if(sgh.hideLocationCard||sgh.hideRepoBanner){
+    h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Gizlenen kartlar '+icon('sparkles',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Bugün ekranında sakladığın kartları tek dokunuşla geri getir.</div>';
+    if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:12.5px;font-weight:800;color:var(--accent);">Geri getir</span></button>';
+    if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:12.5px;font-weight:800;color:var(--accent);">Geri getir</span></button>';
+    h+='</div>';
+  }
   h+=settingsBtn('App.printReport()','Rapor oluştur / PDF',icon('file-text',17));
   h+=settingsBtn('App.exportJson()','Yedek indir',icon('save',17));
   h+=settingsBtn('App.importClick()','Yedek yükle',icon('repeat',17));
@@ -2357,6 +3784,14 @@ function ayarlarHTML(){
   // add to home guide
   h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Bu app giriş istemez. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
+  // ── Hakkında / sürüm ──
+  var _mpv=window.MotivationProgramV2?window.MotivationProgramV2.version:'—';
+  var _mnv=window.MotivationNarratives?window.MotivationNarratives.version:'—';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',14)+' Hakkında</div>';
+  h+='<div style="font-size:13px;color:var(--text2);line-height:1.55;">Şeyma 🦩 · <b>v2.0</b> — Minik Denge Günlüğü. İçsel Pusula &amp; Terapi Odası sürümü.</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  [['Program',_mpv],['Anlatı',_mnv]].forEach(function(v){ h+='<span style="font-size:11px;font-weight:700;color:var(--muted);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:3px 10px;">'+v[0]+' '+esc(v[1])+'</span>'; });
+  h+='</div></div>';
   h+='</div>';
   return h;
 }
@@ -2501,14 +3936,84 @@ function discomfortCard(rec){
   return h;
 }
 
+// ── Ruhsal Denge: fiziksel takibin yanında zihinsel sağlık (mod·enerji·stres) ──
+// Yeni veri modeli EKLEMEZ; mevcut mood/energy/stress alanlarından türetir.
+function moodScore(id){ var m={'cok-iyi':5,'iyi':4,'normal':3,'zorlandim':2,'cok-zorlandim':1}; return m[id]!=null?m[id]:null; }
+function moodColorScore(s){ if(s==null) return 'rgba(150,110,120,0.22)'; return s>=4.5?'#3F8A4F':s>=3.5?'#5BA85B':s>=2.5?'#E8A53C':s>=1.5?'#E9899F':'#D9534F'; }
+function mentalStats(){
+  var today=todayStr(), mv=[],ev=[],sv=[],series=[];
+  for(var i=6;i>=0;i--){ var d=addDays(today,-i), r=data.days[d];
+    var ms=r?moodScore(r.mood):null, e=(r&&r.energy!=null)?Number(r.energy):null, s=(r&&r.stress!=null)?Number(r.stress):null;
+    if(ms!=null) mv.push(ms); if(e!=null) ev.push(e); if(s!=null) sv.push(s);
+    series.push({d:d,mood:ms,en:e,st:s}); }
+  function av(a){ return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null; }
+  var moodA=av(mv),enA=av(ev),stA=av(sv), acc=0,wsum=0;
+  if(moodA!=null){ acc+=(moodA/5)*0.4; wsum+=0.4; }
+  if(enA!=null){ acc+=(enA/5)*0.3; wsum+=0.3; }
+  if(stA!=null){ acc+=((6-stA)/5)*0.3; wsum+=0.3; }
+  var score=wsum>0?Math.round(acc/wsum*100):null;
+  return {moodA:moodA,enA:enA,stA:stA,score:score,series:series,n:mv.length+ev.length+sv.length};
+}
+function mentalBalanceCard(rec){
+  rec=(rec!==undefined?rec:(data.days[activeDate()]||null));
+  var ms=mentalStats();
+  var accent='#8A75C8';
+  var tier,tcol;
+  if(ms.score==null){ tier='Henüz veri yok'; tcol='var(--faint)'; }
+  else if(ms.score>=75){ tier='Dengeli ve iyi'; tcol='#3F8A4F'; }
+  else if(ms.score>=60){ tier='İyi yolda'; tcol='#5BA85B'; }
+  else if(ms.score>=45){ tier='Dalgalı gidiyor'; tcol='#E8A53C'; }
+  else { tier='Zorlu dönem — kendine nazik ol'; tcol='#E9899F'; }
+  var h='<div data-cardkey="mental" class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,'+accent+' 22%,var(--card-bd));box-shadow:0 8px 22px rgba(138,117,200,0.10);">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 15%,var(--icon));">'+icon('brain',18)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;">Ruhsal Denge</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;">Zihinsel sağlığın · son 7 gün</div></div>';
+  if(ms.score!=null) h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:23px;font-weight:800;color:'+tcol+';line-height:1;font-variant-numeric:tabular-nums;">'+ms.score+'</div><div style="font-size:9.5px;color:var(--faint);">/100</div></div>';
+  h+='</div>';
+  h+='<div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-size:12px;font-weight:800;color:'+tcol+';background:color-mix(in srgb,'+tcol+' 13%,var(--icon));padding:5px 11px;border-radius:999px;"><span style="display:inline-flex;">'+icon('sparkles',12)+'</span>'+tier+'</div>';
+  // 7 günlük mod noktaları
+  h+='<div style="display:flex;align-items:flex-end;gap:5px;height:34px;">';
+  var wd=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+  ms.series.forEach(function(x){ var col=moodColorScore(x.mood); var hgt=x.mood!=null?(8+x.mood*4):6; h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:16px;height:'+hgt+'px;border-radius:5px;background:'+col+';"></div></div>'; });
+  h+='</div>';
+  // gauge'lar
+  var gauge=function(label,val,max,grad){ var pct=val!=null?Math.round(val/max*100):0; return '<div style="display:flex;align-items:center;gap:9px;"><div style="width:56px;flex-shrink:0;font-size:11.5px;font-weight:700;color:var(--muted);">'+label+'</div><div style="flex:1;height:8px;border-radius:999px;background:rgba(138,117,200,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+grad+');border-radius:999px;transition:width .4s ease;"></div></div><div style="width:46px;text-align:right;flex-shrink:0;font-size:11px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+(val!=null?(val.toFixed(1).replace('.',',')+'/'+max):'—')+'</div></div>'; };
+  h+='<div style="display:flex;flex-direction:column;gap:8px;background:var(--icon);border-radius:14px;padding:12px;">';
+  h+=gauge('Mod',ms.moodA,5,'#E9899F,#C9B8FF');
+  h+=gauge('Enerji',ms.enA,5,'#FFD37A,#F5A623');
+  h+=gauge('Stres',ms.stA,5,'#C9B8FF,#7C5CC4');
+  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:1px;">Stres için düşük değer daha iyi; mod ve enerjide yüksek değer daha iyi.</div>';
+  h+='</div>';
+  // dinamik bilimsel yorum
+  var sci;
+  if(ms.stA!=null&&ms.stA>=4) sci='Stresin yüksek seyrediyor. Kronik kortizol hem uykuyu böler hem şeker isteğini artırır — kısa nefes molaları (4-7-8) ve tempolu yürüyüş kortizolü ölçülebilir şekilde düşürür.';
+  else if(ms.enA!=null&&ms.enA<=2) sci='Enerjin düşük görünüyor. Uyku, protein ve sabah gün ışığı üçlüsü sirkadiyen ritmi ve gün içi enerjini toparlayan en güçlü doğal kaldıraçlar.';
+  else if(ms.moodA!=null&&ms.moodA>=4) sci='Ruh hâlin güzel bir ritimde. İyi günleri fark edip not almak, zor günlerde beynine “bu da geçer” diyebilmen için gerçek bir kanıt biriktirir.';
+  else sci='Mod, enerji ve stres ruhsal hâlinin üç ayrı ekseni. Düzenli işaretlemek, gözle görülmeyen örüntüleri (uyku–mod, stres–iştah) görünür kılar.';
+  h+=sciNote(sci);
+  // bugün — hızlı işaretleme (mevcut handler’lar; kart yerinde güncellenir)
+  var curMood=rec?rec.mood:null;
+  h+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="font-size:12.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:'+accent+';">'+icon('heart',14)+'</span>Bugün nasılsın?</div>';
+  h+='<div style="display:flex;gap:6px;">';
+  MOODS.forEach(function(m){ var sel=curMood===m.id; var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.35);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);'; h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:9px 3px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,19)+'</span><span style="font-size:10px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>'; });
+  h+='</div>';
+  h+=energyStressBlock(rec);
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+CARD_BUILDERS.mental=mentalBalanceCard;
 function saglikHTML(){
   var ed=editing(); var viewDate=activeDate();
   var today=todayStr(); var rec=data.days[viewDate]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
   var readiness=sleepReadiness(rec);
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="padding:6px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Sağlık '+icon('flower-2',20)+'</div><div style="font-size:13.5px;color:var(--faint);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate))+' — geçmiş gün düzenleniyor':'Uyku, yürüyüş ve döngü — küçük veriler, büyük resim.')+'</div></div>';
+  if(!ed) h+=sciNote('Uyku, hareket ve döngü tek bir sistemin parçaları: düzenli uyku sirkadiyen ritmi, hareket kan şekerini ve ruh hâlini, döngü ise hormonal dalgayı yansıtır. Birlikte bakınca örüntü netleşir.');
   if(!ed) h+=activityRings(rec);
+  // Ruhsal Denge — fiziksel takibin yanında zihinsel sağlık (mevcut veriden türetilir)
+  if(!ed) h+=mentalBalanceCard(rec);
   // uyku
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Uyku '+icon('moon',17)+'</div>';
   h+='<div style="display:flex;align-items:center;gap:10px;"><input type="number" inputmode="decimal" step="0.5" min="0" max="24" value="'+(sl.hours!=null?esc(sl.hours):'')+'" oninput="App.setSleepHours(this)" placeholder="7.5" style="width:92px;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:14px;color:var(--muted);">saat uyudum</span></div>';
@@ -2645,24 +4150,200 @@ function cycleHTML(){
   return h;
 }
 
+// ── Saygı sayfası: uzun Wikipedia metni güvenli düz bloklar halinde basılır. ──
+function saygiSourceFallback(person){ return 'https://tr.wikipedia.org/wiki/'+encodeURIComponent(String(person&&person.trTitle||person&&person.name||'').replace(/ /g,'_')); }
+function saygiSourceCardHTML(article,link,isWiki){
+  var href=isWiki?saygiSafeUrl(article.sourceUrl):saygiSafeUrl(link&&link.url), host=isWiki?(article.lang==='tr'?'tr.wikipedia.org':'en.wikipedia.org'):String(link&&link.host||''), tone=isWiki?'#7A5E2D':saygiDomainTone(host), label=isWiki?(article.lang==='tr'?'Wikipedia · Türkçe kaynak':'Wikipedia · English source'):host;
+  if(!href) return '';
+  var thumb='';
+  if(isWiki&&article.thumbnail) thumb='<img src="'+esc(article.thumbnail)+'" alt="" loading="lazy" referrerpolicy="no-referrer">';
+  else thumb='<span class="saygi-link-monogram">'+esc((host||'K').charAt(0).toUpperCase())+'</span>';
+  return '<a class="saygi-source-card'+(isWiki?' is-wikipedia':'')+'" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" style="--saygi-link-tone:'+tone+';">'
+    +'<span class="saygi-link-thumb">'+thumb+'</span><span class="saygi-link-copy"><span class="saygi-link-label">'+esc(label)+'</span><span class="saygi-link-sub">'+(isWiki?'Maddesini ve kaynaklarını aç':'Kaynakta geçen dış bağlantı')+'</span></span><span class="saygi-link-arrow">'+icon('external-link',14)+'</span></a>';
+}
+function saygiReadButtonHTML(person,done){
+  var ready=!!ui.saygiReadReady, disabled=!done&&!ready, main=done?'Okudum':(ready?'Okudum':'Okudum kilitli'), sub=done?'Ne okudum kaydını aç':(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır');
+  return '<div id="saygi-read-sentinel" class="saygi-read-sentinel" aria-hidden="true"></div><div class="saygi-finish-card">'
+    +'<div class="saygi-finish-orbit">'+icon(done?'circle-check':'book-open',22)+'</div><div class="saygi-finish-copy"><div>Bugünün düşüncesi burada tamamlandı.</div><small>Bu biyografiyi okuduysan kaydını bugüne ekleyelim.</small></div></div>'
+    +'<button id="saygi-read-button" class="saygi-read-button'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'">'
+    +'<span class="saygi-read-button-icon">'+icon(done?'circle-check':'book-open',19)+'</span><span><strong data-saygi-read-copy>'+main+'</strong><small data-saygi-read-sub>'+sub+'</small></span></button>';
+}
+function saygiLoadingHTML(){
+  return '<div class="saygi-loading" role="status"><div class="saygi-loading-mark">'+icon('trophy',26)+'</div><div><strong>Bugünün biyografisi hazırlanıyor</strong><span>Wikipedia’dan metin, görsel ve kaynaklar güvenli biçimde alınıyor.</span></div><div class="saygi-loading-lines"><i></i><i></i><i></i></div></div>';
+}
+function saygiHTML(){
+  var person=saygiCurrentPerson();
+  if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
+  saygiEnsureArticle(person);
+  var article=ui.saygiArticle, idx=saygiPeople().indexOf(person)+1, done=saygiHasRead(person), h='<section class="saygi-page">';
+  h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div><div class="saygi-count"><strong>'+idx+'</strong><span>/ '+saygiPeople().length+'</span></div></div>';
+  if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
+  if(ui.saygiError||!article){
+    h+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
+    return h+'</section>';
+  }
+  var heroLead=article.lead, first=article.blocks&&article.blocks[0]; if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90)) heroLead='';
+  h+='<article class="saygi-article">';
+  h+='<header class="saygi-hero">'+(article.thumbnail?'<div class="saygi-hero-media"><img src="'+esc(article.thumbnail)+'" alt="'+esc(article.title)+' portresi" loading="eager" referrerpolicy="no-referrer"><span>Görsel · Wikipedia</span></div>':'<div class="saygi-hero-media is-empty">'+icon('trophy',42)+'<span>Günün ismi</span></div>');
+  h+='<div class="saygi-hero-copy"><div class="saygi-tags"><span>'+esc(person.kind)+'</span><span>'+esc(person.era)+'</span></div><h2>'+esc(article.title)+'</h2><div class="saygi-discipline">'+icon(person.kind==='Bilim'?'microscope':'feather',15)+' '+esc(person.field)+'</div>'+(article.description?'<p class="saygi-description">'+esc(article.description)+'</p>':'')+(heroLead?'<p class="saygi-lead">'+esc(heroLead)+'</p>':'')+'<div class="saygi-meta"><span>'+icon('clock',13)+' yaklaşık '+saygiReadMinutes(article)+' dk</span><span>'+icon('book-open',13)+' '+(article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span></div></div></header>';
+  h+='<div class="saygi-biography">';
+  article.blocks.forEach(function(block){ if(!block||!block.text) return; if(block.type==='h') h+='<h3>'+esc(block.text)+'</h3>'; else if(block.type==='list') h+='<div class="saygi-list-block">'+icon('sparkles',14)+'<span>'+esc(block.text)+'</span></div>'; else h+='<p>'+esc(block.text)+'</p>'; });
+  h+='</div>';
+  h+='<section class="saygi-sources"><div class="saygi-section-title"><span>'+icon('link-2',16)+'</span><div><strong>Kaynakta daha derine in</strong><small>Wikipedia maddesi ve maddede yer alan seçili dış bağlantılar</small></div></div><div class="saygi-source-grid">'+saygiSourceCardHTML(article,null,true);
+  (article.links||[]).forEach(function(link){ h+=saygiSourceCardHTML(article,link,false); });
+  h+='</div></section>';
+  h+='<footer class="saygi-attribution"><span>'+icon('file-text',13)+'</span><span>Metin <a href="'+esc(article.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Wikipedia katkıda bulunanlarından</a> alınır; '+esc(article.licenseTitle)+' lisansı ile paylaşılır.</span><a href="'+esc(article.licenseUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Lisans ayrıntısı">'+icon('external-link',13)+'</a></footer>';
+  h+=saygiReadButtonHTML(person,done);
+  h+='</article></section>';
+  return h;
+}
+function saygiUnlockReadButton(btn){
+  if(!btn||btn.disabled===false&&ui.saygiReadReady) return;
+  ui.saygiReadReady=true; btn.disabled=false; btn.classList.remove('is-locked'); btn.classList.add('is-ready');
+  var copy=btn.querySelector('[data-saygi-read-copy]'), sub=btn.querySelector('[data-saygi-read-sub]');
+  if(copy) copy.textContent='Okudum'; if(sub) sub.textContent='Bugünün kaydına ekle';
+  var ic=btn.querySelector('.saygi-read-button-icon'); if(ic) ic.innerHTML=icon('circle-check',19);
+}
+function wireSaygiReadGate(sc){
+  if(!sc) return;
+  var person=saygiCurrentPerson(), btn=document.getElementById('saygi-read-button'), sentinel=document.getElementById('saygi-read-sentinel');
+  if(!person||!btn||!sentinel||saygiHasRead(person)) return;
+  function unlock(){ saygiUnlockReadButton(btn); if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } }
+  if(sc.scrollHeight<=sc.clientHeight+32){ unlock(); return; }
+  if(window.IntersectionObserver){
+    saygiReadObserver=new IntersectionObserver(function(entries){ for(var i=0;i<entries.length;i++){ if(entries[i].isIntersecting){ unlock(); break; } } },{root:sc,threshold:.72});
+    saygiReadObserver.observe(sentinel);
+  } else {
+    var onScroll=function(){ if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-28){ sc.removeEventListener('scroll',onScroll); unlock(); } };
+    sc.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  }
+}
+
+function monthTitle(ym){
+  var names=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  var p=String(ym||todayStr().slice(0,7)).split('-'), y=+p[0], m=+p[1];
+  return (names[m-1]||'')+(y?' '+y:'');
+}
+function headerActionHTML(a){
+  if(!a) return '';
+  var cls='sey-header-action'+(a.primary?' is-primary':'');
+  return '<button class="'+cls+'" '+(a.disabled?'disabled':'onclick="'+a.fn+'"')+' aria-label="'+esc(a.label)+'" title="'+esc(a.label)+'">'
+    +icon(a.icon||'sparkles',16)+'<span>'+esc(a.label)+'</span></button>';
+}
+function appHeaderMeta(){
+  var tab=ui.tab||'bugun', ed=editing(), viewDate=activeDate();
+  var rec=data.days[viewDate]||null;
+  var base={kicker:'Şeyma',title:'Bugün',sub:'Minik Denge Günlüğü',icon:'sun',accent:'#3A4048',accent2:'#A4824C',ink:'#2D2A27',action:null};
+  if(tab==='bugun'){
+    if(rec) syncDerivedHabits(rec);
+    var ht=habitCountOn(viewDate), completed=countRec(rec), curIdx=Math.max(1,dayIndexFor(viewDate));
+    base.kicker=ed?'Geçmiş gün':'Gün '+curIdx;
+    base.title=ed?dateLabelTR(viewDate):'Bugün';
+    base.sub=ed?'Bu gün düzenleniyor':(completed+'/'+ht+' tik · '+(savedToday()?'repoya kaydedildi':'kayıt bekliyor'));
+    base.icon='sun'; base.accent='#7B5E2F'; base.accent2='#3E433B'; base.ink='#2D2A27';
+    base.action=!syncConfigured()
+      ? {label:'Bağlan',icon:'link-2',fn:'App.go(\'ayarlar\')'}
+      : (savedToday()?{label:'Kaydedildi',icon:'check',disabled:true}:{label:'Kaydet',icon:'save',fn:'App.saveToday()',primary:true});
+  } else if(tab==='saglik'){
+    var sl=rec&&rec.sleep&&rec.sleep.hours!=null?(rec.sleep.hours+' sa uyku'):null;
+    var steps=trackedSteps(rec);
+    base.kicker=ed?'Geçmiş sağlık':'Beden ritmi';
+    base.title='Sağlık';
+    base.sub=ed?(dateLabelTR(viewDate)+' düzenleniyor'):(sl||(steps?steps.toLocaleString('tr-TR')+' adım':'Uyku, yürüyüş ve döngü'));
+    base.icon='activity'; base.accent='#2F6B63'; base.accent2='#60695D'; base.ink='#1F2826';
+    if(!ed) base.action={label:'İçe aktar',icon:'apple',fn:'App.importHealthClick()'};
+  } else if(tab==='saygi'){
+    var saygiPerson=saygiCurrentPerson(), saygiIndex=saygiPerson?(saygiPeople().indexOf(saygiPerson)+1):0;
+    base.kicker=saygiPerson?('Günün öncüsü · '+saygiIndex+'/'+saygiPeople().length):'Günün öncüsü';
+    base.title='Saygı';
+    base.sub=saygiPerson?(saygiPerson.name+' · '+saygiPerson.field):'Bilim ve sanatın iz bırakan 100 ismi';
+    base.icon='trophy'; base.accent='#826936'; base.accent2='#36454B'; base.ink='#242723';
+    base.action={label:'Yenile',icon:'rotate-ccw',fn:'App.refreshSaygi()'};
+  } else if(tab==='mesaj'){
+    var unread=unreadNotifCount();
+    var pending=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa.filter(function(q){return q&&!q.answer;}).length:0;
+    base.kicker=unread?('Yeni mesaj · '+unread):'Sohbet merkezi';
+    base.title='ÆON';
+    base.sub=pending?(pending+' açık soru · Luna modu içeride'):'sınırsız sohbet · Luna modu içeride';
+    base.icon='hexagon'; base.accent='#A88444'; base.accent2='#30343A'; base.ink='#1E1B16';
+    base.action={label:'Ara',icon:'search',fn:'App.toggleAeonSearch()'};
+  } else if(tab==='harita'){
+    base.kicker='Takvim';
+    base.title=monthTitle(ui.calMonth);
+    base.sub='Bir güne dokun; detayını gör ve düzenle';
+    base.icon='map'; base.accent='#59695E'; base.accent2='#8A734E'; base.ink='#202722';
+    base.action={label:'Bugün',icon:'sun',fn:'App.calToday()'};
+  } else if(tab==='rapor'){
+    base.kicker=daysTracked()+' gün takip';
+    base.title='Rapor';
+    base.sub='Verinin bilimsel okuması, ritim ve trendler';
+    base.icon='chart-column'; base.accent='#3A4048'; base.accent2='#A4824C'; base.ink='#222528';
+    base.action={label:'PDF',icon:'file-text',fn:'App.printReport()',primary:true};
+  } else if(tab==='ayarlar'){
+    base.kicker=syncConfigured()?'Repo bağlı':'Senkron bekliyor';
+    base.title='Ayarlar';
+    base.sub='Kişisel bilgiler, senkron ve gizlilik';
+    base.icon='settings'; base.accent='#4A4852'; base.accent2='#787064'; base.ink='#26252A';
+    base.action=null;
+  }
+  return base;
+}
+// Sabit marka başlığı: marka, aktif sayfa kimliği ve tek bağlamsal aksiyon aynı premium yüzeyde.
+function appHeaderHTML(){
+  var m=appHeaderMeta();
+  var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
+  h+='<div class="sey-header-top">';
+  h+='<button class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
+  h+='<div class="sey-header-tools"><button class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
+  h+='</div>';
+  h+='<div class="sey-header-main">';
+  h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';
+  h+='<div class="sey-header-copy"><div class="sey-header-kicker">'+esc(m.kicker||'Şeyma')+'</div><div class="sey-header-title">'+esc(m.title||'Bugün')+'</div><div class="sey-header-sub">'+esc(m.sub||'')+'</div></div>';
+  h+=headerActionHTML(m.action);
+  h+='</div></header>';
+  return h;
+}
+function wireAppHeaderScroll(sc){
+  var hdr=document.getElementById('sey-appheader'); if(!hdr||!sc) return;
+  function sync(){ if(sc.scrollTop>18) hdr.classList.add('is-scrolled'); else hdr.classList.remove('is-scrolled'); }
+  sc.addEventListener('scroll',sync,{passive:true}); sync();
+}
 function navHTML(){
-  var defs=[['bugun','sun','Bugün'],['saglik','flower-2','Sağlık'],['sos','cookie','SOS'],['mesaj','moon','Luna'],['harita','map','Harita'],['rapor','chart-column','Rapor'],['ayarlar','settings','Ayarlar']];
+  // Alt bar, aktif sayfanın header aksanını paylaşır: iki yüzey tek bir uygulama kabuğu gibi okunur.
+  var defs=[
+    ['bugun','sun','Bugün','#7B5E2F','#3E433B'],
+    ['saglik','flower-2','Sağlık','#2F6B63','#60695D'],
+    ['mesaj','hexagon','Aeon','#A88444','#30343A'],
+    ['saygi','trophy','Saygı','#826936','#36454B',true],
+    ['harita','map','Takvim','#59695E','#8A734E'],
+    ['rapor','chart-column','Rapor','#3A4048','#A4824C'],
+    ['ayarlar','settings','Ayarlar','#4A4852','#787064']
+  ];
   var unread=unreadNotifCount();
-  var h='<nav style="flex-shrink:0;display:flex;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(150,110,120,0.15);padding:8px 2px calc(env(safe-area-inset-bottom) + 8px);">';
+  var current=defs[0];
+  for(var di=0;di<defs.length;di++){ if(defs[di][0]===ui.tab){ current=defs[di]; break; } }
+  var h='<nav class="sey-bottomnav" aria-label="Ana gezinme" style="--nav-active:'+current[3]+';--nav-active2:'+current[4]+';--nav-count:'+defs.length+';">';
+  h+='<div class="sey-bottomnav-surface">';
   defs.forEach(function(n){
     var active=ui.tab===n[0];
-    var badge=(n[0]==='mesaj'&&unread>0)?'<span style="position:absolute;top:-3px;right:50%;transform:translateX(15px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#E9576F;color:#fff;font-size:10px;font-weight:800;line-height:16px;text-align:center;box-shadow:0 2px 6px rgba(233,87,111,0.5);">'+(unread>9?'9+':unread)+'</span>':'';
+    var badge=(n[0]==='mesaj'&&unread>0)?'<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>':'';
     var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
-    h+='<button onclick="'+clickFn+'" style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 1px;background:none;border:none;cursor:pointer;font-size:10px;color:'+(active?'var(--accent)':'var(--faint)')+';font-weight:'+(active?'700':'500')+';transition:color .2s;"><span style="position:relative;line-height:1;">'+icon(n[1],21)+badge+'</span><span style="line-height:1;">'+n[2]+'</span></button>';
+    h+='<button class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
+    h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';
+    h+='<span class="sey-bottomnav-label">'+n[2]+'</span>';
+    h+='</button>';
   });
-  h+='</nav>';
+  h+='</div></nav>';
   return h;
 }
 
 // ================= OKUMA HUB (overlay) =================
-function overlayShell(closeFn, sticky, body, maxw){
+function overlayShell(closeFn, sticky, body, maxw, fixedH){
+  // fixedH: sekmeli hub'larda kart yüksekliğini sabitler → sekme değişince modal
+  // boyu zıplamaz (gövde kaydırılır, kabuk sabit kalır).
+  var sizeCss=fixedH?'height:88vh;max-height:88vh;':'max-height:88vh;';
   var h='<div id="sey-ov-back" onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div id="sey-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;height:86vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
+  h+='<div id="sey-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
   h+='<div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+(sticky||'')+'</div>';
   h+='<div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+(body||'')+'</div>';
   h+='</div></div>';
@@ -2678,7 +4359,7 @@ function readingOverlayHTML(){
   else if(view==='library') body=readingLibraryView();
   else if(view==='stats') body=readingStatsView();
   else if(view==='quotes') body=readingQuotesView();
-  var h=overlayShell('App.closeReading()', head+tabs, body);
+  var h=overlayShell('App.closeReading()', head+tabs, body, null, true);
   if(ui.bookEdit) h+=bookEditModal();
   if(ui.quoteDraft) h+=quoteAddModal();
   return h;
@@ -2708,7 +4389,16 @@ function readingTodayView(){
   if(rEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+rEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+totPages+' sayfa</div></div>';
-    rEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.bookId?findBook(e.bookId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--read);">'+icon('book-open',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--read);font-weight:700;">· kitaplıkta</span>':'')+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    rEntries.slice().reverse().forEach(function(e){
+      var meta=[], linked=e.bookId?findBook(e.bookId):null, isSaygi=e&&e.source==='saygi', sourceUrl=isSaygi?saygiSafeUrl(e.sourceUrl):'';
+      if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk');
+      var chip=isSaygi?'<span style="font-size:10px;color:#77602D;background:rgba(197,163,90,.16);border:1px solid rgba(138,109,54,.26);font-weight:850;letter-spacing:.35px;border-radius:999px;padding:2px 7px;margin-left:5px;">SAYGI</span>':(linked?' <span style="font-size:10.5px;color:var(--read);font-weight:700;">· kitaplıkta</span>':'');
+      h+='<div style="display:flex;align-items:flex-start;gap:10px;background:'+(isSaygi?'linear-gradient(135deg,rgba(197,163,90,.10),var(--card))':'var(--card)')+';border:1px solid '+(isSaygi?'rgba(138,109,54,.25)':'var(--card-bd)')+';border-radius:14px;padding:11px 12px;">';
+      h+='<span style="line-height:1.2;display:inline-flex;color:'+(isSaygi?'#826936':'var(--read)')+';">'+icon(isSaygi?'trophy':'book-open',18)+'</span><div style="flex:1;min-width:0;">';
+      h+='<div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+chip+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'');
+      if(sourceUrl) h+='<a href="'+esc(sourceUrl)+'" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#826936;font-size:11px;font-weight:800;text-decoration:none;">'+icon('external-link',12)+' '+esc(e.sourceLabel||'Wikipedia kaynağı')+'</a>';
+      h+='</div><button onclick="App.removeReading(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>';
+    });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için okuma eklemedin. Birkaç sayfa bile sayılır.</div>';
@@ -2805,7 +4495,7 @@ function watchOverlayHTML(){
   else if(view==='archive') body=watchArchiveView();
   else if(view==='stats') body=watchStatsView();
   else if(view==='quotes') body=watchQuotesView();
-  var h=overlayShell('App.closeWatching()', head+tabs, body);
+  var h=overlayShell('App.closeWatching()', head+tabs, body, null, true);
   if(ui.titleEdit) h+=titleEditModal();
   if(ui.replicaDraft) h+=replicaAddModal();
   return h;
@@ -2936,7 +4626,7 @@ function listeningOverlayHTML(){
   else if(view==='favs') body=listeningFavsView();
   else if(view==='stats') body=listeningStatsView();
   else if(view==='lyrics') body=listeningLyricsView();
-  var h=overlayShell('App.closeListening()', head+tabs, body);
+  var h=overlayShell('App.closeListening()', head+tabs, body, null, true);
   if(ui.trackEdit) h+=trackEditModal();
   if(ui.lyricDraft) h+=lyricAddModal();
   return h;
@@ -3035,11 +4725,54 @@ function lyricAddModal(){
   return '<div onclick="App.closeLyricAdd()" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
 }
 
+function learningEntryCard(e){
+  var when=e&&e.ts?wxHm(e.ts):'';
+  var h='<div class="glass" style="border-radius:16px;padding:13px;display:flex;gap:11px;align-items:flex-start;border:1px solid color-mix(in srgb,var(--learn) 20%, var(--card-bd));">';
+  h+='<span style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--learn);background:var(--learn-bg);">'+icon('lightbulb',16)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.35;">'+esc(e.topic||'')+'</div>';
+  if(e.source&&String(e.source).trim()) h+='<div style="font-size:12px;color:var(--learn);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px;">'+icon('bookmark',11)+' '+esc(e.source)+'</div>';
+  if(e.note&&String(e.note).trim()) h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;margin-top:5px;">'+esc(e.note)+'</div>';
+  if(when) h+='<div style="font-size:10.5px;color:var(--faint);margin-top:5px;">'+esc(when)+'</div>';
+  h+='</div>';
+  h+='<button onclick="App.removeLearning(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:28px;height:28px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">\u00d7</button>';
+  h+='</div>';
+  return h;
+}
+function learningTodayView(){
+  var d=ui.learningDraft||{topic:'',source:'',note:''};
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var entries=(day.learning&&Array.isArray(day.learning.entries))?day.learning.entries:[];
+  var fld='width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;color:var(--text);box-sizing:border-box;';
+  var h='';
+  h+='<div class="glass" style="border-radius:20px;padding:15px;display:flex;flex-direction:column;gap:10px;border:1px solid color-mix(in srgb,var(--learn) 26%, var(--card-bd));box-shadow:0 10px 26px rgba(108,74,58,0.06);">';
+  h+='<div style="font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;"><span style="color:var(--learn);display:inline-flex;">'+icon('sparkles',16)+'</span>Bugün ne öğrendim?</div>';
+  h+='<input id="learning-topic" value="'+esc(d.topic||'')+'" oninput="App.onLearningField(\'topic\',this)" placeholder="örn. Nefes tekniği kalbi yavaşlatıyor" maxlength="140" style="'+fld+'">';
+  h+='<input value="'+esc(d.source||'')+'" oninput="App.onLearningField(\'source\',this)" placeholder="Kaynak: kitap, video, sohbet…" maxlength="120" style="'+fld+'">';
+  h+='<textarea oninput="App.onLearningField(\'note\',this)" placeholder="Kısa bir not (isteğe bağlı)" rows="2" style="'+fld+'resize:none;line-height:1.5;">'+esc(d.note||'')+'</textarea>';
+  h+='<button onclick="App.addLearning()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--learn),#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Ekle '+icon('plus',15)+'</button>';
+  h+='</div>';
+  if(entries.length){
+    h+='<div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-top:2px;">Bugün · '+entries.length+' kayıt</div>';
+    entries.slice().reverse().forEach(function(e){ h+=learningEntryCard(e); });
+  } else {
+    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:20px 16px;line-height:1.5;"><span style="display:inline-flex;">'+icon('graduation-cap',26)+'</span><div style="margin-top:8px;">Henüz kayıt yok — bugün öğrendiğin ilk şeyi ekle.</div></div>';
+  }
+  return h;
+}
+function learningOverlayHTML(){
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Ne öğrendim? '+icon('graduation-cap',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugün öğrendiğin küçük ya da büyük her şey, tek yerde.</div></div><button onclick="App.closeLearning()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  return overlayShell('App.closeLearning()', head, learningTodayView());
+}
+
 function modalsHTML(){
   var h='';
+  if(ui.crisisKind){ h+=crisisModalHTML(); }
+  if(ui.roomOpen){ h+=roomOverlayHTML(); }
   if(ui.readingOpen){ h+=readingOverlayHTML(); }
   if(ui.watchOpen){ h+=watchOverlayHTML(); }
   if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
+  if(ui.learningOpen){ h+=learningOverlayHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
@@ -3051,7 +4784,7 @@ function modalsHTML(){
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:20px;font-weight:800;">'+esc(d.title)+'</div><div style="font-size:13px;color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);">\u2715</button></div>';
     h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
     d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:14.5px;"><span style="font-size:17px;">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
-    h+='</div><div style="display:flex;gap:14px;font-size:14px;color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Tatlı SOS: <b>'+d.sosCount+'</b></span></div>';
+    h+='</div><div style="display:flex;gap:14px;font-size:14px;color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Kriz (SOS): <b>'+d.sosCount+'</b></span></div>';
     var hl=[]; if(d.steps!=null) hl.push({i:'footprints',t:d.steps+' adım'}); if(d.mins!=null) hl.push({i:'timer',t:d.mins+' dk'}); if(d.sleepH!=null) hl.push({i:'moon',t:d.sleepH+' sa'}); if(d.flow) hl.push({i:'droplet',t:d.flow});
     if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:12.5px;background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);display:inline-flex;align-items:center;gap:5px;">'+icon(x.i,12)+esc(x.t)+'</span>';}).join('')+'</div>';
     if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:12.5px;color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
@@ -3126,6 +4859,10 @@ function markLatestLocation(fix){
   data.locationHistory.push(data.location);
   if(data.locationHistory.length>60) data.locationHistory=data.locationHistory.slice(-60);
 }
+function refreshWeatherForLatestLocation(){
+  if(ui.tab!=='bugun' || editing()) return;
+  if(wxStale()) maybeFetchWeather();
+}
 function onLocationFix(pos){
   if(!data || !data.settings || !data.settings.locationEnabled) return;
   var acc=Math.round(pos.coords.accuracy||0);
@@ -3159,13 +4896,13 @@ function onLocationFix(pos){
           moveState.distSinceSync+=dist;
           markLatestLocation(fix);
           moveState.lastFix=fix;
-          saveLocal(); maybeSyncMovement(); updateMovementUI();
+          saveLocal(); maybeSyncMovement(); updateMovementUI(); refreshWeatherForLatestLocation();
           return;
         } else {
           // eşik altı: sabit say, drift biriktirme; zaman referansını ilerlet
           moveState.smoothSpeed*=0.6;
           moveState.lastFix={lat:prev.lat,lng:prev.lng,acc:prev.acc,ts:fix.ts};
-          markLatestLocation(fix); saveLocal(); maybeSyncMovement(); updateMovementUI();
+          markLatestLocation(fix); saveLocal(); maybeSyncMovement(); updateMovementUI(); refreshWeatherForLatestLocation();
           return;
         }
       }
@@ -3173,7 +4910,7 @@ function onLocationFix(pos){
   }
   // ilk fix ya da kullanılamaz: referans ayarla + son konumu işaretle
   moveState.lastFix=fix;
-  if(usable || !data.location){ markLatestLocation(fix); saveLocal(); maybeSyncMovement(); }
+  if(usable || !data.location){ markLatestLocation(fix); saveLocal(); maybeSyncMovement(); refreshWeatherForLatestLocation(); }
   updateMovementUI();
 }
 function updateMovementUI(){
@@ -3478,6 +5215,25 @@ function applyReceipts(rc){
 // sonsuza dek susturmasın.
 function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
 function psychActive(){ return false; }
+// Premium iOS 27 ÆON bildirim balonu — buzlu cam, altın ÆON kimliği, SF font.
+function aeonPopupHTML(o){
+  var inner='';
+  inner+='<div style="position:relative;overflow:hidden;border-radius:22px;padding:16px 17px 15px;background:rgba(24,19,28,0.72);backdrop-filter:blur(30px) saturate(185%);-webkit-backdrop-filter:blur(30px) saturate(185%);border:1px solid rgba(230,193,90,0.30);box-shadow:0 24px 62px rgba(0,0,0,0.44),inset 0 1px 0 rgba(255,255,255,0.10);font-family:-apple-system,BlinkMacSystemFont,\'SF Pro Text\',system-ui,sans-serif;">';
+  inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 90% at 88% -12%,rgba(230,193,90,0.22),transparent 58%);"></div>';
+  inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
+  inner+='<div style="flex-shrink:0;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#F0D274,#C99A3A);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 8px 22px rgba(201,160,60,0.5),inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('hexagon',20)+'</div>';
+  inner+='<div style="flex:1;min-width:0;">';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:14px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(180deg,#F3E4B0,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ÆON</span><span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;">· '+o.label+'</span>'+(o.when?'<span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);font-weight:600;">'+esc(o.when)+'</span>':'')+'</div>';
+  inner+='<div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,0.92);margin-top:5px;word-break:break-word;">'+esc(o.txt)+(o.trunc?'…':'')+'</div>';
+  if(o.more>0) inner+='<div style="font-size:11.5px;color:#E6C15A;margin-top:6px;font-weight:700;">+'+o.more+' '+o.moreLabel+'</div>';
+  inner+='<div style="display:flex;gap:8px;margin-top:13px;">';
+  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#F0D274,#C99A3A);color:#1a1404;font-weight:800;font-size:13.5px;padding:10px;border-radius:13px;box-shadow:0 8px 18px rgba(201,160,60,0.4);font-family:inherit;">Gör</button>';
+  inner+='<button onclick="'+o.closeFn+'" style="border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:13px;font-family:inherit;">Kapat</button>';
+  inner+='</div></div>';
+  inner+='<button onclick="'+o.closeFn+'" aria-label="Kapat" style="position:absolute;top:10px;right:11px;border:none;background:none;cursor:pointer;color:rgba(255,255,255,0.42);line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button>';
+  inner+='</div>';
+  return inner;
+}
 function showInboxPopup(){
   if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
@@ -3489,22 +5245,7 @@ function showInboxPopup(){
   var txt=String(latest.text||'').slice(0,150);
   var pop=document.createElement('div'); pop.id='sey-inbox-pop';
   pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
-  var inner='';
-  inner+='<div style="position:relative;overflow:hidden;border-radius:20px;padding:15px 16px 14px;background:linear-gradient(135deg,#FBE9EF 0%,#F0E7FF 100%);border:1px solid rgba(201,184,255,0.5);box-shadow:0 18px 44px rgba(150,110,170,0.35),0 2px 8px rgba(0,0,0,0.06);">';
-  inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 90% -10%,rgba(233,137,159,0.18),transparent 60%);"></div>';
-  inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
-  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 6px 16px rgba(201,160,60,0.45);">'+icon('hexagon',20)+'</div>';
-  inner+='<div style="flex:1;min-width:0;">';
-  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;letter-spacing:1px;color:#6A4FA0;">ÆON</span><span style="font-size:10px;color:#A88;font-weight:700;">·&nbsp;mesaj</span>'+(when?'<span style="font-size:11px;color:#A88;margin-left:auto;font-weight:600;">'+esc(when)+'</span>':'')+'</div>';
-  inner+='<div style="font-size:14px;line-height:1.45;color:#4A3A44;margin-top:4px;word-break:break-word;">'+esc(txt)+(latest.text&&latest.text.length>150?'…':'')+'</div>';
-  if(more>0) inner+='<div style="font-size:11.5px;color:#9A7;margin-top:5px;font-weight:700;">+'+more+' yeni mesaj daha</div>';
-  inner+='<div style="display:flex;gap:8px;margin-top:12px;">';
-  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(201,160,60,0.4);">Gör</button>';
-  inner+='<button onclick="App.dismissPopup()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
-  inner+='</div></div>';
-  inner+='<button onclick="App.dismissPopup()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button>';
-  inner+='</div>';
-  pop.innerHTML=inner;
+  pop.innerHTML=aeonPopupHTML({label:'mesaj', txt:txt, trunc:(latest.text&&latest.text.length>150), more:more, moreLabel:'yeni mesaj daha', when:when, closeFn:'App.dismissPopup()'});
   document.body.appendChild(pop);
 }
 function showAeonAnswerPopup(text,count){
@@ -3513,22 +5254,7 @@ function showAeonAnswerPopup(text,count){
   var pop=document.createElement('div'); pop.id='sey-inbox-pop';
   pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
   var txt=String(text||'').slice(0,150);
-  var inner='';
-  inner+='<div style="position:relative;overflow:hidden;border-radius:20px;padding:15px 16px 14px;background:linear-gradient(135deg,#FBF4DF 0%,#F3ECFF 100%);border:1px solid rgba(201,160,60,0.5);box-shadow:0 18px 44px rgba(160,130,60,0.32),0 2px 8px rgba(0,0,0,0.06);">';
-  inner+='<div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 90% -10%,rgba(212,175,55,0.18),transparent 60%);"></div>';
-  inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
-  inner+='<div style="flex-shrink:0;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#E6C15A,#C99A3A);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 6px 16px rgba(201,160,60,0.45);">'+icon('hexagon',20)+'</div>';
-  inner+='<div style="flex:1;min-width:0;">';
-  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:13.5px;font-weight:800;letter-spacing:1px;color:#6A4FA0;">ÆON</span><span style="font-size:10px;color:#A88;font-weight:700;">·&nbsp;yanıt</span></div>';
-  inner+='<div style="font-size:14px;line-height:1.45;color:#4A3A44;margin-top:4px;word-break:break-word;">'+esc(txt)+(text&&text.length>150?'…':'')+'</div>';
-  if(count>1) inner+='<div style="font-size:11.5px;color:#9A7;margin-top:5px;font-weight:700;">+'+(count-1)+' yanıt daha</div>';
-  inner+='<div style="display:flex;gap:8px;margin-top:12px;">';
-  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:13px;padding:9px;border-radius:12px;box-shadow:0 6px 14px rgba(201,160,60,0.4);">Gör</button>';
-  inner+='<button onclick="App.closeAeonPop()" style="border:1px solid rgba(150,110,140,0.25);cursor:pointer;background:rgba(255,255,255,0.7);color:#8A6A7A;font-weight:700;font-size:13px;padding:9px 14px;border-radius:12px;">Kapat</button>';
-  inner+='</div></div>';
-  inner+='<button onclick="App.closeAeonPop()" style="position:absolute;top:9px;right:10px;border:none;background:none;cursor:pointer;color:#B89AA8;line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button>';
-  inner+='</div>';
-  pop.innerHTML=inner;
+  pop.innerHTML=aeonPopupHTML({label:'yanıt', txt:txt, trunc:(text&&text.length>150), more:(count>1?count-1:0), moreLabel:'yanıt daha', when:'', closeFn:'App.closeAeonPop()'});
   document.body.appendChild(pop);
 }
 // Önceki oturumda inmiş ama kullanıcıya henüz popup olarak gösterilmemiş ÆON yanıtlarını,
@@ -3729,7 +5455,7 @@ function lunaDayLine(d,r){
   if(typeof r.water==='number'&&r.water>0) parts.push('su:'+r.water+'bardak');
   if(r.energy!=null) parts.push('enerji:'+r.energy+'/5'); if(r.stress!=null) parts.push('stres:'+r.stress+'/5');
   if(r.caffeine&&r.caffeine.last) parts.push('son-kafein:'+r.caffeine.last);
-  if(Array.isArray(r.cravingTriggers)&&r.cravingTriggers.length){ var _tg={tired:'yorgun',bored:'sıkkın',hungry:'açlık',stress:'stres',habit:'alışkanlık'}; parts.push('SOS-tetik:'+r.cravingTriggers.map(function(t){return _tg[t.trigger]||t.trigger;}).join(',')); }
+  if(Array.isArray(r.cravingTriggers)&&r.cravingTriggers.length){ var _tg={tired:'yorgun',bored:'sıkkın',hungry:'açlık',stress:'stres',habit:'alışkanlık',emotional:'duygusal',lowenergy:'enerji dibi',social:'keyif/sosyal'}; parts.push('Kriz-tetik:'+r.cravingTriggers.map(function(t){return _tg[t.trigger]||t.trigger;}).join(',')); }
   if(r.cravingSOSCount) parts.push('SOS:'+r.cravingSOSCount);
   if(r.walk&&r.walk.steps!=null) parts.push('adım:'+r.walk.steps);
   var meals=[]; if(r.meals){ ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(r.meals[k]&&String(r.meals[k]).trim()) meals.push(String(r.meals[k]).trim()); }); }
@@ -3755,8 +5481,8 @@ function lunaContext(){
   lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+htToday()+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
   if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+PROTEIN_GOAL+' g / '+CAL_GOAL+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
   var mfs=medFreeStreak(); if(mfs>0) lines.push('İlaçsız gece serisi: '+mfs+' gece');
-  if(rec&&rec.cravingSOSCount) lines.push('Tatlı krizi (SOS): '+rec.cravingSOSCount+' kez');
-  if(rec&&Array.isArray(rec.cravingTriggers)&&rec.cravingTriggers.length){ var tgm={tired:'yorgunluk',bored:'sıkkınlık',hungry:'gerçek açlık',stress:'stres',habit:'alışkanlık'}; lines.push('SOS tetikleyicileri: '+rec.cravingTriggers.map(function(t){return tgm[t.trigger]||t.trigger;}).join(', ')); }
+  if(rec&&rec.cravingSOSCount){ var _ck=[]; if(rec.craving10MinDone) _ck.push('tatlı'); if(rec.foodCravingDone) _ck.push('yemek'); if(rec.coffeeCravingDone) _ck.push('kahve'); lines.push('Kriz yönetimi (SOS): '+rec.cravingSOSCount+' kez'+(_ck.length?(' · '+_ck.join(', ')):'')); }
+  if(rec&&Array.isArray(rec.cravingTriggers)&&rec.cravingTriggers.length){ var tgm={tired:'yorgunluk',bored:'sıkkınlık',hungry:'gerçek açlık',stress:'stres',habit:'alışkanlık',emotional:'duygusal açlık',lowenergy:'enerji dibi',social:'keyif/sosyal'}; lines.push('Kriz tetikleyicileri: '+rec.cravingTriggers.map(function(t){return tgm[t.trigger]||t.trigger;}).join(', ')); }
   if(rec&&Array.isArray(rec.symptoms)&&rec.symptoms.length) lines.push('Belirtiler: '+rec.symptoms.join(', '));
   if(rec&&rec.note&&String(rec.note).trim()) lines.push('Not: '+String(rec.note).trim());
   // ── 7 ve 30 günlük ortalamalar ──
@@ -4058,7 +5784,10 @@ App.toggleAeonSearch=function(){
   var bar=document.getElementById('aeon-search-bar'); if(!bar) return;
   var show=bar.style.display==='none';
   bar.style.display=show?'block':'none';
-  if(show){ var inp=document.getElementById('aeon-search-input'); if(inp) inp.focus(); }
+  if(show){
+    try{ bar.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
+    var inp=document.getElementById('aeon-search-input'); if(inp) inp.focus();
+  }
   else App.clearAeonSearch();
 };
 App.clearAeonSearch=function(){
@@ -4134,11 +5863,10 @@ function lunaChatHTML(){
   var used=lunaTodayCount(), left=Math.max(0,LUNA_DAILY_LIMIT-used);
   var asking=ui.askKind==='luna';
   var h='';
-  // başlık
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;">';
-  h+='<div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba('+soft+',0.4);">'+icon('moon',24)+'</div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:800;color:var(--text);">Luna</div><div style="font-size:12.5px;color:var(--faint);">seni dinleyen yoldaşın · günde '+LUNA_DAILY_LIMIT+' soru</div></div>';
-  h+='<span style="flex-shrink:0;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);padding:3px 11px;border-radius:999px;">'+used+'/'+LUNA_DAILY_LIMIT+'</span>';
+  h+='<div class="sey-chat-sectionhead" style="--section-accent:#9B7FC9;--section-accent2:#E9AFC1;--section-ink:#fff;">';
+  h+='<span class="section-icon">'+icon('moon',19)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div class="section-title">Luna modu</div><div class="section-sub">sıcak, sakin OpenAI yoldaşın · günde '+LUNA_DAILY_LIMIT+' soru</div></div>';
+  h+='<span class="section-pill">'+used+'/'+LUNA_DAILY_LIMIT+'</span>';
   h+='</div>';
   // anahtar yoksa uyarı
   if(!hasKey){
@@ -4275,7 +6003,10 @@ function aeonItemHTML(it,enterCls){
 // Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
 function aeonChatHTML(){
   var h='';
-  h+='<div style="display:flex;align-items:center;gap:11px;margin:2px 2px 12px;"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--aeon2),var(--aeon));display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 8px 20px var(--aeon-glow);">'+icon('hexagon',22)+'</div><div style="flex:1;"><div style="font-size:20px;font-weight:800;letter-spacing:2px;color:var(--text);">ÆON</div><div style="font-size:12.5px;color:var(--faint);">hep yanında · sınırsız sohbet</div></div><button onclick="App.toggleAeonSearch()" title="Mesajlarda ara" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:12px;width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('search',16)+'</button></div>';
+  h+='<div class="sey-chat-sectionhead" style="--section-accent:var(--aeon);--section-accent2:var(--aeon2);--section-ink:#1a1404;">';
+  h+='<span class="section-icon">'+icon('hexagon',18)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div class="section-title">ÆON akışı</div><div class="section-sub">sınırsız sohbet · ses, fotoğraf ve gözlemci yanıtları</div></div>';
+  h+='<span class="section-pill">canlı</span></div>';
   h+='<div id="aeon-search-bar" style="display:none;margin:0 2px 12px;position:relative;">';
   h+='<input id="aeon-search-input" type="text" oninput="App.filterAeonSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:10px 36px 10px 14px;font-size:14px;color:var(--text);outline:none;">';
   h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',14)+'</button>';

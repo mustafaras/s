@@ -250,6 +250,36 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-10** — **🆘 SOS sekmesi → üçlü "Raşit'in Kriz Odaları" (modal)**: Alttaki
+  `sos` sekmesi kaldırıldı; tatlı krizi tek buton yerine **Bugün**'de üçlü, Raşit-temalı
+  bir kart oldu: **Tatlı · Yemek · Kahve**. Her biri tıklanınca süreli, bilimsel bir
+  **modal oda** açar (`crisisModalHTML`, `CRISES` config): Raşit'in nüktedan girişi +
+  bilimsel kutu (tatlı=10 dk "urge surfing"; yemek=20 dk tokluk sinyali + HALT ayrımı;
+  kahve=adenozin/yarılanma ömrü + saat 14:00 sonrası uyku uyarısı) + geri sayım + "ne
+  denedin" + "tetikleyici" + **"Krizi yönettim"**. "Krizi yönettim" ilgili günün
+  flag'ini kurar → bağlı tik kendiliğinden yeşillenir. **Üç yeni/bağlı tik** Bugün'ün
+  tiklerine eklendi: 🍬 `sweetManaged` (`craving10MinDone`), 🍽️ `foodManaged`
+  (`foodCravingDone`) ve ☕ `coffeeManaged` (`coffeeCravingDone`) — üçü de türetilmiş.
+  Modaldaki **"Şu an ne denedin?"** ve **"Bu isteği ne tetikledi?"** bölümleri premium
+  açılır (expander) hâline geldi (varsayılan kapalı; `ui.crisisTriedOpen`/`ui.crisisTrigOpen`,
+  `App.toggleCrisisSection`). **"Raşit'e yaz / Raşit'i ara"** butonları "Raşit'ten Notlar"
+  balonunun hemen altına, premium ikili olarak taşındı (`rasitContactHTML`). **"Zihnimi
+  Besledim"** kutucukları vurgulu premium bir karta dönüştü. **Rapor**'daki "Raşit'ten
+  Notlar" bölümü kaldırıldı (Bugün'deki balon kaldı). Panel yansıması: `foodManaged` tik
+  çipleri + gün-detayında Tatlı/Yemek/Kahve krizi "Yönetildi" satırları + yeni tetikleyici
+  etiketleri (duygusal/enerji dibi/keyif). Headless harness ile doğrulandı.
+- **2026-07-10** — **✒️ Sabit marka başlığı (sticky header) — el yazısı wordmark + shimmer**:
+  Başlangıç ekranı hariç **her sekmenin en üstünde** sabit, buzlu-cam bir marka başlığı
+  (`appHeaderHTML`, `#app` flex-shell'in ilk çocuğu). Ortada **"Şeyma 🦩"** el yazısı
+  wordmark'ı (iOS `Snell Roundhand`, cursive fallback) — üzerinden akan **ışık süzülmesi**
+  (`.sey-wordmark` + `seyWordSheen` gradyan-kayması), minik sallanan flamingo (`seyFlamBob`)
+  ve altında ✦ süslemeli ince gradyan ayraç. Giriş animasyonu (`seyHeaderIn`) yalnızca ilk
+  görünümde oynar (`lastHeaderShown` ile sonraki render'larda bastırılır → titreme yok);
+  `prefers-reduced-motion`'da tüm animasyonlar kapanır. `data-scroll`'un üst güvenli-alan
+  dolgusu header'a devredildi. Kısa metin + stil alternatifleri kullanıcıya sunulup seçildi
+  (**"Şeyma 🦩"** + script-shimmer). Cache-bust: `styles.css v=20260710a`, `app.js v=20260710b`.
+  Headless harness ile doğrulandı (açık/koyu, tüm sekmeler, üç kriz akışı, expander'lar,
+  kilitli tik→modal, onboarding'de header YOK) — JS hatası yok.
 - **2026-07-06** — **⬡ ÆON sohbetine sesli mesaj + fotoğraf (iki yönlü)**: Hem Şeyma
   (app.js) hem gözlemci (panel.html) artık ÆON sohbetinde WhatsApp tarzı sesli mesaj ve
   fotoğraf gönderip alabiliyor. Video kapsam dışı bırakıldı (iOS Safari'de video

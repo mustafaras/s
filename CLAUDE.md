@@ -23,10 +23,18 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 ## Repo layout
 
 ```
-index.html      Thin HTML shell. Loads styles.css, app.js, sync.js with
-                 cache-busting `?v=YYYYMMDDx` query strings.
-app.js           The entire Şeyma app (single IIFE, ~3.7k lines). Owns state,
+index.html      Thin HTML shell. Loads styles.css, motivationProgramV2.js,
+                 app.js, sync.js with cache-busting `?v=YYYYMMDDx` query
+                 strings.
+app.js           The entire Şeyma app (single IIFE, ~4.3k lines). Owns state,
                  rendering, and all feature logic.
+motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
+                 program" content (per-day Faz/task objects) plus helpers,
+                 exposed as `window.MotivationProgramV2`. Loaded before
+                 app.js but not yet consumed by it — UI/data-model
+                 integration into app.js and panel.html is still in
+                 progress (rollout plan lives in the untracked, local-only
+                 `seyma_motivation_v2_package/` directory — don't commit it).
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
 panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
@@ -41,6 +49,9 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
+AGENTS.md        Parallel, tool-agnostic restatement of this file's rules
+                 (same conventions, generic Agents-format doc). Keep both in
+                 sync when a convention changes.
 .github/workflows/pages.yml  GitHub Pages deploy: on push to `main`, uploads
                  the whole repo root as-is and deploys it. No build step.
 ```
@@ -107,9 +118,15 @@ read files in bounded line ranges rather than in full.
 
 ## Verification
 
-There's no automated test suite or linter. To validate a change:
-- Open `index.html` (and `panel.html` if relevant) in a browser and
-  exercise the affected flow manually, in **both light and dark** theme.
+There's no automated test suite or linter, but `node --check app.js` (or
+`sync.js`) catches JS syntax errors before you even open a browser. To
+validate a change beyond that:
+
+- Serve the repo locally, e.g. `python3 -m http.server 8765`, then open
+  `http://localhost:8765/index.html` (and `/panel.html` if relevant) —
+  opening via `file://` can hit CORS issues on the GitHub API calls
+  sync.js/panel.html make. Exercise the affected flow manually, in **both
+  light and dark** theme.
 - Watch the browser console for errors.
 - If the change touches synced/persisted data, confirm `migrate()` still
   produces a valid object from an old (pre-change) save, and that the panel

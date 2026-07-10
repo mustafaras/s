@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-10 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-04 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
@@ -46,9 +46,8 @@ _Son güncelleme: 2026-07-10 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
 | 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, **"Bugün gösterme"→o günlük sus (ertesi gün tekrar çıkar, `optOutDay`)**; konum AÇIK iken Bugün kartında gerçek veri: mesafe + **⏱️ süre** (`walkSec`/`vehicleSec`), panel "Bugün Hareket"e yansır; 8 reddten sonra fısıltı modu (2026-07-03) |
-| 24 | ☕ Kafein bilimsel takip + ⛾ uyku hazırlık kartı | 3 | ✅ | `CAFFEINE_TYPES`/`CAFFEINE_LIMITS`/`caffeineBlock` → içecek türüne göre otomatik mg (Türk 60 · espresso 60 · filtre 95 · americano 77 · cappuccino 63 · latte 63 · siyah çay 40 · yeşil çay 25 · enerji 80), günlük limit (standart 400 / hassas 300 / gebe 200 mg — EFSA 2015 & FDA) + tek seferlik 200 mg doz uyarısı, yarı ömür (~5 sa) ile yatıştaki kafein kalıntısı + önerilen son kahve cut-off saati; `sleepReadiness` 6-faktörlü premium skor (süre 26 · kalite 18 · kafein 18 · okuma 16 · wind-down 14 · ilaç 8 = 100) + "bu gece önerisi"; yeni **türetilmiş** `caffeineOk` tiki (`HABITS`+`DERIVED_HABITS`) — elle tıklanmaz, kafein miktar+zamanlamaya bağlı (boş gün yeşil); `data.days[].caffeine.drinks[]` + `settings.caffeineMode/targetBed` (migrate ile backfill); panel gün-detayı mg+kalıntı aynası (2026-07-10) |
 
-**Sayım:** ✅ 13 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 12 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 
@@ -250,32 +249,6 @@ notlarını buraya ekleyebiliriz._
 ---
 
 ## 🗒️ Değişiklik günlüğü
-
-- **2026-07-10** — **#24 ☕ Kafein bilimsel takip + ⛾ uyku hazırlık kartı ✅**:
-  Sağlık sekmesindeki kafein takibi "kaç fincan" basitliğinden çıktı; içecek
-  türüne göre **otomatik mg hesabı** + **bilimsel günlük limit** + **uyku
-  zamanlaması** bağlantılı premium sisteme çevrildi.
-  - **İçecek katalogu** (`CAFFEINE_TYPES`): Türk kahvesi 60 · espresso 60 ·
-    filtre 95 · americano 77 · cappuccino 63 · latte 63 · siyah çay 40 · yeşil
-    çay 25 · enerji 80 mg/serving. Chip-grid ile tür + saat + adet eklenir;
-    günlük içim listesi mg ile gösterilir.
-  - **Limitler** (`CAFFEINE_LIMITS`): standart 400 mg (EFSA 2015 & FDA),
-    hassas 300 mg, gebe 200 mg; tek seferlik güvenli doz 200 mg. Mod seçimi
-    kartta ve Ayarlar'da. Aşım → kırmızı uyarı; tek doz >200 mg → sarı uyarı.
-  - **Uyku bağlantısı**: kafein yarı ömrü ~5 sa; `settings.targetBed`'e göre
-    yatıştaki kafein kalıntısı (mg) ve önerilen son kahve cut-off saati
-    (bedtime − 6 sa) hesaplanır; geç içimde timing uyarısı.
-  - **Uykuya dalma hazırlığı kartı** (`sleepReadiness`) 6-faktörlü premium
-    skora geçti: süre 26 · kalite 18 · kafein 18 · okuma 16 · wind-down 14 ·
-    ilaç 8 = 100; kafein kalıntı göstergesi + "bu gece önerisi" satırı + kaynak
-    notu (EFSA/FDA/Harvard).
-  - **Yeni türetilmiş tik** "Günlük kafein limitini aşmadım" (`caffeineOk`):
-    `HABITS` + `DERIVED_HABITS`'ta; **elle tıklanmaz** — kafein miktar +
-    zamanlamaya bağlı otomatik. Boş gün (kahve yok) yeşil; limit aşımı veya
-    geç içim → kırılır. `since` tarihiyle eski günleri etkilemez.
-  - Veri: `data.days[].caffeine.drinks[]` + `settings.caffeineMode/targetBed`
-    (`migrate()` ile backfill; eski `cups` tek `turk` içimi olarak taşınır).
-  - Panel (`panel.html`) gün-detayında mg + son saat + yatış kalıntı aynası.
 
 - **2026-07-06** — **⬡ ÆON sohbetine sesli mesaj + fotoğraf (iki yönlü)**: Hem Şeyma
   (app.js) hem gözlemci (panel.html) artık ÆON sohbetinde WhatsApp tarzı sesli mesaj ve

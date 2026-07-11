@@ -3517,8 +3517,9 @@ function crisisModalHTML(){
   if(ui.crisisDone){
     h+='<div style="display:flex;gap:9px;"><button onclick="App.resetCrisis()" style="flex:1;border:1px solid var(--field-bd);background:var(--card);cursor:pointer;padding:14px;border-radius:16px;font-size:14.5px;font-weight:700;color:var(--muted);">Yeni kriz / sıfırla</button><button onclick="App.closeCrisis()" style="flex:1.3;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 10px 24px color-mix(in srgb,'+A+' 38%, transparent);display:flex;align-items:center;justify-content:center;gap:6px;">Kapat '+icon('check',15)+'</button></div>';
   } else {
-    h+='<button onclick="App.completeCrisis()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;">Krizi yönettim '+icon('check',16)+'</button>';
-    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">“Krizi yönettim”e basınca '+(C.habit?'bugünün ilgili tiki kendiliğinden yeşillenir.':'kaydın Rapor’a işlenir.')+'</div>';
+    var canComplete=ui.crisisTiming && ui.crisisLeft<=0;
+    h+='<button onclick="App.completeCrisis()" '+(canComplete?'':'disabled')+' style="border:none;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;'+(canComplete?'cursor:pointer;opacity:1;':'cursor:not-allowed;opacity:.55;')+'">Krizi yönettim '+icon('check',16)+'</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">'+(canComplete?'Süre tamamlandı — “Krizi yönettim”e basabilirsin.':'Sayaç dolmadan “Krizi yönettim” aktif olmaz — önce durumu anla, sonra düzeltelim.')+' '+(C.habit?'Buton aktif olduğunda bugünün ilgili tiki kendiliğinden yeşillenir.':'Aktif olduğunda kaydın Rapor’a işlenir.')+'</div>';
   }
   h+='</div>'; // footer
 

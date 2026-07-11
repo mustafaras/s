@@ -251,6 +251,78 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-07-11** — **💾 Kapsamlı yazma denetimi + "sekme kapanırken son düzenleme kaybolabilir"
+  düzeltmesi**: Kullanıcının her girdisinin gerçekten `seyma-data`'ya yazıldığından emin olmak
+  için `App.*`'daki **253 handler'ın tamamı** gerçek V8 `Function.toString()` ile tek tek
+  incelendi (headless, tarayıcı açılmadan) — her biri doğrudan ya da zincirleme
+  (`submitAeonMedia`, `parseHealthXML`, `App.completeMotivationTask` gibi bir yardımcı
+  üzerinden) `save()`/`commit()`'e ulaşıyor mu diye otomatik + elle doğrulandı. 213'ü doğrudan
+  persist ediyor; kalan 40'ı meşru şekilde veri değiştirmeyen eylemler (pano kopyalama, dosya
+  seçici açma, sekme/scroll, ve "Kaydet" düğmesine kadar yalnızca taslakta duran alan girişleri
+  — `ui.bookEdit`/`ui.quoteDraft`/`ui.crisisNote` vb., karşılık gelen `App.saveBook`/
+  `App.saveQuote`/`App.completeCrisis` gibi commit handler'larının gerçekten var olduğu ve
+  `commit()` çağırdığı ayrıca doğrulandı). **Bulunan tek gerçek (önceden var olan) açık:** 17
+  metin alanı (niyet, kitap sayfası, döngü rahatsızlık notu/ilaçları, kafein saati, okuma/izleme
+  hedefi…) `debounceSave()` ile geciktirilmiş kayıt kullanıyordu — mutasyon, yazının hemen
+  ardından değil, gecikmeli `fn` **içinde** oluyordu; sekme kapanırken/arka plana alınırken
+  çalışan `finalizeSession()` bu bekleyen zamanlayıcıları hiç flush etmiyordu. Yani bir alana
+  yazıp ~300-500ms içinde uygulama kapatılırsa o son düzenleme hem localStorage'a hem
+  `seyma-data`'ya hiç yazılmadan kaybolabilirdi (önceki kayıtlar etkilenmezdi). **Düzeltme:**
+  `debounceSave()` artık bekleyen fonksiyon referansını `fieldTimerFns`'te tutuyor; yeni
+  `flushFieldTimers()` (app.js:~627) tüm bekleyenleri anında çalıştırıp temizliyor,
+  `finalizeSession()`'ın (beforeunload/pagehide/sekme-gizlenme) en başında çağrılıyor — artık
+  hiçbir düzenleme kapanış anında kaybolmuyor. **Doğrulama:** headless `vm` harness'te
+  `setTimeout`'un hiç ateşlenmediği (gerçek "erken kapatma" senaryosunu birebir taklit eden) bir
+  kurulumda niyet alanına yazılıp hemen `finalizeSession()` tetiklendi — düzenleme doğrulandı
+  şekilde kaydedildi (8/8 PASS); ayrıca çift-çağrı güvenliği ve tüm sekmelerin regresyonsuz
+  render'ı da doğrulandı. `mustafaras/seyma-data`'ya hiçbir şey yazılmadı (yalnızca salt-okunur
+  okuma + headless test).
+- **2026-07-11** — **⏳ Saygı + Terapi Odası (İçsel Pusula): 2026-07-13 09:00 aktivasyon kilidi
+  ("gün 1" garantisi)**: Her iki özellik de artık **2026-07-13 09:00 TR saatiyle** (sabit UTC+3
+  offset, cihazın kendi saat dilimi ayarından bağımsız — `FEATURE_GATE_TS`/`featuresLive()`,
+  `app.js` en üstte) aktifleşiyor; o âna kadar ikisi de şık bir "yakında" durumunda kalıyor
+  (Saygı sekmesi: kilitli bilgi kartı, Wikipedia fetch yok; İçsel Pusula: aynı `#sey-motivation-card`
+  id'li ama tıklanamaz teaser kart). **Kök neden ve düzeltme:** Saygı zaten `data.startDate`'den
+  bağımsız, sabit bir takvim epoch'una göre seçim yapıyordu (`SAYGI_EPOCH`) — yalnızca epoch
+  `2026-07-10` yerine **`2026-07-13`** olacak şekilde düzeltildi. İçsel Pusula'nın günü
+  (`data.motivation.currentProgramDay`) ise zaten eylem-tetiklemeli bir sayaç (ilk oluşturulduğunda
+  1 ile başlar, `data.startDate`'e hiç bağlı değil) — ama `ensureMotivationRoot` her yerde
+  (boot, Bugün/Rapor/Ayarlar render'ı) koşulsuz çağrılıyordu; artık **her çağrı noktası**
+  `featuresLive()` ile korunuyor, yani kilit açılana kadar `data.motivation` **hiçbir koşulda**
+  oluşmuyor — 13 Temmuz'dan önce kim ne kadar test ederse etsin sayaç ilerlemez, kilit açıldığı
+  an ilk kez oluştuğunda otomatik olarak 1'dir. `panel.html`/`sync.js`/`motivationProgramV2.js`
+  dokunulmadı (panel salt-okunur ayna, gerçek prod verisinde bu alanlar zaten hiç yoktu — `gh api`
+  ile salt-okunur doğrulandı, hiçbir şey `seyma-data`'ya yazılmadı).
+  **Doğrulama:** headless `vm` harness'i sahte saat (`FakeDate`) ile hem kilit-öncesi hem
+  kilit-sonrası koşturuldu; en kritik test — `data.startDate` 2025-01-01'e (566+ "kullanım günü")
+  sabitlenip kilit-sonrası bir tarihte hem Saygı'nın (takvim-bazlı, doğru ilerleyen indeks)
+  hem İçsel Pusula'nın ("Gün 1/120") **kullanım gün sayısından tamamen bağımsız** doğru
+  sonucu verdiği kanıtlandı (47/47 assertion PASS). Ayrıca gerçek prod `data/latest.json`
+  (salt-okunur çekildi) `migrate()` + tüm sekme render'larından hem kilit-öncesi hem
+  kilit-sonrası hatasız geçti, 18 gerçek gün kaydından hiçbiri kaybolmadı. Cache-bust:
+  `app.js v=20260711o`.
+- **2026-07-11** — **📎 ÆON sohbetine belge + hazır ses dosyası eki (iki yönlü, premium attach sheet)**:
+  2026-07-06'daki sesli mesaj/fotoğraf altyapısının üzerine, hem Şeyma (app.js) hem gözlemci (panel.html)
+  artık ÆON sohbetine **genel belge** (PDF/Word/Excel/metin/zip…) ve **cihazdan hazır bir ses dosyası**
+  ekleyebiliyor — ikisi de canlı mikrofon kaydından ayrı, WhatsApp/Telegram tarzı bir **ek gönderme sayfası**
+  (bottom-sheet) üzerinden. Composer'daki tek kamera düğmesi, tıklanınca **Fotoğraf / Belge / Ses dosyası**
+  seçenekli bir ataç (paperclip) düğmesine dönüştü; canlı kayıt mikrofon düğmesi olduğu gibi kaldı. Hiçbir
+  yerde emoji ikon kullanılmadı — yeni `paperclip` SVG ikonu mevcut `ICONS`/`icon()` sistemine eklendi.
+  - **Belge:** yeni `mediaKind:'file'` — depolama aynı `data/aeon-media/<id>.json` (yaz-bir-kez) deseni;
+    balonlarda dosya adı + boyut + aç/indir kartı (`aeonPaintFileCard`/`aeonPaintFileCardP`), açma paneldeki
+    zaten mime-generic `openPdfP`'yi (tahlil PDF'leri için yazılmıştı) yeniden kullanıyor, app.js tarafında
+    eşdeğeri yeni `App.aeonOpenFile` — decode→Blob→yeni sekme, açılmazsa `<a download>`.
+  - **Ses dosyası:** **yeni bir oynatıcı yazılmadı** — mevcut `'voice'` kind'i (`viaUpload:true` + `name`
+    ile) aynen yeniden kullanıldı; `aeonPaintVoicePlayer` zaten `peaks` yoksa düz varsayılan dalga formu
+    çiziyor, süre yalnızca seçilen dosyanın kendi metadata'sından (`<audio>`+`loadedmetadata`) okunuyor.
+  - **Boyut uyarısı:** mevcut tahlil-yükleme emsaliyle birebir (`>4MB` → uyarı toast/alert, engellemez).
+  - **Doğrulama:** `node --check app.js`, panel.html script-syntax kontrolü, ve `run-seyma` headless
+    `vm` harness'i genişletilerek (özel bir doğrulama betiği ile — repodaki `driver.mjs` değişmedi) attach
+    sheet açılışı/kapanışı, emoji taraması (yok) ve sahte `file`/yüklenen-`voice` qa öğelerinin balon olarak
+    hatasız render edildiği doğrulandı. Gerçek dosya seç→yükle→aç akışı ve `getUserMedia`/GitHub ağ çağrıları
+    headless ortamda çalıştırılamadığından **tarayıcıda test edilmedi** (CLAUDE.md'nin kesin kuralı gereği —
+    uygulamayı "çalışıyor mu" diye tarayıcıda açmak, stale localStorage + token ile `seyma-data`'yı ezme
+    riski taşır). Cache-bust: `app.js v=20260711n`.
 - **2026-07-10** — **☕ Kafein bilimsel takip + 6-faktör uyku hazırlığı + otomatik kafein tiki**: Sağlık sekmesindeki
   kafein takibi "kaç fincan" basitliğinden çıkarıldı; içecek türlerine göre **otomatik mg hesabı + günlük limit +
   uyku zamanlaması** bağlantılı bilimsel sisteme çevrildi. `CAFFEINE_TYPES` katalogu (türk kahvesi 60 · espresso 60 ·

@@ -16,6 +16,7 @@
   @keyframes seyVoiceWave{0%,100%{transform:scaleY(0.4);opacity:.7;}50%{transform:scaleY(1);opacity:1;}}
   @keyframes seyRingPulse{0%{transform:scale(.92);opacity:.5;}70%{transform:scale(1.18);opacity:0;}100%{transform:scale(1.18);opacity:0;}}
   @keyframes seyFloatIn{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:translateY(0);}}
+  @keyframes seySpin{to{transform:rotate(360deg);}}
   /* Açılır kart gövdesi: JS ölçülü max-height akordeon (animateCardExpand/Collapse). */
   .sey-collbody{will-change:max-height,opacity;}
   @media (prefers-reduced-motion: reduce){ .sey-collbody{transition:none!important;} }
@@ -78,12 +79,14 @@
   .sey-header-action span{white-space:nowrap;}
   @media (max-width:370px){.sey-header-action span{display:none;}.sey-header-action{padding:0;width:40px;}.sey-header-title{font-size:20px;}.sey-header-icon{width:26px;height:26px;}}
   /* ── Premium sticky alt navigasyon — header'ın koyu/rafine cam kabuğunun devamı ── */
-  .sey-bottomnav{position:sticky;bottom:0;z-index:28;flex-shrink:0;padding:9px 10px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(180deg,color-mix(in srgb,var(--page) 0%,transparent),color-mix(in srgb,var(--page) 76%,transparent));}
+  /* Sticky davranış korunur. Kesin yükseklik + küçülebilen ana scroll alanı,
+     uzun sekmelerde (özellikle Sağlık) nav geometrisini sabit tutar. */
+  .sey-bottomnav{position:sticky;bottom:0;z-index:28;align-self:stretch;flex:0 0 calc(84px + env(safe-area-inset-bottom));height:calc(84px + env(safe-area-inset-bottom));padding:9px 10px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(180deg,color-mix(in srgb,var(--page) 0%,transparent),color-mix(in srgb,var(--page) 76%,transparent));}
   .sey-bottomnav::before{content:"";position:absolute;top:0;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--nav-active,#3A4048) 34%,transparent) 22%,color-mix(in srgb,var(--nav-active2,#A4824C) 36%,transparent) 74%,transparent);opacity:.86;pointer-events:none;}
-  .sey-bottomnav-surface{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(var(--nav-count,6),minmax(0,1fr));gap:2px;min-height:65px;padding:5px;border:1px solid color-mix(in srgb,var(--nav-active,#3A4048) 22%,var(--field-bd));border-radius:23px;background:linear-gradient(135deg,color-mix(in srgb,var(--nav) 88%,var(--nav-active,#3A4048)),color-mix(in srgb,var(--nav) 88%,var(--nav-active2,#A4824C)) 68%,color-mix(in srgb,var(--nav) 92%,#2F3437));backdrop-filter:blur(34px) saturate(1.7) brightness(1.07);-webkit-backdrop-filter:blur(34px) saturate(1.7) brightness(1.07);box-shadow:0 18px 38px rgba(38,34,35,.20),0 6px 14px rgba(38,34,35,.09),inset 0 1.5px 0 rgba(255,255,255,.58),inset 0 -1px 0 color-mix(in srgb,var(--nav-active,#3A4048) 16%,transparent),inset 0 0 18px color-mix(in srgb,var(--nav-active2,#A4824C) 6%,transparent);overflow:hidden;}
+  .sey-bottomnav-surface{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(var(--nav-count,6),minmax(0,1fr));grid-template-rows:53px;gap:2px;width:100%;height:65px;min-height:65px;padding:5px;border:1px solid color-mix(in srgb,var(--nav-active,#3A4048) 22%,var(--field-bd));border-radius:23px;background:linear-gradient(135deg,color-mix(in srgb,var(--nav) 88%,var(--nav-active,#3A4048)),color-mix(in srgb,var(--nav) 88%,var(--nav-active2,#A4824C)) 68%,color-mix(in srgb,var(--nav) 92%,#2F3437));backdrop-filter:blur(34px) saturate(1.7) brightness(1.07);-webkit-backdrop-filter:blur(34px) saturate(1.7) brightness(1.07);box-shadow:0 18px 38px rgba(38,34,35,.20),0 6px 14px rgba(38,34,35,.09),inset 0 1.5px 0 rgba(255,255,255,.58),inset 0 -1px 0 color-mix(in srgb,var(--nav-active,#3A4048) 16%,transparent),inset 0 0 18px color-mix(in srgb,var(--nav-active2,#A4824C) 6%,transparent);overflow:hidden;}
   .sey-bottomnav-surface::before{content:"";position:absolute;z-index:-1;inset:-22px -18px;pointer-events:none;opacity:.58;background:linear-gradient(35deg,transparent 0 45%,color-mix(in srgb,var(--nav-active,#3A4048) 17%,transparent) 46% 46.8%,transparent 47.6% 100%),linear-gradient(147deg,transparent 0 44%,color-mix(in srgb,var(--nav-active2,#A4824C) 16%,transparent) 45% 45.8%,transparent 46.6% 100%),radial-gradient(circle at 12% 45%,color-mix(in srgb,var(--nav-active,#3A4048) 42%,transparent) 0 1.6px,transparent 2.5px),radial-gradient(circle at 47% 72%,color-mix(in srgb,var(--nav-active2,#A4824C) 42%,transparent) 0 1.5px,transparent 2.4px),radial-gradient(circle at 86% 34%,color-mix(in srgb,var(--nav-active,#3A4048) 40%,transparent) 0 1.6px,transparent 2.5px);background-size:104px 54px,118px 60px,94px 52px,126px 66px,108px 58px;}
   .sey-bottomnav-surface::after{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(110deg,rgba(255,255,255,.26),transparent 28%,transparent 70%,color-mix(in srgb,var(--nav-active2,#A4824C) 8%,transparent));}
-  .sey-bottomnav-item{position:relative;min-width:0;min-height:50px;padding:3px 1px 2px;border:0;border-radius:17px;background:transparent;color:var(--faint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:color .22s ease,transform .2s var(--ease-premium,cubic-bezier(.16,1,.3,1)),background .24s ease;}
+  .sey-bottomnav-item{position:relative;min-width:0;width:100%;height:53px;min-height:53px;padding:3px 1px 2px;border:0;border-radius:17px;background:transparent;color:var(--faint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:color .22s ease,transform .2s var(--ease-premium,cubic-bezier(.16,1,.3,1)),background .24s ease;}
   .sey-bottomnav-item::before{content:"";position:absolute;inset:1px 0;border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--nav-item-accent,#3A4048) 22%,transparent),color-mix(in srgb,var(--nav-item-accent2,#A4824C) 14%,transparent));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.52),inset 0 -1px 0 color-mix(in srgb,var(--nav-item-accent,#3A4048) 14%,transparent),0 8px 18px color-mix(in srgb,var(--nav-item-accent,#3A4048) 18%,transparent);opacity:0;transform:scale(.9);transition:opacity .26s ease,transform .34s cubic-bezier(.16,1,.3,1);}
   .sey-bottomnav-item.is-active{color:color-mix(in srgb,var(--nav-item-accent,#3A4048) 88%,var(--text));}
   .sey-bottomnav-item.is-active::before{opacity:1;transform:scale(1);}
@@ -106,7 +109,7 @@
   .sey-bottomnav-item.is-saygi .sey-bottomnav-label{color:color-mix(in srgb,var(--nav-item-accent,#826936) 84%,var(--text));font-weight:900;letter-spacing:.2px;}
   .sey-bottomnav-item.is-saygi .sey-bottomnav-indicator{top:3px;background:linear-gradient(90deg,#F4D782,#B98E42);box-shadow:0 1px 7px rgba(244,215,130,.5);}
   .sey-bottomnav-item.is-saygi.is-active::before{background:linear-gradient(135deg,color-mix(in srgb,var(--nav-item-accent,#826936) 22%,transparent),color-mix(in srgb,var(--nav-item-accent2,#36454B) 16%,transparent));}
-  @media (max-width:370px){.sey-bottomnav{padding-left:6px;padding-right:6px;}.sey-bottomnav-surface{gap:0;padding:5px 3px;border-radius:21px;}.sey-bottomnav-item{min-height:49px;}.sey-bottomnav-icon{width:32px;}.sey-bottomnav-label{font-size:8.1px;letter-spacing:0;}.sey-bottomnav-glyph svg{width:18px;height:18px;}.sey-bottomnav-item.is-saygi .sey-bottomnav-icon{width:34px;height:32px;}.sey-bottomnav-item.is-saygi .sey-bottomnav-glyph svg{width:19px;height:19px;}}
+  @media (max-width:370px){.sey-bottomnav{padding-left:6px;padding-right:6px;}.sey-bottomnav-surface{gap:0;padding:5px 3px;border-radius:21px;}.sey-bottomnav-item{height:53px;min-height:53px;}.sey-bottomnav-icon{width:32px;}.sey-bottomnav-label{font-size:8.1px;letter-spacing:0;}.sey-bottomnav-glyph svg{width:18px;height:18px;}.sey-bottomnav-item.is-saygi .sey-bottomnav-icon{width:34px;height:32px;}.sey-bottomnav-item.is-saygi .sey-bottomnav-glyph svg{width:19px;height:19px;}}
   @media (prefers-reduced-motion: reduce){.sey-bottomnav-item,.sey-bottomnav-item::before,.sey-bottomnav-glyph,.sey-bottomnav-indicator{transition:none!important;}}
   /* ── Saygı · bilgiye ve emeğe ayrılmış günlük okuma merkezi ── */
   @keyframes saygiLoadingGlow{0%,100%{opacity:.42;transform:translateX(-14%);}50%{opacity:.9;transform:translateX(12%);}}
@@ -205,29 +208,27 @@
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
   }
   #root[data-theme="dark"]{
-    --page:linear-gradient(170deg,#16121A 0%,#201724 48%,#191525 100%);
-    --card:rgba(60,50,62,0.55); --card-bd:rgba(255,255,255,0.10);
-    --text:#F3E9ED; --text2:#D9CACF; --muted:#B4A4AA; --faint:#8C7E86;
-    --choc:#F1CFA6; --accent:#F2A8C2;
-    --field:rgba(255,255,255,0.06); --field-bd:rgba(255,255,255,0.13);
-    --nav:rgba(28,21,30,0.9); --modal:#201724; --icon:rgba(255,255,255,0.07);
-    --chatbar:rgba(32,23,36,0.42);
-    /* Okuma & İzleme hub accent'leri (koyu tema — daha parlak) */
-    --read:#C3ABF5; --read-bg:rgba(167,139,250,0.22);
-    --watch:#ECB169; --watch-bg:rgba(236,177,105,0.20);
-    --listen:#5FD3DE; --listen-bg:rgba(95,211,222,0.20);
-    --learn:#F2A8C2; --learn-bg:rgba(242,168,194,0.20);
-    --ok:#7BD389; --ok-bg:rgba(123,211,137,0.20);
-    --drop:#E0A264; --drop-bg:rgba(224,162,100,0.20);
-    --pause:#B9A6E6; --pause-bg:rgba(185,166,230,0.20);
-    --warn:#FF6B6B; --warn-glow:rgba(255,107,107,0.55);
-    /* Günışığı (marka) teması — koyu tema, daha sıcak parıltı */
-    --sun:#FFC15E; --sun2:#FF9D57; --sun-glow:rgba(255,180,95,0.30);
-    /* Şeyma & Raşit'in Terapi Odası — koyu temada daha parlak rose-mauve + altın parıltı */
-    --room:#E6A6C0; --room2:#F1C6DC; --room-glow:rgba(230,166,192,0.28); --room-bg:rgba(241,198,220,0.16);
-    /* ÆON chat — koyu temada daha parlak altın + kullanıcı balonu */
-    --aeon:#F0CB6E; --aeon2:#F3D77A; --aeon-bg:rgba(240,203,110,0.18); --aeon-glow:rgba(243,215,122,0.5);
-    --user-bubble:#9B85D9; --user-bubble2:#B39DE8;
+    /* Gerçek siyah zemin + yüksek kontrastlı, nötr yüzeyler. */
+    --page:#000000;
+    --card:rgba(17,17,20,0.96); --card-bd:rgba(255,255,255,0.17);
+    --text:#F8F8FA; --text2:#D8D8DE; --muted:#AFAFB9; --faint:#858590;
+    --choc:#FFD9AA; --accent:#FFB1CF;
+    --field:#0B0B0E; --field-bd:rgba(255,255,255,0.20);
+    --nav:rgba(5,5,7,0.97); --modal:#070709; --icon:#18181D;
+    --chatbar:rgba(0,0,0,0.94);
+    /* Vurgular parlak kalır; renkli yüzey ve halo yoğunluğu düşer. */
+    --read:#CBB8FF; --read-bg:rgba(203,184,255,0.11);
+    --watch:#F0B66E; --watch-bg:rgba(240,182,110,0.11);
+    --listen:#66D9E3; --listen-bg:rgba(102,217,227,0.10);
+    --learn:#FFB1CF; --learn-bg:rgba(255,177,207,0.10);
+    --ok:#82D990; --ok-bg:rgba(130,217,144,0.10);
+    --drop:#E8A96B; --drop-bg:rgba(232,169,107,0.10);
+    --pause:#C2AFE8; --pause-bg:rgba(194,175,232,0.10);
+    --warn:#FF7378; --warn-glow:rgba(255,115,120,0.16);
+    --sun:#FFC768; --sun2:#FFA064; --sun-glow:rgba(255,190,100,0.09);
+    --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
+    --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
+    --user-bubble:#715DA8; --user-bubble2:#8872BD;
   }
   .glass{background:var(--card);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--card-bd);}
   /* Açılır kartlar: iOS 26 liquid-glass — açık/kapalı hâl arası yumuşak geçiş, hafif renk çerçeve */
@@ -260,3 +261,27 @@
     ::view-transition-old(sey-content),::view-transition-new(sey-content){animation:none;}
     .sey-page-in>[data-scroll].scroll{animation:none;}
   }
+  /* Koyu tema: renkli dış haleler yerine net sınırlar ve gerçek siyah derinlik. */
+  #root[data-theme="dark"] .glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none!important;}
+  #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 8px 18px rgba(0,0,0,.52),inset 0 -1px 0 rgba(255,255,255,.04);}
+  #root[data-theme="dark"] .sey-appheader::before,#root[data-theme="dark"] .sey-appheader::after{display:none;}
+  #root[data-theme="dark"] .sey-appheader.is-scrolled{box-shadow:0 6px 14px rgba(0,0,0,.48);}
+  #root[data-theme="dark"] .sey-wordmark{background:linear-gradient(110deg,#FFFFFF 0%,#F5C9DA 42%,#EBD18E 64%,#FFFFFF 100%);background-size:240% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:none;}
+  #root[data-theme="dark"] .sey-header-brand .sey-wordmark-flam{filter:none;}
+  #root[data-theme="dark"] .sey-bottomnav{background:linear-gradient(180deg,transparent,#000 38%);}
+  #root[data-theme="dark"] .sey-bottomnav::before{opacity:.45;}
+  #root[data-theme="dark"] .sey-bottomnav-surface{background:#060607;border-color:rgba(255,255,255,.16);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 10px 22px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.05);}
+  #root[data-theme="dark"] .sey-bottomnav-surface::before,#root[data-theme="dark"] .sey-bottomnav-surface::after{display:none;}
+  #root[data-theme="dark"] .sey-bottomnav-item::before{box-shadow:none;}
+  #root[data-theme="dark"] .sey-bottomnav-item.is-active .sey-bottomnav-glyph{filter:none;}
+  #root[data-theme="dark"] .sey-bottomnav-indicator,#root[data-theme="dark"] .sey-bottomnav-badge,#root[data-theme="dark"] .sey-bottomnav-item.is-saygi .sey-bottomnav-icon{box-shadow:none;}
+  #root[data-theme="dark"] .sey-room-card{animation:none;box-shadow:none!important;}
+  #root[data-theme="dark"] .sey-room-title{filter:none;}
+  #root[data-theme="dark"] .sey-ccard[data-open="1"]>.sey-ccard-sheen{opacity:.38;}
+  #root[data-theme="dark"] .wxcard:hover{box-shadow:none;}
+  #root[data-theme="dark"] .msg-bubble.out,#root[data-theme="dark"] .msg-bubble.in{box-shadow:none;}
+  #root[data-theme="dark"] .aeon-scrollfab{box-shadow:0 5px 12px rgba(0,0,0,.55);}
+  #root[data-theme="dark"] .aeon-scrollfab .fab-count{box-shadow:none;}
+  #root[data-theme="dark"] .sey-chat-sectionhead,#root[data-theme="dark"] .sey-chat-sectionhead .section-icon{box-shadow:none;}
+  #root[data-theme="dark"] .saygi-page{--saygi-gold:#D9BA73;--saygi-gold2:#F0D38C;--saygi-ink:#A8C3C7;}
+  #root[data-theme="dark"] .saygi-intro,#root[data-theme="dark"] .saygi-hero,#root[data-theme="dark"] .saygi-hero-media,#root[data-theme="dark"] .saygi-biography,#root[data-theme="dark"] .saygi-read-button,#root[data-theme="dark"] .saygi-loading-mark{box-shadow:none;}

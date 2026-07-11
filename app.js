@@ -1,6 +1,16 @@
 (function(){
 "use strict";
 var KEY='seyma-reset-v1', TKEY='seyma-theme';
+// Saygı + Terapi Odası (İçsel Pusula), 2026-07-13 09:00 TR saatiyle (UTC+3, sabit
+// offset — cihazın kendi saat dilimi ayarından bağımsız) aktif olur. data.startDate
+// / kullanıcının kaç gündür uygulamayı kullandığı bu anı HİÇ etkilemez: ikisi de
+// kilit açılana kadar "yakında" durumunda kalır, data.motivation kilit açılana
+// kadar hiçbir koşulda oluşturulmaz (bkz. ensureMotivationRoot çağrı noktaları).
+// Dosyanın en başında tanımlı — boot sırasında (data yüklenir yüklenmez) bile
+// doğru değerlendirilsin diye (var hoisting nedeniyle daha aşağıda tanımlansaydı
+// ilk boot çağrısında henüz atanmamış/undefined olurdu).
+var FEATURE_GATE_TS=new Date('2026-07-13T09:00:00+03:00').getTime();
+function featuresLive(){ return Date.now()>=FEATURE_GATE_TS; }
 
 var ICONS={
   'graduation-cap':'<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />',
@@ -73,6 +83,9 @@ var ICONS={
   'lamp':'<path d="M12 12v6" /><path d="M4.077 10.615A1 1 0 0 0 5 12h14a1 1 0 0 0 .923-1.385l-3.077-7.384A2 2 0 0 0 15 2H9a2 2 0 0 0-1.846 1.23Z" /><path d="M8 20a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z" />',
   'leaf':'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />',
   'lock':'<rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />',
+  'flask':'<path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2" /><path d="M8.5 2h7" /><path d="M9.5 16h5" />',
+  'info':'<circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />',
+  'ruler':'<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" /><path d="m14.5 12.5 2-2" /><path d="m11.5 9.5 2-2" /><path d="m8.5 6.5 2-2" /><path d="m17.5 15.5 2-2" />',
   'map-pin':'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" />',
   'microscope':'<path d="M6 18h8" /><path d="M3 22h18" /><path d="M14 22a7 7 0 1 0 0-14h-1" /><path d="M9 14h2" /><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" /><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />',
   'map':'<path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /><path d="M15 5.764v15" /><path d="M9 3.236v15" />',
@@ -113,6 +126,7 @@ var ICONS={
   'wind':'<path d="M12.8 19.6A2 2 0 1 0 14 16H2" /><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" /><path d="M9.8 4.4A2 2 0 1 1 11 8H2" />',
   'x':'<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
   'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />',
+  'paperclip':'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />',
 };
 // SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
 // size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
@@ -534,7 +548,7 @@ var PHASES={
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
-if(window.MotivationProgramV2 && data) window.MotivationProgramV2.ensureMotivationRoot(data);
+if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
 function migrate(d){
   if(!d) return d;
   if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true};
@@ -582,13 +596,23 @@ function migrate(d){
   if(!Array.isArray(d.music.items)) d.music.items=[];
   if(!d.music.goal||typeof d.music.goal!=='object') d.music.goal={dailyMinutes:30,yearlyTitles:null};
   d.music.items=d.music.items.map(normTrack).filter(Boolean);
+  // Vücut ölçüleri (haftalık kilo + tek-seferlik boy). Yeni alan — eski kayıtlara backfill.
+  if(!d.body||typeof d.body!=='object') d.body={heightCm:null,heightSetAt:null,weights:[]};
+  if(typeof d.body.heightCm!=='number'||isNaN(d.body.heightCm)) d.body.heightCm=null;
+  if(typeof d.body.heightSetAt!=='string') d.body.heightSetAt=(d.body.heightSetAt||null)&&String(d.body.heightSetAt);
+  if(d.body.heightSetAt===undefined) d.body.heightSetAt=null;
+  if(!Array.isArray(d.body.weights)) d.body.weights=[];
+  d.body.weights=d.body.weights.filter(function(w){ return w&&typeof w==='object'&&w.ts&&typeof w.kg==='number'&&!isNaN(w.kg); });
+  // Kan/idrar tahlilleri (opsiyonel, panele iletilir). Medya data/aeon-media/<id>.json'da.
+  if(!Array.isArray(d.labResults)) d.labResults=[];
+  d.labResults=d.labResults.filter(function(x){ return x&&typeof x==='object'&&x.id&&Array.isArray(x.files); });
   // Veri-güdümlü tikleri bugüne göre bir kez hizala (geçmiş günlere dokunma — kayıt bütünlüğü).
   try{ var _t=todayStr(); if(d.days&&d.days[_t]&&d.days[_t].habits) syncDerivedHabits(d.days[_t]); }catch(e){}
   d.version=2;
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:true, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
 var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -599,8 +623,21 @@ var lastRoomOpen=false;    // Terapi Odasi zaten aciksa etkilesim render'inda gi
 var aeonLastSeenSort=null; // ÆON: son render'da görünen en yeni mesajın sort anahtarı — yalnızca YENİ mesaja giriş animasyonu oynatmak için
 var aeonLastRenderedDateStr=null; // ÆON: son gösterilen mesajın gün-etiketi — hızlı ekleme (appendAeonOutgoing) sırasında yeni gün ayırıcı gerekip gerekmediğini anlamak için
 var AEON_PAGE_SIZE=40; // ÆON: geçmiş çok uzadığında her tam render'da yalnızca son N öğeyi kur — "Daha eski mesajlar" ile tamamı açılabilir
-var fieldTimers={};
-function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimers[k]=setTimeout(fn,ms||450); }
+var AEON_FILE_ACCEPT='.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.csv,.zip,application/pdf';
+var fieldTimers={}, fieldTimerFns={};
+function debounceSave(k,fn,ms){ clearTimeout(fieldTimers[k]); fieldTimerFns[k]=fn; fieldTimers[k]=setTimeout(function(){ delete fieldTimerFns[k]; fn(); },ms||450); }
+// Sekme kapanırken/arka plana alınırken bekleyen (henüz süresi dolmamış) debounce'lı
+// alan kayıtlarını hemen uygular — aksi halde son 300-500ms içindeki tek bir düzenleme
+// (niyet, sayfa no, ilaç notu vb.) hem localStorage'a hem seyma-data'ya hiç yazılmadan
+// kaybolabilirdi. finalizeSession() (beforeunload/pagehide/sekme-gizlenme) çağırır.
+function flushFieldTimers(){
+  var keys=Object.keys(fieldTimerFns);
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i], fn=fieldTimerFns[k];
+    clearTimeout(fieldTimers[k]); delete fieldTimers[k]; delete fieldTimerFns[k];
+    try{ fn(); }catch(e){}
+  }
+}
 
 // ---------- helpers ----------
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -728,7 +765,7 @@ function emptyReading(){ return {entries:[]}; }
 // Wikipedia içeriği ağdan her gün yalnızca bir kişi için alınır; uzun metin kişisel
 // senkrona değil, cihazın localStorage önbelleğine yazılır. Böylece veri hafif,
 // kaynak güncel ve CC BY-SA atfı içerikle birlikte kalır.
-var SAYGI_EPOCH='2026-07-10', SAYGI_CACHE_PREFIX='seyma-saygi-v1:', saygiMemoryCache={}, saygiReadObserver=null;
+var SAYGI_EPOCH='2026-07-13', SAYGI_CACHE_PREFIX='seyma-saygi-v1:', saygiMemoryCache={}, saygiReadObserver=null;
 function emptySaygi(){ return {personId:null,readAt:null,readingEntryId:null}; }
 function ensureSaygiDay(day){
   if(!day||typeof day!=='object') return emptySaygi();
@@ -1040,6 +1077,8 @@ function collapsibleCardHTML(o){
   h+='</div>';
   return h;
 }
+// Sağlık bölümü başlığında glance-edilen metrik rozeti (iOS-27: kapalıyken bile değer görünür).
+function hBadge(txt,col){ col=col||'var(--muted)'; return '<span style="font-size:11px;font-weight:800;color:'+col+';background:color-mix(in srgb,'+col+' 13%, var(--card));border:1px solid color-mix(in srgb,'+col+' 28%, var(--card-bd));border-radius:999px;padding:3px 9px;white-space:nowrap;">'+txt+'</span>'; }
 // ---- geçmiş gün düzenleme: tarih etiketi + kalıcı uyarı şeridi ----
 function dateLabelTR(s){ if(!s) return ''; var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); var mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']; var wd=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']; return p[2]+' '+mo[p[1]-1]+' '+wd[dt.getDay()]; }
 function editBanner(){
@@ -1091,7 +1130,15 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.start=function(){ var t=todayStr(),nowIso=new Date().toISOString(); data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic()}; if(window.MotivationProgramV2) window.MotivationProgramV2.ensureMotivationRoot(data); ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); };
+App.start=function(){
+  // Her yüklemede karşılama ekranı açılır; mevcut kayıt varsa bu yalnızca bir ekran kapısıdır.
+  // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.
+  if(data){ ui.forceStart=false; ui.tab='bugun'; render(); return; }
+  var t=todayStr(),nowIso=new Date().toISOString();
+  data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
+  ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım');
+};
 App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
 App.refreshSaygi=function(){ var person=saygiCurrentPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
 App.openSaygiReading=function(){ App.openReading(); };
@@ -1436,8 +1483,7 @@ App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 // ── Kriz odaları (modal): Tatlı · Yemek · Kahve ──
-App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); clearInterval(crisisInterval); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=CRISES[kind].secs; ui.crisisTiming=false; ui.crisisDone=false; ui.crisisTriedOpen=false; ui.crisisTrigOpen=false; lastCrisisKind=null; render(); };
-App.toggleCrisisSection=function(which){ if(which==='tried') ui.crisisTriedOpen=!ui.crisisTriedOpen; else ui.crisisTrigOpen=!ui.crisisTrigOpen; haptic(8); render(); };
+App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); clearInterval(crisisInterval); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=CRISES[kind].secs; ui.crisisTiming=false; ui.crisisDone=false; lastCrisisKind=null; render(); };
 App.closeCrisis=function(){ clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisKind=null; render(); };
 App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); };
 App.toggleCrisisTrigger=function(id){ var i=ui.crisisTriggers.indexOf(id); if(i>=0) ui.crisisTriggers.splice(i,1); else ui.crisisTriggers.push(id); render(); };
@@ -1445,7 +1491,7 @@ App.onCrisisNote=function(el){ ui.crisisNote=String(el.value||'').slice(0,200); 
 App.startCrisisTimer=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; clearInterval(crisisInterval); ui.crisisTiming=true; ui.crisisLeft=C.secs; render(); crisisInterval=setInterval(function(){ ui.crisisLeft--; if(ui.crisisLeft<=0){ clearInterval(crisisInterval); ui.crisisLeft=0; ui.crisisTiming=false; var CC=CRISES[ui.crisisKind]; var d=getDay(data,todayStr(),dayIndexFor(todayStr())); if(CC) d[CC.doneField]=true; syncDerivedHabits(d); d.savedAt=new Date().toISOString(); save(); render(); haptic([16,40,16]); if(CC) toast(CC.doneToast,3000); } else { updateCrisisTimer(); } },1000); };
 function updateCrisisTimer(){ var el=document.getElementById('crisis-clock'); if(el){ el.textContent=pad(Math.floor(ui.crisisLeft/60))+':'+pad(ui.crisisLeft%60); } }
 App.completeCrisis=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day[C.doneField]=true; if(!Array.isArray(day.cravingOptionsUsed)) day.cravingOptionsUsed=[]; ui.crisisOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); if(!Array.isArray(day.cravingTriggers)) day.cravingTriggers=[]; var nowIso=new Date().toISOString(); ui.crisisTriggers.forEach(function(tg){ day.cravingTriggers.push({trigger:tg,ts:nowIso,kind:C.key}); }); var tn=String(ui.crisisNote||'').trim().slice(0,200); if(tn) day.cravingTriggerNote=tn; syncDerivedHabits(day); day.savedAt=nowIso; clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisDone=true; commit('Krizi yönettin'); };
-App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; clearInterval(crisisInterval); ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=C?C.secs:600; ui.crisisTiming=false; ui.crisisDone=false; ui.crisisTriedOpen=false; ui.crisisTrigOpen=false; render(); };
+App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; clearInterval(crisisInterval); ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=C?C.secs:600; ui.crisisTiming=false; ui.crisisDone=false; render(); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
@@ -1666,6 +1712,7 @@ function updateMotivationCard(){
 // Tam ekran Terapi Odası: dokununca animasyonlu açılır, kapanınca animasyonlu
 // İçsel Pusula kartına döner.
 App.openRoom=function(){
+  if(!featuresLive()){ toast('İçsel Pusula 13 Temmuz\'da açılıyor'); return; }
   ui.roomOpen=true; ui.motivationMinimumOpen=false;
   // Kaydedilmiş günü düzenleyebilmek için: bugünün kaydı varsa yansımayı input'a getir.
   var M=window.MotivationProgramV2, stt=M?M.dayState(data,activeDate()):null;
@@ -1827,7 +1874,9 @@ function render(){
     if(_painted) return; _painted=true;
     app.classList.remove('sey-page-in');
   var html=appHeaderHTML(); // başlangıç ekranı hariç her sekmenin en üstünde sabit marka başlığı
-  html+='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:14px 16px 28px;display:flex;flex-direction:column;gap:14px;">';
+  // Flex içinde min-height:0 kritik: özellikle uzun Sağlık sayfasında içerik alanı
+  // kabuğu büyütmek yerine kendi içinde kayar; sticky alt nav yerinden oynamaz.
+  html+='<div data-scroll class="scroll sey-main-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px 28px;display:flex;flex-direction:column;gap:14px;">';
   if(editing()) html+=editBanner();
   if(ui.tab==='bugun') html+=bugunHTML();
   else if(ui.tab==='saglik') html+=saglikHTML();
@@ -1914,7 +1963,8 @@ function render(){
     var crCard=document.getElementById('sey-crisis-card');
     if(crBack) crBack.style.animation='none';
     if(crCard){ crCard.style.animation='none'; try{ var cin=crCard.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]'); for(var _c=0;_c<cin.length;_c++){ cin[_c].style.animation='none'; } }catch(e){} }
-    var crBody=document.getElementById('sey-crisis-body'); if(crBody) crBody.scrollTop=prevCrisisTop;
+    var crBody=document.getElementById('sey-crisis-body');
+    if(crBody){ crBody.scrollTop=prevCrisisTop; } // etkileşimde scroll konumunu koru → flash yok
   }
   lastCrisisKind=ui.crisisKind;
   // Sabit marka başlığı: giriş animasyonunu yalnızca ilk görünümde oynat (her render'da tekrar etmesin).
@@ -1937,32 +1987,97 @@ function render(){
 }
 
 function onboardingHTML(){
-  // v2.0 küçük geliştirme notları — dikkat çekmesin diye faint, minik satırlar.
-  var v2=[
-    [icon('compass',13),'İçsel Pusula, dokununca Terapi Odası’na dönüşüyor'],
-    [icon('flower-2',13),'Sağlık & ruh hâli takibi daha bilimsel, daha premium'],
-    [icon('sparkles',13),'Baştan sona yenilenmiş, yumuşak yeni tasarım']
+  // v2.0 boot screen: dark → mevcut super-black, light → sıcak "delight" karşılığı.
+  // Yalnızca onboarding tema-duyarlıdır; uygulamanın geri kalan tema sistemi değişmez.
+  var MONO="'SF Mono',ui-monospace,'JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace";
+  var P=dark?{
+    mode:'super-black',page:'radial-gradient(125% 85% at 50% -5%,#12121B 0%,#0A0A0F 46%,#060608 100%)',text:'#E8E8EE',grid:'rgba(255,255,255,0.028)',strip:'#54545F',
+    topGlow:'rgba(230,193,90,0.15)',sideGlow:'rgba(233,137,159,0.16)',themeBg:'rgba(255,255,255,0.045)',themeBd:'rgba(255,255,255,0.10)',themeText:'#A2A2AD',
+    wordGrad:'linear-gradient(110deg,#FBE7CB,#F4B9CE 42%,#D9C2FF 66%,#FBE7CB)',wordShadow:'drop-shadow(0 2px 16px rgba(230,193,90,0.32))',
+    superGrad:'linear-gradient(110deg,#B6B6C1,#F3F3F8 38%,#7E7E8B 60%,#D4D4DD)',superShadow:'drop-shadow(0 1px 2px rgba(0,0,0,0.6)) drop-shadow(0 0 15px rgba(200,205,222,0.20))',metal:'rgba(210,210,220,0.5)',tag:'#8A8A95',
+    panelBd:'rgba(255,255,255,0.09)',panelBg:'linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.012))',panelShadow:'0 24px 56px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06)',titleBg:'rgba(255,255,255,0.02)',titleBd:'rgba(255,255,255,0.07)',titleText:'#7C7C88',desc:'#777782',
+    dash:'rgba(255,255,255,0.07)',specLabel:'#5F5F69',specVal:'#A2A2AD',status:'#5E5E68',statusSep:'#33333B',aeonBg:'linear-gradient(180deg,rgba(255,255,255,0.045),transparent)',aeonBd:'rgba(255,255,255,0.08)',aeonWord:'#F7F7FA',aeonSub:'#8B8B96',privacy:'#5A5A65'
+  }:{
+    mode:'delight',page:'radial-gradient(125% 88% at 50% -5%,#FFFFFF 0%,#FFF8F1 48%,#F4EEFF 100%)',text:'#2B2630',grid:'rgba(84,66,92,0.050)',strip:'#817783',
+    topGlow:'rgba(246,193,119,0.30)',sideGlow:'rgba(233,137,159,0.20)',themeBg:'rgba(255,255,255,0.72)',themeBd:'rgba(91,72,98,0.14)',themeText:'#5F5662',
+    wordGrad:'linear-gradient(110deg,#6D4652,#B76683 42%,#7864A6 68%,#6D4652)',wordShadow:'drop-shadow(0 2px 10px rgba(183,102,131,0.16))',
+    superGrad:'linear-gradient(110deg,#28252C,#625D68 40%,#3B3741 66%,#28252C)',superShadow:'drop-shadow(0 1px 0 rgba(255,255,255,0.85))',metal:'rgba(81,73,86,0.34)',tag:'#766D78',
+    panelBd:'rgba(91,72,98,0.14)',panelBg:'linear-gradient(180deg,rgba(255,255,255,0.90),rgba(255,250,247,0.76))',panelShadow:'0 24px 56px rgba(91,65,78,0.14),inset 0 1px 0 rgba(255,255,255,0.95)',titleBg:'rgba(92,72,99,0.035)',titleBd:'rgba(91,72,98,0.10)',titleText:'#756B77',desc:'#766D78',
+    dash:'rgba(91,72,98,0.12)',specLabel:'#918792',specVal:'#49424C',status:'#756C77',statusSep:'#C9C0CA',aeonBg:'linear-gradient(180deg,rgba(255,255,255,0.60),rgba(246,238,255,0.34))',aeonBd:'rgba(91,72,98,0.11)',aeonWord:'#29252D',aeonSub:'#6F6672',privacy:'#716873'
+  };
+  // modüller — boot-log satırları (ad · açıklama · accent)
+  var mods=[
+    ['#E9899F','icsel_pusula','duygu takibi · notlar · içgörü'],
+    ['#7BA7D0','saglik.sys','uyku · su · kafein · döngü'],
+    ['#E0A93C','kriz_odasi','10 dk erteleme · güvenli çıkış'],
+    ['#9B7FC9','motivasyon','120 gün · görev · günlük yansıma'],
+    ['#E6C15A','aeon.link','mesaj · ses · fotoğraf · gözlemci'],
+    ['#6E9C6A','medya.log','kitap · film/dizi · müzik günlüğü']
   ];
-  var h='<div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;padding:calc(env(safe-area-inset-top) + 30px) 22px calc(env(safe-area-inset-bottom) + 26px);gap:20px;animation:seyFade .35s ease;overflow:hidden;">';
-  h+='<div style="position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:min(440px,124%);height:340px;background:radial-gradient(60% 60% at 50% 38%,rgba(233,175,193,0.30),transparent 70%);pointer-events:none;"></div>';
-  // hero — flamingo korunur, iOS 27 liquid-glass rozet
-  h+='<div style="position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;">';
-  h+='<div style="position:relative;width:96px;height:96px;border-radius:30px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFE8A3,#F7DDE5 55%,#E9CBFF);box-shadow:0 20px 44px rgba(233,175,193,0.45),inset 0 1px 0 rgba(255,255,255,0.6);overflow:hidden;animation:seyPop .5s var(--ease-premium,ease) both;">';
-  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>';
-  h+='<span style="position:relative;font-size:52px;line-height:1;filter:drop-shadow(0 6px 12px rgba(190,108,139,0.35));">🦩</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;animation:seyFloatIn .5s .06s ease both;"><h1 style="margin:0;font-size:36px;font-weight:800;letter-spacing:-0.6px;">Şeyma</h1><span style="font-size:11.5px;font-weight:800;letter-spacing:.6px;color:var(--faint);border:1px solid var(--card-bd);border-radius:999px;padding:3px 9px;opacity:.75;">v2.0</span></div>';
-  h+='<div style="font-size:15.5px;color:var(--muted);animation:seyFloatIn .5s .1s ease both;">Minik Denge Günlüğü</div></div>';
-  // hoş geldin kartı
-  h+='<div class="glass" style="position:relative;border-radius:28px;padding:22px;box-shadow:0 16px 40px rgba(108,74,58,0.10),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;flex-direction:column;gap:13px;animation:seyFloatIn .5s .14s ease both;">';
-  h+='<p style="margin:0;font-size:19px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:7px;">Hoş geldin Sevgili Günışığı <span style="display:inline-flex;color:var(--room);">'+icon('heart',16)+'</span></p>';
-  h+='<p style="margin:0;font-size:15px;line-height:1.62;color:var(--text2);">Burası diyet kampı değil. Tatlı krizlerinin hafifçe hizaya geldiği, akşam mutfağının biraz daha az ziyaret edildiği, senin de kendine daha iyi davrandığın minik bir alan.</p>';
-  h+='<p style="margin:0;font-size:15px;line-height:1.62;color:var(--text2);">Mükemmel olmaya çalışmıyoruz. Her gün küçük küçük kontrolü geri alıyoruz — süresiz, kendi ritminde.</p>';
-  h+='<div style="margin-top:3px;border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:7px;">';
-  v2.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--faint);line-height:1.35;"><span style="display:inline-flex;flex-shrink:0;opacity:.7;">'+r[0]+'</span><span>'+r[1]+'</span></div>'; });
-  h+='</div></div>';
-  // başla
-  h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:18px;border-radius:22px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 16px 32px rgba(233,175,193,0.5);display:flex;align-items:center;justify-content:center;gap:7px;animation:seyFloatIn .5s .2s ease both;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.4) 50%,transparent 65%);animation:seyShine 4s ease-in-out infinite;"></span><span style="position:relative;display:inline-flex;align-items:center;gap:7px;">Tamam Raşit, başlayalım '+icon('sparkles',15)+'</span></button>';
-  h+='<p style="margin:0;text-align:center;font-size:12px;line-height:1.5;color:var(--faint);animation:seyFloatIn .5s .24s ease both;">Bilgiler sadece bu cihazdaki tarayıcıda tutulur. İstersen yedek dosyası olarak dışa aktarabilirsin.</p>';
+  var h='<div data-onboarding-theme="'+(dark?'dark':'light')+'" style="position:relative;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;font-family:'+MONO+';color:'+P.text+';background:'+P.page+';padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 16px);animation:seyFade .45s ease;">';
+  // ── iOS-27 ambient: teknik grid (kenarlarda sönümlenir) + sıcak glow'lar ──
+  h+='<div style="position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient('+P.grid+' 1px,transparent 1px),linear-gradient(90deg,'+P.grid+' 1px,transparent 1px);background-size:27px 27px;-webkit-mask-image:radial-gradient(130% 92% at 50% 16%,#000 38%,transparent 80%);mask-image:radial-gradient(130% 92% at 50% 16%,#000 38%,transparent 80%);"></div>';
+  h+='<div style="position:absolute;top:-9%;left:50%;transform:translateX(-50%);width:min(480px,150%);height:320px;background:radial-gradient(closest-side,'+P.topGlow+',transparent 74%);pointer-events:none;z-index:0;"></div>';
+  h+='<div style="position:absolute;top:20%;right:-16%;width:240px;height:240px;background:radial-gradient(circle,'+P.sideGlow+',transparent 70%);pointer-events:none;z-index:0;"></div>';
+  // ── üst: build strip ──
+  h+='<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;color:'+P.strip+';animation:seyFloatIn .5s ease both;">';
+  h+='<span>SEYMA_OS</span><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#3F9E63;box-shadow:0 0 6px rgba(63,158,99,.42);animation:seyTwinkle 1.6s ease-in-out infinite;"></span>build · aeon</span><button onclick="App.toggleTheme()" aria-label="Başlangıç temasını değiştir" style="border:1px solid '+P.themeBd+';background:'+P.themeBg+';color:'+P.themeText+';border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-family:'+MONO+';font-size:9px;font-weight:800;letter-spacing:.35px;">'+icon(dark?'moon':'sun',11)+' '+P.mode+'</button></span>';
+  h+='</div>';
+  // ── orta blok (dikey ortalı): hero + terminal paneli ──
+  h+='<div style="position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:15px;">';
+  // HERO — Şeyma rozeti (korunur) + imza + "super-black" alt-imza + v2.0 vurgusu
+  h+='<div style="display:flex;flex-direction:column;align-items:center;gap:8px;">';
+  h+='<div style="position:relative;width:90px;height:90px;border-radius:28px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFE8A3,#F7DDE5 52%,#E9CBFF);box-shadow:0 22px 52px rgba(230,193,90,0.28),0 0 0 1px rgba(255,255,255,0.10),inset 0 1.5px 0 rgba(255,255,255,0.7);overflow:hidden;animation:seyPop .6s var(--ease-premium,ease) both;">';
+  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 3.8s ease-in-out infinite;"></span>';
+  h+='<span style="position:relative;font-size:48px;line-height:1;filter:drop-shadow(0 8px 14px rgba(190,108,139,0.4));">🦩</span></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-top:2px;animation:seyFloatIn .5s .06s ease both;"><span class="sey-wordmark" style="font-size:44px;background:'+P.wordGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.wordShadow+';">Şeyma</span><span class="sey-wordmark-flam" style="font-size:26px;">🦩</span></div>';
+  // "super-black" — imza fontunda metalik gümüş alt-imza
+  h+='<div style="display:flex;align-items:center;gap:9px;margin-top:-4px;animation:seyFloatIn .5s .09s ease both;"><span style="width:26px;height:1px;background:linear-gradient(90deg,transparent,'+P.metal+');"></span><span class="sey-wordmark" style="font-size:25px;background:'+P.superGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.superShadow+';">'+P.mode+'</span><span style="width:26px;height:1px;background:linear-gradient(90deg,'+P.metal+',transparent);"></span></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-top:2px;animation:seyFloatIn .5s .12s ease both;"><span style="font-size:12px;letter-spacing:1.5px;color:'+P.tag+';text-transform:uppercase;">minik denge günlüğü</span><span style="font-size:11.5px;font-weight:800;letter-spacing:.5px;color:#140C10;background:linear-gradient(135deg,#F2D98C,#E9AEC6);border-radius:999px;padding:3px 11px;box-shadow:0 6px 18px rgba(230,193,90,0.20);">v2.0</span></div>';
+  h+='</div>';
+  // TERMINAL PANEL — modüller boot-log + ÆON imzası
+  h+='<div style="border:1px solid '+P.panelBd+';border-radius:18px;overflow:hidden;background:'+P.panelBg+';box-shadow:'+P.panelShadow+';animation:seyFloatIn .5s .16s ease both;">';
+  // titlebar
+  h+='<div style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid '+P.titleBd+';background:'+P.titleBg+';">';
+  ['#FF5F57','#FEBC2E','#28C840'].forEach(function(c){ h+='<span style="width:9px;height:9px;border-radius:50%;background:'+c+';box-shadow:0 0 6px '+c+'66;"></span>'; });
+  h+='<span style="margin-left:7px;font-size:11px;color:'+P.titleText+';">seyma — denge.sys</span>';
+  h+='<span style="margin-left:auto;font-size:10px;color:#3F9E63;letter-spacing:.5px;">● ready</span>';
+  h+='</div>';
+  // body: modül satırları
+  h+='<div style="padding:11px 14px;display:flex;flex-direction:column;gap:8px;">';
+  mods.forEach(function(m,i){
+    var delay=(0.24+i*0.05).toFixed(2);
+    h+='<div style="display:grid;grid-template-columns:7px 1fr auto;column-gap:9px;row-gap:2px;align-items:center;animation:seyFloatIn .5s '+delay+'s ease both;">';
+    h+='<span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+m[0]+';box-shadow:0 0 8px '+m[0]+';"></span>';
+    h+='<span style="min-width:0;color:'+m[0]+';font-size:11.5px;line-height:1.2;font-weight:700;">'+m[1]+'</span>';
+    h+='<span style="color:#3F9E63;font-size:10px;">ok</span>';
+    h+='<span style="grid-column:2 / 4;min-width:0;color:'+P.desc+';font-size:10.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m[2]+'</span>';
+    h+='</div>';
+  });
+  h+='</div>';
+  // teknik özet — saklama ve eşlik modelini kısa, açık ve doğru anlatır.
+  h+='<div style="padding:10px 14px 9px;border-top:1px dashed '+P.dash+';display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:10px;animation:seyFloatIn .5s .44s ease both;">';
+  [['günlük','önce bu cihazda'],['yedek','sen bağlarsan GitHub'],['program','120 gün · 4 faz'],['eşlik','Luna + ÆON']].forEach(function(s){
+    h+='<div style="min-width:0;"><div style="color:'+P.specLabel+';margin-bottom:2px;">'+s[0]+'</div><div style="color:'+P.specVal+';line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s[1]+'</div></div>';
+  });
+  h+='</div>';
+  // hazır göstergesi
+  h+='<div style="display:flex;align-items:center;gap:7px;padding:2px 14px 10px;font-size:10px;letter-spacing:.2px;color:'+P.status+';white-space:nowrap;animation:seyFloatIn .5s .48s ease both;"><span style="color:#3F9E63;">▷</span><span>store·local</span><span style="color:'+P.statusSep+';">·</span><span>sync·github</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#3F9E63;flex-shrink:0;">hazır <span style="width:26px;height:4px;border-radius:999px;overflow:hidden;background:'+(dark?'rgba(255,255,255,0.08)':'rgba(91,72,98,0.10)')+';display:inline-block;"><span style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#E6C15A,#E9899F,#9B7FC9);"></span></span> 100%</span></div>';
+  // ÆON imzası — terminali ezmeyen küçük, beyaz ve sakin güven rozeti.
+  h+='<div style="display:flex;align-items:center;gap:12px;padding:12px 14px 13px;border-top:1px solid '+P.aeonBd+';background:'+P.aeonBg+';animation:seyFloatIn .5s .54s ease both;">';
+  h+='<div style="position:relative;width:52px;height:52px;border-radius:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#101017;background:linear-gradient(145deg,#FFFFFF,#E9E9EF);border:1px solid '+(dark?'rgba(255,255,255,0.10)':'rgba(91,72,98,0.12)')+';box-shadow:'+(dark?'0 10px 25px rgba(255,255,255,0.12)':'0 10px 25px rgba(91,65,78,0.14)')+',inset 0 1px 0 #FFFFFF,inset 0 -2px 5px rgba(40,40,55,0.12);overflow:hidden;">';
+  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.9) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;"></span>';
+  h+='<span style="position:relative;display:inline-flex;">'+icon('hexagon',25)+'</span></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-family:-apple-system,system-ui,\'Segoe UI\',sans-serif;font-size:18px;font-weight:850;letter-spacing:3px;color:'+P.aeonWord+';">ÆON</div>';
+  h+='<div style="font-size:10px;letter-spacing:.25px;color:'+P.aeonSub+';line-height:1.45;margin-top:2px;">Paylaştığın kayıtları anlamlandırır; mesaj, ses ve fotoğraflarında güvenilir bir gözlemci eşlik eder.</div></div>';
+  h+='</div>';
+  h+='</div>'; // terminal panel
+  h+='</div>'; // orta blok
+  // ── alt: CTA + gizlilik ──
+  h+='<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:9px;animation:seyFloatIn .5s .56s ease both;">';
+  h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:16px;border-radius:16px;font-family:'+MONO+';font-size:15px;font-weight:800;letter-spacing:.3px;color:#180D14;background:linear-gradient(135deg,#F4DCA0,#E9AEC6 52%,#CBB8FF);box-shadow:0 18px 40px rgba(233,137,159,0.30),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.5) 50%,transparent 65%);animation:seyShine 4.2s ease-in-out infinite;"></span><span style="position:relative;">❯ Tamam Raşit, başlayalım</span></button>';
+  h+='<p style="margin:0;text-align:center;font-size:10px;line-height:1.5;color:'+P.privacy+';">Günlüğün önce bu cihazda saklanır. Yedekleme ancak sen bağlarsan açılır; kontrol her zaman sende kalır. 🔒</p>';
+  h+='</div>';
   h+='</div>';
   return h;
 }
@@ -2642,11 +2757,12 @@ var WX_QUIPS={
 };
 function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
 function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
-function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay); return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:#7A3E1E;line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:900;color:#A85E3C;">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
-function wxLocationPendingChip(label){ return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11px;font-weight:800;color:#A85E3C;line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:0 0 0 3px rgba(199,119,73,.14);"></span></div>'; }
-function wxDetail(icon,label,val){ return '<div style="flex:1;min-width:0;background:rgba(255,255,255,0.45);border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:#A85E3C;font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:#7A3E1E;margin-top:2px;">'+val+'</div></div>'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay),fg=dark?'#FFE1BC':'#7A3E1E',sub=dark?'#D6A57E':'#A85E3C'; return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:900;color:'+sub+';">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxLocationPendingChip(label){ var fg=dark?'#D6A57E':'#A85E3C'; return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11px;font-weight:800;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:'+(dark?'none':'0 0 0 3px rgba(199,119,73,.14)')+';"></span></div>'; }
+function wxDetail(icon,label,val){ var bg=dark?'rgba(255,255,255,0.055)':'rgba(255,255,255,0.45)',lab=dark?'#D6A57E':'#A85E3C',fg=dark?'#FFE1BC':'#7A3E1E'; return '<div style="flex:1;min-width:0;background:'+bg+';border:'+(dark?'1px solid rgba(255,210,160,.09)':'none')+';border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:'+lab+';font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:'+fg+';margin-top:2px;">'+val+'</div></div>'; }
 function weatherHeaderHTML(greet){
   var open=!!ui.weatherOpen;
+  var W=dark?{bg:'linear-gradient(120deg,#15120F,#211815 52%,#22131A)',bd:'rgba(255,199,142,.22)',shadow:'0 14px 30px rgba(0,0,0,.42)',orb1:'rgba(255,199,142,.09)',orb2:'rgba(242,154,184,.07)',icon:'drop-shadow(0 3px 6px rgba(0,0,0,.52))',title:'#FFD2A1',sub:'#D6A57E',chev:'#E0AD82',hint:'rgba(255,220,184,.58)',divider:'rgba(255,210,160,.14)',noteBg:'rgba(255,255,255,.05)',note:'#F0D8BC',foot:'rgba(235,205,174,.48)'}:{bg:'linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7)',bd:'transparent',shadow:'0 12px 28px var(--sun-glow)',orb1:'rgba(255,255,255,0.55)',orb2:'rgba(255,255,255,0.28)',icon:'drop-shadow(0 3px 7px rgba(240,150,70,0.55))',title:'#8A4426',sub:'#A85E3C',chev:'#B5673A',hint:'rgba(122,62,30,0.6)',divider:'rgba(138,68,38,0.16)',noteBg:'rgba(255,255,255,0.42)',note:'#7A3E1E',foot:'rgba(122,62,30,0.55)'};
   var wx=data.weather;
   var spots=(wx&&wx.spots&&wx.spots.length)?wx.spots:null;
   var live=!!(wx&&wx.mode==='live');
@@ -2657,47 +2773,47 @@ function weatherHeaderHTML(greet){
   var primary=null;
   if(spots){ primary=spots[0]; for(var i=1;i<spots.length;i++){ var b=spots[i]; var sv=(b.uv||0)+(b.feels!=null?b.feels:b.temp||0); var ps=(primary.uv||0)+(primary.feels!=null?primary.feels:primary.temp||0); if(sv>ps) primary=b; } }
   var pm=primary?wxMeta(primary.code,primary.isDay):null;
-  var h='<div class="wxcard" onclick="App.toggleWeather()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;overflow:hidden;border-radius:24px;padding:15px 16px;background:linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7);box-shadow:0 12px 28px var(--sun-glow);">';
-  h+='<div style="position:absolute;top:-32px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.55),transparent 70%);pointer-events:none;"></div>';
-  h+='<div style="position:absolute;bottom:-42px;left:30px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.28),transparent 70%);pointer-events:none;"></div>';
+  var h='<div class="wxcard"'+(dark?' data-dark-variant="weather"':'')+' onclick="App.toggleWeather()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;overflow:hidden;border:1px solid '+W.bd+';border-radius:24px;padding:15px 16px;background:'+W.bg+';box-shadow:'+W.shadow+';">';
+  h+='<div style="position:absolute;top:-32px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,'+W.orb1+',transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:absolute;bottom:-42px;left:30px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,'+W.orb2+',transparent 70%);pointer-events:none;"></div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
-  h+='<span style="display:inline-flex;filter:drop-shadow(0 3px 7px rgba(240,150,70,0.55));">'+(pm?pm.emoji:icon('sun',28))+'</span>';
+  h+='<span style="display:inline-flex;filter:'+W.icon+';">'+(pm?pm.emoji:icon('sun',28))+'</span>';
   var sub=greet; if(pm) sub+=' · '+pm.label;
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:900;letter-spacing:0.3px;color:#8A4426;line-height:1.12;">Günışığı</div><div style="font-size:12px;font-weight:700;color:#A85E3C;letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:900;letter-spacing:0.3px;color:'+W.title+';line-height:1.12;">Günışığı</div><div style="font-size:12px;font-weight:700;color:'+W.sub+';letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:9px;flex-shrink:0;">';
   if(spots||locationPending){
     h+='<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;">';
     if(locationPending) h+=wxLocationPendingChip(locationPendingLabel);
     if(spots){ for(var ci=0; ci<Math.min(spots.length,locationPending?2:3); ci++){ h+=wxSpotChip(spots[ci]); } }
     h+='</div>';
-  } else { h+='<div style="font-size:11.5px;font-weight:700;color:#A85E3C;">hava…</div>'; }
-  h+='<span style="color:#B5673A;transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
+  } else { h+='<div style="font-size:11.5px;font-weight:700;color:'+W.sub+';">hava…</div>'; }
+  h+='<span style="color:'+W.chev+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</div></div>';
-  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:rgba(122,62,30,0.6);display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
+  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:'+W.hint+';display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
   if(open && spots){
     h+='<div style="position:relative;margin-top:12px;animation:seyFade .25s ease;">';
     if(locationPending){
-      h+='<div data-wx-location-pending style="display:flex;align-items:center;gap:8px;padding:10px 0 11px;color:#8A4426;font-size:12.5px;font-weight:800;">'+icon('map-pin',17)+' <span>'+esc(locationPendingLabel)+'</span></div>';
+      h+='<div data-wx-location-pending style="display:flex;align-items:center;gap:8px;padding:10px 0 11px;color:'+W.title+';font-size:12.5px;font-weight:800;">'+icon('map-pin',17)+' <span>'+esc(locationPendingLabel)+'</span></div>';
     }
     for(var si=0; si<spots.length; si++){
       var sp=spots[si]; var m=wxMeta(sp.code,sp.isDay);
-      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
+      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;">'+wxSpotIcon(sp,20)+'</span>';
-      h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:900;color:#8A4426;">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:#A85E3C;">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:11.5px;font-weight:700;color:#A85E3C;">'+m.emoji+' '+m.label+'</div></div>';
-      h+='<div style="font-size:22px;font-weight:900;color:#7A3E1E;">'+sp.temp+'°</div></div>';
+      h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:900;color:'+W.title+';">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:'+W.sub+';">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:11.5px;font-weight:700;color:'+W.sub+';">'+m.emoji+' '+m.label+'</div></div>';
+      h+='<div style="font-size:22px;font-weight:900;color:'+(dark?'#FFE1BC':'#7A3E1E')+';">'+sp.temp+'°</div></div>';
       h+='<div style="display:flex;gap:6px;margin-bottom:6px;">'+wxDetail(icon('thermometer',13),'Hissedilen',sp.feels+'°')+wxDetail(icon('droplet',13),'Nem','%'+sp.hum)+wxDetail(icon('wind',13),'Rüzgâr',sp.wind+' km/sa')+'</div>';
       h+='<div style="display:flex;gap:6px;">'+wxDetail(icon('sun',13),'UV',(sp.uv!=null?sp.uv:'—'))+wxDetail(icon('arrow-up-down',13),'En Y/D',(sp.hi!=null?sp.hi+'°/'+sp.lo+'°':'—'))+wxDetail(icon('sunrise',13),'Doğ/Bat',wxHm(sp.sunrise)+'·'+wxHm(sp.sunset))+'</div>';
       h+='</div>';
     }
     if(primary){
       var adv=wxAdvice(primary);
-      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;margin-top:11px;"><div style="font-size:12.5px;font-weight:900;color:#8A4426;margin-bottom:7px;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',13)+' Sağlık notları</div>';
-      for(var ai=0; ai<adv.length; ai++){ h+='<div style="display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,0.42);border-radius:12px;padding:8px 10px;'+(ai>0?'margin-top:6px;':'')+'"><span style="font-size:15px;line-height:1.3;">'+adv[ai].i+'</span><span style="flex:1;font-size:12.5px;font-weight:600;color:#7A3E1E;line-height:1.4;">'+esc(adv[ai].t)+'</span></div>'; }
+      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;"><div style="font-size:12.5px;font-weight:900;color:'+W.title+';margin-bottom:7px;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',13)+' Sağlık notları</div>';
+      for(var ai=0; ai<adv.length; ai++){ h+='<div style="display:flex;gap:8px;align-items:flex-start;background:'+W.noteBg+';border:'+(dark?'1px solid rgba(255,210,160,.08)':'none')+';border-radius:12px;padding:8px 10px;'+(ai>0?'margin-top:6px;':'')+'"><span style="font-size:15px;line-height:1.3;">'+adv[ai].i+'</span><span style="flex:1;font-size:12.5px;font-weight:600;color:'+W.note+';line-height:1.4;">'+esc(adv[ai].t)+'</span></div>'; }
       h+='</div>';
       var q=wxQuip(pm?pm.cat:'clear');
-      h+='<div style="border-top:1px solid rgba(138,68,38,0.16);padding-top:11px;margin-top:11px;font-size:12.5px;font-style:italic;font-weight:600;color:#8A4426;line-height:1.5;">❝ '+esc(q)+' ❞</div>';
+      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;font-size:12.5px;font-style:italic;font-weight:600;color:'+W.title+';line-height:1.5;">❝ '+esc(q)+' ❞</div>';
     }
-    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:10px;color:rgba(122,62,30,0.55);">Open-Meteo · '+us+'</div>'; }
+    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:10px;color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
     h+='</div>';
   }
   h+='</div>';
@@ -2789,9 +2905,23 @@ function motivationQuoteBlockHTML(quote){
 }
 // Kompakt tetikleyici kart: her zaman "İçsel Pusula" formunda. Dokununca tam ekran
 // Terapi Odası açılır (App.openRoom); kapanınca yine animasyonlu İçsel Pusula'ya döner.
+function motivationComingSoonCardHTML(){
+  var pu=dark?'#B7A8F2':'#6E5FCB';
+  var h='<div id="sey-motivation-card" class="glass sey-room-card" aria-label="Terapi Odası yakında açılıyor" style="border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
+  h+='<div style="display:flex;align-items:center;gap:11px;">';
+  h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('clock',19)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:15.5px;font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
+  h+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
+  h+='</div></div>';
+  h+='<div style="font-size:13px;line-height:1.4;color:var(--muted);">13 Temmuz sabahı, <b style="color:var(--text);">1. gün</b>le birlikte açılıyor.</div>';
+  h+='</div>';
+  return h;
+}
 function motivationTodayCardHTML(){
   var M=window.MotivationProgramV2;
   if(!M||!data) return '';
+  if(!featuresLive()) return motivationComingSoonCardHTML();
   var root=M.ensureMotivationRoot(data);
   if(!root) return '';
   var mot=M.activeDay(data);
@@ -2835,6 +2965,7 @@ function roomStatsHTML(sum,fi){
 function roomOverlayHTML(){
   var M=window.MotivationProgramV2;
   if(!M||!data) return '';
+  if(!featuresLive()) return '';
   var root=M.ensureMotivationRoot(data); if(!root) return '';
   var mot=M.activeDay(data); if(!mot) return '';
   var sum=M.progressSummary(data);
@@ -2957,7 +3088,7 @@ App.setMotivationReflection=function(el){
 // yazmadan devam edemez -- buton devre dışı bırakılır, burada da savunma amaçlı tekrar kontrol edilir.
 App.completeMotivationTask=function(status){
   var M=window.MotivationProgramV2;
-  if(!M||!data) return;
+  if(!M||!data||!featuresLive()) return;
   var reflection=String(ui.motivationReflectionDraft||'').trim();
   if(!reflection){ toast('Devam etmeden önce bir cümle yaz — kısa da olsa yeter.'); return; }
   status=(status==='minimum_completed')?'minimum_completed':'completed';
@@ -3003,10 +3134,11 @@ function hubTilesHTML(){
   var cnt=function(sec){ var e=(day&&day[sec]&&Array.isArray(day[sec].entries))?day[sec].entries:[]; return e.length; };
   var tile=function(fn,label,ic,col,bg,n){
     var done=n>0;
-    var badge=done?'<span style="position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+col+';box-shadow:0 2px 6px rgba(108,74,58,0.3);">'+(n>1?n:icon('check',10))+'</span>':'';
-    return '<button onclick="App.'+fn+'()" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 4px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:7px;background:'+bg+';border:1px solid color-mix(in srgb,'+col+' '+(done?'55':'26')+'%, transparent);box-shadow:'+(done?'0 8px 20px color-mix(in srgb,'+col+' 22%, transparent)':'0 4px 12px rgba(108,74,58,0.06)')+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">'
+    var badge=done?'<span style="position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.3)')+';">'+(n>1?n:icon('check',10))+'</span>':'';
+    var surface=dark?'color-mix(in srgb,'+col+' '+(done?'16':'10')+'%, #0B0B0E)':bg;
+    return '<button onclick="App.'+fn+'()" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 4px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:7px;background:'+surface+';border:1px solid color-mix(in srgb,'+col+' '+(done?'52':(dark?'34':'26'))+'%, transparent);box-shadow:'+(dark?'none':(done?'0 8px 20px color-mix(in srgb,'+col+' 22%, transparent)':'0 4px 12px rgba(108,74,58,0.06)'))+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">'
       +badge
-      +'<span style="width:40px;height:40px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 17%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);">'+icon(ic,19)+'</span>'
+      +'<span style="width:40px;height:40px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' '+(dark?'14':'17')+'%, transparent);box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.35)')+';">'+icon(ic,19)+'</span>'
       +'<span style="font-size:11.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+col+';">'+label+'</span></button>';
   };
   var total=cnt('reading')+cnt('watching')+cnt('listening')+cnt('learning');
@@ -3016,9 +3148,9 @@ function hubTilesHTML(){
   var chip=fed
     ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Zihin tiki yeşil</span>'
     : '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,'+mc+' 24%, var(--card-bd));box-shadow:0 12px 30px color-mix(in srgb,'+mc+' 14%, transparent);">';
+  var h='<div class="glass"'+(dark?' data-dark-variant="mind"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#111013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,'+mc+' '+(dark?'34':'24')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px color-mix(in srgb,'+mc+' 14%, transparent)')+';">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
-  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+mc+',#E9AFC1);box-shadow:0 6px 16px color-mix(in srgb,'+mc+' 34%, transparent);">'+icon('sparkles',19)+'</span>';
+  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#8F5269,#6D567E)':'linear-gradient(135deg,'+mc+',#E9AFC1)')+';box-shadow:'+(dark?'none':'0 6px 16px color-mix(in srgb,'+mc+' 34%, transparent)')+';">'+icon('sparkles',19)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · izledim · dinledim · öğrendim — küçük besinler, büyük denge</div></div>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);">BUGÜN '+filledN+'/4 ALAN</span>'+chip+'</div>';
@@ -3149,16 +3281,18 @@ function rasitActionsHTML(){
   var doneOf={sweet:!!(day&&day.craving10MinDone), food:!!(day&&day.foodCravingDone), coffee:!!(day&&day.coffeeCravingDone)};
   var tile=function(kind){
     var C=CRISES[kind]; var done=doneOf[kind];
-    var badge=done?'<span style="position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:'+C.accent+';background:#fff;box-shadow:0 2px 6px rgba(108,74,58,0.3);">'+icon('check',11)+'</span>':'';
-    return '<button onclick="App.openCrisis(\''+kind+'\')" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 6px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff;border:none;background:linear-gradient(135deg,'+C.accent+','+C.accent2+');box-shadow:0 10px 22px color-mix(in srgb,'+C.accent+' 42%, transparent);transition:transform .18s var(--ease-premium,ease);">'
+    var badge=done?'<span style="position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:'+C.accent+';background:'+(dark?'#0B0B0D':'#fff')+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.3)')+';">'+icon('check',11)+'</span>':'';
+    var darkLine=dark?'<span aria-hidden="true" style="position:absolute;top:0;left:12px;right:12px;height:3px;border-radius:0 0 999px 999px;background:linear-gradient(90deg,'+C.accent+','+C.accent2+');"></span>':'';
+    return '<button'+(dark?' data-dark-crisis-tile="'+kind+'"':'')+' onclick="App.openCrisis(\''+kind+'\')" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 6px 12px;border-radius:18px;'+(dark?'overflow:hidden;':'')+'display:flex;flex-direction:column;align-items:center;gap:6px;color:'+(dark?'#F7F4F6':'#fff')+';border:'+(dark?'1px solid color-mix(in srgb,'+C.accent+' 42%, rgba(255,255,255,.10))':'none')+';background:'+(dark?'linear-gradient(180deg,color-mix(in srgb,'+C.accent+' 9%,#141318),#09090B)':'linear-gradient(135deg,'+C.accent+','+C.accent2+')')+';box-shadow:'+(dark?'inset 0 1px 0 rgba(255,255,255,.035)':'0 10px 22px color-mix(in srgb,'+C.accent+' 42%, transparent)')+';transition:transform .18s var(--ease-premium,ease);">'
+      +darkLine
       +badge
-      +'<span style="width:38px;height:38px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,19)+'</span>'
+      +'<span style="width:38px;height:38px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+(dark?C.accent2:'#fff')+';background:'+(dark?'color-mix(in srgb,'+C.accent+' 13%, rgba(255,255,255,.035))':'rgba(255,255,255,0.22)')+';border:'+(dark?'1px solid color-mix(in srgb,'+C.accent+' 24%, transparent)':'none')+';box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.4)')+';">'+icon(C.icon,19)+'</span>'
       +'<span style="font-size:12.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;">'+C.short+'</span>'
-      +'<span style="font-size:8.5px;font-weight:800;letter-spacing:.4px;opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
+      +'<span style="font-size:8.5px;font-weight:800;letter-spacing:.4px;color:'+(dark?C.accent2:'currentColor')+';opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
   };
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,#E9899F 26%, var(--card-bd));box-shadow:0 12px 30px rgba(233,137,159,0.16);">';
+  var h='<div class="glass"'+(dark?' data-dark-variant="crisis"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#121013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,#E9899F '+(dark?'34':'26')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px rgba(233,137,159,0.16)')+';">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
-  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 6px 16px rgba(233,137,159,0.4);">'+icon('heart-handshake',19)+'</span>';
+  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#9B5870,#68577E)':'linear-gradient(135deg,#E9899F,#C9B8FF)')+';box-shadow:'+(dark?'none':'0 6px 16px rgba(233,137,159,0.4)')+';">'+icon('heart-handshake',19)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Kriz mi geldi? Raşit yetişiyor <span style="font-size:14px;">🦩</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Süreli, bilimsel bir odaya gir — bastırma, yönet.</div></div>';
   h+='</div>';
   h+='<div style="display:flex;gap:9px;">'+tile('sweet')+tile('food')+tile('coffee')+'</div>';
@@ -3288,38 +3422,47 @@ function crisisModalHTML(){
   var A=C.accent, A2=C.accent2, hr=new Date().getHours();
   var tcap=(kind==='coffee'?'MOLASI':'KURALI');
   var pill=function(n){ return '<span style="font-size:11px;font-weight:800;color:#fff;background:'+A+';border-radius:999px;min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;">'+n+'</span>'; };
-  // Premium açılır bölüm (expander): dokunulan başlık + oklu chevron + sığdırılmış gövde.
-  var expander=function(open,which,ic,title,sub,n,body){
-    var frame=open
-      ? 'border:1px solid color-mix(in srgb,'+A+' 42%, var(--card-bd));box-shadow:0 14px 34px color-mix(in srgb,'+A+' 15%, transparent),inset 0 1px 0 rgba(255,255,255,0.4);'
-      : 'border:1px solid color-mix(in srgb,'+A+' 20%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
-    var x='<div class="glass sey-ccard" style="border-radius:18px;padding:0;overflow:hidden;'+frame+'">';
-    x+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+A+',transparent);"></span>';
-    x+='<div onclick="App.toggleCrisisSection(\''+which+'\')" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px 14px;">';
-    x+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(ic,17)+'</span>';
-    x+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:var(--text);line-height:1.15;">'+title+'</div><div style="font-size:11px;color:var(--faint);margin-top:1px;line-height:1.3;">'+sub+'</div></div>';
-    if(n>0) x+='<div style="flex-shrink:0;">'+pill(n)+'</div>';
-    x+='<span style="color:'+A+';display:inline-flex;flex-shrink:0;transition:transform .28s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
-    x+='</div>';
-    if(open){ x+='<div style="padding:2px 14px 14px;display:flex;flex-direction:column;gap:9px;animation:seyFloatIn .3s var(--ease-premium,ease);">'+body+'</div>'; }
-    else { x+='<div onclick="App.toggleCrisisSection(\''+which+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);padding:0 0 12px;display:flex;align-items:center;justify-content:center;gap:4px;">'+(which==='tried'?'seçenekleri gör':'tetikleyicileri gör')+' '+icon('chevron-down',11)+'</div>'; }
-    x+='</div>';
-    return x;
+  // Premium bölüm başlığı (açılır/kapanır DEĞİL): tüm içerik her zaman görünür,
+  // sayfa serbestçe kaydırılır — çerçeve/kafes yok, hiçbir şey kırpılmaz.
+  var secHead=function(ic,title,sub,n){
+    var s='<div style="display:flex;align-items:center;gap:11px;">';
+    s+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(ic,17)+'</span>';
+    s+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);line-height:1.15;">'+title+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">'+sub+'</div></div>';
+    if(n>0) s+='<div style="flex-shrink:0;">'+pill(n)+'</div>';
+    s+='</div>';
+    return s;
+  };
+  // Bölümü tek akışta toplayan sarmalayıcı: başlık + üstünde ince accent ayraç.
+  var section=function(ic,title,sub,n,items){
+    return '<div style="display:flex;flex-direction:column;gap:11px;padding-top:4px;">'
+      +'<div style="height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,'+A+' 30%, transparent),transparent);"></div>'
+      +secHead(ic,title,sub,n)
+      +'<div style="display:flex;flex-direction:column;gap:9px;">'+items+'</div></div>';
   };
 
-  var h='<div id="sey-crisis-back" onclick="App.closeCrisis()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.46);backdrop-filter:blur(5px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div id="sey-crisis-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;height:90vh;max-height:90vh;background:var(--modal);border-radius:26px;box-shadow:0 -10px 40px rgba(0,0,0,0.24);animation:seyPop .25s ease;display:flex;flex-direction:column;overflow:hidden;">';
+  // Tam sayfa modal: alttan-sayfa yerine tüm ekranı kaplar → uzun expander gövdeleri
+  // artık dar bir çerçeveye sıkışmaz, serbestçe kaydırılır. Birincil eylem sabit alt bar'da.
+  var h='<div id="sey-crisis-back" onclick="App.closeCrisis()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div id="sey-crisis-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
 
-  // sticky header (gradient accent, Raşit branding)
-  h+='<div style="flex-shrink:0;position:relative;padding:17px 16px 15px;background:linear-gradient(135deg,'+A+','+A2+');color:#fff;box-shadow:0 6px 18px color-mix(in srgb,'+A+' 30%, transparent);">';
-  h+='<div style="display:flex;align-items:center;gap:12px;">';
-  h+='<span style="width:44px;height:44px;border-radius:14px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,22)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:12px;">🦩</span></div><div style="font-size:19px;font-weight:800;line-height:1.2;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
-  h+='<button onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:34px;height:34px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>';
-  h+='</div></div>';
+  // sticky header (gradient accent, Raşit branding, safe-area üst boşluğu)
+  h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,'+A+','+A2+');color:#fff;box-shadow:0 8px 22px color-mix(in srgb,'+A+' 32%, transparent);overflow:hidden;">';
+  h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
+  h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,23)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
+  h+='<button onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='</div>';
+  // 3 adımlı mikro-müdahale rayı: Dur → Dene → Karar ver
+  h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
+  [['1','Dur'],['2','Dene'],['3','Karar ver']].forEach(function(st){
+    h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:10.5px;font-weight:900;">'+st[0]+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+st[1]+'</span></div>';
+  });
+  h+='</div>';
+  h+='</div>';
 
   // scrollable body
-  h+='<div id="sey-crisis-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:13px;">';
+  h+='<div id="sey-crisis-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 15px 22px;display:flex;flex-direction:column;gap:13px;">';
 
   // Raşit intro bubble
   h+='<div style="display:flex;align-items:flex-start;gap:10px;"><span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 5px 14px var(--room-glow);">'+icon('heart',17)+'</span><div class="glass" style="flex:1;min-width:0;border-radius:6px 18px 18px 18px;padding:12px 14px;border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));"><div style="font-size:10px;font-weight:800;letter-spacing:.8px;color:var(--room);margin-bottom:4px;">RAŞİT 🦩</div><div style="font-size:14px;line-height:1.5;color:var(--text2);">'+esc(C.hero)+'</div></div></div>';
@@ -3345,7 +3488,7 @@ function crisisModalHTML(){
     var stl=sel?('background:color-mix(in srgb,'+A+' 14%, var(--card));border:1px solid '+A+';box-shadow:0 6px 14px color-mix(in srgb,'+A+' 24%, transparent);'):'background:var(--card);border:1px solid var(--card-bd);';
     triedBody+='<button onclick="App.toggleCrisisOpt(\''+val.replace(/'/g,"\\'")+'\')" style="display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;border-radius:15px;cursor:pointer;transition:all .18s;color:var(--text);'+stl+'"><span style="display:inline-flex;color:'+A+';">'+icon(o.icon,16)+'</span><span style="flex:1;text-align:left;font-size:14.5px;font-weight:600;">'+esc(val)+'</span><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(sel?'linear-gradient(135deg,'+A+','+A2+')':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span></button>';
   });
-  h+=expander(ui.crisisTriedOpen,'tried','heart-handshake','Şu an ne denedin?',(triedN>0?triedN+' şey denedin — küçük ama değerli':'Denediğin bir şeyi işaretle'),triedN,triedBody);
+  h+=section('heart-handshake','Şu an ne denedin?',(triedN>0?triedN+' şey denedin — küçük ama değerli':'Denediğin bir şeyi işaretle'),triedN,triedBody);
 
   // ── Bu isteği ne tetikledi? (premium expander) ──
   var trigN=ui.crisisTriggers.length+((ui.crisisNote&&String(ui.crisisNote).trim())?1:0);
@@ -3360,17 +3503,25 @@ function crisisModalHTML(){
   });
   trigBody+='<textarea oninput="App.onCrisisNote(this)" rows="2" placeholder="Başka bir şey mi tetikledi? örn. bir tartışma, yalnızlık, kendini ödüllendirme…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:13.5px;outline:none;resize:none;line-height:1.5;color:var(--text);">'+esc(ui.crisisNote||'')+'</textarea>';
   trigBody+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Tetikleyiciyi işaretlersen Rapor’da örüntünü çıkarırım — neyin gerçek ihtiyaç, neyin duygusal/alışkanlık olduğunu birlikte görürüz.</div>';
-  h+=expander(ui.crisisTrigOpen,'trig','zap','Bu isteği ne tetikledi?','Bilimsel tetikleyiciler · örüntünü çıkaralım',trigN,trigBody);
+  h+=section('zap','Bu isteği ne tetikledi?','Bilimsel tetikleyiciler · örüntünü çıkaralım',trigN,trigBody);
 
-  // complete / done state
+  // done: kutlama kartı (eylem düğmeleri sabit alt bar'a taşındı)
   if(ui.crisisDone){
-    h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 22%, transparent),color-mix(in srgb,'+A2+' 26%, transparent));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:20px;padding:18px;text-align:center;animation:seyPop .3s ease;"><div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text);">'+esc(C.winTitle)+'</div><p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--text2);">'+esc(C.winText)+'</p>'+(C.habit?'<div style="margin-top:11px;font-size:12px;font-weight:800;color:#3F8A4F;display:inline-flex;align-items:center;gap:5px;background:rgba(143,191,138,0.18);border-radius:999px;padding:5px 12px;">'+icon('check',12)+' Bugünün tikine işlendi</div>':'')+'<div style="display:flex;gap:9px;margin-top:14px;"><button onclick="App.resetCrisis()" style="flex:1;border:1px solid var(--field-bd);background:var(--card);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--muted);">Yeni kriz / sıfırla</button><button onclick="App.closeCrisis()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');display:flex;align-items:center;justify-content:center;gap:5px;">Kapat '+icon('check',14)+'</button></div></div>';
-  } else {
-    h+='<button onclick="App.completeCrisis()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;">Krizi yönettim '+icon('check',16)+'</button>';
-    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;">“Krizi yönettim”e basınca '+(C.habit?'bugünün ilgili tiki kendiliğinden yeşillenir.':'kaydın Rapor’a işlenir.')+'</div>';
+    h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 22%, transparent),color-mix(in srgb,'+A2+' 26%, transparent));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:20px;padding:20px;text-align:center;animation:seyPop .3s ease;"><div style="width:52px;height:52px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 10px 24px color-mix(in srgb,'+A+' 40%, transparent);">'+icon('check',26)+'</div><div style="font-size:19px;font-weight:800;margin-bottom:6px;color:var(--text);">'+esc(C.winTitle)+'</div><p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--text2);">'+esc(C.winText)+'</p>'+(C.habit?'<div style="margin-top:12px;font-size:12px;font-weight:800;color:#3F8A4F;display:inline-flex;align-items:center;gap:5px;background:rgba(143,191,138,0.18);border-radius:999px;padding:5px 12px;">'+icon('check',12)+' Bugünün tikine işlendi</div>':'')+'</div>';
   }
 
   h+='</div>'; // body
+
+  // ── sabit alt bar (birincil eylem her zaman erişilebilir) ──
+  h+='<div style="flex-shrink:0;position:relative;padding:12px 15px calc(14px + env(safe-area-inset-bottom));background:var(--modal);border-top:1px solid var(--card-bd);box-shadow:0 -10px 26px rgba(0,0,0,0.07);">';
+  if(ui.crisisDone){
+    h+='<div style="display:flex;gap:9px;"><button onclick="App.resetCrisis()" style="flex:1;border:1px solid var(--field-bd);background:var(--card);cursor:pointer;padding:14px;border-radius:16px;font-size:14.5px;font-weight:700;color:var(--muted);">Yeni kriz / sıfırla</button><button onclick="App.closeCrisis()" style="flex:1.3;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 10px 24px color-mix(in srgb,'+A+' 38%, transparent);display:flex;align-items:center;justify-content:center;gap:6px;">Kapat '+icon('check',15)+'</button></div>';
+  } else {
+    h+='<button onclick="App.completeCrisis()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;">Krizi yönettim '+icon('check',16)+'</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">“Krizi yönettim”e basınca '+(C.habit?'bugünün ilgili tiki kendiliğinden yeşillenir.':'kaydın Rapor’a işlenir.')+'</div>';
+  }
+  h+='</div>'; // footer
+
   h+='</div></div>'; // card + back
   return h;
 }
@@ -3435,7 +3586,7 @@ function haritaHTML(){
     var detail=[];
     if(bestWd>=0) detail.push([icon('calendar',15),'En tutarlı günün','<b>'+wdNames[bestWd]+'</b> · %'+bestWdPct,'var(--accent)']);
     if(delta!=null){ var dcol=delta>0?'#3F8A4F':(delta<0?'#E9899F':'var(--muted)'); var dtxt=(delta>0?'+':'')+delta+' puan'; detail.push([icon(delta>=0?'trending-up':'chart-column',15),'Geçen aya göre','<b style="color:'+dcol+';">'+dtxt+'</b>','var(--muted)']); }
-    if(window.MotivationProgramV2){ var _ms=window.MotivationProgramV2.progressSummary(data); detail.push([icon('compass',15),'İçsel Pusula','Gün '+_ms.currentProgramDay+'/'+_ms.totalDays+' · %'+_ms.percent,'#6E5FCB']); }
+    if(window.MotivationProgramV2 && featuresLive()){ var _ms=window.MotivationProgramV2.progressSummary(data); detail.push([icon('compass',15),'İçsel Pusula','Gün '+_ms.currentProgramDay+'/'+_ms.totalDays+' · %'+_ms.percent,'#6E5FCB']); }
     if(detail.length){
       h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
       detail.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;display:flex;justify-content:center;color:'+r[3]+';">'+r[0]+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+r[1]+'</span><span style="font-size:13.5px;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
@@ -3752,7 +3903,7 @@ function ayarlarHTML(){
   var _dtracked=daysTracked(), _totalTicks=0,_dayRecs=0;
   for(var _dk in data.days){ _dayRecs++; _totalTicks+=countRec(data.days[_dk]); }
   var _sizeKB=0; try{ _sizeKB=Math.round(JSON.stringify(data).length/1024); }catch(e){}
-  var _prog=window.MotivationProgramV2?window.MotivationProgramV2.progressSummary(data):null;
+  var _prog=(window.MotivationProgramV2&&featuresLive())?window.MotivationProgramV2.progressSummary(data):null;
   var _lastSync=data.lastSyncDate?(data.lastSyncDate===todayStr()?'bugün':esc(data.lastSyncDate)):'henüz yok';
   var _conn=syncConfigured();
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
@@ -3941,46 +4092,244 @@ function medFreeBadge(){
   if(s<1) return '';
   return '<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(143,191,138,0.22),rgba(155,127,201,0.16));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 13px;"><span style="color:#6E9C6A;display:inline-flex;">'+icon('moon',22)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">'+s+' gecedir ilaçsız</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">'+(s>=7?'Bir haftayı geçtin — beden kendi sistemini öğreniyor.':'Hedef: uyku ilacına ihtiyacı azaltmak. Düzenli uyku hijyeni bunu büyütür.')+'</div></div></div>';
 }
+// Premium dairesel gauge (SVG halka + ortada değer). BMI/kafein/uyku-skoru için ortak.
+function gaugeBadge(pct,color,big,small,size){
+  size=size||92; pct=Math.max(0,Math.min(100,Number(pct)||0));
+  var sw=Math.round(size*0.095), r=(size-sw)/2, c=2*Math.PI*r, off=c*(1-pct/100), cx=size/2;
+  var s='<div style="position:relative;width:'+size+'px;height:'+size+'px;flex-shrink:0;">';
+  s+='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="transform:rotate(-90deg);display:block;">';
+  s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="rgba(130,110,160,0.16)" stroke-width="'+sw+'"/>';
+  s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="transition:stroke-dashoffset .55s var(--ease-premium,ease);"/>';
+  s+='</svg>';
+  s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:9.5px;color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
+  s+='</div>';
+  return s;
+}
+// Kafein metabolizma eğrisi: içimlerden yatma saatine dek vücuttaki kafein (yarı ömür decay),
+// 50 mg güvenli-uyku eşiği (kesikli yeşil) ve yatma çizgisiyle.
+function caffeineCurveSVG(rec,bed){
+  var ds=caffeineDrinks(rec).map(function(d){ var ty=caffeineType(d&&d.type); var t=hhmmToMin(d&&d.time); if(!ty||t==null) return null; return {t:t,mg:ty.mg*Math.max(1,Number(d.qty)||1)}; }).filter(Boolean);
+  if(!ds.length) return '';
+  var bedMin=hhmmToMin(bed); if(bedMin==null) bedMin=hhmmToMin(CAFFEINE_DEFAULT_BED);
+  var startMin=Math.min.apply(null,ds.map(function(d){return d.t;}));
+  var endMin=bedMin; if(endMin<=startMin) endMin+=1440;
+  var span=Math.max(90,endMin-startMin);
+  var N=48, W=100, H=44, pad=3;
+  var loadAt=function(m){ var s=0; ds.forEach(function(d){ var dt=(m-d.t)/60; if(dt<0) return; s+=d.mg*Math.pow(0.5,dt/CAFFEINE_HALFLIFE_H); }); return s; };
+  var peak=0, samples=[];
+  for(var i=0;i<=N;i++){ var m=startMin+span*i/N; var v=loadAt(m); if(v>peak)peak=v; samples.push([i/N,v]); }
+  peak=Math.max(peak,60);
+  var pts=samples.map(function(p){ var x=pad+p[0]*(W-2*pad); var y=(H-pad)-(p[1]/peak)*(H-2*pad); return x.toFixed(1)+','+y.toFixed(1); }).join(' ');
+  var safeY=(H-pad)-(CAFFEINE_SLEEP_SAFE_MG/peak)*(H-2*pad);
+  var col='#8A5A2B', bedX=(W-pad).toFixed(1);
+  var s='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" width="100%" height="'+H+'" style="display:block;">';
+  s+='<defs><linearGradient id="cafFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity="0.30"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></linearGradient></defs>';
+  if(safeY>pad&&safeY<H-pad) s+='<line x1="'+pad+'" y1="'+safeY.toFixed(1)+'" x2="'+(W-pad)+'" y2="'+safeY.toFixed(1)+'" stroke="#5BA85B" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.75"/>';
+  s+='<polygon points="'+pad+','+(H-pad)+' '+pts+' '+(W-pad)+','+(H-pad)+'" fill="url(#cafFill)"/>';
+  s+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>';
+  s+='<line x1="'+bedX+'" y1="'+pad+'" x2="'+bedX+'" y2="'+(H-pad)+'" stroke="var(--muted)" stroke-width="0.7" stroke-dasharray="1.5 1.5" opacity="0.55"/>';
+  s+='</svg>';
+  return s;
+}
 function caffeineBlock(rec){
   var drinks=caffeineDrinks(rec);
-  var total=caffeineTotalMg(rec);
-  var limit=caffeineLimit();
-  var mode=caffeineMode();
-  var maxSingle=caffeineMaxSingle(rec);
-  var lastCaf=caffeineLastTime(rec);
-  var cut=caffeineCutoffTime(caffeineTargetBed());
-  var residue=caffeineResidueAt(rec,caffeineTargetBed());
-  var timingOk=caffeineTimingOk(rec);
-  var bed=caffeineTargetBed();
+  var total=caffeineTotalMg(rec), limit=caffeineLimit(), mode=caffeineMode();
+  var maxSingle=caffeineMaxSingle(rec), lastCaf=caffeineLastTime(rec);
+  var bed=caffeineTargetBed(), cut=caffeineCutoffTime(bed);
+  var residue=caffeineResidueAt(rec,bed), timingOk=caffeineTimingOk(rec);
   var pct=Math.min(100,Math.round(total/limit*100));
-  var barCol = pct<60?'#5BA85B':(pct<=90?'#E0A93C':'#E25B6A');
-  var h='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:5px;">'+icon('coffee',13)+' Kafein — bilimsel takip (mg · limit · uyku)</div>';
+  var barCol=pct<60?'#5BA85B':(pct<=90?'#E0A93C':'#E25B6A');
+  var resCol=residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(residue<100?'#E0A93C':'#E25B6A');
+  var modeLbl={standard:'Standart',sensitive:'Hassas',pregnant:'Gebe'}[mode]||'Standart';
+  var A='#8A5A2B';
+  var h='';
+  h+='<div style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,'+A+' 9%, var(--card)),var(--card));border:1px solid var(--card-bd);border-radius:16px;padding:13px 14px;">';
+  h+=gaugeBadge(pct,barCol,total,'/ '+limit+' mg',92);
+  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:11px;color:var(--faint);">Günlük toplam</span><span style="font-size:11px;font-weight:800;color:'+barCol+';">%'+pct+' · '+modeLbl+'</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:11px;color:var(--faint);">Yatakta kalıntı</span><span style="font-size:13px;font-weight:800;color:'+resCol+';">'+residue+' mg</span></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:11px;color:var(--faint);">Son kahve · kesim</span><span style="font-size:11.5px;font-weight:700;color:'+(timingOk?'var(--text2)':'#C2803A')+';">'+(lastCaf||'—')+' · '+(cut||'—')+'</span></div>';
+  h+='</div></div>';
+  var curve=caffeineCurveSVG(rec,bed);
+  if(curve){ h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px 12px 8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:10px;font-weight:800;letter-spacing:.3px;color:var(--muted);">METABOLİZMA · YATANA KADAR</span><span style="font-size:9px;color:#5BA85B;display:inline-flex;align-items:center;gap:3px;"><span style="width:12px;border-top:1.4px dashed #5BA85B;display:inline-block;"></span>50 mg eşik</span></div>'+curve+'</div>'; }
   h+='<div style="display:flex;flex-wrap:wrap;gap:5px;">';
-  CAFFEINE_TYPES.forEach(function(t){ h+='<button onclick="App.addCaffeineDrink(\''+t.id+'\')" style="border:1px solid var(--field-bd);background:var(--card);border-radius:999px;padding:6px 10px;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">'+t.label+' <span style="color:var(--faint);font-weight:500;">'+t.mg+'mg</span></button>'; });
+  CAFFEINE_TYPES.forEach(function(t){ h+='<button onclick="App.addCaffeineDrink(\''+t.id+'\')" style="border:1px solid var(--field-bd);background:var(--card);border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">+ '+t.label+' <span style="color:var(--faint);font-weight:500;">'+t.mg+'mg</span></button>'; });
   h+='</div>';
   if(drinks.length){
     h+='<div style="display:flex;flex-direction:column;gap:5px;">';
-    drinks.forEach(function(d,i){ var ty=caffeineType(d.type); var mg=ty?ty.mg*Math.max(1,Number(d.qty)||1):0; h+='<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--card-bd);border-radius:11px;padding:7px 10px;"><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+(ty?ty.label:d.type)+' · <span style="color:var(--faint);font-weight:500;">'+Math.round(mg)+' mg</span></div><div style="display:flex;align-items:center;gap:5px;margin-top:3px;"><input type="time" value="'+esc(d.time||'')+'" onchange="App.setCaffeineDrinkTime('+i+',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:3px 6px;font-size:12px;color:var(--text);outline:none;">'+(d.qty>1?('<span style="font-size:11px;color:var(--faint);">×'+d.qty+'</span>'):'')+'</div></div><button onclick="App.removeCaffeineDrink('+i+')" style="border:none;background:transparent;color:#E25B6A;cursor:pointer;font-size:16px;font-weight:800;padding:4px;">×</button></div>'; });
+    drinks.forEach(function(d,i){ var ty=caffeineType(d.type); var mg=ty?ty.mg*Math.max(1,Number(d.qty)||1):0; h+='<div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--card-bd);border-radius:11px;padding:7px 10px;"><span style="display:inline-flex;color:'+A+';">'+icon('coffee',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+(ty?ty.label:d.type)+' · <span style="color:var(--faint);font-weight:500;">'+Math.round(mg)+' mg</span></div><div style="display:flex;align-items:center;gap:5px;margin-top:3px;"><input type="time" value="'+esc(d.time||'')+'" onchange="App.setCaffeineDrinkTime('+i+',this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:3px 6px;font-size:12px;color:var(--text);outline:none;">'+(d.qty>1?('<span style="font-size:11px;color:var(--faint);">×'+d.qty+'</span>'):'')+'</div></div><button onclick="App.removeCaffeineDrink('+i+')" style="border:none;background:transparent;color:#E25B6A;cursor:pointer;font-size:16px;font-weight:800;padding:4px;">×</button></div>'; });
     h+='</div>';
   } else {
-    h+='<div style="font-size:11.5px;color:var(--faint);background:var(--card);border:1px dashed var(--card-bd);border-radius:11px;padding:9px 11px;">Bugün henüz kafein eklenmedi. Yukarıdaki chip\'lerden bir başlat.</div>';
+    h+='<div style="font-size:11.5px;color:var(--faint);background:var(--card);border:1px dashed var(--card-bd);border-radius:11px;padding:9px 11px;">Bugün henüz kafein eklenmedi. Yukarıdaki chip\'lerden başlat — mg, kalıntı ve eğri otomatik hesaplanır.</div>';
   }
-  h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;">';
-  h+='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+total+' <span style="font-size:11px;color:var(--faint);font-weight:500;">mg / '+limit+' mg</span></div><div style="font-size:11px;font-weight:700;color:'+barCol+';">%'+pct+'</div></div>';
-  h+='<div style="height:7px;border-radius:999px;background:rgba(120,100,150,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+barCol+';transition:width .3s;"></div></div>';
-  h+='<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;"><span style="font-size:10.5px;color:var(--faint);">Profil:</span>';
-  [['standard','Standart 400'],['sensitive','Hassas 300'],['pregnant','Gebe 200']].forEach(function(m){ var on=mode===m[0]; h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?'#8A5A2B':'var(--field-bd)')+';background:'+(on?'rgba(138,90,43,0.12)':'var(--field)')+';color:'+(on?'#8A5A2B':'var(--muted)')+';border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:700;cursor:pointer;">'+m[1]+'</button>'; });
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">';
+  h+='<span style="font-size:10.5px;color:var(--faint);">Profil:</span>';
+  [['standard','Standart 400'],['sensitive','Hassas 300'],['pregnant','Gebe 200']].forEach(function(m){ var on=mode===m[0]; h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?A:'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,'+A+' 12%, var(--field))':'var(--field)')+';color:'+(on?A:'var(--muted)')+';border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">'+m[1]+'</button>'; });
+  h+='<div style="margin-left:auto;display:flex;align-items:center;gap:5px;"><span style="font-size:10.5px;color:var(--faint);">Yatma</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div>';
   h+='</div>';
-  if(total>limit){ h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Günlük kafein limiti aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+limit+' mg.</div>'; }
-  if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek seferlik doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg üstü. Aralara zaman koy.</div>'; }
-  if(lastCaf){ var lateLine = timingOk ? 'Son kahve '+lastCaf+' — önerilen kesme '+cut+' öncesi, uyumlu.' : 'Son kahve '+lastCaf+' — önerilen kesme '+cut+'. Bu saat uykuya geçişi zorlaştırabilir.'; h+='<div style="font-size:11px;color:'+(timingOk?'var(--faint)':'#9A6A2A')+';line-height:1.4;">'+icon('clock',11)+' '+lateLine+'</div>'; }
-  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--card-bd);padding-top:8px;"><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:10.5px;color:var(--faint);">Yatma saati</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div><div style="flex:1;min-width:120px;"><div style="font-size:10.5px;color:var(--faint);">Yatandaki kafein kalıntısı</div><div style="font-size:14px;font-weight:800;color:'+(residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(residue<100?'#E0A93C':'#E25B6A'))+';">'+residue+' mg</div><div style="font-size:10.5px;color:var(--faint);">'+(residue<CAFFEINE_SLEEP_SAFE_MG?'Uykuyu etkilemez (<50 mg)':'Uykuya dalışı geciktirebilir')+'</div></div></div>';
-  h+='<div style="font-size:9.5px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~5 sa. mg değerleri ortalama serving başına.</div>';
-  h+='</div></div>';
-  return h;
+  if(total>limit){ h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Günlük limit aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+limit+' mg.</div>'; }
+  if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg. Aralara zaman koy.</div>'; }
+  if(lastCaf&&!timingOk){ h+='<div style="font-size:11px;color:#9A6A2A;line-height:1.4;display:flex;gap:5px;"><span style="flex-shrink:0;">'+icon('clock',12)+'</span><span>Son kahve '+lastCaf+' — önerilen kesim '+cut+' (yatmadan '+CAFFEINE_CUTOFF_H+' sa önce). Bu saat uykuya geçişi zorlaştırabilir.</span></div>'; }
+  h+='<div style="font-size:9.5px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa. mg ortalama serving başına.</div>';
+  return collapsibleCardHTML({key:'h-caffeine', icon:icon('coffee',18), accent:A, title:'Kafein', subtitle:'Bilimsel takip · mg · yarı ömür · uyku', badge:hBadge(total+' mg',barCol), open:cardOpen('h-caffeine'), body:h, hint:'kafein takibini aç'});
 }
+CARD_BUILDERS['h-caffeine']=caffeineBlock;
+// Uykuya dalma hazırlığı — bağımsız premium kart (skor gauge + 6 faktör + bilimsel ipucu).
+function sleepPrepCard(rec){
+  var readiness=sleepReadiness(rec);
+  var scoreCol=readiness.score>=85?'#6E9C6A':(readiness.score>=70?'#9B7FC9':(readiness.score>=55?'#E0A93C':'#E28A6A'));
+  var A='#9B7FC9';
+  var h='';
+  h+='<div style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,'+A+' 11%, var(--card)),var(--card));border:1px solid var(--card-bd);border-radius:16px;padding:13px 14px;">';
+  h+=gaugeBadge(readiness.score,scoreCol,readiness.score,'/ 100',92);
+  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">';
+  h+='<div style="font-size:17px;font-weight:800;color:'+scoreCol+';line-height:1.1;">'+readiness.tier+'</div>';
+  var rdChip=readiness.readingCount>0?(readiness.readingCount+' kitap · '+readiness.readingPages+' sayfa'):'okuma yok';
+  h+='<div style="font-size:11.5px;color:var(--muted);">Bugün: '+rdChip+'</div>';
+  if(readiness.hasCaf){ var resCol2=readiness.residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(readiness.residue<100?'#E0A93C':'#E25B6A'); h+='<div style="font-size:11px;color:var(--faint);">Kafein kalıntısı <b style="color:'+resCol2+';">'+readiness.residue+' mg</b> · son '+(readiness.lastCaf||'—')+'</div>'; }
+  h+='</div></div>';
+  var rf=readiness.factors||{};
+  var fdefs=[['Uyku süresi',rf.duration||0,26],['Kalite',rf.quality||0,18],['Kafein',rf.caffeine||0,18],['Okuma',rf.reading||0,16],['Wind-down',rf.winddown||0,14],['İlaçsızlık',rf.medication||0,8]];
+  h+='<div style="display:flex;flex-direction:column;gap:7px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;">';
+  fdefs.forEach(function(f){ var fp=Math.round(f[1]/f[2]*100); var bc=fp>=80?'#6E9C6A':(fp>=50?A:'#E0A93C'); h+='<div style="display:flex;align-items:center;gap:9px;"><div style="font-size:11px;font-weight:600;color:var(--muted);width:86px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:7px;border-radius:999px;background:color-mix(in srgb,'+A+' 12%, var(--icon));overflow:hidden;"><div style="height:100%;width:'+fp+'%;background:linear-gradient(90deg,'+bc+',color-mix(in srgb,'+bc+' 55%, #E9AFC1));border-radius:999px;transition:width .4s;"></div></div><div style="font-size:10.5px;font-weight:700;color:var(--faint);width:32px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
+  h+='</div>';
+  var srTip=!readiness.hasCaf?'Kafeinsiz gün uykuyu kolaylaştırır.':(readiness.residue<CAFFEINE_SLEEP_SAFE_MG?'Kafein temiz — uykuya hazırsın.':'Son kahveyi erkene çek, yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa.');
+  h+='<div style="display:flex;gap:8px;align-items:flex-start;background:color-mix(in srgb,'+A+' 9%, var(--card));border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));border-radius:12px;padding:10px 12px;"><span style="flex-shrink:0;color:'+A+';display:inline-flex;margin-top:1px;">'+icon('brain',15)+'</span><div style="font-size:11.5px;line-height:1.5;color:var(--text2);"><b>Bu gece:</b> '+srTip+' <span style="color:var(--faint);">Kaynak EFSA/FDA.</span></div></div>';
+  var rdEntries=readingStats(rec).entries;
+  if(rdEntries.length>0){
+    h+='<div style="display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px 11px;">';
+    h+='<div style="font-size:10.5px;letter-spacing:.4px;font-weight:800;color:var(--muted);">BUGÜN OKUDUKLARIM</div>';
+    rdEntries.forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:'+A+';">'+icon('book-open',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title||'(başlıksız)')+(e.author?' <span style=\"font-weight:500;color:var(--faint);\">· '+esc(e.author)+'</span>':'')+'</div>'+(meta.length?'<div style="font-size:11px;color:var(--faint);">'+meta.join(' · ')+'</div>':'')+'</div></div>'; });
+    h+='</div>';
+  }
+  h+='<button onclick="App.openReading()" style="border:1px solid color-mix(in srgb,'+A+' 35%, var(--field-bd));cursor:pointer;padding:11px;border-radius:14px;font-size:13.5px;font-weight:800;color:'+A+';background:color-mix(in srgb,'+A+' 8%, var(--field));display:flex;align-items:center;justify-content:center;gap:7px;">'+icon('book-open',15)+' Okuma ekle</button>';
+  return collapsibleCardHTML({key:'h-sleepprep', icon:icon('moon',18), accent:A, title:'Uykuya Dalma Hazırlığı', subtitle:'6 faktör · bilimsel skor', badge:hBadge(readiness.score+' / 100',scoreCol), open:cardOpen('h-sleepprep'), body:h, hint:'hazırlık skorunu aç'});
+}
+CARD_BUILDERS['h-sleepprep']=sleepPrepCard;
 
+// ---- Vücut ölçüleri (kilo geçmişi + haftalık tartım önerisi + tek-seferlik boy + BMI) ----
+function bodyData(){ if(!data.body||typeof data.body!=='object') data.body={heightCm:null,heightSetAt:null,weights:[]}; if(!Array.isArray(data.body.weights)) data.body.weights=[]; return data.body; }
+function lastWeight(){ var w=bodyData().weights; return w.length?w[w.length-1]:null; }
+function weightRefMs(){ var w=bodyData().weights; var ref=w.length?new Date(w[w.length-1].ts).getTime():new Date((data.startDate||todayStr())+'T00:00:00').getTime(); return isNaN(ref)?Date.now():ref; }
+function weightWeekReady(){ return (Date.now()-weightRefMs())>=7*24*3600*1000; }
+function nextWeightInDays(){ var d=Math.ceil((weightRefMs()+7*24*3600*1000-Date.now())/(24*3600*1000)); return Math.max(0,d); }
+function bmiFor(kg,cm){ if(!kg||!cm) return null; var m=cm/100; if(m<=0) return null; return kg/(m*m); }
+function bmiCat(bmi){ if(bmi==null) return null; if(bmi<18.5) return {label:'Zayıf',col:'#E0A93C'}; if(bmi<25) return {label:'Normal',col:'#6E9C6A'}; if(bmi<30) return {label:'Fazla kilolu',col:'#E0A93C'}; return {label:'Obez',col:'#E28A6A'}; }
+function bodyCard(rec){
+  var b=bodyData(), lw=lastWeight(), A='#7BA7D0';
+  var h='';
+  var bmi=(b.heightCm&&lw)?bmiFor(lw.kg,b.heightCm):null, cat=bmiCat(bmi);
+  if(bmi!=null){
+    var bmiPct=Math.max(0,Math.min(100,(bmi-14)/(38-14)*100));
+    h+='<div style="display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,'+A+' 10%, var(--card)),var(--card));border:1px solid var(--card-bd);border-radius:16px;padding:13px 14px;">';
+    h+=gaugeBadge(bmiPct,cat.col,(Math.round(bmi*10)/10).toFixed(1),'BMI',92);
+    h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">';
+    h+='<div style="font-size:16px;font-weight:800;color:'+cat.col+';line-height:1.1;">'+cat.label+'</div>';
+    h+='<div style="font-size:11.5px;color:var(--muted);">Boy '+b.heightCm+' cm · Kilo '+lw.kg+' kg</div>';
+    h+='<div style="font-size:10px;color:var(--faint);line-height:1.4;">BMI bilgi amaçlıdır; kas/kemik oranını ayırmaz, tıbbi teşhis değildir.</div>';
+    h+='</div></div>';
+  }
+  if(b.heightCm==null||ui.heightEdit){
+    h+='<div style="background:color-mix(in srgb,'+A+' 8%, var(--card));border:1px solid color-mix(in srgb,'+A+' 26%, var(--card-bd));border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px;">';
+    h+='<div style="display:flex;gap:7px;align-items:flex-start;"><span style="flex-shrink:0;color:'+A+';display:inline-flex;margin-top:1px;">'+icon('ruler',15)+'</span><div style="font-size:12px;line-height:1.5;color:var(--text2);"><b>Boyunu bir kez giriyoruz</b> 📏 — BMI için. Tek seferlik; sonra buradan güncelleyebilirsin.</div></div>';
+    h+='<div style="display:flex;gap:8px;align-items:center;"><input id="sey-height-input" type="number" inputmode="decimal" min="80" max="250" value="'+(b.heightCm!=null?esc(b.heightCm):'')+'" placeholder="168" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:13px;color:var(--muted);">cm</span><button onclick="App.setHeight()" style="border:none;cursor:pointer;background:linear-gradient(135deg,'+A+',#9BC7EC);color:#fff;font-weight:800;font-size:14px;padding:11px 16px;border-radius:12px;">Kaydet</button></div>';
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);"><span style="display:inline-flex;color:'+A+';">'+icon('ruler',14)+'</span>Boy <b style="color:var(--text);">'+b.heightCm+' cm</b><button onclick="App.editHeight()" style="margin-left:auto;border:none;background:transparent;color:'+A+';cursor:pointer;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:2px;">düzenle</button></div>';
+  }
+  var ready=weightWeekReady(), nextD=nextWeightInDays();
+  h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 12%, var(--card)),var(--card));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:9px;">';
+  h+='<div style="display:flex;gap:8px;align-items:flex-start;"><span style="flex-shrink:0;color:'+A+';display:inline-flex;margin-top:1px;">'+icon(ready?'sparkles':'calendar',15)+'</span><div style="font-size:12px;line-height:1.45;color:var(--muted);">'+(ready?'<b style="color:var(--text);">Haftalık tartım zamanı geldi.</b> Aynı saat ve benzer koşullarda ölçmek eğilimi daha doğru gösterir.':'İstersen şimdi de kilo girebilirsin. Daha sağlıklı bir eğilim için <b style="color:var(--text2);">haftada bir, benzer koşullarda tartılmanı</b> öneriyoruz · '+nextD+' gün sonra haftalık ölçüm zamanı.')+'</div></div>';
+  h+='<div style="display:flex;gap:8px;align-items:center;"><input id="sey-weight-input" type="number" inputmode="decimal" step="0.1" min="20" max="400" placeholder="'+(lw?esc(lw.kg):'62.5')+'" aria-label="Kilo" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:13px;color:var(--muted);">kg</span><button onclick="App.addWeight()" style="border:none;cursor:pointer;background:linear-gradient(135deg,'+A+',#9BC7EC);color:#fff;font-weight:800;font-size:14px;padding:11px 16px;border-radius:12px;">Kaydet</button></div>';
+  h+='</div>';
+  if(b.weights.length){
+    var ws=b.weights.slice(-8), vals=ws.map(function(w){return w.kg;});
+    var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), rng=Math.max(0.5,mx-mn);
+    var delta=ws.length>=2?(ws[ws.length-1].kg-ws[ws.length-2].kg):0;
+    var dCol=delta<0?'#6E9C6A':(delta>0?'#E28A6A':'var(--faint)');
+    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--muted);">KİLO TRENDİ</span>'+(ws.length>=2?'<span style="font-size:11px;font-weight:800;color:'+dCol+';">'+(delta>0?'+':'')+(Math.round(delta*10)/10)+' kg</span>':'')+'</div>';
+    h+='<div style="display:flex;align-items:flex-end;gap:5px;height:40px;">';
+    ws.forEach(function(w){ var hh=Math.round(8+((w.kg-mn)/rng)*30); h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:40px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,'+A+',#9BC7EC);"></div></div>'; });
+    h+='</div>';
+    h+='<div style="display:flex;gap:5px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);">'+new Date(w.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</span>'; }).join('')+'</div>';
+    h+='</div>';
+  }
+  return collapsibleCardHTML({key:'h-body', icon:icon('activity',18), accent:A, title:'Vücut Ölçüleri', subtitle:'Kilo · haftalık tartım önerisi · boy · BMI', badge:(bmi!=null?hBadge((Math.round(bmi*10)/10).toFixed(1)+' BMI',cat.col):(lw?hBadge(lw.kg+' kg',A):'')), open:cardOpen('h-body'), body:h, hint:'ölçüleri aç'});
+}
+CARD_BUILDERS['h-body']=bodyCard;
+// ---- Kan/idrar tahlili — PDF + çoklu foto yükleme (data/aeon-media/<id>.json), panele iletilir ----
+function labCard(){
+  var A='#4FA8A0', results=Array.isArray(data.labResults)?data.labResults:[], connected=!!ghCfgApp();
+  var h='';
+  h+='<div style="font-size:12px;line-height:1.5;color:var(--text2);">İstersen kan/idrar tahlili sonuçlarını ekle — ÆON panelinde görünür ve incelenir. Belgeler gizli veri deposunda tutulur, uygulama arayüzüne yazılmaz.</div>';
+  h+='<input type="file" id="sey-lab-blood" accept="application/pdf,image/*" multiple style="display:none;" onchange="App.labFilesChosen(\'blood\',this)">';
+  h+='<input type="file" id="sey-lab-urine" accept="application/pdf,image/*" multiple style="display:none;" onchange="App.labFilesChosen(\'urine\',this)">';
+  if(!connected){
+    h+='<div style="display:flex;gap:8px;align-items:center;background:rgba(226,91,106,0.10);border:1px solid rgba(226,91,106,0.3);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--text2);"><span style="display:inline-flex;color:#C2453A;">'+icon('link-2',15)+'</span>Tahlil eklemek için önce Ayarlar\'dan repoya bağlan.</div>';
+  } else if(ui.labUploading){
+    h+='<div style="display:flex;gap:9px;align-items:center;background:color-mix(in srgb,'+A+' 10%, var(--card));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:12px;padding:12px 13px;font-size:12.5px;font-weight:700;color:var(--text2);"><span style="width:16px;height:16px;border-radius:50%;border:2px solid color-mix(in srgb,'+A+' 30%, transparent);border-top-color:'+A+';display:inline-block;animation:seySpin .7s linear infinite;flex-shrink:0;"></span>Yükleniyor… belge panele iletiliyor.</div>';
+  } else {
+    h+='<div style="display:flex;gap:8px;">';
+    h+='<button onclick="App.pickLab(\'blood\')" style="flex:1;border:1px solid color-mix(in srgb,'+A+' 35%, var(--field-bd));cursor:pointer;background:color-mix(in srgb,'+A+' 8%, var(--field));color:var(--text);font-weight:800;font-size:13px;padding:12px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:4px;"><span style="display:inline-flex;color:#E28A6A;">'+icon('droplet',20)+'</span>Kan tahlili</button>';
+    h+='<button onclick="App.pickLab(\'urine\')" style="flex:1;border:1px solid color-mix(in srgb,'+A+' 35%, var(--field-bd));cursor:pointer;background:color-mix(in srgb,'+A+' 8%, var(--field));color:var(--text);font-weight:800;font-size:13px;padding:12px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:4px;"><span style="display:inline-flex;color:#E0A93C;">'+icon('flask',20)+'</span>İdrar tahlili</button>';
+    h+='</div>';
+  }
+  if(results.length){
+    h+='<div style="display:flex;flex-direction:column;gap:7px;">';
+    results.slice().reverse().forEach(function(r){
+      var kindLbl=r.kind==='blood'?'Kan':'İdrar', kindCol=r.kind==='blood'?'#E28A6A':'#E0A93C';
+      var when=r.ts?new Date(r.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'';
+      var nfiles=Array.isArray(r.files)?r.files.length:0;
+      var statusLbl=r.status==='reviewed'?'İncelendi':'Analiz ediliyor', statusCol=r.status==='reviewed'?'#6E9C6A':A;
+      h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:13px;padding:10px 12px;display:flex;align-items:center;gap:10px;">';
+      h+='<span style="width:30px;height:30px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+kindCol+';background:color-mix(in srgb,'+kindCol+' 15%, var(--icon));">'+icon(r.kind==='blood'?'droplet':'flask',15)+'</span>';
+      h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+kindLbl+' tahlili · <span style="font-weight:600;color:var(--faint);">'+nfiles+' dosya</span></div><div style="font-size:11px;color:var(--faint);">'+when+'</div></div>';
+      h+='<span style="flex-shrink:0;font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;color:'+statusCol+';background:color-mix(in srgb,'+statusCol+' 15%, transparent);border:1px solid color-mix(in srgb,'+statusCol+' 40%, transparent);white-space:nowrap;">'+statusLbl+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  return collapsibleCardHTML({key:'h-lab', icon:icon('flask',18), accent:A, title:'Tahliller 🔬', subtitle:'Kan & idrar · PDF veya foto · panele iletilir', badge:(results.length?hBadge(results.length+' kayıt',A):''), open:cardOpen('h-lab'), body:h, hint:'tahlilleri aç'});
+}
+CARD_BUILDERS['h-lab']=labCard;
+App.editHeight=function(){ ui.heightEdit=true; render(); };
+App.setHeight=function(){ var el=document.getElementById('sey-height-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<80||v>250){ toast('Geçerli bir boy gir (80–250 cm)'); return; } var b=bodyData(); b.heightCm=Math.round(v); b.heightSetAt=new Date().toISOString(); ui.heightEdit=false; haptic(16); commit('Boy kaydedildi 📏'); };
+App.addWeight=function(){ var el=document.getElementById('sey-weight-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<20||v>400){ toast('Geçerli bir kilo gir (20–400 kg)'); return; } var b=bodyData(); b.weights.push({ts:new Date().toISOString(),kg:Math.round(v*10)/10}); haptic([14,40,14]); commit('Kilo kaydedildi 🪶 · haftalık düzen yeterli'); };
+App.pickLab=function(kind){ if(ui.labUploading) return; if(!ghCfgApp()){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } var el=document.getElementById(kind==='urine'?'sey-lab-urine':'sey-lab-blood'); if(el) el.click(); };
+function compressImageFile(file){ return new Promise(function(resolve,reject){ var reader=new FileReader(); reader.onload=function(){ var img=new Image(); img.onload=function(){ var MAXD=1600, w=img.naturalWidth||1, hh=img.naturalHeight||1; var scale=Math.min(1,MAXD/Math.max(w,hh)); var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(hh*scale)); var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch; cv.getContext('2d').drawImage(img,0,0,cw,ch); var url=cv.toDataURL('image/jpeg',0.75); var c=url.indexOf(','); resolve({b64:c>=0?url.slice(c+1):'',mime:'image/jpeg',w:cw,h:ch}); }; img.onerror=function(){ reject(new Error('görsel okunamadı')); }; img.src=String(reader.result||''); }; reader.onerror=function(){ reject(new Error('dosya okunamadı')); }; reader.readAsDataURL(file); }); }
+function readFileB64(file){ return new Promise(function(resolve,reject){ var r=new FileReader(); r.onload=function(){ var url=String(r.result||''); var c=url.indexOf(','); resolve(c>=0?url.slice(c+1):''); }; r.onerror=function(){ reject(new Error('dosya okunamadı')); }; r.readAsDataURL(file); }); }
+App.labFilesChosen=function(kind,el){
+  var files=el&&el.files?Array.prototype.slice.call(el.files):[]; if(el) el.value='';
+  if(!files.length) return;
+  if(!ghCfgApp()){ toast('Önce Ayarlar\'dan repoya bağlan'); return; }
+  var big=files.filter(function(f){ return f.size>4*1024*1024 && f.type==='application/pdf'; });
+  if(big.length){ toast('Bazı PDF\'ler büyük (>4MB) — panelde açılmayabilir',3200); }
+  ui.labUploading=true; render();
+  var out=[], chain=Promise.resolve();
+  files.forEach(function(f){
+    chain=chain.then(function(){
+      var prep=/^image\//.test(f.type) ? compressImageFile(f) : readFileB64(f).then(function(b64){ return {b64:b64,mime:f.type||'application/pdf'}; });
+      return prep.then(function(p){
+        if(!p||!p.b64) return;
+        var id=aeonMediaId('lab');
+        var payload={mime:p.mime,data:p.b64,name:f.name||''}; if(p.w) payload.w=p.w; if(p.h) payload.h=p.h;
+        return putAeonMedia(id,payload).then(function(){ out.push({mediaId:id,mime:p.mime,name:f.name||'',w:p.w||null,h:p.h||null}); });
+      });
+    });
+  });
+  chain.then(function(){
+    if(!out.length){ ui.labUploading=false; render(); toast('Dosya işlenemedi'); return; }
+    if(!Array.isArray(data.labResults)) data.labResults=[];
+    var lr={id:aeonMediaId('labr'),kind:(kind==='urine'?'urine':'blood'),ts:new Date().toISOString(),note:'',status:'analyzing',files:out};
+    data.labResults.push(lr);
+    ui.labUploading=false; haptic([14,40,14]); save();
+    try{ if(window.SeySync&&window.SeySync.pushNow) window.SeySync.pushNow(); }catch(e){}
+    try{ if(window.SeySync&&window.SeySync.pushPing) window.SeySync.pushPing({id:lr.id,question:(lr.kind==='blood'?'Kan':'İdrar')+' tahlili paylaşıldı ('+out.length+' dosya)',ts:lr.ts}); }catch(e){}
+    render();
+    toast('Tahlil kaydedildi ✓ · ÆON\'da analiz ediliyor 🔬',2600);
+  }).catch(function(e){ ui.labUploading=false; render(); toast('Gönderilemedi: '+String((e&&e.message)||e),3000); });
+};
 function discomfortCard(rec){
   var dz=(rec&&rec.discomfort&&typeof rec.discomfort==='object')?rec.discomfort:{regions:{},note:'',meds:[]};
   var regions=dz.regions||{};
@@ -3988,9 +4337,8 @@ function discomfortCard(rec){
   var view=ui.bodyView||'front';
   var active=BODY_REGIONS.filter(function(r){return r.view===view;});
   var selList=Object.keys(regions).filter(function(k){return regions[k]&&regions[k].level>0;});
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;">';
-  h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">Fiziksel Rahatsızlık '+icon('bandage',16)+'</div>';
-  h+='<div style="margin-left:auto;display:flex;gap:4px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:3px;">';
+  var A='#B57BA0';
+  var h='<div style="display:flex;justify-content:flex-end;"><div style="display:flex;gap:4px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:3px;">';
   ['front','back'].forEach(function(v){ var on=view===v; h+='<button onclick="App.setBodyView(\''+v+'\')" style="border:none;cursor:pointer;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;'+(on?'background:linear-gradient(135deg,#E9AFC1,#C9B8FF);color:#fff;':'background:transparent;color:var(--muted);')+'">'+(v==='front'?'Ön':'Arka')+'</button>'; });
   h+='</div></div>';
   h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">Bölgeye dokun, şiddeti ayarla: <b style="color:#F4C152;">1 hafif</b> · <b style="color:#F0892F;">2 orta</b> · <b style="color:#E25B6A;">3 şiddetli</b>. Tekrar dokununca artar, dolunca sıfırlanır.</div>';
@@ -4030,9 +4378,9 @@ function discomfortCard(rec){
   });
   h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. Ağrı kesiciyi sık (ayda 10-15+ gün) kullanıyorsan, ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekimine danış.</div>';
   h+='</div>';
-  h+='</div>';
-  return h;
+  return collapsibleCardHTML({key:'h-discomfort', icon:icon('bandage',18), accent:A, title:'Fiziksel Rahatsızlık', subtitle:'Beden haritası · şiddet · ilaç', badge:(selList.length?hBadge(selList.length+' bölge','#E25B6A'):''), open:cardOpen('h-discomfort'), body:h, hint:'beden haritasını aç'});
 }
+CARD_BUILDERS['h-discomfort']=discomfortCard;
 
 // ── Ruhsal Denge: fiziksel takibin yanında zihinsel sağlık (mod·enerji·stres) ──
 // Yeni veri modeli EKLEMEZ; mevcut mood/energy/stress alanlarından türetir.
@@ -4102,85 +4450,84 @@ function mentalBalanceCard(rec){
   return h;
 }
 CARD_BUILDERS.mental=mentalBalanceCard;
+// ── Sağlık bölümleri: premium iOS-27 açılır kartlar (in-place animasyonlu) ──
+function healthSleepCard(rec){
+  var sl=rec&&rec.sleep?rec.sleep:{}; var A='#8A75C8';
+  var _b='';
+  _b+='<div style="display:flex;align-items:center;gap:10px;"><input type="number" inputmode="decimal" step="0.5" min="0" max="24" value="'+(sl.hours!=null?esc(sl.hours):'')+'" oninput="App.setSleepHours(this)" placeholder="7.5" style="width:92px;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:14px;color:var(--muted);">saat uyudum</span></div>';
+  _b+='<div style="display:flex;gap:8px;">';
+  SLEEP_Q.forEach(function(q){ var sel=sl.quality===q.id; _b+='<button onclick="App.setSleepQuality(\''+q.id+'\')" style="flex:1;padding:10px 4px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#F7E9F1);border:1px solid #B89BD9;color:#4A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:20px;">'+q.emoji+'</span><span style="font-size:11px;font-weight:600;">'+q.label+'</span></button>'; });
+  _b+='</div>';
+  var med=(sl.med&&typeof sl.med==='object')?sl.med:{type:null,note:''};
+  _b+='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:8px;">';
+  _b+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);">Bu gece uyku ilacı / takviyesi kullandın mı?</div>';
+  _b+='<div style="display:flex;gap:8px;">';
+  SLEEP_MED.forEach(function(o){ var sel=med.type===o.id; _b+='<button onclick="App.setSleepMed(\''+o.id+'\')" style="flex:1;padding:9px 4px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#E3ECFF,#EFE7FB);border:1px solid #93A7D9;color:#3A4565;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+o.emoji+'</span><span style="font-size:10.5px;font-weight:700;line-height:1.2;text-align:center;">'+o.label+'</span></button>'; });
+  _b+='</div>';
+  if(med.type==='herbal'||med.type==='rx'){
+    _b+='<input type="text" value="'+(med.note?esc(med.note):'')+'" oninput="App.setSleepMedNote(this)" placeholder="'+(med.type==='rx'?'İlaç adı / doz (örn. trazodon 50mg)':'Takviye adı (örn. melatonin 3mg)')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;">';
+    _b+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. İlaç kullanımıyla ilgili kararları hekiminle birlikte ver.</div>';
+  }
+  _b+='</div>'; // ilaç / takviye bölümü
+  return collapsibleCardHTML({key:'h-sleep', icon:icon('moon',18), accent:A, title:'Uyku', subtitle:'Süre · kalite · ilaç', badge:(sl.hours!=null?hBadge(sl.hours+' sa',A):''), open:cardOpen('h-sleep'), body:_b, hint:'uykunu gir'});
+}
+CARD_BUILDERS['h-sleep']=healthSleepCard;
+function healthWalkCard(rec){
+  var ed=editing(); var wk=rec&&rec.walk?rec.walk:{}; var A='#6E9C6A';
+  var _b='';
+  if(!ed) _b+='<div style="display:flex;justify-content:flex-end;"><button onclick="App.importHealthClick()" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:6px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">'+icon('apple',13)+' Sağlık’tan çek</button></div>';
+  _b+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Adım</div><input type="number" inputmode="numeric" min="0" value="'+(wk.steps!=null?esc(wk.steps):'')+'" oninput="App.setWalkSteps(this)" placeholder="6200" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div>';
+  _b+='<div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(wk.minutes!=null?esc(wk.minutes):'')+'" oninput="App.setWalkMinutes(this)" placeholder="25" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div></div>';
+  var walkedToday=!!(rec&&rec.habits&&rec.habits.walked20);
+  var stepsEmpty=!(wk.steps!=null&&wk.steps!=='');
+  var trk=trackedSteps(rec);
+  if(!ed&&stepsEmpty&&trk>0){ var dmW=dayMovement(rec); _b+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(125,190,119,0.14),rgba(155,127,201,0.10));border:1px solid rgba(125,190,119,0.4);border-radius:14px;padding:11px 12px;"><span style="display:inline-flex;line-height:1.2;">'+icon('map-pin',18)+'</span><div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Konum takibinden bugün <b>~'+trk.toLocaleString('tr-TR')+' adım</b> ('+fmtDist(dmW.walk)+' yürüyüş) algılandı ve kullanılıyor. Elle adım girersen <b>girdiğin değer</b> geçerli olur.</div></div>'; }
+  if(!ed&&walkedToday&&stepsEmpty&&!ui.stepNudgeHidden){
+    _b+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(143,191,138,0.16),rgba(155,127,201,0.12));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 12px;">';
+    _b+='<span style="display:inline-flex;line-height:1.2;">'+icon('footprints',18)+'</span>';
+    _b+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Yürüyüşünü işaretledin, harika. İstersen adımını da ekle — ilerlemeni daha net görürüz. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
+    _b+='<button onclick="App.hideStepNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
+  }
+  if(!ed) _b+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini kendiliğinden yeşillendirir (süre yalnızca kayıt içindir)</div>';
+  return collapsibleCardHTML({key:'h-walk', icon:icon('footprints',18), accent:A, title:'Yürüyüş', subtitle:'Adım · süre · otomatik tik', badge:(wk.steps!=null&&wk.steps!==''?hBadge(Number(wk.steps).toLocaleString('tr-TR')+' adım',A):''), open:cardOpen('h-walk'), body:_b, hint:'adımını gir'});
+}
+CARD_BUILDERS['h-walk']=healthWalkCard;
+function healthAppleCard(rec){
+  var A='#8E8E93';
+  var _b='';
+  _b+='<div style="font-size:13px;line-height:1.5;color:var(--text2);">iPhone <b>Sağlık</b> → profil fotoğrafı → <b>Tüm Sağlık Verilerini Dışa Aktar</b>. Oluşan <b>export.zip</b> içindeki <b>export.xml</b> dosyasını seç; bugünün adımı ve uykusu otomatik dolsun.</div>';
+  _b+='<button onclick="App.importHealthClick()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:16px;font-size:15px;font-weight:700;color:var(--text);background:var(--card);display:flex;align-items:center;justify-content:center;gap:6px;">export.xml seç '+icon('download',15)+'</button>';
+  _b+='<input type="file" id="sey-health-file" accept=".xml,text/xml,application/xml,.zip" onchange="App.importHealthFile(this)" style="display:none;">';
+  _b+='<div id="sey-health-status" style="font-size:12.5px;color:var(--faint);min-height:16px;"></div>';
+  return collapsibleCardHTML({key:'h-apple', icon:icon('apple',18), accent:A, title:'Apple Sağlık\'tan içe aktar', subtitle:'export.xml · adım & uyku otomatik', badge:'', open:cardOpen('h-apple'), body:_b, hint:'içe aktarmayı aç'});
+}
+CARD_BUILDERS['h-apple']=healthAppleCard;
+
 function saglikHTML(){
   var ed=editing(); var viewDate=activeDate();
   var today=todayStr(); var rec=data.days[viewDate]||null;
   var sl=rec&&rec.sleep?rec.sleep:{}; var wk=rec&&rec.walk?rec.walk:{};
-  var readiness=sleepReadiness(rec);
+  // Varsayılan: Uyku açık, diğer sağlık bölümleri kapalı (ilk açılışta bir kez).
+  if(!ui.cards) ui.cards={};
+  if(ui.cards['h-sleep']===undefined) ui.cards['h-sleep']=true;
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   if(!ed) h+=sciNote('Uyku, hareket ve döngü tek bir sistemin parçaları: düzenli uyku sirkadiyen ritmi, hareket kan şekerini ve ruh hâlini, döngü ise hormonal dalgayı yansıtır. Birlikte bakınca örüntü netleşir.');
   if(!ed) h+=activityRings(rec);
   // Ruhsal Denge — fiziksel takibin yanında zihinsel sağlık (mevcut veriden türetilir)
   if(!ed) h+=mentalBalanceCard(rec);
-  // uyku
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Uyku '+icon('moon',17)+'</div>';
-  h+='<div style="display:flex;align-items:center;gap:10px;"><input type="number" inputmode="decimal" step="0.5" min="0" max="24" value="'+(sl.hours!=null?esc(sl.hours):'')+'" oninput="App.setSleepHours(this)" placeholder="7.5" style="width:92px;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"><span style="font-size:14px;color:var(--muted);">saat uyudum</span></div>';
-  h+='<div style="display:flex;gap:8px;">';
-  SLEEP_Q.forEach(function(q){ var sel=sl.quality===q.id; h+='<button onclick="App.setSleepQuality(\''+q.id+'\')" style="flex:1;padding:10px 4px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#F7E9F1);border:1px solid #B89BD9;color:#4A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:20px;">'+q.emoji+'</span><span style="font-size:11px;font-weight:600;">'+q.label+'</span></button>'; });
-  h+='</div>';
-  var med=(sl.med&&typeof sl.med==='object')?sl.med:{type:null,note:''};
-  h+='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:8px;">';
-  h+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);">Bu gece uyku ilacı / takviyesi kullandın mı?</div>';
-  h+='<div style="display:flex;gap:8px;">';
-  SLEEP_MED.forEach(function(o){ var sel=med.type===o.id; h+='<button onclick="App.setSleepMed(\''+o.id+'\')" style="flex:1;padding:9px 4px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#E3ECFF,#EFE7FB);border:1px solid #93A7D9;color:#3A4565;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+o.emoji+'</span><span style="font-size:10.5px;font-weight:700;line-height:1.2;text-align:center;">'+o.label+'</span></button>'; });
-  h+='</div>';
-  if(med.type==='herbal'||med.type==='rx'){
-    h+='<input type="text" value="'+(med.note?esc(med.note):'')+'" oninput="App.setSleepMedNote(this)" placeholder="'+(med.type==='rx'?'İlaç adı / doz (örn. trazodon 50mg)':'Takviye adı (örn. melatonin 3mg)')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;">';
-    h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu bilgi yalnızca kendi takibin için. İlaç kullanımıyla ilgili kararları hekiminle birlikte ver.</div>';
-  }
-  h+='</div>';
+  // uyku (premium açılır bölüm)
+  h+=healthSleepCard(rec);
   h+=caffeineBlock(rec);
   if(!ed) h+=medFreeBadge();
-  if(!ed){
-  h+='<div style="border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(138,117,200,0.2),rgba(233,175,193,0.16));border:1px solid rgba(155,127,201,0.3);display:flex;flex-direction:column;gap:10px;">';
-  var rdChip=readiness.readingCount>0?(readiness.readingCount+' kitap · '+readiness.readingPages+' sayfa'):'okuma yok';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:12px;color:var(--faint);">Uykuya dalma hazırlığı</div><div style="font-size:16px;font-weight:800;color:var(--text);">Skor '+readiness.score+'/100 · '+readiness.tier+'</div></div><div style="font-size:12px;color:#5A457A;background:rgba(255,255,255,0.55);padding:6px 10px;border-radius:999px;border:1px solid rgba(155,127,201,0.25);">'+rdChip+'</div></div>';
-  var rf=readiness.factors||{};
-  var fdefs=[['Uyku süresi',rf.duration||0,26],['Kalite',rf.quality||0,18],['Kafein',rf.caffeine||0,18],['Okuma',rf.reading||0,16],['Wind-down',rf.winddown||0,14],['İlaçsızlık',rf.medication||0,8]];
-  h+='<div style="display:flex;flex-direction:column;gap:5px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
-  fdefs.forEach(function(f){ var pct=Math.round(f[1]/f[2]*100); h+='<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);width:104px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:6px;border-radius:999px;background:rgba(90,69,122,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#9B7FC9,#E9AFC1);"></div></div><div style="font-size:10.5px;color:var(--faint);width:34px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
-  if(readiness.hasCaf){ var resCol=readiness.residue<CAFFEINE_SLEEP_SAFE_MG?'#5BA85B':(readiness.residue<100?'#E0A93C':'#E25B6A'); h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:11px;"><span style="color:var(--faint);">Yatandaki kafein kalıntısı</span><span style="font-weight:800;color:'+resCol+';">'+readiness.residue+' mg · son kahve '+(readiness.lastCaf||'—')+'</span></div>'; }
-  var srTip = !readiness.hasCaf ? 'Kafeinsiz gün uykuyu kolaylaştırır.' : (readiness.residue<CAFFEINE_SLEEP_SAFE_MG ? 'Kafein temiz — uykuya hazırsın.' : 'Son kahveyi erkene çek, yarı ömür ~5 sa.');
-  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:4px;">Bu gece: '+srTip+' · kaynak EFSA/FDA.</div>';
-  h+='</div>';
-  var rdEntries=readingStats(rec).entries;
-  if(rdEntries.length>0){
-    h+='<div style="display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.4);border:1px solid rgba(155,127,201,0.2);border-radius:14px;padding:10px 11px;">';
-    h+='<div style="font-size:11px;letter-spacing:.4px;font-weight:800;color:var(--muted);">BUGÜN OKUDUKLARIM</div>';
-    rdEntries.forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;">'+icon('book-open',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title||'(başlıksız)')+(e.author?' <span style=\"font-weight:500;color:var(--faint);\">· '+esc(e.author)+'</span>':'')+'</div>'+(meta.length?'<div style="font-size:11px;color:var(--faint);">'+meta.join(' · ')+'</div>':'')+'</div></div>'; });
-    h+='</div>';
-  }
-  h+='<button onclick="App.openReading()" style="border:1px solid rgba(155,127,201,0.35);cursor:pointer;padding:11px;border-radius:14px;font-size:13.5px;font-weight:800;color:#5A457A;background:rgba(255,255,255,0.62);display:flex;align-items:center;justify-content:center;gap:7px;">'+icon('book-open',15)+' Okuma ekle</button>';
-  h+='<div style="font-size:11.5px;line-height:1.45;color:var(--muted);">Uyku öncesi birkaç sayfa okumak, ekran ışığına göre uykuya geçişi kolaylaştırır.</div>';
-  h+='</div>';
-  } // /readiness+okuma (geçmiş gün düzenlemesinde gizli)
-  h+='</div>';
-  // yürüyüş
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="display:flex;align-items:center;gap:8px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">Yürüyüş '+icon('footprints',16)+'</div>'+(ed?'':'<button onclick="App.importHealthClick()" style="margin-left:auto;border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:6px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">'+icon('apple',13)+' Sağlık’tan çek</button>')+'</div>';
-  h+='<div style="display:flex;gap:10px;"><div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Adım</div><input type="number" inputmode="numeric" min="0" value="'+(wk.steps!=null?esc(wk.steps):'')+'" oninput="App.setWalkSteps(this)" placeholder="6200" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div>';
-  h+='<div style="flex:1;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:5px;">Süre (dk)</div><input type="number" inputmode="numeric" min="0" value="'+(wk.minutes!=null?esc(wk.minutes):'')+'" oninput="App.setWalkMinutes(this)" placeholder="25" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:16px;outline:none;text-align:center;"></div></div>';
-  var walkedToday=!!(rec&&rec.habits&&rec.habits.walked20);
-  var stepsEmpty=!(wk.steps!=null&&wk.steps!=='');
-  var trk=trackedSteps(rec);
-  if(!ed&&stepsEmpty&&trk>0){ var dmW=dayMovement(rec); h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(125,190,119,0.14),rgba(155,127,201,0.10));border:1px solid rgba(125,190,119,0.4);border-radius:14px;padding:11px 12px;"><span style="display:inline-flex;line-height:1.2;">'+icon('map-pin',18)+'</span><div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Konum takibinden bugün <b>~'+trk.toLocaleString('tr-TR')+' adım</b> ('+fmtDist(dmW.walk)+' yürüyüş) algılandı ve kullanılıyor. Elle adım girersen <b>girdiğin değer</b> geçerli olur.</div></div>'; }
-  if(!ed&&walkedToday&&stepsEmpty&&!ui.stepNudgeHidden){
-    h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(143,191,138,0.16),rgba(155,127,201,0.12));border:1px solid rgba(143,191,138,0.4);border-radius:14px;padding:11px 12px;">';
-    h+='<span style="display:inline-flex;line-height:1.2;">'+icon('footprints',18)+'</span>';
-    h+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Yürüyüşünü işaretledin, harika. İstersen adımını da ekle — ilerlemeni daha net görürüz. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
-    h+='<button onclick="App.hideStepNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
-  }
-  if(!ed) h+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini kendiliğinden yeşillendirir (süre yalnızca kayıt içindir)</div>';
-  h+='</div>';
+  if(!ed) h+=sleepPrepCard(rec);
+  h+=bodyCard(rec);
+  h+=labCard();
+  // yürüyüş (premium açılır bölüm)
+  h+=healthWalkCard(rec);
   if(!ed) h+=sparkCard();
   h+=discomfortCard(rec);
-  // Apple Health
-  if(!ed){
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">Apple Sağlık\'tan içe aktar '+icon('apple',16)+'</div>';
-  h+='<div style="font-size:13px;line-height:1.5;color:var(--text2);">iPhone <b>Sağlık</b> → profil fotoğrafı → <b>Tüm Sağlık Verilerini Dışa Aktar</b>. Oluşan <b>export.zip</b> içindeki <b>export.xml</b> dosyasını seç; bugünün adımı ve uykusu otomatik dolsun.</div>';
-  h+='<button onclick="App.importHealthClick()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:16px;font-size:15px;font-weight:700;color:var(--text);background:var(--card);display:flex;align-items:center;justify-content:center;gap:6px;">export.xml seç '+icon('download',15)+'</button>';
-  h+='<input type="file" id="sey-health-file" accept=".xml,text/xml,application/xml,.zip" onchange="App.importHealthFile(this)" style="display:none;">';
-  h+='<div id="sey-health-status" style="font-size:12.5px;color:var(--faint);min-height:16px;"></div></div>';
-  }
+  // Apple Health (premium açılır bölüm)
+  if(!ed) h+=healthAppleCard(rec);
   h+=cycleHTML();
   h+='</div>';
   return h;
@@ -4221,8 +4568,8 @@ function cycleWheel(st){
 }
 function cycleHTML(){
   var st=cycleStats(); var today=todayStr(); var vd=activeDate(); var edC=editing(); var rec=data.days[vd]||null; var curFlow=rec?rec.flow:null; var curSym=(rec&&rec.symptoms)?rec.symptoms:[]; var ph=st.phase?PHASES[st.phase]:null;
-  var h='<div style="padding:10px 4px 0;"><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Menstrüasyon Döngüsü '+icon('flower-2',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:2px;">Bilimsel takip · tahmindir, tıbbi tavsiye değildir</div></div>';
-  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:14px;"><div style="flex-shrink:0;">'+cycleWheel(st)+'</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;">';
+  var A='#C77DA6';
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:14px;"><div style="flex-shrink:0;">'+cycleWheel(st)+'</div><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;">';
   if(ph){ h+='<div style="display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:800;color:'+ph.color+';">'+ph.emoji+' '+esc(ph.label)+'</div><div style="font-size:12.5px;line-height:1.45;color:var(--text2);">'+esc(ph.note)+'</div>'; }
   else { h+='<div style="font-size:13px;color:var(--muted);line-height:1.5;">Henüz regl kaydı yok. Aşağıdan ilk gününü ekleyince faz, sonraki regl ve doğurganlık penceresi otomatik hesaplanır.</div>'; }
   h+='</div></div>';
@@ -4247,8 +4594,9 @@ function cycleHTML(){
   h+='<div class="glass" style="border-radius:18px;padding:14px;"><div style="font-size:13.5px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">4 Faz kısaca '+icon('microscope',15)+'</div>';
   ['menstrual','follicular','ovulation','luteal'].forEach(function(k){ var p=PHASES[k]; h+='<div style="display:flex;gap:8px;margin-bottom:7px;font-size:12.5px;line-height:1.4;"><span style="flex-shrink:0;">'+p.emoji+'</span><span><b style="color:'+p.color+';">'+esc(p.label)+'</b> — '+esc(p.note)+'</span></div>'; });
   h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;margin-top:6px;border-top:1px solid rgba(150,110,120,0.12);padding-top:8px;">Hesaplamalar takvim/ortalama yöntemine dayanır (luteal faz ~14 gün kabulü). Gerçek ovülasyon kişiden kişiye değişir; gebelikten korunma veya tıbbi karar için tek başına kullanılmamalıdır.</div></div>';
-  return h;
+  return collapsibleCardHTML({key:'h-cycle', icon:icon('flower-2',18), accent:A, title:'Menstrüasyon Döngüsü', subtitle:'Bilimsel takip · tahmindir, tıbbi tavsiye değildir', badge:(ph?hBadge(ph.label,ph.color):(st.dayInCycle?hBadge('Gün '+st.dayInCycle,A):'')), open:cardOpen('h-cycle'), body:h, hint:'döngüyü aç'});
 }
+CARD_BUILDERS['h-cycle']=cycleHTML;
 
 // ── Saygı sayfası: uzun Wikipedia metni güvenli düz bloklar halinde basılır. ──
 function saygiSourceFallback(person){ return 'https://tr.wikipedia.org/wiki/'+encodeURIComponent(String(person&&person.trTitle||person&&person.name||'').replace(/ /g,'_')); }
@@ -4271,7 +4619,15 @@ function saygiReadButtonHTML(person,done){
 function saygiLoadingHTML(){
   return '<div class="saygi-loading" role="status"><div class="saygi-loading-mark">'+icon('trophy',26)+'</div><div><strong>Bugünün biyografisi hazırlanıyor</strong><span>Wikipedia’dan metin, görsel ve kaynaklar güvenli biçimde alınıyor.</span></div><div class="saygi-loading-lines"><i></i><i></i><i></i></div></div>';
 }
+function saygiComingSoonHTML(){
+  var h='<section class="saygi-page">';
+  h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div></div>';
+  h+='<div class="saygi-loading"><span class="saygi-loading-mark">'+icon('clock',20)+'</span><div><strong>Yakında açılıyor</strong><span>Saygı, 13 Temmuz sabahı ilk isimle başlıyor. O güne kadar burada bekliyor olacak.</span></div></div>';
+  h+='</section>';
+  return h;
+}
 function saygiHTML(){
+  if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
   if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
   saygiEnsureArticle(person);
@@ -4353,12 +4709,16 @@ function appHeaderMeta(){
     base.icon='activity'; base.accent='#2F6B63'; base.accent2='#60695D'; base.ink='#1F2826';
     if(!ed) base.action={label:'İçe aktar',icon:'apple',fn:'App.importHealthClick()'};
   } else if(tab==='saygi'){
-    var saygiPerson=saygiCurrentPerson(), saygiIndex=saygiPerson?(saygiPeople().indexOf(saygiPerson)+1):0;
-    base.kicker=saygiPerson?('Günün öncüsü · '+saygiIndex+'/'+saygiPeople().length):'Günün öncüsü';
     base.title='Saygı';
-    base.sub=saygiPerson?(saygiPerson.name+' · '+saygiPerson.field):'Bilim ve sanatın iz bırakan 100 ismi';
     base.icon='trophy'; base.accent='#826936'; base.accent2='#36454B'; base.ink='#242723';
-    base.action={label:'Yenile',icon:'rotate-ccw',fn:'App.refreshSaygi()'};
+    if(!featuresLive()){
+      base.kicker='Yakında'; base.sub='13 Temmuz\'da açılıyor';
+    } else {
+      var saygiPerson=saygiCurrentPerson(), saygiIndex=saygiPerson?(saygiPeople().indexOf(saygiPerson)+1):0;
+      base.kicker=saygiPerson?('Günün öncüsü · '+saygiIndex+'/'+saygiPeople().length):'Günün öncüsü';
+      base.sub=saygiPerson?(saygiPerson.name+' · '+saygiPerson.field):'Bilim ve sanatın iz bırakan 100 ismi';
+      base.action={label:'Yenile',icon:'rotate-ccw',fn:'App.refreshSaygi()'};
+    }
   } else if(tab==='mesaj'){
     var unread=unreadNotifCount();
     var pending=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa.filter(function(q){return q&&!q.answer;}).length:0;
@@ -4873,8 +5233,9 @@ function modalsHTML(){
   if(ui.watchOpen){ h+=watchOverlayHTML(); }
   if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
   if(ui.learningOpen){ h+=learningOverlayHTML(); }
+  if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
-    h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
   }
   if(ui.dayDetail){
@@ -5066,6 +5427,7 @@ function updateLiveSession(){
   save();
 }
 function finalizeSession(){
+  flushFieldTimers();
   if(!data || sessionState.closed) return;
   var today=todayStr();
   var rec=getDay(data,today,diffDays(data.startDate,today));
@@ -5149,6 +5511,12 @@ function fetchAeonMedia(id){
     .then(function(j){ aeonMediaCache[id]=j; return j; });
 }
 function aeonRecTimeStr(sec){ sec=Math.max(0,Math.round(Number(sec)||0)); var m=Math.floor(sec/60), s=sec%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+function humanFileSize(bytes){
+  bytes=Number(bytes)||0;
+  if(bytes<1024) return bytes+' B';
+  if(bytes<1024*1024) return Math.round(bytes/1024)+' KB';
+  return (Math.round(bytes/1024/1024*10)/10)+' MB';
+}
 // Görünen ÆON balonlarındaki ses/foto yuvalarını doldurur — kendi az önce gönderdiğin
 // medya zaten aeonMediaCache'te (yerelde) olduğu için anında görünür; gelen/geçmiş
 // medya ilk görüntülemede data/aeon-media/<id>.json'dan çekilir, sonrasında önbellekte kalır.
@@ -5159,6 +5527,7 @@ function aeonEnsureMediaLoaded(mediaId,kind,elId){
     var uri='data:'+(m.mime||'')+';base64,'+m.data;
     if(kind==='image') el.innerHTML='<img src="'+uri+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
     else if(kind==='voice') aeonPaintVoicePlayer(el,mediaId,m,uri);
+    else if(kind==='file') aeonPaintFileCard(el,mediaId,m);
   }
   if(aeonMediaCache[mediaId]){ paint(aeonMediaCache[mediaId]); return; }
   fetchAeonMedia(mediaId).then(paint).catch(function(){ paint(null); });
@@ -5201,6 +5570,31 @@ App.aeonOpenImage=function(mediaId){
     +'<button aria-label="Kapat" style="position:absolute;top:calc(env(safe-area-inset-top) + 16px);right:16px;border:none;background:rgba(255,255,255,0.15);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('x',18)+'</button>';
   d.onclick=function(e){ if(e.target===d||e.target.tagName==='BUTTON') d.remove(); };
   document.body.appendChild(d);
+};
+// ---------- ÆON belge kartı (WhatsApp tarzı: ikon + ad + boyut + aç/indir) ----------
+function aeonPaintFileCard(container,mediaId,m){
+  var name=m.name||'Belge', size=m.size!=null?humanFileSize(m.size):'';
+  container.setAttribute('onclick','App.aeonOpenFile(\''+mediaId+'\')');
+  container.style.cursor='pointer';
+  container.innerHTML='<div style="display:flex;align-items:center;gap:11px;min-width:170px;max-width:260px;">'
+    +'<span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:currentColor;color:inherit;"><span style="display:flex;color:var(--card);">'+icon('file-text',17)+'</span></span>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(name)+'</div>'
+    +'<div style="font-size:10.5px;opacity:.7;margin-top:1px;">'+(size?esc(size)+' · ':'')+'aç / indir</div></div>'
+    +'<span style="flex-shrink:0;display:inline-flex;opacity:.75;">'+icon('download',15)+'</span>'
+    +'</div>';
+}
+App.aeonOpenFile=function(mediaId){
+  fetchAeonMedia(mediaId).then(function(m){
+    if(!m){ toast('Belge yüklenemedi'); return; }
+    try{
+      var bin=atob(String(m.data||'').replace(/\s+/g,''));
+      var by=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) by[i]=bin.charCodeAt(i);
+      var url=URL.createObjectURL(new Blob([by],{type:m.mime||'application/octet-stream'}));
+      var w=window.open(url,'_blank');
+      if(!w){ var a=document.createElement('a'); a.href=url; a.download=m.name||'belge'; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+    }catch(e){ toast('Belge açılamadı'); }
+  }).catch(function(){ toast('Belge yüklenemedi'); });
 };
 function fetchObserverInbox(){
   var c=ghCfgApp(); if(!c) return;
@@ -5260,7 +5654,7 @@ function mergeInbox(msgs){
       if(q){
         if(q.answerMsgId!==m.id){
           q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; q.answerSynced=false;
-          if(m.kind==='voice'||m.kind==='image'){ q.answerKind=m.kind; q.answerMediaId=m.mediaId; q.answerMediaMime=m.mediaMime; q.answerDurationSec=m.durationSec; q.answerPeaks=m.peaks; q.answerW=m.w; q.answerH=m.h; }
+          if(m.kind==='voice'||m.kind==='image'||m.kind==='file'){ q.answerKind=m.kind; q.answerMediaId=m.mediaId; q.answerMediaMime=m.mediaMime; q.answerDurationSec=m.durationSec; q.answerPeaks=m.peaks; q.answerW=m.w; q.answerH=m.h; if(m.name) q.answerMediaName=m.name; if(m.size!=null) q.answerMediaSize=m.size; }
           answeredCount++; answeredText=q.answer;
         }
         else if(q.answerSynced!==true){ needPush=true; } // yanıt cihaza indi ama repoya işlenmemişse tekrar dene
@@ -5271,7 +5665,7 @@ function mergeInbox(msgs){
     var ex=seen[m.id];
     if(ex){ if(ex.synced!==true) needPush=true; return; } // cihazda var ama repoya işlenmemişse tekrar denenmeli
     var notif={id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false,synced:false};
-    if(m.kind==='voice'||m.kind==='image'){ notif.kind=m.kind; notif.mediaId=m.mediaId; notif.mediaMime=m.mediaMime; notif.durationSec=m.durationSec; notif.peaks=m.peaks; notif.w=m.w; notif.h=m.h; }
+    if(m.kind==='voice'||m.kind==='image'||m.kind==='file'){ notif.kind=m.kind; notif.mediaId=m.mediaId; notif.mediaMime=m.mediaMime; notif.durationSec=m.durationSec; notif.peaks=m.peaks; notif.w=m.w; notif.h=m.h; if(m.name) notif.mediaName=m.name; if(m.size!=null) notif.mediaSize=m.size; }
     data.notifications.push(notif);
     added++;
   });
@@ -5714,7 +6108,7 @@ function submitAeonQuestion(question){
 // biter beklemeden aeonMediaCache'e önceden konur — balonun anında görünmesi için.
 function submitAeonMedia(kind,base64,mime,extra,captionFallback){
   if(!ghCfgApp()){ toast('Önce Ayarlar\'dan repoya bağlan'); return; }
-  var id=aeonMediaId(kind==='voice'?'av':'ai');
+  var id=aeonMediaId(kind==='voice'?'av':(kind==='file'?'af':'ai'));
   var payload={mime:mime,data:base64};
   if(extra) for(var k in extra){ if(extra[k]!=null) payload[k]=extra[k]; }
   aeonMediaCache[id]=payload;
@@ -5725,16 +6119,16 @@ function submitAeonMedia(kind,base64,mime,extra,captionFallback){
     var ts=new Date().toISOString();
     var qid='q_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
     var qaItem={id:qid,question:captionFallback,ts:ts,answer:null,answeredAt:null,kind:kind,mediaId:id,mediaMime:mime};
-    if(extra){ if(extra.durationSec!=null) qaItem.durationSec=extra.durationSec; if(extra.peaks) qaItem.peaks=extra.peaks; if(extra.w) qaItem.w=extra.w; if(extra.h) qaItem.h=extra.h; }
+    if(extra){ if(extra.durationSec!=null) qaItem.durationSec=extra.durationSec; if(extra.peaks) qaItem.peaks=extra.peaks; if(extra.w) qaItem.w=extra.w; if(extra.h) qaItem.h=extra.h; if(extra.name) qaItem.mediaName=extra.name; if(extra.size!=null) qaItem.mediaSize=extra.size; if(extra.viaUpload) qaItem.viaUpload=true; }
     data.aeon.qa.push(qaItem);
     data.aeon.lastAskDate=todayStr();
     ui.aeonUploading=false; ui.aeonScrollBottom=true;
     haptic(14);
     save();
-    appendAeonOutgoing({sort:ts,kind:'out',text:captionFallback,time:ts,answered:false,reviewing:false,mediaKind:kind,mediaId:id,mediaMime:mime,durationSec:qaItem.durationSec,peaks:qaItem.peaks,w:qaItem.w,h:qaItem.h});
+    appendAeonOutgoing({sort:ts,kind:'out',text:captionFallback,time:ts,answered:false,reviewing:false,mediaKind:kind,mediaId:id,mediaMime:mime,durationSec:qaItem.durationSec,peaks:qaItem.peaks,w:qaItem.w,h:qaItem.h,mediaName:qaItem.mediaName,mediaSize:qaItem.mediaSize});
     try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
     try{ if(window.SeySync&&typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:captionFallback,ts:ts}); }catch(e){}
-    toast((kind==='voice'?'Sesli mesaj':'Fotoğraf')+' ÆON’a iletildi ⬡',2200);
+    toast((kind==='file'?'Belge':(kind==='voice'?(extra&&extra.viaUpload?'Ses dosyası':'Sesli mesaj'):'Fotoğraf'))+' ÆON’a iletildi ⬡',2200);
   }).catch(function(e){
     delete aeonMediaCache[id];
     ui.aeonUploading=false; render();
@@ -5848,6 +6242,38 @@ App.aeonPhotoChosen=function(el){
   };
   reader.onerror=function(){ toast('Fotoğraf okunamadı'); };
   reader.readAsDataURL(f);
+};
+// ---------- ÆON belge gönderme (seç → oku → yükle, sıkıştırma yok) ----------
+App.aeonPickFile=function(){ if(ui.aeonUploading||aeonRec) return; var el=document.getElementById('aeon-file-input'); if(el) el.click(); };
+App.aeonFileChosen=function(el){
+  var f=el.files&&el.files[0]; el.value='';
+  if(!f) return;
+  if(f.size>4*1024*1024) toast('Belge büyük (>4MB) — gönderim biraz sürebilir',3200);
+  readFileB64(f).then(function(b64){
+    submitAeonMedia('file',b64,f.type||'application/octet-stream',{name:f.name,size:f.size},'Belge: '+f.name);
+  }).catch(function(){ toast('Belge okunamadı'); });
+};
+// ---------- ÆON hazır ses dosyası gönderme (canlı kayıttan farklı — cihazdan seçilir) ----------
+// Ses oynatıcı zaten 'voice' kind'ini peaks olmadan da (düz dalga formuyla) çizebiliyor,
+// bu yüzden yeni bir oynatıcı yazmak yerine aynı balon/oynatma koduna extra.viaUpload
+// bayrağıyla katılıyoruz — süre yalnızca dosyanın kendi metadata'sından okunur.
+App.aeonPickAudioFile=function(){ if(ui.aeonUploading||aeonRec) return; var el=document.getElementById('aeon-audio-input'); if(el) el.click(); };
+App.aeonAudioFileChosen=function(el){
+  var f=el.files&&el.files[0]; el.value='';
+  if(!f) return;
+  if(!/^audio\//.test(f.type)){ toast('Bu bir ses dosyası değil'); return; }
+  if(f.size>4*1024*1024) toast('Ses dosyası büyük (>4MB) — gönderim biraz sürebilir',3200);
+  var probe=document.createElement('audio'), probeUrl=URL.createObjectURL(f);
+  function finish(durationSec){
+    URL.revokeObjectURL(probeUrl);
+    readFileB64(f).then(function(b64){
+      submitAeonMedia('voice',b64,f.type||'audio/mpeg',{durationSec:durationSec,name:f.name,viaUpload:true},'Ses dosyası: '+f.name);
+    }).catch(function(){ toast('Ses dosyası okunamadı'); });
+  }
+  probe.preload='metadata';
+  probe.onloadedmetadata=function(){ finish(isFinite(probe.duration)?Math.round(probe.duration):0); };
+  probe.onerror=function(){ finish(0); };
+  probe.src=probeUrl;
 };
 App.onLunaDraft=function(el){ ui.lunaDraft=el.value; try{ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }catch(e){} };
 App.onAeonDraft=function(el){
@@ -6071,6 +6497,9 @@ function aeonMediaSlotHTML(it,bg,fg){
     var ratio=(it.w&&it.h)?(it.w+'/'+it.h):'1/1';
     return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="image" onclick="App.aeonOpenImage(\''+it.mediaId+'\')" style="width:210px;max-width:58vw;aspect-ratio:'+ratio+';border-radius:14px;overflow:hidden;background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;color:'+fg+';"><span style="font-size:12.5px;opacity:.75;">Yükleniyor…</span></div>';
   }
+  if(it.mediaKind==='file'){
+    return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="file" style="color:'+fg+';min-width:170px;"><span style="font-size:12.5px;opacity:.75;display:flex;align-items:center;gap:4px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
+  }
   return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="voice" style="color:'+fg+';min-width:170px;"><span style="font-size:12.5px;opacity:.75;display:flex;align-items:center;gap:4px;">'+icon('mic',13)+' Yükleniyor…</span></div>';
 }
 function aeonItemHTML(it,enterCls){
@@ -6098,6 +6527,36 @@ function aeonItemHTML(it,enterCls){
   }
   return h;
 }
+// Ek gönderme sayfası (fotoğraf/belge/ses dosyası) — WhatsApp/Telegram tarzı
+// premium bottom-sheet. Canlı kayıt mikrofon düğmesinden bağımsız; yalnızca
+// cihazdan seçilen ekler burada toplanır.
+function aeonAttachSheetHTML(){
+  var items=[
+    {ic:'camera',label:'Fotoğraf',sub:'Galeriden seç ya da fotoğraf çek',kind:'photo'},
+    {ic:'file-text',label:'Belge',sub:'PDF, Word, Excel ve diğer dosyalar',kind:'file'},
+    {ic:'music',label:'Ses dosyası',sub:'Cihazından hazır bir ses kaydı yükle',kind:'audio'}
+  ];
+  var h='<div id="aeon-attach-back" onclick="App.aeonCloseAttachSheet()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:24px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .22s ease;">';
+  h+='<div style="padding:12px 12px 8px;font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">ÆON’a gönder</div>';
+  items.forEach(function(it){
+    h+='<button onclick="App.aeonSheetPick(\''+it.kind+'\')" style="display:flex;align-items:center;gap:13px;text-align:left;border:none;background:none;cursor:pointer;padding:10px 12px;border-radius:16px;width:100%;">';
+    h+='<span style="width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--aeon2),var(--aeon));color:#1a1404;">'+icon(it.ic,19)+'</span>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:var(--text);">'+it.label+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+it.sub+'</div></div>';
+    h+='</button>';
+  });
+  h+='<button onclick="App.aeonCloseAttachSheet()" style="margin-top:6px;border:1px solid var(--field-bd);background:var(--field);color:var(--muted);font-weight:800;font-size:13.5px;padding:12px;border-radius:14px;cursor:pointer;width:100%;">Vazgeç</button>';
+  h+='</div></div>';
+  return h;
+}
+App.aeonOpenAttachSheet=function(){ if(ui.aeonUploading||aeonRec) return; ui.aeonAttachOpen=true; render(); };
+App.aeonCloseAttachSheet=function(){ ui.aeonAttachOpen=false; render(); };
+App.aeonSheetPick=function(kind){
+  ui.aeonAttachOpen=false; render();
+  if(kind==='photo') App.aeonPickPhoto();
+  else if(kind==='file') App.aeonPickFile();
+  else if(kind==='audio') App.aeonPickAudioFile();
+};
 // ÆON = insan-döngülü sohbet: kullanıcının soruları (sağ/giden balon) panele gider,
 // gözlemci ÆON adına yanıtlar (sol/gelen balon). Gözlemci mesajları da gelen balondur.
 // Tümünü tek kronolojik akışta gösteririz; yazı kutusu altta sabittir.
@@ -6112,11 +6571,11 @@ function aeonChatHTML(){
   h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',14)+'</button>';
   h+='</div>';
   var items=[];
-  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h}); });
+  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
   qa.forEach(function(x){ if(!x) return;
-    items.push({sort:String(x.ts||''),kind:'out',text:x.question,time:x.ts,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h});
-    if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH});
+    items.push({sort:String(x.ts||''),kind:'out',text:x.question,time:x.ts,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize});
+    if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize});
   });
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
   // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ
@@ -6163,7 +6622,9 @@ function aeonChatHTML(){
   } else {
     h+='<div style="display:flex;gap:8px;align-items:flex-end;">';
     h+='<input type="file" id="aeon-photo-input" accept="image/*" style="display:none;" onchange="App.aeonPhotoChosen(this)">';
-    h+='<button onclick="App.aeonPickPhoto()" aria-label="Fotoğraf gönder" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;width:44px;height:44px;border-radius:50%;background:var(--field);color:var(--muted);display:flex;align-items:center;justify-content:center;'+(ui.aeonUploading?'opacity:.5;pointer-events:none;':'')+'">'+icon('camera',18)+'</button>';
+    h+='<input type="file" id="aeon-file-input" accept="'+AEON_FILE_ACCEPT+'" style="display:none;" onchange="App.aeonFileChosen(this)">';
+    h+='<input type="file" id="aeon-audio-input" accept="audio/*" style="display:none;" onchange="App.aeonAudioFileChosen(this)">';
+    h+='<button onclick="App.aeonOpenAttachSheet()" aria-label="Ek gönder" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;width:44px;height:44px;border-radius:50%;background:var(--field);color:var(--muted);display:flex;align-items:center;justify-content:center;'+(ui.aeonUploading?'opacity:.5;pointer-events:none;':'')+'">'+icon('paperclip',18)+'</button>';
     h+='<textarea id="aeon-input" class="aeon-input-field" oninput="App.onAeonDraft(this)" onkeydown="App.onAeonKeydown(event)" placeholder="İçini dök, buradayım…" rows="1" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:18px;padding:11px 14px;font-size:14.5px;resize:none;outline:none;line-height:1.4;max-height:120px;overflow-y:auto;">'+esc(ui.aeonDraft||'')+'</textarea>';
     h+='<button id="aeon-send-btn" class="aeon-send-btn'+(draftLen?'':' is-disabled')+'" onclick="App.askAeon()" aria-label="Gönder" style="display:'+(draftLen?'flex':'none')+';flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));box-shadow:0 6px 16px var(--aeon-glow);align-items:center;justify-content:center;">'+icon('send',19)+'</button>';
     h+='<button id="aeon-mic-btn" onclick="App.aeonMicTap()" aria-label="Sesli mesaj kaydet" style="display:'+(draftLen?'none':'flex')+';flex-shrink:0;border:none;cursor:pointer;width:46px;height:46px;border-radius:50%;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));box-shadow:0 6px 16px var(--aeon-glow);align-items:center;justify-content:center;'+(ui.aeonUploading?'opacity:.5;pointer-events:none;':'')+'">'+icon('mic',19)+'</button>';

@@ -24,6 +24,29 @@ function cfg(){
   }
   return null;
 }
+// ── VERİ GÜVENLİĞİ / DATA-SAFETY GUARDS ─────────────────────────────────────
+// SORUN (2026-07-10): Uygulama yerel bir sunucudan (localhost) tarayıcıda
+// açıldığında, o tarayıcının BAYAT/eksik localStorage durumu (hâlâ geçerli
+// ghToken ile) otomatik push edildi ve data/latest.json'ı ezdi: 17 günlük
+// gerçek veri, 3 günlük boş iskeletle değişti. Aşağıdaki iki guard bunu önler.
+// Bilinçli kaçış kapısı: localStorage.setItem('seyma-sync-force','1') ya da ?forceSync=1
+function devOrigin(){
+  try{
+    if(typeof location==='undefined') return false;
+    if(location.protocol==='file:') return true;
+    var h=(location.hostname||'').toLowerCase();
+    return h==='localhost'||h==='127.0.0.1'||h==='0.0.0.0'||h==='::1'||/\.local$/.test(h);
+  }catch(e){ return false; }
+}
+function syncForced(){
+  try{
+    if(localStorage.getItem('seyma-sync-force')==='1') return true;
+    if(typeof location!=='undefined' && /[?&]forceSync=1/.test(location.search||'')) return true;
+  }catch(e){}
+  return false;
+}
+function dayCount(obj){ try{ return (obj&&obj.days&&typeof obj.days==='object') ? Object.keys(obj.days).length : 0; }catch(e){ return 0; } }
+function b64decodeUtf8(s){ try{ var bin=atob(String(s).replace(/\s+/g,'')); var by=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) by[i]=bin.charCodeAt(i); return new TextDecoder().decode(by); }catch(e){ return ''; } }
 function pad(n){ return (n<10?'0':'')+n; }
 function timeStr(iso){ try{ var d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }catch(e){ return ''; } }
 function statusText(){
@@ -70,11 +93,35 @@ function persistBranch(branch){
     localStorage.setItem(KEY,JSON.stringify(d));
   }catch(e){}
 }
+// GUARD 2 — ANTI-CLOBBER: uzak latest.json'dan daha AZ güne düşecek push'u engelle.
+// Günler yalnızca birikir; local<remote ise bu bir veri kaybı/ezme demektir.
+function putLatestGuarded(c, latestStr, localData){
+  var base='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/latest.json';
+  var H=ghHeaders(c);
+  return fetch(base+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
+    .then(function(r){ if(r.status===200) return r.json(); return null; })
+    .then(function(g){
+      var sha=(g&&g.sha)||null, remoteDays=0;
+      if(g&&g.content){ try{ remoteDays=dayCount(JSON.parse(b64decodeUtf8(g.content))); }catch(e){} }
+      var localDays=dayCount(localData);
+      if(remoteDays>0 && localDays<remoteDays && !syncForced()){
+        try{ console.error('[SeySync] ANTI-CLOBBER: yerel '+localDays+' gün < uzak '+remoteDays+' gün. Veri kaybını önlemek için push İPTAL edildi. Bilinçli üzerine yazmak için: localStorage.setItem("seyma-sync-force","1")'); }catch(e){}
+        setStatus('error','Güvenlik: '+localDays+'<'+remoteDays+' gün, push iptal');
+        throw new Error('anti-clobber: local '+localDays+' < remote '+remoteDays+' days');
+      }
+      var body={message:'sync: data/latest.json', content:b64(latestStr), branch:c.branch}; if(sha) body.sha=sha;
+      var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
+      return fetch(base,{method:'PUT',headers:H2,body:JSON.stringify(body)}).then(function(r){
+        if(r.ok) return;
+        return r.text().then(function(t){ throw new Error(r.status+' '+t.slice(0,160)); });
+      });
+    });
+}
 function pushWithCfg(c, data){
   var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
   var latest=JSON.stringify(data,null,2);
   var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:data},null,2);
-  return ghPut(c,'data/latest.json',latest).then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
+  return putLatestGuarded(c,latest,data).then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
 }
 // repoya yazmadan önce hassas alanları (token) çıkar — public repoya sızmasın
 function sanitize(data){
@@ -88,6 +135,13 @@ function sanitize(data){
 }
 function doPush(data){
   var c=cfg(); if(!c){ setStatus('idle'); return; }
+  // GUARD 1 — yerel/geliştirme ortamından (localhost/file:) push etme. Bayat bir
+  // localStorage durumu gerçek veriyi ezebilir (bkz. CLAUDE.md → Veri Güvenliği).
+  if(devOrigin() && !syncForced()){
+    setStatus('idle');
+    try{ console.warn('[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1'); }catch(e){}
+    return;
+  }
   setStatus('saving');
   var safe=sanitize(data);
   pushWithCfg(c,safe)
@@ -107,12 +161,13 @@ function doPush(data){
 // (hareket/mod gibi sık latest.json push'larında boşuna çalışıp Actions dakikası yakmaz).
 function pushPing(item){
   var c=cfg(); if(!c) return Promise.resolve();
+  if(devOrigin() && !syncForced()) return Promise.resolve(); // GUARD 1 — yerelden ping yazma
   var payload=JSON.stringify({type:'aeon-question',item:item,ts:new Date().toISOString()},null,2);
   return ghPut(c,'data/aeon-outbox.json',payload).catch(function(){});
 }
 
 window.SeySync={
-  schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
+  schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } if(devOrigin() && !syncForced()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
   pushNow:function(){ clearTimeout(timer); if(lastPayload){ doPush(lastPayload); return; } try{ var raw=localStorage.getItem(KEY); if(raw) doPush(JSON.parse(raw)); }catch(e){} },
   pushPing:pushPing,
   statusText:statusText

@@ -2,6 +2,42 @@
 
 Guidance for AI assistants (Claude Code and others) working in this repository.
 
+## ⚠️ DATA SAFETY — READ FIRST (do not skip)
+
+**The problem (happened 2026-07-10):** An agent ran `open http://localhost:8765`
+to "verify the app runs." The browser at that origin still held a **stale,
+partial `seyma-reset-v1` state in localStorage with a valid `ghToken`**. On load
+the app called `save()` → `SeySync.schedule()` and **pushed that stale 3-day
+state to `mustafaras/seyma-data`, overwriting `data/latest.json` and wiping 17
+days of real mood/notes/ticks** (4395 lines → 229). `sync.js` does a *full
+replace*, not a merge, so any device/tab that saves overwrites the whole file.
+
+**Hard rules — every agent, every session:**
+
+1. **NEVER open or serve+open the Şeyma app in a browser to "check it runs."**
+   Use the headless Node `vm` render harness instead (see "Verification" below
+   and `MEMORY.md`). Opening the app is the single most dangerous thing you can
+   do here.
+2. If you *must* use a real browser, it now self-protects: `sync.js` **blocks
+   all pushes from `localhost`/`127.0.0.1`/`file:`/`*.local`** (Guard 1) and
+   **blocks any push whose day-count is lower than the remote** (Guard 2,
+   anti-clobber). Do not defeat these. The deliberate escape hatch is
+   `localStorage.setItem('seyma-sync-force','1')` or `?forceSync=1` — only set
+   it if you *intend* to overwrite real data and have a backup.
+3. **Never write to `mustafaras/seyma-data` without explicit user consent.** It
+   holds the only live copy of personal data. Reads are fine.
+4. **Always stop any local server you start** (`pkill -f http.server`) before
+   ending your turn.
+
+**Recovery (if data is clobbered anyway):** No data is truly lost — restore it.
+The real data survives in (a) `seyma-data` git history — find the last
+`sync: data/latest.json` commit that still has the full day set and restore its
+blob to `data/latest.json` via the Contents API; and (b) the untouched
+`data/gunluk/<date>.json` full snapshots (each wraps the entire `data` object
+under keys `app/date/savedAt/data`). The user's phone is push-only source of
+truth and is *not* cleared by a clobber, so it re-heals on its next sync — tell
+the user to reopen the app there (and not to tap "Verileri sıfırla").
+
 ## What this is
 
 **Şeyma 🦩** is a private, single-user personal wellness/mood-tracking web app

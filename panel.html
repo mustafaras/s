@@ -268,6 +268,8 @@
 "use strict";
 var ICONS={
   'activity':'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />',
+  'ruler':'<path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" /><path d="m14.5 12.5 2-2" /><path d="m11.5 9.5 2-2" /><path d="m8.5 6.5 2-2" /><path d="m17.5 15.5 2-2" />',
+  'info':'<circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />',
   'alarm-clock':'<circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" />',
   'annoyed':'<circle cx="12" cy="12" r="10" /><path d="M8 15h8" /><path d="M8 9h2" /><path d="M14 9h2" />',
   'triangle-alert':'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" />',
@@ -358,6 +360,7 @@ var ICONS={
   'wind':'<path d="M12.8 19.6A2 2 0 1 0 14 16H2" /><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" /><path d="M9.8 4.4A2 2 0 1 1 11 8H2" />',
   'x':'<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
   'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />',
+  'paperclip':'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />',
 };
 // SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
 // size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
@@ -368,8 +371,10 @@ function icon(name,size,cls){
   return '<svg class="seyIcon'+(cls?(' '+cls):'')+'" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
 }
 var qs=new URLSearchParams(location.search);
+var DEMO_MODE=qs.get("demo")==="1";
 var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
+var AEON_FILE_ACCEPT=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.csv,.zip,application/pdf";
 var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
 var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların açık bırakıldığını hatırlar
@@ -378,7 +383,7 @@ var PTOKEN="";
 var D=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all"};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
-var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D vitaminimi aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"]];
+var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D vitaminimi aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"]];
 var HT=HABITS.length;
 function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
 var MOOD_ICON={"cok-iyi":"sun","iyi":"flower-2","normal":"leaf","zorlandim":"cloud-rain","cok-zorlandim":"droplets"};
@@ -386,8 +391,21 @@ var MOOD_LABEL={"cok-iyi":"Çok iyi","iyi":"İyi","normal":"Normal","zorlandim":
 function moodIcon(id,size){ return MOOD_ICON[id]?icon(MOOD_ICON[id],size||14):""; }
 // ── Veri-güdümlü tikler (app ile aynı eşikler) — gözlemci ilerlemeyi de görsün ──
 var WATER_GOAL_P=8, SLEEP_TICK_MIN_P=7.5, STEP_TICK_MIN_P=4500;
-var DERIVED_P={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1};
-var DERIVED_ACCENT_P={water:"#5EA9E6",sleepReg:"#B9A6E6",walked20:"#7DD389",journaled:"#E0A93C",sweetManaged:"#E9899F",foodManaged:"#E0A55E",coffeeManaged:"#C79B6E",mediaFed:"#C77D93"};
+var DERIVED_P={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1,caffeineOk:1};
+var DERIVED_ACCENT_P={water:"#5EA9E6",sleepReg:"#B9A6E6",walked20:"#7DD389",journaled:"#E0A93C",sweetManaged:"#E9899F",foodManaged:"#E0A55E",coffeeManaged:"#C79B6E",mediaFed:"#C77D93",caffeineOk:"#8A5A2B"};
+var CAFFEINE_MG_P={turk:60,espresso:60,filter:95,americano:77,cappuccino:63,latte:63,"black-tea":40,"green-tea":25,energy:80};
+var CAFFEINE_LABEL_P={turk:"Türk kahvesi",espresso:"Espresso",filter:"Filtre kahve",americano:"Americano",cappuccino:"Cappuccino",latte:"Latte","black-tea":"Siyah çay","green-tea":"Yeşil çay",energy:"Enerji içeceği"};
+function hhmmMinP(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(":"); return Number(p[0])*60+Number(p[1]); }
+function caffeineInfoP(rec){
+  var caf=rec&&rec.caffeine&&typeof rec.caffeine==="object"?rec.caffeine:{};
+  var drinks=Array.isArray(caf.drinks)?caf.drinks:[], total=0,last=null,residue=0;
+  drinks.forEach(function(d){ var mg=CAFFEINE_MG_P[d&&d.type]||0,q=Math.max(1,Number(d&&d.qty)||1); total+=mg*q; if(d&&d.time&&/^\d{2}:\d{2}$/.test(d.time)&&(!last||d.time>last)) last=d.time; });
+  if(!drinks.length&&(Number(caf.cups)||0)>0){ total=(Number(caf.cups)||0)*60; last=caf.last||null; }
+  var st=D&&D.settings?D.settings:{}, mode=st.caffeineMode, limit=mode==="pregnant"?200:(mode==="sensitive"?300:400), bed=/^\d{2}:\d{2}$/.test(st.targetBed||"")?st.targetBed:"23:30", bMin=hhmmMinP(bed);
+  drinks.forEach(function(d){ var t=hhmmMinP(d&&d.time); if(t==null||bMin==null) return; var dt=(bMin-t)/60; if(dt<0)dt+=24; residue+=(CAFFEINE_MG_P[d.type]||0)*Math.max(1,Number(d.qty)||1)*Math.pow(.5,dt/5); });
+  var lastMin=hhmmMinP(last), cut=bMin==null||lastMin==null?true:(((bMin-lastMin+1440)%1440)>=360);
+  return {drinks:drinks,total:Math.round(total),last:last,residue:Math.round(residue),limit:limit,amountOk:total<=limit,timingOk:cut};
+}
 function hubEntryCountP(rec){ var n=0; ["reading","watching","listening","learning"].forEach(function(s){ var e=(rec&&rec[s]&&Array.isArray(rec[s].entries))?rec[s].entries:[]; n+=e.length; }); return n; }
 function habitProgP(rec,key){
   if(key==="water"){ var w=(rec&&typeof rec.water==="number"&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL_P,cur:w,goal:WATER_GOAL_P}; }
@@ -398,6 +416,7 @@ function habitProgP(rec,key){
   if(key==="foodManaged"){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true}; }
   if(key==="coffeeManaged"){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true}; }
   if(key==="mediaFed"){ var hc=hubEntryCountP(rec); return {met:hc>0,cur:hc,goal:1,binary:true}; }
+  if(key==="caffeineOk"){ var ci=caffeineInfoP(rec); return {met:ci.amountOk&&(ci.drinks.length?ci.timingOk:true),cur:ci.total,goal:ci.limit,has:ci.drinks.length>0,amountOk:ci.amountOk,timingOk:ci.timingOk}; }
   return null;
 }
 function habitProgLabel(key,p){
@@ -409,6 +428,7 @@ function habitProgLabel(key,p){
   if(key==="foodManaged") return "kriz odası";
   if(key==="coffeeManaged") return "kriz odası";
   if(key==="mediaFed") return "besleme bekliyor";
+  if(key==="caffeineOk") return p.amountOk?(p.has?(p.timingOk?"limit + saat temiz":"son içim geç"):"kahve yok"):(p.cur+"/"+p.goal+" mg");
   return "";
 }
 var SLEEP_Q={good:"Dinç",ok:"Idare",bad:"Yorgun"};
@@ -439,6 +459,7 @@ var SECTIONS=[
   {id:"sec-today",ico:icon('target',15),title:"Bugün Özeti",sub:"KPI · mesaj · seçili gün",ord:10},
   {id:"sec-mood",ico:icon('moon',15),title:"Ruh Hali & Enerji",sub:"mod · ısı haritası · tik trendi · döngü",ord:20},
   {id:"sec-move",ico:icon('footprints',15),title:"Hareket & Konum",sub:"canlı konum · kullanım · hareket",ord:30},
+  {id:"sec-lab",ico:icon('microscope',15),title:"Vücut & Tahlil",sub:"kilo · boy · BMI · kan/idrar",ord:35},
   {id:"sec-risk",ico:icon('compass',15),title:"İçgörü & Risk",sub:"risk · SOS · notlar",ord:40},
   {id:"sec-arch",ico:icon('archive',15),title:"Arşivler",sub:"kütüphane · izleme · dinleme · alıntı",ord:50}
 ];
@@ -507,13 +528,18 @@ function panelReadiness(rec){
   var en=(rec&&rec.reading&&Array.isArray(rec.reading.entries))?rec.reading.entries:[];
   var pages=0; en.forEach(function(e){ var p=Number(e&&e.pages); if(!isNaN(p)&&p>0) pages+=p; });
   var hours=(sl.hours!=null&&!isNaN(Number(sl.hours)))?Number(sl.hours):null;
-  var fDur=hours!=null?Math.round(34*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))):0;
-  var fQual=sl.quality==="good"?22:(sl.quality==="ok"?12:(sl.quality==="bad"?4:0));
+  var fDur=hours!=null?Math.round(26*Math.max(0,Math.min(1,1-Math.abs(hours-7.75)/3))):0;
+  var fQual=sl.quality==="good"?18:(sl.quality==="ok"?10:(sl.quality==="bad"?3:0));
+  var ci=caffeineInfoP(rec), fCaf=!ci.drinks.length?18:((ci.residue<50&&ci.timingOk)?18:(ci.residue<50?12:(ci.residue<100?8:3)));
   var medType=(sl.med&&sl.med.type)?sl.med.type:null;
-  var fMed=medType==="none"?10:(medType==="herbal"?6:(medType==="rx"?3:5));
-  var fReading=en.length>0?Math.min(34,16+Math.min(18,pages)):0;
-  var score=Math.max(0,Math.min(100,fDur+fQual+fMed+fReading));
-  return {score:score,readCount:en.length,readPages:pages,medType:medType};
+  var fMed=medType==="none"?8:(medType==="herbal"?5:(medType==="rx"?2:4));
+  var fReading=en.length>0?Math.min(16,8+Math.min(8,pages)):0;
+  var wd=sl.windDown&&sl.windDown.steps, wdDone=0;
+  if(Array.isArray(wd)) wdDone=wd.reduce(function(a,x){return a+(x&&x.done?1:0);},0);
+  else if(wd&&typeof wd==="object") wdDone=["light","breath","dump","cool"].reduce(function(a,k){return a+(wd[k]?1:0);},0);
+  var fWind=Math.round(14*Math.min(1,wdDone/4));
+  var score=Math.max(0,Math.min(100,Math.round(fDur+fQual+fCaf+fReading+fWind+fMed)));
+  return {score:score,readCount:en.length,readPages:pages,medType:medType,caffeine:ci,windDownDone:wdDone};
 }
 function readingRecap(dates){
   var readDays=0,totalPages=0,scoreSum=0,scoreDays=0,medDays=0;
@@ -826,6 +852,9 @@ function pmMediaSlotHTML(mediaKind,mediaId,w,h){
     var ratio=(w&&h)?(w+"/"+h):"1/1";
     return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP(\''+mediaId+'\')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
   }
+  if(mediaKind==="file"){
+    return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="file" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;display:flex;align-items:center;gap:5px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
+  }
   return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
 }
 function pmRowMedia(side,tone,mediaKind,mediaId,w,h,footHtml,enter){
@@ -905,7 +934,9 @@ function aeonThreadCardHTML(){
     s+='<div style="font-size:var(--f1);color:'+(pendN?'var(--amber)':'var(--t4)')+';font-weight:700;margin-bottom:6px;line-height:1.4;">'+hint+'</div>';
     s+='<div style="display:flex;gap:8px;align-items:flex-end;">';
     s+='<input type="file" id="pm-photo-input" accept="image/*" style="display:none;" onchange="aeonPhotoChosenP(this)">';
-    s+='<button onclick="aeonPickPhotoP()" aria-label="Fotoğraf gönder" class="pm-send" style="background:var(--s3);color:var(--t2);box-shadow:none;'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('camera',17)+'</button>';
+    s+='<input type="file" id="pm-file-input" accept="'+AEON_FILE_ACCEPT+'" style="display:none;" onchange="aeonFileChosenP(this)">';
+    s+='<input type="file" id="pm-audio-input" accept="audio/*" style="display:none;" onchange="aeonAudioFileChosenP(this)">';
+    s+='<button onclick="openAttachSheetP()" aria-label="Ek gönder" class="pm-send" style="background:var(--s3);color:var(--t2);box-shadow:none;'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('paperclip',17)+'</button>';
     s+='<textarea id="pm-aeon-input" oninput="aeonChatDraft(this.value)" onkeydown="pmAeonKeydown(event)" placeholder="ÆON olarak yaz…" rows="1">'+esc(UI.msgDraft||"")+'</textarea>';
     s+='<button id="pm-aeon-send" class="pm-send'+(disabled?' is-disabled':'')+'" onclick="sendAeonChat()" aria-label="Gönder" style="display:'+(draftHas?'flex':'none')+';">'+(UI.msgSending?'…':icon('send',17))+'</button>';
     s+='<button id="pm-aeon-mic" onclick="aeonMicTapP()" aria-label="Sesli mesaj kaydet" class="pm-send" style="display:'+(draftHas?'none':'flex')+';'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('mic',17)+'</button>';
@@ -1454,6 +1485,74 @@ function motivationPanelCardHTML(){
   var badge='<span style="font-size:var(--f2);color:var(--t3);font-weight:700;">'+st.completedTotal+' tamam</span>';
   return cardWrap({key:'motivation',icon:icon('compass',18),title:'Motivasyon Programı',span:12,order:21,badge:badge,summary:sum,details:det});
 }
+// ── Vücut ölçüleri (kilo/boy/BMI) + Tahliller (kan/idrar · foto/PDF) — app ile ayna ──
+function panelBodyCardHTML(){
+  var b=(D&&D.body)?D.body:null;
+  var weights=(b&&Array.isArray(b.weights))?b.weights:[];
+  var heightCm=(b&&typeof b.heightCm==="number")?b.heightCm:null;
+  var lw=weights.length?weights[weights.length-1]:null;
+  var bmi=(heightCm&&lw)?(lw.kg/Math.pow(heightCm/100,2)):null, cat=null;
+  if(bmi!=null){ if(bmi<18.5)cat={l:"Zayıf",c:"var(--amber)"}; else if(bmi<25)cat={l:"Normal",c:"var(--green)"}; else if(bmi<30)cat={l:"Fazla kilolu",c:"var(--amber)"}; else cat={l:"Obez",c:"var(--red)"}; }
+  var h='<div class="card lift span-6 pad" style="order:35;display:flex;flex-direction:column;">';
+  h+='<div class="lbl">'+icon('activity',14)+' Vücut Ölçüleri</div>';
+  if(bmi==null&&!weights.length&&heightCm==null){
+    h+='<div class="empty" style="flex:1;"><span class="ei">'+icon('activity',20)+'</span>Ölçüm bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulamada boy/kilo girilince gelir</span></div>';
+  } else {
+    h+='<div class="dstats" style="grid-template-columns:repeat(3,1fr);margin-bottom:11px;">';
+    h+='<div class="dstat"><div class="dv">'+(heightCm!=null?heightCm:"—")+'</div><div class="dl">boy cm</div></div>';
+    h+='<div class="dstat"><div class="dv">'+(lw?lw.kg:"—")+'</div><div class="dl">kilo kg</div></div>';
+    h+='<div class="dstat"><div class="dv" style="color:'+(cat?cat.c:"var(--t1)")+';">'+(bmi!=null?(Math.round(bmi*10)/10).toFixed(1):"—")+'</div><div class="dl">'+(cat?cat.l:"BMI")+'</div></div>';
+    h+='</div>';
+    if(weights.length){
+      var ws=weights.slice(-8), vals=ws.map(function(w){return w.kg;});
+      var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), rng=Math.max(0.5,mx-mn);
+      var delta=ws.length>=2?(ws[ws.length-1].kg-ws[ws.length-2].kg):0;
+      var dCol=delta<0?"var(--green)":(delta>0?"var(--red)":"var(--t4)");
+      h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:var(--f1);font-weight:800;letter-spacing:.5px;color:var(--t3);text-transform:uppercase;">Kilo trendi</span>'+(ws.length>=2?'<span style="font-size:var(--f2);font-weight:800;color:'+dCol+';">'+(delta>0?"+":"")+(Math.round(delta*10)/10)+' kg</span>':'')+'</div>';
+      h+='<div style="display:flex;align-items:flex-end;gap:4px;height:44px;">';
+      ws.forEach(function(w){ var hh=Math.round(8+((w.kg-mn)/rng)*34); h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:44px;" title="'+esc(w.kg)+' kg">'+'<div style="height:'+hh+'px;border-radius:4px;background:linear-gradient(180deg,#7BA7D0,#4b6f9e);"></div></div>'; });
+      h+='</div>';
+      h+='<div style="display:flex;gap:4px;margin-top:4px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:9px;color:var(--t4);">'+new Date(w.ts).toLocaleDateString("tr-TR",{day:"2-digit",month:"2-digit"})+'</span>'; }).join('')+'</div>';
+      h+='<details style="margin-top:10px;"><summary style="cursor:pointer;font-size:var(--f2);font-weight:800;color:var(--t3);">Tüm kilo kayıtları · '+weights.length+'</summary><div class="scroll" style="max-height:180px;margin-top:7px;display:flex;flex-direction:column;gap:4px;">';
+      weights.slice().reverse().forEach(function(w){ h+='<div class="srow"><span class="k">'+new Date(w.ts).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"})+'</span><span class="v mono">'+esc(w.kg)+' kg</span></div>'; });
+      h+='</div></details>';
+    }
+    if(bmi!=null) h+='<div style="font-size:var(--f1);color:var(--t4);margin-top:8px;line-height:1.4;">BMI bilgi amaçlıdır; tıbbi teşhis değildir.</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function panelLabCardHTML(){
+  var results=(D&&Array.isArray(D.labResults))?D.labResults:[];
+  var h='<div class="card lift span-6 pad" style="order:35;display:flex;flex-direction:column;">';
+  h+='<div class="lbl">'+icon('microscope',14)+' Tahliller'+(results.length?('<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:800;">'+results.length+'</span>'):'')+'</div>';
+  if(!results.length){
+    h+='<div class="empty" style="flex:1;"><span class="ei">'+icon('microscope',20)+'</span>Tahlil bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulamadan kan/idrar sonucu eklenince gelir</span></div>';
+  } else {
+    h+='<div style="display:flex;flex-direction:column;gap:9px;">';
+    results.slice().reverse().forEach(function(r){
+      var kindLbl=r.kind==="blood"?"Kan":"İdrar";
+      var when=r.ts?new Date(r.ts).toLocaleDateString("tr-TR",{day:"2-digit",month:"2-digit",year:"2-digit"}):"";
+      var files=Array.isArray(r.files)?r.files:[];
+      var statusLbl=r.status==="reviewed"?"İncelendi":"Analiz ediliyor", statusCls=r.status==="reviewed"?"b-ok":"b-warn";
+      h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 11px;">';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="display:inline-flex;color:'+(r.kind==="blood"?"#E28A6A":"#E0A93C")+';">'+icon(r.kind==="blood"?"droplet":"microscope",15)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);">'+kindLbl+' tahlili</div><div style="font-size:var(--f1);color:var(--t4);">'+when+' · '+files.length+' dosya</div></div><span class="badge '+statusCls+'">'+statusLbl+'</span></div>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:7px;">';
+      files.forEach(function(f){
+        if(/^image\//.test(f.mime||"")){
+          h+='<div id="pm-media-'+esc(f.mediaId)+'" class="pm-media-slot" data-media-id="'+esc(f.mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP(\''+esc(f.mediaId)+'\')" style="width:78px;height:78px;border-radius:9px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:9px;opacity:.7;">…</span></div>';
+        } else {
+          h+='<button onclick="openPdfP(\''+esc(f.mediaId)+'\',\''+esc(String(f.name||"tahlil.pdf").replace(/[\\\x27]/g,""))+'\')" style="display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--bd);color:var(--t1);border-radius:9px;padding:8px 11px;font:inherit;font-size:var(--f2);font-weight:700;cursor:pointer;">'+icon('book',14)+' PDF aç</button>';
+        }
+      });
+      h+='</div></div>';
+    });
+    h+='</div>';
+    h+='<div style="font-size:var(--f1);color:var(--t4);margin-top:9px;line-height:1.4;">Belgeler gizli veri deposunda; fotoğrafa dokun büyüt, PDF\'i yeni sekmede aç.</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function render(){
   var all=allDays(), saved=lastSavedAt(), fresh=freshness(saved), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   var opened=lastOpenedAt();
@@ -1469,8 +1568,9 @@ function render(){
   var stepPeak=cur.reduce(function(m,d){return Math.max(m,stepFn(d));},0);
   var lastStepDate=null; for(var sIdx=cur.length-1;sIdx>=0;sIdx--){ if(stepFn(cur[sIdx])>0){ lastStepDate=cur[sIdx]; break; } }
   var lastStepVal=lastStepDate?stepFn(lastStepDate):0;
-  var curSleep=avg(cur,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;}), prevSleep=avg(prev,function(d){var r=recOf(d);return r&&r.sleep&&r.sleep.hours?Number(r.sleep.hours):0;});
   function avgWhere(days,valFn){ var s=0,c=0; days.forEach(function(d){ var v=valFn(recOf(d)); if(v!=null&&!isNaN(v)){ s+=v; c++; } }); return c?s/c:0; }
+  var sleepVal=function(r){ return r&&r.sleep&&r.sleep.hours!=null&&r.sleep.hours!==""?Number(r.sleep.hours):null; };
+  var curSleep=avgWhere(cur,sleepVal), prevSleep=avgWhere(prev,sleepVal);
   var waterVal=function(r){ return r&&typeof r.water==='number'&&r.water>0?Number(r.water):null; };
   var energyVal=function(r){ return r&&r.energy!=null?Number(r.energy):null; };
   var curWater=avgWhere(cur,waterVal), prevWater=avgWhere(prev,waterVal);
@@ -1526,6 +1626,7 @@ function render(){
   h+='<span class="brand-name">ÆON</span>';
   h+='</div>';
   h+='<div class="tb-chips">';
+  if(DEMO_MODE) h+='<span class="badge b-warn">DEMO · ağ kapalı</span>';
   h+='<span class="badge '+freshClass+(fresh.klass==="ok"?" pulse":"")+'">'+fresh.txt+'</span>';
   h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
   h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'" style="display:inline-flex;align-items:center;gap:4px;">'+icon('map-pin',12)+' '+locBadgeTxt+'</span>';
@@ -1709,6 +1810,15 @@ function render(){
   h+='<div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('utensils',14)+' Ne Yedi</div>';
   h+=mealRows?'<div style="display:flex;flex-direction:column;gap:7px;">'+mealRows+'</div>'
             :'<div style="font-size:var(--f3);color:var(--t4);font-weight:600;">Bu güne öğün kaydı yok</div>';
+  var mealItemRows=[];
+  MEALS.forEach(function(m){
+    var items=srec.mealItems&&Array.isArray(srec.mealItems[m[0]])?srec.mealItems[m[0]]:[];
+    items.filter(function(it){return it&&String(it.name||"").trim();}).forEach(function(it){
+      var qty=(it.qty==null||it.qty==="")?"":String(it.qty), unit=it.unit==="gr"?" gr":(it.unit==="adet"?" adet":" tabak");
+      mealItemRows.push('<span style="display:inline-flex;gap:5px;align-items:center;padding:4px 8px;border-radius:999px;background:var(--s1);border:1px solid var(--bd2);font-size:var(--f2);color:var(--t2);"><b>'+esc(m[2])+'</b> '+esc((qty?qty+unit+" ":"")+String(it.name).trim())+'</span>');
+    });
+  });
+  if(mealItemRows.length) h+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;">'+mealItemRows.join("")+'</div>';
   // ── Makro özeti (uygulamada Atwater ile hesaplanıp güne yazılır: srec.nutri) ──
   var nmac=srec.nutri;
   if(nmac && ((nmac.calories||0)>0 || (nmac.protein||0)>0)){
@@ -1739,6 +1849,12 @@ function render(){
   if(sl.quality&&SLEEPQ[sl.quality]) sleepBits.push(SLEEPQ[sl.quality]);
   if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push(icon('pill',12)+" "+esc(ml)); }
   exRows+=exRowAlways(icon('moon',13)+' Uyku', sleepBits.join(" · "));
+  var wd=sl.windDown||{}, wdSteps=wd.steps||{}, wdNames={light:"Işığı kıstı",breath:"4-7-8 nefes",dump:"Zihin boşaltma",cool:"Odayı serinletti"}, wdDone=[];
+  if(Array.isArray(wdSteps)) wdSteps.forEach(function(x){ if(x&&x.done) wdDone.push(wdNames[x.key]||x.label||x.key); });
+  else Object.keys(wdNames).forEach(function(k){ if(wdSteps[k]) wdDone.push(wdNames[k]); });
+  var wdBits=wdDone.slice(); if(wd.lastMinutes!=null) wdBits.push(wd.lastMinutes+" dk"); if(Array.isArray(wd.sessions)&&wd.sessions.length) wdBits.push(wd.sessions.length+" oturum");
+  exRows+=exRowAlways(icon('sparkles',13)+' Uyku hazırlığı', wdBits.map(esc).join(" · "));
+  exRows+=exRowAlways(icon('pen-line',13)+' Zihin boşaltma', wd.offloadNote&&String(wd.offloadNote).trim()?esc(String(wd.offloadNote).trim()):"");
   var wk=srec.walk||{}, wkBits=[];
   var esP=effStepsP(srec);
   if(esP.steps>0) wkBits.push(esP.steps.toLocaleString("tr-TR")+" adım"+(esP.source==="tracked"?"~":esP.source==="health"?" "+icon('apple',12):""));
@@ -1748,25 +1864,20 @@ function render(){
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[];
   if(caf){
-    var CAF_MG={turk:60,espresso:60,filter:95,americano:77,cappuccino:63,latte:63,'black-tea':40,'green-tea':25,energy:80};
-    var drinks=Array.isArray(caf.drinks)?caf.drinks:[];
-    var totalMg=0, lastCaf=null;
-    drinks.forEach(function(d){ var mg=CAF_MG[d&&d.type]||0; var q=Math.max(1,Number(d&&d.qty)||1); totalMg+=mg*q; if(d&&d.time&&/^\d{2}:\d{2}$/.test(d.time)){ if(!lastCaf||d.time>lastCaf) lastCaf=d.time; } });
-    if(!drinks.length && (Number(caf.cups)||0)>0){ totalMg=(Number(caf.cups)||0)*60; lastCaf=caf.last||null; }
-    if(totalMg>0) cafBits.push(Math.round(totalMg)+" mg");
-    if(lastCaf) cafBits.push("son "+esc(String(lastCaf)));
-    var bed=(D&&D.settings&&D.settings.targetBed)||'23:30';
-    if(/^\d{2}:\d{2}$/.test(bed) && drinks.length){
-      var bMin=Number(bed.slice(0,2))*60+Number(bed.slice(3,5)); var residue=0;
-      drinks.forEach(function(d){ var mg=CAF_MG[d&&d.type]||0; var q=Math.max(1,Number(d&&d.qty)||1); var t=d&&d.time; if(!t||!/^\d{2}:\d{2}$/.test(t)) return; var tMin=Number(t.slice(0,2))*60+Number(t.slice(3,5)); var dt=(bMin-tMin)/60; if(dt<0) dt+=24; residue+=mg*q*Math.pow(0.5,dt/5); });
-      residue=Math.round(residue); if(residue>0) cafBits.push("yat. kalıntı "+residue+" mg");
-    }
+    var ci=caffeineInfoP(srec), drinks=ci.drinks;
+    if(ci.total>0) cafBits.push(ci.total+" mg");
+    if(ci.last) cafBits.push("son "+esc(String(ci.last)));
+    if(ci.residue>0) cafBits.push("yat. kalıntı "+ci.residue+" mg");
     if(caf.cups!=null&&caf.cups!==""&&!drinks.length) cafBits.push(esc(String(caf.cups))+" fincan");
   }
   exRows+=exRowAlways(icon('coffee',13)+' Kafein', cafBits.join(" · "));
+  if(caf&&Array.isArray(caf.drinks)&&caf.drinks.length){
+    var cafDetail=caf.drinks.map(function(d){ var q=Math.max(1,Number(d&&d.qty)||1); return esc((CAFFEINE_LABEL_P[d&&d.type]||d.type||"Kafein")+(q>1?" ×"+q:"")+(d&&d.time?" · "+d.time:"")); }).join(" · ");
+    exRows+=exRowAlways(icon('clock',13)+' Kafein ayrıntısı', cafDetail);
+  }
   exRows+=exRowAlways(icon('life-buoy',13)+' Kriz (SOS)', (Array.isArray(srec.cravingOptionsUsed)&&srec.cravingOptionsUsed.length)?srec.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · "):"");
   var TRIG={tired:"Yorgun",bored:"Sıkıldı",hungry:"Aç",stress:"Stres",habit:"Alışkanlık",emotional:"Duygusal",lowenergy:"Enerji dibi",social:"Keyif/sosyal"};
-  var trg=(Array.isArray(srec.cravingTriggers))?srec.cravingTriggers.map(function(x){var k=(x&&x.trigger)?x.trigger:x;return TRIG[k]||esc(String(k));}).filter(Boolean):[];
+  var trg=(Array.isArray(srec.cravingTriggers))?srec.cravingTriggers.map(function(x){var k=(x&&x.trigger)?x.trigger:x, bits=[TRIG[k]||String(k)]; if(x&&x.kind) bits.push(x.kind==='sweet'?"tatlı":(x.kind==='food'?"yemek":(x.kind==='coffee'?"kahve":x.kind))); if(x&&x.ts){ try{ bits.push(new Date(x.ts).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})); }catch(e){} } return esc(bits.join(" · "));}).filter(Boolean):[];
   exRows+=exRowAlways(icon('zap',13)+' Tetik', trg.join(" · "));
   // Yönetilen krizler (bugünün tiklerini besleyen) + serbest tetik notu
   var doneChip=function(){ return '<span style="color:var(--green);display:inline-flex;align-items:center;gap:4px;">'+icon('check',12)+' Yönetildi</span>'; };
@@ -1808,8 +1919,13 @@ function render(){
   exRows+=exRowAlways(icon('music',13)+' Süre', lsBits.join(" · "));
   // Öğrenme (learning): bugün öğrenilenler
   var lnEn=(srec.learning&&Array.isArray(srec.learning.entries))?srec.learning.entries:[];
-  var lnTitles=lnEn.map(function(e){ var t=String(e&&e.topic||"").trim(); if(!t) return ""; return esc(t)+(e&&e.source?' <span style="color:var(--t4);font-weight:600;">— '+esc(String(e.source).trim())+'</span>':''); }).filter(Boolean);
+  var lnTitles=lnEn.map(function(e){ var t=String(e&&e.topic||"").trim(); if(!t) return ""; var x=esc(t)+(e&&e.source?' <span style="color:var(--t4);font-weight:600;">— '+esc(String(e.source).trim())+'</span>':''); if(e&&e.note&&String(e.note).trim()) x+='<span style="display:block;color:var(--t3);font-weight:600;margin-top:2px;">'+esc(String(e.note).trim())+'</span>'; return x; }).filter(Boolean);
   exRows+=exRowAlways(icon('brain',13)+' Öğrenme', lnTitles.join(" · "));
+  var health=srec.health&&typeof srec.health==="object"?srec.health:null;
+  if(health){ var hb=[]; if(Number(health.steps)>0) hb.push(Number(health.steps).toLocaleString("tr-TR")+" adım"); if(Number(health.walkM)>0) hb.push(fmtKmM(Number(health.walkM))); if(health.updatedAt){ try{ hb.push("güncelleme "+new Date(health.updatedAt).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})); }catch(e){} } exRows+=exRowAlways(icon('activity',13)+' Sağlık senkronu', hb.join(" · ")); }
+  var daySessions=Array.isArray(srec.sessions)?srec.sessions.slice():[]; if(srec.liveSession) daySessions.push(srec.liveSession);
+  if(daySessions.length){ var sessTxt=daySessions.map(function(s){ var st=s&&s.start?new Date(s.start):null, tm=st&&!isNaN(st.getTime())?st.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"—"; return tm+" · "+formatDuration(Math.round(Number(s&&s.activeSeconds)||0)); }).join(" · "); exRows+=exRowAlways(icon('clock',13)+' Uygulama oturumları', esc(sessTxt)); }
+  if(srec.saygi&&srec.saygi.personId){ var sg=srec.saygi, se=rdEn.find(function(e){return e&&e.id===sg.readingEntryId;}); var sb=[se&&se.title?se.title:sg.personId]; if(sg.readAt){ try{ sb.push(new Date(sg.readAt).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit"})); }catch(e){} } if(se&&se.sourceLabel) sb.push(se.sourceLabel); exRows+=exRowAlways(icon('heart-handshake',13)+' Saygı', sb.map(esc).join(" · ")); }
   // Şükran (gratitude): bugünün güzel şeyleri
   var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
   exRows+=exRowAlways(icon('heart-handshake',13)+' Şükran', grEn.map(function(g){return esc(g);}).join(" · "));
@@ -2186,9 +2302,13 @@ function render(){
   })();
 
 
+  // Vücut & Tahlil bölümü (order:35 → Hareket ile İçgörü arası)
+  h+=panelBodyCardHTML();
+  h+=panelLabCardHTML();
+
   h+='</div>'; // end bento
 
-  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge b-ok pulse nodot" style="padding:3px 8px;"></span>ÆON ÇEKİRDEĞİ · CANLI · OTOMATİK YENİLENİR</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f2);color:var(--t4);padding:14px 0 4px;font-weight:700;letter-spacing:.5px;"><span class="badge '+(DEMO_MODE?'b-warn':'b-ok pulse')+' nodot" style="padding:3px 8px;"></span>'+(DEMO_MODE?'ÆON DEMO · SENTETİK VERİ · AĞ KAPALI':'ÆON ÇEKİRDEĞİ · CANLI · OTOMATİK YENİLENİR')+'</div>';
   h+='</div>'; // end page
 
   document.getElementById("app").innerHTML=h;
@@ -2325,6 +2445,7 @@ window.pmAeonKeydown=function(e){
   if(e && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); window.sendAeonChat(); }
 };
 window.sendAeonChat=function(){
+  if(DEMO_MODE){ alert("Demo modu: ağ ve mesaj yazımı kapalı."); return; }
   if(UI.msgSending) return;
   var ta=document.getElementById("pm-aeon-input");
   var txt=ta?ta.value.trim():String(UI.msgDraft||"").trim();
@@ -2349,6 +2470,7 @@ window.sendAeonChat=function(){
     .catch(function(e){ UI.msgSending=false; render(); alert("Mesaj gönderilemedi: "+String(e&&e.message||e)); });
 };
 window.delObserverMsg=function(id){
+  if(DEMO_MODE){ alert("Demo modu: silme/yazma kapalı."); return; }
   if(UI.msgSending) return;
   if(!confirm("Bu mesaji kanaldan kaldir? (Kullanicinin cihazinda kayitliysa orada kalir.)")) return;
   UI.msgSending=true; render();
@@ -2357,6 +2479,32 @@ window.delObserverMsg=function(id){
     .then(function(){ UI.msgSending=false; return load(); })
     .catch(function(e){ UI.msgSending=false; render(); alert("Silinemedi: "+String(e&&e.message||e)); });
 };
+// ---------- ÆON ek gönderme sayfası (fotoğraf/belge/ses dosyası) — pm-lightbox ile aynı
+// imperatif desen (deklaratif modal sistemi yok, doğrudan document.body'e eklenip kaldırılır) ----------
+window.openAttachSheetP=function(){
+  if(UI.msgSending||aeonRecP) return;
+  window.closeAttachSheetP();
+  var items=[
+    {ic:"camera",label:"Fotoğraf",sub:"Bilgisayarından bir görsel seç",fn:"aeonPickPhotoP"},
+    {ic:"file-text",label:"Belge",sub:"PDF, Word, Excel ve diğer dosyalar",fn:"aeonPickFileP"},
+    {ic:"music",label:"Ses dosyası",sub:"Hazır bir ses kaydı yükle",fn:"aeonPickAudioFileP"}
+  ];
+  var d=document.createElement("div"); d.id="pm-attach-sheet";
+  d.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(3,3,5,0.6);display:flex;align-items:center;justify-content:center;padding:20px;";
+  var inner='<div style="width:100%;max-width:360px;background:var(--s1);border:1px solid var(--bd2);border-radius:16px;padding:8px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">'
+    +'<div style="padding:10px 10px 8px;font-size:var(--f1);font-weight:800;letter-spacing:.4px;color:var(--t4);text-transform:uppercase;">Şeyma’ya gönder</div>';
+  items.forEach(function(it){
+    inner+='<button onclick="'+it.fn+'();window.closeAttachSheetP();" style="display:flex;align-items:center;gap:12px;text-align:left;border:none;background:none;cursor:pointer;padding:10px;border-radius:11px;width:100%;color:var(--t1);">'
+      +'<span style="width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--ggrad);color:#1a1404;">'+icon(it.ic,17)+'</span>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;">'+it.label+'</div><div style="font-size:var(--f1);color:var(--t4);margin-top:1px;">'+it.sub+'</div></div>'
+      +'</button>';
+  });
+  inner+='<button onclick="window.closeAttachSheetP()" style="margin-top:4px;border:1px solid var(--bd2);background:var(--s2);color:var(--t3);font-weight:800;font-size:var(--f2);padding:10px;border-radius:10px;cursor:pointer;width:100%;">Vazgeç</button></div>';
+  d.innerHTML=inner;
+  d.onclick=function(e){ if(e.target===d) window.closeAttachSheetP(); };
+  document.body.appendChild(d);
+};
+window.closeAttachSheetP=function(){ var ex=document.getElementById("pm-attach-sheet"); if(ex) ex.remove(); };
 // ---------- ÆON medya (ses notu / fotoğraf) — data/aeon-media/<id>.json, panelin kendi PUT/GET'i ----------
 // app.js tarafıyla aynı mantık: ana veri (data/latest.json) her save'de tümüyle yeniden
 // yüklendiği için medya oraya gömülmez; her ses/foto kendi tek seferlik dosyasında durur.
@@ -2382,6 +2530,7 @@ function aeonEnsureMediaLoadedP(mediaId,kind,elId){
     var uri="data:"+(m.mime||"")+";base64,"+m.data;
     if(kind==="image") el.innerHTML='<img src="'+uri+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
     else if(kind==="voice") aeonPaintVoicePlayerP(el,mediaId,m,uri);
+    else if(kind==="file") aeonPaintFileCardP(el,mediaId,m);
   }
   if(aeonMediaCacheP[mediaId]){ paint(aeonMediaCacheP[mediaId]); return; }
   fetchAeonMediaP(mediaId).then(paint).catch(function(){ paint(null); });
@@ -2412,6 +2561,29 @@ window.aeonToggleVoiceP=function(mediaId){
   }
   if(st.audio.paused){ st.audio.play().catch(function(){ alert("Ses oynatılamadı"); }); aeonSetVoiceIconP(mediaId,"❚❚"); }
   else { st.audio.pause(); aeonSetVoiceIconP(mediaId,"▶"); }
+};
+function aeonPaintFileCardP(container,mediaId,m){
+  var name=m.name||"Belge", size=m.size!=null?humanFileSizeP(m.size):"";
+  container.setAttribute("onclick","window.openPdfP('"+mediaId+"','"+String(name).replace(/[\\\x27]/g,"")+"')");
+  container.style.cursor="pointer";
+  container.innerHTML='<div style="display:flex;align-items:center;gap:10px;min-width:190px;max-width:260px;">'
+    +'<span style="flex-shrink:0;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:currentColor;"><span style="display:flex;color:var(--bg);">'+icon('file-text',16)+'</span></span>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f2);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(name)+'</div>'
+    +'<div style="font-size:var(--f1);opacity:.7;margin-top:1px;">'+(size?esc(size)+" · ":"")+'aç / indir</div></div>'
+    +'<span style="flex-shrink:0;display:inline-flex;opacity:.75;">'+icon('download',14)+'</span>'
+    +'</div>';
+}
+window.openPdfP=function(mediaId,name){
+  fetchAeonMediaP(mediaId).then(function(m){
+    try{
+      var bin=atob(String(m.data||"").replace(/\s+/g,""));
+      var by=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) by[i]=bin.charCodeAt(i);
+      var url=URL.createObjectURL(new Blob([by],{type:m.mime||"application/pdf"}));
+      var w=window.open(url,"_blank");
+      if(!w){ var a=document.createElement("a"); a.href=url; a.download=name||"tahlil.pdf"; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+    }catch(e){ alert("Belge açılamadı"); }
+  }).catch(function(){ alert("Belge yüklenemedi"); });
 };
 window.aeonOpenImageP=function(mediaId){
   var m=aeonMediaCacheP[mediaId]; if(!m) return;
@@ -2531,13 +2703,51 @@ window.aeonPhotoChosenP=function(el){
   reader.onerror=function(){ alert("Fotoğraf okunamadı"); };
   reader.readAsDataURL(f);
 };
+function readFileB64P(file){ return new Promise(function(resolve,reject){ var r=new FileReader(); r.onload=function(){ var url=String(r.result||""); var c=url.indexOf(","); resolve(c>=0?url.slice(c+1):""); }; r.onerror=function(){ reject(new Error("dosya okunamadı")); }; r.readAsDataURL(file); }); }
+function humanFileSizeP(bytes){
+  bytes=Number(bytes)||0;
+  if(bytes<1024) return bytes+" B";
+  if(bytes<1024*1024) return Math.round(bytes/1024)+" KB";
+  return (Math.round(bytes/1024/1024*10)/10)+" MB";
+}
+// ---------- ÆON belge gönderme (panel tarafı) ----------
+window.aeonPickFileP=function(){ if(UI.msgSending||aeonRecP) return; var el=document.getElementById("pm-file-input"); if(el) el.click(); };
+window.aeonFileChosenP=function(el){
+  var f=el.files&&el.files[0]; el.value="";
+  if(!f) return;
+  if(f.size>4*1024*1024) alert("Belge büyük (>4MB) — gönderim biraz sürebilir");
+  readFileB64P(f).then(function(b64){
+    window.sendAeonMediaP("file",b64,f.type||"application/octet-stream",{name:f.name,size:f.size});
+  }).catch(function(){ alert("Belge okunamadı"); });
+};
+// ---------- ÆON hazır ses dosyası gönderme (panel tarafı) — canlı kayıttan farklı, mevcut
+// 'voice' oynatıcısını (peaks olmadan da çalışan düz dalga formuyla) aynen yeniden kullanır ----------
+window.aeonPickAudioFileP=function(){ if(UI.msgSending||aeonRecP) return; var el=document.getElementById("pm-audio-input"); if(el) el.click(); };
+window.aeonAudioFileChosenP=function(el){
+  var f=el.files&&el.files[0]; el.value="";
+  if(!f) return;
+  if(!/^audio\//.test(f.type)){ alert("Bu bir ses dosyası değil"); return; }
+  if(f.size>4*1024*1024) alert("Ses dosyası büyük (>4MB) — gönderim biraz sürebilir");
+  var probe=document.createElement("audio"), probeUrl=URL.createObjectURL(f);
+  function finish(durationSec){
+    URL.revokeObjectURL(probeUrl);
+    readFileB64P(f).then(function(b64){
+      window.sendAeonMediaP("voice",b64,f.type||"audio/mpeg",{durationSec:durationSec,name:f.name,viaUpload:true});
+    }).catch(function(){ alert("Ses dosyası okunamadı"); });
+  }
+  probe.preload="metadata";
+  probe.onloadedmetadata=function(){ finish(isFinite(probe.duration)?Math.round(probe.duration):0); };
+  probe.onerror=function(){ finish(0); };
+  probe.src=probeUrl;
+};
 // Ses/foto: önce data/aeon-media/<id>.json'a yükler, sonra observer-inbox.json'a hafif
 // bir referans mesajı ekler (sendAeonChat ile aynı replyTo mantığı: bekleyen soru varsa
 // ona yanıt, yoksa proaktif mesaj). Kendi gönderdiğin medya aeonMediaCacheP'te önceden
 // olduğu için karşı taraftan cevap gelmeden de anında görünür.
 window.sendAeonMediaP=function(kind,base64,mime,extra){
+  if(DEMO_MODE){ alert("Demo modu: medya yazımı kapalı."); return; }
   if(UI.msgSending) return;
-  var id=aeonMediaIdP(kind==="voice"?"av":"ai");
+  var id=aeonMediaIdP(kind==="voice"?"av":(kind==="file"?"af":"ai"));
   var payload={mime:mime,data:base64}; if(extra) for(var k in extra){ if(extra[k]!=null) payload[k]=extra[k]; }
   aeonMediaCacheP[id]=payload;
   var pending=null;
@@ -2550,18 +2760,19 @@ window.sendAeonMediaP=function(kind,base64,mime,extra){
   putAeonMediaP(id,payload).then(function(){
     return loadInbox().then(function(res){
       var msgs=(res.messages||[]).slice();
-      var m={id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:(kind==="voice"?"Sesli mesaj":"Fotoğraf"),ts:new Date().toISOString(),kind:kind,mediaId:id,mediaMime:mime};
-      if(extra){ if(extra.durationSec!=null) m.durationSec=extra.durationSec; if(extra.peaks) m.peaks=extra.peaks; if(extra.w) m.w=extra.w; if(extra.h) m.h=extra.h; }
+      var m={id:"m_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text:(kind==="file"?("Belge: "+(extra&&extra.name||"")):(kind==="voice"?((extra&&extra.viaUpload)?("Ses dosyası: "+(extra&&extra.name||"")):"Sesli mesaj"):"Fotoğraf")),ts:new Date().toISOString(),kind:kind,mediaId:id,mediaMime:mime};
+      if(extra){ if(extra.durationSec!=null) m.durationSec=extra.durationSec; if(extra.peaks) m.peaks=extra.peaks; if(extra.w) m.w=extra.w; if(extra.h) m.h=extra.h; if(extra.name) m.name=extra.name; if(extra.size!=null) m.size=extra.size; }
       if(pending&&pending.id) m.replyTo=pending.id;
       msgs.push(m);
       return putInbox(msgs,res.sha,res.receipts);
     });
   }).then(function(){ UI.msgSending=false; return load(); })
-  .catch(function(e){ delete aeonMediaCacheP[id]; UI.msgSending=false; render(); alert((kind==="voice"?"Ses":"Fotoğraf")+" gönderilemedi: "+String((e&&e.message)||e)); });
+  .catch(function(e){ delete aeonMediaCacheP[id]; UI.msgSending=false; render(); alert((kind==="file"?"Belge":(kind==="voice"?"Ses":"Fotoğraf"))+" gönderilemedi: "+String((e&&e.message)||e)); });
 };
 // Gözlemci paneli açıp kullanıcının cevaplanmamış ÆON sorusunu gördüğünde, kullanıcı tarafında
 // "⬡ AEON // EVALUATING INPUT…" durumu görünsün diye observer-inbox.json'a okundu (receipt) yazarız.
 function markReviewWrite(ids){
+  if(DEMO_MODE) return;
   if(!ids||!ids.length) return;
   loadInbox().then(function(res){
     var rc=res.receipts||{}, now=new Date().toISOString(), changed=false;
@@ -2580,7 +2791,16 @@ function maybeMarkReviewing(){
   });
   if(pending.length) markReviewWrite(pending);
 }
+function demoData(){
+  var td=today(), start=addDays(td,-9), days={}, moods=["iyi","normal","cok-iyi","iyi","zorlandim"];
+  for(var i=0;i<10;i++){
+    var ds=addDays(start,i), h=7.2+(i%4)*.3;
+    days[ds]={habits:{sweetManaged:i%3===0,foodManaged:i%4===0,coffeeManaged:i%5===0,eveningControl:i%2===0,walked20:true,protein:true,water:i%2===0,vitaminD:i%3!==1,sleepReg:h>=7.5,journaled:true,mediaFed:i%2===0,freshAir:true,selfKind:true,caffeineOk:true},mood:moods[i%moods.length],cravingSOSCount:(i%4===0||i===9)?1:0,cravingOptionsUsed:(i%4===0||i===9)?["Bir bardak su içtim","10 dakika bekledim"]:[],cravingTriggers:(i%4===0||i===9)?[{trigger:"stress",kind:"sweet",ts:ds+"T16:20:00+03:00"}]:[],craving10MinDone:i%3===0,foodCravingDone:i%4===0,coffeeCravingDone:i%5===0,cravingTriggerNote:(i%4===0||i===9)?"Yoğun bir günün ardından geldi.":"",note:"Demo günlüğü · küçük adımlar da ilerlemedir.",intention:"Bugün kendime nazik davranacağım.",savedAt:ds+"T21:10:00+03:00",meals:{breakfast:"1 adet yumurta, peynir",lunch:"1 tabak tavuklu salata",dinner:"1 tabak çorba",snack:"1 adet elma"},mealItems:{breakfast:[{name:"Yumurta",qty:1,unit:"adet"}],lunch:[{name:"Tavuklu salata",qty:1,unit:"tabak"}],dinner:[{name:"Mercimek çorbası",qty:1,unit:"tabak"}],snack:[{name:"Elma",qty:1,unit:"adet"}]},water:7+i%3,caffeine:{last:"13:20",cups:2,drinks:[{type:"turk",time:"09:10",qty:1},{type:"green-tea",time:"13:20",qty:1}]},energy:3+i%3,stress:2+i%3,sleep:{hours:h,quality:i%3===0?"good":"ok",med:{type:"none",note:""},windDown:{steps:{light:true,breath:i%2===0,dump:true,cool:false},lastMinutes:18,offloadNote:"Yarının üç işini yazdım, gerisini bıraktım.",events:[],sessions:[{ts:ds+"T22:30:00+03:00",minutes:18}]}},walk:{steps:5200+i*180,minutes:42},flow:null,symptoms:i===4?["yorgun"]:[],discomfort:{regions:i===4?{bas:{level:1}}:{},note:i===4?"Hafif baş ağrısı":"",meds:[]},sessions:[{start:new Date(ds+"T09:00:00+03:00").getTime(),end:new Date(ds+"T09:08:00+03:00").getTime(),activeSeconds:360}],movement:{walkM:3800+i*80,vehicleM:0,totalM:3800+i*80,maxSpeed:1.7,samples:24,walkSec:2500,vehicleSec:0,track:[]},reading:{entries:i%2===0?[{id:"r"+i,title:"Kendine Ait Bir Oda",author:"Virginia Woolf",pages:8,minutes:20,note:"Sessizlik ve alan üzerine düşündürdü.",ts:ds+"T20:00:00+03:00"}]:[]},watching:{entries:[]},listening:{entries:i%3===0?[{id:"l"+i,title:"Demo Çalma Listesi",artist:"Günışığı",kind:"album",minutes:24,note:"Yürüyüşe iyi eşlik etti.",ts:ds+"T18:00:00+03:00"}]:[]},learning:{entries:i===9?[{id:"ln1",topic:"Uyku ve kafein ilişkisi",source:"Okuma notu",note:"Kafeinin yarı ömrünün yaklaşık beş saat olduğunu öğrendim.",ts:ds+"T17:00:00+03:00"}]:[]},gratitude:["Sabah ışığı","Sakin bir yürüyüş","Güzel bir sohbet"],health:{steps:5200+i*180,walkM:3800+i*80,updatedAt:ds+"T20:55:00+03:00"},nutri:{calories:1760,protein:92,carbs:185,fat:62},saygi:i===9?{personId:"demo-kisi",readAt:ds+"T20:00:00+03:00",readingEntryId:"r"+i}:null};
+  }
+  return {version:2,startDate:start,lastOpenedDate:td,lastOpenedAt:new Date().toISOString(),days:days,notifications:[],settings:{nickname:"Demo Günışığı",lunaConnected:true,locationMode:"auto",caffeineMode:"standard",targetBed:"23:30"},luna:{qa:[{date:td,ts:td+"T10:00:00+03:00",question:"Bugün enerjin nasıl?",answer:"Sakin ve dengeli görünüyor; ritmini koru."}]},aeon:{qa:[{id:"demo-aeon",date:td,ts:td+"T11:00:00+03:00",question:"Bugünkü verilerimde öne çıkan ne?",answer:"Uyku, su ve yürüyüş birlikte güçlü bir temel oluşturmuş.",answeredAt:td+"T11:02:00+03:00"}]},cycle:{periods:[{start:addDays(td,-18),end:addDays(td,-14)}],avgCycle:28,avgPeriod:5},weather:{fetchedAt:new Date().toISOString(),spots:[{key:"ev",label:"Ev",place:"Demo",iconName:"house",code:1,isDay:true,temp:24,feels:24,hum:46,wind:8,uv:3,hi:26,lo:15}]},library:{goal:{dailyPages:20,yearlyBooks:12},books:[{id:"b1",title:"Kendine Ait Bir Oda",author:"Virginia Woolf",genre:"Deneme",totalPages:160,currentPage:72,status:"reading",rating:5,quotes:[{id:"q1",text:"Kendine ait bir alan, düşünceye nefes verir.",page:36,ts:td+"T20:00:00+03:00"}],createdAt:start+"T10:00:00+03:00"}]},watchlist:{goal:{dailyMinutes:40,yearlyTitles:24},items:[{id:"w1",title:"Demo Belgesel",kind:"film",genre:"Belgesel",status:"finished",watchedEp:1,totalEp:null,rating:4,quotes:[],finishedAt:addDays(td,-2)+"T21:00:00+03:00",createdAt:start+"T10:00:00+03:00"}]},music:{goal:{dailyMinutes:30,yearlyTitles:null},items:[{id:"m1",title:"Demo Çalma Listesi",artist:"Günışığı",kind:"album",genre:"Sakin",rating:5,quotes:[],createdAt:start+"T10:00:00+03:00"}]},body:{heightCm:165,heightSetAt:start+"T09:00:00+03:00",weights:Array.from({length:10},function(_,i){return {ts:addDays(start,i)+"T08:00:00+03:00",kg:68.4-i*.12};})},labResults:[],motivation:{currentProgramDay:3,stats:{pathStreak:2,bestPathStreak:2,courageEvidence:1,returnCount:0,completedTotal:2,minimumTotal:1},history:{demo1:{date:addDays(td,-1),programDay:2,phaseCode:"F1",domain:"destek",status:"minimum_completed",reflection:"Küçük sürümü yapmak devam etmemi sağladı.",quote:"Küçük adım da yoldur.",minimumTask:"Bir kişiye kısa bir mesaj gönder.",successMeaning:"Bağ kurmayı seçtin."}}}};
+}
 function load(){
+  if(DEMO_MODE){ D=demoData(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D); }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
@@ -2609,15 +2829,17 @@ var LASTSIG=null;
 function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS); }catch(e){ return null; } }
 window.load=load;
 try{
-  PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");
-  var raw=localStorage.getItem(APPKEY);
-  if(raw){
-    var app=JSON.parse(raw), s=app&&app.settings?app.settings:{};
-    if(!qs.get("repo")&&s.ghRepo) REPO=s.ghRepo;
-    if(!qs.get("branch")&&s.ghBranch) BRANCH=s.ghBranch;
-    if(!PTOKEN&&s.ghToken) PTOKEN=normalizeToken(s.ghToken);
+  if(!DEMO_MODE){
+    PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");
+    var raw=localStorage.getItem(APPKEY);
+    if(raw){
+      var app=JSON.parse(raw), s=app&&app.settings?app.settings:{};
+      if(!qs.get("repo")&&s.ghRepo) REPO=s.ghRepo;
+      if(!qs.get("branch")&&s.ghBranch) BRANCH=s.ghBranch;
+      if(!PTOKEN&&s.ghToken) PTOKEN=normalizeToken(s.ghToken);
+    }
+    if(PTOKEN&&!localStorage.getItem(PTKEY)) localStorage.setItem(PTKEY,PTOKEN);
   }
-  if(PTOKEN&&!localStorage.getItem(PTKEY)) localStorage.setItem(PTKEY,PTOKEN);
   var expRaw=localStorage.getItem(CARDEXPKEY);
   if(expRaw) UI.expandedCards=JSON.parse(expRaw)||{};
   var insRaw=localStorage.getItem(INSTABKEY);
@@ -2628,9 +2850,9 @@ load();
 // ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
-setInterval(function(){ if(!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },15000);
-document.addEventListener("visibilitychange",function(){ if(!document.hidden&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
-window.addEventListener("focus",function(){ if(PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
+setInterval(function(){ if(DEMO_MODE||!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },15000);
+document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
+window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
 })();
 </script>
 </body>

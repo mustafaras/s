@@ -1632,8 +1632,8 @@ function render(){
   h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'" style="display:inline-flex;align-items:center;gap:4px;">'+icon('map-pin',12)+' '+locBadgeTxt+'</span>';
   h+='</div>';
   h+='<div class="tb-meta">';
-  h+='<div class="meta"><b class="mono">'+(opened?new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}):"—")+'</b><span>Son açılış</span></div>';
-  h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}):"—")+'</b><span>Son kayıt</span></div>';
+  h+='<div class="meta"><b class="mono">'+(opened?new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son açılış</span></div>';
+  h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son kayıt</span></div>';
   h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;">'+icon('rotate-ccw',15)+'</button><button class="btn" title="Çıkış" onclick="resetPanelToken()" style="display:flex;align-items:center;justify-content:center;">'+icon('lock',15)+'</button></div>';
   h+='</div></div>';
 

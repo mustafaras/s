@@ -1756,6 +1756,37 @@ function render(){
     h+='</div>';
   })();
 
+  // Konum Kayıtları — data.locationHistory'nin ham, kronolojik dökümü (son ≤60 GPS
+  // örneği, harita üzerindeki noktaların metin listesi). Yukarıdaki "Konum Geçmişi"
+  // kartından farklı: o, seçili günün movement.track'inden türetilmiş yürüyüş/araç
+  // segmentlerini gösterir; bu ise ham konum örneklerinin kendisini, tarihe bağlı
+  // olmadan (biriktiği sırayla) listeler.
+  (function(){
+    var hist=(D&&Array.isArray(D.locationHistory))?D.locationHistory.slice():[];
+    h+='<div class="card span-12 pad" style="order:32;display:flex;flex-direction:column;">';
+    h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('map-pin',14)+' Konum Kayıtları <span style="margin-left:auto;font-size:var(--f2);color:var(--t4);font-weight:700;">son '+hist.length+' nokta</span></div>';
+    if(!hist.length){
+      h+='<div class="empty"><span class="ei">'+icon('map-pin',20)+'</span>Henüz konum kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Uygulama konum açıkken canlı biriktirir</span></div>';
+    } else {
+      var rows=hist.slice().reverse();
+      h+='<div style="display:flex;flex-direction:column;max-height:320px;overflow-y:auto;">';
+      rows.forEach(function(p){
+        if(!p||p.lat==null||p.lng==null) return;
+        var maps='https://maps.google.com/?q='+p.lat+','+p.lng;
+        var when=''; try{ when=new Date(p.ts).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ when=String(p.ts||''); }
+        h+='<div style="display:flex;gap:11px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd2);">';
+        h+='<span style="width:22px;height:22px;border-radius:7px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--gold);background:rgba(255,255,255,.05);border:1px solid var(--bd2);">'+icon('map-pin',12)+'</span>';
+        h+='<div style="flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">';
+        h+='<b class="mono" style="color:var(--t1);font-size:var(--f2);">'+esc(when)+'</b>';
+        h+='<span style="font-size:var(--f2);color:var(--t4);">'+Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)+(p.acc!=null?' · ±'+Math.round(p.acc)+'m':'')+'</span>';
+        h+='<a href="'+maps+'" target="_blank" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:700;">haritada →</a>';
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  })();
+
   // Selected day card — cardWrap() ile özet (dstats+habit chip'leri) her zaman görünür,
   // detay (öğün/semptom/kayıt/not blokları) chevron ile açılır. Üretim mantığı aynen
   // korunur; h'ye eklenen parçalar sonradan slice ile ayrıştırılıp cardWrap'e sarılır —
@@ -1848,6 +1879,8 @@ function render(){
   if(sl.hours!=null&&sl.hours!=="") sleepBits.push(esc(String(sl.hours))+' sa');
   if(sl.quality&&SLEEPQ[sl.quality]) sleepBits.push(SLEEPQ[sl.quality]);
   if(sl.med&&sl.med.type&&sl.med.type!=="none"){ var ml=SLEEP_MED[sl.med.type]||sl.med.type; if(sl.med.note&&String(sl.med.note).trim()) ml+=" ("+String(sl.med.note).trim()+")"; sleepBits.push(icon('pill',12)+" "+esc(ml)); }
+  var targetBed=(D&&D.settings&&D.settings.targetBed)?String(D.settings.targetBed).trim():"";
+  if(targetBed) sleepBits.push(icon('alarm-clock',12)+" Yatma hedefi "+esc(targetBed));
   exRows+=exRowAlways(icon('moon',13)+' Uyku', sleepBits.join(" · "));
   var wd=sl.windDown||{}, wdSteps=wd.steps||{}, wdNames={light:"Işığı kıstı",breath:"4-7-8 nefes",dump:"Zihin boşaltma",cool:"Odayı serinletti"}, wdDone=[];
   if(Array.isArray(wdSteps)) wdSteps.forEach(function(x){ if(x&&x.done) wdDone.push(wdNames[x.key]||x.label||x.key); });

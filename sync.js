@@ -322,11 +322,22 @@ function pushPing(item){
   var payload=JSON.stringify({type:'aeon-question',item:item,ts:new Date().toISOString()},null,2);
   return ghPut(c,'data/aeon-outbox.json',payload).catch(function(){});
 }
+// Profil değerlendirmesi tetiği: yalnızca 174/174 tamamlanınca (bir kez) yazılır. Ayrı ve
+// küçük bir dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir —
+// aeon-outbox.json ile aynı desen (bkz. yukarıdaki yorum): latest.json'un sık push'larını
+// izlemez, boşuna Actions dakikası yakmaz.
+function pushProfileCompletionPing(){
+  var c=cfg(); if(!c) return Promise.resolve();
+  if(devOrigin() && !syncForced()) return Promise.resolve(); // GUARD 1 — yerelden ping yazma
+  var payload=JSON.stringify({type:'profile-completed',ts:new Date().toISOString()},null,2);
+  return ghPut(c,'data/profile-outbox.json',payload).catch(function(){});
+}
 
 window.SeySync={
   schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } if(devOrigin() && !syncForced()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
   pushNow:function(){ clearTimeout(timer); if(lastPayload){ doPush(lastPayload); return; } try{ var raw=localStorage.getItem(KEY); if(raw) doPush(JSON.parse(raw)); }catch(e){} },
   pushPing:pushPing,
+  pushProfileCompletionPing:pushProfileCompletionPing,
   statusText:statusText,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,

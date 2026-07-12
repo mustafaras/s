@@ -2162,6 +2162,12 @@ App.profileAnswer=function(itemId,value){
       if(pa2.status==='completed' && window.SeySync && typeof window.SeySync.pushNow==='function'){
         try{ window.SeySync.pushNow(); }catch(e){}
       }
+      // Tamamlanma bildirimi: seyma-data'daki mail workflow'unu tetikleyen küçük, ayrı
+      // tetik dosyası (bkz. sync.js → pushProfileCompletionPing). Yalnızca bu geçişte,
+      // bir kez yazılır.
+      if(pa2.status==='completed' && window.SeySync && typeof window.SeySync.pushProfileCompletionPing==='function'){
+        try{ window.SeySync.pushProfileCompletionPing(); }catch(e){}
+      }
       render();
     } else {
       // Soru kartını değiştir — render() ve app.innerHTML YAPMA (flash yok).

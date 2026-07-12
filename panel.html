@@ -1393,6 +1393,123 @@ function psychCardHTML(){
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Öz-bildirim TARAMA araçları (ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF); klinik tanı değildir. İki haftada bir yenilenir. Son tamamlanma: '+esc(String(P.completedAt).slice(0,10))+nextTxt+'.</div>';
   return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
 }
+// ── Faz 11: Bilimsel Profil Değerlendirmesi (tek oturum, 174 madde) kartı ──
+// D.profileAssessment — data.psych'ten TAMAMEN ayrı. Yalnızca completed +
+// consent.panelSummarySharingAccepted === true ise özet gösterilir. Ham cevap,
+// hassas ilişki maddeleri, dikkat kontrol ayrıntıları, yanıt süreleri ve tanı
+// etiketleri ASLA gösterilmez. Eksik/eski veride güvenli boş durum.
+function profileAssessmentCardHTML(){
+  var PA=(D&&D.profileAssessment)?D.profileAssessment:null;
+  // Eski kullanıcıda alan yok → güvenli boş durum
+  if(!PA||typeof PA!=='object'){
+    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
+      summary:'Henüz başlanmadı — Şeyma 174 maddelik bilimsel profil değerlendirmesini tamamladığında boyutsal özet burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Bu, tek oturumluk bilimsel bir profil değerlendirmesidir (Big Five, RAISEC, değerler, motivasyon, bilişsel stil, bağlanma, duygu düzenleme). Klinik tanı değildir; öz-bildirime dayalı bir profildir. Veriler seyma-data reposuna senkronize edilir.</div>'});
+  }
+  var consent=(PA.consent&&typeof PA.consent==='object')?PA.consent:{};
+  var sharingAccepted=consent.panelSummarySharingAccepted===true;
+  var isCompleted=PA.status==='completed';
+  // Tamamlanmamış → kesin yorum gösterme
+  if(!isCompleted){
+    var statusTxt=PA.status==='active'?'Devam ediyor':'Başlanmadı';
+    var progressTxt='';
+    if(typeof PA.currentItemIndex==='number'){
+      var total=174; // bilinen madde sayısı
+      var pct=Math.round((PA.currentItemIndex/total)*100);
+      progressTxt=' · %'+pct+' ('+PA.currentItemIndex+'/'+total+')';
+    }
+    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
+      summary:esc(statusTxt+progressTxt)+' — tamamlandığında boyutsal özet burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Değerlendirme tamamlanmadan profil özeti gösterilmez. Şeyma kaldığı yerden devam edebilir.</div>'});
+  }
+  // Tamamlanmış ama paylaşım kapalı → "Profil özeti paylaşılmıyor."
+  if(!sharingAccepted){
+    var completedDate=PA.completedAt?fmtTR(String(PA.completedAt).slice(0,10)):'—';
+    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
+      summary:'Tamamlandı ('+esc(completedDate)+') — paylaşım kapalı',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">'+icon('lock',15)+'</span><span>Profil özeti paylaşılmıyor. Şeyma paylaşımı açtığında boyutsal özet burada belirir.</span></div>'});
+  }
+  // Tamamlanmış + paylaşım açık → özet göster
+  var ps=(PA.panelSummary&&typeof PA.panelSummary==='object')?PA.panelSummary:{};
+  var scores=PA.scores||{};
+  var report=PA.report||{};
+  var quality=PA.quality||{};
+  // Güven puanı/kategorisi
+  var confScore=ps.confidenceScore!=null?ps.confidenceScore:(quality.score!=null?quality.score:null);
+  var confCat=ps.confidenceCategory||quality.category||null;
+  var completedDate=PA.completedAt?fmtTR(String(PA.completedAt).slice(0,10)):'—';
+  // Özet chip'leri
+  function chip(txt,col){ return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+col+'22;border:1px solid '+col+'66;color:'+col+';white-space:nowrap;">'+esc(txt)+'</span>'; }
+  var confCol=confCat==='high'?'#6bbf7a':(confCat==='low'?'#e08a8a':'#e6c15a');
+  var sumChips='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  sumChips+=chip('Güven: '+(confCat||'—'),confCol);
+  if(ps.riasec&&Array.isArray(ps.riasec.topThree)&&ps.riasec.topThree.length){
+    var RIASEC_TR={realistic:'Gerçekçi',investigative:'Araştırmacı',artistic:'Sanatsal',social:'Sosyal',enterprising:'Girişimci',conventional:'Düzenleyici'};
+    sumChips+=chip('RAISEC: '+ps.riasec.topThree.map(function(c){return RIASEC_TR[c]||c;}).join(', '),'#C9B8FF');
+  }
+  if(ps.values&&Array.isArray(ps.values.topThree)&&ps.values.topThree.length){
+    sumChips+=chip('Değerler: '+ps.values.topThree.join(', '),'#E9899F');
+  }
+  sumChips+='</div>';
+  // Detay bölümleri
+  var det='';
+  // Tamamlanma + güven
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;">'+icon('check',15)+' Tamamlandı · '+esc(completedDate)+'</div>';
+  det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
+  det+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:var(--f4);">'+icon('star',15)+'</span><span style="flex:1;font-size:var(--f3);font-weight:800;color:var(--t1);">Ölçüm Güveni</span>'+chip(confCat||'—',confCol)+'</div>';
+  det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">'+(confScore!=null?('0-100 üzerinden '+confScore):'Güven skoru mevcut değil')+'. Bu değerlendirme klinik bir tanı değildir; öz-bildirime dayalı bir profildir.</div>';
+  det+='</div>';
+  // Big Five özeti
+  var bf=ps.bigFive||{};
+  var B5_LABELS={conscientiousness:'Öz-yönetim ve düzen',negative_emotionality:'Duygusal hassasiyet',extraversion:'Sosyal enerji',agreeableness:'Uyum ve şefkat',open_mindedness:'Açık fikirlilik'};
+  var B5_BAND={high:'belirgin yüksek',low:'ortalama altı',moderate:'dengeli/orta'};
+  var bfHasData=Object.keys(bf).some(function(k){return bf[k]&&bf[k].mean!=null;});
+  if(bfHasData){
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;">'+icon('chart-column',15)+' Big Five Alanları</div>';
+    Object.keys(B5_LABELS).forEach(function(c){
+      var v=bf[c]; if(!v||v.mean==null) return;
+      var band=B5_BAND[v.band]||'—';
+      det+='<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-top:1px solid var(--bd);"><span style="font-size:var(--f2);color:var(--t2);font-weight:700;flex:1;">'+esc(B5_LABELS[c])+'</span><span style="font-size:var(--f2);color:var(--t3);">'+esc(band)+' <span style="color:var(--t4);font-weight:800;">'+v.mean.toFixed(1)+'/7</span></span></div>';
+    });
+    det+='<div style="height:6px;"></div>';
+  }
+  // RAISEC ilk üç
+  if(ps.riasec&&Array.isArray(ps.riasec.topThree)&&ps.riasec.topThree.length){
+    var RIASEC_FULL={realistic:'Gerçekçi (uygulamalı/teknik)',investigative:'Araştırmacı',artistic:'Sanatsal',social:'Sosyal',enterprising:'Girişimci',conventional:'Düzenleyici (yapılandırılmış)'};
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('compass',15)+' RAISEC İlgi Alanları</div>';
+    det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">Öne çıkan ilk üç alan: '+ps.riasec.topThree.map(function(c){return '<b style="color:var(--t1);">'+esc(RIASEC_FULL[c]||c)+'</b>';}).join(', ')+'.</div>';
+    det+='</div>';
+  }
+  // Değer öncelikleri
+  if(ps.values&&Array.isArray(ps.values.topThree)&&ps.values.topThree.length){
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('heart',15)+' Değer Öncelikleri</div>';
+    det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">Öne çıkan öncelikler: <b style="color:var(--t1);">'+ps.values.topThree.map(esc).join(', ')+'</b>. Bu bir "daha iyi insan" sıralaması değildir; kişinin kendi içindeki göreli önceliği yansıtır.</div>';
+    det+='</div>';
+  }
+  // Bağlanma kaygı ve kaçınma
+  var att=ps.attachment||{};
+  if(att.anxiety!=null||att.avoidance!=null){
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('heart-handshake',15)+' Bağlanma</div>';
+    if(att.anxiety!=null) det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">Bağlanma kaygısı: <b style="color:var(--t1);">'+att.anxiety.toFixed(1)+'/7</b></div>';
+    if(att.avoidance!=null) det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">Bağlanma kaçınması: <b style="color:var(--t1);">'+att.avoidance.toFixed(1)+'/7</b></div>';
+    det+='<div style="font-size:var(--f1);color:var(--t4);margin-top:4px;">İki eksen ayrı ayrı değerlendirilir; kategori zorunlu değildir.</div>';
+    det+='</div>';
+  }
+  // Kısa rapor özeti
+  var shortReport=ps.shortReport||(report&&report.sections&&report.sections.characterSummary?report.sections.characterSummary.body:'');
+  if(shortReport){
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('file-text',15)+' Kısa Karakter Özeti</div>';
+    det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.55;">'+esc(shortReport)+'</div>';
+    det+='</div>';
+  }
+  // Sınırlamalar
+  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Bu rapor öz-bildirime dayalıdır, tek bir zaman noktasını yansıtır ve klinik tanı değildir; bir uzmanın değerlendirmesinin yerini tutmaz. Ham yanıtlar panelde gösterilmez.</div>';
+  return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,summary:sumChips,details:det});
+}
 // ---- Motivasyon V2.1 (120 günlük program) — panel yalnızca D.motivation.history'yi okur, ayrı dosya çekmez ----
 function motivationEntries(){
   var hist=(D&&D.motivation&&D.motivation.history)?D.motivation.history:null;
@@ -2102,6 +2219,7 @@ function render(){
   h+=moodHeatmapCardHTML();
   h+=cycleCardHTML();
   h+=psychCardHTML();
+  h+=profileAssessmentCardHTML();
   h+=motivationPanelCardHTML();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';

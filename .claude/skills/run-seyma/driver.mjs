@@ -32,6 +32,14 @@ function today() {
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
 }
 
+// Gerçek 174 itemId sırasını al (seedState()'in "tamamlanmış" tohum verisini gerçek
+// itemId'lerle tutarlı kurabilmesi için — bkz. profileAssessmentComputeCurrentIndex).
+const _paSrc = fs.readFileSync(path.join(REPO, 'profileAssessmentV1.js'), 'utf8');
+const _paSandbox = { window: {}, console };
+vm.createContext(_paSandbox);
+vm.runInContext(_paSrc, _paSandbox, { filename: 'profileAssessmentV1.js' });
+const PROFILE_ITEM_IDS = _paSandbox.window.ProfileAssessmentV1.sessions[0].items.map((it) => it.id);
+
 // ── Fake DOM ────────────────────────────────────────────────────────────────
 let appHTML = ''; // last innerHTML written to #app
 function makeEl(id) {
@@ -162,6 +170,19 @@ function seedState() {
     notifications: [], luna: { qa: [] }, aeon: { qa: [] },
     settings: { nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data' },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
+    // Faz 05: render() artık `profileAssessment.status!=='completed'` iken ana sekmeleri
+    // (bugun/rapor/vb.) kilitler. Bu driver bugun/rapor/tema gibi GENEL render akışını test
+    // ettiği için, "mevcut kullanıcı" tohumu zaten TAMAMLAMIŞ sayılır — gate'in kendi
+    // davranışı (kilit/rıza/soru ekranı) ayrı `verify-profile-assessment-gate.mjs`'de test edilir.
+    profileAssessment: {
+      schemaVersion: 2, deliveryMode: 'single_session', status: 'completed',
+      startedAt: t + 'T09:00:00.000Z', completedAt: t + 'T09:30:00.000Z', currentItemIndex: 174,
+      consent: { version: '1.0.0', informationShownAt: t + 'T09:00:00.000Z', acceptedAt: t + 'T09:00:05.000Z', profileProcessingAccepted: true, sensitiveDataAccepted: true, panelSummarySharingAccepted: false },
+      // status:'completed' ile tutarlı olsun diye tüm 174 gerçek itemId cevaplanmış sayılır
+      // (aksi halde ensureProfileAssessment tutarsızlığı fark edip status'u 'active'e çeker).
+      responses: Object.fromEntries(PROFILE_ITEM_IDS.map((id, i) => [id, { value: 4, scoredValue: 4, shownAt: t + 'T09:00:00.000Z', answeredAt: t + 'T09:00:05.000Z', responseMs: 5000, revisionCount: 0, itemVersion: '1.0.0', sessionId: 'SINGLE', sequence: i + 1 }])),
+      moduleProgress: {}, scores: {}, quality: {}, report: {}, panelSummary: {},
+    },
   };
 }
 
@@ -170,7 +191,7 @@ function assert(name, cond) {
   if (!cond) process.exitCode = 1;
 }
 
-const FILES = ['motivationProgramV2.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app.js'];
 
 console.log('== boot: onboarding (no saved data) ==');
 appHTML = '';
@@ -184,6 +205,18 @@ appHTML = '';
 let sb2 = buildSandbox(seedState());
 let ctx2 = loadInto(sb2, FILES);
 assert('seeded render produced HTML', appHTML.length > 1000);
+
+// Boot always shows the onboarding gate first, even with saved data (app.js
+// render(): `if(!data || ui.forceStart) return onboardingHTML()`, and `ui.forceStart`
+// defaults to true). A real user dismisses it once per fresh profile by tapping
+// "Tamam ..., başlayalım" → App.start(). With `data` already set, App.start() just
+// flips ui.forceStart=false and renders the real "bugun" tab — do the same here,
+// otherwise every assertion below silently re-tests the onboarding screen instead
+// of the app (that's what made "has bottom nav" FAIL despite seeded data).
+if (sb2.App && typeof sb2.App.start === 'function') {
+  appHTML = '';
+  sb2.App.start();
+}
 assert('has bottom nav (bugun tab)', /App\.go\(/.test(appHTML) || /bugun/i.test(appHTML));
 
 console.log('\n== drive: interactions ==');

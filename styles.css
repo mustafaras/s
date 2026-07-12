@@ -285,3 +285,8 @@
   #root[data-theme="dark"] .sey-chat-sectionhead,#root[data-theme="dark"] .sey-chat-sectionhead .section-icon{box-shadow:none;}
   #root[data-theme="dark"] .saygi-page{--saygi-gold:#D9BA73;--saygi-gold2:#F0D38C;--saygi-ink:#A8C3C7;}
   #root[data-theme="dark"] .saygi-intro,#root[data-theme="dark"] .saygi-hero,#root[data-theme="dark"] .saygi-hero-media,#root[data-theme="dark"] .saygi-biography,#root[data-theme="dark"] .saygi-read-button,#root[data-theme="dark"] .saygi-loading-mark{box-shadow:none;}
+  /* Profil değerlendirmesi — tek soru gate'i (Faz 05). Görünür focus + reduced-motion. */
+  .pa-gate{animation:seyFade .3s ease;}
+  .pa-gate:focus{outline:none;}
+  .pa-gate:focus-visible{outline:2px solid #C9B8FF;outline-offset:-2px;}
+  @media (prefers-reduced-motion: reduce){ .pa-gate{animation:none;} }

@@ -266,6 +266,13 @@ notlarını buraya ekleyebiliriz._
   `consent.panelSummarySharingAccepted` alanı `sync.js` merge mantığında ve `app.js` consent akışında hâlâ var, ancak panel
   görünümü artık ona bağlı değil.
 
+- **2026-07-13** — **🧭 120 günlük İçsel Pusula + Saygı Seçkisi artık panelde görünür**:
+  `panel.html` artık `motivationProgramV2.js` ve `saygiPeople.js` modüllerini doğrudan yükleyerek gözlemci panelinde
+  aktif program gününü (Faz, alan, görev, günlük ilerleme çubuğu) ve bugünkü Saygı kişisini (alan, dönem, okundu/okunmadı,
+  toplam okuma ilerlemesi) gösteriyor. Veri kaynağı canlı `D.motivation` ve `D.days[].saygi` kayıtları; herhangi bir panel
+  kullanıcısı için kendi sonuçları panelde yansıtılıyor. Arayüz değişikliği yalnızca `panel.html` üzerinde; `app.js`, modüller
+  veya veri yapısı dokunulmadı.
+
 - **2026-07-11** — **💾 Kapsamlı yazma denetimi + "sekme kapanırken son düzenleme kaybolabilir"
   düzeltmesi**: Kullanıcının her girdisinin gerçekten `seyma-data`'ya yazıldığından emin olmak
   için `App.*`'daki **253 handler'ın tamamı** gerçek V8 `Function.toString()` ile tek tek

@@ -1394,10 +1394,10 @@ function psychCardHTML(){
   return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
 }
 // ── Faz 11: Bilimsel Profil Değerlendirmesi (tek oturum, 174 madde) kartı ──
-// D.profileAssessment — data.psych'ten TAMAMEN ayrı. Yalnızca completed +
-// consent.panelSummarySharingAccepted === true ise özet gösterilir. Ham cevap,
-// hassas ilişki maddeleri, dikkat kontrol ayrıntıları, yanıt süreleri ve tanı
-// etiketleri ASLA gösterilmez. Eksik/eski veride güvenli boş durum.
+// D.profileAssessment — data.psych'ten TAMAMEN ayrı. Tamamlanmış profil özeti
+// panelde doğrudan gösterilir; bu panel kullanıcının kendi gözlem panosudur.
+// Ham cevap, hassas ilişki maddeleri, dikkat kontrol ayrıntıları, yanıt süreleri
+// ve tanı etiketleri ASLA gösterilmez. Eksik/eski veride güvenli boş durum.
 function profileAssessmentCardHTML(){
   var PA=(D&&D.profileAssessment)?D.profileAssessment:null;
   // Eski kullanıcıda alan yok → güvenli boş durum
@@ -1406,8 +1406,6 @@ function profileAssessmentCardHTML(){
       summary:'Henüz başlanmadı — Şeyma 174 maddelik bilimsel profil değerlendirmesini tamamladığında boyutsal özet burada belirir.',
       details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Bu, tek oturumluk bilimsel bir profil değerlendirmesidir (Big Five, RAISEC, değerler, motivasyon, bilişsel stil, bağlanma, duygu düzenleme). Klinik tanı değildir; öz-bildirime dayalı bir profildir. Veriler seyma-data reposuna senkronize edilir.</div>'});
   }
-  var consent=(PA.consent&&typeof PA.consent==='object')?PA.consent:{};
-  var sharingAccepted=consent.panelSummarySharingAccepted===true;
   var isCompleted=PA.status==='completed';
   // Tamamlanmamış → kesin yorum gösterme
   if(!isCompleted){
@@ -1422,14 +1420,7 @@ function profileAssessmentCardHTML(){
       summary:esc(statusTxt+progressTxt)+' — tamamlandığında boyutsal özet burada belirir.',
       details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Değerlendirme tamamlanmadan profil özeti gösterilmez. Şeyma kaldığı yerden devam edebilir.</div>'});
   }
-  // Tamamlanmış ama paylaşım kapalı → "Profil özeti paylaşılmıyor."
-  if(!sharingAccepted){
-    var completedDate=PA.completedAt?fmtTR(String(PA.completedAt).slice(0,10)):'—';
-    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
-      summary:'Tamamlandı ('+esc(completedDate)+') — paylaşım kapalı',
-      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">'+icon('lock',15)+'</span><span>Profil özeti paylaşılmıyor. Şeyma paylaşımı açtığında boyutsal özet burada belirir.</span></div>'});
-  }
-  // Tamamlanmış + paylaşım açık → özet göster
+  // Tamamlanmış → özet göster
   var ps=(PA.panelSummary&&typeof PA.panelSummary==='object')?PA.panelSummary:{};
   var scores=PA.scores||{};
   var report=PA.report||{};

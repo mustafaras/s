@@ -569,6 +569,7 @@ function migrate(d){
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
   if(typeof d.settings.hideRepoBanner!=='boolean') d.settings.hideRepoBanner=false;
+  if(typeof d.settings.profileAssessmentInactive!=='boolean') d.settings.profileAssessmentInactive=true;
   if(d.settings.caffeineMode!=='standard'&&d.settings.caffeineMode!=='sensitive'&&d.settings.caffeineMode!=='pregnant') d.settings.caffeineMode='standard';
   if(typeof d.settings.targetBed!=='string'||!/^\d{2}:\d{2}$/.test(d.settings.targetBed)) d.settings.targetBed=CAFFEINE_DEFAULT_BED;
   if(!d.settings.ghBranch) d.settings.ghBranch='main';
@@ -2955,8 +2956,10 @@ function render(){
   // Saygı sekmeleri kilitli — yalnızca Ayarlar (gizlilik/veri-silme/senkron) erişilebilir
   // kalır (bkz. REPO_INTEGRATION_ARCHITECTURE.md § Erişim). Puanlama/rapor burada YOK
   // (bkz. Faz 07-09); 174. maddeden sonra yalnızca geçici tamamlanma (completedAt) yazılır.
+  // 2026-07-13: Değerlendirme artık ana arayüzde inaktif; sonuçlar panelde görünür.
+  // Kod ve veri korundu; settings.profileAssessmentInactive ile istenirse yeniden açılabilir.
   var pa=ensureProfileAssessment(data);
-  if((pa.status!=='completed' || ui.profileAssessmentCompletionShown) && ui.tab!=='ayarlar'){
+  if(!data.settings.profileAssessmentInactive && (pa.status!=='completed' || ui.profileAssessmentCompletionShown) && ui.tab!=='ayarlar'){
     app.innerHTML=renderProfileAssessmentGate()+modalsHTML();
     lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false;
     try{ var pg=document.getElementById('pa-gate'); if(pg&&pg.focus) pg.focus(); }catch(e){}

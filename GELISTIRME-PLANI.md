@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-10 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-13 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
@@ -250,6 +250,14 @@ notlarını buraya ekleyebiliriz._
 ---
 
 ## 🗒️ Değişiklik günlüğü
+
+- **2026-07-13** — **🧠 Bilimsel Profil Değerlendirmesi ana arayüzde inaktif; sonuçlar panelde korunuyor**:
+  174 maddelik tek oturumlu profil değerlendirmesi (`data.profileAssessment`) artık `Bugün/Sağlık/Rapor/Mesaj/Harita/Saygı`
+  sekmelerini kilitlemiyor. `migrate()` içinde `settings.profileAssessmentInactive=true` varsayılanı eklendi; eski ve yeni
+  kullanıcılarda değerlendirme ana uygulama arayüzünde görünmüyor. Tüm kod, veri modeli, yanıtlar (`responses`), puanlama ve
+  rapor üretimi (`profileAssessmentV1.js` + `app.js` profil motoru) **silinmedi**; Ayarlar'dan veya kod bayrağı değiştirilerek
+  yeniden aktive edilebilir. Tamamlanan profil özetleri zaten panelde (`panel.html` → `profileAssessmentCardHTML`) görünüyor;
+  inaktif hale getirildikten sonra da `data.profileAssessment` senkronize kalmaya devam ediyor. Cache-bust: `app.js v=20260713a`.
 
 - **2026-07-11** — **💾 Kapsamlı yazma denetimi + "sekme kapanırken son düzenleme kaybolabilir"
   düzeltmesi**: Kullanıcının her girdisinin gerçekten `seyma-data`'ya yazıldığından emin olmak

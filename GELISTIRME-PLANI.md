@@ -273,6 +273,12 @@ notlarını buraya ekleyebiliriz._
   kullanıcısı için kendi sonuçları panelde yansıtılıyor. Arayüz değişikliği yalnızca `panel.html` üzerinde; `app.js`, modüller
   veya veri yapısı dokunulmadı.
 
+- **2026-07-13** — **📝 Panelde aktif günün görev metni daha belirgin okunuyor**:
+  `motivationPanelCardHTML()` aktif gün özetinde `standardTask` artık büyük (`var(--f2)`), ikonlu (`clipboard-list`) ve
+  altın renk başlıklı (`var(--gold)`) bir satır olarak gösteriliyor. Yanına `minimumTask` (`shield`) ve `successMeaning`
+  (`sparkles`) eklendi; görevin tam ve minimum versiyonu ile o günün anlamı panelde ilk bakışta görünür hale geldi.
+  İkon setine `clipboard-list` ve `shield` eklendi. `app.js` veya veri modeli dokunulmadı.
+
 - **2026-07-11** — **💾 Kapsamlı yazma denetimi + "sekme kapanırken son düzenleme kaybolabilir"
   düzeltmesi**: Kullanıcının her girdisinin gerçekten `seyma-data`'ya yazıldığından emin olmak
   için `App.*`'daki **253 handler'ın tamamı** gerçek V8 `Function.toString()` ile tek tek

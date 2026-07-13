@@ -256,8 +256,15 @@ notlarını buraya ekleyebiliriz._
   sekmelerini kilitlemiyor. `migrate()` içinde `settings.profileAssessmentInactive=true` varsayılanı eklendi; eski ve yeni
   kullanıcılarda değerlendirme ana uygulama arayüzünde görünmüyor. Tüm kod, veri modeli, yanıtlar (`responses`), puanlama ve
   rapor üretimi (`profileAssessmentV1.js` + `app.js` profil motoru) **silinmedi**; Ayarlar'dan veya kod bayrağı değiştirilerek
-  yeniden aktive edilebilir. Tamamlanan profil özetleri zaten panelde (`panel.html` → `profileAssessmentCardHTML`) görünüyor;
+  yeniden aktive edilebilir. Tamamlanan profil özetleri panelde (`panel.html` → `profileAssessmentCardHTML`) görünmeye devam ediyor;
   inaktif hale getirildikten sonra da `data.profileAssessment` senkronize kalmaya devam ediyor. Cache-bust: `app.js v=20260713a`.
+  
+  **Hata düzeltmesi (2026-07-13 20:00):** `panel.html` içindeki `profileAssessmentCardHTML()` tamamlanmış değerlendirme
+  sonuçlarını yalnızca `consent.panelSummarySharingAccepted === true` ise gösteriyordu. Arayüz inaktif hale gelince kullanıcı
+  bu paylaşım bayrağını değiştiremiyordu ve panelde "paylaşım kapalı" mesajıyla kendi sonuçlarını göremiyordu. Düzeltme:
+  paneldeki bu izin kontrolü kaldırıldı; tamamlanmış profil özeti artık kullanıcının kendi panelinde doğrudan görüntüleniyor.
+  `consent.panelSummarySharingAccepted` alanı `sync.js` merge mantığında ve `app.js` consent akışında hâlâ var, ancak panel
+  görünümü artık ona bağlı değil.
 
 - **2026-07-11** — **💾 Kapsamlı yazma denetimi + "sekme kapanırken son düzenleme kaybolabilir"
   düzeltmesi**: Kullanıcının her girdisinin gerçekten `seyma-data`'ya yazıldığından emin olmak

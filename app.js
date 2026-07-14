@@ -204,7 +204,7 @@ var MG_REASON_LABELS={
   symptom:'Belirtiler', trend:'Son günlerdeki eğilim'
 };
 var MG_PHASE_LABELS={luteal:'Luteal',menstrual:'Regl',ovulation:'Ovulasyon',follicular:'Foliküler',unknown:'Belirtilmemiş'};
-var MG_PHASE_COLORS={luteal:'#C77DA6',menstrual:'#E58B9B',ovulation:'#8F85D3',follicular:'#66B072',unknown:'var(--faint)'};
+var MG_PHASE_COLORS={luteal:'#C77DA6',menstrual:'#E58B9B',ovulation:'#8F85D3',follicular:'#66B072',unknown:'#888888'};
 
 // "HH:MM" -> dakika
 function hhmmToMin(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(':'); return Number(p[0])*60+Number(p[1]); }

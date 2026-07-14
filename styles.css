@@ -290,3 +290,11 @@
   .pa-gate:focus{outline:none;}
   .pa-gate:focus-visible{outline:2px solid #C9B8FF;outline-offset:-2px;}
   @media (prefers-reduced-motion: reduce){ .pa-gate{animation:none;} }
+  /* ── Günün Fotoğrafı kartı (Wikimedia Commons POTD) ── */
+  .sey-daily-photo{animation:seyFade .45s ease, seyRoomGlow 3.6s ease-in-out infinite;}
+  .sey-daily-photo img{transform:scale(1.02);transition:transform 8s ease, opacity .6s ease;}
+  .sey-daily-photo:hover img{transform:scale(1.06);}
+  .sey-daily-photo button:hover{transform:rotate(-30deg) scale(1.08);}
+  .sey-daily-photo button:active{transform:rotate(-45deg) scale(.94);}
+  @media (prefers-reduced-motion: reduce){ .sey-daily-photo img{transform:none;transition:opacity .3s ease;} .sey-daily-photo button:hover,.sey-daily-photo button:active{transform:none;} }
+  

@@ -331,6 +331,17 @@ notlarını buraya ekleyebiliriz._
   (salt-okunur çekildi) `migrate()` + tüm sekme render'larından hem kilit-öncesi hem
   kilit-sonrası hatasız geçti, 18 gerçek gün kaydından hiçbiri kaybolmadı. Cache-bust:
   `app.js v=20260711o`.
+- **2026-07-14** — **💬 ÆON sohbetinde WhatsApp tarzı balonlar + kararlı sıralama + geçmiş toggle + uzun mesaj Tümünü göster / Daralt**:
+  ÆON `mesaj` sekmesindeki `aeonChatHTML()` artık `data.aeon.qa` + bildirimleri tek kronolojik thread'de
+  birleştiriyor; `tsNum` + `_idx` kararlı sıralaması sayesinde aynı saniyedeki mesajlar ekleme sırasını
+  koruyor ve kullanıcı sorusu her zaman kendi ÆON yanıtından önce. Balonlar CSS'de zaten sağda (giden)
+  / solda (gelen) (`msg-row.out`/`msg-row.in`). Geçmiş `AEON_PAGE_SIZE=40` sınırını aşınca üstte
+  **“↑ Daha eski X mesajı göster / ↓ Tümünü daralt”** butonu çıkıyor ve yalnızca tıklama ile açılıp
+  kapanıyor; otomatik daralma kaldırıldı. Ayrıca 240 karakter / 7 satırı aşan uzun metin balonları için
+  yeni `aeonBubbleText()` + `App.toggleAeonBubble()` eklendi: her balonun altında **“Tümünü göster ⌄”**
+  butonu var, tıklayınca **“Daralt ⌃”** oluyor, butona basılmadan balon kendi kendine kapanmıyor.
+  LUNA sohbet eski `clampBubble()` davranışını koruyor (değişiklik yalnızca ÆON balonları). Cache-bust:
+  `app.js v=20260714g`, `styles.css v=20260714g`.
 - **2026-07-11** — **📎 ÆON sohbetine belge + hazır ses dosyası eki (iki yönlü, premium attach sheet)**:
   2026-07-06'daki sesli mesaj/fotoğraf altyapısının üzerine, hem Şeyma (app.js) hem gözlemci (panel.html)
   artık ÆON sohbetine **genel belge** (PDF/Word/Excel/metin/zip…) ve **cihazdan hazır bir ses dosyası**

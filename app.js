@@ -203,6 +203,8 @@ var MG_REASON_LABELS={
   lowEnergy:'Düşük enerji', highStress:'Yüksek stres',
   symptom:'Belirtiler', trend:'Son günlerdeki eğilim'
 };
+var MG_PHASE_LABELS={luteal:'Luteal',menstrual:'Regl',ovulation:'Ovulasyon',follicular:'Foliküler',unknown:'Belirtilmemiş'};
+var MG_PHASE_COLORS={luteal:'#C77DA6',menstrual:'#E58B9B',ovulation:'#8F85D3',follicular:'#66B072',unknown:'var(--faint)'};
 
 // "HH:MM" -> dakika
 function hhmmToMin(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(':'); return Number(p[0])*60+Number(p[1]); }
@@ -5210,7 +5212,9 @@ function magnesiumCardHTML(date){
   h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Danışmanı</div>';
   h+='<div style="font-size:12px;color:var(--muted);">Skor: '+nudge.score+'/100 · '+esc(hl.sig)+' sinyal</div>';
   h+='</div>';
-  h+='<span style="font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+esc(nudge.phase||'bilinmiyor')+'</span>';
+  var phaseName=MG_PHASE_LABELS[nudge.phase]||MG_PHASE_LABELS.unknown;
+  var phaseColor=MG_PHASE_COLORS[nudge.phase]||MG_PHASE_COLORS.unknown;
+  h+='<span style="font-size:11px;font-weight:700;background:'+phaseColor+'22;color:'+phaseColor+';padding:3px 8px;border-radius:999px;">'+esc(phaseName)+'</span>';
   h+='</div>';
 
   if(!s.enabled || s.mode==='off'){

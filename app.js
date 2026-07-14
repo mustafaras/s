@@ -2767,6 +2767,7 @@ App.locNudgeSnooze=function(){ closeLocNudge('later'); };
 App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
 App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optOutDay=todayStr(); ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Tamam, bugünlük kapattım — yarın yine buradayım'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
+App.toggleDailyPhoto=function(){ ui.dailyPhotoOpen=!ui.dailyPhotoOpen; render(); };
 App.refreshDailyPhoto=function(){ data.dailyPhoto.date=''; data.dailyPhoto.url=''; fetchDailyPhoto(); };
 function prefersReducedMotion(){ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
 // Premium akordeon: gövdeyi (.sey-collbody) ölçülmüş max-height ile yumuşakça aç/kapat.
@@ -4506,42 +4507,61 @@ function rasitContactHTML(){
 function dailyPhotoCardHTML(){
   var p=data.dailyPhoto||{};
   var hasUrl=!!p.url;
+  var open=!!ui.dailyPhotoOpen;
   var accent=dark?'#F4C980':'#8A5A2B';
   var cardBg=dark?'linear-gradient(145deg,#141012,#0B0B0D)':'linear-gradient(145deg,#FFF8F0,#FDF6ED)';
   var border=dark?'1px solid rgba(244,201,128,0.20)':'1px solid rgba(138,90,43,0.16)';
-  var text=dark?'#F7F0E8':'#5A3A26';
   var muted=dark?'#C8B9A6':'#8A6A52';
-  var h='<div class="glass sey-daily-photo" style="position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
-  // Başlık şeridi
+  var h='<div class="glass sey-daily-photo" onclick="App.toggleDailyPhoto()" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
+  // Başlık şeridi (Günışığı kartıyla aynı aç/kapa deseni)
   h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
   h+='<div style="display:flex;align-items:center;gap:9px;">';
   h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' '+(dark?'16':'18')+'%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,'+(dark?'0.08':'0.45')+');">'+icon('camera',17)+'</span>';
   h+='<div><div style="font-size:12px;font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:10.5px;color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
   h+='</div>';
-  h+='<button onclick="App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
+  h+='<div style="display:flex;align-items:center;gap:4px;">';
+  h+='<button onclick="event.stopPropagation();App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
+  h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
   h+='</div>';
-  // Görsel alanı
-  h+='<div style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
-  if(hasUrl){
-   h+='<img src="'+esc(p.url)+'" alt="'+esc(p.title||'Günün fotoğrafı')+'" loading="eager" onload="this.style.opacity=1" style="display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;">';
-   h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.28) 40%,transparent 70%);pointer-events:none;"></div>';
-   h+='<div style="position:absolute;left:0;right:0;bottom:0;padding:14px 14px 12px;color:#fff;">';
-   if(p.title) h+='<div style="font-size:15px;font-weight:800;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.45);">'+esc(p.title)+'</div>';
-   var meta=[];
-   if(p.artist) meta.push('© '+esc(p.artist));
-   if(p.license) meta.push(esc(p.license));
-   if(meta.length) h+='<div style="margin-top:5px;font-size:10.5px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
-   h+='</div>';
-   if(p.pageUrl){
-     h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:10px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
-   }
-  }else{
-   h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
-   h+='<span style="opacity:.7;">'+icon('image',40)+'</span>';
-   h+='<div style="font-size:13px;font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
-   h+='</div>';
+  h+='</div>';
+  if(open){
+    // Görsel alanı (açıkken göster)
+    h+='<div class="sey-collbody" style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
+    if(hasUrl){
+     h+='<img src="'+esc(p.url)+'" alt="'+esc(p.title||'Günün fotoğrafı')+'" loading="eager" onload="this.style.opacity=1" style="display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;">';
+     h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.28) 40%,transparent 70%);pointer-events:none;"></div>';
+     h+='<div style="position:absolute;left:0;right:0;bottom:0;padding:14px 14px 12px;color:#fff;">';
+     if(p.title) h+='<div style="font-size:15px;font-weight:800;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.45);">'+esc(p.title)+'</div>';
+     var meta=[];
+     if(p.artist) meta.push('© '+esc(p.artist));
+     if(p.license) meta.push(esc(p.license));
+     if(meta.length) h+='<div style="margin-top:5px;font-size:10.5px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
+     h+='</div>';
+     if(p.pageUrl){
+       h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:10px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
+     }
+    }else{
+     h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
+     h+='<span style="opacity:.7;">'+icon('image',40)+'</span>';
+     h+='<div style="font-size:13px;font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
+     h+='</div>';
+    }
+    h+='</div>';
+  } else {
+    // Kapalıyken minimal önizleme: küçük thumbnail + başlık
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:0 16px 12px;margin-top:-4px;">';
+    if(hasUrl){
+      h+='<div style="width:52px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;background:'+(dark?'#0F0D0E':'#EDE5DB')+';"><img src="'+esc(p.url)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>';
+    } else {
+      h+='<div style="width:52px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;background:'+(dark?'#0F0D0E':'#EDE5DB')+';display:flex;align-items:center;justify-content:center;color:'+muted+';">'+icon('image',20)+'</div>';
+    }
+    h+='<div style="flex:1;min-width:0;">';
+    if(p.title) h+='<div style="font-size:13px;font-weight:800;color:'+(dark?'#F7F0E8':'#5A3A26')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.title)+'</div>';
+    h+='<div style="font-size:11px;color:'+muted+';font-weight:600;">Dokun, açalım · '+(p.source||'Wikimedia Commons')+'</div>';
+    h+='</div>';
+    h+='<span style="color:'+accent+';">'+icon('chevron-down',14)+'</span>';
+    h+='</div>';
   }
-  h+='</div>';
   h+='</div>';
   return h;
 }
@@ -4569,7 +4589,7 @@ function bugunHTML(){
     h+=saveBanner();
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
     h+=weatherHeaderHTML(_greet);
-    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı (Wikimedia Commons POTD)
+    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günışığı hava kartının hemen altında
     h+=rasitBubbleHTML(curIdx);
     h+=rasitContactHTML(); // Raşit'e yaz / ara — notlar kartının hemen altında (premium ikili)
   }

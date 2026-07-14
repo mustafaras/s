@@ -7897,12 +7897,15 @@ App.aeonScrollToBottom=function(){
   var fab=document.getElementById('aeon-scroll-fab'); if(fab) fab.style.display='none';
 };
 App.showAeonHistory=function(){
-  ui.aeonShowAllHistory=true;
+  // Tüm geçmişi aç/kapat — sadece buton tıklamasıyla çalışır; otomatik daralma/açılma olmaz.
+  ui.aeonShowAllHistory=!ui.aeonShowAllHistory;
   render();
-  // Yeni açılan eski mesajlar en üstte belirir; kullanıcıyı orada bırak (en alta zıplama yapma)
   try{
     var thread=document.getElementById('aeon-thread'), sc=document.querySelector('[data-scroll]');
-    if(thread && sc){ var top=thread.offsetTop||0; sc.scrollTop=Math.max(0,top-8); }
+    if(thread && sc){
+      if(ui.aeonShowAllHistory){ var top=thread.offsetTop||0; sc.scrollTop=Math.max(0,top-8); }
+      else { sc.scrollTop=sc.scrollHeight; }
+    }
   }catch(e){}
 };
 App.toggleAeonSearch=function(){
@@ -8169,14 +8172,18 @@ function aeonChatHTML(){
   h+='<input id="aeon-search-input" type="text" oninput="App.filterAeonSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:10px 36px 10px 14px;font-size:14px;color:var(--text);outline:none;">';
   h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',14)+'</button>';
   h+='</div>';
-  var items=[];
-  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ items.push({sort:String(n.ts||n.receivedAt||''),kind:'in',text:n.text,time:n.ts||n.receivedAt,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize}); });
+  // ÆON akışı: bildirimler (gelen/gözlemci) + kullanıcı soruları + ÆON yanıtları
+  // tek kronolojik thread'de birleştirilir. Zaman damgası sayısal, aynı saniyedeki
+  // mesajlar ekleme sırasıyla kararlı kalır; böylece soru her zaman kendi yanıtından önce.
+  function tsNum(t){ var d=new Date(t||0); return isNaN(d.getTime())?Infinity:d.getTime(); }
+  var items=[], seq=0;
+  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ var t=n.ts||n.receivedAt||''; items.push({sort:String(t),tsNum:tsNum(t),_idx:seq++,kind:'in',text:n.text,time:t,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
   qa.forEach(function(x){ if(!x) return;
-    items.push({sort:String(x.ts||''),kind:'out',text:x.question,time:x.ts,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize});
-    if(x.answer) items.push({sort:String(x.answeredAt||x.ts||''),kind:'in',text:x.answer,time:x.answeredAt||x.ts,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize});
+    var qt=x.ts||''; items.push({sort:String(qt),tsNum:tsNum(qt),_idx:seq++,kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize});
+    if(x.answer){ var at=x.answeredAt||qt||''; items.push({sort:String(at),tsNum:tsNum(at),_idx:seq++,kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize}); }
   });
-  items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
+  items.sort(function(a,b){ return (a.tsNum-b.tsNum)||(a._idx-b._idx); });
   // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ
   // yeniden kurmak yerine yalnızca son AEON_PAGE_SIZE öğeyi göster; üstte "daha eski
   // mesajları göster" düğmesiyle kullanıcı isterse tam geçmişi açabilir (veri kaybı yok —
@@ -8187,8 +8194,10 @@ function aeonChatHTML(){
     visibleItems=items.slice(hiddenOlder);
   }
   h+='<div id="aeon-thread" style="display:flex;flex-direction:column;gap:10px;">';
-  if(hiddenOlder>0){
-    h+='<div style="display:flex;justify-content:center;margin:2px 0 4px;"><button onclick="App.showAeonHistory()" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:999px;padding:7px 16px;font-size:12px;font-weight:700;">↑ Daha eski '+hiddenOlder+' mesajı göster</button></div>';
+  if(totalItems>AEON_PAGE_SIZE){
+    var historyOpen=ui.aeonShowAllHistory;
+    var historyLabel=historyOpen?'↓ Tümünü daralt':'↑ Daha eski '+hiddenOlder+' mesajı göster';
+    h+='<div style="display:flex;justify-content:center;margin:2px 0 4px;"><button onclick="App.showAeonHistory()" style="border:1px solid var(--field-bd);background:var(--field);color:var(--muted);cursor:pointer;border-radius:999px;padding:7px 16px;font-size:12px;font-weight:700;">'+historyLabel+'</button></div>';
   }
   if(!items.length){
     h+='<div class="msg-empty-hint" style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(230,193,90,0.13),rgba(201,154,58,0.07));border:1px solid rgba(201,154,58,0.2);"><div style="margin-bottom:7px;color:var(--aeon);display:flex;justify-content:center;">'+icon('hexagon',30)+'</div><div style="font-size:14.5px;font-weight:800;color:var(--text);margin-bottom:5px;">Burası senin sessiz limanın</div><div style="font-size:12.5px;color:var(--muted);line-height:1.6;">Aklından geçeni, içini dökmek istediğin her şeyi buraya bırakabilirsin. Ne zaman istersen — gece ya da gündüz — ben hep buradayım. ✨</div></div>';

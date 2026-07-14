@@ -8082,6 +8082,44 @@ function clampBubble(text,fadeColor){
   h+='<button onclick="App.toggleMsg(this)" style="margin-top:5px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:800;color:inherit;opacity:.92;padding:2px 0;">Devamını göster ⌄</button>';
   return h;
 }
+// ÆON sohbet balonlarında uzun metinler için kullanıcı kontrollü Tümünü göster / Daralt toggle'ı.
+// clampBubble()'dan farklı olarak butona basılmadan balon kendi kendine daralmaz; durum render sırasında
+// belirlenir ve her balon kendi indeksine göre bağımsız toggle'lanır.
+var AEON_BUBBLE_MAX_LINES=7;
+var AEON_BUBBLE_MAX_CHARS=240;
+function aeonBubbleText(text,kind){
+  var t=String(text==null?'':text).trim();
+  var safe=mdLite(esc(t));
+  var long=t.length>AEON_BUBBLE_MAX_CHARS||t.split('\n').length>AEON_BUBBLE_MAX_LINES;
+  if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  var id='aeon-bubble-'+((++aeonBubbleCounter)|0);
+  var isDarkOut=kind==='out';
+  var btnColor=isDarkOut?'rgba(255,255,255,0.88)':'var(--muted)';
+  var h='<div id="'+id+'" style="position:relative;">';
+  h+='<div data-aeon-bubble="1" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  h+='<div data-aeon-fade="1" style="position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.18));pointer-events:none;"></div></div>';
+  h+='<button onclick="App.toggleAeonBubble(\''+id+'\')" style="margin-top:6px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:800;color:'+btnColor+';opacity:.95;padding:2px 0;display:flex;align-items:center;gap:4px;">Tümünü göster ⌄</button>';
+  return h;
+}
+App.toggleAeonBubble=function(id){
+  var wrap=document.getElementById(id); if(!wrap) return;
+  var content=wrap.querySelector('[data-aeon-bubble="1"]');
+  var fade=wrap.querySelector('[data-aeon-fade="1"]');
+  var btn=wrap.nextElementSibling;
+  if(!content) return;
+  if(content.getAttribute('data-exp')==='1'){
+    content.style.maxHeight='140px';
+    content.setAttribute('data-exp','0');
+    if(fade) fade.style.display='';
+    if(btn) btn.innerHTML='Tümünü göster ⌄';
+  } else {
+    content.style.maxHeight='none';
+    content.setAttribute('data-exp','1');
+    if(fade) fade.style.display='none';
+    if(btn) btn.innerHTML='Daralt ⌃';
+  }
+};
+var aeonBubbleCounter=0;
 App.toggleMsg=function(btn){
   var wrap=btn.previousElementSibling; if(!wrap) return;
   var content=wrap.querySelector('[data-clamp]'), fade=wrap.querySelector('.seyfade'); if(!content) return;
@@ -8111,7 +8149,7 @@ function aeonItemHTML(it,enterCls){
     if(it.mediaKind){
       h+='<div class="msg-bubble out" style="padding:'+(it.mediaKind==='image'?'4px':'10px 13px')+';">'+aeonMediaSlotHTML(it,'rgba(255,255,255,0.16)','#fff')+'</div>';
     } else {
-      h+='<div class="msg-bubble out">'+clampBubble(it.text,'var(--user-bubble)')+'</div>';
+      h+='<div class="msg-bubble out">'+aeonBubbleText(it.text,'out')+'</div>';
     }
     var foot;
     if(it.answered) foot='<span style="color:var(--faint);display:inline-flex;align-items:center;gap:3px;">'+icon('check-check',11)+' yanıtlandı</span>';
@@ -8123,7 +8161,7 @@ function aeonItemHTML(it,enterCls){
     h+='<div class="msg-bubble in">';
     h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
     if(it.mediaKind) h+=aeonMediaSlotHTML(it,'var(--icon)','var(--aeon)');
-    else h+='<div style="font-size:14.5px;line-height:1.55;">'+clampBubble(it.text,'var(--card)')+'</div>';
+    else h+='<div style="font-size:14.5px;line-height:1.55;">'+aeonBubbleText(it.text,'in')+'</div>';
     if(it.observer&&it.id) h+='<div style="display:flex;margin-top:7px;"><button onclick="App.deleteNotif(\''+it.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button></div>';
     h+='</div></div>';
   }

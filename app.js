@@ -611,6 +611,17 @@ function migrate(d){
   try{ var _t=todayStr(); if(d.days&&d.days[_t]&&d.days[_t].habits) syncDerivedHabits(d.days[_t]); }catch(e){}
   // Profil değerlendirmesi (data.profileAssessment) — data.psych'ten ayrı, tek seferlik.
   try{ ensureProfileAssessment(d); }catch(e){}
+  // Günün fotoğrafı (Wikimedia Commons POTD) — önbellek + metadata.
+  if(!d.dailyPhoto||typeof d.dailyPhoto!=='object') d.dailyPhoto={date:'',url:'',title:'',artist:'',license:'',description:'',source:'Wikimedia Commons',pageUrl:'',fetchedAt:''};
+  if(typeof d.dailyPhoto.date!=='string') d.dailyPhoto.date='';
+  if(typeof d.dailyPhoto.url!=='string') d.dailyPhoto.url='';
+  if(typeof d.dailyPhoto.title!=='string') d.dailyPhoto.title='';
+  if(typeof d.dailyPhoto.artist!=='string') d.dailyPhoto.artist='';
+  if(typeof d.dailyPhoto.license!=='string') d.dailyPhoto.license='';
+  if(typeof d.dailyPhoto.description!=='string') d.dailyPhoto.description='';
+  if(typeof d.dailyPhoto.source!=='string') d.dailyPhoto.source='Wikimedia Commons';
+  if(typeof d.dailyPhoto.pageUrl!=='string') d.dailyPhoto.pageUrl='';
+  if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
   d.version=2;
   return d;
 }
@@ -2756,6 +2767,7 @@ App.locNudgeSnooze=function(){ closeLocNudge('later'); };
 App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
 App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optOutDay=todayStr(); ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Tamam, bugünlük kapattım — yarın yine buradayım'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
+App.refreshDailyPhoto=function(){ data.dailyPhoto.date=''; data.dailyPhoto.url=''; fetchDailyPhoto(); };
 function prefersReducedMotion(){ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
 // Premium akordeon: gövdeyi (.sey-collbody) ölçülmüş max-height ile yumuşakça aç/kapat.
 // Layout sıçraması yok; kapanınca DOM'u yeni (kapalı) hâle çevirir.
@@ -3004,7 +3016,7 @@ function render(){
   html+=navHTML();
   html+=modalsHTML();
   app.innerHTML=html;
-  if(ui.tab==='bugun' && !editing()) maybeFetchWeather();
+  if(ui.tab==='bugun' && !editing()){ maybeFetchWeather(); maybeFetchDailyPhoto(); }
   if(ui.tab==='mesaj') aeonLoadVisibleMedia();
 
   var newScroll=document.querySelector('[data-scroll]');
@@ -3832,6 +3844,69 @@ function reverseGeocodeLive(lat,lng){
       if(nm && data.weather){ data.weather.liveName=nm; if(data.weather.spots&&data.weather.spots[0]) data.weather.spots[0].place=nm; saveLocal(); if(ui.tab==='bugun') render(); }
     }).catch(function(){});
 }
+// ── Günün Fotoğrafı: Wikimedia Commons "Picture of the Day" ──
+// Ücretsiz, CORS-destekli, keyless; her gün değişen, ödüllü doğa/hayvan/manzara
+// fotoğrafları. National Geographic'in resmi API'si olmadığı için en yakın,
+// yasal ve estetik eşdeğer kaynak olarak kullanılır.
+var DAILY_PHOTO_FETCHING=false;
+var DAILY_PHOTO_NATURE_RE=new RegExp('animals|birds|mammals|insects|reptiles|amphibians|fish|marine life|wildlife|nature|landscapes|national parks|mountains|rivers|seas|lakes|forests|flowers|plants|trees|clouds|sky|water|beaches|sunrise|sunset','i');
+function stripHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').replace(/&nbsp;/g,' ').trim();
+}
+function pickNaturePhoto(pages){
+  var keys=Object.keys(pages), best=null;
+  for(var i=0;i<keys.length;i++){
+    var p=pages[keys[i]]; var ii=p&&p.imageinfo&&p.imageinfo[0]; if(!ii||!ii.url) continue;
+    var em=ii.extmetadata||{}, cats=String(em.Categories&&em.Categories.value||'');
+    if(DAILY_PHOTO_NATURE_RE.test(cats)){ best=p; break; }
+    if(!best) best=p;
+  }
+  return best||null;
+}
+function fetchDailyPhoto(){
+  if(DAILY_PHOTO_FETCHING || typeof fetch!=='function' || !data) return;
+  var today=todayStr();
+  // Aynı gün için zaten geçerli bir kayıt varsa tekrar çekme.
+  if(data.dailyPhoto && data.dailyPhoto.date===today && data.dailyPhoto.url) return;
+  DAILY_PHOTO_FETCHING=true;
+  var url='https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Commons:Picture_of_the_day&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*';
+  fetch(url).then(function(r){ return r.ok?r.json():Promise.reject(r.status); }).then(function(j){
+    var pages=j&&j.query&&j.query.pages?j.query.pages:{};
+    var p=pickNaturePhoto(pages);
+    if(!p || !p.imageinfo || !p.imageinfo[0]){ DAILY_PHOTO_FETCHING=false; return; }
+    var ii=p.imageinfo[0], em=ii.extmetadata||{};
+    var title=stripHtml(em.ObjectName&&em.ObjectName.value) || stripHtml(em.ImageDescription&&em.ImageDescription.value) || '';
+    var desc=stripHtml(em.ImageDescription&&em.ImageDescription.value) || title;
+    if(!title && p.title){ title=stripHtml(p.title.replace(/^File:/,'').replace(/_/g,' ').replace(/\.[^.]+$/,'')); }
+    data.dailyPhoto={
+      date:today,
+      url:ii.url||'',
+      title:title,
+      artist:stripHtml(em.Artist&&em.Artist.value),
+      license:em.LicenseShortName&&em.LicenseShortName.value||'',
+      description:desc,
+      source:'Wikimedia Commons Picture of the Day',
+      pageUrl:ii.descriptionurl||'',
+      fetchedAt:new Date().toISOString()
+    };
+    DAILY_PHOTO_FETCHING=false;
+    save();
+    if(ui.tab==='bugun') render();
+  }).catch(function(e){
+    DAILY_PHOTO_FETCHING=false;
+    // Hata durumunda eski fotoğrafı koru; kart "yine de göster" mantığıyla çalışmaya devam eder.
+  });
+}
+function maybeFetchDailyPhoto(){
+  if(!data || !data.dailyPhoto) return;
+  var today=todayStr();
+  // Son 10 dakika içinde denenmiş ve bugün için kayıt yoksa arka planda tekrar dene.
+  var last=data.dailyPhoto.fetchedAt?new Date(data.dailyPhoto.fetchedAt).getTime():0;
+  var stale=!data.dailyPhoto.date || data.dailyPhoto.date!==today;
+  var recent=Date.now()-last < 10*60*1000;
+  if(stale && !recent && !DAILY_PHOTO_FETCHING){ fetchDailyPhoto(); }
+}
 function wxMeta(code,isDay){
   var c=code;
   if(c===0) return {emoji:icon(isDay?'sun':'moon',18), label:isDay?'Açık':'Açık gece', cat:'clear'};
@@ -4427,6 +4502,49 @@ function rasitContactHTML(){
   h+='</div>';
   return h;
 }
+// ── Günün Fotoğrafı kartı: Wikimedia Commons POTD, National Geographic estetiğinde ──
+function dailyPhotoCardHTML(){
+  var p=data.dailyPhoto||{};
+  var hasUrl=!!p.url;
+  var accent=dark?'#F4C980':'#8A5A2B';
+  var cardBg=dark?'linear-gradient(145deg,#141012,#0B0B0D)':'linear-gradient(145deg,#FFF8F0,#FDF6ED)';
+  var border=dark?'1px solid rgba(244,201,128,0.20)':'1px solid rgba(138,90,43,0.16)';
+  var text=dark?'#F7F0E8':'#5A3A26';
+  var muted=dark?'#C8B9A6':'#8A6A52';
+  var h='<div class="glass sey-daily-photo" style="position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
+  // Başlık şeridi
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
+  h+='<div style="display:flex;align-items:center;gap:9px;">';
+  h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' '+(dark?'16':'18')+'%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,'+(dark?'0.08':'0.45')+');">'+icon('camera',17)+'</span>';
+  h+='<div><div style="font-size:12px;font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:10.5px;color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
+  h+='</div>';
+  h+='<button onclick="App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
+  h+='</div>';
+  // Görsel alanı
+  h+='<div style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
+  if(hasUrl){
+   h+='<img src="'+esc(p.url)+'" alt="'+esc(p.title||'Günün fotoğrafı')+'" loading="eager" onload="this.style.opacity=1" style="display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;">';
+   h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.28) 40%,transparent 70%);pointer-events:none;"></div>';
+   h+='<div style="position:absolute;left:0;right:0;bottom:0;padding:14px 14px 12px;color:#fff;">';
+   if(p.title) h+='<div style="font-size:15px;font-weight:800;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.45);">'+esc(p.title)+'</div>';
+   var meta=[];
+   if(p.artist) meta.push('© '+esc(p.artist));
+   if(p.license) meta.push(esc(p.license));
+   if(meta.length) h+='<div style="margin-top:5px;font-size:10.5px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
+   h+='</div>';
+   if(p.pageUrl){
+     h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:10px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
+   }
+  }else{
+   h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
+   h+='<span style="opacity:.7;">'+icon('image',40)+'</span>';
+   h+='<div style="font-size:13px;font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
+   h+='</div>';
+  }
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
 function bugunHTML(){
   var today=todayStr();
   var ed=editing();
@@ -4451,6 +4569,7 @@ function bugunHTML(){
     h+=saveBanner();
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
     h+=weatherHeaderHTML(_greet);
+    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı (Wikimedia Commons POTD)
     h+=rasitBubbleHTML(curIdx);
     h+=rasitContactHTML(); // Raşit'e yaz / ara — notlar kartının hemen altında (premium ikili)
   }

@@ -47,8 +47,9 @@ _Son güncelleme: 2026-07-13 · Kaynak: `app.js` (fonksiyon/satır kanıtı)._
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
 | 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, **"Bugün gösterme"→o günlük sus (ertesi gün tekrar çıkar, `optOutDay`)**; konum AÇIK iken Bugün kartında gerçek veri: mesafe + **⏱️ süre** (`walkSec`/`vehicleSec`), panel "Bugün Hareket"e yansır; 8 reddten sonra fısıltı modu (2026-07-03) |
 | 24 | ☕ Kafein bilimsel takip + otomatik tik | 7 | ✅ | `CAFFEINE_TYPES` katalogu (türk/espresso/filtre/americano/cappuccino/latte/siyah çay/yeşil çay/enerji · mg/serving), `CAFFEINE_LIMITS` (standart 400/hassas 300/gebe 200), `caffeineTotalMg`/`caffeineResidueAt`/`caffeineCutoffTime`/`caffeineTimingOk`; Sağlık'ta premium kafein kartı (içecek chip'leri + günlük içim listesi + saat input + limit bar + tek sefer 200 mg / günlük limit / geç-kahve uyarıları + yatma saati kalıntı göstergesi + EFSA/FDA kaynak notu); `caffeineMode`/`targetBed` ayarları; 6-faktör `sleepReadiness` (süre 26/kalite 18/kafein 18/okuma 16/wind-down 14/ilaç 8); yeni **türetilmiş** "Günlük kafein limitini aşmadım" tiki (`caffeineOk`, elle tıklanmaz — miktar+saat sağlanınca otomatik yeşil); panel kafein satırı mg+kalıntı hesaplar (2026-07-10) |
+| 25 | 📸 Günün Fotoğrafı kartı | 3 | ✅ | `dailyPhotoCardHTML` + `fetchDailyPhoto`/`maybeFetchDailyPhoto` → Bugün sekmesinde premium "Günün Fotoğrafı" kartı; Wikimedia Commons `Commons:Picture_of_the_day` (ücretsiz, API key'siz, CORS destekli, doğa/hayvan ağırlıklı); `data.dailyPhoto` (gün, url, başlık, sanatçı, lisans, açıklama, kaynak, sayfa bağlantısı, çekilme tarihi); günlük cache + elle yenileme (`App.refreshDailyPhoto`); açık/koyu tema uyumlu; `styles.css` parlaklık/parıltı animasyonu; cache bump `20260713b` (2026-07-13) |
 
-**Sayım:** ✅ 13 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 14 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 
@@ -588,6 +589,14 @@ notlarını buraya ekleyebiliriz._
   (hero/onboarding/rapor/sekme başlığı değişmedi). Sadece `--sun`/`--sun2`/
   `--sun-glow` değişkenleri eklendi (açık+koyu); cache-bust `v=20260704c`.
   Harness ile açık+koyu doğrulandı.
+- **2026-07-13** — **#25 Günün Fotoğrafı kartı ✅**: Bugün sekmesine premium
+  "Günün Fotoğrafı" kartı eklendi. Wikimedia Commons Picture of the Day
+  (`Commons:Picture_of_the_day`) üzerinden ücretsiz, API key'siz, CORS'lu
+  çekim; doğa/hayvan ağırlıklı filtreleme, gün bazlı cache, elle yenileme.
+  `data.dailyPhoto` veri modeli + `migrate()` backfill, `dailyPhotoCardHTML`
+  renderer, `fetchDailyPhoto`/`maybeFetchDailyPhoto` fetcher, `App.refreshDailyPhoto`
+  handler. Tema uyumlu açık/koyu tasarım ve yumuşak parıltı/paralaks animasyon.
+  Cache-bust `v=20260713b`; sayım güncellendi.
 - **2026-07-04** — **#1 Ne Dinledim ✅ + #2 Şükran ✅**: 🎵 "Ne Dinledim"
   hub'ı (Bugün / Favoriler / İstatistik / Sözler) — `data.music` favorileri +
   `data.days[].listening` günlük kayıtları, teal `--listen` accent (açık/koyu),

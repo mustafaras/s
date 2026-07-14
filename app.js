@@ -669,7 +669,7 @@ function migrate(d){
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:true, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
 var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -2253,7 +2253,7 @@ App.profileAnswer=function(itemId,value){
 };
 
 App.start=function(){
-  // Her yüklemede karşılama ekranı açılır; mevcut kayıt varsa bu yalnızca bir ekran kapısıdır.
+  // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
   // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.
   if(data){ ui.forceStart=false; ui.tab='bugun'; render(); return; }
   var t=todayStr(),nowIso=new Date().toISOString();

@@ -1278,6 +1278,60 @@ function cycleCardHTML(){
   det+='</div>';
   return cardWrap({key:'cycle',icon:icon('flower-2',18),title:'Menstrüasyon Döngüsü',span:12,order:20,summary:sum,details:det});
 }
+
+function cyclePhaseForDate(d,st){
+  if(!st||!st.last) return null;
+  var since=diff(st.last,d);
+  if(since<0) return null;
+  var dayInCycle=(since%st.avgCycle)+1;
+  var ovuDay=st.avgCycle-14;
+  if(dayInCycle<=st.avgPeriod) return 'menstrual';
+  if(dayInCycle<ovuDay-1) return 'follicular';
+  if(dayInCycle<=ovuDay+1) return 'ovulation';
+  return 'luteal';
+}
+
+// ── Adaptif Magnezyum Danışmanı kartı (salt-gözlem) ─────────────────────────
+function magnesiumPanelCardHTML(){
+  var mgSet=(D&&D.settings&&D.settings.magnesium)||{};
+  var enabled=!!mgSet.enabled;
+  var td=today();
+  var week=[], days=[];
+  for(var i=6;i>=0;i--) week.push(addDays(td,-i));
+  for(var i=29;i>=0;i--) days.push(addDays(td,-i));
+  function mgRec(d){ var r=recOf(d); return (r&&r.magnesium&&typeof r.magnesium==="object")?r.magnesium:null; }
+  function takenCount(arr){ return arr.reduce(function(a,d){ var m=mgRec(d); return a+(m&&m.taken?1:0); },0); }
+  var curTaken=takenCount(week), curTot=Math.max(1,week.length);
+  var monthTaken=takenCount(days), monthTot=Math.max(1,days.length);
+  var doses=[];
+  days.forEach(function(d){ var m=mgRec(d); if(m&&m.taken&&typeof m.mg==="number"&&m.mg>0) doses.push(m.mg); });
+  var avgDose=doses.length?Math.round(doses.reduce(function(a,b){return a+b;},0)/doses.length):0;
+  var st=panelCycleStats();
+  var lutealDays=0, lutealTaken=0;
+  days.forEach(function(d){ if(cyclePhaseForDate(d,st)==='luteal'){ lutealDays++; var m=mgRec(d); if(m&&m.taken) lutealTaken++; } });
+  var pct7=Math.round((curTaken/curTot)*100);
+  var pct30=Math.round((monthTaken/monthTot)*100);
+  var pctLuteal=lutealDays?Math.round((lutealTaken/lutealDays)*100):null;
+  var color=enabled?(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B')):'var(--t3)';
+  var sum='<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">';
+  sum+='<span style="font-size:var(--f4);font-weight:800;color:'+color+';">'+pct7+'%</span>';
+  sum+='<span style="font-size:var(--f2);color:var(--t3);">Son 7 gün · '+curTaken+'/'+curTot+'</span>';
+  if(lutealDays>0) sum+='<span style="font-size:var(--f2);color:var(--t3);">Lüteal '+pctLuteal+'%</span>';
+  if(avgDose>0) sum+='<span style="font-size:var(--f2);color:var(--t3);">~'+avgDose+' mg</span>';
+  sum+='</div>';
+  function kpiBox(label,val){ return '<div style="flex:1;min-width:90px;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+esc(label)+'</div><div style="font-size:var(--f4);font-weight:800;color:var(--accent,var(--gold));margin-top:2px;">'+val+'</div></div>'; }
+  var det='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
+  det+=kpiBox('Son 30 gün',pct30+'%');
+  det+=kpiBox('Lüteal dönem',pctLuteal!==null?(pctLuteal+'%'):'—');
+  det+=kpiBox('Ortalama doz',avgDose?(avgDose+'<span style="font-size:var(--f2);font-weight:600;"> mg</span>'):'—');
+  det+='</div>';
+  if(!enabled) det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;margin-bottom:8px;">Magnezyum Danışmanı Şeyma uygulamasında kapalı. Açıkken veriler buraya yansıyacak.</div>';
+  if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;">⚠️ Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
+  if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;">⚠️ Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
+  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;">Veriler Şeyma uygulamasından gelir; panel yalnızca gözlemdir. Tıbbi karar için kullanılmamalı.</div>';
+  return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Danışmanı',span:6,order:22,summary:sum,details:det});
+}
+
 // ── Faz 7: Psikolojik Profil kartı — Şeyma'nın iki haftada bir doldurduğu anketin
 // tüm sonuçları + soru & cevapları (salt-gösterim). D.psych latest.json üzerinden senkron gelir.
 function psychCardHTML(){
@@ -2187,6 +2241,17 @@ function render(){
   // Şükran (gratitude): bugünün güzel şeyleri
   var grEn=(Array.isArray(srec.gratitude))?srec.gratitude.map(function(g){return String(g==null?"":g).trim();}).filter(Boolean):[];
   exRows+=exRowAlways(icon('heart-handshake',13)+' Şükran', grEn.map(function(g){return esc(g);}).join(" · "));
+  // Magnezyum (magnesium): bugün alınan destek ve sebepleri
+  var mgRec=srec.magnesium&&typeof srec.magnesium==="object"?srec.magnesium:null;
+  if(mgRec){
+    var MGFORM_LABELS={glycinate:'Glisinat',citrate:'Sitrat',oxide:'Oksit',sulfate:'Sülfat',unknown:'Belirtilmemiş'};
+    var mgBits=[];
+    if(mgRec.taken){ var formLabel=mgRec.form?esc(MGFORM_LABELS[mgRec.form]||mgRec.form):'bir form'; mgBits.push(formLabel+(mgRec.mg?', ~'+esc(String(mgRec.mg))+' mg':'')); if(mgRec.time) mgBits.push('saat '+esc(String(mgRec.time))); }
+    else if(mgRec.skipped) mgBits.push('önerildi ama alınmadı');
+    if(Array.isArray(mgRec.reason)&&mgRec.reason.length) mgBits.push('sinyal: '+mgRec.reason.map(esc).join('+'));
+    if(mgRec.effectNote) mgBits.push('etki: '+esc(String(mgRec.effectNote)));
+    exRows+=exRowAlways(icon('pill',13)+' Magnezyum', mgBits.join(" · "));
+  }
   // Bir yıl önce — seçili günün geçmiş yıllardaki aynı gününden en yakını (salt-okunur nostalji)
   (function(){
     var selMMDD=String(selected).slice(5), selY=parseInt(String(selected).slice(0,4),10), best=null;
@@ -2329,6 +2394,7 @@ function render(){
   h+=psychCardHTML();
   h+=profileAssessmentCardHTML();
   h+=motivationPanelCardHTML();
+  h+=magnesiumPanelCardHTML();
   h+=saygiPanelCardHTML();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';

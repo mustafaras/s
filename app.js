@@ -180,6 +180,25 @@ function caffeineType(id){ for(var i=0;i<CAFFEINE_TYPES.length;i++){ if(CAFFEINE
 function caffeineMode(){ var m=(data&&data.settings&&data.settings.caffeineMode)||'standard'; return (m==='sensitive'||m==='pregnant')?m:'standard'; }
 function caffeineLimit(){ return CAFFEINE_LIMITS[caffeineMode()]||400; }
 function caffeineTargetBed(){ var b=(data&&data.settings&&data.settings.targetBed)||CAFFEINE_DEFAULT_BED; return /^\d{2}:\d{2}$/.test(b)?b:CAFFEINE_DEFAULT_BED; }
+
+// ── Magnezyum Danışmanı sabitleri ──
+var MG_MAX_ELEMENTAL=350; // EFSA/NICE takviyeden günlük üst sınır (elementer magnezyum, mg)
+var MG_FORMS=[
+  {id:'glycinate',label:'Glisinat',emoji:icon('moon',16),bestFor:['sleep','anxiety','muscle'],note:'Yatmadan önce uykuya yardımcı; mideye nazik.'},
+  {id:'citrate',label:'Sitrat',emoji:icon('zap',16),bestFor:['cramp','bloating','constipation'],note:'Kramp ve şişkinlikte destekleyici; bağırsak hareketini artırabilir.'},
+  {id:'oxide',label:'Oksit',emoji:icon('pill',16),bestFor:['general'],note:'Ekonomik ama emilimi düşük; ishal riski yüksek.'},
+  {id:'sulfate',label:'Sülfat',emoji:icon('droplets',16),bestFor:['bath','topical'],note:'Epsom tuzu olarak banyoda kullanılır; oral önerilmez.'},
+  {id:'other',label:'Diğer / Karışık',emoji:icon('flask',16),bestFor:['general'],note:'Bileşenleri kontrol et; elementer magnezyum miktarına bak.'}
+];
+var MG_SYMPTOM_WEIGHTS={kramp:0.35,sanci:0.30,bas:0.20,yorgun:0.15,duygu:0.15,siskinlik:0.10,istah:0.05,cilt:0.05};
+var MG_WEIGHTS={cycle:35,symptom:25,sleep:20,energy:15,trend:5};
+var MG_REASON_LABELS={
+  luteal:'Luteal faz', menstrual:'Regl dönemi', ovulation:'Ovülasyon yakını',
+  sleepLow:'Düşük uyku', sleepPoor:'Kötü uyku kalitesi',
+  lowEnergy:'Düşük enerji', highStress:'Yüksek stres',
+  symptom:'Belirtiler', trend:'Son günlerdeki eğilim'
+};
+
 // "HH:MM" -> dakika
 function hhmmToMin(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(':'); return Number(p[0])*60+Number(p[1]); }
 function minToHHMM(m){ if(m==null||isNaN(m)) return ''; m=((m%1440)+1440)%1440; return pad(Math.floor(m/60))+':'+pad(m%60); }
@@ -622,6 +641,23 @@ function migrate(d){
   if(typeof d.dailyPhoto.source!=='string') d.dailyPhoto.source='Wikimedia Commons';
   if(typeof d.dailyPhoto.pageUrl!=='string') d.dailyPhoto.pageUrl='';
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
+  // Magnezyum Danışmanı — kullanıcı profili + model + günlük kayıt.
+  if(!d.settings.magnesium||typeof d.settings.magnesium!=='object') d.settings.magnesium={enabled:false,onboardingDone:false,preferredForm:'',tolerated:true,kidneyDisease:false,maxElementalMg:MG_MAX_ELEMENTAL,lastNudgeDate:null,dismissedUntil:null};
+  var ms=d.settings.magnesium;
+  if(typeof ms.enabled!=='boolean') ms.enabled=false;
+  if(typeof ms.onboardingDone!=='boolean') ms.onboardingDone=false;
+  if(typeof ms.preferredForm!=='string') ms.preferredForm='';
+  if(typeof ms.tolerated!=='boolean') ms.tolerated=true;
+  if(typeof ms.kidneyDisease!=='boolean') ms.kidneyDisease=false;
+  if(typeof ms.maxElementalMg!=='number'||isNaN(ms.maxElementalMg)||ms.maxElementalMg<=0) ms.maxElementalMg=MG_MAX_ELEMENTAL;
+  if(ms.maxElementalMg>500) ms.maxElementalMg=500;
+  if(typeof ms.lastNudgeDate!=='string'&&ms.lastNudgeDate!==null) ms.lastNudgeDate=null;
+  if(typeof ms.dismissedUntil!=='string'&&ms.dismissedUntil!==null) ms.dismissedUntil=null;
+  if(!d.magnesiumModel||typeof d.magnesiumModel!=='object') d.magnesiumModel={responseLog:[],lutealHitRate:null,lastCalculatedAt:null};
+  if(!Array.isArray(d.magnesiumModel.responseLog)) d.magnesiumModel.responseLog=[];
+  if(typeof d.magnesiumModel.lutealHitRate!=='number'&&d.magnesiumModel.lutealHitRate!==null) d.magnesiumModel.lutealHitRate=null;
+  if(typeof d.magnesiumModel.lastCalculatedAt!=='string'&&d.magnesiumModel.lastCalculatedAt!==null) d.magnesiumModel.lastCalculatedAt=null;
+  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var day=d.days[k]; if(day&&typeof day==='object'){ if(!day.magnesium||typeof day.magnesium!=='object') day.magnesium={taken:false,form:'',mg:null,time:'',reason:[],effectNote:'',skipped:false,feedback:null}; if(typeof day.magnesium.taken!=='boolean') day.magnesium.taken=false; if(typeof day.magnesium.form!=='string') day.magnesium.form=''; if(typeof day.magnesium.mg!=='number'&&day.magnesium.mg!==null) day.magnesium.mg=null; if(typeof day.magnesium.time!=='string') day.magnesium.time=''; if(!Array.isArray(day.magnesium.reason)) day.magnesium.reason=[]; if(typeof day.magnesium.effectNote!=='string') day.magnesium.effectNote=''; if(typeof day.magnesium.skipped!=='boolean') day.magnesium.skipped=false; if(day.magnesium.feedback!==null&&day.magnesium.feedback!==true&&day.magnesium.feedback!==false) day.magnesium.feedback=null; } });
   d.version=2;
   return d;
 }
@@ -772,7 +808,7 @@ function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElem
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 // ---------- SAYGI · günün bilim ve sanat insanı ----------
@@ -921,6 +957,7 @@ function saygiDomainTone(host){ var colors=['#735F37','#4B6670','#76536A','#5267
 // Sağlık uygulaması (iOS Health) senkronu — tarayıcı arka planda GPS izleyemediği için
 // telefonun kendi adım sayacından tek yönlü, otomatik (Kısayollar) beslenen alan.
 function emptyHealth(){ return {steps:0,walkM:0,updatedAt:null}; }
+function emptyMagnesium(){ return {taken:false,form:'',mg:null,time:'',reason:[],effectNote:'',skipped:false,feedback:null}; }
 function dayMovement(rec){ var m=(rec&&rec.movement&&typeof rec.movement==='object')?rec.movement:null; return {total:m?(m.totalM||0):0, walk:m?(m.walkM||0):0, veh:m?(m.vehicleM||0):0, max:m?(m.maxSpeed||0):0}; }
 function trackedSteps(rec){ var w=dayMovement(rec).walk; return w>0?Math.round(w/STEP_LEN_M):0; }
 function effSteps(rec){
@@ -2217,7 +2254,7 @@ App.start=function(){
   if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
   ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım');
 };
-App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
+App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); if(id==='ayarlar' && ui.mgSettingsOpen){ setTimeout(function(){ var el=document.getElementById('mg-settings'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); ui.mgSettingsOpen=false; },60); } };
 // ── Profil Değerlendirmesi: bilgilendirme + rıza (Faz 04) — data.psych'ten ayrı ──
 // Faz 05'ten itibaren render() zaten `pa.status!=='completed'`ye göre bu ekranı
 // (veya soru ekranını) OTOMATİK gösterir — bu fonksiyon yalnızca açıkça/programatik
@@ -4626,6 +4663,12 @@ function bugunHTML(){
   // Zihnini besleyen hub kutucukları — bugünün modu kartının hemen üstünde
   if(!ed) h+=hubTilesHTML();
 
+  // Dünkü magnezyum etkisi geri bildirimi
+  if(!ed) h+=magnesiumFeedbackHTML(viewDate);
+
+  // Magnezyum Danışmanı — bugünün modu kartının hemen üstünde
+  if(!ed) h+=magnesiumBannerHTML(viewDate);
+
   // Bugünün modu
   h+=moodCardHTML(rec);
 
@@ -5084,6 +5127,118 @@ function moodHeatmapCard(){
   h+='</div>';
   return h;
 }
+
+function magnesiumFeedbackHTML(date){
+  var s=data.settings.magnesium||{};
+  if(!s.enabled || s.mode==='off') return '';
+  var yest=addDays(date,-1);
+  var yRec=data.days[yest];
+  if(!yRec || !yRec.magnesium || !yRec.magnesium.taken) return '';
+  if(yRec.magnesium.feedback===true || yRec.magnesium.feedback===false) return '';
+  var form=find(MG_FORMS,'id',yRec.magnesium.form)||MG_FORMS[0];
+  var h='';
+  h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🧂</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">DÜNÜN ETKİSİ</span></div>';
+  h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">Dün '+esc(form.label)+' almıştın. Uykuna, krampına veya genel hissetine yardımcı oldu mu?</div>';
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.saveMgFeedback(true)" style="flex:1;background:rgba(143,191,138,0.15);border:1.5px solid rgba(143,191,138,0.4);color:#3F8A4F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Evet, faydalıydı</button>';
+  h+='<button onclick="App.saveMgFeedback(false)" style="flex:1;background:rgba(217,83,79,0.08);border:1.5px solid rgba(217,83,79,0.3);color:#C0605F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Pek fark görmedim</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+
+function magnesiumBannerHTML(date){
+  var s=data.settings.magnesium||{};
+  if(!s.enabled || s.mode==='off') return '';
+  if(s.kidneyDisease) return '';
+  var rec=data.days[date]||null;
+  var mg=rec&&rec.magnesium?rec.magnesium:null;
+  if(mg && mg.taken) return '';
+  if(mg && mg.skipped && mg.skippedDate===date) return '';
+  if(s.lastNudgeDate===date) return '';
+  if(s.dismissedUntil && s.dismissedUntil>=date) return '';
+  var nudge=calculateMgNudge(date);
+  if(nudge.score<40) return '';
+  var hl=magnesiumHeadline(nudge);
+  var form=find(MG_FORMS,'id',nudge.form)||MG_FORMS[0];
+  var h='';
+  h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;">';
+  h+='<span style="font-size:20px;">🧂</span>';
+  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">MAGNESYUM DANIŞMANI</span>';
+  if(nudge.score>=70) h+='<span style="margin-left:auto;font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
+  h+='</div>';
+  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">'+esc(hl.text)+'</div>';
+  if(nudge.score>=70 && !nudge.blocked){
+    h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
+    h+='<span style="display:inline-flex;">'+(form.emoji||'')+'</span>';
+    h+='<span>Önerilen form: <b>'+esc(form.label)+'</b> · '+esc(form.note)+'</span>';
+    h+='</div>';
+  }
+  if(nudge.blocked){
+    h+='<div style="font-size:12px;color:var(--watch);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
+  }
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">';
+  if(nudge.score>=70 && !nudge.blocked){
+    h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\',200)" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım</button>';
+  }
+  h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;">Bugün almayacağım</button>';
+  h+='<button onclick="App.snoozeMg()" style="min-width:60px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 10px;font-size:13px;font-weight:700;">Sonra</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+
+function magnesiumCardHTML(date){
+  var s=data.settings.magnesium||{};
+  var rec=data.days[date]||null;
+  var mg=rec&&rec.magnesium?rec.magnesium:null;
+  var nudge=calculateMgNudge(date);
+  var hl=magnesiumHeadline(nudge);
+  var form=find(MG_FORMS,'id',nudge.form)||MG_FORMS[0];
+  var h='';
+  h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<span style="font-size:22px;">🧂</span>';
+  h+='<div style="flex:1;">';
+  h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Danışmanı</div>';
+  h+='<div style="font-size:12px;color:var(--muted);">Skor: '+nudge.score+'/100 · '+esc(hl.sig)+' sinyal</div>';
+  h+='</div>';
+  h+='<span style="font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+esc(nudge.phase||'bilinmiyor')+'</span>';
+  h+='</div>';
+
+  if(!s.enabled || s.mode==='off'){
+    h+='<div style="font-size:13px;color:var(--muted);">Danışman kapalı. Ayarlardan açabilirsin.</div>';
+    h+='<button onclick="App.openMgSettings()" style="align-self:flex-start;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:9px 14px;font-size:13px;font-weight:800;">Ayarları aç</button>';
+  } else if(s.kidneyDisease){
+    h+='<div style="font-size:13px;color:var(--watch);">Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.</div>';
+  } else if(mg && mg.taken){
+    h+='<div style="font-size:15px;font-weight:700;color:var(--ok);">✓ Bugün '+esc(form.label)+' kaydettin.</div>';
+    if(mg.mg) h+='<div style="font-size:13px;color:var(--muted);">Alınan: '+esc(mg.mg+' mg')+' · Saat: '+esc(mg.time||'—')+'</div>';
+    if(mg.effectNote) h+='<div style="font-size:12px;color:var(--faint);padding:8px 10px;background:var(--card);border-radius:10px;">Not: '+esc(mg.effectNote)+'</div>';
+    h+='<button onclick="App.editMagnesium()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:700;">Düzenle</button>';
+  } else if(mg && mg.skipped){
+    h+='<div style="font-size:14px;color:var(--muted);">Bugün magnezyum almayı tercih etmedin.</div>';
+  } else {
+    h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">'+esc(hl.text)+'</div>';
+    if(nudge.score>=40){
+      h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
+      h+='<span style="display:inline-flex;">'+(form.emoji||'')+'</span>';
+      h+='<span>Form önerisi: <b>'+esc(form.label)+'</b> · '+esc(form.note)+'</span>';
+      h+='</div>';
+      h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+      h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\',200)" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım</button>';
+      h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;">Bugün almayacağım</button>';
+      h+='<button onclick="App.openMgSettings()" style="min-width:70px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 10px;font-size:12px;font-weight:700;">Ayarlar</button>';
+      h+='</div>';
+    }
+  }
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;border-top:1px solid var(--card-bd);padding-top:8px;">Bu öneri kişiselleştirilmiş bilgilendirme değildir; takviye ve dozaj için hekim/diyetisyene danış.</div>';
+  h+='</div>';
+  return h;
+}
+
 function raporHTML(){
   var all=allDays(); var last30=lastNDays(30);
   var totalTicks=0; all.forEach(function(o){ totalTicks+=countRec(o.rec); });
@@ -5181,6 +5336,8 @@ function ayarlarHTML(){
   var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
   h+='<button onclick="App.setTheme(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(dark?offS:onS)+'">'+icon('sun',15)+' Açık</button>';
   h+='<button onclick="App.setTheme(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(dark?onS:offS)+'">'+icon('moon',15)+' Koyu</button></div></div>';
+  // Magnezyum Danışmanı
+  h+=magnesiumSettingsHTML();
   // titreşim / haptik geri bildirimi
   var hapOn=!(data.settings&&data.settings.haptics===false);
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
@@ -5258,6 +5415,74 @@ function ayarlarHTML(){
   h+='</div>';
   return h;
 }
+
+function magnesiumSettingsHTML(){
+  var s=data.settings.magnesium||{};
+  var h='';
+  h+='<div id="mg-settings" class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🧂</span>Magnezyum Danışmanı</div>';
+  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Döngü, uyku, belirtiler ve enerjiye göre adaptif bir destek önerisi verir. Asla doz reçete etmez; karar her zaman sana aittir.</div>';
+
+  // aç/kapa
+  var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
+  var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
+  var enabled=!!s.enabled && s.mode!=='off';
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.toggleMgEnabled()" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(enabled?onS:offS)+'"">'+(enabled?icon('check',14)+' Açık':icon('power',14)+' Kapalı')+'</button>';
+  h+='<button onclick="App.toggleMgOnboarding()" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:13px;font-weight:700;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);">'+(ui.mgOnboarding?'Kapat':'Başlat / Düzenle')+'</button>';
+  h+='</div>';
+
+  if(ui.mgOnboarding){
+    h+='<div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--card-bd);padding-top:12px;">';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--text);">Hızlı kurulum</div>';
+    // form tercihi
+    h+='<div style="font-size:12.5px;color:var(--text2);">Hangi form daha yakın?</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    MG_FORMS.slice(0,4).forEach(function(f){
+      var sel=s.preferredForm===f.id;
+      h+='<button onclick="App.setMgPreferredForm(\''+f.id+'\')" style="flex:1;min-width:80px;padding:9px 8px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';display:flex;align-items:center;justify-content:center;gap:4px;">'+(f.emoji||'')+' '+esc(f.label)+'</button>';
+    });
+    h+='</div>';
+    // tolerans
+    h+='<div style="font-size:12.5px;color:var(--text2);">Daha önce magnezyum aldığında miden / bağırsakların nasıl tepki verdi?</div>';
+    h+='<div style="display:flex;gap:6px;">';
+    [['good','İyi','👍'],['bad','Rahatsız','👎'],['none','Hiç almadım','—']].forEach(function(o){
+      var sel=s.tolerated===true && o[0]==='good' || s.tolerated===false && o[0]==='bad' || (s.tolerated==null && o[0]==='none');
+      h+='<button onclick="App.setMgTolerated(\''+o[0]+'\')" style="flex:1;padding:10px 6px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';">'+esc(o[2])+' '+esc(o[1])+'</button>';
+    });
+    h+='</div>';
+    // böbrek
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--text2);">';
+    h+='<span>Böbrek rahatsızlığı veya ciddi ilaç etkileşimi var mı?</span>';
+    h+='<button onclick="App.setMgKidney('+(!s.kidneyDisease)+')" style="padding:7px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1.5px solid '+(s.kidneyDisease?'#D9534F':'var(--card-bd)')+';background:'+(s.kidneyDisease?'rgba(217,83,79,0.12)':'var(--card)')+';color:'+(s.kidneyDisease?'#D9534F':'var(--text)')+';">'+(s.kidneyDisease?'Evet':'Hayır')+'</button>';
+    h+='</div>';
+    if(s.kidneyDisease) h+='<div style="font-size:12px;color:#D9534F;background:rgba(217,83,79,0.08);border:1px solid rgba(217,83,79,0.25);border-radius:10px;padding:9px 10px;">Bu durumda magnezyum önerileri filtrelenir ve dozaj önerisi gösterilmez. Lütfen hekimine danış.</div>';
+    h+='<button onclick="App.completeMgOnboarding()" style="border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Kaydet ve aç 🧂</button>';
+    h+='</div>';
+  } else {
+    // özet satırları
+    h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:10px;font-size:12.5px;color:var(--text2);">';
+    var _row=function(l,v){ return '<div style="display:flex;justify-content:space-between;"><span>'+l+'</span><span style="font-weight:700;color:var(--text);">'+v+'</span></div>'; };
+    var pf=find(MG_FORMS,'id',s.preferredForm);
+    h+=_row('Mod',s.mode==='adaptive'?'Adaptif':(s.mode==='lutealOnly'?'Sadece lüteal':'Kapalı'));
+    h+=_row('Tercih edilen form',pf?pf.label:'Belirtilmedi');
+    h+=_row('Günlük tavan',Math.min(s.maxElementalMg||MG_MAX_ELEMENTAL,500)+' mg');
+    if(s.kidneyDisease) h+='<div style="color:#D9534F;font-weight:700;">⚠ Böbrek rahatsızlığı bildirildi — öneriler filtreleniyor.</div>';
+    if(s.tolerated===false) h+='<div style="color:#D9534F;font-weight:700;">⚠ Tolerans sorunu bildirildi — dozaj önerisi gösterilmiyor.</div>';
+    h+='</div>';
+  }
+
+  // detaylı ayarlar (her zaman)
+  h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:10px;">';
+  h+='<div style="font-size:12.5px;color:var(--text2);">Günlük elementer magnezyum tavanı (100–500 mg). Default 350 mg.</div>';
+  h+='<input type="number" min="100" max="500" value="'+Math.min(s.maxElementalMg||MG_MAX_ELEMENTAL,500)+'" onchange="App.setMgMaxMg(this.value)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px;font-size:14px;outline:none;width:100%;box-sizing:border-box;">';
+  h+='</div>';
+
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Bu özellik kişiselleştirilmiş sağlık önerisi değildir. Takviye, ilaç etkileşimleri ve dozaj için hekime/diyetisyene danış.</div>';
+  h+='</div>';
+  return h;
+}
+
 function settingsBtn(onclick,label,icon){
   return '<button onclick="'+onclick+'" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:var(--text);background:var(--card);text-align:left;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);"><span>'+esc(label)+'</span><span>'+icon+'</span></button>';
 }
@@ -5773,6 +5998,7 @@ function saglikHTML(){
   // uyku (premium açılır bölüm)
   h+=healthSleepCard(rec);
   h+=caffeineBlock(rec);
+  h+=magnesiumCardHTML(viewDate);
   if(!ed) h+=medFreeBadge();
   if(!ed) h+=sleepPrepCard(rec);
   h+=bodyCard(rec);
@@ -5786,6 +6012,114 @@ function saglikHTML(){
   h+=cycleHTML();
   h+='</div>';
   return h;
+}
+
+// ---- magnesium adaptive nudge ----
+function calculateMgNudge(date){
+  var s=data.settings.magnesium||{};
+  var rec=data.days[date]||null;
+  var cs=cycleStats();
+  var phase=cs.phase||'unknown';
+  var reasons=[];
+  var cycleSignal=0;
+  if(phase==='luteal'){ cycleSignal=1.0; reasons.push('luteal'); }
+  else if(phase==='menstrual'){ cycleSignal=0.6; reasons.push('menstrual'); }
+  else if(phase==='ovulation'){ cycleSignal=0.3; reasons.push('ovulation'); }
+
+  var symptomSignal=0;
+  if(rec && Array.isArray(rec.symptoms)){
+    rec.symptoms.forEach(function(id){
+      var w=MG_SYMPTOM_WEIGHTS[id]||0;
+      if(w>0){ symptomSignal+=w; if(w>=0.15 && reasons.indexOf(id)<0) reasons.push(id); }
+    });
+  }
+  symptomSignal=Math.min(1,symptomSignal);
+
+  var sleepSignal=0;
+  if(rec && rec.sleep){
+    var h=(rec.sleep.hours!=null)?Number(rec.sleep.hours):null;
+    var q=(rec.sleep.quality!=null)?Number(rec.sleep.quality):null;
+    if(h!=null){
+      if(h<6){ sleepSignal=1.0; if(reasons.indexOf('sleepLow')<0) reasons.push('sleepLow'); }
+      else if(h<7){ sleepSignal=0.6; if(reasons.indexOf('sleepLow')<0) reasons.push('sleepLow'); }
+      else if(h<7.5){ sleepSignal=0.25; }
+    }
+    if(q!=null && q<=2){ sleepSignal=Math.min(1,sleepSignal+0.25); if(reasons.indexOf('sleepPoor')<0) reasons.push('sleepPoor'); }
+  }
+
+  var energySignal=0;
+  if(rec && rec.energy!=null){
+    var e=Number(rec.energy);
+    if(e<=2){ energySignal=1.0; if(reasons.indexOf('lowEnergy')<0) reasons.push('lowEnergy'); }
+    else if(e===3){ energySignal=0.5; }
+  }
+  if(rec && rec.stress!=null){
+    var st=Number(rec.stress);
+    if(st>=4){ energySignal=Math.min(1,energySignal+0.2); if(reasons.indexOf('highStress')<0) reasons.push('highStress'); }
+  }
+
+  var trendSignal=0;
+  var sleepVals=[], energyVals=[];
+  for(var i=1;i<=3;i++){
+    var d=addDays(date,-i);
+    var r=data.days[d];
+    if(r && r.sleep && r.sleep.hours!=null) sleepVals.push(Number(r.sleep.hours));
+    if(r && r.energy!=null) energyVals.push(Number(r.energy));
+  }
+  if(sleepVals.length){
+    var avgSleep=sleepVals.reduce(function(a,b){return a+b;},0)/sleepVals.length;
+    if(avgSleep<6.5){ trendSignal+=0.2; if(reasons.indexOf('trend')<0) reasons.push('trend'); }
+  }
+  if(energyVals.length){
+    var avgEnergy=energyVals.reduce(function(a,b){return a+b;},0)/energyVals.length;
+    if(avgEnergy<2.5){ trendSignal+=0.2; if(reasons.indexOf('trend')<0) reasons.push('trend'); }
+  }
+  trendSignal=Math.min(0.4,trendSignal);
+
+  var score=Math.round(Math.min(100,
+    MG_WEIGHTS.cycle*cycleSignal +
+    MG_WEIGHTS.symptom*symptomSignal +
+    MG_WEIGHTS.sleep*sleepSignal +
+    MG_WEIGHTS.energy*energySignal +
+    MG_WEIGHTS.trend*trendSignal
+  ));
+
+  var form=suggestMgForm(reasons,s.preferredForm);
+  var blocked=!!s.kidneyDisease || s.tolerated===false;
+
+  return {score:score, reasons:reasons, phase:phase, form:form, blocked:blocked, cycleSignal:cycleSignal, symptomSignal:symptomSignal, sleepSignal:sleepSignal, energySignal:energySignal, trendSignal:trendSignal};
+}
+
+function suggestMgForm(reasons, preferred){
+  if(preferred && preferred!=='unknown') return preferred;
+  if(reasons.indexOf('sleepLow')>=0 || reasons.indexOf('sleepPoor')>=0 || reasons.indexOf('highStress')>=0 || reasons.indexOf('duygu')>=0) return 'glycinate';
+  if(reasons.indexOf('kramp')>=0 || reasons.indexOf('sanci')>=0 || reasons.indexOf('siskinlik')>=0 || reasons.indexOf('bas')>=0) return 'citrate';
+  return 'glycinate';
+}
+
+function magnesiumReasonText(nudge){
+  var labels=MG_REASON_LABELS;
+  var sebep=[];
+  nudge.reasons.forEach(function(id){ if(labels[id] && sebep.indexOf(labels[id])<0) sebep.push(labels[id]); });
+  return sebep;
+}
+
+function magnesiumHeadline(nudge){
+  var sebep=magnesiumReasonText(nudge);
+  var sig=nudge.score>=70 ? 'güçlü' : (nudge.score>=40 ? 'orta' : 'zayıf');
+  var text;
+  if(nudge.blocked){
+    text='Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.';
+  } else if(nudge.score>=85){
+    text='Bugün magnezyum desteği düşünmek için güçlü sinyaller var ('+sebep.slice(0,3).join(' · ')+').';
+  } else if(nudge.score>=70){
+    text='Bugün akşam magnezyum desteği faydalı olabilir ('+sebep.slice(0,3).join(' · ')+').';
+  } else if(nudge.score>=40){
+    text='Bugün magnezyum sinyali orta seviyede; zaten alıyorsan devam edebilirsin.';
+  } else {
+    text='Bugün magnezyum sinyali zayıf; destek almana gerek görünmüyor.';
+  }
+  return {sig:sig, text:text};
 }
 
 // ---- cycle math (takvim/ortalama yöntemi, luteal ~14 gün) ----
@@ -7898,6 +8232,127 @@ App.openMesaj=function(){ markNotifsRead(); var ex=document.getElementById('sey-
 App.dismissPopup=function(){ var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; }); pend.forEach(function(n){ n.seen=true; }); if(pend.length) save(); var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); render(); };
 App.closeAeonPop=function(){ var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove(); };
 App.deleteNotif=function(id){ var n=null; notifList().forEach(function(x){ if(x&&x.id===id) n=x; }); if(!n) return; n.deleted=true; n.deletedAt=new Date().toISOString(); save(); render(); toast('Bildirim silindi'); };
+
+// ── Magnezyum Danışmanı handlerları ──
+function timeHM(){ var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+
+App.takeMagnesium=function(form,mg){
+  var date=activeDate();
+  var rec=getDay(data,date,dayIndexFor(date));
+  var nudge=calculateMgNudge(date);
+  var f=form||nudge.form||'glycinate';
+  var maxEl=(data.settings.magnesium||{}).maxElementalMg||MG_MAX_ELEMENTAL;
+  var dose=Math.min(Math.max(1,Math.round(Number(mg)||200)),maxEl);
+  rec.magnesium.taken=true;
+  rec.magnesium.skipped=false;
+  rec.magnesium.skippedDate='';
+  rec.magnesium.form=f;
+  rec.magnesium.mg=dose;
+  rec.magnesium.time=timeHM();
+  rec.magnesium.reason=nudge.reasons.slice(0,5);
+  data.settings.magnesium.lastNudgeDate=date;
+  data.settings.magnesium.dismissedUntil=null;
+  save(); render();
+  toast('Magnezyum kaydedildi ✓');
+};
+
+App.skipMagnesium=function(){
+  var date=activeDate();
+  var rec=getDay(data,date,dayIndexFor(date));
+  rec.magnesium.skipped=true;
+  rec.magnesium.skippedDate=date;
+  rec.magnesium.taken=false;
+  data.settings.magnesium.lastNudgeDate=date;
+  save(); render();
+  toast('Bugün magnezyum alınmadı olarak işaretlendi.');
+};
+
+App.snoozeMg=function(){
+  var s=data.settings.magnesium||{};
+  s.dismissedUntil=addDays(todayStr(),1);
+  s.lastNudgeDate=todayStr();
+  save(); render();
+  toast('Yarın tekrar hatırlatılacak.');
+};
+
+App.openMgSettings=function(){ ui.mgSettingsOpen=true; App.go('ayarlar'); };
+
+App.editMagnesium=function(){ ui.mgEditing=!ui.mgEditing; render(); };
+
+App.setMgForm=function(form){ var date=activeDate(); var rec=getDay(data,date,dayIndexFor(date)); rec.magnesium.form=form; save(); render(); };
+App.setMgMg=function(val){ var date=activeDate(); var rec=getDay(data,date,dayIndexFor(date)); var v=Math.round(Number(val.replace(/[^0-9]/g,''))||0); var maxEl=(data.settings.magnesium||{}).maxElementalMg||MG_MAX_ELEMENTAL; rec.magnesium.mg=Math.min(Math.max(0,v),maxEl); save(); render(); };
+App.setMgTime=function(val){ var date=activeDate(); var rec=getDay(data,date,dayIndexFor(date)); if(/^\d{1,2}:\d{2}$/.test(val)){ var p=val.split(':'); rec.magnesium.time=pad(Number(p[0]))+':'+pad(Number(p[1])); } else { rec.magnesium.time=val; } save(); render(); };
+App.saveMgNote=function(note){ var date=activeDate(); var rec=getDay(data,date,dayIndexFor(date)); rec.magnesium.effectNote=(note||'').slice(0,240); save(); render(); };
+
+App.saveMgFeedback=function(improved){
+  var date=activeDate();
+  var rec=getDay(data,date,dayIndexFor(date));
+  rec.magnesium.feedback=improved===true;
+  var yest=addDays(date,-1);
+  var yRec=data.days[yest];
+  if(yRec && yRec.magnesium && yRec.magnesium.taken && !yRec.magnesium.effectNote){
+    yRec.magnesium.effectNote=improved===true?'Ertesi gün fayda göründü.':'Ertesi gün belirgin fark görülmedi.';
+  }
+  save(); render();
+  toast(improved===true?'Noted: faydalı göründü.':'Noted: pek fark görülmedi.');
+};
+
+App.toggleMgEnabled=function(){
+  var s=data.settings.magnesium||{};
+  s.enabled=!s.enabled;
+  save(); render();
+};
+
+App.setMgMode=function(mode){
+  var s=data.settings.magnesium||{};
+  s.mode=(mode==='adaptive'||mode==='lutealOnly'||mode==='off')?mode:'adaptive';
+  save(); render();
+};
+
+App.setMgPreferredForm=function(form){
+  var s=data.settings.magnesium||{};
+  s.preferredForm=form;
+  save(); render();
+};
+
+App.setMgKidney=function(v){
+  var s=data.settings.magnesium||{};
+  s.kidneyDisease=!!v;
+  save(); render();
+};
+
+App.setMgTolerated=function(v){
+  var s=data.settings.magnesium||{};
+  s.tolerated=(v==='good'?true:(v==='bad'?false:null));
+  save(); render();
+};
+
+App.setMgMaxMg=function(v){
+  var s=data.settings.magnesium||{};
+  var n=Math.round(Number(String(v).replace(/[^0-9]/g,''))||0);
+  s.maxElementalMg=Math.min(Math.max(100,Math.min(n,500)),500);
+  save(); render();
+};
+
+App.setMgEveningPreferred=function(v){
+  var s=data.settings.magnesium||{};
+  s.eveningPreferred=!!v;
+  save(); render();
+};
+
+App.toggleMgOnboarding=function(){ ui.mgOnboarding=!ui.mgOnboarding; render(); };
+
+App.completeMgOnboarding=function(prefForm,tolerated,kidney){
+  var s=data.settings.magnesium||{};
+  s.onboardingDone=true;
+  if(prefForm) s.preferredForm=prefForm;
+  if(tolerated!=null) s.tolerated=tolerated;
+  if(kidney!=null) s.kidneyDisease=!!kidney;
+  s.enabled=true; s.mode='adaptive';
+  ui.mgOnboarding=false;
+  save(); render();
+  toast('Magnezyum Danışmanı hazır 🧂');
+};
 
 setTimeout(pollRemote,1500);
 setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)

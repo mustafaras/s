@@ -46,6 +46,9 @@ var ICONS={
   'ban':'<circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" />',
   'battery-low':'<path d="M22 14v-4" /><path d="M6 14v-4" /><rect x="2" y="6" width="16" height="12" rx="2" />',
   'bed':'<path d="M2 4v16" /><path d="M2 8h18a2 2 0 0 1 2 2v10" /><path d="M2 17h20" /><path d="M6 8v9" />',
+  'pill':'<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" /><path d="m8.5 8.5 7 7" />',
+  'flask':'<path d="M10 2v7.31" /><path d="M14 2v7.31" /><path d="M8.5 2h7" /><path d="M14 9.3a6.5 6.5 0 1 1-4 0" />',
+  'power':'<path d="M12 2v4" /><path d="M5.64 5.64a9 9 0 1 0 12.72 0" />',
   'book-open':'<path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />',
   'book':'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />',
   'brain':'<path d="M12 18V5" /><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4" /><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5" /><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77" /><path d="M18 18a4 4 0 0 0 2-7.464" /><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517" /><path d="M6 18a4 4 0 0 1-2-7.464" /><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77" />',
@@ -127,6 +130,8 @@ var ICONS={
   'x':'<path d="M18 6 6 18" /><path d="m6 6 12 12" />',
   'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />',
   'paperclip':'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />',
+  'thumbs-up':'<path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />',
+  'thumbs-down':'<path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />',
 };
 // SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
 // size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
@@ -184,11 +189,11 @@ function caffeineTargetBed(){ var b=(data&&data.settings&&data.settings.targetBe
 // ── Magnezyum Danışmanı sabitleri ──
 var MG_MAX_ELEMENTAL=350; // EFSA/NICE takviyeden günlük üst sınır (elementer magnezyum, mg)
 var MG_FORMS=[
-  {id:'glycinate',label:'Glisinat',emoji:icon('moon',16),bestFor:['sleep','anxiety','muscle'],note:'Yatmadan önce uykuya yardımcı; mideye nazik.'},
-  {id:'citrate',label:'Sitrat',emoji:icon('zap',16),bestFor:['cramp','bloating','constipation'],note:'Kramp ve şişkinlikte destekleyici; bağırsak hareketini artırabilir.'},
-  {id:'oxide',label:'Oksit',emoji:icon('pill',16),bestFor:['general'],note:'Ekonomik ama emilimi düşük; ishal riski yüksek.'},
-  {id:'sulfate',label:'Sülfat',emoji:icon('droplets',16),bestFor:['bath','topical'],note:'Epsom tuzu olarak banyoda kullanılır; oral önerilmez.'},
-  {id:'other',label:'Diğer / Karışık',emoji:icon('flask',16),bestFor:['general'],note:'Bileşenleri kontrol et; elementer magnezyum miktarına bak.'}
+  {id:'glycinate',label:'Glisinat',icon:icon('moon',16),bestFor:['sleep','anxiety','muscle'],note:'Yatmadan önce uykuya yardımcı; mideye nazik.'},
+  {id:'citrate',label:'Sitrat',icon:icon('zap',16),bestFor:['cramp','bloating','constipation'],note:'Kramp ve şişkinlikte destekleyici; bağırsak hareketini artırabilir.'},
+  {id:'oxide',label:'Oksit',icon:icon('pill',16),bestFor:['general'],note:'Ekonomik ama emilimi düşük; ishal riski yüksek.'},
+  {id:'sulfate',label:'Sülfat',icon:icon('droplets',16),bestFor:['bath','topical'],note:'Epsom tuzu olarak banyoda kullanılır; oral önerilmez.'},
+  {id:'other',label:'Diğer / Karışık',icon:icon('flask',16),bestFor:['general'],note:'Bileşenleri kontrol et; elementer magnezyum miktarına bak.'}
 ];
 var MG_SYMPTOM_WEIGHTS={kramp:0.35,sanci:0.30,bas:0.20,yorgun:0.15,duygu:0.15,siskinlik:0.10,istah:0.05,cilt:0.05};
 var MG_WEIGHTS={cycle:35,symptom:25,sleep:20,energy:15,trend:5};
@@ -5138,7 +5143,7 @@ function magnesiumFeedbackHTML(date){
   var form=find(MG_FORMS,'id',yRec.magnesium.form)||MG_FORMS[0];
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🧂</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">DÜNÜN ETKİSİ</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">DÜNÜN ETKİSİ</span></div>';
   h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">Dün '+esc(form.label)+' almıştın. Uykuna, krampına veya genel hissetine yardımcı oldu mu?</div>';
   h+='<div style="display:flex;gap:8px;">';
   h+='<button onclick="App.saveMgFeedback(true)" style="flex:1;background:rgba(143,191,138,0.15);border:1.5px solid rgba(143,191,138,0.4);color:#3F8A4F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Evet, faydalıydı</button>';
@@ -5165,14 +5170,14 @@ function magnesiumBannerHTML(date){
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<span style="font-size:20px;">🧂</span>';
+  h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span>';
   h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">MAGNESYUM DANIŞMANI</span>';
   if(nudge.score>=70) h+='<span style="margin-left:auto;font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
   h+='</div>';
   h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">'+esc(hl.text)+'</div>';
   if(nudge.score>=70 && !nudge.blocked){
     h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
-    h+='<span style="display:inline-flex;">'+(form.emoji||'')+'</span>';
+    h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
     h+='<span>Önerilen form: <b>'+esc(form.label)+'</b> · '+esc(form.note)+'</span>';
     h+='</div>';
   }
@@ -5200,7 +5205,7 @@ function magnesiumCardHTML(date){
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
-  h+='<span style="font-size:22px;">🧂</span>';
+  h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',22)+'</span>';
   h+='<div style="flex:1;">';
   h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Danışmanı</div>';
   h+='<div style="font-size:12px;color:var(--muted);">Skor: '+nudge.score+'/100 · '+esc(hl.sig)+' sinyal</div>';
@@ -5214,7 +5219,7 @@ function magnesiumCardHTML(date){
   } else if(s.kidneyDisease){
     h+='<div style="font-size:13px;color:var(--watch);">Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.</div>';
   } else if(mg && mg.taken){
-    h+='<div style="font-size:15px;font-weight:700;color:var(--ok);">✓ Bugün '+esc(form.label)+' kaydettin.</div>';
+    h+='<div style="font-size:15px;font-weight:700;color:var(--ok);display:flex;align-items:center;gap:6px;">'+icon('circle-check',16)+' Bugün '+esc(form.label)+' kaydettin.</div>';
     if(mg.mg) h+='<div style="font-size:13px;color:var(--muted);">Alınan: '+esc(mg.mg+' mg')+' · Saat: '+esc(mg.time||'—')+'</div>';
     if(mg.effectNote) h+='<div style="font-size:12px;color:var(--faint);padding:8px 10px;background:var(--card);border-radius:10px;">Not: '+esc(mg.effectNote)+'</div>';
     h+='<button onclick="App.editMagnesium()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:700;">Düzenle</button>';
@@ -5224,7 +5229,7 @@ function magnesiumCardHTML(date){
     h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">'+esc(hl.text)+'</div>';
     if(nudge.score>=40){
       h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
-      h+='<span style="display:inline-flex;">'+(form.emoji||'')+'</span>';
+      h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
       h+='<span>Form önerisi: <b>'+esc(form.label)+'</b> · '+esc(form.note)+'</span>';
       h+='</div>';
       h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
@@ -5420,7 +5425,7 @@ function magnesiumSettingsHTML(){
   var s=data.settings.magnesium||{};
   var h='';
   h+='<div id="mg-settings" class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🧂</span>Magnezyum Danışmanı</div>';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span>Magnezyum Danışmanı</div>';
   h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Döngü, uyku, belirtiler ve enerjiye göre adaptif bir destek önerisi verir. Asla doz reçete etmez; karar her zaman sana aittir.</div>';
 
   // aç/kapa
@@ -5440,15 +5445,16 @@ function magnesiumSettingsHTML(){
     h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
     MG_FORMS.slice(0,4).forEach(function(f){
       var sel=s.preferredForm===f.id;
-      h+='<button onclick="App.setMgPreferredForm(\''+f.id+'\')" style="flex:1;min-width:80px;padding:9px 8px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';display:flex;align-items:center;justify-content:center;gap:4px;">'+(f.emoji||'')+' '+esc(f.label)+'</button>';
+      h+='<button onclick="App.setMgPreferredForm(\''+f.id+'\')" style="flex:1;min-width:80px;padding:9px 8px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';display:flex;align-items:center;justify-content:center;gap:4px;">'+(f.icon||icon('flask',14))+' '+esc(f.label)+'</button>';
     });
     h+='</div>';
     // tolerans
     h+='<div style="font-size:12.5px;color:var(--text2);">Daha önce magnezyum aldığında miden / bağırsakların nasıl tepki verdi?</div>';
     h+='<div style="display:flex;gap:6px;">';
-    [['good','İyi','👍'],['bad','Rahatsız','👎'],['none','Hiç almadım','—']].forEach(function(o){
+    var mgTolIcons={'good':icon('thumbs-up',15),'bad':icon('thumbs-down',15),'none':icon('ban',15)};
+    [['good','İyi'],['bad','Rahatsız'],['none','Hiç almadım']].forEach(function(o){
       var sel=s.tolerated===true && o[0]==='good' || s.tolerated===false && o[0]==='bad' || (s.tolerated==null && o[0]==='none');
-      h+='<button onclick="App.setMgTolerated(\''+o[0]+'\')" style="flex:1;padding:10px 6px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';">'+esc(o[2])+' '+esc(o[1])+'</button>';
+      h+='<button onclick="App.setMgTolerated(\''+o[0]+'\')" style="flex:1;padding:10px 6px;border-radius:11px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid '+(sel?'var(--accent)':'var(--card-bd)')+';background:'+(sel?'rgba(233,175,193,0.2)':'var(--card)')+';color:'+(sel?'var(--choc)':'var(--text)')+';display:flex;align-items:center;justify-content:center;gap:4px;">'+(mgTolIcons[o[0]]||'')+' '+esc(o[1])+'</button>';
     });
     h+='</div>';
     // böbrek
@@ -5457,7 +5463,7 @@ function magnesiumSettingsHTML(){
     h+='<button onclick="App.setMgKidney('+(!s.kidneyDisease)+')" style="padding:7px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1.5px solid '+(s.kidneyDisease?'#D9534F':'var(--card-bd)')+';background:'+(s.kidneyDisease?'rgba(217,83,79,0.12)':'var(--card)')+';color:'+(s.kidneyDisease?'#D9534F':'var(--text)')+';">'+(s.kidneyDisease?'Evet':'Hayır')+'</button>';
     h+='</div>';
     if(s.kidneyDisease) h+='<div style="font-size:12px;color:#D9534F;background:rgba(217,83,79,0.08);border:1px solid rgba(217,83,79,0.25);border-radius:10px;padding:9px 10px;">Bu durumda magnezyum önerileri filtrelenir ve dozaj önerisi gösterilmez. Lütfen hekimine danış.</div>';
-    h+='<button onclick="App.completeMgOnboarding()" style="border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Kaydet ve aç 🧂</button>';
+    h+='<button onclick="App.completeMgOnboarding()" style="border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">'+icon('pill',16)+' Kaydet ve aç</button>';
     h+='</div>';
   } else {
     // özet satırları
@@ -5467,8 +5473,8 @@ function magnesiumSettingsHTML(){
     h+=_row('Mod',s.mode==='adaptive'?'Adaptif':(s.mode==='lutealOnly'?'Sadece lüteal':'Kapalı'));
     h+=_row('Tercih edilen form',pf?pf.label:'Belirtilmedi');
     h+=_row('Günlük tavan',Math.min(s.maxElementalMg||MG_MAX_ELEMENTAL,500)+' mg');
-    if(s.kidneyDisease) h+='<div style="color:#D9534F;font-weight:700;">⚠ Böbrek rahatsızlığı bildirildi — öneriler filtreleniyor.</div>';
-    if(s.tolerated===false) h+='<div style="color:#D9534F;font-weight:700;">⚠ Tolerans sorunu bildirildi — dozaj önerisi gösterilmiyor.</div>';
+    if(s.kidneyDisease) h+='<div style="color:#D9534F;font-weight:700;display:flex;align-items:center;gap:5px;">'+icon('triangle-alert',15)+' Böbrek rahatsızlığı bildirildi — öneriler filtreleniyor.</div>';
+    if(s.tolerated===false) h+='<div style="color:#D9534F;font-weight:700;display:flex;align-items:center;gap:5px;">'+icon('triangle-alert',15)+' Tolerans sorunu bildirildi — dozaj önerisi gösterilmiyor.</div>';
     h+='</div>';
   }
 
@@ -8253,7 +8259,7 @@ App.takeMagnesium=function(form,mg){
   data.settings.magnesium.lastNudgeDate=date;
   data.settings.magnesium.dismissedUntil=null;
   save(); render();
-  toast('Magnezyum kaydedildi ✓');
+  toast('Magnezyum kaydedildi');
 };
 
 App.skipMagnesium=function(){
@@ -8351,7 +8357,7 @@ App.completeMgOnboarding=function(prefForm,tolerated,kidney){
   s.enabled=true; s.mode='adaptive';
   ui.mgOnboarding=false;
   save(); render();
-  toast('Magnezyum Danışmanı hazır 🧂');
+  toast('Magnezyum Danışmanı hazır');
 };
 
 setTimeout(pollRemote,1500);

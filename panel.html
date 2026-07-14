@@ -1326,8 +1326,8 @@ function magnesiumPanelCardHTML(){
   det+=kpiBox('Ortalama doz',avgDose?(avgDose+'<span style="font-size:var(--f2);font-weight:600;"> mg</span>'):'—');
   det+='</div>';
   if(!enabled) det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;margin-bottom:8px;">Magnezyum Danışmanı Şeyma uygulamasında kapalı. Açıkken veriler buraya yansıyacak.</div>';
-  if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;">⚠️ Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
-  if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;">⚠️ Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
+  if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
+  if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;">Veriler Şeyma uygulamasından gelir; panel yalnızca gözlemdir. Tıbbi karar için kullanılmamalı.</div>';
   return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Danışmanı',span:6,order:22,summary:sum,details:det});
 }

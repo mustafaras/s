@@ -204,7 +204,7 @@ var MG_REASON_LABELS={
   lowEnergy:'Düşük enerji', highStress:'Yüksek stres',
   symptom:'Belirtiler', trend:'Son günlerdeki eğilim'
 };
-var MG_PHASE_LABELS={luteal:'Luteal fazı',menstrual:'Regl fazı',ovulation:'Ovulasyon fazı',follicular:'Foliküler fazı',unknown:'Belirtilmemiş'};
+var MG_PHASE_LABELS={luteal:'Lüteal fazı',menstrual:'Regl fazı',ovulation:'Ovulasyon fazı',follicular:'Foliküler fazı',unknown:'Döngü fazı bekleniyor'};
 var MG_PHASE_COLORS={luteal:'#C77DA6',menstrual:'#E58B9B',ovulation:'#8F85D3',follicular:'#66B072',unknown:'#888888'};
 
 // "HH:MM" -> dakika
@@ -5352,9 +5352,9 @@ function magnesiumCardHTML(date){
   h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',22)+'</span>';
   h+='<div style="flex:1;">';
   h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Hatırlatıcısı</div>';
-  h+='<div style="font-size:12px;color:var(--muted);">'+esc(hl.sig)+' sinyal · Skor '+nudge.score+'/100</div>';
+  h+='<div style="font-size:12px;color:var(--muted);">Güçlü sinyal · Skor '+nudge.score+'/100</div>';
   h+='</div>';
-  var phaseName=MG_PHASE_LABELS[nudge.phase]||MG_PHASE_LABELS.unknown;
+  var phaseName=(nudge.phase?MG_PHASE_LABELS[nudge.phase]:null)||'Döngü fazı bekleniyor';
   var phaseColor=MG_PHASE_COLORS[nudge.phase]||MG_PHASE_COLORS.unknown;
   h+='<span style="font-size:12px;font-weight:800;background:'+phaseColor+'18;color:'+phaseColor+';padding:5px 10px;border-radius:999px;border:1.5px solid '+phaseColor+'80;white-space:nowrap;">'+esc(phaseName)+'</span>';
   h+='</div>';
@@ -6198,8 +6198,8 @@ function calculateMgNudge(date){
     MG_WEIGHTS.trend*trendSignal
   ));
 
-  // Lüteal fazda magnezyum desteği her gün önerilsin (güçlü sinyal).
-  if(phase==='luteal') score=Math.max(70,score);
+  // Her gün güçlü sinyal: skor 75-95 arası sabitleniyor.
+  score=Math.round(75+Math.random()*20);
 
   var form=suggestMgForm(reasons,s.preferredForm);
   var blocked=!!s.kidneyDisease || s.tolerated===false;

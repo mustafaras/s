@@ -1326,6 +1326,9 @@ function magnesiumPanelCardHTML(){
   var pct7=Math.round((curTaken/curTot)*100);
   var pct30=Math.round((monthTaken/monthTot)*100);
   var color=(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B'));
+  var avgTargetHit=0; var totalTargetHit=0;
+  for(var i=0;i<days.length;i++){ var m=mgRec(days[i]); if(m&&m.taken&&typeof m.mg==='number'){ totalTargetHit++; avgTargetHit+=Math.min(100,Math.round(m.mg/400*100)); } }
+  if(totalTargetHit>0) avgTargetHit=Math.round(avgTargetHit/totalTargetHit);
   var mgModel=(D&&D.magnesiumModel)||{};
   var hitRate=(typeof mgModel.lutealHitRate==='number')?mgModel.lutealHitRate:null;
   var currentMode=mgSet.mode||'adaptive';
@@ -1346,10 +1349,10 @@ function magnesiumPanelCardHTML(){
   det+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
   det+=kpiBox('Son 7 gün',pct7+'%');
   det+=kpiBox('Son 30 gün',pct30+'%');
-  det+=kpiBox('Lüteal fayda oranı',hitRate!==null?(hitRate+'%'):'—');
-  det+=kpiBox('Aktif mod',esc(modeLabel));
+  det+=kpiBox('Hedef 400 mg tutturma',avgTargetHit+'%');
+  det+=kpiBox('Güncel seri',stats.streak+' gün');
   det+='</div>';
-  det+='<div style="display:flex;align-items:center;gap:8px;font-size:var(--f2);color:var(--t3);background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;margin-bottom:10px;">'+icon('sliders-horizontal',14)+' <b>Mod:</b> '+esc(modeLabel)+' · '+'<span style="color:var(--t4);">'+(currentMode==='adaptive'?'Siklus + semptom + uyku verisine göre öneri üretir.':(currentMode==='lutealOnly'?'Yalnızca lüteal faz günlerinde öneri gösterir.':'Öneriler kapalı; geçmiş kayıtlar yine görünür.'))+'</span></div>';
+  det+='<div style="display:flex;align-items:center;gap:8px;font-size:var(--f2);color:var(--t3);background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;margin-bottom:10px;">'+icon('sliders-horizontal',14)+' <b>Günlük hedef:</b> 400 mg elementer magnezyum · <span style="color:var(--t4);">'+esc(modeLabel)+' modu çalışıyor.</span></div>';
   if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
   if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
   // Son response log kayıtları (son 5)

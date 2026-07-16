@@ -1314,7 +1314,7 @@ function magnesiumPanelCardHTML(){
   var pct7=Math.round((curTaken/curTot)*100);
   var pct30=Math.round((monthTaken/monthTot)*100);
   var pctLuteal=lutealDays?Math.round((lutealTaken/lutealDays)*100):null;
-  var color=enabled?(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B')):'var(--t3)';
+  var color=(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B'));
   var sum='<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">';
   sum+='<span style="font-size:var(--f4);font-weight:800;color:'+color+';">'+pct7+'%</span>';
   sum+='<span style="font-size:var(--f2);color:var(--t3);">Son 7 gün · '+curTaken+'/'+curTot+'</span>';
@@ -1327,7 +1327,7 @@ function magnesiumPanelCardHTML(){
   det+=kpiBox('Lüteal dönem',pctLuteal!==null?(pctLuteal+'%'):'—');
   det+=kpiBox('Ortalama doz',avgDose?(avgDose+'<span style="font-size:var(--f2);font-weight:600;"> mg</span>'):'—');
   det+='</div>';
-  if(!enabled) det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;margin-bottom:8px;">Magnezyum Danışmanı Şeyma uygulamasında kapalı. Açıkken veriler buraya yansıyacak.</div>';
+  if(!enabled) det+='<div style="font-size:var(--f2);color:var(--watch);background:var(--s1);border:1.5px solid var(--card-bd);border-radius:12px;padding:10px 12px;line-height:1.5;margin-bottom:10px;display:flex;align-items:center;gap:8px;">'+icon('info',14)+' <b>Magnezyum Danışmanı Şeyma uygulamasında kapalı.</b> Yine de lüteal faz verileri ve alınan dozlar burada görünür.</div>';
   if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
   if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;">Veriler Şeyma uygulamasından gelir; panel yalnızca gözlemdir. Tıbbi karar için kullanılmamalı.</div>';

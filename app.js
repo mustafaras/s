@@ -5293,7 +5293,10 @@ function magnesiumFeedbackHTML(date){
 
 function magnesiumBannerHTML(date){
   var s=data.settings.magnesium||{};
-  if(!s.enabled || s.mode==='off') return '';
+  var cs=cycleStats();
+  var lutealNow=(cs.phase==='luteal' && date===todayStr());
+  // Lüteal fazdaysa danışman kapalı olsa bile öneri + tik banner'ı göster (böbrek sorunu varsa hariç).
+  if((!s.enabled || s.mode==='off') && !lutealNow) return '';
   if(s.kidneyDisease) return '';
   var rec=data.days[date]||null;
   var mg=rec&&rec.magnesium?rec.magnesium:null;
@@ -5353,7 +5356,8 @@ function magnesiumCardHTML(date){
   h+='<span style="font-size:12px;font-weight:800;background:'+phaseColor+'18;color:'+phaseColor+';padding:5px 10px;border-radius:999px;border:1.5px solid '+phaseColor+'80;white-space:nowrap;">'+esc(phaseName)+'</span>';
   h+='</div>';
 
-  if(!s.enabled || s.mode==='off'){
+  var lutealNow=(nudge.phase==='luteal' && date===todayStr());
+  if((!s.enabled || s.mode==='off') && !lutealNow){
     h+='<div style="font-size:13px;color:var(--muted);">Danışman kapalı. Ayarlardan açabilirsin.</div>';
     h+='<button onclick="App.openMgSettings()" style="align-self:flex-start;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:9px 14px;font-size:13px;font-weight:800;">Ayarları aç</button>';
   } else if(s.kidneyDisease){

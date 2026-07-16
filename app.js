@@ -665,11 +665,64 @@ function migrate(d){
   if(typeof d.magnesiumModel.lutealHitRate!=='number'&&d.magnesiumModel.lutealHitRate!==null) d.magnesiumModel.lutealHitRate=null;
   if(typeof d.magnesiumModel.lastCalculatedAt!=='string'&&d.magnesiumModel.lastCalculatedAt!==null) d.magnesiumModel.lastCalculatedAt=null;
   if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var day=d.days[k]; if(day&&typeof day==='object'){ if(!day.magnesium||typeof day.magnesium!=='object') day.magnesium={taken:false,form:'',mg:null,time:'',reason:[],effectNote:'',skipped:false,feedback:null}; if(typeof day.magnesium.taken!=='boolean') day.magnesium.taken=false; if(typeof day.magnesium.form!=='string') day.magnesium.form=''; if(typeof day.magnesium.mg!=='number'&&day.magnesium.mg!==null) day.magnesium.mg=null; if(typeof day.magnesium.time!=='string') day.magnesium.time=''; if(!Array.isArray(day.magnesium.reason)) day.magnesium.reason=[]; if(typeof day.magnesium.effectNote!=='string') day.magnesium.effectNote=''; if(typeof day.magnesium.skipped!=='boolean') day.magnesium.skipped=false; if(day.magnesium.feedback!==null&&day.magnesium.feedback!==true&&day.magnesium.feedback!==false) day.magnesium.feedback=null; } });
+  // Kilit ekranı zemin — eski kayıtlara backfill; kaynak kodda düz metin yok.
+  if(!d.settings.auth||typeof d.settings.auth!=='object') d.settings.auth={};
+  if(typeof d.settings.auth.usernameHash!=='string') d.settings.auth.usernameHash='';
+  if(typeof d.settings.auth.usernameMask!=='string') d.settings.auth.usernameMask='';
+  if(typeof d.settings.auth.rememberMe!=='boolean') d.settings.auth.rememberMe=false;
+  if(typeof d.settings.auth.unlockedAt!=='string'&&d.settings.auth.unlockedAt!==null) d.settings.auth.unlockedAt=null;
+  if(typeof d.settings.auth.unlockCount!=='number'||isNaN(d.settings.auth.unlockCount)) d.settings.auth.unlockCount=0;
   d.version=2;
   return d;
 }
 var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
+
+// ── Kilit ekranı: statik sadece hash, düz metin kaynak kodda yok ──
+var AUTH_HASH='ae9e1ed2b6abcbce74cc0c15719fdbba372a7dd62e6232510656bade7c201af4';
+function sha256(str){
+  function rotr(n,x){ return (x>>>n)|(x<<(32-n)); }
+  function sigma0(x){ return rotr(2,x)^rotr(13,x)^rotr(22,x); }
+  function sigma1(x){ return rotr(6,x)^rotr(11,x)^rotr(25,x); }
+  function gamma0(x){ return rotr(7,x)^rotr(18,x)^(x>>>3); }
+  function gamma1(x){ return rotr(17,x)^rotr(19,x)^(x>>>10); }
+  function ch(x,y,z){ return (x&y)^(~x&z); }
+  function maj(x,y,z){ return (x&y)^(x&z)^(y&z); }
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var msg=str||'';
+  var bytes=[];
+  for(var i=0;i<msg.length;i++){
+    var c=msg.charCodeAt(i);
+    if(c<0x80) bytes.push(c);
+    else if(c<0x800){ bytes.push(0xC0|(c>>>6), 0x80|(c&0x3F)); }
+    else { bytes.push(0xE0|(c>>>12), 0x80|((c>>>6)&0x3F), 0x80|(c&0x3F)); }
+  }
+  var l=bytes.length;
+  var padLen=64-((l+9)%64); if(padLen===64) padLen=0;
+  bytes.push(0x80);
+  for(var p=0;p<padLen;p++) bytes.push(0);
+  var bitLenHi=(l>>>29), bitLenLo=(l*8)>>>0;
+  for(var b=24;b>=0;b-=8) bytes.push((bitLenHi>>>b)&0xff);
+  for(var b=24;b>=0;b-=8) bytes.push((bitLenLo>>>b)&0xff);
+  var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var w=[];
+  for(var chunk=0;chunk<bytes.length;chunk+=64){
+    for(var t=0;t<16;t++){ w[t]=(bytes[chunk+t*4]<<24)|(bytes[chunk+t*4+1]<<16)|(bytes[chunk+t*4+2]<<8)|bytes[chunk+t*4+3]; }
+    for(var t=16;t<64;t++){ w[t]=(gamma1(w[t-2])+w[t-7]+gamma0(w[t-15])+w[t-16])>>>0; }
+    var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(var t=0;t<64;t++){
+      var t1=(h+sigma1(e)+ch(e,f,g)+K[t]+w[t])>>>0;
+      var t2=(sigma0(a)+maj(a,b,c))>>>0;
+      h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b; b=a; a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0;
+    H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+  }
+  var out='';
+  for(var i=0;i<8;i++){ for(var b=28;b>=0;b-=4) out+=((H[i]>>>b)&0xf).toString(16); }
+  return out;
+}
+
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
 var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -1185,7 +1238,7 @@ function renderProfileConsent(){
   h+='<button onclick="App.profileConsentTogglePrivacyNote()" style="border:none;background:transparent;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--faint);text-decoration:underline;">Gizlilik</button>';
   h+='<button onclick="App.profileAssessmentSOS()" style="border:none;background:transparent;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum</button>';
   h+='</div>';
-  if(ui.profileConsentPrivacyNote) h+='<div class="glass" style="border-radius:16px;padding:13px 15px;">'+icon('lock',13)+'<p style="margin:8px 0 0;font-size:12.5px;line-height:1.6;color:var(--text2);">Bu app giriş istemez. Cevapların önce bu cihazda saklanır; yalnızca sen bağladıysan kendi seyma-data reponda yedeklenir. Panelde gösterim yalnızca yukarıdaki isteğe bağlı izni açarsan olur.</p></div>';
+  if(ui.profileConsentPrivacyNote) h+='<div class="glass" style="border-radius:16px;padding:13px 15px;">'+icon('lock',13)+'<p style="margin:8px 0 0;font-size:12.5px;line-height:1.6;color:var(--text2);">Kilit ekranı seni korur; parola düz metin olarak kaydedilmez. Cevapların önce bu cihazda saklanır; yalnızca sen bağladıysan kendi seyma-data reponda yedeklenir. Panelde gösterim yalnızca yukarıdaki isteğe bağlı izni açarsan olur.</p></div>';
   h+='</div></div>';
   return h;
 }
@@ -2252,12 +2305,15 @@ App.profileAnswer=function(itemId,value){
   },120);
 };
 
+function createDefaultData(){
+  var t=todayStr(), nowIso=new Date().toISOString();
+  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+}
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
   // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.
   if(data){ ui.forceStart=false; ui.tab='bugun'; render(); return; }
-  var t=todayStr(),nowIso=new Date().toISOString();
-  data={version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  data=migrate(createDefaultData());
   if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
   ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım');
 };
@@ -3002,12 +3058,65 @@ function inlinePrint(){
 // ---------- render ----------
 function el(html){ var d=document.createElement('div'); d.innerHTML=html; return d; }
 
+function needsAuth(){
+  if(!data||!data.settings||!data.settings.auth) return true;
+  var a=data.settings.auth;
+  // Bu oturumda açıldıysa kilidi aş.
+  if(ui.authUnlocked) return false;
+  // "Beni hatırla" seçiliyse ve daha önce doğru giriş yapıldıysa kilidi aş.
+  if(a.rememberMe&&a.usernameHash&&a.unlockedAt) return false;
+  return true;
+}
+
+function authGateHTML(){
+  var remember=!!ui.authRemember;
+  var preview=(data&&data.settings&&data.settings.auth&&data.settings.auth.usernameMask)?data.settings.auth.usernameMask:'';
+  var shake=ui.authError?' sey-auth-shake':'';
+  var errorBlock=ui.authError?('<div id="sey-auth-error" class="sey-auth-error" style="display:block;">'+esc(ui.authErrorMsg||'Kullanıcı adı veya parola eşleşmedi. Tekrar dene, gözün korkmasın.')+'</div>'):'';
+  var rememberIcon=remember?'☑':'☐';
+  var previewBlock=preview?'<div class="sey-auth-preview">Hatırlatma: kullanıcı adın <b>'+esc(preview)+'</b></div>':'';
+  return '<div class="sey-auth-backdrop'+shake+'">'
+    +'<div class="sey-auth-glow"></div>'
+    +'<div class="sey-auth-card">'
+      +'<div class="sey-auth-mascot">🦩</div>'
+      +'<h1 class="sey-auth-title">Sevgili Günışığı</h1>'
+      +'<p class="sey-auth-subtitle">Günışığı kapısı seni bekliyor</p>'
+      +previewBlock
+      +'<div class="sey-auth-field">'
+        +'<label for="sey-auth-user">Kullanıcı adı</label>'
+        +'<input id="sey-auth-user" type="text" autocomplete="username" placeholder="Kullanıcı adın" />'
+      +'</div>'
+      +'<div class="sey-auth-field">'
+        +'<label for="sey-auth-pass">Parola</label>'
+        +'<input id="sey-auth-pass" type="password" autocomplete="current-password" placeholder="Parolan" />'
+      +'</div>'
+      +'<div class="sey-auth-options">'
+        +'<span class="sey-auth-remember" onclick="App.toggleRememberAuth()">'+rememberIcon+' Beni hatırla</span>'
+        +'<span class="sey-auth-hint">Aynı değer her iki alana da yazılır</span>'
+      +'</div>'
+      +errorBlock
+      +'<button class="sey-auth-btn" onclick="App.submitAuth()">Giriş yap ✨</button>'
+      +'<p class="sey-auth-footer">Unutursan parola kullanıcı adınla aynıdır.</p>'
+    +'</div>'
+  +'</div>';
+}
+
 function render(){
   var root=document.getElementById('root');
   root.setAttribute('data-theme', dark?'dark':'light');
   var app=document.getElementById('app');
 
+  // Kilit ekranı: şifre doğrulanmadan onboarding/ana arayüz görünmez.
+  if(needsAuth()){
+    app.innerHTML=authGateHTML();
+    lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false;
+    // Hatayı görselleştirdikten sonra bayrağı sıfırla; sarsıntı sınıfı CSS animasyonu kaldırır.
+    if(ui.authError) setTimeout(function(){ ui.authError=false; ui.authErrorMsg=''; },300);
+    return;
+  }
+
   if(!data || ui.forceStart){ app.innerHTML=onboardingHTML(); lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false; return; }
+
   // Faz 05/06: ANA UYGULAMA KİLİDİ. `data.psych`'ten tamamen ayrı bir mekanizma.
   // 174/174 tamamlanana (`status==='completed'`) kadar Bugün/Sağlık/Rapor/Mesaj/Harita/
   // Saygı sekmeleri kilitli — yalnızca Ayarlar (gizlilik/veri-silme/senkron) erişilebilir
@@ -5412,7 +5521,7 @@ function ayarlarHTML(){
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön',icon('rotate-ccw',17));
   // add to home guide
   h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
-  h+='<div class="glass" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Bu app giriş istemez. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Kilit ekranı seni korur; parola ve kullanıcı adı düz metin olarak hiçbir yere yazılmaz. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
   // ── Hakkında / sürüm ──
   var _mpv=window.MotivationProgramV2?window.MotivationProgramV2.version:'—';
   var _mnv=window.MotivationNarratives?window.MotivationNarratives.version:'—';
@@ -8410,6 +8519,33 @@ App.completeMgOnboarding=function(prefForm,tolerated,kidney){
   save(); render();
   toast('Magnezyum Danışmanı hazır');
 };
+
+// ── Kilit ekranı handler'ları ──
+App.submitAuth=function(){
+  var u=(document.getElementById('sey-auth-user').value||'').trim();
+  var p=(document.getElementById('sey-auth-pass').value||'').trim();
+  if(!u||!p){
+    ui.authError=true; ui.authErrorMsg='Lütfen kullanıcı adını ve parolanı yaz.';
+    render(); return;
+  }
+  if(sha256(u)===AUTH_HASH && sha256(p)===AUTH_HASH){
+    if(!data) data=migrate(createDefaultData());
+    var a=data.settings.auth;
+    a.usernameHash=AUTH_HASH;
+    a.usernameMask=u.length>2?u.charAt(0)+'*'.repeat(u.length-2)+u.charAt(u.length-1):'***';
+    a.rememberMe=!!ui.authRemember;
+    a.unlockedAt=new Date().toISOString();
+    a.unlockCount=(a.unlockCount||0)+1;
+    ui.authError=false; ui.authErrorMsg=''; ui.authRemember=false; ui.authUnlocked=true;
+    save(); render();
+    toast('Hoş geldin, Sevgili Günışığı ✨',2600);
+  } else {
+    ui.authError=true; ui.authErrorMsg='Giriş bilgileri uyuşmadı. Bir nefes al ve tekrar dene.';
+    render();
+  }
+};
+App.toggleRememberAuth=function(){ ui.authRemember=!ui.authRemember; render(); };
+App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(); };
 
 setTimeout(pollRemote,1500);
 setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)

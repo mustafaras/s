@@ -181,6 +181,7 @@
   .dz-on{animation:dzPulse 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
   #root{
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
+    --bg:var(--page);
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);
     --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#9C8C92;
     --choc:#6B4A3A; --accent:#C77D93;
@@ -210,6 +211,7 @@
   #root[data-theme="dark"]{
     /* Gerçek siyah zemin + yüksek kontrastlı, nötr yüzeyler. */
     --page:#000000;
+    --bg:var(--page);
     --card:rgba(17,17,20,0.96); --card-bd:rgba(255,255,255,0.17);
     --text:#F8F8FA; --text2:#D8D8DE; --muted:#AFAFB9; --faint:#858590;
     --choc:#FFD9AA; --accent:#FFB1CF;
@@ -297,4 +299,26 @@
   .sey-daily-photo button:hover{transform:rotate(-30deg) scale(1.08);}
   .sey-daily-photo button:active{transform:rotate(-45deg) scale(.94);}
   @media (prefers-reduced-motion: reduce){ .sey-daily-photo img{transform:none;transition:opacity .3s ease;} .sey-daily-photo button:hover,.sey-daily-photo button:active{transform:none;} }
-  
+  /* ── Kilit / giriş ekranı ── */
+.sey-auth-backdrop{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(135deg,var(--bg) 0%, color-mix(in srgb,var(--room) 18%,var(--bg)) 55%, var(--bg) 100%);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+.sey-auth-glow{position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb,var(--room) 40%,transparent) 0%, transparent 70%);filter:blur(34px);pointer-events:none;}
+.sey-auth-card{width:min(400px,100%);background:var(--card);border:1px solid var(--card-bd);border-radius:26px;padding:32px 26px;box-shadow:0 22px 60px rgba(0,0,0,0.14);display:flex;flex-direction:column;align-items:center;gap:15px;position:relative;animation:seyFade .5s var(--ease-premium,cubic-bezier(.16,1,.3,1));}
+.sey-auth-mascot{font-size:54px;line-height:1;filter:drop-shadow(0 6px 16px color-mix(in srgb,var(--room) 38%,transparent));}
+.sey-auth-title{font-size:24px;font-weight:800;color:var(--text);margin:0;text-align:center;letter-spacing:-.3px;}
+.sey-auth-subtitle{font-size:14px;font-weight:600;color:var(--muted);margin:0;text-align:center;}
+.sey-auth-field{width:100%;display:flex;flex-direction:column;gap:6px;}
+.sey-auth-field label{font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.sey-auth-field input{width:100%;border:1px solid var(--field-bd);background:var(--field);color:var(--text);border-radius:14px;padding:13px 14px;font-size:15px;outline:none;box-sizing:border-box;transition:border-color .2s ease,box-shadow .2s ease;}
+.sey-auth-field input:focus{border-color:var(--ok);box-shadow:0 0 0 3px var(--ok-bg);}
+.sey-auth-options{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:8px;}
+.sey-auth-remember{cursor:pointer;user-select:none;color:var(--text);font-weight:700;display:flex;align-items:center;gap:5px;}
+.sey-auth-hint{font-size:11px;color:var(--faint);text-align:right;}
+.sey-auth-error{width:100%;background:rgba(217,83,79,0.10);border:1px solid rgba(217,83,79,0.35);color:var(--warn);border-radius:12px;padding:11px 13px;font-size:13px;text-align:center;font-weight:700;}
+.sey-auth-btn{width:100%;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--ok), color-mix(in srgb,var(--room2) 80%,var(--ok)));cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,var(--ok) 40%,transparent);transition:transform .15s ease,box-shadow .2s ease;}
+.sey-auth-btn:active{transform:scale(.98);}
+.sey-auth-footer{font-size:11.5px;color:var(--faint);margin:0;text-align:center;line-height:1.4;}
+.sey-auth-shake{animation:seyAuthShake .48s ease both;}
+@keyframes seyAuthShake{0%,100%{transform:translateX(0);}15%{transform:translateX(-10px);}30%{transform:translateX(10px);}45%{transform:translateX(-8px);}60%{transform:translateX(8px);}75%{transform:translateX(-4px);}}
+@media (prefers-reduced-motion: reduce){ .sey-auth-shake{animation:none;} }
+.sey-auth-preview{width:100%;text-align:center;font-size:12px;color:var(--muted);margin:-4px 0 2px;}
+.sey-auth-preview b{color:var(--text);font-weight:700;}

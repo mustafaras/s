@@ -5307,29 +5307,28 @@ function magnesiumBannerHTML(date){
   if(mg && mg.skipped && mg.skippedDate===date) return '';
   if(s.dismissedUntil && s.dismissedUntil>=date) return '';
   var nudge=calculateMgNudge(date);
-  var hl=magnesiumHeadline(nudge);
   var form=find(MG_FORMS,'id',nudge.form)||MG_FORMS[0];
   var recDose=400;
+  var sebep=magnesiumReasonText(nudge);
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span>';
-  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">MAGNESYUM DANIŞMANI</span>';
+  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">MAGNESYUM HATIRLATICISI</span>';
   h+='<span style="margin-left:auto;font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
   h+='</div>';
-  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">'+esc(hl.text)+'</div>';
-  if(nudge.score>=40 && !nudge.blocked){
-    h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
-    h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
-    h+='<span>Öneri: <b>'+recDose+' mg '+esc(form.label)+'</b> · '+esc(form.note)+'</span>';
-    h+='</div>';
-  }
+  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent);">400 mg magnezyum</span> almayı unutma.</div>';
   if(nudge.blocked){
     h+='<div style="font-size:12px;color:var(--watch);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
+  } else {
+    h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
+    h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
+    h+='<span>Önerilen form: <b>'+esc(form.label)+'</b> · '+esc(form.note)+(sebep.length?' · Sinyaller: '+esc(sebep.slice(0,3).join(' · ')):'')+'</span>';
+    h+='</div>';
   }
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">';
-  if(nudge.score>=40 && !nudge.blocked){
-    h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım</button>';
+  if(!nudge.blocked){
+    h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım · 400 mg</button>';
   }
   h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;">Bugün almayacağım</button>';
   h+='<button onclick="App.snoozeMg()" style="min-width:60px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 10px;font-size:13px;font-weight:700;">Sonra</button>';
@@ -5352,7 +5351,7 @@ function magnesiumCardHTML(date){
   h+='<div style="display:flex;align-items:center;gap:10px;">';
   h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',22)+'</span>';
   h+='<div style="flex:1;">';
-  h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Danışmanı</div>';
+  h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Hatırlatıcısı</div>';
   h+='<div style="font-size:12px;color:var(--muted);">'+esc(hl.sig)+' sinyal · Skor '+nudge.score+'/100</div>';
   h+='</div>';
   var phaseName=MG_PHASE_LABELS[nudge.phase]||MG_PHASE_LABELS.unknown;
@@ -5402,7 +5401,7 @@ function magnesiumCardHTML(date){
       h+='<div style="font-size:14px;color:var(--muted);">Bugün magnezyum alınmadı.</div>';
     } else {
       h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-      h+='<div style="font-size:14px;font-weight:700;color:var(--text);">Önerilen: 400 mg '+esc(form.label)+'</div>';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);">Bugünkü hedef: 400 mg '+esc(form.label)+'</div>';
       h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
       h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
       h+='<span>'+esc(form.note)+'</span>';
@@ -5411,7 +5410,7 @@ function magnesiumCardHTML(date){
         h+='<div style="font-size:12px;color:var(--faint);">Sinyaller: '+esc(nudge.reasons.slice(0,4).map(function(r){return MG_REASON_LABELS[r]||r;}).join(' · '))+'</div>';
       }
       h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
-      h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım</button>';
+      h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım · 400 mg</button>';
       h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;">Bugün almayacağım</button>';
       h+='</div>';
       h+='</div>';
@@ -6251,13 +6250,13 @@ function magnesiumHeadline(nudge){
   if(nudge.blocked){
     text='Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.';
   } else if(nudge.score>=85){
-    text='Bugün magnezyum desteği düşünmek için güçlü sinyaller var ('+sebep.slice(0,3).join(' · ')+').';
+    text='Bugün güçlü sinyaller var; 400 mg magnezyum almayı unutma ('+sebep.slice(0,3).join(' · ')+').';
   } else if(nudge.score>=70){
-    text='Bugün akşam magnezyum desteği faydalı olabilir ('+sebep.slice(0,3).join(' · ')+').';
+    text='Akşam 400 mg magnezyum desteği faydalı olabilir; almayı unutma ('+sebep.slice(0,3).join(' · ')+').';
   } else if(nudge.score>=40){
-    text='Bugün magnezyum sinyali orta seviyede; zaten alıyorsan devam edebilirsin.';
+    text='Bugün 400 mg magnezyum sinyali orta; rutin desteği almayı unutma.';
   } else {
-    text='Bugün magnezyum sinyali zayıf; destek almana gerek görünmüyor.';
+    text='Bugün sinyal zayıf da olsa 400 mg magnezyum rutinini unutma; destek her gün değerli.';
   }
   return {sig:sig, text:text};
 }

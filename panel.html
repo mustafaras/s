@@ -1293,7 +1293,7 @@ function cyclePhaseForDate(d,st){
   return 'luteal';
 }
 
-// ── Adaptif Magnezyum Danışmanı kartı (salt-gözlem) ─────────────────────────
+// ── Magnezyum Hatırlatıcısı kartı (salt-gözlem) ─────────────────────────
 function panelMagnesiumStats(){
   var td=today(), totalMg=0, totalDays=0, avg=0, streak=0;
   var d=td;
@@ -1374,7 +1374,7 @@ function magnesiumPanelCardHTML(){
     det+='</div>';
   }
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;">Veriler Şeyma uygulamasından gelir; panel yalnızca gözlemdir. Tıbbi karar için kullanılmamalı.</div>';
-  return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Danışmanı',span:6,order:22,summary:sum,details:det});
+  return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Hatırlatıcısı',span:6,order:22,summary:sum,details:det});
 }
 
 function psychCardHTML(){

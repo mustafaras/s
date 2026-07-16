@@ -601,6 +601,7 @@ notlarını buraya ekleyebiliriz._
   (hero/onboarding/rapor/sekme başlığı değişmedi). Sadece `--sun`/`--sun2`/
   `--sun-glow` değişkenleri eklendi (açık+koyu); cache-bust `v=20260704c`.
   Harness ile açık+koyu doğrulandı.
+- **2026-07-16** — **#26 🧂 Magnezyum Danışmanı — her zaman aktif + bilimsel istatistikler**: Bugün sekmesindeki magnezyum banner artık `enabled`/`mode`/`score` kapılarına takılmadan her gün görünür (böbrek filtresi ve taken/skipped/dismissed korunur). Sağlık kartındaki "aç/kapa" destek metinleri kaldırıldı; yerine kümülatif **kullanılan gün, toplam mg, ortalama doz, güncel seri** ızgarası ve EFSA/NICE kaynaklı günlük hedef notu eklendi. `magnesiumStats()` helper eklendi. Panel aynası (`magnesiumPanelCardHTML`) aynı bilimsel özetle güncellendi. `index.html` cache-bust `v=20260718c`. Harness (mg-screenshot-driver) ile açık+koyu doğrulandı; JS hatası yok.
 - **2026-07-13** — **#25 Günün Fotoğrafı kartı ✅**: Bugün sekmesine premium
   "Günün Fotoğrafı" kartı eklendi. Wikimedia Commons Picture of the Day
   (`Commons:Picture_of_the_day`) üzerinden ücretsiz, API key'siz, CORS'lu

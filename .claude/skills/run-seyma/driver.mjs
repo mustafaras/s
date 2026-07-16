@@ -168,7 +168,15 @@ function seedState() {
       [t]: { habits: {}, mood: 'ok', meals: {}, mealItems: {}, intention: 'test', savedAt: new Date().toISOString() },
     },
     notifications: [], luna: { qa: [] }, aeon: { qa: [] },
-    settings: { nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data' },
+    settings: {
+      nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data',
+      // app.js auth gate açılması için rememberMe + geçerli usernameHash + unlockedAt gerekli.
+      auth: {
+        rememberMe: true,
+        usernameHash: 'ae9e1ed2b6abcbce74cc0c15719fdbba372a7dd62e6232510656bade7c201af4',
+        unlockedAt: new Date().toISOString(),
+      },
+    },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
     // Faz 05: render() artık `profileAssessment.status!=='completed'` iken ana sekmeleri
     // (bugun/rapor/vb.) kilitler. Bu driver bugun/rapor/tema gibi GENEL render akışını test

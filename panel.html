@@ -1294,9 +1294,26 @@ function cyclePhaseForDate(d,st){
 }
 
 // ── Adaptif Magnezyum Danışmanı kartı (salt-gözlem) ─────────────────────────
+function panelMagnesiumStats(){
+  var td=today(), totalMg=0, totalDays=0, avg=0, streak=0;
+  var d=td;
+  while(D.days[d]){
+    var m=D.days[d]&&D.days[d].magnesium;
+    if(m&&m.taken){ totalDays++; totalMg+=Math.max(0,Number(m.mg)||0); }
+    d=addDays(d,-1);
+  }
+  if(totalDays>0) avg=Math.round(totalMg/totalDays);
+  d=td;
+  while(true){
+    var m=D.days[d]&&D.days[d].magnesium;
+    if(m&&m.taken){ streak++; d=addDays(d,-1); }
+    else break;
+  }
+  return {totalMg:totalMg,totalDays:totalDays,avgDose:avg,streak:streak};
+}
+
 function magnesiumPanelCardHTML(){
   var mgSet=(D&&D.settings&&D.settings.magnesium)||{};
-  var enabled=!!mgSet.enabled;
   var td=today();
   var week=[], days=[];
   for(var i=6;i>=0;i--) week.push(addDays(td,-i));
@@ -1305,17 +1322,10 @@ function magnesiumPanelCardHTML(){
   function takenCount(arr){ return arr.reduce(function(a,d){ var m=mgRec(d); return a+(m&&m.taken?1:0); },0); }
   var curTaken=takenCount(week), curTot=Math.max(1,week.length);
   var monthTaken=takenCount(days), monthTot=Math.max(1,days.length);
-  var doses=[];
-  days.forEach(function(d){ var m=mgRec(d); if(m&&m.taken&&typeof m.mg==="number"&&m.mg>0) doses.push(m.mg); });
-  var avgDose=doses.length?Math.round(doses.reduce(function(a,b){return a+b;},0)/doses.length):0;
-  var st=panelCycleStats();
-  var lutealDays=0, lutealTaken=0;
-  days.forEach(function(d){ if(cyclePhaseForDate(d,st)==='luteal'){ lutealDays++; var m=mgRec(d); if(m&&m.taken) lutealTaken++; } });
+  var stats=panelMagnesiumStats();
   var pct7=Math.round((curTaken/curTot)*100);
   var pct30=Math.round((monthTaken/monthTot)*100);
-  var pctLuteal=lutealDays?Math.round((lutealTaken/lutealDays)*100):null;
   var color=(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B'));
-  // Aktif model verileri (Faz 26 sonrası app'de loglanmaya başlar)
   var mgModel=(D&&D.magnesiumModel)||{};
   var hitRate=(typeof mgModel.lutealHitRate==='number')?mgModel.lutealHitRate:null;
   var currentMode=mgSet.mode||'adaptive';
@@ -1324,18 +1334,22 @@ function magnesiumPanelCardHTML(){
   var sum='<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">';
   sum+='<span style="font-size:var(--f4);font-weight:800;color:'+color+';">'+pct7+'%</span>';
   sum+='<span style="font-size:var(--f2);color:var(--t3);">Son 7 gün · '+curTaken+'/'+curTot+'</span>';
-  if(lutealDays>0) sum+='<span style="font-size:var(--f2);color:var(--t3);">Lüteal '+pctLuteal+'%</span>';
-  if(avgDose>0) sum+='<span style="font-size:var(--f2);color:var(--t3);">~'+avgDose+' mg</span>';
+  if(stats.totalDays>0) sum+='<span style="font-size:var(--f2);color:var(--t3);">Toplam '+stats.totalDays+' gün · '+stats.totalMg+' mg</span>';
   sum+='</div>';
   function kpiBox(label,val){ return '<div style="flex:1;min-width:90px;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t3);font-weight:700;">'+esc(label)+'</div><div style="font-size:var(--f4);font-weight:800;color:var(--accent,var(--gold));margin-top:2px;">'+val+'</div></div>'; }
   var det='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
+  det+=kpiBox('Toplam gün',stats.totalDays);
+  det+=kpiBox('Toplam mg',stats.totalMg+' mg');
+  det+=kpiBox('Ortalama doz',stats.avgDose?(stats.avgDose+' mg'):'—');
+  det+=kpiBox('Güncel seri',stats.streak+' gün');
+  det+='</div>';
+  det+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
+  det+=kpiBox('Son 7 gün',pct7+'%');
   det+=kpiBox('Son 30 gün',pct30+'%');
-  det+=kpiBox('Lüteal dönem',pctLuteal!==null?(pctLuteal+'%'):'—');
-  det+=kpiBox('Ortalama doz',avgDose?(avgDose+'<span style="font-size:var(--f2);font-weight:600;"> mg</span>'):'—');
   det+=kpiBox('Lüteal fayda oranı',hitRate!==null?(hitRate+'%'):'—');
+  det+=kpiBox('Aktif mod',esc(modeLabel));
   det+='</div>';
   det+='<div style="display:flex;align-items:center;gap:8px;font-size:var(--f2);color:var(--t3);background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;margin-bottom:10px;">'+icon('sliders-horizontal',14)+' <b>Mod:</b> '+esc(modeLabel)+' · '+'<span style="color:var(--t4);">'+(currentMode==='adaptive'?'Siklus + semptom + uyku verisine göre öneri üretir.':(currentMode==='lutealOnly'?'Yalnızca lüteal faz günlerinde öneri gösterir.':'Öneriler kapalı; geçmiş kayıtlar yine görünür.'))+'</span></div>';
-  if(!enabled) det+='<div style="font-size:var(--f2);color:var(--watch);background:var(--s1);border:1.5px solid var(--card-bd);border-radius:12px;padding:10px 12px;line-height:1.5;margin-bottom:10px;display:flex;align-items:center;gap:8px;">'+icon('info',14)+' <b>Magnezyum Danışmanı Şeyma uygulamasında kapalı.</b> Yine de lüteal faz verileri ve alınan dozlar burada görünür.</div>';
   if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
   if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
   // Son response log kayıtları (son 5)
@@ -1360,8 +1374,6 @@ function magnesiumPanelCardHTML(){
   return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Danışmanı',span:6,order:22,summary:sum,details:det});
 }
 
-// ── Faz 7: Psikolojik Profil kartı — Şeyma'nın iki haftada bir doldurduğu anketin
-// tüm sonuçları + soru & cevapları (salt-gösterim). D.psych latest.json üzerinden senkron gelir.
 function psychCardHTML(){
   var P=(D&&D.psych)?D.psych:null, done=P&&P.completedAt&&P.scores;
   if(!done){

@@ -188,7 +188,7 @@ function caffeineLimit(){ return CAFFEINE_LIMITS[caffeineMode()]||400; }
 function caffeineTargetBed(){ var b=(data&&data.settings&&data.settings.targetBed)||CAFFEINE_DEFAULT_BED; return /^\d{2}:\d{2}$/.test(b)?b:CAFFEINE_DEFAULT_BED; }
 
 // ── Magnezyum Danışmanı sabitleri ──
-var MG_MAX_ELEMENTAL=350; // EFSA/NICE takviyeden günlük üst sınır (elementer magnezyum, mg)
+var MG_MAX_ELEMENTAL=400; // standart günlük hedef doz (elementer magnezyum, mg)
 var MG_FORMS=[
   {id:'glycinate',label:'Glisinat',icon:icon('moon',16),bestFor:['sleep','anxiety','muscle'],note:'Yatmadan önce uykuya yardımcı; mideye nazik.'},
   {id:'citrate',label:'Sitrat',icon:icon('zap',16),bestFor:['cramp','bloating','constipation'],note:'Kramp ve şişkinlikte destekleyici; bağırsak hareketini artırabilir.'},
@@ -5311,7 +5311,7 @@ function magnesiumBannerHTML(date){
   var hl=magnesiumHeadline(nudge);
   var form=find(MG_FORMS,'id',nudge.form)||MG_FORMS[0];
   var maxEl=Math.min(s.maxElementalMg||MG_MAX_ELEMENTAL,500);
-  var recDose=Math.min(200,maxEl);
+  var recDose=Math.min(400,maxEl);
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
@@ -5349,7 +5349,7 @@ function magnesiumCardHTML(date){
   var form=find(MG_FORMS,'id',nudge.form)||MG_FORMS[0];
   var stats=magnesiumStats();
   var maxEl=Math.min(s.maxElementalMg||MG_MAX_ELEMENTAL,500);
-  var recDose=Math.min(200,maxEl);
+  var recDose=Math.min(400,maxEl);
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';

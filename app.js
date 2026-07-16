@@ -2405,6 +2405,9 @@ App.toggleHabit=function(key){
   var date=activeDate(), idx=dayIndexFor(date), day=getDay(data,date,idx);
   // Su / uyku / yürüyüş tikleri elle işaretlenmez — yalnızca veri eşiği tutunca yeşillenir.
   if(DERIVED_HABITS[key]){ App.explainDerivedHabit(key,day); return; }
+  // Magnezyum tik'i hem habits.magnesium hem de magnesium.taken kaydını senkronize eder;
+  // skor/model logu da güncellensin diye mevcut toggleMgHabit akışını kullan.
+  if(key==='magnesium'){ App.toggleMgHabit(); return; }
   var before=countRec(day); day.habits[key]=!day.habits[key]; day.savedAt=new Date().toISOString(); var after=countRec(day); haptic(14);
   ui.pulse=key; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   var msg='Kaydedildi'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
@@ -3796,18 +3799,14 @@ function habitsCardHTML(rec){
     var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(locked?hexA(accent,dark?0.07:0.05):'var(--card)');
     var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':(locked?hexA(accent,0.4):'var(--card-bd)'));
     var sh=done?'0 10px 26px rgba(233,175,193,0.4)':(locked?'0 6px 16px '+hexA(accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
-    b+=habitRowHTML({key:hb.key,title:hb.title,sub:hb.sub,msg:hb.msg,icon:hb.icon,derived:derived,prog:prog,done:done,pulsing:pulsing,accent:accent,locked:locked,warn:warn,onclick:'App.toggleHabit(\''+hb.key+'\')'});
+    // Magnezyum için alt-metin doz/form bilgisine göre dinamik olsun
+    var sub=hb.sub;
+    if(hb.key==='magnesium'){
+      var mg=(rec&&rec.magnesium)||{};
+      sub=(mg.taken)?('Form: '+esc(mg.form||'glisinat')+' · '+esc((mg.mg||200)+' mg')):'Destek gününü tamamlamak için dokun.';
+    }
+    b+=habitRowHTML({key:hb.key,title:hb.title,sub:sub,msg:hb.msg,icon:hb.icon,derived:derived,prog:prog,done:done,pulsing:pulsing,accent:accent,locked:locked,warn:warn,onclick:'App.toggleHabit(\''+hb.key+'\')'});
   });
-  var mgHabit=find(HABITS,'key','magnesium');
-  if(mgHabit){
-    var mgDone=!!(rec&&rec.habits&&rec.habits.magnesium);
-    // Eğer kullanıcı magnezyum danışmanıyla alım yaptıysa habit otomatik açılır.
-    if(rec&&rec.magnesium&&rec.magnesium.taken){ mgDone=true; rec.habits=rec.habits||{}; rec.habits.magnesium=true; }
-    var mgAccent='#9B7FC9';
-    var mgSub=mgDone?('Form: '+esc((rec.magnesium.form||'glisinat'))+' · '+esc((rec.magnesium.mg||200)+' mg')):'Destek gününü tamamlamak için dokun.';
-    var mgMsg='Magnezyum desteği kaydedildi. Beden şimdi biraz daha sakin.';
-    b+=habitRowHTML({key:'magnesium',title:mgHabit.title,sub:mgSub,msg:mgMsg,icon:mgHabit.icon,derived:false,prog:null,done:mgDone,pulsing:ui.pulse==='magnesium',accent:mgAccent,locked:false,warn:false,onclick:'App.toggleMgHabit()'});
-  }
   completed=countRec(rec); ht=habitCountOn(viewDate); allDone=ht>0&&completed>=ht;
   var badge2='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:13px;font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
   return collapsibleCardHTML({key:'habits', id:'card-habits', icon:icon('circle-check',18), accent:'var(--ok)', title:(ed?'O günün tikleri':'Bugünün tikleri'), subtitle:(allDone?'hepsi tamam, harika':completed+'/'+ht+' tamamlandı'), badge:badge2, open:open, body:b, hint:'tikleri gör'});

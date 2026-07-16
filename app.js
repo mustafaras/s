@@ -222,7 +222,8 @@ function caffeineResidueAt(rec,targetBed){
 }
 function caffeineCutoffTime(targetBed){ var bed=hhmmToMin(targetBed||caffeineTargetBed()); if(bed==null) return ''; return minToHHMM(bed-CAFFEINE_CUTOFF_H*60); }
 function caffeineTimingOk(rec,targetBed){ var last=caffeineLastTime(rec); if(!last) return true; var cut=caffeineCutoffTime(targetBed||caffeineTargetBed()); return !!cut && last<=cut; }
-function habitCountOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i].since; if(!s||(date&&date>=s)) n++; } return n; }
+function isLutealDay(date){ var cs=cycleStats(); return cs.phase==='luteal' && date===todayStr(); }
+function habitCountOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i].since; if(!s||(date&&date>=s)) n++; } if(isLutealDay(date)) n++; return n; }
 function htToday(){ return habitCountOn(todayStr()); }
 function emptyDiscomfort(){ return {regions:{},note:'',meds:[]}; }
 var MOODS=[
@@ -767,7 +768,7 @@ function activeDate(){ return (ui.editDate)?ui.editDate:todayStr(); }
 function editing(){ return !!ui.editDate; }
 function curDay(){ var d=activeDate(); return getDay(data,d,dayIndexFor(d)); }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
-function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
+function countRec(rec){ var n=rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; if(rec&&rec.magnesium&&rec.magnesium.taken&&isLutealDay(activeDate())) n++; return n; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
 function emptyMealItems(){ return {breakfast:[],lunch:[],dinner:[],snack:[]}; }
 function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,cool:false},lastMinutes:null,lastDoneAt:null,offloadNote:'',events:[],sessions:[]}; }
@@ -1061,6 +1062,25 @@ function syncDerivedHabits(day){
   return newly;
 }
 function hexA(hex,a){ var s=String(hex).replace('#',''); if(s.length===3) s=s[0]+s[0]+s[1]+s[1]+s[2]+s[2]; var n=parseInt(s,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+// Tek bir alışkanlık satırı için tutarlı HTML; hem HABITS hem lüteal Mg satırı için.
+function habitRowHTML(o){
+  var bg=o.done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(o.locked?hexA(o.accent,dark?0.07:0.05):'var(--card)');
+  var bd=o.done?'rgba(233,175,193,0.9)':(o.warn?'var(--warn)':(o.locked?hexA(o.accent,0.4):'var(--card-bd)'));
+  var sh=o.done?'0 10px 26px rgba(233,175,193,0.4)':(o.locked?'0 6px 16px '+hexA(o.accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
+  var h='';
+  h+='<button onclick="'+esc(o.onclick)+'"'+(o.warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(o.pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;">';
+  h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(o.locked?hexA(o.accent,0.12):'var(--icon)')+';color:'+(o.locked?o.accent:'var(--text)')+';">'+o.icon+'</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(o.title)+(o.derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(o.done?'#3F8A4F':o.accent)+';background:'+(o.done?'rgba(143,191,138,0.2)':hexA(o.accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
+  if(o.done){ h+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(o.msg)+'</div>'; }
+  else if(o.locked){ var pct=Math.min(100,Math.max(0,Math.round(((o.prog.cur||0)/o.prog.goal)*100))); h+='<div style="font-size:12.5px;color:'+o.accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(o.key,o.prog))+'</div>'; if(!o.prog.binary){ h+='<div style="height:6px;border-radius:999px;background:'+hexA(o.accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(o.accent,0.65)+','+o.accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
+  else { h+='<div style="font-size:13px;color:'+(o.warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(o.sub)+'</div>'; }
+  h+='</div>';
+  if(o.done){ h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>'; }
+  else if(o.locked){ h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(o.accent,0.85)+';border:2px solid '+hexA(o.accent,0.4)+';background:'+hexA(o.accent,0.06)+';">'+icon('lock',12)+'</div>'; }
+  else { h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:transparent;border:2px solid '+(o.warn?'var(--warn)':'var(--field-bd)')+ ';"></div>'; }
+  h+='</button>';
+  return h;
+}
 // Türetilmiş tik'in (henüz tutmayan) kısa, kibar ilerleme metni.
 function derivedProgText(key,prog){
   if(key==='water') return prog.cur<=0?'Su ekle · '+WATER_GOAL+' bardakta otomatik yeşil':prog.cur+'/'+WATER_GOAL+' bardak · dolunca otomatik yeşil';
@@ -2389,6 +2409,15 @@ App.toggleHabit=function(key){
   if(editing()) return;
   var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
   else if(day.habits[key]){ maybeStreak(); }
+};
+App.toggleMgHabit=function(){
+  var date=activeDate(), day=getDay(data,date,dayIndexFor(date));
+  var before=countRec(day), after;
+  var mg=day.magnesium||emptyMagnesium();
+  if(mg.taken){ App.skipMagnesium(); after=countRec(day); }
+  else { App.takeMagnesium(null,200); after=countRec(day); }
+  // confetti / tamam bildirimi, sadece bugünkü toplam eşiği aşıldıysa
+  if(!editing()){ var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); } }
 };
 // Türetilmiş tik'e dokunulduğunda: eşik tutuyorsa sıcak onay, tutmuyorsa ne yapılacağını kibarca anlat.
 App.explainDerivedHabit=function(key,day){
@@ -3762,18 +3791,16 @@ function habitsCardHTML(rec){
     var bg=done?(dark?'linear-gradient(135deg,rgba(233,175,193,0.25),rgba(201,184,255,0.22))':'linear-gradient(135deg,rgba(255,255,255,0.92),rgba(247,221,229,0.82))'):(locked?hexA(accent,dark?0.07:0.05):'var(--card)');
     var bd=done?'rgba(233,175,193,0.9)':(warn?'var(--warn)':(locked?hexA(accent,0.4):'var(--card-bd)'));
     var sh=done?'0 10px 26px rgba(233,175,193,0.4)':(locked?'0 6px 16px '+hexA(accent,0.12):'0 6px 16px rgba(108,74,58,0.06)');
-    b+='<button onclick="App.toggleHabit(\''+hb.key+'\')"'+(warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;">';
-    b+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(locked?hexA(accent,0.12):'var(--icon)')+';color:'+(locked?accent:'var(--text)')+';">'+hb.icon+'</div>';
-    b+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(hb.title)+(derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(done?'#3F8A4F':accent)+';background:'+(done?'rgba(143,191,138,0.2)':hexA(accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
-    if(done){ b+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(hb.msg)+'</div>'; }
-    else if(locked){ var pct=Math.min(100,Math.max(0,Math.round(((prog.cur||0)/prog.goal)*100))); b+='<div style="font-size:12.5px;color:'+accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(hb.key,prog))+'</div>'; if(!prog.binary){ b+='<div style="height:6px;border-radius:999px;background:'+hexA(accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(accent,0.65)+','+accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
-    else { b+='<div style="font-size:13px;color:'+(warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(hb.sub)+'</div>'; }
-    b+='</div>';
-    if(done){ b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>'; }
-    else if(locked){ b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(accent,0.85)+';border:2px solid '+hexA(accent,0.4)+';background:'+hexA(accent,0.06)+';">'+icon('lock',12)+'</div>'; }
-    else { b+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;background:transparent;border:2px solid '+(warn?'var(--warn)':'var(--field-bd)')+';"></div>'; }
-    b+='</button>';
+    b+=habitRowHTML({key:hb.key,title:hb.title,sub:hb.sub,msg:hb.msg,icon:hb.icon,derived:derived,prog:prog,done:done,pulsing:pulsing,accent:accent,locked:locked,warn:warn,onclick:'App.toggleHabit(\''+hb.key+'\')'});
   });
+  if(isLutealDay(viewDate)){
+    var mgDone=!!(rec&&rec.magnesium&&rec.magnesium.taken);
+    var mgAccent='#9B7FC9';
+    var mgProg={cur:mgDone?1:0,goal:1,binary:true};
+    var mgSub=mgDone?('Form: '+esc((rec.magnesium.form||'glisinat'))+' · '+esc((rec.magnesium.mg||200)+' mg')):'Lüteal desteği — her gün bir doz.';
+    var mgMsg='Magnezyum desteği kaydedildi. Beden şimdi biraz daha sakin.';
+    b+=habitRowHTML({key:'magnesium',title:'Magnezyum takviyesi aldım',sub:mgSub,msg:mgMsg,icon:icon('pill',22),derived:false,prog:null,done:mgDone,pulsing:ui.pulse==='magnesium',accent:mgAccent,locked:false,warn:false,onclick:'App.toggleMgHabit()'});
+  }
   return collapsibleCardHTML({key:'habits', id:'card-habits', icon:icon('circle-check',18), accent:'var(--ok)', title:(ed?'O günün tikleri':'Bugünün tikleri'), subtitle:(allDone?'hepsi tamam, harika':completed+'/'+ht+' tamamlandı'), badge:badge, open:open, body:b, hint:'tikleri gör'});
 }
 CARD_BUILDERS.habits=habitsCardHTML;
@@ -6202,6 +6229,9 @@ function calculateMgNudge(date){
     MG_WEIGHTS.energy*energySignal +
     MG_WEIGHTS.trend*trendSignal
   ));
+
+  // Lüteal fazda magnezyum desteği her gün önerilsin (güçlü sinyal).
+  if(phase==='luteal') score=Math.max(70,score);
 
   var form=suggestMgForm(reasons,s.preferredForm);
   var blocked=!!s.kidneyDisease || s.tolerated===false;

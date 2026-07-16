@@ -1315,6 +1315,12 @@ function magnesiumPanelCardHTML(){
   var pct30=Math.round((monthTaken/monthTot)*100);
   var pctLuteal=lutealDays?Math.round((lutealTaken/lutealDays)*100):null;
   var color=(pct7>=70?'#8FBF8A':(pct7>=40?'#E8A53C':'#E58B9B'));
+  // Aktif model verileri (Faz 26 sonrası app'de loglanmaya başlar)
+  var mgModel=(D&&D.magnesiumModel)||{};
+  var hitRate=(typeof mgModel.lutealHitRate==='number')?mgModel.lutealHitRate:null;
+  var currentMode=mgSet.mode||'adaptive';
+  var MODE_LABELS={adaptive:'Adaptif',lutealOnly:'Sadece lüteal',off:'Kapalı'};
+  var modeLabel=MODE_LABELS[currentMode]||currentMode;
   var sum='<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">';
   sum+='<span style="font-size:var(--f4);font-weight:800;color:'+color+';">'+pct7+'%</span>';
   sum+='<span style="font-size:var(--f2);color:var(--t3);">Son 7 gün · '+curTaken+'/'+curTot+'</span>';
@@ -1326,10 +1332,30 @@ function magnesiumPanelCardHTML(){
   det+=kpiBox('Son 30 gün',pct30+'%');
   det+=kpiBox('Lüteal dönem',pctLuteal!==null?(pctLuteal+'%'):'—');
   det+=kpiBox('Ortalama doz',avgDose?(avgDose+'<span style="font-size:var(--f2);font-weight:600;"> mg</span>'):'—');
+  det+=kpiBox('Lüteal fayda oranı',hitRate!==null?(hitRate+'%'):'—');
   det+='</div>';
+  det+='<div style="display:flex;align-items:center;gap:8px;font-size:var(--f2);color:var(--t3);background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;margin-bottom:10px;">'+icon('sliders-horizontal',14)+' <b>Mod:</b> '+esc(modeLabel)+' · '+'<span style="color:var(--t4);">'+(currentMode==='adaptive'?'Siklus + semptom + uyku verisine göre öneri üretir.':(currentMode==='lutealOnly'?'Yalnızca lüteal faz günlerinde öneri gösterir.':'Öneriler kapalı; geçmiş kayıtlar yine görünür.'))+'</span></div>';
   if(!enabled) det+='<div style="font-size:var(--f2);color:var(--watch);background:var(--s1);border:1.5px solid var(--card-bd);border-radius:12px;padding:10px 12px;line-height:1.5;margin-bottom:10px;display:flex;align-items:center;gap:8px;">'+icon('info',14)+' <b>Magnezyum Danışmanı Şeyma uygulamasında kapalı.</b> Yine de lüteal faz verileri ve alınan dozlar burada görünür.</div>';
   if(mgSet.kidneyDisease) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Böbrek rahatsızlığı bildirilmiş; uygulama önerileri filtreleniyor ve doktor onayı öneriliyor.</div>';
   if(mgSet.tolerated===false) det+='<div style="font-size:var(--f2);color:#c98b8b;line-height:1.5;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Magnezyum toleransı düşük olarak işaretlenmiş; form/doz seçimlerinde dikkatli olunmalı.</div>';
+  // Son response log kayıtları (son 5)
+  var log=Array.isArray(mgModel.responseLog)?mgModel.responseLog.slice(-5).reverse():[];
+  if(log.length>0){
+    var ACTION_TR={taken:'Alındı',skipped:'Atlandı',feedback:'Geri bildirim',snoozed:'Ertelendi',modeChange:'Mod değişti'};
+    det+='<div style="font-size:var(--f1);color:var(--t3);font-weight:700;margin-bottom:6px;">Son hareketler</div>';
+    det+='<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">';
+    log.forEach(function(e){
+      var act=ACTION_TR[e.action]||e.action;
+      var when=e.ts?tsShort(e.ts):'—';
+      var extra='';
+      if(e.action==='taken'&&typeof e.mg==='number') extra=' · '+e.mg+' mg'+(e.form?(' '+esc(e.form)):'');
+      if(e.action==='feedback') extra=' · '+(e.improved?'Fayda göründü':'Fark görülmedi');
+      if(e.action==='modeChange'&&e.mode) extra=' → '+esc(MODE_LABELS[e.mode]||e.mode);
+      if(e.action==='skipped'&&e.reason) extra=' · '+esc(e.reason);
+      det+='<div style="font-size:var(--f1);color:var(--t4);background:var(--s1);border:1px solid var(--bd2);border-radius:8px;padding:6px 8px;display:flex;align-items:center;gap:6px;"><span style="font-weight:700;color:var(--accent,var(--gold));">'+esc(act)+'</span><span style="margin-left:auto;color:var(--t5);">'+esc(when)+'</span>'+extra+'</div>';
+    });
+    det+='</div>';
+  }
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;">Veriler Şeyma uygulamasından gelir; panel yalnızca gözlemdir. Tıbbi karar için kullanılmamalı.</div>';
   return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Danışmanı',span:6,order:22,summary:sum,details:det});
 }

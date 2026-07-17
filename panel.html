@@ -684,6 +684,16 @@ function haversineKm(a,b){
 }
 function fmtKmM(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+" m":(m/1000).toFixed(2)+" km"; }
 function fmtDurP(sec){ sec=Math.max(0,Math.round(Number(sec)||0)); if(sec<60) return sec+" sn"; var m=Math.round(sec/60); if(m<60) return m+" dk"; var hh=Math.floor(m/60), mm=m%60; return hh+" sa"+(mm?(" "+mm+" dk"):""); }
+function fmtIsoShort(iso){
+  if(!iso) return '—';
+  var d=new Date(iso);
+  if(isNaN(d.getTime())) return String(iso);
+  var now=new Date();
+  var sameDay=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+  var time=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  if(sameDay) return 'bugün '+time;
+  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'})+' '+time;
+}
 function trackedStepsP(r){ var w=(r&&r.movement&&r.movement.walkM>0)?r.movement.walkM:0; return w>0?Math.round(w/0.72):0; }
 function effStepsP(r){
   var manual=(r&&r.walk&&r.walk.steps!=null&&r.walk.steps!=="")?Number(r.walk.steps):null;
@@ -2489,12 +2499,17 @@ function render(){
     ['Ort. oturum', formatDuration(curSess.avgActive||0)],
     ['Boşta süresi', idleMin==null?"—":(idleMin<60?idleMin+' dk':Math.round(idleMin/60)+' sa')]
   ];
+  var locEnabled=!!(D&&D.settings&&D.settings.locationEnabled);
+  var locAudit=[];
+  if(D&&D.settings&&D.settings.locationEnabledAt) locAudit.push('Açıldı: '+fmtIsoShort(D.settings.locationEnabledAt)+' ('+(D.settings.locationEnabledReason||'—')+')');
+  if(D&&D.settings&&D.settings.locationDisabledAt) locAudit.push('Kapandı: '+fmtIsoShort(D.settings.locationDisabledAt)+' ('+(D.settings.locationDisabledReason||'—')+')');
   var locRows=[
+    ['Durum', locEnabled?icon('toggle-right',13)+' Açık':icon('toggle-left',13)+' Kapalı'],
     ['Nokta sayısı', String(locSum.recentCount)],
     ['Farklı bölge', String(locSum.zoneCount)],
     ['Yaklaşık hareket', locSum.distanceKm.toFixed(1)+' km'],
     ['Doğruluk ort.', locSum.avgAcc==null?"—":"±"+Math.round(locSum.avgAcc)+" m"]
-  ];
+  ].concat(locAudit.map(function(a){ return ['Audit', a]; }));
   var hth=todayRec&&todayRec.health?todayRec.health:null;
   var moveRows=[
     ['Toplam', mv?fmtKmM(mv.totalM):'—'],

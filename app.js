@@ -587,6 +587,11 @@ function migrate(d){
   if(typeof d.settings.lunaConnected!=='boolean') d.settings.lunaConnected=!!(d.settings.openaiKey&&String(d.settings.openaiKey).trim());
   if(typeof d.settings.locationEnabled!=='boolean') d.settings.locationEnabled=false;
   if(d.settings.locationMode!=='walk'&&d.settings.locationMode!=='vehicle'&&d.settings.locationMode!=='auto') d.settings.locationMode='auto';
+  // Konum aç/kapa audit kaydı: neden ve ne zaman değişti
+  if(typeof d.settings.locationEnabledAt!=='string') d.settings.locationEnabledAt='';
+  if(typeof d.settings.locationEnabledReason!=='string') d.settings.locationEnabledReason='';
+  if(typeof d.settings.locationDisabledAt!=='string') d.settings.locationDisabledAt='';
+  if(typeof d.settings.locationDisabledReason!=='string') d.settings.locationDisabledReason='';
   if(!d.luna||typeof d.luna!=='object') d.luna={qa:[],lastAskDate:null};
   if(!Array.isArray(d.luna.qa)) d.luna.qa=[];
   if(typeof d.luna.lastAskDate!=='string'&&d.luna.lastAskDate!==null) d.luna.lastAskDate=null;
@@ -2797,7 +2802,7 @@ App.cancelReset=function(){ ui.resetStep=0; render(); };
 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} data=null; ui.resetStep=0; ui.tab='bugun'; render(); };
 App.toggleLocation=function(){
   if(!data.settings) data.settings={};
-  if(data.settings.locationEnabled){ data.settings.locationEnabled=false; stopLocationWatch(); save(); render(); toast('Konum paylaşımı kapatıldı'); return; }
+  if(data.settings.locationEnabled){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='manual'; stopLocationWatch(); save(); render(); toast('Konum paylaşımı kapatıldı'); return; }
   ui.locationConsent=true; render();
 };
 App.cancelLocationConsent=function(){ ui.locationConsent=false; render(); };
@@ -2805,7 +2810,12 @@ App.confirmLocationConsent=function(){
   ui.locationConsent=false;
   if(!data.settings) data.settings={};
   if(!navigator.geolocation){ render(); toast('Bu cihaz konumu desteklemiyor'); return; }
-  data.settings.locationEnabled=true; save(); render(); toast('Konum izni isteniyor…');
+  data.settings.locationEnabled=true;
+  data.settings.locationEnabledAt=new Date().toISOString();
+  data.settings.locationEnabledReason='manual';
+  data.settings.locationDisabledAt='';
+  data.settings.locationDisabledReason='';
+  save(); render(); toast('Konum izni isteniyor…');
   startLocationWatch(true);
 };
 App.setLocationMode=function(m){
@@ -7146,7 +7156,7 @@ function startLocationWatch(announce){
   var firstOk=false;
   moveState.watchId=navigator.geolocation.watchPosition(
     function(pos){ if(announce && !firstOk){ firstOk=true; if(!psychActive()) toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
-    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum izni verilmedi'); } },
+    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='permission-denied'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum izni verilmedi'); } else if(err&&err.code===2){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='position-unavailable'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum alınamadı'); } else if(err&&err.code===3){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='timeout'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum zaman aşımı'); } },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
 }

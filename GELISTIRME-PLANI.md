@@ -18,7 +18,10 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-14 · Kaynak: `app.js` + `panel.html` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-17 · Kaynak: `app.js` + `panel.html` (fonksiyon/satır kanıtı)._
+
+> **Günlük değişiklik (changelog):**
+> - **2026-07-17:** Konum aç/kapa audit kaydı eklendi: `data.settings.locationEnabledAt/Reason` ve `locationDisabledAt/Reason`; panel "Gelişmiş İçgörüler → Konum" sekmesinde durum + aç/kapa zamanı/nedeni gösterilir. Böylece sonraki OFF olayının kullanıcı tarafından mı yoksa tarayıcı izin reddi nedeniyle mi gerçekleştiği net ayrılır. Cache bump `20260718h`.
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
 |---|-------|:-----:|:-----:|-------------|
@@ -46,11 +49,12 @@ _Son güncelleme: 2026-07-14 · Kaynak: `app.js` + `panel.html` (fonksiyon/satı
 | 21 | 🎉 Özel gün kutlaması | 3 | ❌ | `specialDays` yok |
 | 22 | 📳 Haptik + mikro animasyon | 3 | ✅ | Mikro animasyon (confetti/seyFade/toast) + `haptic()` → `navigator.vibrate` (tik/mod/SOS dokunuşlarında); Ayarlar'da "Titreşim geri bildirimi" aç/kapa (`settings.haptics`, varsayılan açık) (2026-07-04) |
 | 23 | 📍 Konum-açma dürtüsü (nudge) | 3 | ✅ | `tryLocNudge`/`openLocNudgeNow` → konum kapalıyken Bugün/Sağlık'ta dağınık aralıklarla (6s ara, gün≤2, %60, 3-7s gecikme) çıkan alt-sheet; her seferinde 1-2 sağlık-çerçeveli fayda (`LOC_BENEFITS`, 20 madde — çoğu araç yolu·mesafe·süre·oturuş odaklı); "Konumu aç"→mevcut rıza modalı, "Belki sonra"/✕→snooze+backoff, **"Bugün gösterme"→o günlük sus (ertesi gün tekrar çıkar, `optOutDay`)**; konum AÇIK iken Bugün kartında gerçek veri: mesafe + **⏱️ süre** (`walkSec`/`vehicleSec`), panel "Bugün Hareket"e yansır; 8 reddten sonra fısıltı modu (2026-07-03) |
+| 23a | 📍 Konum aç/kapa audit kaydı | 3 | ✅ | `data.settings.locationEnabledAt/Reason` ve `locationDisabledAt/Reason`; manuel aç/kapa (`App.toggleLocation`/`confirmLocationConsent`) ile izin reddi/hata (`watchPosition` `err.code` 1/2/3) ayrı ayrı kaydedilir; panel "Gelişmiş İçgörüler → Konum" sekmesinde son durum + aç/kapa zamanı ve nedeni görünür; cache bump `20260718h` (2026-07-17) |
 | 24 | ☕ Kafein bilimsel takip + otomatik tik | 7 | ✅ | `CAFFEINE_TYPES` katalogu (türk/espresso/filtre/americano/cappuccino/latte/siyah çay/yeşil çay/enerji · mg/serving), `CAFFEINE_LIMITS` (standart 400/hassas 300/gebe 200), `caffeineTotalMg`/`caffeineResidueAt`/`caffeineCutoffTime`/`caffeineTimingOk`; Sağlık'ta premium kafein kartı (içecek chip'leri + günlük içim listesi + saat input + limit bar + tek sefer 200 mg / günlük limit / geç-kahve uyarıları + yatma saati kalıntı göstergesi + EFSA/FDA kaynak notu); `caffeineMode`/`targetBed` ayarları; 6-faktör `sleepReadiness` (süre 26/kalite 18/kafein 18/okuma 16/wind-down 14/ilaç 8); yeni **türetilmiş** "Günlük kafein limitini aşmadım" tiki (`caffeineOk`, elle tıklanmaz — miktar+saat sağlanınca otomatik yeşil); panel kafein satırı mg+kalıntı hesaplar (2026-07-10) |
 | 25 | 📸 Günün Fotoğrafı kartı | 3 | ✅ | `dailyPhotoCardHTML` + `fetchDailyPhoto`/`maybeFetchDailyPhoto` → Bugün sekmesinde premium "Günün Fotoğrafı" kartı; Wikimedia Commons `Commons:Picture_of_the_day` (ücretsiz, API key'siz, CORS destekli, doğa/hayvan ağırlıklı); `data.dailyPhoto` (gün, url, başlık, sanatçı, lisans, açıklama, kaynak, sayfa bağlantısı, çekilme tarihi); günlük cache + elle yenileme (`App.refreshDailyPhoto`); açık/koyu tema uyumlu; `styles.css` parlaklık/parıltı animasyonu; cache bump `20260713b` (2026-07-13) |
 | 26 | 🧂 Adaptif Magnezyum Danışmanı | 2 | ✅ | `calculateMgNudge` + `suggestMgForm` → döngü fazı (lüteal ağırlığı), semptomlar (kramp/sancı/baş ağrısı/şişkinlik/yorgunluk/duygusal), uyku (<6.5 saat), enerji/stres, 3 günlük trende göre adaptif skor; `magnesiumBannerHTML` Bugün, `magnesiumCardHTML` Sağlık, `magnesiumSettingsHTML` Ayarlar, `magnesiumFeedbackHTML` ertesi-gün etki geri bildirimi; güvenlik filtreleri (`kidneyDisease`, `tolerated`, `maxElementalMg≤350`); `data.settings.magnesium`, `data.days[].magnesium`, `data.magnesiumModel`; panel `magnesiumPanelCardHTML` bento + gün-detayı satırı; cache bump `20260713c` (2026-07-14) |
 
-**Sayım:** ✅ 15 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 16 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 

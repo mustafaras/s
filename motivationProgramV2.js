@@ -6,7 +6,7 @@
 (function(){
   "use strict";
   var PROGRAM = [
-  {
+{
     "day": 1,
     "phaseCode": "F1",
     "phaseTitle": "Faz 1 — Fark Etme",
@@ -34,6 +34,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün geri çekilme isteği geldiğinde 90 sn durdum; vücudumda gerilme fark ettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü anında altımda kırılganlık olduğunu gördüm; sadece 'kaygı' diye adlandırmak yoğunluğu biraz azalttı.",
+      "Cevap vermeden önce 'şu anda zihnim ne diyor?' diye sordum; bu duruş, dürtüyü veri olarak görmek için yeterliydi."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -71,6 +76,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde bunalım hissediyordum ama altında üzüntü vardı; göğsümde ağırlık fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'hayal kırıklığı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta bunalım, ortada suçluluk, bedende sıkışma; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -108,6 +118,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'kontrol etmeliyim' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %70 inanıyordum ama kanıt listelediğimde alternatif açıklamanın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -145,6 +160,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama temizlik için sadece iki dakika başladım; sonra doğal olarak devam etmek istedim.",
+      "Motivasyonu beklemeden 3 dk yürüdüm; başlangıcın hissettiğimden çok daha küçük olabileceğini yeniden öğrendim.",
+      "Bugünün minimumu 'ilk adımı yazmak' idi; yaptığımda kendime 'bu da sayılır' demeyi başardım."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -182,6 +202,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'hiçbir işe yaramıyorsun' dediğimi fark ettim; yerine 'bugün zordu, yeterince çabaladım' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona her gün aynı değil, kendime ise başkaları daha iyi demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -219,6 +244,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "Sağlık belirtisi belirsizliğiyle 20 dk kontrol etmeden kaldım; korktuğum yetersizlik gerçekleşmedi.",
+      "Kontrol dürtüsünü bir saat erteledim; dürtünün geçici olduğunu, paniğin ise dalga gibi geldiğini gördüm.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -256,6 +286,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "Duygusal bir yük konusunda yakın arkadaşımdan yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bu konuda fikrini alabilir miyim' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinlenme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -293,6 +328,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "Sosyal bir davet durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha net hissettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -330,6 +370,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "Eşimle unutulan bir söz sonrası 'tekrar dinlemek isterim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'seni dinlemek için zaman ayırayım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem yumuşamaya yol açtı; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -367,6 +412,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 30 sn daha kaldım ve panik aynı kaldı ama katlanabilirdidi.",
+      "Eşimle sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim titredi; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -404,6 +454,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim dalgalı idi; kısa bir mola yapınca düşüş yavaşladı ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; nefes mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi zor problem için, düşüklerini dinlenme için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -441,6 +496,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün yakınlık değerime hizmet eden küçük eylem: bir adım attım; uzun hedef değil, bugünkü seçim önemli.",
+      "yorgunluk anı anında değerim dürüstlük olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (küçük bir adım attım) ile sağlık arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -478,6 +538,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün düşünce döngüsü anında bir nefes durup fark ettim; vücudumda sıkışma hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü anında altımda çaresizlik olduğunu gördüm; sadece adlandırmak yoğunluğu biraz azalttı.",
+      "Kapatma yapmadan önce 'şu anda zihnim ne diyor?' diye sordum; bu duruş, dürtüyü veri olarak görmek için yeterliydi."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -515,6 +580,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde sinir hissediyordum ama altında suçluluk vardı; göğsümde boşluk fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'kaygı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta sinir, ortada yalnızlık, bedende sıkışma; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -552,6 +622,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'bu işe yaramayacak' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %60 inanıyordum ama kanıt listelediğimde başarıldığına dair kanıtın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -589,6 +664,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama mesaj yazma için sadece iki dakika başladım; sonrasında kayganlık hissettim.",
+      "Motivasyonu beklemeden bir cümle yazdım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -626,6 +706,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'neden bu kadar yavaşsın' dediğimi fark ettim; yerine 'küçük adım da adımdır' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona sabırlı ol, kendime ise başkaları daha iyi demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -663,6 +748,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "ilişki durumu belirsizliğiyle 20 dk kalınca korktuğum en kötü senaryo gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında kaygı kendi kendine düştü ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -700,6 +790,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "pratik iş konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bana 5 dk dinler misin' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -737,6 +832,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "sosyal bir davet durumunda 'şu sınır benim için önemli' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf anlayışla karşıladı, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az yorgun fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -774,6 +874,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "arkadaşımla yaşanan geciken bir cevap sonrası 'özür dilerim, amacım şuydu' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'daha dikkatli olacağım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -811,6 +916,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 30 sn kadar kaldım ve panik hafifledi.",
+      "ailem ile sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim sıcak yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -848,6 +958,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim düşük idi; 10 dk yürüyüş yapınca odak döndü ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 20 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi zor problem için, düşüklerini hafif iş için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -885,6 +1000,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün üretkenlik değerime hizmet eden eylem: zor bir konuşma yaptım; uzun hedef değil, bugünkü seçim önemli.",
+      "rekabet anında değerim sabır olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (kendimi dinledim) ile sabır arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -922,6 +1042,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün kaçınma anında 90 sn durup fark ettim; vücudumda duraklama hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü geldiğinde fark ettim ki aslında alt duygu hissediyordum; sadece durup adlandırmak yoğunluğu azalttı.",
+      "kapatma yapmadan önce kendime 'şu anda ne oluyor?' diye sordum; bu küçük duruş, otomatikliği yavaşlatmak için bir veri."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -959,6 +1084,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde sinir hissediyordum ama altında korku vardı; göğsümde sıkışma fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'hayal kırıklığı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta bunalım, ortada yalnızlık, bedende nefes daralması; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -996,6 +1126,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'daha iyi hissetmem lazım' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %70 inanıyordum ama kanıt listelediğimde geçicilik kanıtının eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1033,6 +1168,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama temizlik için sadece iki dakika başladım; sonrasında en azından başlamış oldum.",
+      "Motivasyonu beklemeden 3 dk yürüdüm yaptım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1070,6 +1210,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'neden bu kadar yavaşsın' dediğimi fark ettim; yerine 'bugün zordu, yeterince çabaladım' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona her gün aynı değil, kendime ise neden bu kadar yavaşsın demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1107,6 +1252,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "sağlık belirtisi belirsizliğiyle 20 dk kalınca korktuğum kaybetme gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında aslında güvenli olduğumu gördüm ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1144,6 +1294,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "karar verme konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'şunu birlikte yapalım' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün fikir talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1181,6 +1336,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "dijital erişim durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı tarafta kısa bir sessizlik oldu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az çatışma fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1218,6 +1378,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "eşimle yaşanan unutulan bir söz sonrası 'senin için ne yapabilirim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'daha dikkatli olacağım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1255,6 +1420,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer birkaç nefes kadar kaldım ve panik hafifledi.",
+      "yakın arkadaşım ile göz teması anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim nefes hızlandı yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1292,6 +1462,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim dalgalı idi; su ve ışık yapınca odak döndü ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 10 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi zor problem için, düşüklerini dinlenme için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1329,6 +1504,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün üretkenlik değerime hizmet eden küçük eylem: bir adım attım; uzun hedef değil, bugünkü seçim önemli.",
+      "beklenti baskısı anında değerim adil olmak olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (sınır koydum) ile sabır arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1366,6 +1546,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün geri çekilme isteği geldiğinde 90 sn durdum; vücudumda gerilme fark ettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü anında altımda yalnızlık olduğunu gördüm; sadece 'kaygı' diye adlandırmak yoğunluğu biraz azalttı.",
+      "Cevap vermeden önce 'şu anda zihnim ne diyor?' diye sordum; bu duruş, dürtüyü veri olarak görmek için yeterliydi."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1403,6 +1588,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde sinir hissediyordum ama altında üzüntü vardı; göğsümde nefes daralması fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'kaygı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta bunalım, ortada yalnızlık, bedende nefes daralması; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1440,6 +1630,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'kontrol etmeliyim' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %70 inanıyordum ama kanıt listelediğimde geçicilik kanıtının eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1477,6 +1672,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama okuma için sadece iki dakika başladım; sonrasında en azından başlamış oldum.",
+      "Motivasyonu beklemeden 3 dk yürüdüm yaptım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1514,6 +1714,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'neden bu kadar yavaşsın' dediğimi fark ettim; yerine 'küçük adım da adımdır' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona sabırlı ol, kendime ise neden bu kadar yavaşsın demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1551,6 +1756,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "bir mesajın cevabı belirsizliğiyle 20 dk kalınca korktuğum kaybetme gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü 15 dk erteledim; sonrasında kaygı kendi kendine düştü ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1588,6 +1798,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "pratik iş konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bu konuda fikrini alabilir miyim' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1625,6 +1840,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "aile içi talep durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı tarafta kısa bir sessizlik oldu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az yorgun fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1662,6 +1882,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "eşimle yaşanan unutulan bir söz sonrası 'tekrar dinlemek isterim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'seni dinlemek için zaman ayırayım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem yumuşama oldu ile sonuçlandı; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1699,6 +1924,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 1 dk kadar kaldım ve panik aynı kaldı ama katlanabilirdi.",
+      "yakın arkadaşım ile göz teması anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim nefes hızlandı yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1736,6 +1966,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim dalgalı idi; kısa bir mola yapınca biraz toparladım ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 20 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi yaratıcı iş için, düşüklerini admin için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1773,6 +2008,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün sabır değerime hizmet eden eylem: kendimi dinledim; uzun hedef değil, bugünkü seçim önemli.",
+      "rekabet anında değerim sabır olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (küçük bir adım attım) ile üretkenlik arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1810,6 +2050,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün düşünce döngüsü anında birkaç saniye durup fark ettim; vücudumda hızlanma hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü geldiğinde fark ettim ki aslında alt duygu hissediyordum; sadece durup adlandırmak yoğunluğu azalttı.",
+      "cevap verme yapmadan önce kendime 'şu anda ne oluyor?' diye sordum; bu küçük duruş, otomatikliği yavaşlatmak için bir veri."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1847,6 +2092,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde bunalım hissediyordum ama altında yalnızlık vardı; göğsümde ağırlık fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'hayal kırıklığı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta öfke, ortada yalnızlık, bedende nefes daralması; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1884,6 +2134,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'daha iyi hissetmem lazım' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %80 inanıyordum ama kanıt listelediğimde alternatif açıklamanın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1921,6 +2176,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama mesaj yazma için sadece iki dakika başladım; sonrasında kayganlık hissettim.",
+      "Motivasyonu beklemeden bir cümle yazdım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1958,6 +2218,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'başkaları daha iyi' dediğimi fark ettim; yerine 'bugün zordu, yeterince çabaladım' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona her gün aynı değil, kendime ise başkaları daha iyi demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -1995,6 +2260,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "bir mesajın cevabı belirsizliğiyle 20 dk kalınca korktuğum yetersizlik gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında dürtü geçti ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2032,6 +2302,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "karar verme konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bu konuda fikrini alabilir miyim' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2069,6 +2344,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "iş yükü durumunda 'şu sınır benim için önemli' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az yorgun fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2106,6 +2386,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "ailemle yaşanan unutulan bir söz sonrası 'senin için ne yapabilirim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'seni dinlemek için zaman ayırayım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem en azından elimi uzatmamı sağladı; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2143,6 +2428,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 1 dk kadar kaldım ve panik aynı kaldı ama katlanabilirdi.",
+      "ailem ile sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim nefes hızlandı yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2180,6 +2470,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim yorucu idi; hafif esneme yapınca odak döndü ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 10 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi yaratıcı iş için, düşüklerini admin için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2217,6 +2512,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün üretkenlik değerime hizmet eden eylem: zor bir konuşma yaptım; uzun hedef değil, bugünkü seçim önemli.",
+      "beklenti baskısı anında değerim yakınlık olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (sınır koydum) ile yakınlık arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2254,6 +2554,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün geri çekilme isteği geldiğinde 90 sn durdum; vücudumda gerilme fark ettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü anında altımda suçluluk olduğunu gördüm; sadece 'kaygı' diye adlandırmak yoğunluğu biraz azalttı.",
+      "Cevap vermeden önce 'şu anda zihnim ne diyor?' diye sordum; bu duruş, dürtüyü veri olarak görmek için yeterliydi."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2291,6 +2596,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde sinir hissediyordum ama altında yalnızlık vardı; göğsümde boşluk fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'hayal kırıklığı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta sinir, ortada korku, bedende sıkışma; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2328,6 +2638,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'her şey benim hatam' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %70 inanıyordum ama kanıt listelediğimde başarıldığına dair kanıtın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2365,6 +2680,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama egzersiz için sadece iki dakika başladım; sonrasında en azından başlamış oldum.",
+      "Motivasyonu beklemeden bir cümle yazdım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2402,6 +2722,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'başkaları daha iyi' dediğimi fark ettim; yerine 'bugün zordu, yeterince çabaladım' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona sabırlı ol, kendime ise başkaları daha iyi demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2439,6 +2764,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "ilişki durumu belirsizliğiyle 20 dk kalınca korktuğum reddedilme gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında aslında güvenli olduğumu gördüm ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2476,6 +2806,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "duygusal bir yük konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bana 5 dk dinler misin' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2513,6 +2848,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "sosyal bir davet durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha net hissettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2550,6 +2890,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "ailemle yaşanan geciken bir cevap sonrası 'özür dilerim, amacım şuydu' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'daha dikkatli olacağım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem en azından elimi uzatmamı sağladı; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2587,6 +2932,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 1 dk kadar kaldım ve panik hafifledi.",
+      "yakın arkadaşım ile göz teması anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim gerildi yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2624,6 +2974,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim dalgalı idi; kısa bir mola yapınca düşüş yavaşladı ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 20 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi zor problem için, düşüklerini hafif iş için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2661,6 +3016,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün yakınlık değerime hizmet eden küçük eylem: bir adım attım; uzun hedef değil, bugünkü seçim önemli.",
+      "yorgunluk anı anında değerim üretkenlik olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (sınır koydum) ile yakınlık arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2698,6 +3058,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün düşünce döngüsü anında bir nefes durup fark ettim; vücudumda sıkışma hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü geldiğinde fark ettim ki aslında alt duygu hissediyordum; sadece durup adlandırmak yoğunluğu azalttı.",
+      "cevap verme yapmadan önce kendime 'şu anda ne oluyor?' diye sordum; bu küçük duruş, dürtüyü veri olarak görmek için bir veri."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2735,6 +3100,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde öfke hissediyordum ama altında suçluluk vardı; göğsümde çarpıntı fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'yalnızlık' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta sinir, ortada yalnızlık, bedende sıkışma; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2772,6 +3142,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'kontrol etmeliyim' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %90 inanıyordum ama kanıt listelediğimde alternatif açıklamanın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2809,6 +3184,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama egzersiz için sadece iki dakika başladım; sonrasında kayganlık hissettim.",
+      "Motivasyonu beklemeden 3 dk yürüdüm yaptım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu bir nefes + bir cümle idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2846,6 +3226,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'hiçbir işe yaramıyorsun' dediğimi fark ettim; yerine 'küçük adım da adımdır' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona her gün aynı değil, kendime ise başkaları daha iyi demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2883,6 +3268,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "iş sonucu belirsizliğiyle 20 dk kalınca korktuğum en kötü senaryo gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında kaygı kendi kendine düştü ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2920,6 +3310,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "karar verme konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'şunu birlikte yapalım' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2957,6 +3352,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "dijital erişim durumunda 'şu sınır benim için önemli' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha net hissettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -2994,6 +3394,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "iş arkadaşımla yaşanan geciken bir cevap sonrası 'tekrar dinlemek isterim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'daha dikkatli olacağım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3031,6 +3436,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 1 dk kadar kaldım ve panik azaldı.",
+      "yakın arkadaşım ile sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim gerildi yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3068,6 +3478,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim düşük idi; su ve ışık yapınca düşüş yavaşladı ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 10 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi iletişim için, düşüklerini dinlenme için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3105,6 +3520,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün sabır değerime hizmet eden eylem: kendimi dinledim; uzun hedef değil, bugünkü seçim önemli.",
+      "rekabet anında değerim sabır olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (sınır koydum) ile yakınlık arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3142,6 +3562,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün düşünce döngüsü anında bir nefes durup fark ettim; vücudumda duraklama hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü geldiğinde fark ettim ki aslında alt duygu hissediyordum; sadece durup adlandırmak yoğunluğu azalttı.",
+      "kapatma yapmadan önce kendime 'şu anda ne oluyor?' diye sordum; bu küçük duruş, seçim alanı açmak için bir veri."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3179,6 +3604,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde kaygı hissediyordum ama altında suçluluk vardı; göğsümde ağırlık fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'yalnızlık' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta öfke, ortada çaresizlik, bedende ağırlık; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3216,6 +3646,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'daha iyi hissetmem lazım' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %80 inanıyordum ama kanıt listelediğimde dış etkenler eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3253,6 +3688,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama egzersiz için sadece iki dakika başladım; sonrasında devam etmek istedim.",
+      "Motivasyonu beklemeden bir başlık açtım yaptım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu 1 dk başlangıç idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3290,6 +3730,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'hiçbir işe yaramıyorsun' dediğimi fark ettim; yerine 'bugün zordu, yeterince çabaladım' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona kendine zaman ver, kendime ise neden bu kadar yavaşsın demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3327,6 +3772,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "bir mesajın cevabı belirsizliğiyle 20 dk kalınca korktuğum reddedilme gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında dürtü geçti ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3364,6 +3814,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "duygusal bir yük konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'şunu birlikte yapalım' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün fikir talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3401,6 +3856,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "dijital erişim durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az çatışma fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3438,6 +3898,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "iş arkadaşımla yaşanan geciken bir cevap sonrası 'tekrar dinlemek isterim' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'birlikte bir çözüm bulalım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3475,6 +3940,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer birkaç nefes kadar kaldım ve panik aynı kaldı ama katlanabilirdi.",
+      "eşim ile sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim nefes hızlandı yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3512,6 +3982,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim dalgalı idi; 10 dk yürüyüş yapınca düşüş yavaşladı ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; nefes mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi iletişim için, düşüklerini admin için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3549,6 +4024,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün yakınlık değerime hizmet eden eylem: sınır koydum; uzun hedef değil, bugünkü seçim önemli.",
+      "zor bir seçim anında değerim üretkenlik olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (kendimi dinledim) ile dürüstlük arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3586,6 +4066,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün geri çekilme isteği geldiğinde 90 sn durdum; vücudumda gerilme fark ettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü anında altımda korku olduğunu gördüm; sadece 'kaygı' diye adlandırmak yoğunluğu biraz azalttı.",
+      "Cevap vermeden önce 'şu anda zihnim ne diyor?' diye sordum; bu duruş, dürtüyü veri olarak görmek için yeterliydi."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3623,6 +4108,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde bunalım hissediyordum ama altında yalnızlık vardı; göğsümde sıkışma fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'yalnızlık' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta kaygı, ortada suçluluk, bedende sıkışma; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3660,6 +4150,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'daha iyi hissetmem lazım' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %60 inanıyordum ama kanıt listelediğimde dış etkenler eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3697,6 +4192,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama egzersiz için sadece iki dakika başladım; sonrasında kayganlık hissettim.",
+      "Motivasyonu beklemeden bir cümle yazdım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu ilk adımı yazmak idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3734,6 +4234,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'hiçbir işe yaramıyorsun' dediğimi fark ettim; yerine 'küçük adım da adımdır' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona sabırlı ol, kendime ise hiçbir işe yaramıyorsun demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3771,6 +4276,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "sağlık belirtisi belirsizliğiyle 20 dk kalınca korktuğum en kötü senaryo gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü bir saat erteledim; sonrasında kaygı kendi kendine düştü ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3808,6 +4318,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "karar verme konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'şunu birlikte yapalım' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün bir gözden geçirme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3845,6 +4360,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "sosyal bir davet durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf anlayışla karşıladı, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha az yorgun fark ettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3882,6 +4402,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "arkadaşımla yaşanan küçük bir sert cümle sonrası 'özür dilerim, amacım şuydu' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'seni dinlemek için zaman ayırayım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3919,6 +4444,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer birkaç nefes kadar kaldım ve panik azaldı.",
+      "yakın arkadaşım ile samimi konuşma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim gerildi yaptı; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3956,6 +4486,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim yorucu idi; hafif esneme yapınca odak döndü ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 10 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi yaratıcı iş için, düşüklerini dinlenme için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -3993,6 +4528,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün adil olmak değerime hizmet eden küçük eylem küçük bir adım attım; uzun hedef değil, bugünkü seçim önemli.",
+      "rekabet anında değerim adil olmak olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (kendimi dinledim) ile sağlık arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4030,6 +4570,11 @@
     "standardTask": "Bugün geri çekilmek istediğin bir anda 90 saniye dur ve dürtünün adını yaz.",
     "minimumTask": "Geri çekilme veya otomatik tepkiyle ilgili yalnızca bir kelime yaz.",
     "successMeaning": "Otomatik tepkiyi fark ettin; bu, değişim için ilk davranış verisidir.",
+    "reflectionExamples": [
+      "Bugün geri çekilme anında birkaç saniye durup fark ettim; vücudumda sıkışma hissettim, hemen tepki vermek zorunda değilmişim.",
+      "Dürtü geldiğinde fark ettim ki aslında alt duygu hissediyordum; sadece durup adlandırmak yoğunluğu azalttı.",
+      "cevap verme yapmadan önce kendime 'şu anda ne oluyor?' diye sordum; bu küçük duruş, seçim alanı açmak için bir veri."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4067,6 +4612,11 @@
     "standardTask": "Bugünün baskın duygusunu üç düzeyde yaz: görünen duygu, alttaki duygu, bedendeki his.",
     "minimumTask": "Bugünkü baskın duygunu tek kelimeyle adlandır.",
     "successMeaning": "Duyguyu adlandırdın; belirsiz iç basıncı daha yönetilebilir hâle getirdin.",
+    "reflectionExamples": [
+      "Bugün görünürde öfke hissediyordum ama altında çaresizlik vardı; göğsümde boşluk fark ettim.",
+      "Duyguyu sadece 'kötü' değil, 'hayal kırıklığı' diye adlandırınca daha yönetilebilir geldi; zihnim 'hâlâ güvensiz' dedi.",
+      "Üç katman yazdım: dışta bunalım, ortada suçluluk, bedende boşluk; bu ayrıştırma panik hissini durdurdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4104,6 +4654,11 @@
     "standardTask": "Zorlayan düşüncenin başına şu ifadeyi ekle: 'Zihnim şu anda bana ... diyor.'",
     "minimumTask": "Zorlayan düşünceni 'Zihnim şu anda bana ... diyor' kalıbıyla bir cümleye çevir.",
     "successMeaning": "Düşünceyle arana mesafe koydun; onu gerçek değil veri olarak ele aldın.",
+    "reflectionExamples": [
+      "Zihnim 'daha iyi hissetmem lazım' diyordu; başına 'zihnim şu anda bana ... diyor' ekleyince gerçekliği azaldı.",
+      "Bu düşünceye %90 inanıyordum ama kanıt listelediğimde başarıldığına dair kanıtın eksik olduğunu gördüm.",
+      "Düşünceyi bir cümle olarak yazıp okudum; aynı cümle tekrarlanınca bir 'veri parçası' gibi durdu."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4141,6 +4696,11 @@
     "standardTask": "İki dakikada başlayabileceğin bir davranış seç ve yalnızca iki dakika uygula.",
     "minimumTask": "Görevin yalnızca ilk 60 saniyesini yap.",
     "successMeaning": "Motivasyonu beklemeden davranış başlattın.",
+    "reflectionExamples": [
+      "Hazır değildim ama odaklanma için sadece iki dakika başladım; sonrasında devam etmek istedim.",
+      "Motivasyonu beklemeden bir başlık açtım yaptım; başlangıç, hissettiğimden çok daha küçük bir şeymiş.",
+      "Bugünün minimumu ilk adımı yazmak idi; yaptığımda kendime 'bu da sayılır' demeyi öğrendim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4178,6 +4738,11 @@
     "standardTask": "Sert bir iç cümleni daha adil ve uygulanabilir bir cümleye çevir.",
     "minimumTask": "Kendine söylediğin sert cümleyi fark et ve yanına daha adil bir kelime ekle.",
     "successMeaning": "Öz-eleştiriye karşı daha sürdürülebilir bir iç dil denedin.",
+    "reflectionExamples": [
+      "Kendime 'neden bu kadar yavaşsın' dediğimi fark ettim; yerine 'tempo değişebilir, bu beni tanımlamaz' desem daha adil ve sürdürülebilir olurdu.",
+      "Aynı durumda arkadaşıma nasıl konuşurdum? Ona her gün aynı değil, kendime ise hiçbir işe yaramıyorsun demiştim; bugün dengeledim.",
+      "Başarısızlık değil, kapasite sınırı; 'bugün bu kadar yeter' demek, daha uzun soluklu çalışmamı sağlıyor."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4215,6 +4780,11 @@
     "standardTask": "Düşük riskli bir belirsizliği 20 dakika kontrol etmeden bırak.",
     "minimumTask": "Bir kontrol davranışını yalnızca 5 dakika ertele.",
     "successMeaning": "Kontrol dürtüsünü erteledin; kaygıya yeni öğrenme alanı açtın.",
+    "reflectionExamples": [
+      "ilişki durumu belirsizliğiyle 20 dk kalınca korktuğum yetersizlik gerçekleşmedi; kaygı gerçeklik değilmiş.",
+      "Kontrol dürtüsünü 15 dk erteledim; sonrasında kaygı kendi kendine düştü ve fark ettim ki dürtü geçici.",
+      "Kesinlik aramak yerine 'şu an yeterli bilgi var mı?' diye sordum; cevap evetti, ek kontrole gerek kalmadı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4252,6 +4822,11 @@
     "standardTask": "Güvendiğin bir kişiden küçük ve somut bir destek iste.",
     "minimumTask": "Destek isteyebileceğin kişinin adını ve isteyeceğin şeyi taslak olarak yaz.",
     "successMeaning": "Destek isteme davranışının ilk basamağını görünür yaptın.",
+    "reflectionExamples": [
+      "pratik iş konusunda bir kişiden yardım istedim; istemek utanç değil, çözüm üretmekmiş.",
+      "Destek ararken 'bu konuda fikrini alabilir miyim' dedim; karşı tarafın sadece dinlemesi bile yükümü hafifletti.",
+      "Yalnız başa çıkmak zorunda değilim; bugün yalnızca dinleme talep ettim, bu yakınlığı güvenli kıldı."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4289,6 +4864,11 @@
     "standardTask": "Bir sınır cümlesi kur: 'Şu an ... yapacağım; ... zamanda döneceğim.'",
     "minimumTask": "Koymak istediğin sınırı göndermeden önce tek cümleyle taslaklaştır.",
     "successMeaning": "Sınırı kopmadan ve cezalandırmadan ifade etmeye yaklaştın.",
+    "reflectionExamples": [
+      "aile içi talep durumunda 'bugün bunu yapamam' dedim; sert değil, net bir çerçeve kurmak rahatlattı.",
+      "Hayır demek önce panik, sonra rahatlama getirdi; karşı taraf soru sordu, ben sınırımda kaldım.",
+      "Sınırımı açıkça söyleyince suçluluk hissettim ama uzun vadede daha net hissettim."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4326,6 +4906,11 @@
     "standardTask": "Uzaklaştığın bir kişiye açıklama taslağı yaz: 'Geri çekildim çünkü ...'",
     "minimumTask": "Onarım cümlesini göndermeden yalnızca notlara yaz.",
     "successMeaning": "Uzaklaşma yerine onarım seçeneğini zihinde erişilebilir yaptın.",
+    "reflectionExamples": [
+      "arkadaşımla yaşanan küçük bir sert cümle sonrası 'özür dilerim, amacım şuydu' dedim; onarım büyük jest değil, küçük ve samimi adım.",
+      "Özür yerine açıklama ve 'seni dinlemek için zaman ayırayım' sundum; ilişkideki gerilim açık konuşunca azaldı.",
+      "Onarım denemem daha net konuşmama yardım etti; denemek, mükemmel olmaktan daha değerli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4363,6 +4948,11 @@
     "standardTask": "Normalde saklayacağın küçük bir doğruyu güvenli bir kişiye söyle.",
     "minimumTask": "Güvenli bir kişiye söyleyebileceğin yüzde beşlik açıklık cümlesini yaz.",
     "successMeaning": "Tam kapanma yerine güvenli dozda temas ihtimalini artırdın.",
+    "reflectionExamples": [
+      "Yakınlık anında çekilme isteği geldi; bu sefer 30 sn kadar kaldım ve panik aynı kaldı ama katlanabilirdi.",
+      "eşim ile sarılma anında 'buradayım' demek, uzaklaşmaktan daha güvenli hissettirdi.",
+      "Yakınlığa maruz kalınca bedenim titredi; nefes alıp kalmak, duygu geçene kadar yeterliymiş."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4400,6 +4990,11 @@
     "standardTask": "Enerjini 0–10 puanla; bugünkü hedefini bu puana göre küçült.",
     "minimumTask": "Enerjini 0–10 arasında puanla ve hedefi bir kademe küçült.",
     "successMeaning": "Kapasiteye göre hedef ayarladın; sürdürülebilirliği korudun.",
+    "reflectionExamples": [
+      "Bugün enerjim düşük idi; su ve ışık yapınca biraz toparladım ve daha sürdürülebilir çalıştım.",
+      "İrade değil ritim; 20 dk mola verince odaklanmam geri geldi, kendimi suçlamadım.",
+      "Yüksek enerjili saatlerimi iletişim için, düşüklerini hafif iş için kullandım; verim değil, denge önemli."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",
@@ -4437,6 +5032,11 @@
     "standardTask": "Bugün yaptığın tek davranışın hangi değere hizmet ettiğini yaz.",
     "minimumTask": "Bugün korumak istediğin değeri tek kelimeyle yaz.",
     "successMeaning": "Duygu durumdan bağımsız olarak yönünü değerle bağladın.",
+    "reflectionExamples": [
+      "Bugün yakınlık değerime hizmet eden küçük eylem: bir adım attım; uzun hedef değil, bugünkü seçim önemli.",
+      "zor bir seçim anında değerim sağlık olduğunu hatırladım; bu, seçimi kolaylaştırdı.",
+      "Davranışım (zor bir konuşma yaptım) ile adil olmak arasındaki bağ kurunca motivasyonum içsel."
+    ],
     "progressRule": "Bu gün, standardTask veya minimumTask tamamlanmadan sonraki güne geçmez.",
     "allowedStatuses": [
       "active",

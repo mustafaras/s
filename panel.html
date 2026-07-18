@@ -2205,7 +2205,18 @@ function render(){
     h+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#e08a8a;"></span>Protein <b style="color:var(--t1);">'+(nmac.protein||0)+'g</b></span>';
     h+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#e6c15a;"></span>Karbonhidrat <b style="color:var(--t1);">'+(nmac.carbs||0)+'g</b></span>';
     h+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#a78bfa;"></span>Yağ <b style="color:var(--t1);">'+(nmac.fat||0)+'g</b></span>';
-    h+='</div></div>';
+    h+='</div>';
+    var tg=(D&&D.settings&&D.settings.targets)||{};
+    var hasTg=(typeof tg.calories==='number'&&typeof tg.protein==='number');
+    if(hasTg){
+      var calPct=Math.min(100,Math.round(((nmac.calories||0)/tg.calories)*100));
+      var proPct=Math.min(100,Math.round(((nmac.protein||0)/tg.protein)*100));
+      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:7px;font-size:var(--f1);color:var(--t3);">';
+      h+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#9dc08b;"></span>Kalori hedef <b style="color:var(--t1);">'+tg.calories+' kcal</b> · %'+calPct+'</span>';
+      h+='<span style="display:flex;align-items:center;gap:5px;">Protein hedef <b style="color:var(--t1);">'+tg.protein+'g</b> · %'+proPct+'</span>';
+      h+='</div>';
+    }
+    h+='</div>';
   }
   h+=syms?'<div style="font-size:var(--f3);color:var(--t3);margin-top:10px;font-weight:600;display:flex;align-items:center;gap:5px;">'+icon('flower-2',13)+' '+esc(syms)+'</div>':'<div style="font-size:var(--f3);color:var(--t4);margin-top:10px;font-weight:600;display:flex;align-items:center;gap:5px;">'+icon('flower-2',13)+' Belirti kaydı yok</div>';
   // ── Şeyma'nın diğer girdileri (eksiksiz, girdiği şekliyle) ──

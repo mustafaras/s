@@ -4760,35 +4760,50 @@ function heroStatsHTML(rec){
   h+='</div>';
   return h;
 }
-// Bugün hero kartında en kritik hedeflerin özet görünümü (kalori/protein/su/adım).
+// Bugün hero kartında en kritik hedeflerin premium özet görünümü.
+// Su/Adım zaten üst durum satırında (heroStatsHTML) olduğu için burada
+// sadece beslenme hedeflerinin en anlamlı üçlüsü gösterilir: Kalori · Protein · Karbonhidrat.
 function heroTargetsHTML(rec){
   var nu=dayNutrition(rec);
-  var calG=calGoal();
-  var proG=proteinGoal();
-  var waterG=waterGoalCups();
-  var stepG=stepsGoal();
-  var water=rec?(Number(rec.water)||0):0;
-  var es=effSteps(rec);
-  var tile=function(ic,cur,goal,unit,label,accent,compact){
+  var t=data.settings.targets||{};
+  var calG=(typeof t.calories==='number'&&!isNaN(t.calories))?t.calories:calGoal();
+  var proG=(typeof t.protein==='number'&&!isNaN(t.protein))?t.protein:proteinGoal();
+  var carbG=(typeof t.carbs==='number'&&!isNaN(t.carbs))?t.carbs:(carbsGoal()||0);
+
+  // SVG halka: r=18, çevre = 2πr.
+  var ring=function(cur,goal,label,accent,icName,icSize){
+    var has=(typeof cur==='number'&&!isNaN(cur));
     var pct=(goal>0)?Math.min(100,Math.round(cur/goal*100)):0;
-    var has=cur!=null&&!isNaN(cur);
     var met=has&&pct>=100;
+    var r=18, c=Math.round(2*Math.PI*r*100)/100;
+    var off=Math.round(c*(1-pct/100)*100)/100;
     var col=met?'#3F8A4F':accent;
-    var bg=met?'rgba(143,191,138,0.16)':'var(--icon)';
-    var val=has?('<span style="font-size:14px;font-weight:800;color:var(--text);">'+cur+'</span><span style="font-size:10px;color:var(--faint);">/'+goal+'</span>'):'<span style="font-size:14px;font-weight:800;color:var(--faint);">—</span>';
-    if(compact && has && unit) val+='<span style="font-size:9px;color:var(--faint);">'+unit+'</span>';
-    return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 3px;border-radius:15px;background:'+bg+';border:1px solid '+(met?'rgba(143,191,138,0.34)':'transparent')+';">'
-      +'<span style="display:inline-flex;color:'+(has?col:'var(--faint))')+';">'+icon(ic,14)+'</span>'
-      +'<div style="display:flex;align-items:baseline;gap:2px;white-space:nowrap;">'+val+'</div>'
-      +'<div style="width:100%;height:3px;background:var(--card-bd);border-radius:999px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div>'
-      +'<span style="font-size:9px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
+    var curTxt=has?('<span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:10px;color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):('<span style="font-size:15px;font-weight:800;color:var(--faint);">—</span>');
+    var grad='linear-gradient(180deg,'+accent+'22 0%,'+accent+'08 100%)';
+    return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 2px 10px;border-radius:20px;background:'+grad+';border:1px solid '+accent+'33;box-shadow:0 4px 14px '+accent+'1A;">'
+      +'<div style="position:relative;width:52px;height:52px;filter:drop-shadow(0 2px 4px '+accent+'26);">'
+      +'<svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg);">'
+      +'<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="var(--card-bd)" stroke-width="4" opacity="0.7"/>'
+      +'<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" style="transition:stroke-dashoffset .5s ease;"/>'
+      +'</svg>'
+      +'<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">'
+      +'<span style="display:inline-flex;color:'+col+';">'+icon(icName,icSize||13)+'</span>'
+      +'</div></div>'
+      +'<div style="display:flex;align-items:baseline;gap:2px;line-height:1;white-space:nowrap;">'+curTxt+'</div>'
+      +'<span style="font-size:9px;font-weight:800;letter-spacing:.35px;color:var(--faint);text-transform:uppercase;">'+label+'</span>'
+      +'</div>';
   };
-  var h='<div style="display:flex;gap:7px;">';
-  h+=tile('flame', nu.calories, calG, '', 'Kalori', '#E8894A');
-  h+=tile('beef', nu.protein, proG, '', 'Protein', '#C2453A');
-  h+=tile('droplet', water, waterG, '', 'Su', '#5EA9E6');
-  h+=tile('footprints', (es.steps!=null?es.steps:null), stepG, '', 'Adım', '#5BA85B');
-  h+='</div>';
+
+  var header='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">'
+    +'<span style="font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--faint);text-transform:uppercase;">Hedeflerim</span>'
+    +'<span style="font-size:10px;font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
+  var h='<div style="display:flex;flex-direction:column;gap:7px;">';
+  h+=header;
+  h+='<div style="display:flex;gap:8px;">';
+  h+=ring(nu.calories, calG, 'Kalori', '#E8894A', 'flame', 14);
+  h+=ring(nu.protein, proG, 'Protein', '#C2453A', 'beef', 14);
+  h+=ring(nu.carbs, carbG, 'Karbonhidrat', '#6E9C6A', 'apple', 14);
+  h+='</div></div>';
   return h;
 }
 // Kısa tik etiketleri (hero "en güçlü/zayıf" istatistiği için).

@@ -4760,6 +4760,37 @@ function heroStatsHTML(rec){
   h+='</div>';
   return h;
 }
+// Bugün hero kartında en kritik hedeflerin özet görünümü (kalori/protein/su/adım).
+function heroTargetsHTML(rec){
+  var nu=dayNutrition(rec);
+  var calG=calGoal();
+  var proG=proteinGoal();
+  var waterG=waterGoalCups();
+  var stepG=stepsGoal();
+  var water=rec?(Number(rec.water)||0):0;
+  var es=effSteps(rec);
+  var tile=function(ic,cur,goal,unit,label,accent,compact){
+    var pct=(goal>0)?Math.min(100,Math.round(cur/goal*100)):0;
+    var has=cur!=null&&!isNaN(cur);
+    var met=has&&pct>=100;
+    var col=met?'#3F8A4F':accent;
+    var bg=met?'rgba(143,191,138,0.16)':'var(--icon)';
+    var val=has?('<span style="font-size:14px;font-weight:800;color:var(--text);">'+cur+'</span><span style="font-size:10px;color:var(--faint);">/'+goal+'</span>'):'<span style="font-size:14px;font-weight:800;color:var(--faint);">—</span>';
+    if(compact && has && unit) val+='<span style="font-size:9px;color:var(--faint);">'+unit+'</span>';
+    return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 3px;border-radius:15px;background:'+bg+';border:1px solid '+(met?'rgba(143,191,138,0.34)':'transparent')+';">'
+      +'<span style="display:inline-flex;color:'+(has?col:'var(--faint))')+';">'+icon(ic,14)+'</span>'
+      +'<div style="display:flex;align-items:baseline;gap:2px;white-space:nowrap;">'+val+'</div>'
+      +'<div style="width:100%;height:3px;background:var(--card-bd);border-radius:999px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';"></div></div>'
+      +'<span style="font-size:9px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
+  };
+  var h='<div style="display:flex;gap:7px;">';
+  h+=tile('flame', nu.calories, calG, '', 'Kalori', '#E8894A');
+  h+=tile('beef', nu.protein, proG, '', 'Protein', '#C2453A');
+  h+=tile('droplet', water, waterG, '', 'Su', '#5EA9E6');
+  h+=tile('footprints', (es.steps!=null?es.steps:null), stepG, '', 'Adım', '#5BA85B');
+  h+='</div>';
+  return h;
+}
 // Kısa tik etiketleri (hero "en güçlü/zayıf" istatistiği için).
 var SHORT_HABIT={sweetManaged:'Tatlı',foodManaged:'Yemek',coffeeManaged:'Kahve',eveningControl:'Akşam',walked20:'Yürüyüş',protein:'Protein',water:'Su',vitaminD:'D₃K₂ damla',sleepReg:'Uyku',journaled:'Not',mediaFed:'Zihin',freshAir:'Açık hava',selfKind:'Öz-şefkat'};
 // ── Premium istatistik şeridi: tek çerçevede seri · 7 günlük ritim · mod eğilimi
@@ -4976,6 +5007,8 @@ function bugunHTML(){
   h+=heroPremiumStatsHTML(viewDate);
   // bugünkü girdi özeti (Mod · Su · Uyku · Adım)
   h+=heroStatsHTML(rec);
+  // en önemli hedeflerin özet görünümü (Kalori · Protein · Su · Adım)
+  h+=heroTargetsHTML(rec);
   // ── Niyet + bilimsel mikro-bilgi — hafif, üstten ayraçlı (fazla çerçeve yok) ──
   h+='<div style="border-top:1px solid var(--card-bd);padding-top:13px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;flex-direction:column;gap:7px;">';

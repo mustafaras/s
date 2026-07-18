@@ -5077,9 +5077,6 @@ function bugunHTML(){
   // akşam adım hatırlatması (yalnızca akşam, bugünün adımı boşsa)
   if(!ed) h+=stepReminder(rec);
 
-  // Hedeflerim — kişiselleştirilmiş makro/mikro/wellness hedefleri, dokununca Sağlık sayfasına
-  if(!ed) h+=targetsCardHTML(rec);
-
   // Beslenme — özet (makro) + "ne yedim" birleşik açılır kart
   h+=beslenmeCardHTML(rec);
 

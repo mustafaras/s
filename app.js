@@ -4431,6 +4431,27 @@ function roomOverlayHTML(){
   h+='<div style="'+fi(0.14)+'display:flex;flex-direction:column;gap:8px;">';
   // Kaydedilmiş günde de yansıma görünür ve düzenlenebilir (önceden dolu gelir).
   if(doneToday) h+='<div style="display:inline-flex;align-self:flex-start;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.16);padding:4px 11px;border-radius:999px;">'+icon('check',12)+(st&&st.status==='minimum_completed'?'Minimum kaydedildi · düzenleyebilirsin':'Bugün kaydedildi · düzenleyebilirsin')+'</div>';
+  // Örnek yansımalar (açılır kapanır kart)
+  if(mot.reflectionExamples && mot.reflectionExamples.length){
+    var exOpen = !!ui.motivationExamplesOpen;
+    h+='<div style="border:1px solid color-mix(in srgb,var(--room) 22%,var(--card-bd));background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:14px;overflow:hidden;">';
+    h+='<button type="button" onclick="App.toggleMotivationExamples()" style="width:100%;border:none;background:transparent;cursor:pointer;padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--room);">';
+    h+='<span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;"><span style="display:inline-flex;">'+icon('pen-tool',14)+'</span>Bugün nasıl yazabilirim?</span>';
+    h+='<span style="display:inline-flex;transition:transform .2s ease;transform:rotate('+(exOpen?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
+    h+='</button>';
+    if(exOpen){
+      h+='<div style="padding:0 13px 13px;display:flex;flex-direction:column;gap:8px;animation:seyFloatIn .22s ease both;">';
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.45;">Aşağıdaki cümleler sana başlangıç noktası olabilir. İstediğini kendi deneyimine göre değiştir.</div>';
+      mot.reflectionExamples.forEach(function(ex, idx){
+        h+='<div style="display:flex;gap:8px;align-items:flex-start;">';
+        h+='<button type="button" onclick="App.copyMotivationExample('+idx+')" title="Yansıma girişine kopyala" style="flex-shrink:0;border:1px solid var(--room);background:transparent;cursor:pointer;padding:7px 9px;border-radius:10px;color:var(--room);display:inline-flex;align-items:center;justify-content:center;">'+icon('copy',13)+'</button>';
+        h+='<div style="font-size:12.5px;line-height:1.55;color:var(--text2);padding-top:2px;">'+esc(ex)+'</div>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  }
   h+='<input id="sey-mot-reflection-main" type="text" maxlength="280" value="'+esc(ui.motivationReflectionDraft||'')+'" oninput="App.setMotivationReflection(this)" placeholder="Bu odaya bugün ne bırakmak istersin?" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
   h+='<div style="font-size:10.5px;color:var(--faint);margin-top:-3px;">'+(doneToday?'Kaydını dilediğin an düzenleyip güncelleyebilirsin.':'Kısa da olsa yeter — bu oda seni duyuyor.')+'</div>';
   var pEnabled=hasReflection; // her zaman bir cümle iste → boşken buton pasif; "cümle yaz" uyarısı çıkmaz
@@ -4471,6 +4492,23 @@ App.setMotivationReflection=function(el){
   var has=!!ui.motivationReflectionDraft.trim();
   var btn=document.getElementById('sey-mot-complete-btn-main');
   if(btn){ btn.disabled=!has; btn.style.opacity=has?'1':'0.45'; btn.style.cursor=has?'pointer':'not-allowed'; }
+};
+App.toggleMotivationExamples=function(){
+  ui.motivationExamplesOpen=!ui.motivationExamplesOpen;
+  render();
+};
+App.copyMotivationExample=function(idx){
+  var M=window.MotivationProgramV2;
+  if(!M||!data) return;
+  var mot=M.activeDay(data);
+  if(!mot||!mot.reflectionExamples||!mot.reflectionExamples[idx]) return;
+  var text=mot.reflectionExamples[idx];
+  ui.motivationReflectionDraft=text.slice(0,280);
+  var input=document.getElementById('sey-mot-reflection-main');
+  if(input){ input.value=ui.motivationReflectionDraft; input.focus(); }
+  var btn=document.getElementById('sey-mot-complete-btn-main');
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
+  toast('Örnek yansıma girişe kopyalandı — dilediğin gibi düzenle.');
 };
 // Bir cümle bırakmak zorunlu: hem standart hem minimum tamamlamada, kullanıcı
 // yazmadan devam edemez -- buton devre dışı bırakılır, burada da savunma amaçlı tekrar kontrol edilir.

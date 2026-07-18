@@ -260,7 +260,7 @@
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="motivationProgramV2.js?v=20260715a"></script>
+<script src="motivationProgramV2.js?v=20260718a"></script>
 <script src="saygiPeople.js?v=20260715a"></script>
 </head>
 <body>
@@ -1703,6 +1703,15 @@ function motivationPanelCardHTML(){
     if(act.standardTask) sum+='<div style="font-size:var(--f2);color:var(--t1);line-height:1.45;margin-bottom:6px;display:flex;gap:6px;"><span style="flex-shrink:0;opacity:0.55;">'+icon('clipboard-list',13)+'</span><span><b style="color:var(--gold);">Görev:</b> '+esc(act.standardTask)+'</span></div>';
     if(act.minimumTask) sum+='<div style="font-size:var(--f2);color:var(--t1);line-height:1.45;margin-bottom:6px;display:flex;gap:6px;"><span style="flex-shrink:0;opacity:0.55;">'+icon('shield',13)+'</span><span><b style="color:var(--gold);">Minimum:</b> '+esc(act.minimumTask)+'</span></div>';
     if(act.successMeaning) sum+='<div style="font-size:var(--f2);color:var(--t2);line-height:1.45;margin-bottom:6px;display:flex;gap:6px;"><span style="flex-shrink:0;opacity:0.55;">'+icon('sparkles',13)+'</span><span><b style="color:var(--t2);">Anlam:</b> '+esc(act.successMeaning)+'</span></div>';
+    if(act.reflectionQuestion) sum+='<div style="font-size:var(--f2);color:var(--t2);line-height:1.45;margin-bottom:6px;display:flex;gap:6px;"><span style="flex-shrink:0;opacity:0.55;">'+icon('help-circle',13)+'</span><span><b style="color:var(--t2);">Soru:</b> '+esc(act.reflectionQuestion)+'</span></div>';
+    if(act.reflectionExamples && act.reflectionExamples.length){
+      sum+='<div style="font-size:var(--f2);color:var(--t2);line-height:1.45;margin-bottom:6px;display:flex;flex-direction:column;gap:4px;">';
+      sum+='<div style="display:flex;align-items:center;gap:6px;color:var(--gold);font-weight:800;"><span style="flex-shrink:0;opacity:0.7;">'+icon('pen-tool',13)+'</span><span>Örnek yansımalar</span></div>';
+      act.reflectionExamples.forEach(function(ex){
+        sum+='<div style="padding-left:19px;font-size:var(--f2);color:var(--t3);line-height:1.45;">• '+esc(ex)+'</div>';
+      });
+      sum+='</div>';
+    }
     sum+='</div>';
   }
   sum+='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">'

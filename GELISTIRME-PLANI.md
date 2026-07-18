@@ -18,9 +18,10 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-17 · Kaynak: `app.js` + `panel.html` (fonksiyon/satır kanıtı)._
+_Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `panel.html`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-07-18:** 120 günlük motivasyon programının her gününe 3 bilimsel yansıma örneği eklendi (`reflectionExamples`). Terapi Odası'nda "Bugün nasıl yazabilirim?" kartı açılıp örnekleri gösteriyor; tıklanan örnek yansıma input'una kopyalanıyor. Panel'de aktif günün örnek yansımaları da gözlemciye yansıyor. Cache bump `20260718a` (`motivationProgramV2.js`) + `20260719a` (`app.js`).
 > - **2026-07-17:** Konum aç/kapa audit kaydı eklendi: `data.settings.locationEnabledAt/Reason` ve `locationDisabledAt/Reason`; panel "Gelişmiş İçgörüler → Konum" sekmesinde durum + aç/kapa zamanı/nedeni gösterilir. Böylece sonraki OFF olayının kullanıcı tarafından mı yoksa tarayıcı izin reddi nedeniyle mi gerçekleştiği net ayrılır. Cache bump `20260718h`.
 
 | # | Madde | Sürüm | Durum | Kanıt / Not |
@@ -53,8 +54,9 @@ _Son güncelleme: 2026-07-17 · Kaynak: `app.js` + `panel.html` (fonksiyon/satı
 | 24 | ☕ Kafein bilimsel takip + otomatik tik | 7 | ✅ | `CAFFEINE_TYPES` katalogu (türk/espresso/filtre/americano/cappuccino/latte/siyah çay/yeşil çay/enerji · mg/serving), `CAFFEINE_LIMITS` (standart 400/hassas 300/gebe 200), `caffeineTotalMg`/`caffeineResidueAt`/`caffeineCutoffTime`/`caffeineTimingOk`; Sağlık'ta premium kafein kartı (içecek chip'leri + günlük içim listesi + saat input + limit bar + tek sefer 200 mg / günlük limit / geç-kahve uyarıları + yatma saati kalıntı göstergesi + EFSA/FDA kaynak notu); `caffeineMode`/`targetBed` ayarları; 6-faktör `sleepReadiness` (süre 26/kalite 18/kafein 18/okuma 16/wind-down 14/ilaç 8); yeni **türetilmiş** "Günlük kafein limitini aşmadım" tiki (`caffeineOk`, elle tıklanmaz — miktar+saat sağlanınca otomatik yeşil); panel kafein satırı mg+kalıntı hesaplar (2026-07-10) |
 | 25 | 📸 Günün Fotoğrafı kartı | 3 | ✅ | `dailyPhotoCardHTML` + `fetchDailyPhoto`/`maybeFetchDailyPhoto` → Bugün sekmesinde premium "Günün Fotoğrafı" kartı; Wikimedia Commons `Commons:Picture_of_the_day` (ücretsiz, API key'siz, CORS destekli, doğa/hayvan ağırlıklı); `data.dailyPhoto` (gün, url, başlık, sanatçı, lisans, açıklama, kaynak, sayfa bağlantısı, çekilme tarihi); günlük cache + elle yenileme (`App.refreshDailyPhoto`); açık/koyu tema uyumlu; `styles.css` parlaklık/parıltı animasyonu; cache bump `20260713b` (2026-07-13) |
 | 26 | 🧂 Adaptif Magnezyum Danışmanı | 2 | ✅ | `calculateMgNudge` + `suggestMgForm` → döngü fazı (lüteal ağırlığı), semptomlar (kramp/sancı/baş ağrısı/şişkinlik/yorgunluk/duygusal), uyku (<6.5 saat), enerji/stres, 3 günlük trende göre adaptif skor; `magnesiumBannerHTML` Bugün, `magnesiumCardHTML` Sağlık, `magnesiumSettingsHTML` Ayarlar, `magnesiumFeedbackHTML` ertesi-gün etki geri bildirimi; güvenlik filtreleri (`kidneyDisease`, `tolerated`, `maxElementalMg≤350`); `data.settings.magnesium`, `data.days[].magnesium`, `data.magnesiumModel`; panel `magnesiumPanelCardHTML` bento + gün-detayı satırı; cache bump `20260713c` (2026-07-14) |
+| 27 | 🎯 Motivasyon programı: günlük yansıma örnekleri | 2 | ✅ | 120 gün × 3 örnek (`reflectionExamples`). Terapi Odası'nda "Bugün nasıl yazabilirim?" açılır kart + copy-to-input; panel aktif gün aynası; cache bump `20260718a`/`20260719a` (2026-07-18) |
 
-**Sayım:** ✅ 16 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 17 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
 
 ---
 

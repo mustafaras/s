@@ -3058,8 +3058,8 @@ App.closeRoom=function(){
 App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
-App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; refreshTargets(); commit('Doğum tarihi kaydedildi'); };
-App.setActivityLevel=function(level){ if(!data.settings.targets) data.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''}; data.settings.targets.activityLevel=level; refreshTargets(); commit('Aktivite seviyesi güncellendi'); };
+App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; refreshTargets(); commit('Doğum tarihi kaydedildi'); App.toast('Doğum tarihi kaydedildi'); render(); };
+App.setActivityLevel=function(level){ if(!data.settings.targets) data.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''}; data.settings.targets.activityLevel=level; refreshTargets(); commit('Aktivite seviyesi güncellendi'); App.toast('Aktivite seviyesi güncellendi'); render(); };
 
 // Rastgele, bir öncekiyle asla aynı olmayan indeks seç.
 function randNoteIdx(n,cur){ if(n<2) return 0; var t; do{ t=Math.floor(Math.random()*n); }while(t===cur); return t; }

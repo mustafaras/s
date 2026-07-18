@@ -662,6 +662,15 @@ function migrate(d){
   // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
   if(typeof d.settings.vitaminDForm!=='string') d.settings.vitaminDForm='D₃K₂ damla';
   if(typeof d.settings.vitaminDDose!=='string') d.settings.vitaminDDose='1 damla (D3 1000 IU + K2 100 mcg)';
+  // Kişiye özel kalori/protein hedefleri: boy/kilo/yaş/kadın → Mifflin-St Jeor + TDEE.
+  if(!d.settings.targets||typeof d.settings.targets!=='object') d.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''};
+  var t=d.settings.targets;
+  if(typeof t.calories!=='number'&&t.calories!==null) t.calories=null;
+  if(typeof t.protein!=='number'&&t.protein!==null) t.protein=null;
+  if(typeof t.bmr!=='number'&&t.bmr!==null) t.bmr=null;
+  if(typeof t.tdee!=='number'&&t.tdee!==null) t.tdee=null;
+  if(t.activityLevel!=='sedentary'&&t.activityLevel!=='light'&&t.activityLevel!=='moderate'&&t.activityLevel!=='active') t.activityLevel='moderate';
+  if(typeof t.lastCalculatedAt!=='string') t.lastCalculatedAt='';
   var ms=d.settings.magnesium;
   if(typeof ms.enabled!=='boolean') ms.enabled=false;
   if(typeof ms.onboardingDone!=='boolean') ms.onboardingDone=false;
@@ -904,7 +913,30 @@ function mealItemNutr(it){
 function mealNutr(rec,key){ var arr=(rec&&rec.mealItems&&rec.mealItems[key])||[]; var P=0,Cb=0,Ft=0,C=0,n=0; arr.forEach(function(it){ if(!it||!it.name||!String(it.name).trim())return; var nu=mealItemNutr(it); P+=nu.protein; Cb+=nu.carbs; Ft+=nu.fat; C+=nu.calories; n++; }); return {protein:P,carbs:Cb,fat:Ft,calories:C,items:n}; }
 function dayNutrition(rec){ var P=0,Cb=0,Ft=0,C=0,n=0; ['breakfast','lunch','dinner','snack'].forEach(function(k){ var m=mealNutr(rec,k); P+=m.protein; Cb+=m.carbs; Ft+=m.fat; C+=m.calories; n+=m.items; }); return {protein:Math.round(P), carbs:Math.round(Cb), fat:Math.round(Ft), calories:Math.round(C), items:n}; }
 function unitLabel(id){ for(var i=0;i<MEAL_UNITS.length;i++){ if(MEAL_UNITS[i].id===id) return MEAL_UNITS[i].label; } return id||'porsiyon'; }
-function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; var lp=document.getElementById('nutri-lp'); if(lp) lp.textContent=nu.protein+'g'; var cb=document.getElementById('nutri-carb'); if(cb) cb.textContent=nu.carbs+'g'; var ft=document.getElementById('nutri-fat'); if(ft) ft.textContent=nu.fat+'g'; var sb=document.getElementById('nutri-subtitle'); if(sb) sb.textContent=nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ'; var bc=document.getElementById('nutri-badgecal'); if(bc) bc.textContent=nu.calories; var mbar=document.getElementById('nutri-macrobar'); if(mbar) mbar.innerHTML=macroBarHTML(nu); var ni=document.getElementById('nutri-insight'); if(ni) ni.innerHTML=nutriInsightHTML(day,nu); }
+function lastWeightKg(){ var w=(data.body&&Array.isArray(data.body.weights)&&data.body.weights.length)?data.body.weights[data.body.weights.length-1].kg:null; return (typeof w==='number'&&!isNaN(w))?w:null; }
+function activityFactor(level){ return ({sedentary:1.2,light:1.375,moderate:1.55,active:1.725}[level])||1.55; }
+function activityLabel(level){ return {sedentary:'Hareketsiz (masa başı)',light:'Hafif aktif',moderate:'Orta aktif',active:'Çok aktif'}[level]||'Orta aktif'; }
+function calcTargets(){
+  var h=(data.body&&typeof data.body.heightCm==='number'&&!isNaN(data.body.heightCm))?data.body.heightCm:null;
+  var w=lastWeightKg();
+  var age=calcAge(data.settings.birthDate);
+  if(h==null||w==null||age==null) return null;
+  var bmr=10*w+6.25*h-5*age-161; // Mifflin-St Jeor (kadın)
+  var factor=activityFactor(data.settings.targets.activityLevel);
+  var tdee=Math.round(bmr*factor);
+  var protein=Math.round(w*1.8);
+  var calories=Math.max(1200,Math.min(3200,tdee)); // güvenlik sınırları
+  return {bmr:Math.round(bmr),tdee:tdee,protein:protein,calories:calories};
+}
+function refreshTargets(){
+  var t=calcTargets();
+  var st=data.settings.targets;
+  if(t){ st.bmr=t.bmr; st.tdee=t.tdee; st.protein=t.protein; st.calories=t.calories; st.lastCalculatedAt=new Date().toISOString(); }
+  return t;
+}
+function proteinGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.protein==='number'&&!isNaN(t.protein))?t.protein:PROTEIN_GOAL; }
+function calGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.calories==='number'&&!isNaN(t.calories))?t.calories:CAL_GOAL; }
+function updateNutriLive(day){ var nu=dayNutrition(day); var pg=proteinGoal(),cg=calGoal(); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/pg*100))+'%'; var lp=document.getElementById('nutri-lp'); if(lp) lp.textContent=nu.protein+'g'; var cb=document.getElementById('nutri-carb'); if(cb) cb.textContent=nu.carbs+'g'; var ft=document.getElementById('nutri-fat'); if(ft) ft.textContent=nu.fat+'g'; var sb=document.getElementById('nutri-subtitle'); if(sb) sb.textContent=nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ'; var bc=document.getElementById('nutri-badgecal'); if(bc) bc.textContent=nu.calories; var mbar=document.getElementById('nutri-macrobar'); if(mbar) mbar.innerHTML=macroBarHTML(nu); var ni=document.getElementById('nutri-insight'); if(ni) ni.innerHTML=nutriInsightHTML(day,nu); }
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
@@ -3026,7 +3058,8 @@ App.closeRoom=function(){
 App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
-App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; commit('Doğum tarihi kaydedildi'); App.toast('Doğum tarihi kaydedildi'); render(); };
+App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; refreshTargets(); commit('Doğum tarihi kaydedildi'); };
+App.setActivityLevel=function(level){ if(!data.settings.targets) data.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''}; data.settings.targets.activityLevel=level; refreshTargets(); commit('Aktivite seviyesi güncellendi'); };
 
 // Rastgele, bir öncekiyle asla aynı olmayan indeks seç.
 function randNoteIdx(n,cur){ if(n<2) return 0; var t; do{ t=Math.floor(Math.random()*n); }while(t===cur); return t; }
@@ -3639,6 +3672,7 @@ function macroBarHTML(nu){
 // (öneri) olarak geçer; protein/makro/glisemik okuması gerçek veriden hesaplanır.
 function nutriInsightHTML(rec,nu){
   var items=nu.items||0;
+  var pg=proteinGoal();
   var wrap=function(inner){ return '<div style="background:linear-gradient(160deg,rgba(201,184,255,0.10),transparent);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:11px;">'
     +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('brain',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--accent);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
   var row=function(ic,col,title,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;">'
@@ -3646,8 +3680,8 @@ function nutriInsightHTML(rec,nu){
     +'<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:800;color:var(--text);line-height:1.3;">'+title+'</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:1px;">'+text+'</div></div></div>'; };
   if(items===0) return wrap(row('utensils','var(--accent)','Öğünlerini ekle, birlikte bakalım','Yediklerini yazınca protein, makro dengesi ve kan şekeri açısından kısa bilimsel bir okuma çıkarırım. Ölçmek, farkındalığın ilk adımıdır.'));
   var inner='';
-  if(nu.protein>=PROTEIN_GOAL) inner+=row('activity','#3F8A4F','Protein hedefi tuttu · '+nu.protein+'g','Yeterli protein tokluk hormonlarını (GLP-1, PYY) artırır, kası korur ve kan şekerini dengeler — tatlı isteğini azaltan en güçlü kaldıraç.');
-  else inner+=row('activity','#E9899F','Protein '+(PROTEIN_GOAL-nu.protein)+'g eksik · '+nu.protein+'/'+PROTEIN_GOAL+'g','Her ana öğüne ~25-30g protein hedefle; tokluğu uzatır, kas sentezini destekler ve öğün sonrası tatlı krizini yatıştırır.');
+  if(nu.protein>=pg) inner+=row('activity','#3F8A4F','Protein hedefi tuttu · '+nu.protein+'g','Yeterli protein tokluk hormonlarını (GLP-1, PYY) artırır, kası korur ve kan şekerini dengeler — tatlı isteğini azaltan en güçlü kaldıraç.');
+  else inner+=row('activity','#E9899F','Protein '+(pg-nu.protein)+'g eksik · '+nu.protein+'/'+pg+'g','Her ana öğüne ~25-30g protein hedefle; tokluğu uzatır, kas sentezini destekler ve öğün sonrası tatlı krizini yatıştırır.');
   var tot=nu.protein*4+nu.carbs*4+nu.fat*9;
   var pP=tot>0?Math.round(nu.protein*4/tot*100):0, cP=tot>0?Math.round(nu.carbs*4/tot*100):0, fP=tot>0?Math.round(nu.fat*9/tot*100):0;
   var balOk=(pP>=20&&cP<=60&&fP<=40);
@@ -3658,20 +3692,21 @@ function nutriInsightHTML(rec,nu){
 }
 function beslenmeCardHTML(rec){
   var nu=dayNutrition(rec);
+  var pg=proteinGoal(), cg=calGoal();
   var mi=(rec&&rec.mealItems)?rec.mealItems:emptyMealItems();
   var hasName=function(k){ return Array.isArray(mi[k])&&mi[k].some(function(it){return it&&it.name&&String(it.name).trim();}); };
   var incomplete=!(hasName('breakfast')&&hasName('lunch')&&hasName('dinner'));
   var open=cardOpen('beslenme', incomplete);
-  var pPct=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100));
+  var pPct=Math.min(100,Math.round(nu.protein/pg*100));
   var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:9.5px;color:var(--faint);">kcal</div></div>';
   var subtitle='<span id="nutri-subtitle">'+nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ</span>';
   var b='';
   // Makro özeti
   b+='<div style="background:var(--icon);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px;">';
   b+='<div style="display:flex;align-items:flex-end;gap:12px;">';
-  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11.5px;color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:11.5px;color:var(--faint);">/ '+PROTEIN_GOAL+'g</span></div>';
+  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11.5px;color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:11.5px;color:var(--faint);">/ '+pg+'g</span></div>';
   b+='<div style="height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:5px;"><div id="nutri-bar" style="height:100%;width:'+pPct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
-  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:10px;color:var(--faint);margin-top:2px;">/ '+CAL_GOAL+' kcal</div></div>';
+  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:10px;color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
   b+='</div>';
   b+='<div id="nutri-macrobar">'+macroBarHTML(nu)+'</div>';
   b+='<div style="display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;">';
@@ -5179,7 +5214,7 @@ function corrInsights(){
   if(gm.length>=3&&bm.length>=3&&gavg(gm)-gavg(bm)>=0.4) out.push([icon('moon',18),'7+ saat uyuduğun günlerde modun belirgin daha iyi. Uyku senin gizli süper gücün.']);
   var ws=[],ns=[]; days.forEach(function(o){ var sos=Number(o.rec.cravingSOSCount||0); ((o.rec.habits&&o.rec.habits.walked20)?ws:ns).push(sos); });
   if(ws.length>=3&&ns.length>=3&&gavg(ns)-gavg(ws)>=0.3) out.push([icon('footprints',18),'Yürüdüğün günlerde tatlı krizi sayın daha düşük. Ayaklar çalışınca tatlı lobisi sus pus.']);
-  var hp=[],lp=[]; days.forEach(function(o){ var pr=dayNutrition(o.rec).protein,sos=Number(o.rec.cravingSOSCount||0); if(pr>=PROTEIN_GOAL*0.8) hp.push(sos); else if(pr>0) lp.push(sos); });
+  var hp=[],lp=[]; var pg=proteinGoal(); days.forEach(function(o){ var pr=dayNutrition(o.rec).protein,sos=Number(o.rec.cravingSOSCount||0); if(pr>=pg*0.8) hp.push(sos); else if(pr>0) lp.push(sos); });
   if(hp.length>=3&&lp.length>=3&&gavg(lp)-gavg(hp)>=0.3) out.push([icon('egg',18),'Proteini tutturduğun günlerde kriz daha az. Tokluk ekibi sahada.']);
   var he=[],le=[]; days.forEach(function(o){ var w=(typeof o.rec.water==='number')?o.rec.water:null,e=o.rec.energy; if(w==null||e==null) return; (w>=WATER_GOAL?he:le).push(Number(e)); });
   if(he.length>=3&&le.length>=3&&gavg(he)-gavg(le)>=0.3) out.push([icon('droplet',18),'Su hedefini tutturduğun günlerde enerjin daha yüksek. Beden susuz çalışmıyor.']);
@@ -5222,15 +5257,15 @@ function consistencyMomentumCard(){
 }
 function badgesGrid(){
   var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
-  var waterGoal=0,proteinGoal=0,perfect=0,readingDays=0;
-  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=PROTEIN_GOAL) proteinGoal++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0) readingDays++; });
+  var waterGoal=0,proteinGoalMet=0,perfect=0,readingDays=0; var pg=proteinGoal();
+  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=pg) proteinGoalMet++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0) readingDays++; });
   var badges=[
     {e:icon('flame',20),l:'7 gün seri',done:best>=7,sub:best>=7?'tamam':best+'/7'},
     {e:icon('trophy',20),l:'30 gün seri',done:best>=30,sub:best>=30?'tamam':best+'/30'},
     {e:icon('crown',20),l:'100 gün seri',done:best>=100,sub:best>=100?'tamam':best+'/100'},
     {e:icon('moon',20),l:'7 gece ilaçsız',done:medStreak>=7,sub:medStreak>=7?'tamam':medStreak+'/7'},
     {e:icon('droplet',20),l:'Su hedefi',done:waterGoal>=1,sub:waterGoal>0?waterGoal+' gün':'henüz yok'},
-    {e:icon('egg',20),l:'Protein hedefi',done:proteinGoal>=1,sub:proteinGoal>0?proteinGoal+' gün':'henüz yok'},
+    {e:icon('egg',20),l:'Protein hedefi',done:proteinGoalMet>=1,sub:proteinGoalMet>0?proteinGoalMet+' gün':'henüz yok'},
     {e:icon('book-open',20),l:'Okuma tutkunu',done:readingDays>=7,sub:readingDays>=7?'tamam':readingDays+'/7'},
     {e:icon('sparkles',20),l:'7/7 mükemmel',done:perfect>=1,sub:perfect>0?perfect+' gün':'henüz yok'}
   ];
@@ -5610,8 +5645,24 @@ function ayarlarHTML(){
   h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Son kilo</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+(_lastW?esc(_lastW+' kg'):'<span style="color:var(--faint);">—</span>')+'</div></div>';
   h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Yaş</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+profileAgeLabel(data.settings.birthDate)+'</div></div>';
   h+='</div>';
-  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin, ileride kişiye özel kalori ve protein hedefleri hesaplanırken kullanılacak. Şu an sadece kaydedilir.</div>';
+  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin, boyun ve son kilonla birlikte kişiye özel kalori ve protein hedefleri hesaplanırken kullanılır. Şu anlık eksikse güvenli varsayılan değerler geçerli.</div>';
   h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Doğum tarihi</label><input type="date" value="'+esc(data.settings.birthDate||'')+'" onchange="App.setBirthDate(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;width:100%;"></div>';
+  var actLevels=[{id:'sedentary',label:'Hareketsiz'},{id:'light',label:'Hafif'},{id:'moderate',label:'Orta'},{id:'active',label:'Çok'}];
+  var curLevel=(data.settings.targets&&data.settings.targets.activityLevel)||'moderate';
+  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Günlük aktivite seviyesi</label><div style="display:flex;gap:6px;">';
+  actLevels.forEach(function(l){ var on=l.id===curLevel; h+='<button onclick="App.setActivityLevel(\''+l.id+'\')" style="flex:1;padding:10px 4px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:700;border:'+(on?'1px solid var(--accent)':'1px solid var(--card-bd)')+';background:'+(on?'linear-gradient(135deg,#FFE8A3,#E9AFC1)':'var(--card)')+';color:'+(on?'#5A2E2A':'var(--text)')+';text-align:center;">'+esc(l.label)+'</button>'; });
+  h+='</div></div>';
+  var targets=data.settings.targets||{};
+  var tOk=(typeof targets.calories==='number'&&typeof targets.protein==='number');
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;">';
+  h+='<div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;">'+icon('target',13)+' Kişiselleştirilmiş hedefler</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
+  h+='<div style="text-align:center;"><div style="font-size:10px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;'+(tOk?'color:var(--text);':'color:var(--faint);')+'">'+(targets.calories!=null?targets.calories:'—')+' kcal</div></div>';
+  h+='<div style="text-align:center;"><div style="font-size:10px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;'+(tOk?'color:var(--text);':'color:var(--faint);')+'">'+(targets.protein!=null?targets.protein:'—')+' g</div></div>';
+  h+='</div>';
+  if(tOk){ h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">BMR '+targets.bmr+' kcal · TDEE '+targets.tdee+' kcal · '+activityLabel(curLevel)+'</div>'; }
+  else { h+='<div style="font-size:11px;color:var(--warn);line-height:1.4;">Hedefler hesaplanamadı; doğum tarihi, boy ve kilo tamamlandığında kişiselleşecek. Şimdilik varsayılan değerler kullanılıyor.</div>'; }
+  h+='</div>';
   h+='</div>';
   // appearance
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
@@ -7838,7 +7889,7 @@ function lunaContext(){
   lines.push('--- Bugün ---');
   lines.push('Yedikleri: '+mealStr);
   lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+htToday()+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
-  if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+PROTEIN_GOAL+' g / '+CAL_GOAL+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
+  if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+proteinGoal()+' g / '+calGoal()+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
   var mfs=medFreeStreak(); if(mfs>0) lines.push('İlaçsız gece serisi: '+mfs+' gece');
   if(rec&&rec.cravingSOSCount){ var _ck=[]; if(rec.craving10MinDone) _ck.push('tatlı'); if(rec.foodCravingDone) _ck.push('yemek'); if(rec.coffeeCravingDone) _ck.push('kahve'); lines.push('Kriz yönetimi (SOS): '+rec.cravingSOSCount+' kez'+(_ck.length?(' · '+_ck.join(', ')):'')); }
   if(rec&&Array.isArray(rec.cravingTriggers)&&rec.cravingTriggers.length){ var tgm={tired:'yorgunluk',bored:'sıkkınlık',hungry:'gerçek açlık',stress:'stres',habit:'alışkanlık',emotional:'duygusal açlık',lowenergy:'enerji dibi',social:'keyif/sosyal'}; lines.push('Kriz tetikleyicileri: '+rec.cravingTriggers.map(function(t){return tgm[t.trigger]||t.trigger;}).join(', ')); }

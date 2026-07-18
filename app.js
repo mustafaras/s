@@ -149,7 +149,7 @@ var HABITS=[
   {key:'walked20',icon:icon('footprints',22),title:'En az 4.500 adım yürüdüm',sub:'Günlük 4.500 adım, bedenine tatlı bir eşik.',msg:'Yürüyüş tamam. Metabolizma "bunu not ettim" dedi.'},
   {key:'protein',icon:icon('egg',22),title:'2 ana öğünde protein vardı',sub:'Tokluk ekibi göreve başladı.',msg:'Protein geldi, krizlerin beli hafif büküldü.'},
   {key:'water',icon:icon('droplet',22),title:'Su içmeyi ihmal etmedim',sub:'Küçük şey, büyük fark.',msg:'Su tamam. Cilt bariyeri sessizce teşekkür ediyor.'},
-  {key:'vitaminD',icon:icon('sun',22),title:'D vitaminimi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D vitamini tamam. Güneş desteği kayda geçti.'},
+  {key:'vitaminD',icon:icon('sun',22),title:'D₃K₂ damla takviyemi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D₃K₂ damla tamam. Güneş desteği kayda geçti.'},
   {key:'sleepReg',icon:icon('bed',22),title:'Yeterli uyudum (7,5+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor.',since:'2026-06-28'},
   {key:'journaled',icon:icon('pen-line',22),title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı.',since:'2026-07-03'},
   {key:'mediaFed',icon:icon('sparkles',22),title:'Zihnimi besledim',sub:'Okudum, izledim, dinledim ya da öğrendim.',msg:'Zihnine iyi bir şey kattın — küçük ama besleyici.',since:'2026-07-09'},
@@ -657,6 +657,9 @@ function migrate(d){
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
   // Magnezyum Danışmanı — kullanıcı profili + model + günlük kayıt.
   if(!d.settings.magnesium||typeof d.settings.magnesium!=='object') d.settings.magnesium={enabled:false,onboardingDone:false,preferredForm:'',tolerated:true,kidneyDisease:false,lastNudgeDate:null,dismissedUntil:null};
+  // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
+  if(typeof d.settings.vitaminDForm!=='string') d.settings.vitaminDForm='D₃K₂ damla';
+  if(typeof d.settings.vitaminDDose!=='string') d.settings.vitaminDDose='1 damla (D3 1000 IU + K2 100 mcg)';
   var ms=d.settings.magnesium;
   if(typeof ms.enabled!=='boolean') ms.enabled=false;
   if(typeof ms.onboardingDone!=='boolean') ms.onboardingDone=false;
@@ -2050,7 +2053,7 @@ function interp(sweet,walk,evening){
 }
 function weekBlock(w,days){
   var slice=days.slice(w*7,w*7+7);
-  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D vitamini'],['sleepReg','Uyku düzeni'],['journaled','Günlük notu'],['freshAir','Açık hava'],['selfKind','Kendime iyi davrandım']];
+  var defs=[['sweetManaged','Tatlı kontrolü'],['eveningControl','Akşam kontrolü'],['walked20','Yürüyüş'],['protein','Protein'],['water','Su'],['vitaminD','D₃K₂ damla'],['sleepReg','Uyku düzeni'],['journaled','Günlük notu'],['freshAir','Açık hava'],['selfKind','Kendime iyi davrandım']];
   var cnt=function(k){ return slice.reduce(function(a,o){return a+(o.rec&&o.rec.habits[k]?1:0);},0); };
   var rows=defs.map(function(d){ return {label:d[1],val:cnt(d[0])+'/7'}; });
   var totalC=slice.reduce(function(a,o){return a+countRec(o.rec);},0);
@@ -3052,7 +3055,7 @@ function reportHTML(){
   h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
   h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
   h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Özet</div>';
-  var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['D vitamini günü',st.tot.vitaminD],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
+  var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['D₃K₂ damla günü',st.tot.vitaminD],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;">';
   stats.forEach(function(s){ h+='<div style="flex:1 1 30%;min-width:150px;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:12px 14px;"><div style="font-size:12px;color:#9C8C92;">'+esc(s[0])+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+esc(s[1])+'</div></div>'; });
   h+='</div>';
@@ -3813,6 +3816,12 @@ function habitsCardHTML(rec){
     if(hb.key==='magnesium'){
       var mg=(rec&&rec.magnesium)||{};
       sub=(mg.taken)?('Form: '+esc(mg.form||'glisinat')+' · '+esc((mg.mg||200)+' mg')):'Destek gününü tamamlamak için dokun.';
+    }
+    if(hb.key==='vitaminD'){
+      var vdForm=esc((data.settings&&data.settings.vitaminDForm)||'D₃K₂ damla');
+      var vdDose=esc((data.settings&&data.settings.vitaminDDose)||'1 damla (D3 1000 IU + K2 100 mcg)');
+      var vdStart='2026-07-20', today=todayStr();
+      sub=(today<vdStart)?('20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla’ya geçiyoruz.'):('Form: '+vdForm+' · '+vdDose);
     }
     b+=habitRowHTML({key:hb.key,title:hb.title,sub:sub,msg:hb.msg,icon:hb.icon,derived:derived,prog:prog,done:done,pulsing:pulsing,accent:accent,locked:locked,warn:warn,onclick:'App.toggleHabit(\''+hb.key+'\')'});
   });
@@ -4627,7 +4636,7 @@ function heroStatsHTML(rec){
   return h;
 }
 // Kısa tik etiketleri (hero "en güçlü/zayıf" istatistiği için).
-var SHORT_HABIT={sweetManaged:'Tatlı',foodManaged:'Yemek',coffeeManaged:'Kahve',eveningControl:'Akşam',walked20:'Yürüyüş',protein:'Protein',water:'Su',vitaminD:'D vit.',sleepReg:'Uyku',journaled:'Not',mediaFed:'Zihin',freshAir:'Açık hava',selfKind:'Öz-şefkat'};
+var SHORT_HABIT={sweetManaged:'Tatlı',foodManaged:'Yemek',coffeeManaged:'Kahve',eveningControl:'Akşam',walked20:'Yürüyüş',protein:'Protein',water:'Su',vitaminD:'D₃K₂ damla',sleepReg:'Uyku',journaled:'Not',mediaFed:'Zihin',freshAir:'Açık hava',selfKind:'Öz-şefkat'};
 // ── Premium istatistik şeridi: tek çerçevede seri · 7 günlük ritim · mod eğilimi
 // + son 14 günün en güçlü/destek isteyen tiki. Fazla kutu yerine tek panel + iç ayraçlar.
 function heroPremiumStatsHTML(viewDate){
@@ -5531,7 +5540,7 @@ function raporHTML(){
   }
   h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Minik Kurallar '+icon('leaf',20)+'</div></div>';
   h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
-  [[icon('leaf',17),'Aç kalmak yok.'],[icon('cookie',17),'Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],[icon('moon',17),'Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],[icon('egg',17),'Her öğüne protein eklemek krizleri sakinleştirir.'],[icon('sun',17),'D vitamini de küçük ritmin bir parçası.'],[icon('dumbbell',17),'Bir gün zor geçti diye sistem bitmez.'],[icon('footprints',17),'Yürüyüş kısa da olsa sayılır.'],[icon('heart',17),'Kendine kötü konuşmak yok.'],[icon('sun',17),'Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span style="display:inline-flex;flex-shrink:0;">'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
+  [[icon('leaf',17),'Aç kalmak yok.'],[icon('cookie',17),'Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],[icon('moon',17),'Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],[icon('egg',17),'Her öğüne protein eklemek krizleri sakinleştirir.'],[icon('sun',17),'D₃K₂ damla da küçük ritmin bir parçası.'],[icon('dumbbell',17),'Bir gün zor geçti diye sistem bitmez.'],[icon('footprints',17),'Yürüyüş kısa da olsa sayılır.'],[icon('heart',17),'Kendine kötü konuşmak yok.'],[icon('sun',17),'Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span style="display:inline-flex;flex-shrink:0;">'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
   h+='</div>';
   h+='<button onclick="App.printReport()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6B4A3A,#A07A52);box-shadow:0 10px 22px rgba(107,74,58,0.3);margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;">Rapor Oluştur / PDF '+icon('file-text',16)+'</button>';
   h+='</div>';
@@ -5572,6 +5581,13 @@ function ayarlarHTML(){
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
   h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
   h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
+  // D vitamini takviyesi — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';
+  var vdForm=esc((data.settings&&data.settings.vitaminDForm)||'D₃K₂ damla');
+  var vdDose=esc((data.settings&&data.settings.vitaminDDose)||'1 damla (D3 1000 IU + K2 100 mcg)');
+  h+=_srow('pill','Form',vdForm);
+  h+=_srow('droplet','Doz',vdDose);
+  h+='</div>';
   // Gizlenen kartlar — yalnızca kullanıcı bir kartı sakladıysa görünür (kilitlenme yok).
   var sgh=data.settings||{};
   if(sgh.hideLocationCard||sgh.hideRepoBanner){

@@ -632,6 +632,8 @@ function migrate(d){
   d.music.items=d.music.items.map(normTrack).filter(Boolean);
   // Vücut ölçüleri (haftalık kilo + tek-seferlik boy). Yeni alan — eski kayıtlara backfill.
   if(!d.body||typeof d.body!=='object') d.body={heightCm:null,heightSetAt:null,weights:[]};
+  // Doğum tarihi: metabolik profil için yaş hesaplaması; cinsiyet kadın olarak sabit.
+  if(typeof d.settings.birthDate!=='string') d.settings.birthDate='';
   if(typeof d.body.heightCm!=='number'||isNaN(d.body.heightCm)) d.body.heightCm=null;
   if(typeof d.body.heightSetAt!=='string') d.body.heightSetAt=(d.body.heightSetAt||null)&&String(d.body.heightSetAt);
   if(d.body.heightSetAt===undefined) d.body.heightSetAt=null;
@@ -790,73 +792,91 @@ function emptyWindDown(){ return {steps:{light:false,breath:false,dump:false,coo
 // Sıra önemlidir (ilk anahtar-eşleşmesi kazanır): özel isimler genel isimlerden önce.
 var FOOD_DB=[
   // yumurta & süt ürünleri
-  {k:['haşlanmış yumurta','omlet','menemen','yumurta'],p:13,cb:1.1,ft:11,piece:50,plate:150},
-  {k:['süzme yoğurt','labne'],p:9,cb:4,ft:5,piece:150,plate:200},
-  {k:['yoğurt','yogurt','cacık'],p:5,cb:5,ft:3.3,piece:150,plate:200},
-  {k:['ayran'],p:1.7,cb:3,ft:1.5,piece:200,plate:250},
-  {k:['kefir'],p:3.3,cb:4,ft:1,piece:200,plate:250},
-  {k:['süt'],p:3.4,cb:5,ft:3.4,piece:200,plate:200},
-  {k:['beyaz peynir','kaşar','peynir'],p:18,cb:2,ft:23,piece:30,plate:80},
-  {k:['lor','çökelek'],p:11,cb:3,ft:5,piece:30,plate:120},
+  {k:['haşlanmış yumurta','omlet','menemen','yumurta'],p:13,cb:1.1,ft:11,piece:50,plate:150,units:{porsiyon:100,adet:50,kasik:25}},
+  {k:['süzme yoğurt','labne'],p:9,cb:4,ft:5,piece:150,plate:200,units:{kase:150,kasik:25,porsiyon:150}},
+  {k:['yoğurt','yogurt','cacık'],p:5,cb:5,ft:3.3,piece:150,plate:200,units:{kase:200,bardak:200,'su-bardagi':200,kasik:25,porsiyon:150}},
+  {k:['ayran'],p:1.7,cb:3,ft:1.5,piece:200,plate:250,units:{bardak:200,kase:250,'su-bardagi':200}},
+  {k:['kefir'],p:3.3,cb:4,ft:1,piece:200,plate:250,units:{bardak:200,kase:200}},
+  {k:['süt'],p:3.4,cb:5,ft:3.4,piece:200,plate:200,units:{bardak:200,'cay-bardagi':100,'su-bardagi':200}},
+  {k:['beyaz peynir','kaşar','peynir'],p:18,cb:2,ft:23,piece:30,plate:80,units:{dilim:30,kase:80,kasik:20,porsiyon:80}},
+  {k:['lor','çökelek'],p:11,cb:3,ft:5,piece:30,plate:120,units:{kase:120,kasik:25,porsiyon:120}},
   // et, tavuk, balık
-  {k:['tavuk göğsü','tavuk göğ','göğüs'],p:31,cb:0,ft:3.6,piece:120,plate:150},
-  {k:['tavuk','piliç','hindi'],p:25,cb:0,ft:9,piece:120,plate:150},
-  {k:['köfte','dana','biftek','kırmızı et','kebap','kavurma','et '],p:26,cb:1,ft:17,piece:30,plate:150},
-  {k:['kuzu','pirzola'],p:25,cb:0,ft:21,piece:40,plate:150},
-  {k:['sucuk','salam','sosis','pastırma'],p:20,cb:2,ft:30,piece:20,plate:60},
-  {k:['ton balığı','ton'],p:24,cb:0,ft:6,piece:80,plate:120},
-  {k:['somon'],p:20,cb:0,ft:13,piece:120,plate:150},
-  {k:['levrek','çipura','hamsi','uskumru','balık'],p:22,cb:0,ft:8,piece:120,plate:150},
+  {k:['tavuk göğsü','tavuk göğ','göğüs'],p:31,cb:0,ft:3.6,piece:120,plate:150,units:{porsiyon:150,kase:120}},
+  {k:['tavuk','piliç','hindi'],p:25,cb:0,ft:9,piece:120,plate:150,units:{porsiyon:150,kase:120}},
+  {k:['köfte','dana','biftek','kırmızı et','kebap','kavurma','et '],p:26,cb:1,ft:17,piece:30,plate:150,units:{adet:30,porsiyon:150,kase:150}},
+  {k:['kuzu','pirzola'],p:25,cb:0,ft:21,piece:40,plate:150,units:{porsiyon:150,adet:40}},
+  {k:['sucuk','salam','sosis','pastırma'],p:20,cb:2,ft:30,piece:20,plate:60,units:{adet:20,dilim:15,porsiyon:60}},
+  {k:['ton balığı','ton'],p:24,cb:0,ft:6,piece:80,plate:120,units:{paket:80,kase:80,porsiyon:120}},
+  {k:['somon'],p:20,cb:0,ft:13,piece:120,plate:150,units:{porsiyon:150,dilim:120,kase:120}},
+  {k:['levrek','çipura','hamsi','uskumru','balık'],p:22,cb:0,ft:8,piece:120,plate:150,units:{porsiyon:150,adet:120,dilim:120}},
   // baklagiller & tahıllar
-  {k:['mercimek çorbası','mercimek'],p:9,cb:20,ft:0.4,piece:30,plate:200},
-  {k:['nohut','humus'],p:9,cb:27,ft:6,piece:30,plate:180},
-  {k:['fasulye','barbunya','baklagil','kuru fasulye'],p:9,cb:22,ft:0.5,piece:30,plate:200},
-  {k:['bulgur','pilav','pirinç'],p:3,cb:28,ft:0.5,piece:30,plate:180},
-  {k:['makarna','erişte','kuskus','spagetti'],p:5,cb:25,ft:1.1,piece:30,plate:200},
-  {k:['yulaf','granola','müsli'],p:13,cb:60,ft:7,piece:40,plate:60},
-  {k:['bulgur pilavı'],p:3,cb:28,ft:1,piece:30,plate:180},
+  {k:['mercimek çorbası','mercimek'],p:9,cb:20,ft:0.4,piece:30,plate:200,units:{kase:200,tabak:200,kasik:30,porsiyon:200}},
+  {k:['nohut','humus'],p:9,cb:27,ft:6,piece:30,plate:180,units:{kase:180,tabak:180,kasik:30,porsiyon:180}},
+  {k:['fasulye','barbunya','baklagil','kuru fasulye'],p:9,cb:22,ft:0.5,piece:30,plate:200,units:{kase:200,tabak:200,kasik:30,porsiyon:200}},
+  {k:['bulgur','pilav','pirinç'],p:3,cb:28,ft:0.5,piece:30,plate:180,units:{kase:180,tabak:200,kasik:25,porsiyon:180}},
+  {k:['makarna','erişte','kuskus','spagetti'],p:5,cb:25,ft:1.1,piece:30,plate:200,units:{kase:200,tabak:200,kasik:25,porsiyon:200}},
+  {k:['yulaf','granola','müsli'],p:13,cb:60,ft:7,piece:40,plate:60,units:{kase:40,kasik:15,bardak:40,porsiyon:40}},
+  {k:['bulgur pilavı'],p:3,cb:28,ft:1,piece:30,plate:180,units:{kase:180,tabak:200,kasik:25,porsiyon:180}},
   // ekmek & hamur işleri
-  {k:['tam buğday ekmek','tam buğday'],p:9,cb:43,ft:3,piece:28,plate:60},
-  {k:['ekmek','tost'],p:8,cb:49,ft:1.5,piece:28,plate:56},
-  {k:['simit'],p:9,cb:52,ft:6,piece:100,plate:100},
-  {k:['poğaça','açma'],p:7,cb:42,ft:16,piece:70,plate:70},
-  {k:['börek'],p:8,cb:35,ft:16,piece:80,plate:120},
-  {k:['pide','lahmacun'],p:10,cb:35,ft:8,piece:150,plate:200},
-  {k:['pizza'],p:11,cb:30,ft:10,piece:120,plate:250},
-  {k:['döner','dürüm'],p:15,cb:20,ft:15,piece:150,plate:250},
-  {k:['mantı'],p:8,cb:30,ft:8,piece:60,plate:220},
-  {k:['hamburger'],p:12,cb:22,ft:14,piece:200,plate:220},
+  {k:['tam buğday ekmek','tam buğday'],p:9,cb:43,ft:3,piece:28,plate:60,units:{dilim:28,porsiyon:56}},
+  {k:['ekmek','tost'],p:8,cb:49,ft:1.5,piece:28,plate:56,units:{dilim:28,porsiyon:56}},
+  {k:['simit'],p:9,cb:52,ft:6,piece:100,plate:100,units:{adet:100,'yarim':50,porsiyon:100}},
+  {k:['poğaça','açma'],p:7,cb:42,ft:16,piece:70,plate:70,units:{adet:70,porsiyon:70}},
+  {k:['börek'],p:8,cb:35,ft:16,piece:80,plate:120,units:{dilim:80,porsiyon:120,adet:80}},
+  {k:['pide','lahmacun'],p:10,cb:35,ft:8,piece:150,plate:200,units:{adet:150,dilim:100,porsiyon:150}},
+  {k:['pizza'],p:11,cb:30,ft:10,piece:120,plate:250,units:{dilim:120,adet:120,porsiyon:250}},
+  {k:['döner','dürüm'],p:15,cb:20,ft:15,piece:150,plate:250,units:{adet:150,porsiyon:200}},
+  {k:['mantı'],p:8,cb:30,ft:8,piece:60,plate:220,units:{kase:220,porsiyon:220}},
+  {k:['hamburger'],p:12,cb:22,ft:14,piece:200,plate:220,units:{adet:200,porsiyon:200}},
   // sebze & çorba
-  {k:['salata','marul','domates','salatalık','brokoli','ıspanak','sebze','biber','kabak','patlıcan'],p:2,cb:5,ft:0.3,piece:50,plate:150},
-  {k:['zeytinyağlı','dolma','sarma'],p:3,cb:15,ft:8,piece:40,plate:180},
-  {k:['çorba'],p:3,cb:7,ft:2,piece:200,plate:250},
-  {k:['patates kızartması','kızartma','cips'],p:3,cb:35,ft:15,piece:100,plate:150},
-  {k:['patates','haşlama'],p:2,cb:17,ft:0.2,piece:120,plate:180},
+  {k:['salata','marul','domates','salatalık','brokoli','ıspanak','sebze','biber','kabak','patlıcan'],p:2,cb:5,ft:0.3,piece:50,plate:150,units:{tabak:150,kase:100,porsiyon:150}},
+  {k:['zeytinyağlı','dolma','sarma'],p:3,cb:15,ft:8,piece:40,plate:180,units:{tabak:180,kase:150,porsiyon:180}},
+  {k:['çorba'],p:3,cb:7,ft:2,piece:200,plate:250,units:{kase:250,bardak:200,'su-bardagi':200,porsiyon:250}},
+  {k:['patates kızartması','kızartma','cips'],p:3,cb:35,ft:15,piece:100,plate:150,units:{porsiyon:150,kase:100,avuc:30}},
+  {k:['patates','haşlama'],p:2,cb:17,ft:0.2,piece:120,plate:180,units:{adet:120,kase:180,porsiyon:180}},
   // meyve
-  {k:['muz'],p:1.1,cb:23,ft:0.3,piece:120,plate:150},
-  {k:['hurma'],p:2,cb:75,ft:0.4,piece:8,plate:60},
-  {k:['kuru meyve','kuru üzüm','kuru kayısı'],p:3,cb:65,ft:0.5,piece:10,plate:50},
-  {k:['elma','armut','portakal','mandalina','şeftali','erik','kayısı'],p:0.6,cb:13,ft:0.2,piece:150,plate:180},
-  {k:['çilek','üzüm','kiraz','karpuz','kavun','meyve'],p:0.8,cb:12,ft:0.3,piece:100,plate:150},
-  {k:['avokado'],p:2,cb:9,ft:15,piece:150,plate:150},
+  {k:['muz'],p:1.1,cb:23,ft:0.3,piece:120,plate:150,units:{adet:120,porsiyon:120}},
+  {k:['hurma'],p:2,cb:75,ft:0.4,piece:8,plate:60,units:{adet:8,porsiyon:60,avuc:40}},
+  {k:['kuru meyve','kuru üzüm','kuru kayısı'],p:3,cb:65,ft:0.5,piece:10,plate:50,units:{avuc:30,kasik:15,porsiyon:50}},
+  {k:['elma','armut','portakal','mandalina','şeftali','erik','kayısı'],p:0.6,cb:13,ft:0.2,piece:150,plate:180,units:{adet:150,porsiyon:150}},
+  {k:['çilek','üzüm','kiraz','karpuz','kavun','meyve'],p:0.8,cb:12,ft:0.3,piece:100,plate:150,units:{kase:100,porsiyon:150,avuc:80}},
+  {k:['avokado'],p:2,cb:9,ft:15,piece:150,plate:150,units:{adet:150,'yarim':75,dilim:30,porsiyon:150}},
   // kuruyemiş & yağlar
-  {k:['badem','ceviz','fındık','antep fıstığı','fıstık','kuruyemiş','kaju'],p:20,cb:20,ft:50,piece:5,plate:40},
-  {k:['fıstık ezmesi','fındık ezmesi','tahin'],p:22,cb:20,ft:50,piece:15,plate:30},
-  {k:['zeytin'],p:1,cb:6,ft:11,piece:4,plate:40},
-  {k:['zeytinyağı','sıvı yağ','ayçiçek yağı'],p:0,cb:0,ft:100,piece:10,plate:15},
-  {k:['tereyağı','tereyağ'],p:0.9,cb:0.1,ft:81,piece:10,plate:20},
+  {k:['badem','ceviz','fındık','antep fıstığı','fıstık','kuruyemiş','kaju'],p:20,cb:20,ft:50,piece:5,plate:40,units:{avuc:30,kasik:15,porsiyon:30}},
+  {k:['fıstık ezmesi','fındık ezmesi','tahin'],p:22,cb:20,ft:50,piece:15,plate:30,units:{kasik:15,'tatli-kasigi':5,porsiyon:30}},
+  {k:['zeytin'],p:1,cb:6,ft:11,piece:4,plate:40,units:{adet:4,porsiyon:40,kasik:20}},
+  {k:['zeytinyağı','sıvı yağ','ayçiçek yağı'],p:0,cb:0,ft:100,piece:10,plate:15,units:{kasik:15,'tatli-kasigi':5,'cay-kasigi':5,porsiyon:15}},
+  {k:['tereyağı','tereyağ'],p:0.9,cb:0.1,ft:81,piece:10,plate:20,units:{'tatli-kasigi':5,'cay-kasigi':3,kasik:10,porsiyon:15}},
   // tatlı & atıştırmalık
-  {k:['baklava','künefe','şerbetli'],p:6,cb:55,ft:25,piece:60,plate:120},
-  {k:['sütlaç','muhallebi','dondurma','puding'],p:4,cb:25,ft:6,piece:120,plate:150},
-  {k:['çikolata','bitter','gofret'],p:7,cb:55,ft:32,piece:20,plate:60},
-  {k:['kek','kurabiye','bisküvi','pasta','tatlı'],p:6,cb:55,ft:20,piece:25,plate:90},
-  {k:['bal','reçel','pekmez','marmelat'],p:0.4,cb:80,ft:0,piece:20,plate:40},
+  {k:['baklava','künefe','şerbetli'],p:6,cb:55,ft:25,piece:60,plate:120,units:{dilim:60,porsiyon:120,kase:120}},
+  {k:['sütlaç','muhallebi','dondurma','puding'],p:4,cb:25,ft:6,piece:120,plate:150,units:{kase:120,bardak:150,porsiyon:150}},
+  {k:['çikolata','bitter','gofret'],p:7,cb:55,ft:32,piece:20,plate:60,units:{kare:10,porsiyon:40,adet:20}},
+  {k:['kek','kurabiye','bisküvi','pasta','tatlı'],p:6,cb:55,ft:20,piece:25,plate:90,units:{dilim:90,adet:25,porsiyon:90}},
+  {k:['bal','reçel','pekmez','marmelat'],p:0.4,cb:80,ft:0,piece:20,plate:40,units:{kasik:20,'tatli-kasigi':7,'cay-kasigi':5,porsiyon:40}},
   // içecek & takviye
-  {k:['protein tozu','whey','protein bar','protein shake'],p:75,cb:10,ft:6,piece:30,plate:30},
-  {k:['çay','kahve','maden suyu','su'],p:0,cb:0,ft:0,piece:200,plate:200}
+  {k:['protein tozu','whey','protein bar','protein shake'],p:75,cb:10,ft:6,piece:30,plate:30,units:{kasik:15,olcu:30,porsiyon:30}},
+  {k:['çay','kahve','maden suyu','su'],p:0,cb:0,ft:0,piece:200,plate:200,units:{bardak:200,'cay-bardagi':100,'su-bardagi':200}}
 ];
 var FOOD_FALLBACK={p:7,cb:18,ft:5,piece:60,plate:200};
-var MEAL_UNITS=[{id:'tabak',label:'tabak'},{id:'gr',label:'gr'},{id:'adet',label:'adet'}];
+var MEAL_UNITS=[
+  {id:'gr',label:'gr'},
+  {id:'adet',label:'adet'},
+  {id:'porsiyon',label:'porsiyon'},
+  {id:'tabak',label:'tabak'},
+  {id:'kase',label:'kase'},
+  {id:'kasik',label:'kaşık'},
+  {id:'corba-kasigi',label:'çorba kaşığı'},
+  {id:'tatli-kasigi',label:'tatlı kaşığı'},
+  {id:'cay-kasigi',label:'çay kaşığı'},
+  {id:'bardak',label:'bardak'},
+  {id:'su-bardagi',label:'su bardağı'},
+  {id:'cay-bardagi',label:'çay bardağı'},
+  {id:'avuc',label:'avuç'},
+  {id:'dilim',label:'dilim'},
+  {id:'paket',label:'paket'}
+];
+// Birim → yaklaşık gram. Yiyecek özel değeri varsa FOOD_DB'deki units objesi onu ezer.
+var DEFAULT_UNIT_GRAMS={porsiyon:150,tabak:200,kase:200,kasik:15,'corba-kasigi':15,'tatli-kasigi':5,'cay-kasigi':3,bardak:200,'su-bardagi':200,'cay-bardagi':100,avuc:30,dilim:30,paket:25};
 var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
 function foodLookup(name){
   var n=String(name||'').toLowerCase().trim(); if(!n) return null;
@@ -867,7 +887,15 @@ function mealItemNutr(it){
   if(!it||!it.name||!String(it.name).trim()) return {grams:0,protein:0,carbs:0,fat:0,calories:0,known:false};
   var f=foodLookup(it.name), known=!!f; if(!f) f=FOOD_FALLBACK;
   var q=Number(it.qty); if(isNaN(q)||q<0) q=0;
-  var g; if(it.unit==='gr') g=q; else if(it.unit==='adet') g=q*(f.piece||FOOD_FALLBACK.piece); else g=q*(f.plate||FOOD_FALLBACK.plate);
+  var g;
+  if(it.unit==='gr') g=q;
+  else if(it.unit==='adet') g=q*(f.piece||FOOD_FALLBACK.piece);
+  else {
+    var unitGrams=(f.units&&typeof f.units==='object'&&f.units[it.unit]);
+    if(unitGrams==null) unitGrams=DEFAULT_UNIT_GRAMS[it.unit];
+    if(unitGrams==null) unitGrams=(f.plate||FOOD_FALLBACK.plate);
+    g=q*unitGrams;
+  }
   var P=g*(f.p||0)/100, Cb=g*(f.cb||0)/100, Ft=g*(f.ft||0)/100;
   // Kalori: makro varsa Atwater (4·P + 4·C + 9·Y); yoksa eski c alanına düş.
   var cal=(f.cb!=null||f.ft!=null)?(4*P+4*Cb+9*Ft):(g*(f.c||0)/100);
@@ -875,9 +903,10 @@ function mealItemNutr(it){
 }
 function mealNutr(rec,key){ var arr=(rec&&rec.mealItems&&rec.mealItems[key])||[]; var P=0,Cb=0,Ft=0,C=0,n=0; arr.forEach(function(it){ if(!it||!it.name||!String(it.name).trim())return; var nu=mealItemNutr(it); P+=nu.protein; Cb+=nu.carbs; Ft+=nu.fat; C+=nu.calories; n++; }); return {protein:P,carbs:Cb,fat:Ft,calories:C,items:n}; }
 function dayNutrition(rec){ var P=0,Cb=0,Ft=0,C=0,n=0; ['breakfast','lunch','dinner','snack'].forEach(function(k){ var m=mealNutr(rec,k); P+=m.protein; Cb+=m.carbs; Ft+=m.fat; C+=m.calories; n+=m.items; }); return {protein:Math.round(P), carbs:Math.round(Cb), fat:Math.round(Ft), calories:Math.round(C), items:n}; }
+function unitLabel(id){ for(var i=0;i<MEAL_UNITS.length;i++){ if(MEAL_UNITS[i].id===id) return MEAL_UNITS[i].label; } return id||'porsiyon'; }
 function updateNutriLive(day){ var nu=dayNutrition(day); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/PROTEIN_GOAL*100))+'%'; var lp=document.getElementById('nutri-lp'); if(lp) lp.textContent=nu.protein+'g'; var cb=document.getElementById('nutri-carb'); if(cb) cb.textContent=nu.carbs+'g'; var ft=document.getElementById('nutri-fat'); if(ft) ft.textContent=nu.fat+'g'; var sb=document.getElementById('nutri-subtitle'); if(sb) sb.textContent=nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ'; var bc=document.getElementById('nutri-badgecal'); if(bc) bc.textContent=nu.calories; var mbar=document.getElementById('nutri-macrobar'); if(mbar) mbar.innerHTML=macroBarHTML(nu); var ni=document.getElementById('nutri-insight'); if(ni) ni.innerHTML=nutriInsightHTML(day,nu); }
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
-function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(it.unit==='adet'?' adet':' tabak'); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
+function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
 function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null; } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
@@ -2477,7 +2506,7 @@ App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.setting
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); save(); },500); };
 
 // ---- öğün detay (tabak/gr/adet) ----
-App.addMealItem=function(key){ var day=curDay(); if(!day.mealItems[key]) day.mealItems[key]=[]; day.mealItems[key].push({name:'',qty:1,unit:'tabak'}); day.savedAt=new Date().toISOString(); commit(); setTimeout(function(){ var inp=document.querySelector('[data-meal="'+key+'"][data-idx="'+(day.mealItems[key].length-1)+'"]'); if(inp) inp.focus(); },40); };
+App.addMealItem=function(key){ var day=curDay(); if(!day.mealItems[key]) day.mealItems[key]=[]; day.mealItems[key].push({name:'',qty:1,unit:'porsiyon'}); day.savedAt=new Date().toISOString(); commit(); setTimeout(function(){ var inp=document.querySelector('[data-meal="'+key+'"][data-idx="'+(day.mealItems[key].length-1)+'"]'); if(inp) inp.focus(); },40); };
 App.removeMealItem=function(key,idx){ var day=curDay(); if(day.mealItems[key]&&day.mealItems[key][idx]!=null){ day.mealItems[key].splice(idx,1); syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); } };
 App.setMealItemName=function(key,idx,el){ var v=el.value; debounceSave('mi-'+key+'-'+idx,function(){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.name=v; syncMealText(day,key); day.savedAt=new Date().toISOString(); save(); var sub=document.getElementById('meal-sub-'+key); if(sub){ var m=mealNutr(day,key); sub.textContent=Math.round(m.protein)+'g P · '+Math.round(m.calories)+' kcal'; } updateNutriLive(day); },350); };
 App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; var v=el.value===''?'':Number(el.value); it.qty=(v===''||isNaN(v))?'':v; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
@@ -2997,6 +3026,7 @@ App.closeRoom=function(){
 App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
+App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; commit('Doğum tarihi kaydedildi'); App.toast('Doğum tarihi kaydedildi'); render(); };
 
 // Rastgele, bir öncekiyle asla aynı olmayan indeks seç.
 function randNoteIdx(n,cur){ if(n<2) return 0; var t; do{ t=Math.floor(Math.random()*n); }while(t===cur); return t; }
@@ -5570,6 +5600,19 @@ function ayarlarHTML(){
   h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
   h+='</div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
+  // metabolik profil
+  var _body=data.body||{}, _lastW=(_body.weights&&_body.weights.length)?_body.weights[_body.weights.length-1].kg:null;
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('heart-pulse',15)+'</span>Metabolik profil</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;">';
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Cinsiyet</div><div style="font-size:15px;font-weight:800;margin-top:3px;">Kadın</div></div>';
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Boy</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+(_body.heightCm?esc(_body.heightCm+' cm'):'<span style="color:var(--faint);">—</span>')+'</div></div>';
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Son kilo</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+(_lastW?esc(_lastW+' kg'):'<span style="color:var(--faint);">—</span>')+'</div></div>';
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Yaş</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+profileAgeLabel(data.settings.birthDate)+'</div></div>';
+  h+='</div>';
+  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin, ileride kişiye özel kalori ve protein hedefleri hesaplanırken kullanılacak. Şu an sadece kaydedilir.</div>';
+  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Doğum tarihi</label><input type="date" value="'+esc(data.settings.birthDate||'')+'" onchange="App.setBirthDate(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;width:100%;"></div>';
+  h+='</div>';
   // appearance
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
   var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
@@ -5667,6 +5710,16 @@ function settingsBtn(onclick,label,icon){
 
 // ================= SAĞLIK & DÖNGÜ =================
 function num(v){ return (v===null||v===undefined||v==='')?null:Number(v); }
+function calcAge(birthDate){
+  if(!birthDate||!/^(\d{4})-(\d{2})-(\d{2})$/.test(birthDate)) return null;
+  var b=new Date(birthDate); if(isNaN(b.getTime())) return null;
+  var n=new Date();
+  var age=n.getFullYear()-b.getFullYear();
+  var m=n.getMonth()-b.getMonth();
+  if(m<0||(m===0&&n.getDate()<b.getDate())) age--;
+  return age>=0?age:null;
+}
+function profileAgeLabel(birthDate){ var a=calcAge(birthDate); return a!=null?a+' yaş':'<span style="color:var(--faint);">—</span>'; }
 function ringSeg(cx,cy,R,C,color,startFrac,lenFrac,w){ if(lenFrac<=0) return ''; return '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="'+w+'" stroke-dasharray="'+(lenFrac*C).toFixed(2)+' '+(C-lenFrac*C).toFixed(2)+'" stroke-dashoffset="'+(-startFrac*C).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"></circle>'; }
 
 function activityRings(rec){

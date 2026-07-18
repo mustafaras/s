@@ -5635,17 +5635,10 @@ function ayarlarHTML(){
   h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
   h+='</div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
-  // metabolik profil
-  var _body=data.body||{}, _lastW=(_body.weights&&_body.weights.length)?_body.weights[_body.weights.length-1].kg:null;
+  // kişiselleştirilmiş hedefler — boy/kilo tek kaynağı: Sağlık sayfası > Vücut Ölçüleri.
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('heart-pulse',15)+'</span>Metabolik profil</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;">';
-  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Cinsiyet</div><div style="font-size:15px;font-weight:800;margin-top:3px;">Kadın</div></div>';
-  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Boy</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+(_body.heightCm?esc(_body.heightCm+' cm'):'<span style="color:var(--faint);">—</span>')+'</div></div>';
-  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Son kilo</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+(_lastW?esc(_lastW+' kg'):'<span style="color:var(--faint);">—</span>')+'</div></div>';
-  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">Yaş</div><div style="font-size:15px;font-weight:800;margin-top:3px;">'+profileAgeLabel(data.settings.birthDate)+'</div></div>';
-  h+='</div>';
-  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin, boyun ve son kilonla birlikte kişiye özel kalori ve protein hedefleri hesaplanırken kullanılır. Şu anlık eksikse güvenli varsayılan değerler geçerli.</div>';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',15)+'</span>Kişiselleştirilmiş hedefler</div>';
+  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin ve günlük aktivite seviyen, <b>Sağlık</b> sayfasından girdiğin boy ve kilo ile birlikte kalori/protein hedeflerini hesaplamakta kullanılır. Şu anlık eksikse güvenli varsayılan değerler geçerli.</div>';
   h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Doğum tarihi</label><input type="date" value="'+esc(data.settings.birthDate||'')+'" onchange="App.setBirthDate(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;width:100%;"></div>';
   var actLevels=[{id:'sedentary',label:'Hareketsiz'},{id:'light',label:'Hafif'},{id:'moderate',label:'Orta'},{id:'active',label:'Çok'}];
   var curLevel=(data.settings.targets&&data.settings.targets.activityLevel)||'moderate';
@@ -6017,7 +6010,7 @@ function bodyCard(rec){
     h+='<div style="display:flex;gap:5px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);">'+new Date(w.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</span>'; }).join('')+'</div>';
     h+='</div>';
   }
-  return collapsibleCardHTML({key:'h-body', icon:icon('activity',18), accent:A, title:'Vücut Ölçüleri', subtitle:'Kilo · haftalık tartım önerisi · boy · BMI', badge:(bmi!=null?hBadge((Math.round(bmi*10)/10).toFixed(1)+' BMI',cat.col):(lw?hBadge(lw.kg+' kg',A):'')), open:cardOpen('h-body'), body:h, hint:'ölçüleri aç'});
+  return collapsibleCardHTML({key:'h-body', icon:icon('activity',18), accent:A, title:'Vücut Ölçüleri', subtitle:'Boy ve kilonun tek giriş yeri · haftalık tartım önerisi · BMI', badge:(bmi!=null?hBadge((Math.round(bmi*10)/10).toFixed(1)+' BMI',cat.col):(lw?hBadge(lw.kg+' kg',A):'')), open:cardOpen('h-body'), body:h, hint:'ölçüleri aç'});
 }
 CARD_BUILDERS['h-body']=bodyCard;
 // ---- Kan/idrar tahlili — PDF + çoklu foto yükleme (data/aeon-media/<id>.json), panele iletilir ----
@@ -6056,8 +6049,8 @@ function labCard(){
 }
 CARD_BUILDERS['h-lab']=labCard;
 App.editHeight=function(){ ui.heightEdit=true; render(); };
-App.setHeight=function(){ var el=document.getElementById('sey-height-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<80||v>250){ toast('Geçerli bir boy gir (80–250 cm)'); return; } var b=bodyData(); b.heightCm=Math.round(v); b.heightSetAt=new Date().toISOString(); ui.heightEdit=false; haptic(16); commit('Boy kaydedildi 📏'); };
-App.addWeight=function(){ var el=document.getElementById('sey-weight-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<20||v>400){ toast('Geçerli bir kilo gir (20–400 kg)'); return; } var b=bodyData(); b.weights.push({ts:new Date().toISOString(),kg:Math.round(v*10)/10}); haptic([14,40,14]); commit('Kilo kaydedildi 🪶 · haftalık düzen yeterli'); };
+App.setHeight=function(){ var el=document.getElementById('sey-height-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<80||v>250){ toast('Geçerli bir boy gir (80–250 cm)'); return; } var b=bodyData(); b.heightCm=Math.round(v); b.heightSetAt=new Date().toISOString(); ui.heightEdit=false; refreshTargets(); haptic(16); commit('Boy kaydedildi 📏'); };
+App.addWeight=function(){ var el=document.getElementById('sey-weight-input'); if(!el) return; var v=parseFloat(String(el.value).replace(',','.')); if(!v||isNaN(v)||v<20||v>400){ toast('Geçerli bir kilo gir (20–400 kg)'); return; } var b=bodyData(); b.weights.push({ts:new Date().toISOString(),kg:Math.round(v*10)/10}); refreshTargets(); haptic([14,40,14]); commit('Kilo kaydedildi 🪶 · haftalık düzen yeterli'); };
 App.pickLab=function(kind){ if(ui.labUploading) return; if(!ghCfgApp()){ toast('Önce Ayarlar\'dan repoya bağlan'); return; } var el=document.getElementById(kind==='urine'?'sey-lab-urine':'sey-lab-blood'); if(el) el.click(); };
 function compressImageFile(file){ return new Promise(function(resolve,reject){ var reader=new FileReader(); reader.onload=function(){ var img=new Image(); img.onload=function(){ var MAXD=1600, w=img.naturalWidth||1, hh=img.naturalHeight||1; var scale=Math.min(1,MAXD/Math.max(w,hh)); var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(hh*scale)); var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch; cv.getContext('2d').drawImage(img,0,0,cw,ch); var url=cv.toDataURL('image/jpeg',0.75); var c=url.indexOf(','); resolve({b64:c>=0?url.slice(c+1):'',mime:'image/jpeg',w:cw,h:ch}); }; img.onerror=function(){ reject(new Error('görsel okunamadı')); }; img.src=String(reader.result||''); }; reader.onerror=function(){ reject(new Error('dosya okunamadı')); }; reader.readAsDataURL(file); }); }
 function readFileB64(file){ return new Promise(function(resolve,reject){ var r=new FileReader(); r.onload=function(){ var url=String(r.result||''); var c=url.indexOf(','); resolve(c>=0?url.slice(c+1):''); }; r.onerror=function(){ reject(new Error('dosya okunamadı')); }; r.readAsDataURL(file); }); }

@@ -2211,9 +2211,17 @@ function render(){
     if(hasTg){
       var calPct=Math.min(100,Math.round(((nmac.calories||0)/tg.calories)*100));
       var proPct=Math.min(100,Math.round(((nmac.protein||0)/tg.protein)*100));
+      var carbPct=Math.min(100,Math.round(((nmac.carbs||0)/(tg.carbs||1))*100));
+      var fatPct=Math.min(100,Math.round(((nmac.fat||0)/(tg.fat||1))*100));
       h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:7px;font-size:var(--f1);color:var(--t3);">';
       h+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#9dc08b;"></span>Kalori hedef <b style="color:var(--t1);">'+tg.calories+' kcal</b> · %'+calPct+'</span>';
       h+='<span style="display:flex;align-items:center;gap:5px;">Protein hedef <b style="color:var(--t1);">'+tg.protein+'g</b> · %'+proPct+'</span>';
+      h+='<span style="display:flex;align-items:center;gap:5px;">Karb hedef <b style="color:var(--t1);">'+tg.carbs+'g</b> · %'+carbPct+'</span>';
+      h+='<span style="display:flex;align-items:center;gap:5px;">Yağ hedef <b style="color:var(--t1);">'+tg.fat+'g</b> · %'+fatPct+'</span>';
+      h+='<span style="display:flex;align-items:center;gap:5px;">Lif hedef <b style="color:var(--t1);">'+tg.fiber+'g</b></span>';
+      h+='</div>';
+      h+='<div style="margin-top:6px;font-size:var(--f1);color:var(--t3);line-height:1.6;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;">';
+      h+='Su <b style="color:var(--t1);">'+tg.waterCups+' bardak</b> · Adım <b style="color:var(--t1);">'+tg.steps.toLocaleString('tr-TR')+'</b> · Uyku <b style="color:var(--t1);">'+tg.sleepHours+' saat</b> · Kafein ≤ <b style="color:var(--t1);">'+tg.caffeineMaxMg+' mg</b> · Magnezyum <b style="color:var(--t1);">'+tg.magnesiumMg+' mg</b> · Demir <b style="color:var(--t1);">'+tg.ironMg+' mg</b> · Omega-3 <b style="color:var(--t1);">'+tg.omega3Mg+' mg</b> · D vitamini <b style="color:var(--t1);">'+tg.vitaminDIU+' IU</b>';
       h+='</div>';
     }
     h+='</div>';

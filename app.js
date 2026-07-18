@@ -662,13 +662,10 @@ function migrate(d){
   // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
   if(typeof d.settings.vitaminDForm!=='string') d.settings.vitaminDForm='D₃K₂ damla';
   if(typeof d.settings.vitaminDDose!=='string') d.settings.vitaminDDose='1 damla (D3 1000 IU + K2 100 mcg)';
-  // Kişiye özel kalori/protein hedefleri: boy/kilo/yaş/kadın → Mifflin-St Jeor + TDEE.
-  if(!d.settings.targets||typeof d.settings.targets!=='object') d.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''};
+  // Kişiye özel hedefler: boy/kilo/yaş/kadın → Mifflin-St Jeor + TDEE + makro/mikro/wellness.
+  if(!d.settings.targets||typeof d.settings.targets!=='object') d.settings.targets={calories:null,protein:null,carbs:null,fat:null,fiber:null,waterCups:null,steps:null,sleepHours:null,caffeineMaxMg:null,magnesiumMg:null,ironMg:null,omega3Mg:null,vitaminDIU:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''};
   var t=d.settings.targets;
-  if(typeof t.calories!=='number'&&t.calories!==null) t.calories=null;
-  if(typeof t.protein!=='number'&&t.protein!==null) t.protein=null;
-  if(typeof t.bmr!=='number'&&t.bmr!==null) t.bmr=null;
-  if(typeof t.tdee!=='number'&&t.tdee!==null) t.tdee=null;
+  ['calories','protein','carbs','fat','fiber','waterCups','steps','sleepHours','caffeineMaxMg','magnesiumMg','ironMg','omega3Mg','vitaminDIU','bmr','tdee'].forEach(function(k){ if(typeof t[k]!=='number'&&t[k]!==null) t[k]=null; });
   if(t.activityLevel!=='sedentary'&&t.activityLevel!=='light'&&t.activityLevel!=='moderate'&&t.activityLevel!=='active') t.activityLevel='moderate';
   if(typeof t.lastCalculatedAt!=='string') t.lastCalculatedAt='';
   var ms=d.settings.magnesium;
@@ -924,18 +921,40 @@ function calcTargets(){
   var bmr=10*w+6.25*h-5*age-161; // Mifflin-St Jeor (kadın)
   var factor=activityFactor(data.settings.targets.activityLevel);
   var tdee=Math.round(bmr*factor);
-  var protein=Math.round(w*1.8);
   var calories=Math.max(1200,Math.min(3200,tdee)); // güvenlik sınırları
-  return {bmr:Math.round(bmr),tdee:tdee,protein:protein,calories:calories};
+  var protein=Math.round(w*1.8);
+  var carbs=Math.round(calories*0.47/4);
+  var fat=Math.round(calories*0.27/9);
+  var fiber=Math.max(25,Math.round(calories*0.014));
+  var waterCups=Math.max(8,Math.round(w*0.033*4)); // kg×0.033 L → 250 ml bardak
+  var steps={sedentary:6000,light:7500,moderate:9000,active:11000}[data.settings.targets.activityLevel]||9000;
+  var sleepHours=7.5;
+  var caffeineMaxMg=400;
+  var magnesiumMg=age>=31?320:310;
+  var ironMg=18;
+  var omega3Mg=500;
+  var vitaminDIU=1000;
+  return {bmr:Math.round(bmr),tdee:tdee,calories:calories,protein:protein,carbs:carbs,fat:fat,fiber:fiber,waterCups:waterCups,steps:steps,sleepHours:sleepHours,caffeineMaxMg:caffeineMaxMg,magnesiumMg:magnesiumMg,ironMg:ironMg,omega3Mg:omega3Mg,vitaminDIU:vitaminDIU};
 }
 function refreshTargets(){
   var t=calcTargets();
   var st=data.settings.targets;
-  if(t){ st.bmr=t.bmr; st.tdee=t.tdee; st.protein=t.protein; st.calories=t.calories; st.lastCalculatedAt=new Date().toISOString(); }
+  if(t){ ['bmr','tdee','calories','protein','carbs','fat','fiber','waterCups','steps','sleepHours','caffeineMaxMg','magnesiumMg','ironMg','omega3Mg','vitaminDIU'].forEach(function(k){ st[k]=t[k]; }); st.lastCalculatedAt=new Date().toISOString(); }
   return t;
 }
 function proteinGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.protein==='number'&&!isNaN(t.protein))?t.protein:PROTEIN_GOAL; }
 function calGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.calories==='number'&&!isNaN(t.calories))?t.calories:CAL_GOAL; }
+function carbsGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.carbs==='number'&&!isNaN(t.carbs))?t.carbs:Math.round(CAL_GOAL*0.47/4); }
+function fatGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.fat==='number'&&!isNaN(t.fat))?t.fat:Math.round(CAL_GOAL*0.27/9); }
+function fiberGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.fiber==='number'&&!isNaN(t.fiber))?t.fiber:25; }
+function waterGoalCups(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.waterCups==='number'&&!isNaN(t.waterCups))?t.waterCups:WATER_GOAL; }
+function stepsGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
+function sleepGoalHours(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
+function caffeineMaxMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.caffeineMaxMg==='number'&&!isNaN(t.caffeineMaxMg))?t.caffeineMaxMg:400; }
+function magnesiumGoalMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.magnesiumMg==='number'&&!isNaN(t.magnesiumMg))?t.magnesiumMg:320; }
+function ironGoalMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.ironMg==='number'&&!isNaN(t.ironMg))?t.ironMg:18; }
+function omega3GoalMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.omega3Mg==='number'&&!isNaN(t.omega3Mg))?t.omega3Mg:500; }
+function vitaminDGoalIU(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.vitaminDIU==='number'&&!isNaN(t.vitaminDIU))?t.vitaminDIU:1000; }
 function updateNutriLive(day){ var nu=dayNutrition(day); var pg=proteinGoal(),cg=calGoal(); var pv=document.getElementById('nutri-protein'); if(pv) pv.textContent=nu.protein+'g'; var cv=document.getElementById('nutri-cal'); if(cv) cv.textContent=nu.calories; var bar=document.getElementById('nutri-bar'); if(bar) bar.style.width=Math.min(100,Math.round(nu.protein/pg*100))+'%'; var lp=document.getElementById('nutri-lp'); if(lp) lp.textContent=nu.protein+'g'; var cb=document.getElementById('nutri-carb'); if(cb) cb.textContent=nu.carbs+'g'; var ft=document.getElementById('nutri-fat'); if(ft) ft.textContent=nu.fat+'g'; var sb=document.getElementById('nutri-subtitle'); if(sb) sb.textContent=nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ'; var bc=document.getElementById('nutri-badgecal'); if(bc) bc.textContent=nu.calories; var mbar=document.getElementById('nutri-macrobar'); if(mbar) mbar.innerHTML=macroBarHTML(nu); var ni=document.getElementById('nutri-insight'); if(ni) ni.innerHTML=nutriInsightHTML(day,nu); }
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
@@ -3059,7 +3078,7 @@ App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.o
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
 App.startDateChange=function(el){ var v=el.value; if(!v) return; data.startDate=v; commit('Başlangıç tarihi güncellendi'); };
 App.setBirthDate=function(el){ var v=el.value; data.settings.birthDate=v; refreshTargets(); commit('Doğum tarihi kaydedildi'); App.toast('Doğum tarihi kaydedildi'); render(); };
-App.setActivityLevel=function(level){ if(!data.settings.targets) data.settings.targets={calories:null,protein:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''}; data.settings.targets.activityLevel=level; refreshTargets(); commit('Aktivite seviyesi güncellendi'); App.toast('Aktivite seviyesi güncellendi'); render(); };
+App.setActivityLevel=function(level){ if(!data.settings.targets) data.settings.targets={calories:null,protein:null,carbs:null,fat:null,fiber:null,waterCups:null,steps:null,sleepHours:null,caffeineMaxMg:null,magnesiumMg:null,ironMg:null,omega3Mg:null,vitaminDIU:null,bmr:null,tdee:null,activityLevel:'moderate',lastCalculatedAt:''}; data.settings.targets.activityLevel=level; refreshTargets(); commit('Aktivite seviyesi güncellendi'); App.toast('Aktivite seviyesi güncellendi'); render(); };
 
 // Rastgele, bir öncekiyle asla aynı olmayan indeks seç.
 function randNoteIdx(n,cur){ if(n<2) return 0; var t; do{ t=Math.floor(Math.random()*n); }while(t===cur); return t; }
@@ -3740,6 +3759,47 @@ function beslenmeCardHTML(rec){
   return collapsibleCardHTML({key:'beslenme', id:'card-beslenme', icon:icon('utensils',18), accent:'var(--watch)', title:'Beslenme', subtitle:subtitle, badge:badge, open:open, body:b, hint:'öğünleri gör / ekle'});
 }
 CARD_BUILDERS.beslenme=beslenmeCardHTML;
+
+// Bugün ekranında kısa "Hedeflerim" kartı — dokununca Sağlık sayfasına götürür.
+function targetsCardHTML(rec){
+  var t=data.settings.targets||{};
+  var tOk=(typeof t.calories==='number'&&typeof t.protein==='number');
+  var nu=dayNutrition(rec);
+  var cal=tOk?t.calories:calGoal();
+  var pro=tOk?t.protein:proteinGoal();
+  var water=tOk?t.waterCups:waterGoalCups();
+  var steps=tOk?t.steps:stepsGoal();
+  var sleep=tOk?t.sleepHours:sleepGoalHours();
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
+  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',17)+'</span>Hedeflerim</div>';
+  if(tOk) h+='<div style="font-size:10.5px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
+  else h+='<div style="font-size:10.5px;color:var(--warn);">henüz hesaplanmadı</div>';
+  h+='</div>';
+  if(tOk){
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.calories+'<span style="font-size:10px;color:var(--faint);">/'+cal+'</span></div><div style="font-size:9px;color:var(--faint);">kcal</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.protein+'<span style="font-size:10px;color:var(--faint);">/'+pro+'</span></div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Su</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+(rec&&typeof rec.water==='number'?rec.water:0)+'<span style="font-size:10px;color:var(--faint);">/'+water+'</span></div><div style="font-size:9px;color:var(--faint);">bardak</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Karbonhidrat</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.carbs+'<span style="font-size:10px;color:var(--faint);">/'+t.carbs+'</span></div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Yağ</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.fat+'<span style="font-size:10px;color:var(--faint);">/'+t.fat+'</span></div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Lif</div><div style="font-size:15px;font-weight:800;color:var(--text);">—<span style="font-size:10px;color:var(--faint);">/'+t.fiber+'</span></div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
+    h+='<div style="text-align:center;"><div style="font-size:9px;color:var(--faint);">Adım</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+steps.toLocaleString('tr-TR')+'</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:9px;color:var(--faint);">Uyku</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+sleep+' saat</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:9px;color:var(--faint);">Kafein</div><div style="font-size:13px;font-weight:800;color:var(--text);">≤'+t.caffeineMaxMg+' mg</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:9px;color:var(--faint);">D vit.</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+t.vitaminDIU+' IU</div></div>';
+    h+='</div>';
+    h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.45;">Tüm kişiselleştirilmiş hedeflerin için dokun · boy, kilo, yaş ve aktivite seviyene göre hesaplanır.</div>';
+  } else {
+    h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Kişiselleştirilmiş makro ve mikro hedeflerini görmek için Sağlık sayfasından boy, kilo, doğum tarihi ve günlük aktivite seviyeni girmen yeterli.</div>';
+    h+='<button onclick="event.stopPropagation();App.go(\'saglik\')" style="border:none;cursor:pointer;background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;font-weight:800;font-size:14px;padding:12px;border-radius:12px;">Sağlık sayfasına git</button>';
+  }
+  h+='</div>';
+  return h;
+}
+
 function waterCard(rec){
   var w=rec&&typeof rec.water==='number'?rec.water:0;
   var pct=Math.min(100,Math.round(w/WATER_GOAL*100));
@@ -4969,6 +5029,9 @@ function bugunHTML(){
   // akşam adım hatırlatması (yalnızca akşam, bugünün adımı boşsa)
   if(!ed) h+=stepReminder(rec);
 
+  // Hedeflerim — kişiselleştirilmiş makro/mikro/wellness hedefleri, dokununca Sağlık sayfasına
+  if(!ed) h+=targetsCardHTML(rec);
+
   // Beslenme — özet (makro) + "ne yedim" birleşik açılır kart
   h+=beslenmeCardHTML(rec);
 
@@ -5635,28 +5698,6 @@ function ayarlarHTML(){
   h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
   h+='</div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
-  // kişiselleştirilmiş hedefler — boy/kilo tek kaynağı: Sağlık sayfası > Vücut Ölçüleri.
-  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',15)+'</span>Kişiselleştirilmiş hedefler</div>';
-  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;">Doğum tarihin ve günlük aktivite seviyen, <b>Sağlık</b> sayfasından girdiğin boy ve kilo ile birlikte kalori/protein hedeflerini hesaplamakta kullanılır. Şu anlık eksikse güvenli varsayılan değerler geçerli.</div>';
-  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Doğum tarihi</label><input type="date" value="'+esc(data.settings.birthDate||'')+'" onchange="App.setBirthDate(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;width:100%;"></div>';
-  var actLevels=[{id:'sedentary',label:'Hareketsiz'},{id:'light',label:'Hafif'},{id:'moderate',label:'Orta'},{id:'active',label:'Çok'}];
-  var curLevel=(data.settings.targets&&data.settings.targets.activityLevel)||'moderate';
-  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Günlük aktivite seviyesi</label><div style="display:flex;gap:6px;">';
-  actLevels.forEach(function(l){ var on=l.id===curLevel; h+='<button onclick="App.setActivityLevel(\''+l.id+'\')" style="flex:1;padding:10px 4px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:700;border:'+(on?'1px solid var(--accent)':'1px solid var(--card-bd)')+';background:'+(on?'linear-gradient(135deg,#FFE8A3,#E9AFC1)':'var(--card)')+';color:'+(on?'#5A2E2A':'var(--text)')+';text-align:center;">'+esc(l.label)+'</button>'; });
-  h+='</div></div>';
-  var targets=data.settings.targets||{};
-  var tOk=(typeof targets.calories==='number'&&typeof targets.protein==='number');
-  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;">';
-  h+='<div style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;">'+icon('target',13)+' Kişiselleştirilmiş hedefler</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
-  h+='<div style="text-align:center;"><div style="font-size:10px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;'+(tOk?'color:var(--text);':'color:var(--faint);')+'">'+(targets.calories!=null?targets.calories:'—')+' kcal</div></div>';
-  h+='<div style="text-align:center;"><div style="font-size:10px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;'+(tOk?'color:var(--text);':'color:var(--faint);')+'">'+(targets.protein!=null?targets.protein:'—')+' g</div></div>';
-  h+='</div>';
-  if(tOk){ h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">BMR '+targets.bmr+' kcal · TDEE '+targets.tdee+' kcal · '+activityLabel(curLevel)+'</div>'; }
-  else { h+='<div style="font-size:11px;color:var(--warn);line-height:1.4;">Hedefler hesaplanamadı; doğum tarihi, boy ve kilo tamamlandığında kişiselleşecek. Şimdilik varsayılan değerler kullanılıyor.</div>'; }
-  h+='</div>';
-  h+='</div>';
   // appearance
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
   var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
@@ -6010,7 +6051,43 @@ function bodyCard(rec){
     h+='<div style="display:flex;gap:5px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);">'+new Date(w.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</span>'; }).join('')+'</div>';
     h+='</div>';
   }
-  return collapsibleCardHTML({key:'h-body', icon:icon('activity',18), accent:A, title:'Vücut Ölçüleri', subtitle:'Boy ve kilonun tek giriş yeri · haftalık tartım önerisi · BMI', badge:(bmi!=null?hBadge((Math.round(bmi*10)/10).toFixed(1)+' BMI',cat.col):(lw?hBadge(lw.kg+' kg',A):'')), open:cardOpen('h-body'), body:h, hint:'ölçüleri aç'});
+  // ---- Profil: doğum tarihi + aktivite seviyesi (hedef hesaplamanın girdileri) ----
+  h+='<div style="display:flex;flex-direction:column;gap:12px;background:color-mix(in srgb,'+A+' 7%, var(--card));border:1px solid color-mix(in srgb,'+A+' 22%, var(--card-bd));border-radius:16px;padding:13px 14px;">';
+  h+='<div style="font-size:12px;font-weight:800;letter-spacing:.4px;color:'+A+';">METABOLİK PROFİL</div>';
+  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Doğum tarihi</label><input type="date" value="'+esc(data.settings.birthDate||'')+'" onchange="App.setBirthDate(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;width:100%;"></div>';
+  var actLevels=[{id:'sedentary',label:'Hareketsiz'},{id:'light',label:'Hafif'},{id:'moderate',label:'Orta'},{id:'active',label:'Çok'}];
+  var curLevel=(data.settings.targets&&data.settings.targets.activityLevel)||'moderate';
+  h+='<div><label style="font-size:12px;color:var(--faint);display:block;margin-bottom:6px;">Günlük aktivite seviyesi</label><div style="display:flex;gap:6px;">';
+  actLevels.forEach(function(l){ var on=l.id===curLevel; h+='<button onclick="App.setActivityLevel(\''+l.id+'\')" style="flex:1;padding:10px 4px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:700;border:'+(on?'1px solid '+A:'1px solid var(--card-bd)')+';background:'+(on?'linear-gradient(135deg,#FFE8A3,#E9AFC1)':'var(--card)')+';color:'+(on?'#5A2E2A':'var(--text)')+';text-align:center;">'+esc(l.label)+'</button>'; });
+  h+='</div></div>';
+  h+='</div>';
+  // ---- Kişiselleştirilmiş hedef grid ----
+  var targets=data.settings.targets||{};
+  var tOk=(typeof targets.calories==='number'&&typeof targets.protein==='number');
+  h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:16px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',13)+'</span>Kişiselleştirilmiş hedefler</div>';
+  if(tOk){
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Kalori</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.calories+'</div><div style="font-size:9px;color:var(--faint);">kcal</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Protein</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.protein+'</div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Karbonhidrat</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.carbs+'</div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Yağ</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.fat+'</div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Lif</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.fiber+'</div><div style="font-size:9px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Su</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.waterCups+'</div><div style="font-size:9px;color:var(--faint);">bardak</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Adım</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.steps.toLocaleString('tr-TR')+'</div><div style="font-size:9px;color:var(--faint);">adım</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Uyku</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.sleepHours+'</div><div style="font-size:9px;color:var(--faint);">saat</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Kafein</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.caffeineMaxMg+'</div><div style="font-size:9px;color:var(--faint);">mg</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Magnezyum</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.magnesiumMg+'</div><div style="font-size:9px;color:var(--faint);">mg</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Demir</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.ironMg+'</div><div style="font-size:9px;color:var(--faint);">mg</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Omega-3</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.omega3Mg+'</div><div style="font-size:9px;color:var(--faint);">mg</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;grid-column:span 3;"><div style="font-size:9px;color:var(--faint);">D vitamini</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.vitaminDIU+' IU</div></div>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">BMR '+targets.bmr+' kcal · TDEE '+targets.tdee+' kcal · '+activityLabel(curLevel)+'</div>';
+  } else {
+    h+='<div style="font-size:12px;color:var(--text2);line-height:1.45;">Doğum tarihi, boy ve kilo tamamlandığında BMR/TDEE üzerinden kalori, protein, karbonhidrat, yağ, lif, su, adım, uyku, kafein, magnezyum, demir, omega-3 ve D vitamini hedefleri kişiselleşecek. Şu anlık eksik alanlar için güvenli varsayılan değerler geçerli.</div>';
+  }
+  h+='</div>';
+  return collapsibleCardHTML({key:'h-body', icon:icon('activity',18), accent:A, title:'Vücut Ölçüleri & Hedeflerim', subtitle:'Boy, kilo ve metabolik profilin tek kaynağı · kişiselleştirilmiş makro/mikro hedefler', badge:(bmi!=null?hBadge((Math.round(bmi*10)/10).toFixed(1)+' BMI',cat.col):(lw?hBadge(lw.kg+' kg',A):'')), open:cardOpen('h-body'), body:h, hint:'ölçüleri ve hedefleri aç'});
 }
 CARD_BUILDERS['h-body']=bodyCard;
 // ---- Kan/idrar tahlili — PDF + çoklu foto yükleme (data/aeon-media/<id>.json), panele iletilir ----

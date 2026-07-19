@@ -600,6 +600,7 @@ function migrate(d){
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
   if(typeof d.aeon.lastNotificationShownAt!=='string'&&d.aeon.lastNotificationShownAt!==null) d.aeon.lastNotificationShownAt=null;
   if(typeof d.settings.aeonNotifyPermission!=='string') d.settings.aeonNotifyPermission='';
+  if(typeof d.settings.aeonNotifyBannerDismissedAt!=='string'&&d.settings.aeonNotifyBannerDismissedAt!==null) d.settings.aeonNotifyBannerDismissedAt=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
@@ -5004,6 +5005,7 @@ function bugunHTML(){
   // ── En üst: repoya bağlan şeridi → hava (Günışığı) → Raşit'in sözü → konum → hero ──
   if(!ed){
     h+=saveBanner();
+    if(shouldShowAeonNotifyBanner()) h+=aeonNotifyBannerHTML({context:'bugun'});
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
     h+=weatherHeaderHTML(_greet);
     h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günışığı hava kartının hemen altında
@@ -7821,11 +7823,27 @@ function requestAeonPermissionOnce(){
   if(perm==='granted' || perm==='denied') return;
   if(aeonPermPrompted) return;
   aeonPermPrompted=true;
+  function onResult(p){
+    aeonPermPrompted=false;
+    if(data && data.settings){
+      if(data.settings.aeonNotifyPermission!==p){ data.settings.aeonNotifyPermission=p; }
+    }
+    if(p==='granted'){
+      if(data && data.settings) data.settings.aeonNotifyBannerDismissedAt=new Date().toISOString();
+      stopAeonPermissionLoop();
+      toast('ÆON bildirimleri açıldı ✨');
+    }
+    save(); render();
+  }
+  // Güvenlik ağı: bazı mobil tarayıcılar izin diyalogunu sessizce yutarsa promise hiç çözülmez.
+  // Banner butonunun tekrar çalışabilmesi için kısa sürede bayrağı sıfırlıyoruz.
+  var resetTimer=setTimeout(function(){ aeonPermPrompted=false; }, 4500);
   var res=Notification.requestPermission();
   if(res && typeof res.then==='function'){
-    res.then(function(){ aeonPermPrompted=false; }).catch(function(){ aeonPermPrompted=false; });
+    res.then(function(p){ clearTimeout(resetTimer); onResult(p); }).catch(function(){ clearTimeout(resetTimer); aeonPermPrompted=false; });
   } else {
-    setTimeout(function(){ aeonPermPrompted=false; }, 3000);
+    clearTimeout(resetTimer);
+    setTimeout(function(){ aeonPermPrompted=false; onResult(aeonNotifyPermission()); }, 3000);
   }
 }
 
@@ -7880,6 +7898,45 @@ function showNativeAeonNotification(opts){
   if(data && data.aeon){ data.aeon.lastNotificationShownAt=new Date().toISOString(); save(); }
   if(data && data.settings && Notification.permission!==data.settings.aeonNotifyPermission){ data.settings.aeonNotifyPermission=Notification.permission; save(); }
 }
+
+// ── ÆON bildirim izni banner'ı (aç/kapa yok; tek dokunuşlu) ──
+function shouldShowAeonNotifyBanner(){
+  if(!canNotify()) return false;
+  if(aeonNotifyPermission()!=='default') return false;
+  if(!data || !data.settings) return false;
+  if(ui.aeonNotifyBannerDismissed) return false;
+  if(data.settings.aeonNotifyBannerDismissedAt) return false;
+  return true;
+}
+function aeonNotifyBannerHTML(opts){
+  opts=opts||{};
+  var compact=!!opts.compact;
+  var title=opts.title || 'ÆON mesajları kilit ekranında';
+  var sub=opts.subtitle || 'Bildirim izni ver, hiçbir şey kaçırma.';
+  var cls=compact?'aeon-notify-nudge':'aeon-notify-banner';
+  var h='<div id="'+esc(opts.id||'aeon-notify-banner')+'" class="'+cls+'">';
+  h+='<div class="aeon-notify-badge"><img src="'+esc(AEON_ICON_URL)+'" alt="ÆON"></div>';
+  h+='<div class="aeon-notify-text">';
+  h+='<div class="aeon-notify-title">'+esc(title)+'</div>';
+  h+='<div class="aeon-notify-sub">'+esc(sub)+'</div>';
+  h+='</div>';
+  h+='<div class="aeon-notify-actions">';
+  h+='<button class="aeon-notify-btn" onclick="App.requestAeonPermissionFromBanner(\''+esc(opts.context||'banner')+'\')" aria-label="Bildirim izni ver">İzin Ver</button>';
+  if(!compact) h+='<button class="aeon-notify-close" onclick="App.dismissAeonNotifyBanner()" aria-label="Kapat">'+icon('x',16)+'</button>';
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+App.requestAeonPermissionFromBanner=function(ctx){
+  haptic([12,18]);
+  if(data && data.settings) data.settings.aeonNotifyBannerContext=String(ctx||'banner');
+  requestAeonPermissionOnce();
+};
+App.dismissAeonNotifyBanner=function(){
+  ui.aeonNotifyBannerDismissed=true;
+  if(data && data.settings) data.settings.aeonNotifyBannerDismissedAt=new Date().toISOString();
+  save(); render();
+};
 
 // ── Faz 7: Psikolojik durum tespiti (öz-bildirim TARAMA ölçekleri; klinik tanı DEĞİL) ──
 // Ölçekler kamuya açık/akademik ve ücretsiz: ASRS-v1.1 Part A (WHO), ECR kısa form,
@@ -8720,6 +8777,7 @@ function aeonChatHTML(){
   h+='<span class="section-icon">'+icon('hexagon',18)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div class="section-title">ÆON akışı</div><div class="section-sub">sınırsız sohbet · ses, fotoğraf ve gözlemci yanıtları</div></div>';
   h+='<span class="section-pill">canlı</span></div>';
+  if(shouldShowAeonNotifyBanner()) h+=aeonNotifyBannerHTML({context:'mesaj', compact:true, title:'ÆON bildirimleri kapalı', subtitle:'Kilit ekranında görmek için izin ver.'});
   h+='<div id="aeon-search-bar" style="display:none;margin:0 2px 12px;position:relative;">';
   h+='<input id="aeon-search-input" type="text" oninput="App.filterAeonSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:10px 36px 10px 14px;font-size:14px;color:var(--text);outline:none;">';
   h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',14)+'</button>';

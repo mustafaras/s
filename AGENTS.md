@@ -48,7 +48,7 @@ When working with multiple AI agents in parallel:
 
 1. **One agent at a time for data-affecting changes** — Only one agent should make changes that touch `data` persistence, `sync.js`, or migration logic. Parallel changes risk race conditions in validation and testing.
 
-2. **Handoff protocol** — Before ending your turn, leave a clear summary in session memory or a comment:
+2. **Handoff protocol** — Before ending your turn, update `AGENTS.md` § "Agent Handoff Log" (en üstten yeni giriş) and optionally session memory:
    - What files you changed
    - What you tested (syntax check, migration, panel)
    - What still needs verification
@@ -339,6 +339,49 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Use `grep_search` to locate function/section by name
 - Read in bounded line ranges (not whole file)
 - Use `replace_string_in_file` with 3-5 lines of context before/after
+
+---
+
+## Agent Handoff Log
+
+> **Talimat:** Her session sonunda bu bölümün EN ÜSTÜNE yeni bir giriş ekle.
+> Girişte: tarih, branch, değişen dosyalar, test sonuçları, deploy durumu ve
+> bir sonraki session için kalan TODO'lar / bilinen sorunlar yazılsın.
+> Böylece sonraki agentlar tüm repoyu okumak zorunda kalmaz.
+
+---
+
+### 2026-07-19 — Faz 12 (ÆON bildirimleri) + Faz 25 (Günün Fotoğrafı güvenilirliği)
+
+**Branch:** `mustafaras-pwa-aeon-bildirim` → `main` squash-merge edildi.  
+**Live sürüm:** `https://mustafaras.github.io/s/index.html` (`app.js?v=20260719b`)
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - ÆON native bildirim izni banner'ı + Mesaj sekmesi nudge'ı (aç/kapa yok, tek dokunuşlu).
+  - 2 dakikalık sessiz izin tekrar döngüsü (`startAeonPermissionLoop`).
+  - `mergeInbox()` yeni gelen ÆON mesajı/yanıtı için `showNativeAeonNotification()` çağırır.
+  - `migrate()`: `data.aeon.lastNotificationShownAt`, `data.settings.aeonNotifyPermission`, `data.settings.aeonNotifyBannerDismissedAt` backfill.
+  - Günün Fotoğrafı güvenilirliği: gün değişince `data.dailyPhoto.fetchedAt` sıfırlanır; `visibilitychange`/`focus`/`pageshow` ile uygulamaya dönünce yeniden kontrol edilir; `maybeFetchDailyPhoto()` bugün güncelse erken çıkar.
+- `index.html`
+  - Cache-bump: `app.js?v=20260719b`, `sw.js?v=20260719a`, `manifest.json?v=20260719a`.
+- `GELISTIRME-PLANI.md`
+  - Faz 12 ve Faz 25 changelog girişleri eklendi.
+- `AGENTS.md`
+  - Bu "Agent Handoff Log" bölümü eklendi.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `notification_harness.js` senaryoları ✅ (izin isteme, banner render, dismiss, Mesaj nudge)
+- `daily_photo_harness.js` senaryoları ✅ (migrate fetchedAt sıfırlama, stale fetch, redundant fetch engelleme)
+- GitHub Pages deploy başarılı (~12 sn).
+
+**Bir sonraki session için notlar / TODO:**
+- ÆON bildirimleri: gerçek iOS cihazda izin dialogu ve kilit ekranı görünümü henüz canlı test edilmedi (sadece headless harness). Kullanıcı isterse gerçek telefon testi planlanmalı.
+- Günün Fotoğrafı: Wikimedia Commons API bozulursa/çevap vermezse fallback mekanizması yok; istenirse sabit bir yedek görsel listesi eklenebilir.
+- `sw.js` `notificationclick` handler'ı ÆON mesaj sekmesine yönlendiriyor; desktop testi yapılmadı.
+- `GELISTIRME-PLANI.md` durum tablosu güncel; yeni Faz seçilirse önce oradan devam edilir.
 
 ---
 

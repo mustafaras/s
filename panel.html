@@ -641,6 +641,15 @@ function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i
 function currentStreak(){ var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1);} else break; } return c; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else c=0;}); return b; }
 function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
+function timeAgo(iso){
+  if(!iso) return '';
+  var t=new Date(iso).getTime(); if(isNaN(t)) return '';
+  var sec=Math.max(0,Math.floor((Date.now()-t)/1000));
+  if(sec<60) return 'şimdi';
+  if(sec<3600){ var m=Math.floor(sec/60); return m+' dk önce'; }
+  if(sec<86400){ var h=Math.floor(sec/3600); return h+' sa önce'; }
+  var d=Math.floor(sec/86400); return d+' gün önce';
+}
 function lastOpenedAt(){
   var best=0;
   function up(v){
@@ -971,19 +980,26 @@ function coreModules(){
   var presence=false; for(var k2 in (D&&D.days||{})){ var r=D.days[k2]; if(r&&(r.liveSession||(Array.isArray(r.sessions)&&r.sessions.length))){ presence=true; break; } }
   var sv=lastSavedAt(); var cont=!!(sv&&(Date.now()-new Date(sv).getTime()<36*3600*1000));
   var cyc=!!(D&&D.cycle&&((Array.isArray(D.cycle.periods)&&D.cycle.periods.length)||D.cycle.avgCycle));
+  var notifyPerm=(D&&D.settings&&D.settings.aeonNotifyPermission)||'';
+  var lastNotif=(D&&D.aeon&&D.aeon.lastNotificationShownAt)?new Date(D.aeon.lastNotificationShownAt).getTime():0;
+  var notifyRecent=!!(lastNotif && (Date.now()-lastNotif < 7*86400000));
   return [
     {k:"Sensorium",on:!!(loc&&locAgeH!=null&&locAgeH<48)},
     {k:"Vitals",on:dayCount>0},
     {k:"Dialogue",on:(luna+aeon)>0},
     {k:"Presence",on:presence},
     {k:"Continuity",on:cont},
-    {k:"Cycle",on:cyc}
+    {k:"Cycle",on:cyc},
+    {k:"Notifications",on:notifyPerm==='granted'}
   ];
 }
 function coreStripHTML(){
   var mods=coreModules();
   var online=mods.reduce(function(a,m){return a+(m.on?1:0);},0);
   var up=Math.max(1,diff(D.startDate,today())+1);
+  var notifyPerm=(D&&D.settings&&D.settings.aeonNotifyPermission)||'';
+  var lastNotif=D&&D.aeon&&D.aeon.lastNotificationShownAt;
+  var notifAge=lastNotif?(Date.now()-new Date(lastNotif).getTime()):null;
   var s='<div class="card pad" style="margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
   s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
   s+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
@@ -991,9 +1007,16 @@ function coreStripHTML(){
   s+='</div>';
   s+='<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;">';
   mods.forEach(function(m){ s+='<span class="badge '+(m.on?"b-ok pulse":"b-dim")+'" style="padding:4px 9px;font-size:var(--f1);" title="'+(m.on?"çevrimiçi":"bekliyor")+'">'+esc(m.k)+'</span>'; });
+  if(notifyPerm==='granted'){
+    s+='<span class="badge b-ok pulse" style="padding:4px 9px;font-size:var(--f1);" title="Bildirim izni verildi">Bildirim açık · '+esc(timeAgo(lastNotif)||'henüz tetiklenmedi')+'</span>';
+  } else if(notifyPerm==='denied'){
+    s+='<span class="badge b-warn" style="padding:4px 9px;font-size:var(--f1);" title="Bildirim izni reddedildi">Bildirim kapalı</span>';
+  } else {
+    s+='<span class="badge b-dim" style="padding:4px 9px;font-size:var(--f1);" title="Bildirim izni bekleniyor">Bildirim bekleniyor</span>';
+  }
   s+='</div>';
   s+='<div style="display:flex;align-items:center;gap:16px;margin-left:auto;">';
-  s+='<div class="meta"><b class="mono">'+online+'/6</b><span>Modül</span></div>';
+  s+='<div class="meta"><b class="mono">'+online+'/'+mods.length+'</b><span>Modül</span></div>';
   s+='<div class="meta"><b class="mono">'+up+'g</b><span>Uptime</span></div>';
   s+='</div>';
   s+='</div>';

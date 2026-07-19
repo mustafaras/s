@@ -1635,6 +1635,40 @@ function profileAssessmentCardHTML(){
   det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Bu rapor öz-bildirime dayalıdır, tek bir zaman noktasını yansıtır ve klinik tanı değildir; bir uzmanın değerlendirmesinin yerini tutmaz. Ham yanıtlar panelde gösterilmez.</div>';
   return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,summary:sumChips,details:det});
 }
+// ── Terapi Odası: uygulamaya çekilen bilimsel profil özeti ──
+function scientificProfileLightCardHTML(){
+  var SP=(D&&D.scientificProfile)?D.scientificProfile:null;
+  if(!SP||typeof SP!=='object'){
+    return cardWrap({key:'sciProfileLight',icon:icon('sparkles',18),title:'Bilimsel Profil Işığı',span:12,order:18,
+      summary:'Henüz Terapi Odası profili çekilmemiş. Uygulamada Profilim sekmesinden raporu yükleyince burada parlayacak.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Bu kart, Şeyma veri reposundaki bilimsel profil özetini uygulamada görüntülediğinde aktive olur. Gözlemciye rehber ışık verir: güçlü yönler, dikkat alanları ve nazik iletişim önerileri.</div>'});
+  }
+  var riasec=(SP.riasec||[]).slice(0,3).map(function(c){ return ({social:'Sosyal',conventional:'Düzenleyici',enterprising:'Girişimci',artistic:'Sanatsal',investigative:'Araştırmacı',realistic:'Gerçekçi'})[String(c).toLowerCase()]||esc(c); });
+  var values=(SP.values||[]).slice(0,3).map(function(v){ return ({security:'Güvenilirlik',benevolence:'İyilikseverlik',achievement:'Başarı',conformity:'Uyum',self_direction:'Özgünlük'})[String(v).toLowerCase()]||esc(v); });
+  function chip(txt,col){ return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+col+'22;border:1px solid '+col+'66;color:'+col+';white-space:nowrap;">'+esc(txt)+'</span>'; }
+  var sum='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  if(SP.confidence!=null) sum+=chip('%'+SP.confidence+' güven','var(--gold)');
+  if(riasec.length) sum+=chip('RIASEC: '+riasec.join(' · '),'var(--purple)');
+  if(values.length) sum+=chip('Değerler: '+values.join(' · '),'var(--rose)');
+  sum+='</div>';
+  var det='';
+  if(SP.strengths&&SP.strengths.length){
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:10px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('zap',14)+' Güçlü yönler</div>';
+    det+='<ul style="margin:0;padding-left:18px;font-size:var(--f2);color:var(--t3);line-height:1.45;">'+SP.strengths.map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>';
+  }
+  if(SP.risks&&SP.risks.length){
+    det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:10px;background:var(--s1);">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('triangle-alert',14)+' Dikkat alanları</div>';
+    det+='<ul style="margin:0;padding-left:18px;font-size:var(--f2);color:var(--t3);line-height:1.45;">'+SP.risks.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul></div>';
+  }
+  det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;background:var(--s1);">';
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('heart-handshake',14)+' Gözlemciye kısa rehber</div>';
+  det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.55;">Küçük başarıları takdir et, zor anlarda duraklat, başlamada destek ol. Kontrolcü çizgiye düşürmeden nazik hatırlatmalar ver. “Şu an zor hissediyorum” sinyalini görünce sakin ve net bir cümleyle yanıt ver.</div>';
+  det+='</div>';
+  if(SP.note) det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.45;margin-top:8px;">'+esc(SP.note)+'</div>';
+  return cardWrap({key:'sciProfileLight',icon:icon('sparkles',18),title:'Bilimsel Profil Işığı',span:12,order:18,summary:sum,details:det});
+}
 // ---- Motivasyon V2.1 (120 günlük program) — panel D.motivation.history'yi okur; aktif gün bilgisi motivationProgramV2.js'den alınır ----
 function panelMotivationActiveDay(){
   var mp=(typeof window!=='undefined'&&window.MotivationProgramV2)?window.MotivationProgramV2:null;
@@ -2446,6 +2480,27 @@ function render(){
       h+='<div style="margin-top:9px;padding:8px 11px;border-radius:10px;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.4);font-size:var(--f2);color:#E58B96;line-height:1.45;font-weight:600;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('triangle-alert',14)+'</span><span>Son 30 günde '+dzMohDays+' gün ağrı kesici kaydı var. Sık kullanım (ayda 10-15+ gün) ilaç aşırı kullanımı baş ağrısını tetikleyebilir — hekime danışmak iyi olur.</span></div>';
     }
   }
+  // ── Terapi Odası kayıtları (günlük mini araçlar) ──
+  var th=srec.therapy||{};
+  var thItems=[];
+  if(th.dailyWin&&th.dailyWin.text) thItems.push({ic:'sparkles',col:'var(--gold)',t:'Bugünün kazanımı',v:'“'+esc(th.dailyWin.text)+'”'});
+  if(th.firstStep&&th.firstStep.text) thItems.push({ic:'footprints',col:'var(--purple)',t:'İlk adım',v:'“'+esc(th.firstStep.text)+'”'});
+  if(th.selfCompassion&&th.selfCompassion.note) thItems.push({ic:'heart',col:'var(--rose)',t:'Öz-şefkat',v:'“'+esc(th.selfCompassion.note)+'”'});
+  if(th.breath&&th.breath.seconds>0) thItems.push({ic:'wind',col:'var(--teal)',t:'Nefes pratiği',v:Math.round(th.breath.seconds)+' sn'});
+  if(th.decision&&th.decision.choice) thItems.push({ic:'scale',col:'var(--purple)',t:'Karar',v:esc(th.decision.choice)});
+  if(th.thoughts&&Array.isArray(th.thoughts)&&th.thoughts.length) thItems.push({ic:'brain',col:'var(--rose)',t:'Düşünce kaydı',v:th.thoughts.length+' adet'});
+  if(th.share&&th.share.sentAt) thItems.push({ic:'send',col:'var(--gold)',t:'Güvenli paylaşım',v:fmtTime(th.share.sentAt)});
+  if(thItems.length){
+    h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('heart-handshake',14)+' Terapi Odası</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">';
+    thItems.forEach(function(it){
+      h+='<div style="display:flex;align-items:flex-start;gap:8px;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;border-left:3px solid '+it.col+';padding:7px 10px;">'
+        +'<span style="display:inline-flex;flex-shrink:0;color:'+it.col+';">'+icon(it.ic,13)+'</span>'
+        +'<div style="min-width:0;"><span style="font-size:var(--f2);font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;">'+it.t+'</span>'
+        +'<div style="font-size:var(--f3);color:var(--t1);line-height:1.35;word-break:break-word;">'+it.v+'</div></div></div>';
+    });
+    h+='</div>';
+  }
   h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('pen-line',14)+' Günün Notu</div>';
   if(srec.note&&String(srec.note).trim()){
     h+='<div style="margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
@@ -2497,6 +2552,7 @@ function render(){
   h+=cycleCardHTML();
   h+=psychCardHTML();
   h+=profileAssessmentCardHTML();
+  h+=scientificProfileLightCardHTML();
   h+=motivationPanelCardHTML();
   h+=magnesiumPanelCardHTML();
   h+=saygiPanelCardHTML();

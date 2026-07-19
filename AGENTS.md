@@ -351,6 +351,53 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-19 — Faz 6/7/9 + Terapi Odası Premium Genişletme (Bilimsel Profil)
+
+**Branch:** `mustafaras-bilimsel-profil-terapi-odasi` (feature branch; henüz `main`'e/canlıya alınmadı — kullanıcı onayı bekleniyor).  
+**İlgili plan:** `/Users/m_ras/.copilot/session-state/cb13fba4-0ce7-4eef-808d-343099513340/plan.md`
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `emptyTherapy()`, `ensureTherapyDay()`, `ensureTherapyAllDays()` ve `getDay()` terapi kaydı normalizasyonu.
+  - `migrate()`: `data.scientificProfile` iskeleti + tüm günler için `therapy` backfill.
+  - `ICONS` haritasına `scale` ikonu eklendi.
+  - Terapi Odası overlay'i 3 sekmeye (`Yol`, `Araçlar`, `Profilim`) bölündü; `ui.roomTab`, `ui.roomTool`, zamanlayıcı/fetch durum alanları.
+  - `roomOverlayHTML()` yeniden `segTabs` kabuğuna çevrildi; mevcut yol içeriği `roomPathHTML()`'e çıkarıldı.
+  - Yeni kartlar: `roomDailyWinHTML()`, `roomFlexNudgeHTML()` ve handler'lar `App.saveDailyWin`, `App.copyFlexNudge`.
+  - `roomToolsHTML()` ile 6 akordeon araç kartı: İlk Adım, Öz-Şefkat, Rehberli Nefes, Karar Hızlandırıcı, CBT Düşünce Kaydı, Güvenli Paylaşım.
+  - Araç handler'ları: `saveFirstStep`, `startFirstStepTimer`, `saveSelfCompassion`, `presetSelfCompassion`, `setBreathPattern`, `toggleBreath`, `stopBreath`, `saveDecision`, `startDecisionTimer`, `chooseDecision`, `saveThought`, `saveShareNote`, `sendAeonShare`.
+  - `roomProfileHTML()`, `roomPrettyRiasec`, `roomPrettyValue`, `roomProfileRecommendations`, `App.fetchProfileForRoom()`, `parseScientificProfileMD()` — `seyma-data` reposundan runtime profil çekimi ve öneri butonları.
+- `panel.html`
+  - `scientificProfileLightCardHTML()` bento kartı (RIASEC/değer çipleri, güçlü yönler/riskler, gözlemci rehberi).
+  - Gün-detay kartına Terapi Odası satırları eklendi: kazanım, ilk adım, öz-şefkat, nefes süresi, karar seçimi, düşünce kaydı sayısı, ÆON paylaşım sinyali.
+- `index.html`
+  - Cache-bump: `styles.css?v=20260720a`, `app.js?v=20260720a`, `sync.js?v=20260720a`.
+- `GELISTIRME-PLANI.md`
+  - Durum tablosu: #6 CBT ✅, #7 Nefes ✅, #9 Niyet/Esneklik ✅; yeni madde #29 Terapi Odası Premium ✅.
+  - 2026-07-20 changelog girişi eklendi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `room_harness.js` (headless Node `vm`) ✅:
+  - 3 sekme (Yol/Araçlar/Profilim) render ediyor.
+  - Yol sekmesinde kazanım ve esneklik nudgesı kartları görünüyor.
+  - Araçlar sekmesinde 6 araç kartı görünüyor.
+  - Profilim sekmesinde bilimsel profil özeti, RIASEC çipi (`Sosyal`), güçlü yönler bölümü görünüyor.
+  - `migrate()` eski veriye `scientificProfile` ve `therapy` backfill ediyor.
+- Gerçek tarayıcı testi yapılmadı (kullanıcı "canlıya alma" talimatı verdi; headless harness ile sınırlı tutuldu).
+
+**Bir sonraki session için notlar / TODO:**
+- Kullanıcı onay verdiğinde `main` → GitHub Pages deploy yapılabilir; öncesinde isterse gerçek cihaz/iPhone testi planlanmalı.
+- Profil çekimi `seyma-data` reposundaki `bilimsel-profil-degerlendirme-ozet-2026-07-13.md` dosyasına bağlı; dosya adı değişirse `App.fetchProfileForRoom()` içindeki path güncellenmeli.
+- Nefes aracındaki animasyonlu halka gerçek tarayıcıda CSS `transform`/`border-color` geçişiyle kontrol edilmeli; headless harness görsel doğrulama yapmıyor.
+- CBT Düşünce Kaydı formundaki `evidenceFor`/`evidenceAgainst` textarea satır sayısı mobil klavyede iyi hissettirmiyorsa ayarlanabilir.
+- Yeni `data.scientificProfile` ve `data.days[].therapy` alanları `sync.js` `sanitize()`'dan geçiyor; gizli alan eklenmediği için ek sanitize gerekmedi.
+
+---
+
 ### 2026-07-19 — Faz 12 (ÆON bildirimleri) + Faz 25 (Günün Fotoğrafı güvenilirliği)
 
 **Branch:** `mustafaras-pwa-aeon-bildirim` → `main` squash-merge edildi.  

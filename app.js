@@ -132,6 +132,7 @@ var ICONS={
   'paperclip':'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />',
   'thumbs-up':'<path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />',
   'thumbs-down':'<path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />',
+  'scale':'<path d="M12 3v18" /><path d="M3 6h18" /><path d="M4 6l4 10" /><path d="M20 6l-4 10" /><circle cx="12" cy="3" r="1.5" /><circle cx="5.5" cy="17" r="2.5" /><circle cx="18.5" cy="17" r="2.5" />',
 };
 // SVG ikon yardımcısı — emoji yerine tutarlı, tema-uyumlu (currentColor) çizgi ikonlar.
 // size: piksel; cls: ekstra CSS class (opsiyonel, örn. "seyIconSpin"). Bilinmeyen isimde
@@ -662,6 +663,21 @@ function migrate(d){
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
   // Gün değişmişse fetchedAt'ı sıfırla, böylece stale koruması gece yarısı sonrası ilk fırsatta yeni fotoğraf çeker.
   if(d.dailyPhoto.date!==todayStr()) d.dailyPhoto.fetchedAt='';
+  // Bilimsel profil değerlendirmesi (runtime'da seyma-data'dan çekilir; burada boş iskelet backfill).
+  if(!d.scientificProfile||typeof d.scientificProfile!=='object') d.scientificProfile={source:'',assessedAt:'',confidence:null,consent:'',riasec:[],values:[],traits:{},attachment:{},strengths:[],risks:[],note:''};
+  if(typeof d.scientificProfile.source!=='string') d.scientificProfile.source='';
+  if(typeof d.scientificProfile.assessedAt!=='string') d.scientificProfile.assessedAt='';
+  if(typeof d.scientificProfile.confidence!=='number'&&d.scientificProfile.confidence!==null) d.scientificProfile.confidence=null;
+  if(typeof d.scientificProfile.consent!=='string') d.scientificProfile.consent='';
+  if(!Array.isArray(d.scientificProfile.riasec)) d.scientificProfile.riasec=[];
+  if(!Array.isArray(d.scientificProfile.values)) d.scientificProfile.values=[];
+  if(!d.scientificProfile.traits||typeof d.scientificProfile.traits!=='object') d.scientificProfile.traits={};
+  if(!d.scientificProfile.attachment||typeof d.scientificProfile.attachment!=='object') d.scientificProfile.attachment={};
+  if(!Array.isArray(d.scientificProfile.strengths)) d.scientificProfile.strengths=[];
+  if(!Array.isArray(d.scientificProfile.risks)) d.scientificProfile.risks=[];
+  if(typeof d.scientificProfile.note!=='string') d.scientificProfile.note='';
+  // Terapi Odası günlük kayıtları
+  ensureTherapyAllDays(d);
   // Magnezyum Danışmanı — kullanıcı profili + model + günlük kayıt.
   if(!d.settings.magnesium||typeof d.settings.magnesium!=='object') d.settings.magnesium={enabled:false,onboardingDone:false,preferredForm:'',tolerated:true,kidneyDisease:false,lastNudgeDate:null,dismissedUntil:null};
   // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
@@ -746,7 +762,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
 var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -964,7 +980,7 @@ function updateNutriLive(day){ var nu=dayNutrition(day); var pg=proteinGoal(),cg
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null; } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium(),therapy:emptyTherapy()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null; ensureTherapyDay(r); } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 // ---------- SAYGI · günün bilim ve sanat insanı ----------
@@ -973,6 +989,37 @@ function emptyReading(){ return {entries:[]}; }
 // kaynak güncel ve CC BY-SA atfı içerikle birlikte kalır.
 var SAYGI_EPOCH='2026-07-13', SAYGI_CACHE_PREFIX='seyma-saygi-v1:', saygiMemoryCache={}, saygiReadObserver=null;
 function emptySaygi(){ return {personId:null,readAt:null,readingEntryId:null}; }
+function emptyTherapy(){ return {firstStep:{text:'',startedAt:null,completedAt:null},selfCompassion:{prompt:'',note:'',completedAt:null},breath:{pattern:'4-7-8',seconds:0,completedAt:null},decision:{optionA:'',optionB:'',choice:'',note:'',completedAt:null},thoughts:[],dailyWin:{text:'',completedAt:null},share:{sentAt:null,note:''}}; }
+function ensureTherapyDay(day){
+  if(!day||typeof day!=='object') return emptyTherapy();
+  if(!day.therapy||typeof day.therapy!=='object') day.therapy=emptyTherapy();
+  var t=day.therapy;
+  if(!t.firstStep||typeof t.firstStep!=='object') t.firstStep={text:'',startedAt:null,completedAt:null};
+  if(typeof t.firstStep.text!=='string') t.firstStep.text='';
+  if(typeof t.firstStep.startedAt!=='string'&&t.firstStep.startedAt!==null) t.firstStep.startedAt=null;
+  if(typeof t.firstStep.completedAt!=='string'&&t.firstStep.completedAt!==null) t.firstStep.completedAt=null;
+  if(!t.selfCompassion||typeof t.selfCompassion!=='object') t.selfCompassion={prompt:'',note:'',completedAt:null};
+  if(typeof t.selfCompassion.prompt!=='string') t.selfCompassion.prompt='';
+  if(typeof t.selfCompassion.note!=='string') t.selfCompassion.note='';
+  if(typeof t.selfCompassion.completedAt!=='string'&&t.selfCompassion.completedAt!==null) t.selfCompassion.completedAt=null;
+  if(!t.breath||typeof t.breath!=='object') t.breath={pattern:'4-7-8',seconds:0,completedAt:null};
+  if(typeof t.breath.pattern!=='string') t.breath.pattern='4-7-8';
+  if(typeof t.breath.seconds!=='number'||isNaN(t.breath.seconds)) t.breath.seconds=0;
+  if(typeof t.breath.completedAt!=='string'&&t.breath.completedAt!==null) t.breath.completedAt=null;
+  if(!t.decision||typeof t.decision!=='object') t.decision={optionA:'',optionB:'',choice:'',note:'',completedAt:null};
+  ['optionA','optionB','choice','note'].forEach(function(k){ if(typeof t.decision[k]!=='string') t.decision[k]=''; });
+  if(typeof t.decision.completedAt!=='string'&&t.decision.completedAt!==null) t.decision.completedAt=null;
+  if(!Array.isArray(t.thoughts)) t.thoughts=[];
+  t.thoughts=t.thoughts.filter(function(x){ return x&&typeof x==='object'; }).map(function(x){ return {situation:String(x.situation||''),thought:String(x.thought||''),evidenceFor:String(x.evidenceFor||''),evidenceAgainst:String(x.evidenceAgainst||''),altThought:String(x.altThought||''),createdAt:String(x.createdAt||new Date().toISOString())}; });
+  if(!t.dailyWin||typeof t.dailyWin!=='object') t.dailyWin={text:'',completedAt:null};
+  if(typeof t.dailyWin.text!=='string') t.dailyWin.text='';
+  if(typeof t.dailyWin.completedAt!=='string'&&t.dailyWin.completedAt!==null) t.dailyWin.completedAt=null;
+  if(!t.share||typeof t.share!=='object') t.share={sentAt:null,note:''};
+  if(typeof t.share.sentAt!=='string'&&t.share.sentAt!==null) t.share.sentAt=null;
+  if(typeof t.share.note!=='string') t.share.note='';
+  return t;
+}
+function ensureTherapyAllDays(d){ if(d&&d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ if(d.days[k]&&typeof d.days[k]==='object') ensureTherapyDay(d.days[k]); }); }
 function ensureSaygiDay(day){
   if(!day||typeof day!=='object') return emptySaygi();
   if(!day.saygi||typeof day.saygi!=='object') day.saygi=emptySaygi();
@@ -3061,7 +3108,7 @@ function updateMotivationCard(){
 // İçsel Pusula kartına döner.
 App.openRoom=function(){
   if(!featuresLive()){ toast('İçsel Pusula 13 Temmuz\'da açılıyor'); return; }
-  ui.roomOpen=true; ui.motivationMinimumOpen=false;
+  ui.roomOpen=true; ui.motivationMinimumOpen=false; ui.roomTab='path'; ui.roomTool=null;
   // Kaydedilmiş günü düzenleyebilmek için: bugünün kaydı varsa yansımayı input'a getir.
   var M=window.MotivationProgramV2, stt=M?M.dayState(data,activeDate()):null;
   var done=!!(stt&&(stt.status==='completed'||stt.status==='minimum_completed'));
@@ -3069,6 +3116,7 @@ App.openRoom=function(){
   haptic(12); render();
 };
 App.closeRoom=function(){
+  clearRoomTimers();
   var ov=document.getElementById('sey-room-overlay'), sh=document.getElementById('sey-room-sheet');
   if(ov&&sh&&!prefersReducedMotion()){
     sh.style.transition='transform .26s var(--ease-premium,cubic-bezier(.16,1,.3,1)),opacity .24s ease';
@@ -3078,6 +3126,14 @@ App.closeRoom=function(){
   } else { ui.roomOpen=false; render(); }
   haptic(8);
 };
+function clearRoomTimers(){
+  if(ui.roomBreathTimer){ clearInterval(ui.roomBreathTimer); ui.roomBreathTimer=null; }
+  if(ui.roomDecisionTimer){ clearInterval(ui.roomDecisionTimer); ui.roomDecisionTimer=null; }
+  if(ui.roomFirstTimer){ clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null; }
+  ui.roomBreathActive=false;
+}
+App.setRoomTab=function(tab){ ui.roomTab=tab; ui.roomTool=null; haptic(6); render(); };
+App.toggleRoomTool=function(id){ ui.roomTool=(ui.roomTool===id?null:id); haptic(8); render(); };
 // Geriye dönük uyumluluk (eski çağrılar tam ekran odayı açsın).
 App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
@@ -4523,18 +4579,28 @@ function roomOverlayHTML(){
   h+='</div>';
   h+='<div style="position:relative;height:6px;border-radius:999px;background:var(--icon);overflow:hidden;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
   h+='</div>';
+  // ── Sekme menüsü ──
+  h+='<div style="padding:0 18px 8px;">';
+  h+=segTabs([['path','Yol', 'compass'],['tools','Araçlar','heart-handshake'],['profile','Profilim','sparkles']], ui.roomTab, 'App.setRoomTab', 'room');
+  h+='</div>';
   // ── Kaydırılabilir gövde ──
   h+='<div class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:14px;">';
-
+  if(ui.roomTab==='path') h+=roomPathHTML(M,mot,sum,st,doneToday,nar,fi);
+  else if(ui.roomTab==='tools') h+=roomToolsHTML(fi);
+  else h+=roomProfileHTML(fi);
+  h+='</div></div></div>';
+  return h;
+}
+function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){
+  var hasReflection=!!(String(ui.motivationReflectionDraft||'').trim());
+  var h='';
   if(sum.programComplete){
     h+='<div style="'+fi(0.04)+'">'+motivationQuoteBlockHTML(mot.quote)+'</div>';
     h+='<div style="font-size:13px;color:var(--text2);line-height:1.6;'+fi(0.08)+'">120 günlük yol, bu odada birlikte yüründü. Elde ettiğin bir rozet değil; zor bir günde kendine dönebildiğin, güvenilir bir iç yol.</div>';
     h+=roomStatsHTML(sum,fi);
     h+='<div style="font-size:12px;color:var(--room);line-height:1.5;font-style:italic;display:flex;align-items:center;gap:6px;'+fi(0.14)+'">'+icon('heart',13)+' Bu oda, ikimizin — sana iyi gelsin diye.</div>';
-    h+='</div></div></div>';
     return h;
   }
-
   // Söz
   h+='<div style="'+fi(0.04)+'">'+motivationQuoteBlockHTML(mot.quote)+'</div>';
   // GÜNE ÖZGÜ ANLATI
@@ -4552,11 +4618,11 @@ function roomOverlayHTML(){
   if(mot.explanation) h+='<div style="font-size:13px;color:var(--text2);line-height:1.55;">'+esc(mot.explanation)+'</div>';
   h+='<div style="font-size:12.5px;color:var(--muted);line-height:1.5;">'+esc(motivationPersonalLine(mot,sum,st))+'</div>';
   h+='</div>';
-  // Bugünün sorusu (yansıma sorusu — artık görünür)
+  // Bugünün sorusu
   if(mot.reflectionQuestion) h+='<div style="'+fi(0.1)+'display:flex;gap:9px;align-items:flex-start;background:rgba(201,184,255,0.12);border:1px solid rgba(201,184,255,0.28);border-radius:14px;padding:12px 13px;"><span style="flex-shrink:0;color:var(--room);display:inline-flex;margin-top:1px;">'+icon('lightbulb',15)+'</span><div style="font-size:13px;line-height:1.55;color:var(--text2);"><b>Bugünün sorusu:</b> '+esc(mot.reflectionQuestion)+'</div></div>';
   // Bugünkü görev + küçültme
   var minMode=!doneToday&&!!ui.motivationMinimumOpen;
-  h+='<div style="border-left:3px solid var(--room);background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:0 14px 14px 0;padding:12px;display:flex;flex-direction:column;gap:6px;transition:opacity .25s ease;'+fi(0.12)+(minMode?'opacity:.5;':'')+'">';
+  h+='<div style="background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;transition:opacity .25s ease;'+fi(0.12)+(minMode?'opacity:.5;':'')+'">';
   h+='<div style="font-size:11px;font-weight:700;color:var(--muted);">Bugünkü görev</div>';
   h+='<div style="font-size:14px;color:var(--text);line-height:1.45;">'+esc(mot.standardTask)+'</div>';
   h+='</div>';
@@ -4568,9 +4634,7 @@ function roomOverlayHTML(){
     h+='</div>';
   }
   h+='<div style="'+fi(0.14)+'display:flex;flex-direction:column;gap:8px;">';
-  // Kaydedilmiş günde de yansıma görünür ve düzenlenebilir (önceden dolu gelir).
   if(doneToday) h+='<div style="display:inline-flex;align-self:flex-start;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.16);padding:4px 11px;border-radius:999px;">'+icon('check',12)+(st&&st.status==='minimum_completed'?'Minimum kaydedildi · düzenleyebilirsin':'Bugün kaydedildi · düzenleyebilirsin')+'</div>';
-  // Örnek yansımalar (açılır kapanır kart)
   if(mot.reflectionExamples && mot.reflectionExamples.length){
     var exOpen = !!ui.motivationExamplesOpen;
     h+='<div style="border:1px solid color-mix(in srgb,var(--room) 22%,var(--card-bd));background:linear-gradient(160deg,var(--room-bg),transparent);border-radius:14px;overflow:hidden;">';
@@ -4593,7 +4657,7 @@ function roomOverlayHTML(){
   }
   h+='<input id="sey-mot-reflection-main" type="text" maxlength="280" value="'+esc(ui.motivationReflectionDraft||'')+'" oninput="App.setMotivationReflection(this)" placeholder="Bu odaya bugün ne bırakmak istersin?" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
   h+='<div style="font-size:10.5px;color:var(--faint);margin-top:-3px;">'+(doneToday?'Kaydını dilediğin an düzenleyip güncelleyebilirsin.':'Kısa da olsa yeter — bu oda seni duyuyor.')+'</div>';
-  var pEnabled=hasReflection; // her zaman bir cümle iste → boşken buton pasif; "cümle yaz" uyarısı çıkmaz
+  var pEnabled=hasReflection;
   var saveStatus=doneToday?((st&&st.status==='minimum_completed')?'minimum_completed':'completed'):'completed';
   var pOnclick=minMode?"App.confirmMotivationMinimum()":("App.completeMotivationTask('"+saveStatus+"')");
   var pLabel=minMode?'Minimum görevi tamamladım':(doneToday?'Kaydı güncelle':motivationNextStepLabel(st));
@@ -4604,28 +4668,481 @@ function roomOverlayHTML(){
   if(minMode) h+='<button onclick="App.closeMotivationMinimum()" style="flex-shrink:0;border:1px solid var(--field-bd);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">Vazgeç</button>';
   else if(!doneToday) h+='<button onclick="App.openMotivationMinimum()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.4);cursor:pointer;padding:13px 15px;border-radius:14px;font-size:12.5px;font-weight:700;color:var(--text2);background:rgba(233,175,193,0.10);">Görevi küçült</button>';
   h+='</div></div>';
-  // Sabah / Akşam / Zor gün notları (programın zengin metinleri — artık görünür)
+  // Bugünün kazanımı (akşam kapanışı)
+  h+=roomDailyWinHTML(fi, doneToday?0.16:0.15);
+  // Esneklik nudgesı
+  h+=roomFlexNudgeHTML(mot,fi, doneToday?0.18:0.17);
+  // Sabah / Akşam / Zor gün notları
   if(mot.appNudge&&(mot.appNudge.morning||mot.appNudge.evening||mot.appNudge.hardDay)){
     var nudgeRow=function(ic,label,txt,col){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="width:28px;height:28px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%,var(--icon));">'+icon(ic,14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">'+label+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-top:1px;">'+esc(txt)+'</div></div></div>'; };
-    h+='<div style="'+fi(0.16)+'display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--card-bd);padding-top:13px;">';
+    h+='<div style="'+fi(doneToday?0.2:0.19)+'display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--card-bd);padding-top:13px;">';
     h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--faint);">GÜN BOYU EŞLİK</div>';
     if(mot.appNudge.morning) h+=nudgeRow('sunrise','SABAH',mot.appNudge.morning,'#E8A53C');
     if(mot.appNudge.evening) h+=nudgeRow('moon','AKŞAM',mot.appNudge.evening,'#7C5CC4');
     if(mot.appNudge.hardDay) h+=nudgeRow('triangle-alert','ZOR GÜN',mot.appNudge.hardDay,'#E9899F');
     h+='</div>';
   }
-  if(mot.eveningCheck) h+='<div style="'+fi(0.18)+'font-size:11.5px;color:var(--faint);line-height:1.5;">'+esc(mot.eveningCheck)+'</div>';
-  // İstatistikler
+  if(mot.eveningCheck) h+='<div style="'+fi(doneToday?0.22:0.21)+'font-size:11.5px;color:var(--faint);line-height:1.5;">'+esc(mot.eveningCheck)+'</div>';
   h+=roomStatsHTML(sum,fi);
   var evLine=motivationEvidenceLine(sum);
-  h+='<div style="'+fi(0.2)+'display:flex;flex-direction:column;gap:5px;">';
+  h+='<div style="'+fi(doneToday?0.24:0.23)+'display:flex;flex-direction:column;gap:5px;">';
   if(evLine) h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">'+esc(evLine)+'</div>';
   if(nar&&nar.closer) h+='<div style="font-size:12px;color:var(--room);font-style:italic;line-height:1.5;display:flex;align-items:center;gap:6px;">'+icon('heart',13)+' '+esc(nar.closer)+'</div>';
   else h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;font-style:italic;display:flex;align-items:center;gap:5px;">'+icon('heart',12)+' Bu oda, ikimizin — sana iyi gelsin diye.</div>';
   h+='</div>';
-  h+='</div></div></div>';
   return h;
 }
+function roomDailyWinHTML(fi, delay){
+  var day=getDay(data,activeDate());
+  var t=day.therapy;
+  var saved=!!(t.dailyWin&&t.dailyWin.text);
+  var h='<div style="'+fi(delay)+'display:flex;flex-direction:column;gap:9px;background:linear-gradient(160deg,var(--room-bg),transparent);border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:18px;padding:14px;">';
+  h+='<div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;"><span style="display:inline-flex;">'+icon('trophy',13)+'</span>Akşam kapanışı · Bugünün kazanımı</div>';
+  h+='<div style="font-size:12.5px;color:var(--muted);line-height:1.45;">Bugün kendinle gurur duyduğun küçük bir şey yaz. Bir adım, bir nazik cümle, bir zorluğu yönetmek — hepsi sayılır.</div>';
+  h+='<input id="sey-room-win" type="text" maxlength="200" value="'+esc(t.dailyWin?t.dailyWin.text:'')+'" onchange="App.saveDailyWin(this)" placeholder="Bugünün kazanımı..." style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
+  if(saved) h+='<div style="font-size:11px;color:#3F8A4F;display:flex;align-items:center;gap:5px;">'+icon('check',11)+' Kazanım kaydedildi</div>';
+  h+='</div>';
+  return h;
+}
+function roomFlexNudgeHTML(mot, fi, delay){
+  var dayIdx=Math.max(0,Math.abs(diffDays(data.startDate||'2026-07-13', activeDate())));
+  var prompts=[
+    'Bugün mükemmellik değil, ilerleme niyetiyle hareket ediyorum.',
+    'Plan değişse de nefes alıp yeni bir küçük adım bulabilirim.',
+    'Kontrol edemediğim şeylere izin veriyorum; kendime ise yumuşak davranıyorum.',
+    'Bugün "iyi yeterli" demeyi pratik ediyorum.',
+    'Bir şeyi ertelemişsem bu karakterim değil, o anın durumuydu.'
+  ];
+  var nudge=prompts[dayIdx%prompts.length];
+  var h='<div style="'+fi(delay)+'display:flex;flex-direction:column;gap:9px;background:rgba(233,175,193,0.10);border:1px solid rgba(233,175,193,0.35);border-radius:18px;padding:14px;">';
+  h+='<div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.5px;color:#B77A8E;text-transform:uppercase;"><span style="display:inline-flex;">'+icon('wind',13)+'</span>Esneklik nudgesı</div>';
+  h+='<div style="font-size:13px;color:var(--text2);line-height:1.55;font-style:italic;">'+esc(nudge)+'</div>';
+  h+='<button onclick="App.copyFlexNudge()" style="align-self:flex-start;border:1px solid rgba(233,175,193,0.45);background:transparent;cursor:pointer;padding:8px 13px;border-radius:12px;font-size:12px;font-weight:700;color:#B77A8E;display:flex;align-items:center;gap:6px;">'+icon('copy',12)+' Bugünün niyetine kopyala</button>';
+  h+='</div>';
+  return h;
+}
+App.saveDailyWin=function(el){
+  var day=getDay(data,activeDate());
+  if(!day.therapy) day.therapy=emptyTherapy();
+  day.therapy.dailyWin={text:String(el.value||'').slice(0,200),completedAt:new Date().toISOString()};
+  save(); toast('Bugünün kazanımı kaydedildi',1500); haptic(8);
+};
+App.copyFlexNudge=function(){
+  var dayIdx=Math.max(0,Math.abs(diffDays(data.startDate||'2026-07-13', activeDate())));
+  var prompts=[
+    'Bugün mükemmellik değil, ilerleme niyetiyle hareket ediyorum.',
+    'Plan değişse de nefes alıp yeni bir küçük adım bulabilirim.',
+    'Kontrol edemediğim şeylere izin veriyorum; kendime ise yumuşak davranıyorum.',
+    'Bugün "iyi yeterli" demeyi pratik ediyorum.',
+    'Bir şeyi ertelemişsem bu karakterim değil, o anın durumuydu.'
+  ];
+  var nudge=prompts[dayIdx%prompts.length];
+  var day=getDay(data,activeDate());
+  day.intention=nudge;
+  save(); toast('Esneklik nudgesı bugünün niyeti oldu',1800); haptic(8);
+};
+function roomToolCard(id, ic, title, subtitle, body, fi, delay){
+  var open=ui.roomTool===id;
+  var h='';
+  h+='<div style="'+fi(delay)+(open?'border-color:var(--room);':'')+'display:flex;flex-direction:column;gap:0;background:linear-gradient(160deg,var(--room-bg),transparent);border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:18px;overflow:hidden;">';
+  h+='<button type="button" onclick="App.toggleRoomTool(\''+id+'\')" style="width:100%;border:none;background:transparent;cursor:pointer;padding:14px;display:flex;align-items:center;gap:11px;text-align:left;">';
+  h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--room);background:color-mix(in srgb,var(--room) 15%,var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(ic,18)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="font-size:14.5px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(title)+'</div>';
+  if(subtitle) h+='<div style="font-size:11.5px;color:var(--muted);line-height:1.35;margin-top:1px;">'+esc(subtitle)+'</div>';
+  h+='</div>';
+  h+='<span style="flex-shrink:0;display:inline-flex;transition:transform .2s ease;transform:rotate('+(open?'90deg':'0deg')+');color:var(--muted);">'+icon('chevron-up',14)+'</span>';
+  h+='</button>';
+  if(open){
+    h+='<div style="padding:0 14px 14px;animation:seyFloatIn .22s ease both;">';
+    h+=body;
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function roomToolsHTML(fi){
+  var day=getDay(data,activeDate()).therapy;
+  var h='';
+  h+='<div style="'+fi(0.02)+'font-size:12.5px;color:var(--muted);line-height:1.5;text-align:center;">Zor anlar geçicidir; bu araçlar seni orada karşılar. Küçük bir adım da yeterli.</div>';
+  // İlk Adım Asistanı
+  var fsBody='';
+  fsBody+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  fsBody+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Bugün hangi küçük adımı atabilirim? Sadece ilk hamleyi yaz, gerisi kendiliğinden açılır.</div>';
+  fsBody+='<input id="sey-room-first-text" type="text" maxlength="200" value="'+esc(day.firstStep.text)+'" placeholder="Örn. su bardağını kaldırıp 5 dakika otur..." onchange="App.saveFirstStep(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
+  fsBody+='<div style="display:flex;gap:8px;align-items:center;">';
+  var fsActive=!!ui.roomFirstTimer;
+  fsBody+='<button onclick="App.startFirstStepTimer()" '+(fsActive?'disabled':'')+' style="flex:1;border:none;cursor:'+(fsActive?'not-allowed':'pointer')+';padding:11px;border-radius:12px;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));opacity:'+(fsActive?'0.5':'1')+';">'+icon('alarm-clock',13)+' 2 dakika şimdi başla</button>';
+  fsBody+='<div id="sey-room-first-count" style="font-size:18px;font-weight:800;color:var(--room);font-variant-numeric:tabular-nums;min-width:50px;text-align:center;">'+(fsActive?'02:00':'')+'</div>';
+  fsBody+='</div>';
+  if(day.firstStep.completedAt) fsBody+='<div style="font-size:11px;color:#3F8A4F;display:flex;align-items:center;gap:5px;">'+icon('check',11)+' '+fmtWhen(day.firstStep.completedAt)+' tamamlandı</div>';
+  fsBody+='</div>';
+  h+=roomToolCard('firstStep','footprints','İlk Adım Asistanı','2 dakikalık başlangıç zamanlayıcısı',fsBody,fi,0.04);
+  // Öz-Şefkat Anı
+  var scPrompts=['Kendine bugün söyleyebileceğin en nazik cümle nedir?','Bu zorluk senin kusurun değil, o anın koşulu.','Nefes al. Şimdi kendine bir çocuğa söyler gibi bir cümle kur.','Kendini iyi hissetmek zorunda değilsin; sadece yanında olmak yeterli.'];
+  var scIdx=Math.max(0,Math.abs(diffDays(data.startDate||'2026-07-13', activeDate())))%scPrompts.length;
+  var scBody='';
+  scBody+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  scBody+='<div style="font-size:12.5px;color:var(--room);line-height:1.5;font-style:italic;">'+esc(scPrompts[scIdx])+'</div>';
+  scBody+='<input id="sey-room-sc" type="text" maxlength="200" value="'+esc(day.selfCompassion.note)+'" placeholder="Kendime şimdi ne söyleyebilirim..." onchange="App.saveSelfCompassion(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
+  scBody+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  ['Bu kadarı yeterli','Zorlanmak insanî','Yarın için biriktiriyorum','Kendime sabırlıyım'].forEach(function(c){
+    scBody+='<button onclick="App.presetSelfCompassion(\''+esc(c.replace(/'/g,"\\'"))+'\')" style="border:1px solid rgba(233,175,193,0.4);background:transparent;cursor:pointer;padding:6px 10px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--text2);">'+esc(c)+'</button>';
+  });
+  scBody+='</div>';
+  if(day.selfCompassion.completedAt) scBody+='<div style="font-size:11px;color:#3F8A4F;display:flex;align-items:center;gap:5px;">'+icon('check',11)+' '+fmtWhen(day.selfCompassion.completedAt)+' kaydedildi</div>';
+  scBody+='</div>';
+  h+=roomToolCard('selfCompassion','heart','Öz-Şefkat Anı','Kendine nazik bir cümle',scBody,fi,0.06);
+  // Rehberli Nefes
+  var brBody='';
+  brBody+='<div style="display:flex;flex-direction:column;gap:12px;align-items:center;">';
+  brBody+='<div style="display:flex;gap:6px;">';
+  ['4-7-8','Kutu (4-4-4-4)'].forEach(function(p){
+    var on=day.breath.pattern===p;
+    brBody+='<button onclick="App.setBreathPattern(\''+p+'\')" style="border:1px solid '+(on?'var(--room)':'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,var(--room) 15%,var(--icon))':'var(--field)')+';cursor:pointer;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:800;color:'+(on?'var(--room)':'var(--muted)')+';">'+esc(p)+'</button>';
+  });
+  brBody+='</div>';
+  brBody+='<div id="sey-room-breath-ring" style="width:110px;height:110px;border-radius:50%;border:3px solid var(--room);display:flex;align-items:center;justify-content:center;transition:transform .6s ease,box-shadow .6s ease;">';
+  brBody+='<div style="text-align:center;">';
+  brBody+='<div id="sey-room-breath-label" style="font-size:14px;font-weight:800;color:var(--room);">Hazır</div>';
+  brBody+='<div id="sey-room-breath-count" style="font-size:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">--</div>';
+  brBody+='</div></div>';
+  brBody+='<button id="sey-room-breath-btn" onclick="App.toggleBreath()" style="border:none;cursor:pointer;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));">'+(ui.roomBreathActive?'Durdur':'Nefes başlat')+'</button>';
+  brBody+='</div>';
+  h+=roomToolCard('breath','wind','Rehberli Nefes','4-7-8 veya kutu nefesi',brBody,fi,0.08);
+  // Karar Hızlandırıcı
+  var dcBody='';
+  dcBody+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  dcBody+='<div style="font-size:12px;color:var(--muted);line-height:1.45;">İki seçenek yaz, 2 dakika düşün, sonra "iyi yeterli" deyip ilerle.</div>';
+  dcBody+='<input id="sey-room-dec-a" type="text" maxlength="120" value="'+esc(day.decision.optionA)+'" placeholder="Seçenek A" onchange="App.saveDecision()" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  dcBody+='<input id="sey-room-dec-b" type="text" maxlength="120" value="'+esc(day.decision.optionB)+'" placeholder="Seçenek B" onchange="App.saveDecision()" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  dcBody+='<div style="display:flex;gap:8px;align-items:center;">';
+  var dcActive=!!ui.roomDecisionTimer;
+  dcBody+='<button onclick="App.startDecisionTimer()" '+(dcActive?'disabled':'')+' style="flex:1;border:none;cursor:'+(dcActive?'not-allowed':'pointer')+';padding:11px;border-radius:12px;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));opacity:'+(dcActive?'0.5':'1')+';">'+icon('clock',13)+' 2 dk kum saati</button>';
+  dcBody+='<div id="sey-room-dec-count" style="font-size:18px;font-weight:800;color:var(--room);font-variant-numeric:tabular-nums;min-width:50px;text-align:center;">'+(dcActive?'02:00':'')+'</div>';
+  dcBody+='</div>';
+  dcBody+='<div style="display:flex;gap:8px;">';
+  dcBody+='<button onclick="App.chooseDecision(\'A\')" style="flex:1;border:1px solid var(--room);background:transparent;cursor:pointer;padding:10px;border-radius:12px;font-size:13px;font-weight:800;color:var(--room);">A seç</button>';
+  dcBody+='<button onclick="App.chooseDecision(\'B\')" style="flex:1;border:1px solid var(--room);background:transparent;cursor:pointer;padding:10px;border-radius:12px;font-size:13px;font-weight:800;color:var(--room);">B seç</button>';
+  dcBody+='<button onclick="App.chooseDecision(\'yeterli\')" style="flex:1;border:1px solid rgba(233,175,193,0.45);background:transparent;cursor:pointer;padding:10px;border-radius:12px;font-size:13px;font-weight:800;color:#B77A8E;">İyi yeterli</button>';
+  dcBody+='</div>';
+  if(day.decision.choice) dcBody+='<div style="font-size:11px;color:var(--room);display:flex;align-items:center;gap:5px;">'+icon('scale',11)+' Seçim: <b>'+esc(day.decision.choice)+'</b> · '+fmtWhen(day.decision.completedAt)+'</div>';
+  dcBody+='</div>';
+  h+=roomToolCard('decision','scale','Karar Hızlandırıcı','A/B + 2 dakika + iyi yeterli',dcBody,fi,0.1);
+  // Düşünce Kaydı (CBT)
+  var cbBody='';
+  cbBody+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  cbBody+='<div style="font-size:12px;color:var(--muted);line-height:1.45;">Düşünceyi yavaşlat, kanıtları ve karşı kanıtları yaz, daha dengeli bir alternatif bul.</div>';
+  cbBody+='<input id="sey-room-thought-sit" type="text" maxlength="160" placeholder="Durum / ne oldu?" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  cbBody+='<input id="sey-room-thought-th" type="text" maxlength="160" placeholder="Aklımdan geçen düşünce" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  cbBody+='<input id="sey-room-thought-for" type="text" maxlength="160" placeholder="Bu düşüncenin lehinde kanıt" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  cbBody+='<input id="sey-room-thought-against" type="text" maxlength="160" placeholder="Aleyhinde kanıt" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  cbBody+='<input id="sey-room-thought-alt" type="text" maxlength="160" placeholder="Daha dengeli alternatif düşünce" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;color:var(--text);">';
+  cbBody+='<button onclick="App.saveThought()" style="border:none;cursor:pointer;padding:11px;border-radius:12px;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));">'+icon('brain',13)+' Kaydet</button>';
+  if(day.thoughts.length){
+    cbBody+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    day.thoughts.slice().reverse().forEach(function(th){
+      cbBody+='<div style="background:var(--icon);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.45;">';
+      cbBody+='<div style="font-weight:800;color:var(--room);margin-bottom:3px;">'+esc(th.situation)+'</div>';
+      cbBody+='<div>'+esc(th.thought)+' → '+esc(th.altThought)+'</div>';
+      cbBody+='<div style="font-size:10.5px;color:var(--faint);margin-top:3px;">'+fmtWhen(th.createdAt)+'</div>';
+      cbBody+='</div>';
+    });
+    cbBody+='</div>';
+  }
+  cbBody+='</div>';
+  h+=roomToolCard('thought','brain','Düşünce Kaydı (CBT)','Durum → düşünce → kanıtlar → alternatif',cbBody,fi,0.12);
+  // Güvenli Paylaşım
+  var shBody='';
+  shBody+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  shBody+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Zor hissediyorsan tek dokunuşla ÆON\'a güvenli bir sinyal gönder. İstersen kısa not ekle.</div>';
+  shBody+='<input id="sey-room-share-note" type="text" maxlength="200" value="'+esc(day.share.note)+'" placeholder="İsteğe bağlı not (örn. konu, saat)" onchange="App.saveShareNote(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
+  shBody+='<button onclick="App.sendAeonShare()" style="border:none;cursor:pointer;padding:13px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));display:flex;align-items:center;justify-content:center;gap:8px;">'+icon('send-horizontal',15)+' Şu an zor hissediyorum</button>';
+  if(day.share.sentAt) shBody+='<div style="font-size:11px;color:var(--room);display:flex;align-items:center;gap:5px;">'+icon('check',11)+' '+fmtWhen(day.share.sentAt)+' iletildi</div>';
+  shBody+='</div>';
+  h+=roomToolCard('share','send','Güvenli Paylaşım','ÆON\'a tek dokunuşla sinyal',shBody,fi,0.14);
+  return h;
+}
+function roomProfileHTML(fi){
+  var p=data.scientificProfile||{};
+  var fetched=!!p.assessedAt;
+  var h='';
+  h+='<div style="'+fi(0.02)+'font-size:12.5px;color:var(--muted);line-height:1.5;text-align:center;">Profilindeki bilgiler uygulamanın sana özel önerilerini şekillendiriyor.</div>';
+  if(ui.roomProfileFetchState==='loading'){
+    h+='<div style="'+fi(0.04)+'display:flex;align-items:center;justify-content:center;gap:8px;padding:28px;color:var(--muted);"><span class="seyIconSpin">'+icon('rotate-ccw',18)+'</span> Profil yükleniyor...</div>';
+  } else if(ui.roomProfileFetchState==='error'){
+    h+='<div style="'+fi(0.04)+'display:flex;flex-direction:column;gap:10px;align-items:center;padding:20px;background:rgba(233,175,193,0.12);border:1px solid rgba(233,175,193,0.35);border-radius:18px;">';
+    h+='<div style="font-size:13px;color:var(--text2);text-align:center;">Profil raporu yüklenemedi.</div>';
+    if(ui.roomProfileError) h+='<div style="font-size:11px;color:var(--faint);text-align:center;">'+esc(ui.roomProfileError)+'</div>';
+    h+='<button onclick="App.fetchProfileForRoom()" style="border:1px solid var(--room);background:transparent;cursor:pointer;padding:8px 14px;border-radius:12px;font-size:12px;font-weight:800;color:var(--room);">Tekrar dene</button>';
+    h+='</div>';
+  }
+  if(!fetched){
+    h+='<div style="'+fi(0.04)+'display:flex;flex-direction:column;gap:12px;align-items:center;padding:20px;border:1px dashed var(--card-bd);border-radius:18px;">';
+    h+='<div style="font-size:13px;color:var(--text2);text-align:center;">Henüz bilimsel profil raporu çekilmemiş.</div>';
+    h+='<button onclick="App.fetchProfileForRoom()" style="border:none;cursor:pointer;padding:12px 16px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));">'+icon('sparkles',14)+' Profili çek</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;">Veri reposundan okunur; buraya kaydedilmez.</div>';
+    h+='</div>';
+    return h;
+  }
+  // Hero
+  h+='<div style="'+fi(0.04)+'display:flex;flex-direction:column;gap:10px;background:linear-gradient(160deg,var(--room-bg),transparent);border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:20px;padding:16px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<span style="width:44px;height:44px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));">'+icon('sparkles',22)+'</span>';
+  h+='<div style="flex:1;">';
+  h+='<div style="font-size:16px;font-weight:800;color:var(--text);">Bilimsel profil özeti</div>';
+  h+='<div style="font-size:11px;color:var(--muted);">'+(p.assessedAt?fmtDateNice(p.assessedAt):'')+(p.source?' · '+esc(p.source):'')+'</div>';
+  h+='</div></div>';
+  if(typeof p.confidence==='number'){
+    h+='<div style="display:flex;align-items:center;gap:10px;">';
+    h+='<div style="flex:1;">'+progBar(p.confidence,'linear-gradient(90deg,var(--room2),var(--room))')+'</div>';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--room);white-space:nowrap;">%'+p.confidence+' güven</div>';
+    h+='</div>';
+  }
+  if(p.riasec&&p.riasec.length){
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    p.riasec.forEach(function(r){ h+='<span style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;background:var(--icon);color:var(--text2);">'+esc(roomPrettyRiasec(r))+'</span>'; });
+    h+='</div>';
+  }
+  if(p.values&&p.values.length){
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    p.values.forEach(function(v){ h+='<span style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--room) 30%,var(--card-bd));color:var(--room);">'+esc(roomPrettyValue(v))+'</span>'; });
+    h+='</div>';
+  }
+  h+='</div>';
+  // Güçlü yönler & dikkat alanları
+  h+='<div style="'+fi(0.06)+'display:flex;flex-direction:column;gap:10px;">';
+  if(p.strengths&&p.strengths.length){
+    h+='<div style="background:color-mix(in srgb,#3F8A4F 8%,var(--icon));border-radius:16px;padding:14px;">';
+    h+='<div style="font-size:11px;font-weight:800;color:#3F8A4F;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;display:flex;align-items:center;gap:5px;">'+icon('zap',12)+' Güçlü yönler</div>';
+    h+='<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--text2);line-height:1.5;">';
+    p.strengths.forEach(function(s){ h+='<li>'+esc(s)+'</li>'; });
+    h+='</ul></div>';
+  }
+  if(p.risks&&p.risks.length){
+    h+='<div style="background:color-mix(in srgb,#E9899F 8%,var(--icon));border-radius:16px;padding:14px;">';
+    h+='<div style="font-size:11px;font-weight:800;color:#B77A8E;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;display:flex;align-items:center;gap:5px;">'+icon('triangle-alert',12)+' Dikkat alanları</div>';
+    h+='<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--text2);line-height:1.5;">';
+    p.risks.forEach(function(r){ h+='<li>'+esc(r)+'</li>'; });
+    h+='</ul></div>';
+  }
+  h+='</div>';
+  // Sana özel içerik önerileri
+  h+='<div style="'+fi(0.08)+'display:flex;flex-direction:column;gap:10px;">';
+  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',12)+' Sana özel içerik önerileri</div>';
+  h+='<div style="font-size:12px;color:var(--muted);line-height:1.45;">Profiline göre aşağıdaki türler seni besleyebilir. Dokununca ilgili hub açılır.</div>';
+  var recs=roomProfileRecommendations(p);
+  h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+  recs.forEach(function(r){
+    h+='<button onclick="'+r.onclick+'" style="width:100%;border:none;background:var(--icon);cursor:pointer;border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;text-align:left;">';
+    h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+r.col+');">'+icon(r.ic,16)+'</span>';
+    h+='<div style="flex:1;min-width:0;">';
+    h+='<div style="font-size:13px;font-weight:800;color:var(--text);">'+esc(r.title)+'</div>';
+    h+='<div style="font-size:11px;color:var(--muted);line-height:1.3;">'+esc(r.sub)+'</div>';
+    h+='</div><span style="color:var(--muted);">›</span></button>';
+  });
+  h+='</div></div>';
+  // Panel Profil Işığı
+  h+='<div style="'+fi(0.1)+'display:flex;flex-direction:column;gap:8px;background:linear-gradient(135deg,rgba(233,175,193,0.14),rgba(201,184,255,0.12));border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:18px;padding:14px;">';
+  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',12)+' Panel Profil Işığı</div>';
+  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.55;">Gözlemciye kısa rehber: Küçük başarıları takdir et, zor anlarda duraklat, başlamada destek ol. Kontrolcü bir çizgiye düşürme; nazik hatırlatma ver.</div>';
+  h+='</div>';
+  // Dipnot
+  if(p.note) h+='<div style="'+fi(0.12)+'font-size:11px;color:var(--faint);line-height:1.4;text-align:center;">'+esc(p.note)+'</div>';
+  return h;
+}
+function roomPrettyRiasec(r){
+  var map={social:'Sosyal',conventional:'Düzenleyici',enterprising:'Girişimci',artistic:'Sanatsal',investigative:'Araştırmacı',realistic:'Gerçekçi'};
+  return map[String(r).toLowerCase()]||esc(r);
+}
+function roomPrettyValue(v){
+  var map={security:'Güvenilirlik',benevolence:'İyilikseverlik',achievement:'Başarı',conformity:'Uyum',hedonism:'Hazcılık',power:'Güç',self_direction:'Özgünlük',stimulation:'Uyarım',tradition:'Gelenek',universalism:'Evrensellik'};
+  return map[String(v).toLowerCase()]||esc(v);
+}
+function roomProfileRecommendations(p){
+  var recs=[];
+  recs.push({title:'Yapı ve derinlik',sub:'Düzenleyici profiline özel kitap önerileri',onclick:'App.openReading()',ic:'book',col:'var(--room2),var(--room)'});
+  recs.push({title:'İnsan hikâyeleri',sub:'Sosyal-Empatik eksende film ve dizi',onclick:'App.openWatching()',ic:'clapperboard',col:'#C88F4C,#E0B080'});
+  recs.push({title:'Sakinleştirici sesler',sub:'Girişimci zihin için nefes ve podcast',onclick:'App.openListening()',ic:'disc',col:'#0E9AA7,#2BC4C4'});
+  return recs;
+}
+function fmtWhen(iso){
+  if(!iso) return '';
+  try{ var d=new Date(iso); return d.toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso.slice(0,16).replace('T',' '); }
+}
+function fmtDateNice(iso){
+  if(!iso) return '';
+  try{ var d=new Date(iso); return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return iso; }
+}
+App.fetchProfileForRoom=function(){
+  var c=ghCfgApp();
+  if(!c){ ui.roomProfileFetchState='error'; ui.roomProfileError='Önce Ayarlar\'dan repoya bağlan'; render(); return; }
+  ui.roomProfileFetchState='loading'; ui.roomProfileError=null; render();
+  var path='bilimsel-profil-degerlendirme-ozet-2026-07-13.md';
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+encodeURIComponent(path)+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
+  fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
+    .then(function(r){ if(!r.ok) throw new Error(String(r.status)); return r.text(); })
+    .then(function(md){
+      data.scientificProfile=parseScientificProfileMD(md);
+      ui.roomProfileFetchState='idle';
+      save();
+      toast('Profil raporu yüklendi',1800); haptic(10);
+      render();
+    })
+    .catch(function(e){ ui.roomProfileFetchState='error'; ui.roomProfileError=e.message||'Bilinmeyen hata'; render(); });
+};
+function parseScientificProfileMD(md){
+  if(!md||typeof md!=='string') md='';
+  var p={source:'seyma-data',assessedAt:'2026-07-13',confidence:null,consent:'öz-bildirime dayalı',riasec:[],values:[],traits:{},attachment:{},strengths:[],risks:[],note:'Öz-bildirime dayalı; klinik tanı değildir.'};
+  var txt=md.replace(/^\s*#/,'');
+  var findLine=function(re){ var m=txt.match(re); return m?m[1].trim():null; };
+  var findBlock=function(startRe){
+    var start=txt.search(startRe);
+    if(start<0) return [];
+    var end=start+1;
+    while(end<txt.length&&!txt.substr(end).match(/^#{1,3}\s/m)) end++;
+    var block=txt.substring(start,end);
+    return block.split(/\n[\*\-]\s+/).slice(1).map(function(s){ return s.replace(/\n/g,' ').replace(/\*\*/g,'').trim(); }).filter(Boolean);
+  };
+  var date=findLine(/Değerlendirme Tarihi:\s*([^\n]+)/i); if(date) p.assessedAt=date;
+  var conf=findLine(/Güvenilirlik:\s*(%?)([\d\.]+)/i); if(conf) p.confidence=Math.round(parseFloat(conf[2])||0);
+  if(txt.match(/Sosyal/i)) p.riasec.push('social');
+  if(txt.match(/Düzenleyici|Conventional/i)) p.riasec.push('conventional');
+  if(txt.match(/Girişimci|Enterprising/i)) p.riasec.push('enterprising');
+  if(!p.riasec.length) p.riasec=['social','conventional','enterprising'];
+  ['güvenilirlik','iyilikseverlik','başarı','uyum','özgünlük'].forEach(function(v){
+    if(new RegExp(v,'i').test(txt)) p.values.push(roomValueKey(v));
+  });
+  if(!p.values.length) p.values=['security','benevolence','achievement'];
+  p.strengths=findBlock(/##\s*Güçlü Yönler/i);
+  p.risks=findBlock(/##\s*Dikkat|Risk|Aşırı/i);
+  if(!p.strengths.length) p.strengths=['Düzen ve sorumluluk','Adillik ve kanıta saygı','İçsel motivasyon','Metabilişsel farkındalık'];
+  if(!p.risks.length) p.risks=['Aşırı kontrol ihtiyacı','Duygusal hassasiyet','Temkinlilik / erteleme'];
+  return p;
+}
+function roomValueKey(tr){
+  var map={'güvenilirlik':'security','iyilikseverlik':'benevolence','başarı':'achievement','uyum':'conformity','özgünlük':'self_direction'};
+  return map[String(tr).toLowerCase()]||tr;
+}
+App.saveFirstStep=function(el){
+  var day=getDay(data,activeDate());
+  day.therapy.firstStep.text=String(el.value||'').slice(0,200);
+  save(); render(); haptic(6);
+};
+App.startFirstStepTimer=function(){
+  if(ui.roomFirstTimer){ clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null; }
+  var left=120;
+  ui.roomFirstTimer=setInterval(function(){
+    left--;
+    var label=document.getElementById('sey-room-first-count');
+    if(label) label.textContent=(Math.floor(left/60)).toString().padStart(2,'0')+':'+(left%60).toString().padStart(2,'0');
+    if(left<=0){
+      clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null;
+      var day=getDay(data,activeDate());
+      day.therapy.firstStep.completedAt=new Date().toISOString();
+      save(); toast('İlk adım zamanı tamamlandı',1800); haptic(14); render();
+    } else { if(label) label.textContent=(Math.floor(left/60)).toString().padStart(2,'0')+':'+(left%60).toString().padStart(2,'0'); }
+  },1000);
+  haptic(8); render();
+};
+App.saveSelfCompassion=function(el){
+  var day=getDay(data,activeDate());
+  day.therapy.selfCompassion={prompt:day.therapy.selfCompassion.prompt||'',note:String(el.value||'').slice(0,200),completedAt:new Date().toISOString()};
+  save(); toast('Öz-şefkat anı kaydedildi',1500); haptic(10); render();
+};
+App.presetSelfCompassion=function(c){
+  var el=document.getElementById('sey-room-sc'); if(el) el.value=c;
+  App.saveSelfCompassion(el||{value:c});
+};
+App.setBreathPattern=function(pat){
+  var day=getDay(data,activeDate());
+  day.therapy.breath.pattern=pat;
+  save(); haptic(6); render();
+};
+App.toggleBreath=function(){
+  if(ui.roomBreathActive){ App.stopBreath(); return; }
+  ui.roomBreathActive=true;
+  var day=getDay(data,activeDate());
+  var pattern=day.therapy.breath.pattern;
+  var seq=pattern==='4-7-8'?[{l:'Nefes al',s:4},{l:'Tut',s:7},{l:'Nefes ver',s:8}]:[{l:'Nefes al',s:4},{l:'Tut',s:4},{l:'Nefes ver',s:4},{l:'Bekle',s:4}];
+  var step=0, sub=0, cur=seq[0].s;
+  function tick(){
+    if(!ui.roomBreathActive) return;
+    var ring=document.getElementById('sey-room-breath-ring');
+    var lbl=document.getElementById('sey-room-breath-label');
+    var cnt=document.getElementById('sey-room-breath-count');
+    if(lbl) lbl.textContent=seq[step].l;
+    if(cnt) cnt.textContent=String(cur-sub);
+    if(ring) ring.style.transform='scale('+(seq[step].l.indexOf('al')>=0?1.15:(seq[step].l.indexOf('ver')>=0?0.85:1))+')';
+    sub++;
+    if(sub>=cur){ sub=0; step=(step+1)%seq.length; cur=seq[step].s; }
+  }
+  tick();
+  ui.roomBreathTimer=setInterval(tick,1000);
+  var total=0, maxSec=180;
+  var totalTimer=setInterval(function(){
+    total++;
+    day.therapy.breath.seconds=total;
+    if(total>=maxSec){ clearInterval(totalTimer); App.stopBreath(); day.therapy.breath.completedAt=new Date().toISOString(); save(); toast('Nefes pratiği tamamlandı',1800); haptic(10); }
+  },1000);
+};
+App.stopBreath=function(){
+  ui.roomBreathActive=false;
+  if(ui.roomBreathTimer){ clearInterval(ui.roomBreathTimer); ui.roomBreathTimer=null; }
+  save(); render();
+};
+App.saveDecision=function(){
+  var day=getDay(data,activeDate());
+  var a=document.getElementById('sey-room-dec-a'), b=document.getElementById('sey-room-dec-b');
+  day.therapy.decision.optionA=a?String(a.value||'').slice(0,120):'';
+  day.therapy.decision.optionB=b?String(b.value||'').slice(0,120):'';
+  save(); haptic(6);
+};
+App.startDecisionTimer=function(){
+  if(ui.roomDecisionTimer){ clearInterval(ui.roomDecisionTimer); ui.roomDecisionTimer=null; }
+  App.saveDecision();
+  var left=120;
+  ui.roomDecisionTimer=setInterval(function(){
+    left--;
+    var label=document.getElementById('sey-room-dec-count');
+    if(label) label.textContent=(Math.floor(left/60)).toString().padStart(2,'0')+':'+(left%60).toString().padStart(2,'0');
+    if(left<=0){
+      clearInterval(ui.roomDecisionTimer); ui.roomDecisionTimer=null;
+      toast('Düşünme süresi doldu — "iyi yeterli" deyip ilerleyebilirsin',2200); haptic(12); render();
+    }
+  },1000);
+  haptic(8); render();
+};
+App.chooseDecision=function(ch){
+  App.saveDecision();
+  var day=getDay(data,activeDate());
+  day.therapy.decision.choice=ch;
+  day.therapy.decision.completedAt=new Date().toISOString();
+  if(ui.roomDecisionTimer){ clearInterval(ui.roomDecisionTimer); ui.roomDecisionTimer=null; }
+  save(); toast('Seçim kaydedildi: '+ch,1800); haptic(10); render();
+};
+App.saveThought=function(){
+  var sit=document.getElementById('sey-room-thought-sit'), th=document.getElementById('sey-room-thought-th'), fo=document.getElementById('sey-room-thought-for'), ag=document.getElementById('sey-room-thought-against'), alt=document.getElementById('sey-room-thought-alt');
+  var o={situation:String(sit?sit.value:'').slice(0,160),thought:String(th?th.value:'').slice(0,160),evidenceFor:String(fo?fo.value:'').slice(0,160),evidenceAgainst:String(ag?ag.value:'').slice(0,160),altThought:String(alt?alt.value:'').slice(0,160),createdAt:new Date().toISOString()};
+  if(!o.situation||!o.thought){ toast('Durum ve düşünce yazmalısın',1800); return; }
+  var day=getDay(data,activeDate());
+  day.therapy.thoughts.push(o);
+  save(); toast('Düşünce kaydı eklendi',1500); haptic(10); ui.roomTool=null; render();
+};
+App.saveShareNote=function(el){
+  var day=getDay(data,activeDate());
+  day.therapy.share.note=String(el.value||'').slice(0,200);
+  save(); haptic(6);
+};
+App.sendAeonShare=function(){
+  var day=getDay(data,activeDate());
+  var note=String(day.therapy.share.note||'').trim();
+  var msg='Şu an zor hissediyorum'+(note?' · '+note:'');
+  day.therapy.share.sentAt=new Date().toISOString();
+  submitAeonQuestion(msg);
+  toast('ÆON\'a sinyal iletildi',1800); haptic(12);
+  render();
+};
 App.setMotivationReflection=function(el){
   ui.motivationReflectionDraft=String(el.value||'').slice(0,280);
   var has=!!ui.motivationReflectionDraft.trim();

@@ -7914,7 +7914,7 @@ function aeonNotifyBannerHTML(opts){
   var title=opts.title || 'ÆON mesajları kilit ekranında';
   var sub=opts.subtitle || 'Bildirim izni ver, hiçbir şey kaçırma.';
   var cls=compact?'aeon-notify-nudge':'aeon-notify-banner';
-  var h='<div id="'+esc(opts.id||'aeon-notify-banner')+'" class="'+cls+'">';
+  var h='<div id="'+esc(opts.id||'aeon-notify-banner')+'" class="'+cls+'" >';
   h+='<div class="aeon-notify-badge"><img src="'+esc(AEON_ICON_URL)+'" alt="ÆON"></div>';
   h+='<div class="aeon-notify-text">';
   h+='<div class="aeon-notify-title">'+esc(title)+'</div>';

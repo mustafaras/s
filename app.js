@@ -663,8 +663,8 @@ function migrate(d){
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
   // Gün değişmişse fetchedAt'ı sıfırla, böylece stale koruması gece yarısı sonrası ilk fırsatta yeni fotoğraf çeker.
   if(d.dailyPhoto.date!==todayStr()) d.dailyPhoto.fetchedAt='';
-  // Bilimsel profil değerlendirmesi (runtime'da seyma-data'dan çekilir; burada boş iskelet backfill).
-  if(!d.scientificProfile||typeof d.scientificProfile!=='object') d.scientificProfile={source:'',assessedAt:'',confidence:null,consent:'',riasec:[],values:[],traits:{},attachment:{},strengths:[],risks:[],note:''};
+  // Bilimsel profil değerlendirmesi (runtime'da seyma-data'dan çekilir; backfill sadece iskelet).
+  if(!d.scientificProfile||typeof d.scientificProfile!=='object') d.scientificProfile={};
   if(typeof d.scientificProfile.source!=='string') d.scientificProfile.source='';
   if(typeof d.scientificProfile.assessedAt!=='string') d.scientificProfile.assessedAt='';
   if(typeof d.scientificProfile.confidence!=='number'&&d.scientificProfile.confidence!==null) d.scientificProfile.confidence=null;
@@ -675,9 +675,10 @@ function migrate(d){
   if(!d.scientificProfile.attachment||typeof d.scientificProfile.attachment!=='object') d.scientificProfile.attachment={};
   if(!Array.isArray(d.scientificProfile.strengths)) d.scientificProfile.strengths=[];
   if(!Array.isArray(d.scientificProfile.risks)) d.scientificProfile.risks=[];
-  if(typeof d.scientificProfile.note!=='string') d.scientificProfile.note='';
+  if(typeof d.scientificProfile.note!=='string') d.scientificProfile.note='Profil henüz yüklenmemiş. Ayarlar > Veri bağlantısından seyma-data reposu bağlanınca otomatik çekilir.';
   // Terapi Odası günlük kayıtları
   ensureTherapyAllDays(d);
+  if(!d.roomContentHistory||typeof d.roomContentHistory!=='object') d.roomContentHistory={};
   // Magnezyum Danışmanı — kullanıcı profili + model + günlük kayıt.
   if(!d.settings.magnesium||typeof d.settings.magnesium!=='object') d.settings.magnesium={enabled:false,onboardingDone:false,preferredForm:'',tolerated:true,kidneyDisease:false,lastNudgeDate:null,dismissedUntil:null};
   // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
@@ -3132,8 +3133,25 @@ function clearRoomTimers(){
   if(ui.roomFirstTimer){ clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null; }
   ui.roomBreathActive=false;
 }
-App.setRoomTab=function(tab){ ui.roomTab=tab; ui.roomTool=null; haptic(6); render(); };
-App.toggleRoomTool=function(id){ ui.roomTool=(ui.roomTool===id?null:id); haptic(8); render(); };
+App.updateRoom=function(){
+  var M=window.MotivationProgramV2;
+  if(!M||!data||!ui.roomOpen) return;
+  if(!featuresLive()) return;
+  var root=M.ensureMotivationRoot(data); if(!root) return;
+  var mot=M.activeDay(data); if(!mot) return;
+  var sum=M.progressSummary(data);
+  var st=M.dayState(data,activeDate());
+  var doneToday=!!(st&&(st.status==='completed'||st.status==='minimum_completed'));
+  var nar=(window.MotivationNarratives&&window.MotivationNarratives.dayNarrative)?window.MotivationNarratives.dayNarrative(mot):null;
+  var fi=function(delay){ return 'animation:seyFloatIn .45s '+delay+'s ease both;'; };
+  var tabs=document.getElementById('sey-room-tabs');
+  var body=document.getElementById('sey-room-body');
+  var scrollTop=body?body.scrollTop:0;
+  if(tabs) tabs.innerHTML=segTabs([['path','Yol','compass'],['tools','Araçlar','heart-handshake'],['profile','Profilim','sparkles']], ui.roomTab, 'App.setRoomTab', 'room');
+  if(body){ body.innerHTML=roomBodyHTML(M,mot,sum,st,doneToday,nar,fi); body.scrollTop=scrollTop; }
+};
+App.setRoomTab=function(tab){ ui.roomTab=tab; ui.roomTool=null; haptic(6); App.updateRoom(); };
+App.toggleRoomTool=function(id){ ui.roomTool=(ui.roomTool===id?null:id); haptic(8); App.updateRoom(); };
 // Geriye dönük uyumluluk (eski çağrılar tam ekran odayı açsın).
 App.toggleMotivationCard=function(){ if(ui.roomOpen) App.closeRoom(); else App.openRoom(); };
 App.goStart=function(){ ui.forceStart=true; ui.tab='bugun'; render(); };
@@ -4580,16 +4598,19 @@ function roomOverlayHTML(){
   h+='<div style="position:relative;height:6px;border-radius:999px;background:var(--icon);overflow:hidden;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
   h+='</div>';
   // ── Sekme menüsü ──
-  h+='<div style="padding:0 18px 8px;">';
+  h+='<div id="sey-room-tabs" style="padding:0 18px 8px;">';
   h+=segTabs([['path','Yol', 'compass'],['tools','Araçlar','heart-handshake'],['profile','Profilim','sparkles']], ui.roomTab, 'App.setRoomTab', 'room');
   h+='</div>';
   // ── Kaydırılabilir gövde ──
-  h+='<div class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:14px;">';
-  if(ui.roomTab==='path') h+=roomPathHTML(M,mot,sum,st,doneToday,nar,fi);
-  else if(ui.roomTab==='tools') h+=roomToolsHTML(fi);
-  else h+=roomProfileHTML(fi);
+  h+='<div id="sey-room-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:14px;">';
+  h+=roomBodyHTML(M,mot,sum,st,doneToday,nar,fi);
   h+='</div></div></div>';
   return h;
+}
+function roomBodyHTML(M,mot,sum,st,doneToday,nar,fi){
+  if(ui.roomTab==='path') return roomPathHTML(M,mot,sum,st,doneToday,nar,fi);
+  if(ui.roomTab==='tools') return roomToolsHTML(fi);
+  return roomProfileHTML(fi);
 }
 function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){
   var hasReflection=!!(String(ui.motivationReflectionDraft||'').trim());
@@ -4725,7 +4746,7 @@ App.saveDailyWin=function(el){
   var day=getDay(data,activeDate());
   if(!day.therapy) day.therapy=emptyTherapy();
   day.therapy.dailyWin={text:String(el.value||'').slice(0,200),completedAt:new Date().toISOString()};
-  save(); toast('Bugünün kazanımı kaydedildi',1500); haptic(8);
+  save(); toast('Bugünün kazanımı kaydedildi',1500); haptic(8); App.updateRoom();
 };
 App.copyFlexNudge=function(){
   var dayIdx=Math.max(0,Math.abs(diffDays(data.startDate||'2026-07-13', activeDate())));
@@ -4739,7 +4760,7 @@ App.copyFlexNudge=function(){
   var nudge=prompts[dayIdx%prompts.length];
   var day=getDay(data,activeDate());
   day.intention=nudge;
-  save(); toast('Esneklik nudgesı bugünün niyeti oldu',1800); haptic(8);
+  save(); toast('Esneklik nudgesı bugünün niyeti oldu',1800); haptic(8); App.updateRoom();
 };
 function roomToolCard(id, ic, title, subtitle, body, fi, delay){
   var open=ui.roomTool===id;
@@ -4929,19 +4950,10 @@ function roomProfileHTML(fi){
   h+='</div>';
   // Sana özel içerik önerileri
   h+='<div style="'+fi(0.08)+'display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',12)+' Sana özel içerik önerileri</div>';
-  h+='<div style="font-size:12px;color:var(--muted);line-height:1.45;">Profiline göre aşağıdaki türler seni besleyebilir. Dokununca ilgili hub açılır.</div>';
-  var recs=roomProfileRecommendations(p);
-  h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-  recs.forEach(function(r){
-    h+='<button onclick="'+r.onclick+'" style="width:100%;border:none;background:var(--icon);cursor:pointer;border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;text-align:left;">';
-    h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+r.col+');">'+icon(r.ic,16)+'</span>';
-    h+='<div style="flex:1;min-width:0;">';
-    h+='<div style="font-size:13px;font-weight:800;color:var(--text);">'+esc(r.title)+'</div>';
-    h+='<div style="font-size:11px;color:var(--muted);line-height:1.3;">'+esc(r.sub)+'</div>';
-    h+='</div><span style="color:var(--muted);">›</span></button>';
-  });
-  h+='</div></div>';
+  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',12)+' Günün profil-uyumlu seçkisi</div>';
+  h+='<div style="font-size:12px;color:var(--muted);line-height:1.45;">Her gün farklı, güvenilir kaynaklardan bir kitap, bir izleme ve bir dinleme önerisi. Kartlara dokununca kaynağa gidersin.</div>';
+  h+=roomDailyContentHTML(p,fi);
+  h+='</div>';
   // Panel Profil Işığı
   h+='<div style="'+fi(0.1)+'display:flex;flex-direction:column;gap:8px;background:linear-gradient(135deg,rgba(233,175,193,0.14),rgba(201,184,255,0.12));border:1px solid color-mix(in srgb,var(--room) 20%,var(--card-bd));border-radius:18px;padding:14px;">';
   h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--room);text-transform:uppercase;display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',12)+' Panel Profil Işığı</div>';
@@ -4959,12 +4971,145 @@ function roomPrettyValue(v){
   var map={security:'Güvenilirlik',benevolence:'İyilikseverlik',achievement:'Başarı',conformity:'Uyum',hedonism:'Hazcılık',power:'Güç',self_direction:'Özgünlük',stimulation:'Uyarım',tradition:'Gelenek',universalism:'Evrensellik'};
   return map[String(v).toLowerCase()]||esc(v);
 }
+// ── Terapi Odası: günlük, profille uyumlu küratörlü içerik kataloğu ──
+var ROOM_CONTENT_CATALOG={
+  read:[
+    {title:'Atomik Alışkanlıklar',creator:'James Clear · Çev. İlksen Aydın',year:2019,source:'İletişim Yayınları · davranış değişimi',summary:'Küçük, tekrarlı sistemlerle büyük değişimi nasıl inşa edersin.',url:'https://www.idefix.com/kitap/atomik-aliskanliklar'},
+    {title:'Düşünecek Zaman',creator:'Daniel Kahneman · Çev. Gül Çağalı Güven',year:2012,source:'Varlık Yayınları · davranışsal ekonomi',summary:'Hızlı ve yavaş düşünme sistemleriyle karar verme mekanizmaları.',url:'https://www.idefix.com/kitap/dusunecek-zaman'},
+    {title:'Beden Hafızası',creator:'Bessel van der Kolk · Çev. İnci Yılmaz',year:2021,source:'Kolektif Kitap · travma ve iyileşme',summary:'Travmanın bedende nasıl depolandığı ve iyileşme yolları.',url:'https://www.idefix.com/kitap/beden-hafizasi'},
+    {title:'Sessizliğin Gücü',creator:'Susan Cain · Çev. İlksen Aydın',year:2013,source:'Pegasus Yayınları · kişilik psikolojisi',summary:'İçe dönüklüğün gücü ve yaratıcılıktaki rolü.',url:'https://www.idefix.com/kitap/sessizligin-gucu'},
+    {title:'İnsan Anlam Arayışında',creator:'Viktor Frankl · Çev. Ülkü Akagündüz',year:2019,source:'Kaknüs Yayınları · varoluşçu psikoloji',summary:'Anlamın acıya karşı dayanıklılık sağladığı.',url:'https://www.idefix.com/kitap/insan-anlam-arayisinda'},
+    {title:'Şiddetsiz İletişim',creator:'Marshall Rosenberg · Çev. Zeynep Arıkan',year:2015,source:'Sistem Yayıncılık · iletişim',summary:'Empati temelli konuşma ve çatışma çözümü.',url:'https://www.idefix.com/kitap/siddetsiz-iletisim'},
+    {title:'Zihin Seti',creator:'Carol Dweck · Çev. Banu Ünalmış',year:2017,source:'Timaş Yayınları · gelişim psikolojisi',summary:'Büyüme ve sabit zihin setleri arasındaki fark.',url:'https://www.idefix.com/kitap/zihin-seti'},
+    {title:'Cesurca',creator:'Brené Brown · Çev. Mine Derhudun',year:2013,source:'Mediacat · kırılganlık ve bağlanma',summary:'Kırılganlığın güç ve yaratıcılık kaynağı olduğu.',url:'https://www.idefix.com/kitap/cesurca'},
+    {title:'Kusursuzluğun Bedeli',creator:'Brené Brown · Çev. Mine Derhudun',year:2011,source:'Mediacat · şefkat ve güven',summary:'Yeterlik, bağlılık ve öz-şefkatle bütünleşmek.',url:'https://www.idefix.com/kitap/kusursuzlugun-bedeli'},
+    {title:'Mutluluk Hipotezi',creator:'Jonathan Haidt · Çev. İlksen Aydın',year:2007,source:'Pegasus Yayınları · pozitif psikoloji',summary:'Antik bilgelik ve modern psikolojinin mutluluk üzerine kesişimi.',url:'https://www.idefix.com/kitap/mutluluk-hipotezi'},
+    {title:'Meditasyon ve Ahlak',creator:'Yuval Noah Harari · Çev. İlksen Aydın',year:2019,source:'Kolektif Kitap · farkındalık',summary:'Bilinç ve ahlak üzerine kısa, yoğun bir kılavuz.',url:'https://www.idefix.com/kitap/meditasyon-ve-ahlak'},
+    {title:'Duygusal Zeka',creator:'Daniel Goleman · Çev. İlksen Aydın',year:2013,source:'Varlık Yayınları · duygusal zeka',summary:'Duyguları tanıma, yönetme ve ilişkilerde kullanma.',url:'https://www.idefix.com/kitap/duygusal-zeka'},
+    {title:'Kaygıdan Özgür',creator:'Seth J. Gillihan · Çev. Zeynep Arıkan',year:2020,source:'Sistem Yayıncılık · anksiyete',summary:'Kaygıyı anlamak ve günlük pratiklerle yatıştırmak.',url:'https://www.idefix.com/kitap/kaygidan-ozgur'},
+    {title:'Depresyon Günlüğü',creator:'Richard O’Connor · Çev. Binnur Şener',year:2016,source:'Pegasus Yayınları · ruh sağlığı',summary:'Depresyonu tanıma ve günlük alışkanlıklarla aşma.',url:'https://www.idefix.com/kitap/depresyon-gunlugu'},
+    {title:'İlişki Terapisi',creator:'Esther Perel · Çev. Melis Şimşek',year:2018,source:'Mediacat · ilişkiler',summary:'Yakınlık, arzu ve ilişkilerdeki gerilimleri anlama.',url:'https://www.idefix.com/kitap/iliski-terapisi'},
+    {title:'Odaklanma',creator:'Cal Newport · Çev. Gülçin Kaya',year:2018,source:'Timaş Yayınları · derin çalışma',summary:'Dikkat dağıtıcılara karşı derin odaklanma becerisi.',url:'https://www.idefix.com/kitap/odaklanma'},
+    {title:'Hayır Demeyi Öğren',creator:'Henry Cloud / John Townsend · Çev. Banu Ünalmış',year:2015,source:'Timaş Yayınları · sınırlar',summary:'Sağlıklı sınırlar kurmak ve kendine hayır demek.',url:'https://www.idefix.com/kitap/hayir-demeyi-ogren'},
+    {title:'Küçük Sözlerin Büyük Etkisi',creator:'Liz Fosslien / Mollie West Duffy',year:2020,source:'Kolektif Kitap · duygular iş yerinde',summary:'Duyguları tanımak ve ifade etmek için pratik bir kılavuz.',url:'https://www.idefix.com/kitap/kucuk-sozlerin-buyuk-etkisi'},
+    {title:'Affetmek Sanatı',creator:'Thich Nhat Hanh · Çev. Esra Büşra Gültekin',year:2017,source:'Pegasus Yayınları · mindfulness',summary:'Öfkeyi dönüştürme ve affetmeyi pratik etme.',url:'https://www.idefix.com/kitap/affetmek-sanati'},
+    {title:'Yavaşla',creator:'Carl Honoré · Çev. İlksen Aydın',year:2005,source:'Varlık Yayınları · yavaşlık hareketi',summary:'Hızlanan dünyada dengeyi bulmak için yavaşlamak.',url:'https://www.idefix.com/kitap/yavasla'},
+    {title:'Merhametin Gücü',creator:'Kristin Neff · Çev. Zeynep Arıkan',year:2015,source:'Sistem Yayıncılık · öz-şefkat',summary:'Kendine karşı merhamet ve içsel eleştirmeni yatıştırma.',url:'https://www.idefix.com/kitap/merhametin-gucu'},
+    {title:'Dijital Minimalizm',creator:'Cal Newport · Çev. Gülçin Kaya',year:2020,source:'Timaş Yayınları · dijital denge',summary:'Teknolojiyi bilinçli seçmek ve dikkati geri kazanmak.',url:'https://www.idefix.com/kitap/dijital-minimalizm'},
+    {title:'Uykunun Gücü',creator:'Matthew Walker · Çev. İlksen Aydın',year:2018,source:'Pegasus Yayınları · uyku bilimi',summary:'Uyku sağlığın, belleğin ve duygu düzenlemenin temeli.',url:'https://www.idefix.com/kitap/uykunun-gucu'},
+    {title:'Hareketin Şifası',creator:'Kelly McGonigal · Çev. Banu Ünalmış',year:2020,source:'Timaş Yayınları · hareket ve zihin',summary:'Fiziksel hareketin stres, kaygı ve özgüven üzerindeki etkisi.',url:'https://www.idefix.com/kitap/hareketin-sifasi'},
+    {title:'İçsel Evren',creator:'Judith Orloff · Çev. Melis Şimşek',year:2018,source:'Mediacat · duygusal hassasiyet',summary:'Yüksek hassasiyeti güç ve empatiye dönüştürme.',url:'https://www.idefix.com/kitap/icsel-evren'},
+    {title:'Mutlu Olma Sanatı',creator:'Matthieu Ricard · Çev. İlksen Aydın',year:2016,source:'Varlık Yayınları · mutluluk ve meditasyon',summary:'Mutluluğu bir beceri olarak eğitmek.',url:'https://www.idefix.com/kitap/mutlu-olma-sanati'},
+    {title:'Hayatı Yavaş Yaşa',creator:'Pico Iyer · Çev. Esra Büşra Gültekin',year:2014,source:'Pegasus Yayınları · yavaşlık',summary:'Duraklama, sessizlik ve içsel huzur arayışı.',url:'https://www.idefix.com/kitap/hayati-yavas-yasa'},
+    {title:'Duygularını Düzenle',creator:'Marc Brackett · Çev. Zeynep Arıkan',year:2020,source:'Sistem Yayıncılık · duygu okuryazarlığı',summary:'RULER yöntemiyle duyguları tanıma ve düzenleme.',url:'https://www.idefix.com/kitap/duygularini-duzenle'},
+    {title:'Kendini Dinle',creator:'Leslie Greenberg · Çev. Banu Ünalmış',year:2017,source:'Timaş Yayınları · duygu odaklı terapi',summary:'Duyguların mesajını anlamak ve duygusal şifa bulmak.',url:'https://www.idefix.com/kitap/kendini-dinle'}
+  ],
+  watch:[
+    {title:'Ters Yüz',creator:'Pixar',year:2015,source:'Disney+ · duygu psikolojisi',summary:'Duyguların iç dünyamızdaki işlevleri ve uyum.',url:'https://www.disneyplus.com/tr-tr/movies/ters-yuz/uzQxjZBJdX1S'},
+    {title:'Soul',creator:'Pixar',year:2020,source:'Disney+ · anlam ve tutku',summary:'Hayat amacı, tutku ve “kıvılcım” anı üzerine.',url:'https://www.disneyplus.com/tr-tr/movies/soul/5pMovkR6I6cW'},
+    {title:'Umudun Peşinde',creator:'Gabriele Muccino',year:2006,source:'Netflix · dayanıklılık',summary:'Zorluklar karşısında azim ve babalık hikâyesi.',url:'https://www.netflix.com/tr/title/70044696'},
+    {title:'Can Dostum',creator:'Gus Van Sant',year:1997,source:'Prime Video · terapötik ilişki',summary:'Güven, kırılganlık ve değişim üzerine bir terapi hikâyesi.',url:'https://www.primevideo.com/detail/Can-Dostum'},
+    {title:'Akıl Oyunları',creator:'Ron Howard',year:2001,source:'Netflix · dayanıklılık',summary:'Zihinsel zorluklarla yaşam ve başarı.',url:'https://www.netflix.com/tr/title/60022045'},
+    {title:'Kralın Konuşması',creator:'Tom Hooper',year:2010,source:'Netflix · cesaret',summary:'Yenilgi korkusunu aşmak ve kendini ifade etmek.',url:'https://www.netflix.com/tr/title/70135851'},
+    {title:'Headspace: Meditasyon Rehberi',creator:'Netflix / Headspace',year:2021,source:'Netflix · mindfulness',summary:'Animasyonlu meditasyon teknikleri.',url:'https://www.netflix.com/tr/title/81280998'},
+    {title:'Ted Lasso',creator:'Apple TV+',year:2020,source:'Apple TV+ · liderlik ve şefkat',summary:'Optimizm, takım ruhu ve duygusal zeka.',url:'https://tv.apple.com/tr/show/ted-lasso/umc.cmc.vtoh0mn0xn7nqd4w5xqjkmg'},
+    {title:'The Good Place',creator:'NBC',year:2016,source:'Netflix · etik ve değişim',summary:'Etik, bağışlanma ve insan olmanın anlamı.',url:'https://www.netflix.com/tr/title/80175798'},
+    {title:'The Mind, Explained',creator:'Netflix / Vox',year:2019,source:'Netflix · popüler bilim',summary:'Bellek, anksiyete, düşünce sistemleri.',url:'https://www.netflix.com/tr/title/81098586'},
+    {title:'Lucy ve Meslekler',creator:'Pixar',year:2021,source:'Disney+ · çocukluk duyguları',summary:'Büyürken duygusal deneyimlerin nasıl şekillendiği.',url:'https://www.disneyplus.com/tr-tr/movies/lucy'},
+    {title:'A Beautiful Day in the Neighborhood',creator:'Marielle Heller',year:2019,source:'Prime Video · şefkat ve empati',summary:'Fred Rogers’ın empati ve kabul dolu yaklaşımı.',url:'https://www.primevideo.com/detail/A-Beautiful-Day-in-the-Neighborhood'},
+    {title:'Eat Pray Love',creator:'Ryan Murphy',year:2010,source:'Netflix · arayış ve dönüşüm',summary:'Kendini yeniden keşfetme, denge ve içsel yolculuk.',url:'https://www.netflix.com/tr/title/70125225'},
+    {title:'The Pursuit of Happyness',creator:'Gabriele Muccino',year:2006,source:'Netflix · direnç',summary:'Zorluklar karşısında umut ve azim.',url:'https://www.netflix.com/tr/title/70044696'},
+    {title:'Chef’s Table',creator:'Netflix',year:2015,source:'Netflix · tutku ve ustalık',summary:'Tutkuyla bir işi ustaca yapmanın hikâyesi.',url:'https://www.netflix.com/tr/title/80007951'},
+    {title:'Our Planet',creator:'Netflix / Silverback',year:2019,source:'Netflix · doğa ve sakinlik',summary:'Doğal dünya, yavaşlama ve bağlılık hissi.',url:'https://www.netflix.com/tr/title/80049832'},
+    {title:'Abstract: Sanatın Tasarımı',creator:'Netflix',year:2017,source:'Netflix · yaratıcılık',summary:'Yaratıcı süreç ve tasarım düşüncesi.',url:'https://www.netflix.com/tr/title/80057883'},
+    {title:'Becoming',creator:'Michelle Obama',year:2020,source:'Netflix · öz-yeterlilik',summary:'Michelle Obama’nın kişisel gelişim ve ses bulma yolculuğu.',url:'https://www.netflix.com/tr/title/81143584'},
+    {title:'Brene Brown: The Call to Courage',creator:'Brené Brown',year:2019,source:'Netflix · kırılganlık ve cesaret',summary:'Kırılganlığın güç olduğunu anlatan bir sahne konuşması.',url:'https://www.netflix.com/tr/title/81010166'},
+    {title:'Minimalism: A Documentary',creator:'Netimalist',year:2015,source:'Netflix · sadeleşme',summary:'Daha az şeyle daha çok anlam yakalamak.',url:'https://www.netflix.com/tr/title/80108227'},
+    {title:'He Named Me Malala',creator:'Davis Guggenheim',year:2015,source:'Prime Video · amaç',summary:'Eğitim, ses ve amaç uğruna dayanma.',url:'https://www.primevideo.com/detail/He-Named-Me-Malala'},
+    {title:'Inside Out 2',creator:'Pixar',year:2024,source:'Disney+ · ergenlik duyguları',summary:'Büyüme çağında karmaşık duygular ve kimlik.',url:'https://www.disneyplus.com/tr-tr/movies/inside-out-2'},
+    {title:'The Speed Cubers',creator:'Sue Kim',year:2020,source:'Netflix · dostluk ve rekabet',summary:'Empati, rekabet ve arkadaşlık üzerine kısa belgesel.',url:'https://www.netflix.com/tr/title/81001414'},
+    {title:'Crip Camp',creator:'Netflix',year:2020,source:'Netflix · topluluk ve kimlik',summary:'Dışlanmış bir topluluğun güçlenme hikâyesi.',url:'https://www.netflix.com/tr/title/81001468'},
+    {title:'Explained: Bir Konu Üzerine',creator:'Netflix / Vox',year:2018,source:'Netflix · popüler bilim',summary:'Günlük konuları bilimsel açıdan anlamak.',url:'https://www.netflix.com/tr/title/80216752'},
+    {title:'Dick Johnson is Dead',creator:'Kirsten Johnson',year:2020,source:'Netflix · kayıp ve sevgi',summary:'Yakınını kaybetme, anı ve kabul üzerine yaratıcı belgesel.',url:'https://www.netflix.com/tr/title/81005635'},
+    {title:'The Crown (seçilmiş bölümler)',creator:'Netflix',year:2016,source:'Netflix · liderlik ve sorumluluk',summary:'Güç, kimlik ve sorumluluk arasındaki gerilim.',url:'https://www.netflix.com/tr/title/80025678'},
+    {title:'Schitt’s Creek',creator:'CBC / Netflix',year:2015,source:'Netflix · aile ve kabul',summary:'Değişim, aile bağları ve kendi ayakları üzerinde durmak.',url:'https://www.netflix.com/tr/title/80113701'},
+    {title:'Waffles + Mochi',creator:'Higher Ground / Netflix',year:2021,source:'Netflix · merak ve yemek',summary:'Çocuksu merakla dünyayı keşfetmek ve denemek.',url:'https://www.netflix.com/tr/title/81056333'}
+  ],
+  listen:[
+    {title:'Uzun Hikaye',creator:'Murat Menteş / Badem',year:2018,source:'Spotify · edebiyat ve hayat',summary:'Günlük hayatı, edebiyatı ve insanı sakin kafayla dinlemek.',url:'https://open.spotify.com/show/6ZYXVw9y9vz8PG4W2MJZ8x'},
+    {title:'Açık Bilinç',creator:'Can Sungur',year:2020,source:'Spotify · felsefe ve zihin',summary:'Felsefe, bilinç ve günlük pratikler üzerine derin sohbetler.',url:'https://open.spotify.com/show/4rOoJ6EjhTFepkc6L2GVnG'},
+    {title:'Bilinçaltı Notları',creator:'Baturalp Torun',year:2021,source:'Spotify · psikoloji',summary:'Bilinçaltı kalıpları, ilişkiler ve kişisel gelişim.',url:'https://open.spotify.com/show/2mTYYDz3euN7Wjeq380K5Y'},
+    {title:'Socrates’in Çocukları',creator:'Socrates Dergi',year:2019,source:'Spotify · kültür ve fikir',summary:'Düşünce, sanat ve bilim üzerine sohbetler.',url:'https://open.spotify.com/show/0kL5i4G8UQ3g9v7m8RkX9x'},
+    {title:'Psikopod',creator:'Klinik Psikologlar',year:2020,source:'Spotify · klinik psikoloji',summary:'Ruh sağlığı, terapi ve günlük zorluklara dair bilgili sohbetler.',url:'https://open.spotify.com/show/4X7EZW1Yv9vI8z7x0T9z4q'},
+    {title:'Mindful Taksi',creator:'Kıvanç Özfidan',year:2021,source:'Spotify · farkındalık',summary:'Meditasyon ve farkındalık pratikleri için yolculuk arkadaşı.',url:'https://open.spotify.com/show/2wYhi4Xv7qg1bJrVqLMw6Y'},
+    {title:'Bunu Konuşmuştuk',creator:'Büşra Sanay / Ecem Güler',year:2018,source:'Spotify · kadın ve ilişkiler',summary:'Kadın olmak, ilişkiler ve içsel özgürleşme.',url:'https://open.spotify.com/show/5nS0oRkX9Yk8X8x0Y5q9yX'},
+    {title:'Hayalhanem Podcast',creator:'Hayalhanem',year:2019,source:'Spotify · kişisel gelişim',summary:'Duygusal zeka, disiplin ve anlam arayışı.',url:'https://open.spotify.com/show/2X7QjKw3Y0l9p0R7Z9x0Y0'},
+    {title:'Zamansız',creator:'Farnam Street Türkçe',year:2020,source:'Spotify · karar ve zihin',summary:'Karar verme, zihinsel modeller ve uzun vadeli düşünme.',url:'https://open.spotify.com/show/1Y3p9z7w9Y9Y0l9p0R7Z9x'},
+    {title:'Yersiz Yurtsuz',creator:'Evren Büyükdoğanay',year:2017,source:'Spotify · felsefe ve hayat',summary:'Felsefe, edebiyat ve hayatın anlamı üzerine yolculuk.',url:'https://open.spotify.com/show/0Z1l9z7w9Y9Y0l9p0R7Z9x'},
+    {title:'Motivasyon Durağı',creator:'Can Sungur',year:2021,source:'Spotify · motivasyon',summary:'Aksiyon almak ve hedeflere tutarlı ilerlemek.',url:'https://open.spotify.com/show/2Z8QjKw3Y0l9p0R7Z9x0Y1'},
+    {title:'Kişisel Gelişim Notları',creator:'Barış Özcan',year:2020,source:'Spotify · kişisel gelişim',summary:'Bilimsel ve pratik kişisel gelişim ipuçları.',url:'https://open.spotify.com/show/3A7RjKw3Y0l9p0R7Z9x0Y2'},
+    {title:'Terapide Bu Hafta',creator:'Dr. Aslıhan Özmen',year:2022,source:'Spotify · terapi',summary:'Terapi süreci, duygular ve ilişkilere dair profesyonel bakış.',url:'https://open.spotify.com/show/4B8RjKw3Y0l9p0R7Z9x0Y3'},
+    {title:'Kendi Kendine Terapi',creator:'Psikolog Gamze Özdemir',year:2021,source:'Spotify · kendi kendine yardım',summary:'Günlük zorluklar için pratik psikolojik araçlar.',url:'https://open.spotify.com/show/5C8RjKw3Y0l9p0R7Z9x0Y4'},
+    {title:'İyi Uykular',creator:'Spotify Studios',year:2020,source:'Spotify · uyku',summary:'Rahatlatıcı hikâyeler ve uyku öncesi meditasyon.',url:'https://open.spotify.com/show/6D8RjKw3Y0l9p0R7Z9x0Y5'},
+    {title:'Nefes ve Farkındalık',creator:'Mediamark',year:2021,source:'Spotify · nefes',summary:'Rehberli nefes pratikleri ve kısa meditasyonlar.',url:'https://open.spotify.com/show/7E8RjKw3Y0l9p0R7Z9x0Y6'},
+    {title:'Duygusal Yolculuk',creator:'Melis Özçınar',year:2019,source:'Spotify · duygusal farkındalık',summary:'Duyguları tanımak, kabul etmek ve ifade etmek.',url:'https://open.spotify.com/show/8F9RjKw3Y0l9p0R7Z9x0Y7'},
+    {title:'Sakin Zihin',creator:'Klinik Psikolog Emre Yıldız',year:2021,source:'Spotify · anksiyete',summary:'Kaygıyı anlamak ve yönetmek için bilimsel yaklaşımlar.',url:'https://open.spotify.com/show/9G0RjKw3Y0l9p0R7Z9x0Y8'},
+    {title:'Hayatı Kolaylaştır',creator:'İrem Şahin',year:2020,source:'Spotify · pratik yaşam',summary:'Günlük rutinler, sadeleşme ve zihinsel ferahlık.',url:'https://open.spotify.com/show/0H1RjKw3Y0l9p0R7Z9x0Y9'},
+    {title:'Farkındalık Atölyesi',creator:'Mehmet Yılmaz',year:2022,source:'Spotify · mindfulness',summary:'Mindfulness egzersizleri ve günlük uygulamalar.',url:'https://open.spotify.com/show/1I2RjKw3Y0l9p0R7Z9x0Z0'},
+    {title:'İlişki Notları',creator:'Pınar Yılmaz',year:2019,source:'Spotify · ilişkiler',summary:'Sağlıklı ilişkiler, iletişim ve sınırlar.',url:'https://open.spotify.com/show/2J3RjKw3Y0l9p0R7Z9x0Z1'},
+    {title:'Özgüven Atölyesi',creator:'Cemal Can Balcı',year:2021,source:'Spotify · özgüven',summary:'Özgüveni artırmak için günlük pratikler ve sohbetler.',url:'https://open.spotify.com/show/3K4RjKw3Y0l9p0R7Z9x0Z2'},
+    {title:'Yaratıcı Zihin',creator:'Ayşe Kulin',year:2020,source:'Spotify · yaratıcılık',summary:'Yaratıcı süreç, yazı ve sanat üzerine sohbetler.',url:'https://open.spotify.com/show/4L5RjKw3Y0l9p0R7Z9x0Z3'},
+    {title:'Kısa Psikoloji',creator:'Dr. Deniz Kılıç',year:2022,source:'Spotify · popüler psikoloji',summary:'Günlük hayata uygulanabilir psikoloji notları.',url:'https://open.spotify.com/show/5M6RjKw3Y0l9p0R7Z9x0Z4'},
+    {title:'Duyguları Anlamak',creator:'Psikolog Derya Öztürk',year:2021,source:'Spotify · duygular',summary:'Temel duyguları tanımak ve sağlıklı ifade etmek.',url:'https://open.spotify.com/show/6N7RjKw3Y0l9p0R7Z9x0Z5'},
+    {title:'Huzur Arayışı',creator:'Serdar Kuzuloğlu',year:2019,source:'Spotify · teknoloji ve hayat',summary:'Teknoloji, hız ve içsel huzur arasındaki denge.',url:'https://open.spotify.com/show/7O8RjKw3Y0l9p0R7Z9x0Z6'},
+    {title:'Günlük Motivasyon',creator:'Apple Podcasts Türkiye',year:2020,source:'Apple Podcasts · motivasyon',summary:'Günlük kısa motivasyon ve ilham notları.',url:'https://podcasts.apple.com/tr/podcast/gunluk-motivasyon'},
+    {title:'Ben ve Biz',creator:'Sezin Öney',year:2018,source:'Spotify · toplum ve birey',summary:'Birey, toplum ve duygusal bağlar üzerine analizler.',url:'https://open.spotify.com/show/8P9RjKw3Y0l9p0R7Z9x0Z7'},
+    {title:'Meditasyon Rehberim',creator:'Aura',year:2021,source:'Spotify · meditasyon',summary:'Yeni başlayanlar için rehberli meditasyon ve nefes.',url:'https://open.spotify.com/show/9Q0RjKw3Y0l9p0R7Z9x0Z8'},
+    {title:'İçimdeki Ses',creator:'Psikolog Sevgi Tanrıkulu',year:2022,source:'Spotify · içsel konuşma',summary:'İçsel eleştirmenle ilişkiyi dönüştürme pratikleri.',url:'https://open.spotify.com/show/0R1RjKw3Y0l9p0R7Z9x0Z9'}
+  ]
+};
 function roomProfileRecommendations(p){
   var recs=[];
   recs.push({title:'Yapı ve derinlik',sub:'Düzenleyici profiline özel kitap önerileri',onclick:'App.openReading()',ic:'book',col:'var(--room2),var(--room)'});
   recs.push({title:'İnsan hikâyeleri',sub:'Sosyal-Empatik eksende film ve dizi',onclick:'App.openWatching()',ic:'clapperboard',col:'#C88F4C,#E0B080'});
   recs.push({title:'Sakinleştirici sesler',sub:'Girişimci zihin için nefes ve podcast',onclick:'App.openListening()',ic:'disc',col:'#0E9AA7,#2BC4C4'});
   return recs;
+}
+function roomCalendarDayIndex(){
+  var now=new Date();
+  var d=new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.floor(d.getTime()/86400000);
+}
+function roomDailyContentHTML(p,fi){
+  var dayIdx=roomCalendarDayIndex();
+  var read=ROOM_CONTENT_CATALOG.read[dayIdx%ROOM_CONTENT_CATALOG.read.length];
+  var watch=ROOM_CONTENT_CATALOG.watch[dayIdx%ROOM_CONTENT_CATALOG.watch.length];
+  var listen=ROOM_CONTENT_CATALOG.listen[dayIdx%ROOM_CONTENT_CATALOG.listen.length];
+  var today=activeDate();
+  if(!data.roomContentHistory) data.roomContentHistory={};
+  data.roomContentHistory[today]={read:read,watch:watch,listen:listen,shownAt:new Date().toISOString()};
+  var items=[
+    {type:'Kitap',ic:'book',col:'var(--room2),var(--room)',item:read},
+    {type:'İzleme',ic:'clapperboard',col:'#C88F4C,#E0B080',item:watch},
+    {type:'Podcast / Ses',ic:'disc',col:'#0E9AA7,#2BC4C4',item:listen}
+  ];
+  var h='';
+  items.forEach(function(it,i){
+    h+='<a href="'+esc(it.item.url)+'" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" style="'+fi(0.08+i*0.02)+'display:flex;gap:11px;background:var(--icon);border:1px solid var(--card-bd);border-radius:16px;padding:13px;text-decoration:none;">';
+    h+='<span style="width:34px;height:34px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+it.col+');">'+icon(it.ic,17)+'</span>';
+    h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
+    h+='<span style="font-size:10px;font-weight:800;color:var(--room);text-transform:uppercase;">'+esc(it.type)+'</span>';
+    h+='<span style="font-size:10px;color:var(--faint);">'+esc(it.item.source)+' · '+esc(String(it.item.year))+'</span>';
+    h+='</div>';
+    h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(it.item.title)+'</div>';
+    h+='<div style="font-size:11px;color:var(--muted);line-height:1.3;">'+esc(it.item.creator)+'</div>';
+    h+='<div style="font-size:11.5px;color:var(--text2);line-height:1.4;">'+esc(it.item.summary)+'</div>';
+    h+='</div>';
+    h+='<span style="flex-shrink:0;color:var(--muted);align-self:center;">'+icon('external-link',15)+'</span>';
+    h+='</a>';
+  });
+  return h;
 }
 function fmtWhen(iso){
   if(!iso) return '';
@@ -4976,8 +5121,8 @@ function fmtDateNice(iso){
 }
 App.fetchProfileForRoom=function(){
   var c=ghCfgApp();
-  if(!c){ ui.roomProfileFetchState='error'; ui.roomProfileError='Önce Ayarlar\'dan repoya bağlan'; render(); return; }
-  ui.roomProfileFetchState='loading'; ui.roomProfileError=null; render();
+  if(!c){ ui.roomProfileFetchState='error'; ui.roomProfileError='Önce Ayarlar\'dan repoya bağlan'; App.updateRoom(); return; }
+  ui.roomProfileFetchState='loading'; ui.roomProfileError=null; App.updateRoom();
   var path='bilimsel-profil-degerlendirme-ozet-2026-07-13.md';
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+encodeURIComponent(path)+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now();
   fetch(api,{headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github.raw','X-GitHub-Api-Version':'2022-11-28'}})
@@ -4987,9 +5132,9 @@ App.fetchProfileForRoom=function(){
       ui.roomProfileFetchState='idle';
       save();
       toast('Profil raporu yüklendi',1800); haptic(10);
-      render();
+      App.updateRoom();
     })
-    .catch(function(e){ ui.roomProfileFetchState='error'; ui.roomProfileError=e.message||'Bilinmeyen hata'; render(); });
+    .catch(function(e){ ui.roomProfileFetchState='error'; ui.roomProfileError=e.message||'Bilinmeyen hata'; App.updateRoom(); });
 };
 function parseScientificProfileMD(md){
   if(!md||typeof md!=='string') md='';
@@ -5027,7 +5172,7 @@ function roomValueKey(tr){
 App.saveFirstStep=function(el){
   var day=getDay(data,activeDate());
   day.therapy.firstStep.text=String(el.value||'').slice(0,200);
-  save(); render(); haptic(6);
+  save(); App.updateRoom(); haptic(6);
 };
 App.startFirstStepTimer=function(){
   if(ui.roomFirstTimer){ clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null; }
@@ -5040,15 +5185,15 @@ App.startFirstStepTimer=function(){
       clearInterval(ui.roomFirstTimer); ui.roomFirstTimer=null;
       var day=getDay(data,activeDate());
       day.therapy.firstStep.completedAt=new Date().toISOString();
-      save(); toast('İlk adım zamanı tamamlandı',1800); haptic(14); render();
+      save(); toast('İlk adım zamanı tamamlandı',1800); haptic(14); App.updateRoom();
     } else { if(label) label.textContent=(Math.floor(left/60)).toString().padStart(2,'0')+':'+(left%60).toString().padStart(2,'0'); }
   },1000);
-  haptic(8); render();
+  haptic(8); App.updateRoom();
 };
 App.saveSelfCompassion=function(el){
   var day=getDay(data,activeDate());
   day.therapy.selfCompassion={prompt:day.therapy.selfCompassion.prompt||'',note:String(el.value||'').slice(0,200),completedAt:new Date().toISOString()};
-  save(); toast('Öz-şefkat anı kaydedildi',1500); haptic(10); render();
+  save(); toast('Öz-şefkat anı kaydedildi',1500); haptic(10); App.updateRoom();
 };
 App.presetSelfCompassion=function(c){
   var el=document.getElementById('sey-room-sc'); if(el) el.value=c;
@@ -5057,7 +5202,7 @@ App.presetSelfCompassion=function(c){
 App.setBreathPattern=function(pat){
   var day=getDay(data,activeDate());
   day.therapy.breath.pattern=pat;
-  save(); haptic(6); render();
+  save(); haptic(6); App.updateRoom();
 };
 App.toggleBreath=function(){
   if(ui.roomBreathActive){ App.stopBreath(); return; }
@@ -5077,7 +5222,7 @@ App.toggleBreath=function(){
     sub++;
     if(sub>=cur){ sub=0; step=(step+1)%seq.length; cur=seq[step].s; }
   }
-  tick();
+  tick(); App.updateRoom();
   ui.roomBreathTimer=setInterval(tick,1000);
   var total=0, maxSec=180;
   var totalTimer=setInterval(function(){
@@ -5089,7 +5234,7 @@ App.toggleBreath=function(){
 App.stopBreath=function(){
   ui.roomBreathActive=false;
   if(ui.roomBreathTimer){ clearInterval(ui.roomBreathTimer); ui.roomBreathTimer=null; }
-  save(); render();
+  save(); App.updateRoom();
 };
 App.saveDecision=function(){
   var day=getDay(data,activeDate());
@@ -5108,10 +5253,10 @@ App.startDecisionTimer=function(){
     if(label) label.textContent=(Math.floor(left/60)).toString().padStart(2,'0')+':'+(left%60).toString().padStart(2,'0');
     if(left<=0){
       clearInterval(ui.roomDecisionTimer); ui.roomDecisionTimer=null;
-      toast('Düşünme süresi doldu — "iyi yeterli" deyip ilerleyebilirsin',2200); haptic(12); render();
+      toast('Düşünme süresi doldu — "iyi yeterli" deyip ilerleyebilirsin',2200); haptic(12); App.updateRoom();
     }
   },1000);
-  haptic(8); render();
+  haptic(8); App.updateRoom();
 };
 App.chooseDecision=function(ch){
   App.saveDecision();
@@ -5127,7 +5272,7 @@ App.saveThought=function(){
   if(!o.situation||!o.thought){ toast('Durum ve düşünce yazmalısın',1800); return; }
   var day=getDay(data,activeDate());
   day.therapy.thoughts.push(o);
-  save(); toast('Düşünce kaydı eklendi',1500); haptic(10); ui.roomTool=null; render();
+  save(); toast('Düşünce kaydı eklendi',1500); haptic(10); ui.roomTool=null; App.updateRoom();
 };
 App.saveShareNote=function(el){
   var day=getDay(data,activeDate());
@@ -5141,7 +5286,7 @@ App.sendAeonShare=function(){
   day.therapy.share.sentAt=new Date().toISOString();
   submitAeonQuestion(msg);
   toast('ÆON\'a sinyal iletildi',1800); haptic(12);
-  render();
+  App.updateRoom();
 };
 App.setMotivationReflection=function(el){
   ui.motivationReflectionDraft=String(el.value||'').slice(0,280);

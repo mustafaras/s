@@ -595,9 +595,11 @@ function migrate(d){
   if(!d.luna||typeof d.luna!=='object') d.luna={qa:[],lastAskDate:null};
   if(!Array.isArray(d.luna.qa)) d.luna.qa=[];
   if(typeof d.luna.lastAskDate!=='string'&&d.luna.lastAskDate!==null) d.luna.lastAskDate=null;
-  if(!d.aeon||typeof d.aeon!=='object') d.aeon={qa:[],lastAskDate:null};
+  if(!d.aeon||typeof d.aeon!=='object') d.aeon={qa:[],lastAskDate:null,lastNotificationShownAt:null};
   if(!Array.isArray(d.aeon.qa)) d.aeon.qa=[];
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
+  if(typeof d.aeon.lastNotificationShownAt!=='string'&&d.aeon.lastNotificationShownAt!==null) d.aeon.lastNotificationShownAt=null;
+  if(typeof d.settings.aeonNotifyPermission!=='string') d.settings.aeonNotifyPermission='';
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
@@ -7678,6 +7680,7 @@ function mergeInbox(msgs){
   if(!Array.isArray(data.aeon.qa)) data.aeon.qa=[];
   var seen={}; data.notifications.forEach(function(n){ if(n&&n.id) seen[n.id]=n; });
   var nowIso=new Date().toISOString(), added=0, answeredCount=0, answeredText=null, needPush=false;
+  var lastNotif=null, lastAnswer=null;
   msgs.forEach(function(m){
     if(!m||!m.id) return;
     if(m.replyTo){
@@ -7686,7 +7689,7 @@ function mergeInbox(msgs){
         if(q.answerMsgId!==m.id){
           q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; q.answerSynced=false;
           if(m.kind==='voice'||m.kind==='image'||m.kind==='file'){ q.answerKind=m.kind; q.answerMediaId=m.mediaId; q.answerMediaMime=m.mediaMime; q.answerDurationSec=m.durationSec; q.answerPeaks=m.peaks; q.answerW=m.w; q.answerH=m.h; if(m.name) q.answerMediaName=m.name; if(m.size!=null) q.answerMediaSize=m.size; }
-          answeredCount++; answeredText=q.answer;
+          answeredCount++; answeredText=q.answer; lastAnswer=q;
         }
         else if(q.answerSynced!==true){ needPush=true; } // yanıt cihaza indi ama repoya işlenmemişse tekrar dene
         return;
@@ -7698,7 +7701,7 @@ function mergeInbox(msgs){
     var notif={id:m.id,text:String(m.text||''),ts:m.ts||nowIso,from:'observer',read:false,readAt:null,deleted:false,deletedAt:null,receivedAt:nowIso,seen:false,synced:false};
     if(m.kind==='voice'||m.kind==='image'||m.kind==='file'){ notif.kind=m.kind; notif.mediaId=m.mediaId; notif.mediaMime=m.mediaMime; notif.durationSec=m.durationSec; notif.peaks=m.peaks; notif.w=m.w; notif.h=m.h; if(m.name) notif.mediaName=m.name; if(m.size!=null) notif.mediaSize=m.size; }
     data.notifications.push(notif);
-    added++;
+    added++; lastNotif=notif;
   });
   if(added>0||answeredCount>0||needPush){
     save(); // localStorage + sync kuyruğu
@@ -7707,8 +7710,8 @@ function mergeInbox(msgs){
     if(!pushed) receiptPushNow(); // makbuzu debounce beklemeden hemen repoya yaz; onaylanınca (SeyOnSynced) synced=true olur
     if(added>0||answeredCount>0){
       render();
-      if(added>0) showInboxPopup();
-      if(answeredCount>0) replayAnswerPopup();
+      if(added>0){ showInboxPopup(); if(lastNotif) showNativeAeonNotification({ body:lastNotif.text, kind:lastNotif.kind, id:lastNotif.id, tag:'aeon-message' }); }
+      if(answeredCount>0){ replayAnswerPopup(); if(lastAnswer) showNativeAeonNotification({ body:lastAnswer.answer, kind:lastAnswer.answerKind, id:lastAnswer.answerMsgId, tag:'aeon-answer' }); }
     }
   }
 }
@@ -7799,6 +7802,85 @@ function replayAnswerPopup(){
   save(); receiptPushNow();
   if(ui.tab!=='mesaj'){ var last=pop[pop.length-1]; showAeonAnswerPopup(last.answer,pop.length); }
 }
+
+// ── ÆON yerel PWA bildirimleri (Service Worker + Notification API) ──
+// iOS 16.4+ PWA ve modern Android/Chrome'da AEON'dan gelen mesaj/yanıt için
+// native kilit-ekranı / merkez bildirimi gösterir. Aç/kapa düğmesi yoktur;
+// izin verilene kadar 2 dk'da bir sessizce tekrar sorar.
+var AEON_ICON_URL='./aeon-icon-192.png';
+var AEON_BADGE_URL='./aeon-icon-192.png';
+var aeonPermTimer=null;
+var aeonPermPrompted=false;
+
+function canNotify(){ return ('Notification' in window); }
+function aeonNotifyPermission(){ return canNotify() ? Notification.permission : 'denied'; }
+
+function requestAeonPermissionOnce(){
+  if(!canNotify()) return;
+  var perm=aeonNotifyPermission();
+  if(perm==='granted' || perm==='denied') return;
+  if(aeonPermPrompted) return;
+  aeonPermPrompted=true;
+  var res=Notification.requestPermission();
+  if(res && typeof res.then==='function'){
+    res.then(function(){ aeonPermPrompted=false; }).catch(function(){ aeonPermPrompted=false; });
+  } else {
+    setTimeout(function(){ aeonPermPrompted=false; }, 3000);
+  }
+}
+
+function startAeonPermissionLoop(){
+  if(aeonPermTimer || !canNotify()) return;
+  function tick(){
+    var perm=aeonNotifyPermission();
+    if(data && data.settings){
+      var prev=data.settings.aeonNotifyPermission;
+      if(prev!==perm){ data.settings.aeonNotifyPermission=perm; save(); }
+    }
+    if(perm==='granted'){ stopAeonPermissionLoop(); return; }
+    requestAeonPermissionOnce();
+  }
+  tick();
+  aeonPermTimer=setInterval(tick, 120000); // 2 dakika, sınırsız
+}
+function stopAeonPermissionLoop(){
+  if(aeonPermTimer){ clearInterval(aeonPermTimer); aeonPermTimer=null; }
+}
+
+function fallbackNativeNotify(title, options){
+  try{
+    new Notification(title, { body: options.body, icon: options.icon, tag: options.tag, requireInteraction: options.requireInteraction, silent: options.silent });
+    if(data && data.aeon) data.aeon.lastNotificationShownAt=new Date().toISOString();
+  }catch(e){}
+}
+function showNativeAeonNotification(opts){
+  opts=opts||{};
+  if(!canNotify() || aeonNotifyPermission()!=='granted') return;
+  var title='ÆON';
+  var body='Yeni bir ÆON mesajı';
+  if(opts.body) body=String(opts.body).slice(0,180);
+  else if(opts.kind==='voice') body='Sesli mesaj';
+  else if(opts.kind==='image') body='Görsel';
+  else if(opts.kind==='file') body='Belge';
+  var options={
+    body: body,
+    icon: AEON_ICON_URL,
+    badge: AEON_BADGE_URL,
+    tag: opts.tag || 'aeon-message',
+    renotify: true,
+    requireInteraction: false,
+    silent: false,
+    data: { id: opts.id || '', type: 'aeon-message' }
+  };
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.ready.then(function(reg){ reg.showNotification(title, options); }).catch(function(){ fallbackNativeNotify(title, options); });
+  } else {
+    fallbackNativeNotify(title, options);
+  }
+  if(data && data.aeon){ data.aeon.lastNotificationShownAt=new Date().toISOString(); save(); }
+  if(data && data.settings && Notification.permission!==data.settings.aeonNotifyPermission){ data.settings.aeonNotifyPermission=Notification.permission; save(); }
+}
+
 // ── Faz 7: Psikolojik durum tespiti (öz-bildirim TARAMA ölçekleri; klinik tanı DEĞİL) ──
 // Ölçekler kamuya açık/akademik ve ücretsiz: ASRS-v1.1 Part A (WHO), ECR kısa form,
 // GAD-7 & PHQ-9 (Pfizer, izinsiz serbest), WHO-5 (WHO), SCS-SF. Tümü Türkçe ve yalnızca-tık.
@@ -8895,4 +8977,13 @@ window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen m
 
 render();
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
+
+// ÆON bildirim izni döngüsü: açık/kapa yok, izin verilene kadar 2 dk'da bir sessizce dener.
+startAeonPermissionLoop();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', function(e){
+    if(e.data && e.data.type==='aeon-open-mesaj'){ App.openMesaj(); }
+  });
+}
 })();

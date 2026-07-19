@@ -46,7 +46,7 @@ _Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `p
 | 9 | 🎯 Günün niyeti | 2 | ✅ | `App.onIntention` + `data.days[].intention` (≤140); Bugün kartı "Bugünün niyeti" (geçmiş günde "O günün niyeti", düzenlenebilir); gün-detayı popup'ında "🎯 Niyet"; panel `exRowAlways("🎯 Niyet", …)`; `daysTracked` sinyali (2026-07-04) |
 | 10 | 🩸 Döngü tahmini & faz | 2 | ✅ | `cycleHTML` + faz hesabı + sonraki regl/ovülasyon/doğurganlık |
 | 11 | 💊 İlaç hatırlatıcı & uyum | 2 | 🟡 | Uyku ilacı türü + ağrı kesici log var; saatli liste + uyum % (`data.meds`) yok |
-| 12 | 🔔 PWA bildirimler | 3 | ❌ | service worker / Notification yok |
+| 12 | 🔔 PWA bildirimler | 3 | ✅ | AEON mesaj/yanıtı için yerel Notification API (`sw.js` + `manifest.json` + AEON ikonu); aç/kapa yok, izin verilene kadar 2 dk'da bir sessiz tekrar; gönderen adı "ÆON"; tıklayınca `mesaj` sekmesi açılır (2026-07-19) |
 | 13 | 🔒 PIN kilidi | 3 | ❌ | `settings.pin` yok |
 | 14 | 🛟 Yedek indir/yükle | 1 | ✅ | `exportJson` / `importJson` + Ayarlar butonları |
 | 15 | 🕰️ Geçmiş günü düzenleme | 3 | ✅ | `editDay`/`exitEdit` + uyarı bandı + auto-exit (2026-07-03) |
@@ -65,7 +65,7 @@ _Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `p
 | 27 | 🎯 Motivasyon programı: günlük yansıma örnekleri | 2 | ✅ | 120 gün × 3 örnek (`reflectionExamples`). Terapi Odası'nda "Bugün nasıl yazabilirim?" açılır kart + copy-to-input; panel aktif gün aynası; cache bump `20260718a`/`20260719a` (2026-07-18) |
 | 28 | 🍽️ Bilimsel öğün ölçü & kişiselleştirilmiş hedefler | 2 | ✅ | Aşama 1: yeni ölçü birimleri (`porsiyon`, `kaşık`, `bardak`, `avuç`, `kase`, `dilim`, `tabak`, `gr`, `adet` vb.) ve gıda özel `units`; Aşama 2: `data.settings.targets` (calories, protein, bmr, tdee, activityLevel), Mifflin-St Jeor kadın BMR + TDEE, aktivite seçici Ayarlar'da, panelde hedef %; Aşama 2.1: boy/kilo için tek giriş kaynağı Sağlık > Vücut Ölçüleri, Ayarlar kartı "Kişiselleştirilmiş hedefler" olarak yeniden adlandırıldı; `setHeight`/`addWeight` sonrası hedefler anında yenileniyor; Aşama 2.2: hedef modeli genişletildi (carbs, fat, fiber, waterCups, steps, sleepHours, caffeineMaxMg, magnesiumMg, ironMg, omega3Mg, vitaminDIU), Sağlık > Vücut Ölçüleri & Hedeflerim tek kart, Bugün "Hedeflerim" kartı, panelde genişletilmiş hedef aynası, Ayarlar'daki hedef kartı kaldırıldı; eski kayıtlar korunur; Bugün hero kartında özet hedef satırı makro üçlüsüne (Kalori/Protein/Karbonhidrat) indirgendi; eski kayıtlar korunur; cache bump `20260718c`/`20260718d`/`20260718e`/`20260718f`/`20260718h` (2026-07-18) |
 
-**Sayım:** ✅ 18 · 🟡 3 · ❌ 8 _(+ altyapı ✅)_
+**Sayım:** ✅ 19 · 🟡 3 · ❌ 7 _(+ altyapı ✅)_
 
 ---
 
@@ -191,12 +191,26 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 
 ## 🔔 Sürüm 3 — Hatırlatıcı & erişim
 
-### 12. PWA yerel bildirimler — ❌ Yok
-- **Ne:** Su, akşam check-in, ilaç, "bugün birkaç sayfa okudun mu?" nazik
-  hatırlatmaları.
-- **Nasıl:** Service worker + Notification API (izin akışı); zamanlama
-  tercihleri `ayarlar`'da.
-- **Emek:** İleri (PWA/SW altyapısı). **Panel:** —
+### 12. PWA yerel bildirimler — ✅ Uygulandı (2026-07-19)
+- **Ne:** ÆON'dan gelen mesaj/yanıt için yerel native bildirim. Kullanıcı
+  ayarlarla uğraşmadan, aç/kapa düğmesi olmadan çalışır; izin verilmezse
+  2 dakikada bir sınırsız tekrar izin istenir, izin verilince döngü durur.
+  Bildirimde gönderen adı sadece **"ÆON"**, flamingo değil; uygulamanın altın
+  altıgen AEON rozeti ikonu kullanılır. Bildirime dokununca uygulama `mesaj`
+  sekmesine açılır.
+- **Nasıl:** `manifest.json` + `sw.js` (service worker kaydı `index.html`'de),
+  `app.js`'te `showNativeAeonNotification()` + `startAeonPermissionLoop()`;
+  `mergeInbox()` yeni mesaj/yanıt geldiğinde hem uygulama içi popup hem native
+  bildirim gönderir. `sw.js` `notificationclick` ile açık pencereye
+  `aeon-open-mesaj` mesajı atar.
+- **Sınırlar:** Statik GitHub Pages olduğu için klasik Web Push sunucusu yok;
+  uygulama kapalıyken anında push almak teknik olarak mümkün değil. Yerel
+  bildirimler uygulama açık/ön plandayken veya açılışta çekilen mesajlar için
+  gösterilir.
+- **Emek:** Orta. **Panel:** ÆON çekirdek şeridinde "Notifications" modül
+  rozeti + bildirim izni durumu (açık/kapalı/bekleniyor) ve son yerel
+  bildirim zamanı (`data.settings.aeonNotifyPermission`,
+  `data.aeon.lastNotificationShownAt`).
 
 ### 13. 🔒 PIN / gizlilik kilidi — ❌ Yok
 - **Ne:** Açılışta PIN (opsiyonel biyometrik).
@@ -637,6 +651,21 @@ notlarını buraya ekleyebiliriz._
 - **2026-07-03** — Belge **yaşayan belge**ye çevrildi: canlı durum tablosu,
   rozetler ve tetikleyici notu eklendi. Mevcut durum denetlendi
   (✅ 6 · 🟡 5 · ❌ 11).
+- **2026-07-19** — **#12 🔔 PWA yerel bildirimler ✅**: ÆON mesaj/yanıtı için native
+  kilit-ekranı / merkez bildirimi. Aç/kapa düğmesi yok; izin verilene kadar
+  2 dakikada bir sessizce tekrar izin istenir, izin verilince döngü durur.
+  Gönderen adı sadece **"ÆON"**, flamingo değil; uygulamanın altın altıgen
+  AEON rozeti ikonu (`aeon-icon-192.png`) kullanılır. `manifest.json` + `sw.js`
+  eklendi; `index.html` service worker kaydı + cache-bust (`v=20260718j` app.js,
+  `v=20260718b` sync.js). `app.js`'te `showNativeAeonNotification()`,
+  `startAeonPermissionLoop()`, `mergeInbox()` tetikleyicisi ve `notificationclick`
+  sonrası `mesaj` sekmesine yönlendirme. Bildirim izni durumu
+  (`data.settings.aeonNotifyPermission`) ve son bildirim zamanı
+  (`data.aeon.lastNotificationShownAt`) `migrate()`'e eklendi; panelde
+  ÆON çekirdek şeridine "Notifications" rozeti + son bildirim yaşı eklendi.
+  Statik GitHub Pages olduğu için klasik Web Push sunucusu yok; uygulama
+  kapalıyken anında push almak teknik olarak mümkün değil. `node --check app.js`,
+  `node --check sw.js` ve panel inline JS syntax temiz.
 - **2026-07-03** — **#15 Geçmiş günü düzenleme ✅**: Harita'dan güvenli
   geçmiş-gün düzenleme, uyarı bandı, otomatik çıkış (idle/görünürlük/reload),
   ay özeti kartı; takvim tarih-yön hatası düzeltildi.

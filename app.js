@@ -660,6 +660,8 @@ function migrate(d){
   if(typeof d.dailyPhoto.source!=='string') d.dailyPhoto.source='Wikimedia Commons';
   if(typeof d.dailyPhoto.pageUrl!=='string') d.dailyPhoto.pageUrl='';
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
+  // Gün değişmişse fetchedAt'ı sıfırla, böylece stale koruması gece yarısı sonrası ilk fırsatta yeni fotoğraf çeker.
+  if(d.dailyPhoto.date!==todayStr()) d.dailyPhoto.fetchedAt='';
   // Magnezyum Danışmanı — kullanıcı profili + model + günlük kayıt.
   if(!d.settings.magnesium||typeof d.settings.magnesium!=='object') d.settings.magnesium={enabled:false,onboardingDone:false,preferredForm:'',tolerated:true,kidneyDisease:false,lastNudgeDate:null,dismissedUntil:null};
   // D vitamini takviyesi formu/dozu — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
@@ -4236,11 +4238,11 @@ function fetchDailyPhoto(){
 function maybeFetchDailyPhoto(){
   if(!data || !data.dailyPhoto) return;
   var today=todayStr();
-  // Son 10 dakika içinde denenmiş ve bugün için kayıt yoksa arka planda tekrar dene.
   var last=data.dailyPhoto.fetchedAt?new Date(data.dailyPhoto.fetchedAt).getTime():0;
   var stale=!data.dailyPhoto.date || data.dailyPhoto.date!==today;
   var recent=Date.now()-last < 10*60*1000;
-  if(stale && !recent && !DAILY_PHOTO_FETCHING){ fetchDailyPhoto(); }
+  if(!stale) return; // bugünün fotoğrafı güncelse hiçbir şey yapma
+  if(!recent && !DAILY_PHOTO_FETCHING){ fetchDailyPhoto(); }
 }
 function wxMeta(code,isDay){
   var c=code;
@@ -7914,7 +7916,7 @@ function aeonNotifyBannerHTML(opts){
   var title=opts.title || 'ÆON mesajları kilit ekranında';
   var sub=opts.subtitle || 'Bildirim izni ver, hiçbir şey kaçırma.';
   var cls=compact?'aeon-notify-nudge':'aeon-notify-banner';
-  var h='<div id="'+esc(opts.id||'aeon-notify-banner')+'" class="'+cls+'">';
+  var h='<div id="'+esc(opts.id||'aeon-notify-banner')+'" class="'+cls+'" >';
   h+='<div class="aeon-notify-badge"><img src="'+esc(AEON_ICON_URL)+'" alt="ÆON"></div>';
   h+='<div class="aeon-notify-text">';
   h+='<div class="aeon-notify-title">'+esc(title)+'</div>';
@@ -9028,9 +9030,9 @@ App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(
 
 setTimeout(pollRemote,1500);
 setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)
-document.addEventListener('visibilitychange',function(){ if(!document.hidden) pollRemote(); });
-window.addEventListener('focus',pollRemote);   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',pollRemote); // bfcache'ten geri dönüşte
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ pollRemote(); maybeFetchDailyPhoto(); } });
+window.addEventListener('focus',function(){ pollRemote(); maybeFetchDailyPhoto(); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',function(){ pollRemote(); maybeFetchDailyPhoto(); }); // bfcache'ten geri dönüşte
 window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();

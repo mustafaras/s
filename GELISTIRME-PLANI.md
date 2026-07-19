@@ -21,6 +21,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `panel.html`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-07-20:** **Terapi Odası Premium Genişletme — Bilimsel Profil** canlıya alındı (`main`): İçsel Pusula → Terapi Odası overlay'i **Yol / Araçlar / Profilim** 3 sekmesine ayrıldı. Yol sekmesinde Bugünün Kazanımları + Esneklik Nudgesı; Araçlar sekmesinde İlk Adım, Öz-Şefkat, Rehberli Nefes (4-7-8 / kutu), Karar Hızlandırıcı, CBT Düşünce Kaydı, Güvenli Paylaşım (ÆON sinyali); Profilim sekmesinde `seyma-data` reposundan bilimsel profil raporu çekilip RIASEC/değer rozetleri, güçlü yönler/riskler ve gözlemci rehberi gösteriliyor. Günlük öneriler (kitap/izleme/podcast) gerçek takvim gününe göre döner, Türkçe/güvenilir kaynaklara bağlanır ve yeni sekmede açar; soft DOM güncellemesi sayesinde sekme değişimlerinde flash/flicker yok. Veri modeli: `data.scientificProfile` + `data.days[].therapy` + `data.roomContentHistory`; panelde "Bilimsel Profil Işığı" bento kartı + gün-detay Terapi Odası satırları. Cache bump `20260720f`.
 > - **2026-07-18 (Aşama 2.2):** Kişiselleştirilmiş hedefler bilimsel olarak genişletildi ve Sağlık sayfasındaki **Vücut Ölçüleri** kartıyla tek kartta birleştirildi. `data.settings.targets` artık kalori, protein, karbonhidrat, yağ, lif, su (bardak), adım, uyku, kafein, magnezyum, demir, omega-3, D vitamini, BMR, TDEE ve aktivite seviyesini tutuyor. Bugün ekranına **"Hedeflerim"** kartı eklendi; dokununca Sağlık sayfasına yönlendiriyor. Panel gün-detayında makro özetinin yanında karbonhidrat, yağ, lif hedefleri ve tüm mikro/wellness hedefleri görünüyor. Ayarlar'daki "Kişiselleştirilmiş hedefler" kartı kaldırıldı; doğum tarihi ve aktivite seviyesi artık Sağlık'tan giriliyor. Cache bump `20260718f` (`app.js`).
 > - **2026-07-18:** Bugün ekranındaki ayrı **"Hedeflerim"** kartı kaldırıldı; hedefler artık sadece hero kartındaki premium makro üçlüsü (**Kalori · Protein · Karbonhidrat**) ve **Sağlık > Vücut Ölçüleri & Hedeflerim** sayfasında görünüyor. Böylece hem ekran sadeleşti hem çakışma tamamen giderildi. Cache bump `20260718i` (`app.js`).
 > - **2026-07-18:** Bugün hero kartındaki özet hedef satırı premium 3 halka tasarımına çevrildi. Su/Adım üst durum satırında (`heroStatsHTML`) zaten göründüğü için bu satırda **Kalori · Protein · Karbonhidrat** makro üçlüsü gösteriliyor; dairesel SVG ilerleme halkaları, gradient zeminler ve hedef başlığıyla çakışmasız, premium görünüm. Cache bump `20260718h` (`app.js`).
@@ -40,10 +41,10 @@ _Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `p
 | 3 | 📈 Otomatik içgörüler | 1 | ✅ | `corrInsights()` → render `rapor` |
 | 4 | 🗓️ Ruh hali ısı haritası | 1 | ✅ | `moodHeatmapCard()` → `rapor`'da GitHub-tarzı yıllık mod ısı haritası: ‹yıl› seçici, yatay kaydırılır 7×hafta grid, mod paleti, ay/gün etiketleri, hücreye dokun → `App.heatOpen` harita'da o günü açar; panel `moodHeatmapCardHTML()` salt-okunur ayna (2026-07-04) |
 | 5 | 🏅 Rozet & seri | 1 | ✅ | `badgesGrid()` + `currentStreak/maybeStreak/bestStreak` + kilometre taşları |
-| 6 | 🧠 Düşünce kaydı (CBT) | 2 | ❌ | `thoughts` yok |
-| 7 | 🌬️ Nefes / meditasyon | 2 | 🟡 | Veri modeli var (`WIND_DOWN_STEPS` "4-7-8 nefes", `emptyWindDown`); rehberli animasyon/UI bağlı değil |
+| 6 | 🧠 Düşünce kaydı (CBT) | 2 | ✅ | Terapi Odası Araçlar sekmesinde 4 adımlı düşünce kaydı (`data.days[].therapy.thoughts[]`); panel gün-detayında sayı/özet (2026-07-20) |
+| 7 | 🌬️ Nefes / meditasyon | 2 | ✅ | Terapi Odası Araçlar sekmesinde 4-7-8 ve kutu nefesi seçici, animasyonlu halka, süre sayacı (`data.days[].therapy.breath`); panel gün-detayında nefes süresi satırı (2026-07-20) |
 | 8 | ✍️ Serbest günlük | 2 | ❌ | Ayrı journaling yok; yalnızca günlük `note` alanı var |
-| 9 | 🎯 Günün niyeti | 2 | ✅ | `App.onIntention` + `data.days[].intention` (≤140); Bugün kartı "Bugünün niyeti" (geçmiş günde "O günün niyeti", düzenlenebilir); gün-detayı popup'ında "🎯 Niyet"; panel `exRowAlways("🎯 Niyet", …)`; `daysTracked` sinyali (2026-07-04) |
+| 9 | 🎯 Günün niyeti / esneklik nudgesı | 2 | ✅ | `App.onIntention` + `data.days[].intention` (≤140); Terapi Odası Yol sekmesinde esneklik nudgesı + Bugünün Kazanımları; panel gün-detayında niyet/kazanım satırı (2026-07-20) |
 | 10 | 🩸 Döngü tahmini & faz | 2 | ✅ | `cycleHTML` + faz hesabı + sonraki regl/ovülasyon/doğurganlık |
 | 11 | 💊 İlaç hatırlatıcı & uyum | 2 | 🟡 | Uyku ilacı türü + ağrı kesici log var; saatli liste + uyum % (`data.meds`) yok |
 | 12 | 🔔 PWA bildirimler | 3 | ✅ | AEON mesaj/yanıtı için yerel Notification API (`sw.js` + `manifest.json` + AEON ikonu); aç/kapa yok, izin verilene kadar 2 dk'da bir sessiz tekrar; gönderen adı "ÆON"; tıklayınca `mesaj` sekmesi açılır (2026-07-19) |
@@ -64,8 +65,9 @@ _Son güncelleme: 2026-07-18 · Kaynak: `app.js` + `motivationProgramV2.js` + `p
 | 26 | 🧂 Adaptif Magnezyum Danışmanı | 2 | ✅ | `calculateMgNudge` + `suggestMgForm` → döngü fazı (lüteal ağırlığı), semptomlar (kramp/sancı/baş ağrısı/şişkinlik/yorgunluk/duygusal), uyku (<6.5 saat), enerji/stres, 3 günlük trende göre adaptif skor; `magnesiumBannerHTML` Bugün, `magnesiumCardHTML` Sağlık, `magnesiumSettingsHTML` Ayarlar, `magnesiumFeedbackHTML` ertesi-gün etki geri bildirimi; güvenlik filtreleri (`kidneyDisease`, `tolerated`, `maxElementalMg≤350`); `data.settings.magnesium`, `data.days[].magnesium`, `data.magnesiumModel`; panel `magnesiumPanelCardHTML` bento + gün-detayı satırı; cache bump `20260713c` (2026-07-14) |
 | 27 | 🎯 Motivasyon programı: günlük yansıma örnekleri | 2 | ✅ | 120 gün × 3 örnek (`reflectionExamples`). Terapi Odası'nda "Bugün nasıl yazabilirim?" açılır kart + copy-to-input; panel aktif gün aynası; cache bump `20260718a`/`20260719a` (2026-07-18) |
 | 28 | 🍽️ Bilimsel öğün ölçü & kişiselleştirilmiş hedefler | 2 | ✅ | Aşama 1: yeni ölçü birimleri (`porsiyon`, `kaşık`, `bardak`, `avuç`, `kase`, `dilim`, `tabak`, `gr`, `adet` vb.) ve gıda özel `units`; Aşama 2: `data.settings.targets` (calories, protein, bmr, tdee, activityLevel), Mifflin-St Jeor kadın BMR + TDEE, aktivite seçici Ayarlar'da, panelde hedef %; Aşama 2.1: boy/kilo için tek giriş kaynağı Sağlık > Vücut Ölçüleri, Ayarlar kartı "Kişiselleştirilmiş hedefler" olarak yeniden adlandırıldı; `setHeight`/`addWeight` sonrası hedefler anında yenileniyor; Aşama 2.2: hedef modeli genişletildi (carbs, fat, fiber, waterCups, steps, sleepHours, caffeineMaxMg, magnesiumMg, ironMg, omega3Mg, vitaminDIU), Sağlık > Vücut Ölçüleri & Hedeflerim tek kart, Bugün "Hedeflerim" kartı, panelde genişletilmiş hedef aynası, Ayarlar'daki hedef kartı kaldırıldı; eski kayıtlar korunur; Bugün hero kartında özet hedef satırı makro üçlüsüne (Kalori/Protein/Karbonhidrat) indirgendi; eski kayıtlar korunur; cache bump `20260718c`/`20260718d`/`20260718e`/`20260718f`/`20260718h` (2026-07-18) |
+| 29 | 🛋️ Terapi Odası Premium Genişletme — Bilimsel Profil | 2 | ✅ | Mevcut 7 alt sekme korundu, İçsel Pusula → Terapi Odası overlay'i 3 sekmeye bölündü: **Yol** (motivasyon akışı + Bugünün Kazanımları + Esneklik Nudgesı), **Araçlar** (İlk Adım, Öz-Şefkat, Rehberli Nefes, Karar Hızlandırıcı, CBT Düşünce Kaydı, Güvenli Paylaşım), **Profilim** (`data.scientificProfile` rapor özeti, RIASEC/değer rozetleri, güçlü yönler/riskler, profil-uyumlu içerik önerileri); `data.days[].therapy` alt yapısı + `migrate()` backfill; panelde "Bilimsel Profil Işığı" bento kartı + gün-detay Terapi Odası satırları; cache bump `20260720a` (2026-07-20) |
 
-**Sayım:** ✅ 19 · 🟡 3 · ❌ 7 _(+ altyapı ✅)_
+**Sayım:** ✅ 22 · 🟡 2 · ❌ 6 _(+ altyapı ✅)_
 
 ---
 
@@ -150,15 +152,15 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 
 ## 💜 Sürüm 2 — Duygu & zihin sağlığı derinleştirme
 
-### 6. 🧠 Düşünce kaydı (CBT tarzı) — ❌ Yok
-- **Ne:** Otomatik düşünce → duygu/şiddet → kanıt → yeniden çerçeveleme.
-- **Nasıl:** `sos` akışına bağlı yeni overlay; `data.days[date].thoughts[]`.
-- **Emek:** Orta. **Panel:** Sayı/özet (mahremiyete saygılı, kısaltılmış).
+### 6. 🧠 Düşünce kaydı (CBT tarzı) — ✅ Uygulandı (2026-07-20)
+- **Ne:** Otomatik düşünce → kanıt (lehte/aykırı) → alternatif düşünce.
+- **Nasıl:** Terapi Odası → Araçlar sekmesinde akordeon kart; `data.days[date].therapy.thoughts[]`.
+- **Emek:** Orta. **Panel:** gün-detayında "Düşünce kaydı · N adet" satırı (içerik gizli, sayı/sinyal görünür).
 
-### 7. 🌬️ Nefes / meditasyon — 🟡 Kısmen
-- **Ne:** Rehberli nefes animasyonu (ör. 4-7-8), süre kaydı, günlük dk hedefi.
-- **Nasıl:** CSS/SVG animasyon; `data.days[date].breath.minutes`. SOS'tan erişim.
-- **Emek:** Orta. **Panel:** "Nefes dakikası" satırı.
+### 7. 🌬️ Nefes / meditasyon — ✅ Uygulandı (2026-07-20)
+- **Ne:** Rehberli nefes animasyonu (4-7-8 ve kutu), süre kaydı.
+- **Nasıl:** Terapi Odası → Araçlar sekmesinde animasyonlu halka + pattern seçici; `data.days[date].therapy.breath`.
+- **Emek:** Orta. **Panel:** gün-detayında nefes süresi satırı.
 
 ### 8. ✍️ Serbest günlük (journaling) + Luna promptları — ❌ Yok
 - **Ne:** "Bugün seni ne zorladı?" gibi yazma soruları; uzun serbest metin.

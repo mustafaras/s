@@ -351,6 +351,42 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-20 — Faz 29: Terapi Odası Premium Genişletme canlıya alındı
+
+**Branch:** `mustafaras-bilimsel-profil-terapi-odasi` → `main` squash-merge edildi.  
+**Live sürüm:** `https://mustafaras.github.io/s/index.html` (`app.js?v=20260720f`)
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - Terapi Odası overlay'i 3 sekmeye (`Yol`, `Araçlar`, `Profilim`) bölündü.
+  - `ROOM_CONTENT_CATALOG` eklendi (~88 öğe: kitap, izleme, podcast). İçerikler her gerçek takvim gününe göre `roomCalendarDayIndex()` ile döner; `data.roomContentHistory` ile hangi gün ne gösterildiği izlenir.
+  - Tüm öneri bağlantıları Türkçe/güvenilir kaynaklara çevrildi (idefix, Netflix TR, Disney+ TR, Prime Video TR, Spotify TR) ve `target="_blank" rel="noopener noreferrer"` ile yeni sekmede açılıyor.
+  - `App.updateRoom()` ile soft DOM güncellemesi eklendi; sekme değişimi ve araç kartı açılış/kapanış tam `render()` yenilemesi yapmadan `#sey-room-body` ve `#sey-room-tabs` içeriğini değiştirir. Bu sayede flash/flicker önlendi.
+  - Demo-only kodlar temizlendi: `App.demoAuthBypass` ve butonu kaldırıldı; `migrate()` içindeki demo bilimsel profil backfill'i boş iskelete indirgendi (prod'da kullanıcı "Profili çek" ile kendi raporunu getirir).
+- `index.html`
+  - Cache-bump: `styles.css?v=20260720f`, `app.js?v=20260720f`, `sync.js?v=20260720f`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-20 changelog girişi güncellendi; #29 Terapi Odası Premium ✅.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `room_harness.js` (headless Node `vm`) ✅:
+  - 3 sekme render ediyor.
+  - Yol/Araçlar/Profilim içerikleri soft-update container'a yazılıyor.
+  - `migrate()` eski veriye `scientificProfile`, `therapy`, `roomContentHistory` backfill ediyor.
+- Demo/localhost artifaktları kalmadı (grep ile doğrulandı) ✅.
+- GitHub Pages deploy başarılı.
+
+**Bir sonraki session için notlar / TODO:**
+- Gerçek iPhone'da Terapi Odası sekmeleri, araç kart akordeonları ve nefes animasyonu test edilmeli.
+- `seyma-data` reposundaki bilimsel profil raporu dosya adı değişirse `App.fetchProfileForRoom()` path'i güncellenmeli.
+- Yeni günlük içerik kataloğu zamanla genişletilebilir; her yeni URL'in güvenilir/Türkçe kaynak olduğu ve hâlâ açıldığı manuel kontrol edilmeli.
+
+---
+
 ### 2026-07-19 — Faz 12 (ÆON bildirimleri) + Faz 25 (Günün Fotoğrafı güvenilirliği)
 
 **Branch:** `mustafaras-pwa-aeon-bildirim` → `main` squash-merge edildi.  

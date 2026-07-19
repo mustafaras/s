@@ -351,6 +351,35 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-21 — Faz 30: ÆON bildirim spam fix (canlıya alınacak)
+
+**Branch:** `mustafaras-crispy-couscous` → `main` squash-merge edilecek.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - ÆON native bildirim spam fix: `showNativeAeonNotification()` artık `opts.id` bazlı oturum içi `aeonShownThisSession` set'i ve kalıcı `data.aeon.shownNotificationIds` dizisini kontrol ediyor; daha önce gösterilmiş mesaj tekrar gösterilmiyor. 5 sn cooldown (`AEON_NOTIFY_COOLDOWN_MS`) eklenerek ardışık farklı mesajların patlaması engellendi. `renotify` `false` yapıldı. `shownNotificationIds` en fazla 50 id tutacak şekilde sınırlandı.
+  - Kullanıcı zaten `mesaj` sekmesini açık görüyorsa native bildirim atlanıyor (`ui.tab==='mesaj'` kontrolü).
+  - `mergeInbox()` çağrı noktaları korundu; aynı mesaj/yanıt için ikinci native notify tetiklenmiyor.
+- `index.html`
+  - Cache-bump: `styles.css?v=20260721b`, `app.js?v=20260721b`, `sync.js?v=20260721b`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-21 changelog girişi güncellendi; Faz 30 satırı "🔔 ÆON bildirim spam fix" olarak yeniden adlandırıldı. Uygulama askıya alma ekranı bu sürüme dahil edilmedi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `notification_dedup_harness.js` (headless Node `vm`) ✅: aynı id tekrar gösterilmiyor, farklı id 5 sn cooldown bekliyor, `renotify:false`, 50 id limiti, mesaj sekmesi aktifken notify atlamıyor.
+- Herhangi bir yerel sunucu açılmadı; tarayıcı açılmadı.
+
+**Bir sonraki session / deploy öncesi notlar / TODO:**
+- Kullanıcı onayı ile `main` squash-merge edilecek; GitHub Pages otomatik deploy edecek.
+- Canlıya alındıktan sonra gerçek iPhone'da ÆON mesajı geldiğinde aynı mesajın tekrarlanmadığı doğrulanmalı.
+- Uygulamayı askıya alma (dondurma) ekranı ayrıca değerlendirilecek; şu anki branch'te dondurma kodu kalmadı.
+
+---
+
 ### 2026-07-20 — Faz 29: Terapi Odası Premium Genişletme canlıya alındı
 
 **Branch:** `mustafaras-bilimsel-profil-terapi-odasi` → `main` squash-merge edildi.  

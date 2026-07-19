@@ -600,6 +600,7 @@ function migrate(d){
   if(!Array.isArray(d.aeon.qa)) d.aeon.qa=[];
   if(typeof d.aeon.lastAskDate!=='string'&&d.aeon.lastAskDate!==null) d.aeon.lastAskDate=null;
   if(typeof d.aeon.lastNotificationShownAt!=='string'&&d.aeon.lastNotificationShownAt!==null) d.aeon.lastNotificationShownAt=null;
+  if(!Array.isArray(d.aeon.shownNotificationIds)) d.aeon.shownNotificationIds=[];
   if(typeof d.settings.aeonNotifyPermission!=='string') d.settings.aeonNotifyPermission='';
   if(typeof d.settings.aeonNotifyBannerDismissedAt!=='string'&&d.settings.aeonNotifyBannerDismissedAt!==null) d.settings.aeonNotifyBannerDismissedAt=null;
   if(!d.settings.ghRepo) d.settings.ghRepo='mustafaras/seyma-data';
@@ -8477,6 +8478,8 @@ var AEON_ICON_URL='./aeon-icon-192.png';
 var AEON_BADGE_URL='./aeon-icon-192.png';
 var aeonPermTimer=null;
 var aeonPermPrompted=false;
+var aeonShownThisSession={}; // aynı oturumda tekrar bildirim göstermemek için (id bazlı)
+var AEON_NOTIFY_COOLDOWN_MS=5000; // aynı id'ye en fazla 5 sn'de bir yeniden uyarı
 
 function canNotify(){ return ('Notification' in window); }
 function aeonNotifyPermission(){ return canNotify() ? Notification.permission : 'denied'; }
@@ -8538,6 +8541,19 @@ function fallbackNativeNotify(title, options){
 function showNativeAeonNotification(opts){
   opts=opts||{};
   if(!canNotify() || aeonNotifyPermission()!=='granted') return;
+  // Kullanıcı zaten Mesaj sekmesini açık görüyorsa native bildirim göstermeye gerek yok.
+  if(ui && ui.tab==='mesaj') return;
+  var id=opts.id || (opts.tag+'-'+(opts.body||Date.now()));
+  if(!id) return;
+  // aynı mesajı aynı oturumda tekrar tekrar gösterme
+  if(aeonShownThisSession[id]) return;
+  // geçmişte kalıcı olarak işaretlenmiş mesajları tekrar gösterme
+  if(data && data.aeon && data.aeon.shownNotificationIds && data.aeon.shownNotificationIds.indexOf(id)>-1) return;
+  // çok yakın zamanda zaten başka bir ÆON bildirimi gösterdiyse ertele
+  if(aeonShownThisSession['__last__']){
+    var now=Date.now();
+    if(now - aeonShownThisSession['__last__'] < AEON_NOTIFY_COOLDOWN_MS) return;
+  }
   var title='ÆON';
   var body='Yeni bir ÆON mesajı';
   if(opts.body) body=String(opts.body).slice(0,180);
@@ -8549,17 +8565,27 @@ function showNativeAeonNotification(opts){
     icon: AEON_ICON_URL,
     badge: AEON_BADGE_URL,
     tag: opts.tag || 'aeon-message',
-    renotify: true,
+    renotify: false,
     requireInteraction: false,
     silent: false,
-    data: { id: opts.id || '', type: 'aeon-message' }
+    data: { id: id, type: 'aeon-message' }
   };
+  aeonShownThisSession[id]=Date.now();
+  aeonShownThisSession['__last__']=Date.now();
+  if(data && data.aeon){
+    data.aeon.lastNotificationShownAt=new Date().toISOString();
+    data.aeon.shownNotificationIds=data.aeon.shownNotificationIds||[];
+    if(data.aeon.shownNotificationIds.indexOf(id)<0){
+      data.aeon.shownNotificationIds.push(id);
+      if(data.aeon.shownNotificationIds.length>50) data.aeon.shownNotificationIds=data.aeon.shownNotificationIds.slice(-50);
+    }
+    save();
+  }
   if('serviceWorker' in navigator){
     navigator.serviceWorker.ready.then(function(reg){ reg.showNotification(title, options); }).catch(function(){ fallbackNativeNotify(title, options); });
   } else {
     fallbackNativeNotify(title, options);
   }
-  if(data && data.aeon){ data.aeon.lastNotificationShownAt=new Date().toISOString(); save(); }
   if(data && data.settings && Notification.permission!==data.settings.aeonNotifyPermission){ data.settings.aeonNotifyPermission=Notification.permission; save(); }
 }
 

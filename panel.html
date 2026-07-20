@@ -24,6 +24,7 @@
     --amber:#fbbf24;--aa:rgba(251,191,36,.10);--ab:rgba(251,191,36,.22);
     --red:#fb7185;--ra:rgba(251,113,133,.10);--rb:rgba(251,113,133,.22);
     --purple:#a78bfa;--pa:rgba(167,139,250,.10);--pb:rgba(167,139,250,.22);
+    --journal:#C9A4FF;--journal2:#A66CFF;--journal-bg:rgba(166,108,255,.12);--journal-glow:rgba(201,164,255,.18);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
@@ -389,6 +390,41 @@ var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonR
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
+function journalModeLabel(mode){
+  var map={free:'Serbest Akış',affect:'Duygu Adlandırma',gratitude:'3 Güzel Şey',win:'Günün Kazanımı',selfCompassion:'Öz-Şefkat',reappraisal:'Yeniden Değerleme',values:'Değer Bağlantısı',urgeSurf:'Dürtü Dalga Geçişi'};
+  return map[mode]||'Günlük Işığı';
+}
+function hasJournalEntry(r){ return !!(r&&((r.note&&String(r.note).trim())||(r.journal&&r.journal.text&&String(r.journal.text).trim()))); }
+function journalStreak(){
+  if(!D||!D.startDate) return 0;
+  var c=0,d=today();
+  while(diff(D.startDate,d)>=0){ if(hasJournalEntry(recOf(d))){ c++; d=addDays(d,-1);} else break; }
+  return c;
+}
+function lastJournalDate(){
+  var days=allDays().slice().reverse();
+  for(var i=0;i<days.length;i++){ if(hasJournalEntry(recOf(days[i]))) return days[i]; }
+  return null;
+}
+function totalJournalWords(){
+  if(!D||!D.days) return 0;
+  var n=0;
+  Object.keys(D.days).forEach(function(d){ var r=D.days[d]; if(r&&r.journal&&typeof r.journal.wordCount==='number') n+=r.journal.wordCount; else if(r&&r.journal&&r.journal.text) n+=String(r.journal.text).trim().split(/\s+/).filter(Boolean).length; });
+  return n;
+}
+function journalDaysThisMonth(){
+  if(!D||!D.days) return 0;
+  var mk=monthKey(today());
+  return Object.keys(D.days).filter(function(d){ return monthKey(d)===mk && hasJournalEntry(D.days[d]); }).length;
+}
+function journalActivePhaseP(){
+  var mp=D&&D.motivationProgramV2;
+  if(!mp) return null;
+  var active=mp.active;
+  if(active&&active.phaseCode) return active;
+  if(mp.history&&mp.history.length) return mp.history[mp.history.length-1];
+  return null;
+}
 function isLutealDayP(date){ return cyclePhaseForDate(date)==='luteal'; }
 function htOn(date){ var n=0; for(var i=0;i<HABITS.length;i++){ var s=HABITS[i][2]; if(!s||(date&&date>=s)) n++; } return n; }
 function cnt(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h[0]]?1:0);},0):0; }
@@ -417,7 +453,7 @@ function habitProgP(rec,key){
   if(key==="water"){ var w=(rec&&typeof rec.water==="number"&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL_P,cur:w,goal:WATER_GOAL_P}; }
   if(key==="sleepReg"){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=="")?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN_P),cur:h,goal:SLEEP_TICK_MIN_P}; }
   if(key==="walked20"){ var s=effStepsP(rec).steps||0; return {met:s>=STEP_TICK_MIN_P,cur:s,goal:STEP_TICK_MIN_P}; }
-  if(key==="journaled"){ var nt=(rec&&rec.note&&String(rec.note).trim())?1:0; return {met:nt>0,cur:nt,goal:1,binary:true}; }
+  if(key==="journaled"){ var nt=(rec&&( (rec.note&&String(rec.note).trim()) || (rec.journal&&rec.journal.text&&String(rec.journal.text).trim()) ))?1:0; return {met:nt>0,cur:nt,goal:1,binary:true}; }
   if(key==="sweetManaged"){ var cd=!!(rec&&rec.craving10MinDone); return {met:cd,cur:cd?1:0,goal:1,binary:true}; }
   if(key==="foodManaged"){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true}; }
   if(key==="coffeeManaged"){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true}; }
@@ -1978,7 +2014,7 @@ function render(){
   var rsk=risk(cur,saved);
   var moodDist={"cok-iyi":0,"iyi":0,"normal":0,"zorlandim":0,"cok-zorlandim":0};
   cur.forEach(function(d){var r=recOf(d); if(r&&r.mood&&moodDist[r.mood]!=null) moodDist[r.mood]++;});
-  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.note&&String(r.note).trim();});
+  var noteRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&( (r.note&&String(r.note).trim()) || (r.journal&&r.journal.text&&String(r.journal.text).trim()) );});
   var sosRows=all.slice().reverse().filter(function(d){var r=recOf(d);return r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0;});
   var curSess=sessionStats(cur);
   var curRit=readingRecap(cur);
@@ -2092,6 +2128,17 @@ function render(){
   var mvMax=Math.max.apply(null,[0.5].concat(cur.map(mvFn)));
   var mvTodayKm=mv?Number(mv.totalM||0)/1000:0;
   h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('footprints',12)+' '+fmtKmM(mv.walkM)+'</span><span style="display:inline-flex;align-items:center;gap:3px;">'+icon('car',12)+' '+fmtKmM(mv.vehicleM)+'</span>'):''));
+
+  // ROW 1.6: Günlük Işığı — serbest günlük refleksiyonu
+  (function(){
+    var jStreak=journalStreak(), jWords=totalJournalWords(), jLast=lastJournalDate(), jMonth=journalDaysThisMonth();
+    var jVal=jStreak>0?jStreak+'<small>g</small>':'—';
+    var jExtra='<span class="tchip fl">'+jMonth+'/'+Math.max(1,cur.length)+' gün</span>';
+    var jCap=jWords>0?('<span>Toplam <b style="color:var(--t2);">'+jWords.toLocaleString('tr-TR')+'</b> kelime</span><span>Son <b style="color:var(--t2);">'+(jLast?shortD(jLast):'—')+'</b></span>'):'<span>Henüz günlük yok</span>';
+    var phase=journalActivePhaseP();
+    if(phase&&phase.phaseCode) jCap+='<span style="color:var(--journal);font-weight:800;">'+esc(phase.phaseCode)+' · Gün '+esc(String(phase.dayInPhase||'—'))+'</span>';
+    h+=kpi('Günlük Işığı',jVal,'var(--journal)',jExtra,null,jCap);
+  })();
 
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();
@@ -2216,6 +2263,15 @@ function render(){
     h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+(derived&&!ok?' auto':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':(derived&&!ok?' title="'+hb[1]+' — veri girildiğinde otomatik yeşillenir"':''))+'><span class="habit-dot"></span>'+hb[1]+extra+'</span>';
   });
   h+='</div>';
+  // Günlük Işığı chip'i seçili gün özetinde
+  if(srec.journal&&srec.journal.text&&String(srec.journal.text).trim()){
+    var jwc=(typeof srec.journal.wordCount==='number'&&srec.journal.wordCount>0)?srec.journal.wordCount:String(srec.journal.text).trim().split(/\s+/).filter(Boolean).length;
+    var jModeLbl=srec.journal.mode?journalModeLabel(srec.journal.mode):'Günlük Işığı';
+    h+='<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+    h+='<span class="hchip on" style="--journal-chip-bg:var(--journal-bg);background:var(--journal-chip-bg);border-color:var(--journal);color:var(--journal);"><span class="habit-dot" style="background:var(--journal);box-shadow:0 0 8px var(--journal);"></span>'+jModeLbl+' · '+jwc+' kelime</span>';
+    if(srec.journal.metGoal) h+='<span class="hchip" style="background:var(--journal-bg);border-color:var(--journal);color:var(--journal);">✓ hedef</span>';
+    h+='</div>';
+  }
   var sdSumEnd=h.length; // özet (dstats+chip) burada biter; bundan sonrası detay olarak sarılır
   // ── Ne yedi? (öğün içerikleri) ──
   var mealRows="";
@@ -2501,10 +2557,21 @@ function render(){
     });
     h+='</div>';
   }
-  h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('pen-line',14)+' Günün Notu</div>';
-  if(srec.note&&String(srec.note).trim()){
+  h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('pen-line',14)+' Günün Notu / Günlük Işığı</div>';
+  var sdHasNote=srec.note&&String(srec.note).trim();
+  var sdHasJournal=srec.journal&&srec.journal.text&&String(srec.journal.text).trim();
+  if(sdHasNote){
     h+='<div style="margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--s2);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--bd2);border-left:3px solid var(--gold);word-break:break-word;white-space:pre-wrap;">'+esc(String(srec.note).trim())+'</div>';
-  } else { h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:4px;">Not yazılmadı</div>'; }
+  }
+  if(sdHasJournal){
+    var jwc2=(typeof srec.journal.wordCount==='number'&&srec.journal.wordCount>0)?srec.journal.wordCount:String(srec.journal.text).trim().split(/\s+/).filter(Boolean).length;
+    var jMode2=srec.journal.mode?journalModeLabel(srec.journal.mode):'Günlük Işığı';
+    h+='<div style="margin-top:6px;padding:9px 11px;border-radius:10px;background:var(--journal-bg);font-size:var(--f3);color:var(--t2);line-height:1.45;border:1px solid var(--journal);border-left:3px solid var(--journal);word-break:break-word;white-space:pre-wrap;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:var(--f2);color:var(--journal);font-weight:800;">'+icon('sparkles',13)+' '+jMode2+' · '+jwc2+' kelime'+(srec.journal.metGoal?' · ✓ hedef':'')+'</div>';
+    h+=esc(String(srec.journal.text).trim());
+    h+='</div>';
+  }
+  if(!sdHasNote&&!sdHasJournal){ h+='<div style="font-size:var(--f3);color:var(--t4);font-weight:600;margin-top:4px;">Not veya günlük yazılmadı</div>'; }
   (function(){
     var sdSum=h.slice(sdMarkStart,sdSumEnd);
     var sdDet=h.slice(sdSumEnd);
@@ -2584,7 +2651,7 @@ function render(){
   h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
-  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;">'+shortD(d)+'</div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(String(r.note).trim())+'</div></div>';}).join(""):'<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Not yok</div>';
+  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);var nt=String(r.note||'').trim();var jt=(r.journal&&r.journal.text)?String(r.journal.text).trim():'';var txt=jt||nt;var isJournal=!!jt;var jMode=(r.journal&&r.journal.mode)?String(r.journal.mode):'';var jLbl=(isJournal?(jMode?('🪶 '+journalModeLabel(jMode)):'🪶 Günlük Işığı'):'📝 Not');return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:6px;font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;"><span>'+shortD(d)+'</span><span style="font-size:var(--f2);color:var(--journal);font-weight:800;">'+jLbl+'</span></div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(txt)+'</div></div>';}).join(""):'<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Not yok</div>';
   h+='</div></div>';
 
   h+='<div class="card lift span-4 pad" style="order:40;">';

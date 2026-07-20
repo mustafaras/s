@@ -199,6 +199,8 @@
     --warn:#E5484D; --warn-glow:rgba(229,72,77,0.5);
     /* Günışığı (marka) teması — gün doğumu / sıcak ışık */
     --sun:#F5A623; --sun2:#F5844E; --sun-glow:rgba(255,193,105,0.42);
+    /* Günlük Işığı — lavanta accent (serbest günlük modalı) */
+    --journal:#A66CFF; --journal2:#D9B8FF; --journal-bg:rgba(166,108,255,0.13); --journal-glow:rgba(166,108,255,0.35);
     /* Şeyma & Raşit'in Terapi Odası — rafine rose-mauve + altın parıltı (premium marka teması) */
     --room:#BE6C8B; --room2:#E6ADCB; --room-glow:rgba(190,108,139,0.30); --room-bg:rgba(230,173,203,0.13);
     /* ÆON chat — altın aile (panel.html --gold ile uyumlu) + kullanıcı balonu + premium easing */
@@ -228,6 +230,7 @@
     --pause:#C2AFE8; --pause-bg:rgba(194,175,232,0.10);
     --warn:#FF7378; --warn-glow:rgba(255,115,120,0.16);
     --sun:#FFC768; --sun2:#FFA064; --sun-glow:rgba(255,190,100,0.09);
+    --journal:#C9A4FF; --journal2:#E4CFFF; --journal-bg:rgba(201,164,255,0.12); --journal-glow:rgba(201,164,255,0.18);
     --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
     --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
     --user-bubble:#715DA8; --user-bubble2:#8872BD;
@@ -342,3 +345,15 @@
 #root[data-theme="dark"] .aeon-notify-banner::before{display:none;}
 #root[data-theme="dark"] .aeon-notify-btn{color:#0b090a;}
 @media (prefers-reduced-motion: reduce){ .aeon-notify-banner::before{display:none;} }
+/* ── Günlük Işığı — ince, nefes alan günlük hatırlatma kartı ── */
+.sgl-journal-card{position:relative;overflow:hidden;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,color-mix(in srgb,var(--journal) 14%,var(--card)) 0%,color-mix(in srgb,var(--journal2) 10%,var(--card)) 100%);border:1px solid color-mix(in srgb,var(--journal) 30%,var(--card-bd));box-shadow:0 6px 20px color-mix(in srgb,var(--journal-glow) 55%,transparent),inset 0 1px 0 rgba(255,255,255,0.28);cursor:pointer;transition:transform .18s ease,box-shadow .25s ease;animation:sglJournalPulse 4s ease-in-out infinite;}
+.sgl-journal-card:active{transform:scale(.985);}
+.sgl-journal-card::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,0.16) 50%,transparent 58%);transform:translateX(-100%);animation:sglJournalSheen 4.5s ease-in-out infinite;pointer-events:none;}
+.sgl-journal-icon{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--journal2),var(--journal));color:#fff;font-size:17px;box-shadow:0 4px 12px color-mix(in srgb,var(--journal) 45%,transparent);}
+.sgl-journal-text{flex:1;min-width:0;}
+.sgl-journal-title{font-size:13.5px;font-weight:800;color:var(--text);line-height:1.25;}
+.sgl-journal-sub{font-size:11px;font-weight:650;color:var(--muted);line-height:1.35;margin-top:1px;}
+.sgl-journal-action{font-size:11px;font-weight:800;color:var(--journal);white-space:nowrap;}
+@keyframes sglJournalPulse{0%,100%{box-shadow:0 6px 20px color-mix(in srgb,var(--journal-glow) 45%,transparent);}50%{box-shadow:0 8px 28px color-mix(in srgb,var(--journal-glow) 90%,transparent);}}
+@keyframes sglJournalSheen{0%{transform:translateX(-100%);}70%{transform:translateX(100%);}100%{transform:translateX(100%);}}
+@media (prefers-reduced-motion: reduce){ .sgl-journal-card,.sgl-journal-card::before{animation:none;} }

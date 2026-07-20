@@ -671,6 +671,14 @@ function migrate(d){
   if(!Array.isArray(d.scientificProfile.strengths)) d.scientificProfile.strengths=[];
   if(!Array.isArray(d.scientificProfile.risks)) d.scientificProfile.risks=[];
   if(typeof d.scientificProfile.note!=='string') d.scientificProfile.note='Profil henüz yüklenmemiş. Ayarlar > Veri bağlantısından seyma-data reposu bağlanınca otomatik çekilir.';
+  // Günlük Işığı — serbest günlük kaydı + hedef ayarları
+  if(!d.settings.journalGoal||typeof d.settings.journalGoal!=='object') d.settings.journalGoal={words:30,chars:140};
+  if(typeof d.settings.journalGoal.words!=='number'||isNaN(d.settings.journalGoal.words)) d.settings.journalGoal.words=30;
+  if(typeof d.settings.journalGoal.chars!=='number'||isNaN(d.settings.journalGoal.chars)) d.settings.journalGoal.chars=140;
+  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){
+    var day=d.days[k]; if(!day.journal||typeof day.journal!=='object') day.journal={text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false};
+    var jn=day.journal; if(typeof jn.text!=='string') jn.text=''; if(typeof jn.mode!=='string') jn.mode='free'; if(typeof jn.promptUsed!=='string') jn.promptUsed=''; if(typeof jn.wordCount!=='number'||isNaN(jn.wordCount)) jn.wordCount=0; if(typeof jn.charCount!=='number'||isNaN(jn.charCount)) jn.charCount=0; if(typeof jn.savedAt!=='string'&&jn.savedAt!==null) jn.savedAt=null; if(typeof jn.streakAtSave!=='number'||isNaN(jn.streakAtSave)) jn.streakAtSave=0; if(typeof jn.metGoal!=='boolean') jn.metGoal=false;
+  });
   // Terapi Odası günlük kayıtları
   ensureTherapyAllDays(d);
   if(!d.roomContentHistory||typeof d.roomContentHistory!=='object') d.roomContentHistory={};
@@ -766,6 +774,7 @@ var lastHeaderShown=false; // Sabit marka başlığı: giriş animasyonu yalnız
 var lastOverlay=null;      // hangi hub overlay'i (reading/watching) bir onceki render'da aciykti
 var lastOverlayView=null;  // o overlay'in aktif sekmesi — gorunum degismediyse scroll korunur
 var lastRoomOpen=false;    // Terapi Odasi zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin (parlama onlenir)
+var lastJournalKind=null;  // Günlük Işığı modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
 var aeonLastSeenSort=null; // ÆON: son render'da görünen en yeni mesajın sort anahtarı — yalnızca YENİ mesaja giriş animasyonu oynatmak için
 var aeonLastRenderedDateStr=null; // ÆON: son gösterilen mesajın gün-etiketi — hızlı ekleme (appendAeonOutgoing) sırasında yeni gün ayırıcı gerekip gerekmediğini anlamak için
 var AEON_PAGE_SIZE=40; // ÆON: geçmiş çok uzadığında her tam render'da yalnızca son N öğeyi kur — "Daha eski mesajlar" ile tamamı açılabilir
@@ -976,7 +985,10 @@ function updateNutriLive(day){ var nu=dayNutrition(day); var pg=proteinGoal(),cg
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium(),therapy:emptyTherapy()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null; ensureTherapyDay(r); } return d.days[date]; }
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',journal:{text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false},savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium(),therapy:emptyTherapy()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null;
+if(!r.journal||typeof r.journal!=='object') r.journal={text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false};
+var jn=r.journal; if(typeof jn.text!=='string') jn.text=''; if(typeof jn.mode!=='string') jn.mode='free'; if(typeof jn.promptUsed!=='string') jn.promptUsed=''; if(typeof jn.wordCount!=='number'||isNaN(jn.wordCount)) jn.wordCount=0; if(typeof jn.charCount!=='number'||isNaN(jn.charCount)) jn.charCount=0; if(typeof jn.savedAt!=='string'&&jn.savedAt!==null) jn.savedAt=null; if(typeof jn.streakAtSave!=='number'||isNaN(jn.streakAtSave)) jn.streakAtSave=0; if(typeof jn.metGoal!=='boolean') jn.metGoal=false;
+ensureTherapyDay(r); } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 // ---------- SAYGI · günün bilim ve sanat insanı ----------
@@ -1184,7 +1196,7 @@ function habitProgress(rec,key){
   if(key==='water'){ var w=(rec&&typeof rec.water==='number'&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL,cur:w,goal:WATER_GOAL,unit:'bardak',has:w>0}; }
   if(key==='sleepReg'){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN),cur:h,goal:SLEEP_TICK_MIN,unit:'saat',has:h!=null}; }
   if(key==='walked20'){ var e=effSteps(rec); var s=(e.steps!=null&&!isNaN(e.steps))?e.steps:0; return {met:s>=STEP_TICK_MIN,cur:s,goal:STEP_TICK_MIN,unit:'adım',has:s>0,source:e.source}; }
-  if(key==='journaled'){ var nt=(rec&&rec.note&&String(rec.note).trim())?1:0; return {met:nt>0,cur:nt,goal:1,binary:true,has:nt>0}; }
+  if(key==='journaled'){ var nt=(rec&&(String(rec.note||'').trim()||String((rec.journal&&rec.journal.text)||'').trim()))?1:0; return {met:nt>0,cur:nt,goal:1,binary:true,has:nt>0}; }
   if(key==='sweetManaged'){ var cd=!!(rec&&rec.craving10MinDone); return {met:cd,cur:cd?1:0,goal:1,binary:true,has:cd}; }
   if(key==='foodManaged'){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true,has:fd}; }
   if(key==='coffeeManaged'){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true,has:kd}; }
@@ -2876,6 +2888,14 @@ App.onCrisisNote=function(el){ ui.crisisNote=String(el.value||'').slice(0,200); 
 App.completeCrisis=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); var firstDone=!day[C.doneField]; day[C.doneField]=true; day.cravingOptionsUsed=ui.crisisOpts.slice(); var nowIso=new Date().toISOString(); day.cravingTriggers=ui.crisisTriggers.map(function(tg){ return {trigger:tg,ts:nowIso,kind:C.key}; }); var tn=String(ui.crisisNote||'').trim().slice(0,200); if(tn) day.cravingTriggerNote=tn; syncDerivedHabits(day); day.savedAt=nowIso; ui.crisisDone=true; if(firstDone) commit('Krizi yönettin'); else save(); };
 App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; ui.crisisTrigOpen=false; ui.crisisTriedOpen=false; render(); };
 
+// ── Günlük Işığı modal handler'ları ──
+App.openJournalModal=function(){ haptic([12,28,12]); ui.journalOpen=true; ui.journalMode=ui.journalMode||'free'; var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); if(day.journal&&String(day.journal.text||'').trim()){ ui.journalText=day.journal.text; ui.journalMode=day.journal.mode||'free'; ui.journalPromptUsed=day.journal.promptUsed||''; } else { var p=journalPhasePrompt(ui.journalMode); ui.journalText=''; ui.journalPromptUsed=p; } lastJournalKind=null; render(); setTimeout(function(){ var t=document.getElementById('sey-journal-text'); if(t) t.focus(); },60); };
+App.closeJournalModal=function(){ ui.journalOpen=false; ui.journalText=''; ui.journalPromptUsed=''; lastJournalKind=null; render(); };
+App.setJournalMode=function(mode){ ui.journalMode=mode||'free'; ui.journalPromptUsed=journalPhasePrompt(mode); if(ui.journalText===undefined) ui.journalText=''; updateJournalUI(); setTimeout(function(){ var t=document.getElementById('sey-journal-text'); if(t) t.focus(); },40); };
+App.onJournalText=function(el){ ui.journalText=String(el.value||''); updateJournalCounts(); };
+App.useJournalPrompt=function(){ ui.journalPromptUsed=journalPhasePrompt(ui.journalMode||'free'); updateJournalPromptLine(); setTimeout(function(){ var t=document.getElementById('sey-journal-text'); if(t) t.focus(); },40); };
+App.saveJournal=function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); var j=day.journal; var text=String(ui.journalText||'').trim(); var goal=data.settings.journalGoal||{words:30,chars:140}; var words=text?text.split(/\s+/).filter(function(w){return w.length>0;}).length:0; var chars=text.length; j.text=text; j.mode=ui.journalMode||'free'; j.promptUsed=String(ui.journalPromptUsed||'').trim(); j.wordCount=words; j.charCount=chars; j.metGoal=(words>=goal.words||chars>=goal.chars); j.streakAtSave=journalStreak(); j.savedAt=new Date().toISOString(); var newly=syncDerivedHabits(day); save(); updateCardByKey('reflection'); updateCardByKey('habits'); ui.journalOpen=false; ui.journalText=''; ui.journalPromptUsed=''; lastJournalKind=null; render(); if(newly.indexOf('journaled')>=0){ haptic(14); toast('Günlük Işığı tiki yeşillendi ✨'); } else { toast('Günlük Işığı kaydedildi ✨',1800); } };
+
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
 App.continueEmergency=function(){ ui.emergency=false; render(); toast('İşte bu. Reset dediğin bazen sadece bir sonraki doğru hamledir.',3000); };
@@ -3977,6 +3997,8 @@ function reflectionCardHTML(rec){
   var b='';
   b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Duyguları yazıya dökmek ve minnet, ruh hâlini toparlamanın en kanıtlı iki yoludur. Birkaç cümle bile bugüne iyi gelir.</div>';
   b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent);">'+icon('feather',15)+'</span><div style="font-size:13px;color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
+  var hasJournal=rec&&rec.journal&&String(rec.journal.text||'').trim();
+  b+='<button onclick="App.openJournalModal()" style="border:none;cursor:pointer;width:100%;padding:14px 15px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 65%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .12s ease,box-shadow .2s ease;">'+(hasJournal?'<span>Bugünün ışığı yazıldı ✨</span>':'<span>Günlük Işığı\'nı aç 🦩</span>')+'</button>';
   b+='<div><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;">'+(ed?'O gün kendine notun':'Bugün kendime notum')+'</div>';
   b+='<textarea oninput="App.onNote(this)" placeholder="Aklından geçeni serbestçe yaz…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;color:var(--text);">'+esc(note)+'</textarea></div>';
   b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:13px;font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11px;color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
@@ -5666,7 +5688,8 @@ function bugunHTML(){
     if(shouldShowAeonNotifyBanner()) h+=aeonNotifyBannerHTML({context:'bugun'});
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
     h+=weatherHeaderHTML(_greet);
-    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günışığı hava kartının hemen altında
+    h+=journalLightCardHTML(rec, streak); // Günlük Işığı — Günışığı hava kartının hemen altında
+    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günlük Işığı kartının hemen altında
     h+=rasitBubbleHTML(curIdx);
     h+=rasitContactHTML(); // Raşit'e yaz / ara — notlar kartının hemen altında (premium ikili)
   }
@@ -5753,6 +5776,268 @@ function bugunHTML(){
   if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:15px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;">Bugün biraz dağıldı '+icon('heart-handshake',15)+'</button>';
   h+='</div>';
   return h;
+}
+
+// ── Günlük Işığı (premium serbest günlük) ──
+var JOURNAL_MODES=[
+  {id:'free',icon:'feather',label:'Serbest Akış',hint:'Pennebaker'},
+  {id:'affect',icon:'brain',label:'Duygu Adlandırma',hint:'Lieberman'},
+  {id:'gratitude',icon:'heart-handshake',label:'3 Güzel Şey',hint:'Seligman'},
+  {id:'win',icon:'trophy',label:'Günün Kazanımı',hint:'Amabile'},
+  {id:'selfCompassion',icon:'hand-heart',label:'Öz-Şefkat Molası',hint:'Neff'},
+  {id:'reappraisal',icon:'refresh-cw',label:'Yeniden Değerleme',hint:'Gross'},
+  {id:'values',icon:'compass',label:'Değer Bağlantısı',hint:'ACT'},
+  {id:'urgeSurf',icon:'waves',label:'Dürtü Dalga Geçişi',hint:'Marlatt'}
+];
+function journalActivePhase(){
+  var ad=null;
+  if(window.MotivationProgramV2 && typeof window.MotivationProgramV2.activeDay==='function'){
+    try{ ad=window.MotivationProgramV2.activeDay(data); }catch(e){ ad=null; }
+  }
+  if(!ad) ad={phaseCode:'F1',phaseTitle:'Fark Etme',phaseGoal:'Bugün fark ettiğin bir dürtüyü, duyguyu veya düşünceyi yazmak.',dayIndex:Math.max(1,dayIndexFor(activeDate())),reflectionExamples:['Bugün fark ettiğin bir dürtü neydi?','Vücudunda nerede hissettin?','Bu dürtüyü adlandır.']};
+  return ad;
+}
+var JOURNAL_PHASE_PROMPTS={
+  F1:{
+    title:'Fark Etme',
+    goal:'Bugün fark ettiğin bir dürtüyü, duyguyu veya düşünceyi yazmak.',
+    free:['Bugün fark ettiğin bir dürtü/düşünce/duygu neydi? Vücudunda nerede hissettin?','Zihnine gelen ilk üç şeyi hiç süzme yaz.'],
+    affect:['Bugün içinde en baskın olan duyguyu üç kelimeyle adlandır.','Şu an hissettiğin duygu nedir? İsmini koymak onu biraz yatıştırır.'],
+    gratitude:['Bugün fark ettiğin üç küçük güzellik neydi?','Bugün sana nefes aldıran üç şey.'],
+    win:['Bugün kendini fark etmenin/izlemenin kendisi bile bir kazanım. Ne gözlemledin?','Bugün farkındalıkla yaptığın en küçük şey.'],
+    selfCompassion:['Bugün zorlandığın bir anda kendine nasıl davrandın? Daha nazik nasıl davranabilirdin?','Kendine bugün söylemek istediğin şefkatli bir cümle.'],
+    reappraisal:['Bugün zorladığın bir olaya başka bir açıdan bakmak nasıl olurdu?','Bu durum üç ay sonra senin için ne ifade eder?'],
+    values:['Bugün hangi değerini fark ettin? (Örn: dürüstlük, bağlılık, özgürlük, merhamet)','Bugün neye değer verdiğini fark ettiğin bir an.'],
+    urgeSurf:['Bugün bir dürtü yükseldiğinde vücudunda neler hissettin? Nasıl geçti?','Bir dürtüyü sadece gözlemlemek: geldi, zirve yaptı, dağıldı.']
+  },
+  F2:{
+    title:'Düzenleme',
+    goal:'Bugün zihnin tekrar tekrar neye takıldığını fark edip küçük bir düzenleme yazmak.',
+    free:['Bugün zihnin tekrar tekrar neye takıldı? Küçük bir düzenleme hamlesi ne olabilirdi?','Bugün düşüncelerinin seni nereye çektiğini fark ettin; o sen misin, yoksa zihnin mi?'],
+    affect:['Bugün tekrar eden bir duygu nedir? Ona isim vermek zihnini yeniden düzenler.','Zihnin bugün hangi duyguya takıldı? Bu duygu ne anlatmak istiyor?'],
+    gratitude:['Zor bir anda bugün görebildiğin küçük bir iyilik neydi?','Bugün sana “iyi ki” dedirten bir detay.'],
+    win:['Bugün zihnini düzenlemek için attığın küçük bir adım.','Bugün eski alışkanlığından farklı düşündüğün bir an.'],
+    selfCompassion:['Bugün kendini yargıladığın bir düşünceyi nasıl daha nazikçe yeniden yazabilirdin?','Zihnin sert konuşunca, ona hangi şefkatli cümleyle cevap verdin?'],
+    reappraisal:['Bugün tekrar eden bir düşünceyi başka nasıl yorumlayabilirdin?','Zihnin söylediği “kesin” bir yargıya meydan okuyan bir bakış açısı.'],
+    values:['Bugün zihnin seni çektiği yer, gerçekten değer verdiğin yön müydü?','Düşüncelerini hangi değerine göre düzenlemek isterdin?'],
+    urgeSurf:['Bugün bir dürtü geldiğinde, onun “dalgası” kaç saniye sürdü? Yaz.','Dürtüyü engellemek yerine izlemek bugün nasıl bir fark yarattı?']
+  },
+  F3:{
+    title:'Temas',
+    goal:'Bugün bir ihtiyacını, sınırını veya destek isteğini dile getirmek üzerine yazmak.',
+    free:['Bugün bir ihtiyacını, sınırını veya destek isteğini nasıl dile getirdin / getirebilirdin?','Bugün başka birine neye ihtiyacın olduğunu söylemek zor geldi?'],
+    affect:['Bugün bir ilişkide hissettiğin duyguyu adlandır.','Duygunu söylemek zor geldiği bir an; ne hissediyordun?'],
+    gratitude:['Bugün bir başkasından gelen küçük bir destek/iyilik neydi?','Bugün senin için “iyi ki varsın” dediğin biri ve nedeni.'],
+    win:['Bugün bir ilişkide küçük bir iletişim kazanımın neydi?','Birine ihtiyacını söylemek için attığın küçük adım.'],
+    selfCompassion:['Bugün başkalarına nazik olduğun kadar kendine nazik miydin?','Kendine ihtiyacın olduğunda destek istemek zor mu geldi?'],
+    reappraisal:['Bugün birinin sözünü/hareketini başka nasıl yorumlayabilirdin?','Bir ilişkide bugün zorlanan anı, yarın arkana yaslanıp nasıl görürsün?'],
+    values:['Bugün ilişkilerinde hangi değerine yaklaştın? (Örn: dürüstlük, yakınlık, adil olmak)','Bir iletişimde değerlerinle uyumlu davrandığın an.'],
+    urgeSurf:['Bugün bir ilişkisel dürtü (öfke, uzaklaşma, yakınlaşma) geldiğinde ne yaptın?','Duygu dalgası geçene kadar nefes almak bugün bir ilişkini nasıl korudu?']
+  },
+  F4:{
+    title:'Pekiştirme',
+    goal:'Bugün hangi küçük tekrarı, değer hamlesini veya kendine sözünü fark ettiğini yazmak.',
+    free:['Bugün hangi küçük tekrarı, değer hamlesini veya kendine sözünü fark ettin?','Bugün kendine verdiğin bir sözü tuttuğun an hangisiydi?'],
+    affect:['Bugün hissettiğin olumlu bir duyguyu pekiştirmek için ne yazabilirsin?','Bugün içindeki en güzel duygu nedir? Onu büyüt.'],
+    gratitude:['Bugün kendi kendine sağladığın bir iyilik neydi?','Bugün seni “iyi ki kendim için bunu yaptım” dedirten bir şey.'],
+    win:['Bugün kendini ödüllendirmek için küçük bir kazanımı nasıl kutladın?','Bugün değerlerinle uyumlu bir “küçük zafer” yaz.'],
+    selfCompassion:['Bugün kendini kutladığın bir an var mı?','Kendine bugün söylediğin en nazik cümle nedir?'],
+    reappraisal:['Bugün zor bir deneyimi “geçmişte öğrenmem gereken bir ders” olarak nasıl görürsün?','Bir zorluğun bugün sana kazandırdığı yetkinlik nedir?'],
+    values:['Bugün değerlerinden hangisini en çok yaşattın?','Yarın da aynı değere yaklaşmak için küçük bir söz yaz.'],
+    urgeSurf:['Bugün eski bir dürtüye yenilmeden geçiş yaptığın anı yaz.','Dürtü dalgasının geçtiğini hatırlatan bir pekiştirme cümlesi.']
+  }
+};
+function journalPhasePrompt(mode){
+  var m=mode||'free';
+  var ph=journalActivePhase();
+  var code=(ph&&ph.phaseCode)||'F1';
+  var p=JOURNAL_PHASE_PROMPTS[code]||JOURNAL_PHASE_PROMPTS.F1;
+  var list=p[m]||p.free||['Bugünün ışığı için kendini serbest bırak.'];
+  return list[Math.floor(Math.random()*list.length)];
+}
+function journalScienceHint(mode){
+  var H={
+    free:'Serbest yazmak, duyguları dışa vurmakla kortizolü düşürür; bağışıklığı destekler (Pennebaker).',
+    affect:'Duyguyu adlandırmak amigdala aktivitesini azaltır, prefrontal korteksi güçlendirir (Lieberman).',
+    gratitude:'Günde 3 iyi şey yazmak, ruh halini bir haftada yükseltir; etkisi aylarca sürer (Seligman).',
+    win:'Küçük kazanımları fark etmek motivasyonu ve öz-yeterliliği artırır (Amabile).',
+    selfCompassion:'Kendine nazik konuşmak depresyon ve anksiyete belirtilerini azaltır (Neff).',
+    reappraisal:'Olaya başka açıdan bakmak duygu şiddetini düşürür (Gross).',
+    values:'Değerlerine yaklaşmak davranışı yönlendirir ve anlam hissi verir (ACT).',
+    urgeSurf:'Dürtüyü adlandırıp gözlemlemek, yerine verme olasılığını azaltır (Marlatt).'
+  };
+  return H[mode]||H.free;
+}
+function phaseDisplay(ph){
+  var code=(ph&&ph.phaseCode)||'F1';
+  var num=String(code).replace('F','');
+  var title=(ph&&ph.phaseTitle)||'Fark Etme';
+  if(/^\s*Faz\s+\d+/.test(title)){
+    return title.replace(/\s*[—–-]\s*Faz\s+\d+\s*[—–-]\s*/g,' — ').replace(/\s+Faz\s+\d+\s*$/g,'').trim();
+  }
+  return 'Faz '+num+' — '+title;
+}
+function phaseShortTitle(ph){
+  var title=(ph&&ph.phaseTitle)||'Fark Etme';
+  var m=title.match(/^\s*Faz\s+\d+\s*[—–-]\s*(.+)$/);
+  if(m) return m[1].trim();
+  return title;
+}
+function journalStreak(){
+  var today=todayStr();
+  var idx=Math.max(1,dayIndexFor(today));
+  var streak=0;
+  for(var i=0;i<idx;i++){
+    var d=addDays(today,-i);
+    var rec=data.days[d];
+    var has=!!(rec&&(String(rec.note||'').trim()||String((rec.journal||{}).text||'').trim()));
+    if(has) streak++; else break;
+  }
+  return streak;
+}
+function fmtDateShort(iso){
+  if(!iso) return '';
+  try{ var d=new Date(iso); return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'}); }catch(e){ return ''; }
+}
+function journalLightCardHTML(rec, streak){
+  var has=rec&&rec.journal&&String(rec.journal.text||'').trim();
+  var title=has?'Bugünün ışığı parlıyor ✨':'Bugünün ışığı henüz yazılmadı 🪶';
+  var sub=has?(rec.journal.wordCount+' kelime · '+fmtDateShort(rec.journal.savedAt)):(streak>1?(streak+' günlük seri · yazmak seriyi korur'):'Birkaç satır yaz, kendine ışık tut');
+  return '<div onclick="App.openJournalModal()" class="sgl-journal-card"><span class="sgl-journal-icon">'+icon('sparkles',17)+'</span><div class="sgl-journal-text"><div class="sgl-journal-title">'+esc(title)+'</div><div class="sgl-journal-sub">'+esc(sub)+'</div></div><span class="sgl-journal-action">'+(has?'Görüntüle':'Aç')+' '+icon('chevron-right',12)+'</span></div>';
+}
+function journalModalHTML(){
+  var date=activeDate();
+  var dayIdx=Math.max(1,dayIndexFor(date));
+  var ph=journalActivePhase();
+  var mode=ui.journalMode||'free';
+  var text=String(ui.journalText!==undefined?ui.journalText:(data.days[date]&&data.days[date].journal?data.days[date].journal.text:''));
+  var streak=journalStreak();
+  var goal=data.settings.journalGoal||{words:30,chars:140};
+  var words=String(text).trim()?String(text).trim().split(/\s+/).filter(function(w){return w.length>0;}).length:0;
+  var chars=String(text).length;
+  var met=(words>=goal.words||chars>=goal.chars);
+  var pct=Math.min(100,Math.round((words/goal.words)*100));
+  var mObj=find(JOURNAL_MODES,'id',mode)||JOURNAL_MODES[0];
+  var hasSaved=(data.days[date]&&data.days[date].journal&&data.days[date].journal.savedAt);
+
+  var h='<div onclick="App.closeJournalModal()" style="position:fixed;inset:0;z-index:350;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
+
+  h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,var(--journal),var(--journal2));color:#fff;box-shadow:0 8px 22px color-mix(in srgb,var(--journal) 32%, transparent);overflow:hidden;">';
+  h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
+  h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
+  h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('book-open',23)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">GÜNLÜK IŞIĞI <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Günışığı\'nın Günlüğü</div></div>';
+  h+='<button onclick="App.closeJournalModal()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
+  h+='</div>';
+
+  h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
+  h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:10.5px;font-weight:900;">'+ph.phaseCode.replace('F','')+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+esc(phaseShortTitle(ph))+'</span></div>';
+  h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="display:inline-flex;">'+icon('flame',14)+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+streak+' günlük seri</span></div>';
+  h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="display:inline-flex;">'+icon('sun',14)+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">Gün '+dayIdx+'</span></div>';
+  h+='</div>';
+  h+='</div>';
+
+  h+='<div class="scroll" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 15px 22px;display:flex;flex-direction:column;gap:14px;">';
+
+  h+='<div style="display:flex;gap:10px;align-items:flex-start;background:linear-gradient(135deg,color-mix(in srgb,var(--journal) 12%,var(--card)),color-mix(in srgb,var(--journal2) 8%,var(--card)));border:1px solid color-mix(in srgb,var(--journal) 28%,var(--card-bd));border-radius:16px;padding:13px 14px;"><span style="flex-shrink:0;display:inline-flex;color:var(--journal);margin-top:1px;">'+icon('sparkles',18)+'</span><div style="font-size:13px;line-height:1.55;color:var(--text2);"><b style="color:var(--text);">'+esc(phaseDisplay(ph))+' · Gün '+dayIdx+'</b><br>'+esc(ph.phaseGoal||JOURNAL_PHASE_PROMPTS.F1.goal)+'</div></div>';
+
+  h+='<div id="sey-journal-chips" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
+  JOURNAL_MODES.forEach(function(m){
+    var active=m.id===mode;
+    var bg=active?'linear-gradient(135deg,var(--journal),var(--journal2))':'var(--icon)';
+    var col=active?'#fff':'var(--text2)';
+    var bd=active?'transparent':'var(--card-bd)';
+    var sh=active?'0 6px 16px color-mix(in srgb,var(--journal-glow) 60%,transparent)':'none';
+    h+='<button id="sey-journal-mode-'+m.id+'" onclick="App.setJournalMode(\''+m.id+'\')" style="border:'+bd+';cursor:pointer;background:'+bg+';color:'+col+';border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:'+sh+';transition:transform .12s ease,box-shadow .2s ease;"><span style="font-size:16px;">'+icon(m.icon,16)+'</span><span style="font-size:10px;font-weight:800;line-height:1.15;text-align:center;">'+esc(m.label)+'</span><span style="font-size:9px;opacity:.8;">'+esc(m.hint)+'</span></button>';
+  });
+  h+='</div>';
+
+  h+='<div style="display:flex;gap:10px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.14));border-radius:16px;padding:12px 13px;">';
+  h+='<span style="flex-shrink:0;display:inline-flex;color:var(--journal);margin-top:2px;">'+icon('feather',17)+'</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:800;color:var(--text);margin-bottom:3px;">Bugünün sana sorduğu</div><div id="sey-journal-prompt" style="font-size:14px;line-height:1.45;color:var(--text2);">'+esc(ui.journalPromptUsed||journalPhasePrompt(mode))+'</div></div>';
+  h+='<button onclick="App.useJournalPrompt()" style="flex-shrink:0;border:1px solid color-mix(in srgb,var(--journal) 40%,var(--card-bd));background:color-mix(in srgb,var(--journal) 10%,var(--card));color:var(--journal);border-radius:12px;padding:7px 10px;font-size:12px;font-weight:800;cursor:pointer;">Başka öneri</button>';
+  h+='</div>';
+
+  h+='<div id="sey-journal-science" style="display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--journal) 9%,var(--card));border:1px solid color-mix(in srgb,var(--journal) 26%,var(--card-bd));border-radius:16px;padding:13px 14px;"><span style="flex-shrink:0;color:var(--journal);display:inline-flex;margin-top:1px;">'+icon('brain',18)+'</span><div style="font-size:12.5px;line-height:1.6;color:var(--text2);"><b style="color:var(--text);">Bilimsel ipucu:</b> '+journalScienceHint(mode)+'</div></div>';
+
+  h+='<div style="display:flex;flex-direction:column;gap:11px;">';
+  h+='<textarea id="sey-journal-text" oninput="App.onJournalText(this)" placeholder="Bir satır bile yeter, Sevgili Günışığı. Yazmak beynin duygu devresini yatıştırır." rows="7" style="width:100%;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--journal) 45%,var(--field-bd));background:var(--field);border-radius:18px;padding:14px 13px;font-size:15.5px;outline:none;resize:none;line-height:1.6;color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,0.25);">'+esc(text)+'</textarea>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">';
+  h+='<div id="sey-journal-counts" style="font-size:12px;font-weight:700;color:var(--text2);">'+words+' kelime · '+chars+' karakter</div>';
+  h+='<div id="sey-journal-goal" style="font-size:11.5px;font-weight:800;color:'+(met?'var(--ok)':'var(--muted)')+';">'+((words>=goal.words||chars>=goal.chars)?'Hedef tamamlandı ✨':('Hedef: '+goal.words+' kelime veya '+goal.chars+' karakter'))+'</div>';
+  h+='</div>';
+  h+='<div style="height:6px;background:var(--icon);border-radius:999px;overflow:hidden;">';
+  h+='<div id="sey-journal-bar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--journal),var(--journal2));border-radius:999px;transition:width .2s ease;"></div>';
+  h+='</div>';
+  h+='</div>';
+
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+  h+='<div id="sey-journal-streak" style="font-size:12px;font-weight:800;color:var(--journal);background:color-mix(in srgb,var(--journal) 12%,var(--card));border:1px solid color-mix(in srgb,var(--journal) 25%,var(--card-bd));border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('flame',13)+streak+' günlük seri</div>';
+  h+='<div style="font-size:12px;font-weight:800;color:var(--text2);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('target',13)+(met?'Hedef tamamlandı':'Hedef: '+goal.words+' kelime')+'</div>';
+  if(hasSaved) h+='<div style="font-size:12px;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--card));border:1px solid color-mix(in srgb,var(--ok) 25%,var(--card-bd));border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('check-circle',13)+'Bugün kaydedildi</div>';
+  h+='</div>';
+
+  h+='</div>';
+
+  h+='<div style="flex-shrink:0;padding:12px 15px calc(12px + env(safe-area-inset-bottom));background:var(--modal);border-top:1px solid var(--card-bd);display:flex;gap:10px;">';
+  h+='<button onclick="App.closeJournalModal()" style="flex:1;border:1px solid var(--card-bd);cursor:pointer;padding:14px;border-radius:16px;font-size:15px;font-weight:700;color:var(--text2);background:transparent;">Kapat</button>';
+  h+='<button onclick="App.saveJournal()" style="flex:2;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 55%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">'+(hasSaved?('Güncelle ve kapat '+icon('sparkles',16)):('Kaydet ve kapat '+icon('sparkles',16)))+'</button>';
+  h+='</div>';
+
+  h+='</div></div>';
+  return h;
+}
+function updateJournalUI(){
+  if(!ui.journalOpen) return;
+  updateJournalModeChips();
+  updateJournalPromptLine();
+  updateJournalScience();
+  updateJournalCounts();
+}
+function updateJournalModeChips(){
+  var mode=ui.journalMode||'free';
+  JOURNAL_MODES.forEach(function(m){
+    var el=document.getElementById('sey-journal-mode-'+m.id);
+    if(!el) return;
+    if(m.id===mode){
+      el.style.background='linear-gradient(135deg,var(--journal),var(--journal2))';
+      el.style.color='#fff';
+      el.style.borderColor='transparent';
+      el.style.boxShadow='0 6px 16px color-mix(in srgb,var(--journal-glow) 60%,transparent)';
+    } else {
+      el.style.background='var(--icon)';
+      el.style.color='var(--text2)';
+      el.style.borderColor='var(--card-bd)';
+      el.style.boxShadow='none';
+    }
+  });
+}
+function updateJournalPromptLine(){
+  var el=document.getElementById('sey-journal-prompt');
+  if(el) el.textContent=String(ui.journalPromptUsed||'');
+}
+function updateJournalScience(){
+  var el=document.getElementById('sey-journal-science');
+  if(!el) return;
+  var mode=ui.journalMode||'free';
+  el.innerHTML='<span style="flex-shrink:0;color:var(--journal);display:inline-flex;margin-top:1px;">'+icon('brain',18)+'</span><div style="font-size:12.5px;line-height:1.6;color:var(--text2);"><b style="color:var(--text);">Bilimsel ipucu:</b> '+journalScienceHint(mode)+'</div>';
+}
+function updateJournalCounts(){
+  var text=String(ui.journalText||'').trim();
+  var words=text?text.split(/\s+/).filter(function(w){return w.length>0;}).length:0;
+  var chars=text.length;
+  var goal=data.settings.journalGoal||{words:30,chars:140};
+  var met=(words>=goal.words||chars>=goal.chars);
+  var pct=Math.min(100,Math.round((words/goal.words)*100));
+  var cEl=document.getElementById('sey-journal-counts');
+  if(cEl) cEl.textContent=words+' kelime · '+chars+' karakter';
+  var gEl=document.getElementById('sey-journal-goal');
+  if(gEl) gEl.textContent=met?'Hedef tamamlandı ✨':('Hedef: '+goal.words+' kelime veya '+goal.chars+' karakter');
+  var bEl=document.getElementById('sey-journal-bar');
+  if(bEl) bEl.style.width=pct+'%';
+  var stEl=document.getElementById('sey-journal-streak');
+  if(stEl) stEl.innerHTML=icon('flame',13)+journalStreak()+' günlük seri';
 }
 
 // ── Kriz odası modalı: Tatlı · Yemek · Kahve. Süreli, bilimsel, işlevsel bir mikro-müdahale. ──
@@ -7956,6 +8241,7 @@ function learningOverlayHTML(){
 function modalsHTML(){
   var h='';
   if(ui.crisisKind){ h+=crisisModalHTML(); }
+  if(ui.journalOpen){ h+=journalModalHTML(); }
   if(ui.roomOpen){ h+=roomOverlayHTML(); }
   if(ui.readingOpen){ h+=readingOverlayHTML(); }
   if(ui.watchOpen){ h+=watchOverlayHTML(); }

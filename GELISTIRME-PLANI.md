@@ -21,6 +21,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 _Son güncelleme: 2026-07-20 · Kaynak: `app.js` + `sync.js` + `styles.css` + `index.html` + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
+> - **2026-07-22:** **Günlük Işığı — Premium Lavanta Günlük** canlıya alınmadı, branch üzerinde tamamlandı (`mustafaras-reimagined-train`): Bugün ekranındaki not kartına belirgin "Günlük Işığı'nı aç 🦩" butonu eklendi; tam ekran modalda 8 bilimsel mod (Serbest Akış, Duygu Adlandırma, 3 Güzel Şey, Günün Kazanımı, Öz-Şefkat, Bilişsel Yeniden Değerleme, Değer Bağlantısı, Dürtü Dalga Geçişi) ve her modun kısa kanıt ipucu kartı sunuluyor. 120 günlük motivasyon programının fazına göre otomatik prompt önerisi (`journalActivePhase()`), 30 kelime/140 karakter hedefi, üst üste gün streak'i, hedef rozeti (`metGoal`) ve "Günışığı" altında ince animasyonlu nefes kartı var. Veri modeli: `data.days[date].journal` (`text`, `mode`, `promptUsed`, `wordCount`, `charCount`, `savedAt`, `streakAtSave`, `metGoal`); eski `note` alanı korunuyor ve `journaled` tiki `note || journal.text` varlığına göre otomatik yeşilleniyor. `panel.html`'de "Günlük Işığı" bento KPI kartı + seçili gün detayındaki journal kutusu + "Son Notlar" listesinde journal etiketlemesi eklendi. Cache bump `20260722c`. Henüz kullanıcı onayına sunulmadı.
 > - **2026-07-21:** ÆON yerel bildirimlerinde aynı mesajın tekrar tekrar gelmesi engellendi: `data.aeon.shownNotificationIds` + oturum içi `aeonShownThisSession` set'i + 5 sn cooldown + `renotify:false`. (Uygulamayı askıya alma ekranı bu sürüme dahil edilmedi; ayrıca değerlendirilecek.) Cache bump `20260721b`.
 > - **2026-07-20:** **Terapi Odası Premium Genişletme — Bilimsel Profil** canlıya alındı (`main`): İçsel Pusula → Terapi Odası overlay'i **Yol / Araçlar / Profilim** 3 sekmesine ayrıldı. Yol sekmesinde Bugünün Kazanımları + Esneklik Nudgesı; Araçlar sekmesinde İlk Adım, Öz-Şefkat, Rehberli Nefes (4-7-8 / kutu), Karar Hızlandırıcı, CBT Düşünce Kaydı, Güvenli Paylaşım (ÆON sinyali); Profilim sekmesinde `seyma-data` reposundan bilimsel profil raporu çekilip RIASEC/değer rozetleri, güçlü yönler/riskler ve gözlemci rehberi gösteriliyor. Günlük öneriler (kitap/izleme/podcast) gerçek takvim gününe göre döner, Türkçe/güvenilir kaynaklara bağlanır ve yeni sekmede açar; soft DOM güncellemesi sayesinde sekme değişimlerinde flash/flicker yok. Veri modeli: `data.scientificProfile` + `data.days[].therapy` + `data.roomContentHistory`; panelde "Bilimsel Profil Işığı" bento kartı + gün-detay Terapi Odası satırları. Cache bump `20260720f`.
 > - **2026-07-18 (Aşama 2.2):** Kişiselleştirilmiş hedefler bilimsel olarak genişletildi ve Sağlık sayfasındaki **Vücut Ölçüleri** kartıyla tek kartta birleştirildi. `data.settings.targets` artık kalori, protein, karbonhidrat, yağ, lif, su (bardak), adım, uyku, kafein, magnezyum, demir, omega-3, D vitamini, BMR, TDEE ve aktivite seviyesini tutuyor. Bugün ekranına **"Hedeflerim"** kartı eklendi; dokununca Sağlık sayfasına yönlendiriyor. Panel gün-detayında makro özetinin yanında karbonhidrat, yağ, lif hedefleri ve tüm mikro/wellness hedefleri görünüyor. Ayarlar'daki "Kişiselleştirilmiş hedefler" kartı kaldırıldı; doğum tarihi ve aktivite seviyesi artık Sağlık'tan giriliyor. Cache bump `20260718f` (`app.js`).
@@ -44,7 +45,7 @@ _Son güncelleme: 2026-07-20 · Kaynak: `app.js` + `sync.js` + `styles.css` + `i
 | 5 | 🏅 Rozet & seri | 1 | ✅ | `badgesGrid()` + `currentStreak/maybeStreak/bestStreak` + kilometre taşları |
 | 6 | 🧠 Düşünce kaydı (CBT) | 2 | ✅ | Terapi Odası Araçlar sekmesinde 4 adımlı düşünce kaydı (`data.days[].therapy.thoughts[]`); panel gün-detayında sayı/özet (2026-07-20) |
 | 7 | 🌬️ Nefes / meditasyon | 2 | ✅ | Terapi Odası Araçlar sekmesinde 4-7-8 ve kutu nefesi seçici, animasyonlu halka, süre sayacı (`data.days[].therapy.breath`); panel gün-detayında nefes süresi satırı (2026-07-20) |
-| 8 | ✍️ Serbest günlük | 2 | ❌ | Ayrı journaling yok; yalnızca günlük `note` alanı var |
+| 8 | ✍️ Serbest günlük | 2 | ✅ | **Günlük Işığı** premium lavanta modal: 8 bilimsel mod + 120 gün faz promptu + 30 kelime/140 karakter hedefi + streak + rozet; eski `note` korunuyor, `journaled` tiki `note \|\| journal.text` varlığına göre; panelde bento kart + gün-detay + Son Notlar aynası (2026-07-22, onay bekliyor) |
 | 9 | 🎯 Günün niyeti / esneklik nudgesı | 2 | ✅ | `App.onIntention` + `data.days[].intention` (≤140); Terapi Odası Yol sekmesinde esneklik nudgesı + Bugünün Kazanımları; panel gün-detayında niyet/kazanım satırı (2026-07-20) |
 | 10 | 🩸 Döngü tahmini & faz | 2 | ✅ | `cycleHTML` + faz hesabı + sonraki regl/ovülasyon/doğurganlık |
 | 11 | 💊 İlaç hatırlatıcı & uyum | 2 | 🟡 | Uyku ilacı türü + ağrı kesici log var; saatli liste + uyum % (`data.meds`) yok |
@@ -164,11 +165,13 @@ Uygulama tek sayfa (vanilla JS, mobil ≤460px), Türkçe, sıcak/emoji dilli.
 - **Nasıl:** Terapi Odası → Araçlar sekmesinde animasyonlu halka + pattern seçici; `data.days[date].therapy.breath`.
 - **Emek:** Orta. **Panel:** gün-detayında nefes süresi satırı.
 
-### 8. ✍️ Serbest günlük (journaling) + Luna promptları — ❌ Yok
-- **Ne:** "Bugün seni ne zorladı?" gibi yazma soruları; uzun serbest metin.
-- **Nasıl:** `data.days[date].journal`; Luna (mesaj sekmesi) verilerden
-  kişisel prompt üretir.
-- **Emek:** Orta. **Panel:** Var/yok rozeti (içerik gizli tutulabilir).
+### 8. ✍️ Serbest günlük (journaling) + bilimsel modlar — ✅ Tamamlandı (onay bekliyor)
+- **Ne:** Premium lavanta "Günlük Işığı" deneyimi: serbest metin + 8 bilimsel mod + 120 günlük program fazına uygun otomatik prompt + hedef/streak/rozet.
+- **Nasıl:** `data.days[date].journal = {text, mode, promptUsed, wordCount, charCount, savedAt, streakAtSave, metGoal}`. Eski `data.days[date].note` korunur; `journaled` tiki `note || journal.text` varlığına göre otomatik yeşillenir. Bugün ekranındaki not kartında belirgin "Günlük Işığı'nı aç 🦩" butonu; açılan tam ekran modalda mod chip grid, bilimsel ipucu kartı, faz rozet kartı, geniş textarea, kelime/karakter sayısı ve hedef ilerleme çubuğu, kaydet/güncelle butonu. Günışığı kartının altında ince, animasyonlu, nefes alan glow'lu Günlük Işığı satır kartı.
+- **Modlar:** Serbest Akış (Pennebaker), Duygu Adlandırma (Lieberman), 3 Güzel Şey (Seligman), Günün Kazanımı (Amabile), Öz-Şefkat (Neff), Bilişsel Yeniden Değerleme (Gross), Değer Bağlantısı (ACT), Dürtü Dalga Geçişi (Marlatt).
+- **Hedef:** 30 kelime / 140 karakter; ulaşılınca `metGoal` rozetlenir. Üst üste gün streak'i hesaplanır.
+- **Panel:** "Günlük Işığı" bento KPI kartı (streak, bu ay gün, toplam kelime, son entry, aktif faz); seçili gün detayında journal metni lavanta kutusunda; "Son Notlar" journal ve eski notları birlikte listeler.
+- **Emek:** Orta-yüksek. **Durum:** Branch üzerinde tamamlandı; kullanıcı onayı sonrası `main`'e alınacak.
 
 ### 9. 🎯 Günün niyeti / kelimesi — ❌ Yok
 - **Ne:** Sabah tek cümlelik niyet, akşam "tuttun mu?" değerlendirmesi.

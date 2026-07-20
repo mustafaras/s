@@ -351,6 +351,61 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-22 (devam) — Günlük Işığı: premium lavanta journal + 8 bilimsel mod + panel aynası (onay bekliyor)
+
+**Branch:** `mustafaras-reimagined-train` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı. Kriz modalı revizyonuyla aynı branch üzerinde ilerleniyor, ikisi birlikte veya ayrı ayrı deploy edilebilir.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `data.days[date].journal` veri modeli eklendi (`text`, `mode`, `promptUsed`, `wordCount`, `charCount`, `savedAt`, `streakAtSave`, `metGoal`); `migrate()` ile eski kayıtlara backfill.
+  - 8 bilimsel günlük modu: Serbest Akış, Duygu Adlandırma, 3 Güzel Şey, Günün Kazanımı, Öz-Şefkat, Bilişsel Yeniden Değerleme, Değer Bağlantısı, Dürtü Dalga Geçişi. Her modun kısa bilimsel ipucu kartı var.
+  - 120 günlük motivasyon programı fazına göre otomatik prompt önerisi (`journalActivePhase()`).
+  - Günlük yazma hedefi (30 kelime / 140 karakter) ve üst üste gün streak'i; hedefe ulaşınca `metGoal` rozetleniyor.
+  - Bugün ekranındaki not kartına belirgin "Günlük Işığı'nı aç 🦩" butonu; yazılmış günlük varsa durum değişiyor.
+  - Günışığı kartının altına ince, animasyonlu, nefes alan glow'lu "Günlük Işığı" satır kartı eklendi.
+  - Tam ekran modal (kriz modalı iskeleti): header, faz rozet kartı, mod seçici chip grid, prompt alanı, bilimsel ipucu, büyük textarea, kelime/karakter sayısı ve hedef ilerleme çubuğu, kaydet/güncelle butonu.
+  - `journaled` tiki `data.days[date].note` veya `data.days[date].journal.text` varlığına göre otomatik yeşilleniyor (`syncDerivedHabits`).
+- `styles.css`
+  - Lavanta accent değişkenleri `--journal`, `--journal2`, `--journal-bg`, `--journal-glow` (hem açık hem koyu tema).
+  - İnce animasyonlu Günlük Işığı kartı, modal mod chip'leri, textarea glow ve shimmer keyframes.
+- `panel.html`
+  - Yeni "Günlük Işığı" bento KPI kartı: aktif journal streak, bu ay kaç gün yazıldı, toplam kelime, son entry tarihi ve aktif 120-gün fazı.
+  - `journaled` tiki artık `rec.note || rec.journal.text` varlığını kabul ediyor.
+  - Seçili gün detayında "Günün Notu / Günlük Işığı" bölümü: eski not ve yeni journal ayrı ayrı, journal için lavanta accent kutusu.
+  - "Son Notlar" kartı artık journal metinlerini de listeliyor; journal girişleri "🪶 Günlük Işığı" etiketiyle, eski notlar "📝 Not" etiketiyle ayrılıyor.
+  - Panel CSS `:root` içine `--journal` lavanta değişkenleri eklendi.
+- `index.html`
+  - Cache-bump: `styles.css?v=20260722c`, `app.js?v=20260722c`, `sync.js?v=20260722c`.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `session-state/.../files/journal-harness.mjs` — headless Node `vm` testi; Günlük Işığı kartının ve modalının render edildiğini, 8 mod chip'inin varlığını, prompt/ilerleme çubuğunun çalıştığını, metin kaydının `data.days[date].journal`'e yazıldığını, `journaled` tikinin otomatik yeşillendiğini ve re-open'da kaydedilmiş metni gösterdiğini doğrular.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `panel.html` inline script syntax check (4/4 script tag) ✅
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- `journal-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS.
+- `crisis-harness.mjs` önceki session'dan ✅ (kriz modalı değişikliği bozulmadı).
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazı yapılmadı.
+- Yerel demo server durdurulmuş durumda.
+
+**Son düzeltmeler (bu session devamı):**
+- Günlük Işığı ince kartı Günışığı hava durumu kartının hemen altına taşındı (`bugunHTML` sıralaması: `weatherHeaderHTML` → `journalLightCardHTML` → `dailyPhotoCardHTML` → `rasitBubbleHTML`).
+- Faz etiketindeki "Faz 1 — Faz 1 — Fark Etme" tekrarı giderildi: yeni `phaseDisplay()` ve `phaseShortTitle()` helper'ları, `motivationProgramV2.js`'nin zaten "Faz X — Başlık" formatında dönen `phaseTitle`'ını doğal şekilde kısaltıyor veya eksikse ön ekliyor.
+- Düzeltmeler sonrası `node --check app.js` + `journal-harness.mjs` + `run-seyma/driver.mjs` tekrar PASS; kart sırası dump üzerinden doğrulandı.
+
+**Bir sonraki session / deploy öncesi notlar / TODO:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Kriz modalı revizyonu ve Günlük Işığı aynı branch'te; kullanıcı isterse tek squash-merge ile birlikte, isterse önce kriz modallarını ayrı deploy edip sonra Günlük Işığı ekleyebiliriz.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `crisis-harness.mjs` + `journal-harness.mjs` + `driver.mjs` çalıştırılmalı.
+- Gerçek iPhone'da Günlük Işığı butonu, modal açılışı, mod switch, textarea, kaydetme, hedef rozet ve ince kart animasyonu manuel test edilmeli.
+- `panel.html` canlı veride journal KPI kartı ve gün detayının düzgün render edildiği gözlemlenmeli; eski sadece `note` içeren günlerde uyumlu kaldığı doğrulanmalı.
+
+---
+
 ### 2026-07-22 — Kriz modalları: sayaçsız, duygu-öncelikli, premium dropdown'lu otomatik tamamlama (onay bekliyor)
 
 **Branch:** `mustafaras-reimagined-train` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.

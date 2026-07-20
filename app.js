@@ -242,13 +242,11 @@ var CRISES={
   sweet:{
     key:'sweet', label:'Tatlı krizi', short:'Tatlı', icon:'cookie',
     accent:'#E9899F', accent2:'#C9B8FF', doneField:'craving10MinDone', habit:'sweetManaged',
-    secs:600, clockLabel:'10 dakika', startLabel:'10 dakikayı başlat',
     tag:'TATLI KRİZİ', hero:'Panik yok Şeyma — tatlı geldi diye tahtın sarsılmaz.',
-    sciTitle:'Neden 10 dakika?',
-    sci:'Şeker isteği bir <b>dalga</b>dır: yükselir ve genelde 10 dakikada kendiliğinden geriler (buna “urge surfing” denir). Kan şekeri düşünce beyin hızlı yakıt için şeker ister, dopamin devresi “ödül” vaadiyle dürtükler. Dalgayı bastırmadan izlersen tepe noktası geçer — karar artık senin olur.',
-    doneToast:'10 dakika doldu — tatlı krizini yönettin. Kararı artık sen ver.',
+    sciTitle:'Tatlı isteği bir dalga',
+    sci:'Şeker isteği bir <b>dalga</b>dır: yükselir ve genelde kısa sürede kendiliğinden geriler. Beyin hızlı yakıt ve dopamin vaadiyle dürtükler; ama duyguyu fark edip adlandırınca prefrontal korteks devreye girer — karar tekrar senin olur.',
     winTitle:'İşte bu.',
-    winText:'Tatlı seni değil, sen tatlıyı yönettin. Küçük zafer, büyük kontrol.',
+    winText:'Tatlı seni değil, sen tatlıyı yönettin. Küçük bir farkındalık, büyük kontrol.',
     opts:[
       {label:'Su içtim',icon:'droplet'},
       {label:'Kahve/çay yaptım',icon:'coffee'},
@@ -268,13 +266,11 @@ var CRISES={
   food:{
     key:'food', label:'Yemek krizi', short:'Yemek', icon:'utensils',
     accent:'#E0A55E', accent2:'#F2C879', doneField:'foodCravingDone', habit:'foodManaged',
-    secs:1200, clockLabel:'20 dakika', startLabel:'20 dakikayı başlat',
     tag:'YEMEK / AÇLIK KRİZİ', hero:'Dur bakalım Şeyma — mide mi konuşuyor, yoksa moral mi?',
     sciTitle:'Gerçek açlık mı, duygusal açlık mı?',
-    sci:'Fiziksel açlık <b>yavaş</b> kurulur, her yiyeceğe açıktır ve doyunca susar. Duygusal açlık <b>aniden</b> gelir, belirli bir şeyi (çoğu kez abur cubur) ister ve doysan bile dinmez. Tokluk sinyalleri (leptin, CCK) beyne ~20 dakikada ulaşır — bu yüzden önce bir bardak su + 20 dakika, sonra karar. İpucu için <b>HALT</b>: Aç mısın (Hungry), kızgın mısın (Angry), yalnız mısın (Lonely), yorgun musun (Tired)?',
-    doneToast:'20 dakika doldu — açlık dalgasını izledin. Şimdi ihtiyaçla karar ver, dürtüyle değil.',
+    sci:'Fiziksel açlık <b>yavaş</b> kurulur, her yiyeceğe açıktır ve doyunca susar. Duygusal açlık <b>aniden</b> gelir, belirli bir şeyi ister ve doysan bile dinmez. İlk adım duyguyu fark etmek: kızgın mısın, yalnız mısın, yorgun musun? <b>HALT</b> sorusu seni gerçek ihtiyaçla buluşturur.',
     winTitle:'Bravo kaptan.',
-    winText:'Açlığı dinledin, boğulmadın. Gerçek açlıksa dengeli beslendin; duygusalsa başka türlü doydun.',
+    winText:'Açlığı dinledin, boğulmadın. Gerçek açlıksa dengeli beslendin; duygusalsa kendini başka türlü besledin.',
     opts:[
       {label:'Bir bardak su içip bekledim',icon:'droplet'},
       {label:'Ilık bitki çayı yaptım',icon:'coffee'},
@@ -294,13 +290,11 @@ var CRISES={
   coffee:{
     key:'coffee', label:'Kahve krizi', short:'Kahve', icon:'coffee',
     accent:'#A9805B', accent2:'#D8B892', doneField:'coffeeCravingDone', habit:'coffeeManaged',
-    secs:600, clockLabel:'10 dakika', startLabel:'10 dakika ara ver',
     tag:'KAHVE / KAFEİN KRİZİ', hero:'Kahve iyidir Şeyma, ama saat kaç? Uykunla pazarlık etmeyelim.',
     sciTitle:'Gerçek yorgunluk mu, alışkanlık mı?',
-    sci:'Kafein isteği çoğu zaman gerçek ihtiyaç değil; <b>alışkanlık</b> ve öğle sonrası enerji düşüşüdür. Kafein, adenozin (uyku baskısı) reseptörlerini bloke eder; yarılanma ömrü ~5-6 saattir — yani öğleden sonra içilen kahve gece uykunu böler. Bir bardak su + 10 dakika kısa hareket, enerji dibini çoğu kez kahveden daha iyi çözer.',
-    doneToast:'Ara verdin — kafein isteği alışkanlığın sesiydi, sen dinlemedin.',
+    sci:'Kafein isteği çoğu zaman gerçek ihtiyaç değil; <b>alışkanlık</b> ve öğle sonrası enerji düşüşüdür. Kafein adenozin (uyku baskısı) reseptörlerini bloke eder; yarılanma ömrü ~5-6 saattir. İstek geldiğinde önce duyguyu adlandır: yorgunluk mu, alışkanlık mı, yoksa keyif mi?',
     winTitle:'Net karar.',
-    winText:'Kahveyi yasaklamıyoruz; saatine ve dozuna sen karar veriyorsun. Uyku bunu unutmayacak.',
+    winText:'Kahveyi yasaklamıyoruz; saatine, dozuna ve nedenine sen karar veriyorsun. Uyku bunu unutmayacak.',
     opts:[
       {label:'Bir bardak su içtim',icon:'droplet'},
       {label:'Kısa yürüyüş/esneme yaptım',icon:'footprints'},
@@ -764,8 +758,8 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisLeft:600, crisisTiming:false, crisisDone:false, crisisTriedOpen:false, crisisTrigOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
-var crisisInterval=null, toastTimer=null, noteTimer=null, pulseTimer=null;
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
+var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
 var lastHeaderShown=false; // Sabit marka başlığı: giriş animasyonu yalnızca ilk görünümde oynasın
@@ -2873,15 +2867,13 @@ App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 // ── Kriz odaları (modal): Tatlı · Yemek · Kahve ──
-App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); clearInterval(crisisInterval); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=CRISES[kind].secs; ui.crisisTiming=false; ui.crisisDone=false; lastCrisisKind=null; render(); };
-App.closeCrisis=function(){ clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisKind=null; render(); };
-App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); };
-App.toggleCrisisTrigger=function(id){ var i=ui.crisisTriggers.indexOf(id); if(i>=0) ui.crisisTriggers.splice(i,1); else ui.crisisTriggers.push(id); render(); };
-App.onCrisisNote=function(el){ ui.crisisNote=String(el.value||'').slice(0,200); };
-App.startCrisisTimer=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; clearInterval(crisisInterval); ui.crisisTiming=true; ui.crisisLeft=C.secs; render(); crisisInterval=setInterval(function(){ ui.crisisLeft--; if(ui.crisisLeft<=0){ clearInterval(crisisInterval); ui.crisisLeft=0; ui.crisisTiming=false; var CC=CRISES[ui.crisisKind]; var d=getDay(data,todayStr(),dayIndexFor(todayStr())); if(CC) d[CC.doneField]=true; syncDerivedHabits(d); d.savedAt=new Date().toISOString(); save(); render(); haptic([16,40,16]); if(CC) toast(CC.doneToast,3000); } else { updateCrisisTimer(); } },1000); };
-function updateCrisisTimer(){ var el=document.getElementById('crisis-clock'); if(el){ el.textContent=pad(Math.floor(ui.crisisLeft/60))+':'+pad(ui.crisisLeft%60); } }
-App.completeCrisis=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day[C.doneField]=true; if(!Array.isArray(day.cravingOptionsUsed)) day.cravingOptionsUsed=[]; ui.crisisOpts.forEach(function(o){ if(day.cravingOptionsUsed.indexOf(o)<0) day.cravingOptionsUsed.push(o); }); if(!Array.isArray(day.cravingTriggers)) day.cravingTriggers=[]; var nowIso=new Date().toISOString(); ui.crisisTriggers.forEach(function(tg){ day.cravingTriggers.push({trigger:tg,ts:nowIso,kind:C.key}); }); var tn=String(ui.crisisNote||'').trim().slice(0,200); if(tn) day.cravingTriggerNote=tn; syncDerivedHabits(day); day.savedAt=nowIso; clearInterval(crisisInterval); ui.crisisTiming=false; ui.crisisDone=true; commit('Krizi yönettin'); };
-App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; clearInterval(crisisInterval); ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisLeft=C?C.secs:600; ui.crisisTiming=false; ui.crisisDone=false; render(); };
+App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day.savedAt=new Date().toISOString(); save(); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; lastCrisisKind=null; render(); };
+App.closeCrisis=function(){ ui.crisisKind=null; render(); };
+App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); App.completeCrisis(); };
+App.toggleCrisisTrigger=function(id){ var i=ui.crisisTriggers.indexOf(id); if(i>=0) ui.crisisTriggers.splice(i,1); else ui.crisisTriggers.push(id); render(); App.completeCrisis(); };
+App.onCrisisNote=function(el){ ui.crisisNote=String(el.value||'').slice(0,200); debounceSave('crisisNote',App.completeCrisis,700); };
+App.completeCrisis=function(){ var C=CRISES[ui.crisisKind]; if(!C) return; var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); var firstDone=!day[C.doneField]; day[C.doneField]=true; day.cravingOptionsUsed=ui.crisisOpts.slice(); var nowIso=new Date().toISOString(); day.cravingTriggers=ui.crisisTriggers.map(function(tg){ return {trigger:tg,ts:nowIso,kind:C.key}; }); var tn=String(ui.crisisNote||'').trim().slice(0,200); if(tn) day.cravingTriggerNote=tn; syncDerivedHabits(day); day.savedAt=nowIso; ui.crisisDone=true; if(firstDone) commit('Krizi yönettin'); else save(); };
+App.resetCrisis=function(){ var C=CRISES[ui.crisisKind]; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; render(); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
@@ -5819,12 +5811,20 @@ function crisisModalHTML(){
   // coffee: saat-farkında uyku uyarısı
   if(kind==='coffee' && hr>=14){ h+='<div style="display:flex;gap:9px;align-items:flex-start;background:rgba(155,127,201,0.12);border:1px solid rgba(155,127,201,0.32);border-radius:14px;padding:11px 13px;"><span style="flex-shrink:0;color:#8A75C8;display:inline-flex;">'+icon('moon',16)+'</span><div style="font-size:12px;line-height:1.55;color:var(--text2);"><b>Saat '+pad(hr)+':00 civarı.</b> Kafein ~5-6 saat kalıcıdır; şimdi içersen gece uykun bölünebilir. Bugünlük kafeinsize ya da suya ne dersin?</div></div>'; }
 
-  // timer block
-  h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 26%, transparent),color-mix(in srgb,'+A2+' 32%, transparent));border:1px solid color-mix(in srgb,'+A+' 26%, var(--card-bd));border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:11px;">';
-  h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--muted);">'+esc(C.clockLabel.toLocaleUpperCase('tr-TR'))+' '+tcap+'</div>';
-  h+='<div id="crisis-clock" style="font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text);line-height:1;">'+pad(Math.floor(ui.crisisLeft/60))+':'+pad(ui.crisisLeft%60)+'</div>';
-  h+='<button onclick="App.startCrisisTimer()" style="border:none;cursor:pointer;padding:13px 24px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 8px 20px color-mix(in srgb,'+A+' 40%, transparent);display:flex;align-items:center;gap:7px;">'+(ui.crisisTiming?'Sayaç çalışıyor…':(esc(C.startLabel)+' '+icon('clock',15)))+'</button>';
-  h+='</div>';
+  // ── Şu an kendimi nasıl hissediyorum? (duygu ön planda) ──
+  var trigN=ui.crisisTriggers.length+((ui.crisisNote&&String(ui.crisisNote).trim())?1:0);
+  var trigBody='';
+  C.triggers.forEach(function(t){
+    var sel=ui.crisisTriggers.indexOf(t.id)>=0;
+    trigBody+='<button onclick="App.toggleCrisisTrigger(\''+t.id+'\')" style="display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:12px 13px;border-radius:15px;cursor:pointer;transition:all .18s;'+(sel?('background:color-mix(in srgb,'+A+' 12%, var(--card));border:1px solid '+A+';box-shadow:0 6px 14px color-mix(in srgb,'+A+' 22%, transparent);'):'background:var(--card);border:1px solid var(--card-bd);')+'">';
+    trigBody+='<span style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 12%, var(--icon));">'+icon(t.icon,16)+'</span>';
+    trigBody+='<span style="flex:1;min-width:0;"><span style="font-size:14px;font-weight:700;color:var(--text);display:block;">'+esc(t.label)+'</span><span style="font-size:11.5px;color:var(--muted);line-height:1.45;display:block;margin-top:2px;">'+esc(t.sci)+'</span></span>';
+    trigBody+='<span style="width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:4px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(sel?'linear-gradient(135deg,'+A+','+A2+')':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',12):'')+'</span>';
+    trigBody+='</button>';
+  });
+  trigBody+='<textarea oninput="App.onCrisisNote(this)" rows="3" placeholder="Şu an içinde ne var? Örn. iş stresi, can sıkıntısı, yorgunluk, ödül arayışı… Yazmak beynin savunma devresini yatıştırır, bu sadece hissetmekten daha etkilidir." style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:13.5px;outline:none;resize:none;line-height:1.5;color:var(--text);">'+esc(ui.crisisNote||'')+'</textarea>';
+  trigBody+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Duyguyu adlandırmak amigdala aktivitesini azaltır, prefrontal korteksi güçlendirir (affect labeling). İşaretlediğin tetikleyiciler Rapor’da örüntünü çıkarmama yardımcı olur.</div>';
+  h+=section('zap','Şu an kendimi nasıl hissediyorum?','Duyguyu fark et, adlandır, yaz — örüntünü birlikte görelim',trigN,trigBody);
 
   // ── Şu an ne denedin? (premium expander) ──
   var triedN=ui.crisisOpts.length;
@@ -5836,21 +5836,6 @@ function crisisModalHTML(){
   });
   h+=section('heart-handshake','Şu an ne denedin?',(triedN>0?triedN+' şey denedin — küçük ama değerli':'Denediğin bir şeyi işaretle'),triedN,triedBody);
 
-  // ── Bu isteği ne tetikledi? (premium expander) ──
-  var trigN=ui.crisisTriggers.length+((ui.crisisNote&&String(ui.crisisNote).trim())?1:0);
-  var trigBody='';
-  C.triggers.forEach(function(t){
-    var sel=ui.crisisTriggers.indexOf(t.id)>=0;
-    trigBody+='<button onclick="App.toggleCrisisTrigger(\''+t.id+'\')" style="display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:12px 13px;border-radius:15px;cursor:pointer;transition:all .18s;'+(sel?('background:color-mix(in srgb,'+A+' 12%, var(--card));border:1px solid '+A+';box-shadow:0 6px 14px color-mix(in srgb,'+A+' 22%, transparent);'):'background:var(--card);border:1px solid var(--card-bd);')+'">';
-    trigBody+='<span style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 12%, var(--icon));">'+icon(t.icon,16)+'</span>';
-    trigBody+='<span style="flex:1;min-width:0;"><span style="font-size:14px;font-weight:700;color:var(--text);display:block;">'+esc(t.label)+'</span><span style="font-size:11.5px;color:var(--muted);line-height:1.45;display:block;margin-top:2px;">'+esc(t.sci)+'</span></span>';
-    trigBody+='<span style="width:22px;height:22px;border-radius:50%;flex-shrink:0;margin-top:4px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+(sel?'linear-gradient(135deg,'+A+','+A2+')':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',12):'')+'</span>';
-    trigBody+='</button>';
-  });
-  trigBody+='<textarea oninput="App.onCrisisNote(this)" rows="2" placeholder="Başka bir şey mi tetikledi? örn. bir tartışma, yalnızlık, kendini ödüllendirme…" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:13.5px;outline:none;resize:none;line-height:1.5;color:var(--text);">'+esc(ui.crisisNote||'')+'</textarea>';
-  trigBody+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Tetikleyiciyi işaretlersen Rapor’da örüntünü çıkarırım — neyin gerçek ihtiyaç, neyin duygusal/alışkanlık olduğunu birlikte görürüz.</div>';
-  h+=section('zap','Bu isteği ne tetikledi?','Bilimsel tetikleyiciler · örüntünü çıkaralım',trigN,trigBody);
-
   // done: kutlama kartı (eylem düğmeleri sabit alt bar'a taşındı)
   if(ui.crisisDone){
     h+='<div style="background:linear-gradient(135deg,color-mix(in srgb,'+A+' 22%, transparent),color-mix(in srgb,'+A2+' 26%, transparent));border:1px solid color-mix(in srgb,'+A+' 30%, var(--card-bd));border-radius:20px;padding:20px;text-align:center;animation:seyPop .3s ease;"><div style="width:52px;height:52px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 10px 24px color-mix(in srgb,'+A+' 40%, transparent);">'+icon('check',26)+'</div><div style="font-size:19px;font-weight:800;margin-bottom:6px;color:var(--text);">'+esc(C.winTitle)+'</div><p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--text2);">'+esc(C.winText)+'</p>'+(C.habit?'<div style="margin-top:12px;font-size:12px;font-weight:800;color:#3F8A4F;display:inline-flex;align-items:center;gap:5px;background:rgba(143,191,138,0.18);border-radius:999px;padding:5px 12px;">'+icon('check',12)+' Bugünün tikine işlendi</div>':'')+'</div>';
@@ -5861,11 +5846,11 @@ function crisisModalHTML(){
   // ── sabit alt bar (birincil eylem her zaman erişilebilir) ──
   h+='<div style="flex-shrink:0;position:relative;padding:12px 15px calc(14px + env(safe-area-inset-bottom));background:var(--modal);border-top:1px solid var(--card-bd);box-shadow:0 -10px 26px rgba(0,0,0,0.07);">';
   if(ui.crisisDone){
-    h+='<div style="display:flex;gap:9px;"><button onclick="App.resetCrisis()" style="flex:1;border:1px solid var(--field-bd);background:var(--card);cursor:pointer;padding:14px;border-radius:16px;font-size:14.5px;font-weight:700;color:var(--muted);">Yeni kriz / sıfırla</button><button onclick="App.closeCrisis()" style="flex:1.3;border:none;cursor:pointer;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 10px 24px color-mix(in srgb,'+A+' 38%, transparent);display:flex;align-items:center;justify-content:center;gap:6px;">Kapat '+icon('check',15)+'</button></div>';
+    h+='<button onclick="App.closeCrisis()" style="border:none;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;">Tamam, kapat '+icon('check',16)+'</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">Kaydını aldım; bugünün ilgili tiki kendiliğinden yeşillendi.'+(C.habit?' Seni takip ediyorum, Sevgili Günışığı.':'')+'</div>';
   } else {
-    var canComplete=ui.crisisTiming && ui.crisisLeft<=0;
-    h+='<button onclick="App.completeCrisis()" '+(canComplete?'':'disabled')+' style="border:none;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;'+(canComplete?'cursor:pointer;opacity:1;':'cursor:not-allowed;opacity:.55;')+'">Krizi yönettim '+icon('check',16)+'</button>';
-    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">'+(canComplete?'Süre tamamlandı — “Krizi yönettim”e basabilirsin.':'Sayaç dolmadan “Krizi yönettim” aktif olmaz — önce durumu anla, sonra düzeltelim.')+' '+(C.habit?'Buton aktif olduğunda bugünün ilgili tiki kendiliğinden yeşillenir.':'Aktif olduğunda kaydın Rapor’a işlenir.')+'</div>';
+    h+='<button onclick="App.completeCrisis()" style="border:none;width:100%;padding:16px;border-radius:18px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,'+A+','+A2+');box-shadow:0 12px 26px color-mix(in srgb,'+A+' 42%, transparent);display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;opacity:1;">Krizi kaydet '+icon('check',16)+'</button>';
+    h+='<div style="font-size:11px;color:var(--faint);text-align:center;line-height:1.5;margin-top:8px;">Herhangi bir duygu, tetikleyici, not veya denenen strateji girdin mi? “Krizi kaydet”e basınca bugünün ilgili tiki yeşillenir.'+(C.habit?'':' Kaydın Rapor’a işlenir.')+'</div>';
   }
   h+='</div>'; // footer
 

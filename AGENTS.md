@@ -351,6 +351,43 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-22 — Kriz modalları: sayaçsız, duygu-öncelikli, girişe dayalı otomatik tamamlama (onay bekliyor)
+
+**Branch:** `mustafaras-kucuk-revizyonlar` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `CRISES` konfigürasyonundan `secs`, `clockLabel`, `startLabel`, `doneToast` gibi tüm sayaç alanları kaldırıldı; kahve, tatlı ve yemek kriz metinleri duygu farkındalığına (affect labeling) odaklanacak şekilde yeniden yazıldı.
+  - `crisisModalHTML()` içindeki büyük sayaç/geri sayım bloğu tamamen çıkarıldı; "Şu an kendimi nasıl hissediyorum?" bölümü en üste, not alanıyla birlikte öne çıkarıldı. Bilimsel kısa bilgi (amigdala → prefrontal korteks) ve yazmanın yatıştırıcı etkisi vurgulandı.
+  - Alt sabit eylem çubuğundaki "başlat/söz ver" butonu kaldırıldı; yerine her zaman aktif, kullanıcıyı not yazmaya teşvik eden "Kaydet ve kapat" butonu kondu.
+  - `App.openCrisis`: modal açıldığında `cravingSOSCount` artırır ve kaydeder (veri kaybı olmaması için).
+  - `App.completeCrisis`: idempotent tamamlama fonksiyonu; ilk girişte toast gösterir, sonraki güncellemelerde sessizce kaydeder. Seçili tetikleyiciler, stratejiler ve not ilgili `data.days[date]` alanlarına (`cravingTriggers`, `cravingOptionsUsed`, `cravingTriggerNote`) yazar; `craving10MinDone` / `foodCravingDone` / `coffeeCravingDone` alanlarını `true` yapar.
+  - `App.toggleCrisisTrigger`, `App.toggleCrisisOpt` ve `App.onCrisisNote` (debounced 700 ms) artık her kullanıcı girişinde otomatik olarak `App.completeCrisis()` çağırır; yani tetikleyici seçmek, strateji seçmek veya not yazmak ilgili kriz tiki anında yeşillendirir.
+  - `App.resetCrisis`: sadece modal içi geçici seçimleri (`ui.crisisTriggers`, `ui.crisisOpts`, `ui.crisisNote`) temizler; tiklenmiş kaydı silmez.
+  - `crisisInterval` global değişkeni, `ui.crisisLeft` / `ui.crisisTiming` / `crisisTriedOpen` / `crisisTrigOpen` kaldırıldı.
+- `index.html`
+  - Cache-bump: tüm asset `?v=20260722b`.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `session-state/.../files/crisis-harness.mjs` — headless Node `vm` testi; kriz modalının sayaç içermediğini, duygu/trigger bölümü ve not alanı render ettiğini, tetikleyici/strateji/not girişlerinin ilgili tiki otomatik yeşillendirdiğini doğrular.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅: onboarding, seeded state, tab/theme geçişleri çalışıyor.
+- `crisis-harness.mjs` (headless Node `vm`) ✅: 11/11 assertion PASS.
+- Herhangi bir yerel sunucu açılmadı; tarayıcı açılmadı; `seyma-data`'ya yazı yapılmadı.
+
+**Bir sonraki session / deploy öncesi notlar / TODO:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `crisis-harness.mjs` + `driver.mjs` çalıştırılmalı.
+- Gerçek iPhone'da kahve/tatlı/yemek kriz butonlarına dokunulduğunda modalın açıldığı, duygu seçimi/not yazımının tik yeşillendirdiği ve tasarımın premium göründüğü manuel test edilmeli.
+- Panel (`panel.html`) bu değişiklikten etkilenmedi; kriz tetikleyici notları zaten gün detayında gösterilmiyordu. İstenirse panelde kriz kayıtlarına ayrı bir bento kart eklenebilir.
+
+---
+
 ### 2026-07-21 — Faz 30: ÆON bildirim spam fix (canlıya alınacak)
 
 **Branch:** `mustafaras-crispy-couscous` → `main` squash-merge edilecek.

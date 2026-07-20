@@ -18,7 +18,7 @@ ile yazıldı. Öncelik sırasına göre sürümlere bölündü.
 
 ## 📊 Uygulama Durumu (canlı özet)
 
-_Son güncelleme: 2026-07-21 · Kaynak: `app.js` + `styles.css` + `index.html`._
+_Son güncelleme: 2026-07-20 · Kaynak: `app.js` + `sync.js` + `styles.css` + `index.html` + `.github/workflows/pages.yml`._
 
 > **Günlük değişiklik (changelog):**
 > - **2026-07-21:** ÆON yerel bildirimlerinde aynı mesajın tekrar tekrar gelmesi engellendi: `data.aeon.shownNotificationIds` + oturum içi `aeonShownThisSession` set'i + 5 sn cooldown + `renotify:false`. (Uygulamayı askıya alma ekranı bu sürüme dahil edilmedi; ayrıca değerlendirilecek.) Cache bump `20260721b`.
@@ -285,6 +285,15 @@ notlarını buraya ekleyebiliriz._
 ---
 
 ## 🗒️ Değişiklik günlüğü
+
+- **2026-07-20** — **🔒 Conflict-safe sync + PWA altyapı güçlendirme + CI ön doğrulama**:
+  `origin/main` ile dal birleştirildi; `manifest.json`, `sw.js`, Faz 12 PWA bildirimleri ve Faz 30 spam fix bu dala geldi.
+  `sync.js` artık her push öncesinde uzak `data/latest.json`'u çekip yerel veriyle **zaman damgasına göre birleştirme**
+  yapıyor (`mergeData`, `mergeDay`, `mergeById`). Böylece bayat/eksik bir cihaz açıldığında uzaktaki yeni günler/veriler
+  kaybolmaz. `settings`'te token/OpenAI key gibi cihaza özel alanlar uzaktan asla ezilmiyor. Her push öncesinde
+  `data/backups/<timestamp>.json` yedeği yazılıyor. `.github/workflows/pages.yml`'e `validate` job'u eklendi; deploy
+  öncesinde `node --check app.js sync.js sw.js motivationProgramV2.js`, `panel.html` script tag dengelesi ve headless
+  render test çalışıyor. Cache-bust: `v=20260722a`.
 
 - **2026-07-13** — **🧠 Bilimsel Profil Değerlendirmesi ana arayüzde inaktif; sonuçlar panelde korunuyor**:
   174 maddelik tek oturumlu profil değerlendirmesi (`data.profileAssessment`) artık `Bugün/Sağlık/Rapor/Mesaj/Harita/Saygı`

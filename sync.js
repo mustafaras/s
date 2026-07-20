@@ -110,6 +110,15 @@ function putLatestGuarded(c, latestStr, localData){
         setStatus('error','Güvenlik: '+localDays+'<'+remoteDays+' gün, push iptal');
         throw new Error('anti-clobber: local '+localDays+' < remote '+remoteDays+' days');
       }
+      // CONFLICT-SAFE SYNC: uzak latest.json varsa, yerel ile zaman damgasına göre
+      // birleştir; bu sayede bayat/eksik bir cihaz açıldığında uzaktaki yeni veriler
+      // kaybolmaz. Birleştirme anti-clobber geçtikten sonra uygulanır.
+      if(remoteObj && localData){
+        var mergedData=mergeData(localData, remoteObj);
+        // localData'yi güncelle (referansı koruyarak) ve string versiyonunu yenile
+        Object.keys(mergedData).forEach(function(k){ localData[k]=mergedData[k]; });
+        latestStr=JSON.stringify(localData,null,2);
+      }
       // Faz 10 — profileAssessment çakışma çözümü: uzakta profileAssessment varsa,
       // yerel ile itemId bazında birleştir. merge yalnızca veri kazandırır, kaybettirmez.
       // Token/localhost/anti-clobber korumaları değiştirilmez; merge anti-clobber
@@ -133,8 +142,14 @@ function putLatestGuarded(c, latestStr, localData){
 function pushWithCfg(c, data){
   var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
   var latest=JSON.stringify(data,null,2);
-  var snap=JSON.stringify({app:'seyma',date:today,savedAt:new Date().toISOString(),data:data},null,2);
-  return putLatestGuarded(c,latest,data).then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
+  var nowIso=new Date().toISOString();
+  var snap=JSON.stringify({app:'seyma',date:today,savedAt:nowIso,data:data},null,2);
+  // Her push öncesinde zaman damgalı yedek: bir şey ters giderse geri dönülebilir.
+  var backup=JSON.stringify({app:'seyma',type:'pre-push-backup',savedAt:nowIso,data:data},null,2);
+  return ghPut(c,'data/backups/'+nowIso.replace(/[:.]/g,'-')+'.json',backup)
+    .catch(function(){})
+    .then(function(){ return putLatestGuarded(c,latest,data); })
+    .then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
 }
 
 // ── Faz 10: profileAssessment çakışma çözümü (conflict resolution) ──────────────
@@ -280,6 +295,115 @@ function mergeProfileAssessment(localPA, remotePA){
   }
   return localPA;
 }
+
+// ── GENEL VERİ BİRLEŞTİRME (conflict-safe sync) ─────────────────────────────────
+// Problem: sync.js eskiden uzak latest.json'u tamamen yerel veriyle eziyordu.
+// Çözüm: her push öncesinde uzak latest.json çekilir, yerel ile zaman damgasına
+// göre birleştirilir, SONRA yazılır. Böylece bayat bir cihaz açılsa bile uzaktaki
+// yeni günler/veriler kaybolmaz; iki uç birleşir.
+//
+// Kurallar:
+//   - settings: yerel ayarlar esas; uzaktaki yalnızca yerelde olmayan anahtarları
+//     ekler. Token/OpenAI key gibi hassas alanlar asla uzaktan alınmaz.
+//   - data.days[date]: her gün için alanlar kendi updatedAt/ts/savedAt zamanına
+//     göre seçilir; yalnızca bir tarafta varsa o alınır.
+//   - notifications / aeon.messages: id bazında birleştirilir; read/seen/synced
+//     bayrakları OR'lanır (bir tarafta okunduysa okunmuş sayılır).
+//   - savedAt: en yeni değer korunur.
+//   - profileAssessment: zaten mergeProfileAssessment ile ayrıca ele alınır.
+function mergeById(localArr, remoteArr, keyField){
+  if(!Array.isArray(localArr)) localArr=[];
+  if(!Array.isArray(remoteArr)) remoteArr=[];
+  var map={};
+  localArr.forEach(function(x){ if(x && x[keyField]) map[x[keyField]]=JSON.parse(JSON.stringify(x)); });
+  remoteArr.forEach(function(x){
+    if(!x || !x[keyField]) return;
+    var id=x[keyField];
+    if(!map[id]){ map[id]=JSON.parse(JSON.stringify(x)); return; }
+    var existing=map[id];
+    Object.keys(x).forEach(function(k){
+      if(!(k in existing)){ existing[k]=x[k]; return; }
+      if(k==='read' || k==='seen' || k==='synced' || k==='deleted'){
+        existing[k]=!!(existing[k] || x[k]);
+        return;
+      }
+      var localTs=existing.ts || existing.receivedAt || existing.updatedAt || existing.savedAt;
+      var remoteTs=x.ts || x.receivedAt || x.updatedAt || x.savedAt;
+      if(typeof remoteTs==='string' && typeof localTs==='string' && remoteTs>localTs){ existing[k]=x[k]; }
+    });
+  });
+  return Object.keys(map).map(function(k){ return map[k]; });
+}
+function fieldTimestamp(v){
+  if(!v || typeof v!=='object') return null;
+  return v.updatedAt || v.ts || v.savedAt || v.receivedAt || v.createdAt || v.completedAt || null;
+}
+function mergeDay(localDay, remoteDay){
+  if(!remoteDay || typeof remoteDay!=='object') return localDay || {};
+  if(!localDay || typeof localDay!=='object') return JSON.parse(JSON.stringify(remoteDay));
+  var merged=JSON.parse(JSON.stringify(localDay));
+  // Gün seviyesinde zaman damgası; alanların kendi zamanı yoksa bunu kullan.
+  var dayLocalTs=merged.updatedAt || merged.ts || merged.savedAt || merged.receivedAt || merged.createdAt || null;
+  var dayRemoteTs=remoteDay.updatedAt || remoteDay.ts || remoteDay.savedAt || remoteDay.receivedAt || remoteDay.createdAt || null;
+  Object.keys(remoteDay).forEach(function(k){
+    if(!(k in merged)){ merged[k]=remoteDay[k]; return; }
+    var localTs=fieldTimestamp(merged[k]), remoteTs=fieldTimestamp(remoteDay[k]);
+    if(typeof localTs!=='string') localTs=dayLocalTs;
+    if(typeof remoteTs!=='string') remoteTs=dayRemoteTs;
+    if(typeof remoteTs==='string' && typeof localTs==='string' && remoteTs>localTs){ merged[k]=remoteDay[k]; }
+    // eşit veya local daha yeni ise local kalır
+  });
+  return merged;
+}
+function mergeSettings(localS, remoteS){
+  if(!remoteS || typeof remoteS!=='object') return localS || {};
+  if(!localS || typeof localS!=='object') return JSON.parse(JSON.stringify(remoteS));
+  var merged=JSON.parse(JSON.stringify(localS));
+  // Uzaktan asla alınmayacak cihaza özel alanlar
+  var localOnlyKeys={ghToken:true, openaiKey:true, syncUrl:true, auth:true, pin:true};
+  Object.keys(remoteS).forEach(function(k){
+    if(localOnlyKeys[k]) return; // local'deki değer korunur
+    if(!(k in merged)) merged[k]=remoteS[k];
+  });
+  return merged;
+}
+function mergeData(localData, remoteData){
+  if(!remoteData || typeof remoteData!=='object') return localData;
+  if(!localData || typeof localData!=='object') return JSON.parse(JSON.stringify(remoteData));
+  var merged=JSON.parse(JSON.stringify(localData));
+  // settings
+  merged.settings=mergeSettings(merged.settings, remoteData.settings);
+  // days
+  if(remoteData.days && typeof remoteData.days==='object'){
+    merged.days=merged.days || {};
+    Object.keys(remoteData.days).forEach(function(date){
+      merged.days[date]=mergeDay(merged.days[date], remoteData.days[date]);
+    });
+  }
+  // notifications
+  if(remoteData.notifications && Array.isArray(remoteData.notifications)){
+    merged.notifications=mergeById(merged.notifications || [], remoteData.notifications, 'id');
+  }
+  // aeon messages
+  if(remoteData.aeon && remoteData.aeon.messages && Array.isArray(remoteData.aeon.messages)){
+    merged.aeon=merged.aeon || {};
+    merged.aeon.messages=mergeById(merged.aeon.messages || [], remoteData.aeon.messages, 'id');
+  }
+  // savedAt: en yeni
+  if(remoteData.savedAt && typeof remoteData.savedAt==='string' && (!merged.savedAt || remoteData.savedAt>merged.savedAt)){
+    merged.savedAt=remoteData.savedAt;
+  }
+  // lastOpenedDate: en yeni
+  if(remoteData.lastOpenedDate && typeof remoteData.lastOpenedDate==='string' && (!merged.lastOpenedDate || remoteData.lastOpenedDate>merged.lastOpenedDate)){
+    merged.lastOpenedDate=remoteData.lastOpenedDate;
+  }
+  // remote'de olup local'de olmayan üst seviye alanları ekle
+  Object.keys(remoteData).forEach(function(k){
+    if(!(k in merged)) merged[k]=JSON.parse(JSON.stringify(remoteData[k]));
+  });
+  return merged;
+}
+
 // repoya yazmadan önce hassas alanları (token + cihaz-özel kilit bilgisi) çıkar — public repoya sızmasın
 function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
@@ -341,6 +465,11 @@ window.SeySync={
   statusText:statusText,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,
+  // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).
+  mergeData:mergeData,
+  mergeDay:mergeDay,
+  mergeById:mergeById,
+  mergeSettings:mergeSettings,
   // Faz 10 — offline reconnect: bağlantı geldiğinde bekleyen push'u tetikler.
   // Gerçek network çağrısı yapmaz; yalnızca schedule/pushNow'u çağırır.
   retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }

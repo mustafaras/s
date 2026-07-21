@@ -351,6 +351,51 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-24 — 🌴 Tatil Modu Genişletme: kafein %25 + kriz odası dinleniyor + bilgi kutusu + Aktif/Aç binding (onay bekliyor)
+
+**Branch:** `mustafaras-fluffy-disco` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `caffeineLimit(date,mode)` artık tarih alır ve `isVacationDay(date)` true ise mod limitini %25 artırır: standart 400→500, hassas 300→375, hamile 200→250 mg.
+  - `habitProgress` ve `caffeineBlock` ilgili çağrılara aktif tarihi geçirir; kafein buton etiketleri dinamik limiti gösterir ("Standart 500").
+  - Limit aşımı uyarısı tatil günü için özel mesajla ayrılır; yatmadan 6 saat önce son kafein hatırlatması korunur.
+  - `App.openCrisis` tatil günlerinde modal açılışını engeller ("Tatil modunda kriz desteği dinleniyor 🦩").
+  - `rasitActionsHTML()` tatil günlerinde kahve/tatlı/yemek kriz butonlarını gizler, yerine nazik "kriz odası dinleniyor" kartı gösterir.
+  - `vacationCardHTML()` açıkken "neler esnetildi" bilgi kutusu ekler: su hedefi, uyku, adım, kafein ve gizli kriz butonları; altında nazik "Yine de yatmadan 6 saat önce son kafein" notu.
+  - **Fix 1 (yerel önizleme geri bildirimi):** tatil preset seçici artık sadece `Aktif` butonu gösteriyor; `Rahat` ve `Keşif` seçenekleri kaldırıldı. Varsayılan preset tüm backfill'lere (`vacationSettings`, `ensureVacationSettings`, `setVacationPreset`) ve panel aynasına (`vacationSettingsP`) `active` olarak ayarlandı.
+  - **Fix 2 (Aktif/Aç binding):** `App.setVacationEnabled(true)` artık açarken preset'i otomatik `active` yapıyor; `App.setVacationPreset('active')` ise kapalıyken tatili açıp `active` preset uyguluyor. Böylece `Aktif` butonuyla `Aç` butonu davranışsal olarak aynı şey.
+- `panel.html`
+  - `caffeineInfoP(rec,date)` imzası tarih alır; `isVacationDayP(date)` true ise %25 artırılmış limiti döner.
+  - `habitProgP` ve gün-detay çağrıları tarih geçirir.
+  - Gün-detay kafein satırı tatil gününde "Kafein · tatilde esnetildi" ve limit değeri gösterir.
+- `index.html`
+  - Cache-bump: `?v=20260724c`.
+- `GELISTIRME-PLANI.md`
+  - Faz 31 satırı "Tatil Modu — premium pause + su hedefi 10 bardak + kafein/crisis genişletme" olarak güncellendi.
+  - 2026-07-24 changelog girişi eklendi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi / güncellendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `vacation-expansion-spec.md` — onaylı tasarım spec'i (kullanıcı tercihleri: sadece kafein esnet, kriz gizli, gerisi aynen kalsın).
+- `vacation-expansion-harness.mjs` — headless Node `vm` testi; 22 assertion (kafein limit tatilde 400→500 / pasifte 400, kriz butonları tatilde gizli / pasifte görünür, bilgi kutusu render, `App.openCrisis` güvenli, sadece `Aktif` preset butonu, **Aktif butonu açarken ve Aç butonu Aktif preset atarken binding**) tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `panel.html` inline script syntax check (4/4 script tag) ✅
+- `vacation-expansion-harness.mjs` (headless Node `vm`) ✅: 22/22 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server `python -m http.server 8765` kullanıcının kendi incelemesi için başlatıldı; kapanışta durdurulacak.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Canlıya alındıktan sonra gerçek iPhone'da: Tatil kartı açılınca sadece `Aktif` preset butonunun göründüğü, `Aktif` dokunulunca `Aç` gibi davrandığı, `Aç` dokunulunca preset'in `Aktif` olduğu, bilgi kutusunun göründüğü, kafein butonlarının dinamik limiti gösterdiği, kriz butonlarının tatil gününde gizlendiği, kapalı/planlanmamış günlerde eski haline döndüğü manuel test edilmeli.
+
+---
+
 ### 2026-07-23 (fix) — Tatil Modu yerel testi: su hedefi + rozet senkronizasyonu düzeltildi
 
 **Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı.

@@ -351,6 +351,44 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-22 — Panel arşiv senkronizasyonu: okuma/izleme/dinleme kayıtları otomatik arşive promote ediliyor (onay bekliyor)
+
+**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - Günlük kayıtlar (okuma/izleme/dinleme) ile arşiv katalogları arasında otomatik senkronizasyon eklendi.
+  - Yeni helper'lar: `normalizeMatch`, `findBookByEntry`, `findTitleByEntry`, `findTrackByEntry`, `syncEntryToLibrary`, `syncEntryToWatchlist`, `syncEntryToMusic`, `backfillArchivesFromDays`.
+  - `App.addReading`: günlük okuma kaydı girildiğinde mevcut kitapla eşleştirir veya yeni `library.books` öğesi oluşturur; `bookId` bağlantısı kurar ve `bumpBookProgress` ile ilerlemeyi günceller.
+  - `App.addWatching`: günlük izleme kaydı girildiğinde mevcut başlıkla eşleştirir veya yeni `watchlist.items` öğesi oluşturur; `itemId` bağlantısı kurar, filmleri otomatik `finished`, dizileri bölüm sayısına göre günceller.
+  - `App.addListening`: günlük dinleme kaydı girildiğinde mevcut parçayla eşleştirir veya yeni `music.items` öğesi oluşturur; `itemId` bağlantısı kurar.
+  - `migrate()`: eski kayıtlardaki günlük reading/watching/listening girişlerini geriye dönük olarak arşiv kataloglarına promote eder ve her girişi ilgili arşiv öğesine bağlar.
+- `index.html`
+  - Cache-bump: `app.js?v=20260722d`.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `session-state/.../files/archive-render-harness.js` — panel.html arşiv kartlarının sadece `library.books` / `watchlist.items` / `music.items`'den okuduğunu ve günlük kayıtlarla otomatik doldurulmadığını gösteren diagnostic simülasyon (önceki phase'den).
+- `session-state/.../files/archive-sync-harness.js` — headless Node `vm` testi; `App.addReading`/`addWatching`/`addListening` ile girilen yeni kayıtların arşiv kataloglarına otomatik eklendiğini, aynı başlık/yazar/artist/tür'e sahip girişlerin kopya oluşturmadığını, `migrate()`'in eski günlük kayıtları geriye dönük bağladığını ve bu sayede panel arşiv kartlarının dolu göründüğünü doğrular.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `archive-sync-harness.js` (headless Node `vm`) ✅: 27/27 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki session / deploy öncesi notlar / TODO:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `archive-sync-harness.js` + `driver.mjs` çalıştırılmalı.
+- Gerçek iPhone'da Bugün ekranından yeni okuma/izleme/dinleme kaydı girildiğinde ilgili arşiv öğesinin oluştuğu ve paneldeki Kütüphane / İzleme Arşivi / Dinleme Arşivi kartlarında göründüğü manuel test edilmeli.
+- Eski veride yalnızca günlük kaydı olan (arşiv öğesi olmayan) günlerin, uygulama açıldığında `migrate()` ile otomatik arşive promote edildiği canlı veride gözlemlenmeli.
+- Bu değişiklik CSS veya panel.html içermiyor; panel arşiv kartları zaten kataloglardan okuduğu için otomatik olarak doluyor.
+
+---
+
 ### 2026-07-22 (devam) — Günlük Işığı: premium lavanta journal + 8 bilimsel mod + panel aynası (onay bekliyor)
 
 **Branch:** `mustafaras-reimagined-train` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı. Kriz modalı revizyonuyla aynı branch üzerinde ilerleniyor, ikisi birlikte veya ayrı ayrı deploy edilebilir.

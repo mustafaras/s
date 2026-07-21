@@ -25,6 +25,7 @@
     --red:#fb7185;--ra:rgba(251,113,133,.10);--rb:rgba(251,113,133,.22);
     --purple:#a78bfa;--pa:rgba(167,139,250,.10);--pb:rgba(167,139,250,.22);
     --journal:#C9A4FF;--journal2:#A66CFF;--journal-bg:rgba(166,108,255,.12);--journal-glow:rgba(201,164,255,.18);
+    --vacation:#5ED4B4;--vacation2:#2A9D8F;--vacation-bg:rgba(42,157,143,.12);--vacation-glow:rgba(94,212,180,.18);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
@@ -432,7 +433,8 @@ var MOOD_ICON={"cok-iyi":"sun","iyi":"flower-2","normal":"leaf","zorlandim":"clo
 var MOOD_LABEL={"cok-iyi":"Çok iyi","iyi":"İyi","normal":"Normal","zorlandim":"Zorlandım","cok-zorlandim":"Çok zorlandım"};
 function moodIcon(id,size){ return MOOD_ICON[id]?icon(MOOD_ICON[id],size||14):""; }
 // ── Veri-güdümlü tikler (app ile aynı eşikler) — gözlemci ilerlemeyi de görsün ──
-var WATER_GOAL_P=8, SLEEP_TICK_MIN_P=7.5, STEP_TICK_MIN_P=4500;
+var WATER_GOAL_P=8, VACATION_WATER_GOAL_P=10, SLEEP_TICK_MIN_P=7.5, STEP_TICK_MIN_P=4500;
+function waterGoalCupsP(date){ var d=date||today(); return isVacationDayP(d)?VACATION_WATER_GOAL_P:WATER_GOAL_P; }
 var DERIVED_P={water:1,sleepReg:1,walked20:1,journaled:1,sweetManaged:1,foodManaged:1,coffeeManaged:1,mediaFed:1,caffeineOk:1};
 var DERIVED_ACCENT_P={water:"#5EA9E6",sleepReg:"#B9A6E6",walked20:"#7DD389",journaled:"#E0A93C",sweetManaged:"#E9899F",foodManaged:"#E0A55E",coffeeManaged:"#C79B6E",mediaFed:"#C77D93",caffeineOk:"#8A5A2B"};
 var CAFFEINE_MG_P={turk:60,espresso:60,filter:95,americano:77,cappuccino:63,latte:63,"black-tea":40,"green-tea":25,energy:80};
@@ -449,8 +451,8 @@ function caffeineInfoP(rec){
   return {drinks:drinks,total:Math.round(total),last:last,residue:Math.round(residue),limit:limit,amountOk:total<=limit,timingOk:cut};
 }
 function hubEntryCountP(rec){ var n=0; ["reading","watching","listening","learning"].forEach(function(s){ var e=(rec&&rec[s]&&Array.isArray(rec[s].entries))?rec[s].entries:[]; n+=e.length; }); return n; }
-function habitProgP(rec,key){
-  if(key==="water"){ var w=(rec&&typeof rec.water==="number"&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL_P,cur:w,goal:WATER_GOAL_P}; }
+function habitProgP(rec,key,date){
+  if(key==="water"){ var w=(rec&&typeof rec.water==="number"&&rec.water>0)?rec.water:0; var wg=waterGoalCupsP(date); return {met:w>=wg,cur:w,goal:wg}; }
   if(key==="sleepReg"){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=="")?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN_P),cur:h,goal:SLEEP_TICK_MIN_P}; }
   if(key==="walked20"){ var s=effStepsP(rec).steps||0; return {met:s>=STEP_TICK_MIN_P,cur:s,goal:STEP_TICK_MIN_P}; }
   if(key==="journaled"){ var nt=(rec&&( (rec.note&&String(rec.note).trim()) || (rec.journal&&rec.journal.text&&String(rec.journal.text).trim()) ))?1:0; return {met:nt>0,cur:nt,goal:1,binary:true}; }
@@ -462,7 +464,7 @@ function habitProgP(rec,key){
   return null;
 }
 function habitProgLabel(key,p){
-  if(key==="water") return p.cur+"/"+WATER_GOAL_P;
+  if(key==="water") return p.cur+"/"+p.goal;
   if(key==="sleepReg") return (p.cur==null?"—":String(p.cur).replace(".",",")+" sa");
   if(key==="walked20") return p.cur.toLocaleString("tr-TR")+"/4.500";
   if(key==="journaled") return "not bekliyor";
@@ -589,6 +591,8 @@ function readingRecap(dates){
   return {readDays:readDays,totalPages:totalPages,avgScore:scoreDays?Math.round(scoreSum/scoreDays):0,medDays:medDays,scoreDays:scoreDays};
 }
 function shortD(s){ var p=s.split("-"); return p[2]+"."+p[1]; }
+function vacationSettingsP(){ return (D&&D.settings&&D.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; }
+function isVacationDayP(date){ var v=vacationSettingsP(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=date||today(); return d>=v.startAt&&d<=v.endAt; }
 function monthKey(d){ return d.slice(0,7); }
 function monthLabel(ym){ var p=ym.split("-").map(Number),m=["Ocak","Subat","Mart","Nisan","Mayis","Haziran","Temmuz","Agustos","Eylul","Ekim","Kasim","Aralik"]; return m[p[1]-1]+" "+p[0]; }
 function recOf(d){ return D.days[d]||null; }
@@ -674,8 +678,8 @@ function moodHeatmapCardHTML(){
 }
 function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n>3000)n=3000; for(var i=0;i<n;i++) out.push(addDays(D.startDate,i)); return out; }
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
-function currentStreak(){ var c=0,d=today(); if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; d=addDays(d,-1);} else break; } return c; }
-function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else c=0;}); return b; }
+function currentStreak(){ var c=0,d=today(),paused=false; if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; paused=false; d=addDays(d,-1);} else if(isVacationDayP(d)){ paused=true; d=addDays(d,-1);} else break; } return c; }
+function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else if(isVacationDayP(d)){ /* pause: don't break or count */ } else c=0;}); return b; }
 function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
 function timeAgo(iso){
   if(!iso) return '';
@@ -2129,6 +2133,19 @@ function render(){
   var mvTodayKm=mv?Number(mv.totalM||0)/1000:0;
   h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('footprints',12)+' '+fmtKmM(mv.walkM)+'</span><span style="display:inline-flex;align-items:center;gap:3px;">'+icon('car',12)+' '+fmtKmM(mv.vehicleM)+'</span>'):''));
 
+  // ROW 1.65: Tatil Modu — uygulamadaki tatil durakları ve su hedefi
+  (function(){
+    var v=vacationSettingsP(), active=v.enabled&&isVacationDayP(), totalDays=v.enabled&&v.startAt&&v.endAt?(diff(v.endAt,v.startAt)+1):0, pastDays=v.enabled&&v.startAt?Math.max(0,diff(today(),v.startAt)+1):0, left=Math.max(0,totalDays-pastDays);
+    var vLabel=v.enabled?(active?'Aktif':(today()<v.startAt?'Yakında':'Bitti')):'Kapalı';
+    var vVal=active?left+'<small>g kaldı</small>':'—';
+    var vExtra='<span class="tchip fl">'+esc(vLabel)+'</span>';
+    var vCap='';
+    if(v.enabled&&v.startAt&&v.endAt) vCap+='<span>'+esc(shortD(v.startAt))+'–'+esc(shortD(v.endAt))+'</span>';
+    if(v.reason) vCap+='<span style="color:var(--vacation);font-weight:800;">'+esc(v.reason)+'</span>';
+    vCap+='<span>Su hedefi <b style="color:var(--t2);">'+(active?10:8)+'</b> bardak</span>';
+    h+=kpi('Tatil Modu',vVal,'var(--vacation)',vExtra,null,vCap);
+  })();
+
   // ROW 1.6: Günlük Işığı — serbest günlük refleksiyonu
   (function(){
     var jStreak=journalStreak(), jWords=totalJournalWords(), jLast=lastJournalDate(), jMonth=journalDaysThisMonth();
@@ -2259,10 +2276,18 @@ function render(){
     // türetilmiş tikler (su/uyku/yürüyüş) kırmızı uyarı taşımaz — sakin, veri-güdümlü; ilerlemeyi gösterir
     var warn=(!ok && CRIT[hb[0]] && !derived && selected===today());
     var extra='';
-    if(derived && !ok){ var p=habitProgP(srec,hb[0]); var ac=DERIVED_ACCENT_P[hb[0]]; extra='<span class="hprog" style="color:'+ac+';">'+habitProgLabel(hb[0],p)+'</span>'; }
+    if(derived && !ok){ var p=habitProgP(srec,hb[0],UI.selectedDate); var ac=DERIVED_ACCENT_P[hb[0]]; extra='<span class="hprog" style="color:'+ac+';">'+habitProgLabel(hb[0],p)+'</span>'; }
     h+='<span class="hchip'+(ok?' on':'')+(warn?' warn':'')+(derived&&!ok?' auto':'')+'"'+(warn?' title="'+hb[1]+' bugün işaretlenmedi"':(derived&&!ok?' title="'+hb[1]+' — veri girildiğinde otomatik yeşillenir"':''))+'><span class="habit-dot"></span>'+hb[1]+extra+'</span>';
   });
   h+='</div>';
+  // Tatil Modu chip'i seçili gün özetinde
+  if(isVacationDayP(UI.selectedDate)){
+    var v=vacationSettingsP();
+    h+='<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+    h+='<span class="hchip on" style="--vacation-chip-bg:var(--vacation-bg);background:var(--vacation-chip-bg);border-color:var(--vacation);color:var(--vacation);"><span class="habit-dot" style="background:var(--vacation);box-shadow:0 0 8px var(--vacation);"></span>🌴 Tatil · su hedefi 10</span>';
+    if(v.reason) h+='<span class="hchip" style="background:var(--vacation-bg);border-color:var(--vacation);color:var(--vacation);">'+esc(v.reason)+'</span>';
+    h+='</div>';
+  }
   // Günlük Işığı chip'i seçili gün özetinde
   if(srec.journal&&srec.journal.text&&String(srec.journal.text).trim()){
     var jwc=(typeof srec.journal.wordCount==='number'&&srec.journal.wordCount>0)?srec.journal.wordCount:String(srec.journal.text).trim().split(/\s+/).filter(Boolean).length;

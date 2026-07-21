@@ -351,6 +351,94 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-23 (fix) — Tatil Modu yerel testi: su hedefi + rozet senkronizasyonu düzeltildi
+
+**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **kullanıcı son onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Sorun:** Kullanıcı "Tatil Modu açık ama hiçbir yerde değişiklik olmuyor" şeklinde geri bildirdi. Yerel sunucu (`localhost:9000`) ve browser canvas ile test edildiğinde iki hata teşhis edildi:
+1. **Su hedefi senkronizasyonu eksik:** `App.setVacationEnabled` / `setVacationStart` / `setVacationEnd` sadece `updateCardByKey('vacation')` çağırıyordu. Su kartı ve hero Su tile'ı ayrı render edildiği için tatil durumu değişse bile su hedefi 8/10 olarak kalmıyordu.
+2. **Rozet/buton UX karışıklığı:** `enabled` switch ile `AKTİF` rozet aynı anlama geliyordu; bugün tatil aralığında olmayan açık bir tatil "KAPALI" gözüküyordu.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `App.setVacationEnabled`, `App.setVacationStart`, `App.setVacationEnd` artık `render()` çağırıyor (eski `updateCardByKey('vacation')` yerine). Böylece tatil durumu değişince su hedefi (Su kartı + hero Su tile'ı), seri sayacı ve diğer türetilmiş göstergeler anında güncelleniyor.
+  - Rozet durumları ayrıştırıldı: bugün tatil aralığındaysa `AKTİF`, açık ama gelecekteyse `Planlandı`, kapalıysa `Kapalı`. Buton metni `Aç`/`Kapat`.
+  - `ensureVacationSettings()` referans güvenliği korunuyor.
+- `index.html`
+  - Cache-bump: `?v=20260723b`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-23 changelog girişi güncellendi (yerel test fix notları).
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi / güncellendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\m_ras\.copilot\session-state\4079ff2f-3bea-48af-8b3f-598e3bfe4b8d\files\vacation-harness.js` — headless Node `vm` testi; 25 assertion (su hedefi 8→10→8, rozet durumları, kart render/expand, migrate backfill, tatil gününde streak pause) tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `vacation-harness.js` (headless Node `vm`) ✅: 25/25 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Browser canvas (`http://localhost:9000/index.html`) ✅: AKTİF durumda Su 0/10, Kapalı durumda Su 0/8, Planlandı durumda Su 0/8 doğrulandı.
+- Herhangi bir tarayıcı açılmadı (browser canvas kullanıldı); `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server `python3 -m http.server 9000` başlatılıp test edildi; 9000 portu artık dinlemiyor (sunucu durdurulmuş).
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası son bir kez `node --check app.js` + `vacation-harness.js` + `driver.mjs` çalıştırılıp hemen ardından commit + push yapılacak.
+- Canlıya alındıktan sonra gerçek iPhone'da tatil kartının Günışığı hava kartının hemen üstünde göründüğü, açılıp tarih/preset/not girişi yapılabildiği, su hedefinin otomatik 10 bardağa çıktığı ve kapalı/planlandı durumlarında 8 kaldığı manuel test edilmeli.
+
+---
+
+### 2026-07-23 — 🌴 Tatil Modu: premium pause + su hedefi 10 bardak + panel aynası (onay bekliyor / deploy hazır)
+
+**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **kullanıcı son onayıyla** yapılacak; şu an canlıya alınmadı. (Aynı branch üzerinde daha önceki panel arşiv senkronizasyonu + boot persistence fix'i zaten `main`de.)
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `migrate()` içine `data.settings.vacation` backfill eklendi (`enabled`, `startAt`, `endAt`, `preset`, `reason`).
+  - `VACATION_WATER_GOAL=10` sabiti ve `waterGoalCups(date)` helper eklendi; su hedefi `WATER_GOAL` sabitini kullanan tüm render/hesaplama noktalarına dinamik çevrildi.
+  - `isVacationDay(date)` / `vacationSettings()` helper'ları eklendi.
+  - `currentStreak()` ve `bestStreak()` içine tatil günü pause mantığı eklendi; seri kırılmıyor, sadece duraklıyor.
+  - Günışığı hava durumu kartının hemen üstüne `vacationCardHTML()` fonksiyonu eklendi; ince, premium, nefes/shimmer'lı kart tasarımı. `CARD_BUILDERS['vacation']` kaydı ve `App.toggleCard('vacation')` / `App.toggleVacation()` / `App.setVacation(...)` handler'ları eklendi.
+  - Kart açıkken tarih inputları (`startAt`, `endAt`), preset seçici (`relaxed`/`moderate`/`active`) ve not alanı görünür; kapalıyken sadece badge + özet görünür.
+  - `App.toggleCard` DOM'da kartı bulamazsa tam `render()` yapma fallback'i eklendi (headless test uyumluluğu + robustluk).
+- `styles.css`
+  - Açık ve koyu tema `:root` bloklarına `--vacation` accent değişkenleri ve `seyShimmer` keyframe eklendi.
+- `panel.html`
+  - Panel `:root` içine `--vacation` değişkenleri eklendi.
+  - `vacationSettingsP()` / `isVacationDayP()` / `waterGoalCupsP()` helper'ları eklendi; su hedefi ve streak pause mantığı panelde de çalışıyor.
+  - Yeni "🌴 Tatil Modu" bento KPI kartı eklendi: aktif/pasif durum, başlangıç-bitiş tarihleri, preset ve not.
+  - Seçili gün detayında tatil günü rozet chip'i eklendi.
+- `index.html`
+  - Cache-bump: `?v=20260723a`.
+- `GELISTIRME-PLANI.md`
+  - Faz 31 "🌴 Tatil Modu — premium pause + su hedefi 10 bardak" satırı ✅ olarak eklendi; changelog ve son güncelleme tarihi güncellendi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `session-state/.../files/vacation-harness.js` — headless Node `vm` testi; 15 assertion (su hedefi 8→10, kart render/expand, migrate backfill, tatil gününde streak pause) tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
+- `vacation-harness.js` (headless Node `vm`) ✅: 15/15 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `vacation-harness.js` + `driver.mjs` çalıştırılmalı.
+- Canlıya alındıktan sonra gerçek iPhone'da tatil kartının Günışığı hava kartının hemen üstünde göründüğü, açılıp tarih/preset/not girişi yapılabildiği, su hedefinin otomatik 10 bardağa çıktığı ve streak hesabının tatil günlerini kırmadığı manuel test edilmeli.
+- Eski kayıtlarda `data.settings.vacation` olmayan kullanıcı verileri `migrate()` ile otomatik backfill alacak; boot persistence fix'i sayesinde açılışta `save()` ile senkronize olacak.
+
+---
+
 ### 2026-07-22 (fix) — Panel arşiv senkronizasyonu: migrate backfill boot'ta kalıcılaştırılıyor
 
 **Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı.

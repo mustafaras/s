@@ -2929,10 +2929,10 @@ App.saveJournal=function(){ var date=activeDate(), day=getDay(data,date,dayIndex
 
 // ── Tatil Modu handler'ları
 App.toggleVacationCard=function(){ haptic(10); App.toggleCard('vacation'); };
-App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); v.enabled=flag===true||flag==='true'||flag===1; if(v.enabled&&(!v.startAt||!v.endAt)){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } save(); render(); };
+App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); var on=flag===true||flag==='true'||flag===1; v.enabled=on; if(on){ v.preset='active'; if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
 App.setVacationStart=function(val){ var v=ensureVacationSettings(); v.startAt=String(val||''); if(v.endAt&&v.startAt&&v.endAt<v.startAt){ v.endAt=v.startAt; } save(); render(); };
 App.setVacationEnd=function(val){ var v=ensureVacationSettings(); v.endAt=String(val||''); if(v.startAt&&v.endAt&&v.endAt<v.startAt){ v.startAt=v.endAt; } save(); render(); };
-App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'active'); save(); updateCardByKey('vacation'); };
+App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'active'); if(!v.enabled){ v.enabled=true; if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
 App.setVacationReason=function(reason){ var v=ensureVacationSettings(); v.reason=String(reason||'').trim(); save(); updateCardByKey('vacation'); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };

@@ -725,6 +725,7 @@ function migrate(d){
   if(typeof d.settings.vacation.endAt!=='string') d.settings.vacation.endAt='';
   if(d.settings.vacation.preset!=='relaxed'&&d.settings.vacation.preset!=='moderate'&&d.settings.vacation.preset!=='active') d.settings.vacation.preset='relaxed';
   if(typeof d.settings.vacation.reason!=='string') d.settings.vacation.reason='';
+  if(typeof d.settings.vacation.enabledAt!=='string') d.settings.vacation.enabledAt='';
   d.version=2;
   return d;
 }
@@ -988,8 +989,8 @@ function waterGoalCups(date){
   var t=(data.settings&&data.settings.targets)||{};
   return (typeof t.waterCups==='number'&&!isNaN(t.waterCups))?t.waterCups:WATER_GOAL;
 }
-function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'active',reason:''}; }
-function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'active',reason:''}; return data.settings.vacation; }
+function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'active',reason:'',enabledAt:''}; }
+function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'active',reason:'',enabledAt:''}; return data.settings.vacation; }
 function isVacationDay(date){ var v=vacationSettings(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=(date||todayStr()); return d>=v.startAt&&d<=v.endAt; }
 function stepsGoal(date){ var d=date||todayStr(); if(isVacationDay(d)){ var p=(vacationSettings().preset||'relaxed'); return p==='active'?12000:(p==='moderate'?9000:5000); } var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
 function sleepGoalHours(date){ var d=date||todayStr(); if(isVacationDay(d)) return SLEEP_TICK_MIN-0.5; var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
@@ -2929,10 +2930,10 @@ App.saveJournal=function(){ var date=activeDate(), day=getDay(data,date,dayIndex
 
 // ── Tatil Modu handler'ları
 App.toggleVacationCard=function(){ haptic(10); App.toggleCard('vacation'); };
-App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); var on=flag===true||flag==='true'||flag===1; v.enabled=on; if(on){ v.preset='active'; if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
+App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); var was=v.enabled; var on=flag===true||flag==='true'||flag===1; v.enabled=on; if(on){ v.preset='active'; v.enabledAt=new Date().toISOString(); if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
 App.setVacationStart=function(val){ var v=ensureVacationSettings(); v.startAt=String(val||''); if(v.endAt&&v.startAt&&v.endAt<v.startAt){ v.endAt=v.startAt; } save(); render(); };
 App.setVacationEnd=function(val){ var v=ensureVacationSettings(); v.endAt=String(val||''); if(v.startAt&&v.endAt&&v.endAt<v.startAt){ v.startAt=v.endAt; } save(); render(); };
-App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'active'); if(!v.enabled){ v.enabled=true; if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
+App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); var was=v.enabled; v.preset=String(preset||'active'); if(!v.enabled){ v.enabled=true; v.enabledAt=new Date().toISOString(); if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
 App.setVacationReason=function(reason){ var v=ensureVacationSettings(); v.reason=String(reason||'').trim(); save(); updateCardByKey('vacation'); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
@@ -10165,9 +10166,20 @@ App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(
 
 setTimeout(pollRemote,1500);
 setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)
-document.addEventListener('visibilitychange',function(){ if(!document.hidden){ pollRemote(); maybeFetchDailyPhoto(); } });
-window.addEventListener('focus',function(){ pollRemote(); maybeFetchDailyPhoto(); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',function(){ pollRemote(); maybeFetchDailyPhoto(); }); // bfcache'ten geri dönüşte
+function onAppForeground(){
+  // iOS PWA / tarayıcı: arka plandan dönüşte soğuk açılış sayılmaz;
+  // yine de panelde "Son açılış" ve "Canlı takip" hemen güncellensin.
+  if(data){
+    data.lastOpenedDate=todayStr();
+    data.lastOpenedAt=new Date().toISOString();
+    save();
+  }
+  pollRemote();
+  maybeFetchDailyPhoto();
+}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ onAppForeground(); } });
+window.addEventListener('focus',function(){ onAppForeground(); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',function(){ onAppForeground(); }); // bfcache'ten geri dönüşte
 window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();

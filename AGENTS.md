@@ -351,6 +351,52 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-25 — Panel "Son Açılış" + "Canlı Takip" Doğruluğu + Tatil `enabledAt` Zaman Damgası (onay bekliyor)
+
+**Branch:** `mustafaras-panel-last-seen` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `visibilitychange`/`focus`/`pageshow` event handler'ları tek bir `onAppForeground()` fonksiyonuna çekildi. Arka plandan dönüşte (PWA veya tarayıcı sekmesi) artık `data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save();` çalışıyor; böylece paneldeki "Son açılış" saati soğuk açılış dışında da güncelleniyor.
+  - `pollRemote()` ve `maybeFetchDailyPhoto()` korundu; önce `lastOpenedAt` güncellenip `save()` yapılıyor.
+  - `vacationSettings()` ve `ensureVacationSettings()` default objelerine `enabledAt:''` eklendi; `migrate()` eski veriye `settings.vacation.enabledAt` backfill yapıyor.
+  - `App.setVacationEnabled(true)` ve `App.setVacationPreset(...)` (kapalıdan açık geçiş) artık `enabledAt = new Date().toISOString()` atıyor. Tatil modu açıldığı an ISO olarak kaydediliyor.
+- `panel.html`
+  - `freshness(saved, opened)` imzası genişletildi: `savedAt` ve `lastOpenedAt`'ın en yeni değeri baz alınıyor; uygulama açıkken gün kaydı olmasa bile "Canlı takip aktif" rozet yeşilleniyor.
+  - `render()` içindeki `freshness()` çağrısı `freshness(saved, opened)` olarak güncellendi.
+  - `vacationSettingsP()` default objesine `enabledAt:''` eklendi.
+  - Yeni `trTime(iso)` helper: ISO zaman damgasını `Europe/Istanbul` saat diliminde "HH:MM" formatına çeviriyor.
+  - Tatil Modu bento KPI kartında `enabledAt` varsa "Açıldı: HH:MM (TR)" satırı gösteriliyor.
+- `index.html`
+  - Cache-bump: tüm asset `?v=20260725b`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-25 changelog girişi `enabledAt` zaman damgası bilgisiyle güncellendi; Faz 31 durum tablosu genişletildi.
+  - "Son güncelleme" tarihi 2026-07-25 olarak korundu.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi güncellendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\PC\.copilot\session-state\7ee51235-19ff-4932-b6cc-beae7cc13a75\files\last-seen-harness.mjs` — headless Node `vm` testi; 13 assertion (visibilitychange/focus/pageshow günceller `lastOpenedAt` + `save`; `setVacationReason` localStorage'a yazar; `freshness()` hem `savedAt` hem `lastOpenedAt`'ı dikkate alır; `setVacationEnabled`/`setVacationPreset` açılışta `enabledAt` yazar; panel.html `enabledAt` TR saati gösterir) tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
+- panel.html inline script syntax check (4/4 script tag) ✅
+- `last-seen-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Canlıya alındıktan sonra gerçek iPhone'da: uygulamayı arka plandan ön plana getirdikten 15–30 saniye sonra paneli yenilemek; "Son açılış" saatinin güncellendiği, "Canlı takip aktif" rozeti yeşil yandığı doğrulanmalı.
+- Tatil modu açıldıktan sonra paneldeki Tatil Modu KPI kartında "Açıldı: HH:MM (TR)" satırı görünür olmalı. Eski açılışlarda `enabledAt` yoksa satır gösterilmeyecek; yeni açılış/kapatma/açma döngüsü zaman damgasını yazar.
+- Senkronizasyonun görünmemesinin nedeni büyük olasılıkla `sync.js` Guard 2: yerel gün sayısı (`Object.keys(data.days).length`) uzaktakinden azsa tüm push engellenir. Çözüm: telefonda uygulamayı kapatıp açarak (soğuk boot) `lastOpenedAt` güncellemesini tetiklemek; boot'ta `save()` çalışır ve Guard 2 yeterli gün sayısıyla aşılır. Kullanıcıya bu mekanizma açıklanmalı.
+- `sync.js` Guard 2 ve `mergeSettings()` mantığında değişiklik yapılmadı; veri güvenliği korundu.
+
 ### 2026-07-24 — 🌴 Tatil Modu Genişletme: kafein %25 + kriz odası dinleniyor + bilgi kutusu + Aktif/Aç binding (onay bekliyor)
 
 **Branch:** `mustafaras-fluffy-disco` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.

@@ -592,7 +592,7 @@ function readingRecap(dates){
   return {readDays:readDays,totalPages:totalPages,avgScore:scoreDays?Math.round(scoreSum/scoreDays):0,medDays:medDays,scoreDays:scoreDays};
 }
 function shortD(s){ var p=s.split("-"); return p[2]+"."+p[1]; }
-function vacationSettingsP(){ return (D&&D.settings&&D.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; }
+function vacationSettingsP(){ return (D&&D.settings&&D.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'active',reason:''}; }
 function isVacationDayP(date){ var v=vacationSettingsP(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=date||today(); return d>=v.startAt&&d<=v.endAt; }
 function monthKey(d){ return d.slice(0,7); }
 function monthLabel(ym){ var p=ym.split("-").map(Number),m=["Ocak","Subat","Mart","Nisan","Mayis","Haziran","Temmuz","Agustos","Eylul","Ekim","Kasim","Aralik"]; return m[p[1]-1]+" "+p[0]; }

@@ -363,12 +363,13 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `App.openCrisis` tatil günlerinde modal açılışını engeller ("Tatil modunda kriz desteği dinleniyor 🦩").
   - `rasitActionsHTML()` tatil günlerinde kahve/tatlı/yemek kriz butonlarını gizler, yerine nazik "kriz odası dinleniyor" kartı gösterir.
   - `vacationCardHTML()` açıkken "neler esnetildi" bilgi kutusu ekler: su hedefi, uyku, adım, kafein ve gizli kriz butonları; altında nazik "Yine de yatmadan 6 saat önce son kafein" notu.
+  - **Fix (yerel önizleme geri bildirimi):** tatil preset seçici artık sadece `Aktif` butonu gösteriyor; `Rahat` ve `Keşif` seçenekleri kaldırıldı. Varsayılan preset tüm backfill'lere (`vacationSettings`, `ensureVacationSettings`, `setVacationPreset`) ve panel aynasına (`vacationSettingsP`) `active` olarak ayarlandı.
 - `panel.html`
   - `caffeineInfoP(rec,date)` imzası tarih alır; `isVacationDayP(date)` true ise %25 artırılmış limiti döner.
   - `habitProgP` ve gün-detay çağrıları tarih geçirir.
   - Gün-detay kafein satırı tatil gününde "Kafein · tatilde esnetildi" ve limit değeri gösterir.
 - `index.html`
-  - Cache-bump: `?v=20260724a`.
+  - Cache-bump: `?v=20260724b`.
 - `GELISTIRME-PLANI.md`
   - Faz 31 satırı "Tatil Modu — premium pause + su hedefi 10 bardak + kafein/crisis genişletme" olarak güncellendi.
   - 2026-07-24 changelog girişi eklendi.
@@ -377,21 +378,21 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
 - `vacation-expansion-spec.md` — onaylı tasarım spec'i (kullanıcı tercihleri: sadece kafein esnet, kriz gizli, gerisi aynen kalsın).
-- `vacation-expansion-harness.mjs` — headless Node `vm` testi; 19 assertion (kafein limit tatilde 400→500 / pasifte 400, kriz butonları tatilde gizli / pasifte görünür, bilgi kutusu render, `App.openCrisis` güvenli) tamamı PASS.
+- `vacation-expansion-harness.mjs` — headless Node `vm` testi; 20 assertion (kafein limit tatilde 400→500 / pasifte 400, kriz butonları tatilde gizli / pasifte görünür, bilgi kutusu render, `App.openCrisis` güvenli, **sadece `Aktif` preset butonu**) tamamı PASS.
 
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
 - `node --check sync.js` ✅
 - `panel.html` inline script syntax check (4/4 script tag) ✅
-- `vacation-expansion-harness.mjs` (headless Node `vm`) ✅: 19/19 assertion PASS.
+- `vacation-expansion-harness.mjs` (headless Node `vm`) ✅: 20/20 assertion PASS.
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server `python -m http.server 8765` kullanıcının kendi incelemesi için başlatıldı; kapanışta durdurulacak.
 
 **Bir sonraki adım / deploy öncesi notlar:**
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay öncesi: `vacation-expansion-harness.js` ve `run-seyma/driver.mjs` çalıştırılıp sonuçları eklenecek; eğer regresyon varsa düzeltilecek.
-- Canlıya alındıktan sonra gerçek iPhone'da: Tatil kartı açılınca bilgi kutusunun göründüğü, kafein butonlarının dinamik limiti gösterdiği, kriz butonlarının tatil gününde gizlendiği, kapalı/planlanmamış günlerde eski haline döndüğü manuel test edilmeli.
+- Canlıya alındıktan sonra gerçek iPhone'da: Tatil kartı açılınca sadece `Aktif` preset butonunun göründüğü, bilgi kutusunun göründüğü, kafein butonlarının dinamik limiti gösterdiği, kriz butonlarının tatil gününde gizlendiği, kapalı/planlanmamış günlerde eski haline döndüğü manuel test edilmeli.
 
 ---
 

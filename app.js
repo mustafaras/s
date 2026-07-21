@@ -988,8 +988,8 @@ function waterGoalCups(date){
   var t=(data.settings&&data.settings.targets)||{};
   return (typeof t.waterCups==='number'&&!isNaN(t.waterCups))?t.waterCups:WATER_GOAL;
 }
-function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; }
-function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; return data.settings.vacation; }
+function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'active',reason:''}; }
+function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'active',reason:''}; return data.settings.vacation; }
 function isVacationDay(date){ var v=vacationSettings(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=(date||todayStr()); return d>=v.startAt&&d<=v.endAt; }
 function stepsGoal(date){ var d=date||todayStr(); if(isVacationDay(d)){ var p=(vacationSettings().preset||'relaxed'); return p==='active'?12000:(p==='moderate'?9000:5000); } var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
 function sleepGoalHours(date){ var d=date||todayStr(); if(isVacationDay(d)) return SLEEP_TICK_MIN-0.5; var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
@@ -2932,7 +2932,7 @@ App.toggleVacationCard=function(){ haptic(10); App.toggleCard('vacation'); };
 App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); v.enabled=flag===true||flag==='true'||flag===1; if(v.enabled&&(!v.startAt||!v.endAt)){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } save(); render(); };
 App.setVacationStart=function(val){ var v=ensureVacationSettings(); v.startAt=String(val||''); if(v.endAt&&v.startAt&&v.endAt<v.startAt){ v.endAt=v.startAt; } save(); render(); };
 App.setVacationEnd=function(val){ var v=ensureVacationSettings(); v.endAt=String(val||''); if(v.startAt&&v.endAt&&v.endAt<v.startAt){ v.startAt=v.endAt; } save(); render(); };
-App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'relaxed'); save(); updateCardByKey('vacation'); };
+App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'active'); save(); updateCardByKey('vacation'); };
 App.setVacationReason=function(reason){ var v=ensureVacationSettings(); v.reason=String(reason||'').trim(); save(); updateCardByKey('vacation'); };
 
 App.openEmergency=function(){ ui.emergency=true; render(); };
@@ -4487,8 +4487,6 @@ function vacationCardHTML(rec){
   var planned=v.enabled&&!active;
   var open=!!(ui.cards&&ui.cards['vacation']);
   var presets=[
-    {id:'relaxed',label:'Rahat',icon:'lamp'},
-    {id:'moderate',label:'Keşif',icon:'map-pin'},
     {id:'active',label:'Aktif',icon:'footprints'}
   ];
   var accent='var(--vacation)';
@@ -4531,7 +4529,7 @@ function vacationCardHTML(rec){
     h+='<div>'+icon('droplet',13)+' Su hedefi <b>'+VACATION_WATER_GOAL+' bardak</b> · seri sayacı duraklar</div>';
     h+='<div>'+icon('coffee',13)+' Kafein limiti %25 yukarı · Standart 400→500 mg</div>';
     h+='<div>'+icon('bed',13)+' Uyku hedefi <b>'+sleepG+' saat</b></div>';
-    h+='<div>'+icon('footprints',13)+' Adım hedefi <b>'+stepG+' adım</b> (preset’e göre)</div>';
+    h+='<div>'+icon('footprints',13)+' Adım hedefi <b>'+stepG+' adım</b></div>';
     h+='<div>'+icon('heart-handshake',13)+' Kriz odası butonları dinleniyor</div>';
     h+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">💡 Yatmadan 6 saat önce son kafein tavsiyesi hâlâ geçerli.</div>';
     h+='</div>';

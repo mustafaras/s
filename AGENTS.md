@@ -351,9 +351,45 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-22 (fix) — Panel arşiv senkronizasyonu: migrate backfill boot'ta kalıcılaştırılıyor
+
+**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı.
+
+**Sorun:** Kullanıcı deploy sonrası panelde eski okuma/izleme/dinleme kayıtlarının hâlâ görünmediğini bildirdi. Neden: `migrate()` içindeki `backfillArchivesFromDays(d)` arşiv kataloglarını sadece bellekte (in-memory) dolduruyordu; uygulama açılışında `render()`'dan sonra otomatik `save()` çağrısı olmadığı için değişiklik localStorage'a ve `seyma-data` GitHub reposuna senkronize olmuyordu.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - Açılış sonunda `render();` çağrısından hemen sonra `if(data){ save(); }` eklendi. Böylece `migrate()` sonrası oluşan arşiv backfill'i ilk açılışta kalıcılaşıyor ve senkronize ediliyor.
+- `index.html`
+  - Cache-bump: `?v=20260722e`.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `session-state/.../files/boot-persist-harness.js` — headless Node `vm` testi; eski veride yalnızca günlük kaydı olan günlerle boot edildiğinde, `migrate()` arşiv kataloglarını doldurduktan sonra `save()` çağrısının bu katalogları localStorage'a yazdığını ve `SeySync.schedule(data)` ile senkronizasyonun tetiklendiğini doğrular.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `archive-sync-harness.js` (headless Node `vm`) ✅: 27/27 assertion PASS.
+- `boot-persist-harness.js` (headless Node `vm`) ✅: 8/8 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Deploy durumu:**
+- `main`e squash-merge edildi ve pushlandı. GitHub Pages otomatik deploy edecek (`app.js?v=20260722e`).
+
+**Bir sonraki adım / kullanıcıya not:**
+- Telefonda uygulamayı bir kez kapatıp açmak yeterli. Yeni `app.js` yüklendiğinde `migrate()` eski günlük kayıtlarını arşiv kataloglarına aktaracak, ardından `save()` ile localStorage + `seyma-data`'ya yazacak.
+- Paneli bir dakika sonra yenileyince Kütüphane / İzleme Arşivi / Dinleme Arşivi kartlarının dolmaya başladığı görülebilir.
+- Eğer hâlâ görünmezse telefon tarayıcı/PWA önbelleğinin henüz güncellenmemiş olması muhtemeldir; bu durumda sayfayı yenilemek veya uygulamayı kapatıp açmak gerekir.
+
+---
+
 ### 2026-07-22 — Panel arşiv senkronizasyonu: okuma/izleme/dinleme kayıtları otomatik arşive promote ediliyor (onay bekliyor)
 
-**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı (ilk deploy sonrası kullanıcı geri bildirimiyle yukarıdaki fix eklendi).
 
 **Bu session'da değişen dosyalar:**
 - `app.js`

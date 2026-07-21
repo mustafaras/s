@@ -10052,6 +10052,7 @@ window.addEventListener('pageshow',function(){ pollRemote(); maybeFetchDailyPhot
 window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
+if(data){ save(); } // migrate() sonrası oluşan arşiv backfill'ini hemen kalıcılaştır ve senkronize et
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 
 // ÆON bildirim izni döngüsü: açık/kapa yok, izin verilene kadar 2 dk'da bir sessizce dener.

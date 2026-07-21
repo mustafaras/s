@@ -440,12 +440,13 @@ var DERIVED_ACCENT_P={water:"#5EA9E6",sleepReg:"#B9A6E6",walked20:"#7DD389",jour
 var CAFFEINE_MG_P={turk:60,espresso:60,filter:95,americano:77,cappuccino:63,latte:63,"black-tea":40,"green-tea":25,energy:80};
 var CAFFEINE_LABEL_P={turk:"Türk kahvesi",espresso:"Espresso",filter:"Filtre kahve",americano:"Americano",cappuccino:"Cappuccino",latte:"Latte","black-tea":"Siyah çay","green-tea":"Yeşil çay",energy:"Enerji içeceği"};
 function hhmmMinP(s){ if(!s||!/^\d{1,2}:\d{2}$/.test(s)) return null; var p=s.split(":"); return Number(p[0])*60+Number(p[1]); }
-function caffeineInfoP(rec){
+function caffeineInfoP(rec,date){
   var caf=rec&&rec.caffeine&&typeof rec.caffeine==="object"?rec.caffeine:{};
   var drinks=Array.isArray(caf.drinks)?caf.drinks:[], total=0,last=null,residue=0;
   drinks.forEach(function(d){ var mg=CAFFEINE_MG_P[d&&d.type]||0,q=Math.max(1,Number(d&&d.qty)||1); total+=mg*q; if(d&&d.time&&/^\d{2}:\d{2}$/.test(d.time)&&(!last||d.time>last)) last=d.time; });
   if(!drinks.length&&(Number(caf.cups)||0)>0){ total=(Number(caf.cups)||0)*60; last=caf.last||null; }
   var st=D&&D.settings?D.settings:{}, mode=st.caffeineMode, limit=mode==="pregnant"?200:(mode==="sensitive"?300:400), bed=/^\d{2}:\d{2}$/.test(st.targetBed||"")?st.targetBed:"23:30", bMin=hhmmMinP(bed);
+  if(isVacationDayP(date||today())) limit=Math.round(limit*1.25);
   drinks.forEach(function(d){ var t=hhmmMinP(d&&d.time); if(t==null||bMin==null) return; var dt=(bMin-t)/60; if(dt<0)dt+=24; residue+=(CAFFEINE_MG_P[d.type]||0)*Math.max(1,Number(d.qty)||1)*Math.pow(.5,dt/5); });
   var lastMin=hhmmMinP(last), cut=bMin==null||lastMin==null?true:(((bMin-lastMin+1440)%1440)>=360);
   return {drinks:drinks,total:Math.round(total),last:last,residue:Math.round(residue),limit:limit,amountOk:total<=limit,timingOk:cut};
@@ -460,7 +461,7 @@ function habitProgP(rec,key,date){
   if(key==="foodManaged"){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true}; }
   if(key==="coffeeManaged"){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true}; }
   if(key==="mediaFed"){ var hc=hubEntryCountP(rec); return {met:hc>0,cur:hc,goal:1,binary:true}; }
-  if(key==="caffeineOk"){ var ci=caffeineInfoP(rec); return {met:ci.amountOk&&(ci.drinks.length?ci.timingOk:true),cur:ci.total,goal:ci.limit,has:ci.drinks.length>0,amountOk:ci.amountOk,timingOk:ci.timingOk}; }
+  if(key==="caffeineOk"){ var ci=caffeineInfoP(rec,date); return {met:ci.amountOk&&(ci.drinks.length?ci.timingOk:true),cur:ci.total,goal:ci.limit,has:ci.drinks.length>0,amountOk:ci.amountOk,timingOk:ci.timingOk}; }
   return null;
 }
 function habitProgLabel(key,p){
@@ -2395,13 +2396,15 @@ function render(){
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[];
   if(caf){
-    var ci=caffeineInfoP(srec), drinks=ci.drinks;
+    var ci=caffeineInfoP(srec,UI.selectedDate), drinks=ci.drinks;
     if(ci.total>0) cafBits.push(ci.total+" mg");
     if(ci.last) cafBits.push("son "+esc(String(ci.last)));
     if(ci.residue>0) cafBits.push("yat. kalıntı "+ci.residue+" mg");
     if(caf.cups!=null&&caf.cups!==""&&!drinks.length) cafBits.push(esc(String(caf.cups))+" fincan");
+    if(isVacationDayP(UI.selectedDate)) cafBits.push("limit "+ci.limit+" mg (tatil)");
   }
-  exRows+=exRowAlways(icon('coffee',13)+' Kafein', cafBits.join(" · "));
+  var cafTitle=icon('coffee',13)+' Kafein'+(isVacationDayP(UI.selectedDate)?' · tatilde esnetildi':'');
+  exRows+=exRowAlways(cafTitle, cafBits.join(" · "));
   if(caf&&Array.isArray(caf.drinks)&&caf.drinks.length){
     var cafDetail=caf.drinks.map(function(d){ var q=Math.max(1,Number(d&&d.qty)||1); return esc((CAFFEINE_LABEL_P[d&&d.type]||d.type||"Kafein")+(q>1?" ×"+q:"")+(d&&d.time?" · "+d.time:"")); }).join(" · ");
     exRows+=exRowAlways(icon('clock',13)+' Kafein ayrıntısı', cafDetail);

@@ -185,7 +185,7 @@ var CAFFEINE_CUTOFF_H=6;        // yatandan önceki önerilen kafein kesme (saat
 var CAFFEINE_DEFAULT_BED='23:30';
 function caffeineType(id){ for(var i=0;i<CAFFEINE_TYPES.length;i++){ if(CAFFEINE_TYPES[i].id===id) return CAFFEINE_TYPES[i]; } return null; }
 function caffeineMode(){ var m=(data&&data.settings&&data.settings.caffeineMode)||'standard'; return (m==='sensitive'||m==='pregnant')?m:'standard'; }
-function caffeineLimit(){ return CAFFEINE_LIMITS[caffeineMode()]||400; }
+function caffeineLimit(date,mode){ var d=date||activeDate()||todayStr(); var m=mode||caffeineMode(); var base=CAFFEINE_LIMITS[m]||400; if(isVacationDay(d)) return Math.round(base*1.25); return base; }
 function caffeineTargetBed(){ var b=(data&&data.settings&&data.settings.targetBed)||CAFFEINE_DEFAULT_BED; return /^\d{2}:\d{2}$/.test(b)?b:CAFFEINE_DEFAULT_BED; }
 
 // ── Magnezyum Danışmanı sabitleri ──
@@ -1218,7 +1218,7 @@ function habitProgress(rec,key,date){
   if(key==='foodManaged'){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true,has:fd}; }
   if(key==='coffeeManaged'){ var kd=!!(rec&&rec.coffeeCravingDone); return {met:kd,cur:kd?1:0,goal:1,binary:true,has:kd}; }
   if(key==='mediaFed'){ var any=hasAnyHubEntry(rec); return {met:any,cur:any?1:0,goal:1,binary:true,has:any}; }
-  if(key==='caffeineOk'){ var cafTotal=caffeineTotalMg(rec); var cafLimit=caffeineLimit(); var cafLast=caffeineLastTime(rec); var cafHas=caffeineDrinks(rec).length>0; var amountOk=cafTotal<=cafLimit; var timingOk=caffeineTimingOk(rec); var met=amountOk&&(cafHas?timingOk:true); return {met:met,cur:cafTotal,goal:cafLimit,unit:'mg',has:cafHas,amountOk:amountOk,timingOk:timingOk}; }
+  if(key==='caffeineOk'){ var cafTotal=caffeineTotalMg(rec); var cafLimit=caffeineLimit(date); var cafLast=caffeineLastTime(rec); var cafHas=caffeineDrinks(rec).length>0; var amountOk=cafTotal<=cafLimit; var timingOk=caffeineTimingOk(rec); var met=amountOk&&(cafHas?timingOk:true); return {met:met,cur:cafTotal,goal:cafLimit,unit:'mg',has:cafHas,amountOk:amountOk,timingOk:timingOk}; }
   return null;
 }
 // day.habits[key]'i veriyle senkronlar; yeni yeşillenen anahtarları döndürür (kutlama için).
@@ -2910,7 +2910,7 @@ App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 // ── Kriz odaları (modal): Tatlı · Yemek · Kahve ──
-App.openCrisis=function(kind){ if(!CRISES[kind]) return; haptic([16,40,16]); var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day.savedAt=new Date().toISOString(); save(); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; ui.crisisTrigOpen=false; ui.crisisTriedOpen=false; lastCrisisKind=null; render(); };
+App.openCrisis=function(kind){ if(!CRISES[kind]) return; if(isVacationDay(todayStr())) return; haptic([16,40,16]); var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day.savedAt=new Date().toISOString(); save(); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; ui.crisisTrigOpen=false; ui.crisisTriedOpen=false; lastCrisisKind=null; render(); };
 App.closeCrisis=function(){ ui.crisisKind=null; render(); };
 App.toggleCrisisDropdown=function(which){ if(which==='trig') ui.crisisTrigOpen=!ui.crisisTrigOpen; else ui.crisisTriedOpen=!ui.crisisTriedOpen; render(); };
 App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); App.completeCrisis(); };
@@ -4523,7 +4523,18 @@ function vacationCardHTML(rec){
     for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:12.5px;font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
     h+='</div>';
     h+='<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Nereye / not</label><input type="text" value="'+esc(v.reason)+'" oninput="App.setVacationReason(this.value)" placeholder="örn. Bodrum, aile tatili" maxlength="80" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
-    h+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:var(--icon);border-radius:12px;padding:10px 12px;">'+icon('droplet',13)+' Tatil günlerinde su hedefi <b>'+VACATION_WATER_GOAL+' bardak</b>; seri sayacı otomatik duraklar. </div>';
+    var vacInfoAccent='var(--vacation)';
+    var sleepG=String(sleepGoalHours(activeDate())).replace('.',',');
+    var stepG=stepsGoal(activeDate()).toLocaleString('tr-TR');
+    h+='<div style="font-size:12px;color:var(--text2);line-height:1.55;background:var(--icon);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px;">';
+    h+='<div style="font-weight:800;color:'+vacInfoAccent+';display:flex;align-items:center;gap:6px;">'+icon('info',13)+' Tatilde neler esnetildi?</div>';
+    h+='<div>'+icon('droplet',13)+' Su hedefi <b>'+VACATION_WATER_GOAL+' bardak</b> · seri sayacı duraklar</div>';
+    h+='<div>'+icon('coffee',13)+' Kafein limiti %25 yukarı · Standart 400→500 mg</div>';
+    h+='<div>'+icon('bed',13)+' Uyku hedefi <b>'+sleepG+' saat</b></div>';
+    h+='<div>'+icon('footprints',13)+' Adım hedefi <b>'+stepG+' adım</b> (preset’e göre)</div>';
+    h+='<div>'+icon('heart-handshake',13)+' Kriz odası butonları dinleniyor</div>';
+    h+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">💡 Yatmadan 6 saat önce son kafein tavsiyesi hâlâ geçerli.</div>';
+    h+='</div>';
     h+='</div>';
   }
   h+='</div>';
@@ -5680,6 +5691,14 @@ function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;g
 function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:13px;color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
 // ── Raşit'in Kriz Odaları: üçlü, Raşit-temalı buton. Her biri süreli-bilimsel bir modal açar. ──
 function rasitActionsHTML(){
+  if(isVacationDay(todayStr())){
+    var vacAccent='var(--vacation)';
+    return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,'+vacAccent+' 28%, var(--card-bd));box-shadow:0 12px 30px color-mix(in srgb,'+vacAccent+' 14%, transparent);">'
+      +'<div style="display:flex;align-items:center;gap:11px;">'
+      +'<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--vacation2),var(--vacation));box-shadow:0 6px 16px var(--vacation-glow);">'+icon('heart-handshake',19)+'</span>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Tatil modunda kriz odası dinleniyor <span style="font-size:14px;">🦩</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit şu an uzakta; keyfini çıkar, bir şeyler sarpa sarılırsa yarın tekrar burada olur.</div></div>'
+      +'</div></div>';
+  }
   var day=(data&&data.days)?data.days[todayStr()]:null;
   var doneOf={sweet:!!(day&&day.craving10MinDone), food:!!(day&&day.foodCravingDone), coffee:!!(day&&day.coffeeCravingDone)};
   var tile=function(kind){
@@ -7071,7 +7090,8 @@ function caffeineCurveSVG(rec,bed){
 }
 function caffeineBlock(rec){
   var drinks=caffeineDrinks(rec);
-  var total=caffeineTotalMg(rec), limit=caffeineLimit(), mode=caffeineMode();
+  var date=activeDate();
+  var total=caffeineTotalMg(rec), limit=caffeineLimit(date), mode=caffeineMode(), baseLimit=CAFFEINE_LIMITS[mode]||400;
   var maxSingle=caffeineMaxSingle(rec), lastCaf=caffeineLastTime(rec);
   var bed=caffeineTargetBed(), cut=caffeineCutoffTime(bed);
   var residue=caffeineResidueAt(rec,bed), timingOk=caffeineTimingOk(rec);
@@ -7102,10 +7122,10 @@ function caffeineBlock(rec){
   }
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">';
   h+='<span style="font-size:10.5px;color:var(--faint);">Profil:</span>';
-  [['standard','Standart 400'],['sensitive','Hassas 300'],['pregnant','Gebe 200']].forEach(function(m){ var on=mode===m[0]; h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?A:'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,'+A+' 12%, var(--field))':'var(--field)')+';color:'+(on?A:'var(--muted)')+';border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">'+m[1]+'</button>'; });
+  [['standard','Standart'],['sensitive','Hassas'],['pregnant','Gebe']].forEach(function(m){ var on=mode===m[0]; var lbl=m[1]+' '+caffeineLimit(date,m[0]); h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?A:'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,'+A+' 12%, var(--field))':'var(--field)')+';color:'+(on?A:'var(--muted)')+';border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">'+lbl+'</button>'; });
   h+='<div style="margin-left:auto;display:flex;align-items:center;gap:5px;"><span style="font-size:10.5px;color:var(--faint);">Yatma</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div>';
   h+='</div>';
-  if(total>limit){ h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Günlük limit aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+limit+' mg.</div>'; }
+  if(total>limit){ var warnMsg=isVacationDay(date)?('Tatil modunda günlük limit esnetildi ('+total+'/'+limit+' mg). Normal günlerde üst sınır '+baseLimit+' mg.'):('Günlük limit aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+baseLimit+' mg.'); h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">'+warnMsg+'</div>'; }
   if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg. Aralara zaman koy.</div>'; }
   if(lastCaf&&!timingOk){ h+='<div style="font-size:11px;color:#9A6A2A;line-height:1.4;display:flex;gap:5px;"><span style="flex-shrink:0;">'+icon('clock',12)+'</span><span>Son kahve '+lastCaf+' — önerilen kesim '+cut+' (yatmadan '+CAFFEINE_CUTOFF_H+' sa önce). Bu saat uykuya geçişi zorlaştırabilir.</span></div>'; }
   h+='<div style="font-size:9.5px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa. mg ortalama serving başına.</div>';

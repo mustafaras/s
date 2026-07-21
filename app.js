@@ -629,6 +629,8 @@ function migrate(d){
   if(!Array.isArray(d.music.items)) d.music.items=[];
   if(!d.music.goal||typeof d.music.goal!=='object') d.music.goal={dailyMinutes:30,yearlyTitles:null};
   d.music.items=d.music.items.map(normTrack).filter(Boolean);
+  // Eski günlük okuma/izleme/dinleme kayıtlarını arşiv kataloglarına senkronize et.
+  try{ backfillArchivesFromDays(d); }catch(e){}
   // Vücut ölçüleri (haftalık kilo + tek-seferlik boy). Yeni alan — eski kayıtlara backfill.
   if(!d.body||typeof d.body!=='object') d.body={heightCm:null,heightSetAt:null,weights:[]};
   // Doğum tarihi: metabolik profil için yaş hesaplaması; cinsiyet kadın olarak sabit.
@@ -2072,6 +2074,15 @@ function findTitle(id){ var W=ensureWatchlist(); for(var i=0;i<W.items.length;i+
 function normTrack(x){ if(!x||typeof x!=='object') return null; if(!x.id) x.id=uid('m'); x.title=String(x.title==null?'':x.title); x.artist=String(x.artist==null?'':x.artist); if(['sarki','album','podcast'].indexOf(x.kind)<0) x.kind='sarki'; x.genre=String(x.genre==null?'':x.genre); if(!x.emoji) x.emoji=''; x.rating=(x.rating==null||x.rating==='')?null:Math.max(1,Math.min(5,Math.round(Number(x.rating)||0))); if(!Array.isArray(x.quotes)) x.quotes=[]; if(!x.createdAt) x.createdAt=new Date().toISOString(); return x; }
 function ensureMusic(){ if(!data.music||typeof data.music!=='object') data.music=emptyMusic(); if(!Array.isArray(data.music.items)) data.music.items=[]; if(!data.music.goal||typeof data.music.goal!=='object') data.music.goal={dailyMinutes:30,yearlyTitles:null}; return data.music; }
 function findTrack(id){ var M=ensureMusic(); for(var i=0;i<M.items.length;i++){ if(M.items[i]&&M.items[i].id===id) return M.items[i]; } return null; }
+// ---- günlük kayıtları ↔ arşiv katalogları senkronizasyonu ----
+function normalizeMatch(s){ return String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' ').replace(/[İ]/g,'i').replace(/[I]/g,'ı'); }
+function findBookByEntry(title,author){ var L=ensureLibrary(); var nt=normalizeMatch(title), na=normalizeMatch(author); for(var i=0;i<L.books.length;i++){ var b=L.books[i]; if(!b) continue; if(normalizeMatch(b.title)===nt && normalizeMatch(b.author)===na) return b; } return null; }
+function findTitleByEntry(title,kind){ var W=ensureWatchlist(); var nt=normalizeMatch(title), nk=(kind==='dizi'?'dizi':'film'); for(var i=0;i<W.items.length;i++){ var t=W.items[i]; if(!t) continue; if(normalizeMatch(t.title)===nt && t.kind===nk) return t; } return null; }
+function findTrackByEntry(title,artist,kind){ var M=ensureMusic(); var nt=normalizeMatch(title), na=normalizeMatch(artist), nk=(['sarki','album','podcast'].indexOf(kind)>=0)?kind:'sarki'; for(var i=0;i<M.items.length;i++){ var x=M.items[i]; if(!x) continue; if(normalizeMatch(x.title)===nt && normalizeMatch(x.artist)===na && x.kind===nk) return x; } return null; }
+function syncEntryToLibrary(entry){ if(!entry||!entry.title) return null; var L=ensureLibrary(); var b=null; if(entry.bookId){ b=findBook(entry.bookId); } if(!b){ b=findBookByEntry(entry.title,entry.author); } if(!b){ b=normBook({title:entry.title,author:String(entry.author||''),currentPage:0,totalPages:null,status:'reading',startedAt:entry.ts||new Date().toISOString()}); L.books.unshift(b); } entry.bookId=b.id; return b; }
+function syncEntryToWatchlist(entry){ if(!entry||!entry.title) return null; var W=ensureWatchlist(); var t=null; if(entry.itemId){ t=findTitle(entry.itemId); } if(!t){ t=findTitleByEntry(entry.title,entry.kind); } if(!t){ var isDizi=entry.kind==='dizi'; t=normTitle({title:entry.title,kind:isDizi?'dizi':'film',watchedEp:0,totalEp:isDizi?null:1,status:'watching',startedAt:entry.ts||new Date().toISOString()}); W.items.unshift(t); } entry.itemId=t.id; return t; }
+function syncEntryToMusic(entry){ if(!entry||!entry.title) return null; var M=ensureMusic(); var x=null; if(entry.itemId){ x=findTrack(entry.itemId); } if(!x){ x=findTrackByEntry(entry.title,entry.artist,entry.kind); } if(!x){ x=normTrack({title:entry.title,artist:String(entry.artist||''),kind:entry.kind,createdAt:entry.ts||new Date().toISOString()}); M.items.unshift(x); } entry.itemId=x.id; return x; }
+function backfillArchivesFromDays(d){ var savedData=data; try{ data=d; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var day=data.days[date]; if(!day||typeof day!=='object') return; if(day.reading&&Array.isArray(day.reading.entries)) day.reading.entries.forEach(syncEntryToLibrary); if(day.watching&&Array.isArray(day.watching.entries)) day.watching.entries.forEach(syncEntryToWatchlist); if(day.listening&&Array.isArray(day.listening.entries)) day.listening.entries.forEach(syncEntryToMusic); }); }finally{ data=savedData; } }
 function bookPct(b){ if(!b||!b.totalPages||b.totalPages<=0) return b&&b.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((b.currentPage/b.totalPages)*100))); }
 function titlePct(t){ if(!t) return 0; if(!t.totalEp||t.totalEp<=0) return t.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((t.watchedEp/t.totalEp)*100))); }
 // istatistik
@@ -2661,6 +2672,7 @@ App.addReading=function(){
   var bookId=ui.logBookId||null; var justFinished=false;
   if(bookId){ var bk=findBook(bookId); if(bk){ justFinished=bumpBookProgress(bk,pages); } else bookId=null; }
   var entry={ id:uid('r'), title:title.slice(0,120), author:String(d.author||'').trim().slice(0,80), pages:pages, minutes:minutes, note:String(d.note||'').trim().slice(0,240), bookId:bookId, ts:new Date().toISOString() };
+  if(!entry.bookId){ var linkedBook=syncEntryToLibrary(entry); if(linkedBook && pages>0){ justFinished=bumpBookProgress(linkedBook,pages); } }
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!day.reading||typeof day.reading!=='object') day.reading=emptyReading();
   if(!Array.isArray(day.reading.entries)) day.reading.entries=[];
@@ -2723,6 +2735,7 @@ App.addWatching=function(){
   var itemId=ui.logItemId||null; var justFinished=false;
   if(itemId){ var it=findTitle(itemId); if(it){ justFinished=bumpTitleProgress(it,episodes||0); } else itemId=null; }
   var entry={ id:uid('we'), title:title.slice(0,120), kind:kind, episodes:episodes, minutes:minutes, note:String(d.note||'').trim().slice(0,240), itemId:itemId, ts:new Date().toISOString() };
+  if(!entry.itemId){ var linkedTitle=syncEntryToWatchlist(entry); if(linkedTitle){ justFinished=bumpTitleProgress(linkedTitle,kind==='dizi'?(episodes||0):1); } }
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!day.watching||typeof day.watching!=='object') day.watching=emptyWatching();
   if(!Array.isArray(day.watching.entries)) day.watching.entries=[];
@@ -2774,6 +2787,7 @@ App.addListening=function(){
   var minutes=parseInt(d.minutes,10); if(isNaN(minutes)||minutes<0) minutes=null;
   var itemId=ui.logTrackId||null; if(itemId&&!findTrack(itemId)) itemId=null;
   var entry={ id:uid('l'), title:title.slice(0,120), artist:String(d.artist||'').trim().slice(0,80), kind:kind, minutes:minutes, note:String(d.note||'').trim().slice(0,240), itemId:itemId, ts:new Date().toISOString() };
+  if(!entry.itemId){ syncEntryToMusic(entry); }
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!day.listening||typeof day.listening!=='object') day.listening=emptyListening();
   if(!Array.isArray(day.listening.entries)) day.listening.entries=[];

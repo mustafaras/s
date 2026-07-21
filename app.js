@@ -644,7 +644,7 @@ function migrate(d){
   if(!Array.isArray(d.labResults)) d.labResults=[];
   d.labResults=d.labResults.filter(function(x){ return x&&typeof x==='object'&&x.id&&Array.isArray(x.files); });
   // Veri-güdümlü tikleri bugüne göre bir kez hizala (geçmiş günlere dokunma — kayıt bütünlüğü).
-  try{ var _t=todayStr(); if(d.days&&d.days[_t]&&d.days[_t].habits) syncDerivedHabits(d.days[_t]); }catch(e){}
+  try{ var _t=todayStr(); if(d.days&&d.days[_t]&&d.days[_t].habits) syncDerivedHabits(d.days[_t],_t); }catch(e){}
   // Profil değerlendirmesi (data.profileAssessment) — data.psych'ten ayrı, tek seferlik.
   try{ ensureProfileAssessment(d); }catch(e){}
   // Günün fotoğrafı (Wikimedia Commons POTD) — önbellek + metadata.
@@ -718,6 +718,13 @@ function migrate(d){
   if(typeof d.settings.auth.rememberMe!=='boolean') d.settings.auth.rememberMe=false;
   if(typeof d.settings.auth.unlockedAt!=='string'&&d.settings.auth.unlockedAt!==null) d.settings.auth.unlockedAt=null;
   if(typeof d.settings.auth.unlockCount!=='number'||isNaN(d.settings.auth.unlockCount)) d.settings.auth.unlockCount=0;
+  // Tatil Modu 🌴 — gezi dönemlerinde su hedefi 10 bardak + streak pause.
+  if(!d.settings.vacation||typeof d.settings.vacation!=='object') d.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''};
+  if(typeof d.settings.vacation.enabled!=='boolean') d.settings.vacation.enabled=false;
+  if(typeof d.settings.vacation.startAt!=='string') d.settings.vacation.startAt='';
+  if(typeof d.settings.vacation.endAt!=='string') d.settings.vacation.endAt='';
+  if(d.settings.vacation.preset!=='relaxed'&&d.settings.vacation.preset!=='moderate'&&d.settings.vacation.preset!=='active') d.settings.vacation.preset='relaxed';
+  if(typeof d.settings.vacation.reason!=='string') d.settings.vacation.reason='';
   d.version=2;
   return d;
 }
@@ -911,7 +918,7 @@ var MEAL_UNITS=[
 ];
 // Birim → yaklaşık gram. Yiyecek özel değeri varsa FOOD_DB'deki units objesi onu ezer.
 var DEFAULT_UNIT_GRAMS={porsiyon:150,tabak:200,kase:200,kasik:15,'corba-kasigi':15,'tatli-kasigi':5,'cay-kasigi':3,bardak:200,'su-bardagi':200,'cay-bardagi':100,avuc:30,dilim:30,paket:25};
-var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
+var PROTEIN_GOAL=60, CAL_GOAL=1800, WATER_GOAL=8, VACATION_WATER_GOAL=10, STEP_TICK_MIN=4500, SLEEP_TICK_MIN=7.5, STEP_LEN_M=0.72;
 function foodLookup(name){
   var n=String(name||'').toLowerCase().trim(); if(!n) return null;
   for(var i=0;i<FOOD_DB.length;i++){ var f=FOOD_DB[i]; for(var j=0;j<f.k.length;j++){ if(n.indexOf(f.k[j])>=0) return f; } }
@@ -975,9 +982,17 @@ function calGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (ty
 function carbsGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.carbs==='number'&&!isNaN(t.carbs))?t.carbs:Math.round(CAL_GOAL*0.47/4); }
 function fatGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.fat==='number'&&!isNaN(t.fat))?t.fat:Math.round(CAL_GOAL*0.27/9); }
 function fiberGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.fiber==='number'&&!isNaN(t.fiber))?t.fiber:25; }
-function waterGoalCups(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.waterCups==='number'&&!isNaN(t.waterCups))?t.waterCups:WATER_GOAL; }
-function stepsGoal(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
-function sleepGoalHours(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
+function waterGoalCups(date){
+  var d=date||todayStr();
+  if(isVacationDay(d)) return VACATION_WATER_GOAL;
+  var t=(data.settings&&data.settings.targets)||{};
+  return (typeof t.waterCups==='number'&&!isNaN(t.waterCups))?t.waterCups:WATER_GOAL;
+}
+function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; }
+function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'relaxed',reason:''}; return data.settings.vacation; }
+function isVacationDay(date){ var v=vacationSettings(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=(date||todayStr()); return d>=v.startAt&&d<=v.endAt; }
+function stepsGoal(date){ var d=date||todayStr(); if(isVacationDay(d)){ var p=(vacationSettings().preset||'relaxed'); return p==='active'?12000:(p==='moderate'?9000:5000); } var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
+function sleepGoalHours(date){ var d=date||todayStr(); if(isVacationDay(d)) return SLEEP_TICK_MIN-0.5; var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
 function caffeineMaxMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.caffeineMaxMg==='number'&&!isNaN(t.caffeineMaxMg))?t.caffeineMaxMg:400; }
 function magnesiumGoalMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.magnesiumMg==='number'&&!isNaN(t.magnesiumMg))?t.magnesiumMg:320; }
 function ironGoalMg(){ var t=(data.settings&&data.settings.targets)||{}; return (typeof t.ironMg==='number'&&!isNaN(t.ironMg))?t.ironMg:18; }
@@ -1194,10 +1209,10 @@ function hasAnyHubEntry(rec){
   for(var i=0;i<keys.length;i++){ var o=rec[keys[i]]; if(o&&Array.isArray(o.entries)&&o.entries.some(function(e){ return e&&((e.title&&String(e.title).trim())||(e.topic&&String(e.topic).trim())); })) return true; }
   return false;
 }
-function habitProgress(rec,key){
-  if(key==='water'){ var w=(rec&&typeof rec.water==='number'&&rec.water>0)?rec.water:0; return {met:w>=WATER_GOAL,cur:w,goal:WATER_GOAL,unit:'bardak',has:w>0}; }
-  if(key==='sleepReg'){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; return {met:(h!=null&&h>=SLEEP_TICK_MIN),cur:h,goal:SLEEP_TICK_MIN,unit:'saat',has:h!=null}; }
-  if(key==='walked20'){ var e=effSteps(rec); var s=(e.steps!=null&&!isNaN(e.steps))?e.steps:0; return {met:s>=STEP_TICK_MIN,cur:s,goal:STEP_TICK_MIN,unit:'adım',has:s>0,source:e.source}; }
+function habitProgress(rec,key,date){
+  if(key==='water'){ var w=(rec&&typeof rec.water==='number'&&rec.water>0)?rec.water:0; var g=waterGoalCups(date); return {met:w>=g,cur:w,goal:g,unit:'bardak',has:w>0}; }
+  if(key==='sleepReg'){ var h=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null; if(h!=null&&isNaN(h)) h=null; var sg=sleepGoalHours(date); return {met:(h!=null&&h>=sg),cur:h,goal:sg,unit:'saat',has:h!=null}; }
+  if(key==='walked20'){ var e=effSteps(rec); var s=(e.steps!=null&&!isNaN(e.steps))?e.steps:0; var stg=stepsGoal(date); return {met:s>=stg,cur:s,goal:stg,unit:'adım',has:s>0,source:e.source}; }
   if(key==='journaled'){ var nt=(rec&&(String(rec.note||'').trim()||String((rec.journal&&rec.journal.text)||'').trim()))?1:0; return {met:nt>0,cur:nt,goal:1,binary:true,has:nt>0}; }
   if(key==='sweetManaged'){ var cd=!!(rec&&rec.craving10MinDone); return {met:cd,cur:cd?1:0,goal:1,binary:true,has:cd}; }
   if(key==='foodManaged'){ var fd=!!(rec&&rec.foodCravingDone); return {met:fd,cur:fd?1:0,goal:1,binary:true,has:fd}; }
@@ -1207,10 +1222,11 @@ function habitProgress(rec,key){
   return null;
 }
 // day.habits[key]'i veriyle senkronlar; yeni yeşillenen anahtarları döndürür (kutlama için).
-function syncDerivedHabits(day){
+function syncDerivedHabits(day,date){
   if(!day||!day.habits) return [];
+  var d=date||activeDate()||todayStr();
   var newly=[];
-  for(var k in DERIVED_HABITS){ var p=habitProgress(day,k); if(!p) continue; if(p.met&&!day.habits[k]) newly.push(k); day.habits[k]=p.met; }
+  for(var k in DERIVED_HABITS){ var p=habitProgress(day,k,d); if(!p) continue; if(p.met&&!day.habits[k]) newly.push(k); day.habits[k]=p.met; }
   return newly;
 }
 function hexA(hex,a){ var s=String(hex).replace('#',''); if(s.length===3) s=s[0]+s[0]+s[1]+s[1]+s[2]+s[2]; var n=parseInt(s,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
@@ -1235,7 +1251,7 @@ function habitRowHTML(o){
 }
 // Türetilmiş tik'in (henüz tutmayan) kısa, kibar ilerleme metni.
 function derivedProgText(key,prog){
-  if(key==='water') return prog.cur<=0?'Su ekle · '+WATER_GOAL+' bardakta otomatik yeşil':prog.cur+'/'+WATER_GOAL+' bardak · dolunca otomatik yeşil';
+  if(key==='water'){ var g=prog.goal||WATER_GOAL; return prog.cur<=0?'Su ekle · '+g+' bardakta otomatik yeşil':prog.cur+'/'+g+' bardak · dolunca otomatik yeşil'; }
   if(key==='sleepReg') return prog.cur==null?'Uyku gir · 7,5 saatte otomatik yeşil':String(prog.cur).replace('.',',')+' saat · 7,5 saatte otomatik yeşil';
   if(key==='walked20') return prog.cur<=0?'Adım gir · 4.500 adımda otomatik yeşil':prog.cur.toLocaleString('tr-TR')+' / 4.500 adım · otomatik yeşil';
   if(key==='journaled') return 'Yansıma kartına bir not yaz → kendiliğinden yeşillenir';
@@ -2117,11 +2133,11 @@ function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if
 function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:10px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
-function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else c=0; }); return b; }
+function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else if(isVacationDay(d.date)){ /* seri dondur; sayaç artmaz, kırılmaz */ } else c=0; }); return b; }
 function topMood(moods){ var k=null,m=0; for(var x in moods){ if(moods[x]>m){m=moods[x];k=x;} } var o=k?find(MOODS,'id',k):null; return o?o.label:'—'; }
 function moodEmoji(id,size){ var o=find(MOODS,'id',id); return o?icon(o.icon,size||22):''; }
 function find(arr,key,val){ for(var i=0;i<arr.length;i++){ if(arr[i][key]===val) return arr[i]; } return null; }
-function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<4) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ if(countRec(data.days[date])>=4){ c++; date=addDays(date,-1); } else break; } return c; }
+function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<4&&!isVacationDay(date)) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ if(countRec(data.days[date])>=4){ c++; date=addDays(date,-1); } else if(isVacationDay(date)){ date=addDays(date,-1); } else break; } return c; }
 function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
 function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRepo); }
 function savedToday(){ return data.lastSyncDate===todayStr(); }
@@ -2190,7 +2206,7 @@ function editBanner(){
     +'</div>';
 }
 window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; }); if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; }); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
-function save(){ try{ var _d=data&&data.days&&data.days[activeDate()]; if(_d&&_d.habits) syncDerivedHabits(_d); }catch(e){} try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
+function save(){ try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){} try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
 function commit(msg){ save(); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
 function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
@@ -2589,7 +2605,8 @@ App.toggleMgHabit=function(){
 App.explainDerivedHabit=function(key,day){
   var p=habitProgress(day,key); if(!p) return; haptic(10);
   if(p.met){
-    var ok={ water:'Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak. Bu tik otomatik, ellemene gerek yok.',
+    var g=waterGoalCups();
+    var ok={ water:'Su tamam — '+g+'/'+g+' bardak. Bu tik otomatik, ellemene gerek yok.',
              sleepReg:'Uyku tamam — 7,5+ saat. Bu tik kendiliğinden yeşil kalır.',
              walked20:'Yürüyüş tamam — 4.500+ adım. Bu tik kendiliğinden yeşil kalır.',
              journaled:'Not tamam — bugün yazdın. Bu tik kendiliğinden yeşil kalır.',
@@ -2605,15 +2622,15 @@ App.explainDerivedHabit=function(key,day){
   if(key==='foodManaged'){ App.openCrisis('food'); return; }
   if(key==='coffeeManaged'){ App.openCrisis('coffee'); return; }
   var msg;
-  if(key==='water'){ var w=p.cur; msg = w<=0
-      ? 'Su tiki otomatik: '+WATER_GOAL+' bardağı tamamlayınca kendiliğinden yeşillenir. Aşağıdaki “Su” kartından eklemeye başla.'
-      : 'Su tikine az kaldı — şu an '+w+'/'+WATER_GOAL+' bardak. '+(WATER_GOAL-w)+' bardak daha, kendiliğinden yeşillenecek.'; }
-  else if(key==='sleepReg'){ var h=p.cur; msg = h==null
-      ? 'Uyku tiki otomatik: Sağlık kartına 7,5 saat ve üzeri uyku girince kendiliğinden yeşillenir.'
-      : 'Uyku tiki 7,5 saatte yeşillenir — şu an '+String(h).replace('.',',')+' saat. Girişini güncelleyince otomatik dolar.'; }
-  else if(key==='walked20'){ var s=p.cur; msg = s<=0
-      ? 'Yürüyüş tiki otomatik: 4.500 adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'
-      : 'Yürüyüş tikine '+(STEP_TICK_MIN-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+STEP_TICK_MIN.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'; }
+  if(key==='water'){ var w=p.cur; var g=p.goal||waterGoalCups(); msg = w<=0
+      ? 'Su tiki otomatik: '+g+' bardağı tamamlayınca kendiliğinden yeşillenir. Aşağıdaki “Su” kartından eklemeye başla.'
+      : 'Su tikine az kaldı — şu an '+w+'/'+g+' bardak. '+(g-w)+' bardak daha, kendiliğinden yeşillenecek.'; }
+  else if(key==='sleepReg'){ var h=p.cur; var sg=(p.goal||sleepGoalHours()); msg = h==null
+      ? 'Uyku tiki otomatik: Sağlık kartına '+String(sg).replace('.',',')+' saat ve üzeri uyku girince kendiliğinden yeşillenir.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')
+      : 'Uyku tiki '+String(sg).replace('.',',')+' saatte yeşillenir'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')+' — şu an '+String(h).replace('.',',')+' saat. Girişini güncelleyince otomatik dolar.'; }
+  else if(key==='walked20'){ var s=p.cur; var stg=(p.goal||stepsGoal()); msg = s<=0
+      ? 'Yürüyüş tiki otomatik: '+stg.toLocaleString('tr-TR')+' adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')
+      : 'Yürüyüş tikine '+(stg-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+stg.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':''); }
   else if(key==='journaled'){ msg='Not tiki otomatik: “Günün yansıması” kartına bir cümle bile yazınca kendiliğinden yeşillenir.'; }
   else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim kutucuklarından birini doldur → yeşillenir.'; }
   else if(key==='caffeineOk'){ if(!p.amountOk) msg='Kafein tiki otomatik: günlük limit ('+p.goal+' mg) aşıldı — içeceği azaltınca kendiliğinden düzelir.'; else if(!p.timingOk) msg='Kafein tiki otomatik: miktar tamam ama son kahve önerilen saatten geç. Sağlık kartından saatini erkene çekince yeşillenir.'; else msg='Kafein tiki otomatik: bugün temiz — kendiliğinden yeşil.'; }
@@ -2635,7 +2652,7 @@ App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[
 App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- su ----
-App.waterAdd=function(n){ var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ haptic(16); toast('Su tamam — '+WATER_GOAL+'/'+WATER_GOAL+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(); };
+App.waterAdd=function(n){ var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ var g=waterGoalCups(); haptic(16); toast('Su tamam — '+g+'/'+g+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(); };
 
 // ---- enerji / stres ----
 App.setEnergy=function(v){ var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); haptic(10); save(); updateCardByKey('mood'); updateCardByKey('mental'); };
@@ -2910,6 +2927,14 @@ App.onJournalText=function(el){ ui.journalText=String(el.value||''); updateJourn
 App.useJournalPrompt=function(){ ui.journalPromptUsed=journalPhasePrompt(ui.journalMode||'free'); updateJournalPromptLine(); setTimeout(function(){ var t=document.getElementById('sey-journal-text'); if(t) t.focus(); },40); };
 App.saveJournal=function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); var j=day.journal; var text=String(ui.journalText||'').trim(); var goal=data.settings.journalGoal||{words:30,chars:140}; var words=text?text.split(/\s+/).filter(function(w){return w.length>0;}).length:0; var chars=text.length; j.text=text; j.mode=ui.journalMode||'free'; j.promptUsed=String(ui.journalPromptUsed||'').trim(); j.wordCount=words; j.charCount=chars; j.metGoal=(words>=goal.words||chars>=goal.chars); j.streakAtSave=journalStreak(); j.savedAt=new Date().toISOString(); var newly=syncDerivedHabits(day); save(); updateCardByKey('reflection'); updateCardByKey('habits'); ui.journalOpen=false; ui.journalText=''; ui.journalPromptUsed=''; lastJournalKind=null; render(); if(newly.indexOf('journaled')>=0){ haptic(14); toast('Günlük Işığı tiki yeşillendi ✨'); } else { toast('Günlük Işığı kaydedildi ✨',1800); } };
 
+// ── Tatil Modu handler'ları
+App.toggleVacationCard=function(){ haptic(10); App.toggleCard('vacation'); };
+App.setVacationEnabled=function(flag){ var v=ensureVacationSettings(); v.enabled=flag===true||flag==='true'||flag===1; if(v.enabled&&(!v.startAt||!v.endAt)){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } save(); render(); };
+App.setVacationStart=function(val){ var v=ensureVacationSettings(); v.startAt=String(val||''); if(v.endAt&&v.startAt&&v.endAt<v.startAt){ v.endAt=v.startAt; } save(); render(); };
+App.setVacationEnd=function(val){ var v=ensureVacationSettings(); v.endAt=String(val||''); if(v.startAt&&v.endAt&&v.endAt<v.startAt){ v.startAt=v.endAt; } save(); render(); };
+App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); v.preset=String(preset||'relaxed'); save(); updateCardByKey('vacation'); };
+App.setVacationReason=function(reason){ var v=ensureVacationSettings(); v.reason=String(reason||'').trim(); save(); updateCardByKey('vacation'); };
+
 App.openEmergency=function(){ ui.emergency=true; render(); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
 App.continueEmergency=function(){ ui.emergency=false; render(); toast('İşte bu. Reset dediğin bazen sadece bir sonraki doğru hamledir.',3000); };
@@ -3117,6 +3142,10 @@ App.toggleCard=function(key){
   // kayıtsız kartlarda durumu değiştirip tam render ederek kesin ve anlaşılır kılar.
   if(!CARD_BUILDERS[key]){ ui.cards[key]=willOpen; haptic(8); render(); return; }
   var el=document.querySelector('[data-cardkey="'+key+'"]');
+  if(!el){
+    // Kart DOM'da yoksa (ör. headless render veya stale state) tam render'a düş.
+    ui.cards[key]=willOpen; haptic(8); render(); return;
+  }
   if(!willOpen && el){
     animateCardCollapse(el, function(){ ui.cards[key]=false; updateCardByKey(key); });
     return;
@@ -3874,7 +3903,7 @@ function targetsCardHTML(rec){
   var nu=dayNutrition(rec);
   var cal=tOk?t.calories:calGoal();
   var pro=tOk?t.protein:proteinGoal();
-  var water=tOk?t.waterCups:waterGoalCups();
+  var water=tOk?t.waterCups:waterGoalCups(activeDate());
   var steps=tOk?t.steps:stepsGoal();
   var sleep=tOk?t.sleepHours:sleepGoalHours();
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')">';
@@ -3909,15 +3938,16 @@ function targetsCardHTML(rec){
 
 function waterCard(rec){
   var w=rec&&typeof rec.water==='number'?rec.water:0;
-  var pct=Math.min(100,Math.round(w/WATER_GOAL*100));
+  var g=waterGoalCups(activeDate());
+  var pct=Math.min(100,Math.round(w/g*100));
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent);font-size:16px;">'+w+'</b> / '+WATER_GOAL+' bardak</div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent);font-size:16px;">'+w+'</b> / '+g+' bardak</div></div>';
   h+='<div style="display:flex;gap:5px;">';
-  for(var i=0;i<WATER_GOAL;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);color:#fff;':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?icon('droplet',14):'')+'</div>'; }
+  for(var i=0;i<g;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);color:#fff;':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?icon('droplet',14):'')+'</div>'; }
   h+='</div>';
-  if(w>WATER_GOAL){ h+='<div style="font-size:11.5px;color:var(--faint);">+'+(w-WATER_GOAL)+' bardak ekstra, harika</div>'; }
+  if(w>g){ h+='<div style="font-size:11.5px;color:var(--faint);">+'+(w-g)+' bardak ekstra, harika</div>'; }
   var waterTicked=!!(rec&&rec.habits&&rec.habits.water);
-  if(waterTicked&&w<WATER_GOAL&&!ui.waterNudgeHidden){
+  if(waterTicked&&w<g&&!ui.waterNudgeHidden){
     h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(127,179,232,0.16),rgba(155,127,201,0.12));border:1px solid rgba(127,179,232,0.4);border-radius:14px;padding:11px 12px;">';
     h+='<span style="flex-shrink:0;display:inline-flex;">'+icon('droplet',18)+'</span>';
     h+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Su tikin işaretli. Kaç bardak içtiğini de girersen takibin daha net olur. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
@@ -4450,6 +4480,57 @@ function weatherHeaderHTML(greet){
   h+='</div>';
   return h;
 }
+// ── Tatil Modu kartı: Günışığı hava kartının hemen üstünde, açıkken tarih/preset/reason girişi.
+function vacationCardHTML(rec){
+  var v=ensureVacationSettings();
+  var active=v.enabled&&isVacationDay(activeDate());
+  var planned=v.enabled&&!active;
+  var open=!!(ui.cards&&ui.cards['vacation']);
+  var presets=[
+    {id:'relaxed',label:'Rahat',icon:'lamp'},
+    {id:'moderate',label:'Keşif',icon:'map-pin'},
+    {id:'active',label:'Aktif',icon:'footprints'}
+  ];
+  var accent='var(--vacation)';
+  var accentHex=dark?'#5ED4B4':'#2A9D8F';
+  var frame=open
+    ? 'border:1px solid color-mix(in srgb,'+accent+' 38%, var(--card-bd));box-shadow:0 14px 34px rgba(42,157,143,0.14),inset 0 1px 0 rgba(255,255,255,0.4);'
+    : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 6px 18px rgba(42,157,143,0.08),inset 0 1px 0 rgba(255,255,255,0.28);';
+  var h='<div class="glass sey-vacation-card" data-cardkey="vacation" data-open="'+(open?'1':'0')+'" style="position:relative;overflow:hidden;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+'">';
+  h+='<span class="sey-vacation-sheen" style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);animation:seyShimmer 3.2s ease-in-out infinite;pointer-events:none;"></span>';
+  h+='<div onclick="App.toggleVacationCard()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  h+='<span style="display:inline-flex;color:'+accent+';">'+icon('plane',20)+'</span>';
+  var badgeColor=active?accentHex:(planned?hexA(accentHex,0.85):(dark?'rgba(169,160,155,0.85)':'rgba(120,113,108,0.8)'));
+  var badgeBg=active?hexA(accentHex,0.14):(planned?hexA(accentHex,0.09):(dark?'rgba(169,160,155,0.18)':'rgba(120,113,108,0.12)'));
+  var badgeText=active?'AKTİF':(planned?'Planlandı':'Kapalı');
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;">Tatil Modu <span style="font-size:9.5px;font-weight:800;letter-spacing:.6px;color:'+badgeColor+';background:'+badgeBg+';border-radius:6px;padding:1.5px 5px;">'+badgeText+'</span></div>';
+  var sub;
+  if(active) sub='Tatildesin — su hedefi '+VACATION_WATER_GOAL+' bardak · seri duraklatıldı';
+  else if(planned) sub='Tatil planlandı — belirttiğin günlerde su 10 bardak, seri duraklar';
+  else sub='Tatil günlerinde su hedefi 10 bardak, seri duraklar';
+  if(v.startAt&&v.endAt) sub+=' · '+esc(shortDate(v.startAt))+'–'+esc(shortDate(v.endAt))+(v.reason?' · '+esc(v.reason):'');
+  h+='<div style="font-size:12px;color:var(--faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sub+'</div></div>';
+  h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
+  h+='</div>';
+  if(open){
+    h+='<div style="position:relative;display:flex;flex-direction:column;gap:12px;animation:seyFade .2s ease;">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:13px;font-weight:700;color:var(--text2);">Tatil modunu aç</div><button onclick="App.setVacationEnabled('+(v.enabled?'false':'true')+')" style="border:none;cursor:pointer;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;color:'+(v.enabled?'#fff':'var(--text2)')+';background:'+(v.enabled?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';" data-on="'+(v.enabled?'1':'0')+'">'+(v.enabled?'Kapat':'Aç')+'</button></div>';
+    h+='<div style="display:flex;gap:8px;">';
+    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Başlangıç</label><input type="date" value="'+esc(v.startAt)+'" onchange="App.setVacationStart(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Bitiş</label><input type="date" value="'+esc(v.endAt)+'" onchange="App.setVacationEnd(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:8px;">';
+    for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:12.5px;font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
+    h+='</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Nereye / not</label><input type="text" value="'+esc(v.reason)+'" oninput="App.setVacationReason(this.value)" placeholder="örn. Bodrum, aile tatili" maxlength="80" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:var(--icon);border-radius:12px;padding:10px 12px;">'+icon('droplet',13)+' Tatil günlerinde su hedefi <b>'+VACATION_WATER_GOAL+' bardak</b>; seri sayacı otomatik duraklar. </div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+CARD_BUILDERS['vacation']=vacationCardHTML;
+
 function onThisDayCard(){
   var today=todayStr(); var mmdd=today.slice(5); var curY=parseInt(today.slice(0,4),10);
   var best=null;
@@ -5445,15 +5526,16 @@ function heroStatTile(ic,val,label,accent,met){
 function heroStatsHTML(rec){
   var mo=(rec&&rec.mood)?find(MOODS,'id',rec.mood):null;
   var water=rec?(Number(rec.water)||0):0;
+  var wg=waterGoalCups(activeDate());
   var sh=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null;
   var es=effSteps(rec);
   var stepTxt='—';
   if(es.steps!=null){ stepTxt=es.steps>=1000?((es.steps/1000).toFixed(es.steps%1000===0?0:1).replace('.',',')+'B'):String(es.steps); }
   var h='<div style="display:flex;gap:7px;">';
   h+=heroStatTile(mo?mo.icon:'smile', mo?esc(mo.short):'—', 'Mod', 'var(--accent)', false);
-  h+=heroStatTile('droplet', (water>0?water+'/'+WATER_GOAL:'—'), 'Su', '#5EA9E6', water>=WATER_GOAL);
-  h+=heroStatTile('moon', (sh!=null?(String(sh).replace('.',',')+'s'):'—'), 'Uyku', '#9B7FC9', sh!=null&&sh>=SLEEP_TICK_MIN);
-  h+=heroStatTile('footprints', stepTxt, 'Adım', '#5BA85B', es.steps!=null&&es.steps>=STEP_TICK_MIN);
+  h+=heroStatTile('droplet', (water>0?water+'/'+wg:'—'), 'Su', '#5EA9E6', water>=wg);
+  h+=heroStatTile('moon', (sh!=null?(String(sh).replace('.',',')+'s'):'—'), 'Uyku', '#9B7FC9', sh!=null&&sh>=sleepGoalHours(activeDate()));
+  h+=heroStatTile('footprints', stepTxt, 'Adım', '#5BA85B', es.steps!=null&&es.steps>=stepsGoal(activeDate()));
   h+='</div>';
   return h;
 }
@@ -5496,11 +5578,26 @@ function heroTargetsHTML(rec){
     +'<span style="font-size:10px;font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
   var h='<div style="display:flex;flex-direction:column;gap:7px;">';
   h+=header;
-  h+='<div style="display:flex;gap:8px;">';
-  h+=ring(nu.calories, calG, 'Kalori', '#E8894A', 'flame', 14);
-  h+=ring(nu.protein, proG, 'Protein', '#C2453A', 'beef', 14);
-  h+=ring(nu.carbs, carbG, 'Karbonhidrat', '#6E9C6A', 'apple', 14);
-  h+='</div></div>';
+  if(isVacationDay(activeDate())){
+    h+='<div style="display:flex;flex-direction:column;gap:8px;background:var(--icon);border:1px solid var(--vacation);border-radius:18px;padding:13px 12px;">';
+    h+='<div style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--vacation);">'+icon('sun',14)+' Tatil modunda beslenme hedefleri esnetildi</div>';
+    h+='<div style="font-size:12px;color:var(--text2);line-height:1.5;">Bugün yemekleri <b>keyif notu</b> olarak kaydetmek yeterli; kalori/protein/karbonhidrat halkaları dinleniyor.</div>';
+    if(nu.calories>0||nu.protein>0||nu.carbs>0){
+      h+='<div style="display:flex;gap:10px;font-size:11px;color:var(--muted);">';
+      if(nu.calories>0) h+='<span>'+Math.round(nu.calories)+' kcal</span>';
+      if(nu.protein>0) h+='<span>'+Math.round(nu.protein)+' g protein</span>';
+      if(nu.carbs>0) h+='<span>'+Math.round(nu.carbs)+' g karb</span>';
+      h+='</div>';
+    }
+    h+='</div>';
+  } else {
+    h+='<div style="display:flex;gap:8px;">';
+    h+=ring(nu.calories, calG, 'Kalori', '#E8894A', 'flame', 14);
+    h+=ring(nu.protein, proG, 'Protein', '#C2453A', 'beef', 14);
+    h+=ring(nu.carbs, carbG, 'Karbonhidrat', '#6E9C6A', 'apple', 14);
+    h+='</div>';
+  }
+  h+='</div>';
   return h;
 }
 // Kısa tik etiketleri (hero "en güçlü/zayıf" istatistiği için).
@@ -5562,13 +5659,16 @@ function gununHavasi(completed, ht, seed){
 function heroScienceLine(rec){
   var sh=(rec&&rec.sleep&&rec.sleep.hours!=null&&rec.sleep.hours!=='')?Number(rec.sleep.hours):null;
   var water=rec?(Number(rec.water)||0):0;
+  var wg=waterGoalCups(activeDate());
   var es=effSteps(rec);
   var mood=rec&&rec.mood;
   var txt;
-  if(sh!=null&&sh<SLEEP_TICK_MIN) txt='7,5+ saat uyku, açlık hormonlarını (leptin/grelin) dengeler — şeker isteğini düşürür.';
-  else if(water<WATER_GOAL) txt='Hafif susuzluk bile yorgunluk ve tatlı isteği gibi hissedilir; önce bir bardak su.';
-  else if(es.steps!=null&&es.steps<STEP_TICK_MIN) txt='Kısa bir yürüyüş bile kan şekerini ve ruh hâlini dengeler — 10 dakika yeter.';
+  var sg=sleepGoalHours(activeDate()), stg=stepsGoal(activeDate());
+  if(sh!=null&&sh<sg) txt=String(sg).replace('.',',')+'+ saat uyku, açlık hormonlarını (leptin/grelin) dengeler — şeker isteğini düşürür.';
+  else if(water<wg) txt='Hafif susuzluk bile yorgunluk ve tatlı isteği gibi hissedilir; önce bir bardak su.';
+  else if(es.steps!=null&&es.steps<stg) txt='Kısa bir yürüyüş bile kan şekerini ve ruh hâlini dengeler — 10 dakika yeter.'+(isVacationDay(activeDate())?' (tatil modunda adım hedefi esnetildi)':'');
   else if(mood==='zorlandim'||mood==='cok-zorlandim') txt='Zor günlerde beyin hızlı dopamin arar; kendine nazik ol — küçük bir adım bile kayda geçer.';
+  else if(isVacationDay(activeDate())) txt='Tatil modunda esneklik var; küçük bir adım, bir bardak su ve kendi kendine nazik bir cümle yeter.';
   else txt='Küçük ve tutarlı adımlar, güçlü iradeden daha kalıcıdır — beyin (nöroplastisite) böyle öğrenir.';
   return '<div style="display:flex;align-items:flex-start;gap:8px;">'
     +'<span style="flex-shrink:0;color:var(--accent);display:inline-flex;margin-top:1px;">'+icon('brain',14)+'</span>'
@@ -5701,6 +5801,7 @@ function bugunHTML(){
     h+=saveBanner();
     if(shouldShowAeonNotifyBanner()) h+=aeonNotifyBannerHTML({context:'bugun'});
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
+    h+=vacationCardHTML(); // Tatil Modu — Günışığı hava kartının hemen üstünde
     h+=weatherHeaderHTML(_greet);
     h+=journalLightCardHTML(rec, streak); // Günlük Işığı — Günışığı hava kartının hemen altında
     h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günlük Işığı kartının hemen altında
@@ -6320,7 +6421,7 @@ function corrInsights(){
   if(ws.length>=3&&ns.length>=3&&gavg(ns)-gavg(ws)>=0.3) out.push([icon('footprints',18),'Yürüdüğün günlerde tatlı krizi sayın daha düşük. Ayaklar çalışınca tatlı lobisi sus pus.']);
   var hp=[],lp=[]; var pg=proteinGoal(); days.forEach(function(o){ var pr=dayNutrition(o.rec).protein,sos=Number(o.rec.cravingSOSCount||0); if(pr>=pg*0.8) hp.push(sos); else if(pr>0) lp.push(sos); });
   if(hp.length>=3&&lp.length>=3&&gavg(lp)-gavg(hp)>=0.3) out.push([icon('egg',18),'Proteini tutturduğun günlerde kriz daha az. Tokluk ekibi sahada.']);
-  var he=[],le=[]; days.forEach(function(o){ var w=(typeof o.rec.water==='number')?o.rec.water:null,e=o.rec.energy; if(w==null||e==null) return; (w>=WATER_GOAL?he:le).push(Number(e)); });
+  var he=[],le=[]; days.forEach(function(o){ var w=(typeof o.rec.water==='number')?o.rec.water:null,e=o.rec.energy; if(w==null||e==null) return; (w>=waterGoalCups(o.date)?he:le).push(Number(e)); });
   if(he.length>=3&&le.length>=3&&gavg(he)-gavg(le)>=0.3) out.push([icon('droplet',18),'Su hedefini tutturduğun günlerde enerjin daha yüksek. Beden susuz çalışmıyor.']);
   return out;
 }
@@ -6362,7 +6463,7 @@ function consistencyMomentumCard(){
 function badgesGrid(){
   var all=allDays(); var best=bestStreak(all); var medStreak=medFreeStreak();
   var waterGoal=0,proteinGoalMet=0,perfect=0,readingDays=0; var pg=proteinGoal();
-  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=WATER_GOAL) waterGoal++; if(dayNutrition(r).protein>=pg) proteinGoalMet++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0) readingDays++; });
+  all.forEach(function(o){ var r=o.rec; if(!r) return; if((r.water||0)>=waterGoalCups(o.date)) waterGoal++; if(dayNutrition(r).protein>=pg) proteinGoalMet++; if(countRec(r)>=habitCountOn(o.date)) perfect++; if(r.reading&&Array.isArray(r.reading.entries)&&r.reading.entries.length>0) readingDays++; });
   var badges=[
     {e:icon('flame',20),l:'7 gün seri',done:best>=7,sub:best>=7?'tamam':best+'/7'},
     {e:icon('trophy',20),l:'30 gün seri',done:best>=30,sub:best>=30?'tamam':best+'/30'},
@@ -7361,7 +7462,7 @@ function healthWalkCard(rec){
     _b+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Yürüyüşünü işaretledin, harika. İstersen adımını da ekle — ilerlemeni daha net görürüz. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
     _b+='<button onclick="App.hideStepNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
   }
-  if(!ed) _b+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥'+STEP_TICK_MIN.toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini kendiliğinden yeşillendirir (süre yalnızca kayıt içindir)</div>';
+  if(!ed) _b+='<div style="font-size:12px;color:var(--faint);line-height:1.4;">≥'+stepsGoal(activeDate()).toLocaleString('tr-TR')+' adım, Bugün ekranındaki yürüyüş tikini kendiliğinden yeşillendirir'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')+' (süre yalnızca kayıt içindir)</div>';
   return collapsibleCardHTML({key:'h-walk', icon:icon('footprints',18), accent:A, title:'Yürüyüş', subtitle:'Adım · süre · otomatik tik', badge:(wk.steps!=null&&wk.steps!==''?hBadge(Number(wk.steps).toLocaleString('tr-TR')+' adım',A):''), open:cardOpen('h-walk'), body:_b, hint:'adımını gir'});
 }
 CARD_BUILDERS['h-walk']=healthWalkCard;
@@ -9161,7 +9262,7 @@ function lunaContext(){
   lines.push('--- Bugün ---');
   lines.push('Yedikleri: '+mealStr);
   lines.push('Mod: '+(moodO?moodO.short:'—')+' · Tik: '+(rec?countRec(rec):0)+'/'+htToday()+(rec&&rec.sleep&&rec.sleep.hours!=null?(' · Uyku: '+rec.sleep.hours+' sa'):''));
-  if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+proteinGoal()+' g / '+calGoal()+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+WATER_GOAL+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
+  if(rec){ var tnu=dayNutrition(rec); if(tnu.protein>0||tnu.calories>0) lines.push('Beslenme: ~'+tnu.protein+' g protein · ~'+tnu.calories+' kcal (hedef '+proteinGoal()+' g / '+calGoal()+' kcal)'); if(typeof rec.water==='number'&&rec.water>0) lines.push('Su: '+rec.water+'/'+waterGoalCups(today)+' bardak'); var es=[]; if(rec.energy!=null) es.push('enerji '+rec.energy+'/5'); if(rec.stress!=null) es.push('stres '+rec.stress+'/5'); if(es.length) lines.push('Hâl: '+es.join(' · ')); if(rec.caffeine&&rec.caffeine.last) lines.push('Son kafein: '+rec.caffeine.last+(rec.caffeine.cups?(' · '+rec.caffeine.cups+' fincan'):'')); }
   var mfs=medFreeStreak(); if(mfs>0) lines.push('İlaçsız gece serisi: '+mfs+' gece');
   if(rec&&rec.cravingSOSCount){ var _ck=[]; if(rec.craving10MinDone) _ck.push('tatlı'); if(rec.foodCravingDone) _ck.push('yemek'); if(rec.coffeeCravingDone) _ck.push('kahve'); lines.push('Kriz yönetimi (SOS): '+rec.cravingSOSCount+' kez'+(_ck.length?(' · '+_ck.join(', ')):'')); }
   if(rec&&Array.isArray(rec.cravingTriggers)&&rec.cravingTriggers.length){ var tgm={tired:'yorgunluk',bored:'sıkkınlık',hungry:'gerçek açlık',stress:'stres',habit:'alışkanlık',emotional:'duygusal açlık',lowenergy:'enerji dibi',social:'keyif/sosyal'}; lines.push('Kriz tetikleyicileri: '+rec.cravingTriggers.map(function(t){return tgm[t.trigger]||t.trigger;}).join(', ')); }

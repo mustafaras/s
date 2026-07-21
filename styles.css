@@ -17,6 +17,7 @@
   @keyframes seyRingPulse{0%{transform:scale(.92);opacity:.5;}70%{transform:scale(1.18);opacity:0;}100%{transform:scale(1.18);opacity:0;}}
   @keyframes seyFloatIn{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:translateY(0);}}
   @keyframes seySpin{to{transform:rotate(360deg);}}
+  @keyframes seyShimmer{0%{transform:translateX(-100%);}60%,100%{transform:translateX(200%);}}
   /* Açılır kart gövdesi: JS ölçülü max-height akordeon (animateCardExpand/Collapse). */
   .sey-collbody{will-change:max-height,opacity;}
   @media (prefers-reduced-motion: reduce){ .sey-collbody{transition:none!important;} }
@@ -201,6 +202,8 @@
     --sun:#F5A623; --sun2:#F5844E; --sun-glow:rgba(255,193,105,0.42);
     /* Günlük Işığı — lavanta accent (serbest günlük modalı) */
     --journal:#A66CFF; --journal2:#D9B8FF; --journal-bg:rgba(166,108,255,0.13); --journal-glow:rgba(166,108,255,0.35);
+    /* Tatil Modu — turkuaz/yeşil accent */
+    --vacation:#2A9D8F; --vacation2:#5ED4B4; --vacation-bg:rgba(42,157,143,0.13); --vacation-glow:rgba(42,157,143,0.35);
     /* Şeyma & Raşit'in Terapi Odası — rafine rose-mauve + altın parıltı (premium marka teması) */
     --room:#BE6C8B; --room2:#E6ADCB; --room-glow:rgba(190,108,139,0.30); --room-bg:rgba(230,173,203,0.13);
     /* ÆON chat — altın aile (panel.html --gold ile uyumlu) + kullanıcı balonu + premium easing */
@@ -231,6 +234,7 @@
     --warn:#FF7378; --warn-glow:rgba(255,115,120,0.16);
     --sun:#FFC768; --sun2:#FFA064; --sun-glow:rgba(255,190,100,0.09);
     --journal:#C9A4FF; --journal2:#E4CFFF; --journal-bg:rgba(201,164,255,0.12); --journal-glow:rgba(201,164,255,0.18);
+    --vacation:#5ED4B4; --vacation2:#7DE8CB; --vacation-bg:rgba(94,212,180,0.12); --vacation-glow:rgba(94,212,180,0.18);
     --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
     --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
     --user-bubble:#715DA8; --user-bubble2:#8872BD;

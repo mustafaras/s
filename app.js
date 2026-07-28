@@ -8143,7 +8143,7 @@ function saygiHeaderBarHTML(idx,total){
       +'<div class="sg-header-bar-title-block">'
         +'<span class="sg-header-bar-trophy">'+icon('trophy',18)+'</span>'
         +'<div class="sg-header-bar-titles">'
-          +'<div class="sg-header-bar-title">Saygı</div>'
+          +'<div class="sg-header-bar-title">İlham & İbadet</div>'
           +'<div class="sg-header-bar-subtitle">'+subtitle+'</div>'
         +'</div>'
       +'</div>'

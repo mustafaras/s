@@ -379,7 +379,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
     - `saygiPreviewCardHTML()` imzası sadeleştirildi; kart içindeki "Günün öncüsü" kicker çizgisi kaldırıldı (bilgi artık header bar'da).
     - `saygiPreviewHubHTML()` ve `saygiHTML()` yeni header/mission kartını kullanacak şekilde güncellendi.
   - **Beşinci pass / header visual refinement (görsel referans):**
-    - `saygiHeaderBarHTML()` görsel mockup'a göre iki katmanlı yeniden tasarlandı: üst katmanda sol "Şeyma 🦩" marka ve sağ "GÜNÜN ÖNCÜSÜ · X/100" kicker; alt katmanda sol büyük trophy rozeti + "Saygı" başlık + kişi adı/alan alt başlık, sağda pill "Yenile" butonu.
+    - `saygiHeaderBarHTML()` görsel mockup'a göre iki katmanlı yeniden tasarlandı: üst katmanda sol "Şeyma 🦩" marka ve sağ "GÜNÜN ÖNCÜSÜ · X/100" kicker; alt katmanda sol büyük trophy rozeti + "İlham & İbadet" başlık + kişi adı/alan alt başlık, sağda pill "Yenile" butonu.
     - `saygiHTML()`'den `saygiMissionCardHTML()` çağrısı kaldırıldı; misyon metni artık preview kart içinde ve header'daki kişi alt başlığıyla yedekleniyor.
     - `styles.css`'te `.sg-header-bar-*` ailesi genişletildi: `.sg-header-bar-top`, `.sg-header-bar-bottom`, `.sg-header-bar-brand`, `.sg-header-bar-kicker`, `.sg-header-bar-title-block`, `.sg-header-bar-trophy`, `.sg-header-bar-titles`, `.sg-header-bar-title`, `.sg-header-bar-subtitle` stilleri eklendi.
   - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
@@ -396,10 +396,10 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Bağımsız panel prayer helper'ları (`PRAYER_NAMES_P`, `emptyPrayerEntryP`, `ensurePrayerDayP`, `prayerDaySummaryP`, `prayerSummaryP`, `prayerDayDetailP`).
   - "🕌 İman Köşesi" bento KPI kartı (kılınan/cemaat/kaza/nafile/son vakit) + seçili gün detayında vakit satırı.
 - `index.html`
-  - Cache-bump: tüm asset'ler `?v=20260730e`.
+  - Cache-bump: tüm asset'ler `?v=20260730f`.
 - `GELISTIRME-PLANI.md`
-  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement, `.sg-mission-card` kaldırıldı) detayları ve cache bump `20260730e` ile güncellendi.
-  - Faz 34 başlığı "İlham & İbadet Hub'ı" olarak genişletildi; durum tablosu satırı cache `20260730e` olarak güncellendi (🟡 — onay bekliyor).
+  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement, `.sg-mission-card` kaldırıldı) + altıncı pass (header başlığı "Saygı" → "İlham & İbadet") detayları ve cache bump `20260730f` ile güncellendi.
+  - Faz 34 başlığı "İlham & İbadet Hub'ı" olarak genişletildi; durum tablosu satırı cache `20260730f` olarak güncellendi (🟡 — onay bekliyor).
 - `AGENTS.md`
   - Bu Agent Handoff Log girişi güncellendi; üçüncü pass + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement) detayları eklendi.
 
@@ -413,10 +413,10 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - `node --check saygiPeople.js` ✅
 - `node --check motivationNarratives.js` ✅
 - `panel.html` inline script syntax check (4/4 script tag) ✅
-- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 5 / header visual refinement assertion'ları dahil).
+- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 6 / "Saygı" → "İlham & İbadet" header başlığı assertion'ları dahil).
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Cache bump `20260730e` uygulandı; onay sonrası kullanıcıya eski `?v=20260730d` önbelleğini temizlemesi / uygulamayı kapatıp açması hatırlatılmalı.
+- Cache bump `20260730f` uygulandı; onay sonrası kullanıcıya eski `?v=20260730e` önbelleğini temizlemesi / uygulamayı kapatıp açması hatırlatılmalı.
 - Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcısından/PWA’sından test etmesi için çalıştırıldı.
 
 **Bir sonraki adım / deploy öncesi notlar:**

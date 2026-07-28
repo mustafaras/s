@@ -351,6 +351,59 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-29 — Faz 33: Zihin-Beden Arşivi — Pilates / Ney / Binicilik geçmişi otomatik arşivleniyor (onay bekliyor)
+
+**Branch:** `mustafaras-animated-garbanzo` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - Yeni `data.soulArchive.items` kalıcı arşiv modeli (library/watchlist/music desenine uygun): `emptySoulArchive()`, `ensureSoulArchive()`, `normSoulItem()`, `findSoulItem()`.
+  - `syncEntryToSoulArchive()` ve `unsyncSoulEntry()` ile artı-eksi senkronizasyon; her günlük soul kaydı arşiv öğesinin `totalSessions`, `totalMinutes`, `lastAt` alanlarını günceller.
+  - `backfillArchivesFromDays()` artık eski `data.days[*].soulActivities` kayıtlarını geriye dönük `data.soulArchive.items`'e toplar.
+  - `migrate()` eski verilere `data.soulArchive` backfill/normalizasyon yapar.
+  - `App.saveSoulActivity()` ve `App.removeSoulActivity()` arşiv toplamlarını senkronize günceller.
+  - Yeni tam ekran arşiv overlay'i: `App.openSoulArchive()` / `App.closeSoulArchive()` / `App.setSoulArchiveFilter()` / `App.removeSoulArchiveSession()`.
+  - `soulArchiveOverlayHTML()` tür kartları + kronolojik seans listesi + silme butonu render eder.
+  - "Zihnimi Besledim" premium kartına (`hubTilesHTML`) "Arşiv" bağlantısı eklendi.
+  - `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `soulArchiveOpen` eklendi; tab geçişlerinde arşiv overlay sabit kalıyor.
+  - **Bug fix:** `soulArchiveOverlayHTML()` içindeki iki yerdeki tanımsız `shortD()` çağrısı `shortDate()`'e çevrildi.
+- `panel.html`
+  - Panel tarafı archive helper'ları: `ensureSoulArchiveP()`, `normSoulItemP()`, `findSoulItemP()`, `syncEntryToSoulArchiveP()`, `unsyncSoulEntryP()`, idempotent `backfillSoulArchiveFromDaysP()`.
+  - Mevcut "Zihin-Beden" KPI kartı yerine tıklanabilir "Zihin-Beden Arşivi" bento KPI kartı: toplam seans/süre, tür dağılımı, son aktivite, tür filtresi chip'leri ve genişleyen kronolojik seans listesi.
+  - Global panel handler'ları: `toggleSoulArchiveP()` / `setSoulArchiveTypeP()`.
+- `index.html`
+  - Cache-bump: tüm asset'ler `?v=20260729a`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-29 changelog girişi eklendi.
+  - Faz 33 "Zihin-Beden Arşivi" durum tablosu satırı eklendi (🟡 — onay bekliyor).
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; soul activities (13 assertion) + soul archive (11 assertion) = 24 assertion tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
+- `panel.html` inline script syntax check (4/4 script tag) ✅
+- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 24/24 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
+- Gerçek iPhone/PWA'da: Bugün ekranındaki "Zihnimi Besledim" kartındaki "Arşiv" bağlantısına dokunulunca arşiv overlay açılmalı; tür kartları (Pilates/Ney/Binicilik) görünmeli; bir tür kartına tıklayınca o türün tüm geçmiş seansları kronolojik listelenmeli; silme butonu hem günlük kaydı hem arşiv toplamlarını güncellemeli.
+- Panelde: "Zihin-Beden Arşivi" bento kartı tıklanabilir olmalı; tür dağılımı, toplam seans/süre ve son aktivite doğru görünmeli; tür chip'leri filtrelenebilmeli; genişleyen liste eski seansları göstermeli.
+- Eski veride `soulArchive` olmayan kullanıcılar için `migrate()` + boot'taki `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
+- Yeni tür eklenmek istendiğinde sadece `SOUL_ACTIVITY_CATALOG`'a satır eklenmesi yeterli; arşiv otomatik o türü tanıyacak.
+
+---
+
 ### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — dördüncü pass: soul modal flash/flicker fix + tab geçişleri (canlıya alındı)
 
 **Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` fast-forward **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260728g`).

@@ -661,7 +661,10 @@ function migrate(d){
   if(!Array.isArray(d.music.items)) d.music.items=[];
   if(!d.music.goal||typeof d.music.goal!=='object') d.music.goal={dailyMinutes:30,yearlyTitles:null};
   d.music.items=d.music.items.map(normTrack).filter(Boolean);
-  // Eski günlük okuma/izleme/dinleme kayıtlarını arşiv kataloglarına senkronize et.
+  if(!d.soulArchive||typeof d.soulArchive!=='object') d.soulArchive=emptySoulArchive();
+  if(!Array.isArray(d.soulArchive.items)) d.soulArchive.items=[];
+  d.soulArchive.items=d.soulArchive.items.map(normSoulItem).filter(Boolean);
+  // Eski günlük okuma/izleme/dinleme ve zihin-beden kayıtlarını arşiv kataloglarına senkronize et.
   try{ backfillArchivesFromDays(d); }catch(e){}
   // Vücut ölçüleri (haftalık kilo + tek-seferlik boy). Yeni alan — eski kayıtlara backfill.
   if(!d.body||typeof d.body!=='object') d.body={heightCm:null,heightSetAt:null,weights:[]};
@@ -808,7 +811,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -1306,6 +1309,7 @@ function emptyWatchlist(){ return {items:[],goal:{dailyMinutes:40,yearlyTitles:n
 function emptyListening(){ return {entries:[]}; }
 function emptyLearning(){ return {entries:[]}; }
 function emptyMusic(){ return {items:[],goal:{dailyMinutes:30,yearlyTitles:null}}; }
+function emptySoulArchive(){ return {items:[]}; }
 
 // ---------- Profil Değerlendirmesi: veri modeli ve migration (Faz 03) ----------
 // Tek seferlik, 174 maddelik bilimsel profil değerlendirmesi (bkz. profileAssessmentV1.js).
@@ -2123,6 +2127,7 @@ function findBook(id){ var L=ensureLibrary(); for(var i=0;i<L.books.length;i++){
 function findTitle(id){ var W=ensureWatchlist(); for(var i=0;i<W.items.length;i++){ if(W.items[i]&&W.items[i].id===id) return W.items[i]; } return null; }
 function normTrack(x){ if(!x||typeof x!=='object') return null; if(!x.id) x.id=uid('m'); x.title=String(x.title==null?'':x.title); x.artist=String(x.artist==null?'':x.artist); if(['sarki','album','podcast'].indexOf(x.kind)<0) x.kind='sarki'; x.genre=String(x.genre==null?'':x.genre); if(!x.emoji) x.emoji=''; x.rating=(x.rating==null||x.rating==='')?null:Math.max(1,Math.min(5,Math.round(Number(x.rating)||0))); if(!Array.isArray(x.quotes)) x.quotes=[]; if(!x.createdAt) x.createdAt=new Date().toISOString(); return x; }
 function ensureMusic(){ if(!data.music||typeof data.music!=='object') data.music=emptyMusic(); if(!Array.isArray(data.music.items)) data.music.items=[]; if(!data.music.goal||typeof data.music.goal!=='object') data.music.goal={dailyMinutes:30,yearlyTitles:null}; return data.music; }
+function ensureSoulArchive(){ if(!data.soulArchive||typeof data.soulArchive!=='object') data.soulArchive=emptySoulArchive(); if(!Array.isArray(data.soulArchive.items)) data.soulArchive.items=[]; return data.soulArchive; }
 function findTrack(id){ var M=ensureMusic(); for(var i=0;i<M.items.length;i++){ if(M.items[i]&&M.items[i].id===id) return M.items[i]; } return null; }
 // ---- günlük kayıtları ↔ arşiv katalogları senkronizasyonu ----
 function normalizeMatch(s){ return String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' ').replace(/[İ]/g,'i').replace(/[I]/g,'ı'); }
@@ -2132,7 +2137,11 @@ function findTrackByEntry(title,artist,kind){ var M=ensureMusic(); var nt=normal
 function syncEntryToLibrary(entry){ if(!entry||!entry.title) return null; var L=ensureLibrary(); var b=null; if(entry.bookId){ b=findBook(entry.bookId); } if(!b){ b=findBookByEntry(entry.title,entry.author); } if(!b){ b=normBook({title:entry.title,author:String(entry.author||''),currentPage:0,totalPages:null,status:'reading',startedAt:entry.ts||new Date().toISOString()}); L.books.unshift(b); } entry.bookId=b.id; return b; }
 function syncEntryToWatchlist(entry){ if(!entry||!entry.title) return null; var W=ensureWatchlist(); var t=null; if(entry.itemId){ t=findTitle(entry.itemId); } if(!t){ t=findTitleByEntry(entry.title,entry.kind); } if(!t){ var isDizi=entry.kind==='dizi'; t=normTitle({title:entry.title,kind:isDizi?'dizi':'film',watchedEp:0,totalEp:isDizi?null:1,status:'watching',startedAt:entry.ts||new Date().toISOString()}); W.items.unshift(t); } entry.itemId=t.id; return t; }
 function syncEntryToMusic(entry){ if(!entry||!entry.title) return null; var M=ensureMusic(); var x=null; if(entry.itemId){ x=findTrack(entry.itemId); } if(!x){ x=findTrackByEntry(entry.title,entry.artist,entry.kind); } if(!x){ x=normTrack({title:entry.title,artist:String(entry.artist||''),kind:entry.kind,createdAt:entry.ts||new Date().toISOString()}); M.items.unshift(x); } entry.itemId=x.id; return x; }
-function backfillArchivesFromDays(d){ var savedData=data; try{ data=d; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var day=data.days[date]; if(!day||typeof day!=='object') return; if(day.reading&&Array.isArray(day.reading.entries)) day.reading.entries.forEach(syncEntryToLibrary); if(day.watching&&Array.isArray(day.watching.entries)) day.watching.entries.forEach(syncEntryToWatchlist); if(day.listening&&Array.isArray(day.listening.entries)) day.listening.entries.forEach(syncEntryToMusic); }); }finally{ data=savedData; } }
+function normSoulItem(o){ if(!o||typeof o!=='object') return null; if(!o.id) o.id=uid('sa'); o.type=String(o.type==null?'':o.type).trim(); var cat=soulActivityById(o.type); o.label=String(o.label==null?(cat?cat.label:o.type):o.label); o.icon=String(o.icon==null?(cat?cat.icon:'sparkles'):o.icon); o.sci=String(o.sci==null?(cat?cat.sci:''):o.sci); o.totalSessions=Math.max(0,Math.round(Number(o.totalSessions)||0)); o.totalMinutes=Math.max(0,Math.round(Number(o.totalMinutes)||0)); if(o.startedAt===undefined) o.startedAt=null; if(o.lastAt===undefined) o.lastAt=null; if(['active','paused'].indexOf(o.status)<0) o.status='active'; if(typeof o.note!=='string') o.note=''; return o; }
+function findSoulItem(type){ var A=ensureSoulArchive(); for(var i=0;i<A.items.length;i++){ var x=A.items[i]; if(x&&x.type===type) return x; } return null; }
+function syncEntryToSoulArchive(entry){ if(!entry||!entry.type) return null; var A=ensureSoulArchive(); var x=findSoulItem(entry.type); if(!x){ var act=soulActivityById(entry.type); x=normSoulItem({type:entry.type,label:act?act.label:ucfirst(entry.type),icon:act?act.icon:'sparkles',sci:act?act.sci:'',startedAt:entry.savedAt||entry.ts||new Date().toISOString()}); A.items.unshift(x); } x.totalSessions++; var m=Number(entry.duration); if(!isNaN(m)&&m>0) x.totalMinutes+=Math.max(0,Math.round(m)); x.lastAt=entry.savedAt||entry.ts||new Date().toISOString(); if(!x.startedAt) x.startedAt=x.lastAt; entry.archiveId=x.id; return x; }
+function unsyncSoulEntry(entry){ if(!entry||!entry.type) return false; var A=ensureSoulArchive(); var x=findSoulItem(entry.type); if(!x) return false; x.totalSessions=Math.max(0,(Number(x.totalSessions)||0)-1); var m=Number(entry.duration); if(!isNaN(m)&&m>0) x.totalMinutes=Math.max(0,(Number(x.totalMinutes)||0)-Math.max(0,Math.round(m))); return true; }
+function backfillArchivesFromDays(d){ var savedData=data; try{ data=d; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var day=data.days[date]; if(!day||typeof day!=='object') return; if(day.reading&&Array.isArray(day.reading.entries)) day.reading.entries.forEach(syncEntryToLibrary); if(day.watching&&Array.isArray(day.watching.entries)) day.watching.entries.forEach(syncEntryToWatchlist); if(day.listening&&Array.isArray(day.listening.entries)) day.listening.entries.forEach(syncEntryToMusic); if(Array.isArray(day.soulActivities)) day.soulActivities.forEach(syncEntryToSoulArchive); }); }finally{ data=savedData; } }
 function bookPct(b){ if(!b||!b.totalPages||b.totalPages<=0) return b&&b.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((b.currentPage/b.totalPages)*100))); }
 function titlePct(t){ if(!t) return 0; if(!t.totalEp||t.totalEp<=0) return t.status==='finished'?100:0; return Math.max(0,Math.min(100,Math.round((t.watchedEp/t.totalEp)*100))); }
 // istatistik
@@ -2903,12 +2912,20 @@ App.saveSoulActivity=function(){
   var note=String(d.note||'').trim().slice(0,200);
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!Array.isArray(day.soulActivities)) day.soulActivities=[];
-  day.soulActivities.push({id:uid('soul'),type:type,label:act.label,duration:duration,note:note,savedAt:new Date().toISOString()});
+  var entry={id:uid('soul'),type:type,label:act.label,duration:duration,note:note,savedAt:new Date().toISOString()};
+  day.soulActivities.push(entry);
+  syncEntryToSoulArchive(entry);
   day.savedAt=new Date().toISOString();
   ui.soulActivityDraft={type:type,duration:'',note:''};
   commit('Zihin-beden pratiği kaydedildi — nefes, denge, ritim 🦩');
 };
-App.removeSoulActivity=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day&&Array.isArray(day.soulActivities)){ var i=day.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ day.soulActivities.splice(i,1); day.savedAt=new Date().toISOString(); commit('Pratik kaydı silindi'); } } };
+App.removeSoulActivity=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day&&Array.isArray(day.soulActivities)){ var i=day.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=day.soulActivities[i]; unsyncSoulEntry(removed); day.soulActivities.splice(i,1); day.savedAt=new Date().toISOString(); commit('Pratik kaydı silindi'); } } };
+
+// ================= ZİHİN-BEDEN ARŞİVİ =================
+App.openSoulArchive=function(){ ui.soulArchiveOpen=true; ui.soulArchiveFilter=null; render(); };
+App.closeSoulArchive=function(){ ui.soulArchiveOpen=false; ui.soulArchiveFilter=null; render(); };
+App.setSoulArchiveFilter=function(type){ ui.soulArchiveFilter=(ui.soulArchiveFilter===type?null:type); render(); };
+App.removeSoulArchiveSession=function(id){ var found=false; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return; var i=rec.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=rec.soulActivities[i]; unsyncSoulEntry(removed); rec.soulActivities.splice(i,1); rec.savedAt=new Date().toISOString(); found=true; } }); if(found){ commit('Pratik kaydı arşivden silindi'); } };
 
 // ================= NE ÖĞRENDİM =================
 App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); };
@@ -3488,7 +3505,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)))));
+  var curOverlay=ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var _painted=false;
@@ -5581,6 +5598,7 @@ function hubTilesHTML(){
     : '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
   h+='<span style="font-size:11px;font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
+  h+='<button onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
   h+=chip;
   h+='</div>';
   // 5 kategori butonu: 3+2 grid (mobilde otomatik wrap)
@@ -8546,6 +8564,69 @@ function soulActivityOverlayHTML(){
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   return soulOverlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
 }
+function soulArchiveSessions(type){
+  var list=[];
+  if(!data.days||typeof data.days!=='object') return list;
+  Object.keys(data.days).forEach(function(date){
+    var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return;
+    rec.soulActivities.forEach(function(a){ if(a&&a.type===type) list.push({id:a.id,date:date,duration:a.duration,note:a.note,savedAt:a.savedAt}); });
+  });
+  list.sort(function(a,b){ var ta=a.savedAt||a.date||'', tb=b.savedAt||b.date||''; return (ta>tb?-1:(ta<tb?1:0)); });
+  return list;
+}
+function soulArchiveOverlayHTML(){
+  var filter=ui.soulArchiveFilter||null;
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Zihin-Beden Arşivi '+icon('archive',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney, binicilik ve ileride eklenecek her pratik burada birikir.</div></div><button onclick="App.closeSoulArchive()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var body='';
+  if(filter){
+    var act=soulActivityById(filter);
+    var sessions=soulArchiveSessions(filter);
+    body+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">';
+    body+='<button onclick="App.setSoulArchiveFilter(null)" style="border:none;background:var(--field);cursor:pointer;padding:7px 10px;border-radius:10px;color:var(--muted);font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">'+icon('arrow-left',14)+' Tümü</button>';
+    body+='<span style="font-size:15px;font-weight:800;color:var(--text);display:inline-flex;align-items:center;gap:7px;"><span style="width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));">'+icon(act?act.icon:'sparkles',14)+'</span>'+(act?act.label:ucfirst(filter))+'</span>';
+    body+='</div>';
+    if(sessions.length){
+      body+='<div style="font-size:12px;color:var(--faint);margin-bottom:8px;">'+sessions.length+' seans · toplam '+fmtDuration(sessions.reduce(function(t,s){ return t+Math.max(0,Number(s.duration)||0); },0))+'</div>';
+      body+='<div style="display:flex;flex-direction:column;gap:8px;">';
+      sessions.forEach(function(s){
+        var dur=fmtDuration(s.duration);
+        body+='<div style="display:flex;gap:10px;align-items:flex-start;border-radius:14px;padding:11px;background:var(--soul-bg);border:1px solid color-mix(in srgb,var(--soul) 18%, var(--card-bd));">';
+        body+='<div style="flex:1;min-width:0;">';
+        body+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:12.5px;font-weight:800;color:var(--text);">'+esc(shortDate(s.date))+'</span>'+(dur?'<span style="font-size:11px;font-weight:700;color:var(--soul);">'+dur+'</span>':'')+'</div>';
+        if(s.note) body+='<div style="font-size:12px;line-height:1.45;color:var(--text2);margin-top:3px;">'+esc(String(s.note))+'</div>';
+        body+='</div>';
+        body+='<button onclick="App.removeSoulArchiveSession(\''+s.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;">'+icon('trash-2',14)+'</button>';
+        body+='</div>';
+      });
+      body+='</div>';
+    } else {
+      body+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:24px 16px;line-height:1.5;"><span style="display:inline-flex;">'+icon('wind',26)+'</span><div style="margin-top:8px;">Bu türde henüz kayıt yok. Bugün bir pratik ekle.</div></div>';
+    }
+  } else {
+    var A=ensureSoulArchive();
+    body+='<div style="display:flex;flex-direction:column;gap:10px;">';
+    SOUL_ACTIVITY_CATALOG.forEach(function(a){
+      var item=findSoulItem(a.id);
+      var sessions=item?soulArchiveSessions(a.id):[];
+      var totalMins=item?item.totalMinutes:0;
+      var totalSessions=item?item.totalSessions:0;
+      var last=item?item.lastAt:null;
+      body+='<button onclick="App.setSoulArchiveFilter(\''+a.id+'\')" style="cursor:pointer;border-radius:18px;padding:14px;display:flex;align-items:center;gap:13px;border:1px solid var(--card-bd);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.06);text-align:left;width:100%;">';
+      body+='<span style="width:48px;height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));box-shadow:0 6px 14px color-mix(in srgb,var(--soul-glow) 60%, transparent);flex-shrink:0;">'+icon(a.icon,22)+'</span>';
+      body+='<div style="flex:1;min-width:0;">';
+      body+='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;"><span style="font-size:15.5px;font-weight:800;color:var(--text);">'+a.label+'</span>'+(totalSessions>0?'<span style="font-size:11px;font-weight:700;color:var(--soul);">'+totalSessions+' seans · '+fmtDuration(totalMins)+'</span>':'')+'</div>';
+      body+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.35;">'+(last?'Son: '+shortDate(last.split('T')[0])+' · ':'')+a.sci+'</div>';
+      body+='</div>';
+      body+='<span style="color:var(--soul);display:inline-flex;flex-shrink:0;">'+icon('chevron-right',18)+'</span>';
+      body+='</button>';
+    });
+    body+='</div>';
+    body+='<div style="margin-top:12px;border-radius:12px;padding:11px 12px;background:var(--soul-bg);border:1px solid color-mix(in srgb,var(--soul) 18%, var(--card-bd));">';
+    body+='<div style="font-size:12px;color:var(--text2);line-height:1.45;">'+icon('sparkles',13)+' Arşiv, her kaydettiğin pratiği otomatik toplar. Pilates, ney ve binicilik dışında yoga, keman, seramik gibi türler eklendiğinde bu ekran kendiliğinden büyür.</div>';
+    body+='</div>';
+  }
+  return soulOverlayShell('App.closeSoulArchive()', head, body);
+}
 
 function modalsHTML(){
   var h='';
@@ -8558,6 +8639,7 @@ function modalsHTML(){
   if(ui.learningOpen){ h+=learningOverlayHTML(); }
   if(ui.soulPracticePicker){ h+=soulPracticePickerHTML(); }
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
+  if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';

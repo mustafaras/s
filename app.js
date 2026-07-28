@@ -2707,6 +2707,12 @@ App.profileAcceptConsent=function(){
 };
 App.refreshSaygi=function(){ var person=saygiCurrentPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
 App.openSaygiReading=function(){ App.openReading(); };
+App.openSaygiPreview=function(){
+  var article=ui.saygiArticle;
+  if(!article||ui.saygiLoading){ App.refreshSaygi(); return; }
+  var el=document.querySelector('.saygi-article');
+  if(el){ try{ el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }
+};
 App.markSaygiRead=function(){
   var person=saygiCurrentPerson(), article=ui.saygiArticle;
   if(!person||!article||article.dailyKey!==saygiDayKey(person)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
@@ -8053,22 +8059,64 @@ function faithSummaryBadges(p, compact){
   if(s.madeUp) badges.push('<span class="sg-faith-badge warn">'+s.madeUp+' kaza</span>');
   return badges.join('');
 }
-function faithCornerInlineHTML(){
+function faithCornerCardHTML(){
   var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
   var p=ensurePrayerDay(day), loc=prayerLocation();
   var s=prayerDaySummary(p), streak=prayerStreak();
+  var times=prayerTimesFromDay(p);
+  var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
   var locName=loc&&loc.cityName?esc(loc.cityName):(loc?'Konum ayarlandı':'Konum seçilmedi');
-  var h='<div class="sg-faith-card" onclick="App.openFaithCorner()">';
-  h+='<span class="sg-faith-icon">'+icon('mosque',18)+'</span>';
-  h+='<div class="sg-faith-text">';
-  h+='<div class="sg-faith-title">İman Köşesi</div>';
-  h+='<div class="sg-faith-sub">'+locName+' · '+s.performed+'/6 vakit'+(streak?' · '+streak+' gün seri':'')+'</div>';
+  var allDone=s.performed>=6;
+  var h='<div class="sg-preview-card sg-preview-faith" onclick="App.openFaithCorner()">';
+  h+='<div class="sg-preview-left"><span class="sg-preview-icon">'+icon('mosque',19)+'</span></div>';
+  h+='<div class="sg-preview-body">';
+  h+='<div class="sg-preview-kicker">'+locName+' · Bugünün 6 vakti</div>';
+  h+='<div class="sg-preview-title">İman Köşesi</div>';
+  // kompakt vakit çubuğu
+  h+='<div class="sg-preview-prayerbar">';
+  PRAYER_ORDER.forEach(function(k,i){
+    var pe=p[k]||emptyPrayerEntry(), performed=!!pe.performed, name=(PRAYER_NAMES[k]||k).slice(0,3);
+    var cls='sg-preview-prayerpill'+(performed?' done':'')+(i===curIdx?' current':'')+(i===nextIdx?' next':'');
+    h+='<span class="'+cls+'">'+(performed?icon('check',10):'')+' '+esc(name)+'</span>';
+  });
   h+='</div>';
-  h+='<div class="sg-faith-badges">'+faithSummaryBadges(p,true)+'</div>';
-  h+='<span class="sg-faith-action">Aç '+icon('chevron-right',14)+'</span>';
+  h+='<div class="sg-preview-meta">';
+  h+='<span class="sg-preview-pill '+(allDone?'ok':'')+'">'+s.performed+'/6 vakit</span>';
+  if(s.congregation) h+='<span class="sg-preview-pill">'+s.congregation+' cemaat</span>';
+  if(s.madeUp) h+='<span class="sg-preview-pill warn">'+s.madeUp+' kaza</span>';
+  if(streak) h+='<span class="sg-preview-pill streak">'+streak+' gün seri</span>';
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="sg-preview-right">'+(allDone?icon('check-circle',20):icon('chevron-right',18))+'</div>';
   h+='</div>';
   return h;
 }
+function saygiPreviewCardHTML(person,idx,total,done,article){
+  if(!person) return '';
+  var thumb='';
+  if(article&&article.thumbnail){
+    thumb='<img src="'+esc(article.thumbnail)+'" alt="" loading="lazy" referrerpolicy="no-referrer">';
+  } else {
+    thumb='<span class="sg-preview-thumb-fallback">'+esc((person.name||'?').charAt(0).toUpperCase())+'</span>';
+  }
+  var sub=esc(person.field)+' · '+esc(person.era);
+  var h='<div class="sg-preview-card sg-preview-saygi" onclick="App.openSaygiPreview()">';
+  h+='<div class="sg-preview-left"><span class="sg-preview-thumb">'+thumb+'</span></div>';
+  h+='<div class="sg-preview-body">';
+  h+='<div class="sg-preview-kicker">'+icon('trophy',12)+' Günün öncüsü · '+idx+'/'+total+'</div>';
+  h+='<div class="sg-preview-title">'+esc(person.name)+'</div>';
+  h+='<div class="sg-preview-sub">'+sub+'</div>';
+  h+='<div class="sg-preview-meta">';
+  h+='<span class="sg-preview-pill '+(done?'ok':'')+'">'+(done?icon('check',10)+' Okundu':icon('book-open',10)+' Bekliyor')+'</span>';
+  if(article&&article.lang) h+='<span class="sg-preview-pill faint">'+(article.lang==='tr'?'Türkçe':'English')+'</span>';
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="sg-preview-right">'+(done?icon('circle-check',20):icon('chevron-right',18))+'</div>';
+  h+='</div>';
+  return h;
+}
+// Eski adla uyumluluk: saygiHTML artık yeni kartları kullanır.
+function faithCornerInlineHTML(){ return faithCornerCardHTML(); }
 function prayerRowHTML(type, entry, isCurrent, isNext){
   var name=PRAYER_NAMES[type]||type;
   var performed=!!entry.performed, cong=!!entry.inCongregation, late=!!entry.late, madeUp=!!entry.madeUp;
@@ -8114,15 +8162,19 @@ function faithCornerOverlayHTML(){
   return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" onclick="App.closeFaithCorner()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
 }
 
+function saygiPreviewHubHTML(person,article,done){
+  var idx=saygiPeople().indexOf(person)+1, total=saygiPeople().length;
+  return '<div class="saygi-preview-hub">'+saygiPreviewCardHTML(person,idx,total,done,article)+faithCornerCardHTML()+'</div>';
+}
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
   if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
   saygiEnsureArticle(person);
-  var article=ui.saygiArticle, idx=saygiPeople().indexOf(person)+1, done=saygiHasRead(person), h='<section class="saygi-page">';
-  h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div><div class="saygi-count"><strong>'+idx+'</strong><span>/ '+saygiPeople().length+'</span></div></div>';
-    h+=faithCornerInlineHTML();
-    if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
+  var article=ui.saygiArticle, done=saygiHasRead(person), h='<section class="saygi-page">';
+  h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div></div>';
+  h+=saygiPreviewHubHTML(person,article,done);
+  if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
   if(ui.saygiError||!article){
     h+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
     return h+'</section>';
@@ -8263,19 +8315,32 @@ function navHTML(){
     ['bugun','sun','Bugün','#7B5E2F','#3E433B'],
     ['saglik','flower-2','Sağlık','#2F6B63','#60695D'],
     ['mesaj','hexagon','Aeon','#A88444','#30343A'],
-    ['saygi','trophy','Saygı','#826936','#36454B',true],
+    ['saygi','trophy','Saygı·İman','#826936','#36454B',true],
     ['harita','map','Takvim','#59695E','#8A734E'],
     ['rapor','chart-column','Rapor','#3A4048','#A4824C'],
     ['ayarlar','settings','Ayarlar','#4A4852','#787064']
   ];
   var unread=unreadNotifCount();
+  // Saygı + İman köşesinde tamamlanmamış görev rozet hesabı.
+  var saygiPending=0;
+  if(featuresLive()){
+    var person=saygiCurrentPerson();
+    if(person&&!saygiHasRead(person)) saygiPending++;
+  }
+  try{
+    var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
+    var p=ensurePrayerDay(day), s=prayerDaySummary(p);
+    if(s.performed<6) saygiPending++;
+  }catch(e){}
   var current=defs[0];
   for(var di=0;di<defs.length;di++){ if(defs[di][0]===ui.tab){ current=defs[di]; break; } }
   var h='<nav class="sey-bottomnav" aria-label="Ana gezinme" style="--nav-active:'+current[3]+';--nav-active2:'+current[4]+';--nav-count:'+defs.length+';">';
   h+='<div class="sey-bottomnav-surface">';
   defs.forEach(function(n){
     var active=ui.tab===n[0];
-    var badge=(n[0]==='mesaj'&&unread>0)?'<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>':'';
+    var badge='';
+    if(n[0]==='mesaj'&&unread>0) badge='<span class="sey-bottomnav-badge">'+(unread>9?'9+':unread)+'</span>';
+    else if(n[0]==='saygi'&&saygiPending>0) badge='<span class="sey-bottomnav-badge saygi">'+saygiPending+'</span>';
     var clickFn=n[0]==='mesaj'?'App.openMesaj()':'App.go(\''+n[0]+'\')';
     h+='<button class="sey-bottomnav-item'+(active?' is-active':'')+(n[5]?' is-saygi':'')+'" style="--nav-item-accent:'+n[3]+';--nav-item-accent2:'+n[4]+';" onclick="'+clickFn+'" aria-label="'+n[2]+'"'+(active?' aria-current="page"':'')+'>';
     h+='<span class="sey-bottomnav-icon"><span class="sey-bottomnav-indicator"></span><span class="sey-bottomnav-glyph">'+icon(n[1],20)+'</span>'+badge+'</span>';

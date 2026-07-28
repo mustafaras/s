@@ -351,6 +351,49 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — dördüncü pass: soul modal flash/flicker fix + tab geçişleri (onay bekliyor)
+
+**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - Soul modalları (Pratik picker + Kurs & Pratik formu) için animasyonsuz, anlık açılışlı yeni `soulOverlayShell()` shell eklendi; mevcut `overlayShell()` diğer hub'ları etkilemedi.
+  - `soulPracticePickerHTML()` ve `soulActivityOverlayHTML()` artık `soulOverlayShell()` kullanıyor; böylece modal açılırken `seyFade`/`seyPop` açılış animasyonu ve `backdrop-filter:blur(4px)` nedeniyle oluşan flash/parlama kalmıyor.
+  - `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `soulPicker` ve `soulActivity` eklendi; artık tab değişiminde veya iç veri aksiyonlarında soul modal'ları tekrar "sallanmıyor".
+  - `App.pickSoulPractice(type)` tek render'da picker'ı kapatıp aktivite formunu açıyor; `App.openSoulActivity()` yerine doğrudan `ui` flag'lerini set edip `render()` çağırıyor.
+  - Picker butonlarından `transition:transform .18s,border-color .2s,box-shadow .25s` kaldırıldı.
+  - Aktivite formundaki tür (Pilates/Ney/Binicilik) butonlarından `transition:all .18s ease` kaldırıldı.
+- `styles.css`
+  - `.sey-app-booted` scope'una `.sey-soul-ov-back`, `.sey-soul-ov-card` ve `.sey-soul-ov-card *` eklendi; boot sonrası bu elementlerde animasyon/transition tamamen devre dışı.
+  - `.sey-app-booted` scope'unda `.sey-soul-ov-back` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;` eklendi.
+- `index.html`
+  - Cache-bump: tüm asset `?v=20260728g`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-28 changelog girişi ve Faz 32 durum tablosu cache değeri `20260728g` olarak güncellendi; dördüncü pass detayları eklendi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 13 assertion tamamı PASS.
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\plan.md` — onaylı redesign planı + sekme-flash notları.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
+- `panel.html` inline script tag balance (4/4) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server `python -m http.server 8989` çalışıyor; kullanıcı kendi tarayıcısından test ediyor.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Kullanıcı `http://localhost:8989/index.html` üzerinde Pratik picker'ın ve aktivite formunun flaşsız açıldığını, tab değişimlerinde modal ve genel ekranın sabit kaldığını doğrulamalı.
+- Hâlâ flaş hissedilirse bir sonraki adım: header/bottom nav'ı sabit tutup sadece `#app` içindeki ana scroll içeriğini değiştirmek (büyük refactor); veya off-screen/pre-render atomic DOM swap denenebilir.
+- Cache-bump `20260728g`; eski `?v=20260728f/e` önbellekleri temizlenmeli.
+
+---
+
 ### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — pilates, ney, binicilik kurs/pratik takibi (onay bekliyor)
 
 **Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
@@ -363,7 +406,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `hasAnyHubEntry()` artık `rec.soulActivities` kayıtlarını da sayıyor; böylece kurs/pratik girişi `mediaFed` tiki otomatik yeşilleniyor.
   - `mediaFed` tanım/help/toast/progress metinleri güncellendi: “okudum/izledim/dinledim **ya da kurs/pratik yaptım**”.
   - **Yeniden tasarım (kullanıcı geri bildirimi sonrası):** `hubTilesHTML()` tamamen yeniden yazıldı. Artık Bugün ekranında tek, bağımsız, premium “Zihnimi Besledim” kartı var. Beş kategori (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit görsel ağırlıkta tek satırda (5 sütun grid). Her kategori kendi accent renginde, doldurulduğunda sayı/yeşil tik rozeti beliriyor. Kartın altındaki magnezyum ve diğer bugün kartlarıyla birleşmiyor, iç içe geçmiyor.
-  - `Pratik` butonu artık doğrudan form açmak yerine `App.openSoulPracticePicker()` ile **Pilates / Ney / Binicilik seçim picker'ı** açıyor; seçim sonrası `App.openSoulActivity(type)` ile ilgili türün formuna geçiliyor.
+  - `Pratik` butonu artık doğrudan form açmak yerine `App.openSoulPracticePicker()` ile **Pilates / Ney / Binicilik seçim picker'ı** açıyor; seçim sonrası tek render'da (`ui.soulPracticePicker=false; ui.soulActivityOpen=true;`) ilgili türün formuna anında geçiliyor.
   - Yeni picker overlay `soulPracticePickerHTML()` ve handler'lar: `App.openSoulPracticePicker`, `App.closeSoulPracticePicker`, `App.pickSoulPractice`.
   - Yeni tam ekran modal `soulActivityOverlayHTML()` + `soulActivityTodayView()` + `soulActivityEntryCard()` eklendi: tür chip grid, dakika inputu, not textarea, bugünkü kayıt listesi ve silme.
   - Handler'lar: `App.openSoulActivity`, `App.closeSoulActivity`, `App.onSoulField`, `App.setSoulType`, `App.saveSoulActivity`, `App.removeSoulActivity`.
@@ -375,7 +418,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
   - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260728e`.
+  - Cache-bump: tüm asset `?v=20260728f`.
   - `#app` inline style'a `background:var(--bg)` eklendi; böylece `innerHTML` değişirken arka yüzey asla beyaz/varsayılan renge dönmüyor.
 - `app.js` (sekme geçişleri düzeltmesi — ikinci, daha derin pass)
   - `render()` içinde `document.startViewTransition()` ile blur/scale cross-fade sekme geçişleri **tamamen kaldırıldı**. `paint()` her zaman anlık çağrılıyor; hiçbir fallback fade/opacity animasyonu kalmadı.
@@ -394,6 +437,13 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `html,body,#app{background:var(--bg);}` eklendi; `index.html` inline style'la birlikte üç katmanlı garanti.
   - `.sey-app-booted` scope'u genişletildi: header, bottom nav, nav children, `.sey-ccard`, `.wxcard`, `.glass` üzerindeki **tüm CSS transition'ları** da `transition:none !important;` ile susturuldu.
   - Boot sonrası `backdrop-filter` blur katmanları sabitlendi: `.sey-app-booted .sey-appheader`, `.sey-app-booted .sey-bottomnav-surface`, `.sey-app-booted .glass` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;`. iOS'ta `innerHTML` swap sırasında blur katmanlarının yeniden boyanıp flaş/parlama yapması engelleniyor.
+- `app.js` (Pratik modal flaş/flicker düzeltmesi — dördüncü pass)
+  - Yeni `soulOverlayShell()` fonksiyonu: Zihin-Beden modalları için animasyonsuz, anlık açılış shell'i. Backdrop ve modal card'ta `animation` tanımı yok; böylece Pratik butonuna dokunulunca ve picker'dan aktivite formuna geçerken fade/pop flaşı oluşmuyor.
+  - `render()` içindeki `curOverlay` hesaplamasına `soulPracticePicker` (`soulPicker`) ve `soulActivityOpen` (`soulActivity`) eklendi. Böylece bu modallar `lastOverlay`/`curOverlay` mekanizmasına dahil oluyor; tab değişiminde modal açık kaldığında tekrar "sallanmıyor".
+  - `App.pickSoulPractice(type)` artık picker'ı kapatıp aktiviteyi tek render'da açıyor (`ui.soulPracticePicker=false; ui.soulActivityOpen=true; render();`).
+- `styles.css` (Pratik modal flaş/flicker düzeltmesi — dördüncü pass)
+  - `.sey-app-booted` scope'una `.sey-soul-ov-back`, `.sey-soul-ov-card`, `.sey-soul-ov-card *` eklendi; animation ve transition tamamen susturuldu.
+  - `.sey-app-booted .sey-soul-ov-back` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;` eklendi; iOS blur katmanı parlama engellendi.
 - `GELISTIRME-PLANI.md`
   - “Son güncelleme” 2026-07-28 yapıldı.
   - 2026-07-28 changelog girişi eklendi / yeniden tasarım detaylarıyla güncellendi.
@@ -423,7 +473,8 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
 - Gerçek iPhone'da / yerel demo sunucuda (port 8989): Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının açıldığı; seçim sonrası süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
-- **Sekme geçiş testi (üçüncü pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi, header/bottomnav/card transition veya backdrop-filter parlama olmadığı gözlemlenmeli. `styles.css`’de View Transitions API, `seyPageIn`, per-kart giriş animasyonları tamamen kaldırıldı; `.sey-app-booted` ile header/bottomnav/card/glass animasyon ve transition'ları devre dışı; `backdrop-filter` sabitlendi; `html`/`body`/`#app` explicit `var(--bg)` yapıldı. Kalan herhangi bir flaş büyük ihtimalle tarayıcı/PWA önbelleğinden eski `?v=20260728d` (veya daha eski) dosyaları çekmeye devam etmekten kaynaklanır; tamamen kapatıp açmak veya önbelleği atarak yenilemek gerekir.
+- **Sekme geçiş testi (dördüncü pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi, header/bottomnav/card transition veya backdrop-filter parlama olmadığı gözlemlenmeli. View Transitions API, `seyPageIn`, per-kart giriş animasyonları tamamen kaldırıldı; `.sey-app-booted` ile header/bottomnav/card/glass/soul-ov animasyon ve transition'ları devre dışı; `backdrop-filter` sabitlendi; `html`/`body`/`#app` explicit `var(--bg)` yapıldı.
+- **Pratik modal testi (dördüncü pass):** “Zihnimi Besledim” kartındaki `Pratik` butonuna dokunulunca açılan Pilates/Ney/Binicilik picker'ın açılışında, seçim yapılınca aktivite formuna geçişte, formdaki tür butonlarına dokunulduğunda ve modal açıkken tab değişimlerinde **hiçbir fade/pop/scale/transition parlama** olmamalı. Kalan herhangi bir flaş büyük ihtimalle tarayıcı/PWA önbelleğinden eski `?v=20260728e` (veya daha eski) dosyaları çekmeye devam etmekten kaynaklanır; tamamen kapatıp açmak veya önbelleği atarak yenilemek gerekir.
 - Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.
 - `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 

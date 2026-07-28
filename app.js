@@ -2884,8 +2884,11 @@ App.closeSoulPracticePicker=function(){
   render();
 };
 App.pickSoulPractice=function(type){
+  // Picker → aktivite geçişini tek render'da, animasyonsuz yap → flash yok.
   ui.soulPracticePicker=false;
-  App.openSoulActivity(type);
+  ui.soulActivityOpen=true;
+  ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
+  render();
 };
 App.closeSoulActivity=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); };
 App.onSoulField=function(field,el){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft[field]=el.value; };
@@ -3485,7 +3488,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)));
+  var curOverlay=ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var _painted=false;
@@ -8045,6 +8048,17 @@ function overlayShell(closeFn, sticky, body, maxw, fixedH){
   h+='</div></div>';
   return h;
 }
+function soulOverlayShell(closeFn, sticky, body, maxw, fixedH){
+  // Zihin-Beden (soul) modalları için animasyonsuz, anlık açılış shell.
+  // Picker → aktivite geçişlerinde ve tab değişimlerinde flash/flicker oluşmasın.
+  var sizeCss=fixedH?'height:88vh;max-height:88vh;':'max-height:88vh;';
+  var h='<div id="sey-ov-back" class="sey-soul-ov-back" onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;">';
+  h+='<div id="sey-ov-card" class="sey-soul-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
+  h+='<div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+(sticky||'')+'</div>';
+  h+='<div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+(body||'')+'</div>';
+  h+='</div></div>';
+  return h;
+}
 function bookStatusChip(st){ var m={reading:['Okunuyor','var(--read)','var(--read-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--drop)','var(--drop-bg)']}; var c=m[st]||m.reading; return '<span style="font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
 function readingOverlayHTML(){
   var view=ui.readingView||'today';
@@ -8474,7 +8488,7 @@ function soulActivityTodayView(){
   h+='<div style="display:flex;gap:8px;">';
   SOUL_ACTIVITY_CATALOG.forEach(function(a){
     var on=a.id===type;
-    h+='<button onclick="App.setSoulType(\''+a.id+'\')" style="flex:1;cursor:pointer;border-radius:14px;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid '+(on?'var(--soul)':'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,var(--soul-bg) 60%, transparent)':'var(--field)')+';box-shadow:'+(on?'0 6px 16px color-mix(in srgb,var(--soul-glow) 45%, transparent)':'none')+';transition:all .18s ease;">';
+    h+='<button onclick="App.setSoulType(\''+a.id+'\')" style="flex:1;cursor:pointer;border-radius:14px;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid '+(on?'var(--soul)':'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,var(--soul-bg) 60%, transparent)':'var(--field)')+';box-shadow:'+(on?'0 6px 16px color-mix(in srgb,var(--soul-glow) 45%, transparent)':'none')+';">';
     h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(on?'linear-gradient(135deg,var(--soul),var(--soul2))':'linear-gradient(135deg,var(--muted),var(--faint))')+';">'+icon(a.icon,16)+'</span>';
     h+='<span style="font-size:11px;font-weight:800;color:'+(on?'var(--soul)':'var(--muted)')+';">'+a.label+'</span>';
     h+='</button>';
@@ -8518,19 +8532,19 @@ function soulPracticePickerHTML(){
   var body='';
   body+='<div style="display:flex;flex-direction:column;gap:10px;">';
   SOUL_ACTIVITY_CATALOG.forEach(function(a){
-    body+='<button onclick="App.pickSoulPractice(\''+a.id+'\')" style="cursor:pointer;border-radius:18px;padding:14px;display:flex;align-items:center;gap:13px;border:1px solid var(--card-bd);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.06);transition:transform .18s,border-color .2s,box-shadow .25s;text-align:left;">';
+    body+='<button onclick="App.pickSoulPractice(\''+a.id+'\')" style="cursor:pointer;border-radius:18px;padding:14px;display:flex;align-items:center;gap:13px;border:1px solid var(--card-bd);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.06);text-align:left;">';
     body+='<span style="width:46px;height:46px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));box-shadow:0 6px 14px color-mix(in srgb,var(--soul-glow) 60%, transparent);">'+icon(a.icon,22)+'</span>';
     body+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);">'+a.label+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;line-height:1.35;">'+a.blurb+'</div></div>';
     body+='<span style="color:var(--soul);display:inline-flex;">'+icon('chevron-right',18)+'</span>';
     body+='</button>';
   });
   body+='</div>';
-  return overlayShell('App.closeSoulPracticePicker()', head, body);
+  return soulOverlayShell('App.closeSoulPracticePicker()', head, body);
 }
 
 function soulActivityOverlayHTML(){
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
-  return overlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
+  return soulOverlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
 }
 
 function modalsHTML(){

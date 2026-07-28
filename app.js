@@ -8131,26 +8131,6 @@ function saygiPreviewCardHTML(person,done,article){
   h+='</div>';
   return h;
 }
-function saygiHeaderBarHTML(idx,total){
-  var person=saygiCurrentPerson();
-  var subtitle=person ? esc(person.name)+' · '+esc(person.field||person.kind||'') : 'Bir hayat, bir iz.';
-  return '<div class="sg-header-bar">'
-    +'<div class="sg-header-bar-top">'
-      +'<div class="sg-header-bar-brand"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></div>'
-      +'<div class="sg-header-bar-kicker">GÜNÜN ÖNCÜSÜ · '+idx+'/'+total+'</div>'
-    +'</div>'
-    +'<div class="sg-header-bar-bottom">'
-      +'<div class="sg-header-bar-title-block">'
-        +'<span class="sg-header-bar-trophy">'+icon('trophy',18)+'</span>'
-        +'<div class="sg-header-bar-titles">'
-          +'<div class="sg-header-bar-title">İlham & İbadet</div>'
-          +'<div class="sg-header-bar-subtitle">'+subtitle+'</div>'
-        +'</div>'
-      +'</div>'
-      +'<button class="sg-header-bar-action" onclick="App.refreshSaygi()" aria-label="Saygı içeriğini yenile">'+icon('rotate-ccw',13)+'<span>Yenile</span></button>'
-    +'</div>'
-  +'</div>';
-}
 function saygiMissionCardHTML(){
   return '<div class="sg-mission-card">'
     +'<div class="sg-mission-kicker">'+icon('trophy',12)+' İLHAM · GÜNÜN İSMİ</div>'
@@ -8214,9 +8194,7 @@ function saygiHTML(){
   if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
   saygiEnsureArticle(person);
   var article=ui.saygiArticle, done=saygiHasRead(person);
-  var idx=saygiPeople().indexOf(person)+1, total=saygiPeople().length;
   var h='<section class="saygi-page">';
-  h+=saygiHeaderBarHTML(idx,total);
   h+=saygiPreviewHubHTML(person,article,done);
   h+='</section>';
   return h;
@@ -8313,7 +8291,7 @@ function appHeaderMeta(){
     base.icon='activity'; base.accent='#2F6B63'; base.accent2='#60695D'; base.ink='#1F2826';
     if(!ed) base.action={label:'İçe aktar',icon:'apple',fn:'App.importHealthClick()'};
   } else if(tab==='saygi'){
-    base.title='Saygı';
+    base.title='İlham & İbadet';
     base.icon='trophy'; base.accent='#826936'; base.accent2='#36454B'; base.ink='#242723';
     if(!featuresLive()){
       base.kicker='Yakında'; base.sub='13 Temmuz\'da açılıyor';

@@ -353,7 +353,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ### 2026-07-30 — Faz 34: Saygı + İman Köşesi Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
 
-**Branch:** `mustafaras-iman-kosesi-plani` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward merge **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260730f`).
 
 **Bu session'da değişen dosyalar:**
 - `app.js`
@@ -416,21 +416,20 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 6 / "Saygı" → "İlham & İbadet" header başlığı assertion'ları dahil).
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Cache bump `20260730f` uygulandı; onay sonrası kullanıcıya eski `?v=20260730e` önbelleğini temizlemesi / uygulamayı kapatıp açması hatırlatılmalı.
-- Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcısından/PWA’sından test etmesi için çalıştırıldı.
+- Cache bump `20260730f` uygulandı.
+- Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcısından/PWA’sından test etmesi için çalıştırıldı; deploy sonrası durdurulacak.
 
-**Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
-- Onay sonrası merge öncesi son bir kez `node --check app.js` + `prayer-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
-- Gerçek iPhone/PWA'da test edilecekler:
-  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte iki katmanlı kompakt header bar görünmeli — üst satırda "Şeyma 🦩" marka + "GÜNÜN ÖNCÜSÜ · X/100" kicker, alt satırda kupa ikonu + "Saygı" başlık + güncel kişi adı/alanı alt başlık + "Yenile" butonu.
+**Bir sonraki adım / canlı test notları:**
+- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi; durum `https://github.com/mustafaras/s/actions` üzerinden takip edilebilir.
+- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260730f` üzerinden doğrulanmalı:
+  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte iki katmanlı kompakt header bar görünmeli — üst satırda "Şeyma 🦩" marka + "GÜNÜN ÖNCÜSÜ · X/100" kicker, alt satırda kupa ikonu + **"İlham & İbadet"** başlık + güncel kişi adı/alanı alt başlık + "Yenile" butonu.
   - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli; sayfa içinde artık misyon kartı ("Bir hayat, bir iz.") olmamalı.
   - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli.
   - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Bugün keşfet" tonu.
   - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/geç/streak rozetleri.
   - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.
   - İman Köşesi kartına dokunulunca vakit overlay'i açılmalı; kılındı/cemaat/geç/kaza/nafile tikleri çalışmalı.
-  - Alt navigasyondaki Saygı butonu "İlham·İbadet" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
+  - Alt navigasyondaki etiket "İlham·İbadet" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
 - Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
 - Vakit kaynağı Aladhan method 13 (Diyanet hesabı) kullanıyor; daha sıkı resmi Diyanet doğruluğu isterse ileride GitHub Actions ile static `prayer-times-tr.json` üretilip uygulama onu okuyabilir.
 - `App.setPrayerMethod()` handler var ama overlay'de görünür method seçici UI henüz eklenmedi; istenirse Faz A sonrası küçük bir ekleme olarak eklenebilir.

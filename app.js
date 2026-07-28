@@ -2874,6 +2874,19 @@ App.openSoulActivity=function(type){
   ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
   render();
 };
+// Yeni: Pratik butonu ilk dokunuşta alt seçim açar (Pilates/Ney/Binicilik)
+App.openSoulPracticePicker=function(){
+  ui.soulPracticePicker=true;
+  render();
+};
+App.closeSoulPracticePicker=function(){
+  ui.soulPracticePicker=false;
+  render();
+};
+App.pickSoulPractice=function(type){
+  ui.soulPracticePicker=false;
+  App.openSoulActivity(type);
+};
 App.closeSoulActivity=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); };
 App.onSoulField=function(field,el){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft[field]=el.value; };
 App.setSoulType=function(type){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft.type=type; render(); };
@@ -3475,12 +3488,9 @@ function render(){
   var curOverlay=ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
-  var vtSupported=('startViewTransition' in document)&&!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var useVT=vtSupported&&!sameTab;
   var _painted=false;
   function paint(){
     if(_painted) return; _painted=true;
-    app.classList.remove('sey-page-in');
   var html=appHeaderHTML(); // başlangıç ekranı hariç her sekmenin en üstünde sabit marka başlığı
   // Flex içinde min-height:0 kritik: özellikle uzun Sağlık sayfasında içerik alanı
   // kabuğu büyütmek yerine kendi içinde kayar; sticky alt nav yerinden oynamaz.
@@ -3509,19 +3519,20 @@ function render(){
       var firstM=newScroll.firstElementChild; if(firstM){ firstM.style.animation='none'; }
       newScroll.scrollTop=newScroll.scrollHeight;
       ui.aeonScrollBottom=false;
-    } else if(useVT){
-      // Sekme geçişinde View Transition içerik akışını üstlensin — alt kartların
-      // teker teker float-in animasyonlarını sustur; sayfa düzeyinde tek premium akış kalsın.
+    } else if(!sameTab){
+      // Sekme degisimi: per-kart giris animasyonlarini sustur ve scroll'u en uste cek.
+      // Bu sayede kartlar her tab gecisinde yeniden "float-in" yapip "refresh"/parlama hissi vermez.
+      // Ambient (sonsuz) animasyonlar seyShine/seyRoomGlow etkilenmez.
+      var firstEl=newScroll.firstElementChild;
+      if(firstEl){ firstEl.style.animation='none'; }
       try{
         var ins=newScroll.querySelectorAll('[style*="seyFloatIn"],[style*="seyFade"],[style*="seyPop"]');
         for(var _i=0;_i<ins.length;_i++){ ins[_i].style.animation='none'; }
       }catch(e){}
       newScroll.scrollTop=0;
-    } else if(sameTab){
+    } else {
       // Aynı sekmede veri kaydı sonrası: kaydırma konumunu koru ve TÜM giriş animasyonlarını
       // tekrar oynatma (tik/mod/yazı gibi kayıtlarda kartların "refresh" gibi titremesini önler).
-      // Ambient (sonsuz) animasyonlar seyShine/seyRoomGlow etkilenmez; yalnızca tek-seferlik
-      // seyFloatIn/seyFade/seyPop giriş animasyonları susturulur.
       var firstEl=newScroll.firstElementChild;
       if(firstEl){ firstEl.style.animation='none'; }
       try{
@@ -3582,16 +3593,13 @@ function render(){
   lastOverlayView=curOverlayView;
   lastRenderTab=ui.tab;
   }
-  // Sekme değişiminde premium sayfa geçişi (View Transitions API); aynı sekmede
-  // veri güncellemelerinde VT kullanma — anlık render kalsın, geçiş yorgunluğu olmasın.
-  if(useVT){
-    try{ document.startViewTransition(function(){ paint(); }); }
-    catch(e){ paint(); }
-  } else {
-    paint();
-    // VT desteklenmeyen tarayıcılarda hafif sayfa-giriş fallback'i (yalnızca sekme değişiminde)
-    if(!sameTab){ var _app=document.getElementById('app'); if(_app){ _app.classList.remove('sey-page-in'); void _app.offsetWidth; _app.classList.add('sey-page-in'); } }
-  }
+  paint();
+  // İlk açılış sonrası sabit animasyon kipine geç; böylece sonraki sekme değişimlerinde
+  // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
+  if(root) root.classList.add('sey-app-booted');
+  // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
+  var tcm=document.querySelector('meta[name="theme-color"]');
+  if(tcm) tcm.setAttribute('content', dark?'#000000':'#FFF8F3');
 }
 
 function onboardingHTML(){
@@ -5535,49 +5543,56 @@ App.confirmMotivationMinimum=function(){
 // Kompakt hub kutucukları: okudum/izledim/dinledim — 3 tam-genişlik gradyan bar yerine
 // yan yana 3 hafif kutucuk (görsel gürültüyü azaltır, günlük log ailesiyle gruplanır).
 function hubTilesHTML(){
-  // "Zihnimi Besledim" — premium, vurgulu bir kart: dört kutucuktan biri dolunca
-  // üstünde onay rozeti belirir ve mediaFed tiki kendiliğinden yeşillenir.
+  // "Zihnimi Besledim" — tek, bağımsız, premium beslenme kartı.
+  // Okuma / izleme / dinleme / öğrenme / pratik beş kategori tek satırda.
+  // Herhangi biri doldurulunca mediaFed tiki otomatik yeşillenir.
   var day=(data&&data.days)?data.days[todayStr()]:null;
   var cnt=function(sec){ var e=(day&&day[sec]&&Array.isArray(day[sec].entries))?day[sec].entries:[]; return e.length; };
-  var tile=function(fn,label,ic,col,bg,n){
-    var done=n>0;
-    var badge=done?'<span style="position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.3)')+';">'+(n>1?n:icon('check',10))+'</span>':'';
-    var surface=dark?'color-mix(in srgb,'+col+' '+(done?'16':'10')+'%, #0B0B0E)':bg;
-    return '<button onclick="App.'+fn+'()" style="position:relative;flex:1;min-width:0;cursor:pointer;padding:14px 4px 12px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:7px;background:'+surface+';border:1px solid color-mix(in srgb,'+col+' '+(done?'52':(dark?'34':'26'))+'%, transparent);box-shadow:'+(dark?'none':(done?'0 8px 20px color-mix(in srgb,'+col+' 22%, transparent)':'0 4px 12px rgba(108,74,58,0.06)'))+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">'
-      +badge
-      +'<span style="width:40px;height:40px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' '+(dark?'14':'17')+'%, transparent);box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.35)')+';">'+icon(ic,19)+'</span>'
-      +'<span style="font-size:11.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+col+';">'+label+'</span></button>';
-  };
-  var total=cnt('reading')+cnt('watching')+cnt('listening')+cnt('learning');
   var soulN=(day&&Array.isArray(day.soulActivities))?day.soulActivities.length:0;
-  var filledN=(cnt('reading')>0?1:0)+(cnt('watching')>0?1:0)+(cnt('listening')>0?1:0)+(cnt('learning')>0?1:0)+(soulN>0?1:0);
-  var fed=total>0||soulN>0;
+  var cats=[
+    {key:'reading',label:'Okudum',icon:'book-open',col:'var(--read)',bg:'var(--read-bg)',fn:'openReading',n:cnt('reading')},
+    {key:'watching',label:'İzledim',icon:'clapperboard',col:'var(--watch)',bg:'var(--watch-bg)',fn:'openWatching',n:cnt('watching')},
+    {key:'listening',label:'Dinledim',icon:'headphones',col:'var(--listen)',bg:'var(--listen-bg)',fn:'openListening',n:cnt('listening')},
+    {key:'learning',label:'Öğrendim',icon:'graduation-cap',col:'var(--learn)',bg:'var(--learn-bg)',fn:'openLearning',n:cnt('learning')},
+    {key:'soul',label:'Pratik',icon:'heart-handshake',col:'var(--soul)',bg:'var(--soul-bg)',fn:'openSoulActivity',n:soulN}
+  ];
+  var filled=cats.filter(function(c){ return c.n>0; }).length;
+  var allFed=filled>0;
   var mc='#C77D93';
-  var chip=fed
-    ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Zihin tiki yeşil</span>'
+  var h='<div class="glass"'+(dark?' data-dark-variant="mind"':'')+' style="border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:14px;'+(dark?'background:linear-gradient(145deg,#111013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,'+mc+' '+(dark?'34':'24')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 14px 34px color-mix(in srgb,'+mc+' 16%, transparent)')+';">';
+  // premium gradient header: ikon, başlık, 5/5 progress
+  h+='<div style="display:flex;align-items:center;gap:12px;">';
+  h+='<span style="width:44px;height:44px;border-radius:14px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#9B5A73,#8B7CBF)':'linear-gradient(135deg,'+mc+',#E9AFC1,#9B7FC3)')+';box-shadow:'+(dark?'none':'0 8px 22px color-mix(in srgb,'+mc+' 40%, transparent)')+';position:relative;overflow:hidden;">';
+  h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.35) 50%,transparent 70%);animation:seyShimmer 2.8s linear infinite;"></span>';
+  h+=icon('sparkles',21);
+  h+='</span>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:17px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · İzledim · Dinledim · Öğrendim · Pratik</div></div>';
+  h+='</div>';
+  // alt başlık satırı: bugün X/5 + durum chip
+  var chip=allFed
+    ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Bugün beslendim</span>'
     : '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
-  var h='<div class="glass"'+(dark?' data-dark-variant="mind"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#111013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,'+mc+' '+(dark?'34':'24')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px color-mix(in srgb,'+mc+' 14%, transparent)')+';">';
-  h+='<div style="display:flex;align-items:center;gap:11px;">';
-  h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#8F5269,#6D567E)':'linear-gradient(135deg,'+mc+',#E9AFC1)')+';box-shadow:'+(dark?'none':'0 6px 16px color-mix(in srgb,'+mc+' 34%, transparent)')+';">'+icon('sparkles',19)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · izledim · dinledim · öğrendim · kurs/pratik — küçük besinler, büyük denge</div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
+  h+='<span style="font-size:11px;font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
+  h+=chip;
   h+='</div>';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);">BUGÜN '+filledN+'/5 ALAN</span>'+chip+'</span>';
-  h+='<div style="display:flex;gap:9px;">';
-  h+=tile('openReading','Okudum','book-open','var(--read)','var(--read-bg)',cnt('reading'));
-  h+=tile('openWatching','İzledim','clapperboard','var(--watch)','var(--watch-bg)',cnt('watching'));
-  h+=tile('openListening','Dinledim','headphones','var(--listen)','var(--listen-bg)',cnt('listening'));
-  h+=tile('openLearning','Öğrendim','graduation-cap','var(--learn)','var(--learn-bg)',cnt('learning'));
+  // 5 kategori butonu: 3+2 grid (mobilde otomatik wrap)
+  h+='<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;">';
+  cats.forEach(function(c){
+    var done=c.n>0;
+    var badge=done?'<span style="position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+c.col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.28)')+';z-index:2;">'+(c.n>1?c.n:icon('check',10))+'</span>':'';
+    var surface=dark?'color-mix(in srgb,'+c.col+' '+(done?'18':'10')+'%, #0B0B0E)':c.bg;
+    var borderOp=done?'58':(dark?'30':'22');
+    var sh=done?'0 8px 20px color-mix(in srgb,'+c.col+' 28%, transparent)':(dark?'none':'0 4px 12px rgba(108,74,58,0.06)');
+    var click=(c.key==='soul')?'App.openSoulPracticePicker()':'App.'+c.fn+'()';
+    h+='<button onclick="'+click+'" style="position:relative;min-width:0;cursor:pointer;padding:12px 3px 10px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px;background:'+surface+';border:1.5px solid color-mix(in srgb,'+c.col+' '+borderOp+'%, transparent);box-shadow:'+sh+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">';
+    h+=badge;
+    h+='<span style="width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:'+c.col+';background:color-mix(in srgb,'+c.col+' '+(dark?'16':'19')+'%, transparent);box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.35)')+';">'+icon(c.icon,17)+'</span>';
+    h+='<span style="font-size:10.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+(done?c.col:'var(--muted)')+';">'+c.label+'</span>';
+    h+='</button>';
+  });
   h+='</div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;">';
-  h+='<div style="width:28px;height:1px;background:linear-gradient(90deg,transparent,var(--card-bd),transparent);"></div>';
-  h+='<span style="font-size:10px;font-weight:800;letter-spacing:.35px;color:var(--muted);text-transform:uppercase;">Zihin-Beden Pratikleri</span>';
-  h+='<div style="flex:1;height:1px;background:linear-gradient(90deg,var(--card-bd),transparent);"></div>';
   h+='</div>';
-  h+='<div style="display:flex;gap:9px;">';
-  h+=tile('openSoulActivity\'pilates\'','Pilates','flower-2','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'pilates'));
-  h+=tile('openSoulActivity\'ney\'','Ney','wind','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'ney'));
-  h+=tile('openSoulActivity\'riding\'','Binicilik','heart-handshake','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'riding'));
-  h+='</div></div>';
   return h;
 }
 // Raşit'in sözü — hemen Günışığı kartının altında; dokununca söz değişir (App.cycleRasit).
@@ -8494,6 +8509,21 @@ function soulActivityEntryCard(a){
   h+='</div>';
   return h;
 }
+function soulPracticePickerHTML(){
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Bugün hangi pratik? '+icon('heart-handshake',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney veya binicilik — beden ve zihni birlikte besleyen ritim.</div></div><button onclick="App.closeSoulPracticePicker()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var body='';
+  body+='<div style="display:flex;flex-direction:column;gap:10px;">';
+  SOUL_ACTIVITY_CATALOG.forEach(function(a){
+    body+='<button onclick="App.pickSoulPractice(\''+a.id+'\')" style="cursor:pointer;border-radius:18px;padding:14px;display:flex;align-items:center;gap:13px;border:1px solid var(--card-bd);background:var(--card);box-shadow:0 4px 12px rgba(108,74,58,0.06);transition:transform .18s,border-color .2s,box-shadow .25s;text-align:left;">';
+    body+='<span style="width:46px;height:46px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));box-shadow:0 6px 14px color-mix(in srgb,var(--soul-glow) 60%, transparent);">'+icon(a.icon,22)+'</span>';
+    body+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);">'+a.label+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;line-height:1.35;">'+a.blurb+'</div></div>';
+    body+='<span style="color:var(--soul);display:inline-flex;">'+icon('chevron-right',18)+'</span>';
+    body+='</button>';
+  });
+  body+='</div>';
+  return overlayShell('App.closeSoulPracticePicker()', head, body);
+}
+
 function soulActivityOverlayHTML(){
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
   return overlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
@@ -8508,6 +8538,7 @@ function modalsHTML(){
   if(ui.watchOpen){ h+=watchOverlayHTML(); }
   if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
   if(ui.learningOpen){ h+=learningOverlayHTML(); }
+  if(ui.soulPracticePicker){ h+=soulPracticePickerHTML(); }
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){

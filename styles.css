@@ -252,27 +252,17 @@
   .wxcard:hover{box-shadow:0 16px 34px var(--sun-glow);}
   .scroll{-webkit-overflow-scrolling:touch;}
   textarea,input{color:var(--text);}
-  /* ── iOS 27 liquid-glass sayfa geçişleri (View Transitions API) ──
-     Header & nav sabit kalsın (krom değişmesin), yalnızca içerik alanı
-     premium bir cross-fade + hafif yukarı kayma + blur ile geçiş yapsın. */
-  .sey-appheader{view-transition-name:sey-header;}
-  .sey-bottomnav{view-transition-name:sey-nav;}
-  [data-scroll].scroll{view-transition-name:sey-content;}
-  @keyframes seyVTContentOut{0%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}100%{opacity:0;transform:translateY(-9px) scale(1.012);filter:blur(7px);}}
-  @keyframes seyVTContentIn{0%{opacity:0;transform:translateY(11px) scale(.985);filter:blur(7px);}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}}
-  ::view-transition-old(sey-content){animation:seyVTContentOut .26s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;}
-  ::view-transition-new(sey-content){animation:seyVTContentIn .4s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;}
-  ::view-transition-group(sey-content){isolation:auto;}
-  /* Krom (header/nav) geçişte sabit — yalnızca içerik akar */
-  ::view-transition-old(sey-header),::view-transition-new(sey-header),::view-transition-group(sey-header),
-  ::view-transition-old(sey-nav),::view-transition-new(sey-nav),::view-transition-group(sey-nav){animation:none;}
-  /* VT desteklenmeyen tarayıcılarda yumuşak giriş fallback'i (sekme değişiminde) */
-  @keyframes seyPageIn{0%{opacity:0;transform:translateY(10px) scale(.987);}100%{opacity:1;transform:translateY(0) scale(1);}}
-  .sey-page-in>[data-scroll].scroll{animation:seyPageIn .42s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;}
-  @media (prefers-reduced-motion: reduce){
-    ::view-transition-old(sey-content),::view-transition-new(sey-content){animation:none;}
-    .sey-page-in>[data-scroll].scroll{animation:none;}
-  }
+  /* ── Sekme geçişlerinde titreme / parlama / flaş önlemi ──
+     View Transitions API ve içerik fade-in tamamen kapatıldı.
+     İlk açılış animasyonları yalnızca root .sey-app-booted sınıfı eklenmeden
+     önce çalışır; sonraki tüm render'larda header/wordmark/pseudo'lar sabit
+     kalır, böylece her tab değişimi anında ve pürüzsüz görünür. */
+  .sey-app-booted .sey-appheader,
+  .sey-app-booted .sey-appheader::before,
+  .sey-app-booted .sey-appheader::after,
+  .sey-app-booted .sey-wordmark,
+  .sey-app-booted .sey-wordmark-flam{animation:none !important;}
+  #app{background:var(--bg);}
   /* Koyu tema: renkli dış haleler yerine net sınırlar ve gerçek siyah derinlik. */
   #root[data-theme="dark"] .glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none!important;}
   #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 8px 18px rgba(0,0,0,.52),inset 0 -1px 0 rgba(255,255,255,.04);}

@@ -362,7 +362,9 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `migrate()` içinde tüm mevcut günlük kayıtlara boş `soulActivities` array backfill yapılıyor.
   - `hasAnyHubEntry()` artık `rec.soulActivities` kayıtlarını da sayıyor; böylece kurs/pratik girişi `mediaFed` tiki otomatik yeşilleniyor.
   - `mediaFed` tanım/help/toast/progress metinleri güncellendi: “okudum/izledim/dinledim **ya da kurs/pratik yaptım**”.
-  - Bugün ekranındaki hub tile satırına “Zihin-Beden Pratikleri” başlığı ve `Pilates` / `Ney` / `Binicilik` hızlı giriş tile'ları eklendi.
+  - **Yeniden tasarım (kullanıcı geri bildirimi sonrası):** `hubTilesHTML()` tamamen yeniden yazıldı. Artık Bugün ekranında tek, bağımsız, premium “Zihnimi Besledim” kartı var. Beş kategori (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit görsel ağırlıkta tek satırda (5 sütun grid). Her kategori kendi accent renginde, doldurulduğunda sayı/yeşil tik rozeti beliriyor. Kartın altındaki magnezyum ve diğer bugün kartlarıyla birleşmiyor, iç içe geçmiyor.
+  - `Pratik` butonu artık doğrudan form açmak yerine `App.openSoulPracticePicker()` ile **Pilates / Ney / Binicilik seçim picker'ı** açıyor; seçim sonrası `App.openSoulActivity(type)` ile ilgili türün formuna geçiliyor.
+  - Yeni picker overlay `soulPracticePickerHTML()` ve handler'lar: `App.openSoulPracticePicker`, `App.closeSoulPracticePicker`, `App.pickSoulPractice`.
   - Yeni tam ekran modal `soulActivityOverlayHTML()` + `soulActivityTodayView()` + `soulActivityEntryCard()` eklendi: tür chip grid, dakika inputu, not textarea, bugünkü kayıt listesi ve silme.
   - Handler'lar: `App.openSoulActivity`, `App.closeSoulActivity`, `App.onSoulField`, `App.setSoulType`, `App.saveSoulActivity`, `App.removeSoulActivity`.
 - `styles.css`
@@ -373,19 +375,30 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
   - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260728a`.
+  - Cache-bump: tüm asset `?v=20260728d`.
+  - `#app` inline style'a `background:var(--bg)` eklendi; böylece `innerHTML` değişirken arka yüzey asla beyaz/varsayılan renge dönmüyor.
+- `app.js` (sekme geçişleri düzeltmesi — ikinci, daha derin pass)
+  - `render()` içinde `document.startViewTransition()` ile blur/scale cross-fade sekme geçişleri **tamamen kaldırıldı**. `paint()` her zaman anlık çağrılıyor; hiçbir fallback fade/opacity animasyonu kalmadı.
+  - İlk açılış sonrası `root.classList.add('sey-app-booted')` çağrılarak sonraki tüm render'larda header pseudo-element drift/pulse ve wordmark/flam sheen animasyonları CSS ile devre dışı kalıyor (her tab değişiminde yeniden başlamıyor).
+  - iOS/PWA durum çubuğu rengi `meta[name="theme-color"]` her render'da mevcut temaya göre (`#FFF8F3` açık / `#000000` koyu) güncelleniyor; açık/koyu geçişlerde durum çubuğu flaşı azaltılıyor.
+  - Sekme değişiminde (`!sameTab`) per-kart `seyFloatIn/seyFade/seyPop` giriş animasyonları susturuldu; scroll konumu en üste çekiliyor.
+- `styles.css`
+  - View Transitions API CSS (`view-transition-name`, `::view-transition-*`, `seyVTContentOut/In`) tamamen kaldırıldı.
+  - `.sey-page-in>[data-scroll].scroll` ve `@keyframes seyPageIn` kaldırıldı; sayfa-giriş/opacity animasyonu yok.
+  - `.sey-app-booted` scope'u eklendi: `.sey-appheader::before/::after`, `.sey-wordmark`, `.sey-wordmark-flam` için `animation:none !important;`, böylece ilk açılış sonrası header shimmer/yazı sheen tekrar oynamaz.
+  - `#app{background:var(--bg);}` eklendi, `index.html` inline style'la birlikte çift garanti sağlanıyor.
 - `GELISTIRME-PLANI.md`
   - “Son güncelleme” 2026-07-28 yapıldı.
-  - 2026-07-28 changelog girişi eklendi.
+  - 2026-07-28 changelog girişi eklendi / yeniden tasarım detaylarıyla güncellendi.
   - Faz 32 “🧘 Zihin-Beden Beslenmesi — kurs/pratik takibi + mediaFed auto-tick” satırı ✅ olarak eklendi; durum sayıları güncellendi.
 - `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi.
+  - Bu Agent Handoff Log girişi eklendi / yeniden tasarımla güncellendi.
 
 **Onaylı plan:**
 - `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\plan.md` içindeki pro premium plan kullanıcı tarafından onaylandı ve uygulandı.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 10 assertion (`migrate` backfill, modal render, kayıt oluşturma, `duration`/`note` ayrıştırma, `mediaFed` otomatik tik, bugün sekmesinde gösterim, silme) tamamı PASS.
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 13 assertion (`migrate` backfill, bağımsız premium kart 5 kategori, X/5 progress label, picker modal render, form açılışı, kayıt oluşturma, `duration`/`note` ayrıştırma, `mediaFed` otomatik tik, bugün sekmesinde gösterim, silme) tamamı PASS.
 
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
@@ -393,16 +406,17 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - `node --check motivationProgramV2.js` ✅
 - `node --check saygiPeople.js` ✅
 - `node --check motivationNarratives.js` ✅
-- `panel.html` inline script syntax check ✅ (1 inline script OK)
+- `panel.html` inline script syntax check ✅ (4/4 script tag balance OK)
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 10/10 assertion PASS.
+- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
+- Yerel demo server `python -m http.server 9000` kullanıcının incelemesi için çalıştırıldı; session kapanmadan önce durdurulacak.
 
 **Bir sonraki adım / deploy öncesi notlar:**
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
-- Gerçek iPhone'da: Bugün ekranında “Pilates / Ney / Binicilik” tile'larının göründüğü, dokunulunca modal açıldığı, süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği, panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
+- Gerçek iPhone'da / yerel demo sunucuda (port 9000): Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının açıldığı; seçim sonrası süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
+- **Sekme geçiş testi (ikinci pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi olmadığı, header shimmer/wordmark sheen’in yeniden başlamadığı, kartların yeniden “sallanmadığı” ve içeriğin anında yerleştiği gözlemlenmeli. `styles.css`’de `.sey-page-in>[data-scroll].scroll` ve tüm View Transitions CSS’i tamamen kaldırıldı; kalan herhangi bir flaş büyük ihtimalle tarayıcı önbelleğinden eski `?v=20260728c` dosyaları çekmeye devam etmekten kaynaklanır.
 - Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.
 - `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 

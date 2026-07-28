@@ -351,6 +351,33 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-28 — İlham & İbadet tek-header düzeltmesi
+
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward push yapıldı. **Kod commit:** `fba346d`. **Canlı sürüm:** `https://mustafaras.github.io/s/index.html?v=20260730g`.
+
+**Değişen dosyalar:**
+- `app.js`: gerçek ortak header başlığı "Saygı" → "İlham & İbadet"; sekme içindeki duplicate `saygiHeaderBarHTML()` ve render çağrısı kaldırıldı.
+- `styles.css`: artık kullanılmayan `.sg-header-bar-*` duplicate header stilleri temizlendi.
+- `index.html`: asset cache sürümü `20260730g`.
+- `GELISTIRME-PLANI.md`: Faz 34 revizyon pass 6 notu eklendi.
+- `AGENTS.md`: bu handoff kaydı eklendi.
+
+**Doğrulama:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `.claude/skills/run-seyma/driver.mjs` genel headless render regresyonu ✅
+- `prayer-harness.mjs` eski veri migration + İlham & İbadet açık/koyu tema render testi ✅
+- Gerçek ortak header'da "İlham & İbadet", kişi bilgisi, sayaç ve "Yenile" mevcut; `.sg-header-bar` duplicate'i iki temada da yok ✅
+- `panel.html` inline script syntax (4/4) ✅
+- `git diff --check` ✅
+- GitHub Pages workflow `30363029665` validate + deploy ✅
+- Canlı HTTP doğrulaması: `index.html` `app.js?v=20260730g` yüklüyor; canlı `app.js` gerçek "İlham & İbadet" başlığını içeriyor ve `saygiHeaderBarHTML()` içermiyor ✅
+- Gerçek tarayıcı agent tarafından açılmadı; kullanıcı testi için başlatılan 8989 yerel server session sonunda kapatıldı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Cihaz/PWA görsel kontrolü kullanıcı tarafından yapılmalı.
+
+---
+
 ### 2026-07-30 — Faz 34: Saygı + İman Köşesi Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward merge **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260730f`).

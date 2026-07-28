@@ -378,13 +378,17 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
     - Yeni `saygiMissionCardHTML()`: "İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz." misyon kartı; altın-yeşil gradient arka plan, dekoratif radial arc ve nazik açıklama paragrafı.
     - `saygiPreviewCardHTML()` imzası sadeleştirildi; kart içindeki "Günün öncüsü" kicker çizgisi kaldırıldı (bilgi artık header bar'da).
     - `saygiPreviewHubHTML()` ve `saygiHTML()` yeni header/mission kartını kullanacak şekilde güncellendi.
+  - **Beşinci pass / header visual refinement (görsel referans):**
+    - `saygiHeaderBarHTML()` görsel mockup'a göre iki katmanlı yeniden tasarlandı: üst katmanda sol "Şeyma 🦩" marka ve sağ "GÜNÜN ÖNCÜSÜ · X/100" kicker; alt katmanda sol büyük trophy rozeti + "Saygı" başlık + kişi adı/alan alt başlık, sağda pill "Yenile" butonu.
+    - `saygiHTML()`'den `saygiMissionCardHTML()` çağrısı kaldırıldı; misyon metni artık preview kart içinde ve header'daki kişi alt başlığıyla yedekleniyor.
+    - `styles.css`'te `.sg-header-bar-*` ailesi genişletildi: `.sg-header-bar-top`, `.sg-header-bar-bottom`, `.sg-header-bar-brand`, `.sg-header-bar-kicker`, `.sg-header-bar-title-block`, `.sg-header-bar-trophy`, `.sg-header-bar-titles`, `.sg-header-bar-title`, `.sg-header-bar-subtitle` stilleri eklendi.
   - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
   - Yeni ikonlar: `mosque` ve `users` SVG path'leri `ICONS` kataloğuna eklendi.
 - `styles.css`
   - Açık/koyu tema `:root` bloklarına `--faith`, `--faith2`, `--faith-bg`, `--faith-glow`, `--faith-soft` accent değişkenleri eklendi.
   - `.sg-faith-*` ve `.sey-faith-*` bileşen stilleri; `.sey-app-booted` kapsamına faith overlay elementleri eklendi.
   - Yeni `.sg-person-preview-*` ailesi (kart, thumbnail, içerik, badge, durum arc), `.sg-faith-preview-*` ailesi (kart, ilerleme şeridi, vakit listesi, satır, pill'ler), `.sg-person-ov-*` modal stilleri (header, body, article override'ları).
-  - Yeni `.sg-header-bar-*` ailesi (compact top bar, title, counter, refresh action) ve `.sg-mission-*` ailesi (mission card, kicker, title, description, radial arc).
+  - Yeni `.sg-header-bar-*` ailesi (compact top bar, title, counter, refresh action) ve `.sg-mission-*` ailesi (mission card, kicker, title, description, radial arc; beşinci pass'te sekme açılışından kaldırıldı, kodda korundu).
   - `.sey-app-booted` kapsamına yeni kart/modal/header/mission elementleri eklendi; animation/transition ve `backdrop-filter` sabitlemeleri saygı/iman preview kartları, kişi modalı, header bar ve misyon kartına da uygulanıyor.
   - `.sey-bottomnav-badge.saygi` altın gradient rozet stili korundu.
 - `panel.html`
@@ -392,15 +396,15 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Bağımsız panel prayer helper'ları (`PRAYER_NAMES_P`, `emptyPrayerEntryP`, `ensurePrayerDayP`, `prayerDaySummaryP`, `prayerSummaryP`, `prayerDayDetailP`).
   - "🕌 İman Köşesi" bento KPI kartı (kılınan/cemaat/kaza/nafile/son vakit) + seçili gün detayında vakit satırı.
 - `index.html`
-  - Cache-bump: tüm asset'ler `?v=20260730d`.
+  - Cache-bump: tüm asset'ler `?v=20260730e`.
 - `GELISTIRME-PLANI.md`
-  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) + dördüncü pass (Saygı header/intro redesign) detayları ve cache bump `20260730d` ile güncellendi.
-  - Faz 34 durum tablosu satırı cache `20260730d` olarak güncellendi (🟡 — onay bekliyor).
+  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement, `.sg-mission-card` kaldırıldı) detayları ve cache bump `20260730e` ile güncellendi.
+  - Faz 34 başlığı "İlham & İbadet Hub'ı" olarak genişletildi; durum tablosu satırı cache `20260730e` olarak güncellendi (🟡 — onay bekliyor).
 - `AGENTS.md`
-  - Bu Agent Handoff Log girişi güncellendi; üçüncü pass + dördüncü pass (Saygı header/intro redesign) detayları eklendi.
+  - Bu Agent Handoff Log girişi güncellendi; üçüncü pass + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement) detayları eklendi.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi senaryolarını kapsar. Revizyon sonrası `window.SaygiPeople` seed ile `saygi` tab'ine gidilip `saygi-preview-hub`, `sg-person-preview-card`, `sg-faith-preview-card`, `sg-header-bar`, `sg-mission-card`, `Bir hayat, bir iz.`, `Yenile`, eski `saygi-intro` bloğunun kaldırıldığı ve kişi isminin render edildiği assertion'lar eklendi. `App.openSaygiPreview()` modalı (`sg-person-ov-card` + `sg-person-ov-head`) assertion'ları eklendi.
+- `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi senaryolarını kapsar. Revizyon sonrası `window.SaygiPeople` seed ile `saygi` tab'ine gidilip `saygi-preview-hub`, `sg-person-preview-card`, `sg-faith-preview-card`, `sg-header-bar`, `sg-header-bar-brand`, `Şeyma`, `sg-header-bar-kicker`, `GÜNÜN ÖNCÜSÜ`, `Saygı`, `sg-header-bar-subtitle`, `Yenile`, eski `saygi-intro` bloğunun kaldırıldığı, eski `sg-mission-card`'ın kaldırıldığı ve kişi isminin render edildiği assertion'lar eklendi. `App.openSaygiPreview()` modalı (`sg-person-ov-card` + `sg-person-ov-head`) assertion'ları eklendi.
 
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
@@ -409,19 +413,19 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - `node --check saygiPeople.js` ✅
 - `node --check motivationNarratives.js` ✅
 - `panel.html` inline script syntax check (4/4 script tag) ✅
-- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 4 assertion'ları da dahil).
+- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 5 / header visual refinement assertion'ları dahil).
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Cache bump `20260730d` uygulandı; onay sonrası kullanıcıya eski `?v=20260730c` önbelleğini temizlemesi / uygulamayı kapatıp açması hatırlatılmalı.
+- Cache bump `20260730e` uygulandı; onay sonrası kullanıcıya eski `?v=20260730d` önbelleğini temizlemesi / uygulamayı kapatıp açması hatırlatılmalı.
 - Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcısından/PWA’sından test etmesi için çalıştırıldı.
 
 **Bir sonraki adım / deploy öncesi notlar:**
 - Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `prayer-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
 - Gerçek iPhone/PWA'da test edilecekler:
-  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte kompakt header bar ("Günün öncüsü · X/100" + "Yenile" butonu) ve altında altın-yeşil gradient misyon kartı ("İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz.") görünmeli.
-  - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli.
-  - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli; preview kartın kendi içinde artık "Günün öncüsü · X/100" kicker çizgisi olmamalı.
+  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte iki katmanlı kompakt header bar görünmeli — üst satırda "Şeyma 🦩" marka + "GÜNÜN ÖNCÜSÜ · X/100" kicker, alt satırda kupa ikonu + "Saygı" başlık + güncel kişi adı/alanı alt başlık + "Yenile" butonu.
+  - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli; sayfa içinde artık misyon kartı ("Bir hayat, bir iz.") olmamalı.
+  - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli.
   - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Bugün keşfet" tonu.
   - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/geç/streak rozetleri.
   - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.

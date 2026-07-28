@@ -8132,10 +8132,24 @@ function saygiPreviewCardHTML(person,done,article){
   return h;
 }
 function saygiHeaderBarHTML(idx,total){
+  var person=saygiCurrentPerson();
+  var subtitle=person ? esc(person.name)+' · '+esc(person.field||person.kind||'') : 'Bir hayat, bir iz.';
   return '<div class="sg-header-bar">'
-    +'<div class="sg-header-bar-main">'+icon('trophy',14)+'<span class="sg-header-bar-label">Günün öncüsü</span><span class="sg-header-bar-count">· '+idx+'/'+total+'</span></div>'
-    +'<button class="sg-header-bar-action" onclick="App.refreshSaygi()" aria-label="Saygı içeriğini yenile">'+icon('rotate-ccw',13)+'<span>Yenile</span></button>'
-    +'</div>';
+    +'<div class="sg-header-bar-top">'
+      +'<div class="sg-header-bar-brand"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></div>'
+      +'<div class="sg-header-bar-kicker">GÜNÜN ÖNCÜSÜ · '+idx+'/'+total+'</div>'
+    +'</div>'
+    +'<div class="sg-header-bar-bottom">'
+      +'<div class="sg-header-bar-title-block">'
+        +'<span class="sg-header-bar-trophy">'+icon('trophy',18)+'</span>'
+        +'<div class="sg-header-bar-titles">'
+          +'<div class="sg-header-bar-title">Saygı</div>'
+          +'<div class="sg-header-bar-subtitle">'+subtitle+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<button class="sg-header-bar-action" onclick="App.refreshSaygi()" aria-label="Saygı içeriğini yenile">'+icon('rotate-ccw',13)+'<span>Yenile</span></button>'
+    +'</div>'
+  +'</div>';
 }
 function saygiMissionCardHTML(){
   return '<div class="sg-mission-card">'
@@ -8203,7 +8217,6 @@ function saygiHTML(){
   var idx=saygiPeople().indexOf(person)+1, total=saygiPeople().length;
   var h='<section class="saygi-page">';
   h+=saygiHeaderBarHTML(idx,total);
-  h+=saygiMissionCardHTML();
   h+=saygiPreviewHubHTML(person,article,done);
   h+='</section>';
   return h;

@@ -204,6 +204,8 @@
     --journal:#A66CFF; --journal2:#D9B8FF; --journal-bg:rgba(166,108,255,0.13); --journal-glow:rgba(166,108,255,0.35);
     /* Tatil Modu — turkuaz/yeşil accent */
     --vacation:#2A9D8F; --vacation2:#5ED4B4; --vacation-bg:rgba(42,157,143,0.13); --vacation-glow:rgba(42,157,143,0.35);
+    /* Zihin-Beden Beslenmesi — lavanta-altın karışımı (nefes, denge, ritim) */
+    --soul:#8E7CC3; --soul2:#D4B374; --soul-bg:rgba(142,124,195,0.13); --soul-glow:rgba(142,124,195,0.30);
     /* Şeyma & Raşit'in Terapi Odası — rafine rose-mauve + altın parıltı (premium marka teması) */
     --room:#BE6C8B; --room2:#E6ADCB; --room-glow:rgba(190,108,139,0.30); --room-bg:rgba(230,173,203,0.13);
     /* ÆON chat — altın aile (panel.html --gold ile uyumlu) + kullanıcı balonu + premium easing */
@@ -235,6 +237,7 @@
     --sun:#FFC768; --sun2:#FFA064; --sun-glow:rgba(255,190,100,0.09);
     --journal:#C9A4FF; --journal2:#E4CFFF; --journal-bg:rgba(201,164,255,0.12); --journal-glow:rgba(201,164,255,0.18);
     --vacation:#5ED4B4; --vacation2:#7DE8CB; --vacation-bg:rgba(94,212,180,0.12); --vacation-glow:rgba(94,212,180,0.18);
+    --soul:#B8A8E8; --soul2:#EBCC90; --soul-bg:rgba(184,168,232,0.11); --soul-glow:rgba(184,168,232,0.15);
     --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
     --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
     --user-bubble:#715DA8; --user-bubble2:#8872BD;

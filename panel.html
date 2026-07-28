@@ -26,6 +26,7 @@
     --purple:#a78bfa;--pa:rgba(167,139,250,.10);--pb:rgba(167,139,250,.22);
     --journal:#C9A4FF;--journal2:#A66CFF;--journal-bg:rgba(166,108,255,.12);--journal-glow:rgba(201,164,255,.18);
     --vacation:#5ED4B4;--vacation2:#2A9D8F;--vacation-bg:rgba(42,157,143,.12);--vacation-glow:rgba(94,212,180,.18);
+    --soul:#B8A8E8;--soul2:#EBCC90;--soul-bg:rgba(184,168,232,.11);--soul-glow:rgba(184,168,232,.15);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
@@ -391,6 +392,26 @@ var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonR
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
+// ── Zihin-Beden Beslenmesi (kurs & pratik) — panel aynası ──
+var SOUL_ACTIVITY_CATALOG_P=[
+  {id:"pilates",label:"Pilates",icon:"flower-2",color:"#7EB5A6",sci:"Kortikospinal plastisite, propriyosepsiyon, lumbopelvik stabilite"},
+  {id:"ney",    label:"Ney",    icon:"wind",    color:"#C9A86C",sci:"Nefes regülasyonu, HRV artışı, parasempatik aktivasyon"},
+  {id:"riding", label:"Binicilik",icon:"heart-handshake",color:"#B89BCA",sci:"Hippoterapi, vestibüler uyarım, duygusal düzenleme, postüral kontrol"}
+];
+function soulActivityByIdP(id){ for(var i=0;i<SOUL_ACTIVITY_CATALOG_P.length;i++){ if(SOUL_ACTIVITY_CATALOG_P[i].id===id) return SOUL_ACTIVITY_CATALOG_P[i]; } return null; }
+function soulActivityMinutesP(rec){ if(!rec||!Array.isArray(rec.soulActivities)) return 0; var t=0; rec.soulActivities.forEach(function(a){ var m=Number(a&&a.duration); if(!isNaN(m)&&m>0) t+=m; }); return t; }
+function soulActivityCountsRangeP(start,end){
+  var counts={pilates:0,ney:0,riding:0}, mins={pilates:0,ney:0,riding:0}, totalMins=0, totalCount=0;
+  if(!D||!D.days) return {counts:counts,mins:mins,totalMins:totalMins,totalCount:totalCount};
+  var s=start||addDays(today(),-6), e=end||today();
+  if(s>e){ var tmp=s; s=e; e=tmp; }
+  for(var d=s; diff(e,d)>=0; d=addDays(d,1)){
+    var rec=D.days[d]; if(!rec||!Array.isArray(rec.soulActivities)) continue;
+    rec.soulActivities.forEach(function(a){ if(!a||!a.type) return; counts[a.type]=(counts[a.type]||0)+1; var m=Number(a.duration); if(!isNaN(m)&&m>0){ mins[a.type]=(mins[a.type]||0)+m; totalMins+=m; } totalCount++; });
+  }
+  return {counts:counts,mins:mins,totalMins:totalMins,totalCount:totalCount};
+}
+function fmtDurationP(min){ if(!min||isNaN(min)||min<=0) return ''; if(min<60) return min+' dk'; var h=Math.floor(min/60), r=min%60; return h+' sa'+(r?' '+r+' dk':''); }
 function journalModeLabel(mode){
   var map={free:'Serbest Akış',affect:'Duygu Adlandırma',gratitude:'3 Güzel Şey',win:'Günün Kazanımı',selfCompassion:'Öz-Şefkat',reappraisal:'Yeniden Değerleme',values:'Değer Bağlantısı',urgeSurf:'Dürtü Dalga Geçişi'};
   return map[mode]||'Günlük Işığı';
@@ -516,6 +537,7 @@ function today(){ return fmt(new Date()); }
 function addDays(s,n){ var p=s.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]); d.setDate(d.getDate()+n); return fmt(d); }
 function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number); return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000); }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function ucfirst(s){ return String(s==null?"":s).replace(/^\s*/,"").replace(/^(.)/,function(m){return m.toUpperCase();}); }
 function cleanEmojiText(s){
   return String(s==null?"":s)
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?(?:\u200D[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?)*/gu,"")
@@ -2158,6 +2180,18 @@ function render(){
     h+=kpi('Tatil Modu',vVal,'var(--vacation)',vExtra,null,vCap);
   })();
 
+  // ROW 1.7: Zihin-Beden Beslenmesi — pilates/ney/binicilik haftalık pratik özeti
+  (function(){
+    var rng=soulActivityCountsRangeP(cur[0],cur[cur.length-1]);
+    var mins=rng.totalMins, cnt=rng.totalCount;
+    var parts=[];
+    ['pilates','ney','riding'].forEach(function(t){ if(rng.counts[t]>0) parts.push(SOUL_ACTIVITY_CATALOG_P.find(function(x){return x.id===t;}).label+' '+rng.counts[t]+'x'+(rng.mins[t]>0?' '+fmtDurationP(rng.mins[t]):'')); });
+    var val=(mins>0)?fmtDurationP(mins):'—';
+    var extra='<span class="tchip fl">'+cnt+' pratik</span>';
+    var cap=parts.length?parts.map(function(s){return '<span>'+s+'</span>';}).join(''):'<span>Son '+UI.range+' günde kayıt yok</span>';
+    h+=kpi('Zihin-Beden',val,'var(--soul)',extra,null,cap);
+  })();
+
   // ROW 1.6: Günlük Işığı — serbest günlük refleksiyonu
   (function(){
     var jStreak=journalStreak(), jWords=totalJournalWords(), jLast=lastJournalDate(), jMonth=journalDaysThisMonth();
@@ -2466,6 +2500,10 @@ function render(){
   var lnEn=(srec.learning&&Array.isArray(srec.learning.entries))?srec.learning.entries:[];
   var lnTitles=lnEn.map(function(e){ var t=String(e&&e.topic||"").trim(); if(!t) return ""; var x=esc(t)+(e&&e.source?' <span style="color:var(--t4);font-weight:600;">— '+esc(String(e.source).trim())+'</span>':''); if(e&&e.note&&String(e.note).trim()) x+='<span style="display:block;color:var(--t3);font-weight:600;margin-top:2px;">'+esc(String(e.note).trim())+'</span>'; return x; }).filter(Boolean);
   exRows+=exRowAlways(icon('brain',13)+' Öğrenme', lnTitles.join(" · "));
+  // Zihin-Beden Beslenmesi (soulActivities): kurs & pratik kayıtları
+  var saEn=(Array.isArray(srec.soulActivities))?srec.soulActivities:[];
+  var saTitles=saEn.map(function(a){ var act=soulActivityByIdP(a.type); var lbl=act?act.label:ucfirst(a.type||''); var dur=fmtDurationP(a.duration); return esc(lbl)+(dur?' <span style="color:var(--soul);font-weight:700;">'+dur+'</span>':'')+(a.note?' <span style="display:block;color:var(--t3);font-weight:600;margin-top:2px;">'+esc(String(a.note).trim())+'</span>':''); }).filter(Boolean);
+  exRows+=exRowAlways(icon('heart-handshake',13)+' Zihin-Beden', saTitles.join(" · "));
   var health=srec.health&&typeof srec.health==="object"?srec.health:null;
   if(health){ var hb=[]; if(Number(health.steps)>0) hb.push(Number(health.steps).toLocaleString("tr-TR")+" adım"); if(Number(health.walkM)>0) hb.push(fmtKmM(Number(health.walkM))); if(health.updatedAt){ try{ hb.push("güncelleme "+new Date(health.updatedAt).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})); }catch(e){} } exRows+=exRowAlways(icon('activity',13)+' Sağlık senkronu', hb.join(" · ")); }
   var daySessions=Array.isArray(srec.sessions)?srec.sessions.slice():[]; if(srec.liveSession) daySessions.push(srec.liveSession);
@@ -2533,6 +2571,20 @@ function render(){
         +'<span style="color:var(--t3);font-size:var(--f2);font-weight:600;">'+kind+'</span>'
         +(meta.length?'<span style="color:var(--teal);font-size:var(--f2);font-weight:700;margin-left:auto;">'+meta.join(' · ')+'</span>':'')+'</div>'
         +((e&&e.note&&String(e.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(e.note).trim())+'”</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  }
+  // ── Bugünün Zihin-Beden pratikleri (soulActivities detay) ──
+  if(saEn.length>0){
+    h+='<div class="divider"></div><div class="lbl" style="display:flex;align-items:center;gap:6px;">'+icon('heart-handshake',14)+' Zihin-Beden Pratikleri</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;margin-top:2px;">';
+    saEn.forEach(function(a){
+      var act=soulActivityByIdP(a.type);
+      var dur=fmtDurationP(a.duration);
+      h+='<div style="background:var(--soul-bg);border:1px solid color-mix(in srgb,var(--soul) 22%, var(--bd2));border-radius:10px;padding:8px 11px;">'
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));flex-shrink:0;">'+icon(act?act.icon:'sparkles',15)+'</span><b style="color:var(--t1);font-weight:800;font-size:var(--f3);">'+(act?act.label:ucfirst(a.type||'(belirsiz)'))+'</b>'+(dur?'<span style="color:var(--soul);font-size:var(--f2);font-weight:700;margin-left:auto;">'+dur+'</span>':'')+'</div>'
+        +((a.note&&String(a.note).trim())?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.45;margin-top:5px;word-break:break-word;white-space:pre-wrap;">“'+esc(String(a.note).trim())+'”</div>':'')
         +'</div>';
     });
     h+='</div>';

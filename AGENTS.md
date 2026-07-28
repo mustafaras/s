@@ -351,6 +351,63 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — pilates, ney, binicilik kurs/pratik takibi (onay bekliyor)
+
+**Branch:** `mustafaras-animated-garbanzo` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `SOUL_ACTIVITY_CATALOG` sabiti eklendi: `pilates` (kortikospinal plastisite, propriyosepsiyon), `ney` (nefes regülasyonu, HRV), `binicilik` (hippoterapi, vestibüler uyarım).
+  - `data.days[date].soulActivities` veri yolu eklendi; her gün kaydı `type`, `label`, `duration`, `note`, `savedAt` içerir.
+  - `migrate()` içinde tüm mevcut günlük kayıtlara boş `soulActivities` array backfill yapılıyor.
+  - `hasAnyHubEntry()` artık `rec.soulActivities` kayıtlarını da sayıyor; böylece kurs/pratik girişi `mediaFed` tiki otomatik yeşilleniyor.
+  - `mediaFed` tanım/help/toast/progress metinleri güncellendi: “okudum/izledim/dinledim **ya da kurs/pratik yaptım**”.
+  - Bugün ekranındaki hub tile satırına “Zihin-Beden Pratikleri” başlığı ve `Pilates` / `Ney` / `Binicilik` hızlı giriş tile'ları eklendi.
+  - Yeni tam ekran modal `soulActivityOverlayHTML()` + `soulActivityTodayView()` + `soulActivityEntryCard()` eklendi: tür chip grid, dakika inputu, not textarea, bugünkü kayıt listesi ve silme.
+  - Handler'lar: `App.openSoulActivity`, `App.closeSoulActivity`, `App.onSoulField`, `App.setSoulType`, `App.saveSoulActivity`, `App.removeSoulActivity`.
+- `styles.css`
+  - Açık/koyu tema `:root` bloklarına `--soul`, `--soul2`, `--soul-bg`, `--soul-glow` accent değişkenleri eklendi.
+- `panel.html`
+  - Panel `:root` içine `--soul` değişkenleri eklendi.
+  - `SOUL_ACTIVITY_CATALOG_P` ve yardımcı fonksiyonlar (`soulActivityByIdP`, `soulActivityMinutesP`, `soulActivityCountsRangeP`, `fmtDurationP`, `ucfirst`) eklendi.
+  - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
+  - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
+- `index.html`
+  - Cache-bump: tüm asset `?v=20260728a`.
+- `GELISTIRME-PLANI.md`
+  - “Son güncelleme” 2026-07-28 yapıldı.
+  - 2026-07-28 changelog girişi eklendi.
+  - Faz 32 “🧘 Zihin-Beden Beslenmesi — kurs/pratik takibi + mediaFed auto-tick” satırı ✅ olarak eklendi; durum sayıları güncellendi.
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Onaylı plan:**
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\plan.md` içindeki pro premium plan kullanıcı tarafından onaylandı ve uygulandı.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 10 assertion (`migrate` backfill, modal render, kayıt oluşturma, `duration`/`note` ayrıştırma, `mediaFed` otomatik tik, bugün sekmesinde gösterim, silme) tamamı PASS.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
+- `panel.html` inline script syntax check ✅ (1 inline script OK)
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 10/10 assertion PASS.
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
+- Gerçek iPhone'da: Bugün ekranında “Pilates / Ney / Binicilik” tile'larının göründüğü, dokunulunca modal açıldığı, süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği, panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
+- Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.
+- `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
+
+---
+
 ### 2026-07-25 — Panel "Son Açılış" + "Canlı Takip" Doğruluğu + Tatil `enabledAt` Zaman Damgası (onay bekliyor)
 
 **Branch:** `mustafaras-panel-last-seen` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.

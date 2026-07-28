@@ -153,13 +153,45 @@ var HABITS=[
   {key:'vitaminD',icon:icon('sun',22),title:'D₃K₂ damla takviyemi aldım',sub:'Minik destek, güneş hesabına yazıldı.',msg:'D₃K₂ damla tamam. Güneş desteği kayda geçti.'},
   {key:'sleepReg',icon:icon('bed',22),title:'Yeterli uyudum (7,5+ saat)',sub:'Uyku, dengenin sessiz kahramanı.',msg:'Uyku tamam. Hormonlar ve ruh hâlin sessizce teşekkür ediyor.',since:'2026-06-28'},
   {key:'journaled',icon:icon('pen-line',22),title:'Duygu/günlük notu yazdım',sub:'Zihni boşaltmak, kaygıyı hafifletir.',msg:'Bir cümle bile olsa yazdın; zihin biraz nefes aldı.',since:'2026-07-03'},
-  {key:'mediaFed',icon:icon('sparkles',22),title:'Zihnimi besledim',sub:'Okudum, izledim, dinledim ya da öğrendim.',msg:'Zihnine iyi bir şey kattın — küçük ama besleyici.',since:'2026-07-09'},
+  {key:'mediaFed',icon:icon('sparkles',22),title:'Zihnimi besledim',sub:'Okudum, izledim, dinledim, öğrendim ya da kurs/pratik yaptım.',msg:'Zihnine iyi bir şey kattın — küçük ama besleyici.',since:'2026-07-09'},
   {key:'freshAir',icon:icon('leaf',22),title:'Açık havaya çıktım',sub:'Doğal ışık, ruh hâlini yukarı çeker.',msg:'Açık hava tamam. Güneş ve ruh hâlin selam gönderdi.',since:'2026-07-03'},
   {key:'selfKind',icon:icon('heart',22),title:'Kendime kötü davranmadım',sub:'En önemli tik bu.',msg:'Bugünün en kıymetli hamlesi: kendine yüklenmemek.'},
   {key:'caffeineOk',icon:icon('coffee',22),title:'Günlük kafein limitini aşmadım',sub:'Kafein saat ve miktarına bağlı — elle açılmaz.',msg:'Kafein limiti + zamanlama tamam. Uyku için de temiz bir gün.',since:'2026-07-10'},
   {key:'magnesium',icon:icon('pill',22),title:'Magnezyum takviyesi aldım',sub:'Destek gününü tamamladın.',msg:'Magnezyum desteği tamam. Beden sana teşekkür ediyor.'}
 ];
 var HABIT_TOTAL=HABITS.length;
+
+// ── Zihin-Beden Beslenmesi: kurs & pratik kataloğu ──
+var SOUL_ACTIVITY_CATALOG=[
+  {id:'pilates',label:'Pilates',icon:'flower-2',sci:'Kortikospinal plastisite, propriyosepsiyon, lumbopelvik stabilite',blurb:'Derin karın stabilizatörleri aktive eder, düşük bel ağrısı riskini azaltır, duruşu düzeltir.'},
+  {id:'ney',label:'Ney',icon:'wind',sci:'Nefes regülasyonu, HRV artışı, parasempatik aktivasyon',blurb:'Yavaş nefes vagus siniri aracılığıyla duygusal dengeyi destekler, iç sessizliği artırır.'},
+  {id:'riding',label:'Binicilik',icon:'heart-handshake',sci:'Hippoterapi, vestibüler uyarım, duygusal düzenleme, postüral kontrol',blurb:'Atın ritmik hareketi denge ve koordinasyonu uyarır; doğayla bağ ve güven duygusu verir.'}
+];
+function soulActivityById(id){ for(var i=0;i<SOUL_ACTIVITY_CATALOG.length;i++){ if(SOUL_ACTIVITY_CATALOG[i].id===id) return SOUL_ACTIVITY_CATALOG[i]; } return null; }
+function soulActivityIcon(id){ var a=soulActivityById(id); return a?a.icon:'sparkles'; }
+function soulActivityLabel(id){ var a=soulActivityById(id); return a?a.label:ucfirst(id); }
+function soulActivityEntries(date){ var d=data&&data.days?data.days[date||activeDate()||todayStr()]:null; return (d&&Array.isArray(d.soulActivities))?d.soulActivities:[]; }
+function soulActivityTypeCount(day,type){ if(!day||!Array.isArray(day.soulActivities)) return 0; var n=0; day.soulActivities.forEach(function(a){ if(a&&a.type===type) n++; }); return n; }
+function soulActivityMinutesTotal(rec){ if(!rec||!Array.isArray(rec.soulActivities)) return 0; var t=0; rec.soulActivities.forEach(function(a){ var m=Number(a&&a.duration); if(!isNaN(m)&&m>0) t+=m; }); return t; }
+function soulActivityCountsForDateRange(start,end){
+  var counts={}; var mins={};
+  SOUL_ACTIVITY_CATALOG.forEach(function(a){ counts[a.id]=0; mins[a.id]=0; });
+  if(!data||!data.days) return {counts:counts,mins:mins};
+  var s=start||todayStr(); var e=end||s;
+  Object.keys(data.days).forEach(function(date){
+    if(date<s||date> e) return;
+    var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return;
+    rec.soulActivities.forEach(function(a){ if(!a||!a.type) return; if(counts[a.type]==null) counts[a.type]=0; if(mins[a.type]==null) mins[a.type]=0; counts[a.type]++; var m=Number(a.duration); if(!isNaN(m)&&m>0) mins[a.type]+=m; });
+  });
+  return {counts:counts,mins:mins};
+}
+function ucfirst(s){ return String(s||'').charAt(0).toUpperCase()+String(s||'').slice(1); }
+function fmtDuration(min){
+  if(min==null||isNaN(min)||min<=0) return '';
+  if(min<60) return min+' dk';
+  var h=Math.floor(min/60), r=min%60;
+  return r===0?h+' saat':h+' saat '+r+' dk';
+}
 
 // ---- Kafein — bilimsel takip (EFSA 2015 · FDA · Harvard Health) ----
 // mg değerleri bir serving (fincan/shot/kupa/bardak/kutu) başına ortalama; demleme/
@@ -615,7 +647,7 @@ function migrate(d){
   if(typeof d.locationLastTs!=='string'&&d.locationLastTs!==null) d.locationLastTs=null;
   if(d.location===undefined) d.location=null;
   if(d.weather===undefined) d.weather=null;
-  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ if(d.days[k]&&typeof d.days[k]==='object') ensureSaygiDay(d.days[k]); });
+  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var rec=d.days[k]; if(rec&&typeof rec==='object'){ ensureSaygiDay(rec); if(!Array.isArray(rec.soulActivities)) rec.soulActivities=[]; } });
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
   if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
   if(!Array.isArray(d.library.books)) d.library.books=[];
@@ -1208,6 +1240,7 @@ function hasAnyHubEntry(rec){
   if(!rec) return false;
   var keys=['reading','watching','listening','learning'];
   for(var i=0;i<keys.length;i++){ var o=rec[keys[i]]; if(o&&Array.isArray(o.entries)&&o.entries.some(function(e){ return e&&((e.title&&String(e.title).trim())||(e.topic&&String(e.topic).trim())); })) return true; }
+  if(Array.isArray(rec.soulActivities)&&rec.soulActivities.some(function(a){ return a&&a.type; })) return true;
   return false;
 }
 function habitProgress(rec,key,date){
@@ -1259,7 +1292,7 @@ function derivedProgText(key,prog){
   if(key==='sweetManaged') return 'Tatlı krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
   if(key==='foodManaged') return 'Yemek/açlık krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
   if(key==='coffeeManaged') return 'Kahve/kafein krizinde “Krizi yönettim”e bas → kendiliğinden yeşillenir';
-  if(key==='mediaFed') return 'Okudum / izledim / dinledim / öğrendim\'den birini doldur → yeşillenir';
+  if(key==='mediaFed') return 'Okudum / izledim / dinledim / öğrendim / kurs-pratik yaptım → yeşillenir';
   if(key==='caffeineOk'){ return prog.amountOk ? (prog.has ? 'Son kahve vaktinde, miktar temiz → otomatik yeşil' : 'Bugün kahve yok → otomatik yeşil') : 'Kafein limiti ('+prog.goal+' mg) aşıldı — azaltınca düzelir'; }
   return '';
 }
@@ -2614,7 +2647,7 @@ App.explainDerivedHabit=function(key,day){
              sweetManaged:'Tatlı krizini yönettin — bu tik kendiliğinden yeşil kaldı. Helal sana.',
              foodManaged:'Yemek/açlık krizini yönettin — bu tik kendiliğinden yeşil kaldı. Kaptan sensin.',
              coffeeManaged:'Kahve/kafein krizini yönettin — bu tik kendiliğinden yeşil kaldı. Net karar.',
-             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin. Bu tik otomatik yeşil.',
+             mediaFed:'Zihnini besledin — okudun/izledin/dinledin/öğrendin ya da kurs/pratik yaptın. Bu tik otomatik yeşil.',
              caffeineOk:'Kafein tiki temiz — günlük limit aşılmadı ve son kahve vaktinde. Otomatik yeşil.' };
     toast(ok[key]||'Bu tik otomatik — eşik tuttuğunda kendiliğinden yeşil kalır.'); return;
   }
@@ -2633,7 +2666,7 @@ App.explainDerivedHabit=function(key,day){
       ? 'Yürüyüş tiki otomatik: '+stg.toLocaleString('tr-TR')+' adım girince kendiliğinden yeşillenir. Sağlık kartından adımını ekleyebilirsin.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':'')
       : 'Yürüyüş tikine '+(stg-s).toLocaleString('tr-TR')+' adım kaldı — şu an '+s.toLocaleString('tr-TR')+'/'+stg.toLocaleString('tr-TR')+'. Girince otomatik yeşillenecek.'+(isVacationDay(activeDate())?' (tatil modunda esnetildi)':''); }
   else if(key==='journaled'){ msg='Not tiki otomatik: “Günün yansıması” kartına bir cümle bile yazınca kendiliğinden yeşillenir.'; }
-  else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim kutucuklarından birini doldur → yeşillenir.'; }
+  else if(key==='mediaFed'){ msg='Zihin tiki otomatik: Okudum / izledim / dinledim / öğrendim / kurs-pratik kutucuklarından birini doldur → yeşillenir.'; }
   else if(key==='caffeineOk'){ if(!p.amountOk) msg='Kafein tiki otomatik: günlük limit ('+p.goal+' mg) aşıldı — içeceği azaltınca kendiliğinden düzelir.'; else if(!p.timingOk) msg='Kafein tiki otomatik: miktar tamam ama son kahve önerilen saatten geç. Sağlık kartından saatini erkene çekince yeşillenir.'; else msg='Kafein tiki otomatik: bugün temiz — kendiliğinden yeşil.'; }
   else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
@@ -2834,6 +2867,32 @@ App.pickLyricTrack=function(id){ if(!ui.lyricDraft) return; ui.lyricDraft.itemId
 App.saveLyric=function(){ if(!ui.lyricDraft) return; var x=findTrack(ui.lyricDraft.itemId); if(!x){ toast('Önce bir favori seç'); return; } var text=String(ui.lyricDraft.text||'').trim(); if(!text){ toast('Sözü yaz'); return; } if(!Array.isArray(x.quotes)) x.quotes=[]; x.quotes.push({id:uid('lq'),text:text.slice(0,400),ts:new Date().toISOString()}); ui.lyricDraft=null; commit('Söz eklendi'); };
 App.removeLyric=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var i=x.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ x.quotes.splice(i,1); commit('Söz silindi'); } };
 App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var q=x.quotes.find(function(z){return z&&z.id===qid;}); if(!q) return; App.copyQuote('“'+q.text+'”\n— '+x.title+(x.artist?', '+x.artist:'')); };
+
+// ================= KURS & PRATİK (Zihin-Beden Beslenmesi) =================
+App.openSoulActivity=function(type){
+  ui.soulActivityOpen=true;
+  ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
+  render();
+};
+App.closeSoulActivity=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); };
+App.onSoulField=function(field,el){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft[field]=el.value; };
+App.setSoulType=function(type){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft.type=type; render(); };
+App.saveSoulActivity=function(){
+  var d=ui.soulActivityDraft||{};
+  var type=String(d.type||'pilates').trim();
+  var act=soulActivityById(type);
+  if(!act){ toast('Lütfen bir aktivite türü seç'); return; }
+  var durRaw=String(d.duration||'').trim();
+  var duration=durRaw?Math.max(0,Math.round(Number(durRaw)||0)):null;
+  var note=String(d.note||'').trim().slice(0,200);
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  if(!Array.isArray(day.soulActivities)) day.soulActivities=[];
+  day.soulActivities.push({id:uid('soul'),type:type,label:act.label,duration:duration,note:note,savedAt:new Date().toISOString()});
+  day.savedAt=new Date().toISOString();
+  ui.soulActivityDraft={type:type,duration:'',note:''};
+  commit('Zihin-beden pratiği kaydedildi — nefes, denge, ritim 🦩');
+};
+App.removeSoulActivity=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day&&Array.isArray(day.soulActivities)){ var i=day.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ day.soulActivities.splice(i,1); day.savedAt=new Date().toISOString(); commit('Pratik kaydı silindi'); } } };
 
 // ================= NE ÖĞRENDİM =================
 App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); };
@@ -5490,8 +5549,9 @@ function hubTilesHTML(){
       +'<span style="font-size:11.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+col+';">'+label+'</span></button>';
   };
   var total=cnt('reading')+cnt('watching')+cnt('listening')+cnt('learning');
-  var filledN=(cnt('reading')>0?1:0)+(cnt('watching')>0?1:0)+(cnt('listening')>0?1:0)+(cnt('learning')>0?1:0);
-  var fed=total>0;
+  var soulN=(day&&Array.isArray(day.soulActivities))?day.soulActivities.length:0;
+  var filledN=(cnt('reading')>0?1:0)+(cnt('watching')>0?1:0)+(cnt('listening')>0?1:0)+(cnt('learning')>0?1:0)+(soulN>0?1:0);
+  var fed=total>0||soulN>0;
   var mc='#C77D93';
   var chip=fed
     ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Zihin tiki yeşil</span>'
@@ -5499,14 +5559,24 @@ function hubTilesHTML(){
   var h='<div class="glass"'+(dark?' data-dark-variant="mind"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#111013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,'+mc+' '+(dark?'34':'24')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px color-mix(in srgb,'+mc+' 14%, transparent)')+';">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#8F5269,#6D567E)':'linear-gradient(135deg,'+mc+',#E9AFC1)')+';box-shadow:'+(dark?'none':'0 6px 16px color-mix(in srgb,'+mc+' 34%, transparent)')+';">'+icon('sparkles',19)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · izledim · dinledim · öğrendim — küçük besinler, büyük denge</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · izledim · dinledim · öğrendim · kurs/pratik — küçük besinler, büyük denge</div></div>';
   h+='</div>';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);">BUGÜN '+filledN+'/4 ALAN</span>'+chip+'</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);">BUGÜN '+filledN+'/5 ALAN</span>'+chip+'</span>';
   h+='<div style="display:flex;gap:9px;">';
   h+=tile('openReading','Okudum','book-open','var(--read)','var(--read-bg)',cnt('reading'));
   h+=tile('openWatching','İzledim','clapperboard','var(--watch)','var(--watch-bg)',cnt('watching'));
   h+=tile('openListening','Dinledim','headphones','var(--listen)','var(--listen-bg)',cnt('listening'));
   h+=tile('openLearning','Öğrendim','graduation-cap','var(--learn)','var(--learn-bg)',cnt('learning'));
+  h+='</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;">';
+  h+='<div style="width:28px;height:1px;background:linear-gradient(90deg,transparent,var(--card-bd),transparent);"></div>';
+  h+='<span style="font-size:10px;font-weight:800;letter-spacing:.35px;color:var(--muted);text-transform:uppercase;">Zihin-Beden Pratikleri</span>';
+  h+='<div style="flex:1;height:1px;background:linear-gradient(90deg,var(--card-bd),transparent);"></div>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:9px;">';
+  h+=tile('openSoulActivity\'pilates\'','Pilates','flower-2','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'pilates'));
+  h+=tile('openSoulActivity\'ney\'','Ney','wind','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'ney'));
+  h+=tile('openSoulActivity\'riding\'','Binicilik','heart-handshake','var(--soul)','var(--soul-bg)',soulActivityTypeCount(day,'riding'));
   h+='</div></div>';
   return h;
 }
@@ -8372,6 +8442,63 @@ function learningOverlayHTML(){
   return overlayShell('App.closeLearning()', head, learningTodayView());
 }
 
+function soulActivityTodayView(){
+  var d=ui.soulActivityDraft||{type:'pilates',duration:'',note:''};
+  var type=String(d.type||'pilates');
+  var act=soulActivityById(type);
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
+  var entries=(day&&Array.isArray(day.soulActivities))?day.soulActivities:[];
+  var fld='width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;outline:none;color:var(--text);box-sizing:border-box;';
+  var h='';
+  h+='<div class="glass" style="border-radius:20px;padding:15px;display:flex;flex-direction:column;gap:12px;border:1px solid color-mix(in srgb,var(--soul) 26%, var(--card-bd));box-shadow:0 10px 26px color-mix(in srgb,var(--soul-glow) 18%, transparent);">';
+  h+='<div style="font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;"><span style="color:var(--soul);display:inline-flex;">'+icon('sparkles',16)+'</span>Bugün neyle beslendim?</div>';
+  h+='<div style="display:flex;gap:8px;">';
+  SOUL_ACTIVITY_CATALOG.forEach(function(a){
+    var on=a.id===type;
+    h+='<button onclick="App.setSoulType(\''+a.id+'\')" style="flex:1;cursor:pointer;border-radius:14px;padding:11px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid '+(on?'var(--soul)':'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,var(--soul-bg) 60%, transparent)':'var(--field)')+';box-shadow:'+(on?'0 6px 16px color-mix(in srgb,var(--soul-glow) 45%, transparent)':'none')+';transition:all .18s ease;">';
+    h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(on?'linear-gradient(135deg,var(--soul),var(--soul2))':'linear-gradient(135deg,var(--muted),var(--faint))')+';">'+icon(a.icon,16)+'</span>';
+    h+='<span style="font-size:11px;font-weight:800;color:'+(on?'var(--soul)':'var(--muted)')+';">'+a.label+'</span>';
+    h+='</button>';
+  });
+  h+='</div>';
+  if(act){
+    h+='<div style="border-radius:12px;padding:10px 12px;background:var(--soul-bg);border:1px solid color-mix(in srgb,var(--soul) 20%, var(--card-bd));">';
+    h+='<div style="font-size:11.5px;font-weight:800;color:var(--soul);margin-bottom:3px;">'+icon('microscope',13)+' '+act.sci+'</div>';
+    h+='<div style="font-size:11.5px;line-height:1.45;color:var(--text2);">'+act.blurb+'</div>';
+    h+='</div>';
+  }
+  h+='<div style="display:flex;gap:10px;">';
+  h+='<input id="soul-duration" type="number" inputmode="numeric" min="0" value="'+esc(d.duration||'')+'" oninput="App.onSoulField(\'duration\',this)" placeholder="Süre (dk)" maxlength="4" style="'+fld+'flex:1;">';
+  h+='</div>';
+  h+='<textarea oninput="App.onSoulField(\'note\',this)" placeholder="Kısa not: nerede, nasıl hissettin, ne fark ettin?" rows="2" maxlength="200" style="'+fld+'resize:none;line-height:1.5;">'+esc(d.note||'')+'</textarea>';
+  h+='<button onclick="App.saveSoulActivity()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));display:flex;align-items:center;justify-content:center;gap:6px;">Kaydet '+icon('plus',15)+'</button>';
+  h+='</div>';
+  if(entries.length){
+    h+='<div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-top:2px;">Bugün · '+entries.length+' pratik</div>';
+    entries.slice().reverse().forEach(function(a){ h+=soulActivityEntryCard(a); });
+  } else {
+    h+='<div style="text-align:center;color:var(--faint);font-size:13px;padding:20px 16px;line-height:1.5;"><span style="display:inline-flex;">'+icon('heart-handshake',26)+'</span><div style="margin-top:8px;">Bugün beden, nefes ve doğayla buluşan bir pratik ekle.</div></div>';
+  }
+  return h;
+}
+function soulActivityEntryCard(a){
+  var act=soulActivityById(a.type);
+  var dur=(a.duration!=null&&!isNaN(a.duration)&&a.duration>0)?fmtDuration(a.duration):'';
+  var h='<div style="display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px;background:var(--soul-bg);border:1px solid color-mix(in srgb,var(--soul) 22%, var(--card-bd));">';
+  h+='<span style="width:34px;height:34px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--soul),var(--soul2));">'+icon(act?act.icon:'sparkles',17)+'</span>';
+  h+='<div style="flex:1;min-width:0;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;font-weight:800;color:var(--text);">'+(act?act.label:ucfirst(a.type))+'</span>'+(dur?'<span style="font-size:11px;font-weight:700;color:var(--soul);">'+dur+'</span>':'')+'</div>';
+  if(a.note) h+='<div style="font-size:12px;line-height:1.45;color:var(--text2);margin-top:3px;">'+esc(a.note)+'</div>';
+  h+='</div>';
+  h+='<button onclick="App.removeSoulActivity(\''+a.id+'\')" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;color:var(--faint);display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;">'+icon('trash-2',15)+'</button>';
+  h+='</div>';
+  return h;
+}
+function soulActivityOverlayHTML(){
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  return overlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
+}
+
 function modalsHTML(){
   var h='';
   if(ui.crisisKind){ h+=crisisModalHTML(); }
@@ -8381,6 +8508,7 @@ function modalsHTML(){
   if(ui.watchOpen){ h+=watchOverlayHTML(); }
   if(ui.listeningOpen){ h+=listeningOverlayHTML(); }
   if(ui.learningOpen){ h+=learningOverlayHTML(); }
+  if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';

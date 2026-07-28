@@ -1,6 +1,6 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   .seyIcon{display:inline-block;vertical-align:middle;flex-shrink:0;}
-  html,body{margin:0;padding:0;overscroll-behavior:none;}
+  html,body{margin:0;padding:0;overscroll-behavior:none;background:var(--bg);}
   ::-webkit-scrollbar{width:0;height:0;}
   textarea,input,button,a{font-family:inherit;}
   button{font:inherit;}
@@ -255,14 +255,35 @@
   /* ── Sekme geçişlerinde titreme / parlama / flaş önlemi ──
      View Transitions API ve içerik fade-in tamamen kapatıldı.
      İlk açılış animasyonları yalnızca root .sey-app-booted sınıfı eklenmeden
-     önce çalışır; sonraki tüm render'larda header/wordmark/pseudo'lar sabit
-     kalır, böylece her tab değişimi anında ve pürüzsüz görünür. */
+     önce çalışır; sonraki tüm render'larda header/bottomnav/card/glass
+     animasyon ve transition'ları sabit kalır, böylece her tab değişimi
+     anında ve pürüzsüz görünür. */
   .sey-app-booted .sey-appheader,
   .sey-app-booted .sey-appheader::before,
   .sey-app-booted .sey-appheader::after,
   .sey-app-booted .sey-wordmark,
-  .sey-app-booted .sey-wordmark-flam{animation:none !important;}
-  #app{background:var(--bg);}
+  .sey-app-booted .sey-wordmark-flam,
+  .sey-app-booted .sey-bottomnav,
+  .sey-app-booted .sey-bottomnav::before,
+  .sey-app-booted .sey-bottomnav::after,
+  .sey-app-booted .sey-bottomnav-surface,
+  .sey-app-booted .sey-bottomnav-surface::before,
+  .sey-app-booted .sey-bottomnav-surface::after,
+  .sey-app-booted .sey-bottomnav-item,
+  .sey-app-booted .sey-bottomnav-item::before,
+  .sey-app-booted .sey-bottomnav-glyph,
+  .sey-app-booted .sey-bottomnav-indicator,
+  .sey-app-booted .sey-bottomnav-label,
+  .sey-app-booted .sey-ccard,
+  .sey-app-booted .sey-ccard>.sey-ccard-sheen,
+  .sey-app-booted .wxcard,
+  .sey-app-booted .glass{animation:none !important;transition:none !important;}
+  /* Boot sonrası backdrop-filter'ları da sabitle; iOS'ta DOM yenilemesi
+     sırasında blur katmanları yeniden boyanıp flaş/parlama yapabiliyor. */
+  .sey-app-booted .sey-appheader,
+  .sey-app-booted .sey-bottomnav-surface,
+  .sey-app-booted .glass{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
+  html,body,#app{background:var(--bg);}
   /* Koyu tema: renkli dış haleler yerine net sınırlar ve gerçek siyah derinlik. */
   #root[data-theme="dark"] .glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none!important;}
   #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 8px 18px rgba(0,0,0,.52),inset 0 -1px 0 rgba(255,255,255,.04);}

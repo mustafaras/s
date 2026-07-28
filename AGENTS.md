@@ -353,7 +353,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — pilates, ney, binicilik kurs/pratik takibi (onay bekliyor)
 
-**Branch:** `mustafaras-animated-garbanzo` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
 
 **Bu session'da değişen dosyalar:**
 - `app.js`
@@ -375,7 +375,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
   - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260728d`.
+  - Cache-bump: tüm asset `?v=20260728e`.
   - `#app` inline style'a `background:var(--bg)` eklendi; böylece `innerHTML` değişirken arka yüzey asla beyaz/varsayılan renge dönmüyor.
 - `app.js` (sekme geçişleri düzeltmesi — ikinci, daha derin pass)
   - `render()` içinde `document.startViewTransition()` ile blur/scale cross-fade sekme geçişleri **tamamen kaldırıldı**. `paint()` her zaman anlık çağrılıyor; hiçbir fallback fade/opacity animasyonu kalmadı.
@@ -387,6 +387,13 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `.sey-page-in>[data-scroll].scroll` ve `@keyframes seyPageIn` kaldırıldı; sayfa-giriş/opacity animasyonu yok.
   - `.sey-app-booted` scope'u eklendi: `.sey-appheader::before/::after`, `.sey-wordmark`, `.sey-wordmark-flam` için `animation:none !important;`, böylece ilk açılış sonrası header shimmer/yazı sheen tekrar oynamaz.
   - `#app{background:var(--bg);}` eklendi, `index.html` inline style'la birlikte çift garanti sağlanıyor.
+- `app.js` (sekme geçişleri düzeltmesi — üçüncü pass, daha da derin)
+  - `render()` içinde `document.startViewTransition()` kaldırılmış durumda; `paint()` anlık çalışıyor.
+  - `meta[name="theme-color"]` güncellemesi artık yalnızca tema gerçekten değiştiğinde yapılıyor; her render'da meta tag yazılmıyor, böylece durum çubuğu etrafında gereksiz repaint flaşı engelleniyor.
+- `styles.css` (sekme geçişleri düzeltmesi — üçüncü pass)
+  - `html,body,#app{background:var(--bg);}` eklendi; `index.html` inline style'la birlikte üç katmanlı garanti.
+  - `.sey-app-booted` scope'u genişletildi: header, bottom nav, nav children, `.sey-ccard`, `.wxcard`, `.glass` üzerindeki **tüm CSS transition'ları** da `transition:none !important;` ile susturuldu.
+  - Boot sonrası `backdrop-filter` blur katmanları sabitlendi: `.sey-app-booted .sey-appheader`, `.sey-app-booted .sey-bottomnav-surface`, `.sey-app-booted .glass` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;`. iOS'ta `innerHTML` swap sırasında blur katmanlarının yeniden boyanıp flaş/parlama yapması engelleniyor.
 - `GELISTIRME-PLANI.md`
   - “Son güncelleme” 2026-07-28 yapıldı.
   - 2026-07-28 changelog girişi eklendi / yeniden tasarım detaylarıyla güncellendi.
@@ -410,13 +417,13 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - `soul-activities-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server `python -m http.server 9000` kullanıcının incelemesi için çalıştırıldı; session kapanmadan önce durdurulacak.
+- Yerel demo server `python -m http.server 8989` kullanıcının incelemesi için çalıştırıldı; session kapanmadan önce durdurulacak.
 
 **Bir sonraki adım / deploy öncesi notlar:**
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
-- Gerçek iPhone'da / yerel demo sunucuda (port 9000): Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının açıldığı; seçim sonrası süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
-- **Sekme geçiş testi (ikinci pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi olmadığı, header shimmer/wordmark sheen’in yeniden başlamadığı, kartların yeniden “sallanmadığı” ve içeriğin anında yerleştiği gözlemlenmeli. `styles.css`’de `.sey-page-in>[data-scroll].scroll` ve tüm View Transitions CSS’i tamamen kaldırıldı; kalan herhangi bir flaş büyük ihtimalle tarayıcı önbelleğinden eski `?v=20260728c` dosyaları çekmeye devam etmekten kaynaklanır.
+- Gerçek iPhone'da / yerel demo sunucuda (port 8989): Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının açıldığı; seçim sonrası süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
+- **Sekme geçiş testi (üçüncü pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi, header/bottomnav/card transition veya backdrop-filter parlama olmadığı gözlemlenmeli. `styles.css`’de View Transitions API, `seyPageIn`, per-kart giriş animasyonları tamamen kaldırıldı; `.sey-app-booted` ile header/bottomnav/card/glass animasyon ve transition'ları devre dışı; `backdrop-filter` sabitlendi; `html`/`body`/`#app` explicit `var(--bg)` yapıldı. Kalan herhangi bir flaş büyük ihtimalle tarayıcı/PWA önbelleğinden eski `?v=20260728d` (veya daha eski) dosyaları çekmeye devam etmekten kaynaklanır; tamamen kapatıp açmak veya önbelleği atarak yenilemek gerekir.
 - Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.
 - `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 

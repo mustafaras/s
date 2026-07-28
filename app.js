@@ -3598,8 +3598,12 @@ function render(){
   // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
   if(root) root.classList.add('sey-app-booted');
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
+  // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
   var tcm=document.querySelector('meta[name="theme-color"]');
-  if(tcm) tcm.setAttribute('content', dark?'#000000':'#FFF8F3');
+  if(tcm){
+    var targetColor=dark?'#000000':'#FFF8F3';
+    if(tcm.getAttribute('content')!==targetColor) tcm.setAttribute('content',targetColor);
+  }
 }
 
 function onboardingHTML(){

@@ -351,9 +351,9 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
-### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — dördüncü pass: soul modal flash/flicker fix + tab geçişleri (onay bekliyor)
+### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — dördüncü pass: soul modal flash/flicker fix + tab geçişleri (canlıya alındı)
 
-**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` fast-forward **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260728g`).
 
 **Bu session'da değişen dosyalar:**
 - `app.js`
@@ -387,16 +387,16 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Yerel demo server `python -m http.server 8989` çalışıyor; kullanıcı kendi tarayıcısından test ediyor.
 
 **Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Kullanıcı `http://localhost:8989/index.html` üzerinde Pratik picker'ın ve aktivite formunun flaşsız açıldığını, tab değişimlerinde modal ve genel ekranın sabit kaldığını doğrulamalı.
+- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi.
+- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260728g` üzerinden Pratik picker'ın ve aktivite formunun flaşsız açıldığı, tab değişimlerinde modal ve genel ekranın sabit kaldığı doğrulanmalı.
 - Hâlâ flaş hissedilirse bir sonraki adım: header/bottom nav'ı sabit tutup sadece `#app` içindeki ana scroll içeriğini değiştirmek (büyük refactor); veya off-screen/pre-render atomic DOM swap denenebilir.
 - Cache-bump `20260728g`; eski `?v=20260728e/d` önbellekleri temizlenmeli.
 
 ---
 
-### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — pilates, ney, binicilik kurs/pratik takibi (onay bekliyor)
+### 2026-07-28 — Faz 32: Zihin-Beden Beslenmesi — pilates, ney, binicilik kurs/pratik takibi (canlıya alındı)
 
-**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+**Branch:** `mustafaras-soul-activities-tab-flash-fix` → `main` fast-forward **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260728g`).
 
 **Bu session'da değişen dosyalar:**
 - `app.js`
@@ -470,9 +470,8 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Yerel demo server `python -m http.server 8989` kullanıcının incelemesi için çalıştırıldı; session kapanmadan önce durdurulacak.
 
 **Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
-- Gerçek iPhone'da / yerel demo sunucuda (port 8989): Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının açıldığı; seçim sonrası süre ve not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; panelde haftalık Zihin-Beden KPI kartının dolduğu manuel test edilmeli.
+- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi; deploy durumu `https://github.com/mustafaras/s/actions` üzerinden takip edilebilir.
+- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260728g` üzerinden doğrulanmalı: Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının flaşsız açıldığı; seçim sonrası aktivite formuna anında geçiş yaptığı; süre/not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; tab değişimlerinde modal/ekran sabit kaldığı; panelde haftalık Zihin-Beden KPI kartının dolduğu.
 - **Sekme geçiş testi (dördüncü pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi, header/bottomnav/card transition veya backdrop-filter parlama olmadığı gözlemlenmeli. View Transitions API, `seyPageIn`, per-kart giriş animasyonları tamamen kaldırıldı; `.sey-app-booted` ile header/bottomnav/card/glass/soul-ov animasyon ve transition'ları devre dışı; `backdrop-filter` sabitlendi; `html`/`body`/`#app` explicit `var(--bg)` yapıldı.
 - **Pratik modal testi (dördüncü pass):** “Zihnimi Besledim” kartındaki `Pratik` butonuna dokunulunca açılan Pilates/Ney/Binicilik picker'ın açılışında, seçim yapılınca aktivite formuna geçişte, formdaki tür butonlarına dokunulduğunda ve modal açıkken tab değişimlerinde **hiçbir fade/pop/scale/transition parlama** olmamalı. Kalan herhangi bir flaş büyük ihtimalle tarayıcı/PWA önbelleğinden eski `?v=20260728e` (veya daha eski) dosyaları çekmeye devam etmekten kaynaklanır; tamamen kapatıp açmak veya önbelleği atarak yenilemek gerekir.
 - Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.

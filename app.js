@@ -14,6 +14,7 @@ function featuresLive(){ return Date.now()>=FEATURE_GATE_TS; }
 
 var ICONS={
   'graduation-cap':'<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />',
+  'mosque':'<path d="M12 3q1.5 2.5 4 4.5a6 6 0 0 1 2 4.5V20a2 2 0 0 1-2 2h-2v-5a2 2 0 0 0-4 0v5H8a2 2 0 0 1-2-2V12a6 6 0 0 1 2-4.5q2.5-2 4-4.5z" /><path d="M7 12h10" />',
   'activity':'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />',
   'alarm-clock':'<circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2" /><path d="M5 3 2 6" /><path d="m22 6-3-3" /><path d="M6.38 18.7 4 21" /><path d="M17.64 18.67 20 21" />',
   'annoyed':'<circle cx="12" cy="12" r="10" /><path d="M8 15h8" /><path d="M8 9h2" /><path d="M14 9h2" />',
@@ -29,6 +30,7 @@ var ICONS={
   'file-text':'<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" />',
   'save':'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" />',
   'rotate-ccw':'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />',
+  'users':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />',
   'phone':'<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />',
   'arrow-up-down':'<path d="m21 16-4 4-4-4" /><path d="M17 20V4" /><path d="m3 8 4-4 4 4" /><path d="M7 4v16" />',
   'crown':'<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" />',
@@ -191,6 +193,107 @@ function fmtDuration(min){
   if(min<60) return min+' dk';
   var h=Math.floor(min/60), r=min%60;
   return r===0?h+' saat':h+' saat '+r+' dk';
+}
+
+// ── İman Köşesi — vakit isimleri, Diyanet hesap yöntemi, fallback şehirleri ──
+var PRAYER_NAMES={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
+var PRAYER_ORDER=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+var PRAYER_CITIES=[
+  {name:'Adana',lat:37.0,lon:35.3213},{name:'Adıyaman',lat:37.7644,lon:38.2763},{name:'Afyonkarahisar',lat:38.7507,lon:30.5567},{name:'Ağrı',lat:39.7191,lon:43.0503},{name:'Amasya',lat:40.6499,lon:35.8353},{name:'Ankara',lat:39.9334,lon:32.8597},{name:'Antalya',lat:36.8969,lon:30.7133},{name:'Artvin',lat:41.1800,lon:41.8200},{name:'Aydın',lat:37.8380,lon:27.8456},{name:'Balıkesir',lat:39.6492,lon:27.8861},{name:'Bilecik',lat:40.1457,lon:29.9794},{name:'Bingöl',lat:38.8845,lon:40.4939},{name:'Bitlis',lat:38.4000,lon:42.1200},{name:'Bolu',lat:40.7350,lon:31.6061},{name:'Burdur',lat:37.7203,lon:30.2908},{name:'Bursa',lat:40.1826,lon:29.0665},{name:'Çanakkale',lat:40.1553,lon:26.4142},{name:'Çankırı',lat:40.6013,lon:33.6134},{name:'Çorum',lat:40.5506,lon:34.9556},{name:'Denizli',lat:37.7765,lon:29.0864},{name:'Diyarbakır',lat:37.9143,lon:40.2306},{name:'Edirne',lat:41.6772,lon:26.5557},{name:'Elazığ',lat:38.6748,lon:39.2225},{name:'Erzincan',lat:39.7463,lon:39.4911},{name:'Erzurum',lat:39.9043,lon:41.2679},{name:'Eskişehir',lat:39.7667,lon:30.5256},{name:'Gaziantep',lat:37.0662,lon:37.3833},{name:'Giresun',lat:40.9128,lon:38.3895},{name:'Gümüşhane',lat:40.4608,lon:39.4814},{name:'Hakkari',lat:37.5833,lon:43.7333},{name:'Hatay',lat:36.2026,lon:36.1604},{name:'Isparta',lat:37.7644,lon:30.5522},{name:'Mersin',lat:36.8121,lon:34.6415},{name:'İstanbul',lat:41.0082,lon:28.9784},{name:'İzmir',lat:38.4192,lon:27.1287},{name:'Kars',lat:40.6013,lon:43.0945},{name:'Kastamonu',lat:41.3887,lon:33.7827},{name:'Kayseri',lat:38.7205,lon:35.4826},{name:'Kırklareli',lat:41.7333,lon:27.2167},{name:'Kırşehir',lat:39.1425,lon:34.1709},{name:'Kocaeli',lat:40.7654,lon:29.9408},{name:'Konya',lat:37.8667,lon:32.4833},{name:'Kütahya',lat:39.4167,lon:29.9833},{name:'Malatya',lat:38.3552,lon:38.3095},{name:'Manisa',lat:38.6191,lon:27.4289},{name:'Kahramanmaraş',lat:37.5858,lon:36.9371},{name:'Mardin',lat:37.3212,lon:40.7245},{name:'Muğla',lat:37.2153,lon:28.3636},{name:'Muş',lat:38.7432,lon:41.5064},{name:'Nevşehir',lat:38.6247,lon:34.7142},{name:'Niğde',lat:37.9667,lon:34.6833},{name:'Ordu',lat:40.9839,lon:37.8764},{name:'Rize',lat:41.0201,lon:40.5235},{name:'Sakarya',lat:40.7563,lon:30.3783},{name:'Samsun',lat:41.2928,lon:36.3313},{name:'Siirt',lat:37.9293,lon:41.9420},{name:'Sinop',lat:42.0265,lon:35.1511},{name:'Sivas',lat:39.7477,lon:37.0179},{name:'Tekirdağ',lat:40.9780,lon:27.5111},{name:'Tokat',lat:40.3167,lon:36.5544},{name:'Trabzon',lat:41.0015,lon:39.7178},{name:'Tunceli',lat:39.1079,lon:39.5401},{name:'Şanlıurfa',lat:37.1591,lon:38.7969},{name:'Uşak',lat:38.6823,lon:29.4082},{name:'Van',lat:38.5012,lon:43.3727},{name:'Yozgat',lat:39.8181,lon:34.8147},{name:'Zonguldak',lat:41.4564,lon:31.7987},{name:'Aksaray',lat:38.3687,lon:34.0360},{name:'Bayburt',lat:40.2552,lon:40.2249},{name:'Karaman',lat:37.1811,lon:33.2150},{name:'Kırıkkale',lat:39.8508,lon:33.5063},{name:'Batman',lat:37.8812,lon:41.1301},{name:'Şırnak',lat:37.4187,lon:42.4918},{name:'Bartın',lat:41.6358,lon:32.3375},{name:'Ardahan',lat:41.1105,lon:42.7022},{name:'Iğdır',lat:39.9208,lon:44.0450},{name:'Yalova',lat:40.6500,lon:29.2667},{name:'Karabük',lat:41.2000,lon:32.6333},{name:'Kilis',lat:36.7184,lon:37.1212},{name:'Osmaniye',lat:37.0741,lon:36.2462},{name:'Düzce',lat:40.8438,lon:31.1565}
+];
+var PRAYER_METHODS={diyanet:13,mwl:3,isna:2,karachi:1,makkah:4,egypt:5,tehran:7,ghana:8,kosovo:9};
+function prayerCityByName(name){ if(!name) return null; var n=String(name).trim().toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c'); for(var i=0;i<PRAYER_CITIES.length;i++){ var c=PRAYER_CITIES[i]; var cn=String(c.name).toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c'); if(cn===n) return c; } return null; }
+function prayerCityOptionsHTML(selected){
+  var s=selected||'';
+  return PRAYER_CITIES.map(function(c){ var sel=c.name===s?' selected':''; return '<option value="'+esc(c.name)+'"'+sel+'>'+esc(c.name)+'</option>'; }).join('');
+}
+
+// ── İman Köşesi veri modeli ──
+function emptyPrayerEntry(time){
+  return {time:time||'',performed:false,inCongregation:false,late:false,madeUp:false,nafile:0,note:'',savedAt:''};
+}
+function emptyPrayerDay(){
+  var p={};
+  PRAYER_ORDER.forEach(function(k){ p[k]=emptyPrayerEntry(); });
+  p.fetchedAt=''; p.fetchedFor=''; p.fetchError='';
+  return p;
+}
+function ensurePrayerDay(day){
+  if(!day) return null;
+  if(!day.prayer||typeof day.prayer!=='object') day.prayer=emptyPrayerDay();
+  var p=day.prayer;
+  PRAYER_ORDER.forEach(function(k){ if(!p[k]||typeof p[k]!=='object') p[k]=emptyPrayerEntry(); var e=p[k]; if(typeof e.time!=='string') e.time=''; if(typeof e.performed!=='boolean') e.performed=false; if(typeof e.inCongregation!=='boolean') e.inCongregation=false; if(typeof e.late!=='boolean') e.late=false; if(typeof e.madeUp!=='boolean') e.madeUp=false; if(typeof e.nafile!=='number'||isNaN(e.nafile)) e.nafile=0; if(typeof e.note!=='string') e.note=''; if(typeof e.savedAt!=='string') e.savedAt=''; });
+  if(typeof p.fetchedAt!=='string') p.fetchedAt=''; if(typeof p.fetchedFor!=='string') p.fetchedFor=''; if(typeof p.fetchError!=='string') p.fetchError='';
+  return p;
+}
+function prayerSettings(){ return (data&&data.settings&&data.settings.prayer)||{}; }
+function prayerLocation(){ var s=prayerSettings(); return s.location||null; }
+function prayerLocationHash(){ var loc=prayerLocation(); if(!loc||typeof loc!=='object') return ''; return String(loc.lat||'')+','+String(loc.lon||'')+','+String(loc.cityName||''); }
+function prayerMethod(){ var s=prayerSettings(); var m=String(s.method||'diyanet').toLowerCase(); return PRAYER_METHODS.hasOwnProperty(m)?m:'diyanet'; }
+function prayerAdjustments(){ var s=prayerSettings(); var a=s.adjustments||{}; var out={}; PRAYER_ORDER.forEach(function(k){ var v=Number(a[k]); out[k]=!isNaN(v)?Math.max(-90,Math.min(90,v)):0; }); return out; }
+
+// ── İman Köşesi — vakit çekme, cache, formatting, yardımcılar ──
+function fmtPrayerTime(d){ if(!d||isNaN(d.getTime())) return ''; return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+function parsePrayerTime(t){ if(!t||typeof t!=='string') return null; var m=t.match(/^(\d{1,2}):(\d{2})$/); if(!m) return null; return {h:+m[1],m:+m[2]}; }
+function prayerCacheKey(date,locHash){ return 'seyma-prayer-cache-v1:'+String(date||'')+':'+String(locHash||prayerLocationHash()); }
+function prayerReadCache(date,locHash){
+  try{ var raw=localStorage.getItem(prayerCacheKey(date,locHash)); if(raw){ var v=JSON.parse(raw); if(v&&typeof v==='object'&&v.times) return v; } }catch(e){}
+  return null;
+}
+function prayerWriteCache(date,locHash,val){
+  try{ localStorage.setItem(prayerCacheKey(date,locHash), JSON.stringify({date:date,locHash:locHash,times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
+}
+function prayerTimesFromDay(p){
+  var out={}; PRAYER_ORDER.forEach(function(k){ out[k]=(p[k]&&p[k].time)||''; }); return out;
+}
+function currentPrayerIndex(times){
+  var now=new Date(), curMin=now.getHours()*60+now.getMinutes(), best=-1;
+  for(var i=PRAYER_ORDER.length-1;i>=0;i--){ var k=PRAYER_ORDER[i]; var pt=parsePrayerTime(times&&times[k]); if(pt){ var m=pt.h*60+pt.m; if(curMin>=m-1){ best=i; break; } } }
+  return best;
+}
+function fetchAladhanTimes(date,lat,lon,method){
+  if(typeof fetch!=='function') return Promise.reject(new Error('fetch yok'));
+  var d=date||todayStr();
+  var url='https://api.aladhan.com/v1/timings/'+d+'?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&method='+encodeURIComponent(PRAYER_METHODS[method]||13)+'&timezonestring=Europe/Istanbul';
+  var ctrl=(typeof AbortController==='function')?new AbortController():null, timer=null;
+  if(ctrl) timer=setTimeout(function(){ try{ ctrl.abort(); }catch(e){} },16000);
+  var opts={headers:{'Accept':'application/json'},credentials:'omit'}; if(ctrl) opts.signal=ctrl.signal;
+  function clear(){ if(timer) clearTimeout(timer); }
+  return fetch(url,opts).then(function(res){ clear(); if(!res.ok){ var e=new Error('Vakit API '+res.status); e.status=res.status; return Promise.reject(e); } return res.json(); },function(err){ clear(); return Promise.reject(err); });
+}
+function fetchPrayerTimes(date, force){
+  var loc=prayerLocation();
+  if(!loc||typeof loc!=='object'||isNaN(+loc.lat)||isNaN(+loc.lon)) return Promise.reject(new Error('Konum ayarlanmamış'));
+  var locHash=prayerLocationHash();
+  if(!force){
+    var cached=prayerReadCache(date,locHash);
+    if(cached&&cached.times&&cached.fetchedAt){ var ageH=(Date.now()-new Date(cached.fetchedAt).getTime())/3600000; if(ageH<48) return Promise.resolve(cached.times); }
+    var day=getDay(data,date,dayIndexFor(date)); var p=(day&&day.prayer)||{};
+    if(p.fetchedAt&&p.fetchedFor===locHash){ var age2=(Date.now()-new Date(p.fetchedAt).getTime())/3600000; if(age2<48) return Promise.resolve(prayerTimesFromDay(p)); }
+  }
+  return fetchAladhanTimes(date, loc.lat, loc.lon, prayerMethod()).then(function(j){
+    if(!j||!j.data||!j.data.timings) return Promise.reject(new Error('Vakit verisi boş'));
+    var t=j.data.timings; var map={fajr:t.Fajr, sunrise:t.Sunrise, dhuhr:t.Dhuhr, asr:t.Asr, maghrib:t.Maghrib, isha:t.Isha};
+    prayerWriteCache(date,locHash,map); return map;
+  });
+}
+function applyPrayerTimesToDay(date,times){
+  var day=getDay(data,date,dayIndexFor(date)); var p=ensurePrayerDay(day);
+  PRAYER_ORDER.forEach(function(k){ p[k].time=String(times[k]||''); });
+  p.fetchedAt=new Date().toISOString(); p.fetchedFor=prayerLocationHash(); p.fetchError='';
+  day.savedAt=new Date().toISOString(); save();
+}
+function prayerDaySummary(p){
+  var total=0, performed=0, congregation=0, late=0, madeUp=0, nafile=0;
+  PRAYER_ORDER.forEach(function(k){ var e=p&&p[k]; if(!e) return; total++; if(e.performed){ performed++; if(e.inCongregation) congregation++; if(e.late) late++; if(e.madeUp) madeUp++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+  return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile};
+}
+function prayerPerformedCount(p){ var n=0; PRAYER_ORDER.forEach(function(k){ if(p&&p[k]&&p[k].performed) n++; }); return n; }
+function prayerAllDone(p){ return prayerPerformedCount(p)>=5; }
+function prayerStreak(){
+  var streak=0, d=todayStr();
+  while(true){ var day=data.days[d]; var p=day&&day.prayer; if(!p||!prayerAllDone(p)) break; streak++; d=prevDayStr(d); if(!d) break; }
+  return streak;
 }
 
 // ---- Kafein — bilimsel takip (EFSA 2015 · FDA · Harvard Health) ----
@@ -761,6 +864,16 @@ function migrate(d){
   if(d.settings.vacation.preset!=='relaxed'&&d.settings.vacation.preset!=='moderate'&&d.settings.vacation.preset!=='active') d.settings.vacation.preset='relaxed';
   if(typeof d.settings.vacation.reason!=='string') d.settings.vacation.reason='';
   if(typeof d.settings.vacation.enabledAt!=='string') d.settings.vacation.enabledAt='';
+  // İman Köşesi — detaylı namaz takibi. settings.prayer + günlük prayers backfill.
+  if(!d.settings.prayer||typeof d.settings.prayer!=='object') d.settings.prayer={method:'diyanet',location:null,adjustments:{},remindersEnabled:false,reminderOffsetMinutes:15,hijriOffset:0};
+  var prSet=d.settings.prayer;
+  if(typeof prSet.method!=='string') prSet.method='diyanet';
+  if(prSet.location!==null&&(typeof prSet.location!=='object'||!prSet.location)) prSet.location=null;
+  if(!prSet.adjustments||typeof prSet.adjustments!=='object') prSet.adjustments={};
+  if(typeof prSet.remindersEnabled!=='boolean') prSet.remindersEnabled=false;
+  if(typeof prSet.reminderOffsetMinutes!=='number'||isNaN(prSet.reminderOffsetMinutes)) prSet.reminderOffsetMinutes=15;
+  if(typeof prSet.hijriOffset!=='number'||isNaN(prSet.hijriOffset)) prSet.hijriOffset=0;
+  if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var day=d.days[k]; if(day&&typeof day==='object') ensurePrayerDay(day); });
   d.version=2;
   return d;
 }
@@ -811,7 +924,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -1038,10 +1151,10 @@ function updateNutriLive(day){ var nu=dayNutrition(day); var pg=proteinGoal(),cg
 // Öğün metnini ve gün makro özetini (day.nutri) birlikte günceller; panel bu özeti okur.
 function syncMealText(day,key){ if(!day.meals) day.meals=emptyMeals(); var arr=(day.mealItems&&day.mealItems[key])||[]; day.meals[key]=arr.filter(function(it){return it&&it.name&&String(it.name).trim();}).map(function(it){ var u=it.unit==='gr'?'gr':(' '+unitLabel(it.unit)); var q=(it.qty===''||it.qty==null)?'':it.qty; return (q!==''?q+u+' ':'')+String(it.name).trim(); }).join(', '); day.nutri=dayNutrition(day); }
 function medFreeStreak(){ var c=0, date=todayStr(); var t=data.days[date]; if(!(t&&t.sleep&&t.sleep.med&&t.sleep.med.type==='none')) date=addDays(date,-1); while(diffDays(data.startDate,date)>=0){ var r=data.days[date]; if(r&&r.sleep&&r.sleep.med&&r.sleep.med.type==='none'){ c++; date=addDays(date,-1); } else break; } return c; }
-function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',journal:{text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false},savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium(),therapy:emptyTherapy()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null;
+function getDay(d,date,idx){ if(!d.days[date]) d.days[date]={dayIndex:idx,habits:emptyHabits(),mood:null,cravingSOSCount:0,cravingOptionsUsed:[],cravingTriggers:[],craving10MinDone:false,foodCravingDone:false,coffeeCravingDone:false,cravingTriggerNote:'',note:'',intention:'',journal:{text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false},savedAt:null,meals:emptyMeals(),mealItems:emptyMealItems(),water:0,caffeine:{last:null,cups:null},energy:null,stress:null,sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},walk:{steps:null,minutes:null},flow:null,symptoms:[],discomfort:emptyDiscomfort(),sessions:[],movement:emptyMovement(),reading:emptyReading(),watching:emptyWatching(),listening:emptyListening(),learning:emptyLearning(),gratitude:[],health:emptyHealth(),nutri:null,magnesium:emptyMagnesium(),therapy:emptyTherapy(),prayer:emptyPrayerDay()}; else { var r=d.days[date]; if(!r.habits) r.habits=emptyHabits(); HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; }); if(!r.meals) r.meals=emptyMeals(); if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems(); ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; }); if(typeof r.water!=='number'||isNaN(r.water)) r.water=0; if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(r.caffeine.drinks)){ r.caffeine.drinks=[]; var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last; if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } } } if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine}); r.caffeine.cups=r.caffeine.drinks.length; if(!('energy' in r)) r.energy=null; if(!('stress' in r)) r.stress=null; if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[]; if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false; if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false; if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false; if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote=''; if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()}; if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''}; if(typeof r.sleep.med.note!=='string') r.sleep.med.note=''; if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown(); if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps; WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; }); if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote=''; if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[]; if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[]; if(!r.walk) r.walk={steps:null,minutes:null}; if(!('flow' in r)) r.flow=null; if(!Array.isArray(r.symptoms)) r.symptoms=[]; if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort(); if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={}; if(typeof r.discomfort.note!=='string') r.discomfort.note=''; if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[]; if(!Array.isArray(r.sessions)) r.sessions=[]; if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement(); if(!Array.isArray(r.movement.track)) r.movement.track=[]; ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; }); if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading(); if(!Array.isArray(r.reading.entries)) r.reading.entries=[]; if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching(); if(!Array.isArray(r.watching.entries)) r.watching.entries=[]; if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening(); if(!Array.isArray(r.listening.entries)) r.listening.entries=[]; if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning(); if(!Array.isArray(r.learning.entries)) r.learning.entries=[]; if(!Array.isArray(r.gratitude)) r.gratitude=[]; if(typeof r.intention!=='string') r.intention=''; if(!r.health||typeof r.health!=='object') r.health=emptyHealth(); if(!('nutri' in r)) r.nutri=null; if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium(); if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false; if(typeof r.magnesium.form!=='string') r.magnesium.form=''; if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null; if(typeof r.magnesium.time!=='string') r.magnesium.time=''; if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[]; if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote=''; if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false; if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null;
 if(!r.journal||typeof r.journal!=='object') r.journal={text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false};
 var jn=r.journal; if(typeof jn.text!=='string') jn.text=''; if(typeof jn.mode!=='string') jn.mode='free'; if(typeof jn.promptUsed!=='string') jn.promptUsed=''; if(typeof jn.wordCount!=='number'||isNaN(jn.wordCount)) jn.wordCount=0; if(typeof jn.charCount!=='number'||isNaN(jn.charCount)) jn.charCount=0; if(typeof jn.savedAt!=='string'&&jn.savedAt!==null) jn.savedAt=null; if(typeof jn.streakAtSave!=='number'||isNaN(jn.streakAtSave)) jn.streakAtSave=0; if(typeof jn.metGoal!=='boolean') jn.metGoal=false;
-ensureTherapyDay(r); } return d.days[date]; }
+ensureTherapyDay(r); ensurePrayerDay(r); } return d.days[date]; }
 function emptyMovement(){ return {walkM:0,vehicleM:0,totalM:0,maxSpeed:0,samples:0,walkSec:0,vehicleSec:0,track:[]}; }
 function emptyReading(){ return {entries:[]}; }
 // ---------- SAYGI · günün bilim ve sanat insanı ----------
@@ -2927,6 +3040,55 @@ App.closeSoulArchive=function(){ ui.soulArchiveOpen=false; ui.soulArchiveFilter=
 App.setSoulArchiveFilter=function(type){ ui.soulArchiveFilter=(ui.soulArchiveFilter===type?null:type); render(); };
 App.removeSoulArchiveSession=function(id){ var found=false; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return; var i=rec.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=rec.soulActivities[i]; unsyncSoulEntry(removed); rec.soulActivities.splice(i,1); rec.savedAt=new Date().toISOString(); found=true; } }); if(found){ commit('Pratik kaydı arşivden silindi'); } };
 
+// ================= İMAN KÖŞESİ =================
+App.openFaithCorner=function(){ ui.faithOpen=true; render(); if(prayerLocation()){ setTimeout(function(){ App.refreshPrayerTimes(); },80); } };
+App.closeFaithCorner=function(){ ui.faithOpen=false; render(); };
+App.setPrayerCity=function(name){
+  var c=prayerCityByName(name);
+  if(!c){ toast('Şehir bulunamadı'); return; }
+  if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
+  data.settings.prayer.location={lat:c.lat,lon:c.lon,cityName:c.name,source:'manual'};
+  save(); render();
+  App.refreshPrayerTimes();
+};
+App.fetchPrayerLocationGPS=function(){
+  if(!navigator||!navigator.geolocation){ toast('Cihaz konum servisi bulunamadı'); return; }
+  toast('Konum alınıyor…');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
+    if(lat==null||lon==null){ toast('Konum alınamadı'); return; }
+    if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
+    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps'};
+    save(); render(); App.refreshPrayerTimes();
+  },function(err){ toast('Konum izni gerekli: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:false,timeout:12000,maximumAge:600000});
+};
+App.setPrayerMethod=function(method){
+  if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
+  data.settings.prayer.method=PRAYER_METHODS.hasOwnProperty(method)?method:'diyanet';
+  save(); render(); App.refreshPrayerTimes();
+};
+App.refreshPrayerTimes=function(force){
+  var d=todayStr();
+  fetchPrayerTimes(d, !!force).then(function(times){ applyPrayerTimesToDay(d,times); }).catch(function(err){
+    var day=getDay(data,d,dayIndexFor(d)); var p=(day&&day.prayer)||{};
+    p.fetchError=String(err&&err.message||'Vakitler alınamadı'); if(day) day.savedAt=new Date().toISOString(); save();
+    if(!force) return;
+    toast('Vakitler yenilenemedi: '+p.fetchError);
+  });
+};
+App.togglePrayer=function(type,field){
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var p=ensurePrayerDay(day); var e=p[type]; if(!e) return;
+  if(field==='performed'||field==='inCongregation'||field==='late'||field==='madeUp') e[field]=!e[field];
+  if(field==='performed'&&!e.performed){ e.inCongregation=false; e.late=false; e.madeUp=false; }
+  e.savedAt=new Date().toISOString(); day.savedAt=new Date().toISOString(); save(); render();
+};
+App.setPrayerNote=function(type,el){ debounceSave('prayerNote'+type,function(){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var p=ensurePrayerDay(day); var e=p[type]; if(!e) return; e.note=String(el.value||'').slice(0,160); e.savedAt=new Date().toISOString(); day.savedAt=new Date().toISOString(); save(); }); };
+App.changeNafile=function(type,delta){
+  var day=getDay(data,todayStr(),dayIndexFor(todayStr())); var p=ensurePrayerDay(day); var e=p[type]; if(!e) return;
+  e.nafile=Math.max(0, (Number(e.nafile)||0)+Number(delta));
+  e.savedAt=new Date().toISOString(); day.savedAt=new Date().toISOString(); save(); render();
+};
+
 // ================= NE ÖĞRENDİM =================
 App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); };
 App.closeLearning=function(){ ui.learningOpen=false; ui.learningDraft=null; render(); };
@@ -3505,7 +3667,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))));
+  var curOverlay=ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)))))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var _painted=false;
@@ -7883,6 +8045,75 @@ function saygiComingSoonHTML(){
   h+='</section>';
   return h;
 }
+function faithSummaryBadges(p, compact){
+  var s=prayerDaySummary(p);
+  var badges=[];
+  badges.push('<span class="sg-faith-badge '+(s.performed>=5?'ok':'')+'">'+s.performed+'/'+(compact?6:s.total)+' vakit</span>');
+  if(s.congregation) badges.push('<span class="sg-faith-badge">'+s.congregation+' cemaat</span>');
+  if(s.madeUp) badges.push('<span class="sg-faith-badge warn">'+s.madeUp+' kaza</span>');
+  return badges.join('');
+}
+function faithCornerInlineHTML(){
+  var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
+  var p=ensurePrayerDay(day), loc=prayerLocation();
+  var s=prayerDaySummary(p), streak=prayerStreak();
+  var locName=loc&&loc.cityName?esc(loc.cityName):(loc?'Konum ayarlandı':'Konum seçilmedi');
+  var h='<div class="sg-faith-card" onclick="App.openFaithCorner()">';
+  h+='<span class="sg-faith-icon">'+icon('mosque',18)+'</span>';
+  h+='<div class="sg-faith-text">';
+  h+='<div class="sg-faith-title">İman Köşesi</div>';
+  h+='<div class="sg-faith-sub">'+locName+' · '+s.performed+'/6 vakit'+(streak?' · '+streak+' gün seri':'')+'</div>';
+  h+='</div>';
+  h+='<div class="sg-faith-badges">'+faithSummaryBadges(p,true)+'</div>';
+  h+='<span class="sg-faith-action">Aç '+icon('chevron-right',14)+'</span>';
+  h+='</div>';
+  return h;
+}
+function prayerRowHTML(type, entry, isCurrent, isNext){
+  var name=PRAYER_NAMES[type]||type;
+  var performed=!!entry.performed, cong=!!entry.inCongregation, late=!!entry.late, madeUp=!!entry.madeUp;
+  var nafile=Math.max(0,Number(entry.nafile)||0);
+  var cls='sg-faith-row'+(isCurrent?' current':'');
+  var h='<div class="'+cls+'">';
+  h+='<div class="sg-faith-row-name">'+esc(name)+'</div>';
+  h+='<div class="sg-faith-row-time">'+(entry.time?esc(entry.time):'--:--')+'</div>';
+  h+='<div class="sg-faith-row-status" style="flex-wrap:wrap;gap:6px;">';
+  h+='<button class="sg-faith-chip '+(performed?'on':'')+'" onclick="App.togglePrayer(\''+type+'\',\'performed\')">'+(performed?icon('check',12):'')+' Kılındı</button>';
+  h+='<button class="sg-faith-chip '+(cong?'on':'')+'" onclick="App.togglePrayer(\''+type+'\',\'inCongregation\')">'+(cong?icon('users',12):'')+' Cemaat</button>';
+  h+='<button class="sg-faith-chip '+(late?'warn':'')+'" onclick="App.togglePrayer(\''+type+'\',\'late\')">'+(late?icon('clock',12):'')+' Geç</button>';
+  h+='<button class="sg-faith-chip '+(madeUp?'warn':'')+'" onclick="App.togglePrayer(\''+type+'\',\'madeUp\')">'+(madeUp?icon('refresh-ccw',12):'')+' Kaza</button>';
+  h+='</div>';
+  h+='<div class="sg-faith-nafile">';
+  h+='<button onclick="App.changeNafile(\''+type+'\',-1)">−</button>';
+  h+='<span>'+nafile+'</span>';
+  h+='<button onclick="App.changeNafile(\''+type+'\',1)">+</button>';
+  h+='</div>';
+  h+='</div>';
+  h+='<textarea class="sg-faith-note" rows="1" placeholder="'+esc(name)+' notu…" oninput="App.setPrayerNote(\''+type+'\',this)">'+(entry.note?esc(entry.note):'')+'</textarea>';
+  return h;
+}
+function faithCornerOverlayHTML(){
+  var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
+  var p=ensurePrayerDay(day), loc=prayerLocation(), times=prayerTimesFromDay(p);
+  var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
+  var s=prayerDaySummary(p), streak=prayerStreak();
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">İman Köşesi '+icon('mosque',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugünün vakitleri, kılındı/cemaat/kaza/geç/nafile takibi.</div></div><button onclick="App.closeFaithCorner()" style="border:none;background:color-mix(in srgb,var(--faith) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  var body='';
+  // Konum / şehir seçimi
+  body+='<div class="sg-faith-city">'+icon('map-pin',14)+'<select onchange="App.setPrayerCity(this.value)">'+prayerCityOptionsHTML(loc&&loc.cityName)+'</select><button onclick="App.fetchPrayerLocationGPS()" style="border:none;background:transparent;cursor:pointer;color:var(--faith);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;">'+icon('compass',14)+'</button></div>';
+  // Günlük özet
+  body+='<div class="sg-faith-summary"><strong>'+s.performed+'/6 vakit</strong><span>· '+s.congregation+' cemaat · '+s.madeUp+' kaza · '+s.late+' geç · '+s.nafile+' nafile</span>'+(streak?'<span style="margin-left:auto;font-weight:800;color:var(--faith);">'+streak+' gün seri</span>':'')+'</div>';
+  // Vakit satırları
+  body+='<div style="display:flex;flex-direction:column;gap:6px;">';
+  PRAYER_ORDER.forEach(function(k,i){ body+=prayerRowHTML(k, p[k]||emptyPrayerEntry(), i===curIdx, i===nextIdx); });
+  body+='</div>';
+  // Yardımcı not
+  body+='<div style="border-radius:12px;padding:11px 12px;background:var(--faith-bg);border:1px solid color-mix(in srgb,var(--faith) 18%, var(--card-bd));font-size:12px;line-height:1.45;color:var(--text2);">';
+  body+=icon('sparkles',13)+' Vakitler Aladhan API ile Diyanet (method 13) hesabına göre çekilir. Şehir değişince otomatik yenilenir; offline son cache kullanılır.';
+  body+='</div>';
+  return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" onclick="App.closeFaithCorner()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
+}
+
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
@@ -7890,7 +8121,8 @@ function saygiHTML(){
   saygiEnsureArticle(person);
   var article=ui.saygiArticle, idx=saygiPeople().indexOf(person)+1, done=saygiHasRead(person), h='<section class="saygi-page">';
   h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div><div class="saygi-count"><strong>'+idx+'</strong><span>/ '+saygiPeople().length+'</span></div></div>';
-  if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
+    h+=faithCornerInlineHTML();
+    if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
   if(ui.saygiError||!article){
     h+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
     return h+'</section>';
@@ -8640,6 +8872,7 @@ function modalsHTML(){
   if(ui.soulPracticePicker){ h+=soulPracticePickerHTML(); }
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
+  if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';

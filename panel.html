@@ -27,6 +27,7 @@
     --journal:#C9A4FF;--journal2:#A66CFF;--journal-bg:rgba(166,108,255,.12);--journal-glow:rgba(201,164,255,.18);
     --vacation:#5ED4B4;--vacation2:#2A9D8F;--vacation-bg:rgba(42,157,143,.12);--vacation-glow:rgba(94,212,180,.18);
     --soul:#B8A8E8;--soul2:#EBCC90;--soul-bg:rgba(184,168,232,.11);--soul-glow:rgba(184,168,232,.15);
+    --faith:#D4B56A;--faith2:#A68B4B;--faith-bg:rgba(212,181,106,.12);--faith-glow:rgba(212,181,106,.16);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
@@ -392,6 +393,44 @@ var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonR
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
+// ── İman Köşesi — panel aynası ──
+var PRAYER_NAMES_P={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
+var PRAYER_ORDER_P=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+function emptyPrayerEntryP(){ return {time:'',performed:false,inCongregation:false,late:false,madeUp:false,nafile:0,note:'',savedAt:''}; }
+function ensurePrayerDayP(rec){
+  if(!rec) return null;
+  if(!rec.prayer||typeof rec.prayer!=='object') rec.prayer={};
+  var p=rec.prayer;
+  PRAYER_ORDER_P.forEach(function(k){ if(!p[k]||typeof p[k]!=='object') p[k]=emptyPrayerEntryP(); var e=p[k]; if(typeof e.time!=='string') e.time=''; if(typeof e.performed!=='boolean') e.performed=false; if(typeof e.inCongregation!=='boolean') e.inCongregation=false; if(typeof e.late!=='boolean') e.late=false; if(typeof e.madeUp!=='boolean') e.madeUp=false; if(typeof e.nafile!=='number'||isNaN(e.nafile)) e.nafile=0; if(typeof e.note!=='string') e.note=''; if(typeof e.savedAt!=='string') e.savedAt=''; });
+  if(typeof p.fetchedAt!=='string') p.fetchedAt=''; if(typeof p.fetchedFor!=='string') p.fetchedFor=''; if(typeof p.fetchError!=='string') p.fetchError='';
+  return p;
+}
+function prayerDaySummaryP(p){
+  var total=0, performed=0, congregation=0, late=0, madeUp=0, nafile=0;
+  PRAYER_ORDER_P.forEach(function(k){ var e=p&&p[k]; if(!e) return; total++; if(e.performed){ performed++; if(e.inCongregation) congregation++; if(e.late) late++; if(e.madeUp) madeUp++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+  return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile};
+}
+function prayerPerformedCountP(p){ var n=0; PRAYER_ORDER_P.forEach(function(k){ if(p&&p[k]&&p[k].performed) n++; }); return n; }
+function prayerAllDoneP(p){ return prayerPerformedCountP(p)>=5; }
+function prayerStreakP(){
+  var streak=0, d=today();
+  while(true){ var rec=D&&D.days?D.days[d]:null; var p=rec?ensurePrayerDayP(rec):null; if(!p||!prayerAllDoneP(p)) break; streak++; d=addDays(d,-1); if(diff(D.startDate,d)<0) break; }
+  return streak;
+}
+function prayerSummaryRangeP(start,end){
+  var total=0, performed=0, congregation=0, late=0, madeUp=0, nafile=0, days=0;
+  if(!D||!D.days) return {total:0,performed:0,congregation:0,late:0,madeUp:0,nafile:0,days:0};
+  var s=start||addDays(today(),-6), e=end||today();
+  if(s>e){ var tmp=s; s=e; e=tmp; }
+  for(var d=s; diff(e,d)>=0; d=addDays(d,1)){
+    var rec=D.days[d]; if(!rec) continue;
+    var p=ensurePrayerDayP(rec); var ps=prayerDaySummaryP(p);
+    days++; total+=ps.total; performed+=ps.performed; congregation+=ps.congregation; late+=ps.late; madeUp+=ps.madeUp; nafile+=ps.nafile;
+  }
+  return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile,days:days};
+}
+function prayerLocationP(){ var s=D&&D.settings&&D.settings.prayer; return s&&s.location?s.location:null; }
+
 // ── Zihin-Beden Beslenmesi (kurs & pratik) — panel aynası ──
 var SOUL_ACTIVITY_CATALOG_P=[
   {id:"pilates",label:"Pilates",icon:"flower-2",color:"#7EB5A6",sci:"Kortikospinal plastisite, propriyosepsiyon, lumbopelvik stabilite"},
@@ -2303,6 +2342,23 @@ function render(){
     h+=kpi('Günlük Işığı',jVal,'var(--journal)',jExtra,null,jCap);
   })();
 
+  // ROW 1.7: İman Köşesi — namaz takibi (Diyanet vakitleri + konum)
+  (function(){
+    var tRec=recOf(today())||{}; var p=ensurePrayerDayP(tRec); var ps=prayerDaySummaryP(p);
+    var rng=prayerSummaryRangeP(addDays(today(),-6),today());
+    var val=ps.total>0?(ps.performed+'<small>/'+ps.total+'</small>'):'—';
+    var loc=prayerLocationP();
+    var locTxt=(loc&&loc.cityName)?esc(loc.cityName):((loc&&loc.lat)?'Konum ayarlı':'Konum bekleniyor');
+    var extra='<span class="tchip fl">'+prayerStreakP()+'g seri</span>';
+    var cap=[];
+    if(rng.days>0) cap.push('<span>'+rng.performed+'/'+rng.total+' son '+rng.days+' gün</span>');
+    if(ps.congregation>0) cap.push('<span><b style="color:var(--t2);">'+ps.congregation+'</b> cemaat</span>');
+    if(ps.late>0) cap.push('<span><b style="color:var(--amber);">'+ps.late+'</b> geç</span>');
+    if(ps.madeUp>0) cap.push('<span><b style="color:var(--t2);">'+ps.madeUp+'</b> kaza</span>');
+    cap.push('<span style="color:var(--faith);font-weight:700;">'+locTxt+'</span>');
+    h+=kpi('İman Köşesi',val,'var(--faith)',extra,sparkLine(cur,function(d){ var r=recOf(d); return r?prayerPerformedCountP(ensurePrayerDayP(r)):0; },6,'var(--faith)',30),cap.join(''));
+  })();
+
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();
   h+=aeonThreadCardHTML();
@@ -2538,6 +2594,19 @@ function render(){
   if(wk.minutes!=null&&wk.minutes!=="") wkBits.push(esc(String(wk.minutes))+" dk");
   exRows+=exRowAlways(icon('footprints',13)+' Yürüyüş', wkBits.join(" · "));
   exRows+=exRowAlways(icon('droplet',13)+' Regl', (srec.flow&&FLOW[srec.flow])?FLOW[srec.flow]:"");
+  (function(){
+    var p=ensurePrayerDayP(srec);
+    var bits=[];
+    PRAYER_ORDER_P.forEach(function(k){
+      var e=p[k]; var name=PRAYER_NAMES_P[k];
+      var icons=[]; if(e.performed) icons.push('✓'); if(e.inCongregation) icons.push('🕌'); if(e.madeUp) icons.push('🌙'); if(e.late) icons.push('⏱'); if(e.nafile>0) icons.push('+'+e.nafile);
+      var txt=(e.performed?(name+' '+icons.join('')):name);
+      bits.push('<span style="display:inline-flex;align-items:center;gap:3px;">'+txt+'</span>');
+    });
+    var ps=prayerDaySummaryP(p);
+    var cap=(ps.performed>0)?(ps.performed+'/'+ps.total+' vakit · '+(ps.congregation?' '+ps.congregation+' cemaat':'')+(ps.madeUp?' · '+ps.madeUp+' kaza':'')+(ps.late?' · '+ps.late+' geç':'')+(ps.nafile?' · '+ps.nafile+' nafile':'')):'Henüz namaz kaydı yok';
+    exRows+=exRowAlways(icon('sunrise',13)+' İman Köşesi', '<div style="display:flex;flex-wrap:wrap;gap:6px 10px;line-height:1.4;">'+bits.join('')+'</div><div style="margin-top:4px;font-size:var(--f1);color:var(--t4);font-weight:700;">'+cap+'</div>');
+  })();
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[];
   if(caf){

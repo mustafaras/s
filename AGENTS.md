@@ -351,6 +351,54 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
+### 2026-07-30 — Faz 34: İman Köşesi — detaylı namaz takibi (Diyanet vakitleri + konum) (onay bekliyor)
+
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
+
+**Bu session'da değişen dosyalar:**
+- `app.js`
+  - `data.days[date].prayer` veri modeli: 6 vakit (`fajr`, `sunrise`, `dhuhr`, `asr`, `maghrib`, `isha`), her biri `performed`, `inCongregation`, `late`, `madeUp`, `nafile`, `note`, `savedAt`.
+  - `data.settings.prayer` modeli: `method`, `location` (`lat`, `lon`, `cityName`, `source`), `adjustments`, `remindersEnabled`, `reminderOffsetMinutes`, `hijriOffset` + `migrate()` backfill.
+  - Aladhan/Diyanet API akışı: `fetchPrayerTimesForCity()` ile `api.aladhan.com/v1/timings?method=13` + `Europe/Istanbul`; 81 il listesi (`PRAYER_CITIES`); GPS fallback; `localStorage` üzerinde 48 saat cache (`seyma-prayer-cache-v1:...`).
+  - `App.openFaithCorner()` / `App.closeFaithCorner()` / `ui.faithOpen` overlay deseni; `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `faithOpen` eklendi.
+  - `faithCornerInlineHTML()` Saygı sekmesine premium "İman Köşesi" kartı; `faithCornerOverlayHTML()` tam ekran detaylı vakit modalı.
+  - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
+  - Yeni ikonlar: `mosque` ve `users` SVG path'leri `ICONS` kataloğuna eklendi.
+- `styles.css`
+  - Açık/koyu tema `:root` bloklarına `--faith`, `--faith2`, `--faith-bg`, `--faith-glow`, `--faith-soft` accent değişkenleri eklendi.
+  - `.sg-faith-*` ve `.sey-faith-*` bileşen stilleri; `.sey-app-booted` kapsamına faith overlay elementleri eklendi.
+- `panel.html`
+  - Inline `:root` içine `--faith*` değişkenleri eklendi.
+  - Bağımsız panel prayer helper'ları (`PRAYER_NAMES_P`, `emptyPrayerEntryP`, `ensurePrayerDayP`, `prayerDaySummaryP`, `prayerSummaryP`, `prayerDayDetailP`).
+  - "🕌 İman Köşesi" bento KPI kartı (kılınan/cemaat/kaza/nafile/son vakit) + seçili gün detayında vakit satırı.
+- `index.html`
+  - Cache-bump: tüm asset'ler `?v=20260730a`.
+- `GELISTIRME-PLANI.md`
+  - 2026-07-30 changelog girişi eklendi.
+  - Faz 34 "🕌 İman Köşesi — Detaylı namaz takibi (Diyanet vakitleri + konum)" durum tablosu satırı eklendi (🟡 — onay bekliyor).
+- `AGENTS.md`
+  - Bu Agent Handoff Log girişi eklendi.
+
+**Oluşturulan session artifact'leri (commit edilmeyecek):**
+- `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi ve localStorage save senaryolarını kapsar.
+
+**Test/doğrulama sonuçları:**
+- `node --check app.js` ✅
+- `node --check sync.js` ✅
+- `panel.html` inline script syntax check (4/4 script tag) ✅
+- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server çalıştırılmadı.
+
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `prayer-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
+- Gerçek iPhone/PWA'da: Saygı sekmesinde "İman Köşesi" kartının göründüğü; dokunulunca vakit overlay'inin açıldığı; vakit saatlerinin geldiği (konum/şehir seçiliyse); kılındı/cemaat/geç/kaza tiklerinin çalıştığı; nafile sayacının artıp azaldığı; not alanına yazıldığında kaydedildiği; şehir seçimi ve GPS butonunun vakitleri güncellediği manuel test edilmeli.
+- Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
+- Vakit kaynağı Aladhan method 13 (Diyanet hesabı) kullanıyor; daha sıkı resmi Diyanet doğruluğu isterse ileride GitHub Actions ile static `prayer-times-tr.json` üretilip uygulama onu okuyabilir.
+- `App.setPrayerMethod()` handler var ama overlay'de görünür method seçici UI henüz eklenmedi; istenirse Faz A sonrası küçük bir ekleme olarak eklenebilir.
+
 ### 2026-07-29 — Faz 33: Zihin-Beden Arşivi — Pilates / Ney / Binicilik geçmişi otomatik arşivleniyor (onay bekliyor)
 
 **Branch:** `mustafaras-animated-garbanzo` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.

@@ -208,6 +208,8 @@
     --soul:#8E7CC3; --soul2:#D4B374; --soul-bg:rgba(142,124,195,0.13); --soul-glow:rgba(142,124,195,0.30);
     /* Şeyma & Raşit'in Terapi Odası — rafine rose-mauve + altın parıltı (premium marka teması) */
     --room:#BE6C8B; --room2:#E6ADCB; --room-glow:rgba(190,108,139,0.30); --room-bg:rgba(230,173,203,0.13);
+    /* İman Köşesi — altın-yeşil manevi vurgu */
+    --faith:#7A6B3D; --faith2:#C4A35A; --faith-bg:rgba(122,107,61,0.13); --faith-glow:rgba(196,163,90,0.32);
     /* ÆON chat — altın aile (panel.html --gold ile uyumlu) + kullanıcı balonu + premium easing */
     --aeon:#C99A3A; --aeon2:#E6C15A; --aeon-bg:rgba(201,154,58,0.14); --aeon-glow:rgba(212,175,55,0.45);
     --user-bubble:#7E62B8; --user-bubble2:#9B7FC9;
@@ -239,6 +241,7 @@
     --vacation:#5ED4B4; --vacation2:#7DE8CB; --vacation-bg:rgba(94,212,180,0.12); --vacation-glow:rgba(94,212,180,0.18);
     --soul:#B8A8E8; --soul2:#EBCC90; --soul-bg:rgba(184,168,232,0.11); --soul-glow:rgba(184,168,232,0.15);
     --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
+    --faith:#D4C58A; --faith2:#E8D9A0; --faith-bg:rgba(212,197,138,0.12); --faith-glow:rgba(232,217,160,0.16);
     --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
     --user-bubble:#715DA8; --user-bubble2:#8872BD;
   }
@@ -280,13 +283,17 @@
   .sey-app-booted .glass,
   .sey-app-booted .sey-soul-ov-back,
   .sey-app-booted .sey-soul-ov-card,
-  .sey-app-booted .sey-soul-ov-card *{animation:none !important;transition:none !important;}
+  .sey-app-booted .sey-soul-ov-card *,
+  .sey-app-booted .sey-faith-ov-back,
+  .sey-app-booted .sey-faith-ov-card,
+  .sey-app-booted .sey-faith-ov-card *{animation:none !important;transition:none !important;}
   /* Boot sonrası backdrop-filter'ları da sabitle; iOS'ta DOM yenilemesi
      sırasında blur katmanları yeniden boyanıp flaş/parlama yapabiliyor. */
   .sey-app-booted .sey-appheader,
   .sey-app-booted .sey-bottomnav-surface,
   .sey-app-booted .glass,
-  .sey-app-booted .sey-soul-ov-back{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
+  .sey-app-booted .sey-soul-ov-back,
+  .sey-app-booted .sey-faith-ov-back{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
   html,body,#app{background:var(--bg);}
   /* Koyu tema: renkli dış haleler yerine net sınırlar ve gerçek siyah derinlik. */
   #root[data-theme="dark"] .glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none!important;}
@@ -379,3 +386,36 @@
 @keyframes sglJournalPulse{0%,100%{box-shadow:0 6px 20px color-mix(in srgb,var(--journal-glow) 45%,transparent);}50%{box-shadow:0 8px 28px color-mix(in srgb,var(--journal-glow) 90%,transparent);}}
 @keyframes sglJournalSheen{0%{transform:translateX(-100%);}70%{transform:translateX(100%);}100%{transform:translateX(100%);}}
 @media (prefers-reduced-motion: reduce){ .sgl-journal-card,.sgl-journal-card::before{animation:none;} }
+/* ── İman Köşesi — manevi vakit + detaylı namaz takibi ── */
+.sg-faith-card{position:relative;overflow:hidden;border-radius:18px;padding:13px 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,color-mix(in srgb,var(--faith) 12%,var(--card)) 0%,color-mix(in srgb,var(--faith2) 10%,var(--card)) 100%);border:1px solid color-mix(in srgb,var(--faith) 28%,var(--card-bd));box-shadow:0 6px 20px color-mix(in srgb,var(--faith-glow) 50%,transparent),inset 0 1px 0 rgba(255,255,255,0.24);cursor:pointer;transition:transform .18s ease,box-shadow .25s ease;}
+.sg-faith-card:active{transform:scale(.985);}
+.sg-faith-icon{width:34px;height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:linear-gradient(135deg,var(--faith2),var(--faith));color:#fff;font-size:17px;box-shadow:0 4px 12px color-mix(in srgb,var(--faith) 45%,transparent);}
+.sg-faith-text{flex:1;min-width:0;}
+.sg-faith-title{font-size:13.5px;font-weight:800;color:var(--text);line-height:1.25;}
+.sg-faith-sub{font-size:11px;font-weight:650;color:var(--muted);line-height:1.35;margin-top:1px;}
+.sg-faith-action{font-size:11px;font-weight:800;color:var(--faith);white-space:nowrap;}
+.sg-faith-badges{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.sg-faith-badge{font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--faith-bg);color:var(--faith);border:1px solid color-mix(in srgb,var(--faith) 22%,transparent);}
+.sg-faith-badge.ok{background:var(--ok-bg);color:var(--ok);border-color:color-mix(in srgb,var(--ok) 22%,transparent);}
+.sg-faith-badge.warn{background:var(--warn-bg, rgba(229,72,77,0.12));color:var(--warn);border-color:color-mix(in srgb,var(--warn) 22%,transparent);}
+.sg-faith-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;background:color-mix(in srgb,var(--faith) 7%,var(--card));border:1px solid color-mix(in srgb,var(--faith) 14%,var(--card-bd));margin-bottom:8px;}
+.sg-faith-row.current{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--faith) 45%,transparent),0 4px 14px color-mix(in srgb,var(--faith-glow) 35%,transparent);}
+.sg-faith-row-name{font-size:13px;font-weight:800;color:var(--text);min-width:62px;}
+.sg-faith-row-time{font-size:12px;font-weight:700;color:var(--faith);min-width:44px;text-align:center;}
+.sg-faith-row-status{display:flex;align-items:center;gap:5px;flex:1;}
+.sg-faith-chip{font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:var(--field);color:var(--muted);border:1px solid var(--field-bd);cursor:pointer;white-space:nowrap;}
+.sg-faith-chip.on{background:var(--ok-bg);color:var(--ok);border-color:color-mix(in srgb,var(--ok) 30%,transparent);}
+.sg-faith-chip.warn{background:var(--warn-bg, rgba(229,72,77,0.12));color:var(--warn);border-color:color-mix(in srgb,var(--warn) 30%,transparent);}
+.sg-faith-chip .count{font-size:10px;font-weight:900;margin-left:3px;}
+.sg-faith-city{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);padding:8px 10px;border-radius:12px;background:var(--field);border:1px solid var(--field-bd);}
+.sg-faith-city select{font-size:12px;background:transparent;border:none;color:var(--text);font-weight:700;outline:none;flex:1;cursor:pointer;}
+.sg-faith-nafile{display:inline-flex;align-items:center;gap:4px;}
+.sg-faith-nafile button{width:24px;height:24px;border-radius:50%;border:none;background:var(--field);color:var(--text);font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--field-bd);}
+.sg-faith-nafile span{font-size:13px;font-weight:800;color:var(--faith);min-width:20px;text-align:center;}
+.sg-faith-note{width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:9px 11px;font-size:12.5px;outline:none;resize:vertical;font-family:inherit;color:var(--text);margin-top:6px;}
+.sg-faith-summary{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:color-mix(in srgb,var(--faith) 9%,var(--card));border:1px solid color-mix(in srgb,var(--faith) 18%,var(--card-bd));}
+.sg-faith-summary strong{font-size:14px;color:var(--text);}
+.sg-faith-summary span{font-size:11px;color:var(--muted);}
+.sg-faith-ov-back,.sg-faith-ov-card{animation:none !important;transition:none !important;}
+#root[data-theme="dark"] .sg-faith-card{box-shadow:0 6px 20px color-mix(in srgb,var(--faith-glow) 30%,transparent),inset 0 1px 0 rgba(255,255,255,0.06);}
+#root[data-theme="dark"] .sg-faith-row.current{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--faith) 35%,transparent),0 4px 14px color-mix(in srgb,var(--faith-glow) 18%,transparent);}

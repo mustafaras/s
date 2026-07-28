@@ -8103,7 +8103,7 @@ function faithCornerCardHTML(){
   h+='</div>';
   return h;
 }
-function saygiPreviewCardHTML(person,idx,total,done,article){
+function saygiPreviewCardHTML(person,done,article){
   if(!person) return '';
   var thumb='';
   if(article&&article.thumbnail){
@@ -8119,7 +8119,6 @@ function saygiPreviewCardHTML(person,idx,total,done,article){
   h+='<span class="sg-person-preview-badge">'+esc(person.kind)+'</span>';
   h+='<span class="sg-person-preview-badge is-era">'+esc(person.era)+'</span>';
   h+='</div>';
-  h+='<div class="sg-person-preview-kicker">'+icon('trophy',11)+' Günün öncüsü · '+idx+'/'+total+'</div>';
   h+='<div class="sg-person-preview-name">'+esc(person.name)+'</div>';
   h+='<div class="sg-person-preview-discipline">'+icon(person.kind==='Bilim'?'microscope':'feather',12)+' '+esc(person.field)+'</div>';
   if(article&&article.description) h+='<p class="sg-person-preview-desc">'+esc(article.description)+'</p>';
@@ -8131,6 +8130,19 @@ function saygiPreviewCardHTML(person,idx,total,done,article){
   h+='</div>';
   h+='</div>';
   return h;
+}
+function saygiHeaderBarHTML(idx,total){
+  return '<div class="sg-header-bar">'
+    +'<div class="sg-header-bar-main">'+icon('trophy',14)+'<span class="sg-header-bar-label">Günün öncüsü</span><span class="sg-header-bar-count">· '+idx+'/'+total+'</span></div>'
+    +'<button class="sg-header-bar-action" onclick="App.refreshSaygi()" aria-label="Saygı içeriğini yenile">'+icon('rotate-ccw',13)+'<span>Yenile</span></button>'
+    +'</div>';
+}
+function saygiMissionCardHTML(){
+  return '<div class="sg-mission-card">'
+    +'<div class="sg-mission-kicker">'+icon('trophy',12)+' SAYGI · GÜNÜN İSMİ</div>'
+    +'<h2 class="sg-mission-title">Bir hayat, bir iz.</h2>'
+    +'<p class="sg-mission-desc">Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p>'
+    +'</div>';
 }
 // Eski adla uyumluluk: saygiHTML artık yeni kartları kullanır.
 function faithCornerInlineHTML(){ return faithCornerCardHTML(); }
@@ -8180,23 +8192,19 @@ function faithCornerOverlayHTML(){
 }
 
 function saygiPreviewHubHTML(person,article,done){
-  var idx=saygiPeople().indexOf(person)+1, total=saygiPeople().length;
-  return '<div class="saygi-preview-hub">'+saygiPreviewCardHTML(person,idx,total,done,article)+faithCornerCardHTML()+'</div>';
+  return '<div class="saygi-preview-hub">'+saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+'</div>';
 }
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
   if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
   saygiEnsureArticle(person);
-  var article=ui.saygiArticle, done=saygiHasRead(person), h='<section class="saygi-page">';
-  h+='<div class="saygi-intro"><div><div class="saygi-kicker">'+icon('trophy',13)+' SAYGI · GÜNÜN İSMİ</div><h1>Bir hayat, bir iz.</h1><p>Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p></div></div>';
+  var article=ui.saygiArticle, done=saygiHasRead(person);
+  var idx=saygiPeople().indexOf(person)+1, total=saygiPeople().length;
+  var h='<section class="saygi-page">';
+  h+=saygiHeaderBarHTML(idx,total);
+  h+=saygiMissionCardHTML();
   h+=saygiPreviewHubHTML(person,article,done);
-  if(ui.saygiLoading) { h+=saygiLoadingHTML(); return h+'</section>'; }
-  if(ui.saygiError||!article){
-    h+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
-    return h+'</section>';
-  }
-  h+=saygiArticleBodyHTML(person,article,done,'saygi-article');
   h+='</section>';
   return h;
 }

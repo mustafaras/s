@@ -351,7 +351,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
-### 2026-07-30 — Faz 34: İman Köşesi — detaylı namaz takibi + Saygı sekme iki-kart revizyonu (Diyanet vakitleri + konum) (onay bekliyor)
+### 2026-07-30 — Faz 34: İman Köşesi — detaylı namaz takibi + Saygı sekme iki-kart revizyonu + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
 
@@ -361,34 +361,46 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - `data.settings.prayer` modeli: `method`, `location` (`lat`, `lon`, `cityName`, `source`), `adjustments`, `remindersEnabled`, `reminderOffsetMinutes`, `hijriOffset` + `migrate()` backfill.
   - Aladhan/Diyanet API akışı: `fetchPrayerTimesForCity()` ile `api.aladhan.com/v1/timings?method=13` + `Europe/Istanbul`; 81 il listesi (`PRAYER_CITIES`); GPS fallback; `localStorage` üzerinde 48 saat cache (`seyma-prayer-cache-v1:...`).
   - `App.openFaithCorner()` / `App.closeFaithCorner()` / `ui.faithOpen` overlay deseni; `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `faithOpen` eklendi.
-  - `faithCornerInlineHTML()` Saygı sekmesine premium "İman Köşesi" kartı; `faithCornerOverlayHTML()` tam ekran detaylı vakit modalı.
-  - **İkinci pass / Saygı sekme revizyonu:** `saygiPreviewHubHTML()` ile Saygı sekmesi intro ile makale arasına iki zengin preview kartı yerleştirildi: `saygiPreviewCardHTML()` (günün saygı öncüsü thumbnail, alan/dönem, okundu/bekliyor rozet, dil chip, aç oku) ve `faithCornerCardHTML()` (şehir adı, 6 vakit pill barı, kılınan/cemaat/kaza/nafile rozetleri, aç oku). `faithCornerInlineHTML()` bu yeni karta delegasyon yapıyor.
-  - Alt navigasyondaki Saygı butonu yenilendi: label `"Saygı·İman"`; `saygiPending` badge, okunmamış makale veya tamamlanmamış namaz durumunda altın gradient rozet gösteriyor.
-  - Yeni handler: `App.openSaygiPreview()` (makale hazırsa oraya scroll, yoksa Saygı içeriğini yenile).
+  - `faithCornerOverlayHTML()` tam ekran detaylı vakit modalı; `faithCornerCardHTML()` kapalı preview kartı İman Köşesi'ni açar.
+  - **İkinci pass / Saygı sekme iki-kart revizyonu:** `saygiPreviewHubHTML()` Saygı sekmesinde intro ile makale arasına iki kart yerleştirdi: `saygiPreviewCardHTML()` (günün öncüsü) ve `faithCornerCardHTML()` (İman Köşesi). Alt navigasyon "Saygı·İman" label + `saygiPending` altın badge.
+  - **Üçüncü pass / zengin modal + estetik kapalı kartlar:**
+    - `ui.saygiPersonOpen` ephemeral state eklendi; `render()` `curOverlay` zincirine `saygiPersonOpen` dahil edildi.
+    - `App.openSaygiPreview()` artık makale hazır olmasa bile tam ekran modal açıyor; yükleme devam ederken modal içinde loading, hata durumunda retry/Wikipedia bağlantısı gösteriyor.
+    - `App.closeSaygiPerson()` modalı kapatır ve read observer'ı temizler.
+    - `saygiPersonModalHTML()` `#sey-ov-back`/`#sey-ov-card` ID'leriyle overlay-preservation mekanizmasına uygun shell üretiyor; `saygiArticleBodyHTML()` aynı hero + biyografi + kaynaklar + attribution + "Okudum" butonu hem sayfa içinde hem modalde çalışıyor.
+    - `saygiReadButtonHTML()` ve `wireSaygiReadGate()` artık `-modal` suffix'i destekliyor; modal scroll alanında da "sayfayı aşağı kaydır → okudum açılır" davranışı korunuyor.
+    - `saygiPreviewCardHTML()` Wikipedia tarzı zengin kapalı karta dönüştü: sol büyük thumbnail, tür/dönem badge'leri, başlık, alan alt başlık, açıklama, okuma süresi/kaynak footer, dekoratif sağ arc, okundu/bekliyor durum rozetleri.
+    - `faithCornerCardHTML()` gerçek vakitleri gösteren zengin kapalı karta dönüştü: şehir/tarih header, 6-dot ilerleme şeridi, 6 satırlık vakit listesi (kılınanlar yeşil, sonraki vakit vurgulu, vakit adı + saat), alt bilgi çubuğunda performed/cemaat/kaza/late/streak rozetleri.
+    - `faithCornerInlineHTML()` ve `saygiPreviewHubHTML()` yeni kartlara göre güncellendi.
   - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
   - Yeni ikonlar: `mosque` ve `users` SVG path'leri `ICONS` kataloğuna eklendi.
 - `styles.css`
   - Açık/koyu tema `:root` bloklarına `--faith`, `--faith2`, `--faith-bg`, `--faith-glow`, `--faith-soft` accent değişkenleri eklendi.
   - `.sg-faith-*` ve `.sey-faith-*` bileşen stilleri; `.sey-app-booted` kapsamına faith overlay elementleri eklendi.
-  - Yeni preview hub ailesi: `.saygi-preview-hub`, `.sg-preview-card`, `.sg-preview-saygi`, `.sg-preview-faith`, `.sg-preview-prayerbar`, vakit pill durumları (done/current/next), `.sg-preview-pill` rozetleri ve `.sey-bottomnav-badge.saygi` altın gradient rozet stili.
+  - Yeni `.sg-person-preview-*` ailesi (kart, thumbnail, içerik, badge, durum arc), `.sg-faith-preview-*` ailesi (kart, ilerleme şeridi, vakit listesi, satır, pill'ler), `.sg-person-ov-*` modal stilleri (header, body, article override'ları).
+  - `.sey-app-booted` kapsamına yeni kart/modal elementleri eklendi; animation/transition ve `backdrop-filter` sabitlemeleri saygı/iman preview kartları ve kişi modalına da uygulanıyor.
+  - `.sey-bottomnav-badge.saygi` altın gradient rozet stili korundu.
 - `panel.html`
   - Inline `:root` içine `--faith*` değişkenleri eklendi.
   - Bağımsız panel prayer helper'ları (`PRAYER_NAMES_P`, `emptyPrayerEntryP`, `ensurePrayerDayP`, `prayerDaySummaryP`, `prayerSummaryP`, `prayerDayDetailP`).
   - "🕌 İman Köşesi" bento KPI kartı (kılınan/cemaat/kaza/nafile/son vakit) + seçili gün detayında vakit satırı.
 - `index.html`
-  - Cache-bump: tüm asset'ler `?v=20260730b`.
+  - Cache-bump: tüm asset'ler `?v=20260730c`.
 - `GELISTIRME-PLANI.md`
-  - 2026-07-30 changelog girişi eklendi; revizyon pass notları ve cache bump `20260730b` ile güncellendi.
-  - Faz 34 "🕌 İman Köşesi — Detaylı namaz takibi (Diyanet vakitleri + konum) + Saygı sekme revizyonu" durum tablosu satırı eklendi (🟡 — onay bekliyor).
+  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) detayları ve cache bump `20260730c` ile güncellendi.
+  - Faz 34 durum tablosu satırı cache `20260730c` olarak güncellendi (🟡 — onay bekliyor).
 - `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi; revizyon pass ile güncellendi.
+  - Bu Agent Handoff Log girişi güncellendi; üçüncü pass detayları eklendi.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi senaryolarını kapsar. Revizyon sonrası `window.SaygiPeople` seed ile `saygi` tab'ine gidilip `saygi-preview-hub`, `sg-preview-saygi`, `sg-preview-faith`, `Günün öncüsü` ve kişi isminin render edildiği assertion'lar eklendi.
+- `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi senaryolarını kapsar. Revizyon sonrası `window.SaygiPeople` seed ile `saygi` tab'ine gidilip `saygi-preview-hub`, `sg-person-preview-card`, `sg-faith-preview-card`, `Günün öncüsü` ve kişi isminin render edildiği assertion'lar eklendi. `App.openSaygiPreview()` modalı (`sg-person-ov-card` + `sg-person-ov-head`) assertion'ları eklendi.
 
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
 - `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
 - `panel.html` inline script syntax check (4/4 script tag) ✅
 - `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS.
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
@@ -398,8 +410,13 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 **Bir sonraki adım / deploy öncesi notlar:**
 - Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `prayer-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
-- Gerçek iPhone/PWA'da: Saygı sekmesinde "İman Köşesi" kartının göründüğü; dokunulunca vakit overlay'inin açıldığı; vakit saatlerinin geldiği (konum/şehir seçiliyse); kılındı/cemaat/geç/kaza tiklerinin çalıştığı; nafile sayacının artıp azaldığı; not alanına yazıldığında kaydedildiği; şehir seçimi ve GPS butonunun vakitleri güncellediği manuel test edilmeli.
-- **Preview kart / nav testi:** Saygı sekmesinin üstünde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli; her kartın solunda ikon/thumbnail, ortada başlık/meta, sağında aç oku olmalı. İman Köşesi kartında şehir adı ve 6 vakit pill barı (kılınanlar dolu, sonraki vakit belirgin) gözükmeli. Alt navigasyondaki Saygı butonu "Saygı·İman" yazmalı; okunmamış makale veya eksik namaz varsa altın gradient rozet sayı göstermeli. Makale hazır olduğunda Saygı preview kartına dokunulunca makale bölümüne scroll yapmalı.
+- Gerçek iPhone/PWA'da test edilecekler:
+  - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli.
+  - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Günün öncüsü" kicker.
+  - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/geç/streak rozetleri.
+  - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.
+  - İman Köşesi kartına dokunulunca vakit overlay'i açılmalı; kılındı/cemaat/geç/kaza/nafile tikleri çalışmalı.
+  - Alt navigasyondaki Saygı butonu "Saygı·İman" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
 - Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
 - Vakit kaynağı Aladhan method 13 (Diyanet hesabı) kullanıyor; daha sıkı resmi Diyanet doğruluğu isterse ileride GitHub Actions ile static `prayer-times-tr.json` üretilip uygulama onu okuyabilir.
 - `App.setPrayerMethod()` handler var ama overlay'de görünür method seçici UI henüz eklenmedi; istenirse Faz A sonrası küçük bir ekleme olarak eklenebilir.

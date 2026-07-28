@@ -924,7 +924,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false};
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -2708,11 +2708,12 @@ App.profileAcceptConsent=function(){
 App.refreshSaygi=function(){ var person=saygiCurrentPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
-  var article=ui.saygiArticle;
-  if(!article||ui.saygiLoading){ App.refreshSaygi(); return; }
-  var el=document.querySelector('.saygi-article');
-  if(el){ try{ el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }
+  var person=saygiCurrentPerson(); if(!person) return;
+  ui.saygiPersonOpen=true;
+  if(!ui.saygiArticle||ui.saygiLoading){ App.refreshSaygi(); }
+  else { render(); }
 };
+App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } render(); };
 App.markSaygiRead=function(){
   var person=saygiCurrentPerson(), article=ui.saygiArticle;
   if(!person||!article||article.dailyKey!==saygiDayKey(person)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
@@ -3673,7 +3674,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)))))));
+  var curOverlay=ui.saygiPersonOpen?'saygiPerson':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var _painted=false;
@@ -3702,6 +3703,7 @@ function render(){
   if(newScroll){
     wireAppHeaderScroll(newScroll);
     if(ui.tab==='saygi') wireSaygiReadGate(newScroll);
+    if(ui.saygiPersonOpen){ var modalBody=document.getElementById('sey-ov-body'); if(modalBody) wireSaygiReadGate(modalBody,'-modal'); }
     if(ui.tab==='mesaj' && (!sameTab || ui.aeonScrollBottom)){
       // ÆON sohbeti: açılışta ve yeni mesaj/cevap sonrası en alta (en yeni mesaja) kaydır
       var firstM=newScroll.firstElementChild; if(firstM){ firstM.style.animation='none'; }
@@ -8034,11 +8036,12 @@ function saygiSourceCardHTML(article,link,isWiki){
   return '<a class="saygi-source-card'+(isWiki?' is-wikipedia':'')+'" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" style="--saygi-link-tone:'+tone+';">'
     +'<span class="saygi-link-thumb">'+thumb+'</span><span class="saygi-link-copy"><span class="saygi-link-label">'+esc(label)+'</span><span class="saygi-link-sub">'+(isWiki?'Maddesini ve kaynaklarını aç':'Kaynakta geçen dış bağlantı')+'</span></span><span class="saygi-link-arrow">'+icon('external-link',14)+'</span></a>';
 }
-function saygiReadButtonHTML(person,done){
+function saygiReadButtonHTML(person,done,suffix){
+  suffix=suffix||'';
   var ready=!!ui.saygiReadReady, disabled=!done&&!ready, main=done?'Okudum':(ready?'Okudum':'Okudum kilitli'), sub=done?'Ne okudum kaydını aç':(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır');
-  return '<div id="saygi-read-sentinel" class="saygi-read-sentinel" aria-hidden="true"></div><div class="saygi-finish-card">'
+  return '<div id="saygi-read-sentinel'+suffix+'" class="saygi-read-sentinel" aria-hidden="true"></div><div class="saygi-finish-card">'
     +'<div class="saygi-finish-orbit">'+icon(done?'circle-check':'book-open',22)+'</div><div class="saygi-finish-copy"><div>Bugünün düşüncesi burada tamamlandı.</div><small>Bu biyografiyi okuduysan kaydını bugüne ekleyelim.</small></div></div>'
-    +'<button id="saygi-read-button" class="saygi-read-button'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'">'
+    +'<button id="saygi-read-button'+suffix+'" class="saygi-read-button'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'">'
     +'<span class="saygi-read-button-icon">'+icon(done?'circle-check':'book-open',19)+'</span><span><strong data-saygi-read-copy>'+main+'</strong><small data-saygi-read-sub>'+sub+'</small></span></button>';
 }
 function saygiLoadingHTML(){
@@ -8067,27 +8070,36 @@ function faithCornerCardHTML(){
   var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
   var locName=loc&&loc.cityName?esc(loc.cityName):(loc?'Konum ayarlandı':'Konum seçilmedi');
   var allDone=s.performed>=6;
-  var h='<div class="sg-preview-card sg-preview-faith" onclick="App.openFaithCorner()">';
-  h+='<div class="sg-preview-left"><span class="sg-preview-icon">'+icon('mosque',19)+'</span></div>';
-  h+='<div class="sg-preview-body">';
-  h+='<div class="sg-preview-kicker">'+locName+' · Bugünün 6 vakti</div>';
-  h+='<div class="sg-preview-title">İman Köşesi</div>';
-  // kompakt vakit çubuğu
-  h+='<div class="sg-preview-prayerbar">';
+  var h='<div class="sg-faith-preview-card'+(allDone?' is-done':'')+'" onclick="App.openFaithCorner()" role="button" aria-label="İman köşesini aç">';
+  h+='<div class="sg-faith-preview-arc" aria-hidden="true"></div>';
+  h+='<div class="sg-faith-preview-head">';
+  h+='<div class="sg-faith-preview-title-block">';
+  h+='<span class="sg-faith-preview-icon">'+icon('mosque',20)+'</span>';
+  h+='<div><div class="sg-faith-preview-title">İman Köşesi</div><div class="sg-faith-preview-sub">'+locName+' · '+dateLabelTR(date)+'</div></div>';
+  h+='</div>';
+  h+='<div class="sg-faith-preview-progress" aria-label="'+s.performed+' / 6 vakit tamamlandı">';
+  PRAYER_ORDER.forEach(function(k,i){ var pe=p[k]||emptyPrayerEntry(); h+='<span class="sg-faith-progress-dot '+(!i?'first':'')+' '+(!!pe.performed?'done':'')+(i===curIdx?' current':'')+'" data-prayer="'+esc(PRAYER_NAMES[k]||k)+'"></span>'; });
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="sg-faith-preview-list">';
   PRAYER_ORDER.forEach(function(k,i){
-    var pe=p[k]||emptyPrayerEntry(), performed=!!pe.performed, name=(PRAYER_NAMES[k]||k).slice(0,3);
-    var cls='sg-preview-prayerpill'+(performed?' done':'')+(i===curIdx?' current':'')+(i===nextIdx?' next':'');
-    h+='<span class="'+cls+'">'+(performed?icon('check',10):'')+' '+esc(name)+'</span>';
+    var pe=p[k]||emptyPrayerEntry(), performed=!!pe.performed, name=PRAYER_NAMES[k]||k, time=pe.time||'--:--';
+    var cls='sg-faith-preview-row'+(performed?' done':'')+(i===curIdx?' current':'')+(i===nextIdx?' next':'')+(i===PRAYER_ORDER.length-1?' last':'');
+    var status=performed?icon('check',11):'';
+    h+='<div class="'+cls+'">';
+    h+='<div class="sg-faith-preview-name">'+esc(name)+'</div>';
+    h+='<div class="sg-faith-preview-time">'+esc(time)+'</div>';
+    h+='<div class="sg-faith-preview-status">'+(status?'<span class="sg-faith-preview-check">'+status+'</span>':'<span class="sg-faith-preview-dot"></span>')+'</div>';
+    h+='</div>';
   });
   h+='</div>';
-  h+='<div class="sg-preview-meta">';
-  h+='<span class="sg-preview-pill '+(allDone?'ok':'')+'">'+s.performed+'/6 vakit</span>';
-  if(s.congregation) h+='<span class="sg-preview-pill">'+s.congregation+' cemaat</span>';
-  if(s.madeUp) h+='<span class="sg-preview-pill warn">'+s.madeUp+' kaza</span>';
-  if(streak) h+='<span class="sg-preview-pill streak">'+streak+' gün seri</span>';
+  h+='<div class="sg-faith-preview-foot">';
+  h+='<span class="sg-faith-preview-pill '+(!allDone?'':'ok')+'">'+icon('check',10)+' '+s.performed+'/6 vakit</span>';
+  if(s.congregation) h+='<span class="sg-faith-preview-pill">'+icon('users',10)+' '+s.congregation+' cemaat</span>';
+  if(s.madeUp) h+='<span class="sg-faith-preview-pill warn">'+icon('refresh-ccw',10)+' '+s.madeUp+' kaza</span>';
+  if(s.late) h+='<span class="sg-faith-preview-pill warn">'+icon('clock',10)+' '+s.late+' geç</span>';
+  if(streak) h+='<span class="sg-faith-preview-pill streak">'+icon('flame',10)+' '+streak+' gün seri</span>';
   h+='</div>';
-  h+='</div>';
-  h+='<div class="sg-preview-right">'+(allDone?icon('check-circle',20):icon('chevron-right',18))+'</div>';
   h+='</div>';
   return h;
 }
@@ -8097,21 +8109,26 @@ function saygiPreviewCardHTML(person,idx,total,done,article){
   if(article&&article.thumbnail){
     thumb='<img src="'+esc(article.thumbnail)+'" alt="" loading="lazy" referrerpolicy="no-referrer">';
   } else {
-    thumb='<span class="sg-preview-thumb-fallback">'+esc((person.name||'?').charAt(0).toUpperCase())+'</span>';
+    thumb='<span class="sg-person-preview-thumb-fallback">'+esc((person.name||'?').charAt(0).toUpperCase())+'</span>';
   }
-  var sub=esc(person.field)+' · '+esc(person.era);
-  var h='<div class="sg-preview-card sg-preview-saygi" onclick="App.openSaygiPreview()">';
-  h+='<div class="sg-preview-left"><span class="sg-preview-thumb">'+thumb+'</span></div>';
-  h+='<div class="sg-preview-body">';
-  h+='<div class="sg-preview-kicker">'+icon('trophy',12)+' Günün öncüsü · '+idx+'/'+total+'</div>';
-  h+='<div class="sg-preview-title">'+esc(person.name)+'</div>';
-  h+='<div class="sg-preview-sub">'+sub+'</div>';
-  h+='<div class="sg-preview-meta">';
-  h+='<span class="sg-preview-pill '+(done?'ok':'')+'">'+(done?icon('check',10)+' Okundu':icon('book-open',10)+' Bekliyor')+'</span>';
-  if(article&&article.lang) h+='<span class="sg-preview-pill faint">'+(article.lang==='tr'?'Türkçe':'English')+'</span>';
+  var h='<div class="sg-person-preview-card'+(done?' is-done':'')+'" onclick="App.openSaygiPreview()" role="button" aria-label="Günün öncüsü: '+esc(person.name)+'">';
+  h+='<div class="sg-person-preview-arc" aria-hidden="true"></div>';
+  h+='<div class="sg-person-preview-thumb">'+thumb+'<span class="sg-person-preview-caption">Görsel · Wikipedia</span></div>';
+  h+='<div class="sg-person-preview-content">';
+  h+='<div class="sg-person-preview-badges">';
+  h+='<span class="sg-person-preview-badge">'+esc(person.kind)+'</span>';
+  h+='<span class="sg-person-preview-badge is-era">'+esc(person.era)+'</span>';
   h+='</div>';
+  h+='<div class="sg-person-preview-kicker">'+icon('trophy',11)+' Günün öncüsü · '+idx+'/'+total+'</div>';
+  h+='<div class="sg-person-preview-name">'+esc(person.name)+'</div>';
+  h+='<div class="sg-person-preview-discipline">'+icon(person.kind==='Bilim'?'microscope':'feather',12)+' '+esc(person.field)+'</div>';
+  if(article&&article.description) h+='<p class="sg-person-preview-desc">'+esc(article.description)+'</p>';
+  h+='<div class="sg-person-preview-meta">';
+  h+='<span>'+icon('clock',11)+' yaklaşık '+(article?saygiReadMinutes(article):'2')+' dk</span>';
+  h+='<span>'+icon('book-open',11)+' '+(article&&article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span>';
   h+='</div>';
-  h+='<div class="sg-preview-right">'+(done?icon('circle-check',20):icon('chevron-right',18))+'</div>';
+  h+='<div class="sg-person-preview-status">'+(done?'<span class="sg-person-preview-status-ok">'+icon('check',10)+' Okundu</span>':'<span class="sg-person-preview-status-wait">'+icon('book-open',10)+' Okumaya başla</span>')+'</div>';
+  h+='</div>';
   h+='</div>';
   return h;
 }
@@ -8179,8 +8196,14 @@ function saygiHTML(){
     h+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
     return h+'</section>';
   }
+  h+=saygiArticleBodyHTML(person,article,done,'saygi-article');
+  h+='</section>';
+  return h;
+}
+function saygiArticleBodyHTML(person,article,done,wrapCls){
   var heroLead=article.lead, first=article.blocks&&article.blocks[0]; if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90)) heroLead='';
-  h+='<article class="saygi-article">';
+  var h='';
+  h+='<article class="'+(wrapCls||'saygi-article')+'">';
   h+='<header class="saygi-hero">'+(article.thumbnail?'<div class="saygi-hero-media"><img src="'+esc(article.thumbnail)+'" alt="'+esc(article.title)+' portresi" loading="eager" referrerpolicy="no-referrer"><span>Görsel · Wikipedia</span></div>':'<div class="saygi-hero-media is-empty">'+icon('trophy',42)+'<span>Günün ismi</span></div>');
   h+='<div class="saygi-hero-copy"><div class="saygi-tags"><span>'+esc(person.kind)+'</span><span>'+esc(person.era)+'</span></div><h2>'+esc(article.title)+'</h2><div class="saygi-discipline">'+icon(person.kind==='Bilim'?'microscope':'feather',15)+' '+esc(person.field)+'</div>'+(article.description?'<p class="saygi-description">'+esc(article.description)+'</p>':'')+(heroLead?'<p class="saygi-lead">'+esc(heroLead)+'</p>':'')+'<div class="saygi-meta"><span>'+icon('clock',13)+' yaklaşık '+saygiReadMinutes(article)+' dk</span><span>'+icon('book-open',13)+' '+(article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span></div></div></header>';
   h+='<div class="saygi-biography">';
@@ -8190,9 +8213,27 @@ function saygiHTML(){
   (article.links||[]).forEach(function(link){ h+=saygiSourceCardHTML(article,link,false); });
   h+='</div></section>';
   h+='<footer class="saygi-attribution"><span>'+icon('file-text',13)+'</span><span>Metin <a href="'+esc(article.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Wikipedia katkıda bulunanlarından</a> alınır; '+esc(article.licenseTitle)+' lisansı ile paylaşılır.</span><a href="'+esc(article.licenseUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Lisans ayrıntısı">'+icon('external-link',13)+'</a></footer>';
-  h+=saygiReadButtonHTML(person,done);
-  h+='</article></section>';
+  h+=saygiReadButtonHTML(person,done,article.suffix||'');
+  h+='</article>';
   return h;
+}
+function saygiPersonModalHTML(){
+  var person=saygiCurrentPerson();
+  if(!person) return '';
+  var article=ui.saygiArticle;
+  var done=saygiHasRead(person);
+  var head='<div class="sg-person-ov-head"><div class="sg-person-ov-title"><span>'+icon('trophy',16)+'</span>Günün öncüsü</div><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+icon('x',16)+'</button></div>';
+  var body='';
+  if(ui.saygiLoading||!article){
+    body+='<div style="padding:18px 4px;">';
+    if(ui.saygiLoading) body+=saygiLoadingHTML();
+    else body+='<div class="saygi-error"><span>'+icon('cloud-rain',22)+'</span><div><strong>Bugünün kaynağına ulaşamadık.</strong><p>'+esc(ui.saygiError||'Birazdan yeniden deneyebilirsin.')+'</p><div class="saygi-error-actions"><button onclick="App.refreshSaygi()">'+icon('rotate-ccw',14)+' Yeniden dene</button><a href="'+esc(saygiSourceFallback(person))+'" target="_blank" rel="noopener noreferrer">Wikipedia’da aç '+icon('external-link',13)+'</a></div></div></div>';
+    body+='</div>';
+  } else {
+    article=Object.create(article); article.suffix='-modal';
+    body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal');
+  }
+  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:520px;max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 28px;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';
 }
 function saygiUnlockReadButton(btn){
   if(!btn||btn.disabled===false&&ui.saygiReadReady) return;
@@ -8201,9 +8242,10 @@ function saygiUnlockReadButton(btn){
   if(copy) copy.textContent='Okudum'; if(sub) sub.textContent='Bugünün kaydına ekle';
   var ic=btn.querySelector('.saygi-read-button-icon'); if(ic) ic.innerHTML=icon('circle-check',19);
 }
-function wireSaygiReadGate(sc){
+function wireSaygiReadGate(sc,suffix){
   if(!sc) return;
-  var person=saygiCurrentPerson(), btn=document.getElementById('saygi-read-button'), sentinel=document.getElementById('saygi-read-sentinel');
+  suffix=suffix||'';
+  var person=saygiCurrentPerson(), btn=document.getElementById('saygi-read-button'+suffix), sentinel=document.getElementById('saygi-read-sentinel'+suffix);
   if(!person||!btn||!sentinel||saygiHasRead(person)) return;
   function unlock(){ saygiUnlockReadButton(btn); if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } }
   if(sc.scrollHeight<=sc.clientHeight+32){ unlock(); return; }
@@ -8938,6 +8980,7 @@ function modalsHTML(){
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
   if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
+  if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';

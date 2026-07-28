@@ -390,7 +390,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
 - Kullanıcı `http://localhost:8989/index.html` üzerinde Pratik picker'ın ve aktivite formunun flaşsız açıldığını, tab değişimlerinde modal ve genel ekranın sabit kaldığını doğrulamalı.
 - Hâlâ flaş hissedilirse bir sonraki adım: header/bottom nav'ı sabit tutup sadece `#app` içindeki ana scroll içeriğini değiştirmek (büyük refactor); veya off-screen/pre-render atomic DOM swap denenebilir.
-- Cache-bump `20260728g`; eski `?v=20260728f/e` önbellekleri temizlenmeli.
+- Cache-bump `20260728g`; eski `?v=20260728e/d` önbellekleri temizlenmeli.
 
 ---
 
@@ -418,7 +418,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
   - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260728f`.
+  - Cache-bump: tüm asset `?v=20260728g`.
   - `#app` inline style'a `background:var(--bg)` eklendi; böylece `innerHTML` değişirken arka yüzey asla beyaz/varsayılan renge dönmüyor.
 - `app.js` (sekme geçişleri düzeltmesi — ikinci, daha derin pass)
   - `render()` içinde `document.startViewTransition()` ile blur/scale cross-fade sekme geçişleri **tamamen kaldırıldı**. `paint()` her zaman anlık çağrılıyor; hiçbir fallback fade/opacity animasyonu kalmadı.

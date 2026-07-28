@@ -8139,7 +8139,7 @@ function saygiHeaderBarHTML(idx,total){
 }
 function saygiMissionCardHTML(){
   return '<div class="sg-mission-card">'
-    +'<div class="sg-mission-kicker">'+icon('trophy',12)+' SAYGI · GÜNÜN İSMİ</div>'
+    +'<div class="sg-mission-kicker">'+icon('trophy',12)+' İLHAM · GÜNÜN İSMİ</div>'
     +'<h2 class="sg-mission-title">Bir hayat, bir iz.</h2>'
     +'<p class="sg-mission-desc">Bilimin ve sanatın yönünü değiştiren 100 kişiden her gün biri. Hızlıca geçmek için değil, biraz durup anlamak için.</p>'
     +'</div>';
@@ -8365,7 +8365,7 @@ function navHTML(){
     ['bugun','sun','Bugün','#7B5E2F','#3E433B'],
     ['saglik','flower-2','Sağlık','#2F6B63','#60695D'],
     ['mesaj','hexagon','Aeon','#A88444','#30343A'],
-    ['saygi','trophy','Saygı·İman','#826936','#36454B',true],
+    ['saygi','trophy','İlham·İbadet','#826936','#36454B',true],
     ['harita','map','Takvim','#59695E','#8A734E'],
     ['rapor','chart-column','Rapor','#3A4048','#A4824C'],
     ['ayarlar','settings','Ayarlar','#4A4852','#787064']

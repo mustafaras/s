@@ -351,7 +351,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 
 ---
 
-### 2026-07-30 — Faz 34: İman Köşesi — detaylı namaz takibi + Saygı sekme iki-kart revizyonu + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
+### 2026-07-30 — Faz 34: Saygı + İman Köşesi Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
 
@@ -362,7 +362,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - Aladhan/Diyanet API akışı: `fetchPrayerTimesForCity()` ile `api.aladhan.com/v1/timings?method=13` + `Europe/Istanbul`; 81 il listesi (`PRAYER_CITIES`); GPS fallback; `localStorage` üzerinde 48 saat cache (`seyma-prayer-cache-v1:...`).
   - `App.openFaithCorner()` / `App.closeFaithCorner()` / `ui.faithOpen` overlay deseni; `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `faithOpen` eklendi.
   - `faithCornerOverlayHTML()` tam ekran detaylı vakit modalı; `faithCornerCardHTML()` kapalı preview kartı İman Köşesi'ni açar.
-  - **İkinci pass / Saygı sekme iki-kart revizyonu:** `saygiPreviewHubHTML()` Saygı sekmesinde intro ile makale arasına iki kart yerleştirdi: `saygiPreviewCardHTML()` (günün öncüsü) ve `faithCornerCardHTML()` (İman Köşesi). Alt navigasyon "Saygı·İman" label + `saygiPending` altın badge.
+  - **İkinci pass / Saygı sekme iki-kart revizyonu:** `saygiPreviewHubHTML()` Saygı sekmesinde intro ile makale arasına iki kart yerleştirdi: `saygiPreviewCardHTML()` (günün öncüsü) ve `faithCornerCardHTML()` (İman Köşesi). Alt navigasyon "İlham·İbadet" label + `saygiPending` altın badge.
   - **Üçüncü pass / zengin modal + estetik kapalı kartlar:**
     - `ui.saygiPersonOpen` ephemeral state eklendi; `render()` `curOverlay` zincirine `saygiPersonOpen` dahil edildi.
     - `App.openSaygiPreview()` artık makale hazır olmasa bile tam ekran modal açıyor; yükleme devam ederken modal içinde loading, hata durumunda retry/Wikipedia bağlantısı gösteriyor.
@@ -375,7 +375,7 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
   - **Dördüncü pass / Saygı header ve intro redesign:**
     - `saygiHTML()` yeniden yapılandırıldı: eski büyük `saygi-intro` bloğu ve sayfa içi makale gövdesi kaldırıldı; makale artık sadece modalda yaşar.
     - Yeni `saygiHeaderBarHTML()`: trophy ikonu, "Günün öncüsü · X/100" sayaç ve "Yenile" aksiyon butonu; kompakt, premium, hafif shimmer'lı.
-    - Yeni `saygiMissionCardHTML()`: "SAYGI · GÜNÜN İSMİ / Bir hayat, bir iz." misyon kartı; altın-yeşil gradient arka plan, dekoratif radial arc ve nazik açıklama paragrafı.
+    - Yeni `saygiMissionCardHTML()`: "İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz." misyon kartı; altın-yeşil gradient arka plan, dekoratif radial arc ve nazik açıklama paragrafı.
     - `saygiPreviewCardHTML()` imzası sadeleştirildi; kart içindeki "Günün öncüsü" kicker çizgisi kaldırıldı (bilgi artık header bar'da).
     - `saygiPreviewHubHTML()` ve `saygiHTML()` yeni header/mission kartını kullanacak şekilde güncellendi.
   - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
@@ -419,14 +419,14 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 - Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
 - Onay sonrası merge öncesi son bir kez `node --check app.js` + `prayer-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
 - Gerçek iPhone/PWA'da test edilecekler:
-  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte kompakt header bar ("Günün öncüsü · X/100" + "Yenile" butonu) ve altında altın-yeşil gradient misyon kartı ("SAYGI · GÜNÜN İSMİ / Bir hayat, bir iz.") görünmeli.
+  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte kompakt header bar ("Günün öncüsü · X/100" + "Yenile" butonu) ve altında altın-yeşil gradient misyon kartı ("İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz.") görünmeli.
   - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli.
   - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli; preview kartın kendi içinde artık "Günün öncüsü · X/100" kicker çizgisi olmamalı.
   - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Bugün keşfet" tonu.
   - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/geç/streak rozetleri.
   - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.
   - İman Köşesi kartına dokunulunca vakit overlay'i açılmalı; kılındı/cemaat/geç/kaza/nafile tikleri çalışmalı.
-  - Alt navigasyondaki Saygı butonu "Saygı·İman" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
+  - Alt navigasyondaki Saygı butonu "İlham·İbadet" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
 - Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
 - Vakit kaynağı Aladhan method 13 (Diyanet hesabı) kullanıyor; daha sıkı resmi Diyanet doğruluğu isterse ileride GitHub Actions ile static `prayer-times-tr.json` üretilip uygulama onu okuyabilir.
 - `App.setPrayerMethod()` handler var ama overlay'de görünür method seçici UI henüz eklenmedi; istenirse Faz A sonrası küçük bir ekleme olarak eklenebilir.

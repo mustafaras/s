@@ -247,8 +247,8 @@ görür. İşlevsel fazlar bu kaplamanın üstüne gelir.
 
 | Faz | Başlık & odak | Öncelik | Durum | Ana etkileşimler (`app.js`) | Panel & notlar |
 |-----|---------------|---------|-------|------------------------------|----------------|
-| 42 | ✨ **Kozmetik Premium** — glass/glow/shimmer kaplama + 5. sekme Rapor polisajı + tüm hub mikro-premium'u | 1 | ✅ | Veri/işlev değişmez; glass kart stilleri, accent gradient'lar, zikir/iman/öncü/rapor yüzeyleri | Cache `20260730k` |
-| 35 | 🎯 **Zikirmatik** — sayaç + preset + günlük kayıt | 1 | ✅ | Sayaç/preset/stats; 5 temel + 99 Esmâ; Arapça yazımdan asıl-ebced hedefi ve geri sayım; çoklu set, ses+haptic | Panel zikir özeti; cache `20260730k` |
+| 42 | ✨ **Kozmetik Premium** — glass/glow/shimmer kaplama + 5. sekme Rapor polisajı + tüm hub mikro-premium'u | 1 | ✅ | Veri/işlev değişmez; glass kart stilleri, accent gradient'lar, zikir/iman/öncü/rapor yüzeyleri | Cache `20260730m` |
+| 35 | 🎯 **Zikirmatik** — sayaç + preset + günlük kayıt | 1 | ✅ | Sayaç/preset/stats; 5 temel + 99 Esmâ; Arapça yazımdan asıl-ebced hedefi ve geri sayım; çoklu set, ses+haptic | Panel zikir özeti; cache `20260730m` |
 | 36 | 🕌 **Sıradaki vakit + geri sayım** + cemaat/pulse vurgu + `currentPrayerIndex` geliştirme | 1 | ✅ | Header'da countdown, `App.tickPrayer`, pulse CSS (`.sg-faith-preview-row.next`), cemaat altın ikon | — |
 | 37 | 🌙 **Hicri & Miladi takvim** + mübarek gün rozeti (`hijriCalendar.js`, offset) | 2 | ✅ | `window.HijriCalendarV1`, `hijriTodayStr`, ±2 gün kullanıcı kontrolü, rozet UI | Panel `Hicri Takvim` bento aynası |
 | 38 | 🧭 **Kıble gülü** (local bearing + GPS), canlı cihaz yönü | 2 | ✅ | SVG compass; izinli `deviceorientation`/iOS permission; statik fallback | — |

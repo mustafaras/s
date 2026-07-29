@@ -8764,8 +8764,18 @@ function saygiPersonModalHTML(){
     body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal',false);
     body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';
   }
-  var action='<div class="sg-person-ov-action">'+(article?saygiReadActionHTML(done,'-modal'):saygiReadActionHTML(false,'-modal',true,'Okudum',ui.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'))+'</div>';
-  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:min(92vh,900px);max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 92px;display:flex;flex-direction:column;gap:14px;">'+body+'</div>'+action+'</div></div>';
+  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:92vh;max-height:900px;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 104px;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';
+}
+function saygiFloatingReadHTML(){
+  var person=saygiModalPerson();
+  if(!person) return '';
+  var article=(ui.saygiArticle&&ui.saygiArticle.personId===person.id)?ui.saygiArticle:null;
+  var done=saygiHasRead(person), ready=!!ui.saygiReadReady;
+  var disabled=!done&&(!article||!ready);
+  var sub=done?'Ne okudum kaydını aç':(!article?(ui.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'):(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır'));
+  return '<button id="saygi-read-button-modal" class="sg-person-read-fab'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'" style="position:fixed!important;z-index:2147483640!important;left:50%!important;bottom:24px!important;transform:translateX(-50%)!important;display:flex!important;visibility:visible!important;opacity:'+(disabled?'.72':'1')+'!important;pointer-events:auto!important;box-sizing:border-box!important;width:calc(100vw - 64px)!important;max-width:484px!important;min-height:58px!important;align-items:center!important;justify-content:center!important;gap:10px!important;border:1px solid rgba(255,255,255,.34)!important;border-radius:18px!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom))!important;color:#FFF9EC!important;background:linear-gradient(135deg,#C4A35A,#826936)!important;box-shadow:0 14px 34px rgba(52,39,18,.38)!important;font:inherit!important;cursor:'+(disabled?'not-allowed':'pointer')+'!important;">'
+    +'<span class="saygi-read-button-icon" style="display:inline-flex!important;">'+icon(done?'circle-check':'book-open',20)+'</span>'
+    +'<span style="display:flex!important;flex-direction:column!important;align-items:flex-start!important;text-align:left!important;"><strong data-saygi-read-copy style="font-size:14px!important;line-height:1.1!important;">Okudum</strong><small data-saygi-read-sub style="margin-top:3px!important;color:rgba(255,249,236,.84)!important;font-size:10.5px!important;font-weight:700!important;">'+esc(sub)+'</small></span></button>';
 }
 function saygiUnlockReadButton(btn){
   if(!btn||btn.disabled===false&&ui.saygiReadReady) return;
@@ -9516,7 +9526,7 @@ function modalsHTML(){
   if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
   if(ui.zikrOpen){ h+=zikroverlayHTML(); }
   if(ui.qiblaOpen){ h+=qiblaOverlayHTML(); }
-  if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); }
+  if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); h+=saygiFloatingReadHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';

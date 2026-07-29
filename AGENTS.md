@@ -336,6 +336,23 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Okudum eylemi modal ağacından çıkarıldı (kök görünürlük düzeltmesi)
+
+**Branch:** `mustafaras-iman-kosesi-plani`; deploy bu kayıt yazılırken bekliyor. Cache `20260730m`.
+
+**Değişen dosyalar:**
+- `app.js`: `Okudum` eylemi modal kartı/backdrop ağacından kaldırıldı; `modalsHTML()` seviyesinde bağımsız `saygiFloatingReadHTML()` katmanı eklendi. Inline görünürlük, ekran altı konum ve yüksek z-index ile `#app`/overlay overflow-stacking kırpması engellendi. Scroll gate ve `App.markSaygiRead()` akışı korunuyor.
+- `styles.css`: eski `.sg-person-ov-action` yerleşimi kaldırıldı; tamamlanmış floating buton durumu eklendi.
+- `index.html`: cache `20260730m`.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: bağımsız floating eylemin modal yanında üretildiği ve yüksek katmanda görünür olduğu assertion'ları.
+- Planlar/handoff güncellendi.
+
+**Doğrulama:** `node --check app.js` ✅; `zikr-harness` 29/29 ✅; genel driver ✅; gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Commit/push/Pages; kullanıcı tarafından canlı görsel kontrol.
+
+---
+
 ### 2026-07-29 — Öncü modalı içerik yarışı + kalıcı Okudum düzeltmesi
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` pushlandı. Kod commit `d76cbd8`; GitHub Pages workflow `30447777691` başarıyla tamamlandı. Cache `20260730k`.

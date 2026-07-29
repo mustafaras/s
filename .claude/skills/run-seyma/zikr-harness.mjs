@@ -151,7 +151,7 @@ ok('Koleksiyon hücresi istenen öncünün modalını açar', (function () {
 })(), appHTML.slice(0,180));
 ok('Okudum eylemi biyografi yüklenirken bile modal altında görünür', (function () {
   sb.App.openSaygiCollectionPerson('albert-einstein');
-  const shown=/sg-person-ov-action/.test(appHTML)&&/saygi-read-button-modal/.test(appHTML)&&/>Okudum</.test(appHTML);
+  const shown=/sg-person-read-fab/.test(appHTML)&&/saygi-read-button-modal/.test(appHTML)&&/>Okudum</.test(appHTML)&&/z-index:2147483640!important/.test(appHTML);
   sb.App.closeSaygiPerson();
   return shown;
 })(), appHTML.slice(-260));
@@ -261,7 +261,7 @@ ok('İlham & İbadet koyu tema raporu render', (function () {
 
 ok('Günün öncüsü modalında sabit Okudum eylemi kod yolu var', (function () {
   const src=fs.readFileSync(path.join(REPO,'app.js'),'utf8');
-  return /sg-person-ov-action/.test(src)&&/position:absolute/.test(fs.readFileSync(path.join(REPO,'styles.css'),'utf8'))&&/saygiReadActionHTML\(done,'-modal'\)/.test(src);
+  return /function saygiFloatingReadHTML\(\)/.test(src)&&/z-index:2147483640!important/.test(src)&&/h\+=saygiPersonModalHTML\(\); h\+=saygiFloatingReadHTML\(\)/.test(src);
 })());
 
 ok('Okudum, Zihnimi Besledim türetilmiş tikini günceller', (function () {

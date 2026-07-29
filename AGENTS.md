@@ -336,6 +336,20 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Yalnız Zikirmatik premium v2 geliştirme planı
+
+**Branch:** `mustafaras-iman-kosesi-plani`; plan-only, kod/deploy yok.
+
+**Değişen dosyalar:**
+- `ZIKIRMATIK-GELISTIRME-PLANI.md` (yeni): tam ekran bağımsız Zikirmatik; günler üstü preset/hatim devamı; `ebced²` hedefi; el-Fettâh `489² = 239.121` ve kaçıncı 489’luk tur göstergesi; v2 journey/hatim/session veri modeli; atomik sayım, migration, undo/reset güvenliği, premium UX, erişilebilirlik, analiz/panel aynası, Z1–Z9 fazları ve sınır testleri.
+- `AGENTS.md`: bu handoff kaydı.
+
+**Doğrulama:** Plan mevcut `app.js`, `esmaulHusnaV1.js` ve İlham & İbadet planıyla karşılaştırıldı; Fettâh ebced değeri modülden `489`, karesi `239121` olarak hesaplandı. Kod çalıştırılmadı/değiştirilmedi; gerçek tarayıcı ve server açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcı planı onayladı; Z1 matematik/şema fazından başlanmalı. Plan commit kapsamına alındı, henüz push/deploy edilmedi.
+
+---
+
 ### 2026-07-29 — Okudum eylemi modal ağacından çıkarıldı (kök görünürlük düzeltmesi)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` pushlandı. Kod commit `32f925a`; Pages workflow `30448983196` başarıyla tamamlandı. Cache `20260730m`.

@@ -336,6 +336,32 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Premium Zikirmatik prompt paketi `main`e fast-forward alındı
+
+**Branch:** `zikirmatik-iphone16-redesign` → `main` fast-forward.
+**İçerik commit’i:** `737759b`.
+**GitHub Pages:** workflow `30457285398` validate + deploy başarılı.
+
+**Repo durumu:**
+- `main` ile redesign branch’i çatışmasız, doğrusal geçmişte eşitlendi.
+- Yeni `ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md` ve plan bağlantısı
+  GitHub reposuna alındı.
+- Uygulama JS/CSS’i değişmedi; Zikirmatik feature flag’leri kapalı ve kullanıcı
+  tarafında gizli kalmaya devam ediyor.
+- Gerçek tarayıcı/server kullanılmadı; `seyma-data` reposuna yazılmadı.
+
+**Doğrulama:**
+- GitHub Actions syntax, panel script dengesi ve headless render adımları PASS.
+- Deploy PASS; remote `main` içerik commit’inde redesign branch’iyle aynı SHA.
+- Workflow yalnız aksiyonların Node.js 20’den Node.js 24’e zorlandığına ilişkin
+  deprecation uyarısı verdi; test/deploy sonucunu etkilemedi.
+
+**Kalan:** Evde çalışma başlamadan önce `main` pull edilmeli. Zikirmatik kod
+uygulaması ZP-00’dan başlamalı; ZP-19 ve kullanıcı onayı tamamlanmadan feature
+flag açılmamalı.
+
+---
+
 ### 2026-07-29 — Zikirmatik iPhone 16 premium aşamalı prompt paketi
 
 **Branch:** `zikirmatik-iphone16-redesign` (yalnız redesign; `main`e merge ve

@@ -7,6 +7,11 @@
 > çevrimdışı çalışan, seçilen zikre günler boyunca kaldığı yerden devam eden,
 > Esmâ için hem tek ebced turunu hem de `ebced²` tamamlama yolculuğunu güvenilir
 > biçimde izleyen bağımsız bir ibadet aracına dönüştürmek.
+>
+> **Sıralı uygulama promptları:**
+> [`ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md`](ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md)
+> — opak iPhone Pro Max tasarımı, 99 Esmâ içerik sözleşmesi, erişilebilirlik,
+> test ve kontrollü yayın kapılarını ZP-00–ZP-19 halinde uygular.
 
 ## Uygulama durumu — 2026-07-29
 

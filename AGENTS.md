@@ -336,6 +336,33 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Zikirmatik iPhone 16 premium aşamalı prompt paketi
+
+**Branch:** `zikirmatik-iphone16-redesign` (yalnız redesign; `main`e merge ve
+deploy yok).
+
+**Değişen dosyalar:**
+- `ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md` (yeni): ZP-00–ZP-19 sıralı
+  uygulama zinciri; veri güvenliği, bilimsel dürüstlük, 99 Esmâ’nın Türkçe
+  anlam/önem/tefekkür/kaynak sözleşmesi, Ebced² matematiği, V3 migration,
+  atomik sayaç, sync merge, opak tam ekran iPhone Pro Max düzeni, Türkçe/Arapça
+  tipografi, modal erişilebilirliği, Esmâ/Hatimlerim akışları, yıllık ısı
+  haritası, panel aynası ve kontrollü yayın kapıları.
+- `ZIKIRMATIK-GELISTIRME-PLANI.md`: yeni prompt paketine yönlendirme eklendi.
+- `AGENTS.md`: bu handoff kaydı eklendi.
+
+**Doğrulama:**
+- Belge yapısı, prompt sırası, kaynak URL’leri ve repo güvenlik kuralları
+  denetlendi.
+- `git diff --check` çalıştırıldı.
+- Uygulama kodu değişmedi; gerçek tarayıcı/server/ağ yazımı kullanılmadı.
+- Zikirmatik feature flag’leri kapalı; canlı görünürlük değişmedi.
+
+**Kalan:** ZP-00’dan başlayarak promptlar sırayla uygulanmalı. ZP-19 tam kabul
+kapısı geçip kullanıcı açık onay verene kadar `main`e merge/deploy yapılmamalı.
+
+---
+
 ### 2026-07-29 — Zikirmatik canlıdan gizlendi; ayrı iPhone 16 Pro Max redesign'e ayrıldı
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` push yapıldı.

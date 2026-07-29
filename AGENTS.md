@@ -336,6 +336,39 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Zikirmatik canlıdan gizlendi; ayrı iPhone 16 Pro Max redesign'e ayrıldı
+
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` push yapıldı.
+**Commit:** `73773ce`. **Cache:** `20260730o`.
+**GitHub Pages:** workflow `30455805253` validate + deploy başarılı.
+
+**Değişen dosyalar:**
+- `app.js`: `ZIKR_V2_VISIBLE` yalnız headless test bayrağıyla açılır; normal
+  kullanıcıda Zikir kartı, hub sekmesi ve modal üretimi kapalı. Eski cache
+  üzerinden `App.openZikr()` çağrılsa bile modal açılmaz. Veri modeli,
+  migration, journeys ve hatimler silinmedi.
+- `panel.html`: `ZIKR_V2_VISIBLE_P=false`; Zikirmatik panel kartı gizli, veri
+  helper'ları korunuyor.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: çekirdeği üretimde görünür
+  yapmadan test etmek için yalnız VM sandbox'ına `__SEYMA_TEST_ZIKR__` eklendi.
+- `index.html`: cache `20260730o`.
+- Plan belgeleri: canlı durum 🟡 / yeniden tasarım bekliyor olarak güncellendi.
+
+**Doğrulama:**
+- Standart headless `saygi` renderında Zikir sekmesi yok, Zikirmatik kartı yok,
+  `#zikr-overlay` yok; çekirdek kod mevcut ✅
+- Gizli çekirdek harness'i 42/42, sync 50/50, panel 39/39 ✅
+- Canlı salt-okunur HTTP: cache O, kullanıcı flag'i kapalı, modal guard ve
+  panel gizleme flag'i mevcut ✅
+
+**Güvenlik / sonraki adım:** Gerçek tarayıcı açılmadı, server başlatılmadı,
+`seyma-data` yazılmadı. Sonraki çalışma `zikirmatik-iphone16-redesign`
+branch'inde; opak yüzey, iPhone 16 Pro Max `430×932 CSS px` / safe-area,
+doğru font ölçeği ve sade tam ekran hiyerarşi kullanıcı onayından önce
+`main`e alınmayacak.
+
+---
+
 ### 2026-07-29 — Zikirmatik v2: kalıcı Ebced² Tam Hatim (canlıya alındı)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward push yapıldı.

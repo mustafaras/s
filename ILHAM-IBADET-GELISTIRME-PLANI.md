@@ -24,6 +24,16 @@ hesaplanan geri sayım hedefleriyle genişletildi (`esmaulHusnaV1.js`). Faz 41
 aylık cetvel isteğe bağlı olduğundan kapsam dışında kalmaya devam eder. Paket
 branch üzerinde doğrulandı; canlıya alınmadı.
 
+### Zikirmatik v2 uygulama revizyonu — 2026-07-29
+
+Zikirmatik bu genel planın eski günlük hedef yaklaşımını aşan, yalnız bu özelliğe
+odaklı `ZIKIRMATIK-GELISTIRME-PLANI.md` uyarınca yenilendi. Esmâ hedefi artık
+yalnız ebced sayısında biten günlük set değildir: ebced bir tur, `ebced²` kalıcı
+tam hatimdir. Tam ekran bağımsız sayaç, ayrı Esmâ yolculukları, Hatimlerim,
+idempotent v2 migration, erişilebilirlik ayarları, panel ayrıntıları ve monotonik
+cihazlar arası merge tamamlandı. Kabul örneği el-Fettâh `489² = 239.121`;
+headless sınır/reload/preset/undo testleri geçmektedir. Cache `20260730n`.
+
 ---
 
 ## 0. Vizyon & Tasarım Dili
@@ -248,7 +258,7 @@ görür. İşlevsel fazlar bu kaplamanın üstüne gelir.
 | Faz | Başlık & odak | Öncelik | Durum | Ana etkileşimler (`app.js`) | Panel & notlar |
 |-----|---------------|---------|-------|------------------------------|----------------|
 | 42 | ✨ **Kozmetik Premium** — glass/glow/shimmer kaplama + 5. sekme Rapor polisajı + tüm hub mikro-premium'u | 1 | ✅ | Veri/işlev değişmez; glass kart stilleri, accent gradient'lar, zikir/iman/öncü/rapor yüzeyleri | Cache `20260730m` |
-| 35 | 🎯 **Zikirmatik** — sayaç + preset + günlük kayıt | 1 | ✅ | Sayaç/preset/stats; 5 temel + 99 Esmâ; Arapça yazımdan asıl-ebced hedefi ve geri sayım; çoklu set, ses+haptic | Panel zikir özeti; cache `20260730m` |
+| 35 | 🎯 **Zikirmatik v2** — kalıcı yolculuk + Ebced² Tam Hatim | 1 | ✅ | Bağımsız 100dvh sayaç; 5 temel + 99 Esmâ; ebced turu + ebced² tam hatim; ayrı hatimler, reload/preset/gün devamı, ses+haptic+reduced motion | Ayrıntılı panel + monotonik sync merge; cache `20260730n` |
 | 36 | 🕌 **Sıradaki vakit + geri sayım** + cemaat/pulse vurgu + `currentPrayerIndex` geliştirme | 1 | ✅ | Header'da countdown, `App.tickPrayer`, pulse CSS (`.sg-faith-preview-row.next`), cemaat altın ikon | — |
 | 37 | 🌙 **Hicri & Miladi takvim** + mübarek gün rozeti (`hijriCalendar.js`, offset) | 2 | ✅ | `window.HijriCalendarV1`, `hijriTodayStr`, ±2 gün kullanıcı kontrolü, rozet UI | Panel `Hicri Takvim` bento aynası |
 | 38 | 🧭 **Kıble gülü** (local bearing + GPS), canlı cihaz yönü | 2 | ✅ | SVG compass; izinli `deviceorientation`/iOS permission; statik fallback | — |

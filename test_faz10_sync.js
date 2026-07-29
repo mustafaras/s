@@ -252,6 +252,35 @@ console.log('[13] Anti-clobber + Guard 1 korumaları değişmedi');
   ok('localhost push blokajı mevcut', /devOrigin\(\)\s*&&\s*!syncForced/.test(src));
 })();
 
+// ── Test 14: Zikirmatik v2 monotonik merge ────────────────────────────────
+console.log('[14] Zikirmatik v2 — bayat cihaz sayacı geriye çekmez');
+(function(){
+  var mergeZikr=global.window.SeySync.mergeZikr;
+  var local={
+    schemaVersion:2,migrationVersion:'zikr_v2',
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,target:489}],
+    settings:{activePresetId:'esma_19'},
+    sessions:{'2026-07-29':{totalCount:488,completedSets:0,perPreset:{esma_19:{count:488,completedCycles:0,lastAt:iso(1000)}},lastAt:iso(1000)}},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:488,activeHatimId:'h1',lastAt:iso(1000),completedHatims:0,hatims:[{id:'h1',count:488,target:239121,baseTarget:489,status:'active',lastAt:iso(1000)}]}},
+    streak:1,streakDate:'2026-07-29'
+  };
+  var remote={
+    schemaVersion:2,migrationVersion:'zikr_v2',
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,target:489}],
+    settings:{activePresetId:'esma_19'},
+    sessions:{'2026-07-29':{totalCount:490,completedSets:1,perPreset:{esma_19:{count:490,completedCycles:1,lastAt:iso(2000)}},lastAt:iso(2000)}},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:490,activeHatimId:'h1',lastAt:iso(2000),completedHatims:0,hatims:[{id:'h1',count:490,target:239121,baseTarget:489,status:'active',lastAt:iso(2000)},{id:'archived_remote',count:10,target:239121,baseTarget:489,status:'archived',lastAt:iso(1500)}]}},
+    streak:2,streakDate:'2026-07-30'
+  };
+  var merged=mergeZikr(local,remote);
+  ok('uzaktaki yüksek lifetime korunur', merged.journeys.esma_19.lifetimeCount===490);
+  ok('günlük preset count ve tur monotonik', merged.sessions['2026-07-29'].perPreset.esma_19.count===490 && merged.sessions['2026-07-29'].perPreset.esma_19.completedCycles===1);
+  ok('hatim id union kayıp üretmez', merged.journeys.esma_19.hatims.length===2);
+  ok('seri ve tarih geriye gitmez', merged.streak===2 && merged.streakDate==='2026-07-30');
+  var stale=mergeZikr(merged,local);
+  ok('bayat ikinci merge sayacı düşürmez', stale.journeys.esma_19.lifetimeCount===490 && stale.journeys.esma_19.hatims.find(function(h){return h.id==='h1';}).count===490);
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) {

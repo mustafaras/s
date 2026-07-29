@@ -120,7 +120,7 @@ function ok(name, cond, detail) {
   else { failed++; console.log('  ✗ ' + name + (detail ? ' — ' + detail : '')); }
 }
 
-console.log('== İlham & İbadet (Faz 35–40) headless test ==');
+console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
 const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app.js'];
 let sb = buildSandbox(seed);
 let ctx = loadInto(sb, FILES);
@@ -161,12 +161,16 @@ ok('Sonraki vakit geri sayım (spirit bar)', /mosque|Sonraki|spirit/i.test(appHT
 ok('App.openZikr overlay render', (function () {
   if (typeof sb.App.openZikr !== 'function') return false;
   appHTML = ''; sb.App.openZikr();
-  return /zikr-stage|Zikirmatik|count|zikr-zikr|Sayaç|Presetler/i.test(appHTML);
+  return /id="zikr-overlay"/.test(appHTML) && /id="zikr-screen"/.test(appHTML) &&
+    /id="zikr-scroll"/.test(appHTML) && /Sayaç[\s\S]*Esmâ[\s\S]*Hatimlerim[\s\S]*Özet/i.test(appHTML) &&
+    /tabindex="-1" onkeydown="App\.onZikrKeydown\(event\)"/.test(appHTML) &&
+    !/id="sey-ov-card"[^]*Zikirmatik/.test(appHTML);
 })(), appHTML.slice(0, 120));
 
 ok('99 Esmâ preset kütüphanesi yüklü', (function () {
   sb.App.setZikrView('presets');
-  return sb.window.EsmaulHusnaV1.names.length === 99 && /99 Esmâ|Esmâ 99|ebced hedefli/i.test(appHTML);
+  return sb.window.EsmaulHusnaV1.names.length === 99 && /99 Esmâ|ebced değeri bir tur/i.test(appHTML) &&
+    /Tam hatim/i.test(appHTML);
 })());
 
 ok('Esmâ ebced sayacı geri sayar', (function () {
@@ -182,6 +186,10 @@ function readState() {
   try { return JSON.parse(sb.localStorage.getItem('seyma-reset-v1')); } catch (e) { return null; }
 }
 const getZikrDay = (date) => { const s = readState(); const sess = s && s.zikr && s.zikr.sessions && s.zikr.sessions[date]; return sess || { perPreset: {}, totalCount: 0, completedSets: 0 }; };
+const presetCount = (day, id) => {
+  const raw = day && day.perPreset && day.perPreset[id];
+  return Number(raw && typeof raw === 'object' ? raw.count : raw) || 0;
+};
 
 // Zikir sayaç (tek dokunma arttırır)
 ok('zikrTap count artırır', (function () {
@@ -194,17 +202,114 @@ ok('zikrTap count artırır', (function () {
 
 ok('zikrTap 33 kez sonra presetDone + streak', (function () {
   sb.App.setZikrPreset('subhanallah');
-  while ((getZikrDay(t).perPreset.subhanallah || 0) < 33) sb.App.zikrTap();
-  const doneToday = (getZikrDay(t).perPreset.subhanallah || 0) >= 33;
+  while (presetCount(getZikrDay(t),'subhanallah') < 33) sb.App.zikrTap();
+  const doneToday = presetCount(getZikrDay(t),'subhanallah') >= 33;
   const st = readState();
   return doneToday && st && st.zikr && st.zikr.streak >= 1;
 })());
 
 ok('aynı hedef ikinci kez dolunca ikinci set kaydolur', (function () {
   const before=getZikrDay(t).completedSets;
-  while ((getZikrDay(t).perPreset.subhanallah || 0) < 66) sb.App.zikrTap();
+  while (presetCount(getZikrDay(t),'subhanallah') < 66) sb.App.zikrTap();
   return getZikrDay(t).completedSets===before+1;
 })());
+
+// Eski v1 günlük sayılarını tek seferde v2 yolculuğuna taşı; ikinci boot'ta
+// toplam veya hatim kaydı bir daha eklenmemeli.
+const legacySeed=JSON.parse(JSON.stringify(seed));
+legacySeed.zikr={
+  presets:[{id:'esma_19',name:'el-Fettâh',phrase:'فتاح',arabic:'فتاح',target:489,ebced:489,kind:'esma',countDirection:'down'}],
+  sessions:{[t]:{totalCount:978,completedSets:2,perPreset:{esma_19:978},lastAt:t+'T12:00:00.000Z'}},
+  settings:{activePresetId:'esma_19',soundOn:false,haptic:true,autoAdvance:false},
+  streak:1,streakDate:t
+};
+const legacySb=buildSandbox(legacySeed);
+loadInto(legacySb,FILES); legacySb.App.start();
+const migratedOnce=JSON.parse(legacySb.localStorage.getItem('seyma-reset-v1'));
+ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===2 &&
+  migratedOnce.zikr.migrationVersion==='zikr_v2' &&
+  migratedOnce.zikr.sessions[t].perPreset.esma_19.count===978 &&
+  migratedOnce.zikr.journeys.esma_19.lifetimeCount===978);
+const beforeReload={
+  lifetime:migratedOnce.zikr.journeys.esma_19.lifetimeCount,
+  hats:migratedOnce.zikr.journeys.esma_19.hatims.length,
+  count:migratedOnce.zikr.journeys.esma_19.hatims[0].count
+};
+const reloadSb=buildSandbox(migratedOnce);
+loadInto(reloadSb,FILES); reloadSb.App.start();
+const migratedTwice=JSON.parse(reloadSb.localStorage.getItem('seyma-reset-v1'));
+ok('zikr v2 migration idempotent', migratedTwice.zikr.journeys.esma_19.lifetimeCount===beforeReload.lifetime &&
+  migratedTwice.zikr.journeys.esma_19.hatims.length===beforeReload.hats &&
+  migratedTwice.zikr.journeys.esma_19.hatims[0].count===beforeReload.count);
+
+function fettahBoundarySeed(count) {
+  const x=JSON.parse(JSON.stringify(seed));
+  const hid='hatim_fettah_test';
+  x.zikr={
+    schemaVersion:2,migrationVersion:'zikr_v2',
+    presets:[{id:'esma_19',name:'el-Fettâh',phrase:'فتاح',arabic:'فتاح',target:489,ebced:489,builtIn:true,kind:'esma',countDirection:'down',hatimMode:'ebced_square'}],
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:count,activeHatimId:hid,lastAt:t+'T12:00:00.000Z',lastSessionId:'',completedHatims:0,legacyCompletedHatims:0,hatims:[{id:hid,mode:'ebced_square',baseTarget:489,target:239121,count:count,startedAt:t+'T00:00:00.000Z',completedAt:null,status:'active'}]}},
+    sessions:{[t]:{totalCount:count,completedSets:Math.floor(count/489),perPreset:{esma_19:{count:count,completedCycles:Math.floor(count/489),lastAt:t+'T12:00:00.000Z'}},lastAt:t+'T12:00:00.000Z'}},
+    activeSession:null,settings:{activePresetId:'esma_19',soundOn:false,haptic:false,autoAdvance:false,defaultMode:'hatim'},streak:0,streakDate:''
+  };
+  return x;
+}
+const cycleSb=buildSandbox(fettahBoundarySeed(488));
+loadInto(cycleSb,FILES); cycleSb.App.start(); cycleSb.App.openZikr(); cycleSb.App.zikrTap();
+const cycleState=JSON.parse(cycleSb.localStorage.getItem('seyma-reset-v1'));
+ok('el-Fettâh 489. sayımda ilk turu tamamlar', cycleState.zikr.journeys.esma_19.hatims[0].count===489 &&
+  cycleState.zikr.sessions[t].perPreset.esma_19.completedCycles===1 && /2\. tur · 0\/489/.test(appHTML));
+cycleSb.App.zikrUndo();
+const undoState=JSON.parse(cycleSb.localStorage.getItem('seyma-reset-v1'));
+ok('489 sınırında geri al turu güvenle geri çeker', undoState.zikr.journeys.esma_19.hatims[0].count===488 &&
+  undoState.zikr.sessions[t].perPreset.esma_19.completedCycles===0);
+
+const hatimSb=buildSandbox(fettahBoundarySeed(239120));
+loadInto(hatimSb,FILES); hatimSb.App.start(); hatimSb.App.openZikr(); hatimSb.App.zikrTap();
+const hatimState=JSON.parse(hatimSb.localStorage.getItem('seyma-reset-v1'));
+ok('el-Fettâh 489² = 239.121 tam hatim sınırı', hatimState.zikr.journeys.esma_19.hatims[0].count===239121 &&
+  hatimState.zikr.journeys.esma_19.hatims[0].status==='completed' &&
+  hatimState.zikr.journeys.esma_19.completedHatims===1 && /Ebced² Tam Hatim tamamlandı/.test(appHTML));
+hatimSb.App.zikrTap();
+const noAutoHatim=JSON.parse(hatimSb.localStorage.getItem('seyma-reset-v1'));
+ok('tamamlanan hatimde dokunma otomatik yeni hatim açmaz', noAutoHatim.zikr.journeys.esma_19.hatims.length===1 &&
+  noAutoHatim.zikr.journeys.esma_19.hatims[0].count===239121);
+hatimSb.App.startNewZikrHatim();
+const newHatimState=JSON.parse(hatimSb.localStorage.getItem('seyma-reset-v1'));
+ok('yeni hatim ömürlük toplamı silmez', newHatimState.zikr.journeys.esma_19.hatims.length===2 &&
+  newHatimState.zikr.journeys.esma_19.lifetimeCount===239121 &&
+  newHatimState.zikr.journeys.esma_19.hatims[1].count===0);
+
+const rapidSeed=JSON.parse(JSON.stringify(seed));
+rapidSeed.zikr={presets:[],sessions:{},settings:{activePresetId:'subhanallah',soundOn:false,haptic:false,autoAdvance:false},streak:0,streakDate:''};
+const rapidSb=buildSandbox(rapidSeed);
+loadInto(rapidSb,FILES); rapidSb.App.start(); rapidSb.App.openZikr();
+for(let i=0;i<100;i++) rapidSb.App.zikrTap();
+const rapidState=JSON.parse(rapidSb.localStorage.getItem('seyma-reset-v1'));
+ok('hızlı 100 sayaç çağrısı tam 100 artar', rapidState.zikr.journeys.subhanallah.lifetimeCount===100 &&
+  rapidState.zikr.sessions[t].perPreset.subhanallah.count===100);
+rapidSb.App.setZikrPreset('elhamdulillah'); rapidSb.App.zikrTap(); rapidSb.App.zikrTap(); rapidSb.App.setZikrPreset('subhanallah');
+const switchState=JSON.parse(rapidSb.localStorage.getItem('seyma-reset-v1'));
+ok('preset A → B → A ayrı ilerlemeyi korur', switchState.zikr.settings.activePresetId==='subhanallah' &&
+  switchState.zikr.journeys.subhanallah.lifetimeCount===100 &&
+  switchState.zikr.journeys.elhamdulillah.lifetimeCount===2);
+const persistSb=buildSandbox(switchState);
+loadInto(persistSb,FILES); persistSb.App.start(); persistSb.App.openZikr();
+const persisted=JSON.parse(persistSb.localStorage.getItem('seyma-reset-v1'));
+ok('reload sayaç ve aktif preseti korur', persisted.zikr.settings.activePresetId==='subhanallah' &&
+  persisted.zikr.journeys.subhanallah.lifetimeCount===100);
+const nextDaySeed=fettahBoundarySeed(132);
+nextDaySeed.zikr.sessions[y]=nextDaySeed.zikr.sessions[t]; delete nextDaySeed.zikr.sessions[t];
+nextDaySeed.days[y]=nextDaySeed.days[t]; nextDaySeed.days[t]={habits:{},mood:null};
+const nextDaySb=buildSandbox(nextDaySeed);
+loadInto(nextDaySb,FILES); nextDaySb.App.start(); nextDaySb.App.openZikr();
+const nextDayState=JSON.parse(nextDaySb.localStorage.getItem('seyma-reset-v1'));
+ok('gün değişince hatim sürer, bugünün sayacı sıfır başlar', nextDayState.zikr.journeys.esma_19.hatims[0].count===132 &&
+  nextDayState.zikr.sessions[t].totalCount===0);
+persistSb.App.setZikrView('stats'); persistSb.App.toggleZikrSetting('reducedMotion');
+ok('kullanıcı hareketi azalt ayarı tam ekrana uygulanır', /zikr-v2-overlay is-reduced/.test(appHTML));
+persistSb.App.setTheme(true); persistSb.App.setZikrView('counter');
+ok('Zikirmatik koyu temada tam ekran render olur', /id="zikr-overlay"/.test(appHTML)&&/role="status" aria-live="polite"/.test(appHTML));
 
 ok('saygiMarkRead koleksiyonu günceller', (function () {
   const st = readState();

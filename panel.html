@@ -447,6 +447,23 @@ function zikrRootP(){ var z=D&&D.zikr; return (z&&typeof z==='object')?z:null; }
 function zikrDayTotalP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.totalCount==='number')?s.totalCount:0; }
 function zikrDaySetsP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.completedSets==='number')?s.completedSets:0; }
 function zikrStreakP(){ var z=zikrRootP(); return (z&&typeof z.streak==='number')?z.streak:0; }
+function zikrPresetP(id){
+  var z=zikrRootP(), list=z&&Array.isArray(z.presets)?z.presets:ZIKR_SEED_P;
+  for(var i=0;i<list.length;i++) if(list[i]&&list[i].id===id) return list[i];
+  return list[0]||null;
+}
+function zikrJourneySummaryP(){
+  var z=zikrRootP(); if(!z) return null;
+  var id=z.settings&&z.settings.activePresetId, p=zikrPresetP(id); if(!p) return null;
+  var journeys=z.journeys&&typeof z.journeys==='object'?z.journeys:{}, j=journeys[p.id]||null, h=null;
+  if(j&&Array.isArray(j.hatims)) for(var i=0;i<j.hatims.length;i++) if(j.hatims[i]&&j.hatims[i].id===j.activeHatimId){ h=j.hatims[i]; break; }
+  var base=Math.max(1,Number(p.kind==='esma'?(p.ebced||p.target):p.target)||1);
+  var target=p.kind==='esma'?base*base:base, count=p.kind==='esma'?(Number(h&&h.count)||0):(Number(j&&j.lifetimeCount)||0);
+  var cycles=Math.min(base,Math.floor(count/base)), pos=count>=target?base:count%base;
+  var completed=0, lifetime=0;
+  Object.keys(journeys).forEach(function(k){ var x=journeys[k]||{}; completed+=Math.max(0,Number(x.completedHatims)||0); lifetime+=Math.max(0,Number(x.lifetimeCount)||0); });
+  return {name:p.name||p.id,kind:p.kind||'core',base:base,target:target,count:count,cycleNo:count>=target?base:Math.min(base,cycles+1),cyclePosition:pos,completedCycles:cycles,completedHatims:completed,lifetime:lifetime,status:h&&h.status||'',lastAt:j&&j.lastAt||''};
+}
 function zikrWeekTotalP(date){
   date=date||today(); var total=0, days=0;
   for(var i=0;i<7;i++){ var d=addDays(date,-i); var v=zikrDayTotalP(d); if(v>0) days++; total+=v; }
@@ -2424,16 +2441,21 @@ function render(){
   // ROW 1.7b: Zikirmatik + İbadet Haftası — panel aynası
   (function(){
     var zday=zikrDayTotalP(today()), zsets=zikrDaySetsP(today()), streak=zikrStreakP();
-    var k=faithWeekKPIsP(today());
-    var zw=zikrWeekTotalP(today());
+    var k=faithWeekKPIsP(today()), js=zikrJourneySummaryP();
     var val=zday>0?(zday+'<small>zikir</small>'):'—';
     var extra='<span class="tchip fl">'+streak+'g seri</span>';
     var cap=[];
+    if(js&&js.kind==='esma'){
+      cap.push('<span><b style="color:var(--zikr);">'+esc(js.name)+'</b> · '+js.cycleNo+'. tur</span>');
+      cap.push('<span><b style="color:var(--t2);">'+js.count.toLocaleString('tr-TR')+'</b> / '+js.target.toLocaleString('tr-TR')+' Ebced²</span>');
+    }
     if(zsets>0) cap.push('<span><b style="color:var(--t2);">'+zsets+'</b> set bugün</span>');
     if(k.zikr>0) cap.push('<span>Haftada <b style="color:var(--t2);">'+k.zikr+'</b></span>');
+    if(js&&js.completedHatims>0) cap.push('<span><b style="color:var(--faith);">'+js.completedHatims+'</b> tam hatim</span>');
+    if(js&&js.lifetime>0) cap.push('<span><b style="color:var(--t2);">'+js.lifetime.toLocaleString('tr-TR')+'</b> ömürlük</span>');
     if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> vakit</span>');
     if(k.cong>0) cap.push('<span><b style="color:var(--t2);">'+k.cong+'</b> cemaat</span>');
-    h+=kpi('Zikir · İbadet',val,'var(--zikr)',extra,null,cap.join(''));
+    h+=kpi('Zikirmatik · Ebced²',val,'var(--zikr)',extra,null,cap.join(''));
   })();
   h+=faithAnnualPanelCardP();
   h+=hijriPanelCardP();

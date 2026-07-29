@@ -230,6 +230,15 @@ console.log('[8] panelSummary yok — scores/report fallback');
   ok('report fallback kısa özet var', h.indexOf('Fallback karakter özeti') >= 0);
 })();
 
+// ── Test 9: Zikirmatik v2 panel aynası ─────────────────────────────────────
+console.log('[9] Zikirmatik v2 — panel güvenli özet yolu');
+(function(){
+  ok('aktif yolculuk helperı var', /function zikrJourneySummaryP\(\)/.test(html));
+  ok('eksik data.zikr için null güvenliği var', /function zikrJourneySummaryP\(\)\{\s*var z=zikrRootP\(\);\s*if\(!z\) return null;/.test(html));
+  ok('Ebced² panel kartı render yolunda', /Zikirmatik · Ebced²/.test(html) && /js\.cycleNo/.test(html) && /js\.completedHatims/.test(html));
+  ok('ömürlük toplam panelde gösterilir', /js\.lifetime\.toLocaleString\('tr-TR'\)/.test(html));
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) process.exit(1);

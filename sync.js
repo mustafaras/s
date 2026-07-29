@@ -367,6 +367,64 @@ function mergeSettings(localS, remoteS){
   });
   return merged;
 }
+// Zikirmatik v2: sayaçlar monotoniktir. İki cihazın aynı yolculuğunu
+// birleştirirken daha yüksek sayım/tur/hatim korunur; hatim kimlikleri union
+// edilir. Böylece bayat bir cihaz aktif adı veya lifetime sayısını geriye
+// çekemez. Olay günlüğü tutulmadığından aynı tabandan eşzamanlı iki artışı
+// toplamak çift sayım riski doğurur; bu nedenle güvenli kural max'tır.
+function mergeZikr(localZ, remoteZ){
+  if(!remoteZ || typeof remoteZ!=='object') return localZ || {};
+  if(!localZ || typeof localZ!=='object') return JSON.parse(JSON.stringify(remoteZ));
+  var out=JSON.parse(JSON.stringify(localZ));
+  function num(v){ v=Number(v); return isFinite(v)&&v>0?Math.floor(v):0; }
+  function later(a,b){ return (typeof b==='string'&&(!a||b>a))?b:a; }
+  out.schemaVersion=Math.max(num(out.schemaVersion),num(remoteZ.schemaVersion));
+  if(!out.migrationVersion&&remoteZ.migrationVersion) out.migrationVersion=remoteZ.migrationVersion;
+  out.presets=mergeById(Array.isArray(out.presets)?out.presets:[],Array.isArray(remoteZ.presets)?remoteZ.presets:[],'id');
+  out.settings=mergeSettings(out.settings||{},remoteZ.settings||{});
+  out.sessions=out.sessions&&typeof out.sessions==='object'?out.sessions:{};
+  if(remoteZ.sessions&&typeof remoteZ.sessions==='object') Object.keys(remoteZ.sessions).forEach(function(date){
+    var l=out.sessions[date], r=remoteZ.sessions[date];
+    if(!l||typeof l!=='object'){ out.sessions[date]=JSON.parse(JSON.stringify(r)); return; }
+    var m=JSON.parse(JSON.stringify(l)), lp=l.perPreset||{}, rp=r&&r.perPreset||{}, per={}, sum=0, sets=0;
+    var ids={}; Object.keys(lp).forEach(function(k){ids[k]=1;}); Object.keys(rp).forEach(function(k){ids[k]=1;});
+    Object.keys(ids).forEach(function(pid){
+      var a=lp[pid], b=rp[pid], ao=a&&typeof a==='object'?a:{count:a}, bo=b&&typeof b==='object'?b:{count:b};
+      var rec={count:Math.max(num(ao&&ao.count),num(bo&&bo.count)),completedCycles:Math.max(num(ao&&ao.completedCycles),num(bo&&bo.completedCycles)),lastAt:later(ao&&ao.lastAt,bo&&bo.lastAt)||null};
+      per[pid]=rec; sum+=rec.count; sets+=rec.completedCycles;
+    });
+    m.perPreset=per; m.totalCount=Math.max(num(l.totalCount),num(r&&r.totalCount),sum); m.completedSets=Math.max(num(l.completedSets),num(r&&r.completedSets),sets); m.lastAt=later(l.lastAt,r&&r.lastAt)||null;
+    out.sessions[date]=m;
+  });
+  out.journeys=out.journeys&&typeof out.journeys==='object'?out.journeys:{};
+  if(remoteZ.journeys&&typeof remoteZ.journeys==='object') Object.keys(remoteZ.journeys).forEach(function(pid){
+    var l=out.journeys[pid], r=remoteZ.journeys[pid];
+    if(!l||typeof l!=='object'){ out.journeys[pid]=JSON.parse(JSON.stringify(r)); return; }
+    var m=JSON.parse(JSON.stringify(l)), lh=Array.isArray(l.hatims)?l.hatims:[], rh=Array.isArray(r.hatims)?r.hatims:[], map={};
+    lh.forEach(function(h){ if(h&&h.id) map[h.id]=JSON.parse(JSON.stringify(h)); });
+    rh.forEach(function(h){
+      if(!h||!h.id) return;
+      if(!map[h.id]){ map[h.id]=JSON.parse(JSON.stringify(h)); return; }
+      var x=map[h.id]; x.count=Math.max(num(x.count),num(h.count)); x.baseTarget=Math.max(num(x.baseTarget),num(h.baseTarget)); x.target=Math.max(num(x.target),num(h.target));
+      if(x.status==='completed'||h.status==='completed'){ x.status='completed'; x.completedAt=later(x.completedAt,h.completedAt)||x.completedAt||h.completedAt||null; }
+      else if((h.lastAt||h.startedAt||'')>(x.lastAt||x.startedAt||'')){ x.status=h.status||x.status; }
+      x.lastAt=later(x.lastAt,h.lastAt)||x.lastAt||h.lastAt||null;
+    });
+    m.hatims=Object.keys(map).map(function(k){return map[k];});
+    m.lifetimeCount=Math.max(num(l.lifetimeCount),num(r.lifetimeCount));
+    var actualDone=m.hatims.filter(function(h){return h&&h.status==='completed';}).length;
+    m.completedHatims=Math.max(num(l.completedHatims),num(r.completedHatims),actualDone);
+    m.legacyCompletedHatims=Math.max(num(l.legacyCompletedHatims),num(r.legacyCompletedHatims));
+    m.lastAt=later(l.lastAt,r.lastAt)||'';
+    if((r.lastAt||'')>(l.lastAt||'')) m.activeHatimId=r.activeHatimId||m.activeHatimId;
+    out.journeys[pid]=m;
+  });
+  out.streak=Math.max(num(out.streak),num(remoteZ.streak));
+  if((remoteZ.streakDate||'')>(out.streakDate||'')) out.streakDate=remoteZ.streakDate;
+  var la=out.activeSession, ra=remoteZ.activeSession;
+  if(ra&&(!la||((ra.lastAt||ra.startedAt||'')>(la.lastAt||la.startedAt||'')))) out.activeSession=JSON.parse(JSON.stringify(ra));
+  return out;
+}
 function mergeData(localData, remoteData){
   if(!remoteData || typeof remoteData!=='object') return localData;
   if(!localData || typeof localData!=='object') return JSON.parse(JSON.stringify(remoteData));
@@ -388,6 +446,9 @@ function mergeData(localData, remoteData){
   if(remoteData.aeon && remoteData.aeon.messages && Array.isArray(remoteData.aeon.messages)){
     merged.aeon=merged.aeon || {};
     merged.aeon.messages=mergeById(merged.aeon.messages || [], remoteData.aeon.messages, 'id');
+  }
+  if(remoteData.zikr && typeof remoteData.zikr==='object'){
+    merged.zikr=mergeZikr(merged.zikr,remoteData.zikr);
   }
   // savedAt: en yeni
   if(remoteData.savedAt && typeof remoteData.savedAt==='string' && (!merged.savedAt || remoteData.savedAt>merged.savedAt)){
@@ -470,6 +531,7 @@ window.SeySync={
   mergeDay:mergeDay,
   mergeById:mergeById,
   mergeSettings:mergeSettings,
+  mergeZikr:mergeZikr,
   // Faz 10 — offline reconnect: bağlantı geldiğinde bekleyen push'u tetikler.
   // Gerçek network çağrısı yapmaz; yalnızca schedule/pushNow'u çağırır.
   retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }

@@ -8,6 +8,14 @@
 > Esmâ için hem tek ebced turunu hem de `ebced²` tamamlama yolculuğunu güvenilir
 > biçimde izleyen bağımsız bir ibadet aracına dönüştürmek.
 
+## Uygulama durumu — 2026-07-29
+
+Z1–Z9 fazlarının tamamı uygulandı ve headless kabul kapılarından geçti. Canlı
+tarayıcı açılmadı; ağ/senkron testleri mock ortamında çalıştı. Son teslim
+durumu: tam ekran bağımsız sayaç, 99 Esmâ, ebced turu + `ebced²` tam hatim,
+kalıcı yolculuklar, güvenli undo/yeni hatim, idempotent migration, erişilebilir
+premium ayarlar, nötr analiz, panel aynası ve monotonik cihaz merge tamamlandı.
+
 ---
 
 ## 0. Ürün ilkesi: gelenek ile bilimsel ürün tasarımını ayır
@@ -492,17 +500,17 @@ Panel:
 
 ## 10. Uygulama fazları
 
-| Faz | Kapsam | Çıktı | Kabul kapısı |
-|---|---|---|---|
-| Z1 | Matematik + şema | `journeys`, `hatims`, saf hesap helper’ları | Sınır testleri eksiksiz |
-| Z2 | Migration | Günlük veriden kayıpsız v2 geçiş | İkinci migration toplamı büyütmez |
-| Z3 | Sayaç çekirdeği | atomik tap/undo/pause/resume | Reload ve gün değişiminde devam |
-| Z4 | Tam ekran kabuk | bağımsız 100dvh overlay + safe-area | Ortak overlay kimliği yok |
-| Z5 | Ebced² UI | tur + hatim + kalan + tamamlanma | Fettâh 489² senaryosu |
-| Z6 | Esmâ/Hatimlerim | arama, aktif hatimler, devam | 99 isimde ayrı ilerleme |
-| Z7 | Premium erişilebilirlik | haptic/ses/reduced motion/keyboard | WCAG dokunma/klavye kapıları |
-| Z8 | Analiz + panel | nötr devamlılık ve hatim özetleri | Eski/eksik veride güvenli |
-| Z9 | Veri güvenliği | sync/mirror/regresyon | Kayıp/çift sayım yok |
+| Faz | Durum | Kapsam | Çıktı | Kabul kapısı |
+|---|---|---|---|---|
+| Z1 | ✅ | Matematik + şema | `journeys`, `hatims`, saf hesap helper’ları | Sınır testleri eksiksiz |
+| Z2 | ✅ | Migration | Günlük veriden kayıpsız v2 geçiş | İkinci migration toplamı büyütmez |
+| Z3 | ✅ | Sayaç çekirdeği | atomik tap/undo/pause/resume | Reload ve gün değişiminde devam |
+| Z4 | ✅ | Tam ekran kabuk | bağımsız 100dvh overlay + safe-area | Ortak overlay kimliği yok |
+| Z5 | ✅ | Ebced² UI | tur + hatim + kalan + tamamlanma | Fettâh 489² senaryosu |
+| Z6 | ✅ | Esmâ/Hatimlerim | arama, aktif hatimler, devam | 99 isimde ayrı ilerleme |
+| Z7 | ✅ | Premium erişilebilirlik | haptic/ses/reduced motion/keyboard | WCAG dokunma/klavye kapıları |
+| Z8 | ✅ | Analiz + panel | nötr devamlılık ve hatim özetleri | Eski/eksik veride güvenli |
+| Z9 | ✅ | Veri güvenliği | sync/mirror/regresyon | Kayıp/çift sayım yok |
 
 ---
 

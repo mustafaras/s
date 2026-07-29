@@ -64,7 +64,7 @@ function makeLS(seed) {
     _store: store,
   };
 }
-function buildSandbox(seedData) {
+function buildSandbox(seedData, fetchImpl) {
   const seed = seedData ? { 'seyma-reset-v1': JSON.stringify(seedData) } : {};
   const localStorage = makeLS(seed);
   const sandbox = {
@@ -73,11 +73,12 @@ function buildSandbox(seedData) {
     location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     DOMParser: DOMParserStub,
-    fetch() { return new Promise(() => {}); },
+    fetch: fetchImpl || function () { return new Promise(() => {}); },
     setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},
     requestAnimationFrame() { return 0; }, cancelAnimationFrame() {},
     crypto: { getRandomValues(a) { for (let i = 0; i < a.length; i++) a[i] = (Math.random() * 256) | 0; return a; } },
-    URL: Object.assign(function () {}, { createObjectURL() { return 'blob:stub'; }, revokeObjectURL() {} }),
+    URL: fetchImpl ? URL : Object.assign(function () {}, { createObjectURL() { return 'blob:stub'; }, revokeObjectURL() {} }),
+    URLSearchParams,
     Blob: function () {}, File: function () {}, FileReader: function () {},
     TextDecoder, TextEncoder, atob, btoa,
     alert() {}, confirm() { return true; }, prompt() { return null; },
@@ -260,8 +261,54 @@ ok('İlham & İbadet koyu tema raporu render', (function () {
 
 ok('Günün öncüsü modalında sabit Okudum eylemi kod yolu var', (function () {
   const src=fs.readFileSync(path.join(REPO,'app.js'),'utf8');
-  return /sg-person-ov-action/.test(src)&&/saygiReadActionHTML\(done,'-modal'\)/.test(src);
+  return /sg-person-ov-action/.test(src)&&/position:absolute/.test(fs.readFileSync(path.join(REPO,'styles.css'),'utf8'))&&/saygiReadActionHTML\(done,'-modal'\)/.test(src);
 })());
+
+ok('Okudum, Zihnimi Besledim türetilmiş tikini günceller', (function () {
+  const src=fs.readFileSync(path.join(REPO,'app.js'),'utf8');
+  return /source:'saygi'[\s\S]{0,900}syncDerivedHabits\(day\)[\s\S]{0,180}Zihnimi besledim tiki/.test(src);
+})());
+
+// Wikipedia yanıtlarını yalnızca bellek içinde taklit ederek seçili kişi ile
+// biyografi gövdesinin hızlı gezinmede dahi ayrışmadığını doğrula.
+function cannedWikipediaFetch(rawUrl) {
+  const url=String(rawUrl||'');
+  if(url.includes('/api/rest_v1/page/summary/')){
+    const slug=decodeURIComponent(url.split('/').pop()||'').replace(/_/g,' ');
+    return Promise.resolve({ok:true,status:200,json(){ return Promise.resolve({
+      title:slug, description:slug+' test biyografisi', extract:slug+' için güvenli headless test biyografisi. Bu metin seçili öncünün başlığı ve içerik gövdesinin aynı kişide kaldığını doğrulamak için yeterince uzundur.',
+      thumbnail:{source:'https://upload.wikimedia.org/test.jpg'},
+      content_urls:{desktop:{page:'https://tr.wikipedia.org/wiki/'+encodeURIComponent(slug.replace(/ /g,'_'))}},
+      titles:{canonical:slug}, revision:1
+    }); }});
+  }
+  if(url.includes('/with_html')){
+    return Promise.resolve({ok:true,status:200,json(){ return Promise.resolve({html:'',latest:{id:1},license:{title:'CC BY-SA 4.0',url:'https://creativecommons.org/licenses/by-sa/4.0/deed.tr'}}); }});
+  }
+  return Promise.resolve({ok:true,status:200,json(){ return Promise.resolve({query:{pages:[{extlinks:[]}]}}); }});
+}
+async function settleWikipedia() {
+  for(let i=0;i<8;i++) await Promise.resolve();
+  await new Promise((resolve)=>setImmediate(resolve));
+}
+const raceSb=buildSandbox(seed,cannedWikipediaFetch);
+loadInto(raceSb,FILES);
+if(raceSb.App&&typeof raceSb.App.start==='function') raceSb.App.start();
+raceSb.App.go('saygi');
+raceSb.App.openSaygiCollectionPerson('ada-lovelace');
+await settleWikipedia();
+ok('Seçilen öncü başlığı ve biyografisi aynı kalır', /sg-person-ov-title[^]*Ada Lovelace/.test(appHTML)&&/<h2>Ada Lovelace<\/h2>/.test(appHTML)&&!/Francis Crick test biyografisi/.test(appHTML), JSON.stringify({h2:appHTML.match(/<h2>.*?<\/h2>/g),loading:/saygi-loading/.test(appHTML),error:/saygi-error/.test(appHTML)}));
+const modalScroll=makeEl('sey-ov-body'), modalButton=makeEl('saygi-read-button-modal'), modalSentinel=makeEl('saygi-read-sentinel-modal');
+modalScroll.scrollHeight=100; modalScroll.clientHeight=200; modalButton.disabled=true;
+elCache['sey-ov-body']=modalScroll; elCache['saygi-read-button-modal']=modalButton; elCache['saygi-read-sentinel-modal']=modalSentinel;
+doc.querySelector=function(sel){ return sel==='[data-scroll]'?modalScroll:null; };
+raceSb.App.setTheme(false); // kısa biyografide Okudum kilidini gerçek gate üzerinden aç
+raceSb.App.markSaygiRead();
+const raceState=JSON.parse(raceSb.localStorage.getItem('seyma-reset-v1'));
+ok('Okudum gerçek akışta Zihnimi Besledim tikini yeşillendirir', !!(raceState.days[t]&&raceState.days[t].habits&&raceState.days[t].habits.mediaFed)&&raceState.days[t].reading.entries.some((entry)=>entry.source==='saygi'&&entry.personId==='ada-lovelace'));
+raceSb.App.browseSaygiPerson(1);
+await settleWikipedia();
+ok('İleri okunda hem başlık hem içerik birlikte değişir', /sg-person-ov-title[^]*Albert Einstein/.test(appHTML)&&/<h2>Albert Einstein<\/h2>/.test(appHTML)&&!/<h2>Ada Lovelace<\/h2>/.test(appHTML), JSON.stringify({h2:appHTML.match(/<h2>.*?<\/h2>/g),loading:/saygi-loading/.test(appHTML),error:/saygi-error/.test(appHTML)}));
 
 ok('migrate eski veriye zikr/saygi backfill yapar', (function () {
   // migrate() IIFE içinde — App.start()'ın veriyi backfill ettiğini localStorage üzerinden doğrula

@@ -2839,9 +2839,12 @@ App.refreshSaygi=function(){ var person=saygiModalPerson(); if(!person) return; 
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
   var person=saygiCurrentPerson(); if(!person) return;
+  var key=saygiDayKey(person);
   ui.saygiBrowseId=person.id;
   ui.saygiPersonOpen=true;
-  if(!ui.saygiArticle||ui.saygiLoading){ App.refreshSaygi(); }
+  if(ui.saygiKey!==key||!ui.saygiArticle||ui.saygiArticle.personId!==person.id){
+    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; App.refreshSaygi();
+  }
   else { render(); }
 };
 App.openSaygiCollectionPerson=function(id){
@@ -8653,8 +8656,11 @@ function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
   if(!person) return '<div class="saygi-empty">'+icon('triangle-alert',24)+' Saygı seçkisi yüklenemedi.</div>';
-  saygiEnsureArticle(person);
-  var article=ui.saygiArticle, done=saygiHasRead(person);
+  // Seçili koleksiyon modalı açıkken alttaki günlük kart aynı global makale
+  // durumunu yeniden yüklememeli; aksi halde modal başlığı ile biyografi ayrışır.
+  if(!ui.saygiPersonOpen) saygiEnsureArticle(person);
+  var article=(!ui.saygiPersonOpen&&ui.saygiArticle&&ui.saygiArticle.personId===person.id)?ui.saygiArticle:null;
+  var done=saygiHasRead(person);
   var h='<section class="saygi-page">';
   h+=spiritBarHTML();
   h+=saygiPreviewHubHTML(person,article,done);
@@ -8741,7 +8747,9 @@ function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){
 function saygiPersonModalHTML(){
   var person=saygiModalPerson();
   if(!person) return '';
-  var article=ui.saygiArticle;
+  // Yavaş/ters sırada tamamlanan Wikipedia istekleri asla başka öncünün
+  // biyografisini seçili kişinin başlığı altında gösteremez.
+  var article=(ui.saygiArticle&&ui.saygiArticle.personId===person.id)?ui.saygiArticle:null;
   var done=saygiHasRead(person);
   var people=saygiPeople(), personIndex=people.findIndex(function(x){ return x.id===person.id; });
   var head='<div class="sg-person-ov-head"><div><div class="sg-person-ov-title"><span>'+icon('trophy',16)+'</span>'+esc(person.name)+'</div><small class="sg-person-ov-count">'+(personIndex+1)+' / '+people.length+' · Öncü koleksiyonu</small></div><div class="sg-person-ov-nav"><button onclick="App.browseSaygiPerson(-1)" aria-label="Önceki öncü">‹</button><button onclick="App.browseSaygiPerson(1)" aria-label="Sonraki öncü">›</button><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+icon('x',16)+'</button></div></div>';
@@ -8757,7 +8765,7 @@ function saygiPersonModalHTML(){
     body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';
   }
   var action='<div class="sg-person-ov-action">'+(article?saygiReadActionHTML(done,'-modal'):saygiReadActionHTML(false,'-modal',true,'Okudum',ui.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'))+'</div>';
-  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:520px;max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 28px;display:flex;flex-direction:column;gap:14px;">'+body+'</div>'+action+'</div></div>';
+  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:min(92vh,900px);max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 92px;display:flex;flex-direction:column;gap:14px;">'+body+'</div>'+action+'</div></div>';
 }
 function saygiUnlockReadButton(btn){
   if(!btn||btn.disabled===false&&ui.saygiReadReady) return;

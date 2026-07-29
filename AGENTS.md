@@ -336,6 +336,29 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Öncü modalı içerik yarışı + kalıcı Okudum düzeltmesi
+
+**Branch:** `mustafaras-iman-kosesi-plani`; `main` push/deploy bu kayıt yazılırken bekliyor. Cache `20260730k`.
+
+**Değişen dosyalar:**
+- `app.js`: modal açıkken günlük öncü preview'sunun ortak makale durumunu ezmesi engellendi; modal makalesine seçili `personId` eşleşme kapısı eklendi; günlük kart/modal açılış yüklemeleri kimlik uyumlu hale getirildi; modal sabit yükseklik ve Okudum için ayrılmış alt boşluk aldı.
+- `styles.css`: `.sg-person-ov-action` modal alt kenarına absolute, safe-area uyumlu sabitlendi.
+- `index.html`: tüm asset cache sürümleri `20260730k`.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: bellek içi Wikipedia mock'u ile Ada→Einstein hızlı geçişinde başlık/gövde eşliği; gerçek `App.markSaygiRead()` ile okuma kaydı + `habits.mediaFed` testi.
+- `GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md`, `AGENTS.md`: düzeltme/kapsam kaydı.
+
+**Doğrulama:**
+- `node --check app.js` ✅
+- `.claude/skills/run-seyma/zikr-harness.mjs` ✅ 29/29
+- `.claude/skills/run-seyma/driver.mjs` ✅
+- `test_faz10_sync.js` ✅ 45/45
+- `test_faz11_panel.js` ✅ 35/35
+- Gerçek tarayıcı açılmadı; server başlatılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Commit/push, Pages deploy ve canlı dosya cache sürümü doğrulaması; gerçek cihazda görsel kontrol kullanıcı tarafından yapılabilir.
+
+---
+
 ### 2026-07-29 — İlham & İbadet v2 final: 99 Esmâ/ebced geri sayım + tıklanabilir öncü/Okudum fix + yıllık ibadet ısısı (canlıya alındı)
 
 **Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward push; GitHub Pages cache `20260730j`.

@@ -338,7 +338,7 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ### 2026-07-29 — Öncü modalı içerik yarışı + kalıcı Okudum düzeltmesi
 
-**Branch:** `mustafaras-iman-kosesi-plani`; `main` push/deploy bu kayıt yazılırken bekliyor. Cache `20260730k`.
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` pushlandı. Kod commit `d76cbd8`; GitHub Pages workflow `30447777691` başarıyla tamamlandı. Cache `20260730k`.
 
 **Değişen dosyalar:**
 - `app.js`: modal açıkken günlük öncü preview'sunun ortak makale durumunu ezmesi engellendi; modal makalesine seçili `personId` eşleşme kapısı eklendi; günlük kart/modal açılış yüklemeleri kimlik uyumlu hale getirildi; modal sabit yükseklik ve Okudum için ayrılmış alt boşluk aldı.
@@ -353,9 +353,10 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 - `.claude/skills/run-seyma/driver.mjs` ✅
 - `test_faz10_sync.js` ✅ 45/45
 - `test_faz11_panel.js` ✅ 35/35
+- Pages validate + deploy ✅; canlı `index.html`, `app.js` ve `styles.css` üzerinde `20260730k`, kişi eşleşme kapısı, arka plan yarış koruması ve sabit Okudum CSS'i HTTP ile doğrulandı.
 - Gerçek tarayıcı açılmadı; server başlatılmadı; `seyma-data`'ya yazılmadı.
 
-**Kalan:** Commit/push, Pages deploy ve canlı dosya cache sürümü doğrulaması; gerçek cihazda görsel kontrol kullanıcı tarafından yapılabilir.
+**Kalan:** Gerçek cihazda görsel kontrol kullanıcı tarafından yapılabilir.
 
 ---
 

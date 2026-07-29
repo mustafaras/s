@@ -336,6 +336,48 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — Zikirmatik v2: kalıcı Ebced² Tam Hatim (canlıya alındı)
+
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward push yapıldı.
+**Plan commit:** `e88c19d`. **Kod commit:** `6bfe339`. **Cache:** `20260730n`.
+**GitHub Pages:** workflow `30452509346` validate + deploy başarılı.
+
+**Değişen dosyalar:**
+- `app.js`: `data.zikr` schema v2; idempotent v1 migration; preset başına kalıcı
+  journey, Esmâ başına hatim arşivi, atomik tap/undo/pause/resume; ebced turu +
+  `ebced²` tam hatim matematiği (el-Fettâh `489²=239121`); bağımsız `100dvh`
+  tam ekran `Sayaç | Esmâ | Hatimlerim | Özet`; ses/titreşim/odak/nefes,
+  reduced-motion, wake-lock, klavye focus trap/Escape ve aria-live.
+- `styles.css`: açık/koyu tema, safe-area, mobil/masaüstü, düşük ekran yüksekliği
+  ve reduced-motion uyumlu Zikirmatik v2 premium tasarım katmanı.
+- `sync.js`: monotonik `mergeZikr()`; bayat cihaz lifetime/günlük/hatim
+  ilerlemesini geriye çekemez, hatim kimlikleri union edilir.
+- `panel.html`: aktif Esmâ, tur, Ebced² ilerlemesi, ömürlük toplam ve tamamlanan
+  hatimlerin salt-okunur panel aynası.
+- `index.html`: tüm asset cache sürümleri `20260730n`.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: migration, reload, gün değişimi,
+  preset A→B→A, hızlı 100 sayım, 488/489 undo ve 239120/239121 hatim sınırları.
+- `test_faz10_sync.js`, `test_faz11_panel.js`: monotonik sync ve eksik veride
+  güvenli panel testleri.
+- `ZIKIRMATIK-GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md`,
+  `GELISTIRME-PLANI.md`: Z1–Z9 tamamlanma ve changelog kayıtları.
+
+**Doğrulama:**
+- `node --check app.js`, `sync.js`, `esmaulHusnaV1.js` ✅
+- `driver.mjs` genel render regresyonu ✅
+- `zikr-harness.mjs` ✅ 42/42
+- `test_faz10_sync.js` ✅ 50/50
+- `test_faz11_panel.js` ✅ 39/39
+- `panel.html` inline script syntax + `git diff --check` ✅
+- Canlı salt-okunur HTTP doğrulaması: index cache N, tam ekran Zikirmatik,
+  Ebced² metni, `mergeZikr` ve panel aynası mevcut ✅
+
+**Güvenlik / kalan:** Gerçek tarayıcı açılmadı, yerel server başlatılmadı,
+`seyma-data` yazılmadı. Zorunlu TODO yok. Workflow yalnız Node 20 action
+deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
+
+---
+
 ### 2026-07-29 — Yalnız Zikirmatik premium v2 geliştirme planı
 
 **Branch:** `mustafaras-iman-kosesi-plani`; plan-only, kod/deploy yok.

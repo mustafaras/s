@@ -338,7 +338,7 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ### 2026-07-29 — Okudum eylemi modal ağacından çıkarıldı (kök görünürlük düzeltmesi)
 
-**Branch:** `mustafaras-iman-kosesi-plani`; deploy bu kayıt yazılırken bekliyor. Cache `20260730m`.
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` pushlandı. Kod commit `32f925a`; Pages workflow `30448983196` başarıyla tamamlandı. Cache `20260730m`.
 
 **Değişen dosyalar:**
 - `app.js`: `Okudum` eylemi modal kartı/backdrop ağacından kaldırıldı; `modalsHTML()` seviyesinde bağımsız `saygiFloatingReadHTML()` katmanı eklendi. Inline görünürlük, ekran altı konum ve yüksek z-index ile `#app`/overlay overflow-stacking kırpması engellendi. Scroll gate ve `App.markSaygiRead()` akışı korunuyor.
@@ -347,9 +347,9 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 - `.claude/skills/run-seyma/zikr-harness.mjs`: bağımsız floating eylemin modal yanında üretildiği ve yüksek katmanda görünür olduğu assertion'ları.
 - Planlar/handoff güncellendi.
 
-**Doğrulama:** `node --check app.js` ✅; `zikr-harness` 29/29 ✅; genel driver ✅; gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+**Doğrulama:** `node --check app.js` ✅; `zikr-harness` 29/29 ✅; genel driver ✅; sync 45/45 ✅; panel 35/35 ✅; Pages validate/deploy ✅. Canlı `index.html`/`app.js` üzerinde cache `m`, floating fonksiyon, modal sibling ve yüksek z-index HTTP ile doğrulandı. Gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
 
-**Kalan:** Commit/push/Pages; kullanıcı tarafından canlı görsel kontrol.
+**Kalan:** Kullanıcı tarafından canlı görsel kontrol.
 
 ---
 

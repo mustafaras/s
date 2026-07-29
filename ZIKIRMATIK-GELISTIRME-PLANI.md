@@ -10,7 +10,12 @@
 
 ## Uygulama durumu — 2026-07-29
 
-Z1–Z9 fazlarının tamamı uygulandı ve headless kabul kapılarından geçti. Canlı
+> **Canlı görünürlük durumu:** Kullanıcı talebiyle Zikirmatik kartı, sekmesi,
+> modalı ve panel kartı geçici olarak kapatıldı. Veri modeli, migration,
+> sayımlar ve hatimler korunuyor. Yeni opak, geniş, iPhone 16 Pro Max uyumlu
+> tasarım ayrı branch üzerinde hazırlanıp onaydan önce `main`e alınmayacak.
+
+Z1–Z9 fazlarının çekirdeği uygulandı ve headless kabul kapılarından geçti. Canlı
 tarayıcı açılmadı; ağ/senkron testleri mock ortamında çalıştı. Son teslim
 durumu: tam ekran bağımsız sayaç, 99 Esmâ, ebced turu + `ebced²` tam hatim,
 kalıcı yolculuklar, güvenli undo/yeni hatim, idempotent migration, erişilebilir

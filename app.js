@@ -326,6 +326,9 @@ var ZIKR_NIYET={
   la_ilaha_illallah:'O\'ndan başka ilah yoktur.',
   estagfirullah:'O çok bağışlayıcıdır.'
 };
+// Zikirmatik v2 yeniden tasarım süresince canlı kullanıcı arayüzünden kapalıdır.
+// Veri/migration kodu korunur; tekrar açıldığında mevcut sayımlar kaybolmaz.
+var ZIKR_V2_VISIBLE=window.__SEYMA_TEST_ZIKR__===true;
 var ZIKR_SCHEMA_VERSION=2, ZIKR_MIGRATION_VERSION='zikr_v2', _zikrNormalizedRef=null;
 function zikrUid(prefix){ return (prefix||'z')+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
 function zikrInt(v){ v=Number(v); return Number.isSafeInteger(v)&&v>0?v:0; }
@@ -3302,7 +3305,7 @@ function zikrPaintLive(result){
     return true;
   }catch(e){ return false; }
 }
-App.openZikr=function(){ ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
+App.openZikr=function(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
 App.closeZikr=function(){ zikrPauseSession(); ui.zikrOpen=false; zikrSyncWakeLock(); save(); _zikrCompleteFlash=false; render(); };
 App.setZikrView=function(v){ ui.zikrView=v; render(); };
 App.onZikrKeydown=function(e){
@@ -8664,12 +8667,14 @@ function faithCornerOverlayHTML(){
 
 function saygiPreviewHubHTML(person,article,done){
   var tab=ui.faithTab||'oz', body='';
+  if(!ZIKR_V2_VISIBLE&&tab==='zikir'){ tab='oz'; ui.faithTab='oz'; }
   if(tab==='oncu') body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);
   else if(tab==='iman') body=faithCornerCardHTML();
-  else if(tab==='zikir') body=zikrPreviewCardHTML();
+  else if(tab==='zikir'&&ZIKR_V2_VISIBLE) body=zikrPreviewCardHTML();
   else if(tab==='rapor') body=faithRaporCardHTML();
-  else body=saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+zikrPreviewCardHTML();
-  return '<div class="saygi-preview-hub"><div class="sg-faith-tabs">'+segTabs([['oz','Öz'],['oncu','Öncü'],['iman','İman'],['zikir','Zikir'],['rapor','Rapor']],tab,'App.setFaithTab','faith')+'</div>'+body+'</div>';
+  else body=saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+(ZIKR_V2_VISIBLE?zikrPreviewCardHTML():'');
+  var tabs=ZIKR_V2_VISIBLE?[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['zikir','Zikir'],['rapor','Rapor']]:[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['rapor','Rapor']];
+  return '<div class="saygi-preview-hub"><div class="sg-faith-tabs">'+segTabs(tabs,tab,'App.setFaithTab','faith')+'</div>'+body+'</div>';
 }
 function zikrPreviewCardHTML(){
   var p=zikrActivePreset(), day=zikrDay(todayStr()), jp=zikrJourneyProgress(p), m=jp.math;
@@ -9727,7 +9732,7 @@ function modalsHTML(){
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
   if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
-  if(ui.zikrOpen){ h+=zikroverlayHTML(); }
+  if(ui.zikrOpen&&ZIKR_V2_VISIBLE){ h+=zikroverlayHTML(); }
   if(ui.qiblaOpen){ h+=qiblaOverlayHTML(); }
   if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); h+=saygiFloatingReadHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }

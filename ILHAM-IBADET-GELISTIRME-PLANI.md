@@ -258,7 +258,7 @@ görür. İşlevsel fazlar bu kaplamanın üstüne gelir.
 | Faz | Başlık & odak | Öncelik | Durum | Ana etkileşimler (`app.js`) | Panel & notlar |
 |-----|---------------|---------|-------|------------------------------|----------------|
 | 42 | ✨ **Kozmetik Premium** — glass/glow/shimmer kaplama + 5. sekme Rapor polisajı + tüm hub mikro-premium'u | 1 | ✅ | Veri/işlev değişmez; glass kart stilleri, accent gradient'lar, zikir/iman/öncü/rapor yüzeyleri | Cache `20260730m` |
-| 35 | 🎯 **Zikirmatik v2** — kalıcı yolculuk + Ebced² Tam Hatim | 1 | ✅ | Bağımsız 100dvh sayaç; 5 temel + 99 Esmâ; ebced turu + ebced² tam hatim; ayrı hatimler, reload/preset/gün devamı, ses+haptic+reduced motion | Ayrıntılı panel + monotonik sync merge; cache `20260730n` |
+| 35 | 🎯 **Zikirmatik v2** — kalıcı yolculuk + Ebced² Tam Hatim | 1 | 🟡 | Çekirdek ve veri korunuyor; kullanıcı talebiyle kart/sekme/modal/panel canlıdan geçici gizlendi | iPhone 16 Pro Max opak tasarım revizyonu ayrı branch; cache `20260730o` |
 | 36 | 🕌 **Sıradaki vakit + geri sayım** + cemaat/pulse vurgu + `currentPrayerIndex` geliştirme | 1 | ✅ | Header'da countdown, `App.tickPrayer`, pulse CSS (`.sg-faith-preview-row.next`), cemaat altın ikon | — |
 | 37 | 🌙 **Hicri & Miladi takvim** + mübarek gün rozeti (`hijriCalendar.js`, offset) | 2 | ✅ | `window.HijriCalendarV1`, `hijriTodayStr`, ±2 gün kullanıcı kontrolü, rozet UI | Panel `Hicri Takvim` bento aynası |
 | 38 | 🧭 **Kıble gülü** (local bearing + GPS), canlı cihaz yönü | 2 | ✅ | SVG compass; izinli `deviceorientation`/iOS permission; statik fallback | — |

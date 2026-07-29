@@ -443,6 +443,9 @@ var ZIKR_SEED_P=[
   {id:'la_ilaha_illallah',name:'Lâ ilâhe illallah',target:100},
   {id:'estagfirullah',name:'Estağfirullah',target:100}
 ];
+// Kullanıcı tarafındaki Zikirmatik yeniden tasarlanırken panel kartı da canlıdan
+// gizlidir; veri okunur ve korunur, yalnızca görsel yüzey üretilmez.
+var ZIKR_V2_VISIBLE_P=false;
 function zikrRootP(){ var z=D&&D.zikr; return (z&&typeof z==='object')?z:null; }
 function zikrDayTotalP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.totalCount==='number')?s.totalCount:0; }
 function zikrDaySetsP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.completedSets==='number')?s.completedSets:0; }
@@ -2440,6 +2443,7 @@ function render(){
 
   // ROW 1.7b: Zikirmatik + İbadet Haftası — panel aynası
   (function(){
+    if(!ZIKR_V2_VISIBLE_P) return;
     var zday=zikrDayTotalP(today()), zsets=zikrDaySetsP(today()), streak=zikrStreakP();
     var k=faithWeekKPIsP(today()), js=zikrJourneySummaryP();
     var val=zday>0?(zday+'<small>zikir</small>'):'—';

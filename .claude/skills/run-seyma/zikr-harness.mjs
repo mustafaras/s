@@ -68,7 +68,7 @@ function buildSandbox(seedData, fetchImpl) {
   const seed = seedData ? { 'seyma-reset-v1': JSON.stringify(seedData) } : {};
   const localStorage = makeLS(seed);
   const sandbox = {
-    console, localStorage, document: doc,
+    console, localStorage, document: doc, __SEYMA_TEST_ZIKR__: true,
     navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
     location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },

@@ -28,6 +28,8 @@
     --vacation:#5ED4B4;--vacation2:#2A9D8F;--vacation-bg:rgba(42,157,143,.12);--vacation-glow:rgba(94,212,180,.18);
     --soul:#B8A8E8;--soul2:#EBCC90;--soul-bg:rgba(184,168,232,.11);--soul-glow:rgba(184,168,232,.15);
     --faith:#D4B56A;--faith2:#A68B4B;--faith-bg:rgba(212,181,106,.12);--faith-glow:rgba(212,181,106,.16);
+    --zikr:#6EC1CE;--zikr2:#93D0DA;--zikr-bg:rgba(110,193,206,.12);
+    --kandil:#F0AABE;--kandil-bg:rgba(240,170,190,.12);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
     /* ── type scale ── */
@@ -155,6 +157,7 @@
      (Eskiden span-3..8 farklı genişliklerde yan yana paketlenip düzensiz görünüyordu.) */
   /* Şeyma kullanıcı ekranı gibi: iPhone genişliğinde ortalanmış tek sütun akış */
   .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;max-width:480px;margin:0 auto}
+  .faith-yheat-scroll{overflow-x:auto;padding:3px 0 5px}.faith-yheat-months{width:744px;display:grid;grid-template-columns:repeat(12,1fr);font-size:9px;color:var(--t4);padding-bottom:3px}.faith-yheat{width:max-content;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px}.faith-yheat i{width:11px;height:11px;border-radius:3px;background:var(--s3);border:1px solid var(--bd);box-sizing:border-box}.faith-yheat i.blank{visibility:hidden}.faith-yheat i[data-l="1"]{background:color-mix(in srgb,var(--faith) 34%,var(--s3))}.faith-yheat i[data-l="2"]{background:color-mix(in srgb,var(--faith) 58%,var(--s3))}.faith-yheat i[data-l="3"]{background:color-mix(in srgb,var(--faith) 82%,var(--s3))}.faith-yheat i[data-l="4"]{background:linear-gradient(135deg,var(--faith2),var(--faith));border-color:var(--faith2)}.faith-yheat-legend{display:flex;align-items:center;gap:5px;font-size:var(--f3);color:var(--t4);margin-top:8px}.faith-yheat-legend b{color:var(--faith)}
   .bento>.span-2{grid-column:span 6}
   .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8,.bento>.span-12{grid-column:span 12}
 
@@ -266,6 +269,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="motivationProgramV2.js?v=20260718a"></script>
 <script src="saygiPeople.js?v=20260715a"></script>
+<script src="hijriCalendar.js?v=20260730j"></script>
 </head>
 <body>
 <div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
@@ -430,6 +434,64 @@ function prayerSummaryRangeP(start,end){
   return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile,days:days};
 }
 function prayerLocationP(){ var s=D&&D.settings&&D.settings.prayer; return s&&s.location?s.location:null; }
+
+// ── İlham & İbadet: zikirmatik + ibadet rapor — panel aynası ──
+var ZIKR_SEED_P=[
+  {id:'subhanallah',name:'Sübhanallah',target:33},
+  {id:'elhamdulillah',name:'Elhamdülillah',target:33},
+  {id:'allahu_ekber',name:'Allahü Ekber',target:34},
+  {id:'la_ilaha_illallah',name:'Lâ ilâhe illallah',target:100},
+  {id:'estagfirullah',name:'Estağfirullah',target:100}
+];
+function zikrRootP(){ var z=D&&D.zikr; return (z&&typeof z==='object')?z:null; }
+function zikrDayTotalP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.totalCount==='number')?s.totalCount:0; }
+function zikrDaySetsP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.completedSets==='number')?s.completedSets:0; }
+function zikrStreakP(){ var z=zikrRootP(); return (z&&typeof z.streak==='number')?z.streak:0; }
+function zikrWeekTotalP(date){
+  date=date||today(); var total=0, days=0;
+  for(var i=0;i<7;i++){ var d=addDays(date,-i); var v=zikrDayTotalP(d); if(v>0) days++; total+=v; }
+  return {total:total,days:days};
+}
+function faithWeekKPIsP(date){
+  date=date||today();
+  var prays=0, cong=0, made=0, late=0, nafile=0, days=0;
+  for(var i=0;i<7;i++){
+    var d=addDays(date,-i), rec=D&&D.days?D.days[d]:null;
+    if(!rec||!rec.prayer) continue; days++;
+    PRAYER_ORDER_P.forEach(function(k){ var e=rec.prayer[k]; if(!e) return; if(e.performed){ prays++; if(e.inCongregation)cong++; if(e.late)late++; if(e.madeUp)made++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+  }
+  var zw=zikrWeekTotalP(date);
+  return {prays:prays,max:days*6,cong:cong,madeUp:made,late:late,nafile:nafile,zikr:zw.total,zikrDays:zw.days};
+}
+function faithDayHeatP(date){
+  var rec=D&&D.days?D.days[date]:null, performed=0;
+  if(rec&&rec.prayer) PRAYER_ORDER_P.forEach(function(k){ if(rec.prayer[k]&&rec.prayer[k].performed) performed++; });
+  var z=D&&D.zikr&&D.zikr.sessions&&D.zikr.sessions[date], zikr=z&&Number(z.totalCount)||0, sets=z&&Number(z.completedSets)||0;
+  var level=performed===0?0:(performed<=2?1:(performed<=4?2:3));
+  if(zikr||sets) level=Math.min(4,Math.max(1,level+1));
+  return {performed:performed,zikr:zikr,sets:sets,level:level};
+}
+function faithAnnualPanelCardP(){
+  var year=+today().slice(0,4), first=year+'-01-01', last=year+'-12-31';
+  var dow=(new Date(year,0,1).getDay()+6)%7, cells='', active=0, prayers=0, zikr=0;
+  for(var b=0;b<dow;b++) cells+='<i class="blank"></i>';
+  for(var d=first;d<=last;d=addDays(d,1)){
+    var x=faithDayHeatP(d); if(x.performed||x.zikr){active++; prayers+=x.performed; zikr+=x.zikr;}
+    cells+='<i data-l="'+x.level+'" title="'+esc(shortD(d)+' · '+x.performed+' vakit'+(x.zikr?' · '+x.zikr+' zikir':''))+'"></i>';
+  }
+  var months='<div class="faith-yheat-months"><span>Oca</span><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span><span>Eki</span><span>Kas</span><span>Ara</span></div>';
+  var map='<div class="faith-yheat-scroll">'+months+'<div class="faith-yheat">'+cells+'</div></div><div class="faith-yheat-legend"><b>'+active+' aktif gün</b><span>· '+prayers+' vakit · '+zikr+' zikir</span></div>';
+  var summary='<span class="tchip fl">'+year+'</span><span class="tchip">'+active+' gün</span><span class="tchip">'+prayers+' vakit</span>';
+  return cardWrap({key:'faith-year-'+year,icon:icon('calendar',18),title:'Yıllık İbadet Isısı · '+year,span:12,order:20,summary:summary,details:map});
+}
+function hijriPanelCardP(){
+  var offset=D&&D.settings&&D.settings.prayer?Number(D.settings.prayer.hijriOffset)||0:0;
+  var cal=window.HijriCalendarV1, label=cal&&cal.todayStr?cal.todayStr(today(),offset):'Hicri tarih bekleniyor';
+  var holy=cal&&cal.holyDay?cal.holyDay(today(),offset):'';
+  var summary='<span class="tchip fl">'+esc(label)+'</span>'+(holy?'<span class="tchip" style="color:var(--kandil);">'+esc(holy)+'</span>':'');
+  var details='<div style="font-size:var(--f3);line-height:1.55;color:var(--t2);">Uygulamadaki Hicri tarih ayarı panelde de aynı görünür.'+(offset?' Kullanıcı farkı: <b>'+(offset>0?'+':'')+offset+' gün</b>.':' Varsayılan hilal farkı kullanılıyor.')+'</div>';
+  return cardWrap({key:'hijri-today',icon:'🌙',title:'Hicri Takvim',span:6,order:20,summary:summary,details:details});
+}
 
 // ── Zihin-Beden Beslenmesi (kurs & pratik) — panel aynası ──
 var SOUL_ACTIVITY_CATALOG_P=[
@@ -2358,6 +2420,23 @@ function render(){
     cap.push('<span style="color:var(--faith);font-weight:700;">'+locTxt+'</span>');
     h+=kpi('İman Köşesi',val,'var(--faith)',extra,sparkLine(cur,function(d){ var r=recOf(d); return r?prayerPerformedCountP(ensurePrayerDayP(r)):0; },6,'var(--faith)',30),cap.join(''));
   })();
+
+  // ROW 1.7b: Zikirmatik + İbadet Haftası — panel aynası
+  (function(){
+    var zday=zikrDayTotalP(today()), zsets=zikrDaySetsP(today()), streak=zikrStreakP();
+    var k=faithWeekKPIsP(today());
+    var zw=zikrWeekTotalP(today());
+    var val=zday>0?(zday+'<small>zikir</small>'):'—';
+    var extra='<span class="tchip fl">'+streak+'g seri</span>';
+    var cap=[];
+    if(zsets>0) cap.push('<span><b style="color:var(--t2);">'+zsets+'</b> set bugün</span>');
+    if(k.zikr>0) cap.push('<span>Haftada <b style="color:var(--t2);">'+k.zikr+'</b></span>');
+    if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> vakit</span>');
+    if(k.cong>0) cap.push('<span><b style="color:var(--t2);">'+k.cong+'</b> cemaat</span>');
+    h+=kpi('Zikir · İbadet',val,'var(--zikr)',extra,null,cap.join(''));
+  })();
+  h+=faithAnnualPanelCardP();
+  h+=hijriPanelCardP();
 
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();

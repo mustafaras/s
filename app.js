@@ -292,12 +292,137 @@ function prayerPerformedCount(p){ var n=0; PRAYER_ORDER.forEach(function(k){ if(
 function prayerAllDone(p){ return prayerPerformedCount(p)>=5; }
 function prayerStreak(){
   var streak=0, d=todayStr();
-  while(true){ var day=data.days[d]; var p=day&&day.prayer; if(!p||!prayerAllDone(p)) break; streak++; d=prevDayStr(d); if(!d) break; }
+  while(true){ var day=data.days[d]; var p=day&&day.prayer; if(!p||!prayerAllDone(p)) break; streak++; d=addDays(d,-1); if(d<data.startDate&&streak>0) break; if(d<data.startDate) break; }
   return streak;
 }
+// Sıradaki vakit + geri sayım (Faz 36) — render bazlı dakikalık hesap; interval yok.
+function nextPrayerInfo(times){
+  times=times||{};
+  var now=new Date(), curMin=now.getHours()*60+now.getMinutes();
+  var name='—', key=null, remMin=null, nextMin=null;
+  for(var i=0;i<PRAYER_ORDER.length;i++){
+    var k=PRAYER_ORDER[i], pt=parsePrayerTime(times[k]);
+    if(!pt) continue;
+    var m=pt.h*60+pt.m;
+    if(m>curMin){ key=k; name=PRAYER_NAMES[k]||k; nextMin=m; break; }
+  }
+  if(!key){ key=PRAYER_ORDER[0]; name=PRAYER_NAMES[PRAYER_ORDER[0]]; var pt2=parsePrayerTime(times[PRAYER_ORDER[0]]); if(pt2){ nextMin=(pt2.h*60+pt2.m)+24*60; } }
+  if(nextMin!=null){ var diff=nextMin-curMin; remMin=diff<=0?24*60+diff:diff; }
+  return {key:key,name:name,remMin:remMin,label:remMin!=null?remMin+' dk':''};
+}
 
-// ---- Kafein — bilimsel takip (EFSA 2015 · FDA · Harvard Health) ----
-// mg değerleri bir serving (fincan/shot/kupa/bardak/kutu) başına ortalama; demleme/
+// ── İlham & İbadet: Zikirmatik · Saygı koleksiyonu · Rapor (Faz 35–40) ─────
+var ZIKR_SEED=[
+  {id:'subhanallah', name:'Sübhanallah', phrase:'Sübhanallah', target:33, color:'zikr',builtIn:true,kind:'core'},
+  {id:'elhamdulillah', name:'Elhamdülillah', phrase:'Elhamdülillah', target:33, color:'zikr',builtIn:true,kind:'core'},
+  {id:'allahu_ekber', name:'Allahü Ekber', phrase:'Allahü Ekber', target:34, color:'zikr',builtIn:true,kind:'core'},
+  {id:'la_ilaha_illallah', name:'Lâ ilâhe illallah', phrase:'Lâ ilâhe illallah', target:100, color:'zikr',builtIn:true,kind:'core'},
+  {id:'estagfirullah', name:'Estağfirullah', phrase:'Estağfirullah', target:100, color:'zikr',builtIn:true,kind:'core'}
+];
+var ZIKR_NIYET={
+  subhanallah:'O her türlü eksikten münezzehtir.',
+  elhamdulillah:'Hamd yalnız O\'nadır.',
+  allahu_ekber:'O en büyüktür.',
+  la_ilaha_illallah:'O\'ndan başka ilah yoktur.',
+  estagfirullah:'O çok bağışlayıcıdır.'
+};
+function emptyZikrRoot(){ return {presets:[],sessions:{},settings:{soundOn:true,haptic:true,autoAdvance:false,activePresetId:''},streakDate:'',streak:0}; }
+function emptyZikrDay(){ return {totalCount:0,completedSets:0,perPreset:{}}; }
+function zikrEsmaSeed(){
+  var src=window.EsmaulHusnaV1&&Array.isArray(window.EsmaulHusnaV1.names)?window.EsmaulHusnaV1.names:[];
+  return src.map(function(x){ return {id:x.id,name:x.name,phrase:x.arabic,target:x.ebced,color:'zikr',favorite:false,createdAt:'',builtIn:true,kind:'esma',arabic:x.arabic,ebced:x.ebced,countDirection:'down'}; });
+}
+function zikrSeedPreset(p){
+  return {id:p.id,name:p.name,phrase:p.phrase,target:p.target,color:p.color||'zikr',favorite:!!p.favorite,createdAt:p.createdAt||'',builtIn:!!p.builtIn,kind:p.kind||'core',arabic:p.arabic||'',ebced:Number(p.ebced)||0,countDirection:p.countDirection==='down'?'down':'up'};
+}
+function ensureZikrRoot(){
+  if(!data) return emptyZikrRoot();
+  if(!data.zikr||typeof data.zikr!=='object') data.zikr=emptyZikrRoot();
+  var z=data.zikr;
+  if(!Array.isArray(z.presets)) z.presets=[];
+  var seeds=ZIKR_SEED.concat(zikrEsmaSeed()), byId={};
+  z.presets.forEach(function(p){ if(p&&p.id) byId[p.id]=p; });
+  seeds.forEach(function(seed){
+    var p=byId[seed.id];
+    if(!p){ p=zikrSeedPreset(seed); if(seed.id==='subhanallah') p.favorite=true; z.presets.push(p); byId[p.id]=p; }
+    else {
+      p.builtIn=true; p.kind=seed.kind||p.kind||'core';
+      if(seed.kind==='esma'){ p.arabic=seed.arabic; p.ebced=seed.ebced; p.target=seed.ebced; p.countDirection='down'; }
+    }
+  });
+  if(!z.sessions||typeof z.sessions!=='object') z.sessions={};
+  if(!z.settings||typeof z.settings!=='object') z.settings={soundOn:true,haptic:true,autoAdvance:false,activePresetId:''};
+  if(typeof z.settings.soundOn!=='boolean') z.settings.soundOn=true;
+  if(typeof z.settings.haptic!=='boolean') z.settings.haptic=true;
+  if(typeof z.settings.autoAdvance!=='boolean') z.settings.autoAdvance=false;
+  if(typeof z.settings.activePresetId!=='string'||!z.settings.activePresetId) z.settings.activePresetId=z.presets[0].id;
+  if(!byId[z.settings.activePresetId]) z.settings.activePresetId=z.presets[0].id;
+  if(typeof z.streak!=='number'||isNaN(z.streak)) z.streak=0;
+  if(typeof z.streakDate!=='string') z.streakDate='';
+  return z;
+}
+function zikrPreset(id){ var z=ensureZikrRoot(); for(var i=0;i<z.presets.length;i++){ if(z.presets[i].id===id) return z.presets[i]; } return z.presets[0]||null; }
+function zikrActivePreset(){ var z=ensureZikrRoot(); return zikrPreset(z.settings.activePresetId)||z.presets[0]; }
+function zikrDay(date){ date=date||todayStr(); var z=ensureZikrRoot(); if(!z.sessions[date]||typeof z.sessions[date]!=='object') z.sessions[date]=emptyZikrDay(); var s=z.sessions[date]; if(typeof s.totalCount!=='number'||isNaN(s.totalCount)) s.totalCount=0; if(typeof s.completedSets!=='number'||isNaN(s.completedSets)) s.completedSets=0; if(!s.perPreset||typeof s.perPreset!=='object') s.perPreset={}; return s; }
+function zikrPresetDone(date,preset){ var day=zikrDay(date); var count=day.perPreset[preset.id]||0; return preset.target>0?count>=preset.target:false; }
+function zikrDayCompleted(date){ var done=false; var z=ensureZikrRoot(); z.presets.forEach(function(p){ if(zikrPresetDone(date,p)) done=true; }); return done; }
+function zikrStreak(){ return ensureZikrRoot().streak; }
+function zikrWeek(date){ var set={}, total=0, perPreset={}; for(var i=0;i<7;i++){ var d=addDays(date,-i); var day=zikrDay(d); total+=day.totalCount; day.perPreset&&Object.keys(day.perPreset).forEach(function(pid){ perPreset[pid]=(perPreset[pid]||0)+0; }); if(zikrDayCompleted(d)) set[d]=1; } return {total:total,days:Object.keys(set).length,perPreset:perPreset}; }
+function zikrTouchTick(){
+  var p=zikrActivePreset(); if(!p) return null;
+  var date=todayStr(), day=zikrDay(date);
+  var cur=day.perPreset[p.id]||0;
+  day.perPreset[p.id]=cur+1; day.totalCount++;
+  var doneNow=p.target>0&&day.perPreset[p.id]%p.target===0;
+  if(doneNow){ day.completedSets++; }
+  day.lastAt=new Date().toISOString();
+  // Günlük kayıt aynası (panel/gün-detayı için)
+  syncZikrDayMirror(date,day);
+  // streak: bugün ilk kez herhangi hedef dolduysa tarihi kaydet
+  var z=ensureZikrRoot();
+  if(doneNow&&z.streakDate!==date){
+    var yester=addDays(date,-1);
+    z.streak = (zikrDayCompleted(yester)||z.streakDate===yester) ? (z.streak+1) : 1;
+    z.streakDate=date;
+  }
+  return {preset:p,count:day.perPreset[p.id],total:day.totalCount,doneNow:doneNow,target:p.target};
+}
+function syncZikrDayMirror(date,day){
+  try{
+    var dd=getDay(data,date,dayIndexFor(date)); if(!dd.zikr) dd.zikr=emptyZikrDay();
+    dd.zikr.totalCount=day.totalCount; dd.zikr.completedSets=day.completedSets;
+    dd.zikr.perPreset=Object.assign({},day.perPreset); dd.zikr.lastAt=day.lastAt||null;
+  }catch(e){}
+}
+
+// Saygı koleksiyonu + seri (Faz 39) — data.saygi kalıcı arşiv
+function emptySaygiRoot(){ return {collection:{},streak:0,lastReadDate:''}; }
+function ensureSaygiRoot(){
+  if(!data) return emptySaygiRoot();
+  if(!data.saygi||typeof data.saygi!=='object') data.saygi=emptySaygiRoot();
+  if(!data.saygi.collection||typeof data.saygi.collection!=='object') data.saygi.collection={};
+  if(typeof data.saygi.streak!=='number'||isNaN(data.saygi.streak)) data.saygi.streak=0;
+  if(typeof data.saygi.lastReadDate!=='string') data.saygi.lastReadDate='';
+  return data.saygi;
+}
+function saygiMarkRead(person){
+  if(!person) return;
+  var root=ensureSaygiRoot(), date=todayStr();
+  var previousReadDate=root.lastReadDate;
+  if(!root.collection[person.id]){ root.collection[person.id]={name:person.name||person.id,field:person.field||'',readAt:new Date().toISOString(),favorite:false}; }
+  else { root.collection[person.id].readAt=new Date().toISOString(); }
+  var yester=addDays(date,-1);
+  var yesterdayRead=false;
+  var yDay=data.days[yester];
+  if(yDay&&yDay.saygi&&yDay.saygi.readAt){ var y=String(yDay.saygi.readAt).slice(0,10); yesterdayRead=(y===yester); }
+  root.streak = previousReadDate===date ? Math.max(1,root.streak) : (yesterdayRead||previousReadDate===yester ? root.streak+1 : 1);
+  root.lastReadDate=date;
+}
+function saygiCollection(){ return ensureSaygiRoot().collection; }
+function saygiReadCount(){ return Object.keys(saygiCollection()).length; }
+function saygiStreak(){ return ensureSaygiRoot().streak; }
+
+// === Kafein hesabı ===
 // çekirdek fark eder, kullanıcı karttan başına göre ayarlayabilir. Yarı ömür
 // ~5 saat (sağlıklı yetişkin). Son kahve yatmadan ~6 saat önce; bedtime kalıntısı
 // <50 mg uykuyu anlamlı etkilemez.
@@ -752,6 +877,9 @@ function migrate(d){
   if(d.weather===undefined) d.weather=null;
   if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var rec=d.days[k]; if(rec&&typeof rec==='object'){ ensureSaygiDay(rec); if(!Array.isArray(rec.soulActivities)) rec.soulActivities=[]; } });
   if(typeof d.lastOpenedAt!=='string') d.lastOpenedAt='';
+  // İlham & İbadet Faz 35/39: zikirmatik + saygı koleksiyonu backfill
+  if(!d.zikr||typeof d.zikr!=='object') d.zikr=emptyZikrRoot();
+  if(!d.saygi||typeof d.saygi!=='object') d.saygi=emptySaygiRoot();
   if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
   if(!Array.isArray(d.library.books)) d.library.books=[];
   if(!d.library.goal||typeof d.library.goal!=='object') d.library.goal={dailyPages:20,yearlyBooks:null};
@@ -924,7 +1052,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, saygiKey:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false};
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -1206,6 +1334,8 @@ function saygiPeople(){ return (window.SaygiPeople&&Array.isArray(window.SaygiPe
 function saygiPositiveMod(n,m){ return ((n%m)+m)%m; }
 function saygiPersonForDate(date){ var people=saygiPeople(); if(!people.length) return null; return people[saygiPositiveMod(diffDays(SAYGI_EPOCH,date||todayStr()),people.length)]; }
 function saygiCurrentPerson(){ return saygiPersonForDate(todayStr()); }
+function saygiPersonById(id){ var people=saygiPeople(); for(var i=0;i<people.length;i++){ if(people[i].id===id) return people[i]; } return null; }
+function saygiModalPerson(){ return (ui.saygiPersonOpen&&ui.saygiBrowseId?saygiPersonById(ui.saygiBrowseId):null)||saygiCurrentPerson(); }
 function saygiDayKey(person){ return String(todayStr())+'|'+String(person&&person.id||''); }
 function saygiCacheKey(lang,canonical,revision){ return SAYGI_CACHE_PREFIX+String(lang||'tr')+':'+encodeURIComponent(String(canonical||''))+':'+String(revision||'current'); }
 function saygiReadCache(key){
@@ -2282,7 +2412,7 @@ function musicStats(){ var M=ensureMusic(); var byKind={sarki:0,album:0,podcast:
 function allLyrics(){ var M=ensureMusic(),out=[]; M.items.forEach(function(x){ (x.quotes||[]).forEach(function(q){ out.push({itemId:x.id,title:x.title,emoji:x.emoji,artist:x.artist,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
 function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) return min+' dk'; var h=Math.floor(min/60),m=min%60; return h+' sa'+(m?' '+m+' dk':''); }
 // ---------- ortak UI parçaları ----------
-function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,#C88F4C,#E0B080)':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
+function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,var(--watch),color-mix(in srgb,var(--watch) 72%,#E0B080))':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,var(--listen))':(accent==='zikr')?'linear-gradient(135deg,var(--zikr),var(--zikr2))':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':(accent==='zikr')?'0 6px 14px var(--zikr-glow)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
 function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
 function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;color:'+(on?'#F2B65A':'var(--faint)')+';opacity:'+(on?'1':'0.45')+';display:inline-flex;">'+icon('star',size)+'</button>'; } h+='</div>'; return h; }
 function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:9.5px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:9px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
@@ -2705,17 +2835,30 @@ App.profileAcceptConsent=function(){
   save();
   render();
 };
-App.refreshSaygi=function(){ var person=saygiCurrentPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
+App.refreshSaygi=function(){ var person=saygiModalPerson(); if(!person) return; saygiLoadArticle(person,true); render(); };
 App.openSaygiReading=function(){ App.openReading(); };
 App.openSaygiPreview=function(){
   var person=saygiCurrentPerson(); if(!person) return;
+  ui.saygiBrowseId=person.id;
   ui.saygiPersonOpen=true;
   if(!ui.saygiArticle||ui.saygiLoading){ App.refreshSaygi(); }
   else { render(); }
 };
-App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } render(); };
+App.openSaygiCollectionPerson=function(id){
+  var person=saygiPersonById(id); if(!person) return;
+  var key=saygiDayKey(person);
+  ui.saygiBrowseId=person.id; ui.saygiPersonOpen=true; ui.saygiReadReady=false;
+  if(ui.saygiKey!==key||!ui.saygiArticle){ ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; saygiLoadArticle(person,false); }
+  render();
+};
+App.browseSaygiPerson=function(delta){
+  var people=saygiPeople(), person=saygiModalPerson(); if(!people.length||!person) return;
+  var idx=people.findIndex(function(x){ return x.id===person.id; }); if(idx<0) idx=0;
+  App.openSaygiCollectionPerson(people[saygiPositiveMod(idx+(Number(delta)||0),people.length)].id);
+};
+App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; ui.saygiBrowseId=null; if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } render(); };
 App.markSaygiRead=function(){
-  var person=saygiCurrentPerson(), article=ui.saygiArticle;
+  var person=saygiModalPerson(), article=ui.saygiArticle;
   if(!person||!article||article.dailyKey!==saygiDayKey(person)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
   if(!ui.saygiReadReady&&!saygiHasRead(person)){ toast('Önce yazının sonuna kadar inelim; “Okudum” orada açılacak.'); return; }
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
@@ -2733,6 +2876,7 @@ App.markSaygiRead=function(){
   };
   day.reading.entries.push(entry);
   state.personId=person.id; state.readingEntryId=entry.id; state.readAt=entry.ts; day.savedAt=entry.ts;
+  try{ saygiMarkRead(person); }catch(e){}
   syncDerivedHabits(day); save(); haptic([10,24,10]); render();
   toast('Okudum kaydedildi · Zihnimi besledim tiki de seninle yeşerdi.',2800);
 };
@@ -2997,6 +3141,128 @@ App.saveLyric=function(){ if(!ui.lyricDraft) return; var x=findTrack(ui.lyricDra
 App.removeLyric=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var i=x.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ x.quotes.splice(i,1); commit('Söz silindi'); } };
 App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var q=x.quotes.find(function(z){return z&&z.id===qid;}); if(!q) return; App.copyQuote('“'+q.text+'”\n— '+x.title+(x.artist?', '+x.artist:'')); };
 
+// ================= İLHAM & İBADET: ZİKİRMATİK (Faz 35) =================
+var _zikrAudio=null;
+function zikrTickSound(){
+  if(!ensureZikrRoot().settings.soundOn) return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    if(!_zikrAudio) _zikrAudio=new AC();
+    if(_zikrAudio.state==='suspended') _zikrAudio.resume();
+    var o=_zikrAudio.createOscillator(), g=_zikrAudio.createGain();
+    o.type='sine'; o.frequency.value=660;
+    g.gain.setValueAtTime(0.06,_zikrAudio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001,_zikrAudio.currentTime+0.09);
+    o.connect(g); g.connect(_zikrAudio.destination);
+    o.start(); o.stop(_zikrAudio.currentTime+0.09);
+  }catch(e){}
+}
+var _zikrCompleteFlash=false;
+App.openZikr=function(){ ui.zikrOpen=true; ui.zikrView='counter'; _zikrCompleteFlash=false; render(); };
+App.closeZikr=function(){ ui.zikrOpen=false; _zikrCompleteFlash=false; render(); };
+App.setZikrView=function(v){ ui.zikrView=v; render(); };
+App.zikrTap=function(){
+  var r=zikrTouchTick(); if(!r) return;
+  zikrTickSound();
+  if(ensureZikrRoot().settings.haptic){ try{ haptic([8]); }catch(e){} }
+  var spark=false;
+  if(r.doneNow){
+    spark=true;
+    _zikrCompleteFlash=true;
+    if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
+    toast('Mâşallah · '+r.preset.name+' tamamlandı ('+r.target+')',2300);
+    if(ensureZikrRoot().settings.autoAdvance){
+      var z=ensureZikrRoot();
+      var idx=0; for(var i=0;i<z.presets.length;i++){ if(z.presets[i].id===r.preset.id){ idx=i; break; } }
+      var next=z.presets[idx+1]||z.presets[0];
+      z.settings.activePresetId=next.id;
+      setTimeout(function(){ toast('Sıradaki: '+next.name+' ('+next.target+')',2000); },900);
+    }
+  }
+  save();
+  render();
+  if(spark){ setTimeout(function(){ _zikrCompleteFlash=false; },1200); }
+};
+App.zikrUndo=function(){
+  var date=todayStr(), day=zikrDay(date), p=zikrActivePreset(); if(!p) return;
+  var cur=day.perPreset[p.id]||0;
+  if(cur>0){
+    if(p.target>0&&cur%p.target===0) day.completedSets=Math.max(0,day.completedSets-1);
+    day.perPreset[p.id]=cur-1; day.totalCount=Math.max(0,day.totalCount-1); day.lastAt=new Date().toISOString();
+    syncZikrDayMirror(date,day);
+  }
+  save(); render();
+};
+App.setZikrPreset=function(id){ ensureZikrRoot().settings.activePresetId=id; ui.zikrView='counter'; save(); render(); };
+App.setZikrPresetFilter=function(el){ ui.zikrPresetFilter=String(el&&el.value||''); render(); };
+App.toggleZikrSetting=function(k){ var z=ensureZikrRoot(); z.settings[k]=!z.settings[k]; save(); render(); };
+App.openZikrPresetAdd=function(){ ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrView='presets'; render(); };
+App.onZikrPresetField=function(f,el){ if(!ui.zikrPresetDraft) ui.zikrPresetDraft={name:'',target:'100'}; ui.zikrPresetDraft[f]=el.value; };
+App.saveZikrPreset=function(){
+  var d=ui.zikrPresetDraft||{}; var name=String(d.name||'').trim(); if(!name){ toast('Preset adını yaz'); return; }
+  var tgt=parseInt(d.target,10); if(isNaN(tgt)||tgt<1) tgt=100;
+  var z=ensureZikrRoot();
+  var id='z_'+Date.now().toString(36);
+  z.presets.push({id:id,name:name.slice(0,60),phrase:name.slice(0,80),target:Math.min(1000,tgt),color:'zikr',favorite:false,createdAt:new Date().toISOString()});
+  z.settings.activePresetId=id; ui.zikrPresetDraft=null; ui.zikrView='counter'; save(); render();
+  toast('Preset eklendi 🌿');
+};
+App.deleteZikrPreset=function(id){
+  var z=ensureZikrRoot();
+  if(z.presets.length<=1){ toast('En az bir preset kalmalı'); return; }
+  var i=z.presets.findIndex(function(p){ return p.id===id; }); if(i<0) return;
+  if(z.presets[i].builtIn){ toast('Hazır zikirler ve Esmâ presetleri korunur; favoriye ekleyebilirsin.'); return; }
+  z.presets.splice(i,1);
+  if(z.settings.activePresetId===id) z.settings.activePresetId=z.presets[0].id;
+  save(); render();
+};
+App.toggleZikrFavorite=function(id){ var p=zikrPreset(id); if(!p) return; p.favorite=!p.favorite; save(); render(); };
+App.zikrResetToday=function(){
+  var date=todayStr(), day=zikrDay(date);
+  day.totalCount=0; day.completedSets=0; day.perPreset={};
+  day.lastAt=null; syncZikrDayMirror(date,day);
+  save(); render();
+  toast('Bugünkü sayaç sıfırlandı');
+};
+
+// ================= İLHAM & İBADET: KIBLE (Faz 38) =================
+function qiblaBearing(lat,lon){
+  // Kaaba: 21.4225°N, 39.8262°E — great-circle initial bearing
+  var kl=21.4225*Math.PI/180, kn=39.8262*Math.PI/180;
+  var la=lat*Math.PI/180, lo=lon*Math.PI/180;
+  var y=Math.sin(kn-lo)*Math.cos(kl);
+  var x=Math.cos(la)*Math.sin(kl)-Math.sin(la)*Math.cos(kl)*Math.cos(kn-lo);
+  var br=Math.atan2(y,x)*180/Math.PI;
+  return Math.round((br+360)%360);
+}
+
+// ================= İLHAM & İBADET: RAPOR (Faz 40) =================
+function faithWeekKPIs(date){
+  date=date||todayStr();
+  var prays=0, cong=0, made=0, late=0, nafile=0, days=0;
+  for(var i=0;i<7;i++){
+    var d=addDays(date,-i), rec=data.days[d];
+    if(!rec||!rec.prayer) continue; days++;
+    PRAYER_ORDER.forEach(function(k){ var e=rec.prayer[k]; if(!e) return; if(e.performed){ prays++; if(e.inCongregation)cong++; if(e.late)late++; if(e.madeUp)made++; } nafile+=Math.max(0,Number(e.nafile)||0); });
+  }
+  var z=zikrWeek(date);
+  return {prays:prays,maxPrays:days*6,cong:cong,madeUp:made,late:late,nafile:nafile,zikrTotal:z.total,zikrDays:z.days};
+}
+function faithDayHeat(date){
+  var rec=data&&data.days&&data.days[date], performed=0;
+  if(rec&&rec.prayer) PRAYER_ORDER.forEach(function(k){ if(rec.prayer[k]&&rec.prayer[k].performed) performed++; });
+  var z=data&&data.zikr&&data.zikr.sessions&&data.zikr.sessions[date], sets=z&&Number(z.completedSets)||0, total=z&&Number(z.totalCount)||0;
+  var level=performed===0?0:(performed<=2?1:(performed<=4?2:3));
+  if(sets>0||total>0) level=Math.min(4,Math.max(1,level+1));
+  return {performed:performed,zikr:total,sets:sets,level:level};
+}
+App.setFaithTab=function(tab){ ui.faithTab=tab||'oz'; render(); };
+App.faithHeatYear=function(delta){
+  var nowY=new Date().getFullYear(), startY=+(data&&data.startDate?String(data.startDate).slice(0,4):nowY);
+  var y=+(ui.faithHeatYear||nowY)+delta; ui.faithHeatYear=Math.max(startY,Math.min(nowY,y)); render();
+};
+App.openFaithHeatDay=function(date){ App.heatOpen(date); };
+
 // ================= KURS & PRATİK (Zihin-Beden Beslenmesi) =================
 App.openSoulActivity=function(type){
   ui.soulActivityOpen=true;
@@ -3073,6 +3339,11 @@ App.setPrayerMethod=function(method){
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
   data.settings.prayer.method=PRAYER_METHODS.hasOwnProperty(method)?method:'diyanet';
   save(); render(); App.refreshPrayerTimes();
+};
+App.adjustHijriOffset=function(delta){
+  var s=prayerSettings(), next=Math.max(-2,Math.min(2,(Number(s.hijriOffset)||0)+(Number(delta)||0)));
+  s.hijriOffset=next; save(); render();
+  toast('Hicri tarih ayarı '+(next===0?'varsayılana döndü':(next>0?'+'+next:next)+' gün'));
 };
 App.refreshPrayerTimes=function(force){
   var d=todayStr();
@@ -3674,7 +3945,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.saygiPersonOpen?'saygiPerson':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))))));
+  var curOverlay=ui.saygiPersonOpen?'saygiPerson':(ui.zikrOpen?'zikr':(ui.qiblaOpen?'qibla':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))))))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):null));
 
   var _painted=false;
@@ -8039,7 +8310,17 @@ function saygiSourceCardHTML(article,link,isWiki){
 function saygiReadButtonHTML(person,done,suffix){
   suffix=suffix||'';
   var ready=!!ui.saygiReadReady, disabled=!done&&!ready, main=done?'Okudum':(ready?'Okudum':'Okudum kilitli'), sub=done?'Ne okudum kaydını aç':(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır');
-  return '<div id="saygi-read-sentinel'+suffix+'" class="saygi-read-sentinel" aria-hidden="true"></div><div class="saygi-finish-card">'
+  return '<div id="saygi-read-sentinel'+suffix+'" class="saygi-read-sentinel" aria-hidden="true"></div>'+saygiReadActionHTML(done,suffix,disabled,main,sub);
+}
+function saygiReadActionHTML(done,suffix,disabled,main,sub){
+  suffix=suffix||'';
+  var ready=!!ui.saygiReadReady;
+  if(main==null){
+    disabled=!done&&!ready;
+    main=done?'Okudum':(ready?'Okudum':'Okudum kilitli');
+    sub=done?'Ne okudum kaydını aç':(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır');
+  }
+  return '<div class="saygi-finish-card">'
     +'<div class="saygi-finish-orbit">'+icon(done?'circle-check':'book-open',22)+'</div><div class="saygi-finish-copy"><div>Bugünün düşüncesi burada tamamlandı.</div><small>Bu biyografiyi okuduysan kaydını bugüne ekleyelim.</small></div></div>'
     +'<button id="saygi-read-button'+suffix+'" class="saygi-read-button'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'">'
     +'<span class="saygi-read-button-icon">'+icon(done?'circle-check':'book-open',19)+'</span><span><strong data-saygi-read-copy>'+main+'</strong><small data-saygi-read-sub>'+sub+'</small></span></button>';
@@ -8169,10 +8450,20 @@ function faithCornerOverlayHTML(){
   var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
   var s=prayerDaySummary(p), streak=prayerStreak();
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">İman Köşesi '+icon('mosque',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugünün vakitleri, kılındı/cemaat/kaza/geç/nafile takibi.</div></div><button onclick="App.closeFaithCorner()" style="border:none;background:color-mix(in srgb,var(--faith) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  // Kıble butonu (Faz 38)
+  head+='<div style="display:flex;gap:7px;"><button onclick="App.openQibla()" style="border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;font-size:11.5px;font-weight:800;color:var(--faith);background:color-mix(in srgb,var(--faith) 13%,transparent);">'+icon('compass',13)+' Kıble</button></div>';
   var body='';
+  // Faz 36 — Sonraki vakit geri sayım
+  var nx=nextPrayerInfo(times);
+  if(nx.key){ var remPct=nx.remMin!=null?Math.max(0,Math.min(100,100-Math.round(nx.remMin/(1440/100)))):0;
+    body+='<div class="sg-faith-next"><div class="nm">'+icon('clock',14)+' Sonraki: '+esc(nx.name)+'</div><div class="cd">'+esc(nx.label)+'</div></div>';
+    body+='<div class="sg-faith-next-bar"><i style="width:'+remPct+'%;"></i></div>';
+  }
   // Konum / şehir seçimi
   body+='<div class="sg-faith-city">'+icon('map-pin',14)+'<select onchange="App.setPrayerCity(this.value)">'+prayerCityOptionsHTML(loc&&loc.cityName)+'</select><button onclick="App.fetchPrayerLocationGPS()" style="border:none;background:transparent;cursor:pointer;color:var(--faith);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;">'+icon('compass',14)+'</button></div>';
-  // Günlük özet
+  // Günlük özet — hicri + mübarek rozet (Faz 37)
+  var hijri=hijriTodayStr(), kand=kandilBadgeFor(date), hoff=(prayerSettings()&&Number(prayerSettings().hijriOffset))||0;
+  body+='<div class="sg-hijri-row"><span>🌙 '+esc(hijri)+(hoff?' · '+(hoff>0?'+':'')+hoff+' gün':'')+'</span>'+(kand?'<span class="kandil">'+icon('sparkles',10)+' '+esc(kand)+'</span>':'')+'<span class="sg-hijri-adjust"><button onclick="App.adjustHijriOffset(-1)" '+(hoff<=-2?'disabled':'')+' aria-label="Hicri tarihi bir gün geri al">−</button><button onclick="App.adjustHijriOffset(1)" '+(hoff>=2?'disabled':'')+' aria-label="Hicri tarihi bir gün ileri al">+</button></span></div>';
   body+='<div class="sg-faith-summary"><strong>'+s.performed+'/6 vakit</strong><span>· '+s.congregation+' cemaat · '+s.madeUp+' kaza · '+s.late+' geç · '+s.nafile+' nafile</span>'+(streak?'<span style="margin-left:auto;font-weight:800;color:var(--faith);">'+streak+' gün seri</span>':'')+'</div>';
   // Vakit satırları
   body+='<div style="display:flex;flex-direction:column;gap:6px;">';
@@ -8186,7 +8477,177 @@ function faithCornerOverlayHTML(){
 }
 
 function saygiPreviewHubHTML(person,article,done){
-  return '<div class="saygi-preview-hub">'+saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+'</div>';
+  var tab=ui.faithTab||'oz', body='';
+  if(tab==='oncu') body=saygiPreviewCardHTML(person,done,article)+saygiCollectionCardHTML(person);
+  else if(tab==='iman') body=faithCornerCardHTML();
+  else if(tab==='zikir') body=zikrPreviewCardHTML();
+  else if(tab==='rapor') body=faithRaporCardHTML();
+  else body=saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+zikrPreviewCardHTML();
+  return '<div class="saygi-preview-hub"><div class="sg-faith-tabs">'+segTabs([['oz','Öz'],['oncu','Öncü'],['iman','İman'],['zikir','Zikir'],['rapor','Rapor']],tab,'App.setFaithTab','faith')+'</div>'+body+'</div>';
+}
+function zikrPreviewCardHTML(){
+  var z=ensureZikrRoot(), p=zikrActivePreset(), day=zikrDay(todayStr());
+  var count=day.perPreset[p.id]||0, pct=p.target>0?Math.min(100,Math.round(count/p.target*100)):0;
+  var done=zikrPresetDone(todayStr(),p), streak=zikrStreak();
+  var h='<div class="sg-faith-preview-card'+(done?' is-done':'')+'" onclick="App.openZikr()" role="button" aria-label="Zikirmatik aç" style="border-left:4px solid var(--zikr);">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">';
+  h+='<div style="display:flex;align-items:center;gap:10px;">';
+  h+='<span style="width:40px;height:40px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:var(--zikr);background:color-mix(in srgb,var(--zikr) 15%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--zikr) 22%,transparent);">'+icon('sparkles',20)+'</span>';
+  h+='<div><div style="font-size:15px;font-weight:800;color:var(--text);">Zikirmatik</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+esc(p.name)+' · '+count+'/'+p.target+'</div></div>';
+  h+='</div>';
+  h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:22px;font-weight:800;color:var(--zikr);font-variant-numeric:tabular-nums;line-height:1;">'+count+'</div>'+(streak?'<div style="font-size:10px;font-weight:800;color:var(--faith2);margin-top:2px;">'+streak+' 🔥</div>':'')+'</div>';
+  h+='</div>';
+  h+='<div style="height:6px;border-radius:999px;background:var(--icon);overflow:hidden;margin-top:9px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,var(--zikr),var(--zikr2));transition:width .35s;"></div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--muted);"><span>Bugün '+day.totalCount+' zikir</span><span style="color:'+(done?'var(--ok)':'var(--zikr)')+';font-weight:800;">'+(done?'✓ '+(p.target)+' tamam':'Devam et')+'</span></div>';
+  h+='</div>';
+  return h;
+}
+function zikroverlayHTML(){
+  var z=ensureZikrRoot(), p=zikrActivePreset(), view=ui.zikrView||'counter';
+  var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;color:var(--zikr);display:flex;align-items:center;gap:8px;">'+icon('sparkles',19)+' Zikirmatik</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Ritmik odak — ritm, nefes, niyet.</div></div><button onclick="App.closeZikr()" style="border:none;background:color-mix(in srgb,var(--zikr) 16%,transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
+  head+=segTabs([['counter','Sayaç'],['presets','Presetler'],['stats','Özet']],view,'App.setZikrView','zikr');
+  var body='';
+  if(view==='counter'){
+    var day=zikrDay(todayStr()), count=day.perPreset[p.id]||0, target=p.target;
+    var isCountdown=p.countDirection==='down', cycleCount=target>0?count%target:count;
+    var cycleProgress=target>0?(count>0&&cycleCount===0?target:cycleCount):count, pct=target>0?Math.min(100,cycleProgress/target*100):0;
+    var displayCount=isCountdown?(count>0&&cycleCount===0?0:Math.max(0,target-cycleCount)):count;
+    var R=88, C=2*Math.PI*R;
+    var off=C*(1-pct/100);
+    body+='<div class="zikr-phrase">'+esc(p.phrase||p.name)+'</div>';
+    if(p.kind==='esma') body+='<div class="zikr-esma-name">'+esc(p.name)+' · Ebced hedefi '+target+'</div>';
+    body+='<div class="zikr-stage" onclick="App.zikrTap()" role="button" aria-label="Say">';
+    body+='<div class="halo"></div><div class="ringbg"></div>';
+    body+='<svg width="236" height="236"><circle cx="118" cy="118" r="'+R+'" fill="none" stroke="var(--icon)" stroke-width="10"/><circle cx="118" cy="118" r="'+R+'" fill="none" stroke="url(#zikrg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="transition:stroke-dashoffset .28s ease;"/><defs><linearGradient id="zikrg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--zikr)"/><stop offset="1" stop-color="var(--zikr2)"/></linearGradient></defs></svg>';
+    body+='<div class="core"><div class="count">'+displayCount+'</div><div class="tgt">'+(isCountdown?'kaldı · '+count+' okundu':'/ '+target)+'</div></div>';
+    body+='<div class="zikr-done-spark'+( _zikrCompleteFlash?' on':'')+'"><div style="font-size:44px;color:var(--faith2);text-shadow:0 0 24px color-mix(in srgb,var(--faith2) 55%,transparent);">✦</div></div>';
+    body+='</div>';
+    body+='<div class="zikr-niyet">'+esc(ZIKR_NIYET[p.id]||(p.kind==='esma'?'Bu güzel isimle dua ederken anlamına yönel.':'Niyet kalpten gelir.'))+'</div>';
+    if(p.kind==='esma') body+='<div class="zikr-ebced-note">Sayaç geri sayar. Hedef, ekranda görülen Arapça yazımın asıl ebced değeridir; sembolik bir gelenektir.</div>';
+    // Hızlı aksiyonlar
+    body+='<div style="display:flex;gap:8px;justify-content:center;margin-top:4px;">';
+    body+='<button onclick="App.zikrUndo()" class="zikr-chip">−1 Geri al</button>';
+    body+='<button onclick="App.zikrResetToday()" class="zikr-chip" style="color:var(--drop);">Sıfırla</button>';
+    body+='</div>';
+    // Preset seçici (yatay chip)
+    body+='<div style="display:flex;gap:6px;overflow-x:auto;padding:4px 2px;margin-top:6px;">';
+    z.presets.filter(function(x){ return x.id===p.id||x.favorite||x.kind==='core'; }).forEach(function(x){ body+='<button class="zikr-chip'+(x.id===p.id?' on':'')+'" onclick="App.setZikrPreset(\''+esc(x.id)+'\')">'+esc(x.name)+'</button>'; });
+    body+='</div>';
+    // Ayar toggles
+    body+='<div style="display:flex;flex-direction:column;gap:7px;margin-top:8px;">';
+    body+='<button class="zikr-toggle" onclick="App.toggleZikrSetting(\'soundOn\')"><span>Ses efekti</span><span style="color:'+(z.settings.soundOn?'var(--ok)':'var(--faint)')+'">'+(z.settings.soundOn?'Açık':'Kapalı')+'</span></button>';
+    body+='<button class="zikr-toggle" onclick="App.toggleZikrSetting(\'haptic\')"><span>Titreşim</span><span style="color:'+(z.settings.haptic?'var(--ok)':'var(--faint)')+'">'+(z.settings.haptic?'Açık':'Kapalı')+'</span></button>';
+    body+='<button class="zikr-toggle" onclick="App.toggleZikrSetting(\'autoAdvance\')"><span>Otomatik ilerleme</span><span style="color:'+(z.settings.autoAdvance?'var(--ok)':'var(--faint)')+'">'+(z.settings.autoAdvance?'Açık':'Kapalı')+'</span></button>';
+    body+='</div>';
+  } else if(view==='presets'){
+    var filter=String(ui.zikrPresetFilter||'').trim().toLocaleLowerCase('tr-TR');
+    var visible=z.presets.filter(function(x){ return !filter||String(x.name+' '+(x.phrase||'')+' '+(x.target||'')).toLocaleLowerCase('tr-TR').indexOf(filter)>=0; });
+    body+='<div class="zikr-library-head"><div><strong>Hazır zikirler + 99 Esmâ</strong><small>'+(z.presets.filter(function(x){return x.kind==='esma';}).length)+' Esmâ · ebced hedefli geri sayım</small></div><input value="'+esc(ui.zikrPresetFilter||'')+'" onchange="App.setZikrPresetFilter(this)" placeholder="İsim veya hedef ara" aria-label="Preset ara"></div>';
+    body+='<div style="display:flex;flex-direction:column;gap:9px;">';
+    visible.forEach(function(x){
+      var day=zikrDay(todayStr()), c=day.perPreset[x.id]||0, done=(x.target>0&&c>=x.target);
+      body+='<div class="zikr-preset'+(x.id===p.id?' on':'')+'" style="'+(x.id===p.id?'border-left-width:5px;box-shadow:0 0 18px color-mix(in srgb,var(--zikr) 18%,transparent);':'')+'background:linear-gradient(135deg,color-mix(in srgb,var(--zikr) 8%,var(--card)) 0%,var(--card) 65%);">';
+      body+='<div class="meta"><div class="name">'+esc(x.name)+(x.favorite?' ' +icon('star',11):'')+(x.kind==='esma'?'<span class="zikr-esma-badge">Esmâ '+String(x.id).slice(-2)+'</span>':'')+'</div><div class="sub">'+esc(x.phrase||'')+' · '+(x.kind==='esma'?'ebced ':'hedef ')+x.target+(done?' · bugün tamam ✓':'')+'</div></div>';
+      body+='<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;">';
+      if(x.id!==p.id) body+='<button onclick="App.setZikrPreset(\''+esc(x.id)+'\')" class="zikr-chip" style="font-size:11px;padding:6px 11px;">Seç</button>';
+      body+='<div style="display:flex;gap:4px;">';
+      body+='<button onclick="App.toggleZikrFavorite(\''+esc(x.id)+'\')" aria-label="Favori" style="border:none;background:none;cursor:pointer;color:'+(x.favorite?'var(--faith2)':'var(--faint)')+';font-size:14px;">★</button>';
+      if(!x.builtIn&&z.presets.length>1) body+='<button onclick="App.deleteZikrPreset(\''+esc(x.id)+'\')" aria-label="Sil" style="border:none;background:none;cursor:pointer;color:var(--drop);font-size:14px;">✕</button>';
+      body+='</div></div>';
+      body+='</div>';
+    });
+    if(!visible.length) body+='<div class="zikr-empty-search">Bu aramada eşleşen bir zikir bulunamadı.</div>';
+    body+='</div>';
+    body+='<div class="zikr-ebced-method">Ebced yöntemi: '+esc(window.EsmaulHusnaV1&&window.EsmaulHusnaV1.method||'asıl ebced')+'. Değerler dua için zorunlu sayı değil, geleneksel harf toplamıdır.</div>';
+    // Yeni preset ekle
+    if(ui.zikrPresetDraft){
+      body+='<div style="margin-top:12px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--card-bd);display:flex;flex-direction:column;gap:10px;">';
+      body+='<input value="'+esc(ui.zikrPresetDraft.name||'')+'" oninput="App.onZikrPresetField(\'name\',this)" placeholder="Preset adı (örn. Hasbünallâh)" style="padding:10px 12px;border-radius:12px;border:1px solid var(--field-bd);background:var(--field);font-size:14px;">';
+      body+='<input value="'+esc(ui.zikrPresetDraft.target||'100')+'" type="number" inputmode="numeric" oninput="App.onZikrPresetField(\'target\',this)" placeholder="Hedef sayı" style="padding:10px 12px;border-radius:12px;border:1px solid var(--field-bd);background:var(--field);font-size:14px;">';
+      body+='<div style="display:flex;gap:8px;"><button onclick="App.saveZikrPreset()" class="zikr-fab" style="flex:1;">Kaydet</button><button onclick="App.setZikrView(\'presets\');ui.zikrPresetDraft=null;render();" class="zikr-fab" style="background:var(--icon);color:var(--muted);box-shadow:none;">İptal</button></div>';
+      body+='</div>';
+    } else {
+      body+='<button onclick="App.openZikrPresetAdd()" class="zikr-fab" style="width:100%;margin-top:12px;">+ Yeni preset</button>';
+    }
+  } else { // stats
+    var day=zikrDay(todayStr()), w=zikrWeek(todayStr());
+    body+='<div style="display:flex;gap:9px;margin-bottom:8px;">';
+    body+='<div class="sg-faith-kpi" style="flex:1;"><div style="font-size:11px;font-weight:700;color:var(--faint);">Bugün</div><div style="font-size:24px;font-weight:800;color:var(--zikr);">'+day.totalCount+'</div><div style="font-size:10.5px;color:var(--muted);">'+day.completedSets+' set</div></div>';
+    body+='<div class="sg-faith-kpi" style="flex:1;"><div style="font-size:11px;font-weight:700;color:var(--faint);">Hafta</div><div style="font-size:24px;font-weight:800;color:var(--faith);">'+w.total+'</div><div style="font-size:10.5px;color:var(--muted);">'+ (w.days)+' gün</div></div>';
+    body+='<div class="sg-faith-kpi" style="flex:1;"><div style="font-size:11px;font-weight:700;color:var(--faint);">Seri</div><div style="font-size:24px;font-weight:800;color:var(--kandil);">'+zikrStreak()+'</div><div style="font-size:10.5px;color:var(--muted);">gün</div></div>';
+    body+='</div>';
+    body+='<div class="sg-insight">Nefes aldıkça bir say, kalpten bir niyet. Ritm kendi kendine yerleşir, sen sadece dokun 🦩</div>';
+  }
+  return '<div id="sey-ov-back" class="sey-faith-ov-back sey-zikr-ov-back" onclick="App.closeZikr()" style="position:fixed;inset:0;z-index:345;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sey-zikr-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:480px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
+}
+function saygiCollectionCardHTML(person){
+  var coll=saygiCollection(), read=saygiReadCount(), streak=saygiStreak(), total=saygiPeople().length;
+  var bilim=0, sanat=0;
+  saygiPeople().forEach(function(x){ if(coll[x.id]){ if(x.kind==='Sanat') sanat++; else bilim++; } });
+  var nudge='';
+  if(read>=6){
+    var totalRead=bilim+sanat;
+    if(totalRead>0 && bilim/totalRead>0.72) nudge='Ağırlık bilimde ('+bilim+') — biraz sanat da keşfet 🎨';
+    else if(totalRead>0 && sanat/totalRead>0.72) nudge='Ağırlık sanatta ('+sanat+') — biraz bilim de keşfet 🔬';
+  }
+  var h='<div class="sg-collect">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
+  h+='<div style="font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;">'+icon('trophy',15)+' 100 Öncü Koleksiyonu</div>';
+  h+='<div class="streak">'+(streak?streak+' gün seri':'&nbsp;')+'</div>';
+  h+='</div>';
+  h+='<div class="sg-collect-grid">';
+  var todayId=person&&person.id;
+  saygiPeople().forEach(function(x,idx){ var r=coll[x.id], hcl=r?' read':''; if(x.id===todayId) hcl+=' todayd'; h+='<button class="d'+hcl+'" onclick="App.openSaygiCollectionPerson(\''+esc(x.id)+'\')" title="'+esc((idx+1)+'. '+x.name+(r?' · okundu':' · keşfedilmeyi bekliyor'))+'" aria-label="'+esc((idx+1)+'. '+x.name+(r?' okundu':' okunmadı')+' · biyografiyi aç')+'"><span>'+(r?'✓':(idx+1))+'</span></button>'; });
+  h+='</div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--muted);"><span>'+read+'/'+total+' okundu</span><span style="color:var(--faith2);font-weight:800;">'+(read>=total?'Tamamlandı 🌟':'Devam')+'</span></div>';
+  if(!read) h+='<div class="sg-collect-empty">Her kutu bir öncüyü temsil ediyor. Bugünün biyografisini “Okudum” diye kaydedince kutusu altın renkle dolacak.</div>';
+  if(nudge) h+='<div class="sg-nudge">'+esc(nudge)+'</div>';
+  h+='</div>';
+  return h;
+}
+function faithAnnualHeatmapHTML(){
+  var now=todayStr(), nowY=new Date().getFullYear(), startY=+(data&&data.startDate?String(data.startDate).slice(0,4):nowY);
+  var year=+(ui.faithHeatYear||nowY); year=Math.max(startY,Math.min(nowY,year)); ui.faithHeatYear=year;
+  var first=year+'-01-01', last=year+'-12-31', firstDow=(new Date(year,0,1).getDay()+6)%7;
+  var cells='', totals={days:0,prayers:0,zikr:0};
+  for(var blank=0;blank<firstDow;blank++) cells+='<span class="c blank" aria-hidden="true"></span>';
+  for(var d=first;d<=last;d=addDays(d,1)){
+    var f=faithDayHeat(d), future=d>now, tip=dateLabelTR(d)+' · '+f.performed+' vakit'+(f.zikr?' · '+f.zikr+' zikir':'');
+    if(f.performed||f.zikr){ totals.days++; totals.prayers+=f.performed; totals.zikr+=f.zikr; }
+    cells+='<button class="c'+(future?' future':'')+'" data-l="'+f.level+'" '+(future?'disabled':'onclick="App.openFaithHeatDay(\''+d+'\')"')+' title="'+esc(tip)+'" aria-label="'+esc(tip)+'"></button>';
+  }
+  var prev=year>startY, next=year<nowY;
+  var h='<section class="sg-faith-year">';
+  h+='<div class="sg-faith-year-head"><div><strong>'+year+' · Yıllık İbadet Isısı</strong><small>'+totals.days+' aktif gün · '+totals.prayers+' vakit · '+totals.zikr+' zikir</small></div><div><button '+(prev?'onclick="App.faithHeatYear(-1)"':'disabled')+' aria-label="Önceki yıl">‹</button><button '+(next?'onclick="App.faithHeatYear(1)"':'disabled')+' aria-label="Sonraki yıl">›</button></div></div>';
+  h+='<div class="sg-faith-year-scroll"><div class="sg-faith-months"><span>Oca</span><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span><span>Eki</span><span>Kas</span><span>Ara</span></div>';
+  h+='<div class="sg-faith-heat" role="grid" aria-label="'+year+' yıllık ibadet ısı haritası">'+cells+'</div></div>';
+  h+='<div class="sg-faith-legend"><span>Sakin</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>Yoğun</span></div>';
+  h+='<p>Renk, günün kılınan vakit sayısını; zikir kaydı varsa bir kademe daha güçlü ritmi gösterir. Bir güne dokununca gün ayrıntısı açılır.</p></section>';
+  return h;
+}
+function faithRaporCardHTML(){
+  var k=faithWeekKPIs(todayStr()), streak=zikrStreak();
+  var pct=k.maxPrays>0?Math.round(k.prays/k.maxPrays*100):0;
+  var h='<div class="sg-faith-hero sg-gradient-border sg-glow">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">';
+  h+='<div><div style="font-size:15px;font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+icon('bar-chart',16)+' Bu Haftanın İbadet Ritmi</div><div style="font-size:12px;color:var(--faint);margin-top:2px;">Vakit · cemaat · zikir · seri</div></div>';
+  h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:26px;font-weight:800;color:var(--faith);">%'+pct+'</div><div style="font-size:10px;color:var(--faint);">uyum</div></div>';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith);">'+k.prays+'/'+k.maxPrays+'</div><div style="font-size:10.5px;color:var(--faint);">vakit</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith2);">'+k.cong+'</div><div style="font-size:10.5px;color:var(--faint);">cemaat</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--zikr);">'+k.zikrTotal+'</div><div style="font-size:10.5px;color:var(--faint);">zikir</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--kandil);">'+(streak||0)+'</div><div style="font-size:10.5px;color:var(--faint);">seri</div></div>';
+  h+='</div>';
+  // Haftalık bar (7 gün) — performed count
+  h+='<div style="display:flex;align-items:flex-end;gap:5px;height:64px;margin-top:4px;">';
+  var max=1, vals=[];
+  for(var i=6;i>=0;i--){ var d=addDays(todayStr(),-i), rec=data.days[d]; var c=0; if(rec&&rec.prayer){ PRAYER_ORDER.forEach(function(k){ if(rec.prayer[k]&&rec.prayer[k].performed)c++; }); } vals.push(c); if(c>max) max=c; }
+  vals.forEach(function(v,i2){ var hp=max>0?Math.round(v/max*52)+6:6; var wd=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date(Date.parse(addDays(todayStr(),-6+i2))).getDay()]; h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">'+(v>0?'<span style="font-size:9px;font-weight:700;color:var(--faint);">'+v+'</span>':'')+'<div style="width:100%;max-width:24px;height:'+hp+'px;border-radius:6px;background:'+(v>0?'linear-gradient(180deg,var(--faith2),var(--faith))':'var(--icon)')+';transition:height .3s;"></div><span style="font-size:9px;color:'+(i2===6?'var(--faith)':'var(--faint)')+';font-weight:'+(i2===6?'800':'600')+';">'+wd+'</span></div>'; });
+  h+='</div>';
+  h+=faithAnnualHeatmapHTML();
+  h+='</div>';
+  return h;
 }
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
@@ -8195,11 +8656,72 @@ function saygiHTML(){
   saygiEnsureArticle(person);
   var article=ui.saygiArticle, done=saygiHasRead(person);
   var h='<section class="saygi-page">';
+  h+=spiritBarHTML();
   h+=saygiPreviewHubHTML(person,article,done);
   h+='</section>';
   return h;
 }
-function saygiArticleBodyHTML(person,article,done,wrapCls){
+function spiritBarHTML(){
+  var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
+  var p=ensurePrayerDay(day), times=prayerTimesFromDay(p), nx=nextPrayerInfo(times);
+  var hijri=hijriTodayStr();
+  var kandil=kandilBadgeFor(date);
+  var h='<div class="sg-spirit-bar sg-glass">';
+  h+='<span class="nnext">'+icon('mosque',13)+' '+esc(nx.name)+(nx.label?' · <strong>'+esc(nx.label)+'</strong>':'')+'</span>';
+  h+='<span class="dot">·</span>';
+  h+='<span class="hijri">🌙 '+esc(hijri)+'</span>';
+  if(kandil) h+='<span class="kandil">'+icon('sparkles',11)+' '+esc(kandil)+'</span>';
+  h+='</div>';
+  return h;
+}
+function hijriTodayStr(){
+  if(window.HijriCalendarV1&&window.HijriCalendarV1.todayStr) return window.HijriCalendarV1.todayStr(todayStr(),(prayerSettings()&&prayerSettings().hijriOffset)||0);
+  // Yedek — basit tablo-free (offsetli değil)
+  var d=new Date(); var mo=['Muharrem','Safer','Rebiülevvel','Rebiülâhir','Cemaziyelevvel','Cemaziyelâhir','Receb','Şaban','Ramazan','Şevval','Zilkade','Zilhicce'];
+  return mo[d.getMonth()]?mo[d.getMonth()]+' '+d.getDate():'';
+}
+function kandilBadgeFor(date){
+  if(window.HijriCalendarV1&&window.HijriCalendarV1.holyDay) return window.HijriCalendarV1.holyDay(date)||'';
+  return '';
+}
+function qiblaOverlayHTML(){
+  var loc=prayerLocation()||{lat:39.9255,lon:32.8663}; // Ankara yedek
+  var br=qiblaBearing(+loc.lat,+loc.lon), heading=Number(ui.qiblaHeading)||0, needle=(br-heading+360)%360;
+  var h='<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 4px;">';
+  h+='<div style="font-size:17px;font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+icon('compass',17)+' Kıble Yönü</div>';
+  h+='<div class="qibla-rose">';
+  h+='<div class="n">K</div>';
+  h+='<div class="needle" style="transform:rotate('+needle+'deg);">';
+  h+='<svg width="120" height="120" viewBox="0 0 100 100"><polygon points="50,8 43,58 50,50 57,58" fill="var(--faith)"/><circle cx="50" cy="50" r="3.2" fill="var(--text)"/></svg>';
+  h+='</div>';
+  h+='<div class="deg">'+br+'° kuzey-'+(br<=90?'doğu':(br<=180?'güney':'batı'))+'</div>';
+  h+='</div>';
+  h+='<div style="font-size:12.5px;color:var(--faint);text-align:center;line-height:1.45;">'+(ui.qiblaListening?'Canlı pusula açık · telefonu düz tutup yeşil oku üste hizala.':'Konumuna göre tahmini yön. Canlı pusula için sensör izni verebilirsin.')+'<br><span style="display:inline-flex;gap:7px;flex-wrap:wrap;justify-content:center;"><button onclick="App.fetchPrayerLocationGPS()" style="margin-top:9px;border:none;background:color-mix(in srgb,var(--faith) 14%,transparent);color:var(--faith);font-weight:800;font-size:12px;padding:8px 14px;border-radius:999px;cursor:pointer;">'+icon('map-pin',12)+' GPS</button><button onclick="App.enableQiblaCompass()" style="margin-top:9px;border:none;background:color-mix(in srgb,var(--faith) 14%,transparent);color:var(--faith);font-weight:800;font-size:12px;padding:8px 14px;border-radius:999px;cursor:pointer;">'+icon('compass',12)+' '+(ui.qiblaListening?'Pusula açık':'Canlı pusula')+'</button></span></div>';
+  h+='</div>';
+  return '<div id="sey-ov-back" class="sey-faith-ov-back" onclick="App.closeQibla()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:400px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:16px;font-weight:800;color:var(--text);">'+icon('compass',16)+' Kıble</div><button onclick="App.closeQibla()" style="border:none;background:color-mix(in srgb,var(--faith) 16%,transparent);cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button></div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+h+'</div></div></div>';
+}
+App.openQibla=function(){ ui.qiblaOpen=true; render(); };
+var _qiblaOrientationHandler=null, _qiblaLastPaint=0;
+App.enableQiblaCompass=function(){
+  function start(){
+    if(_qiblaOrientationHandler) return;
+    _qiblaOrientationHandler=function(e){
+      var hd=(typeof e.webkitCompassHeading==='number')?e.webkitCompassHeading:((typeof e.alpha==='number')?(360-e.alpha):null);
+      if(hd==null||isNaN(hd)||Date.now()-_qiblaLastPaint<120) return; _qiblaLastPaint=Date.now(); ui.qiblaHeading=hd; ui.qiblaListening=true; render();
+    };
+    try{ window.addEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.addEventListener('deviceorientation',_qiblaOrientationHandler,true); ui.qiblaListening=true; render(); }catch(e){ toast('Bu cihaz canlı pusulayı desteklemiyor.'); }
+  }
+  try{
+    if(window.DeviceOrientationEvent&&typeof window.DeviceOrientationEvent.requestPermission==='function'){
+      window.DeviceOrientationEvent.requestPermission().then(function(v){ if(v==='granted') start(); else toast('Pusula izni verilmedi.'); }).catch(function(){ toast('Pusula izni açılamadı.'); });
+    } else start();
+  }catch(e){ toast('Bu cihaz canlı pusulayı desteklemiyor.'); }
+};
+App.closeQibla=function(){
+  if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
+  ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; render();
+};
+function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){
   var heroLead=article.lead, first=article.blocks&&article.blocks[0]; if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90)) heroLead='';
   var h='';
   h+='<article class="'+(wrapCls||'saygi-article')+'">';
@@ -8212,16 +8734,17 @@ function saygiArticleBodyHTML(person,article,done,wrapCls){
   (article.links||[]).forEach(function(link){ h+=saygiSourceCardHTML(article,link,false); });
   h+='</div></section>';
   h+='<footer class="saygi-attribution"><span>'+icon('file-text',13)+'</span><span>Metin <a href="'+esc(article.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Wikipedia katkıda bulunanlarından</a> alınır; '+esc(article.licenseTitle)+' lisansı ile paylaşılır.</span><a href="'+esc(article.licenseUrl)+'" target="_blank" rel="noopener noreferrer" aria-label="Lisans ayrıntısı">'+icon('external-link',13)+'</a></footer>';
-  h+=saygiReadButtonHTML(person,done,article.suffix||'');
+  if(includeReadAction!==false) h+=saygiReadButtonHTML(person,done,article.suffix||'');
   h+='</article>';
   return h;
 }
 function saygiPersonModalHTML(){
-  var person=saygiCurrentPerson();
+  var person=saygiModalPerson();
   if(!person) return '';
   var article=ui.saygiArticle;
   var done=saygiHasRead(person);
-  var head='<div class="sg-person-ov-head"><div class="sg-person-ov-title"><span>'+icon('trophy',16)+'</span>Günün öncüsü</div><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+icon('x',16)+'</button></div>';
+  var people=saygiPeople(), personIndex=people.findIndex(function(x){ return x.id===person.id; });
+  var head='<div class="sg-person-ov-head"><div><div class="sg-person-ov-title"><span>'+icon('trophy',16)+'</span>'+esc(person.name)+'</div><small class="sg-person-ov-count">'+(personIndex+1)+' / '+people.length+' · Öncü koleksiyonu</small></div><div class="sg-person-ov-nav"><button onclick="App.browseSaygiPerson(-1)" aria-label="Önceki öncü">‹</button><button onclick="App.browseSaygiPerson(1)" aria-label="Sonraki öncü">›</button><button onclick="App.closeSaygiPerson()" aria-label="Kapat">'+icon('x',16)+'</button></div></div>';
   var body='';
   if(ui.saygiLoading||!article){
     body+='<div style="padding:18px 4px;">';
@@ -8230,9 +8753,11 @@ function saygiPersonModalHTML(){
     body+='</div>';
   } else {
     article=Object.create(article); article.suffix='-modal';
-    body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal');
+    body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal',false);
+    body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';
   }
-  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:520px;max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 28px;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';
+  var action='<div class="sg-person-ov-action">'+(article?saygiReadActionHTML(done,'-modal'):saygiReadActionHTML(false,'-modal',true,'Okudum',ui.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'))+'</div>';
+  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:520px;max-height:92vh;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 28px;display:flex;flex-direction:column;gap:14px;">'+body+'</div>'+action+'</div></div>';
 }
 function saygiUnlockReadButton(btn){
   if(!btn||btn.disabled===false&&ui.saygiReadReady) return;
@@ -8244,7 +8769,7 @@ function saygiUnlockReadButton(btn){
 function wireSaygiReadGate(sc,suffix){
   if(!sc) return;
   suffix=suffix||'';
-  var person=saygiCurrentPerson(), btn=document.getElementById('saygi-read-button'+suffix), sentinel=document.getElementById('saygi-read-sentinel'+suffix);
+  var person=suffix==='-modal'?saygiModalPerson():saygiCurrentPerson(), btn=document.getElementById('saygi-read-button'+suffix), sentinel=document.getElementById('saygi-read-sentinel'+suffix);
   if(!person||!btn||!sentinel||saygiHasRead(person)) return;
   function unlock(){ saygiUnlockReadButton(btn); if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } }
   if(sc.scrollHeight<=sc.clientHeight+32){ unlock(); return; }
@@ -8372,6 +8897,8 @@ function navHTML(){
     var date=todayStr(), day=getDay(data,date,dayIndexFor(date));
     var p=ensurePrayerDay(day), s=prayerDaySummary(p);
     if(s.performed<6) saygiPending++;
+    // Zikir: aktif preset hedefi henüz dolmadıysa manevi disiplin bekleniyor
+    if(!zikrDayCompleted(date)) saygiPending++;
   }catch(e){}
   var current=defs[0];
   for(var di=0;di<defs.length;di++){ if(defs[di][0]===ui.tab){ current=defs[di]; break; } }
@@ -8979,6 +9506,8 @@ function modalsHTML(){
   if(ui.soulActivityOpen){ h+=soulActivityOverlayHTML(); }
   if(ui.soulArchiveOpen){ h+=soulArchiveOverlayHTML(); }
   if(ui.faithOpen){ h+=faithCornerOverlayHTML(); }
+  if(ui.zikrOpen){ h+=zikroverlayHTML(); }
+  if(ui.qiblaOpen){ h+=qiblaOverlayHTML(); }
   if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){

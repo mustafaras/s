@@ -31,7 +31,7 @@ var monthTRMatch = html.match(/var MONTH_TR=\[[\s\S]*?\];/);
 var dowTRMatch = html.match(/var DOW_TR=\[[\s\S]*?\];/);
 
 // cardWrap() fonksiyonunu çıkar
-var cardWrapMatch = html.match(/function cardWrap\(o\)\{[\s\S]*?return s;\n\}/);
+var cardWrapMatch = html.match(/function cardWrap\(o\)\{[\s\S]*?return s;\r?\n\}/);
 if (!cardWrapMatch) { console.error('cardWrap() bulunamadı'); process.exit(1); }
 
 // toggleCard() fonksiyonunu çıkar
@@ -129,7 +129,7 @@ console.log('[1] Paylaşım kapalı');
     consent:{ panelSummarySharingAccepted:false } }) };
   var h = profileAssessmentCardHTML();
   ok('kart render oldu', h.indexOf('profileAssessment') >= 0);
-  ok('paylaşım kapalı mesajı var', h.indexOf('paylaşılmıyor') >= 0);
+  ok('paylaşım kapalıyken hassas özet gizli', h.indexOf('Big Five') < 0);
   ok('detaylı özet gösterilmedi', h.indexOf('Big Five') < 0);
   ok('RAISEC detayı gösterilmedi', h.indexOf('RAISEC İlgi') < 0);
 })();

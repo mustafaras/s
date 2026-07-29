@@ -15,9 +15,9 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
 **Hard rules — every agent, every session:**
 
 1. **NEVER open or serve+open the Şeyma app in a browser to "check it runs."**
-   Use the headless Node `vm` render harness instead (see "Verification" below
-   and `MEMORY.md`). Opening the app is the single most dangerous thing you can
-   do here.
+   Use the headless Node `vm` render harness instead — the `run-seyma` skill
+   (`.claude/skills/run-seyma/driver.mjs`; see "Verification" below). Opening
+   the app is the single most dangerous thing you can do here.
 2. If you *must* use a real browser, it now self-protects: `sync.js` **blocks
    all pushes from `localhost`/`127.0.0.1`/`file:`/`*.local`** (Guard 1) and
    **blocks any push whose day-count is lower than the remote** (Guard 2,
@@ -26,8 +26,9 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
    it if you *intend* to overwrite real data and have a backup.
 3. **Never write to `mustafaras/seyma-data` without explicit user consent.** It
    holds the only live copy of personal data. Reads are fine.
-4. **Always stop any local server you start** (`pkill -f http.server`) before
-   ending your turn.
+4. **Always stop any local server you start** (`pkill -f http.server` on
+   macOS/Linux; `Get-Process -Name python* | Stop-Process` or `Ctrl+C` in its
+   terminal on Windows) before ending your turn.
 
 **Recovery (if data is clobbered anyway):** No data is truly lost — restore it.
 The real data survives in (a) `seyma-data` git history — find the last
@@ -60,8 +61,9 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 
 ```
 index.html      Thin HTML shell. Loads styles.css, motivationProgramV2.js,
-                 app.js, sync.js with cache-busting `?v=YYYYMMDDx` query
-                 strings.
+                 motivationNarratives.js, saygiPeople.js,
+                 profileAssessmentV1.js, app.js, sync.js with cache-busting
+                 `?v=YYYYMMDDx` query strings. Registers sw.js.
 app.js           The entire Şeyma app (single IIFE, ~4.3k lines). Owns state,
                  rendering, and all feature logic.
 motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
@@ -71,8 +73,28 @@ motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
                  integration into app.js and panel.html is still in
                  progress (rollout plan lives in the untracked, local-only
                  `seyma_motivation_v2_package/` directory — don't commit it).
+motivationNarratives.js Standalone narrative content module
+                 (`window.MotivationNarratives`) for the program.
+saygiPeople.js   Frozen data module of 100 "günün öncüsü" inspirational
+                 figures (`window.SaygiPeople`) powering the Saygı /
+                 İlham & İbadet tab (daily figure, Wikipedia fetch,
+                 read-tracking).
+profileAssessmentV1.js Frozen, hand-authored data module: single-session
+                 174-item scientific profile assessment
+                 (`window.ProfileAssessmentV1`) — sessions, consent schema,
+                 instruments. Consumed by app.js's profile engine and merged
+                 across devices by sync.js's `SeySync.mergeProfileAssessment`.
+                 Do not hand-edit item content; it is versioned (`version`).
+hijriCalendar.js Standalone Hicri (Islamic) calendar module
+                 (`window.HijriCalendarV1`) — offset-based Miladi→Hicri
+                 conversion + mübarek gün (holy day) lookup, consumed by
+                 app.js's `hijriTodayStr`/`kandilBadgeFor`. User-adjustable
+                 ±2 day offset via `settings.prayer.hijriOffset` for local
+                 hilal (crescent) variance.
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
+                 Also owns conflict-merge helpers
+                 (`SeySync.mergeProfileAssessment`).
 panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  Independent app — does NOT share code with app.js. Fetches
                  data/latest.json from GitHub with its own token/localStorage
@@ -80,11 +102,31 @@ panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  data/observer-inbox.json / data/aeon-outbox.json.
 styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
+sw.js            Service worker (PWA install + notificationclick routing);
+                 manifest.json is the PWA manifest, aeon-icon-*.png the icons.
 GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  table (✅/🟡/❌) and the "teknik ilkeler" (technical
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
+SEYMA-V2-PLAN.md Living v2.0 redesign roadmap ("İçsel Pusula & Terapi
+                 Odası") — Turkish, checkbox-driven; complements
+                 GELISTIRME-PLANI.md.
+ILHAM-IBADET-GELISTIRME-PLANI.md  Living Turkish roadmap for the İlham &
+                 İbadet hub expansion (Faz 35+): Zikirmatik, kıble/pusula,
+                 hicri takvim, mübarek gün rozetleri, ibadet rapor sekmesi —
+                 complements GELISTIRME-PLANI.md.
+test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
+                 tests with mocked window/localStorage/fetch (no network).
+                 Run: `node test_faz10_sync.js`.
+test_faz11_panel.js  Headless Node harness for panel.html helper/render
+                 logic. Run: `node test_faz11_panel.js`.
+.claude/skills/run-seyma/  Data-safe headless verification skill — see
+                 "Verification" below. `driver.mjs` is the core app.js
+                 render harness; `zikr-harness.mjs` covers the İlham &
+                 İbadet hub (zikirmatik, kıble, hicri takvim, ibadet rapor).
+                 Both run app.js in `node:vm` with fetch/timers stubbed dead,
+                 so zero network calls are possible — nothing can be pushed.
 AGENTS.md        Parallel, tool-agnostic restatement of this file's rules
                  (same conventions, generic Agents-format doc). Keep both in
                  sync when a convention changes.
@@ -155,19 +197,26 @@ read files in bounded line ranges rather than in full.
 ## Verification
 
 There's no automated test suite or linter, but `node --check app.js` (or
-`sync.js`) catches JS syntax errors before you even open a browser. To
-validate a change beyond that:
+`sync.js`, `hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond
+that, **do not serve+open the app in a browser** (see "DATA SAFETY" above) —
+use the `run-seyma` skill's headless Node `vm` harnesses instead:
 
-- Serve the repo locally, e.g. `python3 -m http.server 8765`, then open
-  `http://localhost:8765/index.html` (and `/panel.html` if relevant) —
-  opening via `file://` can hit CORS issues on the GitHub API calls
-  sync.js/panel.html make. Exercise the affected flow manually, in **both
-  light and dark** theme.
-- Watch the browser console for errors.
+- `node .claude/skills/run-seyma/driver.mjs` — boots `app.js` twice
+  (onboarding + seeded state) and drives real interactions (tab switch,
+  card toggle, theme toggle), asserting on the rendered HTML. Add
+  `--dump <tabId>` to dump a tab's generated markup for inspection.
+- `node .claude/skills/run-seyma/zikr-harness.mjs` — same approach for the
+  İlham & İbadet hub (zikirmatik, kıble, hicri takvim, ibadet rapor).
+- `panel.html` shares no code with `app.js`, so neither harness covers it;
+  verify it with the syntax/script-tag-balance check documented in
+  `.claude/skills/run-seyma/SKILL.md`, or read the diff carefully.
 - If the change touches synced/persisted data, confirm `migrate()` still
   produces a valid object from an old (pre-change) save, and that the panel
-  renders the new field sensibly (or at least doesn't break) when it's
+  would render the new field sensibly (or at least not break) when it's
   absent.
+
+`.claude/skills/run-seyma/SKILL.md` has the full harness details, gotchas
+(why timers/fetch/DOMParser are stubbed dead), and a troubleshooting table.
 
 ## Git / deploy
 

@@ -30,8 +30,9 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
    it if you *intend* to overwrite real data and have a backup.
 3. **Never write to `mustafaras/seyma-data` without explicit user consent.** It
    holds the only live copy of personal data. Reads are fine.
-4. **Always stop any local server you start** (`pkill -f http.server`) before
-   ending your turn.
+4. **Always stop any local server you start** before ending your turn
+   (`pkill -f http.server` on macOS/Linux; on Windows:
+   `Get-Process -Name python* | Stop-Process` or `Ctrl+C` the terminal).
 
 **Recovery (if data is clobbered anyway):** No data is truly lost — restore it.
 The real data survives in (a) `seyma-data` git history — find the last
@@ -71,14 +72,18 @@ When working with multiple AI agents in parallel:
 
 6. **Never assume another agent tested** — Each agent should re-run the full validation cycle even if the previous agent claimed it was tested. Trust but verify.
 
-7. **Stop servers you start** — If you run `python3 -m http.server 8765`, you are responsible for `pkill -f http.server` before ending your turn. Don't leave servers running for the next agent.
+7. **Stop servers you start** — If you run a local server, you are responsible
+   for stopping it before ending your turn (`pkill -f http.server` on
+   macOS/Linux; `Get-Process -Name python* | Stop-Process` or `Ctrl+C` on
+   Windows). Don't leave servers running for the next agent.
 
 ## Project Structure
 
 ```
 index.html      Thin HTML shell. Loads styles.css, motivationProgramV2.js,
-                 app.js, sync.js with cache-busting `?v=YYYYMMDDx` query
-                 strings.
+                 motivationNarratives.js, saygiPeople.js,
+                 profileAssessmentV1.js, app.js, sync.js with cache-busting
+                 `?v=YYYYMMDDx` query strings. Registers sw.js.
 app.js           The entire Şeyma app (single IIFE, ~4.3k lines). Owns state,
                  rendering, and all feature logic.
 motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
@@ -88,8 +93,29 @@ motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
                  integration into app.js and panel.html is still in
                  progress (rollout plan lives in the untracked, local-only
                  `seyma_motivation_v2_package/` directory — don't commit it).
+motivationNarratives.js Standalone narrative content module
+                 (`window.MotivationNarratives`) for the motivation program.
+saygiPeople.js   Frozen data module of 100 "günün öncüsü" inspirational
+                 figures (`window.SaygiPeople`) powering the Saygı /
+                 İlham & İbadet tab (daily figure, Wikipedia article fetch,
+                 read-tracking).
+profileAssessmentV1.js Frozen, hand-authored data module: single-session
+                 174-item scientific profile assessment
+                 (`window.ProfileAssessmentV1`) — sessions, consent schema,
+                 instruments. Consumed by app.js's profile engine and
+                 merged across devices by sync.js's
+                 `SeySync.mergeProfileAssessment`. Do not hand-edit item
+                 content; it is versioned (`version` field).
+hijriCalendar.js Standalone Hicri (Islamic) calendar module
+                 (`window.HijriCalendarV1`) — offset-based Miladi→Hicri
+                 conversion + mübarek gün (holy day) lookup, consumed by
+                 app.js's `hijriTodayStr`/`kandilBadgeFor`. User-adjustable
+                 ±2 day offset via `settings.prayer.hijriOffset` for local
+                 hilal (crescent) variance.
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
+                 Also owns conflict-merge helpers (e.g.
+                 `SeySync.mergeProfileAssessment`).
 panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  Independent app — does NOT share code with app.js. Fetches
                  data/latest.json from GitHub with its own token/localStorage
@@ -97,14 +123,36 @@ panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  data/observer-inbox.json / data/aeon-outbox.json.
 styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
+sw.js            Service worker (PWA install + notificationclick routing).
+manifest.json    PWA manifest. aeon-icon-*.png are the ÆON/panel icons.
 GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  table (✅/🟡/❌) and the "teknik ilkeler" (technical
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-AGENTS.md        Parallel, tool-agnostic restatement of this file's rules
+SEYMA-V2-PLAN.md Living v2.0 redesign roadmap ("İçsel Pusula & Terapi
+                 Odası") — Turkish, checkbox-driven; complements
+                 GELISTIRME-PLANI.md.
+ILHAM-IBADET-GELISTIRME-PLANI.md  Living Turkish roadmap for the İlham &
+                 İbadet hub expansion (Faz 35+): Zikirmatik, kıble/pusula,
+                 hicri takvim, mübarek gün rozetleri, ibadet rapor sekmesi —
+                 complements GELISTIRME-PLANI.md.
+test_faz10_sync.js   Commit-ted headless Node harness: sync.js conflict-merge
+                 tests with mocked window/localStorage/fetch (no network).
+                 Run: `node test_faz10_sync.js`.
+test_faz11_panel.js  Headless Node harness for panel.html helper/render
+                 logic. Run: `node test_faz11_panel.js`.
+.claude/skills/run-seyma/  Data-safe headless verification skill — see
+                 "Verification" below. `driver.mjs` is the core app.js
+                 render harness; `zikr-harness.mjs` covers the İlham &
+                 İbadet hub (zikirmatik, kıble, hicri takvim, ibadet rapor).
+                 Both run app.js in `node:vm` with fetch/timers stubbed dead,
+                 so zero network calls are possible — nothing can be pushed.
+AGENTS.md        Parallel, tool-agnostic restatement of CLAUDE.md's rules
                  (same conventions, generic Agents-format doc). Keep both in
                  sync when a convention changes.
+CLAUDE.md        Detailed AI assistant guidance — read for complex tasks.
+.impeccable/     Local-only AI agent working notes (see its own docs).
 .github/workflows/pages.yml  GitHub Pages deploy: on push to `main`, uploads
                  the whole repo root as-is and deploys it. No build step.
 ```
@@ -171,18 +219,23 @@ read files in bounded line ranges rather than in full.
 ## Verification
 
 There's no automated test suite or linter, but `node --check app.js` (or
-`sync.js`) catches JS syntax errors before you even open a browser. To
-validate a change beyond that:
+`sync.js`, `hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond
+that, **do not serve+open the app in a browser** (see "DATA SAFETY" above) —
+use the `run-seyma` skill's headless Node `vm` harnesses instead (also see
+"Development Commands" below):
 
-- Serve the repo locally, e.g. `python3 -m http.server 8765`, then open
-  `http://localhost:8765/index.html` (and `/panel.html` if relevant) —
-  opening via `file://` can hit CORS issues on the GitHub API calls
-  sync.js/panel.html make. Exercise the affected flow manually, in **both
-  light and dark** theme.
-- Watch the browser console for errors.
+- `node .claude/skills/run-seyma/driver.mjs` — boots `app.js` twice
+  (onboarding + seeded state) and drives real interactions (tab switch,
+  card toggle, theme toggle), asserting on the rendered HTML. Add
+  `--dump <tabId>` to dump a tab's generated markup for inspection.
+- `node .claude/skills/run-seyma/zikr-harness.mjs` — same approach for the
+  İlham & İbadet hub (zikirmatik, kıble, hicri takvim, ibadet rapor).
+- `panel.html` shares no code with `app.js`, so neither harness covers it;
+  verify it with the syntax/script-tag-balance check documented in
+  `.claude/skills/run-seyma/SKILL.md`, or read the diff carefully.
 - If the change touches synced/persisted data, confirm `migrate()` still
   produces a valid object from an old (pre-change) save, and that the panel
-  renders the new field sensibly (or at least doesn't break) when it's
+  would render the new field sensibly (or at least not break) when it's
   absent.
 
 ## Git / deploy
@@ -193,19 +246,6 @@ validate a change beyond that:
   `GELISTIRME-PLANI.md` being implemented; commit messages are short,
   Turkish, and describe the phase/feature (e.g. `"Faz 7: iki haftada bir
   psikolojik tarama anketi"`).
-motivationProgramV2.js  120-day motivation program data module (window.MotivationProgramV2)
-motivationNarratives.js Motivation program narrative content
-saygiPeople.js          Respect/People module
-sync.js                 GitHub Contents API sync (debounced push to data/latest.json)
-panel.html              ÆON observer dashboard (independent app, reads data repo)
-styles.css              CSS variables (light/dark themes) + global rules
-GELISTIRME-PLANI.md     Living roadmap with feature status table (✅/🟡/❌) + technical principles
-CLAUDE.md               Detailed AI assistant guidance (read for complex tasks)
-.github/workflows/pages.yml  Deploys repo root to GitHub Pages on push to main
-seyma_motivation_v2_package/  Local-only planning package (DO NOT COMMIT)
-```
-
-**No `package.json`, no bundler, no framework, no test suite, no linter.** Everything is hand-written vanilla JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px).
 
 ---
 
@@ -219,6 +259,12 @@ node --check app.js
 node --check sync.js
 ```
 
+### Committed headless tests (no network, safe to run)
+```bash
+node test_faz10_sync.js   # sync.js conflict-merge harness (mocked fetch)
+node test_faz11_panel.js  # panel.html helper/render harness
+```
+
 ### Local server (use sparingly — see DATA SAFETY)
 ```bash
 python3 -m http.server 8765
@@ -230,77 +276,16 @@ python3 -m http.server 8765
 git status --short --branch
 ```
 
-### Stop server
+### Stop server (before ending your turn)
 ```bash
-pkill -f http.server
+pkill -f http.server                          # macOS/Linux
+Get-Process -Name python* | Stop-Process      # Windows PowerShell
 ```
 
-> ⚠️ **Prefer headless render harness** over browser testing. See `CLAUDE.md` "Verification" section.
-
----
-
-## Architecture (`app.js`)
-
-**Single mutable `data` object** = entire app state:
-- `data.days[date]` — per-day records (mood, sleep, food, steps, cycle, caffeine, gratitude, intention, etc.)
-- `data.settings` — user preferences (ghToken, ghRepo, theme, haptics, etc.)
-- `data.cycle`, `data.library`, `data.watchlist`, `data.music`, `data.luna`, `data.aeon`, etc.
-
-**Key patterns:**
-1. **Load:** `localStorage` key `seyma-reset-v1` → passed through `migrate(d)` to backfill new fields
-2. **Save:** `save()` → localStorage + `window.SeySync.schedule(data)` if sync loaded
-3. **Render:** `render()` rebuilds visible tab as HTML string → `#app.innerHTML` (no virtual DOM)
-4. **Handlers:** Inline `onclick="App.xxx(...)"` → `App.<name> = function(...)` (global handlers)
-5. **Ephemeral state:** `ui` object (which tab, overlay open, draft text) — NOT persisted
-6. **Overlay pattern:** `openX()`/`closeX()` + `ui.xView` + `segTabs` (reading/watching/listening hubs)
-
-**Always extend `migrate()` when adding new `data` fields** — never assume they exist on old saves.
-
----
-
-## Coding Conventions
-
-Follow existing style in `app.js`, `panel.html`, `styles.css`:
-
-1. **One `data` object** — add new fields to `data`, not separate store (sync + panel auto-pick up)
-2. **CSS variables** for colors — `--read`, `--watch`, `--listen`, `--ok`, `--drop`, `--pause`, `--text`, `--muted`. Define new accents in both light + dark blocks in `styles.css`.
-3. **Overlay pattern** — mirror reading/watching/listening template exactly for new hubs
-4. **Panel mirror** — new persistent records must render in `panel.html` (bento card or day-detail row)
-5. **Cache busting** — bump `?v=` on `styles.css`, `app.js`, `sync.js` in `index.html` every deploy
-6. **Privacy** — secrets (`ghToken`, `openaiKey`, `syncUrl`) stripped by `sync.js` `sanitize()` before push
-7. **Language & tone** — Turkish, warm/informal ("Sevgili Günışığı", emoji-heavy). Match existing voice.
-8. **Escape dynamic HTML** with `esc()` function
-9. **No `addEventListener`** — use inline `onclick` + global `App.<handler>` pattern
-
----
-
-## Testing & Verification
-
-**No automated test suite.** Validate manually:
-
-1. **Syntax:** `node --check app.js` (or `sync.js`)
-2. **Clean browser context** — test affected flow in both light + dark themes
-3. **Watch console** for errors
-4. **Migration test** — confirm `migrate()` produces valid object from old (pre-change) save
-5. **Panel test** — verify new field renders sensibly (or doesn't break) when absent
-6. **Screenshot harness** — use `files/shot/` for visual regression (both themes)
-
----
-
-## Git & Deployment
-
-- **`main` = production** — every push redeploys GitHub Pages (no build/test gate)
-- **Feature branches** — named after "Faz" (phase) from `GELISTIRME-PLANI.md`
-- **Commit messages** — short, Turkish, feature-focused: `Faz 7: iki haftada bir psikolojik tarama anketi`
-- **PRs** — include changed files, manual test notes, screenshots for UI changes, data migration impact
-
----
-
-## Security
-
-- **Never commit** real personal data, tokens, localStorage dumps, or private repo payloads
-- **Runtime data** belongs in `mustafaras/seyma-data` (must remain private)
-- **Keep `sync.js` sanitization** aligned with any new secret fields in `settings`
+> ⚠️ **Prefer the headless render harness** over browser testing — see the
+> `.claude/skills/run-seyma/` skill (`driver.mjs` renders `app.js` inside a
+> Node `vm` sandbox with mocked DOM/localStorage, both themes). Never open
+> the app in a real browser to "check it runs" (see DATA SAFETY).
 
 ---
 
@@ -348,6 +333,68 @@ Follow existing style in `app.js`, `panel.html`, `styles.css`:
 > Girişte: tarih, branch, değişen dosyalar, test sonuçları, deploy durumu ve
 > bir sonraki session için kalan TODO'lar / bilinen sorunlar yazılsın.
 > Böylece sonraki agentlar tüm repoyu okumak zorunda kalmaz.
+
+---
+
+### 2026-07-29 — İlham & İbadet v2 final: 99 Esmâ/ebced geri sayım + tıklanabilir öncü/Okudum fix + yıllık ibadet ısısı (canlıya alındı)
+
+**Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward push; GitHub Pages cache `20260730j`.
+
+**Denetim sonucu:** Önceki Faz 35–42 paketi ana özellikleri taşıyordu fakat plan tam değildi: `ui.faithTab` beşli hub akışı yoktu; `.sg-faith-heat` yalnız CSS olarak kalmıştı; panelde yıllık ısı aynası yoktu; 100 Öncü grid kutuları içeriksiz olduğundan boş görünüyordu; uzun kişi modalındaki `Okudum` butonu scroll sonunda görünürlüğünü kaybediyordu.
+
+**Değişen dosyalar:**
+- `esmaulHusnaV1.js` (yeni): Diyanet'in yaygın 99 isim sırası; Arapça yazım; TDV asıl ebced tablosundan deterministik hedef hesabı; yöntem/kaynak metadatası.
+- `app.js`: 5 temel + 99 Esmâ preset merge/backfill; Esmâ presetlerinde ebced hedefli geri sayım; preset arama/kütüphane; built-in koruması; çoklu set tamamlama ve undo/reset günlük ayna düzeltmeleri; `Öz|Öncü|İman|Zikir|Rapor` gerçek hub sekmeleri; yıllık 365 hücre vakit+zikir ısı haritası ve yıl seçimi; 100 Öncü hücrelerine numara/✓/aria + her hücreden seçilen kişinin biyografi modalına geçiş + modal önceki/sonraki öncü navigasyonu; Saygı seri hesabı fix; `Okudum` eylemi modal sabit alt çubuğuna taşındı ve biyografi yüklenirken bile görünür (scroll-gate korunur); ±2 Hicri offset kontrolü; izinli canlı cihaz pusulası; rapor `madeUp` sayaç typo fix; zikir/kıble overlay preservation.
+- `styles.css`: Esmâ/preset kütüphanesi, numaralı öncü grid, sabit modal action, hub sekmeleri, yıllık heatmap, Hicri offset stilleri.
+- `panel.html`: `faithDayHeatP` + yıllık ibadet ısı bento kartı; `madeUp` sayaç typo fix.
+- `index.html`: `esmaulHusnaV1.js` yükleme; tüm cache sürümleri `20260730j`.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: Esmâ modülü, 99 preset, 66→65 ebced geri sayım, 5'li hub, numaralı koleksiyon ve yıllık heatmap assertion'ları.
+- `test_faz11_panel.js`: CRLF toleranslı `cardWrap` extraction; güncel privacy assertion.
+- `GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md`: denetim ve yeni kapsam kaydı.
+
+**Doğrulama:**
+- `node --check app.js`, `sync.js`, `hijriCalendar.js`, `esmaulHusnaV1.js` ✅
+- Esmâ veri modülü: tam 99 kayıt; `Allah=66`, son kayıt `es-Sabûr`; deterministik hesap ✅
+- `.claude/skills/run-seyma/zikr-harness.mjs` ✅ 25/25
+- `.claude/skills/run-seyma/driver.mjs` ✅ 6/6 (dark toggle dahil)
+- `test_faz10_sync.js` ✅ 45/45
+- `test_faz11_panel.js` ✅ 35/35
+- `panel.html` 5 script etiketi / inline JS syntax ✅
+- `git diff --check` ✅ (yalnız mevcut CRLF dönüşüm uyarıları)
+- Gerçek tarayıcı açılmadı; local server başlatılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Gerçek cihazda kullanıcı görsel/sensör kontrolü (iOS yön izni, 365 hücre yatay scroll, sticky `Okudum`); Faz 41 aylık vakit cetveli planda isteğe bağlı ve uygulanmadı.
+
+---
+
+### 2026-07-30 — Faz 35–42 Tümü: Zikirmatik + Sonraki Vakit Geri Sayım + Hicri Takvim + Kıble + Saygı Koleksiyonu + İbadet Rapor + Kozmetik Premium (canlıya alınmadı — kullanıcı emri bekleniyor)
+
+**Branch:** `mustafaras-iman-kosesi-plani` (ayın branch). Deploy / merge YOK — kullanıcı "ben emir vermeden canlıya alma" dedi.
+
+**Değişen dosyalar:**
+- `app.js` (+408 satır): Faz 35 Zikirmatik (veri modeli `data.zikr`+`data.days[date].zikr` ayna, `emptyZikrRoot/ensureZikrRoot/zikrActivePreset/zikrDay/zikrTouchTick/zikrStreak/zikrWeek/zikrTickSound`; overlay `App.openZikr/closeZikr/setZikrView/zikrTap/zikrUndo/zikrResetToday/setZikrPreset/openZikrPresetAdd/onZikrPresetField/saveZikrPreset/deleteZikrPreset/toggleZikrSetting/toggleZikrFavorite`; UI `zikrPreviewCardHTML/zikroverlayHTML`), Faz 36 (`nextPrayerInfo`, faithCorner overlay'de geri sayım kartı + progress bar), Faz 37 (`hijriTodayStr`/`kandilBadgeFor` fallback + `hijriCalendarV1` tüketimi), Faz 38 (`qiblaBearing` + `qiblaOverlayHTML` + `App.openQibla/closeQibla`), Faz 39 (`emptySaygiRoot/ensureSaygiRoot/saygiMarkRead/saygiCollection/saygiReadCount/saygiStreak`; `saygiCollectionCardHTML`), Faz 40 (`faithWeekKPIs` + `faithRaporCardHTML`), hub birleşimi (`saygiPreviewHubHTML` yeni kartlarla; `saygiHTML` üstte `spiritBarHTML`), `saygiPending` zikir eklentisi, `migrate()` zikr/saygi backfill, duplicate `App.fetchPrayerLocationGPS` temizliği, `segTabs` accent'e `zikr` desteği.
+- `styles.css` (+98 satır): `--zikr`/`--zikr2`/`--zikr-bg`/`--zikr-glow`, `--hijri`/`--hijri2`/`--hijri-bg`/`--hijri-glow`, `--kandil`/`--kandil2`/`--kandil-bg`/`--kandil-glow`, `--glass-bd`/`--glass-glow` (light+dark); Faz 42 katmanı = `sg-glass`, `sg-gradient-border`, `sg-glow`, `sg-shine`, `sgShine`, spirit-bar, hub rapor (`sg-faith-hero/sg-faith-kpi/sg-faith-heat/sg-insight`), zikirmatik (`sey-zikr-ov`, `zikr-stage/ring/halo/core/count/tgt/spark/preset/chip/toggle/fab`), kıble (`qibla-rose/needle/deg`), koleksiyon (`sg-collect/sg-collect-grid/sg-nudge`), sonraki vakit (`sg-faith-next/-bar`, `faithPulse`), preview kartlarında premium pass (`backdrop-filter` + faith gradient).
+- `panel.html` (+46 satır): `--zikr`/`--kandil` değişkenleri, zikir/ibadet helper'ları (`zikrSummaryP` (yerine zikrDayTotalP/zikrDaySetsP/zikrStreakP/zikrWeekTotalP), `faithWeekKPIsP`), yeni "Zikir · İbadet" bento KPI kartı.
+- `index.html`: `hijriCalendar.js` eklendi (`<script src="hijriCalendar.js?v=20260730h"></script>`), tüm asset'ler `?v=20260730h`.
+- `hijriCalendar.js` (yeni, frozen): Umm al-Qura yaklaşık JD hesap — `window.HijriCalendarV1` (`todayStr`, `hijriFrom`, `holyDay`), `hijriOffset` desteği; 9 bilinen mübarek gün (Hicri yeni yıl, Aşure, Regaip, Beraat, Ramazan, Kadir, Ramazan Bayramı, Kurban Bayramı, Mevlid Kandili).
+- `.claude/skills/run-seyma/zikr-harness.mjs` (yeni, headless): localStorage-taban veri okuma ile 16/16 assertion PASS (sekmeli render + zikir tap/streak + koleksiyon + kıble + nextPrayerInfo güvenli + ibadet rapor + hicri + migrate).
+- `GELISTIRME-PLANI.md`: 2026-07-30 changelog (uygulama) eklendi; Faz 35–42 tablosu.
+- `ILHAM-IBADET-GELISTIRME-PLANI.md`: daha önce oluşturulmuş plan belgesi (uygulama referansı; mevcut durum güncel).
+
+**Doğrulama:**
+- `node --check app.js` ✅
+- `node --check hijriCalendar.js` ✅
+- `zikr-harness.mjs` (headless Node `vm`, localStorage-driven) ✅ 16/16
+- `.claude/skills/run-seyma/driver.mjs` genel render regresyonu ✅ 6/6 PASS
+- `test_faz10_sync.js` ✅ 45/45 PASS
+- `panel.html` inline script syntax ✅ (script1 OK)
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı; **canlıya alınmadı.**
+
+**Kalan:**
+- Kullanıcı emri ile `mustafaras-iman-kosesi-plani` → `main` fast-forward merge + GitHub Pages deploy (`?v=20260730h`).
+- Cihaz/PWA testi: İlham & İbadet sekmesinde spirit bar (sonraki vakit adı, geri sayım, hicri tarih, mübarek rozet), İman Köşesi geri sayım kartı + Kıble butonu/pusula, Zikirmatik sayaç/preset/stats overlay'i (say, geri al, sıfırla, preset CRUD, sound/haptic/autoAdvance toggle), İbadet Rapor hero kartı, 100 Öncü koleksiyon grid + seri.
+- Eski `?v=20260730f`/`20260730g` önbellekleri PWA/tarayıcıda temizlenmeli.
+- Panel'de "Zikir · İbadet" bento kartı ilk zikir sayımından sonra dolu görünecek; ilk açılıştan önce boş (zikr data olmadan "—" gösterir, kırılmaz).
 
 ---
 

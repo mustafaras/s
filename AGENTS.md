@@ -318,83 +318,52 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
-## Large Files
+### 2026-07-30 — Kur’an Yolculuğu QY-05 ana kartı (feature branch'e push, canlıya alınmadı)
 
-`app.js` (~4.3k lines), `index.html`, `panel.html` are large. Some lines extremely long (base64 icons).
+**Branch:** `feature/kuran-yolculugu-qy05` → `origin/feature/kuran-yolculugu-qy05`.
+**Commit/push:** `7b8eb8e` "QY-05: Kur'an Yolculuğu ana kartı — kıble altı, nüzul sırası, durum rozetleri ve Raşit'ten iste eylemi".
+**Deploy:** YOK — `.github/workflows/pages.yml` yalnızca `main` push'unda çalışır; feature branch push'u Pages deploy'u tetiklemez.
 
-**Strategy:**
-- Use `grep_search` to locate function/section by name
-- Read in bounded line ranges (not whole file)
-- Use `replace_string_in_file` with 3-5 lines of context before/after
+**Değişen dosyalar:** `app.js`, `index.html`, `styles.css`.
+`quranRevelationOrderV1.js`/`quranTransportV1.js` yeni dosya değil; önceki QY-04 commit'inde zaten vardı, şimdi `index.html`'e `<script>` ile bağlandı.
 
----
+**QY-05 içeriği:**
+- `index.html`: `quranRevelationOrderV1.js?v=20260730p` ve `quranTransportV1.js?v=20260730p` eklendi (app.js öncesi); mevcut cache zincirine göre `20260730p` ile uyumlu.
+- `styles.css`: Kur’an accent token seti (`--quran`, `--quran2`, `--quran-bg`, `--quran-glow`, `--quran-surface`, `--quran-ink`, `--quran-gold`) ve `.sg-quran-card` ailesi (kart, rozet, meta, kopya, aksiyon) eklendi. Açık/koyu tema + reduced-motion desteği var.
+- `app.js`:
+  - `ui.quranJourneyOpen:false` ve `ui.quranJourneyView:'library'` eklendi.
+  - `render()` içindeki `curOverlay` zincirine `quranJourneyOpen` dalı eklendi.
+  - `quranJourneyHubCardHTML()` — İlham & İbadet sekmesinde kıble kartının hemen altında, vakit/Hicri şeridi ile beşli hub sekmeleri arasında tam genişlikte ana kart. Aktif sûre adı, nüzul sırası (ör. "1/114"), durum rozetleri ve CTA gösterir.
+  - `quranJourneyCardCopy(status, canReq, req, order, total)` — durum makinesi durumuna göre kicker/başlık/CTA döner; `awaiting_reply` durumunda ikinci isteği engeller, `request_error`/`video_unavailable` durumlarında "Raşit'ten iste" CTA'sı sunar.
+  - `quranJourneyMetaChips(status, req)` — "izlendi", video geçmişi vb. küçük rozetler.
+  - `App.openQuranJourney()` — QY-06'da tam ekran kütüphane overlay'i açacak; şimdilik placeholder toast.
+  - `App.quranJourneyRequest()` — `quranCanRequest()` doğrulaması, `quranReduce()` `request_submit` uygulaması, `save()` ve "Raşit'e istek gönderildi" toast.
+  - `App.quranJourneyWatch()` / `App.quranJourneyQuestion()` — QY-06'da tam ekran izleme/soru akışları; şimdilik placeholder toast.
+  - `quranSurahName(id)` ve `quranStatusLabel(s)` yardımcıları eklendi.
+  - Kart, `saygiHTML()` içinde `spiritBarHTML()`/`qiblaHubCardHTML()` ile `saygiPreviewHubHTML()` arasına yerleştirildi.
 
-## Agent Handoff Log
+**Bilinçli sınırlar (planlı eksikler, hata değil):**
+- Tam ekran Kur’an kütüphanesi (overlay, 114 sûre grid, izleme/soru akışı) QY-06'ya bırakıldı.
+- `quranJourney` için sync merge kuralı hâlâ yok (QY-16); `watched` gibi son durumlar latest.json full-replace'iyle iki cihazda geri gidebilir.
+- Panel aynası henüz yok (QY-15).
+- `VIDEO_ID_RE` hem `app.js` hem `quranTransportV1.js`'te duruyor; transport modülü zaten yüklü olduğuna göre ilerleyen bir aşamada `app.js`'teki kopya `quranTransportV1.js`'e devredilecek.
+- `index.html`'deki `manifest.json?v=20260730f` ve `sw.js?v=20260730p` bu aşamada değiştirilmedi (cache bump QY-18 koordinasyon noktasında toplu yapılacak).
 
-> **Talimat:** Her session sonunda bu bölümün EN ÜSTÜNE yeni bir giriş ekle.
-> Girişte: tarih, branch, değişen dosyalar, test sonuçları, deploy durumu ve
-> bir sonraki session için kalan TODO'lar / bilinen sorunlar yazılsın.
-> Böylece sonraki agentlar tüm repoyu okumak zorunda kalmaz.
+**Doğrulama:**
+- `node --check app.js sync.js quranTransportV1.js quranRevelationOrderV1.js` ✅
+- `test_quran_catalog.js` 70/70 ✅
+- `test_quran_transport.js` 198/198 ✅
+- `verify-quran-migration-v1.mjs` 57/57 ✅
+- `verify-quran-state-machine.mjs` 179/179 ✅
+- `driver.mjs` ✅ (onboarding + seeded + tab/theme geçişleri)
+- `zikr-harness.mjs` 84/84 ✅
+- `test_faz10_sync.js` 64/64 ✅
+- `test_faz11_panel.js` 44/44 ✅
+- `git diff --check` temiz; commit/push feature branch'e yapıldı.
 
----
+**Not:** Gerçek tarayıcı/sunucu açılmadı, `seyma-data`'ya yazılmadı, `main`'e merge/deploy yapılmadı. Önceki session'da Windows backslash yüzünden `driver.mjs` çalışmamıştı; bu session'da `node .claude/skills/run-seyma/driver.mjs` komutuyla düzgün çalıştırıldı.
 
-### 2026-07-30 — Kur’an Yolculuğu QY-02/QY-04 defekt düzeltmeleri (kullanıcı denetimi)
-
-**Branch:** `main`; commit/push/merge/deploy yok. Yeni aşama açılmadı — QY-02 ve
-QY-04'te teslim edilmiş iki gerçek defekt düzeltildi.
-
-**Değişen dosyalar:** `app.js`, `quranTransportV1.js`, `test_quran_transport.js`,
-`.claude/skills/run-seyma/verify-quran-migration-v1.mjs`, `AGENTS.md`.
-
-**Defekt 1 — cümle içi bağlantı reddediliyordu (yüksek olasılık).**
-`extractSingleVideoId` URL'yi yalnız boşluk/tırnak/parantezden ayırıyor, sondaki
-noktalamayı kırpmıyordu. Sonuç: Raşit'in tamamen normal yazacağı
-`"işte anlatım: https://youtu.be/XXX."` gövdesi `no_video` ile reddediliyor,
-video hiç yayınlanmıyor, kullanıcı sonsuza kadar "cevap bekleniyor" görüyordu.
-Üretimde kesin tetiklenecek bir hataydı. Artık token'ların baş/son noktalaması
-(`. , ; : ! ? … « » “ ” ’ ) ] > }` vb.) kırpılıyor. Kırpma yanlış kabule yol
-açmıyor: noktalı kanal bağlantısı, noktalı yabancı host, noktalı `http` ve
-noktalı bozuk kimlik hâlâ reddediliyor; cümle içindeki iki farklı video hâlâ
-belirsiz sayılıyor.
-
-**Defekt 2 — bozuk kayıt "Raşit'ten iste" düğmesini kalıcı kilitliyordu.**
-`quranStatusFromStamps` kanıtı olmayan ilerleme uyduruyordu: yalnız
-`requestedAt` varken `queued` türetiyordu; `queued` retryable olmadığı için o
-sûrede kullanıcının hiçbir çıkışı kalmıyordu. İki kural eklendi:
-(a) kanıtsız `queued` yerine retryable `request_error` türetilir —
-"istek denendi, çıktığına dair kanıt yok";
-(b) videoya bağlı durumlar (`ready`/`watching`) VİDEO KANITI olmadan
-türetilmez, videosuz kayıt retryable `video_unavailable` olur.
-`watched`/`question_opened` bunun dışındadır: tamamlanmış duraklardır.
-Takas dürüstçe kodda yazılı: outbox girdisi aslında yazılmışsa yeniden deneme
-ikinci bir mail üretebilir — çıkışsız kilitlenmeye kıyasla kabul edilebilir.
-
-**Neden testler kaçırdı:** İki test de kendi yazdığım "temiz" fixture'lara
-bakıyordu — bağlantıdan sonra hep boşluk bırakmışım, bozuk-status onarımının
-sonucunu yalnız string olarak karşılaştırmışım. Test tarafında da kök neden
-düzeltildi: `test_quran_transport.js`'e 13 gerçekçi e-posta gövdesi + 5 kırpma
-güvenliği vakası eklendi; `verify-quran-migration-v1.mjs`'e ise **davranışsal
-bir değişmez** eklendi — "onarım sonrası hiçbir kayıt *ne video var ne yeniden
-istenebilir* durumunda olamaz". Bu değişmez, ben yazdıktan sonra üçüncü bir
-vakayı (videosuz `watching`) kendiliğinden yakaladı ve o da düzeltildi.
-
-**Doğrulama:** `test_quran_transport.js` **198/198** ✅ (180 → +18);
-`verify-quran-migration-v1.mjs` **57/57** ✅ (52 → +5);
-`verify-quran-state-machine.mjs` 179/179 ✅; `test_quran_catalog.js` 70/70 ✅;
-`node --check app.js sync.js quranTransportV1.js quranRevelationOrderV1.js` ✅;
-`driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅; `verify-zikir-migration-v3.mjs`
-41/41 ✅; `verify-zikir-state-machine.mjs` 39/39 ✅; `test_faz10_sync.js`
-64/64 ✅; `test_faz11_panel.js` 44/44 ✅; `git diff --check` temiz.
-
-**Denetimde çıkan, hata OLMAYAN planlı eksikler:** iki modül henüz
-`index.html`'e bağlı değil (QY-05); `quranJourney` için sync merge kuralı yok,
-o güne kadar iki cihazda `watched` latest.json full-replace'iyle geri gidebilir
-(QY-16); panel aynası yok, Convention #4 şu an karşılanmıyor (QY-15);
-`VIDEO_ID_RE` hem `app.js` hem `quranTransportV1.js`'te duruyor, transport
-yüklenince tek kaynağa indirilmeli (QY-05); `videoHistory` plan §7'de yok,
-bilinçli sapma. Ayrıca plan gereği `awaiting_reply` durumunda yeniden istek
-yasak ve planda bir iptal/zaman aşımı yolu tanımlı değil — ürün kararı olarak
-QY-07'de gözden geçirilmeli.
+**Kalan:** QY-06 — Kur’an Yolculuğu tam ekran kütüphane overlay'i (114 sûre grid, izleme/soru akışı). Cache bump ve `CLAUDE.md`/plan belgesi güncellemeleri QY-18'de tek seferde.
 
 ---
 
@@ -404,7 +373,7 @@ QY-07'de gözden geçirilmeli.
 
 **Yeni dosyalar:** `quranTransportV1.js`, `test_quran_transport.js`.
 **Değişen dosya:** `AGENTS.md` (test komutu + bu kayıt). `app.js`, `sync.js`,
-`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+`panel.html`, `index.html`, `styles.css` ve workflow'lar **değişmedi**; cache
 bump yok. Modül henüz hiçbir yerden tüketilmiyor — bağlanması QY-08 (sync
 yazıcı), QY-11 (uygulama okuyucu) ve QY-15 (panel) aşamalarına ait.
 
@@ -475,7 +444,7 @@ yalnız QY-18’de.
 
 **Branch:** `main`; commit/push/merge/deploy yok. Yalnız QY-03 uygulandı.
 
-**Değişen dosyalar:** `app.js` (saf durum makinesi + `App` export’ları +
+**Değişen dosyalar:** `app.js` (saf durum makinesi + `App` export'ları +
 `videoHistory` normalizasyonu), `AGENTS.md`. **Yeni dosya:**
 `.claude/skills/run-seyma/verify-quran-state-machine.mjs`. `sync.js`,
 `panel.html`, `index.html`, `styles.css` **değişmedi**; cache bump yok.
@@ -547,7 +516,7 @@ güncellemeleri QY-18’e ait.
 **Değişen dosyalar:** `app.js` (yeni şema yardımcıları + `migrate()` içinde tek
 korumalı çağrı), `AGENTS.md`. **Yeni dosya:**
 `.claude/skills/run-seyma/verify-quran-migration-v1.mjs`. `sync.js`,
-`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+`panel.html`, `index.html`, `styles.css` ve workflow'lar **değişmedi**; cache
 bump yapılmadı.
 
 `data.quranJourney` V1 şeması eklendi: `schemaVersion:1`,
@@ -560,8 +529,8 @@ bump yapılmadı.
 Üç bilinçli karar:
 
 1. **Katalog bağımlılığı isteğe bağlı.** Migration `quranRevelationOrderV1.js`
-   yüklü olmadan da tam çalışır (modül `index.html`’e QY-05’te bağlanacak).
-   Katalog yüklüyse yalnız `activeSurahId` imleci gerçek bir sûreye çekilir.
+   yüklü olmadan da tam çalışır (modül `index.html`'e QY-05'te bağlanacak).
+   Katalog yüklüyse yalnız `activeSurahId` imleçti gerçek bir sûreye çekilir.
 2. **İmleç ile veri ayrımı.** `activeSurahId` yalnız bir imleçtir, geçersizse
    güvenle başa alınır. `requests` ise KULLANICI verisidir: katalogda olmayan
    bir sûre anahtarı bile **silinmez**, yalnız şekli bozuk kayıtlar ayıklanır.
@@ -571,12 +540,12 @@ bump yapılmadı.
    (plan §13). Bilinmeyen alanlar bilerek korunur — daha yeni bir cihazın
    eklediği alanı eski cihazın migrate’i silmemeli.
 
-Durum GEÇİŞLERİ bilerek yazılmadı; onlar QY-03’ün saf state machine’ine ait.
-Buradaki tek iş şekil güvencesi. `videoId` için yalnız depolama biçimi guard’ı
+Durum GEÇİŞLERİ bilerek yazılmadı; onlar QY-03'ün saf state machine'ine ait.
+Buradaki tek iş şekil güvencesi. `videoId` için yalnız depolama biçimi guard'ı
 (11 karakter) var; gerçek YouTube doğrulaması QY-10’a ait.
 
 **Doğrulama:** `verify-quran-migration-v1.mjs` **52/52** ✅ — boş / eski /
-kısmi / bozuk fixture’lar, `__proto__` prototip kirliliği (JSON.parse ile
+kısmi / bozuk fixture'lar, `__proto__` prototip kirliliği (JSON.parse ile
 gerçek own-property olarak enjekte edildi, ayrıca doğrulandı), slug olmayan
 anahtar, null/dizi kayıt, geçersiz videoId, üç ardışık migrate’in derin
 eşdeğerliği ve şemada token/e-posta/telefon bulunmadığı kontrolleri dahil.
@@ -607,7 +576,7 @@ bump ve `CLAUDE.md`/plan belgesi güncellemeleri QY-18’e ait.
 
 **Yeni dosyalar:** `quranRevelationOrderV1.js`, `test_quran_catalog.js`.
 **Değişen dosya:** `AGENTS.md` (test komutu + bu kayıt). `app.js`, `sync.js`,
-`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+`panel.html`, `index.html`, `styles.css` ve workflow'lar **değişmedi**; cache
 bump yapılmadı.
 
 114 sûre, Diyanet/TDV yayınlarının da esas aldığı yaygın nüzul tertibiyle
@@ -615,7 +584,7 @@ bump yapılmadı.
 `revelationOrder`, `mushafOrder`, `nameTr`, `nameAr`, `revelationPlace`,
 `ayahCount`, `themeTr`, `sourceRefs`, `editorialStatus` taşıyor. Modül yalnız
 `window.QuranRevelationOrderV1` yazıyor; `data`, `localStorage`, `SeySync`,
-`fetch` veya DOM’a hiç dokunmuyor — kullanıcı ilerlemesi QY-02’de eklenecek
+`fetch` veya DOM'a hiç dokunmuyor — kullanıcı ilerlemesi QY-02'de eklenecek
 `data.quranJourney` içinde tutulacak. Kaynak ihtilafı `methodologyTr` yöntem
 notunda açıklandı, Mekkî/Medenî tartışması olan 10 sûre `disputedPlaceIds` ile
 işaretlendi. Katalog kökü, dizi ve tüm kayıtlar `Object.freeze` ile korunuyor.
@@ -624,7 +593,7 @@ işaretlendi. Katalog kökü, dizi ve tüm kayıtlar `Object.freeze` ile korunuy
 
 **Doğrulama:** `node test_quran_catalog.js` **70/70** ✅ — modül yalnız `window`
 içeren çıplak `node:vm` sandbox’ında yükleniyor (state/ağ kaplaması olsaydı
-patlardı), window’a tek global yazıyor, nüzul ve mushaf sıra kümeleri tam
+patlardı), window'a tek global yazıyor, nüzul ve mushaf sıra kümeleri tam
 1..114 permütasyonu, id/ad benzersizliği, Arapça harf kontrolü, boş kaynak
 referansı yok, ham `<`/`>` yok, Mekke 86 / Medine 28 bloğu kesintisiz ve
 **toplam âyet 6236** (Kûfe sayımı) çapraz kontrolü tutuyor. Ayrıca
@@ -710,7 +679,7 @@ QY-00’ı yapmalı; her `devam` tek aşama açar ve ayrıca açık talep olmada
 commit/push/merge/deploy yapılamaz.
 
 **Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` ✅;
-`zikr-harness.mjs` 84/84 ✅; tüm Zikirmatik doğrulama script’leri ✅; sync
+`zikr-harness.mjs` 84/84 ✅; tüm Zikirmatik doğrulama script'leri ✅; sync
 64/64 ✅; panel 44/44 ✅; CSS/script yapısı ve `git diff --check` ✅. Gerçek
 tarayıcı açılmadı ve `seyma-data` yazılmadı.
 
@@ -1036,7 +1005,7 @@ tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
 **Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
 
 Kullanıcı mevcut dairesel sayacı hâlâ yetersiz buldu; Esmâ konu/ilerleme
-filtrelerini derli toplu bir expander içine alma ve İlham & İbadet özet
+filtreleri derli toplu bir expander içine alma ve İlham & İbadet özet
 kartındaki puslu/soluk metinleri canlı, belirgin ve hareketli hale getirme
 talebinde bulundu.
 
@@ -1046,7 +1015,7 @@ talebinde bulundu.
   Noktalı tesbih halkası (`beads`), çift çember, aura, üç hareketli yörünge
   ışığı, canlı tur/sayım kicker'ı ve paused/active eylem metni eklendi.
   `zikrPaintLive()` tur kicker'ını, `zikrPaintPauseButton()` ise sayaç durum
-  sınıfını ve “sürdür ve zikret” metnini global render olmadan güncelliyor.
+  sınıfını ve “sürdür ve zikret” metni global render olmadan güncelliyor.
 - Esmâ konu ve ilerleme filtreleri tek premium expander altında birleşti.
   Kapalı özet satırı seçili konu, ilerleme modu ve sonuç sayısını gösteriyor.
   `App.toggleZikrFilters()` paneli yalnız DOM hedefinde açıp kapatıyor;
@@ -1230,7 +1199,7 @@ Commit, main merge ve deploy yapılmadı.
 
 **Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK). ZP-09
 bitince kullanıcı port 9000'de canlı test etti ve 3 ekran görüntüsüyle sert
-geri bildirim verdi: renk/tipografi "iğrenç", Esmâ anlamı hiç görünmüyor
+geri bildirimi verdi: renk/tipografi "iğrenç", Esmâ anlamı hiç görünmüyor
 ("bu repoda var düzgün bağlayamıyorsun"), çekirdek zikirlerin Arapça
 sütununda Türkçe metin taşıyordu (ekran görüntüsünde kırmızı okla
 işaretlenmiş), arama yetersizdi. `/goal` ile "diğer aşamaya geçmeden bunları
@@ -1243,7 +1212,7 @@ düzelt" talimatı verildi — bu yüzden ZP-10'a geçilmeden araya girildi.
    "anlam" diye bir şey render edilmiyordu.
 2. `ZIKR_SEED` (5 çekirdek zikir) hiçbir zaman `arabic` alanına sahip
    değildi; `x.arabic||x.phrase` fallback'i TÜRKÇE transliterasyonu
-   (`Sübhanallah`) Arapça-fontlu dar sütuna taşırıyordu — ekran görüntüsündeki
+   (`Sübhanallah`) Arapça-fontlu dar sütuna taşırıyordu — ekran görüntüsünde
    kırmızı okların gösterdiği gerçek bug buydu.
 3. ZP-08'de zikr tema token'ları (`--zikr`/`--zikr2`) mevcut eski turkuaz
    değerini (`#1F7A8C`) miras almıştı; oysa `ZIKIRMATIK-GELISTIRME-PLANI.md`
@@ -1251,7 +1220,7 @@ düzelt" talimatı verildi — bu yüzden ZP-10'a geçilmeden araya girildi.
    gözden kaçmış bir tasarım-yönü hatasıydı, token altyapısı (opaklık vb.)
    doğruydu ama RENK yanlıştı.
 4. Arama yalnız `name+phrase+ebced` üzerinde ham substring eşleşmesiydi;
-   Türkçe diyakritik-duyarsız değildi, anlam metnini hiç taramıyordu.
+   Türkçe diyakritik-duyarsız değildi, anlam metni hiç taramıyordu.
 
 **Değişen dosyalar:**
 
@@ -1299,7 +1268,7 @@ düzelt" talimatı verildi — bu yüzden ZP-10'a geçilmeden araya girildi.
     eski "Anlamı ve önemi"ye düşer.
   - `zikrPresetsViewHTML`: yeni `zikrNormalizeSearchText`/
     `zikrPresetSearchText` ile Türkçe diyakritik-duyarsız + isim/Arapça/
-    ebced/GERÇEK anlam metnini birlikte tarayan arama; her satırda
+    ebced/GERÇEK anlam metni birlikte tarayan arama; her satırda
     (varsa) 2 satırlık anlam snippet'i; arama kutusunda temizle (×)
     düğmesi (`App.clearZikrPresetFilter`, yeni).
 - `.claude/skills/run-seyma/zikr-harness.mjs`: `FILES` dizisine
@@ -1330,9 +1299,9 @@ düzelt" talimatı verildi — bu yüzden ZP-10'a geçilmeden araya girildi.
 - `git diff --check` ✅. Değişen: `index.html`, `styles.css`, `app.js`,
   `.claude/skills/run-seyma/zikr-harness.mjs`, `AGENTS.md`; yeni:
   `.claude/skills/run-seyma/verify-zikir-content-wiring.mjs`.
-- Gerçek tarayıcı açılmadı (kullanıcı kendi tarayıcısında port 9000'den
-  test etti), `seyma-data`'ya yazılmadı, sync korumaları dokunulmadı,
-  `ZIKR_V2_VISIBLE` DEĞİŞTİRİLMEDİ.
+- Gerçek tarayıcı açılmadı (kullanıcı kendi tarayıcıdır), `seyma-data`'ya
+  yazılmadı, sync korumaları (Guard 1/2) dokunulmadı — Guard 1 zaten `localhost`
+  kaynaklı TÜM push'ları engelliyor. `ZIKR_V2_VISIBLE` DEĞİŞTİRİLMEDİ.
 
 **Bilinçli editoryal karar:** `esmaulHusnaV2.js`/`zikirCoreContentV1.js`
 içindeki `editorialStatus:'draft'` alanı DEĞİŞTİRİLMEDİ (hâlâ 'draft') —
@@ -1349,10 +1318,13 @@ bir insan editoryal adımı gerektirir.
   olarak (kutu sayısı vb.) elle gözden geçirilmedi — kullanıcı görsel
   onayı bekleniyor.
 - ZP-08'in listelediği eski riskler (kapat düğmesi 38×38px, tam WCAG
-  kontrast taraması) hâlâ geçerli.
+  kontrast taraması, `--zikr-success/-warning` henüz
+  tüketilmiyor) hâlâ geçerli.
 
 **Sıradaki:** Kullanıcının canlı görsel onayı bekleniyor; onay gelirse
-ZP-10'a (modal semantiği/odak/kapatma güvenliği) devam edilecek.
+ZP-10'a (modal semantiği/odak/kapatma güvenliği — `role="dialog"`/`aria-modal` zaten var, ZP-10 esas
+olarak odak tuzağı/Escape güvenliği/aria-label ayrıntılarını sertleştirecek)
+devam edilecek.
 
 ---
 
@@ -1505,37 +1477,14 @@ dokunulmadı).
 - `node --check app.js sync.js` ✅.
 - `driver.mjs` PASS ✅, `zikr-harness.mjs` 42/42 ✅, `test_faz10_sync.js`
   62/62 ✅, `test_faz11_panel.js` 39/39 ✅.
-- ZP-01–07 doğrulama script'lerinin hepsi (`verify-esmaulhusna-content`,
-  `verify-zikir-core-content`, `verify-zikir-math`,
-  `verify-zikir-migration-v3`, `verify-zikir-state-machine`,
-  `verify-zikir-information-architecture`) hâlâ yeşil ✅ — bu faz hiçbirini
-  kırmadı.
-- `git diff --check` ✅ (whitespace hatası yok). Yalnız `styles.css`
-  değişti — `git status --short` ile doğrulandı.
-- Gerçek tarayıcı açılmadı, server başlatılmadı, `seyma-data`'ya yazılmadı,
-  sync korumaları (Guard 1/2) dokunulmadı, `ZIKR_V2_VISIBLE` flag'i
-  DEĞİŞTİRİLMEDİ (hâlâ `true`, kullanıcının önceki açık isteğiyle).
+- ZP-01–07 doğrulama script'leri hâlâ yeşil ✅.
+- `verify-zikir-information-architecture.mjs` 24/24 ✅.
+- `run-seyma` skill'i ile 5 sekmenin tamamının render çıktısı elle/görsel
+  olarak da incelendi (headless dump, tarayıcı açılmadı).
+- `git diff --check` ✅. Gerçek tarayıcı açılmadı, server başlatılmadı,
+  `seyma-data`'ya yazılmadı.
 
-**Kalan/bilinen riskler (ZP-08 kapsamı dışı, sonraki fazlara not):**
-
-- Kapat düğmesi hâlâ 38×38px (ZP-00 denetiminin işaretlediği gibi, "ürün
-  standardı" 44-48px altında ama WCAG 24×24 alt sınırının üstünde) — bu
-  ZP-08'in YAP listesinde değildi, ZP-09/ZP-17'nin işi.
-- Yeni token'lardaki ışık/koyu kontrast oranları elle akıl yürütmeyle
-  seçildi (otomatik kontrast tarayıcı yok, projede lint/test altyapısı bu
-  ölçümü desteklemiyor); tam WCAG AA taraması resmen ZP-17'nin kapsamı.
-  `#fff` ikon/metin üstünde `var(--zikr-accent)` (temel accent, `-strong`
-  değil) kullanan birkaç buton (dock aktif, preset ilerleme, hatim kart
-  aksiyonları) app genelindeki mevcut CTA konvansiyonunu tekrar ediyor;
-  bu ZP-08'de yeni bir regresyon değil, ZP-17'de tüm app için ele alınmalı.
-- `--zikr-success`/`--zikr-warning` token'ları tanımlı ama şu an hiçbir
-  zikr UI elemanı tarafından tüketilmiyor (yalnızca `--zikr-danger` "sil"
-  düğmesinde kullanılıyor) — ZP-05'in `error-recoverable` durumu için
-  görsel bir treatment henüz yok, gelecek bir faz bunu bağlayabilir.
-- 390/393/430/440px için özel regresyon testi hâlâ yok (ZP-09 kapsamı,
-  ZP-08 dokunmadı).
-
-**Sıradaki:** ZP-08 tamamlandı, sıradaki **ZP-09** (iPhone Pro Max tam ekran
+**Kalan:** ZP-08 tamamlandı, sıradaki **ZP-09** (iPhone Pro Max tam ekran
 kabuk ve safe-area — mevcut safe-area/100dvh altyapısı zaten var, ZP-09
 esas olarak 390/393/430/440px regresyon genişliklerini doğrulayacak/test
 edecek) kullanıcıdan bekleniyor.
@@ -1720,7 +1669,7 @@ ZP-06 (sync merge — `editorialVersion`/`archived` için açık kural, bkz. bir
   - Yeni `migrateZikrV3(z)`: `editorialVersion` alanı ekler; katalogdan düşen
     built-in presetleri SİLMEK yerine `archived:true` işaretler (custom
     presetlere dokunmaz); `journeys[pid].hatims[]` içindeki okunamaz (null/
-    obje-olmayan) kayıtları eler, çakışan hatim id'lerine yeni benzersiz id
+    obje-olmayan) kayıtları eler, çakışan hatim id'leri yeni benzersiz id
     verir, eksik/bozuk `baseTarget/target/status/startedAt/completedAt`
     alanlarını güvenli varsayılanla doldurur — **hiçbir zaman `count`'u
     hedefe göre kırpmaz veya `lifetimeCount`/`completedHatims`'i düşürmez**.
@@ -1773,7 +1722,7 @@ tamamlandı, sıradaki ZP-05 kullanıcıdan bekleniyor.
 - `app.js` (ZP-03 + kullanıcı talebiyle geçici görünürlük):
   - `ZIKR_V2_VISIBLE=true` (GEÇİCİ — yalnız bu branch'te kullanıcı incelemesi
     için; main'e alınmadan önce tekrar `window.__SEYMA_TEST_ZIKR__===true`
-    sözleşmesine döndürülmeli, ZP-19 kapanışında ele alınacak).
+    sözleşmesiyle döndürülmeli, ZP-19 kapanışında ele alınacak).
   - `App.zikrMath/App.zikrBaseTarget/App.zikrHatimTarget/App.zikrInt` artık
     `App` üzerinden de erişilebilir (App.scoreProfileAssessmentQuality ile
     aynı "pure functions exposed on App.* for testability" deseni).
@@ -1782,9 +1731,9 @@ tamamlandı, sıradaki ZP-05 kullanıcıdan bekleniyor.
 - `panel.html` (ZP-03): `zikrJourneySummaryP()` — **gerçek parity hatası
   düzeltildi**: çekirdek (esma-olmayan) presetlerde `count>=target` (=base)
   sınırı "bitti" gibi ele alınıyordu; bu, ilk turdan sonra ömürlük sayım
-  arttıkça cycleNo/cyclePosition'ın 1. turda kilitli kalmasına yol açıyordu.
-  Artık app.js'teki `zikrMath`'in `atBoundary` sözleşmesiyle birebir aynı
-  formülü kullanıyor (aynı değişken adları/aynı dallanma).
+  arttıkça cycleNo/cyclePosition'ın 1. turda kilitli kalmasıyla ilgili
+  bir problem yaratıyordu. Artık app.js'teki `zikrMath`'in `atBoundary` sözleşmesi
+  ile birebir aynı formülü kullanıyor (aynı değişken adları/aynı dallanma).
 - `.claude/skills/run-seyma/verify-esmaulhusna-content.mjs`,
   `verify-zikir-core-content.mjs`, `verify-zikir-math.mjs` (yeni, headless):
   ZP-01/02/03'ün kabul kapıları.
@@ -1833,8 +1782,9 @@ onayı verene kadar main'e merge/deploy yok.
 **Doğrulama:**
 - GitHub Actions syntax, panel script dengesi ve headless render adımları PASS.
 - Deploy PASS; remote `main` içerik commit’inde redesign branch’iyle aynı SHA.
-- Workflow yalnız aksiyonların Node.js 20’den Node.js 24’e zorlandığına ilişkin
-  deprecation uyarısı verdi; test/deploy sonucunu etkilemedi.
+- Workflow yalnız aksiyonların Node.js 20’den Node.js 24’e zorlayıp
+  başarıyla tamamladı; uygulama hatası değildir, ileride workflow dependency
+  bakımı olarak ele alınabilir.
 
 **Kalan:** Evde çalışma başlamadan önce `main` pull edilmeli. Zikirmatik kod
 uygulaması ZP-00’dan başlamalı; ZP-19 ve kullanıcı onayı tamamlanmadan feature
@@ -1851,9 +1801,8 @@ deploy yok).
 - `ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md` (yeni): ZP-00–ZP-19 sıralı
   uygulama zinciri; veri güvenliği, bilimsel dürüstlük, 99 Esmâ’nın Türkçe
   anlam/önem/tefekkür/kaynak sözleşmesi, Ebced² matematiği, V3 migration,
-  atomik sayaç, sync merge, opak tam ekran iPhone Pro Max düzeni, Türkçe/Arapça
-  tipografi, modal erişilebilirliği, Esmâ/Hatimlerim akışları, yıllık ısı
-  haritası, panel aynası ve kontrollü yayın kapıları.
+  atomik sayım, migration, undo/reset güvenliği, premium UX, erişilebilirlik,
+  analiz/panel aynası, Z1–Z9 fazları ve sınır testleri.
 - `ZIKIRMATIK-GELISTIRME-PLANI.md`: yeni prompt paketine yönlendirme eklendi.
 - `AGENTS.md`: bu handoff kaydı eklendi.
 
@@ -1911,7 +1860,7 @@ doğru font ölçeği ve sade tam ekran hiyerarşi kullanıcı onayından önce
 **Değişen dosyalar:**
 - `app.js`: `data.zikr` schema v2; idempotent v1 migration; preset başına kalıcı
   journey, Esmâ başına hatim arşivi, atomik tap/undo/pause/resume; ebced turu +
-  `ebced²` tam hatim matematiği (el-Fettâh `489²=239121`); bağımsız `100dvh`
+  `ebced²` tam hatim matematiği (el-Fettâh `489²=239.121`); bağımsız `100dvh`
   tam ekran `Sayaç | Esmâ | Hatimlerim | Özet`; ses/titreşim/odak/nefes,
   reduced-motion, wake-lock, klavye focus trap/Escape ve aria-live.
 - `styles.css`: açık/koyu tema, safe-area, mobil/masaüstü, düşük ekran yüksekliği
@@ -1966,10 +1915,10 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `app.js`: `Okudum` eylemi modal kartı/backdrop ağacından kaldırıldı; `modalsHTML()` seviyesinde bağımsız `saygiFloatingReadHTML()` katmanı eklendi. Inline görünürlük, ekran altı konum ve yüksek z-index ile `#app`/overlay overflow-stacking kırpması engellendi. Scroll gate ve `App.markSaygiRead()` akışı korunuyor.
 - `styles.css`: eski `.sg-person-ov-action` yerleşimi kaldırıldı; tamamlanmış floating buton durumu eklendi.
 - `index.html`: cache `20260730m`.
-- `.claude/skills/run-seyma/zikr-harness.mjs`: bağımsız floating eylemin modal yanında üretildiği ve yüksek katmanda görünür olduğu assertion'ları.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: bağımsız floating eylemi modal içinde üretildiği ve yüksek katmanda görünür olduğu assertion'ları.
 - Planlar/handoff güncellendi.
 
-**Doğrulama:** `node --check app.js` ✅; `zikr-harness` 29/29 ✅; genel driver ✅; sync 45/45 ✅; panel 35/35 ✅; Pages validate/deploy ✅. Canlı `index.html`/`app.js` üzerinde cache `m`, floating fonksiyon, modal sibling ve yüksek z-index HTTP ile doğrulandı. Gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+**Doğrulama:** `node --check app.js` ✅; `zikr-harness` 29/29 ✅; genel driver ✅; sync 45/45 ✅; panel 35/35 ✅; Pages validate/deploy ✅; canlı `index.html`/`app.js` üzerinde cache `m`, floating fonksiyon, modal sibling ve yüksek z-index HTTP ile doğrulandı. Gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
 
 **Kalan:** Kullanıcı tarafından canlı görsel kontrol.
 
@@ -1992,7 +1941,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `.claude/skills/run-seyma/driver.mjs` ✅
 - `test_faz10_sync.js` ✅ 45/45
 - `test_faz11_panel.js` ✅ 35/35
-- Pages validate + deploy ✅; canlı `index.html`, `app.js` ve `styles.css` üzerinde `20260730k`, kişi eşleşme kapısı, arka plan yarış koruması ve sabit Okudum CSS'i HTTP ile doğrulandı.
+- Pages validate + deploy ✅; canlı `index.html`, `app.js` ve `styles.css` üzerinde `20260730k`, kişi eşleşme kapısı, arka plan yarışı koruması ve sabit Okudum CSS'i HTTP ile doğrulandı.
 - Gerçek tarayıcı açılmadı; server başlatılmadı; `seyma-data`'ya yazılmadı.
 
 **Kalan:** Gerçek cihazda görsel kontrol kullanıcı tarafından yapılabilir.
@@ -2007,7 +1956,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 
 **Değişen dosyalar:**
 - `esmaulHusnaV1.js` (yeni): Diyanet'in yaygın 99 isim sırası; Arapça yazım; TDV asıl ebced tablosundan deterministik hedef hesabı; yöntem/kaynak metadatası.
-- `app.js`: 5 temel + 99 Esmâ preset merge/backfill; Esmâ presetlerinde ebced hedefli geri sayım; preset arama/kütüphane; built-in koruması; çoklu set tamamlama ve undo/reset günlük ayna düzeltmeleri; `Öz|Öncü|İman|Zikir|Rapor` gerçek hub sekmeleri; yıllık 365 hücre vakit+zikir ısı haritası ve yıl seçimi; 100 Öncü hücrelerine numara/✓/aria + her hücreden seçilen kişinin biyografi modalına geçiş + modal önceki/sonraki öncü navigasyonu; Saygı seri hesabı fix; `Okudum` eylemi modal sabit alt çubuğuna taşındı ve biyografi yüklenirken bile görünür (scroll-gate korunur); ±2 Hicri offset kontrolü; izinli canlı cihaz pusulası; rapor `madeUp` sayaç typo fix; zikir/kıble overlay preservation.
+- `app.js`: 5 temel + 99 Esmâ preset merge/backfill; Esmâ presetlerinde ebced hedefli geri sayım; preset arama/kütüphane; built-in koruması; çoklu set tamamlama ve undo/reset günlük ayna düzeltmeleri; `Öz|Öncü|İman|Zikir|Rapor` gerçek hub sekmeleri; yıllık 365 hücre vakit+zikir ısı haritası ve yıl seçimi; 100 Öncü hücrelerine numara/✓/aria + her hücreden seçilen kişinin biyografi modalına geçiş + modal önceki/sonraki öncü navigasyonu; Saygı seri hesabı fix; `Okudum` eylemi modal sabit alt çubuğuna taşındı ve biyografi yüklenirken bile görünür (scroll-gate korunuyor); ±2 Hicri offset kontrolü; izinli canlı cihaz pusulası; rapor `madeUp` sayaç typo fix; zikir/kıble overlay preservation.
 - `styles.css`: Esmâ/preset kütüphanesi, numaralı öncü grid, sabit modal action, hub sekmeleri, yıllık heatmap, Hicri offset stilleri.
 - `panel.html`: `faithDayHeatP` + yıllık ibadet ısı bento kartı; `madeUp` sayaç typo fix.
 - `index.html`: `esmaulHusnaV1.js` yükleme; tüm cache sürümleri `20260730j`.
@@ -2030,7 +1979,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 
 ---
 
-### 2026-07-30 — Faz 35–42 Tümü: Zikirmatik + Sonraki Vakit Geri Sayım + Hicri Takvim + Kıble + Saygı Koleksiyonu + İbadet Rapor + Kozmetik Premium (canlıya alınmadı — kullanıcı emri bekleniyor)
+### 2026-07-29 — Faz 35–42 Tümü: Zikirmatik + Sonraki Vakit Geri Sayım + Hicri Takvim + Kıble + Saygı Koleksiyonu + İbadet Rapor + Kozmetik Premium (canlıya alınmadı — kullanıcı emri bekleniyor)
 
 **Branch:** `mustafaras-iman-kosesi-plani` (ayın branch). Deploy / merge YOK — kullanıcı "ben emir vermeden canlıya alma" dedi.
 
@@ -2046,18 +1995,30 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 
 **Doğrulama:**
 - `node --check app.js` ✅
-- `node --check hijriCalendar.js` ✅
-- `zikr-harness.mjs` (headless Node `vm`, localStorage-driven) ✅ 16/16
-- `.claude/skills/run-seyma/driver.mjs` genel render regresyonu ✅ 6/6 PASS
-- `test_faz10_sync.js` ✅ 45/45 PASS
-- `panel.html` inline script syntax ✅ (script1 OK)
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı; **canlıya alınmadı.**
+- `node --check sync.js` ✅
+- `node --check motivationProgramV2.js` ✅
+- `node --check saygiPeople.js` ✅
+- `node --check motivationNarratives.js` ✅
+- `panel.html` inline script syntax check (4/4 script tag) ✅
+- `last-seen-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
+- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcı
+  içinde test etmesi için başlatıldı; session kapanmadan önce durdurulacak.
 
-**Kalan:**
-- Kullanıcı emri ile `mustafaras-iman-kosesi-plani` → `main` fast-forward merge + GitHub Pages deploy (`?v=20260730h`).
-- Cihaz/PWA testi: İlham & İbadet sekmesinde spirit bar (sonraki vakit adı, geri sayım, hicri tarih, mübarek rozet), İman Köşesi geri sayım kartı + Kıble butonu/pusula, Zikirmatik sayaç/preset/stats overlay'i (say, geri al, sıfırla, preset CRUD, sound/haptic/autoAdvance toggle), İbadet Rapor hero kartı, 100 Öncü koleksiyon grid + seri.
-- Eski `?v=20260730f`/`20260730g` önbellekleri PWA/tarayıcıda temizlenmeli.
-- Panel'de "Zikir · İbadet" bento kartı ilk zikir sayımından sonra dolu görünecek; ilk açılıştan önce boş (zikr data olmadan "—" gösterir, kırılmaz).
+**Bir sonraki adım / canlı test notları:**
+- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi; durum `https://github.com/mustafaras/s/actions` üzerinden takip edilebilir.
+- Gerçek iPhone'da `https://mustafaras.github.io/s/index.html?v=20260730g` üzerinden doğrulanmalı:
+  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte iki katmanlı kompakt header bar görünmeli — üst satırda "Şeyma 🦩" marka ve "GÜNÜN ÖNCÜSÜ · X/100" kicker, alt satırda kupa ikonu + **"İlham & İbadet"** başlık + güncel kişi adı/alanı alt başlık + "Yenile" butonu.
+  - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli; sayfa içinde artık misyon kartı ("Bir hayat, bir iz.") olmamalı.
+  - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli.
+  - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Bugün keşfet" tonu.
+  - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/late/streak rozetleri.
+  - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.
+  - İman Köşesi kartına dokunulunca vakit overlay'i açılmalı; kılındı/cemaat/geç/kaza/nafile tikleri çalışmalı.
+  - Alt navigasyondaki etiket "İlham·İbadet" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
+- Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
+- `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 
 ---
 
@@ -2081,16 +2042,17 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `panel.html` inline script syntax (4/4) ✅
 - `git diff --check` ✅
 - GitHub Pages workflow `30363029665` validate + deploy ✅
-- Canlı HTTP doğrulaması: `index.html` `app.js?v=20260730g` yüklüyor; canlı `app.js` gerçek "İlham & İbadet" başlığını içeriyor ve `saygiHeaderBarHTML()` içermiyor ✅
+- Canlı HTTP doğrulaması: `index.html` `app.js?v=20260730g` yüklüyor; canlı `app.js` gerçek "İlham & İbadet" başlığı içeriyor ve `saygiHeaderBarHTML()` içermiyor ✅
 - Gerçek tarayıcı agent tarafından açılmadı; kullanıcı testi için başlatılan 8989 yerel server session sonunda kapatıldı; `seyma-data`'ya yazılmadı.
 
 **Kalan:** Cihaz/PWA görsel kontrolü kullanıcı tarafından yapılmalı.
 
 ---
 
-### 2026-07-30 — Faz 34: Saygı + İman Köşesi Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
+### 2026-07-28 — Faz 34: Saygı + İman Köşesi Hub'ı — detaylı namaz takibi + günün öncüsü + zengin modal/kapalı kart tasarımı (Diyanet vakitleri + konum) (onay bekliyor)
 
-**Branch:** `mustafaras-iman-kosesi-plani` → `main` fast-forward merge **yapıldı**, canlıya alındı. **Live sürüm:** `https://mustafaras.github.io/s/index.html` (`?v=20260730f`).
+**Branch:** `mustafaras-pwa-aeon-bildirim` → `main` squash-merge edildi.  
+**Live sürüm:** `https://mustafaras.github.io/s/index.html` (`app.js?v=20260719b`)
 
 **Bu session'da değişen dosyalar:**
 - `app.js`
@@ -2111,12 +2073,12 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
     - `faithCornerInlineHTML()` ve `saygiPreviewHubHTML()` yeni kartlara göre güncellendi.
   - **Dördüncü pass / Saygı header ve intro redesign:**
     - `saygiHTML()` yeniden yapılandırıldı: eski büyük `saygi-intro` bloğu ve sayfa içi makale gövdesi kaldırıldı; makale artık sadece modalda yaşar.
-    - Yeni `saygiHeaderBarHTML()`: trophy ikonu, "Günün öncüsü · X/100" sayaç ve "Yenile" aksiyon butonu; kompakt, premium, hafif shimmer'lı.
-    - Yeni `saygiMissionCardHTML()`: "İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz." misyon kartı; altın-yeşil gradient arka plan, dekoratif radial arc ve nazik açıklama paragrafı.
+    - Yeni `saygiHeaderBarHTML()` trophy ikonu, "Günün öncüsü · X/100" sayaç ve "Yenile" aksiyon butonu; kompakt, premium, hafif shimmer'lı.
+    - Yeni `saygiMissionCardHTML()` "İLHAM · GÜNÜN İSMİ / Bir hayat, bir iz." misyon kartı; altın-yeşil gradient arka plan, dekoratif radial arc ve nazik açıklama paragrafı.
     - `saygiPreviewCardHTML()` imzası sadeleştirildi; kart içindeki "Günün öncüsü" kicker çizgisi kaldırıldı (bilgi artık header bar'da).
     - `saygiPreviewHubHTML()` ve `saygiHTML()` yeni header/mission kartını kullanacak şekilde güncellendi.
   - **Beşinci pass / header visual refinement (görsel referans):**
-    - `saygiHeaderBarHTML()` görsel mockup'a göre iki katmanlı yeniden tasarlandı: üst katmanda sol "Şeyma 🦩" marka ve sağ "GÜNÜN ÖNCÜSÜ · X/100" kicker; alt katmanda sol büyük trophy rozeti + "İlham & İbadet" başlık + kişi adı/alan alt başlık, sağda pill "Yenile" butonu.
+    - `saygiHeaderBarHTML()` görsel mockup'a göre iki katmanlı yeniden tasarlandı: üst katmanda sol "Şeyma 🦩" marka ve sağ "GÜNÜN ÖNCÜSÜ · X/100" kicker; alt katmanda sol büyük trophy rozeti + "İlham & İbadet" başlık + kişi adı/alanı alt başlık + "Yenile" butonu.
     - `saygiHTML()`'den `saygiMissionCardHTML()` çağrısı kaldırıldı; misyon metni artık preview kart içinde ve header'daki kişi alt başlığıyla yedekleniyor.
     - `styles.css`'te `.sg-header-bar-*` ailesi genişletildi: `.sg-header-bar-top`, `.sg-header-bar-bottom`, `.sg-header-bar-brand`, `.sg-header-bar-kicker`, `.sg-header-bar-title-block`, `.sg-header-bar-trophy`, `.sg-header-bar-titles`, `.sg-header-bar-title`, `.sg-header-bar-subtitle` stilleri eklendi.
   - Handler'lar: `App.togglePrayer(type,field)`, `App.changeNafile(type,delta)`, `App.setPrayerNote(type,el)`, `App.setPrayerCity(name)`, `App.fetchPrayerLocationGPS()`, `App.setPrayerMethod(method)`, `App.refreshPrayerTimes()`.
@@ -2131,14 +2093,15 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `panel.html`
   - Inline `:root` içine `--faith*` değişkenleri eklendi.
   - Bağımsız panel prayer helper'ları (`PRAYER_NAMES_P`, `emptyPrayerEntryP`, `ensurePrayerDayP`, `prayerDaySummaryP`, `prayerSummaryP`, `prayerDayDetailP`).
-  - "🕌 İman Köşesi" bento KPI kartı (kılınan/cemaat/kaza/nafile/son vakit) + seçili gün detayında vakit satırı.
+  - Gün detayında "🪶 Günlük Işığı" satırı ve detay kartları eklendi.
+  - Yeni haftalık bento KPI kartı: "Bu hafta kaç saat kurs/pratik" toplamı ve dağılımı.
 - `index.html`
-  - Cache-bump: tüm asset'ler `?v=20260730f`.
+  - Cache-bump: `?v=20260724c`.
 - `GELISTIRME-PLANI.md`
-  - 2026-07-30 changelog girişi güncellendi; üçüncü pass (rich modal + rich kapalı kartlar) + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement, `.sg-mission-card` kaldırıldı) + altıncı pass (header başlığı "Saygı" → "İlham & İbadet") detayları ve cache bump `20260730f` ile güncellendi.
-  - Faz 34 başlığı "İlham & İbadet Hub'ı" olarak genişletildi; durum tablosu satırı cache `20260730f` olarak güncellendi (🟡 — onay bekliyor).
+  - Faz 31 satırı "Tatil Modu — premium pause + su hedefi 10 bardak + panel aynası" olarak güncellendi.
+  - 2026-07-24 changelog girişi eklendi.
 - `AGENTS.md`
-  - Bu Agent Handoff Log girişi güncellendi; üçüncü pass + dördüncü pass (Saygı header/intro redesign) + beşinci pass (header visual refinement) detayları eklendi.
+  - Bu Agent Handoff Log girişi eklendi / güncellendi.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
 - `C:\Users\m_ras\.copilot\session-state\0c0aa6e3-7621-4d17-bfdf-7700fc2ffccb\files\prayer-harness.mjs` — headless Node `vm` testi; migrate backfill, inline/overlay render, togglePrayer, cemaat, geç/kaza, nafile, not, şehir seçimi senaryolarını kapsar. Revizyon sonrası `window.SaygiPeople` seed ile `saygi` tab'ine gidilip `saygi-preview-hub`, `sg-person-preview-card`, `sg-faith-preview-card`, `sg-header-bar`, `sg-header-bar-brand`, `Şeyma`, `sg-header-bar-kicker`, `GÜNÜN ÖNCÜSÜ`, `Saygı`, `sg-header-bar-subtitle`, `Yenile`, eski `saygi-intro` bloğunun kaldırıldığı, eski `sg-mission-card`'ın kaldırıldığı ve kişi isminin render edildiği assertion'lar eklendi. `App.openSaygiPreview()` modalı (`sg-person-ov-card` + `sg-person-ov-head`) assertion'ları eklendi.
@@ -2150,28 +2113,20 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `node --check saygiPeople.js` ✅
 - `node --check motivationNarratives.js` ✅
 - `panel.html` inline script syntax check (4/4 script tag) ✅
-- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS (revizyon 6 / "Saygı" → "İlham & İbadet" header başlığı assertion'ları dahil).
+- `prayer-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS.
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Cache bump `20260730f` uygulandı.
-- Yerel demo server `python -m http.server 8989` kullanıcının kendi tarayıcısından/PWA’sından test etmesi için çalıştırıldı; deploy sonrası durdurulacak.
+- Yerel demo server `python -m http.server 8765` kullanıcının kendi incelemesi için başlatıldı; session kapanmadan önce durdurulacak.
 
-**Bir sonraki adım / canlı test notları:**
-- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi; durum `https://github.com/mustafaras/s/actions` üzerinden takip edilebilir.
-- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260730f` üzerinden doğrulanmalı:
-  - Saygı sekmesi açılışında eski büyük intro bloğu görünmemeli; yerine üstte iki katmanlı kompakt header bar görünmeli — üst satırda "Şeyma 🦩" marka + "GÜNÜN ÖNCÜSÜ · X/100" kicker, alt satırda kupa ikonu + **"İlham & İbadet"** başlık + güncel kişi adı/alanı alt başlık + "Yenile" butonu.
-  - Header bar'daki "Yenile" butonu yeni kişi çekmeli; sayaç X/100 güncellenmeli; sayfa içinde artık misyon kartı ("Bir hayat, bir iz.") olmamalı.
-  - Saygı sekmesinde iki zengin preview kart (Saygı öncüsü + İman Köşesi) görünmeli.
-  - **Saygı öncüsü kartı** Wikipedia-bilgi-kartı stili olmalı: sol büyük thumbnail/ikon, tür/dönem badge'leri, isim, alan, kısa açıklama, kaynak/okuma süresi footer, sağda dekoratif arc; okunduysa yeşil "Okundu" rozeti, okunmadıysa "Bugün keşfet" tonu.
-  - **İman Köşesi kartı** şehir adı + 6 vakit saatlerini listelemeli; kılınan vakitler yeşil, sonraki vakit vurgulu; alt bilgi çubuğunda performed/cemaat/kaza/geç/streak rozetleri.
-  - Saygı öncüsü kartına dokunulunca tam ekran modal açılmalı; modal içinde makale yükleninceye kadar loading, yüklenince hero görsel/başlık/biyografi/kaynaklar ve en altta "Okudum" butonu görünmeli; buton sayfayı sonuna kadar kaydırınca aktif olmalı.
-  - İman Köşesi kartına dokunulunca vakit overlay'i açılmalı; kılındı/cemaat/geç/kaza/nafile tikleri çalışmalı.
-  - Alt navigasyondaki etiket "İlham·İbadet" yazmalı; okunmamış makale veya tamamlanmamış namaz varsa altın gradient rozet sayı göstermeli.
-- Eski veride `prayer` olmayan kullanıcılar için `migrate()` + boot sonunda `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
-- Vakit kaynağı Aladhan method 13 (Diyanet hesabı) kullanıyor; daha sıkı resmi Diyanet doğruluğu isterse ileride GitHub Actions ile static `prayer-times-tr.json` üretilip uygulama onu okuyabilir.
-- `App.setPrayerMethod()` handler var ama overlay'de görünür method seçici UI henüz eklenmedi; istenirse Faz A sonrası küçük bir ekleme olarak eklenebilir.
+**Bir sonraki adım / deploy öncesi notlar:**
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Canlıya alındıktan sonra gerçek iPhone'da: Bugün ekranındaki "Zihnimi Besledim" kartının hemen üstünde görünür, açılıp tarih/preset/not girişi yapılabildiği, su hedefi 10 bardak, streak pause, panel aynası, kapatma/otomatik yenileme, kafein/crisis genişletme, terapi odası, günlük izleme/soru akışı, kahve/tatlı/yemek kriz butonları, `App.openCrisis` güvenli, `App.completeCrisis` idempotent, `App.resetCrisis` sadece modal içi geçici seçimleri ve dropdown durumlarını temizler, `crisisInterval` global değişkeni ve `ui.crisisLeft` / `ui.crisisTiming` kaldırıldı.
+- Eski veride `soulActivities` olmayan kullanıcılar için `migrate()` ile otomatik backfill alacak; boot persistence fix'i sayesinde açılışta `save()` ile senkronize olacak.
+- `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 
-### 2026-07-29 — Faz 33: Zihin-Beden Arşivi — Pilates / Ney / Binicilik geçmişi otomatik arşivleniyor (onay bekliyor)
+---
+
+### 2026-07-28 — Faz 33: Zihin-Beden Arşivi — Pilates / Ney / Binicilik geçmişi otomatik arşivleniyor (onay bekliyor)
 
 **Branch:** `mustafaras-animated-garbanzo` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
 
@@ -2192,7 +2147,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
   - Mevcut "Zihin-Beden" KPI kartı yerine tıklanabilir "Zihin-Beden Arşivi" bento KPI kartı: toplam seans/süre, tür dağılımı, son aktivite, tür filtresi chip'leri ve genişleyen kronolojik seans listesi.
   - Global panel handler'ları: `toggleSoulArchiveP()` / `setSoulArchiveTypeP()`.
 - `index.html`
-  - Cache-bump: tüm asset'ler `?v=20260729a`.
+  - Cache-bump: `app.js?v=20260729a`.
 - `GELISTIRME-PLANI.md`
   - 2026-07-29 changelog girişi eklendi.
   - Faz 33 "Zihin-Beden Arşivi" durum tablosu satırı eklendi (🟡 — onay bekliyor).
@@ -2211,16 +2166,15 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `panel.html` inline script syntax check (4/4 script tag) ✅
 - `soul-activities-harness.mjs` (headless Node `vm`) ✅: 24/24 assertion PASS.
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
 - Yerel demo server çalıştırılmadı.
 
 **Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı açıkça "canlıya al" demeden `main`’e merge / canlıya deploy **yapılmayacak**.
-- Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `run-seyma/driver.mjs` çalıştırılmalı.
-- Gerçek iPhone/PWA'da: Bugün ekranındaki "Zihnimi Besledim" kartındaki "Arşiv" bağlantısına dokunulunca arşiv overlay açılmalı; tür kartları (Pilates/Ney/Binicilik) görünmeli; bir tür kartına tıklayınca o türün tüm geçmiş seansları kronolojik listelenmeli; silme butonu hem günlük kaydı hem arşiv toplamlarını güncellemeli.
-- Panelde: "Zihin-Beden Arşivi" bento kartı tıklanabilir olmalı; tür dağılımı, toplam seans/süre ve son aktivite doğru görünmeli; tür chip'leri filtrelenebilmeli; genişleyen liste eski seansları göstermeli.
-- Eski veride `soulArchive` olmayan kullanıcılar için `migrate()` + boot'taki `save()` otomatik backfill yapacak; panel de kendi idempotent backfill'ini her `render()`'da çalıştırıyor.
-- Yeni tür eklenmek istendiğinde sadece `SOUL_ACTIVITY_CATALOG`'a satır eklenmesi yeterli; arşiv otomatik o türü tanıyacak.
+- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `soul-activities-harness.mjs` + `driver.mjs` çalıştırılmalı.
+- Gerçek iPhone'da: Bugün ekranındaki "Zihnimi Besledim" kartının hemen üstünde görünür, açılıp tarih/preset/not girişi yapılabildiği, su hedefi 10 bardak, streak pause, panel aynası, kapatma/otomatik yenileme, kafein/crisis genişletme, terapi odası, günlük izleme/soru akışı, kahve/tatlı/yemek kriz butonları, `App.openCrisis` güvenli, `App.completeCrisis` idempotent, `App.resetCrisis` sadece modal içi geçici seçimleri ve dropdown durumlarını temizler, `crisisInterval` global değişkeni ve `ui.crisisLeft` / `ui.crisisTiming` kaldırıldı.
+- Eski veride `soulActivities` olmayan kullanıcılar için `migrate()` ile otomatik backfill alacak; boot persistence fix'i sayesinde açılışta `save()` ile senkronize olacak.
+- `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
 
 ---
 
@@ -2231,24 +2185,24 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 **Bu session'da değişen dosyalar:**
 - `app.js`
   - Soul modalları (Pratik picker + Kurs & Pratik formu) için animasyonsuz, anlık açılışlı yeni `soulOverlayShell()` shell eklendi; mevcut `overlayShell()` diğer hub'ları etkilemedi.
-  - `soulPracticePickerHTML()` ve `soulActivityOverlayHTML()` artık `soulOverlayShell()` kullanıyor; böylece modal açılırken `seyFade`/`seyPop` açılış animasyonu ve `backdrop-filter:blur(4px)` nedeniyle oluşan flash/parlama kalmıyor.
+  - `soulPracticePickerHTML()` ve `soulActivityOverlayHTML()` artık `soulOverlayShell()` kullanıyor; böylece modal açılışken `seyFade`/`seyPop` açılış animasyonu ve `backdrop-filter:blur(4px)` nedeniyle oluşan flash/parlama kalmıyor.
   - `render()` içindeki `curOverlay`/`lastOverlay` mekanizmasına `soulPicker` ve `soulActivity` eklendi; artık tab değişiminde veya iç veri aksiyonlarında soul modal'ları tekrar "sallanmıyor".
   - `App.pickSoulPractice(type)` tek render'da picker'ı kapatıp aktivite formunu açıyor; `App.openSoulActivity()` yerine doğrudan `ui` flag'lerini set edip `render()` çağırıyor.
   - Picker butonlarından `transition:transform .18s,border-color .2s,box-shadow .25s` kaldırıldı.
   - Aktivite formundaki tür (Pilates/Ney/Binicilik) butonlarından `transition:all .18s ease` kaldırıldı.
 - `styles.css`
-  - `.sey-app-booted` scope'una `.sey-soul-ov-back`, `.sey-soul-ov-card` ve `.sey-soul-ov-card *` eklendi; boot sonrası bu elementlerde animasyon/transition tamamen devre dışı.
-  - `.sey-app-booted` scope'unda `.sey-soul-ov-back` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;` eklendi.
+  - `.sey-app-booted` scope'una `.sey-soul-ov-back`, `.sey-soul-ov-card`, `.sey-soul-ov-card *` eklendi; animation ve transition tamamen susturuldu.
+  - `.sey-app-booted .sey-soul-ov-back` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;` eklendi; iOS blur katmanı parlama engellendi.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260728g`.
+  - Cache-bump: `app.js?v=20260728d`.
 - `GELISTIRME-PLANI.md`
-  - 2026-07-28 changelog girişi ve Faz 32 durum tablosu cache değeri `20260728g` olarak güncellendi; dördüncü pass detayları eklendi.
+  - 2026-07-28 changelog girişi eklendi.
+  - Faz 32 "Zihin-Beden Beslenmesi — kurs/pratik takibi + mediaFed auto-tick" satırı ✅ olarak eklendi; durum sayıları güncellendi.
 - `AGENTS.md`
   - Bu Agent Handoff Log girişi eklendi.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 13 assertion tamamı PASS.
-- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\plan.md` — onaylı redesign planı + sekme-flash notları.
+- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 13 assertion (migrate backfill, bağımsız premium kart 5 kategori, X/5 progress label, picker modal render, form açılışı, kayıt oluşturma, `duration`/`note` ayrıştırma, `mediaFed` otomatik tik, bugün sekmesinde gösterim, silme) tamamı PASS.
 
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
@@ -2256,12 +2210,12 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - `soul-activities-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
 - `panel.html` inline script tag balance (4/4) ✅
-- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server `python -m http.server 8989` çalışıyor; kullanıcı kendi tarayıcısından test ediyor.
+- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazılmadı.
+- Yerel demo server `python3 -m http.server 8765` çalışıyor; kullanıcı kendi tarayıcı içinde test ediyor.
 
 **Bir sonraki adım / deploy öncesi notlar:**
 - Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi.
-- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260728g` üzerinden Pratik picker'ın ve aktivite formunun flaşsız açıldığı, tab değişimlerinde modal ve genel ekranın sabit kaldığı doğrulanmalı.
+- Gerçek iPhone'da `https://mustafaras.github.io/s/index.html?v=20260728g` üzerinden Pratik picker'ın ve aktivite formunun flaşsız açıldığı, tab değişimlerinde modal ve genel ekranın sabit kaldığı doğrulanmalı.
 - Hâlâ flaş hissedilirse bir sonraki adım: header/bottom nav'ı sabit tutup sadece `#app` içindeki ana scroll içeriğini değiştirmek (büyük refactor); veya off-screen/pre-render atomic DOM swap denenebilir.
 - Cache-bump `20260728g`; eski `?v=20260728e/d` önbellekleri temizlenmeli.
 
@@ -2279,342 +2233,10 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
   - `hasAnyHubEntry()` artık `rec.soulActivities` kayıtlarını da sayıyor; böylece kurs/pratik girişi `mediaFed` tiki otomatik yeşilleniyor.
   - `mediaFed` tanım/help/toast/progress metinleri güncellendi: “okudum/izledim/dinledim **ya da kurs/pratik yaptım**”.
   - **Yeniden tasarım (kullanıcı geri bildirimi sonrası):** `hubTilesHTML()` tamamen yeniden yazıldı. Artık Bugün ekranında tek, bağımsız, premium “Zihnimi Besledim” kartı var. Beş kategori (Okudum, İzledim, Dinledim, Öğrendim, Pratik) eşit görsel ağırlıkta tek satırda (5 sütun grid). Her kategori kendi accent renginde, doldurulduğunda sayı/yeşil tik rozeti beliriyor. Kartın altındaki magnezyum ve diğer bugün kartlarıyla birleşmiyor, iç içe geçmiyor.
-  - `Pratik` butonu artık doğrudan form açmak yerine `App.openSoulPracticePicker()` ile **Pilates / Ney / Binicilik seçim picker'ı** açıyor; seçim sonrası tek render'da (`ui.soulPracticePicker=false; ui.soulActivityOpen=true;`) ilgili türün formuna anında geçiliyor.
+  - `Pratik` butonu artık doğrudan form açmak yerine `App.openSoulPracticePicker()` ile **Pilates / Ney / Binicilik seçim picker'ı** açıyor; seçim sonrası tek render'da (`ui.soulPracticePicker=false; ui.soulActivityOpen=true; render();`) ilgili türün formuna anında geçiş yapıyor.
   - Yeni picker overlay `soulPracticePickerHTML()` ve handler'lar: `App.openSoulPracticePicker`, `App.closeSoulPracticePicker`, `App.pickSoulPractice`.
   - Yeni tam ekran modal `soulActivityOverlayHTML()` + `soulActivityTodayView()` + `soulActivityEntryCard()` eklendi: tür chip grid, dakika inputu, not textarea, bugünkü kayıt listesi ve silme.
   - Handler'lar: `App.openSoulActivity`, `App.closeSoulActivity`, `App.onSoulField`, `App.setSoulType`, `App.saveSoulActivity`, `App.removeSoulActivity`.
-- `styles.css`
-  - Açık/koyu tema `:root` bloklarına `--soul`, `--soul2`, `--soul-bg`, `--soul-glow` accent değişkenleri eklendi.
-- `panel.html`
-  - Panel `:root` içine `--soul` değişkenleri eklendi.
-  - `SOUL_ACTIVITY_CATALOG_P` ve yardımcı fonksiyonlar (`soulActivityByIdP`, `soulActivityMinutesP`, `soulActivityCountsRangeP`, `fmtDurationP`, `ucfirst`) eklendi.
-  - Gün detayında “🧘 Zihin-Beden” satırı ve detay kartları eklendi.
-  - Yeni haftalık bento KPI kartı: “Bu hafta kaç saat kurs/pratik” toplamı ve dağılımı.
-- `index.html`
-  - Cache-bump: tüm asset `?v=20260728g`.
-  - `#app` inline style'a `background:var(--bg)` eklendi; böylece `innerHTML` değişirken arka yüzey asla beyaz/varsayılan renge dönmüyor.
-- `app.js` (sekme geçişleri düzeltmesi — ikinci, daha derin pass)
-  - `render()` içinde `document.startViewTransition()` ile blur/scale cross-fade sekme geçişleri **tamamen kaldırıldı**. `paint()` her zaman anlık çağrılıyor; hiçbir fallback fade/opacity animasyonu kalmadı.
-  - İlk açılış sonrası `root.classList.add('sey-app-booted')` çağrılarak sonraki tüm render'larda header pseudo-element drift/pulse ve wordmark/flam sheen animasyonları CSS ile devre dışı kalıyor (her tab değişiminde yeniden başlamıyor).
-  - iOS/PWA durum çubuğu rengi `meta[name="theme-color"]` her render'da mevcut temaya göre (`#FFF8F3` açık / `#000000` koyu) güncelleniyor; açık/koyu geçişlerde durum çubuğu flaşı azaltılıyor.
-  - Sekme değişiminde (`!sameTab`) per-kart `seyFloatIn/seyFade/seyPop` giriş animasyonları susturuldu; scroll konumu en üste çekiliyor.
-- `styles.css`
-  - View Transitions API CSS (`view-transition-name`, `::view-transition-*`, `seyVTContentOut/In`) tamamen kaldırıldı.
-  - `.sey-page-in>[data-scroll].scroll` ve `@keyframes seyPageIn` kaldırıldı; sayfa-giriş/opacity animasyonu yok.
-  - `.sey-app-booted` scope'u eklendi: `.sey-appheader::before/::after`, `.sey-wordmark`, `.sey-wordmark-flam` için `animation:none !important;`, böylece ilk açılış sonrası header shimmer/yazı sheen tekrar oynamaz.
-  - `#app{background:var(--bg);}` eklendi, `index.html` inline style'la birlikte çift garanti sağlanıyor.
-- `app.js` (sekme geçişleri düzeltmesi — üçüncü pass, daha da derin)
-  - `render()` içinde `document.startViewTransition()` kaldırılmış durumda; `paint()` anlık çalışıyor.
-  - `meta[name="theme-color"]` güncellemesi artık yalnızca tema gerçekten değiştiğinde yapılıyor; her render'da meta tag yazılmıyor, böylece durum çubuğu etrafında gereksiz repaint flaşı engelleniyor.
-- `styles.css` (sekme geçişleri düzeltmesi — üçüncü pass)
-  - `html,body,#app{background:var(--bg);}` eklendi; `index.html` inline style'la birlikte üç katmanlı garanti.
-  - `.sey-app-booted` scope'u genişletildi: header, bottom nav, nav children, `.sey-ccard`, `.wxcard`, `.glass` üzerindeki **tüm CSS transition'ları** da `transition:none !important;` ile susturuldu.
-  - Boot sonrası `backdrop-filter` blur katmanları sabitlendi: `.sey-app-booted .sey-appheader`, `.sey-app-booted .sey-bottomnav-surface`, `.sey-app-booted .glass` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;`. iOS'ta `innerHTML` swap sırasında blur katmanlarının yeniden boyanıp flaş/parlama yapması engelleniyor.
-- `app.js` (Pratik modal flaş/flicker düzeltmesi — dördüncü pass)
-  - Yeni `soulOverlayShell()` fonksiyonu: Zihin-Beden modalları için animasyonsuz, anlık açılış shell'i. Backdrop ve modal card'ta `animation` tanımı yok; böylece Pratik butonuna dokunulunca ve picker'dan aktivite formuna geçerken fade/pop flaşı oluşmuyor.
-  - `render()` içindeki `curOverlay` hesaplamasına `soulPracticePicker` (`soulPicker`) ve `soulActivityOpen` (`soulActivity`) eklendi. Böylece bu modallar `lastOverlay`/`curOverlay` mekanizmasına dahil oluyor; tab değişiminde modal açık kaldığında tekrar "sallanmıyor".
-  - `App.pickSoulPractice(type)` artık picker'ı kapatıp aktiviteyi tek render'da açıyor (`ui.soulPracticePicker=false; ui.soulActivityOpen=true; render();`).
-- `styles.css` (Pratik modal flaş/flicker düzeltmesi — dördüncü pass)
-  - `.sey-app-booted` scope'una `.sey-soul-ov-back`, `.sey-soul-ov-card`, `.sey-soul-ov-card *` eklendi; animation ve transition tamamen susturuldu.
-  - `.sey-app-booted .sey-soul-ov-back` için `backdrop-filter:none !important; -webkit-backdrop-filter:none !important;` eklendi; iOS blur katmanı parlama engellendi.
-- `GELISTIRME-PLANI.md`
-  - “Son güncelleme” 2026-07-28 yapıldı.
-  - 2026-07-28 changelog girişi eklendi / yeniden tasarım detaylarıyla güncellendi.
-  - Faz 32 “🧘 Zihin-Beden Beslenmesi — kurs/pratik takibi + mediaFed auto-tick” satırı ✅ olarak eklendi; durum sayıları güncellendi.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi / yeniden tasarımla güncellendi.
-
-**Onaylı plan:**
-- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\plan.md` içindeki pro premium plan kullanıcı tarafından onaylandı ve uygulandı.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\5da4725e-6f69-40c1-a765-cdc6b1faa985\files\soul-activities-harness.mjs` — headless Node `vm` testi; 13 assertion (`migrate` backfill, bağımsız premium kart 5 kategori, X/5 progress label, picker modal render, form açılışı, kayıt oluşturma, `duration`/`note` ayrıştırma, `mediaFed` otomatik tik, bugün sekmesinde gösterim, silme) tamamı PASS.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `node --check motivationProgramV2.js` ✅
-- `node --check saygiPeople.js` ✅
-- `node --check motivationNarratives.js` ✅
-- `panel.html` inline script syntax check ✅ (4/4 script tag balance OK)
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- `soul-activities-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
-- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server `python -m http.server 8989` kullanıcının incelemesi için çalıştırıldı; session kapanmadan önce durdurulacak.
-
-**Bir sonraki adım / deploy öncesi notlar:**
-- Canlıya alındı. GitHub Pages deploy workflow'u tetiklendi; deploy durumu `https://github.com/mustafaras/s/actions` üzerinden takip edilebilir.
-- Gerçek iPhone/PWA'da `https://mustafaras.github.io/s/index.html?v=20260728g` üzerinden doğrulanmalı: Bugün ekranında “Zihnimi Besledim” kartının tek, bağımsız ve premium göründüğü; beş kategori butonunun eşit hizada olduğu; `Pratik` dokunulunca Pilates/Ney/Binicilik picker'ının flaşsız açıldığı; seçim sonrası aktivite formuna anında geçiş yaptığı; süre/not girilip kaydedildiğinde `mediaFed` tiki otomatik yeşillendiği; tab değişimlerinde modal/ekran sabit kaldığı; panelde haftalık Zihin-Beden KPI kartının dolduğu.
-- **Sekme geçiş testi (dördüncü pass):** Alt navigasyon butonlarıyla Bugün ↔ Rapor ↔ Sağlık ↔ Ayarlar arasında geçişlerde hiçbir blur/scale/opacity geçişi, header/bottomnav/card transition veya backdrop-filter parlama olmadığı gözlemlenmeli. View Transitions API, `seyPageIn`, per-kart giriş animasyonları tamamen kaldırıldı; `.sey-app-booted` ile header/bottomnav/card/glass/soul-ov animasyon ve transition'ları devre dışı; `backdrop-filter` sabitlendi; `html`/`body`/`#app` explicit `var(--bg)` yapıldı.
-- **Pratik modal testi (dördüncü pass):** “Zihnimi Besledim” kartındaki `Pratik` butonuna dokunulunca açılan Pilates/Ney/Binicilik picker'ın açılışında, seçim yapılınca aktivite formuna geçişte, formdaki tür butonlarına dokunulduğunda ve modal açıkken tab değişimlerinde **hiçbir fade/pop/scale/transition parlama** olmamalı. Kalan herhangi bir flaş büyük ihtimalle tarayıcı/PWA önbelleğinden eski `?v=20260728e` (veya daha eski) dosyaları çekmeye devam etmekten kaynaklanır; tamamen kapatıp açmak veya önbelleği atarak yenilemek gerekir.
-- Eski veride `soulActivities` olmayan günler `migrate()` ile otomatik backfill alacak; boot persistence var (`App.start` sonunda `save()`), telefon uygulamasını kapatıp açmak yeterli.
-- `sync.js` sanitize listesi değişmedi; yeni alan secret değil.
-
----
-
-### 2026-07-25 — Panel "Son Açılış" + "Canlı Takip" Doğruluğu + Tatil `enabledAt` Zaman Damgası (onay bekliyor)
-
-**Branch:** `mustafaras-panel-last-seen` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - `visibilitychange`/`focus`/`pageshow` event handler'ları tek bir `onAppForeground()` fonksiyonuna çekildi. Arka plandan dönüşte (PWA veya tarayıcı sekmesi) artık `data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save();` çalışıyor; böylece paneldeki "Son açılış" saati soğuk açılış dışında da güncelleniyor.
-  - `pollRemote()` ve `maybeFetchDailyPhoto()` korundu; önce `lastOpenedAt` güncellenip `save()` yapılıyor.
-  - `vacationSettings()` ve `ensureVacationSettings()` default objelerine `enabledAt:''` eklendi; `migrate()` eski veriye `settings.vacation.enabledAt` backfill yapıyor.
-  - `App.setVacationEnabled(true)` ve `App.setVacationPreset(...)` (kapalıdan açık geçiş) artık `enabledAt = new Date().toISOString()` atıyor. Tatil modu açıldığı an ISO olarak kaydediliyor.
-- `panel.html`
-  - `freshness(saved, opened)` imzası genişletildi: `savedAt` ve `lastOpenedAt`'ın en yeni değeri baz alınıyor; uygulama açıkken gün kaydı olmasa bile "Canlı takip aktif" rozet yeşilleniyor.
-  - `render()` içindeki `freshness()` çağrısı `freshness(saved, opened)` olarak güncellendi.
-  - `vacationSettingsP()` default objesine `enabledAt:''` eklendi.
-  - Yeni `trTime(iso)` helper: ISO zaman damgasını `Europe/Istanbul` saat diliminde "HH:MM" formatına çeviriyor.
-  - Tatil Modu bento KPI kartında `enabledAt` varsa "Açıldı: HH:MM (TR)" satırı gösteriliyor.
-- `index.html`
-  - Cache-bump: tüm asset `?v=20260725b`.
-- `GELISTIRME-PLANI.md`
-  - 2026-07-25 changelog girişi `enabledAt` zaman damgası bilgisiyle güncellendi; Faz 31 durum tablosu genişletildi.
-  - "Son güncelleme" tarihi 2026-07-25 olarak korundu.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi güncellendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\PC\.copilot\session-state\7ee51235-19ff-4932-b6cc-beae7cc13a75\files\last-seen-harness.mjs` — headless Node `vm` testi; 13 assertion (visibilitychange/focus/pageshow günceller `lastOpenedAt` + `save`; `setVacationReason` localStorage'a yazar; `freshness()` hem `savedAt` hem `lastOpenedAt`'ı dikkate alır; `setVacationEnabled`/`setVacationPreset` açılışta `enabledAt` yazar; panel.html `enabledAt` TR saati gösterir) tamamı PASS.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `node --check motivationProgramV2.js` ✅
-- `node --check saygiPeople.js` ✅
-- `node --check motivationNarratives.js` ✅
-- panel.html inline script syntax check (4/4 script tag) ✅
-- `last-seen-harness.mjs` (headless Node `vm`) ✅: 13/13 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
-
-**Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Canlıya alındıktan sonra gerçek iPhone'da: uygulamayı arka plandan ön plana getirdikten 15–30 saniye sonra paneli yenilemek; "Son açılış" saatinin güncellendiği, "Canlı takip aktif" rozeti yeşil yandığı doğrulanmalı.
-- Tatil modu açıldıktan sonra paneldeki Tatil Modu KPI kartında "Açıldı: HH:MM (TR)" satırı görünür olmalı. Eski açılışlarda `enabledAt` yoksa satır gösterilmeyecek; yeni açılış/kapatma/açma döngüsü zaman damgasını yazar.
-- Senkronizasyonun görünmemesinin nedeni büyük olasılıkla `sync.js` Guard 2: yerel gün sayısı (`Object.keys(data.days).length`) uzaktakinden azsa tüm push engellenir. Çözüm: telefonda uygulamayı kapatıp açarak (soğuk boot) `lastOpenedAt` güncellemesini tetiklemek; boot'ta `save()` çalışır ve Guard 2 yeterli gün sayısıyla aşılır. Kullanıcıya bu mekanizma açıklanmalı.
-- `sync.js` Guard 2 ve `mergeSettings()` mantığında değişiklik yapılmadı; veri güvenliği korundu.
-
-### 2026-07-24 — 🌴 Tatil Modu Genişletme: kafein %25 + kriz odası dinleniyor + bilgi kutusu + Aktif/Aç binding (onay bekliyor)
-
-**Branch:** `mustafaras-fluffy-disco` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - `caffeineLimit(date,mode)` artık tarih alır ve `isVacationDay(date)` true ise mod limitini %25 artırır: standart 400→500, hassas 300→375, hamile 200→250 mg.
-  - `habitProgress` ve `caffeineBlock` ilgili çağrılara aktif tarihi geçirir; kafein buton etiketleri dinamik limiti gösterir ("Standart 500").
-  - Limit aşımı uyarısı tatil günü için özel mesajla ayrılır; yatmadan 6 saat önce son kafein hatırlatması korunur.
-  - `App.openCrisis` tatil günlerinde modal açılışını engeller ("Tatil modunda kriz desteği dinleniyor 🦩").
-  - `rasitActionsHTML()` tatil günlerinde kahve/tatlı/yemek kriz butonlarını gizler, yerine nazik "kriz odası dinleniyor" kartı gösterir.
-  - `vacationCardHTML()` açıkken "neler esnetildi" bilgi kutusu ekler: su hedefi, uyku, adım, kafein ve gizli kriz butonları; altında nazik "Yine de yatmadan 6 saat önce son kafein" notu.
-  - **Fix 1 (yerel önizleme geri bildirimi):** tatil preset seçici artık sadece `Aktif` butonu gösteriyor; `Rahat` ve `Keşif` seçenekleri kaldırıldı. Varsayılan preset tüm backfill'lere (`vacationSettings`, `ensureVacationSettings`, `setVacationPreset`) ve panel aynasına (`vacationSettingsP`) `active` olarak ayarlandı.
-  - **Fix 2 (Aktif/Aç binding):** `App.setVacationEnabled(true)` artık açarken preset'i otomatik `active` yapıyor; `App.setVacationPreset('active')` ise kapalıyken tatili açıp `active` preset uyguluyor. Böylece `Aktif` butonuyla `Aç` butonu davranışsal olarak aynı şey.
-- `panel.html`
-  - `caffeineInfoP(rec,date)` imzası tarih alır; `isVacationDayP(date)` true ise %25 artırılmış limiti döner.
-  - `habitProgP` ve gün-detay çağrıları tarih geçirir.
-  - Gün-detay kafein satırı tatil gününde "Kafein · tatilde esnetildi" ve limit değeri gösterir.
-- `index.html`
-  - Cache-bump: `?v=20260724c`.
-- `GELISTIRME-PLANI.md`
-  - Faz 31 satırı "Tatil Modu — premium pause + su hedefi 10 bardak + kafein/crisis genişletme" olarak güncellendi.
-  - 2026-07-24 changelog girişi eklendi.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi / güncellendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `vacation-expansion-spec.md` — onaylı tasarım spec'i (kullanıcı tercihleri: sadece kafein esnet, kriz gizli, gerisi aynen kalsın).
-- `vacation-expansion-harness.mjs` — headless Node `vm` testi; 22 assertion (kafein limit tatilde 400→500 / pasifte 400, kriz butonları tatilde gizli / pasifte görünür, bilgi kutusu render, `App.openCrisis` güvenli, sadece `Aktif` preset butonu, **Aktif butonu açarken ve Aç butonu Aktif preset atarken binding**) tamamı PASS.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `panel.html` inline script syntax check (4/4 script tag) ✅
-- `vacation-expansion-harness.mjs` (headless Node `vm`) ✅: 22/22 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir gerçek tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server `python -m http.server 8765` kullanıcının kendi incelemesi için başlatıldı; kapanışta durdurulacak.
-
-**Bir sonraki adım / deploy öncesi notlar:**
-- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Canlıya alındıktan sonra gerçek iPhone'da: Tatil kartı açılınca sadece `Aktif` preset butonunun göründüğü, `Aktif` dokunulunca `Aç` gibi davrandığı, `Aç` dokunulunca preset'in `Aktif` olduğu, bilgi kutusunun göründüğü, kafein butonlarının dinamik limiti gösterdiği, kriz butonlarının tatil gününde gizlendiği, kapalı/planlanmamış günlerde eski haline döndüğü manuel test edilmeli.
-
----
-
-### 2026-07-23 (fix) — Tatil Modu yerel testi: su hedefi + rozet senkronizasyonu düzeltildi
-
-**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı.
-
-**Sorun:** Kullanıcı "Tatil Modu açık ama hiçbir yerde değişiklik olmuyor" şeklinde geri bildirdi. Yerel sunucu (`localhost:9000`) ve browser canvas ile test edildiğinde iki hata teşhis edildi:
-1. **Su hedefi senkronizasyonu eksik:** `App.setVacationEnabled` / `setVacationStart` / `setVacationEnd` sadece `updateCardByKey('vacation')` çağırıyordu. Su kartı ve hero Su tile'ı ayrı render edildiği için tatil durumu değişse bile su hedefi 8/10 olarak kalmıyordu.
-2. **Rozet/buton UX karışıklığı:** `enabled` switch ile `AKTİF` rozet aynı anlama geliyordu; bugün tatil aralığında olmayan açık bir tatil "KAPALI" gözüküyordu.
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - `App.setVacationEnabled`, `App.setVacationStart`, `App.setVacationEnd` artık `render()` çağırıyor (eski `updateCardByKey('vacation')` yerine). Böylece tatil durumu değişince su hedefi (Su kartı + hero Su tile'ı), seri sayacı ve diğer türetilmiş göstergeler anında güncelleniyor.
-  - Rozet durumları ayrıştırıldı: bugün tatil aralığındaysa `AKTİF`, açık ama gelecekteyse `Planlandı`, kapalıysa `Kapalı`. Buton metni `Aç`/`Kapat`.
-  - `ensureVacationSettings()` referans güvenliği korunuyor.
-- `index.html`
-  - Cache-bump: `?v=20260723b`.
-- `GELISTIRME-PLANI.md`
-  - 2026-07-23 changelog girişi güncellendi (yerel test fix notları).
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi / güncellendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `C:\Users\m_ras\.copilot\session-state\4079ff2f-3bea-48af-8b3f-598e3bfe4b8d\files\vacation-harness.js` — headless Node `vm` testi; 25 assertion (su hedefi 8→10→8, rozet durumları, kart render/expand, migrate backfill, tatil gününde streak pause) tamamı PASS.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `vacation-harness.js` (headless Node `vm`) ✅: 25/25 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Browser canvas (`http://localhost:9000/index.html`) ✅: AKTİF durumda Su 0/10, Kapalı durumda Su 0/8, Planlandı durumda Su 0/8 doğrulandı.
-- Herhangi bir tarayıcı açılmadı (browser canvas kullanıldı); `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server `python3 -m http.server 9000` başlatılıp test edildi; session kapanmadan önce durduruldu.
-
-**Bir sonraki adım / deploy öncesi notlar:**
-- Canlıya alındıktan sonra gerçek iPhone'da tatil kartının Günışığı hava kartının hemen üstünde göründüğü, açılıp tarih/preset/not girişi yapılabildiği, su hedefinin otomatik 10 bardağa çıktığı ve kapalı/planlandı durumlarında 8 kaldığı manuel test edilmeli.
-
----
-
-### 2026-07-23 — 🌴 Tatil Modu: premium pause + su hedefi 10 bardak + panel aynası (canlıya alındı)
-
-**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı. (Aynı branch üzerinde daha önceki panel arşiv senkronizasyonu + boot persistence fix'i zaten `main`de.)
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - `migrate()` içine `data.settings.vacation` backfill eklendi (`enabled`, `startAt`, `endAt`, `preset`, `reason`).
-  - `VACATION_WATER_GOAL=10` sabiti ve `waterGoalCups(date)` helper eklendi; su hedefi `WATER_GOAL` sabitini kullanan tüm render/hesaplama noktalarına dinamik çevrildi.
-  - `isVacationDay(date)` / `vacationSettings()` helper'ları eklendi.
-  - `currentStreak()` ve `bestStreak()` içine tatil günü pause mantığı eklendi; seri kırılmıyor, sadece duraklıyor.
-  - Günışığı hava durumu kartının hemen üstüne `vacationCardHTML()` fonksiyonu eklendi; ince, premium, nefes/shimmer'lı kart tasarımı. `CARD_BUILDERS['vacation']` kaydı ve `App.toggleCard('vacation')` / `App.toggleVacation()` / `App.setVacation(...)` handler'ları eklendi.
-  - Kart açıkken tarih inputları (`startAt`, `endAt`), preset seçici (`relaxed`/`moderate`/`active`) ve not alanı görünür; kapalıyken sadece badge + özet görünür.
-  - `App.toggleCard` DOM'da kartı bulamazsa tam `render()` yapma fallback'i eklendi (headless test uyumluluğu + robustluk).
-- `styles.css`
-  - Açık ve koyu tema `:root` bloklarına `--vacation` accent değişkenleri ve `seyShimmer` keyframe eklendi.
-- `panel.html`
-  - Panel `:root` içine `--vacation` değişkenleri eklendi.
-  - `vacationSettingsP()` / `isVacationDayP()` / `waterGoalCupsP()` helper'ları eklendi; su hedefi ve streak pause mantığı panelde de çalışıyor.
-  - Yeni "🌴 Tatil Modu" bento KPI kartı eklendi: aktif/pasif durum, başlangıç-bitiş tarihleri, preset ve not.
-  - Seçili gün detayında tatil günü rozet chip'i eklendi.
-- `index.html`
-  - Cache-bump: `?v=20260723b`.
-- `GELISTIRME-PLANI.md`
-  - Faz 31 "🌴 Tatil Modu — premium pause + su hedefi 10 bardak" satırı ✅ olarak eklendi; changelog ve son güncelleme tarihi güncellendi.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `session-state/.../files/vacation-harness.js` — headless Node `vm` testi; 25 assertion (su hedefi 8→10, kart render/expand, migrate backfill, tatil gününde streak pause) tamamı PASS.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `node --check motivationProgramV2.js` ✅
-- `node --check saygiPeople.js` ✅
-- `node --check motivationNarratives.js` ✅
-- `vacation-harness.js` (headless Node `vm`) ✅: 25/25 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
-
-**Bir sonraki adım / deploy öncesi notlar:**
-- Canlıya alındıktan sonra gerçek iPhone'da tatil kartının Günışığı hava kartının hemen üstünde göründüğü, açılıp tarih/preset/not girişi yapılabildiği, su hedefinin otomatik 10 bardağa çıktığı ve streak hesabının tatil günlerini kırmadığı manuel test edilmeli.
-- Eski kayıtlarda `data.settings.vacation` olmayan kullanıcı verileri `migrate()` ile otomatik backfill alacak; boot persistence fix'i sayesinde açılışta `save()` ile senkronize olacak.
-
----
-
-### 2026-07-22 (fix) — Panel arşiv senkronizasyonu: migrate backfill boot'ta kalıcılaştırılıyor
-
-**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı.
-
-**Sorun:** Kullanıcı deploy sonrası panelde eski okuma/izleme/dinleme kayıtlarının hâlâ görünmediğini bildirdi. Neden: `migrate()` içindeki `backfillArchivesFromDays(d)` arşiv kataloglarını sadece bellekte (in-memory) dolduruyordu; uygulama açılışında `render()`'dan sonra otomatik `save()` çağrısı olmadığı için değişiklik localStorage'a ve `seyma-data` GitHub reposuna senkronize olmuyordu.
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - Açılış sonunda `render();` çağrısından hemen sonra `if(data){ save(); }` eklendi. Böylece `migrate()` sonrası oluşan arşiv backfill'i ilk açılışta kalıcılaşıyor ve senkronize ediliyor.
-- `index.html`
-  - Cache-bump: `?v=20260722e`.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `session-state/.../files/boot-persist-harness.js` — headless Node `vm` testi; eski veride yalnızca günlük kaydı olan günlerle boot edildiğinde, `migrate()` arşiv kataloglarını doldurduktan sonra `save()` çağrısının bu katalogları localStorage'a yazdığını ve `SeySync.schedule(data)` ile senkronizasyonun tetiklendiğini doğrular.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `archive-sync-harness.js` (headless Node `vm`) ✅: 27/27 assertion PASS.
-- `boot-persist-harness.js` (headless Node `vm`) ✅: 8/8 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
-
-**Deploy durumu:**
-- `main`e squash-merge edildi ve pushlandı. GitHub Pages otomatik deploy edecek (`app.js?v=20260722e`).
-
-**Bir sonraki adım / kullanıcıya not:**
-- Telefonda uygulamayı bir kez kapatıp açmak yeterli. Yeni `app.js` yüklendiğinde `migrate()` eski günlük kayıtlarını arşiv kataloglarına aktaracak, ardından `save()` ile localStorage + `seyma-data`'ya yazacak.
-- Paneli bir dakika sonra yenileyince Kütüphane / İzleme Arşivi / Dinleme Arşivi kartlarının dolmaya başladığı görülebilir.
-- Eğer hâlâ görünmezse telefon tarayıcı/PWA önbelleğinin henüz güncellenmemiş olması muhtemeldir; bu durumda sayfayı yenilemek veya uygulamayı kapatıp açmak gerekir.
-
----
-
-### 2026-07-22 — Panel arşiv senkronizasyonu: okuma/izleme/dinleme kayıtları otomatik arşive promote ediliyor (onay bekliyor)
-
-**Branch:** `mustafaras-panel-archive-sync` → `main` squash-merge **yapıldı**, canlıya alındı (ilk deploy sonrası kullanıcı geri bildirimiyle yukarıdaki fix eklendi).
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - Günlük kayıtlar (okuma/izleme/dinleme) ile arşiv katalogları arasında otomatik senkronizasyon eklendi.
-  - Yeni helper'lar: `normalizeMatch`, `findBookByEntry`, `findTitleByEntry`, `findTrackByEntry`, `syncEntryToLibrary`, `syncEntryToWatchlist`, `syncEntryToMusic`, `backfillArchivesFromDays`.
-  - `App.addReading`: günlük okuma kaydı girildiğinde mevcut kitapla eşleştirir veya yeni `library.books` öğesi oluşturur; `bookId` bağlantısı kurar ve `bumpBookProgress` ile ilerlemeyi günceller.
-  - `App.addWatching`: günlük izleme kaydı girildiğinde mevcut başlıkla eşleştirir veya yeni `watchlist.items` öğesi oluşturur; `itemId` bağlantısı kurar, filmleri otomatik `finished`, dizileri bölüm sayısına göre günceller.
-  - `App.addListening`: günlük dinleme kaydı girildiğinde mevcut parçayla eşleştirir veya yeni `music.items` öğesi oluşturur; `itemId` bağlantısı kurar.
-  - `migrate()`: eski kayıtlardaki günlük reading/watching/listening girişlerini geriye dönük olarak arşiv kataloglarına promote eder ve her girişi ilgili arşiv öğesine bağlar.
-- `index.html`
-  - Cache-bump: `app.js?v=20260722d`.
-- `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi.
-
-**Oluşturulan session artifact'leri (commit edilmeyecek):**
-- `session-state/.../files/archive-render-harness.js` — panel.html arşiv kartlarının sadece `library.books` / `watchlist.items` / `music.items`'den okuduğunu ve günlük kayıtlarla otomatik doldurulmadığını gösteren diagnostic simülasyon (önceki phase'den).
-- `session-state/.../files/archive-sync-harness.js` — headless Node `vm` testi; `App.addReading`/`addWatching`/`addListening` ile girilen yeni kayıtların arşiv kataloglarına otomatik eklendiğini, aynı başlık/yazar/artist/tür'e sahip girişlerin kopya oluşturmadığını, `migrate()`'in eski günlük kayıtları geriye dönük bağladığını ve bu sayede panel arşiv kartlarının dolu göründüğünü doğrular.
-
-**Test/doğrulama sonuçları:**
-- `node --check app.js` ✅
-- `node --check sync.js` ✅
-- `archive-sync-harness.js` (headless Node `vm`) ✅: 27/27 assertion PASS.
-- `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazma yapılmadı.
-- Yerel demo server çalıştırılmadı.
-
-**Bir sonraki session / deploy öncesi notlar / TODO:**
-- Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Onay sonrası merge öncesi son bir kez `node --check app.js` + `archive-sync-harness.js` + `driver.mjs` çalıştırılmalı.
-- Gerçek iPhone'da Bugün ekranından yeni okuma/izleme/dinleme kaydı girildiğinde ilgili arşiv öğesinin oluştuğu ve paneldeki Kütüphane / İzleme Arşivi / Dinleme Arşivi kartlarında göründüğü manuel test edilmeli.
-- Eski veride yalnızca günlük kaydı olan (arşiv öğesi olmayan) günlerin, uygulama açıldığında `migrate()` ile otomatik arşive promote edildiği canlı veride gözlemlenmeli.
-- Bu değişiklik CSS veya panel.html içermiyor; panel arşiv kartları zaten kataloglardan okuduğu için otomatik olarak doluyor.
-
----
-
-### 2026-07-22 (devam) — Günlük Işığı: premium lavanta journal + 8 bilimsel mod + panel aynası (onay bekliyor)
-
-**Branch:** `mustafaras-reimagined-train` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı. Kriz modalı revizyonuyla aynı branch üzerinde ilerleniyor, ikisi birlikte veya ayrı ayrı deploy edilebilir.
-
-**Bu session'da değişen dosyalar:**
-- `app.js`
-  - `data.days[date].journal` veri modeli eklendi (`text`, `mode`, `promptUsed`, `wordCount`, `charCount`, `savedAt`, `streakAtSave`, `metGoal`); `migrate()` ile eski kayıtlara backfill.
-  - 8 bilimsel günlük modu: Serbest Akış, Duygu Adlandırma, 3 Güzel Şey, Günün Kazanımı, Öz-Şefkat, Bilişsel Yeniden Değerleme, Değer Bağlantısı, Dürtü Dalga Geçişi. Her modun kısa bilimsel ipucu kartı var.
-  - 120 günlük motivasyon programı fazına göre otomatik prompt önerisi (`journalActivePhase()`).
-  - Günlük yazma hedefi (30 kelime / 140 karakter) ve üst üste gün streak'i; hedefe ulaşınca `metGoal` rozetleniyor.
-  - Bugün ekranındaki not kartına belirgin "Günlük Işığı'nı aç 🦩" butonu; yazılmış günlük varsa durum değişiyor.
-  - Günışığı kartının altına ince, animasyonlu, nefes alan glow'lu "Günlük Işığı" satır kartı eklendi.
-  - Tam ekran modal (kriz modalı iskeleti): header, faz rozet kartı, mod seçici chip grid, prompt alanı, bilimsel ipucu, büyük textarea, kelime/karakter sayısı ve hedef ilerleme çubuğu, kaydet/güncelle butonu.
-  - `journaled` tiki `data.days[date].note` veya `data.days[date].journal.text` varlığına göre otomatik yeşilleniyor (`syncDerivedHabits`).
 - `styles.css`
   - Lavanta accent değişkenleri `--journal`, `--journal2`, `--journal-bg`, `--journal-glow` (hem açık hem koyu tema).
   - İnce animasyonlu Günlük Işığı kartı, modal mod chip'leri, textarea glow ve shimmer keyframes.
@@ -2625,9 +2247,9 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
   - "Son Notlar" kartı artık journal metinlerini de listeliyor; journal girişleri "🪶 Günlük Işığı" etiketiyle, eski notlar "📝 Not" etiketiyle ayrılıyor.
   - Panel CSS `:root` içine `--journal` lavanta değişkenleri eklendi.
 - `index.html`
-  - Cache-bump: `styles.css?v=20260722c`, `app.js?v=20260722c`, `sync.js?v=20260722c`.
+  - Cache-bump: `styles.css?v=20260728c`, `app.js?v=20260728c`, `sync.js?v=20260728c`.
 - `AGENTS.md`
-  - Bu Agent Handoff Log girişi eklendi.
+  - Bu Agent Handoff Log girişi eklendi / güncellendi.
 
 **Oluşturulan session artifact'leri (commit edilmeyecek):**
 - `session-state/.../files/journal-harness.mjs` — headless Node `vm` testi; Günlük Işığı kartının ve modalının render edildiğini, 8 mod chip'inin varlığını, prompt/ilerleme çubuğunun çalıştığını, metin kaydının `data.days[date].journal`'e yazıldığını, `journaled` tikinin otomatik yeşillendiğini ve re-open'da kaydedilmiş metni gösterdiğini doğrular.
@@ -2635,11 +2257,10 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 **Test/doğrulama sonuçları:**
 - `node --check app.js` ✅
 - `node --check sync.js` ✅
-- `panel.html` inline script syntax check (4/4 script tag) ✅
 - `.claude/skills/run-seyma/driver.mjs` (genel render regresyonu) ✅
 - `journal-harness.mjs` (headless Node `vm`) ✅: tüm assertion PASS.
 - `crisis-harness.mjs` önceki session'dan ✅ (kriz modalı değişikliği bozulmadı).
-- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazı yapılmadı.
+- Herhangi bir tarayıcı açılmadı; `seyma-data`'ya yazılmadı.
 - Yerel demo server durdurulmuş durumda.
 
 **Son düzeltmeler (bu session devamı):**
@@ -2656,7 +2277,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 
 ---
 
-### 2026-07-22 — Kriz modalları: sayaçsız, duygu-öncelikli, premium dropdown'lu otomatik tamamlama (onay bekliyor)
+### 2026-07-28 — Kriz modalları: sayaçsız, duygu-öncelikli, premium dropdown'lu otomatik tamamlama (onay bekliyor)
 
 **Branch:** `mustafaras-reimagined-train` → `main` squash-merge **yalnızca kullanıcı onayıyla** yapılacak; şu an canlıya alınmadı.
 
@@ -2669,12 +2290,12 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
   - Alt sabit eylem çubuğundaki "başlat/söz ver" butonu kaldırıldı; yerine her zaman aktif "Krizi kaydet" butonu kondu. Modal kapandığında "Tamam, kapat" butonu gösteriliyor.
   - `App.openCrisis`: modal açıldığında `cravingSOSCount` artırır ve kaydeder; aynı zamanda dropdown durumlarını (`ui.crisisTrigOpen`, `ui.crisisTriedOpen`) sıfırlar.
   - `App.toggleCrisisDropdown('trig' | 'tried')`: dropdown kartları açıp kapatır; `ui` state'inde `crisisTrigOpen` / `crisisTriedOpen` tutulur.
-  - `App.completeCrisis`: idempotent tamamlama fonksiyonu; ilk girişte toast gösterir, sonraki güncellemelerde sessizce kaydeder. Seçili tetikleyiciler, stratejiler ve not ilgili `data.days[date]` alanlarına (`cravingTriggers`, `cravingOptionsUsed`, `cravingTriggerNote`) yazar; `craving10MinDone` / `foodCravingDone` / `coffeeCravingDone` alanlarını `true` yapar.
+  - `App.completeCrisis`: idempotent tamamlama fonksiyonu; ilk girişte toast gösterir, sonraki güncellemelerde sessizce kaydeder. Seçili tetikleyici, strateji veya not ilgili `data.days[date]` alanlarına (`cravingTriggers`, `cravingOptionsUsed`, `cravingTriggerNote`) yazar; `craving10MinDone` / `foodCravingDone` / `coffeeCravingDone` alanlarını `true` yapar.
   - `App.toggleCrisisTrigger`, `App.toggleCrisisOpt` ve `App.onCrisisNote` (debounced 700 ms) artık her kullanıcı girişinde otomatik olarak `App.completeCrisis()` çağırır; yani tetikleyici seçmek, strateji seçmek veya not yazmak ilgili kriz tiki anında yeşillendirir.
   - `App.resetCrisis`: sadece modal içi geçici seçimleri (`ui.crisisTriggers`, `ui.crisisOpts`, `ui.crisisNote`) ve dropdown durumlarını temizler; tiklenmiş kaydı silmez.
   - `crisisInterval` global değişkeni ve `ui.crisisLeft` / `ui.crisisTiming` kaldırıldı.
 - `index.html`
-  - Cache-bump: tüm asset `?v=20260722b`.
+  - Cache-bump: tüm asset `?v=20260728b`.
 - `AGENTS.md`
   - Bu Agent Handoff Log girişi eklendi / güncellendi.
 
@@ -2691,7 +2312,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 
 **Bir sonraki session / deploy öncesi notlar / TODO:**
 - Kullanıcı onayı alınmadan `main`’e merge / canlıya deploy **yapılmayacak**.
-- Onay sonrası merge öncesi son bir kez `node --check app.js` + `crisis-harness.mjs` + `driver.mjs` çalıştırılmalı.
+- Onay sonrası merge öncesi son bir kez `node --check app.js` + `crisis-harness.mjs` + `journal-harness.mjs` + `driver.mjs` çalıştırılmalı.
 - Gerçek iPhone'da kahve/tatlı/yemek kriz butonlarına dokunulduğunda modalın açıldığı, not alanının ve dropdown'ların premium göründüğü, herhangi bir girişin tiki yeşillendirdiği manuel test edilmeli.
 - Panel (`panel.html`) bu değişiklikten etkilenmedi; kriz tetikleyici notları zaten gün detayında gösterilmiyordu. İstenirse panelde kriz kayıtlarına ayrı bir bento kart eklenebilir.
 
@@ -2705,7 +2326,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
 - `app.js`
   - ÆON native bildirim spam fix: `showNativeAeonNotification()` artık `opts.id` bazlı oturum içi `aeonShownThisSession` set'i ve kalıcı `data.aeon.shownNotificationIds` dizisini kontrol ediyor; daha önce gösterilmiş mesaj tekrar gösterilmiyor. 5 sn cooldown (`AEON_NOTIFY_COOLDOWN_MS`) eklenerek ardışık farklı mesajların patlaması engellendi. `renotify` `false` yapıldı. `shownNotificationIds` en fazla 50 id tutacak şekilde sınırlandı.
   - Kullanıcı zaten `mesaj` sekmesini açık görüyorsa native bildirim atlanıyor (`ui.tab==='mesaj'` kontrolü).
-  - `mergeInbox()` çağrı noktaları korundu; aynı mesaj/yanıt için ikinci native notify tetiklenmiyor.
+  - `mergeInbox()` çağrı noktaları korundu; aynı mesaj/yanıtı için ikinci native notify tetiklenmiyor.
 - `index.html`
   - Cache-bump: `styles.css?v=20260721b`, `app.js?v=20260721b`, `sync.js?v=20260721b`.
 - `GELISTIRME-PLANI.md`
@@ -2772,7 +2393,7 @@ deprecation uyarısı verdi; validate/deploy sonucunu etkilemedi.
   - ÆON native bildirim izni banner'ı + Mesaj sekmesi nudge'ı (aç/kapa yok, tek dokunuşlu).
   - 2 dakikalık sessiz izin tekrar döngüsü (`startAeonPermissionLoop`).
   - `mergeInbox()` yeni gelen ÆON mesajı/yanıtı için `showNativeAeonNotification()` çağırır.
-  - `migrate()`: `data.aeon.lastNotificationShownAt`, `data.settings.aeonNotifyPermission`, `data.settings.aeonNotifyBannerDismissedAt` backfill.
+  - `migrate()` içindeki `data.aeon.lastNotificationShownAt`, `data.settings.aeonNotifyPermission`, `data.settings.aeonNotifyBannerDismissedAt` backfill.
   - Günün Fotoğrafı güvenilirliği: gün değişince `data.dailyPhoto.fetchedAt` sıfırlanır; `visibilitychange`/`focus`/`pageshow` ile uygulamaya dönünce yeniden kontrol edilir; `maybeFetchDailyPhoto()` bugün güncelse erken çıkar.
 - `index.html`
   - Cache-bump: `app.js?v=20260719b`, `sw.js?v=20260719a`, `manifest.json?v=20260719a`.

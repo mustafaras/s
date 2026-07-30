@@ -43,6 +43,8 @@ arşivlenir, ÆON panelinde bugünkü KPI, seçili gün tam metni ve son kayıtl
 olarak aynalanır. Çoklu cihaz birleşimi `updatedAt` ile en yeni düzenlemeyi
 korur ve farklı zikir notlarını union olarak taşır. Headless sayaç 78/78,
 sync 64/64, panel 44/44 doğrulandı; cache `20260730y`.
+Feature commit `0963c19`, GitHub Pages workflow `30533428561` ile `main`
+üzerinden canlıya alındı.
 
 ---
 

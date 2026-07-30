@@ -336,9 +336,10 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
-### 2026-07-30 — ZP-08.11: Zikir başına günlük Tefekkür Günlüğü + ÆON panel aynası (main'e alınmadı)
+### 2026-07-30 — ZP-08.11: Zikir başına günlük Tefekkür Günlüğü + ÆON panel aynası (canlıya alındı)
 
-**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+**Branch:** `zikirmatik-iphone16-redesign` → `main` fast-forward.
+Feature commit `0963c19` hem feature branch'e hem `main`'e pushlandı.
 
 **Değişen dosyalar:** `app.js`, `styles.css`, `sync.js`, `panel.html`,
 `index.html`, `GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md`,
@@ -355,7 +356,7 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 - Geçmiş sekmesine tarih+zikir bazlı Tefekkür Arşivi eklendi.
 - `sync.js mergeZikr()` reflections kayıtlarını `updatedAt` last-write-wins ve
   farklı id'leri union kuralıyla birleştiriyor.
-- Panel Zikirmatik aynası branch üzerinde görünür hale getirildi; KPI bugünkü
+- Panel Zikirmatik aynası canlıda görünür hale getirildi; KPI bugünkü
   not sayısını, seçili gün tam yapılandırılmış metni, ayrı arşiv kartı son 40
   kaydı gösteriyor.
 - Cache: `styles.css`, `app.js`, `sync.js` → `20260730y`.
@@ -367,8 +368,11 @@ information architecture 24/24, safe-area 20/20, content wiring 27/27 ve
 Esmâ/core/math kontrolleri ✅; panel inline JS syntax ve CSS brace dengesi ✅.
 Gerçek tarayıcı açılmadı, `seyma-data`'ya yazılmadı.
 
-**Kalan:** Kullanıcı görsel onayı. Sunucu PID 31372 önceki oturumdan port
-9000'de çalışıyor; bu ajan açmadı ve tarayıcıyla erişmedi. Commit/deploy yok.
+**Deploy:** Kullanıcının açık onayıyla `main` pushlandı. GitHub Pages workflow
+`30533428561` validate + deploy başarıyla tamamlandı. Canlı:
+`https://mustafaras.github.io/s/index.html?v=20260730y`. Sunucu PID 31372
+önceki oturumdan port 9000'de çalışıyor; bu ajan açmadı ve tarayıcıyla
+erişmedi. `seyma-data`'ya yazılmadı.
 
 ---
 

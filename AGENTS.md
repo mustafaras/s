@@ -263,6 +263,8 @@ node --check sync.js
 ```bash
 node test_faz10_sync.js   # sync.js conflict-merge harness (mocked fetch)
 node test_faz11_panel.js  # panel.html helper/render harness
+node test_quran_catalog.js # quranRevelationOrderV1.js katalog doğrulaması
+node test_quran_transport.js # quranTransportV1.js taşıma sözleşmeleri
 ```
 
 ### Local server (use sparingly — see DATA SAFETY)
@@ -333,6 +335,358 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 > Girişte: tarih, branch, değişen dosyalar, test sonuçları, deploy durumu ve
 > bir sonraki session için kalan TODO'lar / bilinen sorunlar yazılsın.
 > Böylece sonraki agentlar tüm repoyu okumak zorunda kalmaz.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-02/QY-04 defekt düzeltmeleri (kullanıcı denetimi)
+
+**Branch:** `main`; commit/push/merge/deploy yok. Yeni aşama açılmadı — QY-02 ve
+QY-04'te teslim edilmiş iki gerçek defekt düzeltildi.
+
+**Değişen dosyalar:** `app.js`, `quranTransportV1.js`, `test_quran_transport.js`,
+`.claude/skills/run-seyma/verify-quran-migration-v1.mjs`, `AGENTS.md`.
+
+**Defekt 1 — cümle içi bağlantı reddediliyordu (yüksek olasılık).**
+`extractSingleVideoId` URL'yi yalnız boşluk/tırnak/parantezden ayırıyor, sondaki
+noktalamayı kırpmıyordu. Sonuç: Raşit'in tamamen normal yazacağı
+`"işte anlatım: https://youtu.be/XXX."` gövdesi `no_video` ile reddediliyor,
+video hiç yayınlanmıyor, kullanıcı sonsuza kadar "cevap bekleniyor" görüyordu.
+Üretimde kesin tetiklenecek bir hataydı. Artık token'ların baş/son noktalaması
+(`. , ; : ! ? … « » “ ” ’ ) ] > }` vb.) kırpılıyor. Kırpma yanlış kabule yol
+açmıyor: noktalı kanal bağlantısı, noktalı yabancı host, noktalı `http` ve
+noktalı bozuk kimlik hâlâ reddediliyor; cümle içindeki iki farklı video hâlâ
+belirsiz sayılıyor.
+
+**Defekt 2 — bozuk kayıt "Raşit'ten iste" düğmesini kalıcı kilitliyordu.**
+`quranStatusFromStamps` kanıtı olmayan ilerleme uyduruyordu: yalnız
+`requestedAt` varken `queued` türetiyordu; `queued` retryable olmadığı için o
+sûrede kullanıcının hiçbir çıkışı kalmıyordu. İki kural eklendi:
+(a) kanıtsız `queued` yerine retryable `request_error` türetilir —
+"istek denendi, çıktığına dair kanıt yok";
+(b) videoya bağlı durumlar (`ready`/`watching`) VİDEO KANITI olmadan
+türetilmez, videosuz kayıt retryable `video_unavailable` olur.
+`watched`/`question_opened` bunun dışındadır: tamamlanmış duraklardır.
+Takas dürüstçe kodda yazılı: outbox girdisi aslında yazılmışsa yeniden deneme
+ikinci bir mail üretebilir — çıkışsız kilitlenmeye kıyasla kabul edilebilir.
+
+**Neden testler kaçırdı:** İki test de kendi yazdığım "temiz" fixture'lara
+bakıyordu — bağlantıdan sonra hep boşluk bırakmışım, bozuk-status onarımının
+sonucunu yalnız string olarak karşılaştırmışım. Test tarafında da kök neden
+düzeltildi: `test_quran_transport.js`'e 13 gerçekçi e-posta gövdesi + 5 kırpma
+güvenliği vakası eklendi; `verify-quran-migration-v1.mjs`'e ise **davranışsal
+bir değişmez** eklendi — "onarım sonrası hiçbir kayıt *ne video var ne yeniden
+istenebilir* durumunda olamaz". Bu değişmez, ben yazdıktan sonra üçüncü bir
+vakayı (videosuz `watching`) kendiliğinden yakaladı ve o da düzeltildi.
+
+**Doğrulama:** `test_quran_transport.js` **198/198** ✅ (180 → +18);
+`verify-quran-migration-v1.mjs` **57/57** ✅ (52 → +5);
+`verify-quran-state-machine.mjs` 179/179 ✅; `test_quran_catalog.js` 70/70 ✅;
+`node --check app.js sync.js quranTransportV1.js quranRevelationOrderV1.js` ✅;
+`driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅; `verify-zikir-migration-v3.mjs`
+41/41 ✅; `verify-zikir-state-machine.mjs` 39/39 ✅; `test_faz10_sync.js`
+64/64 ✅; `test_faz11_panel.js` 44/44 ✅; `git diff --check` temiz.
+
+**Denetimde çıkan, hata OLMAYAN planlı eksikler:** iki modül henüz
+`index.html`'e bağlı değil (QY-05); `quranJourney` için sync merge kuralı yok,
+o güne kadar iki cihazda `watched` latest.json full-replace'iyle geri gidebilir
+(QY-16); panel aynası yok, Convention #4 şu an karşılanmıyor (QY-15);
+`VIDEO_ID_RE` hem `app.js` hem `quranTransportV1.js`'te duruyor, transport
+yüklenince tek kaynağa indirilmeli (QY-05); `videoHistory` plan §7'de yok,
+bilinçli sapma. Ayrıca plan gereği `awaiting_reply` durumunda yeniden istek
+yasak ve planda bir iptal/zaman aşımı yolu tanımlı değil — ürün kararı olarak
+QY-07'de gözden geçirilmeli.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-04 ayrı transport sözleşmeleri
+
+**Branch:** `main`; commit/push/merge/deploy yok. Yalnız QY-04 uygulandı.
+
+**Yeni dosyalar:** `quranTransportV1.js`, `test_quran_transport.js`.
+**Değişen dosya:** `AGENTS.md` (test komutu + bu kayıt). `app.js`, `sync.js`,
+`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+bump yok. Modül henüz hiçbir yerden tüketilmiyor — bağlanması QY-08 (sync
+yazıcı), QY-11 (uygulama okuyucu) ve QY-15 (panel) aşamalarına ait.
+
+Üç dosyanın sürümlü sözleşmesi ve ortak validator’ı tanımlandı:
+`data/quran-request-outbox.json`, `data/quran-delivery.json`,
+`data/quran-responses.json`. Modül tamamen saftır: ağ, depolama, DOM,
+`Date.now()` ve `Math.random()` içermez — zaman damgaları çağırandan gelir.
+
+Beş kritik karar:
+
+1. **QY-00’ın taşınan riski kapatıldı.** Plan §7’deki tek-slot outbox, iki
+   farklı sûre arka arkaya istenirse ilk isteği eziyordu. Outbox artık
+   `requestId` ile anahtarlı bir **defter**; `upsertOutboxRequest` hiçbir
+   isteği ezmiyor, `pendingOutboxRequests` yalnız receipt’i olmayanları
+   döndürüyor, `pruneOutbox` cevabı beklenen isteği **asla** düşürmüyor.
+2. **latest.json’a dokunma imkânı yapısal olarak kapatıldı.**
+   `isWritableTransportPath()` yalnız üç transport yolunu kabul ediyor;
+   `latest.json`, `data/gunluk/*`, `observer-inbox`, `aeon-outbox`,
+   `profile-outbox` ve `aeon-media` açıkça yasaklı. Yazan her taraf bu
+   kapıdan geçecek.
+3. **Ortak YouTube validator’ı.** `parseYouTubeVideoId` yalnız `https` ve
+   yalnız gerçek video yollarını (watch / youtu.be / shorts) kabul ediyor;
+   kanal, playlist, `javascript:`, `data:`, host taklidi
+   (`youtube.com.evil.com`) reddediliyor. `extractSingleVideoId` aynı videonun
+   iki biçimde geçmesini tek sayıyor, iki FARKLI video varsa cevabı belirsiz
+   sayıp reddediyor (plan §9). Panel manuel girişi de bunu kullanacak (§12).
+4. **Secret sınırı sözleşmede.** `senderFingerprint` yalnız hex özet kabul
+   ediyor; içinde `@` geçen bir değer sözleşme ihlali sayılıp kayıt tamamen
+   reddediliyor. `containsSecret()` outbox’un `replyToken` taşıdığını —
+   yani **istemciye gönderilemeyeceğini** — kanıtlıyor; responses ve delivery
+   dosyalarının temiz olduğu test ediliyor. Hata metinleri 80 karaktere
+   kırpılıyor ki stack trace sızmasın.
+5. **Sürüm ve bozukluk politikası.** Hiçbir parse fonksiyonu throw etmiyor;
+   bozuk JSON, dizi, boş dosya ve yanlış tip boş sözleşme + hata listesi
+   döndürüyor. Eski/yeni `schemaVersion` çökertmiyor, bilinen alanlar yine
+   okunuyor ve durum `errors` ile bildiriliyor.
+
+Ayrıca `applyDeliveryReceipt` retry’den gelen `failed`’ın bir `sent`’i
+ezmesini engelliyor (`sent_is_final`), `applyResponse` aynı cevap ikinci kez
+geldiğinde hiçbir şeyi değiştirmiyor ve aynı isteğe ikinci KAYIT açmıyor
+(requestId anahtarlı supersede). `verifyResponseAgainstOutbox` requestId,
+replyToken ve surahId üçünü birden doğruluyor — sahte gönderici ve yanlış sûre
+eşleme tehditlerinin tek kapısı.
+
+**Doğrulama:** `test_quran_transport.js` **180/180** ✅ — çıplak sandbox
+izolasyonu, 10 yasaklı yol, zayıf/bozuk token reddi, 8 kabul + 14 red YouTube
+URL vakası, tek/çift/yok video çıkarma, 11 bozuk dosya girdisinde çökmeme,
+sürüm fallback’i, anahtar/requestId uyuşmazlığı, düz e-posta adresinin
+fingerprint olarak reddi, iki sûrenin birbirini ezmemesi, defter üst sınırı,
+budama, receipt ve response idempotensi, çapraz doğrulamanın beş red nedeni ve
+secret sızıntı denetimi dahil. Ayrıca `node --check` (app, sync, iki yeni
+dosya) ✅; `driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅;
+`verify-zikir-migration-v3.mjs` 41/41 ✅; `verify-zikir-state-machine.mjs`
+39/39 ✅; `verify-quran-migration-v1.mjs` 52/52 ✅;
+`verify-quran-state-machine.mjs` 179/179 ✅; `test_quran_catalog.js` 70/70 ✅;
+`test_faz10_sync.js` 64/64 ✅; `test_faz11_panel.js` 44/44 ✅;
+`git diff --check` temiz. Gerçek tarayıcı/sunucu açılmadı, gerçek
+mail/WhatsApp gönderilmedi, `seyma-data`’ya yazılmadı.
+
+**Kalan:** QY-05 hazır (Kıble kartının altına bağımsız Kur’an Yolculuğu ana
+kartı — ilk görsel aşama). QY-05’te `quranRevelationOrderV1.js` ve
+`quranTransportV1.js` `index.html`’e `<script>` ile bağlanmalı; cache bump yine
+yalnız QY-18’de.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-03 saf durum makinesi
+
+**Branch:** `main`; commit/push/merge/deploy yok. Yalnız QY-03 uygulandı.
+
+**Değişen dosyalar:** `app.js` (saf durum makinesi + `App` export’ları +
+`videoHistory` normalizasyonu), `AGENTS.md`. **Yeni dosya:**
+`.claude/skills/run-seyma/verify-quran-state-machine.mjs`. `sync.js`,
+`panel.html`, `index.html`, `styles.css` **değişmedi**; cache bump yok.
+
+`quranReduce(request, event)` eklendi: girdiyi ASLA mutasyona uğratmayan, içinde
+`Date.now()`/`Math.random()` bulunmayan saf indirgeyici. Her olay kendi zaman
+damgasını (`ev.at`) taşır; damga yoksa geçiş reddedilir. Bu sayede tüm geçişler
+deterministik ve tek tek test edilebilir. Yan etkiler (save/sync/outbox yazma)
+bilerek dışarıda bırakıldı — onlar QY-07/QY-08’in işi.
+
+Dönüş sözleşmesi `{ok, changed, reason, request}`:
+`ok:false` → geçiş reddedildi, kayıt **değişmeden** döner;
+`ok:true, changed:false` → idempotent tekrar, güvenle yok sayılır.
+
+13 olay, 14 durum. Yardımcılar `App.quranReduce`, `App.quranCanRequest`,
+`App.quranStatusRank`, `App.quranNewRequest` olarak dışa açıldı.
+
+Dört tasarım kararı:
+
+1. **Çift gönderim tek kaynaktan engelleniyor.** `QURAN_RETRYABLE` listesi hem
+   `request_submit` geçişinin kaynak kümesi hem de UI’ın `quranCanRequest`
+   sözleşmesidir; ikisi ayrışamaz. Bekleyen dokuz durumun her birinde ikinci
+   istek `request_pending` ile reddediliyor.
+2. **Monotonluk mutlak.** `watched` sonrası `video_gone` durumu düşürmüyor
+   (`watched_is_final`). İzlendikten sonra gelen yeni geçerli anlatım videoyu
+   tazeliyor fakat durumu `ready`’e **çekmiyor** (`video_superseded`) — eski
+   video `videoHistory`’ye taşınıyor, `watchedAt` korunuyor (plan §6/§13).
+3. **Doğrulanmamış videoId hiçbir yoldan yayına giremiyor.** `response_valid`
+   olayında 11 karakter kontrolü geçişten ÖNCE yapılıyor; supersede yolu da
+   aynı kapıdan geçiyor. Gerçek YouTube varlık doğrulaması yine QY-10’a ait.
+4. **Hata rütbesi kardeşiyle eşit.** `video_unavailable` = `ready`,
+   `notification_error` = `queued` rütbesinde. Hata ilerlemeyi geriye saymıyor,
+   yalnız o duraktaki sonucu değiştiriyor — QY-16 cihaz merge’i bu sıraya
+   bakacak.
+
+`videoHistory` alanı şemaya eklendi ve `normQuranRequest` içinde normalize
+ediliyor; sync’e giden kalıcı veri olduğu için 20 kayıtla sınırlı.
+
+**Doğrulama:** `verify-quran-state-machine.mjs` **179/179** ✅ — 14 durumun
+tamamının fixture olarak üretilebildiği kurulum sağlaması (testin kendisi
+vacuous olmasın diye), dokuz adımlık mutlu yolun her geçişi, dört hata dalı ve
+dördünden de retry, 31 geçersiz sıçramanın reddi + reddedilen her denemede
+kaydın birebir korunduğu, sekiz olayın idempotens tekrarı, monotonluk ve
+supersede, sekiz farklı geçersiz videoId, saflık (girdi mutasyonu yok, yeni
+referans, paylaşılmayan dizi, deterministik çıktı, bilinmeyen alanın korunması)
+ve `videoHistory` sınırı dahil. Ayrıca `node --check app.js sync.js` ✅;
+`driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅; `verify-zikir-migration-v3.mjs`
+41/41 ✅; `verify-zikir-state-machine.mjs` 39/39 ✅;
+`verify-quran-migration-v1.mjs` 52/52 ✅; `test_faz10_sync.js` 64/64 ✅;
+`test_faz11_panel.js` 44/44 ✅; `test_quran_catalog.js` 70/70 ✅;
+`git diff --check` temiz. Gerçek tarayıcı/sunucu açılmadı, gerçek
+mail/WhatsApp gönderilmedi, `seyma-data`’ya yazılmadı.
+
+**Not:** Bu aşama tamamen mantık katmanıdır; görsel “premium” iş QY-05 (ana
+kart) ve QY-06 (tam ekran kütüphane) aşamalarına aittir. Burada premium olan,
+durum makinesinin eksiksizliği ve her reddedilen geçişin kanıtlanmış olmasıdır.
+
+**Kalan:** QY-04 hazır (ayrı transport sözleşmeleri: `quran-request-outbox`,
+`quran-delivery`, `quran-responses` sürümlü JSON şemaları, validator,
+idempotency ve bozuk dosyada çökmeme). Cache bump ile `CLAUDE.md`/plan belgesi
+güncellemeleri QY-18’e ait.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-02 V1 şeması + migration
+
+**Branch:** `main`; commit/push/merge/deploy yok. Yalnız QY-02 uygulandı.
+
+**Değişen dosyalar:** `app.js` (yeni şema yardımcıları + `migrate()` içinde tek
+korumalı çağrı), `AGENTS.md`. **Yeni dosya:**
+`.claude/skills/run-seyma/verify-quran-migration-v1.mjs`. `sync.js`,
+`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+bump yapılmadı.
+
+`data.quranJourney` V1 şeması eklendi: `schemaVersion:1`,
+`catalogVersion:'quran-revelation-tr-v1'`, `startedAt`, `activeSurahId`,
+`requests[surahId]`. İstek kaydı `requestId`, `status`, `requestedAt`,
+`notifiedAt`, `responseId`, `videoId`, `readyAt`, `startedWatchingAt`,
+`watchedAt`, `questionOpenedAt`, `updatedAt` taşıyor. `migrate()` içine
+`ensureQuranJourney(d)` additive ve idempotent biçimde bağlandı.
+
+Üç bilinçli karar:
+
+1. **Katalog bağımlılığı isteğe bağlı.** Migration `quranRevelationOrderV1.js`
+   yüklü olmadan da tam çalışır (modül `index.html`’e QY-05’te bağlanacak).
+   Katalog yüklüyse yalnız `activeSurahId` imleci gerçek bir sûreye çekilir.
+2. **İmleç ile veri ayrımı.** `activeSurahId` yalnız bir imleçtir, geçersizse
+   güvenle başa alınır. `requests` ise KULLANICI verisidir: katalogda olmayan
+   bir sûre anahtarı bile **silinmez**, yalnız şekli bozuk kayıtlar ayıklanır.
+3. **İlerleme monotonluğu.** `status` bozuk/eksikse zaman damgalarından en
+   ileri durum türetilir (`watchedAt` → `watched`, `questionOpenedAt` →
+   `question_opened` …), böylece bozuk bir kayıt ilerlemeyi geriye çekemez
+   (plan §13). Bilinmeyen alanlar bilerek korunur — daha yeni bir cihazın
+   eklediği alanı eski cihazın migrate’i silmemeli.
+
+Durum GEÇİŞLERİ bilerek yazılmadı; onlar QY-03’ün saf state machine’ine ait.
+Buradaki tek iş şekil güvencesi. `videoId` için yalnız depolama biçimi guard’ı
+(11 karakter) var; gerçek YouTube doğrulaması QY-10’a ait.
+
+**Doğrulama:** `verify-quran-migration-v1.mjs` **52/52** ✅ — boş / eski /
+kısmi / bozuk fixture’lar, `__proto__` prototip kirliliği (JSON.parse ile
+gerçek own-property olarak enjekte edildi, ayrıca doğrulandı), slug olmayan
+anahtar, null/dizi kayıt, geçersiz videoId, üç ardışık migrate’in derin
+eşdeğerliği ve şemada token/e-posta/telefon bulunmadığı kontrolleri dahil.
+Ayrıca `node --check app.js sync.js` ✅; `driver.mjs` ✅; `zikr-harness.mjs`
+84/84 ✅; `verify-zikir-migration-v3.mjs` 41/41 ✅;
+`verify-profile-assessment-migration.mjs` ✅; `test_faz10_sync.js` 64/64 ✅;
+`test_faz11_panel.js` 44/44 ✅; `test_quran_catalog.js` 70/70 ✅;
+`git diff --check` temiz. Gerçek tarayıcı/sunucu açılmadı, gerçek mail/WhatsApp
+gönderilmedi, `seyma-data`’ya yazılmadı.
+
+**Kullanıcıdan alınan çalışma-zamanı değerleri (KAYNAK KODA YAZILMADI):**
+Raşit’in izinli cevap e-posta adresi ve WhatsApp numarası kullanıcı tarafından
+bildirildi. E-posta adresi hiçbir dosyaya yazılmadı; yeri QY-09’da GitHub
+Actions Secret (`MAIL_TO`) ve QY-10’da Apps Script Properties’teki gönderici
+allowlist’idir — plan §7 gereği istemciye düz adres taşınmayacak,
+`senderFingerprint` kullanılacak. WhatsApp numarası QY-14’te tek merkezî
+sabitte tutulacak (onaylanmış karar #10).
+
+**Kalan:** QY-03 hazır (saf durum makinesi: geçersiz sıçramaların reddi, çift
+gönderim engeli, ready/watched geri gitmemesi, idempotent olay işleme). Cache
+bump ve `CLAUDE.md`/plan belgesi güncellemeleri QY-18’e ait.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-01 nüzul kataloğu (yalnız içerik modülü)
+
+**Branch:** `main`; commit/push/merge/deploy yok. Yalnız QY-01 uygulandı.
+
+**Yeni dosyalar:** `quranRevelationOrderV1.js`, `test_quran_catalog.js`.
+**Değişen dosya:** `AGENTS.md` (test komutu + bu kayıt). `app.js`, `sync.js`,
+`panel.html`, `index.html`, `styles.css` ve workflow’lar **değişmedi**; cache
+bump yapılmadı.
+
+114 sûre, Diyanet/TDV yayınlarının da esas aldığı yaygın nüzul tertibiyle
+(Mısır/Kahire) dondurulmuş içerik modülüne alındı. Her kayıt `id`,
+`revelationOrder`, `mushafOrder`, `nameTr`, `nameAr`, `revelationPlace`,
+`ayahCount`, `themeTr`, `sourceRefs`, `editorialStatus` taşıyor. Modül yalnız
+`window.QuranRevelationOrderV1` yazıyor; `data`, `localStorage`, `SeySync`,
+`fetch` veya DOM’a hiç dokunmuyor — kullanıcı ilerlemesi QY-02’de eklenecek
+`data.quranJourney` içinde tutulacak. Kaynak ihtilafı `methodologyTr` yöntem
+notunda açıklandı, Mekkî/Medenî tartışması olan 10 sûre `disputedPlaceIds` ile
+işaretlendi. Katalog kökü, dizi ve tüm kayıtlar `Object.freeze` ile korunuyor.
+`byId` / `byRevelationOrder` / `byMushafOrder` `hasOwnProperty` üzerinden
+çalışıyor; `toString` gibi prototip anahtarları kayıt gibi dönmüyor.
+
+**Doğrulama:** `node test_quran_catalog.js` **70/70** ✅ — modül yalnız `window`
+içeren çıplak `node:vm` sandbox’ında yükleniyor (state/ağ kaplaması olsaydı
+patlardı), window’a tek global yazıyor, nüzul ve mushaf sıra kümeleri tam
+1..114 permütasyonu, id/ad benzersizliği, Arapça harf kontrolü, boş kaynak
+referansı yok, ham `<`/`>` yok, Mekke 86 / Medine 28 bloğu kesintisiz ve
+**toplam âyet 6236** (Kûfe sayımı) çapraz kontrolü tutuyor. Ayrıca
+`node --check app.js sync.js quranRevelationOrderV1.js test_quran_catalog.js`
+✅; `driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅; `test_faz10_sync.js` 64/64 ✅;
+`test_faz11_panel.js` 44/44 ✅; `git diff --check` temiz. Gerçek tarayıcı/sunucu
+açılmadı, gerçek mail/WhatsApp gönderilmedi, `seyma-data`’ya yazılmadı.
+
+**Not:** Testin statik sızıntı taraması ilk turda modülün kendi yorum satırında
+geçen “localStorage” kelimesine takıldı. Metin yumuşatılmadı; tarayıcı kök
+nedenden düzeltildi — artık yorumları ayıklayıp yalnız çalışan kodu tarıyor ve
+gerçek bir `localStorage`/`fetch(` kullanımını hâlâ yakalıyor (negatif testle
+doğrulandı).
+
+**Kalan:** QY-02 hazır (`data.quranJourney` V1 şeması + additive/idempotent
+migration). Modülün `index.html`’e `<script>` ile bağlanması bilinçli biçimde
+QY-05’e bırakıldı; cache bump planın son koordinasyon noktasında (QY-18) tek
+seferde yapılacak. `CLAUDE.md` repo düzeni ile `GELISTIRME-PLANI.md` /
+`ILHAM-IBADET-GELISTIRME-PLANI.md` güncellemeleri QY-18 dokümantasyon kapısında
+yapılacak.
+
+---
+
+### 2026-07-30 — Kur’an Yolculuğu QY-00 mimari ve tehdit denetimi
+
+**Branch:** `main`; commit/push/merge/deploy yok.
+
+**Değişen dosya:** Yalnız bu handoff kaydı için `AGENTS.md`; uygulama kodu,
+`sync.js`, panel, workflow ve `seyma-data` içeriği değiştirilmedi.
+
+Mevcut akış salt-okunur çıkarıldı: uygulama `save()` ile yerel state'i
+`SeySync.schedule()` üzerinden `latest.json` + pre-push backup + günlük snapshot'a
+yazıyor; ÆON ve profil mail tetikleri `aeon-outbox.json` /
+`profile-outbox.json` dosyalarına ayrılmış durumda. Panel cevapları
+`observer-inbox.json`, büyük medya `aeon-media/<id>.json` üzerinden gidiyor.
+Veri reposundaki iki workflow yalnız ilgili outbox yolunu dinliyor ve
+`MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_TO` Actions secret'larını kullanıyor.
+Kur’an transport'unun `quran-request-outbox.json`, `quran-delivery.json`,
+`quran-responses.json` ile `latest.json` zincirinden tamamen ayrı kalabileceği
+doğrulandı; Gmail Apps Script yalnız doğrulanmış cevabı response dosyasına
+yazmalı, hiçbir koşulda `latest.json` yazmamalı.
+
+**Riskler:** Mevcut SMTP deseni retry sonrası kesin exactly-once mail garantisi
+vermiyor; QY-09'da sağlayıcı idempotency anahtarı veya açık at-least-once
+sözleşmesi gerekli. Gelen köprüde sender allowlist, aktif ve yüksek entropili
+reply token, requestId+surahId çapraz eşleme, tek YouTube URL/videoId, oEmbed
+varlık kontrolü, processed-label + responseId idempotency, secret redaksiyonu ve
+yanıtın supersede/revoke geçmişi zorunlu. Farklı sûre isteklerinin tek-slot
+outbox'ta birbirini ezmemesi için sürümlü request map/ledger sözleşmesi QY-04'te
+kesinleştirilmeli.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` 84/84 ✅; sync 64/64 ✅; panel 44/44 ✅; panel script tag
+5/5 ✅; CSS brace dengesi ✅; `git diff --check` ✅. Gerçek tarayıcı/sunucu,
+gerçek mail/WhatsApp ve dış yazma yapılmadı. `seyma-data` yalnız workflow adları,
+transport dosya şekilleri ve ilgili git geçmişi bakımından salt-okunur
+incelendi; `latest.json` kişisel içeriği okunmadı.
+
+**Kalan:** QY-01 hazır. Yalnız kullanıcı `devam` dediğinde
+`quranRevelationOrderV1.js` ve bağımsız katalog doğrulama testiyle 114 sûre
+kataloğu uygulanmalı; state/sync/UI entegrasyonuna geçilmemeli ve cache bump
+yapılmamalı.
 
 ---
 

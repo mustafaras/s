@@ -766,6 +766,217 @@ function ensureSaygiRoot(){
   if(typeof data.saygi.lastReadDate!=='string') data.saygi.lastReadDate='';
   return data.saygi;
 }
+// ── Raşit ile Kur’an Yolculuğu — V1 şema (QY-02) ──
+// Katalog (quranRevelationOrderV1.js) AYRI bir içerik modülüdür ve burada zorunlu
+// değildir: yüklüyse activeSurahId doğrulaması için kullanılır, yüklü değilse
+// migration yine tam çalışır. Durum GEÇİŞLERİ bu katmana ait değil — onlar
+// QY-03'ün saf state machine'ine bırakıldı; burada yalnız şekil güvencesi var.
+var QURAN_SCHEMA_VERSION=1;
+var QURAN_CATALOG_VERSION='quran-revelation-tr-v1';
+var QURAN_DEFAULT_SURAH_ID='alak';
+var QURAN_SURAH_ID_RE=/^[a-z]+(-[a-z]+)*$/;
+// Yalnız DEPOLAMA biçimi güvencesi. Gerçek YouTube doğrulaması (oEmbed, tek URL,
+// izinli gönderici) QY-10'un işidir; buraya çöp videoId yazılmasın diye var.
+var QURAN_VIDEO_ID_RE=/^[A-Za-z0-9_-]{11}$/;
+var QURAN_STATUSES=['idle','submitting','queued','notified','awaiting_reply','validating_reply','ready','watching','watched','question_opened','request_error','notification_error','invalid_reply','video_unavailable'];
+var QURAN_REQUEST_STAMPS=['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt','updatedAt'];
+// videoHistory sync'e giden kalıcı veridir; sınırsız büyümesin.
+var QURAN_HISTORY_MAX=20;
+
+function emptyQuranJourney(){
+  return {schemaVersion:QURAN_SCHEMA_VERSION,catalogVersion:QURAN_CATALOG_VERSION,startedAt:null,activeSurahId:QURAN_DEFAULT_SURAH_ID,requests:{}};
+}
+function quranNullableStr(v){ return (typeof v==='string'&&v)?v:null; }
+// Status bozuk/eksikse zaman damgalarından türet. İki kural birlikte geçerli:
+//
+// 1) İlerleme ASLA geriye gitmez — en ileri damga hangisiyse durum odur (§13).
+// 2) Onarım, KANITI OLMAYAN bir ilerlemeyi uydurmaz ve kullanıcıyı çıkışsız
+//    bırakmaz. Elimizde yalnız `requestedAt` varsa "outbox'a yazıldı"nın (queued)
+//    kanıtı yoktur; queued retryable olmadığı için o sûrenin "Raşit'ten iste"
+//    düğmesi kalıcı olarak kilitlenirdi. Bu yüzden bu bandın doğru karşılığı
+//    retryable olan `request_error`'dur: "istek denendi, çıktığına dair kanıt yok."
+//    Bunun bedeli, outbox girdisi aslında yazılmışsa yeniden denemenin ikinci bir
+//    mail üretebilmesidir; çıkışsız kilitlenmeye kıyasla kabul edilebilir bir
+//    takas. (`notifiedAt` gerçek bir delivery receipt'le yazılır, o yüzden
+//    `notified` kanıtlıdır ve olduğu gibi bırakılır.)
+// 3) Videoya bağlı durumlar (ready/watching) VİDEO KANITI olmadan türetilmez.
+//    Videosu olmayan bir "watching" kaydı hem izlenecek bir şey sunmaz hem de
+//    retryable değildir — yani çıkışsızdır. Böyle bir kayıt için doğru karşılık
+//    retryable olan `video_unavailable`'dır: "anlatım kayıp, yenisi istenebilir."
+//    (`watched`/`question_opened` bunun dışındadır: onlar tamamlanmış duraklardır,
+//    video sonradan kaybolsa bile kullanıcı için bitmiş sayılır.)
+function quranStatusFromStamps(r){
+  if(quranNullableStr(r.questionOpenedAt)) return 'question_opened';
+  if(quranNullableStr(r.watchedAt)) return 'watched';
+  var hasVideo=QURAN_VIDEO_ID_RE.test(String(r.videoId||''));
+  if(quranNullableStr(r.startedWatchingAt)) return hasVideo?'watching':'video_unavailable';
+  if(hasVideo) return 'ready';
+  if(quranNullableStr(r.readyAt)) return 'video_unavailable';
+  if(quranNullableStr(r.notifiedAt)) return 'notified';
+  if(quranNullableStr(r.requestedAt)) return 'request_error';
+  return 'idle';
+}
+// Kaydı yerinde normalize eder. BİLİNMEYEN alanlar bilerek KORUNUR: daha yeni
+// bir cihazın eklediği alanı eski cihazın migrate'i silmemeli.
+function normQuranRequest(r){
+  if(!r||typeof r!=='object'||Array.isArray(r)) return null;
+  r.requestId=quranNullableStr(r.requestId);
+  r.responseId=quranNullableStr(r.responseId);
+  r.videoId=QURAN_VIDEO_ID_RE.test(String(r.videoId||''))?String(r.videoId):null;
+  QURAN_REQUEST_STAMPS.forEach(function(k){ r[k]=quranNullableStr(r[k]); });
+  if(QURAN_STATUSES.indexOf(r.status)<0) r.status=quranStatusFromStamps(r);
+  // Değişen/kaldırılan videoların geçmişi (plan §6/§13: yanıt geçmişi kaybolmaz).
+  if(!Array.isArray(r.videoHistory)) r.videoHistory=[];
+  r.videoHistory=r.videoHistory.filter(function(h){ return h&&typeof h==='object'&&!Array.isArray(h)&&QURAN_VIDEO_ID_RE.test(String(h.videoId||'')); });
+  if(r.videoHistory.length>QURAN_HISTORY_MAX) r.videoHistory=r.videoHistory.slice(-QURAN_HISTORY_MAX);
+  return r;
+}
+function ensureQuranJourney(d){
+  if(!d||typeof d!=='object') return null;
+  if(!d.quranJourney||typeof d.quranJourney!=='object'||Array.isArray(d.quranJourney)) d.quranJourney=emptyQuranJourney();
+  var q=d.quranJourney;
+  q.schemaVersion=QURAN_SCHEMA_VERSION;
+  if(typeof q.catalogVersion!=='string'||!q.catalogVersion) q.catalogVersion=QURAN_CATALOG_VERSION;
+  q.startedAt=quranNullableStr(q.startedAt);
+  if(typeof q.activeSurahId!=='string'||!QURAN_SURAH_ID_RE.test(q.activeSurahId)) q.activeSurahId=QURAN_DEFAULT_SURAH_ID;
+  // Katalog yüklüyse imleç gerçek bir sûreyi göstermeli; imleç veri değil, bu yüzden
+  // güvenle başa alınabilir. requests ise KULLANICI verisidir — bilinmeyen sûre
+  // anahtarı olsa bile silinmez, yalnız şekli bozuk kayıtlar ayıklanır.
+  var cat=(typeof window!=='undefined'&&window.QuranRevelationOrderV1)||null;
+  if(cat&&typeof cat.byId==='function'&&!cat.byId(q.activeSurahId)) q.activeSurahId=cat.firstSurahId||QURAN_DEFAULT_SURAH_ID;
+  if(!q.requests||typeof q.requests!=='object'||Array.isArray(q.requests)) q.requests={};
+  Object.keys(q.requests).forEach(function(id){
+    var rec=QURAN_SURAH_ID_RE.test(id)?normQuranRequest(q.requests[id]):null;
+    if(rec) q.requests[id]=rec; else delete q.requests[id];
+  });
+  return q;
+}
+// ── Kur’an Yolculuğu durum makinesi (QY-03) — SAF fonksiyonlar ──
+// Girdi ASLA mutasyona uğramaz, dönen kayıt her zaman yeni bir nesnedir.
+// İçeride Date.now()/Math.random() YOKTUR: her olay kendi zaman damgasını
+// (ev.at) taşır, böylece geçişler deterministik ve tek tek test edilebilir.
+// Yan etkiler (save/sync/outbox yazma) ÇAĞIRANIN işidir — QY-07/QY-08.
+//
+// İlerleme rütbesi: monotonluk ve (QY-16'da) cihaz merge'i bu sıraya bakar.
+// Hata durumu, kardeşi olan başarı durumuyla AYNI rütbede durur; hata
+// ilerlemeyi geriye saymaz, yalnız o duraktaki sonucu değiştirir.
+var QURAN_RANK={idle:0,request_error:0,submitting:1,queued:2,notification_error:2,notified:3,awaiting_reply:4,validating_reply:5,invalid_reply:5,ready:6,video_unavailable:6,watching:7,watched:8,question_opened:9};
+// Yeni istek yalnız bu duraklardan gönderilebilir. Bu liste aynı zamanda
+// "bekleyen istek varken ikinci istek gönderilemez" kuralının tek kaynağıdır.
+var QURAN_RETRYABLE=['idle','request_error','notification_error','invalid_reply','video_unavailable'];
+var QURAN_TRANSITIONS={
+  request_submit:{from:QURAN_RETRYABLE,to:'submitting'},
+  outbox_written:{from:['submitting'],to:'queued'},
+  outbox_failed:{from:['submitting'],to:'request_error'},
+  delivery_receipt:{from:['queued'],to:'notified'},
+  delivery_failed:{from:['queued'],to:'notification_error'},
+  await_reply:{from:['notified'],to:'awaiting_reply'},
+  response_received:{from:['awaiting_reply'],to:'validating_reply'},
+  response_valid:{from:['validating_reply','video_unavailable'],to:'ready'},
+  response_invalid:{from:['validating_reply'],to:'invalid_reply'},
+  watch_start:{from:['ready'],to:'watching'},
+  watch_complete:{from:['ready','watching'],to:'watched'},
+  video_gone:{from:['ready','watching'],to:'video_unavailable'},
+  question_open:{from:['watched'],to:'question_opened'}
+};
+
+function quranStatusRank(s){ return (typeof s==='string'&&typeof QURAN_RANK[s]==='number')?QURAN_RANK[s]:-1; }
+function quranNewRequest(){
+  return {requestId:null,status:'idle',requestedAt:null,notifiedAt:null,responseId:null,videoId:null,readyAt:null,startedWatchingAt:null,watchedAt:null,questionOpenedAt:null,updatedAt:null,videoHistory:[]};
+}
+// UI sözleşmesi (QY-07): "Raşit'ten iste" yalnız bu true iken etkin olur.
+function quranCanRequest(r){
+  if(!r||typeof r!=='object') return true;
+  return QURAN_RETRYABLE.indexOf(r.status)>=0;
+}
+function quranCloneRequest(r){
+  var out={},k;
+  for(k in r) if(Object.prototype.hasOwnProperty.call(r,k)) out[k]=r[k];
+  out.videoHistory=Array.isArray(r.videoHistory)?r.videoHistory.slice():[];
+  return out;
+}
+function quranResult(okFlag,changed,reason,req){ return {ok:okFlag,changed:changed,reason:reason,request:req}; }
+// Mevcut videoyu geçmişe taşır. Video hiç kaybolmaz (plan §13).
+function quranArchiveVideo(n,at,reason){
+  if(!n.videoId) return;
+  n.videoHistory.push({videoId:n.videoId,responseId:n.responseId,readyAt:n.readyAt,replacedAt:at,reason:reason});
+  if(n.videoHistory.length>QURAN_HISTORY_MAX) n.videoHistory=n.videoHistory.slice(-QURAN_HISTORY_MAX);
+  n.videoId=null; n.responseId=null; n.readyAt=null;
+}
+function quranApplyEvent(cur,ev,to,at){
+  var n=quranCloneRequest(cur);
+  switch(ev.type){
+    case 'request_submit':
+      // Yeniden istek: eski anlatım geçmişe düşer, bu turun izleri sıfırlanır.
+      quranArchiveVideo(n,at,'yeniden istendi');
+      if(typeof ev.requestId==='string'&&ev.requestId) n.requestId=ev.requestId;
+      n.requestedAt=at; n.notifiedAt=null; n.startedWatchingAt=null;
+      break;
+    case 'delivery_receipt': n.notifiedAt=at; break;
+    case 'response_valid':
+      quranArchiveVideo(n,at,'yeni anlatım geldi');
+      n.responseId=(typeof ev.responseId==='string'&&ev.responseId)?ev.responseId:null;
+      n.videoId=ev.videoId; n.readyAt=at;
+      break;
+    case 'watch_start': n.startedWatchingAt=at; break;
+    case 'watch_complete': n.watchedAt=at; break;
+    case 'question_open': n.questionOpenedAt=at; break;
+    // video_gone: videoId bilerek KORUNUR — kullanıcıya hangi anlatımın
+    // erişilemediğini söyleyebilmek ve yeniden istemek için gerekli.
+  }
+  n.status=to; n.updatedAt=at;
+  return n;
+}
+// Tek istek + tek olay → yeni istek. Sonuç: {ok,changed,reason,request}
+// ok:false  → geçiş reddedildi, request DEĞİŞMEDEN döner.
+// changed:false + ok:true → idempotent tekrar; güvenle yok sayılır.
+function quranReduce(request,ev){
+  var cur=(request&&typeof request==='object'&&!Array.isArray(request))?request:quranNewRequest();
+  if(!ev||typeof ev!=='object'||Array.isArray(ev)) return quranResult(false,false,'invalid_event',cur);
+  var rule=QURAN_TRANSITIONS[ev.type];
+  if(!rule) return quranResult(false,false,'unknown_event',cur);
+  var at=(typeof ev.at==='string'&&ev.at)?ev.at:'';
+  if(!at) return quranResult(false,false,'missing_timestamp',cur);
+  var status=(typeof cur.status==='string'&&typeof QURAN_RANK[cur.status]==='number')?cur.status:'idle';
+  var rank=quranStatusRank(status);
+
+  // 1) response_valid için videoId doğrulaması geçişten ÖNCE yapılır:
+  //    doğrulanmamış bir kimlik hiçbir koşulda ready üretmez.
+  if(ev.type==='response_valid'&&!QURAN_VIDEO_ID_RE.test(String(ev.videoId||''))){
+    return quranResult(false,false,'invalid_video_id',cur);
+  }
+
+  // 2) İdempotens: aynı olayın ikinci kez işlenmesi durumu değiştirmez.
+  if(ev.type==='request_submit'&&typeof ev.requestId==='string'&&ev.requestId&&ev.requestId===cur.requestId){
+    return quranResult(true,false,'duplicate_request',cur);
+  }
+  if(ev.type==='response_valid'&&typeof ev.responseId==='string'&&ev.responseId&&ev.responseId===cur.responseId){
+    return quranResult(true,false,'duplicate_response',cur);
+  }
+  if(ev.type==='outbox_written'&&rank>=QURAN_RANK.queued) return quranResult(true,false,'already_queued',cur);
+  if(ev.type==='delivery_receipt'&&rank>=QURAN_RANK.notified) return quranResult(true,false,'already_notified',cur);
+  if(ev.type==='await_reply'&&rank>=QURAN_RANK.awaiting_reply) return quranResult(true,false,'already_awaiting',cur);
+  if(ev.type==='response_received'&&rank>=QURAN_RANK.validating_reply) return quranResult(true,false,'already_validating',cur);
+  if(ev.type==='watch_start'&&rank>=QURAN_RANK.watching) return quranResult(true,false,'already_watching',cur);
+  if(ev.type==='watch_complete'&&rank>=QURAN_RANK.watched) return quranResult(true,false,'already_watched',cur);
+  if(ev.type==='question_open'&&status==='question_opened') return quranResult(true,false,'already_opened',cur);
+
+  // 3) Monotonluk: izlendi bilgisi hiçbir olayla geri alınamaz (plan §13).
+  //    Kaldırılmış video bile "izlendi"yi silmez; yalnız geçmişe not düşer.
+  if(ev.type==='video_gone'&&rank>=QURAN_RANK.watched) return quranResult(true,false,'watched_is_final',cur);
+
+  // 4) Supersede: izlendikten sonra gelen YENİ ve geçerli anlatım videoyu
+  //    tazeler, fakat durumu ready'e DÜŞÜRMEZ.
+  if(ev.type==='response_valid'&&rank>=QURAN_RANK.watched){
+    return quranResult(true,true,'video_superseded',quranApplyEvent(cur,ev,status,at));
+  }
+
+  // 5) Normal geçiş — tablo dışındaki her sıçrama reddedilir.
+  if(rule.from.indexOf(status)<0){
+    return quranResult(false,false,ev.type==='request_submit'?'request_pending':'invalid_transition',cur);
+  }
+  return quranResult(true,true,'ok',quranApplyEvent(cur,ev,rule.to,at));
+}
 function saygiMarkRead(person){
   if(!person) return;
   var root=ensureSaygiRoot(), date=todayStr();
@@ -1242,6 +1453,8 @@ function migrate(d){
   if(!d.zikr||typeof d.zikr!=='object') d.zikr=emptyZikrRoot();
   try{ migrateZikrV2(d); }catch(e){ try{ console.warn('[Zikirmatik] v2 migration uygulanamadı',e); }catch(_e){} }
   if(!d.saygi||typeof d.saygi!=='object') d.saygi=emptySaygiRoot();
+  // Raşit ile Kur’an Yolculuğu (QY-02): V1 şema backfill — additive ve idempotent.
+  try{ ensureQuranJourney(d); }catch(e){ try{ console.warn('[Kur’an] migration uygulanamadı',e); }catch(_e){} }
   if(!d.library||typeof d.library!=='object') d.library=emptyLibrary();
   if(!Array.isArray(d.library.books)) d.library.books=[];
   if(!d.library.goal||typeof d.library.goal!=='object') d.library.goal={dailyPages:20,yearlyBooks:null};
@@ -10619,6 +10832,11 @@ function modalsHTML(){
 
 // boot
 if(data){ data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save(); }
+// Kur’an Yolculuğu saf durum makinesi (QY-03) — UI ve headless testler için.
+App.quranReduce=quranReduce;
+App.quranCanRequest=quranCanRequest;
+App.quranStatusRank=quranStatusRank;
+App.quranNewRequest=quranNewRequest;
 window.App=App;
 
 // ---------- konum & hareket takibi (yalnızca kullanıcı açık rıza verdiyse) ----------

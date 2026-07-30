@@ -336,6 +336,280 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-29 — ZP-07 uygulandı: Zikirmatik bilgi mimarisi / tek görevli ekran (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK). FAZ C'nin
+ilk fazı — artık denetim/sertleştirme değil, gerçek ürün/UI kararları.
+
+**Değişen dosyalar:**
+
+- `app.js`:
+  - İç navigasyon 4 sekmeden (Sayaç/Esmâ/Hatimlerim/Özet) **5 sekmeye**
+    çıktı: Sayaç/Esmâ/Hatimlerim/**Geçmiş**/**Ayarlar**. Eski karma "Özet"
+    (istatistik + tüm ayarlar bir arada) `zikrHistoryViewHTML` (yalnız
+    KPI/7-gün grafiği/en çok eşlik edenler) ve `zikrSettingsViewHTML` (tüm 7
+    toggle: ses/titreşim/odak/nefes/hareket/uyanık-tut/otomatik-ilerleme) diye
+    ikiye ayrıldı.
+  - `zikrCounterViewHTML`: eskiden eşzamanlı **5 rakam** gösteriyordu (2'li
+    tur/hatim kutusu + 3'lü bugün/bu-zikir/seans şeridi) — prompt paketinin
+    "en fazla 3 ilerleme seviyesi" kuralına aykırıydı (ZP-00'da işaretlenmiş
+    açık karardı). Şimdi TEK bir 3'lü şerit: BUGÜN / BU TUR / TAM HATİM
+    (esma) ya da ÖMÜRLÜK (core). Ayrı "seans" sayacı kaldırıldı. Dock 5
+    düğmeden (geri al/duraklat/odak/ses/titreşim) **2'ye** indi (geri al/
+    duraklat); odak/ses/titreşim Ayarlar'a taşındı.
+  - Uzun açıklama metni (ebced/dinî zorunluluk olmadığı notu) ana sayaçtan
+    ayrılıp yeni, kapalı başlayan bir "Anlamı ve önemi" detay panosuna
+    taşındı (`ui.zikrDetailOpen` + `App.toggleZikrDetail()`) — ZP-13'te
+    esmaulHusnaV2.js/zikirCoreContentV1.js içeriğiyle zenginleştirilecek.
+  - `App.closeZikr()`: artık kapanışta odağı `#zikr-preview-card`'a
+    (Saygı hub'ındaki tetikleyici) geri veriyor — `render()` tüm `#app`
+    içeriğini yeniden kurduğundan eski DOM referansı tutulamıyor, bu yüzden
+    kararlı id ile yeniden sorgulanıyor.
+  - `zikrPreviewCardHTML()`: butona `id="zikr-preview-card"` eklendi (odak
+    hedefi için).
+- `styles.css`: `.zikr-v2-cycle-grid` 2→3 sütun (`repeat(3,1fr)`, küçük
+  padding/font ayarı taşma olmasın diye); yeni `.zikr-v2-detail-toggle`/
+  `.zikr-v2-detail-sheet`/`.zikr-v2-settings-view` — minimal, opak
+  (`var(--card)`, gradient/transparency yok — ZP-08'in yönüne şimdiden uygun).
+- `.claude/skills/run-seyma/zikr-harness.mjs`: sekme etiketi regex'i
+  "...Hatimlerim...Özet" → "...Hatimlerim...Geçmiş...Ayarlar"; `'stats'`
+  view id kullanımı `'settings'`e güncellendi (davranış aynı, yalnız isim).
+- `.claude/skills/run-seyma/verify-zikir-information-architecture.mjs`
+  (yeni, headless, 24 assertion): 5 sekme sırası, sayaç ekranında tam 3
+  ilerleme kutusu + 2 dock düğmesi, detay panosu aç/kapa, Geçmiş'te ayar
+  YOK, Ayarlar'da tüm 7 toggle var ve KPI YOK, 4 sekme arası geçişte oturum/
+  sayaç kaybolmuyor, kapanışta odak `#zikr-preview-card`'a dönüyor, hatim
+  tamamlandığında tek CTA (yarışan ikinci düğme yok), geri al/duraklat
+  menüye gizlenmemiş.
+
+**Doğrulama:**
+
+- `node --check app.js` ✅.
+- `zikr-harness.mjs` 42/42 ✅, `driver.mjs` PASS ✅, `test_faz10_sync.js`
+  62/62 ✅, `test_faz11_panel.js` 39/39 ✅.
+- ZP-01–06 doğrulama script'leri hâlâ yeşil ✅.
+- `verify-zikir-information-architecture.mjs` 24/24 ✅.
+- `run-seyma` skill'i ile 5 sekmenin tamamının render çıktısı elle/görsel
+  olarak da incelendi (headless dump, tarayıcı açılmadı).
+- `git diff --check` ✅. Gerçek tarayıcı açılmadı, server başlatılmadı,
+  `seyma-data`'ya yazılmadı.
+
+**Kalan:** ZP-07 tamamlandı, sıradaki **ZP-08** (opak tasarım sistemi ve
+tipografi — ZP-00'ın işaretlediği şeffaflık/11px-altı-yazı borçları burada
+ele alınacak) kullanıcıdan bekleniyor.
+
+---
+
+### 2026-07-29 — ZP-06 uygulandı: Zikirmatik sync merge + çoklu cihaz güvenliği (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+**Değişen dosyalar:**
+
+- `sync.js`:
+  - `mergeZikr`: `editorialVersion` için monotonik `Math.max` merge eklendi
+    (ZP-04'te eklenen alan hiç ele alınmıyordu, sessizce yerelde takılı
+    kalıyordu).
+  - `mergeById`: **gerçek bir sıra-bağımlılığı hatası düzeltildi.** "Uzak
+    daha yeni mi" kararı artık kaydın ORİJİNAL zaman damgalarından TEK SEFER
+    (alan döngüsünden ÖNCE) hesaplanıyor. Öncesinde bu karar her alan için
+    döngü içinde `existing[...]` okunarak veriliyordu; `updatedAt` alanının
+    kendisi (ör. presetlerde `archived`'dan önce gelir) başka bir alandan
+    önce işlenirse `existing.updatedAt` döngü ortasında ezilip SONRAKİ
+    alanların (ör. `archived`) güncellenmesini engelleyebiliyordu — nesne
+    anahtar sırasına bağlı, sessiz bir "kaçırılan güncelleme" riski. Bu
+    düzeltme `mergeById`'in TÜM kullanıcıları için (presetler, bildirimler,
+    aeon mesajları) geçerli; davranış hâlâ last-write-wins, yalnız artık
+    alan sırasından bağımsız ve doğru.
+- `app.js`:
+  - `zikrSeedPreset`: `updatedAt` alanı eklendi (`mergeById` bunu zaten
+    tanınan bir zaman damgası olarak arıyordu, yalnız presetlerde hiç
+    doluydu değildi — artık aktif).
+  - `App.saveZikrPreset`/`App.toggleZikrFavorite`: gerçek düzenlemede
+    `updatedAt=now()` damgalanıyor.
+  - `migrateZikrV3`: `archived` durumu GERÇEKTEN değiştiğinde (ör. preset
+    katalogdan düştüğünde) `updatedAt` damgalanıyor; değişmediyse dokunmuyor.
+- `test_faz10_sync.js`: yeni **[15] Zikirmatik V3** bölümü — KABUL'ün
+  "A=100, B=120 → 120 (220 değil)" örneği birebir, `editorialVersion`
+  monotonikliği, preset `favorite` alanında timestamp'li last-write-wins
+  (hem kazanan hem kazanamayan yön), tamamlanmış hatimin daha yeni "active"
+  tarafından geriletilmediği + `completedAt` kaybolmadığı, active/archived
+  çelişkisinde daha yeni tarafın deterministik kazandığı, 3 farklı hatimin
+  (1 ortak + 2 cihaza özel) hepsinin kayıpsız kaldığı ve en son işlem gören
+  hatimin `activeHatimId` olarak seçildiği — 12 yeni assertion, hepsi PASS.
+- Guard 1 (localhost/file anti-push) ve Guard 2 (anti-clobber gün sayısı)
+  KESİNLİKLE dokunulmadı (rule 6) — test_faz10_sync.js'in [13] bölümü hâlâ
+  aynen geçiyor.
+
+**Doğrulama:**
+
+- `node --check app.js sync.js` ✅.
+- `test_faz10_sync.js` **62/62 PASS** (50 eski + 12 yeni).
+- `zikr-harness.mjs` 42/42 ✅, `driver.mjs` PASS ✅, `test_faz11_panel.js`
+  39/39 ✅ (mergeById değişikliği bu ikisini etkilemiyor ama regresyon için
+  çalıştırıldı).
+- ZP-01/02/03/04/05 doğrulama script'leri hâlâ yeşil ✅.
+- `git diff --check` ✅. Gerçek tarayıcı açılmadı, server başlatılmadı,
+  `seyma-data`'ya yazılmadı, ağ çağrısı yok (fetch mock'u hiç tetiklenmedi).
+
+**Kalan:** Kullanıcı tek tek faz onayı istiyor — ZP-06 tamamlandı, sıradaki
+ZP-07 (bilgi mimarisi / tek görevli ekran akışı — FAZ C'nin başlangıcı, artık
+tasarım/UI fazlarına geçiliyor) kullanıcıdan bekleniyor.
+
+---
+
+### 2026-07-29 — ZP-05 uygulandı: Zikirmatik oturum durum makinesi (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+**Değişen dosyalar:**
+
+- `app.js`: yeni `zikrSessionState(preset)` — tek doğruluk kaynağı olarak
+  `idle/active/paused/hatim-complete/error-recoverable` durumlarını mevcut
+  veriden (activeSession, hatim.status, hatim kimliği) türetir; `cycle-complete`
+  kalıcı bir durum değil, active→active üzerindeki anlık bir OLAY olarak
+  belgelendi (zikrTouchTick'in `doneNow` sonucu). Fonksiyonun hemen üstüne tüm
+  izinli geçişleri (olay→yan etki) listeleyen bir sözleşme yorumu eklendi.
+  `App.zikrSessionState` test edilebilirlik için dışa açıldı (ZP-03'teki
+  `App.zikrMath` deseniyle aynı). Mevcut `zikrTouchTick`/`App.zikrTap`/
+  `App.zikrUndo`/`App.toggleZikrPause`/`App.setZikrPreset`/
+  `App.startNewZikrHatim` davranışlarına DOKUNULMADI — hepsi zaten doğru
+  çalışıyordu (bkz. ZIKIRMATIK-REDESIGN-DENETIMI.md), bu faz onları
+  formalize edip test etti.
+- `.claude/skills/run-seyma/verify-zikir-state-machine.mjs` (yeni, headless):
+  idle→active→paused→active, hızlı 100 tap, 489 sınırında tap/undo, hatim-
+  complete'te dokunmanın mutasyon/save üretmediği ve otomatik yeni hatim
+  açmadığı, hatim-complete→undo→active, hatim-complete→startNewZikrHatim→idle,
+  preset A→B→A izolasyonu, gün değişimi, undo'nun 0 altına inmediği, tek
+  `onclick` bağlayıcısı (ayrı pointerdown/touchstart yok — çift tetik
+  yapısal olarak imkânsız) — 36/36 PASS.
+
+**Doğrulama:**
+
+- `node --check app.js` ✅.
+- `zikr-harness.mjs` 42/42 ✅, `driver.mjs` PASS ✅, `test_faz10_sync.js`
+  50/50 ✅, `test_faz11_panel.js` 39/39 ✅.
+- ZP-01/02/03/04 doğrulama script'leri hâlâ yeşil ✅.
+- `verify-zikir-state-machine.mjs` 36/36 ✅.
+- `git diff --check` ✅. Gerçek tarayıcı açılmadı, server başlatılmadı,
+  `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcı tek tek faz onayı istiyor — ZP-05 tamamlandı, sıradaki
+ZP-06 (sync merge — `editorialVersion`/`archived` için açık kural, bkz. bir
+önceki giriş) kullanıcıdan bekleniyor.
+
+---
+
+### 2026-07-29 — ZP-04 uygulandı: data.zikr V3 şema + kayıpsız migration (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+**Değişen dosyalar:**
+
+- `app.js`:
+  - `ZIKR_SCHEMA_VERSION` 2→3. `ZIKR_MIGRATION_VERSION='zikr_v2'` KASITLI OLARAK
+    değişmedi (bu sabiti değiştirmek eski riskli v1→v2 "journeys'i toplamdan
+    yeniden kur" bloğunu zaten migrate olmuş kullanıcılarda tekrar tetikler ve
+    hatim geçmişini ezerdi — bkz. ZIKIRMATIK-REDESIGN-DENETIMI.md §1.2).
+  - Yeni `migrateZikrV3(z)`: `editorialVersion` alanı ekler; katalogdan düşen
+    built-in presetleri SİLMEK yerine `archived:true` işaretler (custom
+    presetlere dokunmaz); `journeys[pid].hatims[]` içindeki okunamaz (null/
+    obje-olmayan) kayıtları eler, çakışan hatim id'lerine yeni benzersiz id
+    verir, eksik/bozuk `baseTarget/target/status/startedAt/completedAt`
+    alanlarını güvenli varsayılanla doldurur — **hiçbir zaman `count`'u
+    hedefe göre kırpmaz veya `lifetimeCount`/`completedHatims`'i düşürmez**.
+    `migrateZikrV2` içinden yalnız `schemaVersion<3` iken bir kez çağrılır
+    (eski `migrationVersion` kapısından tamamen bağımsız, idempotent).
+  - `emptyZikrRoot()`: `editorialVersion:0` eklendi.
+  - `zikrSeedPreset()`: `archived:!!p.archived` alanı eklendi.
+- `.claude/skills/run-seyma/zikr-harness.mjs`: tek hardcode edilmiş
+  `schemaVersion===2` iddiası `===3`'e güncellendi (şema meşru biçimde
+  ilerledi; başka hiçbir assertion değişmedi).
+- `.claude/skills/run-seyma/verify-zikir-migration-v3.mjs` (yeni, headless):
+  boş/V1/V2/kısmi/bozuk fixture'lar, migrate(migrate(x)) derin eşdeğerlik,
+  orphan-preset arşivleme, custom-preset koruma, panel'in V3 alanları
+  olmadan kırılmadığı — 41/41 PASS.
+
+**Doğrulama:**
+
+- `node --check app.js` ✅.
+- `zikr-harness.mjs` 42/42 ✅ (schemaVersion güncellemesi dahil), `driver.mjs`
+  PASS ✅, `test_faz10_sync.js` 50/50 ✅, `test_faz11_panel.js` 39/39 ✅.
+- `verify-esmaulhusna-content.mjs`/`verify-zikir-core-content.mjs`/
+  `verify-zikir-math.mjs` (ZP-01/02/03) hâlâ yeşil ✅.
+- `verify-zikir-migration-v3.mjs` 41/41 ✅.
+- `git diff --check` ✅. Gerçek tarayıcı açılmadı, server başlatılmadı,
+  `seyma-data`'ya yazılmadı.
+
+**Kalan / sonraki fazlara not:** `sync.js`'teki `mergeZikr` henüz
+`editorialVersion`/`archived` alanlarını özel olarak ele almıyor (ZP-06
+kapsamı) — şu an genel/per-id merge yolundan geçtikleri için veri kaybı
+YOK (test_faz10_sync.js hâlâ yeşil), ama ZP-06'da bu iki yeni alan için
+açık bir merge kuralı yazılmalı. Kullanıcı tek tek faz onayı istiyor — ZP-04
+tamamlandı, sıradaki ZP-05 kullanıcıdan bekleniyor.
+
+---
+
+### 2026-07-29 — ZP-00→ZP-03 uygulandı (Zikirmatik iPhone16 redesign, main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+**Değişen dosyalar:**
+
+- `ZIKIRMATIK-REDESIGN-DENETIMI.md` (yeni, ZP-00): tam kod envanteri, koru/
+  değiştir/ekle/kaldır tablosu. Kod değişikliği içermiyor.
+- `esmaulHusnaV2.js` (yeni, ZP-01): 99 Esmâ için meaningTr/importanceTr/
+  reflectionTr/sourceRefs içerik katmanı, hepsi `editorialStatus:'draft'`.
+  esmaulHusnaV1.js'i değiştirmiyor, henüz hiçbir yere bağlanmadı.
+- `zikirCoreContentV1.js` (yeni, ZP-02): 5 çekirdek zikir (Sübhanallah vb.)
+  için aynı içerik deseni + kullanıcı-preset "Kişisel not" sözleşmesi.
+  Henüz app.js'e bağlanmadı.
+- `app.js` (ZP-03 + kullanıcı talebiyle geçici görünürlük):
+  - `ZIKR_V2_VISIBLE=true` (GEÇİCİ — yalnız bu branch'te kullanıcı incelemesi
+    için; main'e alınmadan önce tekrar `window.__SEYMA_TEST_ZIKR__===true`
+    sözleşmesine döndürülmeli, ZP-19 kapanışında ele alınacak).
+  - `App.zikrMath/App.zikrBaseTarget/App.zikrHatimTarget/App.zikrInt` artık
+    `App` üzerinden de erişilebilir (App.scoreProfileAssessmentQuality ile
+    aynı "pure functions exposed on App.* for testability" deseni).
+- `esmaulHusnaV1.js`: `normalizeArabic` artık `EsmaulHusnaV1.normalizeArabic`
+  olarak da dışa açık (yalnız test edilebilirlik, davranış değişmedi).
+- `panel.html` (ZP-03): `zikrJourneySummaryP()` — **gerçek parity hatası
+  düzeltildi**: çekirdek (esma-olmayan) presetlerde `count>=target` (=base)
+  sınırı "bitti" gibi ele alınıyordu; bu, ilk turdan sonra ömürlük sayım
+  arttıkça cycleNo/cyclePosition'ın 1. turda kilitli kalmasına yol açıyordu.
+  Artık app.js'teki `zikrMath`'in `atBoundary` sözleşmesiyle birebir aynı
+  formülü kullanıyor (aynı değişken adları/aynı dallanma).
+- `.claude/skills/run-seyma/verify-esmaulhusna-content.mjs`,
+  `verify-zikir-core-content.mjs`, `verify-zikir-math.mjs` (yeni, headless):
+  ZP-01/02/03'ün kabul kapıları.
+
+**Doğrulama:**
+
+- `node --check app.js/esmaulHusnaV1.js/sync.js` ✅
+- `zikr-harness.mjs` 42/42 ✅, `driver.mjs` PASS ✅, `test_faz10_sync.js` 50/50
+  ✅, `test_faz11_panel.js` 39/39 ✅ (panel.html değişikliğinden sonra da
+  değişmedi — [9] numaralı zikir testleri dahil).
+- `verify-esmaulhusna-content.mjs` 17/17 ✅, `verify-zikir-core-content.mjs`
+  14/14 ✅, `verify-zikir-math.mjs` 41/41 ✅ (Fettâh 0/1/488/489/490/8445/
+  239120/239121/239122 sınırları, core-preset sınırları, NaN/negatif/eksik
+  preset güvenliği, UI/panel formül paritesi dahil).
+- `git diff --check` ✅.
+- Gerçek tarayıcı açılmadı, server başlatılmadı, `seyma-data`'ya yazılmadı.
+
+**Güvenlik notu:** `ZIKR_V2_VISIBLE=true` şu an bu branch'te kalıcı (flag
+değil, sabit `true`) — kullanıcı kendi makinesinde bu branch'i açarsa
+Zikirmatik görünür olur. Bu, kullanıcının açık isteğiyle yapıldı ("gizli
+bayrağını görünür yapalım ama canlıya almayalım"); `main`e merge/deploy
+öncesi mutlaka geri alınmalı.
+
+**Kalan:** Kullanıcı sıralı, tek-tek faz onayı istiyor — her ZP tamamlanınca
+dur, sonrakini kullanıcıdan bekle. Sıradaki: ZP-04 (veri modeli V3 ve
+kayıpsız migration — ZP-00 denetimine göre mevcut şema zaten büyük ölçüde
+uyumlu, muhtemelen küçük bir ek + doğrulama). ZP-19 tamamlanıp kullanıcı açık
+onayı verene kadar main'e merge/deploy yok.
+
+---
+
 ### 2026-07-29 — Premium Zikirmatik prompt paketi `main`e fast-forward alındı
 
 **Branch:** `zikirmatik-iphone16-redesign` → `main` fast-forward.

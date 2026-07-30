@@ -460,12 +460,22 @@ function zikrJourneySummaryP(){
   var id=z.settings&&z.settings.activePresetId, p=zikrPresetP(id); if(!p) return null;
   var journeys=z.journeys&&typeof z.journeys==='object'?z.journeys:{}, j=journeys[p.id]||null, h=null;
   if(j&&Array.isArray(j.hatims)) for(var i=0;i<j.hatims.length;i++) if(j.hatims[i]&&j.hatims[i].id===j.activeHatimId){ h=j.hatims[i]; break; }
-  var base=Math.max(1,Number(p.kind==='esma'?(p.ebced||p.target):p.target)||1);
-  var target=p.kind==='esma'?base*base:base, count=p.kind==='esma'?(Number(h&&h.count)||0):(Number(j&&j.lifetimeCount)||0);
-  var cycles=Math.min(base,Math.floor(count/base)), pos=count>=target?base:count%base;
+  // ZP-03: app.js'teki zikrMath ile birebir aynı formül sözleşmesi (aynı değişken
+  // adları/aynı dallanma) kullanılır; UI kendi başına farklı matematik üretmez.
+  // Not: core (esma-olmayan) presetlerde eskiden `count>=target` (yani base) sınırı
+  // "bitti" gibi ele alınıyordu; bu, ilk 1 tur'dan sonra ömürlük sayım arttıkça
+  // cycleNo/cyclePosition'ın 1. turda kilitli kalmasına yol açan gerçek bir
+  // parity hatasıydı. Şimdi app.js'teki `atBoundary` sözleşmesiyle aynı davranır.
+  var isEsma=p.kind==='esma';
+  var base=Math.max(1,Number(isEsma?(p.ebced||p.target):p.target)||1);
+  var target=isEsma?base*base:base, rawCount=isEsma?(Number(h&&h.count)||0):(Number(j&&j.lifetimeCount)||0);
+  var count=isEsma?Math.max(0,Math.min(rawCount,target)):Math.max(0,rawCount);
+  var pos=count%base, cycles=Math.floor(count/base), complete=isEsma&&count>=target, atBoundary=!isEsma&&count>0&&pos===0;
+  var cyclePosition=complete||atBoundary?base:pos, cycleNo=complete?base:(atBoundary?cycles:cycles+1);
+  var completedCycles=isEsma?Math.min(base,cycles):cycles;
   var completed=0, lifetime=0;
   Object.keys(journeys).forEach(function(k){ var x=journeys[k]||{}; completed+=Math.max(0,Number(x.completedHatims)||0); lifetime+=Math.max(0,Number(x.lifetimeCount)||0); });
-  return {name:p.name||p.id,kind:p.kind||'core',base:base,target:target,count:count,cycleNo:count>=target?base:Math.min(base,cycles+1),cyclePosition:pos,completedCycles:cycles,completedHatims:completed,lifetime:lifetime,status:h&&h.status||'',lastAt:j&&j.lastAt||''};
+  return {name:p.name||p.id,kind:p.kind||'core',base:base,target:target,count:count,cycleNo:cycleNo,cyclePosition:cyclePosition,completedCycles:completedCycles,completedHatims:completed,lifetime:lifetime,status:h&&h.status||'',lastAt:j&&j.lastAt||''};
 }
 function zikrWeekTotalP(date){
   date=date||today(); var total=0, days=0;

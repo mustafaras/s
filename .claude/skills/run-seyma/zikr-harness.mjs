@@ -162,7 +162,7 @@ ok('App.openZikr overlay render', (function () {
   if (typeof sb.App.openZikr !== 'function') return false;
   appHTML = ''; sb.App.openZikr();
   return /id="zikr-overlay"/.test(appHTML) && /id="zikr-screen"/.test(appHTML) &&
-    /id="zikr-scroll"/.test(appHTML) && /Sayaç[\s\S]*Esmâ[\s\S]*Hatimlerim[\s\S]*Özet/i.test(appHTML) &&
+    /id="zikr-scroll"/.test(appHTML) && /Sayaç[\s\S]*Esmâ[\s\S]*Hatimlerim[\s\S]*Geçmiş[\s\S]*Ayarlar/i.test(appHTML) &&
     /tabindex="-1" onkeydown="App\.onZikrKeydown\(event\)"/.test(appHTML) &&
     !/id="sey-ov-card"[^]*Zikirmatik/.test(appHTML);
 })(), appHTML.slice(0, 120));
@@ -226,7 +226,7 @@ legacySeed.zikr={
 const legacySb=buildSandbox(legacySeed);
 loadInto(legacySb,FILES); legacySb.App.start();
 const migratedOnce=JSON.parse(legacySb.localStorage.getItem('seyma-reset-v1'));
-ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===2 &&
+ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===3 &&
   migratedOnce.zikr.migrationVersion==='zikr_v2' &&
   migratedOnce.zikr.sessions[t].perPreset.esma_19.count===978 &&
   migratedOnce.zikr.journeys.esma_19.lifetimeCount===978);
@@ -306,7 +306,7 @@ loadInto(nextDaySb,FILES); nextDaySb.App.start(); nextDaySb.App.openZikr();
 const nextDayState=JSON.parse(nextDaySb.localStorage.getItem('seyma-reset-v1'));
 ok('gün değişince hatim sürer, bugünün sayacı sıfır başlar', nextDayState.zikr.journeys.esma_19.hatims[0].count===132 &&
   nextDayState.zikr.sessions[t].totalCount===0);
-persistSb.App.setZikrView('stats'); persistSb.App.toggleZikrSetting('reducedMotion');
+persistSb.App.setZikrView('settings'); persistSb.App.toggleZikrSetting('reducedMotion');
 ok('kullanıcı hareketi azalt ayarı tam ekrana uygulanır', /zikr-v2-overlay is-reduced/.test(appHTML));
 persistSb.App.setTheme(true); persistSb.App.setZikrView('counter');
 ok('Zikirmatik koyu temada tam ekran render olur', /id="zikr-overlay"/.test(appHTML)&&/role="status" aria-live="polite"/.test(appHTML));

@@ -326,15 +326,25 @@ var ZIKR_NIYET={
   la_ilaha_illallah:'O\'ndan başka ilah yoktur.',
   estagfirullah:'O çok bağışlayıcıdır.'
 };
-// Zikirmatik v2 yeniden tasarım süresince canlı kullanıcı arayüzünden kapalıdır.
-// Veri/migration kodu korunur; tekrar açıldığında mevcut sayımlar kaybolmaz.
-var ZIKR_V2_VISIBLE=window.__SEYMA_TEST_ZIKR__===true;
-var ZIKR_SCHEMA_VERSION=2, ZIKR_MIGRATION_VERSION='zikr_v2', _zikrNormalizedRef=null;
+// GEÇİCİ ÖNİZLEME (zikirmatik-iphone16-redesign branch'ine özel): redesign
+// ilerlemesini kullanıcı incelemesi için görünür kılmak amacıyla açık
+// bırakıldı. main'e merge/deploy ETMEDEN ÖNCE — ZP-19 kapanışında — bu satır
+// tekrar `window.__SEYMA_TEST_ZIKR__===true` sözleşmesine (yalnız headless
+// test bayrağıyla açılır) döndürülmeli; canlıya bu haliyle ALINMAMALI.
+var ZIKR_V2_VISIBLE=true;
+// ZP-04: V3 şema yükseltmesi — schemaVersion 3'e çıkar. ZIKR_MIGRATION_VERSION
+// KASITLI OLARAK 'zikr_v2' kalır: bu sabit yalnız aşağıdaki migrateZikrV2'nin
+// riskli v1->v2 "journeys'i toplamlardan yeniden kur" bloğunu bir kez tetikler.
+// Bu sabiti değiştirmek o bloğu ZATEN V2/V3'e geçmiş kullanıcılarda tekrar
+// çalıştırıp gerçek hatims[] geçmişini ezerdi — bkz. ZIKIRMATIK-REDESIGN-
+// DENETIMI.md §1.2. V3'e özgü yükseltme tamamen ayrı, additive bir fonksiyonda
+// (migrateZikrV3) ve schemaVersion<3 kontrolüyle yürütülür.
+var ZIKR_SCHEMA_VERSION=3, ZIKR_MIGRATION_VERSION='zikr_v2', _zikrNormalizedRef=null;
 function zikrUid(prefix){ return (prefix||'z')+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
 function zikrInt(v){ v=Number(v); return Number.isSafeInteger(v)&&v>0?v:0; }
 function emptyZikrRoot(){
   return {
-    schemaVersion:ZIKR_SCHEMA_VERSION,migrationVersion:ZIKR_MIGRATION_VERSION,
+    schemaVersion:ZIKR_SCHEMA_VERSION,migrationVersion:ZIKR_MIGRATION_VERSION,editorialVersion:0,
     presets:[],journeys:{},sessions:{},activeSession:null,
     settings:{soundOn:false,haptic:true,autoAdvance:false,activePresetId:'',defaultMode:'hatim',keepAwake:false,reducedMotion:false,breathGuide:false,confirmReset:true,focusMode:false},
     streakDate:'',streak:0
@@ -347,7 +357,12 @@ function zikrEsmaSeed(){
   return src.map(function(x){ return {id:x.id,name:x.name,phrase:x.arabic,target:x.ebced,color:'zikr',favorite:false,createdAt:'',builtIn:true,kind:'esma',arabic:x.arabic,ebced:x.ebced,countDirection:'down'}; });
 }
 function zikrSeedPreset(p){
-  return {id:p.id,name:p.name,phrase:p.phrase,target:p.target,color:p.color||'zikr',favorite:!!p.favorite,createdAt:p.createdAt||'',builtIn:!!p.builtIn,kind:p.kind||'core',arabic:p.arabic||'',ebced:Number(p.ebced)||0,countDirection:p.countDirection==='down'?'down':'up',hatimMode:p.kind==='esma'?'ebced_square':'simple'};
+  // ZP-06: updatedAt, çoklu cihaz merge'inde last-write-wins kararını
+  // zamana bağlamak için var (bkz. sync.js mergeById — zaten updatedAt'ı
+  // tanınan bir zaman damgası alanı olarak kontrol ediyordu, yalnız
+  // presetlerde hiç dolu değildi). Yalnız gerçek bir düzenlemede
+  // (favori/ekleme/arşivleme) güncellenir; her normalize çağrısında DEĞİL.
+  return {id:p.id,name:p.name,phrase:p.phrase,target:p.target,color:p.color||'zikr',favorite:!!p.favorite,createdAt:p.createdAt||'',updatedAt:p.updatedAt||p.createdAt||'',builtIn:!!p.builtIn,kind:p.kind||'core',arabic:p.arabic||'',ebced:Number(p.ebced)||0,countDirection:p.countDirection==='down'?'down':'up',hatimMode:p.kind==='esma'?'ebced_square':'simple',archived:!!p.archived};
 }
 function zikrBaseTarget(p){ return Math.max(1,zikrInt(p&&p.kind==='esma'?(p.ebced||p.target):p&&p.target)||1); }
 function zikrHatimTarget(p){ var b=zikrBaseTarget(p); return p&&p.kind==='esma'?b*b:b; }
@@ -401,8 +416,63 @@ function zikrNormalizeRoot(rootData){
   if(typeof z.streakDate!=='string') z.streakDate='';
   return z;
 }
+function migrateZikrV3(z){
+  // ZP-04: V3 şema yükseltmesi — editorialVersion, katalogdan düşen presetleri
+  // SİLMEK yerine archived=true işaretleme, journeys/hatims alt alanlarının
+  // güvenli normalizasyonu. Bilinçli olarak SAF/idempotent: hiçbir geçerli
+  // lifetime/completedHatims/count DEĞERİNİ düşürmez veya yeniden hesaplamaz;
+  // yalnız eksik/tip-hatalı alanları safe default ile tamamlar ya da
+  // okunamayan (obje bile olmayan) çöp kayıtları eler. Bu fonksiyon
+  // migrateZikrV2 içinden yalnız schemaVersion<3 iken, tek sefer çağrılır
+  // (bkz. çağıran taraftaki needsV3 kontrolü) — eski migrationVersion
+  // kapısından tamamen bağımsızdır.
+  if(typeof z.editorialVersion!=='number'||isNaN(z.editorialVersion)) z.editorialVersion=0;
+
+  var seedIds={}; ZIKR_SEED.concat(zikrEsmaSeed()).forEach(function(s){ seedIds[s.id]=true; });
+  z.presets.forEach(function(p){
+    if(!p) return;
+    var wasArchived=!!p.archived;
+    if(seedIds[p.id]) p.archived=false;
+    else if(p.builtIn) p.archived=true; // katalogda artık yok: sil değil, arşivle
+    else if(typeof p.archived!=='boolean') p.archived=false; // kullanıcı özel preseti: dokunma, yalnız tip garantile
+    // ZP-06: archived durumu gerçekten değiştiyse updatedAt'ı damgala — çoklu
+    // cihaz merge'inde (sync.js mergeById) hangi cihazın arşiv kararının daha
+    // yeni olduğu bununla çözülür. Değişmediyse dokunma (gereksiz churn yok).
+    if(!!p.archived!==wasArchived) p.updatedAt=new Date().toISOString();
+    if(typeof p.updatedAt!=='string') p.updatedAt=p.createdAt||'';
+  });
+
+  Object.keys(z.journeys).forEach(function(pid){
+    var j=z.journeys[pid];
+    if(!j||typeof j!=='object'){ delete z.journeys[pid]; return; } // okunamaz kayıt: lifetime zaten burada tutulmuyordu, kaybedilecek toplam yok
+    j.presetId=(typeof j.presetId==='string'&&j.presetId)?j.presetId:pid;
+    j.lifetimeCount=zikrInt(j.lifetimeCount);
+    j.completedHatims=zikrInt(j.completedHatims);
+    j.legacyCompletedHatims=zikrInt(j.legacyCompletedHatims);
+    if(typeof j.activeHatimId!=='string') j.activeHatimId='';
+    if(typeof j.lastAt!=='string') j.lastAt='';
+    if(typeof j.lastSessionId!=='string') j.lastSessionId='';
+    if(!Array.isArray(j.hatims)) j.hatims=[];
+    var p=z.presets.find(function(x){ return x.id===pid; }), seenIds={}, cleaned=[];
+    j.hatims.forEach(function(h){
+      if(!h||typeof h!=='object') return; // okunamaz hatim: at (lifetimeCount/completedHatims sayaçları ayrı tutulur, düşmez)
+      if(!h.id||seenIds[h.id]) h.id=zikrUid('hatim');
+      seenIds[h.id]=true;
+      h.baseTarget=zikrInt(h.baseTarget)||(p?zikrBaseTarget(p):1);
+      h.target=zikrInt(h.target)||(p?zikrHatimTarget(p):(h.baseTarget||1));
+      h.count=zikrInt(h.count); // yalnız tip/işaret güvenliği; hedefe göre KIRPILMAZ (o, okuma anında zikrMath'te yapılır)
+      h.status=(h.status==='completed'||h.status==='archived'||h.status==='active')?h.status:(h.target>0&&h.count>=h.target?'completed':'active');
+      if(typeof h.startedAt!=='string'||!h.startedAt) h.startedAt=j.lastAt||new Date().toISOString();
+      if(h.status==='completed'){ if(typeof h.completedAt!=='string'||!h.completedAt) h.completedAt=h.startedAt; }
+      else if(typeof h.completedAt!=='string') h.completedAt=null;
+      cleaned.push(h);
+    });
+    j.hatims=cleaned;
+    if(j.activeHatimId&&!seenIds[j.activeHatimId]) j.activeHatimId='';
+  });
+}
 function migrateZikrV2(rootData){
-  var z=zikrNormalizeRoot(rootData), totals={}, firstAt={}, lastAt={};
+  var z=zikrNormalizeRoot(rootData), totals={}, firstAt={}, lastAt={}, needsV3=zikrInt(z.schemaVersion)<3;
   Object.keys(z.sessions).sort().forEach(function(date){
     var day=z.sessions[date]; if(!day||typeof day!=='object') day=z.sessions[date]=emptyZikrDay();
     if(!day.perPreset||typeof day.perPreset!=='object') day.perPreset={};
@@ -433,6 +503,7 @@ function migrateZikrV2(rootData){
     });
     z.migrationVersion=ZIKR_MIGRATION_VERSION;
   }
+  if(needsV3) migrateZikrV3(z);
   z.schemaVersion=ZIKR_SCHEMA_VERSION;
   return z;
 }
@@ -473,6 +544,67 @@ function zikrJourneyProgress(preset){
   var p=preset||zikrActivePreset(), j=zikrJourney(p,true), h=zikrActiveHatim(p,false);
   if(p.kind!=='esma') return {journey:j,hatim:null,math:zikrMath(p,j.lifetimeCount),count:j.lifetimeCount};
   return {journey:j,hatim:h,math:zikrMath(p,h?h.count:0),count:h?h.count:0};
+}
+// ZP-05 — Zikirmatik oturum durum makinesi (tek doğruluk kaynağı).
+//
+// Durumlar:
+//   idle            — preset seçili, bu preset için henüz aktif/duraklamış
+//                      bir activeSession yok (ör. az önce preset değiştirildi).
+//   active          — activeSession bu presete ait ve pausedAt boş; dokunma
+//                      kabul edilir.
+//   paused          — activeSession bu presete ait ve pausedAt dolu; dokunma
+//                      App.toggleZikrPause ile yeniden 'active'e döner.
+//   hatim-complete   — (yalnız esma) aktif hatim status==='completed'; kalıcı
+//                      bir dinlenme durumudur, otomatik yeni hatim AÇILMAZ.
+//   cycle-complete   — kalıcı bir durum DEĞİL, active→active kendi-döngüsü
+//                      üzerinde anlık bir OLAYDIR (zikrTouchTick sonucunda
+//                      `doneNow===true`); veri modelinde "sıkışıp kalınan" bir
+//                      hâl yoktur, bir sonraki tur otomatik başlar.
+//   error-recoverable — geçerli bir preset çözülemediğinde (ör. z.presets boş)
+//                      düşülen güvenli varsayılan; hiçbir zaman throw etmez.
+//
+// İzinli geçişler (olay → yan etki):
+//   idle/paused --zikrTap--> active         : zikrTouchTick() journey+aktif
+//     hatim+gün kaydı+activeSession'ı TEK senkron çağrıda atomik günceller;
+//     ardından save() çağrılır (rule 3). doneNow ise 'cycle-complete' OLAYI
+//     ateşlenir (spark/toast), hatim tamamlandıysa 'hatim-complete'e geçilir.
+//   hatim-complete --zikrTap--> hatim-complete : hiçbir mutasyon yapılmaz,
+//     yalnız bilgilendirme toast'ı; save() ÇAĞRILMAZ (delta üretilmez).
+//   active --toggleZikrPause--> paused       : activeSession.pausedAt=now.
+//   paused --toggleZikrPause--> active       : yeni/devam eden activeSession,
+//     pausedAt=null.
+//   (herhangi) --setZikrPreset(id)--> idle    : zikrPauseSession() ESKİ
+//     preseti duraklatır (silmez); yeni preset kendi journey'sinde `idle`
+//     başlar — iki yolculuk birbirinden asla karışmaz (rule 7).
+//   (herhangi) --closeZikr--> (aynı state, ama oturum duraklamış)
+//   active/paused/idle --zikrUndo--> (aynı state, sayaç -1) : yalnız CARİ
+//     presetin BUGÜNKÜ sayımı >0 ise uygulanır; 0 altına asla inmez (rule 5).
+//   hatim-complete --zikrUndo--> active        : tamamlanma geri alınır
+//     (h.status='active', completedHatims-1).
+//   hatim-complete --startNewZikrHatim--> idle : eski hatim zaten 'completed'
+//     ise dokunulmaz, tamamlanmamış bir yolculuk varsa 'archived' olur; yeni
+//     hatim count=0 ile başlar (rule 8 — yalnız açık kullanıcı eylemiyle).
+//   (gün değişimi, herhangi bir state) --> (aynı state korunur) : yeni tarihte
+//     zikrDay() günlük sayaç sıfırla başlar, journey/hatim/lifetimeCount
+//     ETKİLENMEZ (rule 6).
+//
+// Dokunma kaynağı: tek `onclick="App.zikrTap()"` (bkz. zikrCounterViewHTML) —
+// ayrı bir pointerdown/touchstart bağlayıcısı YOKTUR, bu yüzden gerçek
+// tarayıcıda pointerup/click/touch sentezinden çift sayım yapısal olarak
+// mümkün değildir (rule 4); verify-zikir-state-machine.mjs bunu regex ile
+// de doğrular.
+function zikrSessionState(preset){
+  var p=preset||zikrActivePreset(); if(!p) return 'error-recoverable';
+  var curHatimId='';
+  if(p.kind==='esma'){
+    var h=zikrActiveHatim(p,false); if(h&&h.status==='completed') return 'hatim-complete';
+    curHatimId=h?h.id:'';
+  }
+  var z=ensureZikrRoot(), s=z.activeSession;
+  // Esmâ'da oturum yalnız CARİ hatime aitse geçerli sayılır — startNewZikrHatim
+  // sonrası eski (duraklamış) oturum yeni hatimle eşleşmediği için 'idle'e düşer.
+  if(s&&s.presetId===p.id&&(p.kind!=='esma'||s.hatimId===curHatimId)) return s.pausedAt?'paused':'active';
+  return 'idle';
 }
 function zikrTouchTick(){
   var p=zikrActivePreset(); if(!p) return null;
@@ -3305,9 +3437,26 @@ function zikrPaintLive(result){
     return true;
   }catch(e){ return false; }
 }
+// ZP-03: saf matematik fonksiyonları doğrudan test edilebilir olsun diye App
+// üzerinden de erişilebilir kılınır (App.scoreProfileAssessmentQuality'deki
+// "pure functions exposed on App.* purely for direct testability" deseniyle
+// aynı). Üretim davranışını değiştirmez; hiçbiri state/DOM'a dokunmaz.
+App.zikrMath=zikrMath;
+App.zikrBaseTarget=zikrBaseTarget;
+App.zikrHatimTarget=zikrHatimTarget;
+App.zikrInt=zikrInt;
+App.zikrSessionState=zikrSessionState; // ZP-05: durum makinesi doğrudan test edilebilir
 App.openZikr=function(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
-App.closeZikr=function(){ zikrPauseSession(); ui.zikrOpen=false; zikrSyncWakeLock(); save(); _zikrCompleteFlash=false; render(); };
+App.closeZikr=function(){
+  zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; zikrSyncWakeLock(); save(); _zikrCompleteFlash=false; render();
+  // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
+  // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
+  // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
+  // yüzden kapalıktan sonra kararlı id ile yeniden sorgulanır.
+  try{ var trigger=document.getElementById('zikr-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
+};
 App.setZikrView=function(v){ ui.zikrView=v; render(); };
+App.toggleZikrDetail=function(){ ui.zikrDetailOpen=!ui.zikrDetailOpen; render(); };
 App.onZikrKeydown=function(e){
   if(!e) return;
   if(e.key==='Escape'){ if(e.preventDefault)e.preventDefault(); App.closeZikr(); return; }
@@ -3380,7 +3529,8 @@ App.saveZikrPreset=function(){
   var tgt=parseInt(d.target,10); if(isNaN(tgt)||tgt<1) tgt=100;
   var z=ensureZikrRoot();
   var id='z_'+Date.now().toString(36);
-  z.presets.push({id:id,name:name.slice(0,60),phrase:name.slice(0,80),target:Math.min(1000000,tgt),color:'zikr',favorite:false,createdAt:new Date().toISOString(),builtIn:false,kind:'custom',hatimMode:'simple'});
+  var nowIso=new Date().toISOString();
+  z.presets.push({id:id,name:name.slice(0,60),phrase:name.slice(0,80),target:Math.min(1000000,tgt),color:'zikr',favorite:false,createdAt:nowIso,updatedAt:nowIso,builtIn:false,kind:'custom',hatimMode:'simple'});
   z.settings.activePresetId=id; ui.zikrPresetDraft=null; ui.zikrView='counter'; save(); render();
   toast('Preset eklendi 🌿');
 };
@@ -3393,7 +3543,7 @@ App.deleteZikrPreset=function(id){
   if(z.settings.activePresetId===id) z.settings.activePresetId=z.presets[0].id;
   save(); render();
 };
-App.toggleZikrFavorite=function(id){ var p=zikrPreset(id); if(!p) return; p.favorite=!p.favorite; save(); render(); };
+App.toggleZikrFavorite=function(id){ var p=zikrPreset(id); if(!p) return; p.favorite=!p.favorite; p.updatedAt=new Date().toISOString(); save(); render(); };
 App.zikrResetToday=function(){
   var p=zikrActivePreset(), day=zikrDay(todayStr()), pd=zikrPresetDay(day,p.id);
   if(pd.count<=0) return;
@@ -8679,7 +8829,7 @@ function saygiPreviewHubHTML(person,article,done){
 function zikrPreviewCardHTML(){
   var p=zikrActivePreset(), day=zikrDay(todayStr()), jp=zikrJourneyProgress(p), m=jp.math;
   var pct=Math.round(m.progress*100), streak=zikrStreak();
-  var h='<button class="sg-faith-preview-card zikr-v2-preview" onclick="App.openZikr()" aria-label="Zikirmatiği tam ekran aç">';
+  var h='<button id="zikr-preview-card" class="sg-faith-preview-card zikr-v2-preview" onclick="App.openZikr()" aria-label="Zikirmatiği tam ekran aç">';
   h+='<div class="zikr-v2-preview-top"><span class="zikr-v2-preview-icon">'+icon('sparkles',20)+'</span><div class="zikr-v2-preview-copy"><strong>Zikirmatik</strong><small>'+esc(p.name)+(p.kind==='esma'?' · Ebced '+m.baseTarget:' · hedef '+m.baseTarget)+'</small></div><span class="zikr-v2-preview-go">'+icon('chevron-right',18)+'</span></div>';
   if(p.kind==='esma'){
     h+='<div class="zikr-v2-preview-metric"><div><span>Şu an</span><strong>'+(m.complete?'Tamamlandı':m.currentCycleNo+'. × '+m.baseTarget)+'</strong></div><div><span>Bu turda</span><strong>'+(m.complete?'✓':m.cyclePosition+' / '+m.baseTarget)+'</strong></div></div>';
@@ -8696,12 +8846,20 @@ function zikrPreviewCardHTML(){
 function zikrCounterViewHTML(p,z){
   var jp=zikrJourneyProgress(p), m=jp.math, day=zikrDay(todayStr()), pd=zikrPresetDay(day,p.id);
   var session=z.activeSession&&z.activeSession.presetId===p.id?z.activeSession:null;
-  var paused=!session||!!session.pausedAt, sessionCount=session?zikrInt(session.count):0;
+  var paused=!session||!!session.pausedAt;
   var R=88, C=2*Math.PI*R, cyclePct=m.complete?1:(m.cyclePosition/m.baseTarget), off=C*(1-cyclePct);
   var h='<section class="zikr-v2-counter'+(z.settings.focusMode?' is-focus':'')+'" aria-labelledby="zikr-active-name">';
   h+='<div class="zikr-v2-intention"><span>NİYET</span><p>'+esc(ZIKR_NIYET[p.id]||(p.kind==='esma'?'Bu güzel ismin anlamına yönelerek, sakin ve bilinçli bir ritim tut.':'Niyet kalpten gelir; sayı yalnızca ritmi korur.'))+'</p></div>';
   h+='<div class="zikr-v2-name"><div class="arabic" lang="ar" dir="rtl">'+esc(p.arabic||p.phrase||p.name)+'</div><h2 id="zikr-active-name">'+esc(p.name)+'</h2>';
-  h+='<div class="meta">'+(p.kind==='esma'?'Ebced '+m.baseTarget+' · Tam hatim '+m.baseTarget+'² = '+m.hatimTarget.toLocaleString('tr-TR'):'Tur hedefi '+m.baseTarget)+'</div></div>';
+  h+='<div class="meta">'+(p.kind==='esma'?'Ebced '+m.baseTarget+' · Tam hatim '+m.baseTarget+'² = '+m.hatimTarget.toLocaleString('tr-TR'):'Tur hedefi '+m.baseTarget)+'</div>';
+  // ZP-07 rule 3: uzun açıklama metni ana sayaçtan ayrılıp isteğe bağlı bir
+  // detay panosuna taşındı (ZP-13'te esmaulHusnaV2.js/zikirCoreContentV1.js
+  // içeriğiyle zenginleştirilecek; şimdilik ebced/hatim yöntem notunu taşır).
+  h+='<button class="zikr-v2-detail-toggle" onclick="App.toggleZikrDetail()" aria-expanded="'+(!!ui.zikrDetailOpen)+'" aria-controls="zikr-detail-sheet">'+(ui.zikrDetailOpen?'Anlamı ve önemi ▲':'Anlamı ve önemi ▾')+'</button>';
+  if(ui.zikrDetailOpen){
+    h+='<div id="zikr-detail-sheet" class="zikr-v2-detail-sheet" role="region" aria-label="'+esc(p.name)+' anlamı ve önemi">Ebced değerleri geleneksel harf hesabıdır; ibadetin kabulü veya dinî bir zorunluluk için bilimsel ölçü değildir. Sayaç yalnızca kişisel takip aracıdır.</div>';
+  }
+  h+='</div>';
   if(p.kind==='esma'&&m.complete){
     h+='<div class="zikr-v2-complete"><div class="spark">✦</div><h3>Ebced² Tam Hatim tamamlandı</h3><p>'+m.hatimTarget.toLocaleString('tr-TR')+' zikir ve '+m.completedCycles+' tam tur, güvenle arşivlendi.</p><button onclick="App.startNewZikrHatim()">Yeni hatim başlat</button></div>';
   } else {
@@ -8710,20 +8868,25 @@ function zikrCounterViewHTML(p,z){
     h+='<span class="zikr-v2-core"><strong id="zikr-live-count">'+(p.kind==='esma'?m.remainingInCycle:m.cyclePosition)+'</strong><small id="zikr-live-sub">'+(p.kind==='esma'?'kaldı':'/ '+m.baseTarget)+'</small><em>dokun ve say</em></span>';
     h+='<span class="zikr-done-spark'+(_zikrCompleteFlash?' on':'')+'"><b>✦</b></span></button>';
   }
+  // ZP-07 rule 2: sayaç ekranında en fazla ÜÇ ilerleme seviyesi bir arada
+  // gösterilir — "bugün", "bu tur", "tam hatim/ömürlük" (prompt paketi §3).
+  // Önceki sürümde ayrı bir "seans" sayacı da vardı (toplam 5 rakam); bu,
+  // gereksiz rozet/istatistik kalabalığı sayıldığı için kaldırıldı. Oturum
+  // sayısı hâlâ activeSession'da tutuluyor ve durum makinesinden okunabilir;
+  // yalnız her an ekranda GÖRÜNMÜYOR.
   h+='<div class="zikr-v2-cycle-grid">';
-  h+='<div><span>MEVCUT TUR</span><strong id="zikr-live-cycle">'+(m.complete?m.baseTarget+' tur tamam':m.currentCycleNo+'. tur · '+m.cyclePosition+'/'+m.baseTarget)+'</strong><small>'+(m.complete?'Yeni hatme hazırsın':m.remainingInCycle+' kaldı')+'</small></div>';
+  h+='<div><span>BUGÜN</span><strong id="zikr-live-today">'+pd.count.toLocaleString('tr-TR')+'</strong><small>'+day.totalCount.toLocaleString('tr-TR')+' toplam</small></div>';
+  h+='<div><span>BU TUR</span><strong id="zikr-live-cycle">'+(m.complete?m.baseTarget+' tur tamam':m.currentCycleNo+'. tur · '+m.cyclePosition+'/'+m.baseTarget)+'</strong><small>'+(m.complete?'Yeni hatme hazırsın':m.remainingInCycle+' kaldı')+'</small></div>';
   h+='<div><span>'+(p.kind==='esma'?'TAM HATİM':'ÖMÜRLÜK')+'</span><strong id="zikr-live-hatim">'+(p.kind==='esma'?(m.count.toLocaleString('tr-TR')+' / '+m.hatimTarget.toLocaleString('tr-TR')):(jp.journey.lifetimeCount.toLocaleString('tr-TR')+' zikir'))+'</strong><small>'+(p.kind==='esma'?m.remainingInHatim.toLocaleString('tr-TR')+' kaldı':Math.floor(jp.journey.lifetimeCount/m.baseTarget)+' tur')+'</small></div>';
   h+='</div>';
-  h+='<div class="zikr-v2-session"><span><small>BUGÜN</small><b id="zikr-live-today">'+day.totalCount.toLocaleString('tr-TR')+'</b></span><span><small>BU ZİKİR</small><b>'+pd.count.toLocaleString('tr-TR')+'</b></span><span><small>SEANS</small><b id="zikr-live-session">'+sessionCount.toLocaleString('tr-TR')+'</b></span></div>';
+  // Alt eylem bölgesi: yalnız SIRASINDA/anında gereken iki eylem (geri al,
+  // duraklat). Ses/titreşim/odak/nefes/hareket ayarları Ayarlar sekmesine
+  // taşındı (bkz. zikrSettingsViewHTML) — sayaç ekranı yarışan CTA'lardan arınık.
   h+='<div class="zikr-v2-dock" role="toolbar" aria-label="Sayaç araçları">';
   h+='<button onclick="App.zikrUndo()" aria-label="Son sayımı geri al">'+icon('rotate-ccw',17)+'<span>Geri al</span></button>';
   h+='<button onclick="App.toggleZikrPause()" aria-label="'+(paused?'Seansı sürdür':'Seansı duraklat')+'">'+icon(paused?'play':'pause',17)+'<span>'+(paused?'Sürdür':'Duraklat')+'</span></button>';
-  h+='<button class="'+(z.settings.focusMode?'on':'')+'" onclick="App.toggleZikrSetting(\'focusMode\')" aria-pressed="'+z.settings.focusMode+'">'+icon('target',17)+'<span>Odak</span></button>';
-  h+='<button class="'+(z.settings.soundOn?'on':'')+'" onclick="App.toggleZikrSetting(\'soundOn\')" aria-pressed="'+z.settings.soundOn+'">'+icon('music',17)+'<span>Ses</span></button>';
-  h+='<button class="'+(z.settings.haptic?'on':'')+'" onclick="App.toggleZikrSetting(\'haptic\')" aria-pressed="'+z.settings.haptic+'">'+icon('vibrate',17)+'<span>Titreşim</span></button>';
   h+='</div>';
   h+='<div class="zikr-v2-sr" role="status" aria-live="polite">'+(m.complete?esc(p.name)+' Ebced kare tam hatmi tamamlandı':esc(p.name)+', '+m.currentCycleNo+'. tur, '+m.cyclePosition+' sayıldı, '+m.remainingInCycle+' kaldı')+'</div>';
-  h+='<p class="zikr-v2-disclaimer">Ebced değerleri geleneksel harf hesabıdır; ibadetin kabulü veya dinî bir zorunluluk için bilimsel ölçü değildir. Sayaç yalnızca kişisel takip aracıdır.</p>';
   h+='</section>';
   return h;
 }
@@ -8766,27 +8929,42 @@ function zikrHatimsViewHTML(p,z){
   out+=cards||'<div class="zikr-v2-empty"><strong>Henüz başlayan bir Esmâ hatmi yok.</strong><span>Kütüphaneden bir isim seçip ilk dokunuşunla başlayabilirsin.</span><button onclick="App.setZikrView(\'presets\')">99 Esmâ’yı aç</button></div>';
   out+='</section>'; return out;
 }
-function zikrStatsViewHTML(z){
+function zikrHistoryViewHTML(z){
+  // ZP-07: eski "Özet" görünümünün istatistik kısmı — ayarlar buradan
+  // zikrSettingsViewHTML'e taşındı (tek görevli ekran ilkesi). Derin nötr
+  // analiz/ısı haritası zenginleştirmesi ZP-18'in kapsamıdır.
   var day=zikrDay(todayStr()), w=zikrWeek(todayStr()), lifetime=0, completed=0, max=1, bars='', top=[];
   Object.keys(z.journeys).forEach(function(pid){ var j=z.journeys[pid]; lifetime+=zikrInt(j&&j.lifetimeCount); completed+=zikrInt(j&&j.completedHatims); if(j&&j.lifetimeCount){ var p=zikrPreset(pid); top.push({name:p&&p.name||pid,count:j.lifetimeCount}); } });
   for(var i=6;i>=0;i--){ var date=addDays(todayStr(),-i), d=zikrDay(date); if(d.totalCount>max) max=d.totalCount; }
   for(var k=6;k>=0;k--){ var dt=addDays(todayStr(),-k), dy=zikrDay(dt), hp=Math.max(5,Math.round(dy.totalCount/max*100)); bars+='<div><i style="height:'+hp+'%"></i><b>'+dy.totalCount+'</b><span>'+['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date(dt+'T12:00:00').getDay()]+'</span></div>'; }
   top.sort(function(a,b){return b.count-a.count;});
-  var h='<section class="zikr-v2-stats"><div class="zikr-v2-section-head"><div><span>İSTATİSTİK</span><h2>Yargısız, sakin ilerleme</h2><p>Sayılar performans notu değil; yalnızca kaldığın yeri hatırlatır.</p></div></div>';
+  var h='<section class="zikr-v2-stats"><div class="zikr-v2-section-head"><div><span>GEÇMİŞ</span><h2>Yargısız, sakin ilerleme</h2><p>Sayılar performans notu değil; yalnızca kaldığın yeri hatırlatır.</p></div></div>';
   h+='<div class="zikr-v2-kpis"><div><span>BUGÜN</span><strong>'+day.totalCount.toLocaleString('tr-TR')+'</strong><small>'+day.completedSets+' tur</small></div><div><span>7 GÜN</span><strong>'+w.total.toLocaleString('tr-TR')+'</strong><small>'+w.days+' aktif gün</small></div><div><span>ÖMÜRLÜK</span><strong>'+lifetime.toLocaleString('tr-TR')+'</strong><small>'+completed+' tam hatim</small></div></div>';
   h+='<div class="zikr-v2-week"><div class="title"><strong>Son 7 gün</strong><span>'+zikrStreak()+' gün devamlılık</span></div><div class="bars">'+bars+'</div></div>';
   if(top.length){ h+='<div class="zikr-v2-top"><h3>En çok eşlik edenler</h3>'; top.slice(0,5).forEach(function(x,i){ h+='<div><span><b>'+(i+1)+'</b>'+esc(x.name)+'</span><strong>'+x.count.toLocaleString('tr-TR')+'</strong></div>'; }); h+='</div>'; }
-  h+='<div class="zikr-v2-settings"><h3>Sayaç deneyimi</h3>';
+  h+='</section>'; return h;
+}
+function zikrSettingsViewHTML(z){
+  // ZP-07: sayaç ekranındaki dock'tan (ses/titreşim/odak) ve eski "Özet"ten
+  // (nefes/hareket/uyanık-tut/otomatik-ilerleme) TÜM ayarlar tek bir yerde.
+  var h='<section class="zikr-v2-settings-view"><div class="zikr-v2-section-head"><div><span>AYARLAR</span><h2>Sayaç deneyimi</h2><p>Bu ayarlar kapalıyken de sayaç çalışmaya devam eder.</p></div></div>';
+  h+='<div class="zikr-v2-settings">';
+  h+='<button onclick="App.toggleZikrSetting(\'soundOn\')" aria-pressed="'+z.settings.soundOn+'"><span><b>Ses</b><small>Her dokunuşta hafif bir tık sesi</small></span><i class="'+(z.settings.soundOn?'on':'')+'"></i></button>';
+  h+='<button onclick="App.toggleZikrSetting(\'haptic\')" aria-pressed="'+z.settings.haptic+'"><span><b>Titreşim</b><small>Desteklenen cihazlarda dokunma geri bildirimi</small></span><i class="'+(z.settings.haptic?'on':'')+'"></i></button>';
+  h+='<button onclick="App.toggleZikrSetting(\'focusMode\')" aria-pressed="'+z.settings.focusMode+'"><span><b>Odak modu</b><small>Sayaç ekranında yalnız isim ve sayaç kalır</small></span><i class="'+(z.settings.focusMode?'on':'')+'"></i></button>';
   h+='<button onclick="App.toggleZikrSetting(\'breathGuide\')" aria-pressed="'+z.settings.breathGuide+'"><span><b>Nefes ritmi</b><small>İsteğe bağlı yavaş görsel rehber</small></span><i class="'+(z.settings.breathGuide?'on':'')+'"></i></button>';
   h+='<button onclick="App.toggleZikrSetting(\'reducedMotion\')" aria-pressed="'+z.settings.reducedMotion+'"><span><b>Hareketi azalt</b><small>Sayaç animasyonlarını sakinleştirir</small></span><i class="'+(z.settings.reducedMotion?'on':'')+'"></i></button>';
   h+='<button onclick="App.toggleZikrSetting(\'keepAwake\')" aria-pressed="'+z.settings.keepAwake+'"><span><b>Ekranı uyanık tut</b><small>Desteklenen cihazlarda yalnız sayaç açıkken</small></span><i class="'+(z.settings.keepAwake?'on':'')+'"></i></button>';
-  h+='<button onclick="App.toggleZikrSetting(\'autoAdvance\')" aria-pressed="'+z.settings.autoAdvance+'"><span><b>Otomatik sıradaki zikir</b><small>Yalnız normal tur tamamlanınca</small></span><i class="'+(z.settings.autoAdvance?'on':'')+'"></i></button></div>';
-  h+='</section>'; return h;
+  h+='<button onclick="App.toggleZikrSetting(\'autoAdvance\')" aria-pressed="'+z.settings.autoAdvance+'"><span><b>Otomatik sıradaki zikir</b><small>Yalnız normal tur tamamlanınca</small></span><i class="'+(z.settings.autoAdvance?'on':'')+'"></i></button>';
+  h+='</div></section>'; return h;
 }
 function zikroverlayHTML(){
   var z=ensureZikrRoot(), p=zikrActivePreset(), view=ui.zikrView||'counter';
-  var body=view==='presets'?zikrPresetsViewHTML(p,z):(view==='hatims'?zikrHatimsViewHTML(p,z):(view==='stats'?zikrStatsViewHTML(z):zikrCounterViewHTML(p,z)));
-  var tabs=[['counter','Sayaç'],['presets','Esmâ'],['hatims','Hatimlerim'],['stats','Özet']];
+  var body=view==='presets'?zikrPresetsViewHTML(p,z):(view==='hatims'?zikrHatimsViewHTML(p,z):(view==='history'?zikrHistoryViewHTML(z):(view==='settings'?zikrSettingsViewHTML(z):zikrCounterViewHTML(p,z))));
+  // ZP-07: İÇ NAVİGASYON — Sayaç/Esmâ/Hatimlerim/Geçmiş/Ayarlar (5 sekme, hepsi
+  // kısa Türkçe etiket). Eski tek "Özet" sekmesi Geçmiş (istatistik/ısı) ve
+  // Ayarlar (tüm toggle'lar) olarak ikiye ayrıldı — her ekranın tek bir işi var.
+  var tabs=[['counter','Sayaç'],['presets','Esmâ'],['hatims','Hatimlerim'],['history','Geçmiş'],['settings','Ayarlar']];
   var head='<header class="zikr-v2-header"><div class="brand"><span>'+icon('sparkles',18)+'</span><div><strong>Zikirmatik</strong><small>Kalıcı, odaklı ve sana ait</small></div></div><button class="close" onclick="App.closeZikr()" aria-label="Zikirmatiği kapat">'+icon('x',18)+'</button></header>';
   head+='<nav class="zikr-v2-tabs" aria-label="Zikirmatik bölümleri">'+segTabs(tabs,view,'App.setZikrView','zikr')+'</nav>';
   return '<div id="zikr-overlay" class="zikr-v2-overlay'+(z.settings.reducedMotion?' is-reduced':'')+'" role="dialog" aria-modal="true" aria-label="Tam ekran Zikirmatik"><div id="zikr-screen" class="zikr-v2-screen" tabindex="-1" onkeydown="App.onZikrKeydown(event)">'+head+'<main id="zikr-scroll" class="scroll zikr-v2-scroll">'+body+'</main></div></div>';

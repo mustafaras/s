@@ -281,6 +281,111 @@ console.log('[14] Zikirmatik v2 — bayat cihaz sayacı geriye çekmez');
   ok('bayat ikinci merge sayacı düşürmez', stale.journeys.esma_19.lifetimeCount===490 && stale.journeys.esma_19.hatims.find(function(h){return h.id==='h1';}).count===490);
 })();
 
+// ── Test 15: ZP-06 — Zikirmatik V3 alanları + timestamp'li preset merge ────
+console.log('[15] Zikirmatik V3 — editorialVersion, preset last-write-wins, hatim durum çelişkisi');
+(function(){
+  var mergeZikr=global.window.SeySync.mergeZikr;
+
+  // KABUL: A cihazı 100, B cihazı aynı hatimde 120 → birleşim 120; 220 değil.
+  var a100={
+    schemaVersion:3,migrationVersion:'zikr_v2',editorialVersion:0,
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,target:489,archived:false,updatedAt:iso(1000)}],
+    settings:{activePresetId:'esma_19'},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:100,activeHatimId:'hA',lastAt:iso(1000),completedHatims:0,hatims:[{id:'hA',count:100,target:239121,baseTarget:489,status:'active',lastAt:iso(1000)}]}},
+    streak:0,streakDate:''
+  };
+  var b120={
+    schemaVersion:3,migrationVersion:'zikr_v2',editorialVersion:0,
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,target:489,archived:false,updatedAt:iso(1000)}],
+    settings:{activePresetId:'esma_19'},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:120,activeHatimId:'hA',lastAt:iso(2000),completedHatims:0,hatims:[{id:'hA',count:120,target:239121,baseTarget:489,status:'active',lastAt:iso(2000)}]}},
+    streak:0,streakDate:''
+  };
+  var abMerged=mergeZikr(a100,b120);
+  ok('A=100, B=120 aynı hatimde birleşim 120 (KABUL örneği)', abMerged.journeys.esma_19.hatims.find(function(h){return h.id==='hA';}).count===120);
+  ok('Birleşim 220 DEĞİL (toplama değil, max)', abMerged.journeys.esma_19.hatims.find(function(h){return h.id==='hA';}).count!==220 && abMerged.journeys.esma_19.lifetimeCount!==220);
+
+  // editorialVersion: yalnız ileri gider, geri düşmez
+  var localEd={schemaVersion:3,editorialVersion:2,presets:[],settings:{},sessions:{},journeys:{},streak:0,streakDate:''};
+  var remoteEdHigher={schemaVersion:3,editorialVersion:5,presets:[],settings:{},sessions:{},journeys:{},streak:0,streakDate:''};
+  var remoteEdLower={schemaVersion:3,editorialVersion:1,presets:[],settings:{},sessions:{},journeys:{},streak:0,streakDate:''};
+  ok('editorialVersion: uzak daha yüksekse ilerler (2→5)', mergeZikr(localEd,remoteEdHigher).editorialVersion===5);
+  ok('editorialVersion: uzak daha düşükse geriye gitmez (2 kalır)', mergeZikr(localEd,remoteEdLower).editorialVersion===2);
+
+  // Preset last-write-wins: updatedAt üzerinden (rule 5) — favorite ve archived
+  var localFav={
+    schemaVersion:3,editorialVersion:0,
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,favorite:false,archived:false,updatedAt:iso(1000)}],
+    settings:{},sessions:{},journeys:{},streak:0,streakDate:''
+  };
+  var remoteFavNewer={
+    schemaVersion:3,editorialVersion:0,
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,favorite:true,archived:false,updatedAt:iso(5000)}],
+    settings:{},sessions:{},journeys:{},streak:0,streakDate:''
+  };
+  var favMerged=mergeZikr(localFav,remoteFavNewer);
+  ok('Preset favorite: daha YENİ (updatedAt) taraf kazanır (false→true)', favMerged.presets[0].favorite===true && favMerged.presets[0].updatedAt===iso(5000));
+  var remoteFavOlder={
+    schemaVersion:3,editorialVersion:0,
+    presets:[{id:'esma_19',name:'el-Fettâh',kind:'esma',ebced:489,favorite:true,archived:false,updatedAt:iso(500)}],
+    settings:{},sessions:{},journeys:{},streak:0,streakDate:''
+  };
+  var favMerged2=mergeZikr(localFav,remoteFavOlder);
+  ok('Preset favorite: daha ESKİ taraf kazanamaz (yerel false kalır)', favMerged2.presets[0].favorite===false);
+
+  // Tamamlanmış hatim aktif duruma gerilemez (rule 4) — remote daha yeni olsa bile
+  var localDone={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:239121,activeHatimId:'hC',lastAt:iso(1000),completedHatims:1,hatims:[{id:'hC',count:239121,target:239121,baseTarget:489,status:'completed',completedAt:iso(900),lastAt:iso(1000)}]}},
+    streak:0,streakDate:''
+  };
+  var remoteStillActive={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:239100,activeHatimId:'hC',lastAt:iso(9000),completedHatims:0,hatims:[{id:'hC',count:239100,target:239121,baseTarget:489,status:'active',lastAt:iso(9000)}]}},
+    streak:0,streakDate:''
+  };
+  var doneMerged=mergeZikr(localDone,remoteStillActive);
+  var hC=doneMerged.journeys.esma_19.hatims.find(function(h){return h.id==='hC';});
+  ok('Tamamlanmış hatim, uzaktaki daha yeni "active" tarafından geriletilmiyor', hC.status==='completed');
+  ok('Tamamlanma zaman damgası (completedAt) kaybolmuyor', hC.completedAt===iso(900));
+  ok('completedHatims sayısı gerçek tamamlanmış hatim sayısıyla tutarlı (>=1)', doneMerged.journeys.esma_19.completedHatims>=1);
+
+  // archived/active çelişkisi (ikisi de completed değil) — daha yeni taraf (lastAt) kazanır
+  var localActive={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:50,activeHatimId:'hD',lastAt:iso(1000),completedHatims:0,hatims:[{id:'hD',count:50,target:239121,baseTarget:489,status:'active',lastAt:iso(1000)}]}},
+    streak:0,streakDate:''
+  };
+  var remoteArchivedNewer={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:50,activeHatimId:'',lastAt:iso(5000),completedHatims:0,hatims:[{id:'hD',count:50,target:239121,baseTarget:489,status:'archived',lastAt:iso(5000)}]}},
+    streak:0,streakDate:''
+  };
+  var archMerged=mergeZikr(localActive,remoteArchivedNewer);
+  ok('active/archived çelişkisi: daha yeni (lastAt) taraf deterministik kazanır', archMerged.journeys.esma_19.hatims.find(function(h){return h.id==='hD';}).status==='archived');
+
+  // Farklı hatim id\'leri kaybolmadan birlikte kalır (ek fixture, preset+iki farklı hatim)
+  var localTwoA={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:239121,activeHatimId:'hE2',lastAt:iso(3000),completedHatims:1,hatims:[
+      {id:'hE1',count:239121,target:239121,baseTarget:489,status:'completed',completedAt:iso(2000),lastAt:iso(2000)},
+      {id:'hE2',count:30,target:239121,baseTarget:489,status:'active',lastAt:iso(3000)}
+    ]}},
+    streak:0,streakDate:''
+  };
+  var remoteTwoB={
+    schemaVersion:3,editorialVersion:0,presets:[],settings:{},sessions:{},
+    journeys:{esma_19:{presetId:'esma_19',lifetimeCount:239121,activeHatimId:'hE3',lastAt:iso(4000),completedHatims:1,hatims:[
+      {id:'hE1',count:239121,target:239121,baseTarget:489,status:'completed',completedAt:iso(2000),lastAt:iso(2000)},
+      {id:'hE3',count:15,target:239121,baseTarget:489,status:'active',lastAt:iso(4000)}
+    ]}},
+    streak:0,streakDate:''
+  };
+  var threeWay=mergeZikr(localTwoA,remoteTwoB);
+  ok('3 farklı hatim (biri ortak, ikisi ayrı cihazlarda başlamış) hepsi birlikte kalır', threeWay.journeys.esma_19.hatims.length===3);
+  ok('En son işlem gören hatim (hE3, lastAt en yeni) activeHatimId olarak seçilir', threeWay.journeys.esma_19.activeHatimId==='hE3');
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) {

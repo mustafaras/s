@@ -321,15 +321,23 @@ function mergeById(localArr, remoteArr, keyField){
     var id=x[keyField];
     if(!map[id]){ map[id]=JSON.parse(JSON.stringify(x)); return; }
     var existing=map[id];
+    // ZP-06 düzeltmesi: "uzak daha yeni mi" kararı kaydın ORİJİNAL (henüz hiçbir
+    // alanı ezilmemiş) zaman damgalarından TEK SEFER hesaplanır ve tüm alanlara
+    // aynı şekilde uygulanır. Önceden bu hesap her alan için existing[...] okuyarak
+    // döngü İÇİNDE yapılıyordu; `updatedAt` alanının kendisi diğer alanlardan önce
+    // işlenirse (ör. presetlerde updatedAt, archived'dan önce gelir) existing.updatedAt
+    // döngü ortasında ezilip sonraki alanların kararını bozabiliyordu (alan sırasına
+    // bağlı, kaçırılan güncelleme riski).
+    var localTs=existing.ts || existing.receivedAt || existing.updatedAt || existing.savedAt;
+    var remoteTs=x.ts || x.receivedAt || x.updatedAt || x.savedAt;
+    var remoteNewer=typeof remoteTs==='string' && typeof localTs==='string' && remoteTs>localTs;
     Object.keys(x).forEach(function(k){
       if(!(k in existing)){ existing[k]=x[k]; return; }
       if(k==='read' || k==='seen' || k==='synced' || k==='deleted'){
         existing[k]=!!(existing[k] || x[k]);
         return;
       }
-      var localTs=existing.ts || existing.receivedAt || existing.updatedAt || existing.savedAt;
-      var remoteTs=x.ts || x.receivedAt || x.updatedAt || x.savedAt;
-      if(typeof remoteTs==='string' && typeof localTs==='string' && remoteTs>localTs){ existing[k]=x[k]; }
+      if(remoteNewer){ existing[k]=x[k]; }
     });
   });
   return Object.keys(map).map(function(k){ return map[k]; });
@@ -380,6 +388,9 @@ function mergeZikr(localZ, remoteZ){
   function later(a,b){ return (typeof b==='string'&&(!a||b>a))?b:a; }
   out.schemaVersion=Math.max(num(out.schemaVersion),num(remoteZ.schemaVersion));
   if(!out.migrationVersion&&remoteZ.migrationVersion) out.migrationVersion=remoteZ.migrationVersion;
+  // ZP-06: editorialVersion (ZP-04'te eklendi) — schemaVersion ile aynı
+  // monotonik mantık: içerik sürümü yalnız ileri gider, geri düşmez.
+  out.editorialVersion=Math.max(num(out.editorialVersion),num(remoteZ.editorialVersion));
   out.presets=mergeById(Array.isArray(out.presets)?out.presets:[],Array.isArray(remoteZ.presets)?remoteZ.presets:[],'id');
   out.settings=mergeSettings(out.settings||{},remoteZ.settings||{});
   out.sessions=out.sessions&&typeof out.sessions==='object'?out.sessions:{};

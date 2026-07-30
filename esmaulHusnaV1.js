@@ -62,6 +62,7 @@
     version:'1.0.0',
     names:Object.freeze(names),
     ebced:ebced,
+    normalizeArabic:normalizeArabic,
     method:'Asıl ebced (el-cümelü’l-kebîr); tek isimlerde el- takısı hariç',
     sources:Object.freeze({
       names:'https://kurul.diyanet.gov.tr/tr/fetva/allahin-99-ismi-hakkinda-bilgi-verir-misiniz/56aa0e7b-6fe0-45ce-0892-08dd1c135351',

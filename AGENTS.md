@@ -336,6 +336,37 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-30 — Bilimsel Kıble v2 canlı; Kur’an Yolculuğu yalnız plan
+
+**Branch/teslim:** `feature/bilimsel-kible-kuran-plani` → `main` fast-forward.
+Feature commit `68a47ca` iki branche pushlandı; Pages workflow `30537236034`
+başarıyla tamamlandı.
+
+**Canlı uygulama değişikliği:** Kıble, İman Köşesi içinden kaldırılıp vakit/
+Hicri şeridi ile hub sekmelerinin arasına taşındı. Büyük-daire azimutu,
+Haversine mesafesi, 16 yön dilimi, yüksek hassasiyetli GPS, konum doğruluk
+metriği, mutlak/manyetik sensör ayrımı, ekran yönü telafisi, hedefli (tam
+render’sız) sensör boyaması ve premium tam ekran pusula canlıya çıktı. Cache
+`app.js/styles.css?v=20260730z`.
+
+**Kur’an Yolculuğu durumu:** Uygulama kodu yazılmadı. Yalnız
+`KURAN-YOLCULUGU-GELISTIRME-PLANI.md` (QY-00→QY-18) ve
+`KURAN-YOLCULUGU-YENI-OTURUM-PROMPTU.md` teslim edildi. Yeni oturum önce yalnız
+QY-00’ı yapmalı; her `devam` tek aşama açar ve ayrıca açık talep olmadan
+commit/push/merge/deploy yapılamaz.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` 84/84 ✅; tüm Zikirmatik doğrulama script’leri ✅; sync
+64/64 ✅; panel 44/44 ✅; CSS/script yapısı ve `git diff --check` ✅. Gerçek
+tarayıcı açılmadı ve `seyma-data` yazılmadı.
+
+**Deploy notu:** Workflow yeşil; yalnız GitHub’ın kullandığı `actions/*`
+sürümlerinin Node 20 deprecation uyarısı var. Runner bunları Node 24’e zorlayıp
+başarıyla tamamladı; uygulama hatası değildir, ileride workflow dependency
+bakımı olarak ele alınabilir.
+
+---
+
 ### 2026-07-30 — Kur’an Yolculuğu yeni oturum kontrol prompt’u (yalnız dokümantasyon)
 
 **Branch:** `main`; commit/push/deploy yok.

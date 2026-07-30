@@ -1627,7 +1627,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library'};
 ui.zikrNoteOpen=true; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus='';
 ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; ui.qiblaLastAt='';
 var toastTimer=null, noteTimer=null, pulseTimer=null;
@@ -4845,7 +4845,7 @@ function render(){
   var prevCrisisBody=document.getElementById('sey-crisis-body');
   var prevCrisisTop=prevCrisisBody?prevCrisisBody.scrollTop:0;
   if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; }
-  var curOverlay=ui.saygiPersonOpen?'saygiPerson':(ui.zikrOpen?'zikr':(ui.qiblaOpen?'qibla':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null))))))))));
+  var curOverlay=ui.saygiPersonOpen?'saygiPerson':(ui.quranJourneyOpen?'quranJourney':(ui.zikrOpen?'zikr':(ui.qiblaOpen?'qibla':(ui.faithOpen?'faith':(ui.soulArchiveOpen?'soulArchive':(ui.soulPracticePicker?'soulPicker':(ui.soulActivityOpen?'soulActivity':(ui.readingOpen?'reading':(ui.watchOpen?'watching':(ui.listeningOpen?'listening':(ui.learningOpen?'learning':null)))))))))));
   var curOverlayView=curOverlay==='reading'?(ui.readingView||'today'):(curOverlay==='watching'?(ui.watchView||'today'):(curOverlay==='listening'?(ui.listeningView||'today'):(curOverlay==='zikr'?(ui.zikrView||'counter'):null)));
 
   var _painted=false;
@@ -9848,6 +9848,83 @@ function qiblaHubCardHTML(){
   h+='</button>';
   return h;
 }
+function quranJourneyHubCardHTML(){
+  var q=ensureQuranJourney(data);
+  var cat=(typeof window!=='undefined'&&window.QuranRevelationOrderV1)||null;
+  var surah=cat&&typeof cat.byId==='function'?cat.byId(q.activeSurahId):null;
+  var id=surah?surah.id:(q.activeSurahId||QURAN_DEFAULT_SURAH_ID);
+  var name=surah?(surah.nameAr+' · '+surah.nameTr):esc(id);
+  var order=surah?surah.revelationOrder:1;
+  var total=cat&&cat.list&&cat.list.length?cat.list.length:114;
+  var req=q.requests[id]||quranNewRequest();
+  var status=req.status||'idle';
+  var canReq=quranCanRequest(req);
+  var copy=quranJourneyCardCopy(status,canReq,req,order,total);
+  var h='<button class="sg-quran-card" onclick="App.openQuranJourney()" aria-label="Kur’an Yolculuğu panelini aç">';
+  h+='<span class="sg-quran-badge" aria-hidden="true"><span>📖</span>'+(order?'<i class="order">'+order+'/'+total+'</i>':'')+'</span>';
+  h+='<span class="sg-quran-copy"><small>'+esc(copy.kicker)+'</small><strong>'+esc(name)+'</strong><em>'+esc(copy.line)+'</em></span>';
+  h+='<span class="sg-quran-meta">'+quranJourneyMetaChips(status,req)+'</span>';
+  h+='<span class="sg-quran-action">';
+  h+='<span class="cta '+copy.ctaClass+'" onclick="event.stopPropagation();'+copy.ctaAction+'">'+esc(copy.ctaLabel)+'</span>';
+  h+='<span class="status">'+esc(copy.statusLabel)+'</span>';
+  h+='</span>';
+  h+='</button>';
+  return h;
+}
+function quranJourneyCardCopy(status,canReq,req,order,total){
+  if(status==='question_opened') return {kicker:'SÜRE · TEFEKKÜR TAMAMLANDI',line:'Bugünkü yolculuk tamam 🦩',ctaClass:'',ctaLabel:'Kütüphaneyi aç',ctaAction:'App.openQuranJourney()',statusLabel:order+'/'+total+' tamam'};
+  if(status==='watched') return {kicker:'SÜRE · İZLENDİ',line:'Raşit’e sormaya hazır',ctaClass:'is-gold',ctaLabel:'Soru aç',ctaAction:'App.quranJourneyQuestion()',statusLabel:'soru bekliyor'};
+  if(status==='watching') return {kicker:'SÜRE · İZLENİYOR',line:'Kaldığı yerden devam et',ctaClass:'is-gold',ctaLabel:'Devam et',ctaAction:'App.openQuranJourney()',statusLabel:'izleniyor'};
+  if(status==='ready'||status==='video_unavailable') return {kicker:'SÜRE · ANLATIM HAZIR',line:'Bugünkü sûre için anlatım var',ctaClass:'is-gold',ctaLabel:'İzlemeye başla',ctaAction:'App.quranJourneyWatch()',statusLabel:'hazır'};
+  if(status==='notified'||status==='awaiting_reply'||status==='validating_reply') return {kicker:'SÜRE · CEVAP BEKLENİYOR',line:'Raşit hazırlıyor…',ctaClass:'is-outline',ctaLabel:'Durum',ctaAction:'App.openQuranJourney()',statusLabel:'cevap bekleniyor'};
+  if(canReq) return {kicker:'SÜRE · YENİ İSTEK',line:'Raşit’ten anlatım iste',ctaClass:'',ctaLabel:'İste',ctaAction:'App.quranJourneyRequest()',statusLabel:'istenebilir'};
+  return {kicker:'SÜRE · İŞLENİYOR',line:'Birazdan tekrar dene',ctaClass:'is-outline',ctaLabel:'Durum',ctaAction:'App.openQuranJourney()',statusLabel:'işleniyor'};
+}
+function quranJourneyMetaChips(status,req){
+  var chips=[];
+  if(status==='watched'||status==='question_opened') chips.push('<i class="chip is-gold">✓ izlendi</i>');
+  if(req.videoHistory&&req.videoHistory.length>0) chips.push('<i class="chip">'+req.videoHistory.length+' anlatım</i>');
+  return chips.join('')||'<i class="chip">nüzül sırası</i>';
+}
+App.openQuranJourney=function(){
+  // QY-06'da tam kütüphane overlay'i eklenecek; şimdilik bilgi notu gösterelim.
+  var q=ensureQuranJourney(data), cat=(typeof window!=='undefined'&&window.QuranRevelationOrderV1)||null;
+  var id=q.activeSurahId;
+  var surah=cat&&typeof cat.byId==='function'?cat.byId(id):null;
+  var name=surah?(surah.nameTr+' ('+surah.nameAr+')'):id;
+  var rec=q.requests[id]||quranNewRequest();
+  toast('Kur’an Yolculuğu: '+name+' · '+quranStatusLabel(rec.status));
+  // ui.quranJourneyOpen=true; ui.quranJourneyView='library'; render(); // QY-06
+};
+App.quranJourneyRequest=function(){
+  var q=ensureQuranJourney(data), id=q.activeSurahId;
+  var req=q.requests[id]||quranNewRequest();
+  if(!quranCanRequest(req)) { toast('Bu sûre için şu an yeni istek gönderilemiyor.'); return; }
+  var at=new Date().toISOString();
+  var rid='q_'+id+'_'+Date.now();
+  var ev={type:'request_submit',requestId:rid,at:at};
+  var res=quranReduce(req,ev);
+  if(!res.ok){ toast('İstek şu an gönderilemez: '+quranStatusLabel(req.status)); return; }
+  q.requests[id]=res.request;
+  if(!q.startedAt) q.startedAt=at;
+  save();
+  toast('Raşit’ten anlatım istendi · '+esc(quranSurahName(id)));
+};
+App.quranJourneyWatch=function(){
+  toast('Anlatım izleyici QY-06’da açılacak 🦩');
+};
+App.quranJourneyQuestion=function(){
+  toast('Soru ekranı QY-06’da açılacak 🦩');
+};
+function quranSurahName(id){
+  var cat=(typeof window!=='undefined'&&window.QuranRevelationOrderV1)||null;
+  if(cat&&typeof cat.byId==='function'){ var s=cat.byId(id); if(s) return s.nameTr; }
+  return id;
+}
+function quranStatusLabel(s){
+  var labels={idle:'başlamadı',submitting:'gönderiliyor',queued:'sırada',notified:'bildirildi',awaiting_reply:'cevap bekleniyor',validating_reply:'doğrulanıyor',ready:'hazır',watching:'izleniyor',watched:'izlendi',question_opened:'soru açıldı',request_error:'istek tekrarlanabilir',notification_error:'bildirim hatası',invalid_reply:'geçersiz cevap',video_unavailable:'anlatım kayıp'};
+  return labels[s]||s;
+}
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
@@ -9860,6 +9937,7 @@ function saygiHTML(){
   var h='<section class="saygi-page">';
   h+=spiritBarHTML();
   h+=qiblaHubCardHTML();
+  h+=quranJourneyHubCardHTML();
   h+=saygiPreviewHubHTML(person,article,done);
   h+='</section>';
   return h;

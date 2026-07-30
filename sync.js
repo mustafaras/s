@@ -392,6 +392,10 @@ function mergeZikr(localZ, remoteZ){
   // monotonik mantık: içerik sürümü yalnız ileri gider, geri düşmez.
   out.editorialVersion=Math.max(num(out.editorialVersion),num(remoteZ.editorialVersion));
   out.presets=mergeById(Array.isArray(out.presets)?out.presets:[],Array.isArray(remoteZ.presets)?remoteZ.presets:[],'id');
+  // Zikir tefekkürleri sabit gün+preset kimliği taşır. Aynı kayıt iki cihazda
+  // düzenlenirse mergeById updatedAt üzerinden en yeni metni korur; farklı
+  // günler ve farklı zikirler union olarak eksiksiz kalır.
+  out.reflections=mergeById(Array.isArray(out.reflections)?out.reflections:[],Array.isArray(remoteZ.reflections)?remoteZ.reflections:[],'id');
   out.settings=mergeSettings(out.settings||{},remoteZ.settings||{});
   out.sessions=out.sessions&&typeof out.sessions==='object'?out.sessions:{};
   if(remoteZ.sessions&&typeof remoteZ.sessions==='object') Object.keys(remoteZ.sessions).forEach(function(date){

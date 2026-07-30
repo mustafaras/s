@@ -336,6 +336,737 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-30 — ZP-08.11: Zikir başına günlük Tefekkür Günlüğü + ÆON panel aynası (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+**Değişen dosyalar:** `app.js`, `styles.css`, `sync.js`, `panel.html`,
+`index.html`, `GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md`,
+`test_faz10_sync.js`, `test_faz11_panel.js`,
+`.claude/skills/run-seyma/zikr-harness.mjs`,
+`.claude/skills/run-seyma/verify-zikir-migration-v3.mjs`, `AGENTS.md`.
+
+- Sayaç altına her gün + her preset için ayrı duygu etiketi, Hislerim,
+  Düşüncelerim, Duam/niyetim, kelime sayacı ve hedefli DOM boyaması olan
+  Tefekkür Günlüğü eklendi. Yazma global overlay render'ı tetiklemiyor.
+- `data.zikr.reflections[]` ve `schemaVersion:4` eklendi. Kimlik
+  `zn_<date>_<presetId>`; createdAt/updatedAt/wordCount taşır. V3→V4
+  migration additive ve idempotent; eski sayaç/hatim verisine dokunmaz.
+- Geçmiş sekmesine tarih+zikir bazlı Tefekkür Arşivi eklendi.
+- `sync.js mergeZikr()` reflections kayıtlarını `updatedAt` last-write-wins ve
+  farklı id'leri union kuralıyla birleştiriyor.
+- Panel Zikirmatik aynası branch üzerinde görünür hale getirildi; KPI bugünkü
+  not sayısını, seçili gün tam yapılandırılmış metni, ayrı arşiv kartı son 40
+  kaydı gösteriyor.
+- Cache: `styles.css`, `app.js`, `sync.js` → `20260730y`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` açık/koyu ✅;
+`zikr-harness.mjs` 78/78 ✅; `test_faz10_sync.js` 64/64 ✅;
+`test_faz11_panel.js` 44/44 ✅; migration 41/41, state-machine 39/39,
+information architecture 24/24, safe-area 20/20, content wiring 27/27 ve
+Esmâ/core/math kontrolleri ✅; panel inline JS syntax ve CSS brace dengesi ✅.
+Gerçek tarayıcı açılmadı, `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcı görsel onayı. Sunucu PID 31372 önceki oturumdan port
+9000'de çalışıyor; bu ajan açmadı ve tarayıcıyla erişmedi. Commit/deploy yok.
+
+---
+
+### 2026-07-30 — ZP-08.10: Ayarlar işlev denetimi + kategorili/detaylı Hatimlerim ve güvenli Kaldır (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı Ayarlar'daki tüm anahtarların gerçekten işlevsel olduğunun
+doğrulanmasını; Hatimlerim kartlarında `Devam et` yanında `Kaldır`, daha ince
+detay tasarımı ve her ismin kategorisinin gösterilmesini istedi.
+
+**Ayar denetimi / düzeltmeler:**
+
+- Yedi ayar (`soundOn`, `haptic`, `focusMode`, `breathGuide`,
+  `reducedMotion`, `keepAwake`, `autoAdvance`) whitelist ile sınırlandı,
+  gerçek state değişimi ve `save()` kalıcılığı doğrulandı.
+- Anahtar tıklaması artık tüm ayar ekranını yeniden kurmuyor; yalnız ilgili
+  `aria-pressed`, switch ve `zikr-settings-note` durum mesajı yerinde
+  güncelleniyor.
+- Ses açılırken gerçek AudioContext önizlemesi, titreşim açılırken haptic
+  önizlemesi çalışıyor. `keepAwake` gerçek Wake Lock isteği/release akışına
+  bağlı. `reducedMotion` overlay `.is-reduced` sınıfını anında güncelliyor
+  (önceden yalnız sonraki tam render'da uygulanıyordu). Focus/breath sayaç
+  sınıfları ve normal tur sonunda autoAdvance gerçek davranışı test edildi.
+
+**Hatimlerim:**
+
+- Eski görünüm her preset için yalnız `activeHatimId` kaydını okuyordu;
+  journey içindeki diğer tamamlanmış hatimler görünmeyebiliyordu. Yeni
+  görünüm `j.hatims` dizisindeki tüm `active` ve `completed` kayıtları doğru
+  gruba render ediyor, `archived` kayıtları listeden hariç tutuyor.
+- Kartlara anlam tabanlı kategori rozeti (`zikrPresetTopicLabel`), Türkçe
+  anlam, `Sayılan / Tur / Kalan` metrikleri, Ebced² hedefi/yüzdesi, bu-tur
+  konumu ve tamamlanan hatim sayısı eklendi. Daha ince 18px kart, kompakt
+  üçlü metrik şeridi ve iki eşit aksiyon kullanılıyor.
+- `Devam et/Görüntüle` yanında görünür `Kaldır` eklendi. İlk dokunuş kart
+  içinde onay açıyor; onay hatmi silmek yerine `archived` yapıyor,
+  `archivedAt`, `hatim.lastAt` ve `journey.lastAt` damgalıyor, aktif pointer
+  ve session bağını güvenle bırakıyor. Ömürlük toplam ve tamamlanan hatim
+  sayısı korunuyor; timestamp sync merge'de eski aktif durumun kazanmasını
+  engelliyor.
+- Yeni `App.openZikrHatim`, `requestRemoveZikrHatim`,
+  `cancelRemoveZikrHatim`, `confirmRemoveZikrHatim` akışları eklendi.
+- `zikr-harness.mjs`: tüm ayarların çift yönlü kalıcılığı, ses/haptic/Wake
+  Lock/reduced-motion/focus/breath/autoAdvance etkileri, global rendersız
+  switch boyama, kart kategori/metrikleri ve güvenli kaldırma testleri
+  eklendi; toplam 71/71.
+- `index.html`: cache `20260730w` → `20260730x`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; driver açık/koyu PASS;
+Zikirmatik 71/71; state 39/39; content wiring 27/27; bilgi mimarisi 24/24;
+safe-area 20/20; migration 41/41; sync 62/62; panel 39/39; içerik/matematik
+kontrolleri PASS. CSS brace 938/938 ve `git diff --check` temiz. Gerçek
+tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Port 9000'de gerçek cihaz/görsel onayı. Commit/main merge/deploy yok.
+
+---
+
+### 2026-07-30 — ZP-08.9: Geri al görünürlüğü + sıfırlamayı kurtarma (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı `Geri al` düğmesinin de çalışmadığını bildirdi.
+
+**Kök neden:** Normal tek-sayım undo çekirdeği çalışıyordu; ancak sayı `0`
+olduğunda verilen tek geri bildirim global toast'tı. Zikirmatik overlay
+`z-index:500`, toast ise `z-index:400` olduğundan mesaj modalın arkasında
+kalıyor ve düğme tamamen tepkisiz görünüyordu. Ayrıca ZP-08.8 toplu
+sıfırlamasından sonra günlük preset kaydı silindiği için mevcut undo'nun
+geri alacağı tekil sayım kalmıyordu.
+
+**Değişiklikler:**
+
+- `app.js`: toast `z-index:10000` ve daha opak/okunaklı yüzeye çıkarıldı.
+- Sayaç içine kalıcı hedefli `zikr-action-region` eklendi. Normal undo
+  “Son sayım geri alındı · bugün X”, boş undo “Geri alınacak yeni bir sayım
+  yok” mesajını modal içinde görünür gösteriyor; global render yok.
+- Toplu sıfırlama öncesinde yalnız Zikirmatik kökü ve bugünkü mirror'ın
+  ephemeral snapshot'ı `ui.zikrLastReset` içinde tutuluyor. Sıfırlamadan
+  sonraki ilk `Geri al`, günlük kayıt/journey/hatim/lifetime/activeSession
+  durumunun tamamını atomik biçimde geri yüklüyor. Yeni sayaç dokunuşu veya
+  preset değişimi bu kurtarma snapshot'ını temizliyor; sync'e yazılmıyor.
+- Sıfırlama sonrası görünür mesaj “X sayım sıfırlandı · Geri al ile
+  kurtarabilirsin” olarak değişti.
+- `styles.css`: sayaç içi action-note yüzeyi ve reduced-motion desteği.
+- `zikr-harness.mjs`: toplu sıfırlamanın tek dokunuşla eksiksiz geri
+  yüklenmesi ve toast'ın overlay üstünde bulunması test edildi; 59/59.
+- `index.html`: cache `20260730v` → `20260730w`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; driver açık/koyu PASS;
+Zikirmatik 59/59; state 39/39; content wiring 27/27; bilgi mimarisi 24/24;
+safe-area 20/20; migration 41/41; sync 62/62; panel 39/39; içerik/matematik
+kontrolleri PASS. CSS brace 920/920 ve `git diff --check` temiz. Gerçek
+tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Port 9000'de gerçek cihaz onayı. Commit/main merge/deploy yok.
+
+---
+
+### 2026-07-30 — ZP-08.8: Çalışmayan Sıfırla için uygulama içi güvenilir onay akışı (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı sayaç dock'undaki `Sıfırla` düğmesinin gerçek cihazda çalışmadığını
+bildirdi. Veri azaltma çekirdeği headless testte doğruydu; kırılgan nokta,
+tam ekran modal içinden çağrılan tarayıcı/PWA `confirm()` penceresine bağımlı
+tek adımlı etkileşimdi.
+
+**Değişiklikler:**
+
+- `app.js`: native `confirm()` kaldırıldı. İlk `Sıfırla` dokunuşu kalıcı
+  veriyi değiştirmeden sayaç içinde erişilebilir bir onay kartı açıyor.
+  Kart aktif zikir adını ve geri alınacak kesin sayıyı gösteriyor;
+  `Vazgeç` ve `X sayımı sıfırla` eylemleri sunuyor.
+- Yeni geçici UI alanları `zikrResetPending`/`zikrResetPresetId`, yeni
+  `zikrResetConfirmHTML`, `zikrPaintResetConfirm`,
+  `App.cancelZikrReset` ve `App.confirmZikrResetToday` eklendi. Bunlar
+  localStorage/sync verisine eklenmedi.
+- Onaylanan işlem eski atomik güvenliği koruyor: bugünkü preset/gün toplamı,
+  journey lifetime, Esmâ hatim sayısı ve aktif session birlikte azalıyor;
+  session sıfırlanıp duraklatılıyor. Sonuç yalnız canlı sayaç/özet/onay
+  bölgelerinde boyanıyor, global render/parlama yok.
+- Modal kapanınca veya aktif preset değişince bekleyen onay iptal ediliyor;
+  yanlış preset üzerinde onay uygulanamıyor.
+- `styles.css`: görünür danger sınırı, kesin miktar metni ve 42px
+  `Vazgeç`/`sıfırla` butonları olan premium inline onay paneli eklendi;
+  reduced-motion desteği var.
+- `zikr-harness.mjs`: ilk dokunuşun hiçbir veri mutasyonu yapmadan inline
+  onayı açtığı ve ikinci açık onayın tüm aynaları doğru sıfırladığı test
+  edildi; toplam 57/57.
+- `index.html`: cache `20260730u` → `20260730v`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; driver açık/koyu PASS;
+Zikirmatik 57/57; state 39/39; content wiring 27/27; bilgi mimarisi 24/24;
+safe-area 20/20; migration 41/41; sync 62/62; panel 39/39; içerik/matematik
+kontrolleri PASS. CSS brace 918/918 ve `git diff --check` temiz. Gerçek
+tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Port 9000'de gerçek cihaz onayı. Commit/main merge/deploy yok.
+
+---
+
+### 2026-07-30 — ZP-08.7: Dikey Esmâ filtreleri + özet kart blur kök neden düzeltmesi (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı Esmâ expander içindeki seçeneklerin yatay kaydırma yerine alt alta
+olmasını ve Zikirmatik özet kartının hâlâ üstünde flu bir perde varmış gibi
+göründüğünü bildirdi.
+
+**Kök neden:** Zikirmatik kartı aynı zamanda ortak
+`.sg-faith-preview-card` sınıfını taşıdığı için iki eski kozmetik katmanı
+miras alıyordu: `.sg-faith-preview-card::before` kartın tamamına `%55`
+opaklıklı gradient perde koyuyor; `#root .sg-faith-preview-card` ise
+`backdrop-filter:blur(20px) saturate(180%)` uyguluyordu. Zikirmatik'in kendi
+opak arka planı bu iki ayrı katmanı tek başına geçersiz kılamıyordu. Kartın
+puslu görünümü renk token'ından değil, gerçek ortak pseudo-element + blur
+mirasından kaynaklanıyordu.
+
+**Değişiklikler:**
+
+- `styles.css`: `.zikr-v2-preview` artık `filter:none`,
+  `backdrop-filter:none` ve `-webkit-backdrop-filter:none` değerlerini
+  `!important` ile kesin olarak uyguluyor. Ortak karttan gelen `::before`
+  perdesi ve ZP-08.6'nın soluk dekoratif `::after` yıldızı `content:none`
+  ile tamamen kaldırıldı. Opak Zikirmatik yüzeyi ve canlı metin renkleri
+  arada cam/perde olmadan doğrudan render ediliyor.
+- `.zikr-v2-topics` ve `.zikr-v2-chips` yatay scroll/snap modelinden
+  `flex-direction:column; overflow:visible` modeline geçti. Tüm konu ve
+  ilerleme seçenekleri tam genişlikte, 42–44px dokunma hedefleriyle alt alta;
+  ikon/etiket solda, sayı sağda gösteriliyor.
+- `zikr-harness.mjs`: dikey/tam genişlikte filtre CSS sözleşmesi ve ortak
+  faith blur/pseudo-element katmanlarının kesin geçersiz kılınması için iki
+  yeni assertion eklendi; toplam 56/56.
+- `index.html`: `styles.css` ve `app.js` cache `20260730t` → `20260730u`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; driver açık/koyu tema PASS;
+Zikirmatik 56/56; state 39/39; content wiring 27/27; bilgi mimarisi 24/24;
+safe-area 20/20; migration 41/41; sync 62/62; panel 39/39; içerik/matematik
+kontrolleri PASS. CSS brace 904/904 ve `git diff --check` temiz. Gerçek
+tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Port 9000'de kullanıcı görsel onayı. Commit/main merge/deploy yok.
+
+---
+
+### 2026-07-30 — ZP-08.6: İleri seviye sayaç odağı + Esmâ filtre expanderı + canlı özet kartı (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı mevcut dairesel sayacı hâlâ yetersiz buldu; Esmâ konu/ilerleme
+filtrelerini derli toplu bir expander içine alma ve İlham & İbadet özet
+kartındaki puslu/soluk metinleri canlı, belirgin ve hareketli hale getirme
+talebinde bulundu.
+
+**Değişiklikler:**
+
+- `app.js`: ana sayaç, durum sınıfı taşıyan yeni odak nesnesine dönüştü.
+  Noktalı tesbih halkası (`beads`), çift çember, aura, üç hareketli yörünge
+  ışığı, canlı tur/sayım kicker'ı ve paused/active eylem metni eklendi.
+  `zikrPaintLive()` tur kicker'ını, `zikrPaintPauseButton()` ise sayaç durum
+  sınıfını ve “sürdür ve zikret” metnini global render olmadan güncelliyor.
+- Esmâ konu ve ilerleme filtreleri tek premium expander altında birleşti.
+  Kapalı özet satırı seçili konu, ilerleme modu ve sonuç sayısını gösteriyor.
+  `App.toggleZikrFilters()` paneli yalnız DOM hedefinde açıp kapatıyor;
+  `aria-expanded`, `aria-controls` ve gerçek `hidden` durumu birlikte
+  güncelleniyor. Filtre sonucu yeniden boyandığında açık/kapalı tercih `ui`
+  içinde korunuyor, kalıcı veriye yazılmıyor.
+- Zikirmatik minimal özet kartı state-aware hale getirildi. Başlık, açıklama,
+  anlam, metrik ve alt aksiyon kontrastları yükseltildi; aktif/duraklatılmış
+  durumlar ayrı sınır/yüzeylerle belirginleştirildi.
+- `styles.css`: sayaç 286px'e kadar büyüyen responsive odak alanına geçirildi;
+  altın progress glow, orbit/aura/float motion, daha büyük tabular sayı ve
+  güçlü petrol–fildişi–şampanya kontrastı eklendi. Özet kartta durum pulse,
+  yaşayan progress çizgisi, Arapça hat nefesi ve hover/focus hareketi var.
+  Tüm yeni hareketler `prefers-reduced-motion` ve mevcut `.is-reduced`
+  güvenliğiyle kapanıyor. Kısa ekran için 224px sayaç/optik koordinatlar
+  ayrıca tanımlandı.
+- `zikr-harness.mjs`: erişilebilir kapalı expander, global render olmadan
+  yerel açılış, yeni beads/aura/orbit/kicker katmanları ve reduced-motion
+  sözleşmesi eklendi; toplam 54 assertion.
+- `index.html`: `styles.css` ve `app.js` cache `20260730s` → `20260730t`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` açık/koyu tema
+PASS; `zikr-harness` 54/54; state machine 39/39; content wiring 27/27; bilgi
+mimarisi 24/24; safe-area 20/20; migration 41/41; sync 62/62; panel 39/39;
+Esmâ/çekirdek içerik ve matematik kontrolleri PASS. CSS brace 904/904,
+script tag 11/11, `git diff --check` temiz. Gerçek tarayıcı agent tarafından
+açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcının port 9000'de gerçek cihaz/görsel onayı. Animasyon
+yoğunluğu gerekirse kullanıcı geri bildirimiyle ince ayarlanabilir.
+Commit/main merge/deploy yapılmadı.
+
+---
+
+### 2026-07-30 — ZP-08.5: Premium Esmâ kütüphanesi + kesintisiz sayaç oturumu + işlevsel özet kartı (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı Esmâ sekmesindeki çakışma/yeniden boyamaları, çekirdek zikirlerde
+Türkçe Latin metnin Arapça sütununda tekrarlanmasını, sayaç içindeki her
+eylemde parlamayı, bozuk `Sürdür` davranışını ve küçük Zikirmatik özet kartının
+zayıf görünmesini bildirdi.
+
+**Değişiklikler:**
+
+- `app.js`: eski/migrate edilmiş beş çekirdek preset artık `ZIKR_SEED` içindeki
+  gerçek Arapça yazımla backfill ediliyor; kütüphane Arapça alanında Latin
+  `phrase` fallback'i kullanılmıyor.
+- Esmâ kütüphanesi “İsmi değil, anlamı keşfet” bilgi mimarisine geçti. Arama
+  alanı DOM'da sabit kalıyor; sonuçlar ayrı hedef bölgede boyanıyor. Rahmet,
+  huzur, rızık, sabır, tevbe ve şükür niyet mercekleri anlam metni üzerinden
+  yakın Esmâ/zikirleri grupluyor. Kartlarda konu, gerçek Arapça, Türkçe anlam,
+  ilerleme ve aktif/favori durumu taşmasız bir hiyerarşide gösteriliyor.
+- Sayaç dokunma, geri al, detay aç/kapat ve duraklat/sürdür işlemleri global
+  `render()` yerine ilgili sayaç parçalarını yerinde güncelliyor. Günlük alt
+  özetin tüm zikir toplamını göstermesine yol açan hata düzeltildi.
+- Duraklatılmış sayaç yüzeyine dokunmak artık yeni oturum açmıyor ve sayımı
+  değiştirmiyor. `Sürdür` aynı `activeSession.id` ve aynı count ile kaldığı
+  yerden devam ediyor; idle/paused/active düğme metni sırasıyla
+  `Başlat`/`Sürdür`/`Duraklat`.
+- İlham & İbadet içindeki minimal Zikirmatik kartı yükseltildi: canlı durum
+  rozeti, aktif Esmâ/zikir, gerçek Arapça ve anlam, bugün/bu tur/ömürlük veya
+  tam hatim metrikleri, ilerleme çubuğu ve devamlılık özeti gösteriyor.
+- `styles.css`: Esmâ konu rayı, ilerleme filtreleri, premium preset satırları,
+  güçlü odak yüzeyi ve daha yüksek/vurgulu özet kart için petrol yeşili +
+  fildişi + şampanya altın tasarım katmanı eklendi. Sayaç durum düğmeleri
+  active/paused olarak ayrıştırıldı.
+- Testler gerçek davranışlara güncellendi; paused tap immutability, aynı
+  oturumu sürdürme, legacy gerçek Arapça backfill, konu filtresi ve yeni özet
+  kart için yeni assertion'lar eklendi.
+- `index.html`: `styles.css` ve `app.js` cache `20260730r` → `20260730s`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` açık/koyu tema
+PASS; `zikr-harness` 51/51; state machine 39/39; content wiring 27/27; bilgi
+mimarisi 24/24; safe-area 20/20; migration 41/41; sync 62/62; panel 39/39;
+Esmâ/çekirdek içerik ve matematik kontrolleri PASS. CSS brace 849/849,
+script tag 11/11, `git diff --check` temiz. Gerçek tarayıcı agent tarafından
+açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcının port 9000'de görsel/dokunsal onayı. Panelin bağımsız
+teal paleti bu UI kapsamına alınmadı. Commit/main merge/deploy yapılmadı.
+
+---
+
+### 2026-07-30 — ZP-08.4: Sayaç optik merkez/palet düzeltmesi + güvenli Sıfırla (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı canlı ekran görüntüsünde altın ilerleme yayının üstteki `BU TURDA`
+metniyle çakıştığını, sayının merkezde olmadığını, renklerin iyileştirilmesi ve
+görünür bir `Sıfırla` düğmesi gerektiğini bildirdi.
+
+**Değişiklikler:**
+
+- `app.js`: Sayaç içindeki `BU TURDA` etiketi kaldırıldı. Rakam artık bağımsız
+  mutlak konumla geometrik/optik merkeze yerleşiyor; `kaldı`, ayraç ve
+  `dokunarak zikret` alt bölgede ayrı koordinatlara sahip.
+- Mevcut fakat UI'a bağlı olmayan `App.zikrResetToday()` üçüncü dock eylemi
+  olarak görünür yapıldı (`Geri al | Duraklat | Sıfırla`). İşlem kullanıcı
+  onayı ister; yalnız bugünkü aktif preset sayımını hatim/ömürlük/günlük
+  aynalardan aynı miktarda geri alır, aktif oturumu sıfırlayıp duraklatır.
+  Boş günde açıklayıcı toast gösterir. Sonuç Zikirmatik gövdesinde yerel
+  boyanır; overlay/global app refresh edilmez.
+- `styles.css`: Sayaç paleti doygun yeşilden daha rafine koyu petrol yeşiline
+  (`#103F3B`) ve ayrı şampanya altın token'ına (`--zikr-counter-gold`) geçti.
+  Light/dark karşılıkları tanımlandı. Rakam/alt metinler mutlak merkez
+  koordinatlarıyla ayrıştırıldı; kısa ekran koordinatları ayrıca ayarlandı.
+  Dock üç eşit sütuna geçirildi, sıfırlama danger rengiyle ayrıştırıldı.
+- `verify-zikir-information-architecture.mjs` ve
+  `verify-zikir-safe-area-shell.mjs` üç düğmeli dock sözleşmesine güncellendi.
+- `zikr-harness.mjs`: çakışan üst etiketin yokluğu, görünür Sıfırla ve üç
+  sayım sonrası gerçek günlük/journey/session sıfırlama akışı test edildi.
+- `index.html`: `styles.css` ve `app.js` cache `20260730q` → `20260730r`.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `zikr-harness` 48/48,
+bilgi mimarisi 24/24, safe-area 20/20, migration 41/41, state machine 36/36,
+sync 62/62, panel 39/39 ve diğer tüm ZP içerik/matematik testleri PASS ✅.
+Driver light/dark render PASS, CSS brace 821/821, `git diff --check` temiz.
+Gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+
+**Kalan:** Port 9000'de kullanıcı görsel onayı. Commit/main/deploy yapılmadı.
+
+---
+
+### 2026-07-30 — ZP-08.3: Zikirmatik sekme parlaması giderildi + premium tezhip sayaç (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+Kullanıcı, Zikirmatik modalının iç sekmelerinde her tıklamada görünen gereksiz
+refresh/parlama hissini ve sayaç halkasının soluk/boş/çirkin görünümünü ekran
+görüntüsüyle bildirdi.
+
+**Kök neden ve çözüm:**
+
+- `App.setZikrView()` her iç sekme tıklamasında global `render()` çağırıyor,
+  bütün `#app` ağacını ve `#zikr-overlay` kabuğunu yeniden kuruyordu.
+- Yeni `zikrViewBodyHTML()` görünüm üreticisi ve `zikrPaintView()` yerel DOM
+  boyayıcısı yalnız `#zikr-scroll` içeriğini değiştiriyor; `#zikr-tabs`
+  düğmelerinin `aria-selected`/`.on` durumu yerinde güncelleniyor. Header,
+  modal kabuğu, odak ve arka plan artık yeniden oluşturulmuyor. DOM/harness
+  desteği yoksa güvenli biçimde eski tam `render()` yoluna düşüyor.
+- Sayaç 236px soluk fildişi halkadan 260px koyu zümrüt mühür/rozet yüzeyine
+  geçirildi: çift altın çember, gerçek SVG ilerleme yayı, dört yönlü tezhip
+  işaretleri, iç zümrüt disk, Georgia/serif sayaç rakamı ve sade
+  `BU TURDA / kaldı / dokunarak zikret` hiyerarşisi. Kısa ekran karşılığı
+  216px. Light/dark tema için ayrı `--zikr-counter-*` semantic token'ları var.
+- İlerleme yayı tek `ZIKR_RING_RADIUS=108` sabitinden hem render hem canlı
+  `zikrPaintLive()` tarafından hesaplanıyor; sayım matematiği değişmedi.
+
+**Değişen dosyalar:**
+
+- `app.js`
+- `styles.css`
+- `.claude/skills/run-seyma/zikr-harness.mjs`
+- `index.html` (`styles.css` ve `app.js` cache `20260730p` → `20260730q`)
+- `AGENTS.md`
+
+**Doğrulama:**
+
+- `node --check app.js` + `node --check sync.js` ✅.
+- `driver.mjs` onboarding/seeded/light-dark etkileşimleri ✅.
+- `zikr-harness.mjs` **46/46** ✅; yeni assertion'lar global `#app`
+  HTML'inin tab geçişinde değişmediğini, yalnız Zikirmatik gövdesinin yerinde
+  boyandığını, `aria-selected` güncellendiğini ve tezhip sayaç markup'ını
+  doğruluyor.
+- `verify-zikir-safe-area-shell.mjs` 20/20, bilgi mimarisi 24/24, içerik
+  wiring 27/27, migration V3 41/41, state machine 36/36 ve matematik/içerik
+  doğrulamaları tümü PASS ✅.
+- `test_faz10_sync.js` 62/62, `test_faz11_panel.js` 39/39 ✅.
+- CSS brace dengesi 819/819, `git diff --check` ✅.
+- Gerçek tarayıcı agent tarafından açılmadı; `seyma-data`'ya yazılmadı.
+  Önceden çalışan `python -m http.server 9000` sürecine dokunulmadı.
+
+**Kalan:** Kullanıcının port 9000'de görsel onayı; özellikle 390–440px
+cihazlarda sayaç ölçeği/kontrast hissi. Onaydan sonra ZP-10'a geçilebilir.
+Commit, main merge ve deploy yapılmadı.
+
+---
+
+### 2026-07-30 — ZP-08.1 uygulandı: Kullanıcı geri bildirimiyle acil tasarım/içerik düzeltmesi (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK). ZP-09
+bitince kullanıcı port 9000'de canlı test etti ve 3 ekran görüntüsüyle sert
+geri bildirim verdi: renk/tipografi "iğrenç", Esmâ anlamı hiç görünmüyor
+("bu repoda var düzgün bağlayamıyorsun"), çekirdek zikirlerin Arapça
+sütununda Türkçe metin taşıyordu (ekran görüntüsünde kırmızı okla
+işaretlenmiş), arama yetersizdi. `/goal` ile "diğer aşamaya geçmeden bunları
+düzelt" talimatı verildi — bu yüzden ZP-10'a geçilmeden araya girildi.
+
+**Kök neden analizi (kanıtlı):**
+1. ZP-01/ZP-02'de yazılan `esmaulHusnaV2.js`/`zikirCoreContentV1.js` içerik
+   modülleri (meaningTr/importanceTr/reflectionTr/sourceRefs) `index.html`'e
+   HİÇ eklenmemişti — ZP-13'e bırakılmıştı, ama sonuç olarak Esmâ ekranında
+   "anlam" diye bir şey render edilmiyordu.
+2. `ZIKR_SEED` (5 çekirdek zikir) hiçbir zaman `arabic` alanına sahip
+   değildi; `x.arabic||x.phrase` fallback'i TÜRKÇE transliterasyonu
+   (`Sübhanallah`) Arapça-fontlu dar sütuna taşırıyordu — ekran görüntüsündeki
+   kırmızı okların gösterdiği gerçek bug buydu.
+3. ZP-08'de zikr tema token'ları (`--zikr`/`--zikr2`) mevcut eski turkuaz
+   değerini (`#1F7A8C`) miras almıştı; oysa `ZIKIRMATIK-GELISTIRME-PLANI.md`
+   §5.1 açıkça "koyu zümrüt + sıcak altın + fildişi" istiyordu — bu ZP-08'de
+   gözden kaçmış bir tasarım-yönü hatasıydı, token altyapısı (opaklık vb.)
+   doğruydu ama RENK yanlıştı.
+4. Arama yalnız `name+phrase+ebced` üzerinde ham substring eşleşmesiydi;
+   Türkçe diyakritik-duyarsız değildi, anlam metnini hiç taramıyordu.
+
+**Değişen dosyalar:**
+
+- `index.html`: `esmaulHusnaV2.js`/`zikirCoreContentV1.js` script tag'leri
+  `esmaulHusnaV1.js`'ten sonra, `app.js`'ten önce eklendi. Tüm `?v=` cache
+  sürümleri `20260730o`→`20260730p` (canlı test oturumu için istisnai erken
+  bump — normalde paket bitince tek seferde artırılır, ama kullanıcı o an
+  port 9000'de aktif test ediyordu).
+- `styles.css`:
+  - `--zikr`/`--zikr2`/`--zikr-bg`/`--zikr-glow` (açık+koyu tema) turkuazdan
+    koyu zümrüde çevrildi (`#0E6B4F`/`#4C9B78` açık, `#35A579`/`#6FC79E`
+    koyu); yeni `--zikr-gold:var(--faith2)` token'ı eklendi (uygulamanın
+    zaten var olan "İman Köşesi" altın-yeşil aksanını yeniden kullanıyor —
+    yeni bir renk icat edilmedi). `--zikr-accent-strong`/`--zikr-focus`
+    yeni zümrüt ailesine güncellendi.
+  - `.zikr-v2-intention` (eski "NİYET" kutusu) tamamen kaldırıldı; yerine
+    kutu/sınır olmayan `.zikr-v2-meaning` (italik, 16-17px gövde bandı)
+    eklendi — `is-focus` gizleme listesi de güncellendi.
+  - `.zikr-v2-cycle-grid` üç ayrı sınırlı/gölgeli kutudan TEK birleşik
+    şerit + ince iç ayraçlara çevrildi ("dağınık/kutu kutu" azaltma).
+  - `.zikr-v2-name .arabic`/`.zikr-v2-preset .arabic` rengi emerald'dan
+    `var(--zikr-gold)`'a (Arapça hat için sıcak altın, manuscript hissi).
+  - `.zikr-v2-detail-sheet` artık çok paragraflı gerçek içerik için
+    stillendirildi (`p.reflect` italik, `p.verse/.disclaimer/.source` 13px
+    dipnot tonu — hâlâ ≥11px, ZP-08 kuralına uygun).
+  - `.zikr-v2-preset .copy .meaning` (kütüphane satırı anlam snippet'i, 2
+    satır clamp), `.zikr-v2-search .clear`/`:focus-within` (temizle düğmesi
+    + odak vurgusu) eklendi.
+- `app.js`:
+  - `ZIKR_SEED`'e her 5 çekirdek zikir için GERÇEK Arapça `arabic` alanı
+    eklendi (zikirCoreContentV1.js'teki `originalText` ile birebir aynı,
+    harekesiz yazım kararıyla tutarlı) — kök nedendeki bug'ı doğrudan
+    düzeltir.
+  - Yeni `zikrContentFor(preset)`: `kind==='esma'` ise
+    `window.EsmaulHusnaV2.names`'ten id ile, değilse
+    `window.ZikirCoreContentV1.content[id]`'den meaningTr/importanceTr/
+    reflectionTr/sourceRefs/verseNoteTr okuyup kaynak kurum adlarını
+    çözer; modül yoksa veya kayıt boşsa `null` döner (savunmacı).
+  - `zikrCounterViewHTML`: eski "NİYET" kutusu kaldırıldı; gerçek
+    `meaningTr` artık isim bloğunun hemen altında DOĞRUDAN render ediliyor
+    (içerik modülü yoksa eski `ZIKR_NIYET`/genel metne düşer). Detay
+    panosu artık gerçek `importanceTr`+`reflectionTr`(italik tefekkür
+    sorusu)+`verseNoteTr`+kaynak gösteriyor; buton etiketi zengin içerikte
+    "Önemi ve tefekkür"e (anlam zaten yukarıda olduğu için), içerik yoksa
+    eski "Anlamı ve önemi"ye düşer.
+  - `zikrPresetsViewHTML`: yeni `zikrNormalizeSearchText`/
+    `zikrPresetSearchText` ile Türkçe diyakritik-duyarsız + isim/Arapça/
+    ebced/GERÇEK anlam metnini birlikte tarayan arama; her satırda
+    (varsa) 2 satırlık anlam snippet'i; arama kutusunda temizle (×)
+    düğmesi (`App.clearZikrPresetFilter`, yeni).
+- `.claude/skills/run-seyma/zikr-harness.mjs`: `FILES` dizisine
+  `esmaulHusnaV2.js`/`zikirCoreContentV1.js` eklendi — mevcut 42 assertion
+  artık üretimdekiyle aynı (içerik modülleri yüklü) koşulda çalışıyor.
+- `.claude/skills/run-seyma/verify-zikir-content-wiring.mjs` (yeni,
+  headless, 27 assertion): index.html script sırası, ZIKR_SEED'in her 5
+  kaydında gerçek Arapça (Latin harf YOK), sayaç ekranında anlamın toggle'sız
+  göründüğü, zengin içerikte buton etiketinin değiştiği, detay panosunda
+  kaynak satırı, kütüphanede gerçek Arapça + anlam snippet'i, diyakritiksiz
+  arama + anlam-tabanlı arama ("merhamet" → er-Rahmân/er-Rahîm) + temizle
+  düğmesi + boş durum mesajı, VE içerik modülü yokken eski davranışa güvenle
+  düşüldüğü — 27/27 PASS.
+
+**Doğrulama:**
+
+- `node --check app.js sync.js` ✅.
+- `driver.mjs` PASS ✅, `zikr-harness.mjs` 42/42 ✅ (artık içerik modülleri
+  yüklü koşulda), `test_faz10_sync.js` 62/62 ✅, `test_faz11_panel.js`
+  39/39 ✅.
+- ZP-01–09'un tüm eski doğrulama script'leri (`verify-esmaulhusna-content`,
+  `verify-zikir-core-content`, `verify-zikir-math`,
+  `verify-zikir-migration-v3`, `verify-zikir-state-machine`,
+  `verify-zikir-information-architecture`, `verify-zikir-safe-area-shell`)
+  hâlâ yeşil ✅ — bu acil düzeltme hiçbirini kırmadı.
+- `verify-zikir-content-wiring.mjs` (yeni) 27/27 ✅.
+- `index.html` script tag sayısı dengeli (11 açık/11 kapalı) ✅.
+- `git diff --check` ✅. Değişen: `index.html`, `styles.css`, `app.js`,
+  `.claude/skills/run-seyma/zikr-harness.mjs`, `AGENTS.md`; yeni:
+  `.claude/skills/run-seyma/verify-zikir-content-wiring.mjs`.
+- Gerçek tarayıcı açılmadı (kullanıcı kendi tarayıcısında port 9000'den
+  test etti), `seyma-data`'ya yazılmadı, sync korumaları dokunulmadı,
+  `ZIKR_V2_VISIBLE` DEĞİŞTİRİLMEDİ.
+
+**Bilinçli editoryal karar:** `esmaulHusnaV2.js`/`zikirCoreContentV1.js`
+içindeki `editorialStatus:'draft'` alanı DEĞİŞTİRİLMEDİ (hâlâ 'draft') —
+yalnızca UI'da GÖSTERİLMESİ kullanıcının bu oturumdaki açık talebiyle
+gerçekleşti. ZP-19 kapanışında bu içeriğin nihai "reviewed" onayı hâlâ ayrı
+bir insan editoryal adımı gerektirir.
+
+**Kalan/bilinen riskler:**
+- `panel.html`'in KENDİ ayrı `--zikr` teal paleti (styles.css'ten bağımsız,
+  panel kod paylaşmıyor) güncellenmedi — kapsam dışıydı (kullanıcı şikayeti
+  yalnızca app tarafı ekranlarındaydı), istenirse ayrı bir küçük iş.
+  Hatimlerim/Geçmiş/Ayarlar ekranları yeni emerald+altın token'larını
+  otomatik miras alır (hepsi `var(--zikr-*)` kullanıyordu) ama yapısal
+  olarak (kutu sayısı vb.) elle gözden geçirilmedi — kullanıcı görsel
+  onayı bekleniyor.
+- ZP-08'in listelediği eski riskler (kapat düğmesi 38×38px, tam WCAG
+  kontrast taraması) hâlâ geçerli.
+
+**Sıradaki:** Kullanıcının canlı görsel onayı bekleniyor; onay gelirse
+ZP-10'a (modal semantiği/odak/kapatma güvenliği) devam edilecek.
+
+---
+
+### 2026-07-30 — ZP-09 uygulandı: Zikirmatik iPhone Pro Max tam ekran kabuk ve safe-area (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK).
+
+ZP-00/ZP-08 denetimleri safe-area/100dvh altyapısının **zaten** var olduğunu
+işaretlemişti — bu yüzden ZP-09 sıfırdan inşa değil, üç somut boşluğu
+kapattı: (1) `100dvh`'nin tek başına kullanılması (eski Safari/tarayıcı
+fallback'i yoktu), (2) Zikirmatik modalının body scroll kilidi hiç yoktu,
+(3) 390/393/430/440px genişlik iddiasını doğrulayan bir headless test yoktu.
+
+**Değişen dosyalar:**
+
+- `styles.css`: `.zikr-v2-screen` ve `min-width:681px` masaüstü override'ı
+  artık `height:100vh;height:100svh;height:100dvh` (ve masaüstünde
+  `calc(...- 32px)` üç değişkeniyle) sırasıyla düşen fallback zinciri
+  kullanıyor (madde 1) — tarayıcı `dvh`'yi tanımıyorsa `svh`'ye, o da
+  tanınmıyorsa `vh`'ye düşer. Safe-area padding'leri (`env(safe-area-inset-
+  top/bottom)`), sabit header (`flex:none`), sticky dock (`bottom:0`) ve tek
+  kontrollü scroll alanı (`.zikr-v2-scroll{overflow-y:auto}`) zaten ZP-07/
+  ZP-08'den beri doğruydu — madde 2/3 için değişiklik gerekmedi, yalnız
+  yeniden doğrulandı. Hardcode cihaz yüksekliği (madde 8) `.zikr-v2-screen`
+  kuralında hiç yoktu, kalmadı. Kısa ekran (`max-height:700px`) ve landscape
+  (aynı medya sorgusu düşük viewport yüksekliğinde otomatik tetiklenir, ayrı
+  `orientation:landscape` kuralı gerekmedi — madde 7 zaten dolaylı
+  karşılanıyor) davranışları ZP-08'den beri `clamp()` ile taşmasız.
+- `app.js`: `App.openZikr`/`App.closeZikr` artık `zikrLockBodyScroll()`/
+  `zikrUnlockBodyScroll()` çağırıyor (madde 4) — açılışta önceki
+  `document.body.style.overflow` değeri saklanıp `hidden` yapılıyor,
+  kapanışta saklanan değere (boş dahil) geri dönülüyor. `#app` zaten
+  `overflow:hidden` idi ama iOS Safari'de `position:fixed` overlay'lerin
+  arkasında yine de rubber-band scroll sızabildiği için bu, açık bir
+  savunma katmanı. İdempotent (`_zikrBodyLocked` flag'i) — iç içe
+  çağrılarda önceki değeri ezmiyor.
+- `.claude/skills/run-seyma/verify-zikir-safe-area-shell.mjs` (yeni,
+  headless, 20 assertion): vh→svh→dvh fallback zinciri (temel + masaüstü),
+  hardcode piksel yükseklik yokluğu, safe-area env() varlığı, sabit header/
+  sticky dock/tek scroll alanı, dock'un 2 düğmeye güncel grid'i, kısa ekran
+  clamp'i + dock'un gizlenmediği, 390-440px aralığında çelişen bir
+  breakpoint olmadığı, body scroll lock/unlock (boş VE dolu önceki değerle,
+  idempotent), app.js'in genişlik okumadığı (`innerWidth`/`matchMedia(width)`
+  yok) ve aynı veri için üretilen zikr overlay markup'ının deterministik
+  (390px senaryosu = 440px senaryosu) olduğu — 20/20 PASS.
+
+**Doğrulama:**
+
+- `node --check app.js sync.js` ✅.
+- `driver.mjs` PASS ✅, `zikr-harness.mjs` 42/42 ✅, `test_faz10_sync.js`
+  62/62 ✅, `test_faz11_panel.js` 39/39 ✅.
+- ZP-01–08 doğrulama script'lerinin hepsi (`verify-esmaulhusna-content`,
+  `verify-zikir-core-content`, `verify-zikir-math`,
+  `verify-zikir-migration-v3`, `verify-zikir-state-machine`,
+  `verify-zikir-information-architecture`) hâlâ yeşil ✅.
+- `verify-zikir-safe-area-shell.mjs` (yeni) 20/20 ✅.
+- `git diff --check` ✅. Değişen: `styles.css`, `app.js`, `AGENTS.md`; yeni:
+  `.claude/skills/run-seyma/verify-zikir-safe-area-shell.mjs`.
+- Kullanıcının açık talebiyle **`python -m http.server 9000` yerelde
+  başlatıldı** (yalnız görsel inceleme için — ajan tarayıcı AÇMADI, yalnız
+  sunucuyu başlatıp URL'i paylaştı; DATA SAFETY kuralı gereği kapanışta
+  durdurulacak). `seyma-data`'ya yazılmadı, sync korumaları (Guard 1/2)
+  dokunulmadı — Guard 1 zaten `localhost` kaynaklı TÜM push'ları engelliyor.
+  `ZIKR_V2_VISIBLE` DEĞİŞTİRİLMEDİ.
+
+**Kalan/bilinen riskler:** ZP-08'in listelediği riskler (kapat düğmesi
+38×38px, tam WCAG kontrast taraması, `--zikr-success/-warning` henüz
+tüketilmiyor) hâlâ geçerli, ZP-09 bunlara dokunmadı.
+
+**Sıradaki:** ZP-09 tamamlandı, sıradaki **ZP-10** (modal semantiği, odak ve
+kapatma güvenliği — `role="dialog"`/`aria-modal` zaten var, ZP-10 esas
+olarak odak tuzağı/Escape güvenliği/aria-label ayrıntılarını sertleştirecek)
+kullanıcıdan bekleniyor.
+
+---
+
+### 2026-07-30 — ZP-08 uygulandı: Zikirmatik opak tasarım sistemi ve tipografi (main'e alınmadı)
+
+**Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK). Not: bu
+prompt "hiçbir şey commit edilmedi" varsayımıyla başladı ama branch'te zaten
+`8133823` commit'i ZP-00→ZP-07'yi barındırıyormuş — güncel `git log` esas
+alındı, hiçbir şey silinmedi/resetlenmedi.
+
+**Değişen dosya:** yalnız `styles.css` (ZP-00 denetiminin işaretlediği borç
+tam olarak burada yaşıyordu; app.js'te Arapça `lang="ar" dir="rtl"` zaten
+mevcuttu, değişiklik gerekmedi — bu yüzden app.js/panel.html/sync.js
+dokunulmadı).
+
+- Yeni `--zikr-*` semantic token seti (`#root` açık + `#root[data-theme="dark"]`
+  blokları, mevcut `--zikr/--zikr2/--zikr-bg/--zikr-glow` satırının hemen
+  altında): `surface, surface-2 (raised), border, text, text-muted, accent,
+  accent-strong, success, warning, danger, focus, shadow`. `text/text-muted`
+  global `--text/--muted`'a alias; `success/warning/danger` sırasıyla
+  `--ok/--drop/--warn`'a alias (silme/kaldırma eylemleri artık `--zikr-danger`
+  = kırmızı `--warn` kullanıyor, önceden turuncu `--drop` idi — anlamsal
+  olarak daha doğru). `surface/surface-2/border/accent-strong/focus/shadow`
+  YENİ, düz renk (açık: sıcak kum `#FBF3E6`/`#FFFDF8`; koyu: gerçek koyu
+  `#121316`/`#1B1D21`) — hiçbiri `rgba`/`color-mix(...,transparent)` değil.
+- `.zikr-v2-*` CSS bloğu (646-677 civarı) baştan sona bu token'lara geçirildi:
+  - **Backdrop-filter tamamen kaldırıldı** (2 gerçek kullanım vardı: alt dock
+    ve `min-width:681px` masaüstü overlay — ZP-00'ın işaretlediği kritik borç).
+  - **Sıfır gradient** (önceden ekran arka planı, önizleme kartı, tamamlanma
+    kartı, hatim kartı, ikon rozetleri, ilerleme çubukları dahil ~12 yerde
+    `linear-gradient`/`radial-gradient` vardı; "en fazla bir hafif dekoratif
+    gradient, metin arkasına koyma" kuralına en güvenli/basit uyum sıfır
+    gradienttir — özellikle tamamlanma kartı ve hatim kartı üstündeki
+    başlık metinleri artık gradient DEĞİL, düz opak yüzey üstünde).
+  - **Sıfır `color-mix(...,transparent)`/yarı saydam `rgba` yüzey** — tüm
+    kart/buton/dock/arama/preset/KPI arka planları artık düz opak
+    `var(--zikr-surface)`/`var(--zikr-surface-2)`.
+  - **~30 kuralda 11px altı font-size** (8-10.5px aralığı) → tamamı ≥11px.
+  - Gerçek gövde metni (niyet cümlesi, "Anlamı ve önemi" detay panosu,
+    tamamlanma özeti, bölüm açıklaması — `.zikr-v2-intention p`,
+    `.zikr-v2-detail-sheet`, `.zikr-v2-complete p`, `.zikr-v2-section-head p`)
+    `clamp(16px,.5vw + 15px,17px)` bandına alındı (madde 5). Kısa
+    liste/ayar etiketleri (KPI, dock, ayarlar satırı) bu bandın dışında
+    tutuldu — onlar "gövde metni" değil, destekleyici etiket.
+  - Ana sayı (`.zikr-v2-core strong`) sabit 56px → `clamp(40px,11vw,56px)`;
+    kısa ekran medyasındaki 46px de aynı şekilde `clamp(34px,10vw,46px)`
+    (madde 6, taşma koruması).
+  - Arapça: `lang="ar"/dir="rtl"` zaten app.js'te vardı; CSS tarafında
+    `line-height:1.45→1.6` (harekesiz Arapça harflerin/ligatürlerin
+    kesilmemesi için) + fallback zincirine `"Times New Roman"` eklendi.
+  - `font-weight` zaten hiçbir zikr kuralında 400 altına inmiyordu (grep
+    doğrulandı) — madde 8 zaten sağlanıyordu, değişiklik gerekmedi.
+  - Odak halkası (`:focus-visible`) artık %55 saydam değil, tam opak
+    `var(--zikr-focus)` — hem "opak yüzey" hem WCAG focus-visible için
+    iyileştirme.
+  - **Bulunan iki gerçek hata düzeltildi (kapsam dışı ama aynı satırdaydı):**
+    (1) `.zikr-v2-dock{grid-template-columns:repeat(5,1fr)}` hâlâ ZP-07
+    ÖNCESİ 5-düğmeli dock'tan kalmaydı; ZP-07 dock'u 2 düğmeye indirmişti
+    ama bu satırı güncellememişti — `repeat(2,1fr)` yapıldı. (2) ölü
+    `.zikr-v2-session` kuralı (ZP-07'de UI'dan kaldırılan ayrı "seans"
+    şeridi) CSS'te unutulmuştu, hiçbir app.js fonksiyonu üretmiyordu (grep
+    ile doğrulandı) — silindi, `is-focus`/`cycle-grid` paylaşımlı
+    selector'lardan referansı da temizlendi.
+  - Ölü ZP-08-öncesi `.zikr-*` (v1, non-v2) kuralları temizlendi:
+    `.sey-zikr-ov-*`, `.zikr-stage`(+alt kuralları), `.zikr-phrase`,
+    `.zikr-niyet`, `.zikr-esma-name`, `.zikr-ebced-note/-method`,
+    `.zikr-library-head`(+alt), `.zikr-esma-badge`, `.zikr-empty-search`,
+    `.zikr-preset`(eski)/`.zikr-chip`/`.zikr-fab`/`.zikr-toggle` — hepsi
+    app.js VE panel.html'de sıfır referans (fresh grep ile doğrulandı, ZP-00
+    denetiminin öngörüsüyle uyumlu). **`.zikr-done-spark`/`@keyframes
+    zikrSpark` İSTİSNA tutuldu** — ZP-00 denetimi bunu da "kaldırılacak"
+    listesine koymuştu ama fresh grep, `zikrCounterViewHTML`'in hâlâ bu
+    sınıfı ürettiğini gösterdi (tamamlanma "spark" efekti); silinmedi.
+
+**Doğrulama:**
+
+- `node --check app.js sync.js` ✅.
+- `driver.mjs` PASS ✅, `zikr-harness.mjs` 42/42 ✅, `test_faz10_sync.js`
+  62/62 ✅, `test_faz11_panel.js` 39/39 ✅.
+- ZP-01–07 doğrulama script'lerinin hepsi (`verify-esmaulhusna-content`,
+  `verify-zikir-core-content`, `verify-zikir-math`,
+  `verify-zikir-migration-v3`, `verify-zikir-state-machine`,
+  `verify-zikir-information-architecture`) hâlâ yeşil ✅ — bu faz hiçbirini
+  kırmadı.
+- `git diff --check` ✅ (whitespace hatası yok). Yalnız `styles.css`
+  değişti — `git status --short` ile doğrulandı.
+- Gerçek tarayıcı açılmadı, server başlatılmadı, `seyma-data`'ya yazılmadı,
+  sync korumaları (Guard 1/2) dokunulmadı, `ZIKR_V2_VISIBLE` flag'i
+  DEĞİŞTİRİLMEDİ (hâlâ `true`, kullanıcının önceki açık isteğiyle).
+
+**Kalan/bilinen riskler (ZP-08 kapsamı dışı, sonraki fazlara not):**
+
+- Kapat düğmesi hâlâ 38×38px (ZP-00 denetiminin işaretlediği gibi, "ürün
+  standardı" 44-48px altında ama WCAG 24×24 alt sınırının üstünde) — bu
+  ZP-08'in YAP listesinde değildi, ZP-09/ZP-17'nin işi.
+- Yeni token'lardaki ışık/koyu kontrast oranları elle akıl yürütmeyle
+  seçildi (otomatik kontrast tarayıcı yok, projede lint/test altyapısı bu
+  ölçümü desteklemiyor); tam WCAG AA taraması resmen ZP-17'nin kapsamı.
+  `#fff` ikon/metin üstünde `var(--zikr-accent)` (temel accent, `-strong`
+  değil) kullanan birkaç buton (dock aktif, preset ilerleme, hatim kart
+  aksiyonları) app genelindeki mevcut CTA konvansiyonunu tekrar ediyor;
+  bu ZP-08'de yeni bir regresyon değil, ZP-17'de tüm app için ele alınmalı.
+- `--zikr-success`/`--zikr-warning` token'ları tanımlı ama şu an hiçbir
+  zikr UI elemanı tarafından tüketilmiyor (yalnızca `--zikr-danger` "sil"
+  düğmesinde kullanılıyor) — ZP-05'in `error-recoverable` durumu için
+  görsel bir treatment henüz yok, gelecek bir faz bunu bağlayabilir.
+- 390/393/430/440px için özel regresyon testi hâlâ yok (ZP-09 kapsamı,
+  ZP-08 dokunmadı).
+
+**Sıradaki:** ZP-08 tamamlandı, sıradaki **ZP-09** (iPhone Pro Max tam ekran
+kabuk ve safe-area — mevcut safe-area/100dvh altyapısı zaten var, ZP-09
+esas olarak 390/393/430/440px regresyon genişliklerini doğrulayacak/test
+edecek) kullanıcıdan bekleniyor.
+
+---
+
 ### 2026-07-29 — ZP-07 uygulandı: Zikirmatik bilgi mimarisi / tek görevli ekran (main'e alınmadı)
 
 **Branch:** `zikirmatik-iphone16-redesign` (main'e merge/deploy YOK). FAZ C'nin

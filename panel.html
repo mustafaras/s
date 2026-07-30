@@ -445,8 +445,28 @@ var ZIKR_SEED_P=[
 ];
 // Kullanıcı tarafındaki Zikirmatik yeniden tasarlanırken panel kartı da canlıdan
 // gizlidir; veri okunur ve korunur, yalnızca görsel yüzey üretilmez.
-var ZIKR_V2_VISIBLE_P=false;
+var ZIKR_V2_VISIBLE_P=true;
 function zikrRootP(){ var z=D&&D.zikr; return (z&&typeof z==='object')?z:null; }
+function zikrReflectionsP(date){
+  var z=zikrRootP(), list=z&&Array.isArray(z.reflections)?z.reflections:[];
+  return list.filter(function(x){ return x&&(!date||x.date===date)&&(x.mood||x.feelings||x.thoughts||x.intention); }).sort(function(a,b){ return String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')); });
+}
+function zikrReflectionArchiveCardP(){
+  var list=zikrReflectionsP(), h='<div class="card lift span-12 pad" style="order:38;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('pen-line',14)+' Zikir Tefekkürleri <span style="margin-left:auto;font-size:var(--f2);color:var(--zikr);font-weight:850;letter-spacing:0;text-transform:none;">'+list.length+' kayıt</span></div>';
+  h+='<div class="scroll" style="max-height:360px;display:flex;flex-direction:column;gap:8px;">';
+  if(!list.length) h+='<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Henüz zikir notu yok</div>';
+  else list.slice(0,40).forEach(function(n){
+    var mood=n.mood?'<span style="padding:3px 7px;border-radius:999px;background:var(--s2);color:var(--zikr);font-size:var(--f1);font-weight:850;">'+esc(n.mood)+'</span>':'';
+    h+='<div onclick="pickDay(\''+esc(n.date)+'\')" style="cursor:pointer;padding:10px 11px;border:1px solid var(--bd2);border-radius:11px;background:var(--s1);">';
+    h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;"><div><span style="display:block;color:var(--t4);font-size:var(--f1);font-weight:750;">'+esc(shortD(n.date))+'</span><strong style="display:block;margin-top:2px;color:var(--t1);font-size:var(--f3);">'+esc(n.presetName||((zikrPresetP(n.presetId)||{}).name)||n.presetId)+'</strong></div>'+mood+'</div>';
+    if(n.feelings) h+='<div style="margin-top:7px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Hislerim · </b>'+esc(n.feelings)+'</div>';
+    if(n.thoughts) h+='<div style="margin-top:5px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Düşüncelerim · </b>'+esc(n.thoughts)+'</div>';
+    if(n.intention) h+='<div style="margin-top:5px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--amber);">Duam · niyetim · </b>'+esc(n.intention)+'</div>';
+    h+='<div style="margin-top:6px;color:var(--t4);font-size:var(--f1);font-weight:700;">'+(Number(n.wordCount)||0)+' kelime · '+esc(String(n.updatedAt||'').slice(11,16))+'</div></div>';
+  });
+  h+='</div></div>'; return h;
+}
 function zikrDayTotalP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.totalCount==='number')?s.totalCount:0; }
 function zikrDaySetsP(date){ var z=zikrRootP(); if(!z||!z.sessions) return 0; var s=z.sessions[date]; return (s&&typeof s.completedSets==='number')?s.completedSets:0; }
 function zikrStreakP(){ var z=zikrRootP(); return (z&&typeof z.streak==='number')?z.streak:0; }
@@ -2454,7 +2474,7 @@ function render(){
   // ROW 1.7b: Zikirmatik + İbadet Haftası — panel aynası
   (function(){
     if(!ZIKR_V2_VISIBLE_P) return;
-    var zday=zikrDayTotalP(today()), zsets=zikrDaySetsP(today()), streak=zikrStreakP();
+    var zday=zikrDayTotalP(today()), zsets=zikrDaySetsP(today()), streak=zikrStreakP(), znotes=zikrReflectionsP(today());
     var k=faithWeekKPIsP(today()), js=zikrJourneySummaryP();
     var val=zday>0?(zday+'<small>zikir</small>'):'—';
     var extra='<span class="tchip fl">'+streak+'g seri</span>';
@@ -2467,6 +2487,7 @@ function render(){
     if(k.zikr>0) cap.push('<span>Haftada <b style="color:var(--t2);">'+k.zikr+'</b></span>');
     if(js&&js.completedHatims>0) cap.push('<span><b style="color:var(--faith);">'+js.completedHatims+'</b> tam hatim</span>');
     if(js&&js.lifetime>0) cap.push('<span><b style="color:var(--t2);">'+js.lifetime.toLocaleString('tr-TR')+'</b> ömürlük</span>');
+    if(znotes.length) cap.push('<span><b style="color:var(--zikr);">'+znotes.length+'</b> tefekkür notu</span>');
     if(k.prays>0) cap.push('<span><b style="color:var(--faith);">'+k.prays+'/'+k.max+'</b> vakit</span>');
     if(k.cong>0) cap.push('<span><b style="color:var(--t2);">'+k.cong+'</b> cemaat</span>');
     h+=kpi('Zikirmatik · Ebced²',val,'var(--zikr)',extra,null,cap.join(''));
@@ -2721,6 +2742,19 @@ function render(){
     var ps=prayerDaySummaryP(p);
     var cap=(ps.performed>0)?(ps.performed+'/'+ps.total+' vakit · '+(ps.congregation?' '+ps.congregation+' cemaat':'')+(ps.madeUp?' · '+ps.madeUp+' kaza':'')+(ps.late?' · '+ps.late+' geç':'')+(ps.nafile?' · '+ps.nafile+' nafile':'')):'Henüz namaz kaydı yok';
     exRows+=exRowAlways(icon('sunrise',13)+' İman Köşesi', '<div style="display:flex;flex-wrap:wrap;gap:6px 10px;line-height:1.4;">'+bits.join('')+'</div><div style="margin-top:4px;font-size:var(--f1);color:var(--t4);font-weight:700;">'+cap+'</div>');
+  })();
+  (function(){
+    var notes=zikrReflectionsP(UI.selectedDate);
+    var body=notes.map(function(n){
+      var parts=[];
+      if(n.mood) parts.push('<span style="display:inline-block;padding:3px 7px;border-radius:99px;background:var(--s2);color:var(--zikr);font-size:var(--f1);font-weight:850;">'+esc(n.mood)+'</span>');
+      var text='';
+      if(n.feelings) text+='<div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Hislerim</b><br>'+esc(n.feelings)+'</div>';
+      if(n.thoughts) text+='<div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Düşüncelerim</b><br>'+esc(n.thoughts)+'</div>';
+      if(n.intention) text+='<div style="margin-top:6px;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--amber);">Duam · niyetim</b><br>'+esc(n.intention)+'</div>';
+      return '<div style="padding:8px 0;border-top:1px solid var(--bd2);"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><strong style="color:var(--t1);">'+esc(n.presetName||((zikrPresetP(n.presetId)||{}).name)||n.presetId)+'</strong>'+parts.join('')+'</div>'+text+'<div style="margin-top:6px;color:var(--t4);font-size:var(--f1);font-weight:700;">'+(Number(n.wordCount)||0)+' kelime · '+esc(String(n.updatedAt||'').slice(11,16))+'</div></div>';
+    }).join('');
+    exRows+=exRowAlways(icon('pen-line',13)+' Zikir tefekkürleri', body);
   })();
   var caf=(srec.caffeine&&typeof srec.caffeine==='object')?srec.caffeine:null;
   var cafBits=[];
@@ -2998,6 +3032,7 @@ function render(){
   h+=motivationPanelCardHTML();
   h+=magnesiumPanelCardHTML();
   h+=saygiPanelCardHTML();
+  h+=zikrReflectionArchiveCardP();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';
   h+=sparkLine(cur,function(d){return cnt(recOf(d));},HT,"#e6c15a",76);

@@ -386,6 +386,22 @@ console.log('[15] Zikirmatik V3 — editorialVersion, preset last-write-wins, ha
   ok('En son işlem gören hatim (hE3, lastAt en yeni) activeHatimId olarak seçilir', threeWay.journeys.esma_19.activeHatimId==='hE3');
 })();
 
+// ── Test 16: Zikirmatik tefekkür notları cihazlar arası birleşir ───────────
+console.log('[16] Zikirmatik V4 — tefekkür notları last-write-wins + union');
+(function(){
+  var mergeZikr=global.window.SeySync.mergeZikr;
+  var local={schemaVersion:4,presets:[],settings:{},sessions:{},journeys:{},reflections:[
+    {id:'zn_2026-07-30_esma_01',date:'2026-07-30',presetId:'esma_01',feelings:'Sakin',thoughts:'Eski metin',updatedAt:iso(1000)}
+  ],streak:0,streakDate:''};
+  var remote={schemaVersion:4,presets:[],settings:{},sessions:{},journeys:{},reflections:[
+    {id:'zn_2026-07-30_esma_01',date:'2026-07-30',presetId:'esma_01',feelings:'Huzurlu',thoughts:'Yeni metin',updatedAt:iso(5000)},
+    {id:'zn_2026-07-30_esma_02',date:'2026-07-30',presetId:'esma_02',feelings:'Umutlu',updatedAt:iso(3000)}
+  ],streak:0,streakDate:''};
+  var merged=mergeZikr(local,remote);
+  ok('Aynı gün+zikir notunda daha yeni düzenleme korunur', merged.reflections.find(function(x){return x.id==='zn_2026-07-30_esma_01';}).thoughts==='Yeni metin');
+  ok('Farklı zikirlerin notları union olarak eksiksiz kalır', merged.reflections.length===2&&!!merged.reflections.find(function(x){return x.presetId==='esma_02';}));
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) {

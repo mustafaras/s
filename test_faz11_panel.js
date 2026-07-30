@@ -239,6 +239,16 @@ console.log('[9] Zikirmatik v2 — panel güvenli özet yolu');
   ok('ömürlük toplam panelde gösterilir', /js\.lifetime\.toLocaleString\('tr-TR'\)/.test(html));
 })();
 
+// ── Test 10: Zikir tefekkürlerinin panel aynası ────────────────────────────
+console.log('[10] Zikir tefekkürleri — günlük ayrıntı + arşiv');
+(function(){
+  ok('tefekkür kayıtlarını gün bazında filtreleyen helper var', /function zikrReflectionsP\(date\)/.test(html));
+  ok('panelde tam metinli tefekkür arşiv kartı var', /function zikrReflectionArchiveCardP\(\)/.test(html) && /Zikir Tefekkürleri/.test(html));
+  ok('seçili gün ayrıntısında zikir tefekkürleri gösteriliyor', /Zikir tefekkürleri/.test(html) && /zikrReflectionsP\(UI\.selectedDate\)/.test(html));
+  ok('his, düşünce ve dua-niyet alanlarının tümü panelde görünür', /Hislerim/.test(html) && /Düşüncelerim/.test(html) && /Duam · niyetim/.test(html));
+  ok('panel Zikirmatik aynası bu branchte görünür', /var ZIKR_V2_VISIBLE_P=true;/.test(html));
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) process.exit(1);

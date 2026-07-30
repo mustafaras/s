@@ -149,7 +149,7 @@ console.log('== ZP-07 Zikirmatik bilgi mimarisi / tek görevli ekran akışı do
   ok('Eski ayrı "SEANS" sayacı KALDIRILDI (gereksiz istatistik kalabalığı değil)', !/SEANS/.test(appHTML));
   const dockButtons = (appHTML.match(/zikr-v2-dock[\s\S]*?<\/div>/) || [''])[0];
   const dockButtonCount = (dockButtons.match(/<button/g) || []).length;
-  ok('Alt eylem bölgesinde (dock) tam olarak 2 düğme var (Geri al, Duraklat)', dockButtonCount === 2, dockButtonCount);
+  ok('Alt eylem bölgesinde tam 3 düğme var (Geri al, Duraklat, onaylı Sıfırla)', dockButtonCount === 3 && /App\.zikrResetToday/.test(dockButtons), dockButtonCount);
   ok('Ses/Titreşim/Odak artık dock\'ta DEĞİL (Ayarlar\'a taşındı)', !/dock[\s\S]{0,400}Ses<\/span>/.test(appHTML));
 }
 

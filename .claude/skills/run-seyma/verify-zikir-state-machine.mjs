@@ -149,10 +149,20 @@ console.log('== ZP-05 Zikirmatik oturum durum makinesi doğrulaması ==');
   const p = { kind: 'esma', ebced: 489 };
   sb.App.openZikr(); sb.App.zikrTap();
   ok('Tap sonrası active', sb.App.zikrSessionState() === 'active');
+  const activeBefore=JSON.parse(sb.localStorage.getItem('seyma-reset-v1')).zikr.activeSession;
   sb.App.toggleZikrPause();
   ok('toggleZikrPause: active → paused', sb.App.zikrSessionState() === 'paused');
+  const pausedBefore=sb.localStorage.getItem('seyma-reset-v1');
+  sb.App.zikrTap();
+  const pausedAfter=sb.localStorage.getItem('seyma-reset-v1');
+  ok('Duraklatılmış sayaç yüzeyine dokunmak sayımı veya oturumu değiştirmiyor', pausedBefore === pausedAfter);
   sb.App.toggleZikrPause();
   ok('toggleZikrPause tekrar: paused → active', sb.App.zikrSessionState() === 'active');
+  const resumed=JSON.parse(sb.localStorage.getItem('seyma-reset-v1')).zikr.activeSession;
+  ok('Sürdür aynı oturum kimliği ve sayımla devam ediyor', resumed.id === activeBefore.id && resumed.count === activeBefore.count && !resumed.pausedAt);
+  sb.App.zikrTap();
+  const afterResume=JSON.parse(sb.localStorage.getItem('seyma-reset-v1')).zikr.activeSession;
+  ok('Sürdür sonrası ilk dokunuş aynı oturumda sayımı artırıyor', afterResume.id === activeBefore.id && afterResume.count === activeBefore.count + 1);
 }
 
 // ── 3) hızlı 100 tap = tam 100 (state='active' boyunca) ──

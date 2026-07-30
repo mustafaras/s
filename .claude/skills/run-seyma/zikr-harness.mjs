@@ -121,7 +121,9 @@ function ok(name, cond, detail) {
 }
 
 console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app.js'];
+const styles = fs.readFileSync(path.join(REPO, 'styles.css'), 'utf8');
+const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 let sb = buildSandbox(seed);
 let ctx = loadInto(sb, FILES);
 if (sb.App && typeof sb.App.start === 'function') sb.App.start();
@@ -169,8 +171,8 @@ ok('App.openZikr overlay render', (function () {
 
 ok('99 Esmâ preset kütüphanesi yüklü', (function () {
   sb.App.setZikrView('presets');
-  return sb.window.EsmaulHusnaV1.names.length === 99 && /99 Esmâ|ebced değeri bir tur/i.test(appHTML) &&
-    /Tam hatim/i.test(appHTML);
+  return sb.window.EsmaulHusnaV1.names.length === 99 && /ESMÂ KÜTÜPHANESİ|İsmi değil, anlamı keşfet/i.test(appHTML) &&
+    /NİYETİNE GÖRE KEŞFET/i.test(appHTML);
 })());
 
 ok('Esmâ ebced sayacı geri sayar', (function () {
@@ -226,7 +228,7 @@ legacySeed.zikr={
 const legacySb=buildSandbox(legacySeed);
 loadInto(legacySb,FILES); legacySb.App.start();
 const migratedOnce=JSON.parse(legacySb.localStorage.getItem('seyma-reset-v1'));
-ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===3 &&
+ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===4 &&
   migratedOnce.zikr.migrationVersion==='zikr_v2' &&
   migratedOnce.zikr.sessions[t].perPreset.esma_19.count===978 &&
   migratedOnce.zikr.journeys.esma_19.lifetimeCount===978);
@@ -420,6 +422,230 @@ ok('migrate eski veriye zikr/saygi backfill yapar', (function () {
   const st = readState();
   return st && st.zikr && Array.isArray(st.zikr.presets) && st.zikr.presets.length > 0 && st.saygi && typeof st.saygi.collection === 'object';
 })());
+
+// Zikirmatik iç sekmeleri global render() yerine yalnız kendi main alanını
+// boyamalı. Gerçek DOM ayrıştırıcısı gerekmeden kararlı kabuk ve değişen içerik
+// alanını ayrı sahte elemanlarla gözlemliyoruz.
+const zikrTabNames=['counter','presets','hatims','history','settings'];
+const zikrTabButtons=zikrTabNames.map((name)=>{
+  const el=makeEl('zikr-tab-'+name);
+  el._attrs={'data-zikr-view':name};
+  el.getAttribute=(key)=>el._attrs[key]||null;
+  el.setAttribute=(key,value)=>{ el._attrs[key]=String(value); };
+  return el;
+});
+const zikrTabsEl=makeEl('zikr-tabs');
+zikrTabsEl.querySelectorAll=()=>zikrTabButtons;
+const zikrScrollEl=makeEl('zikr-scroll');
+zikrScrollEl.scrollTop=137;
+elCache['zikr-tabs']=zikrTabsEl;
+elCache['zikr-scroll']=zikrScrollEl;
+const appHTMLBeforeLocalTabPaint=appHTML;
+sb.App.setZikrView('settings');
+sb.App.setZikrView('presets');
+ok('Zikirmatik sekme geçişi global #app/overlay kabuğunu yeniden kurmuyor', appHTML===appHTMLBeforeLocalTabPaint);
+ok('Zikirmatik sekme geçişi yalnız içerik alanını yerinde boyuyor', /İsmi değil, anlamı keşfet/.test(zikrScrollEl.innerHTML)&&zikrScrollEl.scrollTop===0);
+ok('Zikirmatik yerel tab boyaması aria-selected durumunu güncelliyor', zikrTabButtons.find((x)=>x.getAttribute('data-zikr-view')==='presets')._attrs['aria-selected']==='true');
+
+ok('Eski çekirdek preset kaydı gerçek Arapça ile migrate ediliyor', (function () {
+  const state=readState();
+  const preset=state.zikr.presets.find((x)=>x.id==='subhanallah');
+  return preset&&preset.arabic==='سبحان الله'&&!/Sübhanallah/.test(preset.arabic);
+})());
+
+ok('Esmâ kütüphanesi niyet konularına göre süzülebiliyor', (function () {
+  sb.App.setZikrTopic('rahmet');
+  return /Merhamet/.test(zikrScrollEl.innerHTML)&&/er-Rahmân|er-Rahîm/.test(zikrScrollEl.innerHTML);
+})());
+
+ok('Keşif filtreleri kapalıyken seçimi özetleyen erişilebilir expander render ediliyor',
+  /zikr-v2-filter-expander/.test(zikrScrollEl.innerHTML)&&/aria-expanded="false"/.test(zikrScrollEl.innerHTML)&&
+  /id="zikr-filter-panel"[^>]* hidden/.test(zikrScrollEl.innerHTML)&&/KEŞİF FİLTRELERİ/.test(zikrScrollEl.innerHTML));
+
+ok('Keşif filtresi expanderı global render olmadan yerinde açılıyor', (function () {
+  const shell=makeEl('zikr-filter-shell'), panel=makeEl('zikr-filter-panel'), summary=makeEl('zikr-filter-summary');
+  summary._attrs={}; summary.setAttribute=(key,value)=>{ summary._attrs[key]=String(value); };
+  shell.querySelector=(sel)=>sel==='.zikr-v2-filter-summary'?summary:null;
+  panel.hidden=true; elCache['zikr-filter-panel']=panel;
+  const before=appHTML, oldQuery=doc.querySelector;
+  doc.querySelector=(sel)=>sel==='.zikr-v2-filter-expander'?shell:null;
+  sb.App.toggleZikrFilters();
+  doc.querySelector=oldQuery;
+  delete elCache['zikr-filter-panel'];
+  return appHTML===before&&panel.hidden===false&&summary._attrs['aria-expanded']==='true';
+})());
+
+ok('Premium tezhip sayaç yüzeyi render ediliyor', (function () {
+  sb.App.setZikrView('counter');
+  return /class="rim"/.test(zikrScrollEl.innerHTML)&&/class="beads"/.test(zikrScrollEl.innerHTML)&&
+    /zikr-v2-aura/.test(zikrScrollEl.innerHTML)&&/zikr-v2-orbit/.test(zikrScrollEl.innerHTML)&&
+    /id="zikr-live-kicker"/.test(zikrScrollEl.innerHTML)&&!/BU TURDA/.test(zikrScrollEl.innerHTML)&&/dokunarak zikret/.test(zikrScrollEl.innerHTML);
+})());
+
+ok('Minimal Zikirmatik kartı anlamlı durum, özet ve ilerleme sunuyor', (function () {
+  sb.App.closeZikr();
+  sb.App.setFaithTab('zikir');
+  return /zikr-v2-preview-status/.test(appHTML)&&/zikr-v2-preview-focus/.test(appHTML)&&
+    /BUGÜN[\s\S]*BU TUR[\s\S]*(ÖMÜRLÜK|TAM HATİM)/i.test(appHTML)&&/zikr-v2-preview-bar/.test(appHTML);
+})());
+
+ok('Sayaç ve özet kart animasyonları reduced-motion ile güvenle kapanıyor',
+  /@keyframes zikrOrbit/.test(styles)&&/@keyframes zikrStatusPulse/.test(styles)&&
+  /prefers-reduced-motion:reduce[^}]*[\s\S]*?\.zikr-v2-orbit/.test(styles));
+
+ok('Esmâ expander seçenekleri yatay kaydırma yerine tam genişlikte alt alta diziliyor',
+  /\.zikr-v2-topics\{[^}]*flex-direction:column[^}]*overflow:visible/.test(styles)&&
+  /\.zikr-v2-chips\{[^}]*flex-direction:column[^}]*overflow:visible/.test(styles)&&
+  /\.zikr-v2-topics button\{[^}]*width:100%/.test(styles)&&
+  /\.zikr-v2-chips button\{[^}]*width:100%/.test(styles));
+
+ok('Zikirmatik özet kartı ortak faith cam/blur perdesini kesin olarak geçersiz kılıyor',
+  /\.zikr-v2-preview\{[^}]*filter:none!important[^}]*backdrop-filter:none!important/.test(styles)&&
+  /\.zikr-v2-preview::before,.zikr-v2-preview::after\{[^}]*content:none!important/.test(styles));
+
+const noteSeed=JSON.parse(JSON.stringify(seed));
+noteSeed.zikr.schemaVersion=3;
+const noteSb=buildSandbox(noteSeed);
+loadInto(noteSb,FILES);
+if(noteSb.App&&typeof noteSb.App.start==='function') noteSb.App.start();
+let noteMigrated=JSON.parse(noteSb.localStorage.getItem('seyma-reset-v1'));
+ok('V3 kayıt additive biçimde V4 tefekkür şemasına taşınıyor',
+  noteMigrated.zikr.schemaVersion===4&&Array.isArray(noteMigrated.zikr.reflections));
+noteSb.App.go('saygi'); noteSb.App.openZikr(); noteSb.App.setZikrPreset('esma_01');
+ok('Sayaç altında zikir adına ve güne bağlı gelişmiş tefekkür editörü render ediliyor',
+  /TEFEKKÜR GÜNLÜĞÜ[\s\S]*Hislerim[\s\S]*Düşüncelerim[\s\S]*Duam · niyetim/.test(zikrScrollEl.innerHTML)&&
+  /için bugüne özel/.test(zikrScrollEl.innerHTML));
+const noteAppBefore=appHTML;
+const noteCountEl=makeEl('zikr-note-count'), noteStatusEl=makeEl('zikr-note-status');
+elCache['zikr-note-count']=noteCountEl; elCache['zikr-note-status']=noteStatusEl;
+noteSb.App.onZikrNoteField('feelings',{value:'Kalbimde sakin ve güvenli bir alan hissettim.'});
+noteSb.App.onZikrNoteField('thoughts',{value:'Merhametin gündelik davranışlarıma nasıl yansıyacağını düşündüm.'});
+noteSb.App.onZikrNoteField('intention',{value:'Bugün daha yumuşak konuşmaya niyet ediyorum.'});
+ok('Not yazarken global ekran yenilenmiyor ve kelime sayacı yerinde güncelleniyor',
+  appHTML===noteAppBefore&&/kelime/.test(noteCountEl.textContent));
+noteSb.App.setZikrNoteMood('huzurlu');
+noteSb.App.saveZikrNote();
+let noteState=JSON.parse(noteSb.localStorage.getItem('seyma-reset-v1'));
+const firstReflection=noteState.zikr.reflections.find((n)=>n.presetId==='esma_01'&&n.date===t);
+ok('Duygu, his, düşünce ve niyet tek günlük zikir kaydında kalıcı saklanıyor',
+  !!firstReflection&&firstReflection.mood==='huzurlu'&&firstReflection.feelings.includes('güvenli')&&
+  firstReflection.thoughts.includes('Merhametin')&&firstReflection.intention.includes('niyet')&&firstReflection.wordCount>0);
+ok('Yalnız not yazılan gün de panel takviminde görünmesi için günlük bağlam oluşturuyor',
+  !!noteState.days[t].zikrReflectionUpdatedAt);
+noteSb.App.setZikrPreset('esma_02');
+noteSb.App.onZikrNoteField('feelings',{value:'İçimde güçlü bir şükür duygusu vardı.'});
+noteSb.App.setZikrNoteMood('şükür');
+noteSb.App.saveZikrNote();
+noteState=JSON.parse(noteSb.localStorage.getItem('seyma-reset-v1'));
+ok('Aynı gün iki farklı Esmâ için ayrı notlar korunuyor',
+  noteState.zikr.reflections.filter((n)=>n.date===t&&/^esma_0[12]$/.test(n.presetId)).length===2);
+noteSb.App.setZikrView('history');
+ok('Zikirmatik Geçmiş sekmesi notları tarih, zikir ve yapılandırılmış alanlarla arşivliyor',
+  /TEFEKKÜR ARŞİVİ[\s\S]*Hislerim[\s\S]*Düşüncelerim[\s\S]*Duam · niyetim/.test(zikrScrollEl.innerHTML));
+delete elCache['zikr-note-count']; delete elCache['zikr-note-status'];
+
+const settingsSb=buildSandbox(JSON.parse(JSON.stringify(seed)));
+loadInto(settingsSb,FILES);
+if(settingsSb.App&&typeof settingsSb.App.start==='function') settingsSb.App.start();
+let soundPreviewCount=0, hapticPreviewCount=0, wakeRequestCount=0, reducedClassState=null;
+settingsSb.AudioContext=function(){
+  soundPreviewCount++;
+  return {state:'running',currentTime:0,resume(){},createOscillator(){return{type:'',frequency:{value:0},connect(){},start(){},stop(){}}},createGain(){return{gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}},destination:{}};
+};
+settingsSb.navigator.vibrate=()=>{ hapticPreviewCount++; return true; };
+settingsSb.navigator.wakeLock={request(){ wakeRequestCount++; return Promise.resolve({release(){},addEventListener(){}}); }};
+const reducedOverlay=makeEl('zikr-overlay');
+reducedOverlay.classList={toggle(name,on){ if(name==='is-reduced') reducedClassState=!!on; }};
+elCache['zikr-overlay']=reducedOverlay;
+settingsSb.App.go('saygi'); settingsSb.App.openZikr(); settingsSb.App.setZikrView('settings');
+const settingKeys=['soundOn','haptic','focusMode','breathGuide','reducedMotion','keepAwake','autoAdvance'];
+const settingsBefore=JSON.parse(settingsSb.localStorage.getItem('seyma-reset-v1')).zikr.settings;
+settingKeys.forEach((key)=>settingsSb.App.toggleZikrSetting(key));
+const settingsFlipped=JSON.parse(settingsSb.localStorage.getItem('seyma-reset-v1')).zikr.settings;
+settingKeys.forEach((key)=>settingsSb.App.toggleZikrSetting(key));
+const settingsRestored=JSON.parse(settingsSb.localStorage.getItem('seyma-reset-v1')).zikr.settings;
+delete elCache['zikr-overlay'];
+ok('Ayarlar ekranındaki yedi anahtarın tamamı gerçek state\'i değiştirip kalıcı kaydediyor',
+  settingKeys.every((key)=>settingsFlipped[key]===!settingsBefore[key]&&settingsRestored[key]===settingsBefore[key]));
+ok('Ses ve titreşim açılırken anlık işlev önizlemesi çalışıyor', soundPreviewCount>0&&hapticPreviewCount>0);
+ok('Ekranı uyanık tut gerçek Wake Lock isteği yapıyor', wakeRequestCount>0);
+ok('Hareketi azalt modal sınıfını tam render beklemeden anında güncelliyor', reducedClassState===false);
+ok('Ayar anahtarları erişilebilir kimlik ve görünür durum mesajı taşıyor',
+  settingKeys.every((key)=>new RegExp('id="zikr-setting-'+key+'"').test(zikrScrollEl.innerHTML))&&/id="zikr-settings-note"/.test(zikrScrollEl.innerHTML));
+const localSettingButton=makeEl('zikr-setting-autoAdvance'), localSettingToggle=makeEl(''), localSettingNote=makeEl('zikr-settings-note');
+localSettingButton._attrs={}; localSettingButton.setAttribute=(key,value)=>{ localSettingButton._attrs[key]=String(value); };
+localSettingButton.querySelector=(sel)=>sel==='i'?localSettingToggle:null;
+elCache['zikr-setting-autoAdvance']=localSettingButton; elCache['zikr-settings-note']=localSettingNote;
+const settingsAppBefore=appHTML;
+settingsSb.App.toggleZikrSetting('autoAdvance');
+ok('Ayar tıklaması global modalı yenilemeden yalnız ilgili switch ve mesajı güncelliyor',
+  appHTML===settingsAppBefore&&localSettingButton._attrs['aria-pressed']==='true'&&/Otomatik sıradaki zikir açıldı/.test(localSettingNote.innerHTML));
+settingsSb.App.toggleZikrSetting('autoAdvance');
+delete elCache['zikr-setting-autoAdvance']; delete elCache['zikr-settings-note'];
+settingsSb.App.toggleZikrSetting('focusMode'); settingsSb.App.toggleZikrSetting('breathGuide');
+settingsSb.App.setZikrView('counter');
+ok('Odak modu ve nefes ritmi sayaç yüzeyinde gerçek davranış sınıflarını etkinleştiriyor',
+  /zikr-v2-counter is-focus/.test(zikrScrollEl.innerHTML)&&/zikr-v2-tap[^"]*is-breathing/.test(zikrScrollEl.innerHTML));
+settingsSb.App.toggleZikrSetting('autoAdvance');
+for(let i=0;i<33;i++) settingsSb.App.zikrTap();
+const autoAdvanceState=JSON.parse(settingsSb.localStorage.getItem('seyma-reset-v1'));
+ok('Otomatik sıradaki zikir normal tur hedefinde gerçekten sonraki presete geçiyor',
+  autoAdvanceState.zikr.settings.activePresetId!=='subhanallah');
+
+const premiumHatimSb=buildSandbox(JSON.parse(JSON.stringify(seed)));
+loadInto(premiumHatimSb,FILES);
+if(premiumHatimSb.App&&typeof premiumHatimSb.App.start==='function') premiumHatimSb.App.start();
+premiumHatimSb.App.go('saygi'); premiumHatimSb.App.openZikr(); premiumHatimSb.App.setZikrPreset('esma_07');
+premiumHatimSb.App.zikrTap(); premiumHatimSb.App.zikrTap(); premiumHatimSb.App.setZikrView('hatims');
+const hatimBefore=JSON.parse(premiumHatimSb.localStorage.getItem('seyma-reset-v1'));
+const activeHatim=hatimBefore.zikr.journeys.esma_07.hatims.find((h)=>h.status==='active');
+ok('Hatimlerim kartı kategori, Türkçe anlam ve üç ayrıntılı metriği gösteriyor',
+  /hatim-badges[\s\S]*category/.test(zikrScrollEl.innerHTML)&&/hatim-metrics/.test(zikrScrollEl.innerHTML)&&
+  /SAYILAN[\s\S]*TUR[\s\S]*KALAN/.test(zikrScrollEl.innerHTML)&&/class="top"[\s\S]*<p>/.test(zikrScrollEl.innerHTML));
+ok('Devam et yanında görünür Kaldır eylemi var',
+  /App\.openZikrHatim\('esma_07'/.test(zikrScrollEl.innerHTML)&&/App\.requestRemoveZikrHatim\('esma_07'/.test(zikrScrollEl.innerHTML)&&/> Kaldır<\/button>/.test(zikrScrollEl.innerHTML));
+premiumHatimSb.App.requestRemoveZikrHatim('esma_07',activeHatim.id);
+ok('Kaldır ilk dokunuşta ömürlük toplamı silmeden kart içi onay açıyor',
+  /remove-confirm/.test(zikrScrollEl.innerHTML)&&/Ömürlük toplamın korunur/.test(zikrScrollEl.innerHTML));
+premiumHatimSb.App.confirmRemoveZikrHatim();
+const hatimAfter=JSON.parse(premiumHatimSb.localStorage.getItem('seyma-reset-v1'));
+const removedHatim=hatimAfter.zikr.journeys.esma_07.hatims.find((h)=>h.id===activeHatim.id);
+ok('Kaldır onayı hatmi arşivliyor, listeden çıkarıyor ve ömürlük toplamı koruyor',
+  removedHatim.status==='archived'&&hatimAfter.zikr.journeys.esma_07.lifetimeCount===2&&
+  !!removedHatim.lastAt&&!!hatimAfter.zikr.journeys.esma_07.lastAt&&!new RegExp(activeHatim.id).test(zikrScrollEl.innerHTML));
+
+const resetSb=buildSandbox(JSON.parse(JSON.stringify(seed)));
+loadInto(resetSb,FILES);
+if(resetSb.App&&typeof resetSb.App.start==='function') resetSb.App.start();
+resetSb.App.go('saygi');
+resetSb.App.openZikr();
+resetSb.App.zikrTap();
+resetSb.App.zikrTap();
+resetSb.App.zikrTap();
+const resetBefore=JSON.parse(resetSb.localStorage.getItem('seyma-reset-v1'));
+resetSb.App.zikrResetToday();
+const resetArmed=JSON.parse(resetSb.localStorage.getItem('seyma-reset-v1'));
+ok('Sıfırla ilk dokunuşta native confirm yerine görünür uygulama içi onay açıyor',
+  JSON.stringify(resetArmed)===JSON.stringify(resetBefore)&&
+  /zikr-v2-reset-confirm/.test(zikrScrollEl.innerHTML)&&/App\.confirmZikrResetToday\(\)/.test(zikrScrollEl.innerHTML));
+resetSb.App.confirmZikrResetToday();
+const resetAfter=JSON.parse(resetSb.localStorage.getItem('seyma-reset-v1'));
+ok('Sayaç araçlarında görünür Sıfırla düğmesi var', /App\.zikrResetToday\(\)/.test(appHTML)&&/>Sıfırla<\/span>/.test(appHTML));
+ok('Sıfırla yalnız bugünkü aktif preset sayımını onaylı biçimde geri alıyor',
+  resetBefore.zikr.sessions[t].perPreset.subhanallah.count===3 &&
+  !resetAfter.zikr.sessions[t].perPreset.subhanallah &&
+  resetAfter.zikr.journeys.subhanallah.lifetimeCount===0 &&
+  resetAfter.zikr.activeSession.count===0 &&
+  !!resetAfter.zikr.activeSession.pausedAt);
+resetSb.App.zikrUndo();
+const resetRestored=JSON.parse(resetSb.localStorage.getItem('seyma-reset-v1'));
+ok('Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor',
+  resetRestored.zikr.sessions[t].perPreset.subhanallah.count===3 &&
+  resetRestored.zikr.journeys.subhanallah.lifetimeCount===3 &&
+  resetRestored.zikr.activeSession.count===3 &&
+  !resetRestored.zikr.activeSession.pausedAt);
+ok('Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür',
+  /z-index:10000/.test(appSource)&&/Geri alınacak yeni bir sayım yok/.test(appSource));
 
 console.log('\n' + (failed ? '⚠️ ' + failed + ' başarısız, ' : '✅ ') + passed + '/' + (passed + failed) + ' assertion pass');
 process.exit(failed ? 1 : 0);

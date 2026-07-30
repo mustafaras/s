@@ -336,6 +336,92 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-30 — Kur’an Yolculuğu yeni oturum kontrol prompt’u (yalnız dokümantasyon)
+
+**Branch:** `main`; commit/push/deploy yok.
+
+**Yeni dosya:** `KURAN-YOLCULUGU-YENI-OTURUM-PROMPTU.md`.
+
+QY-00→QY-18 planını her kullanıcı `devam` komutunda yalnız tek aşama ilerleten,
+ilk turu salt-okunur QY-00 denetimine kilitleyen yeni oturum başlangıç prompt’u
+hazırlandı. “Devam”ın commit/push/merge/deploy izni olmadığı; bu eylemlerin,
+gerçek e-posta/WhatsApp/data yazmalarının ve GitHub Pages dağıtımının ayrı açık
+kullanıcı emri gerektirdiği kesinleştirildi. Dirty worktree koruması, tarayıcı
+yasağı, `seyma-data` güvenliği, aşama sonu test/handoff/durma protokolü ve
+ürünün onaylanmış 13 kararı prompt’a gömüldü.
+
+**Doğrulama:** Bu alt işte uygulama kodu değiştirilmedi; yalnız Markdown
+dokümantasyonu eklendi. Gerçek tarayıcı/ağ/dış yazma yapılmadı.
+
+**Kalan:** Yeni geliştirme oturumu bu prompt ile başlatılmalı ve önce yalnız
+QY-00 tamamlanmalı.
+
+---
+
+### 2026-07-30 — Raşit ile Kur’an Yolculuğu uygulama planı (yalnız dokümantasyon)
+
+**Branch:** `main`; commit/push/deploy yok.
+
+**Yeni dosya:** `KURAN-YOLCULUGU-GELISTIRME-PLANI.md`.
+
+Kıble kartının altında yer alacak nüzul sıralı 114 sûre yolculuğu; sûre bazlı
+“Raşit’ten iste” e-posta akışı; izinli gönderici + request token + YouTube
+videoId doğrulamasından sonra panel onayı olmadan otomatik yayın; güvenli
+click-to-load `youtube-nocookie` embed; izlenme sonrası `+90 506 602 00 98`
+numarasına sûre bağlamlı “Raşit’e sor” WhatsApp deep-link’i planlandı. Ana
+`latest.json` dosyasını gelen e-posta otomasyonundan izole eden outbox/delivery/
+responses sözleşmeleri, state machine, sync/migration, panel aynası, güvenlik
+tehditleri ve QY-00→QY-18 sıralı uygulama prompt’ları belgelendi.
+
+**Doğrulama:** Bu alt işte yalnız Markdown ve handoff kaydı değişti; uygulama
+kodu değiştirilmedi. `git diff --check` ✅. Gerçek tarayıcı/ağ/mail/WhatsApp/
+data yazma işlemi yapılmadı.
+
+**Kalan:** Uygulama başlamadan Raşit’in izinli cevap e-posta adresi ve Gmail
+Apps Script/GitHub Secrets kurulumu çalışma zamanında güvenli biçimde
+tanımlanmalı. Plan QY-00 denetiminden başlayarak sırayla yürütülmeli.
+
+---
+
+### 2026-07-30 — Bilimsel Kıble v2 üst hub kartı (commit/deploy edilmedi)
+
+**Branch:** `main`; çalışma ağacı bu iş için kirli, henüz commit/push/deploy
+yoktur.
+
+**Değişen dosyalar:** `app.js`, `styles.css`, `index.html`,
+`.claude/skills/run-seyma/zikr-harness.mjs`,
+`ILHAM-IBADET-GELISTIRME-PLANI.md`, `GELISTIRME-PLANI.md`, `AGENTS.md`.
+
+- Kıble eylemi İman Köşesi modalından kaldırılıp vakit/Hicri şeridi ile beşli
+  hub sekmeleri arasına tam genişlik premium özet kartı olarak taşındı.
+- Yerel büyük-daire başlangıç azimutu (Kâbe 21,4225° K / 39,8262° D),
+  Haversine mesafesi, 0,1° doğrultu ve 16 yön dilimi eklendi. GPS artık yüksek
+  hassasiyet ister, raporlanan metre doğruluğunu saklar; konum yoksa Ankara
+  fallback'i açıkça etiketlenir.
+- Tam ekran pusula gerçek-kuzey hedefini, cihaz yönünü, sağ/sol hizalama
+  farkını, Kâbe mesafesini ve konum/sensör kaynağını ayrı alanlarda gösterir.
+  Mutlak `deviceorientation` ve iOS manyetik `webkitCompassHeading` ayrılır;
+  ekran yönü telafisi ve dairesel yumuşatma uygulanır. Göreli/kuzeye
+  sabitlenmemiş sensör reddedilir; manyetik sapma, metal/mıknatıs ve
+  kalibrasyon sınırları görünürdür.
+- Sensör olayındaki tam `render()` kaldırıldı; ibre/ölçüm/status hedefli DOM
+  boyamasıyla güncellenir. 370px altı ve reduced-motion CSS kuralları eklendi.
+- `styles.css` ve `app.js` cache sürümü `20260730z`; `sync.js` değişmedi ve
+  `20260730y` kaldı.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` **84/84** ✅ (azimut/mesafe, kart sırası, eski konumun
+kaldırılması, yöntem metni, yüksek hassasiyetli GPS ve sensörde rendersız DOM
+boyama dahil); tüm Zikirmatik doğrulama script'leri ✅; `test_faz10_sync.js`
+**64/64** ✅; `test_faz11_panel.js` **44/44** ✅; `git diff --check` ✅.
+Gerçek tarayıcı açılmadı, `seyma-data` okunmadı/yazılmadı.
+
+**Kalan:** Kullanıcı görsel onayından sonra istenirse temiz commit/push/deploy.
+Gerçek cihaz sensör kalitesi donanıma ve manyetik çevreye bağlıdır; arayüz bunu
+bilinçli biçimde kesin ölçüm gibi sunmaz.
+
+---
+
 ### 2026-07-30 — ZP-08.11: Zikir başına günlük Tefekkür Günlüğü + ÆON panel aynası (canlıya alındı)
 
 **Branch:** `zikirmatik-iphone16-redesign` → `main` fast-forward.

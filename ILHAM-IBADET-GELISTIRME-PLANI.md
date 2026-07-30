@@ -154,12 +154,19 @@ Faz 34'teki temel vakit takibini **derinleştir**: vakitler artık
   yapmaz, sadece `render()` geldiğinde dakikalık yeniler (performans).
 
 ### 2.2 Kıble pusulası (yön + mesafe hissi)
-- Yeni bölüm: şehir seçiminin altında **kıble gülü** (SVG kuzey-kıble iğnesi).
-- Kullanıcının koordinatından Kâbe'ye `bearing` (Aladhan `/v1/qibla/{lat}/{lon}`
-  veya local great-circle hesabı). Telefon `deviceorientation` yoksa statik
-  gül; varsa (HTTPS + izin) gerçek zamanlı yön.
-- Görsel: ince altın yay + yeşil ok; altında "Tahmini yön · X° kuzeydoğu".
-- Görsel amaçlı: **GPS butonuyla birlikte** "kıbleye doğru çevir" ipucu.
+- Vakit/Hicri şeridi ile hub sekmeleri arasında tek dokunuşluk, sabit gridli
+  **Kıble · Gerçek Kuzey** kartı bulunur; İman Köşesi modalına gömülü değildir.
+- Kullanıcının koordinatından Kâbe'ye yerel büyük-daire başlangıç azimutu ve
+  Haversine mesafesi hesaplanır (Kâbe `21,4225° K · 39,8262° D`, ortalama Dünya
+  yarıçapı `6371,0088 km`). Sonuç 0,1° ve 16 yön dilimiyle açıklanır.
+- GPS yüksek hassasiyet ister ve metre cinsinden raporlanan doğruluğu saklar.
+  Konum yoksa bunun gerçek konum olmadığı açıkça belirtilen Ankara fallback'i
+  kullanılır.
+- Canlı pusula yalnız mutlak yön veya iOS `webkitCompassHeading` verisini kabul
+  eder; manyetik kaynak/sapma ve donanım etkileri kullanıcıya açıklanır. Sensör
+  akışı tüm sayfayı render etmez, yalnız ibre ve ölçüm alanlarını boyar.
+- Tam ekran pusula; hizalama farkını sağ/sol dönüş olarak verir, ekran yönünü
+  hesaba katar, kalibrasyon ve mıknatıs/metal sınırlamalarını görünür tutar.
 
 ### 2.3 Cemaat & camii ruhu vurgusu
 - Vakit satırlarında `cemaat` tiki artık daha belirgin: küçük insan ikonu,
@@ -273,7 +280,7 @@ görür. İşlevsel fazlar bu kaplamanın üstüne gelir.
 | 35 | 🎯 **Zikirmatik v2** — kalıcı yolculuk + Ebced² Tam Hatim | 1 | 🟡 | Çekirdek ve veri korunuyor; kullanıcı talebiyle kart/sekme/modal/panel canlıdan geçici gizlendi | iPhone 16 Pro Max opak tasarım revizyonu ayrı branch; cache `20260730o` |
 | 36 | 🕌 **Sıradaki vakit + geri sayım** + cemaat/pulse vurgu + `currentPrayerIndex` geliştirme | 1 | ✅ | Header'da countdown, `App.tickPrayer`, pulse CSS (`.sg-faith-preview-row.next`), cemaat altın ikon | — |
 | 37 | 🌙 **Hicri & Miladi takvim** + mübarek gün rozeti (`hijriCalendar.js`, offset) | 2 | ✅ | `window.HijriCalendarV1`, `hijriTodayStr`, ±2 gün kullanıcı kontrolü, rozet UI | Panel `Hicri Takvim` bento aynası |
-| 38 | 🧭 **Kıble gülü** (local bearing + GPS), canlı cihaz yönü | 2 | ✅ | SVG compass; izinli `deviceorientation`/iOS permission; statik fallback | — |
+| 38 | 🧭 **Bilimsel kıble kartı** (büyük-daire azimutu + mesafe + GPS), canlı cihaz yönü | 2 | ✅ | Üst hub kartı; gerçek-kuzey hedefi; 16 yön dilimi; yüksek hassasiyetli GPS; mutlak/manyetik sensör ayrımı; hedefli DOM boyama; açık kalibrasyon sınırları | — |
 | 39 | 🌟 **Saygı koleksiyonu + seri** + kategori denge nudge'ı | 2 | ✅ | Tıklanabilir numaralı/✓ 10×10 grid; seçilen öncünün modalı + önceki/sonraki; yüklenirken dahi görünür sabit `Okudum` | Panelde "Öncü koleksiyonu" satırı |
 | 40 | 📊 **İbadet rapor** sekmesi (KPI + yıllık ısı haritası) + panel mirror | 2 | ✅ | Gerçek 5'li `ui.faithTab`; haftalık KPI/bar + seçilebilir 365 günlük ısı | Panelde yıllık ısı bento kartı |
 | 41 | 📅 (İsteğe bağlı) **Aylık vakit cetveli** overlay'i | 3 | ❌ | İkinci katman overlay; 30 gün tablo, gün seçici | — |

@@ -24,6 +24,7 @@ var ICONS={
   'stethoscope':'<path d="M11 2v2" /><path d="M5 2v2" /><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" /><path d="M8 15a6 6 0 0 0 12 0v-3" /><circle cx="20" cy="10" r="2" />',
   'dumbbell':'<path d="M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z" /><path d="m2.5 21.5 1.4-1.4" /><path d="m20.1 3.9 1.4-1.4" /><path d="M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z" /><path d="m9.6 14.4 4.8-4.8" />',
   'route':'<circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" />',
+  'navigation':'<polygon points="3 11 22 2 13 21 11 13 3 11" />',
   'armchair':'<path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" /><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z" /><path d="M5 18v2" /><path d="M19 18v2" />',
   'apple':'<path d="M12 6.528V3a1 1 0 0 1 1-1h0" /><path d="M18.237 21A15 15 0 0 0 22 11a6 6 0 0 0-10-4.472A6 6 0 0 0 2 11a15.1 15.1 0 0 0 3.763 10 3 3 0 0 0 3.648.648 5.5 5.5 0 0 1 5.178 0A3 3 0 0 0 18.237 21" />',
   'archive':'<rect width="20" height="5" x="2" y="3" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /><path d="M10 12h4" />',
@@ -1415,6 +1416,7 @@ function sha256(str){
 
 var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false};
 ui.zikrNoteOpen=true; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus='';
+ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; ui.qiblaLastAt='';
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -3870,13 +3872,50 @@ App.confirmZikrResetToday=function(){
 
 // ================= İLHAM & İBADET: KIBLE (Faz 38) =================
 function qiblaBearing(lat,lon){
-  // Kaaba: 21.4225°N, 39.8262°E — great-circle initial bearing
+  // Kâbe: 21.4225°N, 39.8262°E. Başlangıç doğrultusu, küresel Dünya
+  // modelinde coğrafi (gerçek) kuzeye göre büyük-daire azimutudur.
   var kl=21.4225*Math.PI/180, kn=39.8262*Math.PI/180;
   var la=lat*Math.PI/180, lo=lon*Math.PI/180;
   var y=Math.sin(kn-lo)*Math.cos(kl);
   var x=Math.cos(la)*Math.sin(kl)-Math.sin(la)*Math.cos(kl)*Math.cos(kn-lo);
   var br=Math.atan2(y,x)*180/Math.PI;
-  return Math.round((br+360)%360);
+  return Math.round(((br+360)%360)*10)/10;
+}
+function qiblaDistanceKm(lat,lon){
+  var r=6371.0088, la=lat*Math.PI/180, lo=lon*Math.PI/180;
+  var kl=21.4225*Math.PI/180, kn=39.8262*Math.PI/180;
+  var dlat=kl-la, dlon=kn-lo;
+  var a=Math.sin(dlat/2)*Math.sin(dlat/2)+Math.cos(la)*Math.cos(kl)*Math.sin(dlon/2)*Math.sin(dlon/2);
+  return Math.round(r*2*Math.atan2(Math.sqrt(a),Math.sqrt(Math.max(0,1-a))));
+}
+function qiblaDirectionLabel(bearing){
+  var labels=['kuzey','kuzey-kuzeydoğu','kuzeydoğu','doğu-kuzeydoğu','doğu','doğu-güneydoğu','güneydoğu','güney-güneydoğu','güney','güney-güneybatı','güneybatı','batı-güneybatı','batı','batı-kuzeybatı','kuzeybatı','kuzey-kuzeybatı'];
+  return labels[Math.round((((Number(bearing)||0)%360)+360)%360/22.5)%16];
+}
+function qiblaMetrics(location,heading){
+  var valid=location&&isFinite(+location.lat)&&isFinite(+location.lon);
+  var loc=valid?location:{lat:39.9334,lon:32.8597,cityName:'Ankara',source:'fallback'};
+  var bearing=qiblaBearing(+loc.lat,+loc.lon), distance=qiblaDistanceKm(+loc.lat,+loc.lon);
+  var hasHeading=heading!==null&&heading!==''&&isFinite(Number(heading)), hd=hasHeading?(((Number(heading)%360)+360)%360):0;
+  var relative=((bearing-hd)%360+360)%360;
+  var error=hasHeading?Math.abs(((bearing-hd+540)%360)-180):null;
+  return {bearing:bearing,distanceKm:distance,direction:qiblaDirectionLabel(bearing),relative:relative,alignmentError:error,hasHeading:hasHeading,location:loc,isFallback:!valid};
+}
+function qiblaLocationPrecision(m){
+  var loc=m.location||{}, acc=Number(loc.accuracy);
+  if(m.isFallback) return 'Geçici Ankara merkezi';
+  if(loc.source==='gps'&&isFinite(acc)&&acc>0) return 'GPS ±'+Math.round(acc)+' m';
+  if(loc.source==='gps') return 'GPS konumu';
+  return 'Şehir merkezi hesabı';
+}
+function qiblaAlignmentCopy(m){
+  if(!m.hasHeading) return {state:'idle',title:'Canlı yön bekleniyor',detail:'Sensör izni verince telefonun üst kenarını Kâbe doğrultusuna hizala.'};
+  var e=Math.round(m.alignmentError*10)/10;
+  var signed=((m.relative+540)%360)-180;
+  var turn=signed>=0?'sağa':'sola';
+  if(e<=3) return {state:'aligned',title:'Kıbleye hizalandın',detail:'Sensör farkı '+e.toLocaleString('tr-TR')+'°'};
+  if(e<=12) return {state:'near',title:'Çok yakınsın',detail:e.toLocaleString('tr-TR')+'° '+turn+' çevir'};
+  return {state:'seeking',title:'Telefonu '+turn+' çevir',detail:e.toLocaleString('tr-TR')+'° yön farkı'};
 }
 
 // ================= İLHAM & İBADET: RAPOR (Faz 40) =================
@@ -3963,7 +4002,7 @@ App.setPrayerCity=function(name){
   var c=prayerCityByName(name);
   if(!c){ toast('Şehir bulunamadı'); return; }
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
-  data.settings.prayer.location={lat:c.lat,lon:c.lon,cityName:c.name,source:'manual'};
+  data.settings.prayer.location={lat:c.lat,lon:c.lon,cityName:c.name,source:'manual',accuracy:null,capturedAt:new Date().toISOString()};
   save(); render();
   App.refreshPrayerTimes();
 };
@@ -3974,9 +4013,10 @@ App.fetchPrayerLocationGPS=function(){
     var lat=pos&&pos.coords&&pos.coords.latitude, lon=pos&&pos.coords&&pos.coords.longitude;
     if(lat==null||lon==null){ toast('Konum alınamadı'); return; }
     if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
-    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps'};
+    var acc=Math.round(Number(pos.coords.accuracy)||0);
+    data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:acc||null,capturedAt:new Date().toISOString()};
     save(); render(); App.refreshPrayerTimes();
-  },function(err){ toast('Konum izni gerekli: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:false,timeout:12000,maximumAge:600000});
+  },function(err){ toast('Konum izni gerekli: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
 };
 App.setPrayerMethod=function(method){
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
@@ -9099,8 +9139,6 @@ function faithCornerOverlayHTML(){
   var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
   var s=prayerDaySummary(p), streak=prayerStreak();
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">İman Köşesi '+icon('mosque',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugünün vakitleri, kılındı/cemaat/kaza/geç/nafile takibi.</div></div><button onclick="App.closeFaithCorner()" style="border:none;background:color-mix(in srgb,var(--faith) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
-  // Kıble butonu (Faz 38)
-  head+='<div style="display:flex;gap:7px;"><button onclick="App.openQibla()" style="border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;font-size:11.5px;font-weight:800;color:var(--faith);background:color-mix(in srgb,var(--faith) 13%,transparent);">'+icon('compass',13)+' Kıble</button></div>';
   var body='';
   // Faz 36 — Sonraki vakit geri sayım
   var nx=nextPrayerInfo(times);
@@ -9587,6 +9625,16 @@ function faithRaporCardHTML(){
   h+='</div>';
   return h;
 }
+function qiblaHubCardHTML(){
+  var m=qiblaMetrics(prayerLocation(),null), loc=m.location||{};
+  var h='<button class="sg-qibla-card" onclick="App.openQibla()" aria-label="Kıble pusulasını aç">';
+  h+='<span class="sg-qibla-card-dial" aria-hidden="true"><i class="north">K</i><i class="arrow" style="transform:rotate('+m.bearing+'deg)">'+icon('navigation',18)+'</i></span>';
+  h+='<span class="sg-qibla-card-copy"><small>KIBLE · GERÇEK KUZEY</small><strong>'+m.bearing.toLocaleString('tr-TR')+'° · '+esc(m.direction)+'</strong><em>'+esc(loc.cityName||'Konum')+' · Kâbe '+m.distanceKm.toLocaleString('tr-TR')+' km</em></span>';
+  h+='<span class="sg-qibla-card-method"><b>'+icon('route',12)+' Büyük daire</b><em>'+esc(qiblaLocationPrecision(m))+'</em></span>';
+  h+='<span class="sg-qibla-card-action">'+(m.isFallback?'Konumu doğrula':'Pusulayı aç')+' '+icon('chevron-right',15)+'</span>';
+  h+='</button>';
+  return h;
+}
 function saygiHTML(){
   if(!featuresLive()) return saygiComingSoonHTML();
   var person=saygiCurrentPerson();
@@ -9598,6 +9646,7 @@ function saygiHTML(){
   var done=saygiHasRead(person);
   var h='<section class="saygi-page">';
   h+=spiritBarHTML();
+  h+=qiblaHubCardHTML();
   h+=saygiPreviewHubHTML(person,article,done);
   h+='</section>';
   return h;
@@ -9626,42 +9675,88 @@ function kandilBadgeFor(date){
   return '';
 }
 function qiblaOverlayHTML(){
-  var loc=prayerLocation()||{lat:39.9255,lon:32.8663}; // Ankara yedek
-  var br=qiblaBearing(+loc.lat,+loc.lon), heading=Number(ui.qiblaHeading)||0, needle=(br-heading+360)%360;
-  var h='<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 4px;">';
-  h+='<div style="font-size:17px;font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+icon('compass',17)+' Kıble Yönü</div>';
-  h+='<div class="qibla-rose">';
-  h+='<div class="n">K</div>';
-  h+='<div class="needle" style="transform:rotate('+needle+'deg);">';
-  h+='<svg width="120" height="120" viewBox="0 0 100 100"><polygon points="50,8 43,58 50,50 57,58" fill="var(--faith)"/><circle cx="50" cy="50" r="3.2" fill="var(--text)"/></svg>';
+  var m=qiblaMetrics(prayerLocation(),ui.qiblaHeading), loc=m.location||{}, align=qiblaAlignmentCopy(m);
+  var sensor=ui.qiblaListening?(ui.qiblaSensorSource==='magnetic'?'Manyetik pusula · yerel sapma olabilir':'Mutlak cihaz yönü'):('Sensör kapalı');
+  if(ui.qiblaAccuracy!=null) sensor+=' · ±'+Math.round(ui.qiblaAccuracy)+'°';
+  var h='<div id="qibla-overlay" class="qibla-v2-back" onclick="App.closeQibla()">';
+  h+='<section class="qibla-v2-sheet" role="dialog" aria-modal="true" aria-labelledby="qibla-v2-title" onclick="event.stopPropagation()">';
+  h+='<header class="qibla-v2-head"><div><span>'+icon('compass',14)+' BİLİMSEL YÖN HESABI</span><h2 id="qibla-v2-title">Kıble pusulası</h2><p>Konumdan Kâbe’ye başlangıç büyük-daire azimutu</p></div><button onclick="App.closeQibla()" aria-label="Kıble pusulasını kapat">'+icon('x',18)+'</button></header>';
+  h+='<div class="qibla-v2-scroll">';
+  h+='<div class="qibla-v2-target"><div><span>HEDEF DOĞRULTU</span><strong>'+m.bearing.toLocaleString('tr-TR')+'°</strong><small>gerçek kuzeyden saat yönünde · '+esc(m.direction)+'</small></div><div><span>KÂBE MESAFESİ</span><strong>'+m.distanceKm.toLocaleString('tr-TR')+' km</strong><small>'+esc(loc.cityName||'Konum')+' merkezli</small></div></div>';
+  h+='<div class="qibla-v2-stage">';
+  h+='<div class="qibla-v2-dial" aria-label="Kıble yönü '+m.bearing+' derece"><span class="cardinal n">K</span><span class="cardinal e">D</span><span class="cardinal s">G</span><span class="cardinal w">B</span><span class="qibla-v2-ticks"></span>';
+  h+='<span id="qibla-live-needle" class="qibla-v2-needle" style="transform:rotate('+m.relative+'deg)"><i class="tip">'+icon('navigation',25)+'</i><i class="shaft"></i><b>KÂBE</b></span>';
+  h+='<span class="qibla-v2-center"><i></i></span></div>';
+  h+='<div id="qibla-live-status" class="qibla-v2-alignment '+align.state+'"><span class="signal">'+icon(align.state==='aligned'?'circle-check':'navigation',16)+'</span><div><strong>'+esc(align.title)+'</strong><small>'+esc(align.detail)+'</small></div></div>';
   h+='</div>';
-  h+='<div class="deg">'+br+'° kuzey-'+(br<=90?'doğu':(br<=180?'güney':'batı'))+'</div>';
-  h+='</div>';
-  h+='<div style="font-size:12.5px;color:var(--faint);text-align:center;line-height:1.45;">'+(ui.qiblaListening?'Canlı pusula açık · telefonu düz tutup yeşil oku üste hizala.':'Konumuna göre tahmini yön. Canlı pusula için sensör izni verebilirsin.')+'<br><span style="display:inline-flex;gap:7px;flex-wrap:wrap;justify-content:center;"><button onclick="App.fetchPrayerLocationGPS()" style="margin-top:9px;border:none;background:color-mix(in srgb,var(--faith) 14%,transparent);color:var(--faith);font-weight:800;font-size:12px;padding:8px 14px;border-radius:999px;cursor:pointer;">'+icon('map-pin',12)+' GPS</button><button onclick="App.enableQiblaCompass()" style="margin-top:9px;border:none;background:color-mix(in srgb,var(--faith) 14%,transparent);color:var(--faith);font-weight:800;font-size:12px;padding:8px 14px;border-radius:999px;cursor:pointer;">'+icon('compass',12)+' '+(ui.qiblaListening?'Pusula açık':'Canlı pusula')+'</button></span></div>';
-  h+='</div>';
-  return '<div id="sey-ov-back" class="sey-faith-ov-back" onclick="App.closeQibla()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:400px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:16px;font-weight:800;color:var(--text);">'+icon('compass',16)+' Kıble</div><button onclick="App.closeQibla()" style="border:none;background:color-mix(in srgb,var(--faith) 16%,transparent);cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button></div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+h+'</div></div></div>';
+  h+='<div class="qibla-v2-readings"><div><span>CİHAZ YÖNÜ</span><strong id="qibla-live-heading">'+(m.hasHeading?(((Number(ui.qiblaHeading)%360+360)%360).toFixed(1).replace('.',',')+'°'):'—')+'</strong><small id="qibla-live-sensor">'+esc(sensor)+'</small></div><div><span>KONUM HASSASİYETİ</span><strong>'+esc(qiblaLocationPrecision(m))+'</strong><small>'+(m.isFallback?'GPS ile doğrula':(+loc.lat).toFixed(4)+', '+(+loc.lon).toFixed(4))+'</small></div></div>';
+  if(ui.qiblaSensorError) h+='<div id="qibla-live-error" class="qibla-v2-error" role="alert">'+icon('triangle-alert',15)+'<span>'+esc(ui.qiblaSensorError)+'</span></div>'; else h+='<div id="qibla-live-error" class="qibla-v2-error" role="alert" hidden></div>';
+  h+='<div class="qibla-v2-actions"><button class="location" onclick="App.fetchPrayerLocationGPS()">'+icon('map-pin',16)+'<span><b>GPS’i yenile</b><small>Yüksek hassasiyetli konum</small></span></button><button id="qibla-sensor-button" class="sensor '+(ui.qiblaListening?'on':'')+'" onclick="App.enableQiblaCompass()">'+icon('compass',16)+'<span><b>'+(ui.qiblaListening?'Pusula açık':'Canlı pusulayı aç')+'</b><small>'+(ui.qiblaListening?'Telefonu düz tut':'Sensör izni gerekir')+'</small></span></button></div>';
+  h+='<aside class="qibla-v2-method"><strong>'+icon('info',14)+' Hesap ve sensör sınırları</strong><p>Kâbe koordinatı 21,4225° K · 39,8262° D alınır. Hedef, coğrafi kuzeye göre büyük-daire başlangıç azimutudur. Telefon pusulası metal, mıknatıs, elektronik cihazlar ve manyetik sapmadan etkilenebilir; telefonu sekiz çizerek kalibre et ve kılıftaki mıknatıslardan uzaklaştır.</p></aside>';
+  h+='</div></section></div>';
+  return h;
 }
-App.openQibla=function(){ ui.qiblaOpen=true; render(); };
-var _qiblaOrientationHandler=null, _qiblaLastPaint=0;
+App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); };
+var _qiblaOrientationHandler=null, _qiblaLastPaint=0, _qiblaSmoothHeading=null, _qiblaAbsoluteSeen=false;
+function qiblaSmoothAngle(previous,next,weight){
+  if(previous==null) return next;
+  var delta=((next-previous+540)%360)-180;
+  return (previous+delta*(weight||.22)+360)%360;
+}
+function qiblaScreenAngle(){
+  var angle=0;
+  try{
+    if(window.screen&&window.screen.orientation&&isFinite(Number(window.screen.orientation.angle))) angle=Number(window.screen.orientation.angle);
+    else if(isFinite(Number(window.orientation))) angle=Number(window.orientation);
+  }catch(e){}
+  return ((angle%360)+360)%360;
+}
+function qiblaPaintLive(){
+  try{
+    var m=qiblaMetrics(prayerLocation(),ui.qiblaHeading), align=qiblaAlignmentCopy(m);
+    var needle=document.getElementById('qibla-live-needle'), heading=document.getElementById('qibla-live-heading'), status=document.getElementById('qibla-live-status'), sensor=document.getElementById('qibla-live-sensor'), error=document.getElementById('qibla-live-error'), button=document.getElementById('qibla-sensor-button');
+    if(!needle||!heading||!status||!sensor||!button) return false;
+    needle.style.transform='rotate('+m.relative+'deg)';
+    heading.textContent=m.hasHeading?(((Number(ui.qiblaHeading)%360+360)%360).toFixed(1).replace('.',',')+'°'):'—';
+    status.className='qibla-v2-alignment '+align.state;
+    status.innerHTML='<span class="signal">'+icon(align.state==='aligned'?'circle-check':'navigation',16)+'</span><div><strong>'+esc(align.title)+'</strong><small>'+esc(align.detail)+'</small></div>';
+    sensor.textContent=(ui.qiblaSensorSource==='magnetic'?'Manyetik pusula · sapma olabilir':'Mutlak cihaz yönü')+(ui.qiblaAccuracy!=null?' · ±'+Math.round(ui.qiblaAccuracy)+'°':'');
+    button.className='sensor on'; button.innerHTML=icon('compass',16)+'<span><b>Pusula açık</b><small>Telefonu düz tut</small></span>';
+    if(error){ error.hidden=!ui.qiblaSensorError; error.innerHTML=ui.qiblaSensorError?(icon('triangle-alert',15)+'<span>'+esc(ui.qiblaSensorError)+'</span>'):''; }
+    return true;
+  }catch(e){ return false; }
+}
 App.enableQiblaCompass=function(){
   function start(){
-    if(_qiblaOrientationHandler) return;
+    if(_qiblaOrientationHandler){ qiblaPaintLive(); return; }
     _qiblaOrientationHandler=function(e){
-      var hd=(typeof e.webkitCompassHeading==='number')?e.webkitCompassHeading:((typeof e.alpha==='number')?(360-e.alpha):null);
-      if(hd==null||isNaN(hd)||Date.now()-_qiblaLastPaint<120) return; _qiblaLastPaint=Date.now(); ui.qiblaHeading=hd; ui.qiblaListening=true; render();
+      var hd=null, source='';
+      if(typeof e.webkitCompassHeading==='number'&&isFinite(e.webkitCompassHeading)){
+        hd=e.webkitCompassHeading; source='magnetic'; ui.qiblaAccuracy=(typeof e.webkitCompassAccuracy==='number'&&e.webkitCompassAccuracy>=0)?e.webkitCompassAccuracy:null;
+      } else if(e.type==='deviceorientationabsolute'||e.absolute===true){
+        if(typeof e.alpha==='number'&&isFinite(e.alpha)){ hd=(360-e.alpha+qiblaScreenAngle())%360; source='absolute'; _qiblaAbsoluteSeen=true; }
+      } else if(!_qiblaAbsoluteSeen){
+        ui.qiblaSensorError='Bu sensör kuzeye sabitlenmiş mutlak yön vermiyor. Cihaz pusulasını kalibre edip yeniden dene.';
+        qiblaPaintLive(); return;
+      }
+      if(hd==null||Date.now()-_qiblaLastPaint<80) return;
+      _qiblaLastPaint=Date.now(); _qiblaSmoothHeading=qiblaSmoothAngle(_qiblaSmoothHeading,hd,.24);
+      ui.qiblaHeading=_qiblaSmoothHeading; ui.qiblaListening=true; ui.qiblaSensorSource=source; ui.qiblaSensorError=''; ui.qiblaLastAt=new Date().toISOString();
+      qiblaPaintLive();
     };
-    try{ window.addEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.addEventListener('deviceorientation',_qiblaOrientationHandler,true); ui.qiblaListening=true; render(); }catch(e){ toast('Bu cihaz canlı pusulayı desteklemiyor.'); }
+    try{ window.addEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.addEventListener('deviceorientation',_qiblaOrientationHandler,true); ui.qiblaListening=true; ui.qiblaSensorError='Yön verisi bekleniyor…'; qiblaPaintLive(); }catch(e){ ui.qiblaSensorError='Bu cihaz canlı pusulayı desteklemiyor.'; qiblaPaintLive(); toast(ui.qiblaSensorError); }
   }
   try{
     if(window.DeviceOrientationEvent&&typeof window.DeviceOrientationEvent.requestPermission==='function'){
-      window.DeviceOrientationEvent.requestPermission().then(function(v){ if(v==='granted') start(); else toast('Pusula izni verilmedi.'); }).catch(function(){ toast('Pusula izni açılamadı.'); });
+      window.DeviceOrientationEvent.requestPermission().then(function(v){ if(v==='granted') start(); else { ui.qiblaSensorError='Pusula izni verilmedi.'; qiblaPaintLive(); toast(ui.qiblaSensorError); } }).catch(function(){ ui.qiblaSensorError='Pusula izni açılamadı.'; qiblaPaintLive(); toast(ui.qiblaSensorError); });
     } else start();
-  }catch(e){ toast('Bu cihaz canlı pusulayı desteklemiyor.'); }
+  }catch(e){ ui.qiblaSensorError='Bu cihaz canlı pusulayı desteklemiyor.'; qiblaPaintLive(); toast(ui.qiblaSensorError); }
 };
 App.closeQibla=function(){
   if(_qiblaOrientationHandler){ try{ window.removeEventListener('deviceorientationabsolute',_qiblaOrientationHandler,true); window.removeEventListener('deviceorientation',_qiblaOrientationHandler,true); }catch(e){} _qiblaOrientationHandler=null; }
-  ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; render();
+  _qiblaSmoothHeading=null; _qiblaAbsoluteSeen=false; ui.qiblaOpen=false; ui.qiblaListening=false; ui.qiblaHeading=null; ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; render();
 };
+App.qiblaBearing=qiblaBearing; App.qiblaDistanceKm=qiblaDistanceKm; App.qiblaMetrics=qiblaMetrics;
 function saygiArticleBodyHTML(person,article,done,wrapCls,includeReadAction){
   var heroLead=article.lead, first=article.blocks&&article.blocks[0]; if(first&&heroLead&&first.text.slice(0,90)===heroLead.slice(0,90)) heroLead='';
   var h='';

@@ -323,11 +323,18 @@ ok('saygiStreak okundu günde artar', (function () {
   return st && st.saygi && st.saygi.streak >= 1;
 })());
 
-ok('Kıble yönü hesaplanır (Ankara)', (function () {
-  // IIFE içindeki qiblaBearing'e ulaşılamaz; App.openQibla render ile yönü doğrula
-  if (typeof sb.App.openQibla !== 'function') return false;
-  appHTML = ''; sb.App.openQibla();
-  return /°|doğu|batı|kuzey/i.test(appHTML);
+ok('Kıble hesabı Ankara için doğru azimut ve mesafeyi verir', (function () {
+  if (typeof sb.App.qiblaBearing !== 'function' || typeof sb.App.qiblaDistanceKm !== 'function') return false;
+  const bearing=sb.App.qiblaBearing(39.9334,32.8597);
+  const distance=sb.App.qiblaDistanceKm(39.9334,32.8597);
+  return bearing>159 && bearing<162 && distance>2150 && distance<2180;
+})());
+
+ok('Kıble metriği gerçek kuzeyi, yön dilimini ve sensör durumunu ayırır', (function () {
+  if (typeof sb.App.qiblaMetrics !== 'function') return false;
+  const m=sb.App.qiblaMetrics({lat:39.9334,lon:32.8597,cityName:'Ankara',source:'manual'},null);
+  return m.direction==='güney-güneydoğu' && m.hasHeading===false && m.isFallback===false &&
+    Math.abs(m.relative-m.bearing)<0.001;
 })());
 
 ok('Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)', (function () {
@@ -336,10 +343,62 @@ ok('Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)', (fu
   return /mosque|kandil|spirit|İlham/i.test(appHTML);
 })());
 
-ok('Kıble overlay render', (function () {
+ok('Kıble kartı vakit şeridi ile sekmelerin arasında render olur', (function () {
+  appHTML = ''; sb.App.go('saygi');
+  const spiritAt=appHTML.indexOf('sg-spirit-bar');
+  const qiblaAt=appHTML.indexOf('sg-qibla-card');
+  const tabsAt=appHTML.indexOf('sg-faith-tabs');
+  return spiritAt>=0 && qiblaAt>spiritAt && tabsAt>qiblaAt;
+})());
+
+ok('Üst kıble kartı bilimsel hesap özetini gösterir', (function () {
+  appHTML = ''; sb.App.go('saygi');
+  return /KIBLE · GERÇEK KUZEY/.test(appHTML) && /Büyük daire/.test(appHTML) &&
+    /Kâbe[\s\S]*km/.test(appHTML) && /(GPS|Şehir merkezi|Geçici Ankara)/.test(appHTML);
+})());
+
+ok('Eski İman Köşesi kıble düğmesi kaldırıldı', (function () {
+  const start=appSource.indexOf('function faithCornerOverlayHTML');
+  const end=appSource.indexOf('function saygiPreviewHubHTML',start);
+  return start>=0 && end>start && !/App\.openQibla/.test(appSource.slice(start,end));
+})());
+
+ok('Kıble overlay gelişmiş pusula ve yöntem açıklamasıyla render olur', (function () {
   if (typeof sb.App.openQibla !== 'function') return false;
   appHTML = ''; sb.App.openQibla();
-  return /Kıble|qibla-rose|pusula|°/i.test(appHTML);
+  return /qibla-v2-sheet/.test(appHTML) && /qibla-v2-dial/.test(appHTML) &&
+    /HEDEF DOĞRULTU/.test(appHTML) && /KÂBE MESAFESİ/.test(appHTML) &&
+    /Hesap ve sensör sınırları/.test(appHTML) && !/qibla-rose/.test(appHTML);
+})());
+
+ok('Kıble sensörü tam render yerine hedefli DOM güncellemesi kullanır', (function () {
+  const start=appSource.indexOf('App.enableQiblaCompass=function');
+  const end=appSource.indexOf('App.closeQibla=function',start);
+  const sensorCode=appSource.slice(start,end);
+  return start>=0 && end>start && /qiblaPaintLive\(\)/.test(sensorCode) &&
+    !/\brender\(\)/.test(sensorCode) && /enableHighAccuracy:true/.test(appSource);
+})());
+
+ok('Canlı kıble olayı ibreyi güncellerken sayfayı yeniden render etmez', (function () {
+  const listeners={};
+  const sensorSb=buildSandbox(JSON.parse(JSON.stringify(seed)));
+  sensorSb.addEventListener=function(type,fn){ listeners[type]=fn; };
+  sensorSb.removeEventListener=function(){};
+  loadInto(sensorSb,FILES); sensorSb.App.start(); sensorSb.App.go('saygi'); sensorSb.App.openQibla();
+  const ids=['qibla-live-needle','qibla-live-heading','qibla-live-status','qibla-live-sensor','qibla-live-error','qibla-sensor-button'];
+  ids.forEach(function(id){ elCache[id]=makeEl(id); });
+  const htmlBefore=appHTML;
+  sensorSb.App.enableQiblaCompass();
+  if(typeof listeners.deviceorientationabsolute!=='function') return false;
+  listeners.deviceorientationabsolute({type:'deviceorientationabsolute',absolute:true,alpha:200});
+  const passed=appHTML===htmlBefore &&
+    /°/.test(elCache['qibla-live-heading'].textContent) &&
+    /^rotate\([0-9.-]+deg\)$/.test(elCache['qibla-live-needle'].style.transform||'') &&
+    /qibla-v2-alignment/.test(elCache['qibla-live-status'].className||'') &&
+    /Mutlak cihaz yönü/.test(elCache['qibla-live-sensor'].textContent);
+  ids.forEach(function(id){ delete elCache[id]; });
+  sensorSb.App.closeQibla();
+  return passed;
 })());
 
 ok('İbadet raporu (haftalık zikir/vakit toplamı)', (function () {

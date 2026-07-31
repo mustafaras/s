@@ -667,11 +667,16 @@
 .quran-v2-header .lead{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .quran-v2-header .mark{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:13px;font-size:19px;background:var(--quran-bg);border:1px solid var(--qj-line)}
 .quran-v2-header .back{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:13px;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--quran-ink);cursor:pointer}
-.quran-v2-header .back:focus-visible,.quran-v2-header .close:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
+.quran-v2-header .back:focus-visible,.quran-v2-header .close:focus-visible,.quran-v2-header .refresh:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
 .quran-v2-header .copy{display:flex;flex-direction:column;min-width:0}
 .quran-v2-header .copy strong{font-size:16.5px;font-weight:900;letter-spacing:-.015em;color:var(--quran-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quran-v2-header .copy small{font-size:11px;font-weight:700;color:var(--qj-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quran-v2-header .close{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--qj-muted);cursor:pointer}
+.quran-v2-header .refresh{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--qj-muted);cursor:pointer}
+.quran-v2-header .refresh:disabled{opacity:.6;cursor:default}
+.quran-v2-header .refresh.is-spinning svg{animation:seyQuranSpin .9s linear infinite}
+@keyframes seyQuranSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.quran-v2-header .refresh.is-spinning svg{animation:none}}
 .quran-v2-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:14px 14px calc(26px + env(safe-area-inset-bottom));scrollbar-width:thin;scrollbar-color:var(--qj-line) transparent}
 .quran-v2-library,.quran-v2-detail{display:flex;flex-direction:column;gap:12px;min-width:0}
 .quran-v2-section-head span{display:block;font-size:9.5px;font-weight:950;letter-spacing:.14em;color:var(--quran-gold)}

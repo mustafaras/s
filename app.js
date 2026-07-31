@@ -10030,6 +10030,7 @@ function quranJourneyMetaChips(status,req){
 // ── QY-06 tam ekran kabuk ──
 function quranJourneyOverlayHTML(){
   var head='<header class="quran-v2-header"><div id="quran-head-lead" class="lead">'+quranHeadLeadHTML()+'</div>';
+  head+='<button id="quran-refresh-button" class="refresh'+(ui.quranRefreshing?' is-spinning':'')+'" onclick="App.refreshQuranUpdates()" aria-label="Güncellemeleri kontrol et" aria-busy="'+(!!ui.quranRefreshing)+'"'+(ui.quranRefreshing?' disabled':'')+'>'+icon('rotate-ccw',17)+'</button>';
   head+='<button class="close" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
   return '<div id="quran-overlay" class="quran-v2-overlay" role="dialog" aria-modal="true" aria-label="Raşit ile Kur’an Yolculuğu">'
     +'<div id="quran-screen" class="quran-v2-screen" tabindex="-1" onkeydown="App.onQuranKeydown(event)">'
@@ -10184,6 +10185,15 @@ function quranPaintDetail(){
 }
 // Durum değiştikten sonra en dar kapsamı boyar; DOM yoksa (headless/eski
 // tarayıcı) güvenle tam render'a düşer.
+function quranPaintRefreshButton(){
+  try{
+    var b=document.getElementById('quran-refresh-button'); if(!b) return false;
+    b.disabled=!!ui.quranRefreshing;
+    if(b.setAttribute) b.setAttribute('aria-busy',ui.quranRefreshing?'true':'false');
+    if(b.classList) b.classList.toggle('is-spinning',!!ui.quranRefreshing);
+    return true;
+  }catch(e){ return false; }
+}
 function quranRepaintAfterChange(id){
   if(!ui.quranJourneyOpen){ render(); return; }
   if(ui.quranJourneyView==='detail'&&ui.quranDetailId===id&&quranPaintDetail()) return;
@@ -10267,6 +10277,61 @@ App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(da
 App.quranJourneyWatch=function(){ toast('Anlatım oynatıcı henüz açılmadı; hazır olduğunda burada açılacak.'); };
 App.quranJourneyQuestion=function(){ toast('“Raşit’e sor” bağlantısı henüz açılmadı.'); };
 
+// ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
+// Girdi ZATEN QuranTransportV1 ile ayrıştırılmış/doğrulanmış yapılardır; bu
+// fonksiyon ham JSON/ağ hiç görmez. Her geçiş quranReduce() üzerinden gider,
+// bu yüzden idempotens/monotonluk garantisi otomatik miras alınır: aynı
+// teslim/yanıt tekrar tekrar uygulansa bile durum bozulmaz, geriye gitmez.
+// requestId eşleşmesi zaten sûre bazlı arama ile sağlanır; response.surahId
+// ayrıca çapraz doğrulanır (yanlış sûre eşleme tehdidi — plan §2/§9).
+function quranApplyRemoteUpdates(delivery,responses){
+  var q=ensureQuranJourney(data), changed=false, at=new Date().toISOString();
+  var dl=(delivery&&delivery.requests)||{}, rs=(responses&&responses.responses)||{};
+  Object.keys(q.requests).forEach(function(sid){
+    var req=q.requests[sid];
+    if(!req||!req.requestId) return;
+    function apply(ev){ var r=quranReduce(req,ev); if(r.changed){ req=r.request; q.requests[sid]=req; changed=true; } }
+    var receipt=dl[req.requestId];
+    if(receipt&&receipt.status==='sent'){ apply({type:'delivery_receipt',at:at}); apply({type:'await_reply',at:at}); }
+    var resp=rs[req.requestId];
+    if(resp&&resp.surahId===sid){
+      apply({type:'response_received',at:at});
+      if(resp.status==='ready'){
+        apply({type:'response_valid',responseId:resp.responseId,videoId:resp.videoId,at:at});
+      } else if(resp.status==='revoked'){
+        // Zaten ready/watching'e geçmişse videoyu geçmişe düşür (video_gone);
+        // hâlâ doğrulama aşamasındaysa geçersiz say. quranReduce'un kendi
+        // `from` listesi hangisinin uygulanabilir olduğuna karar verir —
+        // uygulanamayan çağrı güvenle no-op'tur.
+        apply({type:'video_gone',at:at});
+        apply({type:'response_invalid',at:at});
+      }
+    }
+  });
+  return changed;
+}
+var QURAN_REFRESH_TIMEOUT_MS=20000;
+App.refreshQuranUpdates=function(silent){
+  if(ui.quranRefreshing) return;
+  var s=(typeof window!=='undefined')?window.SeySync:null;
+  if(!s||typeof s.pullQuranUpdates!=='function'){ if(!silent) toast('Senkron yapılandırılmamış; güncelleme kontrol edilemedi.'); return; }
+  ui.quranRefreshing=true;
+  quranPaintRefreshButton();
+  var settled=false;
+  function settle(fn){ if(settled) return; settled=true; ui.quranRefreshing=false; quranPaintRefreshButton(); fn(); }
+  try{ setTimeout(function(){ settle(function(){ if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); }); },QURAN_REFRESH_TIMEOUT_MS); }catch(e){}
+  try{
+    s.pullQuranUpdates(function(err,result){
+      settle(function(){
+        if(err||!result){ if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); return; }
+        var changed=quranApplyRemoteUpdates(result.delivery,result.responses);
+        if(changed){ save(); quranRepaintAfterChange(ui.quranJourneyView==='detail'?ui.quranDetailId:''); if(!silent) toast('Kur’an Yolculuğu güncellendi.'); }
+        else if(!silent) toast('Yeni bir güncelleme yok.');
+      });
+    });
+  }catch(e){ settle(function(){}); }
+};
+
 // ── Overlay ve kütüphane etkileşimleri ──
 App.openQuranJourney=function(){
   ui.quranJourneyOpen=true;
@@ -10276,6 +10341,11 @@ App.openQuranJourney=function(){
   render();
   quranLockBodyScroll();
   try{ var shell=document.getElementById('quran-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){}
+  // QY-11: "uygulama açılışında kontrol" — ekran her açıldığında SESSİZCE
+  // (toast'sız) bir kez teslim/yanıt kontrolü yapılır; arka planda tekrarlayan
+  // bir polling YOKTUR, yalnız bu açılış anı ve App.refreshQuranUpdates()'in
+  // kullanıcı eylemi.
+  App.refreshQuranUpdates(true);
 };
 App.closeQuranJourney=function(){
   ui.quranJourneyOpen=false;
@@ -11365,6 +11435,8 @@ App.quranDetailAction=quranDetailAction;
 App.quranStatusNote=quranStatusNote;
 App.quranRowState=quranRowState;
 App.quranNewRequestId=quranNewRequestId;
+// QY-11 kabul kapısı için: uzak teslim/yanıt uygulayıcısı (harness okur).
+App.quranApplyRemoteUpdates=quranApplyRemoteUpdates;
 // Kalıcı OLMAYAN görünüm durumunun salt-okunur anlık kopyası. `ui` tek yazar
 // olarak app.js içinde kalır; harness yalnız okur, asla yazmaz.
 App.quranUiState=function(){

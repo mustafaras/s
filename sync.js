@@ -618,6 +618,42 @@ function pushQuranRequest(payload, cb){
     .catch(function(e){ cb(e); throw e; });
 }
 
+// ── QY-11: Kur’an Yolculuğu teslim/yanıt dosyalarını salt-okunur çek ────────
+// Yalnız GET; hiçbir dosyaya yazmaz. Guard 1/2 burada uygulanmaz — okumak
+// (yazmanın aksine) veri kaybı riski taşımaz, localhost'ta bile güvenlidir.
+// Cache-busting `&t=Date.now()` aynı desen (bkz. putLatestGuarded). Bozuk/eksik
+// dosya asla throw etmez: QuranTransportV1.parse* zaten tolerant; dosya hiç
+// yoksa (404/boş) hata değil, "henüz yok" sayılıp boş sözleşme döndürülür.
+function ghGetTransportFile(c, path){
+  var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path;
+  var H=ghHeaders(c);
+  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
+    .then(function(r){ if(r.status===200) return r.json(); return null; })
+    .then(function(g){ return (g&&typeof g.content==='string')?b64decodeUtf8(g.content):null; });
+}
+// cb(err, {delivery, responses, deliveryErrors, responseErrors}). Senkron
+// yapılandırılmamışsa veya QuranTransportV1 yüklü değilse sessizce boş
+// sözleşmeyle döner (err yok) — bu bir hata değil, "kontrol edilecek bir şey
+// yok" durumudur. Arka planda çağrılmaz; yalnız app.js QY-11 açık istekle
+// (ekran açılışı/kullanıcı yenilemesi) tetikler — burada polling YOKTUR.
+function pullQuranUpdates(cb){
+  cb = typeof cb==='function' ? cb : function(){};
+  var T = window.QuranTransportV1;
+  if(!T){ cb(null,{delivery:null,responses:null}); return Promise.resolve(); }
+  var c=cfg();
+  if(!c){ cb(null,{delivery:T.emptyDelivery(),responses:T.emptyResponses()}); return Promise.resolve(); }
+  return Promise.all([
+    ghGetTransportFile(c,T.PATHS.delivery),
+    ghGetTransportFile(c,T.PATHS.responses)
+  ]).then(function(raw){
+    var d = raw[0]===null ? {value:T.emptyDelivery(),errors:[]} : T.parseDelivery(raw[0]);
+    var r = raw[1]===null ? {value:T.emptyResponses(),errors:[]} : T.parseResponses(raw[1]);
+    cb(null,{delivery:d.value,responses:r.value,deliveryErrors:d.errors,responseErrors:r.errors});
+  }).catch(function(e){
+    cb(e,{delivery:T.emptyDelivery(),responses:T.emptyResponses()});
+  });
+}
+
 // ÆON soru tetiği: yalnızca Şeyma ÆON'a soru gönderince yazılır. Küçük ve ayrı bir
 // dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir
 // (hareket/mod gibi sık latest.json push'larında boşuna çalışıp Actions dakikası yakmaz).
@@ -646,6 +682,9 @@ window.SeySync={
   // QY-08 — Kur’an Yolculuğu istek outbox yazıcısı. latest.json zincirinden
   // bağımsız; ayrıntı için yukarıdaki "QY-08" bloğunun yorumlarına bakın.
   pushQuranRequest:pushQuranRequest,
+  // QY-11 — Kur’an Yolculuğu teslim/yanıt salt-okunur çekici. Ayrıntı için
+  // yukarıdaki "QY-11" bloğunun yorumlarına bakın.
+  pullQuranUpdates:pullQuranUpdates,
   statusText:statusText,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,

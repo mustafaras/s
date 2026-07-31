@@ -318,6 +318,72 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-31 — Kur’an Yolculuğu QY-11: teslim/yanıt salt-okunur çekici (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`.
+
+**Bağlam:** QY-00→QY-10 tamamlanmıştı (commit `5b53a90`); QY-10'un Gmail Apps
+Script köprüsü deploy edilemedi (Apps Script API erişimi yok — kullanıcının
+elle script.google.com'a yapıştırması gerekiyor) ama STAGED. Planın kendi
+"Kalan" notu QY-11'i işaret ediyordu: "uygulamanın `quran-delivery.json`/
+`quran-responses.json`'u güvenli okuyup yerel duruma uygulaması."
+
+**Değişen dosyalar:** `sync.js`, `app.js`, `styles.css`,
+`test_quran_pull_sync.js` (yeni),
+`.claude/skills/run-seyma/verify-quran-remote-updates.mjs` (yeni).
+
+- `sync.js`: `SeySync.pullQuranUpdates(cb)` — `data/quran-delivery.json` ve
+  `data/quran-responses.json`'u salt-okunur, cache-busted (`&t=Date.now()`)
+  GET ile çeker, `QuranTransportV1.parseDelivery`/`parseResponses` ile
+  ayrıştırır. Guard 1 (dev-origin) BİLEREK uygulanmaz — okumak (yazmanın
+  aksine) veri kaybı riski taşımaz, localhost'ta bile çalışır. Dosya yoksa
+  (404) hata değil, boş sözleşme.
+- `app.js`: `quranApplyRemoteUpdates(delivery,responses)` — yerel
+  `data.quranJourney.requests`'teki her açık istek için, eşleşen
+  `requestId`'yi bulup `quranReduce()` üzerinden `delivery_receipt`+
+  `await_reply` (teslim alındıysa) ve `response_received`+`response_valid`
+  veya `video_gone`/`response_invalid` (revoked ise) olaylarını sırayla
+  dener; `quranReduce`'un kendi `from` listesi uygulanamayan olayları güvenle
+  no-op yapar. `response.surahId===sid` çapraz kontrolü yanlış sûre eşleme
+  tehdidine karşı (plan §2/§9). `App.refreshQuranUpdates(silent)` bunu
+  `SeySync.pullQuranUpdates`'e bağlar, `save()`+hedefli repaint yapar, eşzamanlı
+  çağrıyı engeller (`ui.quranRefreshing`), 20sn watchdog taşır. Kur’an
+  ekranı `App.openQuranJourney()` her açıldığında SESSİZCE bir kez tetiklenir
+  (plan: "açılışta kontrol"); ayrıca header'da yeni bir 🔄 "Yenile" düğmesi
+  (`#quran-refresh-button`) kullanıcı eylemiyle tetikler (plan: "kullanıcı
+  yenilemesinde kontrol"). Arka planda tekrarlayan `setInterval` YOKTUR.
+- `styles.css`: `.quran-v2-header .refresh` (mevcut `.close` ile aynı 44×44
+  desen) + `prefers-reduced-motion` korumalı dönme animasyonu.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; `test_quran_pull_sync.js`
+11/11 ✅ (yeni — cache-busting, bozuk/eksik dosya, salt-okunur/PUT yok,
+Guard 1 okumayı engellemiyor); `verify-quran-remote-updates.mjs` 14/14 ✅
+(yeni — teslim→awaiting_reply, yanıt→ready, idempotent tekrar, yanlış sûre
+reddi, revoked→video_gone [videoId teşhis için korunur, arşivlenmez],
+eşleşmeyen requestId no-op, SeySync yokken güvenli, statik setInterval
+denetimi); regresyon: `test_quran_transport.js` 207/207, `test_quran_
+outbox_sync.js` 55/55, `test_quran_catalog.js` 70/70, `verify-quran-
+migration-v1.mjs` 57/57, `verify-quran-state-machine.mjs` 179/179,
+`verify-quran-library-ui.mjs` 127/127, `driver.mjs` ✅, `zikr-harness.mjs`
+84/84, `test_faz10_sync.js` 64/64, `test_faz11_panel.js` 44/44 — hepsi ✅.
+`git diff --check` ✅. Gerçek Gmail/YouTube/GitHub çağrısı yapılmadı.
+
+**Kalan/bilinen sınırlar:** `verifyResponseAgainstOutbox` (QY-04'te tanımlı,
+replyToken çapraz doğrulaması) burada KULLANILMADI — replyToken cihazda hiç
+tutulmaz (bilinçli tasarım, bkz. QY-08 notu), asıl doğrulama zaten QY-10'un
+Apps Script'inde sunucu tarafında yapılıyor; buradaki savunma katmanı yalnız
+"bu cihazın kendi requestId'si + surahId eşleşmesi"dir — yeterli ama tek
+katman. QY-12/13 (güvenli video kartı, gerçek izlenme doğrulaması) henüz
+yok; `ready` durumu artık doğru şekilde ulaşılabiliyor ama "İzlemeye başla"
+hâlâ QY-12'ye kadar placeholder toast.
+
+**Sıradaki:** QY-12 (güvenli YouTube video kartı, click-to-load,
+youtube-nocookie.com) → QY-13 (IFrame API ENDED izleme doğrulaması) → QY-14
+(WhatsApp "Raşit'e sor"). `main`e merge/deploy YOK; commit dahi edilmedi —
+kullanıcı onayı bekleniyor.
+
+---
+
 ### 2026-07-31 — Kur’an Yolculuğu QY-10 Gmail cevap köprüsü (STAGED — hiçbir yere deploy YOK)
 
 **Branch:** `feature/kuran-yolculugu-qy05` (çalışma ağacında; commit edilmedi).

@@ -10125,6 +10125,62 @@ function quranDetailViewHTML(id){
 // sıfırlanır, böylece "click-to-load" yalnız ilk açılışa özgü bir istisna
 // olmaz, her ziyarette geçerli kalır.
 function quranVideoThumbUrl(videoId){ return 'https://i.ytimg.com/vi/'+encodeURIComponent(videoId)+'/hqdefault.jpg'; }
+// ── QY-13: YouTube IFrame Player API — gerçek "izlendi" algısı ──
+// Yalnız iframe'in AÇILMASI izlenme sayılmaz (plan QY-13 madde 3); gerçek
+// tamamlama ya API'nin ENDED olayıyla ya da kullanıcının görünür "İzledim"
+// yedeğiyle kaydedilir. Script yalnız bir video GERÇEKTEN yüklendiğinde
+// tembel enjekte edilir — uygulama açılışında asla, sessizce.
+function quranEmbedOrigin(){
+  try{
+    if(typeof location!=='undefined'){
+      if(location.origin) return location.origin;
+      if(location.protocol&&location.hostname) return location.protocol+'//'+location.hostname+(location.port?(':'+location.port):'');
+    }
+  }catch(e){}
+  return '';
+}
+var _quranYtApiState='idle'; // idle | loading | ready
+var _quranYtPendingSurahId='';
+function quranLoadYtApi(){
+  if(_quranYtApiState!=='idle') return;
+  _quranYtApiState='loading';
+  try{
+    if(typeof document==='undefined'||!document.createElement) return;
+    var prev=(typeof window!=='undefined')?window.onYouTubeIframeAPIReady:null;
+    window.onYouTubeIframeAPIReady=function(){
+      _quranYtApiState='ready';
+      try{ if(typeof prev==='function') prev(); }catch(e){}
+      if(_quranYtPendingSurahId) quranBindPlayer(_quranYtPendingSurahId);
+    };
+    var s=document.createElement('script');
+    s.src='https://www.youtube.com/iframe_api';
+    s.async=true;
+    (document.head||document.body||document.documentElement).appendChild(s);
+  }catch(e){ _quranYtApiState='idle'; }
+}
+// API engellenir/yüklenemezse (adblock, ağ hatası) sessizce hiç bağlanamaz —
+// bu bilinçlidir: görünür "İzledim" yedeği tam olarak bu durumu karşılar.
+function quranAttachPlayer(surahId){
+  _quranYtPendingSurahId=surahId;
+  if(_quranYtApiState==='ready'){ quranBindPlayer(surahId); return; }
+  quranLoadYtApi();
+}
+function quranBindPlayer(surahId){
+  try{
+    if(typeof window==='undefined'||typeof window.YT==='undefined'||!window.YT||typeof window.YT.Player!=='function') return;
+    var el=document.getElementById('quran-yt-player'); if(!el) return;
+    new window.YT.Player('quran-yt-player',{events:{onStateChange:function(e){ quranOnPlayerStateChange(surahId,e); }}});
+  }catch(e){}
+}
+function quranOnPlayerStateChange(surahId,e){
+  try{
+    if(!e||e.data!==0) return; // YT.PlayerState.ENDED === 0
+    // Kullanıcı bu arada başka bir ekrana/sûreye geçmiş olabilir; artık
+    // görünür olmayan bir oynatıcının gecikmeli ENDED'ı durumu değiştirmesin.
+    if(ui.quranPlayerLoadedId!==surahId) return;
+    App.quranMarkWatched(surahId);
+  }catch(err){}
+}
 function quranVideoCardHTML(x,req){
   var vid=req.videoId;
   if(!QURAN_VIDEO_ID_RE.test(String(vid||''))) return '';
@@ -10138,8 +10194,9 @@ function quranVideoCardHTML(x,req){
     // youtube-nocookie.com ÇAPRAZ KÖKENLİ (bizim sayfamızla aynı origin
     // DEĞİL) olduğu için allow-scripts+allow-same-origin birlikte
     // kullanılabilir — izolasyon zaafı yalnız aynı-köken/saldırgan kontrollü
-    // içerikte oluşur, resmi YouTube oynatıcısında değil.
-    h+='<iframe src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1" '
+    // içerikte oluşur, resmi YouTube oynatıcısında değil. `enablejsapi=1`
+    // + `origin` QY-13'ün ENDED algısı için gerekli (quranAttachPlayer).
+    h+='<iframe id="quran-yt-player" src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1&enablejsapi=1&origin='+esc(quranEmbedOrigin())+'" '
       +'title="'+esc(x.nameTr)+' Sûresi anlatımı" loading="lazy" '
       +'allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen '
       +'referrerpolicy="no-referrer" '
@@ -10152,6 +10209,13 @@ function quranVideoCardHTML(x,req){
     h+='</button>';
   }
   h+='</div>';
+  // QY-13 madde 2: API engellenirse/yüklenemezse görünür erişilebilir yedek.
+  // Yalnız `watching`te gösterilir — zaten izlenmiş bir anlatımda tekrar
+  // "İzledim" istemek kafa karıştırıcı olur (repaint bu durumu otomatik
+  // düşürür, ayrı bir gizleme mantığı gerekmez).
+  if(loaded&&req.status==='watching'){
+    h+='<button class="quran-v2-watched-fallback" onclick="App.quranMarkWatched(\''+esc(x.id)+'\')">'+icon('circle-check',15)+'<span>İzledim</span></button>';
+  }
   if(req.readyAt) h+='<p class="quran-v2-video-meta">Hazır: '+esc(fmtDateNice(req.readyAt))+'</p>';
   h+='</section>';
   return h;
@@ -10351,6 +10415,22 @@ App.quranJourneyWatch=function(id){
   var res=quranReduce(req,{type:'watch_start',at:new Date().toISOString()});
   if(res.changed){ q.requests[sid]=res.request; save(); }
   if(!quranPaintDetail()) render();
+  // QY-13: iframe artık DOM'da — gerçek ENDED algısı için oynatıcıyı bağla.
+  quranAttachPlayer(sid);
+};
+// QY-13: ENDED olayı VEYA bu görünür yedek — ikisi de aynı tek yola çıkar.
+// quranReduce'un kendi idempotens/monotonluk kuralları sayesinde tekrar
+// tekrar çağrılsa (API + yedek ikisi de tetiklense) bile watchedAt yalnız
+// ilk kez yazılır ve asla geriye gitmez.
+App.quranMarkWatched=function(id){
+  var sid=quranSafeSurahId(id); if(!sid) return;
+  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
+  var res=quranReduce(req,{type:'watch_complete',at:new Date().toISOString()});
+  if(!res.changed) return;
+  q.requests[sid]=res.request; save();
+  if(!quranPaintDetail()) render();
+  var x=quranSurah(sid);
+  toast('Mâşallah · '+(x?x.nameTr:'anlatım')+' izlendi olarak işaretlendi.');
 };
 App.quranJourneyQuestion=function(){ toast('“Raşit’e sor” bağlantısı henüz açılmadı.'); };
 

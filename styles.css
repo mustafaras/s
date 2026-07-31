@@ -784,6 +784,8 @@
 .quran-v2-video-frame .cover .play{position:relative;z-index:1;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:rgba(15,15,20,0.55);color:#fff}
 .quran-v2-video-frame .cover .cta-label{position:absolute;left:12px;bottom:10px;z-index:1;color:#fff;font-size:13px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .quran-v2-video-frame .cover:focus-visible{outline:3px solid var(--qj-focus);outline-offset:-3px}
+.quran-v2-watched-fallback{appearance:none;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:9px 16px;border-radius:999px;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--quran-ink);font-size:13px;font-weight:800;cursor:pointer}
+.quran-v2-watched-fallback:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
 .quran-v2-video-meta{margin:0;font-size:11px;color:var(--qj-muted)}
 .quran-v2-video.is-unavailable{padding:14px;border:1px solid var(--qj-line);border-radius:14px;background:var(--qj-panel)}
 .quran-v2-video.is-unavailable p{margin:0;font-size:13px;line-height:1.55;color:var(--quran-ink)}

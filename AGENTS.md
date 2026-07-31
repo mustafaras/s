@@ -318,6 +318,78 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-31 — Kur’an Yolculuğu QY-13: gerçek izlenme doğrulaması (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı bu oturumda ayrıca port
+9000'de zaten çalışan bir sunucu olduğunu gördü ve "sunucu başlat" istedi;
+CLAUDE.md'nin "gerçek tarayıcıda aç/serve+open" yasağı gerekçesiyle (2026-07-10
+veri kaybı olayı) ajan tarafında ne yeni bir sunucu başlatıldı ne de tarayıcı
+açıldı — kullanıcıya durum açıklanıp "apply" ifadesinin ne anlama geldiği
+soruldu, kullanıcı QY-13'e devam onayı verdi.
+
+**Bağlam:** QY-12 video kartı `App.quranJourneyWatch` ile oynatıcıyı açıyordu
+(`ready→watching`) ama gerçek tamamlanma (ENDED) hiçbir yerden algılanmıyordu
+— sûre asla otomatik `watched`'a geçmiyordu. Bu oturum planın QY-13 maddesini
+uyguladı.
+
+**Değişen dosyalar:** `app.js`, `styles.css`,
+`.claude/skills/run-seyma/verify-quran-library-ui.mjs`.
+
+- YouTube IFrame Player API tembel entegrasyonu: `quranLoadYtApi()` yalnız
+  bir video GERÇEKTEN açıldığında (`App.quranJourneyWatch` içinden
+  `quranAttachPlayer`) `https://www.youtube.com/iframe_api` betiğini bir kez
+  enjekte eder; uygulama AÇILIŞINDA asla tetiklenmez (statik denetimle
+  kanıtlı). `window.onYouTubeIframeAPIReady` zaten varsa zincirlenir (başka
+  bir entegrasyonu ezmez). `quranBindPlayer` mevcut `#quran-yt-player`
+  iframe'ine `new YT.Player(...)` bağlar; `onStateChange`'te yalnız
+  `ENDED` (`e.data===0`) `App.quranMarkWatched()`'ı tetikler — ve yalnız
+  hâlâ o sûrenin ekranda GÖRÜNÜR olduğu doğrulanırsa (`ui.quranPlayerLoadedId`
+  eşleşmesi), gecikmeli/orphan bir olay durumu bozmasın diye.
+- API engellenir/yüklenemezse (adblock, ağ hatası, CSP) sessizce hiçbir şey
+  olmaz — bilerek: görünür `"İzledim"` yedek düğmesi (`App.quranMarkWatched`)
+  tam bu senaryo için var, yalnız `watching` durumunda gösterilir (zaten
+  izlenmiş bir anlatımda ikinci kez "İzledim" istemek kafa karıştırır).
+- `App.quranMarkWatched` → `quranReduce({type:'watch_complete'})`: hem
+  ENDED hem de görünür yedek AYNI tek yola çıkar; reducer'ın kendi
+  idempotens/monotonluk kuralı sayesinde ikisi de tetiklense (ya da yedeğe
+  birden fazla kez tıklansa) `watchedAt` yalnız İLK seferde yazılır, asla
+  geriye gitmez.
+- Embed URL'sine `enablejsapi=1` + hesaplanan `origin=` eklendi (ENDED
+  postMessage doğrulaması için); iframe'e kararlı `id="quran-yt-player"`
+  verildi.
+- `styles.css`: `.quran-v2-watched-fallback` — 44px min-height dokunma
+  hedefi, mevcut `--qj-*` token'ları.
+
+**Doğrulama:** `node --check app.js` ✅; `verify-quran-library-ui.mjs`
+155/155 ✅ (11 yeni QY-13 assertion: enablejsapi+origin, kararlı player id,
+İzledim yedeği yalnız watching'te görünür, oynatıcıyı açmak tek başına
+izlendi SAYMAZ, yedek watched'a geçirir, tekrar tetiklense de watchedAt
+DEĞİŞMEZ monotonik, uygunsuz durumda no-op, betik açılışta değil yalnız
+izlemede tetiklenir); regresyon: `test_quran_transport.js` 207/207,
+`test_quran_outbox_sync.js` 55/55, `test_quran_pull_sync.js` 11/11,
+`test_quran_catalog.js` 70/70, `verify-quran-migration-v1.mjs` 57/57,
+`verify-quran-state-machine.mjs` 179/179, `verify-quran-remote-updates.mjs`
+14/14, `driver.mjs` ✅, `zikr-harness.mjs` 84/84, `test_faz10_sync.js` 64/64,
+`test_faz11_panel.js` 44/44 — hepsi ✅. `git diff --check` ✅; `styles.css`
+brace dengesi 1254/1254. Gerçek tarayıcı açılmadı, gerçek YouTube isteği
+yapılmadı.
+
+**Kalan/bilinen sınırlar:** Gerçek `ENDED` postMessage akışı yalnız GERÇEK
+bir tarayıcıda uçtan uca doğrulanabilir (headless `node:vm`'de `window.YT`
+yok — proje kuralı gereği bu ajan tarafından tarayıcıda denenmedi); üretim
+kodu savunmacı yazıldı (`YT`/`document` yoksa sessizce hiçbir şey yapmaz) ve
+görünür "İzledim" yedeği zaten bağımsız, tam kapsayıcı bir yoldur. Eski
+`YT.Player` örnekleri ekrandan ayrılınca/yeniden izlenince `destroy()`
+edilmiyor (DOM düğümüyle birlikte kopuk kalıyor) — tek kullanıcılı, kısa
+oturumlu bu uygulama için önemsiz bir bellek borcu, bilinçli olarak kapsam
+dışı bırakıldı.
+
+**Sıradaki:** QY-14 (WhatsApp "Raşit'e sor" — `watched` durumunda görünür
+hâle getirme, `wa.me` deep-link, hazır mesaj şablonu). `main`e merge/deploy
+YOK, commit dahi edilmedi — kullanıcı onayı bekleniyor.
+
+---
+
 ### 2026-07-31 — Kur’an Yolculuğu QY-12: güvenli YouTube video kartı (commit edilmedi)
 
 **Branch:** `feature/kuran-yolculugu-qy05`. Not: bir altındaki QY-11 girişi

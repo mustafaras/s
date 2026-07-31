@@ -400,6 +400,40 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   App.backToQuranLibrary(); App.openQuranSurah('fatiha');
   ok('ekrana her yeniden girişte kapak katmanına dönülür (kalıcı auto-load yok)', !detailHTML().includes('<iframe'));
 
+  // ── QY-13: gerçek izlenme doğrulaması (ENDED algısı + erişilebilir yedek) ──
+  App.quranJourneyWatch('fatiha');
+  vd = detailHTML();
+  ok('ENDED algısı için enablejsapi=1 + origin embed URL’sinde', /[?&]enablejsapi=1(&|")/.test(vd) && /[?&]origin=/.test(vd));
+  ok('oynatıcı kararlı id taşır (quranAttachPlayer bunu hedefler)', vd.includes('id="quran-yt-player"'));
+  ok('yalnız izlerken görünür "İzledim" yedeği var', /class="quran-v2-watched-fallback"[^>]*onclick="App\.quranMarkWatched\('fatiha'\)"/.test(vd));
+  ok('yalnız oynatıcı açmak "izlendi" saymaz — durum hâlâ watching', journey().requests.fatiha.status === 'watching');
+
+  App.quranMarkWatched('fatiha'); // API engellenmiş senaryoda kullanıcının kendi işaretlemesi
+  let jAfter = journey();
+  ok('"İzledim" yedeği watched’a geçirir', jAfter.requests.fatiha.status === 'watched', jAfter.requests.fatiha.status);
+  const watchedAt1 = jAfter.requests.fatiha.watchedAt;
+  ok('watchedAt yazıldı', !!watchedAt1);
+  vd = detailHTML();
+  ok('watched olunca "İzledim" yedeği kayboluyor (kafa karıştırmaz)', !vd.includes('quran-v2-watched-fallback'));
+  ok('watched olunca video kartı hâlâ var (yeniden izlenebilir)', vd.includes('quran-v2-video-frame'));
+
+  App.quranMarkWatched('fatiha'); // tekrar tetiklense de (ENDED + yedek ikisi de) idempotent
+  const watchedAt2 = journey().requests.fatiha.watchedAt;
+  ok('tekrar çağrı watchedAt’ı DEĞİŞTİRMEZ (monotonik, ikinci "kayıt" yok)', watchedAt2 === watchedAt1, [watchedAt1, watchedAt2]);
+
+  ok('App.quranMarkWatched uygunsuz durumda (hiç istenmemiş/idle) sessizce no-op', (function () {
+    const before = JSON.stringify(journey().requests.tekvir);
+    App.quranMarkWatched('tekvir');
+    return JSON.stringify(journey().requests.tekvir) === before;
+  })());
+
+  ok('YouTube API betiği uygulama AÇILIŞINDA değil, yalnız izleme başladığında tetiklenir (statik denetim)', (function () {
+    const src = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
+    const bootIdx = src.indexOf('// boot');
+    const bootSlice = bootIdx >= 0 ? src.slice(bootIdx, bootIdx + 300) : '';
+    return !/quranLoadYtApi|quranAttachPlayer/.test(bootSlice) && /quranAttachPlayer\(sid\);/.test(src);
+  })());
+
   App.openQuranSurah('kadir'); // status: video_unavailable
   vd = detailHTML();
   ok('erişilemeyen videoda kapak/iframe YOK, yalnız açıklama', !vd.includes('quran-v2-video-frame') && vd.includes('Bu anlatım artık erişilebilir değil'));

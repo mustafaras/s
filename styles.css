@@ -773,6 +773,20 @@
 .quran-v2-cta.is-disabled,.quran-v2-cta:disabled{background:var(--qj-panel2);color:var(--qj-muted);border-color:var(--qj-line);cursor:default;transform:none}
 .quran-v2-hint{margin:0;font-size:11px;line-height:1.5;text-align:center;color:var(--qj-faint)}
 .quran-v2-history{padding:12px;border:1px solid var(--qj-line);border-radius:14px;background:var(--qj-panel)}
+.quran-v2-video{display:flex;flex-direction:column;gap:8px}
+.quran-v2-video-badge{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--quran2) 16%,transparent);color:var(--quran-gold);font-size:11px;font-weight:900}
+.quran-v2-video-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--qj-panel2);border:1px solid var(--qj-line)}
+.quran-v2-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.quran-v2-video-frame .cover{appearance:none;position:absolute;inset:0;width:100%;height:100%;padding:0;margin:0;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--qj-panel2)}
+.quran-v2-video-frame .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.quran-v2-video-frame .cover.no-thumb img{display:none}
+.quran-v2-video-frame .cover::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.45) 100%);pointer-events:none}
+.quran-v2-video-frame .cover .play{position:relative;z-index:1;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:rgba(15,15,20,0.55);color:#fff}
+.quran-v2-video-frame .cover .cta-label{position:absolute;left:12px;bottom:10px;z-index:1;color:#fff;font-size:13px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.quran-v2-video-frame .cover:focus-visible{outline:3px solid var(--qj-focus);outline-offset:-3px}
+.quran-v2-video-meta{margin:0;font-size:11px;color:var(--qj-muted)}
+.quran-v2-video.is-unavailable{padding:14px;border:1px solid var(--qj-line);border-radius:14px;background:var(--qj-panel)}
+.quran-v2-video.is-unavailable p{margin:0;font-size:13px;line-height:1.55;color:var(--quran-ink)}
 .quran-v2-history h3{margin:0 0 8px;font-size:9.5px;font-weight:950;letter-spacing:.12em;color:var(--quran-gold)}
 .quran-v2-history ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .quran-v2-history li{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;font-size:11.5px}

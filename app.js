@@ -1630,6 +1630,11 @@ function sha256(str){
 var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:''};
 ui.zikrNoteOpen=true; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus='';
 ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; ui.qiblaLastAt='';
+ui.quranRefreshing=false;
+// QY-12: hangi sûrenin video oynatıcısı YÜKLÜ (iframe basılmış). Kalıcı
+// DEĞİLDİR — her ekran girişinde kapak/izin katmanına döner (click-to-load
+// mahremiyet ilkesi yalnız ilk açılışa özgü değildir, her ziyarete uygulanır).
+ui.quranPlayerLoadedId='';
 var toastTimer=null, noteTimer=null, pulseTimer=null;
 var lastRenderTab=null;
 var lastCrisisKind=null;   // Kriz modalı zaten aciksa etkilesim render'inda giris animasyonu tekrar oynamasin
@@ -10111,6 +10116,52 @@ function quranDetailViewHTML(id){
   if(!x) return '<section class="quran-v2-detail"><div class="quran-v2-empty"><strong>Sûre bulunamadı.</strong><span>Kütüphaneden yeniden seçebilirsin.</span><button onclick="App.backToQuranLibrary()">Kütüphaneye dön</button></div></section>';
   return '<section class="quran-v2-detail"><div id="quran-detail-region">'+quranDetailBodyHTML(x)+'</div></section>';
 }
+// ── QY-12: güvenli, mahremiyet geliştirilmiş YouTube video kartı ──
+// İlk render'da HİÇBİR iframe basılmaz — yalnız güvenli bir kapak/izin
+// katmanı (thumbnail + "İzlemeye başla"). iframe yalnız kullanıcı AÇIKÇA
+// dokununca `youtube-nocookie.com` ile enjekte edilir (App.quranJourneyWatch).
+// `ui.quranPlayerLoadedId` kalıcı değildir — ekrana her yeniden girişte
+// (openQuranSurah/backToQuranLibrary/openQuranJourney/closeQuranJourney)
+// sıfırlanır, böylece "click-to-load" yalnız ilk açılışa özgü bir istisna
+// olmaz, her ziyarette geçerli kalır.
+function quranVideoThumbUrl(videoId){ return 'https://i.ytimg.com/vi/'+encodeURIComponent(videoId)+'/hqdefault.jpg'; }
+function quranVideoCardHTML(x,req){
+  var vid=req.videoId;
+  if(!QURAN_VIDEO_ID_RE.test(String(vid||''))) return '';
+  var loaded=(ui.quranPlayerLoadedId===x.id);
+  var h='<section class="quran-v2-video" aria-label="'+esc(x.nameTr)+' Sûresi anlatımı">';
+  h+='<div class="quran-v2-video-badge">'+icon('circle-check',13)+'<span>Raşit’in anlatımı hazır</span></div>';
+  h+='<div id="quran-video-frame" class="quran-v2-video-frame">';
+  if(loaded){
+    // Dar allow listesi: "autoplay" BİLEREK yok — otomatik oynatma URL
+    // parametresiyle istense bile Permissions-Policy bunu engeller. Sandbox,
+    // youtube-nocookie.com ÇAPRAZ KÖKENLİ (bizim sayfamızla aynı origin
+    // DEĞİL) olduğu için allow-scripts+allow-same-origin birlikte
+    // kullanılabilir — izolasyon zaafı yalnız aynı-köken/saldırgan kontrollü
+    // içerikte oluşur, resmi YouTube oynatıcısında değil.
+    h+='<iframe src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1" '
+      +'title="'+esc(x.nameTr)+' Sûresi anlatımı" loading="lazy" '
+      +'allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen '
+      +'referrerpolicy="no-referrer" '
+      +'sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"></iframe>';
+  } else {
+    h+='<button class="cover" onclick="App.quranJourneyWatch(\''+esc(x.id)+'\')" aria-label="'+esc(x.nameTr)+' Sûresi anlatımını oynat">';
+    h+='<img src="'+quranVideoThumbUrl(vid)+'" alt="" loading="lazy" onerror="this.hidden=true;this.parentNode.classList.add(\'no-thumb\')">';
+    h+='<span class="play" aria-hidden="true">'+icon('play',22)+'</span>';
+    h+='<span class="cta-label">İzlemeye başla</span>';
+    h+='</button>';
+  }
+  h+='</div>';
+  if(req.readyAt) h+='<p class="quran-v2-video-meta">Hazır: '+esc(fmtDateNice(req.readyAt))+'</p>';
+  h+='</section>';
+  return h;
+}
+// video_gone: videoId TEŞHİS için korunur ama burada ASLA kapak/iframe
+// üretilmez — "kırık alan yerine açıklama" (plan §10).
+function quranVideoUnavailableHTML(){
+  return '<section class="quran-v2-video is-unavailable" role="status">'
+    +'<p><strong>Bu anlatım artık erişilebilir değil.</strong><br>Raşit’ten yeni bir bağlantı istenebilir.</p></section>';
+}
 function quranDetailBodyHTML(x){
   var q=ensureQuranJourney(data), req=quranRequestOf(q,x.id), st=req.status||'idle';
   var state=quranRowState(st), total=quranTotal(), disputed=quranPlaceDisputed(x.id);
@@ -10129,11 +10180,22 @@ function quranDetailBodyHTML(x){
   if(disputed) h+='<p class="quran-v2-foot">* Bu sûrenin Mekkî/Medenî nitelemesi klasik kaynaklarda ihtilaflıdır.</p>';
   h+='<div class="quran-v2-status is-'+state.tone+'" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i>';
   h+='<span><strong>'+esc(state.label)+'</strong><em>'+esc(quranStatusNote(st,x.nameTr))+'</em></span></div>';
-  // QY-07: DURUMA GÖRE TEK ana eylem. Pasif durumlarda buton gerçekten
-  // disabled'dır — tıklanabilir görünüp hiçbir şey yapmaz duruma düşmez.
-  h+='<button class="quran-v2-cta'+(act.disabled?' is-disabled':'')+'"'+(act.disabled?' disabled aria-disabled="true"':' onclick="'+act.action+'"')+'>';
-  h+=icon(act.icon||'send',16)+'<span>'+esc(act.label)+'</span></button>';
-  if(act.hint) h+='<p class="quran-v2-hint">'+esc(act.hint)+'</p>';
+  // QY-12: video kartı hazır/izleniyor/izlendi durumlarında CTA'nın YERİNİ
+  // alır — kartın kendi "İzlemeye başla" kapağı zaten birincil eylemdir,
+  // aynı işi yapan ikinci bir düğme göstermek karışıklık yaratır. video_gone
+  // (video_unavailable) durumunda kart yerine yalnız açıklama basılır, genel
+  // CTA ("Yeni bağlantı iste") olduğu gibi kalır.
+  var hasVideoCard=(st==='ready'||st==='watching'||st==='watched'||st==='question_opened')&&QURAN_VIDEO_ID_RE.test(String(req.videoId||''));
+  var ctaReplacedByCard=hasVideoCard&&(st==='ready'||st==='watching');
+  if(hasVideoCard) h+=quranVideoCardHTML(x,req);
+  else if(st==='video_unavailable') h+=quranVideoUnavailableHTML();
+  if(!ctaReplacedByCard){
+    // QY-07: DURUMA GÖRE TEK ana eylem. Pasif durumlarda buton gerçekten
+    // disabled'dır — tıklanabilir görünüp hiçbir şey yapmaz duruma düşmez.
+    h+='<button class="quran-v2-cta'+(act.disabled?' is-disabled':'')+'"'+(act.disabled?' disabled aria-disabled="true"':' onclick="'+act.action+'"')+'>';
+    h+=icon(act.icon||'send',16)+'<span>'+esc(act.label)+'</span></button>';
+    if(act.hint) h+='<p class="quran-v2-hint">'+esc(act.hint)+'</p>';
+  }
   if(req.videoHistory&&req.videoHistory.length){
     h+='<div class="quran-v2-history"><h3>Önceki anlatımlar</h3><ul>';
     req.videoHistory.slice().reverse().forEach(function(v){
@@ -10272,9 +10334,24 @@ function quranSettleSubmit(sid,okFlag){
   toast(okFlag?'İsteğin kaydedildi.':'İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.');
 }
 App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(data).activeSurahId); };
-// QY-12/QY-13 (güvenli video kartı, izlenme doğrulaması) ve QY-14 (WhatsApp)
-// henüz açılmadı. Uygulama bunu açıkça söyler; sahte bir akış göstermez.
-App.quranJourneyWatch=function(){ toast('Anlatım oynatıcı henüz açılmadı; hazır olduğunda burada açılacak.'); };
+// QY-13 (IFrame API ENDED izleme doğrulaması, "İzledim" yedeği) ve QY-14
+// (WhatsApp) henüz açılmadı. Uygulama bunu açıkça söyler; sahte bir akış
+// göstermez.
+// QY-12: kapak/izin katmanındaki "İzlemeye başla" dokunuşu — iframe'i enjekte
+// eder VE "izlemeye başladı" durumunu (ready→watching) kaydeder. Zaten
+// watching/watched/question_opened ise quranReduce idempotent biçimde no-op
+// yapar (aşağıdaki `if(res.changed)`); yalnız oynatıcı yeniden yüklenir
+// (rewatch). videoId doğrulanmamışsa (markup state'le uyuşmuyorsa — beklenmez
+// ama savunmacı) sessizce hiçbir şey yapmaz.
+App.quranJourneyWatch=function(id){
+  var sid=quranSafeSurahId(id); if(!sid) return;
+  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
+  if(!QURAN_VIDEO_ID_RE.test(String(req.videoId||''))) return;
+  ui.quranPlayerLoadedId=sid;
+  var res=quranReduce(req,{type:'watch_start',at:new Date().toISOString()});
+  if(res.changed){ q.requests[sid]=res.request; save(); }
+  if(!quranPaintDetail()) render();
+};
 App.quranJourneyQuestion=function(){ toast('“Raşit’e sor” bağlantısı henüz açılmadı.'); };
 
 // ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
@@ -10338,6 +10415,7 @@ App.openQuranJourney=function(){
   ui.quranJourneyView='library';
   ui.quranDetailId='';
   ui.quranListScroll=0;
+  ui.quranPlayerLoadedId='';
   render();
   quranLockBodyScroll();
   try{ var shell=document.getElementById('quran-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){}
@@ -10351,6 +10429,7 @@ App.closeQuranJourney=function(){
   ui.quranJourneyOpen=false;
   ui.quranJourneyView='library';
   ui.quranDetailId='';
+  ui.quranPlayerLoadedId='';
   ui.quranFiltersOpen=false;
   quranUnlockBodyScroll();
   render();
@@ -10364,6 +10443,7 @@ App.openQuranSurah=function(id){
   try{ var body=document.getElementById('quran-scroll'); ui.quranListScroll=body?(body.scrollTop||0):0; }catch(e){ ui.quranListScroll=0; }
   ui.quranDetailId=sid;
   ui.quranJourneyView='detail';
+  ui.quranPlayerLoadedId='';
   if(!quranPaintView('detail',0)) render();
   try{ var t=document.getElementById('quran-detail-title'); if(t&&t.focus) t.focus(); }catch(e){}
 };
@@ -10371,6 +10451,7 @@ App.backToQuranLibrary=function(){
   var from=ui.quranDetailId;
   ui.quranJourneyView='library';
   ui.quranDetailId='';
+  ui.quranPlayerLoadedId='';
   if(!quranPaintView('library',ui.quranListScroll||0)) render();
   try{ var row=document.getElementById('quran-row-'+from); if(row&&row.focus) row.focus(); }catch(e){}
 };

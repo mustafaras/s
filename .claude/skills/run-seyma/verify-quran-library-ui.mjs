@@ -335,11 +335,15 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('ihtilaflı niteleme dipnotla işaretlendi', d.includes('klasik kaynaklarda ihtilaflıdır'));
   ok('durum bölgesi aria-live taşıyor', d.includes('role="status" aria-live="polite"'));
   ok('başlık odaklanabilir', d.includes('id="quran-detail-title" tabindex="-1"'));
-  ok('ayrıntıda TEK ana eylem var', (d.match(/class="quran-v2-cta/g) || []).length === 1);
+  // QY-12: 'ready' durumunda video kartı (kendi "İzlemeye başla" kapağıyla)
+  // genel `.quran-v2-cta` düğmesinin YERİNİ alır — aynı işi yapan ikinci bir
+  // düğme göstermemek için. "Tek ana eylem" ilkesi bozulmuyor; eylem artık
+  // `.quran-v2-video .cover` düğmesi.
+  ok('ayrıntıda TEK ana eylem var (video kartının kapak düğmesi, ayrı CTA yok)', (d.match(/class="quran-v2-cta/g) || []).length === 0 && (d.match(/class="cover"/g) || []).length === 1);
   ok('hazır sûrede ana eylem “İzlemeye başla”', d.includes('İzlemeye başla'));
   ok('başlıkta geri düğmesi belirdi', registry['quran-head-lead'].innerHTML.includes('Sûre kütüphanesine dön'));
   ok('geri düğmesi boş kutu değil (ikon çizildi)', registry['quran-head-lead'].innerHTML.includes('<svg class="seyIcon"'));
-  ok('ana eylem ikonuyla birlikte çiziliyor', /class="quran-v2-cta[^"]*"[^>]*>\s*<svg/.test(d));
+  ok('ana eylem (video kartı kapağı) ikonuyla birlikte çiziliyor', /class="cover"[\s\S]{0,400}?<svg class="seyIcon"/.test(d));
 
   // Plan §5 "duruma göre ana eylem" tablosunun tamamı
   const table = [
@@ -371,6 +375,40 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('bekleyen sûrede buton gerçekten disabled', detailHTML().includes('disabled aria-disabled="true"'));
   App.openQuranSurah('kadir');
   ok('video geçmişi korunuyor ve gösteriliyor', detailHTML().includes('Önceki anlatımlar'));
+
+  // ── QY-12: güvenli, mahremiyet geliştirilmiş YouTube video kartı ─────────
+  App.openQuranSurah('fatiha'); // status: ready, videoId: dQw4w9WgXcQ (seed)
+  let vd = detailHTML();
+  ok('ilk render: HİÇ iframe yok (click-to-load)', !vd.includes('<iframe'));
+  ok('kapak: sabit aspect-ratio konteyneri var', vd.includes('quran-v2-video-frame'));
+  ok('kapak: güvenli ytimg thumbnail img', /src="https:\/\/i\.ytimg\.com\/vi\/dQw4w9WgXcQ\/hqdefault\.jpg"/.test(vd));
+  ok('kapak: gerçek buton semantiği + erişilebilir ad', /<button class="cover"[^>]*aria-label="[^"]+"/.test(vd));
+
+  App.quranJourneyWatch('fatiha');
+  vd = detailHTML();
+  ok('dokunuşta iframe enjekte edilir', vd.includes('<iframe'));
+  ok('yalnız youtube-nocookie.com embed kullanılır', /src="https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ/.test(vd));
+  ok('URL’de autoplay parametresi yok', !/[?&]autoplay=1/.test(vd));
+  ok('allow listesinde "autoplay" YOK (otomatik oynatma kapalı)', /allow="[^"]*"/.exec(vd) && !/allow="[^"]*autoplay/.test(vd));
+  ok('referrerpolicy no-referrer', vd.includes('referrerpolicy="no-referrer"'));
+  ok('sandbox uygulanmış, allow-forms/top-navigation YOK', /sandbox="[^"]*"/.test(vd) && !/sandbox="[^"]*(allow-forms|allow-top-navigation)/.test(vd));
+  ok('durum ready→watching geçti (izlemeye başladı kaydı)', journey().requests.fatiha.status === 'watching', journey().requests.fatiha.status);
+
+  App.quranJourneyWatch('fatiha'); // yeniden izleme — idempotent, çökme yok
+  ok('tekrar dokunuş güvenle no-op (durum bozulmaz)', journey().requests.fatiha.status === 'watching');
+
+  App.backToQuranLibrary(); App.openQuranSurah('fatiha');
+  ok('ekrana her yeniden girişte kapak katmanına dönülür (kalıcı auto-load yok)', !detailHTML().includes('<iframe'));
+
+  App.openQuranSurah('kadir'); // status: video_unavailable
+  vd = detailHTML();
+  ok('erişilemeyen videoda kapak/iframe YOK, yalnız açıklama', !vd.includes('quran-v2-video-frame') && vd.includes('Bu anlatım artık erişilebilir değil'));
+  ok('erişilemeyen videoda genel CTA hâlâ görünür (Yeni bağlantı iste)', vd.includes('Yeni bağlantı iste'));
+
+  App.openQuranSurah('asr'); // status: watched, videoId: aaaaaaaaaaa
+  vd = detailHTML();
+  ok('izlenmiş sûrede video kartı hâlâ var (yeniden izlenebilir)', vd.includes('quran-v2-video-frame'));
+  ok('izlenmiş sûrede “Raşit’e sor” CTA’sı da birlikte görünür', vd.includes('Raşit’e sor') && /class="quran-v2-cta/.test(vd));
 }
 
 // ── 7) İstek hattı ────────────────────────────────────────────────────────

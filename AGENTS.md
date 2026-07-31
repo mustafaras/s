@@ -318,6 +318,80 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-31 — Kur’an Yolculuğu QY-12: güvenli YouTube video kartı (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Not: bir altındaki QY-11 girişi
+"commit edilmedi" diyor ama o oturumda gerçekten commitlendi — commit
+`41d9564`; bu girişin kendisi o commit'in içinde yazıldığı için an itibarıyla
+henüz commitlenmemiş görünüyordu (kayıt tutarlılığı notu, hâlâ geçerli/canlı
+sorun değil).
+
+**Bağlam:** QY-11 ile `ready` durumuna doğru bir `videoId` ulaşmaya başladı;
+ama `App.quranJourneyWatch` hâlâ QY-09 öncesi bir yer tutucu toast'tı ("henüz
+açılmadı"). Bu oturum QY-12'yi (plan §10/§QY-12: click-to-load, youtube-
+nocookie.com, sabit aspect-ratio, dar `allow`/`referrerpolicy`/`sandbox`,
+otomatik oynatma kapalı, kırık video yerine açıklama) uyguladı.
+
+**Değişen dosyalar:** `app.js`, `styles.css`,
+`.claude/skills/run-seyma/verify-quran-library-ui.mjs`.
+
+- Yeni `quranVideoCardHTML(x,req)`: `ready/watching/watched/question_opened`
+  ve geçerli `videoId` birlikteyken sûre ayrıntısına eklenir. İlk render'da SIFIR
+  iframe — yalnız `ui.quranPlayerLoadedId` (kalıcı DEĞİL, `ui` state) ile
+  kontrol edilen bir kapak: `i.ytimg.com` thumbnail (yüklenemezse `onerror`
+  ile sessizce gizlenir) + gerçek `<button class="cover">` + "İzlemeye
+  başla". Kalıcı olmaması bilinçli: ekrana HER yeniden girişte (openQuranSurah/
+  backToQuranLibrary/openQuranJourney/closeQuranJourney hepsi sıfırlar) kapağa
+  dönülür — click-to-load yalnız "ilk kez" değil, her ziyarette geçerli.
+- `App.quranJourneyWatch(id)` artık gerçek: `ui.quranPlayerLoadedId` set
+  edilip iframe enjekte edilir VE `quranReduce({type:'watch_start'})` ile
+  `ready→watching` kaydedilir (zaten watching/watched ise reducer'ın kendi
+  idempotens kuralı no-op yapar — rewatch güvenli).
+- iframe: `youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1` (autoplay
+  parametresi YOK), `allow="encrypted-media; picture-in-picture; fullscreen"`
+  (autoplay BİLEREK allow listesinde yok — Permissions-Policy URL parametresini
+  bile ezip engeller), `referrerpolicy="no-referrer"`,
+  `sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"`
+  (allow-forms/allow-top-navigation YOK). `allow-scripts`+`allow-same-origin`
+  birlikteliği ÇAPRAZ KÖKENLİ (youtube-nocookie.com bizim sayfamızla aynı
+  origin değil) bir iframe için güvenlidir — asıl risk yalnız aynı-köken/
+  saldırgan-kontrollü içerikte oluşur.
+- `video_unavailable` (video_gone, videoId TEŞHİS için korunur ama artık
+  hiç kapak/iframe üretilmez) için `quranVideoUnavailableHTML()`: kırık alan
+  yerine sakin metin açıklaması.
+- `ready`/`watching`'te video kartının kendi kapak düğmesi genel
+  `.quran-v2-cta`'nın YERİNİ alır (aynı işi yapan ikinci düğme olmasın diye);
+  `watched`/`question_opened`'ta video kartı VE "Raşit'e sor" CTA'sı BİRLİKTE
+  görünür (yeniden izlenebilir + soru sorulabilir).
+- `styles.css`: `.quran-v2-video*` — `aspect-ratio:16/9` sabit konteyner
+  (sayfa kayması yok), light/dark `--quran-*`/`--qj-*` token'ları.
+
+**Doğrulama:** `node --check app.js` ✅; `verify-quran-library-ui.mjs`
+144/144 ✅ (17 yeni QY-12 assertion + 2 güncellenmiş QY-07 assertion —
+eskisi `.quran-v2-cta` sayısını 1 bekliyordu, artık `ready` durumunda 0 CTA
+ve 1 video-kartı-kapağı doğru davranış olduğu için güncellendi, bu bir
+regresyon DEĞİL kasıtlı davranış değişikliği); regresyon: `test_quran_
+transport.js` 207/207, `test_quran_outbox_sync.js` 55/55, `test_quran_pull_
+sync.js` 11/11, `test_quran_catalog.js` 70/70, `verify-quran-migration-v1.mjs`
+57/57, `verify-quran-state-machine.mjs` 179/179, `verify-quran-remote-
+updates.mjs` 14/14, `driver.mjs` ✅, `zikr-harness.mjs` 84/84, `test_faz10_
+sync.js` 64/64, `test_faz11_panel.js` 44/44 — hepsi ✅. `git diff --check` ✅;
+`styles.css` brace dengesi doğrulandı (1252/1252). Kullanılan ikonlar
+(`play`, `circle-check`) ICONS setinde teyit edildi. Gerçek tarayıcı
+açılmadı, gerçek YouTube isteği yapılmadı.
+
+**Kalan/bilinen sınırlar:** QY-13 (IFrame Player API `ENDED` olayı ile
+gerçek izlenme doğrulaması, erişilebilir "İzledim" yedek butonu) henüz yok —
+şu an `watch_start` (oynatıcıyı açma) kaydediliyor ama `watch_complete`
+(izlemeyi bitirme) hiçbir yerden tetiklenmiyor, yani sûre asla otomatik
+`watched`'a geçmiyor. QY-14 (WhatsApp "Raşit'e sor") hâlâ placeholder toast.
+`enablejsapi=1` embed URL'sine BİLEREK eklenmedi (QY-13'ün işi).
+
+**Sıradaki:** QY-13 (izlenme doğrulaması) → QY-14 (WhatsApp). `main`e
+merge/deploy YOK, commit dahi edilmedi — kullanıcı onayı bekleniyor.
+
+---
+
 ### 2026-07-31 — Kur’an Yolculuğu QY-11: teslim/yanıt salt-okunur çekici (commit edilmedi)
 
 **Branch:** `feature/kuran-yolculugu-qy05`.

@@ -87,6 +87,125 @@ Edit the driver's `seedState()` or add `App.<handler>(…)` calls to reach the
 code you touched, then re-run. The pattern is always: mutate/interact → clear
 `appHTML` → trigger a render → assert on the captured string.
 
+### Kur'an Yolculuğu (QY-06 / QY-07)
+
+```bash
+node .claude/skills/run-seyma/verify-quran-library-ui.mjs
+node .claude/skills/run-seyma/verify-quran-library-ui.mjs --dump library
+node .claude/skills/run-seyma/verify-quran-library-ui.mjs --dump detail:alak
+```
+
+127 assertions over the full-screen surah library and the surah detail:
+markup order in the İlham & İbadet hub, the 114-row revelation list, search
+(Turkish/Arabic name, mushaf no, theme), the five status filters, the fact
+that filter/search taps **do not** trigger a global `render()`, list scroll
+restoration, the per-status single-CTA table, request de-duplication /
+double-tap guard / safe retry, plan §15 wording, and the CSS layout +
+accessibility contract.
+
+Two seed fields are load-bearing and easy to forget when copying this
+harness: `settings.auth` (else `needsAuth()` paints the lock screen) and
+`settings.profileAssessmentInactive` (else `render()` paints the assessment
+gate). Without them `#app` never contains the hub at all and every markup
+assertion fails for the wrong reason.
+
+Its DOM stub resolves `getElementById` **only** for ids present in the last
+painted markup, and reads the most recently written region — that is what
+makes "targeted repaint instead of full render" actually measurable rather
+than vacuously true.
+
+The other Kur'an gates are pure-function level and much faster:
+`verify-quran-migration-v1.mjs` (QY-02 schema) and
+`verify-quran-state-machine.mjs` (QY-03 transitions), plus repo-root
+`node test_quran_catalog.js` and `node test_quran_transport.js`.
+
+### Kur'an Yolculuğu outbox writer (QY-08)
+
+```bash
+node test_quran_outbox_sync.js
+```
+
+Repo-root harness (mirrors `test_faz10_sync.js`'s `eval`-in-mocked-globals
+style, not the `node:vm` driver style above) that mock-`fetch`-tests
+`sync.js`'s `window.SeySync.pushQuranRequest(payload, cb)` — the QY-08
+dedicated writer for `data/quran-request-outbox.json`. 54 assertions: the
+write path never touches `data/latest.json`/`data/gunluk`; the outbox
+content round-trips through `QuranTransportV1.parseOutbox`; the GitHub
+token never appears in any PUT body (only in the `Authorization` header);
+409/422 conflicts retry with a re-fetched `sha` (bounded to 3 retries);
+two different pending surah requests coexist in the same file without
+clobbering each other; offline/network-rejecting and even
+synchronously-throwing `fetch` mocks all resolve through `cb(err)` without
+an uncaught exception; and Guard 1 (dev-origin) blocks the push with zero
+`fetch` calls on `localhost`/`file:`, while the existing
+`seyma-sync-force`/`?forceSync=1` escape hatch still works. No real network
+call is ever made — everything runs against an in-memory mock.
+
+### Kur'an Yolculuğu request-email workflow (QY-09) — STAGED, not deployed here
+
+```bash
+cd .claude/skills/run-seyma/quran-mail-workflow
+python test_quran_mail.py
+```
+
+`quran-mail-workflow/` holds a GitHub Actions workflow + Python script meant
+for `mustafaras/seyma-data/.github/{workflows,scripts}/` — **not** this
+repo. `data/quran-request-outbox.json` (QY-08's output) lives in that
+private data repo, so the workflow watching it must live there too, mirroring
+the existing `aeon-mail.yml`/`profile-completion-mail.yml` pattern (same
+`MAIL_USERNAME`/`MAIL_PASSWORD`/`MAIL_TO` secrets — confirmed via read-only
+`gh api` to already exist there, so copying this over needs **zero** new
+secret setup and will start sending real email on the next outbox push).
+See that folder's `README.md` before ever copying/merging it — it spells out
+the explicit-consent gate this crosses (`CLAUDE.md`'s "never write to
+`mustafaras/seyma-data` without explicit user consent").
+
+`test_quran_mail.py` is a 12-test, zero-network `unittest` suite —
+`smtplib.SMTP_SSL` is fully monkeypatched, no real SMTP connection is ever
+attempted. It covers: exact plan §8 subject/body wording, the
+`mushafOrder`-optional line, idempotent skip-if-already-`sent` (so a workflow
+retry can't double-mail), a batch where one send fails and the rest still
+process, secret redaction in error messages (not just truncation — a real
+gap the test caught and `quran_mail.py`'s `redact_secrets()` now closes),
+malformed-outbox-entry tolerance, and `main()`'s exact-`aeon_mail.py`-parity
+behavior of touching `data/quran-delivery.json` **not at all** when
+`MAIL_USERNAME`/`MAIL_PASSWORD` aren't set.
+
+### Kur'an Yolculuğu Gmail reply bridge (QY-10) — STAGED, no deploy path exists
+
+```bash
+cd .claude/skills/run-seyma/quran-reply-bridge
+node test_reply_bridge.mjs        # 46 assertions — pure decision logic
+node test_transport_parity.mjs    # 69 assertions — zero-drift proof
+```
+
+Unlike QY-09 (which I could push via `gh`), **this one has no automatable
+deploy path at all** — it's a Google Apps Script project (bound to whatever
+Gmail account receives Raşit's replies), and no `clasp`/Apps Script API
+access exists in this environment. Everything here is 100% manual
+copy-paste by the user into script.google.com; see the folder's `README.md`
+for exact setup steps (Script Properties, one manual `installTimeTrigger()`
+run).
+
+Three `.gs` files: `QuranTransportV1.gs` (a mechanical copy of the repo-root
+`quranTransportV1.js` — same validation/parsing logic, only the final
+export line differs since Apps Script has no `window`), `ReplyBridgeLogic.gs`
+(the pure `evaluateReply()` decision function — takes `sha256Hex` and
+`checkVideoExists` as injected functions, so it's fully Node-testable),
+and `Code.gs` (the untestable Gmail/UrlFetchApp/PropertiesService glue,
+kept deliberately thin — it contains no decision logic of its own).
+
+`test_reply_bridge.mjs` covers the QY-10 plan's DOĞRULAMA list verbatim:
+valid reply, spoofed sender, wrong/stale token, two URLs in one reply,
+malformed URL, duplicate reply (same Gmail message ID → same deterministic
+`responseId` → `applyResponse` no-ops), and video-unavailable — plus that
+an *ambiguous* video-existence check (network hiccup) throws rather than
+silently rejecting, so `Code.gs` knows not to permanently label that thread
+processed. `test_transport_parity.mjs` proves — by actually running both,
+not by diffing text — that the `.gs` copy of the transport module produces
+identical output to the real `quranTransportV1.js` across every validator,
+parser, and merge function.
+
 ## panel.html (the ÆON observer dashboard)
 
 `panel.html` is a separate, self-contained app that does **not** share code with

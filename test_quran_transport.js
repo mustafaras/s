@@ -159,9 +159,12 @@ section('5b. Gerçekçi e-posta gövdeleri (cümle içi bağlantı)');
 }
 
 // ── fixture üreticileri ─────────────────────────────────────────────────────
-function outboxEntry(rid, surah, order, tok, at) {
-  return { requestId: rid, surahId: surah, revelationOrder: order, surahName: surah,
+// mushafOrder isteğe bağlı sondaki parametre: mevcut çağrı yerleri etkilenmez.
+function outboxEntry(rid, surah, order, tok, at, mushaf) {
+  var e = { requestId: rid, surahId: surah, revelationOrder: order, surahName: surah,
            requestedAt: at || AT, replyToken: tok || TOK };
+  if (mushaf !== undefined) e.mushafOrder = mushaf;
+  return e;
 }
 function responseEntry(rid, respId, surah, vid, at) {
   return { responseId: respId, requestId: rid, surahId: surah, videoId: vid,
@@ -227,6 +230,31 @@ section('8. Kayıt doğrulama (kötü kayıt sessizce içeri girmiyor)');
   var badVid = { schemaVersion: 1, responses: {} };
   badVid.responses[RID] = responseEntry(RID, RESP, 'alak', 'kotu-id');
   ok(T.parseResponses(badVid).errors.indexOf('bad_video_id') >= 0, 'geçersiz videoId taşıyan cevap reddedildi');
+}
+
+// ── QY-09'un e-posta gövdesi için gerekli mushafOrder alanı ─────────────────
+section('8b. mushafOrder — isteğe bağlı ama geçerliyse korunur');
+{
+  var withOrder = { schemaVersion: 1, requests: {} };
+  withOrder.requests[RID] = outboxEntry(RID, 'alak', 1, TOK, AT, 96);
+  var wp = T.parseOutbox(withOrder);
+  ok(wp.ok && wp.value.requests[RID].mushafOrder === 96, 'geçerli mushafOrder korunuyor', wp.value.requests[RID]);
+
+  var withoutOrder = { schemaVersion: 1, requests: {} };
+  withoutOrder.requests[RID] = outboxEntry(RID, 'alak', 1);
+  var np = T.parseOutbox(withoutOrder);
+  ok(np.ok && np.value.requests[RID].mushafOrder === null, 'mushafOrder eksikse null (kaydı REDDETMEZ)', np.value.requests[RID]);
+
+  [0, 115, 1.5, 'x', -1, null].forEach(function (bad) {
+    var raw = { schemaVersion: 1, requests: {} };
+    raw.requests[RID] = outboxEntry(RID, 'alak', 1, TOK, AT, bad);
+    var r = T.parseOutbox(raw);
+    ok(r.ok && r.value.requests[RID].mushafOrder === null, 'geçersiz mushafOrder (' + JSON.stringify(bad) + ') null’a düşer, kayıt yine geçerli', r.errors);
+  });
+
+  // upsertOutboxRequest de aynı alanı korumalı (sync.js'in gerçekte çağırdığı yol).
+  var up = T.upsertOutboxRequest(T.emptyOutbox(), outboxEntry(RID, 'fatiha', 5, TOK, AT, 1), AT);
+  ok(up.ok && up.value.requests[RID].mushafOrder === 1, 'upsertOutboxRequest mushafOrder’ı da yazıyor', up.value.requests[RID]);
 }
 
 // ── QY-00 riski: iki farklı sûre birbirini ezmemeli ─────────────────────────

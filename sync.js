@@ -513,6 +513,111 @@ function doPush(data){
     .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
 }
 
+// ── QY-08: Kur’an Yolculuğu istek outbox'u ──────────────────────────────────
+// data/quran-request-outbox.json TEK dosyası, QuranTransportV1 (QY-04)
+// sözleşmesiyle okunup yazılır. KRİTİK İZOLASYON: latest.json'a ASLA
+// dokunmaz, doPush()/putLatestGuarded()'ın full-replace zincirine hiç
+// karışmaz — outbox kendi GET+merge+PUT döngüsünü ayrı yürütür.
+//
+// Guard 1 (dev-origin) burada da AYNEN uygulanır: yerel/geliştirme kökeninden
+// gerçek bir Raşit'e-istek e-postası tetiklenmesin. Guard 2 (anti-clobber gün
+// sayımı) yalnızca latest.json'un "gün" kavramına özgüdür; outbox bir kuyruk/
+// defterdir, buraya taşınmaz — zayıflatma değil, kapsam dışı bırakmadır.
+//
+// replyToken YALNIZ burada üretilir ve YALNIZ outbox dosyasına yazılır;
+// app.js'ten gelen payload'da hiç bulunmaz, çağırana asla geri döndürülmez
+// (QuranTransportV1.containsSecret sözleşmesi). GitHub token ise hiçbir
+// zaman JSON gövdesine girmez — yalnız Authorization header'ında taşınır
+// (ghHeaders/ghPut ile aynı desen).
+var QURAN_REPLY_ALPHABET='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function quranReplyToken(){
+  var len=40, out='', bytes=null, i, n;
+  try{
+    if(typeof crypto!=='undefined' && crypto && typeof crypto.getRandomValues==='function' && typeof Uint8Array!=='undefined'){
+      bytes=new Uint8Array(len); crypto.getRandomValues(bytes);
+    }
+  }catch(e){ bytes=null; }
+  for(i=0;i<len;i++){
+    n=bytes?bytes[i]:Math.floor(Math.random()*256);
+    out+=QURAN_REPLY_ALPHABET.charAt(n%QURAN_REPLY_ALPHABET.length);
+  }
+  return out;
+}
+function quranOutboxEntryFromPayload(payload, at){
+  return {
+    requestId: payload.requestId,
+    surahId: payload.surahId,
+    revelationOrder: payload.revelationOrder,
+    // mushafOrder QY-09'un e-posta gövdesindeki "Mushaf sırası" satırı için
+    // gerekli; app.js payload'ında zaten var, burada ilk kez korunuyor.
+    mushafOrder: (typeof payload.mushafOrder==='number') ? payload.mushafOrder : null,
+    surahName: payload.surahName,
+    requestedAt: payload.requestedAt || at,
+    replyToken: quranReplyToken()
+  };
+}
+// GET (sha + mevcut defter) → QuranTransportV1.upsertOutboxRequest (saf birleştirme)
+// → PUT. 409/422 (eşzamanlı yazma çakışması) üzerine sha'yı yeniden okuyup
+// sınırlı sayıda yeniden dener — ghPut()'taki desenin aynısı.
+function putQuranOutboxGuarded(c, entry, at, attempt){
+  attempt = attempt||0;
+  var T = window.QuranTransportV1;
+  var api = 'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+T.PATHS.outbox;
+  var H = ghHeaders(c);
+  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
+    .then(function(r){ if(r.status===200) return r.json(); return null; })
+    .then(function(g){
+      var sha=(g&&g.sha)||null, current=T.emptyOutbox();
+      if(g && g.content){
+        try{ var parsed=T.parseOutbox(b64decodeUtf8(g.content)); current=parsed.value; }catch(e){}
+      }
+      var res=T.upsertOutboxRequest(current, entry, at);
+      if(!res.ok) return Promise.reject(new Error('quran_outbox_invalid_entry:'+(res.errors||[]).join(',')));
+      var contentStr=JSON.stringify(res.value,null,2);
+      var body={message:'quran-outbox: '+entry.surahId, content:b64(contentStr), branch:c.branch}; if(sha) body.sha=sha;
+      var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
+      return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)});
+    })
+    .then(function(r){
+      if(r.ok) return;
+      return r.text().then(function(t){
+        if((r.status===409||r.status===422) && attempt<3) return putQuranOutboxGuarded(c,entry,at,attempt+1);
+        throw new Error(r.status+' '+t.slice(0,160));
+      });
+    });
+}
+// Uygulama (app.js QY-07) bu fonksiyonu çağırır: cb(err) ve/veya döndürülen
+// Promise ile sonuç bildirilir. Payload'da replyToken YOKTUR — üretimi ve
+// saklanması tamamen burada, ağ sınırının ötesine hiç geçmez. Kanal
+// yapılandırılmamışsa veya yerel kökendeyse istek yerelde AYNEN kalır
+// (app.js zaten yerel kaydı önce, ağ çağrısından BAĞIMSIZ olarak yapar);
+// burada yalnız "iletildi mi" sonucu bildirilir, yerel veri hiç kaybolmaz.
+function pushQuranRequest(payload, cb){
+  cb = typeof cb==='function' ? cb : function(){};
+  var T = window.QuranTransportV1;
+  if(!T || !payload || !T.isValidRequestId(payload.requestId) || !T.isValidSurahId(payload.surahId)){
+    var e1=new Error('quran_outbox: geçersiz payload'); cb(e1); return Promise.reject(e1);
+  }
+  var c=cfg();
+  if(!c){ var e2=new Error('quran_outbox: senkron yapılandırılmamış'); cb(e2); return Promise.reject(e2); }
+  if(devOrigin() && !syncForced()){
+    try{ console.warn('[SeySync] Yerel ortam (localhost/file:) algılandı — Kur’an isteği ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1'); }catch(e){}
+    var e3=new Error('quran_outbox: yerel ortamdan push engellendi'); cb(e3); return Promise.reject(e3);
+  }
+  var at=new Date().toISOString();
+  var entry=quranOutboxEntryFromPayload(payload, at);
+  var chain;
+  // fetch normalde reddedilen bir Promise döner, ama bozuk/mock bir ortamda
+  // SENKRON fırlatabilir; bu durumda çağrı .then() bağlanmadan önce çöker.
+  // try/catch, "outbox yazılamazsa yerel istek kaybolmaz" garantisinin UI'ya
+  // asla bir istisna sızdırmadan ulaşmasını sağlar.
+  try{ chain=putQuranOutboxGuarded(c, entry, at); }
+  catch(syncErr){ cb(syncErr); return Promise.reject(syncErr); }
+  return chain
+    .then(function(){ cb(null); })
+    .catch(function(e){ cb(e); throw e; });
+}
+
 // ÆON soru tetiği: yalnızca Şeyma ÆON'a soru gönderince yazılır. Küçük ve ayrı bir
 // dosya olduğu için veri reposundaki mail workflow'u SADECE burada tetiklenir
 // (hareket/mod gibi sık latest.json push'larında boşuna çalışıp Actions dakikası yakmaz).
@@ -538,6 +643,9 @@ window.SeySync={
   pushNow:function(){ clearTimeout(timer); if(lastPayload){ doPush(lastPayload); return; } try{ var raw=localStorage.getItem(KEY); if(raw) doPush(JSON.parse(raw)); }catch(e){} },
   pushPing:pushPing,
   pushProfileCompletionPing:pushProfileCompletionPing,
+  // QY-08 — Kur’an Yolculuğu istek outbox yazıcısı. latest.json zincirinden
+  // bağımsız; ayrıntı için yukarıdaki "QY-08" bloğunun yorumlarına bakın.
+  pushQuranRequest:pushQuranRequest,
   statusText:statusText,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,

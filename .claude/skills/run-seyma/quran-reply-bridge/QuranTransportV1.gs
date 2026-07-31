@@ -1,20 +1,22 @@
-(function(){
-  'use strict';
+// QuranTransportV1.gs — Apps Script uyarlaması (QY-10).
+//
+// Bu dosya, mustafaras/s reposundaki quranTransportV1.js (QY-04) ile
+// MANTIK OLARAK BİREBİR AYNIDIR. TEK fark: Apps Script'te `window` yoktur,
+// bu yüzden dışa aktarım `window.QuranTransportV1 = ...` yerine IIFE'nin
+// dönüş değerini üst seviye bir `var`e atayarak yapılır. Gövdenin geri
+// kalanı satır satır aynıdır — kopya kayması riskini sıfırlamak için
+// buradaki HİÇBİR fonksiyon elle yeniden yazılmadı.
+//
+// Kanıt: bu klasördeki test_transport_parity.mjs, bu dosyayı ve gerçek
+// quranTransportV1.js'i aynı girdi setiyle çalıştırıp sonuçların birebir
+// eşit olduğunu doğrular (Node'da, gerçek Apps Script çalışma zamanı
+// olmadan).
+//
+// GÜNCELLEME KURALI: quranTransportV1.js değiştiğinde bu dosya da AYNI
+// mantıkla güncellenmeli ve test_transport_parity.mjs tekrar çalıştırılmalı.
 
-  // QuranTransportV1 — Raşit ile Kur’an Yolculuğu taşıma sözleşmeleri (QY-04).
-  //
-  // ÜÇ AYRI DOSYA, latest.json ZİNCİRİNDEN TAMAMEN BAĞIMSIZ:
-  //   data/quran-request-outbox.json   uygulama yazar, GitHub Actions okur
-  //   data/quran-delivery.json         GitHub Actions yazar, uygulama okur
-  //   data/quran-responses.json        Gmail Apps Script yazar, uygulama okur
-  //
-  // DEĞİŞTİRİLEMEZ KURAL: Hiçbir otomasyon data/latest.json'u yazamaz veya
-  // full-replace edemez. isWritableTransportPath() bunun tek kapısıdır; yazan
-  // her taraf (QY-08 sync, QY-10 Apps Script, QY-15 panel) buradan geçmelidir.
-  //
-  // Bu modül SAF'tır: ağ yok, depolama yok, DOM yok, Date.now() yok. Zaman
-  // damgaları çağırandan gelir. Tüm parse fonksiyonları ASLA throw etmez —
-  // bozuk dosya uygulamayı çökertemez, boş sözleşme + hata listesi döner.
+var QuranTransportV1 = (function(){
+  'use strict';
 
   var SCHEMA_VERSION = 1;
 
@@ -23,7 +25,6 @@
     delivery: 'data/quran-delivery.json',
     responses: 'data/quran-responses.json'
   });
-  // Kur’an otomasyonunun asla dokunamayacağı yollar.
   var FORBIDDEN_PATHS = Object.freeze([
     'data/latest.json', 'data/gunluk', 'data/observer-inbox.json',
     'data/aeon-outbox.json', 'data/profile-outbox.json', 'data/aeon-media'
@@ -33,7 +34,6 @@
   var RESPONSE_ID_RE = /^qrr_[A-Za-z0-9_-]{8,64}$/;
   var SURAH_ID_RE = /^[a-z]+(-[a-z]+)*$/;
   var VIDEO_ID_RE = /^[A-Za-z0-9_-]{11}$/;
-  // replyToken tahmin edilemez olmalı: en az 32 karakter base64url.
   var REPLY_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
   var ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
   var FINGERPRINT_RE = /^[a-f0-9]{16,64}$/;
@@ -42,20 +42,16 @@
   var RESPONSE_STATUSES = ['ready', 'revoked'];
   var RESPONSE_SOURCES = ['gmail_reply', 'panel_manual'];
 
-  // Sınırlar: bu dosyalar sürekli büyüyen kuyruklar değil, çalışan kayıtlardır.
   var MAX_OUTBOX = 50;
   var MAX_DELIVERY = 200;
   var MAX_RESPONSES = 200;
 
-  // Yalnız https ve yalnız gerçek video yolları. Kanal, profil, playlist,
-  // javascript:, data: ve YouTube dışı her şey buradan geçemez.
   var YT_PATTERNS = [
     /^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?(?:[^#\s]*&)?v=([A-Za-z0-9_-]{11})(?:[&#]|$)/,
     /^https:\/\/youtu\.be\/([A-Za-z0-9_-]{11})(?:[?#]|$)/,
     /^https:\/\/(?:www\.|m\.)?youtube\.com\/shorts\/([A-Za-z0-9_-]{11})(?:[?#]|$)/
   ];
 
-  // ── küçük yardımcılar ───────────────────────────────────────────────────
   function isPlainObject(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
   function str(v){ return (typeof v === 'string' && v) ? v : null; }
   function isoOrNull(v){ return (typeof v === 'string' && ISO_RE.test(v)) ? v : null; }
@@ -65,10 +61,6 @@
   function isValidVideoId(v){ return typeof v === 'string' && VIDEO_ID_RE.test(v); }
   function isValidReplyToken(v){ return typeof v === 'string' && REPLY_TOKEN_RE.test(v); }
 
-  // Sabit zamanlı karşılaştırma denemesi. DÜRÜST NOT: JavaScript motorunda
-  // gerçek sabit zaman garanti edilemez; asıl token karşılaştırması sunucu
-  // tarafında (QY-10 Apps Script) yapılır. Buradaki amaç, istemci/panel
-  // tarafında erken-çıkışlı naif karşılaştırmayı önlemektir.
   function tokensEqual(a, b){
     if (typeof a !== 'string' || typeof b !== 'string') return false;
     if (a.length !== b.length) return false;
@@ -92,7 +84,6 @@
     return false;
   }
 
-  // ── YouTube bağlantı doğrulama (Apps Script, uygulama ve panel ortak kullanır) ──
   function parseYouTubeVideoId(url){
     if (typeof url !== 'string' || !url) return null;
     var u = url.trim();
@@ -102,18 +93,11 @@
     }
     return null;
   }
-  // İnsanlar bağlantıyı cümlenin içine yazar: "işte anlatım: <link>." Sondaki
-  // noktalama URL'nin parçası değildir ve kırpılmazsa geçerli bir bağlantı
-  // "video yok" sayılır. Bir URL asla bu karakterlerle bitmez, bu yüzden
-  // kırpmak güvenlidir. Baştaki tırnak/parantez de aynı nedenle temizlenir.
   var URL_LEAD_RE = /^[«“„"'(\[<¡¿]+/;
   var URL_TRAIL_RE = /[.,;:!?…«»“”„‟'"’)\]>}]+$/;
   function trimUrlEdges(token){
     return String(token).replace(URL_LEAD_RE, '').replace(URL_TRAIL_RE, '');
   }
-  // Serbest metinden TAM OLARAK bir video kimliği çıkarır.
-  // Aynı video farklı biçimlerde tekrar geçse bile tek sayılır; iki FARKLI
-  // video varsa cevap belirsizdir ve reddedilir (plan §9).
   function extractSingleVideoId(text){
     if (typeof text !== 'string' || !text) return { ok: false, videoId: null, reason: 'no_video' };
     var tokens = text.split(/[\s<>"'()\[\]]+/);
@@ -127,12 +111,10 @@
     return { ok: true, videoId: found[0], reason: 'ok' };
   }
 
-  // ── boş sözleşmeler ─────────────────────────────────────────────────────
   function emptyOutbox(){ return { schemaVersion: SCHEMA_VERSION, updatedAt: null, requests: {} }; }
   function emptyDelivery(){ return { schemaVersion: SCHEMA_VERSION, updatedAt: null, requests: {} }; }
   function emptyResponses(){ return { schemaVersion: SCHEMA_VERSION, updatedAt: null, responses: {} }; }
 
-  // Ham girdiyi (JSON metni veya nesne) güvenle çözer. Asla throw etmez.
   function coerceRoot(raw, errors){
     if (typeof raw === 'string') {
       if (!raw.trim()) { errors.push('empty_file'); return null; }
@@ -142,9 +124,6 @@
     if (!isPlainObject(raw)) { errors.push('not_an_object'); return null; }
     return raw;
   }
-  // Sürüm politikası: bilinmeyen/eski sürümde ÇÖKME yok. Bilinen alanlar
-  // okunur, durum errors ile bildirilir; çağıran isterse kullanıcıya
-  // "bu kayıt daha yeni bir sürümden" diyebilir.
   function readVersion(root, errors){
     var v = root.schemaVersion;
     if (typeof v !== 'number' || !isFinite(v)) { errors.push('missing_schema_version'); return SCHEMA_VERSION; }
@@ -163,10 +142,6 @@
     }
   }
 
-  // ── outbox ──────────────────────────────────────────────────────────────
-  // mushafOrder isteğe bağlıdır (geriye dönük uyum): eksik/geçersizse null
-  // olarak saklanır, kaydı REDDETMEZ. QY-09'un e-posta gövdesindeki "Mushaf
-  // sırası" satırı bu alandan gelir — sağlanmışsa gösterilir, yoksa atlanır.
   function validOrder(n){ return typeof n === 'number' && n >= 1 && n <= 114 && n === Math.floor(n); }
   function normOutboxEntry(key, v, errors){
     if (!isPlainObject(v)) { errors.push('bad_outbox_entry'); return null; }
@@ -193,17 +168,13 @@
     return { ok: errors.length === 0, value: out, errors: errors };
   }
 
-  // ── delivery ────────────────────────────────────────────────────────────
   function normDeliveryEntry(key, v, errors){
     if (!isPlainObject(v)) { errors.push('bad_delivery_entry'); return null; }
     if (DELIVERY_STATUSES.indexOf(v.status) < 0) { errors.push('bad_delivery_status'); return null; }
     return {
       status: v.status,
       sentAt: isoOrNull(v.sentAt),
-      // Sağlayıcı mesaj kimliği: retry'de aynı isteğin iki kez postalanmadığını
-      // kanıtlayan idempotency çıpası (QY-09).
       providerMessageId: str(v.providerMessageId),
-      // Hata YALNIZ kısa kod olarak taşınır; stack trace / adres / token yasak.
       error: str(v.error) ? String(v.error).slice(0, 80) : null
     };
   }
@@ -217,9 +188,6 @@
     return { ok: errors.length === 0, value: out, errors: errors };
   }
 
-  // ── responses ───────────────────────────────────────────────────────────
-  // requestId ile anahtarlanır: aynı isteğe gelen ikinci cevap yeni kayıt
-  // AÇMAZ, mevcut kaydın yerine geçer (idempotency + supersede tek yerde).
   function normResponseEntry(key, v, errors){
     if (!isPlainObject(v)) { errors.push('bad_response_entry'); return null; }
     if (v.requestId !== undefined && v.requestId !== key) { errors.push('response_key_mismatch'); return null; }
@@ -230,8 +198,6 @@
     if (RESPONSE_STATUSES.indexOf(v.status) < 0) { errors.push('bad_response_status'); return null; }
     var validatedAt = isoOrNull(v.validatedAt);
     if (!validatedAt) { errors.push('bad_validated_at'); return null; }
-    // senderFingerprint DÜZ E-POSTA ADRESİ OLAMAZ; yalnız hex özet kabul edilir.
-    // '@' içeren bir değer sözleşme ihlalidir ve kayıt reddedilir (plan §7).
     var fp = str(v.senderFingerprint);
     if (fp && !FINGERPRINT_RE.test(fp)) { errors.push('bad_sender_fingerprint'); return null; }
     return {
@@ -250,7 +216,6 @@
     return { ok: errors.length === 0, value: out, errors: errors };
   }
 
-  // ── saf yazma yardımcıları (hepsi YENİ nesne döndürür) ──────────────────
   function cloneMap(m){
     var out = {}, keys = Object.keys(m || {});
     for (var i = 0; i < keys.length; i++) out[keys[i]] = m[keys[i]];
@@ -271,8 +236,6 @@
     return out;
   }
 
-  // Outbox tek slot DEĞİL, requestId ile anahtarlı bir defterdir: iki farklı
-  // sûre arka arkaya istenirse ikinci istek birinciyi EZMEZ (QY-00 riski).
   function upsertOutboxRequest(outbox, entry, at){
     var base = isPlainObject(outbox) ? outbox : emptyOutbox();
     var errors = [];
@@ -289,13 +252,11 @@
     };
   }
 
-  // Henüz postalanmamış istekler. GitHub Actions bunları gönderir; delivery
-  // receipt'i olan istek TEKRAR postalanmaz (retry çift mail üretmesin, QY-09).
   function pendingOutboxRequests(outbox, delivery){
     var ob = isPlainObject(outbox) ? (outbox.requests || {}) : {};
     var dl = isPlainObject(delivery) ? (delivery.requests || {}) : {};
     var out = [], keys = newestFirst(ob, function(r){ return r.requestedAt; });
-    for (var i = keys.length - 1; i >= 0; i--) {   // eskiden yeniye: istek sırası korunur
+    for (var i = keys.length - 1; i >= 0; i--) {
       var k = keys[i], receipt = dl[k];
       if (receipt && receipt.status === 'sent') continue;
       out.push(ob[k]);
@@ -303,8 +264,6 @@
     return out;
   }
 
-  // Postalanmış VE cevabı gelmiş istekleri defterden düşürür; cevabı
-  // beklenenler ASLA düşmez (istek kaybolmasın).
   function pruneOutbox(outbox, delivery, responses){
     var base = isPlainObject(outbox) ? outbox : emptyOutbox();
     var dl = isPlainObject(delivery) ? (delivery.requests || {}) : {};
@@ -318,8 +277,6 @@
     return { schemaVersion: SCHEMA_VERSION, updatedAt: base.updatedAt || null, requests: requests };
   }
 
-  // Doğrulanmış cevabı deftere idempotent biçimde işler.
-  // Aynı cevap ikinci kez gelirse hiçbir şey değişmez.
   function applyResponse(responses, resp, at){
     var base = isPlainObject(responses) ? responses : emptyResponses();
     var errors = [];
@@ -348,7 +305,6 @@
     var rec = normDeliveryEntry(requestId, receipt, errors);
     if (!rec) return { ok: false, changed: false, value: base, errors: errors };
     var prev = (base.requests || {})[requestId];
-    // Gönderildi bilgisi geri alınamaz: retry'den gelen 'failed' bir 'sent'i ezemez.
     if (prev && prev.status === 'sent' && rec.status !== 'sent') {
       return { ok: true, changed: false, value: base, errors: ['sent_is_final'] };
     }
@@ -365,9 +321,6 @@
     };
   }
 
-  // Bir cevabın gerçekten bu isteğe ait olduğunu çapraz doğrular.
-  // requestId, replyToken ve surahId üçü birden tutmalı (sahte gönderici ve
-  // yanlış sûre eşleme tehdidi — QY-00 tehdit modeli).
   function verifyResponseAgainstOutbox(outbox, claim){
     if (!isPlainObject(claim)) return { ok: false, reason: 'bad_claim' };
     var ob = isPlainObject(outbox) ? (outbox.requests || {}) : {};
@@ -379,7 +332,6 @@
     return { ok: true, reason: 'ok', surahId: req.surahId, revelationOrder: req.revelationOrder };
   }
 
-  // Uygulamaya/panele gidecek yükte secret kalmadığını kanıtlar.
   function containsSecret(payload){
     var s;
     try { s = JSON.stringify(payload); } catch (e) { return true; }
@@ -390,7 +342,10 @@
     return false;
   }
 
-  window.QuranTransportV1 = Object.freeze({
+  // Tek fark BURADA: window.QuranTransportV1 = ... yerine IIFE'nin dönüş
+  // değeri üst seviye `var QuranTransportV1`e atanıyor (dosyanın en başına
+  // bakın). Gövdenin geri kalanı quranTransportV1.js ile birebir aynıdır.
+  return Object.freeze({
     SCHEMA_VERSION: SCHEMA_VERSION,
     PATHS: PATHS,
     FORBIDDEN_PATHS: FORBIDDEN_PATHS,

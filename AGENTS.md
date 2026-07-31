@@ -318,6 +318,316 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-07-31 — Kur’an Yolculuğu QY-10 Gmail cevap köprüsü (STAGED — hiçbir yere deploy YOK)
+
+**Branch:** `feature/kuran-yolculugu-qy05` (çalışma ağacında; commit edilmedi).
+**Deploy:** YOK ve **YAPILAMAZ** — bu aşama QY-09'dan farklı: Google Apps
+Script'e (`clasp`/Apps Script API) hiçbir erişimim yok, bu yüzden `gh` ile
+push ettiğim QY-09'un aksine burada dosyaları hiçbir yere kopyalayamadım.
+Tamamı kullanıcının script.google.com'da elle yapıştırması gereken bir
+teslimat; bkz. `.claude/skills/run-seyma/quran-reply-bridge/README.md`.
+
+**Yeni dosyalar (`.claude/skills/run-seyma/quran-reply-bridge/`):**
+
+- `QuranTransportV1.gs` — `quranTransportV1.js`'in mekanik Apps Script
+  uyarlaması: gövde satır satır AYNI, tek fark son satırdaki dışa aktarım
+  (`window.X=...` yerine `var X=(IIFE)()`, çünkü Apps Script'te `window` yok).
+- `ReplyBridgeLogic.gs` — saf karar fonksiyonu `evaluateReply(ctx)`.
+  GmailApp/UrlFetchApp/PropertiesService'e hiç dokunmaz; `sha256Hex` ve
+  `checkVideoExists` ctx üzerinden enjekte edilir. surahId e-postadan
+  OKUNMAZ — her zaman requestId üzerinden outbox kaydından türetilir (yanlış
+  sûre eşleme tehdidini yapısal olarak imkânsız kılar). responseId,
+  `sha256Hex(requestId+':'+gmailMessageId)`'den deterministik üretilir —
+  aynı e-posta iki kez işlense AYNI responseId çıkar, `applyResponse` no-op yapar.
+- `Code.gs` — Apps Script'e özel ince yapıştırıcı (GmailApp arama/etiketleme,
+  GitHub Contents API GET+sha-retry+PUT, YouTube oEmbed kontrolü). Bilinçli
+  olarak HİÇBİR karar mantığı içermez; hepsi yukarıdaki saf fonksiyona delege
+  edilir — bu yüzden test edilemeyen kod yüzeyi minimumda tutuldu.
+  `checkVideoExists_` yalnız KESİN 404/400/401'de `false` döner; belirsiz
+  (5xx/zaman aşımı) durumda THROW eder ki thread "işlendi" damgalanmasın.
+- `test_reply_bridge.mjs` — 46 test, sıfır ağ. Plan DOĞRULAMA listesiyle
+  birebir: geçerli cevap, spoof sender, yanlış token, iki URL, bozuk URL,
+  tekrar cevap (idempotency), silinmiş video — artı gizlilik testleri
+  (kabul/red sonuçlarında ham gövde/adres/token asla yok).
+- `test_transport_parity.mjs` — 69 test: `QuranTransportV1.gs`'i gerçek
+  `quranTransportV1.js` ile AYNI girdilerle ÇALIŞTIRIP sonuçların birebir
+  eşit olduğunu kanıtlar (metin karşılaştırması değil, davranış kanıtı).
+
+**Doğrulama:**
+
+- `node test_reply_bridge.mjs` → 46/46 ✅
+- `node test_transport_parity.mjs` → 69/69 ✅ (sıfır kayma kanıtı)
+- Üç `.gs` dosyası `vm.Script` ile sözdizimi doğrulandı ✅
+- Regresyon: `test_quran_transport.js` 207/207, `test_quran_outbox_sync.js`
+  55/55, `verify-quran-library-ui.mjs` 127/127, `verify-quran-migration-v1.mjs`
+  57/57, `verify-quran-state-machine.mjs` 179/179, `test_quran_catalog.js`
+  70/70, `driver.mjs` ✅, `zikr-harness.mjs` 84/84, `test_faz10_sync.js` 64/64,
+  `test_faz11_panel.js` 44/44, `python test_quran_mail.py` 12/12 — hepsi ✅.
+- `git diff --check` temiz ✅. Gerçek Gmail/YouTube/GitHub çağrısı hiç
+  yapılmadı; script.google.com'a hiçbir şey yapıştırılmadı.
+
+**Bilinçli sınırlar (planlı, hata değil):**
+
+- `Code.gs` deploy edilmeden hiçbir cevap otomatik işlenmez.
+- Uygulamanın `data/quran-responses.json`'u okuyup göstermesi QY-11'e
+  (yanıt polling) aittir — henüz yazılmadı.
+- Panel aynası (QY-15) ve çoklu cihaz merge testleri (QY-16) hâlâ yok.
+
+**Kalan:** Kullanıcı Apps Script kurulumunu elle yaparsa QY-10 fiilen devreye
+girer; ardından QY-11 — uygulamanın `quran-delivery.json`/`quran-responses.json`'u
+güvenli okuyup yerel duruma uygulaması (cache-busting, bozuk dosyada çökme yok,
+arka planda agresif polling yok).
+
+---
+
+### 2026-07-31 — Kur’an Yolculuğu QY-09 takip: PR merge edildi (mustafaras/seyma-data#1)
+
+**Ne değişti:** Aşağıdaki QY-09 kaydı "STAGED — seyma-data'ya YAZILMADI"
+olarak yazılmıştı; kullanıcı bu oturumda AskUserQuestion ile açıkça
+"seyma-data'ya kopyala ve merge et" seçeneğini seçti. Bunun üzerine:
+
+1. `mustafaras/seyma-data` scratchpad'e shallow-clone edildi.
+2. `qy09-quran-mail-workflow` dalında YALNIZ iki dosya eklendi:
+   `.github/workflows/quran-mail.yml`, `.github/scripts/quran_mail.py`
+   (bu klasördeki `quran-mail-workflow/` içeriğiyle birebir aynı).
+3. `gh pr create` ile PR #1 açıldı, dosya listesi doğrulandı (yalnız bu iki
+   dosya, `ADDED`), `gh pr merge --merge --delete-branch` ile `main`'e
+   merge edildi (commit `ac1c312`).
+4. Merge sonrası `gh api` ile doğrulandı: `data/` klasöründe henüz hiçbir
+   `quran-*.json` YOK (beklenen — bu Kur’an Yolculuğu özelliği `mustafaras/s`'te
+   henüz `main`'e merge/deploy edilmedi, dolayısıyla gerçek bir istek hiç
+   oluşmadı) ve `data/latest.json` dahil hiçbir mevcut dosyaya dokunulmadı.
+
+**Sonuç:** Workflow artık CANLI ama UYKUDA — yalnız `mustafaras/s`'teki bu
+özellik `main`'e alınıp deploy edildikten SONRA, gerçek bir "Raşit'ten iste"
+tıklaması `data/quran-request-outbox.json`'u değiştirdiğinde tetiklenecek ve
+gerçekten mail gönderecek. Bu artık bir tatbikat değil; secret'lar zaten
+mevcut olduğu için tetiklendiği an gerçek e-posta gider.
+
+---
+
+### 2026-07-31 — Kur’an Yolculuğu QY-09 e-posta workflow'u (STAGED — seyma-data'ya YAZILMADI)
+
+**Branch:** `feature/kuran-yolculugu-qy05` (çalışma ağacında; commit edilmedi).
+**Deploy:** YOK. `mustafaras/seyma-data`'ya hiçbir şey push edilmedi/yazılmadı;
+o repo yalnız READ-ONLY olarak (`gh api`, QY-00 emsaliyle aynı yetkiyle)
+mevcut `aeon-mail.yml`/`aeon_mail.py` desenini incelemek için okundu.
+
+**Neden "staged" ve merge edilmedi:** `data/quran-request-outbox.json`
+`mustafaras/seyma-data`'da yaşıyor (bu repo yalnız uygulama kodu barındırır).
+O dosyayı dinleyecek GitHub Actions workflow'u da mantıken oraya ait. Salt-
+okunur inceleme, `seyma-data`'da `MAIL_USERNAME`/`MAIL_PASSWORD`/`MAIL_TO`
+secret'larının **zaten tanımlı** olduğunu doğruladı (mevcut ÆON/profil mail
+workflow'ları için) — yani bu dosyaları kopyalayıp merge etmek YENİ BİR
+SECRET GEREKTİRMEZ ve bir sonraki gerçek istekte GERÇEKTEN mail gönderir.
+`CLAUDE.md`'nin "Never write to `mustafaras/seyma-data` without explicit
+user consent" kuralı ve planın kendi QY-09 doğrulama notu ("gerçek e-posta
+ancak açık kullanıcı izniyle") gereği, dosyalar yalnız bu repoda hazırlanıp
+incelemeye sunuldu; kopyalama/merge adımı kullanıcının açık onayını bekliyor.
+
+**Yeni dosyalar (bu repoda, `.claude/skills/run-seyma/quran-mail-workflow/`):**
+
+- `README.md` — kopyalama adımları, secret uyarısı, kapsam dışı notlar.
+- `quran-mail.yml` — `seyma-data/.github/workflows/quran-mail.yml` adayı.
+  `aeon-mail.yml` ile AYNI temel desen (`on: push: paths:
+  [data/quran-request-outbox.json]`, `workflow_dispatch`, `concurrency`
+  grubu, aynı üç secret) + YENİ: değişen `data/quran-delivery.json`'u
+  `git commit`/`push` ile geri yazan bir adım (`permissions: contents:
+  write`).
+- `quran_mail.py` — `seyma-data/.github/scripts/quran_mail.py` adayı.
+  Yalnız standart kütüphane (`aeon_mail.py` ilkesiyle aynı). Outbox'ta
+  `data/quran-delivery.json`'da henüz `status:'sent'` OLMAYAN istekleri
+  bulur, plan §8'in birebir konu/gövde şablonuyla (`[KURAN-REQ:{requestId}:
+  {replyToken}] {nüzulNo}. Durak · {sûreAdı}` + Sûre/Nüzul/Mushaf/İstek
+  zamanı + kabul edilen URL örnekleri) tek e-posta gönderir, sonucu
+  idempotent yazar. Secret yoksa `aeon_mail.py` ile birebir davranış:
+  hiçbir şey göndermez, `delivery.json`'a DOKUNMAZ, exit 0.
+- `test_quran_mail.py` — 12 testlik, sıfır ağlı `unittest` paketi
+  (`smtplib.SMTP_SSL` tamamen sahte). `cd .claude/skills/run-seyma/
+  quran-mail-workflow && python test_quran_mail.py`.
+
+**Test sırasında bulunup düzeltilen gerçek hata:** ilk yazımda hata mesajı
+yalnız 80 karaktere kısaltılıyordu ("kısaltma = redaksiyon" varsayımı
+YANLIŞTI). Kısa bir sahte SMTP hatası bu sınırın altında kalıp secret'ı
+olduğu gibi taşıdı — testi FAIL etti. Düzeltme: `send_mail()` artık
+`redact_secrets()` ile parola/gönderen adresini metinden GERÇEKTEN çıkarıyor,
+kısaltma yalnız bundan SONRA uygulanıyor. 12/12 yeşil.
+
+**Ayrıca bu oturumda (QY-04/QY-08 üzerinde küçük ama gerçek bir düzeltme):**
+`quranTransportV1.js`'in outbox şeması ve `sync.js`'in `quranOutboxEntryFromPayload`'ı
+artık `mushafOrder`'ı da koruyor. Önceden app.js'in payload'ında zaten var
+olan bu alan sessizce düşüyordu — QY-09'un e-posta gövdesinin gerektirdiği
+"Mushaf sırası" satırı için veri yoktu. Alan isteğe bağlı/geriye dönük
+uyumlu eklendi (geçersizse `null`, kaydı reddetmez); `test_quran_transport.js`'e
+yeni bölüm (8b) ve `test_quran_outbox_sync.js`'e bir assertion eklendi.
+
+**Doğrulama:**
+
+- `python test_quran_mail.py` → 12/12 ✅ (sıfır ağ çağrısı)
+- Manuel uçtan uca dry-run (scratchpad'de, gerçek secret/ağ YOK): secret
+  yokken `delivery.json` hiç oluşmuyor ✅; sahte ağ hatasında temiz hata
+  metniyle `status:'failed'` ve exit 0 ✅.
+- `node --check` (tüm JS) ✅; `test_quran_transport.js` 207/207 ✅ (yeni
+  mushafOrder bölümüyle); `test_quran_outbox_sync.js` 55/55 ✅;
+  `verify-quran-library-ui.mjs` 127/127 ✅; `verify-quran-migration-v1.mjs`
+  57/57 ✅; `verify-quran-state-machine.mjs` 179/179 ✅; `test_quran_catalog.js`
+  70/70 ✅; `driver.mjs` ✅; `zikr-harness.mjs` 84/84 ✅; `test_faz10_sync.js`
+  64/64 ✅; `test_faz11_panel.js` 44/44 ✅; `git diff --check` temiz ✅.
+- `gh api repos/mustafaras/seyma-data/...` yalnız salt-okunur GET çağrıları
+  (workflow listesi, script içeriği, secret adları) — hiçbir yazma/PUT/POST
+  yapılmadı.
+
+**Bilinçli sınırlar (planlı, hata değil):**
+
+- Bu QY-09 dosyaları `seyma-data`'ya kopyalanıp merge edilmeden gerçek bir
+  e-posta ASLA gitmez — outbox dosyası QY-08'den beri gerçekten yazılıyor
+  ama onu okuyup mail atan hiçbir workflow şu an canlı değil.
+- Gelen cevabın otomatik işlenmesi (Gmail Apps Script köprüsü) QY-10'a aittir.
+- `data/quran-responses.json` bu aşamada hiç yazılmaz/okunmaz.
+
+**Kalan:** Kullanıcı onayı gelirse `quran-mail-workflow/`'daki üç dosyanın
+`seyma-data`'ya kopyalanıp merge edilmesi (QY-09'un fiilen devreye girmesi);
+ardından QY-10 — Gmail Apps Script gelen cevap köprüsü.
+
+---
+
+### 2026-07-31 — Kur’an Yolculuğu QY-08 outbox yazma ve sync izolasyonu (commit/push YOK)
+
+**Branch:** `feature/kuran-yolculugu-qy05` (çalışma ağacında; commit edilmedi).
+**Deploy:** YOK. `main`'e merge yok, gerçek GitHub API çağrısı yapılmadı (tüm testler mock `fetch`).
+
+**Değişen dosyalar:** `sync.js`; yeni: `test_quran_outbox_sync.js`.
+`app.js` bu oturumda değişmedi — QY-07'de yazılan `quranOutboxWriter()` /
+`window.SeySync.pushQuranRequest(payload, cb)` çağrısı zaten hazırdı, bu
+aşama yalnız sync.js tarafındaki karşılığı doldurdu.
+
+**QY-08 içeriği (`sync.js`):**
+
+- `pushQuranRequest(payload, cb)` — `window.SeySync`'e yeni eklenen tek giriş
+  noktası. Payload'da `replyToken` YOKTUR; token yalnız burada
+  (`quranReplyToken()`, 40 karakter, crypto tabanlı) üretilir, yalnız outbox
+  dosyasına yazılır, çağırana asla geri döndürülmez.
+- `putQuranOutboxGuarded(c, entry, at, attempt)` — GET (sha + mevcut defter)
+  → `QuranTransportV1.upsertOutboxRequest()` (saf birleştirme) → PUT.
+  409/422 çakışmasında sha yeniden okunup 3 kez daha denenir (mevcut
+  `ghPut()` deseninin aynısı).
+- **İzolasyon:** `data/quran-request-outbox.json` dışında hiçbir dosyaya
+  dokunmaz; `doPush()`/`putLatestGuarded()`'ın `data/latest.json` full-replace
+  zincirine hiç girmez.
+- **Guard 1 (dev-origin) aynen uygulanır:** localhost/file:/*.local'dan
+  çağrılırsa `fetch` HİÇ tetiklenmez, `cb(err)` ile dürüst hata döner; mevcut
+  `seyma-sync-force`/`?forceSync=1` kaçış kapısı burada da çalışır.
+  Guard 2 (anti-clobber gün sayımı) yalnızca `latest.json`'a özgüdür,
+  outbox'a taşınmadı — zayıflatma değil, kapsam dışı bırakma.
+- Girdi doğrulama: `requestId`/`surahId` `QuranTransportV1` desenlerinden
+  geçmezse hiç `fetch` çağrılmadan `cb(err)` döner. `cfg()` (ghToken/ghRepo)
+  yoksa aynı şekilde erken çıkar.
+- Senkron fırlatan bir `fetch` bile (mock/bozuk ortam ihtimali) try/catch ile
+  yakalanır — "outbox yazılamazsa yerel istek kaybolmaz" garantisi hiçbir
+  koşulda bir istisna olarak UI'ya sızmaz.
+
+**Doğrulama (`test_quran_outbox_sync.js`, 54/54, tamamı mock `fetch`, gerçek ağ çağrısı YOK):**
+
+- Yol: yalnız `data/quran-request-outbox.json`'a yazılır; `latest.json`/`gunluk` hiç çağrılmaz.
+- Payload: yazılan defter `QuranTransportV1.parseOutbox()`'tan hatasız geçiyor; GitHub token PUT gövdesinde YOK, yalnız `Authorization` header'ında.
+- Retry: 409 sonrası başarılı retry + sürekli 409'da sınırlı (8 çağrı) hata.
+- Tekilleştirme: aynı `requestId` ikinci kez gönderilince tek anahtar kalıyor; farklı sûreler birbirini EZMİYOR (2 ayrı anahtar).
+- Offline: GET/PUT reddi ve senkron fırlatan `fetch` — hepsi `cb(err)` ile güvenli sonuçlanıyor, çökme yok.
+- Guard 1: localhost/file:'ta sıfır `fetch` çağrısı; `seyma-sync-force` kaçış kapısı çalışıyor.
+- Regresyon: `mergeData`/`mergeZikr`/`schedule`/`pushNow` API'leri değişmedi.
+
+**Bilinçli sınırlar (planlı, hata değil):**
+
+- GitHub Actions e-posta bildirimi (QY-09) ve Gmail Apps Script gelen cevap
+  köprüsü (QY-10) henüz yok. Outbox dosyası şimdi gerçekten yazılıyor ama
+  kimse okuyup e-posta göndermiyor — bu yüzden gerçek bir Raşit e-postası
+  hâlâ gitmiyor (yalnız outbox kaydı oluşuyor).
+- QY-11 (yanıt polling) ve panel aynası (QY-15) hâlâ yok.
+- `index.html` cache bump YAPILMADI (QY-18'de tek seferde; bu değişiklik zaten `index.html`'e dokunmuyor).
+
+**Kalan:** QY-09 — Outbox değişikliğinde Raşit'e e-posta gönderen GitHub
+Actions workflow'u (yalnız `quran-request-outbox` değişiminde tetiklenir,
+konu `requestId+replyToken` taşır, delivery receipt `quran-delivery.json`'a yazılır).
+
+---
+
+### 2026-07-31 — Kur’an Yolculuğu QY-06 kütüphane + QY-07 sûre ayrıntısı (commit/push YOK)
+
+**Branch:** `feature/kuran-yolculugu-qy05` (çalışma ağacında; commit edilmedi).
+**Deploy:** YOK. `main`'e merge yok, `seyma-data`'ya yazma yok, gerçek tarayıcı açılmadı.
+
+**Değişen dosyalar:** `app.js`, `styles.css`, `.claude/skills/run-seyma/SKILL.md`;
+yeni: `.claude/skills/run-seyma/verify-quran-library-ui.mjs`.
+`index.html` DEĞİŞMEDİ — katalog/transport script'leri QY-05'te zaten bağlanmıştı,
+cache bump QY-18'e ait.
+
+**QY-06 (tam ekran sûre kütüphanesi):**
+
+- `quranJourneyOverlayHTML()` — `#quran-overlay`/`#quran-screen`/`#quran-scroll`,
+  `role="dialog" aria-modal="true"`, `onkeydown="App.onQuranKeydown(event)"`.
+  Zikirmatik'in 100dvh kabuk desenini birebir izler.
+- `quranLibraryViewHTML()` — bölüm başlığı, ilerleme şeridi (izlenen/114),
+  arama alanı, `#quran-library-results` ve katalog yöntem notu.
+- `quranLibraryResultsHTML()` — premium expander içinde beş durum filtresi
+  (`Tümü/İstenmedi/Bekleniyor/Hazır/İzlendi`), sonuç notu ve 114 satır.
+- `quranRowHTML(x,q)` — nüzul no, Türkçe ad, Arapça ad (`lang="ar" dir="rtl"`),
+  Mekkî/Medenî, âyet sayısı, mushaf no ve durum rozeti. Rozet meta satırının
+  İÇİNDE ve `flex-wrap` ile sarmalanır → 370px'te bile yatay taşma yok.
+- Arama alanları plan §4 ile birebir: Türkçe ad, Arapça ad, mushaf no, tema.
+  Normalizasyon Zikirmatik'le ORTAK (`zikrNormalizeSearchText`) — kopya yok.
+- Hedefli boyama: `quranPaintView` / `quranPaintLibraryResults` /
+  `quranPaintDetail` / `quranPaintHeadLead`. Filtre, arama ve
+  kütüphane↔ayrıntı geçişi GLOBAL `render()` çağırmaz; DOM yoksa güvenle
+  tam render'a düşer. `ui.quranListScroll` ile liste konumu korunur.
+
+**QY-07 (sûre ayrıntısı + istek CTA'sı):**
+
+- `quranDetailBodyHTML(x)` — Arapça/Türkçe ad, nüzul + mushaf sırası,
+  Mekkî/Medenî (ihtilaflıysa dipnot), âyet sayısı, tema özeti,
+  `role="status" aria-live="polite"` durum bloğu ve TEK ana eylem.
+- `quranDetailAction(id,req)` plan §5 tablosunun tek kaynağı; pasif durumlarda
+  buton gerçekten `disabled`.
+- `App.quranJourneySubmit(id)` — `quranSafeSurahId` doğrulaması,
+  `ui.quranSubmittingId` ile çift dokunma engeli (aynı anda tek uçuş),
+  `quranCanRequest` ikinci-kayıt kapısı, `quranReduce('request_submit')`,
+  `save()`, ardından **QY-08 dikişi** `window.SeySync.pushQuranRequest(payload, cb)`.
+  Callback, Promise ve `throw` yolları ile 20 sn watchdog'un hepsi tek
+  `settle()` üzerinden idempotent biçimde `outbox_written`/`outbox_failed`'e bağlanır.
+- `requestId` artık `qr_` + 24 karakter (crypto tabanlı) → QY-04'ün
+  `/^qr_[A-Za-z0-9_-]{8,64}$/` sözleşmesine uyar. **Bu bir hata düzeltmesidir:**
+  QY-05'teki `q_<id>_<ms>` biçimi outbox tarafından reddedilecekti.
+- `ICONS`'a `chevron-left` eklendi; sette OLMAYAN `loader/refresh-cw/message-circle`
+  adları mevcut ikonlara (`clock/rotate-ccw/phone`) eşlendi. `icon()` bilinmeyen
+  adda sessizce `''` döndüğü için geri düğmesi boş bir 44px kutu olarak
+  çiziliyordu — harness artık bu sınıf hatayı statik olarak yakalıyor.
+
+**Bilinçli sınırlar (planlı, hata değil):**
+
+- Taşıma kanalı (QY-08/QY-09) henüz yok. Bu yüzden "Raşit'ten iste" bugün
+  gerçekten `request_error` ile biter ve plan §15'in birebir metnini gösterir:
+  *"İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin."*
+  Kayıt yerelde durur, retry açıktır. `queued` demek yalan olurdu.
+- `App.quranJourneyWatch/Question` hâlâ dürüst placeholder toast — güvenli
+  YouTube kartı QY-12, izlenme doğrulaması QY-13, WhatsApp QY-14.
+- `quranJourney` sync merge kuralı yok (QY-16); panel aynası yok (QY-15).
+- `index.html` cache bump YAPILMADI (QY-18'de tek seferde).
+
+**Doğrulama:**
+
+- `node --check app.js sync.js quranRevelationOrderV1.js quranTransportV1.js hijriCalendar.js` ✅
+- **`verify-quran-library-ui.mjs` 127/127 ✅** (yeni QY-06/QY-07 kapısı)
+- `verify-quran-migration-v1.mjs` 57/57 ✅ · `verify-quran-state-machine.mjs` 179/179 ✅
+- `test_quran_catalog.js` 70/70 ✅ · `test_quran_transport.js` 198/198 ✅
+- `driver.mjs` ✅ · `zikr-harness.mjs` 84/84 ✅
+- `test_faz10_sync.js` 64/64 ✅ · `test_faz11_panel.js` 44/44 ✅
+- styles.css brace/paren dengesi ✅ · `git diff --check` temiz ✅
+
+**Kalan:** QY-08 — Kur’an isteğini adanmış outbox'a yazan `SeySync.pushQuranRequest`
+(latest.json full-replace zincirinden bağımsız, dev-origin ve anti-clobber
+korumaları zayıflatılmadan). Dikiş app.js tarafında hazır; sync.js tarafı boş.
+
+---
+
 ### 2026-07-30 — Kur’an Yolculuğu QY-05 ana kartı (feature branch'e push, canlıya alınmadı)
 
 **Branch:** `feature/kuran-yolculugu-qy05` → `origin/feature/kuran-yolculugu-qy05`.

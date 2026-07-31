@@ -1,0 +1,65 @@
+name: Kur’an Yolculuğu istek maili
+
+# QY-09: data/quran-request-outbox.json değiştiğinde, henüz 'sent' delivery
+# kaydı olmayan istekler için Raşit'e tek bir e-posta gönderir ve sonucu
+# (başarı/başarısızlık) data/quran-delivery.json'a idempotent biçimde yazar.
+#
+# aeon-mail.yml / profile-completion-mail.yml ile AYNI temel desen ve AYNI
+# üç secret (MAIL_USERNAME/MAIL_PASSWORD/MAIL_TO) — yeni secret gerekmez.
+# TEK FARK: bu workflow, sonucu delivery.json'a geri yazmak için ayrıca bir
+# commit adımı içerir (aeon/profil maillerinde delivery receipt yoktur,
+# çünkü onlar tek seferlik "bildirim" niteliğindedir; Kur'an isteği ise
+# yanıtlanabilir olmalı — uygulama "Raşit'e haber verildi" demeden önce bu
+# dosyayı okur).
+#
+# KRİTİK İZOLASYON: Bu workflow data/latest.json'a ASLA dokunmaz; yalnız
+# data/quran-delivery.json'u günceller. quran_mail.py idempotenttir: aynı
+# requestId için status zaten 'sent' ise İKİNCİ KEZ e-posta göndermez —
+# bu yüzden workflow'un manuel/otomatik yeniden çalıştırılması (retry) çift
+# maile yol açmaz.
+
+on:
+  push:
+    paths:
+      - data/quran-request-outbox.json
+  workflow_dispatch: {}
+
+# Aynı anda tek çalıştırma yeter; art arda birden fazla istek gelirse aynı
+# çalıştırma hepsini işler (quran_mail.py tüm bekleyenleri tek seferde tarar).
+concurrency:
+  group: quran-mail
+  cancel-in-progress: false
+
+permissions:
+  contents: write  # yalnız data/quran-delivery.json'u commit'lemek için
+
+jobs:
+  mail:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kaynağı al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bekleyen istekleri e-postala ve delivery kaydını güncelle
+        env:
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python .github/scripts/quran_mail.py
+
+      - name: Delivery kaydını commit'le (yalnız değiştiyse)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git status --porcelain -- data/quran-delivery.json | grep -q .; then
+            git add data/quran-delivery.json
+            git commit -m "quran-delivery: istek teslim kaydı güncellendi"
+            git push
+          else
+            echo "data/quran-delivery.json değişmedi — commit atlanıyor."
+          fi

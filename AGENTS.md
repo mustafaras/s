@@ -328,6 +328,19 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an videosu “Baştan izle” 30. saniyeye atlıyordu
+
+Kayıtta yalnız videoId vardı; `t=`/start parametresi yoktu. YouTube gizlilikli
+embed oturumdan izleme konumunu hatırlayıp yeniden izlemede yaklaşık 30.
+saniyeye atlayabiliyordu. Embed URL'sine `start=0` eklendi. Yalnız
+`watched/question_opened` yeniden izleme akışında IFrame API `onReady` içinde
+`seekTo(0,true)` ve `playVideo()` çağrılır; ilk izleme davranışı değişmez.
+Kur’an UI 208/208, state 179/179, remote 16/16, hub 90/90, transport 207/207,
+pull 11/11, merge 34/34, sync 64/64, panel 44/44 geçti. Cache
+`app/styles?v=20260801i`.
+
+---
+
 ### 2026-08-01 — Kur’an videosu “İzledim” sonrası başa sarıyordu (iframe koruma)
 
 Gerçek cihazda video kısa süre oynayıp `Raşit’e sor` görünürken başa dönüyordu.

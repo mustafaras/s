@@ -10163,6 +10163,7 @@ function quranEmbedOrigin(){
 }
 var _quranYtApiState='idle'; // idle | loading | ready
 var _quranYtPendingSurahId='';
+var _quranYtRestartSurahId='';
 function quranLoadYtApi(){
   if(_quranYtApiState!=='idle') return;
   _quranYtApiState='loading';
@@ -10191,7 +10192,14 @@ function quranBindPlayer(surahId){
   try{
     if(typeof window==='undefined'||typeof window.YT==='undefined'||!window.YT||typeof window.YT.Player!=='function') return;
     var el=document.getElementById('quran-yt-player'); if(!el) return;
-    new window.YT.Player('quran-yt-player',{events:{onStateChange:function(e){ quranOnPlayerStateChange(surahId,e); }}});
+    new window.YT.Player('quran-yt-player',{events:{
+      onReady:function(e){
+        if(_quranYtRestartSurahId!==surahId||ui.quranPlayerLoadedId!==surahId) return;
+        _quranYtRestartSurahId='';
+        try{ e.target.seekTo(0,true); e.target.playVideo(); }catch(err){}
+      },
+      onStateChange:function(e){ quranOnPlayerStateChange(surahId,e); }
+    }});
   }catch(e){}
 }
 function quranOnPlayerStateChange(surahId,e){
@@ -10218,7 +10226,7 @@ function quranVideoCardHTML(x,req){
     // kullanılabilir — izolasyon zaafı yalnız aynı-köken/saldırgan kontrollü
     // içerikte oluşur, resmi YouTube oynatıcısında değil. `enablejsapi=1`
     // + `origin` QY-13'ün ENDED algısı için gerekli (quranAttachPlayer).
-    h+='<iframe id="quran-yt-player" src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin='+esc(quranEmbedOrigin())+'" '
+    h+='<iframe id="quran-yt-player" src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1&playsinline=1&start=0&enablejsapi=1&origin='+esc(quranEmbedOrigin())+'" '
       +'title="'+esc(x.nameTr)+' Sûresi anlatımı" loading="lazy" '
       +'allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen '
       +'referrerpolicy="strict-origin-when-cross-origin" '
@@ -10464,6 +10472,9 @@ App.quranJourneyWatch=function(id){
   var sid=quranSafeSurahId(id||q.activeSurahId); if(!sid) return;
   var req=quranRequestOf(q,sid);
   if(!QURAN_VIDEO_ID_RE.test(String(req.videoId||''))) return;
+  // İzlenmiş bir anlatım yeniden açılıyorsa YouTube'un oturumdan hatırladığı
+  // konumu değil kesin olarak 0. saniyeyi kullan. İlk izleme normal başlar.
+  _quranYtRestartSurahId=(req.status==='watched'||req.status==='question_opened')?sid:'';
   ui.quranPlayerLoadedId=sid;
   var res=quranReduce(req,{type:'watch_start',at:new Date().toISOString()});
   if(res.changed){ q.requests[sid]=res.request; save(); }

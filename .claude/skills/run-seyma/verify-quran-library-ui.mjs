@@ -466,6 +466,7 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('YouTube Error 153 önlenir: yalnız origin gönderen referrer policy',
     vd.includes('referrerpolicy="strict-origin-when-cross-origin"') && !vd.includes('referrerpolicy="no-referrer"'));
   ok('iOS oynatıcı sayfa içinde açılır (playsinline)', /[?&]playsinline=1/.test(vd));
+  ok('embed URL’si baştan oynatma için start=0 taşır', /[?&]start=0/.test(vd));
   ok('sandbox uygulanmış, allow-forms/top-navigation YOK', /sandbox="[^"]*"/.test(vd) && !/sandbox="[^"]*(allow-forms|allow-top-navigation)/.test(vd));
   ok('durum ready→watching geçti (izlemeye başladı kaydı)', journey().requests.fatiha.status === 'watching', journey().requests.fatiha.status);
 
@@ -525,6 +526,9 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
     /class="quran-v2-video is-unavailable" role="status" aria-live="polite"/.test(vd), vd);
 
   App.openQuranSurah('asr'); // status: watched, videoId: aaaaaaaaaaa
+  App.quranJourneyWatch('asr');
+  ok('izlenmiş anlatımı yeniden açma kaynakta seekTo(0) + playVideo kullanır',
+    /_quranYtRestartSurahId[\s\S]*seekTo\(0,true\)[\s\S]*playVideo\(\)/.test(fs.readFileSync(path.join(REPO, 'app.js'), 'utf8')));
   vd = detailHTML();
   ok('izlenmiş sûrede video kartı hâlâ var (yeniden izlenebilir)', vd.includes('quran-v2-video-frame'));
   ok('izlenmiş sûrede “Raşit’e sor” CTA’sı da birlikte görünür', vd.includes('Raşit’e sor') && /class="quran-v2-cta/.test(vd));

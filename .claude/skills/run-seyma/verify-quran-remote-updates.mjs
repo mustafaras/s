@@ -145,6 +145,17 @@ console.log('\n2. Geçerli yanıt (responses.json) + idempotent tekrar');
 }
 
 // ── 3) Yanlış sûre eşleme tehdidi: response.surahId sûre anahtarıyla uyuşmuyorsa UYGULANMAZ ──
+console.log('\n2b. Delivery kaydı eksikken doğrulanmış yanıt queued → ready');
+{
+  const pull = { delivery: { requests: {} }, responses: { responses: { qr_2b: { responseId: 'qrr_2b', requestId: 'qr_2b', surahId: 'alak', videoId: VID, status: 'ready' } } } };
+  const sb = bootWithPull({ alak: req('qr_2b', 'queued') }, pull);
+  sb.App.refreshQuranUpdates(true);
+  const j = journey(sb);
+  ok('doğrulanmış response delivery olmadan queued durumunu ready yapar', j.requests.alak.status === 'ready', j.requests.alak.status);
+  ok('delivery eksik senaryoda videoId kaybolmadan uygulanır', j.requests.alak.videoId === VID, j.requests.alak.videoId);
+}
+
+// ── 3) Yanlış sûre eşleme tehdidi: response.surahId sûre anahtarıyla uyuşmuyorsa UYGULANMAZ ──
 console.log('\n3. Yanlış sûre eşleme reddi (plan §2/§9 tehdit modeli)');
 {
   // Aynı requestId altında ama surahId ALAK olan (yasin değil) sahte/bozuk kayıt.

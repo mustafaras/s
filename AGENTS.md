@@ -328,6 +328,21 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an yanıtı delivery olmadan kullanıcıya ulaşmıyordu (kök düzeltme)
+
+Gerçek uçtan uca testte Alak isteği `quran-request-outbox.json`'a yazıldı ve
+Gmail Apps Script cevabı doğrulayıp `quran-responses.json` içinde `ready`
+oluşturdu; ancak QY-09 workflow'u delivery dosyasını yazamadığı için kullanıcı
+state'i `queued` kaldı. `quranApplyRemoteUpdates()` doğrulanmış response'u
+delivery receipt'ten daha güçlü kanıt sayacak şekilde düzeltildi: response
+eşleştiğinde eksik ara durumlar reducer üzerinden monotonik olarak
+`queued → notified → awaiting_reply → validating_reply → ready` tamamlanır.
+Yeni gerçek-senaryo testi `verify-quran-remote-updates.mjs` içinde 16/16 geçti;
+state-machine/UI/pull/merge/shared sync/panel regresyonları yeşil. Cache
+`app.js?v=20260801f`.
+
+---
+
 ### 2026-08-01 — Kur’an mail/cevap/video güvenli demo (yerel-only)
 
 Gerçek Şeyma verisine, tokena, Gmail'e veya `seyma-data`'ya dokunmadan akışı

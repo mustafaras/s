@@ -10511,6 +10511,12 @@ function quranApplyRemoteUpdates(delivery,responses){
     if(receipt&&receipt.status==='sent'){ apply({type:'delivery_receipt',at:at}); apply({type:'await_reply',at:at}); }
     var resp=rs[req.requestId];
     if(resp&&resp.surahId===sid){
+      // Doğrulanmış bir response, mail delivery kaydından daha güçlü kanıttır.
+      // Workflow delivery.json yazamasa bile (gerçek üretim vakası), cevap
+      // requestId+token+sûre+video doğrulamasından geçtiyse queued durumunu
+      // monotonik ara geçişlerle awaiting_reply'e taşır; asla geriye çekmez.
+      apply({type:'delivery_receipt',at:at});
+      apply({type:'await_reply',at:at});
       apply({type:'response_received',at:at});
       if(resp.status==='ready'){
         apply({type:'response_valid',responseId:resp.responseId,videoId:resp.videoId,at:at});

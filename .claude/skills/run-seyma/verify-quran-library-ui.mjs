@@ -531,8 +531,9 @@ section('7. İstek gönderimi, tekilleştirme ve güvenli retry');
   ok('istek yerel olarak kaydedildi', !!r1 && !!r1.requestedAt);
   ok('kanal yokken durum request_error (dürüst hata)', r1.status === 'request_error', r1 && r1.status);
   ok('requestId QY-04 taşıma desenine uyuyor', TRANSPORT.isValidRequestId(r1.requestId), r1 && r1.requestId);
-  ok('kullanıcı metni plan §15 ile birebir',
-    toasts.some((t) => t.textContent === 'İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.'), toasts.map((t) => t.textContent));
+  ok('kullanıcı metni plan §15 mesajını ve secretsız hata sınıfını taşıyor',
+    toasts.some((t) => /^İstek şu an iletilemedi \((GitHub (401|403|404|409|422)|Bağlantı ayarı|İstek doğrulama|Yerel ortam koruması|Zaman aşımı|Ağ hatası)\)\. Kaydın duruyor; yeniden deneyebilirsin\.$/.test(t.textContent)),
+    toasts.map((t) => t.textContent));
   ok('uçuş kilidi serbest bırakıldı', uiState().submittingId === '');
   ok('aktif sûre isteğe taşındı', journey().activeSurahId === 'tekvir');
 

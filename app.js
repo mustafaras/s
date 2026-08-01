@@ -10375,6 +10375,16 @@ function quranOutboxWriter(){
   return (s&&typeof s.pushQuranRequest==='function')?s:null;
 }
 var QURAN_SUBMIT_TIMEOUT_MS=20000;
+function quranOutboxErrorLabel(err){
+  var msg=String((err&&err.message)||err||'');
+  var http=msg.match(/(?:^|\s)(401|403|404|409|422)(?:\s|$)/);
+  if(http) return 'GitHub '+http[1];
+  if(msg.indexOf('senkron yapılandırılmamış')>=0) return 'Bağlantı ayarı';
+  if(msg.indexOf('geçersiz payload')>=0||msg.indexOf('invalid_entry')>=0) return 'İstek doğrulama';
+  if(msg.indexOf('yerel ortam')>=0) return 'Yerel ortam koruması';
+  if(msg.indexOf('timeout')>=0||msg.indexOf('zaman aşımı')>=0) return 'Zaman aşımı';
+  return 'Ağ hatası';
+}
 App.quranJourneySubmit=function(id){
   var sid=quranSafeSurahId(id);
   if(!sid){ toast('Bu sûre bulunamadı.'); return; }
@@ -10399,25 +10409,25 @@ App.quranJourneySubmit=function(id){
     surahName:x?x.nameTr:sid,requestedAt:at
   };
   var settled=false;
-  function settle(okFlag){ if(settled) return; settled=true; quranSettleSubmit(sid,okFlag); }
+  function settle(okFlag,err){ if(settled) return; settled=true; quranSettleSubmit(sid,okFlag,err); }
   var writer=quranOutboxWriter();
-  if(!writer){ settle(false); return; }
+  if(!writer){ settle(false,new Error('quran_outbox: senkron yapılandırılmamış')); return; }
   // Yazıcı ne callback ne promise döndürürse istek sonsuza dek "submitting"de
   // asılı kalmasın; watchdog güvenli hataya düşürür ve retry açılır.
-  try{ setTimeout(function(){ settle(false); },QURAN_SUBMIT_TIMEOUT_MS); }catch(e){}
+  try{ setTimeout(function(){ settle(false,new Error('quran_outbox: timeout')); },QURAN_SUBMIT_TIMEOUT_MS); }catch(e){}
   try{
-    var ret=writer.pushQuranRequest(payload,function(err){ settle(!err); });
-    if(ret&&typeof ret.then==='function') ret.then(function(){ settle(true); },function(){ settle(false); });
-  }catch(e){ settle(false); }
+    var ret=writer.pushQuranRequest(payload,function(err){ settle(!err,err); });
+    if(ret&&typeof ret.then==='function') ret.then(function(){ settle(true); },function(err){ settle(false,err); });
+  }catch(e){ settle(false,e); }
 };
-function quranSettleSubmit(sid,okFlag){
+function quranSettleSubmit(sid,okFlag,err){
   var q=ensureQuranJourney(data), req=quranRequestOf(q,sid), at=new Date().toISOString();
   var res=quranReduce(req,{type:okFlag?'outbox_written':'outbox_failed',at:at});
   if(res.changed) q.requests[sid]=res.request;
   if(ui.quranSubmittingId===sid) ui.quranSubmittingId='';
   save();
   quranRepaintAfterChange(sid);
-  toast(okFlag?'İsteğin kaydedildi.':'İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.');
+  toast(okFlag?'İsteğin kaydedildi.':'İstek şu an iletilemedi ('+quranOutboxErrorLabel(err)+'). Kaydın duruyor; yeniden deneyebilirsin.');
 }
 App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(data).activeSurahId); };
 // QY-13 (IFrame API ENDED izleme doğrulaması, "İzledim" yedeği) ve QY-14

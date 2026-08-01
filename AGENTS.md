@@ -328,6 +328,19 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an isteği production teşhis etiketi (commit edilmedi)
+
+Kullanıcının üretimde Müzzemmil için iki gerçek denemesi de outbox oluşmadan
+`request_error` ile bitti; `seyma-data` üzerinde workflow run ve
+`data/quran-request-outbox.json` yoktu. Uygulama önceden gerçek hatayı tamamen
+yuttuğu için `quranOutboxErrorLabel()` eklendi. UI artık yalnız secretsız hata
+sınıfını gösterir: GitHub 401/403/404/409/422 veya bağlantı/validasyon/yerel
+koruma/zaman aşımı/ağ. API gövdesi ve token hiçbir zaman DOM'a gelmez. Callback,
+Promise reddi, senkron throw ve watchdog gerçek hatayı ortak `settle` yoluna
+taşır. `verify-quran-library-ui.mjs` 202/202; cache `app.js?v=20260801e`.
+
+---
+
 ### 2026-08-01 — Kur’an Yolculuğu modalı: premium ilmî kütüphane pass’i (commit edilmedi)
 
 **Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı görsel referansla Kur’an

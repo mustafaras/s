@@ -14,10 +14,21 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
 
 **Hard rules — every agent, every session:**
 
-1. **NEVER open or serve+open the Şeyma app in a browser to "check it runs."**
-   Use the headless Node `vm` render harness instead — the `run-seyma` skill
+1. **NEVER open the Şeyma app in a browser yourself, and never serve+open it
+   generically to "check it runs."** Use the headless Node `vm` render
+   harness instead — the `run-seyma` skill
    (`.claude/skills/run-seyma/driver.mjs`; see "Verification" below). Opening
    the app is the single most dangerous thing you can do here.
+   **Narrow exception (2026-08-01, standing user permission):** if the user
+   asks you to serve the app on **port 9000**, you may start a plain static
+   file server bound to that port (e.g. `python3 -m http.server 9000` from
+   the repo root) — this is pre-approved, no need to ask again each time.
+   You still must never navigate a browser to it yourself; the user opens it
+   in their own browser. Tell them to prefer a clean/incognito profile (no
+   prior `seyma-reset-v1` in that profile's localStorage) so Guard 1/2 below
+   aren't the only line of defense. Stop the server per rule 4 before ending
+   your turn. This exception is scoped to port 9000 only — other ports/generic
+   "let's just run it" requests are still covered by the rule above.
 2. If you *must* use a real browser, it now self-protects: `sync.js` **blocks
    all pushes from `localhost`/`127.0.0.1`/`file:`/`*.local`** (Guard 1) and
    **blocks any push whose day-count is lower than the remote** (Guard 2,

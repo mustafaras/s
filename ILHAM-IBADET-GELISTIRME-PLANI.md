@@ -11,6 +11,25 @@
 
 ---
 
+## Hub tasarım birliği ve Kur’an vitrini — 2026-08-01
+
+İlham & İbadet hub yenilemesi A-F tamamlandı. Kıble kartı bilimsel/kompakt
+yapısıyla korunurken Sûre, Günün Öncüsü, İman Köşesi ve Zikirmatik aynı büyük
+kart dilinde birleşti: başlık/durum, ana vitrin, üçlü metrik, ilerleme ve alt
+eylem katmanları. Beşli `Öz | Öncü | İman | Zikir | Rapor` navigasyonu sayfanın
+en üstüne, vakit-Hicri şeridinin hemen üzerine taşındı; seçili bölüm
+`aria-current="page"` ile duyurulur ve tüm hedefler en az 44px'tir.
+
+Kur’an kartı kullanıcı tarafından doğrulanan 100 âyetlik dondurulmuş
+`quranStrikingVersesV1.js` seçkisini gerçek hub girişlerinde sırayla döndürür;
+aynı sekmedeki ilgisiz render'lar vitrini ilerletmez. Saygı kartı kişi,
+Wikipedia özeti, okuma/koleksiyon/seri bilgisini; İman kartı sıradaki vakit,
+saat, kılınan/cemaat/seri metriklerini gösterir. Dar ekran ve
+`prefers-reduced-motion` sözleşmeleri headless harness'te kalıcı kapıdır.
+Cache sürümü `20260801b`; commit/push/deploy kullanıcı emri olmadan yapılmadı.
+
+---
+
 ## Uygulama denetimi — 2026-07-29
 
 Kod-plan karşılaştırmasında önceki teslimin ana özellikleri çalışır durumda olsa

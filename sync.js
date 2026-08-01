@@ -440,6 +440,84 @@ function mergeZikr(localZ, remoteZ){
   if(ra&&(!la||((ra.lastAt||ra.startedAt||'')>(la.lastAt||la.startedAt||'')))) out.activeSession=JSON.parse(JSON.stringify(ra));
   return out;
 }
+// ── QY-16: Kur’an Yolculuğu çoklu cihaz birleştirmesi ───────────────────────
+// Plan §13 "Birleştirme kuralları" burada BİREBİR uygulanır:
+//   - Farklı sûre istekleri union.
+//   - Aynı istek `updatedAt` ile LWW, fakat durum geriye gidemez.
+//   - `ready`, `watched` tarafından geriye çekilemez.
+//   - `watchedAt` bir kez oluştuysa eski cihaz silemez.
+//   - Yanıt/video geçmişi kaybolmaz.
+// (Ayrı response dosyası zaten latest.json'dan bağımsız — QY-04/QY-08/QY-11
+// isolasyonu; "aynı requestId iki kez eklenemez" kuralı da zaten
+// upsertOutboxRequest'in map-by-requestId sözleşmesiyle sağlanıyor — burada
+// yeniden uygulanmaz.)
+//
+// KEŞİF: mergeData bu faza kadar quranJourney'e hiç dokunmuyordu — iki
+// cihazda da alan zaten var olduğu için "remote'de olup local'de olmayanı
+// ekle" yedeği de devreye girmiyordu, yani B bayat kalmış bir cihazdan push
+// ettiğinde A'nın az önce kaydettirdiği isteği/videoyu SESSİZCE EZİYORDU.
+// Bu fonksiyon tam olarak o riski kapatır.
+//
+// Rütbe tablosu app.js'teki QURAN_RANK ile BİREBİR aynı (kasıtlı kopya —
+// sync.js app.js'e bağımlı değildir, her modül kendi küçük sabitini taşır;
+// bkz. diğer *_S yardımcıları ve mergeZikr'in kendi kopyaladığı örüntü).
+var QURAN_RANK_S={idle:0,request_error:0,submitting:1,queued:2,notification_error:2,notified:3,awaiting_reply:4,validating_reply:5,invalid_reply:5,ready:6,video_unavailable:6,watching:7,watched:8,question_opened:9};
+var QURAN_HISTORY_MAX_S=20;
+function quranRankS(s){ return (typeof s==='string'&&typeof QURAN_RANK_S[s]==='number')?QURAN_RANK_S[s]:0; }
+// videoHistory: iki cihazın ayrı ayrı archiveVideo ettiği kayıtları kaybetmeden
+// birleştirir. responseId+videoId+replacedAt üçlüsü pratik bir doğal anahtar
+// (aynı olayın iki cihazda aynı şekilde arşivlenmesi durumunda tekilleştirir).
+function mergeQuranVideoHistory(a,b){
+  var list=(Array.isArray(a)?a:[]).concat(Array.isArray(b)?b:[]);
+  var seen={}, out=[];
+  list.forEach(function(h){
+    if(!h||typeof h!=='object') return;
+    var key=(h.responseId||'')+'|'+(h.videoId||'')+'|'+(h.replacedAt||'');
+    if(seen[key]) return;
+    seen[key]=true; out.push(h);
+  });
+  out.sort(function(x,y){ return String(x.replacedAt||'').localeCompare(String(y.replacedAt||'')); });
+  if(out.length>QURAN_HISTORY_MAX_S) out=out.slice(-QURAN_HISTORY_MAX_S);
+  return out;
+}
+// Aynı sûrenin iki cihazdaki isteğini birleştirir. Kazanan taraf rütbeye göre
+// seçilir (durum ASLA geriye gitmez); rütbe eşitse (örn. iki cihaz da 'ready'
+// ama farklı videoId — "aynı request iki response alır" senaryosu) updatedAt
+// LWW devreye girer. Kaybeden tarafın "bir kez oluşmuş" zaman damgaları ve
+// video geçmişi yine de korunur — kazananda boşsa kaybedenden doldurulur.
+function mergeQuranRequest(localReq, remoteReq){
+  if(!remoteReq||typeof remoteReq!=='object') return localReq;
+  if(!localReq||typeof localReq!=='object') return JSON.parse(JSON.stringify(remoteReq));
+  var lRank=quranRankS(localReq.status), rRank=quranRankS(remoteReq.status);
+  var winner, loser;
+  if(lRank>rRank){ winner=localReq; loser=remoteReq; }
+  else if(rRank>lRank){ winner=remoteReq; loser=localReq; }
+  else if((remoteReq.updatedAt||'')>(localReq.updatedAt||'')){ winner=remoteReq; loser=localReq; }
+  else { winner=localReq; loser=remoteReq; }
+  var out=JSON.parse(JSON.stringify(winner));
+  ['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt'].forEach(function(k){
+    if(!out[k]&&loser[k]) out[k]=loser[k];
+  });
+  out.videoHistory=mergeQuranVideoHistory(winner.videoHistory,loser.videoHistory);
+  return out;
+}
+function mergeQuranJourney(localQ, remoteQ){
+  if(!remoteQ||typeof remoteQ!=='object') return localQ||{};
+  if(!localQ||typeof localQ!=='object') return JSON.parse(JSON.stringify(remoteQ));
+  var out=JSON.parse(JSON.stringify(localQ));
+  function num(v){ v=Number(v); return isFinite(v)&&v>0?Math.floor(v):0; }
+  out.schemaVersion=Math.max(num(out.schemaVersion)||1,num(remoteQ.schemaVersion)||1);
+  if(!out.catalogVersion&&remoteQ.catalogVersion) out.catalogVersion=remoteQ.catalogVersion;
+  // startedAt yolculuğun İLK başladığı an — LWW değil, en erken değer kazanır.
+  if(remoteQ.startedAt&&(!out.startedAt||remoteQ.startedAt<out.startedAt)) out.startedAt=remoteQ.startedAt;
+  out.requests=out.requests&&typeof out.requests==='object'?out.requests:{};
+  if(remoteQ.requests&&typeof remoteQ.requests==='object'){
+    Object.keys(remoteQ.requests).forEach(function(sid){
+      out.requests[sid]=mergeQuranRequest(out.requests[sid],remoteQ.requests[sid]);
+    });
+  }
+  return out;
+}
 function mergeData(localData, remoteData){
   if(!remoteData || typeof remoteData!=='object') return localData;
   if(!localData || typeof localData!=='object') return JSON.parse(JSON.stringify(remoteData));
@@ -464,6 +542,12 @@ function mergeData(localData, remoteData){
   }
   if(remoteData.zikr && typeof remoteData.zikr==='object'){
     merged.zikr=mergeZikr(merged.zikr,remoteData.zikr);
+  }
+  // QY-16 — quranJourney bu satırdan önce hiç birleştirilmiyordu (bkz. yukarıdaki
+  // mergeQuranJourney yorum bloğu); bayat bir cihazın push'u diğerinin isteğini/
+  // videosunu sessizce ezebiliyordu.
+  if(remoteData.quranJourney && typeof remoteData.quranJourney==='object'){
+    merged.quranJourney=mergeQuranJourney(merged.quranJourney,remoteData.quranJourney);
   }
   // savedAt: en yeni
   if(remoteData.savedAt && typeof remoteData.savedAt==='string' && (!merged.savedAt || remoteData.savedAt>merged.savedAt)){
@@ -694,6 +778,9 @@ window.SeySync={
   mergeById:mergeById,
   mergeSettings:mergeSettings,
   mergeZikr:mergeZikr,
+  // QY-16 — Kur’an Yolculuğu çoklu cihaz birleştirmesi (headless testlerden çağrılır).
+  mergeQuranJourney:mergeQuranJourney,
+  mergeQuranRequest:mergeQuranRequest,
   // Faz 10 — offline reconnect: bağlantı geldiğinde bekleyen push'u tetikler.
   // Gerçek network çağrısı yapmaz; yalnızca schedule/pushNow'u çağırır.
   retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }

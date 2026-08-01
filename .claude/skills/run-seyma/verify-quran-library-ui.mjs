@@ -57,7 +57,7 @@ function makeEl(id) {
     set textContent(v) { this._text = String(v); },
     setAttribute(k, v) { this._attrs[k] = String(v); },
     getAttribute(k) { return k in this._attrs ? this._attrs[k] : null; },
-    appendChild(c) { this.children.push(c); if (this.id === 'body' && c && c.id === 'sey-toast') toasts.push(c.textContent); return c; },
+    appendChild(c) { this.children.push(c); if (this.id === 'body' && c && c.id === 'sey-toast') toasts.push(c); return c; },
     removeChild() {}, remove() {}, replaceWith() {}, insertBefore(c) { return c; },
     addEventListener() {}, removeEventListener() {}, click() {},
     focus() { lastFocus = this.id; }, blur() {},
@@ -126,9 +126,13 @@ const seedState = {
   },
 };
 
+// QY-14: window.open çağrılarını casusla — gerçek pencere açılmaz, yalnız
+// (url, target, features) argümanları kaydedilir.
+const opened = [];
 const sandbox = {
   console, localStorage: makeLS({ 'seyma-reset-v1': JSON.stringify(seedState) }),
   document: doc, __SEYMA_TEST_ZIKR__: true,
+  open(url, target, features) { opened.push({ url, target, features }); return { closed: false, focus() {} }; },
   navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
   location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
   matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
@@ -150,8 +154,8 @@ sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
 sandbox.AudioContext = function () { return { state: 'running', currentTime: 0, resume() {}, createOscillator() { return { type: '', frequency: { value: 0 }, connect() {}, start() {}, stop() {} }; }, createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }, destination: {} }; };
 
 const FILES = ['motivationProgramV2.js', 'motivationNarratives.js', 'profileAssessmentV1.js', 'saygiPeople.js',
-  'hijriCalendar.js', 'quranRevelationOrderV1.js', 'quranTransportV1.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js',
-  'zikirCoreContentV1.js', 'app.js'];
+  'hijriCalendar.js', 'quranRevelationOrderV1.js', 'quranTransportV1.js', 'quranStrikingVersesV1.js',
+  'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app.js'];
 const ctx = vm.createContext(sandbox);
 for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(REPO, f), 'utf8'), ctx, { filename: f });
 
@@ -183,14 +187,70 @@ console.log('== QY-06 / QY-07 Kur’an Yolculuğu kütüphane + ayrıntı doğru
 section('1. Bilgi mimarisi ve hub kartı (QY-05 regresyonu)');
 {
   App.go('saygi');
+  const iNav = appHTML.indexOf('faith-v2-nav');
   const iSpirit = appHTML.indexOf('sg-spirit-bar');
   const iQibla = appHTML.indexOf('sg-qibla-card');
   const iQuran = appHTML.indexOf('id="quran-journey-card"');
-  const iTabs = appHTML.indexOf('sg-faith-tabs');
+  const iContent = appHTML.indexOf('saygi-preview-hub');
   ok('Kur’an kartı render ediliyor', iQuran > 0);
-  ok('sıra: Vakit/Hicri → Kıble → Kur’an → hub sekmeleri',
-    iSpirit > 0 && iSpirit < iQibla && iQibla < iQuran && iQuran < iTabs, { iSpirit, iQibla, iQuran, iTabs });
+  ok('sıra: premium nav → Vakit/Hicri → Kıble → Kur’an → seçili içerik',
+    iNav > 0 && iNav < iSpirit && iSpirit < iQibla && iQibla < iQuran && iQuran < iContent,
+    { iNav, iSpirit, iQibla, iQuran, iContent });
   ok('kartın kütüphaneyi açan erişilebilir adı var', appHTML.includes('aria-label="Kur’an Yolculuğu kütüphanesini aç"'));
+  // QY-17: hub kartındaki Arapça sûre adı önceden tek düz dizeye (nameAr+' · '+nameTr)
+  // gömülüyordu, lang="ar"/dir="rtl" YOKTU — ekran okuyucu Arapçayı Türkçe
+  // telaffuz etmeye çalışırdı. quran-v2-row/detail'de zaten vardı, yalnız hub
+  // kartı eksikti.
+  const cardBlock = appHTML.slice(iQuran, appHTML.indexOf('</button>', iQuran));
+  // İY-B: hub kartı Zikirmatik büyük-kart diline geçti (bkz. aşağıdaki bölüm
+  // 1b) — Arapça artık vitrindeki âyetin/aktif sûrenin class="arabic" span'ı.
+  ok('hub kartındaki Arapça metin lang="ar" dir="rtl" ile işaretli',
+    /<span class="arabic" lang="ar" dir="rtl">[^<]+<\/span>/.test(cardBlock), cardBlock);
+}
+
+// ── 1b) İY-B: büyük önizleme kartı (Zikirmatik diliyle) ────────────────────
+section('1b. Kur’an Yolculuğu önizleme kartı — Zikirmatik büyük-kart dili (İY-B)');
+{
+  const iQuran = appHTML.indexOf('id="quran-journey-card"');
+  const cardBlock = appHTML.slice(iQuran, appHTML.indexOf('</button>', iQuran));
+  ok('quran-v2-preview sınıfı kullanılıyor (Zikirmatik ile aynı yapı ailesi)', cardBlock.includes('class="quran-v2-preview'));
+  ok('üst satır: ikon + başlık + durum rozeti', /quran-v2-preview-top[\s\S]*quran-v2-preview-icon[\s\S]*quran-v2-preview-copy[\s\S]*quran-v2-preview-status/.test(cardBlock));
+  ok('vitrin alanı (çarpıcı âyet veya aktif sûre) var', cardBlock.includes('quran-v2-preview-focus'));
+  ok('üç sütunlu istatistik satırı var (Nüzul/İstenen/İzlenen)', /quran-v2-preview-metric[\s\S]*Nüzul[\s\S]*İstenen[\s\S]*İzlenen/.test(cardBlock));
+  ok('ilerleme çubuğu var', cardBlock.includes('quran-v2-preview-bar'));
+  ok('alt satırda CTA var (event.stopPropagation ile ayrı eylem)', /quran-v2-preview-foot[\s\S]*event\.stopPropagation\(\)/.test(cardBlock));
+}
+
+// ── 1c) İY-B: âyet vitrini rotasyonu ────────────────────────────────────────
+section('1c. Çarpıcı âyet vitrini — her gerçek girişte sıradaki âyete geçer (İY-B)');
+{
+  const verseRef = () => {
+    const i = appHTML.indexOf('id="quran-journey-card"');
+    const block = appHTML.slice(i, appHTML.indexOf('</button>', i));
+    const m = block.match(/ÇARPICI ÂYET<\/span><strong>([^<]+)<\/strong>/);
+    return m ? m[1] : null;
+  };
+  const first = verseRef();
+  ok('modül yüklüyken vitrin gerçek bir âyet referansı gösteriyor (fallback’a düşmedi)', !!first, first);
+
+  App.go('rapor');       // başka bir sekmeye geç
+  App.go('saygi');       // GERÇEK yeniden giriş — vitrin ilerlemeli
+  const second = verseRef();
+  ok('başka sekmeden İlham & İbadet’e her dönüşte vitrin değişir', !!second && second !== first, { first, second });
+
+  const beforeSameTab = verseRef();
+  App.go('saygi');       // ZATEN o sekmedeyken tekrar 'saygi' — ilerlememeli
+  const afterSameTab = verseRef();
+  ok('aynı sekmedeyken tekrar App.go(\'saygi\') vitrini İLERLETMEZ (yalnız gerçek giriş ilerletir)',
+    afterSameTab === beforeSameTab, { beforeSameTab, afterSameTab });
+
+  // 100 âyetin tamamını tur ederek başa sarmanın (100 → 0) çökmediğini kanıtla.
+  let crashed = false, seen = new Set([second]);
+  try {
+    for (let i = 0; i < 105; i++) { App.go('rapor'); App.go('saygi'); seen.add(verseRef()); }
+  } catch (e) { crashed = true; }
+  ok('105 tur (100’ü aşan) boyunca çökmeden başa sarar', !crashed);
+  ok('turlama sırasında birden çok FARKLI âyet gerçekten görüldü (sabit kalmadı)', seen.size >= 20, seen.size);
 }
 
 // ── 2) Overlay ve 114 satırlık liste ──────────────────────────────────────
@@ -231,6 +291,19 @@ section('2. Tam ekran kütüphane (QY-06)');
     appHTML.includes('>Anlatım hazır<') && appHTML.includes('>İzlendi<'));
   ok('ilerleme özeti var', appHTML.includes('<strong>1 / 114</strong> izlendi'));
   ok('katalog yöntem notu görünüyor', appHTML.includes('Mısır/Kahire'));
+  ok('premium nüzul arşivi masthead’i ve mühür render ediliyor',
+    appHTML.includes('quran-v2-library-hero') && appHTML.includes('quran-v2-hero-seal') &&
+    appHTML.includes('NÜZUL ARŞİVİ · İLMÎ YOLCULUK'));
+  ok('ilerleme bandı yöntem başlığı taşıyor',
+    appHTML.includes('quran-v2-progress-head') && appHTML.includes('YOLCULUK İLERLEMESİ'));
+  ok('ilmî katalog yöntemi görünür ve erişilebilir not olarak render ediliyor',
+    appHTML.includes('quran-v2-method-note') && appHTML.includes('role="note"') &&
+    appHTML.includes('Katalog yöntemi'));
+  ok('tek liste bağlamı satırı sayı ve nüzul bağlamını birlikte veriyor',
+    appHTML.includes('quran-v2-result-note') && appHTML.includes('result-context') &&
+    appHTML.includes('NÜZUL SIRASIYLA') && (appHTML.match(/<strong>114<\/strong> sûre/g)||[]).length===1);
+  ok('her sûre satırı durak omurgasına bağlanıyor',
+    appHTML.includes('class="ord-line"') && appHTML.includes('NÜZUL ARŞİVİ'));
 }
 
 // ── 3) Arama ──────────────────────────────────────────────────────────────
@@ -438,6 +511,8 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   vd = detailHTML();
   ok('erişilemeyen videoda kapak/iframe YOK, yalnız açıklama', !vd.includes('quran-v2-video-frame') && vd.includes('Bu anlatım artık erişilebilir değil'));
   ok('erişilemeyen videoda genel CTA hâlâ görünür (Yeni bağlantı iste)', vd.includes('Yeni bağlantı iste'));
+  ok('QY-17: erişilemeyen video bölgesi role="status" aria-live="polite" taşıyor (durum değişince duyurulsun)',
+    /class="quran-v2-video is-unavailable" role="status" aria-live="polite"/.test(vd), vd);
 
   App.openQuranSurah('asr'); // status: watched, videoId: aaaaaaaaaaa
   vd = detailHTML();
@@ -457,7 +532,7 @@ section('7. İstek gönderimi, tekilleştirme ve güvenli retry');
   ok('kanal yokken durum request_error (dürüst hata)', r1.status === 'request_error', r1 && r1.status);
   ok('requestId QY-04 taşıma desenine uyuyor', TRANSPORT.isValidRequestId(r1.requestId), r1 && r1.requestId);
   ok('kullanıcı metni plan §15 ile birebir',
-    toasts.includes('İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.'), toasts);
+    toasts.some((t) => t.textContent === 'İstek şu an iletilemedi. Kaydın duruyor; yeniden deneyebilirsin.'), toasts.map((t) => t.textContent));
   ok('uçuş kilidi serbest bırakıldı', uiState().submittingId === '');
   ok('aktif sûre isteğe taşındı', journey().activeSurahId === 'tekvir');
 
@@ -473,7 +548,7 @@ section('7. İstek gönderimi, tekilleştirme ve güvenli retry');
   const beforeKalem = JSON.stringify(journey().requests.kalem);
   App.quranJourneySubmit('kalem');
   ok('awaiting_reply durumundaki sûre tekrar istenemez', JSON.stringify(journey().requests.kalem) === beforeKalem);
-  ok('kullanıcı nedenini öğreniyor', toasts.some((t) => t.includes('ikinci istek gönderilmiyor')), toasts);
+  ok('kullanıcı nedenini öğreniyor', toasts.some((t) => t.textContent.includes('ikinci istek gönderilmiyor')), toasts.map((t) => t.textContent));
 
   // 7d) watched geriye gitmez.
   const beforeAsr = JSON.stringify(journey().requests.asr);
@@ -504,7 +579,7 @@ section('7. İstek gönderimi, tekilleştirme ve güvenli retry');
   toasts.length = 0;
   pending.cb(null);
   ok('outbox yazılınca durum queued', journey().requests.ala.status === 'queued', journey().requests.ala.status);
-  ok('kullanıcı metni “İsteğin kaydedildi.”', toasts.includes('İsteğin kaydedildi.'), toasts);
+  ok('kullanıcı metni “İsteğin kaydedildi.”', toasts.some((t) => t.textContent === 'İsteğin kaydedildi.'), toasts.map((t) => t.textContent));
   ok('kilit çözüldü', uiState().submittingId === '');
   pending.cb(null);
   ok('aynı callback tekrar çağrılsa durum değişmiyor', journey().requests.ala.status === 'queued');
@@ -556,7 +631,7 @@ section('8. Kullanıcı iletişimi dürüstlüğü (plan §5/§15)');
 }
 
 // ── 9) Erişilebilirlik ve responsive CSS sözleşmesi ───────────────────────
-section('9. CSS sözleşmesi (QY-06 layout + QY-17 ön kontrolleri)');
+section('9. CSS sözleşmesi (QY-06 layout + QY-17 erişilebilirlik/responsive/motion denetimi)');
 {
   // Blok yalnız Kur'an Yolculuğu kurallarıyla sınırlanır; sonraki yorum
   // başlığı bittiği yeri işaretler. Aksi halde dosyanın kalanı da ölçülürdü.
@@ -574,7 +649,7 @@ section('9. CSS sözleşmesi (QY-06 layout + QY-17 ön kontrolleri)');
   ok('filtre rozetleri en az 44px dokunma hedefi', /\.quran-v2-chips button\{[^}]*min-height:44px/.test(block));
   ok('kapat ve geri düğmeleri 44px',
     /\.quran-v2-header \.close\{[^}]*width:44px;height:44px/.test(block) && /\.quran-v2-header \.back\{[^}]*width:44px;height:44px/.test(block));
-  ok('satır dokunma hedefi 64px', /\.quran-v2-row\{[^}]*min-height:64px/.test(block));
+  ok('satır dokunma hedefi en az 64px', /\.quran-v2-row\{[^}]*min-height:(6[4-9]|[7-9][0-9])px/.test(block));
   ok('metin arkasında blur filtresi yok', !/backdrop-filter|filter:blur/.test(block));
   ok('dar ekran (≤389px) uyarlaması var', block.includes('@media(max-width:389px)'));
   ok('geniş ekran kabuğu var', block.includes('@media(min-width:681px)'));
@@ -583,6 +658,39 @@ section('9. CSS sözleşmesi (QY-06 layout + QY-17 ön kontrolleri)');
   ok('renkler tema değişkenlerinden geliyor (hardcode hex yok)', hexes.length === 0, hexes.slice(0, 3));
   ok('odak halkaları tanımlı', (block.match(/focus-visible/g) || []).length >= 6);
   ok('100dvh tam ekran kabuğu', /\.quran-v2-screen\{[^}]*height:100dvh/.test(block));
+
+  // QY-17 kontrol 1: 370/390/393/430/460px hiçbirinde yatay taşma olmasın.
+  // @media(min-width:681px) dışındaki hiçbir kural 370px'i aşan SABİT width
+  // (min-width/max-width DEĞİL) taşımamalı — böyle bir kural en dar test
+  // genişliğinde (370px) yatay kaydırmaya zorlardı.
+  const noWide = block.replace(/@media\(min-width:681px\)\{[\s\S]*?\n\}/, '');
+  const wideFixedWidths = Array.from(noWide.matchAll(/[^-]width:(\d+)px/g)).map((m) => Number(m[1])).filter((n) => n > 370);
+  ok('370px dar ekranda taşacak sabit genişlik yok (370/390/393/430/460 güvenli)', wideFixedWidths.length === 0, wideFixedWidths);
+
+  // QY-17 kontrol 2: 200% metin yakınlaştırması. Asıl kırılma deseni SABİT
+  // height (min-height DEĞİL) + overflow:hidden birlikteliğidir — metin
+  // büyüyünce kutu büyüyemez ve kırpılır. Tek bilinen/güvenli istisna: ilerleme
+  // çubuğu rayı (.quran-v2-progress>i), metin İÇERMEYEN dekoratif bir şerittir
+  // (yalnız iç dolgu barının köşe radius'unu kırpar).
+  const rules = block.match(/\.[a-zA-Z0-9_.:>\-\s]+\{[^}]*\}/g) || [];
+  const zoomRisk = rules.filter((r) => /[^-]height:\d+px/.test(r) && /overflow:hidden/.test(r));
+  ok('200% metin yakınlaştırmasında kırpılma riski taşıyan (sabit height+overflow:hidden, metin içeren) kural yok',
+    zoomRisk.length === 1 && zoomRisk[0].indexOf('.quran-v2-progress>i{') === 0, zoomRisk);
+  ok('premium arşiv masthead’i ve mühür CSS’i var',
+    /\.quran-v2-library-hero\{[^}]*grid-template-columns/.test(block) &&
+    /\.quran-v2-hero-seal\{[^}]*border-radius:50%/.test(block));
+  ok('ilmî yöntem bandı sol vurgu ve erişilebilir ölçekte tasarlanmış',
+    /\.quran-v2-method-note\{[^}]*border-left:3px/.test(block) &&
+    /\.quran-v2-method-note small\{[^}]*font-size:10\.5px/.test(block));
+  ok('nüzul listesi dikey omurga ve 68px satır hedefi taşıyor',
+    /\.quran-v2-list::before\{[^}]*position:absolute/.test(block) &&
+    /\.quran-v2-row\{[^}]*min-height:68px/.test(block));
+  ok('premium modal küçük ekranda mühür ve yöntem notunu küçültüyor',
+    /@media\(max-width:389px\)\{[\s\S]*?\.quran-v2-library-hero\{[^}]*60px/.test(block) &&
+    /\.quran-v2-method-note\{[^}]*grid-template-columns:31px/.test(block));
+  ok('premium modal yeni hareketleri reduced-motion altında kapatıyor',
+    /\.quran-v2-progress>i>b,\.quran-v2-filter-summary \.filter-chevron,\.quran-v2-row\{transition:none/.test(block) &&
+    /\.quran-v2-row:active,\.quran-v2-row:hover\{transform:none\}/.test(block));
 
   // icon() bilinmeyen adda sessizce '' döner; boş bir 44px geri düğmesi
   // bırakmamak için kullanılan her ikon adı ICONS setinde OLMALI.
@@ -628,6 +736,164 @@ section('10. Dayanıklılık, klavye ve şema regresyonu');
   }));
   ok('seed edilen kayıtların hiçbiri kaybolmadı',
     ['kalem', 'fatiha', 'asr', 'ihlas', 'kadir'].every((k) => !!j.requests[k]));
+}
+
+// ── 11) QY-14 — "Raşit'e sor" WhatsApp yönlendirmesi ──────────────────────
+section('11. QY-14 — Raşit’e sor WhatsApp yönlendirmesi');
+{
+  ok('ön koşul: asr hâlâ watched (önceki bölümler yalnız görüntüledi)',
+    journey().requests.asr.status === 'watched', journey().requests.asr.status);
+
+  opened.length = 0; toasts.length = 0;
+  App.quranJourneyQuestion('asr');
+  ok('tam bir wa.me çağrısı açıldı', opened.length === 1, opened);
+  const call1 = opened[0] || {};
+  ok('WhatsApp uygulaması/web fallback (wa.me E.164 sabit hedefi)',
+    String(call1.url).indexOf('https://wa.me/905066020098?text=') === 0, call1.url);
+  ok('target _blank', call1.target === '_blank', call1.target);
+  ok('noopener + noreferrer', /noopener/.test(call1.features) && /noreferrer/.test(call1.features), call1.features);
+  const decoded1 = decodeURIComponent(String(call1.url).split('?text=')[1] || '');
+  ok('mesaj plan şablonuna birebir uyuyor (sûre adı + nüzul durağı)',
+    decoded1 === 'Selam Raşit, Kur’an Yolculuğu’nda Asr Sûresi\n(13. durak) anlatımını izledim.\n\nBu sûreyle ilgili sana şunu sormak istiyorum:',
+    decoded1);
+  ok('“mesaj gönderildi” DENMEDİ, yalnız “WhatsApp açıldı.”',
+    toasts[toasts.length - 1].textContent === 'WhatsApp açıldı.', toasts.map((t) => t.textContent));
+  ok('QY-17: toast ekran okuyucuya role="status" aria-live="polite" ile duyuruluyor',
+    toasts[toasts.length - 1].getAttribute('role') === 'status' && toasts[toasts.length - 1].getAttribute('aria-live') === 'polite',
+    { role: toasts[toasts.length - 1].getAttribute('role'), live: toasts[toasts.length - 1].getAttribute('aria-live') });
+  ok('tıklamada questionOpenedAt yazıldı', !!journey().requests.asr.questionOpenedAt);
+  ok('durum question_opened’a geçti', journey().requests.asr.status === 'question_opened', journey().requests.asr.status);
+  const openedAt1 = journey().requests.asr.questionOpenedAt;
+
+  App.quranJourneyQuestion('asr'); // tekrar tıklama — meşru "tekrar sor"
+  ok('tekrar tıklamada WhatsApp yine açılır (yasak değil)', opened.length === 2);
+  ok('questionOpenedAt tekrar tıklamada DEĞİŞMEZ (idempotent, ilk kayıt korunur)',
+    journey().requests.asr.questionOpenedAt === openedAt1);
+
+  opened.length = 0; toasts.length = 0;
+  const beforeKalem = JSON.stringify(journey().requests.kalem);
+  App.quranJourneyQuestion('kalem'); // awaiting_reply — henüz watched değil
+  ok('watched/question_opened DIŞINDA çağrılırsa no-op (WhatsApp açılmaz)', opened.length === 0);
+  ok('watched DIŞINDA state bozulmaz', JSON.stringify(journey().requests.kalem) === beforeKalem);
+
+  let threwInvalid = false;
+  try { App.quranJourneyQuestion('BÖYLE-BIR-SURE-YOK!!'); } catch (e) { threwInvalid = true; }
+  ok('geçersiz id çökmeden no-op geçer', !threwInvalid && opened.length === 0);
+
+  // Türkçe karakter/özel karakter sağlamlığı: fatiha (bölüm 6 sonunda watched,
+  // "Fâtiha" — â). URL kur, geri çöz, gerçek fonksiyon çıktısıyla karşılaştır.
+  opened.length = 0;
+  App.quranJourneyQuestion('fatiha');
+  const decodedF = decodeURIComponent(String((opened[0] || {}).url).split('?text=')[1] || '');
+  ok('Türkçe diakritik (â) URL round-trip’te bozulmadan korunuyor',
+    decodedF.indexOf('Fâtiha Sûresi') >= 0, decodedF);
+
+  // Tüm 114 sûre kataloğunda mesaj üretimi çökmeden, boş olmadan çalışıyor mu?
+  const askFailures = [];
+  CAT.surahs.forEach((x) => {
+    let msg = null, threw = false;
+    try { msg = App.quranAskMessage(x); } catch (e) { threw = true; }
+    const roundTrip = !threw && decodeURIComponent(encodeURIComponent(msg)) === msg;
+    if (threw || !msg || msg.indexOf(x.nameTr + ' Sûresi') < 0 || !roundTrip) askFailures.push(x.id);
+  });
+  ok('114 sûrenin tamamında mesaj çökmeden/eksiksiz üretiliyor (Türkçe/özel karakter taraması)',
+    askFailures.length === 0, askFailures);
+  ok('sûre bilgisi eksikken (null) bile çökmez, dürüst yedek metin döner',
+    (function () { try { return typeof App.quranAskMessage(null) === 'string' && App.quranAskMessage(null).length > 0; } catch (e) { return false; } })());
+
+  // ── Statik denetim: bare (id'siz) çağrı aktif yolculuğa düşüyor mu? ──────
+  // Bu ikisi hub kartından id'siz çağrılır (App.quranJourneyWatch()/
+  // App.quranJourneyQuestion()); düzeltme öncesi quranJourneyWatch id'siz
+  // çağrıldığında quranSafeSurahId(undefined) boş döndüğü için SESSİZCE
+  // no-op'tu — gerçek regresyon, bu oturumda düzeltildi.
+  const appSrc = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
+  const fnSlice = (name) => { const i = appSrc.indexOf('App.' + name + '=function'); return i >= 0 ? appSrc.slice(i, i + 500) : ''; };
+  ok('App.quranJourneyWatch id yoksa aktif yolculuğa düşer (kaynak denetimi)',
+    /quranSafeSurahId\(id\|\|q\.activeSurahId\)/.test(fnSlice('quranJourneyWatch')));
+  ok('App.quranJourneyQuestion id yoksa aktif yolculuğa düşer (kaynak denetimi)',
+    /quranSafeSurahId\(id\|\|q\.activeSurahId\)/.test(fnSlice('quranJourneyQuestion')));
+
+  // ── Canlı kanıt: taze, izole bir önyükleme ile id'siz çağrı gerçekten
+  //    aktif yolculuğu ilerletiyor mu? (hub kartının onclick'i BİREBİR budur) ──
+  function bootMini(activeSurahId, requests) {
+    const store = {};
+    const ls = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+    const els = {};
+    const mkEl = (id) => {
+      if (els[id]) return els[id];
+      const e = {
+        id, _html: '', _text: '',
+        style: { cssText: '', setProperty() {} },
+        _classes: new Set(),
+        dataset: {}, children: [], scrollTop: 0, offsetWidth: 0, value: '', files: [],
+        get innerHTML() { return this._html; }, set innerHTML(v) { this._html = String(v); },
+        get textContent() { return this._text; }, set textContent(v) { this._text = String(v); },
+        setAttribute() {}, getAttribute() { return null; },
+        appendChild(c) { this.children.push(c); return c; }, removeChild() {}, remove() {}, replaceWith() {}, insertBefore(c) { return c; },
+        addEventListener() {}, removeEventListener() {}, click() {}, focus() {}, blur() {},
+        querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
+        replaceChildren() {}, contains() { return false; },
+        getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0 }; },
+      };
+      e.classList = { add(c) { e._classes.add(c); }, remove(c) { e._classes.delete(c); }, toggle() {}, contains(c) { return e._classes.has(c); } };
+      els[id] = e; return e;
+    };
+    const miniOpened = [];
+    const sb = {
+      console, localStorage: ls,
+      document: {
+        getElementById: mkEl, addEventListener() {}, removeEventListener() {},
+        documentElement: mkEl('root'), body: mkEl('body'),
+        createElement() { return mkEl('__tmp' + Math.random()); }, createDocumentFragment() { return mkEl('__frag' + Math.random()); },
+        querySelector() { return null; }, querySelectorAll() { return []; }, DOMParser: undefined,
+      },
+      open(url, target, features) { miniOpened.push({ url, target, features }); return { closed: false, focus() {} }; },
+      navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+      location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
+      matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
+      DOMParser: DOMParserStub,
+      fetch() { return new Promise(() => {}); },
+      setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},
+      requestAnimationFrame() { return 0; }, cancelAnimationFrame() {},
+      crypto: { getRandomValues(a) { for (let i = 0; i < a.length; i++) a[i] = (Math.random() * 256) | 0; return a; } },
+      URL: Object.assign(function () {}, { createObjectURL() { return 'blob:stub'; }, revokeObjectURL() {} }), URLSearchParams,
+      Blob: function () {}, File: function () {}, FileReader: function () {},
+      TextDecoder, TextEncoder, atob, btoa,
+      alert() {}, confirm() { return true; }, prompt() { return null; },
+      addEventListener() {}, removeEventListener() {},
+      Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error,
+      parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent,
+      Promise, Set, Map, Symbol, Intl,
+    };
+    sb.window = sb; sb.self = sb; sb.globalThis = sb;
+    sb.AudioContext = function () { return { state: 'running', currentTime: 0, resume() {}, createOscillator() { return { type: '', frequency: { value: 0 }, connect() {}, start() {}, stop() {} }; }, createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }, destination: {} }; };
+    const miniSeed = Object.assign({}, seedState, {
+      quranJourney: { schemaVersion: 1, catalogVersion: 'quran-revelation-tr-v1', startedAt: ISO(9), activeSurahId, requests },
+    });
+    ls.setItem('seyma-reset-v1', JSON.stringify(miniSeed));
+    const mctx = vm.createContext(sb);
+    for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(REPO, f), 'utf8'), mctx, { filename: f });
+    sb.App.start();
+    return { App: sb.App, opened: miniOpened, journey: () => JSON.parse(ls.getItem('seyma-reset-v1')).quranJourney };
+  }
+
+  {
+    const mini = bootMini('fatiha', {
+      fatiha: { requestId: 'qr_' + 'z'.repeat(24), status: 'ready', requestedAt: ISO(9), notifiedAt: ISO(10), responseId: 'qrr_' + 'z'.repeat(24), videoId: 'dQw4w9WgXcQ', readyAt: ISO(11), updatedAt: ISO(11), videoHistory: [] },
+    });
+    mini.App.quranJourneyWatch(); // BARE — hub kartının "İzlemeye başla" onclick'i budur
+    ok('DÜZELTME kanıtı: id’siz App.quranJourneyWatch() aktif yolculuğa (fatiha) düşer',
+      mini.journey().requests.fatiha.status === 'watching', mini.journey().requests.fatiha.status);
+  }
+  {
+    const mini = bootMini('asr', {
+      asr: { requestId: 'qr_' + 'y'.repeat(24), status: 'watched', requestedAt: ISO(9), notifiedAt: ISO(10), responseId: 'qrr_' + 'y'.repeat(24), videoId: 'aaaaaaaaaaa', readyAt: ISO(11), startedWatchingAt: ISO(12), watchedAt: ISO(13), updatedAt: ISO(13), videoHistory: [] },
+    });
+    mini.App.quranJourneyQuestion(); // BARE — hub kartının "Raşit'e sor" onclick'i budur
+    ok('id’siz App.quranJourneyQuestion() aktif yolculuğa (asr) düşer, WhatsApp açılır',
+      mini.opened.length === 1 && mini.journey().requests.asr.status === 'question_opened',
+      { opened: mini.opened, status: mini.journey().requests.asr.status });
+  }
 }
 
 // `--dump library` veya `--dump detail:<surahId>` ile üretilen markup incelenebilir.

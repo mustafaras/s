@@ -343,13 +343,47 @@ ok('Sonraki vakit hesabı güvenli (spiritBarHTML render ile doğrulandı)', (fu
   return /mosque|kandil|spirit|İlham/i.test(appHTML);
 })());
 
-ok('Kıble kartı vakit şeridi ile sekmelerin arasında render olur', (function () {
+ok('Premium nav sayfanın en üstünde, vakit şeridi ve Kıble kartından önce render olur', (function () {
   appHTML = ''; sb.App.go('saygi');
+  const navAt=appHTML.indexOf('faith-v2-nav');
   const spiritAt=appHTML.indexOf('sg-spirit-bar');
   const qiblaAt=appHTML.indexOf('sg-qibla-card');
-  const tabsAt=appHTML.indexOf('sg-faith-tabs');
-  return spiritAt>=0 && qiblaAt>spiritAt && tabsAt>qiblaAt;
+  const quranAt=appHTML.indexOf('quran-v2-preview');
+  return navAt>=0 && spiritAt>navAt && qiblaAt>spiritAt && quranAt>qiblaAt;
 })());
+
+ok('Saygı kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır', (function () {
+  sb.App.setFaithTab('oncu');
+  return /id="saygi-preview-card"/.test(appHTML)&&/person-v2-preview/.test(appHTML)&&
+    /hub-v2-preview-top/.test(appHTML)&&/hub-v2-preview-focus/.test(appHTML)&&
+    /hub-v2-preview-metric/.test(appHTML)&&/hub-v2-preview-bar/.test(appHTML)&&
+    /hub-v2-preview-foot/.test(appHTML);
+})());
+
+ok('İman Köşesi kartı Zikirmatik ile aynı beş katmanlı büyük-kart dilini kullanır', (function () {
+  sb.App.setFaithTab('iman');
+  return /id="faith-preview-card"/.test(appHTML)&&/faith-v2-preview/.test(appHTML)&&
+    /SIRADAKİ VAKİT/.test(appHTML)&&/Kılınan[\s\S]*Cemaat[\s\S]*Devamlılık/.test(appHTML)&&
+    /hub-v2-preview-bar/.test(appHTML)&&/Vakitleri aç/.test(appHTML);
+})());
+
+ok('Premium nav erişilebilir bölüm adı ve seçili sayfa semantiği taşır', (function () {
+  sb.App.setFaithTab('oz');
+  return /<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">/.test(appHTML)&&
+    /class="on"[^>]*aria-current="page"/.test(appHTML)&&
+    (appHTML.match(/aria-current="false"/g)||[]).length===4;
+})());
+
+ok('Premium nav ve yeni kartlar en az 44px dokunma hedefi taşır',
+  /\.faith-v2-nav button\{[^}]*min-height:50px/.test(styles)&&
+  /\.hub-v2-preview-foot\{[^}]*min-height:44px/.test(styles));
+
+ok('Yeni hub kartları 389px dar ekran uyarlaması taşır',
+  /@media\(max-width:389px\)\{\.faith-v2-nav button\{[^}]*min-height:47px[^}]*\}[\s\S]*?\.hub-v2-preview\{[^}]*padding:15px/.test(styles));
+
+ok('Premium nav ve yeni kart hareketleri reduced-motion altında kapanır',
+  /@media\(prefers-reduced-motion:reduce\)\{\.faith-v2-nav button,\.hub-v2-preview,[^}]*transition:none!important/.test(styles)&&
+  /\.hub-v2-preview:hover,\.hub-v2-preview:active\{transform:none\}/.test(styles));
 
 ok('Üst kıble kartı bilimsel hesap özetini gösterir', (function () {
   appHTML = ''; sb.App.go('saygi');

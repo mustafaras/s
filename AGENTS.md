@@ -18,10 +18,20 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
 
 **Hard rules — every agent, every session:**
 
-1. **NEVER open or serve+open the Şeyma app in a browser to "check it runs."**
-   Use the headless Node `vm` render harness instead (see "Verification" below
-   and `CLAUDE.md`). Opening the app is the single most dangerous thing you can
-   do here.
+1. **NEVER open the Şeyma app in a browser yourself, and never serve+open it
+   generically to "check it runs."** Use the headless Node `vm` render
+   harness instead (see "Verification" below and `CLAUDE.md`). Opening the
+   app is the single most dangerous thing you can do here.
+   **Narrow exception (2026-08-01, standing user permission):** if the user
+   asks you to serve the app on **port 9000**, you may start a plain static
+   file server bound to that port (e.g. `python3 -m http.server 9000` from
+   the repo root) — this is pre-approved, no need to ask again each time.
+   You still must never navigate a browser to it yourself; the user opens it
+   in their own browser. Tell them to prefer a clean/incognito profile (no
+   prior `seyma-reset-v1` in that profile's localStorage) so Guard 1/2 below
+   aren't the only line of defense. Stop the server per rule 4 before ending
+   your turn. This exception is scoped to port 9000 only — other ports/generic
+   "let's just run it" requests are still covered by the rule above.
 2. If you *must* use a real browser, it now self-protects: `sync.js` **blocks
    all pushes from `localhost`/`127.0.0.1`/`file:`/`*.local`** (Guard 1) and
    **blocks any push whose day-count is lower than the remote** (Guard 2,
@@ -315,6 +325,621 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 - **DO NOT COMMIT** this directory (local-only planning)
 - Use `DETAILED_AGENT_PROMPT_PACK.md` for 30-step implementation workflow
 - Data lives in `window.MotivationProgramV2` (exposed globally, not yet consumed by app.js)
+
+---
+
+### 2026-08-01 — Kur’an Yolculuğu modalı: premium ilmî kütüphane pass’i (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı görsel referansla Kur’an
+Yolculuğu modalının daha derli toplu, world-class, bilimsel ve İslami tasarım
+diliyle yeniden yükseltilmesini istedi. Veri modeli, 114 sûre kataloğu, arama,
+filtre, istek, odak ve durum akışlarına dokunulmadı.
+
+**Uygulanan:** `quranJourneyOverlayHTML`/`quranLibraryViewHTML` artık başlıkta
+`NÜZUL ARŞİVİ · İLMÎ YOLCULUK` masthead’i ve 114 durak mührü taşır. İlerleme
+bandı ayrı bir ölçüm başlığına kavuştu; görünür `Katalog yöntemi` notu nüzul
+tertibi ve durum hesaplamasının bilimsel sınırını açıklar. Tek liste bağlamı
+satırı sonuç sayısını ve `NÜZUL SIRASIYLA` bilgisini birlikte taşır; sûre satırları daha ferah 68px hedef, numaralı durak
+omurgası, Arapça hat ve durum vurgu çizgisiyle yeniden stillendi. Parchment/
+mürekkep/altın token’ları açık ve koyu temada korunur; 389px ve reduced-motion
+kuralları eklendi.
+
+**Doğrulama:** `verify-quran-library-ui.mjs` yeni markup/CSS kapılarıyla
+192’den **202/202** assertion’a çıktı; `node --check app.js`, CSS brace ve
+VS Code diagnostics temiz. Headless dump’ta yeni masthead, mühür, yöntem bandı,
+liste bağlamı ve 114 satır doğrulandı. Cache: `styles.css`, `app.js` ve service
+worker kayıt URL’si `20260801d`. Gerçek tarayıcı/ağ/dış veri yazımı yok;
+commit/push/deploy yapılmadı.
+
+---
+
+### 2026-08-01 — İlham & İbadet hub yenilemesi (İY) — Aşama C-F + QY-18 teslimat kapısı (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcının daha önce onayladığı
+A-F planının kalan C (Saygı), D (İman Köşesi), E (premium üst nav), F
+(a11y/responsive/motion) aşamaları tamamlandı; ardından ertelenen QY-18 final
+kapısı çalıştırıldı. Gerçek tarayıcı açılmadı, `seyma-data` okunmadı/yazılmadı,
+commit/push/deploy yapılmadı.
+
+**Aşama C — Günün Öncüsü:** Eski yatay Wikipedia bilgi kartı
+`saygiPreviewCardHTML()` içinde Zikirmatik ile aynı beş katmanlı büyük-kart
+yapısına geçti: ikon/başlık/durum, kişi vitrini + sabit görsel alanı, üçlü
+alan-okuma-koleksiyon metriği, 100 kişi ilerlemesi ve biyografi eylemi. Mevcut
+modal, Wikipedia yükleme ve `Okudum` veri akışı değişmedi.
+
+**Aşama D — İman Köşesi:** Eski altı satırlı kompakt vakit listesi
+`faithCornerCardHTML()` içinde aynı yapıya geçti: başlık/durum, sıradaki vakit
+ve saat vitrini, kılınan-cemaat-seri metrikleri, günlük ilerleme ve vakitleri
+aç eylemi. Tam ekran vakit takibi ve kalıcı dua/namaz verisi değişmedi.
+
+**Aşama E — premium navigasyon:** `faithNavHTML()` eklendi. `Öz | Öncü |
+İman | Zikir | Rapor` nav'ı içerik kartlarının altından sayfanın en üstüne,
+vakit/Hicri şeridinin hemen üzerine taşındı. Nihai akış:
+`nav → vakit/Hicri → Kıble → Kur’an → seçili içerik`. Kıble kartına
+dokunulmadı. Nav gerçek `<nav>` + butonlar kullanır; seçili bölüm
+`aria-current="page"` taşır.
+
+**Aşama F:** Ortak `.hub-v2-preview*` ve `.faith-v2-nav` CSS sözleşmesi
+eklendi. Kartlar opak yüzey, 5px sol vurgu, sabit üçlü metrik grid, 44px alt
+eylem ve 389px dar ekran kuralları taşır. Nav hedefleri 50px (dar ekranda
+47px). Tüm hover/progress/nav geçişleri `prefers-reduced-motion` altında
+kapanır. `zikr-harness.mjs` yeni sıra, iki kartın beş katmanı, nav semantiği,
+dokunma hedefi, responsive ve reduced-motion kapılarıyla 84'ten 90 assertion'a
+çıktı. Kur’an harness'inin sıra sözleşmesi de yeni IA'ya güncellendi.
+
+**QY-18:** `GELISTIRME-PLANI.md`, `ILHAM-IBADET-GELISTIRME-PLANI.md` ve
+`KURAN-YOLCULUGU-GELISTIRME-PLANI.md` güncellendi. Koordineli final cache
+`20260801b`: `styles.css`, `app.js`, `sync.js`, `quranStrikingVersesV1.js`
+ve service worker kayıt URL'si.
+
+**Final doğrulama:** `node --check` (app/sync/transport/nüzul/100 âyet/Hicri)
+✅; CSS brace 1337/1337 ✅; panel script 7/7 ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` **90/90**; `verify-quran-library-ui.mjs` **192/192**;
+migration 57/57; state-machine 179/179; remote updates 14/14; katalog 70/70;
+100 âyet 41/41; transport 207/207; outbox 55/55; pull 11/11; merge 34/34;
+WCAG kontrast 66/66; ortak sync 64/64; panel 44/44; mail workflow 12/12;
+reply bridge 46/46; Apps Script transport parity 69/69; VS Code diagnostics
+temiz; `git diff --check` ✅. Gerçek tarayıcı/ağ/dış yazma yok.
+
+---
+
+### 2026-08-01 — İlham & İbadet hub yenilemesi (İY) — Aşama A+B: 100 âyet içerik modülü + Sûre önizleme kartının Zikirmatik diline geçişi (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. QY-00..17 tamamlandıktan sonra
+kullanıcı, ekran görüntüsü üzerinden YENİ bir istek getirdi: İlham & İbadet
+hub sayfasındaki kartların (Kıble hariç) Zikirmatik'in büyük-kart tasarım
+diline getirilmesi + Sûre kartının Zikirmatik ölçeğinde büyütülüp Kur'an'dan
+100 çarpıcı âyeti döndüren dinamik bir vitrine kavuşturulması + sekme
+navigasyonunun sayfanın en tepesine taşınıp premium yeniden tasarlanması. Bu,
+QY-00..18 planının PARÇASI DEĞİL — kullanıcı açıkça "önce bu, sonra QY-18"
+dedi; QY-18 (teslimat kapısı) bu işi de kapsayacak şekilde EN SONA ertelendi.
+Kod yazmadan önce anladığımı iki turda (AskUserQuestion) doğrulattım; kullanıcı
+6 aşamalı bir plana onay verdi: **A** (100 âyet içeriği) → **B** (Sûre kartı) →
+**C** (Saygı kartı) → **D** (İman Köşesi kartı) → **E** (nav taşı+yenile) →
+**F** (a11y/responsive/motion denetimi + ILHAM-IBADET-GELISTIRME-PLANI.md
+güncellemesi) → sonra QY-18. Bu oturumda yalnız **A ve B** tamamlandı; C/D/E/F
+ve QY-18 SIRADA, her biri kendi "dur, devam bekle" kapısından geçecek.
+
+**Aşama A — `quranStrikingVersesV1.js` (yeni dosya):** nüzul kataloğuyla
+(`quranRevelationOrderV1.js`) aynı desende dondurulmuş içerik modülü — 100
+âyet, her biri `surahId` (katalogla çapraz doğrulanmış), Arapça metin, Türkçe
+meal, nötr tema etiketi taşıyor. 60+ farklı sûre, 25+ tema; tek bir sûreye
+8'den fazla yığılma yok. **Kritik güvenlik notu:** İçerik başlangıçta
+`verified:false`/`requiresHumanVerification:true` ile dürüstçe "doğrulanmamış"
+işaretlendi (ben bir yapay zekayım, dini metin doğruluğunu garanti edemem).
+**Kullanıcı bu oturumda "ben kontrol ettim ayetler dogru ve guvenilir" diyerek
+100 kaydı onayladı** — bunun üzerine modül `verified:true, verifiedAt:
+'2026-08-01'` (kayıt bazında) ve `requiresHumanVerification:false` (modül
+düzeyinde) olarak güncellendi; içerik yeniden değişirse (yeni âyet eklenir/
+düzenlenirse) bu bayrakların YENİDEN false'a çekilip yeniden doğrulanması
+gerekir — bu disiplin `test_quran_striking_verses.js`'in kendisinde bir
+assertion olarak kayıtlı (bkz. aşağıda).
+
+**Aşama B — Sûre/Kur'an Yolculuğu önizleme kartı (`quranJourneyHubCardHTML`,
+app.js):** Eski kompakt `.sg-quran-card` (rozet+ad+tek CTA satırı) tamamen
+kaldırıldı; yerine Zikirmatik'in `zikrPreviewCardHTML()`/`.zikr-v2-preview*`
+yapısını BİREBİR izleyen yeni `.quran-v2-preview*` sınıf ailesi geldi (üst
+satır: ikon+başlık+durum rozeti → vitrin: dönen âyet + Arapçası → 3 sütunlu
+istatistik: Nüzul/İstenen/İzlenen → ilerleme çubuğu → alt satır: bağlam metni
++ ayrı `event.stopPropagation()` CTA'sı). **Rotasyon:** `App.go('saygi')`
+ÖNCEKİ sekme 'saygi' DEĞİLKEN çağrıldığında (gerçek giriş, aynı sekmedeyken
+tetiklenen alakasız re-render'larda DEĞİL) `quranAdvanceVerseIndex()` vitrini
+bir sonraki âyete ilerletir; index `ui.quranVerseIdx`'te tutulur (data'da
+DEĞİL — bu salt kozmetik bir vitrin sırası, senkronize edilecek gerçek
+yolculuk verisi değil), 100'ü aştığında (`%n`) başa sarar. Modül yüklü
+değilse (statik/eski derleme) vitrin aktif sûrenin adına düşer, kart hiçbir
+zaman boş kalmaz.
+
+**Yan bulgular, ayrıca düzeltildi:**
+- **Gerçek, önceden var olan bir buğ bulundu:** `icon('chevron-right',...)`
+  uygulama genelinde (zikir/kıble/günlük kartları dahil, en az 5 çağrı yeri)
+  ICONS setinde tanımlı OLMADIĞI için SESSİZCE boş dönüyordu — kimse fark
+  etmemiş çünkü hiçbir test o satırları taramıyordu. Eksik SVG path eklendi
+  (Lucide chevron-right, `chevron-left`in aynası); bu TEK satırlık ekleme
+  benim yeni kodumun yanında zaten var olan 5 çağrı yerini de düzeltti.
+- Kontrast: yeni `.quran-v2-preview*` kuralları QY-17'de bulunan/düzeltilen
+  aynı hataları YENİDEN AÇMAMAK için özenle `--quran-mid`/`--quran-ok`/
+  `--quran-warn` (koyu panelde/rozette güvenli metin varyantları) kullanıyor,
+  ham `--quran`/`--ok`/`--drop`'u metin rolünde KULLANMIYOR. Yerel `--qp-line`/
+  `--qp-muted` değişkenleri `.quran-v2-overlay`'in `--qj-line`/`--qj-muted`
+  formülleriyle AYNI (test_quran_a11y_contrast.js'te kanıtlanmış) oranları
+  kullanır. Bu yeni kart CSS'i overlay bloğunun DIŞINDA olduğu için mevcut
+  66 assertion'ı test etmiyor — resmi a11y kanıtı Aşama F'ye bırakıldı, ama
+  değerler bilinçli olarak zaten güvenli seçildi.
+- Dokunma hedefi: alt satırdaki ayrı CTA (`<b onclick="event.stopPropagation()...">`)
+  negatif margin tekniğiyle 44px'e genişletildi (görsel yoğunluğu bozmadan).
+
+**Değişen/eklenen dosyalar:** `quranStrikingVersesV1.js` (yeni, Aşama A),
+`app.js` (hub kart yeniden yazımı + rotasyon mantığı + chevron-right düzeltmesi),
+`styles.css` (.sg-quran-card ailesi SİLİNDİ, .quran-v2-preview ailesi eklendi),
+`index.html` (yeni script etiketi), `.claude/skills/run-seyma/verify-quran-library-ui.mjs`
+(FILES dizisine yeni modül eklendi, hub kartı lang/dir testi yeni yapıya
+güncellendi, 1b/1c yeni bölümler: yapı + rotasyon kanıtı). **Yeni:**
+`test_quran_striking_verses.js` (41 assertion — izolasyon, 100 kayıt, tekrarsız
+kimlik, GERÇEK katalog çapraz referansı, Arapça Unicode varlığı, verified/
+verifiedAt tutarlılığı, tema/sûre çeşitliliği, byId sözleşmesi).
+
+**Doğrulama:** `node --check` (app.js, sync.js, quranTransportV1.js,
+quranRevelationOrderV1.js, **quranStrikingVersesV1.js**, hijriCalendar.js) ✅;
+styles.css brace dengesi (1283/1283) ✅; panel.html script dengesi ✅;
+`driver.mjs` ✅; `zikr-harness.mjs` 84/84 (regresyonsuz); `test_faz10_sync.js`
+64/64; `test_faz11_panel.js` 44/44; `test_quran_catalog.js` 70/70;
+`test_quran_transport.js` 207/207; `test_quran_outbox_sync.js` 55/55;
+`test_quran_pull_sync.js` 11/11; `test_quran_merge.js` 34/34;
+`test_quran_a11y_contrast.js` 66/66 (regresyonsuz — yeni kart CSS'i bu testin
+tarama aralığı dışında ama aynı güvenli token'ları kullanıyor); **`test_quran_striking_verses.js`
+41/41 (YENİ)**; `verify-quran-library-ui.mjs` **192/192** (187 + 5 yeni:
+1c bölümü — vitrin gerçek âyet gösteriyor, gerçek girişte ilerliyor, aynı
+sekmede TEKRARLAMIYOR, 105 tur boyunca çökmeden başa sarıyor, turlama
+boyunca ≥20 farklı âyet gerçekten görüldü); `verify-quran-migration-v1.mjs`
+57/57; `verify-quran-state-machine.mjs` 179/179; `verify-quran-remote-updates.mjs`
+14/14 — hepsi ✅. `git diff --check` ✅. Gerçek tarayıcı açılmadı.
+
+**Kalan:** Kullanıcı görsel onayı — özellikle yeni büyük Sûre kartının gerçek
+cihazda Zikirmatik ile ne kadar "aynı dilde" hissettirdiği (hesaplama/yapı
+doğru ama estetik uyum kullanıcının kendi gözlemine kalıyor). `main`e
+merge/deploy YOK, commit dahi edilmedi. Kullanıcının "devam" onayı Aşama C'yi
+(Saygı kartını Zikirmatik diline getirme) açacak.
+
+---
+
+### 2026-08-01 — Kur’an Yolculuğu QY-17: erişilebilirlik, responsive ve motion denetimi (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı QY-16'nın ardından
+"devam" onayı verdi, "kusursuz uygula" vurgusuyla. Plan §QY-17'nin 10
+KONTROL maddesinin her biri tek tek, gerçek hesaplama/statik denetimle
+kanıtlandı; yalnız rapor değil, bulunan eksiklikler DÜZELTİLDİ.
+
+**GERÇEK, HESAPLANMIŞ WCAG AA KONTRAST İHLALLERİ BULUNDU VE DÜZELTİLDİ
+(en büyük bulgu):** `--quran*` renk sistemi hiç gerçek kontrast oranıyla
+doğrulanmamıştı. sRGB göreli parlaklık formülüyle EL İLE hesapladım (bkz.
+`test_quran_a11y_contrast.js`) — açık temada `--quran-gold` sûre kütüphanesi
+satırlarındaki Arapça adlarda ve kicker etiketlerinde **2.61–2.88:1**
+(gerekli 4.5:1), `qj-muted`/`qj-faint` (durum açıklaması, ipucu, dipnot
+metinleri) **2.55–4.13:1**, satır durumu "izlendi"/"erişilemiyor" renkleri
+(paylaşılan `--ok`/`--drop`) **2.93/3.27:1** idi. Koyu temada birincil CTA
+butonunun **beyaz metni** kendi `--quran` fonunda **4.41:1** (4.5 sınırını
+biraz altında), aynı `--quran` sıra numarası/"bekleniyor" durumu gibi KOYU
+PANELDE METİN olarak kullanıldığında **3.63:1**'e düşüyordu — aynı renk
+hem "buton fonu" hem "koyu panelde metin" rolünü aynı anda üstlenemiyordu.
+Ayrıca ayrı bir gerçek buğ: filtre rozetinin seçili sayaç metni
+(`--quran-ink`) koyu temada neredeyse beyaza dönüp hâlâ AÇIK olan
+`--quran2` (altın) fonunda **1.42:1**'e düşüyordu — dark-mode'a özgü,
+muhtemelen yalnız açık temada test edilmiş klasik bir hata.
+
+**Düzeltme — `styles.css`:** Mevcut `--ok`/`--drop` gibi UYGULAMA GENELİNDEKİ
+paylaşılan token'lara DOKUNULMADI (blast radius kontrolü). Bunun yerine
+Kur'an'a özel, yeni, tema-başına ayarlı token'lar eklendi:
+`--quran-mid` (koyu panelde okunan metin rolü — dark'ta `--quran`'dan
+AÇIK), `--quran-ok`/`--quran-warn` (satır durumu metni/kenarlığı, ışık
+temada koyulaştırılmış), `--quran-gold-ink` (altın fon üzerinde her iki
+temada da sabit koyu metin). `--quran-gold` (açık tema) ve `--quran`
+(koyu tema, yalnız buton fonu rolü) doğrudan koyulaştırıldı. `qj-muted`/
+`qj-faint` karışım yüzdeleri %62/%45'ten %72/%68'e çıkarıldı. Her değişikliğin
+YANINA hangi gerçek kuralı neden etkilediğini açıklayan yorum eklendi.
+**Hesaplanan tüm 66 gerçek metin/arka plan çifti artık her iki temada da
+WCAG AA geçiyor** (bkz. Doğrulama) — hiçbiri tahmin değil, gerçek hex
+değerleriyle hesaplandı.
+
+**Diğer bulunan ve düzeltilen gerçek eksiklikler:**
+- **Arapça lang/dir:** Sûre ayrıntısı ve kütüphane satırlarında zaten
+  vardı; **hub kartında (`quranJourneyHubCardHTML`) YOKTU** — Arapça+Türkçe
+  ad tek düz dizeye gömülüp `esc()`leniyordu, ekran okuyucu Arapçayı
+  Türkçe telaffuz etmeye çalışırdı. Arapça kısmı artık ayrı
+  `<span lang="ar" dir="rtl">` içinde.
+- **Loading/error/status aria-live:** `toast()` (app.js'in TEK paylaşılan
+  bildirim mekanizması — Kur'an Yolculuğu'nun "İsteğin kaydedildi.",
+  "WhatsApp açıldı.", güncelleme sonucu dahil HER toast'u besler) hiç
+  `role`/`aria-live` TAŞIMIYORDU — ekran okuyucu hiçbirini duyurmuyordu.
+  Artık `role="status" aria-live="polite"`. Ayrıca "erişilemeyen video"
+  bölgesi `role="status"` taşıyordu ama açık `aria-live="polite"` yoktu
+  (durum sonradan `ready`→`video_unavailable`'a değişebildiği için önemli);
+  eklendi.
+- **Reduced motion:** Overlay girişi zaten korunuyordu; `toast()`'un kendi
+  giriş animasyonu (`seyToast`, inline stil) hiçbir yerde korunmuyordu —
+  `#sey-toast` için `!important`'lı hedefli bir kural eklendi (inline stili
+  ezmenin tek yolu).
+
+**Zaten sağlam olduğu KANITLANAN (değişiklik gerekmedi, yalnız
+doğrulandı):**
+- Klavye/odak sırası + dialog semantiği + focus return: `onQuranKeydown`
+  zaten tam bir focus-trap (Tab döngüsü) + Escape davranışı uyguluyordu;
+  `role="dialog" aria-modal="true" aria-label`, açılışta odak/kapanışta
+  hub kartına dönüş, ayrıntı↔kütüphane geçişinde scroll+odak korunması
+  hepsi mevcut 176 testte zaten kanıtlıydı.
+- 370/390/393/430/460px: `@media(max-width:389px)`/`@media(min-width:681px)`
+  ikilisi bu beş genişliğin hepsini kapsıyor; YENİ statik denetim (aşağıda)
+  370px'i aşan hiçbir sabit `width` olmadığını kanıtladı.
+- 200% metin yakınlaştırması: satır/CTA/chip yükseklikleri hep `min-height`
+  (sabit `height` değil); YENİ statik denetim, "sabit height + overflow:hidden"
+  (kırpılma deseni) taşıyan TEK kuralın metin İÇERMEYEN ilerleme çubuğu rayı
+  olduğunu kanıtladı.
+- Dokunma hedefleri ≥44px: mevcut testlerde zaten kanıtlıydı (52–64px).
+  **Bilinçli kapsam dışı bırakma:** panel.html'in genel `.btn` sınıfı 34px —
+  ama bu QY-15'te eklenen, tüm panel genelinde (mood/zikr/saygı/Kur'an
+  hepsi) paylaşılan bir bileşen; plan §QY-17'nin kapsamı açıkça "kart,
+  kütüphane, video, WhatsApp CTA'sı" (ana uygulama yüzeyleri) — panelin
+  TÜM buton sistemini yeniden boyutlandırmak bu fazın orantısız dışına
+  taşardı, dokunulmadı.
+
+**Değişen dosyalar:** `styles.css` (kontrast düzeltmeleri), `app.js` (hub
+kart lang/dir, toast aria-live, video-unavailable aria-live),
+`.claude/skills/run-seyma/verify-quran-library-ui.mjs` (yeni denetimler +
+`toasts` dizisinin artık tam element referansı taşıması — üç mevcut
+tüketici de güncellendi). **Yeni:** `test_quran_a11y_contrast.js` (66
+assertion, styles.css'ten GERÇEK hex değerlerini regex ile çıkarıp
+hesaplayan bağımsız kontrast kapısı + eski başarısız değerlere dönüşü
+yakalayan regresyon çapaları).
+
+**Testin gerçekten iş gördüğü ayrıca kanıtlandı:** Açık temanın
+`--quran-gold`'unu geçici olarak eski (başarısız) değerine geri alıp
+`test_quran_a11y_contrast.js` çalıştırıldı — 5 assertion gerçekten
+başarısız oldu (61/66), sonra dosya geri yüklendi (`diff` ile bit-bit aynı
+olduğu doğrulandı). Kör bir "her zaman geçer" testi değil.
+
+**Doğrulama:** `node --check` (app.js, sync.js, quranTransportV1.js,
+quranRevelationOrderV1.js, hijriCalendar.js) ✅; `styles.css` brace dengesi
+(1264/1264) ✅; panel.html script dengesi ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` 84/84 (toast() değiştiği için ÖZELLİKLE regresyonsuz
+teyit edildi); `test_faz10_sync.js` 64/64; `test_faz11_panel.js` 44/44;
+`test_quran_catalog.js` 70/70; `test_quran_transport.js` 207/207;
+`test_quran_outbox_sync.js` 55/55; `test_quran_pull_sync.js` 11/11;
+`test_quran_merge.js` 34/34; **`test_quran_a11y_contrast.js` 66/66 (YENİ)**;
+`verify-quran-library-ui.mjs` **181/181** (176 + 5 yeni: hub kart lang/dir,
+toast aria-live, video-unavailable aria-live, 370px genişlik denetimi,
+200% zoom kırpılma denetimi); `verify-quran-migration-v1.mjs` 57/57;
+`verify-quran-state-machine.mjs` 179/179; `verify-quran-remote-updates.mjs`
+14/14 — hepsi ✅. `git diff --check` ✅. Gerçek tarayıcı açılmadı, gerçek
+ağ çağrısı yapılmadı, `seyma-data`'ya hiçbir yazma yapılmadı.
+
+**Kalan:** Kullanıcı görsel onayı — özellikle koyulaştırılmış altın/mavi
+tonların gerçek cihazda "premium" hissi koruyup korumadığı (hesaplama
+doğru ama estetik tercih kullanıcıya ait). `main`e merge/deploy YOK,
+commit dahi edilmedi. Kullanıcının "devam" onayı QY-18'i (teslimat kapısı,
+cache ve dokümantasyon — planın SON aşaması) açacak.
+
+---
+
+### 2026-08-01 — Kur’an Yolculuğu QY-16: çoklu cihaz merge ve regresyon testleri (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı QY-15'in ardından "devam"
+onayı verdi, "kusursuz uygula" vurgusuyla. Plana göre QY-16'nın kendisi bir
+test/kanıt fazı: "Kur'an yolculuğunun iki cihazda veri kaybetmeden birleştiğini
+kanıtla."
+
+**GERÇEK BİR REGRESYON BULUNDU VE DÜZELTİLDİ (test yazmadan önce, kodu okurken
+ortaya çıktı):** `sync.js`'in `mergeData()`'sı — her push'tan önce
+`putLatestGuarded` içinde gerçekten çağrılan, üretimde canlı olan fonksiyon —
+`settings`/`days`/`notifications`/`aeon.messages`/`zikr` alanlarını birleştiriyor
+ama **`quranJourney`'e hiç dokunmuyordu**. İki cihazda da alan zaten migration'la
+var olduğu için "remote'de olup local'de olmayan üst seviye alanı ekle" yedek
+satırı da devreye girmiyordu. Somut sonuç: A cihazı bir istek gönderip/cevap
+alıp ilerledikten SONRA, bayat kalmış B cihazı herhangi bir kaydetme
+tetiklediğinde (mood/tik gibi alakasız bir değişiklikle bile) push ederken,
+B'nin eski `quranJourney`'si A'nın ilerlemesini SESSİZCE eziyordu — tam olarak
+CLAUDE.md'nin DATA SAFETY bölümünün uyardığı "full-replace, merge değil" sınıfı
+bir veri kaybı, yalnız `quranJourney` alanına özel. Bunu doğrudan simülasyonla
+kanıtladım (bkz. Doğrulama) önce, sonra düzelttim.
+
+**Uygulanan düzeltme — `sync.js`:**
+- `mergeQuranJourney(localQ, remoteQ)`, `mergeQuranRequest(localReq, remoteReq)`
+  ve `mergeQuranVideoHistory(a,b)` eklendi (mevcut `mergeZikr`/
+  `mergeProfileAssessment` ile aynı "saf fonksiyon, kendi küçük sabitini taşır"
+  deseni — `sync.js` bilerek `app.js`'e bağımlı değil).
+- Rütbe tablosu `QURAN_RANK_S`, `app.js`'teki `QURAN_RANK`'ın (QY-03) BİREBİR
+  kasıtlı kopyası — durum asla geriye gitmez ilkesi buradan gelir.
+- Birleştirme kuralı tam olarak plan §13: farklı sûre istekleri **union**;
+  aynı istek rütbeye göre kazanır (durum geriye gidemez), **rütbe eşitse**
+  `updatedAt` **LWW**; kazananda boş kalan "bir kez oluşmuş" zaman damgaları
+  (`requestedAt/notifiedAt/readyAt/startedWatchingAt/watchedAt/questionOpenedAt`)
+  kaybedenden doldurulur (eski cihaz bunları silemez); `videoHistory` iki
+  taraftan da **union+dedupe+20 sınırı** ile birleşir (yanıt/video geçmişi
+  kaybolmaz). `startedAt` LWW DEĞİL — en erken değer korunur (yolculuğun ilk
+  başladığı an).
+- `mergeData()`'ya gerçek çağrı eklendi (`zikr` merge bloğunun hemen altına):
+  artık her push öncesi `quranJourney` da birleştiriliyor. `window.SeySync`
+  export listesine `mergeQuranJourney`/`mergeQuranRequest` eklendi (testlerden
+  doğrudan çağrılabilsin diye, `mergeZikr` ile aynı gerekçe).
+- "Aynı requestId iki kez eklenemez" ve "ayrı response dosyası full-replace
+  edilmez" kuralları YENİDEN uygulanmadı — ikisi de zaten QY-08/QY-04'ün
+  `upsertOutboxRequest` (map-by-requestId) ve transport dosya izolasyonu
+  tarafından garanti ediliyor; bu faz yalnız `quranJourney`'in KENDİ
+  birleştirmesini kapatıyor.
+
+**Yeni dosya — `test_quran_merge.js`** (repo kökü, `test_quran_*.js`
+kuralına uygun, commit edilmedi): plan §QY-16'nın 7 senaryosunun HER BİRİ
+ayrı bölüm olarak birebir uygulanmış (A istek/B bayat, cevap geldiğinde B eski
+push eder, A watched/B ready — iki yönde de, iki farklı sûre union, aynı
+request'e iki response — eşit rütbe LWW, video değişimi — geçmiş union,
+offline istek). Ayrıca: §8 gerçek `mergeData()` üzerinden entegrasyon kanıtı
+(izole fonksiyonu değil, GERÇEKTE kullanılan yolu test eder — bulunan
+regresyonu tam olarak bu yakalardı), §9 null/undefined sağlamlık, §10
+idempotens (kendisiyle birleşince veri çoğalmaz/kaybolmaz), §11
+`QURAN_RANK`/`QURAN_RANK_S` sürüklenme denetimi (iki dosyadaki tabloyu
+kaynaktan regex ile çıkarıp `JSON.stringify` karşılaştırır — biri güncellenip
+diğeri unutulursa burada patlar), §12 ağ izolasyonu (fetch hiç çağrılmadı).
+**34/34 geçti.**
+
+**Testin gerçekten iş gördüğü ayrıca kanıtlandı:** `mergeData`'nın QY-16
+öncesi haline (yalnız benim eklediğim satırlar çıkarılmış geçici bir kopyaya)
+karşı §8'in senaryosu elle çalıştırıldı — düzeltme olmadan sonuç gerçekten
+`'ready'` yerine bayat `'notified'`de kalıp `videoId`'yi kaybediyor; düzeltmeyle
+`'ready'` + `videoId` korunuyor. Yani bu test kör bir "her zaman geçer" testi
+değil, gerçek regresyonu yakaladığı elle doğrulanmış bir kapı.
+
+**Değişen/eklenen dosyalar:** `sync.js` (mergeQuranJourney ailesi + mergeData
+kablolaması + export), `test_quran_merge.js` (yeni). `app.js`/`quranTransportV1.js`/
+`panel.html` bu fazda DOKUNULMADI.
+
+**Doğrulama:** `node --check` (app.js, sync.js, quranTransportV1.js,
+quranRevelationOrderV1.js, hijriCalendar.js) ✅; panel.html script-tag dengesi
+✅; `driver.mjs` ✅; `zikr-harness.mjs` 84/84; `test_faz10_sync.js` 64/64
+(mergeData'ya dokunulduğu için ÖZELLİKLE regresyonsuz kaldığı teyit edildi);
+`test_faz11_panel.js` 44/44; `test_quran_catalog.js` 70/70;
+`test_quran_transport.js` 207/207; `test_quran_outbox_sync.js` 55/55;
+`test_quran_pull_sync.js` 11/11; **`test_quran_merge.js` 34/34 (YENİ)**;
+`verify-quran-library-ui.mjs` 176/176; `verify-quran-migration-v1.mjs` 57/57;
+`verify-quran-state-machine.mjs` 179/179; `verify-quran-remote-updates.mjs`
+14/14 — hepsi ✅. `git diff --check` ✅. Gerçek tarayıcı açılmadı, gerçek ağ
+çağrısı yapılmadı (`test_quran_merge.js` kendi içinde fetch'in hiç
+çağrılmadığını da assert ediyor), `seyma-data`'ya hiçbir yazma yapılmadı.
+
+**Kalan:** Kullanıcı onayı. `main`e merge/deploy YOK, commit dahi edilmedi.
+Kullanıcının "devam" onayı QY-17'yi (erişilebilirlik, responsive ve motion
+denetimi) açacak.
+
+---
+
+### 2026-08-01 — Kur’an Yolculuğu QY-15: panel aynası ve operasyon ekranı (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı QY-00..14 + plan dışı iki
+ek işin (tezhip yükseltmesi, gap regresyonu) hepsi commit edilmeden bırakıldığı
+temiz çalışma ağacı üzerinden, yalnız QY-15 ile devam etmemi istedi — tek
+aşama, sonra dur.
+
+**Ne yapıldı:** `panel.html`'de (app.js ile kod paylaşmayan, bağımsız ÆON
+gözlem panosu) daha önce HİÇ Kur'an Yolculuğu yüzeyi yoktu — CLAUDE.md'nin
+"panel mirror" ilkesine göre zaten olması gereken bir boşluktu. Şimdi eklendi:
+
+- **Script/CSS:** `quranRevelationOrderV1.js`/`quranTransportV1.js`
+  `?v=20260801a` ile panel `<head>`'ine yüklendi (index.html'deki sürümle aynı
+  içerik). `--quranp`/`--quranp2`/`--quranp-bg` (mavi/altın, panelin kendi
+  koyu/altın paletinden — app'in lacivert/altın `--quran` sistemini KOPYALAMADI,
+  ayrı bir aksan) + `.b-quranp` rozet tonu eklendi.
+- **Veri kaynağı:** KPI'lar, sûre/istek durumu ve "gelen video kimliği" ekstra
+  ağ çağrısı olmadan doğrudan `D.quranJourney` üzerinden okunuyor (app.js zaten
+  hesaplayıp `latest.json`'a yazıyor). Yalnız otomasyon hata nedeni
+  (`quran-delivery.json`'daki kısa `error` alanı) `latest.json`'da yok — panel
+  onu `load()` içinde `loadInbox()` ile paralel, salt-okunur ayrıca çekiyor
+  (`loadDeliveryP`), okunamazsa sessizce atlıyor (panelin geri kalanını
+  etkilemiyor).
+- **Kart (`quranJourneyPanelCardHTML`, `cardWrap` ile, span 12, order 23):**
+  4 KPI (istendi/bekliyor/hazır/izlendi, 114 sûre toplamı + "son etkinlik"
+  bağıl zamanı), otomasyon hata listesi (varsa, sûre adı + kısa hata metni +
+  "Tekrar dene"), açık istek listesi (yalnız `idle` olmayan sûreler; her satır
+  durum rozeti + video varsa `youtube-nocookie.com/embed/<id>` güvenli
+  bağlantısı + "Yanlış video · kaldır", yoksa manuel URL yapıştırma + "Ekle").
+- **Yazma (3 eylem, hepsi `QuranTransportV1`'in ORTAK doğrulayıcısından
+  geçiyor — plan §12'nin "manuel işlem de ortak validator kullanmalı" şartı):**
+  - *Tekrar bildirim* (`quranRetryNotifyP`): mevcut outbox kaydını
+    değiştirmeden `upsertOutboxRequest` ile yeniden PUT'lar → dosya-seviyeli
+    `updatedAt` değişir → QY-09 workflow'unun `push` tetikleyicisi yeniden
+    ateşlenir; `quran_mail.py` idempotent olduğu için (`sent` ise ikinci mail
+    atmaz) çift postalama riski yok. QY-09 workflow henüz `seyma-data`'ya
+    deploy edilmediği için (`STAGED`) bu buton bugün gerçek bir e-posta
+    tetiklemez, yalnız dosyayı nazikçe dürtükler — ileride deploy edilince
+    doğrudan işlevsel olacak.
+  - *Manuel video ekle* (`quranManualAddP`): `T.extractSingleVideoId()` ile
+    doğrulanan URL'den `source:'panel_manual', status:'ready'` bir yanıt kaydı
+    üretip `T.applyResponse()` ile `quran-responses.json`'a yazar. `source:
+    'panel_manual'` zaten QY-04'te bu tam kullanım için tanımlıydı.
+  - *Manuel video kaldır* (`quranManualRevokeP`): aynı yolla
+    `status:'revoked'` yazar → app.js'in mevcut `quranApplyRemoteUpdates`'i
+    bunu zaten `video_gone`+`response_invalid`'e çeviriyor (QY-11'de test
+    edilmiş yol, panel tarafında yeni bir dal AÇILMADI).
+  - Üçü de get-sha→build→PUT, 409/422'de 3 denemeye kadar retry (sync.js'in
+    `putQuranOutboxGuarded`'ıyla aynı desen); `T.isWritableTransportPath()`
+    kapısından geçmeyen hiçbir yazma denenmiyor; `data/latest.json`/`gunluk`'a
+    HİÇ dokunulmuyor.
+- **Secret/token güvencesi:** `replyToken` yalnız retry-notify'ın
+  get→PUT round-trip'inde JS belleğinde taşınır (dosyanın kendi alanı
+  olduğu için — yazılması gerekiyor), **hiçbir zaman HTML'e enterpole
+  edilmiyor**; `senderFingerprint` hiç render edilmiyor; `requestId`/
+  `responseId` (secret değil, salt kimlik) bile ekrana basılmıyor. Node ile
+  gerçek `QuranTransportV1.containsSecret()` çalıştırılarak manuel-ekleme
+  yazma yolunun ürettiği `quran-responses.json` içeriğinin secret
+  İÇERMEDİĞİ doğrulandı (bkz. Doğrulama).
+- **Diğer:** `UI.quranBusyId` (tek-uçuş kilidi), `load()`'a
+  `Promise.all([loadInbox(), loadDeliveryP()])`, `panelSig()`'e `QDELIVERY`
+  eklendi (otomasyon hatası değişince de yeniden çizim tetiklensin diye).
+
+**Değişen dosya:** yalnız `panel.html`. `app.js`/`sync.js`/`quranTransportV1.js`
+DOKUNULMADI (panel tamamen kendi kod tabanında, mevcut sözleşmeleri tüketiyor).
+
+**Doğrulama:** `node --check` (app.js, sync.js, quranTransportV1.js,
+quranRevelationOrderV1.js) ✅; panel.html script-tag dengesi (7/7) + tek inline
+script bloğunun `new Function()` ile syntax doğrulaması ✅; `driver.mjs` ✅;
+`zikr-harness.mjs` 84/84; `test_faz10_sync.js` 64/64; `test_faz11_panel.js`
+44/44; `test_quran_catalog.js` 70/70; `test_quran_transport.js` 207/207;
+`test_quran_outbox_sync.js` 55/55; `test_quran_pull_sync.js` 11/11;
+`verify-quran-library-ui.mjs` 176/176; `verify-quran-migration-v1.mjs` 57/57;
+`verify-quran-state-machine.mjs` 179/179; `verify-quran-remote-updates.mjs`
+14/14 — hepsi ✅, hiçbiri bu oturumda dokunulmayan dosyaları test ettiği için
+zaten regresyon beklenmiyordu, teyit edildi. `git diff --check` ✅ (whitespace
+temiz). Ayrıca gerçek `quranRevelationOrderV1.js`/`quranTransportV1.js` Node'a
+yüklenip: 114 sûre üzerinde bucket dağılımı, `extractSingleVideoId` (geçerli/
+çoklu/yok senaryoları), `applyResponse` (manuel ekleme) ve `upsertOutboxRequest`
+(tekrar bildirim) uçtan uca simüle edildi; `T.containsSecret()` manuel-ekleme
+çıktısında `false`, outbox çıktısında (replyToken kendi alanı olduğu için)
+beklendiği gibi `true` döndü — secret izolasyonu koddan değil, gerçek
+çalıştırmadan kanıtlandı. Gerçek tarayıcı açılmadı, `seyma-data`'ya hiçbir
+yazma yapılmadı (yalnız yerel dosya düzenlemesi + headless Node testleri).
+
+**Kalan:** Kullanıcı görsel/işlevsel onayı — özellikle panel'in gerçek
+`seyma-data` verisiyle görünümü hiç doğrulanmadı (yalnız headless mantık
+simülasyonu yapıldı, DATA SAFETY kuralı gereği tarayıcı açılmadı). `main`e
+merge/deploy YOK, commit dahi edilmedi. Kullanıcının "devam" onayı QY-16'yı
+(çoklu cihaz merge ve regresyon testleri) açacak.
+
+---
+
+### 2026-08-01 — Sûre ayrıntısı ekranı: premium tezhip görsel yükseltmesi (yalnız CSS, commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı port 9000'de kendi
+sunucusunu (CLAUDE.md'ye eklenen istisna sonrası bu ajan tarafından da
+başlatılabilir hale gelen desen) açıp bir ekran görüntüsüyle "bu alanı çok
+daha gelişmiş ve pro premium şekilde tasarla" istedi.
+
+**Değişen dosya:** yalnız `styles.css` — `app.js`'teki markup'a HİÇ
+dokunulmadı (tüm 645+ mevcut assertion string bazlı markup kontrolü yaptığı
+için bu, sıfır regresyon riski demekti).
+
+- `.quran-v2-detail-head h2`: düz metin bloğu yerine altın hatlı, katmanlı
+  gölgeli, üstte ince altın şerit (`::before`) olan opak bir "levha" —
+  Arapça metin büyütüldü (27→34px) ve altında altın ayraç çizgisi var;
+  Türkçe ad artık küçük harf aralıklı altın etiket.
+- `.quran-v2-facts` kartları: üstte altın vurgu kenarlığı + gölge ile
+  yükseltildi; `dd` değerlerine `tabular-nums`.
+- `.quran-v2-status`: düz 9px nokta yerine halkalı, duruma göre renklenen
+  30px "işaret" (iç nokta + dış halka, hâlâ salt CSS — HTML'e yeni eleman
+  eklenmedi).
+- `.quran-v2-cta`: katmanlı gölge + üstte altın iç parlaklık çizgisiyle
+  yükseltildi (linear-gradient DEĞİL — ZP-08'in şeffaflık/gradyan yasağına
+  bilerek uyuldu, tüm derinlik `box-shadow`/`color-mix` ile).
+- `.quran-v2-header .back`: hafif gölge + altın tonlu kenarlık.
+
+**Renk kısıtlaması bulundu ve düzeltildi:** İlk taslakta CTA'nın iç
+parlaklığı için `color-mix(in srgb,#fff 18%,transparent)` kullanılmıştı;
+`verify-quran-library-ui.mjs`'in "hardcode hex yok" testi (yalnız tek bir
+önceden onaylı `color:#fff` metin rengini muaf tutuyor) bunu doğru şekilde
+yakaladı. `#fff` yerine `var(--quran2)` (mevcut altın token) tonuna
+geçirildi — hem testi geçti hem de tezhip temasına daha uygun oldu. Ayrıca
+CTA `min-height`'ı ilk taslakta 56px'e çıkarılmıştı; testin `52px` literal
+regex beklentisi yüzünden 52px'e geri alındı (52px zaten dokunma hedefi
+gereksinimini fazlasıyla karşılıyor, görsel fark önemsiz).
+
+**Doğrulama:** `styles.css` brace dengesi 1261/1261; `verify-quran-library-ui.mjs`
+**176/176** ✅ (CSS sözleşmesi bölümü dahil); `zikr-harness.mjs` 84/84,
+`driver.mjs` ✅, `test_faz10_sync.js` 64/64, `test_faz11_panel.js` 44/44,
+`test_quran_catalog.js` 70/70, `verify-quran-migration-v1.mjs` 57/57,
+`verify-quran-state-machine.mjs` 179/179, `verify-quran-remote-updates.mjs`
+14/14 — hepsi ✅. `git diff --check` temiz. Gerçek tarayıcı açılmadı; bu
+ajan port 9000'i yalnız düz statik sunucu olarak başlattı (CLAUDE.md'nin
+2026-08-01 istisnası), tarayıcıda kendisi açmadı.
+
+**Kalan:** Kullanıcı görsel onayı (Artifact önizlemesiyle gösterildi).
+İstenirse aynı tezhip dili kütüphane satırlarına (`.quran-v2-row`) ve hub
+önizleme kartına (`.sg-quran-card`) da genişletilebilir — bu oturumda
+kapsam yalnız ayrıntı ekranıyla sınırlı tutuldu.
+
+**Sonradan bulunan GERÇEK regresyon (aynı oturum, aynı gün) — kartlar arası
+boşluk hiç uygulanmıyordu:** Kullanıcı gerçek tarayıcıda "kartlar
+birbirine yapışıyor" dedi. İlk tanı yanlıştı (cache-busting `?v=` sanıldı,
+`index.html`'de `styles.css?v=20260730z→20260801a` yapıldı — bu da gerekliydi
+ama tek başına yetmedi). Gerçek kök neden: `quranDetailViewHTML()`
+(`app.js`) `.quran-v2-detail` (dış `<section>`) içine TEK çocuk olarak
+`<div id="quran-detail-region">` sarmalıyor (QY-06'nın hedefli boyama
+deseni); `gap` kuralı `.quran-v2-detail`'e yazılmıştı ama flex item'lar
+(header/facts/status/cta) aslında `#quran-detail-region`'ın çocukları —
+bu yüzden gap HİÇBİR ZAMAN uygulanmıyordu (bu oturumun kendi hatası değil,
+QY-06/07'den beri var olan pre-existing bir CSS-yapı uyumsuzluğu; bu
+oturum yalnız gap DEĞERİYLE uğraşırken fark etti). Düzeltme:
+`display:flex;flex-direction:column;gap:18px` `#quran-detail-region`'a
+taşındı. Bunu eklerken `verify-quran-library-ui.mjs`'in bölüm 9 tarama
+mantığı (`CSS.indexOf('.quran-v2-overlay{')`'den başlayıp ilk `\n/*`'de
+duruyor) yeni eklenen çok satırlı bir CSS yorumuyla erken tetiklendi,
+12 assertion'ı geçersiz kıldı (yanlış pozitif FAIL) — yorum tek satıra
+(`} /* ... */` aynı satırda) indirilerek düzeltildi. **176/176 tekrar
+yeşil.** Ders: bu test dosyasında CSS bloğu içine YENİ standalone
+`/* ... */` yorum satırı eklerken dikkatli ol, satır-içi (`} /* ... */`)
+tercih et.
+
+---
+
+### 2026-08-01 — Kur’an Yolculuğu QY-14: "Raşit'e sor" WhatsApp yönlendirmesi + hub kartı regresyon düzeltmesi (commit edilmedi)
+
+**Branch:** `feature/kuran-yolculugu-qy05`. Kullanıcı bu oturumda önce tam bir
+hata taraması istedi ("kontrol et, hata varsa söyle ve düzelt"), sonra QY-14'ün
+kusursuz uygulanmasını istedi.
+
+**Kontrol sonucu (QY-14'ten ÖNCE):** Syntax (11 JS modülü), `git diff --check`,
+panel.html script dengesi, `driver.mjs`, `zikr-harness.mjs` (84/84),
+`test_faz10_sync.js` (64/64), `test_faz11_panel.js` (44/44), 4 Kur'an test
+dosyası (70+55+11+207), 4 `verify-quran-*.mjs` (155+57+14+179), reply-bridge
+testleri (46+69) ve Python mail-workflow testi (12/12) — hepsi temiz çıktı.
+`verify-profile-assessment-{breaks,consent,gate}.mjs`'in halen (16 Temmuz'dan
+beri, bu branch'ten bağımsız, önceki bir oturumda tespit edilmiş) 16 Temmuz'da
+eklenen kilit ekranı (`needsAuth()`) yüzünden bozuk olduğu doğrulandı — test
+çürümesi, üretim hatası değil; bu oturumda dokunulmadı (kapsam dışı, ayrı not).
+
+**Gerçek regresyon bulundu ve düzeltildi:** `App.quranJourneyWatch(id)` id'siz
+çağrıldığında (`quranJourneyCardCopy`'nin hub kartı CTA'sı `ready`/`watching`
+durumunda TAM OLARAK böyle çağırıyor: `onclick="App.quranJourneyWatch()"`)
+`quranSafeSurahId(undefined)` boş döndüğü için fonksiyon sessizce hiçbir şey
+yapmıyordu — kullanıcı ana ekrandaki Kur'an Yolculuğu kartında "İzlemeye
+başla"/"Devam et"e dokunduğunda gerçek uygulamada gözle görünmeyen bir no-op
+oluşuyordu (kütüphane/ayrıntı ekranından açılan aynı düğme etkiliydi, çünkü
+oradan her zaman açık id ile çağrılıyor). Düzeltme: `id||q.activeSurahId`
+düşüşü eklendi (mevcut `App.quranJourneyRequest()`'in zaten kullandığı
+sözleşmeyle aynı desen). Canlı, izole bir `node:vm` önyüklemesiyle hem hatanın
+var olduğu hem düzeltmenin çalıştığı ayrıca kanıtlandı.
+
+**QY-14 uygulaması:** `App.quranJourneyQuestion(id)` artık gerçek — sabit
+hedef `wa.me/905066020098`, mesaj plan §14'teki şablona birebir (`Selam Raşit,
+Kur’an Yolculuğu’nda {sûreAdı} Sûresi\n({nüzulNo}. durak) anlatımını
+izledim.\n\nBu sûreyle ilgili sana şunu sormak istiyorum:`),
+`encodeURIComponent` ile kurulu, `window.open(url,'_blank','noopener,noreferrer')`.
+Yalnız `watched`/`question_opened` durumunda etkin (her iki render yeri —
+hub kartı ve sûre ayrıntısı ana CTA'sı — bu kapıyı zaten uyguluyordu).
+Tıklama `quranReduce({type:'question_open'})`'u tetikler; reducer QY-04'te
+zaten tanımlıydı (`from:['watched'],to:'question_opened'`, idempotent) —
+bu faz yalnız UI tarafını bağladı. Tekrar tıklama WhatsApp'ı yine açar (meşru
+"tekrar sor") ama `questionOpenedAt` yalnız ilk seferde yazılır. Toast metni
+"Mesaj gönderildi" DEMİYOR, yalnız "WhatsApp açıldı." (plan gereksinimi).
+Hub kartı id'siz çağırdığı için aynı `id||q.activeSurahId` düşüşünü kullanır.
+
+**Değişen dosyalar:** `app.js`, `.claude/skills/run-seyma/verify-quran-library-ui.mjs`.
+`styles.css`/`panel.html` DOKUNULMADI — CTA zaten var olan `.quran-v2-cta`/
+`sg-quran-*` sınıflarını kullanıyor; panel aynası bilerek QY-15'e bırakıldı
+(plan bu ayrımı zaten öyle yapıyor).
+
+**Doğrulama:** `node --check app.js` ✅; `verify-quran-library-ui.mjs`
+**176/176** ✅ (21 yeni: wa.me URL/target/noopener+noreferrer, plan şablonuyla
+birebir mesaj, "WhatsApp açıldı" toast metni, questionOpenedAt yazımı ve
+idempotens, watched-dışı guard, geçersiz id güvenliği, Türkçe diakritik
+round-trip, 114 sûrenin tamamında mesaj üretimi çökmesiz taraması, null-safe
+yedek metin, bare-call kaynak denetimi × 2, izole mini-boot ile canlı kanıt ×
+2); regresyon: `driver.mjs` ✅, `zikr-harness.mjs` 84/84, `test_faz10_sync.js`
+64/64, `test_faz11_panel.js` 44/44, `test_quran_catalog.js` 70/70,
+`test_quran_outbox_sync.js` 55/55, `test_quran_pull_sync.js` 11/11,
+`test_quran_transport.js` 207/207, `verify-quran-migration-v1.mjs` 57/57,
+`verify-quran-remote-updates.mjs` 14/14, `verify-quran-state-machine.mjs`
+179/179 — hepsi ✅. `git diff --check` ✅. Gerçek tarayıcı açılmadı, gerçek
+WhatsApp/YouTube isteği yapılmadı, `seyma-data`'ya yazılmadı.
+
+**Kalan:** Kullanıcı görsel onayı. `main`e merge/deploy YOK, commit dahi
+edilmedi — kullanıcı onayı bekleniyor. Sıradaki: QY-15 (panel aynası ve
+operasyon ekranı).
 
 ---
 

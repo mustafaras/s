@@ -29,6 +29,7 @@
     --soul:#B8A8E8;--soul2:#EBCC90;--soul-bg:rgba(184,168,232,.11);--soul-glow:rgba(184,168,232,.15);
     --faith:#D4B56A;--faith2:#A68B4B;--faith-bg:rgba(212,181,106,.12);--faith-glow:rgba(212,181,106,.16);
     --zikr:#6EC1CE;--zikr2:#93D0DA;--zikr-bg:rgba(110,193,206,.12);
+    --quranp:#5B87C4;--quranp2:#E4C54A;--quranp-bg:rgba(91,135,196,.12);
     --kandil:#F0AABE;--kandil-bg:rgba(240,170,190,.12);
     --teal:#2BC4C4;--ta:rgba(43,196,196,.10);--tb:rgba(43,196,196,.22);
     --pink:#f472b6;
@@ -93,6 +94,7 @@
   .b-danger{background:var(--ra);color:var(--red);border:1px solid var(--rb)}
   .b-gold{background:var(--ga);color:var(--gold);border:1px solid var(--gb)}
   .b-dim{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
+  .b-quranp{background:var(--quranp-bg);color:var(--quranp2);border:1px solid rgba(228,197,74,.3)}
   .pulse::before{animation:pulse 1.8s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
 
@@ -270,6 +272,8 @@
 <script src="motivationProgramV2.js?v=20260718a"></script>
 <script src="saygiPeople.js?v=20260715a"></script>
 <script src="hijriCalendar.js?v=20260730j"></script>
+<script src="quranRevelationOrderV1.js?v=20260801a"></script>
+<script src="quranTransportV1.js?v=20260801a"></script>
 </head>
 <body>
 <div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
@@ -393,7 +397,7 @@ var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların a�
 var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartında hangi sekmenin seçili kaldığını hatırlar
 var PTOKEN="";
 var D=null;
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:""};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
@@ -541,6 +545,258 @@ function hijriPanelCardP(){
   var summary='<span class="tchip fl">'+esc(label)+'</span>'+(holy?'<span class="tchip" style="color:var(--kandil);">'+esc(holy)+'</span>':'');
   var details='<div style="font-size:var(--f3);line-height:1.55;color:var(--t2);">Uygulamadaki Hicri tarih ayarı panelde de aynı görünür.'+(offset?' Kullanıcı farkı: <b>'+(offset>0?'+':'')+offset+' gün</b>.':' Varsayılan hilal farkı kullanılıyor.')+'</div>';
   return cardWrap({key:'hijri-today',icon:'🌙',title:'Hicri Takvim',span:6,order:20,summary:summary,details:details});
+}
+
+// ── Kur’an Yolculuğu — panel aynası ve operasyon ekranı (QY-15) ───────────
+// D.quranJourney zaten app.js'in hesapladığı durumu taşır (latest.json ile
+// gelir) — KPI'lar, sûre/istek durumu ve "gelen video kimliği" doğrudan
+// oradan okunur, ekstra çekim gerekmez. Yalnız otomasyon hata nedeni
+// (quran-delivery.json'daki kısa `error` alanı) latest.json'da YOKTUR; bu
+// yüzden panel onu salt-okunur ayrıca çeker (loadDeliveryP, load() içinde).
+// Yazma yalnız iki dosyaya gider — quran-request-outbox.json (tekrar
+// bildirim) ve quran-responses.json (manuel video ekle/kaldır) — ikisi de
+// ortak QuranTransportV1 doğrulayıcısından (extractSingleVideoId,
+// upsertOutboxRequest, applyResponse) geçer; latest.json/gunluk asla
+// dokunulmaz (T.isWritableTransportPath tek kapıdır, sync.js'teki QY-08/QY-11
+// disiplini burada da aynen uygulanır). replyToken/ghToken hiçbir zaman
+// DOM'a yazılmaz — outbox kaydı yeniden kuyruklanırken bile içeriği
+// olduğu gibi (parse edilmiş haliyle) taşınır, ekrana asla basılmaz.
+var QDELIVERY=null;
+var QURAN_BUCKET_P={
+  idle:'unrequested',
+  submitting:'waiting',queued:'waiting',notified:'waiting',awaiting_reply:'waiting',validating_reply:'waiting',
+  request_error:'waiting',notification_error:'waiting',invalid_reply:'waiting',video_unavailable:'waiting',
+  ready:'ready',watching:'ready',
+  watched:'watched',question_opened:'watched'
+};
+// App.js'teki QURAN_ROW_STATES ile bilerek birebir aynı Türkçe etiketler —
+// panel app.js'i import etmez (mimari kısıt), bu yüzden küçük eşleme
+// tabloları burada yerel olarak yeniden tanımlanır (diğer *_P yardımcıları
+// gibi), ama kullanıcıya görünen dil iki yüzeyde de tutarlı kalır.
+var QURAN_ROW_P={
+  submitting:{tone:'wait',label:'İletiliyor'},
+  queued:{tone:'wait',label:'İstek kaydedildi'},
+  notified:{tone:'wait',label:'Raşit’e haber verildi'},
+  awaiting_reply:{tone:'wait',label:'Cevap bekleniyor'},
+  validating_reply:{tone:'wait',label:'Cevap doğrulanıyor'},
+  ready:{tone:'ready',label:'Anlatım hazır'},
+  watching:{tone:'ready',label:'İzleniyor'},
+  watched:{tone:'done',label:'İzlendi'},
+  question_opened:{tone:'done',label:'Soru açıldı'},
+  request_error:{tone:'warn',label:'İletilemedi'},
+  notification_error:{tone:'warn',label:'Bildirilemedi'},
+  invalid_reply:{tone:'warn',label:'Bağlantı doğrulanamadı'},
+  video_unavailable:{tone:'warn',label:'Anlatım erişilemiyor'}
+};
+function quranBadgeClassP(tone){ return tone==='wait'?'b-warn':tone==='ready'?'b-quranp':tone==='done'?'b-ok':tone==='warn'?'b-danger':'b-dim'; }
+function quranJourneyRootP(){ return (D&&D.quranJourney&&typeof D.quranJourney==='object')?D.quranJourney:null; }
+// qrr_/qr_ + zaman tabanlı gövde: QuranTransportV1'in kimlik regex'ine
+// (8-64 alnum/_/-) rahatça uyar; çakışma riski günlük tek-operatör
+// kullanımında ihmal edilebilir (aynı kalıp app.js'in requestId üretiminde
+// de kabul edilebilir bulunmuştu).
+function quranPanelIdP(prefix){ return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,10); }
+
+// ── transport dosyası okuma/yazma — observer-inbox.json ile AYNI Contents
+// API deseni (loadInbox/putInbox), yalnız yol parametrik ──
+function ghTransportApiP(path){ var p=REPO.split("/"); return "https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/"+path; }
+function loadTransportFileP(path){
+  return fetch(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH)+"&t="+Date.now(),{headers:ghJsonHeaders()})
+    .then(function(r){
+      if(r.status===404) return {raw:null,sha:null};
+      if(!r.ok) throw new Error("transport "+r.status);
+      return r.json().then(function(g){ return {raw:(g&&typeof g.content==="string")?b64dec(g.content):null,sha:(g&&g.sha)||null}; });
+    });
+}
+function putTransportFileP(path,value,sha){
+  var T=window.QuranTransportV1;
+  if(!T||!T.isWritableTransportPath(path)) return Promise.reject(new Error("geçersiz transport yolu"));
+  var body={message:"panel: "+path.split("/").pop(),content:b64enc(JSON.stringify(value,null,2)),branch:BRANCH};
+  if(sha) body.sha=sha;
+  var H=ghJsonHeaders(); H["Content-Type"]="application/json";
+  return fetch(ghTransportApiP(path),{method:"PUT",headers:H,body:JSON.stringify(body)})
+    .then(function(r){ if(!r.ok) return r.text().then(function(t){ var e=new Error(r.status+" "+t.slice(0,160)); e.status=r.status; throw e; }); return r.json(); });
+}
+// Salt-okunur — yalnız otomasyon hata nedenini göstermek için. Okunamazsa
+// (yetkisiz/ağ) sessizce atlanır: KPI ve istek listesi D.quranJourney'den
+// geldiği için bu, panelin geri kalanını hiç etkilemez.
+function loadDeliveryP(){
+  var T=window.QuranTransportV1; if(!T) return Promise.resolve();
+  return loadTransportFileP(T.PATHS.delivery).then(function(cur){
+    QDELIVERY=T.parseDelivery(cur.raw).value;
+  }).catch(function(){});
+}
+function quranDeliveryErrorsP(){
+  var q=quranJourneyRootP(); if(!q) return [];
+  var reqs=q.requests||{}, dl=(QDELIVERY&&QDELIVERY.requests)||{}, out=[];
+  Object.keys(reqs).forEach(function(sid){
+    var req=reqs[sid]; if(!req||!req.requestId) return;
+    var rec=dl[req.requestId];
+    if(rec&&rec.status==='failed') out.push({surahId:sid,error:rec.error||'bilinmeyen hata'});
+  });
+  return out;
+}
+
+// ── tekrar bildirim: aynı outbox kaydını değiştirmeden yeniden PUT'lar —
+// dosya-seviyeli updatedAt değişir, QY-09 workflow'unun `push` tetikleyicisi
+// yeniden ateşlenir; quran_mail.py idempotent olduğu için (aynı requestId
+// zaten 'sent'se ikinci kez maillemez) çift postalama riski yoktur ──
+window.quranRetryNotifyP=function(surahId){
+  if(DEMO_MODE){ alert("Demo modu: yazma kapalı."); return; }
+  if(UI.quranBusyId) return;
+  var T=window.QuranTransportV1, q=quranJourneyRootP();
+  var req=q&&q.requests?q.requests[surahId]:null;
+  if(!T||!req||!req.requestId){ alert("Bu sûre için açık istek yok."); return; }
+  UI.quranBusyId=surahId; render();
+  function attempt(n){
+    loadTransportFileP(T.PATHS.outbox).then(function(cur){
+      var parsed=T.parseOutbox(cur.raw), entry=parsed.value.requests[req.requestId];
+      if(!entry) throw new Error("outbox kaydı bulunamadı (postalanmış olabilir)");
+      var res=T.upsertOutboxRequest(parsed.value,entry,new Date().toISOString());
+      if(!res.ok) throw new Error("geçersiz outbox kaydı: "+(res.errors||[]).join(","));
+      return putTransportFileP(T.PATHS.outbox,res.value,cur.sha);
+    }).then(function(){
+      UI.quranBusyId=""; render(); alert("Bildirim yeniden kuyruklandı.");
+    }).catch(function(e){
+      if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
+      UI.quranBusyId=""; render(); alert("Kuyruklanamadı: "+String(e&&e.message||e));
+    });
+  }
+  attempt(1);
+};
+
+// ── manuel video ekle/kaldır — güvenli yedek yol. Doğrulama TAMAMEN ortak
+// QuranTransportV1'den gelir (extractSingleVideoId/applyResponse); panel
+// kendi gevşek bir kural icat etmez (plan §12 şartı) ──
+window.quranManualAddP=function(surahId){
+  if(DEMO_MODE){ alert("Demo modu: yazma kapalı."); return; }
+  if(UI.quranBusyId) return;
+  var T=window.QuranTransportV1, q=quranJourneyRootP();
+  var req=q&&q.requests?q.requests[surahId]:null;
+  if(!T||!req||!req.requestId){ alert("Bu sûre için açık istek yok."); return; }
+  var el=document.getElementById('qm-url-'+surahId), raw=el?el.value.trim():"";
+  var ext=T.extractSingleVideoId(raw);
+  if(!ext.ok){ alert(ext.reason==='multiple_videos'?"Metinde birden fazla video bağlantısı var; tek bağlantı gerekli.":"Geçerli bir YouTube bağlantısı bulunamadı."); return; }
+  UI.quranBusyId=surahId; render();
+  var at=new Date().toISOString();
+  var resp={responseId:quranPanelIdP('qrr_'),requestId:req.requestId,surahId:surahId,videoId:ext.videoId,source:'panel_manual',receivedAt:at,validatedAt:at,senderFingerprint:null,status:'ready'};
+  function attempt(n){
+    loadTransportFileP(T.PATHS.responses).then(function(cur){
+      var parsed=T.parseResponses(cur.raw);
+      var res=T.applyResponse(parsed.value,resp,at);
+      if(!res.ok) throw new Error("geçersiz yanıt: "+(res.errors||[]).join(","));
+      return putTransportFileP(T.PATHS.responses,res.value,cur.sha);
+    }).then(function(){
+      UI.quranBusyId=""; render(); alert("Video kaydedildi. Uygulama bir sonraki güncellemede görecek.");
+    }).catch(function(e){
+      if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
+      UI.quranBusyId=""; render(); alert("Kaydedilemedi: "+String(e&&e.message||e));
+    });
+  }
+  attempt(1);
+};
+window.quranManualRevokeP=function(surahId){
+  if(DEMO_MODE){ alert("Demo modu: yazma kapalı."); return; }
+  if(UI.quranBusyId) return;
+  var T=window.QuranTransportV1, q=quranJourneyRootP();
+  var req=q&&q.requests?q.requests[surahId]:null;
+  if(!T||!req||!req.requestId) return;
+  if(!confirm("Bu sûre için geçerli videoyu geri çek? Raşit’ten yeni bağlantı beklenecek.")) return;
+  UI.quranBusyId=surahId; render();
+  var at=new Date().toISOString();
+  function attempt(n){
+    loadTransportFileP(T.PATHS.responses).then(function(cur){
+      var parsed=T.parseResponses(cur.raw);
+      var prev=parsed.value.responses[req.requestId];
+      var videoId=req.videoId||(prev&&prev.videoId);
+      if(!videoId) throw new Error("geri çekilecek video kimliği yok");
+      var resp={responseId:quranPanelIdP('qrr_'),requestId:req.requestId,surahId:surahId,videoId:videoId,source:'panel_manual',receivedAt:at,validatedAt:at,senderFingerprint:null,status:'revoked'};
+      var res=T.applyResponse(parsed.value,resp,at);
+      if(!res.ok) throw new Error("geçersiz yanıt: "+(res.errors||[]).join(","));
+      return putTransportFileP(T.PATHS.responses,res.value,cur.sha);
+    }).then(function(){
+      UI.quranBusyId=""; render(); alert("Video geri çekildi.");
+    }).catch(function(e){
+      if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
+      UI.quranBusyId=""; render(); alert("Geri çekilemedi: "+String(e&&e.message||e));
+    });
+  }
+  attempt(1);
+};
+
+function quranJourneyPanelCardHTML(){
+  var T=window.QuranTransportV1, cat=window.QuranRevelationOrderV1, q=quranJourneyRootP();
+  if(!T||!cat||!Array.isArray(cat.surahs)||!cat.surahs.length){
+    return cardWrap({key:'quranJourney',icon:icon('book',18),title:'Kur’an Yolculuğu',span:12,order:23,
+      summary:'<div class="empty"><span class="ei">'+icon('book',20)+'</span>Kütüphane modülü yüklenemedi</div>'});
+  }
+  var reqs=(q&&q.requests&&typeof q.requests==='object')?q.requests:{};
+  var surahs=cat.surahs, total=surahs.length;
+  var stats={unrequested:0,waiting:0,ready:0,watched:0}, rows=[], lastActivity=null;
+  surahs.forEach(function(x){
+    var req=reqs[x.id]||null, status=(req&&req.status)||'idle', bucket=QURAN_BUCKET_P[status]||'unrequested';
+    stats[bucket]++;
+    if(bucket!=='unrequested'){
+      rows.push({x:x,req:req,status:status});
+      var u=req&&req.updatedAt; if(u&&(!lastActivity||u>lastActivity)) lastActivity=u;
+    }
+  });
+  rows.sort(function(a,b){ return String((b.req&&b.req.updatedAt)||'').localeCompare(String((a.req&&a.req.updatedAt)||'')); });
+
+  var sum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">';
+  sum+='<div class="dstat"><div class="dv">'+rows.length+'</div><div class="dl">istendi</div></div>';
+  sum+='<div class="dstat"><div class="dv" style="color:var(--amber);">'+stats.waiting+'</div><div class="dl">bekliyor</div></div>';
+  sum+='<div class="dstat"><div class="dv" style="color:var(--quranp2);">'+stats.ready+'</div><div class="dl">hazır</div></div>';
+  sum+='<div class="dstat"><div class="dv" style="color:var(--green);">'+stats.watched+'</div><div class="dl">izlendi</div></div>';
+  sum+='</div>';
+  sum+='<div style="font-size:var(--f1);color:var(--t3);margin-top:8px;text-align:right;font-weight:700;">'+total+' sûre · son etkinlik '+(lastActivity?esc(timeAgo(lastActivity)):'—')+'</div>';
+
+  var det='';
+  var errs=quranDeliveryErrorsP();
+  if(errs.length){
+    det+='<div style="background:var(--ra);border:1px solid var(--rb);border-radius:12px;padding:10px 12px;margin-bottom:11px;">';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--red);margin-bottom:6px;">Otomasyon hatası · '+errs.length+'</div>';
+    errs.forEach(function(e){
+      var surah=cat.byId(e.surahId);
+      det+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--bd2);">';
+      det+='<div style="min-width:0;"><div style="font-size:var(--f3);font-weight:700;color:var(--t1);">'+esc(surah?surah.nameTr:e.surahId)+'</div><div style="font-size:var(--f1);color:var(--t4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(e.error)+'</div></div>';
+      det+='<button class="btn" style="font-size:var(--f1);padding:6px 9px;flex:none;" '+(UI.quranBusyId===e.surahId?'disabled':'')+' onclick="quranRetryNotifyP(\''+esc(e.surahId)+'\')">'+(UI.quranBusyId===e.surahId?'…':'Tekrar dene')+'</button>';
+      det+='</div>';
+    });
+    det+='</div>';
+  }
+
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;">Açık istekler'+(rows.length?' · '+rows.length:'')+'</div>';
+  if(!rows.length){
+    det+='<div class="empty"><span class="ei">'+icon('book',20)+'</span>Henüz istek yok</div>';
+  } else {
+    det+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    rows.forEach(function(r){
+      var rs=QURAN_ROW_P[r.status]||{tone:'idle',label:r.status};
+      det+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 11px;">';
+      det+='<div style="display:flex;align-items:center;gap:8px;">';
+      det+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak</div></div>';
+      det+='<span class="badge '+quranBadgeClassP(rs.tone)+'">'+esc(rs.label)+'</span>';
+      det+='</div>';
+      if(r.req&&r.req.videoId){
+        var vurl='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(r.req.videoId);
+        det+='<div style="margin-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+        det+='<a href="'+esc(vurl)+'" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-size:var(--f2);color:var(--quranp2);font-weight:700;text-decoration:none;">'+icon('play',12)+' Güvenli bağlantı</a>';
+        det+='<span class="mono" style="font-size:var(--f1);color:var(--t4);">'+esc(r.req.videoId)+'</span>';
+        det+='<button class="btn" style="font-size:var(--f1);padding:5px 8px;margin-left:auto;" '+(UI.quranBusyId===r.x.id?'disabled':'')+' onclick="quranManualRevokeP(\''+esc(r.x.id)+'\')">Yanlış video · kaldır</button>';
+        det+='</div>';
+      } else {
+        det+='<div style="margin-top:9px;display:flex;gap:6px;">';
+        det+='<input id="qm-url-'+esc(r.x.id)+'" type="text" placeholder="YouTube bağlantısı yapıştır (manuel yedek)" style="flex:1;font-size:var(--f2);padding:7px 9px;">';
+        det+='<button class="btn" style="font-size:var(--f1);padding:7px 10px;flex:none;" '+(UI.quranBusyId===r.x.id?'disabled':'')+' onclick="quranManualAddP(\''+esc(r.x.id)+'\')">Ekle</button>';
+        det+='</div>';
+      }
+      det+='</div>';
+    });
+    det+='</div>';
+  }
+  det+='<div style="font-size:var(--f1);color:var(--t4);margin-top:10px;line-height:1.4;">Panel onayı yayın için şart değil; yalnız gözlem ve gerektiğinde geri alma yüzeyi. Manuel işlemler ortak doğrulayıcıdan geçer; secret/token burada hiç görünmez.</div>';
+
+  return cardWrap({key:'quranJourney',icon:icon('book',18),title:'Kur’an Yolculuğu',span:12,order:23,summary:sum,details:det});
 }
 
 // ── Zihin-Beden Beslenmesi (kurs & pratik) — panel aynası ──
@@ -2494,6 +2750,7 @@ function render(){
   })();
   h+=faithAnnualPanelCardP();
   h+=hijriPanelCardP();
+  h+=quranJourneyPanelCardHTML();
 
   // ROW 1.5: Luna sohbeti (salt-izleme) + ÆON sohbeti (etkileşimli) — WhatsApp thread'leri
   h+=lunaThreadCardHTML();
@@ -3775,8 +4032,9 @@ function load(){
     .then(function(j){
       D=j; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      loadInbox().then(function(res){
-        OBSINBOX=res.messages||[]; OBSSHA=res.sha; OBSRECEIPTS=res.receipts||{};
+      Promise.all([loadInbox(), loadDeliveryP()]).then(function(res){
+        var ib=res[0]||{};
+        OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
@@ -3794,7 +4052,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

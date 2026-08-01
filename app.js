@@ -62,6 +62,7 @@ var ICONS={
   'check':'<path d="M20 6 9 17l-5-5" />',
   'cherry':'<path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z" /><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z" /><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12" /><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7Z" />',
   'chevron-down':'<path d="m6 9 6 6 6-6" />','chevron-left':'<path d="m15 18-6-6 6-6" />',
+  'chevron-right':'<path d="m9 18 6-6-6-6" />',
   'chevron-up':'<path d="m18 15-6-6-6 6" />',
   'circle':'<circle cx="12" cy="12" r="10" />',
   'clapperboard':'<path d="m12.296 3.464 3.02 3.956" /><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z" /><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m6.18 5.276 3.1 3.899" />',
@@ -782,6 +783,8 @@ var QURAN_STATUSES=['idle','submitting','queued','notified','awaiting_reply','va
 var QURAN_REQUEST_STAMPS=['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt','updatedAt'];
 // videoHistory sync'e giden kalıcı veridir; sınırsız büyümesin.
 var QURAN_HISTORY_MAX=20;
+// QY-14: "Raşit'e sor" WhatsApp hedefi — E.164, ülke kodu dahil, boşluk/işaret yok.
+var QURAN_WHATSAPP_NUMBER='905066020098';
 
 function emptyQuranJourney(){
   return {schemaVersion:QURAN_SCHEMA_VERSION,catalogVersion:QURAN_CATALOG_VERSION,startedAt:null,activeSurahId:QURAN_DEFAULT_SURAH_ID,requests:{}};
@@ -1627,7 +1630,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:''};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranVerseIdx:quranRandomVerseStart()};
 ui.zikrNoteOpen=true; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus='';
 ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; ui.qiblaLastAt='';
 ui.quranRefreshing=false;
@@ -3100,6 +3103,10 @@ function weekBlock(w,days){
 function toast(msg,ms){
   var ex=document.getElementById('sey-toast'); if(ex) ex.remove();
   var t=document.createElement('div'); t.id='sey-toast';
+  // QY-17: rol/aria-live yoktu — bu tek fonksiyon uygulama genelindeki TÜM
+  // toast'ları (Kur'an Yolculuğu'nun "İsteğin kaydedildi.", "WhatsApp açıldı.",
+  // güncelleme sonucu dahil) besler; ekran okuyucu hiçbirini duyurmuyordu.
+  t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
   t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;justify-content:center;max-width:88vw;padding:12px 19px;border-radius:17px;background:rgba(28,22,30,0.88);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,0.22);color:#fff;font:700 14px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;box-shadow:0 16px 42px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.14);text-align:center;letter-spacing:.1px;animation:seyToast .32s cubic-bezier(.16,1,.3,1);';
   t.textContent=msg; document.body.appendChild(t);
   clearTimeout(toastTimer); toastTimer=setTimeout(function(){ if(t&&t.parentNode){ t.style.transition='opacity .28s ease,transform .28s ease'; t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px) scale(.97)'; setTimeout(function(){ if(t.parentNode) t.remove(); },300); } }, ms||1800);
@@ -3382,7 +3389,13 @@ App.start=function(){
   if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
   ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım');
 };
-App.go=function(id){ ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab'); };
+App.go=function(id){
+  // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
+  // aynı sekmedeyken tetiklenen alakasız re-render'larda DEĞİL) Kur'an
+  // Yolculuğu kartının âyet vitrini bir sonrakine geçer.
+  if(id==='saygi'&&ui.tab!=='saygi'&&typeof quranAdvanceVerseIndex==='function') quranAdvanceVerseIndex();
+  ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab');
+};
 // ── Profil Değerlendirmesi: bilgilendirme + rıza (Faz 04) — data.psych'ten ayrı ──
 // Faz 05'ten itibaren render() zaten `pa.status!=='completed'`ye göre bu ekranı
 // (veya soru ekranını) OTOMATİK gösterir — bu fonksiyon yalnızca açıkça/programatik
@@ -9263,38 +9276,15 @@ function faithCornerCardHTML(){
   var times=prayerTimesFromDay(p);
   var curIdx=currentPrayerIndex(times), nextIdx=(curIdx+1<PRAYER_ORDER.length?curIdx+1:PRAYER_ORDER.length-1);
   var locName=loc&&loc.cityName?esc(loc.cityName):(loc?'Konum ayarlandı':'Konum seçilmedi');
-  var allDone=s.performed>=6;
-  var h='<div class="sg-faith-preview-card'+(allDone?' is-done':'')+'" onclick="App.openFaithCorner()" role="button" aria-label="İman köşesini aç">';
-  h+='<div class="sg-faith-preview-arc" aria-hidden="true"></div>';
-  h+='<div class="sg-faith-preview-head">';
-  h+='<div class="sg-faith-preview-title-block">';
-  h+='<span class="sg-faith-preview-icon">'+icon('mosque',20)+'</span>';
-  h+='<div><div class="sg-faith-preview-title">İman Köşesi</div><div class="sg-faith-preview-sub">'+locName+' · '+dateLabelTR(date)+'</div></div>';
-  h+='</div>';
-  h+='<div class="sg-faith-preview-progress" aria-label="'+s.performed+' / 6 vakit tamamlandı">';
-  PRAYER_ORDER.forEach(function(k,i){ var pe=p[k]||emptyPrayerEntry(); h+='<span class="sg-faith-progress-dot '+(!i?'first':'')+' '+(!!pe.performed?'done':'')+(i===curIdx?' current':'')+'" data-prayer="'+esc(PRAYER_NAMES[k]||k)+'"></span>'; });
-  h+='</div>';
-  h+='</div>';
-  h+='<div class="sg-faith-preview-list">';
-  PRAYER_ORDER.forEach(function(k,i){
-    var pe=p[k]||emptyPrayerEntry(), performed=!!pe.performed, name=PRAYER_NAMES[k]||k, time=pe.time||'--:--';
-    var cls='sg-faith-preview-row'+(performed?' done':'')+(i===curIdx?' current':'')+(i===nextIdx?' next':'')+(i===PRAYER_ORDER.length-1?' last':'');
-    var status=performed?icon('check',11):'';
-    h+='<div class="'+cls+'">';
-    h+='<div class="sg-faith-preview-name">'+esc(name)+'</div>';
-    h+='<div class="sg-faith-preview-time">'+esc(time)+'</div>';
-    h+='<div class="sg-faith-preview-status">'+(status?'<span class="sg-faith-preview-check">'+status+'</span>':'<span class="sg-faith-preview-dot"></span>')+'</div>';
-    h+='</div>';
-  });
-  h+='</div>';
-  h+='<div class="sg-faith-preview-foot">';
-  h+='<span class="sg-faith-preview-pill '+(!allDone?'':'ok')+'">'+icon('check',10)+' '+s.performed+'/6 vakit</span>';
-  if(s.congregation) h+='<span class="sg-faith-preview-pill">'+icon('users',10)+' '+s.congregation+' cemaat</span>';
-  if(s.madeUp) h+='<span class="sg-faith-preview-pill warn">'+icon('refresh-ccw',10)+' '+s.madeUp+' kaza</span>';
-  if(s.late) h+='<span class="sg-faith-preview-pill warn">'+icon('clock',10)+' '+s.late+' geç</span>';
-  if(streak) h+='<span class="sg-faith-preview-pill streak">'+icon('flame',10)+' '+streak+' gün seri</span>';
-  h+='</div>';
-  h+='</div>';
+  var nx=nextPrayerInfo(times), pct=Math.round((s.performed/6)*100), allDone=s.performed>=6;
+  var nextKey=nx.key||PRAYER_ORDER[nextIdx]||PRAYER_ORDER[0], nextEntry=p[nextKey]||emptyPrayerEntry();
+  var h='<button id="faith-preview-card" class="hub-v2-preview faith-v2-preview'+(allDone?' is-complete':'')+'" onclick="App.openFaithCorner()" aria-label="İman Köşesini aç">';
+  h+='<div class="hub-v2-preview-top"><span class="hub-v2-preview-icon">'+icon('mosque',20)+'</span><div class="hub-v2-preview-copy"><strong>İman Köşesi</strong><small>'+locName+' · '+dateLabelTR(date)+'</small></div><span class="hub-v2-preview-status '+(allDone?'complete':'active')+'">'+(allDone?'tamamlandı':s.performed+'/6 vakit')+'</span></div>';
+  h+='<div class="hub-v2-preview-focus"><div><span class="eyebrow">SIRADAKİ VAKİT</span><strong>'+esc(nx.name||PRAYER_NAMES[nextKey]||'Vakit')+'</strong><p>'+(nx.label?esc(nx.label):'Vakit bilgisi hazırlanıyor')+'</p></div><span class="faith-time">'+esc(nextEntry.time||'--:--')+'</span></div>';
+  h+='<div class="hub-v2-preview-metric"><div><span>Kılınan</span><strong>'+s.performed+' / 6</strong><small>bugün</small></div><div><span>Cemaat</span><strong>'+s.congregation+'</strong><small>vakit</small></div><div><span>Devamlılık</span><strong>'+streak+'</strong><small>gün seri</small></div></div>';
+  h+='<div class="hub-v2-preview-bar" aria-label="'+s.performed+' / 6 vakit tamamlandı"><i style="width:'+pct+'%"></i></div>';
+  h+='<div class="hub-v2-preview-foot"><span>'+(s.madeUp?icon('rotate-ccw',12)+s.madeUp+' kaza':'Bugünün ibadet ritmi')+'</span><b>Vakitleri aç '+icon('chevron-right',13)+'</b></div>';
+  h+='</button>';
   return h;
 }
 function saygiPreviewCardHTML(person,done,article){
@@ -9305,24 +9295,14 @@ function saygiPreviewCardHTML(person,done,article){
   } else {
     thumb='<span class="sg-person-preview-thumb-fallback">'+esc((person.name||'?').charAt(0).toUpperCase())+'</span>';
   }
-  var h='<div class="sg-person-preview-card'+(done?' is-done':'')+'" onclick="App.openSaygiPreview()" role="button" aria-label="Günün öncüsü: '+esc(person.name)+'">';
-  h+='<div class="sg-person-preview-arc" aria-hidden="true"></div>';
-  h+='<div class="sg-person-preview-thumb">'+thumb+'<span class="sg-person-preview-caption">Görsel · Wikipedia</span></div>';
-  h+='<div class="sg-person-preview-content">';
-  h+='<div class="sg-person-preview-badges">';
-  h+='<span class="sg-person-preview-badge">'+esc(person.kind)+'</span>';
-  h+='<span class="sg-person-preview-badge is-era">'+esc(person.era)+'</span>';
-  h+='</div>';
-  h+='<div class="sg-person-preview-name">'+esc(person.name)+'</div>';
-  h+='<div class="sg-person-preview-discipline">'+icon(person.kind==='Bilim'?'microscope':'feather',12)+' '+esc(person.field)+'</div>';
-  if(article&&article.description) h+='<p class="sg-person-preview-desc">'+esc(article.description)+'</p>';
-  h+='<div class="sg-person-preview-meta">';
-  h+='<span>'+icon('clock',11)+' yaklaşık '+(article?saygiReadMinutes(article):'2')+' dk</span>';
-  h+='<span>'+icon('book-open',11)+' '+(article&&article.lang==='tr'?'Türkçe Wikipedia':'English Wikipedia')+'</span>';
-  h+='</div>';
-  h+='<div class="sg-person-preview-status">'+(done?'<span class="sg-person-preview-status-ok">'+icon('check',10)+' Okundu</span>':'<span class="sg-person-preview-status-wait">'+icon('book-open',10)+' Okumaya başla</span>')+'</div>';
-  h+='</div>';
-  h+='</div>';
+  var readCount=saygiReadCount(), pct=Math.min(100,Math.round((readCount/100)*100));
+  var h='<button id="saygi-preview-card" class="hub-v2-preview person-v2-preview'+(done?' is-complete':'')+'" onclick="App.openSaygiPreview()" aria-label="Günün öncüsü: '+esc(person.name)+'">';
+  h+='<div class="hub-v2-preview-top"><span class="hub-v2-preview-icon">'+icon('trophy',20)+'</span><div class="hub-v2-preview-copy"><strong>Günün Öncüsü</strong><small>100 hayat · 100 iz</small></div><span class="hub-v2-preview-status '+(done?'complete':'active')+'">'+(done?'okundu':'bugün keşfet')+'</span></div>';
+  h+='<div class="hub-v2-preview-focus"><div><span class="eyebrow">'+esc(person.kind)+' · '+esc(person.era)+'</span><strong>'+esc(person.name)+'</strong><p>'+(article&&article.description?esc(article.description):esc(person.field))+'</p></div><span class="person-thumb">'+thumb+'</span></div>';
+  h+='<div class="hub-v2-preview-metric"><div><span>Alan</span><strong>'+esc(person.kind)+'</strong><small>'+esc(person.field)+'</small></div><div><span>Okuma</span><strong>'+ (article?saygiReadMinutes(article):2)+' dk</strong><small>'+(article&&article.lang==='tr'?'Türkçe':'Wikipedia')+'</small></div><div><span>Koleksiyon</span><strong>'+readCount+' / 100</strong><small>'+saygiStreak()+' gün seri</small></div></div>';
+  h+='<div class="hub-v2-preview-bar" aria-label="100 öncüden '+readCount+' okundu"><i style="width:'+pct+'%"></i></div>';
+  h+='<div class="hub-v2-preview-foot"><span>'+icon(person.kind==='Bilim'?'microscope':'feather',12)+esc(person.field)+'</span><b>'+(done?'Yeniden oku':'Biyografiyi aç')+' '+icon('chevron-right',13)+'</b></div>';
+  h+='</button>';
   return h;
 }
 function saygiMissionCardHTML(){
@@ -9395,8 +9375,14 @@ function saygiPreviewHubHTML(person,article,done){
   else if(tab==='zikir'&&ZIKR_V2_VISIBLE) body=zikrPreviewCardHTML();
   else if(tab==='rapor') body=faithRaporCardHTML();
   else body=saygiPreviewCardHTML(person,done,article)+faithCornerCardHTML()+(ZIKR_V2_VISIBLE?zikrPreviewCardHTML():'');
+  return '<div class="saygi-preview-hub">'+body+'</div>';
+}
+function faithNavHTML(){
   var tabs=ZIKR_V2_VISIBLE?[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['zikir','Zikir'],['rapor','Rapor']]:[['oz','Öz'],['oncu','Öncü'],['iman','İman'],['rapor','Rapor']];
-  return '<div class="saygi-preview-hub"><div class="sg-faith-tabs">'+segTabs(tabs,tab,'App.setFaithTab','faith')+'</div>'+body+'</div>';
+  var tab=ui.faithTab||'oz', icons={oz:'circle',oncu:'trophy',iman:'mosque',zikir:'sparkles',rapor:'chart-column'};
+  var h='<nav class="faith-v2-nav" aria-label="İlham ve İbadet bölümleri">';
+  tabs.forEach(function(x){ var on=x[0]===tab; h+='<button class="'+(on?'on':'')+'" onclick="App.setFaithTab(\''+x[0]+'\')" aria-current="'+(on?'page':'false')+'"><span>'+icon(icons[x[0]]||'circle',16)+'</span><b>'+x[1]+'</b></button>'; });
+  return h+'</nav>';
 }
 function zikrPreviewCardHTML(){
   var p=zikrActivePreset(), day=zikrDay(todayStr()), jp=zikrJourneyProgress(p), m=jp.math;
@@ -9990,26 +9976,66 @@ function quranJourneyStats(){
   return s;
 }
 
-// ── QY-05 hub kartı ──
+// ── İY-B hub kartı — Zikirmatik büyük-kart tasarım diliyle (bkz.
+// zikrPreviewCardHTML/.zikr-v2-preview*), yalnız --quran* tema tonlarıyla.
+// Vitrindeki âyet kart her açıldığında (App.go('saygi') ile, bkz. aşağıdaki
+// quranAdvanceVerseIndex çağrı noktası) sıradaki âyete geçer — 100 âyetlik
+// quranStrikingVersesV1.js modülü sırayla, baştan sona turlanır. ui-düzeyinde
+// tutulur (senkronize edilmez): bu salt kozmetik bir vitrin sırası, gerçek
+// yolculuk verisi değil.
+function quranRandomVerseStart(){
+  var mod=(typeof window!=='undefined')&&window.QuranStrikingVersesV1;
+  var n=(mod&&mod.totalCount)||100;
+  return Math.floor(Math.random()*n);
+}
+function quranActiveVerse(){
+  var mod=(typeof window!=='undefined')&&window.QuranStrikingVersesV1;
+  if(!mod||!Array.isArray(mod.verses)||!mod.verses.length) return null;
+  var n=mod.verses.length;
+  var idx=((Number(ui.quranVerseIdx)||0)%n+n)%n;
+  return mod.verses[idx];
+}
+function quranAdvanceVerseIndex(){ ui.quranVerseIdx=(Number(ui.quranVerseIdx)||0)+1; }
+// Durum → rozet/kenarlık tonu. quranBucket'ın dört kovasını (unrequested/
+// waiting/ready/watched) kartın kendi tonlama sözlüğüne eşler.
+function quranPreviewToneOf(status){
+  var b=quranBucket(status);
+  return b==='watched'?'done':(b==='ready'?'ready':(b==='waiting'?'wait':'idle'));
+}
 function quranJourneyHubCardHTML(){
   var q=ensureQuranJourney(data);
   var surah=quranSurah(q.activeSurahId);
   var id=surah?surah.id:(q.activeSurahId||QURAN_DEFAULT_SURAH_ID);
-  var name=surah?(surah.nameAr+' · '+surah.nameTr):id;
   var order=surah?surah.revelationOrder:1;
   var total=quranTotal();
   var req=quranRequestOf(q,id);
   var status=req.status||'idle';
   var copy=quranJourneyCardCopy(status,quranCanRequest(req),req,order,total);
-  var h='<button id="quran-journey-card" class="sg-quran-card" onclick="App.openQuranJourney()" aria-label="Kur’an Yolculuğu kütüphanesini aç">';
-  h+='<span class="sg-quran-badge" aria-hidden="true"><span>📖</span>'+(order?'<i class="order">'+order+'/'+total+'</i>':'')+'</span>';
-  h+='<span class="sg-quran-copy"><small>'+esc(copy.kicker)+'</small><strong>'+esc(name)+'</strong><em>'+esc(copy.line)+'</em></span>';
-  h+='<span class="sg-quran-meta">'+quranJourneyMetaChips(status,req)+'</span>';
-  h+='<span class="sg-quran-action">';
-  if(copy.ctaAction) h+='<span class="cta '+copy.ctaClass+'" onclick="event.stopPropagation();'+copy.ctaAction+'">'+esc(copy.ctaLabel)+'</span>';
-  else h+='<span class="cta is-outline is-disabled" aria-disabled="true">'+esc(copy.ctaLabel)+'</span>';
-  h+='<span class="status">'+esc(copy.statusLabel)+'</span>';
-  h+='</span>';
+  var stats=quranJourneyStats();
+  var tone=quranPreviewToneOf(status);
+  var verse=quranActiveVerse();
+
+  var h='<button id="quran-journey-card" class="quran-v2-preview is-'+tone+'" onclick="App.openQuranJourney()" aria-label="Kur’an Yolculuğu kütüphanesini aç">';
+  h+='<div class="quran-v2-preview-top"><span class="quran-v2-preview-icon" aria-hidden="true">'+icon('book',20)+'</span><div class="quran-v2-preview-copy"><strong>Kur’an Yolculuğu</strong><small>'+esc(copy.line)+'</small></div><span class="quran-v2-preview-status '+tone+'">'+esc(copy.statusLabel)+'</span></div>';
+
+  // Vitrin: çarpıcı âyet modülü yüklüyse döner; yüklü değilse (statik denetim/
+  // eski derleme) aktif sûrenin adına düşülür — kart hiçbir zaman boş kalmaz.
+  if(verse){
+    h+='<div class="quran-v2-preview-focus"><div><span class="eyebrow">ÇARPICI ÂYET</span><strong>'+esc(verse.surahNameTr)+' · '+esc(verse.ayetNo)+'</strong><p>'+esc(verse.meal)+'</p></div><span class="arabic" lang="ar" dir="rtl">'+esc(verse.arabic)+'</span></div>';
+  } else if(surah){
+    h+='<div class="quran-v2-preview-focus"><div><span class="eyebrow">AKTİF SÛRE</span><strong>'+esc(surah.nameTr)+'</strong><p>'+esc(copy.line)+'</p></div><span class="arabic" lang="ar" dir="rtl">'+esc(surah.nameAr)+'</span></div>';
+  }
+
+  h+='<div class="quran-v2-preview-metric">';
+  h+='<div><span>Nüzul</span><strong>'+order+' / '+total+'</strong><small>'+esc(surah?surah.nameTr:id)+'</small></div>';
+  h+='<div><span>İstenen</span><strong>'+stats.requested+'</strong><small>'+total+' sûreden</small></div>';
+  h+='<div><span>İzlenen</span><strong>'+stats.watched+'</strong><small>%'+stats.pct+'</small></div>';
+  h+='</div>';
+  h+='<div class="quran-v2-preview-bar"><i style="width:'+stats.pct+'%"></i></div>';
+  h+='<div class="quran-v2-preview-foot"><span>'+order+'. durak · '+total+' sûrelik yolculuk</span>';
+  if(copy.ctaAction) h+='<b onclick="event.stopPropagation();'+copy.ctaAction+'">'+esc(copy.ctaLabel)+' '+icon('chevron-right',13)+'</b>';
+  else h+='<b class="is-disabled" aria-disabled="true">'+esc(copy.ctaLabel)+'</b>';
+  h+='</div>';
   h+='</button>';
   return h;
 }
@@ -10024,12 +10050,6 @@ function quranJourneyCardCopy(status,canReq,req,order,total){
   if(status==='video_unavailable'||status==='invalid_reply') return {kicker:'SÛRE · YENİ BAĞLANTI',line:'Güvenli bir bağlantı bekleniyor',ctaClass:'',ctaLabel:'Yeniden iste',ctaAction:'App.quranJourneyRequest()',statusLabel:'bağlantı yenilenecek'};
   if(canReq) return {kicker:'SÛRE · YENİ İSTEK',line:'Raşit’ten anlatım iste',ctaClass:'',ctaLabel:'İste',ctaAction:'App.quranJourneyRequest()',statusLabel:'istenebilir'};
   return {kicker:'SÛRE · İŞLENİYOR',line:'Birazdan tekrar dene',ctaClass:'is-outline',ctaLabel:'Durumu aç',ctaAction:'App.openQuranJourney()',statusLabel:'işleniyor'};
-}
-function quranJourneyMetaChips(status,req){
-  var chips=[];
-  if(status==='watched'||status==='question_opened') chips.push('<i class="chip is-gold">✓ izlendi</i>');
-  if(req.videoHistory&&req.videoHistory.length>0) chips.push('<i class="chip">'+req.videoHistory.length+' anlatım</i>');
-  return chips.join('')||'<i class="chip">nüzul sırası</i>';
 }
 
 // ── QY-06 tam ekran kabuk ──
@@ -10047,7 +10067,7 @@ function quranHeadLeadHTML(){
     return '<button class="back" onclick="App.backToQuranLibrary()" aria-label="Sûre kütüphanesine dön">'+icon('chevron-left',18)+'</button>'
       +'<span class="copy"><strong>'+esc(x?(x.nameTr+' Sûresi'):'Sûre')+'</strong><small>'+esc(x?(x.revelationOrder+'. durak · '+quranTotal()+' sûrelik yolculuk'):'Kur’an Yolculuğu')+'</small></span>';
   }
-  return '<span class="mark" aria-hidden="true">📖</span><span class="copy"><strong>Kur’an Yolculuğu</strong><small>Raşit’in anlatımıyla, nüzul sırasıyla</small></span>';
+  return '<span class="mark" aria-hidden="true"><span>'+icon('book-open',20)+'</span><i></i></span><span class="copy"><strong>Kur’an Yolculuğu</strong><small>Raşit’in anlatımıyla · nüzul arşivi</small></span>';
 }
 function quranViewBodyHTML(){
   return (ui.quranJourneyView==='detail')?quranDetailViewHTML(ui.quranDetailId):quranLibraryViewHTML();
@@ -10057,11 +10077,13 @@ function quranViewBodyHTML(){
 function quranLibraryViewHTML(){
   var s=quranJourneyStats(), cat=quranCatalog();
   var h='<section class="quran-v2-library">';
-  h+='<div class="quran-v2-section-head"><span>NÜZUL YOLCULUĞU</span><h2>İniş sırasıyla '+s.total+' sûre</h2><p>Her sûre bir durak. Raşit’ten anlatım iste; geldiğinde bu listede açılır.</p></div>';
+  h+='<div class="quran-v2-library-hero"><div class="quran-v2-section-head"><span>NÜZUL ARŞİVİ · İLMÎ YOLCULUK</span><h2>İniş sırasıyla '+s.total+' sûre</h2><p>Her sûre bir durak. Raşit’ten anlatım iste; geldiğinde bu listede açılır.</p></div><div class="quran-v2-hero-seal" aria-hidden="true"><i></i><b>114</b><span>DURAK</span></div></div>';
   h+='<div class="quran-v2-progress" role="group" aria-label="Yolculuk ilerlemesi">';
+  h+='<div class="quran-v2-progress-head"><span>YOLCULUK İLERLEMESİ</span><b>Nüzul sırası</b></div>';
   h+='<i aria-hidden="true"><b style="width:'+s.pct+'%"></b></i>';
   h+='<span><strong>'+s.watched+' / '+s.total+'</strong> izlendi · '+s.requested+' sûre için istek açıldı</span>';
   h+='</div>';
+  h+='<div class="quran-v2-method-note" role="note"><span class="method-icon" aria-hidden="true">'+icon('scale',16)+'</span><span><strong>Katalog yöntemi</strong><small>Yaygın nüzul tertibi · sûreler tek tek doğrulanabilir · durumlar kullanıcı ilerlemesinden hesaplanır.</small></span><b aria-hidden="true">'+icon('chevron-right',14)+'</b></div>';
   h+='<label class="quran-v2-search">'+icon('search',16)+'<input id="quran-search-input" value="'+esc(ui.quranQuery||'')+'" oninput="App.setQuranQuery(this)" placeholder="Sûre adı, Arapça ad, mushaf no veya konu" aria-label="Sûre ara">';
   h+='<button id="quran-search-clear" class="clear" onclick="App.clearQuranQuery()" aria-label="Aramayı temizle"'+(ui.quranQuery?'':' hidden')+'>'+icon('x',13)+'</button></label>';
   h+='<div id="quran-library-results">'+quranLibraryResultsHTML()+'</div>';
@@ -10084,7 +10106,7 @@ function quranLibraryResultsHTML(){
     h+='<button class="'+(filter===f[0]?'on':'')+'" onclick="App.setQuranFilter(\''+f[0]+'\')" aria-pressed="'+(filter===f[0])+'">'+esc(f[1])+'<b>'+(counts[f[0]]||0)+'</b></button>';
   });
   h+='</div></div></section>';
-  h+='<div class="quran-v2-result-note" role="status" aria-live="polite"><strong>'+rows.length+'</strong> sûre'+(filter!=='all'?' · '+esc(quranFilterLabel(filter)):'')+(query?' · “'+esc(query)+'”':'')+'</div>';
+  h+='<div class="quran-v2-result-note" role="status" aria-live="polite"><span><strong>'+rows.length+'</strong> sûre'+(filter!=='all'?' · '+esc(quranFilterLabel(filter)):'')+(query?' · “'+esc(query)+'”':'')+'</span><span class="result-context">'+((filter==='all'&&!query)?'NÜZUL SIRASIYLA':'EŞLEŞEN DURAKLAR')+'</span></div>';
   if(!rows.length){
     h+='<div class="quran-v2-empty"><strong>Bu mercekte eşleşme yok.</strong><span>Aramayı temizleyebilir veya filtreyi “Tümü” yapabilirsin.</span><button onclick="App.resetQuranLens()">Filtreyi sıfırla</button></div>';
     return h;
@@ -10102,7 +10124,7 @@ function quranRowHTML(x,q){
   // Durum rozeti meta satırının İÇİNDE ve sarmalanabilir: 370px'te bile
   // "Raşit’e haber verildi" gibi uzun etiketler satırı yatay taşırmaz.
   var h='<button id="quran-row-'+esc(x.id)+'" class="quran-v2-row is-'+state.tone+(active?' is-active':'')+'" onclick="App.openQuranSurah(\''+esc(x.id)+'\')" aria-label="'+esc(aria)+'">';
-  h+='<span class="ord" aria-hidden="true"><b>'+x.revelationOrder+'</b><i>durak</i></span>';
+  h+='<span class="ord" aria-hidden="true"><b>'+x.revelationOrder+'</b><i>durak</i><span class="ord-line"></span></span>';
   h+='<span class="titleline"><strong>'+esc(x.nameTr)+'</strong><span class="arabic" lang="ar" dir="rtl">'+esc(x.nameAr)+'</span></span>';
   h+='<span class="metarow" aria-hidden="true"><span class="meta">'+esc(place)+' · '+x.ayahCount+' âyet · Mushaf '+x.mushafOrder+'</span>';
   h+='<span class="state"><i class="dot"></i><em>'+esc(state.label)+'</em></span></span>';
@@ -10223,7 +10245,7 @@ function quranVideoCardHTML(x,req){
 // video_gone: videoId TEŞHİS için korunur ama burada ASLA kapak/iframe
 // üretilmez — "kırık alan yerine açıklama" (plan §10).
 function quranVideoUnavailableHTML(){
-  return '<section class="quran-v2-video is-unavailable" role="status">'
+  return '<section class="quran-v2-video is-unavailable" role="status" aria-live="polite">'
     +'<p><strong>Bu anlatım artık erişilebilir değil.</strong><br>Raşit’ten yeni bir bağlantı istenebilir.</p></section>';
 }
 function quranDetailBodyHTML(x){
@@ -10408,8 +10430,12 @@ App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(da
 // (rewatch). videoId doğrulanmamışsa (markup state'le uyuşmuyorsa — beklenmez
 // ama savunmacı) sessizce hiçbir şey yapmaz.
 App.quranJourneyWatch=function(id){
-  var sid=quranSafeSurahId(id); if(!sid) return;
-  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
+  // Hub kartı (quranJourneyCardCopy) bu eylemi id'siz çağırır (ready/watching
+  // durumunda "İzlemeye başla"/"Devam et"); id yoksa aktif yolculuğa düş —
+  // aksi halde düğme sessizce hiçbir şey yapmazdı (gerçek regresyon, düzeltildi).
+  var q=ensureQuranJourney(data);
+  var sid=quranSafeSurahId(id||q.activeSurahId); if(!sid) return;
+  var req=quranRequestOf(q,sid);
   if(!QURAN_VIDEO_ID_RE.test(String(req.videoId||''))) return;
   ui.quranPlayerLoadedId=sid;
   var res=quranReduce(req,{type:'watch_start',at:new Date().toISOString()});
@@ -10432,7 +10458,30 @@ App.quranMarkWatched=function(id){
   var x=quranSurah(sid);
   toast('Mâşallah · '+(x?x.nameTr:'anlatım')+' izlendi olarak işaretlendi.');
 };
-App.quranJourneyQuestion=function(){ toast('“Raşit’e sor” bağlantısı henüz açılmadı.'); };
+// QY-14: sûre bağlamlı WhatsApp mesaj şablonu (plan §14 birebir).
+function quranAskMessage(x){
+  var name=x?x.nameTr:'bu sûre', order=x?x.revelationOrder:'';
+  return 'Selam Raşit, Kur’an Yolculuğu’nda '+name+' Sûresi\n('+order+'. durak) anlatımını izledim.\n\nBu sûreyle ilgili sana şunu sormak istiyorum:';
+}
+// QY-14: yalnız watched/question_opened durumunda çağrılabilir (her iki render
+// yeri de bu kapıyı zaten uyguluyor); reducer 'watched' dışından geleni
+// reddeder, bu yüzden question_opened'dan tekrar tıklamak state'i bozmaz
+// (idempotent no-op) ama WhatsApp'ı her seferinde yine açar — "tekrar sor"
+// meşru bir kullanım. Hub kartı bu eylemi id'siz çağırır (App.quranJourneyWatch
+// ile aynı sözleşme); id yoksa aktif yolculuğa düşer.
+App.quranJourneyQuestion=function(id){
+  var q=ensureQuranJourney(data);
+  var sid=quranSafeSurahId(id||q.activeSurahId); if(!sid) return;
+  var req=quranRequestOf(q,sid);
+  if(req.status!=='watched'&&req.status!=='question_opened') return;
+  var x=quranSurah(sid);
+  var url='https://wa.me/'+QURAN_WHATSAPP_NUMBER+'?text='+encodeURIComponent(quranAskMessage(x));
+  var res=quranReduce(req,{type:'question_open',at:new Date().toISOString()});
+  if(res.changed){ q.requests[sid]=res.request; save(); }
+  try{ if(typeof window!=='undefined'&&typeof window.open==='function') window.open(url,'_blank','noopener,noreferrer'); }catch(e){}
+  quranRepaintAfterChange(sid);
+  toast('WhatsApp açıldı.');
+};
 
 // ── QY-11: uzak teslim/yanıt dosyalarını yerel duruma güvenle uygula ──
 // Girdi ZATEN QuranTransportV1 ile ayrıştırılmış/doğrulanmış yapılardır; bu
@@ -10606,6 +10655,7 @@ function saygiHTML(){
   var article=(!ui.saygiPersonOpen&&ui.saygiArticle&&ui.saygiArticle.personId===person.id)?ui.saygiArticle:null;
   var done=saygiHasRead(person);
   var h='<section class="saygi-page">';
+  h+=faithNavHTML();
   h+=spiritBarHTML();
   h+=qiblaHubCardHTML();
   h+=quranJourneyHubCardHTML();
@@ -11593,6 +11643,7 @@ App.quranFilteredSurahs=quranFilteredSurahs;
 App.quranFilterCounts=quranFilterCounts;
 App.quranJourneyStats=quranJourneyStats;
 App.quranDetailAction=quranDetailAction;
+App.quranAskMessage=quranAskMessage;
 App.quranStatusNote=quranStatusNote;
 App.quranRowState=quranRowState;
 App.quranNewRequestId=quranNewRequestId;

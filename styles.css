@@ -21,6 +21,10 @@
   /* Açılır kart gövdesi: JS ölçülü max-height akordeon (animateCardExpand/Collapse). */
   .sey-collbody{will-change:max-height,opacity;}
   @media (prefers-reduced-motion: reduce){ .sey-collbody{transition:none!important;} }
+  /* QY-17: toast() (app.js) inline style ile seyToast animasyonu uygular —
+     tüm uygulamadaki toast'lar (Kur'an Yolculuğu'nun durum bildirimleri
+     dahil) etkilenir. Inline stili ezmek için burada !important şart. */
+  @media (prefers-reduced-motion: reduce){ #sey-toast{animation:none!important;} }
   @keyframes dzPulse{0%,100%{transform:scale(1);opacity:.92;}50%{transform:scale(1.13);opacity:1;}}
   @keyframes seyHabitWarn{0%,100%{border-color:var(--warn);box-shadow:0 6px 16px rgba(108,74,58,0.06),0 0 0 transparent;}50%{border-color:var(--warn);box-shadow:0 0 16px var(--warn-glow);}}
   .sey-habit-warn{animation:seyHabitWarn 1.25s ease-in-out infinite;}
@@ -213,7 +217,14 @@
     --qibla:#124F45;--qibla-2:#B48A36;--qibla-bg:#F8F3E8;--qibla-surface:#FFFDF8;--qibla-line:#DED3BB;--qibla-ink:#182B28;
     /* Raşit ile Kur'an Yolculuğu — derin lacivert + altın hat (nüzül sırası) */
     --quran:#1C3A5F; --quran2:#C9A227; --quran-bg:rgba(28,58,95,0.10); --quran-glow:rgba(201,162,39,0.24);
-    --quran-surface:#F7F5EE; --quran-ink:#172B45; --quran-gold:#B08D1F;
+    --quran-surface:#F7F5EE; --quran-ink:#172B45; --quran-gold:#715B14;
+    /* QY-17: --quran zaten koyu panelde METİN olarak 4.5:1 geçiyor, --quran-mid
+       ona eşit tutulur (yalnız dark temada farklılaşır — bkz. aşağıdaki not).
+       --quran-ok/--quran-warn, paylaşılan --ok/--drop'un quran panel fonunda
+       (qj-panel/qj-panel2) WCAG AA'yı tutturan koyulaştırılmış varyantı —
+       app genelindeki --ok/--drop'a DOKUNULMADI. --quran-gold-ink, altın
+       (--quran2) fon üzerinde her iki temada da sabit koyu okunur metin. */
+    --quran-mid:#1C3A5F; --quran-ok:#2E703A; --quran-warn:#87573C; --quran-gold-ink:#172B45;
     /* Zikirmatik — koyu zümrüt + sıcak altın + fildişi (ZIKIRMATIK-GELISTIRME-
        PLANI.md §5.1'in premium tema kararı; ZP-08'de yanlışlıkla eski
        turkuaz kalmıştı, kullanıcı geri bildirimiyle ZP-08.1'de düzeltildi) */
@@ -273,8 +284,14 @@
     --room:#F0AAC7; --room2:#F5C8DD; --room-glow:rgba(240,170,199,0.08); --room-bg:rgba(245,200,221,0.10);
     --faith:#D4C58A; --faith2:#E8D9A0; --faith-bg:rgba(212,197,138,0.12); --faith-glow:rgba(232,217,160,0.16);
     --qibla:#69C6AC;--qibla-2:#E2C06F;--qibla-bg:#171D1B;--qibla-surface:#202725;--qibla-line:#3A4641;--qibla-ink:#F4F5EF;
-    --quran:#4A7AB8; --quran2:#E4C54A; --quran-bg:rgba(74,122,184,0.12); --quran-glow:rgba(228,197,74,0.14);
+    --quran:#4777B6; --quran2:#E4C54A; --quran-bg:rgba(71,119,182,0.12); --quran-glow:rgba(228,197,74,0.14);
     --quran-surface:#151C28; --quran-ink:#E8EBF2; --quran-gold:#E4C54A;
+    /* QY-17: --quran hafifçe koyulaştırıldı (#4A7AB8→#4777B6) — üstündeki BEYAZ
+       CTA metni artık 4.5:1 geçiyor (önce 4.41:1 ile başarısızdı). Aynı mavi
+       koyu panelde METİN olarak kullanıldığında (sıra no, "bekleniyor" durumu,
+       filtre rozet sayacı) bu kez YETERSİZ KALIR (koyu fon + koyulaşmış mavi);
+       o roller için ayrıca AÇIK bir metin varyantı gerekir — --quran-mid. */
+    --quran-mid:#6790C3; --quran-ok:#82D990; --quran-warn:#E8A96B; --quran-gold-ink:#172B45;
     /* Zikirmatik — koyu zümrüt + sıcak altın + fildişi (bkz. açık tema notu) */
     --zikr:#4FBE92; --zikr2:#7FD4B0; --zikr-bg:rgba(79,190,146,0.12); --zikr-glow:rgba(127,212,176,0.18);
     /* Zikirmatik v2 — opak "tezhip" tasarım sistemi, koyu mürekkep varyantı */
@@ -640,15 +657,78 @@
 @media(max-width:370px){.sg-qibla-card{grid-template-columns:46px minmax(0,1fr) auto;padding:10px;gap:3px 8px}.sg-qibla-card-dial{width:44px;height:44px}.sg-qibla-card-method em{display:none}.sg-qibla-card-action{font-size:0}.sg-qibla-card-action svg{width:17px;height:17px}.qibla-v2-scroll{padding:12px}.qibla-v2-dial{width:min(73vw,228px);height:min(73vw,228px)}.qibla-v2-target small{white-space:normal}.qibla-v2-actions{grid-template-columns:1fr}.qibla-v2-sheet{border-radius:22px}}
 @media(prefers-reduced-motion:reduce){.qibla-v2-needle{transition:none}.sg-qibla-card:active{transform:none}}
 
-/* Raşit ile Kur'an Yolculuğu — QY-05 ana kart */
-.sg-quran-card{appearance:none;width:100%;min-width:0;padding:12px 13px;display:grid;grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"badge copy action" "badge meta action";align-items:center;gap:4px 12px;border:1px solid color-mix(in srgb,var(--quran) 22%,var(--card-bd));border-left:3px solid var(--quran2);border-radius:18px;background:var(--quran-surface);box-shadow:0 8px 24px color-mix(in srgb,var(--quran) 10%,transparent);color:var(--quran-ink);text-align:left;cursor:pointer;overflow:hidden}.sg-quran-card:focus-visible{outline:3px solid color-mix(in srgb,var(--quran2) 35%,transparent);outline-offset:2px}.sg-quran-card:active{transform:translateY(1px)}
-.sg-quran-badge{grid-area:badge;position:relative;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--quran-bg);border:1px solid color-mix(in srgb,var(--quran2) 35%,transparent);color:var(--quran2);font-size:20px;flex:none}.sg-quran-badge .order{position:absolute;bottom:-2px;right:-2px;min-width:18px;height:18px;padding:0 5px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:var(--quran2);color:#fff;font-size:8px;font-weight:950;letter-spacing:.02em;border:1px solid var(--quran-surface)}
-.sg-quran-copy{grid-area:copy;min-width:0;display:flex;flex-direction:column}.sg-quran-copy small{overflow:hidden;color:var(--quran-gold);font-size:8px;font-weight:950;letter-spacing:.1em;text-overflow:ellipsis;white-space:nowrap}.sg-quran-copy strong{margin-top:2px;overflow:hidden;color:var(--quran-ink);font-size:15px;font-weight:950;letter-spacing:-.015em;text-overflow:ellipsis;white-space:nowrap}.sg-quran-copy em{margin-top:1px;overflow:hidden;color:var(--muted);font-size:10px;font-style:normal;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
-.sg-quran-meta{grid-area:meta;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.sg-quran-meta .chip{font-size:9px;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--quran-bg);color:var(--quran);border:1px solid color-mix(in srgb,var(--quran) 16%,transparent)}.sg-quran-meta .chip.is-gold{background:color-mix(in srgb,var(--quran2) 16%,transparent);color:var(--quran-gold);border-color:color-mix(in srgb,var(--quran2) 30%,transparent)}
-.sg-quran-action{grid-area:action;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px}.sg-quran-action .cta{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;border-radius:999px;background:var(--quran);color:#fff;font-size:9.5px;font-weight:950;white-space:nowrap;border:1px solid transparent}.sg-quran-action .cta.is-gold{background:var(--quran2);color:var(--quran-ink)}.sg-quran-action .cta.is-outline{background:transparent;color:var(--quran);border-color:color-mix(in srgb,var(--quran) 25%,transparent)}.sg-quran-action .status{font-size:9px;font-weight:800;color:var(--muted);white-space:nowrap}
-@media(max-width:370px){.sg-quran-card{grid-template-columns:48px minmax(0,1fr) auto;padding:11px 11px;gap:4px 9px}.sg-quran-badge{width:46px;height:46px;font-size:18px}.sg-quran-badge .order{font-size:7.5px}.sg-quran-copy strong{font-size:14px}.sg-quran-action .status{display:none}.sg-quran-action .cta{padding:6px 8px;font-size:9px}}
-@media(prefers-reduced-motion:reduce){.sg-quran-card:active{transform:none}}
-.sg-quran-action .cta.is-disabled{opacity:.6;cursor:default}
+/* Raşit ile Kur'an Yolculuğu — İY-B önizleme kartı. Zikirmatik'in büyük-kart
+   dilini (bkz. .zikr-v2-preview*) BİREBİR yapısal olarak izler — yalnız
+   --quran* tema tonlarıyla. Yerel --qp-* değişkenleri .quran-v2-overlay'in
+   --qj-* reçeteleriyle AYNI oranları kullanır (test_quran_a11y_contrast.js'te
+   kanıtlanmış WCAG AA kontrastını burada da garantiler): qp-muted %72,
+   metin-güvenli --quran-mid/--quran-ok/--quran-warn koyu panelde/rozette
+   ham --quran/--ok/--drop yerine kullanılır (QY-17'nin kapattığı dark-mode
+   kontrast hatasını burada YENİDEN açmamak için). */
+.quran-v2-preview{appearance:none;position:relative;isolation:isolate;overflow:hidden;width:100%;min-height:224px;display:flex;flex-direction:column;text-align:left;padding:17px 17px 15px;border:1px solid color-mix(in srgb,var(--quran) 18%,var(--card-bd));border-left:5px solid var(--quran2);border-radius:22px;color:var(--quran-ink);cursor:pointer;background:var(--quran-surface);box-shadow:0 16px 38px color-mix(in srgb,var(--quran) 16%,transparent);transition:transform .18s ease,box-shadow .22s ease;
+  --qp-line:color-mix(in srgb,var(--quran) 16%,transparent);
+  --qp-muted:color-mix(in srgb,var(--quran-ink) 72%,transparent);
+}
+.quran-v2-preview:hover{transform:translateY(-2px);box-shadow:0 20px 44px color-mix(in srgb,var(--quran) 20%,transparent)}
+.quran-v2-preview:active{transform:translateY(0) scale(.99)}
+.quran-v2-preview:focus-visible{outline:3px solid color-mix(in srgb,var(--quran2) 45%,transparent);outline-offset:3px}
+.quran-v2-preview.is-done{border-left-color:var(--quran-ok)}
+.quran-v2-preview.is-wait{border-left-color:var(--quran)}
+.quran-v2-preview-top{display:flex;align-items:center;gap:11px}
+.quran-v2-preview-icon{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;color:var(--quran2);background:var(--quran-bg);box-shadow:0 8px 18px color-mix(in srgb,var(--quran) 18%,transparent)}
+.quran-v2-preview-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
+.quran-v2-preview-copy strong{font-size:17px;font-weight:900;letter-spacing:-.015em;color:var(--quran-ink)}
+.quran-v2-preview-copy small{font-size:11.5px;font-weight:650;color:var(--quran-gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quran-v2-preview-status{flex:none;padding:6px 10px;border-radius:99px;border:1px solid var(--qp-line);background:color-mix(in srgb,var(--quran) 6%,var(--quran-surface));color:var(--quran-ink);font-size:10px;font-weight:900;white-space:nowrap}
+.quran-v2-preview-status.done{border-color:color-mix(in srgb,var(--quran-ok) 40%,transparent);background:color-mix(in srgb,var(--quran-ok) 14%,var(--quran-surface));color:var(--quran-ok)}
+.quran-v2-preview-status.ready{border-color:color-mix(in srgb,var(--quran2) 45%,transparent);background:color-mix(in srgb,var(--quran2) 16%,var(--quran-surface));color:var(--quran-gold)}
+.quran-v2-preview-status.wait{border-color:color-mix(in srgb,var(--quran) 30%,transparent);background:color-mix(in srgb,var(--quran) 10%,var(--quran-surface));color:var(--quran-mid)}
+.quran-v2-preview-focus{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin-top:15px;padding:0 1px 13px;border-bottom:1px solid var(--qp-line)}
+.quran-v2-preview-focus>div{min-width:0}
+.quran-v2-preview-focus .eyebrow{display:block;margin-bottom:5px;font-size:10px;font-weight:950;letter-spacing:.13em;color:var(--quran-gold)}
+.quran-v2-preview-focus strong{display:block;font-size:15.5px;font-weight:900;line-height:1.25;color:var(--quran-ink)}
+.quran-v2-preview-focus p{margin:6px 0 0;font-size:12px;font-weight:600;line-height:1.5;color:var(--qp-muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.quran-v2-preview-focus .arabic{max-width:118px;font-family:"Noto Naskh Arabic","Amiri","Times New Roman",serif;font-size:23px;line-height:1.55;text-align:right;color:var(--quran-gold);overflow-wrap:anywhere}
+.quran-v2-preview-metric{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--qp-line)}
+.quran-v2-preview-metric>div{min-width:0;display:flex;flex-direction:column;gap:3px;padding:11px 8px 10px;border-right:1px solid var(--qp-line)}
+.quran-v2-preview-metric>div:first-child{padding-left:1px}
+.quran-v2-preview-metric>div:last-child{border-right:0}
+.quran-v2-preview-metric span{font-size:10px;font-weight:900;color:var(--quran-gold);letter-spacing:.08em;text-transform:uppercase}
+.quran-v2-preview-metric strong{font-size:14.5px;font-weight:900;color:var(--quran-ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quran-v2-preview-metric small{font-size:10px;font-weight:700;color:var(--qp-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quran-v2-preview-bar{height:6px;margin-top:12px;padding:1px;border-radius:99px;overflow:hidden;background:var(--qp-line);border:1px solid var(--qp-line)}
+.quran-v2-preview-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--quran),var(--quran2));transition:width .35s ease}
+.quran-v2-preview-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--qp-muted)}
+.quran-v2-preview-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quran-v2-preview-foot b{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:44px;padding:0 4px;margin:-12px -4px;border-radius:10px;color:var(--quran-gold);font-weight:900;cursor:pointer}
+.quran-v2-preview-foot b:focus-visible{outline:3px solid color-mix(in srgb,var(--quran2) 45%,transparent);outline-offset:2px}
+.quran-v2-preview-foot b.is-disabled{color:var(--qp-muted);cursor:default}
+.quran-v2-preview-foot b svg{transition:transform .18s ease}
+.quran-v2-preview:hover .quran-v2-preview-foot b svg{transform:translateX(3px)}
+@media(max-width:389px){.quran-v2-preview{padding:14px 14px 13px}.quran-v2-preview-focus .arabic{max-width:96px;font-size:20px}.quran-v2-preview-copy strong{font-size:15.5px}}
+@media(prefers-reduced-motion:reduce){.quran-v2-preview{transition:none}.quran-v2-preview:hover,.quran-v2-preview:active{transform:none}.quran-v2-preview-bar i{transition:none}.quran-v2-preview-foot b svg,.quran-v2-preview:hover .quran-v2-preview-foot b svg{transition:none;transform:none}}
+
+/* İlham & İbadet hub — Zikirmatik ile ortak büyük-kart dili. */
+.faith-v2-nav{position:sticky;top:0;z-index:8;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:5px;border:1px solid color-mix(in srgb,var(--faith) 22%,var(--card-bd));border-radius:17px;background:var(--card);box-shadow:0 10px 28px color-mix(in srgb,var(--faith) 12%,transparent)}
+.faith-v2-nav button{appearance:none;min-width:0;min-height:50px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer}
+.faith-v2-nav button span{height:18px;display:grid;place-items:center}.faith-v2-nav button b{font-size:10.5px;font-weight:850;white-space:nowrap}
+.faith-v2-nav button.on{background:var(--faith);color:var(--card);box-shadow:0 6px 15px color-mix(in srgb,var(--faith) 24%,transparent)}
+.faith-v2-nav button:focus-visible{outline:3px solid color-mix(in srgb,var(--faith2) 50%,transparent);outline-offset:2px}
+
+.hub-v2-preview{--hub-accent:var(--faith);--hub-accent-2:var(--faith2);--hub-line:color-mix(in srgb,var(--hub-accent) 20%,var(--card-bd));appearance:none;position:relative;isolation:isolate;overflow:hidden;width:100%;min-height:244px;padding:18px 18px 16px;display:flex;flex-direction:column;border:1px solid var(--hub-line);border-left:5px solid var(--hub-accent-2);border-radius:22px;background:var(--card);color:var(--text);text-align:left;cursor:pointer;box-shadow:0 16px 38px color-mix(in srgb,var(--hub-accent) 14%,transparent);transition:transform .18s ease,box-shadow .22s ease}
+.person-v2-preview{--hub-accent:var(--saygi-ink);--hub-accent-2:var(--saygi-gold2)}.faith-v2-preview{--hub-accent:var(--faith);--hub-accent-2:var(--faith2)}
+.hub-v2-preview:hover{transform:translateY(-2px);box-shadow:0 21px 44px color-mix(in srgb,var(--hub-accent) 20%,transparent)}.hub-v2-preview:active{transform:scale(.99)}
+.hub-v2-preview:focus-visible{outline:3px solid color-mix(in srgb,var(--hub-accent-2) 50%,transparent);outline-offset:3px}.hub-v2-preview.is-complete{border-left-color:var(--ok)}
+.hub-v2-preview-top{display:flex;align-items:center;gap:11px}.hub-v2-preview-icon{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;background:color-mix(in srgb,var(--hub-accent) 12%,var(--card));color:var(--hub-accent);box-shadow:0 8px 18px color-mix(in srgb,var(--hub-accent) 16%,transparent)}
+.hub-v2-preview-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}.hub-v2-preview-copy strong{font-size:17px;font-weight:900;color:var(--text)}.hub-v2-preview-copy small{overflow:hidden;color:var(--hub-accent);font-size:11.5px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+.hub-v2-preview-status{flex:none;padding:6px 9px;border:1px solid var(--hub-line);border-radius:99px;background:color-mix(in srgb,var(--hub-accent) 7%,var(--card));color:var(--hub-accent);font-size:10px;font-weight:900;white-space:nowrap}.hub-v2-preview-status.complete{border-color:color-mix(in srgb,var(--ok) 35%,var(--card-bd));background:var(--ok-bg);color:var(--ok)}
+.hub-v2-preview-focus{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:15px;margin-top:16px;padding:0 1px 14px;border-bottom:1px solid var(--hub-line)}.hub-v2-preview-focus>div{min-width:0}.hub-v2-preview-focus .eyebrow{display:block;margin-bottom:5px;color:var(--hub-accent);font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase}.hub-v2-preview-focus strong{display:block;color:var(--text);font-size:20px;font-weight:900;line-height:1.15}.hub-v2-preview-focus p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;margin:6px 0 0;color:var(--text2);font-size:12.5px;font-weight:600;line-height:1.45}
+.hub-v2-preview-focus .person-thumb{width:84px;height:84px;flex:none;display:grid;place-items:center;overflow:hidden;border:2px solid color-mix(in srgb,var(--hub-accent-2) 38%,var(--card-bd));border-radius:18px;background:var(--field);box-shadow:0 9px 22px color-mix(in srgb,var(--hub-accent) 22%,transparent)}.hub-v2-preview-focus .person-thumb img,.hub-v2-preview-focus .person-thumb .sg-person-preview-thumb-fallback{width:100%;height:100%;border-radius:0;object-fit:cover}.hub-v2-preview-focus .faith-time{min-width:88px;color:var(--hub-accent);font-size:29px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
+.hub-v2-preview-metric{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--hub-line)}.hub-v2-preview-metric>div{min-width:0;padding:11px 8px 10px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--hub-line)}.hub-v2-preview-metric>div:first-child{padding-left:1px}.hub-v2-preview-metric>div:last-child{border-right:0}.hub-v2-preview-metric span{color:var(--hub-accent);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.hub-v2-preview-metric strong{overflow:hidden;color:var(--text);font-size:14.5px;font-weight:900;font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap}.hub-v2-preview-metric small{overflow:hidden;color:var(--muted);font-size:10px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}
+.hub-v2-preview-bar{height:6px;margin-top:12px;padding:1px;overflow:hidden;border:1px solid var(--hub-line);border-radius:99px;background:color-mix(in srgb,var(--hub-accent) 8%,var(--card))}.hub-v2-preview-bar i{display:block;height:100%;border-radius:inherit;background:var(--hub-accent-2);transition:width .35s ease}.faith-v2-preview .hub-v2-preview-bar i{background:var(--faith)}
+.hub-v2-preview-foot{min-height:44px;margin-top:5px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:11.5px;font-weight:700}.hub-v2-preview-foot span{min-width:0;display:flex;align-items:center;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hub-v2-preview-foot b{flex:none;display:inline-flex;align-items:center;gap:5px;color:var(--hub-accent);font-weight:900}.hub-v2-preview-foot b svg{transition:transform .18s ease}.hub-v2-preview:hover .hub-v2-preview-foot b svg{transform:translateX(3px)}
+@media(max-width:389px){.faith-v2-nav button{min-height:47px}.faith-v2-nav button b{font-size:9.5px}.hub-v2-preview{padding:15px 14px 13px}.hub-v2-preview-focus .person-thumb{width:70px;height:70px}.hub-v2-preview-focus .faith-time{min-width:74px;font-size:25px}.hub-v2-preview-focus strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.faith-v2-nav button,.hub-v2-preview,.hub-v2-preview-bar i,.hub-v2-preview-foot b svg{transition:none!important}.hub-v2-preview:hover,.hub-v2-preview:active{transform:none}.hub-v2-preview:hover .hub-v2-preview-foot b svg{transform:none}}
 
 /* Raşit ile Kur'an Yolculuğu — QY-06 tam ekran kütüphane + QY-07 sûre ayrıntısı.
    Tasarım yönü (plan §14): vakur mürekkep + sıcak parşömen + kontrollü altın.
@@ -658,15 +738,23 @@
   --qj-line:color-mix(in srgb,var(--quran) 18%,transparent);
   --qj-panel:color-mix(in srgb,var(--quran) 6%,var(--quran-surface));
   --qj-panel2:color-mix(in srgb,var(--quran) 11%,var(--quran-surface));
-  --qj-muted:color-mix(in srgb,var(--quran-ink) 62%,transparent);
-  --qj-faint:color-mix(in srgb,var(--quran-ink) 45%,transparent);
+  /* QY-17: yüzdeler 62%/45%'ten 72%/68%'e çıkarıldı — hesaplanan gerçek WCAG
+     AA denetiminde (bkz. test_quran_a11y_contrast.js) eski değerler açık
+     temada 4.5:1'in altında kalıyordu (durum açıklaması/ipucu metinleri gerçek
+     içerik taşıyor, salt dekoratif değil). */
+  --qj-muted:color-mix(in srgb,var(--quran-ink) 72%,transparent);
+  --qj-faint:color-mix(in srgb,var(--quran-ink) 68%,transparent);
   --qj-focus:color-mix(in srgb,var(--quran2) 45%,transparent)}
 .quran-v2-screen{width:100%;height:100vh;height:100svh;height:100dvh;max-width:460px;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:var(--quran-surface);color:var(--quran-ink)}
 .quran-v2-screen:focus-visible{outline:none}
+.quran-v2-overlay::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.24;background-image:linear-gradient(90deg,transparent 0,transparent 49.5%,color-mix(in srgb,var(--quran2) 9%,transparent) 50%,transparent 50.5%,transparent 100%),linear-gradient(0deg,transparent 0,transparent 49.5%,color-mix(in srgb,var(--quran2) 7%,transparent) 50%,transparent 50.5%,transparent 100%);background-size:34px 34px}
+.quran-v2-screen{position:relative;z-index:1}
 .quran-v2-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 14px 11px;border-bottom:1px solid var(--qj-line);background:var(--quran-surface)}
 .quran-v2-header .lead{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.quran-v2-header .mark{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:13px;font-size:19px;background:var(--quran-bg);border:1px solid var(--qj-line)}
-.quran-v2-header .back{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:13px;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--quran-ink);cursor:pointer}
+.quran-v2-header .mark{position:relative;width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:14px;font-size:19px;background:var(--quran-bg);border:1px solid color-mix(in srgb,var(--quran2) 34%,var(--qj-line));color:var(--quran);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--quran2) 22%,transparent),0 7px 16px color-mix(in srgb,var(--quran) 10%,transparent)}
+.quran-v2-header .mark>span{display:grid;place-items:center}.quran-v2-header .mark>i{position:absolute;right:4px;top:4px;width:6px;height:6px;border-radius:50%;background:var(--quran2);box-shadow:0 0 0 2px var(--quran-surface)}
+.quran-v2-header .back{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:13px;border:1px solid color-mix(in srgb,var(--quran2) 24%,var(--qj-line));background:var(--qj-panel);color:var(--quran-ink);cursor:pointer;box-shadow:0 2px 8px color-mix(in srgb,var(--quran) 12%,transparent)}
+.quran-v2-header .back:active{transform:translateY(1px)}
 .quran-v2-header .back:focus-visible,.quran-v2-header .close:focus-visible,.quran-v2-header .refresh:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
 .quran-v2-header .copy{display:flex;flex-direction:column;min-width:0}
 .quran-v2-header .copy strong{font-size:16.5px;font-weight:900;letter-spacing:-.015em;color:var(--quran-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -679,21 +767,30 @@
 @media (prefers-reduced-motion: reduce){.quran-v2-header .refresh.is-spinning svg{animation:none}}
 .quran-v2-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:14px 14px calc(26px + env(safe-area-inset-bottom));scrollbar-width:thin;scrollbar-color:var(--qj-line) transparent}
 .quran-v2-library,.quran-v2-detail{display:flex;flex-direction:column;gap:12px;min-width:0}
+#quran-detail-region{display:flex;flex-direction:column;gap:18px;min-width:0} /* hedefli boyama sarmalayıcısı (QY-06); .quran-v2-detail'in TEK çocuğu, gap üstteki section'da değil burada olmalı */
+.quran-v2-library-hero{display:grid;grid-template-columns:minmax(0,1fr) 72px;align-items:end;gap:14px;padding:4px 1px 14px;border-bottom:1px solid var(--qj-line)}
 .quran-v2-section-head span{display:block;font-size:9.5px;font-weight:950;letter-spacing:.14em;color:var(--quran-gold)}
-.quran-v2-section-head h2{margin:3px 0 0;font-size:20px;font-weight:950;letter-spacing:-.02em;color:var(--quran-ink);line-height:1.2}
+.quran-v2-section-head h2{margin:4px 0 0;font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:24px;font-weight:800;letter-spacing:-.025em;color:var(--quran-ink);line-height:1.1}
 .quran-v2-section-head p{margin:5px 0 0;font-size:12.5px;line-height:1.5;color:var(--qj-muted)}
+.quran-v2-hero-seal{width:68px;height:68px;position:relative;display:grid;place-items:center;align-content:center;gap:1px;border:1px solid color-mix(in srgb,var(--quran2) 48%,var(--qj-line));border-radius:50%;background:var(--qj-panel);color:var(--quran-gold);box-shadow:inset 0 0 0 5px color-mix(in srgb,var(--quran2) 7%,transparent),0 10px 22px color-mix(in srgb,var(--quran) 12%,transparent)}
+.quran-v2-hero-seal::before,.quran-v2-hero-seal::after{content:'';position:absolute;inset:7px;border:1px solid color-mix(in srgb,var(--quran2) 26%,transparent);border-radius:50%}.quran-v2-hero-seal::after{inset:14px;border-color:color-mix(in srgb,var(--quran2) 18%,transparent)}
+.quran-v2-hero-seal i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--quran2);top:9px;left:50%;transform:translateX(-50%)}.quran-v2-hero-seal b{position:relative;font-family:Georgia,serif;font-size:20px;line-height:1;font-weight:800}.quran-v2-hero-seal span{position:relative;font-size:7px;font-weight:950;letter-spacing:.13em}
 .quran-v2-progress{display:flex;flex-direction:column;gap:7px}
-.quran-v2-progress>i{display:block;height:7px;border-radius:999px;background:var(--qj-panel2);overflow:hidden}
+.quran-v2-progress{padding:13px 1px 0}
+.quran-v2-progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.quran-v2-progress-head span{font-size:9px;font-weight:950;letter-spacing:.13em;color:var(--quran-gold)}.quran-v2-progress-head b{font-size:10px;font-weight:800;color:var(--qj-muted)}
+.quran-v2-progress>i{display:block;height:8px;border-radius:999px;background:var(--qj-panel2);overflow:hidden;border:1px solid var(--qj-line);padding:1px}
 .quran-v2-progress>i>b{display:block;height:100%;min-width:2px;border-radius:999px;background:linear-gradient(90deg,var(--quran),var(--quran2));transition:width .35s ease}
-.quran-v2-progress>span{font-size:11.5px;font-weight:700;color:var(--qj-muted)}
+.quran-v2-progress>span{font-size:11.5px;font-weight:700;color:var(--qj-muted);font-variant-numeric:tabular-nums}.quran-v2-progress>span::first-letter{color:var(--quran-ink)}
 .quran-v2-progress>span strong{color:var(--quran-ink);font-weight:950}
+.quran-v2-method-note{display:grid;grid-template-columns:34px minmax(0,1fr) 18px;align-items:center;gap:10px;padding:10px 11px;border-left:3px solid var(--quran2);border-radius:3px 14px 14px 3px;background:var(--qj-panel);box-shadow:0 7px 16px -12px color-mix(in srgb,var(--quran) 30%,transparent)}
+.quran-v2-method-note .method-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--quran-bg);color:var(--quran)}.quran-v2-method-note>span:nth-child(2){display:flex;flex-direction:column;gap:2px;min-width:0}.quran-v2-method-note strong{font-size:11px;font-weight:950;color:var(--quran-ink)}.quran-v2-method-note small{font-size:10.5px;line-height:1.4;color:var(--qj-muted)}.quran-v2-method-note>b{display:grid;place-items:center;color:var(--quran-gold)}
 .quran-v2-search{display:flex;align-items:center;gap:8px;padding:0 12px;min-height:48px;border-radius:15px;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--qj-muted)}
 .quran-v2-search:focus-within{border-color:color-mix(in srgb,var(--quran2) 55%,transparent)}
 .quran-v2-search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:700;color:var(--quran-ink)}
 .quran-v2-search input:focus{outline:none}
 .quran-v2-search input::placeholder{color:var(--qj-faint);font-weight:600}
 .quran-v2-search .clear{appearance:none;width:30px;height:30px;flex:none;display:grid;place-items:center;border:0;border-radius:50%;background:var(--qj-panel2);color:var(--qj-muted);cursor:pointer}
-.quran-v2-filter-expander{border:1px solid var(--qj-line);border-radius:16px;background:var(--qj-panel);overflow:hidden}
+.quran-v2-filter-expander{border:1px solid var(--qj-line);border-left:3px solid var(--quran);border-radius:3px 16px 16px 3px;background:var(--qj-panel);overflow:hidden;box-shadow:0 8px 18px -14px color-mix(in srgb,var(--quran) 35%,transparent)}
 .quran-v2-filter-summary{appearance:none;width:100%;min-height:56px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 12px;border:0;background:transparent;color:var(--quran-ink);text-align:left;cursor:pointer}
 .quran-v2-filter-summary:focus-visible{outline:3px solid var(--qj-focus);outline-offset:-3px}
 .quran-v2-filter-summary .filter-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--quran-bg);color:var(--quran)}
@@ -707,22 +804,23 @@
 .quran-v2-filter-panel[hidden]{display:none}
 .quran-v2-chips{display:flex;flex-direction:column;gap:6px;padding-top:11px}
 .quran-v2-chips button{appearance:none;width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 13px;border:1px solid var(--qj-line);border-radius:12px;background:var(--quran-surface);color:var(--qj-muted);font-size:12.5px;font-weight:800;text-align:left;cursor:pointer}
-.quran-v2-chips button b{flex:none;font-size:11px;font-weight:950;padding:2px 8px;border-radius:999px;background:var(--qj-panel2);color:var(--quran)}
+.quran-v2-chips button b{flex:none;font-size:11px;font-weight:950;padding:2px 8px;border-radius:999px;background:var(--qj-panel2);color:var(--quran-mid)}
 .quran-v2-chips button.on{border-color:color-mix(in srgb,var(--quran2) 55%,transparent);background:var(--quran-bg);color:var(--quran-ink)}
-.quran-v2-chips button.on b{background:var(--quran2);color:var(--quran-ink)}
+.quran-v2-chips button.on b{background:var(--quran2);color:var(--quran-gold-ink)} /* QY-17: --quran-ink DEĞİL — dark temada beyaza döner, hâlâ açık olan --quran2 fonunda 1.4:1'e düşer; --quran-gold-ink iki temada da sabit koyu */
 .quran-v2-chips button:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
-.quran-v2-result-note{font-size:11.5px;font-weight:800;color:var(--qj-muted)}
-.quran-v2-result-note strong{color:var(--quran-ink);font-weight:950}
-.quran-v2-list{display:flex;flex-direction:column;gap:7px;min-width:0}
-.quran-v2-row{appearance:none;width:100%;min-width:0;min-height:64px;display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-areas:"ord title" "ord metarow";align-items:center;gap:3px 11px;padding:10px 12px;border:1px solid var(--qj-line);border-left:3px solid transparent;border-radius:14px;background:var(--qj-panel);color:var(--quran-ink);text-align:left;cursor:pointer;overflow:hidden}
+.quran-v2-result-note{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 2px 6px;border-bottom:1px solid var(--qj-line);font-size:11.5px;font-weight:800;color:var(--qj-muted)}
+.quran-v2-result-note strong{color:var(--quran-ink);font-size:13px;font-weight:950}.quran-v2-result-note .result-context{flex:none;color:var(--qj-muted);font-size:9.5px;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+.quran-v2-list{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0;padding-top:2px}
+.quran-v2-list::before{content:'';position:absolute;left:25px;top:6px;bottom:6px;width:1px;background:color-mix(in srgb,var(--quran2) 18%,transparent);pointer-events:none}
+.quran-v2-row{appearance:none;width:100%;min-width:0;min-height:68px;display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-areas:"ord title" "ord metarow";align-items:center;gap:3px 11px;padding:11px 13px;border:1px solid var(--qj-line);border-left:4px solid transparent;border-radius:16px;background:var(--qj-panel);color:var(--quran-ink);text-align:left;cursor:pointer;overflow:hidden;box-shadow:0 6px 16px -13px color-mix(in srgb,var(--quran) 30%,transparent);transition:transform .16s ease,border-color .16s ease,background .16s ease}
 .quran-v2-row:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
-.quran-v2-row.is-active{background:var(--quran-bg)}
+.quran-v2-row:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--quran2) 34%,var(--qj-line))}.quran-v2-row.is-active{background:var(--quran-bg);border-color:color-mix(in srgb,var(--quran2) 48%,var(--qj-line))}
 .quran-v2-row .ord{grid-area:ord;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.quran-v2-row .ord b{font-size:15px;font-weight:950;line-height:1;color:var(--quran)}
+.quran-v2-row .ord b{position:relative;z-index:1;font-family:Georgia,serif;font-size:17px;font-weight:800;line-height:1;color:var(--quran-mid)}
 .quran-v2-row .ord i{font-size:7.5px;font-weight:900;font-style:normal;letter-spacing:.08em;color:var(--qj-faint)}
+.quran-v2-row .ord-line{position:relative;z-index:1;width:5px;height:5px;margin-top:3px;border:1px solid var(--quran2);border-radius:50%;background:var(--quran-surface)}
 .quran-v2-row .titleline{grid-area:title;display:flex;align-items:baseline;gap:8px;min-width:0}
-.quran-v2-row .titleline strong{flex:1;min-width:0;font-size:14.5px;font-weight:900;letter-spacing:-.01em;color:var(--quran-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.quran-v2-row .titleline .arabic{flex:none;max-width:46%;font-size:14px;font-weight:700;color:var(--quran-gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quran-v2-row .titleline strong{flex:1;min-width:0;font-size:15px;font-weight:900;letter-spacing:-.01em;color:var(--quran-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.quran-v2-row .titleline .arabic{flex:none;max-width:46%;font-family:"Noto Naskh Arabic","Amiri","Times New Roman",serif;font-size:16px;font-weight:700;color:var(--quran-gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quran-v2-row .metarow{grid-area:metarow;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
 .quran-v2-row .meta{font-size:10.5px;font-weight:700;color:var(--qj-muted)}
 .quran-v2-row .state{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:var(--qj-panel2)}
@@ -730,49 +828,62 @@
 .quran-v2-row .state em{font-size:9.5px;font-style:normal;font-weight:900;color:var(--qj-muted)}
 .quran-v2-row.is-wait{border-left-color:var(--quran)}
 .quran-v2-row.is-wait .state .dot{background:var(--quran)}
-.quran-v2-row.is-wait .state em{color:var(--quran)}
+.quran-v2-row.is-wait .state em{color:var(--quran-mid)} /* QY-17: --quran DEĞİL — dark temada (buton fonu için koyulaştırıldı) qj-panel üzerinde 3.63:1'e düşer; --quran-mid koyu panelde metin rolü için ayrı tutulur */
 .quran-v2-row.is-ready{border-left-color:var(--quran2)}
 .quran-v2-row.is-ready .state .dot{background:var(--quran2)}
 .quran-v2-row.is-ready .state em{color:var(--quran-gold)}
-.quran-v2-row.is-done{border-left-color:var(--ok)}
-.quran-v2-row.is-done .state .dot{background:var(--ok)}
-.quran-v2-row.is-done .state em{color:var(--ok)}
-.quran-v2-row.is-warn{border-left-color:var(--drop)}
-.quran-v2-row.is-warn .state .dot{background:var(--drop)}
-.quran-v2-row.is-warn .state em{color:var(--drop)}
+.quran-v2-row.is-done{border-left-color:var(--quran-ok)} /* QY-17: paylaşılan --ok qj-panel'de 3:1'in altında kalıyordu (2.93); --quran-ok yalnız bu satırlar için koyulaştırılmış, app geneline dokunulmadı */
+.quran-v2-row.is-done .state .dot{background:var(--quran-ok)}
+.quran-v2-row.is-done .state em{color:var(--quran-ok)}
+.quran-v2-row.is-warn{border-left-color:var(--quran-warn)}
+.quran-v2-row.is-warn .state .dot{background:var(--quran-warn)}
+.quran-v2-row.is-warn .state em{color:var(--quran-warn)}
 .quran-v2-empty{display:flex;flex-direction:column;gap:6px;padding:20px 16px;border:1px dashed var(--qj-line);border-radius:16px;text-align:center}
 .quran-v2-empty strong{font-size:14px;font-weight:900;color:var(--quran-ink)}
 .quran-v2-empty span{font-size:12px;line-height:1.5;color:var(--qj-muted)}
 .quran-v2-empty button{appearance:none;align-self:center;margin-top:6px;min-height:44px;padding:10px 18px;border:1px solid var(--qj-line);border-radius:12px;background:var(--quran-bg);color:var(--quran-ink);font-size:12.5px;font-weight:900;cursor:pointer}
 .quran-v2-disclaimer{margin:2px 0 0;font-size:10.5px;line-height:1.6;color:var(--qj-faint)}
-.quran-v2-detail-head{display:flex;flex-direction:column;gap:6px}
+.quran-v2-detail-head{display:flex;flex-direction:column;gap:10px}
 .quran-v2-detail-head .stop{font-size:9.5px;font-weight:950;letter-spacing:.13em;color:var(--quran-gold)}
-.quran-v2-detail-head h2{margin:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.quran-v2-detail-head h2{margin:0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;
+  position:relative;overflow:hidden;text-align:center;padding:26px 20px 22px;border-radius:22px;
+  background:var(--qj-panel2);border:1px solid color-mix(in srgb,var(--quran2) 32%,var(--qj-line));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--quran2) 14%,transparent),
+    0 18px 36px -16px color-mix(in srgb,var(--quran) 38%,transparent),
+    0 3px 12px color-mix(in srgb,var(--quran) 10%,transparent)}
+.quran-v2-detail-head h2::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;border-radius:0 0 3px 3px;background:var(--quran2)}
 .quran-v2-detail-head h2:focus-visible{outline:3px solid var(--qj-focus);outline-offset:4px;border-radius:6px}
-.quran-v2-detail-head .arabic{font-size:27px;font-weight:800;line-height:1.35;color:var(--quran-ink);overflow-wrap:anywhere}
-.quran-v2-detail-head .tr{font-size:16px;font-weight:900;letter-spacing:-.015em;color:var(--quran);overflow-wrap:anywhere}
-.quran-v2-facts{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.quran-v2-facts>div{min-width:0;padding:9px 11px;border:1px solid var(--qj-line);border-radius:12px;background:var(--qj-panel)}
+.quran-v2-detail-head .arabic{width:100%;font-size:34px;font-weight:800;line-height:1.45;color:var(--quran-ink);overflow-wrap:anywhere;
+  padding-bottom:14px;border-bottom:1px solid color-mix(in srgb,var(--quran2) 38%,transparent)}
+.quran-v2-detail-head .tr{font-size:12.5px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:var(--quran-gold);overflow-wrap:anywhere}
+.quran-v2-facts{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.quran-v2-facts>div{min-width:0;padding:11px 12px;border-radius:13px;background:var(--qj-panel);
+  border:1px solid var(--qj-line);border-top:2px solid color-mix(in srgb,var(--quran2) 45%,var(--qj-line));
+  box-shadow:0 6px 16px -8px color-mix(in srgb,var(--quran) 22%,transparent)}
 .quran-v2-facts dt{font-size:8.5px;font-weight:950;letter-spacing:.1em;text-transform:uppercase;color:var(--qj-faint)}
-.quran-v2-facts dd{margin:3px 0 0;font-size:13.5px;font-weight:900;color:var(--quran-ink);overflow-wrap:anywhere}
+.quran-v2-facts dd{margin:4px 0 0;font-size:14.5px;font-weight:900;color:var(--quran-ink);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .quran-v2-facts .disp{font-style:normal;color:var(--quran-gold)}
 .quran-v2-theme{margin:0;font-size:13.5px;line-height:1.65;color:var(--quran-ink)}
 .quran-v2-foot{margin:0;font-size:10.5px;line-height:1.55;color:var(--qj-faint)}
-.quran-v2-status{display:flex;align-items:flex-start;gap:9px;padding:12px;border:1px solid var(--qj-line);border-left:3px solid var(--qj-faint);border-radius:14px;background:var(--qj-panel)}
-.quran-v2-status .dot{width:9px;height:9px;flex:none;margin-top:4px;border-radius:50%;background:var(--qj-faint)}
+.quran-v2-status{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:15px;background:var(--qj-panel);
+  border:1px solid var(--qj-line);box-shadow:0 8px 20px -12px color-mix(in srgb,var(--quran) 26%,transparent)}
+.quran-v2-status .dot{width:30px;height:30px;flex:none;margin-top:0;border-radius:50%;position:relative;background:color-mix(in srgb,var(--qj-faint) 16%,var(--qj-panel2));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--qj-faint) 32%,transparent)}
+.quran-v2-status .dot::after{content:'';position:absolute;inset:0;margin:auto;width:9px;height:9px;border-radius:50%;background:var(--qj-faint)}
 .quran-v2-status>span{display:flex;flex-direction:column;gap:3px;min-width:0}
 .quran-v2-status strong{font-size:13px;font-weight:950;color:var(--quran-ink)}
 .quran-v2-status em{font-size:12px;font-style:normal;line-height:1.55;color:var(--qj-muted)}
-.quran-v2-status.is-wait{border-left-color:var(--quran)}.quran-v2-status.is-wait .dot{background:var(--quran)}
-.quran-v2-status.is-ready{border-left-color:var(--quran2)}.quran-v2-status.is-ready .dot{background:var(--quran2)}
-.quran-v2-status.is-done{border-left-color:var(--ok)}.quran-v2-status.is-done .dot{background:var(--ok)}
-.quran-v2-status.is-warn{border-left-color:var(--drop)}.quran-v2-status.is-warn .dot{background:var(--drop)}
-.quran-v2-cta{appearance:none;width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 16px;border:1px solid transparent;border-radius:15px;background:var(--quran);color:#fff;font-size:15px;font-weight:900;letter-spacing:-.01em;cursor:pointer}
+.quran-v2-status.is-wait .dot{background:color-mix(in srgb,var(--quran) 16%,var(--qj-panel2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--quran) 40%,transparent)}.quran-v2-status.is-wait .dot::after{background:var(--quran)}
+.quran-v2-status.is-ready{border-color:color-mix(in srgb,var(--quran2) 45%,var(--qj-line))}.quran-v2-status.is-ready .dot{background:color-mix(in srgb,var(--quran2) 22%,var(--qj-panel2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--quran2) 55%,transparent)}.quran-v2-status.is-ready .dot::after{background:var(--quran2)}
+.quran-v2-status.is-done{border-color:color-mix(in srgb,var(--ok) 40%,var(--qj-line))}.quran-v2-status.is-done .dot{background:color-mix(in srgb,var(--ok) 18%,var(--qj-panel2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 45%,transparent)}.quran-v2-status.is-done .dot::after{background:var(--ok)}
+.quran-v2-status.is-warn{border-color:color-mix(in srgb,var(--drop) 40%,var(--qj-line))}.quran-v2-status.is-warn .dot{background:color-mix(in srgb,var(--drop) 18%,var(--qj-panel2));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--drop) 45%,transparent)}.quran-v2-status.is-warn .dot::after{background:var(--drop)}
+.quran-v2-cta{appearance:none;width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;gap:9px;padding:15px 16px;border:1px solid color-mix(in srgb,var(--quran2) 55%,var(--quran));border-radius:16px;background:var(--quran);color:#fff;font-size:15.5px;font-weight:900;letter-spacing:-.01em;cursor:pointer;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--quran2) 55%,transparent),0 14px 28px -10px color-mix(in srgb,var(--quran) 55%,transparent),0 4px 14px color-mix(in srgb,var(--quran2) 30%,transparent)}
 .quran-v2-cta:focus-visible{outline:3px solid var(--qj-focus);outline-offset:2px}
-.quran-v2-cta:active{transform:translateY(1px)}
-.quran-v2-cta.is-disabled,.quran-v2-cta:disabled{background:var(--qj-panel2);color:var(--qj-muted);border-color:var(--qj-line);cursor:default;transform:none}
+.quran-v2-cta:active{transform:translateY(1px);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--quran2) 40%,transparent),0 6px 16px -8px color-mix(in srgb,var(--quran) 45%,transparent)}
+.quran-v2-cta.is-disabled,.quran-v2-cta:disabled{background:var(--qj-panel2);color:var(--qj-muted);border-color:var(--qj-line);cursor:default;transform:none;box-shadow:none}
 .quran-v2-hint{margin:0;font-size:11px;line-height:1.5;text-align:center;color:var(--qj-faint)}
-.quran-v2-history{padding:12px;border:1px solid var(--qj-line);border-radius:14px;background:var(--qj-panel)}
+.quran-v2-history{padding:13px;border-radius:15px;background:var(--qj-panel);border:1px solid var(--qj-line);box-shadow:0 6px 16px -10px color-mix(in srgb,var(--quran) 20%,transparent)}
 .quran-v2-video{display:flex;flex-direction:column;gap:8px}
 .quran-v2-video-badge{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--quran2) 16%,transparent);color:var(--quran-gold);font-size:11px;font-weight:900}
 .quran-v2-video-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--qj-panel2);border:1px solid var(--qj-line)}
@@ -800,11 +911,14 @@
   .quran-v2-scroll{padding:12px 11px calc(24px + env(safe-area-inset-bottom))}
   .quran-v2-header{padding:calc(11px + env(safe-area-inset-top)) 11px 10px}
   .quran-v2-section-head h2{font-size:18.5px}
-  .quran-v2-row{grid-template-columns:34px minmax(0,1fr);gap:3px 9px;padding:10px}
+  .quran-v2-library-hero{grid-template-columns:minmax(0,1fr) 60px;gap:9px}.quran-v2-hero-seal{width:58px;height:58px}.quran-v2-hero-seal b{font-size:17px}.quran-v2-hero-seal span{font-size:6px}
+  .quran-v2-method-note{grid-template-columns:31px minmax(0,1fr) 14px;gap:8px;padding:9px}.quran-v2-method-note .method-icon{width:31px;height:31px}.quran-v2-method-note small{font-size:10px}
+  .quran-v2-row{grid-template-columns:34px minmax(0,1fr);gap:3px 9px;padding:10px}.quran-v2-list::before{left:21px}
   .quran-v2-row .titleline strong{font-size:14px}
-  .quran-v2-row .titleline .arabic{max-width:42%;font-size:13px}
+  .quran-v2-row .titleline .arabic{max-width:42%;font-size:14px}
   .quran-v2-facts{grid-template-columns:minmax(0,1fr)}
-  .quran-v2-detail-head .arabic{font-size:24px}
+  .quran-v2-detail-head h2{padding:20px 14px 18px}
+  .quran-v2-detail-head .arabic{font-size:26px}
   .quran-v2-filter-summary{gap:8px;padding:9px 10px}
   .quran-v2-filter-summary .filter-count{display:none}
 }
@@ -814,8 +928,8 @@
 }
 @media(prefers-reduced-motion:reduce){
   .quran-v2-overlay{animation:none}
-  .quran-v2-progress>i>b,.quran-v2-filter-summary .filter-chevron{transition:none}
-  .quran-v2-cta:active,.quran-v2-row:active{transform:none}
+  .quran-v2-progress>i>b,.quran-v2-filter-summary .filter-chevron,.quran-v2-row{transition:none}
+  .quran-v2-cta:active,.quran-v2-row:active,.quran-v2-row:hover{transform:none}
 }
 
 /* Saygı koleksiyon grid + seri */

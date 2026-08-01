@@ -328,6 +328,20 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an videosu iOS’ta siyah iframe görünüyordu (embed düzeltme)
+
+Gerçek cihazda Alak videosu `ready/watching` durumuna geçti ancak iframe siyah
+kaldı. Video oEmbed, thumbnail ve youtube-nocookie embed uçları 200 döndü.
+Kök neden iframe `referrerpolicy="no-referrer"` politikasıydı: YouTube embed
+oynatıcısı artık istemci/origin kimliği olmadan Error 153 üretebiliyor. Politika
+`strict-origin-when-cross-origin` yapıldı; yalnız origin gönderilir, tam URL
+gönderilmez. Mobil sayfa-içi oynatma için `playsinline=1` eklendi. Click-to-load,
+autoplay kapalı, youtube-nocookie ve sandbox korumaları aynen kaldı. Kur’an UI
+202/202, remote update 16/16, hub 90/90, transport 207/207, pull 11/11 geçti.
+Cache `app.js?v=20260801g`.
+
+---
+
 ### 2026-08-01 — Kur’an yanıtı delivery olmadan kullanıcıya ulaşmıyordu (kök düzeltme)
 
 Gerçek uçtan uca testte Alak isteği `quran-request-outbox.json`'a yazıldı ve

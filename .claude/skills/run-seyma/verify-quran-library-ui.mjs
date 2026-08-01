@@ -463,7 +463,9 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('yalnız youtube-nocookie.com embed kullanılır', /src="https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ/.test(vd));
   ok('URL’de autoplay parametresi yok', !/[?&]autoplay=1/.test(vd));
   ok('allow listesinde "autoplay" YOK (otomatik oynatma kapalı)', /allow="[^"]*"/.exec(vd) && !/allow="[^"]*autoplay/.test(vd));
-  ok('referrerpolicy no-referrer', vd.includes('referrerpolicy="no-referrer"'));
+  ok('YouTube Error 153 önlenir: yalnız origin gönderen referrer policy',
+    vd.includes('referrerpolicy="strict-origin-when-cross-origin"') && !vd.includes('referrerpolicy="no-referrer"'));
+  ok('iOS oynatıcı sayfa içinde açılır (playsinline)', /[?&]playsinline=1/.test(vd));
   ok('sandbox uygulanmış, allow-forms/top-navigation YOK', /sandbox="[^"]*"/.test(vd) && !/sandbox="[^"]*(allow-forms|allow-top-navigation)/.test(vd));
   ok('durum ready→watching geçti (izlemeye başladı kaydı)', journey().requests.fatiha.status === 'watching', journey().requests.fatiha.status);
 

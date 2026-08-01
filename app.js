@@ -10218,10 +10218,10 @@ function quranVideoCardHTML(x,req){
     // kullanılabilir — izolasyon zaafı yalnız aynı-köken/saldırgan kontrollü
     // içerikte oluşur, resmi YouTube oynatıcısında değil. `enablejsapi=1`
     // + `origin` QY-13'ün ENDED algısı için gerekli (quranAttachPlayer).
-    h+='<iframe id="quran-yt-player" src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1&enablejsapi=1&origin='+esc(quranEmbedOrigin())+'" '
+    h+='<iframe id="quran-yt-player" src="https://www.youtube-nocookie.com/embed/'+esc(vid)+'?rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin='+esc(quranEmbedOrigin())+'" '
       +'title="'+esc(x.nameTr)+' Sûresi anlatımı" loading="lazy" '
       +'allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen '
-      +'referrerpolicy="no-referrer" '
+      +'referrerpolicy="strict-origin-when-cross-origin" '
       +'sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"></iframe>';
   } else {
     h+='<button class="cover" onclick="App.quranJourneyWatch(\''+esc(x.id)+'\')" aria-label="'+esc(x.nameTr)+' Sûresi anlatımını oynat">';

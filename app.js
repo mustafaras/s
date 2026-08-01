@@ -10236,7 +10236,7 @@ function quranVideoCardHTML(x,req){
   // "İzledim" istemek kafa karıştırıcı olur (repaint bu durumu otomatik
   // düşürür, ayrı bir gizleme mantığı gerekmez).
   if(loaded&&req.status==='watching'){
-    h+='<button class="quran-v2-watched-fallback" onclick="App.quranMarkWatched(\''+esc(x.id)+'\')">'+icon('circle-check',15)+'<span>İzledim</span></button>';
+    h+='<button id="quran-watched-fallback" class="quran-v2-watched-fallback" onclick="App.quranMarkWatched(\''+esc(x.id)+'\')">'+icon('circle-check',15)+'<span>İzledim</span></button>';
   }
   if(req.readyAt) h+='<p class="quran-v2-video-meta">Hazır: '+esc(fmtDateNice(req.readyAt))+'</p>';
   h+='</section>';
@@ -10264,7 +10264,7 @@ function quranDetailBodyHTML(x){
   h+='</dl>';
   h+='<p class="quran-v2-theme">'+esc(x.themeTr)+'</p>';
   if(disputed) h+='<p class="quran-v2-foot">* Bu sûrenin Mekkî/Medenî nitelemesi klasik kaynaklarda ihtilaflıdır.</p>';
-  h+='<div class="quran-v2-status is-'+state.tone+'" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i>';
+  h+='<div id="quran-detail-status" class="quran-v2-status is-'+state.tone+'" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i>';
   h+='<span><strong>'+esc(state.label)+'</strong><em>'+esc(quranStatusNote(st,x.nameTr))+'</em></span></div>';
   // QY-12: video kartı hazır/izleniyor/izlendi durumlarında CTA'nın YERİNİ
   // alır — kartın kendi "İzlemeye başla" kapağı zaten birincil eylemdir,
@@ -10275,6 +10275,7 @@ function quranDetailBodyHTML(x){
   var ctaReplacedByCard=hasVideoCard&&(st==='ready'||st==='watching');
   if(hasVideoCard) h+=quranVideoCardHTML(x,req);
   else if(st==='video_unavailable') h+=quranVideoUnavailableHTML();
+  h+='<div id="quran-detail-action-region" class="quran-v2-action-region">';
   if(!ctaReplacedByCard){
     // QY-07: DURUMA GÖRE TEK ana eylem. Pasif durumlarda buton gerçekten
     // disabled'dır — tıklanabilir görünüp hiçbir şey yapmaz duruma düşmez.
@@ -10282,6 +10283,7 @@ function quranDetailBodyHTML(x){
     h+=icon(act.icon||'send',16)+'<span>'+esc(act.label)+'</span></button>';
     if(act.hint) h+='<p class="quran-v2-hint">'+esc(act.hint)+'</p>';
   }
+  h+='</div>';
   if(req.videoHistory&&req.videoHistory.length){
     h+='<div class="quran-v2-history"><h3>Önceki anlatımlar</h3><ul>';
     req.videoHistory.slice().reverse().forEach(function(v){
@@ -10328,6 +10330,21 @@ function quranPaintDetail(){
     var el=document.getElementById('quran-detail-region'), x=quranSurah(ui.quranDetailId);
     if(!el||!x) return false;
     el.innerHTML=quranDetailBodyHTML(x);
+    return true;
+  }catch(e){ return false; }
+}
+function quranPaintWatchedState(sid){
+  try{
+    var x=quranSurah(sid), q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
+    var statusEl=document.getElementById('quran-detail-status');
+    var actionEl=document.getElementById('quran-detail-action-region');
+    if(!x||!statusEl||!actionEl) return false;
+    var state=quranRowState(req.status||'idle'), act=quranDetailAction(sid,req);
+    statusEl.className='quran-v2-status is-'+state.tone;
+    statusEl.innerHTML='<i class="dot" aria-hidden="true"></i><span><strong>'+esc(state.label)+'</strong><em>'+esc(quranStatusNote(req.status,x.nameTr))+'</em></span>';
+    actionEl.innerHTML='<button class="quran-v2-cta" onclick="'+act.action+'">'+icon(act.icon||'phone',16)+'<span>'+esc(act.label)+'</span></button>'+(act.hint?'<p class="quran-v2-hint">'+esc(act.hint)+'</p>':'');
+    var fallback=document.getElementById('quran-watched-fallback');
+    if(fallback&&fallback.remove) fallback.remove();
     return true;
   }catch(e){ return false; }
 }
@@ -10464,7 +10481,10 @@ App.quranMarkWatched=function(id){
   var res=quranReduce(req,{type:'watch_complete',at:new Date().toISOString()});
   if(!res.changed) return;
   q.requests[sid]=res.request; save();
-  if(!quranPaintDetail()) render();
+  // Çalışan iframe'i yeniden kurmak videoyu başa sarar. Oynatıcı bu sûre için
+  // hâlâ DOM'daysa yalnız durum/CTA alanlarını güncelle; iframe referansı ve
+  // oynatma zamanı aynen korunsun. DOM yoksa güvenli tam boyamaya düş.
+  if(!(ui.quranPlayerLoadedId===sid&&quranPaintWatchedState(sid))){ if(!quranPaintDetail()) render(); }
   var x=quranSurah(sid);
   toast('Mâşallah · '+(x?x.nameTr:'anlatım')+' izlendi olarak işaretlendi.');
 };

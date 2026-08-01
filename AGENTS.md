@@ -328,6 +328,20 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an videosu “İzledim” sonrası başa sarıyordu (iframe koruma)
+
+Gerçek cihazda video kısa süre oynayıp `Raşit’e sor` görünürken başa dönüyordu.
+Kök neden `quranMarkWatched()` fonksiyonunun tüm `#quran-detail-region` HTML'ini
+yeniden kurmasıydı; çalışan iframe silinip aynı URL ile sıfırdan oluşturuluyordu.
+`quranPaintWatchedState()` eklendi: oynatıcı aktifken yalnız durum bloğu,
+`İzledim` fallback'i ve CTA bölgesi hedefli güncellenir; iframe DOM nesnesi ve
+oynatma zamanı korunur. DOM yoksa eski tam repaint fallback'i devam eder.
+Kur’an UI harness'i aynı iframe referansını açıkça assert ederek 206/206 geçti;
+state 179/179, remote update 16/16, hub 90/90, transport 207/207, pull 11/11,
+merge 34/34, sync 64/64, panel 44/44 geçti. Cache `app/styles?v=20260801h`.
+
+---
+
 ### 2026-08-01 — Kur’an videosu iOS’ta siyah iframe görünüyordu (embed düzeltme)
 
 Gerçek cihazda Alak videosu `ready/watching` durumuna geçti ancak iframe siyah

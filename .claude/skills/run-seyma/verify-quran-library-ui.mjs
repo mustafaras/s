@@ -58,7 +58,7 @@ function makeEl(id) {
     setAttribute(k, v) { this._attrs[k] = String(v); },
     getAttribute(k) { return k in this._attrs ? this._attrs[k] : null; },
     appendChild(c) { this.children.push(c); if (this.id === 'body' && c && c.id === 'sey-toast') toasts.push(c); return c; },
-    removeChild() {}, remove() {}, replaceWith() {}, insertBefore(c) { return c; },
+    removeChild() {}, remove() { this.removed = true; this.hidden = true; }, replaceWith() {}, insertBefore(c) { return c; },
     addEventListener() {}, removeEventListener() {}, click() {},
     focus() { lastFocus = this.id; }, blur() {},
     querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
@@ -482,14 +482,22 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('oynatıcı kararlı id taşır (quranAttachPlayer bunu hedefler)', vd.includes('id="quran-yt-player"'));
   ok('yalnız izlerken görünür "İzledim" yedeği var', /class="quran-v2-watched-fallback"[^>]*onclick="App\.quranMarkWatched\('fatiha'\)"/.test(vd));
   ok('yalnız oynatıcı açmak "izlendi" saymaz — durum hâlâ watching', journey().requests.fatiha.status === 'watching');
+  const playerBeforeComplete = doc.getElementById('quran-yt-player');
+  const fallbackBeforeComplete = doc.getElementById('quran-watched-fallback');
 
   App.quranMarkWatched('fatiha'); // API engellenmiş senaryoda kullanıcının kendi işaretlemesi
   let jAfter = journey();
   ok('"İzledim" yedeği watched’a geçirir', jAfter.requests.fatiha.status === 'watched', jAfter.requests.fatiha.status);
   const watchedAt1 = jAfter.requests.fatiha.watchedAt;
   ok('watchedAt yazıldı', !!watchedAt1);
+  ok('watched geçişi çalışan iframe nesnesini DEĞİŞTİRMEZ (video başa sarmaz)',
+    doc.getElementById('quran-yt-player') === playerBeforeComplete);
+  ok('watched olunca "İzledim" yedeği DOM’dan kaldırılıyor', !!fallbackBeforeComplete && fallbackBeforeComplete.removed === true);
+  ok('watched olunca hedefli eylem bölgesinde Raşit’e sor açılıyor',
+    doc.getElementById('quran-detail-action-region').innerHTML.includes('Raşit’e sor'));
+  ok('watched durum metni tam ayrıntıyı yeniden kurmadan yerinde güncelleniyor',
+    doc.getElementById('quran-detail-status').innerHTML.includes('İzlendi'));
   vd = detailHTML();
-  ok('watched olunca "İzledim" yedeği kayboluyor (kafa karıştırmaz)', !vd.includes('quran-v2-watched-fallback'));
   ok('watched olunca video kartı hâlâ var (yeniden izlenebilir)', vd.includes('quran-v2-video-frame'));
 
   App.quranMarkWatched('fatiha'); // tekrar tetiklense de (ENDED + yedek ikisi de) idempotent

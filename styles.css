@@ -883,6 +883,7 @@
 .quran-v2-cta:active{transform:translateY(1px);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--quran2) 40%,transparent),0 6px 16px -8px color-mix(in srgb,var(--quran) 45%,transparent)}
 .quran-v2-cta.is-disabled,.quran-v2-cta:disabled{background:var(--qj-panel2);color:var(--qj-muted);border-color:var(--qj-line);cursor:default;transform:none;box-shadow:none}
 .quran-v2-hint{margin:0;font-size:11px;line-height:1.5;text-align:center;color:var(--qj-faint)}
+.quran-v2-action-region{display:contents}
 .quran-v2-history{padding:13px;border-radius:15px;background:var(--qj-panel);border:1px solid var(--qj-line);box-shadow:0 6px 16px -10px color-mix(in srgb,var(--quran) 20%,transparent)}
 .quran-v2-video{display:flex;flex-direction:column;gap:8px}
 .quran-v2-video-badge{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--quran2) 16%,transparent);color:var(--quran-gold);font-size:11px;font-weight:900}

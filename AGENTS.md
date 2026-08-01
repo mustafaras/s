@@ -328,6 +328,17 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-01 — Kur’an mail/cevap/video güvenli demo (yerel-only)
+
+Gerçek Şeyma verisine, tokena, Gmail'e veya `seyma-data`'ya dokunmadan akışı
+göstermek için `quran-flow-demo.html` eklendi. Dört aşama: Müzzemmil isteği →
+örnek QY-09 maili → tek YouTube linkli cevap/doğrulama → kullanıcıda hazır,
+click-to-load video kartı. Demo hiçbir storage, fetch, GitHub API veya SeySync
+çağrısı içermez; state yalnız sekme belleğindedir. `test_quran_flow_demo.js`
+güvenlik/sözdizimi/akış sözleşmesini doğrular.
+
+---
+
 ### 2026-08-01 — Kur’an isteği production teşhis etiketi (commit edilmedi)
 
 Kullanıcının üretimde Müzzemmil için iki gerçek denemesi de outbox oluşmadan

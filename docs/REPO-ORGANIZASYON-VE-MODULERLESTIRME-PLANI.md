@@ -1,8 +1,8 @@
 # Şeyma Repo Organizasyonu ve Modülerleştirme Planı
 
-**Durum:** M0–M3 ve L1 tamamlandı; L2-a constants/ICONS ve L2-b/B1-B2
-read-only/parity kapıları `REPO-L002`/`REPO-L004`/`REPO-L005` ile
-`ready_for_review`.
+**Durum:** M0–M3 ve L1 tamamlandı; L2-a constants/ICONS ve L2-b/B1-B3
+read-only/parity/adapter scratch kapıları `REPO-L002`/`REPO-L004`/
+`REPO-L005`/`REPO-L006` ile `ready_for_review`.
 **Kapsam:** Kök Markdown dağınıklığı, uzun runtime dosyaları ve güvenli
 modülerleştirme
 **Dış etki:** Bu plan tek başına commit, push, merge, deploy veya kullanıcı
@@ -168,8 +168,9 @@ Tek seferde yeniden yazım yapılmaz. Sıra şöyledir:
    [`REPO-L2-CONSTANTS-RECEIPT.md`](REPO-L2-CONSTANTS-RECEIPT.md).
 2. `app/core/state.js`: default state, `migrate`, normalizasyon — `REPO-L003`
    ile sınır/fixture envanteri, `REPO-L004` ile yalnız read-only helper
-   kanıtı, `REPO-L005` ile sentetik black-box parity tamamlandı; runtime
-   taşıması henüz yok.
+   kanıtı, `REPO-L005` ile sentetik black-box parity ve `REPO-L006` ile
+   dependency-bag adapter scratch sözleşmesi tamamlandı; runtime taşıması
+   henüz yok.
 3. `app/core/persistence.js`: `save`, localStorage ve sync çağrısı.
 4. `app/core/render.js`: tab/overlay orkestrasyonu.
 5. `app/features/quran.js`, `app/features/faith.js`, `app/features/zikr.js`,

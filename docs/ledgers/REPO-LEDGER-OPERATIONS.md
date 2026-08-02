@@ -18,6 +18,7 @@
 | REPO-L003 | 2026-08-02 | L2-b state/migrate boundary inventory | `data` bootu, `migrate()` ve `createDefaultData()` sınır/hash/bağımlılık haritası çıkarıldı; read-only migration fixture kapısı tanımlandı; runtime taşıması yapılmadı | `docs/REPO-L2-STATE-BOUNDARY-RECEIPT.md`, `app.js` satır 1310–1489/3284–3287 | Boot/migrate/default hashleri kaydedildi; doğrudan helper bağımlılıkları ve global `data` side-effect riski sınıflandı; çalışma ağacı runtime/data açısından değişmedi | Yalnız belge/ledger güncellendi; `app.js`, `sync.js`, panel, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
 | REPO-L004 | 2026-08-02 | L2-b/B1 state helper read-only fixture | `empty*` kökleri ve arşiv normalizer’ları app.js boot edilmeden explicit dependency-bag VM’de sınandı; runtime state/migrate/persistence taşınmadı | `.claude/skills/run-seyma/verify-state-helper-boundary.mjs`, `docs/REPO-L2-B1-STATE-HELPER-RECEIPT.md` | 11 helper declaration kaynak sınırı; **64/64** fixture assertion; unknown-field korunumu, idempotent kimlik ve forbidden surface kapıları PASS | Yalnız harness/doküman/ledger değişti; `app.js`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
 | REPO-L005 | 2026-08-02 | L2-b/B2 synthetic migration parity | Minimal/kısmi/zengin/bozuk sentetik kayıtlar gerçek app.js boot VM’sinde gözlendi; ikinci boot deep parity projection’ı geçti; runtime state.js/persistence taşınmadı | `.claude/skills/run-seyma/verify-state-migration-boundary.mjs`, `docs/REPO-L2-B2-MIGRATION-PARITY-RECEIPT.md` | **32/32**; psych/profile/Zikirmatik/Kur’an/prayer/arşiv sentinel’ları korundu; ikinci geçiş eşdeğer; fetch=0 | Yalnız harness/doküman/ledger değişti; `app.js`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
+| REPO-L006 | 2026-08-02 | L2-b/B3 dependency-bag adapter scratch | Production graph dışı frozen dependency-bag, clone boundary ve wrapper sözleşmesi tasarlandı; gerçek migrate/state/save bağlanmadı | `.claude/skills/run-seyma/state-adapter-scratch.mjs`, `.claude/skills/run-seyma/verify-state-adapter-contract.mjs`, `docs/REPO-L2-B3-ADAPTER-SCRATCH-RECEIPT.md` | **20/20**; no app/sync import, no storage/network invocation, unknown-field/psych/Quran korunumu ve caller isolation PASS | Yalnız scratch/harness/doküman/ledger değişti; production `app.js`, `index.html`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
 
 ## Kullanılan güvenli komutlar
 
@@ -69,3 +70,10 @@ kapıdan ayrı tutulur.
 runtime extraction veya persistence yetkisi açmaz. Sonraki olası iş,
 dependency-bag adapter’ının scratch tasarımıdır; üretim script sırası ve
 `save()` bağlantısı ayrı kabul kapısı olmadan değiştirilemez.
+
+## REPO-L006 sonrası güvenli sınır
+
+`REPO-L006` dependency-bag adapter sözleşmesinin scratch kanıtıdır; gerçek
+`migrate()` adapter’ı, `app/core/state.js`, `index.html` script sırası ve
+`save()`/persistence bağlantısı hâlâ kapalıdır. Panel prompt’ları bu fazdan
+bağımsızdır ve yalnız seçilen prompt’un açık başlatılmasıyla ilerler.

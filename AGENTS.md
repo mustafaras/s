@@ -181,6 +181,8 @@ test_faz11_panel.js  Headless Node harness for panel.html helper/render
 .claude/skills/run-seyma/verify-state-migration-boundary.mjs
                  L2-b/B2 synthetic black-box migrate parity fixture; memory-only
                  localStorage, no sync/network/private data.
+.claude/skills/run-seyma/state-adapter-scratch.mjs + verify-state-adapter-contract.mjs
+                 L2-b/B3 scratch-only dependency-bag contract; production graph dışı.
 .claude/skills/run-seyma/  Data-safe headless verification skill — see
                  "Verification" below. `driver.mjs` is the core app.js
                  render harness; `zikr-harness.mjs` covers the İlham &
@@ -308,6 +310,8 @@ node .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                             # L2-b/B1 isolated helper boundary fixture
 node .claude/skills/run-seyma/verify-state-migration-boundary.mjs
                             # L2-b/B2 synthetic migrate parity fixture
+node .claude/skills/run-seyma/verify-state-adapter-contract.mjs
+                            # L2-b/B3 scratch dependency-bag contract
 ```
 
 ### Local server (use sparingly — see DATA SAFETY)

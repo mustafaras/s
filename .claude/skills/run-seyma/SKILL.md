@@ -145,6 +145,18 @@ in-memory localStorage stub, asserts unknown-field/data preservation and a
 second-boot deep parity projection, and confirms zero fetch calls. It does not
 authorize `app/core/state.js` extraction or any real persistence/sync write.
 
+### L2-b/B3 dependency-bag adapter (scratch-only)
+
+```bash
+node .claude/skills/run-seyma/verify-state-adapter-contract.mjs
+```
+
+`state-adapter-scratch.mjs` is deliberately outside the production script
+graph. It defines the future `now`/`uid`/catalog/feature-migration/logger bag,
+clones inputs at the boundary, and proves caller-state isolation. The harness
+does not load `app.js`, `sync.js`, `localStorage`, or a real migration function;
+green output is contract evidence only, not a production state-module release.
+
 ### Kur'an Yolculuğu outbox writer (QY-08)
 
 ```bash

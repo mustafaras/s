@@ -68,6 +68,10 @@ sırası aşağıdaki `docs/panel/` paketidir.
   — B2 sentetik black-box migration parity kanıtı.
 - `.claude/skills/run-seyma/verify-state-migration-boundary.mjs` — B2
   sentetik migration fixture’ı; gerçek persistence/sync değildir.
+- [`docs/REPO-L2-B3-ADAPTER-SCRATCH-RECEIPT.md`](REPO-L2-B3-ADAPTER-SCRATCH-RECEIPT.md)
+  — B3 dependency-bag adapter scratch sözleşmesi.
+- `.claude/skills/run-seyma/verify-state-adapter-contract.mjs` — B3 contract
+  harness; production state/persistence graph’ına bağlı değildir.
 - [`docs/ledgers/`](ledgers/) — repo organizasyonu için paired Operations/State ledger’ları.
 - [`docs/panel/plans/`](panel/plans/) — araştırma ve tasarım planları.
 - [`docs/panel/prompts/`](panel/prompts/) — tek aşamalı, dur-kontrol et mantığında prompt’lar.

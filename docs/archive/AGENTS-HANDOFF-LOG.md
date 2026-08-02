@@ -5,6 +5,31 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-02 — REPO-L006 L2-b/B3 dependency-bag adapter scratch
+
+**Kullanıcı talimatı:** REPO-L005 sonrası önerilen dependency-bag adapter
+tasarımı uygulandı; yalnız scratch/test katmanında kaldı. Production graph’a
+girmeyen `state-adapter-scratch.mjs`, `now`, `uid`, catalog,
+featureMigrations ve logger değerlerini frozen bag olarak tanımlıyor; input’u
+clone eden helper/wrapper sınırı veriyor.
+
+**Kanıt:** `verify-state-adapter-contract.mjs` **20/20** PASS. Adapter’da
+`app.js`/`sync.js` importu, localStorage/fetch/SeySync invocation’ı yok;
+unknown state, psych/Kur’an sentinel’ları ve caller isolation korunuyor.
+Mevcut uygulama/panel/sync/migration regresyonları da bu tur yeniden yeşil.
+
+**Sınır:** `app/core/state.js`, `migrate()` adapter’ı, `index.html` script
+sırası ve `save()` entegrasyonu yapılmadı. Panel prompt’ları açılmadı; panel
+ledger’ı seçilen prompt için ayrı kullanıcı başlangıcı bekliyor.
+
+**Güvenlik:** `app.js`, `index.html`, `sync.js`, storage, `data/` ve
+`seyma-data` değişmedi; browser/server/ağ, commit/push/merge/deploy yok.
+Branch scratch review için `feature/repo-l2-b3-adapter` olarak açıldı.
+
+**Sonraki güvenli adım:** REPO-L006 kullanıcı review. Sonraki gerçek migration
+adapter parity’si bu sözleşme onaylanmadan production state’e bağlanmayacak.
+
+---
 ### 2026-08-02 — REPO-L005 L2-b/B2 sentetik migration parity
 
 **Kullanıcı devam talimatı:** B1 helper kapısından sonra yalnız sentetik

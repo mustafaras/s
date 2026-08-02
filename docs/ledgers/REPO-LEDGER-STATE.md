@@ -26,6 +26,7 @@
 | REPO-L003 | 2026-08-02 | L2-b state/migrate boundary inventory | ready_for_review | REPO-L002 | `data` boot/migrate/default sınırları, doğrudan bağımlılık tablosu, side-effect riskleri ve beş sınıflı migration fixture kapısı kayda alındı; runtime taşıması yok | B1: empty/normalizer helper’ları için yalnız read-only fixture; persistence yok |
 | REPO-L004 | 2026-08-02 | L2-b/B1 state helper read-only fixture | ready_for_review | REPO-L003 | Explicit dependency-bag VM’de 11 helper, unknown-field ve idempotence parity; 64/64; app boot/persistence/network yok | B2: sentetik migrate parity fixture; state.js/save entegrasyonu yok |
 | REPO-L005 | 2026-08-02 | L2-b/B2 synthetic migration parity | ready_for_review | REPO-L004 | Minimal/kısmi/zengin/bozuk sentetik boot ve ikinci geçiş projection parity; 32/32; fetch=0; runtime taşıması yok | Scratch dependency-bag adapter tasarımı; üretim state.js/save entegrasyonu yok |
+| REPO-L006 | 2026-08-02 | L2-b/B3 dependency-bag adapter scratch | ready_for_review | REPO-L005 | Frozen dependency bag + clone boundary + wrapper contract; 20/20; production graph/storage/network yok | Kullanıcı review; gerçek migrate adapter parity ve production state.js ayrı kapı |
 
 ## Aktif güvenli sınır
 
@@ -85,6 +86,18 @@ implementation_started: true
 external_write_authorized: false
 data_mutation_authorized: false
 next_safe_action: dependency-bag adapter scratch tasarımı; production state.js/save entegrasyonu yok
+```
+
+## Güncel aktif sınır — REPO-L006
+
+```text
+active_phase: L2-B3-STATE-ADAPTER-SCRATCH
+active_sequences: REPO-L006
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+data_mutation_authorized: false
+next_safe_action: kullanıcı review; gerçek migrate adapter parity ve production state.js/save entegrasyonu yok
 ```
 
 ## Eşleşme kapısı

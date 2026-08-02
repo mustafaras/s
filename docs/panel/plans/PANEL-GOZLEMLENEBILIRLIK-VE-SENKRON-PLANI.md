@@ -284,6 +284,31 @@ Projection ham snapshot’ın yerine geçmez; `latest.json` ve günlük backup�
 silinmez. Panel için güvenli, küçük ve kaynakları açıkça etiketlenmiş bir
 okuma modelidir.
 
+PANEL-004 uygulamasında bu sözleşme `panelCoverageManifest.js` içindeki
+`window.PanelCoverageV1` ile korunur. `data` alanı panel parity’sini bozmamak
+için legacy-shaped fakat redacted bir görünüm taşır; panel projection’ı yalnız
+receipt’in `sourceLatestSha` + `snapshotRevision` değerleriyle eşleştiğinde
+kullanır. Projection yok, bozuk veya eskiyse panel aynı adapter üzerinden
+secret/GPS/profile raw/media verisini ayıklanmış legacy fallback’e düşer.
+
+PANEL-005 / Prompt 03 ile aynı adapter’in `sections` read-modeline kök
+`dailyPhoto`, `roomContentHistory`, `saygi` root/günlük karşılaştırması,
+`locNudge`, konum sample/process/accepted zamanları ve lifecycle/settings
+özeti eklendi. Panel kartı source value ile türetilmiş durumu ayrı badge’lerle
+gösterir; eski cache lisans/kaynak doğrulanmadan hazır sayılmaz, günlük konum
+track’i projection’a girmez ve render sırasında soul-archive backfill’i
+çalıştırılmaz. Root Saygı ile günlük read kanıtı uyuşmazlığı alarm olarak kalır.
+
+PANEL-006 / Prompt 04 ile `sections.therapyProvenance`, `profileProgress`,
+`notificationTimeline` ve `externalSources` eklenmiştir. Terapi thought/note
+alanları observer modelinden redacted olur; seçim, tamamlanma, gönderim/teslim
+ve wind-down event agregatı metadata olarak kalır. Bildirim timeline’ı
+oluşturulma, inbox, cihaz teslimi, okuma/görülme, silme, sync ve retry/error
+stage’lerini aynı event altında taşır; `receivedAt` okundu kanıtı sayılmaz.
+Profil response raw değerleri ve terapi hassas metni DOM’a girmez. Dış kaynak
+fetch hataları `error` + whitelist code olarak görünür; missing ile sessizce
+birleştirilmez. Her event/metric provenance sınıfını ve privacy sınıfını taşır.
+
 ### 6.2 `observer-events/YYYY-MM-DD.jsonl`
 
 Append-only event satırı:

@@ -5,6 +5,110 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-02 — PANEL-006 / Prompt 04 P1 terapi, bildirim ve provenance
+
+**Kullanıcı talimatı:** Kullanıcı PANEL-005 review kapısından sonra açıkça
+`go next` dedi. Sıradaki tek prompt olan `PANEL-04 — P1 Terapi, Bildirim ve
+Provenance` uygulandı; Prompt 05 açılmadı.
+
+**Değişen dosyalar:** `panelCoverageManifest.js` içinde therapy/profile/
+notification/external sections, sensitive path redaction ve provenance
+metadata; `panel.js` içinde Terapi · Bildirim · Provenance kartı; `panel.css`
+kart aralığı; `panel.html`/`index.html` cache-bust; yeni
+`test_panel_p4_provenance.js`; `AGENTS.md`, `CLAUDE.md`, panel plan/README ve
+paired `PANEL-006` ledger kayıtları. Önceki PANEL-004/005 çalışma ağacı
+değişiklikleri korunarak aynı bounded çalışma alanında ilerlenildi.
+
+**Kanıt:** PANEL-04 sentetik fixture **19/19**; P3 **26/26**; P1 **35/35**;
+P0 **27/27**; Faz 10 sync **64/64**; Faz 11 panel **50/50**; B1 **64/64**;
+B2 **32/32**; B3 **20/20**; app driver PASS; Zikirmatik **90/90**; Kur’an
+katalog **70/70**; transport **207/207**; app/sync/panel/manifest syntax,
+`git diff --check` ve panel script tag **8/8** PASS. Fixture raw therapy/profile
+verilerini projection/DOM dışına çıkarmaz; thoughts count/safe time, decision
+choice/completion, share sent/delivered, wind-down aggregate, notification
+created/inbox/device/read/delete/sync/retry-error stages, `answerReadAt`,
+observer receipt ve external fetch error code kanıtlanmıştır.
+
+**Sınır ve açık nokta:** `receivedAt` okundu sayılmaz; notification text mevcut
+observer sohbet parity’si için legacy data yüzeyinde kalır, P4 provenance kartı
+metin taşımaz. Therapy notes/options/prompts/thought arrays, profile responses,
+wind-down events ve external raw error metinleri güvenli projection/DOM
+modelinden redacted veya whitelist code olarak tutulur. Gerçek browser/server/
+ağ, `data/`, localStorage kullanıcı state’i ve `mustafaras/seyma-data`
+değişmedi. Commit, push, merge ve deploy yapılmadı.
+
+**Sonraki güvenli adım:** `PANEL-006` paired ledger kaydı
+`ready_for_review`; kullanıcı review’ı ve açık kabul/“devam” talimatı olmadan
+Prompt 05 veya `PANEL-007` başlatılmayacak.
+
+---
+### 2026-08-02 — PANEL-005 / Prompt 03 P1 eksik kök modüller
+
+**Kullanıcı talimatı:** Kullanıcı `PANEL-03 — P1 Eksik Kök Modüller Prompt’u`
+ile Prompt 03’ü açıkça başlattı. Yalnız `PANEL-005` kapsamı yürütüldü;
+Prompt 04 açılmadı.
+
+**Değişen dosyalar:** `panelCoverageManifest.js` içinde root-module
+projection sections; `panel.js` içinde projection kartı, root `savedAt`
+freshness’i, settings allowlist’i ve location malformed ayrımı; `panel.css`
+P3 kart/ayar özeti stilleri; `panel.html`/`index.html` cache-bust; yeni
+`test_panel_p3_root_modules.js`; `AGENTS.md`, `CLAUDE.md`, panel plan/README ve
+paired `PANEL-005` ledger kayıtları. Mevcut PANEL-004 değişiklikleri korunarak
+aynı çalışma ağacında devam edildi.
+
+**Kanıt:** PANEL-03 sentetik dolu/eski/yok/bozuk fixture **26/26**; P1
+projection **35/35**; P0 **27/27**; sync **64/64**; panel **50/50**; B1
+**64/64**; B2 **32/32**; B3 **20/20**; app driver PASS; Zikirmatik
+**90/90**; Kur’an katalog **70/70**; transport **207/207**; app/sync/panel/
+manifest syntax, `git diff --check` ve panel script tag **8/8** PASS. Fixture
+source state mutation’ını, raw GPS track redaction’ını, photo stale/not-ready
+durumunu, Saygı root/daily mismatch alarmını, nudge audit’ini, ayrı location
+sample/process/accepted zamanlarını ve settings source/privacy badge’lerini
+kanıtlıyor.
+
+**Sınır ve açık nokta:** Panel render’ı `backfillSoulArchiveFromDaysP()`
+çağırmıyor; projection kaynak değeri ile türetilmiş durumu ayırıyor. Fotoğraf
+lisans + kaynak + page URL + fetchedAt olmadan hazır sayılmıyor. Gerçek
+browser/server/ağ, `data/`, localStorage kullanıcı state’i ve
+`mustafaras/seyma-data` değişmedi. Commit, push, merge ve deploy yapılmadı.
+
+**Sonraki güvenli adım:** `PANEL-005` paired ledger kaydı `ready_for_review`;
+kullanıcı review’ı ve açık kabul/“devam” talimatı olmadan Prompt 04 veya
+`PANEL-006` başlatılmayacak.
+
+---
+### 2026-08-02 — PANEL-004 / Prompt 02 P1 coverage ve observer projection
+
+**Kullanıcı talimatı:** Kullanıcı PANEL-003 sonrasında açıkça `go next` dedi;
+yalnız `PANEL-004 / PANEL-02` kapsamı uygulandı. Prompt 03 açılmadı.
+
+**Değişen dosyalar:** `panelCoverageManifest.js` yeni saf manifest/redaction/
+projection adapter’ı; `sync.js` ayrı `data/observer-snapshot.json` üretimi;
+`panel.js` projection-first seçim, stale/bozuk/missing fallback ve coverage
+şeridi; `panel.css`, `panel.html`, `index.html` cache-bust/script sırası;
+`test_panel_p1_projection.js`, güncellenen `test_panel_p0_sync.js`,
+`AGENTS.md`, `CLAUDE.md`, panel plan/README ve paired `PANEL-004` ledger
+kayıtları.
+
+**Kanıt:** P1 fixture **35/35**; P0 **27/27**; Faz 10 sync **64/64**; Faz 11
+panel **50/50**; B1 **64/64**; B2 **32/32**; B3 **20/20**; app driver PASS;
+Zikirmatik **90/90**; Kur’an katalog **70/70**; transport **207/207**;
+`node --check` app/sync/panel/manifest; `git diff --check`; panel script tag
+**8/8**. Fixture’lar revision/SHA eşleşmesini, missing/broken/stale fail-closed
+fallback’i, secret/raw profile/GPS/base64 media redaction’ını ve panel
+latest’e PUT yapılmadığını doğruluyor.
+
+**Sınır ve açık nokta:** Projection safe legacy-shaped `data` ile panel parity
+sağlar; raw secret, profil cevapları, GPS koordinatları ve base64 media
+projection/coverage DOM yüzeyine çıkmaz. Gerçek browser/server/ağ, `data/`,
+localStorage kullanıcı state’i ve `mustafaras/seyma-data` değişmedi. Commit,
+push, merge ve deploy yapılmadı.
+
+**Sonraki güvenli adım:** `PANEL-004` paired ledger kaydı
+`ready_for_review`; kullanıcı review’ı ve açık kabul/“devam” talimatı olmadan
+PANEL-005 veya Prompt 03 başlatılmayacak.
+
+---
 ### 2026-08-02 — PANEL-003 / Prompt 01 P0 senkron makbuzu
 
 **Kullanıcı talimatı:** Kullanıcı `PANEL-01 — P0 Senkron Makbuzu ve Revision

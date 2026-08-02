@@ -7,6 +7,7 @@
 var KEY='seyma-reset-v1';
 var DEBOUNCE=4000;
 var RECEIPT_PATH='data/sync-receipt.json';
+var PROJECTION_PATH='data/observer-snapshot.json';
 var timer=null, lastPayload=null;
 var state={status:'idle', last:null, error:null};
 
@@ -210,7 +211,17 @@ function pushWithCfg(c, data, pendingReceipt){
       receipt.sourceLatestSha=safeReceiptString(latestResult&&latestResult.content&&latestResult.content.sha,128);
       receipt.snapshotRevision=safeReceiptString((latestResult&&latestResult.commit&&latestResult.commit.sha)||(latestResult&&latestResult.content&&latestResult.content.sha),128);
       if(!receipt.sourceLatestSha||!receipt.snapshotRevision){ var re=new Error('sync receipt missing revision'); re.code='receipt_failed'; throw re; }
-      return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).then(function(){ return receipt; });
+      return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).then(function(){
+        // Observer projection ayrı bir read-model dosyasıdır. latest.json'ın
+        // full-replace/anti-clobber zincirine eklenmez; üretilemezse push
+        // başarı iddiası vermez ve güvenli failure receipt yazılır.
+        var P=window.PanelCoverageV1;
+        if(!P||typeof P.buildObserverSnapshot!=='function'){
+          var pe=new Error('observer projection unavailable'); pe.code='projection_failed'; throw pe;
+        }
+        var projection=P.buildObserverSnapshot(data,receipt);
+        return ghPut(c,PROJECTION_PATH,JSON.stringify(projection,null,2)).then(function(){ return receipt; });
+      });
     })
     .then(function(receipt){ return ghPut(c,'data/gunluk/'+today+'.json',snap).then(function(){ return receipt; }); });
 }

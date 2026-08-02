@@ -58,8 +58,15 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - Prompt paketi: hazır.
 - Teknik plan: hazır.
 - Tasarım planı: hazır.
-- Kod uygulaması: `PANEL-003` / Prompt 01 uygulandı; `ready_for_review`.
-- Commit/push/merge/deploy: yapılmadı.
-- P0 kanıtı: `test_panel_p0_sync.js` 25/25; mevcut app/sync/panel ve
+- Kod uygulaması: `PANEL-003` yayınlandı; `PANEL-004` / Prompt 02,
+  `PANEL-005` / Prompt 03 ve `PANEL-006` / Prompt 04 `ready_for_review`.
+- Commit/push/merge/deploy: PANEL-003 `cf6389c` ile main’e merge edildi;
+  Pages doğrulaması başarılı. PANEL-004, PANEL-005 ve PANEL-006 için henüz
+  yayın işlemi yok.
+- Kanıt: `test_panel_p0_sync.js` 27/27; `test_panel_p1_projection.js` 35/35;
+  `test_panel_p3_root_modules.js` 26/26; `test_panel_p4_provenance.js`
+  19/19; mevcut app/sync/panel ve
   migration/headless kapıları da yeşil.
-- Kullanıcı incelemesi bekleniyor; kabul edilmeden Prompt 02’ye geçilmez.
+- Coverage/projection/redaction, root-modül/mismatch/privacy ve
+  terapi/bildirim/provenance kapıları kanıtlandı; kullanıcı review’ı
+  bekleniyor, Prompt 05’e otomatik geçilmez.

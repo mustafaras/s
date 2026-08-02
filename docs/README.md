@@ -17,6 +17,9 @@ referansları bozulmaması için kökte bırakılmıştır.
    - [`ZIKIRMATIK-GELISTIRME-PLANI.md`](roadmaps/ZIKIRMATIK-GELISTIRME-PLANI.md)
 5. İlgili prompt/denetim paketi.
 
+Yeni oturum için güncel, kanıt bağlı başlangıç dosyası:
+[`NEW-SESSION-STARTER-REPO-PANEL.md`](NEW-SESSION-STARTER-REPO-PANEL.md).
+
 ## Kök belgelerin sınıfları
 
 ### Operasyonel ve değişmez referanslar

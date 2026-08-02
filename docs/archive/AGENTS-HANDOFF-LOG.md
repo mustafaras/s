@@ -5,6 +5,33 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-02 — B3 teslimi ve repo/panel new-session starter dağıtımı
+
+**Kullanıcı talimatı:** B3 scratch adapter değişiklikleri önce commit, push,
+PR, merge ve Pages deploy ile canlıya alındı; ardından kalan repo review
+kapılarını ve panel prompt geçişini taşıyan yeni oturum starter’ı oluşturuldu.
+
+**Kanıt:** B3 PR [#96](https://github.com/mustafaras/s/pull/96) merge commit’i
+`1675c6e1dc3ae7177fa405a51f24841b96a360e8`; Pages run
+`30753065870` validate/deploy `success`. Starter PR
+[#97](https://github.com/mustafaras/s/pull/97) merge commit’i
+`1f6428436df1b90e563951e83680a2ee9f1aedb2`; Pages run
+`30753224359` validate/deploy `success`. `main` bu son merge ile hizalandı.
+
+**Yeni artefakt:** `docs/NEW-SESSION-STARTER-REPO-PANEL.md` canonical docs
+index’e bağlandı. Dosya; authority read order, REPO-L002–L006 review kapıları,
+PANEL-003/Prompt 01 sırası, test komutları, dış yazma ve kullanıcı verisi
+sınırlarını içeriyor.
+
+**Güvenlik:** Starter ve handoff değişiklikleri docs-only’dir; `app.js`,
+`panel.html`, `sync.js`, `data/`, localStorage, `seyma-data` ve production
+persistence değişmedi. Gerçek browser/server açılmadı.
+
+**Sonraki güvenli adım:** Yeni oturum starter’ını okuyup canlı paired
+ledger’ları doğrula; REPO-L002–L006 için kullanıcı kabulü alınmadan panel
+Prompt 01 veya production `state.js/save()` entegrasyonu başlatma.
+
+---
 ### 2026-08-02 — REPO-L006 L2-b/B3 dependency-bag adapter scratch
 
 **Kullanıcı talimatı:** REPO-L005 sonrası önerilen dependency-bag adapter

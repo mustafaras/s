@@ -112,7 +112,7 @@ function responsesFor(items) {
   items.forEach((it, i) => { r[it.id] = { value: 4, scoredValue: 4, shownAt: '2026-07-01T09:00:00.000Z', answeredAt: '2026-07-01T09:00:05.000Z', responseMs: 5000, revisionCount: 0, itemVersion: '1.0.0', sessionId: 'SINGLE', sequence: i + 1 }; });
   return r;
 }
-const FILES = ['profileAssessmentV1.js', 'app.js'];
+const FILES = ['profileAssessmentV1.js', 'app/core/constants.js', 'app.js'];
 
 function pageShell(theme, bodyHTML) {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Şeyma snapshot (${theme})</title><link rel="stylesheet" href="../../styles.css"></head><body style="margin:0;">

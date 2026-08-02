@@ -100,7 +100,7 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 const sb = buildSandbox();
-loadInto(sb, ['esmaulHusnaV1.js', 'app.js']);
+loadInto(sb, ['esmaulHusnaV1.js', 'app/core/constants.js', 'app.js']);
 const App = sb.App;
 const Esma = sb.EsmaulHusnaV1;
 
@@ -226,10 +226,10 @@ ok("EsmaulHusnaV1.method el- takısı kararını metadata olarak belgeliyor",
 // ── UI/panel formül sözleşmesi paritesi (KABUL: "UI ve panel aynı helper sonuçlarını/aynı
 // formül sözleşmesini kullanıyor") — panel.html'in saf fonksiyonlarını regex ile çıkarıp
 // ayrı bir vm bağlamında çalıştır, App.zikrMath ile aynı senaryolarda karşılaştır. ──
-const panelSrc = fs.readFileSync(path.join(REPO, 'panel.html'), 'utf8');
+const panelSrc = fs.readFileSync(path.join(REPO, 'panel.js'), 'utf8');
 function extract(re, label) {
   const m = panelSrc.match(re);
-  if (!m) throw new Error(`panel.html'den çıkarılamadı: ${label}`);
+  if (!m) throw new Error(`panel.js'den çıkarılamadı: ${label}`);
   return m[0];
 }
 const ZIKR_SEED_P_SRC = extract(/var ZIKR_SEED_P=\[[\s\S]*?\];/, 'ZIKR_SEED_P');
@@ -241,7 +241,7 @@ const panelSandbox = { console, D: null };
 const panelCtx = vm.createContext(panelSandbox);
 vm.runInContext(
   [ZIKR_SEED_P_SRC, zikrRootP_SRC, zikrPresetP_SRC, zikrJourneySummaryP_SRC].join('\n'),
-  panelCtx, { filename: 'panel.html (extracted)' }
+  panelCtx, { filename: 'panel.js (extracted)' }
 );
 
 function panelSummaryFor(preset, count, isEsma) {

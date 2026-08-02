@@ -98,7 +98,7 @@ function buildSandbox(seedDataObj) {
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   return sandbox;
 }
-const FILES = ['profileAssessmentV1.js', 'app.js'];
+const FILES = ['profileAssessmentV1.js', 'app/core/constants.js', 'app.js'];
 function loadInto(sandbox, files) {
   const ctx = vm.createContext(sandbox);
   for (const f of files) {

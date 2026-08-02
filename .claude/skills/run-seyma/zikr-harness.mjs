@@ -121,7 +121,7 @@ function ok(name, cond, detail) {
 }
 
 console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app/core/constants.js', 'app.js'];
 const styles = fs.readFileSync(path.join(REPO, 'styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 let sb = buildSandbox(seed);

@@ -9,7 +9,7 @@
 > biçimde izleyen bağımsız bir ibadet aracına dönüştürmek.
 >
 > **Sıralı uygulama promptları:**
-> [`ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md`](ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md)
+> [`ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md`](../prompts/legacy/ZIKIRMATIK-IPHONE16-PREMIUM-PROMPT-PAKETI.md)
 > — opak iPhone Pro Max tasarımı, 99 Esmâ içerik sözleşmesi, erişilebilirlik,
 > test ve kontrollü yayın kapılarını ZP-00–ZP-19 halinde uygular.
 

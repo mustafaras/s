@@ -99,7 +99,7 @@ function responsesFor(items) {
   return r;
 }
 
-const FILES = ['profileAssessmentV1.js', 'app.js'];
+const FILES = ['profileAssessmentV1.js', 'app/core/constants.js', 'app.js'];
 const sb = buildSandbox(baseSeed({ profileAssessment: consentedPA(responsesFor(ITEMS.slice(0, 173))) }));
 loadInto(sb, FILES);
 appHTML = '';

@@ -92,7 +92,7 @@ function loadInto(sandbox, files) {
   for (const f of files) { const src = fs.readFileSync(path.join(REPO, f), 'utf8'); vm.runInContext(src, ctx, { filename: f }); }
   return ctx;
 }
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
 
 function baseSeed(zikr) {
   return {
@@ -254,17 +254,17 @@ console.log('== ZP-04 V3 şema / kayıpsız migration doğrulaması ==');
   ok('Bozuk fixture ikinci migration idempotent (zikr kısmı derin eşdeğer)', JSON.stringify(data.zikr) === JSON.stringify(data2.zikr));
 }
 
-// ── 6) panel.html eksik V3 alanında (editorialVersion/archived yok) kırılmaz ──
+// ── 6) panel.js eksik V3 alanında (editorialVersion/archived yok) kırılmaz ──
 {
-  const panelSrc = fs.readFileSync(path.join(REPO, 'panel.html'), 'utf8');
-  function extract(re, label) { const m = panelSrc.match(re); if (!m) throw new Error('panel.html\'den çıkarılamadı: ' + label); return m[0]; }
+  const panelSrc = fs.readFileSync(path.join(REPO, 'panel.js'), 'utf8');
+  function extract(re, label) { const m = panelSrc.match(re); if (!m) throw new Error('panel.js\'den çıkarılamadı: ' + label); return m[0]; }
   const ZIKR_SEED_P_SRC = extract(/var ZIKR_SEED_P=\[[\s\S]*?\];/, 'ZIKR_SEED_P');
   const zikrRootP_SRC = extract(/function zikrRootP\(\)\{[\s\S]*?\n\}/, 'zikrRootP');
   const zikrPresetP_SRC = extract(/function zikrPresetP\(id\)\{[\s\S]*?\n\}/, 'zikrPresetP');
   const zikrJourneySummaryP_SRC = extract(/function zikrJourneySummaryP\(\)\{[\s\S]*?\n\}/, 'zikrJourneySummaryP');
   const panelSandbox = { console, D: null };
   const panelCtx = vm.createContext(panelSandbox);
-  vm.runInContext([ZIKR_SEED_P_SRC, zikrRootP_SRC, zikrPresetP_SRC, zikrJourneySummaryP_SRC].join('\n'), panelCtx, { filename: 'panel.html (extracted)' });
+  vm.runInContext([ZIKR_SEED_P_SRC, zikrRootP_SRC, zikrPresetP_SRC, zikrJourneySummaryP_SRC].join('\n'), panelCtx, { filename: 'panel.js (extracted)' });
 
   // V3-öncesi şekil: editorialVersion/archived YOK — panel bu alanlara hiç bakmıyor olmalı
   panelSandbox.D = {
@@ -277,8 +277,8 @@ console.log('== ZP-04 V3 şema / kayıpsız migration doğrulaması ==');
   };
   let panelResult, threw = false;
   try { panelResult = panelCtx.zikrJourneySummaryP(); } catch (e) { threw = true; }
-  ok('panel.html V3 alanları (editorialVersion/archived) olmadan çökmüyor', !threw);
-  ok('panel.html eksik V3 alanında doğru sonucu üretmeye devam ediyor', panelResult && panelResult.count === 8445 && panelResult.cyclePosition === 132);
+  ok('panel.js V3 alanları (editorialVersion/archived) olmadan çökmüyor', !threw);
+  ok('panel.js eksik V3 alanında doğru sonucu üretmeye devam ediyor', panelResult && panelResult.count === 8445 && panelResult.cyclePosition === 132);
 }
 
 console.log(failed === 0 ? `\n✅ Tüm kontroller PASS (${passed}/${passed})` : `\n❌ ${failed} kontrol FAIL (${passed} geçti)`);

@@ -121,7 +121,7 @@ function buildSandbox(seedDataObj) {
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   return sandbox;
 }
-const FILES = ['profileAssessmentV1.js', 'app.js']; // sync.js bilerek yüklenmiyor — App.saveToday() güvenli
+const FILES = ['profileAssessmentV1.js', 'app/core/constants.js', 'app.js']; // sync.js bilerek yüklenmiyor — App.saveToday() güvenli
 function loadInto(sandbox, files) {
   const ctx = vm.createContext(sandbox);
   for (const f of files) {

@@ -1,15 +1,16 @@
 ---
 name: run-seyma
-description: Run, launch, drive, verify, or screenshot the Şeyma mood-tracking web app and its app.js render path. Use when asked to run/start the app, check that a change renders, or exercise a tab/card/overlay — WITHOUT opening a browser (which can clobber real data). Covers app.js (the core) and panel.html.
+description: Run, launch, drive, verify, or screenshot the Şeyma mood-tracking web app and its app.js render path. Use when asked to run/start the app, check that a change renders, or exercise a tab/card/overlay — WITHOUT opening a browser (which can clobber real data). Covers app/core/constants.js, app.js (the core), and the panel.html/panel.js shell.
 ---
 
 # Run Şeyma (data-safe headless driver)
 
 Şeyma 🦩 is a single-user, client-side wellness/mood web app. There is **no
 build step, no bundler, no framework, no test suite** — just static files
-(`index.html` loads `styles.css`, `motivationProgramV2.js`, `app.js`, `sync.js`;
-`panel.html` is a standalone observer dashboard). Almost all logic lives in
-`app.js` (~6.4k lines, one IIFE) which builds the UI as HTML strings and does
+(`index.html` loads `styles.css`, frozen content modules,
+`app/core/constants.js`, `app.js`, `sync.js`; `panel.html` is a shell that
+loads `panel.css` and `panel.js`). Almost all runtime logic still lives in
+`app.js` (one IIFE) which builds the UI as HTML strings and does
 `#app.innerHTML = …`.
 
 ## ⛔ DO NOT open the app in a browser to "check it runs"
@@ -58,7 +59,8 @@ PASS  theme toggle re-rendered (dark)
 Done.
 ```
 
-It loads `motivationProgramV2.js` then `app.js` inside `node:vm` twice — once
+It loads `motivationProgramV2.js`, `app/core/constants.js`, then `app.js` inside
+`node:vm` twice — once
 with empty localStorage (onboarding), once with a seeded one-day `data` object —
 then **drives real interactions**: `App.go('rapor')` (tab switch),
 `App.toggleCard('habits')`, `App.setTheme(true)` (dark re-render). Any
@@ -118,6 +120,30 @@ The other Kur'an gates are pure-function level and much faster:
 `verify-quran-migration-v1.mjs` (QY-02 schema) and
 `verify-quran-state-machine.mjs` (QY-03 transitions), plus repo-root
 `node test_quran_catalog.js` and `node test_quran_transport.js`.
+
+### L2-b/B1 state helper boundary (read-only)
+
+```bash
+node .claude/skills/run-seyma/verify-state-helper-boundary.mjs
+```
+
+This fixture extracts only the current `empty*` and archive normalizer
+declarations from `app.js` into an isolated `node:vm` dependency bag. It does
+not boot `app.js`, call `migrate()`, touch localStorage, load `sync.js`, or
+perform network I/O. A green result is helper-shape evidence only; it does not
+authorize moving runtime state/persistence code.
+
+### L2-b/B2 migration parity (synthetic black-box)
+
+```bash
+node .claude/skills/run-seyma/verify-state-migration-boundary.mjs
+```
+
+This harness boots only synthetic minimal, partial, rich and malformed states
+with the real `app.js` in a VM. It observes the post-migration JSON through an
+in-memory localStorage stub, asserts unknown-field/data preservation and a
+second-boot deep parity projection, and confirms zero fetch calls. It does not
+authorize `app/core/state.js` extraction or any real persistence/sync write.
 
 ### Kur'an Yolculuğu outbox writer (QY-08)
 
@@ -206,16 +232,17 @@ not by diffing text — that the `.gs` copy of the transport module produces
 identical output to the real `quranTransportV1.js` across every validator,
 parser, and merge function.
 
-## panel.html (the ÆON observer dashboard)
+## panel.html / panel.js (the ÆON observer dashboard)
 
-`panel.html` is a separate, self-contained app that does **not** share code with
-`app.js`, so the `app.js` driver does not cover it. It is far less risky (it
+`panel.html` is a shell for a separate app that does **not** share code with
+`app.js`; its observer IIFE is in `panel.js`, so the `app.js` driver does not
+cover it. It is far less risky (it
 mostly *reads* `seyma-data`; its writes go to `observer-inbox.json` /
 `aeon-outbox.json`, not `latest.json`). For a change to `panel.html`, syntax +
 structure check without a browser:
 
 ```bash
-node --check app.js && node --check sync.js          # JS syntax gate
+node --check app.js && node --check panel.js && node --check sync.js  # JS syntax gate
 node -e "const s=require('fs').readFileSync('panel.html','utf8'); \
   const o=(s.match(/<script/g)||[]).length, c=(s.match(/<\/script>/g)||[]).length; \
   console.log('script tags', o, c, o===c?'OK':'MISMATCH')"
@@ -227,6 +254,9 @@ the change and eyeballing the diff over launching it.
 
 ## Gotchas (battle scars from building this driver)
 
+- **`app/core/constants.js` must load before `app.js`**. The driver mirrors the
+  production order; direct vm fixtures that boot `app.js` must include the
+  constants module first.
 - **`app.js` boot immediately calls `render()`**, which hard-requires both
   `#app` and `#root` in the DOM. The stub provides exactly those two; every
   other `getElementById` returns `null` on purpose — the app guards those with

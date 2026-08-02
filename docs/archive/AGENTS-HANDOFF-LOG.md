@@ -5,6 +5,26 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-02 — PANEL-006 yayınlama / commit, merge ve Pages deploy
+
+**Kullanıcı talimatı:** Kullanıcı açıkça `push commit merge deploy` istedi.
+PANEL-004–006 değişiklikleri feature branch’e commit edilip pushlandı; branch
+`main`’e no-ff merge edildi ve `main` pushlandı.
+
+**Yayın kanıtı:** Feature commit `631dd6d`; merge commit `ba98b74`;
+`origin/feature/panel-004-006-provenance` ve `origin/main` pushları başarılı.
+GitHub Pages workflow run `30761174707` `completed/success` ve head SHA
+`ba98b74bfdfe8ccbae68ada16573528ae3b07bce` olarak doğrulandı:
+https://github.com/mustafaras/s/actions/runs/30761174707
+
+**Güvenlik sınırı:** `data/`, localStorage kullanıcı state’i ve
+`mustafaras/seyma-data` değişmedi; browser açılmadı, local server çalıştırılmadı.
+
+**Sonraki güvenli adım:** PANEL-006 yayınlandı ancak state’i
+`ready_for_review`; kullanıcı review’ı ve açık kabul/“devam” talimatı olmadan
+Prompt 05 veya PANEL-007 başlatılmayacak.
+
+---
 ### 2026-08-02 — PANEL-006 / Prompt 04 P1 terapi, bildirim ve provenance
 
 **Kullanıcı talimatı:** Kullanıcı PANEL-005 review kapısından sonra açıkça

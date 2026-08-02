@@ -60,9 +60,9 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - Tasarım planı: hazır.
 - Kod uygulaması: `PANEL-003` yayınlandı; `PANEL-004` / Prompt 02,
   `PANEL-005` / Prompt 03 ve `PANEL-006` / Prompt 04 `ready_for_review`.
-- Commit/push/merge/deploy: PANEL-003 `cf6389c` ile main’e merge edildi;
-  Pages doğrulaması başarılı. PANEL-004, PANEL-005 ve PANEL-006 için henüz
-  yayın işlemi yok.
+- Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
+  `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
+  push edildi. Pages run `30761174707` başarılı.
 - Kanıt: `test_panel_p0_sync.js` 27/27; `test_panel_p1_projection.js` 35/35;
   `test_panel_p3_root_modules.js` 26/26; `test_panel_p4_provenance.js`
   19/19; mevcut app/sync/panel ve

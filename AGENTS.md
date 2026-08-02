@@ -328,6 +328,110 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 ---
 
+### 2026-08-02 — QY-21 kullanıcı video notları + ÆON teslim video aynası
+
+**Branch:** `main`; commit/push/deploy yok.
+
+**Değişen dosyalar:**
+- `app.js`: Kur’an video isteklerine additive `notes[]`/`lastNoteAt` alanları;
+  `watch`, `listen`, `reflection` türleri; videoId, saniye, etiket, metin ve
+  zaman damgası normalizasyonu. Video ayrıntısına gelişmiş not editörü eklendi;
+  video gelmeden önce de kilitli açıklama/placeholder olarak görünür.
+  Kaydetme yalnız `#quran-video-notes` bölgesini boyuyor; çalışan iframe DOM'u
+  yeniden kurulmadığı için oynatma konumu korunuyor.
+- `sync.js`: notları ID + `updatedAt` ile union/dedupe eden, 100 kayıtla
+  sınırlayan merge; `lastNoteAt` en yeni değeri koruyor.
+- `panel.html`: “Kullanıcıya gönderilen videolar” bölümü; video kimliği,
+  hazır/izleme/tamam zamanları, durum, not sayısı, tür/saniye/etiket/metin ve
+  eski anlatım ayrımı.
+- `styles.css`: açık/koyu Kur’an modalında not listesi ve formu için responsive,
+  kilitli/etkin form durumları,
+  odaklanabilir 44px eylem ve dar ekran kuralları.
+- `index.html`: app/styles cache `20260802d` (sync/service-worker davranışı
+  değişmedi).
+- `KURAN-YOLCULUGU-GELISTIRME-PLANI.md`, `GELISTIRME-PLANI.md`: QY-21 kapsamı,
+  kabul kanıtları ve changelog.
+- `.claude/skills/run-seyma/verify-quran-library-ui.mjs`, `test_faz11_panel.js`,
+  `test_quran_merge.js`: kullanıcı notu, panel aynası ve çoklu-cihaz merge
+  kapıları.
+
+**Doğrulama:** `node --check app.js sync.js` ✅; Kur’an UI **223/223**;
+  migration 59/59; state-machine 179/179; remote 16/16; sync 64/64;
+  panel 50/50; merge **38/38**; driver; Zikirmatik 90/90; transport 207/207;
+  katalog 70/70; striking 41/41; WCAG 66/66; outbox 55/55; pull 11/11;
+  demo 9/9; CSS brace 1410/1410; panel script 7/7; `git diff --check` ✅.
+  Gerçek tarayıcı açılmadı, sunucu bu oturumda başlatılmadı, `seyma-data`'ya
+  yazılmadı.
+
+**Kalan:** Kullanıcı kendi iPhone/PWA'sında gönderilmiş videoyu açıp not
+  formunu ve panel yenilemesinde aynı notu görmeyi manuel onaylayabilir.
+
+---
+
+### 2026-08-02 — QY-20 koşulsuz WhatsApp “Raşit’e sor” eylemi
+
+**Branch:** `main`; commit/push/deploy yok.
+
+**Değişen dosyalar:**
+- `app.js`: Quran ayrıntı modalındaki “Raşit’e sor” artık video durumundan
+  bağımsız etkin; telefon SVG’si yerine `whatsapp` konuşma balonu/telefon
+  SVG’si kullanılıyor. `quranJourneyQuestion()` her durumdan `wa.me` açıyor;
+  yalnız `watched/question_opened` geçişlerinde reducer state’i güncelliyor.
+  Mesaj şablonu artık “anlatımını izledim” varsayımı taşımayan nötr sûre
+  bağlamına sahip. Hedefli boyama iframe’i yeniden kurmadan korunuyor.
+- `.claude/skills/run-seyma/verify-quran-library-ui.mjs`: hazır, idle ve
+  bekleyen durumlarda etkin WhatsApp CTA’sı; izlenmeden de deep-link; nötr
+  mesaj ve iframe referansı regresyon kapıları güncellendi.
+- `index.html`: app/styles/service-worker cache `20260802b` olarak koordine
+  edildi.
+- `GELISTIRME-PLANI.md`, `KURAN-YOLCULUGU-GELISTIRME-PLANI.md`: QY-20
+  koşulsuz WhatsApp davranışı, ikon ve mesaj sözleşmesi işlendi.
+
+**Doğrulama:** `node --check` (app/sync/ek Kur’an modülleri), `driver.mjs`,
+`zikr-harness.mjs` 90/90, Kur’an UI 216/216, migration 57/57,
+state-machine 179/179, remote updates 16/16, sync 64/64, panel 44/44,
+katalog 70/70, transport 207/207, striking verses 41/41, WCAG 66/66,
+merge 34/34, outbox 55/55, pull 11/11, demo 9/9, CSS brace 1379/1379,
+panel script 7/7, `git diff --check` ✅. Gerçek tarayıcı açılmadı; gerçek
+video/WhatsApp/GitHub-data yazımı yapılmadı.
+
+---
+
+### 2026-08-02 — QY-19 kalıcı “Raşit’e sor” eylemi + iframe oynatma koruması
+
+**Branch:** `main`; commit/push/deploy yok.
+
+**Değişen dosyalar:**
+- `app.js`: Sûre ayrıntısında “Raşit’e sor” artık her durumda görünür; izleme
+  öncesi `disabled`, `watched/question_opened` durumlarında etkin. “Raşit’ten
+  iste” ile birlikte iki eylemli düzen üretildi. `quranJourneyQuestion()` ve
+  `quranMarkWatched()` yalnız durum/eylem bölgelerini hedefli boyuyor;
+  soru tıklamasında çalışan YouTube iframe’i yeniden kurulmadığı için video
+  oynatma konumu korunuyor. Yanlış sûre DOM’unu boyamamak için ayrıntı kimliği
+  guard’ı eklendi.
+- `styles.css`: iki eylemli responsive grid, ikincil/pasif soru düğmesi ve
+  389px dar ekran stilleri.
+- `index.html`: `styles.css`, `app.js` ve service worker cache `20260802a`.
+- `.claude/skills/run-seyma/verify-quran-library-ui.mjs`: QY-19 görünürlük,
+  pasiflik, responsive CSS ve iframe referansı regresyon kapıları; UI toplamı
+  214 assertion.
+- `GELISTIRME-PLANI.md`, `KURAN-YOLCULUGU-GELISTIRME-PLANI.md`: QY-19
+  davranış ve teslimat notu.
+
+**Doğrulama:** `node --check` (app/sync/ek Kur’an modülleri), `driver.mjs`,
+`zikr-harness.mjs` 90/90, Kur’an UI 214/214, migration 57/57,
+state-machine 179/179, remote updates 16/16, sync 64/64, panel 44/44,
+katalog 70/70, transport 207/207, striking verses 41/41, WCAG 66/66,
+merge 34/34, outbox 55/55, pull 11/11, demo 9/9, CSS brace 1379/1379,
+panel script 7/7, `git diff --check` ✅. Gerçek tarayıcı açılmadı; gerçek
+video/WhatsApp/GitHub-data yazımı yapılmadı.
+
+**Kalan:** Gerçek iPhone’da kullanıcı tarafından click-to-load video ve
+WhatsApp uygulama/web fallback’i manuel görülebilir; bu oturumda commit,
+push veya deploy yapılmadı.
+
+---
+
 ### 2026-08-01 — Kur’an videosu “Baştan izle” 30. saniyeye atlıyordu
 
 Kayıtta yalnız videoId vardı; `t=`/start parametresi yoktu. YouTube gizlilikli

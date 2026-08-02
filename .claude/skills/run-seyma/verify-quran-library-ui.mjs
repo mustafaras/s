@@ -408,11 +408,17 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('ihtilaflı niteleme dipnotla işaretlendi', d.includes('klasik kaynaklarda ihtilaflıdır'));
   ok('durum bölgesi aria-live taşıyor', d.includes('role="status" aria-live="polite"'));
   ok('başlık odaklanabilir', d.includes('id="quran-detail-title" tabindex="-1"'));
-  // QY-12: 'ready' durumunda video kartı (kendi "İzlemeye başla" kapağıyla)
-  // genel `.quran-v2-cta` düğmesinin YERİNİ alır — aynı işi yapan ikinci bir
-  // düğme göstermemek için. "Tek ana eylem" ilkesi bozulmuyor; eylem artık
-  // `.quran-v2-video .cover` düğmesi.
-  ok('ayrıntıda TEK ana eylem var (video kartının kapak düğmesi, ayrı CTA yok)', (d.match(/class="quran-v2-cta/g) || []).length === 0 && (d.match(/class="cover"/g) || []).length === 1);
+  // QY-20: hazır video kartı kendi “İzlemeye başla” kapağını korur; kalıcı
+  // “Raşit’e sor” düğmesi video durumundan bağımsız etkin ve WhatsApp ikonludur.
+  ok('hazır ayrıntıda video kapağı + kalıcı etkin WhatsApp eylemi var',
+    (d.match(/class="quran-v2-cta/g) || []).length === 1 &&
+    (d.match(/class="cover"/g) || []).length === 1 &&
+    /class="quran-v2-cta is-secondary"[^>]*onclick="App\.quranJourneyQuestion\('fatiha'\)"/.test(d) &&
+    d.includes('<svg class="seyIcon"') &&
+    d.includes('Raşit’e sor'));
+  const readyAsk = App.quranQuestionAction('fatiha', Object.assign(App.quranNewRequest(), { status: 'ready' }));
+  ok('kalıcı soru eylemi WhatsApp ikonlu ve her durumda etkin',
+    readyAsk.icon === 'whatsapp' && readyAsk.disabled === false && !!readyAsk.action);
   ok('hazır sûrede ana eylem “İzlemeye başla”', d.includes('İzlemeye başla'));
   ok('başlıkta geri düğmesi belirdi', registry['quran-head-lead'].innerHTML.includes('Sûre kütüphanesine dön'));
   ok('geri düğmesi boş kutu değil (ikon çizildi)', registry['quran-head-lead'].innerHTML.includes('<svg class="seyIcon"'));
@@ -444,6 +450,20 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('pasif eylemin tıklama hedefi yok',
     !App.quranDetailAction('alak', Object.assign(App.quranNewRequest(), { status: 'submitting' })).action);
 
+  App.openQuranSurah('tekvir');
+  const idleDetail = detailHTML();
+  ok('istenmemiş sûrede iki eylem yan yana görünür',
+    idleDetail.includes('Raşit’ten iste') && idleDetail.includes('Raşit’e sor') &&
+    /class="quran-v2-action-buttons has-primary"/.test(idleDetail));
+  ok('izleme öncesi kalıcı Raşit’e sor düğmesi etkindir',
+    /class="quran-v2-cta is-secondary"[^>]*onclick="App\.quranJourneyQuestion\('tekvir'\)"/.test(idleDetail) &&
+    !/class="quran-v2-cta is-secondary is-disabled"[^>]*disabled/.test(idleDetail));
+  ok('video gelmeden not alanı görünür ve kilitli açıklama taşır',
+    idleDetail.includes('class="quran-v2-notes is-locked"') &&
+    idleDetail.includes('Video hazır olduğunda not yazma açılır.') &&
+    idleDetail.includes('class="quran-v2-note-compose is-locked"') &&
+    idleDetail.includes('Video hazır olduğunda açılır'));
+
   App.openQuranSurah('kalem');
   ok('bekleyen sûrede buton gerçekten disabled', detailHTML().includes('disabled aria-disabled="true"'));
   App.openQuranSurah('kadir');
@@ -452,6 +472,9 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   // ── QY-12: güvenli, mahremiyet geliştirilmiş YouTube video kartı ─────────
   App.openQuranSurah('fatiha'); // status: ready, videoId: dQw4w9WgXcQ (seed)
   let vd = detailHTML();
+  ok('video hazır olduğunda not alanı etkinleşir',
+    vd.includes('class="quran-v2-notes"') && !vd.includes('class="quran-v2-notes is-locked"') &&
+    vd.includes('class="quran-v2-note-save"') && vd.includes('>Notu kaydet</span>'));
   ok('ilk render: HİÇ iframe yok (click-to-load)', !vd.includes('<iframe'));
   ok('kapak: sabit aspect-ratio konteyneri var', vd.includes('quran-v2-video-frame'));
   ok('kapak: güvenli ytimg thumbnail img', /src="https:\/\/i\.ytimg\.com\/vi\/dQw4w9WgXcQ\/hqdefault\.jpg"/.test(vd));
@@ -469,6 +492,23 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('embed URL’si baştan oynatma için start=0 taşır', /[?&]start=0/.test(vd));
   ok('sandbox uygulanmış, allow-forms/top-navigation YOK', /sandbox="[^"]*"/.test(vd) && !/sandbox="[^"]*(allow-forms|allow-top-navigation)/.test(vd));
   ok('durum ready→watching geçti (izlemeye başladı kaydı)', journey().requests.fatiha.status === 'watching', journey().requests.fatiha.status);
+  const watchingAskFallback = doc.getElementById('quran-watched-fallback');
+  App.quranJourneyQuestion('fatiha');
+  ok('izleniyor durumunda WhatsApp sorusu açılırken İzledim yedeği korunur',
+    !!watchingAskFallback && doc.getElementById('quran-watched-fallback') === watchingAskFallback);
+
+  // QY-21: video DOM'una dokunmadan izleme/dinleme çalışma notu.
+  const playerBeforeNote = doc.getElementById('quran-yt-player');
+  App.quranNoteField('kind', { value: 'listen' });
+  App.quranNoteField('timestamp', { value: '42' });
+  App.quranNoteField('tag', { value: 'sabır' });
+  App.quranNoteField('text', { value: 'Bu bölümde sabır vurgusu bende kaldı.' });
+  App.quranAddNote('fatiha');
+  const notedFatiha = journey().requests.fatiha;
+  ok('not alanı video ayrıntısında görünür', detailHTML().includes('quran-video-notes') && detailHTML().includes('İzlerken / dinlerken notlar'));
+  ok('not türü, video kimliği, saniyesi ve etiket kalıcı kayda yazılır', notedFatiha.notes.length === 1 && notedFatiha.notes[0].kind === 'listen' && notedFatiha.notes[0].videoId === 'dQw4w9WgXcQ' && notedFatiha.notes[0].timestampSec === 42 && notedFatiha.notes[0].tag === 'sabır');
+  ok('not metni kullanıcı ekranında güvenli biçimde görünür', doc.getElementById('quran-video-notes').innerHTML.includes('Bu bölümde sabır vurgusu bende kaldı.'));
+  ok('not kaydı çalışan iframe nesnesini DEĞİŞTİRMEZ', doc.getElementById('quran-yt-player') === playerBeforeNote);
 
   App.quranJourneyWatch('fatiha'); // yeniden izleme — idempotent, çökme yok
   ok('tekrar dokunuş güvenle no-op (durum bozulmaz)', journey().requests.fatiha.status === 'watching');
@@ -491,6 +531,7 @@ section('6. Sûre ayrıntısı ve duruma göre TEK ana eylem');
   ok('"İzledim" yedeği watched’a geçirir', jAfter.requests.fatiha.status === 'watched', jAfter.requests.fatiha.status);
   const watchedAt1 = jAfter.requests.fatiha.watchedAt;
   ok('watchedAt yazıldı', !!watchedAt1);
+  ok('izlenme durumu geçişi notları kaybetmez', journey().requests.fatiha.notes.length === 1 && journey().requests.fatiha.notes[0].text === 'Bu bölümde sabır vurgusu bende kaldı.');
   ok('watched geçişi çalışan iframe nesnesini DEĞİŞTİRMEZ (video başa sarmaz)',
     doc.getElementById('quran-yt-player') === playerBeforeComplete);
   ok('watched olunca "İzledim" yedeği DOM’dan kaldırılıyor', !!fallbackBeforeComplete && fallbackBeforeComplete.removed === true);
@@ -661,6 +702,12 @@ section('9. CSS sözleşmesi (QY-06 layout + QY-17 erişilebilirlik/responsive/m
   ok('uzun Arapça ad taşmıyor', /\.quran-v2-row \.titleline \.arabic\{[^}]*max-width:4\d%/.test(block));
   ok('durum rozeti meta satırında sarmalanıyor', /\.quran-v2-row \.metarow\{[^}]*flex-wrap:wrap/.test(block));
   ok('ana CTA en az 52px', /\.quran-v2-cta\{[^}]*min-height:52px/.test(block));
+  ok('istek + soru eylemleri iki sütunlu responsive grid taşıyor',
+    /\.quran-v2-action-buttons\.has-primary\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(block));
+  ok('soru eylemi ikincil yüzeyde tema değişkenleri kullanıyor',
+    /\.quran-v2-cta\.is-secondary\{[^}]*background:var\(--qj-panel2\)[^}]*color:var\(--quran-ink\)/.test(block));
+  ok('soru eylemi 389px ekranda tipografiyi küçültüyor',
+    /@media\(max-width:389px\)\{[\s\S]*?\.quran-v2-action-buttons \.quran-v2-cta\{[^}]*font-size:12\.5px/.test(block));
   ok('filtre rozetleri en az 44px dokunma hedefi', /\.quran-v2-chips button\{[^}]*min-height:44px/.test(block));
   ok('kapat ve geri düğmeleri 44px',
     /\.quran-v2-header \.close\{[^}]*width:44px;height:44px/.test(block) && /\.quran-v2-header \.back\{[^}]*width:44px;height:44px/.test(block));
@@ -759,6 +806,12 @@ section('11. QY-14 — Raşit’e sor WhatsApp yönlendirmesi');
   ok('ön koşul: asr hâlâ watched (önceki bölümler yalnız görüntüledi)',
     journey().requests.asr.status === 'watched', journey().requests.asr.status);
 
+  // QY-19: Soru CTA'sı video oynatıcısı açıkken de güvenle kullanılabilir.
+  // Gerçek DOM'da iframe nesnesi aynı kalmalı; tam ayrıntı boyaması yapılırsa
+  // YouTube oturumu yeniden kurulur ve video başa sarar.
+  App.openQuranSurah('asr');
+  App.quranJourneyWatch('asr');
+  const playerBeforeQuestion = doc.getElementById('quran-yt-player');
   opened.length = 0; toasts.length = 0;
   App.quranJourneyQuestion('asr');
   ok('tam bir wa.me çağrısı açıldı', opened.length === 1, opened);
@@ -769,7 +822,7 @@ section('11. QY-14 — Raşit’e sor WhatsApp yönlendirmesi');
   ok('noopener + noreferrer', /noopener/.test(call1.features) && /noreferrer/.test(call1.features), call1.features);
   const decoded1 = decodeURIComponent(String(call1.url).split('?text=')[1] || '');
   ok('mesaj plan şablonuna birebir uyuyor (sûre adı + nüzul durağı)',
-    decoded1 === 'Selam Raşit, Kur’an Yolculuğu’nda Asr Sûresi\n(13. durak) anlatımını izledim.\n\nBu sûreyle ilgili sana şunu sormak istiyorum:',
+    decoded1 === 'Selam Raşit, Kur’an Yolculuğu’nda Asr Sûresi\n(13. durak) hakkında sana şunu sormak istiyorum:',
     decoded1);
   ok('“mesaj gönderildi” DENMEDİ, yalnız “WhatsApp açıldı.”',
     toasts[toasts.length - 1].textContent === 'WhatsApp açıldı.', toasts.map((t) => t.textContent));
@@ -778,6 +831,8 @@ section('11. QY-14 — Raşit’e sor WhatsApp yönlendirmesi');
     { role: toasts[toasts.length - 1].getAttribute('role'), live: toasts[toasts.length - 1].getAttribute('aria-live') });
   ok('tıklamada questionOpenedAt yazıldı', !!journey().requests.asr.questionOpenedAt);
   ok('durum question_opened’a geçti', journey().requests.asr.status === 'question_opened', journey().requests.asr.status);
+  ok('Raşit’e sor tıklaması çalışan iframe nesnesini DEĞİŞTİRMEZ (video başa sarmaz)',
+    doc.getElementById('quran-yt-player') === playerBeforeQuestion);
   const openedAt1 = journey().requests.asr.questionOpenedAt;
 
   App.quranJourneyQuestion('asr'); // tekrar tıklama — meşru "tekrar sor"
@@ -787,13 +842,13 @@ section('11. QY-14 — Raşit’e sor WhatsApp yönlendirmesi');
 
   opened.length = 0; toasts.length = 0;
   const beforeKalem = JSON.stringify(journey().requests.kalem);
-  App.quranJourneyQuestion('kalem'); // awaiting_reply — henüz watched değil
-  ok('watched/question_opened DIŞINDA çağrılırsa no-op (WhatsApp açılmaz)', opened.length === 0);
+  App.quranJourneyQuestion('kalem'); // awaiting_reply — video koşulu artık yok
+  ok('watched/question_opened DIŞINDA da WhatsApp açılır', opened.length === 1);
   ok('watched DIŞINDA state bozulmaz', JSON.stringify(journey().requests.kalem) === beforeKalem);
 
   let threwInvalid = false;
   try { App.quranJourneyQuestion('BÖYLE-BIR-SURE-YOK!!'); } catch (e) { threwInvalid = true; }
-  ok('geçersiz id çökmeden no-op geçer', !threwInvalid && opened.length === 0);
+  ok('geçersiz id çökmeden no-op geçer', !threwInvalid && opened.length === 1);
 
   // Türkçe karakter/özel karakter sağlamlığı: fatiha (bölüm 6 sonunda watched,
   // "Fâtiha" — â). URL kur, geri çöz, gerçek fonksiyon çıktısıyla karşılaştır.

@@ -69,6 +69,7 @@ function req(overrides) {
     requestId: null, status: 'idle', requestedAt: null, notifiedAt: null,
     responseId: null, videoId: null, readyAt: null, startedWatchingAt: null,
     watchedAt: null, questionOpenedAt: null, updatedAt: null, videoHistory: []
+    ,notes:[],lastNoteAt:null
   };
   if (overrides) for (var k in overrides) base[k] = overrides[k];
   return base;
@@ -161,6 +162,21 @@ section('6. Video değiştirilir — her iki cihazın geçmişi de korunur');
   ok(hist.some(function (h) { return h.videoId === 'videoLOCALHIS'; }), 'yerel cihazın arşivi kaybolmaz');
   ok(hist.some(function (h) { return h.videoId === 'videoREMOTEHIS'; }), 'uzak cihazın arşivi kaybolmaz');
   ok(merged.requests.alak.videoId === 'videoCURRENT', 'güncel video değişmeden kalır');
+})();
+
+// ── 7b. Notlar — iki cihazdan union + aynı id için yeni sürüm ──────────────
+section('7b. Video notları iki cihazda birleşir, eski cihaz ezemez');
+(function () {
+  var oldNote = { id:'qn_same', kind:'watch', timestampSec:12, text:'eski metin', createdAt:T1, updatedAt:T1 };
+  var newNote = { id:'qn_same', kind:'listen', timestampSec:18, text:'güncellenmiş metin', createdAt:T1, updatedAt:T2 };
+  var remoteOnly = { id:'qn_remote', kind:'reflection', timestampSec:null, text:'uzak cihaz notu', createdAt:T2, updatedAt:T2 };
+  var localReq = req({ requestId:'qr_notes', status:'watching', videoId:'videoNOTES01', updatedAt:T2, notes:[oldNote] });
+  var remoteReq = req({ requestId:'qr_notes', status:'watching', videoId:'videoNOTES01', updatedAt:T2, notes:[newNote,remoteOnly], lastNoteAt:T2 });
+  var merged = S.mergeQuranJourney(journey({ alak:localReq }), journey({ alak:remoteReq })).requests.alak;
+  ok(merged.notes.length === 2, 'aynı id tekilleşir, farklı not korunur', merged.notes);
+  ok(merged.notes.some(function(n){ return n.id==='qn_same'&&n.text==='güncellenmiş metin'&&n.kind==='listen'; }), 'aynı notun daha yeni sürümü kazanır');
+  ok(merged.notes.some(function(n){ return n.id==='qn_remote'; }), 'diğer cihazın yeni notu union ile gelir');
+  ok(merged.lastNoteAt === T2, 'lastNoteAt en yeni damgayı taşır', merged.lastNoteAt);
 })();
 
 // ── 7. Offline istek sonra gönderilir ───────────────────────────────────────

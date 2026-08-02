@@ -463,6 +463,7 @@ function mergeZikr(localZ, remoteZ){
 // bkz. diğer *_S yardımcıları ve mergeZikr'in kendi kopyaladığı örüntü).
 var QURAN_RANK_S={idle:0,request_error:0,submitting:1,queued:2,notification_error:2,notified:3,awaiting_reply:4,validating_reply:5,invalid_reply:5,ready:6,video_unavailable:6,watching:7,watched:8,question_opened:9};
 var QURAN_HISTORY_MAX_S=20;
+var QURAN_NOTE_MAX_S=100;
 function quranRankS(s){ return (typeof s==='string'&&typeof QURAN_RANK_S[s]==='number')?QURAN_RANK_S[s]:0; }
 // videoHistory: iki cihazın ayrı ayrı archiveVideo ettiği kayıtları kaybetmeden
 // birleştirir. responseId+videoId+replacedAt üçlüsü pratik bir doğal anahtar
@@ -479,6 +480,17 @@ function mergeQuranVideoHistory(a,b){
   out.sort(function(x,y){ return String(x.replacedAt||'').localeCompare(String(y.replacedAt||'')); });
   if(out.length>QURAN_HISTORY_MAX_S) out=out.slice(-QURAN_HISTORY_MAX_S);
   return out;
+}
+function mergeQuranNotes(a,b){
+  var list=(Array.isArray(a)?a:[]).concat(Array.isArray(b)?b:[]), byId={};
+  list.forEach(function(n){
+    if(!n||typeof n!=='object'||!n.id||!n.text) return;
+    var key=String(n.id), prev=byId[key];
+    if(!prev||String(n.updatedAt||n.createdAt||'')>String(prev.updatedAt||prev.createdAt||'')) byId[key]=n;
+  });
+  var out=Object.keys(byId).map(function(k){ return byId[k]; });
+  out.sort(function(x,y){ return String(y.updatedAt||y.createdAt||'').localeCompare(String(x.updatedAt||x.createdAt||'')); });
+  return out.slice(0,QURAN_NOTE_MAX_S);
 }
 // Aynı sûrenin iki cihazdaki isteğini birleştirir. Kazanan taraf rütbeye göre
 // seçilir (durum ASLA geriye gitmez); rütbe eşitse (örn. iki cihaz da 'ready'
@@ -499,6 +511,8 @@ function mergeQuranRequest(localReq, remoteReq){
     if(!out[k]&&loser[k]) out[k]=loser[k];
   });
   out.videoHistory=mergeQuranVideoHistory(winner.videoHistory,loser.videoHistory);
+  out.notes=mergeQuranNotes(winner.notes,loser.notes);
+  out.lastNoteAt=(String(winner.lastNoteAt||'')>=String(loser.lastNoteAt||''))?(winner.lastNoteAt||loser.lastNoteAt||null):(loser.lastNoteAt||winner.lastNoteAt||null);
   return out;
 }
 function mergeQuranJourney(localQ, remoteQ){

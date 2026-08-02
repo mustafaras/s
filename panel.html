@@ -590,6 +590,11 @@ var QURAN_ROW_P={
 };
 function quranBadgeClassP(tone){ return tone==='wait'?'b-warn':tone==='ready'?'b-quranp':tone==='done'?'b-ok':tone==='warn'?'b-danger':'b-dim'; }
 function quranJourneyRootP(){ return (D&&D.quranJourney&&typeof D.quranJourney==='object')?D.quranJourney:null; }
+function quranNoteKindP(kind){ return kind==='listen'?'Dinlerken':kind==='reflection'?'Yansıma':'İzlerken'; }
+function quranNoteTimeP(sec){ var n=Number(sec); if(!isFinite(n)||n<0) return ''; n=Math.floor(n); return Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
+function quranNotesP(req){
+  return (req&&Array.isArray(req.notes)?req.notes:[]).filter(function(n){ return n&&typeof n==='object'&&String(n.text||'').trim(); }).slice().sort(function(a,b){ return String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')); });
+}
 // qrr_/qr_ + zaman tabanlı gövde: QuranTransportV1'in kimlik regex'ine
 // (8-64 alnum/_/-) rahatça uyar; çakışma riski günlük tek-operatör
 // kullanımında ihmal edilebilir (aynı kalıp app.js'in requestId üretiminde
@@ -731,10 +736,12 @@ function quranJourneyPanelCardHTML(){
   }
   var reqs=(q&&q.requests&&typeof q.requests==='object')?q.requests:{};
   var surahs=cat.surahs, total=surahs.length;
-  var stats={unrequested:0,waiting:0,ready:0,watched:0}, rows=[], lastActivity=null;
+  var stats={unrequested:0,waiting:0,ready:0,watched:0}, rows=[], deliveredRows=[], noteTotal=0, lastActivity=null;
   surahs.forEach(function(x){
     var req=reqs[x.id]||null, status=(req&&req.status)||'idle', bucket=QURAN_BUCKET_P[status]||'unrequested';
     stats[bucket]++;
+    var notes=quranNotesP(req); noteTotal+=notes.length;
+    if(req&&/^[A-Za-z0-9_-]{11}$/.test(String(req.videoId||''))) deliveredRows.push({x:x,req:req,status:status,notes:notes});
     if(bucket!=='unrequested'){
       rows.push({x:x,req:req,status:status});
       var u=req&&req.updatedAt; if(u&&(!lastActivity||u>lastActivity)) lastActivity=u;
@@ -748,7 +755,7 @@ function quranJourneyPanelCardHTML(){
   sum+='<div class="dstat"><div class="dv" style="color:var(--quranp2);">'+stats.ready+'</div><div class="dl">hazır</div></div>';
   sum+='<div class="dstat"><div class="dv" style="color:var(--green);">'+stats.watched+'</div><div class="dl">izlendi</div></div>';
   sum+='</div>';
-  sum+='<div style="font-size:var(--f1);color:var(--t3);margin-top:8px;text-align:right;font-weight:700;">'+total+' sûre · son etkinlik '+(lastActivity?esc(timeAgo(lastActivity)):'—')+'</div>';
+  sum+='<div style="font-size:var(--f1);color:var(--t3);margin-top:8px;text-align:right;font-weight:700;">'+total+' sûre · '+deliveredRows.length+' kullanıcıya gönderilen video · '+noteTotal+' not · son etkinlik '+(lastActivity?esc(timeAgo(lastActivity)):'—')+'</div>';
 
   var det='';
   var errs=quranDeliveryErrorsP();
@@ -765,7 +772,29 @@ function quranJourneyPanelCardHTML(){
     det+='</div>';
   }
 
-  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;">Açık istekler'+(rows.length?' · '+rows.length:'')+'</div>';
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin:14px 0 8px;display:flex;align-items:center;gap:7px;">'+icon('play',14)+' Kullanıcıya gönderilen videolar'+(deliveredRows.length?' · '+deliveredRows.length:'')+'</div>';
+  if(!deliveredRows.length){
+    det+='<div class="empty"><span class="ei">'+icon('play',20)+'</span>Henüz kullanıcıya gönderilmiş video yok</div>';
+  } else {
+    det+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    deliveredRows.forEach(function(r){
+      var rs=QURAN_ROW_P[r.status]||{tone:'idle',label:r.status}, last=r.notes[0];
+      det+='<div style="background:linear-gradient(135deg,var(--quranp-bg),var(--s2));border:1px solid rgba(91,135,196,.28);border-radius:12px;padding:11px 12px;">';
+      det+='<div style="display:flex;align-items:flex-start;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak · '+esc(r.req.videoId)+'</div></div><span class="badge '+quranBadgeClassP(rs.tone)+'">'+esc(rs.label)+'</span></div>';
+      det+='<div style="display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:8px;font-size:var(--f1);color:var(--t3);">';
+      det+='<span>Hazır: '+esc(tsShort(r.req.readyAt)||'—')+'</span><span>İzleme: '+esc(tsShort(r.req.startedWatchingAt)||'—')+'</span><span>Tamam: '+esc(tsShort(r.req.watchedAt)||'—')+'</span><span style="color:var(--quranp2);font-weight:800;">'+r.notes.length+' not</span></div>';
+      det+='<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><a href="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(r.req.videoId)+'" target="_blank" rel="noopener noreferrer" style="font-size:var(--f2);color:var(--quranp2);font-weight:800;text-decoration:none;">'+icon('external-link',12)+' Videoyu aç</a>'+(last?'<span style="font-size:var(--f1);color:var(--t3);">Son not: '+esc(quranNoteKindP(last.kind))+(last.timestampSec!==null&&last.timestampSec!==undefined?' · '+esc(quranNoteTimeP(last.timestampSec)):'')+'</span>':'<span style="font-size:var(--f1);color:var(--t4);">Not bekleniyor</span>')+'</div>';
+      if(r.notes.length){
+        det+='<div style="margin-top:8px;border-top:1px solid var(--bd2);padding-top:7px;display:flex;flex-direction:column;gap:5px;">';
+        r.notes.slice(0,5).forEach(function(n){ var oldVideo=n.videoId&&n.videoId!==r.req.videoId; det+='<div style="font-size:var(--f2);line-height:1.45;color:var(--t2);"><b style="color:var(--quranp2);">'+esc(quranNoteKindP(n.kind))+(n.timestampSec!==null&&n.timestampSec!==undefined?' · '+esc(quranNoteTimeP(n.timestampSec)):'')+(n.updatedAt?' · '+esc(tsShort(n.updatedAt)):'')+(oldVideo?' · eski anlatım':'')+'</b> '+esc(n.text)+(n.tag?' <span style="color:var(--t4);">#'+esc(n.tag)+'</span>':'')+'</div>'; });
+        if(r.notes.length>5) det+='<div style="font-size:var(--f1);color:var(--t4);">+'+(r.notes.length-5)+' eski not daha</div>';
+        det+='</div>';
+      }
+      det+='</div>';
+    });
+    det+='</div>';
+  }
+  det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin:16px 0 8px;">Açık istekler'+(rows.length?' · '+rows.length:'')+'</div>';
   if(!rows.length){
     det+='<div class="empty"><span class="ei">'+icon('book',20)+'</span>Henüz istek yok</div>';
   } else {

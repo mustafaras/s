@@ -249,6 +249,17 @@ console.log('[10] Zikir tefekkürleri — günlük ayrıntı + arşiv');
   ok('panel Zikirmatik aynası bu branchte görünür', /var ZIKR_V2_VISIBLE_P=true;/.test(html));
 })();
 
+// ── Test 11: Kur’an teslim videoları + kullanıcı notları aynası ────────────
+console.log('[11] Kur’an teslim videoları ve notlar — panel aynası');
+(function(){
+  ok('panel teslim edilen video sayısını hesaplıyor', /deliveredRows\.length/.test(html));
+  ok('panelde kullanıcıya gönderilen videolar başlığı var', /Kullanıcıya gönderilen videolar/.test(html));
+  ok('video durum zamanları (hazır/izleme/tamam) gösteriliyor', /r\.req\.readyAt/.test(html) && /r\.req\.startedWatchingAt/.test(html) && /r\.req\.watchedAt/.test(html));
+  ok('not türü ve video saniyesi panelde gösteriliyor', /function quranNoteKindP/.test(html) && /function quranNoteTimeP/.test(html) && /quranNoteKindP\(last\.kind\)/.test(html));
+  ok('not metni escape edilerek panelde gösteriliyor', /esc\(n\.text\)/.test(html));
+  ok('not sayısı ve son not panel özetine taşınıyor', /noteTotal/.test(html) && /Son not:/.test(html));
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) process.exit(1);

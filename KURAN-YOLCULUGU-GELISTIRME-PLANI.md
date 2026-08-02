@@ -1,11 +1,14 @@
 # Raşit ile Kur’an Yolculuğu — Ürün, İletişim ve Uygulama Planı
 
-> **Durum:** Planlandı; uygulama kodu yazılmadı.
+> **Durum:** QY-18 teslimat kapısı tamamlandı; QY-19 video/WhatsApp eylem
+> düzeltmesi, QY-20 koşulsuz WhatsApp eylemi ve QY-21 video not/panel aynası
+> 2026-08-02'de uygulandı
+> (commit/push/deploy edilmedi).
 > **Tarih:** 2026-07-30
 > **Hedef:** Kıble kartının altında, sûreleri nüzul sırasıyla sunan; kullanıcı
 > isteğini Raşit’e e-postayla ileten, e-posta yanıtındaki doğrulanmış YouTube
-> videosunu otomatik yayınlayan ve izleme sonrasında WhatsApp üzerinden soru
-> sormayı sağlayan kalıcı bir Kur’an yolculuğu.
+> videosunu otomatik yayınlayan ve video durumundan bağımsız WhatsApp üzerinden
+> soru sormayı sağlayan kalıcı bir Kur’an yolculuğu.
 
 ---
 
@@ -14,7 +17,8 @@
 1. Sûreler, Diyanet/TDV temelli yaygın **nüzul sırasına** göre sunulacak.
 2. Raşit’in e-posta yanıtındaki geçerli YouTube bağlantısı panel onayı
    beklemeden **doğrudan** ilgili sûreye bağlanacak.
-3. Video izlendiğinde **“Raşit’e sor”** eylemi açılacak.
+3. “Raşit’e sor” eylemi ayrıntı modalında her zaman görünecek ve her durumda
+   etkin olacak; görünürlüğü veya çalışması video izlenme durumuna bağlı değil.
 4. Bu eylem, önceden hazırlanmış sûre bağlamıyla şu WhatsApp numarasına
    yönlendirecek: `+90 506 602 00 98`.
 5. Katalogdaki bütün sûreler görülebilecek; sıra, keşfi düzenleyecek fakat
@@ -448,11 +452,9 @@ Kullanıcı açıkça “İzledim” demeden yalnız sayfanın açılması izlen
 
 ### Görünürlük
 
-Buton yalnız şu koşullardan biri gerçekleştiğinde açılır:
-
-- YouTube oynatıcı `ENDED` olayı verdi.
-- Kullanıcı `İzledim` eylemini onayladı.
-- Aynı sûre daha önce başka cihazda `watchedAt` kazanmış durumda.
+Buton ayrıntı modalında her durumda görünür ve etkindir. YouTube oynatıcının
+`ENDED` olayı, kullanıcının `İzledim` onayı veya başka cihazdaki `watchedAt`
+değeri bu eylemin açılmasını koşullamaz.
 
 ### Buton
 
@@ -476,9 +478,7 @@ https://wa.me/905066020098?text={encodeURIComponent(message)}
 
 ```text
 Selam Raşit, Kur’an Yolculuğu’nda {sûreAdı} Sûresi
-({nüzulNo}. durak) anlatımını izledim.
-
-Bu sûreyle ilgili sana şunu sormak istiyorum:
+({nüzulNo}. durak) hakkında sana şunu sormak istiyorum:
 ```
 
 Mesaj soru uydurmayacak. İmleç son satırda kalacak ve kullanıcı kendi sorusunu
@@ -597,7 +597,7 @@ göstermemeli.
 - Geçersiz gönderen veya token uygulamada video yayınlayamaz.
 - Yanıt otomasyonu ana kullanıcı veri dosyasını yazamaz.
 - Video hazır olduğunda uygulama yeniden kurulum gerektirmeden gösterir.
-- Video izlenmeden WhatsApp CTA’sı açılmaz.
+- WhatsApp CTA’sı video izlenme durumundan bağımsız açılır.
 - WhatsApp mesajı doğru sûre ve nüzul sıra bağlamıyla hazırlanır.
 - Uygulama WhatsApp mesajının gönderildiğine dair yanlış iddiada bulunmaz.
 - Yolculuk ilerlemesi cihazlar arasında geriye gitmez.
@@ -944,7 +944,7 @@ ROL
 Mobil deep-link ve güvenilir kullanıcı iletişimi mühendisisin.
 
 AMAÇ
-Video izlendiğinde açılan Raşit’e sor butonunu uygula.
+Sûre ayrıntı modalında her zaman çalışan Raşit’e sor butonunu uygula.
 
 SABİT HEDEF
 +90 506 602 00 98
@@ -952,13 +952,12 @@ wa.me E.164: 905066020098
 
 MESAJ
 Selam Raşit, Kur’an Yolculuğu’nda {sûreAdı} Sûresi
-({nüzulNo}. durak) anlatımını izledim.
-
-Bu sûreyle ilgili sana şunu sormak istiyorum:
+({nüzulNo}. durak) hakkında sana şunu sormak istiyorum:
 
 GEREKSİNİMLER
 - URL encodeURIComponent ile kurulsun.
-- Yalnız watched durumunda görünsün.
+- Ayrıntı modalında her durumda görünsün ve etkin olsun; video durumuna göre
+  `disabled` edilmesin.
 - target blank + noopener noreferrer.
 - WhatsApp uygulaması/web fallback.
 - Tıklamada questionOpenedAt yazılabilir.
@@ -1072,6 +1071,49 @@ YASAK
 
 ---
 
+## QY-19 — Kalıcı “Raşit’e sor” eylemi ve iframe oynatma koruması
+
+**Durum (2026-08-02): ✅ TAMAMLANDI — commit/push/deploy edilmedi.** Ayrıntı
+modalındaki WhatsApp eylemi artık istek eyleminin yanında her durumda görünür
+ve etkindir; video izlenme durumuna bağlı değildir. `quranJourneyQuestion()` ve izlenme
+durumu geçişleri yalnız `#quran-detail-status` ile
+`#quran-detail-action-region` bölgelerini hedefli boyar. Böylece çalışan
+YouTube iframe'i yeniden kurulmaz ve video konumu başa sarmaz.
+
+Zorunlu kanıtlar:
+
+- Hazır/istenmemiş/bekleyen durumlarda kalıcı etkin düğme ve WhatsApp SVG ikonu.
+- `watched → question_opened` geçişinde iframe nesnesi kimlik olarak aynı.
+- WhatsApp URL'si, target ve `noopener,noreferrer` sözleşmesi korunur.
+- 389px/dark/reduced-motion CSS düzeni ve cache `20260802b`; headless UI kapısı
+  216/216 güncel doğrulama ile geçti.
+
+---
+
+## QY-21 — Teslim edilen video çalışma notları ve panel aynası
+
+**Durum (2026-08-02): ✅ TAMAMLANDI — commit/push/deploy edilmedi.** Kullanıcı,
+kendisine gönderilen anlatım videosunu izlerken veya dinlerken not türü, video
+saniyesi, etiket ve serbest metin kaydedebilir. Notlar ilgili sûre/video
+kaydında tutulur; migration bilinmeyen alanları korur, sync iki cihazın notlarını
+ID üzerinden birleştirir ve daha yeni aynı not sürümünü seçer. ÆON paneli,
+kullanıcıya gönderilmiş geçerli videoları ayrı bir bölümde; hazır/izleme/tamam
+zamanlarını, video kimliğini, not sayısını ve son not özetlerini gösterir.
+
+Kabul kanıtları:
+
+- Not kaydı hedefli boyama ile yalnız not bölgesini günceller; çalışan iframe
+  nesnesi yeniden kurulmaz ve video başa sarmaz.
+- `watch`, `listen`, `reflection` not türleri; opsiyonel saniye ve etiket;
+  metin 2.000 karakter, kayıt 100 not ile sınırlıdır.
+- `sync.js` not union/dedupe/updatedAt merge kurallarıyla bayat cihazın notu
+  yeni cihazın notunu silemez.
+- Panelde geçerli `videoId` kayıtları “Kullanıcıya gönderilen videolar”
+  bölümünde görünür; not metinleri escape edilerek basılır.
+- Video ulaşmadan önce de ayrıntıda kilitli not alanı ve “Video hazır olduğunda açılır” açıklaması görünür; geçerli video geldiğinde form etkinleşir.
+- Headless UI 223/223, panel aynası 50/50 ve merge 38/38 geçti; migration
+  59/59 korunuyor.
+
 ## 18. Definition of Done
 
 Özellik ancak aşağıdakilerin tamamı gerçekleşince bitmiş sayılır:
@@ -1086,9 +1128,12 @@ YASAK
 - Geçersiz/spoof cevap video yayınlayamıyor.
 - YouTube embed güvenli ve click-to-load.
 - İzlenme açık olay veya kullanıcı onayıyla kaydoluyor.
-- “Raşit’e sor” yalnız izleme sonrası açılıyor.
+- “Raşit’e sor” her zaman görünür ve etkindir; WhatsApp deep-link’i video
+  izlenme durumuna bağlı değildir.
 - WhatsApp doğru numaraya, doğru sûre bağlamıyla yönleniyor.
 - Uygulama mesajın gönderildiğini yanlış biçimde iddia etmiyor.
 - Panel aynası ve hata denetimi hazır.
+- Kullanıcıya gönderilen videolar panelde açıkça listelenir; izlerken/dinlerken
+  alınan notlar iframe'i bozmadan kaydolur ve panelde takip edilir.
 - Migration ve çoklu cihaz merge testleri yeşil.
 - Ana kullanıcı veri dosyası e-posta otomasyonu tarafından hiç yazılmıyor.

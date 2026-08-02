@@ -149,7 +149,7 @@ console.log('\n3. Kısmi fixture (eksik alan tamamlama)');
       startedAt: TS,
       requests: {
         alak: { requestId: 'qr_ORNEK1', status: 'awaiting_reply', requestedAt: TS },
-        kalem: { requestId: 'qr_ORNEK2', status: 'ready', videoId: 'aaaaaaaaaaa', readyAt: TS, ozelAlan: 'yeni-cihazdan-geldi' },
+        kalem: { requestId: 'qr_ORNEK2', status: 'ready', videoId: 'aaaaaaaaaaa', readyAt: TS, ozelAlan: 'yeni-cihazdan-geldi', notes: [{ id: 'qn_eski', kind: 'listen', videoId: 'aaaaaaaaaaa', timestampSec: '12', tag: 'sabır', text: 'Eski kayıttan gelen not', createdAt: TS } , { id: '', text: 'ayıklanmalı' }] },
       },
     },
   });
@@ -165,6 +165,8 @@ console.log('\n3. Kısmi fixture (eksik alan tamamlama)');
      q.requests.alak.notifiedAt === null && q.requests.alak.watchedAt === null && q.requests.alak.questionOpenedAt === null);
   ok('eksik responseId/videoId null', q.requests.alak.responseId === null && q.requests.alak.videoId === null);
   ok('geçerli videoId korundu', q.requests.kalem.videoId === 'aaaaaaaaaaa');
+  ok('eski kayıttaki video notu normalize edilip korunur', q.requests.kalem.notes.length === 1 && q.requests.kalem.notes[0].videoId === 'aaaaaaaaaaa' && q.requests.kalem.notes[0].timestampSec === 12 && q.requests.kalem.notes[0].kind === 'listen');
+  ok('bozuk/kimliksiz not migration sırasında ayıklanır', q.requests.kalem.notes.every((n) => n.id && n.text));
   ok('BİLİNMEYEN alan korundu (ileri uyumluluk / cihaz merge)', q.requests.kalem.ozelAlan === 'yeni-cihazdan-geldi');
   ok('iki ayrı sûre isteği de duruyor', Object.keys(q.requests).sort().join(',') === 'alak,kalem');
 }

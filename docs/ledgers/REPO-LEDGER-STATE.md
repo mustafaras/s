@@ -27,6 +27,7 @@
 | REPO-L004 | 2026-08-02 | L2-b/B1 state helper read-only fixture | ready_for_review | REPO-L003 | Explicit dependency-bag VM’de 11 helper, unknown-field ve idempotence parity; 64/64; app boot/persistence/network yok | B2: sentetik migrate parity fixture; state.js/save entegrasyonu yok |
 | REPO-L005 | 2026-08-02 | L2-b/B2 synthetic migration parity | ready_for_review | REPO-L004 | Minimal/kısmi/zengin/bozuk sentetik boot ve ikinci geçiş projection parity; 32/32; fetch=0; runtime taşıması yok | Scratch dependency-bag adapter tasarımı; üretim state.js/save entegrasyonu yok |
 | REPO-L006 | 2026-08-02 | L2-b/B3 dependency-bag adapter scratch | ready_for_review | REPO-L005 | Frozen dependency bag + clone boundary + wrapper contract; 20/20; production graph/storage/network yok | Kullanıcı review; gerçek migrate adapter parity ve production state.js ayrı kapı |
+| REPO-L007 | 2026-08-02 | L2 review acceptance | completed | REPO-L002–L006 | Kullanıcı REPO-L002–L006 kanıtlarını kontrol ederek kabul etti; paired kabul kaydı eklendi | Kullanıcı açıkça başlatırsa `PANEL-003` / Prompt 01; production state.js/save hâlâ ayrı kapı |
 
 ## Aktif güvenli sınır
 
@@ -110,4 +111,16 @@ AND State ledger aynı sequence’i içeriyor
 AND dosya/link/hash kanıtı mevcut
 AND app/sync/panel/headless testleri geçiyor
 AND kullanıcı verisi ve dış yazma sınırı korunuyor
+```
+
+## Güncel kabul sınırı — REPO-L007
+
+```text
+active_phase: L2-REVIEW-ACCEPTANCE
+active_sequences: REPO-L007
+status: completed
+implementation_started: false
+external_write_authorized: false
+data_mutation_authorized: false
+next_safe_action: kullanıcı açıkça PANEL-003 / 01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md başlatırsa yalnız o promptu okumak ve uygulamak; production state.js/save entegrasyonunu başlatmamak
 ```

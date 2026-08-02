@@ -6,8 +6,60 @@
 "use strict";
 var KEY='seyma-reset-v1';
 var DEBOUNCE=4000;
+var RECEIPT_PATH='data/sync-receipt.json';
 var timer=null, lastPayload=null;
 var state={status:'idle', last:null, error:null};
+
+var SYNC_STATUS_TEXT={idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
+var SYNC_RECEIPT_STATUSES={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
+var SYNC_ERROR_CODES={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
+function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null}; }
+function safeReceiptString(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
+function safeReceiptIso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
+function normalizeSyncReceipt(r){
+  var out=emptySyncReceipt(), x=r&&typeof r==='object'?r:{};
+  out.status=SYNC_RECEIPT_STATUSES[x.status]?x.status:'idle';
+  out.snapshotRevision=safeReceiptString(x.snapshotRevision,128);
+  out.sourceUpdatedAt=safeReceiptIso(x.sourceUpdatedAt);
+  out.submittedAt=safeReceiptIso(x.submittedAt);
+  out.acceptedAt=safeReceiptIso(x.acceptedAt);
+  out.sourceLatestSha=safeReceiptString(x.sourceLatestSha,128);
+  out.lastErrorCode=SYNC_ERROR_CODES[x.lastErrorCode]?x.lastErrorCode:null;
+  return out;
+}
+function localReceipt(data,patch){
+  var out=normalizeSyncReceipt(data&&data.syncReceipt), p=patch||{};
+  Object.keys(p).forEach(function(k){ if(k in out) out[k]=p[k]; });
+  out=normalizeSyncReceipt(out);
+  if(data&&typeof data==='object') data.syncReceipt=out;
+  try{ if(data&&typeof data==='object') localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
+  try{ if(window.SeyOnSyncState) window.SeyOnSyncState(out); }catch(e){}
+  return out;
+}
+function errorCode(err){
+  if(err&&SYNC_ERROR_CODES[err.code]) return err.code;
+  var m=String((err&&err.message)||err||'').toLowerCase();
+  if(m.indexOf('anti-clobber')>=0||m.indexOf('veri kayb')>=0) return 'anti_clobber';
+  if(m.indexOf('offline')>=0||m.indexOf('network')>=0||m.indexOf('failed to fetch')>=0) return 'offline';
+  if(m.indexOf('401')>=0||m.indexOf('unauthorized')>=0) return 'unauthorized';
+  if(m.indexOf('403')>=0||m.indexOf('yetki')>=0||m.indexOf('forbidden')>=0) return 'forbidden';
+  if(m.indexOf('404')>=0||m.indexOf('not found')>=0) return 'not_found';
+  if(m.indexOf('409')>=0||m.indexOf('422')>=0||m.indexOf('conflict')>=0) return 'conflict';
+  if(m.indexOf('429')>=0||m.indexOf('rate')>=0) return 'rate_limited';
+  return 'unknown';
+}
+function failureStatus(code){
+  return (code==='unauthorized'||code==='forbidden'||code==='not_found')?'permission':(SYNC_RECEIPT_STATUSES[code]?code:'error');
+}
+function writeFailureReceipt(c,pending,code){
+  // latest.json'a dokunmadan yalnız whitelist metadata yazar; böylece
+  // anti-clobber/conflict panelde görünür, receipt hiçbir ham veri taşımaz.
+  if(!c||!pending||code==='receipt_failed') return Promise.resolve();
+  var receipt=normalizeSyncReceipt(pending);
+  receipt.status=failureStatus(code);
+  receipt.lastErrorCode=SYNC_ERROR_CODES[code]?code:'unknown';
+  return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).catch(function(){ return null; });
+}
 
 function settings(){
   if(lastPayload && lastPayload.settings) return lastPayload.settings;
@@ -53,12 +105,12 @@ function statusText(){
   var c=cfg();
   if(!c) return 'Bağlı değil';
   if(state.status==='saving') return 'Kaydediliyor…';
-  if(state.status==='ok') return 'Bağlantı aktif ✓ Son kayıt '+timeStr(state.last);
-  if(state.status==='error') return 'Hata: '+(state.error||'bilinmiyor');
+  if(state.status==='ok') return 'Uzak kayda alındı ✓ '+timeStr(state.last);
+  if(state.status==='error') return SYNC_STATUS_TEXT[state.error]||'Senkron hatası';
   return 'Bağlantı hazır';
 }
 function paint(){ var el=document.getElementById('sey-sync-status'); if(el) el.textContent=statusText(); }
-function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().toISOString(); state.error=null; if(window.SeyOnSynced){ try{ window.SeyOnSynced(); }catch(e){} } } if(s==='error') state.error=err||'bilinmiyor'; paint(); }
+function setStatus(s,err){ state.status=s; if(s==='ok'){ state.last=new Date().toISOString(); state.error=null; } if(s==='error') state.error=SYNC_ERROR_CODES[err]?err:'unknown'; paint(); }
 
 // unicode-safe base64 (büyük JSON için döngülü)
 function b64(str){ var bytes=new TextEncoder().encode(str); var bin=''; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
@@ -74,10 +126,10 @@ function ghPut(c, path, contentStr, attempt){
       var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
       return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)}); })
     .then(function(r){
-      if(r.ok) return;
+      if(r.ok) return r.json().catch(function(){ return {}; });
       return r.text().then(function(t){
         if((r.status===409||r.status===422) && attempt<3) return ghPut(c,path,contentStr,attempt+1);
-        throw new Error(r.status+' '+t.slice(0,160));
+        var e=new Error(r.status+' '+t.slice(0,160)); e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown'); throw e;
       });
     });
 }
@@ -107,8 +159,8 @@ function putLatestGuarded(c, latestStr, localData){
       var localDays=dayCount(localData);
       if(remoteDays>0 && localDays<remoteDays && !syncForced()){
         try{ console.error('[SeySync] ANTI-CLOBBER: yerel '+localDays+' gün < uzak '+remoteDays+' gün. Veri kaybını önlemek için push İPTAL edildi. Bilinçli üzerine yazmak için: localStorage.setItem("seyma-sync-force","1")'); }catch(e){}
-        setStatus('error','Güvenlik: '+localDays+'<'+remoteDays+' gün, push iptal');
-        throw new Error('anti-clobber: local '+localDays+' < remote '+remoteDays+' days');
+        setStatus('error','anti_clobber');
+        var ac=new Error('anti-clobber: local '+localDays+' < remote '+remoteDays+' days'); ac.code='anti_clobber'; throw ac;
       }
       // CONFLICT-SAFE SYNC: uzak latest.json varsa, yerel ile zaman damgasına göre
       // birleştir; bu sayede bayat/eksik bir cihaz açıldığında uzaktaki yeni veriler
@@ -134,22 +186,33 @@ function putLatestGuarded(c, latestStr, localData){
       var body={message:'sync: data/latest.json', content:b64(latestStr), branch:c.branch}; if(sha) body.sha=sha;
       var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
       return fetch(base,{method:'PUT',headers:H2,body:JSON.stringify(body)}).then(function(r){
-        if(r.ok) return;
-        return r.text().then(function(t){ throw new Error(r.status+' '+t.slice(0,160)); });
+        if(r.ok) return r.json().catch(function(){ return {}; });
+        return r.text().then(function(t){ var e=new Error(r.status+' '+t.slice(0,160)); e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown'); throw e; });
       });
     });
 }
-function pushWithCfg(c, data){
+function pushWithCfg(c, data, pendingReceipt){
   var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
   var latest=JSON.stringify(data,null,2);
   var nowIso=new Date().toISOString();
   var snap=JSON.stringify({app:'seyma',date:today,savedAt:nowIso,data:data},null,2);
+  var pending=normalizeSyncReceipt(pendingReceipt||data.syncReceipt);
+  if(!pending.sourceUpdatedAt) pending.sourceUpdatedAt=safeReceiptIso(data&&data.savedAt)||nowIso;
+  if(!pending.submittedAt) pending.submittedAt=nowIso;
   // Her push öncesinde zaman damgalı yedek: bir şey ters giderse geri dönülebilir.
   var backup=JSON.stringify({app:'seyma',type:'pre-push-backup',savedAt:nowIso,data:data},null,2);
   return ghPut(c,'data/backups/'+nowIso.replace(/[:.]/g,'-')+'.json',backup)
     .catch(function(){})
     .then(function(){ return putLatestGuarded(c,latest,data); })
-    .then(function(){ return ghPut(c,'data/gunluk/'+today+'.json',snap); });
+    .then(function(latestResult){
+      var receipt=normalizeSyncReceipt(pending);
+      receipt.status='accepted'; receipt.acceptedAt=new Date().toISOString(); receipt.lastErrorCode=null;
+      receipt.sourceLatestSha=safeReceiptString(latestResult&&latestResult.content&&latestResult.content.sha,128);
+      receipt.snapshotRevision=safeReceiptString((latestResult&&latestResult.commit&&latestResult.commit.sha)||(latestResult&&latestResult.content&&latestResult.content.sha),128);
+      if(!receipt.sourceLatestSha||!receipt.snapshotRevision){ var re=new Error('sync receipt missing revision'); re.code='receipt_failed'; throw re; }
+      return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).then(function(){ return receipt; });
+    })
+    .then(function(receipt){ return ghPut(c,'data/gunluk/'+today+'.json',snap).then(function(){ return receipt; }); });
 }
 
 // ── Faz 10: profileAssessment çakışma çözümü (conflict resolution) ──────────────
@@ -582,6 +645,7 @@ function mergeData(localData, remoteData){
 function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
   if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; delete c.settings.openaiKey; delete c.settings.auth; }
+  if(c&&typeof c==='object') c.syncReceipt=normalizeSyncReceipt(c.syncReceipt);
   if(c&&c.weather&&Array.isArray(c.weather.spots)){ c.weather.spots.forEach(function(sp){ if(sp&&typeof sp==="object") delete sp.emoji; }); }
   if(c&&c.library&&Array.isArray(c.library.books)){ c.library.books.forEach(function(b){ if(b&&typeof b==="object") delete b.emoji; }); }
   if(c&&c.watchlist&&Array.isArray(c.watchlist.items)){ c.watchlist.items.forEach(function(t){ if(t&&typeof t==="object") delete t.emoji; }); }
@@ -589,26 +653,33 @@ function sanitize(data){
   return c;
 }
 function doPush(data){
-  var c=cfg(); if(!c){ setStatus('idle'); return; }
+  var c=cfg(); if(!c){ setStatus('idle'); return Promise.resolve(null); }
   // GUARD 1 — yerel/geliştirme ortamından (localhost/file:) push etme. Bayat bir
   // localStorage durumu gerçek veriyi ezebilir (bkz. CLAUDE.md → Veri Güvenliği).
   if(devOrigin() && !syncForced()){
     setStatus('idle');
     try{ console.warn('[SeySync] Yerel ortam (localhost/file:) algılandı — push ENGELLENDİ (veri güvenliği). Bilinçli test için: localStorage.setItem("seyma-sync-force","1") veya ?forceSync=1'); }catch(e){}
-    return;
+    return Promise.resolve(null);
   }
+  var nowIso=new Date().toISOString(), current=normalizeSyncReceipt(data&&data.syncReceipt);
+  var pending=localReceipt(data,{status:'saving',sourceUpdatedAt:current.sourceUpdatedAt||safeReceiptIso(data&&data.savedAt)||nowIso,submittedAt:nowIso,lastErrorCode:null});
   setStatus('saving');
   var safe=sanitize(data);
-  pushWithCfg(c,safe)
-    .then(function(){ setStatus('ok'); })
+  return pushWithCfg(c,safe,pending)
+    .then(function(receipt){ localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt; })
     .catch(function(e){
       if(c.branch!=='main' && isMissingRefError(e)){
         var c2={token:c.token, owner:c.owner, repo:c.repo, branch:'main'};
-        return pushWithCfg(c2,safe).then(function(){ persistBranch('main'); setStatus('ok'); });
+        return pushWithCfg(c2,safe,pending).then(function(receipt){ persistBranch('main'); localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt; });
       }
       throw e;
     })
-    .catch(function(e){ setStatus('error', String((e&&e.message)||e)); });
+    .catch(function(e){
+      var code=errorCode(e), st=failureStatus(code);
+      return writeFailureReceipt(c,pending,code).then(function(){
+        localReceipt(data,{status:st,lastErrorCode:code}); setStatus('error',code); return null;
+      });
+    });
 }
 
 // ── QY-08: Kur’an Yolculuğu istek outbox'u ──────────────────────────────────
@@ -773,8 +844,8 @@ function pushProfileCompletionPing(){
 }
 
 window.SeySync={
-  schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } if(devOrigin() && !syncForced()){ setStatus('idle'); return; } clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
-  pushNow:function(){ clearTimeout(timer); if(lastPayload){ doPush(lastPayload); return; } try{ var raw=localStorage.getItem(KEY); if(raw) doPush(JSON.parse(raw)); }catch(e){} },
+  schedule:function(data){ lastPayload=data; if(!cfg()){ setStatus('idle'); return; } if(devOrigin() && !syncForced()){ setStatus('idle'); return; } localReceipt(data,{status:'queued',sourceUpdatedAt:normalizeSyncReceipt(data&&data.syncReceipt).sourceUpdatedAt||safeReceiptIso(data&&data.savedAt)||new Date().toISOString(),lastErrorCode:null}); clearTimeout(timer); setStatus('saving'); timer=setTimeout(function(){ doPush(lastPayload); }, DEBOUNCE); },
+  pushNow:function(){ clearTimeout(timer); if(lastPayload) return doPush(lastPayload); try{ var raw=localStorage.getItem(KEY); if(raw) return doPush(JSON.parse(raw)); }catch(e){} return Promise.resolve(null); },
   pushPing:pushPing,
   pushProfileCompletionPing:pushProfileCompletionPing,
   // QY-08 — Kur’an Yolculuğu istek outbox yazıcısı. latest.json zincirinden
@@ -784,6 +855,8 @@ window.SeySync={
   // yukarıdaki "QY-11" bloğunun yorumlarına bakın.
   pullQuranUpdates:pullQuranUpdates,
   statusText:statusText,
+  normalizeSyncReceipt:normalizeSyncReceipt,
+  syncErrorCode:errorCode,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,
   // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).
@@ -797,7 +870,7 @@ window.SeySync={
   mergeQuranRequest:mergeQuranRequest,
   // Faz 10 — offline reconnect: bağlantı geldiğinde bekleyen push'u tetikler.
   // Gerçek network çağrısı yapmaz; yalnızca schedule/pushNow'u çağırır.
-  retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }
+  retryIfPending:function(){ if(lastPayload && cfg() && !devOrigin()){ localReceipt(lastPayload,{status:'retrying',lastErrorCode:null}); clearTimeout(timer); timer=setTimeout(function(){ doPush(lastPayload); }, 500); } }
 };
 // Faz 10 — offline reconnect: bağlantı geri geldiğinde bekleyen senkronu tetikle.
 // Tarayıcı online/offline event'leri (mocklanabilir). push yine de Guard 1/2'den geçer.

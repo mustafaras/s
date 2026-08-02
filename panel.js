@@ -110,6 +110,7 @@ var qs=new URLSearchParams(location.search);
 var DEMO_MODE=qs.get("demo")==="1";
 var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
+var SYNC_RECEIPT_PATH="data/sync-receipt.json";
 var AEON_FILE_ACCEPT=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.csv,.zip,application/pdf";
 var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
@@ -117,6 +118,8 @@ var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların a�
 var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartında hangi sekmenin seçili kaldığını hatırlar
 var PTOKEN="";
 var D=null;
+var SYNC_RECEIPT=null;
+var PANEL_POLL_AT=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:""};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
@@ -331,6 +334,20 @@ function loadTransportFileP(path){
       if(!r.ok) throw new Error("transport "+r.status);
       return r.json().then(function(g){ return {raw:(g&&typeof g.content==="string")?b64dec(g.content):null,sha:(g&&g.sha)||null}; });
     });
+}
+function loadSyncReceiptP(){
+  return loadTransportFileP(SYNC_RECEIPT_PATH).then(function(x){
+    if(!x||!x.raw) return null;
+    try{ return normalizeSyncReceiptP(JSON.parse(x.raw)); }catch(e){ return null; }
+  }).catch(function(e){
+    var m=String(e&&e.message||e).toLowerCase(), code='network';
+    if(m.indexOf('401')>=0||m.indexOf('unauthorized')>=0) code='unauthorized';
+    else if(m.indexOf('403')>=0||m.indexOf('forbidden')>=0) code='forbidden';
+    else if(m.indexOf('404')>=0||m.indexOf('not found')>=0) code='not_found';
+    else if(m.indexOf('409')>=0||m.indexOf('422')>=0||m.indexOf('conflict')>=0) code='conflict';
+    else if(m.indexOf('429')>=0||m.indexOf('rate')>=0) code='rate_limited';
+    return normalizeSyncReceiptP({status:(code==='unauthorized'||code==='forbidden'||code==='not_found')?'permission':'error',lastErrorCode:code});
+  });
 }
 function putTransportFileP(path,value,sha){
   var T=window.QuranTransportV1;
@@ -913,6 +930,68 @@ function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i
 function currentStreak(){ var c=0,d=today(),paused=false; if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; paused=false; d=addDays(d,-1);} else if(isVacationDayP(d)){ paused=true; d=addDays(d,-1);} else break; } return c; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else if(isVacationDayP(d)){ /* pause: don't break or count */ } else c=0;}); return b; }
 function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
+var SYNC_STATUS_P={
+  accepted:{cls:'b-ok',label:'Uzak kayda alındı'},
+  local_saved:{cls:'b-dim',label:'Yerel kayıt var'},
+  queued:{cls:'b-warn',label:'Gönderilmek üzere bekliyor'},
+  saving:{cls:'b-warn',label:'Kaydediliyor'},
+  retrying:{cls:'b-warn',label:'Yeniden deneniyor'},
+  offline:{cls:'b-warn',label:'Çevrimdışı'},
+  permission:{cls:'b-danger',label:'Yetki gerekli'},
+  unauthorized:{cls:'b-danger',label:'Yetki gerekli'},
+  forbidden:{cls:'b-danger',label:'Yetki gerekli'},
+  not_found:{cls:'b-danger',label:'Repo veya dosya bulunamadı'},
+  conflict:{cls:'b-danger',label:'Çakışma durduruldu'},
+  anti_clobber:{cls:'b-danger',label:'Veri kaybını önlemek için durduruldu'},
+  network:{cls:'b-warn',label:'Ağ bekleniyor'},
+  rate_limited:{cls:'b-warn',label:'Sunucu sınırı; sonra yeniden denenecek'},
+  receipt_failed:{cls:'b-danger',label:'Uzak kabul makbuzu alınamadı'},
+  error:{cls:'b-danger',label:'Senkron hatası'},
+  missing:{cls:'b-warn',label:'Uzak kabul makbuzu yok'}
+};
+function normalizeSyncReceiptP(r){
+  var out={schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null};
+  var x=r&&typeof r==='object'?r:{};
+  var statuses={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
+  var errors={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
+  function str(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
+  function iso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
+  out.status=statuses[x.status]?x.status:'idle'; out.snapshotRevision=str(x.snapshotRevision,128); out.sourceUpdatedAt=iso(x.sourceUpdatedAt); out.submittedAt=iso(x.submittedAt); out.acceptedAt=iso(x.acceptedAt); out.sourceLatestSha=str(x.sourceLatestSha,128); out.lastErrorCode=errors[x.lastErrorCode]?x.lastErrorCode:null;
+  return out;
+}
+function syncStatusP(receipt){
+  var r=normalizeSyncReceiptP(receipt);
+  var code=r.lastErrorCode||r.status;
+  if(code&&code!=='accepted'&&SYNC_STATUS_P[code]){
+    var pending=SYNC_STATUS_P[code];
+    return {code:code,cls:pending.cls,label:pending.label};
+  }
+  if(!receipt||!r.acceptedAt||!r.sourceLatestSha) return {code:'missing',cls:SYNC_STATUS_P.missing.cls,label:SYNC_STATUS_P.missing.label};
+  if(code==='accepted') return {code:code,cls:SYNC_STATUS_P.accepted.cls,label:SYNC_STATUS_P.accepted.label};
+  var s=SYNC_STATUS_P[code]||SYNC_STATUS_P.error;
+  return {code:SYNC_STATUS_P[code]?code:'error',cls:s.cls,label:s.label};
+}
+function syncTimesP(receipt,pollAt){
+  var r=normalizeSyncReceiptP(receipt);
+  return {local:r.sourceUpdatedAt,remote:r.acceptedAt,projection:null,panelPoll:pollAt||null};
+}
+function syncTimeP(v){ return v?tsShort(v):'—'; }
+function syncFreshnessP(receipt,pollAt){
+  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt);
+  if(st.code!=='accepted') return {klass:st.code==='missing'?'warn':'danger',txt:st.label};
+  var age=Math.max(0,Math.round((Date.now()-new Date(r.acceptedAt).getTime())/60000));
+  if(age<=30) return {klass:'ok',txt:'Uzak kabul edildi · '+(pollAt?'panel çekildi':'panel çekimi bekleniyor')};
+  if(age<=180) return {klass:'warn',txt:'Uzak kabul edildi · hafif gecikmiş'};
+  if(age<=2160) return {klass:'warn',txt:'Uzak kabul eski'};
+  return {klass:'danger',txt:'Uzak kabul kritik derecede eski'};
+}
+function syncRibbonHTMLP(receipt,pollAt){
+  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt);
+  var rev=r.snapshotRevision?String(r.snapshotRevision).slice(0,12):'—';
+  var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
+  var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
+  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybını önlemek için push durduruldu.':'Kaynak, uzak kabul, projection ve panel çekimi ayrı zamanlar olarak izleniyor.')+'</div></section>';
+}
 function timeAgo(iso){
   if(!iso) return '';
   var t=new Date(iso).getTime(); if(isNaN(t)) return '';
@@ -2235,7 +2314,7 @@ function panelLabCardHTML(){
 }
 function render(){
   backfillSoulArchiveFromDaysP();
-  var all=allDays(), saved=lastSavedAt(), opened=lastOpenedAt(), fresh=freshness(saved, opened), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
+  var all=allDays(), saved=lastSavedAt(), opened=lastOpenedAt(), fresh=syncFreshnessP(SYNC_RECEIPT,PANEL_POLL_AT), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   if(!UI.month) UI.month=monthKey(selected);
   UI.selectedDate=selected;
   var srec=recOf(selected)||{};
@@ -2316,6 +2395,7 @@ function render(){
   h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son kayıt</span></div>';
   h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;">'+icon('rotate-ccw',15)+'</button><button class="btn" title="Çıkış" onclick="resetPanelToken()" style="display:flex;align-items:center;justify-content:center;">'+icon('lock',15)+'</button></div>';
   h+='</div></div>';
+  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT);
 
   // ── PAGE ────────────────────────────────────────────────────
   h+='<div class="page">';
@@ -3774,22 +3854,23 @@ function demoData(){
   return {version:2,startDate:start,lastOpenedDate:td,lastOpenedAt:new Date().toISOString(),days:days,notifications:[],settings:{nickname:"Demo Günışığı",lunaConnected:true,locationMode:"auto",caffeineMode:"standard",targetBed:"23:30"},luna:{qa:[{date:td,ts:td+"T10:00:00+03:00",question:"Bugün enerjin nasıl?",answer:"Sakin ve dengeli görünüyor; ritmini koru."}]},aeon:{qa:[{id:"demo-aeon",date:td,ts:td+"T11:00:00+03:00",question:"Bugünkü verilerimde öne çıkan ne?",answer:"Uyku, su ve yürüyüş birlikte güçlü bir temel oluşturmuş.",answeredAt:td+"T11:02:00+03:00"}]},cycle:{periods:[{start:addDays(td,-18),end:addDays(td,-14)}],avgCycle:28,avgPeriod:5},weather:{fetchedAt:new Date().toISOString(),spots:[{key:"ev",label:"Ev",place:"Demo",iconName:"house",code:1,isDay:true,temp:24,feels:24,hum:46,wind:8,uv:3,hi:26,lo:15}]},library:{goal:{dailyPages:20,yearlyBooks:12},books:[{id:"b1",title:"Kendine Ait Bir Oda",author:"Virginia Woolf",genre:"Deneme",totalPages:160,currentPage:72,status:"reading",rating:5,quotes:[{id:"q1",text:"Kendine ait bir alan, düşünceye nefes verir.",page:36,ts:td+"T20:00:00+03:00"}],createdAt:start+"T10:00:00+03:00"}]},watchlist:{goal:{dailyMinutes:40,yearlyTitles:24},items:[{id:"w1",title:"Demo Belgesel",kind:"film",genre:"Belgesel",status:"finished",watchedEp:1,totalEp:null,rating:4,quotes:[],finishedAt:addDays(td,-2)+"T21:00:00+03:00",createdAt:start+"T10:00:00+03:00"}]},music:{goal:{dailyMinutes:30,yearlyTitles:null},items:[{id:"m1",title:"Demo Çalma Listesi",artist:"Günışığı",kind:"album",genre:"Sakin",rating:5,quotes:[],createdAt:start+"T10:00:00+03:00"}]},body:{heightCm:165,heightSetAt:start+"T09:00:00+03:00",weights:Array.from({length:10},function(_,i){return {ts:addDays(start,i)+"T08:00:00+03:00",kg:68.4-i*.12};})},labResults:[],motivation:{currentProgramDay:3,stats:{pathStreak:2,bestPathStreak:2,courageEvidence:1,returnCount:0,completedTotal:2,minimumTotal:1},history:{demo1:{date:addDays(td,-1),programDay:2,phaseCode:"F1",domain:"destek",status:"minimum_completed",reflection:"Küçük sürümü yapmak devam etmemi sağladı.",quote:"Küçük adım da yoldur.",minimumTask:"Bir kişiye kısa bir mesaj gönder.",successMeaning:"Bağ kurmayı seçtin."}}}};
 }
 function load(){
-  if(DEMO_MODE){ D=demoData(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D); }
+  if(DEMO_MODE){ D=demoData(); SYNC_RECEIPT=normalizeSyncReceiptP({status:'accepted',snapshotRevision:'d'.repeat(40),sourceUpdatedAt:new Date(Date.now()-30000).toISOString(),submittedAt:new Date(Date.now()-25000).toISOString(),acceptedAt:new Date(Date.now()-10000).toISOString(),sourceLatestSha:'e'.repeat(40)}); PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D); }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
     .then(function(j){
-      D=j; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
+      D=j; PANEL_POLL_AT=new Date().toISOString(); SYNC_RECEIPT=null; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      Promise.all([loadInbox(), loadDeliveryP()]).then(function(res){
+      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP()]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
+        SYNC_RECEIPT=res[2]||null;
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
         if(sig!==null && sig===LASTSIG) return;
         LASTSIG=sig; render();
-      }).catch(function(){ render(); });
+      }).catch(function(){ SYNC_RECEIPT=null; render(); });
     })
     .catch(function(e){
       var m=String(e&&e.message||e);
@@ -3801,7 +3882,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

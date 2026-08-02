@@ -152,6 +152,9 @@ test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  Run: `node test_faz10_sync.js`.
 test_faz11_panel.js  Headless Node harness for panel.html helper/render
                  logic. Run: `node test_faz11_panel.js`.
+test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
+                 anti-clobber and panel time/status projection. Run:
+                 `node test_panel_p0_sync.js`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network.

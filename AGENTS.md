@@ -131,6 +131,10 @@ sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
                  Also owns conflict-merge helpers (e.g.
                  `SeySync.mergeProfileAssessment`).
+panelCoverageManifest.js  Pure P1 coverage/redaction adapter. Defines the
+                 manifest and builds/parses `data/observer-snapshot.json`;
+                 no network, DOM, localStorage or raw secret/GPS/profile/media
+                 output.
 panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  Independent app — does NOT share code with app.js. Fetches
                  data/latest.json from GitHub with its own token/localStorage
@@ -178,6 +182,16 @@ test_faz11_panel.js  Headless Node harness for panel.html helper/render
 test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
                  anti-clobber and panel time/status projection. Run:
                  `node test_panel_p0_sync.js`.
+test_panel_p1_projection.js Headless Node fixture for PANEL-02 coverage,
+                 redaction, stale projection and legacy fallback. Run:
+                 `node test_panel_p1_projection.js`.
+test_panel_p3_root_modules.js Headless Node fixture for PANEL-03 root-module
+                 projection/render, stale/missing/broken states, Saygı mismatch,
+                 settings summary, privacy and no-mutation boundary. Run:
+                 `node test_panel_p3_root_modules.js`.
+test_panel_p4_provenance.js Headless Node fixture for PANEL-04 therapy
+                 redaction, profile progress, notification lifecycle and
+                 external fetch provenance. Run: `node test_panel_p4_provenance.js`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network. Run from repo root.
@@ -308,6 +322,9 @@ node --check sync.js
 node test_faz10_sync.js   # sync.js conflict-merge harness (mocked fetch)
 node test_faz11_panel.js  # panel.html helper/render harness
 node test_panel_p0_sync.js # PANEL-01 receipt/revision + anti-clobber fixture
+node test_panel_p1_projection.js # PANEL-02 coverage/redaction/projection fixture
+node test_panel_p3_root_modules.js # PANEL-03 root modules/privacy/mismatch fixture
+node test_panel_p4_provenance.js # PANEL-04 therapy/notification/provenance fixture
 node test_quran_catalog.js # quranRevelationOrderV1.js katalog doğrulaması
 node test_quran_transport.js # quranTransportV1.js taşıma sözleşmeleri
 node .claude/skills/run-seyma/verify-state-helper-boundary.mjs

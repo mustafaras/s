@@ -10,6 +10,7 @@ var path = require('path');
 var vm = require('vm');
 
 var syncSource = fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8');
+var coverageSource = fs.readFileSync(path.join(__dirname, 'panelCoverageManifest.js'), 'utf8');
 var panelSource = fs.readFileSync(path.join(__dirname, 'panel.js'), 'utf8');
 var KEY = 'seyma-reset-v1';
 var HASH_A = 'a'.repeat(40);
@@ -77,6 +78,7 @@ function makeContext(seed, remoteDays, latestSha, revision){
       return Promise.resolve(response(200,{content:{sha:latestSha},commit:{sha:revision}}));
     }
     if(pathPart==='data/sync-receipt.json') return Promise.resolve(method==='GET'?response(404):response(200,{}));
+    if(pathPart==='data/observer-snapshot.json') return Promise.resolve(method==='GET'?response(404):response(200,{}));
     if(pathPart.indexOf('data/gunluk/')===0) return Promise.resolve(method==='GET'?response(404):response(200,{}));
     return Promise.resolve(response(404));
   };
@@ -112,6 +114,7 @@ function makeContext(seed, remoteDays, latestSha, revision){
     btoa:function(value){ return Buffer.from(String(value),'binary').toString('base64'); },
     Buffer:Buffer
   };
+  vm.runInNewContext(coverageSource,context,{filename:'panelCoverageManifest.js'});
   vm.runInNewContext(syncSource,context,{filename:'sync.js'});
   return {context:context,storage:storage,calls:calls,stateReceipts:stateReceipts,acceptedReceipts:acceptedReceipts};
 }
@@ -145,6 +148,9 @@ await (async function(){
   ok('receipt token içermez',receiptJson&&!receiptJson.includes('secret-token'));
   ok('receipt raw kullanıcı metni içermez',receiptJson&&!receiptJson.includes('sadece yerel kullanıcı metni'));
   ok('latest payload token’ı ve openai anahtarını taşımıyor',latestPut&&!JSON.stringify(decodedBody(latestPut)).includes('secret-token')&&!JSON.stringify(decodedBody(latestPut)).includes('raw-openai-key'));
+  var projectionPut=callOf(run,'data/observer-snapshot.json','PUT');
+  ok('observer projection ayrı dosyaya yazılır',!!projectionPut);
+  ok('observer projection da token taşımaz',projectionPut&&!JSON.stringify(decodedBody(projectionPut)).includes('secret-token')&&!JSON.stringify(decodedBody(projectionPut)).includes('raw-openai-key'));
 })();
 
 console.log('[2] Anti-clobber — veri kaybı riski insan diline çevrilir');

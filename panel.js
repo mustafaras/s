@@ -111,6 +111,7 @@ var DEMO_MODE=qs.get("demo")==="1";
 var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
 var SYNC_RECEIPT_PATH="data/sync-receipt.json";
+var OBSERVER_PROJECTION_PATH="data/observer-snapshot.json";
 var AEON_FILE_ACCEPT=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.csv,.zip,application/pdf";
 var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
@@ -119,6 +120,9 @@ var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartı
 var PTOKEN="";
 var D=null;
 var SYNC_RECEIPT=null;
+var OBSERVER_PROJECTION=null;
+var PROJECTION_STATE={source:'none',reason:'not_loaded',snapshot:null,data:null,coverage:null};
+var PROJECTION_SECTIONS={};
 var PANEL_POLL_AT=null;
 var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:""};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
@@ -347,6 +351,21 @@ function loadSyncReceiptP(){
     else if(m.indexOf('409')>=0||m.indexOf('422')>=0||m.indexOf('conflict')>=0) code='conflict';
     else if(m.indexOf('429')>=0||m.indexOf('rate')>=0) code='rate_limited';
     return normalizeSyncReceiptP({status:(code==='unauthorized'||code==='forbidden'||code==='not_found')?'permission':'error',lastErrorCode:code});
+  });
+}
+function loadObserverProjectionP(){
+  return loadTransportFileP(OBSERVER_PROJECTION_PATH).then(function(x){
+    if(!x||!x.raw) return {snapshot:null,sha:null,reason:'projection_missing'};
+    var P=window.PanelCoverageV1;
+    if(!P||typeof P.parseObserverSnapshot!=='function') return {snapshot:null,sha:x.sha||null,reason:'projection_unavailable'};
+    var parsed=P.parseObserverSnapshot(x.raw);
+    return parsed&&parsed.ok?{snapshot:parsed.value,sha:x.sha||null,reason:'ready'}:{snapshot:null,sha:x.sha||null,reason:(parsed&&parsed.code)||'projection_invalid'};
+  }).catch(function(e){
+    var m=String(e&&e.message||e).toLowerCase(), code='projection_network';
+    if(m.indexOf('401')>=0||m.indexOf('unauthorized')>=0) code='projection_permission';
+    else if(m.indexOf('403')>=0||m.indexOf('forbidden')>=0) code='projection_permission';
+    else if(m.indexOf('404')>=0||m.indexOf('not found')>=0) code='projection_missing';
+    return {snapshot:null,sha:null,reason:code};
   });
 }
 function putTransportFileP(path,value,sha){
@@ -929,7 +948,7 @@ function allDays(){ var out=[],n=Math.max(1,diff(D.startDate,spanEnd())+1); if(n
 function windowDays(n,endDate){ var out=[],end=endDate||today(); for(var i=n-1;i>=0;i--) out.push(addDays(end,-i)); return out; }
 function currentStreak(){ var c=0,d=today(),paused=false; if(cnt(recOf(d))<4) d=addDays(d,-1); while(diff(D.startDate,d)>=0){ if(cnt(recOf(d))>=4){ c++; paused=false; d=addDays(d,-1);} else if(isVacationDayP(d)){ paused=true; d=addDays(d,-1);} else break; } return c; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(cnt(recOf(d))>=4){ c++; if(c>b)b=c; } else if(isVacationDayP(d)){ /* pause: don't break or count */ } else c=0;}); return b; }
-function lastSavedAt(){ var b=null; for(var k in D.days){ var s=D.days[k]&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
+function lastSavedAt(){ var b=D&&typeof D.savedAt==='string'&&D.savedAt||null; for(var k in (D&&D.days||{})){ var s=D.days[k]&&typeof D.days[k].savedAt==='string'&&D.days[k].savedAt; if(s&&(!b||s>b)) b=s; } return b; }
 var SYNC_STATUS_P={
   accepted:{cls:'b-ok',label:'Uzak kayda alındı'},
   local_saved:{cls:'b-dim',label:'Yerel kayıt var'},
@@ -943,6 +962,8 @@ var SYNC_STATUS_P={
   not_found:{cls:'b-danger',label:'Repo veya dosya bulunamadı'},
   conflict:{cls:'b-danger',label:'Çakışma durduruldu'},
   anti_clobber:{cls:'b-danger',label:'Veri kaybını önlemek için durduruldu'},
+  projection_failed:{cls:'b-danger',label:'Observer projection oluşturulamadı'},
+  projection_invalid:{cls:'b-danger',label:'Observer projection bozuk'},
   network:{cls:'b-warn',label:'Ağ bekleniyor'},
   rate_limited:{cls:'b-warn',label:'Sunucu sınırı; sonra yeniden denenecek'},
   receipt_failed:{cls:'b-danger',label:'Uzak kabul makbuzu alınamadı'},
@@ -971,9 +992,10 @@ function syncStatusP(receipt){
   var s=SYNC_STATUS_P[code]||SYNC_STATUS_P.error;
   return {code:SYNC_STATUS_P[code]?code:'error',cls:s.cls,label:s.label};
 }
-function syncTimesP(receipt,pollAt){
+function syncTimesP(receipt,pollAt,projectionState){
   var r=normalizeSyncReceiptP(receipt);
-  return {local:r.sourceUpdatedAt,remote:r.acceptedAt,projection:null,panelPoll:pollAt||null};
+  var p=projectionState&&projectionState.snapshot?projectionState.snapshot:null;
+  return {local:r.sourceUpdatedAt,remote:r.acceptedAt,projection:p&&p.projectionBuiltAt||null,panelPoll:pollAt||null};
 }
 function syncTimeP(v){ return v?tsShort(v):'—'; }
 function syncFreshnessP(receipt,pollAt){
@@ -985,12 +1007,82 @@ function syncFreshnessP(receipt,pollAt){
   if(age<=2160) return {klass:'warn',txt:'Uzak kabul eski'};
   return {klass:'danger',txt:'Uzak kabul kritik derecede eski'};
 }
-function syncRibbonHTMLP(receipt,pollAt){
-  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt);
+function syncRibbonHTMLP(receipt,pollAt,projectionState){
+  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt,projectionState);
   var rev=r.snapshotRevision?String(r.snapshotRevision).slice(0,12):'—';
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
-  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybını önlemek için push durduruldu.':'Kaynak, uzak kabul, projection ve panel çekimi ayrı zamanlar olarak izleniyor.')+'</div></section>';
+  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybını önlemek için push durduruldu.':st.code==='projection_failed'?'Uzak kayıt alınmış olabilir; observer projection oluşmadığı için panel bunu tam başarı saymıyor.':'Kaynak, uzak kabul, projection ve panel çekimi ayrı zamanlar olarak izleniyor.')+'</div></section>';
+}
+function projectionStatusP(state){
+  var s=state&&state.source||'none', reason=state&&state.reason||'projection_missing';
+  if(s==='projection') return {cls:'b-ok',label:'Projection hazır',note:'Panel güvenli observer read-modelini kullanıyor.'};
+  if(reason==='projection_stale') return {cls:'b-warn',label:'Projection eski',note:'Revision/SHA eşleşmedi; güvenli legacy fallback kullanılıyor.'};
+  if(reason==='projection_invalid'||reason==='projection_parse_failed') return {cls:'b-danger',label:'Projection bozuk',note:'Projection okunamadı; panel güvenli legacy fallback ile açık kaldı.'};
+  if(reason==='receipt_missing') return {cls:'b-warn',label:'Receipt bekleniyor',note:'Uzak kabul receipt’i olmadan projection başarıya yükseltilmedi.'};
+  if(reason==='projection_permission'||reason==='projection_network') return {cls:'b-warn',label:'Projection okunamadı',note:'Projection çekilemedi; panel güvenli legacy fallback ile açık kaldı.'};
+  return {cls:'b-dim',label:'Projection yok',note:'Eski latest.json güvenli redaction fallback olarak kullanılıyor.'};
+}
+function coverageRibbonHTMLP(state){
+  var st=projectionStatusP(state), c=state&&state.coverage||{}, full=Array.isArray(c.full)?c.full.length:0, summary=Array.isArray(c.summary)?c.summary.length:0, redacted=Array.isArray(c.redacted)?c.redacted.length:0, missing=Array.isArray(c.missing)?c.missing.length:0;
+  var cells=[['Tam',full],['Özet',summary],['Redacted',redacted],['Eksik',missing]].map(function(x){ return '<div class="coverage-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(String(x[1]))+'</b></div>'; }).join('');
+  return '<section class="coverage-ribbon" aria-label="Observer coverage özeti"><div class="coverage-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="coverage-ribbon-manifest">manifest · v1</span></div><div class="coverage-ribbon-grid">'+cells+'</div><div class="coverage-ribbon-note">'+esc(st.note)+'</div></section>';
+}
+function p3BadgeP(text,kind){ return '<span class="p3-badge '+(kind||'source')+'">'+esc(text)+'</span>'; }
+function p3TimeP(v){ return v?esc(String(v).slice(0,16).replace('T',' ')):'—'; }
+function p3StatusP(status){ var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']}; var x=m[status]||['Bekleniyor','b-dim']; return '<span class="badge '+x[1]+'">'+esc(x[0])+'</span>'; }
+function p3SettingsSummaryP(settings){
+  var t=settings&&settings.tracked||{}, labels={locationEnabled:'Konum',locationMode:'Konum modu',caffeineMode:'Kafein modu',targetBed:'Hedef uyku',hideLocationCard:'Konum kartı',hideRepoBanner:'Repo bandı',profileAssessmentInactive:'Profil pasif',aeonNotifyPermission:'ÆON bildirim',prayerMethod:'Namaz yöntemi',prayerRemindersEnabled:'Namaz hatırlatıcı',magnesiumEnabled:'Magnezyum'};
+  var keys=Object.keys(labels), out=[];
+  keys.forEach(function(k){ if(t[k]===null||t[k]===undefined) return; var v=typeof t[k]==='boolean'?(t[k]?'açık':'kapalı'):String(t[k]); out.push('<span><small>'+esc(labels[k])+'</small><b>'+esc(v)+'</b></span>'); });
+  return out.length?'<div class="p3-settings-grid">'+out.join('')+'</div>':'<div class="p3-muted">İzinli ayar özeti yok.</div>';
+}
+function rootModulesCardHTMLP(){
+  var s=PROJECTION_SECTIONS||{}, photo=s.dailyPhoto||{status:'missing'}, room=s.roomContentHistory||{status:'missing',records:[]}, sg=s.saygiRoot||{status:'missing',collectionCount:0}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{}, life=s.lifecycle||{};
+  var h='<div class="card lift span-12 pad p3-root-card" style="order:6;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('layers',14)+' Eksik Kök Modüller <span style="margin-left:auto;">'+p3BadgeP('canonical projection','source')+'</span></div>';
+  h+='<div class="p3-grid">';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Günün fotoğrafı</b>'+p3StatusP(photo.status)+'</div><div class="p3-source-row">'+p3BadgeP(photo.sourcePath||'data.dailyPhoto','source')+p3BadgeP(photo.privacy||'public metadata','privacy')+'</div>';
+  if(photo.title) h+='<div class="p3-value">'+esc(photo.title)+'</div>';
+  if(photo.artist) h+='<div class="p3-muted">'+esc(photo.artist)+'</div>';
+  h+='<div class="p3-kv"><span>Lisans</span><b>'+esc(photo.license||'—')+'</b></div><div class="p3-kv"><span>Kaynak</span><b>'+esc(photo.source||'—')+'</b></div><div class="p3-kv"><span>Fetched</span><b>'+p3TimeP(photo.fetchedAt)+'</b></div>';
+  if(photo.ready&&photo.pageUrl) h+='<a class="p3-link" href="'+esc(photo.pageUrl)+'" target="_blank" rel="noopener noreferrer">Kaynak sayfası →</a>';
+  else h+='<div class="p3-warning">Hazır değil — lisans ve kaynak birlikte doğrulanmadı.</div>';
+  if(photo.error) h+='<div class="p3-warning">'+esc(photo.error)+'</div>';
+  h+='</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi Odası geçmişi</b>'+p3StatusP(room.status)+'</div><div class="p3-source-row">'+p3BadgeP(room.sourcePath||'data.roomContentHistory','source')+p3BadgeP(room.privacy||'public metadata','privacy')+'</div><div class="p3-value">'+esc(String(room.count||0))+' gösterim · '+esc(String(room.invalidCount||0))+' bozuk</div>';
+  (Array.isArray(room.records)?room.records.slice(0,4):[]).forEach(function(x){ h+='<div class="p3-history-row"><span>'+esc(x.day||'—')+' · '+esc(x.type||'öğe')+'</span><b>'+esc(x.title||'—')+'</b><small>'+esc(x.source||'kaynak yok')+' · '+p3TimeP(x.shownAt)+'</small></div>'; });
+  if(!room.records||!room.records.length) h+='<div class="p3-muted">Gösterim kaydı yok.</div>';
+  h+='</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Saygı root · günlük kanıt</b>'+p3StatusP(sg.status)+'</div><div class="p3-source-row">'+p3BadgeP('root: data.saygi','source')+p3BadgeP('daily: days.*.saygi','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(sg.collectionCount||0))+'</b><span>koleksiyon · root seri <b>'+esc(String(sg.rootStreak||0))+'</b></span></div><div class="p3-kv"><span>Root lastReadDate</span><b>'+esc(sg.rootLastReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily son kanıt</span><b>'+esc(sg.dailyLatestReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily türetilen seri</span><b>'+esc(String(sg.dailyDerivedStreak||0))+'</b></div>';
+  if(sg.mismatch) h+='<div class="p3-warning">⚠ Root ve günlük read kanıtı uyuşmuyor: '+esc((sg.mismatchReasons||[]).join(', '))+'</div>';
+  h+='</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum nudge audit</b>'+p3StatusP(nud.status)+'</div><div class="p3-source-row">'+p3BadgeP(nud.sourcePath||'data.locNudge','source')+p3BadgeP(nud.privacy||'behavior summary','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(nud.shownCount||0))+'</b><span>gösterim · <b>'+esc(String(nud.dismissCount||0))+'</b> dismiss</span></div><div class="p3-kv"><span>Erteleme bitişi</span><b>'+p3TimeP(nud.snoozeUntil)+'</b></div><div class="p3-kv"><span>Türetilmiş backoff</span><b>'+esc(String(nud.derivedBackoffHours||0))+' saat</b></div><div class="p3-kv"><span>Opt-out</span><b>'+esc(nud.optOutDay||(!nud.optedOut?'yok':'aktif'))+'</b></div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum zaman ayrımı</b>'+p3StatusP(lt.status||((lt.sampleTs||lt.processedTs)?'ok':'missing'))+'</div><div class="p3-source-row">'+p3BadgeP('GPS track redacted','privacy')+p3BadgeP('timestamp-only','source')+'</div><div class="p3-kv"><span>Örnek</span><b>'+p3TimeP(lt.sampleTs)+'</b></div><div class="p3-kv"><span>İşlendi</span><b>'+p3TimeP(lt.processedTs)+'</b></div><div class="p3-kv"><span>Uzak kabul</span><b>'+p3TimeP(lt.syncAcceptedAt)+'</b></div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Yaşam döngüsü · ayarlar</b>'+p3StatusP(life.rootSavedAt||life.lastOpenedDate?'ok':'missing')+'</div><div class="p3-source-row">'+p3BadgeP(life.sourcePath||'root metadata','source')+p3BadgeP('per-key audit yok','privacy')+'</div><div class="p3-kv"><span>Son açılan gün</span><b>'+esc(life.lastOpenedDate||'—')+'</b></div><div class="p3-kv"><span>Root savedAt</span><b>'+p3TimeP(life.rootSavedAt)+'</b></div><div class="p3-kv"><span>Ayar source zaman</span><b>'+p3TimeP(life.settings&&life.settings.changedAt)+'</b></div>'+p3SettingsSummaryP(life.settings)+'<div class="p3-muted">Ayar alanları projection’da izinli özet; tek tek değişiklik geçmişi kaynakta tutulmuyor.</div></div>';
+  h+='</div><div class="p3-footnote">Kaynak değerleri ile türetilmiş durumlar ayrı tutulur; panel render’ı backfill yapmaz.</div></div>';
+  return h;
+}
+function p4StageTextP(e){
+  if(!e) return '';
+  return esc(e.name||'event')+' · '+p3TimeP(e.at);
+}
+function p4ProvenanceCardHTMLP(){
+  var s=PROJECTION_SECTIONS||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}}, pp=s.profileProgress||{status:'missing'}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, ex=s.externalSources||{status:'missing',items:[]};
+  var tc=th.consent||{}, dc=th.decision||{}, sh=th.share||{}, wd=th.windDown||{}, counts=nt.counts||{};
+  var h='<div class="card lift span-12 pad p4-audit-card" style="order:7;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('shield-check',14)+' Terapi · Bildirim · Provenance <span style="margin-left:auto;">'+p3BadgeP('metadata-first projection','source')+'</span></div><div class="p3-grid">';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi araçları</b>'+p3StatusP(th.status)+'</div><div class="p3-source-row">'+p3BadgeP(th.sourcePath||'data.days.*.therapy','source')+p3BadgeP(th.privacy||'sensitive redacted','privacy')+p3BadgeP('provenance: '+(th.provenance||'redacted'),'source')+'</div><div class="p3-kpi-line"><b>'+esc(String(th.thoughtCount||0))+'</b><span>düşünce · metin <b>redacted</b></span></div>';
+  (Array.isArray(th.thoughts)?th.thoughts.slice(0,3):[]).forEach(function(x){ h+='<div class="p3-history-row"><span>Düşünce #'+esc(String(x.index||'—'))+' · '+esc(x.summary||'Metin redacted')+'</span><small>'+p3TimeP(x.createdAt)+' · '+esc(x.provenance||'redacted')+'</small></div>'; });
+  h+='<div class="p3-kv"><span>Karar</span><b>'+esc(dc.choice||'—')+' · '+p3TimeP(dc.completedAt)+'</b></div><div class="p3-kv"><span>Karar notu</span><b>'+esc(dc.noteStatus||'empty')+'</b></div><div class="p3-kv"><span>Paylaşım</span><b>'+esc(sh.status||'—')+' · '+p3TimeP(sh.sentAt)+'</b></div><div class="p3-kv"><span>Teslim</span><b>'+p3TimeP(sh.deliveredAt)+'</b></div><div class="p3-kv"><span>Paylaşım notu</span><b>'+esc(sh.noteStatus||'empty')+'</b></div><div class="p3-kv"><span>Wind-down</span><b>'+esc(String(wd.eventCount||0))+' event · '+esc(String(wd.totalMinutes||0))+' dk</b></div><div class="p3-muted">Consent panel özeti: '+(tc.panelSummarySharingAccepted?'kabul edildi':'kayıtlı değil')+' · hassas metin varsayılan kapalı.</div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Profil ilerlemesi</b>'+p3StatusP(pp.status)+'</div><div class="p3-source-row">'+p3BadgeP(pp.sourcePath||'data.profileAssessment','source')+p3BadgeP(pp.privacy||'sensitive redacted','privacy')+p3BadgeP('raw responses: redacted','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(pp.responseCount||0))+'</b><span>cevap anahtarı · madde '+esc(pp.currentItemIndex===null||pp.currentItemIndex===undefined?'—':String(pp.currentItemIndex))+'</span></div><div class="p3-kv"><span>Başlangıç</span><b>'+p3TimeP(pp.startedAt)+'</b></div><div class="p3-kv"><span>Tamamlanma</span><b>'+p3TimeP(pp.completedAt)+'</b></div><div class="p3-kv"><span>Panel paylaşımı</span><b>'+esc(pp.consent&&pp.consent.panelSummarySharingAccepted?'kabul':'kapalı')+'</b></div><div class="p3-kv"><span>Summary</span><b>'+esc(pp.panelSummaryAvailable?'var':'yok')+'</b></div><div class="p3-footnote">Cevap değerleri DOM’a ve observer projection data alanına alınmaz.</div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Bildirim yaşam döngüsü</b>'+p3StatusP(nt.status)+'</div><div class="p3-source-row">'+p3BadgeP(nt.sourcePath||'data.notifications + data.aeon.qa','source')+p3BadgeP(nt.privacy||'metadata only','privacy')+p3BadgeP('observer receipt ayrı','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(nt.count||0))+'</b><span>event · oluşturuldu '+esc(String(counts.created||0))+' · iletildi '+esc(String(counts.delivered||0))+' · okundu '+esc(String(counts.read||0))+'</span></div><div class="p3-kv"><span>Silindi</span><b>'+esc(String(counts.deleted||0))+'</b></div><div class="p3-kv"><span>Sync edildi</span><b>'+esc(String(counts.synced||0))+'</b></div><div class="p3-kv"><span>Retry/error</span><b>'+esc(String(counts.error||0))+'</b></div>';
+  (Array.isArray(nt.events)?nt.events.slice(0,5):[]).forEach(function(e){ h+='<div class="p3-history-row"><span>'+p3StatusP(e.status)+' '+esc(e.kind||'notification')+' · '+esc(e.id||'—')+'</span><small>'+p4StageTextP(e.stages&&e.stages[0])+(e.readAt?' · okundu '+p3TimeP(e.readAt):' · iletildi '+p3TimeP(e.deliveredAt))+'</small></div>'; });
+  h+='<div class="p3-kv"><span>Observer kabul</span><b>'+p3TimeP(nt.observerReceipt&&nt.observerReceipt.acceptedAt)+'</b></div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Dış kaynak fetch</b>'+p3StatusP(ex.status)+'</div><div class="p3-source-row">'+p3BadgeP(ex.sourcePath||'external fetch/cache metadata','source')+p3BadgeP(ex.privacy||'metadata','privacy')+p3BadgeP('provenance: external','source')+'</div>';
+  (Array.isArray(ex.items)?ex.items:[]).forEach(function(x){ h+='<div class="p3-kv"><span>'+esc(x.name||'external')+'</span><b>'+p3StatusP(x.status)+(x.errorCode?' · '+esc(x.errorCode):'')+'</b></div><div class="p3-muted">'+esc(x.source||'external')+' · '+p3TimeP(x.fetchedAt)+'</div>'; });
+  h+='<div class="p3-footnote">Fetch hatası, veri yokmuş gibi değil; ayrı hata durumu ve kaynak zamanı olarak gösterilir.</div></div></div><div class="p3-footnote">Provenance sınıfları: user_input · derived · external · delivery · observer · redacted. Hassas terapi/profil metni varsayılan DOM yüzeyinde yoktur.</div></div>';
+  return h;
 }
 function timeAgo(iso){
   if(!iso) return '';
@@ -2313,7 +2405,6 @@ function panelLabCardHTML(){
   return h;
 }
 function render(){
-  backfillSoulArchiveFromDaysP();
   var all=allDays(), saved=lastSavedAt(), opened=lastOpenedAt(), fresh=syncFreshnessP(SYNC_RECEIPT,PANEL_POLL_AT), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   if(!UI.month) UI.month=monthKey(selected);
   UI.selectedDate=selected;
@@ -2395,13 +2486,16 @@ function render(){
   h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son kayıt</span></div>';
   h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;">'+icon('rotate-ccw',15)+'</button><button class="btn" title="Çıkış" onclick="resetPanelToken()" style="display:flex;align-items:center;justify-content:center;">'+icon('lock',15)+'</button></div>';
   h+='</div></div>';
-  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT);
+  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION_STATE);
+  h+=coverageRibbonHTMLP(PROJECTION_STATE);
 
   // ── PAGE ────────────────────────────────────────────────────
   h+='<div class="page">';
 
   // ── ORCHESTRATION CORE şeridi ──
   h+=coreStripHTML();
+  h+=rootModulesCardHTMLP();
+  h+=p4ProvenanceCardHTMLP();
 
   // toolbar
   h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">';
@@ -3854,23 +3948,50 @@ function demoData(){
   return {version:2,startDate:start,lastOpenedDate:td,lastOpenedAt:new Date().toISOString(),days:days,notifications:[],settings:{nickname:"Demo Günışığı",lunaConnected:true,locationMode:"auto",caffeineMode:"standard",targetBed:"23:30"},luna:{qa:[{date:td,ts:td+"T10:00:00+03:00",question:"Bugün enerjin nasıl?",answer:"Sakin ve dengeli görünüyor; ritmini koru."}]},aeon:{qa:[{id:"demo-aeon",date:td,ts:td+"T11:00:00+03:00",question:"Bugünkü verilerimde öne çıkan ne?",answer:"Uyku, su ve yürüyüş birlikte güçlü bir temel oluşturmuş.",answeredAt:td+"T11:02:00+03:00"}]},cycle:{periods:[{start:addDays(td,-18),end:addDays(td,-14)}],avgCycle:28,avgPeriod:5},weather:{fetchedAt:new Date().toISOString(),spots:[{key:"ev",label:"Ev",place:"Demo",iconName:"house",code:1,isDay:true,temp:24,feels:24,hum:46,wind:8,uv:3,hi:26,lo:15}]},library:{goal:{dailyPages:20,yearlyBooks:12},books:[{id:"b1",title:"Kendine Ait Bir Oda",author:"Virginia Woolf",genre:"Deneme",totalPages:160,currentPage:72,status:"reading",rating:5,quotes:[{id:"q1",text:"Kendine ait bir alan, düşünceye nefes verir.",page:36,ts:td+"T20:00:00+03:00"}],createdAt:start+"T10:00:00+03:00"}]},watchlist:{goal:{dailyMinutes:40,yearlyTitles:24},items:[{id:"w1",title:"Demo Belgesel",kind:"film",genre:"Belgesel",status:"finished",watchedEp:1,totalEp:null,rating:4,quotes:[],finishedAt:addDays(td,-2)+"T21:00:00+03:00",createdAt:start+"T10:00:00+03:00"}]},music:{goal:{dailyMinutes:30,yearlyTitles:null},items:[{id:"m1",title:"Demo Çalma Listesi",artist:"Günışığı",kind:"album",genre:"Sakin",rating:5,quotes:[],createdAt:start+"T10:00:00+03:00"}]},body:{heightCm:165,heightSetAt:start+"T09:00:00+03:00",weights:Array.from({length:10},function(_,i){return {ts:addDays(start,i)+"T08:00:00+03:00",kg:68.4-i*.12};})},labResults:[],motivation:{currentProgramDay:3,stats:{pathStreak:2,bestPathStreak:2,courageEvidence:1,returnCount:0,completedTotal:2,minimumTotal:1},history:{demo1:{date:addDays(td,-1),programDay:2,phaseCode:"F1",domain:"destek",status:"minimum_completed",reflection:"Küçük sürümü yapmak devam etmemi sağladı.",quote:"Küçük adım da yoldur.",minimumTask:"Bir kişiye kısa bir mesaj gönder.",successMeaning:"Bağ kurmayı seçtin."}}}};
 }
 function load(){
-  if(DEMO_MODE){ D=demoData(); SYNC_RECEIPT=normalizeSyncReceiptP({status:'accepted',snapshotRevision:'d'.repeat(40),sourceUpdatedAt:new Date(Date.now()-30000).toISOString(),submittedAt:new Date(Date.now()-25000).toISOString(),acceptedAt:new Date(Date.now()-10000).toISOString(),sourceLatestSha:'e'.repeat(40)}); PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D); }
+  if(DEMO_MODE){
+    var demo=demoData();
+    SYNC_RECEIPT=normalizeSyncReceiptP({status:'accepted',snapshotRevision:'d'.repeat(40),sourceUpdatedAt:new Date(Date.now()-30000).toISOString(),submittedAt:new Date(Date.now()-25000).toISOString(),acceptedAt:new Date(Date.now()-10000).toISOString(),sourceLatestSha:'e'.repeat(40)});
+    var DP=window.PanelCoverageV1;
+    if(DP&&typeof DP.buildObserverSnapshot==='function'&&typeof DP.chooseProjection==='function'){
+      var ds=DP.buildObserverSnapshot(demo,SYNC_RECEIPT), dd=DP.chooseProjection(ds,demo,SYNC_RECEIPT);
+      D=dd.data; OBSERVER_PROJECTION=dd.snapshot; PROJECTION_STATE=dd; PROJECTION_SECTIONS=dd.sections||{};
+    }else{ D=demo; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={}; }
+    PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
+  }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
     .then(function(j){
-      D=j; PANEL_POLL_AT=new Date().toISOString(); SYNC_RECEIPT=null; if(!D||!D.days||!D.startDate) throw new Error("Beklenen veri yapisi yok.");
+      var latestLegacy=j; PANEL_POLL_AT=new Date().toISOString(); SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP()]).then(function(res){
+      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP(), loadObserverProjectionP()]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
         SYNC_RECEIPT=res[2]||null;
+        var P=window.PanelCoverageV1, projection=res[3]&&res[3].snapshot||null;
+        if(P&&typeof P.chooseProjection==='function'){
+          var chosen=P.chooseProjection(projection,latestLegacy,SYNC_RECEIPT);
+          if(chosen&&chosen.reason==='projection_missing'&&res[3]&&res[3].reason&&res[3].reason!=='projection_missing') chosen.reason=res[3].reason;
+          PROJECTION_STATE=chosen||{source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:latestLegacy,coverage:null};
+          D=PROJECTION_STATE.data||P.redactForObserver(latestLegacy);
+          OBSERVER_PROJECTION=PROJECTION_STATE.snapshot||null;
+          PROJECTION_SECTIONS=PROJECTION_STATE.sections||{};
+        }else{
+          D=latestLegacy; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={};
+        }
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
         if(sig!==null && sig===LASTSIG) return;
         LASTSIG=sig; render();
-      }).catch(function(){ SYNC_RECEIPT=null; render(); });
+      }).catch(function(){
+        var P=window.PanelCoverageV1;
+        SYNC_RECEIPT=null;
+        D=P&&typeof P.redactForObserver==='function'?P.redactForObserver(latestLegacy):latestLegacy;
+        OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
+        PROJECTION_SECTIONS={};
+        render();
+      });
     })
     .catch(function(e){
       var m=String(e&&e.message||e);
@@ -3882,7 +4003,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

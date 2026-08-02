@@ -86,7 +86,7 @@ function buildSandbox(seedState) {
   sandbox.AudioContext = function () { return { state: 'running', currentTime: 0, resume() {}, createOscillator() { return { type: '', frequency: { value: 0 }, connect() {}, start() {}, stop() {} }; }, createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }, destination: {} }; };
   return sandbox;
 }
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
 
 function journey(sandbox) { try { return JSON.parse(sandbox.localStorage.getItem('seyma-reset-v1')).quranJourney; } catch (e) { return null; } }
 

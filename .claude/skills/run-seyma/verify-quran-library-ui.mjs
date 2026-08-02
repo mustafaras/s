@@ -155,7 +155,7 @@ sandbox.AudioContext = function () { return { state: 'running', currentTime: 0, 
 
 const FILES = ['motivationProgramV2.js', 'motivationNarratives.js', 'profileAssessmentV1.js', 'saygiPeople.js',
   'hijriCalendar.js', 'quranRevelationOrderV1.js', 'quranTransportV1.js', 'quranStrikingVersesV1.js',
-  'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app.js'];
+  'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app/core/constants.js', 'app.js'];
 const ctx = vm.createContext(sandbox);
 for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(REPO, f), 'utf8'), ctx, { filename: f });
 

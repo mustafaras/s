@@ -92,7 +92,7 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 const sb = buildSandbox();
-loadInto(sb, ['profileAssessmentV1.js', 'app.js']);
+loadInto(sb, ['profileAssessmentV1.js', 'app/core/constants.js', 'app.js']);
 const App = sb.App;
 const PA = sb.window.ProfileAssessmentV1;
 const ITEMS = PA.sessions[0].items;

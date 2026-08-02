@@ -199,7 +199,7 @@ function assert(name, cond) {
   if (!cond) process.exitCode = 1;
 }
 
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app/core/constants.js', 'app.js'];
 
 console.log('== boot: onboarding (no saved data) ==');
 appHTML = '';

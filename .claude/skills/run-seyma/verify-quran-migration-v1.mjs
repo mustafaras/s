@@ -93,7 +93,7 @@ function loadInto(sandbox, files) {
 }
 // Katalog modülü BİLEREK bu listede yok: migration'ın katalogsuz da tam
 // çalışması gerekir (modül index.html'e QY-05'te bağlanacak).
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app.js'];
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
 const FILES_WITH_CATALOG = ['quranRevelationOrderV1.js', ...FILES];
 
 function baseSeed(extra) {

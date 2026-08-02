@@ -71,12 +71,15 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 ## Repo layout
 
 ```
-index.html      Thin HTML shell. Loads styles.css, motivationProgramV2.js,
-                 motivationNarratives.js, saygiPeople.js,
-                 profileAssessmentV1.js, app.js, sync.js with cache-busting
+index.html      Thin HTML shell. Loads styles.css, data modules,
+                 app/core/constants.js, app.js, sync.js with cache-busting
                  `?v=YYYYMMDDx` query strings. Registers sw.js.
-app.js           The entire Şeyma app (single IIFE, ~4.3k lines). Owns state,
-                 rendering, and all feature logic.
+app/core/constants.js  Classic script loaded immediately before app.js;
+                 exposes the extracted icon map and boot constants through
+                 `window.SeymaConstants`.
+app.js           The Şeyma runtime (single IIFE). It retains state, rendering,
+                 feature logic, and the existing `App` surface during the
+                 incremental L2 extraction.
 motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
                  program" content (per-day Faz/task objects) plus helpers,
                  exposed as `window.MotivationProgramV2`. Loaded before
@@ -111,6 +114,9 @@ panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  data/latest.json from GitHub with its own token/localStorage
                  key, dark/gold theme, can write to
                  data/observer-inbox.json / data/aeon-outbox.json.
+panel.css        Panel-only stylesheet extracted from panel.html.
+panel.js         Panel observer IIFE extracted from panel.html; helper names
+                 and API flow remain compatible with the panel harness.
 styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
 sw.js            Service worker (PWA install + notificationclick routing);
@@ -120,18 +126,38 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-SEYMA-V2-PLAN.md Living v2.0 redesign roadmap ("İçsel Pusula & Terapi
+docs/roadmaps/SEYMA-V2-PLAN.md Living v2.0 redesign roadmap ("İçsel Pusula & Terapi
                  Odası") — Turkish, checkbox-driven; complements
                  GELISTIRME-PLANI.md.
-ILHAM-IBADET-GELISTIRME-PLANI.md  Living Turkish roadmap for the İlham &
+docs/roadmaps/ILHAM-IBADET-GELISTIRME-PLANI.md  Living Turkish roadmap for the İlham &
                  İbadet hub expansion (Faz 35+): Zikirmatik, kıble/pusula,
                  hicri takvim, mübarek gün rozetleri, ibadet rapor sekmesi —
                  complements GELISTIRME-PLANI.md.
+docs/roadmaps/KURAN-YOLCULUGU-GELISTIRME-PLANI.md
+                    Living Turkish roadmap for Raşit ile Kur’an Yolculuğu.
+docs/roadmaps/ZIKIRMATIK-GELISTIRME-PLANI.md
+                    Living Turkish roadmap for Zikirmatik v2.
+docs/README.md      Root Markdown inventory and canonical documentation index.
+docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md
+                    Root documentation and runtime modularization plan.
+docs/REPO-M0-MARKDOWN-MANIFEST.md
+docs/REPO-L0-RUNTIME-DEPENDENCY-MAP.md
+                    M0/L0 inventory evidence manifests.
+docs/ledgers/        Repo organization paired operations/state ledgers.
+docs/archive/        Append-only historical AGENTS handoff archive.
+docs/panel/         ÆON panel research/design plans, ordered anti-amnesia
+                    prompts, and paired append-only ledgers.
 test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
                  Run: `node test_faz10_sync.js`.
 test_faz11_panel.js  Headless Node harness for panel.html helper/render
                  logic. Run: `node test_faz11_panel.js`.
+.claude/skills/run-seyma/verify-state-helper-boundary.mjs
+                 L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
+                 localStorage, sync.js or network.
+.claude/skills/run-seyma/verify-state-migration-boundary.mjs
+                 L2-b/B2 synthetic black-box migrate parity fixture; memory-only
+                 localStorage, no sync/network/private data.
 .claude/skills/run-seyma/  Data-safe headless verification skill — see
                  "Verification" below. `driver.mjs` is the core app.js
                  render harness; `zikr-harness.mjs` covers the İlham &
@@ -212,12 +238,18 @@ There's no automated test suite or linter, but `node --check app.js` (or
 that, **do not serve+open the app in a browser** (see "DATA SAFETY" above) —
 use the `run-seyma` skill's headless Node `vm` harnesses instead:
 
-- `node .claude/skills/run-seyma/driver.mjs` — boots `app.js` twice
+- `node .claude/skills/run-seyma/driver.mjs` — boots constants + `app.js` twice
   (onboarding + seeded state) and drives real interactions (tab switch,
   card toggle, theme toggle), asserting on the rendered HTML. Add
   `--dump <tabId>` to dump a tab's generated markup for inspection.
 - `node .claude/skills/run-seyma/zikr-harness.mjs` — same approach for the
   İlham & İbadet hub (zikirmatik, kıble, hicri takvim, ibadet rapor).
+- `node .claude/skills/run-seyma/verify-state-helper-boundary.mjs` — extracts
+  only the current empty/normalizer helper declarations into a dependency-bag
+  VM; this is B1 read-only evidence, not runtime state/migrate integration.
+- `node .claude/skills/run-seyma/verify-state-migration-boundary.mjs` — boots
+  synthetic minimal/partial/rich/malformed states and checks migration
+  preservation/idempotence; persistence is an in-memory observation only.
 - `panel.html` shares no code with `app.js`, so neither harness covers it;
   verify it with the syntax/script-tag-balance check documented in
   `.claude/skills/run-seyma/SKILL.md`, or read the diff carefully.

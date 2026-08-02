@@ -20,16 +20,17 @@
 | PANEL-000 | 2026-08-02 | BASELINE | completed | Yok | Araştırma tamamlandı; 50/50 panel testi ve syntax kontrolleri geçti | Belgeleri anti-amnesia pakete dönüştür |
 | PANEL-001 | 2026-08-02 | DOCS-PACK | ready_for_review | PANEL-000 | Teknik/tasarım planı + 00–13 prompt sırası + eşli ledger oluşturuldu; `git diff --check` temiz | Kullanıcı onayıyla yalnız `01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md` başlat |
 | PANEL-002 | 2026-08-02 | DOCS-INDEX | ready_for_review | PANEL-001 | Kök MD index’i ve canonical `docs/panel/` bağlantıları oluşturuldu; prompt/ledger sıraları doğrulandı | Kullanıcı onayıyla yalnız `01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md` başlat |
+| PANEL-003 | 2026-08-02 | P0-SYNC-RECEIPT | ready_for_review | PANEL-002; kullanıcı Prompt 01’i açıkça başlattı | `snapshotRevision`, `sourceUpdatedAt`, `submittedAt`, `acceptedAt`, `sourceLatestSha`, whitelist `lastErrorCode`; ayrı `data/sync-receipt.json`; local/server callback ayrımı; panel local/remote/projection/panelPoll; anti-clobber güvenli hata makbuzu; eski alan fallback’i; P0 fixture 25/25 ve tüm regresyon kapıları yeşil | Kullanıcı review’ı; açık kabul/“devam” olmadan PANEL-004 veya Prompt 02 başlatma |
 
 ## Aktif faz
 
 ```text
-active_phase: DOCS-PACK
-active_sequence: PANEL-002
+active_phase: P0-SYNC-RECEIPT
+active_sequence: PANEL-003
 status: ready_for_review
-implementation_started: false
+implementation_started: true
 external_write_authorized: false
-next_safe_action: kullanıcı onayıyla 01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md dosyasını okumak ve başlatmak
+next_safe_action: PANEL-003 P0 değişikliklerini kullanıcıya review için sunmak; açık devam talimatı olmadan yeni prompt açmamak
 ```
 
 ## Ledger eşleşme kapısı

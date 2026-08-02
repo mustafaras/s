@@ -5,6 +5,57 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-02 — PANEL-003 / Prompt 01 P0 senkron makbuzu
+
+**Kullanıcı talimatı:** Kullanıcı `PANEL-01 — P0 Senkron Makbuzu ve Revision
+Prompt’u` açıkça başlattı ve uygulanmasını istedi. Scope yalnız local/server
+receipt ayrımı, revision/lag/conflict görünürlüğü ve güvenli fallback’tir;
+Prompt 02 açılmadı.
+
+**Değişen dosyalar:** `app.js`, `sync.js`, `panel.js`, `panel.css`,
+`index.html`, `panel.html`, yeni sentetik `test_panel_p0_sync.js`, test komut
+envanterleri `AGENTS.md`/`CLAUDE.md`, güncel `docs/panel/README.md` ve paired
+`PANEL-003` ledger kayıtları.
+
+**Kanıt:** P0 fixture **25/25**; Faz 10 sync **64/64**; Faz 11 panel **50/50**;
+B1 **64/64**; B2 **32/32**; B3 **20/20**; app driver PASS; Zikirmatik
+**90/90**; Kur’an katalog **70/70**; transport **207/207**; syntax ve
+`git diff --check` PASS. Fixture başarılı push’ta server revision/acceptedAt,
+anti-clobber’da latest PUT öncesi duruş ve güvenli hata receipt’i; panel
+makbuzsuz başarıyı reddeden fallback ile dört ayrı zamanı doğruluyor.
+
+**Sınır ve açık nokta:** Gerçek browser/server/ağ, `data/`, gerçek localStorage
+kullanıcı state’i ve `mustafaras/seyma-data` değişmedi. Mock fetch dışında dış
+yazma yapılmadı; commit/push/merge/deploy yapılmadı. Panel `projection` alanı
+P0’da ayrı model bulunmadığını açıkça gösteriyor; gerçek read-model üretimi
+Prompt 02 kapsamıdır.
+
+**Sonraki güvenli adım:** `PANEL-003` paired ledger kaydı
+`ready_for_review`; kullanıcı review’ı ve açık devam talimatı olmadan dur.
+
+---
+### 2026-08-02 — REPO-L002–L006 kullanıcı review kabulü
+
+**Kullanıcı talimatı:** Kullanıcı REPO-L002–L006 L2 kapılarını kontrol ettiğini,
+tamam olduğunu ve sorun bulunmadığını açıkça bildirdi. Geçmiş `ready_for_review`
+satırları değiştirilmeden paired repo ledger’larına `REPO-L007` kabul kaydı
+eklendi.
+
+**Kanıt:** Canlı checkout `main` ile `origin/main` hizalı (`24cffbf`) ve
+çalışma ağacı temizdi. Bu oturum zincirinde app/sync/panel syntax, B1 64/64,
+B2 32/32, B3 20/20, app headless, Zikirmatik 90/90, sync 64/64, panel 50/50,
+script tag 7/7 ve `git diff --check` PASS kanıtları mevcuttu.
+
+**Sınır:** `app/core/state.js`, production `migrate()`/`save()` entegrasyonu,
+`panel.js`, `panel.html`, `sync.js`, `data/`, localStorage ve `seyma-data`
+değişmedi. Prompt 01 okunmadı/başlatılmadı; `PANEL-003` açılmadı. Browser,
+server, commit, push, merge ve deploy yapılmadı.
+
+**Sonraki güvenli adım:** Kullanıcı açıkça
+`01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md` başlatırsa yalnız `PANEL-003` kapsamını
+çalıştırmak ve kendi review kapısında durmak.
+
+---
 ### 2026-08-02 — B3 teslimi ve repo/panel new-session starter dağıtımı
 
 **Kullanıcı talimatı:** B3 scratch adapter değişiklikleri önce commit, push,

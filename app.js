@@ -1307,12 +1307,37 @@ var PHASES={
 };
 
 // ---------- state ----------
+var SYNC_RECEIPT_STATUSES={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
+var SYNC_ERROR_CODES={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
+function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null}; }
+function safeSyncReceiptString(v,max){
+  if(typeof v!=='string'||!v||v.length>(max||160)||!/^[a-f0-9]{7,128}$/i.test(v)) return null;
+  return v;
+}
+function safeSyncReceiptIso(v){
+  if(typeof v!=='string'||!v||v.length>40) return null;
+  var s=v;
+  var t=Date.parse(s); return isNaN(t)?null:new Date(t).toISOString();
+}
+function normalizeSyncReceipt(r){
+  var out=emptySyncReceipt(), x=r&&typeof r==='object'?r:{};
+  out.status=SYNC_RECEIPT_STATUSES[x.status]?x.status:'idle';
+  out.snapshotRevision=safeSyncReceiptString(x.snapshotRevision,128);
+  out.sourceUpdatedAt=safeSyncReceiptIso(x.sourceUpdatedAt);
+  out.submittedAt=safeSyncReceiptIso(x.submittedAt);
+  out.acceptedAt=safeSyncReceiptIso(x.acceptedAt);
+  out.sourceLatestSha=safeSyncReceiptString(x.sourceLatestSha,128);
+  out.lastErrorCode=SYNC_ERROR_CODES[x.lastErrorCode]?x.lastErrorCode:null;
+  return out;
+}
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
 function migrate(d){
   if(!d) return d;
+  d.syncReceipt=normalizeSyncReceipt(d.syncReceipt);
+  if(typeof d.savedAt!=='string') d.savedAt='';
   if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true};
   if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
   if(typeof d.settings.ghRepo!=='string') d.settings.ghRepo='';
@@ -2980,8 +3005,37 @@ function editBanner(){
     +'<button onclick="App.exitEdit()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#C24A2E;font-weight:800;font-size:12.5px;padding:9px 13px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Bugüne dön '+icon('sun',13)+'</button>'
     +'</div>';
 }
-window.SeyOnSynced=function(date){ data.lastSyncDate=todayStr(); if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; }); if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; }); ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} updateSaveBanner(); if(ui.tab==='ayarlar') render(); };
-function save(){ try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){} try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } }
+window.SeyOnSyncState=function(receipt){
+  if(!data) return;
+  data.syncReceipt=normalizeSyncReceipt(receipt);
+  try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
+  updateSaveBanner();
+};
+window.SeyOnSynced=function(receipt){
+  if(!data) return;
+  data.lastSyncDate=todayStr();
+  data.syncReceipt=normalizeSyncReceipt(receipt||data.syncReceipt);
+  data.syncReceipt.status='accepted'; data.syncReceipt.lastErrorCode=null;
+  if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; });
+  if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; });
+  ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
+  updateSaveBanner(); if(ui.tab==='ayarlar') render();
+};
+function save(touchSource){
+  try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){}
+  try{
+    var _now=new Date().toISOString();
+    data.syncReceipt=normalizeSyncReceipt(data.syncReceipt);
+    if(touchSource!==false){
+      data.savedAt=_now;
+      data.syncReceipt.sourceUpdatedAt=_now;
+      data.syncReceipt.status=data.syncReceipt.status==='accepted'?'local_saved':data.syncReceipt.status;
+      data.syncReceipt.submittedAt=null; data.syncReceipt.lastErrorCode=null;
+    }
+    localStorage.setItem(KEY,JSON.stringify(data));
+  }catch(e){}
+  if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} }
+}
 function commit(msg){ save(); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
 function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
@@ -3283,7 +3337,7 @@ App.profileAnswer=function(itemId,value){
 
 function createDefaultData(){
   var t=todayStr(), nowIso=new Date().toISOString();
-  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
 }
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
@@ -11699,7 +11753,7 @@ function modalsHTML(){
 }
 
 // boot
-if(data){ data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save(); }
+if(data){ data.lastOpenedDate=todayStr(); data.lastOpenedAt=new Date().toISOString(); save(false); }
 // Kur’an Yolculuğu saf durum makinesi (QY-03) — UI ve headless testler için.
 App.quranReduce=quranReduce;
 App.quranCanRequest=quranCanRequest;
@@ -11856,7 +11910,9 @@ function updateLiveSession(){
   var today=todayStr();
   var rec=getDay(data,today,diffDays(data.startDate,today));
   rec.liveSession={start:sessionState.start,lastSeen:nowMs(),activeSeconds:currentActiveSeconds()};
-  save();
+  // Oturum telemetrisi kalıcıdır ancak yeni kullanıcı kaydı değildir;
+  // root savedAt/sourceUpdatedAt yalnızca içerik değişimini temsil eder.
+  save(false);
 }
 function finalizeSession(){
   flushFieldTimers();
@@ -13456,7 +13512,7 @@ function onAppForeground(){
   if(data){
     data.lastOpenedDate=todayStr();
     data.lastOpenedAt=new Date().toISOString();
-    save();
+    save(false);
   }
   pollRemote();
   maybeFetchDailyPhoto();
@@ -13467,7 +13523,7 @@ window.addEventListener('pageshow',function(){ onAppForeground(); }); // bfcache
 window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
 
 render();
-if(data){ save(); } // migrate() sonrası oluşan arşiv backfill'ini hemen kalıcılaştır ve senkronize et
+if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 
 // ÆON bildirim izni döngüsü: açık/kapa yok, izin verilene kadar 2 dk'da bir sessizce dener.

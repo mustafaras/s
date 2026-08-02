@@ -19,6 +19,7 @@
 | REPO-L004 | 2026-08-02 | L2-b/B1 state helper read-only fixture | `empty*` kökleri ve arşiv normalizer’ları app.js boot edilmeden explicit dependency-bag VM’de sınandı; runtime state/migrate/persistence taşınmadı | `.claude/skills/run-seyma/verify-state-helper-boundary.mjs`, `docs/REPO-L2-B1-STATE-HELPER-RECEIPT.md` | 11 helper declaration kaynak sınırı; **64/64** fixture assertion; unknown-field korunumu, idempotent kimlik ve forbidden surface kapıları PASS | Yalnız harness/doküman/ledger değişti; `app.js`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
 | REPO-L005 | 2026-08-02 | L2-b/B2 synthetic migration parity | Minimal/kısmi/zengin/bozuk sentetik kayıtlar gerçek app.js boot VM’sinde gözlendi; ikinci boot deep parity projection’ı geçti; runtime state.js/persistence taşınmadı | `.claude/skills/run-seyma/verify-state-migration-boundary.mjs`, `docs/REPO-L2-B2-MIGRATION-PARITY-RECEIPT.md` | **32/32**; psych/profile/Zikirmatik/Kur’an/prayer/arşiv sentinel’ları korundu; ikinci geçiş eşdeğer; fetch=0 | Yalnız harness/doküman/ledger değişti; `app.js`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
 | REPO-L006 | 2026-08-02 | L2-b/B3 dependency-bag adapter scratch | Production graph dışı frozen dependency-bag, clone boundary ve wrapper sözleşmesi tasarlandı; gerçek migrate/state/save bağlanmadı | `.claude/skills/run-seyma/state-adapter-scratch.mjs`, `.claude/skills/run-seyma/verify-state-adapter-contract.mjs`, `docs/REPO-L2-B3-ADAPTER-SCRATCH-RECEIPT.md` | **20/20**; no app/sync import, no storage/network invocation, unknown-field/psych/Quran korunumu ve caller isolation PASS | Yalnız scratch/harness/doküman/ledger değişti; production `app.js`, `index.html`, `sync.js`, storage, `data/`, `seyma-data`, browser/server ve dış yazma değişmedi |
+| REPO-L007 | 2026-08-02 | L2 review acceptance | Kullanıcı REPO-L002–L006 kanıtlarını kontrol ederek kabul etti; geçmiş review kayıtları append-only korunarak kabul makbuzu eklendi | `REPO-L002`–`REPO-L006`, paired repo ledger’ları | Syntax: app/sync/panel PASS; B1 64/64; B2 32/32; B3 20/20; app headless PASS; Zikirmatik 90/90; sync 64/64; panel 50/50; script 7/7; diff check PASS | `app.js`, `sync.js`, `panel.js`, `data/`, localStorage ve `seyma-data` değişmedi; browser/server, commit/push/merge/deploy yok |
 
 ## Kullanılan güvenli komutlar
 
@@ -42,6 +43,9 @@
 
 Kullanıcı ayrıca onay vermeden `REPO-M001` (tarihsel Markdown taşıması) veya
 `REPO-L001` (panel CSS/JS ayrıştırması) başlatılamaz.
+
+REPO-L002–L006 kullanıcı review kabulünden sonra sonraki güvenli sequence,
+yalnız kullanıcı açıkça başlatırsa panel `PANEL-003` / Prompt 01’dir.
 
 ## REPO-L002 sonrası güvenli sınır
 

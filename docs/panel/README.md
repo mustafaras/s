@@ -58,8 +58,8 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - Prompt paketi: hazır.
 - Teknik plan: hazır.
 - Tasarım planı: hazır.
-- Kod uygulaması: başlamadı.
+- Kod uygulaması: `PANEL-003` / Prompt 01 uygulandı; `ready_for_review`.
 - Commit/push/merge/deploy: yapılmadı.
-- Son güvenli başlangıç: `PANEL-002` — kullanıcı onayı bekleniyor.
-- Kullanıcı onayı sonrası açılacak tek dosya: `01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md`;
-  bunun ledger kaydı bir sonraki `PANEL-003` sequence’i olacaktır.
+- P0 kanıtı: `test_panel_p0_sync.js` 25/25; mevcut app/sync/panel ve
+  migration/headless kapıları da yeşil.
+- Kullanıcı incelemesi bekleniyor; kabul edilmeden Prompt 02’ye geçilmez.

@@ -3,7 +3,7 @@
 **Belge türü:** Ayrı panel tasarım/UX/uygulanabilir geliştirme planı
 **Kapsam:** `panel.html` gözlemci arayüzü; bilgi mimarisi, estetik, okunabilirlik, erişilebilirlik, responsive davranış ve senkron verinin görünür sunumu
 **Tarih:** 2026-08-02
-**Durum:** D2 command center ve sync ribbon hazır; kullanıcı review’ı bekleniyor; D3 bekliyor
+**Durum:** D2–D3 kabul edildi; D4 modül kartları hazır; kullanıcı review’ı bekleniyor
 
 > Teknik veri kapsamı ve senkron sözleşmesi için
 > [PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md](PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md)
@@ -546,6 +546,9 @@ erişilebilir tarih/pencere/yenile/çıkış eylemleri; manuel yönlendirmeli `N
 değişiklik` chip’i eklendi. Desktop genişliği ve mobil sticky çakışması için
 responsive kurallar uygulandı.
 
+**D2 kabulü (2026-08-03):** Kullanıcı command center ve sync ribbon teslimini
+onayladı; paired ledger kaydı `PANEL-011` olarak append edildi.
+
 ### Geliştirme Faz D3 — Son değişiklikler timeline’ı
 
 - event projection tüketimi,
@@ -557,7 +560,35 @@ responsive kurallar uygulandı.
 **Çıkış kriteri:** Uygulamadaki yeni bir değişiklik panelde kaynak ve zaman
 bilgisiyle izlenebilir.
 
-### Geliştirme Faz D4 — Eksik modül kartları
+**D3 teslimatı (2026-08-03):**
+[PANEL-D3-TIMELINE-DRAWER.md](PANEL-D3-TIMELINE-DRAWER.md) ile event satırları
+saat + feature + güvenli özet + source + status + revision + drawer eylemi
+taşıyacak şekilde yenilendi. Correlation ID zincirleri tek grupta gösteriliyor;
+dokuz filtre `aria-pressed` ile görünür; drawer hızlı özet / feature ayrıntısı /
+audit seviyelerine ayrılıyor. Desktop sağ paneli ve mobil tam ekran davranışı,
+Esc/close/focus trap, ana odağa iade, raw redaction, taslak koruması ve
+reduced-motion kuralları uygulandı.
+
+**D3 çıkış kanıtı:** `test_panel_p3_timeline_drawer.js` **13/13**, mevcut event
+fixture **13/13**, tüm P0–P4/Polling/Faz 10–11/headless migration kapıları yeşil;
+paired ledger sequence `PANEL-012` `completed`.
+
+### Geliştirme Faz D4 — Eksik ve özet modül kartları
+
+**D4 teslimatı (2026-08-03):**
+[PANEL-D4-MODUL-KARTLARI.md](PANEL-D4-MODUL-KARTLARI.md) ile terapi/profil,
+bildirim teslimatı, Kur’an teslimatı, Saygı kanıtı, Günün Fotoğrafı, Konum
+Audit ve Zihin-Beden/arşiv provenance modülleri ortak `module-card` +
+`detail-drawer` sistemine bağlandı. Her kart canonical metric, cross-check,
+source/time, status, privacy ve `Tam/Özet/Redacted/Eksik` coverage rozeti taşır;
+boş/bozuk/stale durumlar fail-closed görünür.
+
+**D4 çıkış kanıtı:** `test_panel_p4_module_cards.js` **13/13**; P3 root **26/26**,
+P4 provenance **19/19**, D3 timeline **13/13**, P2 sync **8/8**, P2 polling
+**15/15** ve tüm headless/migration/syntax kapıları yeşil; paired ledger
+sequence `PANEL-013` `ready_for_review`.
+
+### D4 uygulama sırası (teslim kapsamı)
 
 Sırayla:
 

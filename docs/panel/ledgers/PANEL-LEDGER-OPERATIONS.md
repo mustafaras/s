@@ -142,3 +142,41 @@ sync ribbon teslimini inceleyip açık kabul/“devam” vermeden Prompt 10 /
 | Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
 |---|---|---|---|---|---|---|
 | PANEL-011 | 2026-08-03 | RELEASE-PUBLICATION | Feature commit/push/merge/deploy tamamlandı | `fc66fa1` feature commit; `cc9dc19` `main` merge commit; Pages workflow `30805538047` | Workflow `success`; head SHA `cc9dc195ae2967855c3e479cfab7ffd47f6a7967`; canlı `https://mustafaras.github.io/s/` HTTP **200** | GitHub `main` ve Pages değişti; `data/`, localStorage, `mustafaras/seyma-data` ve observer write kanalları değişmedi |
+
+## PANEL-011 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | Kullanıcı D2 command center ve sync ribbon teslimini açıkça kabul etti; Prompt 10 / PANEL-012 başlatıldı | Önceki PANEL-011 D2 teslimi; eşli ledger’lar | Kullanıcı “d2 kabul ve” ifadesiyle açık kabul verdi; D2 fixture **13/13** ve önceki regresyon kanıtları korunuyor | Yalnız ledger/plan akışı; veri/sync/relay dış etkisi yok |
+
+## PANEL-012 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | Kullanıcı Prompt 10’u açıkça başlattı; son değişiklikler timeline’ı ve drawer uygulaması açıldı | `panel.js`, `panel.css`, `panel.html`, `test_panel_p2_event_log.js`, `test_panel_p3_timeline_drawer.js`, `docs/panel/plans/PANEL-D3-TIMELINE-DRAWER.md`, README ve tasarım planı | D2 kabulü mevcut; event grouping/filter/drawer/focus/redaction kapsamı uygulanmaya başlandı | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay dış etkisi yok |
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | Prompt 10 uygulandı; D3 timeline ve drawer `ready_for_review` | `panel.js`, `panel.css`, `panel.html`, D3 planı, D3 sentetik fixture, paired ledger’lar | D3 fixture **13/13**; mevcut event **13/13**, sync **8/8**, polling **15/15**; P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, Faz 10 **64/64**, Faz 11 **50/50**; syntax/cache/headless/migration ve `git diff --check` PASS; cache **20260803d** | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay açılmadı; yalnız headless VM ve mock/sentetik fixture kullanıldı; observer write kanalları değiştirilmedi |
+
+## Sonraki sequence (PANEL-012 sonrası)
+
+`PANEL-012` `ready_for_review` durumundadır. Kullanıcı D3 timeline/drawer
+teslimini inceleyip açık kabul vermeden Prompt 11 / `PANEL-013` başlatılmayacak;
+drawer veya yeni modül kartı refactor’ı açılmayacaktır.
+
+## PANEL-012 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | Kullanıcı D3 timeline/drawer teslimini açıkça kabul etti; Prompt 11 / PANEL-013 başlatıldı | Önceki PANEL-012 D3 teslimi; eşli ledger’lar | Kullanıcı “kabu ve” ifadesiyle D3’ü onayladı; D3 fixture **13/13** ve regression kanıtları korunuyor | Yalnız ledger/plan akışı; veri/sync/relay dış etkisi yok |
+
+## PANEL-013 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | Kullanıcı Prompt 11’i açıkça başlattı; eksik/özet modül kartları ve ortak drawer uygulaması açıldı | `panel.js`, `panel.css`, `panel.html`, `test_panel_p4_module_cards.js`, D4 planı, README/tasarım planı | PANEL-012 kabulü mevcut; 7 modül descriptor’ı, canonical metric/cross-check, coverage badge ve read-only drawer uygulanmaya başlandı | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay dış etkisi yok |
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | Prompt 11 uygulandı; D4 modül kartları `ready_for_review` | `panel.js`, `panel.css`, `panel.html`, `test_panel_p4_module_cards.js`, `docs/panel/plans/PANEL-D4-MODUL-KARTLARI.md`, paired ledger’lar | D4 fixture **13/13**; P3 root **26/26**, P4 provenance **19/19**, D3 **13/13**, event sync **8/8**, polling **15/15**, P0 **27/27**, P1 **35/35**, Faz 10 **64/64**, Faz 11 **50/50**; syntax/cache/headless/migration ve `git diff --check` PASS; cache **20260803e** | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay açılmadı; yalnız headless VM ve mock/sentetik fixture kullanıldı; latest full-replace ve observer write kanalları değişmedi |
+
+## Sonraki sequence (PANEL-013 sonrası)
+
+`PANEL-013` `ready_for_review` durumundadır. Kullanıcı D4 modül kartları
+teslimini inceleyip açık kabul vermeden Prompt 12 / `PANEL-014` başlatılmayacak;
+responsive/a11y pass’i yeni bir faz olarak açılacaktır.

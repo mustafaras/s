@@ -131,7 +131,9 @@ var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
 var PANEL_TRANSPORT_CACHE={};
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:"all",eventDrawerLevel:1,d4SelectedModule:null};
+var EVENT_DRAWER_RETURN_ID=null;
+var D4_DRAWER_RETURN_ID=null;
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
@@ -1243,6 +1245,68 @@ function p4ProvenanceCardHTMLP(){
   h+='<div class="p3-footnote">Fetch hatası, veri yokmuş gibi değil; ayrı hata durumu ve kaynak zamanı olarak gösterilir.</div></div></div><div class="p3-footnote">Provenance sınıfları: user_input · derived · external · delivery · observer · redacted. Hassas terapi/profil metni varsayılan DOM yüzeyinde yoktur.</div></div>';
   return h;
 }
+function d4SafeTimeP(v){ return v?String(v).slice(0,16).replace('T',' '):'—'; }
+function d4LatestTimeP(values){
+  var valid=(Array.isArray(values)?values:[]).filter(function(v){return !!v;}).map(String).sort();
+  return valid.length?d4SafeTimeP(valid[valid.length-1]):'—';
+}
+function d4CoverageBadgeP(mode){
+  var m=['full','summary','redacted','missing'].indexOf(mode)>=0?mode:'summary', labels={full:'Tam',summary:'Özet',redacted:'Redacted',missing:'Eksik'};
+  return '<span class="d4-coverage-badge d4-coverage-'+m+'" data-component="coverage-badge" data-coverage="'+m+'">'+labels[m]+'</span>';
+}
+function d4ModuleDescriptorsP(){
+  var s=PROJECTION_SECTIONS||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],consent:{}}, pp=s.profileProgress||{status:'missing',consent:{}}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, photo=s.dailyPhoto||{status:'missing'}, sg=s.saygiRoot||{status:'missing'}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{status:'missing'}, archives=s.archives||{};
+  var q=typeof quranJourneyRootP==='function'?quranJourneyRootP():null, reqs=q&&q.requests&&typeof q.requests==='object'?q.requests:{}, reqIds=Object.keys(reqs), qDelivered=0, qNotes=0, qWaiting=0, qLatest=[];
+  reqIds.forEach(function(id){ var r=reqs[id]||{}; if(/^[A-Za-z0-9_-]{11}$/.test(String(r.videoId||''))) qDelivered++; if(Array.isArray(r.notes)) qNotes+=r.notes.length; if(r.status==='waiting'||r.status==='requested') qWaiting++; qLatest.push(r.updatedAt||r.requestedAt||r.createdAt); });
+  var qErrors=typeof quranDeliveryErrorsP==='function'?quranDeliveryErrorsP():[], qStatus=!q?'missing':qErrors.length?'error':reqIds.length?'ok':'missing';
+  var thStatus=th.status==='malformed'||pp.status==='malformed'?'malformed':(th.status==='missing'&&pp.status==='missing'?'missing':(th.status==='missing'||pp.status==='missing'?'incomplete':'ok'));
+  var nCounts=nt.counts||{}, nLatest=(Array.isArray(nt.events)?nt.events:[]).map(function(e){return e&&[e.createdAt,e.deliveredAt,e.readAt,e.retryAt];}).reduce(function(a,x){return a.concat(x||[]);},[]);
+  var locationStatus=lt.status==='malformed'||nud.status==='malformed'?'malformed':(lt.status==='missing'&&nud.status==='missing'?'missing':'ok');
+  var soul=D&&D.soulArchive&&Array.isArray(D.soulArchive.items)?D.soulArchive.items:[], soulSessions=soul.reduce(function(a,x){return a+(Number(x&&x.totalSessions)||0);},0), soulMinutes=soul.reduce(function(a,x){return a+(Number(x&&x.totalMinutes)||0);},0), lib=archives.library&&Array.isArray(archives.library.books)?archives.library.books:[], watch=archives.watchlist&&Array.isArray(archives.watchlist.items)?archives.watchlist.items:[], music=archives.music&&Array.isArray(archives.music.items)?archives.music.items:[], archiveTotal=lib.length+watch.length+music.length;
+  var archiveStatus=(soul.length||archiveTotal)?'ok':'missing';
+  return [
+    {key:'therapy-profile',title:'Terapi + Profil',icon:'heart-pulse',decision:'Hassas ilerleme hangi izin ve redaction sınırında?',status:thStatus,coverage:thStatus==='missing'?'missing':'redacted',source:'data.days.*.therapy + data.profileAssessment',time:d4LatestTimeP([th.date,pp.startedAt,pp.completedAt]),privacy:'sensitive_redacted',summary:(th.thoughtCount||0)+' güvenli terapi özeti · '+(pp.responseCount||0)+' profil yanıt anahtarı',canonical:'Profil ilerlemesi · '+(pp.responseCount||0)+' yanıt',crossCheck:'Terapi düşünce sayısı · '+(th.thoughtCount||0),rows:[['Consent',pp.consent&&pp.consent.panelSummarySharingAccepted?'kabul':'kapalı'],['Profil durumu',pp.status||'missing'],['Ham yanıtlar','redacted'],['Terapi zaman damgası',d4SafeTimeP(th.date)]],note:'Hassas metin, ham yanıt ve karar notu bu kart/drawer yüzeyine alınmaz.'},
+    {key:'notification-delivery',title:'Bildirim Teslimatı',icon:'bell',decision:'Bildirim hangi aşamada ve retry/error gerekiyor mu?',status:nt.status||'missing',coverage:nt.status==='missing'?'missing':'summary',source:nt.sourcePath||'data.notifications + data.aeon.qa',time:d4LatestTimeP(nLatest),privacy:nt.privacy||'metadata_only',summary:(nt.count||0)+' event · '+(nCounts.delivered||0)+' iletildi · '+(nCounts.error||0)+' hata',canonical:'Bildirim event sayısı · '+(nt.count||0),crossCheck:'İletildi/okundu/error · '+(nCounts.delivered||0)+' / '+(nCounts.read||0)+' / '+(nCounts.error||0),rows:[['Oluşturuldu',String(nCounts.created||0)],['İletildi',String(nCounts.delivered||0)],['Okundu',String(nCounts.read||0)],['Retry/error',String(nCounts.error||0)]],note:'Bildirim içeriği değil; yalnız lifecycle metadata ve kaynak zamanı gösterilir.'},
+    {key:'quran-delivery',title:'Kur’an Teslimatı',icon:'book-open',decision:'İstek, video teslimi ve not zinciri nerede?',status:qStatus,coverage:qStatus==='missing'?'missing':qStatus==='ok'?'full':'summary',source:'data.quranJourney + delivery/response metadata',time:d4LatestTimeP(qLatest),privacy:'summary',summary:reqIds.length+' istek · '+qDelivered+' video · '+qNotes+' not · '+qWaiting+' bekliyor',canonical:'Kullanıcıya teslim video · '+qDelivered,crossCheck:'İstek / not / bekleyen · '+reqIds.length+' / '+qNotes+' / '+qWaiting,rows:[['İstek',String(reqIds.length)],['Teslim video',String(qDelivered)],['Not metadata',String(qNotes)],['Delivery error',String(qErrors.length)]],note:'Kur’an kartı ve panel işlemleri latest full-replace zincirine bağlanmaz; güvenli transport/outbox sınırı korunur.'},
+    {key:'saygi-evidence',title:'Saygı Kanıtı',icon:'heart-handshake',decision:'Root collection ve günlük evidence aynı seriyi doğruluyor mu?',status:sg.status||'missing',coverage:sg.status==='missing'?'missing':'summary',source:sg.sourcePath||'data.saygi + data.days.*.saygi',time:d4LatestTimeP([sg.rootLastReadDate,sg.dailyLatestReadDate]),privacy:sg.privacy||'public_metadata',summary:(sg.collectionCount||0)+' kişi · root seri '+(sg.rootStreak||0)+' · daily kanıt '+(sg.dailyEvidenceCount||0),canonical:'Root collection · '+(sg.collectionCount||0),crossCheck:'Daily evidence / derived streak · '+(sg.dailyEvidenceCount||0)+' / '+(sg.dailyDerivedStreak||0),rows:[['Root lastReadDate',sg.rootLastReadDate||'—'],['Daily son kanıt',sg.dailyLatestReadDate||'—'],['Root seri',String(sg.rootStreak||0)],['Türetilmiş seri',String(sg.dailyDerivedStreak||0)]],note:sg.mismatch?'Root ve daily kanıt uyuşmazlığı ayrı alarm olarak korunuyor.':'Root ve daily kanıt aynı projection içinde karşılaştırılıyor.'},
+    {key:'daily-photo',title:'Günün Fotoğrafı',icon:'image',decision:'Fotoğraf kaynağı, lisansı ve cache’i yayınlanabilir mi?',status:photo.status||'missing',coverage:photo.status==='missing'?'missing':photo.ready?'full':'summary',source:photo.sourcePath||'data.dailyPhoto · Wikimedia cache',time:d4SafeTimeP(photo.fetchedAt),privacy:photo.privacy||'public_metadata',summary:photo.title||'Fotoğraf metadata’sı bekleniyor',canonical:'Fotoğraf hazır · '+(photo.ready?'evet':'hayır'),crossCheck:'Cache · '+(photo.cacheState||'empty')+' · lisans '+(photo.license||'—'),rows:[['Başlık',photo.title||'—'],['Lisans',photo.license||'—'],['Kaynak',photo.source||'—'],['Cache',photo.cacheState||'empty'],['Fetched',d4SafeTimeP(photo.fetchedAt)]],note:photo.error?'Kaynak hatası hazır içerik gibi gösterilmiyor.':'Lisans + kaynak + zaman birlikte doğrulanmadan hazır iddiası yok.'},
+    {key:'location-audit',title:'Konum Audit',icon:'map-pin',decision:'Konum izni, nudge davranışı ve son fix hangi aşamada?',status:locationStatus,coverage:locationStatus==='missing'?'missing':'redacted',source:'data.settings + data.locNudge + timestamp-only location',time:d4LatestTimeP([lt.sampleTs,lt.processedTs,lt.syncAcceptedAt,nud.lastShownAt]),privacy:lt.privacy||'timestamp_only',summary:(nud.shownCount||0)+' nudge · '+(nud.dismissCount||0)+' dismiss · son fix '+d4SafeTimeP(lt.sampleTs),canonical:'Son fix örneği · '+d4SafeTimeP(lt.sampleTs),crossCheck:'İşlendi / uzak kabul · '+d4SafeTimeP(lt.processedTs)+' / '+d4SafeTimeP(lt.syncAcceptedAt),rows:[['Nudge gösterim',String(nud.shownCount||0)],['Dismiss',String(nud.dismissCount||0)],['Snooze',d4SafeTimeP(nud.snoozeUntil)],['Örnek',d4SafeTimeP(lt.sampleTs)],['İşlendi',d4SafeTimeP(lt.processedTs)]],note:'GPS koordinatı ve raw track yok; yalnız izin/davranış ve zaman metadata’sı gösterilir.'},
+    {key:'archives-provenance',title:'Zihin-Beden + Arşiv',icon:'archive',decision:'Arşivlerin canonical metriği ve provenance zamanı ne söylüyor?',status:archiveStatus,coverage:archiveStatus==='missing'?'missing':'summary',source:'data.soulArchive + library/watchlist/music',time:d4LatestTimeP(soul.map(function(x){return x&&[x.lastAt,x.startedAt];}).reduce(function(a,x){return a.concat(x||[]);},[])),privacy:'metadata_summary',summary:soulSessions+' seans · '+soulMinutes+' dk · '+archiveTotal+' arşiv öğesi',canonical:'Zihin-Beden seans · '+soulSessions,crossCheck:'Kütüphane / izleme / dinleme · '+lib.length+' / '+watch.length+' / '+music.length,rows:[['Seans',String(soulSessions)],['Dakika',String(soulMinutes)],['Kütüphane',String(lib.length)],['İzleme',String(watch.length)],['Dinleme',String(music.length)]],note:'Arşiv içerik metni değil; provenance, sayaç ve kaynak zamanları özetlenir.'}
+  ];
+}
+function d4ModuleDrawerHTMLP(module){
+  if(!module) return '';
+  var h='<div class="d4-drawer-backdrop" data-component="detail-drawer" data-open="true" role="presentation" onclick="if(event.target===this)closeD4ModuleDrawerP()">';
+  h+='<aside id="d4-module-drawer" class="detail-drawer d4-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="d4-drawer-title" aria-describedby="d4-drawer-desc" tabindex="-1" onkeydown="eventDrawerKeydownP(event)">';
+  h+='<div class="d4-drawer-head"><div><span class="drawer-kicker">D4 modül ayrıntısı</span><h2 id="d4-drawer-title">'+esc(module.title)+'</h2></div><button class="btn d4-drawer-close" onclick="closeD4ModuleDrawerP()" aria-label="'+esc(module.title)+' ayrıntısını kapat">×</button></div>';
+  h+='<p id="d4-drawer-desc" class="d4-drawer-decision">'+esc(module.decision)+'</p><div class="d4-drawer-status-row">'+p3StatusP(module.status)+' '+p3BadgeP(module.source,'source')+' '+p3BadgeP(module.privacy,'privacy')+' '+d4CoverageBadgeP(module.coverage)+'</div>';
+  h+='<div class="d4-drawer-summary"><span>Güvenli özet</span><b>'+esc(module.summary)+'</b></div><div class="d4-drawer-grid">';
+  (Array.isArray(module.rows)?module.rows:[]).forEach(function(row){ h+='<div class="d4-drawer-cell"><span>'+esc(row[0])+'</span><b>'+esc(row[1])+'</b></div>'; });
+  h+='</div><div class="d4-drawer-proof"><b>Canonical metric</b><span>'+esc(module.canonical)+'</span><b>Cross-check</b><span>'+esc(module.crossCheck)+'</span><b>Kaynak zamanı</b><span>'+esc(module.time)+'</span></div><div class="d4-drawer-note">'+esc(module.note)+'</div></aside></div>';
+  return h;
+}
+function d4ModuleAtlasHTMLP(){
+  var modules=d4ModuleDescriptorsP(), selected=null;
+  if(UI.d4SelectedModule) selected=modules.find(function(x){return x.key===UI.d4SelectedModule;})||null;
+  var h='<section class="card lift span-12 pad d4-module-atlas" data-component="module-atlas" aria-labelledby="d4-module-atlas-title">';
+  h+='<div class="d4-atlas-head"><div><span class="drawer-kicker">Observer coverage</span><h2 id="d4-module-atlas-title">Eksik ve özet modüller</h2><p>Her modül tek canonical metric, kaynak zamanı, durum ve güvenli ayrıntı yüzeyi taşır.</p></div><span class="d4-atlas-count">'+modules.length+' modül · metadata-first</span></div><div class="d4-module-grid">';
+  modules.forEach(function(m){ h+='<article class="d4-module-card d4-module-status-'+esc(m.status||'unknown')+'" data-component="module-card" data-module="'+esc(m.key)+'"><div class="d4-module-card-head"><span class="d4-module-icon">'+icon(m.icon,17)+'</span><div><h3>'+esc(m.title)+'</h3><p>'+esc(m.decision)+'</p></div>'+p3StatusP(m.status)+'</div><div class="d4-module-badges">'+p3BadgeP(m.source,'source')+p3BadgeP(m.privacy,'privacy')+d4CoverageBadgeP(m.coverage)+'</div><div class="d4-module-summary">'+esc(m.summary)+'</div><div class="d4-module-meta"><span>'+esc(m.time)+'</span><span class="d4-canonical-label">Canonical metric</span><b>'+esc(m.canonical)+'</b></div><div class="d4-module-cross">Cross-check · '+esc(m.crossCheck)+'</div><button type="button" class="d4-module-detail" onclick="openD4ModuleDrawerP(\''+esc(m.key)+'\',this)">Ayrıntıyı aç <span aria-hidden="true">→</span></button></article>'; });
+  h+='</div>';
+  if(selected) h+=d4ModuleDrawerHTMLP(selected);
+  h+='<p class="d4-atlas-foot">Dolu, eski, eksik, bozuk ve redacted durumlar aynı kart sözleşmesiyle fail-closed gösterilir. Panel render’ı source data’yı backfill etmez.</p></section>';
+  return h;
+}
+function openD4ModuleDrawerP(key,trigger){
+  D4_DRAWER_RETURN_ID=trigger&&trigger.closest?((trigger.closest('[data-module]')||{}).getAttribute?((trigger.closest('[data-module]')||{}).getAttribute('data-module')):null):null;
+  UI.d4SelectedModule=String(key||''); render();
+  setTimeout(function(){ if(typeof document==='undefined') return; var root=document.getElementById('d4-module-drawer'), focusables=eventDrawerFocusableP(root), el=focusables[0]||root; if(el&&typeof el.focus==='function') el.focus(); },0);
+}
+window.openD4ModuleDrawerP=openD4ModuleDrawerP;
+function closeD4ModuleDrawerP(){
+  var returnKey=D4_DRAWER_RETURN_ID; UI.d4SelectedModule=null; D4_DRAWER_RETURN_ID=null; render();
+  setTimeout(function(){ if(!returnKey||typeof document==='undefined') return; var el=document.querySelector('[data-component="module-card"][data-module="'+returnKey+'"] .d4-module-detail'); if(el&&typeof el.focus==='function') el.focus(); },0);
+}
+window.closeD4ModuleDrawerP=closeD4ModuleDrawerP;
 function eventLogSourceP(){
   var s=EVENT_LOG_STATE||{};
   if(s.source==='event_files') return {cls:'b-ok',label:'Günlük event dosyaları',note:'Canonical append-only günlük kayıtlar okunuyor.'};
@@ -1251,44 +1315,138 @@ function eventLogSourceP(){
   return {cls:'b-dim',label:'Event log yok',note:'Legacy snapshot kullanılabilir; henüz canonical event kaydı alınmadı.'};
 }
 function eventStatusP(e){
+  var code=String(e&&(e.lastErrorCode||e.status||e.syncStatus)||'').toLowerCase();
+  if(/conflict|anti[_ -]?clobber|error|failed|forbidden|unauthor/.test(code)) return {cls:'b-danger',kind:'danger',label:'Dikkat gerekli'};
+  if(/stale|old|out[_ -]?of[_ -]?date/.test(code)) return {cls:'b-warn',kind:'warning',label:'Eski görünüm'};
   if(e&&e.acceptedAt) return {cls:'b-ok',label:'Uzak kabul'};
   if(e&&e.submittedAt) return {cls:'b-warn',label:'Gönderildi'};
   return {cls:'b-dim',label:'Yerel'};
 }
 function eventTimeP(v){ return v?p3TimeP(v):'—'; }
-function eventDetailsP(e){
+function safeEventSummaryP(e){
+  var raw=String(e&&e.summary||'Güvenli kayıt özeti');
+  if(/ghp_|sk-[a-z0-9]|api[_ -]?key|lat(?:itude)?\s*[:=]|lon(?:gitude)?\s*[:=]|profile[_ -]?raw|raw[_ -]?response|base64|bearer\s+/i.test(raw)) return 'Güvenli kayıt özeti';
+  return raw;
+}
+function eventSourceKindForP(e){
+  var s=String(e&&(e.source||e.sourceType||e.provenance)||'').toLowerCase();
+  if(/external|wikipedia|youtube|fetch|remote/.test(s)) return {kind:'external',label:'Dış kaynak'};
+  if(/derived|projection|inferred|computed/.test(s)) return {kind:'derived',label:'Türetilmiş'};
+  if(/delivery|notification|outbox|inbox/.test(s)) return {kind:'delivery',label:'Teslimat'};
+  if(/observer|panel/.test(s)) return {kind:'observer',label:'Gözlemci'};
+  return {kind:'user',label:'Kullanıcı girdisi'};
+}
+function eventMatchesFilterP(e,filter){
+  var f=String(filter||'all'), t=String(e&&[e.section,e.path,e.operation,e.source,e.summary,e.kind].join(' ')||'').toLowerCase(), st=eventStatusP(e);
+  if(f==='all') return true;
+  if(f==='attention') return st.kind==='danger'||st.kind==='warning'||!e.acceptedAt;
+  if(f==='sync') return /sync|receipt|revision|retry|merge|accepted|submit|persist|poll|event/.test(t);
+  if(f==='therapy-profile') return /therapy|terapi|profile|profil|thought|reflection|room/.test(t);
+  if(f==='quran-video') return /quran|kur.?an|video|watch|reading|reading/.test(t);
+  if(f==='communication') return /message|mesaj|communication|ileti|aeon|notification|bildirim|inbox|outbox/.test(t);
+  if(f==='user') return eventSourceKindForP(e).kind==='user';
+  if(f==='derived') return eventSourceKindForP(e).kind==='derived';
+  if(f==='external') return eventSourceKindForP(e).kind==='external';
+  return true;
+}
+function eventFeatureForP(e){
+  var t=String(e&&[e.section,e.path,e.operation,e.kind].join(' ')||'').toLowerCase();
+  if(/quran|kur.?an|reading/.test(t)) return {icon:'book-open',label:'Kur’an'};
+  if(/video|watch/.test(t)) return {icon:'play',label:'Video'};
+  if(/therapy|terapi|profile|profil|reflection|thought|room/.test(t)) return {icon:'heart-pulse',label:'Terapi / profil'};
+  if(/message|mesaj|aeon|notification|bildirim|inbox|outbox/.test(t)) return {icon:'message-circle',label:'İletişim'};
+  if(/sync|receipt|revision|retry|merge|event|poll/.test(t)) return {icon:'refresh-cw',label:'Senkron'};
+  return {icon:'activity',label:'Günlük akış'};
+}
+function eventJsArgP(v){ return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function eventDrawerFocusableP(root){
+  if(!root||typeof root.querySelectorAll!=='function') return [];
+  var all=root.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+  return Array.prototype.filter.call(all,function(el){ return !el.disabled&&el.getAttribute('aria-hidden')!=='true'; });
+}
+function eventDrawerKeydownP(ev){
+  if(!ev||(!UI.eventSelectedId&&!UI.d4SelectedModule)) return;
+  if(ev.key==='Escape'){ ev.preventDefault(); if(UI.d4SelectedModule) closeD4ModuleDrawerP(); else closeEventDrawerP(); return; }
+  if(ev.key!=='Tab'||typeof document==='undefined') return;
+  var root=document.getElementById(UI.d4SelectedModule?'d4-module-drawer':'event-drawer-panel'), focusables=eventDrawerFocusableP(root);
+  if(!focusables.length) return;
+  var first=focusables[0], last=focusables[focusables.length-1];
+  if(ev.shiftKey&&document.activeElement===first){ ev.preventDefault(); last.focus(); }
+  else if(!ev.shiftKey&&document.activeElement===last){ ev.preventDefault(); first.focus(); }
+}
+window.eventDrawerKeydownP=eventDrawerKeydownP;
+function setEventFilterP(filter){
+  var allowed=['all','attention','sync','therapy-profile','quran-video','communication','user','derived','external'];
+  UI.eventFilter=allowed.indexOf(filter)>=0?filter:'all';
+  UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; render();
+}
+window.setEventFilterP=setEventFilterP;
+function setEventDrawerLevelP(level){
+  var n=Number(level); UI.eventDrawerLevel=[1,2,3].indexOf(n)>=0?n:1; render();
+  setTimeout(function(){ if(typeof document==='undefined') return; var root=document.getElementById('event-drawer-panel'), focusables=eventDrawerFocusableP(root), el=focusables[0]||root; if(el&&typeof el.focus==='function') el.focus(); },0);
+}
+window.setEventDrawerLevelP=setEventDrawerLevelP;
+function eventDetailsP(e,chainEvents){
   if(!e) return '';
-  var st=eventStatusP(e), rev=e.snapshotRevision||'—';
-  var h='<div class="detail-drawer event-drawer" data-component="detail-drawer" role="dialog" aria-label="Event ayrıntısı">';
-  h+='<div class="event-drawer-head"><b>Event ayrıntısı</b><button class="btn" onclick="closeEventDrawerP()" aria-label="Kapat">×</button></div>';
-  h+='<div class="event-drawer-grid">';
-  [['Durum',st.label],['Event ID',e.eventId],['Correlation ID',e.correlationId||e.eventId],['Sıra',String(e.sequence)],['Bölüm',e.section],['Path',e.path],['İşlem',e.operation],['Kaynak',e.source],['Cihaz',e.sourceDeviceId],['Privacy',e.privacyClass],['Oluştu',eventTimeP(e.occurredAt)],['Yerel persist',eventTimeP(e.persistedAt)],['Gönderildi',eventTimeP(e.submittedAt)],['Uzak kabul',eventTimeP(e.acceptedAt)],['Snapshot revision',rev]].forEach(function(x){ h+='<div class="event-drawer-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; });
-  h+='</div><div class="event-drawer-summary"><span>Güvenli özet</span><b>'+esc(e.summary||'Güvenli kayıt özeti')+'</b></div>';
-  if(e.snapshotRevision) h+='<div class="event-drawer-note">Bu event, revision <span class="mono">'+esc(e.snapshotRevision)+'</span> snapshot’ı ile ilişkilidir. Ham payload drawer’a taşınmaz.</div>';
-  else h+='<div class="event-drawer-note">Snapshot revision henüz yok; bu kayıt yalnız yerel/fallback eventidir.</div>';
-  return h+'</div>';
+  var st=eventStatusP(e), rev=e.snapshotRevision||'—', src=eventSourceKindForP(e), level=(UI&&[1,2,3].indexOf(Number(UI.eventDrawerLevel))>=0)?Number(UI.eventDrawerLevel):1, chain=Array.isArray(chainEvents)&&chainEvents.length?chainEvents:[e], titleId='event-drawer-title', descId='event-drawer-desc';
+  function statusHTML(){ var kind=st.kind||({'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}[st.cls]||'muted'); return '<span class="badge status-badge status-'+kind+' '+(st.cls||'b-dim')+'" data-component="status-badge" data-status="'+kind+'">'+esc(st.label)+'</span>'; }
+  function sourceHTML(){ return '<span class="badge source-badge source-'+src.kind+'" data-component="source-badge" data-source="'+src.kind+'">'+esc(src.label)+'</span>'; }
+  function levelBlock(n,label,body){ return '<section id="drawer-level-'+n+'" class="drawer-level drawer-level-'+n+(level===n?' is-active':'')+'" data-drawer-level="'+n+'"'+(level===n?'':' hidden')+'><h3>'+esc(label)+'</h3>'+body+'</section>'; }
+  var h='<div class="event-drawer-backdrop" data-component="detail-drawer" data-open="true" role="presentation" onclick="if(event.target===this)closeEventDrawerP()">';
+  h+='<aside id="event-drawer-panel" class="detail-drawer event-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="'+titleId+'" aria-describedby="'+descId+'" tabindex="-1" onkeydown="eventDrawerKeydownP(event)">';
+  h+='<div class="event-drawer-head"><div><span class="drawer-kicker">Son değişiklik</span><h2 id="'+titleId+'">Event ayrıntısı</h2></div><button class="btn event-drawer-close" data-autofocus="true" onclick="closeEventDrawerP()" aria-label="Event ayrıntısını kapat">×</button></div>';
+  h+='<p id="'+descId+'" class="event-drawer-desc">'+esc(safeEventSummaryP(e))+' · ham payload ve hassas metin bu yüzeye alınmaz.</p>';
+  h+='<div class="drawer-level-tabs" role="tablist" aria-label="Ayrıntı seviyesi">';
+  [[1,'Hızlı özet'],[2,'Feature ayrıntısı'],[3,'Audit']].forEach(function(x){ h+='<button class="drawer-level-tab'+(level===x[0]?' active':'')+'" role="tab" aria-selected="'+(level===x[0]?'true':'false')+'" aria-controls="drawer-level-'+x[0]+'" onclick="setEventDrawerLevelP('+x[0]+')">'+esc(x[1])+'</button>'; });
+  h+='</div>';
+  var summary='<div class="drawer-summary-grid"><div class="drawer-summary-item"><span>Durum</span>'+statusHTML()+'</div><div class="drawer-summary-item"><span>Kaynak</span>'+sourceHTML()+'</div><div class="drawer-summary-item"><span>Özellik</span><b>'+esc(eventFeatureForP(e).label)+'</b></div><div class="drawer-summary-item"><span>Revision</span><b class="mono">'+esc(String(rev))+'</b></div></div><div class="event-drawer-summary"><span>Güvenli özet</span><b>'+esc(safeEventSummaryP(e))+'</b></div>';
+  h+=levelBlock(1,'1 · Hızlı özet',summary);
+  var featureGrid='<div class="event-drawer-grid">';
+  [['Event ID',e.eventId],['Correlation ID',e.correlationId||e.eventId],['Bölüm',e.section],['Path',e.path],['İşlem',e.operation],['Kaynak alanı',e.source],['Privacy',e.privacyClass],['Oluştu',eventTimeP(e.occurredAt)],['Yerel persist',eventTimeP(e.persistedAt)],['Gönderildi',eventTimeP(e.submittedAt)],['Uzak kabul',eventTimeP(e.acceptedAt)]].forEach(function(x){ featureGrid+='<div class="event-drawer-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1]||'—')+'</b></div>'; });
+  featureGrid+='</div><div class="event-drawer-note">Feature ayrıntısı yalnız allowlist edilmiş metadata ve redacted özet gösterir. Ham payload drawer’a taşınmaz; token, GPS, profil cevabı ve base64 medya yoktur.</div>';
+  h+=levelBlock(2,'2 · Feature ayrıntısı',featureGrid);
+  var auditGrid='<div class="event-drawer-grid drawer-audit-grid">';
+  [['Sequence',String(e.sequence)],['Correlation ID',e.correlationId||e.eventId],['Source device',e.sourceDeviceId],['Snapshot revision',rev],['Event zinciri',chain.length>1?String(chain.length)+' kayıt':'Tek kayıt'],['Sıra kanıtı',EVENT_LOG_STATE&&EVENT_LOG_STATE.audit&&EVENT_LOG_STATE.audit.ok?'PASS':'Dikkat gerekli']].forEach(function(x){ auditGrid+='<div class="event-drawer-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1]||'—')+'</b></div>'; });
+  auditGrid+='</div><div class="drawer-audit-chain">'+chain.slice().sort(function(a,b){return Number(a.sequence||0)-Number(b.sequence||0);}).map(function(x){ return '<div class="timeline-chain-row"><span class="mono">#'+esc(String(x.sequence||'—'))+'</span><span>'+esc(safeEventSummaryP(x))+'</span><small>'+esc(eventStatusP(x).label)+'</small></div>'; }).join('')+'</div><div class="event-drawer-note">Audit seviyesi retry/merge/accepted zincirini correlation ID ile ilişkilendirir; ham payload, token, GPS, profil cevabı ve base64 medya yoktur.</div>';
+  h+=levelBlock(3,'3 · Audit',auditGrid);
+  if(e.snapshotRevision) h+='<div class="event-drawer-note event-drawer-proof">Bu event, revision <span class="mono">'+esc(e.snapshotRevision)+'</span> snapshot’ı ile ilişkilidir.</div>';
+  else h+='<div class="event-drawer-note event-drawer-proof">Snapshot revision henüz yok; bu kayıt yalnız yerel/fallback eventidir.</div>';
+  return h+'</aside></div>';
 }
 function setEventLimitP(n){ n=Number(n); UI.eventLimit=[20,50,100].indexOf(n)>=0?n:20; render(); } window.setEventLimitP=setEventLimitP;
-function openEventDrawerP(id){ UI.eventSelectedId=String(id||''); render(); } window.openEventDrawerP=openEventDrawerP;
-function closeEventDrawerP(){ UI.eventSelectedId=null; render(); } window.closeEventDrawerP=closeEventDrawerP;
+function openEventDrawerP(id,trigger,groupKey){
+  EVENT_DRAWER_RETURN_ID=trigger&&trigger.id?String(trigger.id):null;
+  UI.eventSelectedId=String(id||''); UI.eventSelectedGroupKey=groupKey?String(groupKey):null; UI.eventDrawerLevel=1; render();
+  setTimeout(function(){ if(typeof document==='undefined') return; var root=document.getElementById('event-drawer-panel'), focusables=eventDrawerFocusableP(root), el=focusables[0]||root; if(el&&typeof el.focus==='function') el.focus(); },0);
+} window.openEventDrawerP=openEventDrawerP;
+function closeEventDrawerP(){
+  var returnId=EVENT_DRAWER_RETURN_ID; UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; UI.eventDrawerLevel=1; EVENT_DRAWER_RETURN_ID=null; render();
+  setTimeout(function(){ if(!returnId||typeof document==='undefined') return; var el=document.getElementById(returnId); if(el&&typeof el.focus==='function') el.focus(); },0);
+} window.closeEventDrawerP=closeEventDrawerP;
 function eventLogCardHTMLP(){
   var st=eventLogSourceP(), all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], audit=EVENT_LOG_STATE.audit||{ok:true,issueCount:0,issues:[]};
   function localStatus(label,legacy){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+kind+'">'+esc(label)+'</span>'; }
+  function localSourceBadgeP(src){ return '<span class="badge source-badge source-'+esc(src.kind)+'" data-component="source-badge" data-source="'+esc(src.kind)+'">'+esc(src.label)+'</span>'; }
   all.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); });
-  var visible=all.slice(0,UI.eventLimit||20), selected=null;
-  if(UI.eventSelectedId) for(var si=0;si<all.length;si++){ if(all[si].eventId===UI.eventSelectedId){selected=all[si];break;} }
+  var filter=UI.eventFilter||'all', filtered=all.filter(function(e){ return eventMatchesFilterP(e,filter); }), groups=[], groupMap={};
+  filtered.forEach(function(e){ var key=String(e.correlationId||e.eventId||'unknown'); if(!groupMap[key]){ groupMap[key]={key:key,event:e,members:[]}; groupMap[key].members.push(e); groups.push(groupMap[key]); } else groupMap[key].members.push(e); });
+  groups.forEach(function(g){ g.members.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); }); g.event=g.members[0]; });
+  var visible=groups.slice(0,UI.eventLimit||20), selectedGroup=null;
+  if(UI.eventSelectedId) for(var si=0;si<groups.length;si++){ if(groups[si].key===UI.eventSelectedGroupKey||groups[si].members.some(function(x){return x.eventId===UI.eventSelectedId;})){selectedGroup=groups[si];break;} }
   var h='<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">';
   h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;">'+localStatus(st.label,st.cls)+'</span></div>';
   h+='<div class="event-log-meta"><span>'+esc(st.note)+'</span><span class="mono">'+all.length+' kayıt · '+(EVENT_LOG_STATE.loadedAt?esc(tsShort(EVENT_LOG_STATE.loadedAt)):'—')+'</span></div>';
-  h+='<div class="event-log-toolbar"><div class="seg" aria-label="Event sayısı filtresi">'+[20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
+  var filters=[['all','Tümü'],['attention','Dikkat gerektiren'],['sync','Senkron'],['therapy-profile','Terapi / profil'],['quran-video','Kur’an / video'],['communication','İletişim'],['user','Kullanıcı girdisi'],['derived','Türetilmiş'],['external','Dış kaynak']];
+  h+='<div class="event-log-toolbar"><div class="timeline-filter" role="group" aria-label="Son değişiklik filtresi">'+filters.map(function(x){ var count=x[0]==='all'?all.length:all.filter(function(e){return eventMatchesFilterP(e,x[0]);}).length; return '<button class="timeline-filter-btn'+(filter===x[0]?' active':'')+'" data-filter="'+x[0]+'" aria-pressed="'+(filter===x[0]?'true':'false')+'" onclick="setEventFilterP(\''+x[0]+'\')">'+esc(x[1])+' <span>'+count+'</span></button>'; }).join('')+'</div><div class="seg event-limit-filter" aria-label="Event sayısı filtresi">'+[20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
+  h+='<div class="event-log-filter-summary" aria-live="polite">'+esc(filter==='all'?'Tüm güvenli event kayıtları':filters.filter(function(x){return x[0]===filter;})[0][1])+' · '+filtered.length+' event · '+groups.length+' zincir</div>';
   if(!audit.ok) h+='<div class="event-log-alarm error-state" data-component="error-state" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(e){ var es=eventStatusP(e); h+='<button class="event-log-row" data-component="timeline-row" onclick="openEventDrawerP(\''+e.eventId+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence))+'</span><span class="event-log-main"><b>'+esc(e.summary)+'</b><small>'+esc(e.section)+' · '+esc(e.operation)+' · '+esc(e.path)+'</small></span><span class="event-log-side">'+localStatus(es.label,es.cls)+'<small>'+eventTimeP(e.occurredAt)+'</small></span></button>'; });
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-source="'+esc(src.kind)+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main"><b>'+esc(safeEventSummaryP(e))+'</b><small>'+esc(feature.label)+' · '+esc(e.section||'—')+' · '+esc(e.operation||'—')+' · '+esc(e.path||'—')+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
     h+='</div>';
   }
-  if(selected) h+=eventDetailsP(selected);
+  if(selectedGroup) h+=eventDetailsP(selectedGroup.event,selectedGroup.members);
   h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div></div>';
   return h;
 }
@@ -2737,6 +2895,7 @@ function render(){
   h+=coreStripHTML();
   h+=rootModulesCardHTMLP();
   h+=p4ProvenanceCardHTMLP();
+  h+=d4ModuleAtlasHTMLP();
   h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){
@@ -4278,6 +4437,7 @@ load();
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
 setInterval(function(){ if(DEMO_MODE||!PTOKEN) return; if(UI.msgSending||panelBusyTyping()){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return; } load(); },15000);
+document.addEventListener("keydown",eventDrawerKeydownP);
 document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
 window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
 })();

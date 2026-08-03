@@ -1,7 +1,7 @@
 # ÆON Paneli — PANEL-09 D2 Command Center ve Sync Ribbon
 
 **Sequence:** `PANEL-011`
-**Durum:** `ready_for_review`
+**Durum:** `completed`
 **Tarih:** 2026-08-03
 **Önkoşul:** D0 wireframe + D1 semantic token/component sözleşmesi
 
@@ -97,5 +97,8 @@ değiştirilmemiştir.
   Zikirmatik **90/90**, B1 PASS, B2 **32/32**, B3 **20/20**,
 - `git diff --check`: PASS.
 
-**Sonraki güvenli adım:** Kullanıcı D2 review/kabulü. Açık kabul olmadan
-PANEL-012 / Prompt 10 D3 timeline-drawer işi başlatılmaz.
+**Kabul:** Kullanıcı D2 command center ve sync ribbon teslimini açıkça kabul
+etti; kabul kaydı paired ledger’larda `PANEL-011` sequence’iyle tutuluyor.
+
+**Sonraki güvenli adım:** PANEL-012 / Prompt 10 D3 timeline-drawer teslimi
+uygulandı ve kullanıcı review’ını bekliyor.

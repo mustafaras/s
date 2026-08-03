@@ -5,6 +5,76 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-012 D3 kabulü + PANEL-013 D4 modül kartları teslimi
+
+**Kullanıcı kararı:** Kullanıcı D3 timeline/drawer teslimini `kabu ve` diyerek
+açıkça kabul etti ve PANEL-11 / Prompt 11’i başlattı. D4 teslimi kullanıcı
+review’ına sunulmak üzere `ready_for_review` durumunda bırakıldı; Prompt 12
+başlatılmadı.
+
+**Değişen dosyalar:** `panel.js`, `panel.css`, `panel.html`,
+`test_panel_p4_module_cards.js`, `docs/panel/plans/PANEL-D4-MODUL-KARTLARI.md`,
+D3 planı, panel README, UX planı, eşli panel ledger’ları.
+
+**Uygulanan D4 yüzeyi:** Terapi/profil, bildirim teslimatı, Kur’an teslimatı,
+Saygı evidence, Günün Fotoğrafı, konum audit ve arşiv provenance için ortak
+summary/source/time/status/privacy/coverage kart atlası kuruldu. Her kart
+canonical metric ve cross-check gösterir; dolu, stale, eksik, bozuk ve
+redacted durumları fail-closed biçimde görünür. Ortak detail drawer; mobilde
+tam ekran, desktop’ta sağ panel, `role=dialog`/`aria-modal`, close/Esc, focus
+trap ve odak iadesini taşır. Mevcut P3/P4 kartları veri sürekliliği için
+korundu; yeni atlas veri mutate etmez ve latest full-replace/observer write
+zincirine bağlanmaz.
+
+**Testler:** D4 fixture **13/13**; P3 **26/26**, P4 **19/19**, D3 **13/13**,
+event **13/13**, sync **8/8**, polling **15/15**, P0 **27/27**, P1 **35/35**,
+Faz 10 **64/64**, Faz 11 **50/50**; syntax, headless app/migration/Zikirmatik,
+cache ve `git diff --check` PASS. Panel cache version’ı `20260803e`.
+
+**Güvenlik / dış etki:** Browser veya local server açılmadı; gerçek ağ,
+localStorage, `data/`, `data/events/`, `mustafaras/seyma-data` ve observer
+write kanalları değişmedi. Commit/push/merge/deploy bu turda yapılmadı.
+
+**Sonraki güvenli adım:** Kullanıcı PANEL-013 D4 modül kartları review/kabulü;
+açık kabul olmadan Prompt 12 / PANEL-014 başlatılmayacak.
+
+---
+### 2026-08-03 — PANEL-011 D2 kabulü + PANEL-012 D3 timeline/drawer teslimi
+
+**Kullanıcı kararı:** Kullanıcı D2 command center ve sync ribbon teslimini
+`d2 kabul` diyerek açıkça kabul etti ve hemen ardından PANEL-10 / Prompt 10’u
+başlattı. D3 teslimi kullanıcı review’ına sunulmak üzere `ready_for_review`
+durumunda bırakıldı; Prompt 11 başlatılmadı.
+
+**Değişen dosyalar:** `panel.js`, `panel.css`, `panel.html`,
+`test_panel_p2_event_log.js`, `test_panel_p3_timeline_drawer.js`,
+`docs/panel/plans/PANEL-D3-TIMELINE-DRAWER.md`, `docs/panel/README.md`,
+`docs/panel/plans/PANEL-D2-COMMAND-CENTER.md`, `docs/panel/plans/PANEL-TASARIM-VE-GELISTIRME-PLANI.md`,
+eşli panel ledger’ları.
+
+**Uygulanan D3 yüzeyi:** Son değişiklikler timeline’ı saat/feature/güvenli özet/
+source/status/revision alanlarını taşır; retry/merge/accepted aynı correlation
+ID ile tek zincir satırında gruplanır. Dokuz filtre `aria-pressed` ile görünür.
+Drawer hızlı özet, feature ayrıntısı ve audit seviyelerine ayrılır; desktop
+420–520px sağ panel, mobil tam ekran, `role=dialog`/`aria-modal`, close/Esc,
+focus trap ve açan satıra odak iadesi uygulanır. Raw payload, token, GPS,
+profil cevabı ve base64 medya drawer’a alınmaz; polling/input taslak sınırı
+korunur.
+
+**Testler:** `test_panel_p3_timeline_drawer.js` **13/13**; mevcut event
+fixture **13/13**, sync **8/8**, polling **15/15**; P0 **27/27**, P1 **35/35**,
+P3 **26/26**, P4 **19/19**, Faz 10 **64/64**, Faz 11 **50/50**; syntax,
+headless app/migration/Zikirmatik ve `git diff --check` PASS. Panel cache
+version’ı `20260803d`.
+
+**Güvenlik / dış etki:** Browser veya local server açılmadı; gerçek ağ,
+localStorage, `data/`, `data/events/`, `mustafaras/seyma-data` ve observer
+write kanalları değişmedi. Commit/push/merge/deploy bu turda yapılmadı.
+
+**Sonraki güvenli adım:** Kullanıcı PANEL-012 D3 timeline/drawer review/kabulü;
+açık kabul olmadan Prompt 11 / PANEL-013 başlatılmayacak.
+
+---
 ### 2026-08-03 — PANEL-011 publication receipt
 
 **Yayın makbuzu:** D2 feature commit’i `fc66fa1` push edildi, `cc9dc19`

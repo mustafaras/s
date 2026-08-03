@@ -119,3 +119,25 @@ AND State ledger aynı sequence’i içeriyor
 AND prompt kabul kriterleri kanıtlandı
 AND dış eylem izni ayrıca mevcut
 ```
+
+## Kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-003 | 2026-08-03 | P0-SYNC-RECEIPT | completed | P0 uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen P0 fixture 27/27 ve syntax/regression kapıları yeşil | Prompt 07 planlı; açık başlatma olmadan uygulama yok |
+| PANEL-004 | 2026-08-03 | P1-COVERAGE-PROJECTION | completed | P1 uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen P1 fixture 35/35 ve redaction/fallback kapıları yeşil | Prompt 07 planlı; açık başlatma olmadan uygulama yok |
+| PANEL-005 | 2026-08-03 | P1-MISSING-ROOT-MODULES | completed | Eksik kök modül uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen P3 fixture 26/26 ve privacy/mutation kapıları yeşil | Prompt 07 planlı; açık başlatma olmadan uygulama yok |
+| PANEL-006 | 2026-08-03 | P1-TERAPI-BILDIRIM-PROVENANS | completed | Terapi/bildirim/provenance uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen P4 fixture 19/19 ve hassas redaction kapıları yeşil | Prompt 07 planlı; açık başlatma olmadan uygulama yok |
+| PANEL-007 | 2026-08-03 | P2-APPEND-ONLY-EVENT-LOG | completed | Event log uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen P2 panel 13/13 + sync 8/8 ve idempotence/redaction kapıları yeşil | Prompt 07 planlı; event dış yazımı yok |
+| PANEL-008 | 2026-08-03 | P2-POLLING-RELAY | completed | Polling uygulaması ve kabul kapısı hazır | Kullanıcı kabulü; yeniden kontrol edilen polling fixture 15/15; relay açılmadı | Prompt 07 planlı; relay veya dış servis açma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D0-IA-WIREFRAME
+active_sequence: PANEL-009
+status: planned
+implementation_started: false
+external_write_authorized: false
+next_safe_action: Kullanıcı açıkça başlatırsa yalnız Prompt 07 wireframe çalışmasını yapmak; CSS/panel HTML refactor’ına wireframe kabul edilmeden başlamamak
+```

@@ -74,3 +74,14 @@ başlatılmayacak.
 başka bilgisayarda clone sonrası `git rev-parse HEAD` ile canlı SHA
 doğrulanmalıdır. Son doğrulanan Pages workflow `30791390264` ve deployment
 `5722051874` success; canlı URL HTTP 200’dür.
+
+## PANEL-003–008 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-003 | 2026-08-03 | P0-SYNC-RECEIPT | Kullanıcı Prompt 01 kabulünü verdi | Önceki PANEL-003 uygulaması | P0 fixture 27/27; syntax ve regression kapıları yeşil | Yalnız ledger dokümantasyonu; veri/sync dış etkisi yok |
+| PANEL-004 | 2026-08-03 | P1-COVERAGE-PROJECTION | Kullanıcı Prompt 02 kabulünü verdi | Önceki PANEL-004 uygulaması | P1 fixture 35/35; redaction/fallback kapıları yeşil | Yalnız ledger dokümantasyonu; veri/sync dış etkisi yok |
+| PANEL-005 | 2026-08-03 | P1-MISSING-ROOT-MODULES | Kullanıcı Prompt 03 kabulünü verdi | Önceki PANEL-005 uygulaması | P3 fixture 26/26; privacy/mutation kapıları yeşil | Yalnız ledger dokümantasyonu; veri/sync dış etkisi yok |
+| PANEL-006 | 2026-08-03 | P1-TERAPI-BILDIRIM-PROVENANS | Kullanıcı Prompt 04 kabulünü verdi | Önceki PANEL-006 uygulaması | P4 fixture 19/19; hassas veri redaction kapıları yeşil | Yalnız ledger dokümantasyonu; veri/sync dış etkisi yok |
+| PANEL-007 | 2026-08-03 | P2-APPEND-ONLY-EVENT-LOG | Kullanıcı Prompt 05 kabulünü verdi | Önceki PANEL-007 uygulaması | P2 panel 13/13; sync 8/8; idempotence/redaction kapıları yeşil | Yalnız ledger dokümantasyonu; event dosyasına yazım yok |
+| PANEL-008 | 2026-08-03 | P2-POLLING-RELAY | Kullanıcı Prompt 06 kabulünü verdi | Önceki PANEL-008 uygulaması | Polling fixture 15/15; ETag/304, draft-safety ve status-map kapıları yeşil | Relay açılmadı; yalnız ledger dokümantasyonu |

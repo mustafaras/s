@@ -5,6 +5,26 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-003–008 kullanıcı kabulü ve yeniden kontrol
+
+**Kullanıcı talimatı:** Kullanıcı Prompt 01–06 kapsamını kabul etti ve yeniden
+kontrol istedi. Kabul yalnız mevcut uygulama ve kanıtlar içindir; Prompt 07
+başlatılmadı.
+
+**Değişen dosyalar:** `docs/panel/ledgers/PANEL-LEDGER-OPERATIONS.md`,
+`docs/panel/ledgers/PANEL-LEDGER-STATE.md`, `docs/panel/README.md` ve bu
+append-only handoff kaydı.
+
+**Kanıt:** P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, P2 event
+**13/13**, P2 sync **8/8**, polling **15/15**; `node --check app.js`,
+`sync.js`, `panel.js`, `panelCoverageManifest.js` PASS; `git status` temiz.
+
+**Sınır:** Browser/server, gerçek GitHub, `data/`, localStorage kullanıcı
+state’i, `mustafaras/seyma-data`, relay ve dış servis açılmadı. Prompt 07 /
+`PANEL-009` `planned` durumunda; wireframe kabul edilmeden CSS veya panel HTML
+refactor’ı yapılmayacak.
+
+---
 ### 2026-08-03 — PANEL-008 / Prompt 06 P2 polling, ETag ve relay kararı
 
 **Kullanıcı talimatı:** Kullanıcı `PANEL-06 — P2 Polling, ETag ve Relay

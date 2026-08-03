@@ -13,11 +13,12 @@
 //   7. Offline istek sonra gönderilir.
 // KABUL: Hiçbir senaryoda watched/ready geriye gitmez, request/video kaybolmaz.
 //
-// Çalıştırma: node test_quran_merge.js
+// Çalıştırma: node tests/test_quran_merge.js
 
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 // ── Mock ortam: sync.js window/localStorage/fetch bekler (test_faz10_sync.js
 // ile AYNI desen). fetch hiç çağrılmamalı — bu dosya yalnız saf fonksiyonları
@@ -40,7 +41,7 @@ global.fetch = function (url, opts) {
 if (typeof TextEncoder === 'undefined') { global.TextEncoder = require('util').TextEncoder; }
 if (typeof TextDecoder === 'undefined') { global.TextDecoder = require('util').TextDecoder; }
 
-eval(fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8'));
+  eval(fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8'));
 var S = global.window.SeySync;
 
 var pass = 0, fail = 0;
@@ -246,8 +247,8 @@ section('10. İdempotens — aynı durumu kendisiyle birleştirmek veri üretmez
 // güncellenip diğeri unutulursa (örn. yeni bir durum eklenirse) burada patlar.
 section('11. QURAN_RANK (app.js) ile QURAN_RANK_S (sync.js) sürüklenmemiş');
 (function () {
-  var appSrc = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
-  var syncSrc = fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8');
+  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var syncSrc = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
   var appMatch = appSrc.match(/var QURAN_RANK=(\{[^}]*\});/);
   var syncMatch = syncSrc.match(/var QURAN_RANK_S=(\{[^}]*\});/);
   ok(!!appMatch, 'app.js içinde QURAN_RANK bulunuyor');

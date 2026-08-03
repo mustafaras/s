@@ -119,7 +119,7 @@ than vacuously true.
 The other Kur'an gates are pure-function level and much faster:
 `verify-quran-migration-v1.mjs` (QY-02 schema) and
 `verify-quran-state-machine.mjs` (QY-03 transitions), plus repo-root
-`node test_quran_catalog.js` and `node test_quran_transport.js`.
+`node tests/test_quran_catalog.js` and `node tests/test_quran_transport.js`.
 
 ### L2-b/B1 state helper boundary (read-only)
 
@@ -160,10 +160,10 @@ green output is contract evidence only, not a production state-module release.
 ### Kur'an Yolculuğu outbox writer (QY-08)
 
 ```bash
-node test_quran_outbox_sync.js
+node tests/test_quran_outbox_sync.js
 ```
 
-Repo-root harness (mirrors `test_faz10_sync.js`'s `eval`-in-mocked-globals
+Repo-root harness (mirrors `tests/test_faz10_sync.js`'s `eval`-in-mocked-globals
 style, not the `node:vm` driver style above) that mock-`fetch`-tests
 `sync.js`'s `window.SeySync.pushQuranRequest(payload, cb)` — the QY-08
 dedicated writer for `data/quran-request-outbox.json`. 54 assertions: the

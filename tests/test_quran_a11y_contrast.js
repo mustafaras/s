@@ -7,11 +7,12 @@
 // --quran-gold-ink, CTA beyaz metin) hem açık hem koyu temada denetler.
 //
 // Bu dosya bir HESAP testidir — DOM/vm gerektirmez, tarayıcı/ağ YOK.
-// Çalıştırma: node test_quran_a11y_contrast.js
+// Çalıştırma: node tests/test_quran_a11y_contrast.js
 
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 var pass = 0, fail = 0;
 function ok(cond, label, detail) {
@@ -52,7 +53,7 @@ function composite(colorHex, alpha, backdropHex) {
 }
 
 // ── styles.css'ten gerçek değerleri çıkar ────────────────────────────────
-var CSS = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
+var CSS = fs.readFileSync(path.join(repoRoot, 'styles.css'), 'utf8');
 
 section('1. styles.css içinden gerçek renk değerleri okunuyor');
 function pickVar(block, name) {

@@ -62,7 +62,7 @@ observer inbox/outbox ve başka bir write kanalı eklenmedi veya değiştirilmed
 
 ## 5. Kanıt
 
-- `test_panel_p4_module_cards.js`: **13/13 PASS** — 7 descriptor, source-data
+- `tests/test_panel_p4_module_cards.js`: **13/13 PASS** — 7 descriptor, source-data
   immutability, dolu/eski/eksik/bozuk/redacted, source/time/status/privacy,
   coverage, canonical/cross-check, ARIA drawer, focus trap ve write sınırı.
 - P3 root modules **26/26**, P4 provenance **19/19**, D3 timeline **13/13**,

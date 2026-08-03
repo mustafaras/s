@@ -16,11 +16,12 @@
 //   · izolasyon       — Guard 1 (dev-origin) aynen uygulanır; Guard 2
 //                       (anti-clobber) burada kapsam dışıdır, zayıflatılmaz.
 //
-// Çalıştırma: node test_quran_outbox_sync.js
+// Çalıştırma: node tests/test_quran_outbox_sync.js
 
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 if (typeof TextEncoder === 'undefined') { global.TextEncoder = require('util').TextEncoder; }
 if (typeof TextDecoder === 'undefined') { global.TextDecoder = require('util').TextDecoder; }
@@ -79,9 +80,9 @@ function setup(seedOutbox, opts) {
   };
 
   // quranTransportV1 önce yüklenmeli (window.QuranTransportV1 kurulur), sonra sync.js.
-  var transportSrc = fs.readFileSync(path.join(__dirname, 'quranTransportV1.js'), 'utf8');
+  var transportSrc = fs.readFileSync(path.join(repoRoot, 'quranTransportV1.js'), 'utf8');
   eval(transportSrc);
-  var syncSrc = fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8');
+  var syncSrc = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
   eval(syncSrc);
   return global.window.SeySync;
 }

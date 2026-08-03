@@ -9,11 +9,12 @@
 // false olarak ayarlanmış olması) kanıtlar. Metin doğruluğu için modülün
 // kendi başındaki ZORUNLU İNSAN DOĞRULAMASI notuna bakın.
 //
-// Çalıştırma: node test_quran_striking_verses.js
+// Çalıştırma: node tests/test_quran_striking_verses.js
 
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var repoRoot = require('./repo-root');
 
 var SRC_FILE = 'quranStrikingVersesV1.js';
 var CATALOG_FILE = 'quranRevelationOrderV1.js';
@@ -30,7 +31,7 @@ function ok(cond, label, detail) {
 function section(t) { console.log('\n' + t); }
 
 section('1. İzolasyon ve yükleme');
-var src = fs.readFileSync(path.join(__dirname, SRC_FILE), 'utf8');
+var src = fs.readFileSync(path.join(repoRoot, SRC_FILE), 'utf8');
 var code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[\r\n])\s*\/\/[^\r\n]*/g, '$1');
 var FORBIDDEN = ['localStorage', 'sessionStorage', 'fetch(', 'XMLHttpRequest',
                  'SeySync', 'document.', 'indexedDB', 'ghToken', 'require(', 'Date.now', 'Math.random'];
@@ -42,7 +43,7 @@ ok(/^\(function\s*\(\)\s*\{\s*[\r\n]+\s*'use strict';/.test(src),
 
 var sandbox = { window: {} };
 vm.createContext(sandbox);
-var catalogSrc = fs.readFileSync(path.join(__dirname, CATALOG_FILE), 'utf8');
+var catalogSrc = fs.readFileSync(path.join(repoRoot, CATALOG_FILE), 'utf8');
 var loadErr = null;
 try {
   vm.runInContext(catalogSrc, sandbox, { filename: CATALOG_FILE, timeout: 5000 });

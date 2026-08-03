@@ -79,11 +79,11 @@ yapılmamıştır.
 
 ## 6. Kanıt
 
-- `test_panel_p3_timeline_drawer.js`: **13/13 PASS** — zincir gruplama,
+- `tests/test_panel_p3_timeline_drawer.js`: **13/13 PASS** — zincir gruplama,
   dokuz filtre, source/status/revision, raw redaction, modal ARIA, üç seviye,
   focus trap, Tab/Esc, responsive/reduced-motion ve cache-bust.
-- `test_panel_p2_event_log.js`: **13/13 PASS**.
-- `test_panel_p2_sync.js`: **8/8 PASS**; `test_panel_p2_polling.js`: **15/15 PASS**.
+- `tests/test_panel_p2_event_log.js`: **13/13 PASS**.
+- `tests/test_panel_p2_sync.js`: **8/8 PASS**; `tests/test_panel_p2_polling.js`: **15/15 PASS**.
 - P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, Faz 10 **64/64**,
   Faz 11 **50/50**.
 - `node --check panel.js`, `sync.js`, `panelCoverageManifest.js`: PASS.

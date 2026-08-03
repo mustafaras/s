@@ -1,11 +1,12 @@
 // Faz 10 — Headless senkronizasyon testleri (sentetik veri, gerçek network YOK)
 // sync.js IIFE'ını window/localStorage/fetch mock'larıyla yükler, sonra
 // window.SeySync.mergeProfileAssessment üzerinden çakışma çözümünü test eder.
-// Çalıştırma: node test_faz10_sync.js
+// Çalıştırma: node tests/test_faz10_sync.js
 
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 // ── Mock ortam: window, localStorage, fetch, location ──────────────────────
 var _ls = {};
@@ -32,7 +33,7 @@ if (typeof TextEncoder === 'undefined') { global.TextEncoder = require('util').T
 if (typeof TextDecoder === 'undefined') { global.TextDecoder = require('util').TextDecoder; }
 
 // sync.js'yi yükle (IIFE global.window.SeySync'ı kurar)
-var syncSrc = fs.readFileSync(path.join(__dirname,'sync.js'),'utf8');
+  var syncSrc = fs.readFileSync(path.join(repoRoot,'sync.js'),'utf8');
 try { eval(syncSrc); } catch(e){ /* IIFE window.SeySync kurar, hata beklenmez */ }
 
 var merge = global.window.SeySync && global.window.SeySync.mergeProfileAssessment;
@@ -233,7 +234,7 @@ console.log('[12] sanitize — profileAssessment korunur, token silinir');
   // öncesi. Doğrudan test: sanitize fonksiyonunu eval scope'undan çek.
   // Pragmatik: sync.js kaynağında sanitize'in profileAssessment'e dokunmadığını
   // ve settings.ghToken/openaiKey/syncUrl sildiğini metin tabanlı doğrula.
-  var src = fs.readFileSync(path.join(__dirname,'sync.js'),'utf8');
+  var src = fs.readFileSync(path.join(repoRoot,'sync.js'),'utf8');
   ok('sanitize profileAssessment silmez', src.indexOf('delete') >= 0 && src.toLowerCase().indexOf('profileassessment') >= 0 && !/delete\s+[^;]*profileassessment/i.test(src.replace(/\/\/[^\n]*/g,'')));
   ok('sanitize ghToken siler', /delete\s+c\.settings\.ghToken/.test(src));
   ok('sanitize openaiKey siler', /delete\s+c\.settings\.openaiKey/.test(src));
@@ -245,7 +246,7 @@ console.log('[12] sanitize — profileAssessment korunur, token silinir');
 // ── Test 13: anti-clobber korumaları değişmedi ─────────────────────────────
 console.log('[13] Anti-clobber + Guard 1 korumaları değişmedi');
 (function(){
-  var src = fs.readFileSync(path.join(__dirname,'sync.js'),'utf8');
+  var src = fs.readFileSync(path.join(repoRoot,'sync.js'),'utf8');
   ok('devOrigin() mevcut', src.indexOf('function devOrigin()') >= 0);
   ok('syncForced() mevcut', src.indexOf('function syncForced()') >= 0);
   ok('anti-clobber gün kontrolü mevcut', src.indexOf('localDays<remoteDays') >= 0);

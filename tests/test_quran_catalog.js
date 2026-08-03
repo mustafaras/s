@@ -3,11 +3,12 @@
 // node:vm sandbox'ında çalıştırır. Sandbox'ta localStorage/fetch/document/
 // process bulunmadığı için modül bunlara dokunursa test anında patlar —
 // yani "içerik uygulama state'ine karışmıyor" iddiası kanıtlanır.
-// Çalıştırma: node test_quran_catalog.js
+// Çalıştırma: node tests/test_quran_catalog.js
 
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var repoRoot = require('./repo-root');
 
 var SRC_FILE = 'quranRevelationOrderV1.js';
 var TOTAL = 114;
@@ -25,7 +26,7 @@ function ok(cond, label, detail) {
 function section(t) { console.log('\n' + t); }
 
 // ---- Modülü izole sandbox'ta yükle -----------------------------------------
-var src = fs.readFileSync(path.join(__dirname, SRC_FILE), 'utf8');
+var src = fs.readFileSync(path.join(repoRoot, SRC_FILE), 'utf8');
 
 section('1. İzolasyon ve yükleme');
 

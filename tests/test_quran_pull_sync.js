@@ -10,11 +10,12 @@
 //                      YAZMAya özgüdür; okumak veri kaybı riski taşımaz).
 //   · yapılandırılmamış — token/repo yoksa sessizce boş sözleşme, hata yok.
 //
-// Çalıştırma: node test_quran_pull_sync.js
+// Çalıştırma: node tests/test_quran_pull_sync.js
 
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 if (typeof TextEncoder === 'undefined') { global.TextEncoder = require('util').TextEncoder; }
 if (typeof TextDecoder === 'undefined') { global.TextDecoder = require('util').TextDecoder; }
@@ -60,8 +61,8 @@ function setup(opts) {
     return Promise.resolve(mockRes(res));
   };
 
-  eval(fs.readFileSync(path.join(__dirname, 'quranTransportV1.js'), 'utf8'));
-  eval(fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8'));
+  eval(fs.readFileSync(path.join(repoRoot, 'quranTransportV1.js'), 'utf8'));
+  eval(fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8'));
   return { sync: global.window.SeySync, calls: calls };
 }
 

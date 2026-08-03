@@ -44,7 +44,7 @@ viewport’u aşmadan desktop sağ panel ve mobil tam ekran davranışını koru
 - `panel.js`: native accordion, ARIA state sync, semantic header/main,
   section current state, drawer/event expanded state ve reduced-motion jump.
 - `panel.html`: D5 cache bump.
-- `test_panel_p5_responsive_a11y.js`: altı viewport ve accessibility/motion
+- `tests/test_panel_p5_responsive_a11y.js`: altı viewport ve accessibility/motion
   sentetik fixture’ı.
 
 ## Kanıt

@@ -8,10 +8,11 @@
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var repoRoot = require('./repo-root');
 
-var syncSource = fs.readFileSync(path.join(__dirname, 'sync.js'), 'utf8');
-var coverageSource = fs.readFileSync(path.join(__dirname, 'panelCoverageManifest.js'), 'utf8');
-var panelSource = fs.readFileSync(path.join(__dirname, 'panel.js'), 'utf8');
+var syncSource = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
+var coverageSource = fs.readFileSync(path.join(repoRoot, 'panelCoverageManifest.js'), 'utf8');
+var panelSource = fs.readFileSync(path.join(repoRoot, 'panel.js'), 'utf8');
 var KEY = 'seyma-reset-v1';
 var HASH_A = 'a'.repeat(40);
 var HASH_B = 'b'.repeat(40);

@@ -2,7 +2,7 @@
 // Sentetik release gate; gerçek ağ, browser, localStorage ve kişisel veri yoktur.
 'use strict';
 var fs=require('fs'),path=require('path'),vm=require('vm');
-var root=__dirname;
+var root=require('./repo-root');
 var panelSource=fs.readFileSync(path.join(root,'panel.js'),'utf8');
 var cssSource=fs.readFileSync(path.join(root,'panel.css'),'utf8');
 var htmlSource=fs.readFileSync(path.join(root,'panel.html'),'utf8');
@@ -57,7 +57,7 @@ ok('1000 event timeline tam kapasite render edilir',(timeline.match(/class="even
 ok('1000 event render güvenli özet ve süre sınırında',!timeline.includes('QA_SECRET_TOKEN')&&!timeline.includes('QA_RAW_PROFILE')&&elapsed<5000,'elapsed '+elapsed+'ms');
 
 console.log('[4] Responsive/motion/privacy regression bağlantıları');
-ok('D5 six viewport fixture gate bağlı',fs.existsSync(path.join(root,'test_panel_p5_responsive_a11y.js'))&&fs.readFileSync(path.join(root,'test_panel_p5_responsive_a11y.js'),'utf8').includes('1440px desktop'));
+ok('D5 six viewport fixture gate bağlı',fs.existsSync(path.join(__dirname,'test_panel_p5_responsive_a11y.js'))&&fs.readFileSync(path.join(__dirname,'test_panel_p5_responsive_a11y.js'),'utf8').includes('1440px desktop'));
 ok('input-focused polling/defer contract bağlı',panelSource.includes('panelDraftActiveP')&&panelSource.includes('skipped_input')&&panelSource.includes('deferred_draft'));
 ok('observer read-only boundary korunuyor',!panelSource.includes('SeySync.schedule')&&!/data\/latest\.json[\s\S]{0,240}method:["']PUT/.test(panelSource));
 ok('rollback/backup SHA dokümantasyon kapısı tanımlı',fs.existsSync(path.join(root,'docs/panel/prompts/13-PANEL-D6-QA-RELEASE-GATE-PROMPTU.md')));

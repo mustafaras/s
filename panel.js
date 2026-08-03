@@ -905,21 +905,28 @@ function toggleCard(key){
   UI.expandedCards[key]=open;
   try{ localStorage.setItem(CARDEXPKEY,JSON.stringify(UI.expandedCards)); }catch(e){}
   var el=document.querySelector('[data-card-key="'+key+'"]');
-  if(el) el.classList.toggle('is-open',open);
+  if(el){
+    el.classList.toggle('is-open',open);
+    var trigger=el.querySelector('.card-exp-head');
+    if(trigger) trigger.setAttribute('aria-expanded',open?'true':'false');
+    var body=el.querySelector('.card-exp-body');
+    if(body) body.setAttribute('aria-hidden',open?'false':'true');
+  }
 }
 window.toggleCard=toggleCard;
 function cardWrap(o){
   // o: {key, icon, title, badge, summary, details, span, order, cls}
   var key=o.key, open=!!UI.expandedCards[key];
   var span=o.span||12, order=o.order||30;
+  var controlId='card-exp-body-'+String(key).replace(/[^a-zA-Z0-9_-]/g,'-');
   var s='<div class="card lift span-'+span+' pad card-exp'+(open?' is-open':'')+(o.cls?' '+o.cls:'')+'" style="order:'+order+';" data-card-key="'+esc(key)+'">';
-  s+='<div class="card-exp-head" onclick="toggleCard(\''+key+'\')">';
+  s+='<button type="button" class="card-exp-head" aria-expanded="'+(open?'true':'false')+'" aria-controls="'+controlId+'" onclick="toggleCard(\''+key+'\')">';
   s+='<div class="lbl" style="margin-bottom:0;flex:1;">'+(o.icon?o.icon+' ':'')+esc(o.title)+'</div>';
   if(o.badge) s+=o.badge;
   s+='<span class="card-exp-chevron">▾</span>';
-  s+='</div>';
+  s+='</button>';
   if(o.summary) s+='<div class="card-exp-summary">'+o.summary+'</div>';
-  s+='<div class="card-exp-body"><div><div class="card-exp-inner">'+(o.details||'')+'</div></div></div>';
+  s+='<div id="'+controlId+'" class="card-exp-body" aria-hidden="'+(open?'false':'true')+'"><div><div class="card-exp-inner">'+(o.details||'')+'</div></div></div>';
   s+='</div>';
   return s;
 }
@@ -1290,7 +1297,7 @@ function d4ModuleAtlasHTMLP(){
   if(UI.d4SelectedModule) selected=modules.find(function(x){return x.key===UI.d4SelectedModule;})||null;
   var h='<section class="card lift span-12 pad d4-module-atlas" data-component="module-atlas" aria-labelledby="d4-module-atlas-title">';
   h+='<div class="d4-atlas-head"><div><span class="drawer-kicker">Observer coverage</span><h2 id="d4-module-atlas-title">Eksik ve özet modüller</h2><p>Her modül tek canonical metric, kaynak zamanı, durum ve güvenli ayrıntı yüzeyi taşır.</p></div><span class="d4-atlas-count">'+modules.length+' modül · metadata-first</span></div><div class="d4-module-grid">';
-  modules.forEach(function(m){ h+='<article class="d4-module-card d4-module-status-'+esc(m.status||'unknown')+'" data-component="module-card" data-module="'+esc(m.key)+'"><div class="d4-module-card-head"><span class="d4-module-icon">'+icon(m.icon,17)+'</span><div><h3>'+esc(m.title)+'</h3><p>'+esc(m.decision)+'</p></div>'+p3StatusP(m.status)+'</div><div class="d4-module-badges">'+p3BadgeP(m.source,'source')+p3BadgeP(m.privacy,'privacy')+d4CoverageBadgeP(m.coverage)+'</div><div class="d4-module-summary">'+esc(m.summary)+'</div><div class="d4-module-meta"><span>'+esc(m.time)+'</span><span class="d4-canonical-label">Canonical metric</span><b>'+esc(m.canonical)+'</b></div><div class="d4-module-cross">Cross-check · '+esc(m.crossCheck)+'</div><button type="button" class="d4-module-detail" onclick="openD4ModuleDrawerP(\''+esc(m.key)+'\',this)">Ayrıntıyı aç <span aria-hidden="true">→</span></button></article>'; });
+  modules.forEach(function(m){ h+='<article class="d4-module-card d4-module-status-'+esc(m.status||'unknown')+'" data-component="module-card" data-module="'+esc(m.key)+'"><div class="d4-module-card-head"><span class="d4-module-icon">'+icon(m.icon,17)+'</span><div><h3>'+esc(m.title)+'</h3><p>'+esc(m.decision)+'</p></div>'+p3StatusP(m.status)+'</div><div class="d4-module-badges">'+p3BadgeP(m.source,'source')+p3BadgeP(m.privacy,'privacy')+d4CoverageBadgeP(m.coverage)+'</div><div class="d4-module-summary">'+esc(m.summary)+'</div><div class="d4-module-meta"><span>'+esc(m.time)+'</span><span class="d4-canonical-label">Canonical metric</span><b>'+esc(m.canonical)+'</b></div><div class="d4-module-cross">Cross-check · '+esc(m.crossCheck)+'</div><button type="button" class="d4-module-detail" aria-controls="d4-module-drawer" aria-expanded="'+(UI.d4SelectedModule===m.key?'true':'false')+'" onclick="openD4ModuleDrawerP(\''+esc(m.key)+'\',this)">Ayrıntıyı aç <span aria-hidden="true">→</span></button></article>'; });
   h+='</div>';
   if(selected) h+=d4ModuleDrawerHTMLP(selected);
   h+='<p class="d4-atlas-foot">Dolu, eski, eksik, bozuk ve redacted durumlar aynı kart sözleşmesiyle fail-closed gösterilir. Panel render’ı source data’yı backfill etmez.</p></section>';
@@ -1443,7 +1450,7 @@ function eventLogCardHTMLP(){
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-source="'+esc(src.kind)+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main"><b>'+esc(safeEventSummaryP(e))+'</b><small>'+esc(feature.label)+' · '+esc(e.section||'—')+' · '+esc(e.operation||'—')+' · '+esc(e.path||'—')+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button type="button" id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-source="'+esc(src.kind)+'" aria-controls="event-drawer-panel" aria-expanded="'+(UI.eventSelectedId===e.eventId?'true':'false')+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main"><b>'+esc(safeEventSummaryP(e))+'</b><small>'+esc(feature.label)+' · '+esc(e.section||'—')+' · '+esc(e.operation||'—')+' · '+esc(e.path||'—')+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
     h+='</div>';
   }
   if(selectedGroup) h+=eventDetailsP(selectedGroup.event,selectedGroup.members);
@@ -1906,7 +1913,9 @@ function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); rend
 // ── Jump-nav: bölüme kaydır + scroll-spy (aktif bölümü şeritte vurgula) ──
 function jumpToSection(id){
   var el=document.getElementById(id); if(!el) return;
-  el.scrollIntoView({behavior:'smooth',block:'start'});
+  var reduce=false;
+  try{ reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+  el.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
 }
 window.jumpToSection=jumpToSection;
 var _secSpyBound=null;
@@ -1918,7 +1927,11 @@ function initSectionScrollSpy(){
   function update(){
     var pageTop=page.getBoundingClientRect().top, activeId=headers.length?headers[0].id:null;
     headers.forEach(function(hEl){ if(hEl.getBoundingClientRect().top-pageTop<=60) activeId=hEl.id; });
-    btns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-sec')===activeId); });
+    btns.forEach(function(b){
+      var active=b.getAttribute('data-sec')===activeId;
+      b.classList.toggle('active',active);
+      b.setAttribute('aria-current',active?'true':'false');
+    });
   }
   if(_secSpyBound) page.removeEventListener('scroll',_secSpyBound);
   _secSpyBound=update; page.addEventListener('scroll',update,{passive:true});
@@ -2858,14 +2871,14 @@ function render(){
   }
 
   // ── D2 COMMAND CENTER ─────────────────────────────────────
-  h+='<div class="topbar" data-component="command-center" aria-label="ÆON komuta merkezi">';
+  h+='<header class="topbar" data-component="command-center" role="banner" aria-label="ÆON komuta merkezi">';
   h+='<div class="topbar-brand"><div class="brand"><span class="brand-mark" style="color:#1a1404;font-weight:800;">⬡</span><span class="brand-name">ÆON</span></div><span class="brand-context">Observer · Command Center</span></div>';
   h+='<div class="topbar-status" aria-live="polite">'+d2StatusBadgeP(canonical.label,canonical.kind,canonical.cls)+'<span class="topbar-status-detail">'+esc(canonical.detail)+'</span>'+(DEMO_MODE?'<span class="badge status-pending b-warn">Demo · ağ kapalı</span>':'')+(UI.newChanges>0?'<button type="button" class="new-changes-chip" data-component="new-changes" aria-label="'+UI.newChanges+' yeni değişikliği görüntüle" onclick="viewNewChangesP()">'+UI.newChanges+' yeni değişiklik</button>':'')+'</div>';
   h+='<div class="topbar-actions" role="toolbar" aria-label="Panel eylemleri"><div class="density-toggle" data-component="density-toggle" role="group" aria-label="Görünüm yoğunluğu">'+[['quick','Hızlı'],['standard','Standart'],['audit','Audit']].map(function(x){return '<button type="button" aria-pressed="'+(UI.density===x[0]?'true':'false')+'" class="'+(UI.density===x[0]?'active':'')+'" onclick="setDensityP(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div><button type="button" class="btn command-action" aria-label="Paneli yenile" title="Yenile" onclick="load()">'+icon('rotate-ccw',15)+'<span class="sr-only">Yenile</span></button><button type="button" class="btn command-action" aria-label="Panelden çıkış yap" title="Çıkış" onclick="resetPanelToken()">'+icon('lock',15)+'<span class="sr-only">Çıkış</span></button></div>';
-  h+='</div>';
+  h+='</header>';
 
   // ── PAGE ────────────────────────────────────────────────────
-  h+='<div class="page density-'+esc(UI.density)+'" data-density="'+esc(UI.density)+'">';
+  h+='<main class="page density-'+esc(UI.density)+'" data-density="'+esc(UI.density)+'" aria-label="ÆON gözlem paneli">';
   h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION_STATE);
   h+=commandCenterHeroesHTMLP([
     {key:'ruh',label:'Ruh',icon:'♡',value:srec.mood?esc(MOOD_LABEL[srec.mood]||srec.mood):'Kayıt bekleniyor',detail:'Seçili gün · '+(journalStreak()?journalStreak()+' gün günlük sürekliliği':'günlük ritmi başlat')},
@@ -2887,7 +2900,7 @@ function render(){
 
   // ── JUMP-NAV: 5 bölüme atlama şeridi ──
   h+='<div class="jumpnav" id="jumpnav" data-component="section-navigation" aria-label="Bölüm navigasyonu">';
-  SECTIONS.forEach(function(sec){ h+='<button data-sec="'+sec.id+'" onclick="jumpToSection(\''+sec.id+'\')">'+sec.ico+' '+sec.title+'</button>'; });
+  SECTIONS.forEach(function(sec){ h+='<button type="button" data-sec="'+sec.id+'" aria-controls="'+sec.id+'" aria-current="false" onclick="jumpToSection(\''+sec.id+'\')">'+sec.ico+' '+sec.title+'</button>'; });
   h+='</div>';
 
   // ── BENTO GRID ──────────────────────────────────────────────
@@ -2899,7 +2912,7 @@ function render(){
   h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){
-    h+='<div class="section-header" id="'+sec.id+'" style="order:'+(sec.ord-1)+';top:0;"><span class="sh-ico">'+sec.ico+'</span><span class="sh-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';
+    h+='<div class="section-header" id="'+sec.id+'" role="region" aria-labelledby="'+sec.id+'-title" style="order:'+(sec.ord-1)+';"><span class="sh-ico" aria-hidden="true">'+sec.ico+'</span><span class="sh-title" id="'+sec.id+'-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';
   });
 
   // D2 ayrıntı metrikleri — ilk bakış dört hero’da; tam sayısal döküm burada.

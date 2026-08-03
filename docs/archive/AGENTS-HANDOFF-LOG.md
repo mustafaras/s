@@ -5,6 +5,72 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-014 D5 kabulü + PANEL-015 D6 QA/release gate teslimi
+
+**Kullanıcı kararı:** Kullanıcı PANEL-13 / Prompt 13’ü açıkça başlattı; D5
+responsive/a11y/motion teslimi kabul edilerek D6 QA/release kapısı açıldı.
+D6 tüm zorunlu kapıları geçti ve `ready_for_review` durumunda bırakıldı.
+Commit/push/merge/deploy yapılmadı.
+
+**Değişen dosyalar:** `test_panel_p6_qa_release.js`,
+`docs/panel/plans/PANEL-D6-QA-RELEASE-GATE.md`, panel README/UX planı ve
+paired ledger’lar.
+
+**QA kanıtı:** D6 fixture **16/16**; toplam **22 mandatory command check
+PASS**; ek Kur’an catalog/transport/flow/a11y regresyonları **8 command PASS**.
+`node --check` app/sync/panel/coverage; panel script-tag balance; CSS brace;
+coverage manifest validator; projection redaction/secret/GPS/media scanner;
+empty/full/stale/error/redacted; offline/reconnect; 409/422 bounded retry;
+anti-clobber; input-focused polling; 1000 event timeline; D5 responsive/
+contrast/reduced-motion ve headless/migration kapıları PASS.
+
+**Backup / rollback:** Production/base ve `origin/main` SHA’sı
+`b6ba580b00660c5c9475caaacb6d68904a9f95dd`; rollback yolu ilgili merge
+SHA’sına `git revert`, komut çalıştırılmadı.
+
+**Güvenlik / dış etki:** Browser veya local server açılmadı; gerçek ağ,
+localStorage, `data/`, `data/events/`, `mustafaras/seyma-data` ve observer
+write kanalları değişmedi. Yeşil test sonucu release yetkisi olarak kabul
+edilmedi.
+
+**Sonraki güvenli adım:** Kullanıcı QA/release özetini inceleyip açık release
+onayı verene kadar dış eylem veya yeni faz başlatılmayacak.
+
+---
+### 2026-08-03 — PANEL-013 D4 kabulü + PANEL-014 D5 responsive/a11y teslimi
+
+**Kullanıcı kararı:** Kullanıcı D4 teslimini `d4 kabul` diyerek açıkça kabul
+etti ve sıradaki prompta geçiş izni verdi. PANEL-014 / Prompt 12 uygulandı;
+D5 teslimi kullanıcı review’ına sunulmak üzere `ready_for_review` durumunda
+bırakıldı. Prompt 13 başlatılmadı.
+
+**Değişen dosyalar:** `panel.css`, `panel.js`, `panel.html`,
+`test_panel_p5_responsive_a11y.js`, `docs/panel/plans/PANEL-D5-RESPONSIVE-A11Y.md`,
+README/UX planı ve paired ledger’lar.
+
+**Uygulanan D5 yüzeyi:** 375/390/430 mobil tek kolon, 768 tablet iki kolon,
+1280/1440 desktop 12 kolon sözleşmesi; 480px sınırı yalnız mobil koşulunda;
+desktop sticky section header’ın jump-nav altında kalması; native accordion;
+44px action target; visible focus; `aria-current`/`aria-controls`,
+`aria-expanded`/`aria-hidden`, live regions; AA contrast ve high-contrast
+token’ları; reduced-motion CSS ve JS section jump davranışı.
+
+**Testler:** D5 fixture **24/24**; toplam **21 command check PASS**; app/sync/
+panel/coverage syntax, P0–D5 regressions, app/Zikirmatik headless,
+B1/B2/B3 migration, panel script/cache ve `git diff --check` PASS. Cache
+version’ı `20260803f`.
+
+**Güvenlik / dış etki:** Browser veya local server açılmadı; gerçek ağ,
+localStorage, `data/`, `data/events/`, `mustafaras/seyma-data` ve observer
+write kanalları değişmedi. Accessibility ve design-system yönergeleri native
+semantics, focus containment, 44px targets, contrast ve shared token
+uygulamasını yönlendirdi.
+
+**Sonraki güvenli adım:** Kullanıcı PANEL-014 D5 responsive/a11y/motion
+review/kabulü; açık kabul olmadan Prompt 13 / PANEL-015 QA-release gate’i
+başlatılmayacak.
+
+---
 ### 2026-08-03 — PANEL-012 D3 kabulü + PANEL-013 D4 modül kartları teslimi
 
 **Kullanıcı kararı:** Kullanıcı D3 timeline/drawer teslimini `kabu ve` diyerek

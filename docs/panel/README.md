@@ -72,6 +72,12 @@ PANEL-012 / Prompt 10 D3 timeline/drawer teslimatı:
 PANEL-013 / Prompt 11 D4 modül kartları teslimatı:
 [PANEL-D4-MODUL-KARTLARI.md](plans/PANEL-D4-MODUL-KARTLARI.md).
 
+PANEL-014 / Prompt 12 D5 responsive/a11y/motion teslimatı:
+[PANEL-D5-RESPONSIVE-A11Y.md](plans/PANEL-D5-RESPONSIVE-A11Y.md).
+
+PANEL-015 / Prompt 13 D6 QA/release gate teslimatı:
+[PANEL-D6-QA-RELEASE-GATE.md](plans/PANEL-D6-QA-RELEASE-GATE.md).
+
 ## Şu anki durum
 
 - Prompt paketi: hazır.
@@ -79,8 +85,8 @@ PANEL-013 / Prompt 11 D4 modül kartları teslimatı:
 - Tasarım planı: hazır.
 - Kod uygulaması: `PANEL-003`–`PANEL-009` / Prompt 01–07 kullanıcı kabulüyle
   `completed`; Prompt 08 / `PANEL-010` review bekliyor, Prompt 09 / `PANEL-011`
-  ve Prompt 10 / `PANEL-012` kullanıcı kabulüyle `completed`; Prompt 11 /
-  `PANEL-013` uygulandı ve paired ledger review’ı bekliyor.
+  ve Prompt 10–11 / `PANEL-012`–`PANEL-013` kullanıcı kabulüyle `completed`;
+  Prompt 12 / `PANEL-014` uygulandı ve paired ledger review’ı bekliyor.
 - Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
   `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
   push edildi. Pages run `30761174707` başarılı. PANEL-007/PANEL-008 teslimatı
@@ -98,7 +104,8 @@ PANEL-013 / Prompt 11 D4 modül kartları teslimatı:
 - Coverage/projection/redaction, root-modül/mismatch/privacy,
   terapi/bildirim/provenance, append-only event log, polling/relay karar
   kapıları, D1 semantic component yüzeyi, D2 command center, D3 timeline /
-  drawer ve D4 modül atlası hazır. Prompt 01–07 kullanıcı kabulüyle
-  tamamlandı; Prompt 08 `ready_for_review`, Prompt 09–10 tamamlandı, Prompt 11
-  `ready_for_review`. Relay açılmadı; Prompt 12 yalnız D4 açık kabulünden sonra
-  başlatılabilir.
+  drawer, D4 modül atlası ve D5 responsive/a11y/motion pass’i hazır. Prompt
+  01–07 kullanıcı kabulüyle tamamlandı; Prompt 08 `ready_for_review`, Prompt
+  09–12 tamamlandı, Prompt 13 / `PANEL-015` QA/release gate’i uygulandı ve
+  paired ledger review’ı bekliyor. Relay açılmadı; commit/push/merge/deploy
+  yapılmadı.

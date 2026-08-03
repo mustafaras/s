@@ -288,3 +288,73 @@ implementation_started: true
 external_write_authorized: false
 next_safe_action: PANEL-013 D4 modül kartları teslimini kullanıcıya review için sunmak; açık kabul olmadan Prompt 12 / PANEL-014 veya responsive/a11y pass’i başlatmamak
 ```
+
+## PANEL-013 kullanıcı kabulü + PANEL-014 başlangıcı (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | completed | D4 implementation `ready_for_review`; kullanıcı açık D4 kabulü verdi | Kullanıcı `d4 kabul` diyerek D4 modül kartları teslimini onayladı; D4 fixture **13/13**, yayın `b6ba580`, Pages `30808155565` success, canlı panel HTTP **200** | Prompt 12 / PANEL-014 D5 responsive/a11y/motion işi başlatıldı |
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | in_progress | PANEL-013 completed; kullanıcı sıradaki prompta geçiş izni verdi | 375/390/430/768/1280/1440 fixture, 44px actions, ARIA, contrast, overflow, focus ve reduced-motion kapıları uygulanıyor | D5 fixture, syntax, regression, headless/migration ve diff kapılarını tamamla; Prompt 13’ü başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D5-RESPONSIVE-A11Y
+active_sequence: PANEL-014
+status: in_progress
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-014 responsive/a11y/motion kabul kapılarını tamamlamak; Prompt 13 / PANEL-015’i başlatmamak
+```
+
+## PANEL-014 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | ready_for_review | PANEL-013 completed; kullanıcı sıradaki prompta geçiş izni verdi | `PANEL-D5-RESPONSIVE-A11Y.md`; D5 fixture **24/24**; altı viewport, 44px action, ARIA, focus, contrast, overflow ve reduced-motion kapıları PASS; D3/D4/Faz 11 regresyonları PASS; cache **20260803f** | Kullanıcı D5 responsive/a11y/motion review/kabulü; açık kabul olmadan Prompt 13 / PANEL-015 başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D5-RESPONSIVE-A11Y
+active_sequence: PANEL-014
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-014 D5 responsive/a11y/motion teslimini kullanıcıya review için sunmak; açık kabul olmadan Prompt 13 / PANEL-015 QA-release gate’ini başlatmamak
+```
+
+## PANEL-014 kullanıcı kabulü + PANEL-015 başlangıcı (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | completed | D5 implementation `ready_for_review`; kullanıcı PANEL-13 promptunu açıkça başlattı | D5 fixture **24/24**, 21 command check PASS; kullanıcı yeni Prompt 13 ile D5 kapısını kabul ederek D6 QA/release fazını açtı | PANEL-015 D6 QA/release kapısını tamamla; dış release yapma |
+| PANEL-015 | 2026-08-03 | D6-QA-RELEASE-GATE | in_progress | PANEL-014 completed; kullanıcı Prompt 13’ü açıkça başlattı | Kod/sözleşme, headless, projection/redaction, retry/anti-clobber, 1000 event, backup/rollback ve kullanıcı onayı kapıları çalıştırılıyor | D6 fixture, full regression ve paired ledger kanıtını tamamla; release izni varsayma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D6-QA-RELEASE-GATE
+active_sequence: PANEL-015
+status: in_progress
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-015 D6 QA/release kapılarını tamamlamak ve kullanıcıya kanıtlı review sunmak; release dış eylemi yapmamak
+```
+
+## PANEL-015 final kayıt (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-015 | 2026-08-03 | D6-QA-RELEASE-GATE | ready_for_review | PANEL-014 completed; kullanıcı Prompt 13’ü açıkça başlattı | D6 fixture **16/16**; toplam **22 command check PASS**; backup SHA `b6ba580b00660c5c9475caaacb6d68904a9f95dd`; redaction/secret, 1000 event, retry/anti-clobber, headless/migration ve diff kapıları PASS | Kullanıcıya kısa kanıtlı özet sun; açık release/onay olmadan commit/push/merge/deploy veya yeni faz başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D6-QA-RELEASE-GATE
+active_sequence: PANEL-015
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-015 D6 QA/release kanıtını kullanıcıya review için sunmak; açık release/onay olmadan dış eylem yapmamak
+```

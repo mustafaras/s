@@ -141,3 +141,74 @@ implementation_started: false
 external_write_authorized: false
 next_safe_action: Kullanıcı açıkça başlatırsa yalnız Prompt 07 wireframe çalışmasını yapmak; CSS/panel HTML refactor’ına wireframe kabul edilmeden başlamamak
 ```
+
+## PANEL-009 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | in_progress | PANEL-003–008 completed; kullanıcı Prompt 07’yi açıkça başlattı | Kodsuz IA/wireframe çalışması açıldı; hedef akış, responsive ve drawer sınırları hazırlanıyor | D0 wireframe kabul kapısını tamamla; CSS/panel HTML’e dokunma |
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | ready_for_review | PANEL-003–008 completed; kullanıcı Prompt 07’yi açıkça başlattı | Wireframe dosyası 375–430/768/1280 layout’larını, 10/60 sn akışları, Hızlı/Standart/Audit modlarını, tüm fail-closed durumları, coverage/provenance eşleşmesini ve hassas drawer sınırlarını içeriyor; `git diff --check` PASS | Kullanıcı review/kabulü; açık kabul olmadan Prompt 08 / PANEL-010 veya CSS/panel HTML refactor’ı başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D0-IA-WIREFRAME
+active_sequence: PANEL-009
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-009 wireframe’ini kullanıcıya review için sunmak; açık kabul olmadan Prompt 08 / PANEL-010 veya CSS/panel HTML refactor’ı başlatmamak
+```
+
+## PANEL-009 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | completed | D0 wireframe teslimi ve kabul kapısı hazır | Kullanıcı açıkça onayladı; wireframe kapsamı, responsive akış, yoğunluklar, durumlar, coverage/provenance ve drawer sınırları kabul edildi | Prompt 08 / PANEL-010 planned; kullanıcı açık başlatması beklenir |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D1-TOKEN-COMPONENT
+active_sequence: PANEL-010
+status: planned
+implementation_started: false
+external_write_authorized: false
+next_safe_action: Kullanıcı açıkça başlatırsa Prompt 08 D1 token/component sözleşmesini uygulamak; CSS/panel HTML kod değişikliği ancak o prompt kapsamında yapılabilir
+```
+
+## PANEL-010 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-010 | 2026-08-03 | D1-TOKEN-COMPONENT | in_progress | PANEL-009 completed; kullanıcı Prompt 08’i açıkça başlattı | Semantic surface/status/source/privacy/feature token katmanları ve ortak component API’si uygulanıyor; 44px, contrast, reduced-motion ve desktop/mobile semantik eşliği doğrulanıyor | D1 component sözleşmesini, CSS/HTML/JS entegrasyonunu ve fixture kapısını tamamla |
+| PANEL-010 | 2026-08-03 | D1-TOKEN-COMPONENT | ready_for_review | PANEL-009 completed; kullanıcı Prompt 08’i açıkça başlattı | `PANEL-D1-TOKEN-COMPONENT.md`; 25 token grubu + 10 component contract PASS; status icon+metin, source/privacy ayrımı, density toggle ve 44px touch target; syntax/regression/headless/migration kapıları yeşil | Kullanıcı D1 review/kabulü; açık kabul/“devam” olmadan Prompt 09 / PANEL-011 başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D1-TOKEN-COMPONENT
+active_sequence: PANEL-010
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-010 D1 token/component sözleşmesini kullanıcıya review için sunmak; açık kabul olmadan Prompt 09 / PANEL-011 veya yeni panel refactor’ı başlatmamak
+```
+
+## PANEL-011 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | in_progress | PANEL-010 ready_for_review; kullanıcı Prompt 09’u açıkça başlattı | Header, canonical status, sync zamanları, dört hero, risk/stale ayrımı, erişilebilir eylemler ve yeni değişiklik chip’i uygulanıyor | D2 visual/a11y/syntax/safety kabul kapısını tamamla; latest/projection write sınırını koru |
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | ready_for_review | PANEL-010 ready_for_review; kullanıcı Prompt 09’u açıkça başlattı | D2 sözleşme dokümanı; 13/13 visual/a11y/safety fixture; syntax/cache/headless/regression/migration kapıları yeşil; yeni veri chip’i yalnız kullanıcı eylemiyle scroll eder | Kullanıcı D2 review/kabulü; açık kabul/“devam” olmadan Prompt 10 / PANEL-012 başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D2-COMMAND-CENTER
+active_sequence: PANEL-011
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-011 D2 command center ve sync ribbon teslimini kullanıcıya review için sunmak; açık kabul olmadan Prompt 10 / PANEL-012 başlatmamak
+```

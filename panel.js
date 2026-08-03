@@ -118,6 +118,7 @@ var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
 var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların açık bırakıldığını hatırlar
 var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartında hangi sekmenin seçili kaldığını hatırlar
+var DENSITYKEY="seyma-panel-density-v1"; // Hızlı/Standart/Audit görünüm yoğunluğu
 var PTOKEN="";
 var D=null;
 var SYNC_RECEIPT=null;
@@ -130,7 +131,7 @@ var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
 var PANEL_TRANSPORT_CACHE={};
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
@@ -186,7 +187,7 @@ function pollStatusP(){
 function updatePollRibbonP(){
   try{
     var p=pollStatusP(), badge=document.getElementById('poll-ribbon-status'), note=document.getElementById('poll-ribbon-note');
-    if(badge){ badge.className='badge '+p.cls; badge.textContent=p.label; }
+    if(badge){ badge.className='badge status-badge status-'+statusToneP(p.cls)+' '+p.cls; badge.textContent=p.label; }
     if(note) note.textContent=p.note;
   }catch(e){}
 }
@@ -392,7 +393,7 @@ var QURAN_ROW_P={
   invalid_reply:{tone:'warn',label:'Bağlantı doğrulanamadı'},
   video_unavailable:{tone:'warn',label:'Anlatım erişilemiyor'}
 };
-function quranBadgeClassP(tone){ return tone==='wait'?'b-warn':tone==='ready'?'b-quranp':tone==='done'?'b-ok':tone==='warn'?'b-danger':'b-dim'; }
+function quranBadgeClassP(tone){ return tone==='wait'?'badge status-badge status-pending b-warn':tone==='ready'?'badge status-badge status-ok b-ok':tone==='done'?'badge status-badge status-ok b-ok':tone==='warn'?'badge status-badge status-danger b-danger':'badge status-badge status-muted b-dim'; }
 function quranJourneyRootP(){ return (D&&D.quranJourney&&typeof D.quranJourney==='object')?D.quranJourney:null; }
 function quranNoteKindP(kind){ return kind==='listen'?'Dinlerken':kind==='reflection'?'Yansıma':'İzlerken'; }
 function quranNoteTimeP(sec){ var n=Number(sec); if(!isFinite(n)||n<0) return ''; n=Math.floor(n); return Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
@@ -636,7 +637,7 @@ function quranJourneyPanelCardHTML(){
     deliveredRows.forEach(function(r){
       var rs=QURAN_ROW_P[r.status]||{tone:'idle',label:r.status}, last=r.notes[0];
       det+='<div style="background:linear-gradient(135deg,var(--quranp-bg),var(--s2));border:1px solid rgba(91,135,196,.28);border-radius:12px;padding:11px 12px;">';
-      det+='<div style="display:flex;align-items:flex-start;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak · '+esc(r.req.videoId)+'</div></div><span class="badge '+quranBadgeClassP(rs.tone)+'">'+esc(rs.label)+'</span></div>';
+      det+='<div style="display:flex;align-items:flex-start;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak · '+esc(r.req.videoId)+'</div></div><span class="'+quranBadgeClassP(rs.tone)+'" data-component="status-badge">'+esc(rs.label)+'</span></div>';
       det+='<div style="display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:8px;font-size:var(--f1);color:var(--t3);">';
       det+='<span>Hazır: '+esc(tsShort(r.req.readyAt)||'—')+'</span><span>İzleme: '+esc(tsShort(r.req.startedWatchingAt)||'—')+'</span><span>Tamam: '+esc(tsShort(r.req.watchedAt)||'—')+'</span><span style="color:var(--quranp2);font-weight:800;">'+r.notes.length+' not</span></div>';
       det+='<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><a href="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(r.req.videoId)+'" target="_blank" rel="noopener noreferrer" style="font-size:var(--f2);color:var(--quranp2);font-weight:800;text-decoration:none;">'+icon('external-link',12)+' Videoyu aç</a>'+(last?'<span style="font-size:var(--f1);color:var(--t3);">Son not: '+esc(quranNoteKindP(last.kind))+(last.timestampSec!==null&&last.timestampSec!==undefined?' · '+esc(quranNoteTimeP(last.timestampSec)):'')+'</span>':'<span style="font-size:var(--f1);color:var(--t4);">Not bekleniyor</span>')+'</div>';
@@ -660,7 +661,7 @@ function quranJourneyPanelCardHTML(){
       det+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 11px;">';
       det+='<div style="display:flex;align-items:center;gap:8px;">';
       det+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak</div></div>';
-      det+='<span class="badge '+quranBadgeClassP(rs.tone)+'">'+esc(rs.label)+'</span>';
+      det+='<span class="'+quranBadgeClassP(rs.tone)+'" data-component="status-badge">'+esc(rs.label)+'</span>';
       det+='</div>';
       if(r.req&&r.req.videoId){
         var vurl='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(r.req.videoId);
@@ -1111,11 +1112,43 @@ function syncFreshnessP(receipt,pollAt){
   if(age<=2160) return {klass:'warn',txt:'Yakın takip · uzak kabul eski'};
   return {klass:'danger',txt:'Yakın takip · uzak kabul kritik derecede eski'};
 }
+function canonicalStatusP(receipt,projectionState){
+  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), reason=projectionState&&projectionState.reason||'';
+  if(st.code==='anti_clobber'||st.code==='conflict') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical conflict',detail:'Uzak kabul bekleniyor; veri kaybı riskinde işlem durdu.',revision:r.snapshotRevision||null};
+  if(st.code==='error'||st.code==='permission'||st.code==='unauthorized'||st.code==='forbidden'||st.code==='receipt_failed') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical hata',detail:'Receipt/revision doğrulanamadı; önceki güvenli görünüm korunuyor.',revision:r.snapshotRevision||null};
+  if(st.code==='missing') return {code:st.code,kind:'warning',cls:'b-warn',label:'Canonical receipt bekleniyor',detail:'Uzak kabul makbuzu olmadan başarı iddiası yok.',revision:r.snapshotRevision||null};
+  if(st.code==='accepted'&&(reason==='projection_stale'||reason==='projection_invalid'||reason==='projection_parse_failed'||reason==='projection_network'||reason==='projection_permission')) return {code:'projection',kind:'warning',cls:'b-warn',label:'Canonical kabul · projection bekliyor',detail:'Receipt kabul edildi; observer görünümü güvenli fallback ile sürüyor.',revision:r.snapshotRevision||null};
+  if(st.code==='accepted') return {code:'accepted',kind:'ok',cls:'b-ok',label:'Canonical kabul edildi',detail:'Receipt + revision kanıtı doğrulandı.',revision:r.snapshotRevision||null};
+  if(st.code==='queued'||st.code==='saving'||st.code==='retrying'||st.code==='offline'||st.code==='local_saved') return {code:st.code,kind:'pending',cls:'b-warn',label:'Canonical bekliyor',detail:'Yerel kayıt var; uzak kabul henüz oluşmadı.',revision:r.snapshotRevision||null};
+  return {code:st.code||'idle',kind:'muted',cls:'b-dim',label:'Canonical durum bekleniyor',detail:'İlk receipt/revision kontrolü bekleniyor.',revision:r.snapshotRevision||null};
+}
+function d2StatusBadgeP(label,kind,extra){
+  var k=['ok','pending','warning','danger','muted'].indexOf(kind)>=0?kind:'muted';
+  return '<span class="badge status-badge status-'+k+' '+(extra||'b-dim')+'" data-component="status-badge" data-status="'+k+'">'+esc(label)+'</span>';
+}
+function countNewEventChangesP(previous,next){
+  var oldIds={}; (Array.isArray(previous)?previous:[]).forEach(function(e){ if(e&&e.eventId) oldIds[String(e.eventId)]=true; });
+  var count=0; (Array.isArray(next)?next:[]).forEach(function(e){ if(e&&e.eventId&&!oldIds[String(e.eventId)]) count++; });
+  return count;
+}
+function viewNewChangesP(){
+  UI.newChanges=0; render();
+  setTimeout(function(){ var el=document.getElementById('event-log-card'); if(el&&typeof el.scrollIntoView==='function') el.scrollIntoView({behavior:'smooth',block:'start'}); },0);
+}
+window.viewNewChangesP=viewNewChangesP;
 function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt,projectionState), pollState=typeof PANEL_POLL_STATE==='object'&&PANEL_POLL_STATE?PANEL_POLL_STATE:{}, ps=typeof pollStatusP==='function'?pollStatusP():{cls:'b-dim',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'}, revFull=pollState.sourceRevision||r.snapshotRevision||'—', rev=String(revFull).slice(0,12), visibleFull=pollState.visibleRevision||r.snapshotRevision||'—', visible=String(visibleFull).slice(0,12);
+  function localStatus(label,legacy,tone){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=tone||inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(kind)+'">'+esc(label)+'</span>'; }
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
-  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span id="poll-ribbon-status" class="badge '+ps.cls+'">'+esc(ps.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='projection_failed'?'Uzak kayıt alınmış olabilir; observer projection oluşmadığı için panel bunu tam başarı saymıyor.':'')+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
+  var errorState=['error','permission','unauthorized','forbidden','conflict','anti_clobber','receipt_failed'].indexOf(st.code)>=0||ps.code==='error';
+  var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
+  var noteClass=errorState?' error-state':staleState?' stale-banner':'';
+  var noteComponent=errorState?'error-state':staleState?'stale-banner':'sync-ribbon-note';
+  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?'Canonical hata; önceki güvenli görünüm korunuyor.':staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':'';
+  var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
+  var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
+  return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
 }
 function projectionStatusP(state){
   var s=state&&state.source||'none', reason=state&&state.reason||'projection_missing';
@@ -1128,12 +1161,35 @@ function projectionStatusP(state){
 }
 function coverageRibbonHTMLP(state){
   var st=projectionStatusP(state), c=state&&state.coverage||{}, full=Array.isArray(c.full)?c.full.length:0, summary=Array.isArray(c.summary)?c.summary.length:0, redacted=Array.isArray(c.redacted)?c.redacted.length:0, missing=Array.isArray(c.missing)?c.missing.length:0;
+  function localStatus(label,legacy){ var map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(kind)+'">'+esc(label)+'</span>'; }
   var cells=[['Tam',full],['Özet',summary],['Redacted',redacted],['Eksik',missing]].map(function(x){ return '<div class="coverage-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(String(x[1]))+'</b></div>'; }).join('');
-  return '<section class="coverage-ribbon" aria-label="Observer coverage özeti"><div class="coverage-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="coverage-ribbon-manifest">manifest · v1</span></div><div class="coverage-ribbon-grid">'+cells+'</div><div class="coverage-ribbon-note">'+esc(st.note)+'</div></section>';
+  return '<section class="coverage-ribbon" data-component="coverage-ribbon" aria-label="Observer coverage özeti"><div class="coverage-ribbon-head">'+localStatus(st.label,st.cls)+'<span class="coverage-ribbon-manifest">manifest · v1</span></div><div class="coverage-ribbon-grid">'+cells+'</div><div class="coverage-ribbon-note">'+esc(st.note)+'</div></section>';
 }
-function p3BadgeP(text,kind){ return '<span class="p3-badge '+(kind||'source')+'">'+esc(text)+'</span>'; }
+function statusToneP(legacy){ return legacy==='b-ok'?'ok':legacy==='b-danger'?'danger':legacy==='b-warn'?'warning':legacy==='b-gold'?'pending':'muted'; }
+function statusToneForCodeP(status,legacy){
+  if(['pending','started','sent','delivered','active'].indexOf(status)>=0) return 'pending';
+  if(['incomplete','stale'].indexOf(status)>=0) return 'warning';
+  return statusToneP(legacy);
+}
+function statusBadgeP(label,legacy,tone){ var text=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(text)?'pending':null, t=tone||inferred||statusToneP(legacy); return '<span class="badge status-badge status-'+t+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(t)+'">'+esc(label)+'</span>'; }
+function sourceKindP(text){
+  var s=String(text||'').toLowerCase();
+  if(/external|wikimedia|youtube|harici/.test(s)) return 'external';
+  if(/delivery|teslim|inbox|bildirim|notification/.test(s)) return 'delivery';
+  if(/observer|projection|canonical|panel/.test(s)) return 'observer';
+  if(/derived|türetil|trend|summary|backoff/.test(s)) return 'derived';
+  return 'user';
+}
+function privacyKindP(text){ return /sensitive|raw|gps|track|base64|redacted|gizli|restricted/.test(String(text||'').toLowerCase())?'restricted':'redacted'; }
+function p3BadgeP(text,kind){
+  var k=kind||'source', raw=String(text||'').toLowerCase(), variant;
+  if(k==='privacy') variant=/sensitive|raw|gps|track|base64|redacted|gizli|restricted/.test(raw)?'restricted':'redacted';
+  else variant=/external|wikimedia|youtube|harici/.test(raw)?'external':/delivery|teslim|inbox|bildirim|notification/.test(raw)?'delivery':/observer|projection|canonical|panel/.test(raw)?'observer':/derived|türetil|trend|summary|backoff/.test(raw)?'derived':'user';
+  var cls=k==='privacy'?'privacy-badge privacy-'+variant:'source-badge source-'+variant;
+  return '<span class="p3-badge '+k+' '+cls+'" data-component="'+(k==='privacy'?'privacy-badge':'source-badge')+'" data-'+k+'-kind="'+variant+'">'+esc(text)+'</span>';
+}
 function p3TimeP(v){ return v?esc(String(v).slice(0,16).replace('T',' ')):'—'; }
-function p3StatusP(status){ var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']}; var x=m[status]||['Bekleniyor','b-dim']; return '<span class="badge '+x[1]+'">'+esc(x[0])+'</span>'; }
+function p3StatusP(status){ var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']}; var x=m[status]||['Bekleniyor','b-dim'], tone=['pending','started','sent','delivered','active'].indexOf(status)>=0?'pending':['incomplete','stale'].indexOf(status)>=0?'warning':({ 'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}[x[1]]||'muted'); return '<span class="badge status-badge status-'+tone+' '+x[1]+'" data-component="status-badge" data-status="'+tone+'">'+esc(x[0])+'</span>'; }
 function p3SettingsSummaryP(settings){
   var t=settings&&settings.tracked||{}, labels={locationEnabled:'Konum',locationMode:'Konum modu',caffeineMode:'Kafein modu',targetBed:'Hedef uyku',hideLocationCard:'Konum kartı',hideRepoBanner:'Repo bandı',profileAssessmentInactive:'Profil pasif',aeonNotifyPermission:'ÆON bildirim',prayerMethod:'Namaz yöntemi',prayerRemindersEnabled:'Namaz hatırlatıcı',magnesiumEnabled:'Magnezyum'};
   var keys=Object.keys(labels), out=[];
@@ -1203,7 +1259,7 @@ function eventTimeP(v){ return v?p3TimeP(v):'—'; }
 function eventDetailsP(e){
   if(!e) return '';
   var st=eventStatusP(e), rev=e.snapshotRevision||'—';
-  var h='<div class="event-drawer" role="dialog" aria-label="Event ayrıntısı">';
+  var h='<div class="detail-drawer event-drawer" data-component="detail-drawer" role="dialog" aria-label="Event ayrıntısı">';
   h+='<div class="event-drawer-head"><b>Event ayrıntısı</b><button class="btn" onclick="closeEventDrawerP()" aria-label="Kapat">×</button></div>';
   h+='<div class="event-drawer-grid">';
   [['Durum',st.label],['Event ID',e.eventId],['Correlation ID',e.correlationId||e.eventId],['Sıra',String(e.sequence)],['Bölüm',e.section],['Path',e.path],['İşlem',e.operation],['Kaynak',e.source],['Cihaz',e.sourceDeviceId],['Privacy',e.privacyClass],['Oluştu',eventTimeP(e.occurredAt)],['Yerel persist',eventTimeP(e.persistedAt)],['Gönderildi',eventTimeP(e.submittedAt)],['Uzak kabul',eventTimeP(e.acceptedAt)],['Snapshot revision',rev]].forEach(function(x){ h+='<div class="event-drawer-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; });
@@ -1217,18 +1273,19 @@ function openEventDrawerP(id){ UI.eventSelectedId=String(id||''); render(); } wi
 function closeEventDrawerP(){ UI.eventSelectedId=null; render(); } window.closeEventDrawerP=closeEventDrawerP;
 function eventLogCardHTMLP(){
   var st=eventLogSourceP(), all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], audit=EVENT_LOG_STATE.audit||{ok:true,issueCount:0,issues:[]};
+  function localStatus(label,legacy){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+kind+'">'+esc(label)+'</span>'; }
   all.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); });
   var visible=all.slice(0,UI.eventLimit||20), selected=null;
   if(UI.eventSelectedId) for(var si=0;si<all.length;si++){ if(all[si].eventId===UI.eventSelectedId){selected=all[si];break;} }
-  var h='<div class="card lift span-12 pad event-log-card" style="order:8;display:flex;flex-direction:column;">';
-  h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;" class="badge '+st.cls+'">'+esc(st.label)+'</span></div>';
+  var h='<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">';
+  h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;">'+localStatus(st.label,st.cls)+'</span></div>';
   h+='<div class="event-log-meta"><span>'+esc(st.note)+'</span><span class="mono">'+all.length+' kayıt · '+(EVENT_LOG_STATE.loadedAt?esc(tsShort(EVENT_LOG_STATE.loadedAt)):'—')+'</span></div>';
   h+='<div class="event-log-toolbar"><div class="seg" aria-label="Event sayısı filtresi">'+[20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
-  if(!audit.ok) h+='<div class="event-log-alarm" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
-  if(!visible.length) h+='<div class="empty"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
+  if(!audit.ok) h+='<div class="event-log-alarm error-state" data-component="error-state" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
+  if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(e){ var es=eventStatusP(e); h+='<button class="event-log-row" onclick="openEventDrawerP(\''+e.eventId+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence))+'</span><span class="event-log-main"><b>'+esc(e.summary)+'</b><small>'+esc(e.section)+' · '+esc(e.operation)+' · '+esc(e.path)+'</small></span><span class="event-log-side"><span class="badge '+es.cls+'">'+esc(es.label)+'</span><small>'+eventTimeP(e.occurredAt)+'</small></span></button>'; });
+    visible.forEach(function(e){ var es=eventStatusP(e); h+='<button class="event-log-row" data-component="timeline-row" onclick="openEventDrawerP(\''+e.eventId+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence))+'</span><span class="event-log-main"><b>'+esc(e.summary)+'</b><small>'+esc(e.section)+' · '+esc(e.operation)+' · '+esc(e.path)+'</small></span><span class="event-log-side">'+localStatus(es.label,es.cls)+'<small>'+eventTimeP(e.occurredAt)+'</small></span></button>'; });
     h+='</div>';
   }
   if(selected) h+=eventDetailsP(selected);
@@ -1597,6 +1654,25 @@ function coreModules(){
     {k:"Notifications",on:notifyPerm==='granted'}
   ];
 }
+function commandCenterHeroesHTMLP(heroes){
+  var h='<section class="d2-hero-grid" data-component="command-heroes" aria-label="ÆON temel durum özeti">';
+  (Array.isArray(heroes)?heroes:[]).forEach(function(x){
+    h+='<article class="d2-hero d2-hero-'+esc(x.key||'summary')+'" data-hero="'+esc(x.key||'summary')+'">';
+    h+='<div class="d2-hero-head"><span class="d2-hero-icon" aria-hidden="true">'+(x.icon||'·')+'</span><span class="d2-hero-label">'+esc(x.label||'Özet')+'</span>'+(x.badge||'')+'</div>';
+    h+='<div class="d2-hero-value">'+(x.value||'—')+'</div>';
+    h+='<div class="d2-hero-detail">'+(x.detail||'')+'</div>';
+    h+='</article>';
+  });
+  return h+'</section>';
+}
+function commandRiskHTMLP(riskState,canonical,projectionState){
+  var poll=typeof pollStatusP==='function'?pollStatusP():{code:'idle',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'};
+  var tone=riskState&&riskState.klass||'warn', kind=tone==='danger'?'danger':tone==='ok'?'ok':'warning', title=tone==='danger'?'Yakın takip gerekli':tone==='ok'?'Ritim sakin':'Dikkat isteyen bir sinyal var', detail=riskState&&riskState.txt||'Risk özeti bekleniyor';
+  if(canonical&&canonical.code==='conflict'){ kind='danger'; title='Senkron conflict'; detail='Uzak kabul ile yerel durum eşleşmiyor; panel güvenli görünümü koruyor.'; }
+  else if(poll.code==='error'){ kind='danger'; title='Panel çekimi başarısız'; detail='Önceki görünüm korunuyor; yeni veri doğrulanmadı.'; }
+  else if(poll.code==='stale'||(projectionState&&projectionState.reason==='projection_stale')){ kind='warning'; title='Görünüm eski olabilir'; detail='Kaynak veya projection yaşı nedeniyle karar verirken zamanı kontrol et.'; }
+  return '<section class="d2-risk-band d2-risk-'+kind+'" data-component="risk-banner" role="'+(kind==='danger'?'alert':'status')+'" aria-live="polite"><div class="d2-risk-copy"><span class="d2-risk-icon" aria-hidden="true">'+(kind==='danger'?'!':kind==='ok'?'✓':'△')+'</span><div><b>'+esc(title)+'</b><span>'+esc(detail)+'</span></div></div><div class="d2-risk-meta">'+d2StatusBadgeP(riskState&&riskState.txt||'Risk bekleniyor',kind,'b-'+(kind==='warning'?'warn':kind==='danger'?'danger':'ok'))+'<span>'+esc(poll.label||'Yakın takip bekleniyor')+'</span></div></section>';
+}
 function coreStripHTML(){
   var mods=coreModules();
   var online=mods.reduce(function(a,m){return a+(m.on?1:0);},0);
@@ -1604,7 +1680,7 @@ function coreStripHTML(){
   var notifyPerm=(D&&D.settings&&D.settings.aeonNotifyPermission)||'';
   var lastNotif=D&&D.aeon&&D.aeon.lastNotificationShownAt;
   var notifAge=lastNotif?(Date.now()-new Date(lastNotif).getTime()):null;
-  var s='<div class="card pad" style="margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
+  var s='<div class="card pad d2-core-strip span-12" data-component="command-center" style="order:1;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
   s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
   s+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
   s+='<div style="line-height:1.2;"><div style="font-size:var(--f4);font-weight:800;color:var(--t1);letter-spacing:2px;">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Orchestration Core</div></div>';
@@ -1663,6 +1739,8 @@ function lunaThreadCardHTML(){
   return s;
 }
 function setRange(n){ UI.range=n; render(); } window.setRange=setRange;
+function setDensityP(mode){ mode=['quick','standard','audit'].indexOf(mode)>=0?mode:'standard'; UI.density=mode; try{ localStorage.setItem(DENSITYKEY,mode); }catch(e){} render(); }
+window.setDensityP=setDensityP;
 function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.selectedDate); render(); } window.setSelectedDate=setSelectedDate;
 function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
 function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
@@ -2609,6 +2687,7 @@ function render(){
   var syncLagMin=saved?Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)):null;
   var missingInRange=missingDays(cur);
   var dzMohDays=windowDays(30,today()).reduce(function(a,d){ var r=recOf(d); var ms=r&&r.discomfort&&Array.isArray(r.discomfort.meds)?r.discomfort.meds:[]; return a+(ms.some(function(m){return m&&isAnalgesic(m.name);})?1:0); },0);
+  var canonical=canonicalStatusP(SYNC_RECEIPT,PROJECTION_STATE);
 
   var h="";
 
@@ -2620,57 +2699,52 @@ function render(){
     return '<span class="tchip '+cls+'">'+arr+' '+a.toFixed(1)+'</span>';
   }
 
-  // ── COMMAND BAR ─────────────────────────────────────────────
-  h+='<div class="topbar">';
-  h+='<div class="brand">';
-  h+='<span class="brand-mark" style="color:#1a1404;font-weight:800;">⬡</span>';
-  h+='<span class="brand-name">ÆON</span>';
+  // ── D2 COMMAND CENTER ─────────────────────────────────────
+  h+='<div class="topbar" data-component="command-center" aria-label="ÆON komuta merkezi">';
+  h+='<div class="topbar-brand"><div class="brand"><span class="brand-mark" style="color:#1a1404;font-weight:800;">⬡</span><span class="brand-name">ÆON</span></div><span class="brand-context">Observer · Command Center</span></div>';
+  h+='<div class="topbar-status" aria-live="polite">'+d2StatusBadgeP(canonical.label,canonical.kind,canonical.cls)+'<span class="topbar-status-detail">'+esc(canonical.detail)+'</span>'+(DEMO_MODE?'<span class="badge status-pending b-warn">Demo · ağ kapalı</span>':'')+(UI.newChanges>0?'<button type="button" class="new-changes-chip" data-component="new-changes" aria-label="'+UI.newChanges+' yeni değişikliği görüntüle" onclick="viewNewChangesP()">'+UI.newChanges+' yeni değişiklik</button>':'')+'</div>';
+  h+='<div class="topbar-actions" role="toolbar" aria-label="Panel eylemleri"><div class="density-toggle" data-component="density-toggle" role="group" aria-label="Görünüm yoğunluğu">'+[['quick','Hızlı'],['standard','Standart'],['audit','Audit']].map(function(x){return '<button type="button" aria-pressed="'+(UI.density===x[0]?'true':'false')+'" class="'+(UI.density===x[0]?'active':'')+'" onclick="setDensityP(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div><button type="button" class="btn command-action" aria-label="Paneli yenile" title="Yenile" onclick="load()">'+icon('rotate-ccw',15)+'<span class="sr-only">Yenile</span></button><button type="button" class="btn command-action" aria-label="Panelden çıkış yap" title="Çıkış" onclick="resetPanelToken()">'+icon('lock',15)+'<span class="sr-only">Çıkış</span></button></div>';
   h+='</div>';
-  h+='<div class="tb-chips">';
-  if(DEMO_MODE) h+='<span class="badge b-warn">DEMO · ağ kapalı</span>';
-  h+='<span class="badge '+freshClass+(fresh.klass==="ok"?" pulse":"")+'">'+fresh.txt+'</span>';
-  h+='<span class="badge '+rskClass+'">'+rsk.txt+'</span>';
-  h+='<span class="'+locBadgeClass+(loc&&locAgeMin<120?" pulse":"")+'" style="display:inline-flex;align-items:center;gap:4px;">'+icon('map-pin',12)+' '+locBadgeTxt+'</span>';
-  h+='</div>';
-  h+='<div class="tb-meta">';
-  h+='<div class="meta"><b class="mono">'+(opened?new Date(opened).toLocaleString("tr-TR",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son açılış</span></div>';
-  h+='<div class="meta"><b class="mono">'+(saved?new Date(saved).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}):"—")+'</b><span>Son kayıt</span></div>';
-  h+='<div class="tb-actions"><button class="btn" title="Yenile" onclick="location.reload()" style="display:flex;align-items:center;justify-content:center;">'+icon('rotate-ccw',15)+'</button><button class="btn" title="Çıkış" onclick="resetPanelToken()" style="display:flex;align-items:center;justify-content:center;">'+icon('lock',15)+'</button></div>';
-  h+='</div></div>';
-  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION_STATE);
-  h+=coverageRibbonHTMLP(PROJECTION_STATE);
 
   // ── PAGE ────────────────────────────────────────────────────
-  h+='<div class="page">';
+  h+='<div class="page density-'+esc(UI.density)+'" data-density="'+esc(UI.density)+'">';
+  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION_STATE);
+  h+=commandCenterHeroesHTMLP([
+    {key:'ruh',label:'Ruh',icon:'♡',value:srec.mood?esc(MOOD_LABEL[srec.mood]||srec.mood):'Kayıt bekleniyor',detail:'Seçili gün · '+(journalStreak()?journalStreak()+' gün günlük sürekliliği':'günlük ritmi başlat')},
+    {key:'beden',label:'Beden',icon:'✦',value:curSleep>0?(Math.round(curSleep*10)/10).toFixed(1)+' sa uyku':'Veri bekleniyor',detail:(curWater>0?'Su '+(Math.round(curWater*10)/10)+'/8':'Su kaydı yok')+(curEnergy>0?' · enerji '+(Math.round(curEnergy*10)/10)+'/5':'')},
+    {key:'sureklilik',label:'Süreklilik',icon:'↗',value:currentStreak()+' gün',detail:cur.filter(function(d){return cnt(recOf(d))>0;}).length+'/'+cur.length+' gün kayıt · '+curSess.sessionCount+' oturum'},
+    {key:'senkron',label:'Senkron',icon:'⇄',value:d2StatusBadgeP(canonical.label,canonical.kind,canonical.cls),detail:'revision · '+esc(canonical.revision?String(canonical.revision).slice(0,12):'—')+' · '+esc(canonical.detail)}
+  ]);
+  h+=commandRiskHTMLP(rsk,canonical,PROJECTION_STATE);
+  h+=coverageRibbonHTMLP(PROJECTION_STATE);
 
-  // ── ORCHESTRATION CORE şeridi ──
-  h+=coreStripHTML();
-  h+=rootModulesCardHTMLP();
-  h+=p4ProvenanceCardHTMLP();
-  h+=eventLogCardHTMLP();
-
-  // toolbar
-  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">';
-  h+='<div class="seg">';
-  h+=[7,14,30,90].map(function(n){return '<button class="'+(UI.range===n?"active":"")+'" onclick="setRange('+n+')">'+n+'g</button>';}).join("");
+  // ── erişilebilir hızlı yönlendirme ─────────────────────────
+  h+='<div class="d2-controls" data-component="command-actions">';
+  h+='<div class="seg" role="group" aria-label="Görüntülenecek zaman aralığı">';
+  h+=[7,14,30,90].map(function(n){return '<button type="button" aria-pressed="'+(UI.range===n?'true':'false')+'" class="'+(UI.range===n?"active":"")+'" onclick="setRange('+n+')">'+n+' gün</button>';}).join("");
   h+='</div>';
-  h+='<span style="font-size:var(--f2);color:var(--t4);font-weight:700;letter-spacing:.4px;text-transform:uppercase;">'+UI.range+' günlük pencere</span>';
-  h+='<input type="date" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)" style="margin-left:auto;">';
+  h+='<span class="d2-range-label">'+UI.range+' günlük pencere</span>';
+  h+='<label class="d2-date-label" for="panel-date">Tarih</label><input id="panel-date" type="date" aria-label="Panel tarihi" value="'+esc(selected)+'" onchange="setSelectedDate(this.value)">';
   h+='</div>';
 
-  // ── JUMP-NAV: 5 bölüme atlama şeridi (scroll-spy ile aktif bölüm vurgulanır) ──
-  h+='<div class="jumpnav" id="jumpnav">';
+  // ── JUMP-NAV: 5 bölüme atlama şeridi ──
+  h+='<div class="jumpnav" id="jumpnav" data-component="section-navigation" aria-label="Bölüm navigasyonu">';
   SECTIONS.forEach(function(sec){ h+='<button data-sec="'+sec.id+'" onclick="jumpToSection(\''+sec.id+'\')">'+sec.ico+' '+sec.title+'</button>'; });
   h+='</div>';
 
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
+  h+=coreStripHTML();
+  h+=rootModulesCardHTMLP();
+  h+=p4ProvenanceCardHTMLP();
+  h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){
     h+='<div class="section-header" id="'+sec.id+'" style="order:'+(sec.ord-1)+';top:0;"><span class="sh-ico">'+sec.ico+'</span><span class="sh-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';
   });
 
-  // ROW 1: 6 KPI hero tiles (span-2 each)
+  // D2 ayrıntı metrikleri — ilk bakış dört hero’da; tam sayısal döküm burada.
+  h+='<section class="d2-detail-metrics span-12" data-component="detail-metrics" aria-label="Ayrıntılı metrikler"><div class="d2-detail-head"><b>Ayrıntılı metrikler</b><span>'+UI.range+' günlük pencere · Audit modunda tam görünür</span></div>';
   function kpi(label,val,accent,extra,spark,caption){
     var s='<div class="card lift kpi span-2" style="--accent:'+accent+';order:10;">';
     s+='<div class="kpi-top"><span class="kpi-l">'+label+'</span>'+(extra||'')+'</div>';
@@ -2700,6 +2774,7 @@ function render(){
   var mvMax=Math.max.apply(null,[0.5].concat(cur.map(mvFn)));
   var mvTodayKm=mv?Number(mv.totalM||0)/1000:0;
   h+=kpi('Mesafe Bugün',mvTodayKm.toFixed(2)+'<small>km</small>','#7DD389','<span class="tchip fl">'+mvDays.length+'/'+cur.length+' gün</span>',sparkLine(cur,mvFn,mvMax,"#7DD389",30),(mv?('<span style="display:inline-flex;align-items:center;gap:3px;">'+icon('footprints',12)+' '+fmtKmM(mv.walkM)+'</span><span style="display:inline-flex;align-items:center;gap:3px;">'+icon('car',12)+' '+fmtKmM(mv.vehicleM)+'</span>'):''));
+  h+='</section>';
 
   // ROW 1.65: Tatil Modu — uygulamadaki tatil durakları ve su hedefi
   (function(){
@@ -4128,10 +4203,12 @@ function load(){
       }
       var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
+      var previousEventRows=EVENT_LOG_STATE&&Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], hadPreviousSnapshot=!!D;
       Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
-        EVENT_LOG_STATE=res[4]||buildEventLogStateP(latestLegacy,[]);
+        var incomingEventState=res[4]||buildEventLogStateP(latestLegacy,[]), newEventCount=countNewEventChangesP(previousEventRows,incomingEventState.events);
+        EVENT_LOG_STATE=incomingEventState;
         SYNC_RECEIPT=res[2]||null;
         var P=window.PanelCoverageV1, projection=res[3]&&res[3].snapshot||null;
         if(P&&typeof P.chooseProjection==='function'){
@@ -4149,6 +4226,7 @@ function load(){
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
         var changed=sig===null||sig!==LASTSIG;
+        if(hadPreviousSnapshot&&changed) UI.newChanges=Math.min(99,Math.max(1,newEventCount));
         applyPollRenderP(sig,changed,changed?'changed':'unchanged',pollStartedAt,{etag:pollMeta.etag,completedAt:PANEL_POLL_AT});
       }).catch(function(){
         pollRecordP('error',pollStartedAt,{errorCode:'network'});
@@ -4191,6 +4269,8 @@ try{
   if(expRaw) UI.expandedCards=JSON.parse(expRaw)||{};
   var insRaw=localStorage.getItem(INSTABKEY);
   if(insRaw) UI.insightTab=insRaw;
+  var densityRaw=localStorage.getItem(DENSITYKEY);
+  if(['quick','standard','audit'].indexOf(densityRaw)>=0) UI.density=densityRaw;
 }catch(e){}
 load();
 // Panel otomatik yenileme: ~15 sn'de bir (mesajlar mümkün olduğunca anlık gelsin),

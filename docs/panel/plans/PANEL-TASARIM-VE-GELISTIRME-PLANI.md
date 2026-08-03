@@ -3,7 +3,7 @@
 **Belge türü:** Ayrı panel tasarım/UX/uygulanabilir geliştirme planı
 **Kapsam:** `panel.html` gözlemci arayüzü; bilgi mimarisi, estetik, okunabilirlik, erişilebilirlik, responsive davranış ve senkron verinin görünür sunumu
 **Tarih:** 2026-08-02
-**Durum:** Tasarım araştırması tamamlandı; uygulama bekliyor
+**Durum:** D2 command center ve sync ribbon hazır; kullanıcı review’ı bekleniyor; D3 bekliyor
 
 > Teknik veri kapsamı ve senkron sözleşmesi için
 > [PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md](PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md)
@@ -501,6 +501,12 @@ karışmamalıdır.
 - Card anatomy ve status taxonomy’yi sabitle.
 - Hassas alanların drawer/redaction sınırını çiz.
 
+**D0 teslimatı (2026-08-03):**
+[PANEL-D0-IA-WIREFRAME.md](PANEL-D0-IA-WIREFRAME.md) içinde 375–430px,
+768px ve 1280px wireframe’leri; 10/60 saniyelik akışlar; hızlı/standart/audit
+yoğunluk modları; loading/empty/stale/error/conflict/redacted durumları;
+coverage/provenance eşleşmesi ve hassas drawer sınırları sabitlendi.
+
 **Çıkış kriteri:** Kod yazmadan tüm ana ekran ve drawer durumlarının metinsel
 ve görsel wireframe’i hazır.
 
@@ -510,6 +516,14 @@ ve görsel wireframe’i hazır.
 - source/privacy badge’leri,
 - card, drawer, timeline row, empty state, error state,
 - loading/skeleton ve stale banner.
+
+**D1 teslimatı (2026-08-03):**
+[PANEL-D1-TOKEN-COMPONENT.md](PANEL-D1-TOKEN-COMPONENT.md) ile semantic
+surface/status/source/privacy/feature token’ları; `sync-ribbon`,
+`status-badge`, source/privacy badge, `timeline-row`, empty/error/stale,
+`detail-drawer` ve `density-toggle` API’leri `panel.css`/`panel.js` içine
+bağlandı. Legacy class’lar fixture uyumluluğu için korunuyor; status renkleri
+feature accent’lerden ayrıldı.
 
 **Çıkış kriteri:** Yeni kartların inline stil yerine ortak sınıflarla
 üretilebilmesi.
@@ -522,6 +536,15 @@ ve görsel wireframe’i hazır.
 - yoğunluk modlarını ekle.
 
 **Çıkış kriteri:** Panel açıldığında senkron durumu ilk bakışta anlaşılır.
+
+**D2 teslimatı (2026-08-03):**
+[PANEL-D2-COMMAND-CENTER.md](PANEL-D2-COMMAND-CENTER.md) ile header marka /
+canonical status / eylem katmanlarına ayrıldı; local/remote/projection/panel
+poll zamanları receipt ve revision kanıtıyla görünür kılındı. Ruh, Beden,
+Süreklilik ve Senkron hero’ları; ayrı risk/stale/conflict/error bandı;
+erişilebilir tarih/pencere/yenile/çıkış eylemleri; manuel yönlendirmeli `N yeni
+değişiklik` chip’i eklendi. Desktop genişliği ve mobil sticky çakışması için
+responsive kurallar uygulandı.
 
 ### Geliştirme Faz D3 — Son değişiklikler timeline’ı
 

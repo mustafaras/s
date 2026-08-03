@@ -82,6 +82,21 @@ external_write_authorized: false
 next_safe_action: PANEL-008 kanıtını kullanıcıya sunup review beklemek; açık kabul/“devam” olmadan Prompt 07 / PANEL-009 veya relay başlatmamak
 ```
 
+## Yayın durumu güncellemesi (append-only)
+
+```text
+active_phase: P2-POLLING-RELAY
+active_sequence: PANEL-008
+status: ready_for_review
+delivery_status: published
+feature_commit: 4599331c9f7e77428881ccd78a4909fb40fd2b42
+merge_commit: 564b3985cbc18654183e647bbb7379979dc6c043
+pages_workflow: 30791188610 completed/success
+pages_deployment: 5722017717 success
+external_write_authorized: false
+next_safe_action: Başka bilgisayarda origin/main clone edilip kullanıcı review’ı yapılabilir; açık “devam” olmadan Prompt 07 / PANEL-009 veya relay başlatmamak
+```
+
 ## Ledger eşleşme kapısı
 
 Bir sequence yalnız şu durumda ilerletilebilir:

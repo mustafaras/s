@@ -54,3 +54,15 @@ Bir sonraki olası kayıt `PANEL-008` / Prompt 06’dır; kullanıcı review’�
 `PANEL-008` `ready_for_review` durumundadır. Kullanıcı incelemesi ve açık
 “devam” talimatı olmadan Prompt 07 / `PANEL-009` veya relay açılışı
 başlatılmayacak.
+
+## PANEL-008 yayın kaydı (append-only)
+
+| Alan | Kanıt |
+|---|---|
+| Feature commit | `4599331c9f7e77428881ccd78a4909fb40fd2b42` — `feature/panel-007-008-observability` origin’e pushlandı |
+| Main merge | `564b3985cbc18654183e647bbb7379979dc6c043` — no-ff merge; `origin/main` ile eşleşiyor |
+| Pages workflow | [run 30791188610](https://github.com/mustafaras/s/actions/runs/30791188610) `completed/success`; validate ve deploy job’ları success |
+| Pages deployment | deployment `5722017717`, status `success`, head SHA `564b3985cbc18654183e647bbb7379979dc6c043` |
+| Canlı URL | [mustafaras.github.io/s](https://mustafaras.github.io/s/) HTTP 200; response `last-modified` 2026-08-03T06:45:08Z |
+| API notu | Pages API’deki legacy `latest-build` kaydı eski `529d448` commit’ine ait `errored` durumda; yeni workflow deployment status’u success ve canlı URL 200’dür |
+| Dış etki | GitHub branch/`main`/Pages değişti; `data/`, localStorage kullanıcı state’i ve `mustafaras/seyma-data` değişmedi |

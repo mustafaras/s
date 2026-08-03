@@ -62,9 +62,8 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - Prompt paketi: hazır.
 - Teknik plan: hazır.
 - Tasarım planı: hazır.
-- Kod uygulaması: `PANEL-003` yayınlandı; `PANEL-004` / Prompt 02,
-  `PANEL-005` / Prompt 03, `PANEL-006` / Prompt 04, `PANEL-007` / Prompt 05
-  ve `PANEL-008` / Prompt 06 `ready_for_review`.
+- Kod uygulaması: `PANEL-003`–`PANEL-008` / Prompt 01–06 kullanıcı kabulüyle
+  `completed`; Prompt 07 / `PANEL-009` `planned` durumunda.
 - Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
   `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
   push edildi. Pages run `30761174707` başarılı. PANEL-007/PANEL-008 teslimatı
@@ -81,5 +80,5 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
   değişmeyen snapshot’ta tam rerender yapılmadığını kanıtlıyor.
 - Coverage/projection/redaction, root-modül/mismatch/privacy,
   terapi/bildirim/provenance, append-only event log ve polling/relay karar
-  kapıları kanıtlandı. Relay açılmadı; kullanıcı review’ı bekleniyor, Prompt
-  07’ye otomatik geçilmez.
+  kapıları kanıtlandı ve Prompt 01–06 kullanıcı kabulüyle tamamlandı. Relay
+  açılmadı; Prompt 07 yalnız açık başlatma ile uygulanabilir.

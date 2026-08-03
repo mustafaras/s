@@ -61,6 +61,90 @@ function writeFailureReceipt(c,pending,code){
   receipt.lastErrorCode=SYNC_ERROR_CODES[code]?code:'unknown';
   return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).catch(function(){ return null; });
 }
+// ── PANEL-007: günlük append-only event dosyaları ──────────────────────────
+// latest.json full-replace sözleşmesine dokunulmaz. Olaylar ayrıca
+// data/events/<YYYY-MM-DD>.json içinde GET+merge+PUT ile birleştirilir;
+// aynı eventId tekrar gelirse mevcut satır korunur ve duplicate yazılmaz.
+var EVENT_LOG_DIR='data/events', EVENT_LOG_SCHEMA_VERSION=1;
+var EVENT_LOG_SECTIONS={wellness:1,mood:1,sleep:1,nutrition:1,content:1,therapy:1,profile:1,notifications:1,location:1,settings:1,quran:1,faith:1,sync:1,system:1,unknown:1};
+var EVENT_LOG_OPERATIONS={create:1,update:1,delete:1,complete:1,record:1,accepted:1,retry:1,merge:1,sync_submitted:1};
+var EVENT_LOG_SAFE_SUMMARIES={'Kriz desteği kaydı güncellendi':1,'Yansıtma/pratik kaydı güncellendi':1,'İçerik/arşiv kaydı güncellendi':1,'Profil ilerlemesi güncellendi':1,'Bildirim yaşam döngüsü güncellendi':1,'Konum/hareket kaydı güncellendi':1,'İman/okuma kaydı güncellendi':1,'Uyku/beden kaydı güncellendi':1,'Beslenme kaydı güncellendi':1,'Ayarlar güncellendi':1,'Uygulama kaydı güncellendi':1,'Güvenli kayıt özeti':1};
+function eventLogSafePart(v,max){ var s=typeof v==='string'?v.trim():''; return s&&s.length<=(max||120)&&/^[a-zA-Z0-9:_./*-]+$/.test(s)?s:null; }
+function eventLogSafeIso(v){ return safeReceiptIso(v); }
+function eventLogSafeSummary(v){
+  var s=String(v||'').replace(/[\r\n\t]+/g,' ').trim().slice(0,120);
+  if(!s||!EVENT_LOG_SAFE_SUMMARIES[s]||/ghp_|github_pat_|sk-[a-z0-9_-]{8,}/i.test(s)||/\b(?:lat|lon|latitude|longitude)\s*[:=]/i.test(s)) return 'Güvenli kayıt özeti';
+  return s;
+}
+function normalizeSyncEvent(e,fallbackDevice){
+  if(!e||typeof e!=='object'||Array.isArray(e)) return null;
+  var seq=Number(e.sequence), id=eventLogSafePart(e.eventId,180), occurred=eventLogSafeIso(e.occurredAt);
+  if(!id||!isFinite(seq)||seq<1||Math.floor(seq)!==seq||!occurred) return null;
+  var device=eventLogSafePart(e.sourceDeviceId||fallbackDevice,96); if(!device) return null;
+  return {eventId:id,correlationId:eventLogSafePart(e.correlationId,180)||id,sequence:seq,occurredAt:occurred,persistedAt:eventLogSafeIso(e.persistedAt)||occurred,submittedAt:eventLogSafeIso(e.submittedAt),acceptedAt:eventLogSafeIso(e.acceptedAt),section:EVENT_LOG_SECTIONS[e.section]?e.section:'unknown',path:eventLogSafePart(e.path,160)||'data',operation:EVENT_LOG_OPERATIONS[e.operation]?e.operation:'update',summary:eventLogSafeSummary(e.summary),source:eventLogSafePart(e.source,40)||'app',sourceDeviceId:device,privacyClass:eventLogSafePart(e.privacyClass,40)||'summary',snapshotRevision:safeReceiptString(e.snapshotRevision,128)};
+}
+function emptyEventFile(date){ return {schemaVersion:EVENT_LOG_SCHEMA_VERSION,date:date,events:[]}; }
+function parseEventFile(raw,date){
+  var x=raw;
+  try{ if(typeof x==='string') x=JSON.parse(x); }catch(e){ return emptyEventFile(date); }
+  var out=emptyEventFile(date), seen={};
+  var arr=Array.isArray(x)?x:(x&&Array.isArray(x.events)?x.events:[]);
+  arr.forEach(function(e){ var n=normalizeSyncEvent(e,e&&e.sourceDeviceId); if(n&&!seen[n.eventId]){seen[n.eventId]=true;out.events.push(n);} });
+  out.events.sort(function(a,b){ return String(a.occurredAt).localeCompare(String(b.occurredAt))||a.sequence-b.sequence||String(a.eventId).localeCompare(String(b.eventId)); });
+  return out;
+}
+function mergeEventFile(current,incoming,date){
+  var out=parseEventFile(current,date), seen={}; out.events.forEach(function(e){seen[e.eventId]=true;});
+  parseEventFile(incoming,date).events.forEach(function(e){ if(!seen[e.eventId]){seen[e.eventId]=true;out.events.push(e);} });
+  out.events.sort(function(a,b){ return String(a.occurredAt).localeCompare(String(b.occurredAt))||a.sequence-b.sequence||String(a.eventId).localeCompare(String(b.eventId)); });
+  return out;
+}
+function eventLogDate(iso){ var s=eventLogSafeIso(iso); return s?s.slice(0,10):null; }
+function eventLogForPush(data,receipt){
+  var l=data&&data.eventLog, groups={}; if(!l||!Array.isArray(l.events)) return groups;
+  var published=l.published&&typeof l.published==='object'?l.published:{};
+  l.events.forEach(function(raw){
+    var e=normalizeSyncEvent(raw,raw&&raw.sourceDeviceId); if(!e||published[e.eventId]) return;
+    var day=eventLogDate(e.occurredAt); if(!day) return;
+    // Local event is written only after the snapshot has been accepted, so the
+    // canonical daily record carries the complete receipt tuple in one row.
+    e.submittedAt=e.submittedAt||eventLogSafeIso(receipt&&receipt.submittedAt);
+    e.acceptedAt=eventLogSafeIso(receipt&&receipt.acceptedAt);
+    e.snapshotRevision=safeReceiptString(receipt&&receipt.snapshotRevision,128);
+    (groups[day]||(groups[day]=[])).push(e);
+  });
+  return groups;
+}
+function putEventLogDayGuarded(c,date,events,attempt){
+  attempt=attempt||0;
+  var path=EVENT_LOG_DIR+'/'+date+'.json', api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path, H=ghHeaders(c);
+  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
+    .then(function(r){ if(r.status===200) return r.json(); if(r.status===404) return null; var e=new Error(String(r.status)); e.code=r.status===401?'unauthorized':r.status===403?'forbidden':'unknown'; throw e; })
+    .then(function(g){
+      var sha=g&&g.sha, current=g&&g.content?parseEventFile(b64decodeUtf8(g.content),date):emptyEventFile(date), merged=mergeEventFile(current,{date:date,events:events},date), contentStr=JSON.stringify(merged,null,2), body={message:'sync: '+path,content:b64(contentStr),branch:c.branch};
+      if(sha) body.sha=sha;
+      var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
+      return fetch(api,{method:'PUT',headers:H2,body:JSON.stringify(body)}).then(function(r){
+        if(r.ok) return r.json().catch(function(){return {};});
+        return r.text().then(function(t){ if((r.status===409||r.status===422)&&attempt<3) return putEventLogDayGuarded(c,date,events,attempt+1); var e=new Error(r.status+' '+t.slice(0,160)); e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown'); throw e; });
+      });
+    });
+}
+function pushEventLog(c,data,receipt){
+  var groups=eventLogForPush(data,receipt), days=Object.keys(groups), l=data&&data.eventLog;
+  if(!days.length) return Promise.resolve();
+  return Promise.all(days.map(function(day){ return putEventLogDayGuarded(c,day,groups[day]).then(function(){ if(l){ l.published=l.published&&typeof l.published==='object'?l.published:{}; groups[day].forEach(function(e){l.published[e.eventId]=true;}); } }); }));
+}
+function mergeEventLog(localLog,remoteLog){
+  var local=localLog&&typeof localLog==='object'?localLog:{}, remote=remoteLog&&typeof remoteLog==='object'?remoteLog:{};
+  var out=JSON.parse(JSON.stringify(local)), seen={}, source=out.sourceDeviceId||remote.sourceDeviceId||'dev_unknown', events=[];
+  (Array.isArray(local.events)?local.events:[]).concat(Array.isArray(remote.events)?remote.events:[]).forEach(function(e){ var n=normalizeSyncEvent(e,e&&e.sourceDeviceId); if(n&&!seen[n.eventId]){seen[n.eventId]=true;events.push(n);} });
+  events.sort(function(a,b){ return String(a.occurredAt).localeCompare(String(b.occurredAt))||a.sequence-b.sequence||String(a.eventId).localeCompare(String(b.eventId)); });
+  out.schemaVersion=EVENT_LOG_SCHEMA_VERSION; out.sourceDeviceId=source; out.events=events.slice(-200); out.nextSequence=Math.max(1,Number(local.nextSequence)||1,Number(remote.nextSequence)||1);
+  if(!out.days||typeof out.days!=='object'||Array.isArray(out.days)) out.days={}; Object.keys((remote&&remote.days)||{}).forEach(function(k){out.days[k]=true;});
+  out.published=local.published&&typeof local.published==='object'?local.published:{};
+  return out;
+}
 
 function settings(){
   if(lastPayload && lastPayload.settings) return lastPayload.settings;
@@ -223,7 +307,14 @@ function pushWithCfg(c, data, pendingReceipt){
         return ghPut(c,PROJECTION_PATH,JSON.stringify(projection,null,2)).then(function(){ return receipt; });
       });
     })
-    .then(function(receipt){ return ghPut(c,'data/gunluk/'+today+'.json',snap).then(function(){ return receipt; }); });
+    .then(function(receipt){
+      return ghPut(c,'data/gunluk/'+today+'.json',snap).then(function(){
+        // Event dosyası ayrı ve best-effort'tur: event yazımı kaybolsa bile
+        // accepted latest snapshot bozulmaz; bir sonraki sync aynı eventId'yi
+        // idempotent merge ile yeniden dener.
+        return pushEventLog(c,data,receipt).catch(function(){ return null; }).then(function(){ return receipt; });
+      });
+    });
 }
 
 // ── Faz 10: profileAssessment çakışma çözümü (conflict resolution) ──────────────
@@ -637,6 +728,9 @@ function mergeData(localData, remoteData){
   if(remoteData.quranJourney && typeof remoteData.quranJourney==='object'){
     merged.quranJourney=mergeQuranJourney(merged.quranJourney,remoteData.quranJourney);
   }
+  if(remoteData.eventLog && typeof remoteData.eventLog==='object'){
+    merged.eventLog=mergeEventLog(merged.eventLog,remoteData.eventLog);
+  }
   // savedAt: en yeni
   if(remoteData.savedAt && typeof remoteData.savedAt==='string' && (!merged.savedAt || remoteData.savedAt>merged.savedAt)){
     merged.savedAt=remoteData.savedAt;
@@ -657,6 +751,7 @@ function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
   if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; delete c.settings.openaiKey; delete c.settings.auth; }
   if(c&&typeof c==='object') c.syncReceipt=normalizeSyncReceipt(c.syncReceipt);
+  if(c&&c.eventLog&&typeof c.eventLog==='object') c.eventLog=mergeEventLog(c.eventLog,{});
   if(c&&c.weather&&Array.isArray(c.weather.spots)){ c.weather.spots.forEach(function(sp){ if(sp&&typeof sp==="object") delete sp.emoji; }); }
   if(c&&c.library&&Array.isArray(c.library.books)){ c.library.books.forEach(function(b){ if(b&&typeof b==="object") delete b.emoji; }); }
   if(c&&c.watchlist&&Array.isArray(c.watchlist.items)){ c.watchlist.items.forEach(function(t){ if(t&&typeof t==="object") delete t.emoji; }); }
@@ -676,12 +771,16 @@ function doPush(data){
   var pending=localReceipt(data,{status:'saving',sourceUpdatedAt:current.sourceUpdatedAt||safeReceiptIso(data&&data.savedAt)||nowIso,submittedAt:nowIso,lastErrorCode:null});
   setStatus('saving');
   var safe=sanitize(data);
+  function accept(receipt){
+    if(safe&&safe.eventLog&&data&&data.eventLog){ data.eventLog.published=safe.eventLog.published&&typeof safe.eventLog.published==='object'?safe.eventLog.published:{}; }
+    localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt;
+  }
   return pushWithCfg(c,safe,pending)
-    .then(function(receipt){ localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt; })
+    .then(function(receipt){ return accept(receipt); })
     .catch(function(e){
       if(c.branch!=='main' && isMissingRefError(e)){
         var c2={token:c.token, owner:c.owner, repo:c.repo, branch:'main'};
-        return pushWithCfg(c2,safe,pending).then(function(receipt){ persistBranch('main'); localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt; });
+        return pushWithCfg(c2,safe,pending).then(function(receipt){ persistBranch('main'); return accept(receipt); });
       }
       throw e;
     })
@@ -872,6 +971,12 @@ window.SeySync={
   mergeProfileAssessment:mergeProfileAssessment,
   // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).
   mergeData:mergeData,
+  mergeEventLog:mergeEventLog,
+  normalizeEvent:normalizeSyncEvent,
+  parseEventFile:parseEventFile,
+  mergeEventFile:mergeEventFile,
+  putEventLogDayGuarded:putEventLogDayGuarded,
+  pushEventLog:pushEventLog,
   mergeDay:mergeDay,
   mergeById:mergeById,
   mergeSettings:mergeSettings,

@@ -18,6 +18,10 @@ için canonical çalışma paketidir.
 
 Sonra yalnız hedeflenen fazın tek promptu okunur.
 
+Karar kayıtları [`decisions/`](decisions/) altında tutulur; PANEL-008 için
+[polling/relay kararı](decisions/PANEL-008-POLLING-RELAY-KARARI.md) ETag,
+taslak güvenliği ve relay karar kapısını belgeler.
+
 ## Prompt sırası
 
 | Sıra | Prompt | Kapsam | Önkoşul |
@@ -59,14 +63,20 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - Teknik plan: hazır.
 - Tasarım planı: hazır.
 - Kod uygulaması: `PANEL-003` yayınlandı; `PANEL-004` / Prompt 02,
-  `PANEL-005` / Prompt 03 ve `PANEL-006` / Prompt 04 `ready_for_review`.
+  `PANEL-005` / Prompt 03, `PANEL-006` / Prompt 04, `PANEL-007` / Prompt 05
+  ve `PANEL-008` / Prompt 06 `ready_for_review`.
 - Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
   `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
-  push edildi. Pages run `30761174707` başarılı.
+  push edildi. Pages run `30761174707` başarılı. PANEL-007 ve PANEL-008 bu
+  turda commit, push, merge veya deploy edilmedi.
 - Kanıt: `test_panel_p0_sync.js` 27/27; `test_panel_p1_projection.js` 35/35;
   `test_panel_p3_root_modules.js` 26/26; `test_panel_p4_provenance.js`
-  19/19; mevcut app/sync/panel ve
-  migration/headless kapıları da yeşil.
-- Coverage/projection/redaction, root-modül/mismatch/privacy ve
-  terapi/bildirim/provenance kapıları kanıtlandı; kullanıcı review’ı
-  bekleniyor, Prompt 05’e otomatik geçilmez.
+  19/19; `test_panel_p2_event_log.js` 13/13; `test_panel_p2_sync.js` 8/8;
+  `test_panel_p2_polling.js` 15/15; mevcut app/sync/panel ve
+  migration/headless kapıları da yeşil. PANEL-008 fixture’ı ETag/304,
+  `If-None-Match`, p50/p95 (120/190 ms), input skip, taslak defer ve
+  değişmeyen snapshot’ta tam rerender yapılmadığını kanıtlıyor.
+- Coverage/projection/redaction, root-modül/mismatch/privacy,
+  terapi/bildirim/provenance, append-only event log ve polling/relay karar
+  kapıları kanıtlandı. Relay açılmadı; kullanıcı review’ı bekleniyor, Prompt
+  07’ye otomatik geçilmez.

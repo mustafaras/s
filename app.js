@@ -1319,6 +1319,85 @@ function safeSyncReceiptIso(v){
   var s=v;
   var t=Date.parse(s); return isNaN(t)?null:new Date(t).toISOString();
 }
+// ── PANEL-007: append-only event log (yerel kaynak + günlük dış kayıt) ─────
+// `eventLog.events` latest snapshot içinde yalnızca güvenli recent projection'dır.
+// Kanonik append-only kayıt, sync.js'in data/events/<date>.json dosyasıdır.
+var EVENT_LOG_SCHEMA_VERSION=1, EVENT_LOG_RECENT_MAX=200, EVENT_DEVICE_KEY='seyma-event-device-v1';
+var EVENT_SECTIONS={wellness:1,mood:1,sleep:1,nutrition:1,content:1,therapy:1,profile:1,notifications:1,location:1,settings:1,quran:1,faith:1,sync:1,system:1,unknown:1};
+var EVENT_OPERATIONS={create:1,update:1,delete:1,complete:1,record:1,accepted:1,retry:1,merge:1,sync_submitted:1};
+var EVENT_SAFE_SUMMARIES={'Kriz desteği kaydı güncellendi':1,'Yansıtma/pratik kaydı güncellendi':1,'İçerik/arşiv kaydı güncellendi':1,'Profil ilerlemesi güncellendi':1,'Bildirim yaşam döngüsü güncellendi':1,'Konum/hareket kaydı güncellendi':1,'İman/okuma kaydı güncellendi':1,'Uyku/beden kaydı güncellendi':1,'Beslenme kaydı güncellendi':1,'Ayarlar güncellendi':1,'Uygulama kaydı güncellendi':1,'Güvenli kayıt özeti':1};
+function eventSafePart(v,max){
+  var s=typeof v==='string'?v.trim():'';
+  return s&&s.length<=(max||120)&&/^[a-zA-Z0-9:_./*-]+$/.test(s)?s:null;
+}
+function eventSafeIso(v){ return safeSyncReceiptIso(v); }
+function eventDeviceId(){
+  var id='';
+  try{ id=String(localStorage.getItem(EVENT_DEVICE_KEY)||''); }catch(e){}
+  if(!/^dev_[a-z0-9_-]{8,80}$/i.test(id)){
+    id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
+    try{ localStorage.setItem(EVENT_DEVICE_KEY,id); }catch(e){}
+  }
+  return id;
+}
+function emptyEventLog(){ return {schemaVersion:EVENT_LOG_SCHEMA_VERSION,sourceDeviceId:eventDeviceId(),nextSequence:1,events:[],days:{}}; }
+function eventSafeSummary(v){
+  var s=String(v||'').replace(/[\r\n\t]+/g,' ').trim().slice(0,120);
+  if(!s||!EVENT_SAFE_SUMMARIES[s]||/ghp_|github_pat_|sk-[a-z0-9_-]{8,}/i.test(s)||/\b(?:lat|lon|latitude|longitude)\s*[:=]/i.test(s)) return 'Güvenli kayıt özeti';
+  return s;
+}
+function normalizeEventEntry(e,fallbackDevice){
+  if(!e||typeof e!=='object'||Array.isArray(e)) return null;
+  var seq=Number(e.sequence), id=eventSafePart(e.eventId,180), occurred=eventSafeIso(e.occurredAt);
+  if(!id||!isFinite(seq)||seq<1||Math.floor(seq)!==seq||!occurred) return null;
+  var device=eventSafePart(e.sourceDeviceId||fallbackDevice,96); if(!device) return null;
+  var section=EVENT_SECTIONS[e.section]?e.section:'unknown', operation=EVENT_OPERATIONS[e.operation]?e.operation:'update';
+  return {eventId:id,correlationId:eventSafePart(e.correlationId,180)||id,sequence:seq,occurredAt:occurred,persistedAt:eventSafeIso(e.persistedAt)||occurred,submittedAt:eventSafeIso(e.submittedAt),acceptedAt:eventSafeIso(e.acceptedAt),section:section,path:eventSafePart(e.path,160)||'data',operation:operation,summary:eventSafeSummary(e.summary),source:eventSafePart(e.source,40)||'app',sourceDeviceId:device,privacyClass:eventSafePart(e.privacyClass,40)||'summary',snapshotRevision:safeSyncReceiptString(e.snapshotRevision,128)};
+}
+function ensureEventLog(d){
+  if(!d||typeof d!=='object') return null;
+  if(!d.eventLog||typeof d.eventLog!=='object'||Array.isArray(d.eventLog)) d.eventLog=emptyEventLog();
+  var l=d.eventLog, device=eventSafePart(l.sourceDeviceId,96)||eventDeviceId(), seen={}, events=[];
+  l.schemaVersion=EVENT_LOG_SCHEMA_VERSION; l.sourceDeviceId=device;
+  var raw=Array.isArray(l.events)?l.events:[];
+  raw.forEach(function(e){ var n=normalizeEventEntry(e,e&&e.sourceDeviceId); if(n&&!seen[n.eventId]){seen[n.eventId]=true;events.push(n);} });
+  events.sort(function(a,b){ return a.sequence-b.sequence||String(a.eventId).localeCompare(String(b.eventId)); });
+  if(events.length>EVENT_LOG_RECENT_MAX) events=events.slice(-EVENT_LOG_RECENT_MAX);
+  l.events=events;
+  var next=Number(l.nextSequence); if(!isFinite(next)||next<1) next=1;
+  events.forEach(function(e){ if(e.sourceDeviceId===device) next=Math.max(next,e.sequence+1); });
+  l.nextSequence=Math.floor(next);
+  if(!l.days||typeof l.days!=='object'||Array.isArray(l.days)) l.days={};
+  events.forEach(function(e){ var day=e.occurredAt.slice(0,10); if(/^\d{4}-\d{2}-\d{2}$/.test(day)) l.days[day]=true; });
+  return l;
+}
+function classifyEvent(msg,meta){
+  var m=String(msg||'').toLocaleLowerCase('tr-TR'), x=meta&&typeof meta==='object'?meta:{};
+  var rules=[
+    [/krizi|sos|kriz/, 'wellness','data.days.*.crisis','record','Kriz desteği kaydı güncellendi'],
+    [/günlük|not|niyet|öz-şefkat|nefes|pratik|zihin-beden/, 'therapy','data.days.*.reflection','record','Yansıtma/pratik kaydı güncellendi'],
+    [/kitap|okuma|alıntı|replik|izleme|dinleme|söz|öğrenme|arşiv/, 'content','data.library.watchlist.music','update','İçerik/arşiv kaydı güncellendi'],
+    [/profil|değerlendirme|consent|rıza/, 'profile','data.profileAssessment','update','Profil ilerlemesi güncellendi'],
+    [/bildirim|mesaj|cevap|ileti/, 'notifications','data.notifications','update','Bildirim yaşam döngüsü güncellendi'],
+    [/konum|hareket|nudge/, 'location','data.location','update','Konum/hareket kaydı güncellendi'],
+    [/namaz|dua|zikr|saygı|kuran|kur’an|ibadet/, 'faith','data.faith','update','İman/okuma kaydı güncellendi'],
+    [/uyku|uyku|magnezyum/, 'sleep','data.days.*.sleep','update','Uyku/beden kaydı güncellendi'],
+    [/su|öğün|protein|kafein|vitamin|yemek/, 'nutrition','data.days.*.nutrition','update','Beslenme kaydı güncellendi'],
+    [/ayar|tema|repo|anahtar|başlangıç/, 'settings','data.settings','update','Ayarlar güncellendi']
+  ];
+  var section=EVENT_SECTIONS[x.section]?x.section:null, path=eventSafePart(x.path,160), operation=EVENT_OPERATIONS[x.operation]?x.operation:null, summary=null;
+  if(!section){ for(var i=0;i<rules.length;i++){ if(rules[i][0].test(m)){section=rules[i][1];path=path||rules[i][2];operation=operation||rules[i][3];summary=rules[i][4];break;} } }
+  return {section:section||'system',path:path||'data',operation:operation||'update',summary:eventSafeSummary(summary||x.summary||'Uygulama kaydı güncellendi'),privacyClass:'summary'};
+}
+function appendEvent(d,msg,meta){
+  var l=ensureEventLog(d); if(!l) return null;
+  var now=new Date().toISOString(), spec=classifyEvent(msg,meta), seq=l.nextSequence++, id=l.sourceDeviceId+'-'+seq;
+  var e=normalizeEventEntry({eventId:id,correlationId:id,sequence:seq,occurredAt:now,persistedAt:now,submittedAt:null,acceptedAt:null,section:spec.section,path:spec.path,operation:spec.operation,summary:spec.summary,source:'app',sourceDeviceId:l.sourceDeviceId,privacyClass:spec.privacyClass,snapshotRevision:normalizeSyncReceipt(d.syncReceipt).snapshotRevision},l.sourceDeviceId);
+  if(!e) return null;
+  l.events.push(e); if(l.events.length>EVENT_LOG_RECENT_MAX) l.events=l.events.slice(-EVENT_LOG_RECENT_MAX);
+  l.days[now.slice(0,10)]=true;
+  return e;
+}
 function normalizeSyncReceipt(r){
   var out=emptySyncReceipt(), x=r&&typeof r==='object'?r:{};
   out.status=SYNC_RECEIPT_STATUSES[x.status]?x.status:'idle';
@@ -1337,6 +1416,7 @@ if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgra
 function migrate(d){
   if(!d) return d;
   d.syncReceipt=normalizeSyncReceipt(d.syncReceipt);
+  ensureEventLog(d);
   if(typeof d.savedAt!=='string') d.savedAt='';
   if(!d.settings) d.settings={nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true};
   if(typeof d.settings.ghToken!=='string') d.settings.ghToken='';
@@ -3021,11 +3101,12 @@ window.SeyOnSynced=function(receipt){
   ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
   updateSaveBanner(); if(ui.tab==='ayarlar') render();
 };
-function save(touchSource){
+function save(touchSource,eventSpec){
   try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){}
   try{
     var _now=new Date().toISOString();
     data.syncReceipt=normalizeSyncReceipt(data.syncReceipt);
+    if(touchSource!==false&&eventSpec) appendEvent(data,eventSpec.message,eventSpec.meta);
     if(touchSource!==false){
       data.savedAt=_now;
       data.syncReceipt.sourceUpdatedAt=_now;
@@ -3036,7 +3117,7 @@ function save(touchSource){
   }catch(e){}
   if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} }
 }
-function commit(msg){ save(); render(); if(msg) toast(msg); }
+function commit(msg,meta){ save(undefined,{message:msg,meta:meta}); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
 function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
 
@@ -3078,6 +3159,7 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
+App.eventLog={schemaVersion:EVENT_LOG_SCHEMA_VERSION,ensure:ensureEventLog,normalize:normalizeEventEntry,classify:classifyEvent,append:appendEvent};
 // ── Profil Değerlendirmesi: puanlama motoru — doğrudan test için erişilebilir kılındı
 // (Faz 07). Bunlar UI handler'ı DEĞİL, saf hesaplama fonksiyonları; app.js yalnızca
 // window.App'i dışa açtığı için headless testlerin bunlara ulaşabilmesinin tek yolu bu.
@@ -3337,7 +3419,7 @@ App.profileAnswer=function(itemId,value){
 
 function createDefaultData(){
   var t=todayStr(), nowIso=new Date().toISOString();
-  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),eventLog:emptyEventLog(),days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
 }
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.

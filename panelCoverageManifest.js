@@ -55,6 +55,8 @@ var MANIFEST={
     {path:"days.*.media",owner:"media",source:"user_input",privacy:"raw_media",mode:"redacted",fallback:"summary_only"},
     {path:"aeon-media",owner:"media",source:"transport",privacy:"raw_media",mode:"redacted",fallback:"never"},
     {path:"notifications",owner:"app",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
+    {path:"eventLog",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
+    {path:"eventLog.events",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"quranJourney",owner:"quran",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     {path:"saygi",owner:"saygi",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     {path:"*",owner:"app",source:"state",privacy:"summary",mode:"summary",fallback:"latest"}
@@ -62,7 +64,7 @@ var MANIFEST={
   expectedPaths:[
     "days","settings","profileAssessment","location","locationHistory",
     "notifications","quranJourney","saygi","dailyPhoto","roomContentHistory",
-    "locNudge","locationLastTs","labResults","aeon"
+    "locNudge","locationLastTs","labResults","aeon","eventLog"
   ]
 };
 
@@ -142,6 +144,50 @@ function safeReceipt(receipt){
   var statuses={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,rate_limited:1,receipt_failed:1};
   var errors={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
   return {schemaVersion:1,status:statuses[r.status]?r.status:'idle',snapshotRevision:safeHash(r.snapshotRevision),sourceUpdatedAt:safeIso(r.sourceUpdatedAt),submittedAt:safeIso(r.submittedAt),acceptedAt:safeIso(r.acceptedAt),sourceLatestSha:safeHash(r.sourceLatestSha),lastErrorCode:errors[r.lastErrorCode]?r.lastErrorCode:null};
+}
+// ── PANEL-007 event adapter ────────────────────────────────────────────────
+var EVENT_SECTIONS={wellness:1,mood:1,sleep:1,nutrition:1,content:1,therapy:1,profile:1,notifications:1,location:1,settings:1,quran:1,faith:1,sync:1,system:1,unknown:1};
+var EVENT_OPERATIONS={create:1,update:1,delete:1,complete:1,record:1,accepted:1,retry:1,merge:1,sync_submitted:1};
+var EVENT_SAFE_SUMMARIES={'Kriz desteği kaydı güncellendi':1,'Yansıtma/pratik kaydı güncellendi':1,'İçerik/arşiv kaydı güncellendi':1,'Profil ilerlemesi güncellendi':1,'Bildirim yaşam döngüsü güncellendi':1,'Konum/hareket kaydı güncellendi':1,'İman/okuma kaydı güncellendi':1,'Uyku/beden kaydı güncellendi':1,'Beslenme kaydı güncellendi':1,'Ayarlar güncellendi':1,'Uygulama kaydı güncellendi':1,'Güvenli kayıt özeti':1};
+function eventPart(v,max){ var s=typeof v==='string'?v.trim():''; return s&&s.length<=(max||120)&&/^[a-zA-Z0-9:_./*-]+$/.test(s)?s:null; }
+function eventSummary(v){
+  var s=String(v||'').replace(/[\r\n\t]+/g,' ').trim().slice(0,120);
+  if(!s||!EVENT_SAFE_SUMMARIES[s]||/ghp_|github_pat_|sk-[a-z0-9_-]{8,}/i.test(s)||/\b(?:lat|lon|latitude|longitude)\s*[:=]/i.test(s)) return 'Güvenli kayıt özeti';
+  return s;
+}
+function normalizeEvent(e,fallbackDevice){
+  if(!isObject(e)||Array.isArray(e)) return null;
+  var seq=Number(e.sequence), id=eventPart(e.eventId,180), occurred=safeIso(e.occurredAt);
+  if(!id||!isFinite(seq)||seq<1||Math.floor(seq)!==seq||!occurred) return null;
+  var device=eventPart(e.sourceDeviceId||fallbackDevice,96); if(!device) return null;
+  return {eventId:id,correlationId:eventPart(e.correlationId,180)||id,sequence:seq,occurredAt:occurred,persistedAt:safeIso(e.persistedAt)||occurred,submittedAt:safeIso(e.submittedAt),acceptedAt:safeIso(e.acceptedAt),section:EVENT_SECTIONS[e.section]?e.section:'unknown',path:eventPart(e.path,160)||'data',operation:EVENT_OPERATIONS[e.operation]?e.operation:'update',summary:eventSummary(e.summary),source:eventPart(e.source,40)||'app',sourceDeviceId:device,privacyClass:eventPart(e.privacyClass,40)||'summary',snapshotRevision:safeHash(e.snapshotRevision)};
+}
+function parseEventLog(raw,date){
+  var x=raw; try{ if(typeof x==='string') x=JSON.parse(x); }catch(e){ return {ok:false,code:'event_log_parse_failed',date:date||null,events:[]}; }
+  var arr=Array.isArray(x)?x:(x&&Array.isArray(x.events)?x.events:[]), out=[], seen={};
+  arr.forEach(function(e){ var n=normalizeEvent(e,e&&e.sourceDeviceId); if(n&&!seen[n.eventId]){seen[n.eventId]=true;out.push(n);} });
+  return {ok:!!(x&&typeof x==='object'),code:null,date:safeText((x&&x.date)||date,32),events:out};
+}
+function mergeEventLogs(a,b){
+  var left=parseEventLog(a||{}).events,right=parseEventLog(b||{}).events,out=[],seen={};
+  left.concat(right).forEach(function(e){ if(!seen[e.eventId]){seen[e.eventId]=true;out.push(e);} });
+  out.sort(function(x,y){ return String(x.occurredAt).localeCompare(String(y.occurredAt))||x.sequence-y.sequence||String(x.eventId).localeCompare(String(y.eventId)); });
+  return out;
+}
+function eventSequenceAudit(events){
+  var groups={},issues=[],lastInput={};
+  (Array.isArray(events)?events:[]).forEach(function(e){
+    if(!e||!e.sourceDeviceId) return;
+    var d=e.sourceDeviceId, seq=Number(e.sequence); groups[d]=groups[d]||[];
+    if(lastInput[d]!=null&&seq<lastInput[d]) issues.push({kind:'out_of_order',device:d,sequence:seq,previous:lastInput[d]});
+    if(lastInput[d]===seq) issues.push({kind:'duplicate_sequence',device:d,sequence:seq});
+    lastInput[d]=seq; groups[d].push(e);
+  });
+  Object.keys(groups).forEach(function(d){
+    var arr=groups[d].slice().sort(function(a,b){return a.sequence-b.sequence;}), prev=null;
+    arr.forEach(function(e){ if(prev!==null&&e.sequence>prev+1) issues.push({kind:'sequence_gap',device:d,from:prev,to:e.sequence}); prev=e.sequence; });
+  });
+  return {ok:issues.length===0,issueCount:issues.length,issues:issues,deviceCount:Object.keys(groups).length};
 }
 function locationSummary(v){
   if(!isObject(v)) return null;
@@ -384,6 +430,10 @@ root.PanelCoverageV1={
   buildObserverSnapshot:buildObserverSnapshot,
   parseObserverSnapshot:parseObserverSnapshot,
   chooseProjection:chooseProjection,
+  normalizeEvent:normalizeEvent,
+  parseEventLog:parseEventLog,
+  mergeEventLogs:mergeEventLogs,
+  eventSequenceAudit:eventSequenceAudit,
   normalizeReceipt:safeReceipt
 };
 })(typeof window!=='undefined'?window:this);

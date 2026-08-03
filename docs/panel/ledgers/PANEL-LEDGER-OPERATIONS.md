@@ -224,3 +224,14 @@ gate’i başlatılmayacak.
 `PANEL-015` `ready_for_review` durumundadır. Kullanıcı QA/release kanıtını
 inceleyip açık release/onay vermeden commit/push/merge/deploy veya yeni faz
 başlatılmayacaktır.
+
+## PANEL-015 yayın makbuzu (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-015 | 2026-08-03 | RELEASE-PUBLICATION | Kullanıcı açık `push commit merge deploy` yetkisi verdi; feature commit, push, PR merge ve Pages deploy tamamlandı | Branch `agent/panel-13-d6-qa-release-20260803`; feature commit `4a819108`; PR [#101](https://github.com/mustafaras/s/pull/101); `main` merge `c63e1de65571076ea79b3068aba804e1a9118e06` | Pages workflow [30813654381](https://github.com/mustafaras/s/actions/runs/30813654381) `validate` + `deploy` **success**; canlı `https://mustafaras.github.io/s/panel.html` HTTP **200**; live cache/ARIA marker’ları doğrulandı | GitHub `main` ve Pages değişti; `data/`, `data/events/`, localStorage, `mustafaras/seyma-data` ve observer write kanalları değişmedi |
+
+## Sonraki sequence (PANEL-015 yayınından sonra)
+
+`PANEL-015` `completed` durumundadır. Yeni faz veya yeni dış eylem yalnız
+kullanıcının açık bir sonraki promptuyla başlatılacaktır.

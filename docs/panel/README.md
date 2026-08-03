@@ -85,8 +85,8 @@ PANEL-015 / Prompt 13 D6 QA/release gate teslimatı:
 - Tasarım planı: hazır.
 - Kod uygulaması: `PANEL-003`–`PANEL-009` / Prompt 01–07 kullanıcı kabulüyle
   `completed`; Prompt 08 / `PANEL-010` review bekliyor, Prompt 09 / `PANEL-011`
-  ve Prompt 10–11 / `PANEL-012`–`PANEL-013` kullanıcı kabulüyle `completed`;
-  Prompt 12 / `PANEL-014` uygulandı ve paired ledger review’ı bekliyor.
+  ve Prompt 10–13 / `PANEL-012`–`PANEL-015` kullanıcı kabulü ve release
+  makbuzuyla `completed`.
 - Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
   `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
   push edildi. Pages run `30761174707` başarılı. PANEL-007/PANEL-008 teslimatı
@@ -106,6 +106,9 @@ PANEL-015 / Prompt 13 D6 QA/release gate teslimatı:
   kapıları, D1 semantic component yüzeyi, D2 command center, D3 timeline /
   drawer, D4 modül atlası ve D5 responsive/a11y/motion pass’i hazır. Prompt
   01–07 kullanıcı kabulüyle tamamlandı; Prompt 08 `ready_for_review`, Prompt
-  09–12 tamamlandı, Prompt 13 / `PANEL-015` QA/release gate’i uygulandı ve
-  paired ledger review’ı bekliyor. Relay açılmadı; commit/push/merge/deploy
-  yapılmadı.
+  09–13 / `PANEL-011`–`PANEL-015` tamamlandı. D6 fixture **16/16**, tam
+  komut kapısı **22/22 PASS**, ek Kur’an regresyonları **8/8 PASS**. PANEL-015
+  feature commit’i `4a81910`, PR #101, `main` merge’i `c63e1de` ve Pages run
+  `30813654381` success; canlı panel HTTP **200**.
+- Relay açılmadı; `data/`, `data/events/`, localStorage, `seyma-data` ve
+  observer write kanalları değişmedi. Rollback: `git revert c63e1de`.

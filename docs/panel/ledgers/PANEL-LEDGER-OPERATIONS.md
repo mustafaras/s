@@ -136,3 +136,9 @@ CSS veya panel HTML’inde yeni component/refactor açılmayacaktır.
 `PANEL-011` `ready_for_review` durumundadır. Kullanıcı D2 command center ve
 sync ribbon teslimini inceleyip açık kabul/“devam” vermeden Prompt 10 /
 `PANEL-012` D3 timeline/drawer işi başlamayacak.
+
+## PANEL-011 yayın makbuzu (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-011 | 2026-08-03 | RELEASE-PUBLICATION | Feature commit/push/merge/deploy tamamlandı | `fc66fa1` feature commit; `cc9dc19` `main` merge commit; Pages workflow `30805538047` | Workflow `success`; head SHA `cc9dc195ae2967855c3e479cfab7ffd47f6a7967`; canlı `https://mustafaras.github.io/s/` HTTP **200** | GitHub `main` ve Pages değişti; `data/`, localStorage, `mustafaras/seyma-data` ve observer write kanalları değişmedi |

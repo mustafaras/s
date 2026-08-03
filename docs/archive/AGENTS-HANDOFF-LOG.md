@@ -5,6 +5,22 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-011 publication receipt
+
+**Yayın makbuzu:** D2 feature commit’i `fc66fa1` push edildi, `cc9dc19`
+merge commit’i `main`’e push edildi. GitHub Pages workflow `30805538047`
+`success` ile bu SHA’yı deploy etti; canlı `https://mustafaras.github.io/s/`
+HTTP **200** döndü.
+
+**Kapsam:** Yayın yalnız PANEL-011’in `panel.css`, `panel.js`, `panel.html`,
+D0–D2 dokümanları ve paired ledger/handoff değişikliklerini içeriyor. Gerçek
+Şeyma uygulaması açılmadı; `data/`, localStorage, `mustafaras/seyma-data` ve
+observer write kanalları değişmedi.
+
+**Sonraki güvenli adım:** PANEL-011 kullanıcı review/kabulü bekleniyor;
+Prompt 10 / PANEL-012 başlatılmayacak.
+
+---
 ### 2026-08-03 — PANEL-011 D2 command center ve sync ribbon teslimi
 
 **Kullanıcı talimatı:** Kullanıcı Prompt 09 / PANEL-011 D2 command center

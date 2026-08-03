@@ -151,33 +151,33 @@ docs/ledgers/        Repo organization paired operations/state ledgers.
 docs/archive/        Append-only historical AGENTS handoff archive.
 docs/panel/         ÆON panel research/design plans, ordered anti-amnesia
                     prompts, and paired append-only ledgers.
-test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
+tests/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
-                 Run: `node test_faz10_sync.js`.
-test_faz11_panel.js  Headless Node harness for panel.html helper/render
-                 logic. Run: `node test_faz11_panel.js`.
-test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
+                 Run: `node tests/test_faz10_sync.js`.
+tests/test_faz11_panel.js  Headless Node harness for panel.html helper/render
+                 logic. Run: `node tests/test_faz11_panel.js`.
+tests/test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
                  anti-clobber and panel time/status projection. Run:
-                 `node test_panel_p0_sync.js`.
-test_panel_p1_projection.js Headless Node fixture for PANEL-02 coverage,
+                 `node tests/test_panel_p0_sync.js`.
+tests/test_panel_p1_projection.js Headless Node fixture for PANEL-02 coverage,
                  redaction, stale projection and legacy fallback. Run:
-                 `node test_panel_p1_projection.js`.
-test_panel_p3_root_modules.js Headless Node fixture for PANEL-03 root-module
+                 `node tests/test_panel_p1_projection.js`.
+tests/test_panel_p3_root_modules.js Headless Node fixture for PANEL-03 root-module
                  projection/render, stale/missing/broken states, Saygı mismatch,
                  settings summary, privacy and no-mutation boundary. Run:
-                 `node test_panel_p3_root_modules.js`.
-test_panel_p4_provenance.js Headless Node fixture for PANEL-04 therapy
+                 `node tests/test_panel_p3_root_modules.js`.
+tests/test_panel_p4_provenance.js Headless Node fixture for PANEL-04 therapy
                  redaction, profile progress, notification lifecycle and
-                 external fetch provenance. Run: `node test_panel_p4_provenance.js`.
-test_panel_p2_event_log.js Headless Node fixture for PANEL-05 event contract,
+                 external fetch provenance. Run: `node tests/test_panel_p4_provenance.js`.
+tests/test_panel_p2_event_log.js Headless Node fixture for PANEL-05 event contract,
                  redaction, sequence audit, panel filters and revision drawer.
-                 Run: `node test_panel_p2_event_log.js`.
-test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
+                 Run: `node tests/test_panel_p2_event_log.js`.
+tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
                  merge, duplicate idempotence and receipt-bound push. Run:
-                 `node test_panel_p2_sync.js`.
-test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
+                 `node tests/test_panel_p2_sync.js`.
+tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
-                 Run: `node test_panel_p2_polling.js`.
+                 Run: `node tests/test_panel_p2_polling.js`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network.

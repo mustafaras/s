@@ -4,8 +4,9 @@
 var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
-var manifestSource=fs.readFileSync(path.join(__dirname,'panelCoverageManifest.js'),'utf8');
-var panelSource=fs.readFileSync(path.join(__dirname,'panel.js'),'utf8');
+var repoRoot=require('./repo-root');
+var manifestSource=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
 var HASH_A='a'.repeat(40), HASH_B='b'.repeat(40), HASH_C='c'.repeat(40);
 var receipt={status:'accepted',snapshotRevision:HASH_C,sourceLatestSha:HASH_B,sourceUpdatedAt:'2026-08-02T14:58:00.000Z',submittedAt:'2026-08-02T14:59:00.000Z',acceptedAt:'2026-08-02T15:00:00.000Z'};
 var passed=0,failed=0;

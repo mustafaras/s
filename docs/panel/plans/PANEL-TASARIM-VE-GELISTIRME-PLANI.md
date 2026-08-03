@@ -569,7 +569,7 @@ audit seviyelerine ayrılıyor. Desktop sağ paneli ve mobil tam ekran davranı�
 Esc/close/focus trap, ana odağa iade, raw redaction, taslak koruması ve
 reduced-motion kuralları uygulandı.
 
-**D3 çıkış kanıtı:** `test_panel_p3_timeline_drawer.js` **13/13**, mevcut event
+**D3 çıkış kanıtı:** `tests/test_panel_p3_timeline_drawer.js` **13/13**, mevcut event
 fixture **13/13**, tüm P0–P4/Polling/Faz 10–11/headless migration kapıları yeşil;
 paired ledger sequence `PANEL-012` `completed`.
 
@@ -583,7 +583,7 @@ Audit ve Zihin-Beden/arşiv provenance modülleri ortak `module-card` +
 source/time, status, privacy ve `Tam/Özet/Redacted/Eksik` coverage rozeti taşır;
 boş/bozuk/stale durumlar fail-closed görünür.
 
-**D4 çıkış kanıtı:** `test_panel_p4_module_cards.js` **13/13**; P3 root **26/26**,
+**D4 çıkış kanıtı:** `tests/test_panel_p4_module_cards.js` **13/13**; P3 root **26/26**,
 P4 provenance **19/19**, D3 timeline **13/13**, P2 sync **8/8**, P2 polling
 **15/15** ve tüm headless/migration/syntax kapıları yeşil; paired ledger
 sequence `PANEL-013` `ready_for_review`.
@@ -608,7 +608,7 @@ Sırayla:
   nav, section header ve drawer çakışma kapıları düzeltildi.
 - 44px action target, native accordion, ARIA current/controls/expanded/live,
   focus ring, AA contrast ve reduced-motion CSS/JS davranışı uygulandı.
-- D5 çıkış kanıtı: `test_panel_p5_responsive_a11y.js` **24/24**; paired ledger
+- D5 çıkış kanıtı: `tests/test_panel_p5_responsive_a11y.js` **24/24**; paired ledger
   sequence `PANEL-014` `ready_for_review`.
 
 ### Geliştirme Faz D6 — Erişilebilirlik ve kalite

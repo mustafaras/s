@@ -6,8 +6,9 @@
 var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
-var source=fs.readFileSync(path.join(__dirname,'panelCoverageManifest.js'),'utf8');
-var panelSource=fs.readFileSync(path.join(__dirname,'panel.js'),'utf8');
+var repoRoot=require('./repo-root');
+var source=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
 var HASH_A='a'.repeat(40), HASH_B='b'.repeat(40), HASH_C='c'.repeat(40);
 var receipt={schemaVersion:1,status:'accepted',snapshotRevision:HASH_C,sourceUpdatedAt:'2026-08-02T14:58:00.000Z',submittedAt:'2026-08-02T14:59:00.000Z',acceptedAt:'2026-08-02T15:00:00.000Z',sourceLatestSha:HASH_B,lastErrorCode:null};
 var passed=0, failed=0;

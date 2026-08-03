@@ -76,6 +76,7 @@ sırası aşağıdaki `docs/panel/` paketidir.
 - `.claude/skills/run-seyma/verify-state-adapter-contract.mjs` — B3 contract
   harness; production state/persistence graph’ına bağlı değildir.
 - [`docs/ledgers/`](ledgers/) — repo organizasyonu için paired Operations/State ledger’ları.
+- [`tests/README.md`](../tests/README.md) — root test fixture’ları, ortak repo-root resolver ve güvenli çalıştırma komutları.
 - [`docs/panel/plans/`](panel/plans/) — araştırma ve tasarım planları.
 - [`docs/panel/prompts/`](panel/prompts/) — tek aşamalı, dur-kontrol et mantığında prompt’lar.
 - [`docs/panel/ledgers/`](panel/ledgers/) — eşli, sequence-aligned, append-only ledger’lar.

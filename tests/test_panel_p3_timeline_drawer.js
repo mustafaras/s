@@ -2,9 +2,10 @@
 // Gerçek ağ, browser, token, localStorage ve kişisel veri yoktur.
 'use strict';
 var fs=require('fs'),path=require('path'),vm=require('vm');
-var panelSource=fs.readFileSync(path.join(__dirname,'panel.js'),'utf8');
-var cssSource=fs.readFileSync(path.join(__dirname,'panel.css'),'utf8');
-var htmlSource=fs.readFileSync(path.join(__dirname,'panel.html'),'utf8');
+var repoRoot=require('./repo-root');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var cssSource=fs.readFileSync(path.join(repoRoot,'panel.css'),'utf8');
+var htmlSource=fs.readFileSync(path.join(repoRoot,'panel.html'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){ var start=panelSource.indexOf('function '+name+'('); if(start<0) throw new Error(name+' bulunamadı'); var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end); }

@@ -574,8 +574,8 @@ Panel:
 node --check app.js
 node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
-node test_faz10_sync.js
-node test_faz11_panel.js
+node tests/test_faz10_sync.js
+node tests/test_faz11_panel.js
 git diff --check
 ```
 

@@ -94,10 +94,12 @@ PANEL-015 / Prompt 13 D6 QA/release gate teslimatı:
   push edildi; Pages run `30791188610` başarılı, canlı kök URL HTTP 200.
 - Clone için canonical ref: `origin/main`; publication receipt ve son ledger
   güncellemeleri de bu ref üzerinde tutulur.
-- Kanıt: `test_panel_p0_sync.js` 27/27; `test_panel_p1_projection.js` 35/35;
-  `test_panel_p3_root_modules.js` 26/26; `test_panel_p4_provenance.js`
-  19/19; `test_panel_p2_event_log.js` 13/13; `test_panel_p2_sync.js` 8/8;
-  `test_panel_p2_polling.js` 15/15; mevcut app/sync/panel ve
+- Kanıt: `tests/test_panel_p0_sync.js` 27/27;
+  `tests/test_panel_p1_projection.js` 35/35;
+  `tests/test_panel_p3_root_modules.js` 26/26;
+  `tests/test_panel_p4_provenance.js` 19/19;
+  `tests/test_panel_p2_event_log.js` 13/13; `tests/test_panel_p2_sync.js` 8/8;
+  `tests/test_panel_p2_polling.js` 15/15; mevcut app/sync/panel ve
   migration/headless kapıları da yeşil. PANEL-008 fixture’ı ETag/304,
   `If-None-Match`, p50/p95 (120/190 ms), input skip, taslak defer ve
   değişmeyen snapshot’ta tam rerender yapılmadığını kanıtlıyor.

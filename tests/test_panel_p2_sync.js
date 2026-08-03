@@ -3,6 +3,7 @@
 'use strict';
 var fs=require('fs');
 var path=require('path');
+var repoRoot=require('./repo-root');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 var ls={};
@@ -15,7 +16,7 @@ if(typeof TextDecoder==='undefined') global.TextDecoder=require('util').TextDeco
 if(typeof btoa==='undefined') global.btoa=function(s){return Buffer.from(s,'binary').toString('base64');};
 if(typeof atob==='undefined') global.atob=function(s){return Buffer.from(s,'base64').toString('binary');};
 global.fetch=function(){ return Promise.reject(new Error('unexpected fetch')); };
-var source=fs.readFileSync(path.join(__dirname,'sync.js'),'utf8');
+var source=fs.readFileSync(path.join(repoRoot,'sync.js'),'utf8');
 eval(source);
 var S=global.window.SeySync;
 if(!S){console.error('SeySync yüklenemedi');process.exit(1);}

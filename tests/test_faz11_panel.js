@@ -2,13 +2,14 @@
 // panel.js'deki profileAssessmentCardHTML fonksiyonunu kaynak dosyadan çıkarıp
 // mock bağımlılıklarla test eder. panel.js IIFE olduğu için vm.runInContext
 // çalışmaz — bunun yerine fonksiyon kaynağını çekip minimal mock'larla eval eder.
-// Çalıştırma: node test_faz11_panel.js
+// Çalıştırma: node tests/test_faz11_panel.js
 
 var fs = require('fs');
 var path = require('path');
+var repoRoot = require('./repo-root');
 
 // Ayrıştırılmış panel JS kaynağını oku
-var html = fs.readFileSync(path.join(__dirname,'panel.js'),'utf8');
+var html = fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
 
 // ICONS map'i çıkar (icon() fonksiyonu için)
 var iconsMatch = html.match(/var ICONS\s*=\s*\{[\s\S]*?\};/);

@@ -155,7 +155,7 @@ panel.js         # fetch, projection, render ve observer eylemleri
 ```
 
 `panel.html` bağımsız çalışmaya devam eder. Global helper adları ve mevcut
-`test_faz11_panel.js` sözleşmesi korundu; panel CSS/JS ayrıştırma makbuzu
+`tests/test_faz11_panel.js` sözleşmesi korundu; panel CSS/JS ayrıştırma makbuzu
 [`REPO-L1-PANEL-SPLIT-RECEIPT.md`](REPO-L1-PANEL-SPLIT-RECEIPT.md)
 dosyasındadır.
 

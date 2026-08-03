@@ -2,11 +2,12 @@
 // quranTransportV1.js dosyasını yalnız `window` içeren çıplak bir node:vm
 // sandbox'ında çalıştırır. Sandbox'ta localStorage/fetch/document bulunmadığı
 // için modül bunlara dokunursa test anında patlar.
-// Çalıştırma: node test_quran_transport.js
+// Çalıştırma: node tests/test_quran_transport.js
 
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
+var repoRoot = require('./repo-root');
 
 var SRC_FILE = 'quranTransportV1.js';
 var AT = '2026-07-30T12:00:00.000Z';
@@ -29,7 +30,7 @@ function ok(cond, label, detail) {
 function section(t) { console.log('\n' + t); }
 
 // ── yükleme ve izolasyon ────────────────────────────────────────────────────
-var src = fs.readFileSync(path.join(__dirname, SRC_FILE), 'utf8');
+var src = fs.readFileSync(path.join(repoRoot, SRC_FILE), 'utf8');
 
 section('1. İzolasyon ve yükleme');
 var code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[\r\n])\s*\/\/[^\r\n]*/g, '$1');

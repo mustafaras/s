@@ -36,7 +36,7 @@ kullanıcı metni telemetry’ye yazılmaz.
 
 ## Fixture ölçümü
 
-`test_panel_p2_polling.js` sentetik 20 poll süresinde:
+`tests/test_panel_p2_polling.js` sentetik 20 poll süresinde:
 
 - p50: **120 ms**
 - p95: **190 ms**

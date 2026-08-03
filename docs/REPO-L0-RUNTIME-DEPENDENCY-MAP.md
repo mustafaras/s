@@ -89,7 +89,7 @@ içindedir.
 - `D`, `UI`, panel tokenı ve GitHub Contents API erişimi inline script içinde.
 - Panelin veri yazma yüzeyi observer inbox/outbox dosyalarıdır; bu envanter
   sırasında hiçbir çağrı çalıştırılmadı.
-- `test_faz11_panel.js` mevcut helper/render isimlerini doğrudan doğrular;
+- `tests/test_faz11_panel.js` mevcut helper/render isimlerini doğrudan doğrular;
   CSS/JS ayırma öncesi bu sözleşme sabitlenmelidir.
 
 ## 4. Güvenli modül sınırı adayları
@@ -125,7 +125,7 @@ ve frozen içerik modülleri bu zincirin dışında tutulmalıdır.
 - `index.html` script sırası ve cache-bust değerleri, gerçek modül taşıması
   olmadan güncellenmez.
 - `panel.html` ayrıştırılırsa önce helper isimleri, inline handler’lar ve
-  `test_faz11_panel.js` fixture’ları korunur.
+  `tests/test_faz11_panel.js` fixture’ları korunur.
 - Browser/server açılmaz; headless harness kullanılır.
 
 ## L0 kabul kapısı

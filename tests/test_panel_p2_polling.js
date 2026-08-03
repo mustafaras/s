@@ -4,7 +4,8 @@
 var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
-var source=fs.readFileSync(path.join(__dirname,'panel.js'),'utf8');
+var repoRoot=require('./repo-root');
+var source=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){

@@ -218,3 +218,73 @@ next_safe_action: PANEL-011 D2 command center ve sync ribbon teslimini kullanıc
 | Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
 |---|---|---|---|---|---|---|
 | PANEL-011 | 2026-08-03 | RELEASE-PUBLICATION | ready_for_review | D2 implementation `ready_for_review`; kullanıcı commit/push/merge/deploy istedi | `fc66fa1` feature push; `cc9dc19` main merge/push; Pages `30805538047` success; canlı URL HTTP 200 | Kullanıcı D2 review/kabulü; açık kabul/“devam” olmadan Prompt 10 / PANEL-012 başlatma |
+
+## PANEL-011 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | completed | D2 implementation `ready_for_review`; kullanıcı açık D2 kabulü verdi | Kullanıcı “d2 kabul ve” diyerek command center + sync ribbon teslimini onayladı; D2 visual/a11y/safety fixture **13/13** ve regresyon kapıları korunuyor | Prompt 10 / PANEL-012 D3 timeline/drawer işi başlatıldı |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D3-TIMELINE-DRAWER
+active_sequence: PANEL-012
+status: in_progress
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-012 timeline grouping/filter/drawer/focus/redaction kapılarını tamamlamak; Prompt 11’i başlatmamak
+```
+
+## PANEL-012 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | in_progress | PANEL-011 completed; kullanıcı Prompt 10’u açıkça başlattı | Event projection timeline’ı, correlation zinciri, dokuz filtre, üç seviyeli redacted drawer ve keyboard/focus davranışı uygulanıyor | D3 fixture, syntax, regression, headless/migration ve diff kapılarını tamamla |
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | ready_for_review | PANEL-011 completed; kullanıcı Prompt 10’u açıkça başlattı | `PANEL-D3-TIMELINE-DRAWER.md`; D3 fixture **13/13**; mevcut event **13/13**, sync **8/8**, polling **15/15**; P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, Faz 10 **64/64**, Faz 11 **50/50**; syntax/cache/headless/migration/diff kapıları yeşil; raw redaction, ARIA dialog, focus trap, Esc ve mobile/desktop drawer kanıtlandı | Kullanıcı D3 review/kabulü; açık kabul/“devam” olmadan Prompt 11 / PANEL-013 başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D3-TIMELINE-DRAWER
+active_sequence: PANEL-012
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-012 D3 timeline/drawer teslimini kullanıcıya review için sunmak; açık kabul olmadan Prompt 11 / PANEL-013 veya yeni modül kartı refactor’ı başlatmamak
+```
+
+## PANEL-012 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-012 | 2026-08-03 | D3-TIMELINE-DRAWER | completed | D3 implementation `ready_for_review`; kullanıcı açık D3 kabulü verdi | Kullanıcı “kabu ve” diyerek timeline/drawer teslimini onayladı; D3 fixture **13/13** ve redaction/focus/regression kanıtları korunuyor | Prompt 11 / PANEL-013 D4 modül kartları başlatıldı |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D4-MODULE-CARDS
+active_sequence: PANEL-013
+status: in_progress
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-013 yedi modül kartı/drawer ve dolu-eski-eksik-bozuk-redacted fixture kapılarını tamamlamak; Prompt 12’yi başlatmamak
+```
+
+## PANEL-013 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | in_progress | PANEL-012 completed; kullanıcı Prompt 11’i açıkça başlattı | Terapi/profil, bildirim, Kur’an, Saygı, fotoğraf, konum ve Zihin-Beden/arşiv için ortak module-card + drawer uygulanıyor; canonical/cross-check ve coverage badge’leri bağlanıyor | D4 fixture, syntax, regression, headless/migration ve diff kapılarını tamamla |
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | ready_for_review | PANEL-012 completed; kullanıcı Prompt 11’i açıkça başlattı | `PANEL-D4-MODUL-KARTLARI.md`; D4 fixture **13/13**; P3 root **26/26**, P4 **19/19**, D3 **13/13**, sync **8/8**, polling **15/15**, P0 **27/27**, P1 **35/35**, Faz 10 **64/64**, Faz 11 **50/50**; syntax/cache/headless/migration/diff kapıları yeşil; source immutability ve no-write sınırı kanıtlandı | Kullanıcı D4 review/kabulü; açık kabul/“devam” olmadan Prompt 12 / PANEL-014 başlatma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D4-MODULE-CARDS
+active_sequence: PANEL-013
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-013 D4 modül kartları teslimini kullanıcıya review için sunmak; açık kabul olmadan Prompt 12 / PANEL-014 veya responsive/a11y pass’i başlatmamak
+```

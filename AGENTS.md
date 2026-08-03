@@ -75,9 +75,9 @@ When working with multiple AI agents in parallel:
 
 1. **One agent at a time for data-affecting changes** — Only one agent should make changes that touch `data` persistence, `sync.js`, or migration logic. Parallel changes risk race conditions in validation and testing.
 
-2. **Handoff protocol** — Before ending your turn, update the top of
-   `docs/archive/AGENTS-HANDOFF-LOG.md` (en üstten yeni giriş) and optionally
-   session memory; root `AGENTS.md` yalnız güncel kuralları taşır:
+2. **Handoff protocol** — Before ending your turn, write a brief handoff summary
+   to session memory (`/memories/session/`) or, if the user prefers, directly
+   in your final message. Root `AGENTS.md` yalnız güncel kuralları taşır:
    - What files you changed
    - What you tested (syntax check, migration, panel)
    - What still needs verification
@@ -169,7 +169,6 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-docs/archive/        Append-only historical AGENTS handoff archive.
 tests/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
                  Run: `node tests/test_faz10_sync.js`.
@@ -408,4 +407,3 @@ Yeni handoff kayıtları yalnız bu arşive eklenir; eski bölümler değiştiri
 
 - [`CLAUDE.md`](CLAUDE.md) — Detailed AI assistant guidance, architecture deep-dive
 - [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md) — Feature roadmap + technical principles (Turkish)
-- [`docs/archive/AGENTS-HANDOFF-LOG.md`](docs/archive/AGENTS-HANDOFF-LOG.md) — append-only historical handoff archive

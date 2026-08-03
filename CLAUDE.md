@@ -146,7 +146,6 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-docs/archive/        Append-only historical AGENTS handoff archive.
 tests/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
                  Run: `node tests/test_faz10_sync.js`.

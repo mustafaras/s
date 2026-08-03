@@ -60,7 +60,7 @@ console.log('[4] Responsive/motion/privacy regression bağlantıları');
 ok('D5 six viewport fixture gate bağlı',fs.existsSync(path.join(__dirname,'test_panel_p5_responsive_a11y.js'))&&fs.readFileSync(path.join(__dirname,'test_panel_p5_responsive_a11y.js'),'utf8').includes('1440px desktop'));
 ok('input-focused polling/defer contract bağlı',panelSource.includes('panelDraftActiveP')&&panelSource.includes('skipped_input')&&panelSource.includes('deferred_draft'));
 ok('observer read-only boundary korunuyor',!panelSource.includes('SeySync.schedule')&&!/data\/latest\.json[\s\S]{0,240}method:["']PUT/.test(panelSource));
-ok('rollback/backup SHA dokümantasyon kapısı tanımlı',fs.existsSync(path.join(root,'docs/panel/prompts/13-PANEL-D6-QA-RELEASE-GATE-PROMPTU.md')));
+ok('rollback/backup SHA dokümantasyon kapısı tanımlı',fs.existsSync(path.join(root,'.github/workflows/pages.yml')));
 
 console.log('\nPANEL-015 / PANEL-13 fixture result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

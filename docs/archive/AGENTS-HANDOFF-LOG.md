@@ -5,6 +5,36 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — REPO-M004 test fixture organizasyonu ve yayın makbuzu
+
+**Kullanıcı kararı:** Kullanıcı test dosyalarının derli toplu bir klasöre,
+işlevsel hata oluşturmadan taşınmasını ve ardından push/commit/merge/deploy
+akışını açıkça istedi. 21 root test fixture `tests/` altına alındı.
+
+**Uygulama:** `tests/repo-root.js` ortak resolver’ı eklendi; testlerin
+`__dirname`/cwd bağımlılıkları repo root’a sabitlendi; `tests/README.md`,
+AGENTS/CLAUDE, run-seyma skill’i ve güncel doküman komutları düzeltildi.
+Runtime `app.js`/`sync.js`/`panel.js` import veya script sırası değiştirilmedi.
+
+**Kanıt:** Core/test syntax **27/27**; repo root’tan **21/21**; `tests/`
+çalışma dizininden **21/21**; app driver PASS; Zikirmatik **90/90**; B1 PASS;
+B2 **32/32**; B3 **20/20**; `git diff --check` PASS. Canlı `tests/README.md`
+HTTP **200**, eski root test yolu yok, canlı panel HTTP **200**.
+
+**Yayın zinciri:** Feature commit `dde41245d811f7d975a45e49a9c212e26ad7495a`,
+PR [#103](https://github.com/mustafaras/s/pull/103), `main` merge SHA
+`db00ada3f6f97835b7fd9694d3afe691c3228633`. Pages workflow
+[30818312034](https://github.com/mustafaras/s/actions/runs/30818312034)
+`validate` ve `deploy` **success**.
+
+**Güvenlik:** Browser veya local server açılmadı; `data/`, localStorage,
+`mustafaras/seyma-data`, sync ve observer write kanalları değişmedi. Test
+taşıması yalnız kod/doküman yollarını ve Pages içindeki test konumunu etkiledi.
+
+**Sonraki güvenli adım:** Yeni repo/runtime taşıması yalnız açık kullanıcı
+talebiyle başlatılacak.
+
+---
 ### 2026-08-03 — PANEL-015 D6 release makbuzu ve Pages doğrulaması
 
 **Kullanıcı kararı:** Kullanıcı açıkça `push commit merge deploy` yetkisi

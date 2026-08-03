@@ -208,6 +208,9 @@ dark/light tema regresyonu tek değişiklikte bozulmaz.
   ve `node --check` kanıtı ile taşınır.
 - Test dosyaları `tests/` altına alınabilir; `AGENTS.md` komutları ve CI/Pages
   olmayan yerel çalıştırma belgeleri aynı değişiklikte güncellenir.
+- REPO-M004 ile 21 root fixture `tests/` altına alındı; ortak resolver, güncel
+  komut yolları ve `tests/README.md` eklendi. Runtime/import sınırı korunarak
+  root’tan ve `tests/` çalışma dizininden tam regresyon kanıtı alındı.
 
 ## 5. Anti-amnesia ve ledger kapısı
 

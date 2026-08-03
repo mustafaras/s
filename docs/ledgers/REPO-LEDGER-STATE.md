@@ -124,3 +124,21 @@ external_write_authorized: false
 data_mutation_authorized: false
 next_safe_action: kullanıcı açıkça PANEL-003 / 01-PANEL-P0-SENKRON-MAKBUZU-PROMPTU.md başlatırsa yalnız o promptu okumak ve uygulamak; production state.js/save entegrasyonunu başlatmamak
 ```
+
+## REPO-M004 test fixture taşıma kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| REPO-M004 | 2026-08-03 | M4 test fixture organization | completed | REPO-L007 completed; kullanıcı test klasörü taşıması ve release akışını açıkça istedi | Feature commit `dde41245`; PR #103; `main` merge `db00ada3f6f97835b7fd9694d3afe691c3228633`; Pages `30818312034` success; 21/21 fixture iki cwd’den ve migration/headless kapıları PASS | Yeni repo taşıması yalnız ayrı kullanıcı onayıyla başlatılacak |
+
+## Güncel aktif sınır — REPO-M004
+
+```text
+active_phase: M4-TEST-FIXTURE-ORGANIZATION
+active_sequences: REPO-M004
+status: completed
+implementation_started: true
+external_write_authorized: false
+data_mutation_authorized: false
+next_safe_action: Yeni bir repo/runtime taşıması başlatmadan kullanıcının açık sonraki talebini beklemek
+```

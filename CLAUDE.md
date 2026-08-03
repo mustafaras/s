@@ -38,8 +38,18 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
 3. **Never write to `mustafaras/seyma-data` without explicit user consent.** It
    holds the only live copy of personal data. Reads are fine.
 4. **Always stop any local server you start** (`pkill -f http.server` on
-   macOS/Linux; `Get-Process -Name python* | Stop-Process` or `Ctrl+C` in its
-   terminal on Windows) before ending your turn.
+  macOS/Linux; `Get-Process -Name python* | Stop-Process` or `Ctrl+C` in its
+  terminal on Windows) before ending your turn.
+5. **Never ask the user to paste, send, or disclose secrets** such as GitHub
+  tokens, passwords, 2FA codes, API keys, or private data in chat. The user
+  must enter them directly into the intended local UI or terminal.
+6. **Never use browser automation to read or fill token, password, GitHub,
+  Apps Script, or 2FA fields.** Treat live-account setup as user-performed;
+  use mocked/headless fixtures for repository verification.
+7. **Separate evidence levels in status reports.** Distinguish source/test
+  evidence, deploy evidence, and user-device confirmation; do not call a
+  device-side or production behavior “definitely fixed” without the matching
+  evidence.
 
 **Recovery (if data is clobbered anyway):** No data is truly lost — restore it.
 The real data survives in (a) `seyma-data` git history — find the last
@@ -67,6 +77,12 @@ static site to GitHub Pages. It should never contain real personal data
 (mood logs, cycle data, medication, discomfort maps, psych screening
 answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 `localStorage`.
+
+## Agent Routing
+
+- Start new sessions with [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
+- Use [`.claude/skills/run-seyma/SKILL.md`](.claude/skills/run-seyma/SKILL.md) for data-safe app verification and [`tests/README.md`](tests/README.md) for the current root fixture inventory.
+- Keep root guidance operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ## Repo layout
 
@@ -130,27 +146,7 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-docs/roadmaps/SEYMA-V2-PLAN.md Living v2.0 redesign roadmap ("İçsel Pusula & Terapi
-                 Odası") — Turkish, checkbox-driven; complements
-                 GELISTIRME-PLANI.md.
-docs/roadmaps/ILHAM-IBADET-GELISTIRME-PLANI.md  Living Turkish roadmap for the İlham &
-                 İbadet hub expansion (Faz 35+): Zikirmatik, kıble/pusula,
-                 hicri takvim, mübarek gün rozetleri, ibadet rapor sekmesi —
-                 complements GELISTIRME-PLANI.md.
-docs/roadmaps/KURAN-YOLCULUGU-GELISTIRME-PLANI.md
-                    Living Turkish roadmap for Raşit ile Kur’an Yolculuğu.
-docs/roadmaps/ZIKIRMATIK-GELISTIRME-PLANI.md
-                    Living Turkish roadmap for Zikirmatik v2.
-docs/README.md      Root Markdown inventory and canonical documentation index.
-docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md
-                    Root documentation and runtime modularization plan.
-docs/REPO-M0-MARKDOWN-MANIFEST.md
-docs/REPO-L0-RUNTIME-DEPENDENCY-MAP.md
-                    M0/L0 inventory evidence manifests.
-docs/ledgers/        Repo organization paired operations/state ledgers.
 docs/archive/        Append-only historical AGENTS handoff archive.
-docs/panel/         ÆON panel research/design plans, ordered anti-amnesia
-                    prompts, and paired append-only ledgers.
 tests/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
                  Run: `node tests/test_faz10_sync.js`.
@@ -201,9 +197,10 @@ AGENTS.md        Parallel, tool-agnostic restatement of this file's rules
                  the whole repo root as-is and deploys it. No build step.
 ```
 
-There is **no `package.json`, no bundler, no framework, no test suite, and
-no linter**. Everything is hand-written vanilla JS/HTML/CSS targeting
-mobile Safari/Chrome (viewport ≤460px design).
+There is **no `package.json`, bundler, framework, npm test script, or
+linter**. Committed headless Node fixtures live under `tests/` and
+`.claude/skills/run-seyma/`; everything else is hand-written vanilla
+JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px design).
 
 ## Architecture of `app.js`
 

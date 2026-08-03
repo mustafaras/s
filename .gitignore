@@ -3,3 +3,6 @@ files/
 .impeccable/
 __pycache__/
 *.pyc
+
+# Local docs archive snapshots
+docs_ARCHIVE_*/

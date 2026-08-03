@@ -5,6 +5,115 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-011 D2 command center ve sync ribbon teslimi
+
+**Kullanıcı talimatı:** Kullanıcı Prompt 09 / PANEL-011 D2 command center
+çalışmasını açıkça başlattı; visual fixture, a11y ve syntax kanıtının paired
+ledger’lara yazılmasını ve sonra durulmasını istedi.
+
+**Değişen dosyalar:** `panel.css`, `panel.js`, `panel.html`,
+`docs/panel/plans/PANEL-D2-COMMAND-CENTER.md`, D1/UX planı, panel README ve
+eşli ledger’lar.
+
+**Sonuç:** Header marka/canonical status/eylem katmanlarına ayrıldı; sync
+ribbon local/remote/projection/panel poll zamanları ve receipt/revision
+kanıtını gösteriyor. Ruh, Beden, Süreklilik ve Senkron hero’ları; ayrı
+risk/stale/conflict/error bandı; erişilebilir tarih/yoğunluk/yenile/çıkış
+eylemleri; yeni veri geldiğinde otomatik scroll etmeyen, yalnız kullanıcı
+tıklamasıyla event günlüğüne giden `N yeni değişiklik` chip’i eklendi. Eski
+KPI’lar ayrıntı yoğunluğuna taşındı; desktop genişliği ve mobil sticky
+çakışması düzeltildi. D2 `ready_for_review` durumunda.
+
+**Kanıt:** D2 visual/a11y/safety fixture **13/13**; panel/sync/coverage
+syntax PASS; script-tag balance ve cache-bust `20260803c` PASS; PANEL-01–06,
+Faz 10/11, app driver, Zikirmatik ve B1/B2/B3 kapıları yeşil; `git diff
+--check` PASS. `design-system` skill’i, command center bileşenlerinin
+variant/state/accessibility ve token eşleşmesiyle tasarlanmasını yönlendirdi.
+
+**Güvenlik ve kalan iş:** Browser/server/canlı ağ/`localStorage`/
+`mustafaras/seyma-data`/relay açılmadı. `data/latest.json` veya
+`data/observer-snapshot.json` için yeni PUT yolu eklenmedi; yalnız headless VM,
+mock/sentetik fixture ve mevcut read/write kanalları kullanıldı. Kullanıcı D2
+review/kabulü vermeden Prompt 10 / PANEL-012 başlatılmayacak.
+
+---
+### 2026-08-03 — PANEL-010 D1 token/component sözleşmesi teslimi
+
+**Kullanıcı talimatı:** Kullanıcı Prompt 08 / PANEL-010 D1 semantic token ve
+component sözleşmesini açıkça başlattı; CSS/syntax kanıtı ve iki ledger sequence
+ile uygulanmasını istedi.
+
+**Değişen dosyalar:** `panel.css`, `panel.js`, `panel.html`,
+`docs/panel/plans/PANEL-D1-TOKEN-COMPONENT.md`, tasarım planı, panel README ve
+eşli ledger’lar.
+
+**Sonuç:** D1 token katmanları (surface/status/source/privacy/feature), ortak
+`sync-ribbon`, status/source/privacy badge, timeline, empty/error/stale,
+detail-drawer ve density-toggle sözleşmeleri uygulandı. Status artık icon +
+metin taşıyor; feature accent ile durum rengi ayrıldı; 44px touch target,
+reduced-motion ve focus/contrast token’ları eklendi. Prompt 08 `ready_for_review`
+durumunda.
+
+**Kanıt:** D1 contract fixture 25 token grubu + 10 component PASS; panel/app/
+sync/coverage syntax PASS; PANEL-01–06 fixture’ları, Faz 10/11, app driver,
+Zikirmatik, B1/B2/B3 ve `git diff --check` PASS. `design-system` skill’i,
+component API’sinin token/variant/state/accessibility sözleşmesiyle
+belgelenmesine yön verdi.
+
+**Güvenlik ve kalan iş:** Browser/server/canlı ağ/`localStorage`/
+`mustafaras/seyma-data`/relay açılmadı; yalnız headless VM ve sentetik/mock
+fixture kullanıldı. Kullanıcı D1 review/kabulü vermeden Prompt 09 / PANEL-011
+başlatılmayacak.
+
+---
+### 2026-08-03 — PANEL-009 D0 wireframe kullanıcı kabulü
+
+**Kullanıcı talimatı:** Kullanıcı PANEL-009 / Prompt 07 D0 wireframe’ini
+onayladı ve panel görünümünde değişiklik olup olmadığını sordu.
+
+**Sonuç:** PANEL-009 paired ledger’larda `completed` yapıldı; sonraki güvenli
+sequence PANEL-010 / Prompt 08 olarak `planned` bırakıldı.
+
+**Görünüm kontrolü:** Prompt 07 kodsuzdu. Değişen/eklenen tüm dosyalar
+`docs/` altındadır; `panel.html`, `panel.css`, `app.js`, `panel.js`, `sync.js`,
+runtime state ve kullanıcı verileri değişmedi. Bu nedenle panelin gerçek görsel
+görünümünde bu prompttan sonra değişiklik yoktur.
+
+**Kanıt:** Önceki D0 wireframe içerik/diff/headless kabul kapıları korunuyor;
+runtime dosya diff’i yok; `git diff --check` daha önce PASS.
+
+**Sonraki güvenli adım:** Kullanıcı açıkça başlatmadan Prompt 08 / PANEL-010
+uygulanmayacak. D1’den sonra CSS/component uygulaması başlayabilir.
+
+---
+### 2026-08-03 — PANEL-009 / Prompt 07 D0 IA ve wireframe teslimi
+
+**Kullanıcı talimatı:** Önce PANEL-003–008 kabul dokümantasyonu commit/push,
+`main` merge/push ve Pages deploy yapıldı; ardından kullanıcı PANEL-07’yi
+“go apply” ile açıkça başlattı. Prompt yalnız kodsuz D0 wireframe kapsamıyla
+uygulandı.
+
+**Yayın kanıtı (ön adım):** Feature commit `77defd4`, `main` merge commit
+`bbc761c`; Pages workflow `30797548007` `completed/success`, head SHA
+`bbc761c`; canlı Pages kökü HTTP 200. Pages deployments REST endpoint’i bu
+repo için 404 döndü; workflow ve canlı HTTP sonucu deploy kanıtı olarak kaldı.
+
+**Değişen dosyalar:** `docs/panel/plans/PANEL-D0-IA-WIREFRAME.md`,
+`docs/panel/plans/PANEL-TASARIM-VE-GELISTIRME-PLANI.md`, `docs/panel/README.md`,
+`docs/panel/ledgers/PANEL-LEDGER-OPERATIONS.md`,
+`docs/panel/ledgers/PANEL-LEDGER-STATE.md` ve bu handoff kaydı.
+
+**Kanıt:** 375–430px, 768px ve 1280px wireframe; 10/60 saniyelik akışlar;
+Hızlı/Standart/Audit yoğunlukları; loading/empty/stale/error/conflict/redacted/
+near-follow durumları; coverage/provenance kart eşleşmesi; hassas drawer
+sınırları; header/sticky nav/drawer çakışma invariant’ları; `git diff --check`
+PASS. `panel.html`, `panel.css`, JS, runtime state ve veri dosyaları değişmedi.
+
+**Sonraki güvenli adım:** `PANEL-009` `ready_for_review`; kullanıcı D0
+wireframe kabulü olmadan Prompt 08 / `PANEL-010`, CSS veya `panel.html`
+refactor’ı başlatılmayacak. Görsel component/token uygulaması D1 kapsamıdır.
+
+---
 ### 2026-08-03 — PANEL-003–008 kullanıcı kabulü ve yeniden kontrol
 
 **Kullanıcı talimatı:** Kullanıcı Prompt 01–06 kapsamını kabul etti ve yeniden

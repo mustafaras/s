@@ -57,13 +57,23 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
 - `planned`, `in_progress`, `blocked`, `ready_for_review`, `completed`
   durumları birbirine karıştırılmaz.
 
+PANEL-009 / Prompt 07 D0 wireframe teslimatı:
+[PANEL-D0-IA-WIREFRAME.md](plans/PANEL-D0-IA-WIREFRAME.md).
+
+PANEL-010 / Prompt 08 D1 token/component teslimatı:
+[PANEL-D1-TOKEN-COMPONENT.md](plans/PANEL-D1-TOKEN-COMPONENT.md).
+
+PANEL-011 / Prompt 09 D2 command center teslimatı:
+[PANEL-D2-COMMAND-CENTER.md](plans/PANEL-D2-COMMAND-CENTER.md).
+
 ## Şu anki durum
 
 - Prompt paketi: hazır.
 - Teknik plan: hazır.
 - Tasarım planı: hazır.
-- Kod uygulaması: `PANEL-003`–`PANEL-008` / Prompt 01–06 kullanıcı kabulüyle
-  `completed`; Prompt 07 / `PANEL-009` `planned` durumunda.
+- Kod uygulaması: `PANEL-003`–`PANEL-009` / Prompt 01–07 kullanıcı kabulüyle
+  `completed`; Prompt 08 / `PANEL-010` ve Prompt 09 / `PANEL-011` uygulandı,
+  ikisi de paired ledger review’ı bekliyor.
 - Commit/push/merge/deploy: PANEL-003 `cf6389c` ile; PANEL-004–006
   `631dd6d` feature commit’iyle, `ba98b74` merge commit’i üzerinden `main`’e
   push edildi. Pages run `30761174707` başarılı. PANEL-007/PANEL-008 teslimatı
@@ -79,6 +89,7 @@ sonraki prompt yalnız kullanıcı açıkça “devam” dediğinde açılır.
   `If-None-Match`, p50/p95 (120/190 ms), input skip, taslak defer ve
   değişmeyen snapshot’ta tam rerender yapılmadığını kanıtlıyor.
 - Coverage/projection/redaction, root-modül/mismatch/privacy,
-  terapi/bildirim/provenance, append-only event log ve polling/relay karar
-  kapıları kanıtlandı ve Prompt 01–06 kullanıcı kabulüyle tamamlandı. Relay
-  açılmadı; Prompt 07 yalnız açık başlatma ile uygulanabilir.
+  terapi/bildirim/provenance, append-only event log, polling/relay karar
+  kapıları, D1 semantic component yüzeyi ve D2 command center hazır. Prompt
+  01–08 kullanıcı kabulüyle tamamlandı; Prompt 09 `ready_for_review`. Relay
+  açılmadı; Prompt 10 yalnız D2 review/kabulünden sonra başlatılabilir.

@@ -85,3 +85,54 @@ doğrulanmalıdır. Son doğrulanan Pages workflow `30791390264` ve deployment
 | PANEL-006 | 2026-08-03 | P1-TERAPI-BILDIRIM-PROVENANS | Kullanıcı Prompt 04 kabulünü verdi | Önceki PANEL-006 uygulaması | P4 fixture 19/19; hassas veri redaction kapıları yeşil | Yalnız ledger dokümantasyonu; veri/sync dış etkisi yok |
 | PANEL-007 | 2026-08-03 | P2-APPEND-ONLY-EVENT-LOG | Kullanıcı Prompt 05 kabulünü verdi | Önceki PANEL-007 uygulaması | P2 panel 13/13; sync 8/8; idempotence/redaction kapıları yeşil | Yalnız ledger dokümantasyonu; event dosyasına yazım yok |
 | PANEL-008 | 2026-08-03 | P2-POLLING-RELAY | Kullanıcı Prompt 06 kabulünü verdi | Önceki PANEL-008 uygulaması | Polling fixture 15/15; ETag/304, draft-safety ve status-map kapıları yeşil | Relay açılmadı; yalnız ledger dokümantasyonu |
+
+## PANEL-009 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | Kullanıcı Prompt 07’yi açıkça başlattı; kodsuz wireframe çalışması başlatıldı | `docs/panel/plans/PANEL-D0-IA-WIREFRAME.md`, tasarım planı, panel README | Başlangıç kaydı; CSS/panel HTML/runtime değişikliği yok | Yalnız docs çalışma alanı; veri/sync/relay dış etkisi yok |
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | Prompt 07 uygulandı; wireframe ve gezinme sözleşmesi hazır | `docs/panel/plans/PANEL-D0-IA-WIREFRAME.md`, `PANEL-TASARIM-VE-GELISTIRME-PLANI.md`, `docs/panel/README.md` | 375–430/768/1280 wireframe; 10/60 sn akış; 3 yoğunluk modu; loading/empty/stale/error/conflict/redacted/near-follow; coverage/provenance ve drawer sınırları; diff check PASS | Browser/server/gerçek GitHub/data/localStorage/seyma-data/relay açılmadı; commit/push/merge/deploy bu Prompt 07 turunda yapılmadı |
+
+## Sonraki sequence (PANEL-009 sonrası)
+
+`PANEL-009` `ready_for_review` durumundadır. Kullanıcı wireframe incelemesi ve
+açık kabulü olmadan Prompt 08 / `PANEL-010`, CSS veya `panel.html` refactor’ı
+başlatılmayacak.
+
+## PANEL-009 kullanıcı kabulü (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-009 | 2026-08-03 | D0-IA-WIREFRAME | Kullanıcı D0 wireframe’ini onayladı; Prompt 07 tamamlandı | `docs/panel/plans/PANEL-D0-IA-WIREFRAME.md` ve eşli ledger’lar | Kullanıcı açık kabulü; önceki wireframe/diff/headless kanıtları korunuyor | Yalnız docs ledger güncellemesi; panel görünümü/runtime/data değişmedi |
+
+## Sonraki sequence (PANEL-009 kabulü sonrası)
+
+`PANEL-009` `completed` durumundadır. Sonraki güvenli adım Prompt 08 /
+`PANEL-010` D1 token/component sözleşmesidir; kullanıcı açıkça başlatmadan
+uygulanmayacaktır.
+
+## PANEL-010 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-010 | 2026-08-03 | D1-TOKEN-COMPONENT | Kullanıcı Prompt 08’i açıkça başlattı; semantic token/component uygulaması açıldı | `panel.css`, `panel.js`, `panel.html`, D1 sözleşme dokümanı | Başlangıç kaydı; D0 wireframe kabulü mevcut; component API ve token katmanları uygulanmaya başlandı | Browser/server/canlı veri/relay dış etkisi yok |
+| PANEL-010 | 2026-08-03 | D1-TOKEN-COMPONENT | Prompt 08 uygulandı; D1 token ve component sözleşmesi `ready_for_review` | `panel.css`, `panel.js`, `panel.html`, `docs/panel/plans/PANEL-D1-TOKEN-COMPONENT.md`, tasarım planı, panel README | D1 contract **PASS** (25 token grubu, 10 component, cache/accessibility); `node --check` panel/app/sync/coverage PASS; P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, P2 event **13/13**, P2 sync **8/8**, P2 polling **15/15**, Faz 10 **64/64**, Faz 11 **50/50**, app driver PASS, Zikirmatik **90/90**, B1 PASS, B2 **32/32**, B3 **20/20**, `git diff --check` PASS | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay açılmadı; yalnız headless VM ve mock/sentetik fixture kullanıldı |
+
+## Sonraki sequence (PANEL-010 sonrası)
+
+`PANEL-010` `ready_for_review` durumundadır. Kullanıcı D1 sözleşmesini
+inceleyip açık kabul/“devam” vermeden Prompt 09 / `PANEL-011` başlamayacak;
+CSS veya panel HTML’inde yeni component/refactor açılmayacaktır.
+
+## PANEL-011 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | Kullanıcı Prompt 09’u açıkça başlattı; command center ve sync ribbon uygulaması açıldı | `panel.css`, `panel.js`, `panel.html`, D2 sözleşme dokümanı | PANEL-010 D1 teslimi mevcut; D2 ilk ekran akışı, canonical status, dört hero ve yeni değişiklik chip’i uygulanmaya başlandı | Browser/server/canlı veri/relay dış etkisi yok |
+| PANEL-011 | 2026-08-03 | D2-COMMAND-CENTER | Prompt 09 uygulandı; D2 command center ve sync ribbon `ready_for_review` | `panel.css`, `panel.js`, `panel.html`, `docs/panel/plans/PANEL-D2-COMMAND-CENTER.md`, tasarım planı, panel README | D2 visual/a11y/safety fixture **13/13**; syntax PASS; script/cache **20260803c**; P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, P2 event **13/13**, P2 sync **8/8**, P2 polling **15/15**, Faz 10 **64/64**, Faz 11 **50/50**, app driver PASS, Zikirmatik **90/90**, B1 PASS, B2 **32/32**, B3 **20/20**, `git diff --check` PASS | Browser/server/gerçek ağ/`localStorage`/`seyma-data`/relay açılmadı; yalnız headless VM ve mock/sentetik fixture kullanıldı; latest/projection için yeni PUT yolu eklenmedi |
+
+## Sonraki sequence (PANEL-011 sonrası)
+
+`PANEL-011` `ready_for_review` durumundadır. Kullanıcı D2 command center ve
+sync ribbon teslimini inceleyip açık kabul/“devam” vermeden Prompt 10 /
+`PANEL-012` D3 timeline/drawer işi başlamayacak.

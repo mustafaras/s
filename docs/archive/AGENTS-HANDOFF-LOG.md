@@ -5,6 +5,30 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-015 D6 release makbuzu ve Pages doğrulaması
+
+**Kullanıcı kararı:** Kullanıcı açıkça `push commit merge deploy` yetkisi
+verdi. PANEL-015 D6 QA/release kapısı yayınlandı ve `completed` durumuna
+alındı.
+
+**Yayın zinciri:** Feature branch
+`agent/panel-13-d6-qa-release-20260803`, feature commit `4a819108`, PR #101,
+`main` merge SHA `c63e1de65571076ea79b3068aba804e1a9118e06`. Pages workflow
+`30813654381` içinde `validate` ve `deploy` job’ları **success**.
+
+**Canlı doğrulama:** `https://mustafaras.github.io/s/panel.html` HTTP **200**;
+`panel.css?v=20260803f` responsive/reduced-motion/44px yüzeyleri ve
+`panel.js?v=20260803f` ARIA marker’ları HTTP GET ile doğrulandı. Tarayıcı veya
+local server açılmadı.
+
+**Güvenlik / rollback:** `data/`, `data/events/`, localStorage,
+`mustafaras/seyma-data` ve observer write kanalları değişmedi. Rollback yolu
+`git revert c63e1de65571076ea79b3068aba804e1a9118e06`; rollback çalıştırılmadı.
+
+**Sonraki güvenli adım:** Yeni faz yalnız açık kullanıcı promptuyla
+başlatılacak.
+
+---
 ### 2026-08-03 — PANEL-014 D5 kabulü + PANEL-015 D6 QA/release gate teslimi
 
 **Kullanıcı kararı:** Kullanıcı PANEL-13 / Prompt 13’ü açıkça başlattı; D5

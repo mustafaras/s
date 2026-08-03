@@ -358,3 +358,20 @@ implementation_started: true
 external_write_authorized: false
 next_safe_action: PANEL-015 D6 QA/release kanıtını kullanıcıya review için sunmak; açık release/onay olmadan dış eylem yapmamak
 ```
+
+## PANEL-015 yayın kabulü (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-015 | 2026-08-03 | D6-QA-RELEASE-GATE | completed | D6 `ready_for_review`; kullanıcı açık `push commit merge deploy` yetkisi verdi | Feature commit `4a819108`; PR #101; `main` merge SHA `c63e1de65571076ea79b3068aba804e1a9118e06`; Pages workflow `30813654381` `success`; canlı panel HTTP **200**; D6 **16/16**, mandatory **22/22**, ek Kur’an **8/8** PASS | Yeni faz yalnız açık kullanıcı promptuyla başlatılacak |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: D6-QA-RELEASE-GATE
+active_sequence: PANEL-015
+status: completed
+implementation_started: true
+external_write_authorized: false
+next_safe_action: Yeni bir faz veya dış release eylemi başlatmadan kullanıcının açık sonraki promptunu beklemek
+```

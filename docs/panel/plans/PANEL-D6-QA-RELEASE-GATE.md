@@ -1,7 +1,7 @@
 # ÆON Paneli — PANEL-13 D6 QA, Release ve Kullanıcı Onayı Kapısı
 
 **Sequence:** `PANEL-015`
-**Durum:** `ready_for_review`
+**Durum:** `completed`
 **Tarih:** 2026-08-03
 **Önkoşul:** PANEL-014 D5 responsive/a11y/motion teslimi
 
@@ -45,3 +45,22 @@ açıkça yetkilendirmeden dış release eylemi yapılmayacak.
 
 **Sonraki güvenli adım:** Kullanıcıya kısa kanıt özeti sunmak; yalnız açık
 kullanıcı onayından sonra release veya sonraki fazı başlatmak.
+
+## Release makbuzu (append-only)
+
+Kullanıcı açıkça `push commit merge deploy` yetkisi verdi. PANEL-015 release
+makbuzu tamamlandı:
+
+- feature branch: `agent/panel-13-d6-qa-release-20260803`
+- feature commit: `4a819108905d6f59e3bb217debbcc8c69bb2bfc8`
+- PR: [#101](https://github.com/mustafaras/s/pull/101)
+- `main` merge SHA: `c63e1de65571076ea79b3068aba804e1a9118e06`
+- Pages workflow: [30813654381](https://github.com/mustafaras/s/actions/runs/30813654381) — `validate` ve `deploy` **success**
+- canlı panel: `https://mustafaras.github.io/s/panel.html` HTTP **200**
+- canlı asset kanıtı: `panel.css?v=20260803f` responsive/reduced-motion/44px
+  kurallarını; `panel.js?v=20260803f` ARIA davranışlarını içeriyor
+- rollback: `git revert c63e1de65571076ea79b3068aba804e1a9118e06`
+
+Bu release sırasında `data/`, `data/events/`, `localStorage`,
+`mustafaras/seyma-data` ve observer write kanalları değiştirilmedi. Yeni faz
+başlatılmadı; sonraki adım yalnız açık kullanıcı promptudur.

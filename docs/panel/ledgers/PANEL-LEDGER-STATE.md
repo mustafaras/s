@@ -97,6 +97,18 @@ external_write_authorized: false
 next_safe_action: Başka bilgisayarda origin/main clone edilip kullanıcı review’ı yapılabilir; açık “devam” olmadan Prompt 07 / PANEL-009 veya relay başlatmamak
 ```
 
+## Clone pointer güncellemesi (append-only)
+
+```text
+active_sequence: PANEL-008
+status: ready_for_review
+delivery_status: published
+canonical_clone_ref: origin/main
+clone_rule: clone sonrası git rev-parse HEAD ile canlı main SHA doğrulanır
+external_write_authorized: false
+next_safe_action: Başka bilgisayarda origin/main clone edip review yapmak; Prompt 07 / PANEL-009 veya relay başlatmamak
+```
+
 ## Ledger eşleşme kapısı
 
 Bir sequence yalnız şu durumda ilerletilebilir:

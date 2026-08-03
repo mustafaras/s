@@ -66,3 +66,11 @@ başlatılmayacak.
 | Canlı URL | [mustafaras.github.io/s](https://mustafaras.github.io/s/) HTTP 200; response `last-modified` 2026-08-03T06:45:08Z |
 | API notu | Pages API’deki legacy `latest-build` kaydı eski `529d448` commit’ine ait `errored` durumda; yeni workflow deployment status’u success ve canlı URL 200’dür |
 | Dış etki | GitHub branch/`main`/Pages değişti; `data/`, localStorage kullanıcı state’i ve `mustafaras/seyma-data` değişmedi |
+
+## Clone pointer güncellemesi (append-only)
+
+`PANEL-008` teslimatının canonical clone kaynağı sabit bir feature SHA değil,
+`origin/main` ref’idir. Bu ref publication receipt merge’ini de içerir;
+başka bilgisayarda clone sonrası `git rev-parse HEAD` ile canlı SHA
+doğrulanmalıdır. Son doğrulanan Pages workflow `30791390264` ve deployment
+`5722051874` success; canlı URL HTTP 200’dür.

@@ -62,6 +62,16 @@ state’i ve `mustafaras/seyma-data` değişmedi. Kullanıcı review’ı sürü
 Prompt 07 / `PANEL-009` veya relay başlatılmadı.
 
 ---
+### 2026-08-03 — PANEL-008 final clone pointer
+
+Publication receipt merge’inden sonra canonical clone kaynağı sabit bir
+feature SHA olarak değil `origin/main` ref’i olarak belirlendi. Başka
+bilgisayarda `git clone https://github.com/mustafaras/s.git` ve ardından
+`git rev-parse HEAD` ile canlı `main` SHA doğrulanmalıdır. Son doğrulanan
+Pages workflow `30791390264`, deployment `5722051874` success ve canlı URL
+HTTP 200’dür.
+
+---
 ### 2026-08-02 — PANEL-007 / Prompt 05 P2 append-only event log
 
 **Kullanıcı talimatı:** Kullanıcı `PANEL-05 — P2 Append-Only Event Log

@@ -5,6 +5,76 @@
 **M3 kuralı:** Aşağıdaki handoff gövdesi byte-korumalıdır; düzeltme gerekiyorsa yeni tarihli kayıt eklenir.
 
 ---
+### 2026-08-03 — PANEL-008 / Prompt 06 P2 polling, ETag ve relay kararı
+
+**Kullanıcı talimatı:** Kullanıcı `PANEL-06 — P2 Polling, ETag ve Relay
+Kararı Prompt’u` ile bu tek prompt kapsamını açıkça başlattı. Dış servis
+açılmadı; commit, push, merge ve deploy yapılmadı.
+
+**Değişen dosyalar:** `panel.js` içinde memory-içi ETag cache, conditional
+`If-None-Match`/304 akışı, kaynak-visible revision ayrımı, poll zamanları ve
+son 100 latency telemetry’si, input/taslak skip-defer kapısı ve hedefli ribbon
+durum güncellemesi; `panel.css`/`panel.html` polling yüzeyi ve cache-bust;
+`test_panel_p2_polling.js` sentetik fixture; `docs/panel/decisions/PANEL-008-
+POLLING-RELAY-KARARI.md` karar kaydı; test envanteri ve paired ledger.
+
+**Kanıt:** PANEL-06 fixture **15/15**: 200+ETag→304, `If-None-Match`, JSON
+body’nin yeniden parse edilmemesi, p50 **120 ms**, p95 **190 ms**, input skip,
+taslak defer, stale/status map ve aynı snapshot’ta tam rerender yapılmaması.
+P0 **27/27**, P1 **35/35**, P3 **26/26**, P4 **19/19**, P2 event **13/13**,
+P2 sync **8/8**, Faz 10 **64/64**, Faz 11 **50/50**, B2 **32/32**, B3
+**20/20**, app driver PASS, Zikirmatik **90/90**, Kur’an katalog **70/70**,
+transport **207/207**, syntax, panel script tag **8/8** ve `git diff --check`
+PASS.
+
+**Karar ve güvenlik sınırı:** UI “anlık” yerine “yakın takip” kullanır;
+SSE/WebSocket relay açılmadı. Fixture/mock fetch dışında gerçek GitHub/relay,
+browser/server, `data/`, localStorage kullanıcı state’i veya
+`mustafaras/seyma-data` değişmedi. Relay ancak ayrı auth, origin/replay,
+rate-limit, veri izolasyonu, secret rotation, maliyet/sahiplik ve rollback
+kanıtlarıyla yeniden değerlendirilebilir.
+
+**Sonraki güvenli adım:** `PANEL-008` paired ledger kaydı
+`ready_for_review`; kullanıcı incelemesi bekleniyor. Açık “devam” olmadan
+Prompt 07 / `PANEL-009` veya relay başlatılmayacak. DUR.
+
+---
+### 2026-08-02 — PANEL-007 / Prompt 05 P2 append-only event log
+
+**Kullanıcı talimatı:** Kullanıcı `PANEL-05 — P2 Append-Only Event Log
+Prompt’u` ile bu tek prompt kapsamını açıkça başlattı. Push, commit, merge ve
+deploy yapılmadı; yalnız çalışma ağacında bounded değişiklik yapıldı.
+
+**Değişen dosyalar:** `app.js` anlamlı `commit()` değişiklikleri için güvenli
+event contract/migration ve sabit summary allowlist; `sync.js` günlük
+`data/events/YYYY-MM-DD.json` GET+merge+PUT, receipt bağlama, duplicate
+idempotence ve best-effort event push; `panelCoverageManifest.js` event parser/
+sequence audit; `panel.js` Son Değişiklikler kartı, 20/50/100 filter ve revision
+drawer; `panel.css`; `index.html`/`panel.html` cache-bust; sentetik
+`test_panel_p2_event_log.js` ve `test_panel_p2_sync.js`.
+
+**Kanıt:** P2 panel **13/13**, P2 sync **8/8**; P0 **27/27**, P1 **35/35**,
+P3 **26/26**, P4 **19/19**; Faz 10 **64/64**, Faz 11 **50/50**; B2
+**32/32**, B3 **20/20**; app driver PASS; Zikirmatik **90/90**; Kur’an
+katalog **70/70**, transport **207/207**, merge **38/38**, outbox **55/55**,
+pull **11/11**; syntax ve `git diff --check` PASS. B2 migration idempotence
+ilk denemede cihaz kimliği drift’i verdi; `ensureEventLog()` geçerli kök
+`sourceDeviceId`’yi koruyacak şekilde düzeltildi ve B2 yeniden **32/32** geçti.
+
+**Güvenlik ve dış yazma sınırı:** Event summary yalnız sabit sınıflandırılmış
+özetlerden geçer; token, raw GPS, raw profil ve base64 medya event’e alınmaz.
+Event log canonical olarak mevcut repo sync yapılandırmasıyla
+`data/events/*` dosyasına yazabilir; bu yeni bir servis değildir ama mevcut
+`ghToken/ghRepo` yetkisinin dış etkisidir ve kullanıcı izni olmadan etkinleştiril-
+memelidir. Bu turda gerçek ağ, browser, server, localStorage kullanıcı state’i,
+`data/` ve `mustafaras/seyma-data` değişmedi; yalnız mock fetch kullanıldı.
+Panel event dosyasına PUT yapmaz.
+
+**Sonraki güvenli adım:** `PANEL-007` paired ledger kaydı
+`ready_for_review`; kullanıcı review’ı ve açık “devam” olmadan Prompt 06 /
+`PANEL-008` başlatılmayacak. DUR.
+
+---
 ### 2026-08-02 — PANEL-006 yayınlama / commit, merge ve Pages deploy
 
 **Kullanıcı talimatı:** Kullanıcı açıkça `push commit merge deploy` istedi.

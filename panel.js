@@ -112,6 +112,7 @@ var REPO=qs.get("repo")||"mustafaras/seyma-data";
 var BRANCH=qs.get("branch")||"main";
 var SYNC_RECEIPT_PATH="data/sync-receipt.json";
 var OBSERVER_PROJECTION_PATH="data/observer-snapshot.json";
+var EVENT_LOG_DIR="data/events";
 var AEON_FILE_ACCEPT=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.csv,.zip,application/pdf";
 var PTKEY="seyma-panel-token";
 var APPKEY="seyma-reset-v1";
@@ -124,10 +125,86 @@ var OBSERVER_PROJECTION=null;
 var PROJECTION_STATE={source:'none',reason:'not_loaded',snapshot:null,data:null,coverage:null};
 var PROJECTION_SECTIONS={};
 var PANEL_POLL_AT=null;
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:""};
+var PANEL_POLL_STATE={status:'idle',lastOutcome:'idle',lastPollAt:null,lastFetchStartedAt:null,lastFetchCompletedAt:null,lastDurationMs:null,sourceRevision:null,visibleRevision:null,sourceUpdatedAt:null,etag:null,conditionalMode:'etag',fetchCount:0,notModifiedCount:0,skippedCount:0,draftDeferredCount:0,lastErrorCode:null,pendingRender:false,samples:[]};
+var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
+var PANEL_TRANSPORT_CACHE={};
+var LAST_RENDERED_POLL_OUTCOME='idle';
+var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null};
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
 var HT=HABITS.length;
+function responseHeaderP(response,name){
+  try{ if(response&&response.headers&&typeof response.headers.get==='function') return response.headers.get(name)||null; }catch(e){}
+  return null;
+}
+function pollConditionalDecisionP(cache,status,etag){
+  var known=cache&&typeof cache.etag==='string'&&cache.etag;
+  if(status===304&&known) return {kind:'not_modified',etag:known,body:false};
+  return {kind:'changed',etag:etag||null,body:true};
+}
+function pollLatencyStatsP(samples){
+  var a=(Array.isArray(samples)?samples:[]).map(Number).filter(function(x){return isFinite(x)&&x>=0;}).sort(function(x,y){return x-y;});
+  function at(p){ if(!a.length) return null; return a[Math.min(a.length-1,Math.max(0,Math.ceil(a.length*p)-1))]; }
+  return {count:a.length,min:a.length?a[0]:null,max:a.length?a[a.length-1]:null,p50:at(.50),p95:at(.95)};
+}
+function pollRevisionP(data,receipt,projectionState){
+  var r=normalizeSyncReceiptP(receipt), p=projectionState&&projectionState.snapshot?projectionState.snapshot:null;
+  return {sourceRevision:(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||r.snapshotRevision||null,sourceUpdatedAt:(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||r.sourceUpdatedAt||null,visibleRevision:(p&&p.snapshotRevision)||r.snapshotRevision||null};
+}
+function pollRecordP(outcome,startedAt,meta){
+  var now=Date.now(), duration=startedAt?Math.max(0,now-startedAt):null, m=meta||{};
+  PANEL_POLL_STATE.status=outcome==='error'?'error':outcome==='skipped_input'||outcome==='deferred_draft'?'deferred':'ok';
+  PANEL_POLL_STATE.lastOutcome=outcome;
+  PANEL_POLL_STATE.lastPollAt=new Date(now).toISOString();
+  PANEL_POLL_STATE.lastFetchCompletedAt=m.completedAt||PANEL_POLL_STATE.lastPollAt;
+  PANEL_POLL_STATE.lastDurationMs=duration;
+  if(m.etag) PANEL_POLL_STATE.etag=m.etag;
+  if(m.errorCode) PANEL_POLL_STATE.lastErrorCode=m.errorCode;
+  else if(outcome!=='error') PANEL_POLL_STATE.lastErrorCode=null;
+  if(duration!==null){ PANEL_POLL_STATE.samples.push(duration); if(PANEL_POLL_STATE.samples.length>100) PANEL_POLL_STATE.samples=PANEL_POLL_STATE.samples.slice(-100); }
+  updatePollRibbonP();
+  return pollLatencyStatsP(PANEL_POLL_STATE.samples);
+}
+function markPollSkippedP(reason){
+  PANEL_POLL_STATE.status='deferred'; PANEL_POLL_STATE.lastOutcome=reason||'skipped_input'; PANEL_POLL_STATE.skippedCount++; PANEL_POLL_STATE.lastPollAt=new Date().toISOString();
+  if(reason==='deferred_draft') PANEL_POLL_STATE.draftDeferredCount++;
+  updatePollRibbonP();
+}
+function panelDraftActiveP(){ return !!(UI.msgSending||String(UI.msgDraft||'').trim()||panelBusyTyping()); }
+function pollStatusP(){
+  var s=PANEL_POLL_STATE||{}, o=s.lastOutcome||'idle';
+  if(o==='skipped_input') return {code:o,cls:'b-warn',label:'Polling atlandı',note:'Input odağı korunuyor; sonraki güvenli tur beklenecek.'};
+  if(o==='deferred_draft') return {code:o,cls:'b-warn',label:'Taslak korunuyor',note:'Yeni veri alındı; render taslak gönderilene veya temizlenene kadar ertelendi.'};
+  if(o==='error') return {code:o,cls:'b-danger',label:'Polling hatası',note:'Son panel çekimi başarısız; önceki görünüm korunuyor.'};
+  if(s.lastPollAt&&Date.now()-new Date(s.lastPollAt).getTime()>45000) return {code:'stale',cls:'b-warn',label:'Polling eski',note:'Son güvenli panel çekimi 45 saniyeyi geçti.'};
+  if(o==='not_modified') return {code:o,cls:'b-ok',label:'Yakın takip · değişmedi',note:'ETag 304; snapshot gövdesi yeniden indirilmedi.'};
+  if(o==='unchanged') return {code:o,cls:'b-ok',label:'Yakın takip · aynı',note:'Kaynak değişmedi; panel yeniden render edilmedi.'};
+  if(o==='changed') return {code:o,cls:'b-ok',label:'Yakın takip · güncel',note:'Yeni kaynak revision’ı güvenli şekilde görünür kılındı.'};
+  return {code:o,cls:'b-dim',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'};
+}
+function updatePollRibbonP(){
+  try{
+    var p=pollStatusP(), badge=document.getElementById('poll-ribbon-status'), note=document.getElementById('poll-ribbon-note');
+    if(badge){ badge.className='badge '+p.cls; badge.textContent=p.label; }
+    if(note) note.textContent=p.note;
+  }catch(e){}
+}
+function updatePollRevisionsP(data,receipt,projectionState){
+  var r=pollRevisionP(data,receipt,projectionState);
+  PANEL_POLL_STATE.sourceRevision=r.sourceRevision; PANEL_POLL_STATE.sourceUpdatedAt=r.sourceUpdatedAt; PANEL_POLL_STATE.visibleRevision=r.visibleRevision;
+  return r;
+}
+function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
+  if(panelDraftActiveP()){
+    PANEL_POLL_STATE.pendingRender=true; pollRecordP('deferred_draft',startedAt,meta); return false;
+  }
+  var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP(outcome,startedAt,meta);
+  var shouldRender=!!dataChanged||hadPending;
+  LAST_RENDERED_POLL_OUTCOME=outcome;
+  if(shouldRender){ LASTSIG=sig; render(); } else updatePollRibbonP();
+  return shouldRender;
+}
 // ── İman Köşesi — panel aynası ──
 var PRAYER_NAMES_P={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
 var PRAYER_ORDER_P=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
@@ -332,11 +409,15 @@ function quranPanelIdP(prefix){ return prefix+Date.now().toString(36)+Math.rando
 // API deseni (loadInbox/putInbox), yalnız yol parametrik ──
 function ghTransportApiP(path){ var p=REPO.split("/"); return "https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/"+path; }
 function loadTransportFileP(path){
-  return fetch(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH)+"&t="+Date.now(),{headers:ghJsonHeaders()})
+  var cache=PANEL_TRANSPORT_CACHE[path]||{};
+  var H=ghJsonHeaders(); if(cache.etag) H["If-None-Match"]=cache.etag;
+  return fetch(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"})
     .then(function(r){
-      if(r.status===404) return {raw:null,sha:null};
+      var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(cache,r.status,etag);
+      if(decision.kind==='not_modified') return {raw:cache.raw||null,sha:cache.sha||null,etag:decision.etag,notModified:true};
+      if(r.status===404){ PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:null,sha:null}; return {raw:null,sha:null,etag:etag}; }
       if(!r.ok) throw new Error("transport "+r.status);
-      return r.json().then(function(g){ return {raw:(g&&typeof g.content==="string")?b64dec(g.content):null,sha:(g&&g.sha)||null}; });
+      return r.json().then(function(g){ var raw=(g&&typeof g.content==="string")?b64dec(g.content):null, sha=(g&&g.sha)||null; PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:raw,sha:sha}; return {raw:raw,sha:sha,etag:etag}; });
     });
 }
 function loadSyncReceiptP(){
@@ -367,6 +448,25 @@ function loadObserverProjectionP(){
     else if(m.indexOf('404')>=0||m.indexOf('not found')>=0) code='projection_missing';
     return {snapshot:null,sha:null,reason:code};
   });
+}
+function eventDayKeysP(root){
+  var l=root&&root.eventLog&&typeof root.eventLog==='object'?root.eventLog:{}, keys=[];
+  if(l.days&&typeof l.days==='object'&&!Array.isArray(l.days)) Object.keys(l.days).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k)) keys.push(k);});
+  if(Array.isArray(l.events)) l.events.forEach(function(e){ if(e&&typeof e.occurredAt==='string'&&/^\d{4}-\d{2}-\d{2}/.test(e.occurredAt)) keys.push(e.occurredAt.slice(0,10)); });
+  keys.sort().reverse(); var out=[]; keys.forEach(function(k){if(out.indexOf(k)<0)out.push(k);}); return out.slice(0,120);
+}
+function buildEventLogStateP(root,files){
+  var P=window.PanelCoverageV1, fallback=root&&root.eventLog?root.eventLog:{}, external=[], foundFile=false, hadError=false;
+  (Array.isArray(files)?files:[]).forEach(function(x){ if(x&&x.raw){ foundFile=true; var parsed=P&&P.parseEventLog?P.parseEventLog(x.raw,x.date):{events:[]}; external=external.concat(parsed.events||[]); } else if(x&&x.error) hadError=true; });
+  var events=external.length?external:(P&&P.parseEventLog?P.parseEventLog(fallback).events:[]);
+  if(P&&typeof P.mergeEventLogs==='function') events=P.mergeEventLogs({events:events},{});
+  var audit=P&&typeof P.eventSequenceAudit==='function'?P.eventSequenceAudit(events):{ok:true,issueCount:0,issues:[],deviceCount:0};
+  return {source:external.length||foundFile?'event_files':(events.length?'latest_fallback':(hadError?'error':'missing')),events:events,audit:audit,loadedAt:new Date().toISOString(),days:eventDayKeysP(root)};
+}
+function loadEventLogP(root){
+  var keys=eventDayKeysP(root), files=[];
+  if(!keys.length) return Promise.resolve(buildEventLogStateP(root,files));
+  return Promise.all(keys.map(function(day){ return loadTransportFileP(EVENT_LOG_DIR+'/'+day+'.json').then(function(x){ return {date:day,raw:x&&x.raw,sha:x&&x.sha}; }).catch(function(e){ var m=String(e&&e.message||e).toLowerCase(); return {date:day,raw:null,error:!(m.indexOf('404')>=0||m.indexOf('not found')>=0)}; }); })).then(function(rows){ return buildEventLogStateP(root,rows); });
 }
 function putTransportFileP(path,value,sha){
   var T=window.QuranTransportV1;
@@ -1000,19 +1100,22 @@ function syncTimesP(receipt,pollAt,projectionState){
 function syncTimeP(v){ return v?tsShort(v):'—'; }
 function syncFreshnessP(receipt,pollAt){
   var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt);
+  var ps=typeof pollStatusP==='function'?pollStatusP():{code:'idle',label:'Yakın takip bekleniyor'};
+  if(ps.code==='skipped_input'||ps.code==='deferred_draft') return {klass:'warn',txt:ps.label};
+  if(ps.code==='error') return {klass:'danger',txt:ps.label};
+  if(ps.code==='stale') return {klass:'warn',txt:ps.label};
   if(st.code!=='accepted') return {klass:st.code==='missing'?'warn':'danger',txt:st.label};
   var age=Math.max(0,Math.round((Date.now()-new Date(r.acceptedAt).getTime())/60000));
-  if(age<=30) return {klass:'ok',txt:'Uzak kabul edildi · '+(pollAt?'panel çekildi':'panel çekimi bekleniyor')};
-  if(age<=180) return {klass:'warn',txt:'Uzak kabul edildi · hafif gecikmiş'};
-  if(age<=2160) return {klass:'warn',txt:'Uzak kabul eski'};
-  return {klass:'danger',txt:'Uzak kabul kritik derecede eski'};
+  if(age<=30) return {klass:'ok',txt:ps.label};
+  if(age<=180) return {klass:'warn',txt:'Yakın takip · uzak kabul hafif gecikmiş'};
+  if(age<=2160) return {klass:'warn',txt:'Yakın takip · uzak kabul eski'};
+  return {klass:'danger',txt:'Yakın takip · uzak kabul kritik derecede eski'};
 }
 function syncRibbonHTMLP(receipt,pollAt,projectionState){
-  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt,projectionState);
-  var rev=r.snapshotRevision?String(r.snapshotRevision).slice(0,12):'—';
+  var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt,projectionState), pollState=typeof PANEL_POLL_STATE==='object'&&PANEL_POLL_STATE?PANEL_POLL_STATE:{}, ps=typeof pollStatusP==='function'?pollStatusP():{cls:'b-dim',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'}, revFull=pollState.sourceRevision||r.snapshotRevision||'—', rev=String(revFull).slice(0,12), visibleFull=pollState.visibleRevision||r.snapshotRevision||'—', visible=String(visibleFull).slice(0,12);
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
-  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybını önlemek için push durduruldu.':st.code==='projection_failed'?'Uzak kayıt alınmış olabilir; observer projection oluşmadığı için panel bunu tam başarı saymıyor.':'Kaynak, uzak kabul, projection ve panel çekimi ayrı zamanlar olarak izleniyor.')+'</div></section>';
+  return '<section class="sync-ribbon" aria-label="Senkron sağlık özeti"><div class="sync-ribbon-head"><span class="badge '+st.cls+'">'+esc(st.label)+'</span><span id="poll-ribbon-status" class="badge '+ps.cls+'">'+esc(ps.label)+'</span><span class="sync-ribbon-rev">revision · '+esc(rev)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note">'+(st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='projection_failed'?'Uzak kayıt alınmış olabilir; observer projection oluşmadığı için panel bunu tam başarı saymıyor.':'')+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
 }
 function projectionStatusP(state){
   var s=state&&state.source||'none', reason=state&&state.reason||'projection_missing';
@@ -1082,6 +1185,54 @@ function p4ProvenanceCardHTMLP(){
   h+='<div class="p3-module"><div class="p3-module-head"><b>Dış kaynak fetch</b>'+p3StatusP(ex.status)+'</div><div class="p3-source-row">'+p3BadgeP(ex.sourcePath||'external fetch/cache metadata','source')+p3BadgeP(ex.privacy||'metadata','privacy')+p3BadgeP('provenance: external','source')+'</div>';
   (Array.isArray(ex.items)?ex.items:[]).forEach(function(x){ h+='<div class="p3-kv"><span>'+esc(x.name||'external')+'</span><b>'+p3StatusP(x.status)+(x.errorCode?' · '+esc(x.errorCode):'')+'</b></div><div class="p3-muted">'+esc(x.source||'external')+' · '+p3TimeP(x.fetchedAt)+'</div>'; });
   h+='<div class="p3-footnote">Fetch hatası, veri yokmuş gibi değil; ayrı hata durumu ve kaynak zamanı olarak gösterilir.</div></div></div><div class="p3-footnote">Provenance sınıfları: user_input · derived · external · delivery · observer · redacted. Hassas terapi/profil metni varsayılan DOM yüzeyinde yoktur.</div></div>';
+  return h;
+}
+function eventLogSourceP(){
+  var s=EVENT_LOG_STATE||{};
+  if(s.source==='event_files') return {cls:'b-ok',label:'Günlük event dosyaları',note:'Canonical append-only günlük kayıtlar okunuyor.'};
+  if(s.source==='latest_fallback') return {cls:'b-warn',label:'Latest fallback',note:'Günlük event dosyası yok; latest snapshot recent projection gösteriliyor.'};
+  if(s.source==='error') return {cls:'b-danger',label:'Event log okunamadı',note:'Event kaynağı bozuk veya erişilemez; legacy snapshot çalışmaya devam ediyor.'};
+  return {cls:'b-dim',label:'Event log yok',note:'Legacy snapshot kullanılabilir; henüz canonical event kaydı alınmadı.'};
+}
+function eventStatusP(e){
+  if(e&&e.acceptedAt) return {cls:'b-ok',label:'Uzak kabul'};
+  if(e&&e.submittedAt) return {cls:'b-warn',label:'Gönderildi'};
+  return {cls:'b-dim',label:'Yerel'};
+}
+function eventTimeP(v){ return v?p3TimeP(v):'—'; }
+function eventDetailsP(e){
+  if(!e) return '';
+  var st=eventStatusP(e), rev=e.snapshotRevision||'—';
+  var h='<div class="event-drawer" role="dialog" aria-label="Event ayrıntısı">';
+  h+='<div class="event-drawer-head"><b>Event ayrıntısı</b><button class="btn" onclick="closeEventDrawerP()" aria-label="Kapat">×</button></div>';
+  h+='<div class="event-drawer-grid">';
+  [['Durum',st.label],['Event ID',e.eventId],['Correlation ID',e.correlationId||e.eventId],['Sıra',String(e.sequence)],['Bölüm',e.section],['Path',e.path],['İşlem',e.operation],['Kaynak',e.source],['Cihaz',e.sourceDeviceId],['Privacy',e.privacyClass],['Oluştu',eventTimeP(e.occurredAt)],['Yerel persist',eventTimeP(e.persistedAt)],['Gönderildi',eventTimeP(e.submittedAt)],['Uzak kabul',eventTimeP(e.acceptedAt)],['Snapshot revision',rev]].forEach(function(x){ h+='<div class="event-drawer-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; });
+  h+='</div><div class="event-drawer-summary"><span>Güvenli özet</span><b>'+esc(e.summary||'Güvenli kayıt özeti')+'</b></div>';
+  if(e.snapshotRevision) h+='<div class="event-drawer-note">Bu event, revision <span class="mono">'+esc(e.snapshotRevision)+'</span> snapshot’ı ile ilişkilidir. Ham payload drawer’a taşınmaz.</div>';
+  else h+='<div class="event-drawer-note">Snapshot revision henüz yok; bu kayıt yalnız yerel/fallback eventidir.</div>';
+  return h+'</div>';
+}
+function setEventLimitP(n){ n=Number(n); UI.eventLimit=[20,50,100].indexOf(n)>=0?n:20; render(); } window.setEventLimitP=setEventLimitP;
+function openEventDrawerP(id){ UI.eventSelectedId=String(id||''); render(); } window.openEventDrawerP=openEventDrawerP;
+function closeEventDrawerP(){ UI.eventSelectedId=null; render(); } window.closeEventDrawerP=closeEventDrawerP;
+function eventLogCardHTMLP(){
+  var st=eventLogSourceP(), all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], audit=EVENT_LOG_STATE.audit||{ok:true,issueCount:0,issues:[]};
+  all.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); });
+  var visible=all.slice(0,UI.eventLimit||20), selected=null;
+  if(UI.eventSelectedId) for(var si=0;si<all.length;si++){ if(all[si].eventId===UI.eventSelectedId){selected=all[si];break;} }
+  var h='<div class="card lift span-12 pad event-log-card" style="order:8;display:flex;flex-direction:column;">';
+  h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;" class="badge '+st.cls+'">'+esc(st.label)+'</span></div>';
+  h+='<div class="event-log-meta"><span>'+esc(st.note)+'</span><span class="mono">'+all.length+' kayıt · '+(EVENT_LOG_STATE.loadedAt?esc(tsShort(EVENT_LOG_STATE.loadedAt)):'—')+'</span></div>';
+  h+='<div class="event-log-toolbar"><div class="seg" aria-label="Event sayısı filtresi">'+[20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
+  if(!audit.ok) h+='<div class="event-log-alarm" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
+  if(!visible.length) h+='<div class="empty"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
+  else {
+    h+='<div class="event-log-list" aria-live="polite">';
+    visible.forEach(function(e){ var es=eventStatusP(e); h+='<button class="event-log-row" onclick="openEventDrawerP(\''+e.eventId+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence))+'</span><span class="event-log-main"><b>'+esc(e.summary)+'</b><small>'+esc(e.section)+' · '+esc(e.operation)+' · '+esc(e.path)+'</small></span><span class="event-log-side"><span class="badge '+es.cls+'">'+esc(es.label)+'</span><small>'+eventTimeP(e.occurredAt)+'</small></span></button>'; });
+    h+='</div>';
+  }
+  if(selected) h+=eventDetailsP(selected);
+  h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div></div>';
   return h;
 }
 function timeAgo(iso){
@@ -2496,6 +2647,7 @@ function render(){
   h+=coreStripHTML();
   h+=rootModulesCardHTMLP();
   h+=p4ProvenanceCardHTMLP();
+  h+=eventLogCardHTMLP();
 
   // toolbar
   h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">';
@@ -3549,17 +3701,20 @@ window.savePanelToken=function(){
 };
 window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY);}catch(e){} PTOKEN=""; tokenPrompt(); };
 function tokenPrompt(msg){
-  document.getElementById("app").innerHTML='<div style="max-width:380px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-size:17px;font-weight:800;margin-bottom:4px;">ÆON · Giriş</div><div style="font-size:11px;line-height:1.5;color:var(--t2);margin-bottom:12px;">GitHub token gir — panel canlı takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:10px;border-radius:7px;padding:6px 10px;font-size:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_…" style="width:100%;margin-bottom:8px;padding:9px 10px;font-size:12px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Başlat</button></div></div>';
+  document.getElementById("app").innerHTML='<div style="max-width:380px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-size:17px;font-weight:800;margin-bottom:4px;">ÆON · Giriş</div><div style="font-size:11px;line-height:1.5;color:var(--t2);margin-bottom:12px;">GitHub token gir — panel yakın takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:10px;border-radius:7px;padding:6px 10px;font-size:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_…" style="width:100%;margin-bottom:8px;padding:9px 10px;font-size:12px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Başlat</button></div></div>';
 }
 function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
-  var api="https://api.github.com/repos/"+p[0]+"/"+p[1]+"/contents/data/latest.json?ref="+branch+"&t="+Date.now();
-  return fetch(api,{headers:{"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"}})
+  var api="https://api.github.com/repos/"+p[0]+"/"+p[1]+"/contents/data/latest.json?ref="+branch, H={"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"};
+  if(PANEL_LATEST_CACHE.etag) H["If-None-Match"]=PANEL_LATEST_CACHE.etag;
+  return fetch(api,{headers:H,cache:"no-store"})
     .then(function(r){
+      var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(PANEL_LATEST_CACHE,r.status,etag);
+      if(decision.kind==='not_modified') return {notModified:true,meta:{etag:decision.etag,completedAt:new Date().toISOString()}};
       if(r.status===401||r.status===403) throw new Error("Token gecersiz veya yetkisiz.");
       if(r.status===404){ var e=new Error("data/latest.json bulunamadi."); e.notFound=true; throw e; }
       if(!r.ok) throw new Error("Sunucu hatasi: "+r.status);
-      return r.json();
+      return r.json().then(function(data){ PANEL_LATEST_CACHE.etag=etag; PANEL_LATEST_CACHE.sourceRevision=(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||null; PANEL_LATEST_CACHE.sourceUpdatedAt=(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||null; PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached'; return {notModified:false,data:data,meta:{etag:etag,completedAt:new Date().toISOString()}}; });
     });
 }
 // ---------- observer → kullanici mesaj kanali (data/observer-inbox.json) ----------
@@ -3948,25 +4103,35 @@ function demoData(){
   return {version:2,startDate:start,lastOpenedDate:td,lastOpenedAt:new Date().toISOString(),days:days,notifications:[],settings:{nickname:"Demo Günışığı",lunaConnected:true,locationMode:"auto",caffeineMode:"standard",targetBed:"23:30"},luna:{qa:[{date:td,ts:td+"T10:00:00+03:00",question:"Bugün enerjin nasıl?",answer:"Sakin ve dengeli görünüyor; ritmini koru."}]},aeon:{qa:[{id:"demo-aeon",date:td,ts:td+"T11:00:00+03:00",question:"Bugünkü verilerimde öne çıkan ne?",answer:"Uyku, su ve yürüyüş birlikte güçlü bir temel oluşturmuş.",answeredAt:td+"T11:02:00+03:00"}]},cycle:{periods:[{start:addDays(td,-18),end:addDays(td,-14)}],avgCycle:28,avgPeriod:5},weather:{fetchedAt:new Date().toISOString(),spots:[{key:"ev",label:"Ev",place:"Demo",iconName:"house",code:1,isDay:true,temp:24,feels:24,hum:46,wind:8,uv:3,hi:26,lo:15}]},library:{goal:{dailyPages:20,yearlyBooks:12},books:[{id:"b1",title:"Kendine Ait Bir Oda",author:"Virginia Woolf",genre:"Deneme",totalPages:160,currentPage:72,status:"reading",rating:5,quotes:[{id:"q1",text:"Kendine ait bir alan, düşünceye nefes verir.",page:36,ts:td+"T20:00:00+03:00"}],createdAt:start+"T10:00:00+03:00"}]},watchlist:{goal:{dailyMinutes:40,yearlyTitles:24},items:[{id:"w1",title:"Demo Belgesel",kind:"film",genre:"Belgesel",status:"finished",watchedEp:1,totalEp:null,rating:4,quotes:[],finishedAt:addDays(td,-2)+"T21:00:00+03:00",createdAt:start+"T10:00:00+03:00"}]},music:{goal:{dailyMinutes:30,yearlyTitles:null},items:[{id:"m1",title:"Demo Çalma Listesi",artist:"Günışığı",kind:"album",genre:"Sakin",rating:5,quotes:[],createdAt:start+"T10:00:00+03:00"}]},body:{heightCm:165,heightSetAt:start+"T09:00:00+03:00",weights:Array.from({length:10},function(_,i){return {ts:addDays(start,i)+"T08:00:00+03:00",kg:68.4-i*.12};})},labResults:[],motivation:{currentProgramDay:3,stats:{pathStreak:2,bestPathStreak:2,courageEvidence:1,returnCount:0,completedTotal:2,minimumTotal:1},history:{demo1:{date:addDays(td,-1),programDay:2,phaseCode:"F1",domain:"destek",status:"minimum_completed",reflection:"Küçük sürümü yapmak devam etmemi sağladı.",quote:"Küçük adım da yoldur.",minimumTask:"Bir kişiye kısa bir mesaj gönder.",successMeaning:"Bağ kurmayı seçtin."}}}};
 }
 function load(){
+  if(!DEMO_MODE&&(UI.msgSending||panelBusyTyping())){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return Promise.resolve(D); }
+  var pollStartedAt=Date.now();
+  if(!DEMO_MODE){ PANEL_POLL_STATE.fetchCount++; PANEL_POLL_STATE.status='fetching'; PANEL_POLL_STATE.lastFetchStartedAt=new Date(pollStartedAt).toISOString(); }
   if(DEMO_MODE){
     var demo=demoData();
     SYNC_RECEIPT=normalizeSyncReceiptP({status:'accepted',snapshotRevision:'d'.repeat(40),sourceUpdatedAt:new Date(Date.now()-30000).toISOString(),submittedAt:new Date(Date.now()-25000).toISOString(),acceptedAt:new Date(Date.now()-10000).toISOString(),sourceLatestSha:'e'.repeat(40)});
     var DP=window.PanelCoverageV1;
     if(DP&&typeof DP.buildObserverSnapshot==='function'&&typeof DP.chooseProjection==='function'){
       var ds=DP.buildObserverSnapshot(demo,SYNC_RECEIPT), dd=DP.chooseProjection(ds,demo,SYNC_RECEIPT);
-      D=dd.data; OBSERVER_PROJECTION=dd.snapshot; PROJECTION_STATE=dd; PROJECTION_SECTIONS=dd.sections||{};
+      D=dd.data; OBSERVER_PROJECTION=dd.snapshot; PROJECTION_STATE=dd; PROJECTION_SECTIONS=dd.sections||{}; EVENT_LOG_STATE=buildEventLogStateP(D,[]);
     }else{ D=demo; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={}; }
-    PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
+    PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.lastOutcome='demo'; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
   }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
     .then(function(j){
-      var latestLegacy=j; PANEL_POLL_AT=new Date().toISOString(); SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
+      var pollMeta=j&&j.meta||{}, pollCompleted=pollMeta.completedAt||new Date().toISOString();
+      if(j&&j.notModified){
+        PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.notModifiedCount++; var pollSig=panelSig();
+        if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
+        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
+      }
+      var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
-      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP(), loadObserverProjectionP()]).then(function(res){
+      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
+        EVENT_LOG_STATE=res[4]||buildEventLogStateP(latestLegacy,[]);
         SYNC_RECEIPT=res[2]||null;
         var P=window.PanelCoverageV1, projection=res[3]&&res[3].snapshot||null;
         if(P&&typeof P.chooseProjection==='function'){
@@ -3979,31 +4144,36 @@ function load(){
         }else{
           D=latestLegacy; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={};
         }
+        PANEL_POLL_AT=new Date().toISOString(); updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE);
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
-        if(sig!==null && sig===LASTSIG) return;
-        LASTSIG=sig; render();
+        var changed=sig===null||sig!==LASTSIG;
+        applyPollRenderP(sig,changed,changed?'changed':'unchanged',pollStartedAt,{etag:pollMeta.etag,completedAt:PANEL_POLL_AT});
       }).catch(function(){
+        pollRecordP('error',pollStartedAt,{errorCode:'network'});
         var P=window.PanelCoverageV1;
         SYNC_RECEIPT=null;
         D=P&&typeof P.redactForObserver==='function'?P.redactForObserver(latestLegacy):latestLegacy;
         OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
-        PROJECTION_SECTIONS={};
+        PROJECTION_SECTIONS={}; EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
+        if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
         render();
       });
     })
     .catch(function(e){
+      pollRecordP('error',pollStartedAt,{errorCode:e&&e.code||'network'});
       var m=String(e&&e.message||e);
       if(/headers.+RequestInit|non ISO-8859-1|String contains/i.test(m)){ tokenPrompt("Anahtar bicimi hatali, yeniden yapistir."); return; }
       if(/gecersiz|yetkisiz/i.test(m)){ tokenPrompt("Anahtar gecersiz veya yetki yok."); return; }
+      if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; markPollSkippedP('deferred_draft'); return; }
       fail(m);
     });
 }
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){
@@ -4027,7 +4197,7 @@ load();
 // ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
-setInterval(function(){ if(DEMO_MODE||!PTOKEN||UI.msgSending||panelBusyTyping()) return; load(); },15000);
-document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
-window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load(); });
+setInterval(function(){ if(DEMO_MODE||!PTOKEN) return; if(UI.msgSending||panelBusyTyping()){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return; } load(); },15000);
+document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
+window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
 })();

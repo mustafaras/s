@@ -28,6 +28,8 @@
 | PANEL-006 | 2026-08-02 | P1-TERAPI-BILDIRIM-PROVENANS | in_progress | PANEL-005 ready_for_review; kullanıcı Prompt 04’ü açıkça başlattı | Therapy/profil/bildirim/provenance projection kapısı açıldı; hassas metin redaction ve lifecycle fixture hazırlanıyor | Prompt 04 hedeflerini tamamla; gerçek workflow veya dış servis yazma |
 | PANEL-006 | 2026-08-02 | P1-TERAPI-BILDIRIM-PROVENANS | ready_for_review | PANEL-005 ready_for_review; kullanıcı Prompt 04’ü açıkça başlattı | `therapyProvenance`, `profileProgress`, `notificationTimeline`, `externalSources`; raw therapy/profile redaction; delivered/read ayrımı; answerReadAt/observer receipt; external error code; provenance/privacy badges; P4 19/19 ve tüm regression kapıları yeşil | Kullanıcı review’ı; açık kabul/“devam” olmadan Prompt 05 veya PANEL-007 başlatma |
 | PANEL-006 | 2026-08-02 | RELEASE-PUBLICATION | ready_for_review | PANEL-006 uygulaması ve kullanıcı publish/merge/deploy talimatı | `631dd6d` feature commit’i push edildi; `ba98b74` merge commit’i `main`’e push edildi; Pages run `30761174707` `success` | Yayın doğrulandı; kullanıcı review’ı sürüyor; açık kabul/“devam” olmadan Prompt 05 veya PANEL-007 başlatma |
+| PANEL-007 | 2026-08-02 | P2-APPEND-ONLY-EVENT-LOG | in_progress | PANEL-006 ready_for_review; kullanıcı PANEL-05’i açıkça başlattı | Event contract, daily append-only dosya ve panel timeline için uygulama/fixture çalışması sürüyor | Kabul kapısını tamamla; dış event-log yazımı için mevcut sync izni sınırını koru |
+| PANEL-007 | 2026-08-02 | P2-APPEND-ONLY-EVENT-LOG | ready_for_review | PANEL-006 ready_for_review; kullanıcı PANEL-05’i açıkça başlattı | Zorunlu event alanları ve allowlist redaction; monotonic per-device sequence audit; duplicate eventId idempotence; event loss latest’i bozmaz; legacy fallback; 20/50/100 filter; revision/correlation drawer; P2 panel 13/13 + sync 8/8 ve regresyon kapıları yeşil | Kullanıcı review’ı; açık kabul/“devam” olmadan Prompt 06 / PANEL-008 başlatma; external event-log write için yeni izin varsayma |
 
 ## Aktif faz
 
@@ -38,6 +40,46 @@ status: ready_for_review
 implementation_started: true
 external_write_authorized: false
 next_safe_action: PANEL-006 kanıtını kullanıcıya sunup review beklemek; açık kabul/“devam” olmadan Prompt 05’e geçmemek
+```
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: P2-APPEND-ONLY-EVENT-LOG
+active_sequence: PANEL-007
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-007 kanıtını kullanıcıya sunup review beklemek; açık kabul/“devam” olmadan Prompt 06 / PANEL-008’e geçmemek
+```
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: P2-POLLING-RELAY
+active_sequence: PANEL-008
+status: in_progress
+implementation_started: true
+external_write_authorized: false
+next_safe_action: ETag/304, draft-safety, stale/skip status map ve relay karar fixture’ını tamamlayıp paired ledger kanıtını yazmak
+```
+
+## PANEL-008 kayıt (append-only)
+
+| Sequence | Tarih | Faz | Durum | Önkoşul | Kabul/kanıt | Sonraki güvenli adım |
+|---|---|---|---|---|---|---|
+| PANEL-008 | 2026-08-03 | P2-POLLING-RELAY | in_progress | PANEL-007 ready_for_review; kullanıcı Prompt 06’yı açıkça başlattı | ETag/304, poll telemetry, taslak güvenliği ve relay karar kapısı için uygulama ve fixture çalışması başlatıldı | Kabul kapısını tamamla; relay veya dış servis açma |
+| PANEL-008 | 2026-08-03 | P2-POLLING-RELAY | ready_for_review | PANEL-007 ready_for_review; kullanıcı Prompt 06’yı açıkça başlattı | 15 saniyelik polling ETag cache ve `If-None-Match` ile conditional oldu; 304 gövde parse/rerender edilmedi; kaynak/visible revision ve dört zaman ayrı tutuldu; input/taslak skip/defer; stale/error/near-follow status map; relay auth/maliyet/rollback karar kapısı; karar dokümanı; fixture 15/15 ve tüm regresyon kapıları yeşil | Kullanıcı review’ı; açık kabul/“devam” olmadan Prompt 07 / PANEL-009 başlatma; relay veya dış servis açma |
+
+## Aktif faz güncellemesi (append-only)
+
+```text
+active_phase: P2-POLLING-RELAY
+active_sequence: PANEL-008
+status: ready_for_review
+implementation_started: true
+external_write_authorized: false
+next_safe_action: PANEL-008 kanıtını kullanıcıya sunup review beklemek; açık kabul/“devam” olmadan Prompt 07 / PANEL-009 veya relay başlatmamak
 ```
 
 ## Ledger eşleşme kapısı

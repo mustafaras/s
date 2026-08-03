@@ -18,10 +18,12 @@ Bu prompt, çalışan AI agent'a:
 Agent, bu promptu okuduktan sonra:
 - `panel-revize-manifest.json` içindeki kısıtlara uyar.
 - `panel-revize-tasks.json` içinden **bir sonraki yapılmamış görevi** seçer.
-- İlgili plan dokümanını (01-07) açar.
+- İlgili plan dokümanını (01-07) veya o fazın sıralı prompt dosyasını (`PANEL-REVIZE-PLANI/prompts/P1-…` ile `P10-…` arası) açar.
 - Kodu yazar/test eder.
 - `panel-revize-state.json` günceller.
 - Kullanıcıya kısa rapor verir.
+
+**Yeni session kuralı:** Eğer bu yeni bir session ise, önce `PANEL-REVIZE-PLANI/prompts/P0-SESSION-START.md` verilir; o prompt state okur ve nerede kalındığını raporlar.
 
 ---
 
@@ -90,6 +92,7 @@ Her tur sonunda `panel-revize-state.json` şunları içermelidir:
 - Aynı faz içinde bağımsız görevler paralel yapılabilir; bağımlı görevler sıralı.
 - Bir görev `blockers` listesindeyse, önce bloke kaldırılmalı.
 - Hiçbir görev "gelecekte hallederim" bırakılamaz; ya tamamlanır ya da blocker olarak kaydedilir.
+- Her faz için o fazın özel prompt dosyası (`prompts/P1-FAZ-0-HAZIRLIK.md` … `prompts/P10-FAZ-9-GECIS-DEPLOY.md`) kullanılır; bu dosyalar fazın test, state ve rapor formatını tekrarlar.
 
 ### 4.4 Test zorunluluğu
 
@@ -291,6 +294,19 @@ Eğer bu prompt yeni bir oturumda okunuyorsa:
 - [panel-revize-state-example.json](panel-revize-state-example.json)
 - [panel-revize-state.json](panel-revize-state.json)
 - [panel-revize-acceptance-schema.json](panel-revize-acceptance-schema.json)
+- [prompts/00-INDEX.md](prompts/00-INDEX.md)
+- [prompts/P0-SESSION-START.md](prompts/P0-SESSION-START.md)
+- [prompts/P1-FAZ-0-HAZIRLIK.md](prompts/P1-FAZ-0-HAZIRLIK.md)
+- [prompts/P2-FAZ-1-SEKME-ISKELETI.md](prompts/P2-FAZ-1-SEKME-ISKELETI.md)
+- [prompts/P3-FAZ-2-GENEL-BAKIS.md](prompts/P3-FAZ-2-GENEL-BAKIS.md)
+- [prompts/P4-FAZ-3-TRENDLER.md](prompts/P4-FAZ-3-TRENDLER.md)
+- [prompts/P5-FAZ-4-GUN-DETAYI.md](prompts/P5-FAZ-4-GUN-DETAYI.md)
+- [prompts/P6-FAZ-5-ARSIVLER.md](prompts/P6-FAZ-5-ARSIVLER.md)
+- [prompts/P7-FAZ-6-SISTEM-MESAJLAR.md](prompts/P7-FAZ-6-SISTEM-MESAJLAR.md)
+- [prompts/P8-FAZ-7-POLISH.md](prompts/P8-FAZ-7-POLISH.md)
+- [prompts/P9-FAZ-8-TEST-KABUL.md](prompts/P9-FAZ-8-TEST-KABUL.md)
+- [prompts/P10-FAZ-9-GECIS-DEPLOY.md](prompts/P10-FAZ-9-GECIS-DEPLOY.md)
+- [prompts/PX-YARDIMCI-PROMPTLAR.md](prompts/PX-YARDIMCI-PROMPTLAR.md)
 
 ### Mevcut kod (değiştirilecek referanslar)
 - [panel.html](../../panel.html)

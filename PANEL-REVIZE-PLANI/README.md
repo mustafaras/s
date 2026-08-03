@@ -37,6 +37,19 @@ Bu dosyalar, çok parçalı görevleri ve tur-tur ilerlemeyi takip etmek için k
 | [panel-revize-state-example.json](panel-revize-state-example.json) | JSON (örnek) | İlk state şablonu. `cp panel-revize-state-example.json panel-revize-state.json` ile başlatılır. |
 | [panel-revize-state.json](panel-revize-state.json) | JSON (çalışan) | Anlık ilerleme; her tur sonunda güncellenir. |
 | [panel-revize-acceptance-schema.json](panel-revize-acceptance-schema.json) | JSON Schema | Faz bazlı kabul kriterlerinin yapısı. |
+| [prompts/00-INDEX.md](prompts/00-INDEX.md) | Markdown | Sıralı prompt kataloğu; hangi prompt ne zaman verilir. |
+| [prompts/P0-SESSION-START.md](prompts/P0-SESSION-START.md) | Markdown | Her yeni session'da verilen başlangıç promptu. |
+| [prompts/P1-FAZ-0-HAZIRLIK.md](prompts/P1-FAZ-0-HAZIRLIK.md) | Markdown | Faz 0 promptu: iskelet dosyaları. |
+| [prompts/P2-FAZ-1-SEKME-ISKELETI.md](prompts/P2-FAZ-1-SEKME-ISKELETI.md) | Markdown | Faz 1 promptu: 5 sekme ve topbar. |
+| [prompts/P3-FAZ-2-GENEL-BAKIS.md](prompts/P3-FAZ-2-GENEL-BAKIS.md) | Markdown | Faz 2 promptu: Genel Bakış. |
+| [prompts/P4-FAZ-3-TRENDLER.md](prompts/P4-FAZ-3-TRENDLER.md) | Markdown | Faz 3 promptu: Trendler \& Uyarılar. |
+| [prompts/P5-FAZ-4-GUN-DETAYI.md](prompts/P5-FAZ-4-GUN-DETAYI.md) | Markdown | Faz 4 promptu: Gün Detayı. |
+| [prompts/P6-FAZ-5-ARSIVLER.md](prompts/P6-FAZ-5-ARSIVLER.md) | Markdown | Faz 5 promptu: Arşivler. |
+| [prompts/P7-FAZ-6-SISTEM-MESAJLAR.md](prompts/P7-FAZ-6-SISTEM-MESAJLAR.md) | Markdown | Faz 6 promptu: Sistem \& Mesajlar. |
+| [prompts/P8-FAZ-7-POLISH.md](prompts/P8-FAZ-7-POLISH.md) | Markdown | Faz 7 promptu: Premium polish. |
+| [prompts/P9-FAZ-8-TEST-KABUL.md](prompts/P9-FAZ-8-TEST-KABUL.md) | Markdown | Faz 8 promptu: Test ve kabul. |
+| [prompts/P10-FAZ-9-GECIS-DEPLOY.md](prompts/P10-FAZ-9-GECIS-DEPLOY.md) | Markdown | Faz 9 promptu: Geçiş ve deploy. |
+| [prompts/PX-YARDIMCI-PROMPTLAR.md](prompts/PX-YARDIMCI-PROMPTLAR.md) | Markdown | Debug, karşılaştırma, rollback, data safety yardımcıları. |
 
 ## 4. Temel kısıtlar
 
@@ -48,12 +61,13 @@ Bu dosyalar, çok parçalı görevleri ve tur-tur ilerlemeyi takip etmek için k
 
 ## 5. Nasıl kullanılır
 
-1. Yeni oturumda önce [00-PANEL-ANA-PROMPT.md](00-PANEL-ANA-PROMPT.md) okunur.
-2. `panel-revize-state.json` yoksa `panel-revize-state-example.json`'dan oluşturulur.
-3. `panel-revize-tasks.json` içinden bir sonraki hazır görev seçilir.
-4. İlgili plan dokümanı (01-07) ve `panel-revize-manifest.json` kısıtları takip edilir.
-5. Görev uygulanır, test edilir, `panel-revize-state.json` güncellenir.
-6. Rapor verilir.
+1. Yeni oturumda önce [prompts/P0-SESSION-START.md](prompts/P0-SESSION-START.md) verilir; state okunur ve son durum raporlanır.
+2. Ardından [00-PANEL-ANA-PROMPT.md](00-PANEL-ANA-PROMPT.md) okunur.
+3. `panel-revize-state.json` yoksa `panel-revize-state-example.json`'dan oluşturulur.
+4. [prompts/00-INDEX.md](prompts/00-INDEX.md) ile o sırada gelen faz prompt dosyası (`P1-…` ile `P10-…` arası) belirlenir.
+5. İlgili plan dokümanı (01-07) ve `panel-revize-manifest.json` kısıtları takip edilir.
+6. Görev uygulanır, test edilir, `panel-revize-state.json` güncellenir.
+7. Rapor verilir.
 
 ---
 

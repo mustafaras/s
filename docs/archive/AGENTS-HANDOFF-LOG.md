@@ -39,6 +39,29 @@ kanıtlarıyla yeniden değerlendirilebilir.
 Prompt 07 / `PANEL-009` veya relay başlatılmayacak. DUR.
 
 ---
+### 2026-08-03 — PANEL-008 yayınlama / clone teslimi
+
+**Teslim sonucu:** Kullanıcının `push commit merge deploy` talimatı uygulandı.
+Feature branch `feature/panel-007-008-observability` commit
+`4599331c9f7e77428881ccd78a4909fb40fd2b42` ile origin’e pushlandı; `main`e
+no-ff merge commit `564b3985cbc18654183e647bbb7379979dc6c043` ile merge edilip
+pushlandı.
+
+**Deploy kanıtı:** Pages workflow [30791188610](https://github.com/mustafaras/s/actions/runs/30791188610)
+`completed/success`; `validate` ve `deploy` job’ları başarılı. Pages deployment
+`5722017717` success; [canlı URL](https://mustafaras.github.io/s/) HTTP 200 ve
+2026-08-03 06:45:08Z son değişiklik zamanını döndürüyor. Pages API’de görünen
+legacy `latest-build` hatası eski `529d448` commit’ine ait; yeni workflow
+deployment sonucu success olarak ayrı doğrulandı.
+
+**Clone handoff:** Başka bilgisayar için canonical kaynak `origin/main` ve
+SHA `564b3985cbc18654183e647bbb7379979dc6c043`.
+
+**Sınır:** GitHub branch/main/Pages değişti; `data/`, localStorage kullanıcı
+state’i ve `mustafaras/seyma-data` değişmedi. Kullanıcı review’ı sürüyor;
+Prompt 07 / `PANEL-009` veya relay başlatılmadı.
+
+---
 ### 2026-08-02 — PANEL-007 / Prompt 05 P2 append-only event log
 
 **Kullanıcı talimatı:** Kullanıcı `PANEL-05 — P2 Append-Only Event Log

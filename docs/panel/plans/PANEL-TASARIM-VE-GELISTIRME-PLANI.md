@@ -3,7 +3,7 @@
 **Belge türü:** Ayrı panel tasarım/UX/uygulanabilir geliştirme planı
 **Kapsam:** `panel.html` gözlemci arayüzü; bilgi mimarisi, estetik, okunabilirlik, erişilebilirlik, responsive davranış ve senkron verinin görünür sunumu
 **Tarih:** 2026-08-02
-**Durum:** D2–D3 kabul edildi; D4 modül kartları hazır; kullanıcı review’ı bekleniyor
+**Durum:** D2–D4 kabul edildi; D5 responsive/a11y/motion hazır; kullanıcı review’ı bekleniyor
 
 > Teknik veri kapsamı ve senkron sözleşmesi için
 > [PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md](PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md)
@@ -602,18 +602,26 @@ Sırayla:
 
 ### Geliştirme Faz D5 — Responsive desktop/mobile pass
 
-- 480px sınırını mobil koşuluna taşı,
-- masaüstü 12 kolon gerçek bento düzeni,
-- tablet iki kolon düzen,
-- drawer ve sticky nav çakışma düzeltmeleri.
+- `PANEL-D5-RESPONSIVE-A11Y.md` ile 375/390/430/768/1280/1440 viewport
+  sözleşmeleri uygulandı; 480px üst sınırı yalnız mobil koşuluna taşındı.
+- Desktop 12 kolon bento, tablet iki kolon, mobil tek kolon; header, sticky
+  nav, section header ve drawer çakışma kapıları düzeltildi.
+- 44px action target, native accordion, ARIA current/controls/expanded/live,
+  focus ring, AA contrast ve reduced-motion CSS/JS davranışı uygulandı.
+- D5 çıkış kanıtı: `test_panel_p5_responsive_a11y.js` **24/24**; paired ledger
+  sequence `PANEL-014` `ready_for_review`.
 
 ### Geliştirme Faz D6 — Erişilebilirlik ve kalite
 
-- keyboard-only turu,
-- VoiceOver/NVDA semantik kontrolü,
-- kontrast,
-- reduced-motion,
-- loading/error/empty/stale bütün durumları.
+- `PANEL-D6-QA-RELEASE-GATE.md` ile D5 sonrası QA/release kapısı tamamlandı:
+  syntax, script/CSS, coverage validator, projection redaction/secret scan,
+  offline/reconnect, 409/422 retry, anti-clobber, input polling, 1000 event ve
+  responsive/contrast/reduced-motion kanıtları kaydedildi.
+- D6 fixture **16/16**, tam komut kapısı **22/22 PASS**; backup SHA
+  `b6ba580b00660c5c9475caaacb6d68904a9f95dd`; paired ledger sequence
+  `PANEL-015` `ready_for_review`.
+- Yeşil test release yetkisi değildir; kullanıcı açık onayı olmadan dış eylem
+  yapılmaz.
 
 ### Geliştirme Faz D7 — Görsel polish ve yayın kapısı
 

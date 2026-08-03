@@ -180,3 +180,47 @@ drawer veya yeni modül kartı refactor’ı açılmayacaktır.
 `PANEL-013` `ready_for_review` durumundadır. Kullanıcı D4 modül kartları
 teslimini inceleyip açık kabul vermeden Prompt 12 / `PANEL-014` başlatılmayacak;
 responsive/a11y pass’i yeni bir faz olarak açılacaktır.
+
+## PANEL-014 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | Responsive, accessibility ve motion pass’i tamamlandı; `ready_for_review` | `panel.css`, `panel.js`, `panel.html`, `test_panel_p5_responsive_a11y.js`, D5 planı, README/UX planı | D5 fixture **24/24**; 375/390/430 mobil tek kolon, 768 tablet iki kolon, 1280/1440 desktop 12 kolon; 44px target, ARIA current/controls/expanded/live, focus, contrast, overflow ve reduced-motion PASS; D3/D4/Faz 11 regresyonları PASS; cache **20260803f** | Browser/server/gerçek ağ/localStorage/`seyma-data`/relay açılmadı; yalnız sentetik CSS/DOM ve headless VM kullanıldı |
+
+## Sonraki sequence (PANEL-014 sonrası)
+
+`PANEL-014` `ready_for_review` durumundadır. Kullanıcı D5 responsive/a11y/motion
+teslimini inceleyip açık kabul vermeden Prompt 13 / `PANEL-015` QA-release
+gate’i başlatılmayacak.
+
+## PANEL-013 kullanıcı kabulü + PANEL-014 başlangıcı (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-013 | 2026-08-03 | D4-MODULE-CARDS | Kullanıcı D4 modül kartları teslimini açıkça kabul etti; Prompt 12 / PANEL-014 başlatıldı | Önceki D4 teslimi ve paired ledger’lar | Kullanıcı `d4 kabul` ifadesiyle D4’ü onayladı; D4 fixture **13/13**, yayın commit’i `b6ba580`, Pages run `30808155565` success ve canlı panel HTTP **200** | Yalnız ledger/plan akışı; `data/`, `data/events/`, `seyma-data` ve observer write kanalları değişmedi |
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | Responsive, keyboard/ARIA, contrast ve motion pass’i başlatıldı | `panel.css`, `panel.js`, `panel.html`, D5 planı ve fixture’lar | PANEL-013 kabulü mevcut; 375–1440px viewport, 44px target, ARIA/current/live, focus/overflow/contrast/motion kapıları inceleniyor | Browser/server/gerçek ağ/localStorage/relay dış etkisi yok |
+
+## PANEL-014 final kanıt makbuzu (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | D5 final doğrulaması tamamlandı; teslim `ready_for_review` olarak kapatıldı | D5 planı, paired ledger’lar, panel/runtime fixture’ları | D5 **24/24**; toplam **21 command check PASS**; app/sync/panel/coverage syntax, P0–D5 regression, app/Zikirmatik headless, B1/B2/B3 migration, script/cache ve `git diff --check` PASS; cache **20260803f** | Browser/server/gerçek ağ/localStorage/`seyma-data`/relay açılmadı; veri ve observer write kanalları değişmedi |
+
+## PANEL-014 kullanıcı kabulü + PANEL-015 başlangıcı (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-014 | 2026-08-03 | D5-RESPONSIVE-A11Y | Kullanıcı Prompt 13’ü açıkça başlatarak D5 teslimini kabul etti; PANEL-015 D6 QA/release kapısı açıldı | Önceki D5 planı, fixture ve paired ledger’lar | Kullanıcı PANEL-13 promptunu verdi; D5 fixture **24/24** ve 21 command check kanıtı korunuyor | Yalnız ledger/plan akışı; veri/sync/relay dış etkisi yok |
+| PANEL-015 | 2026-08-03 | D6-QA-RELEASE-GATE | D6 QA/release gate uygulaması başlatıldı | D6 planı ve `test_panel_p6_qa_release.js` | D6 zorunlu senaryoları, backup SHA ve rollback sınırı inceleniyor; release yetkisi yok | Browser/server/gerçek ağ/localStorage/`seyma-data`/relay dış etkisi yok |
+
+## PANEL-015 kayıtları (append-only)
+
+| Sequence | Tarih | Faz | Eylem | Dosya/alan | Kanıt | Dış etki |
+|---|---|---|---|---|---|---|
+| PANEL-015 | 2026-08-03 | D6-QA-RELEASE-GATE | D6 QA kapıları tamamlandı; `ready_for_review` | `test_panel_p6_qa_release.js`, `docs/panel/plans/PANEL-D6-QA-RELEASE-GATE.md`, paired ledger’lar | D6 fixture **16/16**; toplam **22 command check PASS**; backup SHA `b6ba580b00660c5c9475caaacb6d68904a9f95dd`; syntax/CSS/script/coverage/redaction/headless/migration/regression/1000 event/diff PASS | Commit/push/merge/deploy yapılmadı; kullanıcı verisi ve observer write kanalları değişmedi |
+
+## Sonraki sequence (PANEL-015 sonrası)
+
+`PANEL-015` `ready_for_review` durumundadır. Kullanıcı QA/release kanıtını
+inceleyip açık release/onay vermeden commit/push/merge/deploy veya yeni faz
+başlatılmayacaktır.

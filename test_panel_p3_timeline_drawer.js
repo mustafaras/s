@@ -44,7 +44,7 @@ ok('focus trap Tab ile drawer içinde kalır',ev2.prevented===true&&doc.activeEl
 var escEv={key:'Escape',preventDefault:function(){escEv.prevented=true;}}; context.eventDrawerKeydownP(escEv);
 ok('Esc drawer kapatma akışını çağırır',escEv.prevented===true&&context.UI.eventSelectedId===null);
 ok('responsive drawer/reduced-motion sözleşmesi var',cssSource.includes('.event-drawer-panel{')&&cssSource.includes('@media(max-width:768px)')&&cssSource.includes('@media(prefers-reduced-motion:reduce)')&&cssSource.includes('width:100%'));
-ok('cache-bust güncel panel sürümünde',htmlSource.includes('panel.css?v=20260803e')&&htmlSource.includes('panel.js?v=20260803e'));
+ok('cache-bust güncel panel sürümünde',htmlSource.includes('panel.css?v=20260803f')&&htmlSource.includes('panel.js?v=20260803f'));
 
 console.log('\nPANEL-012 / PANEL-10 fixture result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

@@ -1,0 +1,99 @@
+{
+  "project": "PANEL-REVIZE",
+  "version": "1.0.0",
+  "createdAt": "2026-08-03",
+  "updatedAt": "2026-08-03",
+  "description": "ÆON Observer Dashboard premium, pro ve veri-kaybetmeyen yeniden tasarım planı.",
+  "owner": "mustafaras",
+  "repo": "s",
+  "dataRepo": "mustafaras/seyma-data",
+  "rootFolder": "PANEL-REVIZE-PLANI",
+  "newCodeFiles": [
+    "panel-v2.html",
+    "panel-v2.js",
+    "panel-v2.css"
+  ],
+  "existingFilesToKeep": [
+    "panel.html",
+    "panel.js",
+    "panel.css",
+    "panelCoverageManifest.js",
+    "index.html",
+    "sw.js",
+    "app.js",
+    "sync.js",
+    "styles.css"
+  ],
+  "constraints": [
+    {
+      "id": "C01",
+      "rule": "Hiçbir mevcut fonksiyon çalışmaz etkilenmez.",
+      "rationale": "Yeni panel ayrı dosyalar (panel-v2.*) olarak inşa edilir; geçiş son aşamada yapılır."
+    },
+    {
+      "id": "C02",
+      "rule": "Hiçbir kullanıcı verisi kaybolmaz.",
+      "rationale": "Panel read-only gözlem arayüzüdür; yalnızca görünürlük düzeyi değişir."
+    },
+    {
+      "id": "C03",
+      "rule": "Secrets asla panel DOM'unda veya yeni dosyalarda yazılmaz.",
+      "rationale": "ghToken, openaiKey, syncUrl, auth, token gibi alanlar sync.js sanitize ile de gizli kalır."
+    },
+    {
+      "id": "C04",
+      "rule": "Ham GPS, profil cevapları, terapi metinleri, medya redacted kalır.",
+      "rationale": "panelCoverageManifest.js kuralları yeni panelde de uygulanır."
+    },
+    {
+      "id": "C05",
+      "rule": "Testler headless Node fixture'larıyla yapılır; browser açmadan doğrulanır.",
+      "rationale": "AGENTS.md/CLAUDE.md veri güvenliği kuralları."
+    },
+    {
+      "id": "C06",
+      "rule": "Her deploy'da index.html cache-bump (?v=) yapılır.",
+      "rationale": "GitHub Pages CDN/PWA stale asset göndermemeli."
+    },
+    {
+      "id": "C07",
+      "rule": "Mobil öncelikli tasarım: kaynak ekran 375px-460px.",
+      "rationale": "Şeyma hedef cihaz mobil Safari/Chrome."
+    },
+    {
+      "id": "C08",
+      "rule": "Türkçe, saygılı, sakin, premium ton kullanılır.",
+      "rationale": "ÆON, kişisel veriye bakan güvenilir ikinci gözdür."
+    }
+  ],
+  "canonicalDocs": [
+    "PANEL-REVIZE-PLANI/00-PANEL-ANA-PROMPT.md",
+    "PANEL-REVIZE-PLANI/00-UYGULAMA-YAPISI-ANALIZI.md",
+    "PANEL-REVIZE-PLANI/01-MEVCUT-SORUNLAR-ANALIZI.md",
+    "PANEL-REVIZE-PLANI/02-TASARIM-ILKELERI-VE-VIZYON.md",
+    "PANEL-REVIZE-PLANI/03-BILGI-MIMARISI-VE-SEVKIYAT.md",
+    "PANEL-REVIZE-PLANI/04-KOMPONENT-KUTUPHANESI.md",
+    "PANEL-REVIZE-PLANI/05-ESTETIK-DESIGN-SISTEMI.md",
+    "PANEL-REVIZE-PLANI/06-VERI-GUVENLIGI-VE-HATA-DURUMLARI.md",
+    "PANEL-REVIZE-PLANI/07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+  ],
+  "antiAmnesia": {
+    "stateFile": "PANEL-REVIZE-PLANI/panel-revize-state.json",
+    "stateSchema": "PANEL-REVIZE-PLANI/panel-revize-state-schema.json",
+    "stateExample": "PANEL-REVIZE-PLANI/panel-revize-state-example.json",
+    "tasksFile": "PANEL-REVIZE-PLANI/panel-revize-tasks.json",
+    "acceptanceSchema": "PANEL-REVIZE-PLANI/panel-revize-acceptance-schema.json",
+    "requiredUpdateFrequency": "every-turn",
+    "rules": [
+      "Her tur sonunda state.json güncellenir.",
+      "currentTaskId her zaman işlenen görevi gösterir.",
+      "Tamamlanan her görev completedTasks listesine eklenir.",
+      "Bloke görevler blockers dizisinde nedeniyle birlikte kaydedilir.",
+      "Sonraki görev nextTaskId olarak belirtilir."
+    ]
+  },
+  "notes": [
+    "Bu manifest, proje kökünde PANEL-REVIZE-PLANI/ klasöründe tutulur.",
+    "Tüm plan dosyaları sadece tasarlanır; uygulama kodu panel-v2.* dosyalarına yazılır."
+  ]
+}

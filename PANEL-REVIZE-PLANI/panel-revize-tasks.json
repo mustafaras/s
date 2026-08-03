@@ -1,0 +1,774 @@
+{
+  "project": "PANEL-REVIZE",
+  "version": "1.0.0",
+  "updatedAt": "2026-08-03",
+  "phases": [
+    {
+      "phaseId": 0,
+      "phaseName": "Hazırlık ve izolasyon",
+      "goal": "Yeni panel dosyalarını mevcut panelden bağımsız olarak oluştur; iskeleti ve design system'i başlat.",
+      "tasks": [
+        {
+          "id": "0.1",
+          "title": "panel-v2.html shell oluştur",
+          "description": "panel.html'in yapısını yalın bir shell olarak yeniden yaz: meta viewport, title, panel-v2.css/js yükleri, panelCoverageManifest.js yükü, #app konteyneri. Leaflet ve diğer modüller ihtiyaç halinde eklenecek.",
+          "dependsOn": [],
+          "acceptanceCriteria": [
+            "DOCTYPE, html lang=tr, charset, viewport mevcut.",
+            "panel-v2.css?v=... ve panel-v2.js?v=... yükleniyor.",
+            "panelCoverageManifest.js yükleniyor.",
+            "#app konteyneri var."
+          ],
+          "filesAffected": ["panel-v2.html"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md#faz-0--hazırlık-ve-izolasyon"
+        },
+        {
+          "id": "0.2",
+          "title": "panel-v2.css design system skeleton",
+          "description": "05-ESTETIK-DESIGN-SISTEMI.md'deki token'ları uygula: renkler, tipografi, spacing, kart bazları, sekme bazları, boş durumlar. Mobil öncelikli.",
+          "dependsOn": [],
+          "acceptanceCriteria": [
+            "--ae-* CSS custom properties tanımlı.",
+            ".ae-app, .ae-card, .ae-tabs, .ae-tab temelleri var.",
+            "Light tema için data-theme='light' varyantı var.",
+            "Mobil grid tanımları var."
+          ],
+          "filesAffected": ["panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "05-ESTETIK-DESIGN-SISTEMI.md"
+        },
+        {
+          "id": "0.3",
+          "title": "panel-v2.js IIFE skeleton ve global export",
+          "description": "Yeni IIFE iskeleti oluştur. window.AeonV2 tek global export olsun. render, setTab, init gibi temel fonksiyonlar placeholder olarak tanımlansın.",
+          "dependsOn": [],
+          "acceptanceCriteria": [
+            "IIFE yapısı var.",
+            "window.AeonV2 mevcut.",
+            "render(), setTab(), init() placeholder fonksiyonlar var.",
+            "Syntax hatasız: node --check panel-v2.js PASS."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "0.4",
+          "title": "Veri projection adapter bağlantısı",
+          "description": "panelCoverageManifest.js içindeki coverageForData ve projection fonksiyonlarını panel-v2.js'te nasıl tüketileceğini belirle; adapter wrapper'ı yaz.",
+          "dependsOn": ["0.3"],
+          "acceptanceCriteria": [
+            "Projection state D objesi oluşturuluyor.",
+            "coverageForData çağrısı var.",
+            "Eksik/bozuk data durumlarında çökmez."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "0.5",
+          "title": "Anti-amnesia state.json başlat",
+          "description": "panel-revize-state-example.json şablonundan gerçek panel-revize-state.json dosyasını oluştur; başlangıç durumunu ayarla.",
+          "dependsOn": [],
+          "acceptanceCriteria": [
+            "panel-revize-state.json mevcut.",
+            "panel-revize-state-schema.json'e uygun.",
+            "status 'in-progress', currentTaskId '0.1'."
+          ],
+          "filesAffected": ["PANEL-REVIZE-PLANI/panel-revize-state.json"],
+          "estimatedComplexity": "low",
+          "planRef": "00-PANEL-ANA-PROMPT.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 1,
+      "phaseName": "Sekme iskeleti ve topbar",
+      "goal": "5 ana sekme arasında geçiş, topbar ve ARIA yapısını kur.",
+      "tasks": [
+        {
+          "id": "1.1",
+          "title": "5 ana sekme iskeleti",
+          "description": "Genel Bakış, Trendler & Uyarılar, Gün Detayı, Arşivler, Sistem & Mesajlar sekmelerini oluştur. HTML string tabanlı render fonksiyonları ayır.",
+          "dependsOn": ["0.1", "0.2", "0.3"],
+          "acceptanceCriteria": [
+            "Her sekme için ayrı render fonksiyonu var.",
+            "Sekme değişimi AeonV2.setTab(id) ile çalışır.",
+            "ARIA role='tablist/tab' mevcut."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "1.2",
+          "title": "Topbar: marka, tek status badge, eylemler",
+          "description": "Üst topbar'da ÆON markası, tek senkron durum rozeti, yenile ve çıkış butonları yer alsın. Yoğunluk seçici buraya veya Sistem sekmesine taşınabilir.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "Marka ve status badge görünür.",
+            "Yenile/çıkış butonları çalışır.",
+            "Mobilde tek satırda veya kompakt düzen."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "02-TASARIM-ILKELERI-VE-VIZYON.md"
+        },
+        {
+          "id": "1.3",
+          "title": "Placeholder içerik ve boş durum dili",
+          "description": "Her sekme için minimal placeholder içerik ve standart boş durum mesajları ekle.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "5 sekmenin her birinde placeholder metin var.",
+            "AeEmpty bileşeni kullanılıyor."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "1.4",
+          "title": "Sekme geçiş test fixture'ı",
+          "description": "tests/test_panel_v2_tabs.js fixture'ı yaz; 5 sekmenin render edildiğini ve geçişlerin state değişikliği ürettiğini doğrula.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "Fixture PASS.",
+            "Syntax check PASS."
+          ],
+          "filesAffected": ["tests/test_panel_v2_tabs.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 2,
+      "phaseName": "Genel Bakış (Today)",
+      "goal": "Bugünün sinyal kartlarını, 7 günlük trend strip'ini ve hızlı not kartını oluştur.",
+      "tasks": [
+        {
+          "id": "2.1",
+          "title": "HeroCard komponenti ve hero grid",
+          "description": "AeCard varyantı olarak HeroCard oluştur; 2x2 mobil grid'de mod, uyku, SOS, adımları göster.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "HeroCard HTML string fonksiyonu var.",
+            "4 hero kart render ediliyor.",
+            "Mobilde 2x2 grid."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "2.2",
+          "title": "7 günlük mini trend strip",
+          "description": "Seçili metrikler için son 7 günü gösteren küçük sparkline/bar strip'i ekle.",
+          "dependsOn": ["2.1"],
+          "acceptanceCriteria": [
+            "Son 7 gün verisi gösteriliyor.",
+            "SVG veya CSS bar kullanılıyor.",
+            "Eksik günler boşluk olarak görünür."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "2.3",
+          "title": "Hızlı notlar / terapi paylaşımı kartı",
+          "description": "Var ise bugünün journal notu veya terapi paylaşımının varlığını gösteren L1 summary kartı ekle.",
+          "dependsOn": ["2.1"],
+          "acceptanceCriteria": [
+            "Not/paylaşım varsa özet gösteriliyor.",
+            "Yoksa kart gizleniyor veya 'bugün not yok' durumu."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "2.4",
+          "title": "Tarih seçici (görünüm)",
+          "description": "Genel Bakış sekmesinde bugün tarihini ve önceki/sonraki gün butonlarını göster; detay açma henüz Gün Detayı sekmesine yönlendirsin.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "Tarih çubuğu render ediliyor.",
+            "Butonlar state'i değiştiriyor."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "2.5",
+          "title": "Genel Bakış render testi",
+          "description": "Seeded data ve boş data ile Genel Bakış sekmesinin render çıktısını doğrula.",
+          "dependsOn": ["2.1", "2.2", "2.3", "2.4"],
+          "acceptanceCriteria": [
+            "Hero kart değerleri doğru.",
+            "Boş data'da ae-empty görünür.",
+            "Fixture PASS."
+          ],
+          "filesAffected": ["tests/test_panel_v2_today.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 3,
+      "phaseName": "Trendler & Uyarılar",
+      "goal": "Trend kartları, anomali kuralları ve anomaliden detaya atlama.",
+      "tasks": [
+        {
+          "id": "3.1",
+          "title": "SummaryCard komponenti",
+          "description": "Trend ve karşılaştırma kartı varyantını oluştur: başlık, değer, trend yönü, kısa açıklama.",
+          "dependsOn": ["2.1"],
+          "acceptanceCriteria": [
+            "AeCard--summary varyantı var.",
+            "Trend yukarı/aşağı/yan okları var."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "3.2",
+          "title": "7/14/30 günlük trend kartları",
+          "description": "Uyku ortalaması, adım ortalaması, su, SOS yoğunluğu, eksik gün sayısı için summary kartları oluştur.",
+          "dependsOn": ["3.1"],
+          "acceptanceCriteria": [
+            "Her metrik için summary kart var.",
+            "Pencere seçici (7/14/30) çalışıyor.",
+            "Değerler mevcut paneldeki hesaplarla uyumlu."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "3.3",
+          "title": "Anomali tespit motoru",
+          "description": "Aşağıdaki anomali kurallarını uygula: uyku düşüş trendi, SOS artışı, MOH ≥ 10 gün, eksik gün, hedef altı su/adım.",
+          "dependsOn": ["3.2"],
+          "acceptanceCriteria": [
+            "Kurallar tanımlı ve test edilmiş.",
+            "Anomali listesi üretiliyor."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "high",
+          "planRef": "02-TASARIM-ILKELERI-VE-VIZYON.md"
+        },
+        {
+          "id": "3.4",
+          "title": "AnomalyCard komponenti ve anomali listesi",
+          "description": "Anomalileri öne çıkan kartlarla listele; sol border renkli, aksiyon linki ilgili güne yönlendirsin.",
+          "dependsOn": ["3.3"],
+          "acceptanceCriteria": [
+            "AnomalyCard varyantı var.",
+            "Anomali listesi boşken ae-empty gösterir."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "3.5",
+          "title": "Anomaliden Gün Detayı'na atlama",
+          "description": "Anomaliye tıklayınca Gün Detayı sekmesi açılsın ve ilgili tarih seçili olsun.",
+          "dependsOn": ["3.4", "4.1"],
+          "acceptanceCriteria": [
+            "Tıklama setTab('day') ve gotoDate(date) çağırır.",
+            "Gün Detayı ilgili tarihle açılır."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "3.6",
+          "title": "Trendler test fixture'ı",
+          "description": "tests/test_panel_v2_trends.js yaz; seeded data ile summary kart değerleri ve anomali tespitini doğrula.",
+          "dependsOn": ["3.2", "3.3", "3.4"],
+          "acceptanceCriteria": [
+            "Fixture PASS.",
+            "Anomali senaryoları kapsanıyor."
+          ],
+          "filesAffected": ["tests/test_panel_v2_trends.js"],
+          "estimatedComplexity": "high",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 4,
+      "phaseName": "Gün Detayı",
+      "goal": "Seçili günün tüm girdilerini kategorilere ayırarak göster; redaction ve boş durumları yönet.",
+      "tasks": [
+        {
+          "id": "4.1",
+          "title": "Tarih seçici / takvim ısı haritası",
+          "description": "Gün Detayı sekmesinde tarih seçici veya küçük takvim ısı haritası göster. Seçili tarih state tutulsun.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "Tarih seçici render ediliyor.",
+            "Önceki/sonraki gün butonları çalışıyor.",
+            "Takvim ısı haritası (opsiyonel) vardır veya placeholder."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "4.2",
+          "title": "DetailSection komponenti",
+          "description": "Kategorize detay bölümü için başlık + liste + boş durum komponenti oluştur.",
+          "dependsOn": ["1.3"],
+          "acceptanceCriteria": [
+            "DetailSection varyantı var.",
+            "Liste satırları ve boş durum render ediliyor."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "4.3",
+          "title": "Ruh hali ve terapi bölümü",
+          "description": "Mood, journal/note, intention, gratitude, therapy özetini göster; terapi metinleri redacted.",
+          "dependsOn": ["4.2"],
+          "acceptanceCriteria": [
+            "Mood, not, niyet, şükran gösteriliyor.",
+            "Therapy thoughts/share metinleri redacted; sayı/varlık görünür."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "06-VERI-GUVENLIGI-VE-HATA-DURUMLARI.md"
+        },
+        {
+          "id": "4.4",
+          "title": "Beslenme ve öğün bölümü",
+          "description": "Öğünler, mealItems makro özeti, su, kafein bilgilerini listele.",
+          "dependsOn": ["4.2"],
+          "acceptanceCriteria": [
+            "Öğün listesi ve makro özet var.",
+            "Su bardak sayısı gösteriliyor."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "4.5",
+          "title": "İbadet ve Saygı bölümü",
+          "description": "Namaz vakitleri durumu, zikir özet, günün öncüsü, Kur'an isteklerini göster.",
+          "dependsOn": ["4.2"],
+          "acceptanceCriteria": [
+            "Namaz vakitleri özetleniyor.",
+            "Zikir/Saygı/Kur'an varlığı gösteriliyor."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "4.6",
+          "title": "Hareket ve konum özet bölümü",
+          "description": "Adım, yürüyüş, konum segmentlerini özet şekilde göster; ham GPS redacted.",
+          "dependsOn": ["4.2"],
+          "acceptanceCriteria": [
+            "Adım ve yürüyüş özet var.",
+            "Konum segmentleri kategori olarak gösterilir; koordinat yok."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "06-VERI-GUVENLIGI-VE-HATA-DURUMLARI.md"
+        },
+        {
+          "id": "4.7",
+          "title": "İçerik bölümü (reading/watching/listening/quotes)",
+          "description": "Seçili günün okuma, izleme, dinleme kayıtları ve alıntılarını göster.",
+          "dependsOn": ["4.2"],
+          "acceptanceCriteria": [
+            "İçerik kategorileri ayrı ayrı listeleniyor.",
+            "Boş durumlar merkezi."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "4.8",
+          "title": "Gün Detayı redaction ve test fixture'ı",
+          "description": "tests/test_panel_v2_day_detail.js yaz; redaction kurallarını, boş günü ve seçili tarih değişimini doğrula.",
+          "dependsOn": ["4.3", "4.4", "4.5", "4.6", "4.7"],
+          "acceptanceCriteria": [
+            "Ham GPS string'i render çıktısında yok.",
+            "Terapi metinleri redacted.",
+            "Boş gün mesajı doğru.",
+            "Fixture PASS."
+          ],
+          "filesAffected": ["tests/test_panel_v2_day_detail.js"],
+          "estimatedComplexity": "high",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 5,
+      "phaseName": "Arşivler",
+      "goal": "Uzun vadeli arşivleri alt sekmelerde listeleyerek göster; performans ve boş durumları yönet.",
+      "tasks": [
+        {
+          "id": "5.1",
+          "title": "SubTabs komponenti",
+          "description": "Arşivler ve Sistem sekmeleri için iç sekme bileşeni oluştur.",
+          "dependsOn": ["1.1"],
+          "acceptanceCriteria": [
+            "SubTabs varyantı var.",
+            "Alt sekme değişimi state'i günceller."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "low",
+          "planRef": "04-KOMPONENT-KUTUPHANESI.md"
+        },
+        {
+          "id": "5.2",
+          "title": "Kütüphane arşivi listesi",
+          "description": "data.library ve günlük reading kayıtlarını birleştir; kitap listesi göster.",
+          "dependsOn": ["5.1"],
+          "acceptanceCriteria": [
+            "Kitap listesi satırları render ediliyor.",
+            "Son okuma tarihi ve sayfa sayısı görünür."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "5.3",
+          "title": "İzleme arşivi listesi",
+          "description": "data.watchlist ve günlük watching kayıtlarını birleştir; dizi/film listesi göster.",
+          "dependsOn": ["5.1"],
+          "acceptanceCriteria": [
+            "İzleme listesi satırları var.",
+            "Dakika ve bölüm/film sayısı gösterilir."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "5.4",
+          "title": "Dinleme arşivi listesi",
+          "description": "data.music ve günlük listening kayıtlarını birleştir; müzik/podcast listesi göster.",
+          "dependsOn": ["5.1"],
+          "acceptanceCriteria": [
+            "Dinleme listesi satırları var.",
+            "Dakika ve parça sayısı gösterilir."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "5.5",
+          "title": "Alıntılar arşivi listesi",
+          "description": "library, watchlist, music içindeki quotes alanlarını birleştir; alıntı listesi göster.",
+          "dependsOn": ["5.1"],
+          "acceptanceCriteria": [
+            "Alıntı listesi satırları var.",
+            "Kaynak (kitap/dizi/şarkı) belirtilir."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "low",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "5.6",
+          "title": "Arşiv performansı: pagination veya lazy scroll",
+          "description": "100+ kayıt olduğunda takılmaması için basit pagination veya lazy scroll ekle.",
+          "dependsOn": ["5.2", "5.3", "5.4", "5.5"],
+          "acceptanceCriteria": [
+            "100+ kayıt render edilebilir.",
+            "Sekme geçişi 150ms altında kalır."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "5.7",
+          "title": "Arşivler test fixture'ı",
+          "description": "tests/test_panel_v2_archives.js yaz; her alt sekmenin render ve pagination davranışını doğrula.",
+          "dependsOn": ["5.2", "5.3", "5.4", "5.5", "5.6"],
+          "acceptanceCriteria": [
+            "Tüm alt sekmeler render ediliyor.",
+            "Boş arşiv durumu doğru.",
+            "Pagination çalışıyor."
+          ],
+          "filesAffected": ["tests/test_panel_v2_archives.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 6,
+      "phaseName": "Sistem & Mesajlar",
+      "goal": "Teknik durum, senkron detayları, mesajlaşma ve ayarları merkezi bir sekmede topla.",
+      "tasks": [
+        {
+          "id": "6.1",
+          "title": "Tek status badge detayı",
+          "description": "Topbar'daki status badge tıklayınca veya Sistem sekmesinde açılınca detaylı sync durumu göster.",
+          "dependsOn": ["1.2"],
+          "acceptanceCriteria": [
+            "Status badge detayı açılabilir.",
+            "Revision/SHA/ETag/p50/p95 burada görünür."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "6.2",
+          "title": "Senkron audit çekmecesi",
+          "description": "Coverage/provenance/polling durumlarını tek, sade audit çekmecesinde göster.",
+          "dependsOn": ["6.1"],
+          "acceptanceCriteria": [
+            "Audit çekmecesi render ediliyor.",
+            "Fallback mesajları kullanıcı dostu."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "06-VERI-GUVENLIGI-VE-HATA-DURUMLARI.md"
+        },
+        {
+          "id": "6.3",
+          "title": "Observer inbox/outbox mesajlaşma",
+          "description": "data/observer-inbox.json ve data/aeon-outbox.json okuma/yazma arayüzünü Sistem sekmesinde oluştur.",
+          "dependsOn": ["6.1"],
+          "acceptanceCriteria": [
+            "Mesajlar listeleniyor.",
+            "Yeni mesaj yazma alanı var (yalnızca outbox'a yazılır).",
+            "Token alanı kullanıcı kontrolünde."
+          ],
+          "filesAffected": ["panel-v2.js"],
+          "estimatedComplexity": "high",
+          "planRef": "03-BILGI-MIMARISI-VE-SEVKIYAT.md"
+        },
+        {
+          "id": "6.4",
+          "title": "Ayarlar: density, tema, token alanı",
+          "description": "Yoğunluk seçici, light/dark tema geçişi ve GitHub token alanını Sistem sekmesine taşı.",
+          "dependsOn": ["6.1"],
+          "acceptanceCriteria": [
+            "Density seçici çalışır.",
+            "Tema geçişi çalışır.",
+            "Token alanı vardır; agent tarafından otomatik doldurulmaz."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "05-ESTETIK-DESIGN-SISTEMI.md"
+        },
+        {
+          "id": "6.5",
+          "title": "Sistem sekmesi test fixture'ı",
+          "description": "tests/test_panel_v2_system.js yaz; status badge, audit, token gizliliği, mesajlaşma UI varlığını doğrula.",
+          "dependsOn": ["6.1", "6.2", "6.3", "6.4"],
+          "acceptanceCriteria": [
+            "Token string'i render çıktısında yok.",
+            "Audit detayları render ediliyor.",
+            "Fixture PASS."
+          ],
+          "filesAffected": ["tests/test_panel_v2_system.js"],
+          "estimatedComplexity": "high",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 7,
+      "phaseName": "Premium polish",
+      "goal": "Tüm kartları design system'e uygun hale getir; animasyon ve performansı optimize et.",
+      "tasks": [
+        {
+          "id": "7.1",
+          "title": "Design system tutarlılık denetimi",
+          "description": "Tüm kartların .ae-* class'larını kullandığını, inline style içermediğini ve renk paletine uyduğunu kontrol et.",
+          "dependsOn": ["2.1", "3.1", "4.2", "5.1", "6.1"],
+          "acceptanceCriteria": [
+            "Hiçbir kartta inline style kalmamış.",
+            "Renkler 05-ESTETIK-DESIGN-SISTEMI.md ile sınırlı sette."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "05-ESTETIK-DESIGN-SISTEMI.md"
+        },
+        {
+          "id": "7.2",
+          "title": "Animasyon ve geçiş kalitesi",
+          "description": "Sekme geçişleri, kart hover ve anomali pulse animasyonlarını optimize et; ağır animasyonlardan kaçın.",
+          "dependsOn": ["7.1"],
+          "acceptanceCriteria": [
+            "Sekme geçişi ≤150ms.",
+            "Animasyonlar reduced-motion'a duyarlı."
+          ],
+          "filesAffected": ["panel-v2.css", "panel-v2.js"],
+          "estimatedComplexity": "medium",
+          "planRef": "05-ESTETIK-DESIGN-SISTEMI.md"
+        },
+        {
+          "id": "7.3",
+          "title": "Mobil ve masaüstü grid doğrulaması",
+          "description": "375px, 460px, 768px, 1200px genişliklerinde layout'u kontrol et; taşma ve sıkışma olmamalı.",
+          "dependsOn": ["7.1"],
+          "acceptanceCriteria": [
+            "Mobil 2x2 hero grid çalışır.",
+            "Masaüstü summary kartları 3 sütuna yayılır."
+          ],
+          "filesAffected": ["panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "05-ESTETIK-DESIGN-SISTEMI.md"
+        },
+        {
+          "id": "7.4",
+          "title": "Erişilebilirlik kontrolü",
+          "description": "ARIA rolleri, klavye navigasyonu, kontrast, focus stillerini gözden geçir.",
+          "dependsOn": ["7.2", "7.3"],
+          "acceptanceCriteria": [
+            "Tüm sekmeler role='tab' ile.",
+            "Tüm butonlar erişilebilir.",
+            "Kontrast yeterli."
+          ],
+          "filesAffected": ["panel-v2.js", "panel-v2.css"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 8,
+      "phaseName": "Test ve kabul",
+      "goal": "Tüm yeni fixture'ları yaz, veri doğruluğunu karşılaştır, kabul kriterlerini sağla.",
+      "tasks": [
+        {
+          "id": "8.1",
+          "title": "panel-v2 için headless fixture seti",
+          "description": "Tüm testleri toparla: render, today, trends, day_detail, archives, system, redaction. Ortak test helper'ları oluştur.",
+          "dependsOn": ["1.4", "2.5", "3.6", "4.8", "5.7", "6.5"],
+          "acceptanceCriteria": [
+            "Tüm fixture'lar PASS.",
+            "Ortak helper yoksa oluşturulur."
+          ],
+          "filesAffected": ["tests/test_panel_v2_*.js"],
+          "estimatedComplexity": "high",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "8.2",
+          "title": "Veri doğruluğu karşılaştırması",
+          "description": "Aynı data objesiyle mevcut panel ve yeni panelin hesapladığı KPI'ları karşılaştır; farkları belgele.",
+          "dependsOn": ["8.1"],
+          "acceptanceCriteria": [
+            "KPI farkları (varsa) nedenleriyle belgelenmiş.",
+            "Temel metrikler (mood, sleep, steps, water, sos) eşleşiyor."
+          ],
+          "filesAffected": ["PANEL-REVIZE-PLANI/08-VERI-KARSILASTIRMASI.md"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "8.3",
+          "title": "Kabul kriterleri audit'ı",
+          "description": "panel-revize-acceptance-schema.json içindeki tüm kriterleri kontrol et; eksikleri belgele.",
+          "dependsOn": ["8.1", "8.2"],
+          "acceptanceCriteria": [
+            "Tüm AC maddeleri işaretlenebilir.",
+            "Eksikler blocker olarak kaydedilir."
+          ],
+          "filesAffected": ["PANEL-REVIZE-PLANI/panel-revize-state.json"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    },
+    {
+      "phaseId": 9,
+      "phaseName": "Geçiş ve deploy",
+      "goal": "Yeni paneli canlıya al; eski paneli yedekle veya değiştir.",
+      "tasks": [
+        {
+          "id": "9.1",
+          "title": "Eski panel yedekleme",
+          "description": "panel.html, panel.js, panel.css dosyalarını panel-v1-backup/ klasörüne veya geçici branch'e yedekle.",
+          "dependsOn": ["8.3"],
+          "acceptanceCriteria": [
+            "Yedekleme tamam.",
+            "Git history'de yedek commit var."
+          ],
+          "filesAffected": ["panel-v1-backup/"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "9.2",
+          "title": "panel-v2 → panel rename veya index.html güncelleme",
+          "description": "Geçiş stratejisine göre ya panel-v2.* dosyaları panel.* yap veya index.html panel-v2.html'yi yükleyecek şekilde güncelle.",
+          "dependsOn": ["9.1"],
+          "acceptanceCriteria": [
+            "Yeni panel canlı URL'de erişilebilir.",
+            "Eski panel gerekirse yedekte."
+          ],
+          "filesAffected": ["panel.html", "panel.js", "panel.css", "index.html"],
+          "estimatedComplexity": "medium",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "9.3",
+          "title": "index.html cache-bump",
+          "description": "panel.css, panel.js, panelCoverageManifest.js, app.js, sync.js, styles.css için ?v= query string güncelle.",
+          "dependsOn": ["9.2"],
+          "acceptanceCriteria": [
+            "Tüm değişen asset'ler için cache-bump yapılmış."
+          ],
+          "filesAffected": ["index.html"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "9.4",
+          "title": "sw.js cache listesi güncelleme (gerekirse)",
+          "description": "Eğer sw.js statik asset listesi tutuyorsa yeni dosyaları ekle.",
+          "dependsOn": ["9.2"],
+          "acceptanceCriteria": [
+            "Yeni panel dosyaları cache listesinde (gerekirse)."
+          ],
+          "filesAffected": ["sw.js"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        },
+        {
+          "id": "9.5",
+          "title": "Final commit ve deploy onayı",
+          "description": "Değişiklikleri commit et; GitHub Pages deploy workflow'unun tetiklenmesini bekle. Kullanıcı onayıyla canlıya al.",
+          "dependsOn": ["9.2", "9.3", "9.4"],
+          "acceptanceCriteria": [
+            "Commit mesajı açıklayıcı (Türkçe, faz bilgisi).",
+            "Deploy workflow başarılı.",
+            "panel-revize-state.json status 'completed'."
+          ],
+          "filesAffected": ["PANEL-REVIZE-PLANI/panel-revize-state.json"],
+          "estimatedComplexity": "low",
+          "planRef": "07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md"
+        }
+      ]
+    }
+  ]
+}

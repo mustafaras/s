@@ -118,5 +118,5 @@
     }
   ],
   "nextTaskId": "9.1",
-  "notes": "Faz 8 tamamlandı. Ortak test helper, 7 refaktör fixture, panel.js/panel-v2.js KPI karşılaştırması ve kabul kriterleri audit dosyası oluşturuldu. Tüm Faz 0-8 kriterleri passed. Bir sonraki aşama: Faz 9 Geçiş & Deploy."
+  "notes": "Faz 8 tamamlandı. Ortak test helper, 7 refaktör fixture, panel.js/panel-v2.js KPI karşılaştırması ve kabul kriterleri audit dosyası oluşturuldu. Tüm Faz 0-8 kriterleri passed. 2026-08-04 kararı: eski panel yayında kalacak, yeni panel ayrı URL olarak erişilebilir. Bir sonraki aşama: Faz 9 Geçiş & Deploy (çift panel stratejisi)."
 }

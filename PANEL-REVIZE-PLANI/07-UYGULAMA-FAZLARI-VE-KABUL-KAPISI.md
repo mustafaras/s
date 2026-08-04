@@ -18,6 +18,11 @@ panelCoverageManifest.js # ortak, değişmez
 
 Geçiş tamamlandığında `panel.html` yeniden adlandırılabilir veya `panel-v2.html` `panel.html` yapılabilir.
 
+> **2026-08-04 kararı:** Kullanıcı eski panelin yayında kalmasını istedi. Bu nedenle iki panel yan yana çalışacak:
+> - `panel.html` + `panel.js` + `panel.css` → mevcut ÆON Orchestration Core (eski) korunur.
+> - `panel-v2.html` + `panel-v2.js` + `panel-v2.css` → yeni ÆON Observer Dashboard v2 ayrı URL olarak erişilebilir.
+> Bu stratejiyle Faz 9'da yalnızca cache-bump, `sw.js` asset listesi ve kısa bir yönlendirme/alias yapılır; dosya rename'i yapılmaz.
+
 ## 2. Fazlar
 
 ### Faz 0 — Hazırlık ve izolasyon

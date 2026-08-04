@@ -1,16 +1,11 @@
 {
   "project": "PANEL-REVIZE",
   "version": "1.0.0",
-  "lastUpdated": "2026-08-03T00:00:00Z",
+  "lastUpdated": "2026-08-04T00:00:00Z",
   "status": "in-progress",
-  "currentTaskId": "0.1",
-  "completedTasks": [],
+  "currentTaskId": null,
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5"],
   "pendingTasks": [
-    "0.1",
-    "0.2",
-    "0.3",
-    "0.4",
-    "0.5",
     "1.1",
     "1.2",
     "1.3",
@@ -65,25 +60,17 @@
       "recordedAt": "2026-08-03T00:00:00Z",
       "taskId": "0.1",
       "kind": "note",
-      "summary": "PANEL-REVIZE-PLANI klasörü ve plan dosyaları oluşturuldu. Uygulama henüz başlamadı.",
-      "files": [
-        "PANEL-REVIZE-PLANI/00-PANEL-ANA-PROMPT.md",
-        "PANEL-REVIZE-PLANI/00-UYGULAMA-YAPISI-ANALIZI.md",
-        "PANEL-REVIZE-PLANI/01-MEVCUT-SORUNLAR-ANALIZI.md",
-        "PANEL-REVIZE-PLANI/02-TASARIM-ILKELERI-VE-VIZYON.md",
-        "PANEL-REVIZE-PLANI/03-BILGI-MIMARISI-VE-SEVKIYAT.md",
-        "PANEL-REVIZE-PLANI/04-KOMPONENT-KUTUPHANESI.md",
-        "PANEL-REVIZE-PLANI/05-ESTETIK-DESIGN-SISTEMI.md",
-        "PANEL-REVIZE-PLANI/06-VERI-GUVENLIGI-VE-HATA-DURUMLARI.md",
-        "PANEL-REVIZE-PLANI/07-UYGULAMA-FAZLARI-VE-KABUL-KAPISI.md",
-        "PANEL-REVIZE-PLANI/panel-revize-manifest.json",
-        "PANEL-REVIZE-PLANI/panel-revize-tasks.json",
-        "PANEL-REVIZE-PLANI/panel-revize-state-schema.json",
-        "PANEL-REVIZE-PLANI/panel-revize-state-example.json",
-        "PANEL-REVIZE-PLANI/panel-revize-acceptance-schema.json"
-      ]
+      "summary": "PANEL-REVIZE-PLANI klasörü ve plan dosyaları oluşturuldu. Uygulama henüz başlamadı."
+    },
+    {
+      "recordedAt": "2026-08-04T00:00:00Z",
+      "taskId": "0.5",
+      "kind": "test-pass",
+      "summary": "Faz 0 skeleton + fixture PASS",
+      "command": "node tests/test_panel_v2_skeleton.js",
+      "files": ["panel-v2.html", "panel-v2.css", "panel-v2.js", "tests/test_panel_v2_skeleton.js"]
     }
   ],
-  "nextTaskId": "0.1",
-  "notes": "Planlama tamamlandı. İlk uygulama görevi: panel-v2.html shell oluştur."
+  "nextTaskId": "1.1",
+  "notes": "Faz 0 skeleton tamamlandı. Bir sonraki aşama: sekme iskeleti ve topbar."
 }

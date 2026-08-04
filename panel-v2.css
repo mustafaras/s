@@ -1,0 +1,240 @@
+/* ÆON Observer Dashboard v2 — design system skeleton */
+/* Mobil öncelikli, 375px-460px kaynak ekran. */
+
+:root {
+  /* Temel sayfa zeminleri */
+  --ae-page: #F8F6F2;
+  --ae-bg: #FFFFFF;
+  --ae-surface: #FFFFFF;
+  --ae-elevated: #FDFBF8;
+
+  /* Metin */
+  --ae-text: #1F1C19;
+  --ae-muted: #6E6862;
+  --ae-faint: #9B958E;
+
+  /* Vurgu — premium altın/bronz */
+  --ae-accent: #A4824C;
+  --ae-accent2: #C9A86C;
+  --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 18%, transparent);
+  --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 28%, transparent);
+
+  /* Durum renkleri */
+  --ae-ok: #4A8C6A;
+  --ae-warn: #C79A4F;
+  --ae-drop: #B85C5C;
+  --ae-info: #5A7E9A;
+  --ae-pause: #8A8496;
+
+  /* Kart / konteyner */
+  --ae-card-bg: #FFFFFF;
+  --ae-card-bd: color-mix(in srgb, var(--ae-accent) 16%, rgba(30,28,25,0.08));
+  --ae-card-shadow: 0 10px 30px rgba(30,28,25,0.06), 0 2px 8px rgba(30,28,25,0.03);
+  --ae-card-radius: 20px;
+
+  /* Sekme / navigasyon */
+  --ae-nav-bg: color-mix(in srgb, var(--ae-page) 92%, var(--ae-accent));
+  --ae-nav-active: color-mix(in srgb, var(--ae-accent) 14%, var(--ae-page));
+  --ae-nav-active-text: var(--ae-accent);
+  --ae-tab-bd: color-mix(in srgb, var(--ae-accent) 24%, rgba(30,28,25,0.10));
+
+  /* Buton / rozet */
+  --ae-chip-bg: color-mix(in srgb, var(--ae-accent) 8%, var(--ae-page));
+  --ae-chip-text: var(--ae-accent);
+
+  /* Boş durum */
+  --ae-empty-bg: color-mix(in srgb, var(--ae-accent) 5%, var(--ae-page));
+  --ae-empty-icon: var(--ae-accent);
+
+  /* Uzaklık */
+  --ae-space-xs: 4px;
+  --ae-space-sm: 8px;
+  --ae-space-md: 12px;
+  --ae-space-lg: 16px;
+  --ae-space-xl: 24px;
+
+  /* Tipografi */
+  --ae-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ae-radius-sm: 10px;
+  --ae-radius-md: 14px;
+  --ae-radius-lg: 20px;
+
+  /* Geçiş / ease */
+  --ae-ease: cubic-bezier(0.16, 1, 0.30, 1);
+}
+
+#root[data-theme="dark"] {
+  --ae-page: #12100E;
+  --ae-bg: #181513;
+  --ae-surface: #1E1B17;
+  --ae-elevated: #26221D;
+
+  --ae-text: #F4F0EA;
+  --ae-muted: #9B958E;
+  --ae-faint: #6E6862;
+
+  --ae-accent: #C9A86C;
+  --ae-accent2: #E8C887;
+  --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 16%, transparent);
+  --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 24%, transparent);
+
+  --ae-card-bg: #1E1B17;
+  --ae-card-bd: color-mix(in srgb, var(--ae-accent) 22%, rgba(244,240,234,0.08));
+  --ae-card-shadow: 0 12px 34px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.12);
+
+  --ae-nav-bg: color-mix(in srgb, var(--ae-surface) 92%, var(--ae-accent));
+  --ae-nav-active: color-mix(in srgb, var(--ae-accent) 14%, var(--ae-surface));
+  --ae-nav-active-text: var(--ae-accent2);
+  --ae-tab-bd: color-mix(in srgb, var(--ae-accent) 24%, rgba(244,240,234,0.10));
+
+  --ae-chip-bg: color-mix(in srgb, var(--ae-accent) 10%, var(--ae-elevated));
+  --ae-chip-text: var(--ae-accent2);
+
+  --ae-empty-bg: color-mix(in srgb, var(--ae-accent) 6%, var(--ae-surface));
+  --ae-empty-icon: var(--ae-accent);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+
+.ae-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--ae-font);
+  background: var(--ae-page);
+  color: var(--ae-text);
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Kartlar ── */
+.ae-card {
+  background: var(--ae-card-bg);
+  border: 1px solid var(--ae-card-bd);
+  border-radius: var(--ae-card-radius);
+  box-shadow: var(--ae-card-shadow);
+  padding: var(--ae-space-lg);
+}
+
+.ae-card--hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+  padding: var(--ae-space-md);
+  border-radius: var(--ae-radius-md);
+}
+
+.ae-card--summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-xs);
+  padding: var(--ae-space-md);
+  border-radius: var(--ae-radius-md);
+}
+
+/* ── Grid ── */
+.ae-grid--hero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ae-space-md);
+}
+
+/* ── Sekmeler ── */
+.ae-tabs {
+  display: flex;
+  gap: var(--ae-space-xs);
+  padding: var(--ae-space-sm);
+  background: var(--ae-nav-bg);
+  border: 1px solid var(--ae-tab-bd);
+  border-radius: 999px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.ae-tabs::-webkit-scrollbar { display: none; }
+
+.ae-tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--ae-faint);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  padding: var(--ae-space-sm) var(--ae-space-md);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.24s ease;
+}
+
+.ae-tab.is-active {
+  background: var(--ae-nav-active);
+  color: var(--ae-nav-active-text);
+}
+
+/* ── Boş durum ── */
+.ae-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ae-space-md);
+  padding: var(--ae-space-xl) var(--ae-space-lg);
+  text-align: center;
+  background: var(--ae-empty-bg);
+  border: 1px dashed var(--ae-card-bd);
+  border-radius: var(--ae-radius-lg);
+}
+
+.ae-empty__icon {
+  font-size: 28px;
+  color: var(--ae-empty-icon);
+}
+
+.ae-empty__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ae-text);
+}
+
+.ae-empty__text {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ae-muted);
+}
+
+/* ── Metin atomları ── */
+.ae-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ae-faint);
+}
+
+.ae-value {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ae-text);
+}
+
+.ae-value--sm { font-size: 16px; }
+
+/* ── Animasyonlar ── */
+@keyframes aeFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ae-fade-in {
+  animation: aeFadeIn 0.35s var(--ae-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ae-fade-in { animation: none !important; }
+}

@@ -311,6 +311,15 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   border-radius: 999px;
 }
 
+.ae-btn--text {
+  border: none;
+  background: transparent;
+  color: var(--ae-accent);
+  font-size: 12px;
+  font-weight: 800;
+  padding: var(--ae-space-xs) var(--ae-space-sm);
+}
+
 /* ── Status badge ── */
 .ae-status {
   display: inline-flex;
@@ -349,6 +358,193 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   scrollbar-width: none;
 }
 .ae-app__body::-webkit-scrollbar { display: none; }
+
+/* ── Today view ── */
+.today-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+
+/* ── Hero cards ── */
+.hero-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card__icon {
+  font-size: 22px;
+  line-height: 1;
+  margin-bottom: var(--ae-space-xs);
+}
+
+.hero-card__title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ae-faint);
+}
+
+.hero-card__value {
+  margin-top: var(--ae-space-xs);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--ae-text);
+  word-break: break-word;
+}
+
+.hero-card__unit {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ae-muted);
+  margin-left: 2px;
+}
+
+.hero-card__trend {
+  font-size: 12px;
+  margin-left: 3px;
+}
+
+.hero-card__sub {
+  margin-top: var(--ae-space-xs);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ae-muted);
+}
+
+.hero-card--mood { --hero-tone: var(--ae-accent); }
+.hero-card--sleep { --hero-tone: var(--ae-info); }
+.hero-card--ok { --hero-tone: var(--ae-ok); }
+.hero-card--drop { --hero-tone: var(--ae-drop); }
+.hero-card--info { --hero-tone: var(--ae-info); }
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--hero-tone, var(--ae-accent));
+  opacity: 0.8;
+}
+
+/* ── Trend strip ── */
+.trend-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+
+.trend-strip__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-md);
+}
+
+.trend-strip__label {
+  flex: 0 0 40px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ae-faint);
+  text-transform: uppercase;
+}
+
+.trend-strip__bars {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 38px;
+}
+
+.trend-bar {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 4px;
+  border-radius: 4px;
+  background: var(--ae-empty-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.trend-bar__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bar-pct, 0%);
+  border-radius: 4px;
+  background: var(--ae-accent);
+  transition: height 0.4s var(--ae-ease);
+}
+
+.trend-bar--mood .trend-bar__fill { background: var(--ae-accent); }
+.trend-bar--sleep .trend-bar__fill { background: var(--ae-info); }
+.trend-bar--info .trend-bar__fill { background: var(--ae-info); }
+.trend-bar--ok .trend-bar__fill { background: var(--ae-ok); }
+.trend-bar--empty .trend-bar__fill { height: 0; }
+
+/* ── Date picker ── */
+.date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-sm);
+  padding: var(--ae-space-sm) var(--ae-space-md);
+}
+
+.date-picker__display {
+  flex: 1 1 auto;
+  text-align: center;
+  min-width: 0;
+}
+
+.date-picker__label {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--ae-text);
+}
+
+.date-picker__iso {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ae-faint);
+}
+
+/* ── Quick notes ── */
+.quick-notes__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-sm);
+  margin-top: var(--ae-space-sm);
+}
+
+.ae-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--ae-space-xs) var(--ae-space-sm);
+  border-radius: 999px;
+  background: var(--ae-chip-bg);
+  color: var(--ae-chip-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ae-chip--redacted {
+  background: color-mix(in srgb, var(--ae-drop) 12%, var(--ae-chip-bg));
+  color: var(--ae-drop);
+}
+
+.ae-chip__hint {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
 
 /* ── Tab ikonu/etiketi ── */
 .ae-tab__icon {

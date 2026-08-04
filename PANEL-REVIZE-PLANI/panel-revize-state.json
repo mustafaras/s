@@ -1,7 +1,7 @@
 {
   "project": "PANEL-REVIZE",
   "version": "1.0.0",
-  "lastUpdated": "2026-08-04T07:00:00Z",
+  "lastUpdated": "2026-08-04T08:00:00Z",
   "status": "in-progress",
   "currentTaskId": null,
   "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4", "8.1", "8.2", "8.3", "9.1", "9.2", "9.3", "9.4", "9.5"],
@@ -128,8 +128,16 @@
       "summary": "Token girdikten sonra hiçbir şey olmama hatası düzeltildi: panel-v2.js gerçek GitHub fetch/localStorage token kullanmaya başladı, fixture'lar async uyumlu hale getirildi, cache-bump 2026080403 yapıldı.",
       "command": "node --check panel-v2.js && node tests/test_panel_v2_*.js && node .claude/skills/run-seyma/driver.mjs && node .claude/skills/run-seyma/zikr-harness.mjs",
       "files": ["panel-v2.js", "panel-v2.css", "panel-v2.html", "tests/helpers/panel-v2-test-helper.js", "tests/test_panel_v2_tabs.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T11:00:00Z",
+      "taskId": "9.2",
+      "kind": "test-pass",
+      "summary": "Tüm v2 test fixture'ları app.js şemasına hizalandı: day_detail (mood string id, sleep.hours, water, meals obj, prayer {performed}, movement walkM/vehicleM, reading/watching/listening {entries}, zikr sessions, quranRequests), system (notifications+aeon.qa), today/trends (mood string id, sleep.hours, water). 8/8 v2 fixture PASS. 11/11 legacy panel harness PASS. Tüm quran/faz testleri PASS. Cache-bump 2026080404.",
+      "command": "for f in tests/test_panel_v2_*.js; do node \"$f\" && echo; done && for f in tests/test_panel_p*.js; do node \"$f\" 2>&1 | tail -3 && echo; done && for f in tests/test_faz*.js tests/test_quran*.js; do node \"$f\" 2>&1 | tail -3 && echo; done",
+      "files": ["tests/test_panel_v2_day_detail.js", "tests/test_panel_v2_system.js", "tests/test_panel_v2_today.js", "tests/test_panel_v2_trends.js", "panel-v2.html"]
     }
   ],
   "nextTaskId": null,
-  "notes": "PANEL-REVIZE tamamlandı. Eski panel (panel.html/panel.js/panel.css) yayında korunuyor; yeni panel (panel-v2.html/panel-v2.js/panel-v2.css) ayrı URL'de canlı. Cache-bump 2026080403 yapıldı. Tüm Faz 0-9 tamamlandı. Son fix: token/fetch async retrofit."
+  "notes": "PANEL-REVIZE tamamlandı. Eski panel (panel.html/panel.js/panel.css) yayında korunuyor; yeni panel (panel-v2.html/panel-v2.js/panel-v2.css) ayrı URL'de canlı. Cache-bump 2026080404 yapıldı. Tüm Faz 0-9 tamamlandı. Son fix: tüm v2 test fixture'ları app.js şemasına hizalandı, 8/8 v2 + 11/11 legacy + tüm quran/faz testleri PASS."
 }

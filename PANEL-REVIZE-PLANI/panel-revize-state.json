@@ -4,15 +4,12 @@
   "lastUpdated": "2026-08-04T07:00:00Z",
   "status": "in-progress",
   "currentTaskId": null,
-  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4", "8.1", "8.2", "8.3"],
-  "pendingTasks": [
-    "9.1",
-    "9.2",
-    "9.3",
-    "9.4",
-    "9.5"
-  ],
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4", "8.1", "8.2", "8.3", "9.1", "9.2", "9.3", "9.4", "9.5"],
+  "pendingTasks": [],
   "blockers": [],
+  "status": "completed",
+  "currentTaskId": null,
+  "nextTaskId": null,
   "evidence": [
     {
       "recordedAt": "2026-08-03T00:00:00Z",
@@ -115,8 +112,16 @@
       "summary": "Faz 7 CSS contract fixture PASS — panel-v2.css değişken/class/reaktif/a11y/responsive/density kuralları doğrulandı",
       "command": "node tests/test_panel_v2_css.js",
       "files": ["tests/test_panel_v2_css.js", "panel-v2.css"]
+    },
+    {
+      "recordedAt": "2026-08-04T08:30:00Z",
+      "taskId": "9.1",
+      "kind": "deploy",
+      "summary": "Faz 9.1 — Çift panel stratejisiyle cache-bump; eski panel korundu, panel-v2 ayrı URL'de canlı",
+      "command": "node --check panel-v2.js && node tests/test_panel_v2_*.js",
+      "files": ["index.html", "panel-v2.html", "panel-revize-state.json"]
     }
   ],
-  "nextTaskId": "9.1",
-  "notes": "Faz 8 tamamlandı. Ortak test helper, 7 refaktör fixture, panel.js/panel-v2.js KPI karşılaştırması ve kabul kriterleri audit dosyası oluşturuldu. Tüm Faz 0-8 kriterleri passed. 2026-08-04 kararı: eski panel yayında kalacak, yeni panel ayrı URL olarak erişilebilir. Bir sonraki aşama: Faz 9 Geçiş & Deploy (çift panel stratejisi)."
+  "nextTaskId": null,
+  "notes": "PANEL-REVIZE tamamlandı. Eski panel (panel.html/panel.js/panel.css) yayında korunuyor; yeni panel (panel-v2.html/panel-v2.js/panel-v2.css) ayrı URL'de canlı. Cache-bump 2026080402 yapıldı. Tüm Faz 0-9 tamamlandı."
 }

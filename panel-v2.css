@@ -225,6 +225,142 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .ae-value--sm { font-size: 16px; }
 
+/* ── Topbar ── */
+.ae-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+  padding: calc(env(safe-area-inset-top) + 10px) var(--ae-space-lg) 10px;
+  background: var(--ae-surface);
+  border-bottom: 1px solid var(--ae-card-bd);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+.ae-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-xs);
+  min-width: 0;
+}
+
+.ae-topbar__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ae-radius-sm);
+  background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));
+  color: var(--ae-page);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.ae-topbar__title {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--ae-text);
+  white-space: nowrap;
+}
+
+.ae-topbar__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-sm);
+  flex-shrink: 0;
+}
+
+/* ── Butonlar ── */
+.ae-btn {
+  border: 1px solid var(--ae-card-bd);
+  background: var(--ae-elevated);
+  color: var(--ae-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  padding: var(--ae-space-sm) var(--ae-space-md);
+  border-radius: var(--ae-radius-sm);
+  cursor: pointer;
+  transition: transform 0.16s var(--ae-ease), background 0.18s ease, border-color 0.18s ease;
+}
+
+.ae-btn:hover {
+  background: var(--ae-chip-bg);
+  border-color: var(--ae-tab-bd);
+}
+
+.ae-btn:active {
+  transform: scale(0.96);
+}
+
+.ae-btn--mini {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 999px;
+}
+
+/* ── Status badge ── */
+.ae-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ae-space-xs);
+  padding: var(--ae-space-xs) var(--ae-space-sm);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  background: var(--ae-chip-bg);
+  color: var(--ae-chip-text);
+}
+
+.ae-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.ae-status--ok    { color: var(--ae-ok); }
+.ae-status--warn  { color: var(--ae-warn); }
+.ae-status--drop  { color: var(--ae-drop); }
+.ae-status--info  { color: var(--ae-info); }
+.ae-status--pause { color: var(--ae-pause); }
+.ae-status--muted { color: var(--ae-faint); }
+
+/* ── Uygulama gövdesi ── */
+.ae-app__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--ae-space-md) var(--ae-space-lg) var(--ae-space-xl);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ae-app__body::-webkit-scrollbar { display: none; }
+
+/* ── Tab ikonu/etiketi ── */
+.ae-tab__icon {
+  display: inline-block;
+  margin-right: 3px;
+  font-size: 13px;
+}
+
+.ae-tab__label {
+  display: inline;
+}
+
 /* ── Animasyonlar ── */
 @keyframes aeFadeIn {
   from { opacity: 0; transform: translateY(6px); }

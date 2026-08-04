@@ -1,15 +1,11 @@
 {
   "project": "PANEL-REVIZE",
   "version": "1.0.0",
-  "lastUpdated": "2026-08-04T00:00:00Z",
+  "lastUpdated": "2026-08-04T01:00:00Z",
   "status": "in-progress",
   "currentTaskId": null,
-  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5"],
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4"],
   "pendingTasks": [
-    "1.1",
-    "1.2",
-    "1.3",
-    "1.4",
     "2.1",
     "2.2",
     "2.3",
@@ -69,8 +65,16 @@
       "summary": "Faz 0 skeleton + fixture PASS",
       "command": "node tests/test_panel_v2_skeleton.js",
       "files": ["panel-v2.html", "panel-v2.css", "panel-v2.js", "tests/test_panel_v2_skeleton.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T01:00:00Z",
+      "taskId": "1.4",
+      "kind": "test-pass",
+      "summary": "Faz 1 tabs + topbar fixture PASS",
+      "command": "node tests/test_panel_v2_tabs.js",
+      "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_tabs.js"]
     }
   ],
-  "nextTaskId": "1.1",
-  "notes": "Faz 0 skeleton tamamlandı. Bir sonraki aşama: sekme iskeleti ve topbar."
+  "nextTaskId": "2.1",
+  "notes": "Faz 1 tamamlandı. Bir sonraki aşama: Genel Bakış hero kartları ve 7 günlük trend strip."
 }

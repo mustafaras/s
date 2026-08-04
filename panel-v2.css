@@ -140,6 +140,179 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   gap: var(--ae-space-md);
 }
 
+.ae-grid--summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ae-space-md);
+}
+
+/* ── Summary cards ── */
+.summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-xs);
+  margin-bottom: var(--ae-space-xs);
+}
+
+.summary-card__title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ae-faint);
+}
+
+.summary-card__value {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--ae-text);
+}
+
+.summary-card__unit {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ae-muted);
+  margin-left: 2px;
+}
+
+.summary-card__trend {
+  font-size: 13px;
+  margin-left: 3px;
+}
+
+.summary-card__window {
+  margin-top: var(--ae-space-xs);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ae-faint);
+}
+
+.summary-card__delta {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ae-muted);
+}
+
+.summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ae-accent);
+  opacity: 0.6;
+}
+
+.summary-card--attention::before { background: var(--ae-warn); opacity: 0.9; }
+.summary-card--risk::before { background: var(--ae-drop); opacity: 0.9; }
+
+/* ── Window selector ── */
+.window-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+
+.window-selector__buttons {
+  display: flex;
+  gap: var(--ae-space-sm);
+}
+
+.ae-btn--pill {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: var(--ae-space-sm) var(--ae-space-md);
+}
+
+.ae-btn--pill.is-active {
+  background: var(--ae-accent);
+  color: var(--ae-page);
+  border-color: var(--ae-accent);
+}
+
+/* ── Anomaly cards ── */
+.anomaly-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+
+.anomaly-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.anomaly-card__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-md);
+}
+
+.anomaly-card__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--ae-empty-bg);
+  font-size: 18px;
+}
+
+.anomaly-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.anomaly-card__message {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ae-text);
+  word-break: break-word;
+}
+
+.anomaly-card__meta {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ae-muted);
+}
+
+.anomaly-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--ae-info);
+  opacity: 0.85;
+}
+
+.anomaly-card--warn::before { background: var(--ae-warn); }
+.anomaly-card--risk::before { background: var(--ae-drop); }
+
+/* ── Trends view ── */
+.trends-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+
 /* ── Sekmeler ── */
 .ae-tabs {
   display: flex;

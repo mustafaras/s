@@ -15,6 +15,7 @@
     tab: "today",
     subTab: null,
     date: isoDate(new Date()),
+    trendWindow: 7,
     density: "comfortable",
     theme: "dark"
   };
@@ -303,8 +304,268 @@
     setDate(dateOffset(ui.date, delta));
   }
 
-  function goToDayDetail() {
+  function goToDayDetail(isoDate) {
+    if (isoDate && /^\d{4}-\d{2}-\d{2}$/.test(isoDate)) ui.date = isoDate;
     ui.tab = "day";
+    render();
+  }
+
+  // ── Summary / anomaly analytics ───────────────────────────────────────
+  function mean(arr) {
+    var nums = arr.filter(function(n) { return n !== null && isFinite(n); });
+    return nums.length ? nums.reduce(function(a, b) { return a + b; }, 0) / nums.length : null;
+  }
+
+  function isQuickEntry(day) {
+    if (!isObject(day)) return false;
+    var hasMood = !!(day.mood && day.mood.value != null);
+    var hasDetail = !!(day.sleep || day.nutrition || day.health || day.journal || day.note || day.prayer || day.media || day.therapy);
+    return hasMood && !hasDetail;
+  }
+
+  function getGoal(key, fallback) {
+    if (!isObject(appData) || !isObject(appData.settings) || !isObject(appData.settings.goals)) return fallback;
+    var v = safeNumber(appData.settings.goals[key]);
+    return v !== null ? v : fallback;
+  }
+
+  function summaryForWindow(endDate, days) {
+    var dates = lastNDates(days, endDate);
+    var moods = [], sleeps = [], steps = [], waters = [], sosCounts = [], missing = 0, moh = 0, maxMoh = 0;
+    dates.forEach(function(d) {
+      var day = getDay(d);
+      if (!day) { missing++; maxMoh = 0; return; }
+      missing = 0;
+      if (isQuickEntry(day)) { moh++; maxMoh = Math.max(maxMoh, moh); }
+      else { maxMoh = Math.max(maxMoh, moh); moh = 0; }
+      if (day.mood && day.mood.value != null) moods.push(day.mood.value);
+      if (day.sleep && day.sleep.duration != null) sleeps.push(day.sleep.duration);
+      var s = safeNumber(day.health && day.health.steps);
+      if (s !== null) steps.push(s);
+      var w = safeNumber(day.nutrition && day.nutrition.waterGlasses);
+      if (w !== null) waters.push(w);
+      var sos = safeNumber(day.cravingSOSCount) || safeNumber(day.sos && day.sos.count) || 0;
+      sosCounts.push(sos);
+    });
+    return {
+      dates: dates,
+      moodMean: mean(moods),
+      sleepMean: mean(sleeps),
+      stepsMean: mean(steps),
+      waterMean: mean(waters),
+      sosTotal: sosCounts.reduce(function(a, b) { return a + b; }, 0),
+      missingDays: dates.length - dates.filter(function(d) { return !!getDay(d); }).length,
+      mohStreak: maxMoh,
+      _moods: moods,
+      _sleeps: sleeps,
+      _steps: steps,
+      _waters: waters,
+      _sos: sosCounts
+    };
+  }
+
+  function deltaPct(current, previous) {
+    if (current === null || previous === null || previous === 0) return null;
+    return Math.round(((current - previous) / previous) * 100);
+  }
+
+  function detectAnomalies(endDate) {
+    var anomalies = [];
+    var w7 = summaryForWindow(endDate, 7);
+    var prev7 = summaryForWindow(dateOffset(endDate, -7), 7);
+
+    // Uyku düşüşü ≥%20
+    if (w7.sleepMean !== null && prev7.sleepMean !== null) {
+      var sleepDrop = deltaPct(w7.sleepMean, prev7.sleepMean);
+      if (sleepDrop <= -20) {
+        anomalies.push({
+          id: "sleep-drop-" + endDate,
+          kind: "sleep",
+          severity: "risk",
+          message: "Uyku süresi son 7 günde %" + Math.abs(sleepDrop) + " düştü",
+          dates: w7.dates,
+          linkDate: endDate
+        });
+      }
+    }
+
+    // SOS artışı
+    if (w7.sosTotal > 0 && w7.sosTotal > prev7.sosTotal) {
+      anomalies.push({
+        id: "sos-rise-" + endDate,
+        kind: "sos",
+        severity: "warn",
+        message: "SOS kaydı artışı: " + w7.sosTotal + " (önceki 7 gün: " + prev7.sosTotal + ")",
+        dates: w7.dates,
+        linkDate: endDate
+      });
+    }
+
+    // Eksik gün ≥3 arka arkaya
+    var dates = lastNDates(14, endDate);
+    var missingStreak = 0, maxMissingStreak = 0, streakEnd = null;
+    for (var i = 0; i < dates.length; i++) {
+      if (!getDay(dates[i])) { missingStreak++; if (missingStreak > maxMissingStreak) { maxMissingStreak = missingStreak; streakEnd = dates[i]; } }
+      else { missingStreak = 0; }
+    }
+    if (maxMissingStreak >= 3) {
+      anomalies.push({
+        id: "missing-streak-" + endDate,
+        kind: "missing",
+        severity: "warn",
+        message: maxMissingStreak + " gün arka arkaya kayıt yok",
+        dates: dates,
+        linkDate: streakEnd || endDate
+      });
+    }
+
+    // MOH ≥10 gün arka arkaya
+    var mohDates = lastNDates(14, endDate);
+    var mohStreak = 0, maxMohStreak = 0, mohEnd = null;
+    for (var j = 0; j < mohDates.length; j++) {
+      if (isQuickEntry(getDay(mohDates[j]))) { mohStreak++; if (mohStreak > maxMohStreak) { maxMohStreak = mohStreak; mohEnd = mohDates[j]; } }
+      else { mohStreak = 0; }
+    }
+    if (maxMohStreak >= 10) {
+      anomalies.push({
+        id: "moh-streak-" + endDate,
+        kind: "moh",
+        severity: "risk",
+        message: maxMohStreak + " gün arka arkaya sadece mod kaydı",
+        dates: mohDates,
+        linkDate: mohEnd || endDate
+      });
+    }
+
+    // Su / adım hedefin %50 altında (son 7 gün ortalama)
+    var stepGoal = getGoal("steps", 10000);
+    var waterGoal = getGoal("waterGlasses", 8);
+    if (w7.stepsMean !== null && w7.stepsMean < stepGoal * 0.5) {
+      anomalies.push({
+        id: "steps-low-" + endDate,
+        kind: "steps",
+        severity: "info",
+        message: "Adım ortalaması hedefin yarısının altında",
+        dates: w7.dates,
+        linkDate: endDate
+      });
+    }
+    if (w7.waterMean !== null && w7.waterMean < waterGoal * 0.5) {
+      anomalies.push({
+        id: "water-low-" + endDate,
+        kind: "water",
+        severity: "info",
+        message: "Su ortalaması hedefin yarısının altında",
+        dates: w7.dates,
+        linkDate: endDate
+      });
+    }
+
+    return anomalies;
+  }
+
+  // ── SummaryCard komponenti ──────────────────────────────────────────────
+  function SummaryCard(opts) {
+    opts = opts || {};
+    var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
+    var unit = opts.unit ? ' <span class="summary-card__unit">' + escapeHtml(opts.unit) + "</span>" : "";
+    var trend = opts.trend || "→";
+    var status = opts.status || "normal";
+    var statusTone = { normal: "ok", attention: "warn", risk: "drop" }[status] || "info";
+    return '<div class="ae-card ae-card--summary summary-card summary-card--' + status + '">' +
+           '<div class="summary-card__head">' +
+           '<div class="summary-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
+           '<span class="ae-status ae-status--' + statusTone + '">' + escapeHtml({ normal: "normal", attention: "dikkat", risk: "risk" }[status] || status) + "</span>" +
+           "</div>" +
+           '<div class="summary-card__value">' + escapeHtml(value) + unit + ' <span class="summary-card__trend">' + escapeHtml(trend) + "</span></div>" +
+           '<div class="summary-card__window">Son ' + escapeHtml(String(opts.windowDays || 7)) + " gün</div>" +
+           (opts.delta ? '<div class="summary-card__delta">' + escapeHtml(opts.delta) + "</div>" : "") +
+           "</div>";
+  }
+
+  function AnomalyCard(a) {
+    var tone = { info: "info", warn: "warn", risk: "drop" }[a.severity] || "info";
+    var dateLabel = a.linkDate ? formatDateLabel(a.linkDate) : "";
+    return '<div class="ae-card ae-card--summary anomaly-card anomaly-card--' + a.severity + '">' +
+           '<div class="anomaly-card__row">' +
+           '<div class="anomaly-card__icon">' + escapeHtml({ sleep: "🌙", sos: "🆘", missing: "🕳", moh: "🌫", steps: "👟", water: "💧" }[a.kind] || "◌") + "</div>" +
+           '<div class="anomaly-card__body">' +
+           '<div class="anomaly-card__message">' + escapeHtml(a.message) + "</div>" +
+           '<div class="anomaly-card__meta">' + escapeHtml(dateLabel) + "</div>" +
+           "</div>" +
+           '<button type="button" class="ae-btn ae-btn--text" onclick="AeonV2.goToDayDetail(\'' + escapeHtml(a.linkDate) + '\')">Detay gör</button>' +
+           "</div></div>";
+  }
+
+  function renderSummaryGrid(endDate, windowDays) {
+    var s = summaryForWindow(endDate, windowDays);
+    var prev = summaryForWindow(dateOffset(endDate, -windowDays), windowDays);
+
+    function fmtMean(n, digits) {
+      if (n === null) return "—";
+      digits = digits || 0;
+      return n.toLocaleString("tr-TR", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    var moodTrend = "→", moodStatus = "normal";
+    if (s.moodMean !== null && prev.moodMean !== null) {
+      moodTrend = s.moodMean > prev.moodMean ? "↑" : s.moodMean < prev.moodMean ? "↓" : "→";
+      moodStatus = s.moodMean < prev.moodMean ? "attention" : "normal";
+    }
+
+    var sleepTrend = "→", sleepStatus = "normal";
+    if (s.sleepMean !== null && prev.sleepMean !== null) {
+      sleepTrend = s.sleepMean > prev.sleepMean ? "↑" : s.sleepMean < prev.sleepMean ? "↓" : "→";
+      sleepStatus = s.sleepMean < prev.sleepMean * 0.8 ? "risk" : s.sleepMean < prev.sleepMean ? "attention" : "normal";
+    }
+
+    var sosTrend = s.sosTotal > prev.sosTotal ? "↑" : s.sosTotal < prev.sosTotal ? "↓" : "→";
+    var sosStatus = s.sosTotal > 0 ? "attention" : "normal";
+
+    var missingStatus = s.missingDays >= 3 ? "risk" : s.missingDays > 0 ? "attention" : "normal";
+    var mohStatus = s.mohStreak >= 10 ? "risk" : s.mohStreak >= 5 ? "attention" : "normal";
+
+    return '<div class="ae-grid--summary">' +
+           SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus }) +
+           SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal" }) +
+           SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal" }) +
+           SummaryCard({ title: "SOS yoğ.", value: s.sosTotal, unit: "kayıt", windowDays: windowDays, trend: sosTrend, status: sosStatus }) +
+           SummaryCard({ title: "Eksik gün", value: s.missingDays, unit: "gün", windowDays: windowDays, trend: "→", status: missingStatus }) +
+           SummaryCard({ title: "MOH gün", value: s.mohStreak, unit: "gün", windowDays: windowDays, trend: "→", status: mohStatus }) +
+           "</div>";
+  }
+
+  function renderAnomalies(endDate) {
+    var anomalies = detectAnomalies(endDate);
+    if (!anomalies.length) {
+      return AeEmpty({
+        icon: "✓",
+        title: "Uyarı yok",
+        message: "Seçili pencerede dikkat çeken bir durum tespit edilmedi."
+      });
+    }
+    return '<div class="anomaly-list">' +
+           '<div class="ae-label">Tespit edilen durumlar</div>' +
+           anomalies.map(AnomalyCard).join("") +
+           "</div>";
+  }
+
+  function renderWindowSelector() {
+    var options = [7, 14, 30];
+    var buttons = options.map(function(d) {
+      var active = ui.trendWindow === d ? " is-active" : "";
+      return '<button type="button" class="ae-btn ae-btn--pill' + active + '" onclick="AeonV2.setTrendWindow(' + d + ')">' + d + " gün</button>";
+    }).join("");
+    return '<div class="window-selector">' +
+           '<div class="ae-label">Pencere</div>' +
+           '<div class="window-selector__buttons">' + buttons + "</div>" +
+           "</div>";
+  }
+
+  function setTrendWindow(days) {
+    var n = safeNumber(days);
+    if (n === null) return;
+    ui.trendWindow = Math.max(7, Math.min(30, n === 14 ? 14 : n <= 7 ? 7 : 30));
     render();
   }
 
@@ -364,13 +625,23 @@
   }
 
   function renderTrends() {
-    return AeCard({
-      children: AeEmpty({
-        icon: "◑",
-        title: "Trendler & Uyarılar",
-        message: "7/14/30 günlük özet kartlar ve anomali listesi Faz 3'te aktif olacak."
-      })
-    });
+    var date = todayStr();
+    var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
+    if (!dayCount) {
+      return AeCard({
+        children: AeEmpty({
+          icon: "◑",
+          title: "Trendler & Uyarılar",
+          message: "Henüz synced veri yok. Veri geldiğinde 7/14/30 günlük özetler ve anomaliler burada görünecek."
+        })
+      });
+    }
+    var windowDays = ui.trendWindow || 7;
+    return '<div class="trends-view ae-fade-in">' +
+           renderWindowSelector() +
+           renderSummaryGrid(date, windowDays) +
+           renderAnomalies(date) +
+           "</div>";
   }
 
   function renderDay() {
@@ -472,6 +743,7 @@
     setData: setData,
     shiftDate: shiftDate,
     goToDayDetail: goToDayDetail,
+    setTrendWindow: setTrendWindow,
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,

@@ -1,19 +1,11 @@
 {
   "project": "PANEL-REVIZE",
   "version": "1.0.0",
-  "lastUpdated": "2026-08-04T03:30:00Z",
+  "lastUpdated": "2026-08-04T04:30:00Z",
   "status": "in-progress",
   "currentTaskId": null,
-  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6"],
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8"],
   "pendingTasks": [
-    "4.1",
-    "4.2",
-    "4.3",
-    "4.4",
-    "4.5",
-    "4.6",
-    "4.7",
-    "4.8",
     "5.1",
     "5.2",
     "5.3",
@@ -78,8 +70,16 @@
       "summary": "Faz 3 Trendler & Uyarılar fixture PASS — 7/14/30 günlük özet kartları, anomali tespiti, pencere seçici, gün detayına atlama",
       "command": "node tests/test_panel_v2_trends.js",
       "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_trends.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T04:30:00Z",
+      "taskId": "4.8",
+      "kind": "test-pass",
+      "summary": "Faz 4 Gün Detayı fixture PASS — tarih seçici, 30 günlük ısı haritası, ruh hali/terapi/beslenme/ibadet/hareket/içerik bölümleri, redaction, boş gün",
+      "command": "node tests/test_panel_v2_day_detail.js",
+      "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_day_detail.js"]
     }
   ],
-  "nextTaskId": "4.1",
-  "notes": "Faz 3 tamamlandı: summaryForWindow/detectAnomalies analitikleri, 6 özet kartı (uyku/adım/su/SOS/eksik gün/MOH), anomali listesi, 7/14/30 gün pencere seçici ve gün detayına atlama. Bir sonraki aşama: Gün Detayı (Faz 4)."
+  "nextTaskId": "5.1",
+  "notes": "Faz 4 tamamlandı: Gün Detayı (day) sekmesi tarih seçici + 30 günlük ısı haritası + 6 ayrıntılı bölüm (ruh hali & terapi, beslenme, ibadet & Saygı, hareket & konum, içerik), redaction kuralları (ham GPS, terapi/düşünce/journal/not/niyet/şükür/alıntı metinleri DOM'da yok), boş gün durumu. Bir sonraki aşama: Arşivler (Faz 5)."
 }

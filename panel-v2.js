@@ -105,8 +105,8 @@
 
   function AeCard(opts) {
     opts = opts || {};
-    var cls = classNames(["ae-card", "ae-fade-in", opts.variant ? "ae-card--" + opts.variant : ""]);
-    return '<div class="' + cls + '">' + (opts.children || "") + "</div>";
+    var cls = classNames(["ae-card", "ae-fade-in", opts.variant ? "ae-card--" + opts.variant : "", opts.className]);
+    return '<div class="' + escapeHtml(cls) + '">' + (opts.children || "") + "</div>";
   }
 
   function AeButton(opts) {
@@ -114,7 +114,7 @@
     var cls = classNames(["ae-btn", opts.variant ? "ae-btn--" + opts.variant : "", opts.className]);
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
-    return '<button type="button" class="' + cls + '"' + attrs + '>' + escapeHtml(label) + "</button>";
+    return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + escapeHtml(label) + "</button>";
   }
 
   function AeStatusBadge(opts) {
@@ -644,14 +644,239 @@
            "</div>";
   }
 
-  function renderDay() {
+  // ── Day detail ────────────────────────────────────────────────────────
+  function DetailSection(opts) {
+    opts = opts || {};
+    var title = safeText(opts.title || "Bölüm", 40);
+    var icon = safeText(opts.icon || "◌", 4);
+    var emptyText = safeText(opts.emptyText || "Bu bölümde kayıt yok.", 160);
+    var bodyHtml = opts.children && String(opts.children).trim()
+      ? '<div class="detail-section__body">' + opts.children + "</div>"
+      : '<div class="detail-section__empty">' + escapeHtml(emptyText) + "</div>";
     return AeCard({
+      variant: "summary",
+      className: "detail-section",
+      children: '<div class="detail-section__head">' +
+                '<span class="detail-section__icon" aria-hidden="true">' + escapeHtml(icon) + "</span>" +
+                '<span class="detail-section__title">' + escapeHtml(title) + "</span>" +
+                "</div>" + bodyHtml
+    });
+  }
+
+  function renderChip(label, redacted) {
+    return '<span class="ae-chip ' + (redacted ? "ae-chip--redacted" : "") + '">' +
+           escapeHtml(label) +
+           (redacted ? ' <span class="ae-chip__hint">redacted</span>' : "") +
+           "</span>";
+  }
+
+  function renderDayDatePicker(date) {
+    var today = isoDate(new Date());
+    var label = date === today ? "Bugün" : formatDateLabel(date);
+    return '<div class="ae-card ae-card--summary day-date-picker">' +
+           AeButton({ label: "◀", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)" }) +
+           '<div class="day-date-picker__display">' +
+           '<div class="day-date-picker__label">' + escapeHtml(label) + "</div>" +
+           '<div class="day-date-picker__iso">' + escapeHtml(date) + "</div>" +
+           "</div>" +
+           AeButton({ label: "▶", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(1)" }) +
+           "</div>";
+  }
+
+  var DAY_HEAT_COLORS = {
+    1: "var(--ae-drop)",
+    2: "color-mix(in srgb, var(--ae-drop) 55%, var(--ae-warn))",
+    3: "var(--ae-warn)",
+    4: "var(--ae-accent)",
+    5: "var(--ae-ok)",
+    6: "color-mix(in srgb, var(--ae-ok) 60%, var(--ae-accent2))",
+    7: "var(--ae-accent2)"
+  };
+
+  function renderDayHeatmap(date) {
+    var dates = lastNDates(30, date);
+    var cells = dates.map(function(d) {
+      var day = getDay(d) || {};
+      var mood = safeNumber(day.mood && day.mood.value);
+      var color = mood ? (DAY_HEAT_COLORS[mood] || "var(--ae-empty-bg)") : "var(--ae-empty-bg)";
+      var title = formatDateLabel(d);
+      return '<div class="day-heatmap__cell" style="background:' + color + '" title="' + escapeHtml(title) + '">' +
+             '<span class="day-heatmap__day">' + escapeHtml(Number(d.split("-")[2]).toString()) + "</span>" +
+             "</div>";
+    }).join("");
+    return '<div class="ae-card ae-card--summary day-heatmap">' +
+           '<div class="ae-label">Son 30 gün</div>' +
+           '<div class="day-heatmap__grid">' + cells + "</div>" +
+           "</div>";
+  }
+
+  function renderMoodTherapy(date) {
+    var day = getDay(date) || {};
+    var chips = [];
+    var moodVal = safeNumber(day.mood && day.mood.value);
+    if (moodVal) {
+      var moodIcon = MOOD_ICONS[moodVal] || "◌";
+      var moodLabel = MOOD_LABELS[moodVal] || "Mod";
+      chips.push(renderChip(moodIcon + " " + moodLabel, false));
+    }
+    if (day.journal && day.journal.text) chips.push(renderChip("📝 Günlük", true));
+    if (day.note) chips.push(renderChip("📌 Not", true));
+    if (day.intention) chips.push(renderChip("🕯 Niyet", true));
+    if (day.gratitude) chips.push(renderChip("🙏 Şükür", true));
+
+    var t = day.therapy || {};
+    var thoughts = Array.isArray(t.thoughts) ? t.thoughts : [];
+    if (thoughts.length) chips.push(renderChip("💭 Düşünce (" + thoughts.length + ")", true));
+    if (t.decision) chips.push(renderChip("✓ Karar: " + safeText(t.decision, 40), false));
+    if (t.share) chips.push(renderChip("🛡 Terapi paylaşımı", true));
+    if (t.breath) chips.push(renderChip("🌬 Nefes", false));
+    if (t.dailyWin) chips.push(renderChip("🏆 Günlük kazanım", false));
+    if (t.selfCompassion) chips.push(renderChip("💖 Kendi şefkati", false));
+    if (t.firstStep) chips.push(renderChip("👣 İlk adım", false));
+
+    return DetailSection({
+      id: "mood-therapy",
+      title: "Ruh hali & Terapi",
+      icon: "🌤",
+      emptyText: "Bu gün için mod veya terapi kaydı yok.",
+      children: chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : ""
+    });
+  }
+
+  function renderNutrition(date) {
+    var n = (getDay(date) || {}).nutrition || {};
+    var chips = [];
+    var meals = Array.isArray(n.meals) ? n.meals : [];
+    if (meals.length) chips.push(renderChip("🍽 Öğün: " + meals.length, false));
+    var water = safeNumber(n.waterGlasses);
+    if (water !== null) chips.push(renderChip("💧 Su: " + water + " bardak", false));
+    if (n.caffeine) chips.push(renderChip("☕ Kafein", false));
+    var items = Array.isArray(n.mealItems) ? n.mealItems : [];
+    if (items.length) chips.push(renderChip("🥗 Makro özeti (" + items.length + ")", true));
+    return DetailSection({
+      id: "nutrition",
+      title: "Beslenme & Öğün",
+      icon: "🍽",
+      emptyText: "Beslenme kaydı girilmemiş.",
+      children: chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : ""
+    });
+  }
+
+  function renderPrayer(date) {
+    var day = getDay(date) || {};
+    var chips = [];
+    var p = day.prayer || {};
+    var vakitNames = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+    var done = vakitNames.filter(function(k) { return !!p[k]; }).length;
+    if (done > 0 || p.fajr != null || p.dhuhr != null || p.asr != null || p.maghrib != null || p.isha != null) {
+      chips.push(renderChip("🕌 Namaz: " + done + "/5", false));
+    }
+    var z = day.zikr || {};
+    var zCount = safeNumber(z.count);
+    if (zCount !== null || z.dhikr || z.name) {
+      var zLabel = "📿 Zikir" + (zCount !== null ? ": " + zCount.toLocaleString("tr-TR") : "");
+      chips.push(renderChip(zLabel, false));
+    }
+    var s = day.saygi || {};
+    if (s.personName) {
+      chips.push(renderChip("🌟 Öncü: " + safeText(s.personName, 40), false));
+      if (s.read) chips.push(renderChip("✓ Okundu", false));
+    }
+    var q = day.quranJourney || {};
+    if (q.requests || q.verseRef || q.surah || q.page) {
+      chips.push(renderChip("📖 Kur'an yolculuğu", false));
+    }
+    return DetailSection({
+      id: "prayer",
+      title: "İbadet & Saygı",
+      icon: "🕌",
+      emptyText: "Namaz, zikir veya Saygı kaydı yok.",
+      children: chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : ""
+    });
+  }
+
+  function renderMovement(date) {
+    var day = getDay(date) || {};
+    var h = day.health || {};
+    var m = day.movement || {};
+    var loc = day.location || {};
+    var chips = [];
+    var steps = safeNumber(h.steps);
+    if (steps !== null) chips.push(renderChip("👟 Adım: " + steps.toLocaleString("tr-TR"), false));
+    var walk = formatHours(m.walkDuration);
+    if (walk) chips.push(renderChip("🚶 Yürüyüş: " + walk, false));
+    var dist = safeNumber(m.distanceKm);
+    if (dist !== null) chips.push(renderChip("📍 Mesafe: " + dist.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " km", false));
+    var segs = Array.isArray(loc.segments) ? loc.segments : [];
+    var cats = [];
+    segs.forEach(function(seg) {
+      if (seg && seg.category && cats.indexOf(seg.category) === -1) cats.push(seg.category);
+    });
+    if (cats.length) chips.push(renderChip("🗺 Konum: " + cats.join(", "), false));
+    return DetailSection({
+      id: "movement",
+      title: "Hareket & Konum",
+      icon: "👟",
+      emptyText: "Hareket ve konum özeti yok.",
+      children: chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : ""
+    });
+  }
+
+  function renderContent(date) {
+    var day = getDay(date) || {};
+    var chips = [];
+    var media = day.media || {};
+    function count(v) {
+      if (Array.isArray(v)) return v.length;
+      return isObject(v) ? 1 : 0;
+    }
+    var reading = count(media.reading || day.reading);
+    var watching = count(media.watching || day.watching);
+    var listening = count(media.listening || day.listening);
+    var quotes = count(day.quotes);
+    if (reading) chips.push(renderChip("📖 Okuma: " + reading, false));
+    if (watching) chips.push(renderChip("🎬 İzleme: " + watching, false));
+    if (listening) chips.push(renderChip("🎧 Dinleme: " + listening, false));
+    if (quotes) chips.push(renderChip("✍️ Alıntı: " + quotes, true));
+    return DetailSection({
+      id: "content",
+      title: "İçerik",
+      icon: "📖",
+      emptyText: "Okuma, izleme veya dinleme kaydı yok.",
+      children: chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : ""
+    });
+  }
+
+  function renderDay() {
+    var date = todayStr();
+    var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
+    if (!dayCount) {
+      return AeCard({
+        children: AeEmpty({
+          icon: "◎",
+          title: "Gün Detayı",
+          message: "Henüz synced veri yok. Veri geldiğinde seçili gün burada görünecek."
+        })
+      });
+    }
+    var day = getDay(date);
+    var emptyDay = !day ? AeCard({
       children: AeEmpty({
         icon: "◎",
-        title: "Gün Detayı",
-        message: "Seçili günün ruh hali, beslenme, ibadet ve hareket özetleri Faz 4'te eklenecek."
+        title: "Boş gün",
+        message: "Bu tarihe ait kayıt yok. Takvimden başka bir gün seçebilirsin."
       })
-    });
+    }) : "";
+    return '<div class="day-view ae-fade-in">' +
+           renderDayDatePicker(date) +
+           renderDayHeatmap(date) +
+           (day ? renderMoodTherapy(date) : "") +
+           (day ? renderNutrition(date) : "") +
+           (day ? renderPrayer(date) : "") +
+           (day ? renderMovement(date) : "") +
+           (day ? renderContent(date) : "") +
+           emptyDay +
+           "</div>";
   }
 
   function renderArchives() {

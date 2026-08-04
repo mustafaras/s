@@ -730,6 +730,118 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   display: inline;
 }
 
+/* ── Day detail view ── */
+.day-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+
+.day-date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-sm);
+  padding: var(--ae-space-sm) var(--ae-space-md);
+}
+
+.day-date-picker__nav {
+  flex-shrink: 0;
+}
+
+.day-date-picker__display {
+  flex: 1 1 auto;
+  text-align: center;
+  min-width: 0;
+}
+
+.day-date-picker__label {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ae-text);
+}
+
+.day-date-picker__iso {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ae-faint);
+}
+
+/* ── 30-day heatmap ── */
+.day-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+
+.day-heatmap__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.day-heatmap__cell {
+  aspect-ratio: 1;
+  min-height: 28px;
+  border-radius: var(--ae-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ae-empty-bg);
+}
+
+.day-heatmap__day {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ae-text);
+  opacity: 0.7;
+}
+
+/* ── Detail section ── */
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-xs);
+}
+
+.detail-section__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-sm);
+  margin-bottom: var(--ae-space-xs);
+}
+
+.detail-section__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.detail-section__title {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--ae-text);
+}
+
+.detail-section__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-sm);
+}
+
+.detail-section__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-sm);
+}
+
+.detail-section__empty {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ae-muted);
+}
+
 /* ── Animasyonlar ── */
 @keyframes aeFadeIn {
   from { opacity: 0; transform: translateY(6px); }

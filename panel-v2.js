@@ -311,6 +311,24 @@
     return isObject(day) && isObject(day.discomfort) ? day.discomfort : { regions: {}, note: "", meds: [] };
   }
 
+  function getDiscomfortDetail(day) {
+    var dis = getDiscomfort(day);
+    var regions = isObject(dis.regions) ? dis.regions : {};
+    var regionKeys = Object.keys(regions);
+    var regionList = regionKeys.map(function(k) {
+      var r = regions[k];
+      var level = isObject(r) ? safeNumber(r.level) : safeNumber(r);
+      return { id: k, level: level !== null ? level : 0 };
+    });
+    return {
+      regions: regionList,
+      note: dis.note || "",
+      meds: Array.isArray(dis.meds) ? dis.meds : [],
+      totalRegions: regionList.length,
+      maxLevel: regionList.reduce(function(m, r) { return Math.max(m, r.level); }, 0)
+    };
+  }
+
   function getTherapy(day) {
     return isObject(day) && isObject(day.therapy) ? day.therapy : emptyTherapyShape();
   }
@@ -321,6 +339,140 @@
 
   function getHabits(day) {
     return isObject(day) && isObject(day.habits) ? day.habits : {};
+  }
+
+  function getEnergy(day) {
+    return isObject(day) ? safeNumber(day.energy) : null;
+  }
+
+  function getStress(day) {
+    return isObject(day) ? safeNumber(day.stress) : null;
+  }
+
+  function getNutri(day) {
+    return isObject(day) && isObject(day.nutri) ? day.nutri : null;
+  }
+
+  function getMagnesium(day) {
+    return isObject(day) && isObject(day.magnesium) ? day.magnesium : null;
+  }
+
+  function getCycleInfo(day) {
+    if (!isObject(day)) return { flow: null, symptoms: [] };
+    return {
+      flow: day.flow || null,
+      symptoms: Array.isArray(day.symptoms) ? day.symptoms : []
+    };
+  }
+
+  function getCravingDetails(day) {
+    if (!isObject(day)) return {};
+    return {
+      sosCount: safeNumber(day.cravingSOSCount) || 0,
+      optionsUsed: Array.isArray(day.cravingOptionsUsed) ? day.cravingOptionsUsed : [],
+      triggers: Array.isArray(day.cravingTriggers) ? day.cravingTriggers : [],
+      triggerNote: day.cravingTriggerNote || "",
+      tenMinDone: !!day.craving10MinDone,
+      foodDone: !!day.foodCravingDone,
+      coffeeDone: !!day.coffeeCravingDone
+    };
+  }
+
+  function getWindDown(day) {
+    if (!isObject(day) || !isObject(day.sleep)) return null;
+    var wd = day.sleep.windDown;
+    if (!isObject(wd)) return null;
+    var steps = isObject(wd.steps) ? wd.steps : {};
+    return {
+      light: !!steps.light,
+      breath: !!steps.breath,
+      dump: !!steps.dump,
+      cool: !!steps.cool,
+      lastMinutes: safeNumber(wd.lastMinutes),
+      offloadNote: wd.offloadNote || "",
+      events: Array.isArray(wd.events) ? wd.events : [],
+      sessions: Array.isArray(wd.sessions) ? wd.sessions : []
+    };
+  }
+
+  function getSleepMed(day) {
+    if (!isObject(day) || !isObject(day.sleep)) return null;
+    var med = day.sleep.med;
+    if (!isObject(med)) return null;
+    return { type: med.type || null, note: med.note || "" };
+  }
+
+  var HABIT_LABELS = {
+    sweetManaged: "Tatlı krizi", foodManaged: "Yemek krizi", coffeeManaged: "Kahve krizi",
+    eveningControl: "Akşam atıştırma", walked20: "Yürüyüş", protein: "Protein",
+    water: "Su", vitaminD: "D₃K₂", sleepReg: "Uyku düzeni", journaled: "Günlük",
+    mediaFed: "Zihin besleme", freshAir: "Temiz hava", selfKind: "Kendine şefkat",
+    caffeineOk: "Kafein limiti", magnesium: "Magnezyum"
+  };
+  var HABIT_ICONS = {
+    sweetManaged: "🍬", foodManaged: "🍽", coffeeManaged: "☕",
+    eveningControl: "🌙", walked20: "👟", protein: "🥩",
+    water: "💧", vitaminD: "💊", sleepReg: "😴", journaled: "📝",
+    mediaFed: "📚", freshAir: "🌿", selfKind: "💖",
+    caffeineOk: "✅", magnesium: "🧪"
+  };
+
+  function getHabitSummary(day) {
+    var habits = getHabits(day);
+    var done = [], undone = [];
+    Object.keys(HABIT_LABELS).forEach(function(k) {
+      if (habits[k]) done.push(k);
+      else undone.push(k);
+    });
+    return { done: done, undone: undone, total: done.length + undone.length, doneCount: done.length };
+  }
+
+  function getRootCycle() {
+    return isObject(appData) && isObject(appData.cycle) ? appData.cycle : null;
+  }
+
+  function getRootBody() {
+    return isObject(appData) && isObject(appData.body) ? appData.body : null;
+  }
+
+  function getRootQuranJourney() {
+    return isObject(appData) && isObject(appData.quranJourney) ? appData.quranJourney : null;
+  }
+
+  function getLocationInfo() {
+    if (!isObject(appData)) return null;
+    var loc = appData.location || null;
+    var history = Array.isArray(appData.locationHistory) ? appData.locationHistory : [];
+    var settings = isObject(appData.settings) ? appData.settings : {};
+    return {
+      current: loc,
+      history: history,
+      historyCount: history.length,
+      lastTs: appData.locationLastTs || null,
+      enabled: !!settings.locationEnabled,
+      mode: settings.locationMode || 'auto',
+      enabledAt: settings.locationEnabledAt || null,
+      enabledReason: settings.locationEnabledReason || null,
+      disabledAt: settings.locationDisabledAt || null,
+      disabledReason: settings.locationDisabledReason || null
+    };
+  }
+
+  function getAppSessionInfo() {
+    if (!isObject(appData)) return null;
+    return {
+      startDate: appData.startDate || null,
+      lastOpenedDate: appData.lastOpenedDate || null,
+      lastOpenedAt: appData.lastOpenedAt || null,
+      savedAt: appData.savedAt || null,
+      dayCount: isObject(appData.days) ? Object.keys(appData.days).length : 0
+    };
+  }
+
+  function getDaySavedAt(date) {
+    var day = getDay(date);
+    if (!isObject(day)) return null;
+    return day.savedAt || null;
   }
 
   function getTarget(key, fallback) {
@@ -807,6 +959,7 @@
            renderHeroGrid(date) +
            renderTrendStrip(date) +
            renderQuickNotes(date) +
+           renderLocationTimeline(null) +
            "</div>";
   }
 
@@ -1106,18 +1259,243 @@
     });
   }
 
+  function renderHabits(date) {
+    var day = getDay(date) || {};
+    var hs = getHabitSummary(day);
+    if (!hs.total) return "";
+
+    var chips = [];
+    chips.push(renderChip("✅ " + hs.doneCount + "/" + hs.total + " alışkanlık", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (hs.done.length) {
+      var doneBody = hs.done.map(function(k) {
+        return '<div class="habit-row habit-row--done"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "✅") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
+      }).join("");
+      html += DetailBlock({ icon: "✅", title: "Yapılan alışkanlıklar (" + hs.doneCount + ")", body: doneBody });
+    }
+    if (hs.undone.length) {
+      var undoneBody = hs.undone.map(function(k) {
+        return '<div class="habit-row habit-row--undone"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "◻") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
+      }).join("");
+      html += DetailBlock({ icon: "◻", title: "Yapılmayan alışkanlıklar (" + hs.undone.length + ")", body: undoneBody });
+    }
+
+    return DetailSection({
+      id: "habits",
+      title: "Alışkanlıklar",
+      icon: "✅",
+      emptyText: "Alışkanlık kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderEnergyStress(date) {
+    var day = getDay(date) || {};
+    var energy = getEnergy(day);
+    var stress = getStress(day);
+    if (energy === null && stress === null) return "";
+
+    var chips = [];
+    if (energy !== null) chips.push(renderChip("⚡ Enerji: " + energy + "/5", false));
+    if (stress !== null) chips.push(renderChip("😰 Stres: " + stress + "/5", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (energy !== null) {
+      var eBar = '<div class="scale-bar"><div class="scale-bar__fill scale-bar__fill--energy" style="width:' + (energy / 5 * 100) + '%"></div></div>';
+      html += DetailBlock({ icon: "⚡", title: "Enerji seviyesi", body: energy + "/5" + eBar });
+    }
+    if (stress !== null) {
+      var sBar = '<div class="scale-bar"><div class="scale-bar__fill scale-bar__fill--stress" style="width:' + (stress / 5 * 100) + '%"></div></div>';
+      html += DetailBlock({ icon: "😰", title: "Stres seviyesi", body: stress + "/5" + sBar });
+    }
+
+    return DetailSection({
+      id: "energy-stress",
+      title: "Enerji & Stres",
+      icon: "⚡",
+      emptyText: "Enerji ve stres kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderCraving(date) {
+    var day = getDay(date) || {};
+    var c = getCravingDetails(day);
+    if (!c.sosCount && !c.optionsUsed.length && !c.triggers.length && !c.triggerNote && !c.tenMinDone && !c.foodDone && !c.coffeeDone) return "";
+
+    var chips = [];
+    if (c.sosCount > 0) chips.push(renderChip("🆘 SOS: " + c.sosCount, false));
+    if (c.tenMinDone) chips.push(renderChip("🍬 10 dk gecikme", false));
+    if (c.foodDone) chips.push(renderChip("🍽 Yemek krizi yönetildi", false));
+    if (c.coffeeDone) chips.push(renderChip("☕ Kahve krizi yönetildi", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (c.sosCount > 0) {
+      html += DetailBlock({ icon: "🆘", title: "SOS aktivasyonları", body: c.sosCount + " kez SOS butonuna basıldı" });
+    }
+    if (c.optionsUsed.length) {
+      html += DetailBlock({ icon: "🔧", title: "Kullanılan SOS seçenekleri", body: c.optionsUsed.map(function(o) { return "• " + escapeHtml(String(o)); }).join("<br>") });
+    }
+    if (c.triggers.length) {
+      html += DetailBlock({ icon: "⚠️", title: "Tetikleyiciler", body: c.triggers.map(function(t) { return "• " + escapeHtml(String(t)); }).join("<br>") });
+    }
+    if (c.triggerNote) {
+      html += DetailBlock({ icon: "📝", title: "Tetikleyici notu", body: nl2br(escapeHtml(c.triggerNote)) });
+    }
+    if (c.tenMinDone || c.foodDone || c.coffeeDone) {
+      var copingBody = [];
+      if (c.tenMinDone) copingBody.push("✅ Tatlı krizi: 10 dakika gecikme yapıldı");
+      if (c.foodDone) copingBody.push("✅ Yemek krizi yönetildi");
+      if (c.coffeeDone) copingBody.push("✅ Kahve krizi yönetildi");
+      html += DetailBlock({ icon: "💪", title: "Baş etme stratejileri", body: copingBody.join("<br>") });
+    }
+
+    return DetailSection({
+      id: "craving",
+      title: "Kriz & Baş etme",
+      icon: "🆘",
+      emptyText: "Kriz kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderMagnesium(date) {
+    var day = getDay(date) || {};
+    var mg = getMagnesium(day);
+    if (!mg) return "";
+
+    var chips = [];
+    if (mg.taken) chips.push(renderChip("🧪 Magnezyum alındı", false));
+    else if (mg.skipped) chips.push(renderChip("🧪 Magnezyum atlandı", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (mg.taken) {
+      var mgBody = "";
+      if (mg.form) mgBody += "Form: " + escapeHtml(mg.form) + "<br>";
+      if (mg.mg) mgBody += "Doz: " + mg.mg + " mg<br>";
+      if (mg.time) mgBody += "Saat: " + escapeHtml(mg.time) + "<br>";
+      if (Array.isArray(mg.reason) && mg.reason.length) mgBody += "Neden: " + mg.reason.map(function(r) { return escapeHtml(String(r)); }).join(", ") + "<br>";
+      if (mg.effectNote) mgBody += "Etki: " + nl2br(escapeHtml(mg.effectNote));
+      html += DetailBlock({ icon: "🧪", title: "Magnezyum takviyesi", body: mgBody || "Alındı" });
+    } else if (mg.skipped) {
+      html += DetailBlock({ icon: "🧪", title: "Magnezyum atlandı", body: mg.feedback ? "Geri bildirim: " + escapeHtml(String(mg.feedback)) : "Atlandı" });
+    }
+
+    return DetailSection({
+      id: "magnesium",
+      title: "Magnezyum",
+      icon: "🧪",
+      emptyText: "Magnezyum kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderWindDown(date) {
+    var day = getDay(date) || {};
+    var wd = getWindDown(day);
+    if (!wd) return "";
+
+    var chips = [];
+    var stepCount = [wd.light, wd.breath, wd.dump, wd.cool].filter(Boolean).length;
+    if (stepCount > 0) chips.push(renderChip("🌙 Wind-down: " + stepCount + "/4 adım", false));
+    if (wd.lastMinutes) chips.push(renderChip("⏱ " + wd.lastMinutes + " dk", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    var stepsBody = "";
+    stepsBody += (wd.light ? "✅" : "◻") + " Işık azaltma<br>";
+    stepsBody += (wd.breath ? "✅" : "◻") + " Nefes egzersizi<br>";
+    stepsBody += (wd.dump ? "✅" : "◻") + " Zihin boşaltma<br>";
+    stepsBody += (wd.cool ? "✅" : "◻") + " Serinleme<br>";
+    if (wd.lastMinutes) stepsBody += "<br>Süre: " + wd.lastMinutes + " dk";
+    html += DetailBlock({ icon: "🌙", title: "Wind-down adımları", body: stepsBody });
+
+    if (wd.offloadNote) {
+      html += DetailBlock({ icon: "📤", title: "Zihin boşaltma notu", body: nl2br(escapeHtml(wd.offloadNote)) });
+    }
+
+    return DetailSection({
+      id: "winddown",
+      title: "Wind-down (Uyku hazırlık)",
+      icon: "🌙",
+      emptyText: "Wind-down kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderCycle(date) {
+    var day = getDay(date) || {};
+    var cyc = getCycleInfo(day);
+    if (!cyc.flow && !cyc.symptoms.length) return "";
+
+    var chips = [];
+    if (cyc.flow) chips.push(renderChip("🩸 Akış: " + escapeHtml(cyc.flow), false));
+    if (cyc.symptoms.length) chips.push(renderChip("🩺 Semptom: " + cyc.symptoms.length, false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (cyc.flow) {
+      html += DetailBlock({ icon: "🩸", title: "Adet akışı", body: escapeHtml(cyc.flow) });
+    }
+    if (cyc.symptoms.length) {
+      html += DetailBlock({ icon: "🩺", title: "Semptomlar", body: cyc.symptoms.map(function(s) { return "• " + escapeHtml(String(s)); }).join("<br>") });
+    }
+
+    return DetailSection({
+      id: "cycle",
+      title: "Döngü & Semptomlar",
+      icon: "🩸",
+      emptyText: "Döngü kaydı yok.",
+      children: html
+    });
+  }
+
+  function renderNutri(date) {
+    var day = getDay(date) || {};
+    var nutri = getNutri(day);
+    if (!nutri) return "";
+
+    var chips = [];
+    if (nutri.calories) chips.push(renderChip("🔥 " + nutri.calories + " kcal", false));
+    if (nutri.protein) chips.push(renderChip("🥩 Protein: " + nutri.protein + "g", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    var body = "";
+    if (nutri.calories) body += "🔥 Kalori: " + nutri.calories + " kcal<br>";
+    if (nutri.protein) body += "🥩 Protein: " + nutri.protein + "g<br>";
+    if (nutri.carbs) body += "🍚 Karbonhidrat: " + nutri.carbs + "g<br>";
+    if (nutri.fat) body += "🧈 Yağ: " + nutri.fat + "g<br>";
+    if (nutri.items) body += "📦 Öğün sayısı: " + nutri.items;
+    html += DetailBlock({ icon: "📊", title: "Makro besin özeti", body: body });
+
+    return DetailSection({
+      id: "nutri",
+      title: "Besin değerleri",
+      icon: "📊",
+      emptyText: "Makro besin kaydı yok.",
+      children: html
+    });
+  }
+
   function renderMovement(date) {
     var day = getDay(date) || {};
     var steps = getSteps(day);
     var m = getMovement(day);
     var loc = day.location || {};
     var dis = getDiscomfort(day);
+    var disDetail = getDiscomfortDetail(day);
     var chips = [];
     if (steps !== null && steps > 0) chips.push(renderChip("👟 Adım: " + steps.toLocaleString("tr-TR"), false));
     if (m.walkM > 0) chips.push(renderChip("🚶 Yürüyüş: " + m.walkM + " m", false));
     if (m.vehicleM > 0) chips.push(renderChip("🚗 Araç: " + m.vehicleM + " m", false));
     if (m.totalM > 0) chips.push(renderChip("📍 Toplam: " + m.totalM + " m", false));
-    if (safeNumber(dis.regions) ? Object.keys(dis.regions).length : 0) chips.push(renderChip("🩹 Rahatsızlık", false));
+    if (disDetail.totalRegions > 0) chips.push(renderChip("🩹 Rahatsızlık: " + disDetail.totalRegions + " bölge", false));
     var segs = Array.isArray(loc.segments) ? loc.segments : [];
     var cats = [];
     segs.forEach(function(seg) { if (seg && seg.category && cats.indexOf(seg.category) === -1) cats.push(seg.category); });
@@ -1140,12 +1518,14 @@
       html += DetailBlock({ icon: "🛣", title: "Hareket", body: movBody });
     }
 
-    var regionCount = isObject(dis.regions) ? Object.keys(dis.regions).length : 0;
-    if (regionCount || dis.note || (dis.meds && dis.meds.length)) {
-      var regBody = regionCount ? Object.keys(dis.regions).map(function(k){ return "• " + escapeHtml(k); }).join("<br>") : "";
+    if (disDetail.totalRegions > 0 || dis.note || (dis.meds && dis.meds.length)) {
+      var regBody = disDetail.regions.map(function(r) {
+        var levelStr = ["○", "●", "●●", "●●●"][r.level] || "●";
+        return "• " + escapeHtml(r.id) + " " + levelStr;
+      }).join("<br>");
       if (dis.note) regBody += (regBody ? "<br>" : "") + "Not: " + escapeHtml(dis.note);
       if (dis.meds && dis.meds.length) regBody += (regBody ? "<br>" : "") + "İlaç: " + dis.meds.map(function(med){ return escapeHtml(String(med)); }).join(", ");
-      html += DetailBlock({ icon: "🩹", title: "Rahatsızlık & İlaç", body: regBody });
+      html += DetailBlock({ icon: "🩹", title: "Rahatsızlık & İlaç (" + disDetail.totalRegions + " bölge)", body: regBody });
     }
 
     if (cats.length) {
@@ -1157,6 +1537,151 @@
       title: "Hareket, Rahatsızlık & Konum",
       icon: "👟",
       emptyText: "Hareket ve konum özeti yok.",
+      children: html
+    });
+  }
+
+  function renderLocationTimeline(date) {
+    var locInfo = getLocationInfo();
+    if (!locInfo || !locInfo.historyCount) return "";
+
+    // Gün bazında konum geçmişini filtrele
+    var dayHistory = [];
+    if (date) {
+      var dateStart = date + "T00:00:00Z";
+      var dateEnd = date + "T23:59:59Z";
+      locInfo.history.forEach(function(h) {
+        if (h && h.ts && h.ts >= dateStart && h.ts <= dateEnd) {
+          dayHistory.push(h);
+        }
+      });
+    }
+
+    var chips = [];
+    chips.push(renderChip("📍 Konum: " + (locInfo.enabled ? "Açık" : "Kapalı"), false));
+    chips.push(renderChip("📡 Mod: " + locInfo.mode, false));
+    if (locInfo.historyCount) chips.push(renderChip("🗺 " + locInfo.historyCount + " kayıt", false));
+    if (dayHistory.length) chips.push(renderChip("⏱ Bugün " + dayHistory.length + " güncelleme", false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    // Konum ayar değişiklikleri
+    if (locInfo.enabledAt) {
+      html += DetailBlock({ icon: "🔛", title: "Konum açılma zamanı", body: formatTs(locInfo.enabledAt) + (locInfo.enabledReason ? "<br>Neden: " + escapeHtml(locInfo.enabledReason) : "") });
+    }
+    if (locInfo.disabledAt) {
+      html += DetailBlock({ icon: "🔒", title: "Konum kapanma zamanı", body: formatTs(locInfo.disabledAt) + (locInfo.disabledReason ? "<br>Neden: " + escapeHtml(locInfo.disabledReason) : "") });
+    }
+
+    // Son konum
+    if (locInfo.current && locInfo.current.ts) {
+      var cur = locInfo.current;
+      var curBody = "Enlem: " + (typeof cur.lat === 'number' ? cur.lat.toFixed(4) : "—") + "<br>" +
+                    "Boylam: " + (typeof cur.lng === 'number' ? cur.lng.toFixed(4) : "—") + "<br>" +
+                    "Doğruluk: " + (cur.acc ? cur.acc + " m" : "—") + "<br>" +
+                    "Son güncelleme: " + formatTs(cur.ts);
+      html += DetailBlock({ icon: "📍", title: "Anlık konum", body: curBody });
+    }
+
+    // Günlük konum geçmişi zaman çizelgesi
+    if (dayHistory.length) {
+      var timelineBody = dayHistory.map(function(h, i) {
+        var timeStr = h.ts ? formatTs(h.ts) : "—";
+        var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
+        var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
+        var accStr = h.acc ? h.acc + "m" : "—";
+        return '<div class="timeline-row">' +
+               '<span class="timeline-row__dot"></span>' +
+               '<div class="timeline-row__body">' +
+               '<div class="timeline-row__time">' + escapeHtml(timeStr) + '</div>' +
+               '<div class="timeline-row__detail">' + escapeHtml(latStr + ", " + lngStr) + " · " + escapeHtml(accStr) + "</div>" +
+               "</div></div>";
+      }).join("");
+      html += DetailBlock({ icon: "🕐", title: "Günlük konum zaman çizelgesi (" + dayHistory.length + ")", body: timelineBody });
+    }
+
+    // Tüm konum geçmişi (son 10)
+    if (!date && locInfo.history.length) {
+      var recent = locInfo.history.slice(-10).reverse();
+      var recentBody = recent.map(function(h) {
+        var timeStr = h.ts ? formatTs(h.ts) : "—";
+        var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
+        var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
+        return '<div class="timeline-row">' +
+               '<span class="timeline-row__dot"></span>' +
+               '<div class="timeline-row__body">' +
+               '<div class="timeline-row__time">' + escapeHtml(timeStr) + '</div>' +
+               '<div class="timeline-row__detail">' + escapeHtml(latStr + ", " + lngStr) + "</div>" +
+               "</div></div>";
+      }).join("");
+      html += DetailBlock({ icon: "🗺", title: "Son 10 konum güncellemesi", body: recentBody });
+    }
+
+    return DetailSection({
+      id: "location-timeline",
+      title: "Konum & Zaman Çizelgesi",
+      icon: "📍",
+      emptyText: "Konum geçmişi yok.",
+      children: html
+    });
+  }
+
+  function renderAppSessionInfo() {
+    var session = getAppSessionInfo();
+    if (!session) return "";
+
+    var chips = [];
+    chips.push(renderChip("📅 " + session.dayCount + " gün", false));
+    if (session.startDate) chips.push(renderChip("🚀 " + formatDateLabel(session.startDate), false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    if (session.startDate) {
+      html += DetailBlock({ icon: "🚀", title: "Uygulama başlangıç", body: formatDateLabel(session.startDate) });
+    }
+    if (session.lastOpenedDate) {
+      html += DetailBlock({ icon: "📂", title: "Son açılış tarihi", body: formatDateLabel(session.lastOpenedDate) });
+    }
+    if (session.lastOpenedAt) {
+      html += DetailBlock({ icon: "🕐", title: "Son açılış zamanı", body: formatTs(session.lastOpenedAt) });
+    }
+    if (session.savedAt) {
+      html += DetailBlock({ icon: "💾", title: "Son kayıt zamanı", body: formatTs(session.savedAt) });
+    }
+
+    return DetailSection({
+      id: "app-session",
+      title: "Uygulama Oturumu",
+      icon: "📱",
+      emptyText: "Oturum bilgisi yok.",
+      children: html
+    });
+  }
+
+  function renderDayTimestamps(date) {
+    var day = getDay(date);
+    if (!day) return "";
+
+    var savedAt = getDaySavedAt(date);
+    if (!savedAt) return "";
+
+    var chips = [];
+    chips.push(renderChip("💾 Kayıt: " + formatTs(savedAt), false));
+
+    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+
+    html += DetailBlock({ icon: "💾", title: "Gün kaydı oluşturulma", body: formatTs(savedAt) });
+
+    // Günlük journal varsa onun da kayıt zamanı
+    if (day.journal && day.journal.savedAt) {
+      html += DetailBlock({ icon: "📝", title: "Günlük kayıt zamanı", body: formatTs(day.journal.savedAt) + (day.journal.mode ? " · Mod: " + day.journal.mode : "") });
+    }
+
+    return DetailSection({
+      id: "day-timestamps",
+      title: "Kayıt Zamanları",
+      icon: "⏱",
+      emptyText: "Zaman bilgisi yok.",
       children: html
     });
   }
@@ -1254,10 +1779,19 @@
     return '<div class="day-view ae-fade-in">' +
            renderDayDatePicker(date) +
            renderDayHeatmap(date) +
+           (day ? renderDayTimestamps(date) : "") +
            (day ? renderMoodTherapy(date) : "") +
+           (day ? renderEnergyStress(date) : "") +
+           (day ? renderHabits(date) : "") +
+           (day ? renderCraving(date) : "") +
            (day ? renderNutrition(date) : "") +
+           (day ? renderNutri(date) : "") +
+           (day ? renderMagnesium(date) : "") +
            (day ? renderPrayer(date) : "") +
+           (day ? renderWindDown(date) : "") +
+           (day ? renderCycle(date) : "") +
            (day ? renderMovement(date) : "") +
+           (day ? renderLocationTimeline(date) : "") +
            (day ? renderContent(date) : "") +
            emptyDay +
            "</div>";
@@ -1372,6 +1906,7 @@
       : "";
     return '<div class="status-detail ae-fade-in">' +
            AeCard({ className: "status-card", children: body }) +
+           renderAppSessionInfo() +
            errorBox +
            "</div>";
   }
@@ -1970,6 +2505,22 @@
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,
-    init: init
+    init: init,
+    // Helper exports for testing
+    getEnergy: getEnergy,
+    getStress: getStress,
+    getHabitSummary: getHabitSummary,
+    getCravingDetails: getCravingDetails,
+    getMagnesium: getMagnesium,
+    getWindDown: getWindDown,
+    getSleepMed: getSleepMed,
+    getCycleInfo: getCycleInfo,
+    getDiscomfortDetail: getDiscomfortDetail,
+    getNutri: getNutri,
+    HABIT_LABELS: HABIT_LABELS,
+    HABIT_ICONS: HABIT_ICONS,
+    getLocationInfo: getLocationInfo,
+    getAppSessionInfo: getAppSessionInfo,
+    getDaySavedAt: getDaySavedAt
   };
 })(typeof window !== "undefined" ? window : this);

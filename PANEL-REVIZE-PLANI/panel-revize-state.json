@@ -120,8 +120,16 @@
       "summary": "Faz 9.1 — Çift panel stratejisiyle cache-bump; eski panel korundu, panel-v2 ayrı URL'de canlı",
       "command": "node --check panel-v2.js && node tests/test_panel_v2_*.js",
       "files": ["index.html", "panel-v2.html", "panel-revize-state.json"]
+    },
+    {
+      "recordedAt": "2026-08-04T10:00:00Z",
+      "taskId": "9.1-fix",
+      "kind": "fix",
+      "summary": "Token girdikten sonra hiçbir şey olmama hatası düzeltildi: panel-v2.js gerçek GitHub fetch/localStorage token kullanmaya başladı, fixture'lar async uyumlu hale getirildi, cache-bump 2026080403 yapıldı.",
+      "command": "node --check panel-v2.js && node tests/test_panel_v2_*.js && node .claude/skills/run-seyma/driver.mjs && node .claude/skills/run-seyma/zikr-harness.mjs",
+      "files": ["panel-v2.js", "panel-v2.css", "panel-v2.html", "tests/helpers/panel-v2-test-helper.js", "tests/test_panel_v2_tabs.js"]
     }
   ],
   "nextTaskId": null,
-  "notes": "PANEL-REVIZE tamamlandı. Eski panel (panel.html/panel.js/panel.css) yayında korunuyor; yeni panel (panel-v2.html/panel-v2.js/panel-v2.css) ayrı URL'de canlı. Cache-bump 2026080402 yapıldı. Tüm Faz 0-9 tamamlandı."
+  "notes": "PANEL-REVIZE tamamlandı. Eski panel (panel.html/panel.js/panel.css) yayında korunuyor; yeni panel (panel-v2.html/panel-v2.js/panel-v2.css) ayrı URL'de canlı. Cache-bump 2026080403 yapıldı. Tüm Faz 0-9 tamamlandı. Son fix: token/fetch async retrofit."
 }

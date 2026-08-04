@@ -3,16 +3,33 @@
 > **Amaç:** PANEL-V2-PREMIUM-TASARIM klasöründeki tüm planları 40 adımda, sıralı ve bağımsız prompt'lar halinde uygulamak.
 > Her prompt tek bir oturumda tamamlanabilir. Her adımda mevcut testlerin geçtiği doğrulanmalıdır.
 > **Tarih:** 2026-08-04
-> **Commit:** `392a6b3`
+> **Commit:** `704da96`
+
+---
+
+## 🧠 Anti-Amnesia Protokolü
+
+Her prompt'a başlamadan önce:
+
+1. **Önce `LEDGER.md` okunur** — `PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/LEDGER.md`
+2. **Sonra `AGENT-CONTEXT.md` okunur** — bağımsız ajanlar için minimum bağlam
+3. **Sonra `TOKEN-BUDGET.md` kontrol edilir** — context yönetimi kuralları
+4. **Prompt tamamlandığında:**
+   - `LEDGER.md` güncellenir (`✅ TAMAMLANDI`, `currentStep` ilerletilir)
+   - `HANDOFF-TEMPLATE.md` kullanılarak `.anti-amnesia/handoff-PROMPT-XX.md` oluşturulur
+   - Context >%70 ise `/compact` veya yeni oturum önerilir
+
+Bu protokol sayesinde oturum veya ajan değişikliğinde yapı kaybolmadan devam eder.
 
 ---
 
 ## Nasıl Kullanılır
 
-1. Her prompt'u sırayla bir AI agent'ına verin
-2. Agent prompt'u uygular, testleri çalıştırır, commit yapar
-3. Bir sonraki prompt'a geçmeden önce tüm testlerin geçtiğini doğrulayın
-4. Her 5 adımda bir `git push origin main` yapın
+1. `LEDGER.md`'deki `currentStep` değerine bakın
+2. İlgili Prompt bölümünü okuyun
+3. Kod değişikliğini yapın, testleri çalıştırın, commit atın
+4. `LEDGER.md`'yi ve handoff dosyasını güncelleyin
+5. Her 5 adımda bir `git push origin main` yapın
 
 ---
 
@@ -34,6 +51,15 @@
 - [ ] Yeni gölge token'larını ekle: `--ae-shadow-sm`, `--ae-shadow-md`, `--ae-shadow-lg`, `--ae-shadow-xl`, `--ae-shadow-glow`
 - [ ] Yeni spacing token'larını ekle: `--ae-space-2xs: 2px`, `--ae-space-2xl: 32px`, `--ae-space-3xl: 48px`
 - [ ] Yeni radius token'larını ekle: `--ae-radius-xs: 6px`, `--ae-radius-xl: 28px`, `--ae-radius-full: 9999px`
+
+### Ledger, Context & Handoff — Prompt 1
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 1 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 1 için `02`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-01.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm mevcut testleri çalıştır: `for f in tests/test_panel_v2_*.js; do node "$f"; done`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 2.1, 2.3, 2.4, 2.5
@@ -50,6 +76,15 @@
 - [ ] Font scale token'larını ekle: `--ae-scale-xs: 10px`, `--ae-scale-sm: 12px`, `--ae-scale-md: 14px`, `--ae-scale-lg: 18px`, `--ae-scale-xl: 24px`, `--ae-scale-2xl: 32px`, `--ae-scale-3xl: 42px`
 - [ ] Tüm mevcut font-size değerlerini yeni scale token'larına dönüştür
 - [ ] Mono font'u koordinat/sayı gösterimlerinde kullan (`--ae-mono`)
+
+### Ledger, Context & Handoff — Prompt 2
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 2 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 2 için `03`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-02.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_css.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 2.2
@@ -68,6 +103,15 @@
 - [ ] `.ae-card--outline` varyantı (sadece border, inline detaylar)
 - [ ] Hover efektlerini güncelle: `translateY(-4px)`, glow artışı
 - [ ] Tüm mevcut kart kullanımlarını yeni varyantlara güncelle
+
+### Ledger, Context & Handoff — Prompt 3
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 3 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 3 için `04`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-03.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_skeleton.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3.1, `02-TASARIM-REFERANSI.md` bölüm 1
@@ -87,6 +131,15 @@
 - [ ] `.ae-status--ok .ae-status__dot`'a yeşil glow ekle: `box-shadow: 0 0 8px var(--ae-ok)`
 - [ ] `.ae-status--drop .ae-status__dot`'a kırmızı pulse animasyonu ekle
 - [ ] Tüm buton kullanımlarını güncelle
+
+### Ledger, Context & Handoff — Prompt 4
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 4 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 4 için `05`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-04.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_tabs.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3.1
@@ -106,6 +159,15 @@
 - [ ] Staggered giriş CSS'ini ekle: `.ae-stagger > .ae-card:nth-child(n)` gecikmeleri
 - [ ] Tüm `ae-fade-in` kullanımlarını uygun animasyonlarla değiştir
 - [ ] `prefers-reduced-motion` desteğini koru
+
+### Ledger, Context & Handoff — Prompt 5
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 5 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 5 için `06`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-05.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_css.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 4, `02-TASARIM-REFERANSI.md` bölüm 6
@@ -123,6 +185,15 @@
 - [ ] `.ae-tooltip` CSS sınıfını oluştur (glass efektli, ok işaretli)
 - [ ] JS'de `AeTooltip(opts)` fonksiyonunu oluştur
 - [ ] Veri yüklenirken skeleton göster, yüklendiğinde gerçek içerik
+
+### Ledger, Context & Handoff — Prompt 6
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 6 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 6 için `07`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-06.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_skeleton.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3.2, `02-TASARIM-REFERANSI.md` bölüm 5
@@ -144,6 +215,15 @@
 - [ ] JS'de `AeProgressRing(opts)` fonksiyonunu oluştur (yüzde değeri, renk)
 - [ ] `renderHeroGrid()` fonksiyonunu güncelle: HeroCard → AeMetric + AeProgressRing
 - [ ] Her metrik kartına mini sparkline ve delta oku ekle
+
+### Ledger, Context & Handoff — Prompt 7
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 7 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 7 için `08`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-07.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_today.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3.2, `02-TASARIM-REFERANSI.md` bölüm 3, 8
@@ -160,6 +240,15 @@
 - [ ] Fonksiyon: `[1,3,2,5,4,6,3]` → SVG path + area fill + dots
 - [ ] `renderTrendStrip()` fonksiyonunu güncelle: bar → sparkline
 - [ ] Her metrik için farklı renk: mood=accent, sleep=info, steps=info, water=ok
+
+### Ledger, Context & Handoff — Prompt 8
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 8 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 8 için `09`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-08.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_today.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.1, `02-TASARIM-REFERANSI.md` bölüm 2
@@ -178,6 +267,15 @@
 - [ ] `.ae-toast--success`, `.ae-toast--error`, `.ae-toast--info` varyantları
 - [ ] JS'de `AeToast(opts)` ve `AeV2.showToast(message, type)` fonksiyonlarını oluştur
 - [ ] Gün Detayı sayfasında bölümler arasına AeDivider ekle
+
+### Ledger, Context & Handoff — Prompt 9
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 9 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 9 için `10`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-09.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_day_detail.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3.2, `02-TASARIM-REFERANSI.md` bölüm 4
@@ -193,6 +291,15 @@
 - [ ] Bölüm başlıklarını AeDivider--label olarak düzenle
 - [ ] Bölüm sırasını optimize et: Zamanlar → Ruh Hali → Alışkanlıklar → Beslenme → İbadet → Hareket → Konum → Döngü
 - [ ] Her bölümün boş durum mesajlarını güncelle
+
+### Ledger, Context & Handoff — Prompt 10
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 10 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 10 için `11`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-10.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_day_detail.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.3
@@ -210,6 +317,15 @@
 - [ ] `SummaryCard()` fonksiyonunu AeMetric ile değiştir
 - [ ] `AnomalyCard()` stillerini güncelle (glow, left border)
 - [ ] `DetailSection()` ve `DetailBlock()` stillerini güncelle
+
+### Ledger, Context & Handoff — Prompt 11
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 11 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 11 için `12`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-11.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm testleri çalıştır: `for f in tests/test_panel_v2_*.js; do node "$f"; done`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 3
@@ -227,6 +343,15 @@
 - [ ] Trend strip değerlerine count-up ekle
 - [ ] Sayfa değiştiğinde count-up'ları yeniden tetikle
 - [ ] `prefers-reduced-motion`'da animasyonu atla
+
+### Ledger, Context & Handoff — Prompt 12
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 12 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 12 için `13`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-12.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_today.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 4.1, `02-TASARIM-REFERANSI.md` bölüm 7
@@ -247,6 +372,15 @@
 - [ ] Sparkline: area fill + line + son nokta vurgusu
 - [ ] Responsive: sparkline viewBox ile ölçeklenebilir
 - [ ] Boş veri durumunda düz çizgi göster
+
+### Ledger, Context & Handoff — Prompt 13
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 13 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 13 için `14`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-13.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_today.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.1, `02-TASARIM-REFERANSI.md` bölüm 9
@@ -262,6 +396,15 @@
 - [ ] Her SummaryCard'a mini sparkline SVG ekle
 - [ ] Sparkline rengini metrik türüne göre ayarla
 - [ ] 7/14/30 günlük veriyi sparkline'da göster
+
+### Ledger, Context & Handoff — Prompt 14
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 14 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 14 için `15`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-14.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_trends.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.2
@@ -279,6 +422,15 @@
 - [ ] Y ekseni: 1-5 mood seviyesi
 - [ ] Tooltip: hover'da gün ve değer göster
 - [ ] Responsive: viewBox ile ölçeklenebilir
+
+### Ledger, Context & Handoff — Prompt 15
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 15 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 15 için `16`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-15.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_trends.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.1, `02-TASARIM-REFERANSI.md` bölüm 9
@@ -295,6 +447,15 @@
 - [ ] Adım chart'ı (info rengi, 0-12000 aralığı)
 - [ ] Su chart'ı (ok rengi, 0-12 bardak aralığı)
 - [ ] Hedef çizgisi ekle (kesikli çizgi)
+
+### Ledger, Context & Handoff — Prompt 16
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 16 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 16 için `17`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-16.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_trends.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.1
@@ -311,6 +472,15 @@
 - [ ] Boş günleri farklı desenle göster (noktalı/noktasız)
 - [ ] Bugün hücresini vurgula
 - [ ] Responsive: 7 sütun → 5 sütun (küçük ekran)
+
+### Ledger, Context & Handoff — Prompt 17
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 17 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 17 için `18`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-17.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_day_detail.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 5.4
@@ -332,6 +502,15 @@
 - [ ] Quick notes: AeCard--glass içinde
 - [ ] Location: AeCard--glass içinde harita + timeline
 - [ ] Staggered giriş animasyonu ekle
+
+### Ledger, Context & Handoff — Prompt 18
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 18 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 18 için `19`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-18.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_today.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.1
@@ -350,6 +529,15 @@
 - [ ] Area chart'lar (uyku/adım/su)
 - [ ] Anomali kartları: AeCard--gradient ile vurgula
 - [ ] Staggered giriş animasyonu
+
+### Ledger, Context & Handoff — Prompt 19
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 19 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 19 için `20`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-19.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_trends.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.2
@@ -367,6 +555,15 @@
 - [ ] Bölüm sırası: Zamanlar → Ruh Hali → Alışkanlıklar → Beslenme → İbadet → Hareket → Konum → Döngü
 - [ ] Her bölümde chip'leri üstte göster
 - [ ] Staggered giriş animasyonu
+
+### Ledger, Context & Handoff — Prompt 20
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 20 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 20 için `21`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-20.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_day_detail.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.3
@@ -382,6 +579,15 @@
 - [ ] Filtreleme: durum (okunuyor/bitti/bırakıldı), tür, tarih aralığı
 - [ ] Grid/görünüm seçeneği (liste / ızgara)
 - [ ] Arama sonucu yoksa AeEmpty göster
+
+### Ledger, Context & Handoff — Prompt 21
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 21 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 21 için `22`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-21.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_archives.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.4
@@ -398,6 +604,15 @@
 - [ ] Mesajlar sekmesine bildirim animasyonu ekle
 - [ ] Tüm kartları AeCard--glass yap
 - [ ] Staggered giriş animasyonu
+
+### Ledger, Context & Handoff — Prompt 22
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 22 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 22 için `23`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-22.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_system.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 6.5
@@ -414,6 +629,15 @@
 - [ ] Tab değişiminde eski içerik fade-out, yeni içerik fade-in
 - [ ] Kartlar sırayla görünür (0ms, 80ms, 160ms, ...)
 - [ ] `prefers-reduced-motion` desteği
+
+### Ledger, Context & Handoff — Prompt 23
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 23 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 23 için `24`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-23.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm testleri çalıştır
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 4.2, `02-TASARIM-REFERANSI.md` bölüm 6
@@ -434,6 +658,15 @@
 - [ ] Safe area padding ekle (`env(safe-area-inset-bottom)`)
 - [ ] `.ae-app__body`'ye bottom padding ekle (tab bar yüksekliği kadar)
 - [ ] Top tab bar'ı mobilde gizle
+
+### Ledger, Context & Handoff — Prompt 24
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 24 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 24 için `25`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-24.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_css.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 7.2, `02-TASARIM-REFERANSI.md` bölüm 10
@@ -450,6 +683,15 @@
 - [ ] Sola kaydırma → sonraki gün, sağa kaydırma → önceki gün
 - [ ] Sadece Gün Detayı sayfasında aktif et
 - [ ] Çakışma önleme (dikey scroll ile karışmasın)
+
+### Ledger, Context & Handoff — Prompt 25
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 25 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 25 için `26`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-25.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: manuel tarayıcı testi
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 7.2
@@ -465,6 +707,15 @@
 - [ ] Touch event'leri ile entegre et
 - [ ] 60px eşik değeri
 - [ ] Sadece mobilde aktif et
+
+### Ledger, Context & Handoff — Prompt 26
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 26 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 26 için `27`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-26.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: manuel tarayıcı testi
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 7.2
@@ -480,6 +731,15 @@
 - [ ] Tab öğelerinin min-height: 44px olduğunu kontrol et
 - [ ] Chip'lerin min-height: 32px olduğunu kontrol et
 - [ ] Tüm breakpoint'lerde test et (375px, 414px, 460px, 768px)
+
+### Ledger, Context & Handoff — Prompt 27
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 27 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 27 için `28`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-27.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_css.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 7.2
@@ -502,6 +762,15 @@
 - [ ] GitHub API rate limit header'larını oku (`x-ratelimit-remaining`)
 - [ ] Token varken polling başlat, token yokken durdur
 - [ ] Veri tazelik göstergesi: "X dk önce" (syncStatus.lastSyncedAt vs Date.now())
+
+### Ledger, Context & Handoff — Prompt 28
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 28 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 28 için `29`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-28.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_tabs.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 3.1, 5A
@@ -521,6 +790,15 @@
 - [ ] Her olay: saat + icon + bölüm + işlem + revizyon
 - [ ] Olay detay drawer'ı: eventId, correlationId, sequence, path, revision, kaynak, gizlilik
 - [ ] `panelCoverageManifest.js`'deki `normalizeEvent` ve `parseEventLog`'u kullan
+
+### Ledger, Context & Handoff — Prompt 29
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 29 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 29 için `30`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-29.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_p2_event_log.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 3.2, 4.3, 5B
@@ -537,6 +815,15 @@
 - [ ] API durumu kartı: kalan limit, sıfırlanma zamanı, token durumu
 - [ ] Hata geçmişi listesi (son 10 hata)
 - [ ] `renderStatusDetail()` fonksiyonunu güncelle
+
+### Ledger, Context & Handoff — Prompt 30
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 30 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 30 için `31`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-30.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_system.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 3.3, 4.2, 5C
@@ -554,6 +841,15 @@
 - [ ] Okunma/iletilme durumu göstergeleri (dot renkleri)
 - [ ] Mesaj gönderme arayüzü (observer-inbox.json'a yazma)
 - [ ] `renderMessages()` fonksiyonunu güncelle
+
+### Ledger, Context & Handoff — Prompt 31
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 31 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 31 için `32`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-31.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_system.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 3.4, 4.5, 5D
@@ -570,6 +866,15 @@
 - [ ] Detaylı rapor: hangi sequence'lerde sorun var
 - [ ] Revizyon geçmişi listesi (son 20 revizyon, snapshotRevision'dan)
 - [ ] `renderAuditDetail()` fonksiyonunu güncelle
+
+### Ledger, Context & Handoff — Prompt 32
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 32 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 32 için `33`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-32.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_p2_event_log.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 3.5, 4.4, 5E
@@ -586,6 +891,15 @@
 - [ ] Tanı araçları: [Test Bağlantısı] [Veri Doğrulama] [Önbellek Temizle] [Zorla Senkron]
 - [ ] Hakkında bölümü: sürüm, tarih, commit hash
 - [ ] `renderSettings()` fonksiyonunu güncelle
+
+### Ledger, Context & Handoff — Prompt 33
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 33 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 33 için `34`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-33.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_system.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 4.6, 5F
@@ -601,6 +915,15 @@
 - [ ] `renderSystem()` fonksiyonunu güncelle
 - [ ] Her sub-tab için render fonksiyonlarını bağla
 - [ ] Sub-tab geçişlerinde animasyon ekle
+
+### Ledger, Context & Handoff — Prompt 34
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 34 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 34 için `35`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-34.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm testleri çalıştır
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 4.1
@@ -617,6 +940,15 @@
 - [ ] API rate limit okuma testi
 - [ ] Veri tazelik hesaplama testi
 - [ ] 304 yanıtında render tetiklenmeme testi
+
+### Ledger, Context & Handoff — Prompt 35
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 35 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 35 için `36`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-35.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm testleri çalıştır
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/03-BILGI-AKISI-KONTROL-TAKIP.md` bölüm 6
@@ -636,6 +968,15 @@
 - [ ] Düşük kontrastlı alanları tespit et ve düzelt
 - [ ] Özellikle: `--ae-faint` ve `--ae-muted` değerlerini kontrol et
 - [ ] Koyu ve aydınlık tema için ayrı ayrı doğrula
+
+### Ledger, Context & Handoff — Prompt 36
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 36 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 36 için `37`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-36.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_css.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 8.2
@@ -652,6 +993,15 @@
 - [ ] Focus order'ın mantıksal olduğunu doğrula
 - [ ] Tab geçişlerinde focus yönetimi ekle
 - [ ] Modal/overlay açıldığında focus trap ekle
+
+### Ledger, Context & Handoff — Prompt 37
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 37 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 37 için `38`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-37.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: manuel klavye testi
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 8.2
@@ -668,6 +1018,15 @@
 - [ ] Leaflet harita lazy loading (sadece konum verisi varsa yükle)
 - [ ] Arşiv verileri lazy loading (sayfa değiştikçe yükle)
 - [ ] Debounce/throttle: scroll ve resize olayları
+
+### Ledger, Context & Handoff — Prompt 38
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 38 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 38 için `39`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-38.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Test: `node tests/test_panel_v2_skeleton.js`
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/00-PLAN.md` bölüm 8.1
@@ -691,6 +1050,15 @@
 - [ ] AeToast testi: göster/kapat, otomatik kapanma
 - [ ] Polling testi: başlat/durdur, p50/p95
 - [ ] Event log testi: filtreleme, sayfalama, detay drawer'ı
+
+### Ledger, Context & Handoff — Prompt 39
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 39 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini bir ileri taşı (Prompt 39 için `40`).
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-39.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Eğer başka bir ajan devralacaksa, son handoff dosyasının yolunu vurgula.
 - [ ] Tüm testleri çalıştır
 
 **Referans:** `PANEL-V2-PREMIUM-TASARIM/01-GOREV-LISTESI.md` Faz 6
@@ -710,6 +1078,15 @@
 - [ ] Push: `git push origin main`
 - [ ] GitHub Pages deploy'ını kontrol et (1-2 dk)
 - [ ] Canlıda test et: `https://mustafaras.github.io/s/panel-v2.html`
+
+### Ledger, Context & Handoff — Prompt 40
+
+- [ ] Bu prompt tamamlandığında `LEDGER.md`'de Prompt 40 satırını `✅ TAMAMLANDI` olarak güncelle.
+- [ ] `currentStep` değerini `41` (tüm promptlar tamamlandı) olarak güncelle.
+- [ ] Bitiş commit hash'ini, test sonuçlarını ve kısa notları `LEDGER.md`'ye yaz.
+- [ ] `HANDOFF-TEMPLATE.md` şablonunu kullanarak `.anti-amnesia/handoff-PROMPT-40.md` oluştur.
+- [ ] Context >%70 ise `/compact` veya yeni oturum öner.
+- [ ] Tüm 40 prompt tamamlandığında `LEDGER.md`'de bir “Proje Tamamlandı” bölümü oluştur.
 
 ---
 

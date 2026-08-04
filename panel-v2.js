@@ -1545,84 +1545,69 @@
     var locInfo = getLocationInfo();
     if (!locInfo || !locInfo.historyCount) return "";
 
-    // Gün bazında konum geçmişini filtrele
     var dayHistory = [];
     if (date) {
       var dateStart = date + "T00:00:00Z";
       var dateEnd = date + "T23:59:59Z";
       locInfo.history.forEach(function(h) {
-        if (h && h.ts && h.ts >= dateStart && h.ts <= dateEnd) {
-          dayHistory.push(h);
-        }
+        if (h && h.ts && h.ts >= dateStart && h.ts <= dateEnd) dayHistory.push(h);
       });
     }
 
-    var chips = [];
-    chips.push(renderChip("📍 Konum: " + (locInfo.enabled ? "Açık" : "Kapalı"), false));
-    chips.push(renderChip("📡 Mod: " + locInfo.mode, false));
-    if (locInfo.historyCount) chips.push(renderChip("🗺 " + locInfo.historyCount + " kayıt", false));
-    if (dayHistory.length) chips.push(renderChip("⏱ Bugün " + dayHistory.length + " güncelleme", false));
+    var mapId = "ae-map-" + (date || "all");
+    var mapData = date && dayHistory.length ? dayHistory : locInfo.history.slice(-10);
+    var mapDataJson = escapeHtml(JSON.stringify(mapData));
 
-    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
+    // Kompakt üst bilgi
+    var infoHtml = '<div class="loc-info">' +
+      '<span class="loc-info__item">📍 ' + (locInfo.enabled ? "Açık" : "Kapalı") + '</span>' +
+      '<span class="loc-info__item">📡 ' + locInfo.mode + '</span>' +
+      '<span class="loc-info__item">🗺 ' + locInfo.historyCount + ' kayıt</span>' +
+      (dayHistory.length ? '<span class="loc-info__item">⏱ ' + dayHistory.length + ' güncelleme</span>' : '') +
+      '</div>';
 
-    // Konum ayar değişiklikleri
+    // Harita konteyneri
+    var mapHtml = '<div class="loc-map-wrap">' +
+      '<div id="' + mapId + '" class="loc-map" data-points=\'' + mapDataJson + '\'></div>' +
+      '</div>';
+
+    // Kompakt zaman çizelgesi (sadece saat farkı + koordinat)
+    var timelineHtml = '';
+    if (dayHistory.length) {
+      var items = dayHistory.map(function(h, i) {
+        var t = h.ts ? new Date(h.ts) : null;
+        var timeStr = t ? t.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' }) : "—";
+        var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
+        var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
+        var accStr = h.acc ? h.acc + "m" : "";
+        return '<div class="loc-dot-row">' +
+          '<span class="loc-dot"></span>' +
+          '<span class="loc-dot__time">' + escapeHtml(timeStr) + '</span>' +
+          '<span class="loc-dot__coord">' + escapeHtml(latStr + ", " + lngStr) + '</span>' +
+          (accStr ? '<span class="loc-dot__acc">' + escapeHtml(accStr) + '</span>' : '') +
+          '</div>';
+      }).join("");
+      timelineHtml = '<div class="loc-timeline-compact">' + items + '</div>';
+    }
+
+    // Ayar değişiklikleri (kompakt)
+    var eventsHtml = '';
     if (locInfo.enabledAt) {
-      html += DetailBlock({ icon: "🔛", title: "Konum açılma zamanı", body: formatTs(locInfo.enabledAt) + (locInfo.enabledReason ? "<br>Neden: " + escapeHtml(locInfo.enabledReason) : "") });
+      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">🔛</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.enabledAt)) + (locInfo.enabledReason ? ' · ' + escapeHtml(locInfo.enabledReason) : '') + '</span></div>';
     }
     if (locInfo.disabledAt) {
-      html += DetailBlock({ icon: "🔒", title: "Konum kapanma zamanı", body: formatTs(locInfo.disabledAt) + (locInfo.disabledReason ? "<br>Neden: " + escapeHtml(locInfo.disabledReason) : "") });
+      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">🔒</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.disabledAt)) + (locInfo.disabledReason ? ' · ' + escapeHtml(locInfo.disabledReason) : '') + '</span></div>';
     }
 
-    // Son konum
-    if (locInfo.current && locInfo.current.ts) {
-      var cur = locInfo.current;
-      var curBody = "Enlem: " + (typeof cur.lat === 'number' ? cur.lat.toFixed(4) : "—") + "<br>" +
-                    "Boylam: " + (typeof cur.lng === 'number' ? cur.lng.toFixed(4) : "—") + "<br>" +
-                    "Doğruluk: " + (cur.acc ? cur.acc + " m" : "—") + "<br>" +
-                    "Son güncelleme: " + formatTs(cur.ts);
-      html += DetailBlock({ icon: "📍", title: "Anlık konum", body: curBody });
-    }
-
-    // Günlük konum geçmişi zaman çizelgesi
-    if (dayHistory.length) {
-      var timelineBody = dayHistory.map(function(h, i) {
-        var timeStr = h.ts ? formatTs(h.ts) : "—";
-        var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
-        var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
-        var accStr = h.acc ? h.acc + "m" : "—";
-        return '<div class="timeline-row">' +
-               '<span class="timeline-row__dot"></span>' +
-               '<div class="timeline-row__body">' +
-               '<div class="timeline-row__time">' + escapeHtml(timeStr) + '</div>' +
-               '<div class="timeline-row__detail">' + escapeHtml(latStr + ", " + lngStr) + " · " + escapeHtml(accStr) + "</div>" +
-               "</div></div>";
-      }).join("");
-      html += DetailBlock({ icon: "🕐", title: "Günlük konum zaman çizelgesi (" + dayHistory.length + ")", body: timelineBody });
-    }
-
-    // Tüm konum geçmişi (son 10)
-    if (!date && locInfo.history.length) {
-      var recent = locInfo.history.slice(-10).reverse();
-      var recentBody = recent.map(function(h) {
-        var timeStr = h.ts ? formatTs(h.ts) : "—";
-        var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
-        var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
-        return '<div class="timeline-row">' +
-               '<span class="timeline-row__dot"></span>' +
-               '<div class="timeline-row__body">' +
-               '<div class="timeline-row__time">' + escapeHtml(timeStr) + '</div>' +
-               '<div class="timeline-row__detail">' + escapeHtml(latStr + ", " + lngStr) + "</div>" +
-               "</div></div>";
-      }).join("");
-      html += DetailBlock({ icon: "🗺", title: "Son 10 konum güncellemesi", body: recentBody });
-    }
-
-    return DetailSection({
-      id: "location-timeline",
-      title: "Konum & Zaman Çizelgesi",
-      icon: "📍",
-      emptyText: "Konum geçmişi yok.",
-      children: html
+    return AeCard({
+      variant: "summary",
+      children: '<div class="loc-section">' +
+        '<div class="ae-label">📍 Konum & Zaman Çizelgesi</div>' +
+        infoHtml +
+        mapHtml +
+        timelineHtml +
+        (eventsHtml ? '<div class="loc-events">' + eventsHtml + '</div>' : '') +
+        '</div>'
     });
   }
 
@@ -1630,31 +1615,17 @@
     var session = getAppSessionInfo();
     if (!session) return "";
 
-    var chips = [];
-    chips.push(renderChip("📅 " + session.dayCount + " gün", false));
-    if (session.startDate) chips.push(renderChip("🚀 " + formatDateLabel(session.startDate), false));
-
-    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
-
-    if (session.startDate) {
-      html += DetailBlock({ icon: "🚀", title: "Uygulama başlangıç", body: formatDateLabel(session.startDate) });
-    }
-    if (session.lastOpenedDate) {
-      html += DetailBlock({ icon: "📂", title: "Son açılış tarihi", body: formatDateLabel(session.lastOpenedDate) });
-    }
-    if (session.lastOpenedAt) {
-      html += DetailBlock({ icon: "🕐", title: "Son açılış zamanı", body: formatTs(session.lastOpenedAt) });
-    }
-    if (session.savedAt) {
-      html += DetailBlock({ icon: "💾", title: "Son kayıt zamanı", body: formatTs(session.savedAt) });
-    }
-
-    return DetailSection({
-      id: "app-session",
-      title: "Uygulama Oturumu",
-      icon: "📱",
-      emptyText: "Oturum bilgisi yok.",
-      children: html
+    return AeCard({
+      variant: "summary",
+      children: '<div class="sess-section">' +
+        '<div class="ae-label">📱 Uygulama Oturumu</div>' +
+        '<div class="sess-grid">' +
+        (session.startDate ? '<div class="sess-item"><span class="sess-item__label">Başlangıç</span><span class="sess-item__value">' + escapeHtml(formatDateLabel(session.startDate)) + '</span></div>' : '') +
+        (session.lastOpenedDate ? '<div class="sess-item"><span class="sess-item__label">Son açılış</span><span class="sess-item__value">' + escapeHtml(formatDateLabel(session.lastOpenedDate)) + '</span></div>' : '') +
+        (session.lastOpenedAt ? '<div class="sess-item"><span class="sess-item__label">Açılış zamanı</span><span class="sess-item__value">' + escapeHtml(formatTs(session.lastOpenedAt)) + '</span></div>' : '') +
+        (session.savedAt ? '<div class="sess-item"><span class="sess-item__label">Son kayıt</span><span class="sess-item__value">' + escapeHtml(formatTs(session.savedAt)) + '</span></div>' : '') +
+        '<div class="sess-item"><span class="sess-item__label">Toplam gün</span><span class="sess-item__value">' + session.dayCount + '</span></div>' +
+        '</div></div>'
     });
   }
 
@@ -1665,24 +1636,16 @@
     var savedAt = getDaySavedAt(date);
     if (!savedAt) return "";
 
-    var chips = [];
-    chips.push(renderChip("💾 Kayıt: " + formatTs(savedAt), false));
-
-    var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
-
-    html += DetailBlock({ icon: "💾", title: "Gün kaydı oluşturulma", body: formatTs(savedAt) });
-
-    // Günlük journal varsa onun da kayıt zamanı
+    var items = '<div class="sess-item"><span class="sess-item__label">Kayıt</span><span class="sess-item__value">' + escapeHtml(formatTs(savedAt)) + '</span></div>';
     if (day.journal && day.journal.savedAt) {
-      html += DetailBlock({ icon: "📝", title: "Günlük kayıt zamanı", body: formatTs(day.journal.savedAt) + (day.journal.mode ? " · Mod: " + day.journal.mode : "") });
+      items += '<div class="sess-item"><span class="sess-item__label">Günlük</span><span class="sess-item__value">' + escapeHtml(formatTs(day.journal.savedAt)) + (day.journal.mode ? ' · ' + escapeHtml(day.journal.mode) : '') + '</span></div>';
     }
 
-    return DetailSection({
-      id: "day-timestamps",
-      title: "Kayıt Zamanları",
-      icon: "⏱",
-      emptyText: "Zaman bilgisi yok.",
-      children: html
+    return AeCard({
+      variant: "summary",
+      children: '<div class="sess-section">' +
+        '<div class="ae-label">⏱ Kayıt Zamanları</div>' +
+        '<div class="sess-grid">' + items + '</div></div>'
     });
   }
 
@@ -2352,6 +2315,76 @@
       renderTabs() +
       '<main class="ae-app__body">' + renderActiveTab() + "</main>" +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
+
+    // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)
+    setTimeout(initMaps, 50);
+  }
+
+  function initMaps() {
+    if (typeof root.L === "undefined") return;
+    var containers = root.document.querySelectorAll(".loc-map");
+    containers.forEach(function(el) {
+      if (el._leaflet_map) return;
+      var raw = el.getAttribute("data-points");
+      if (!raw) return;
+      var points;
+      try { points = JSON.parse(raw); } catch(e) { return; }
+      if (!Array.isArray(points) || !points.length) return;
+
+      // Ortalama koordinat
+      var latSum = 0, lngSum = 0, count = 0;
+      points.forEach(function(p) {
+        if (typeof p.lat === "number" && typeof p.lng === "number") {
+          latSum += p.lat; lngSum += p.lng; count++;
+        }
+      });
+      if (!count) return;
+      var centerLat = latSum / count, centerLng = lngSum / count;
+
+      var map = root.L.map(el, {
+        center: [centerLat, centerLng],
+        zoom: 14,
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false
+      });
+      root.L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19
+      }).addTo(map);
+
+      // Marker'lar
+      points.forEach(function(p, i) {
+        if (typeof p.lat !== "number" || typeof p.lng !== "number") return;
+        var color = i === points.length - 1 ? "#C9A86C" : "#6E6862";
+        var ts = p.ts ? new Date(p.ts).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : "";
+        var acc = p.acc ? " ±" + p.acc + "m" : "";
+        root.L.circleMarker([p.lat, p.lng], {
+          radius: i === points.length - 1 ? 8 : 5,
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.7,
+          weight: 2
+        }).addTo(map).bindPopup("<strong>" + escapeHtml(ts) + "</strong><br>" +
+          p.lat.toFixed(4) + ", " + p.lng.toFixed(4) + acc);
+      });
+
+      // Fit bounds
+      if (points.length > 1) {
+        var bounds = [];
+        points.forEach(function(p) {
+          if (typeof p.lat === "number" && typeof p.lng === "number")
+            bounds.push([p.lat, p.lng]);
+        });
+        if (bounds.length > 1) map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+      }
+
+      el._leaflet_map = map;
+      // Tıklayınca zoom aç
+      el.addEventListener("click", function() {
+        map.scrollWheelZoom.enable();
+        setTimeout(function() { map.scrollWheelZoom.disable(); }, 5000);
+      });
+    });
   }
 
   function setTab(id) {

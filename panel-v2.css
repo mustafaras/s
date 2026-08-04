@@ -1374,6 +1374,150 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   margin-top: 1px;
 }
 
+/* ── Konum bölümü (kompakt + harita) ── */
+.loc-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+
+.loc-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ae-space-xs);
+}
+
+.loc-info__item {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ae-muted);
+  background: var(--ae-chip-bg);
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+.loc-map-wrap {
+  width: 100%;
+  border-radius: var(--ae-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--ae-card-bd);
+}
+
+.loc-map {
+  width: 100%;
+  height: 180px;
+  background: var(--ae-elevated);
+}
+
+.loc-timeline-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--ae-space-xs) 0;
+}
+
+.loc-dot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-sm);
+  padding: 3px 0;
+  font-size: 11px;
+  border-bottom: 1px solid var(--ae-card-bd);
+}
+
+.loc-dot-row:last-child { border-bottom: none; }
+
+.loc-dot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ae-accent);
+  opacity: 0.6;
+}
+
+.loc-dot__time {
+  flex: 0 0 50px;
+  font-weight: 800;
+  color: var(--ae-text);
+  font-size: 11px;
+}
+
+.loc-dot__coord {
+  flex: 1 1 auto;
+  font-weight: 600;
+  color: var(--ae-muted);
+  font-size: 10px;
+  font-family: "SF Mono", "Menlo", monospace;
+}
+
+.loc-dot__acc {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ae-faint);
+  background: var(--ae-chip-bg);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.loc-events {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--ae-space-xs) 0;
+}
+
+.loc-event {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-sm);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ae-muted);
+}
+
+.loc-event__icon { flex-shrink: 0; font-size: 12px; }
+.loc-event__text { color: var(--ae-faint); }
+
+/* ── Session grid (kompakt) ── */
+.sess-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+
+.sess-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ae-space-xs);
+}
+
+.sess-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--ae-space-xs) var(--ae-space-sm);
+  background: var(--ae-empty-bg);
+  border-radius: var(--ae-radius-sm);
+}
+
+.sess-item__label {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ae-faint);
+}
+
+.sess-item__value {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--ae-text);
+  line-height: 1.2;
+}
+
 /* Primary / Drop button variants */
 .ae-btn--primary {
   background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));

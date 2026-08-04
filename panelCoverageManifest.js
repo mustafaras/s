@@ -89,17 +89,52 @@ function ruleForPath(path){
   if(!best) best=MANIFEST.paths[MANIFEST.paths.length-1];
   return best;
 }
-function modeForPath(parts,key,value){
+var FULL_DETAIL_ALLOW={
+  'days':1,'days.*':1,'days.*.habits':1,
+  'days.*.mood':1,'days.*.note':1,'days.*.intention':1,'days.*.journal':1,'days.*.journal.text':1,'days.*.journal.mode':1,'days.*.journal.wordCount':1,'days.*.journal.charCount':1,'days.*.journal.savedAt':1,'days.*.journal.streakAtSave':1,'days.*.journal.metGoal':1,'days.*.journal.promptUsed':1,
+  'days.*.gratitude':1,'days.*.savedAt':1,'days.*.dayIndex':1,
+  'days.*.cravingSOSCount':1,'days.*.cravingOptionsUsed':1,'days.*.cravingTriggers':1,'days.*.craving10MinDone':1,'days.*.foodCravingDone':1,'days.*.coffeeCravingDone':1,'days.*.cravingTriggerNote':1,
+  'days.*.meals':1,'days.*.mealItems':1,'days.*.water':1,'days.*.caffeine':1,'days.*.caffeine.last':1,'days.*.caffeine.cups':1,'days.*.caffeine.drinks':1,
+  'days.*.energy':1,'days.*.stress':1,
+  'days.*.sleep':1,'days.*.sleep.hours':1,'days.*.sleep.quality':1,'days.*.sleep.med':1,'days.*.sleep.med.type':1,'days.*.sleep.med.note':1,'days.*.sleep.windDown':1,'days.*.sleep.windDown.steps':1,'days.*.sleep.windDown.lastMinutes':1,'days.*.sleep.windDown.lastDoneAt':1,'days.*.sleep.windDown.offloadNote':1,'days.*.sleep.windDown.sessions':1,
+  'days.*.walk':1,'days.*.walk.steps':1,'days.*.walk.minutes':1,
+  'days.*.health':1,'days.*.health.steps':1,'days.*.health.walkM':1,'days.*.health.updatedAt':1,
+  'days.*.movement':1,'days.*.movement.walkM':1,'days.*.movement.vehicleM':1,'days.*.movement.totalM':1,'days.*.movement.maxSpeed':1,'days.*.movement.samples':1,'days.*.movement.walkSec':1,'days.*.movement.vehicleSec':1,
+  'days.*.location':1,'days.*.location.segments':1,'days.*.location.summary':1,
+  'days.*.discomfort':1,'days.*.discomfort.regions':1,'days.*.discomfort.note':1,'days.*.discomfort.meds':1,
+  'days.*.therapy':1,'days.*.therapy.breath':1,'days.*.therapy.breath.pattern':1,'days.*.therapy.breath.seconds':1,'days.*.therapy.breath.completedAt':1,
+  'days.*.prayer':1,'days.*.prayer.fajr':1,'days.*.prayer.sunrise':1,'days.*.prayer.dhuhr':1,'days.*.prayer.asr':1,'days.*.prayer.maghrib':1,'days.*.prayer.isha':1,
+  'days.*.reading':1,'days.*.reading.entries':1,'days.*.watching':1,'days.*.watching.entries':1,'days.*.listening':1,'days.*.listening.entries':1,'days.*.learning':1,'days.*.learning.entries':1,
+  'days.*.soulActivities':1,'days.*.soulActivities.*':1,
+  'days.*.nutri':1,'days.*.magnesium':1,'days.*.sessions':1,
+  'settings':1,'settings.targets':1,'settings.prayer':1,'settings.theme':1,'settings.panelSummarySharingAccepted':1,'settings.profileProcessingAccepted':1,'settings.sensitiveDataAccepted':1,'settings.shareProfileSummary':1,
+  'quranJourney':1,'saygi':1,'saygi.collection':1,'saygi.streak':1,'saygi.lastReadDate':1,'saygi.daily':1,
+  'library':1,'watchlist':1,'music':1,'soulArchive':1,'dailyPhoto':1,'roomContentHistory':1,'notifications':1,'eventLog':1,'aeon':1,'aeon.qa':1,
+  'zikr':1,'zikr.sessions':1,'zikr.lifetimeCount':1,'zikr.activeHatimId':1,'zikr.hatims':1,'zikr.presets':1,'zikr.editorialVersion':1
+};
+function fullDetailAllowed(path){
+  var parts=Array.isArray(path)?path:pathParts(path), p=pathText(parts);
+  if(FULL_DETAIL_ALLOW[p]) return true;
+  // parent wildcard match for day-level arrays/objects
+  if(parts.length>=2 && parts[0]==='days' && !/^\d+$/.test(parts[1])){
+    var wildcard=parts.slice(0,2).concat(['*']).join('.');
+    if(FULL_DETAIL_ALLOW[wildcard]) return true;
+  }
+  return false;
+}
+function modeForPath(parts,key,value,opts){
   var p=pathText(parts), low=p.toLowerCase(), k=String(key||'').toLowerCase();
   if(SECRET_KEYS[k]||SECRET_KEYS[String(key||'')]) return 'redacted';
   if(k==='base64'||k==='dataurl'||k==='contentbase64'||k==='raw') return 'redacted';
   if(/location|gps|movement|track/i.test(low)&&/^(lat|lng|lon|latitude|longitude|accuracy)$/.test(k)) return 'redacted';
   if((k==='data'||k==='content')&&(/media|attachment|upload|file|labresult|aeon/i.test(low)||typeof value!=='string'||String(value).length>40)) return 'redacted';
+  if(opts&&opts.fullDetail&&fullDetailAllowed(parts)) return 'full';
   return ruleForPath(parts).mode||'summary';
 }
 function addUnique(a,v){ if(a.indexOf(v)<0) a.push(v); }
-function walkCoverage(value,parts,out){
+function walkCoverage(value,parts,out,opts){
   var rule=ruleForPath(parts), mode=rule.mode||'summary';
+  if(opts&&opts.fullDetail) mode=modeForPath(parts,null,null,opts);
   if(parts.length && mode==='redacted'){
     addUnique(out.redacted,pathText(parts));
     return;
@@ -111,9 +146,10 @@ function walkCoverage(value,parts,out){
   var keys=Object.keys(value);
   if(!keys.length){ if(parts.length) addUnique(out[mode]||out.summary,pathText(parts)); return; }
   keys.forEach(function(k){
-    var next=parts.concat([k]), childMode=modeForPath(next,k,value[k]);
+    var next=parts.concat([k]), childMode=modeForPath(next,k,value[k],opts);
     if(childMode==='redacted') addUnique(out.redacted,pathText(next));
-    else if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out);
+    else if(childMode==='full'){ addUnique(out.full,pathText(next)); if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out,opts); }
+    else if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out,opts);
     else addUnique(out[childMode]||out.summary,pathText(next));
   });
 }
@@ -125,13 +161,15 @@ function hasPath(obj,path){
   }
   return true;
 }
-function coverageForData(data){
+function coverageForData(data,opts){
+  opts=opts||{};
   var out={full:[],summary:[],redacted:[],missing:[],unmappedPaths:[]};
-  walkCoverage(isObject(data)?data:{},[],out);
+  walkCoverage(isObject(data)?data:{},[],out,opts);
   MANIFEST.expectedPaths.forEach(function(p){ if(!hasPath(data,p)) addUnique(out.missing,p); });
   ["full","summary","redacted","missing","unmappedPaths"].forEach(function(k){ out[k].sort(); });
   return out;
 }
+function redactedPaths(){ return MANIFEST.paths.filter(function(r){ return r.mode==='redacted'; }).map(function(r){ return r.path; }); }
 
 function safeIso(v){
   if(typeof v!=='string'||!v||v.length>ISO_MAX) return null;
@@ -434,6 +472,8 @@ root.PanelCoverageV1={
   parseEventLog:parseEventLog,
   mergeEventLogs:mergeEventLogs,
   eventSequenceAudit:eventSequenceAudit,
-  normalizeReceipt:safeReceipt
+  normalizeReceipt:safeReceipt,
+  FULL_DETAIL_ALLOW:FULL_DETAIL_ALLOW,
+  redactedPaths:redactedPaths
 };
 })(typeof window!=='undefined'?window:this);

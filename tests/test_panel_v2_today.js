@@ -24,49 +24,51 @@ assert(html.indexOf('Genel Bakış') !== -1, "Boş durumda Today başlığı var
 
 // 2. Seeded data ile render
 const seededData = {
+  settings: { targets: { steps: 10000, waterGlasses: 8 } },
   days: {
     "2026-08-04": {
-      mood: { value: 4, note: "Huzurlu" },
+      mood: "iyi",
+      moodNote: "Huzurlu",
       cravingSOSCount: 0,
       health: { steps: 8432 },
-      nutrition: { waterGlasses: 7 },
+      water: 7,
       journal: { text: "Bugün güzeldi" }
     },
     "2026-08-03": {
-      sleep: { duration: 7.5, quality: 8 },
-      mood: { value: 3 },
+      sleep: { hours: 7.5, quality: 8 },
+      mood: "normal",
       health: { steps: 6200 },
-      nutrition: { waterGlasses: 5 }
+      water: 5
     },
     "2026-08-02": {
-      mood: { value: 5 },
-      sleep: { duration: 6 },
+      mood: "cok-iyi",
+      sleep: { hours: 6 },
       health: { steps: 10500 },
-      nutrition: { waterGlasses: 9 }
+      water: 9
     },
     "2026-08-01": {
-      mood: { value: 2 },
-      sleep: { duration: 5.5 },
+      mood: "zorlandim",
+      sleep: { hours: 5.5 },
       health: { steps: 3100 },
-      nutrition: { waterGlasses: 4 }
+      water: 4
     },
     "2026-07-31": {
-      mood: { value: 6 },
-      sleep: { duration: 8 },
+      mood: "cok-iyi",
+      sleep: { hours: 8 },
       health: { steps: 12000 },
-      nutrition: { waterGlasses: 10 }
+      water: 10
     },
     "2026-07-30": {
-      mood: { value: 4 },
-      sleep: { duration: 7 },
+      mood: "iyi",
+      sleep: { hours: 7 },
       health: { steps: 7800 },
-      nutrition: { waterGlasses: 6 }
+      water: 6
     },
     "2026-07-29": {
-      mood: { value: 5 },
-      sleep: { duration: 6.5 },
+      mood: "cok-iyi",
+      sleep: { hours: 6.5 },
       health: { steps: 9100 },
-      nutrition: { waterGlasses: 8 }
+      water: 8
     }
   }
 };
@@ -79,7 +81,7 @@ assert(!/class="ae-empty"/.test(html), "Seeded data'da ae-empty kalktı");
 assert((html.match(/ae-card--hero/g) || []).length === 4, "4 hero kart render edildi");
 assert(/Huzurlu/.test(html), "Mod kartı Huzurlu değerini gösteriyor");
 assert(/7sa 30dk/.test(html), "Uyku kartı süreyi gösteriyor");
-assert(/8\.432/.test(html), "Adım kartı değerini gösteriyor");
+assert(/8\.432|8 432/.test(html), "Adım kartı değerini gösteriyor");
 assert(/Sessiz|SOS/.test(html), "SOS kartı var");
 
 // 4. 7 günlük strip — her metrik için 7 bar (4 metrik * 7 = 28 bar elementi)

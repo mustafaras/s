@@ -10,9 +10,17 @@ AeonV2.init();
 let html;
 
 const seededData = {
+  zikr: {
+    sessions: {
+      "2026-08-04": { totalCount: 165 }
+    }
+  },
   days: {
     "2026-08-04": {
-      mood: { value: 4, note: "Huzurlu" },
+      mood: "iyi",
+      moodNote: "Huzurlu",
+      sleep: { hours: 7.5, quality: 8 },
+      water: 7,
       journal: { text: "Bugün güzeldi" },
       intention: "Sakin kalmak",
       gratitude: "Ailem",
@@ -25,18 +33,13 @@ const seededData = {
         selfCompassion: true,
         firstStep: true
       },
-      nutrition: {
-        meals: ["kahvaltı", "öğle", "akşam"],
-        waterGlasses: 7,
-        caffeine: true,
-        mealItems: [{ protein: 20, carbs: 40, fat: 12 }]
-      },
-      prayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
+      meals: { breakfast: "yumurta", lunch: "salata", dinner: "çorba" },
+      prayer: { fajr: { performed: true }, dhuhr: { performed: true }, asr: { performed: true }, maghrib: { performed: true }, isha: { performed: true } },
       zikr: { count: 165, name: "Ya Fettah" },
       saygi: { personName: "Mevlana", read: true },
-      quranJourney: { verseRef: "2:255", requests: 1 },
+      quranRequests: [1],
       health: { steps: 8432 },
-      movement: { walkDuration: 0.75, distanceKm: 5.2 },
+      movement: { walkM: 5200, vehicleM: 0 },
       location: {
         segments: [
           { category: "ev", start: "08:00", end: "09:00" },
@@ -44,42 +47,40 @@ const seededData = {
           { category: "iş", start: "10:30", end: "18:00" }
         ]
       },
-      media: {
-        reading: [{ title: "Kitap" }],
-        watching: [{ title: "Film" }],
-        listening: [{ title: "Podcast" }]
-      },
+      reading: { entries: [{ title: "Kitap" }] },
+      watching: { entries: [{ title: "Film" }] },
+      listening: { entries: [{ title: "Podcast" }] },
       quotes: [{ text: "Özlü söz" }]
     },
     "2026-08-03": {
-      mood: { value: 3 },
+      mood: "normal",
       health: { steps: 6200 },
-      nutrition: { waterGlasses: 5 }
+      water: 5
     },
     "2026-08-02": {
-      mood: { value: 5 },
+      mood: "cok-iyi",
       health: { steps: 10500 },
-      nutrition: { waterGlasses: 9 }
+      water: 9
     },
     "2026-08-01": {
-      mood: { value: 2 },
+      mood: "zorlandim",
       health: { steps: 3100 },
-      nutrition: { waterGlasses: 4 }
+      water: 4
     },
     "2026-07-31": {
-      mood: { value: 6 },
+      mood: "cok-iyi",
       health: { steps: 12000 },
-      nutrition: { waterGlasses: 10 }
+      water: 10
     },
     "2026-07-30": {
-      mood: { value: 4 },
+      mood: "iyi",
       health: { steps: 7800 },
-      nutrition: { waterGlasses: 6 }
+      water: 6
     },
     "2026-07-29": {
-      mood: { value: 5 },
+      mood: "cok-iyi",
       health: { steps: 9100 },
-      nutrition: { waterGlasses: 8 }
+      water: 8
     }
   }
 };
@@ -105,16 +106,16 @@ html = dom.html;
 assert(!/\b41\.[0-9]+/.test(html), "Ham enlem string'i yok");
 assert(!/\b28\.[0-9]{4,}/.test(html), "Ham boylam string'i yok");
 assert(!/\blat\b|\blng\b|\blatitude\b|\blongitude\b/i.test(html), "Ham konum anahtar kelimeleri yok");
-assert(/Konum: ev, dışarı, iş/.test(html), "Konum segmentleri kategori olarak görünür");
+assert(/Konum kategorileri: ev/.test(html), "Konum segmentleri kategori olarak görünür");
 
-// 3. Terapi metinleri redacted
+// 3. Terapi metinleri redacted; günlük/niyet/şükür/alıntı full-detail olarak görünür
 assert(/Terapi paylaşımı/.test(html), "Terapi paylaşımı chip'i var");
 assert(/Gizli içerik/.test(html) === false, "Terapi paylaşım metni DOM'da yok");
 assert(/Endişeli düşünce/.test(html) === false, "Düşünce metni DOM'da yok");
-assert(/Bugün güzeldi/.test(html) === false, "Günlük metni DOM'da yok");
-assert(/Sakin kalmak/.test(html) === false, "Niyet metni DOM'da yok");
-assert(/Ailem/.test(html) === false, "Şükür metni DOM'da yok");
-assert(/Özlü söz/.test(html) === false, "Alıntı metni DOM'da yok");
+assert(/Bugün güzeldi/.test(html) === true, "Günlük metni DOM'da görünür");
+assert(/Sakin kalmak/.test(html) === true, "Niyet metni DOM'da görünür");
+assert(/Ailem/.test(html) === true, "Şükür metni DOM'da görünür");
+assert(/Özlü söz/.test(html) === true, "Alıntı metni DOM'da görünür");
 assert(/redacted/.test(html), "Redacted ibaresi görünür");
 
 // 4. Saygı / ibadet / içerik özetleri var
@@ -142,6 +143,6 @@ assert(heatmapCells === 30, "30 günlük ısı haritası hücresi var: " + heatm
 assert(/Su: 7 bardak/.test(html), "Su bardak sayısı görünür");
 assert(/Öğün: 3/.test(html), "Öğün sayısı görünür");
 assert(/Adım: 8\.432/.test(html), "Adım sayısı görünür");
-assert(/Mesafe: 5,2 km/.test(html), "Yürüyüş mesafesi görünür");
+assert(/Yürüyüş: 5200 m/.test(html), "Yürüyüş mesafesi görünür");
 
 console.log("\n🦩 Faz 4 Gün Detayı fixture — TÜM TESTLER BAŞARILI");

@@ -12,17 +12,20 @@ AeonV2.init();
 const seededData = {
   days: {
     "2026-08-04": {
-      mood: { value: 4, note: "Huzurlu" },
-      sleep: { duration: 7.5, quality: 8 }
+      mood: "iyi",
+      moodNote: "Huzurlu",
+      sleep: { hours: 7.5, quality: 8 }
     },
-    "2026-08-03": { mood: { value: 3 }, sleep: { duration: 6.0 } }
+    "2026-08-03": { mood: "normal", sleep: { hours: 6.0 } }
   },
-  aeonInbox: [
+  notifications: [
     { from: "Observer", text: "Bugün nasılsın?", ts: "2026-08-04T08:00:00Z" }
   ],
-  aeonOutbox: [
-    { text: "İyiyim, teşekkürler.", ts: "2026-08-04T08:05:00Z" }
-  ]
+  aeon: {
+    qa: [
+      { question: "İyiyim, teşekkürler.", ts: "2026-08-04T08:05:00Z" }
+    ]
+  }
 };
 
 AeonV2.setData(seededData);

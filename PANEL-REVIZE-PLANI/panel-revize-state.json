@@ -4,11 +4,8 @@
   "lastUpdated": "2026-08-04T07:00:00Z",
   "status": "in-progress",
   "currentTaskId": null,
-  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4"],
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4", "8.1", "8.2", "8.3"],
   "pendingTasks": [
-    "8.1",
-    "8.2",
-    "8.3",
     "9.1",
     "9.2",
     "9.3",
@@ -86,8 +83,32 @@
       "summary": "Faz 7 Premium Polish PASS — inline stiller kaldırıldı, ARIA etiketleri eklendi, reduced-motion, responsive grids, focus/hover polish, day-detail ısı haritası 30 hücre doğru, tüm Faz 1-6 fixture'ları yeniden yeşil",
       "command": "node tests/test_panel_v2_tabs.js && node tests/test_panel_v2_today.js && node tests/test_panel_v2_trends.js && node tests/test_panel_v2_day_detail.js && node tests/test_panel_v2_archives.js && node tests/test_panel_v2_system.js",
       "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_day_detail.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T07:30:00Z",
+      "taskId": "8.1",
+      "kind": "test-pass",
+      "summary": "Faz 8.1 headless fixture seti — shared helper oluşturuldu, 7 fixture yeniden düzenlendi ve PASS",
+      "command": "node tests/test_panel_v2_skeleton.js && node tests/test_panel_v2_tabs.js && node tests/test_panel_v2_today.js && node tests/test_panel_v2_trends.js && node tests/test_panel_v2_day_detail.js && node tests/test_panel_v2_archives.js && node tests/test_panel_v2_system.js",
+      "files": ["tests/helpers/panel-v2-test-helper.js", "tests/test_panel_v2_skeleton.js", "tests/test_panel_v2_tabs.js", "tests/test_panel_v2_today.js", "tests/test_panel_v2_trends.js", "tests/test_panel_v2_day_detail.js", "tests/test_panel_v2_archives.js", "tests/test_panel_v2_system.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T07:45:00Z",
+      "taskId": "8.2",
+      "kind": "test-pass",
+      "summary": "Faz 8.2 data comparison — panel.js/panel-v2.js KPI karşılaştırması, panel-v2.js beklentilerle tutarlı",
+      "command": "node tests/test_panel_v2_compare.js",
+      "files": ["tests/test_panel_v2_compare.js", "PANEL-REVIZE-PLANI/08-VERI-KARSILASTIRMASI.md"]
+    },
+    {
+      "recordedAt": "2026-08-04T08:00:00Z",
+      "taskId": "8.3",
+      "kind": "test-pass",
+      "summary": "Faz 8.3 acceptance audit — panel-revize-acceptance.json şemaya uygun oluşturuldu, Faz 0-8 passed",
+      "command": "node -e 'schema-conformance-check'",
+      "files": ["PANEL-REVIZE-PLANI/panel-revize-acceptance.json", "PANEL-REVIZE-PLANI/panel-revize-acceptance-schema.json"]
     }
   ],
-  "nextTaskId": "8.1",
-  "notes": "Faz 7 tamamlandı: inline stiller kaldırıldı (data-pct trend bar + mood sınıflı ısı haritası), AeButton aria-label desteği, icon-only butonlar erişilebilir, reduced-motion medya sorgusu, responsive grid breakpoint'leri (375/460/768/120px), focus-visible ve hover-lift polish, taşma ve density varyantları. Tüm Faz 1-6 fixture'ları yeniden PASS. Bir sonraki aşama: Faz 8 Test & Kabul."
+  "nextTaskId": "9.1",
+  "notes": "Faz 8 tamamlandı. Ortak test helper, 7 refaktör fixture, panel.js/panel-v2.js KPI karşılaştırması ve kabul kriterleri audit dosyası oluşturuldu. Tüm Faz 0-8 kriterleri passed. Bir sonraki aşama: Faz 9 Geçiş & Deploy."
 }

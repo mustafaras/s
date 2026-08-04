@@ -1,58 +1,13 @@
 // ÆON Panel v2 — Faz 5 Arşivler fixture
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const root = path.resolve(__dirname, "..");
+const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
-function read(rel) { return fs.readFileSync(path.join(root, rel), "utf8"); }
+const { dom, ctx, AeonV2 } = boot();
 
-function assert(cond, msg) {
-  if (!cond) {
-    console.error("❌ FAIL: " + msg);
-    process.exitCode = 1;
-    throw new Error(msg);
-  }
-  console.log("✅ PASS: " + msg);
-}
+AeonV2.init();
 
-let html = "";
-global.document = {
-  getElementById: function(id) {
-    if (id === "app") {
-      return {
-        innerHTML: html,
-        set innerHTML(v) { html = v; }
-      };
-    }
-    if (id === "root") {
-      let theme = "dark";
-      return {
-        setAttribute: function(k, v) { if (k === "data-theme") theme = v; },
-        getAttribute: function(k) { return k === "data-theme" ? theme : null; }
-      };
-    }
-    return null;
-  }
-};
-
-const vm = require("vm");
-const ctx = {
-  window: {},
-  document: global.document,
-  console: console,
-  setTimeout: function(cb) { if (typeof cb === "function") cb(); return 0; },
-  setInterval: function() { return 0; },
-  clearTimeout: function() {},
-  clearInterval: function() {}
-};
-ctx.window = ctx;
-
-vm.createContext(ctx);
-vm.runInContext(read("panelCoverageManifest.js"), ctx);
-vm.runInContext(read("panel-v2.js"), ctx);
-
-ctx.AeonV2.init();
+let html;
 
 function dateStr(offsetDays) {
   const d = new Date("2026-08-04T00:00:00Z");
@@ -129,8 +84,9 @@ function buildData() {
   return seededData;
 }
 
-ctx.AeonV2.setData(buildData());
-ctx.AeonV2.setTab("archives");
+AeonV2.setData(buildData());
+AeonV2.setTab("archives");
+html = dom.html;
 
 // 1. Sub-tabs render
 assert(/sub-tab/.test(html), "Sub-tab butonları render edildi");
@@ -147,32 +103,39 @@ assert(/Bitti/.test(html), "Bitti badge'i var");
 assert(/Okunuyor/.test(html), "Okunuyor badge'i var");
 
 // 3. İzleme listesi
-ctx.AeonV2.setArchiveSubTab("watch");
+AeonV2.setArchiveSubTab("watch");
+html = dom.html;
 assert(/Dizi 1/.test(html), "İzleme listesinde Dizi 1 var");
 assert(/İzleniyor/.test(html), "İzleniyor badge'i var");
 assert(/Film/.test(html), "Film kategorisi var");
 
 // 4. Dinleme listesi
-ctx.AeonV2.setArchiveSubTab("listen");
+AeonV2.setArchiveSubTab("listen");
+html = dom.html;
 assert(/Şarkı 1/.test(html), "Dinleme listesinde Şarkı 1 var");
 assert(/Podcast/.test(html), "Podcast kategorisi var");
 assert(/Sanatçı 1/.test(html), "Sanatçı adı meta olarak var");
 
 // 5. Alıntılar listesi
-ctx.AeonV2.setArchiveSubTab("quotes");
+AeonV2.setArchiveSubTab("quotes");
+html = dom.html;
 assert(/Alıntı kitap 2/.test(html), "Kitap alıntısı var");
 assert(/Replik 1/.test(html), "İzleme replik alıntısı var");
 assert(/Söz 1/.test(html), "Müzik söz alıntısı var");
 
 // 6. Boş arşiv durumu
-ctx.AeonV2.setData({ days: {}, library: { books: [] }, watchlist: { items: [] }, music: { items: [] } });
-ctx.AeonV2.setArchiveSubTab("library");
+AeonV2.setData({ days: {}, library: { books: [] }, watchlist: { items: [] }, music: { items: [] } });
+AeonV2.setArchiveSubTab("library");
+html = dom.html;
 assert(/Kütüphane boş/.test(html), "Boş kütüphane mesajı var");
-ctx.AeonV2.setArchiveSubTab("watch");
+AeonV2.setArchiveSubTab("watch");
+html = dom.html;
 assert(/İzleme listesi boş/.test(html), "Boş izleme mesajı var");
-ctx.AeonV2.setArchiveSubTab("listen");
+AeonV2.setArchiveSubTab("listen");
+html = dom.html;
 assert(/Dinleme listesi boş/.test(html), "Boş dinleme mesajı var");
-ctx.AeonV2.setArchiveSubTab("quotes");
+AeonV2.setArchiveSubTab("quotes");
+html = dom.html;
 assert(/Alıntı yok/.test(html), "Boş alıntı mesajı var");
 
 // 7. Pagination 100+ öğe
@@ -180,30 +143,35 @@ const manyBooks = [];
 for (let i = 1; i <= 120; i++) {
   manyBooks.push({ id: "mb_" + i, title: "Kitap " + i, author: "Yazar", status: "reading", createdAt: "2026-07-01T00:00:00Z" });
 }
-ctx.AeonV2.setData({ days: {}, library: { books: manyBooks }, watchlist: { items: [] }, music: { items: [] } });
-ctx.AeonV2.setArchiveSubTab("library");
+AeonV2.setData({ days: {}, library: { books: manyBooks }, watchlist: { items: [] }, music: { items: [] } });
+AeonV2.setArchiveSubTab("library");
+html = dom.html;
 const firstPageRows = (html.match(/class=\"archive-row\"/g) || []).length;
 assert(firstPageRows === 20, "İlk sayfada 20 satır var: " + firstPageRows);
 assert(/pagination/.test(html), "Pagination kontrolü var");
 assert(/1 \/ 6/.test(html), "Sayfa 1/6 gösteriliyor");
 
-ctx.AeonV2.setArchivePage(2);
+AeonV2.setArchivePage(2);
+html = dom.html;
 assert(/2 \/ 6/.test(html), "Sayfa 2/6 gösteriliyor");
 const secondPageRows = (html.match(/class=\"archive-row\"/g) || []).length;
 assert(secondPageRows === 20, "İkinci sayfada 20 satır var: " + secondPageRows);
 
 // 8. Son sayfa
-ctx.AeonV2.setArchivePage(6);
+AeonV2.setArchivePage(6);
+html = dom.html;
 assert(/6 \/ 6/.test(html), "Son sayfa gösteriliyor");
 const lastPageRows = (html.match(/class=\"archive-row\"/g) || []).length;
 assert(lastPageRows === 20, "Son sayfada 20 satır var: " + lastPageRows);
 
 // 9. Geçersiz sub-tab reddedilir
-ctx.AeonV2.setArchiveSubTab("invalid");
+AeonV2.setArchiveSubTab("invalid");
+html = dom.html;
 assert(/Kütüphane/.test(html), "Geçersiz sub-tab sonrası Kütüphane sekmesi aktif kaldı");
 
 // 10. Geçersiz sayfa numarası
-ctx.AeonV2.setArchivePage(-5);
+AeonV2.setArchivePage(-5);
+html = dom.html;
 assert(/1 \/ 6/.test(html), "Negatif sayfa 1'e sıfırlandı");
 
 console.log("\n🦩 Faz 5 Arşivler fixture — TÜM TESTLER BAŞARILI");

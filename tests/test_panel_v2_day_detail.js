@@ -1,58 +1,13 @@
 // ÆON Panel v2 — Faz 4 Gün Detayı fixture
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const root = path.resolve(__dirname, "..");
+const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
-function read(rel) { return fs.readFileSync(path.join(root, rel), "utf8"); }
+const { dom, ctx, AeonV2 } = boot();
 
-function assert(cond, msg) {
-  if (!cond) {
-    console.error("❌ FAIL: " + msg);
-    process.exitCode = 1;
-    throw new Error(msg);
-  }
-  console.log("✅ PASS: " + msg);
-}
+AeonV2.init();
 
-let html = "";
-global.document = {
-  getElementById: function(id) {
-    if (id === "app") {
-      return {
-        innerHTML: html,
-        set innerHTML(v) { html = v; }
-      };
-    }
-    if (id === "root") {
-      let theme = "dark";
-      return {
-        setAttribute: function(k, v) { if (k === "data-theme") theme = v; },
-        getAttribute: function(k) { return k === "data-theme" ? theme : null; }
-      };
-    }
-    return null;
-  }
-};
-
-const vm = require("vm");
-const ctx = {
-  window: {},
-  document: global.document,
-  console: console,
-  setTimeout: function(cb) { if (typeof cb === "function") cb(); return 0; },
-  setInterval: function() { return 0; },
-  clearTimeout: function() {},
-  clearInterval: function() {}
-};
-ctx.window = ctx;
-
-vm.createContext(ctx);
-vm.runInContext(read("panelCoverageManifest.js"), ctx);
-vm.runInContext(read("panel-v2.js"), ctx);
-
-ctx.AeonV2.init();
+let html;
 
 const seededData = {
   days: {
@@ -129,21 +84,24 @@ const seededData = {
   }
 };
 
-ctx.AeonV2.setData(seededData);
+AeonV2.setData(seededData);
 
 // 1. Seçili gün değişince render değişiyor
-ctx.AeonV2.setTab("day");
+AeonV2.setTab("day");
+html = dom.html;
 const firstDayHtml = html;
 assert(/Gün Detayı|Bugün/.test(html), "Gün Detayı sekmesi başlığı var");
 assert(/Ruh hali|Mod|Beslenme|İbadet|Hareket|İçerik|Terapi/.test(html), "Gün detayı bölüm başlıkları var");
 
-ctx.AeonV2.setDate("2026-08-03");
+AeonV2.setDate("2026-08-03");
+html = dom.html;
 const secondDayHtml = html;
 assert(firstDayHtml !== secondDayHtml, "Tarih değişince DOM değişti");
 assert(/2026-08-03/.test(html), "Yeni tarih gösteriliyor");
 
 // 2. Ham GPS string'i DOM'da yok
-ctx.AeonV2.setDate("2026-08-04");
+AeonV2.setDate("2026-08-04");
+html = dom.html;
 assert(!/\b41\.[0-9]+/.test(html), "Ham enlem string'i yok");
 assert(!/\b28\.[0-9]{4,}/.test(html), "Ham boylam string'i yok");
 assert(!/\blat\b|\blng\b|\blatitude\b|\blongitude\b/i.test(html), "Ham konum anahtar kelimeleri yok");
@@ -169,12 +127,14 @@ assert(/İzleme: 1/.test(html), "İzleme sayısı görünür");
 assert(/Dinleme: 1/.test(html), "Dinleme sayısı görünür");
 
 // 5. Boş gün mesajı doğru
-ctx.AeonV2.setDate("2026-06-01");
+AeonV2.setDate("2026-06-01");
+html = dom.html;
 assert(/Boş gün/.test(html), "Boş gün başlığı görünür");
 assert(/Bu tarihe ait kayıt yok/.test(html), "Boş gün açıklaması doğru");
 
 // 6. 30 günlük ısı haritası var
-ctx.AeonV2.setDate("2026-08-04");
+AeonV2.setDate("2026-08-04");
+html = dom.html;
 const heatmapCells = (html.match(/class="day-heatmap__cell/g) || []).length;
 assert(heatmapCells === 30, "30 günlük ısı haritası hücresi var: " + heatmapCells);
 

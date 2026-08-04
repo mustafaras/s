@@ -1,63 +1,21 @@
 // ÆON Panel v2 — Faz 2 Genel Bakış fixture
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const root = path.resolve(__dirname, "..");
+const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
-function read(rel) { return fs.readFileSync(path.join(root, rel), "utf8"); }
-
-function assert(cond, msg) {
-  if (!cond) {
-    console.error("❌ FAIL: " + msg);
-    process.exitCode = 1;
-    throw new Error(msg);
-  }
-  console.log("✅ PASS: " + msg);
-}
-
-let html = "";
-global.document = {
-  getElementById: function(id) {
-    if (id === "app") {
-      return {
-        innerHTML: html,
-        set innerHTML(v) { html = v; }
-      };
-    }
-    if (id === "root") {
-      let theme = "dark";
-      return {
-        setAttribute: function(k, v) { if (k === "data-theme") theme = v; },
-        getAttribute: function(k) { return k === "data-theme" ? theme : null; }
-      };
-    }
-    return null;
-  }
-};
-
-const vm = require("vm");
-const ctx = {
-  window: {},
-  document: global.document,
-  console: console,
-  setTimeout: function(cb) { if (typeof cb === "function") cb(); return 0; },
-  setInterval: function() { return 0; },
-  clearTimeout: function() {},
-  clearInterval: function() {}
-};
-ctx.window = ctx;
-
-vm.createContext(ctx);
-vm.runInContext(read("panelCoverageManifest.js"), ctx);
-vm.runInContext(read("panel-v2.js"), ctx);
+const { dom, ctx, AeonV2 } = boot();
 
 function countMatches(re) {
-  const m = html.match(re) || [];
+  const m = dom.html.match(re) || [];
   return m.length;
 }
 
-// 1. Boş data'da ae-empty görünür
+let html;
+
+// 1. Boş data'da ae-empty görünür (init today sekmesinde açılır; ae-empty'yi panel içinde arıyoruz)
+AeonV2.init();
+html = dom.html;
+// Üstbar + sekme + panel wrapper render edilmiş olur; ae-empty'yi panel içinde arıyoruz
 ctx.AeonV2.init();
 // Üstbar + sekme + panel wrapper render edilmiş olur; ae-empty'yi panel içinde arıyoruz
 const hasEmpty = html.indexOf('ae-empty') !== -1;
@@ -113,7 +71,8 @@ const seededData = {
   }
 };
 
-ctx.AeonV2.setData(seededData);
+AeonV2.setData(seededData);
+html = dom.html;
 assert(!/class="ae-empty"/.test(html), "Seeded data'da ae-empty kalktı");
 
 // 3. 4 hero kart var
@@ -136,22 +95,23 @@ assert(/Günlük/.test(html), "Günlük chip'i var");
 // 6. Terapi paylaşımı redacted
 const therapyData = JSON.parse(JSON.stringify(seededData));
 therapyData.days["2026-08-04"].therapy = { share: { note: "Gizli içerik", score: 7 } };
-ctx.AeonV2.setData(therapyData);
+AeonV2.setData(therapyData);
+html = dom.html;
 assert(/Terapi paylaşımı/.test(html), "Terapi paylaşımı chip'i var");
 assert(/redacted/.test(html), "Terapi paylaşımı redacted olarak işaretli");
 assert(!/Gizli içerik/.test(html), "Terapi metni DOM'a yansımamış");
 
 // 7. Tarih seçici state değiştiriyor
-ctx.AeonV2.shiftDate(-1);
-assert(ctx.AeonV2.ui.date === "2026-08-03", "shiftDate(-1) bir gün geri gitti");
-ctx.AeonV2.shiftDate(1);
-assert(ctx.AeonV2.ui.date === "2026-08-04", "shiftDate(1) bugüne döndü");
+AeonV2.shiftDate(-1);
+assert(AeonV2.ui.date === "2026-08-03", "shiftDate(-1) bir gün geri gitti");
+AeonV2.shiftDate(1);
+assert(AeonV2.ui.date === "2026-08-04", "shiftDate(1) bugüne döndü");
 
-ctx.AeonV2.goToDayDetail();
-assert(ctx.AeonV2.ui.tab === "day", "goToDayDetail Gün Detayı sekmesine geçti");
+AeonV2.goToDayDetail();
+assert(AeonV2.ui.tab === "day", "goToDayDetail Gün Detayı sekmesine geçti");
 
 // 8. Date setter validasyon
-ctx.AeonV2.setDate("bad-date");
-assert(ctx.AeonV2.ui.date !== "bad-date", "Geçersiz tarih reddedildi");
+AeonV2.setDate("bad-date");
+assert(AeonV2.ui.date !== "bad-date", "Geçersiz tarih reddedildi");
 
 console.log("\n🦩 Faz 2 Genel Bakış fixture — TÜM TESTLER BAŞARILI");

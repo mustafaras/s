@@ -577,7 +577,9 @@
            '<span class="ae-topbar__title">ÆON</span>' +
            "</div>" +
            '<div class="ae-topbar__tools">' +
+           '<button type="button" class="ae-status-btn" onclick="AeonV2.setTab(\'system\');AeonV2.setSystemSubTab(\'status\')" aria-label="Senkron durumu">' +
            AeStatusBadge({ status: syncStatus.status }) +
+           "</button>" +
            AeButton({ label: "↻", variant: "mini", onclick: "AeonV2.refresh()" }) +
            AeButton({ label: "✕", variant: "mini", onclick: "AeonV2.logout()" }) +
            "</div>" +
@@ -903,10 +905,173 @@
   }
 
   function setSystemSubTab(id) {
-    var valid = ["status", "audit", "messages"];
+    var valid = ["status", "audit", "messages", "settings"];
     if (valid.indexOf(id) === -1) return;
     ui.systemSubTab = id;
     render();
+  }
+
+  function setDensity(d) {
+    var allowed = ["compact", "comfortable", "spacious"];
+    if (allowed.indexOf(d) === -1) return;
+    ui.density = d;
+    var rootEl = root.document && root.document.getElementById("root");
+    if (rootEl) rootEl.setAttribute("data-density", d);
+    render();
+  }
+
+  function setTheme(theme) {
+    if (theme !== "light" && theme !== "dark") return;
+    ui.theme = theme;
+    var rootEl = root.document && root.document.getElementById("root");
+    if (rootEl) rootEl.setAttribute("data-theme", theme);
+    render();
+  }
+
+  function setPanelToken(token) {
+    ui.panelToken = typeof token === "string" ? token : "";
+  }
+
+  function formatTs(ts) {
+    if (!ts) return "—";
+    var d = new Date(ts);
+    return isNaN(d.getTime()) ? String(ts) : d.toLocaleString("tr-TR");
+  }
+
+  function renderStatusDetail() {
+    var s = syncStatus || {};
+    var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
+    var rows = [
+      { label: "Durum", value: s.status || "idle" },
+      { label: "Son senkron", value: s.lastSyncedAt ? formatTs(s.lastSyncedAt) : "—" },
+      { label: "Gün sayısı", value: dayCount },
+      { label: "Revision", value: s.snapshotRevision || "—" },
+      { label: "ETag", value: s.etag || "—" },
+      { label: "p50 gecikme", value: s.p50LatencyMs ? s.p50LatencyMs + " ms" : "—" },
+      { label: "p95 gecikme", value: s.p95LatencyMs ? s.p95LatencyMs + " ms" : "—" },
+      { label: "304 sayısı", value: s.notModifiedCount !== undefined ? s.notModifiedCount : "—" }
+    ];
+    var body = rows.map(function(r) {
+      return '<div class="status-row"><span class="status-row__label">' + escapeHtml(r.label) +
+             '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
+    }).join("");
+    var errorBox = s.lastErrorCode
+      ? '<div class="ae-card ae-card--warn status-error">' +
+        '<div class="status-error__title">Son hata</div>' +
+        '<div class="status-error__code">' + escapeHtml(String(s.lastErrorCode)) + "</div>" +
+        '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>' +
+        "</div>"
+      : "";
+    return '<div class="status-detail ae-fade-in">' +
+           AeCard({ className: "status-card", children: body }) +
+           errorBox +
+           "</div>";
+  }
+
+  function renderAuditDetail() {
+    var proj = projectData(appData);
+    var coverage = proj && proj.coverage ? proj.coverage : {};
+    var redacted = Array.isArray(coverage.redacted) ? coverage.redacted.length : 0;
+    var summary = Array.isArray(coverage.summary) ? coverage.summary.length : 0;
+    var full = Array.isArray(coverage.full) ? coverage.full.length : 0;
+    var rows = [
+      { label: "Coverage durumu", value: (coverage.error ? "Hata" : "Hazır") },
+      { label: "Redacted alan", value: redacted },
+      { label: "Summary alan", value: summary },
+      { label: "Full alan", value: full },
+      { label: "Provenance", value: "observer-snapshot" },
+      { label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor" },
+      { label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—" }
+    ];
+    var body = rows.map(function(r) {
+      return '<div class="status-row"><span class="status-row__label">' + escapeHtml(r.label) +
+             '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
+    }).join("");
+    return '<div class="audit-detail ae-fade-in">' +
+           AeCard({ className: "audit-card", children: body }) +
+           '<div class="audit-hint">Yalnızca izin verilen alanlar observer\'a yansıtılır. Detaylar panelCoverageManifest.js\'te tanımlı.</div>' +
+           "</div>";
+  }
+
+  function renderMessages() {
+    var inbox = isObject(appData) && Array.isArray(appData.aeonInbox) ? appData.aeonInbox : [];
+    var outbox = isObject(appData) && Array.isArray(appData.aeonOutbox) ? appData.aeonOutbox : [];
+    var messages = inbox.map(function(m) {
+      return { direction: "in", from: m.from || "Observer", text: m.text || "", ts: m.ts || "" };
+    }).concat(outbox.map(function(m) {
+      return { direction: "out", from: "Sen", text: m.text || "", ts: m.ts || "" };
+    })).sort(function(a, b) { return String(b.ts).localeCompare(String(a.ts)); });
+
+    var list = messages.length
+      ? messages.map(function(m) {
+          return '<div class="message-bubble message-bubble--' + m.direction + '">' +
+                 '<div class="message-bubble__meta">' + escapeHtml(m.from) + " · " + escapeHtml(formatTs(m.ts)) + "</div>" +
+                 '<div class="message-bubble__text">' + escapeHtml(safeText(m.text, 400)) + "</div>" +
+                 "</div>";
+        }).join("")
+      : AeEmpty({ icon: "💬", title: "Henüz mesaj yok", message: "Gelen ve giden mesajlar burada listelenecek." });
+
+    var tokenValue = (ui.panelToken || "").replace(/./g, "•");
+    return '<div class="messages-detail ae-fade-in">' +
+           AeCard({ className: "messages-card", children: list }) +
+           '<div class="ae-card ae-card--summary token-card">' +
+           '<div class="ae-label">GitHub token</div>' +
+           '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="token gir..." onchange="AeonV2.setPanelToken(this.value)" />' +
+           '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez.</div>' +
+           "</div>" +
+           "</div>";
+  }
+
+  function renderSettings() {
+    var densities = [
+      { id: "compact", label: "Sıkı" },
+      { id: "comfortable", label: "Rahat" },
+      { id: "spacious", label: "Geniş" }
+    ];
+    var densityButtons = densities.map(function(d) {
+      var active = ui.density === d.id ? " is-active" : "";
+      return '<button type="button" class="density-btn' + active + '" onclick="AeonV2.setDensity(\'' + d.id + '\')">' + escapeHtml(d.label) + "</button>";
+    }).join("");
+
+    var themeBtn = ui.theme === "dark"
+      ? AeButton({ label: "☀️ Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
+      : AeButton({ label: "🌙 Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
+
+    return '<div class="settings-detail ae-fade-in">' +
+           AeCard({
+             className: "settings-card",
+             children: '<div class="settings-group">' +
+                       '<div class="ae-label">Yoğunluk</div>' +
+                       '<div class="density-select">' + densityButtons + "</div>" +
+                       "</div>" +
+                       '<div class="settings-group">' +
+                       '<div class="ae-label">Tema</div>' + themeBtn + "</div>" +
+                       '<div class="settings-group">' +
+                       '<div class="ae-label">Oturum</div>' +
+                       AeButton({ label: "Oturumu sonlandır", variant: "drop", onclick: "AeonV2.logout()" }) +
+                       "</div>"
+           }) +
+           "</div>";
+  }
+
+  function renderSystem() {
+    var subTab = ui.systemSubTab || "status";
+    var tabs = [
+      { id: "status", label: "Durum" },
+      { id: "audit", label: "Audit" },
+      { id: "messages", label: "Mesajlar" },
+      { id: "settings", label: "Ayarlar" }
+    ];
+    var contentBySubTab = {
+      status: renderStatusDetail,
+      audit: renderAuditDetail,
+      messages: renderMessages,
+      settings: renderSettings
+    };
+    var renderFn = contentBySubTab[subTab] || renderStatusDetail;
+    return '<div class="system-view ae-fade-in">' +
+           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
+           '<div class="system-panel">' + renderFn() + "</div></div>";
   }
 
   function getArchiveLibrary() {
@@ -1202,20 +1367,6 @@
            "</div>";
   }
 
-  function renderSystem() {
-    var subTab = ui.systemSubTab || "status";
-    var tabs = [
-      { id: "status", label: "Durum" },
-      { id: "audit", label: "Audit" },
-      { id: "messages", label: "Mesajlar" }
-    ];
-    return '<div class="system-view ae-fade-in">' +
-           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
-           '<div class="system-panel">' +
-           AeEmpty({ icon: "◉", title: "Sistem", message: "Senkron durumu, audit ve mesajlaşma Faz 6'da burada olacak." }) +
-           "</div></div>";
-  }
-
   function renderActiveTab() {
     var panels = {
       today: renderToday,
@@ -1289,6 +1440,9 @@
     setArchiveSubTab: setArchiveSubTab,
     setSystemSubTab: setSystemSubTab,
     setArchivePage: setArchivePage,
+    setDensity: setDensity,
+    setTheme: setTheme,
+    setPanelToken: setPanelToken,
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,

@@ -11,23 +11,33 @@
     { id: "system",   label: "Sistem",      icon: "◉" }
   ];
 
+  var PTKEY = "seyma-panel-token";
+  var APPKEY = "seyma-reset-v1";
+  var REPO = "mustafaras/seyma-data";
+  var BRANCH = "main";
+
   var ui = {
     tab: "today",
     subTab: null,
     date: isoDate(new Date()),
     trendWindow: 7,
     density: "comfortable",
-    theme: "dark"
+    theme: "dark",
+    panelToken: ""
   };
 
   var syncStatus = {
     status: "idle",
     lastErrorCode: null,
     snapshotRevision: null,
-    sourceUpdatedAt: null
+    sourceUpdatedAt: null,
+    etag: null,
+    lastSyncedAt: null,
+    notModifiedCount: 0
   };
 
   var appData = null;
+  var isFetching = false;
 
   function isoDate(d) {
     if (!d || isNaN(d.getTime())) d = new Date();
@@ -944,8 +954,34 @@
     render();
   }
 
+  function normalizeToken(v) {
+    return String(v || "").replace(/[^\x20-\x7E]/g, "").trim();
+  }
+
+  function getLocalToken() {
+    try {
+      if (root.localStorage) return normalizeToken(root.localStorage.getItem(PTKEY));
+    } catch (e) {}
+    return "";
+  }
+
+  function setLocalToken(token) {
+    try {
+      if (root.localStorage && token) root.localStorage.setItem(PTKEY, token);
+    } catch (e) {}
+  }
+
+  function removeLocalToken() {
+    try {
+      if (root.localStorage) root.localStorage.removeItem(PTKEY);
+    } catch (e) {}
+  }
+
   function setPanelToken(token) {
-    ui.panelToken = typeof token === "string" ? token : "";
+    ui.panelToken = normalizeToken(token);
+    if (ui.panelToken) setLocalToken(ui.panelToken);
+    render();
+    return true;
   }
 
   function formatTs(ts) {
@@ -1028,12 +1064,16 @@
       : AeEmpty({ icon: "💬", title: "Henüz mesaj yok", message: "Gelen ve giden mesajlar burada listelenecek." });
 
     var tokenValue = (ui.panelToken || "").replace(/./g, "•");
+    var saveBtn = ui.panelToken
+      ? AeButton({ label: "↻ Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
+      : "";
     return '<div class="messages-detail ae-fade-in">' +
            AeCard({ className: "messages-card", children: list }) +
            '<div class="ae-card ae-card--summary token-card">' +
            '<div class="ae-label">GitHub token</div>' +
-           '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="token gir..." onchange="AeonV2.setPanelToken(this.value)" />' +
-           '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez.</div>' +
+           '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
+           '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez. Değiştirip dışarıya tıkladığında kaydedilir.</div>' +
+           saveBtn +
            "</div>" +
            "</div>";
   }
@@ -1415,18 +1455,111 @@
     render();
   }
 
-  function refresh() {
-    syncStatus.status = "saving";
-    render();
-    setTimeout(function() {
-      syncStatus.status = "accepted";
+  function responseHeader(r, name) {
+    try {
+      if (r && typeof r.headers === "object") {
+        var h = r.headers.get ? r.headers.get(name) : r.headers[name];
+        return h || "";
+      }
+    } catch (e) {}
+    return "";
+  }
+
+  function fetchLatest(repo, branch) {
+    var p = String(repo || REPO).split("/");
+    if (p.length !== 2 || !p[0] || !p[1]) throw new Error("Repo bicimi gecersiz.");
+    var api = "https://api.github.com/repos/" + encodeURIComponent(p[0]) + "/" + encodeURIComponent(p[1]) + "/contents/data/latest.json?ref=" + encodeURIComponent(branch || BRANCH);
+    var H = {
+      "Accept": "application/vnd.github.raw",
+      "Authorization": "Bearer " + ui.panelToken,
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    if (syncStatus.etag) H["If-None-Match"] = syncStatus.etag;
+    return root.fetch(api, { headers: H, cache: "no-store" }).then(function(r) {
+      var etag = responseHeader(r, "ETag");
+      if (r.status === 401 || r.status === 403) throw new Error("Token gecersiz veya yetkisiz.");
+      if (r.status === 404) {
+        var e = new Error("data/latest.json bulunamadi.");
+        e.notFound = true;
+        throw e;
+      }
+      if (r.status === 304) {
+        syncStatus.status = "accepted";
+        syncStatus.lastSyncedAt = new Date().toISOString();
+        syncStatus.notModifiedCount = (syncStatus.notModifiedCount || 0) + 1;
+        render();
+        return { notModified: true, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
+      }
+      if (!r.ok) throw new Error("Sunucu hatasi: " + r.status);
+      return r.json().then(function(data) {
+        syncStatus.etag = etag;
+        syncStatus.snapshotRevision = (data && data.syncReceipt && data.syncReceipt.snapshotRevision) || null;
+        syncStatus.sourceUpdatedAt = (data && data.syncReceipt && data.syncReceipt.sourceUpdatedAt) || null;
+        syncStatus.status = "accepted";
+        syncStatus.lastErrorCode = null;
+        syncStatus.lastSyncedAt = new Date().toISOString();
+        appData = data;
+        render();
+        return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
+      });
+    });
+  }
+
+  function load() {
+    if (isFetching) return Promise.resolve(null);
+    ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
+    if (!ui.panelToken) {
+      syncStatus.status = "idle";
+      syncStatus.lastErrorCode = "no_token";
       render();
-    }, 400);
+      return Promise.resolve(null);
+    }
+    isFetching = true;
+    syncStatus.status = "saving";
+    syncStatus.lastErrorCode = null;
+    render();
+    return fetchLatest(REPO, BRANCH)
+      .catch(function(e) {
+        if (e && e.notFound && BRANCH !== "main") {
+          BRANCH = "main";
+          return fetchLatest(REPO, BRANCH);
+        }
+        throw e;
+      })
+      .then(function(res) {
+        isFetching = false;
+        if (res && res.notModified) return appData;
+        return appData;
+      })
+      .catch(function(e) {
+        isFetching = false;
+        var m = String(e && e.message || e);
+        syncStatus.status = "error";
+        if (/gecersiz|yetkisiz|unauthorized|forbidden/i.test(m)) syncStatus.status = "unauthorized";
+        else if (/bulunamadi|not_found|404/i.test(m)) syncStatus.status = "not_found";
+        else if (/limit|rate/i.test(m)) syncStatus.status = "rate_limited";
+        syncStatus.lastErrorCode = m;
+        render();
+        return null;
+      });
+  }
+
+  function refresh() {
+    return load();
   }
 
   function logout() {
+    removeLocalToken();
+    ui.panelToken = "";
     syncStatus.status = "idle";
+    syncStatus.lastErrorCode = null;
+    syncStatus.etag = null;
+    syncStatus.snapshotRevision = null;
+    syncStatus.sourceUpdatedAt = null;
+    syncStatus.lastSyncedAt = null;
+    appData = null;
     ui.tab = "today";
+    ui.subTab = null;
     render();
   }
 
@@ -1438,7 +1571,9 @@
   function init() {
     var rootEl = root.document && root.document.getElementById("root");
     if (rootEl && ui.theme) rootEl.setAttribute("data-theme", ui.theme);
+    ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     render();
+    if (ui.panelToken) load();
   }
 
   root.AeonV2 = {
@@ -1459,6 +1594,9 @@
     setDensity: setDensity,
     setTheme: setTheme,
     setPanelToken: setPanelToken,
+    savePanelToken: setPanelToken,
+    load: load,
+    fetchLatest: fetchLatest,
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,

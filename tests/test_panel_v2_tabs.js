@@ -3,7 +3,9 @@
 
 const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
-const { dom, ctx, AeonV2 } = boot();
+const { dom, ctx, AeonV2, flushPromises } = boot();
+
+ctx.fetch = function() { return Promise.resolve({ status: 200, ok: true, headers: { get: function() { return null; } }, json: function() { return Promise.resolve({ days: { "2026-07-30": { mood: 5 } }, startDate: "2026-01-01", syncReceipt: { snapshotRevision: "abc123" } }); } }); };
 let html = dom.html;
 
 assert(AeonV2.TABS.length === 5, "5 ana sekme tanımlı");
@@ -45,11 +47,15 @@ assert(/Arşivler/.test(dom.html), "archives placeholder render edildi");
 AeonV2.setTab("system");
 assert(/Sistem/.test(dom.html), "system placeholder render edildi");
 
-AeonV2.refresh();
-assert(AeonV2.syncStatus.status === "accepted", "refresh sonunda accepted durumuna geçti");
+AeonV2.setPanelToken("ghp_demo_token");
+AeonV2.refresh().then(function() {
+  return flushPromises();
+}).then(function() {
+  assert(AeonV2.syncStatus.status === "accepted", "refresh sonunda accepted durumuna geçti");
 
-AeonV2.logout();
-assert(AeonV2.ui.tab === "today", "logout sonrası today sekmesine döndü");
-assert(AeonV2.syncStatus.status === "idle", "logout sonrası status idle");
+  AeonV2.logout();
+  assert(AeonV2.ui.tab === "today", "logout sonrası today sekmesine döndü");
+  assert(AeonV2.syncStatus.status === "idle", "logout sonrası status idle");
 
-console.log("\n🦩 Faz 1 tabs + topbar fixture — TÜM TESTLER BAŞARILI");
+  console.log("\n🦩 Faz 1 tabs + topbar fixture — TÜM TESTLER BAŞARILI");
+});

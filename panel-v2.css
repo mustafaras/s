@@ -1198,12 +1198,94 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 /* Kontrast desteği: düşük tonlu metin */
 .ae-status--muted { opacity: 0.85; }
 
+/* Primary / Drop button variants */
+.ae-btn--primary {
+  background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));
+  border-color: transparent;
+  color: var(--ae-page);
+}
+.ae-btn--primary:hover {
+  background: linear-gradient(135deg, var(--ae-accent2), var(--ae-accent));
+  color: var(--ae-page);
+}
+.ae-btn--drop {
+  background: color-mix(in srgb, var(--ae-drop) 10%, var(--ae-elevated));
+  border-color: color-mix(in srgb, var(--ae-drop) 24%, transparent);
+  color: var(--ae-drop);
+}
+.ae-btn--drop:hover {
+  background: color-mix(in srgb, var(--ae-drop) 16%, var(--ae-elevated));
+}
+
 /* Icon-only buton boyutu */
 .ae-btn--icon { width: 34px; height: 34px; padding: 0; }
 
-/* Token input odak */
+/* Token card / input */
+.token-card {
+  gap: var(--ae-space-sm);
+  padding: var(--ae-space-md);
+}
+.token-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--ae-space-sm) var(--ae-space-md);
+  border: 1px solid var(--ae-card-bd);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-elevated);
+  color: var(--ae-text);
+  font-size: 13px;
+  font-family: var(--ae-font);
+}
+.token-input::placeholder { color: var(--ae-faint); }
+.token-hint {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ae-muted);
+}
 .token-input:focus-visible {
   outline: 2px solid var(--ae-accent);
   outline-offset: 2px;
   border-color: var(--ae-accent);
 }
+
+/* Message bubbles */
+.messages-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+}
+.messages-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-xs);
+  padding: var(--ae-space-sm) var(--ae-space-md);
+  border-radius: var(--ae-radius-md);
+  max-width: 92%;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.message-bubble--in {
+  align-self: flex-start;
+  background: var(--ae-empty-bg);
+  border: 1px solid var(--ae-card-bd);
+  color: var(--ae-text);
+  border-bottom-left-radius: 4px;
+}
+.message-bubble--out {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));
+  border: none;
+  color: var(--ae-page);
+  border-bottom-right-radius: 4px;
+}
+.message-bubble__meta {
+  font-size: 10px;
+  font-weight: 800;
+  opacity: 0.8;
+}
+.message-bubble__text { word-break: break-word; }

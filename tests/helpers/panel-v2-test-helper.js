@@ -58,29 +58,62 @@ function boot(opts) {
   opts = opts || {};
   const dom = createDom(opts.theme, opts.density);
   global.document = dom;
+  const pendingTimers = [];
 
   const ctx = {
     window: {},
     document: dom,
     console: console,
-    setTimeout: function(cb) { if (typeof cb === "function") cb(); return 0; },
+    setTimeout: function(cb, ms) {
+      if (typeof cb === "function") {
+        if (ms > 0) {
+          pendingTimers.push(cb);
+        } else {
+          cb();
+        }
+      }
+      return 0;
+    },
+    setImmediate: function(cb) { if (typeof cb === "function") cb(); return 0; },
     setInterval: function() { return 0; },
     clearTimeout: function() {},
     clearInterval: function() {}
   };
   ctx.window = ctx;
 
+  // Minimal localStorage mock with per-context storage
+  const store = {};
+  ctx.localStorage = {
+    getItem: function(k) { return store[k] === undefined ? null : store[k]; },
+    setItem: function(k, v) { store[k] = String(v); },
+    removeItem: function(k) { delete store[k]; }
+  };
+
+  // Promise-based fetch mock: call-site can override via ctx.fetch = ...
+  ctx.fetch = function() { return Promise.resolve({ status: 200, ok: true, headers: {}, json: function() { return Promise.resolve({ days: {}, startDate: "2026-01-01" }); } }); };
+
   vm.createContext(ctx);
   vm.runInContext(read("panelCoverageManifest.js"), ctx);
   vm.runInContext(read("panel-v2.js"), ctx);
 
-  return {
+  const helper = {
     dom: dom,
     ctx: ctx,
     AeonV2: ctx.AeonV2,
     read: read,
-    assert: assert
+    assert: assert,
+    runTimers: function() {
+      var cbs = pendingTimers.slice();
+      pendingTimers.length = 0;
+      cbs.forEach(function(cb) { try { cb(); } catch (e) {} });
+      return cbs.length;
+    },
+    flushPromises: async function() {
+      await new Promise(function(resolve) { setImmediate(resolve); });
+    }
   };
+
+  return helper;
 }
 
 module.exports = { boot, read, assert };

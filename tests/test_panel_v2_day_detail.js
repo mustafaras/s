@@ -175,7 +175,7 @@ assert(/Bu tarihe ait kayıt yok/.test(html), "Boş gün açıklaması doğru");
 
 // 6. 30 günlük ısı haritası var
 ctx.AeonV2.setDate("2026-08-04");
-const heatmapCells = (html.match(/class="day-heatmap__cell"/g) || []).length;
+const heatmapCells = (html.match(/class="day-heatmap__cell/g) || []).length;
 assert(heatmapCells === 30, "30 günlük ısı haritası hücresi var: " + heatmapCells);
 
 // 7. Beslenme ve hareket özeti

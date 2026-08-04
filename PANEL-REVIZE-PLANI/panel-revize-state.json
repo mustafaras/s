@@ -1,15 +1,11 @@
 {
   "project": "PANEL-REVIZE",
   "version": "1.0.0",
-  "lastUpdated": "2026-08-04T06:00:00Z",
+  "lastUpdated": "2026-08-04T07:00:00Z",
   "status": "in-progress",
   "currentTaskId": null,
-  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5"],
+  "completedTasks": ["0.1", "0.2", "0.3", "0.4", "0.5", "1.1", "1.2", "1.3", "1.4", "2.1", "2.2", "2.3", "2.4", "2.5", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7", "4.8", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "6.1", "6.2", "6.3", "6.4", "6.5", "7.1", "7.2", "7.3", "7.4"],
   "pendingTasks": [
-    "7.1",
-    "7.2",
-    "7.3",
-    "7.4",
     "8.1",
     "8.2",
     "8.3",
@@ -82,8 +78,16 @@
       "summary": "Faz 6 Sistem & Mesajlar fixture PASS — Durum/Audit/Mesajlar/Ayarlar alt-sekmeleri, sync durum detayı, coverage audit, inbox/outbox mesajlaşma, token/density/theme/oturum ayarları, topbar badge yönlendirme",
       "command": "node tests/test_panel_v2_system.js",
       "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_system.js"]
+    },
+    {
+      "recordedAt": "2026-08-04T07:00:00Z",
+      "taskId": "7.4",
+      "kind": "test-pass",
+      "summary": "Faz 7 Premium Polish PASS — inline stiller kaldırıldı, ARIA etiketleri eklendi, reduced-motion, responsive grids, focus/hover polish, day-detail ısı haritası 30 hücre doğru, tüm Faz 1-6 fixture'ları yeniden yeşil",
+      "command": "node tests/test_panel_v2_tabs.js && node tests/test_panel_v2_today.js && node tests/test_panel_v2_trends.js && node tests/test_panel_v2_day_detail.js && node tests/test_panel_v2_archives.js && node tests/test_panel_v2_system.js",
+      "files": ["panel-v2.js", "panel-v2.css", "tests/test_panel_v2_day_detail.js"]
     }
   ],
-  "nextTaskId": "7.1",
-  "notes": "Faz 6 tamamlandı: Sistem sekmesi 4 alt-sekme (Durum, Audit, Mesajlar, Ayarlar), sync durum detayı, coverage audit, inbox/outbox mesajlaşma, panel token/density/theme/oturum ayarları, topbar status badge'inden sistem sekmesine atlama. Bir sonraki aşama: Faz 7 Polish (PX- yardımcı promptlar)."
+  "nextTaskId": "8.1",
+  "notes": "Faz 7 tamamlandı: inline stiller kaldırıldı (data-pct trend bar + mood sınıflı ısı haritası), AeButton aria-label desteği, icon-only butonlar erişilebilir, reduced-motion medya sorgusu, responsive grid breakpoint'leri (375/460/768/120px), focus-visible ve hover-lift polish, taşma ve density varyantları. Tüm Faz 1-6 fixture'ları yeniden PASS. Bir sonraki aşama: Faz 8 Test & Kabul."
 }

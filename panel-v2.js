@@ -114,6 +114,7 @@
     var cls = classNames(["ae-btn", opts.variant ? "ae-btn--" + opts.variant : "", opts.className]);
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
+    if (opts.ariaLabel) attrs += ' aria-label="' + escapeHtml(opts.ariaLabel) + '"';
     return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + escapeHtml(label) + "</button>";
   }
 
@@ -155,9 +156,20 @@
   function getDay(date) {
     return isObject(appData) && isObject(appData.days) ? (appData.days[date] || null) : null;
   }
-  function lastNDates(n, ref) {
+  function lastNDates(n, ref, includeFuture) {
     var out = [], base = ref || todayStr();
-    for (var i = n - 1; i >= 0; i--) out.push(dateOffset(base, -i));
+    var today = todayStr();
+    for (var i = n - 1; i >= 0; i--) {
+      var d = dateOffset(base, -i);
+      if (!includeFuture && d > today) {
+        out.push(null);
+        continue;
+      }
+      out.push(d);
+    }
+    // Sondaki boş (gelecek) gün kayıtlarını at; çağrıcı 30 gerçek hücre görmeli.
+    while (out.length < n) out.push(null);
+    while (out.length > n && out[out.length - 1] === null) out.pop();
     return out;
   }
 
@@ -217,8 +229,8 @@
     var n = safeNumber(value), m = safeNumber(max) || 10;
     var pct = n !== null ? Math.max(0, Math.min(100, Math.round((n / m) * 100))) : 0;
     var empty = n === null;
-    return '<div class="trend-bar ' + (empty ? "trend-bar--empty" : "") + ' trend-bar--' + (color || "accent") + '" ' +
-           'style="--bar-pct:' + pct + '%" aria-hidden="true"><div class="trend-bar__fill"></div></div>';
+    var dataPct = empty ? '' : ' data-pct="' + pct + '"';
+    return '<div class="trend-bar ' + (empty ? "trend-bar--empty" : "") + ' trend-bar--' + (color || "accent") + '"' + dataPct + ' aria-hidden="true"><div class="trend-bar__fill"></div></div>';
   }
 
   function renderTrendStrip(date) {
@@ -580,8 +592,8 @@
            '<button type="button" class="ae-status-btn" onclick="AeonV2.setTab(\'system\');AeonV2.setSystemSubTab(\'status\')" aria-label="Senkron durumu">' +
            AeStatusBadge({ status: syncStatus.status }) +
            "</button>" +
-           AeButton({ label: "↻", variant: "mini", onclick: "AeonV2.refresh()" }) +
-           AeButton({ label: "✕", variant: "mini", onclick: "AeonV2.logout()" }) +
+           AeButton({ label: "↻", variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.refresh()", ariaLabel: "Yenile" }) +
+           AeButton({ label: "✕", variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.logout()", ariaLabel: "Oturumu sonlandır" }) +
            "</div>" +
            "</header>";
   }
@@ -676,12 +688,12 @@
     var today = isoDate(new Date());
     var label = date === today ? "Bugün" : formatDateLabel(date);
     return '<div class="ae-card ae-card--summary day-date-picker">' +
-           AeButton({ label: "◀", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)" }) +
+           AeButton({ label: "◀", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
            '<div class="day-date-picker__display">' +
            '<div class="day-date-picker__label">' + escapeHtml(label) + "</div>" +
            '<div class="day-date-picker__iso">' + escapeHtml(date) + "</div>" +
            "</div>" +
-           AeButton({ label: "▶", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(1)" }) +
+           AeButton({ label: "▶", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
            "</div>";
   }
 
@@ -696,15 +708,19 @@
   };
 
   function renderDayHeatmap(date) {
-    var dates = lastNDates(30, date);
+    var dates = lastNDates(30, date, true);
     var cells = dates.map(function(d) {
-      var day = getDay(d) || {};
-      var mood = safeNumber(day.mood && day.mood.value);
-      var color = mood ? (DAY_HEAT_COLORS[mood] || "var(--ae-empty-bg)") : "var(--ae-empty-bg)";
-      var title = formatDateLabel(d);
-      return '<div class="day-heatmap__cell" style="background:' + color + '" title="' + escapeHtml(title) + '">' +
-             '<span class="day-heatmap__day">' + escapeHtml(Number(d.split("-")[2]).toString()) + "</span>" +
-             "</div>";
+      var toneClass = '', label = '';
+      if (d) {
+        var day = getDay(d) || {};
+        var mood = safeNumber(day.mood && day.mood.value);
+        toneClass = mood ? ' day-heatmap__cell--mood-' + mood : '';
+        label = '<span class="day-heatmap__day">' + escapeHtml(Number(d.split("-")[2]).toString()) + "</span>";
+      } else {
+        toneClass = ' day-heatmap__cell--empty';
+      }
+      var title = d ? formatDateLabel(d) : 'Gelecek gün';
+      return '<div class="day-heatmap__cell' + toneClass + '" title="' + escapeHtml(title) + '">' + label + "</div>";
     }).join("");
     return '<div class="ae-card ae-card--summary day-heatmap">' +
            '<div class="ae-label">Son 30 gün</div>' +
@@ -1390,7 +1406,7 @@
       renderTopbar() +
       renderTabs() +
       '<main class="ae-app__body">' + renderActiveTab() + "</main>" +
-      '<div style="display:none" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
+      '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
   }
 
   function setTab(id) {

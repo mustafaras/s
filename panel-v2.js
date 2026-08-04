@@ -879,24 +879,341 @@
            "</div>";
   }
 
-  function renderArchives() {
-    return AeCard({
-      children: AeEmpty({
-        icon: "◈",
-        title: "Arşivler",
-        message: "İçerik, ibadet ve profil arşivleri Faz 5'te listelenecek."
-      })
+  function SubTabs(opts) {
+    opts = opts || {};
+    var tabs = Array.isArray(opts.tabs) ? opts.tabs : [];
+    var active = opts.active || (tabs[0] && tabs[0].id);
+    var html = '<div class="sub-tabs" role="tablist">';
+    tabs.forEach(function(t) {
+      var isActive = t.id === active;
+      html += '<button type="button" class="sub-tab' + (isActive ? " is-active" : "") + '" ' +
+              'role="tab" aria-selected="' + (isActive ? "true" : "false") + '" ' +
+              'onclick="' + escapeHtml(String(opts.onChange || "").replace(/\{id\}/g, t.id)) + '">' +
+              escapeHtml(safeText(t.label, 24)) + "</button>";
     });
+    html += "</div>";
+    return html;
+  }
+
+  function setArchiveSubTab(id) {
+    var valid = ["library", "watch", "listen", "quotes"];
+    if (valid.indexOf(id) === -1) return;
+    ui.subTab = id;
+    render();
+  }
+
+  function setSystemSubTab(id) {
+    var valid = ["status", "audit", "messages"];
+    if (valid.indexOf(id) === -1) return;
+    ui.systemSubTab = id;
+    render();
+  }
+
+  function getArchiveLibrary() {
+    var root = isObject(appData) ? appData : {};
+    var library = isObject(root.library) ? root.library : {};
+    var books = Array.isArray(library.books) ? library.books : [];
+    var byId = {};
+    books.forEach(function(b) { if (b && b.id) byId[b.id] = b; });
+
+    // daily reading entries merge
+    var days = isObject(root.days) ? root.days : {};
+    Object.keys(days).forEach(function(date) {
+      var reading = (days[date].reading || {}).entries;
+      if (!Array.isArray(reading)) return;
+      reading.forEach(function(e) {
+        if (!e || !e.title) return;
+        if (e.bookId && byId[e.bookId]) {
+          var b = byId[e.bookId];
+          b._lastRead = date;
+          b._dailyPages = (b._dailyPages || 0) + (safeNumber(e.pages) || 0);
+        } else {
+          var key = "daily:" + (e.id || e.title);
+          if (!byId[key]) {
+            byId[key] = {
+              id: key, title: e.title, author: e.author || "",
+              status: "reading", source: "daily", _lastRead: date,
+              _dailyPages: safeNumber(e.pages) || 0
+            };
+          } else {
+            byId[key]._lastRead = date;
+            byId[key]._dailyPages += safeNumber(e.pages) || 0;
+          }
+        }
+      });
+    });
+
+    return Object.keys(byId).map(function(k) { return byId[k]; });
+  }
+
+  function getArchiveWatch() {
+    var root = isObject(appData) ? appData : {};
+    var watchlist = isObject(root.watchlist) ? root.watchlist : {};
+    var items = Array.isArray(watchlist.items) ? watchlist.items : [];
+    var byId = {};
+    items.forEach(function(i) { if (i && i.id) byId[i.id] = i; });
+
+    var days = isObject(root.days) ? root.days : {};
+    Object.keys(days).forEach(function(date) {
+      var watching = (days[date].watching || {}).entries;
+      if (!Array.isArray(watching)) return;
+      watching.forEach(function(e) {
+        if (!e || !e.title) return;
+        if (e.itemId && byId[e.itemId]) {
+          var it = byId[e.itemId];
+          it._lastWatch = date;
+          it._dailyMinutes = (it._dailyMinutes || 0) + (safeNumber(e.minutes) || 0);
+          it._dailyEps = (it._dailyEps || 0) + (safeNumber(e.episodes) || 0);
+        } else {
+          var key = "daily:" + (e.id || e.title);
+          if (!byId[key]) {
+            byId[key] = {
+              id: key, title: e.title, kind: e.kind || "film", source: "daily",
+              _lastWatch: date, _dailyMinutes: safeNumber(e.minutes) || 0,
+              _dailyEps: safeNumber(e.episodes) || 0
+            };
+          } else {
+            byId[key]._lastWatch = date;
+            byId[key]._dailyMinutes += safeNumber(e.minutes) || 0;
+            byId[key]._dailyEps += safeNumber(e.episodes) || 0;
+          }
+        }
+      });
+    });
+
+    return Object.keys(byId).map(function(k) { return byId[k]; });
+  }
+
+  function getArchiveListen() {
+    var root = isObject(appData) ? appData : {};
+    var music = isObject(root.music) ? root.music : {};
+    var items = Array.isArray(music.items) ? music.items : [];
+    var byId = {};
+    items.forEach(function(i) { if (i && i.id) byId[i.id] = i; });
+
+    var days = isObject(root.days) ? root.days : {};
+    Object.keys(days).forEach(function(date) {
+      var listening = (days[date].listening || {}).entries;
+      if (!Array.isArray(listening)) return;
+      listening.forEach(function(e) {
+        if (!e || !e.title) return;
+        if (e.itemId && byId[e.itemId]) {
+          var it = byId[e.itemId];
+          it._lastListen = date;
+          it._dailyMinutes = (it._dailyMinutes || 0) + (safeNumber(e.minutes) || 0);
+        } else {
+          var key = "daily:" + (e.id || e.title);
+          if (!byId[key]) {
+            byId[key] = {
+              id: key, title: e.title, artist: e.artist || "", kind: e.kind || "sarki",
+              source: "daily", _lastListen: date, _dailyMinutes: safeNumber(e.minutes) || 0
+            };
+          } else {
+            byId[key]._lastListen = date;
+            byId[key]._dailyMinutes += safeNumber(e.minutes) || 0;
+          }
+        }
+      });
+    });
+
+    return Object.keys(byId).map(function(k) { return byId[k]; });
+  }
+
+  function getArchiveQuotes() {
+    var root = isObject(appData) ? appData : {};
+    var out = [];
+
+    function pushFrom(items, source, titleField) {
+      if (!Array.isArray(items)) return;
+      items.forEach(function(it) {
+        if (!it) return;
+        var qs = Array.isArray(it.quotes) ? it.quotes : [];
+        qs.forEach(function(q) {
+          if (!q || !q.text) return;
+          out.push({
+            id: q.id || (source + "-" + Math.random().toString(36).slice(2)),
+            text: q.text,
+            source: source,
+            title: it[titleField] || "",
+            ts: q.ts || it.createdAt || ""
+          });
+        });
+      });
+    }
+
+    var library = isObject(root.library) ? root.library : {};
+    pushFrom(library.books, "kitap", "title");
+
+    var watchlist = isObject(root.watchlist) ? root.watchlist : {};
+    pushFrom(watchlist.items, "izleme", "title");
+
+    var music = isObject(root.music) ? root.music : {};
+    pushFrom(music.items, "müzik", "title");
+
+    return out.sort(function(a, b) { return String(b.ts).localeCompare(String(a.ts)); });
+  }
+
+  function paginate(items, page, pageSize) {
+    page = Math.max(1, safeNumber(page) || 1);
+    pageSize = Math.max(1, safeNumber(pageSize) || 20);
+    var total = items.length;
+    var totalPages = Math.max(1, Math.ceil(total / pageSize));
+    page = Math.min(page, totalPages);
+    var start = (page - 1) * pageSize;
+    var pageItems = items.slice(start, start + pageSize);
+    return { items: pageItems, page: page, totalPages: totalPages, total: total, hasPrev: page > 1, hasNext: page < totalPages };
+  }
+
+  var ARCHIVE_PAGE_SIZE = 20;
+
+  function renderPagination(state, onClickPrefix) {
+    if (state.totalPages <= 1) return "";
+    var buttons = "";
+    if (state.hasPrev) {
+      buttons += '<button type="button" class="ae-btn ae-btn--mini" onclick="' + escapeHtml(onClickPrefix + "(" + (state.page - 1) + ")") + '">◀</button>';
+    }
+    buttons += '<span class="pagination__info">' + state.page + " / " + state.totalPages + "</span>";
+    if (state.hasNext) {
+      buttons += '<button type="button" class="ae-btn ae-btn--mini" onclick="' + escapeHtml(onClickPrefix + "(" + (state.page + 1) + ")") + '">▶</button>';
+    }
+    return '<div class="pagination">' + buttons + "</div>";
+  }
+
+  function setArchivePage(page) {
+    ui.archivePage = Math.max(1, safeNumber(page) || 1);
+    render();
+  }
+
+  function ArchiveRow(opts) {
+    opts = opts || {};
+    return '<div class="archive-row">' +
+           '<div class="archive-row__main">' +
+           (opts.icon ? '<span class="archive-row__icon" aria-hidden="true">' + escapeHtml(opts.icon) + "</span>" : "") +
+           '<div class="archive-row__body">' +
+           '<div class="archive-row__title">' + escapeHtml(safeText(opts.title, 80)) + "</div>" +
+           (opts.meta ? '<div class="archive-row__meta">' + escapeHtml(safeText(opts.meta, 120)) + "</div>" : "") +
+           "</div></div>" +
+           (opts.badge ? '<span class="ae-chip">' + escapeHtml(opts.badge) + "</span>" : "") +
+           "</div>";
+  }
+
+  function renderArchiveLibrary(page) {
+    var items = getArchiveLibrary();
+    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    if (!state.items.length) {
+      return AeEmpty({ icon: "📚", title: "Kütüphane boş", message: "Henüz kitap veya okuma kaydı yok." });
+    }
+    var rows = state.items.map(function(b) {
+      var progress = "";
+      if (safeNumber(b.totalPages) > 0 && safeNumber(b.currentPage) >= 0) {
+        progress = b.currentPage + "/" + b.totalPages + " sayfa";
+      } else if (b._dailyPages) {
+        progress = b._dailyPages + " sayfa günlük";
+      }
+      var meta = [b.author, b._lastRead ? "Son: " + formatDateLabel(b._lastRead) : "", progress].filter(Boolean).join(" · ");
+      return ArchiveRow({
+        icon: b.emoji || "📖",
+        title: b.title,
+        meta: meta,
+        badge: { reading: "Okunuyor", finished: "Bitti", dropped: "Bırakıldı" }[b.status] || "Kayıtlı"
+      });
+    }).join("");
+    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+  }
+
+  function renderArchiveWatch(page) {
+    var items = getArchiveWatch();
+    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    if (!state.items.length) {
+      return AeEmpty({ icon: "🎬", title: "İzleme listesi boş", message: "Henüz film/dizi veya izleme kaydı yok." });
+    }
+    var rows = state.items.map(function(it) {
+      var progress = "";
+      if (safeNumber(it.totalEp) > 0) {
+        progress = (it.watchedEp || 0) + "/" + it.totalEp + " bölüm";
+      } else if (it._dailyEps) {
+        progress = it._dailyEps + " bölüm günlük";
+      }
+      if (it._dailyMinutes) progress += (progress ? " · " : "") + it._dailyMinutes + " dk";
+      var meta = [it.kind === "dizi" ? "Dizi" : "Film", it._lastWatch ? "Son: " + formatDateLabel(it._lastWatch) : "", progress].filter(Boolean).join(" · ");
+      return ArchiveRow({
+        icon: it.emoji || (it.kind === "dizi" ? "📺" : "🎞"),
+        title: it.title,
+        meta: meta,
+        badge: { watching: "İzleniyor", finished: "Bitti", dropped: "Bırakıldı" }[it.status] || "Kayıtlı"
+      });
+    }).join("");
+    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+  }
+
+  function renderArchiveListen(page) {
+    var items = getArchiveListen();
+    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    if (!state.items.length) {
+      return AeEmpty({ icon: "🎧", title: "Dinleme listesi boş", message: "Henüz müzik/podcast veya dinleme kaydı yok." });
+    }
+    var rows = state.items.map(function(it) {
+      var kindLabel = { sarki: "Şarkı", album: "Albüm", podcast: "Podcast" }[it.kind] || it.kind || "Müzik";
+      var meta = [it.artist, it._lastListen ? "Son: " + formatDateLabel(it._lastListen) : "", it._dailyMinutes ? it._dailyMinutes + " dk" : ""].filter(Boolean).join(" · ");
+      return ArchiveRow({
+        icon: it.emoji || (it.kind === "podcast" ? "🎙" : "🎵"),
+        title: it.title,
+        meta: meta,
+        badge: kindLabel
+      });
+    }).join("");
+    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+  }
+
+  function renderArchiveQuotes(page) {
+    var items = getArchiveQuotes();
+    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    if (!state.items.length) {
+      return AeEmpty({ icon: "✍️", title: "Alıntı yok", message: "Henüz kitap, film/dizi veya müzik alıntısı yok." });
+    }
+    var rows = state.items.map(function(q) {
+      return '<div class="archive-row archive-row--quote">' +
+             '<div class="archive-row__body">' +
+             '<div class="archive-row__title">“' + escapeHtml(safeText(q.text, 160)) + '”</div>' +
+             '<div class="archive-row__meta">' + escapeHtml(safeText(q.source + (q.title ? " · " + q.title : ""), 80)) + "</div>" +
+             "</div></div>";
+    }).join("");
+    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+  }
+
+  function renderArchives() {
+    var subTab = ui.subTab || "library";
+    var tabs = [
+      { id: "library", label: "Kütüphane" },
+      { id: "watch", label: "İzleme" },
+      { id: "listen", label: "Dinleme" },
+      { id: "quotes", label: "Alıntılar" }
+    ];
+    var contentBySubTab = {
+      library: renderArchiveLibrary,
+      watch: renderArchiveWatch,
+      listen: renderArchiveListen,
+      quotes: renderArchiveQuotes
+    };
+    var renderFn = contentBySubTab[subTab] || renderArchiveLibrary;
+    return '<div class="archives-view ae-fade-in">' +
+           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
+           '<div class="archive-panel">' + renderFn() + "</div>" +
+           "</div>";
   }
 
   function renderSystem() {
-    return AeCard({
-      children: AeEmpty({
-        icon: "◉",
-        title: "Sistem & Mesajlar",
-        message: "Senkron durumu, audit, inbox/outbox ve yoğunluk seçici Faz 6'da burada olacak."
-      })
-    });
+    var subTab = ui.systemSubTab || "status";
+    var tabs = [
+      { id: "status", label: "Durum" },
+      { id: "audit", label: "Audit" },
+      { id: "messages", label: "Mesajlar" }
+    ];
+    return '<div class="system-view ae-fade-in">' +
+           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
+           '<div class="system-panel">' +
+           AeEmpty({ icon: "◉", title: "Sistem", message: "Senkron durumu, audit ve mesajlaşma Faz 6'da burada olacak." }) +
+           "</div></div>";
   }
 
   function renderActiveTab() {
@@ -969,6 +1286,9 @@
     shiftDate: shiftDate,
     goToDayDetail: goToDayDetail,
     setTrendWindow: setTrendWindow,
+    setArchiveSubTab: setArchiveSubTab,
+    setSystemSubTab: setSystemSubTab,
+    setArchivePage: setArchivePage,
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,

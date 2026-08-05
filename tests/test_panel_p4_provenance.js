@@ -55,7 +55,7 @@ console.log('[2] Yok + bozuk fixture');
 var missing={lastOpenedDate:'2026-08-02',days:{},notifications:[]}, missingSnapshot=P.buildObserverSnapshot(missing,receipt,'2026-08-02T15:00:05.000Z');
 ok('yok fixture terapi/profil/bildirim/external durumunu taşır',missingSnapshot.sections.therapyProvenance.status==='missing'&&missingSnapshot.sections.profileProgress.status==='missing'&&missingSnapshot.sections.notificationTimeline.status==='missing'&&missingSnapshot.sections.externalSources.status==='missing');
 panelContext.PROJECTION_SECTIONS=missingSnapshot.sections;
-ok('yok fixture kartı çökmeksizin render olur',panelContext.p4ProvenanceCardHTMLP().includes('Terapi araçları'));
+ok('yok fixture kartı çökmeksizin render olur',panelContext.p4ProvenanceCardHTMLP().includes('Terapi araçları')&&panelContext.p4ProvenanceCardHTMLP().includes('Kayıt yok'));
 var broken=fixture(); broken.days['2026-08-02'].therapy.thoughts=[null]; broken.days['2026-08-02'].sleep.windDown.events=[null]; broken.notifications=[null]; broken.profileAssessment.responses='broken';
 var brokenSnapshot=P.buildObserverSnapshot(broken,receipt,'2026-08-02T15:00:05.000Z');
 ok('bozuk terapi/event/bildirim yapısı fail-safe görünür',brokenSnapshot.sections.therapyProvenance.status==='malformed'&&brokenSnapshot.sections.therapyProvenance.windDown.status==='malformed'&&brokenSnapshot.sections.notificationTimeline.status==='malformed');

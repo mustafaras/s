@@ -3087,8 +3087,8 @@ function render(){
   h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;order:30;">';
   h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('map-pin',14)+' Canlı Konum';
   if(loc){
-    var mapsUrl="https://maps.google.com/?q="+loc.lat+","+loc.lng;
-    h+='<a href="'+mapsUrl+'" target="_blank" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:800;letter-spacing:.3px;">Google Maps →</a>';
+    var mapsUrl="https://www.google.com/maps/search/?api=1&query="+loc.lat+","+loc.lng;
+    h+='<a href="'+mapsUrl+'" target="_blank" rel="noopener noreferrer" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:800;letter-spacing:.3px;">Google Maps →</a>';
   }
   h+='</div>';
   if(loc){
@@ -3119,7 +3119,7 @@ function render(){
       h+='<div style="display:flex;flex-direction:column;max-height:340px;overflow-y:auto;">';
       shown.forEach(function(s){
         var isVeh=s.mode==='vehicle', col=isVeh?'var(--purple)':'var(--green)', ic=isVeh?'car':'footprints', lbl=isVeh?'Araç':'Yürüyüş';
-        var maps='https://maps.google.com/?q='+s.end.lat+','+s.end.lng;
+        var maps='https://www.google.com/maps/search/?api=1&query='+s.end.lat+','+s.end.lng;
         h+='<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--bd2);">';
         h+='<span style="width:26px;height:26px;border-radius:8px;flex-shrink:0;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:rgba(255,255,255,.05);border:1px solid var(--bd2);">'+icon(ic,14)+'</span>';
         h+='<div style="flex:1;min-width:0;">';
@@ -3151,7 +3151,7 @@ function render(){
       h+='<div style="display:flex;flex-direction:column;max-height:320px;overflow-y:auto;">';
       rows.forEach(function(p){
         if(!p||p.lat==null||p.lng==null) return;
-        var maps='https://maps.google.com/?q='+p.lat+','+p.lng;
+        var maps='https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng;
         var when=''; try{ when=new Date(p.ts).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ when=String(p.ts||''); }
         h+='<div style="display:flex;gap:11px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd2);">';
         h+='<span style="width:22px;height:22px;border-radius:7px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--gold);background:rgba(255,255,255,.05);border:1px solid var(--bd2);">'+icon('map-pin',12)+'</span>';

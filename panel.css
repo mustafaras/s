@@ -135,50 +135,6 @@
   .card-exp.is-open .card-exp-body{grid-template-rows:1fr}
   .card-exp-body>div{overflow:hidden}
   .card-exp-inner{padding-top:11px}
-  .loc-body{display:flex;flex-direction:column;gap:12px}
-  .loc-map-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-  .loc-map-style,.loc-map-height{display:inline-flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--bd2);border-radius:8px;background:var(--surface-nested)}
-  .loc-map-toolbar button{min-height:28px;padding:3px 8px;border:0;border-radius:6px;background:transparent;color:var(--t3);font:inherit;font-size:var(--f1);font-weight:800;cursor:pointer}
-  .loc-map-toolbar button:hover,.loc-map-toolbar button:focus-visible{color:var(--t1);background:var(--s3);outline:none}
-  .loc-map-toolbar button.active{background:var(--ggrad);color:#1a1404}
-  .loc-map-gmaps{margin-left:auto;color:var(--gold);font-size:var(--f2);font-weight:800;text-decoration:none;white-space:nowrap}
-  .loc-map-gmaps:hover,.loc-point-link:hover,.loc-track-coords a:hover{color:var(--t1)}
-  .loc-map{height:310px;min-height:0!important;border-radius:11px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
-  .loc-map-short{height:190px}
-  .loc-map-medium{height:310px}
-  .loc-map-tall{height:430px}
-  .loc-map-full{height:560px}
-  .loc-address{font-size:var(--f3);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-  .loc-subsection{border-top:1px solid var(--bd2);padding-top:10px}
-  .loc-subhead{display:flex;align-items:center;gap:6px;margin-bottom:5px;color:var(--t3);font-size:var(--f2);font-weight:800;letter-spacing:.4px}
-  .loc-subhead>span{margin-left:auto;color:var(--t4);font-size:var(--f1);font-weight:700}
-  .loc-empty{padding:9px 0;color:var(--t4);font-size:var(--f2)}
-  .loc-track-list,.loc-point-list{display:flex;flex-direction:column;max-height:300px;overflow-y:auto}
-  .loc-track-list::-webkit-scrollbar,.loc-point-list::-webkit-scrollbar{width:6px}
-  .loc-track-list::-webkit-scrollbar-thumb,.loc-point-list::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-  .loc-track-row,.loc-point-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd2);min-width:0}
-  .loc-track-icon,.loc-point-icon{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 26px;border:1px solid var(--bd2);border-radius:8px;background:rgba(255,255,255,.04)}
-  .loc-point-icon{width:22px;height:22px;flex-basis:22px;border-radius:7px;color:var(--gold)}
-  .loc-track-main,.loc-point-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
-  .loc-track-line{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-size:var(--f2);color:var(--t3)}
-  .loc-track-line b,.loc-point-main b{color:var(--t1);font-size:var(--f2)}
-  .loc-track-line>span:last-child{color:var(--t3)}
-  .loc-track-coords,.loc-point-main>span{font-size:var(--f1);color:var(--t4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .loc-track-coords a,.loc-point-link{color:var(--gold);font-weight:800;text-decoration:none}
-  .loc-point-link{font-size:var(--f1);white-space:nowrap}
-  .loc-track-foot{padding-top:7px;color:var(--t4);font-size:var(--f1);font-weight:700}
-  .audit-entry-btn{margin:0 0 10px 0;color:var(--gold);border-color:var(--bd-gold);background:var(--ga)}
-  .audit-entry-btn:hover{background:var(--ggrad);color:#1a1404}
-  .audit-page{top:0;padding-top:14px}
-  .audit-page>.d2-core-strip{margin-bottom:12px}
-  .audit-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px}
-  .audit-tabs::-webkit-scrollbar{display:none}
-  .audit-tab{display:inline-flex;align-items:center;gap:6px;min-height:var(--touch-min);flex:0 0 auto;padding:0 12px;border:1px solid var(--bd2);border-radius:9px;background:var(--surface-nested);color:var(--t3);font:inherit;font-size:var(--f2);font-weight:800;cursor:pointer}
-  .audit-tab:hover,.audit-tab:focus-visible{color:var(--t1);border-color:var(--gold);outline:none}
-  .audit-tab.active{background:var(--ggrad);border-color:transparent;color:#1a1404}
-  .audit-content{min-width:0}
-  .audit-content>.card{margin-bottom:0}
-  .audit-back-floating{display:none}
 
   /* ── WhatsApp benzeri sohbet balonları (Faz 4) ──
      Gözlemci perspektifi: Şeyma solda (gelen), ÆON/Luna sağda (giden).
@@ -296,7 +252,7 @@
   .scroll::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
 
   .chart{width:100%;display:block}
-  #loc-map{min-height:180px;border-radius:11px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
+  #loc-map{height:100%;min-height:180px;border-radius:11px;overflow:hidden;border:1px solid var(--bd);background:#08080e}
   .loc-live{background:var(--gra);color:var(--green);border:1px solid var(--grb)}
   .loc-old{background:var(--aa);color:var(--amber);border:1px solid var(--ab)}
   .loc-none{background:rgba(255,255,255,0.04);color:var(--t3);border:1px solid var(--bd)}
@@ -549,13 +505,6 @@
     .sync-ribbon-grid,.coverage-ribbon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .jumpnav,.section-header{position:relative;top:auto}
     .d2-detail-metrics .span-2{grid-column:span 6}
-    .loc-map-toolbar{align-items:stretch}
-    .loc-map-style,.loc-map-height{flex:1;min-width:0}
-    .loc-map-toolbar button{flex:1;padding-left:5px;padding-right:5px}
-    .loc-map-gmaps{width:100%;margin-left:0}
-    .loc-map-tall{height:350px}
-    .loc-map-full{height:430px}
-    .audit-tab{padding-left:10px;padding-right:10px}
   }
   @media(max-width:480px){
     .brand-context{font-size:9px}
@@ -568,13 +517,6 @@
     .d2-controls .seg button{flex:1;min-width:0;padding-left:6px;padding-right:6px}
     .d2-range-label{order:3}
     .d2-date-label{margin-left:0}
-    .loc-map-style,.loc-map-height{width:100%;flex-basis:100%}
-    .loc-map{height:250px}
-    .loc-map-short{height:180px}
-    .loc-map-tall{height:300px}
-    .loc-map-full{height:360px}
-    .loc-track-row,.loc-point-row{align-items:flex-start}
-    .loc-point-link{margin-left:auto}
   }
 
   /* ── D3 timeline + detail drawer ── */

@@ -133,7 +133,7 @@ var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
 var PANEL_TRANSPORT_CACHE={};
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:"all",eventDrawerLevel:1,d4SelectedModule:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:5,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:"all",eventDrawerLevel:1,d4SelectedModule:null};
 var EVENT_DRAWER_RETURN_ID=null;
 var D4_DRAWER_RETURN_ID=null;
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
@@ -1399,6 +1399,44 @@ function eventStatusP(e){
   if(e&&e.submittedAt) return {cls:'b-warn',label:'Gönderildi'};
   return {cls:'b-dim',label:'Yerel'};
 }
+function eventCategoryDefsP(){
+  return [
+    ['all','Tümü','Tüm alanlardan gelen son kayıtlar'],
+    ['attention','Dikkat gereken','Hata, eski görünüm veya kabul kanıtı eksik kayıtlar'],
+    ['sync','Senkronizasyon','Makbuz, retry, merge ve uzak kabul zinciri'],
+    ['therapy-profile','Terapi & profil','Terapi araçları ve profil ilerlemesi'],
+    ['quran-video','Kur’an & içerik','Kur’an, okuma, izleme ve içerik akışı'],
+    ['communication','İletişim & bildirim','ÆON mesajları ve bildirim teslimatı'],
+    ['user','Kullanıcı kayıtları','Günlük yaşamda kullanıcının kaydettiği alanlar'],
+    ['derived','Otomatik özet','Panelin veya uygulamanın türettiği özetler'],
+    ['external','Dış kaynak','Hava, fotoğraf ve dış servis fetch kayıtları']
+  ];
+}
+function eventPathLabelP(path){
+  var raw=String(path||'data'), normalized=raw.replace(/^data\.days\.\*\.?/,'').replace(/^data\./,'');
+  var labels={mood:'Ruh hali',journal:'Günlük',note:'Not',intention:'Niyet',gratitude:'Şükür',water:'Su',energy:'Enerji',stress:'Stres',sleep:'Uyku',meals:'Beslenme',mealItems:'Beslenme kalemleri',movement:'Hareket',location:'Konum',locationHistory:'Konum geçmişi',therapy:'Terapi',thoughts:'Düşünceler',decision:'Karar',share:'Paylaşım',firstStep:'İlk adım',selfCompassion:'Öz şefkat',dailyWin:'Günlük kazanım',windDown:'Uykuya geçiş',profileAssessment:'Profil değerlendirmesi',notifications:'Bildirimler',aeon:'ÆON sohbeti',quranJourney:'Kur’an yolculuğu',library:'Kütüphane',watchlist:'İzleme',music:'Dinleme',settings:'Ayarlar',syncReceipt:'Senkron makbuzu',eventLog:'Event günlüğü',weather:'Hava',fetch:'Fetch durumu',dailyPhoto:'Günün fotoğrafı',saygi:'Saygı',zikr:'Zikir',soulArchive:'Zihin-Beden'};
+  var parts=normalized.split('.').filter(function(x){return x&&x!=='*';}), mapped=parts.map(function(x){return labels[x]||x;});
+  if(raw.indexOf('data.days.')===0) return 'Günlük / '+(mapped[0]||'alan');
+  return mapped.join(' / ')||raw;
+}
+function eventOperationLabelP(operation){
+  var labels={create:'Oluşturuldu',record:'Kaydedildi',update:'Güncellendi',delete:'Silindi',complete:'Tamamlandı',accepted:'Kabul edildi',retry:'Yeniden denendi',merge:'Birleştirildi',sync_submitted:'Senkrona gönderildi'};
+  return labels[String(operation||'').toLowerCase()]||'İşlendi';
+}
+function eventChangeDescriptorP(e){
+  var path=eventPathLabelP(e&&e.path), subject=path.split(' / ').pop()||'Kayıt', operation=eventOperationLabelP(e&&e.operation), title=subject+' '+operation.toLocaleLowerCase('tr-TR');
+  return {title:title,pathLabel:path,operationLabel:operation};
+}
+function eventClassificationP(e){
+  var section=String(e&&e.section||'').toLowerCase(), path=String(e&&e.path||'').toLowerCase(), source=String(e&&(e.source||e.sourceType||e.provenance)||'').toLowerCase(), text=[section,path,source,e&&e.operation,e&&e.summary].join(' ');
+  if(/external|wikipedia|wikimedia|youtube|fetch|remote/.test(source)||/external|fetch|weather|dailyphoto|wikimedia/.test(path)) return {key:'external',label:'Dış kaynak',description:'Dış servis veya cache kaydı'};
+  if(/derived|projection|inferred|computed/.test(source)||/projection|summary|trend|continuity|backoff/.test(text)) return {key:'derived',label:'Otomatik özet',description:'Türetilmiş panel veya uygulama özeti'};
+  if(/therapy|terapi|profile|profil|thought|reflection|room/.test(text)) return {key:'therapy-profile',label:'Terapi & profil',description:'Terapi ve profil ilerlemesi'};
+  if(/notification|bildirim|message|mesaj|communication|ileti|aeon|inbox|outbox/.test(text)) return {key:'communication',label:'İletişim & bildirim',description:'Mesaj ve bildirim teslimatı'};
+  if(section==='sync'||/sync|receipt|revision|retry|merge|accepted|submit|persist|poll|event/.test(text)) return {key:'sync',label:'Senkronizasyon',description:'Kayıt ve uzak kabul zinciri'};
+  if(/quran|kur.?an|video|watch|reading|listening|library|watchlist|music/.test(text)) return {key:'quran-video',label:'Kur’an & içerik',description:'Kur’an ve içerik akışı'};
+  return {key:'user',label:'Kullanıcı kayıtları',description:'Kullanıcının uygulamaya kaydettiği alan'};
+}
 function eventTimeP(v){ return v?p3TimeP(v):'—'; }
 function safeEventSummaryP(e){
   var raw=String(e&&e.summary||'Güvenli kayıt özeti');
@@ -1417,14 +1455,7 @@ function eventMatchesFilterP(e,filter){
   var f=String(filter||'all'), t=String(e&&[e.section,e.path,e.operation,e.source,e.summary,e.kind].join(' ')||'').toLowerCase(), st=eventStatusP(e);
   if(f==='all') return true;
   if(f==='attention') return st.kind==='danger'||st.kind==='warning'||!e.acceptedAt;
-  if(f==='sync') return /sync|receipt|revision|retry|merge|accepted|submit|persist|poll|event/.test(t);
-  if(f==='therapy-profile') return /therapy|terapi|profile|profil|thought|reflection|room/.test(t);
-  if(f==='quran-video') return /quran|kur.?an|video|watch|reading|reading/.test(t);
-  if(f==='communication') return /message|mesaj|communication|ileti|aeon|notification|bildirim|inbox|outbox/.test(t);
-  if(f==='user') return eventSourceKindForP(e).kind==='user';
-  if(f==='derived') return eventSourceKindForP(e).kind==='derived';
-  if(f==='external') return eventSourceKindForP(e).kind==='external';
-  return true;
+  return eventClassificationP(e).key===f;
 }
 function eventFeatureForP(e){
   var t=String(e&&[e.section,e.path,e.operation,e.kind].join(' ')||'').toLowerCase();
@@ -1452,10 +1483,18 @@ function eventDrawerKeydownP(ev){
   else if(!ev.shiftKey&&document.activeElement===last){ ev.preventDefault(); first.focus(); }
 }
 window.eventDrawerKeydownP=eventDrawerKeydownP;
+function refreshEventLogP(){
+  var card=document.getElementById('event-log-card');
+  if(!card){ render(); return; }
+  var top=Number(card.scrollTop)||0;
+  card.innerHTML=eventLogCardInnerHTMLP();
+  card.scrollTop=top;
+}
+window.refreshEventLogP=refreshEventLogP;
 function setEventFilterP(filter){
   var allowed=['all','attention','sync','therapy-profile','quran-video','communication','user','derived','external'];
   UI.eventFilter=allowed.indexOf(filter)>=0?filter:'all';
-  UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; render();
+  UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; refreshEventLogP();
 }
 window.setEventFilterP=setEventFilterP;
 function setEventDrawerLevelP(level){
@@ -1490,7 +1529,9 @@ function eventDetailsP(e,chainEvents){
   else h+='<div class="event-drawer-note event-drawer-proof">Snapshot revision henüz yok; bu kayıt yalnız yerel/fallback eventidir.</div>';
   return h+'</aside></div>';
 }
-function setEventLimitP(n){ n=Number(n); UI.eventLimit=[20,50,100].indexOf(n)>=0?n:20; render(); } window.setEventLimitP=setEventLimitP;
+function setEventLimitP(n){ n=Number(n); UI.eventLimit=[5,20,50,100].indexOf(n)>=0?n:5; refreshEventLogP(); } window.setEventLimitP=setEventLimitP;
+function showMoreEventsP(){ UI.eventLimit=Math.max(5,Number(UI.eventLimit)||5)+5; refreshEventLogP(); }
+window.showMoreEventsP=showMoreEventsP;
 function openEventDrawerP(id,trigger,groupKey){
   EVENT_DRAWER_RETURN_ID=trigger&&trigger.id?String(trigger.id):null;
   UI.eventSelectedId=String(id||''); UI.eventSelectedGroupKey=groupKey?String(groupKey):null; UI.eventDrawerLevel=1; render();
@@ -1500,7 +1541,7 @@ function closeEventDrawerP(){
   var returnId=EVENT_DRAWER_RETURN_ID; UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; UI.eventDrawerLevel=1; EVENT_DRAWER_RETURN_ID=null; render();
   setTimeout(function(){ if(!returnId||typeof document==='undefined') return; var el=document.getElementById(returnId); if(el&&typeof el.focus==='function') el.focus(); },0);
 } window.closeEventDrawerP=closeEventDrawerP;
-function eventLogCardHTMLP(){
+function eventLogCardInnerHTMLP(){
   var st=eventLogSourceP(), all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], audit=EVENT_LOG_STATE.audit||{ok:true,issueCount:0,issues:[]};
   function localStatus(label,legacy){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+kind+'">'+esc(label)+'</span>'; }
   function localSourceBadgeP(src){ return '<span class="badge source-badge source-'+esc(src.kind)+'" data-component="source-badge" data-source="'+esc(src.kind)+'">'+esc(src.label)+'</span>'; }
@@ -1508,24 +1549,28 @@ function eventLogCardHTMLP(){
   var filter=UI.eventFilter||'all', filtered=all.filter(function(e){ return eventMatchesFilterP(e,filter); }), groups=[], groupMap={};
   filtered.forEach(function(e){ var key=String(e.correlationId||e.eventId||'unknown'); if(!groupMap[key]){ groupMap[key]={key:key,event:e,members:[]}; groupMap[key].members.push(e); groups.push(groupMap[key]); } else groupMap[key].members.push(e); });
   groups.forEach(function(g){ g.members.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); }); g.event=g.members[0]; });
-  var visible=groups.slice(0,UI.eventLimit||20), selectedGroup=null;
+  var visible=groups.slice(0,UI.eventLimit||5), selectedGroup=null;
   if(UI.eventSelectedId) for(var si=0;si<groups.length;si++){ if(groups[si].key===UI.eventSelectedGroupKey||groups[si].members.some(function(x){return x.eventId===UI.eventSelectedId;})){selectedGroup=groups[si];break;} }
-  var h='<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">';
+  var h='';
   h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;">'+localStatus(st.label,st.cls)+'</span></div>';
   h+='<div class="event-log-meta"><span>'+esc(st.note)+'</span><span class="mono">'+all.length+' kayıt · '+(EVENT_LOG_STATE.loadedAt?esc(tsShort(EVENT_LOG_STATE.loadedAt)):'—')+'</span></div>';
-  var filters=[['all','Tümü'],['attention','Dikkat gerektiren'],['sync','Senkron'],['therapy-profile','Terapi / profil'],['quran-video','Kur’an / video'],['communication','İletişim'],['user','Kullanıcı girdisi'],['derived','Türetilmiş'],['external','Dış kaynak']];
-  h+='<div class="event-log-toolbar"><div class="timeline-filter" role="group" aria-label="Son değişiklik filtresi">'+filters.map(function(x){ var count=x[0]==='all'?all.length:all.filter(function(e){return eventMatchesFilterP(e,x[0]);}).length; return '<button class="timeline-filter-btn'+(filter===x[0]?' active':'')+'" data-filter="'+x[0]+'" aria-pressed="'+(filter===x[0]?'true':'false')+'" onclick="setEventFilterP(\''+x[0]+'\')">'+esc(x[1])+' <span>'+count+'</span></button>'; }).join('')+'</div><div class="seg event-limit-filter" aria-label="Event sayısı filtresi">'+[20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
-  h+='<div class="event-log-filter-summary" aria-live="polite">'+esc(filter==='all'?'Tüm güvenli event kayıtları':filters.filter(function(x){return x[0]===filter;})[0][1])+' · '+filtered.length+' event · '+groups.length+' zincir</div>';
+  var filters=eventCategoryDefsP(), selectedFilter=filters.filter(function(x){return x[0]===filter;})[0]||filters[0];
+  h+='<div class="event-log-toolbar"><div class="timeline-filter" role="group" aria-label="Son değişiklik filtresi">'+filters.map(function(x){ var count=x[0]==='all'?all.length:all.filter(function(e){return eventMatchesFilterP(e,x[0]);}).length; return '<button class="timeline-filter-btn'+(filter===x[0]?' active':'')+'" data-filter="'+x[0]+'" aria-pressed="'+(filter===x[0]?'true':'false')+'" title="'+esc(x[2])+'" onclick="setEventFilterP(\''+x[0]+'\')">'+esc(x[1])+' <span>'+count+'</span></button>'; }).join('')+'</div><div class="seg event-limit-filter" aria-label="Event sayısı filtresi">'+[5,20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
+  h+='<div class="event-log-filter-summary" aria-live="polite">'+esc(selectedFilter[1])+' · son '+Math.min(visible.length,groups.length)+' / '+groups.length+' değişiklik · '+filtered.length+' eşleşme</div>';
   if(!audit.ok) h+='<div class="event-log-alarm error-state" data-component="error-state" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button type="button" id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-source="'+esc(src.kind)+'" aria-controls="event-drawer-panel" aria-expanded="'+(UI.eventSelectedId===e.eventId?'true':'false')+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main"><b>'+esc(safeEventSummaryP(e))+'</b><small>'+esc(feature.label)+' · '+esc(e.section||'—')+' · '+esc(e.operation||'—')+' · '+esc(e.path||'—')+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button type="button" id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-category="'+esc(category.key)+'" data-source="'+esc(src.kind)+'" aria-controls="event-drawer-panel" aria-expanded="'+(UI.eventSelectedId===e.eventId?'true':'false')+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main" title="'+esc(safeEventSummaryP(e))+'"><b>'+esc(change.title)+'</b><small>Alan: '+esc(change.pathLabel)+' · İşlem: '+esc(change.operationLabel)+' · '+esc(category.label)+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
     h+='</div>';
   }
+  if(visible.length<groups.length) h+='<button type="button" class="event-log-more" data-event-action="load-more" onclick="showMoreEventsP()">Daha fazla göster · '+(groups.length-visible.length)+' kayıt</button>';
   if(selectedGroup) h+=eventDetailsP(selectedGroup.event,selectedGroup.members);
-  h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div></div>';
+  h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div>';
   return h;
+}
+function eventLogCardHTMLP(){
+  return '<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">'+eventLogCardInnerHTMLP()+'</div>';
 }
 function timeAgo(iso){
   if(!iso) return '';

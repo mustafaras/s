@@ -561,6 +561,8 @@
   .timeline-filter-btn.active span{color:var(--gold)}
   .event-limit-filter{flex-shrink:0}
   .event-log-filter-summary{color:var(--t4);font-size:var(--f1);font-weight:750;letter-spacing:.2px}
+  .event-log-more{align-self:center;min-height:var(--touch-min);margin-top:8px;padding:7px 12px;border:1px solid var(--bd2);border-radius:9px;background:var(--surface-nested);color:var(--gold);font:inherit;font-size:var(--f2);font-weight:850;cursor:pointer}
+  .event-log-more:hover,.event-log-more:focus-visible{border-color:var(--gold);background:var(--status-pending-bg);outline:none;box-shadow:var(--focus-ring)}
   .event-log-row{min-height:var(--touch-min);padding:9px 10px;transition:background var(--motion-fast) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),transform var(--motion-fast) var(--ease-standard)}
   .event-log-row:hover{background:rgba(212,175,55,.06);transform:translateY(-1px)}
   .event-log-row:focus-visible{box-shadow:var(--focus-ring)}

@@ -154,19 +154,29 @@ await (async function(){
   ok('observer projection da token taşımaz',projectionPut&&!JSON.stringify(decodedBody(projectionPut)).includes('secret-token')&&!JSON.stringify(decodedBody(projectionPut)).includes('raw-openai-key'));
 })();
 
-console.log('[2] Anti-clobber — veri kaybı riski insan diline çevrilir');
+console.log('[2] Anti-clobber — gün farkı merge ile kapanırsa artık engel çıkarmaz');
 await (async function(){
   var run=makeContext(localState(1),2,HASH_B,HASH_C);
   var result=await run.context.window.SeySync.pushNow();
   var persisted=JSON.parse(run.storage.raw(KEY));
-  var failureReceipt=callOf(run,'data/sync-receipt.json','PUT');
-  ok('anti-clobber push başarılı iddiası vermez',result===null);
-  ok('anti-clobber status saklanır',persisted.syncReceipt&&persisted.syncReceipt.status==='anti_clobber');
-  ok('anti-clobber error code saklanır',persisted.syncReceipt&&persisted.syncReceipt.lastErrorCode==='anti_clobber');
-  ok('latest PUT veri kaybı öncesi durur',!callOf(run,'data/latest.json','PUT'));
-  ok('anti-clobber güvenli hata makbuzu panel yoluna yazılır',failureReceipt&&decodedBody(failureReceipt).status==='anti_clobber'&&decodedBody(failureReceipt).lastErrorCode==='anti_clobber');
-  ok('hata makbuzu da token/raw metin içermez',failureReceipt&&!JSON.stringify(decodedBody(failureReceipt)).includes('secret-token')&&!JSON.stringify(decodedBody(failureReceipt)).includes('sadece yerel kullanıcı metni'));
+  var latestPut=callOf(run,'data/latest.json','PUT');
+  var receiptPut=callOf(run,'data/sync-receipt.json','PUT');
+  ok('merge sonrası push accepted olur',!!result&&result.status==='accepted');
+  ok('yerel state remote günleriyle genişler',persisted.days&&Object.keys(persisted.days).length===2);
+  ok('latest PUT yapılır',!!latestPut);
+  ok('accepted makbuzu panel yoluna yazılır',receiptPut&&decodedBody(receiptPut).status==='accepted');
+  ok('makbuz token/raw metin içermez',receiptPut&&!JSON.stringify(decodedBody(receiptPut)).includes('secret-token')&&!JSON.stringify(decodedBody(receiptPut)).includes('sadece yerel kullanıcı metni'));
   ok('anti-clobber log human-readable code üretir',run.context.window.SeySync.syncErrorCode({code:'anti_clobber'})==='anti_clobber');
+})();
+
+console.log('[2b] Anti-clobber — forceSync bilinçli üzerine yazma yolunu korur');
+await (async function(){
+  var run=makeContext(localState(1),2,HASH_B,HASH_C);
+  run.context.localStorage.setItem('seyma-sync-force','1');
+  var result=await run.context.window.SeySync.pushNow();
+  var persisted=JSON.parse(run.storage.raw(KEY));
+  ok('forceSync açıkken push accepted olur',!!result&&result.status==='accepted');
+  ok('forceSync açıkken yerel state remote günleriyle genişler',persisted.days&&Object.keys(persisted.days).length===2);
 })();
 
 function extractTopLevelFunction(source,name){

@@ -241,32 +241,26 @@ function putLatestGuarded(c, latestStr, localData){
       var sha=(g&&g.sha)||null, remoteDays=0, remoteObj=null;
       if(g&&g.content){ try{ remoteObj=JSON.parse(b64decodeUtf8(g.content)); }catch(e){} }
       try{ remoteDays=dayCount(remoteObj); }catch(e){}
+      // CONFLICT-SAFE SYNC: önce uzak veriyi yerel ile birleştir; bu sayede bayat/eksik
+      // bir cihaz açıldığında uzaktaki yeni günler kaybolmaz. Anti-clobber kontrolü
+      // birleştirme sonrası çalışır: eğer merge local günlük sayısını remote kadar
+      // tamamlayamadıysa, gerçek veri kaybı riski vardır ve push iptal edilir.
+      if(remoteObj && localData){
+        var mergedData=mergeData(localData, remoteObj);
+        Object.keys(mergedData).forEach(function(k){ localData[k]=mergedData[k]; });
+      }
+      if(remoteObj && remoteObj.profileAssessment && localData && localData.profileAssessment){
+        mergeProfileAssessment(localData.profileAssessment, remoteObj.profileAssessment);
+        if(typeof window.SeySync.onProfileMerge==='function'){
+          try{ window.SeySync.onProfileMerge(localData.profileAssessment); }catch(e){}
+        }
+      }
+      latestStr=JSON.stringify(sanitize(localData),null,2);
       var localDays=dayCount(localData);
       if(remoteDays>0 && localDays<remoteDays && !syncForced()){
         try{ console.error('[SeySync] ANTI-CLOBBER: yerel '+localDays+' gün < uzak '+remoteDays+' gün. Veri kaybını önlemek için push İPTAL edildi. Bilinçli üzerine yazmak için: localStorage.setItem("seyma-sync-force","1")'); }catch(e){}
         setStatus('error','anti_clobber');
         var ac=new Error('anti-clobber: local '+localDays+' < remote '+remoteDays+' days'); ac.code='anti_clobber'; throw ac;
-      }
-      // CONFLICT-SAFE SYNC: uzak latest.json varsa, yerel ile zaman damgasına göre
-      // birleştir; bu sayede bayat/eksik bir cihaz açıldığında uzaktaki yeni veriler
-      // kaybolmaz. Birleştirme anti-clobber geçtikten sonra uygulanır.
-      if(remoteObj && localData){
-        var mergedData=mergeData(localData, remoteObj);
-        // localData'yi güncelle (referansı koruyarak) ve string versiyonunu yenile
-        Object.keys(mergedData).forEach(function(k){ localData[k]=mergedData[k]; });
-        latestStr=JSON.stringify(localData,null,2);
-      }
-      // Faz 10 — profileAssessment çakışma çözümü: uzakta profileAssessment varsa,
-      // yerel ile itemId bazında birleştir. merge yalnızca veri kazandırır, kaybettirmez.
-      // Token/localhost/anti-clobber korumaları değiştirilmez; merge anti-clobber
-      // geçtikten sonra uygulanır. Saf fonksiyon (mergeProfileAssessment) testlerden
-      // doğrudan da çağrılabilir.
-      if(remoteObj && remoteObj.profileAssessment && localData && localData.profileAssessment){
-        mergeProfileAssessment(localData.profileAssessment, remoteObj.profileAssessment);
-        latestStr=JSON.stringify(localData,null,2);
-        if(typeof window.SeySync.onProfileMerge==='function'){
-          try{ window.SeySync.onProfileMerge(localData.profileAssessment); }catch(e){}
-        }
       }
       var body={message:'sync: data/latest.json', content:b64(latestStr), branch:c.branch}; if(sha) body.sha=sha;
       var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
@@ -280,7 +274,8 @@ function pushWithCfg(c, data, pendingReceipt){
   var today=(data&&data.lastOpenedDate)|| new Date().toISOString().slice(0,10);
   var latest=JSON.stringify(data,null,2);
   var nowIso=new Date().toISOString();
-  var snap=JSON.stringify({app:'seyma',date:today,savedAt:nowIso,data:data},null,2);
+  var safeForFiles=sanitize(data);
+  var snap=JSON.stringify({app:'seyma',date:today,savedAt:nowIso,data:safeForFiles},null,2);
   var pending=normalizeSyncReceipt(pendingReceipt||data.syncReceipt);
   if(!pending.sourceUpdatedAt) pending.sourceUpdatedAt=safeReceiptIso(data&&data.savedAt)||nowIso;
   if(!pending.submittedAt) pending.submittedAt=nowIso;
@@ -303,7 +298,7 @@ function pushWithCfg(c, data, pendingReceipt){
         if(!P||typeof P.buildObserverSnapshot!=='function'){
           var pe=new Error('observer projection unavailable'); pe.code='projection_failed'; throw pe;
         }
-        var projection=P.buildObserverSnapshot(data,receipt);
+        var projection=P.buildObserverSnapshot(safeForFiles,receipt);
         return ghPut(c,PROJECTION_PATH,JSON.stringify(projection,null,2)).then(function(){ return receipt; });
       });
     })
@@ -770,17 +765,16 @@ function doPush(data){
   var nowIso=new Date().toISOString(), current=normalizeSyncReceipt(data&&data.syncReceipt);
   var pending=localReceipt(data,{status:'saving',sourceUpdatedAt:current.sourceUpdatedAt||safeReceiptIso(data&&data.savedAt)||nowIso,submittedAt:nowIso,lastErrorCode:null});
   setStatus('saving');
-  var safe=sanitize(data);
+  if(data&&data.eventLog){ data.eventLog=mergeEventLog(data.eventLog,{}); }
   function accept(receipt){
-    if(safe&&safe.eventLog&&data&&data.eventLog){ data.eventLog.published=safe.eventLog.published&&typeof safe.eventLog.published==='object'?safe.eventLog.published:{}; }
     localReceipt(data,receipt); setStatus('ok'); if(window.SeyOnSynced){ try{ window.SeyOnSynced(receipt); }catch(e){} } return receipt;
   }
-  return pushWithCfg(c,safe,pending)
+  return pushWithCfg(c,data,pending)
     .then(function(receipt){ return accept(receipt); })
     .catch(function(e){
       if(c.branch!=='main' && isMissingRefError(e)){
         var c2={token:c.token, owner:c.owner, repo:c.repo, branch:'main'};
-        return pushWithCfg(c2,safe,pending).then(function(receipt){ persistBranch('main'); return accept(receipt); });
+        return pushWithCfg(c2,data,pending).then(function(receipt){ persistBranch('main'); return accept(receipt); });
       }
       throw e;
     })

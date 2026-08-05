@@ -29,7 +29,7 @@ function extractFunction(name){
   var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end);
 }
 var panelContext={PROJECTION_SECTIONS:{},String:String,Array:Array,Date:Date,Math:Math,isNaN:isNaN,icon:function(){return '';},esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}};
-vm.runInNewContext(extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('p4StageTextP')+'\n'+extractFunction('p4ProvenanceCardHTMLP'),panelContext,{filename:'panel-p4-card.js'});
+vm.runInNewContext(extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('p4StageTextP')+'\n'+extractFunction('therapyRecencyTextP')+'\n'+extractFunction('p4ProvenanceCardHTMLP'),panelContext,{filename:'panel-p4-card.js'});
 
 console.log('\n=== PANEL-006 / PANEL-04 — terapi, bildirim ve provenance fixture ===\n');
 console.log('[1] Dolu fixture — sensitive redaction + safe lifecycle');
@@ -69,10 +69,16 @@ ok('stale terapi ham düşünce metni sızdırmaz',!JSON.stringify(staleTherapyS
 panelContext.PROJECTION_SECTIONS=staleTherapySnapshot.sections;
 var staleTherapyHtml=panelContext.p4ProvenanceCardHTMLP();
 ok('stale terapi kartında Eski cache rozeti görünür',staleTherapyHtml.includes('Eski cache'));
+ok('stale terapi kartı "bugün yok, geçmişte var" metnini gösterir (hiç yapılmamış gibi değil)',staleTherapyHtml.includes('Bugün kayıt yok · son kayıt 9 gün önce (2026-08-01)'));
 var recentTherapy={lastOpenedDate:'2026-08-10',days:{'2026-08-08':{therapy:{thoughts:[{situation:'s',thought:'t',createdAt:'2026-08-08T09:00:00.000Z'}]}}},notifications:[]};
 var recentTherapySnapshot=P.buildObserverSnapshot(recentTherapy,receipt,'2026-08-10T15:00:05.000Z');
 ok('2 gün önceki terapi kaydı eşiği aşmaz, stale olmaz',recentTherapySnapshot.sections.therapyProvenance.status==='missing'&&recentTherapySnapshot.sections.therapyProvenance.daysSinceLastRecord===2);
+panelContext.PROJECTION_SECTIONS=recentTherapySnapshot.sections;
+var recentTherapyHtml=panelContext.p4ProvenanceCardHTMLP();
+ok('missing durumunda bile geçmiş kayıt varsa "hiç yapılmamış" değil "son kayıt" metni gösterilir',recentTherapyHtml.includes('Bugün kayıt yok · son kayıt 2 gün önce (2026-08-08)'));
 ok('hiç terapi kaydı olmayan fixture regresyonsuz missing kalır',missingSnapshot.sections.therapyProvenance.status==='missing'&&missingSnapshot.sections.therapyProvenance.lastRecordedDate===null);
+panelContext.PROJECTION_SECTIONS=missingSnapshot.sections;
+ok('hiç kayıt yoksa "son kayıt" metni hiç gösterilmez, mevcut davranış korunur',!panelContext.p4ProvenanceCardHTMLP().includes('son kayıt'));
 
 console.log('\nPANEL-006 / PANEL-04 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

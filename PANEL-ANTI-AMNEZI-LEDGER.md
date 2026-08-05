@@ -139,6 +139,20 @@ uygulandığında AYNEN izlenir:
    (`git rev-parse HEAD`) ve test sonucu özetini yaz. Ledger güncellemesini
    AYRI bir commit olarak da atabilirsin (örn. `docs: ledger — prompt 1.1 done`)
    ya da kod commit'ine dahil edebilirsin, tutarlı ol.
+4b. **Cache-bust kontrolü (ZORUNLU, atlanamaz)** — eğer bu commit
+    `app.js`/`sync.js`/`styles.css` İÇERİĞİNİ değiştirdiyse `index.html`'deki
+    ilgili `?v=` string'ini; `panel.js`/`panel.css`/`panelCoverageManifest.js`
+    içeriğini değiştirdiyse `panel.html`'deki ilgili `?v=` string'ini AYNI
+    commit'te bump'la. Bump'lamazsan kod doğru olsa bile canlıda eski,
+    cache'lenmiş sürüm çalışmaya devam eder — bu, 2026-08-05'te 7 commit
+    boyunca unutulup ancak kullanıcı ekran görüntüsüyle sorduğunda fark
+    edilen gerçek bir olaydı (bkz. altındaki Olay Kaydı). `grep -n
+    "app.js?v=\|sync.js?v=" index.html` ve `grep -n "panel.js?v=\|panel.css?v=\|
+    panelCoverageManifest.js?v=" panel.html` ile bump'ı commit ETMEDEN ÖNCE
+    doğrula; 3 test dosyası (`test_panel_p3_timeline_drawer.js`,
+    `test_panel_p5_responsive_a11y.js`, `test_panel_p6_qa_release.js`)
+    `panel.js`/`panel.css` versiyonunu hardcoded assert ediyor — bump
+    edince bu testlerin literal'lerini de güncellemen gerekir.
 5. **Faz tamamlandıysa push + deploy** — bir Faz'ın (1, 2, 3 veya 4)
    TÜM prompt'ları `done` olduğunda:
    - `git push origin main` (bu repo doğrudan `main` üzerinde çalışıyor,
@@ -183,3 +197,28 @@ karşılaşılırsa:
   `.claude/skills/run-seyma/` harness'larıyla yapılır.
 - Push/deploy `main`'e doğrudan gider (ayrı review/PR aşaması yok) — bu
   yüzden §4 madde 2'deki doğrulama adımını ASLA atlamadan commit atma.
+
+---
+
+## 7. Olay Kaydı (Incident Log)
+
+> Bu bölüm, ilerideki oturumların TEKRARLAMAMASI gereken gerçek hataları
+> kaydeder — anti-amnezi'nin özü budur. Yeni bir olay olursa buraya EKLE,
+> mevcut kaydı silme/üzerine yazma.
+
+**2026-08-05 — Cache-bust bump'ı 7 commit boyunca unutuldu.** Prompt
+1.1/1.2/1.3 ve öncesindeki "satırlarda gerçek değeri göster" commit'i
+`app.js`, `panel.js`, `panelCoverageManifest.js`, `panel.css` içeriğini
+değiştirdi, tüm testler PASS verdi, deploy başarılı oldu — ama
+`index.html`/`panel.html`'deki `?v=` cache-bust string'leri hiç
+bump'lanmadı. Kullanıcı canlı ekran görüntüsü paylaşıp "tam ve kusursuz
+oldugundan emin misin" diye sorana kadar fark edilmedi; ekrandaki "Su
+güncellendi" (değersiz) satırı, kullanıcının cihazının hâlâ eski
+cache'lenmiş `app.js`'i çalıştırdığının işaretiydi. Düzeltme: commit
+`4872509` ile `app.js` (2026080501→2026080502), `panel.css`
+(20260805a→20260805b), `panel.js` (20260805a→20260805b),
+`panelCoverageManifest.js` (20260802e→20260805a) bump'landı, 3 test
+dosyasının hardcoded assertion'ları güncellendi, deploy run `31030556963`
+ile doğrulandı. **Ders:** "testler PASS + deploy success" DEPLOY'UN
+GÖRÜNÜR OLDUĞU anlamına gelmez — cache-bust ayrı, unutulması kolay bir
+adımdır; bu yüzden §4'e madde 4b olarak zorunlu kontrol eklendi.

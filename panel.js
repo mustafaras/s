@@ -127,6 +127,7 @@ var SYNC_RECEIPT=null;
 var OBSERVER_PROJECTION=null;
 var PROJECTION_STATE={source:'none',reason:'not_loaded',snapshot:null,data:null,coverage:null};
 var PROJECTION_SECTIONS={};
+var SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
 var PANEL_POLL_AT=null;
 var PANEL_POLL_STATE={status:'idle',lastOutcome:'idle',lastPollAt:null,lastFetchStartedAt:null,lastFetchCompletedAt:null,lastDurationMs:null,sourceRevision:null,visibleRevision:null,sourceUpdatedAt:null,etag:null,conditionalMode:'etag',fetchCount:0,notModifiedCount:0,skippedCount:0,draftDeferredCount:0,lastErrorCode:null,pendingRender:false,samples:[]};
 var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
@@ -1152,11 +1153,12 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   function localStatus(label,legacy,tone){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=tone||inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(kind)+'">'+esc(label)+'</span>'; }
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
+  var sectionFetchFailed=typeof SECTION_FETCH_STATE==='object'&&SECTION_FETCH_STATE&&!SECTION_FETCH_STATE.ok;
   var errorState=['error','permission','unauthorized','forbidden','conflict','anti_clobber','receipt_failed'].indexOf(st.code)>=0||ps.code==='error';
   var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
-  var noteClass=errorState?' error-state':staleState?' stale-banner':'';
-  var noteComponent=errorState?'error-state':staleState?'stale-banner':'sync-ribbon-note';
-  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?'Canonical hata; önceki güvenli görünüm korunuyor.':staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':'';
+  var noteClass=errorState?' error-state':staleState?' stale-banner':sectionFetchFailed?' stale-banner':'';
+  var noteComponent=errorState?'error-state':staleState?'stale-banner':sectionFetchFailed?'stale-banner':'sync-ribbon-note';
+  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?'Canonical hata; önceki güvenli görünüm korunuyor.':staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
   var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
   var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
   return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
@@ -4529,6 +4531,7 @@ function load(){
       var ds=DP.buildObserverSnapshot(demo,SYNC_RECEIPT), dd=DP.chooseProjection(ds,demo,SYNC_RECEIPT);
       D=dd.data; OBSERVER_PROJECTION=dd.snapshot; PROJECTION_STATE=dd; PROJECTION_SECTIONS=dd.sections||{}; EVENT_LOG_STATE=buildEventLogStateP(D,[]);
     }else{ D=demo; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={}; }
+    SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
     PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.lastOutcome='demo'; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
   }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
@@ -4537,7 +4540,10 @@ function load(){
     .then(function(j){
       var pollMeta=j&&j.meta||{}, pollCompleted=pollMeta.completedAt||new Date().toISOString();
       if(j&&j.notModified){
-        PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.notModifiedCount++; var pollSig=panelSig();
+        PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.notModifiedCount++;
+        // 304 yaniti: section fetch state'ini sifirla (önceki hata varsa uyari sönsün).
+        SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+        var pollSig=panelSig();
         if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
         var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
       }
@@ -4563,19 +4569,29 @@ function load(){
           D=latestLegacy; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={};
         }
         PANEL_POLL_AT=new Date().toISOString(); updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE);
+        // Basarili yükleme: section fetch state'ini sifirla (önceki hata varsa
+        // uyari metni sönsün, bir sonraki poll'da tekrar hata olursa yeniden
+        // set edilecek).
+        SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
         var changed=sig===null||sig!==LASTSIG;
         if(hadPreviousSnapshot&&changed) UI.newChanges=Math.min(99,Math.max(1,newEventCount));
         applyPollRenderP(sig,changed,changed?'changed':'unchanged',pollStartedAt,{etag:pollMeta.etag,completedAt:PANEL_POLL_AT});
-      }).catch(function(){
+      }).catch(function(err){
         pollRecordP('error',pollStartedAt,{errorCode:'network'});
         var P=window.PanelCoverageV1;
         SYNC_RECEIPT=null;
         D=P&&typeof P.redactForObserver==='function'?P.redactForObserver(latestLegacy):latestLegacy;
         OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
-        PROJECTION_SECTIONS={}; EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
+        // Yan-kanal fetch hatasi: PROJECTION_SECTIONS zaten doluysa (önceki
+        // saglikli yüklemeden kalma) KORU, yalnizca hata durumunu isaretle.
+        // Ilk yüklemede (henüz hic veri yokken) normal "missing" davranisi.
+        var hadSections=Object.keys(PROJECTION_SECTIONS).length>0;
+        if(!hadSections) PROJECTION_SECTIONS={};
+        SECTION_FETCH_STATE={ok:false,lastError:String(err&&err.message||err||'network'),failedAt:new Date().toISOString()};
+        EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
         if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
         render();
       });
@@ -4592,7 +4608,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE)+"\u0001"+JSON.stringify(SECTION_FETCH_STATE); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

@@ -211,6 +211,31 @@ console.log('[3] Panel projection — local/remote/projection/panelPoll ayrı');
   ok('panel receipt raw metni yansıtmaz',!html.includes('sadece yerel kullanıcı metni')&&!html.includes('secret-token'));
 })();
 
+console.log('[4] Section fetch failure — PROJECTION_SECTIONS korunur, sync ribbon uyarı gösterir');
+(function(){
+  var map=panelSource.match(/var SYNC_STATUS_P=\{[\s\S]*?\};/);
+  var names=['normalizeSyncReceiptP','syncStatusP','syncTimesP','syncTimeP','syncFreshnessP','syncRibbonHTMLP'];
+  var code=(map?map[0]:'')+'\n'+names.map(function(n){return extractTopLevelFunction(panelSource,n);}).join('\n');
+  var context={
+    Date:Date,Math:Math,String:String,Number:Number,isFinite:isFinite,
+    esc:function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');},
+    tsShort:function(s){return s?String(s):'—';},
+    PANEL_POLL_STATE:{status:'idle',lastOutcome:'idle',conditionalMode:'etag'},
+    pollStatusP:function(){ return {cls:'b-dim',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'}; }
+  };
+  // Test 1: SECTION_FETCH_STATE.ok=false → uyarı metni içermeli
+  context.SECTION_FETCH_STATE={ok:false,lastError:'network',failedAt:'2026-08-02T15:00:00.000Z'};
+  vm.runInNewContext(code,context,{filename:'panel-p0-section-fetch.js'});
+  var accepted={schemaVersion:1,status:'accepted',snapshotRevision:HASH_C,sourceUpdatedAt:SOURCE,submittedAt:SUBMITTED,acceptedAt:NOW,sourceLatestSha:HASH_B,lastErrorCode:null};
+  var html=context.syncRibbonHTMLP(accepted,'2026-08-02T15:01:00.000Z');
+  ok('section fetch hatası sync ribbon uyarı metni içerir',html.includes('Bazı modüller geçici olarak yüklenemedi'));
+  ok('section fetch hatası stale-banner class kullanır',html.includes('stale-banner'));
+  // Test 2: SECTION_FETCH_STATE.ok=true → uyarı metni içermemeli
+  context.SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+  var htmlOk=context.syncRibbonHTMLP(accepted,'2026-08-02T15:01:00.000Z');
+  ok('section fetch başarılıysa uyarı metni içermez',!htmlOk.includes('Bazı modüller geçici olarak yüklenemedi'));
+})();
+
 console.log('\nPANEL-003 / PANEL-01 P0 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;
 }

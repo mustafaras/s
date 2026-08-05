@@ -87,7 +87,7 @@ PANEL-ANTI-AMNEZI-LEDGER.md (bu dosya) ──her ledger satırı bir prompt'a,�
 | Prompt | Rapor Maddesi | Durum | Commit SHA | Test Sonucu | Deploy Run | Tarih | Not |
 |--------|---------------|-------|------------|-------------|------------|-------|-----|
 | 1.1 | A1 | `done` | d359cfe | test_panel_p0_sync.js 31/31 PASS (yeni [4] bloğu dahil) + 10 diğer panel test dosyası regresyonsuz PASS | — (Faz 1 tamamlanınca push/deploy edilecek) | 2026-08-05 | SECTION_FETCH_STATE eklendi, sync ribbon uyarısı eklendi, panelSig() güncellendi |
-| 1.2 | A2 | `pending` | — | — | — | — | Henüz uygulanmadı |
+| 1.2 | A2 | `done` | ab355dc | test_panel_p1_projection 35/35, p3_root_modules 29/29, p4_provenance 24/24 PASS (yeni [3]/[5] blokları dahil) + 9 diğer panel test dosyası regresyonsuz PASS | — (Faz 1 tamamlanınca push/deploy edilecek) | 2026-08-05 | therapyProjection/locationTimingProjection 'stale' status eklendi (7/3 gün eşik), d4ModuleDescriptorsP rollup güncellendi |
 | 1.3 | A3 | `pending` | — | — | — | — | Henüz uygulanmadı |
 | 2.1 | A4 | `pending` | — | — | — | — | Henüz uygulanmadı |
 | 2.2 | B1 | `pending` | — | — | — | — | Henüz uygulanmadı |

@@ -35,13 +35,13 @@ function load(names,ctx){
 console.log('\n=== PANEL event focus fixture ===\n');
 var descriptorCtx=contextFor();
 load(['eventStatusP','eventSourceKindForP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP'],descriptorCtx);
-var mood=event({eventId:'mood-1',section:'mood',path:'data.days.*.mood',operation:'update'});
+var mood=event({eventId:'mood-1',section:'mood',path:'data.days.*.mood',operation:'update',detail:'Ruh hali',value:'Normal'});
 var therapy=event({eventId:'therapy-1',section:'therapy',path:'data.days.*.therapy.thoughts',operation:'record'});
 var notice=event({eventId:'notice-1',section:'notifications',path:'data.notifications',operation:'accepted',source:'delivery'});
 var sync=event({eventId:'sync-1',section:'sync',path:'data.syncReceipt',operation:'merge',source:'observer'});
 var external=event({eventId:'external-1',section:'system',path:'weather.fetch',operation:'update',source:'external'});
 var moodChange=descriptorCtx.eventChangeDescriptorP(mood)||{};
-ok('günlük kaydının neresi ve işlemi anlaşılır',moodChange.title==='Ruh hali güncellendi'&&moodChange.pathLabel==='Günlük / Ruh hali');
+ok('günlük kaydının neresi ve işlemi anlaşılır',moodChange.title==='Ruh hali: Normal güncellendi'&&moodChange.pathLabel==='Günlük / Ruh hali');
 ok('terapi kaydı terapi/profil sınıfına girer',descriptorCtx.eventClassificationP(therapy)&&descriptorCtx.eventClassificationP(therapy).key==='therapy-profile'&&descriptorCtx.eventMatchesFilterP(therapy,'therapy-profile'));
 ok('bildirim teslimatı iletişim sınıfına girer',descriptorCtx.eventClassificationP(notice)&&descriptorCtx.eventClassificationP(notice).key==='communication'&&descriptorCtx.eventMatchesFilterP(notice,'communication'));
 ok('senkron zinciri ayrı sınıfa girer',descriptorCtx.eventClassificationP(sync)&&descriptorCtx.eventClassificationP(sync).key==='sync'&&descriptorCtx.eventMatchesFilterP(sync,'sync'));
@@ -49,7 +49,7 @@ ok('dış kaynak ayrı sınıfa girer',descriptorCtx.eventClassificationP(extern
 ok('yanlış sekme event’i kabul etmez',!descriptorCtx.eventMatchesFilterP(therapy,'communication')&&!descriptorCtx.eventMatchesFilterP(external,'user'));
 
 var events=[];
-for(var i=0;i<12;i++) events.push(event({eventId:'evt-'+i,correlationId:'evt-'+i,sequence:i+1,path:i%2?'data.days.*.journal':'data.days.*.mood',section:i%2?'wellness':'mood',operation:i%3?'update':'record'}));
+for(var i=0;i<12;i++) events.push(event({eventId:'evt-'+i,correlationId:'evt-'+i,sequence:i+1,path:i%2?'data.days.*.journal':'data.days.*.mood',section:i%2?'wellness':'mood',operation:i%3?'update':'record',detail:i%2?'Günlük notu':'Ruh hali',value:i%2?'Kısa not':'Normal'}));
 var cardCtx=contextFor();
 cardCtx.EVENT_LOG_STATE.events=events;
 load(['eventStatusP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventTimeP','safeEventSummaryP','eventLogSourceP','eventDetailsP','eventLogCardInnerHTMLP','eventLogCardHTMLP','refreshEventLogP','setEventFilterP','setEventLimitP','showMoreEventsP'],cardCtx);
@@ -57,7 +57,7 @@ var html=cardCtx.eventLogCardHTMLP();
 ok('Tümü görünümünde varsayılan son 5 değişiklik görünür',(html.match(/class="event-log-row"/g)||[]).length===5);
 ok('kart daha fazla göster seçeneği sunar',html.includes('Daha fazla göster')&&html.includes('data-event-action="load-more"'));
 ok('sekme isimleri karar alanı olarak anlaşılır',html.includes('Kullanıcı kayıtları')&&html.includes('Senkronizasyon')&&html.includes('Terapi &amp; profil')&&html.includes('İletişim &amp; bildirim')&&html.includes('Kur’an &amp; içerik')&&html.includes('Otomatik özet')&&html.includes('Dış kaynak'));
-ok('satır gerçek değişiklik açıklamasını ve alanı gösterir',html.includes('Ruh hali güncellendi')&&html.includes('Alan: Günlük / Ruh hali')&&html.includes('İşlem: Güncellendi'));
+ok('satır gerçek değişiklik açıklamasını ve alanı gösterir',html.includes('Ruh hali: Normal güncellendi')&&html.includes('Kullanıcı kayıtları'));
 
 cardCtx.setEventFilterP('therapy-profile');
 ok('filtre değişimi tam panel render etmez',cardCtx.__renderCalls()===0&&cardCtx.__card.innerHTML.includes('event-log'));

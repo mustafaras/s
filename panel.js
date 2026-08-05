@@ -1424,8 +1424,13 @@ function eventOperationLabelP(operation){
   return labels[String(operation||'').toLowerCase()]||'İşlendi';
 }
 function eventChangeDescriptorP(e){
-  var path=eventPathLabelP(e&&e.path), subject=path.split(' / ').pop()||'Kayıt', operation=eventOperationLabelP(e&&e.operation), title=subject+' '+operation.toLocaleLowerCase('tr-TR');
-  return {title:title,pathLabel:path,operationLabel:operation};
+  var path=eventPathLabelP(e&&e.path), subject=path.split(' / ').pop()||'Kayıt', operation=eventOperationLabelP(e&&e.operation);
+  var detail=String(e&&e.detail||''), value=String(e&&e.value||''), unit=String(e&&e.unit||'');
+  var title;
+  if(detail&&value) title=detail+': '+value+(unit?' '+unit:'')+' '+operation.toLocaleLowerCase('tr-TR');
+  else if(detail) title=detail+' '+operation.toLocaleLowerCase('tr-TR');
+  else title=subject+' '+operation.toLocaleLowerCase('tr-TR');
+  return {title:title,pathLabel:path,operationLabel:operation,detail:detail,value:value,unit:unit};
 }
 function eventClassificationP(e){
   var section=String(e&&e.section||'').toLowerCase(), path=String(e&&e.path||'').toLowerCase(), source=String(e&&(e.source||e.sourceType||e.provenance)||'').toLowerCase(), text=[section,path,source,e&&e.operation,e&&e.summary].join(' ');
@@ -1561,7 +1566,7 @@ function eventLogCardInnerHTMLP(){
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<button type="button" id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-category="'+esc(category.key)+'" data-source="'+esc(src.kind)+'" aria-controls="event-drawer-panel" aria-expanded="'+(UI.eventSelectedId===e.eventId?'true':'false')+'" onclick="openEventDrawerP(\''+eventJsArgP(e.eventId)+'\',this,\''+eventJsArgP(g.key)+'\')"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main" title="'+esc(safeEventSummaryP(e))+'"><b>'+esc(change.title)+'</b><small>Alan: '+esc(change.pathLabel)+' · İşlem: '+esc(change.operationLabel)+' · '+esc(category.label)+'</small></span><span class="event-log-side">'+localSourceBadgeP(src)+' '+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span><small>'+eventTimeP(e.occurredAt)+'</small>'+chain+'</span></button>'; });
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<div id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-category="'+esc(category.key)+'" data-source="'+esc(src.kind)+'"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main" title="'+esc(safeEventSummaryP(e))+'"><b class="event-log-headline"><span class="event-log-time mono">'+esc(eventTimeP(e.occurredAt))+'</span> · '+esc(change.title)+'</b><small>'+esc(category.label)+'</small></span><span class="event-log-side">'+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span></span>'+chain+'</div>'; });
     h+='</div>';
   }
   if(visible.length<groups.length) h+='<button type="button" class="event-log-more" data-event-action="load-more" onclick="showMoreEventsP()">Daha fazla göster · '+(groups.length-visible.length)+' kayıt</button>';

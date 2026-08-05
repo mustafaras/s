@@ -28,7 +28,7 @@ console.log('\n=== PANEL-012 / PANEL-10 — timeline + drawer fixture ===\n');
 var html=context.eventLogCardHTMLP();
 ok('dokuz timeline filtresi semantik olarak görünür', ['all','attention','sync','therapy-profile','quran-video','communication','user','derived','external'].every(function(k){return html.includes('data-filter="'+k+'"')&&html.includes('aria-pressed=');}));
 ok('retry/merge/accepted zinciri tek satır grubudur',(html.match(/class="event-log-row"/g)||[]).length===3&&html.includes('zincir · 2'));
-ok('satır source/status/revision/feature metadata taşır',html.includes('source-badge')&&html.includes('status-badge')&&html.includes('event-log-revision')&&html.includes('timeline-feature-icon'));
+ok('satır source/status/revision/feature metadata taşır',html.includes('data-source=')&&html.includes('status-badge')&&html.includes('event-log-revision')&&html.includes('timeline-feature-icon'));
 ok('hassas event özeti redacted kalır',!html.includes('PROFILE_RAW_RESPONSE_SENTINEL')&&html.includes('Güvenli kayıt özeti'));
 context.UI.eventFilter='external';
 var external=context.eventLogCardHTMLP();

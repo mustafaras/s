@@ -61,7 +61,7 @@ ok('reduced motion section jump auto',scrollCall&&scrollCall.behavior==='auto');
 
 ok('ARIA live regions: status/sync/filter surfaces',panelSource.includes('class="topbar-status" aria-live="polite"')&&panelSource.includes('class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"')&&panelSource.includes('class="event-log-filter-summary" aria-live="polite"'));
 ok('ARIA current/controls section navigation',/aria-controls="'\+sec\.id\+'"/.test(panelSource)&&panelSource.includes('aria-current="false"')&&panelSource.includes("setAttribute('aria-current'"));
-ok('drawer/event/module expanded state controls',panelSource.includes('aria-controls="d4-module-drawer"')&&panelSource.includes('aria-controls="event-drawer-panel"')&&panelSource.includes("UI.d4SelectedModule===m.key?'true':'false'"));
+ok('drawer/event/module expanded state controls',panelSource.includes('aria-controls="d4-module-drawer"')&&panelSource.includes('data-component="timeline-row"')&&panelSource.includes("UI.d4SelectedModule===m.key?'true':'false'"));
 ok('accordion ve drawer focus kaybını önleyen native/focus sözleşmesi',panelSource.includes('card-exp-head')&&panelSource.includes('eventDrawerFocusableP')&&panelSource.includes('D4_DRAWER_RETURN_ID'));
 ok('status rengi tek anlam değil, metin/icon badge korunuyor',panelSource.includes('d2StatusBadgeP')&&panelSource.includes('p3StatusP')&&cssSource.includes('.status-badge::before'));
 ok('empty/stale/error/redacted fixture metinleri D4 atlas sözleşmesinde korunuyor',panelSource.includes('Eksik')&&panelSource.includes('Eski cache')&&panelSource.includes('Bozuk')&&panelSource.includes('Hata')&&panelSource.includes('Redacted'));

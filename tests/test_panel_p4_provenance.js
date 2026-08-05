@@ -61,5 +61,18 @@ var brokenSnapshot=P.buildObserverSnapshot(broken,receipt,'2026-08-02T15:00:05.0
 ok('bozuk terapi/event/bildirim yapısı fail-safe görünür',brokenSnapshot.sections.therapyProvenance.status==='malformed'&&brokenSnapshot.sections.therapyProvenance.windDown.status==='malformed'&&brokenSnapshot.sections.notificationTimeline.status==='malformed');
 ok('bozuk profil response tipi raw üretmez',brokenSnapshot.sections.profileProgress.rawResponses==='redacted'&&!JSON.stringify(brokenSnapshot).includes('THERAPY_PRIVATE_'));
 
+console.log('[3] Eski terapi kaydı — stale (bugün kayıt yok, geçmişte var)');
+var staleTherapy={lastOpenedDate:'2026-08-10',days:{'2026-08-01':{therapy:{thoughts:[{situation:'s',thought:'t',createdAt:'2026-08-01T09:00:00.000Z'}]}}},notifications:[]};
+var staleTherapySnapshot=P.buildObserverSnapshot(staleTherapy,receipt,'2026-08-10T15:00:05.000Z');
+ok('8 gün önceki terapi kaydı stale olur, missing değil',staleTherapySnapshot.sections.therapyProvenance.status==='stale'&&staleTherapySnapshot.sections.therapyProvenance.lastRecordedDate==='2026-08-01'&&staleTherapySnapshot.sections.therapyProvenance.daysSinceLastRecord===9);
+ok('stale terapi ham düşünce metni sızdırmaz',!JSON.stringify(staleTherapySnapshot).includes('"t"')&&staleTherapySnapshot.sections.therapyProvenance.thoughts.length===0);
+panelContext.PROJECTION_SECTIONS=staleTherapySnapshot.sections;
+var staleTherapyHtml=panelContext.p4ProvenanceCardHTMLP();
+ok('stale terapi kartında Eski cache rozeti görünür',staleTherapyHtml.includes('Eski cache'));
+var recentTherapy={lastOpenedDate:'2026-08-10',days:{'2026-08-08':{therapy:{thoughts:[{situation:'s',thought:'t',createdAt:'2026-08-08T09:00:00.000Z'}]}}},notifications:[]};
+var recentTherapySnapshot=P.buildObserverSnapshot(recentTherapy,receipt,'2026-08-10T15:00:05.000Z');
+ok('2 gün önceki terapi kaydı eşiği aşmaz, stale olmaz',recentTherapySnapshot.sections.therapyProvenance.status==='missing'&&recentTherapySnapshot.sections.therapyProvenance.daysSinceLastRecord===2);
+ok('hiç terapi kaydı olmayan fixture regresyonsuz missing kalır',missingSnapshot.sections.therapyProvenance.status==='missing'&&missingSnapshot.sections.therapyProvenance.lastRecordedDate===null);
+
 console.log('\nPANEL-006 / PANEL-04 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

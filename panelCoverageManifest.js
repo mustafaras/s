@@ -7,6 +7,17 @@
 var SECRET_KEYS={ghToken:1,openaiKey:1,syncUrl:1,auth:1,replyToken:1,token:1,password:1,githubToken:1,apiKey:1,accessToken:1,privateKey:1};
 var HASH=/^[a-f0-9]{7,128}$/i;
 var ISO_MAX=40;
+// Terapi günlük/seyrek tutulabildiği için bir haftadan uzun sessizlik "eski" sayılır;
+// konum örneği daha sık akan bir sinyal olduğundan eşik daha kısa tutulur.
+var THERAPY_STALE_DAYS=7;
+var LOCATION_STALE_DAYS=3;
+// İki tarih (ISO veya YYYY-MM-DD) arasındaki gün farkını döner (b - a); geçersizse null.
+function dayDiff(a,b){
+  if(!a||!b) return null;
+  var ta=Date.parse(String(a).slice(0,10)+'T00:00:00Z'), tb=Date.parse(String(b).slice(0,10)+'T00:00:00Z');
+  if(isNaN(ta)||isNaN(tb)) return null;
+  return Math.round((tb-ta)/86400000);
+}
 
 // Explicit rules are the audit surface. The final `*` rule deliberately makes
 // unknown future fields summary-classified instead of silently unclassified.
@@ -292,10 +303,13 @@ function locNudgeProjection(v){
   var streak=Math.max(0,validNumber(v.dismissStreak)||0);
   return {status:malformed?'malformed':'ok',shownCount:Math.max(0,validNumber(v.shownCount)||0),dismissCount:Math.max(0,validNumber(v.dismissCount)||0),dismissStreak:streak,dayCount:Math.max(0,validNumber(v.dayCount)||0),dayKey:safeText(v.dayKey,32),lastShownAt:safeIso(v.lastShownAt),snoozeUntil:safeIso(v.snoozeUntil),optOutDay:safeText(v.optOutDay,32),optedOut:!!v.optedOut,derivedBackoffHours:Math.min(24,streak*2),sourcePath:'data.locNudge',privacy:'behavior_summary'};
 }
-function locationTimingProjection(d,r){
+function locationTimingProjection(d,r,date){
   var root=isObject(d)?d:{}, loc=isObject(root.location)?root.location:null;
   var sampleTs=safeIso(loc&&loc.ts), processedTs=safeIso(root.locationLastTs), syncAcceptedAt=safeIso(r&&r.acceptedAt), malformed=!!(loc&&loc.ts!==undefined&&loc.ts!==null&&!sampleTs)||(root.locationLastTs!==undefined&&root.locationLastTs!==null&&!processedTs);
-  return {status:malformed?'malformed':(sampleTs||processedTs?'ok':'missing'),sampleTs:sampleTs,processedTs:processedTs,syncAcceptedAt:syncAcceptedAt,sourceSample:'data.location.ts',sourceProcessed:'data.locationLastTs',sourceSync:'data.syncReceipt.acceptedAt',privacy:'timestamp_only'};
+  var latestKnown=[sampleTs,processedTs].filter(Boolean).sort().slice(-1)[0]||null;
+  var gap=latestKnown&&date?dayDiff(latestKnown,date):null;
+  var stale=!malformed&&!!latestKnown&&gap!==null&&gap>LOCATION_STALE_DAYS;
+  return {status:malformed?'malformed':(stale?'stale':(sampleTs||processedTs?'ok':'missing')),sampleTs:sampleTs,processedTs:processedTs,syncAcceptedAt:syncAcceptedAt,daysSinceLastSample:gap,sourceSample:'data.location.ts',sourceProcessed:'data.locationLastTs',sourceSync:'data.syncReceipt.acceptedAt',privacy:'timestamp_only'};
 }
 function settingsProjection(d){
   var root=isObject(d)?d:{}, s=isObject(root.settings)?root.settings:{}, pr=isObject(s.prayer)?s.prayer:{}, mg=isObject(s.magnesium)?s.magnesium:{};
@@ -312,9 +326,28 @@ function safeStage(v){
   return allowed[s]?s:null;
 }
 function boolPresent(v){ return typeof v==='string'?!!v.trim():v!==null&&v!==undefined; }
+// data.days üzerinde, verilen tarihten ÖNCEKİ günler içinde anlamlı terapi
+// içeriği (düşünce/karar/paylaşım) taşıyan en güncel gün anahtarını bulur.
+// Ham düşünce/karar metnini döndürmez — yalnız tarih (meta veri).
+function lastTherapyRecordDate(days,beforeDate){
+  if(!isObject(days)) return null;
+  var keys=Object.keys(days).filter(function(k){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return false;
+    if(beforeDate&&k>=beforeDate) return false;
+    var t=isObject(days[k])&&isObject(days[k].therapy)?days[k].therapy:null;
+    if(!t) return false;
+    return (Array.isArray(t.thoughts)&&t.thoughts.length>0)||isObject(t.decision)||isObject(t.share);
+  });
+  if(!keys.length) return null;
+  keys.sort();
+  return keys[keys.length-1];
+}
 function therapyProjection(source,date){
   var root=isObject(source)?source:{}, days=isObject(root.days)?root.days:{}, rec=isObject(days[date])?days[date]:null, t=rec&&isObject(rec.therapy)?rec.therapy:null, pa=isObject(root.profileAssessment)?root.profileAssessment:{}, consent=isObject(pa.consent)?pa.consent:{};
-  if(!t) return {status:'missing',date:safeText(date,32),thoughtCount:0,thoughts:[],decision:null,share:null,windDown:{status:'missing',eventCount:0,totalMinutes:0,events:[]},consent:{panelSummarySharingAccepted:consent.panelSummarySharingAccepted===true,sensitiveDataAccepted:consent.sensitiveDataAccepted===true,rawText:'redacted'},sourcePath:'data.days.'+safeText(date,32)+'.therapy',provenance:'redacted',privacy:'sensitive_redacted'};
+  if(!t){
+    var lastDate=lastTherapyRecordDate(days,date), gap=lastDate?dayDiff(lastDate,date):null, stale=!!lastDate&&gap!==null&&gap>THERAPY_STALE_DAYS;
+    return {status:stale?'stale':'missing',date:safeText(date,32),thoughtCount:0,thoughts:[],decision:null,share:null,windDown:{status:'missing',eventCount:0,totalMinutes:0,events:[]},consent:{panelSummarySharingAccepted:consent.panelSummarySharingAccepted===true,sensitiveDataAccepted:consent.sensitiveDataAccepted===true,rawText:'redacted'},sourcePath:'data.days.'+safeText(date,32)+'.therapy',provenance:'redacted',privacy:'sensitive_redacted',lastRecordedDate:lastDate,daysSinceLastRecord:gap};
+  }
   var thoughts=[], invalidThoughts=0;
   if(Array.isArray(t.thoughts)) t.thoughts.forEach(function(x,i){
     if(!isObject(x)){ invalidThoughts++; return; }
@@ -415,7 +448,7 @@ function sectionSnapshot(safe,receipt,source){
     roomContentHistory:roomHistoryProjection(d.roomContentHistory),
     saygiRoot:saygiProjection(d.saygi,d.days),
     locNudge:locNudgeProjection(d.locNudge),
-    locationTiming:locationTimingProjection(d,receipt),
+    locationTiming:locationTimingProjection(d,receipt,date),
     lifecycle:{lastOpenedDate:date,lastOpenedAt:safeIso(d.lastOpenedAt),rootSavedAt:safeIso(d.savedAt),lastSyncDate:safeText(d.lastSyncDate,32),settings:settingsProjection(d),sourcePath:'data.lastOpenedDate + data.savedAt + data.settings',privacy:'metadata_summary'},
     therapyProvenance:therapyProjection(raw,date),
     profileProgress:profileProgressProjection(raw),

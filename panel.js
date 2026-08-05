@@ -1338,9 +1338,9 @@ function d4ModuleDescriptorsP(){
   var q=typeof quranJourneyRootP==='function'?quranJourneyRootP():null, reqs=q&&q.requests&&typeof q.requests==='object'?q.requests:{}, reqIds=Object.keys(reqs), qDelivered=0, qNotes=0, qWaiting=0, qLatest=[];
   reqIds.forEach(function(id){ var r=reqs[id]||{}; if(/^[A-Za-z0-9_-]{11}$/.test(String(r.videoId||''))) qDelivered++; if(Array.isArray(r.notes)) qNotes+=r.notes.length; if(r.status==='waiting'||r.status==='requested') qWaiting++; qLatest.push(r.updatedAt||r.requestedAt||r.createdAt); });
   var qErrors=typeof quranDeliveryErrorsP==='function'?quranDeliveryErrorsP():[], qStatus=!q?'missing':qErrors.length?'error':reqIds.length?'ok':'missing';
-  var thStatus=th.status==='malformed'||pp.status==='malformed'?'malformed':(th.status==='missing'&&pp.status==='missing'?'missing':(th.status==='missing'||pp.status==='missing'?'incomplete':'ok'));
+  var thStatus=th.status==='malformed'||pp.status==='malformed'?'malformed':(th.status==='missing'&&pp.status==='missing'?'missing':(th.status==='missing'||pp.status==='missing'?'incomplete':(th.status==='stale'||pp.status==='stale'?'stale':'ok')));
   var nCounts=nt.counts||{}, nLatest=(Array.isArray(nt.events)?nt.events:[]).map(function(e){return e&&[e.createdAt,e.deliveredAt,e.readAt,e.retryAt];}).reduce(function(a,x){return a.concat(x||[]);},[]);
-  var locationStatus=lt.status==='malformed'||nud.status==='malformed'?'malformed':(lt.status==='missing'&&nud.status==='missing'?'missing':'ok');
+  var locationStatus=lt.status==='malformed'||nud.status==='malformed'?'malformed':(lt.status==='missing'&&nud.status==='missing'?'missing':(lt.status==='stale'?'stale':'ok'));
   var soul=D&&D.soulArchive&&Array.isArray(D.soulArchive.items)?D.soulArchive.items:[], soulSessions=soul.reduce(function(a,x){return a+(Number(x&&x.totalSessions)||0);},0), soulMinutes=soul.reduce(function(a,x){return a+(Number(x&&x.totalMinutes)||0);},0), lib=archives.library&&Array.isArray(archives.library.books)?archives.library.books:[], watch=archives.watchlist&&Array.isArray(archives.watchlist.items)?archives.watchlist.items:[], music=archives.music&&Array.isArray(archives.music.items)?archives.music.items:[], archiveTotal=lib.length+watch.length+music.length;
   var archiveStatus=(soul.length||archiveTotal)?'ok':'missing';
   return [

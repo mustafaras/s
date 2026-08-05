@@ -88,5 +88,16 @@ var brokenHtml=panelContext.rootModulesCardHTMLP();
 ok('mismatch alarmı panelde görünür',brokenHtml.includes('Uyuşmazlık')&&brokenHtml.includes('Root ve günlük read kanıtı uyuşmuyor'));
 ok('render yolu source backfill çağırmıyor',panelSource.indexOf('backfillSoulArchiveFromDaysP();')<0);
 
+console.log('[5] Konum örneği eski — stale');
+var staleLoc=base(); staleLoc.lastOpenedDate='2026-08-10'; staleLoc.location.ts='2026-08-02T11:00:00.000Z'; staleLoc.locationLastTs='2026-08-02T11:00:01.000Z';
+var staleLocSnapshot=P.buildObserverSnapshot(staleLoc,receipt,'2026-08-10T15:00:05.000Z');
+ok('8 gün önceki konum örneği stale olur',staleLocSnapshot.sections.locationTiming.status==='stale'&&staleLocSnapshot.sections.locationTiming.daysSinceLastSample===8);
+panelContext.PROJECTION_SECTIONS=staleLocSnapshot.sections;
+var staleLocHtml=panelContext.rootModulesCardHTMLP();
+ok('stale konum kartında Eski cache rozeti görünür',staleLocHtml.includes('Eski cache'));
+var recentLoc=base(); recentLoc.lastOpenedDate='2026-08-03'; recentLoc.location.ts='2026-08-02T11:00:00.000Z'; recentLoc.locationLastTs='2026-08-02T11:00:01.000Z';
+var recentLocSnapshot=P.buildObserverSnapshot(recentLoc,receipt,'2026-08-03T15:00:05.000Z');
+ok('1 gün önceki konum örneği eşiği aşmaz, stale olmaz',recentLocSnapshot.sections.locationTiming.status==='ok'&&recentLocSnapshot.sections.locationTiming.daysSinceLastSample===1);
+
 console.log('\nPANEL-005 / PANEL-03 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

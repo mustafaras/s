@@ -119,6 +119,10 @@ var APPKEY="seyma-reset-v1";
 var CARDEXPKEY="seyma-panel-expand-v1"; // hangi genişletilebilir kartların açık bırakıldığını hatırlar
 var INSTABKEY="seyma-panel-insight-tab-v1"; // "Gelişmiş İçgörüler" kartında hangi sekmenin seçili kaldığını hatırlar
 var DENSITYKEY="seyma-panel-density-v1"; // Hızlı/Standart/Audit görünüm yoğunluğu
+var MAPSTYLEKEY="seyma-panel-map-style-v1";
+var MAPHEIGHTKEY="seyma-panel-map-height-v1";
+var AUDITTABKEY="seyma-panel-audit-tab-v1";
+var CARD_ACCORDION_DURATION_MS=340;
 var PTOKEN="";
 var D=null;
 var SYNC_RECEIPT=null;
@@ -131,7 +135,7 @@ var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
 var PANEL_TRANSPORT_CACHE={};
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:"all",eventDrawerLevel:1,d4SelectedModule:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",mapStyle:"dark",mapHeight:"medium",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:20,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:"all",eventDrawerLevel:1,d4SelectedModule:null};
 var EVENT_DRAWER_RETURN_ID=null;
 var D4_DRAWER_RETURN_ID=null;
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
@@ -205,7 +209,7 @@ function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
   var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP(outcome,startedAt,meta);
   var shouldRender=!!dataChanged||hadPending;
   LAST_RENDERED_POLL_OUTCOME=outcome;
-  if(shouldRender){ LASTSIG=sig; render(); } else updatePollRibbonP();
+  if(shouldRender){ LASTSIG=sig; preserveScrollDuring(render); } else updatePollRibbonP();
   return shouldRender;
 }
 // ── İman Köşesi — panel aynası ──
@@ -911,6 +915,7 @@ function toggleCard(key){
     if(trigger) trigger.setAttribute('aria-expanded',open?'true':'false');
     var body=el.querySelector('.card-exp-body');
     if(body) body.setAttribute('aria-hidden',open?'false':'true');
+    if(open&&key==='location-section') setTimeout(function(){ try{ if(!_locMap) initLocMap(); if(_locMap) _locMap.invalidateSize(); }catch(e){} },CARD_ACCORDION_DURATION_MS);
   }
 }
 window.toggleCard=toggleCard;
@@ -1199,6 +1204,150 @@ function p3BadgeP(text,kind){
 }
 function p3TimeP(v){ return v?esc(String(v).slice(0,16).replace('T',' ')):'—'; }
 function p3StatusP(status){ var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']}; var x=m[status]||['Bekleniyor','b-dim'], tone=['pending','started','sent','delivered','active'].indexOf(status)>=0?'pending':['incomplete','stale'].indexOf(status)>=0?'warning':({ 'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}[x[1]]||'muted'); return '<span class="badge status-badge status-'+tone+' '+x[1]+'" data-component="status-badge" data-status="'+tone+'">'+esc(x[0])+'</span>'; }
+function locationSectionHTMLP(srec,loc){
+  var selected=UI.selectedDate||today();
+  var hist=(D&&Array.isArray(D.locationHistory))?D.locationHistory:[];
+  var histCount=hist.length;
+  var mvTrk=(srec.movement&&Array.isArray(srec.movement.track))?srec.movement.track:[];
+  var segCount=0;
+  if(mvTrk.length){
+    var curS=null, GAP=8*60000;
+    for(var gi=0;gi<mvTrk.length;gi++){ var pt=mvTrk[gi]; var tt=new Date(pt.ts).getTime(); if(isNaN(tt)||pt.lat==null||pt.lng==null) continue;
+      if(!curS||curS.mode!==pt.mode||(tt-curS.endT)>GAP){ if(curS) segCount++; curS={mode:pt.mode,startT:tt,endT:tt,end:pt}; }
+      else { curS.endT=tt; curS.end=pt; }
+    }
+    if(curS) segCount++;
+  }
+  var summary=loc
+    ? Number(loc.lat).toFixed(4)+', '+Number(loc.lng).toFixed(4)+(loc.acc!=null?' · ±'+Math.round(loc.acc)+'m':'')+' · '+histCount+' kayıt · '+segCount+' segment'
+    : 'Konum verisi bekleniyor';
+
+  var mapToolbar='<div class="loc-map-toolbar">';
+  mapToolbar+='<div class="loc-map-style" role="group" aria-label="Harita stili">'+[['dark','Koyu'],['light','Açık'],['satellite','Uydu'],['terrain','Topo']].map(function(x){ return '<button type="button" data-map-style="'+x[0]+'" aria-pressed="'+(UI.mapStyle===x[0]?'true':'false')+'" class="'+(UI.mapStyle===x[0]?'active':'')+'" onclick="setMapStyle(\''+x[0]+'\')">'+x[1]+'</button>'; }).join('')+'</div>';
+  mapToolbar+='<div class="loc-map-height" role="group" aria-label="Harita yüksekliği">'+[['short','Kısa'],['medium','Orta'],['tall','Uzun'],['full','Tam']].map(function(x){ return '<button type="button" data-map-height="'+x[0]+'" aria-pressed="'+(UI.mapHeight===x[0]?'true':'false')+'" class="'+(UI.mapHeight===x[0]?'active':'')+'" onclick="setMapHeight(\''+x[0]+'\')">'+x[1]+'</button>'; }).join('')+'</div>';
+  if(loc){ mapToolbar+='<a href="https://www.google.com/maps/search/?api=1&query='+loc.lat+','+loc.lng+'" target="_blank" rel="noopener noreferrer" class="loc-map-gmaps">Google Maps →</a>'; }
+  mapToolbar+='</div>';
+
+  var mapBlock='';
+  if(loc){
+    mapBlock+='<div id="loc-map" class="loc-map loc-map-'+esc(UI.mapHeight||'medium')+'"></div>';
+    mapBlock+='<div id="loc-address" class="loc-address">Adres çözümleniyor…</div>';
+  } else {
+    mapBlock+='<div class="empty" style="flex:1;"><span class="ei">'+icon('map-pin',20)+'</span>Konum verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıldığında otomatik gelir</span></div>';
+  }
+
+  var details='<div class="loc-body">';
+  details+=mapToolbar+mapBlock;
+
+  // Konum geçmişi — seçili gün
+  (function(){
+    var trk=(srec.movement&&Array.isArray(srec.movement.track))?srec.movement.track:[];
+    var dTxt=(function(){ try{ return new Date(selected+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'short'}); }catch(e){ return String(selected); } })();
+    details+='<div class="loc-subsection">';
+    details+='<div class="loc-subhead">'+icon('route',14)+' Konum Geçmişi <span>'+esc(dTxt)+'</span></div>';
+    if(!trk.length){
+      details+='<div class="loc-empty">Bu gün için konum izi yok.</div>';
+    } else {
+      var segs=[], curS=null, GAP=8*60000;
+      for(var gi=0;gi<trk.length;gi++){ var pt=trk[gi]; var tt=new Date(pt.ts).getTime(); if(isNaN(tt)||pt.lat==null||pt.lng==null) continue;
+        if(!curS||curS.mode!==pt.mode||(tt-curS.endT)>GAP){ if(curS) segs.push(curS); curS={mode:pt.mode,startT:tt,endT:tt,dist:0,end:pt,n:1}; }
+        else { curS.dist+=haversineKm(curS.end,pt)*1000; curS.endT=tt; curS.end=pt; curS.n++; }
+      }
+      if(curS) segs.push(curS);
+      var hm=function(ms){ return new Date(ms).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}); };
+      var shown=segs.slice(-12).reverse();
+      details+='<div class="loc-track-list">';
+      shown.forEach(function(s){
+        var isVeh=s.mode==='vehicle', col=isVeh?'var(--purple)':'var(--green)', ic=isVeh?'car':'footprints', lbl=isVeh?'Araç':'Yürüyüş';
+        var maps='https://www.google.com/maps/search/?api=1&query='+s.end.lat+','+s.end.lng;
+        details+='<div class="loc-track-row">';
+        details+='<span class="loc-track-icon" style="color:'+col+';">'+icon(ic,14)+'</span>';
+        details+='<div class="loc-track-main">';
+        details+='<div class="loc-track-line"><b class="mono">'+hm(s.startT)+(s.endT>s.startT?' \u2013 '+hm(s.endT):'')+'</b><span style="color:'+col+';font-weight:800;">'+lbl+'</span>'+(s.dist>30?'<span>'+fmtKmM(s.dist)+'</span>':'')+'</div>';
+        details+='<div class="loc-track-coords">'+Number(s.end.lat).toFixed(4)+', '+Number(s.end.lng).toFixed(4)+' · <a href="'+maps+'" target="_blank" rel="noopener noreferrer">haritada →</a></div>';
+        details+='</div></div>';
+      });
+      details+='</div>';
+      var totM=segs.reduce(function(a,s){return a+s.dist;},0);
+      details+='<div class="loc-track-foot">'+trk.length+' nokta · '+segs.length+' segment · ~'+fmtKmM(totM)+'</div>';
+    }
+    details+='</div>';
+  })();
+
+  // Ham konum kayıtları
+  (function(){
+    details+='<div class="loc-subsection">';
+    details+='<div class="loc-subhead">'+icon('map-pin',14)+' Konum Kayıtları <span>son '+histCount+' nokta</span></div>';
+    if(!histCount){
+      details+='<div class="loc-empty">Henüz konum kaydı yok.</div>';
+    } else {
+      var rows=hist.slice().reverse();
+      details+='<div class="loc-point-list">';
+      rows.slice(0,24).forEach(function(p){
+        if(!p||p.lat==null||p.lng==null) return;
+        var maps='https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng;
+        var when=''; try{ when=new Date(p.ts).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ when=String(p.ts||''); }
+        details+='<div class="loc-point-row">';
+        details+='<span class="loc-point-icon">'+icon('map-pin',12)+'</span>';
+        details+='<div class="loc-point-main">';
+        details+='<b class="mono">'+esc(when)+'</b>';
+        details+='<span>'+Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)+(p.acc!=null?' · ±'+Math.round(p.acc)+'m':'')+'</span>';
+        details+='</div>';
+        details+='<a href="'+maps+'" target="_blank" rel="noopener noreferrer" class="loc-point-link">haritada →</a>';
+        details+='</div>';
+      });
+      details+='</div>';
+      if(rows.length>24) details+='<div class="loc-track-foot">+ '+(rows.length-24)+' daha eski nokta</div>';
+    }
+    details+='</div>';
+  })();
+
+  details+='</div>'; // .loc-body
+
+  return cardWrap({key:'location-section',icon:icon('map-pin',18),title:'Hareket & Konum',span:12,order:30,summary:summary,details:details});
+}
+
+function auditPaneHTMLP(tab){
+  if(tab==='provenance') return p4ProvenanceCardHTMLP();
+  if(tab==='modules') return d4ModuleAtlasHTMLP();
+  if(tab==='events') return eventLogCardHTMLP();
+  return rootModulesCardHTMLP();
+}
+function setAuditTab(t){
+  if(['root','provenance','modules','events'].indexOf(t)<0) return;
+  UI.auditTab=t;
+  try{ localStorage.setItem(AUDITTABKEY,t); }catch(e){}
+  var content=document.querySelector('.audit-content');
+  if(content){
+    content.innerHTML=auditPaneHTMLP(t);
+    document.querySelectorAll('.audit-tab').forEach(function(button){
+      var active=button.getAttribute('data-audit-tab')===t;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-selected',active?'true':'false');
+    });
+    setTimeout(function(){ if(typeof initClampButtons==='function') initClampButtons(); },0);
+    return;
+  }
+  render();
+}
+window.setAuditTab=setAuditTab;
+function auditPageHTMLP(){
+  var tabs=[['root','Eksik Kök Modüller','layers'],['provenance','Terapi · Bildirim · Provenance','shield-check'],['modules','Eksik ve Özet Modüller','target'],['events','Event Günlüğü','activity']];
+  var h='<div class="page audit-page">';
+  h+='<div class="card pad d2-core-strip span-12" style="margin-bottom:12px;">';
+  h+='<div style="display:flex;align-items:center;gap:11px;flex:1;min-width:0;">';
+  h+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
+  h+='<div style="line-height:1.2;"><div style="font-size:var(--f4);font-weight:800;color:var(--t1);letter-spacing:2px;">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Denetim Merkezi</div></div>';
+  h+='</div>';
+  h+='<button type="button" class="btn" onclick="toggleAuditPage(false)" style="margin-left:auto;">← Panele dön</button>';
+  h+='</div>';
+  h+='<div class="audit-tabs" role="tablist" aria-label="Denetim sekmeleri">'+tabs.map(function(t){ return '<button type="button" role="tab" data-audit-tab="'+t[0]+'" aria-controls="audit-content" aria-selected="'+(UI.auditTab===t[0]?'true':'false')+'" class="audit-tab '+(UI.auditTab===t[0]?'active':'')+'" onclick="setAuditTab(\''+t[0]+'\')">'+icon(t[2],14)+' '+t[1]+'</button>'; }).join('')+'</div>';
+  h+='<div id="audit-content" class="audit-content" role="tabpanel" aria-live="polite">'+auditPaneHTMLP(UI.auditTab)+'</div>';
+  h+='<button type="button" class="btn audit-back-floating" onclick="toggleAuditPage(false)">← Panele dön</button>';
+  h+='</div>';
+  return h;
+}
+
 function p3SettingsSummaryP(settings){
   var t=settings&&settings.tracked||{}, labels={locationEnabled:'Konum',locationMode:'Konum modu',caffeineMode:'Kafein modu',targetBed:'Hedef uyku',hideLocationCard:'Konum kartı',hideRepoBanner:'Repo bandı',profileAssessmentInactive:'Profil pasif',aeonNotifyPermission:'ÆON bildirim',prayerMethod:'Namaz yöntemi',prayerRemindersEnabled:'Namaz hatırlatıcı',magnesiumEnabled:'Magnezyum'};
   var keys=Object.keys(labels), out=[];
@@ -1903,12 +2052,51 @@ function lunaThreadCardHTML(){
   s+='</div>';
   return s;
 }
-function setRange(n){ UI.range=n; render(); } window.setRange=setRange;
-function setDensityP(mode){ mode=['quick','standard','audit'].indexOf(mode)>=0?mode:'standard'; UI.density=mode; try{ localStorage.setItem(DENSITYKEY,mode); }catch(e){} render(); }
+function preserveScrollDuring(fn){
+  var page=document.querySelector('.page');
+  var y=page?page.scrollTop:0;
+  fn();
+  requestAnimationFrame(function(){ var next=document.querySelector('.page'); if(next) next.scrollTop=y; });
+}
+function setRange(n){ preserveScrollDuring(function(){ UI.range=n; render(); }); } window.setRange=setRange;
+function setDensityP(mode){ mode=['quick','standard','audit'].indexOf(mode)>=0?mode:'standard'; UI.density=mode; try{ localStorage.setItem(DENSITYKEY,mode); }catch(e){} preserveScrollDuring(function(){ render(); }); }
 window.setDensityP=setDensityP;
-function setSelectedDate(v){ UI.selectedDate=v||today(); UI.month=monthKey(UI.selectedDate); render(); } window.setSelectedDate=setSelectedDate;
-function setMonth(v){ UI.month=v||monthKey(today()); render(); } window.setMonth=setMonth;
-function pickDay(d){ if(!d)return; UI.selectedDate=d; UI.month=monthKey(d); render(); } window.pickDay=pickDay;
+function setSelectedDate(v){ preserveScrollDuring(function(){ UI.selectedDate=v||today(); UI.month=monthKey(UI.selectedDate); render(); }); } window.setSelectedDate=setSelectedDate;
+function setMonth(v){ preserveScrollDuring(function(){ UI.month=v||monthKey(today()); render(); }); } window.setMonth=setMonth;
+function pickDay(d){ if(!d)return; preserveScrollDuring(function(){ UI.selectedDate=d; UI.month=monthKey(d); render(); }); } window.pickDay=pickDay;
+function updateMapControlStateP(){
+  document.querySelectorAll('[data-map-style]').forEach(function(button){ var active=button.getAttribute('data-map-style')===UI.mapStyle; button.classList.toggle('active',active); button.setAttribute('aria-pressed',active?'true':'false'); });
+  document.querySelectorAll('[data-map-height]').forEach(function(button){ var active=button.getAttribute('data-map-height')===UI.mapHeight; button.classList.toggle('active',active); button.setAttribute('aria-pressed',active?'true':'false'); });
+}
+function setMapStyle(s){
+  if(['dark','light','satellite','terrain'].indexOf(s)<0) return;
+  UI.mapStyle=s;
+  try{ localStorage.setItem(MAPSTYLEKEY,s); }catch(e){}
+  if(_locMap&&_locMap._container&&document.body.contains(_locMap._container)&&typeof L!=='undefined'){
+    var cfg=mapTileLayerByStyleP(s);
+    if(_locTileLayer) _locMap.removeLayer(_locTileLayer);
+    _locTileLayer=L.tileLayer(cfg.url,{maxZoom:19,attribution:cfg.attribution}).addTo(_locMap);
+    updateMapControlStateP();
+    try{ _locMap.invalidateSize(); }catch(e){}
+    return;
+  }
+  preserveScrollDuring(function(){ render(); });
+} window.setMapStyle=setMapStyle;
+function setMapHeight(h){
+  if(['short','medium','tall','full'].indexOf(h)<0) return;
+  UI.mapHeight=h;
+  try{ localStorage.setItem(MAPHEIGHTKEY,h); }catch(e){}
+  var mapEl=document.getElementById('loc-map');
+  if(mapEl){ ['short','medium','tall','full'].forEach(function(size){ mapEl.classList.remove('loc-map-'+size); }); mapEl.classList.add('loc-map-'+h); updateMapControlStateP(); if(_locMap) setTimeout(function(){ try{ if(_locMap._container&&document.body.contains(_locMap._container)) _locMap.invalidateSize(); }catch(e){} },0); return; }
+  preserveScrollDuring(function(){ render(); });
+} window.setMapHeight=setMapHeight;
+function toggleAuditPage(show){
+  var page=document.querySelector('.page'), currentScroll=page?page.scrollTop:0;
+  if(show){ UI.auditReturnScroll=currentScroll; UI.showAuditPage=true; render(); return; }
+  var restore=Number(UI.auditReturnScroll)||0;
+  UI.showAuditPage=false; UI.d4SelectedModule=null; UI.eventSelectedId=null; UI.eventSelectedGroupKey=null; render();
+  requestAnimationFrame(function(){ var next=document.querySelector('.page'); if(next) next.scrollTop=restore; });
+} window.toggleAuditPage=toggleAuditPage;
 
 // ── Jump-nav: bölüme kaydır + scroll-spy (aktif bölümü şeritte vurgula) ──
 function jumpToSection(id){
@@ -2860,6 +3048,11 @@ function render(){
   var dzMohDays=windowDays(30,today()).reduce(function(a,d){ var r=recOf(d); var ms=r&&r.discomfort&&Array.isArray(r.discomfort.meds)?r.discomfort.meds:[]; return a+(ms.some(function(m){return m&&isAnalgesic(m.name);})?1:0); },0);
   var canonical=canonicalStatusP(SYNC_RECEIPT,PROJECTION_STATE);
 
+  if(UI.showAuditPage){
+    document.getElementById("app").innerHTML=auditPageHTMLP();
+    setTimeout(function(){ if(typeof initClampButtons==='function') initClampButtons(); },0);
+    return;
+  }
   var h="";
 
   // trend-chip helper
@@ -2888,6 +3081,7 @@ function render(){
   ]);
   h+=commandRiskHTMLP(rsk,canonical,PROJECTION_STATE);
   h+=coverageRibbonHTMLP(PROJECTION_STATE);
+  h+='<button type="button" class="btn audit-entry-btn" data-component="audit-entry" onclick="toggleAuditPage(true)">'+icon('layers',14)+' Denetim merkezi</button>';
 
   // ── erişilebilir hızlı yönlendirme ─────────────────────────
   h+='<div class="d2-controls" data-component="command-actions">';
@@ -2906,9 +3100,6 @@ function render(){
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
   h+=coreStripHTML();
-  h+=rootModulesCardHTMLP();
-  h+=p4ProvenanceCardHTMLP();
-  h+=d4ModuleAtlasHTMLP();
   h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){
@@ -3081,92 +3272,10 @@ function render(){
   // Günışığı hava durumu (uygulama Bugün ekranından senkronlanır)
   h+=weatherCardHTML();
 
-  // ROW 2: Map (span-5) + Selected Day (span-4) + Mood (span-3)
+  // ROW 2: Konum akordeonu (span-12)
+  h+=locationSectionHTMLP(srec,loc);
 
-  // Map card
-  h+='<div class="card lift span-5 pad" style="min-height:248px;display:flex;flex-direction:column;order:30;">';
-  h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('map-pin',14)+' Canlı Konum';
-  if(loc){
-    var mapsUrl="https://www.google.com/maps/search/?api=1&query="+loc.lat+","+loc.lng;
-    h+='<a href="'+mapsUrl+'" target="_blank" rel="noopener noreferrer" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:800;letter-spacing:.3px;">Google Maps →</a>';
-  }
-  h+='</div>';
-  if(loc){
-    h+='<div id="loc-map" style="flex:1;min-height:170px;"></div>';
-    h+='<div id="loc-address" style="font-size:var(--f3);color:var(--t3);margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">Adres çözümleniyor…</div>';
-  } else {
-    h+='<div class="empty" style="flex:1;"><span class="ei">'+icon('map-pin',20)+'</span>Konum verisi bekleniyor<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıldığında otomatik gelir</span></div>';
-  }
-  h+='</div>';
-
-  // Konum geçmişi — seçili günün tarihli & zamanlı hareket izi (movement.track)
-  (function(){
-    var trk=(srec.movement&&Array.isArray(srec.movement.track))?srec.movement.track:[];
-    var dTxt=(function(){ try{ return new Date(selected+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'short'}); }catch(e){ return String(selected); } })();
-    h+='<div class="card span-12 pad" style="order:31;display:flex;flex-direction:column;">';
-    h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('route',14)+' Konum Geçmişi <span style="margin-left:auto;font-size:var(--f2);color:var(--t4);font-weight:700;">'+esc(dTxt)+'</span></div>';
-    if(!trk.length){
-      h+='<div class="empty"><span class="ei">'+icon('route',20)+'</span>Bu gün için konum izi yok<span style="font-size:var(--f2);color:var(--t4);">Uygulama açıkken canlı takip ile birikir</span></div>';
-    } else {
-      var segs=[], curS=null, GAP=8*60000;
-      for(var gi=0;gi<trk.length;gi++){ var pt=trk[gi]; var tt=new Date(pt.ts).getTime(); if(isNaN(tt)||pt.lat==null||pt.lng==null) continue;
-        if(!curS||curS.mode!==pt.mode||(tt-curS.endT)>GAP){ if(curS) segs.push(curS); curS={mode:pt.mode,startT:tt,endT:tt,dist:0,end:pt,n:1}; }
-        else { curS.dist+=haversineKm(curS.end,pt)*1000; curS.endT=tt; curS.end=pt; curS.n++; }
-      }
-      if(curS) segs.push(curS);
-      var hm=function(ms){ return new Date(ms).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}); };
-      var shown=segs.slice(-24).reverse();
-      h+='<div style="display:flex;flex-direction:column;max-height:340px;overflow-y:auto;">';
-      shown.forEach(function(s){
-        var isVeh=s.mode==='vehicle', col=isVeh?'var(--purple)':'var(--green)', ic=isVeh?'car':'footprints', lbl=isVeh?'Araç':'Yürüyüş';
-        var maps='https://www.google.com/maps/search/?api=1&query='+s.end.lat+','+s.end.lng;
-        h+='<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--bd2);">';
-        h+='<span style="width:26px;height:26px;border-radius:8px;flex-shrink:0;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:rgba(255,255,255,.05);border:1px solid var(--bd2);">'+icon(ic,14)+'</span>';
-        h+='<div style="flex:1;min-width:0;">';
-        h+='<div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;"><b class="mono" style="color:var(--t1);font-size:var(--f3);">'+hm(s.startT)+(s.endT>s.startT?' \u2013 '+hm(s.endT):'')+'</b><span style="font-size:var(--f2);color:'+col+';font-weight:800;">'+lbl+'</span>'+(s.dist>30?'<span style="font-size:var(--f2);color:var(--t3);">'+fmtKmM(s.dist)+'</span>':'')+'</div>';
-        h+='<div style="font-size:var(--f2);color:var(--t4);margin-top:2px;">'+Number(s.end.lat).toFixed(4)+', '+Number(s.end.lng).toFixed(4)+' \u00b7 <a href="'+maps+'" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:700;">haritada \u2192</a></div>';
-        h+='</div></div>';
-      });
-      h+='</div>';
-      if(segs.length>shown.length) h+='<div style="font-size:var(--f2);color:var(--t4);margin-top:8px;text-align:center;">+ '+(segs.length-shown.length)+' \u00f6nceki segment</div>';
-      var totM=segs.reduce(function(a,s){return a+s.dist;},0);
-      h+='<div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--bd);display:flex;gap:12px;flex-wrap:wrap;font-size:var(--f2);color:var(--t3);"><span>'+trk.length+' nokta</span><span>'+segs.length+' segment</span><span>~'+fmtKmM(totM)+'</span></div>';
-    }
-    h+='</div>';
-  })();
-
-  // Konum Kayıtları — data.locationHistory'nin ham, kronolojik dökümü (son ≤60 GPS
-  // örneği, harita üzerindeki noktaların metin listesi). Yukarıdaki "Konum Geçmişi"
-  // kartından farklı: o, seçili günün movement.track'inden türetilmiş yürüyüş/araç
-  // segmentlerini gösterir; bu ise ham konum örneklerinin kendisini, tarihe bağlı
-  // olmadan (biriktiği sırayla) listeler.
-  (function(){
-    var hist=(D&&Array.isArray(D.locationHistory))?D.locationHistory.slice():[];
-    h+='<div class="card span-12 pad" style="order:32;display:flex;flex-direction:column;">';
-    h+='<div class="lbl" style="margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('map-pin',14)+' Konum Kayıtları <span style="margin-left:auto;font-size:var(--f2);color:var(--t4);font-weight:700;">son '+hist.length+' nokta</span></div>';
-    if(!hist.length){
-      h+='<div class="empty"><span class="ei">'+icon('map-pin',20)+'</span>Henüz konum kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Uygulama konum açıkken canlı biriktirir</span></div>';
-    } else {
-      var rows=hist.slice().reverse();
-      h+='<div style="display:flex;flex-direction:column;max-height:320px;overflow-y:auto;">';
-      rows.forEach(function(p){
-        if(!p||p.lat==null||p.lng==null) return;
-        var maps='https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng;
-        var when=''; try{ when=new Date(p.ts).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }catch(e){ when=String(p.ts||''); }
-        h+='<div style="display:flex;gap:11px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd2);">';
-        h+='<span style="width:22px;height:22px;border-radius:7px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--gold);background:rgba(255,255,255,.05);border:1px solid var(--bd2);">'+icon('map-pin',12)+'</span>';
-        h+='<div style="flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">';
-        h+='<b class="mono" style="color:var(--t1);font-size:var(--f2);">'+esc(when)+'</b>';
-        h+='<span style="font-size:var(--f2);color:var(--t4);">'+Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)+(p.acc!=null?' · ±'+Math.round(p.acc)+'m':'')+'</span>';
-        h+='<a href="'+maps+'" target="_blank" style="margin-left:auto;font-size:var(--f2);color:var(--gold);text-decoration:none;font-weight:700;">haritada →</a>';
-        h+='</div></div>';
-      });
-      h+='</div>';
-    }
-    h+='</div>';
-  })();
-
-  // Selected day card — cardWrap() ile özet (dstats+habit chip'leri) her zaman görünür,
+  // ROW 3: Selected Day (span-4) + Mood (span-3) — cardWrap() ile özet (dstats+habit chip'leri) her zaman görünür,
   // detay (öğün/semptom/kayıt/not blokları) chevron ile açılır. Üretim mantığı aynen
   // korunur; h'ye eklenen parçalar sonradan slice ile ayrıştırılıp cardWrap'e sarılır —
   // veri/gözlem kaybı yok, yalnızca varsayılan görünürlük değişir.
@@ -3867,8 +3976,17 @@ function render(){
   try{ maybeMarkReviewing(); }catch(e){}
 }
 
+function mapTileLayerByStyleP(style){
+  var tiles={
+    dark:{url:"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>'},
+    light:{url:"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>'},
+    satellite:{url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",attribution:'© Esri'},
+    terrain:{url:"https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",attribution:'© OpenTopoMap © OpenStreetMap'}
+  };
+  return tiles[style]||tiles.dark;
+}
 // ---------- Leaflet harita başlatma ----------
-var _locMap=null, _locMarker=null, _locHistLayer=null;
+var _locMap=null, _locTileLayer=null, _locMarker=null, _locHistLayer=null, _locAccuracyCircle=null;
 function initLocMap(){
   var loc=D&&D.location?D.location:null;
   var hist=D&&Array.isArray(D.locationHistory)?D.locationHistory:[];
@@ -3878,13 +3996,15 @@ function initLocMap(){
 
   // innerHTML yenilendikten sonra eski map nesnesi geçersiz olur — sıfırla
   if(_locMap&&(!_locMap._container||!document.body.contains(_locMap._container))){
-    _locMap=null; _locMarker=null; _locHistLayer=null;
+    _locMap=null; _locTileLayer=null; _locMarker=null; _locHistLayer=null; _locAccuracyCircle=null;
   }
 
+  var style=UI.mapStyle||"dark", cfg=mapTileLayerByStyleP(style);
   if(!_locMap){
     _locMap=L.map(container,{zoomControl:true,attributionControl:true});
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(_locMap);
   }
+  if(_locTileLayer){ _locMap.removeLayer(_locTileLayer); _locTileLayer=null; }
+  _locTileLayer=L.tileLayer(cfg.url,{maxZoom:19,attribution:cfg.attribution}).addTo(_locMap);
 
   _locMap.setView([loc.lat,loc.lng],15);
 
@@ -3921,7 +4041,8 @@ function initLocMap(){
     .addTo(_locMap);
 
   // doğruluk dairesi
-  L.circle([loc.lat,loc.lng],{radius:loc.acc,color:"#b79a60",fillColor:"#E9899F",fillOpacity:0.08,weight:1.5}).addTo(_locMap);
+  if(_locAccuracyCircle){ _locMap.removeLayer(_locAccuracyCircle); _locAccuracyCircle=null; }
+  _locAccuracyCircle=L.circle([loc.lat,loc.lng],{radius:loc.acc,color:"#b79a60",fillColor:"#E9899F",fillOpacity:0.08,weight:1.5}).addTo(_locMap);
 
   // adres çöz (Nominatim)
   var addrEl=document.getElementById("loc-address");
@@ -4443,6 +4564,12 @@ try{
   if(insRaw) UI.insightTab=insRaw;
   var densityRaw=localStorage.getItem(DENSITYKEY);
   if(['quick','standard','audit'].indexOf(densityRaw)>=0) UI.density=densityRaw;
+  var msRaw=localStorage.getItem(MAPSTYLEKEY);
+  if(['dark','light','satellite','terrain'].indexOf(msRaw)>=0) UI.mapStyle=msRaw;
+  var mhRaw=localStorage.getItem(MAPHEIGHTKEY);
+  if(['short','medium','tall','full'].indexOf(mhRaw)>=0) UI.mapHeight=mhRaw;
+  var atRaw=localStorage.getItem(AUDITTABKEY);
+  if(['root','provenance','modules','events'].indexOf(atRaw)>=0) UI.auditTab=atRaw;
 }catch(e){}
 load();
 // Panel otomatik yenileme: ~15 sn'de bir (mesajlar mümkün olduğunca anlık gelsin),

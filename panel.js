@@ -4953,7 +4953,17 @@ initDevModeUrlTriggerP();
 // ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
-setInterval(function(){ if(DEMO_MODE||!PTOKEN) return; if(UI.msgSending||panelBusyTyping()){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return; } load(); },15000);
+setInterval(function(){ if(DEMO_MODE||!PTOKEN) return; if(UI.msgSending||panelBusyTyping()){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return; } load(); },5000);
+// Sekme arka plana alınıp geri dönüldüğünde bir sonraki 5sn'lik turu
+// beklemeden anında yenile — "eş zamanlı" hissi asıl burada kurulur, çünkü
+// gözlemci genelde panele "az önce ne oldu" diye bakmak için döner.
+// ETag/conditional GET (pollConditionalDecisionP) sayesinde veri
+// değişmediyse bu ekstra istek ucuzdur (304, gövde indirilmez).
+if(typeof document!=='undefined'&&typeof document.addEventListener==='function'){
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible'&&!DEMO_MODE&&PTOKEN&&!UI.msgSending&&!panelBusyTyping()) load();
+  });
+}
 document.addEventListener("keydown",eventDrawerKeydownP);
 document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
 window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });

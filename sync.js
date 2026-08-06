@@ -5,7 +5,12 @@
 (function(){
 "use strict";
 var KEY='seyma-reset-v1';
-var DEBOUNCE=4000;
+// Kullanıcı bir kaydı değiştirdikten sonra uzak repoya ne kadar hızlı
+// gönderileceği — panelin "eş zamanlı" hissetmesi için kısaltıldı (eskiden
+// 4000ms). Yine de art arda hızlı etkileşimleri (birkaç habit tik'i,
+// mood/su/enerji ayarı) TEK push'a topluyor; her tık başına ayrı istek
+// atmaz.
+var DEBOUNCE=1500;
 var RECEIPT_PATH='data/sync-receipt.json';
 var PROJECTION_PATH='data/observer-snapshot.json';
 var timer=null, lastPayload=null;

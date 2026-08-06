@@ -1154,10 +1154,15 @@ function canonicalStatusP(receipt,projectionState){
   if(st.code==='queued'||st.code==='saving'||st.code==='retrying'||st.code==='offline'||st.code==='local_saved') return {code:st.code,kind:'pending',cls:'b-warn',label:'Canonical bekliyor',detail:'Yerel kayıt var; uzak kabul henüz oluşmadı.',revision:r.snapshotRevision||null};
   return {code:st.code||'idle',kind:'muted',cls:'b-dim',label:'Canonical durum bekleniyor',detail:'İlk receipt/revision kontrolü bekleniyor.',revision:r.snapshotRevision||null};
 }
-function d2StatusBadgeP(label,kind,extra){
-  var k=['ok','pending','warning','danger','muted'].indexOf(kind)>=0?kind:'muted';
-  return '<span class="badge status-badge status-'+k+' '+(extra||'b-dim')+'" data-component="status-badge" data-status="'+k+'">'+esc(label)+'</span>';
+// Kanonik status-badge HTML şablonu — tone burada ZATEN çözülmüş kabul
+// edilir (yalnız bilinen 5 değere karşı doğrulanır). panelStatusP,
+// panelLegacyBadgeHTMLP ve d2StatusBadgeP bu şablonu paylaşır; aralarındaki
+// tek fark tone'un nasıl hesaplandığıdır (prompt 3.2).
+function panelStatusBadgeHTMLP(label,tone,legacyCls){
+  var t=['ok','pending','warning','danger','muted'].indexOf(tone)>=0?tone:'muted';
+  return '<span class="badge status-badge status-'+t+' '+(legacyCls||'b-dim')+'" data-component="status-badge" data-status="'+t+'">'+esc(label)+'</span>';
 }
+function d2StatusBadgeP(label,kind,extra){ return panelStatusBadgeHTMLP(label,kind,extra); }
 function countNewEventChangesP(previous,next){
   var oldIds={}; (Array.isArray(previous)?previous:[]).forEach(function(e){ if(e&&e.eventId) oldIds[String(e.eventId)]=true; });
   var count=0; (Array.isArray(next)?next:[]).forEach(function(e){ if(e&&e.eventId&&!oldIds[String(e.eventId)]) count++; });
@@ -1170,7 +1175,7 @@ function viewNewChangesP(){
 window.viewNewChangesP=viewNewChangesP;
 function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), t=syncTimesP(receipt,pollAt,projectionState), pollState=typeof PANEL_POLL_STATE==='object'&&PANEL_POLL_STATE?PANEL_POLL_STATE:{}, ps=typeof pollStatusP==='function'?pollStatusP():{cls:'b-dim',label:'Yakın takip bekleniyor',note:'İlk panel çekimi bekleniyor.'}, revFull=pollState.sourceRevision||r.snapshotRevision||'—', rev=String(revFull).slice(0,12), visibleFull=pollState.visibleRevision||r.snapshotRevision||'—', visible=String(visibleFull).slice(0,12);
-  function localStatus(label,legacy,tone){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=tone||inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(kind)+'">'+esc(label)+'</span>'; }
+  function localStatus(label,legacy,tone){ return panelLegacyBadgeHTMLP(label,legacy,tone); }
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
   var sectionFetchFailed=typeof SECTION_FETCH_STATE==='object'&&SECTION_FETCH_STATE&&!SECTION_FETCH_STATE.ok;
@@ -1194,15 +1199,45 @@ function projectionStatusP(state){
 }
 function coverageRibbonHTMLP(state){
   var st=projectionStatusP(state), c=state&&state.coverage||{}, full=Array.isArray(c.full)?c.full.length:0, summary=Array.isArray(c.summary)?c.summary.length:0, redacted=Array.isArray(c.redacted)?c.redacted.length:0, missing=Array.isArray(c.missing)?c.missing.length:0;
-  function localStatus(label,legacy){ var map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+esc(kind)+'">'+esc(label)+'</span>'; }
+  // Not (prompt 3.2 birleştirmesi): bu localStatus eskiden yalnız legacy
+  // class'a bakıyordu, syncRibbonHTMLP/eventLogCardInnerHTMLP'nin metin
+  // tabanlı 'bekliyor/...' çıkarımını YAPMIYORDU (tutarsızlık). Hiçbir test
+  // bu eski davranışı sabitlemiyor; diğer ikisiyle tutarlı olacak şekilde
+  // panelLegacyBadgeHTMLP'ye yönlendirildi (tek gerçek fark: 'Receipt
+  // bekleniyor' artık tone 'warning' yerine 'pending' — anlamsal olarak
+  // daha doğru bir sınıf).
+  function localStatus(label,legacy){ return panelLegacyBadgeHTMLP(label,legacy); }
   var cells=[['Tam',full],['Özet',summary],['Redacted',redacted],['Eksik',missing]].map(function(x){ return '<div class="coverage-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(String(x[1]))+'</b></div>'; }).join('');
   return '<section class="coverage-ribbon" data-component="coverage-ribbon" aria-label="Observer coverage özeti"><div class="coverage-ribbon-head">'+localStatus(st.label,st.cls)+'<span class="coverage-ribbon-manifest">manifest · v1</span></div><div class="coverage-ribbon-grid">'+cells+'</div><div class="coverage-ribbon-note">'+esc(st.note)+'</div></section>';
 }
 function statusToneP(legacy){ return legacy==='b-ok'?'ok':legacy==='b-danger'?'danger':legacy==='b-warn'?'warning':legacy==='b-gold'?'pending':'muted'; }
-function statusToneForCodeP(status,legacy){
-  if(['pending','started','sent','delivered','active'].indexOf(status)>=0) return 'pending';
-  if(['incomplete','stale'].indexOf(status)>=0) return 'warning';
-  return statusToneP(legacy);
+// Bazı status KODLARI kendi legacy class'ından bağımsız bir tone'a zorlanır
+// (örn. 'pending' kodunun legacy class'ı 'b-warn' olsa da tone 'pending'
+// olmalı) — panelStatusP ve statusToneForCodeP bu tek listeyi paylaşır.
+function panelToneOverrideP(code){
+  if(['pending','started','sent','delivered','active'].indexOf(code)>=0) return 'pending';
+  if(['incomplete','stale'].indexOf(code)>=0) return 'warning';
+  return null;
+}
+function statusToneForCodeP(status,legacy){ return panelToneOverrideP(status)||statusToneP(legacy); }
+// Kanonik status kodu -> {label, cls, tone} eşlemesi (prompt 3.2). Eskiden
+// p3StatusP, statusToneP/statusToneForCodeP, d2StatusBadgeP,
+// auditRollupStatusP ve syncRibbonHTMLP/coverageRibbonHTMLP/
+// eventLogCardInnerHTMLP içindeki üç ayrı localStatus() kapanışı bu
+// eşlemeyi (küçük tutarsızlıklarla) ayrı ayrı tekrarlıyordu. Harita
+// p3StatusP'ninkinden taşındı — en kapsamlı (en çok status kodunu
+// kapsayan) implementasyon oydu.
+function panelStatusP(code){
+  var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']};
+  var x=m[code]||['Bekleniyor','b-dim'];
+  return {label:x[0],cls:x[1],tone:panelToneOverrideP(code)||statusToneP(x[1])};
+}
+// label + legacy class (+ opsiyonel açık tone override) alan badge
+// üreticisi — syncRibbonHTMLP/coverageRibbonHTMLP/eventLogCardInnerHTMLP'nin
+// durum KODU değil serbest metin etiketli rozetleri için ortak yol.
+function panelLegacyBadgeHTMLP(label,legacy,explicitTone){
+  var inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(String(label||'').toLowerCase())?'pending':null;
+  return panelStatusBadgeHTMLP(label,explicitTone||inferred||statusToneP(legacy),legacy);
 }
 function sourceKindP(text){
   var s=String(text||'').toLowerCase();
@@ -1238,7 +1273,7 @@ function stalenessBadgeP(iso){
   if(days<=STALE_DANGER_DAYS) return '<span class="badge status-badge status-warning b-warn" data-component="status-badge" data-status="warning">'+n+' gün önce</span>';
   return '<span class="badge status-badge status-danger b-danger" data-component="status-badge" data-status="danger">Eski · '+n+' gün önce</span>';
 }
-function p3StatusP(status){ var m={ready:['Hazır','b-ok'],ok:['Kayıtlı','b-ok'],fresh:['Taze','b-ok'],incomplete:['Eksik metadata','b-warn'],stale:['Eski cache','b-warn'],missing:['Yok','b-dim'],malformed:['Bozuk','b-danger'],error:['Hata','b-danger'],mismatch:['Uyuşmazlık','b-danger'],active:['Sürüyor','b-warn'],completed:['Tamamlandı','b-ok'],not_started:['Başlamadı','b-dim'],unknown:['Bilinmiyor','b-dim'],started:['Başladı','b-warn'],chosen:['Seçildi','b-ok'],sent:['Gönderildi','b-warn'],delivered:['İletildi','b-warn'],created:['Oluşturuldu','b-dim'],deleted:['Silindi','b-danger'],read:['Okundu','b-ok'],pending:['Bekliyor','b-warn']}; var x=m[status]||['Bekleniyor','b-dim'], tone=['pending','started','sent','delivered','active'].indexOf(status)>=0?'pending':['incomplete','stale'].indexOf(status)>=0?'warning':({ 'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}[x[1]]||'muted'); return '<span class="badge status-badge status-'+tone+' '+x[1]+'" data-component="status-badge" data-status="'+tone+'">'+esc(x[0])+'</span>'; }
+function p3StatusP(status){ var r=panelStatusP(status); return panelStatusBadgeHTMLP(r.label,r.tone,r.cls); }
 // Bir modülün 'missing' durumunun KÖK SEBEBİNİ üç kategoriye ayırır —
 // "hiç kullanılmadı" (gerçekten hiç veri yok), "senkron bekleniyor" (Faz
 // 1.1'in SECTION_FETCH_STATE'i veya receipt/projection henüz taze değil),
@@ -1579,7 +1614,7 @@ function showMoreEventsP(){ UI.eventLimit=Math.max(5,Number(UI.eventLimit)||5)+5
 window.showMoreEventsP=showMoreEventsP;
 function eventLogCardInnerHTMLP(){
   var st=eventLogSourceP(), all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], audit=EVENT_LOG_STATE.audit||{ok:true,issueCount:0,issues:[]};
-  function localStatus(label,legacy){ var txt=String(label||'').toLowerCase(), inferred=/bekliyor|gönderildi|sürüyor|iletildi|başladı|taslak/.test(txt)?'pending':null, map={'b-ok':'ok','b-warn':'warning','b-danger':'danger','b-gold':'pending','b-dim':'muted'}, kind=inferred||map[legacy]||'muted'; return '<span class="badge status-badge status-'+kind+' '+(legacy||'b-dim')+'" data-component="status-badge" data-status="'+kind+'">'+esc(label)+'</span>'; }
+  function localStatus(label,legacy){ return panelLegacyBadgeHTMLP(label,legacy); }
   function localSourceBadgeP(src){ return '<span class="badge source-badge source-'+esc(src.kind)+'" data-component="source-badge" data-source="'+esc(src.kind)+'">'+esc(src.label)+'</span>'; }
   all.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); });
   var filter=UI.eventFilter||'all', filtered=all.filter(function(e){ return eventMatchesFilterP(e,filter); }), groups=[], groupMap={};

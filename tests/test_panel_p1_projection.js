@@ -95,7 +95,7 @@ var panelContext={
   esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');},
   String:String,Array:Array,Date:Date,Math:Math
 };
-vm.runInNewContext(extractFunction('projectionStatusP')+'\n'+extractFunction('coverageRibbonHTMLP'),panelContext,{filename:'panel-p1-ribbon.js'});
+vm.runInNewContext(extractFunction('projectionStatusP')+'\n'+extractFunction('statusToneP')+'\n'+extractFunction('panelStatusBadgeHTMLP')+'\n'+extractFunction('panelLegacyBadgeHTMLP')+'\n'+extractFunction('coverageRibbonHTMLP'),panelContext,{filename:'panel-p1-ribbon.js'});
 var domHtml=panelContext.coverageRibbonHTMLP({source:'legacy_fallback',reason:'projection_invalid',coverage:cov});
 ok('panel bozuk projection durumunu görünür kılar',domHtml.includes('Projection bozuk')&&domHtml.includes('legacy fallback'));
 ok('coverage ribbon raw veri DOM’una taşımaz',!domHtml.includes('secret-token')&&!domHtml.includes('RAW_PROFILE_ANSWER')&&!domHtml.includes('41.01'));

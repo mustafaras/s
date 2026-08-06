@@ -47,7 +47,7 @@ var panelContext={
   icon:function(){return '';},esc:esc,tsShort:function(v){return String(v);},p3TimeP:function(v){return v?'t:'+v:'—';},
   render:function(){},eventLogSourceP:null,eventStatusP:null,eventTimeP:null
 };
-var parts=['eventLogSourceP','eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','setEventLimitP','eventLogCardInnerHTMLP','eventLogCardHTMLP'].map(extractFunction).join('\n');
+var parts=['eventLogSourceP','eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','setEventLimitP','statusToneP','panelStatusBadgeHTMLP','panelLegacyBadgeHTMLP','eventLogCardInnerHTMLP','eventLogCardHTMLP'].map(extractFunction).join('\n');
 vm.runInNewContext(parts,panelContext,{filename:'panel-p2-event-card.js'});
 var html=panelContext.eventLogCardHTMLP();
 ok('event kartı render olur',html.includes('Son Değişiklikler')&&html.includes('son 20')&&html.includes('son 50')&&html.includes('son 100'));

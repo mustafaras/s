@@ -38,7 +38,7 @@ var panelContext={
   icon:function(){return '';},
   esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 };
-vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('emptyStateReasonP')+'\n'+extractFunction('emptyStateNoteHTMLP')+'\n'+extractFunction('p3SettingsSummaryP')+'\n'+extractFunction('rootModulesCardHTMLP'),panelContext,{filename:'panel-p3-card.js'});
+vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('statusToneP')+'\n'+extractFunction('panelToneOverrideP')+'\n'+extractFunction('panelStatusP')+'\n'+extractFunction('panelStatusBadgeHTMLP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('emptyStateReasonP')+'\n'+extractFunction('emptyStateNoteHTMLP')+'\n'+extractFunction('p3SettingsSummaryP')+'\n'+extractFunction('rootModulesCardHTMLP'),panelContext,{filename:'panel-p3-card.js'});
 
 console.log('\n=== PANEL-005 / PANEL-03 — eksik kök modül fixture ===\n');
 console.log('[1] Dolu fixture — all targets + source/privacy badges');

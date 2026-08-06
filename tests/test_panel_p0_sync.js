@@ -189,7 +189,7 @@ function extractTopLevelFunction(source,name){
 console.log('[3] Panel projection — local/remote/projection/panelPoll ayrı');
 (function(){
   var map=panelSource.match(/var SYNC_STATUS_P=\{[\s\S]*?\};/);
-  var names=['normalizeSyncReceiptP','syncStatusP','syncTimesP','syncTimeP','syncFreshnessP','syncRibbonHTMLP'];
+  var names=['normalizeSyncReceiptP','syncStatusP','syncTimesP','syncTimeP','syncFreshnessP','statusToneP','panelStatusBadgeHTMLP','panelLegacyBadgeHTMLP','syncRibbonHTMLP'];
   var code=(map?map[0]:'')+'\n'+names.map(function(n){return extractTopLevelFunction(panelSource,n);}).join('\n');
   var context={
     Date:Date,Math:Math,String:String,Number:Number,isFinite:isFinite,
@@ -214,7 +214,7 @@ console.log('[3] Panel projection — local/remote/projection/panelPoll ayrı');
 console.log('[4] Section fetch failure — PROJECTION_SECTIONS korunur, sync ribbon uyarı gösterir');
 (function(){
   var map=panelSource.match(/var SYNC_STATUS_P=\{[\s\S]*?\};/);
-  var names=['normalizeSyncReceiptP','syncStatusP','syncTimesP','syncTimeP','syncFreshnessP','syncRibbonHTMLP'];
+  var names=['normalizeSyncReceiptP','syncStatusP','syncTimesP','syncTimeP','syncFreshnessP','statusToneP','panelStatusBadgeHTMLP','panelLegacyBadgeHTMLP','syncRibbonHTMLP'];
   var code=(map?map[0]:'')+'\n'+names.map(function(n){return extractTopLevelFunction(panelSource,n);}).join('\n');
   var context={
     Date:Date,Math:Math,String:String,Number:Number,isFinite:isFinite,

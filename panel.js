@@ -137,7 +137,7 @@ var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issu
 // Kart tazelik rozeti eşikleri: <1 gün "güncel", 1-7 gün "N gün önce" (uyarı),
 // >7 gün "eski" (tehlike). dailyPhoto'nun kendi stale mantığından bağımsızdır.
 var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:5,eventFilter:"all",d4SelectedModule:null};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:5,eventFilter:"all",d4SelectedModule:null,curatedLogShowAll:false};
 var D4_DRAWER_RETURN_ID=null;
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
@@ -1683,6 +1683,42 @@ function eventLogCardInnerHTMLP(){
 function eventLogCardHTMLP(){
   return '<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">'+eventLogCardInnerHTMLP()+'</div>';
 }
+// D1.2 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §6.2) — aynı EVENT_LOG_STATE
+// kaynağını kullanan ama eventClassificationP(e).key==='user' (rutin gün
+// kaydı — 132 kayıttan 129'unu oluşturan gürültü kaynağı) olan grupları
+// varsayılan olarak süzen küratörlü liste. eventLogSourceP/loadEventLogP
+// veri çekme mantığına dokunmuyor, yalnızca zaten yüklenmiş listeyi filtreliyor.
+function curatedChangeLogGroupsP(){
+  var all=Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], groups=[], groupMap={};
+  all.sort(function(a,b){ return String(b.occurredAt||'').localeCompare(String(a.occurredAt||''))||Number(b.sequence||0)-Number(a.sequence||0); });
+  all.forEach(function(e){ var key=String(e.correlationId||e.eventId||'unknown'); if(!groupMap[key]){ groupMap[key]={key:key,event:e,members:[e]}; groups.push(groupMap[key]); } else groupMap[key].members.push(e); });
+  return groups.filter(function(g){ return eventClassificationP(g.event).key!=='user'; });
+}
+function curatedChangeLogCardInnerHTMLP(){
+  var st=eventLogSourceP(), curated=curatedChangeLogGroupsP(), visible=curated.slice(0,10);
+  var h='<div class="lbl event-log-head">'+icon('sparkles',14)+' Bu Hafta Değişenler <span style="margin-left:auto;">'+panelLegacyBadgeHTMLP(st.label,st.cls)+'</span></div>';
+  h+='<p class="p3-muted" style="margin:2px 0 10px;">Rutin gün kayıtları hariç, dikkat çeken değişiklikler.</p>';
+  if(!visible.length){
+    h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('sparkles',20)+'</span>Rutin dışı bir değişiklik yok</div>';
+  } else {
+    h+='<div class="event-log-list" aria-live="polite">';
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e); h+='<div class="event-log-row" data-component="timeline-row" data-category="'+esc(category.key)+'"><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main"><b class="event-log-headline"><span class="event-log-time mono">'+esc(eventTimeP(e.occurredAt))+'</span> · '+esc(change.title)+'</b><small>'+esc(category.label)+'</small></span><span class="event-log-side">'+panelLegacyBadgeHTMLP(es.label,es.cls)+'</span></div>'; });
+    h+='</div>';
+  }
+  h+='<button type="button" class="event-log-more" data-event-action="toggle-curated-all" onclick="toggleCuratedLogShowAllP()">'+(UI.curatedLogShowAll?'Yalnız öne çıkanları göster':'Tüm kayıtları göster')+'</button>';
+  if(UI.curatedLogShowAll) h+='<div class="curated-log-full" style="margin-top:10px;border-top:1px solid var(--bd2);padding-top:10px;">'+eventLogCardInnerHTMLP()+'</div>';
+  return h;
+}
+function curatedChangeLogCardHTMLP(){
+  return '<div id="curated-change-log-card" class="card lift span-12 pad event-log-card" data-component="curated-timeline" style="order:7;display:flex;flex-direction:column;">'+curatedChangeLogCardInnerHTMLP()+'</div>';
+}
+function toggleCuratedLogShowAllP(){
+  UI.curatedLogShowAll=!UI.curatedLogShowAll;
+  var card=document.getElementById('curated-change-log-card');
+  if(!card){ render(); return; }
+  card.innerHTML=curatedChangeLogCardInnerHTMLP();
+}
+window.toggleCuratedLogShowAllP=toggleCuratedLogShowAllP;
 function timeAgo(iso){
   if(!iso) return '';
   var t=new Date(iso).getTime(); if(isNaN(t)) return '';
@@ -3248,6 +3284,7 @@ function render(){
   var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
   h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
   h+=auditEntryHTMLP();
+  h+=curatedChangeLogCardHTMLP();
   h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){

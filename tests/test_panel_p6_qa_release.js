@@ -31,7 +31,7 @@ console.log('\n=== PANEL-015 / PANEL-13 — D6 QA + release gate fixture ===\n')
 console.log('[1] Kod ve sözleşme gate’leri');
 ok('CSS brace balance temiz',braceBalance(cssSource));
 ok('panel inline script/script-tag balance temiz',(htmlSource.match(/<script\b/g)||[]).length===(htmlSource.match(/<\/script>/g)||[]).length);
-ok('D5 cache sürümü release surface’te',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806h'));
+ok('D5 cache sürümü release surface’te',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806i'));
 ok('coverage manifest validator export ve schema v1 mevcut',manifestSource.includes('PanelCoverageV1')&&manifestSource.includes('schemaVersion:1'));
 ok('sync retry 409/422 bounded ve anti-clobber guard mevcut',/r\.status===409\|\|r\.status===422/.test(syncSource)&&/attempt<3/.test(syncSource)&&syncSource.includes('anti_clobber'));
 ok('offline/reconnect ve localhost push guard mevcut',syncSource.includes("retryIfPending:function")&&syncSource.includes("addEventListener('online'")&&syncSource.includes('devOrigin'));

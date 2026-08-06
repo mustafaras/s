@@ -43,19 +43,15 @@ ok('out-of-order ve gap panel alarmı üretir',!bad.ok&&bad.issues.some(function
 console.log('[2] Panel son 20/50/100 filtresi ve revision drawer');
 var panelContext={
   window:{},PROJECTION_SECTIONS:{},EVENT_LOG_STATE:{source:'event_files',events:[a,b],audit:good,loadedAt:'2026-08-02T12:03:00.000Z'},
-  UI:{eventLimit:20,eventSelectedId:null},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Math:Math,
+  UI:{eventLimit:20},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Math:Math,
   icon:function(){return '';},esc:esc,tsShort:function(v){return String(v);},p3TimeP:function(v){return v?'t:'+v:'—';},
-  render:function(){},eventLogSourceP:null,eventStatusP:null,eventTimeP:null,eventDetailsP:null
+  render:function(){},eventLogSourceP:null,eventStatusP:null,eventTimeP:null
 };
-var parts=['eventLogSourceP','eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventDetailsP','setEventLimitP','openEventDrawerP','closeEventDrawerP','eventLogCardInnerHTMLP','eventLogCardHTMLP'].map(extractFunction).join('\n');
+var parts=['eventLogSourceP','eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','setEventLimitP','eventLogCardInnerHTMLP','eventLogCardHTMLP'].map(extractFunction).join('\n');
 vm.runInNewContext(parts,panelContext,{filename:'panel-p2-event-card.js'});
 var html=panelContext.eventLogCardHTMLP();
 ok('event kartı render olur',html.includes('Son Değişiklikler')&&html.includes('son 20')&&html.includes('son 50')&&html.includes('son 100'));
 ok('accepted durum rozeti görünür',html.includes('Uzak kabul')&&!html.includes('PROFILE_RAW_RESPONSE_SENTINEL'));
-panelContext.UI.eventSelectedId='evt-a-1';
-var drawerHtml=panelContext.eventLogCardHTMLP();
-ok('event drawer event/correlation/path/revision gösterir',drawerHtml.includes('Event ID')&&drawerHtml.includes('Correlation ID')&&drawerHtml.includes('data.days.*.reflection')&&drawerHtml.includes('Snapshot revision')&&drawerHtml.includes('a'.repeat(40)));
-ok('panel ham payload iddiası taşımaz',drawerHtml.includes('Ham payload drawer’a taşınmaz')&&drawerHtml.includes('token, GPS, profil cevabı ve base64 medya yoktur'));
 var many=[]; for(var mi=1;mi<=105;mi++) many.push(event(mi,'evt-many-'+mi,'dev_many','2026-08-02T13:'+String(Math.floor(mi/60)).padStart(2,'0')+':'+String(mi%60).padStart(2,'0')+'.000Z'));
 panelContext.EVENT_LOG_STATE={source:'event_files',events:many,audit:P.eventSequenceAudit(many),loadedAt:'2026-08-02T15:00:00.000Z'};
 [20,50,100].forEach(function(limit){ panelContext.UI.eventLimit=limit; var filtered=panelContext.eventLogCardHTMLP(); var rows=(filtered.match(/class="event-log-row"/g)||[]).length; ok('son '+limit+' filtresi '+limit+' satırı güvenle işler',rows===limit); });

@@ -31,7 +31,7 @@ console.log('\n=== PANEL-015 / PANEL-13 — D6 QA + release gate fixture ===\n')
 console.log('[1] Kod ve sözleşme gate’leri');
 ok('CSS brace balance temiz',braceBalance(cssSource));
 ok('panel inline script/script-tag balance temiz',(htmlSource.match(/<script\b/g)||[]).length===(htmlSource.match(/<\/script>/g)||[]).length);
-ok('D5 cache sürümü release surface’te',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806b'));
+ok('D5 cache sürümü release surface’te',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806c'));
 ok('coverage manifest validator export ve schema v1 mevcut',manifestSource.includes('PanelCoverageV1')&&manifestSource.includes('schemaVersion:1'));
 ok('sync retry 409/422 bounded ve anti-clobber guard mevcut',/r\.status===409\|\|r\.status===422/.test(syncSource)&&/attempt<3/.test(syncSource)&&syncSource.includes('anti_clobber'));
 ok('offline/reconnect ve localhost push guard mevcut',syncSource.includes("retryIfPending:function")&&syncSource.includes("addEventListener('online'")&&syncSource.includes('devOrigin'));
@@ -49,8 +49,8 @@ ok('empty/full/stale/error/redacted projection sözleşmeleri mevcut',panelSourc
 console.log('[3] 1000 event timeline ve redacted rendering');
 var events=[]; for(var i=0;i<1000;i++) events.push(makeEvent(i));
 var doc={activeElement:null,getElementById:function(){return null;},querySelector:function(){return null;}};
-var ctx={window:{},UI:{eventLimit:1000,eventSelectedId:null,eventSelectedGroupKey:null,eventFilter:'all',eventDrawerLevel:1},EVENT_DRAWER_RETURN_ID:null,EVENT_LOG_STATE:{source:'event_files',events:events,audit:{ok:true,issueCount:0,issues:[]},loadedAt:'2026-08-03T11:00:00.000Z'},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Math:Math,isNaN:isNaN,esc:esc,icon:function(){return '<svg aria-hidden="true"></svg>';},p3TimeP:function(v){return v?'t:'+v:'—';},tsShort:function(v){return String(v);},render:function(){},setTimeout:function(fn){fn();},document:doc};
-var names=['eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventDrawerFocusableP','eventDrawerKeydownP','eventLogSourceP','eventDetailsP','eventLogCardInnerHTMLP','eventLogCardHTMLP'];
+var ctx={window:{},UI:{eventLimit:1000,eventFilter:'all',d4SelectedModule:null},EVENT_LOG_STATE:{source:'event_files',events:events,audit:{ok:true,issueCount:0,issues:[]},loadedAt:'2026-08-03T11:00:00.000Z'},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Math:Math,isNaN:isNaN,esc:esc,icon:function(){return '<svg aria-hidden="true"></svg>';},p3TimeP:function(v){return v?'t:'+v:'—';},tsShort:function(v){return String(v);},render:function(){},setTimeout:function(fn){fn();},document:doc};
+var names=['eventStatusP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventDrawerFocusableP','eventDrawerKeydownP','eventLogSourceP','eventLogCardInnerHTMLP','eventLogCardHTMLP'];
 vm.runInNewContext(names.map(extractFunction).join('\n'),ctx,{filename:'panel-p6-1000-event.js'});
 var started=Date.now(),timeline=ctx.eventLogCardHTMLP(),elapsed=Date.now()-started;
 ok('1000 event timeline tam kapasite render edilir',(timeline.match(/class="event-log-row"/g)||[]).length===1000);

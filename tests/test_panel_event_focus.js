@@ -52,7 +52,7 @@ var events=[];
 for(var i=0;i<12;i++) events.push(event({eventId:'evt-'+i,correlationId:'evt-'+i,sequence:i+1,path:i%2?'data.days.*.journal':'data.days.*.mood',section:i%2?'wellness':'mood',operation:i%3?'update':'record',detail:i%2?'Günlük notu':'Ruh hali',value:i%2?'Kısa not':'Normal'}));
 var cardCtx=contextFor();
 cardCtx.EVENT_LOG_STATE.events=events;
-load(['eventStatusP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventTimeP','safeEventSummaryP','eventLogSourceP','eventDetailsP','eventLogCardInnerHTMLP','eventLogCardHTMLP','refreshEventLogP','setEventFilterP','setEventLimitP','showMoreEventsP'],cardCtx);
+load(['eventStatusP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventTimeP','safeEventSummaryP','eventLogSourceP','eventLogCardInnerHTMLP','eventLogCardHTMLP','refreshEventLogP','setEventFilterP','setEventLimitP','showMoreEventsP'],cardCtx);
 var html=cardCtx.eventLogCardHTMLP();
 ok('Tümü görünümünde varsayılan son 5 değişiklik görünür',(html.match(/class="event-log-row"/g)||[]).length===5);
 ok('kart daha fazla göster seçeneği sunar',html.includes('Daha fazla göster')&&html.includes('data-event-action="load-more"'));

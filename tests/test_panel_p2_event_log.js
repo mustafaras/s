@@ -42,7 +42,7 @@ ok('out-of-order ve gap panel alarmı üretir',!bad.ok&&bad.issues.some(function
 
 console.log('[2] Panel son 20/50/100 filtresi ve revision drawer');
 var panelContext={
-  window:{},PROJECTION_SECTIONS:{},EVENT_LOG_STATE:{source:'event_files',events:[a,b],audit:good,loadedAt:'2026-08-02T12:03:00.000Z'},
+  window:{},PROJECTION:{sections:{}},EVENT_LOG_STATE:{source:'event_files',events:[a,b],audit:good,loadedAt:'2026-08-02T12:03:00.000Z'},
   UI:{eventLimit:20},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Math:Math,
   icon:function(){return '';},esc:esc,tsShort:function(v){return String(v);},p3TimeP:function(v){return v?'t:'+v:'—';},
   render:function(){},eventLogSourceP:null,eventStatusP:null,eventTimeP:null

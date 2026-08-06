@@ -124,10 +124,10 @@ var PTOKEN="";
 var D=null;
 var PANEL_LOCATION_CONTEXT={fix:null,history:[],tracks:{}};
 var SYNC_RECEIPT=null;
-var OBSERVER_PROJECTION=null;
-var PROJECTION_STATE={source:'none',reason:'not_loaded',snapshot:null,data:null,coverage:null};
-var PROJECTION_SECTIONS={};
-var SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+// Prompt 4.2 (Faz 4, C5): eskiden ayri PROJECTION.snapshot/PROJECTION.state/
+// PROJECTION.sections/PROJECTION.sectionFetchState globalleri, manuel senkronize
+// edilen (panelSig() dahil) tek bir PROJECTION objesinde birlestirildi.
+var PROJECTION={snapshot:null,state:{source:'none',reason:'not_loaded',snapshot:null,data:null,coverage:null},sections:{},sectionFetchState:{ok:true,lastError:null,failedAt:null}};
 var PANEL_POLL_AT=null;
 var PANEL_POLL_STATE={status:'idle',lastOutcome:'idle',lastPollAt:null,lastFetchStartedAt:null,lastFetchCompletedAt:null,lastDurationMs:null,sourceRevision:null,visibleRevision:null,sourceUpdatedAt:null,etag:null,conditionalMode:'etag',fetchCount:0,notModifiedCount:0,skippedCount:0,draftDeferredCount:0,lastErrorCode:null,pendingRender:false,samples:[]};
 var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
@@ -1184,7 +1184,7 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   function localStatus(label,legacy,tone){ return panelLegacyBadgeHTMLP(label,legacy,tone); }
   var rows=[['Yerel kayıt',syncTimeP(t.local)],['Uzak kabul',syncTimeP(t.remote)],['Projection',t.projection?'hazır · '+syncTimeP(t.projection):'ayrı model yok'],['Panel çekimi',syncTimeP(t.panelPoll)]];
   var cells=rows.map(function(x){ return '<div class="sync-ribbon-cell"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; }).join('');
-  var sectionFetchFailed=typeof SECTION_FETCH_STATE==='object'&&SECTION_FETCH_STATE&&!SECTION_FETCH_STATE.ok;
+  var sectionFetchFailed=typeof PROJECTION!=='undefined'&&PROJECTION&&typeof PROJECTION.sectionFetchState==='object'&&PROJECTION.sectionFetchState&&!PROJECTION.sectionFetchState.ok;
   var errorState=['error','permission','unauthorized','forbidden','conflict','anti_clobber','receipt_failed'].indexOf(st.code)>=0||ps.code==='error';
   var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
   var noteClass=errorState?' error-state':staleState?' stale-banner':sectionFetchFailed?' stale-banner':'';
@@ -1282,17 +1282,17 @@ function stalenessBadgeP(iso){
 function p3StatusP(status){ var r=panelStatusP(status); return panelStatusBadgeHTMLP(r.label,r.tone,r.cls); }
 // Bir modülün 'missing' durumunun KÖK SEBEBİNİ üç kategoriye ayırır —
 // "hiç kullanılmadı" (gerçekten hiç veri yok), "senkron bekleniyor" (Faz
-// 1.1'in SECTION_FETCH_STATE'i veya receipt/projection henüz taze değil),
+// 1.1'in PROJECTION.sectionFetchState'i veya receipt/projection henüz taze değil),
 // "hata" (projection açıkça bozuk/yüklenemedi). status 'missing' değilse
 // (ok/malformed/stale) null döner — o durumların kendi mesajı zaten var.
-// PROJECTION_STATE/SECTION_FETCH_STATE bare global referansları typeof
-// guard'ıyla korunuyor (panel.js:~1160 civarındaki sectionFetchFailed
-// deseniyle aynı) — test VM context'lerinde bu globaller tanımlı
-// olmasa bile ReferenceError fırlatmaz.
+// PROJECTION bare global referansı typeof guard'ıyla korunuyor (panel.js:~1187
+// civarındaki sectionFetchFailed deseniyle aynı) — test VM context'lerinde
+// PROJECTION hiç tanımlı olmasa bile ReferenceError fırlatmaz (typeof obj.prop,
+// obj tanımsızsa yine fırlatır; bu yüzden önce PROJECTION'ın kendisi kontrol edilir).
 function emptyStateReasonP(status){
   if(status!=='missing') return null;
-  var fetchFailed=typeof SECTION_FETCH_STATE!=='undefined'&&SECTION_FETCH_STATE&&!SECTION_FETCH_STATE.ok;
-  var reason=typeof PROJECTION_STATE!=='undefined'&&PROJECTION_STATE?PROJECTION_STATE.reason:null;
+  var fetchFailed=typeof PROJECTION!=='undefined'&&PROJECTION&&PROJECTION.sectionFetchState&&!PROJECTION.sectionFetchState.ok;
+  var reason=typeof PROJECTION!=='undefined'&&PROJECTION&&PROJECTION.state?PROJECTION.state.reason:null;
   if(fetchFailed||reason==='receipt_missing'||reason==='projection_stale') return {kind:'pending',text:'Senkron bekleniyor · veri gelmiş olabilir, henüz panelde görünmüyor.'};
   if(reason==='projection_invalid'||reason==='projection_load_failed') return {kind:'error',text:'Kaynak/projection hatası · önceki güvenli görünüm korunuyor.'};
   return {kind:'unused',text:'Bu özellik henüz kullanılmamış.'};
@@ -1308,7 +1308,7 @@ function p3SettingsSummaryP(settings){
   return out.length?'<div class="p3-settings-grid">'+out.join('')+'</div>':'<div class="p3-muted">İzinli ayar özeti yok.</div>';
 }
 function rootModulesCardHTMLP(){
-  var s=PROJECTION_SECTIONS||{}, photo=s.dailyPhoto||{status:'missing'}, room=s.roomContentHistory||{status:'missing',records:[]}, sg=s.saygiRoot||{status:'missing',collectionCount:0}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{}, life=s.lifecycle||{};
+  var s=PROJECTION.sections||{}, photo=s.dailyPhoto||{status:'missing'}, room=s.roomContentHistory||{status:'missing',records:[]}, sg=s.saygiRoot||{status:'missing',collectionCount:0}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{}, life=s.lifecycle||{};
   var h='<div class="card lift span-12 pad p3-root-card" style="order:6;display:flex;flex-direction:column;">';
   h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('layers',14)+' Eksik Kök Modüller <span style="margin-left:auto;">'+p3BadgeP('canonical projection','source')+'</span></div>';
   h+='<div class="p3-grid">';
@@ -1347,7 +1347,7 @@ function therapyRecencyTextP(th){
   return 'Bugün kayıt yok · son kayıt '+(n!=null?n+' gün önce':'geçmişte')+' ('+th.lastRecordedDate+')';
 }
 function p4ProvenanceCardHTMLP(){
-  var s=PROJECTION_SECTIONS||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}}, pp=s.profileProgress||{status:'missing'}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, ex=s.externalSources||{status:'missing',items:[]};
+  var s=PROJECTION.sections||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}}, pp=s.profileProgress||{status:'missing'}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, ex=s.externalSources||{status:'missing',items:[]};
   var tc=th.consent||{}, dc=th.decision||null, sh=th.share||null, wd=th.windDown||{}, counts=nt.counts||{};
   var decisionLabel=dc?(dc.choice||'Seçim yok')+' · '+p3TimeP(dc.completedAt):'Kayıt yok';
   var shareLabel=sh?(sh.status||'Bekliyor')+' · '+p3TimeP(sh.sentAt):'Kayıt yok';
@@ -1377,7 +1377,7 @@ function auditRollupStatusP(statuses){
   return 'missing';
 }
 function auditEntryHTMLP(){
-  var s=PROJECTION_SECTIONS||{}, photo=s.dailyPhoto||{}, room=s.roomContentHistory||{}, sg=s.saygiRoot||{}, lt=s.locationTiming||{}, th=s.therapyProvenance||{}, pp=s.profileProgress||{}, nt=s.notificationTimeline||{}, ex=s.externalSources||{};
+  var s=PROJECTION.sections||{}, photo=s.dailyPhoto||{}, room=s.roomContentHistory||{}, sg=s.saygiRoot||{}, lt=s.locationTiming||{}, th=s.therapyProvenance||{}, pp=s.profileProgress||{}, nt=s.notificationTimeline||{}, ex=s.externalSources||{};
   var externalItems=Array.isArray(ex.items)?ex.items:[];
   var rootStatus=auditRollupStatusP([photo.status,room.status,sg.status,lt.status]);
   var provenanceStatus=auditRollupStatusP([th.status,pp.status,nt.status,ex.status]);
@@ -1443,7 +1443,7 @@ function d4CoverageBadgeP(mode){
   return '<span class="d4-coverage-badge d4-coverage-'+m+'" data-component="coverage-badge" data-coverage="'+m+'">'+labels[m]+'</span>';
 }
 function d4ModuleDescriptorsP(){
-  var s=PROJECTION_SECTIONS||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],consent:{}}, pp=s.profileProgress||{status:'missing',consent:{}}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, photo=s.dailyPhoto||{status:'missing'}, sg=s.saygiRoot||{status:'missing'}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{status:'missing'}, archives=s.archives||{};
+  var s=PROJECTION.sections||{}, th=s.therapyProvenance||{status:'missing',thoughts:[],consent:{}}, pp=s.profileProgress||{status:'missing',consent:{}}, nt=s.notificationTimeline||{status:'missing',events:[],counts:{}}, photo=s.dailyPhoto||{status:'missing'}, sg=s.saygiRoot||{status:'missing'}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{status:'missing'}, archives=s.archives||{};
   var q=typeof quranJourneyRootP==='function'?quranJourneyRootP():null, reqs=q&&q.requests&&typeof q.requests==='object'?q.requests:{}, reqIds=Object.keys(reqs), qDelivered=0, qNotes=0, qWaiting=0, qLatest=[];
   reqIds.forEach(function(id){ var r=reqs[id]||{}; if(/^[A-Za-z0-9_-]{11}$/.test(String(r.videoId||''))) qDelivered++; if(Array.isArray(r.notes)) qNotes+=r.notes.length; if(r.status==='waiting'||r.status==='requested') qWaiting++; qLatest.push(r.updatedAt||r.requestedAt||r.createdAt); });
   var qErrors=typeof quranDeliveryErrorsP==='function'?quranDeliveryErrorsP():[], qStatus=!q?'missing':qErrors.length?'error':reqIds.length?'ok':'missing';
@@ -3125,7 +3125,7 @@ function render(){
   var syncLagMin=saved?Math.max(0,Math.round((Date.now()-new Date(saved).getTime())/60000)):null;
   var missingInRange=missingDays(cur);
   var dzMohDays=windowDays(30,today()).reduce(function(a,d){ var r=recOf(d); var ms=r&&r.discomfort&&Array.isArray(r.discomfort.meds)?r.discomfort.meds:[]; return a+(ms.some(function(m){return m&&isAnalgesic(m.name);})?1:0); },0);
-  var canonical=canonicalStatusP(SYNC_RECEIPT,PROJECTION_STATE);
+  var canonical=canonicalStatusP(SYNC_RECEIPT,PROJECTION.state);
 
   if(UI.showAuditPage){
     document.getElementById("app").innerHTML=auditPageHTMLP();
@@ -3152,15 +3152,15 @@ function render(){
 
   // ── PAGE ────────────────────────────────────────────────────
   h+='<main class="page density-'+esc(UI.density)+'" data-density="'+esc(UI.density)+'" aria-label="ÆON gözlem paneli">';
-  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION_STATE);
+  h+=syncRibbonHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION.state);
   h+=commandCenterHeroesHTMLP([
     {key:'ruh',label:'Ruh',icon:'♡',value:srec.mood?esc(MOOD_LABEL[srec.mood]||srec.mood):'Kayıt bekleniyor',detail:'Seçili gün · '+(journalStreak()?journalStreak()+' gün günlük sürekliliği':'günlük ritmi başlat')},
     {key:'beden',label:'Beden',icon:'✦',value:curSleep>0?(Math.round(curSleep*10)/10).toFixed(1)+' sa uyku':'Veri bekleniyor',detail:(curWater>0?'Su '+(Math.round(curWater*10)/10)+'/8':'Su kaydı yok')+(curEnergy>0?' · enerji '+(Math.round(curEnergy*10)/10)+'/5':'')},
     {key:'sureklilik',label:'Süreklilik',icon:'↗',value:currentStreak()+' gün',detail:cur.filter(function(d){return cnt(recOf(d))>0;}).length+'/'+cur.length+' gün kayıt · '+curSess.sessionCount+' oturum'},
     {key:'senkron',label:'Senkron',icon:'⇄',value:d2StatusBadgeP(canonical.label,canonical.kind,canonical.cls),detail:'revision · '+esc(canonical.revision?String(canonical.revision).slice(0,12):'—')+' · '+esc(canonical.detail)}
   ]);
-  h+=commandRiskHTMLP(rsk,canonical,PROJECTION_STATE);
-  h+=coverageRibbonHTMLP(PROJECTION_STATE);
+  h+=commandRiskHTMLP(rsk,canonical,PROJECTION.state);
+  h+=coverageRibbonHTMLP(PROJECTION.state);
 
   // ── erişilebilir hızlı yönlendirme ─────────────────────────
   h+='<div class="d2-controls" data-component="command-actions">';
@@ -4638,10 +4638,10 @@ function load(){
     var DP=window.PanelCoverageV1;
     if(DP&&typeof DP.buildObserverSnapshot==='function'&&typeof DP.chooseProjection==='function'){
       var ds=DP.buildObserverSnapshot(demo,SYNC_RECEIPT), dd=DP.chooseProjection(ds,demo,SYNC_RECEIPT);
-      D=dd.data; OBSERVER_PROJECTION=dd.snapshot; PROJECTION_STATE=dd; PROJECTION_SECTIONS=dd.sections||{}; EVENT_LOG_STATE=buildEventLogStateP(D,[]);
-    }else{ D=demo; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={}; }
-    SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
-    PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.lastOutcome='demo'; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
+      D=dd.data; PROJECTION.snapshot=dd.snapshot; PROJECTION.state=dd; PROJECTION.sections=dd.sections||{}; EVENT_LOG_STATE=buildEventLogStateP(D,[]);
+    }else{ D=demo; PROJECTION.snapshot=null; PROJECTION.state={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION.sections={}; }
+    PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
+    PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state); PANEL_POLL_STATE.lastOutcome='demo'; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
   }
   PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
   return fetchLatest(REPO,BRANCH)
@@ -4649,9 +4649,9 @@ function load(){
     .then(function(j){
       var pollMeta=j&&j.meta||{}, pollCompleted=pollMeta.completedAt||new Date().toISOString();
       if(j&&j.notModified){
-        PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE); PANEL_POLL_STATE.notModifiedCount++;
+        PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state); PANEL_POLL_STATE.notModifiedCount++;
         // 304 yaniti: section fetch state'ini sifirla (önceki hata varsa uyari sönsün).
-        SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+        PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
         var pollSig=panelSig();
         if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
         var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
@@ -4670,18 +4670,18 @@ function load(){
         if(P&&typeof P.chooseProjection==='function'){
           var chosen=P.chooseProjection(projection,latestLegacy,SYNC_RECEIPT);
           if(chosen&&chosen.reason==='projection_missing'&&res[3]&&res[3].reason&&res[3].reason!=='projection_missing') chosen.reason=res[3].reason;
-          PROJECTION_STATE=chosen||{source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:latestLegacy,coverage:null};
-          D=PROJECTION_STATE.data||P.redactForObserver(latestLegacy);
-          OBSERVER_PROJECTION=PROJECTION_STATE.snapshot||null;
-          PROJECTION_SECTIONS=PROJECTION_STATE.sections||{};
+          PROJECTION.state=chosen||{source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:latestLegacy,coverage:null};
+          D=PROJECTION.state.data||P.redactForObserver(latestLegacy);
+          PROJECTION.snapshot=PROJECTION.state.snapshot||null;
+          PROJECTION.sections=PROJECTION.state.sections||{};
         }else{
-          D=latestLegacy; OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION_SECTIONS={};
+          D=latestLegacy; PROJECTION.snapshot=null; PROJECTION.state={source:'none',reason:'projection_unavailable',snapshot:null,data:D,coverage:null}; PROJECTION.sections={};
         }
-        PANEL_POLL_AT=new Date().toISOString(); updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION_STATE);
+        PANEL_POLL_AT=new Date().toISOString(); updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state);
         // Basarili yükleme: section fetch state'ini sifirla (önceki hata varsa
         // uyari metni sönsün, bir sonraki poll'da tekrar hata olursa yeniden
         // set edilecek).
-        SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+        PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
         // Sunucu verisi bir önceki turla birebir aynıysa yeniden çizme: gözlemcinin
         // açtığı "Tümünü göster" balonları kapanmasın, akış titremesin (anlık poll'a rağmen).
         var sig=panelSig();
@@ -4693,13 +4693,13 @@ function load(){
         var P=window.PanelCoverageV1;
         SYNC_RECEIPT=null;
         D=P&&typeof P.redactForObserver==='function'?P.redactForObserver(latestLegacy):latestLegacy;
-        OBSERVER_PROJECTION=null; PROJECTION_STATE={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
-        // Yan-kanal fetch hatasi: PROJECTION_SECTIONS zaten doluysa (önceki
+        PROJECTION.snapshot=null; PROJECTION.state={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
+        // Yan-kanal fetch hatasi: PROJECTION.sections zaten doluysa (önceki
         // saglikli yüklemeden kalma) KORU, yalnizca hata durumunu isaretle.
         // Ilk yüklemede (henüz hic veri yokken) normal "missing" davranisi.
-        var hadSections=Object.keys(PROJECTION_SECTIONS).length>0;
-        if(!hadSections) PROJECTION_SECTIONS={};
-        SECTION_FETCH_STATE={ok:false,lastError:String(err&&err.message||err||'network'),failedAt:new Date().toISOString()};
+        var hadSections=Object.keys(PROJECTION.sections).length>0;
+        if(!hadSections) PROJECTION.sections={};
+        PROJECTION.sectionFetchState={ok:false,lastError:String(err&&err.message||err||'network'),failedAt:new Date().toISOString()};
         EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
         if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
         render();
@@ -4717,7 +4717,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(OBSERVER_PROJECTION)+"\u0001"+JSON.stringify(PROJECTION_STATE)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE)+"\u0001"+JSON.stringify(SECTION_FETCH_STATE); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(PROJECTION)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

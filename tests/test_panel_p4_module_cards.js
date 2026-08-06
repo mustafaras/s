@@ -22,14 +22,14 @@ function makeProjection(){
 }
 function makeData(){ return {quranJourney:{requests:{baqara:{status:'ready',videoId:'abcdefghijk',notes:[{kind:'reflection'}],updatedAt:'2026-08-03T06:00:00Z'}}},soulArchive:{items:[{type:'pilates',totalSessions:4,totalMinutes:120,lastAt:'2026-08-02T12:00:00Z'}]},profileAssessment:{responses:{raw_01:'PROFILE_RAW_RESPONSE_SENTINEL'}}}; }
 var doc={activeElement:null,getElementById:function(){return null;},querySelector:function(){return null;}};
-var context={window:{},UI:{d4SelectedModule:null},D:makeData(),PROJECTION_SECTIONS:makeProjection().sections,D4_DRAWER_RETURN_ID:null,EVENT_DRAWER_RETURN_ID:null,Q_ERRORS:[],document:doc,Date:Date,Math:Math,Array:Array,Object:Object,String:String,Number:Number,isNaN:isNaN,JSON:JSON,esc:esc,icon:function(){return '';},p3TimeP:function(v){return v?'t:'+v:'—';},render:function(){},setTimeout:function(){},quranJourneyRootP:function(){return context.D&&context.D.quranJourney||null;},quranDeliveryErrorsP:function(){return context.Q_ERRORS;}};
+var context={window:{},UI:{d4SelectedModule:null},D:makeData(),PROJECTION:{sections:makeProjection().sections},D4_DRAWER_RETURN_ID:null,EVENT_DRAWER_RETURN_ID:null,Q_ERRORS:[],document:doc,Date:Date,Math:Math,Array:Array,Object:Object,String:String,Number:Number,isNaN:isNaN,JSON:JSON,esc:esc,icon:function(){return '';},p3TimeP:function(v){return v?'t:'+v:'—';},render:function(){},setTimeout:function(){},quranJourneyRootP:function(){return context.D&&context.D.quranJourney||null;},quranDeliveryErrorsP:function(){return context.Q_ERRORS;}};
 var names=['d4SafeTimeP','d4LatestTimeP','d4CoverageBadgeP','therapyRecencyTextP','d4ModuleDescriptorsP','d4ModuleDrawerHTMLP','d4ModuleAtlasHTMLP','eventDrawerFocusableP','eventDrawerKeydownP','openD4ModuleDrawerP','closeD4ModuleDrawerP','p3BadgeP','statusToneP','panelToneOverrideP','panelStatusP','panelStatusBadgeHTMLP','p3StatusP'];
 vm.runInNewContext(names.map(extractFunction).join('\n'),context,{filename:'panel-p4-module-cards.js'});
 
 console.log('\n=== PANEL-013 / PANEL-11 — D4 module cards fixture ===\n');
-var before=JSON.stringify({D:context.D,sections:context.PROJECTION_SECTIONS}), modules=context.d4ModuleDescriptorsP();
+var before=JSON.stringify({D:context.D,sections:context.PROJECTION.sections}), modules=context.d4ModuleDescriptorsP();
 ok('yedi hedef modül tek descriptor sözleşmesinde',modules.length===7&&['therapy-profile','notification-delivery','quran-delivery','saygi-evidence','daily-photo','location-audit','archives-provenance'].every(function(k){return modules.some(function(m){return m.key===k;});}));
-ok('descriptor üretimi source data’yı mutate etmez',JSON.stringify({D:context.D,sections:context.PROJECTION_SECTIONS})===before);
+ok('descriptor üretimi source data’yı mutate etmez',JSON.stringify({D:context.D,sections:context.PROJECTION.sections})===before);
 var full=context.d4ModuleAtlasHTMLP(), cardTitles=['Terapi + Profil','Bildirim Teslimatı','Kur’an Teslimatı','Saygı Kanıtı','Günün Fotoğrafı','Konum Audit','Zihin-Beden + Arşiv'];
 ok('dolu fixture tüm kartları ve canonical metric’i render eder',cardTitles.every(function(x){return full.includes(x);})&&full.includes('Canonical metric'),cardTitles.filter(function(x){return !full.includes(x);}).join(', '));
 ok('dolu fixture source/time/status/privacy/coverage taşır',full.includes('source-badge')&&full.includes('privacy-badge')&&full.includes('status-badge')&&full.includes('data-coverage="full"')&&full.includes('data-coverage="redacted"'));
@@ -41,15 +41,15 @@ ok('ortak D4 drawer modal ARIA ile açılır',drawer.includes('id="d4-module-dra
 ok('D4 drawer canonical/cross-check/source time gösterir',drawer.includes('Canonical metric')&&drawer.includes('Cross-check')&&drawer.includes('Kaynak zamanı')&&drawer.includes('Terapi + Profil'));
 ok('D4 yüzeyi latest full-replace/write kanalı açmaz',!panelSource.slice(panelSource.indexOf('function d4ModuleDescriptorsP'),panelSource.indexOf('function eventLogSourceP')).includes('data/latest.json')&&!panelSource.slice(panelSource.indexOf('function d4ModuleDescriptorsP'),panelSource.indexOf('function eventLogSourceP')).includes('SeySync.schedule'));
 
-var old=makeProjection(); old.sections.dailyPhoto.status='stale'; old.sections.dailyPhoto.ready=false; old.sections.dailyPhoto.cacheState='stale'; old.sections.notificationTimeline.status='stale'; context.PROJECTION_SECTIONS=old.sections; context.UI.d4SelectedModule=null;
+var old=makeProjection(); old.sections.dailyPhoto.status='stale'; old.sections.dailyPhoto.ready=false; old.sections.dailyPhoto.cacheState='stale'; old.sections.notificationTimeline.status='stale'; context.PROJECTION.sections=old.sections; context.UI.d4SelectedModule=null;
 var oldHtml=context.d4ModuleAtlasHTMLP();
 ok('eski fixture ayrı status ve cache mesajı taşır',oldHtml.includes('Eski cache')&&oldHtml.includes('stale')&&oldHtml.includes('Özet'));
 
-context.PROJECTION_SECTIONS={therapyProvenance:{status:'missing',thoughtCount:0,consent:{}},profileProgress:{status:'missing',responseCount:0,consent:{}},notificationTimeline:{status:'missing',count:0,counts:{},events:[]},dailyPhoto:{status:'missing'},saygiRoot:{status:'missing'},locNudge:{status:'missing'},locationTiming:{status:'missing'},archives:{}}; context.D={};
+context.PROJECTION.sections={therapyProvenance:{status:'missing',thoughtCount:0,consent:{}},profileProgress:{status:'missing',responseCount:0,consent:{}},notificationTimeline:{status:'missing',count:0,counts:{},events:[]},dailyPhoto:{status:'missing'},saygiRoot:{status:'missing'},locNudge:{status:'missing'},locationTiming:{status:'missing'},archives:{}}; context.D={};
 var missingHtml=context.d4ModuleAtlasHTMLP();
 ok('eksik fixture nedenli boş durumları görünür kılar',(missingHtml.match(/data-coverage="missing"/g)||[]).length===7&&missingHtml.includes('Eksik modüller')===false&&missingHtml.includes('Ayrıntıyı aç'));
 
-var broken=makeProjection(); broken.sections.therapyProvenance.status='malformed'; broken.sections.profileProgress.status='malformed'; broken.sections.notificationTimeline.status='malformed'; broken.sections.dailyPhoto.status='error'; broken.sections.saygiRoot.status='mismatch'; broken.sections.locNudge.status='malformed'; broken.sections.locationTiming.status='malformed'; context.PROJECTION_SECTIONS=broken.sections; context.D={quranJourney:{requests:{x:{status:'waiting',updatedAt:'2026-08-03T01:00:00Z'}}},soulArchive:{items:[]}}; context.Q_ERRORS=[{surahId:'x',error:'safe_error'}];
+var broken=makeProjection(); broken.sections.therapyProvenance.status='malformed'; broken.sections.profileProgress.status='malformed'; broken.sections.notificationTimeline.status='malformed'; broken.sections.dailyPhoto.status='error'; broken.sections.saygiRoot.status='mismatch'; broken.sections.locNudge.status='malformed'; broken.sections.locationTiming.status='malformed'; context.PROJECTION.sections=broken.sections; context.D={quranJourney:{requests:{x:{status:'waiting',updatedAt:'2026-08-03T01:00:00Z'}}},soulArchive:{items:[]}}; context.Q_ERRORS=[{surahId:'x',error:'safe_error'}];
 var brokenHtml=context.d4ModuleAtlasHTMLP();
 ok('bozuk fixture fail-closed status metinleri üretir',brokenHtml.includes('Bozuk')&&brokenHtml.includes('Hata')&&brokenHtml.includes('Uyuşmazlık')&&!brokenHtml.includes('safe_error'));
 

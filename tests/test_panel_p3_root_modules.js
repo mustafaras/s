@@ -31,9 +31,7 @@ function extractFunction(name){
   var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end);
 }
 var panelContext={
-  PROJECTION_SECTIONS:{},
-  PROJECTION_STATE:{source:'projection',reason:'ready',snapshot:null,data:null,coverage:null},
-  SECTION_FETCH_STATE:{ok:true,lastError:null,failedAt:null},
+  PROJECTION:{sections:{},state:{source:'projection',reason:'ready',snapshot:null,data:null,coverage:null},sectionFetchState:{ok:true,lastError:null,failedAt:null}},
   String:String,Array:Array,Date:Date,Math:Math,isNaN:isNaN,
   icon:function(){return '';},
   esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -51,7 +49,7 @@ ok('locNudge audit ve backoff taşınır',fullSnapshot.sections.locNudge.shownCo
 ok('location sample/process/sync ayrı taşınır',fullSnapshot.sections.locationTiming.sampleTs&&fullSnapshot.sections.locationTiming.processedTs&&fullSnapshot.sections.locationTiming.syncAcceptedAt);
 ok('lastOpened/root savedAt/settings summary taşınır',fullSnapshot.sections.lifecycle.lastOpenedDate==='2026-08-02'&&fullSnapshot.sections.lifecycle.rootSavedAt&&fullSnapshot.sections.lifecycle.settings.changedAt);
 ok('raw daily GPS track projection’a girmez',!fullJson.includes('41.01')&&!fullJson.includes('28.97'));
-panelContext.PROJECTION_SECTIONS=fullSnapshot.sections;
+panelContext.PROJECTION.sections=fullSnapshot.sections;
 var fullHtml=panelContext.rootModulesCardHTMLP();
 ok('dolu fixture panel kartında render olur',fullHtml.includes('Günün fotoğrafı')&&fullHtml.includes('Terapi Odası geçmişi')&&fullHtml.includes('Konum nudge audit'));
 ok('source/privacy badges görünür',fullHtml.includes('data.dailyPhoto')&&fullHtml.includes('root: data.saygi')&&fullHtml.includes('GPS track redacted')&&fullHtml.includes('per-key audit yok'));
@@ -61,7 +59,7 @@ console.log('[2] Eski/stale fixture');
 var stale=base(); stale.dailyPhoto.date='2026-08-01'; stale.dailyPhoto.fetchedAt='2026-08-01T10:00:00.000Z'; stale.roomContentHistory['2026-08-02'].shownAt='2025-01-01T12:00:00.000Z'; stale.saygi.lastReadDate='2025-01-01'; stale.days['2026-08-02'].saygi.readAt='2025-01-01T09:00:00.000Z'; stale.locNudge.lastShownAt='2025-01-01T08:00:00.000Z'; stale.location.ts='2025-01-01T11:00:00.000Z'; stale.locationLastTs='2025-01-01T11:00:01.000Z'; stale.savedAt='2025-01-01T12:00:00.000Z';
 var staleSnapshot=P.buildObserverSnapshot(stale,receipt,'2026-08-02T15:00:05.000Z');
 ok('stale fotoğraf kaynaklı olarak ayrılır',staleSnapshot.sections.dailyPhoto.status==='stale'&&staleSnapshot.sections.dailyPhoto.ready===false);
-panelContext.PROJECTION_SECTIONS=staleSnapshot.sections;
+panelContext.PROJECTION.sections=staleSnapshot.sections;
 var staleHtml=panelContext.rootModulesCardHTMLP();
 ok('stale cache panelde hazır iddiası kullanmaz',staleHtml.includes('Eski cache')&&staleHtml.includes('Hazır değil'));
 ok('eski kök tarihleri kaybolmadan render edilir',staleSnapshot.sections.roomContentHistory.records.length===3&&staleSnapshot.sections.lifecycle.rootSavedAt&&staleHtml.includes('2025-01-01'));
@@ -73,7 +71,7 @@ ok('dailyPhoto yok durumu',missingSnapshot.sections.dailyPhoto.status==='missing
 ok('room history yok durumu',missingSnapshot.sections.roomContentHistory.status==='missing');
 ok('Saygı yok durumu',missingSnapshot.sections.saygiRoot.status==='missing');
 ok('nudge/location timing yok durumu',missingSnapshot.sections.locNudge.status==='missing'&&missingSnapshot.sections.locationTiming.status==='missing'&&missingSnapshot.sections.locationTiming.sampleTs===null&&missingSnapshot.sections.locationTiming.processedTs===null);
-panelContext.PROJECTION_SECTIONS=missingSnapshot.sections;
+panelContext.PROJECTION.sections=missingSnapshot.sections;
 var missingHtml=panelContext.rootModulesCardHTMLP();
 ok('yok fixture tüm hedef kartlarını boş durumla render eder',missingHtml.includes('Günün fotoğrafı')&&missingHtml.includes('Yok')&&missingHtml.includes('Konum zaman ayrımı'));
 
@@ -85,7 +83,7 @@ ok('bozuk room history malformed olur',brokenSnapshot.sections.roomContentHistor
 ok('bozuk nudge malformed olur',brokenSnapshot.sections.locNudge.status==='malformed');
 ok('bozuk location timing malformed olur',brokenSnapshot.sections.locationTiming.status==='malformed');
 ok('root/daily Saygı farkı ayrı alarm olur',brokenSnapshot.sections.saygiRoot.mismatch===true&&brokenSnapshot.sections.saygiRoot.mismatchReasons.length>0);
-panelContext.PROJECTION_SECTIONS=brokenSnapshot.sections;
+panelContext.PROJECTION.sections=brokenSnapshot.sections;
 var brokenHtml=panelContext.rootModulesCardHTMLP();
 ok('mismatch alarmı panelde görünür',brokenHtml.includes('Uyuşmazlık')&&brokenHtml.includes('Root ve günlük read kanıtı uyuşmuyor'));
 ok('render yolu source backfill çağırmıyor',panelSource.indexOf('backfillSoulArchiveFromDaysP();')<0);
@@ -94,7 +92,7 @@ console.log('[5] Konum örneği eski — stale');
 var staleLoc=base(); staleLoc.lastOpenedDate='2026-08-10'; staleLoc.location.ts='2026-08-02T11:00:00.000Z'; staleLoc.locationLastTs='2026-08-02T11:00:01.000Z';
 var staleLocSnapshot=P.buildObserverSnapshot(staleLoc,receipt,'2026-08-10T15:00:05.000Z');
 ok('8 gün önceki konum örneği stale olur',staleLocSnapshot.sections.locationTiming.status==='stale'&&staleLocSnapshot.sections.locationTiming.daysSinceLastSample===8);
-panelContext.PROJECTION_SECTIONS=staleLocSnapshot.sections;
+panelContext.PROJECTION.sections=staleLocSnapshot.sections;
 var staleLocHtml=panelContext.rootModulesCardHTMLP();
 ok('stale konum kartında Eski cache rozeti görünür',staleLocHtml.includes('Eski cache'));
 var recentLoc=base(); recentLoc.lastOpenedDate='2026-08-03'; recentLoc.location.ts='2026-08-02T11:00:00.000Z'; recentLoc.locationLastTs='2026-08-02T11:00:01.000Z';
@@ -102,21 +100,21 @@ var recentLocSnapshot=P.buildObserverSnapshot(recentLoc,receipt,'2026-08-03T15:0
 ok('1 gün önceki konum örneği eşiği aşmaz, stale olmaz',recentLocSnapshot.sections.locationTiming.status==='ok'&&recentLocSnapshot.sections.locationTiming.daysSinceLastSample===1);
 
 console.log('[6] Boş durum kategorileri — hiç kullanılmadı / senkron bekleniyor / hata');
-panelContext.PROJECTION_STATE={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
-panelContext.SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+panelContext.PROJECTION.state={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
+panelContext.PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
 ok('hiç kullanılmamış modül -> unused metni',panelContext.emptyStateReasonP('missing').kind==='unused'&&panelContext.emptyStateReasonP('missing').text.includes('henüz kullanılmamış'));
-panelContext.SECTION_FETCH_STATE={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
+panelContext.PROJECTION.sectionFetchState={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
 ok('section_fetch_failed durumunda -> pending metni',panelContext.emptyStateReasonP('missing').kind==='pending'&&panelContext.emptyStateReasonP('missing').text.includes('Senkron bekleniyor'));
-panelContext.SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
-panelContext.PROJECTION_STATE={source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:null,coverage:null};
+panelContext.PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
+panelContext.PROJECTION.state={source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:null,coverage:null};
 ok('projection_invalid durumunda -> error metni',panelContext.emptyStateReasonP('missing').kind==='error'&&panelContext.emptyStateReasonP('missing').text.includes('hata'));
 ok('missing olmayan status için null döner (ok/malformed/stale kendi mesajı korunur)',panelContext.emptyStateReasonP('ok')===null&&panelContext.emptyStateReasonP('malformed')===null&&panelContext.emptyStateReasonP('stale')===null);
-ok('üç kategori metni birbirinden farklı',new Set(['unused','pending','error'].map(function(k){ var st=k==='pending'?{ok:false}:{ok:true}; panelContext.SECTION_FETCH_STATE=st; panelContext.PROJECTION_STATE={reason:k==='error'?'projection_invalid':'ready'}; return panelContext.emptyStateReasonP('missing').text; })).size===3);
-panelContext.PROJECTION_STATE={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
-panelContext.SECTION_FETCH_STATE={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
+ok('üç kategori metni birbirinden farklı',new Set(['unused','pending','error'].map(function(k){ var st=k==='pending'?{ok:false}:{ok:true}; panelContext.PROJECTION.sectionFetchState=st; panelContext.PROJECTION.state={reason:k==='error'?'projection_invalid':'ready'}; return panelContext.emptyStateReasonP('missing').text; })).size===3);
+panelContext.PROJECTION.state={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
+panelContext.PROJECTION.sectionFetchState={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
 var emptyRoom=base(); delete emptyRoom.roomContentHistory;
 var emptyRoomSnapshot=P.buildObserverSnapshot(emptyRoom,receipt,'2026-08-05T15:00:00.000Z');
-panelContext.PROJECTION_SECTIONS=emptyRoomSnapshot.sections;
+panelContext.PROJECTION.sections=emptyRoomSnapshot.sections;
 ok('kart seviyesinde de pending metni gerçekten render ediliyor (uçtan uca)',panelContext.rootModulesCardHTMLP().includes('Senkron bekleniyor · veri gelmiş olabilir'));
 
 console.log('\nPANEL-005 / PANEL-03 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');

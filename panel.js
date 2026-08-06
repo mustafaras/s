@@ -859,6 +859,25 @@ var DZLEVEL=[{label:"Hafif",color:"#F4C152"},{label:"Orta",color:"#F0892F"},{lab
 function dzCol(n){ return n>=3?"#E25B6A":(n===2?"#F0892F":(n>=1?"#F4C152":"#888")); }
 var DZREG={bas:"Baş",boyun:"Boyun","omuz-sol":"Sol omuz","omuz-sag":"Sağ omuz",gogus:"Göğüs",karin:"Karın","kol-sol":"Sol kol","kol-sag":"Sağ kol","el-sol":"Sol el/bilek","el-sag":"Sağ el/bilek",kalca:"Kasık/kalça","diz-sol":"Sol diz","diz-sag":"Sağ diz","bacak-sol":"Sol bacak","bacak-sag":"Sağ bacak","ayak-sol":"Sol ayak","ayak-sag":"Sağ ayak",ense:"Ense","omuz-arka-sol":"Sol omuz (arka)","omuz-arka-sag":"Sağ omuz (arka)","sirt-ust":"Üst sırt",bel:"Bel","kalca-arka":"Kalça","kol-arka-sol":"Sol kol (arka)","kol-arka-sag":"Sağ kol (arka)","bacak-arka-sol":"Sol bacak (arka)","bacak-arka-sag":"Sağ bacak (arka)"};
 function dzRegLabel(id){ return DZREG[id]||id; }
+// Son 30 günün discomfort.regions verisini tarayıp hangi vücut
+// bölgelerinin ne sıklıkla işaretlendiğini özetler — yalnız bölge id'si/
+// etiketi ve sayım (meta veri); ham not metni (discomfort.note) hiç
+// okunmaz/taşınmaz. days verilmezse üretimde windowDays(30,today())
+// kullanılır; testler sabit bir tarih listesi enjekte edebilir.
+function discomfortTrendP(days){
+  var list=Array.isArray(days)?days:windowDays(30,today());
+  var regionCounts={}, totalDaysWithPain=0;
+  list.forEach(function(d){
+    var r=recOf(d), dz=r&&r.discomfort&&typeof r.discomfort==='object'?r.discomfort:null, regs=dz&&dz.regions&&typeof dz.regions==='object'?dz.regions:null;
+    if(!regs) return;
+    var keys=Object.keys(regs).filter(function(k){return regs[k]&&regs[k].level>0;});
+    if(!keys.length) return;
+    totalDaysWithPain++;
+    keys.forEach(function(k){ regionCounts[k]=(regionCounts[k]||0)+1; });
+  });
+  var topRegions=Object.keys(regionCounts).map(function(k){return {id:k,label:dzRegLabel(k),count:regionCounts[k]};}).sort(function(a,b){return b.count-a.count;}).slice(0,3);
+  return {regionCounts:regionCounts,totalDaysWithPain:totalDaysWithPain,topRegions:topRegions};
+}
 // Menstrüel akış emojileri + 4 faz — uygulamadaki app.js tanımlarıyla birebir aynı (panelde salt-gösterim).
 var FLOWEMO={spot:icon('droplet',15),light:icon('droplet',15),medium:icon('droplet',15),heavy:icon('droplet',15)};
 var CYCPHASES={
@@ -2950,6 +2969,24 @@ function saygiPanelCardHTML(){
 }
 
 // ── Vücut ölçüleri (kilo/boy/BMI) + Tahliller (kan/idrar · foto/PDF) — app ile ayna ──
+function discomfortTrendCardHTMLP(){
+  var t=discomfortTrendP();
+  var h='<div class="card lift span-6 pad" style="order:35;display:flex;flex-direction:column;">';
+  h+='<div class="lbl">'+icon('bandage',14)+' Ağrı/Rahatsızlık Trendi'+(t.totalDaysWithPain?('<span style="margin-left:auto;font-size:var(--f2);color:var(--t3);font-weight:800;">'+t.totalDaysWithPain+' gün</span>'):'')+'</div>';
+  if(!t.totalDaysWithPain){
+    h+='<div class="empty" style="flex:1;"><span class="ei">'+icon('bandage',20)+'</span>Son 30 günde ağrı kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Uygulamada vücut haritasından bölge işaretlenince gelir</span></div>';
+  } else {
+    h+='<div style="font-size:var(--f1);font-weight:800;letter-spacing:.5px;color:var(--t3);text-transform:uppercase;margin-bottom:6px;">En sık işaretlenen bölgeler</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+    t.topRegions.forEach(function(r){
+      var pct=Math.max(6,Math.round((r.count/30)*100));
+      h+='<div><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;"><span style="flex:1;font-size:var(--f3);color:var(--t1);font-weight:700;">'+esc(r.label)+'</span><span style="font-size:var(--f2);color:var(--t3);font-weight:800;">'+r.count+' gün</span></div><div style="height:6px;border-radius:999px;background:var(--s1);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#F4C152,#E25B6A);"></div></div></div>';
+    });
+    h+='</div><div style="font-size:var(--f1);color:var(--t4);margin-top:8px;line-height:1.4;">Son 30 gün · yalnız bölge ve sayım gösterilir, not metni taşınmaz.</div>';
+  }
+  h+='</div>';
+  return h;
+}
 function panelBodyCardHTML(){
   var b=(D&&D.body)?D.body:null;
   var weights=(b&&Array.isArray(b.weights))?b.weights:[];
@@ -4069,6 +4106,7 @@ function render(){
   // Vücut & Tahlil bölümü (order:35 → Hareket ile İçgörü arası)
   h+=panelBodyCardHTML();
   h+=panelLabCardHTML();
+  h+=discomfortTrendCardHTMLP();
 
   h+='</div>'; // end bento
 

@@ -1719,6 +1719,38 @@ function toggleCuratedLogShowAllP(){
   card.innerHTML=curatedChangeLogCardInnerHTMLP();
 }
 window.toggleCuratedLogShowAllP=toggleCuratedLogShowAllP;
+// D1.4 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A2) — aylık mood/tik/SOS
+// ısı haritası. Yalnızca render — data'ya UI.month (zaten var, panel.js
+// içindeki render() UI.month=monthKey(selected) satırı) dışında hiçbir
+// kalıcı alan yazılmaz.
+function monthDaysP(mk){
+  var parts=String(mk||'').split('-').map(Number), y=parts[0], m=parts[1];
+  var days=[], last=(y&&m)?new Date(y,m,0).getDate():0;
+  for(var d=1;d<=last;d++) days.push(y+'-'+pad(m)+'-'+pad(d));
+  return days;
+}
+function shiftMonthP(mk,delta){
+  var parts=String(mk||'').split('-').map(Number), y=parts[0], m=parts[1]+delta;
+  while(m<1){ m+=12; y--; }
+  while(m>12){ m-=12; y++; }
+  return y+'-'+pad(m);
+}
+function setPanelMonthP(mk){ UI.month=mk; render(); }
+window.setPanelMonthP=setPanelMonthP;
+function monthlyHeatmapCardHTMLP(mk){
+  var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
+  var days=monthDaysP(mk), parts=String(mk||'').split('-');
+  var label=parts.length===2?new Date(Number(parts[0]),Number(parts[1])-1,1).toLocaleDateString('tr-TR',{month:'long',year:'numeric'}):mk;
+  var h='<div class="card lift span-12 pad monthly-heatmap-card" data-component="monthly-heatmap" style="order:29;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('calendar',14)+' Aylık Görünüm<span style="margin-left:auto;display:flex;align-items:center;gap:8px;"><button type="button" onclick="setPanelMonthP(\''+shiftMonthP(mk,-1)+'\')" aria-label="Önceki ay" style="border:none;background:transparent;cursor:pointer;color:var(--t2);">‹</button><span class="mono" style="font-size:12.5px;">'+esc(label)+'</span><button type="button" onclick="setPanelMonthP(\''+shiftMonthP(mk,1)+'\')" aria-label="Sonraki ay" style="border:none;background:transparent;cursor:pointer;color:var(--t2);">›</button></span></div>';
+  h+='<div class="monthly-heatmap-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;">';
+  days.forEach(function(d){
+    var r=recOf(d), mood=r&&r.mood, bg=(mood&&moodColor[mood])?moodColor[mood]:'var(--s1)', sos=r&&r.cravingSOSCount?Number(r.cravingSOSCount):0, dayNum=Number(d.slice(8,10));
+    h+='<div class="monthly-heatmap-cell" title="'+esc(d)+(mood?' · '+esc(MOOD_LABEL[mood]||mood):'')+(sos?' · '+sos+' SOS':'')+'" style="aspect-ratio:1;border-radius:6px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:10.5px;color:'+(mood?'rgba(7,7,9,.6)':'var(--t4)')+';position:relative;">'+dayNum+(sos?'<span style="position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;background:#fb7185;"></span>':'')+'</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
 function timeAgo(iso){
   if(!iso) return '';
   var t=new Date(iso).getTime(); if(isNaN(t)) return '';
@@ -3305,6 +3337,7 @@ function render(){
   var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
   h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
   h+=weeklyDigestCardHTMLP(curAvg,prevAvg,curSleep,prevSleep,curSos,prevSos,curSess);
+  h+=monthlyHeatmapCardHTMLP(UI.month);
   h+=auditEntryHTMLP();
   h+=curatedChangeLogCardHTMLP();
   h+=eventLogCardHTMLP();

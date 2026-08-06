@@ -1307,12 +1307,25 @@ function p3SettingsSummaryP(settings){
   keys.forEach(function(k){ if(t[k]===null||t[k]===undefined) return; var v=typeof t[k]==='boolean'?(t[k]?'açık':'kapalı'):String(t[k]); out.push('<span><small>'+esc(labels[k])+'</small><b>'+esc(v)+'</b></span>'); });
   return out.length?'<div class="p3-settings-grid">'+out.join('')+'</div>':'<div class="p3-muted">İzinli ayar özeti yok.</div>';
 }
+// Saygı root/daily uyuşmazlık kodlarını (panelCoverageManifest.js'in ürettiği
+// ham İngilizce/snake_case reason'lar) sade Türkçe cümlelere çevirir. Bilinmeyen
+// bir kod gelirse (ör. manifest'e yeni bir reason eklenirse) ham kodu aynen
+// gösterir — sessizce kaybolmaz, yalnızca henüz çevrilmemiş olur.
+function saygiMismatchReasonTrP(code){
+  var m={
+    root_lastReadDate_daily_evidence_mismatch:'Kök kayıttaki son okuma tarihi, günlük kayıtlarla uyuşmuyor',
+    root_streak_daily_evidence_mismatch:'Kök kayıttaki seri sayısı, günlük kayıtlardan hesaplanan seriyle uyuşmuyor',
+    daily_person_not_in_root_collection:'Günlükte okunduğu görünen bir kişi kök koleksiyonda kayıtlı değil'
+  };
+  return m[code]||code;
+}
 function rootModulesCardHTMLP(){
   var s=PROJECTION.sections||{}, photo=s.dailyPhoto||{status:'missing'}, room=s.roomContentHistory||{status:'missing',records:[]}, sg=s.saygiRoot||{status:'missing',collectionCount:0}, nud=s.locNudge||{status:'missing'}, lt=s.locationTiming||{}, life=s.lifecycle||{};
   var h='<div class="card lift span-12 pad p3-root-card" style="order:6;display:flex;flex-direction:column;">';
   h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('layers',14)+' Eksik Kök Modüller <span style="margin-left:auto;">'+p3BadgeP('canonical projection','source')+'</span></div>';
+  h+='<p class="p3-muted" style="margin:2px 0 12px;">Aşağıdaki 6 kart, uygulamanın kök verisinde (fotoğraf, terapi geçmişi, Saygı, konum, ayarlar) ne olduğunu ve panelin bunu ne zaman/nasıl gördüğünü gösterir — dolu, eski veya eksik her durum aynı düzende görünür.</p>';
   h+='<div class="p3-grid">';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Günün fotoğrafı</b>'+p3StatusP(photo.status)+'</div><div class="p3-source-row">'+p3BadgeP(photo.sourcePath||'data.dailyPhoto','source')+p3BadgeP(photo.privacy||'public metadata','privacy')+'</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Günün fotoğrafı</b>'+p3StatusP(photo.status)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Her gün otomatik seçilen, lisansı doğrulanmış bir fotoğraf.</div><div class="p3-source-row">'+p3BadgeP(photo.sourcePath||'data.dailyPhoto','source')+p3BadgeP(photo.privacy||'public metadata','privacy')+'</div>';
   if(photo.title) h+='<div class="p3-value">'+esc(photo.title)+'</div>';
   if(photo.artist) h+='<div class="p3-muted">'+esc(photo.artist)+'</div>';
   h+='<div class="p3-kv"><span>Lisans</span><b>'+esc(photo.license||'—')+'</b></div><div class="p3-kv"><span>Kaynak</span><b>'+esc(photo.source||'—')+'</b></div><div class="p3-kv"><span>Fetched</span><b>'+p3TimeP(photo.fetchedAt)+'</b></div>';
@@ -1320,17 +1333,17 @@ function rootModulesCardHTMLP(){
   else h+='<div class="p3-warning">Hazır değil — lisans ve kaynak birlikte doğrulanmadı.</div>';
   if(photo.error) h+='<div class="p3-warning">'+esc(photo.error)+'</div>';
   h+='</div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi Odası geçmişi</b>'+p3StatusP(room.status)+stalenessBadgeP(room.latestShownAt)+'</div><div class="p3-source-row">'+p3BadgeP(room.sourcePath||'data.roomContentHistory','source')+p3BadgeP(room.privacy||'public metadata','privacy')+'</div><div class="p3-value">'+esc(String(room.count||0))+' gösterim · '+esc(String(room.invalidCount||0))+' bozuk</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi Odası geçmişi</b>'+p3StatusP(room.status)+stalenessBadgeP(room.latestShownAt)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Terapi Odası\'nda hangi içeriğin ne zaman gösterildiğinin kaydı.</div><div class="p3-source-row">'+p3BadgeP(room.sourcePath||'data.roomContentHistory','source')+p3BadgeP(room.privacy||'public metadata','privacy')+'</div><div class="p3-value">'+esc(String(room.count||0))+' gösterim · '+esc(String(room.invalidCount||0))+' bozuk</div>';
   (Array.isArray(room.records)?room.records.slice(0,4):[]).forEach(function(x){ h+='<div class="p3-history-row"><span>'+esc(x.day||'—')+' · '+esc(x.type||'öğe')+'</span><b>'+esc(x.title||'—')+'</b><small>'+esc(x.source||'kaynak yok')+' · '+p3TimeP(x.shownAt)+'</small></div>'; });
   if(!room.records||!room.records.length) h+=(emptyStateNoteHTMLP(room.status)||'<div class="p3-muted">Gösterim kaydı yok.</div>');
   h+='</div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Saygı root · günlük kanıt</b>'+p3StatusP(sg.status)+stalenessBadgeP(sg.dailyLatestReadDate)+'</div><div class="p3-source-row">'+p3BadgeP('root: data.saygi','source')+p3BadgeP('daily: days.*.saygi','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(sg.collectionCount||0))+'</b><span>koleksiyon · root seri <b>'+esc(String(sg.rootStreak||0))+'</b></span></div><div class="p3-kv"><span>Root lastReadDate</span><b>'+esc(sg.rootLastReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily son kanıt</span><b>'+esc(sg.dailyLatestReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily türetilen seri</span><b>'+esc(String(sg.dailyDerivedStreak||0))+'</b></div>';
-  if(sg.mismatch) h+='<div class="p3-warning">⚠ Root ve günlük read kanıtı uyuşmuyor: '+esc((sg.mismatchReasons||[]).join(', '))+'</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Saygı root · günlük kanıt</b>'+p3StatusP(sg.status)+stalenessBadgeP(sg.dailyLatestReadDate)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Saygı sekmesinde okunan kişi kaydının, günlük okuma kanıtıyla eşleştiğini doğrular.</div><div class="p3-source-row">'+p3BadgeP('root: data.saygi','source')+p3BadgeP('daily: days.*.saygi','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(sg.collectionCount||0))+'</b><span>koleksiyon · root seri <b>'+esc(String(sg.rootStreak||0))+'</b></span></div><div class="p3-kv"><span>Root lastReadDate</span><b>'+esc(sg.rootLastReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily son kanıt</span><b>'+esc(sg.dailyLatestReadDate||'—')+'</b></div><div class="p3-kv"><span>Daily türetilen seri</span><b>'+esc(String(sg.dailyDerivedStreak||0))+'</b></div>';
+  if(sg.mismatch) h+='<div class="p3-warning">⚠ Root ve günlük read kanıtı uyuşmuyor: '+esc((sg.mismatchReasons||[]).map(saygiMismatchReasonTrP).join('; '))+'</div>';
   h+=emptyStateNoteHTMLP(sg.status)+'</div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum nudge audit</b>'+p3StatusP(nud.status)+stalenessBadgeP(nud.lastShownAt)+'</div><div class="p3-source-row">'+p3BadgeP(nud.sourcePath||'data.locNudge','source')+p3BadgeP(nud.privacy||'behavior summary','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(nud.shownCount||0))+'</b><span>gösterim · <b>'+esc(String(nud.dismissCount||0))+'</b> dismiss</span></div><div class="p3-kv"><span>Erteleme bitişi</span><b>'+p3TimeP(nud.snoozeUntil)+'</b></div><div class="p3-kv"><span>Türetilmiş backoff</span><b>'+esc(String(nud.derivedBackoffHours||0))+' saat</b></div><div class="p3-kv"><span>Opt-out</span><b>'+esc(nud.optOutDay||(!nud.optedOut?'yok':'aktif'))+'</b></div>'+emptyStateNoteHTMLP(nud.status)+'</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum nudge audit</b>'+p3StatusP(nud.status)+stalenessBadgeP(nud.lastShownAt)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Konumunu açman için gösterilen hatırlatmaların kaç kez görüldüğü ve ertelendiği.</div><div class="p3-source-row">'+p3BadgeP(nud.sourcePath||'data.locNudge','source')+p3BadgeP(nud.privacy||'behavior summary','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(nud.shownCount||0))+'</b><span>gösterim · <b>'+esc(String(nud.dismissCount||0))+'</b> dismiss</span></div><div class="p3-kv"><span>Erteleme bitişi</span><b>'+p3TimeP(nud.snoozeUntil)+'</b></div><div class="p3-kv"><span>Türetilmiş backoff</span><b>'+esc(String(nud.derivedBackoffHours||0))+' saat</b></div><div class="p3-kv"><span>Opt-out</span><b>'+esc(nud.optOutDay||(!nud.optedOut?'yok':'aktif'))+'</b></div>'+emptyStateNoteHTMLP(nud.status)+'</div>';
   var ltStatus=lt.status||((lt.sampleTs||lt.processedTs)?'ok':'missing');
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum zaman ayrımı</b>'+p3StatusP(ltStatus)+stalenessBadgeP(lt.sampleTs||lt.processedTs)+'</div><div class="p3-source-row">'+p3BadgeP('GPS track redacted','privacy')+p3BadgeP('timestamp-only','source')+'</div><div class="p3-kv"><span>Örnek</span><b>'+p3TimeP(lt.sampleTs)+'</b></div><div class="p3-kv"><span>İşlendi</span><b>'+p3TimeP(lt.processedTs)+'</b></div><div class="p3-kv"><span>Uzak kabul</span><b>'+p3TimeP(lt.syncAcceptedAt)+'</b></div>'+emptyStateNoteHTMLP(ltStatus)+'</div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Yaşam döngüsü · ayarlar</b>'+p3StatusP(life.rootSavedAt||life.lastOpenedDate?'ok':'missing')+'</div><div class="p3-source-row">'+p3BadgeP(life.sourcePath||'root metadata','source')+p3BadgeP('per-key audit yok','privacy')+'</div><div class="p3-kv"><span>Son açılan gün</span><b>'+esc(life.lastOpenedDate||'—')+'</b></div><div class="p3-kv"><span>Root savedAt</span><b>'+p3TimeP(life.rootSavedAt)+'</b></div><div class="p3-kv"><span>Ayar source zaman</span><b>'+p3TimeP(life.settings&&life.settings.changedAt)+'</b></div>'+p3SettingsSummaryP(life.settings)+'<div class="p3-muted">Ayar alanları projection’da izinli özet; tek tek değişiklik geçmişi kaynakta tutulmuyor.</div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Konum zaman ayrımı</b>'+p3StatusP(ltStatus)+stalenessBadgeP(lt.sampleTs||lt.processedTs)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Ham GPS koordinatı burada hiç görünmez — yalnızca konum örneğinin ne zaman alınıp işlendiği.</div><div class="p3-source-row">'+p3BadgeP('GPS track redacted','privacy')+p3BadgeP('timestamp-only','source')+'</div><div class="p3-kv"><span>Örnek</span><b>'+p3TimeP(lt.sampleTs)+'</b></div><div class="p3-kv"><span>İşlendi</span><b>'+p3TimeP(lt.processedTs)+'</b></div><div class="p3-kv"><span>Uzak kabul</span><b>'+p3TimeP(lt.syncAcceptedAt)+'</b></div>'+emptyStateNoteHTMLP(ltStatus)+'</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Yaşam döngüsü · ayarlar</b>'+p3StatusP(life.rootSavedAt||life.lastOpenedDate?'ok':'missing')+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Uygulamanın en son ne zaman açıldığı ve hangi ayarların açık/kapalı olduğunun özeti.</div><div class="p3-source-row">'+p3BadgeP(life.sourcePath||'root metadata','source')+p3BadgeP('per-key audit yok','privacy')+'</div><div class="p3-kv"><span>Son açılan gün</span><b>'+esc(life.lastOpenedDate||'—')+'</b></div><div class="p3-kv"><span>Root savedAt</span><b>'+p3TimeP(life.rootSavedAt)+'</b></div><div class="p3-kv"><span>Ayar source zaman</span><b>'+p3TimeP(life.settings&&life.settings.changedAt)+'</b></div>'+p3SettingsSummaryP(life.settings)+'<div class="p3-muted">Ayar alanları projection’da izinli özet; tek tek değişiklik geçmişi kaynakta tutulmuyor.</div></div>';
   h+='</div><div class="p3-footnote">Kaynak değerleri ile türetilmiş durumlar ayrı tutulur; panel render’ı backfill yapmaz.</div></div>';
   return h;
 }
@@ -1355,16 +1368,17 @@ function p4ProvenanceCardHTMLP(){
   var windDownLabel=wd.status==='missing'?'Kayıt yok':String(wd.eventCount||0)+' event · '+String(wd.totalMinutes||0)+' dk';
   var ntTimestamps=(Array.isArray(nt.events)?nt.events:[]).map(function(e){return e&&[e.createdAt,e.deliveredAt,e.readAt,e.retryAt];}).reduce(function(a,x){return a.concat(x||[]);},[]).filter(Boolean).sort(), ntLatest=ntTimestamps.length?ntTimestamps[ntTimestamps.length-1]:null;
   var h='<div class="card lift span-12 pad p4-audit-card" style="order:7;display:flex;flex-direction:column;">';
-  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('shield-check',14)+' Terapi · Bildirim · Provenance <span style="margin-left:auto;">'+p3BadgeP('metadata-first projection','source')+'</span></div><div class="p3-grid">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('shield-check',14)+' Terapi · Bildirim · Provenance <span style="margin-left:auto;">'+p3BadgeP('metadata-first projection','source')+'</span></div>';
+  h+='<p class="p3-muted" style="margin:2px 0 12px;">Terapi Odası kullanımın, profil değerlendirmen, bildirimlerin ve dış kaynak (fotoğraf/hava) çekimlerinin NE ZAMAN gerçekleştiğinin kaydı — hassas metinler (düşünce içeriği, cevaplar) burada asla gösterilmez, yalnızca sayaç ve zaman damgası.</p><div class="p3-grid">';
   var thRecency=therapyRecencyTextP(th);
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi araçları</b>'+p3StatusP(th.status)+'</div><div class="p3-source-row">'+p3BadgeP(th.sourcePath||'data.days.*.therapy','source')+p3BadgeP(th.privacy||'sensitive redacted','privacy')+p3BadgeP('provenance: '+(th.provenance||'redacted'),'source')+'</div><div class="p3-kpi-line"><b>'+esc(String(th.thoughtCount||0))+'</b><span>düşünce · metin <b>redacted</b></span></div>'+(thRecency?'<div class="p3-muted">'+esc(thRecency)+'</div>':'');
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Terapi araçları</b>'+p3StatusP(th.status)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Terapi Odası\'ndaki düşünce kaydı, karar ve paylaşım adımlarının ne zaman tamamlandığı — metin içeriği gizli kalır.</div><div class="p3-source-row">'+p3BadgeP(th.sourcePath||'data.days.*.therapy','source')+p3BadgeP(th.privacy||'sensitive redacted','privacy')+p3BadgeP('provenance: '+(th.provenance||'redacted'),'source')+'</div><div class="p3-kpi-line"><b>'+esc(String(th.thoughtCount||0))+'</b><span>düşünce · metin <b>redacted</b></span></div>'+(thRecency?'<div class="p3-muted">'+esc(thRecency)+'</div>':'');
   (Array.isArray(th.thoughts)?th.thoughts.slice(0,3):[]).forEach(function(x){ h+='<div class="p3-history-row"><span>Düşünce #'+esc(String(x.index||'—'))+' · '+esc(x.summary||'Metin redacted')+'</span><small>'+p3TimeP(x.createdAt)+' · '+esc(x.provenance||'redacted')+'</small></div>'; });
   h+='<div class="p3-kv"><span>Karar</span><b>'+esc(decisionLabel)+'</b></div><div class="p3-kv"><span>Karar notu</span><b>'+esc(dc?dc.noteStatus||'empty':'Kayıt yok')+'</b></div><div class="p3-kv"><span>Paylaşım</span><b>'+esc(shareLabel)+'</b></div><div class="p3-kv"><span>Teslim</span><b>'+esc(deliveredLabel)+'</b></div><div class="p3-kv"><span>Paylaşım notu</span><b>'+esc(sh?sh.noteStatus||'empty':'Kayıt yok')+'</b></div><div class="p3-kv"><span>Wind-down</span><b>'+esc(windDownLabel)+'</b></div><div class="p3-muted">Consent panel özeti: '+(tc.panelSummarySharingAccepted?'kabul edildi':'kayıtlı değil')+' · hassas metin varsayılan kapalı.</div></div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Profil ilerlemesi</b>'+p3StatusP(pp.status)+'</div><div class="p3-source-row">'+p3BadgeP(pp.sourcePath||'data.profileAssessment','source')+p3BadgeP(pp.privacy||'sensitive redacted','privacy')+p3BadgeP('raw responses: redacted','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(pp.responseCount||0))+'</b><span>cevap anahtarı · madde '+esc(pp.currentItemIndex===null||pp.currentItemIndex===undefined?'—':String(pp.currentItemIndex))+'</span></div><div class="p3-kv"><span>Başlangıç</span><b>'+p3TimeP(pp.startedAt)+'</b></div><div class="p3-kv"><span>Tamamlanma</span><b>'+p3TimeP(pp.completedAt)+'</b></div><div class="p3-kv"><span>Panel paylaşımı</span><b>'+esc(pp.consent&&pp.consent.panelSummarySharingAccepted?'kabul':'kapalı')+'</b></div><div class="p3-kv"><span>Summary</span><b>'+esc(pp.panelSummaryAvailable?'var':'yok')+'</b></div>'+emptyStateNoteHTMLP(pp.status)+'<div class="p3-footnote">Cevap değerleri DOM’a ve observer projection data alanına alınmaz.</div></div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Bildirim yaşam döngüsü</b>'+p3StatusP(nt.status)+stalenessBadgeP(ntLatest)+'</div><div class="p3-source-row">'+p3BadgeP(nt.sourcePath||'data.notifications + data.aeon.qa','source')+p3BadgeP(nt.privacy||'metadata only','privacy')+p3BadgeP('observer receipt ayrı','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(nt.count||0))+'</b><span>event · oluşturuldu '+esc(String(counts.created||0))+' · iletildi '+esc(String(counts.delivered||0))+' · okundu '+esc(String(counts.read||0))+'</span></div><div class="p3-kv"><span>Silindi</span><b>'+esc(String(counts.deleted||0))+'</b></div><div class="p3-kv"><span>Sync edildi</span><b>'+esc(String(counts.synced||0))+'</b></div><div class="p3-kv"><span>Retry/error</span><b>'+esc(String(counts.error||0))+'</b></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Profil ilerlemesi</b>'+p3StatusP(pp.status)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">174 maddelik bilimsel profil anketinin ne kadarının tamamlandığı — ham cevaplar burada asla görünmez.</div><div class="p3-source-row">'+p3BadgeP(pp.sourcePath||'data.profileAssessment','source')+p3BadgeP(pp.privacy||'sensitive redacted','privacy')+p3BadgeP('raw responses: redacted','privacy')+'</div><div class="p3-kpi-line"><b>'+esc(String(pp.responseCount||0))+'</b><span>cevap anahtarı · madde '+esc(pp.currentItemIndex===null||pp.currentItemIndex===undefined?'—':String(pp.currentItemIndex))+'</span></div><div class="p3-kv"><span>Başlangıç</span><b>'+p3TimeP(pp.startedAt)+'</b></div><div class="p3-kv"><span>Tamamlanma</span><b>'+p3TimeP(pp.completedAt)+'</b></div><div class="p3-kv"><span>Panel paylaşımı</span><b>'+esc(pp.consent&&pp.consent.panelSummarySharingAccepted?'kabul':'kapalı')+'</b></div><div class="p3-kv"><span>Summary</span><b>'+esc(pp.panelSummaryAvailable?'var':'yok')+'</b></div>'+emptyStateNoteHTMLP(pp.status)+'<div class="p3-footnote">Cevap değerleri DOM’a ve observer projection data alanına alınmaz.</div></div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Bildirim yaşam döngüsü</b>'+p3StatusP(nt.status)+stalenessBadgeP(ntLatest)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Bir bildirimin oluşturulmasından okunmasına kadar geçtiği aşamaların (iletildi/okundu/silindi) sayımı.</div><div class="p3-source-row">'+p3BadgeP(nt.sourcePath||'data.notifications + data.aeon.qa','source')+p3BadgeP(nt.privacy||'metadata only','privacy')+p3BadgeP('observer receipt ayrı','source')+'</div><div class="p3-kpi-line"><b>'+esc(String(nt.count||0))+'</b><span>event · oluşturuldu '+esc(String(counts.created||0))+' · iletildi '+esc(String(counts.delivered||0))+' · okundu '+esc(String(counts.read||0))+'</span></div><div class="p3-kv"><span>Silindi</span><b>'+esc(String(counts.deleted||0))+'</b></div><div class="p3-kv"><span>Sync edildi</span><b>'+esc(String(counts.synced||0))+'</b></div><div class="p3-kv"><span>Retry/error</span><b>'+esc(String(counts.error||0))+'</b></div>';
   (Array.isArray(nt.events)?nt.events.slice(0,5):[]).forEach(function(e){ h+='<div class="p3-history-row"><span>'+p3StatusP(e.status)+' '+esc(e.kind||'notification')+' · '+esc(e.id||'—')+'</span><small>'+p4StageTextP(e.stages&&e.stages[0])+(e.readAt?' · okundu '+p3TimeP(e.readAt):' · iletildi '+p3TimeP(e.deliveredAt))+'</small></div>'; });
   h+='<div class="p3-kv"><span>Observer kabul</span><b>'+p3TimeP(nt.observerReceipt&&nt.observerReceipt.acceptedAt)+'</b></div>'+emptyStateNoteHTMLP(nt.status)+'</div>';
-  h+='<div class="p3-module"><div class="p3-module-head"><b>Dış kaynak fetch</b>'+p3StatusP(ex.status)+'</div><div class="p3-source-row">'+p3BadgeP(ex.sourcePath||'external fetch/cache metadata','source')+p3BadgeP(ex.privacy||'metadata','privacy')+p3BadgeP('provenance: external','source')+'</div>';
+  h+='<div class="p3-module"><div class="p3-module-head"><b>Dış kaynak fetch</b>'+p3StatusP(ex.status)+'</div><div class="p3-muted" style="margin:-4px 0 6px;">Günün fotoğrafı ve hava durumu gibi dış kaynaklardan veri çekilirken oluşan hataların ayrı bir kayıt altında tutulduğu yer.</div><div class="p3-source-row">'+p3BadgeP(ex.sourcePath||'external fetch/cache metadata','source')+p3BadgeP(ex.privacy||'metadata','privacy')+p3BadgeP('provenance: external','source')+'</div>';
   (Array.isArray(ex.items)?ex.items:[]).forEach(function(x){ h+='<div class="p3-kv"><span>'+esc(x.name||'external')+'</span><b>'+p3StatusP(x.status)+stalenessBadgeP(x.fetchedAt)+(x.errorCode?' · '+esc(x.errorCode):'')+'</b></div><div class="p3-muted">'+esc(x.source||'external')+' · '+p3TimeP(x.fetchedAt)+'</div>'; });
   h+=emptyStateNoteHTMLP(ex.status)+'<div class="p3-footnote">Fetch hatası, veri yokmuş gibi değil; ayrı hata durumu ve kaynak zamanı olarak gösterilir.</div></div></div><div class="p3-footnote">Provenance sınıfları: user_input · derived · external · delivery · observer · redacted. Hassas terapi/profil metni varsayılan DOM yüzeyinde yoktur.</div></div>';
   return h;
@@ -1407,6 +1421,8 @@ function setAuditTab(tab){
   var content=document.querySelector('.audit-content');
   if(!content){ render(); return; }
   content.innerHTML=auditPaneHTMLP(tab);
+  var descEl=document.getElementById('audit-tab-desc');
+  if(descEl) descEl.textContent=auditTabDescriptionP(tab);
   document.querySelectorAll('.audit-tab').forEach(function(button){
     var active=button.getAttribute('data-audit-tab')===tab;
     button.classList.toggle('active',active);
@@ -1415,11 +1431,24 @@ function setAuditTab(tab){
   setTimeout(function(){ if(typeof initClampButtons==='function') initClampButtons(); },0);
 }
 window.setAuditTab=setAuditTab;
+// Her Denetim Merkezi sekmesinin ne gösterdiğini tek cümleyle açıklar —
+// sekme adı tek başına yeterince açıklayıcı değildi (kullanıcı geri
+// bildirimi: "sekmelerin ne işe yaradığı anlaşılmıyor").
+function auditTabDescriptionP(tab){
+  var m={
+    root:'Uygulamanın temel kayıtları (günün fotoğrafı, Terapi Odası geçmişi, Saygı okuma serisi, konum, ayarlar) burada — her biri güncel mi, eski mi, hiç mi kullanılmamış görürsün.',
+    provenance:'Terapi/profil kullanımının ve bildirimlerin NE ZAMAN gerçekleştiği burada özetlenir — hassas metinler (düşünce, cevap) hiçbir zaman gösterilmez, yalnızca sayaç ve zaman.',
+    modules:'Yukarıdaki iki sekmenin özetini tek bir karşılaştırılabilir karta indirger — her kartta "asıl kaynak ne diyor" (canonical) ile "çapraz kontrol ne diyor" yan yana.',
+    events:'Panelde görünen her değişikliğin (senkron, bildirim, terapi kaydı vb.) kronolojik günlüğü — hangi değişiklik ne zaman, hangi cihazdan geldi.'
+  };
+  return m[tab]||'';
+}
 function auditPageHTMLP(){
   var tabs=[['root','Eksik Kök Modüller','layers'],['provenance','Terapi · Bildirim · Provenance','shield-check'],['modules','Eksik ve Özet Modüller','target'],['events','Event Günlüğü','activity']];
   var h='<div class="page audit-page"><section class="audit-page-shell">';
   h+='<div class="audit-page-head"><div><span class="drawer-kicker">Observer coverage</span><h1>Denetim Merkezi</h1><p>Her yüzey tek karar, kaynak zamanı, durum ve güvenli ayrıntı sınırıyla okunur.</p></div><button type="button" class="btn" onclick="toggleAuditPage(false)">Panele dön</button></div>';
   h+='<div class="audit-tabs" role="tablist" aria-label="Denetim sekmeleri">'+tabs.map(function(item){ return '<button type="button" role="tab" data-audit-tab="'+item[0]+'" aria-controls="audit-content" aria-selected="'+(UI.auditTab===item[0]?'true':'false')+'" class="audit-tab '+(UI.auditTab===item[0]?'active':'')+'" onclick="setAuditTab(\''+item[0]+'\')">'+icon(item[2],14)+' '+item[1]+'</button>'; }).join('')+'</div>';
+  h+='<p class="p3-muted" id="audit-tab-desc" style="margin:8px 0 0;">'+esc(auditTabDescriptionP(UI.auditTab))+'</p>';
   h+='<div id="audit-content" class="audit-content" role="tabpanel" aria-live="polite">'+auditPaneHTMLP(UI.auditTab)+'</div>';
   h+='</section></div>';
   return h;
@@ -1450,7 +1479,14 @@ function d4ModuleDescriptorsP(){
   var thStatus=th.status==='malformed'||pp.status==='malformed'?'malformed':(th.status==='missing'&&pp.status==='missing'?'missing':(th.status==='missing'||pp.status==='missing'?'incomplete':(th.status==='stale'||pp.status==='stale'?'stale':'ok')));
   var nCounts=nt.counts||{}, nLatest=(Array.isArray(nt.events)?nt.events:[]).map(function(e){return e&&[e.createdAt,e.deliveredAt,e.readAt,e.retryAt];}).reduce(function(a,x){return a.concat(x||[]);},[]);
   var locationStatus=lt.status==='malformed'||nud.status==='malformed'?'malformed':(lt.status==='missing'&&nud.status==='missing'?'missing':(lt.status==='stale'?'stale':'ok'));
-  var soul=D&&D.soulArchive&&Array.isArray(D.soulArchive.items)?D.soulArchive.items:[], soulSessions=soul.reduce(function(a,x){return a+(Number(x&&x.totalSessions)||0);},0), soulMinutes=soul.reduce(function(a,x){return a+(Number(x&&x.totalMinutes)||0);},0), lib=archives.library&&Array.isArray(archives.library.books)?archives.library.books:[], watch=archives.watchlist&&Array.isArray(archives.watchlist.items)?archives.watchlist.items:[], music=archives.music&&Array.isArray(archives.music.items)?archives.music.items:[], archiveTotal=lib.length+watch.length+music.length;
+  var soul=D&&D.soulArchive&&Array.isArray(D.soulArchive.items)?D.soulArchive.items:[];
+  // Seans/dakika sayısı, KPI kartıyla (Zihin-Beden Arşivi) AYNI kaynaktan
+  // (ham günlük seans listesi) türetilir — D.soulArchive.items'ın kendi
+  // sayaçları burada KULLANILMAZ, aksi halde iki yüzey birbirinden farklı
+  // toplam gösterebilir (kullanıcı geri bildirimi: "174 nereden çıkıyor").
+  var soulAllSessions=(typeof allSoulArchiveSessionsP==='function')?allSoulArchiveSessionsP():[];
+  var soulSessions=soulAllSessions.length, soulMinutes=soulAllSessions.reduce(function(a,s){ var m=Number(s&&s.duration); return a+((isNaN(m)||m<0)?0:m); },0);
+  var lib=archives.library&&Array.isArray(archives.library.books)?archives.library.books:[], watch=archives.watchlist&&Array.isArray(archives.watchlist.items)?archives.watchlist.items:[], music=archives.music&&Array.isArray(archives.music.items)?archives.music.items:[], archiveTotal=lib.length+watch.length+music.length;
   var archiveStatus=(soul.length||archiveTotal)?'ok':'missing';
   var thRecency=therapyRecencyTextP(th), thRows=[['Consent',pp.consent&&pp.consent.panelSummarySharingAccepted?'kabul':'kapalı'],['Profil durumu',pp.status||'missing'],['Ham yanıtlar','redacted'],['Terapi zaman damgası',d4SafeTimeP(th.date)]];
   if(thRecency) thRows.push(['Son terapi kaydı',thRecency]);
@@ -3236,22 +3272,29 @@ function render(){
   // ROW 1.7: Zihin-Beden Beslenmesi — pilates/ney/binicilik arşiv + haftalık pratik özeti
   (function(){
     ensureSoulArchiveP();
-    var rng=soulActivityCountsRangeP(cur[0],cur[cur.length-1]);
-    var arc=D.soulArchive.items;
-    var arcTotalSessions=arc.reduce(function(a,it){return a+(it.totalSessions||0);},0);
-    var arcTotalMins=arc.reduce(function(a,it){return a+(it.totalMinutes||0);},0);
-    var val=(arcTotalMins>0)?fmtDurationP(arcTotalMins):'—';
-    var extra='<span class="tchip fl">'+arcTotalSessions+' seans · arşiv</span>';
+    // Tek kaynak: başlıktaki toplam ve tür kırılımı, aşağıdaki "son kayıtlar"
+    // listesiyle AYNI ham günlük seans dizisinden (allSoulArchiveSessionsP)
+    // hesaplanır — ayrı, kendi başına artan bir sayaç önbelleği
+    // (D.soulArchive.items.totalSessions/.totalMinutes) kullanılmıyor. Böylece
+    // "174 sa" gibi bir toplam her zaman görünen kayıtların birebir toplamıdır,
+    // ayrı bir önbellekten kayıp/kayma (drift) ile gelemez.
+    var allSessions=allSoulArchiveSessionsP();
+    var byType={}, totalMins=0;
+    allSessions.forEach(function(s){
+      var m=Number(s.duration); if(isNaN(m)||m<0) m=0;
+      if(!byType[s.type]) byType[s.type]={count:0,mins:0};
+      byType[s.type].count++; byType[s.type].mins+=m;
+      totalMins+=m;
+    });
+    var totalSessions=allSessions.length;
+    var val=(totalMins>0)?fmtDurationP(totalMins):'—';
     // tür chip'leri
     var parts=[];
     SOUL_ACTIVITY_CATALOG_P.forEach(function(cat){
-      var it=findSoulItemP(cat.id);
-      if(it&&it.totalSessions>0) parts.push('<span>'+cat.label+' '+it.totalSessions+'x'+(it.totalMinutes>0?' '+fmtDurationP(it.totalMinutes):'')+'</span>');
+      var t=byType[cat.id];
+      if(t&&t.count>0) parts.push(cat.label+' '+t.count+'x'+(t.mins>0?' '+fmtDurationP(t.mins):''));
     });
-    if(!parts.length && rng.totalCount>0){
-      ['pilates','ney','riding'].forEach(function(t){ if(rng.counts[t]>0) parts.push(SOUL_ACTIVITY_CATALOG_P.find(function(x){return x.id===t;}).label+' '+rng.counts[t]+'x'+(rng.mins[t]>0?' '+fmtDurationP(rng.mins[t]):'')); });
-    }
-    var cap=parts.length?parts.map(function(s){return '<span>'+s+'</span>';}).join(''):'<span>Arşivde kayıt yok · uygulamadan pratik eklendiğinde dolar</span>';
+    var cap=parts.length?parts.map(function(s){return '<span>'+s+'</span>';}).join('')+(totalSessions>0?'<span style="color:var(--t3);">toplam '+esc(totalSessions+' seans · '+val)+'</span>':''):'<span>Arşivde kayıt yok · uygulamadan pratik eklendiğinde dolar</span>';
     h+='<div class="card lift kpi span-2" style="--accent:var(--soul);order:18;cursor:pointer;" onclick="toggleSoulArchiveP()">';
     h+='<div class="kpi-top"><span class="kpi-l">Zihin-Beden Arşivi</span><span class="tchip fl">'+icon(UI.soulArchiveExpanded?'chevron-up':'chevron-down',12)+' '+esc(UI.soulArchiveExpanded?'kapat':'aç')+'</span></div>';
     h+='<div class="kpi-v mono">'+val+'</div>';
@@ -3261,10 +3304,10 @@ function render(){
       var typeChips='';
       typeChips+='<button onclick="setSoulArchiveTypeP(null);event.stopPropagation();" class="tchip '+(UI.soulArchiveType===null?'fl':'')+'" style="border:none;background:transparent;cursor:pointer;font:inherit;">Tümü</button>';
       SOUL_ACTIVITY_CATALOG_P.forEach(function(cat){
-        var it=findSoulItemP(cat.id);
+        var t=byType[cat.id];
         var active=UI.soulArchiveType===cat.id;
-        if(it&&it.totalSessions>0){
-          typeChips+='<button onclick="setSoulArchiveTypeP(\''+cat.id+'\');event.stopPropagation();" class="tchip '+(active?'fl':'')+'" style="border:none;background:transparent;cursor:pointer;font:inherit;color:'+(active?'var(--soul)':'')+';">'+cat.label+' '+it.totalSessions+'x</button>';
+        if(t&&t.count>0){
+          typeChips+='<button onclick="setSoulArchiveTypeP(\''+cat.id+'\');event.stopPropagation();" class="tchip '+(active?'fl':'')+'" style="border:none;background:transparent;cursor:pointer;font:inherit;color:'+(active?'var(--soul)':'')+';">'+cat.label+' '+t.count+'x</button>';
         }
       });
       h+='<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">'+typeChips+'</div>';

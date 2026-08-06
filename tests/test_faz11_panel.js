@@ -39,6 +39,16 @@ if (!cardWrapMatch) { console.error('cardWrap() bulunamadı'); process.exit(1); 
 var toggleCardMatch = html.match(/function toggleCard\(key\)\{[\s\S]*?\}/);
 if (!toggleCardMatch) { console.error('toggleCard() bulunamadı'); process.exit(1); }
 
+// profileAssessmentDataP() fonksiyonunu çıkar — prompt 4.1 (Faz 4) ile
+// profileAssessmentCardHTML() ikiye ayrıldı (hesapla/render et); render
+// fonksiyonu artık bu veri fonksiyonunu çağırıyor, o yüzden mock eval'e de
+// birlikte eklenmesi gerekiyor.
+var pdFnStart = html.indexOf('function profileAssessmentDataP()');
+if (pdFnStart < 0) { console.error('profileAssessmentDataP bulunamadı'); process.exit(1); }
+var pdFnEnd = html.indexOf('\nfunction profileAssessmentCardHTML()', pdFnStart);
+if (pdFnEnd < 0) { console.error('profileAssessmentDataP sonu bulunamadı'); process.exit(1); }
+var pdFn = html.substring(pdFnStart, pdFnEnd).trim();
+
 // profileAssessmentCardHTML() fonksiyonunu çıkar — "function profileAssessmentCardHTML()" ile başlar
 // ve bir sonraki "function motivationEntries()" veya "// ---- Motivasyon" satırına kadar
 var paFnStart = html.indexOf('function profileAssessmentCardHTML()');
@@ -67,6 +77,7 @@ var mockCode = [
   'function toggleCard(key){}',
   'window.toggleCard=toggleCard;',
   cardWrapMatch[0],
+  pdFn,
   paFn
 ].join('\n\n');
 

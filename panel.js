@@ -592,12 +592,9 @@ window.quranManualRevokeP=function(surahId){
   attempt(1);
 };
 
-function quranJourneyPanelCardHTML(){
+function quranJourneyDataP(){
   var T=window.QuranTransportV1, cat=window.QuranRevelationOrderV1, q=quranJourneyRootP();
-  if(!T||!cat||!Array.isArray(cat.surahs)||!cat.surahs.length){
-    return cardWrap({key:'quranJourney',icon:icon('book',18),title:'Kur’an Yolculuğu',span:12,order:23,
-      summary:'<div class="empty"><span class="ei">'+icon('book',20)+'</span>Kütüphane modülü yüklenemedi</div>'});
-  }
+  if(!T||!cat||!Array.isArray(cat.surahs)||!cat.surahs.length) return {ok:false};
   var reqs=(q&&q.requests&&typeof q.requests==='object')?q.requests:{};
   var surahs=cat.surahs, total=surahs.length;
   var stats={unrequested:0,waiting:0,ready:0,watched:0}, rows=[], deliveredRows=[], noteTotal=0, lastActivity=null;
@@ -612,6 +609,15 @@ function quranJourneyPanelCardHTML(){
     }
   });
   rows.sort(function(a,b){ return String((b.req&&b.req.updatedAt)||'').localeCompare(String((a.req&&a.req.updatedAt)||'')); });
+  return {ok:true,cat:cat,total:total,stats:stats,rows:rows,deliveredRows:deliveredRows,noteTotal:noteTotal,lastActivity:lastActivity,errs:quranDeliveryErrorsP()};
+}
+function quranJourneyPanelCardHTML(){
+  var QD=quranJourneyDataP();
+  if(!QD.ok){
+    return cardWrap({key:'quranJourney',icon:icon('book',18),title:'Kur’an Yolculuğu',span:12,order:23,
+      summary:'<div class="empty"><span class="ei">'+icon('book',20)+'</span>Kütüphane modülü yüklenemedi</div>'});
+  }
+  var cat=QD.cat, total=QD.total, stats=QD.stats, rows=QD.rows, deliveredRows=QD.deliveredRows, noteTotal=QD.noteTotal, lastActivity=QD.lastActivity;
 
   var sum='<div class="dstats" style="grid-template-columns:repeat(4,1fr);margin-bottom:0;">';
   sum+='<div class="dstat"><div class="dv">'+rows.length+'</div><div class="dl">istendi</div></div>';
@@ -622,7 +628,7 @@ function quranJourneyPanelCardHTML(){
   sum+='<div style="font-size:var(--f1);color:var(--t3);margin-top:8px;text-align:right;font-weight:700;">'+total+' sûre · '+deliveredRows.length+' kullanıcıya gönderilen video · '+noteTotal+' not · son etkinlik '+(lastActivity?esc(timeAgo(lastActivity)):'—')+'</div>';
 
   var det='';
-  var errs=quranDeliveryErrorsP();
+  var errs=QD.errs;
   if(errs.length){
     det+='<div style="background:var(--ra);border:1px solid var(--rb);border-radius:12px;padding:10px 12px;margin-bottom:11px;">';
     det+='<div style="font-size:var(--f3);font-weight:800;color:var(--red);margin-bottom:6px;">Otomasyon hatası · '+errs.length+'</div>';
@@ -2484,23 +2490,58 @@ function magnesiumPanelCardHTML(){
   return cardWrap({key:'magnesium',icon:icon('pill',18),title:'Magnezyum Hatırlatıcısı',span:6,order:22,summary:sum,details:det});
 }
 
-function psychCardHTML(){
+function psychCardDataP(){
   var P=(D&&D.psych)?D.psych:null, done=P&&P.completedAt&&P.scores;
-  if(!done){
-    return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,
-      summary:'Henüz tamamlanmadı — Şeyma tanıma anketini doldurunca dikkat, bağlanma/güven, kaygı, duygudurum, iyi oluş ve öz-şefkat profili ile tüm soru & cevapları burada belirir.',
-      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Öz-bildirim tarama araçları: ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF. Klinik tanı değildir. İki haftada bir yenilenir.</div>'});
-  }
+  if(!done) return {done:false};
   var sc=P.scores;
-  function col(tone){ return tone==='bad'?'#e08a8a':(tone==='mid'?'#e6c15a':'#6bbf7a'); }
-  function chip(ico,txt,tone){ if(tone==null){ tone=txt; txt=ico; ico=''; } var c=col(tone); return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+c+'22;border:1px solid '+c+'66;color:'+c+';white-space:nowrap;">'+(ico?ico:'')+esc(txt)+'</span>'; }
-  function bar(pct,tone){ var c=col(tone); pct=Math.max(0,Math.min(100,pct)); return '<div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:999px;"></div></div>'; }
   var at=sc.attention.band, atTone=at==='yüksek uyum'?'bad':(at==='sınırda'?'mid':'good');
   var stl=sc.attachment.style, stTone=stl==='Güvenli'?'good':'mid';
   var an=sc.anxiety.band, anTone=(an==='orta'||an==='yüksek')?'bad':(an==='hafif'?'mid':'good');
   var dp=sc.depression.band, dpTone=(dp==='minimal')?'good':(dp==='hafif'?'mid':'bad');
   var wb=sc.wellbeing.band, wbTone=wb==='iyi'?'good':(wb==='düşük'?'mid':'bad');
   var scz=sc.selfCompassion.band, sczTone=scz==='yüksek'?'good':(scz==='orta'?'mid':'bad');
+  // ── Zaman içinde karşılaştırma (trend) — iki haftalık ölçümlerin geçmişi ──
+  var hist=Array.isArray(P.history)?P.history.filter(function(h){return h&&h.scores;}):[];
+  if(!hist.length && P.scores) hist=[{completedAt:P.completedAt,scores:P.scores}];
+  var METRICS=[
+    {iconName:'target',label:'Dikkat/Odak (ASRS-6)',get:function(s){return s.attention?s.attention.shaded:0;},max:6,hib:false,unit:'/6'},
+    {iconName:'heart-handshake',label:'Bağlanma kaygısı (ECR)',get:function(s){return s.attachment?s.attachment.anxiety:0;},max:7,hib:false,unit:'/7'},
+    {iconName:'heart-handshake',label:'Bağlanma kaçınması (ECR)',get:function(s){return s.attachment?s.attachment.avoidance:0;},max:7,hib:false,unit:'/7'},
+    {iconName:'wind',label:'Kaygı (GAD-7)',get:function(s){return s.anxiety?s.anxiety.sum:0;},max:21,hib:false,unit:'/21'},
+    {iconName:'cloud-rain',label:'Duygudurum (PHQ-9)',get:function(s){return s.depression?s.depression.sum:0;},max:27,hib:false,unit:'/27'},
+    {iconName:'sun',label:'İyi oluş (WHO-5)',get:function(s){return s.wellbeing?s.wellbeing.score:0;},max:100,hib:true,unit:'/100'},
+    {iconName:'feather',label:'Öz-şefkat (SCS-SF)',get:function(s){return s.selfCompassion?s.selfCompassion.mean:0;},max:5,hib:true,unit:'/5'}
+  ];
+  var trendReady=hist.length>=2, trendMetrics=null, trendSummary=null;
+  if(trendReady){
+    trendMetrics=METRICS.map(function(m){
+      var series=hist.map(function(h){return Math.round(m.get(h.scores)*10)/10;});
+      return {iconName:m.iconName,label:m.label,unit:m.unit,max:m.max,hib:m.hib,series:series,cur:series[series.length-1],prev:series.length>=2?series[series.length-2]:null};
+    });
+    var imp=[],wor=[];
+    METRICS.forEach(function(m){
+      var series=hist.map(function(h){return m.get(h.scores);});
+      var cur=series[series.length-1], prev=series[series.length-2];
+      if(prev==null) return; var d=cur-prev; if(d===0) return;
+      (( m.hib?(d>0):(d<0) )?imp:wor).push(m.label.replace(/ \(.*\)/,''));
+    });
+    trendSummary={imp:imp,wor:wor};
+  }
+  // ── Tüm soru & cevaplar (denormalize edilmiş qa dizisi) ──
+  return {done:true,sc:sc,at:at,atTone:atTone,stl:stl,stTone:stTone,an:an,anTone:anTone,dp:dp,dpTone:dpTone,wb:wb,wbTone:wbTone,scz:scz,sczTone:sczTone,
+    hist:hist,trendReady:trendReady,trendMetrics:trendMetrics,trendSummary:trendSummary,qa:Array.isArray(P.qa)?P.qa:[],completedAt:P.completedAt};
+}
+function psychCardHTML(){
+  var PD=psychCardDataP();
+  if(!PD.done){
+    return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,
+      summary:'Henüz tamamlanmadı — Şeyma tanıma anketini doldurunca dikkat, bağlanma/güven, kaygı, duygudurum, iyi oluş ve öz-şefkat profili ile tüm soru & cevapları burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Öz-bildirim tarama araçları: ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF. Klinik tanı değildir. İki haftada bir yenilenir.</div>'});
+  }
+  var sc=PD.sc, at=PD.at, atTone=PD.atTone, stl=PD.stl, stTone=PD.stTone, an=PD.an, anTone=PD.anTone, dp=PD.dp, dpTone=PD.dpTone, wb=PD.wb, wbTone=PD.wbTone, scz=PD.scz, sczTone=PD.sczTone, hist=PD.hist;
+  function col(tone){ return tone==='bad'?'#e08a8a':(tone==='mid'?'#e6c15a':'#6bbf7a'); }
+  function chip(ico,txt,tone){ if(tone==null){ tone=txt; txt=ico; ico=''; } var c=col(tone); return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+c+'22;border:1px solid '+c+'66;color:'+c+';white-space:nowrap;">'+(ico?ico:'')+esc(txt)+'</span>'; }
+  function bar(pct,tone){ var c=col(tone); pct=Math.max(0,Math.min(100,pct)); return '<div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.10);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:999px;"></div></div>'; }
   var sum='<div style="display:flex;flex-wrap:wrap;gap:6px;">'
     +chip(icon('target',12),'Dikkat: '+at,atTone)+chip(icon('heart-handshake',12),stl,stTone)+chip(icon('wind',12),'Kaygı: '+an,anTone)
     +chip(icon('cloud-rain',12),'Duygudurum: '+dp,dpTone)+chip(icon('sun',12),'İyi oluş: '+wb,wbTone)+chip(icon('feather',12),'Öz-şefkat: '+scz,sczTone)
@@ -2513,9 +2554,6 @@ function psychCardHTML(){
     r+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;gap:8px;"><span style="font-size:var(--f2);color:var(--t3);line-height:1.45;flex:1;">'+esc(desc)+'</span><span style="font-size:var(--f1);color:var(--t4);font-weight:800;white-space:nowrap;">'+esc(valTxt)+'</span></div></div>';
     return r;
   }
-  // ── Zaman içinde karşılaştırma (trend) — iki haftalık ölçümlerin geçmişi ──
-  var hist=Array.isArray(P.history)?P.history.filter(function(h){return h&&h.scores;}):[];
-  if(!hist.length && P.scores) hist=[{completedAt:P.completedAt,scores:P.scores}];
   function fmtd(iso){ try{ return fmtTR(String(iso).slice(0,10)); }catch(e){ return String(iso||'').slice(0,10); } }
   function spark(vals,max){
     var n=vals.length; if(!n) return '';
@@ -2535,41 +2573,23 @@ function psychCardHTML(){
     var improved=hib?(d>0):(d<0), c=improved?'#6bbf7a':'#e08a8a', arrow=(d>0?'▲':'▼');
     return '<span style="font-size:var(--f1);color:'+c+';font-weight:800;white-space:nowrap;">'+arrow+' '+Math.abs(d)+' · '+(improved?'iyi yönde':'dikkat')+'</span>';
   }
-  var METRICS=[
-    {icon:icon('target',15),label:'Dikkat/Odak (ASRS-6)',get:function(s){return s.attention?s.attention.shaded:0;},max:6,hib:false,unit:'/6'},
-    {icon:icon('heart-handshake',15),label:'Bağlanma kaygısı (ECR)',get:function(s){return s.attachment?s.attachment.anxiety:0;},max:7,hib:false,unit:'/7'},
-    {icon:icon('heart-handshake',15),label:'Bağlanma kaçınması (ECR)',get:function(s){return s.attachment?s.attachment.avoidance:0;},max:7,hib:false,unit:'/7'},
-    {icon:icon('wind',15),label:'Kaygı (GAD-7)',get:function(s){return s.anxiety?s.anxiety.sum:0;},max:21,hib:false,unit:'/21'},
-    {icon:icon('cloud-rain',15),label:'Duygudurum (PHQ-9)',get:function(s){return s.depression?s.depression.sum:0;},max:27,hib:false,unit:'/27'},
-    {icon:icon('sun',15),label:'İyi oluş (WHO-5)',get:function(s){return s.wellbeing?s.wellbeing.score:0;},max:100,hib:true,unit:'/100'},
-    {icon:icon('feather',15),label:'Öz-şefkat (SCS-SF)',get:function(s){return s.selfCompassion?s.selfCompassion.mean:0;},max:5,hib:true,unit:'/5'}
-  ];
   var trend='';
-  if(hist.length>=2){
+  if(PD.trendReady){
     var first=hist[0], last=hist[hist.length-1];
     trend+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:12px 13px;margin-bottom:12px;background:var(--s1);">';
     trend+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('trending-up',15)+' Zaman içinde karşılaştırma</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+hist.length+' ölçüm · '+fmtd(first.completedAt)+' → '+fmtd(last.completedAt)+'</span></div>';
     trend+='<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;">';
     hist.forEach(function(h,i){ trend+='<span style="font-size:var(--f1);font-weight:700;padding:2px 8px;border-radius:999px;background:'+(i===hist.length-1?'#e6c15a22':'rgba(255,255,255,0.05)')+';border:1px solid '+(i===hist.length-1?'#e6c15a66':'var(--bd2)')+';color:'+(i===hist.length-1?'#e6c15a':'var(--t3)')+';">'+(i+1)+'. '+fmtd(h.completedAt)+'</span>'; });
     trend+='</div>';
-    METRICS.forEach(function(m){
-      var series=hist.map(function(h){return Math.round(m.get(h.scores)*10)/10;});
-      var cur=series[series.length-1], prev=series.length>=2?series[series.length-2]:null;
+    PD.trendMetrics.forEach(function(m){
       trend+='<div style="padding:9px 0;border-top:1px solid var(--bd);">';
-      trend+='<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:var(--f3);">'+m.icon+'</span><span style="flex:1;font-size:var(--f2);font-weight:700;color:var(--t2);min-width:0;">'+esc(m.label)+'</span><span style="font-size:var(--f3);font-weight:800;color:var(--t1);white-space:nowrap;">'+cur+'<span style="font-size:var(--f1);color:var(--t4);">'+m.unit+'</span></span></div>';
-      trend+='<div style="display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap;"><div style="flex-shrink:0;">'+spark(series,m.max)+'</div>'+delta(cur,prev,m.hib)+'</div>';
+      trend+='<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:var(--f3);">'+icon(m.iconName,15)+'</span><span style="flex:1;font-size:var(--f2);font-weight:700;color:var(--t2);min-width:0;">'+esc(m.label)+'</span><span style="font-size:var(--f3);font-weight:800;color:var(--t1);white-space:nowrap;">'+m.cur+'<span style="font-size:var(--f1);color:var(--t4);">'+m.unit+'</span></span></div>';
+      trend+='<div style="display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap;"><div style="flex-shrink:0;">'+spark(m.series,m.max)+'</div>'+delta(m.cur,m.prev,m.hib)+'</div>';
       trend+='</div>';
     });
-    var imp=[],wor=[];
-    METRICS.forEach(function(m){
-      var series=hist.map(function(h){return m.get(h.scores);});
-      var cur=series[series.length-1], prev=series[series.length-2];
-      if(prev==null) return; var d=cur-prev; if(d===0) return;
-      (( m.hib?(d>0):(d<0) )?imp:wor).push(m.label.replace(/ \(.*\)/,''));
-    });
     var yorum='';
-    if(imp.length) yorum+='<b style="color:#6bbf7a;">İyi yönde:</b> '+esc(imp.join(', '))+'. ';
-    if(wor.length) yorum+='<b style="color:#e08a8a;">Dikkat:</b> '+esc(wor.join(', '))+'. ';
+    if(PD.trendSummary.imp.length) yorum+='<b style="color:#6bbf7a;">İyi yönde:</b> '+esc(PD.trendSummary.imp.join(', '))+'. ';
+    if(PD.trendSummary.wor.length) yorum+='<b style="color:#e08a8a;">Dikkat:</b> '+esc(PD.trendSummary.wor.join(', '))+'. ';
     if(!yorum) yorum='Son iki ölçüm arasında belirgin değişim yok. ';
     trend+='<div style="border-top:1px solid var(--bd);margin-top:2px;padding-top:9px;font-size:var(--f2);color:var(--t3);line-height:1.5;">'+yorum+'<span style="color:var(--t4);">Kaygı/duygudurum/dikkat/bağlanmada düşüş, iyi oluş/öz-şefkatte artış olumludur. Bu bir tarama karşılaştırmasıdır; klinik tanı değildir.</span></div>';
     trend+='</div>';
@@ -2584,12 +2604,11 @@ function psychCardHTML(){
   det+=drow(icon('cloud-rain',16),'Duygudurum',dp,dpTone,sc.depression.sum+'/27',sc.depression.sum/27*100,'PHQ-9 tarama puanı'+(sc.depression.alert?' · dikkat gerektiren düzey':''));
   det+=drow(icon('sun',16),'İyi Oluş',wb,wbTone,sc.wellbeing.score+'/100',sc.wellbeing.score,'WHO-5 (yüksek daha iyidir)');
   det+=drow(icon('feather',16),'Öz-Şefkat',scz,sczTone,sc.selfCompassion.mean+'/5',sc.selfCompassion.mean/5*100,'SCS-SF ortalaması');
-  // ── Tüm soru & cevaplar (denormalize edilmiş qa dizisi) ──
-  if(Array.isArray(P.qa)&&P.qa.length){
+  if(PD.qa.length){
     det+='<div style="border-top:1px solid var(--bd);margin-top:6px;padding-top:11px;">';
-    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('file-text',15)+' Tüm soru & cevaplar</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+P.qa.length+' madde</span></div>';
+    det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;">'+icon('file-text',15)+' Tüm soru & cevaplar</span><span style="font-size:var(--f1);color:var(--t4);font-weight:700;">'+PD.qa.length+' madde</span></div>';
     var curScale=null;
-    P.qa.forEach(function(item){
+    PD.qa.forEach(function(item){
       if(item.scale!==curScale){ curScale=item.scale; det+='<div style="font-size:var(--f2);font-weight:800;color:var(--t3);margin:11px 0 4px;">'+esc(item.icon||'')+' '+esc(item.scale)+'</div>'; }
       det+='<div style="display:flex;gap:9px;align-items:baseline;font-size:var(--f2);line-height:1.5;padding:5px 0;border-top:1px solid var(--bd);">';
       det+='<span style="flex:1;color:var(--t2);min-width:0;word-break:break-word;">'+esc(item.q)+'</span>';
@@ -2597,8 +2616,8 @@ function psychCardHTML(){
     });
     det+='</div>';
   }
-  var nextTxt=''; try{ var t=Date.parse(P.completedAt); if(!isNaN(t)){ var nd=new Date(t+14*24*3600*1000); nextTxt=' · sonraki ~'+esc(nd.toISOString().slice(0,10)); } }catch(e){}
-  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Öz-bildirim TARAMA araçları (ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF); klinik tanı değildir. İki haftada bir yenilenir. Son tamamlanma: '+esc(String(P.completedAt).slice(0,10))+nextTxt+'.</div>';
+  var nextTxt=''; try{ var t=Date.parse(PD.completedAt); if(!isNaN(t)){ var nd=new Date(t+14*24*3600*1000); nextTxt=' · sonraki ~'+esc(nd.toISOString().slice(0,10)); } }catch(e){}
+  det+='<div style="font-size:var(--f1);color:var(--t4);line-height:1.5;margin-top:8px;border-top:1px solid var(--bd);padding-top:9px;">Öz-bildirim TARAMA araçları (ASRS-6 · ECR-12 · GAD-7 · PHQ-9 · WHO-5 · SCS-SF); klinik tanı değildir. İki haftada bir yenilenir. Son tamamlanma: '+esc(String(PD.completedAt).slice(0,10))+nextTxt+'.</div>';
   return cardWrap({key:'psych',icon:icon('brain',18),title:'Psikolojik Profil',span:12,order:20,summary:sum,details:det});
 }
 // ── Faz 11: Bilimsel Profil Değerlendirmesi (tek oturum, 174 madde) kartı ──
@@ -2606,14 +2625,10 @@ function psychCardHTML(){
 // panelde doğrudan gösterilir; bu panel kullanıcının kendi gözlem panosudur.
 // Ham cevap, hassas ilişki maddeleri, dikkat kontrol ayrıntıları, yanıt süreleri
 // ve tanı etiketleri ASLA gösterilmez. Eksik/eski veride güvenli boş durum.
-function profileAssessmentCardHTML(){
+function profileAssessmentDataP(){
   var PA=(D&&D.profileAssessment)?D.profileAssessment:null;
   // Eski kullanıcıda alan yok → güvenli boş durum
-  if(!PA||typeof PA!=='object'){
-    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
-      summary:'Henüz başlanmadı — Şeyma 174 maddelik bilimsel profil değerlendirmesini tamamladığında boyutsal özet burada belirir.',
-      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Bu, tek oturumluk bilimsel bir profil değerlendirmesidir (Big Five, RAISEC, değerler, motivasyon, bilişsel stil, bağlanma, duygu düzenleme). Klinik tanı değildir; öz-bildirime dayalı bir profildir. Veriler seyma-data reposuna senkronize edilir.</div>'});
-  }
+  if(!PA||typeof PA!=='object') return {state:'missing'};
   var isCompleted=PA.status==='completed';
   // Tamamlanmamış → kesin yorum gösterme
   if(!isCompleted){
@@ -2624,9 +2639,7 @@ function profileAssessmentCardHTML(){
       var pct=Math.round((PA.currentItemIndex/total)*100);
       progressTxt=' · %'+pct+' ('+PA.currentItemIndex+'/'+total+')';
     }
-    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
-      summary:esc(statusTxt+progressTxt)+' — tamamlandığında boyutsal özet burada belirir.',
-      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Değerlendirme tamamlanmadan profil özeti gösterilmez. Şeyma kaldığı yerden devam edebilir.</div>'});
+    return {state:'incomplete',statusTxt:statusTxt,progressTxt:progressTxt};
   }
   // Tamamlanmış → özet göster
   var ps=(PA.panelSummary&&typeof PA.panelSummary==='object')?PA.panelSummary:{};
@@ -2637,6 +2650,24 @@ function profileAssessmentCardHTML(){
   var confScore=ps.confidenceScore!=null?ps.confidenceScore:(quality.score!=null?quality.score:null);
   var confCat=ps.confidenceCategory||quality.category||null;
   var completedDate=PA.completedAt?fmtTR(String(PA.completedAt).slice(0,10)):'—';
+  var bf=ps.bigFive||{};
+  var bfHasData=Object.keys(bf).some(function(k){return bf[k]&&bf[k].mean!=null;});
+  var shortReport=ps.shortReport||(report&&report.sections&&report.sections.characterSummary?report.sections.characterSummary.body:'');
+  return {state:'completed',ps:ps,scores:scores,report:report,quality:quality,confScore:confScore,confCat:confCat,completedDate:completedDate,bf:bf,bfHasData:bfHasData,shortReport:shortReport};
+}
+function profileAssessmentCardHTML(){
+  var PD=profileAssessmentDataP();
+  if(PD.state==='missing'){
+    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
+      summary:'Henüz başlanmadı — Şeyma 174 maddelik bilimsel profil değerlendirmesini tamamladığında boyutsal özet burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Bu, tek oturumluk bilimsel bir profil değerlendirmesidir (Big Five, RAISEC, değerler, motivasyon, bilişsel stil, bağlanma, duygu düzenleme). Klinik tanı değildir; öz-bildirime dayalı bir profildir. Veriler seyma-data reposuna senkronize edilir.</div>'});
+  }
+  if(PD.state==='incomplete'){
+    return cardWrap({key:'profileAssessment',icon:icon('brain',18),title:'Bilimsel Profil Değerlendirmesi',span:12,order:19,
+      summary:esc(PD.statusTxt+PD.progressTxt)+' — tamamlandığında boyutsal özet burada belirir.',
+      details:'<div style="font-size:var(--f2);color:var(--t4);line-height:1.5;">Değerlendirme tamamlanmadan profil özeti gösterilmez. Şeyma kaldığı yerden devam edebilir.</div>'});
+  }
+  var ps=PD.ps, confScore=PD.confScore, confCat=PD.confCat, completedDate=PD.completedDate, bf=PD.bf, bfHasData=PD.bfHasData, shortReport=PD.shortReport, report=PD.report;
   // Özet chip'leri
   function chip(txt,col){ return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f1);font-weight:800;padding:3px 9px;border-radius:999px;background:'+col+'22;border:1px solid '+col+'66;color:'+col+';white-space:nowrap;">'+esc(txt)+'</span>'; }
   var confCol=confCat==='high'?'#6bbf7a':(confCat==='low'?'#e08a8a':'#e6c15a');
@@ -2659,10 +2690,8 @@ function profileAssessmentCardHTML(){
   det+='<div style="font-size:var(--f2);color:var(--t3);line-height:1.5;">'+(confScore!=null?('0-100 üzerinden '+confScore):'Güven skoru mevcut değil')+'. Bu değerlendirme klinik bir tanı değildir; öz-bildirime dayalı bir profildir.</div>';
   det+='</div>';
   // Big Five özeti
-  var bf=ps.bigFive||{};
   var B5_LABELS={conscientiousness:'Öz-yönetim ve düzen',negative_emotionality:'Duygusal hassasiyet',extraversion:'Sosyal enerji',agreeableness:'Uyum ve şefkat',open_mindedness:'Açık fikirlilik'};
   var B5_BAND={high:'belirgin yüksek',low:'ortalama altı',moderate:'dengeli/orta'};
-  var bfHasData=Object.keys(bf).some(function(k){return bf[k]&&bf[k].mean!=null;});
   if(bfHasData){
     det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;">'+icon('chart-column',15)+' Big Five Alanları</div>';
     Object.keys(B5_LABELS).forEach(function(c){
@@ -2698,7 +2727,6 @@ function profileAssessmentCardHTML(){
     det+='</div>';
   }
   // Kısa rapor özeti
-  var shortReport=ps.shortReport||(report&&report.sections&&report.sections.characterSummary?report.sections.characterSummary.body:'');
   if(shortReport){
     det+='<div style="border:1px solid var(--bd2);border-radius:12px;padding:11px 12px;margin-bottom:11px;background:var(--s1);">';
     det+='<div style="font-size:var(--f3);font-weight:800;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('file-text',15)+' Kısa Karakter Özeti</div>';

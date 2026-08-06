@@ -64,3 +64,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # GitHub Pages backend has intermittently queued deployments for
+          # ~9-10 min before completing; the 10 min action default was
+          # aborting deploys that would otherwise have succeeded.
+          timeout: 1200000

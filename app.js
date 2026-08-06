@@ -4299,7 +4299,7 @@ App.fetchPrayerLocationGPS=function(){
     var acc=Math.round(Number(pos.coords.accuracy)||0);
     data.settings.prayer.location={lat:lat,lon:lon,cityName:'GPS Konum',source:'gps',accuracy:acc||null,capturedAt:new Date().toISOString()};
     save(); render(); App.refreshPrayerTimes();
-  },function(err){ toast('Konum izni gerekli: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
+  },function(err){ if(err&&err.code===1) toastLocationDenied(); else toast('Konum alınamadı: '+String(err&&err.message||'bilinmiyor')); },{enableHighAccuracy:true,timeout:15000,maximumAge:120000});
 };
 App.setPrayerMethod=function(method){
   if(!data.settings) data.settings={}; if(!data.settings.prayer) data.settings.prayer={};
@@ -4535,7 +4535,7 @@ var LOC_BENEFITS=[
   {i:icon('target',17), t:'Adım hedefin yolda eriyorsa kart seni nazikçe uyarır; akşam küçük bir tur telafi eder.'},
   {i:icon('wind',17), t:'Derin bir nefes ve birkaç adım, uzun sürüşün gerginliğini alır; kart mola vaktini hatırlatır.'}
 ];
-var LOC_NUDGE={ minGapH:6, maxPerDay:2, prob:0.60, delayMinMs:3000, delayMaxMs:7000, dwellMs:8000, laterH:8, dismissH:4, backoffH:2, backoffMaxH:24, stopAfter:8, whisperDays:3 };
+var LOC_NUDGE={ minGapH:1/6, maxPerDay:999, prob:1, delayMinMs:1500, delayMaxMs:3000, dwellMs:8000, laterH:1/6, dismissH:1/6, backoffH:0, backoffMaxH:1/6, stopAfter:9999, whisperDays:1 };
 var locNudgeTimer=null;
 function ensureLocNudge(){
   if(!data) return null;
@@ -11971,6 +11971,28 @@ function updateMovementUI(){
   if(loc&&loc.ts){ var am=Math.round((Date.now()-new Date(loc.ts).getTime())/60000); upd=am<1?'az önce':am<60?am+' dk önce':am<1440?Math.round(am/60)+' sa önce':Math.round(am/1440)+' g önce'; }
   set('loc-updated',upd);
 }
+// iOS Safari web sayfaları için sistem konum izin diyaloğunu JS'ten yeniden
+// tetiklemenin veya Ayarlar uygulamasına programatik yönlendirmenin desteklenen
+// bir yolu yok — kalıcı red sonrası tek çözüm kullanıcının elle açması, bu yüzden
+// "nereye bakması gerektiğini" olabildiğince net söylüyoruz (standalone PWA'da
+// Ayarlar > Şeyma; Safari sekmesinde "aA" > Web Sitesi Ayarları farklı yerler).
+function isIOS(){
+  var ua=(navigator.userAgent||'');
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+}
+function isStandalonePWA(){
+  return !!(navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches));
+}
+function toastLocationDenied(){
+  if(isIOS()){
+    var msg=isStandalonePWA()
+      ? 'Konum izni kapalı · Ayarlar → Şeyma → Konum → "Uygulamayı Kullanırken"i seç'
+      : 'Konum izni kapalı · adres çubuğundaki "aA" simgesine dokun → Web Sitesi Ayarları → Konum → İzin Ver';
+    toast(msg,6500);
+  } else {
+    toast('Konum izni verilmedi · tarayıcı site ayarlarından izin ver',4000);
+  }
+}
 function startLocationWatch(announce){
   if(!navigator.geolocation) return;
   if(moveState.watchId!=null) return;
@@ -11978,7 +12000,7 @@ function startLocationWatch(announce){
   var firstOk=false;
   moveState.watchId=navigator.geolocation.watchPosition(
     function(pos){ if(announce && !firstOk){ firstOk=true; if(!psychActive()) toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
-    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='permission-denied'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum izni verilmedi'); } else if(err&&err.code===2){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='position-unavailable'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum alınamadı'); } else if(err&&err.code===3){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='timeout'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum zaman aşımı'); } },
+    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='permission-denied'; save(); } stopLocationWatch(); render(); if(!psychActive()) toastLocationDenied(); } else if(err&&err.code===2){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='position-unavailable'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum alınamadı'); } else if(err&&err.code===3){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='timeout'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum zaman aşımı'); } },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
 }

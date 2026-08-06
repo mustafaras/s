@@ -28,8 +28,8 @@ function extractFunction(name){
   var start=panelSource.indexOf('function '+name+'('); if(start<0) throw new Error(name+' bulunamadı');
   var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end);
 }
-var panelContext={PROJECTION_SECTIONS:{},String:String,Array:Array,Date:Date,Math:Math,isNaN:isNaN,icon:function(){return '';},esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}};
-vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('p4StageTextP')+'\n'+extractFunction('therapyRecencyTextP')+'\n'+extractFunction('p4ProvenanceCardHTMLP'),panelContext,{filename:'panel-p4-card.js'});
+var panelContext={PROJECTION_SECTIONS:{},PROJECTION_STATE:{source:'projection',reason:'ready',snapshot:null,data:null,coverage:null},SECTION_FETCH_STATE:{ok:true,lastError:null,failedAt:null},String:String,Array:Array,Date:Date,Math:Math,isNaN:isNaN,icon:function(){return '';},esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}};
+vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('emptyStateReasonP')+'\n'+extractFunction('emptyStateNoteHTMLP')+'\n'+extractFunction('p4StageTextP')+'\n'+extractFunction('therapyRecencyTextP')+'\n'+extractFunction('p4ProvenanceCardHTMLP'),panelContext,{filename:'panel-p4-card.js'});
 
 console.log('\n=== PANEL-006 / PANEL-04 — terapi, bildirim ve provenance fixture ===\n');
 console.log('[1] Dolu fixture — sensitive redaction + safe lifecycle');
@@ -56,6 +56,7 @@ var missing={lastOpenedDate:'2026-08-02',days:{},notifications:[]}, missingSnaps
 ok('yok fixture terapi/profil/bildirim/external durumunu taşır',missingSnapshot.sections.therapyProvenance.status==='missing'&&missingSnapshot.sections.profileProgress.status==='missing'&&missingSnapshot.sections.notificationTimeline.status==='missing'&&missingSnapshot.sections.externalSources.status==='missing');
 panelContext.PROJECTION_SECTIONS=missingSnapshot.sections;
 ok('yok fixture kartı çökmeksizin render olur',panelContext.p4ProvenanceCardHTMLP().includes('Terapi araçları')&&panelContext.p4ProvenanceCardHTMLP().includes('Kayıt yok'));
+ok('varsayılan sağlıklı global state ile profil/bildirim/dış kaynak "henüz kullanılmamış" metni gösterir',panelContext.p4ProvenanceCardHTMLP().includes('Bu özellik henüz kullanılmamış.'));
 var broken=fixture(); broken.days['2026-08-02'].therapy.thoughts=[null]; broken.days['2026-08-02'].sleep.windDown.events=[null]; broken.notifications=[null]; broken.profileAssessment.responses='broken';
 var brokenSnapshot=P.buildObserverSnapshot(broken,receipt,'2026-08-02T15:00:05.000Z');
 ok('bozuk terapi/event/bildirim yapısı fail-safe görünür',brokenSnapshot.sections.therapyProvenance.status==='malformed'&&brokenSnapshot.sections.therapyProvenance.windDown.status==='malformed'&&brokenSnapshot.sections.notificationTimeline.status==='malformed');

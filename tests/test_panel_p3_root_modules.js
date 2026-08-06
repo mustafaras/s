@@ -32,11 +32,13 @@ function extractFunction(name){
 }
 var panelContext={
   PROJECTION_SECTIONS:{},
+  PROJECTION_STATE:{source:'projection',reason:'ready',snapshot:null,data:null,coverage:null},
+  SECTION_FETCH_STATE:{ok:true,lastError:null,failedAt:null},
   String:String,Array:Array,Date:Date,Math:Math,isNaN:isNaN,
   icon:function(){return '';},
   esc:function(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 };
-vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('p3SettingsSummaryP')+'\n'+extractFunction('rootModulesCardHTMLP'),panelContext,{filename:'panel-p3-card.js'});
+vm.runInNewContext('var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;\n'+extractFunction('p3BadgeP')+'\n'+extractFunction('p3TimeP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('stalenessBadgeP')+'\n'+extractFunction('emptyStateReasonP')+'\n'+extractFunction('emptyStateNoteHTMLP')+'\n'+extractFunction('p3SettingsSummaryP')+'\n'+extractFunction('rootModulesCardHTMLP'),panelContext,{filename:'panel-p3-card.js'});
 
 console.log('\n=== PANEL-005 / PANEL-03 — eksik kök modül fixture ===\n');
 console.log('[1] Dolu fixture — all targets + source/privacy badges');
@@ -98,6 +100,24 @@ ok('stale konum kartında Eski cache rozeti görünür',staleLocHtml.includes('E
 var recentLoc=base(); recentLoc.lastOpenedDate='2026-08-03'; recentLoc.location.ts='2026-08-02T11:00:00.000Z'; recentLoc.locationLastTs='2026-08-02T11:00:01.000Z';
 var recentLocSnapshot=P.buildObserverSnapshot(recentLoc,receipt,'2026-08-03T15:00:05.000Z');
 ok('1 gün önceki konum örneği eşiği aşmaz, stale olmaz',recentLocSnapshot.sections.locationTiming.status==='ok'&&recentLocSnapshot.sections.locationTiming.daysSinceLastSample===1);
+
+console.log('[6] Boş durum kategorileri — hiç kullanılmadı / senkron bekleniyor / hata');
+panelContext.PROJECTION_STATE={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
+panelContext.SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+ok('hiç kullanılmamış modül -> unused metni',panelContext.emptyStateReasonP('missing').kind==='unused'&&panelContext.emptyStateReasonP('missing').text.includes('henüz kullanılmamış'));
+panelContext.SECTION_FETCH_STATE={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
+ok('section_fetch_failed durumunda -> pending metni',panelContext.emptyStateReasonP('missing').kind==='pending'&&panelContext.emptyStateReasonP('missing').text.includes('Senkron bekleniyor'));
+panelContext.SECTION_FETCH_STATE={ok:true,lastError:null,failedAt:null};
+panelContext.PROJECTION_STATE={source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:null,coverage:null};
+ok('projection_invalid durumunda -> error metni',panelContext.emptyStateReasonP('missing').kind==='error'&&panelContext.emptyStateReasonP('missing').text.includes('hata'));
+ok('missing olmayan status için null döner (ok/malformed/stale kendi mesajı korunur)',panelContext.emptyStateReasonP('ok')===null&&panelContext.emptyStateReasonP('malformed')===null&&panelContext.emptyStateReasonP('stale')===null);
+ok('üç kategori metni birbirinden farklı',new Set(['unused','pending','error'].map(function(k){ var st=k==='pending'?{ok:false}:{ok:true}; panelContext.SECTION_FETCH_STATE=st; panelContext.PROJECTION_STATE={reason:k==='error'?'projection_invalid':'ready'}; return panelContext.emptyStateReasonP('missing').text; })).size===3);
+panelContext.PROJECTION_STATE={source:'projection',reason:'ready',snapshot:null,data:null,coverage:null};
+panelContext.SECTION_FETCH_STATE={ok:false,lastError:'network',failedAt:'2026-08-05T10:00:00.000Z'};
+var emptyRoom=base(); delete emptyRoom.roomContentHistory;
+var emptyRoomSnapshot=P.buildObserverSnapshot(emptyRoom,receipt,'2026-08-05T15:00:00.000Z');
+panelContext.PROJECTION_SECTIONS=emptyRoomSnapshot.sections;
+ok('kart seviyesinde de pending metni gerçekten render ediliyor (uçtan uca)',panelContext.rootModulesCardHTMLP().includes('Senkron bekleniyor · veri gelmiş olabilir'));
 
 console.log('\nPANEL-005 / PANEL-03 result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

@@ -2101,6 +2101,36 @@ function commandRiskHTMLP(riskState,canonical,projectionState){
   else if(poll.code==='stale'||(projectionState&&projectionState.reason==='projection_stale')){ kind='warning'; title='Görünüm eski olabilir'; detail='Kaynak veya projection yaşı nedeniyle karar verirken zamanı kontrol et.'; }
   return '<section class="d2-risk-band d2-risk-'+kind+'" data-component="risk-banner" role="'+(kind==='danger'?'alert':'status')+'" aria-live="polite"><div class="d2-risk-copy"><span class="d2-risk-icon" aria-hidden="true">'+(kind==='danger'?'!':kind==='ok'?'✓':'△')+'</span><div><b>'+esc(title)+'</b><span>'+esc(detail)+'</span></div></div><div class="d2-risk-meta">'+d2StatusBadgeP(riskState&&riskState.txt||'Risk bekleniyor',kind,'b-'+(kind==='warning'?'warn':kind==='danger'?'danger':'ok'))+'<span>'+esc(poll.label||'Yakın takip bekleniyor')+'</span></div></section>';
 }
+// D1.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §6.1) — audit apparatus'un yerini
+// alacak, zaten hesaplanan sinyallerden (risk/moodDist/sosRows/missingDays/
+// uyku trendi/terapi son kayıt) türetilen, insan-odaklı "bugüne bak" özeti.
+// Yeni bir risk motoru DEĞİL — risk()'in kendi eşikleriyle (panel.js:1729)
+// tutarlı, yalnızca metne döken bir katman.
+function needsAttentionCardHTMLP(riskState,moodDist,sosRows,missingCount,curSleep,prevSleep,therapyText){
+  var maddeler=[];
+  if(missingCount>=2) maddeler.push(missingCount+' gündür kayıt yok');
+  var weekAgo=addDays(today(),-7);
+  var sosCount=(Array.isArray(sosRows)?sosRows:[]).filter(function(d){return d>=weekAgo;}).reduce(function(a,d){ var r=recOf(d); return a+(r&&r.cravingSOSCount?Number(r.cravingSOSCount):0); },0);
+  if(sosCount>=1) maddeler.push('Son 7 günde '+sosCount+' kez SOS kullanıldı');
+  var toughDays=((moodDist&&moodDist['zorlandim'])||0)+((moodDist&&moodDist['cok-zorlandim'])||0);
+  if(toughDays>=3) maddeler.push('Bu dönem '+toughDays+' gün zor geçmiş');
+  if(curSleep>0&&prevSleep>0&&curSleep<prevSleep-1.5) maddeler.push('Uyku ortalaması düşüyor: '+(Math.round(prevSleep*10)/10)+' → '+(Math.round(curSleep*10)/10)+' sa');
+  if(therapyText) maddeler.push(therapyText);
+  var calm=maddeler.length===0;
+  var tone=calm?'ok':(riskState&&riskState.klass)||'warn';
+  var cls=tone==='danger'?'danger':tone==='ok'?'ok':'warning';
+  var h='<div class="card lift span-12 pad needs-attention-card needs-attention-'+cls+'" data-component="needs-attention" style="order:6;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('heart-handshake',14)+' Bugün Ne Yapmalıyım</div>';
+  if(calm){
+    h+='<p class="p3-muted" style="margin:6px 0 0;">Şu an dikkat gereken bir şey görünmüyor · ritim sakin</p>';
+  } else {
+    h+='<ul style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px;">';
+    maddeler.slice(0,3).forEach(function(m){ h+='<li style="font-size:13.5px;color:var(--t2);">'+esc(m)+'</li>'; });
+    h+='</ul>';
+  }
+  h+='</div>';
+  return h;
+}
 function coreStripHTML(){
   var mods=coreModules();
   var online=mods.reduce(function(a,m){return a+(m.on?1:0);},0);
@@ -3215,6 +3245,8 @@ function render(){
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
   h+=coreStripHTML();
+  var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
+  h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
   h+=auditEntryHTMLP();
   h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)

@@ -46,7 +46,12 @@ context.PROJECTION={sections:{dailyPhoto:{status:'ready',title:'Fotoğraf'},room
 vm.runInNewContext(extractFunction('p3TimeP')+'\n'+extractFunction('statusToneP')+'\n'+extractFunction('panelToneOverrideP')+'\n'+extractFunction('panelStatusP')+'\n'+extractFunction('panelStatusBadgeHTMLP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('auditRollupStatusP')+'\n'+extractFunction('auditEntryHTMLP'),context,{filename:'panel-audit-entry.js'});
 var auditHtml=context.auditEntryHTMLP();
 ok('kompakt audit girişi gerçek HTML üretir',auditHtml.includes('Eksik Kök Modüller')&&auditHtml.includes('Terapi · Bildirim · Provenance')&&auditHtml.includes('174 cevap anahtarı')&&auditHtml.includes('Denetim Merkezi'));
-ok('normal dashboard hedef kartlarını tekrar basmaz',renderSource.includes('h+=auditEntryHTMLP();')&&!renderSource.includes('h+=rootModulesCardHTMLP();')&&!renderSource.includes('h+=p4ProvenanceCardHTMLP();')&&!renderSource.includes('h+=d4ModuleAtlasHTMLP();'));
+// D3.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §4/§9 Faz 3) — auditEntryHTMLP()
+// artık render()'ın birincil akışından da çıkarıldı (dev-mode'a taşındı,
+// bkz. toggleAuditPage/setAuditTab). Bu assertion'ın özgün amacı korunuyor
+// (ağır audit fragmanlarının render()'da tekrar basılmaması) ama artık
+// auditEntryHTMLP() de bu listeye dahil — hiçbiri render()'da çağrılmamalı.
+ok('normal dashboard audit fragmanlarını basmaz (dev-mode\'a taşındı)',!renderSource.includes('h+=auditEntryHTMLP();')&&!renderSource.includes('h+=rootModulesCardHTMLP();')&&!renderSource.includes('h+=p4ProvenanceCardHTMLP();')&&!renderSource.includes('h+=d4ModuleAtlasHTMLP();'));
 ok('audit ayrıntıları sekmeli yüzeye bağlıdır',panelSource.includes('function auditPageHTMLP(')&&panelSource.includes('function setAuditTab(')&&panelSource.includes('function auditPaneHTMLP('));
 ok('harita canonical panel fix bağlamını kullanır',initSource.includes('panelLocationP()')&&!initSource.includes('var loc=D&&D.location?D.location:null'));
 ok('harita yeniden boyutlandırmayı güvenceye alır',initSource.includes('invalidateSize'));

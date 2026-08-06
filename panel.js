@@ -3380,9 +3380,7 @@ function render(){
   h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
   h+=weeklyDigestCardHTMLP(curAvg,prevAvg,curSleep,prevSleep,curSos,prevSos,curSess);
   h+=monthlyHeatmapCardHTMLP(UI.month);
-  h+=auditEntryHTMLP();
   h+=curatedChangeLogCardHTMLP();
-  h+=eventLogCardHTMLP();
   // 5 sabit bölüm başlığı — CSS "order" ile doğru sıraya yerleşir, kartların DOM sırası/verisi değişmez (sıfır veri kaybı)
   SECTIONS.forEach(function(sec){
     h+='<div class="section-header" id="'+sec.id+'" role="region" aria-labelledby="'+sec.id+'-title" style="order:'+(sec.ord-1)+';"><span class="sh-ico" aria-hidden="true">'+sec.ico+'</span><span class="sh-title" id="'+sec.id+'-title">'+sec.title+'</span><span class="sh-sub">'+sec.sub+'</span></div>';

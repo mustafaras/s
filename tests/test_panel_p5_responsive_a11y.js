@@ -41,7 +41,7 @@ ok('header, sticky nav ve section header çakışma sözleşmesi',cssSource.incl
 ok('tüm ana eylemler 44px hedef sözleşmesine bağlı',cssSource.includes('--touch-min:44px')&&cssSource.includes('button{font:inherit;min-height:var(--touch-min)}')&&cssSource.includes('button[aria-label]{min-width:var(--touch-min)}'));
 ok('visible focus ring ve yüksek kontrast override var',cssSource.includes('button:focus-visible')&&cssSource.includes('--focus-ring:0 0 0 4px #fff')&&cssSource.includes('@media(prefers-contrast:more)'));
 ok('reduced-motion CSS tüm animasyon/transition/scroll davranışını sakinleştiriyor',cssSource.includes('@media(prefers-reduced-motion:reduce)')&&cssSource.includes('animation-duration:.01ms!important')&&cssSource.includes('scroll-behavior:auto!important'));
-ok('panel HTML cache D5 sürümünde',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806m'));
+ok('panel HTML cache D5 sürümünde',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806n'));
 
 var doc={activeElement:null,getElementById:function(){return null;},querySelector:function(){return null;}};
 var context={window:{matchMedia:function(){return {matches:false};}},UI:{expandedCards:{},d4SelectedModule:null,eventSelectedId:null},CARDEXPKEY:'d5-fixture',document:doc,localStorage:{setItem:function(){}},esc:esc,icon:function(){return '';},String:String};

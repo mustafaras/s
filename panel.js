@@ -137,7 +137,7 @@ var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issu
 // Kart tazelik rozeti eşikleri: <1 gün "güncel", 1-7 gün "N gün önce" (uyarı),
 // >7 gün "eski" (tehlike). dailyPhoto'nun kendi stale mantığından bağımsızdır.
 var STALE_WARN_DAYS=1, STALE_DANGER_DAYS=7;
-var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:5,eventFilter:"all",d4SelectedModule:null,curatedLogShowAll:false};
+var UI={range:30,selectedDate:null,month:null,msgDraft:"",msgSending:false,aeonReplies:{},expandedCards:{},insightTab:"usage",density:"standard",showAuditPage:false,auditTab:"root",auditReturnScroll:0,newChanges:0,aeonRecActiveP:false,motivationFilter:"all",soulArchiveExpanded:false,soulArchiveType:null,quranBusyId:"",eventLimit:5,eventFilter:"all",d4SelectedModule:null,curatedLogShowAll:false,devTapCount:0,devTapFirstAt:0};
 var D4_DRAWER_RETURN_ID=null;
 var OBSINBOX=[], OBSSHA=null, OBSRECEIPTS={}, MARKED_REVIEW={};
 var HABITS=[["sweetManaged","Tatlı krizini yönettim"],["foodManaged","Yemek/açlık krizini yönettim","2026-07-10"],["coffeeManaged","Kahve/kafein krizini yönettim","2026-07-10"],["eveningControl","Akşam 7'den sonra gereksiz atıştırmadım"],["walked20","En az 4.500 adım yürüdüm"],["protein","2 ana öğünde protein vardı"],["water","Su içmeyi ihmal etmedim"],["vitaminD","D₃K₂ damla aldım"],["sleepReg","Yeterli uyudum (7,5+ saat)","2026-06-28"],["journaled","Duygu/günlük notu yazdım","2026-07-03"],["mediaFed","Zihnimi besledim","2026-07-09"],["freshAir","Açık havaya çıktım","2026-07-03"],["selfKind","Kendime kötü davranmadım"],["caffeineOk","Günlük kafein limitini aşmadım","2026-07-10"],["magnesium","Magnezyum takviyesi aldım"]];
@@ -1462,6 +1462,23 @@ function toggleAuditPage(show){
   if(typeof requestAnimationFrame==='function') requestAnimationFrame(restoreScroll); else setTimeout(restoreScroll,0);
 }
 window.toggleAuditPage=toggleAuditPage;
+// D2.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §5) — audit apparatus'un tam
+// sayfa görünümüne (auditPageHTMLP/toggleAuditPage, YUKARIDA, DEĞİŞMEDİ)
+// gizli bir ikinci giriş yolu. Görünür hiçbir buton/link yok; localStorage'a
+// iz bırakmaz, yalnızca bellekte (UI) tutulur, sayfa yenilenince sıfırlanır.
+function devLogoTapP(){
+  var now=Date.now();
+  if(!UI.devTapCount||now-UI.devTapFirstAt>5000){ UI.devTapCount=1; UI.devTapFirstAt=now; return; }
+  UI.devTapCount++;
+  if(UI.devTapCount>=5){ UI.devTapCount=0; UI.devTapFirstAt=0; toggleAuditPage(true); }
+}
+window.devLogoTapP=devLogoTapP;
+function initDevModeUrlTriggerP(){
+  try{
+    if(typeof location==='undefined'||typeof URLSearchParams==='undefined') return;
+    if(new URLSearchParams(location.search).get('debug')==='1') toggleAuditPage(true);
+  }catch(e){}
+}
 function d4SafeTimeP(v){ return v?String(v).slice(0,16).replace('T',' '):'—'; }
 function d4LatestTimeP(values){
   var valid=(Array.isArray(values)?values:[]).filter(function(v){return !!v;}).map(String).sort();
@@ -2253,7 +2270,7 @@ function coreStripHTML(){
   var notifAge=lastNotif?(Date.now()-new Date(lastNotif).getTime()):null;
   var s='<div class="card pad d2-core-strip span-12" data-component="command-center" style="order:1;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
   s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
-  s+='<div style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);">⬡</div>';
+  s+='<div onclick="devLogoTapP()" style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);cursor:default;">⬡</div>';
   s+='<div style="line-height:1.2;"><div style="font-size:var(--f4);font-weight:800;color:var(--t1);letter-spacing:2px;">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Orchestration Core</div></div>';
   s+='</div>';
   s+='<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;">';
@@ -4933,6 +4950,7 @@ try{
   if(['root','provenance','modules','events'].indexOf(auditRaw)>=0) UI.auditTab=auditRaw;
 }catch(e){}
 load();
+initDevModeUrlTriggerP();
 // Panel otomatik yenileme: ~15 sn'de bir (mesajlar mümkün olduğunca anlık gelsin),
 // ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.

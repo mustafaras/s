@@ -115,7 +115,7 @@ PANEL-DENETIM-MERKEZI-LEDGER.md (bu dosya) ──her ledger satırı bir prompt'
 
 | Prompt | Plan Bölümü | Durum | Commit SHA | Test Sonucu | Deploy Run | Tarih | Not |
 |--------|-------------|-------|------------|-------------|------------|-------|-----|
-| D1.1 | §6.1 | `pending` | — | — | — | — | "Bugün Ne Yapmalıyım" kartı |
+| D1.1 | §6.1 | `done` | 4eaf798 | test_panel_needs_attention.js 11/11 PASS (yeni) + test_panel_p0_sync 31/31, p1_projection 35/35 PASS + 21 diğer panel test dosyası regresyonsuz PASS (3 bilinen test_panel_v2_* çökmesi git stash ile önceden var olduğu doğrulandı, kapsam dışı) | — | 2026-08-06 | needsAttentionCardHTMLP() eklendi (panel.js:2104 sonrası), render():3218 öncesine bağlandı; cache-bust panel.js→20260806h aynı commit'te yapıldı (3 hardcoded test literal'i güncellendi) |
 | D1.2 | §6.2 | `pending` | — | — | — | — | "Bu hafta değişenler" süzülmüş liste |
 | D1.3 | §12.1 A4 | `pending` | — | — | — | — | Haftalık otomatik özet |
 | D1.4 | §12.1 A2 | `pending` | — | — | — | — | Aylık ısı haritası takvimi |

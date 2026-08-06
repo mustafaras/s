@@ -1737,6 +1737,30 @@ function shiftMonthP(mk,delta){
 }
 function setPanelMonthP(mk){ UI.month=mk; render(); }
 window.setPanelMonthP=setPanelMonthP;
+// D1.5 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A6) — yalnız gerçekten bir
+// kilometre taşı geçildiğinde beliren, "her zaman görünen kart" OLMAYAN
+// kutlama şeridi. `data`'ya "gösterildi mi" bayrağı YAZMAZ, her render'da
+// mevcut duruma göre yeniden hesaplanır.
+function sosFreeStreakP(){
+  var c=0,d=today();
+  while(D&&D.startDate&&diff(D.startDate,d)>=0){
+    var r=recOf(d);
+    if(r&&r.cravingSOSCount&&Number(r.cravingSOSCount)>0) break;
+    c++; d=addDays(d,-1);
+  }
+  return c;
+}
+function milestoneRibbonHTMLP(streak,best,therapyUsageCount,sosFreeStreak){
+  var badges=[];
+  if(streak===best&&best>=7) badges.push({icon:'trophy',text:'Yeni seri rekoru! '+best+' gün'});
+  if(sosFreeStreak>=30) badges.push({icon:'shield-check',text:sosFreeStreak+' gündür SOS\'suz'});
+  [10,25,50].forEach(function(n){ if(therapyUsageCount===n) badges.push({icon:'heart-handshake',text:'Terapi aracını '+n+'. kez kullandın'}); });
+  if(!badges.length) return '';
+  var h='<div class="card lift span-12 pad milestone-ribbon-card" data-component="milestone-ribbon" style="order:2;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">';
+  badges.forEach(function(b){ h+='<span class="milestone-badge" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(212,175,55,.08));border:1px solid rgba(212,175,55,.35);font-size:12.5px;font-weight:800;color:var(--gold);">'+icon(b.icon,14)+' '+esc(b.text)+'</span>'; });
+  h+='</div>';
+  return h;
+}
 function monthlyHeatmapCardHTMLP(mk){
   var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
   var days=monthDaysP(mk), parts=String(mk||'').split('-');
@@ -3315,6 +3339,8 @@ function render(){
     {key:'senkron',label:'Senkron',icon:'⇄',value:d2StatusBadgeP(canonical.label,canonical.kind,canonical.cls),detail:'revision · '+esc(canonical.revision?String(canonical.revision).slice(0,12):'—')+' · '+esc(canonical.detail)}
   ]);
   h+=commandRiskHTMLP(rsk,canonical,PROJECTION.state);
+  var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
+  h+=milestoneRibbonHTMLP(currentStreak(),bestStreak(all),naTh.thoughtCount||0,sosFreeStreakP());
   h+=coverageRibbonHTMLP(PROJECTION.state);
 
   // ── erişilebilir hızlı yönlendirme ─────────────────────────
@@ -3334,7 +3360,6 @@ function render(){
   // ── BENTO GRID ──────────────────────────────────────────────
   h+='<div class="bento">';
   h+=coreStripHTML();
-  var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
   h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
   h+=weeklyDigestCardHTMLP(curAvg,prevAvg,curSleep,prevSleep,curSos,prevSos,curSess);
   h+=monthlyHeatmapCardHTMLP(UI.month);

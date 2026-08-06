@@ -2167,6 +2167,27 @@ function needsAttentionCardHTMLP(riskState,moodDist,sosRows,missingCount,curSlee
   h+='</div>';
   return h;
 }
+// D1.3 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A4) — cur/prev pencere
+// karşılaştırmalarından türetilmiş, insan diliyle yazılmış haftalık özet.
+// LLM/network yok — düz string birleştirme. tc()'nin (render() içi,
+// panel.js:3175 civarı) kullandığı fark<0.05 → "→" eşiğiyle tutarlı.
+function trendArrowP(now,prev){
+  var d=now-prev, a=Math.abs(d);
+  if(a<0.05) return '→';
+  return d>0?'↑':'↓';
+}
+function weeklyDigestCardHTMLP(curAvg,prevAvg,curSleep,prevSleep,curSos,prevSos,curSess){
+  var ritimArrow=trendArrowP(curAvg,prevAvg);
+  var ritimTxt=ritimArrow==='→'?'geçen haftaya göre benzer':(ritimArrow==='↑'?'geçen haftaya göre daha hareketli':'geçen haftaya göre sakin');
+  var sleepTxt=curSleep>0?('uyku ortalaması '+(Math.round(curSleep*10)/10)+' saat '+trendArrowP(curSleep,prevSleep)):'uyku kaydı yok';
+  var sosTxt=curSos>0?(curSos+' kez SOS oldu '+trendArrowP(curSos,prevSos)):'SOS olmadı';
+  var sessionTxt=(curSess&&curSess.sessionCount)?(' '+curSess.sessionCount+' oturumda uygulama kullanıldı.'):'';
+  var h='<div class="card lift span-12 pad weekly-digest-card" data-component="weekly-digest" style="order:6;display:flex;flex-direction:column;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('calendar',14)+' Bu Hafta Nasıldı</div>';
+  h+='<p style="margin:6px 0 0;font-size:13.5px;color:var(--t2);line-height:1.6;">Bu hafta ritim '+esc(ritimTxt)+' · '+esc(sleepTxt)+' · '+esc(sosTxt)+'.'+esc(sessionTxt)+'</p>';
+  h+='</div>';
+  return h;
+}
 function coreStripHTML(){
   var mods=coreModules();
   var online=mods.reduce(function(a,m){return a+(m.on?1:0);},0);
@@ -3283,6 +3304,7 @@ function render(){
   h+=coreStripHTML();
   var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
   h+=needsAttentionCardHTMLP(rsk,moodDist,sosRows,missingInRange,curSleep,prevSleep,therapyRecencyTextP(naTh));
+  h+=weeklyDigestCardHTMLP(curAvg,prevAvg,curSleep,prevSleep,curSos,prevSos,curSess);
   h+=auditEntryHTMLP();
   h+=curatedChangeLogCardHTMLP();
   h+=eventLogCardHTMLP();

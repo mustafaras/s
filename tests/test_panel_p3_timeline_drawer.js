@@ -29,7 +29,7 @@ ok('event satırları tıklanabilir drawer tetiklemez (ölü kod temizlendi)',!h
 context.UI.eventFilter='external';
 var external=context.eventLogCardHTMLP();
 ok('external filtresi yalnız dış kaynağı gösterir',external.includes('evt-external')&&!external.includes('evt-chain-1')&&!external.includes('evt-derived'));
-ok('cache-bust güncel panel sürümünde',htmlSource.includes('panel.css?v=20260805b')&&htmlSource.includes('panel.js?v=20260806o'));
+ok('cache-bust güncel panel sürümünde',htmlSource.includes('panel.css?v=20260807a')&&htmlSource.includes('panel.js?v=20260806p'));
 
 console.log('\nPANEL-012 / PANEL-10 fixture result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

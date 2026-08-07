@@ -180,6 +180,10 @@
   /* ÆON paneli: desktop 12 kolon; mobil daraltma yalnız D5 media koşulunda yapılır. */
   .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px;max-width:100%;margin:0 auto}
   .faith-yheat-scroll{overflow-x:auto;padding:3px 0 5px}.faith-yheat-months{width:744px;display:grid;grid-template-columns:repeat(12,1fr);font-size:9px;color:var(--t4);padding-bottom:3px}.faith-yheat{width:max-content;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px}.faith-yheat i{width:11px;height:11px;border-radius:3px;background:var(--s3);border:1px solid var(--bd);box-sizing:border-box}.faith-yheat i.blank{visibility:hidden}.faith-yheat i[data-l="1"]{background:color-mix(in srgb,var(--faith) 34%,var(--s3))}.faith-yheat i[data-l="2"]{background:color-mix(in srgb,var(--faith) 58%,var(--s3))}.faith-yheat i[data-l="3"]{background:color-mix(in srgb,var(--faith) 82%,var(--s3))}.faith-yheat i[data-l="4"]{background:linear-gradient(135deg,var(--faith2),var(--faith));border-color:var(--faith2)}.faith-yheat-legend{display:flex;align-items:center;gap:5px;font-size:var(--f3);color:var(--t4);margin-top:8px}.faith-yheat-legend b{color:var(--faith)}
+  /* Aylık + Yıllık Görünüm kartı yan yana iki kolon (2026-08-07, kullanıcı talebi) — TEK kart içinde flex satırı, dar ekranda alt alta yığılır; ayrı bento kartlarının "düzensiz yan yana" sorunu (satır 176-179'daki not) burada geçerli değil çünkü ikisi de aynı kartın içinde. */
+  .monthly-yearly-row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .monthly-yearly-row>.myh-col{flex:1 1 240px;min-width:220px}
+  .mood-yheat i[data-l="1"]{background:color-mix(in srgb,#fb7185 40%,var(--s3))}.mood-yheat i[data-l="2"]{background:color-mix(in srgb,#fbbf24 55%,var(--s3))}.mood-yheat i[data-l="3"]{background:color-mix(in srgb,#a3e635 70%,var(--s3))}.mood-yheat i[data-l="4"]{background:linear-gradient(135deg,#4ade80,#22c55e);border-color:#22c55e}
   .bento>.span-2{grid-column:span 6}
   .bento>.span-3,.bento>.span-4,.bento>.span-5,.bento>.span-6,.bento>.span-7,.bento>.span-8,.bento>.span-12{grid-column:span 12}
 

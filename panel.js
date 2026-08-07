@@ -1752,7 +1752,17 @@ function shiftMonthP(mk,delta){
   while(m>12){ m-=12; y++; }
   return y+'-'+pad(m);
 }
-function setPanelMonthP(mk){ UI.month=mk; render(); }
+// Kullanıcı talebi (2026-08-07): ay değiştirirken tüm sayfa render()
+// edilip "gereksiz refresh" hissi vermesin — yalnızca kartın kendi
+// innerHTML'i güncellenir (refreshEventLogP/toggleCuratedLogShowAllP ile
+// AYNI hedefli-güncelleme deseni). Kart DOM'da yoksa (ör. henüz ilk
+// render tamamlanmadıysa) güvenli fallback olarak tam render() yapılır.
+function setPanelMonthP(mk){
+  UI.month=mk;
+  var card=typeof document!=='undefined'?document.getElementById('monthly-heatmap-card'):null;
+  if(!card){ render(); return; }
+  card.innerHTML=monthlyYearlyRowHTMLP(mk);
+}
 window.setPanelMonthP=setPanelMonthP;
 // D1.5 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A6) — yalnız gerçekten bir
 // kilometre taşı geçildiğinde beliren, "her zaman görünen kart" OLMAYAN
@@ -1778,11 +1788,14 @@ function milestoneRibbonHTMLP(streak,best,therapyUsageCount,sosFreeStreak){
   h+='</div>';
   return h;
 }
-function monthlyHeatmapCardHTMLP(mk){
+// Aylık ısı grid'inin gövdesi — dış kart div'inden ayrıldı (2026-08-07,
+// kullanıcı talebi) ki setPanelMonthP() ay değişiminde tüm sayfayı değil
+// yalnızca bu iç içeriği yeniden yazabilsin.
+function monthlyHeatmapInnerHTMLP(mk){
   var moodColor={"cok-iyi":"#4ade80","iyi":"#a3e635","normal":"#fbbf24","zorlandim":"#fb923c","cok-zorlandim":"#fb7185"};
   var days=monthDaysP(mk), parts=String(mk||'').split('-');
   var label=parts.length===2?new Date(Number(parts[0]),Number(parts[1])-1,1).toLocaleDateString('tr-TR',{month:'long',year:'numeric'}):mk;
-  var h='<div class="card lift span-12 pad monthly-heatmap-card" data-component="monthly-heatmap" style="order:29;display:flex;flex-direction:column;">';
+  var h='<div class="myh-col">';
   h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('calendar',14)+' Aylık Görünüm<span style="margin-left:auto;display:flex;align-items:center;gap:8px;"><button type="button" onclick="setPanelMonthP(\''+shiftMonthP(mk,-1)+'\')" aria-label="Önceki ay" style="border:none;background:transparent;cursor:pointer;color:var(--t2);">‹</button><span class="mono" style="font-size:12.5px;">'+esc(label)+'</span><button type="button" onclick="setPanelMonthP(\''+shiftMonthP(mk,1)+'\')" aria-label="Sonraki ay" style="border:none;background:transparent;cursor:pointer;color:var(--t2);">›</button></span></div>';
   h+='<div class="monthly-heatmap-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;">';
   days.forEach(function(d){
@@ -1791,6 +1804,34 @@ function monthlyHeatmapCardHTMLP(mk){
   });
   h+='</div></div>';
   return h;
+}
+// Yıllık ısı şeridi (2026-08-07, kullanıcı talebi — aylık kartın yanına).
+// faithAnnualPanelCardP()'nin (panel.js:340 civarı) GitHub-tarzı
+// .faith-yheat ızgara desenini yeniden kullanır — yalnızca renk skalası
+// .mood-yheat modifier sınıfıyla (panel.css) mood verisine göre değişir.
+function moodDayLevelP(d){
+  var r=recOf(d);
+  if(!r||!r.mood) return 0;
+  var levels={"cok-zorlandim":1,"zorlandim":1,"normal":2,"iyi":3,"cok-iyi":4};
+  return levels[r.mood]||0;
+}
+function yearlyMoodHeatInnerHTMLP(mk){
+  var year=Number(String(mk||'').slice(0,4))||Number(today().slice(0,4));
+  var first=year+'-01-01', last=year+'-12-31', dow=(new Date(year,0,1).getDay()+6)%7, cells='', active=0;
+  for(var b=0;b<dow;b++) cells+='<i class="blank"></i>';
+  for(var d=first;d<=last;d=addDays(d,1)){
+    var lvl=moodDayLevelP(d), r=recOf(d);
+    if(lvl>0) active++;
+    cells+='<i data-l="'+lvl+'" title="'+esc(shortD(d)+(r&&r.mood?' · '+(MOOD_LABEL[r.mood]||r.mood):''))+'"></i>';
+  }
+  var months='<div class="faith-yheat-months"><span>Oca</span><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span><span>Eki</span><span>Kas</span><span>Ara</span></div>';
+  return '<div class="myh-col"><div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('calendar',14)+' Yıllık Görünüm · '+year+'</div><div class="faith-yheat-scroll mood-yheat" style="margin-top:8px;">'+months+'<div class="faith-yheat">'+cells+'</div></div><div class="faith-yheat-legend"><b>'+active+' kayıtlı gün</b></div></div>';
+}
+function monthlyYearlyRowHTMLP(mk){
+  return '<div class="monthly-yearly-row">'+monthlyHeatmapInnerHTMLP(mk)+yearlyMoodHeatInnerHTMLP(mk)+'</div>';
+}
+function monthlyHeatmapCardHTMLP(mk){
+  return '<div id="monthly-heatmap-card" class="card lift span-12 pad monthly-heatmap-card" data-component="monthly-heatmap" style="order:29;">'+monthlyYearlyRowHTMLP(mk)+'</div>';
 }
 function timeAgo(iso){
   if(!iso) return '';

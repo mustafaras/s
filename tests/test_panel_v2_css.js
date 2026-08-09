@@ -109,6 +109,7 @@ classRule("sub-tab.is-active");
 
 // ── Buttons ──
 classRule("ae-btn");
+classRule("ae-btn--glow");
 classRule("ae-status-btn");
 classRule("density-btn");
 assert(css.includes("background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));"), "Primary/pill gradient var");
@@ -148,6 +149,13 @@ classRule("ae-metric__delta");
 classRule("ae-ring");
 classRule("ae-ring__progress");
 classRule("summary-card");
+classRule("anomaly-card__severity");
+assert(css.includes(".summary-card.ae-metric"), "SummaryCard kompakt AeMetric stilleri var");
+assert(js.includes("function AeCard"), "AeCard komponenti JS'de var");
+assert(js.includes("cardVariants"), "AeCard canonical variant listesi var");
+assert(js.includes("return AeMetric({"), "SummaryCard AeMetric'e delege ediyor");
+assert(js.includes("function DetailSection"), "DetailSection komponenti JS'de var");
+assert(js.includes("function DetailBlock"), "DetailBlock komponenti JS'de var");
 classRule("ae-empty");
 classRule("ae-empty__icon");
 classRule("ae-divider");

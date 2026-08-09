@@ -120,7 +120,9 @@
     var icon = opts.icon || "◌";
     var title = safeText(opts.title || "Henüz veri yok", 80);
     var message = safeText(opts.message || "Bu bölümde görüntülenecek veri şu an yok.", 240);
-    return '<div class="ae-empty ae-scale-in">' +
+    var variant = safeText(opts.variant || "", 20).replace(/[^A-Za-z0-9_-]/g, "");
+    var cls = classNames(["ae-empty", "ae-scale-in", variant ? "ae-empty--" + variant : "", opts.className]);
+    return '<div class="' + escapeHtml(cls) + '" role="' + escapeHtml(opts.role || "status") + '" aria-live="polite">' +
            '<div class="ae-empty__icon">' + escapeHtml(icon) + "</div>" +
            '<div class="ae-empty__title">' + escapeHtml(title) + "</div>" +
            '<div class="ae-empty__text">' + escapeHtml(message) + "</div>" +
@@ -129,8 +131,17 @@
 
   function AeCard(opts) {
     opts = opts || {};
-    var visualVariant = opts.visualVariant || (opts.variant === "summary" ? "solid" : "glass");
-    var cls = classNames(["ae-card", "ae-slide-up", opts.variant ? "ae-card--" + opts.variant : "", "ae-card--" + visualVariant, opts.className]);
+    var cardVariants = ["glass", "solid", "gradient", "outline"];
+    var requestedVariant = safeText(opts.variant || "", 24);
+    var visualVariant = cardVariants.indexOf(opts.visualVariant) !== -1
+      ? opts.visualVariant
+      : cardVariants.indexOf(requestedVariant) !== -1
+        ? requestedVariant
+        : requestedVariant === "summary" ? "solid" : "glass";
+    var semanticClass = requestedVariant && cardVariants.indexOf(requestedVariant) === -1
+      ? "ae-card--" + requestedVariant.replace(/[^A-Za-z0-9_-]/g, "")
+      : "";
+    var cls = classNames(["ae-card", "ae-slide-up", semanticClass, "ae-card--" + visualVariant, opts.className]);
     return '<div class="' + escapeHtml(cls) + '">' + (opts.children || "") + "</div>";
   }
 
@@ -232,6 +243,11 @@
   function AeMetric(opts) {
     opts = opts || {};
     var color = String(opts.color || "accent").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 20) || "accent";
+    var compact = opts.compact === true;
+    var metricStatus = safeText(opts.status || "normal", 20).replace(/[^A-Za-z0-9_-]/g, "") || "normal";
+    var metricVariant = ["glass", "solid", "gradient", "outline"].indexOf(opts.variant) !== -1
+      ? opts.variant
+      : compact ? "solid" : "gradient";
     var title = safeText(opts.title || opts.label || "Metrik", 40);
     var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
     var unit = opts.unit ? '<span class="ae-metric__unit">' + escapeHtml(opts.unit) + "</span>" : "";
@@ -250,8 +266,9 @@
     if (allowedTones.indexOf(deltaTone) === -1) deltaTone = "muted";
     var sparkLabel = safeText(opts.sparklineLabel || title + " son 7 kayıt", 80);
     var metricClass = classNames([
-      "ae-card", "ae-card--hero", "hero-card", "ae-metric", "ae-slide-up", "ae-card--gradient",
-      "hero-card--" + color, opts.className
+      "ae-card", compact ? "ae-card--summary" : "ae-card--hero", compact ? "summary-card" : "hero-card",
+      "ae-metric", "ae-slide-up", "ae-card--" + metricVariant,
+      compact ? "summary-card--" + metricStatus : "hero-card--" + color, opts.className
     ]);
     var head = '<div class="ae-metric__head">' +
                '<span class="ae-metric__icon" aria-hidden="true">' + escapeHtml(opts.icon || "◌") + "</span>" +
@@ -280,7 +297,9 @@
 
   function AeButton(opts) {
     opts = opts || {};
-    var cls = classNames(["ae-btn", opts.variant ? "ae-btn--" + opts.variant : "", opts.className]);
+    var variant = safeText(opts.variant || "", 24).replace(/[^A-Za-z0-9_-]/g, "");
+    var hasGlow = opts.glow === true || (opts.glow !== false && ["primary", "drop"].indexOf(variant) !== -1);
+    var cls = classNames(["ae-btn", variant ? "ae-btn--" + variant : "", hasGlow ? "ae-btn--glow" : "", opts.className]);
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
     if (opts.ariaLabel) attrs += ' aria-label="' + escapeHtml(opts.ariaLabel) + '"';
@@ -308,8 +327,9 @@
     if (["ok", "warn", "drop", "info", "pause", "muted"].indexOf(opts.tone) !== -1) {
       tone = opts.tone;
     }
-    var label = opts.label || labels[status] || status;
-    return '<span class="ae-status ae-status--' + tone + '">' +
+    var label = safeText(opts.label || labels[status] || status, 80);
+    var classes = classNames(["ae-status", "ae-status--" + tone, opts.className]);
+    return '<span class="' + escapeHtml(classes) + '" role="status" aria-label="' + escapeHtml(label) + '">' +
            '<span class="ae-status__dot"></span>' +
            '<span class="ae-status__label">' + escapeHtml(label) + "</span>" +
            "</span>";
@@ -1086,37 +1106,46 @@
   function SummaryCard(opts) {
     opts = opts || {};
     var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
-    var unit = opts.unit ? ' <span class="summary-card__unit">' + escapeHtml(opts.unit) + "</span>" : "";
     var trend = opts.trend || "→";
     var status = opts.status || "normal";
     var statusTone = { normal: "ok", attention: "warn", risk: "drop" }[status] || "info";
-    return '<div class="ae-card ae-card--solid ae-card--summary summary-card summary-card--' + status + '">' +
-           '<div class="summary-card__head">' +
-           '<div class="summary-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
-           AeStatusBadge({
-             status: status,
-             tone: statusTone,
-             label: { normal: "normal", attention: "dikkat", risk: "risk" }[status] || status
-           }) +
-           "</div>" +
-           '<div class="summary-card__value ae-count-up">' + escapeHtml(value) + unit + ' <span class="summary-card__trend">' + escapeHtml(trend) + "</span></div>" +
-           '<div class="summary-card__window">Son ' + escapeHtml(String(opts.windowDays || 7)) + " gün</div>" +
-           (opts.delta ? '<div class="summary-card__delta">' + escapeHtml(opts.delta) + "</div>" : "") +
-           "</div>";
+    return AeMetric({
+      title: opts.title,
+      value: value,
+      unit: opts.unit,
+      color: opts.color || statusTone,
+      compact: true,
+      variant: opts.variant || "solid",
+      status: status,
+      sparkline: opts.sparkline,
+      delta: {
+        value: trend,
+        tone: statusTone,
+        label: opts.delta || "Trend yönü"
+      },
+      sub: "Son " + String(opts.windowDays || 7) + " gün",
+      className: opts.className
+    });
   }
 
   function AnomalyCard(a) {
-    var tone = { info: "info", warn: "warn", risk: "drop" }[a.severity] || "info";
+    a = a || {};
+    var severity = safeText(a.severity || "info", 16).replace(/[^A-Za-z0-9_-]/g, "") || "info";
     var dateLabel = a.linkDate ? formatDateLabel(a.linkDate) : "";
-    return '<div class="ae-card ae-card--solid ae-card--summary anomaly-card anomaly-card--' + a.severity + '">' +
-           '<div class="anomaly-card__row">' +
-           '<div class="anomaly-card__icon">' + escapeHtml({ sleep: "🌙", sos: "🆘", missing: "🕳", moh: "🌫", steps: "👟", water: "💧" }[a.kind] || "◌") + "</div>" +
-           '<div class="anomaly-card__body">' +
-           '<div class="anomaly-card__message">' + escapeHtml(a.message) + "</div>" +
-           '<div class="anomaly-card__meta">' + escapeHtml(dateLabel) + "</div>" +
-           "</div>" +
-           AeButton({ label: "Detay gör", variant: "text", onclick: "AeonV2.goToDayDetail('" + escapeHtml(a.linkDate) + "')" }) +
-           "</div></div>";
+    var body = '<div class="anomaly-card__row">' +
+               '<div class="anomaly-card__icon" aria-hidden="true">' + escapeHtml({ sleep: "🌙", sos: "🆘", missing: "🕳", moh: "🌫", steps: "👟", water: "💧" }[a.kind] || "◌") + "</div>" +
+               '<div class="anomaly-card__body">' +
+               '<div class="anomaly-card__message">' + escapeHtml(a.message || "Dikkat gerektiren durum") + "</div>" +
+               '<div class="anomaly-card__meta">' + escapeHtml(dateLabel) +
+               '<span class="anomaly-card__severity anomaly-card__severity--' + escapeHtml(severity) + '">' + escapeHtml(severity) + "</span></div>" +
+               "</div>" +
+               AeButton({ label: "Detay gör", variant: "text", onclick: "AeonV2.goToDayDetail('" + escapeHtml(a.linkDate || "") + "')" }) +
+               "</div>";
+    return AeCard({
+      variant: "solid",
+      className: "ae-card--summary anomaly-card anomaly-card--" + severity,
+      children: body
+    });
   }
 
   function renderSummaryGrid(endDate, windowDays) {
@@ -1286,6 +1315,7 @@
       : '<div class="detail-section__empty">' + escapeHtml(emptyText) + "</div>";
     return AeCard({
       variant: "summary",
+      visualVariant: opts.visualVariant || "glass",
       className: "detail-section",
       children: '<div class="detail-section__head">' +
                 '<span class="detail-section__icon" aria-hidden="true">' + escapeHtml(icon) + "</span>" +
@@ -1300,7 +1330,8 @@
     var title = safeText(opts.title || "", 80);
     var body = opts.body || "";
     var meta = opts.meta ? '<div class="detail-block__meta">' + escapeHtml(opts.meta) + "</div>" : "";
-    return '<div class="detail-block' + (opts.redacted ? " detail-block--redacted" : "") + '">' +
+    var classes = classNames(["detail-block", "ae-scale-in", opts.redacted ? "detail-block--redacted" : "", opts.className]);
+    return '<div class="' + escapeHtml(classes) + '">' +
            '<div class="detail-block__head">' +
            '<span class="detail-block__icon" aria-hidden="true">' + escapeHtml(icon) + "</span>" +
            '<span class="detail-block__title">' + escapeHtml(title) + "</span>" +
@@ -2899,6 +2930,10 @@
     dismissToast: dismissToast,
     init: init,
     // Helper exports for testing
+    AeEmpty: AeEmpty,
+    AeCard: AeCard,
+    AeButton: AeButton,
+    AeStatusBadge: AeStatusBadge,
     AeMetric: AeMetric,
     AeProgressRing: AeProgressRing,
     AeDivider: AeDivider,
@@ -2921,6 +2956,10 @@
     getLocationInfo: getLocationInfo,
     getAppSessionInfo: getAppSessionInfo,
     getDaySavedAt: getDaySavedAt,
+    SummaryCard: SummaryCard,
+    AnomalyCard: AnomalyCard,
+    DetailSection: DetailSection,
+    DetailBlock: DetailBlock,
     AeSparkline: AeSparkline
   };
 })(typeof window !== "undefined" ? window : this);

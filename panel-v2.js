@@ -704,38 +704,113 @@
            "</div>";
   }
 
-  // ── Trend strip ─────────────────────────────────────────────────────────
-  function metricBar(value, max, color) {
-    var n = safeNumber(value), m = safeNumber(max) || 10;
-    var pct = n !== null ? Math.max(0, Math.min(100, Math.round((n / m) * 100))) : 0;
-    var empty = n === null;
-    var dataPct = empty ? '' : ' data-pct="' + pct + '"';
-    return '<div class="trend-bar ' + (empty ? "trend-bar--empty" : "") + ' trend-bar--' + (color || "accent") + '"' + dataPct + ' aria-hidden="true"><div class="trend-bar__fill"></div></div>';
+  // ── SVG sparkline ────────────────────────────────────────────────────────
+  function sparklinePath(segment) {
+    return segment.map(function(point, index) {
+      return (index ? "L " : "M ") + point.x.toFixed(2) + " " + point.y.toFixed(2);
+    }).join(" ");
+  }
+
+  function sparklineAreaPath(segment, baseline) {
+    if (!segment.length) return "";
+    return "M " + segment[0].x.toFixed(2) + " " + baseline.toFixed(2) +
+           " L " + segment.map(function(point) {
+             return point.x.toFixed(2) + " " + point.y.toFixed(2);
+           }).join(" L ") +
+           " L " + segment[segment.length - 1].x.toFixed(2) + " " + baseline.toFixed(2) + " Z";
+  }
+
+  function AeSparkline(data, color, height, label) {
+    var values = Array.isArray(data) ? data.slice(0, 30).map(safeNumber) : [];
+    var valid = values.filter(function(value) { return value !== null; });
+    var colorKey = String(color || "accent").toLowerCase();
+    if (colorKey === "mood") colorKey = "accent";
+    if (!AE_RING_COLORS[colorKey]) colorKey = "accent";
+    var h = safeNumber(height);
+    h = h === null ? 42 : Math.max(24, Math.min(120, Math.round(h)));
+    var width = 160;
+    var pad = 4;
+    var baseline = h - pad;
+    var title = safeText(label || "Son 7 gün trendi", 100);
+    var baseClass = "ae-sparkline ae-sparkline--" + colorKey;
+    var viewBox = 'viewBox="0 0 ' + width + " " + h + '"';
+    if (!valid.length) {
+      return '<div class="' + baseClass + ' ae-sparkline--empty" role="img" aria-label="' +
+             escapeHtml(title + ": veri yok") + '">' +
+             '<svg class="ae-sparkline__svg" ' + viewBox + ' aria-hidden="true" focusable="false">' +
+             '<line class="ae-sparkline__empty-line" x1="' + pad + '" y1="' + (h / 2).toFixed(2) +
+             '" x2="' + (width - pad) + '" y2="' + (h / 2).toFixed(2) + '"></line>' +
+             "</svg>" +
+             '<span class="ae-sparkline__empty-label" aria-hidden="true">—</span>' +
+             "</div>";
+    }
+
+    var min = Math.min.apply(Math, valid);
+    var max = Math.max.apply(Math, valid);
+    var range = max - min || 1;
+    var span = width - (pad * 2);
+    var innerHeight = h - (pad * 2);
+    var points = values.map(function(value, index) {
+      if (value === null) return null;
+      var x = values.length === 1 ? width / 2 : pad + (index / (values.length - 1)) * span;
+      var y = max === min ? h / 2 : pad + ((max - value) / range) * innerHeight;
+      return { x: x, y: y, value: value };
+    });
+    var segments = [];
+    var segment = [];
+    points.forEach(function(point) {
+      if (point) {
+        segment.push(point);
+      } else if (segment.length) {
+        segments.push(segment);
+        segment = [];
+      }
+    });
+    if (segment.length) segments.push(segment);
+
+    var linePaths = segments.map(sparklinePath).map(function(path) {
+      return '<path class="ae-sparkline__line" d="' + path + '"></path>';
+    }).join("");
+    var areaPaths = segments.map(function(pointsInSegment) {
+      return '<path class="ae-sparkline__area" d="' + sparklineAreaPath(pointsInSegment, baseline) + '"></path>';
+    }).join("");
+    var dots = points.filter(Boolean).map(function(point) {
+      return '<circle class="ae-sparkline__dot" cx="' + point.x.toFixed(2) +
+             '" cy="' + point.y.toFixed(2) + '" r="2.5"></circle>';
+    }).join("");
+
+    return '<div class="' + baseClass + '" role="img" aria-label="' + escapeHtml(title) + '">' +
+           '<svg class="ae-sparkline__svg" ' + viewBox +
+           ' preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
+           areaPaths + linePaths + dots +
+           "</svg></div>";
   }
 
   function renderTrendStrip(date) {
     var dates = lastNDates(7, date);
     var metrics = [
-      { key: "mood", label: "Mod", max: 7, color: "mood" },
-      { key: "sleep", label: "Uyku", max: 10, color: "sleep" },
-      { key: "steps", label: "Adım", max: 12000, color: "info" },
-      { key: "water", label: "Su", max: 12, color: "ok" }
+      { key: "mood", label: "Mod", color: "accent" },
+      { key: "sleep", label: "Uyku", color: "info" },
+      { key: "steps", label: "Adım", color: "info" },
+      { key: "water", label: "Su", color: "ok" }
     ];
     var html = '<div class="ae-card ae-card--glass ae-slide-up trend-strip">' +
                '<div class="ae-label">Son 7 gün</div>';
     metrics.forEach(function(meta) {
       html += '<div class="trend-strip__row">' +
               '<div class="trend-strip__label">' + escapeHtml(meta.label) + "</div>" +
-              '<div class="trend-strip__bars">';
+              '<div class="trend-strip__sparkline">';
+      var values = [];
       dates.forEach(function(d) {
-        var day = getDay(d) || {};
+        var day = d ? (getDay(d) || {}) : {};
         var v = null;
         if (meta.key === "mood") { var m = getMood(day); v = m.value; }
         else if (meta.key === "sleep") v = getSleepHours(day);
         else if (meta.key === "steps") v = getSteps(day);
         else if (meta.key === "water") v = getWater(day);
-        html += metricBar(v, meta.max, meta.color);
+        values.push(v);
       });
+      html += AeSparkline(values, meta.color, 42, meta.label + " son 7 gün");
       html += "</div></div>";
     });
     html += "</div>";
@@ -2753,6 +2828,7 @@
     HABIT_ICONS: HABIT_ICONS,
     getLocationInfo: getLocationInfo,
     getAppSessionInfo: getAppSessionInfo,
-    getDaySavedAt: getDaySavedAt
+    getDaySavedAt: getDaySavedAt,
+    AeSparkline: AeSparkline
   };
 })(typeof window !== "undefined" ? window : this);

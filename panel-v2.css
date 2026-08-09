@@ -1052,142 +1052,71 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   text-transform: uppercase;
 }
 
-.trend-strip__bars {
+.trend-strip__sparkline {
   flex: 1 1 auto;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 38px;
+  min-width: 0;
+  height: 42px;
 }
 
-.trend-bar {
-  flex: 1 1 auto;
-  height: 100%;
-  min-height: 4px;
-  border-radius: 4px;
-  background: var(--ae-empty-bg);
+.ae-sparkline {
   position: relative;
-  overflow: hidden;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
 }
 
-.trend-bar__fill {
+.ae-sparkline--accent { --ae-spark-color: var(--ae-accent); }
+.ae-sparkline--info { --ae-spark-color: var(--ae-info); }
+.ae-sparkline--ok { --ae-spark-color: var(--ae-ok); }
+.ae-sparkline--warn { --ae-spark-color: var(--ae-warn); }
+.ae-sparkline--drop { --ae-spark-color: var(--ae-drop); }
+
+.ae-sparkline__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ae-sparkline__area {
+  fill: color-mix(in srgb, var(--ae-spark-color) 18%, transparent);
+  stroke: none;
+  opacity: 0.85;
+}
+
+.ae-sparkline__line {
+  fill: none;
+  stroke: var(--ae-spark-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ae-spark-color) 36%, transparent));
+}
+
+.ae-sparkline__dot {
+  fill: var(--ae-spark-color);
+  stroke: var(--ae-surface);
+  stroke-width: 1.5;
+}
+
+.ae-sparkline__empty-line {
+  stroke: var(--ae-glass-border);
+  stroke-dasharray: 3 4;
+  stroke-linecap: round;
+  stroke-width: 1.5;
+}
+
+.ae-sparkline__empty-label {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 0%;
-  border-radius: 4px;
-  background: var(--ae-accent);
-  transition: height 0.4s var(--ae-ease);
+  top: 50%;
+  right: var(--ae-space-xs);
+  color: var(--ae-faint);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-sm);
+  line-height: 1;
+  transform: translateY(-50%);
 }
-
-.trend-bar[data-pct="0"] .trend-bar__fill { height: 0%; }
-.trend-bar[data-pct="1"] .trend-bar__fill { height: 1%; }
-.trend-bar[data-pct="2"] .trend-bar__fill { height: 2%; }
-.trend-bar[data-pct="3"] .trend-bar__fill { height: 3%; }
-.trend-bar[data-pct="4"] .trend-bar__fill { height: 4%; }
-.trend-bar[data-pct="5"] .trend-bar__fill { height: 5%; }
-.trend-bar[data-pct="6"] .trend-bar__fill { height: 6%; }
-.trend-bar[data-pct="7"] .trend-bar__fill { height: 7%; }
-.trend-bar[data-pct="8"] .trend-bar__fill { height: 8%; }
-.trend-bar[data-pct="9"] .trend-bar__fill { height: 9%; }
-.trend-bar[data-pct="10"] .trend-bar__fill { height: 10%; }
-.trend-bar[data-pct="11"] .trend-bar__fill { height: 11%; }
-.trend-bar[data-pct="12"] .trend-bar__fill { height: 12%; }
-.trend-bar[data-pct="13"] .trend-bar__fill { height: 13%; }
-.trend-bar[data-pct="14"] .trend-bar__fill { height: 14%; }
-.trend-bar[data-pct="15"] .trend-bar__fill { height: 15%; }
-.trend-bar[data-pct="16"] .trend-bar__fill { height: 16%; }
-.trend-bar[data-pct="17"] .trend-bar__fill { height: 17%; }
-.trend-bar[data-pct="18"] .trend-bar__fill { height: 18%; }
-.trend-bar[data-pct="19"] .trend-bar__fill { height: 19%; }
-.trend-bar[data-pct="20"] .trend-bar__fill { height: 20%; }
-.trend-bar[data-pct="21"] .trend-bar__fill { height: 21%; }
-.trend-bar[data-pct="22"] .trend-bar__fill { height: 22%; }
-.trend-bar[data-pct="23"] .trend-bar__fill { height: 23%; }
-.trend-bar[data-pct="24"] .trend-bar__fill { height: 24%; }
-.trend-bar[data-pct="25"] .trend-bar__fill { height: 25%; }
-.trend-bar[data-pct="26"] .trend-bar__fill { height: 26%; }
-.trend-bar[data-pct="27"] .trend-bar__fill { height: 27%; }
-.trend-bar[data-pct="28"] .trend-bar__fill { height: 28%; }
-.trend-bar[data-pct="29"] .trend-bar__fill { height: 29%; }
-.trend-bar[data-pct="30"] .trend-bar__fill { height: 30%; }
-.trend-bar[data-pct="31"] .trend-bar__fill { height: 31%; }
-.trend-bar[data-pct="32"] .trend-bar__fill { height: 32%; }
-.trend-bar[data-pct="33"] .trend-bar__fill { height: 33%; }
-.trend-bar[data-pct="34"] .trend-bar__fill { height: 34%; }
-.trend-bar[data-pct="35"] .trend-bar__fill { height: 35%; }
-.trend-bar[data-pct="36"] .trend-bar__fill { height: 36%; }
-.trend-bar[data-pct="37"] .trend-bar__fill { height: 37%; }
-.trend-bar[data-pct="38"] .trend-bar__fill { height: 38%; }
-.trend-bar[data-pct="39"] .trend-bar__fill { height: 39%; }
-.trend-bar[data-pct="40"] .trend-bar__fill { height: 40%; }
-.trend-bar[data-pct="41"] .trend-bar__fill { height: 41%; }
-.trend-bar[data-pct="42"] .trend-bar__fill { height: 42%; }
-.trend-bar[data-pct="43"] .trend-bar__fill { height: 43%; }
-.trend-bar[data-pct="44"] .trend-bar__fill { height: 44%; }
-.trend-bar[data-pct="45"] .trend-bar__fill { height: 45%; }
-.trend-bar[data-pct="46"] .trend-bar__fill { height: 46%; }
-.trend-bar[data-pct="47"] .trend-bar__fill { height: 47%; }
-.trend-bar[data-pct="48"] .trend-bar__fill { height: 48%; }
-.trend-bar[data-pct="49"] .trend-bar__fill { height: 49%; }
-.trend-bar[data-pct="50"] .trend-bar__fill { height: 50%; }
-.trend-bar[data-pct="51"] .trend-bar__fill { height: 51%; }
-.trend-bar[data-pct="52"] .trend-bar__fill { height: 52%; }
-.trend-bar[data-pct="53"] .trend-bar__fill { height: 53%; }
-.trend-bar[data-pct="54"] .trend-bar__fill { height: 54%; }
-.trend-bar[data-pct="55"] .trend-bar__fill { height: 55%; }
-.trend-bar[data-pct="56"] .trend-bar__fill { height: 56%; }
-.trend-bar[data-pct="57"] .trend-bar__fill { height: 57%; }
-.trend-bar[data-pct="58"] .trend-bar__fill { height: 58%; }
-.trend-bar[data-pct="59"] .trend-bar__fill { height: 59%; }
-.trend-bar[data-pct="60"] .trend-bar__fill { height: 60%; }
-.trend-bar[data-pct="61"] .trend-bar__fill { height: 61%; }
-.trend-bar[data-pct="62"] .trend-bar__fill { height: 62%; }
-.trend-bar[data-pct="63"] .trend-bar__fill { height: 63%; }
-.trend-bar[data-pct="64"] .trend-bar__fill { height: 64%; }
-.trend-bar[data-pct="65"] .trend-bar__fill { height: 65%; }
-.trend-bar[data-pct="66"] .trend-bar__fill { height: 66%; }
-.trend-bar[data-pct="67"] .trend-bar__fill { height: 67%; }
-.trend-bar[data-pct="68"] .trend-bar__fill { height: 68%; }
-.trend-bar[data-pct="69"] .trend-bar__fill { height: 69%; }
-.trend-bar[data-pct="70"] .trend-bar__fill { height: 70%; }
-.trend-bar[data-pct="71"] .trend-bar__fill { height: 71%; }
-.trend-bar[data-pct="72"] .trend-bar__fill { height: 72%; }
-.trend-bar[data-pct="73"] .trend-bar__fill { height: 73%; }
-.trend-bar[data-pct="74"] .trend-bar__fill { height: 74%; }
-.trend-bar[data-pct="75"] .trend-bar__fill { height: 75%; }
-.trend-bar[data-pct="76"] .trend-bar__fill { height: 76%; }
-.trend-bar[data-pct="77"] .trend-bar__fill { height: 77%; }
-.trend-bar[data-pct="78"] .trend-bar__fill { height: 78%; }
-.trend-bar[data-pct="79"] .trend-bar__fill { height: 79%; }
-.trend-bar[data-pct="80"] .trend-bar__fill { height: 80%; }
-.trend-bar[data-pct="81"] .trend-bar__fill { height: 81%; }
-.trend-bar[data-pct="82"] .trend-bar__fill { height: 82%; }
-.trend-bar[data-pct="83"] .trend-bar__fill { height: 83%; }
-.trend-bar[data-pct="84"] .trend-bar__fill { height: 84%; }
-.trend-bar[data-pct="85"] .trend-bar__fill { height: 85%; }
-.trend-bar[data-pct="86"] .trend-bar__fill { height: 86%; }
-.trend-bar[data-pct="87"] .trend-bar__fill { height: 87%; }
-.trend-bar[data-pct="88"] .trend-bar__fill { height: 88%; }
-.trend-bar[data-pct="89"] .trend-bar__fill { height: 89%; }
-.trend-bar[data-pct="90"] .trend-bar__fill { height: 90%; }
-.trend-bar[data-pct="91"] .trend-bar__fill { height: 91%; }
-.trend-bar[data-pct="92"] .trend-bar__fill { height: 92%; }
-.trend-bar[data-pct="93"] .trend-bar__fill { height: 93%; }
-.trend-bar[data-pct="94"] .trend-bar__fill { height: 94%; }
-.trend-bar[data-pct="95"] .trend-bar__fill { height: 95%; }
-.trend-bar[data-pct="96"] .trend-bar__fill { height: 96%; }
-.trend-bar[data-pct="97"] .trend-bar__fill { height: 97%; }
-.trend-bar[data-pct="98"] .trend-bar__fill { height: 98%; }
-.trend-bar[data-pct="99"] .trend-bar__fill { height: 99%; }
-.trend-bar[data-pct="100"] .trend-bar__fill { height: 100%; }
-
-.trend-bar--mood .trend-bar__fill { background: var(--ae-accent); }
-.trend-bar--sleep .trend-bar__fill { background: var(--ae-info); }
-.trend-bar--info .trend-bar__fill { background: var(--ae-info); }
-.trend-bar--ok .trend-bar__fill { background: var(--ae-ok); }
-.trend-bar--empty .trend-bar__fill { height: 0; }
 
 /* ── Date picker ── */
 .date-picker {
@@ -1636,7 +1565,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-tab,
   .sub-tab,
   .ae-btn,
-  .trend-bar__fill,
+  .ae-sparkline__line,
+  .ae-sparkline__area,
   .ae-metric__spark-bar,
   .ae-ring__progress { transition: none !important; }
   .ae-status--ok .ae-status__dot,

@@ -7,10 +7,16 @@ const { dom, ctx, AeonV2 } = boot();
 
 assert(typeof AeonV2.AeMetric === "function", "AeMetric export ediliyor");
 assert(typeof AeonV2.AeProgressRing === "function", "AeProgressRing export ediliyor");
+assert(typeof AeonV2.AeSparkline === "function", "AeSparkline export ediliyor");
 const ringFixture = AeonV2.AeProgressRing({ value: 72, color: "ok", label: "Test ilerlemesi" });
 assert(/class="ae-ring"/.test(ringFixture), "Progress ring dış kabı var");
 assert(/class="ae-ring__progress"/.test(ringFixture), "Progress ring ilerleme çemberi var");
 assert(/stroke-dasharray=/.test(ringFixture) && /stroke-dashoffset=/.test(ringFixture), "Progress ring SVG ölçüleri var");
+const sparkFixture = AeonV2.AeSparkline([1, 3, 2, 5, 4, 6, 3], "ok", 42);
+assert(/class="ae-sparkline ae-sparkline--ok"/.test(sparkFixture), "AeSparkline renk sınıfı var");
+assert(/class="ae-sparkline__line"/.test(sparkFixture), "AeSparkline SVG line path var");
+assert(/class="ae-sparkline__area"/.test(sparkFixture), "AeSparkline area fill path var");
+assert((sparkFixture.match(/class="ae-sparkline__dot"/g) || []).length === 7, "AeSparkline veri noktaları var");
 
 function countMatches(re) {
   const m = dom.html.match(re) || [];
@@ -96,10 +102,15 @@ assert(/7sa 30dk/.test(html), "Uyku kartı süreyi gösteriyor");
 assert(/8\.432|8 432/.test(html), "Adım kartı değerini gösteriyor");
 assert(/Sessiz|SOS/.test(html), "SOS kartı var");
 
-// 4. 7 günlük strip — her metrik için 7 bar (4 metrik * 7 = 28 bar elementi)
-// açılış tag'indeki tam class string'ini say (trend-bar__fill dahil etme)
-const barCount = (html.match(/<div class="trend-bar [^"]*"/g) || []).length;
-assert(barCount === 28, "Trend strip'te 28 bar var (4 metrik × 7 gün): " + barCount);
+// 4. 7 günlük strip — her metrik için bir SVG sparkline
+const sparklineCount = (html.match(/class="ae-sparkline ae-sparkline--/g) || []).length;
+assert(sparklineCount === 4, "Trend strip'te 4 SVG sparkline var: " + sparklineCount);
+assert((html.match(/class="ae-sparkline__line"/g) || []).length === 4, "Trend strip'te 4 line path var");
+assert((html.match(/class="ae-sparkline__area"/g) || []).length === 4, "Trend strip'te 4 area fill var");
+assert((html.match(/ae-sparkline--accent/g) || []).length === 1, "Mod sparkline accent rengi kullanıyor");
+assert((html.match(/ae-sparkline--info/g) || []).length === 2, "Uyku ve adım sparkline info rengi kullanıyor");
+assert((html.match(/ae-sparkline--ok/g) || []).length === 1, "Su sparkline ok rengi kullanıyor");
+assert(!/class="trend-bar/.test(html), "Trend strip'te eski CSS bar markup'ı yok");
 assert(/Son 7 gün/.test(html), "Trend strip başlığı var");
 
 // 5. Hızlı notlar kartı

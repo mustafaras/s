@@ -161,14 +161,21 @@ assert(css.includes("backdrop-filter: blur(16px) saturate(1.2)"), "Tooltip glass
 assert(css.includes(".ae-tooltip-wrap:hover .ae-tooltip"), "Tooltip hover görünürlüğü var");
 assert(css.includes(".ae-tooltip-wrap:focus-within .ae-tooltip"), "Tooltip focus görünürlüğü var");
 
-// ── Trend bars (data-pct driven) ──
-classRule("trend-bar");
-classRule("trend-bar__fill");
-classRule("trend-bar--empty");
-classRule("trend-bar--mood");
-assert(css.includes('[data-pct="0"]'), "data-pct=0 selector var");
-assert(css.includes('[data-pct="50"]'), "data-pct=50 selector var");
-assert(css.includes('[data-pct="100"]'), "data-pct=100 selector var");
+// ── SVG sparklines ──
+classRule("trend-strip__sparkline");
+classRule("ae-sparkline");
+classRule("ae-sparkline__svg");
+classRule("ae-sparkline__line");
+classRule("ae-sparkline__area");
+classRule("ae-sparkline__dot");
+classRule("ae-sparkline--accent");
+classRule("ae-sparkline--info");
+classRule("ae-sparkline--ok");
+assert(css.includes('preserveAspectRatio="none"') || js.includes('preserveAspectRatio="none"'), "Sparkline responsive SVG oranı var");
+assert(css.includes("color-mix(in srgb, var(--ae-spark-color) 18%, transparent)"), "Sparkline area fill token rengi var");
+assert(js.includes("function AeSparkline"), "AeSparkline JS komponenti var");
+assert(!js.includes("metricBar("), "Trend strip eski metricBar fonksiyonunu kullanmıyor");
+assert(!css.includes(".trend-bar"), "CSS eski trend bar bileşenini taşımıyor");
 
 // ── 30-day heatmap (day detail) ──
 classRule("day-heatmap");

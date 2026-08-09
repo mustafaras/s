@@ -12360,6 +12360,25 @@ function applyReceipts(rc){
 // sonsuza dek susturmasın.
 function psychDue(){ try{ if(!data) return false; if(!(data.psych&&data.psych.completedAt)) return true; var t=Date.parse(data.psych.completedAt); if(isNaN(t)) return true; return (Date.now()-t)>=14*24*3600*1000; }catch(e){ return false; } }
 function psychActive(){ return false; }
+// Metni cihazın paylaşım sayfasına gönderir (Web Share API); desteklenmeyen
+// tarayıcılarda (çoğu masaüstü, eski iOS) panoya kopyalayıp haber verir —
+// böylece "paylaş" hiçbir cihazda sessizce hiçbir şey yapmamış olmaz.
+function shareText(text,title){
+  try{ if(navigator.share){ navigator.share({text:text,title:title||'Şeyma'}).catch(function(){}); return; } }catch(e){}
+  try{ navigator.clipboard.writeText(text); toast('Paylaşım desteklenmiyor, kopyalandı'); }catch(e){ toast('Paylaşılamadı'); }
+}
+// ÆON mesaj/soru/yanıt metnini id ile bulur — raw metni onclick attribute'una
+// gömmek yerine (tırnak/yeni satır kaçış sorunu) App.copyQuoteById ile aynı
+// desen: yalnızca kimlik geçirilir, metin tıklama anında data'dan okunur.
+function aeonTextById(kind,id,field){
+  if(kind==='notif'){ var n=notifList().find(function(x){ return x&&x.id===id; }); return n?n.text:null; }
+  var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
+  var q=qa.find(function(x){ return x&&x.id===id; });
+  if(!q) return null;
+  return field==='answer'?q.answer:q.question;
+}
+App.copyAeonText=function(kind,id,field){ var t=aeonTextById(kind,id,field); if(!t){ toast('Kopyalanamadı'); return; } App.copyQuote(t); };
+App.shareAeonText=function(kind,id,field){ var t=aeonTextById(kind,id,field); if(!t){ toast('Paylaşılamadı'); return; } shareText(t,'ÆON'); };
 // Premium iOS 27 ÆON bildirim balonu — buzlu cam, altın ÆON kimliği, SF font.
 function aeonPopupHTML(o){
   var inner='';
@@ -12373,34 +12392,39 @@ function aeonPopupHTML(o){
   if(o.more>0) inner+='<div style="font-size:11.5px;color:#E6C15A;margin-top:6px;font-weight:700;">+'+o.more+' '+o.moreLabel+'</div>';
   inner+='<div style="display:flex;gap:8px;margin-top:13px;">';
   inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#F0D274,#C99A3A);color:#1a1404;font-weight:800;font-size:13.5px;padding:10px;border-radius:13px;box-shadow:0 8px 18px rgba(201,160,60,0.4);font-family:inherit;">Gör</button>';
-  inner+='<button onclick="'+o.closeFn+'" style="border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:13px;font-family:inherit;">Kapat</button>';
+  inner+='<button onclick="'+o.copyFn+'" aria-label="Kopyala" style="flex-shrink:0;border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;">'+icon('copy',16)+'</button>';
+  inner+='<button onclick="'+o.shareFn+'" aria-label="Paylaş" style="flex-shrink:0;border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;">'+icon('share-2',16)+'</button>';
   inner+='</div></div>';
   inner+='<button onclick="'+o.closeFn+'" aria-label="Kapat" style="position:absolute;top:10px;right:11px;border:none;background:none;cursor:pointer;color:rgba(255,255,255,0.42);line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button>';
   inner+='</div>';
   return inner;
 }
+// Balon zaten ekrandaysa YOK EDİP YENİDEN KURMAYIZ — kullanıcı o an okuyor
+// olabilir; sil+baştan-kur hem giriş animasyonunu tekrar oynatıp "kapanmış
+// gibi" hissettiriyordu hem de art arda gelen mesaj/yanıtlarda okunmadan
+// eziliyordu. Bunun yerine içeriği YERİNDE günceller (aynı DOM düğümü kalır).
+function renderAeonPopup(html){
+  var ex=document.getElementById('sey-inbox-pop');
+  if(ex){ ex.innerHTML=html; return; }
+  var pop=document.createElement('div'); pop.id='sey-inbox-pop';
+  pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
+  pop.innerHTML=html;
+  document.body.appendChild(pop);
+}
 function showInboxPopup(){
   if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
   var pend=notifList().filter(function(n){ return n&&!n.deleted&&!n.seen; });
   if(!pend.length) return;
-  var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
   var latest=pend[pend.length-1];
   var more=pend.length-1;
   var when=''; try{ when=new Date(latest.ts).toLocaleString('tr-TR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}); }catch(e){}
   var txt=String(latest.text||'').slice(0,150);
-  var pop=document.createElement('div'); pop.id='sey-inbox-pop';
-  pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
-  pop.innerHTML=aeonPopupHTML({label:'mesaj', txt:txt, trunc:(latest.text&&latest.text.length>150), more:more, moreLabel:'yeni mesaj daha', when:when, closeFn:'App.dismissPopup()'});
-  document.body.appendChild(pop);
+  renderAeonPopup(aeonPopupHTML({label:'mesaj', txt:txt, trunc:(latest.text&&latest.text.length>150), more:more, moreLabel:'yeni mesaj daha', when:when, closeFn:'App.dismissPopup()', copyFn:"App.copyAeonText('notif','"+esc(latest.id)+"','')", shareFn:"App.shareAeonText('notif','"+esc(latest.id)+"','')"}));
 }
-function showAeonAnswerPopup(text,count){
+function showAeonAnswerPopup(id,text,count){
   if(psychActive()) return; // Faz 7: zorunlu anket açıkken arka plan popup'ı gösterme
-  var ex=document.getElementById('sey-inbox-pop'); if(ex) ex.remove();
-  var pop=document.createElement('div'); pop.id='sey-inbox-pop';
-  pop.style.cssText='position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 14px);transform:translateX(-50%);z-index:500;width:min(420px,92vw);animation:seyInboxPop .42s cubic-bezier(.22,1.2,.36,1);';
   var txt=String(text||'').slice(0,150);
-  pop.innerHTML=aeonPopupHTML({label:'yanıt', txt:txt, trunc:(text&&text.length>150), more:(count>1?count-1:0), moreLabel:'yanıt daha', when:'', closeFn:'App.closeAeonPop()'});
-  document.body.appendChild(pop);
+  renderAeonPopup(aeonPopupHTML({label:'yanıt', txt:txt, trunc:(text&&text.length>150), more:(count>1?count-1:0), moreLabel:'yanıt daha', when:'', closeFn:'App.closeAeonPop()', copyFn:"App.copyAeonText('qa','"+esc(id)+"','answer')", shareFn:"App.shareAeonText('qa','"+esc(id)+"','answer')"}));
 }
 // Önceki oturumda inmiş ama kullanıcıya henüz popup olarak gösterilmemiş ÆON yanıtlarını,
 // uygulama bir sonraki açıldığında otomatik popup yapar. Popup görünmesi = "görüldü" kabul edilir;
@@ -12417,7 +12441,7 @@ function replayAnswerPopup(){
   if(!pop.length){ if(changed) save(); return; }
   pop.forEach(function(q){ q.answerReadAt=nowIso; q.answerSynced=false; });
   save(); receiptPushNow();
-  if(ui.tab!=='mesaj'){ var last=pop[pop.length-1]; showAeonAnswerPopup(last.answer,pop.length); }
+  if(ui.tab!=='mesaj'){ var last=pop[pop.length-1]; showAeonAnswerPopup(last.id,last.answer,pop.length); }
 }
 
 // ── ÆON yerel PWA bildirimleri (Service Worker + Notification API) ──
@@ -13373,7 +13397,13 @@ function aeonItemHTML(it,enterCls){
     h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
     if(it.mediaKind) h+=aeonMediaSlotHTML(it,'var(--icon)','var(--aeon)');
     else h+='<div style="font-size:14.5px;line-height:1.55;">'+aeonBubbleText(it.text,'in')+'</div>';
-    if(it.observer&&it.id) h+='<div style="display:flex;margin-top:7px;"><button onclick="App.deleteNotif(\''+it.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button></div>';
+    var delBtn=(it.observer&&it.id)?('<button onclick="App.deleteNotif(\''+it.id+'\')" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button>'):'';
+    var textActions='';
+    if(!it.mediaKind&&it.text){
+      var akKind=it.observer?'notif':'qa', akId=it.observer?it.id:it.qaId, akField=it.observer?'':(it.qaField||'');
+      if(akId) textActions='<button onclick="App.copyAeonText(\''+akKind+'\',\''+esc(akId)+'\',\''+akField+'\')" aria-label="Kopyala" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:var(--muted);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;">'+icon('copy',12)+'</button><button onclick="App.shareAeonText(\''+akKind+'\',\''+esc(akId)+'\',\''+akField+'\')" aria-label="Paylaş" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:var(--muted);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;">'+icon('share-2',12)+'</button>';
+    }
+    if(textActions||delBtn) h+='<div style="display:flex;gap:6px;margin-top:7px;justify-content:flex-end;">'+textActions+delBtn+'</div>';
     h+='</div></div>';
   }
   return h;
@@ -13430,8 +13460,8 @@ function aeonChatHTML(){
   notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ var t=n.ts||n.receivedAt||''; items.push({sort:String(t),tsNum:tsNum(t),_idx:seq++,kind:'in',text:n.text,time:t,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize}); });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
   qa.forEach(function(x){ if(!x) return;
-    var qt=x.ts||''; items.push({sort:String(qt),tsNum:tsNum(qt),_idx:seq++,kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize});
-    if(x.answer){ var at=x.answeredAt||qt||''; items.push({sort:String(at),tsNum:tsNum(at),_idx:seq++,kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize}); }
+    var qt=x.ts||''; items.push({sort:String(qt),tsNum:tsNum(qt),_idx:seq++,kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize,qaId:x.id,qaField:'question'});
+    if(x.answer){ var at=x.answeredAt||qt||''; items.push({sort:String(at),tsNum:tsNum(at),_idx:seq++,kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize,qaId:x.id,qaField:'answer'}); }
   });
   items.sort(function(a,b){ return (a.tsNum-b.tsNum)||(a._idx-b._idx); });
   // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ

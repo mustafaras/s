@@ -38,7 +38,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | Step | Prompt Kısa Adı | Durum | Commit | Testler | Notlar |
 |------|-----------------|-------|--------|---------|--------|
 | 0 | Başlangıç / Ledger kurulum | ✅ TAMAMLANDI | `704da96` üzerine ekleme | `node tests/test_panel_v2_*.js` | Anti-amnesia dosyaları oluşturuldu |
-| 1 | Renk Paleti & Tasarım Token'ları | ⏳ HAZIR | - | - | Henüz başlanmadı |
+| 1 | Renk Paleti & Tasarım Token'ları | ✅ TAMAMLANDI | `96c64cf` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS) | Premium açık/koyu token sistemi, cache bump ve deterministik tarih fixture düzeltmeleri |
 | 2 | Tipografi Sistemi & Font Yükleme | 🔒 BEKLEMEDE | - | - | 1 tamamlanmalı |
 | 3 | Glassmorphism Kart Sistemi | 🔒 BEKLEMEDE | - | - | - |
 | 4 | Buton & Status Badge Sistemi | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 1
+- **currentStep:** 2
 - **totalSteps:** 40
-- **lastUpdated:** 2026-08-04
-- **lastAgent:** GitHub Copilot (kimik-k2.7-code:cloud)
+- **lastUpdated:** 2026-08-09
+- **lastAgent:** OpenAI Codex (GPT-5)
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

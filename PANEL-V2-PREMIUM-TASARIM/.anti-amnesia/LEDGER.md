@@ -49,7 +49,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 9 | AeDivider & AeToast | ✅ TAMAMLANDI | `9215460` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS | Etiketli gradient dividerlar, glass slide-in toast, manuel/otomatik kapanma ve Gün Detayı entegrasyonu tamamlandı |
 | 10 | Gün Detayı Bölümlerini Ayır | ✅ TAMAMLANDI | `51598a6` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS; Pages run `31319342296` SUCCESS | Zamanlar → Ruh Hali → Alışkanlıklar → Beslenme → İbadet → Hareket → Konum → Döngü divider grupları, görünür boş durumları ve JS cache bump tamamlandı |
 | 11 | Mevcut Komponentleri Taşı | ✅ TAMAMLANDI | `d90b38e` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (10/10 PASS); `git diff --check`; secret scan PASS | AeCard canonical varyantları, AeButton glow, erişilebilir AeEmpty/AeStatusBadge, SummaryCard → AeMetric, AnomalyCard glow/left-border ve DetailSection/DetailBlock premium stilleri tamamlandı |
-| 12 | Count-up Animasyonu | 🔒 BEKLEMEDE | - | - | - |
+| 12 | Count-up Animasyonu | ✅ TAMAMLANDI | `2b75f59` | `node --check panel-v2.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31324058409` tetiklendi | `animateCountUp`, hero/summary/trend hedef işaretleri, reduced-motion bypass, render sonrası yeniden tetikleme, cache bump ve count-up fixture tamamlandı |
 | 13 | Trend Strip Sparkline | 🔒 BEKLEMEDE | - | - | - |
 | 14 | Summary Grid Mini Sparkline | 🔒 BEKLEMEDE | - | - | - |
 | 15 | Büyük SVG Line Chart (Mod) | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 12
+- **currentStep:** 13
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-09
 - **lastAgent:** OpenAI Codex (GPT-5)

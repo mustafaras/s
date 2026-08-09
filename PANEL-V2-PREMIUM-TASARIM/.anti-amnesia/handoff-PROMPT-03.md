@@ -8,7 +8,7 @@
 - **Tarih:** 2026-08-09
 - **Oturum ID:** İsteğe bağlı
 - **Başlangıç Commit:** `e859aca`
-- **Bitiş Commit:** `cc61b19`
+- **Bitiş Commit:** `6402408`
 
 ## Yapılanlar
 
@@ -20,13 +20,13 @@
 
 ### Özet
 
-`.ae-card` temel yüzeyi glassmorphism blur, glass border, premium gölge/glow ve hover lift davranışıyla güncellendi. `glass`, `solid`, `gradient` ve `outline` varyantları tanımlandı; mevcut hero, özet, trend, tarih, sistem ve gün detay kartları görsel varyantlara eşlendi ve yapısal sınıfları korundu. CSS cache-busting sürümü `2026080903` oldu.
+`.ae-card` temel yüzeyi glassmorphism blur, glass border, premium gölge/glow ve hover lift davranışıyla güncellendi. `glass`, `solid`, `gradient` ve `outline` varyantları tanımlandı; mevcut hero, özet, trend, tarih, sistem ve gün detay kartları görsel varyantlara eşlendi ve yapısal sınıfları korundu. CSS ve değişen JavaScript için cache-busting sürümü `2026080903` oldu; canlı doğrulamada yeni JS varyantları görüldü.
 
 ### Değiştirilen Dosyalar
 
 - `panel-v2.css` — glassmorphism temel kartı, hover ve dört görsel varyant
 - `panel-v2.js` — `AeCard` varyant seçimi ve mevcut kart çıktılarının eşlenmesi
-- `panel-v2.html` — CSS cache-busting sürümü
+- `panel-v2.html` — CSS ve JavaScript cache-busting sürümleri
 - `tests/test_panel_v2_css.js` — varyant, blur, hover ve glow sözleşmeleri
 - `tests/test_panel_v2_skeleton.js` — varyant sınıfı sözleşmeleri
 
@@ -46,6 +46,7 @@
 - node --check panelCoverageManifest.js → PASS
 - for f in tests/test_panel_v2_*.js; do node "$f"; done → 9/9 PASS
 - rendered card variants probe → PASS (glass=2, solid=15, gradient=4, outline=2)
+- GitHub Pages HTML/CSS/JS live cache verification → PASS
 - git diff --check → PASS
 - staged secret/token scan → PASS
 ```
@@ -71,3 +72,4 @@
 - `main` branch’e doğrudan push edildi; ayrı feature branch olmadığı için merge gerektiren bir dal yok.
 - `PANEL-DENETIM-MERKEZI-*` silinmeleri ve `.anti-amnesia/CODEX-STARTER.md` kullanıcı çalışma alanı değişiklikleri olarak korunmuş, stage edilmemiştir.
 - Tarayıcı açılmadı; veri reposuna veya `data/` altına yazılmadı.
+- İlk teslimde değişen `panel-v2.js` için eski query string kaldığı fark edildi; `6402408` ile `panel-v2.js?v=2026080903` olarak düzeltildi ve Pages üzerinde doğrulandı.

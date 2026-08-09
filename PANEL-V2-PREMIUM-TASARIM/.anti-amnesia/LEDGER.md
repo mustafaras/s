@@ -40,7 +40,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 0 | Başlangıç / Ledger kurulum | ✅ TAMAMLANDI | `704da96` üzerine ekleme | `node tests/test_panel_v2_*.js` | Anti-amnesia dosyaları oluşturuldu |
 | 1 | Renk Paleti & Tasarım Token'ları | ✅ TAMAMLANDI | `96c64cf` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS) | Premium açık/koyu token sistemi, cache bump ve deterministik tarih fixture düzeltmeleri |
 | 2 | Tipografi Sistemi & Font Yükleme | ✅ TAMAMLANDI | `f1131eb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); literal font-size audit | Inter/JetBrains Mono, scale tokenları, mono veri yüzeyleri ve CSS cache bump tamamlandı |
-| 3 | Glassmorphism Kart Sistemi | ✅ TAMAMLANDI | `cc61b19` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); rendered variants PASS | AeCard glass/solid/gradient/outline varyantları, mevcut kart eşlemeleri ve cache bump tamamlandı |
+| 3 | Glassmorphism Kart Sistemi | ✅ TAMAMLANDI | `cc61b19`, `6402408` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); rendered variants PASS; live cache verification PASS | AeCard glass/solid/gradient/outline varyantları, mevcut kart eşlemeleri ve CSS/JS cache bump tamamlandı |
 | 4 | Buton & Status Badge Sistemi | 🔒 BEKLEMEDE | - | - | - |
 | 5 | Animasyon Kütüphanesi | 🔒 BEKLEMEDE | - | - | - |
 | 6 | Skeleton & Tooltip | 🔒 BEKLEMEDE | - | - | - |

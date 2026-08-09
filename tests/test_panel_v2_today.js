@@ -8,6 +8,7 @@ const { dom, ctx, AeonV2 } = boot();
 assert(typeof AeonV2.AeMetric === "function", "AeMetric export ediliyor");
 assert(typeof AeonV2.AeProgressRing === "function", "AeProgressRing export ediliyor");
 assert(typeof AeonV2.AeSparkline === "function", "AeSparkline export ediliyor");
+assert(typeof AeonV2.animateCountUp === "function", "animateCountUp export ediliyor");
 const ringFixture = AeonV2.AeProgressRing({ value: 72, color: "ok", label: "Test ilerlemesi" });
 assert(/class="ae-ring"/.test(ringFixture), "Progress ring dış kabı var");
 assert(/class="ae-ring__progress"/.test(ringFixture), "Progress ring ilerleme çemberi var");
@@ -101,6 +102,9 @@ assert(/Huzurlu/.test(html), "Mod kartı Huzurlu değerini gösteriyor");
 assert(/7sa 30dk/.test(html), "Uyku kartı süreyi gösteriyor");
 assert(/8\.432|8 432/.test(html), "Adım kartı değerini gösteriyor");
 assert(/Sessiz|SOS/.test(html), "SOS kartı var");
+assert((html.match(/data-count-target=/g) || []).length >= 7, "Hero ve trend sayıları count-up hedefi taşıyor");
+assert(/data-count-format="hours"/.test(html), "Uyku sayısı saat formatıyla işaretli");
+assert(/data-count-format="integer"/.test(html), "Tam sayılar integer formatıyla işaretli");
 
 // 4. 7 günlük strip — her metrik için bir SVG sparkline
 const sparklineCount = (html.match(/class="ae-sparkline ae-sparkline--/g) || []).length;
@@ -112,6 +116,7 @@ assert((html.match(/ae-sparkline--info/g) || []).length === 2, "Uyku ve adım sp
 assert((html.match(/ae-sparkline--ok/g) || []).length === 1, "Su sparkline ok rengi kullanıyor");
 assert(!/class="trend-bar/.test(html), "Trend strip'te eski CSS bar markup'ı yok");
 assert(/Son 7 gün/.test(html), "Trend strip başlığı var");
+assert((html.match(/class="trend-strip__value ae-count-up"/g) || []).length === 4, "Trend strip'te 4 sayısal değer var");
 
 // 5. Hızlı notlar kartı
 assert(/Hızlı notlar/.test(html), "Hızlı notlar bölümü var");

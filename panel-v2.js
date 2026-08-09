@@ -75,6 +75,93 @@
     return min ? hInt + "sa " + min + "dk" : hInt + "sa";
   }
 
+  function countNumber(value) {
+    if (value === null || value === undefined || value === "") return null;
+    return safeNumber(value);
+  }
+
+  function formatCountValue(value, format) {
+    var n = countNumber(value);
+    if (n === null) return "—";
+    format = format || "number";
+    if (format === "hours") return formatHours(n) || "0sa";
+    if (format === "mood") return Math.round(n) + "/7";
+    if (format === "integer") return Math.round(n).toLocaleString("tr-TR");
+    if (format === "decimal") {
+      return n.toLocaleString("tr-TR", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+    }
+    return n.toLocaleString("tr-TR", { maximumFractionDigits: 2 });
+  }
+
+  function countTargetAttrs(value, format) {
+    var n = countNumber(value);
+    if (n === null) return "";
+    return ' data-count-target="' + escapeHtml(n) + '" data-count-format="' +
+           escapeHtml(format || "number") + '"';
+  }
+
+  function prefersReducedMotion() {
+    try {
+      return !!(root.matchMedia && root.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setCountText(element, value) {
+    if (!element) return;
+    var format = element.getAttribute ? element.getAttribute("data-count-format") : "number";
+    var text = formatCountValue(value, format);
+    if ("textContent" in element) element.textContent = text;
+    else if ("innerText" in element) element.innerText = text;
+  }
+
+  function animateCountUp(element, targetValue, duration) {
+    var target = countNumber(targetValue);
+    if (!element || target === null) return;
+
+    var durationValue = countNumber(duration);
+    var durationMs = durationValue === null ? 650 : Math.max(0, Math.min(2000, durationValue));
+    var previous = element.getAttribute ? countNumber(element.getAttribute("data-count-value")) : null;
+    var startValue = previous === null ? 0 : previous;
+    if (element.__aeCountAnimation && root.cancelAnimationFrame) {
+      root.cancelAnimationFrame(element.__aeCountAnimation);
+    }
+    if (element.setAttribute) element.setAttribute("data-count-value", String(target));
+
+    if (prefersReducedMotion() || typeof root.requestAnimationFrame !== "function" || durationMs === 0) {
+      setCountText(element, target);
+      element.__aeCountAnimation = null;
+      return;
+    }
+
+    var startedAt = null;
+    function tick(timestamp) {
+      var now = countNumber(timestamp);
+      if (now === null) now = Date.now();
+      if (startedAt === null) startedAt = now;
+      var progress = Math.max(0, Math.min(1, (now - startedAt) / durationMs));
+      var eased = 1 - Math.pow(1 - progress, 3);
+      setCountText(element, startValue + ((target - startValue) * eased));
+      if (progress < 1) {
+        element.__aeCountAnimation = root.requestAnimationFrame(tick);
+      } else {
+        setCountText(element, target);
+        element.__aeCountAnimation = null;
+      }
+    }
+    element.__aeCountAnimation = root.requestAnimationFrame(tick);
+  }
+
+  function runCountUps() {
+    var doc = root.document;
+    if (!doc || typeof doc.querySelectorAll !== "function") return;
+    var elements = doc.querySelectorAll("[data-count-target]");
+    Array.prototype.forEach.call(elements, function(element) {
+      animateCountUp(element, element.getAttribute("data-count-target"), 650);
+    });
+  }
+
   function isObject(v) {
     return !!v && typeof v === "object" && !Array.isArray(v);
   }
@@ -250,6 +337,14 @@
       : compact ? "solid" : "gradient";
     var title = safeText(opts.title || opts.label || "Metrik", 40);
     var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
+    var countValue = countNumber(opts.countValue);
+    var countFormat = safeText(opts.countFormat || "number", 20).replace(/[^A-Za-z0-9_-]/g, "") || "number";
+    var countAttrs = countTargetAttrs(countValue, countFormat);
+    var countBadge = opts.countBadge === true && countValue !== null
+      ? '<span class="ae-metric__count ae-count-up"' + countAttrs + '>' +
+        escapeHtml(formatCountValue(countValue, countFormat)) + "</span>"
+      : "";
+    var valueCountAttrs = opts.countBadge === true ? "" : countAttrs;
     var unit = opts.unit ? '<span class="ae-metric__unit">' + escapeHtml(opts.unit) + "</span>" : "";
     var series = Array.isArray(opts.sparkline) ? opts.sparkline.slice(0, 7) : [];
     var sparkPcts = metricSparkPcts(series);
@@ -289,7 +384,9 @@
                  "</span></div>";
     return '<article class="' + escapeHtml(metricClass) + '">' +
            head +
-           '<div class="ae-metric__value ae-count-up">' + escapeHtml(value) + unit + "</div>" +
+           '<div class="ae-metric__value"><span class="ae-count-up"' + valueCountAttrs + '>' +
+           escapeHtml(value) + "</span>" + unit + "</div>" +
+           countBadge +
            (opts.sub ? '<div class="ae-metric__sub">' + escapeHtml(safeText(opts.sub, 80)) + "</div>" : "") +
            footer +
            "</article>";
@@ -737,22 +834,22 @@
 
     return '<div class="ae-grid--hero ae-stagger">' +
            AeMetric({
-             icon: "🌤", title: "Mod", value: moodText, color: "mood", sub: moodSub,
+             icon: "🌤", title: "Mod", value: moodText, countValue: mood.value, countFormat: "mood", countBadge: true, color: "mood", sub: moodSub,
              sparkline: moodSeries, delta: metricDelta(moodSeries),
              ring: { value: mood.value === null ? 0 : (mood.value / 7) * 100, color: "accent", label: "Mod ilerlemesi" }
            }) +
            AeMetric({
-             icon: "🌙", title: "Uyku", value: sleepText, color: "sleep", sub: sleepSub,
+             icon: "🌙", title: "Uyku", value: sleepText, countValue: sleepH, countFormat: "hours", color: "sleep", sub: sleepSub,
              sparkline: sleepSeries, delta: metricDelta(sleepSeries),
              ring: { value: sleepH === null ? 0 : (sleepH / 8) * 100, color: "info", label: "Uyku hedefi" }
            }) +
            AeMetric({
-             icon: "🆘", title: "SOS", value: sosText, color: sosCount > 0 ? "drop" : "ok", sub: sosSub,
+             icon: "🆘", title: "SOS", value: sosText, countValue: sosCount > 0 ? sosCount : null, countFormat: "integer", color: sosCount > 0 ? "drop" : "ok", sub: sosSub,
              sparkline: sosSeries, delta: metricDelta(sosSeries, true),
              ring: { value: Math.min(100, sosCount * 20), color: sosCount > 0 ? "drop" : "ok", label: "SOS yoğunluğu" }
            }) +
            AeMetric({
-             icon: "👟", title: "Adım", value: stepsText, color: "info", unit: steps !== null ? "adım" : null,
+             icon: "👟", title: "Adım", value: stepsText, countValue: steps, countFormat: "integer", color: "info", unit: steps !== null ? "adım" : null,
              sparkline: stepsSeries, delta: metricDelta(stepsSeries),
              ring: { value: steps === null ? 0 : (steps / (getTarget("steps", 10000))) * 100, color: "info", label: "Adım hedefi" }
            }) +
@@ -852,9 +949,6 @@
     var html = '<div class="ae-card ae-card--glass ae-slide-up trend-strip">' +
                '<div class="ae-label">Son 7 gün</div>';
     metrics.forEach(function(meta) {
-      html += '<div class="trend-strip__row">' +
-              '<div class="trend-strip__label">' + escapeHtml(meta.label) + "</div>" +
-              '<div class="trend-strip__sparkline">';
       var values = [];
       dates.forEach(function(d) {
         var day = d ? (getDay(d) || {}) : {};
@@ -865,6 +959,20 @@
         else if (meta.key === "water") v = getWater(day);
         values.push(v);
       });
+      var latestValue = null;
+      for (var i = values.length - 1; i >= 0; i--) {
+        if (countNumber(values[i]) !== null) {
+          latestValue = values[i];
+          break;
+        }
+      }
+      var countFormat = meta.key === "mood" ? "mood" : meta.key === "sleep" ? "hours" :
+        meta.key === "steps" ? "integer" : "decimal";
+      html += '<div class="trend-strip__row">' +
+              '<div class="trend-strip__label">' + escapeHtml(meta.label) + "</div>" +
+              '<div class="trend-strip__value ae-count-up"' + countTargetAttrs(latestValue, countFormat) + '>' +
+              escapeHtml(formatCountValue(latestValue, countFormat)) + "</div>" +
+              '<div class="trend-strip__sparkline">';
       html += AeSparkline(values, meta.color, 42, meta.label + " son 7 gün");
       html += "</div></div>";
     });
@@ -1112,6 +1220,8 @@
     return AeMetric({
       title: opts.title,
       value: value,
+      countValue: opts.countValue,
+      countFormat: opts.countFormat || "decimal",
       unit: opts.unit,
       color: opts.color || statusTone,
       compact: true,
@@ -1177,12 +1287,12 @@
     var mohStatus = s.mohStreak >= 10 ? "risk" : s.mohStreak >= 5 ? "attention" : "normal";
 
     return '<div class="ae-grid--summary ae-stagger">' +
-           SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus }) +
-           SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal" }) +
-           SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal" }) +
-           SummaryCard({ title: "SOS yoğ.", value: s.sosTotal, unit: "kayıt", windowDays: windowDays, trend: sosTrend, status: sosStatus }) +
-           SummaryCard({ title: "Eksik gün", value: s.missingDays, unit: "gün", windowDays: windowDays, trend: "→", status: missingStatus }) +
-           SummaryCard({ title: "MOH gün", value: s.mohStreak, unit: "gün", windowDays: windowDays, trend: "→", status: mohStatus }) +
+           SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), countValue: s.sleepMean, countFormat: "decimal", unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus }) +
+           SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), countValue: s.stepsMean, countFormat: "integer", unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal" }) +
+           SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), countValue: s.waterMean, countFormat: "decimal", unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal" }) +
+           SummaryCard({ title: "SOS yoğ.", value: s.sosTotal, countValue: s.sosTotal, countFormat: "integer", unit: "kayıt", windowDays: windowDays, trend: sosTrend, status: sosStatus }) +
+           SummaryCard({ title: "Eksik gün", value: s.missingDays, countValue: s.missingDays, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: missingStatus }) +
+           SummaryCard({ title: "MOH gün", value: s.mohStreak, countValue: s.mohStreak, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: mohStatus }) +
            "</div>";
   }
 
@@ -2703,6 +2813,8 @@
       renderToastHost() +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
 
+    runCountUps();
+
     // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)
     setTimeout(initMaps, 50);
   }
@@ -2940,6 +3052,7 @@
     AeToast: AeToast,
     AeSkeleton: AeSkeleton,
     AeTooltip: AeTooltip,
+    animateCountUp: animateCountUp,
     renderLoadingState: renderLoadingState,
     getEnergy: getEnergy,
     getStress: getStress,

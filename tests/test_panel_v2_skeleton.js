@@ -14,6 +14,8 @@ assert(panelHtml.includes('html lang="tr"'), "panel-v2.html lang=tr");
 assert(panelHtml.includes('id="app"'), "panel-v2.html #app var");
 assert(panelHtml.includes('panel-v2.css'), "panel-v2.html CSS yükleniyor");
 assert(panelHtml.includes('panel-v2.js'), "panel-v2.html JS yükleniyor");
+assert(panelHtml.includes('fonts.googleapis.com/css2?family=Inter'), "Inter font link'i var");
+assert(panelHtml.includes('JetBrains+Mono'), "JetBrains Mono font link'i var");
 assert(panelHtml.includes('panelCoverageManifest.js'), "panel-v2.html coverage manifest yükleniyor");
 
 assert(panelCss.includes('.ae-card'), "panel-v2.css .ae-card var");

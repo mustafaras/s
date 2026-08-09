@@ -32,7 +32,8 @@ function mediaRule(query) {
   "--ae-chip-bg", "--ae-chip-text",
   "--ae-empty-bg", "--ae-empty-icon",
   "--ae-space-2xs", "--ae-space-xs", "--ae-space-sm", "--ae-space-md", "--ae-space-lg", "--ae-space-xl", "--ae-space-2xl", "--ae-space-3xl",
-  "--ae-font", "--ae-radius-xs", "--ae-radius-sm", "--ae-radius-md", "--ae-radius-lg", "--ae-radius-xl", "--ae-radius-full",
+  "--ae-font", "--ae-mono", "--ae-scale-xs", "--ae-scale-sm", "--ae-scale-md", "--ae-scale-lg", "--ae-scale-xl", "--ae-scale-2xl", "--ae-scale-3xl",
+  "--ae-radius-xs", "--ae-radius-sm", "--ae-radius-md", "--ae-radius-lg", "--ae-radius-xl", "--ae-radius-full",
   "--ae-ease"
 ].forEach(varRule);
 
@@ -57,6 +58,23 @@ function mediaRule(query) {
 ].forEach(function(token) {
   assert(css.includes(token), "Premium token değeri var: " + token);
 });
+
+// ── Typography tokens / mono data surface ──
+[
+  "--ae-font: 'Inter', -apple-system, sans-serif",
+  "--ae-mono: 'JetBrains Mono', 'SF Mono', monospace",
+  "--ae-scale-xs: 10px", "--ae-scale-sm: 12px", "--ae-scale-md: 14px",
+  "--ae-scale-lg: 18px", "--ae-scale-xl: 24px", "--ae-scale-2xl: 32px", "--ae-scale-3xl: 42px"
+].forEach(function(token) {
+  assert(css.includes(token), "Tipografi token değeri var: " + token);
+});
+[
+  ".ae-value", ".summary-card__value", ".day-date-picker__iso", ".date-picker__iso",
+  ".loc-timeline-compact", ".sess-item__value", ".status-row__value", ".loc-dot__coord"
+].forEach(function(selector) {
+  assert(css.includes(selector), "Mono veri yüzeyi seçicisi var: " + selector);
+});
+assert(!/font-size:\s*[0-9]+px/.test(css), "Tüm font-size değerleri scale token kullanıyor");
 
 // ── Dark theme override block ──
 assert(css.includes('#root[data-theme="dark"]'), "Dark theme override bloğu var");

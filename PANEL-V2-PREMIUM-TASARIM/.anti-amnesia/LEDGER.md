@@ -41,7 +41,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 1 | Renk Paleti & Tasarım Token'ları | ✅ TAMAMLANDI | `96c64cf` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS) | Premium açık/koyu token sistemi, cache bump ve deterministik tarih fixture düzeltmeleri |
 | 2 | Tipografi Sistemi & Font Yükleme | ✅ TAMAMLANDI | `f1131eb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); literal font-size audit | Inter/JetBrains Mono, scale tokenları, mono veri yüzeyleri ve CSS cache bump tamamlandı |
 | 3 | Glassmorphism Kart Sistemi | ✅ TAMAMLANDI | `cc61b19`, `6402408` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); rendered variants PASS; live cache verification PASS | AeCard glass/solid/gradient/outline varyantları, mevcut kart eşlemeleri ve CSS/JS cache bump tamamlandı |
-| 4 | Buton & Status Badge Sistemi | 🔒 BEKLEMEDE | - | - | - |
+| 4 | Buton & Status Badge Sistemi | ✅ TAMAMLANDI | \`e79b530\` | \`node --check panel-v2.js\`; \`node --check panelCoverageManifest.js\`; \`tests/test_panel_v2_tabs.js\` PASS; \`tests/test_panel_v2_*.js\` (9/9 PASS); diff/secret audit PASS | AeButton gradient/glow/spring, AeStatusBadge dot glow/pulse, kullanım eşlemeleri ve cache bump tamamlandı |
 | 5 | Animasyon Kütüphanesi | 🔒 BEKLEMEDE | - | - | - |
 | 6 | Skeleton & Tooltip | 🔒 BEKLEMEDE | - | - | - |
 | 7 | AeMetric & AeProgressRing | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 4
+- **currentStep:** 5
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-09
 - **lastAgent:** OpenAI Codex (GPT-5)

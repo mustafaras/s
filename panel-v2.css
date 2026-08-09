@@ -1187,6 +1187,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   stroke-width: 1.5;
 }
 
+.ae-sparkline__dot[data-last="true"] {
+  stroke-width: 2.25;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ae-spark-color) 52%, transparent));
+}
+
 .ae-sparkline__empty-line {
   stroke: var(--ae-glass-border);
   stroke-dasharray: 3 4;

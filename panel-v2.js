@@ -926,9 +926,13 @@
     var areaPaths = segments.map(function(pointsInSegment) {
       return '<path class="ae-sparkline__area" d="' + sparklineAreaPath(pointsInSegment, baseline) + '"></path>';
     }).join("");
-    var dots = points.filter(Boolean).map(function(point) {
+    var validPoints = points.filter(Boolean);
+    var lastPoint = validPoints.length ? validPoints[validPoints.length - 1] : null;
+    var dots = validPoints.map(function(point) {
+      var isLast = point === lastPoint;
       return '<circle class="ae-sparkline__dot" cx="' + point.x.toFixed(2) +
-             '" cy="' + point.y.toFixed(2) + '" r="2.5"></circle>';
+             '" cy="' + point.y.toFixed(2) + '" r="' + (isLast ? "3.75" : "2.5") +
+             '" data-last="' + (isLast ? "true" : "false") + '" aria-hidden="true"></circle>';
     }).join("");
 
     return '<div class="' + baseClass + '" role="img" aria-label="' + escapeHtml(title) + '">' +

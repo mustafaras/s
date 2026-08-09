@@ -18,6 +18,10 @@ assert(/class="ae-sparkline ae-sparkline--ok"/.test(sparkFixture), "AeSparkline 
 assert(/class="ae-sparkline__line"/.test(sparkFixture), "AeSparkline SVG line path var");
 assert(/class="ae-sparkline__area"/.test(sparkFixture), "AeSparkline area fill path var");
 assert((sparkFixture.match(/class="ae-sparkline__dot"/g) || []).length === 7, "AeSparkline veri noktaları var");
+assert((sparkFixture.match(/data-last="true"/g) || []).length === 1, "AeSparkline son noktayı vurguluyor");
+assert(/viewBox="0 0 160 42"/.test(sparkFixture), "AeSparkline responsive viewBox taşıyor");
+const emptySparkFixture = AeonV2.AeSparkline([], "ok", 42);
+assert(/ae-sparkline--empty/.test(emptySparkFixture) && /ae-sparkline__empty-line/.test(emptySparkFixture), "Boş AeSparkline düz placeholder çizgisi gösteriyor");
 
 function countMatches(re) {
   const m = dom.html.match(re) || [];
@@ -111,6 +115,7 @@ const sparklineCount = (html.match(/class="ae-sparkline ae-sparkline--/g) || [])
 assert(sparklineCount === 4, "Trend strip'te 4 SVG sparkline var: " + sparklineCount);
 assert((html.match(/class="ae-sparkline__line"/g) || []).length === 4, "Trend strip'te 4 line path var");
 assert((html.match(/class="ae-sparkline__area"/g) || []).length === 4, "Trend strip'te 4 area fill var");
+assert((html.match(/data-last="true"/g) || []).length === 4, "Trend strip'te her metrik son noktayı vurguluyor");
 assert((html.match(/ae-sparkline--accent/g) || []).length === 1, "Mod sparkline accent rengi kullanıyor");
 assert((html.match(/ae-sparkline--info/g) || []).length === 2, "Uyku ve adım sparkline info rengi kullanıyor");
 assert((html.match(/ae-sparkline--ok/g) || []).length === 1, "Su sparkline ok rengi kullanıyor");

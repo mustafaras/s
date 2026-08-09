@@ -191,6 +191,7 @@ classRule("ae-sparkline__dot");
 classRule("ae-sparkline--accent");
 classRule("ae-sparkline--info");
 classRule("ae-sparkline--ok");
+assert(css.includes('.ae-sparkline__dot[data-last="true"]'), "Sparkline son nokta vurgusu var");
 assert(css.includes('preserveAspectRatio="none"') || js.includes('preserveAspectRatio="none"'), "Sparkline responsive SVG oranı var");
 assert(css.includes("color-mix(in srgb, var(--ae-spark-color) 18%, transparent)"), "Sparkline area fill token rengi var");
 assert(js.includes("function AeSparkline"), "AeSparkline JS komponenti var");

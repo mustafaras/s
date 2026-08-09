@@ -44,7 +44,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 4 | Buton & Status Badge Sistemi | ✅ TAMAMLANDI | \`e79b530\` | \`node --check panel-v2.js\`; \`node --check panelCoverageManifest.js\`; \`tests/test_panel_v2_tabs.js\` PASS; \`tests/test_panel_v2_*.js\` (9/9 PASS); diff/secret audit PASS | AeButton gradient/glow/spring, AeStatusBadge dot glow/pulse, kullanım eşlemeleri ve cache bump tamamlandı |
 | 5 | Animasyon Kütüphanesi | ✅ TAMAMLANDI | 05aa066 | node --check panel-v2.js; node --check panelCoverageManifest.js; test_panel_v2_css PASS; test_panel_v2_* (9/9 PASS); old fade audit/secret scan PASS | Slide-up, scale-in, shimmer, count-up, pulse, stagger ve reduced-motion sistemi tamamlandı |
 | 6 | Skeleton & Tooltip | ✅ TAMAMLANDI | 5665fb6 | node --check panel-v2.js; node --check panelCoverageManifest.js; test_panel_v2_skeleton PASS; test_panel_v2_* (9/9 PASS); loading/data swap, diff/secret audit PASS | AeSkeleton varyantları, AeTooltip glass/ok/focus davranışı ve fetch loading shell tamamlandı |
-| 7 | AeMetric & AeProgressRing | 🔒 BEKLEMEDE | - | - | - |
+| 7 | AeMetric & AeProgressRing | ✅ TAMAMLANDI | `92180bb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS | AeMetric/AeProgressRing, mini sparkline/delta göstergeleri, cache bump ve yeni kontrat testleri tamamlandı |
 | 8 | AeSparkline SVG Grafik | 🔒 BEKLEMEDE | - | - | - |
 | 9 | AeDivider & AeToast | 🔒 BEKLEMEDE | - | - | - |
 | 10 | Gün Detayı Bölümlerini Ayır | 🔒 BEKLEMEDE | - | - | - |
@@ -90,6 +90,8 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)
+- **deliveryPolicy:** `auto_commit_push_pages_after_each_prompt` (kullanıcı onayı: 2026-08-09)
+- **mergePolicy:** `main` doğrudan push; ayrı feature branch yoksa ayrı merge commit’i oluşturulmaz
 
 ---
 
@@ -99,7 +101,8 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 2. **Handoff formatı:** Her prompt bitiminde `handoff-PROMPT-XX.md` dosyası oluşturulacak.
 3. **Context/token yönetimi:** Her 5 promptta bir `/compact` veya yeni oturum önerilecek; ayrıntılar `TOKEN-BUDGET.md`’de.
 4. **Çok ajan koordinasyonu:** Aynı anda sadece bir ajan `panel-v2.js/css/html` yazmalı; paralel çalışma farklı test dosyaları üzerinde yapılabilir.
-5. **Deploy frekansı:** Her 5 promptta bir `git push origin main`.
+5. **Deploy frekansı:** Her prompt tamamlanıp testleri geçtiğinde otomatik commit + `git push origin main` + GitHub Pages doğrulaması.
+6. **Tek-adım sınırı:** Otomatik teslim yalnızca tamamlanan mevcut prompt için çalışır; sonraki prompt kullanıcı onayı/mesajı olmadan başlatılmaz.
 
 ---
 
@@ -124,6 +127,6 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 2. `04-40-PROMPT.md`’de ilgili Prompt bölümünü oku.
 3. `AGENT-CONTEXT.md`’den minimum bağlamı al.
 4. `TOKEN-BUDGET.md`’den context limiti ve compact önerisini kontrol et.
-5. Promptu uygula, test et, commit/push yap.
+5. Promptu uygula, test et, otomatik teslim politikasına göre yalnızca o promptu commit/push/deploy doğrula.
 6. `HANDOFF-TEMPLATE.md`’yi doldur ve `handoff-PROMPT-XX.md` olarak kaydet.
 7. Bu `LEDGER.md`’de durumu güncelle ve `currentStep`’i ilerlet.

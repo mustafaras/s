@@ -2185,13 +2185,30 @@ function pmClamp(text){
     '<button class="pm-more" style="display:none" onclick="pmToggleMsg(this)">Tümünü göster ⌄</button></div>';
 }
 // Tek balon satırı — side:'in'(Şeyma sol) | 'out'(companion sağ), tone:'aeon'|'luna'
-function pmRow(side,tone,text,footHtml,enter){
+function pmRow(side,tone,text,footHtml,enter,grouped){
   var cls=side==="out"?("out-"+(tone||"aeon")):"in";
-  var h='<div class="pm-row '+side+(enter?" pm-enter":"")+'">';
+  var h='<div class="pm-row '+side+(enter?" pm-enter":"")+(grouped?" grouped":"")+'">';
   h+='<div class="pm-bubble '+cls+'">'+pmClamp(text)+'</div>';
-  if(footHtml) h+='<div class="pm-foot">'+footHtml+'</div>';
+  var t=esc(String(text==null?"":text));
+  var actions='<button class="pm-msgact" data-text="'+t+'" onclick="copyPmMsg(this)" aria-label="Kopyala">'+icon('copy',11)+'</button><button class="pm-msgact" data-text="'+t+'" onclick="sharePmMsg(this)" aria-label="Paylaş">'+icon('share-2',11)+'</button>';
+  h+='<div class="pm-foot">'+(footHtml||"")+actions+'</div>';
   h+='</div>';
   return h;
+}
+window.copyPmMsg=function(el){
+  var t=el&&el.getAttribute("data-text"); if(!t) return;
+  try{ navigator.clipboard.writeText(t); }catch(e){ return; }
+  pmMsgActFeedback(el);
+};
+window.sharePmMsg=function(el){
+  var t=el&&el.getAttribute("data-text"); if(!t) return;
+  try{ if(navigator.share){ navigator.share({text:t,title:"ÆON"}).catch(function(){}); return; } }catch(e){}
+  try{ navigator.clipboard.writeText(t); pmMsgActFeedback(el); }catch(e){}
+};
+function pmMsgActFeedback(el){
+  if(!el) return;
+  var orig=el.innerHTML; el.innerHTML=icon("check",11);
+  setTimeout(function(){ if(el) el.innerHTML=orig; },1200);
 }
 // Ses/foto balonu — pmRow'un metin/markdown yolunu atlayıp doğrudan medya yuvası basar.
 // Yuva boş başlar; aeonLoadVisibleMediaP() (render sonrası) doldurur — kendi az önce
@@ -2207,9 +2224,9 @@ function pmMediaSlotHTML(mediaKind,mediaId,w,h){
   }
   return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
 }
-function pmRowMedia(side,tone,mediaKind,mediaId,w,h,footHtml,enter){
+function pmRowMedia(side,tone,mediaKind,mediaId,w,h,footHtml,enter,grouped){
   var cls=side==="out"?("out-"+(tone||"aeon")):"in";
-  var h2='<div class="pm-row '+side+(enter?" pm-enter":"")+'">';
+  var h2='<div class="pm-row '+side+(enter?" pm-enter":"")+(grouped?" grouped":"")+'">';
   h2+='<div class="pm-bubble '+cls+'" style="padding:4px;">'+pmMediaSlotHTML(mediaKind,mediaId,w,h)+'</div>';
   if(footHtml) h2+='<div class="pm-foot">'+footHtml+'</div>';
   h2+='</div>';
@@ -2241,29 +2258,36 @@ function aeonThreadCardHTML(){
   qa.forEach(function(x){ if(x&&x.answer&&(!x.answerMsgId||!shownInbox[x.answerMsgId])){ items.push({sort:String(x.answeredAt||x.ts||""),side:"out",text:x.answer,time:x.answeredAt||x.ts,st:{cls:x.answerReadAt?"b-ok":"b-warn",txt:x.answerReadAt?(icon('check-check',11)+' Görüldü'):(icon('check',11)+' İletildi')},mediaKind:x.answerKind,mediaId:x.answerMediaId,w:x.answerW,h:x.answerH}); } });
   items.sort(function(a,b){ return a.sort<b.sort?-1:(a.sort>b.sort?1:0); });
 
-  var s='<div class="card span-6 pad" style="order:10;">';
+  var s='<div class="card span-12 pad" style="order:10;">';
   s+='<div style="display:flex;align-items:center;gap:11px;margin-bottom:11px;">';
   s+='<div style="width:42px;height:42px;border-radius:13px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 4px 14px rgba(212,175,55,.4);">'+icon('hexagon',22)+'</div>';
   s+='<div style="flex:1;min-width:0;line-height:1.25;"><div style="font-size:var(--f5);font-weight:800;letter-spacing:1.5px;color:var(--t1);">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:700;letter-spacing:.4px;">hep yanında · sınırsız sohbet</div></div>';
   if(unread) s+='<span class="badge b-warn nodot" style="padding:3px 10px;">'+unread+' okunmadı</span>';
+  s+='<button onclick="togglePmSearch()" aria-label="Mesajlarda ara" style="flex-shrink:0;border:1px solid var(--bd);background:var(--s2);color:var(--t2);width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('search',15)+'</button>';
   s+='</div>';
-  s+='<div class="pm-thread" id="pm-aeon-thread" style="max-height:360px;">';
+  s+='<div id="pm-search-bar" style="display:none;margin:0 0 10px;position:relative;">';
+  s+='<input id="pm-search-input" type="text" oninput="filterPmSearch(this)" placeholder="Mesajlarda ara…" style="width:100%;box-sizing:border-box;border:1px solid var(--bd);background:var(--s2);color:var(--t1);border-radius:13px;padding:9px 34px 9px 13px;font-size:var(--f3);outline:none;">';
+  s+='<button onclick="clearPmSearch()" style="position:absolute;right:7px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--t4);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',13)+'</button>';
+  s+='</div>';
+  s+='<div class="pm-thread" id="pm-aeon-thread" style="max-height:min(72vh,640px);">';
   if(!items.length){
     s+='<div class="empty" style="padding:26px 14px;"><span class="ei">⬡</span>Şeyma henüz ÆON’a yazmadı</div>';
   } else {
-    var prev=null;
+    var prev=null, prevSide=null;
     items.forEach(function(it){
       var ds=""; try{ var dd=new Date(it.time); if(!isNaN(dd.getTime())) ds=fmt(dd); }catch(e){}
-      if(ds && ds!==prev){ s+='<div class="pm-daydiv">'+esc(pmDay(it.time))+'</div>'; prev=ds; }
+      if(ds && ds!==prev){ s+='<div class="pm-daydiv">'+esc(pmDay(it.time))+'</div>'; prev=ds; prevSide=null; }
+      var grouped=(prevSide===it.side);
       if(it.side==="in"){
         var f='<span>Şeyma · '+esc(pmClock(it.time))+'</span>';
         if(it.reviewing) f+='<span style="color:var(--amber);font-weight:800;">⏳ yanıt bekliyor</span>';
-        s+=it.mediaKind?pmRowMedia("in",null,it.mediaKind,it.mediaId,it.w,it.h,f,false):pmRow("in",null,it.text,f,false);
+        s+=it.mediaKind?pmRowMedia("in",null,it.mediaKind,it.mediaId,it.w,it.h,f,false,grouped):pmRow("in",null,it.text,f,false,grouped);
       } else {
         var f2=pmStatusFoot(it.st,it.time);
         if(it.del) f2+='<button class="pm-del" title="Kanaldan kaldır" onclick="delObserverMsg(\''+esc(it.id)+'\')" style="display:inline-flex;align-items:center;">'+icon('trash-2',12)+'</button>';
-        s+=it.mediaKind?pmRowMedia("out","aeon",it.mediaKind,it.mediaId,it.w,it.h,f2,false):pmRow("out","aeon",it.text,f2,false);
+        s+=it.mediaKind?pmRowMedia("out","aeon",it.mediaKind,it.mediaId,it.w,it.h,f2,false,grouped):pmRow("out","aeon",it.text,f2,false,grouped);
       }
+      prevSide=it.side;
     });
   }
   s+='</div>';
@@ -2287,7 +2311,7 @@ function aeonThreadCardHTML(){
     s+='<input type="file" id="pm-file-input" accept="'+AEON_FILE_ACCEPT+'" style="display:none;" onchange="aeonFileChosenP(this)">';
     s+='<input type="file" id="pm-audio-input" accept="audio/*" style="display:none;" onchange="aeonAudioFileChosenP(this)">';
     s+='<button onclick="openAttachSheetP()" aria-label="Ek gönder" class="pm-send" style="background:var(--s3);color:var(--t2);box-shadow:none;'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('paperclip',17)+'</button>';
-    s+='<textarea id="pm-aeon-input" oninput="aeonChatDraft(this.value)" onkeydown="pmAeonKeydown(event)" placeholder="ÆON olarak yaz…" rows="1">'+esc(UI.msgDraft||"")+'</textarea>';
+    s+='<textarea id="pm-aeon-input" oninput="aeonChatDraft(this)" onkeydown="pmAeonKeydown(event)" placeholder="ÆON olarak yaz…" rows="1">'+esc(UI.msgDraft||"")+'</textarea>';
     s+='<button id="pm-aeon-send" class="pm-send'+(disabled?' is-disabled':'')+'" onclick="sendAeonChat()" aria-label="Gönder" style="display:'+(draftHas?'flex':'none')+';">'+(UI.msgSending?'…':icon('send',17))+'</button>';
     s+='<button id="pm-aeon-mic" onclick="aeonMicTapP()" aria-label="Sesli mesaj kaydet" class="pm-send" style="display:'+(draftHas?'none':'flex')+';'+(UI.msgSending?'opacity:.5;pointer-events:none;':'')+'">'+icon('mic',17)+'</button>';
     s+='</div>';
@@ -4597,8 +4621,10 @@ function putInbox(messages,sha,receipts){
   var H=ghJsonHeaders(); H["Content-Type"]="application/json";
   return fetch(inboxApi(),{method:"PUT",headers:H,body:JSON.stringify(body)}).then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+" "+t.slice(0,120)); }); });
 }
-window.aeonChatDraft=function(v){
+window.aeonChatDraft=function(el){
+  var v=(el&&el.value)||"";
   UI.msgDraft=v;
+  try{ if(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,120)+"px"; } }catch(e){}
   var hasText=!!String(v||"").trim();
   var btn=document.getElementById("pm-aeon-send");
   if(btn){ btn.className="pm-send"+((!hasText||UI.msgSending)?" is-disabled":""); btn.style.display=hasText?"flex":"none"; }
@@ -4606,6 +4632,51 @@ window.aeonChatDraft=function(v){
 };
 window.pmAeonKeydown=function(e){
   if(e && e.key==="Enter" && !e.shiftKey){ e.preventDefault(); window.sendAeonChat(); }
+};
+// app.js'teki App.toggleAeonSearch/filterAeonSearch ile aynı desen: tam render
+// TETİKLEMEDEN DOM'da satır bazlı filtreler, veri silinmez.
+window.togglePmSearch=function(){
+  var bar=document.getElementById("pm-search-bar"); if(!bar) return;
+  var show=bar.style.display==="none";
+  bar.style.display=show?"block":"none";
+  if(show){ var inp=document.getElementById("pm-search-input"); if(inp) inp.focus(); }
+  else window.clearPmSearch();
+};
+window.clearPmSearch=function(){
+  var inp=document.getElementById("pm-search-input"); if(inp) inp.value="";
+  window.filterPmSearch({value:""});
+};
+window.filterPmSearch=function(el){
+  var q=String((el&&el.value)||"").trim().toLowerCase();
+  var thread=document.getElementById("pm-aeon-thread"); if(!thread) return;
+  var groups=[], current=null, totalMatches=0;
+  Array.prototype.forEach.call(thread.children,function(node){
+    if(!node.classList) return;
+    if(node.classList.contains("pm-daydiv")){ current={div:node,rows:[]}; groups.push(current); }
+    else if(node.classList.contains("pm-row")){
+      if(!current){ current={div:null,rows:[]}; groups.push(current); }
+      current.rows.push(node);
+    }
+  });
+  groups.forEach(function(g){
+    var groupHasMatch=false;
+    g.rows.forEach(function(row){
+      var match=!q || row.textContent.toLowerCase().indexOf(q)!==-1;
+      row.style.display=match?"":"none";
+      if(match) groupHasMatch=true;
+    });
+    totalMatches+=g.rows.filter(function(r){ return r.style.display!=="none"; }).length;
+    if(g.div) g.div.style.display=groupHasMatch?"":"none";
+  });
+  var hint=document.getElementById("pm-search-noresult");
+  if(q && totalMatches===0){
+    if(!hint){
+      hint=document.createElement("div"); hint.id="pm-search-noresult";
+      hint.style.cssText="text-align:center;padding:16px 10px;color:var(--t4);font-size:var(--f3);font-weight:600;";
+      hint.textContent="Eşleşen mesaj bulunamadı";
+      thread.appendChild(hint);
+    }
+  } else if(hint){ hint.remove(); }
 };
 window.sendAeonChat=function(){
   if(DEMO_MODE){ alert("Demo modu: ağ ve mesaj yazımı kapalı."); return; }
@@ -4751,12 +4822,18 @@ window.openPdfP=function(mediaId,name){
 window.aeonOpenImageP=function(mediaId){
   var m=aeonMediaCacheP[mediaId]; if(!m) return;
   var uri="data:"+(m.mime||"")+";base64,"+m.data;
+  var ext=(m.mime&&m.mime.indexOf("png")>=0)?"png":(m.mime&&m.mime.indexOf("gif")>=0)?"gif":(m.mime&&m.mime.indexOf("webp")>=0)?"webp":"jpg";
   var ex=document.getElementById("pm-lightbox"); if(ex) ex.remove();
   var d=document.createElement("div"); d.id="pm-lightbox";
-  d.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(3,3,5,0.94);display:flex;align-items:center;justify-content:center;padding:20px;";
-  d.innerHTML='<img src="'+uri+'" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">'
-    +'<button aria-label="Kapat" style="position:absolute;top:16px;right:16px;border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>';
-  d.onclick=function(e){ if(e.target===d||e.target.tagName==="BUTTON") d.remove(); };
+  d.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(3,3,5,0.94);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;";
+  d.innerHTML='<img id="pm-lightbox-img" src="'+uri+'" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform .18s ease;">'
+    +'<div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">'
+    +'<a href="'+uri+'" download="aeon-foto.'+ext+'" aria-label="İndir" style="border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('download',16)+'</a>'
+    +'<button aria-label="Kapat" style="border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>'
+    +'</div>';
+  d.onclick=function(e){ if(e.target===d||e.target.tagName==="BUTTON"){ d.remove(); } };
+  var img=document.getElementById("pm-lightbox-img"), zoomed=false;
+  img.onclick=function(e){ e.stopPropagation(); zoomed=!zoomed; img.style.transform=zoomed?"scale(1.8)":"scale(1)"; img.style.cursor=zoomed?"zoom-out":"zoom-in"; };
   document.body.appendChild(d);
 };
 // ---------- ÆON ses kaydı (panel tarafı) ----------

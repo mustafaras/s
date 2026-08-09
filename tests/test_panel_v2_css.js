@@ -109,6 +109,15 @@ classRule("sub-tab.is-active");
 classRule("ae-btn");
 classRule("ae-status-btn");
 classRule("density-btn");
+assert(css.includes("background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));"), "Primary/pill gradient var");
+assert(css.includes("box-shadow: var(--ae-shadow-md), var(--ae-glow-accent);"), "Primary hover glow shadow var");
+assert(css.includes("transform: translateY(-1px) scale(1.02);"), "Primary hover spring scale var");
+assert(css.includes("transform: scale(0.97);"), "Button active spring scale var");
+assert(css.includes("background: linear-gradient(135deg, var(--ae-drop),"), "Drop button red gradient var");
+assert(css.includes(".ae-btn--pill.is-active"), "Active pill selector var");
+assert(css.includes("box-shadow: 0 0 8px var(--ae-ok);"), "OK status dot glow var");
+assert(css.includes("@keyframes aeStatusDropPulse"), "Drop status pulse animation var");
+assert(css.includes("box-shadow: 0 0 12px var(--ae-drop);"), "Drop status dot red glow var");
 
 // ── Hero / summary / empty ──
 classRule("ae-grid--hero");

@@ -154,9 +154,13 @@
       anti_clobber: "warn", rate_limited: "warn", receipt_failed: "drop"
     };
     var tone = palette[status] || "muted";
+    if (["ok", "warn", "drop", "info", "pause", "muted"].indexOf(opts.tone) !== -1) {
+      tone = opts.tone;
+    }
+    var label = opts.label || labels[status] || status;
     return '<span class="ae-status ae-status--' + tone + '">' +
            '<span class="ae-status__dot"></span>' +
-           '<span class="ae-status__label">' + escapeHtml(labels[status] || status) + "</span>" +
+           '<span class="ae-status__label">' + escapeHtml(label) + "</span>" +
            "</span>";
   }
 
@@ -624,13 +628,13 @@
     var isToday = ui.date === today;
     var dateText = isToday ? "Bugün" : formatDateLabel(ui.date);
     return '<div class="ae-card ae-card--outline ae-card--summary date-picker">' +
-           '<button type="button" class="ae-btn ae-btn--mini" onclick="AeonV2.shiftDate(-1)">◀</button>' +
+           AeButton({ label: "◀", variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
            '<div class="date-picker__display">' +
            '<div class="date-picker__label">' + escapeHtml(dateText) + "</div>" +
            '<div class="date-picker__iso">' + escapeHtml(ui.date) + "</div>" +
            "</div>" +
-           '<button type="button" class="ae-btn ae-btn--mini" onclick="AeonV2.shiftDate(1)">▶</button>' +
-           '<button type="button" class="ae-btn ae-btn--text" onclick="AeonV2.goToDayDetail()">Detay</button>' +
+           AeButton({ label: "▶", variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
+           AeButton({ label: "Detay", variant: "text", onclick: "AeonV2.goToDayDetail()" }) +
            "</div>";
   }
 
@@ -812,7 +816,11 @@
     return '<div class="ae-card ae-card--solid ae-card--summary summary-card summary-card--' + status + '">' +
            '<div class="summary-card__head">' +
            '<div class="summary-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
-           '<span class="ae-status ae-status--' + statusTone + '">' + escapeHtml({ normal: "normal", attention: "dikkat", risk: "risk" }[status] || status) + "</span>" +
+           AeStatusBadge({
+             status: status,
+             tone: statusTone,
+             label: { normal: "normal", attention: "dikkat", risk: "risk" }[status] || status
+           }) +
            "</div>" +
            '<div class="summary-card__value">' + escapeHtml(value) + unit + ' <span class="summary-card__trend">' + escapeHtml(trend) + "</span></div>" +
            '<div class="summary-card__window">Son ' + escapeHtml(String(opts.windowDays || 7)) + " gün</div>" +
@@ -830,7 +838,7 @@
            '<div class="anomaly-card__message">' + escapeHtml(a.message) + "</div>" +
            '<div class="anomaly-card__meta">' + escapeHtml(dateLabel) + "</div>" +
            "</div>" +
-           '<button type="button" class="ae-btn ae-btn--text" onclick="AeonV2.goToDayDetail(\'' + escapeHtml(a.linkDate) + '\')">Detay gör</button>' +
+           AeButton({ label: "Detay gör", variant: "text", onclick: "AeonV2.goToDayDetail('" + escapeHtml(a.linkDate) + "')" }) +
            "</div></div>";
   }
 
@@ -890,8 +898,14 @@
   function renderWindowSelector() {
     var options = [7, 14, 30];
     var buttons = options.map(function(d) {
-      var active = ui.trendWindow === d ? " is-active" : "";
-      return '<button type="button" class="ae-btn ae-btn--pill' + active + '" onclick="AeonV2.setTrendWindow(' + d + ')">' + d + " gün</button>";
+      var active = ui.trendWindow === d ? "is-active" : "";
+      return AeButton({
+        label: d + " gün",
+        variant: "pill",
+        className: active,
+        onclick: "AeonV2.setTrendWindow(" + d + ")",
+        ariaLabel: d + " günlük pencere"
+      });
     }).join("");
     return '<div class="window-selector">' +
            '<div class="ae-label">Pencere</div>' +
@@ -2160,11 +2174,21 @@
     if (state.totalPages <= 1) return "";
     var buttons = "";
     if (state.hasPrev) {
-      buttons += '<button type="button" class="ae-btn ae-btn--mini" onclick="' + escapeHtml(onClickPrefix + "(" + (state.page - 1) + ")") + '">◀</button>';
+      buttons += AeButton({
+        label: "◀",
+        variant: "mini",
+        onclick: onClickPrefix + "(" + (state.page - 1) + ")",
+        ariaLabel: "Önceki sayfa"
+      });
     }
     buttons += '<span class="pagination__info">' + state.page + " / " + state.totalPages + "</span>";
     if (state.hasNext) {
-      buttons += '<button type="button" class="ae-btn ae-btn--mini" onclick="' + escapeHtml(onClickPrefix + "(" + (state.page + 1) + ")") + '">▶</button>';
+      buttons += AeButton({
+        label: "▶",
+        variant: "mini",
+        onclick: onClickPrefix + "(" + (state.page + 1) + ")",
+        ariaLabel: "Sonraki sayfa"
+      });
     }
     return '<div class="pagination">' + buttons + "</div>";
   }

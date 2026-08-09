@@ -324,9 +324,10 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 .ae-btn--pill.is-active {
-  background: var(--ae-accent);
+  background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));
   color: var(--ae-page);
-  border-color: var(--ae-accent);
+  border-color: transparent;
+  box-shadow: var(--ae-glow-accent);
 }
 
 /* ── Anomaly cards ── */
@@ -565,16 +566,17 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   padding: var(--ae-space-sm) var(--ae-space-md);
   border-radius: var(--ae-radius-sm);
   cursor: pointer;
-  transition: transform 0.16s var(--ae-ease), background 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease, border-color 0.18s ease, box-shadow 0.22s ease;
 }
 
 .ae-btn:hover {
   background: var(--ae-chip-bg);
   border-color: var(--ae-tab-bd);
+  transform: scale(1.02);
 }
 
 .ae-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .ae-btn--mini {
@@ -1239,15 +1241,33 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
+@keyframes aeStatusDropPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 4px var(--ae-drop);
+  }
+  50% {
+    opacity: 0.68;
+    transform: scale(1.25);
+    box-shadow: 0 0 12px var(--ae-drop);
+  }
+}
+.ae-status--ok .ae-status__dot {
+  box-shadow: 0 0 8px var(--ae-ok);
+}
 .ae-status--drop .ae-status__dot {
-  animation: aePulse 1.6s ease-in-out infinite;
+  animation: aeStatusDropPulse 1.6s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--ae-drop);
 }
 
 /* Sekme geçişi <=150ms */
 .ae-tab,
-.sub-tab,
-.ae-btn {
+.sub-tab {
   transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease, transform 0.12s var(--ae-ease);
+}
+.ae-btn {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.12s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.22s ease;
 }
 
 /* Reduced-motion */
@@ -1259,6 +1279,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-btn,
   .trend-bar__fill { transition: none !important; }
   .ae-status--drop .ae-status__dot { animation: none !important; }
+  .ae-btn:hover,
+  .ae-btn:active { transform: none; }
   .ae-card--summary:hover { transform: none; }
 }
 
@@ -1628,18 +1650,26 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   background: linear-gradient(135deg, var(--ae-accent), var(--ae-accent2));
   border-color: transparent;
   color: var(--ae-page);
+  box-shadow: var(--ae-shadow-sm);
 }
 .ae-btn--primary:hover {
   background: linear-gradient(135deg, var(--ae-accent2), var(--ae-accent));
+  border-color: transparent;
   color: var(--ae-page);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: var(--ae-shadow-md), var(--ae-glow-accent);
 }
 .ae-btn--drop {
-  background: color-mix(in srgb, var(--ae-drop) 10%, var(--ae-elevated));
-  border-color: color-mix(in srgb, var(--ae-drop) 24%, transparent);
-  color: var(--ae-drop);
+  background: linear-gradient(135deg, var(--ae-drop), color-mix(in srgb, var(--ae-drop) 72%, #7c3434 28%));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--ae-shadow-sm);
 }
 .ae-btn--drop:hover {
-  background: color-mix(in srgb, var(--ae-drop) 16%, var(--ae-elevated));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ae-drop) 82%, #fff 18%), var(--ae-drop));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--ae-shadow-md), var(--ae-glow-drop);
 }
 
 /* Icon-only buton boyutu */

@@ -152,6 +152,97 @@
            "</span>";
   }
 
+  var AE_RING_COLORS = {
+    accent: "var(--ae-accent)",
+    ok: "var(--ae-ok)",
+    warn: "var(--ae-warn)",
+    drop: "var(--ae-drop)",
+    info: "var(--ae-info)"
+  };
+
+  function AeProgressRing(opts) {
+    opts = opts || {};
+    var value = safeNumber(opts.value);
+    var pct = value === null ? 0 : Math.max(0, Math.min(100, value));
+    var radius = 18;
+    var circumference = 2 * Math.PI * radius;
+    var offset = circumference * (1 - pct / 100);
+    var colorKey = String(opts.color || "accent");
+    var color = AE_RING_COLORS[colorKey] || AE_RING_COLORS.accent;
+    var label = safeText(opts.label || "İlerleme", 60);
+    var pctText = Math.round(pct) + "%";
+    return '<div class="ae-ring" role="img" aria-label="' + escapeHtml(label + ": " + pctText) + '">' +
+           '<svg class="ae-ring__svg" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' +
+           '<circle class="ae-ring__track" cx="24" cy="24" r="' + radius + '"></circle>' +
+           '<circle class="ae-ring__progress" cx="24" cy="24" r="' + radius +
+           '" stroke="' + color + '" stroke-dasharray="' + circumference.toFixed(2) +
+           '" stroke-dashoffset="' + offset.toFixed(2) + '"></circle>' +
+           '</svg>' +
+           '<span class="ae-ring__value" aria-hidden="true">' + pctText + "</span>" +
+           "</div>";
+  }
+
+  function metricSparkPcts(values) {
+    var numbers = (Array.isArray(values) ? values : []).map(safeNumber).filter(function(v) { return v !== null; });
+    var min = numbers.length ? Math.min.apply(Math, numbers) : 0;
+    var max = numbers.length ? Math.max.apply(Math, numbers) : 0;
+    return (Array.isArray(values) ? values : []).map(function(v) {
+      var n = safeNumber(v);
+      if (n === null) return { pct: 0, empty: true };
+      if (max === min) return { pct: max === 0 ? 18 : 72, empty: false };
+      return { pct: Math.max(8, Math.min(100, Math.round(18 + ((n - min) / (max - min)) * 82))), empty: false };
+    });
+  }
+
+  function AeMetric(opts) {
+    opts = opts || {};
+    var color = String(opts.color || "accent").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 20) || "accent";
+    var title = safeText(opts.title || opts.label || "Metrik", 40);
+    var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
+    var unit = opts.unit ? '<span class="ae-metric__unit">' + escapeHtml(opts.unit) + "</span>" : "";
+    var series = Array.isArray(opts.sparkline) ? opts.sparkline.slice(0, 7) : [];
+    var sparkPcts = metricSparkPcts(series);
+    var spark = sparkPcts.map(function(item) {
+      var sparkPct = Math.round(item.pct / 10) * 10;
+      return '<span class="ae-metric__spark-bar' + (item.empty ? " is-empty" : "") +
+             '" data-pct="' + sparkPct + '" aria-hidden="true"></span>';
+    }).join("");
+    var delta = opts.delta;
+    var deltaValue = typeof delta === "object" && delta ? delta.value : delta;
+    var deltaTone = typeof delta === "object" && delta ? delta.tone : "muted";
+    var deltaLabel = typeof delta === "object" && delta ? delta.label : "Önceki kayda göre değişim";
+    var allowedTones = ["ok", "warn", "drop", "info", "muted"];
+    if (allowedTones.indexOf(deltaTone) === -1) deltaTone = "muted";
+    var sparkLabel = safeText(opts.sparklineLabel || title + " son 7 kayıt", 80);
+    var metricClass = classNames([
+      "ae-card", "ae-card--hero", "hero-card", "ae-metric", "ae-slide-up", "ae-card--gradient",
+      "hero-card--" + color, opts.className
+    ]);
+    var head = '<div class="ae-metric__head">' +
+               '<span class="ae-metric__icon" aria-hidden="true">' + escapeHtml(opts.icon || "◌") + "</span>" +
+               '<span class="ae-metric__title">' + escapeHtml(title) + "</span>" +
+               (opts.ring ? AeProgressRing({
+                 value: opts.ring.value,
+                 color: opts.ring.color || color,
+                 label: opts.ring.label || title + " ilerlemesi"
+               }) : "") +
+               "</div>";
+    var footer = '<div class="ae-metric__footer">' +
+                 '<span class="ae-metric__delta ae-metric__delta--' + deltaTone +
+                 '" title="' + escapeHtml(deltaLabel) + '" aria-label="' + escapeHtml(deltaLabel) + '">' +
+                 escapeHtml(deltaValue === undefined || deltaValue === null ? "—" : String(deltaValue)) +
+                 "</span>" +
+                 '<span class="ae-metric__sparkline" role="img" aria-label="' + escapeHtml(sparkLabel) + '">' +
+                 (spark || '<span class="ae-metric__spark-empty" aria-hidden="true">—</span>') +
+                 "</span></div>";
+    return '<article class="' + escapeHtml(metricClass) + '">' +
+           head +
+           '<div class="ae-metric__value ae-count-up">' + escapeHtml(value) + unit + "</div>" +
+           (opts.sub ? '<div class="ae-metric__sub">' + escapeHtml(safeText(opts.sub, 80)) + "</div>" : "") +
+           footer +
+           "</article>";
+  }
+
   function AeButton(opts) {
     opts = opts || {};
     var cls = classNames(["ae-btn", opts.variant ? "ae-btn--" + opts.variant : "", opts.className]);
@@ -539,19 +630,26 @@
     return r ? h + " sa " + r + " dk" : h + " sa";
   }
 
-  // ── HeroCard ─────────────────────────────────────────────────────────────
-  function HeroCard(opts) {
-    opts = opts || {};
-    var color = opts.color || "accent";
-    var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
-    var unit = opts.unit ? ' <span class="hero-card__unit">' + escapeHtml(opts.unit) + "</span>" : "";
-    var trend = opts.trend ? ' <span class="hero-card__trend">' + escapeHtml(opts.trend) + "</span>" : "";
-    return '<div class="ae-card ae-card--hero hero-card ae-slide-up ae-card--gradient hero-card--' + color + '">' +
-           '<div class="hero-card__icon">' + escapeHtml(opts.icon || "◌") + "</div>" +
-           '<div class="hero-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
-           '<div class="hero-card__value ae-count-up">' + escapeHtml(value) + unit + trend + "</div>" +
-           (opts.sub ? '<div class="hero-card__sub">' + escapeHtml(safeText(opts.sub, 80)) + "</div>" : "") +
-           "</div>";
+  // ── Metric helpers ───────────────────────────────────────────────────────
+  function metricSeries(date, getter) {
+    return lastNDates(7, date).map(function(d) {
+      return d ? getter(getDay(d) || {}) : null;
+    });
+  }
+
+  function metricDelta(values, inverse) {
+    var numbers = (Array.isArray(values) ? values : []).map(safeNumber).filter(function(v) { return v !== null; });
+    if (numbers.length < 2) return { value: "→", tone: "muted", label: "Karşılaştırma için yeterli veri yok" };
+    var current = numbers[numbers.length - 1];
+    var previous = numbers[numbers.length - 2];
+    if (current === previous) return { value: "→", tone: "info", label: "Önceki kayda göre değişmedi" };
+    var rising = current > previous;
+    var positive = inverse ? !rising : rising;
+    return {
+      value: rising ? "↑" : "↓",
+      tone: positive ? "ok" : "drop",
+      label: rising ? "Önceki kayda göre yükseldi" : "Önceki kayda göre düştü"
+    };
   }
 
   function renderHeroGrid(date) {
@@ -574,11 +672,35 @@
     var steps = getSteps(day);
     var stepsText = steps !== null ? steps.toLocaleString("tr-TR") : "—";
 
+    var moodSeries = metricSeries(date, function(d) { return getMood(d).value; });
+    var sleepSeries = metricSeries(date, function(d) { return getSleepHours(getDay(dateOffset(d, -1)) || {}); });
+    var sosSeries = metricSeries(date, function(d) {
+      if (!isObject(d) || d.cravingSOSCount === undefined) return null;
+      return safeNumber(d.cravingSOSCount);
+    });
+    var stepsSeries = metricSeries(date, getSteps);
+
     return '<div class="ae-grid--hero ae-stagger">' +
-           HeroCard({ icon: "🌤", title: "Mod", value: moodText, color: "mood", sub: moodSub }) +
-           HeroCard({ icon: "🌙", title: "Uyku", value: sleepText, color: "sleep", sub: sleepSub, unit: sleepText !== "—" ? "" : null }) +
-           HeroCard({ icon: "🆘", title: "SOS", value: sosText, color: sosCount > 0 ? "drop" : "ok", sub: sosSub }) +
-           HeroCard({ icon: "👟", title: "Adım", value: stepsText, color: "info", unit: steps !== null ? "adım" : null }) +
+           AeMetric({
+             icon: "🌤", title: "Mod", value: moodText, color: "mood", sub: moodSub,
+             sparkline: moodSeries, delta: metricDelta(moodSeries),
+             ring: { value: mood.value === null ? 0 : (mood.value / 7) * 100, color: "accent", label: "Mod ilerlemesi" }
+           }) +
+           AeMetric({
+             icon: "🌙", title: "Uyku", value: sleepText, color: "sleep", sub: sleepSub,
+             sparkline: sleepSeries, delta: metricDelta(sleepSeries),
+             ring: { value: sleepH === null ? 0 : (sleepH / 8) * 100, color: "info", label: "Uyku hedefi" }
+           }) +
+           AeMetric({
+             icon: "🆘", title: "SOS", value: sosText, color: sosCount > 0 ? "drop" : "ok", sub: sosSub,
+             sparkline: sosSeries, delta: metricDelta(sosSeries, true),
+             ring: { value: Math.min(100, sosCount * 20), color: sosCount > 0 ? "drop" : "ok", label: "SOS yoğunluğu" }
+           }) +
+           AeMetric({
+             icon: "👟", title: "Adım", value: stepsText, color: "info", unit: steps !== null ? "adım" : null,
+             sparkline: stepsSeries, delta: metricDelta(stepsSeries),
+             ring: { value: steps === null ? 0 : (steps / (getTarget("steps", 10000))) * 100, color: "info", label: "Adım hedefi" }
+           }) +
            "</div>";
   }
 
@@ -2612,6 +2734,8 @@
     updateStatus: updateStatus,
     init: init,
     // Helper exports for testing
+    AeMetric: AeMetric,
+    AeProgressRing: AeProgressRing,
     AeSkeleton: AeSkeleton,
     AeTooltip: AeTooltip,
     renderLoadingState: renderLoadingState,

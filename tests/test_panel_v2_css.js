@@ -142,6 +142,11 @@ assert(!js.includes("ae-fade-in"), "JS eski fade-in sınıfını kullanmıyor");
 
 // ── Hero / summary / empty ──
 classRule("ae-grid--hero");
+classRule("ae-metric");
+classRule("ae-metric__sparkline");
+classRule("ae-metric__delta");
+classRule("ae-ring");
+classRule("ae-ring__progress");
 classRule("summary-card");
 classRule("ae-empty");
 classRule("ae-empty__icon");

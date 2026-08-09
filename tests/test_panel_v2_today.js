@@ -5,6 +5,13 @@ const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
 const { dom, ctx, AeonV2 } = boot();
 
+assert(typeof AeonV2.AeMetric === "function", "AeMetric export ediliyor");
+assert(typeof AeonV2.AeProgressRing === "function", "AeProgressRing export ediliyor");
+const ringFixture = AeonV2.AeProgressRing({ value: 72, color: "ok", label: "Test ilerlemesi" });
+assert(/class="ae-ring"/.test(ringFixture), "Progress ring dış kabı var");
+assert(/class="ae-ring__progress"/.test(ringFixture), "Progress ring ilerleme çemberi var");
+assert(/stroke-dasharray=/.test(ringFixture) && /stroke-dashoffset=/.test(ringFixture), "Progress ring SVG ölçüleri var");
+
 function countMatches(re) {
   const m = dom.html.match(re) || [];
   return m.length;
@@ -80,6 +87,10 @@ assert(!/class="ae-empty"/.test(html), "Seeded data'da ae-empty kalktı");
 
 // 3. 4 hero kart var
 assert((html.match(/ae-card--hero/g) || []).length === 4, "4 hero kart render edildi");
+assert((html.match(/class="ae-card ae-card--hero hero-card ae-metric/g) || []).length === 4, "4 AeMetric kartı render edildi");
+assert((html.match(/class="ae-ring"/g) || []).length === 4, "Her metrikte ProgressRing render edildi");
+assert((html.match(/ae-metric__sparkline/g) || []).length === 4, "Her metrikte mini sparkline var");
+assert((html.match(/class="ae-metric__delta ae-metric__delta--/g) || []).length === 4, "Her metrikte delta oku var");
 assert(/Huzurlu/.test(html), "Mod kartı Huzurlu değerini gösteriyor");
 assert(/7sa 30dk/.test(html), "Uyku kartı süreyi gösteriyor");
 assert(/8\.432|8 432/.test(html), "Adım kartı değerini gösteriyor");

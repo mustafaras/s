@@ -17,7 +17,7 @@
 - [x] Testler çalıştırıldı
 - [x] Commit yapıldı
 - [x] Push yapıldı
-- [x] GitHub Pages deploy tetiklendi
+- [x] GitHub Pages deploy doğrulandı
 
 ### Özet
 
@@ -69,6 +69,6 @@ Boş veri fixture’ında varsayılan boş kafein dizisinin truthy olması Besle
 ## Ek Notlar
 
 - `main` branch’e doğrudan push edildi; ayrı feature branch olmadığı için ayrı merge commit’i yok.
-- GitHub Pages deploy’u `main` push’u ile tetiklenecek; doğrulama metadata push’undan sonra yapılmalı.
+- GitHub Pages run `31319342296` (`e33f75d`) `completed/success` oldu; canlı kontrol HTTP 200 ve `panel-v2.js?v=2026080910` doğrulandı.
 - Tarayıcı açılmadı; doğrulama yalnızca headless Node testleriyle yapıldı.
 - `panel.html`, `panel.js`, `panel.css`, `app.js`, `sync.js`, `index.html`, `data/` ve `seyma-data` reposuna dokunulmadı.

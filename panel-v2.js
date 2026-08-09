@@ -127,6 +127,31 @@
     return '<div class="' + escapeHtml(cls) + '">' + (opts.children || "") + "</div>";
   }
 
+  function AeSkeleton(opts) {
+    opts = opts || {};
+    var allowed = ["text", "card", "circle"];
+    var variant = allowed.indexOf(opts.variant) !== -1 ? opts.variant : "text";
+    var cls = classNames(["ae-skeleton", "ae-skeleton--" + variant, "ae-shimmer", opts.className]);
+    return '<span class="' + escapeHtml(cls) + '" aria-hidden="true"></span>';
+  }
+
+  function AeTooltip(opts) {
+    opts = opts || {};
+    var positions = ["top", "right", "bottom", "left"];
+    var position = positions.indexOf(opts.position) !== -1 ? opts.position : "top";
+    var id = String(opts.id || "ae-tooltip").replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 48) || "ae-tooltip";
+    var text = safeText(opts.text || opts.message || "Daha fazla bilgi", 240);
+    var label = safeText(opts.label || "ⓘ", 24);
+    var triggerClass = classNames(["ae-tooltip-trigger", opts.triggerClass]);
+    var ariaLabel = safeText(opts.ariaLabel || text, 120);
+    return '<span class="ae-tooltip-wrap" data-tooltip-position="' + position + '">' +
+           '<button type="button" class="' + escapeHtml(triggerClass) + '" aria-label="' + escapeHtml(ariaLabel) + '" aria-describedby="' + escapeHtml(id) + '">' +
+           escapeHtml(label) +
+           "</button>" +
+           '<span class="ae-tooltip" id="' + escapeHtml(id) + '" role="tooltip">' + escapeHtml(text) + "</span>" +
+           "</span>";
+  }
+
   function AeButton(opts) {
     opts = opts || {};
     var cls = classNames(["ae-btn", opts.variant ? "ae-btn--" + opts.variant : "", opts.className]);
@@ -162,6 +187,26 @@
            '<span class="ae-status__dot"></span>' +
            '<span class="ae-status__label">' + escapeHtml(label) + "</span>" +
            "</span>";
+  }
+
+  function renderLoadingState() {
+    return '<section class="ae-loading ae-slide-up" role="status" aria-live="polite" aria-label="Veriler yükleniyor">' +
+           '<div class="ae-loading__head">' +
+           AeSkeleton({ variant: "text", className: "ae-loading__title" }) +
+           AeSkeleton({ variant: "text", className: "ae-loading__meta" }) +
+           "</div>" +
+           '<div class="ae-loading__grid">' +
+           AeSkeleton({ variant: "card" }) +
+           AeSkeleton({ variant: "card" }) +
+           AeSkeleton({ variant: "card" }) +
+           AeSkeleton({ variant: "card" }) +
+           "</div>" +
+           '<div class="ae-loading__body">' +
+           AeSkeleton({ variant: "text" }) +
+           AeSkeleton({ variant: "text", className: "ae-loading__line--short" }) +
+           '<span class="ae-loading__label">Veriler yükleniyor…</span>' +
+           "</div>" +
+           "</section>";
   }
 
   // ── Date helpers / state access ─────────────────────────────────────────
@@ -924,7 +969,7 @@
   function renderTopbar() {
     return '<header class="ae-topbar" role="banner">' +
            '<div class="ae-topbar__brand">' +
-           '<span class="ae-topbar__logo">Æ</span>' +
+           AeTooltip({ id: "aeon-brand-tooltip", label: "Æ", triggerClass: "ae-topbar__logo", ariaLabel: "ÆON Observer Dashboard", text: "ÆON gözlem paneli" }) +
            '<span class="ae-topbar__title">ÆON</span>' +
            "</div>" +
            '<div class="ae-topbar__tools">' +
@@ -2335,10 +2380,11 @@
     var app = root.document && root.document.getElementById("app");
     if (!app) return;
     var projection = projectData(null);
+    var activeContent = isFetching ? renderLoadingState() : renderActiveTab();
     app.innerHTML =
       renderTopbar() +
       renderTabs() +
-      '<main class="ae-app__body">' + renderActiveTab() + "</main>" +
+      '<main class="ae-app__body">' + activeContent + "</main>" +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
 
     // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)
@@ -2491,6 +2537,7 @@
       })
       .then(function(res) {
         isFetching = false;
+        render();
         if (res && res.notModified) return appData;
         return appData;
       })
@@ -2565,6 +2612,9 @@
     updateStatus: updateStatus,
     init: init,
     // Helper exports for testing
+    AeSkeleton: AeSkeleton,
+    AeTooltip: AeTooltip,
+    renderLoadingState: renderLoadingState,
     getEnergy: getEnergy,
     getStress: getStress,
     getHabitSummary: getHabitSummary,

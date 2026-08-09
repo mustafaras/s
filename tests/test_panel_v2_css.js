@@ -32,6 +32,7 @@ function mediaRule(query) {
   "--ae-nav-bg", "--ae-nav-active", "--ae-nav-active-text", "--ae-tab-bd",
   "--ae-chip-bg", "--ae-chip-text",
   "--ae-empty-bg", "--ae-empty-icon",
+  "--ae-skeleton-bg", "--ae-skeleton-shine",
   "--ae-space-2xs", "--ae-space-xs", "--ae-space-sm", "--ae-space-md", "--ae-space-lg", "--ae-space-xl", "--ae-space-2xl", "--ae-space-3xl",
   "--ae-font", "--ae-mono", "--ae-scale-xs", "--ae-scale-sm", "--ae-scale-md", "--ae-scale-lg", "--ae-scale-xl", "--ae-scale-2xl", "--ae-scale-3xl",
   "--ae-radius-xs", "--ae-radius-sm", "--ae-radius-md", "--ae-radius-lg", "--ae-radius-xl", "--ae-radius-full",
@@ -144,6 +145,16 @@ classRule("ae-grid--hero");
 classRule("summary-card");
 classRule("ae-empty");
 classRule("ae-empty__icon");
+classRule("ae-skeleton");
+classRule("ae-skeleton--text");
+classRule("ae-skeleton--card");
+classRule("ae-skeleton--circle");
+classRule("ae-tooltip");
+assert(css.includes("background: linear-gradient(90deg, var(--ae-skeleton-bg)"), "Skeleton gradient var");
+assert(css.includes(".ae-tooltip::after"), "Tooltip arrow var");
+assert(css.includes("backdrop-filter: blur(16px) saturate(1.2)"), "Tooltip glass blur var");
+assert(css.includes(".ae-tooltip-wrap:hover .ae-tooltip"), "Tooltip hover görünürlüğü var");
+assert(css.includes(".ae-tooltip-wrap:focus-within .ae-tooltip"), "Tooltip focus görünürlüğü var");
 
 // ── Trend bars (data-pct driven) ──
 classRule("trend-bar");

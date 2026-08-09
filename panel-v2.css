@@ -60,6 +60,8 @@
   /* Boş durum */
   --ae-empty-bg: color-mix(in srgb, var(--ae-accent) 5%, var(--ae-page));
   --ae-empty-icon: var(--ae-accent);
+  --ae-skeleton-bg: color-mix(in srgb, var(--ae-accent) 8%, var(--ae-page));
+  --ae-skeleton-shine: color-mix(in srgb, var(--ae-accent) 18%, var(--ae-page));
 
   /* Uzaklık */
   --ae-space-2xs: 2px;
@@ -134,6 +136,8 @@
 
   --ae-empty-bg: color-mix(in srgb, var(--ae-accent) 6%, var(--ae-surface));
   --ae-empty-icon: var(--ae-accent);
+  --ae-skeleton-bg: color-mix(in srgb, var(--ae-accent) 12%, var(--ae-surface));
+  --ae-skeleton-shine: color-mix(in srgb, var(--ae-accent) 26%, var(--ae-surface));
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -466,6 +470,145 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   font-size: var(--ae-scale-sm);
   line-height: 1.45;
   color: var(--ae-muted);
+}
+
+/* ── Skeleton yükleme ── */
+.ae-skeleton {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--ae-skeleton-bg) 0%, var(--ae-skeleton-shine) 50%, var(--ae-skeleton-bg) 100%);
+  background-size: 200% 100%;
+  border-radius: var(--ae-radius-sm);
+}
+.ae-skeleton--text {
+  height: var(--ae-scale-sm);
+  min-width: 96px;
+}
+.ae-skeleton--card {
+  min-height: 132px;
+  border-radius: var(--ae-radius-lg);
+}
+.ae-skeleton--circle {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ae-radius-full);
+}
+.ae-loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-lg);
+  padding: var(--ae-space-sm) 0;
+}
+.ae-loading__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+}
+.ae-loading__title {
+  width: 42%;
+  height: var(--ae-scale-lg);
+}
+.ae-loading__meta {
+  width: 26%;
+}
+.ae-loading__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ae-space-md);
+}
+.ae-loading__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+  padding: var(--ae-space-md);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-lg);
+  background: var(--ae-glass);
+}
+.ae-loading__line--short {
+  width: 68%;
+}
+.ae-loading__label {
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ── Tooltip ── */
+.ae-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.ae-tooltip-trigger {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: help;
+}
+.ae-tooltip {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  bottom: calc(100% + var(--ae-space-sm));
+  width: max-content;
+  max-width: min(240px, calc(100vw - 32px));
+  padding: var(--ae-space-sm) var(--ae-space-md);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-glass);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: var(--ae-shadow-md), var(--ae-shadow-glow);
+  color: var(--ae-text);
+  font-size: var(--ae-scale-sm);
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.18s ease, transform 0.22s var(--ae-ease), visibility 0.18s ease;
+  visibility: hidden;
+}
+.ae-tooltip-wrap:hover .ae-tooltip,
+.ae-tooltip-wrap:focus-within .ae-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+  visibility: visible;
+}
+.ae-tooltip::after {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid var(--ae-glass);
+  border-right: 6px solid transparent;
+  border-left: 6px solid transparent;
+  content: "";
+  transform: translateX(-50%);
+}
+.ae-tooltip-wrap[data-tooltip-position="bottom"] .ae-tooltip {
+  top: calc(100% + var(--ae-space-sm));
+  bottom: auto;
+  transform: translate(-50%, -4px);
+}
+.ae-tooltip-wrap[data-tooltip-position="bottom"]:hover .ae-tooltip,
+.ae-tooltip-wrap[data-tooltip-position="bottom"]:focus-within .ae-tooltip {
+  transform: translate(-50%, 0);
+}
+.ae-tooltip-wrap[data-tooltip-position="bottom"] .ae-tooltip::after {
+  top: -6px;
+  bottom: auto;
+  border-top: 0;
+  border-bottom: 6px solid var(--ae-glass);
 }
 
 /* ── Metin atomları ── */

@@ -1195,17 +1195,54 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 /* ── Animasyonlar ── */
-@keyframes aeFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+@keyframes aeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.ae-fade-in {
-  animation: aeFadeIn 0.35s var(--ae-ease) both;
+@keyframes aeScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes aeShimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes aeCountUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes aePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ae-fade-in { animation: none !important; }
+.ae-slide-up {
+  animation: aeSlideUp 0.35s var(--ae-ease) both;
+}
+.ae-scale-in {
+  animation: aeScaleIn 0.28s var(--ae-ease) both;
+}
+.ae-shimmer {
+  animation: aeShimmer 1.6s linear infinite;
+}
+.ae-count-up {
+  animation: aeCountUp 0.45s var(--ae-ease) both;
+}
+.ae-pulse {
+  animation: aePulse 1.8s ease-in-out infinite;
+}
+
+/* Kademeli kart girişi */
+.ae-stagger > .ae-card:nth-child(1) { animation-delay: 0.04s; }
+.ae-stagger > .ae-card:nth-child(2) { animation-delay: 0.08s; }
+.ae-stagger > .ae-card:nth-child(3) { animation-delay: 0.12s; }
+.ae-stagger > .ae-card:nth-child(4) { animation-delay: 0.16s; }
+.ae-stagger > .ae-card:nth-child(5) { animation-delay: 0.20s; }
+.ae-stagger > .ae-card:nth-child(6) { animation-delay: 0.24s; }
+
+/* Eski sınıfı kullanan yerler için geçiş alias'ı */
+.ae-fade-in {
+  animation: aeSlideUp 0.35s var(--ae-ease) both;
 }
 
 /* ── Faz 7: Premium polish — focus, hover, reduced-motion, responsive ── */
@@ -1236,11 +1273,6 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   box-shadow: 0 14px 38px rgba(0,0,0,0.28), 0 3px 12px rgba(0,0,0,0.14);
 }
 
-/* Anomali pulse yavaş */
-@keyframes aePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
 @keyframes aeStatusDropPulse {
   0%, 100% {
     opacity: 1;
@@ -1254,6 +1286,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   }
 }
 .ae-status--ok .ae-status__dot {
+  animation: aePulse 2.4s ease-in-out infinite;
   box-shadow: 0 0 8px var(--ae-ok);
 }
 .ae-status--drop .ae-status__dot {
@@ -1272,12 +1305,18 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 /* Reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-  .ae-fade-in { animation: none !important; }
+  .ae-fade-in,
+  .ae-slide-up,
+  .ae-scale-in,
+  .ae-shimmer,
+  .ae-count-up,
+  .ae-pulse { animation: none !important; }
   .ae-card,
   .ae-tab,
   .sub-tab,
   .ae-btn,
   .trend-bar__fill { transition: none !important; }
+  .ae-status--ok .ae-status__dot,
   .ae-status--drop .ae-status__dot { animation: none !important; }
   .ae-btn:hover,
   .ae-btn:active { transform: none; }

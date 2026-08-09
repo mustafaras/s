@@ -113,7 +113,7 @@
     var icon = opts.icon || "◌";
     var title = safeText(opts.title || "Henüz veri yok", 80);
     var message = safeText(opts.message || "Bu bölümde görüntülenecek veri şu an yok.", 240);
-    return '<div class="ae-empty ae-fade-in">' +
+    return '<div class="ae-empty ae-scale-in">' +
            '<div class="ae-empty__icon">' + escapeHtml(icon) + "</div>" +
            '<div class="ae-empty__title">' + escapeHtml(title) + "</div>" +
            '<div class="ae-empty__text">' + escapeHtml(message) + "</div>" +
@@ -123,7 +123,7 @@
   function AeCard(opts) {
     opts = opts || {};
     var visualVariant = opts.visualVariant || (opts.variant === "summary" ? "solid" : "glass");
-    var cls = classNames(["ae-card", "ae-fade-in", opts.variant ? "ae-card--" + opts.variant : "", "ae-card--" + visualVariant, opts.className]);
+    var cls = classNames(["ae-card", "ae-slide-up", opts.variant ? "ae-card--" + opts.variant : "", "ae-card--" + visualVariant, opts.className]);
     return '<div class="' + escapeHtml(cls) + '">' + (opts.children || "") + "</div>";
   }
 
@@ -501,10 +501,10 @@
     var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
     var unit = opts.unit ? ' <span class="hero-card__unit">' + escapeHtml(opts.unit) + "</span>" : "";
     var trend = opts.trend ? ' <span class="hero-card__trend">' + escapeHtml(opts.trend) + "</span>" : "";
-    return '<div class="ae-card ae-card--hero hero-card ae-card--gradient hero-card--' + color + '">' +
+    return '<div class="ae-card ae-card--hero hero-card ae-slide-up ae-card--gradient hero-card--' + color + '">' +
            '<div class="hero-card__icon">' + escapeHtml(opts.icon || "◌") + "</div>" +
            '<div class="hero-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
-           '<div class="hero-card__value">' + escapeHtml(value) + unit + trend + "</div>" +
+           '<div class="hero-card__value ae-count-up">' + escapeHtml(value) + unit + trend + "</div>" +
            (opts.sub ? '<div class="hero-card__sub">' + escapeHtml(safeText(opts.sub, 80)) + "</div>" : "") +
            "</div>";
   }
@@ -529,7 +529,7 @@
     var steps = getSteps(day);
     var stepsText = steps !== null ? steps.toLocaleString("tr-TR") : "—";
 
-    return '<div class="ae-grid--hero">' +
+    return '<div class="ae-grid--hero ae-stagger">' +
            HeroCard({ icon: "🌤", title: "Mod", value: moodText, color: "mood", sub: moodSub }) +
            HeroCard({ icon: "🌙", title: "Uyku", value: sleepText, color: "sleep", sub: sleepSub, unit: sleepText !== "—" ? "" : null }) +
            HeroCard({ icon: "🆘", title: "SOS", value: sosText, color: sosCount > 0 ? "drop" : "ok", sub: sosSub }) +
@@ -554,7 +554,7 @@
       { key: "steps", label: "Adım", max: 12000, color: "info" },
       { key: "water", label: "Su", max: 12, color: "ok" }
     ];
-    var html = '<div class="ae-card ae-card--glass ae-fade-in trend-strip">' +
+    var html = '<div class="ae-card ae-card--glass ae-slide-up trend-strip">' +
                '<div class="ae-label">Son 7 gün</div>';
     metrics.forEach(function(meta) {
       html += '<div class="trend-strip__row">' +
@@ -822,7 +822,7 @@
              label: { normal: "normal", attention: "dikkat", risk: "risk" }[status] || status
            }) +
            "</div>" +
-           '<div class="summary-card__value">' + escapeHtml(value) + unit + ' <span class="summary-card__trend">' + escapeHtml(trend) + "</span></div>" +
+           '<div class="summary-card__value ae-count-up">' + escapeHtml(value) + unit + ' <span class="summary-card__trend">' + escapeHtml(trend) + "</span></div>" +
            '<div class="summary-card__window">Son ' + escapeHtml(String(opts.windowDays || 7)) + " gün</div>" +
            (opts.delta ? '<div class="summary-card__delta">' + escapeHtml(opts.delta) + "</div>" : "") +
            "</div>";
@@ -870,7 +870,7 @@
     var missingStatus = s.missingDays >= 3 ? "risk" : s.missingDays > 0 ? "attention" : "normal";
     var mohStatus = s.mohStreak >= 10 ? "risk" : s.mohStreak >= 5 ? "attention" : "normal";
 
-    return '<div class="ae-grid--summary">' +
+    return '<div class="ae-grid--summary ae-stagger">' +
            SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus }) +
            SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal" }) +
            SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal" }) +
@@ -969,7 +969,7 @@
         })
       });
     }
-    return '<div class="today-view ae-fade-in">' +
+    return '<div class="today-view ae-slide-up">' +
            renderDatePicker() +
            renderHeroGrid(date) +
            renderTrendStrip(date) +
@@ -991,7 +991,7 @@
       });
     }
     var windowDays = ui.trendWindow || 7;
-    return '<div class="trends-view ae-fade-in">' +
+    return '<div class="trends-view ae-slide-up">' +
            renderWindowSelector() +
            renderSummaryGrid(date, windowDays) +
            renderAnomalies(date) +
@@ -1754,7 +1754,7 @@
         message: "Bu tarihe ait kayıt yok. Takvimden başka bir gün seçebilirsin."
       })
     }) : "";
-    return '<div class="day-view ae-fade-in">' +
+    return '<div class="day-view ae-slide-up">' +
            renderDayDatePicker(date) +
            renderDayHeatmap(date) +
            (day ? renderDayTimestamps(date) : "") +
@@ -1882,7 +1882,7 @@
         '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>' +
         "</div>"
       : "";
-    return '<div class="status-detail ae-fade-in">' +
+    return '<div class="status-detail ae-slide-up">' +
            AeCard({ className: "status-card", children: body }) +
            renderAppSessionInfo() +
            errorBox +
@@ -1908,7 +1908,7 @@
       return '<div class="status-row"><span class="status-row__label">' + escapeHtml(r.label) +
              '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
     }).join("");
-    return '<div class="audit-detail ae-fade-in">' +
+    return '<div class="audit-detail ae-slide-up">' +
            AeCard({ className: "audit-card", children: body }) +
            '<div class="audit-hint">Yalnızca izin verilen alanlar observer\'a yansıtılır. Detaylar panelCoverageManifest.js\'te tanımlı.</div>' +
            "</div>";
@@ -1951,7 +1951,7 @@
     var saveBtn = ui.panelToken
       ? AeButton({ label: "↻ Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
       : "";
-    return '<div class="messages-detail ae-fade-in">' +
+    return '<div class="messages-detail ae-slide-up">' +
            AeCard({ className: "messages-card", children: list }) +
            '<div class="ae-card ae-card--solid ae-card--summary token-card">' +
            '<div class="ae-label">GitHub token</div>' +
@@ -1977,7 +1977,7 @@
       ? AeButton({ label: "☀️ Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
       : AeButton({ label: "🌙 Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
 
-    return '<div class="settings-detail ae-fade-in">' +
+    return '<div class="settings-detail ae-slide-up">' +
            AeCard({
              className: "settings-card",
              children: '<div class="settings-group">' +
@@ -2009,7 +2009,7 @@
       settings: renderSettings
     };
     var renderFn = contentBySubTab[subTab] || renderStatusDetail;
-    return '<div class="system-view ae-fade-in">' +
+    return '<div class="system-view ae-slide-up">' +
            SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
            '<div class="system-panel">' + renderFn() + "</div></div>";
   }
@@ -2232,7 +2232,7 @@
         badge: { reading: "Okunuyor", finished: "Bitti", dropped: "Bırakıldı" }[b.status] || "Kayıtlı"
       });
     }).join("");
-    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveWatch(page) {
@@ -2257,7 +2257,7 @@
         badge: { watching: "İzleniyor", finished: "Bitti", dropped: "Bırakıldı" }[it.status] || "Kayıtlı"
       });
     }).join("");
-    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveListen(page) {
@@ -2276,7 +2276,7 @@
         badge: kindLabel
       });
     }).join("");
-    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveQuotes(page) {
@@ -2292,7 +2292,7 @@
              '<div class="archive-row__meta">' + escapeHtml(safeText(q.source + (q.title ? " · " + q.title : ""), 80)) + "</div>" +
              "</div></div>";
     }).join("");
-    return '<div class="archive-list ae-fade-in">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchives() {
@@ -2310,7 +2310,7 @@
       quotes: renderArchiveQuotes
     };
     var renderFn = contentBySubTab[subTab] || renderArchiveLibrary;
-    return '<div class="archives-view ae-fade-in">' +
+    return '<div class="archives-view ae-slide-up">' +
            SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
            '<div class="archive-panel">' + renderFn() + "</div>" +
            "</div>";
@@ -2325,7 +2325,7 @@
       system: renderSystem
     };
     var fn = panels[ui.tab] || renderToday;
-    return '<div class="ae-panel ae-fade-in" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '">' +
+    return '<div class="ae-panel ae-slide-up" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '">' +
            fn() +
            "</div>";
   }

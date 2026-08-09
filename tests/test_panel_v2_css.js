@@ -5,6 +5,7 @@
 const { read, assert } = require("./helpers/panel-v2-test-helper");
 
 const css = read("panel-v2.css");
+const js = read("panel-v2.js");
 
 function varRule(name, fallback) {
   const re = new RegExp(name + "s*:");
@@ -118,6 +119,25 @@ assert(css.includes(".ae-btn--pill.is-active"), "Active pill selector var");
 assert(css.includes("box-shadow: 0 0 8px var(--ae-ok);"), "OK status dot glow var");
 assert(css.includes("@keyframes aeStatusDropPulse"), "Drop status pulse animation var");
 assert(css.includes("box-shadow: 0 0 12px var(--ae-drop);"), "Drop status dot red glow var");
+
+// ── Animation system ──
+[
+  "ae-slide-up", "ae-scale-in", "ae-shimmer", "ae-count-up", "ae-pulse", "ae-stagger"
+].forEach(classRule);
+[
+  "@keyframes aeSlideUp", "@keyframes aeScaleIn", "@keyframes aeShimmer",
+  "@keyframes aeCountUp", "@keyframes aePulse"
+].forEach(function(animation) {
+  assert(css.includes(animation), "Animasyon tanımı var: " + animation);
+});
+assert(css.includes("translateY(12px)"), "Slide-up başlangıç mesafesi var");
+assert(css.includes("scale(0.95)"), "Scale-in başlangıç ölçeği var");
+assert(css.includes("background-position: -200% 0"), "Shimmer başlangıç pozisyonu var");
+assert(css.includes("translateY(8px)"), "Count-up başlangıç mesafesi var");
+assert(css.includes(".ae-stagger > .ae-card:nth-child(6)"), "Stagger gecikme zinciri var");
+assert(js.includes("ae-stagger"), "Render çıktılarında stagger kullanılıyor");
+assert(js.includes("ae-count-up"), "Render çıktılarında count-up kullanılıyor");
+assert(!js.includes("ae-fade-in"), "JS eski fade-in sınıfını kullanmıyor");
 
 // ── Hero / summary / empty ──
 classRule("ae-grid--hero");

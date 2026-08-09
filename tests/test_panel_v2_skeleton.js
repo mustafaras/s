@@ -19,6 +19,10 @@ assert(panelHtml.includes('JetBrains+Mono'), "JetBrains Mono font link'i var");
 assert(panelHtml.includes('panelCoverageManifest.js'), "panel-v2.html coverage manifest yükleniyor");
 
 assert(panelCss.includes('.ae-card'), "panel-v2.css .ae-card var");
+assert(panelCss.includes('.ae-card--glass'), "panel-v2.css glass kart varyantı var");
+assert(panelCss.includes('.ae-card--solid'), "panel-v2.css solid kart varyantı var");
+assert(panelCss.includes('.ae-card--gradient'), "panel-v2.css gradient kart varyantı var");
+assert(panelCss.includes('.ae-card--outline'), "panel-v2.css outline kart varyantı var");
 assert(panelCss.includes('.ae-tabs'), "panel-v2.css .ae-tabs var");
 assert(panelCss.includes('.ae-tab'), "panel-v2.css .ae-tab var");
 assert(panelCss.includes('.ae-grid--hero'), "panel-v2.css .ae-grid--hero var");

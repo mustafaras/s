@@ -86,8 +86,16 @@ classRule("ae-app__body");
 
 // ── Cards ──
 classRule("ae-card");
+classRule("ae-card--glass");
+classRule("ae-card--solid");
+classRule("ae-card--gradient");
+classRule("ae-card--outline");
 classRule("ae-card--hero");
 classRule("hero-card");
+assert(css.includes("backdrop-filter: blur(20px)"), "Glass blur efekti var");
+assert(css.includes("-webkit-backdrop-filter: blur(20px)"), "WebKit glass blur efekti var");
+assert(css.includes("transform: translateY(-4px)"), "Kart hover yükselme efekti var");
+assert(css.includes("var(--ae-shadow-lg), var(--ae-shadow-glow)"), "Kart hover glow gölgesi var");
 
 // ── Tabs / navigation ──
 classRule("ae-tabs");

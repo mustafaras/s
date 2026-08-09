@@ -122,7 +122,8 @@
 
   function AeCard(opts) {
     opts = opts || {};
-    var cls = classNames(["ae-card", "ae-fade-in", opts.variant ? "ae-card--" + opts.variant : "", opts.className]);
+    var visualVariant = opts.visualVariant || (opts.variant === "summary" ? "solid" : "glass");
+    var cls = classNames(["ae-card", "ae-fade-in", opts.variant ? "ae-card--" + opts.variant : "", "ae-card--" + visualVariant, opts.className]);
     return '<div class="' + escapeHtml(cls) + '">' + (opts.children || "") + "</div>";
   }
 
@@ -496,7 +497,7 @@
     var value = opts.value !== undefined && opts.value !== null ? String(opts.value) : "—";
     var unit = opts.unit ? ' <span class="hero-card__unit">' + escapeHtml(opts.unit) + "</span>" : "";
     var trend = opts.trend ? ' <span class="hero-card__trend">' + escapeHtml(opts.trend) + "</span>" : "";
-    return '<div class="ae-card ae-card--hero hero-card hero-card--' + color + '">' +
+    return '<div class="ae-card ae-card--hero hero-card ae-card--gradient hero-card--' + color + '">' +
            '<div class="hero-card__icon">' + escapeHtml(opts.icon || "◌") + "</div>" +
            '<div class="hero-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
            '<div class="hero-card__value">' + escapeHtml(value) + unit + trend + "</div>" +
@@ -549,7 +550,7 @@
       { key: "steps", label: "Adım", max: 12000, color: "info" },
       { key: "water", label: "Su", max: 12, color: "ok" }
     ];
-    var html = '<div class="ae-card ae-fade-in trend-strip">' +
+    var html = '<div class="ae-card ae-card--glass ae-fade-in trend-strip">' +
                '<div class="ae-label">Son 7 gün</div>';
     metrics.forEach(function(meta) {
       html += '<div class="trend-strip__row">' +
@@ -622,7 +623,7 @@
     var today = isoDate(new Date());
     var isToday = ui.date === today;
     var dateText = isToday ? "Bugün" : formatDateLabel(ui.date);
-    return '<div class="ae-card ae-card--summary date-picker">' +
+    return '<div class="ae-card ae-card--outline ae-card--summary date-picker">' +
            '<button type="button" class="ae-btn ae-btn--mini" onclick="AeonV2.shiftDate(-1)">◀</button>' +
            '<div class="date-picker__display">' +
            '<div class="date-picker__label">' + escapeHtml(dateText) + "</div>" +
@@ -808,7 +809,7 @@
     var trend = opts.trend || "→";
     var status = opts.status || "normal";
     var statusTone = { normal: "ok", attention: "warn", risk: "drop" }[status] || "info";
-    return '<div class="ae-card ae-card--summary summary-card summary-card--' + status + '">' +
+    return '<div class="ae-card ae-card--solid ae-card--summary summary-card summary-card--' + status + '">' +
            '<div class="summary-card__head">' +
            '<div class="summary-card__title">' + escapeHtml(safeText(opts.title, 40)) + "</div>" +
            '<span class="ae-status ae-status--' + statusTone + '">' + escapeHtml({ normal: "normal", attention: "dikkat", risk: "risk" }[status] || status) + "</span>" +
@@ -822,7 +823,7 @@
   function AnomalyCard(a) {
     var tone = { info: "info", warn: "warn", risk: "drop" }[a.severity] || "info";
     var dateLabel = a.linkDate ? formatDateLabel(a.linkDate) : "";
-    return '<div class="ae-card ae-card--summary anomaly-card anomaly-card--' + a.severity + '">' +
+    return '<div class="ae-card ae-card--solid ae-card--summary anomaly-card anomaly-card--' + a.severity + '">' +
            '<div class="anomaly-card__row">' +
            '<div class="anomaly-card__icon">' + escapeHtml({ sleep: "🌙", sos: "🆘", missing: "🕳", moh: "🌫", steps: "👟", water: "💧" }[a.kind] || "◌") + "</div>" +
            '<div class="anomaly-card__body">' +
@@ -1028,7 +1029,7 @@
   function renderDayDatePicker(date) {
     var today = isoDate(new Date());
     var label = date === today ? "Bugün" : formatDateLabel(date);
-    return '<div class="ae-card ae-card--summary day-date-picker">' +
+    return '<div class="ae-card ae-card--outline ae-card--summary day-date-picker">' +
            AeButton({ label: "◀", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
            '<div class="day-date-picker__display">' +
            '<div class="day-date-picker__label">' + escapeHtml(label) + "</div>" +
@@ -1063,7 +1064,7 @@
       var title = d ? formatDateLabel(d) : 'Gelecek gün';
       return '<div class="day-heatmap__cell' + toneClass + '" title="' + escapeHtml(title) + '">' + label + "</div>";
     }).join("");
-    return '<div class="ae-card ae-card--summary day-heatmap">' +
+    return '<div class="ae-card ae-card--solid ae-card--summary day-heatmap">' +
            '<div class="ae-label">Son 30 gün</div>' +
            '<div class="day-heatmap__grid">' + cells + "</div>" +
            "</div>";
@@ -1861,7 +1862,7 @@
              '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
     }).join("");
     var errorBox = s.lastErrorCode
-      ? '<div class="ae-card ae-card--warn status-error">' +
+      ? '<div class="ae-card ae-card--solid ae-card--warn status-error">' +
         '<div class="status-error__title">Son hata</div>' +
         '<div class="status-error__code">' + escapeHtml(String(s.lastErrorCode)) + "</div>" +
         '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>' +
@@ -1938,7 +1939,7 @@
       : "";
     return '<div class="messages-detail ae-fade-in">' +
            AeCard({ className: "messages-card", children: list }) +
-           '<div class="ae-card ae-card--summary token-card">' +
+           '<div class="ae-card ae-card--solid ae-card--summary token-card">' +
            '<div class="ae-label">GitHub token</div>' +
            '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
            '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez. Değiştirip dışarıya tıkladığında kaydedilir.</div>' +

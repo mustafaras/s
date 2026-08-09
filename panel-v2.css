@@ -152,11 +152,56 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 /* ── Kartlar ── */
 .ae-card {
-  background: var(--ae-card-bg);
-  border: 1px solid var(--ae-card-bd);
-  border-radius: var(--ae-card-radius);
-  box-shadow: var(--ae-card-shadow);
+  background: var(--ae-glass);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-lg);
+  box-shadow: var(--ae-shadow-md), var(--ae-shadow-glow);
   padding: var(--ae-space-lg);
+  transition: transform 0.3s var(--ae-ease), box-shadow 0.3s var(--ae-ease);
+}
+
+.ae-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ae-shadow-lg), var(--ae-shadow-glow);
+}
+
+.ae-card--glass {
+  background: var(--ae-glass);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  border-color: var(--ae-glass-border);
+  box-shadow: var(--ae-shadow-md), var(--ae-shadow-glow);
+}
+
+.ae-card--solid {
+  background: var(--ae-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--ae-card-bd);
+  box-shadow: var(--ae-shadow-sm);
+}
+
+.ae-card--gradient {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ae-accent) 16%, var(--ae-surface)),
+    color-mix(in srgb, var(--ae-accent2) 8%, var(--ae-elevated))
+  );
+  border-color: color-mix(in srgb, var(--ae-accent) 34%, var(--ae-glass-border));
+}
+
+.ae-card--outline {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--ae-glass-border);
+  box-shadow: none;
+}
+
+.ae-card--outline:hover {
+  box-shadow: var(--ae-shadow-sm), var(--ae-shadow-glow);
 }
 
 .ae-card--hero {

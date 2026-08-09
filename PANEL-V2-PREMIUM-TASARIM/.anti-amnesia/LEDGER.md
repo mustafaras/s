@@ -46,7 +46,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 6 | Skeleton & Tooltip | ✅ TAMAMLANDI | 5665fb6 | node --check panel-v2.js; node --check panelCoverageManifest.js; test_panel_v2_skeleton PASS; test_panel_v2_* (9/9 PASS); loading/data swap, diff/secret audit PASS | AeSkeleton varyantları, AeTooltip glass/ok/focus davranışı ve fetch loading shell tamamlandı |
 | 7 | AeMetric & AeProgressRing | ✅ TAMAMLANDI | `92180bb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS | AeMetric/AeProgressRing, mini sparkline/delta göstergeleri, cache bump ve yeni kontrat testleri tamamlandı |
 | 8 | AeSparkline SVG Grafik | ✅ TAMAMLANDI | `a62e730` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS | Trend strip CSS barları erişilebilir SVG path/area/dot sparklinelara taşındı, renk tokenları ve cache bump tamamlandı |
-| 9 | AeDivider & AeToast | 🔒 BEKLEMEDE | - | - | - |
+| 9 | AeDivider & AeToast | ✅ TAMAMLANDI | `9215460` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (9/9 PASS); `git diff --check`; secret scan PASS | Etiketli gradient dividerlar, glass slide-in toast, manuel/otomatik kapanma ve Gün Detayı entegrasyonu tamamlandı |
 | 10 | Gün Detayı Bölümlerini Ayır | 🔒 BEKLEMEDE | - | - | - |
 | 11 | Mevcut Komponentleri Taşı | 🔒 BEKLEMEDE | - | - | - |
 | 12 | Count-up Animasyonu | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 9
+- **currentStep:** 10
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-09
 - **lastAgent:** OpenAI Codex (GPT-5)

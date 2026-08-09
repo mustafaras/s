@@ -85,6 +85,7 @@ const seededData = {
   }
 };
 
+AeonV2.setDate("2026-08-04");
 AeonV2.setData(seededData);
 
 // 1. Seçili gün değişince render değişiyor

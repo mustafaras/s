@@ -73,6 +73,7 @@ const seededData = {
   }
 };
 
+AeonV2.setDate("2026-08-04");
 AeonV2.setData(seededData);
 html = dom.html;
 assert(!/class="ae-empty"/.test(html), "Seeded data'da ae-empty kalktı");

@@ -40,6 +40,7 @@ for (let i = 1; i <= 6; i++) {
 }
 
 const seededData = { settings: { targets: { steps: 10000, waterGlasses: 8 } }, days: days };
+AeonV2.setDate(today);
 AeonV2.setData(seededData);
 AeonV2.setTab("trends");
 html = dom.html;

@@ -23,16 +23,40 @@ function mediaRule(query) {
 [
   "--ae-page", "--ae-bg", "--ae-surface", "--ae-elevated",
   "--ae-text", "--ae-muted", "--ae-faint",
-  "--ae-accent", "--ae-accent2", "--ae-accent-soft", "--ae-accent-glow",
+  "--ae-accent", "--ae-accent2", "--ae-accent3", "--ae-accent-soft", "--ae-accent-glow",
   "--ae-ok", "--ae-warn", "--ae-drop", "--ae-info", "--ae-pause",
+  "--ae-glass", "--ae-glass-border", "--ae-glow-accent", "--ae-glow-ok", "--ae-glow-drop",
+  "--ae-shadow-sm", "--ae-shadow-md", "--ae-shadow-lg", "--ae-shadow-xl", "--ae-shadow-glow",
   "--ae-card-bg", "--ae-card-bd", "--ae-card-shadow", "--ae-card-radius",
   "--ae-nav-bg", "--ae-nav-active", "--ae-nav-active-text", "--ae-tab-bd",
   "--ae-chip-bg", "--ae-chip-text",
   "--ae-empty-bg", "--ae-empty-icon",
-  "--ae-space-xs", "--ae-space-sm", "--ae-space-md", "--ae-space-lg", "--ae-space-xl",
-  "--ae-font", "--ae-radius-sm", "--ae-radius-md", "--ae-radius-lg",
+  "--ae-space-2xs", "--ae-space-xs", "--ae-space-sm", "--ae-space-md", "--ae-space-lg", "--ae-space-xl", "--ae-space-2xl", "--ae-space-3xl",
+  "--ae-font", "--ae-radius-xs", "--ae-radius-sm", "--ae-radius-md", "--ae-radius-lg", "--ae-radius-xl", "--ae-radius-full",
   "--ae-ease"
 ].forEach(varRule);
+
+// ── Premium token values ──
+[
+  "--ae-page: #F5F3EF", "--ae-bg: #FDFCFA", "--ae-surface: #FCFAF7", "--ae-elevated: #FAF7F2",
+  "--ae-accent: #B08D4E", "--ae-accent3: #A08040",
+  "--ae-space-2xs: 2px", "--ae-space-2xl: 32px", "--ae-space-3xl: 48px",
+  "--ae-radius-xs: 6px", "--ae-radius-xl: 28px", "--ae-radius-full: 9999px",
+  "--ae-page: #0C0A09", "--ae-bg: #11100E", "--ae-surface: #1A1815", "--ae-elevated: #221F1B",
+  "--ae-accent: #D4AF6E", "--ae-accent2: #F0D48A", "--ae-accent3: #A08040",
+  "--ae-ok: #4CAF7A", "--ae-warn: #D4A84C", "--ae-drop: #C86565", "--ae-info: #5E8AAA",
+  "--ae-glass: rgba(255,255,255,0.04)", "--ae-glass-border: rgba(255,255,255,0.06)",
+  "--ae-glow-accent: 0 0 30px rgba(212,175,110,0.15)",
+  "--ae-glow-ok: 0 0 20px rgba(76,175,122,0.12)",
+  "--ae-glow-drop: 0 0 20px rgba(200,101,101,0.12)",
+  "--ae-shadow-sm: 0 2px 8px rgba(0,0,0,0.12)",
+  "--ae-shadow-md: 0 8px 24px rgba(0,0,0,0.16)",
+  "--ae-shadow-lg: 0 16px 48px rgba(0,0,0,0.20)",
+  "--ae-shadow-xl: 0 24px 64px rgba(0,0,0,0.25)",
+  "--ae-shadow-glow: 0 0 30px rgba(212,175,110,0.10)"
+].forEach(function(token) {
+  assert(css.includes(token), "Premium token değeri var: " + token);
+});
 
 // ── Dark theme override block ──
 assert(css.includes('#root[data-theme="dark"]'), "Dark theme override bloğu var");

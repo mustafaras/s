@@ -3,28 +3,43 @@
 
 :root {
   /* Temel sayfa zeminleri */
-  --ae-page: #F8F6F2;
-  --ae-bg: #FFFFFF;
-  --ae-surface: #FFFFFF;
-  --ae-elevated: #FDFBF8;
+  --ae-page: #F5F3EF;
+  --ae-bg: #FDFCFA;
+  --ae-surface: #FCFAF7;
+  --ae-elevated: #FAF7F2;
 
   /* Metin */
-  --ae-text: #1F1C19;
+  --ae-text: #1C1916;
   --ae-muted: #6E6862;
   --ae-faint: #9B958E;
 
   /* Vurgu — premium altın/bronz */
-  --ae-accent: #A4824C;
+  --ae-accent: #B08D4E;
   --ae-accent2: #C9A86C;
+  --ae-accent3: #A08040;
   --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 18%, transparent);
   --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 28%, transparent);
 
   /* Durum renkleri */
-  --ae-ok: #4A8C6A;
-  --ae-warn: #C79A4F;
-  --ae-drop: #B85C5C;
-  --ae-info: #5A7E9A;
+  --ae-ok: #4CAF7A;
+  --ae-warn: #D4A84C;
+  --ae-drop: #C86565;
+  --ae-info: #5E8AAA;
   --ae-pause: #8A8496;
+
+  /* Glassmorphism / glow */
+  --ae-glass: rgba(0,0,0,0.02);
+  --ae-glass-border: rgba(0,0,0,0.06);
+  --ae-glow-accent: 0 0 30px rgba(212,175,110,0.15);
+  --ae-glow-ok: 0 0 20px rgba(76,175,122,0.12);
+  --ae-glow-drop: 0 0 20px rgba(200,101,101,0.12);
+
+  /* Gölge */
+  --ae-shadow-sm: 0 2px 8px rgba(0,0,0,0.12);
+  --ae-shadow-md: 0 8px 24px rgba(0,0,0,0.16);
+  --ae-shadow-lg: 0 16px 48px rgba(0,0,0,0.20);
+  --ae-shadow-xl: 0 24px 64px rgba(0,0,0,0.25);
+  --ae-shadow-glow: 0 0 30px rgba(212,175,110,0.10);
 
   /* Kart / konteyner */
   --ae-card-bg: #FFFFFF;
@@ -47,36 +62,55 @@
   --ae-empty-icon: var(--ae-accent);
 
   /* Uzaklık */
+  --ae-space-2xs: 2px;
   --ae-space-xs: 4px;
   --ae-space-sm: 8px;
   --ae-space-md: 12px;
   --ae-space-lg: 16px;
   --ae-space-xl: 24px;
+  --ae-space-2xl: 32px;
+  --ae-space-3xl: 48px;
 
   /* Tipografi */
   --ae-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --ae-radius-xs: 6px;
   --ae-radius-sm: 10px;
   --ae-radius-md: 14px;
   --ae-radius-lg: 20px;
+  --ae-radius-xl: 28px;
+  --ae-radius-full: 9999px;
 
   /* Geçiş / ease */
   --ae-ease: cubic-bezier(0.16, 1, 0.30, 1);
 }
 
 #root[data-theme="dark"] {
-  --ae-page: #12100E;
-  --ae-bg: #181513;
-  --ae-surface: #1E1B17;
-  --ae-elevated: #26221D;
+  --ae-page: #0C0A09;
+  --ae-bg: #11100E;
+  --ae-surface: #1A1815;
+  --ae-elevated: #221F1B;
 
-  --ae-text: #F4F0EA;
-  --ae-muted: #9B958E;
-  --ae-faint: #6E6862;
+  --ae-text: #F5F0EB;
+  --ae-muted: #8A847D;
+  --ae-faint: #5E5852;
 
-  --ae-accent: #C9A86C;
-  --ae-accent2: #E8C887;
+  --ae-accent: #D4AF6E;
+  --ae-accent2: #F0D48A;
+  --ae-accent3: #A08040;
   --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 16%, transparent);
   --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 24%, transparent);
+
+  --ae-glass: rgba(255,255,255,0.04);
+  --ae-glass-border: rgba(255,255,255,0.06);
+  --ae-glow-accent: 0 0 30px rgba(212,175,110,0.15);
+  --ae-glow-ok: 0 0 20px rgba(76,175,122,0.12);
+  --ae-glow-drop: 0 0 20px rgba(200,101,101,0.12);
+
+  --ae-shadow-sm: 0 2px 8px rgba(0,0,0,0.12);
+  --ae-shadow-md: 0 8px 24px rgba(0,0,0,0.16);
+  --ae-shadow-lg: 0 16px 48px rgba(0,0,0,0.20);
+  --ae-shadow-xl: 0 24px 64px rgba(0,0,0,0.25);
+  --ae-shadow-glow: 0 0 30px rgba(212,175,110,0.10);
 
   --ae-card-bg: #1E1B17;
   --ae-card-bd: color-mix(in srgb, var(--ae-accent) 22%, rgba(244,240,234,0.08));

@@ -9491,6 +9491,12 @@ function zikrNoteEditorHTML(p){
   var d=zikrNoteDraftFor(p), saved=zikrReflection(todayStr(),p.id);
   var moods=[['huzurlu','Huzurlu'],['şükür','Şükür dolu'],['umutlu','Umutlu'],['dalgın','Dalgın'],['yorgun','Yorgun'],['zorlanıyorum','Zorlanıyorum']];
   var words=zikrReflectionWordCount(d), h='<section id="zikr-note-region" class="zikr-v2-note'+(ui.zikrNoteOpen?' is-open':'')+'">';
+  // Nazik davet: bugün bu zikirden en az bir tık var ama henüz not yoksa,
+  // toggle'ın üstünde daha görünür bir davet çıkar — zorlamaz, günlük not
+  // yazılınca ya da panel kapanıp açılana kadar kendiliğinden kaybolur.
+  if(!ui.zikrNoteOpen&&!saved&&zikrPresetDay(zikrDay(todayStr()),p.id).count>0){
+    h+='<button class="zikr-v2-note-invite" onclick="App.toggleZikrNote()"><span class="icon">'+icon('feather',16)+'</span><span><strong>Bugünü birkaç kelimeyle anlat</strong><em>'+esc(p.name)+' çekerken içinden ne geçti?</em></span><b>'+icon('chevron-right',15)+'</b></button>';
+  }
   h+='<button class="zikr-v2-note-summary" onclick="App.toggleZikrNote()" aria-expanded="'+(!!ui.zikrNoteOpen)+'" aria-controls="zikr-note-editor"><span class="icon">'+icon('pen-line',18)+'</span><span><small>TEFEKKÜR GÜNLÜĞÜ</small><strong>Hislerim · Düşüncelerim</strong><em>'+esc(p.name)+' için bugüne özel</em></span><b>'+(saved?icon('circle-check',15):icon('chevron-down',16))+'</b></button>';
   if(ui.zikrNoteOpen){
     h+='<div id="zikr-note-editor" class="zikr-v2-note-editor">';

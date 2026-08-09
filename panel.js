@@ -291,27 +291,112 @@ function zikrPresetP(id){
   for(var i=0;i<list.length;i++) if(list[i]&&list[i].id===id) return list[i];
   return list[0]||null;
 }
-function zikrJourneySummaryP(){
-  var z=zikrRootP(); if(!z) return null;
-  var id=z.settings&&z.settings.activePresetId, p=zikrPresetP(id); if(!p) return null;
-  var journeys=z.journeys&&typeof z.journeys==='object'?z.journeys:{}, j=journeys[p.id]||null, h=null;
+// ZP-03: app.js'teki zikrMath ile birebir aynı formül sözleşmesi (aynı değişken
+// adları/aynı dallanma) kullanılır; UI kendi başına farklı matematik üretmez.
+// Not: core (esma-olmayan) presetlerde eskiden `count>=target` (yani base) sınırı
+// "bitti" gibi ele alınıyordu; bu, ilk 1 tur'dan sonra ömürlük sayım arttıkça
+// cycleNo/cyclePosition'ın 1. turda kilitli kalmasına yol açan gerçek bir
+// parity hatasıydı. Şimdi app.js'teki `atBoundary` sözleşmesiyle aynı davranır.
+// zikrJourneySummaryP (yalnız aktif preset) ve zikrPresetBreakdownP (her preset)
+// AYNI matematiği paylaşır — tek kaynak burası.
+function zikrPresetMathP(p,j){
+  var isEsma=p&&p.kind==='esma', h=null;
   if(j&&Array.isArray(j.hatims)) for(var i=0;i<j.hatims.length;i++) if(j.hatims[i]&&j.hatims[i].id===j.activeHatimId){ h=j.hatims[i]; break; }
-  // ZP-03: app.js'teki zikrMath ile birebir aynı formül sözleşmesi (aynı değişken
-  // adları/aynı dallanma) kullanılır; UI kendi başına farklı matematik üretmez.
-  // Not: core (esma-olmayan) presetlerde eskiden `count>=target` (yani base) sınırı
-  // "bitti" gibi ele alınıyordu; bu, ilk 1 tur'dan sonra ömürlük sayım arttıkça
-  // cycleNo/cyclePosition'ın 1. turda kilitli kalmasına yol açan gerçek bir
-  // parity hatasıydı. Şimdi app.js'teki `atBoundary` sözleşmesiyle aynı davranır.
-  var isEsma=p.kind==='esma';
   var base=Math.max(1,Number(isEsma?(p.ebced||p.target):p.target)||1);
   var target=isEsma?base*base:base, rawCount=isEsma?(Number(h&&h.count)||0):(Number(j&&j.lifetimeCount)||0);
   var count=isEsma?Math.max(0,Math.min(rawCount,target)):Math.max(0,rawCount);
   var pos=count%base, cycles=Math.floor(count/base), complete=isEsma&&count>=target, atBoundary=!isEsma&&count>0&&pos===0;
   var cyclePosition=complete||atBoundary?base:pos, cycleNo=complete?base:(atBoundary?cycles:cycles+1);
   var completedCycles=isEsma?Math.min(base,cycles):cycles;
+  return {base:base,target:target,count:count,cycleNo:cycleNo,cyclePosition:cyclePosition,completedCycles:completedCycles,complete:complete,status:h&&h.status||''};
+}
+function zikrJourneySummaryP(){
+  var z=zikrRootP(); if(!z) return null;
+  var id=z.settings&&z.settings.activePresetId, p=zikrPresetP(id); if(!p) return null;
+  var journeys=z.journeys&&typeof z.journeys==='object'?z.journeys:{}, j=journeys[p.id]||null;
+  var m=zikrPresetMathP(p,j);
   var completed=0, lifetime=0;
   Object.keys(journeys).forEach(function(k){ var x=journeys[k]||{}; completed+=Math.max(0,Number(x.completedHatims)||0); lifetime+=Math.max(0,Number(x.lifetimeCount)||0); });
-  return {name:p.name||p.id,kind:p.kind||'core',base:base,target:target,count:count,cycleNo:cycleNo,cyclePosition:cyclePosition,completedCycles:completedCycles,completedHatims:completed,lifetime:lifetime,status:h&&h.status||'',lastAt:j&&j.lastAt||''};
+  return {name:p.name||p.id,kind:p.kind||'core',base:m.base,target:m.target,count:m.count,cycleNo:m.cycleNo,cyclePosition:m.cyclePosition,completedCycles:m.completedCycles,completedHatims:completed,lifetime:lifetime,status:m.status,lastAt:j&&j.lastAt||''};
+}
+// Her preset/esma için ömür boyu döküm — zikrJourneySummaryP yalnız o an AKTİF
+// olanı özetler, bu ise hiç zikredilmiş her preset'i (lifetimeCount>0) listeler.
+function zikrPresetBreakdownP(){
+  var z=zikrRootP(); if(!z) return [];
+  var journeys=z.journeys&&typeof z.journeys==='object'?z.journeys:{};
+  var todaySession=(z.sessions&&z.sessions[today()])||null, perPresetToday=(todaySession&&todaySession.perPreset)||{};
+  var out=[];
+  Object.keys(journeys).forEach(function(pid){
+    var j=journeys[pid], lifetime=Math.max(0,Number(j&&j.lifetimeCount)||0);
+    if(!j||!lifetime) return;
+    var p=zikrPresetP(pid); if(!p) return;
+    var m=zikrPresetMathP(p,j), todayCount=Math.max(0,Number((perPresetToday[pid]||{}).count)||0);
+    out.push({id:pid,name:p.name||pid,kind:p.kind||'core',today:todayCount,lifetime:lifetime,completedHatims:Math.max(0,Number(j.completedHatims)||0),cyclePosition:m.cyclePosition,base:m.base,cycleNo:m.cycleNo,lastAt:j.lastAt||''});
+  });
+  out.sort(function(a,b){ return b.lifetime-a.lifetime; });
+  return out;
+}
+// z.sessions tam geçmişi tutar (budanmıyor) — güncel seri zaten data'da hazır
+// (z.streak) ama "en uzun seri" hiç saklanmıyor; salt-okunur panel bunu her
+// render'da geçmişten türetir, yeni bir alan yazmaz/persist etmez.
+function zikrLongestStreakP(){
+  var z=zikrRootP(); if(!z||!z.sessions) return 0;
+  var dates=Object.keys(z.sessions).filter(function(d){ var s=z.sessions[d]; return s&&Number(s.totalCount)>0; }).sort();
+  if(!dates.length) return 0;
+  var longest=1, run=1;
+  for(var i=1;i<dates.length;i++){
+    var prev=new Date(dates[i-1]+'T00:00:00'), cur=new Date(dates[i]+'T00:00:00');
+    var diffDays=Math.round((cur-prev)/86400000);
+    run=(diffDays===1)?run+1:1;
+    if(run>longest) longest=run;
+  }
+  return longest;
+}
+// Gün içi eğilim — her günün SON zikir anına (z.sessions[date].lastAt) bakar;
+// tek tek her tekin zaman damgası tutulmuyor, bu yüzden bu bir yaklaşıktır
+// ("genelde ne zaman biter"), tam dağılım değil — kartta öyle etiketlenir.
+function zikrTimeOfDayP(){
+  var z=zikrRootP(); if(!z||!z.sessions) return null;
+  var buckets={sabah:0,ogle:0,aksam:0,gece:0}, total=0;
+  Object.keys(z.sessions).forEach(function(d){
+    var s=z.sessions[d]; if(!s||!s.lastAt) return;
+    var dt=new Date(s.lastAt); if(isNaN(dt.getTime())) return;
+    var hr=dt.getHours(); total++;
+    if(hr>=5&&hr<12) buckets.sabah++; else if(hr>=12&&hr<17) buckets.ogle++; else if(hr>=17&&hr<21) buckets.aksam++; else buckets.gece++;
+  });
+  return total?{total:total,buckets:buckets}:null;
+}
+function zikrDetailCardP(){
+  if(!ZIKR_V2_VISIBLE_P) return '';
+  var breakdown=zikrPresetBreakdownP();
+  if(!breakdown.length) return '';
+  var streak=zikrStreakP(), longest=zikrLongestStreakP(), tod=zikrTimeOfDayP();
+  var h='<div class="card lift span-12 pad" style="order:37;">';
+  h+='<div class="lbl" style="display:flex;align-items:center;gap:7px;">'+icon('flame',14)+' Zikir Dökümü <span style="margin-left:auto;font-size:var(--f2);color:var(--zikr);font-weight:850;letter-spacing:0;text-transform:none;">'+breakdown.length+' zikir</span></div>';
+  h+='<div style="display:flex;gap:8px;margin:2px 0 12px;flex-wrap:wrap;">';
+  h+='<span class="tchip fl">Güncel seri · <b style="color:var(--zikr);">'+streak+'</b> gün</span>';
+  h+='<span class="tchip fl">En uzun seri · <b style="color:var(--zikr);">'+longest+'</b> gün</span>';
+  h+='</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:8px;">';
+  breakdown.slice(0,14).forEach(function(x){
+    var pct=x.base?Math.min(100,Math.round(x.cyclePosition/x.base*100)):0;
+    h+='<div style="padding:9px 11px;border:1px solid var(--bd2);border-radius:11px;background:var(--s1);">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><strong style="color:var(--t1);font-size:var(--f3);">'+esc(x.name)+'</strong><span style="font-size:var(--f1);color:var(--t4);font-weight:700;white-space:nowrap;">'+x.lifetime.toLocaleString('tr-TR')+' ömürlük'+(x.completedHatims?' · '+x.completedHatims+' hatim':'')+'</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><div style="flex:1;height:6px;border-radius:99px;background:var(--bd2);overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--zikr);"></div></div><span style="font-size:var(--f1);color:var(--t4);font-weight:700;white-space:nowrap;">'+x.cyclePosition+'/'+x.base+' · '+x.cycleNo+'. tur</span></div>';
+    if(x.today>0) h+='<div style="margin-top:5px;font-size:var(--f1);color:var(--zikr);font-weight:700;">Bugün +'+x.today+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  if(tod&&tod.total>=5){
+    var b=tod.buckets, mx=Math.max(b.sabah,b.ogle,b.aksam,b.gece,1);
+    var row=function(label,v){ return '<div style="display:flex;align-items:center;gap:8px;"><span style="width:44px;font-size:var(--f1);color:var(--t4);font-weight:700;">'+label+'</span><div style="flex:1;height:6px;border-radius:99px;background:var(--bd2);overflow:hidden;"><div style="height:100%;width:'+Math.round(v/mx*100)+'%;background:var(--zikr);"></div></div><span style="width:22px;text-align:right;font-size:var(--f1);color:var(--t4);font-weight:700;">'+v+'</span></div>'; };
+    h+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bd2);">';
+    h+='<div style="font-size:var(--f1);color:var(--t4);font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Genelde ne zaman biter · son '+tod.total+' gün (yaklaşık)</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">'+row('Sabah',b.sabah)+row('Öğle',b.ogle)+row('Akşam',b.aksam)+row('Gece',b.gece)+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
 }
 function zikrWeekTotalP(date){
   date=date||today(); var total=0, days=0;
@@ -4131,6 +4216,7 @@ function render(){
   h+=motivationPanelCardHTML();
   h+=magnesiumPanelCardHTML();
   h+=saygiPanelCardHTML();
+  h+=zikrDetailCardP();
   h+=zikrReflectionArchiveCardP();
   h+='<div class="card lift span-8 pad" style="order:20;">';
   h+='<div class="lbl">Tik Trendi · '+UI.range+'g<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">ort '+curAvg.toFixed(1)+'</span><span style="margin-left:8px;">'+tc(curAvg,prevAvg,true)+'</span></div>';

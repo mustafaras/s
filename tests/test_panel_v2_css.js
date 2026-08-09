@@ -150,6 +150,12 @@ classRule("ae-ring__progress");
 classRule("summary-card");
 classRule("ae-empty");
 classRule("ae-empty__icon");
+classRule("ae-divider");
+classRule("ae-divider--label");
+classRule("ae-toast");
+classRule("ae-toast--success");
+classRule("ae-toast--error");
+classRule("ae-toast--info");
 classRule("ae-skeleton");
 classRule("ae-skeleton--text");
 classRule("ae-skeleton--card");
@@ -160,6 +166,12 @@ assert(css.includes(".ae-tooltip::after"), "Tooltip arrow var");
 assert(css.includes("backdrop-filter: blur(16px) saturate(1.2)"), "Tooltip glass blur var");
 assert(css.includes(".ae-tooltip-wrap:hover .ae-tooltip"), "Tooltip hover görünürlüğü var");
 assert(css.includes(".ae-tooltip-wrap:focus-within .ae-tooltip"), "Tooltip focus görünürlüğü var");
+assert(css.includes("linear-gradient(90deg, transparent"), "Divider gradient çizgisi var");
+assert(css.includes("@keyframes aeToastIn"), "Toast slide-in animasyonu var");
+assert(css.includes("backdrop-filter: blur(20px) saturate(1.15)"), "Toast glass blur var");
+assert(js.includes("function AeDivider"), "AeDivider JS komponenti var");
+assert(js.includes("function AeToast"), "AeToast JS komponenti var");
+assert(js.includes("function showToast"), "showToast JS fonksiyonu var");
 
 // ── SVG sparklines ──
 classRule("trend-strip__sparkline");

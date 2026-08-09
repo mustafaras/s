@@ -3,7 +3,19 @@
 
 const { boot, assert } = require("./helpers/panel-v2-test-helper");
 
-const { dom, ctx, AeonV2 } = boot();
+const helper = boot();
+const { dom, ctx, AeonV2 } = helper;
+
+assert(typeof AeonV2.AeDivider === "function", "AeDivider export ediliyor");
+assert(typeof AeonV2.AeToast === "function", "AeToast export ediliyor");
+assert(typeof AeonV2.showToast === "function", "showToast export ediliyor");
+assert(typeof AeonV2.dismissToast === "function", "dismissToast export ediliyor");
+const dividerFixture = AeonV2.AeDivider({ label: "Ruh hali" });
+assert(/class="ae-divider ae-divider--label"/.test(dividerFixture), "Etiketli divider markup doğru");
+assert(/role="separator"/.test(dividerFixture), "Divider separator rolü var");
+const toastFixture = AeonV2.AeToast({ message: "Tamamlandı", type: "success", id: "fixture" });
+assert(/class="ae-toast ae-toast--success"/.test(toastFixture), "Success toast markup doğru");
+assert(/role="status"/.test(toastFixture), "Success toast status rolü var");
 
 AeonV2.init();
 
@@ -94,6 +106,19 @@ html = dom.html;
 const firstDayHtml = html;
 assert(/Gün Detayı|Bugün/.test(html), "Gün Detayı sekmesi başlığı var");
 assert(/Ruh hali|Mod|Beslenme|İbadet|Hareket|İçerik|Terapi/.test(html), "Gün detayı bölüm başlıkları var");
+assert((html.match(/class="ae-divider ae-divider--label/g) || []).length >= 5, "Gün detayında divider bölücüleri var");
+assert(/Ruh hali &amp; Terapi/.test(html), "Gün detayı divider etiketi var");
+
+AeonV2.showToast("Kayıt tamamlandı", "success");
+html = dom.html;
+assert(/class="ae-toast ae-toast--success"/.test(html), "Success toast görünür");
+assert(/Kayıt tamamlandı/.test(html), "Toast mesajı görünür");
+AeonV2.dismissToast();
+assert(!/class="ae-toast ae-toast--success"/.test(dom.html), "Toast manuel kapatılabiliyor");
+AeonV2.showToast("Bilgi", "info");
+assert(/class="ae-toast ae-toast--info"/.test(dom.html), "Info toast görünür");
+helper.runTimers();
+assert(!/class="ae-toast ae-toast--info"/.test(dom.html), "Toast süresi dolunca otomatik kapanıyor");
 
 AeonV2.setDate("2026-08-03");
 html = dom.html;

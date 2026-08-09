@@ -38,6 +38,13 @@
 
   var appData = null;
   var isFetching = false;
+  var toastState = {
+    visible: false,
+    id: 0,
+    message: "",
+    type: "info",
+    duration: 4200
+  };
 
   function isoDate(d) {
     if (!d || isNaN(d.getTime())) d = new Date();
@@ -150,6 +157,34 @@
            "</button>" +
            '<span class="ae-tooltip" id="' + escapeHtml(id) + '" role="tooltip">' + escapeHtml(text) + "</span>" +
            "</span>";
+  }
+
+  function AeDivider(opts) {
+    opts = opts || {};
+    var label = safeText(opts.label || "", 80);
+    var classes = classNames(["ae-divider", label ? "ae-divider--label" : "", opts.className]);
+    var aria = label ? ' aria-label="' + escapeHtml(label) + '"' : "";
+    return '<div class="' + escapeHtml(classes) + '" role="separator"' + aria + '>' +
+           (label ? '<span class="ae-divider__label">' + escapeHtml(label) + "</span>" : "") +
+           "</div>";
+  }
+
+  function AeToast(opts) {
+    opts = opts || {};
+    var allowedTypes = ["success", "error", "info"];
+    var type = allowedTypes.indexOf(opts.type) !== -1 ? opts.type : "info";
+    var message = safeText(opts.message || opts.text || "Bildirim", 240);
+    var id = String(opts.id || "toast").replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 48) || "toast";
+    var icons = { success: "✓", error: "!", info: "i" };
+    var role = type === "error" ? "alert" : "status";
+    var close = opts.dismissible === false ? "" :
+      '<button type="button" class="ae-toast__close" onclick="AeonV2.dismissToast(\'' + escapeHtml(id) + '\')" aria-label="Bildirimi kapat">×</button>';
+    return '<div class="ae-toast ae-toast--' + type + '" id="ae-toast-' + escapeHtml(id) +
+           '" role="' + role + '" aria-live="polite" aria-atomic="true">' +
+           '<span class="ae-toast__icon" aria-hidden="true">' + icons[type] + "</span>" +
+           '<span class="ae-toast__message">' + escapeHtml(message) + "</span>" +
+           close +
+           "</div>";
   }
 
   var AE_RING_COLORS = {
@@ -1976,6 +2011,44 @@
     });
   }
 
+  function showToast(message, type) {
+    var text = safeText(message, 240);
+    if (!text) return null;
+    var allowedTypes = ["success", "error", "info"];
+    var toastType = allowedTypes.indexOf(type) !== -1 ? type : "info";
+    var id = toastState.id + 1;
+    toastState = {
+      visible: true,
+      id: id,
+      message: text,
+      type: toastType,
+      duration: 4200
+    };
+    render();
+    setTimeout(function() {
+      if (toastState.id === id) dismissToast(id);
+    }, toastState.duration);
+    return id;
+  }
+
+  function dismissToast(id) {
+    if (!toastState.visible) return;
+    if (id !== undefined && id !== null && String(toastState.id) !== String(id)) return;
+    toastState.visible = false;
+    render();
+  }
+
+  function renderToastHost() {
+    if (!toastState.visible) return "";
+    return '<div class="ae-toast-viewport" id="ae-toast-container">' +
+           AeToast({ id: toastState.id, message: toastState.message, type: toastState.type }) +
+           "</div>";
+  }
+
+  function renderDaySection(label, content) {
+    return content ? AeDivider({ label: label }) + content : "";
+  }
+
   function renderDay() {
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
@@ -1998,21 +2071,21 @@
     }) : "";
     return '<div class="day-view ae-slide-up">' +
            renderDayDatePicker(date) +
-           renderDayHeatmap(date) +
-           (day ? renderDayTimestamps(date) : "") +
-           (day ? renderMoodTherapy(date) : "") +
-           (day ? renderEnergyStress(date) : "") +
-           (day ? renderHabits(date) : "") +
-           (day ? renderCraving(date) : "") +
-           (day ? renderNutrition(date) : "") +
-           (day ? renderNutri(date) : "") +
-           (day ? renderMagnesium(date) : "") +
-           (day ? renderPrayer(date) : "") +
-           (day ? renderWindDown(date) : "") +
-           (day ? renderCycle(date) : "") +
-           (day ? renderMovement(date) : "") +
-           (day ? renderLocationTimeline(date) : "") +
-           (day ? renderContent(date) : "") +
+           renderDaySection("Son 30 gün", renderDayHeatmap(date)) +
+           (day ? renderDaySection("Kayıt zamanları", renderDayTimestamps(date)) : "") +
+           (day ? renderDaySection("Ruh hali & Terapi", renderMoodTherapy(date)) : "") +
+           (day ? renderDaySection("Enerji & Stres", renderEnergyStress(date)) : "") +
+           (day ? renderDaySection("Alışkanlıklar", renderHabits(date)) : "") +
+           (day ? renderDaySection("İstek & SOS", renderCraving(date)) : "") +
+           (day ? renderDaySection("Beslenme", renderNutrition(date)) : "") +
+           (day ? renderDaySection("Besin destekleri", renderNutri(date)) : "") +
+           (day ? renderDaySection("Magnezyum", renderMagnesium(date)) : "") +
+           (day ? renderDaySection("İbadet", renderPrayer(date)) : "") +
+           (day ? renderDaySection("Uyku rutini", renderWindDown(date)) : "") +
+           (day ? renderDaySection("Döngü", renderCycle(date)) : "") +
+           (day ? renderDaySection("Hareket", renderMovement(date)) : "") +
+           (day ? renderDaySection("Konum", renderLocationTimeline(date)) : "") +
+           (day ? renderDaySection("İçerik", renderContent(date)) : "") +
            emptyDay +
            "</div>";
   }
@@ -2582,6 +2655,7 @@
       renderTopbar() +
       renderTabs() +
       '<main class="ae-app__body">' + activeContent + "</main>" +
+      renderToastHost() +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
 
     // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)
@@ -2807,10 +2881,14 @@
     refresh: refresh,
     logout: logout,
     updateStatus: updateStatus,
+    showToast: showToast,
+    dismissToast: dismissToast,
     init: init,
     // Helper exports for testing
     AeMetric: AeMetric,
     AeProgressRing: AeProgressRing,
+    AeDivider: AeDivider,
+    AeToast: AeToast,
     AeSkeleton: AeSkeleton,
     AeTooltip: AeTooltip,
     renderLoadingState: renderLoadingState,

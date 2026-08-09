@@ -42,7 +42,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 2 | Tipografi Sistemi & Font Yükleme | ✅ TAMAMLANDI | `f1131eb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); literal font-size audit | Inter/JetBrains Mono, scale tokenları, mono veri yüzeyleri ve CSS cache bump tamamlandı |
 | 3 | Glassmorphism Kart Sistemi | ✅ TAMAMLANDI | `cc61b19`, `6402408` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (9/9 PASS); rendered variants PASS; live cache verification PASS | AeCard glass/solid/gradient/outline varyantları, mevcut kart eşlemeleri ve CSS/JS cache bump tamamlandı |
 | 4 | Buton & Status Badge Sistemi | ✅ TAMAMLANDI | \`e79b530\` | \`node --check panel-v2.js\`; \`node --check panelCoverageManifest.js\`; \`tests/test_panel_v2_tabs.js\` PASS; \`tests/test_panel_v2_*.js\` (9/9 PASS); diff/secret audit PASS | AeButton gradient/glow/spring, AeStatusBadge dot glow/pulse, kullanım eşlemeleri ve cache bump tamamlandı |
-| 5 | Animasyon Kütüphanesi | 🔒 BEKLEMEDE | - | - | - |
+| 5 | Animasyon Kütüphanesi | ✅ TAMAMLANDI | 05aa066 | node --check panel-v2.js; node --check panelCoverageManifest.js; test_panel_v2_css PASS; test_panel_v2_* (9/9 PASS); old fade audit/secret scan PASS | Slide-up, scale-in, shimmer, count-up, pulse, stagger ve reduced-motion sistemi tamamlandı |
 | 6 | Skeleton & Tooltip | 🔒 BEKLEMEDE | - | - | - |
 | 7 | AeMetric & AeProgressRing | 🔒 BEKLEMEDE | - | - | - |
 | 8 | AeSparkline SVG Grafik | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 5
+- **currentStep:** 6
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-09
 - **lastAgent:** OpenAI Codex (GPT-5)

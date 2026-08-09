@@ -108,6 +108,31 @@ assert(/Gün Detayı|Bugün/.test(html), "Gün Detayı sekmesi başlığı var")
 assert(/Ruh hali|Mod|Beslenme|İbadet|Hareket|İçerik|Terapi/.test(html), "Gün detayı bölüm başlıkları var");
 assert((html.match(/class="ae-divider ae-divider--label/g) || []).length >= 5, "Gün detayında divider bölücüleri var");
 assert(/Ruh hali &amp; Terapi/.test(html), "Gün detayı divider etiketi var");
+const requiredSectionOrder = ["Zamanlar", "Ruh Hali", "Alışkanlıklar", "Beslenme", "İbadet", "Hareket", "Konum", "Döngü"];
+const renderedSectionLabels = Array.from(html.matchAll(/class="ae-divider ae-divider--label"[^>]*>[\s\S]*?<span class="ae-divider__label">([^<]+)<\/span>/g)).map(function(match) {
+  return match[1];
+});
+assert(requiredSectionOrder.every(function(label) { return renderedSectionLabels.indexOf(label) !== -1; }), "Gün detayı ana bölüm divider etiketleri eksiksiz");
+assert(requiredSectionOrder.every(function(label, index) {
+  return index === 0 || renderedSectionLabels.indexOf(label) > renderedSectionLabels.indexOf(requiredSectionOrder[index - 1]);
+}), "Gün detayı ana bölüm sırası doğru");
+
+// Kayıt alanları boş olsa bile bölüm kabukları ve yönlendirici mesajlar korunuyor.
+AeonV2.setData({ days: { "2026-08-05": {} } });
+AeonV2.setDate("2026-08-05");
+html = dom.html;
+assert(requiredSectionOrder.every(function(label) { return html.indexOf('class="ae-divider ae-divider--label') !== -1 && html.indexOf(label) !== -1; }), "Boş gün ana bölüm dividerları korunuyor");
+assert(/Bu gün için kayıt zamanı bilgisi yok/.test(html), "Boş zamanlar mesajı görünür");
+assert(/Bu gün için ruh hali veya terapi özeti kaydı yok/.test(html), "Boş ruh hali mesajı görünür");
+assert(/Bugün için alışkanlık kaydı yok/.test(html), "Boş alışkanlık mesajı görünür");
+assert(/Beslenme, su veya kafein kaydı yok/.test(html), "Boş beslenme mesajı görünür");
+assert(/Bugün için ibadet, zikir veya Saygı kaydı yok/.test(html), "Boş ibadet mesajı görünür");
+assert(/Bugün için hareket veya adım kaydı yok/.test(html), "Boş hareket mesajı görünür");
+assert(/Bu gün için konum geçmişi kaydı yok/.test(html), "Boş konum mesajı görünür");
+assert(/Bugün için döngü veya semptom kaydı yok/.test(html), "Boş döngü mesajı görünür");
+AeonV2.setData(seededData);
+AeonV2.setDate("2026-08-04");
+html = dom.html;
 
 AeonV2.showToast("Kayıt tamamlandı", "success");
 html = dom.html;

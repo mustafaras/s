@@ -1428,7 +1428,7 @@
       id: "mood-therapy",
       title: "Ruh hali & Terapi",
       icon: "🌤",
-      emptyText: "Bu gün için mod veya terapi kaydı yok.",
+      emptyText: "Bu gün için ruh hali veya terapi özeti kaydı yok.",
       children: html
     });
   }
@@ -1466,7 +1466,8 @@
       html += DetailBlock({ icon: "🍽", title: label, body: body });
     });
 
-    if (water !== null || (caf && (caf.drinks || caf.last || caf.cups))) {
+    var hasCaffeine = caf && ((caf.drinks && caf.drinks.length) || caf.last || caf.cups);
+    if (water !== null || hasCaffeine) {
       var fluidBody = water !== null ? "💧 Su: " + water + " bardak" : "";
       if (caf.drinks && caf.drinks.length) {
         fluidBody += (fluidBody ? "<br>" : "") + caf.drinks.map(function(d){ return "☕ " + escapeHtml(String(d.type || "")) + (d.qty ? " ×" + d.qty : "") + (d.time ? " @" + escapeHtml(d.time) : ""); }).join("<br>");
@@ -1484,7 +1485,7 @@
       id: "nutrition",
       title: "Beslenme & Öğün",
       icon: "🍽",
-      emptyText: "Beslenme kaydı girilmemiş.",
+      emptyText: "Beslenme, su veya kafein kaydı yok.",
       children: html
     });
   }
@@ -1546,7 +1547,7 @@
       id: "prayer",
       title: "İbadet & Saygı",
       icon: "🕌",
-      emptyText: "Namaz, zikir veya Saygı kaydı yok.",
+      emptyText: "Bugün için ibadet, zikir veya Saygı kaydı yok.",
       children: html
     });
   }
@@ -1554,20 +1555,19 @@
   function renderHabits(date) {
     var day = getDay(date) || {};
     var hs = getHabitSummary(day);
-    if (!hs.total) return "";
-
+    var hasHabitData = Object.keys(getHabits(day)).length > 0;
     var chips = [];
-    chips.push(renderChip("✅ " + hs.doneCount + "/" + hs.total + " alışkanlık", false));
+    if (hasHabitData) chips.push(renderChip("✅ " + hs.doneCount + "/" + hs.total + " alışkanlık", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
-    if (hs.done.length) {
+    if (hasHabitData && hs.done.length) {
       var doneBody = hs.done.map(function(k) {
         return '<div class="habit-row habit-row--done"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "✅") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
       }).join("");
       html += DetailBlock({ icon: "✅", title: "Yapılan alışkanlıklar (" + hs.doneCount + ")", body: doneBody });
     }
-    if (hs.undone.length) {
+    if (hasHabitData && hs.undone.length) {
       var undoneBody = hs.undone.map(function(k) {
         return '<div class="habit-row habit-row--undone"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "◻") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
       }).join("");
@@ -1578,7 +1578,7 @@
       id: "habits",
       title: "Alışkanlıklar",
       icon: "✅",
-      emptyText: "Alışkanlık kaydı yok.",
+      emptyText: "Bugün için alışkanlık kaydı yok.",
       children: html
     });
   }
@@ -1587,7 +1587,6 @@
     var day = getDay(date) || {};
     var energy = getEnergy(day);
     var stress = getStress(day);
-    if (energy === null && stress === null) return "";
 
     var chips = [];
     if (energy !== null) chips.push(renderChip("⚡ Enerji: " + energy + "/5", false));
@@ -1608,7 +1607,7 @@
       id: "energy-stress",
       title: "Enerji & Stres",
       icon: "⚡",
-      emptyText: "Enerji ve stres kaydı yok.",
+      emptyText: "Bugün için enerji veya stres ölçümü yok.",
       children: html
     });
   }
@@ -1616,8 +1615,6 @@
   function renderCraving(date) {
     var day = getDay(date) || {};
     var c = getCravingDetails(day);
-    if (!c.sosCount && !c.optionsUsed.length && !c.triggers.length && !c.triggerNote && !c.tenMinDone && !c.foodDone && !c.coffeeDone) return "";
-
     var chips = [];
     if (c.sosCount > 0) chips.push(renderChip("🆘 SOS: " + c.sosCount, false));
     if (c.tenMinDone) chips.push(renderChip("🍬 10 dk gecikme", false));
@@ -1650,15 +1647,14 @@
       id: "craving",
       title: "Kriz & Baş etme",
       icon: "🆘",
-      emptyText: "Kriz kaydı yok.",
+      emptyText: "Bugün için istek veya SOS kaydı yok.",
       children: html
     });
   }
 
   function renderMagnesium(date) {
     var day = getDay(date) || {};
-    var mg = getMagnesium(day);
-    if (!mg) return "";
+    var mg = getMagnesium(day) || {};
 
     var chips = [];
     if (mg.taken) chips.push(renderChip("🧪 Magnezyum alındı", false));
@@ -1682,32 +1678,34 @@
       id: "magnesium",
       title: "Magnezyum",
       icon: "🧪",
-      emptyText: "Magnezyum kaydı yok.",
+      emptyText: "Bugün için magnezyum veya destek kaydı yok.",
       children: html
     });
   }
 
   function renderWindDown(date) {
     var day = getDay(date) || {};
-    var wd = getWindDown(day);
-    if (!wd) return "";
+    var windDown = getWindDown(day);
+    var wd = windDown || {};
 
     var chips = [];
     var stepCount = [wd.light, wd.breath, wd.dump, wd.cool].filter(Boolean).length;
-    if (stepCount > 0) chips.push(renderChip("🌙 Wind-down: " + stepCount + "/4 adım", false));
-    if (wd.lastMinutes) chips.push(renderChip("⏱ " + wd.lastMinutes + " dk", false));
+    if (windDown && stepCount > 0) chips.push(renderChip("🌙 Wind-down: " + stepCount + "/4 adım", false));
+    if (windDown && wd.lastMinutes) chips.push(renderChip("⏱ " + wd.lastMinutes + " dk", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
-    var stepsBody = "";
-    stepsBody += (wd.light ? "✅" : "◻") + " Işık azaltma<br>";
-    stepsBody += (wd.breath ? "✅" : "◻") + " Nefes egzersizi<br>";
-    stepsBody += (wd.dump ? "✅" : "◻") + " Zihin boşaltma<br>";
-    stepsBody += (wd.cool ? "✅" : "◻") + " Serinleme<br>";
-    if (wd.lastMinutes) stepsBody += "<br>Süre: " + wd.lastMinutes + " dk";
-    html += DetailBlock({ icon: "🌙", title: "Wind-down adımları", body: stepsBody });
+    if (windDown) {
+      var stepsBody = "";
+      stepsBody += (wd.light ? "✅" : "◻") + " Işık azaltma<br>";
+      stepsBody += (wd.breath ? "✅" : "◻") + " Nefes egzersizi<br>";
+      stepsBody += (wd.dump ? "✅" : "◻") + " Zihin boşaltma<br>";
+      stepsBody += (wd.cool ? "✅" : "◻") + " Serinleme<br>";
+      if (wd.lastMinutes) stepsBody += "<br>Süre: " + wd.lastMinutes + " dk";
+      html += DetailBlock({ icon: "🌙", title: "Wind-down adımları", body: stepsBody });
+    }
 
-    if (wd.offloadNote) {
+    if (windDown && wd.offloadNote) {
       html += DetailBlock({ icon: "📤", title: "Zihin boşaltma notu", body: nl2br(escapeHtml(wd.offloadNote)) });
     }
 
@@ -1715,7 +1713,7 @@
       id: "winddown",
       title: "Wind-down (Uyku hazırlık)",
       icon: "🌙",
-      emptyText: "Wind-down kaydı yok.",
+      emptyText: "Bugün için uyku rutini kaydı yok.",
       children: html
     });
   }
@@ -1723,8 +1721,6 @@
   function renderCycle(date) {
     var day = getDay(date) || {};
     var cyc = getCycleInfo(day);
-    if (!cyc.flow && !cyc.symptoms.length) return "";
-
     var chips = [];
     if (cyc.flow) chips.push(renderChip("🩸 Akış: " + escapeHtml(cyc.flow), false));
     if (cyc.symptoms.length) chips.push(renderChip("🩺 Semptom: " + cyc.symptoms.length, false));
@@ -1742,35 +1738,37 @@
       id: "cycle",
       title: "Döngü & Semptomlar",
       icon: "🩸",
-      emptyText: "Döngü kaydı yok.",
+      emptyText: "Bugün için döngü veya semptom kaydı yok.",
       children: html
     });
   }
 
   function renderNutri(date) {
     var day = getDay(date) || {};
-    var nutri = getNutri(day);
-    if (!nutri) return "";
+    var nutriData = getNutri(day);
+    var nutri = nutriData || {};
 
     var chips = [];
-    if (nutri.calories) chips.push(renderChip("🔥 " + nutri.calories + " kcal", false));
-    if (nutri.protein) chips.push(renderChip("🥩 Protein: " + nutri.protein + "g", false));
+    if (nutriData && nutri.calories) chips.push(renderChip("🔥 " + nutri.calories + " kcal", false));
+    if (nutriData && nutri.protein) chips.push(renderChip("🥩 Protein: " + nutri.protein + "g", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
-    var body = "";
-    if (nutri.calories) body += "🔥 Kalori: " + nutri.calories + " kcal<br>";
-    if (nutri.protein) body += "🥩 Protein: " + nutri.protein + "g<br>";
-    if (nutri.carbs) body += "🍚 Karbonhidrat: " + nutri.carbs + "g<br>";
-    if (nutri.fat) body += "🧈 Yağ: " + nutri.fat + "g<br>";
-    if (nutri.items) body += "📦 Öğün sayısı: " + nutri.items;
-    html += DetailBlock({ icon: "📊", title: "Makro besin özeti", body: body });
+    if (nutriData && Object.keys(nutriData).length) {
+      var body = "";
+      if (nutri.calories) body += "🔥 Kalori: " + nutri.calories + " kcal<br>";
+      if (nutri.protein) body += "🥩 Protein: " + nutri.protein + "g<br>";
+      if (nutri.carbs) body += "🍚 Karbonhidrat: " + nutri.carbs + "g<br>";
+      if (nutri.fat) body += "🧈 Yağ: " + nutri.fat + "g<br>";
+      if (nutri.items) body += "📦 Öğün sayısı: " + nutri.items;
+      html += DetailBlock({ icon: "📊", title: "Makro besin özeti", body: body });
+    }
 
     return DetailSection({
       id: "nutri",
       title: "Besin değerleri",
       icon: "📊",
-      emptyText: "Makro besin kaydı yok.",
+      emptyText: "Bugün için makro besin kaydı yok.",
       children: html
     });
   }
@@ -1826,9 +1824,9 @@
 
     return DetailSection({
       id: "movement",
-      title: "Hareket, Rahatsızlık & Konum",
+      title: "Hareket",
       icon: "👟",
-      emptyText: "Hareket ve konum özeti yok.",
+      emptyText: "Bugün için hareket veya adım kaydı yok.",
       children: html
     });
   }
@@ -1922,11 +1920,18 @@
   }
 
   function renderDayTimestamps(date) {
-    var day = getDay(date);
-    if (!day) return "";
+    var day = getDay(date) || {};
 
     var savedAt = getDaySavedAt(date);
-    if (!savedAt) return "";
+    if (!savedAt) {
+      return DetailSection({
+        id: "day-timestamps",
+        title: "Kayıt zamanları",
+        icon: "⏱",
+        emptyText: "Bu gün için kayıt zamanı bilgisi yok.",
+        children: ""
+      });
+    }
 
     var items = '<div class="sess-item"><span class="sess-item__label">Kayıt</span><span class="sess-item__value">' + escapeHtml(formatTs(savedAt)) + '</span></div>';
     if (day.journal && day.journal.savedAt) {
@@ -1938,6 +1943,16 @@
       children: '<div class="sess-section">' +
         '<div class="ae-label">⏱ Kayıt Zamanları</div>' +
         '<div class="sess-grid">' + items + '</div></div>'
+    });
+  }
+
+  function renderDayLocation(date) {
+    return renderLocationTimeline(date) || DetailSection({
+      id: "day-location",
+      title: "Konum",
+      icon: "📍",
+      emptyText: "Bu gün için konum geçmişi kaydı yok.",
+      children: ""
     });
   }
 
@@ -2045,7 +2060,11 @@
            "</div>";
   }
 
-  function renderDaySection(label, content) {
+  function renderDayGroup(label, contents) {
+    var parts = Array.isArray(contents) ? contents : [contents];
+    var content = parts.filter(function(part) {
+      return part !== null && part !== undefined && String(part).trim();
+    }).join("");
     return content ? AeDivider({ label: label }) + content : "";
   }
 
@@ -2071,21 +2090,16 @@
     }) : "";
     return '<div class="day-view ae-slide-up">' +
            renderDayDatePicker(date) +
-           renderDaySection("Son 30 gün", renderDayHeatmap(date)) +
-           (day ? renderDaySection("Kayıt zamanları", renderDayTimestamps(date)) : "") +
-           (day ? renderDaySection("Ruh hali & Terapi", renderMoodTherapy(date)) : "") +
-           (day ? renderDaySection("Enerji & Stres", renderEnergyStress(date)) : "") +
-           (day ? renderDaySection("Alışkanlıklar", renderHabits(date)) : "") +
-           (day ? renderDaySection("İstek & SOS", renderCraving(date)) : "") +
-           (day ? renderDaySection("Beslenme", renderNutrition(date)) : "") +
-           (day ? renderDaySection("Besin destekleri", renderNutri(date)) : "") +
-           (day ? renderDaySection("Magnezyum", renderMagnesium(date)) : "") +
-           (day ? renderDaySection("İbadet", renderPrayer(date)) : "") +
-           (day ? renderDaySection("Uyku rutini", renderWindDown(date)) : "") +
-           (day ? renderDaySection("Döngü", renderCycle(date)) : "") +
-           (day ? renderDaySection("Hareket", renderMovement(date)) : "") +
-           (day ? renderDaySection("Konum", renderLocationTimeline(date)) : "") +
-           (day ? renderDaySection("İçerik", renderContent(date)) : "") +
+           renderDayHeatmap(date) +
+           (day ? renderDayGroup("Zamanlar", [renderDayTimestamps(date)]) : "") +
+           (day ? renderDayGroup("Ruh Hali", [renderMoodTherapy(date), renderEnergyStress(date)]) : "") +
+           (day ? renderDayGroup("Alışkanlıklar", [renderHabits(date), renderCraving(date), renderWindDown(date), renderMagnesium(date)]) : "") +
+           (day ? renderDayGroup("Beslenme", [renderNutrition(date), renderNutri(date)]) : "") +
+           (day ? renderDayGroup("İbadet", [renderPrayer(date)]) : "") +
+           (day ? renderDayGroup("Hareket", [renderMovement(date)]) : "") +
+           (day ? renderDayGroup("Konum", [renderDayLocation(date)]) : "") +
+           (day ? renderDayGroup("Döngü", [renderCycle(date)]) : "") +
+           (day ? renderDayGroup("İçerik", [renderContent(date)]) : "") +
            emptyDay +
            "</div>";
   }

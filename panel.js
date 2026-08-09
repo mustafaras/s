@@ -1110,13 +1110,14 @@ var SYNC_STATUS_P={
   missing:{cls:'b-warn',label:'Uzak kabul makbuzu yok'}
 };
 function normalizeSyncReceiptP(r){
-  var out={schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null};
+  var out={schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null,lastErrorDetail:null};
   var x=r&&typeof r==='object'?r:{};
   var statuses={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
   var errors={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
   function str(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
   function iso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
-  out.status=statuses[x.status]?x.status:'idle'; out.snapshotRevision=str(x.snapshotRevision,128); out.sourceUpdatedAt=iso(x.sourceUpdatedAt); out.submittedAt=iso(x.submittedAt); out.acceptedAt=iso(x.acceptedAt); out.sourceLatestSha=str(x.sourceLatestSha,128); out.lastErrorCode=errors[x.lastErrorCode]?x.lastErrorCode:null;
+  function detail(v){ return typeof v==='string'&&/^[a-z0-9_]{1,24}$/.test(v)?v:null; }
+  out.status=statuses[x.status]?x.status:'idle'; out.snapshotRevision=str(x.snapshotRevision,128); out.sourceUpdatedAt=iso(x.sourceUpdatedAt); out.submittedAt=iso(x.submittedAt); out.acceptedAt=iso(x.acceptedAt); out.sourceLatestSha=str(x.sourceLatestSha,128); out.lastErrorCode=errors[x.lastErrorCode]?x.lastErrorCode:null; out.lastErrorDetail=detail(x.lastErrorDetail);
   return out;
 }
 function syncStatusP(receipt){
@@ -1153,7 +1154,7 @@ function syncFreshnessP(receipt,pollAt){
 function canonicalStatusP(receipt,projectionState){
   var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), reason=projectionState&&projectionState.reason||'';
   if(st.code==='anti_clobber'||st.code==='conflict') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical conflict',detail:'Uzak kabul bekleniyor; veri kaybı riskinde işlem durdu.',revision:r.snapshotRevision||null};
-  if(st.code==='error'||st.code==='permission'||st.code==='unauthorized'||st.code==='forbidden'||st.code==='receipt_failed') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical hata',detail:'Receipt/revision doğrulanamadı; önceki güvenli görünüm korunuyor.',revision:r.snapshotRevision||null};
+  if(st.code==='error'||st.code==='permission'||st.code==='unauthorized'||st.code==='forbidden'||st.code==='receipt_failed') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical hata',detail:'Receipt/revision doğrulanamadı; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):''),revision:r.snapshotRevision||null};
   if(st.code==='missing') return {code:st.code,kind:'warning',cls:'b-warn',label:'Canonical receipt bekleniyor',detail:'Uzak kabul makbuzu olmadan başarı iddiası yok.',revision:r.snapshotRevision||null};
   if(st.code==='accepted'&&(reason==='projection_stale'||reason==='projection_invalid'||reason==='projection_parse_failed'||reason==='projection_network'||reason==='projection_permission')) return {code:'projection',kind:'warning',cls:'b-warn',label:'Canonical kabul · projection bekliyor',detail:'Receipt kabul edildi; observer görünümü güvenli fallback ile sürüyor.',revision:r.snapshotRevision||null};
   if(st.code==='accepted') return {code:'accepted',kind:'ok',cls:'b-ok',label:'Canonical kabul edildi',detail:'Receipt + revision kanıtı doğrulandı.',revision:r.snapshotRevision||null};
@@ -1189,7 +1190,7 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
   var noteClass=errorState?' error-state':staleState?' stale-banner':sectionFetchFailed?' stale-banner':'';
   var noteComponent=errorState?'error-state':staleState?'stale-banner':sectionFetchFailed?'stale-banner':'sync-ribbon-note';
-  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?'Canonical hata; önceki güvenli görünüm korunuyor.':staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
+  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?('Canonical hata; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):'')):staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
   var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
   var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
   return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';

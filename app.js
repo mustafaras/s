@@ -10575,14 +10575,42 @@ function quranOutboxErrorLabel(err){
   if(msg.indexOf('timeout')>=0||msg.indexOf('zaman aşımı')>=0) return 'Zaman aşımı';
   return 'Ağ hatası';
 }
+var QURAN_PRECHECK_TIMEOUT_MS=8000;
+// QY-07: gönderim sırasında çift dokunma engeli — aynı anda tek uçuş.
+// Karara varmadan önce en güncel teslim/yanıt durumunu çekmeyi dener: bayat
+// bir sekme/cihaz, başka bir cihazda zaten yanıtlanmış bir sûreyi hâlâ
+// "istenebilir" sanıp ikinci bir requestId + outbox kaydı + mail üretmesin
+// (bkz. quranApplyRemoteUpdates — aynı fonksiyon "Güncellemeleri kontrol et"
+// butonunun da kullandığı, salt-okunur ve idempotent yoldur).
 App.quranJourneySubmit=function(id){
   var sid=quranSafeSurahId(id);
   if(!sid){ toast('Bu sûre bulunamadı.'); return; }
-  // QY-07: gönderim sırasında çift dokunma engeli — aynı anda tek uçuş.
   if(ui.quranSubmittingId) return;
+  var s=(typeof window!=='undefined')?window.SeySync:null;
+  if(s&&typeof s.pullQuranUpdates==='function'){
+    ui.quranSubmittingId=sid;
+    var settledPre=false;
+    function settlePre(){ if(settledPre) return; settledPre=true; ui.quranSubmittingId=''; quranJourneySubmitProceed(sid); }
+    try{ setTimeout(settlePre,QURAN_PRECHECK_TIMEOUT_MS); }catch(e){}
+    try{
+      s.pullQuranUpdates(function(err,result){
+        if(!err&&result) quranApplyRemoteUpdates(result.delivery,result.responses);
+        settlePre();
+      });
+    }catch(e){ settlePre(); }
+    return;
+  }
+  quranJourneySubmitProceed(sid);
+};
+function quranJourneySubmitProceed(sid){
   var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
   // İkinci kayıt kapısı: açık istek varken yeni requestId üretilmez.
-  if(!quranCanRequest(req)){ toast('Bu sûre için açık bir istek var; ikinci istek gönderilmiyor.'); return; }
+  if(!quranCanRequest(req)){
+    var doneStatuses={ready:1,watching:1,watched:1,question_opened:1};
+    toast(doneStatuses[req.status]?'Bu sûre için anlatım zaten var; kütüphaneden izleyebilirsin.':'Bu sûre için açık bir istek var; ikinci istek gönderilmiyor.');
+    quranRepaintAfterChange(sid);
+    return;
+  }
   var at=new Date().toISOString(), requestId=quranNewRequestId();
   var res=quranReduce(req,{type:'request_submit',requestId:requestId,at:at});
   if(!res.ok||!res.changed){ toast('Bu sûre için şu an yeni istek gönderilemiyor.'); return; }
@@ -10609,7 +10637,7 @@ App.quranJourneySubmit=function(id){
     var ret=writer.pushQuranRequest(payload,function(err){ settle(!err,err); });
     if(ret&&typeof ret.then==='function') ret.then(function(){ settle(true); },function(err){ settle(false,err); });
   }catch(e){ settle(false,e); }
-};
+}
 function quranSettleSubmit(sid,okFlag,err){
   var q=ensureQuranJourney(data), req=quranRequestOf(q,sid), at=new Date().toISOString();
   var res=quranReduce(req,{type:okFlag?'outbox_written':'outbox_failed',at:at});
@@ -12243,7 +12271,25 @@ function fetchHealthSync(){
     })
     .catch(function(){});
 }
-function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); }
+// Sekme hiç arka plana alınmadan sürekli açık kalırsa visibilitychange/focus/
+// pageshow hiç tetiklenmez, dolayısıyla onAppForeground()'daki doğal retry de
+// devreye girmez. pollRemote zaten 30 sn'de bir çalıştığı için burada da
+// (throttle'lı) bir push-retry denemesi eklemek, hatanın sekme açık kaldığı
+// sürece süresiz asılı kalmasını önler. Guard 1/2 (dev-origin, anti-clobber)
+// retryIfPending'in çağırdığı doPush() içinde zaten korunuyor.
+var lastSyncRetryWatchdogAt=0;
+var SYNC_RETRY_WATCHDOG_MS=300000;
+function maybeRetrySync(){
+  try{
+    if(!data||!data.syncReceipt||!data.syncReceipt.lastErrorCode) return;
+    if(!window.SeySync||typeof window.SeySync.retryIfPending!=='function') return;
+    var now=Date.now();
+    if(now-lastSyncRetryWatchdogAt<SYNC_RETRY_WATCHDOG_MS) return;
+    lastSyncRetryWatchdogAt=now;
+    window.SeySync.retryIfPending();
+  }catch(e){}
+}
+function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); maybeRetrySync(); }
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];

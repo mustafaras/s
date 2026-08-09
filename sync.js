@@ -19,9 +19,13 @@ var state={status:'idle', last:null, error:null};
 var SYNC_STATUS_TEXT={idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
 var SYNC_RECEIPT_STATUSES={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
 var SYNC_ERROR_CODES={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
-function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null}; }
+function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null,lastErrorDetail:null}; }
 function safeReceiptString(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
 function safeReceiptIso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
+// unknown/network gibi geniş kutulardan ayrı, tanılama amaçlı kısa ayrıntı
+// (örn. "http_500"): serbest metin değil, dar bir karakter kümesiyle
+// sınırlanır — receipt hâlâ hiçbir ham veri taşımaz.
+function safeReceiptDetail(v){ return typeof v==='string'&&/^[a-z0-9_]{1,24}$/.test(v)?v:null; }
 function normalizeSyncReceipt(r){
   var out=emptySyncReceipt(), x=r&&typeof r==='object'?r:{};
   out.status=SYNC_RECEIPT_STATUSES[x.status]?x.status:'idle';
@@ -31,6 +35,7 @@ function normalizeSyncReceipt(r){
   out.acceptedAt=safeReceiptIso(x.acceptedAt);
   out.sourceLatestSha=safeReceiptString(x.sourceLatestSha,128);
   out.lastErrorCode=SYNC_ERROR_CODES[x.lastErrorCode]?x.lastErrorCode:null;
+  out.lastErrorDetail=safeReceiptDetail(x.lastErrorDetail);
   return out;
 }
 function localReceipt(data,patch){
@@ -54,16 +59,27 @@ function errorCode(err){
   if(m.indexOf('429')>=0||m.indexOf('rate')>=0) return 'rate_limited';
   return 'unknown';
 }
+// errorCode() kaba kutuya (çoğunlukla 'unknown') düşen hatalar için asıl HTTP
+// durumunu (örn. GitHub'dan gelen geçici 500/502/503) ya da JS hata adını
+// receipt'e taşır — panelde "Canonical hata" teşhisini kolaylaştırır.
+function errorDetail(err){
+  var m=String((err&&err.message)||err||'');
+  var http=m.match(/^(\d{3})\b/);
+  if(http) return 'http_'+http[1];
+  if(err&&err.name&&err.name!=='Error') return String(err.name).toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,24)||null;
+  return null;
+}
 function failureStatus(code){
   return (code==='unauthorized'||code==='forbidden'||code==='not_found')?'permission':(SYNC_RECEIPT_STATUSES[code]?code:'error');
 }
-function writeFailureReceipt(c,pending,code){
+function writeFailureReceipt(c,pending,code,detail){
   // latest.json'a dokunmadan yalnız whitelist metadata yazar; böylece
   // anti-clobber/conflict panelde görünür, receipt hiçbir ham veri taşımaz.
   if(!c||!pending||code==='receipt_failed') return Promise.resolve();
   var receipt=normalizeSyncReceipt(pending);
   receipt.status=failureStatus(code);
   receipt.lastErrorCode=SYNC_ERROR_CODES[code]?code:'unknown';
+  receipt.lastErrorDetail=safeReceiptDetail(detail);
   return ghPut(c,RECEIPT_PATH,JSON.stringify(receipt,null,2)).catch(function(){ return null; });
 }
 // ── PANEL-007: günlük append-only event dosyaları ──────────────────────────
@@ -784,9 +800,9 @@ function doPush(data){
       throw e;
     })
     .catch(function(e){
-      var code=errorCode(e), st=failureStatus(code);
-      return writeFailureReceipt(c,pending,code).then(function(){
-        localReceipt(data,{status:st,lastErrorCode:code}); setStatus('error',code); return null;
+      var code=errorCode(e), detail=errorDetail(e), st=failureStatus(code);
+      return writeFailureReceipt(c,pending,code,detail).then(function(){
+        localReceipt(data,{status:st,lastErrorCode:code,lastErrorDetail:detail}); setStatus('error',code); return null;
       });
     });
 }
@@ -966,6 +982,7 @@ window.SeySync={
   statusText:statusText,
   normalizeSyncReceipt:normalizeSyncReceipt,
   syncErrorCode:errorCode,
+  syncErrorDetail:errorDetail,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).
   mergeProfileAssessment:mergeProfileAssessment,
   // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).

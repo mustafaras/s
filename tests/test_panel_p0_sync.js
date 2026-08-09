@@ -144,7 +144,7 @@ await (async function(){
   ok('local callback server receipt’ini ayrı alır',run.acceptedReceipts.length===1&&run.acceptedReceipts[0].acceptedAt===receipt.acceptedAt);
   ok('local state saving ve accepted geçişini gördü',run.stateReceipts.some(function(x){return x.status==='saving';})&&run.stateReceipts.some(function(x){return x.status==='accepted';}));
   ok('persisted state accepted receipt içerir',persisted.syncReceipt&&persisted.syncReceipt.snapshotRevision===HASH_C);
-  ok('receipt yalnızca whitelist alanlarını içerir',receiptPut&&Object.keys(decodedBody(receiptPut)).sort().join(',')==='acceptedAt,lastErrorCode,schemaVersion,snapshotRevision,sourceLatestSha,sourceUpdatedAt,status,submittedAt',receiptPut?Object.keys(decodedBody(receiptPut)).sort().join(','):'receipt PUT yok');
+  ok('receipt yalnızca whitelist alanlarını içerir',receiptPut&&Object.keys(decodedBody(receiptPut)).sort().join(',')==='acceptedAt,lastErrorCode,lastErrorDetail,schemaVersion,snapshotRevision,sourceLatestSha,sourceUpdatedAt,status,submittedAt',receiptPut?Object.keys(decodedBody(receiptPut)).sort().join(','):'receipt PUT yok');
   var receiptJson=receiptPut&&JSON.stringify(decodedBody(receiptPut));
   ok('receipt token içermez',receiptJson&&!receiptJson.includes('secret-token'));
   ok('receipt raw kullanıcı metni içermez',receiptJson&&!receiptJson.includes('sadece yerel kullanıcı metni'));

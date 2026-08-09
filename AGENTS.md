@@ -146,7 +146,28 @@ hijriCalendar.js Standalone Hicri (Islamic) calendar module
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
                  Also owns conflict-merge helpers (e.g.
-                 `SeySync.mergeProfileAssessment`).
+                 `SeySync.mergeProfileAssessment`). Failure receipts
+                 (`data/sync-receipt.json`) carry a whitelisted
+                 `lastErrorDetail` (e.g. `http_500`) alongside the existing
+                 coarse `lastErrorCode`, purely for diagnosis — never raw
+                 data. `SeySync.retryIfPending` (already wired to the
+                 browser `online` event) is also called from app.js's 30s
+                 foreground poll loop as a throttled (5 min) watchdog, so a
+                 push stuck in error state doesn't sit unresolved
+                 indefinitely if the tab is never backgrounded/refocused.
+quranTransportV1.js  Pure QY-04 transport contract for "Raşit ile Kur'an
+                 Yolculuğu": three files fully independent of the
+                 latest.json chain — `data/quran-request-outbox.json`
+                 (app writes, GitHub Actions in the seyma-data repo reads
+                 and emails a reminder via `.github/workflows/quran-mail.yml`),
+                 `data/quran-delivery.json` (that Action writes back),
+                 `data/quran-responses.json` (a Gmail Apps Script writes
+                 after the user replies with a video link). app.js's
+                 `App.quranJourneySubmit` pulls+applies the latest
+                 delivery/response state (read-only, idempotent) before
+                 allowing a new request, so a stale tab/device can't refire
+                 a duplicate request+email for a surah already answered
+                 elsewhere.
 panelCoverageManifest.js  Pure P1 coverage/redaction adapter. Defines the
                  manifest and builds/parses `data/observer-snapshot.json`;
                  no network, DOM, localStorage or raw secret/GPS/profile/media

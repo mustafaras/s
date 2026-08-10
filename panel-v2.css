@@ -142,6 +142,7 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+#root { view-transition-name: aeon-root; }
 
 .ae-app {
   min-height: 100vh;
@@ -968,11 +969,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 .today-view__section--picker {
-  animation: aeSlideUp 0.35s var(--ae-ease) 0.04s both;
+  animation-delay: 0.08s;
 }
 
 .today-view__section--trend {
-  animation: aeSlideUp 0.35s var(--ae-ease) 0.18s both;
+  animation-delay: 0.24s;
 }
 
 .today-view__secondary-grid {
@@ -2815,6 +2816,18 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.55; }
 }
+@keyframes aeStaggerIn {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes aePageEnter {
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes aePageExit {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(0, -4px, 0); }
+}
 
 .ae-slide-up {
   animation: aeSlideUp 0.35s var(--ae-ease) both;
@@ -2830,6 +2843,35 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 .ae-pulse {
   animation: aePulse 1.8s ease-in-out infinite;
+}
+
+.ae-page-transition {
+  animation: aePageEnter 0.28s var(--ae-ease) both;
+}
+
+/* Sayfa içindeki doğrudan çocuklar 0 / 80 / 160 ms ritmiyle görünür. */
+.ae-stagger > * {
+  animation: aeStaggerIn 0.44s var(--ae-ease) both;
+}
+.ae-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.ae-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.ae-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.ae-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.ae-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.ae-stagger > *:nth-child(6) { animation-delay: 400ms; }
+.ae-stagger > *:nth-child(7) { animation-delay: 480ms; }
+.ae-stagger > *:nth-child(8) { animation-delay: 560ms; }
+.ae-stagger > *:nth-child(9) { animation-delay: 640ms; }
+.ae-stagger > *:nth-child(10) { animation-delay: 720ms; }
+.ae-stagger > *:nth-child(11) { animation-delay: 800ms; }
+.ae-stagger > *:nth-child(12) { animation-delay: 880ms; }
+
+/* View Transition API destekleyen tarayıcılarda eski sekme dışarı, yenisi içeri akar. */
+::view-transition-old(aeon-root) {
+  animation: aePageExit 0.18s ease both;
+}
+::view-transition-new(aeon-root) {
+  animation: aePageEnter 0.28s var(--ae-ease) both;
 }
 
 @keyframes aeToastIn {
@@ -2916,12 +2958,12 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 /* Kademeli kart girişi */
-.ae-stagger > .ae-card:nth-child(1) { animation-delay: 0.04s; }
-.ae-stagger > .ae-card:nth-child(2) { animation-delay: 0.08s; }
-.ae-stagger > .ae-card:nth-child(3) { animation-delay: 0.12s; }
-.ae-stagger > .ae-card:nth-child(4) { animation-delay: 0.16s; }
-.ae-stagger > .ae-card:nth-child(5) { animation-delay: 0.20s; }
-.ae-stagger > .ae-card:nth-child(6) { animation-delay: 0.24s; }
+.ae-stagger > .ae-card:nth-child(1) { animation-delay: 0ms; }
+.ae-stagger > .ae-card:nth-child(2) { animation-delay: 80ms; }
+.ae-stagger > .ae-card:nth-child(3) { animation-delay: 160ms; }
+.ae-stagger > .ae-card:nth-child(4) { animation-delay: 240ms; }
+.ae-stagger > .ae-card:nth-child(5) { animation-delay: 320ms; }
+.ae-stagger > .ae-card:nth-child(6) { animation-delay: 400ms; }
 
 /* Eski sınıfı kullanan yerler için geçiş alias'ı */
 .ae-fade-in {
@@ -2995,6 +3037,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-shimmer,
   .ae-count-up,
   .ae-pulse,
+  .ae-page-transition,
+  .ae-stagger > *,
   .ae-toast,
   .message-bubble,
   .system-live-metric,
@@ -3018,6 +3062,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .system-progress__fill { transition: none !important; }
   .ae-status--ok .ae-status__dot,
   .ae-status--drop .ae-status__dot { animation: none !important; }
+  ::view-transition-old(aeon-root),
+  ::view-transition-new(aeon-root) { animation: none !important; }
   .ae-btn:hover,
   .ae-btn:active { transform: none; }
   .ae-card--summary:hover { transform: none; }

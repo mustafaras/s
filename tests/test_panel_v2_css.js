@@ -164,8 +164,19 @@ assert(css.includes("scale(0.95)"), "Scale-in başlangıç ölçeği var");
 assert(css.includes("background-position: -200% 0"), "Shimmer başlangıç pozisyonu var");
 assert(css.includes("translateY(8px)"), "Count-up başlangıç mesafesi var");
 assert(css.includes(".ae-stagger > .ae-card:nth-child(6)"), "Stagger gecikme zinciri var");
+assert(css.includes(".ae-stagger > *"), "Tüm sayfa çocukları stagger zincirine dahil");
+assert(css.includes("animation-delay: 0ms"), "Stagger başlangıcı 0ms");
+assert(css.includes("animation-delay: 80ms"), "Stagger adımı 80ms");
+assert(css.includes("@keyframes aeStaggerIn"), "Genel stagger animasyonu var");
+assert(css.includes(".ae-page-transition"), "Sayfa geçişi sınıfı var");
+assert(css.includes("@keyframes aePageEnter"), "Sayfa giriş animasyonu var");
+assert(css.includes("@keyframes aePageExit"), "Sayfa çıkış animasyonu var");
+assert(css.includes("::view-transition-old(aeon-root)"), "Eski sayfa View Transition çıkışı var");
+assert(css.includes("::view-transition-new(aeon-root)"), "Yeni sayfa View Transition girişi var");
 assert(js.includes("ae-stagger"), "Render çıktılarında stagger kullanılıyor");
 assert(js.includes("ae-count-up"), "Render çıktılarında count-up kullanılıyor");
+assert(js.includes("startViewTransition"), "Sekme değişiminde View Transition API kullanılıyor");
+assert(js.includes("ae-page-transition"), "Sekme paneli geçiş sınıfını kullanıyor");
 assert(!js.includes("ae-fade-in"), "JS eski fade-in sınıfını kullanmıyor");
 
 // ── Hero / summary / empty ──

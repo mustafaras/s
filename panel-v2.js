@@ -1846,17 +1846,19 @@
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
     if (!dayCount) {
-      return AeCard({
-        children: AeEmpty({
-          icon: "◐",
-          title: "Genel Bakış",
-          message: "Henüz synced veri yok. Veri geldiğinde bugünün sinyal kartları burada görünecek."
-        })
-      });
+      return '<div class="today-view ae-stagger">' +
+             AeCard({
+               children: AeEmpty({
+                 icon: "◐",
+                 title: "Genel Bakış",
+                 message: "Henüz synced veri yok. Veri geldiğinde bugünün sinyal kartları burada görünecek."
+               })
+             }) +
+             "</div>";
     }
     var isCurrentDate = date === isoDate(new Date());
     var title = isCurrentDate ? "Bugünün sinyalleri" : formatDateLabel(date) + " sinyalleri";
-    return '<div class="today-view ae-slide-up">' +
+    return '<div class="today-view ae-slide-up ae-stagger">' +
            '<header class="today-view__intro">' +
              '<div class="today-view__intro-copy">' +
                '<div class="today-view__eyebrow">ÆON / GENEL BAKIŞ</div>' +
@@ -1887,16 +1889,18 @@
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
     if (!dayCount) {
-      return AeCard({
-        children: AeEmpty({
-          icon: "◑",
-          title: "Trendler & Uyarılar",
-          message: "Henüz synced veri yok. Veri geldiğinde 7/14/30 günlük özetler ve anomaliler burada görünecek."
-        })
-      });
+      return '<div class="trends-view ae-stagger">' +
+             AeCard({
+               children: AeEmpty({
+                 icon: "◑",
+                 title: "Trendler & Uyarılar",
+                 message: "Henüz synced veri yok. Veri geldiğinde 7/14/30 günlük özetler ve anomaliler burada görünecek."
+               })
+             }) +
+             "</div>";
     }
     var windowDays = ui.trendWindow || 7;
-    return '<div class="trends-view ae-slide-up">' +
+    return '<div class="trends-view ae-slide-up ae-stagger">' +
            '<header class="trends-view__intro">' +
              '<div class="trends-view__intro-copy">' +
                '<div class="trends-view__eyebrow">ÆON / TRENDLER</div>' +
@@ -2763,22 +2767,24 @@
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
     if (!dayCount) {
-      return AeCard({
-        children: AeEmpty({
-          icon: "◎",
-          title: "Gün Detayı",
-          message: "Henüz synced veri yok. Veri geldiğinde seçili gün burada görünecek."
-        })
-      });
+      return '<div class="day-view ae-stagger">' +
+             AeCard({
+               children: AeEmpty({
+                 icon: "◎",
+                 title: "Gün Detayı",
+                 message: "Henüz synced veri yok. Veri geldiğinde seçili gün burada görünecek."
+               })
+             }) +
+             "</div>";
     }
     var day = getDay(date);
-    var emptyDay = !day ? AeCard({
+    var emptyDay = !day ? '<div class="day-view__empty ae-stagger">' + AeCard({
       children: AeEmpty({
         icon: "◎",
         title: "Boş gün",
         message: "Bu tarihe ait kayıt yok. Takvimden başka bir gün seçebilirsin."
       })
-    }) : "";
+    }) + "</div>" : "";
     var groups = day ? '<div class="day-detail-groups ae-stagger">' +
            renderDayGroup("Zamanlar", [renderDayTimestamps(date)]) +
            renderDayGroup("Ruh Hali", [renderMoodTherapy(date), renderEnergyStress(date)]) +
@@ -2790,7 +2796,7 @@
            renderDayGroup("Döngü", [renderCycle(date)]) +
            renderDayGroup("İçerik", [renderContent(date)]) +
            '</div>' : "";
-    return '<div class="day-view ae-slide-up">' +
+    return '<div class="day-view ae-slide-up ae-stagger">' +
            renderDayDatePicker(date) +
            renderDayHeatmap(date) +
            groups +
@@ -3621,14 +3627,14 @@
     var renderFn = contentBySubTab[subTab] || renderArchiveLibrary;
     var total = getArchiveItems(subTab).length;
     var filtered = getFilteredArchiveItems(subTab).length;
-    return '<div class="archives-view ae-slide-up">' +
+    return '<div class="archives-view ae-slide-up ae-stagger">' +
            SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
            renderArchiveControls(subTab, total, filtered) +
            '<div class="archive-panel">' + renderFn() + "</div>" +
            "</div>";
   }
 
-  function renderActiveTab() {
+  function renderActiveTab(withTransition) {
     var panels = {
       today: renderToday,
       trends: renderTrends,
@@ -3637,17 +3643,19 @@
       system: renderSystem
     };
     var fn = panels[ui.tab] || renderToday;
-    return '<div class="ae-panel ae-slide-up" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '">' +
+    var transitionClass = withTransition ? " ae-page-transition" : "";
+    return '<div class="ae-panel ae-slide-up' + transitionClass + '" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '">' +
            fn() +
            "</div>";
   }
 
   // ── Main render ────────────────────────────────────────────────────────
-  function render() {
+  function render(options) {
     var app = root.document && root.document.getElementById("app");
     if (!app) return;
+    options = options || {};
     var projection = projectData(null);
-    var activeContent = isFetching ? renderLoadingState() : renderActiveTab();
+    var activeContent = isFetching ? renderLoadingState() : renderActiveTab(Boolean(options.transition));
     app.innerHTML =
       renderTopbar() +
       renderTabs() +
@@ -3732,8 +3740,16 @@
 
   function setTab(id) {
     if (!id || !TABS.some(function(t) { return t.id === id; })) return;
+    if (ui.tab === id) return;
     ui.tab = id;
-    render();
+    var doc = root.document;
+    if (doc && typeof doc.startViewTransition === "function") {
+      try {
+        doc.startViewTransition(function() { render({ transition: true }); });
+        return;
+      } catch (e) {}
+    }
+    render({ transition: true });
   }
 
   function responseHeader(r, name) {

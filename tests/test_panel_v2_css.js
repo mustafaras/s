@@ -252,10 +252,22 @@ assert(!css.includes(".trend-bar"), "CSS eski trend bar bileşenini taşımıyor
 
 // ── 30-day heatmap (day detail) ──
 classRule("day-heatmap");
+classRule("day-heatmap__weekdays");
+classRule("day-heatmap__weekday");
 classRule("day-heatmap__grid");
 classRule("day-heatmap__cell");
+classRule("day-heatmap__cell--empty");
+classRule("day-heatmap__cell--today");
+classRule("day-heatmap__cell--selected");
+classRule("day-heatmap__tooltip");
 assert(css.includes(".day-heatmap__cell--mood-1"), "Isı haritası mood-1 sınıfı var");
 assert(css.includes(".day-heatmap__cell--mood-7"), "Isı haritası mood-7 sınıfı var");
+assert(css.includes("radial-gradient(circle"), "Boş günler noktalı desen taşıyor");
+assert(css.includes(".day-heatmap__cell:hover .day-heatmap__tooltip"), "Isı haritası hover tooltip görünürlüğü var");
+assert(css.includes(".day-heatmap__cell:focus .day-heatmap__tooltip"), "Isı haritası focus tooltip görünürlüğü var");
+assert(css.includes("@media (max-width: 374px)"), "Isı haritası küçük ekranda 5 sütuna düşüyor");
+assert(js.includes("actualToday"), "Isı haritası bugün hücresini işaretliyor");
+assert(js.includes("day-heatmap__weekdays"), "Isı haritası hafta etiketlerini render ediyor");
 
 // ── Accessibility / motion ──
 assert(css.includes("focus-visible"), ":focus-visible kullanımı var");

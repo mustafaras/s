@@ -1746,22 +1746,37 @@
 
   function renderDayHeatmap(date) {
     var dates = lastNDates(30, date, true);
+    var actualToday = isoDate(new Date());
     var cells = dates.map(function(d) {
-      var toneClass = '', label = '';
+      var toneClass = '', label = '', day = null, mood = { value: null, label: null, note: "" };
       if (d) {
-        var day = getDay(d) || {};
-        var mood = getMood(day).value;
-        toneClass = mood ? ' day-heatmap__cell--mood-' + mood : '';
+        day = getDay(d) || {};
+        mood = getMood(day);
+        toneClass = mood.value ? ' day-heatmap__cell--mood-' + mood.value : ' day-heatmap__cell--empty';
+        if (d === actualToday) toneClass += ' day-heatmap__cell--today';
+        if (d === date) toneClass += ' day-heatmap__cell--selected';
         label = '<span class="day-heatmap__day">' + escapeHtml(Number(d.split("-")[2]).toString()) + "</span>";
       } else {
         toneClass = ' day-heatmap__cell--empty';
       }
-      var title = d ? formatDateLabel(d) : 'Gelecek gün';
-      return '<div class="day-heatmap__cell' + toneClass + '" title="' + escapeHtml(title) + '">' + label + "</div>";
+      var tooltipParts = [d ? formatDateLabel(d) : "Gelecek gün", mood.label || "Mod kaydı yok"];
+      if (mood.note) tooltipParts.push("Not: " + safeText(mood.note, 120));
+      if (d === date) tooltipParts.push("Seçili gün");
+      var tooltip = tooltipParts.join(" · ");
+      var dataMood = mood.label || "empty";
+      return '<div class="day-heatmap__cell' + toneClass + '" role="gridcell" tabindex="0"' +
+             ' data-date="' + escapeHtml(d || "") + '" data-mood="' + escapeHtml(dataMood) +
+             '" aria-label="' + escapeHtml(tooltip) + '" title="' + escapeHtml(tooltip) + '">' +
+             label + '<span class="day-heatmap__tooltip" role="tooltip">' + escapeHtml(tooltip) +
+             '</span></div>';
+    }).join("");
+    var weekdays = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map(function(label) {
+      return '<span class="day-heatmap__weekday" role="columnheader">' + label + "</span>";
     }).join("");
     return '<div class="ae-card ae-card--solid ae-card--summary day-heatmap">' +
            '<div class="ae-label">Son 30 gün</div>' +
-           '<div class="day-heatmap__grid">' + cells + "</div>" +
+           '<div class="day-heatmap__weekdays" role="row" aria-label="Haftanın günleri">' + weekdays + "</div>" +
+           '<div class="day-heatmap__grid" role="grid" aria-label="Son 30 gün ruh hali">' + cells + "</div>" +
            "</div>";
   }
 

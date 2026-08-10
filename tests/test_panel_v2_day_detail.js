@@ -189,6 +189,15 @@ AeonV2.setDate("2026-08-04");
 html = dom.html;
 const heatmapCells = (html.match(/class="day-heatmap__cell/g) || []).length;
 assert(heatmapCells === 30, "30 günlük ısı haritası hücresi var: " + heatmapCells);
+assert(/class="day-heatmap__weekdays"/.test(html), "Isı haritası hafta başlıkları var");
+["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].forEach(function(label) {
+  assert(html.indexOf('class="day-heatmap__weekday"') !== -1 && html.indexOf(">" + label + "</span>") !== -1, "Hafta etiketi var: " + label);
+});
+assert((html.match(/class="day-heatmap__tooltip"/g) || []).length === 30, "Her ısı haritası hücresinde tooltip var");
+assert(/data-date="2026-08-04"/.test(html), "Isı haritası hücreleri tarih metadata'sı taşıyor");
+assert(/Huzurlu/.test(html), "Isı haritası tooltip'i mod/not bilgisini taşıyor");
+assert(/day-heatmap__cell--empty/.test(html), "Boş günler ayrı pattern sınıfı taşıyor");
+assert(/day-heatmap__cell--selected/.test(html), "Seçili gün hücresi vurgulanıyor");
 
 // 7. Beslenme ve hareket özeti
 assert(/Su: 7 bardak/.test(html), "Su bardak sayısı görünür");

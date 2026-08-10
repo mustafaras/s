@@ -1559,6 +1559,23 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   display: flex;
   flex-direction: column;
   gap: var(--ae-space-sm);
+  overflow: visible;
+}
+
+.day-heatmap__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  color: var(--ae-faint);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.day-heatmap__weekday {
+  min-width: 0;
 }
 
 .day-heatmap__grid {
@@ -1575,6 +1592,10 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   align-items: center;
   justify-content: center;
   background: var(--ae-empty-bg);
+  color: var(--ae-muted);
+  cursor: default;
+  position: relative;
+  transition: transform 0.18s var(--ae-ease), box-shadow 0.18s ease, outline-color 0.18s ease;
 }
 
 .day-heatmap__cell--mood-1 { background: var(--ae-drop); }
@@ -1585,12 +1606,92 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .day-heatmap__cell--mood-6 { background: color-mix(in srgb, var(--ae-ok) 60%, var(--ae-accent2)); }
 .day-heatmap__cell--mood-7 { background: var(--ae-accent2); }
 
+.day-heatmap__cell--empty {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ae-muted) 62%, transparent) 1px, transparent 1.5px) 0 0 / 6px 6px,
+    var(--ae-empty-bg);
+  border: 1px dashed var(--ae-glass-border);
+}
+
+.day-heatmap__cell--today {
+  outline: 2px solid var(--ae-accent2);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ae-accent2) 18%, transparent), var(--ae-glow-accent);
+}
+
+.day-heatmap__cell--selected:not(.day-heatmap__cell--today) {
+  outline: 2px solid var(--ae-accent);
+  outline-offset: 2px;
+}
+
+.day-heatmap__cell:hover,
+.day-heatmap__cell:focus {
+  z-index: 3;
+  transform: translateY(-2px);
+}
+
+.day-heatmap__cell:focus-visible {
+  outline: 2px solid var(--ae-accent2);
+  outline-offset: 3px;
+}
+
+.day-heatmap__tooltip {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  width: max-content;
+  max-width: 190px;
+  padding: var(--ae-space-xs) var(--ae-space-sm);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-sm);
+  background: color-mix(in srgb, var(--ae-elevated) 94%, transparent);
+  box-shadow: var(--ae-shadow-md), var(--ae-glow-accent);
+  color: var(--ae-text);
+  font-family: var(--ae-font);
+  font-size: var(--ae-scale-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.18s ease, transform 0.18s var(--ae-ease), visibility 0.18s ease;
+  visibility: hidden;
+  white-space: normal;
+}
+
+.day-heatmap__tooltip::after {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid var(--ae-glass-border);
+  border-bottom: 1px solid var(--ae-glass-border);
+  background: var(--ae-elevated);
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.day-heatmap__cell:hover .day-heatmap__tooltip,
+.day-heatmap__cell:focus .day-heatmap__tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
+}
+
 .day-heatmap__cell--mood-1 .day-heatmap__day,
 .day-heatmap__cell--mood-2 .day-heatmap__day,
 .day-heatmap__cell--mood-3 .day-heatmap__day { color: #1F1C19; }
 #root[data-theme="dark"] .day-heatmap__cell--mood-1 .day-heatmap__day,
 #root[data-theme="dark"] .day-heatmap__cell--mood-2 .day-heatmap__day,
 #root[data-theme="dark"] .day-heatmap__cell--mood-3 .day-heatmap__day { color: #F4F0EA; }
+
+@media (max-width: 374px) {
+  .day-heatmap__weekdays,
+  .day-heatmap__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .day-heatmap__weekday:nth-child(n + 6) { display: none; }
+}
 
 /* ── Detail section ── */
 .detail-section {
@@ -2031,6 +2132,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-sparkline__area,
   .ae-mood-chart__point,
   .ae-metric-chart__point,
+  .day-heatmap__cell,
+  .day-heatmap__tooltip,
   .ae-metric__spark-bar,
   .ae-ring__progress { transition: none !important; }
   .ae-status--ok .ae-status__dot,

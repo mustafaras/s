@@ -85,6 +85,31 @@ assert(countMatches(/class="ae-mood-chart__point"/g) === 7, "Mod trendi seeded m
 assert(countMatches(/<title>/g) >= 7, "Mod trendi noktalarında hover tooltip başlıkları var");
 assert(/aria-label="Son 30 gün mod trendi"/.test(html), "Mod trendi erişilebilir grafik etiketi taşıyor");
 
+// 3c. Uyku / adım / su genel SVG area chart'ları
+assert(/ae-metric-chart-grid/.test(html), "Metrik area chart grid'i render edildi");
+assert(countMatches(/ae-metric-chart-card--sleep/g) === 1, "Uyku area chart kartı var");
+assert(countMatches(/ae-metric-chart-card--steps/g) === 1, "Adım area chart kartı var");
+assert(countMatches(/ae-metric-chart-card--water/g) === 1, "Su area chart kartı var");
+assert(countMatches(/class="ae-metric-chart__svg"/g) === 3, "Üç metrik için SVG area chart var");
+assert(countMatches(/class="ae-metric-chart__grid-line"/g) === 9, "Her metrikte 3 grid çizgisi var");
+assert(countMatches(/class="ae-metric-chart__area"/g) === 3, "Her metrikte area fill var");
+assert(countMatches(/class="ae-metric-chart__line"/g) === 3, "Her metrikte line path var");
+assert(countMatches(/class="ae-metric-chart__target"/g) === 3, "Her metrikte hedef çizgisi var");
+assert(countMatches(/class="ae-metric-chart__point"/g) === 21, "Metrik chart'larda seeded veri noktaları var");
+assert(/0–12,0 sa/.test(html), "Uyku chart'ı 0-12 saat aralığını gösteriyor");
+assert(/0–12\.000 adım/.test(html), "Adım chart'ı 0-12000 aralığını gösteriyor");
+assert(/0–12,0 bardak/.test(html), "Su chart'ı 0-12 bardak aralığını gösteriyor");
+assert(/Hedef 8,0 sa/.test(html), "Uyku hedef chip'i var");
+assert(/Hedef 10\.000 adım/.test(html), "Adım hedef chip'i var");
+assert(/Hedef 8,0 bardak/.test(html), "Su hedef chip'i var");
+assert(/data-target="10000"/.test(html) && countMatches(/data-target="8"/g) === 2, "Hedef çizgileri doğru hedef değerlerini taşıyor");
+assert(countMatches(/<svg class="ae-metric-chart__svg"[^>]+preserveAspectRatio="none"/g) === 3, "Metrik chart'lar responsive viewBox oranı taşıyor");
+assert(/ae-metric-chart--info/.test(html) && /ae-metric-chart--ok/.test(html), "Metrik chart renk sınıfları doğru");
+assert(/function renderMetricChart/.test(ctx.__panelV2Source || "") || typeof AeonV2.renderMetricChart === "function", "Genel renderMetricChart export ediliyor");
+const emptyMetricChart = AeonV2.renderMetricChart("sleep", { values: [null, null], dates: [today, dateOffset(today, -1)] }, "info");
+assert(/ae-metric-chart__empty/.test(emptyMetricChart), "Boş metrik chart veri yok mesajı gösteriyor");
+assert(!/ae-metric-chart__point/.test(emptyMetricChart), "Boş metrik chart nokta üretmiyor");
+
 // 4. Pencere değişimi
 assert(AeonV2.ui.trendWindow === 7, "Varsayılan pencere 7 gün");
 AeonV2.setTrendWindow(14);

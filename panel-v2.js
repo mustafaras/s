@@ -1429,6 +1429,134 @@
     });
   }
 
+  function renderMetricChart(metricKey, data, color) {
+    var configs = {
+      sleep: { key: "sleep", icon: "🌙", title: "Uyku Trendi", unit: "sa", min: 0, max: 12, targetKey: "sleepHours", target: 8 },
+      steps: { key: "steps", icon: "👟", title: "Adım Trendi", unit: "adım", min: 0, max: 12000, targetKey: "steps", target: 10000 },
+      water: { key: "water", icon: "💧", title: "Su Trendi", unit: "bardak", min: 0, max: 12, targetKey: "waterGlasses", target: 8 }
+    };
+    var config = configs[String(metricKey)] || configs.sleep;
+    var sourceValues = Array.isArray(data) ? data : data && Array.isArray(data.values) ? data.values : [];
+    var sourceDates = data && Array.isArray(data.dates) ? data.dates : lastNDates(sourceValues.length || 30, todayStr());
+    var values = sourceValues.slice(0, 30).map(function(value) {
+      if (value === null || value === undefined || value === "") return null;
+      var n = safeNumber(value);
+      return n === null ? null : Math.max(config.min, Math.min(config.max, n));
+    });
+    var dates = sourceDates.slice(0, values.length);
+    var targetSource = data && !Array.isArray(data) && data.target !== undefined
+      ? data.target
+      : getTarget(config.targetKey, config.target);
+    var target = safeNumber(targetSource);
+    if (target !== null) target = Math.max(config.min, Math.min(config.max, target));
+
+    var width = 720;
+    var height = 248;
+    var pad = { top: 22, right: 16, bottom: 40, left: 54 };
+    var plotWidth = width - pad.left - pad.right;
+    var plotHeight = height - pad.top - pad.bottom;
+    var baseline = pad.top + plotHeight;
+    var points = values.map(function(value, index) {
+      if (value === null) return null;
+      var x = values.length === 1 ? width / 2 : pad.left + (index / Math.max(1, values.length - 1)) * plotWidth;
+      var y = pad.top + ((config.max - value) / (config.max - config.min)) * plotHeight;
+      return { x: x, y: y, value: value, date: dates[index] || null };
+    });
+    var segments = [];
+    var segment = [];
+    points.forEach(function(point) {
+      if (point) {
+        segment.push(point);
+      } else if (segment.length) {
+        segments.push(segment);
+        segment = [];
+      }
+    });
+    if (segment.length) segments.push(segment);
+
+    function formatValue(value) {
+      if (value === null || value === undefined) return "—";
+      var digits = config.key === "steps" ? 0 : 1;
+      return value.toLocaleString("tr-TR", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    var yTicks = [config.max, (config.max + config.min) / 2, config.min];
+    var gridLines = yTicks.map(function(value) {
+      var y = pad.top + ((config.max - value) / (config.max - config.min)) * plotHeight;
+      return '<line class="ae-metric-chart__grid-line" x1="' + pad.left +
+        '" y1="' + y.toFixed(2) + '" x2="' + (width - pad.right) +
+        '" y2="' + y.toFixed(2) + '"></line>' +
+        '<text class="ae-metric-chart__y-label" x="' + (pad.left - 10) +
+        '" y="' + (y + 4).toFixed(2) + '" text-anchor="end">' +
+        escapeHtml(formatValue(value)) + '</text>';
+    }).join("");
+    var xLabels = dates.map(function(date, index) {
+      if (!date || (index % 5 !== 0 && index !== dates.length - 1)) return "";
+      var x = pad.left + (index / Math.max(1, values.length - 1)) * plotWidth;
+      return '<text class="ae-metric-chart__x-label" data-day-index="' + index +
+        '" x="' + x.toFixed(2) + '" y="' + (height - 13) +
+        '" text-anchor="middle">' + escapeHtml(formatDateLabel(date).slice(0, 5)) + '</text>';
+    }).join("");
+    var areaPaths = segments.map(function(pointsInSegment) {
+      return '<path class="ae-metric-chart__area" d="' +
+        sparklineAreaPath(pointsInSegment, baseline) + '"></path>';
+    }).join("");
+    var linePaths = segments.map(function(pointsInSegment) {
+      return '<path class="ae-metric-chart__line" d="' +
+        sparklinePath(pointsInSegment) + '"></path>';
+    }).join("");
+    var dots = points.filter(Boolean).map(function(point) {
+      var label = point.date ? formatDateLabel(point.date) + ": " : "";
+      label += formatValue(point.value) + " " + config.unit;
+      return '<circle class="ae-metric-chart__point" cx="' + point.x.toFixed(2) +
+        '" cy="' + point.y.toFixed(2) + '" r="3.5" tabindex="0" focusable="true"' +
+        ' data-date="' + escapeHtml(point.date || "") + '" data-value="' + point.value +
+        '" aria-label="' + escapeHtml(label) + '"><title>' + escapeHtml(label) +
+        '</title></circle>';
+    }).join("");
+    var targetLine = target === null ? "" : (function() {
+      var y = pad.top + ((config.max - target) / (config.max - config.min)) * plotHeight;
+      var label = "Hedef: " + formatValue(target) + " " + config.unit;
+      return '<line class="ae-metric-chart__target" x1="' + pad.left +
+        '" y1="' + y.toFixed(2) + '" x2="' + (width - pad.right) +
+        '" y2="' + y.toFixed(2) + '" data-target="' + target +
+        '" aria-label="' + escapeHtml(label) + '"><title>' + escapeHtml(label) +
+        '</title></line>';
+    })();
+    var empty = points.filter(Boolean).length ? "" :
+      '<text class="ae-metric-chart__empty" x="' + (pad.left + plotWidth / 2) +
+      '" y="' + (pad.top + plotHeight / 2) + '" text-anchor="middle">Veri yok</text>';
+    var colorKey = ["info", "ok", "accent", "warn", "drop"].indexOf(String(color)) !== -1 ? String(color) : "info";
+    var titleId = "ae-metric-chart-title-" + config.key;
+    var gradientId = "ae-metric-chart-fill-" + config.key;
+
+    return AeCard({
+      variant: "glass",
+      className: "ae-metric-chart-card ae-metric-chart-card--" + config.key,
+      children: '<section class="ae-metric-chart ae-metric-chart--' + colorKey + '" aria-labelledby="' + titleId + '">' +
+        '<div class="ae-metric-chart__head">' +
+        '<div><div class="ae-label" id="' + titleId + '">' + config.icon + " " + escapeHtml(config.title) + '</div>' +
+        '<div class="ae-metric-chart__subtitle">Son 30 gün · 0–' + escapeHtml(formatValue(config.max)) + " " + escapeHtml(config.unit) + '</div></div>' +
+        '<span class="ae-chip ae-metric-chart__target-chip">Hedef ' + escapeHtml(formatValue(target)) + " " + escapeHtml(config.unit) + '</span>' +
+        '</div><div class="ae-metric-chart__plot"><svg class="ae-metric-chart__svg" viewBox="0 0 ' + width + " " + height +
+        '" preserveAspectRatio="none" role="img" aria-label="' + escapeHtml(config.title + ", son 30 gün") + '" focusable="false">' +
+        '<defs><linearGradient id="' + gradientId + '" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="var(--ae-chart-color)" stop-opacity="0.32"></stop>' +
+        '<stop offset="100%" stop-color="var(--ae-chart-color)" stop-opacity="0"></stop>' +
+        '</linearGradient></defs>' + gridLines + xLabels + targetLine +
+        areaPaths + linePaths + dots + empty + '</svg></div></section>'
+    });
+  }
+
+  function renderMetricCharts(endDate) {
+    var summary = summaryForWindow(endDate, 30);
+    return '<div class="ae-metric-chart-grid" aria-label="Uyku, adım ve su trend grafikleri">' +
+      renderMetricChart("sleep", { values: summary._sleepSeries, dates: summary.dates }, "info") +
+      renderMetricChart("steps", { values: summary._stepsSeries, dates: summary.dates }, "info") +
+      renderMetricChart("water", { values: summary._waterSeries, dates: summary.dates }, "ok") +
+      '</div>';
+  }
+
   function renderAnomalies(endDate) {
     var anomalies = detectAnomalies(endDate);
     if (!anomalies.length) {
@@ -1544,6 +1672,7 @@
            renderWindowSelector() +
            renderSummaryGrid(date, windowDays) +
            renderMoodTrendChart(date) +
+           renderMetricCharts(date) +
            renderAnomalies(date) +
            "</div>";
   }
@@ -3207,6 +3336,9 @@
     AnomalyCard: AnomalyCard,
     DetailSection: DetailSection,
     DetailBlock: DetailBlock,
-    AeSparkline: AeSparkline
+    AeSparkline: AeSparkline,
+    renderMoodTrendChart: renderMoodTrendChart,
+    renderMetricChart: renderMetricChart,
+    renderMetricCharts: renderMetricCharts
   };
 })(typeof window !== "undefined" ? window : this);

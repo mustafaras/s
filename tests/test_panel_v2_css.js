@@ -201,6 +201,38 @@ assert(js.includes("lastNDates(30, endDate)"), "Mood trend chart 30 günlük ver
 assert(js.includes("sparklineAreaPath"), "Mood trend chart area path kullanıyor");
 assert(js.includes("<title>"), "Mood trend chart native SVG tooltip kullanıyor");
 
+// ── Uyku / adım / su area chart'ları ──
+classRule("ae-metric-chart-grid");
+classRule("ae-metric-chart-card");
+classRule("ae-metric-chart-card--sleep");
+classRule("ae-metric-chart-card--steps");
+classRule("ae-metric-chart-card--water");
+classRule("ae-metric-chart");
+classRule("ae-metric-chart__svg");
+classRule("ae-metric-chart__grid-line");
+classRule("ae-metric-chart__y-label");
+classRule("ae-metric-chart__x-label");
+classRule("ae-metric-chart__area");
+classRule("ae-metric-chart__line");
+classRule("ae-metric-chart__target");
+classRule("ae-metric-chart__point");
+classRule("ae-metric-chart__empty");
+assert(css.includes("--ae-chart-color: var(--ae-info)"), "Area chart varsayılan info rengi var");
+assert(css.includes(".ae-metric-chart--ok"), "Su area chart ok rengi var");
+assert(css.includes("stroke-dasharray: 7 6"), "Area chart hedef çizgisi kesikli");
+assert(css.includes("url(#ae-metric-chart-fill-sleep)"), "Uyku area gradient'i var");
+assert(css.includes("url(#ae-metric-chart-fill-steps)"), "Adım area gradient'i var");
+assert(css.includes("url(#ae-metric-chart-fill-water)"), "Su area gradient'i var");
+assert(css.includes(".ae-metric-chart__point:hover"), "Area chart noktası hover/focus efekti var");
+assert(css.includes(".ae-metric-chart__point,") && css.includes("prefers-reduced-motion: reduce"), "Area chart reduced-motion desteği var");
+assert(js.includes("function renderMetricChart"), "Genel renderMetricChart fonksiyonu var");
+assert(js.includes("function renderMetricCharts"), "Üç metrik chart grid render fonksiyonu var");
+assert(js.includes('renderMetricChart("sleep"'), "Uyku chart çağrısı var");
+assert(js.includes('renderMetricChart("steps"'), "Adım chart çağrısı var");
+assert(js.includes('renderMetricChart("water"'), "Su chart çağrısı var");
+assert(js.includes('targetKey: "steps"'), "Adım hedef anahtarı var");
+assert(js.includes('targetKey: "waterGlasses"'), "Su hedef anahtarı var");
+
 // ── SVG sparklines ──
 classRule("trend-strip__sparkline");
 classRule("ae-sparkline");

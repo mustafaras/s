@@ -1172,6 +1172,136 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   font-weight: 700;
 }
 
+.ae-metric-chart-grid {
+  display: grid;
+  gap: var(--ae-space-md);
+  min-width: 0;
+}
+
+.ae-metric-chart-card {
+  min-width: 0;
+  padding: var(--ae-space-lg);
+}
+
+.ae-metric-chart {
+  --ae-chart-color: var(--ae-info);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-md);
+  min-width: 0;
+}
+
+.ae-metric-chart--ok { --ae-chart-color: var(--ae-ok); }
+.ae-metric-chart--accent { --ae-chart-color: var(--ae-accent); }
+.ae-metric-chart--warn { --ae-chart-color: var(--ae-warn); }
+.ae-metric-chart--drop { --ae-chart-color: var(--ae-drop); }
+
+.ae-metric-chart__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+}
+
+.ae-metric-chart__subtitle {
+  margin-top: var(--ae-space-2xs);
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-xs);
+  font-weight: 700;
+}
+
+.ae-metric-chart__target-chip {
+  flex-shrink: 0;
+  color: var(--ae-chart-color);
+}
+
+.ae-metric-chart__plot {
+  width: 100%;
+  min-width: 0;
+  min-height: 200px;
+}
+
+.ae-metric-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  overflow: visible;
+}
+
+.ae-metric-chart__grid-line {
+  stroke: var(--ae-glass-border);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.ae-metric-chart__y-label,
+.ae-metric-chart__x-label {
+  fill: var(--ae-faint);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 700;
+}
+
+.ae-metric-chart__x-label { fill: var(--ae-muted); }
+
+.ae-metric-chart__area {
+  fill: url(#ae-metric-chart-fill-sleep);
+  stroke: none;
+}
+
+.ae-metric-chart-card--sleep .ae-metric-chart__area {
+  fill: url(#ae-metric-chart-fill-sleep);
+}
+
+.ae-metric-chart-card--steps .ae-metric-chart__area {
+  fill: url(#ae-metric-chart-fill-steps);
+}
+
+.ae-metric-chart-card--water .ae-metric-chart__area {
+  fill: url(#ae-metric-chart-fill-water);
+}
+
+.ae-metric-chart__line {
+  fill: none;
+  stroke: var(--ae-chart-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ae-chart-color) 42%, transparent));
+}
+
+.ae-metric-chart__target {
+  stroke: var(--ae-chart-color);
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+
+.ae-metric-chart__point {
+  cursor: pointer;
+  fill: var(--ae-chart-color);
+  stroke: var(--ae-surface);
+  stroke-width: 2;
+  transition: r 0.18s var(--ae-ease), filter 0.18s ease, stroke-width 0.18s ease;
+}
+
+.ae-metric-chart__point:hover,
+.ae-metric-chart__point:focus {
+  filter: drop-shadow(0 0 8px var(--ae-chart-color));
+  outline: none;
+  stroke: var(--ae-chart-color);
+  stroke-width: 3;
+}
+
+.ae-metric-chart__empty {
+  fill: var(--ae-faint);
+  font-family: var(--ae-font);
+  font-size: var(--ae-scale-sm);
+  font-weight: 700;
+}
+
 .ae-ring {
   position: relative;
   display: inline-grid;
@@ -1900,6 +2030,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-sparkline__line,
   .ae-sparkline__area,
   .ae-mood-chart__point,
+  .ae-metric-chart__point,
   .ae-metric__spark-bar,
   .ae-ring__progress { transition: none !important; }
   .ae-status--ok .ae-status__dot,

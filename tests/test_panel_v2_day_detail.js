@@ -241,5 +241,6 @@ html = dom.html;
 assert(/class="loc-history-details"/.test(html), "Konum geçmişi expander içinde");
 assert(!/class="loc-history-details" open/.test(html), "Konum geçmişi varsayılan olarak kapalı");
 assert(/2 kayıt/.test(html), "Konum geçmişi kayıt sayısı net görünür");
+assert(/href="https:\/\/www\.google\.com\/maps\/dir\/\?api=1&amp;destination=/.test(html), "Gün detayında Google Maps rota bağlantısı var");
 
 console.log("\n🦩 Faz 4 Gün Detayı fixture — TÜM TESTLER BAŞARILI");

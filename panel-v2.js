@@ -2383,6 +2383,28 @@
     var mapData = date && dayHistory.length ? dayHistory : locInfo.history.slice(-10);
     var mapDataJson = escapeHtml(JSON.stringify(mapData));
 
+    // En güncel güvenilir noktayı Google Maps rota hedefi olarak kullan.
+    var navigationPoint = null;
+    var pointCandidates = [];
+    if (locInfo.current) pointCandidates.push(locInfo.current);
+    for (var pointIndex = mapData.length - 1; pointIndex >= 0; pointIndex--) pointCandidates.push(mapData[pointIndex]);
+    pointCandidates.some(function(point) {
+      if (!point) return false;
+      var lat = safeNumber(point.lat);
+      var lng = safeNumber(point.lng);
+      if (lat === null) lat = safeNumber(point.latitude);
+      if (lng === null) lng = safeNumber(point.longitude);
+      if (lat === null || lng === null) return false;
+      navigationPoint = { lat: lat, lng: lng };
+      return true;
+    });
+    var mapsUrl = navigationPoint
+      ? "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(navigationPoint.lat.toFixed(6) + "," + navigationPoint.lng.toFixed(6))
+      : "";
+    var mapsActionHtml = mapsUrl
+      ? '<div class="loc-actions"><a class="ae-btn ae-btn--primary loc-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Google Maps üzerinde konuma rota oluştur">↗ Google Maps’te rota oluştur</a></div>'
+      : "";
+
     // Kompakt üst bilgi
     var infoHtml = '<div class="loc-info">' +
       '<span class="loc-info__item">📍 ' + (locInfo.enabled ? "Açık" : "Kapalı") + '</span>' +
@@ -2433,6 +2455,7 @@
       children: '<div class="loc-section">' +
         '<div class="ae-label">📍 Konum & Zaman Çizelgesi</div>' +
         infoHtml +
+        mapsActionHtml +
         mapHtml +
         timelineHtml +
         (eventsHtml ? '<div class="loc-events">' + eventsHtml + '</div>' : '') +

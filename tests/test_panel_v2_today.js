@@ -150,6 +150,8 @@ assert(/class="loc-map"/.test(html), "Konum kartı harita yüzeyi taşıyor");
 assert(/loc-timeline-compact/.test(html), "Konum kartı zaman çizelgesi taşıyor");
 assert(/class="loc-history-details"/.test(html), "Konum zaman çizelgesi expander içinde");
 assert(!/class="loc-history-details" open/.test(html), "Konum zaman çizelgesi varsayılan olarak kapalı");
+assert(/href="https:\/\/www\.google\.com\/maps\/dir\/\?api=1&amp;destination=/.test(html), "Google Maps rota bağlantısı var");
+assert(/target="_blank" rel="noopener noreferrer"/.test(html), "Google Maps bağlantısı güvenli yeni sekmede açılıyor");
 
 // 6. Terapi paylaşımı redacted
 const therapyData = JSON.parse(JSON.stringify(seededData));

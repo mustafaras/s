@@ -61,7 +61,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 21 | Arşivlere Arama & Filtre | ✅ TAMAMLANDI | `cbc0e9d` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_archives.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `test_panel_v2_css.js`; `git diff --check`; secret scan PASS; Pages run `31384869135` SUCCESS; canlı cache smoke PASS | Kitap/izleme/dinleme/alıntı araması, durum/tür/tarih filtreleri, liste/ızgara görünümü, filtreli AeEmpty, arşiv kontrol yüzeyi ve cache bump `2026081024` tamamlandı |
 | 22 | Sistem Sayfası Görsel İyileştirme | ✅ TAMAMLANDI | 40c4f18 | node --check panel-v2.js; node --check panelCoverageManifest.js; node tests/test_panel_v2_system.js; tests/test_panel_v2_*.js (11/11 PASS); test_panel_v2_css.js; git diff --check; secret scan PASS; Pages run 31389328525 SUCCESS; canlı cache smoke PASS | Durum kartlarına API limit/token ömrü progress bar ve canlı metrikler, Audit timeline, okunmamış bildirim animasyonu, glass kartlar, settings kartları/stagger ve cache bump 2026081025 tamamlandı |
 | 23 | Staggered Giriş & Sayfa Geçişleri | ✅ TAMAMLANDI | `ecdf940` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `tests/test_panel_v2_*.js` (11/11 PASS); 5 sayfa stagger + View Transition headless fixture PASS; `git diff --check`; secret scan PASS; Pages run `31391538223` SUCCESS; canlı cache smoke PASS | Beş ana sayfa 0/80/160 ms stagger köklerine alındı; View Transition API eski/yeni sayfa animasyonları ve fallback giriş geçişi eklendi; reduced-motion desteği, cache bump `2026081026` ve CSS kontrat testleri tamamlandı |
-| 24 | Mobil Bottom Tab Bar | 🔒 BEKLEMEDE | - | - | - |
+| 24 | Mobil Bottom Tab Bar | ✅ TAMAMLANDI | `3ea426c` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31393125507` SUCCESS; canlı cache smoke PASS | 460px altı fixed bottom tab bar, 72px mobil nav tokenı, safe-area alt padding, body/scroll bottom inset, glass dock, 48px touch hedefleri ve dikey ikon/etiket düzeni; cache bump `2026081027` tamamlandı |
 | 25 | Swipe Gesture | 🔒 BEKLEMEDE | - | - | - |
 | 26 | Pull-to-Refresh | 🔒 BEKLEMEDE | - | - | - |
 | 27 | Touch-friendly Hit Areas | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 24
+- **currentStep:** 25
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-10
 - **lastAgent:** OpenAI Codex (GPT-5)

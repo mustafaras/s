@@ -204,6 +204,12 @@ assert(css.includes("--ae-mobile-tabbar-height, 72px"), "Gövde mobil tab bar y�
 assert(css.includes("scroll-padding-bottom"), "Mobil son içerik scroll padding'i var");
 assert(css.includes("backdrop-filter: blur(24px)"), "Mobil tab bar glass yüzeyi var");
 assert(css.includes("flex-direction: column"), "Mobil tab ikon ve etiketleri dikey hizalı");
+assert(css.includes("touch-action: pan-y"), "Gün Detayı yatay swipe ve dikey scroll ayrımını koruyor");
+assert(js.includes("touchstart"), "Swipe touchstart listener kodu var");
+assert(js.includes("touchmove"), "Swipe touchmove listener kodu var");
+assert(js.includes("touchend"), "Swipe touchend listener kodu var");
+assert(js.includes("threshold = 50"), "Swipe eşiği 50px");
+assert(js.includes("ui.tab !== \"day\""), "Swipe yalnızca Gün Detayı'nda aktif");
 classRule("ae-grid--hero");
 classRule("ae-metric");
 classRule("ae-metric__sparkline");

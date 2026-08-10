@@ -57,6 +57,10 @@
     type: "info",
     duration: 4200
   };
+  var swipeBinding = {
+    element: null,
+    handlers: null
+  };
 
   function isoDate(d) {
     if (!d || isNaN(d.getTime())) d = new Date();
@@ -1276,6 +1280,107 @@
 
   function shiftDate(delta) {
     setDate(dateOffset(ui.date, delta));
+  }
+
+  function swipeViewportEnabled() {
+    if (typeof root.matchMedia !== "function") return false;
+    try {
+      return root.matchMedia("(max-width: 460px)").matches;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function swipeExcludedTarget(target) {
+    if (!target || typeof target.closest !== "function") return false;
+    return !!target.closest("a,button,input,select,textarea,summary,[contenteditable=\"true\"],.loc-map,.ae-tabs,.sub-tabs");
+  }
+
+  function clearSwipeBinding() {
+    if (!swipeBinding.element || !swipeBinding.handlers || typeof swipeBinding.element.removeEventListener !== "function") {
+      swipeBinding.element = null;
+      swipeBinding.handlers = null;
+      return;
+    }
+    swipeBinding.element.removeEventListener("touchstart", swipeBinding.handlers.start);
+    swipeBinding.element.removeEventListener("touchmove", swipeBinding.handlers.move);
+    swipeBinding.element.removeEventListener("touchend", swipeBinding.handlers.end);
+    swipeBinding.element.removeEventListener("touchcancel", swipeBinding.handlers.cancel);
+    swipeBinding.element = null;
+    swipeBinding.handlers = null;
+  }
+
+  function initSwipeGestures(app) {
+    clearSwipeBinding();
+    if (ui.tab !== "day" || !swipeViewportEnabled() || !app || typeof app.addEventListener !== "function") return;
+
+    var gesture = {
+      active: false,
+      canceled: false,
+      horizontal: false,
+      startX: 0,
+      startY: 0
+    };
+    var threshold = 50;
+
+    function pointFromTouchList(list) {
+      return list && list.length ? list[0] : null;
+    }
+
+    function onTouchStart(event) {
+      var touch = pointFromTouchList(event && event.touches);
+      if (!touch || (event.touches && event.touches.length !== 1) || swipeExcludedTarget(event.target)) {
+        gesture.active = false;
+        return;
+      }
+      gesture.active = true;
+      gesture.canceled = false;
+      gesture.horizontal = false;
+      gesture.startX = Number(touch.clientX) || 0;
+      gesture.startY = Number(touch.clientY) || 0;
+    }
+
+    function onTouchMove(event) {
+      if (!gesture.active) return;
+      var touch = pointFromTouchList(event && event.touches);
+      if (!touch) return;
+      var dx = (Number(touch.clientX) || 0) - gesture.startX;
+      var dy = (Number(touch.clientY) || 0) - gesture.startY;
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) >= 10) {
+        gesture.canceled = true;
+        gesture.horizontal = false;
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= 10) {
+        gesture.horizontal = true;
+        if (event && event.cancelable && typeof event.preventDefault === "function") event.preventDefault();
+      }
+    }
+
+    function onTouchEnd(event) {
+      if (!gesture.active) return;
+      var touch = pointFromTouchList(event && event.changedTouches) || pointFromTouchList(event && event.touches);
+      var dx = touch ? (Number(touch.clientX) || 0) - gesture.startX : 0;
+      var shouldShift = gesture.horizontal && !gesture.canceled && Math.abs(dx) >= threshold;
+      gesture.active = false;
+      if (!shouldShift) return;
+      // Sol: sonraki gün, sağ: önceki gün.
+      shiftDate(dx < 0 ? 1 : -1);
+    }
+
+    function onTouchCancel() {
+      gesture.active = false;
+      gesture.canceled = true;
+      gesture.horizontal = false;
+    }
+
+    var handlers = { start: onTouchStart, move: onTouchMove, end: onTouchEnd, cancel: onTouchCancel };
+    app.addEventListener("touchstart", handlers.start, { passive: true });
+    app.addEventListener("touchmove", handlers.move, { passive: false });
+    app.addEventListener("touchend", handlers.end, { passive: true });
+    app.addEventListener("touchcancel", handlers.cancel, { passive: true });
+    swipeBinding.element = app;
+    swipeBinding.handlers = handlers;
   }
 
   function goToDayDetail(isoDate) {
@@ -3663,6 +3768,7 @@
       renderToastHost() +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
 
+    initSwipeGestures(app);
     runCountUps();
 
     // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)

@@ -24,17 +24,35 @@ function createDom(initialTheme, initialDensity) {
   let html = "";
   let theme = initialTheme || "dark";
   let density = initialDensity || "comfortable";
+  const appListeners = {};
+  const appElement = {
+    get innerHTML() { return html; },
+    set innerHTML(v) { html = v; },
+    addEventListener: function(type, listener) {
+      if (!appListeners[type]) appListeners[type] = [];
+      appListeners[type].push(listener);
+    },
+    removeEventListener: function(type, listener) {
+      const listeners = appListeners[type] || [];
+      appListeners[type] = listeners.filter(function(fn) { return fn !== listener; });
+    },
+    dispatchEvent: function(event) {
+      const listeners = (appListeners[event.type] || []).slice();
+      listeners.forEach(function(listener) { listener.call(appElement, event); });
+      return true;
+    },
+    listenerCount: function(type) { return (appListeners[type] || []).length; }
+  };
   return {
     get html() { return html; },
     set html(v) { html = v; },
     get theme() { return theme; },
     get density() { return density; },
+    dispatchAppEvent: function(event) { return appElement.dispatchEvent(event); },
+    appListenerCount: function(type) { return appElement.listenerCount(type); },
     getElementById: function(id) {
       if (id === "app") {
-        return {
-          get innerHTML() { return html; },
-          set innerHTML(v) { html = v; }
-        };
+        return appElement;
       }
       if (id === "root") {
         return {

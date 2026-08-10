@@ -3142,6 +3142,10 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
     scroll-padding-bottom: calc(var(--ae-mobile-tabbar-height, 72px) + var(--ae-space-lg) + env(safe-area-inset-bottom));
   }
 
+  .day-view {
+    touch-action: pan-y;
+  }
+
   .ae-tab {
     display: flex;
     min-height: 48px;

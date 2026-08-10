@@ -204,7 +204,9 @@ assert(css.includes(".loc-map-link:focus-visible"), "Google Maps bağlantısı f
 assert(js.includes("function renderZikrDetail"), "Zikir ve Esmâ ayrıntı render fonksiyonu var");
 assert(js.includes("zikrReflectionWordCount"), "Tefekkür kelime sayısı gösterim kontratı var");
 assert(js.includes("loc-history-details"), "Konum geçmişi expander render kontratı var");
-assert(js.includes("www.google.com/maps/dir/"), "Google Maps rota URL kontratı var");
+assert(js.includes("compressLocationHistory"), "GPS örneklerini anlamlı konumlara indirgeyen helper var");
+assert(js.includes("www.google.com/maps/search/"), "Google Maps nokta URL kontratı var");
+assert(!js.includes("www.google.com/maps/dir/"), "Google Maps rota URL'si kullanılmıyor");
 assert(css.includes("background: linear-gradient(90deg, var(--ae-skeleton-bg)"), "Skeleton gradient var");
 assert(css.includes(".ae-tooltip::after"), "Tooltip arrow var");
 assert(css.includes("backdrop-filter: blur(16px) saturate(1.2)"), "Tooltip glass blur var");

@@ -232,15 +232,19 @@ assert(/Yürüyüş: 5200 m/.test(html), "Yürüyüş mesafesi görünür");
 // 8. Konum geçmişi varsayılan olarak daraltılmış expander içinde kalır.
 const locationData = JSON.parse(JSON.stringify(seededData));
 locationData.locationHistory = [
+  { ts: "2026-08-03T18:20:00Z", lat: 39.9400, lng: 32.8700, acc: 14 },
   { ts: "2026-08-04T10:15:00Z", lat: 39.9533, lng: 32.8889, acc: 16 },
-  { ts: "2026-08-04T10:16:00Z", lat: 39.9534, lng: 32.8888, acc: 8 }
+  { ts: "2026-08-04T10:16:00Z", lat: 39.9534, lng: 32.8888, acc: 8 },
+  { ts: "2026-08-04T10:40:00Z", lat: 39.9600, lng: 32.9000, acc: 12 }
 ];
 AeonV2.setData(locationData);
 AeonV2.setDate("2026-08-04");
 html = dom.html;
 assert(/class="loc-history-details"/.test(html), "Konum geçmişi expander içinde");
 assert(!/class="loc-history-details" open/.test(html), "Konum geçmişi varsayılan olarak kapalı");
-assert(/2 kayıt/.test(html), "Konum geçmişi kayıt sayısı net görünür");
-assert(/href="https:\/\/www\.google\.com\/maps\/dir\/\?api=1&amp;destination=/.test(html), "Gün detayında Google Maps rota bağlantısı var");
+assert(/3 nokta/.test(html), "Konum geçmişi tüm günlerden gerçek yer değişikliği sayısını gösterir");
+assert(/2 örnek/.test(html), "Aynı yerdeki GPS örnekleri gruplanır");
+assert(/href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/.test(html), "Gün detayında Google Maps nokta bağlantısı var");
+assert((html.match(/class="loc-dot__map"/g) || []).length === 3, "Her anlamlı geçmiş konumun Google Maps noktası var");
 
 console.log("\n🦩 Faz 4 Gün Detayı fixture — TÜM TESTLER BAŞARILI");

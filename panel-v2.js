@@ -863,6 +863,101 @@
     };
   }
 
+  // GPS örneklerini gerçek yer değişikliklerine indirger. Aynı konumda alınan
+  // sık örnekler tek kayıtta tutulur; kullanıcı yine kaç ham örneğin birleştiğini
+  // görür. Eşik, GPS titreşimini ayırmak için 120 metredir.
+  function normalizeLocationPoint(point) {
+    if (!isObject(point)) return null;
+    var lat = safeNumber(point.lat);
+    var lng = safeNumber(point.lng);
+    if (lat === null) lat = safeNumber(point.latitude);
+    if (lng === null) lng = safeNumber(point.longitude);
+    if (lat === null || lng === null) return null;
+    return {
+      lat: lat,
+      lng: lng,
+      ts: point.ts || point.timestamp || "",
+      acc: safeNumber(point.acc) || safeNumber(point.accuracy) || null
+    };
+  }
+
+  function locationDistanceMeters(a, b) {
+    if (!a || !b) return Infinity;
+    var rad = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * rad;
+    var dLng = (b.lng - a.lng) * rad;
+    var lat1 = a.lat * rad;
+    var lat2 = b.lat * rad;
+    var sinLat = Math.sin(dLat / 2);
+    var sinLng = Math.sin(dLng / 2);
+    var h = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLng * sinLng;
+    return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  }
+
+  function compressLocationHistory(history) {
+    var source = (Array.isArray(history) ? history : []).map(function(point, index) {
+      var normalized = normalizeLocationPoint(point);
+      if (normalized) normalized._order = index;
+      return normalized;
+    }).filter(Boolean).sort(function(a, b) {
+      if (!a.ts || !b.ts) return a._order - b._order;
+      return String(a.ts).localeCompare(String(b.ts)) || a._order - b._order;
+    });
+    var clusters = [];
+    source.forEach(function(point) {
+      var current = clusters[clusters.length - 1];
+      if (!current || locationDistanceMeters(current.lastPoint, point) > 120) {
+        clusters.push({
+          latSum: point.lat,
+          lngSum: point.lng,
+          samples: 1,
+          firstTs: point.ts,
+          lastTs: point.ts,
+          acc: point.acc,
+          lastPoint: point
+        });
+        return;
+      }
+      current.latSum += point.lat;
+      current.lngSum += point.lng;
+      current.samples += 1;
+      current.lastTs = point.ts || current.lastTs;
+      current.acc = point.acc || current.acc;
+      current.lastPoint = point;
+    });
+    return clusters.map(function(cluster) {
+      return {
+        lat: cluster.latSum / cluster.samples,
+        lng: cluster.lngSum / cluster.samples,
+        ts: cluster.lastTs || cluster.firstTs,
+        firstTs: cluster.firstTs || cluster.lastTs || "",
+        lastTs: cluster.lastTs || cluster.firstTs || "",
+        acc: cluster.acc,
+        samples: cluster.samples
+      };
+    });
+  }
+
+  function locationMapsUrl(point) {
+    var normalized = normalizeLocationPoint(point);
+    if (!normalized) return "";
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(normalized.lat.toFixed(6) + "," + normalized.lng.toFixed(6));
+  }
+
+  function locationHistoryWithCurrent(locInfo) {
+    var history = Array.isArray(locInfo && locInfo.history) ? locInfo.history.slice() : [];
+    var current = normalizeLocationPoint(locInfo && locInfo.current);
+    if (current) {
+      history.push({
+        lat: current.lat,
+        lng: current.lng,
+        ts: current.ts || (locInfo && locInfo.lastTs) || "",
+        acc: current.acc
+      });
+    }
+    return history;
+  }
+
   function getAppSessionInfo() {
     if (!isObject(appData)) return null;
     return {
@@ -2368,49 +2463,37 @@
 
   function renderLocationTimeline(date) {
     var locInfo = getLocationInfo();
-    if (!locInfo || !locInfo.historyCount) return "";
+    if (!locInfo || (!locInfo.historyCount && !locInfo.current)) return "";
 
-    var dayHistory = [];
-    if (date) {
-      var dateStart = date + "T00:00:00Z";
-      var dateEnd = date + "T23:59:59Z";
-      locInfo.history.forEach(function(h) {
-        if (h && h.ts && h.ts >= dateStart && h.ts <= dateEnd) dayHistory.push(h);
-      });
-    }
-
+    // Gün detayı açık olsa bile geçmişi günle sınırlama: kart, güncel noktayı
+    // ve tüm geçmişteki anlamlı yer değişikliklerini birlikte göstermeli.
+    var scopedHistory = locationHistoryWithCurrent(locInfo);
+    var mapData = compressLocationHistory(scopedHistory);
     var mapId = "ae-map-" + (date || "all");
-    var mapData = date && dayHistory.length ? dayHistory : locInfo.history.slice(-10);
     var mapDataJson = escapeHtml(JSON.stringify(mapData));
 
-    // En güncel güvenilir noktayı Google Maps rota hedefi olarak kullan.
+    // En güncel güvenilir noktayı yalnızca Google Maps'te açılacak nokta olarak kullan.
     var navigationPoint = null;
     var pointCandidates = [];
     if (locInfo.current) pointCandidates.push(locInfo.current);
-    for (var pointIndex = mapData.length - 1; pointIndex >= 0; pointIndex--) pointCandidates.push(mapData[pointIndex]);
+    for (var pointIndex = locInfo.history.length - 1; pointIndex >= 0; pointIndex--) pointCandidates.push(locInfo.history[pointIndex]);
     pointCandidates.some(function(point) {
-      if (!point) return false;
-      var lat = safeNumber(point.lat);
-      var lng = safeNumber(point.lng);
-      if (lat === null) lat = safeNumber(point.latitude);
-      if (lng === null) lng = safeNumber(point.longitude);
-      if (lat === null || lng === null) return false;
-      navigationPoint = { lat: lat, lng: lng };
+      var normalized = normalizeLocationPoint(point);
+      if (!normalized) return false;
+      navigationPoint = normalized;
       return true;
     });
-    var mapsUrl = navigationPoint
-      ? "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(navigationPoint.lat.toFixed(6) + "," + navigationPoint.lng.toFixed(6))
-      : "";
+    var mapsUrl = locationMapsUrl(navigationPoint);
     var mapsActionHtml = mapsUrl
-      ? '<div class="loc-actions"><a class="ae-btn ae-btn--primary loc-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Google Maps üzerinde konuma rota oluştur">↗ Google Maps’te rota oluştur</a></div>'
+      ? '<div class="loc-actions"><a class="ae-btn ae-btn--primary loc-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Güncel noktayı Google Maps üzerinde aç">↗ Güncel noktayı Google Maps’te aç</a></div>'
       : "";
 
     // Kompakt üst bilgi
     var infoHtml = '<div class="loc-info">' +
       '<span class="loc-info__item">📍 ' + (locInfo.enabled ? "Açık" : "Kapalı") + '</span>' +
       '<span class="loc-info__item">📡 ' + locInfo.mode + '</span>' +
-      '<span class="loc-info__item">🗺 ' + locInfo.historyCount + ' kayıt</span>' +
-      (dayHistory.length ? '<span class="loc-info__item">⏱ ' + dayHistory.length + ' güncelleme</span>' : '') +
+      '<span class="loc-info__item">🗺 ' + mapData.length.toLocaleString("tr-TR") + ' anlamlı nokta</span>' +
+      '<span class="loc-info__item">↳ ' + scopedHistory.length.toLocaleString("tr-TR") + ' örnek</span>' +
       '</div>';
 
     // Harita konteyneri
@@ -2420,22 +2503,26 @@
 
     // Kompakt zaman çizelgesi (sadece saat farkı + koordinat)
     var timelineHtml = '';
-    if (dayHistory.length) {
-      var items = dayHistory.map(function(h, i) {
-        var t = h.ts ? new Date(h.ts) : null;
-        var timeStr = t ? t.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' }) : "—";
+    if (mapData.length) {
+      var items = mapData.map(function(h, i) {
+        var first = h.firstTs ? new Date(h.firstTs) : null;
+        var last = h.lastTs ? new Date(h.lastTs) : null;
+        var firstTime = first && !isNaN(first.getTime()) ? first.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' }) : "—";
+        var lastTime = last && !isNaN(last.getTime()) ? last.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' }) : firstTime;
+        var timeStr = firstTime === lastTime ? firstTime : firstTime + "–" + lastTime;
         var latStr = typeof h.lat === 'number' ? h.lat.toFixed(4) : "—";
         var lngStr = typeof h.lng === 'number' ? h.lng.toFixed(4) : "—";
-        var accStr = h.acc ? h.acc + "m" : "";
+        var accStr = h.samples > 1 ? h.samples + " örnek" : (h.acc ? h.acc + "m" : "1 nokta");
         return '<div class="loc-dot-row">' +
           '<span class="loc-dot"></span>' +
           '<span class="loc-dot__time">' + escapeHtml(timeStr) + '</span>' +
           '<span class="loc-dot__coord">' + escapeHtml(latStr + ", " + lngStr) + '</span>' +
           (accStr ? '<span class="loc-dot__acc">' + escapeHtml(accStr) + '</span>' : '') +
+          (locationMapsUrl(h) ? '<a class="loc-dot__map" href="' + escapeHtml(locationMapsUrl(h)) + '" target="_blank" rel="noopener noreferrer" aria-label="Bu geçmiş konumu Google Maps üzerinde aç">↗ Maps</a>' : '') +
           '</div>';
       }).join("");
       timelineHtml = '<details class="loc-history-details">' +
-        '<summary class="loc-history-details__summary"><span class="loc-history-details__title">Konum geçmişi</span><span class="loc-history-details__count">' + dayHistory.length.toLocaleString("tr-TR") + ' kayıt</span><span class="loc-history-details__chevron" aria-hidden="true">⌄</span></summary>' +
+        '<summary class="loc-history-details__summary"><span class="loc-history-details__title">Tüm anlamlı konum geçmişi</span><span class="loc-history-details__count">' + mapData.length.toLocaleString("tr-TR") + ' nokta</span><span class="loc-history-details__chevron" aria-hidden="true">⌄</span></summary>' +
         '<div class="loc-timeline-compact">' + items + '</div>' +
         '</details>';
     }
@@ -3278,6 +3365,8 @@
         var color = i === points.length - 1 ? "#C9A86C" : "#6E6862";
         var ts = p.ts ? new Date(p.ts).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : "";
         var acc = p.acc ? " ±" + p.acc + "m" : "";
+        var mapsUrl = locationMapsUrl(p);
+        var mapsPopup = mapsUrl ? '<br><a class="loc-popup-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer">↗ Google Maps’te aç</a>' : "";
         root.L.circleMarker([p.lat, p.lng], {
           radius: i === points.length - 1 ? 8 : 5,
           color: color,
@@ -3285,7 +3374,7 @@
           fillOpacity: 0.7,
           weight: 2
         }).addTo(map).bindPopup("<strong>" + escapeHtml(ts) + "</strong><br>" +
-          p.lat.toFixed(4) + ", " + p.lng.toFixed(4) + acc);
+          p.lat.toFixed(4) + ", " + p.lng.toFixed(4) + acc + mapsPopup);
       });
 
       // Fit bounds

@@ -2711,11 +2711,15 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .loc-dot__coord {
   flex: 1 1 auto;
+  min-width: 0;
   font-weight: 600;
   color: var(--ae-muted);
   font-size: var(--ae-scale-xs);
   font-family: var(--ae-mono);
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .loc-dot__acc {
@@ -2726,6 +2730,29 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   background: var(--ae-chip-bg);
   padding: 1px 6px;
   border-radius: 999px;
+}
+
+.loc-dot__map,
+.loc-popup-map-link {
+  flex: 0 0 auto;
+  color: var(--ae-accent2);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.loc-dot__map:hover,
+.loc-popup-map-link:hover {
+  color: var(--ae-accent);
+  text-decoration: underline;
+}
+
+.loc-dot__map:focus-visible,
+.loc-popup-map-link:focus-visible {
+  outline: 2px solid var(--ae-accent2);
+  outline-offset: 2px;
+  border-radius: var(--ae-radius-xs);
 }
 
 .loc-events {

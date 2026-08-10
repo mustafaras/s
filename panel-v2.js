@@ -1035,7 +1035,8 @@
     }).join("");
 
     return AeCard({
-      variant: "summary",
+      variant: "glass",
+      className: "today-section-card today-section-card--notes",
       children: '<div class="quick-notes">' +
                 '<div class="ae-label">Hızlı notlar</div>' +
                 '<div class="quick-notes__chips">' + chips + "</div>" +
@@ -1646,12 +1647,32 @@
         })
       });
     }
+    var isCurrentDate = date === isoDate(new Date());
+    var title = isCurrentDate ? "Bugünün sinyalleri" : formatDateLabel(date) + " sinyalleri";
     return '<div class="today-view ae-slide-up">' +
-           renderDatePicker() +
-           renderHeroGrid(date) +
-           renderTrendStrip(date) +
-           renderQuickNotes(date) +
-           renderLocationTimeline(null) +
+           '<header class="today-view__intro">' +
+             '<div class="today-view__intro-copy">' +
+               '<div class="today-view__eyebrow">ÆON / GENEL BAKIŞ</div>' +
+               '<h1 class="today-view__title">' + escapeHtml(title) + '</h1>' +
+               '<p class="today-view__meta">Günün ritmini, küçük sinyallerden okuyalım.</p>' +
+             '</div>' +
+             '<span class="today-view__signal ae-status ae-status--info" role="status">' +
+               '<span class="ae-status__dot"></span><span class="ae-status__label">Canlı özet</span>' +
+             '</span>' +
+           '</header>' +
+           '<div class="today-view__section today-view__section--picker">' +
+             renderDatePicker() +
+           '</div>' +
+           '<section class="today-view__section today-view__section--hero" aria-label="Günün metrikleri">' +
+             renderHeroGrid(date) +
+           '</section>' +
+           '<section class="today-view__section today-view__section--trend" aria-label="Son yedi günlük trendler">' +
+             renderTrendStrip(date) +
+           '</section>' +
+           '<section class="today-view__secondary-grid ae-stagger" aria-label="Günün notları ve konum akışı">' +
+             renderQuickNotes(date) +
+             renderLocationTimeline(date) +
+           '</section>' +
            "</div>";
   }
 
@@ -2309,7 +2330,8 @@
     }
 
     return AeCard({
-      variant: "summary",
+      variant: "glass",
+      className: "today-section-card today-section-card--location",
       children: '<div class="loc-section">' +
         '<div class="ae-label">📍 Konum & Zaman Çizelgesi</div>' +
         infoHtml +

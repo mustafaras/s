@@ -828,6 +828,71 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   gap: var(--ae-space-md);
 }
 
+.today-view__intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+  padding: var(--ae-space-xs) var(--ae-space-2xs);
+}
+
+.today-view__intro-copy {
+  min-width: 0;
+}
+
+.today-view__eyebrow {
+  color: var(--ae-accent);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+}
+
+.today-view__title {
+  margin: var(--ae-space-2xs) 0 0;
+  color: var(--ae-text);
+  font-size: var(--ae-scale-xl);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.today-view__meta {
+  margin: var(--ae-space-xs) 0 0;
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-sm);
+  line-height: 1.45;
+}
+
+.today-view__signal {
+  flex: 0 0 auto;
+  margin-top: var(--ae-space-2xs);
+}
+
+.today-view__section {
+  min-width: 0;
+}
+
+.today-view__section--picker {
+  animation: aeSlideUp 0.35s var(--ae-ease) 0.04s both;
+}
+
+.today-view__section--trend {
+  animation: aeSlideUp 0.35s var(--ae-ease) 0.18s both;
+}
+
+.today-view__secondary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ae-space-md);
+  min-width: 0;
+}
+
+.today-section-card {
+  min-width: 0;
+}
+
 /* ── Hero cards ── */
 .hero-card {
   position: relative;
@@ -2123,7 +2188,9 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-shimmer,
   .ae-count-up,
   .ae-pulse,
-  .ae-toast { animation: none !important; }
+  .ae-toast,
+  .today-view__section--picker,
+  .today-view__section--trend { animation: none !important; }
   .ae-card,
   .ae-tab,
   .sub-tab,
@@ -2156,12 +2223,14 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 @media (min-width: 768px) {
   .ae-grid--summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .today-view__secondary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ae-app__body { padding: var(--ae-space-lg) var(--ae-space-xl) var(--ae-space-xl); }
   .ae-topbar { padding: calc(env(safe-area-inset-top) + 12px) var(--ae-space-xl) 12px; }
 }
 
 @media (min-width: 1200px) {
   .ae-grid--summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .today-view__secondary-grid { gap: var(--ae-space-lg); }
   .ae-app { max-width: 1200px; margin: 0 auto; }
 }
 

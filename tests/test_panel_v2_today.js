@@ -96,6 +96,16 @@ AeonV2.setData(seededData);
 html = dom.html;
 assert(!/class="ae-empty"/.test(html), "Seeded data'da ae-empty kalktı");
 
+// 2b. Genel Bakış premium sayfa iskeleti
+assert(/today-view__intro/.test(html), "Genel Bakış premium giriş başlığı var");
+assert(/sinyalleri/.test(html), "Genel Bakış tarihli sinyal başlığı var");
+assert(/today-view__section--picker/.test(html), "Genel Bakış tarih seçici bölümü var");
+assert(/today-view__section--hero/.test(html), "Genel Bakış hero bölümü var");
+assert(/today-view__section--trend/.test(html), "Genel Bakış trend bölümü var");
+assert(/today-view__secondary-grid ae-stagger/.test(html), "Genel Bakış ikincil alanı stagger ile render ediliyor");
+assert(/today-section-card--notes/.test(html), "Hızlı notlar Today glass kart sınıfını taşıyor");
+assert(/ae-card--glass today-section-card/.test(html), "Hızlı notlar glass kart içinde");
+
 // 3. 4 hero kart var
 assert((html.match(/ae-card--hero/g) || []).length === 4, "4 hero kart render edildi");
 assert((html.match(/class="ae-card ae-card--hero hero-card ae-metric/g) || []).length === 4, "4 AeMetric kartı render edildi");
@@ -126,6 +136,18 @@ assert((html.match(/class="trend-strip__value ae-count-up"/g) || []).length === 
 // 5. Hızlı notlar kartı
 assert(/Hızlı notlar/.test(html), "Hızlı notlar bölümü var");
 assert(/Günlük/.test(html), "Günlük chip'i var");
+
+// 5b. Konum kartı yalnızca konum geçmişi olduğunda güvenli biçimde görünür
+const locationData = JSON.parse(JSON.stringify(seededData));
+locationData.locationHistory = [{ ts: "2026-08-04T10:15:00Z", lat: 41.0082, lng: 28.9784, acc: 12 }];
+locationData.location = { lat: 41.0082, lng: 28.9784 };
+locationData.settings.locationEnabled = true;
+AeonV2.setData(locationData);
+html = dom.html;
+assert(/today-section-card--location/.test(html), "Konum Today glass kart sınıfını taşıyor");
+assert(/ae-card--glass today-section-card today-section-card--location/.test(html), "Konum glass kart içinde");
+assert(/class="loc-map"/.test(html), "Konum kartı harita yüzeyi taşıyor");
+assert(/loc-timeline-compact/.test(html), "Konum kartı zaman çizelgesi taşıyor");
 
 // 6. Terapi paylaşımı redacted
 const therapyData = JSON.parse(JSON.stringify(seededData));

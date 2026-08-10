@@ -142,6 +142,20 @@ assert(js.includes("ae-count-up"), "Render çıktılarında count-up kullanılı
 assert(!js.includes("ae-fade-in"), "JS eski fade-in sınıfını kullanmıyor");
 
 // ── Hero / summary / empty ──
+classRule("today-view__intro");
+classRule("today-view__eyebrow");
+classRule("today-view__title");
+classRule("today-view__meta");
+classRule("today-view__secondary-grid");
+classRule("today-section-card");
+assert(css.includes(".today-view__section--picker"), "Today tarih seçici giriş animasyonu var");
+assert(css.includes(".today-view__section--trend"), "Today trend giriş animasyonu var");
+assert(css.includes(".today-view__secondary-grid { grid-template-columns: repeat(2"), "Today ikincil grid responsive iki kolona çıkıyor");
+assert(css.includes(".today-section-card"), "Today ikincil kart yüzeyi var");
+assert(js.includes("today-view__intro"), "renderToday premium giriş başlığını oluşturuyor");
+assert(js.includes("today-view__secondary-grid ae-stagger"), "renderToday staggered ikincil alanı oluşturuyor");
+assert(js.includes('variant: "glass"'), "Today kartları glass varyantını kullanıyor");
+assert(js.includes("renderLocationTimeline(date)"), "Today konum kartına seçili tarih aktarılıyor");
 classRule("ae-grid--hero");
 classRule("ae-metric");
 classRule("ae-metric__sparkline");

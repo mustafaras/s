@@ -59,7 +59,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 19 | Trendler Sayfası Yenileme | ✅ TAMAMLANDI | `9e526d9` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31378279269` SUCCESS | `renderTrends()` premium giriş ve semantik bölüm hiyerarşisiyle yeniden düzenlendi; 7/14/30 pill seçici, AeMetric özetleri, SVG mood/area chart grupları, gradient anomali kartları, stagger ve erişilebilir grup etiketleri tamamlandı; cache bump `2026081022` |
 | 20 | Gün Detayı Akordeon Düzeni | ✅ TAMAMLANDI | `4bb0321` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31381630606` SUCCESS | Ana Gün Detayı bölümleri native details akordeonlarına alındı; inline AeDivider--label başlıkları, varsayılan açık/kapatılabilir içerik, chip üst yerleşimi, Zamanlar → Ruh Hali → Alışkanlıklar → Beslenme → İbadet → Hareket → Konum → Döngü sırası, stagger ve reduced-motion desteği tamamlandı; cache bump `2026081023` |
 | 21 | Arşivlere Arama & Filtre | ✅ TAMAMLANDI | `cbc0e9d` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_archives.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `test_panel_v2_css.js`; `git diff --check`; secret scan PASS; Pages run `31384869135` SUCCESS; canlı cache smoke PASS | Kitap/izleme/dinleme/alıntı araması, durum/tür/tarih filtreleri, liste/ızgara görünümü, filtreli AeEmpty, arşiv kontrol yüzeyi ve cache bump `2026081024` tamamlandı |
-| 22 | Sistem Sayfası Görsel İyileştirme | 🔒 BEKLEMEDE | - | - | - |
+| 22 | Sistem Sayfası Görsel İyileştirme | ✅ TAMAMLANDI | 40c4f18 | node --check panel-v2.js; node --check panelCoverageManifest.js; node tests/test_panel_v2_system.js; tests/test_panel_v2_*.js (11/11 PASS); test_panel_v2_css.js; git diff --check; secret scan PASS; Pages run 31389328525 SUCCESS; canlı cache smoke PASS | Durum kartlarına API limit/token ömrü progress bar ve canlı metrikler, Audit timeline, okunmamış bildirim animasyonu, glass kartlar, settings kartları/stagger ve cache bump 2026081025 tamamlandı |
 | 23 | Staggered Giriş & Sayfa Geçişleri | 🔒 BEKLEMEDE | - | - | - |
 | 24 | Mobil Bottom Tab Bar | 🔒 BEKLEMEDE | - | - | - |
 | 25 | Swipe Gesture | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 22
+- **currentStep:** 23
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-10
 - **lastAgent:** OpenAI Codex (GPT-5)

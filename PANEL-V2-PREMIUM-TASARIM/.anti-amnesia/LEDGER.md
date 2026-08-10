@@ -53,7 +53,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 13 | Trend Strip Sparkline | ✅ TAMAMLANDI | `da4c795` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31324602943` tetiklendi | SVG area/line/viewBox/boş çizgi kontratı doğrulandı; her metrikte son geçerli nokta büyütülmüş radius ve glow ile vurgulandı; cache bump tamamlandı |
 | 14 | Summary Grid Mini Sparkline | ✅ TAMAMLANDI | `78d814e` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31361140091` tetiklendi | 6 SummaryCard’a SVG mini sparkline, 7/14/30 pencere serileri, metrik renk eşlemeleri, eksik gün boşlukları, erişilebilir etiketler ve cache bump tamamlandı |
 | 15 | Büyük SVG Line Chart (Mod) | ✅ TAMAMLANDI | `9534833` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31362181980` SUCCESS | 30 günlük responsive SVG mood chart, 1-5 Y ekseni, 5 günlük X etiketleri, area/line/dot katmanları, boş gün gap koruması, native SVG tooltip ve klavye erişimi tamamlandı; cache bump `2026081015` |
-| 16 | SVG Area Chart (Uyku/Adım/Su) | 🔒 BEKLEMEDE | - | - | - |
+| 16 | SVG Area Chart (Uyku/Adım/Su) | ✅ TAMAMLANDI | `3039b1f` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31364029297` SUCCESS | Genel `renderMetricChart()` ile 30 günlük uyku/adım/su area chart’ları, 0–12/0–12000 ölçekleri, info/ok renkleri, area-line-dots katmanları, hedef kesikli çizgileri, boş veri, tooltip/a11y ve reduced-motion desteği tamamlandı; cache bump `2026081016` |
 | 17 | Isı Haritası İyileştirme | 🔒 BEKLEMEDE | - | - | - |
 | 18 | Genel Bakış Sayfası Yenileme | 🔒 BEKLEMEDE | - | - | - |
 | 19 | Trendler Sayfası Yenileme | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 16
+- **currentStep:** 17
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-10
 - **lastAgent:** OpenAI Codex (GPT-5)

@@ -63,7 +63,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 23 | Staggered Giriş & Sayfa Geçişleri | ✅ TAMAMLANDI | `ecdf940` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `tests/test_panel_v2_*.js` (11/11 PASS); 5 sayfa stagger + View Transition headless fixture PASS; `git diff --check`; secret scan PASS; Pages run `31391538223` SUCCESS; canlı cache smoke PASS | Beş ana sayfa 0/80/160 ms stagger köklerine alındı; View Transition API eski/yeni sayfa animasyonları ve fallback giriş geçişi eklendi; reduced-motion desteği, cache bump `2026081026` ve CSS kontrat testleri tamamlandı |
 | 24 | Mobil Bottom Tab Bar | ✅ TAMAMLANDI | `3ea426c` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31393125507` SUCCESS; canlı cache smoke PASS | 460px altı fixed bottom tab bar, 72px mobil nav tokenı, safe-area alt padding, body/scroll bottom inset, glass dock, 48px touch hedefleri ve dikey ikon/etiket düzeni; cache bump `2026081027` tamamlandı |
 | 25 | Swipe Gesture | ✅ TAMAMLANDI | P25 önceki commit + kalite düzeltmesi 2ebb707 | node --check panel-v2.js; node --check panelCoverageManifest.js; tests/test_panel_v2_*.js (13/13 PASS); git diff --check; secret scan PASS; emoji scan PASS; Pages doğrulaması push sonrası yapılacak | Prompt 26 öncesi kalite düzeltmesi: kanonik adım alan eşlemesi ve dürüst empty state, 7/14/30 + Tümü geçmiş kayıtları, zikir/ibadet hedef-yüzde ayrıntısı, SVG ikon yüzeyi, Gün Detayı spacing/expander iyileştirmesi ve 120 m konum kümelendirme korunarak doğrulandı; Prompt 26 başlatılmadı |
-| 26 | Pull-to-Refresh | 🔒 BEKLEMEDE | - | - | - |
+| 26 | Pull-to-Refresh | ✅ TAMAMLANDI | `c56480f` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (14/14 PASS); `git diff --check`; secret-pattern scan PASS; emoji scan PASS; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı | Mobilde ortak touch gesture bağlayıcısına 60px pull-to-refresh eşiği, hazır/yenileniyor SVG göstergesi, fetch sonrası kapanış, üstte değilken/etkileşimli hedefte iptal ve desktop listener sınırı eklendi; Prompt 25 swipe sözleşmesi güncellendi; deploy doğrulaması metadata commit'i push edildikten sonra yapılacak |
 | 27 | Touch-friendly Hit Areas | 🔒 BEKLEMEDE | - | - | - |
 | 28 | Polling & Telemetry Altyapısı | 🔒 BEKLEMEDE | - | - | - |
 | 29 | Olay Günlüğü Görüntüleyicisi | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 26
+- **currentStep:** 27
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-10
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 26 öncesi kalite düzeltmesi
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 26 Pull-to-Refresh
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

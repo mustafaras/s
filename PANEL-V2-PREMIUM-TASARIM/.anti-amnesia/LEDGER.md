@@ -51,7 +51,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 11 | Mevcut Komponentleri Taşı | ✅ TAMAMLANDI | `d90b38e` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (10/10 PASS); `git diff --check`; secret scan PASS | AeCard canonical varyantları, AeButton glow, erişilebilir AeEmpty/AeStatusBadge, SummaryCard → AeMetric, AnomalyCard glow/left-border ve DetailSection/DetailBlock premium stilleri tamamlandı |
 | 12 | Count-up Animasyonu | ✅ TAMAMLANDI | `2b75f59` | `node --check panel-v2.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31324058409` tetiklendi | `animateCountUp`, hero/summary/trend hedef işaretleri, reduced-motion bypass, render sonrası yeniden tetikleme, cache bump ve count-up fixture tamamlandı |
 | 13 | Trend Strip Sparkline | ✅ TAMAMLANDI | `da4c795` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31324602943` tetiklendi | SVG area/line/viewBox/boş çizgi kontratı doğrulandı; her metrikte son geçerli nokta büyütülmüş radius ve glow ile vurgulandı; cache bump tamamlandı |
-| 14 | Summary Grid Mini Sparkline | 🔒 BEKLEMEDE | - | - | - |
+| 14 | Summary Grid Mini Sparkline | ✅ TAMAMLANDI | `78d814e` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31361140091` tetiklendi | 6 SummaryCard’a SVG mini sparkline, 7/14/30 pencere serileri, metrik renk eşlemeleri, eksik gün boşlukları, erişilebilir etiketler ve cache bump tamamlandı |
 | 15 | Büyük SVG Line Chart (Mod) | 🔒 BEKLEMEDE | - | - | - |
 | 16 | SVG Area Chart (Uyku/Adım/Su) | 🔒 BEKLEMEDE | - | - | - |
 | 17 | Isı Haritası İyileştirme | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 14
+- **currentStep:** 15
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-09
 - **lastAgent:** OpenAI Codex (GPT-5)

@@ -23,9 +23,27 @@ let html;
 
 const seededData = {
   zikr: {
+    presets: [
+      { id: "esma_01", name: "Ya Fettah", kind: "esma", ebced: 489, target: 489 },
+      { id: "subhanallah", name: "Sübhanallah", kind: "core", target: 33 }
+    ],
     sessions: {
-      "2026-08-04": { totalCount: 165 }
-    }
+      "2026-08-04": {
+        totalCount: 165,
+        completedSets: 2,
+        perPreset: { esma_01: { count: 120 }, subhanallah: { count: 45, completedCycles: 1 } }
+      }
+    },
+    reflections: [{
+      id: "zn_2026-08-04_esma_01",
+      date: "2026-08-04",
+      presetId: "esma_01",
+      feelings: "Sakin",
+      thoughts: "Bugünü fark ederek yaşadım.",
+      intention: "Şükürle devam etmek",
+      wordCount: 6,
+      updatedAt: "2026-08-04T20:10:00Z"
+    }]
   },
   days: {
     "2026-08-04": {
@@ -172,6 +190,12 @@ assert(/redacted/.test(html), "Redacted ibaresi görünür");
 // 4. Saygı / ibadet / içerik özetleri var
 assert(/Namaz: 5\/5/.test(html), "Namaz durumu 5/5 görünür");
 assert(/Zikir: 165/.test(html), "Zikir sayacı görünür");
+assert(/class="zikr-detail"/.test(html), "Zikir ayrıntısı expander olarak görünür");
+assert(/Zikir ve Esmâ/.test(html), "Zikir ve Esmâ başlığı görünür");
+assert(/165 toplam/.test(html), "Zikir toplam sayısı net görünür");
+assert(/Ya Fettah/.test(html) && /Esmâ-i Hüsnâ/.test(html), "Esmâ adı ve türü görünür");
+assert(/Tefekkürler/.test(html) && /Hislerim/.test(html) && /Düşüncelerim/.test(html), "Tefekkür ayrıntıları görünür");
+assert(/6 kelime/.test(html), "Tefekkür kelime sayısı görünür");
 assert(/Öncü: Mevlana/.test(html), "Günün öncüsü görünür");
 assert(/Kur['\u0027]an yolculuğu|Kur&#39;an yolculuğu|Kuran yolculuğu/.test(html), "Kur'an yolculuğu görünür");
 assert(/Okuma: 1/.test(html), "Okuma sayısı görünür");
@@ -204,5 +228,18 @@ assert(/Su: 7 bardak/.test(html), "Su bardak sayısı görünür");
 assert(/Öğün: 3/.test(html), "Öğün sayısı görünür");
 assert(/Adım: 8\.432/.test(html), "Adım sayısı görünür");
 assert(/Yürüyüş: 5200 m/.test(html), "Yürüyüş mesafesi görünür");
+
+// 8. Konum geçmişi varsayılan olarak daraltılmış expander içinde kalır.
+const locationData = JSON.parse(JSON.stringify(seededData));
+locationData.locationHistory = [
+  { ts: "2026-08-04T10:15:00Z", lat: 39.9533, lng: 32.8889, acc: 16 },
+  { ts: "2026-08-04T10:16:00Z", lat: 39.9534, lng: 32.8888, acc: 8 }
+];
+AeonV2.setData(locationData);
+AeonV2.setDate("2026-08-04");
+html = dom.html;
+assert(/class="loc-history-details"/.test(html), "Konum geçmişi expander içinde");
+assert(!/class="loc-history-details" open/.test(html), "Konum geçmişi varsayılan olarak kapalı");
+assert(/2 kayıt/.test(html), "Konum geçmişi kayıt sayısı net görünür");
 
 console.log("\n🦩 Faz 4 Gün Detayı fixture — TÜM TESTLER BAŞARILI");

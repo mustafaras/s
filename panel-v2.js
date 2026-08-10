@@ -571,10 +571,109 @@
   }
 
   function getZikrCount(date) {
+    var session = getZikrSession(date);
+    return session ? safeNumber(session.totalCount) : null;
+  }
+
+  function getZikrSession(date) {
     if (!isObject(appData) || !isObject(appData.zikr) || !isObject(appData.zikr.sessions)) return null;
-    var s = appData.zikr.sessions[date];
-    if (!isObject(s)) return null;
-    return safeNumber(s.totalCount);
+    var session = appData.zikr.sessions[date];
+    return isObject(session) ? session : null;
+  }
+
+  function getZikrPreset(date, presetId) {
+    var z = isObject(appData) && isObject(appData.zikr) ? appData.zikr : {};
+    var presets = Array.isArray(z.presets) ? z.presets : [];
+    for (var i = 0; i < presets.length; i++) {
+      if (presets[i] && String(presets[i].id || "") === String(presetId || "")) return presets[i];
+    }
+    return null;
+  }
+
+  function getZikrReflections(date) {
+    var z = isObject(appData) && isObject(appData.zikr) ? appData.zikr : {};
+    if (!Array.isArray(z.reflections)) return [];
+    return z.reflections.filter(function(ref) {
+      return isObject(ref) && String(ref.date || "") === String(date || "") &&
+        (ref.mood || ref.feelings || ref.thoughts || ref.intention);
+    }).sort(function(a, b) {
+      return String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || ""));
+    });
+  }
+
+  function zikrReflectionWordCount(ref) {
+    var text = [ref && ref.feelings, ref && ref.thoughts, ref && ref.intention].filter(Boolean).join(" ").trim();
+    if (!text) return 0;
+    return safeNumber(ref.wordCount) || text.split(/\s+/).length;
+  }
+
+  function renderZikrDetail(date) {
+    var session = getZikrSession(date) || {};
+    var total = safeNumber(session.totalCount) || 0;
+    var completedSets = safeNumber(session.completedSets) || 0;
+    var perPreset = isObject(session.perPreset) ? session.perPreset : {};
+    var presetIds = Object.keys(perPreset);
+    var entries = presetIds.map(function(id) {
+      var raw = perPreset[id];
+      var count = isObject(raw) ? safeNumber(raw.count) : safeNumber(raw);
+      var preset = getZikrPreset(date, id) || {};
+      return {
+        id: id,
+        name: safeText(preset.name || id, 60),
+        kind: preset.kind === "esma" ? "Esmâ-i Hüsnâ" : "Temel zikir",
+        count: count === null ? 0 : Math.max(0, count),
+        target: safeNumber(preset.ebced || preset.target),
+        completedCycles: isObject(raw) ? (safeNumber(raw.completedCycles) || 0) : 0
+      };
+    }).filter(function(entry) {
+      return entry.count > 0 || entry.completedCycles > 0;
+    }).sort(function(a, b) { return b.count - a.count; });
+    var reflections = getZikrReflections(date);
+    if (!total && !entries.length && !reflections.length) return "";
+
+    var kpis = '<div class="zikr-detail__kpis">' +
+      '<div class="zikr-detail__kpi"><span>Bugün</span><strong>' + total.toLocaleString("tr-TR") + '</strong><small>toplam zikir</small></div>' +
+      '<div class="zikr-detail__kpi"><span>Tur</span><strong>' + completedSets.toLocaleString("tr-TR") + '</strong><small>tamamlanan</small></div>' +
+      '<div class="zikr-detail__kpi"><span>Zikir</span><strong>' + entries.length.toLocaleString("tr-TR") + '</strong><small>ayrıntılı kayıt</small></div>' +
+      '<div class="zikr-detail__kpi"><span>Tefekkür</span><strong>' + reflections.length.toLocaleString("tr-TR") + '</strong><small>not</small></div>' +
+      '</div>';
+
+    var breakdown = entries.length ? '<div class="zikr-detail__section">' +
+      '<div class="zikr-detail__section-head"><span>Zikir dökümü</span><span>' + entries.length + ' kalem</span></div>' +
+      '<div class="zikr-breakdown">' + entries.map(function(entry) {
+        var targetText = entry.target !== null && entry.target > 0 ? " · hedef " + entry.target.toLocaleString("tr-TR") : "";
+        var cycleText = entry.completedCycles ? " · " + entry.completedCycles.toLocaleString("tr-TR") + " tur" : "";
+        return '<div class="zikr-breakdown__row">' +
+          '<div class="zikr-breakdown__identity"><strong>' + escapeHtml(entry.name) + '</strong><span>' + escapeHtml(entry.kind) + '</span></div>' +
+          '<div class="zikr-breakdown__count"><strong>' + entry.count.toLocaleString("tr-TR") + '</strong><span>bugün' + escapeHtml(targetText + cycleText) + '</span></div>' +
+          '</div>';
+      }).join("") + '</div></div>' :
+      '<div class="zikr-detail__empty">Bu gün için preset bazında ayrıntılı sayaç kaydı yok; toplam sayaç korunuyor.</div>';
+
+    var reflectionHtml = reflections.length ? '<div class="zikr-detail__section zikr-detail__section--reflections">' +
+      '<div class="zikr-detail__section-head"><span>Tefekkürler</span><span>' + reflections.length + ' kayıt</span></div>' +
+      '<div class="zikr-reflections">' + reflections.map(function(ref) {
+        var preset = getZikrPreset(date, ref.presetId) || {};
+        var title = safeText(ref.presetName || preset.name || ref.presetId || "Zikir tefekkürü", 60);
+        var mood = ref.mood ? '<span class="zikr-reflection__mood">' + escapeHtml(safeText(ref.mood, 40)) + '</span>' : "";
+        var updatedAt = ref.updatedAt || ref.createdAt || "";
+        var time = updatedAt && updatedAt.length >= 16 ? updatedAt.slice(11, 16) : "";
+        var text = "";
+        if (ref.feelings) text += '<div><b>Hislerim</b><span>' + nl2br(escapeHtml(ref.feelings)) + '</span></div>';
+        if (ref.thoughts) text += '<div><b>Düşüncelerim</b><span>' + nl2br(escapeHtml(ref.thoughts)) + '</span></div>';
+        if (ref.intention) text += '<div><b>Duam · niyetim</b><span>' + nl2br(escapeHtml(ref.intention)) + '</span></div>';
+        return '<article class="zikr-reflection">' +
+          '<div class="zikr-reflection__head"><strong>' + escapeHtml(title) + '</strong>' + mood + '</div>' +
+          (text ? '<div class="zikr-reflection__body">' + text + '</div>' : "") +
+          '<div class="zikr-reflection__meta">' + zikrReflectionWordCount(ref).toLocaleString("tr-TR") + ' kelime' + (time ? ' · ' + escapeHtml(time) : "") + '</div>' +
+          '</article>';
+      }).join("") + '</div></div>' :
+      '<div class="zikr-detail__empty">Bugün için tefekkür notu yok.</div>';
+
+    return '<details class="zikr-detail"' + (reflections.length ? ' data-reflection-count="' + reflections.length + '"' : "") + '>' +
+      '<summary class="zikr-detail__summary"><span class="zikr-detail__summary-title">📿 Zikir ve Esmâ</span><span class="zikr-detail__summary-total">' + total.toLocaleString("tr-TR") + ' toplam</span><span class="zikr-detail__summary-chevron" aria-hidden="true">⌄</span></summary>' +
+      '<div class="zikr-detail__body">' + kpis + breakdown + reflectionHtml + '</div>' +
+      '</details>';
   }
 
   function getSaygiInfo(day) {
@@ -1967,12 +2066,8 @@
       html += DetailBlock({ icon: "🕌", title: label, body: meta + (e.note ? "<br>Not: " + escapeHtml(e.note) : "") });
     });
 
-    if (zCount !== null && zCount > 0) {
-      var zs = (isObject(appData) && isObject(appData.zikr) && isObject(appData.zikr.sessions) && isObject(appData.zikr.sessions[date])) ? appData.zikr.sessions[date] : {};
-      var per = isObject(zs.perPreset) ? zs.perPreset : {};
-      var perBody = Object.keys(per).length ? Object.keys(per).map(function(pid){ return "• " + escapeHtml(pid) + ": " + Number(per[pid] || 0).toLocaleString("tr-TR"); }).join("<br>") : "Toplam " + zCount.toLocaleString("tr-TR") + " vird";
-      html += DetailBlock({ icon: "📿", title: "Zikir", body: perBody });
-    }
+    var zikrDetail = renderZikrDetail(date);
+    if (zikrDetail) html += zikrDetail;
 
     if (s && s.name) {
       html += DetailBlock({ icon: "🌟", title: "Saygı", body: escapeHtml(s.name) + (s.read ? "<br>✓ Okundu" : "") });
@@ -2317,7 +2412,10 @@
           (accStr ? '<span class="loc-dot__acc">' + escapeHtml(accStr) + '</span>' : '') +
           '</div>';
       }).join("");
-      timelineHtml = '<div class="loc-timeline-compact">' + items + '</div>';
+      timelineHtml = '<details class="loc-history-details">' +
+        '<summary class="loc-history-details__summary"><span class="loc-history-details__title">Konum geçmişi</span><span class="loc-history-details__count">' + dayHistory.length.toLocaleString("tr-TR") + ' kayıt</span><span class="loc-history-details__chevron" aria-hidden="true">⌄</span></summary>' +
+        '<div class="loc-timeline-compact">' + items + '</div>' +
+        '</details>';
     }
 
     // Ayar değişiklikleri (kompakt)

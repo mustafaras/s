@@ -148,6 +148,8 @@ assert(/today-section-card--location/.test(html), "Konum Today glass kart sını
 assert(/ae-card--glass today-section-card today-section-card--location/.test(html), "Konum glass kart içinde");
 assert(/class="loc-map"/.test(html), "Konum kartı harita yüzeyi taşıyor");
 assert(/loc-timeline-compact/.test(html), "Konum kartı zaman çizelgesi taşıyor");
+assert(/class="loc-history-details"/.test(html), "Konum zaman çizelgesi expander içinde");
+assert(!/class="loc-history-details" open/.test(html), "Konum zaman çizelgesi varsayılan olarak kapalı");
 
 // 6. Terapi paylaşımı redacted
 const therapyData = JSON.parse(JSON.stringify(seededData));

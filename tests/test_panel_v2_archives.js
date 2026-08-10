@@ -94,6 +94,12 @@ assert(/Kütüphane/.test(html), "Kütüphane sub-tab var");
 assert(/İzleme/.test(html), "İzleme sub-tab var");
 assert(/Dinleme/.test(html), "Dinleme sub-tab var");
 assert(/Alıntılar/.test(html), "Alıntılar sub-tab var");
+assert(/archive-controls/.test(html), "Arşiv filtre paneli var");
+assert(/Arşivlerde ara/.test(html), "Arşiv arama alanı var");
+assert(/ae-archive-filter-status/.test(html), "Durum filtresi var");
+assert(/ae-archive-filter-kind/.test(html), "Tür filtresi var");
+assert(/Başlangıç/.test(html) && /Bitiş/.test(html), "Tarih aralığı filtreleri var");
+assert(/Liste görünümü/.test(html) && /Izgara görünümü/.test(html), "Liste ve ızgara görünümü kontrolleri var");
 
 // 2. Kütüphane listesi varsayılan
 assert(/archive-row/.test(html), "Kütüphane satırları var");
@@ -123,7 +129,46 @@ assert(/Alıntı kitap 2/.test(html), "Kitap alıntısı var");
 assert(/Replik 1/.test(html), "İzleme replik alıntısı var");
 assert(/Söz 1/.test(html), "Müzik söz alıntısı var");
 
-// 6. Boş arşiv durumu
+// 6. Arama, durum/tür/tarih filtreleri ve görünüm seçimi
+AeonV2.setArchiveSubTab("library");
+AeonV2.setArchiveSearch("Kitap 1");
+html = dom.html;
+assert(/Kitap 1/.test(html), "Arama sonucu eşleşen kitabı gösteriyor");
+assert(!/Kitap 5/.test(html), "Arama sonucu eşleşmeyen kitabı gizliyor");
+
+AeonV2.resetArchiveFilters();
+AeonV2.setArchiveFilter("status", "finished");
+html = dom.html;
+assert(/Kitap 5/.test(html), "Durum filtresi biten kitabı gösteriyor");
+assert(!/Kitap 1/.test(html), "Durum filtresi okunmakta olan kitabı gizliyor");
+
+AeonV2.setArchiveSubTab("watch");
+AeonV2.setArchiveFilter("kind", "dizi");
+html = dom.html;
+assert(/Dizi 1/.test(html), "Tür filtresi diziyi gösteriyor");
+assert(!/Dizi 2/.test(html), "Tür filtresi filmi gizliyor");
+
+AeonV2.setArchiveSubTab("library");
+AeonV2.setArchiveFilter("from", "2026-08-04");
+AeonV2.setArchiveFilter("to", "2026-08-04");
+html = dom.html;
+assert(/Kitap 1/.test(html), "Tarih aralığı güncel okuma kaydını gösteriyor");
+assert(/Günlük Okuma/.test(html), "Tarih aralığı günlük kaydı gösteriyor");
+
+AeonV2.setArchiveView("grid");
+html = dom.html;
+assert(/archive-list--grid/.test(html), "Izgara görünümü sınıfı var");
+AeonV2.setArchiveView("list");
+html = dom.html;
+assert(!/archive-list--grid/.test(html), "Liste görünümü ızgara sınıfını kaldırıyor");
+
+AeonV2.setArchiveSearch("kesinlikle-yok");
+html = dom.html;
+assert(/Sonuç bulunamadı/.test(html), "Filtre sonucu yoksa AeEmpty gösteriliyor");
+assert(/Seçili filtrelerle eşleşen arşiv kaydı yok/.test(html), "Filtre boş durumu açıklaması var");
+
+// 7. Boş arşiv durumu
+AeonV2.resetArchiveFilters();
 AeonV2.setData({ days: {}, library: { books: [] }, watchlist: { items: [] }, music: { items: [] } });
 AeonV2.setArchiveSubTab("library");
 html = dom.html;

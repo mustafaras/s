@@ -107,6 +107,15 @@ classRule("sub-tabs");
 classRule("sub-tab");
 classRule("sub-tab.is-active");
 
+// ── Archive search / filters / views ──
+classRule("archive-controls");
+classRule("archive-search");
+classRule("archive-filter-grid");
+classRule("archive-view-toggle");
+classRule("archive-list--grid");
+assert(css.includes(".archive-controls__summary"), "Arşiv filtre özeti stili var");
+assert(css.includes(".archive-list--grid .archive-row"), "Arşiv ızgara satır düzeni var");
+
 // ── Buttons ──
 classRule("ae-btn");
 classRule("ae-btn--glow");

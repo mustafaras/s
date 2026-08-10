@@ -7,7 +7,7 @@
 - Uygulayan Ajan: OpenAI Codex (GPT-5)
 - Tarih: 2026-08-10
 - Başlangıç Commit: `c3a307f`
-- Bitiş Commit (kod teslimi): `5265a27` (önceki düzeltme: `0ba4c4a`)
+- Bitiş Commit (kod teslimi): `cb3ff72` (önceki düzeltmeler: `5265a27`, `0ba4c4a`)
 
 ## Yapılanlar
 
@@ -20,16 +20,16 @@
 
 ### Özet
 
-Genel Bakış sayfası premium bir giriş başlığı, tarih seçici, metrik hero alanı, SVG trend strip ve ikincil not/konum grid’i olarak yeniden düzenlendi. Son kullanıcı düzeltmelerinde uzun konum geçmişi kapalı expander’a taşındı, zikir/Esmâ sayaçları ve tefekkürler net KPI/preset dökümüyle genişletildi, header/navigasyon ayrıldı. Konum kartına en güncel güvenilir noktaya Google Maps rota bağlantısı da eklendi; bağlantı yeni sekmede güvenli açılıyor.
+Genel Bakış sayfası premium bir giriş başlığı, tarih seçici, metrik hero alanı, SVG trend strip ve ikincil not/konum grid’i olarak yeniden düzenlendi. Son kullanıcı düzeltmelerinde uzun konum geçmişi kapalı expander’a taşındı, zikir/Esmâ sayaçları ve tefekkürler net KPI/preset dökümüyle genişletildi, header/navigasyon ayrıldı. Konum kartı artık rota üretmiyor: güncel nokta ve her anlamlı geçmiş nokta Google Maps search bağlantısıyla açılıyor; ardışık 120 m içindeki GPS örnekleri tek noktada gruplanırken gerçek yer değişiklikleri ayrı kalıyor.
 
 ### Değiştirilen Dosyalar
 
-- `panel-v2.js` — `renderToday()`, konum expander’ı, Google Maps rota URL’si ve `renderZikrDetail()` zikir/tefekkür ayrıntıları
-- `panel-v2.css` — Today giriş başlığı, header/navigasyon shell’i, yatay date picker, zikir/tefekkür, expander ve Maps link stilleri
-- `panel-v2.html` — CSS/JS cache-busting sürümü `2026081020`
+- `panel-v2.js` — `renderToday()`, konum geçmişi sıkıştırma ve Maps search noktaları, `renderZikrDetail()` zikir/tefekkür ayrıntıları
+- `panel-v2.css` — Today giriş başlığı, header/navigasyon shell’i, yatay date picker, zikir/tefekkür, expander ve geçmiş Maps link stilleri
+- `panel-v2.html` — CSS/JS cache-busting sürümü `2026081021`
 - `tests/test_panel_v2_today.js` — Today iskeleti, konum glass kartı ve kapalı expander kontratları
-- `tests/test_panel_v2_day_detail.js` — Esmâ/zikir/tefekkür ve konum expander fixture’ları
-- `tests/test_panel_v2_css.js` — header/nav, date picker, zikir/tefekkür ve expander kontratları
+- `tests/test_panel_v2_day_detail.js` — Esmâ/zikir/tefekkür, tüm günlerden konum geçmişi, anlamlı küme ve Maps noktası fixture’ları
+- `tests/test_panel_v2_css.js` — header/nav, date picker, zikir/tefekkür, expander ve rota kullanılmayan Maps URL kontratları
 
 ## Önemli Teknik Kararlar
 
@@ -37,7 +37,9 @@ Genel Bakış sayfası premium bir giriş başlığı, tarih seçici, metrik her
 |-------|---------|
 | `renderToday()` mevcut metrik, sparkline ve date-picker yardımcılarını yeniden kullandı | Önceki promptlarda doğrulanmış veri görselleştirme ve count-up davranışları korunurken sayfa hiyerarşisi yenilendi |
 | Notlar ve konum kartları `AeCard({ variant: "glass" })` ile işaretlendi | Prompt 18’in glass yüzey gereksinimi ve premium tasarım tokenlarıyla tekil görsel dil |
-| Konum helper’ına seçili `date` aktarıldı | Harita ve zaman çizelgesi gün görünümündeki tarihle tutarlı, kapsamı sınırlı veri göstermeli |
+| Konum geçmişi seçili `date` ile daraltılmadı | Kullanıcının güncel ve tüm geçmiş anlamlı yer değişikliklerini tek kartta görmesi; gün/geçmiş ayrımı kaybolmamalı |
+| Ardışık GPS örnekleri 120 m eşiğiyle kümelendi | Aynı yerdeki GPS titreşimini gizlerken gerçek yer değişikliklerini, dönüşleri ve ham örnek sayısını korur |
+| Google Maps `maps/search/?api=1&query=lat,lng` kullanıldı | Kullanıcı yalnızca ilgili noktayı açar; rota/destination akışı üretilmez |
 | Today bölüm animasyonları reduced-motion seçicisine eklendi | Staggered giriş hissini korurken erişilebilir hareket azaltma davranışı sağlandı |
 
 ## Test Sonuçları
@@ -52,12 +54,13 @@ Genel Bakış sayfası premium bir giriş başlığı, tarih seçici, metrik her
 - for f in tests/test_panel_v2_*.js; do node "$f"; done → 11/11 PASS
 - git diff --check → PASS
 - changed-files secret/token scan → PASS
-- GitHub Pages run 31367948256 → SUCCESS (validate + deploy)
+- canlı HTTP cache/asset ve `maps/search` rota-yok kontrolü → PASS
+- GitHub Pages run 31368984628 → SUCCESS (validate + deploy)
 ```
 
 ### Hatalar ve Çözümleri
 
-Hata oluşmadı. Cache-busting sürümü `2026081020` olarak yükseltildi; böylece Pages/PWA eski Panel-v2 CSS/JS dosyalarını kullanmamalı.
+Hata oluşmadı. İlk kullanıcı düzeltmesinde rota URL’si kullanılmıştı; son düzeltmede rota tamamen kaldırılıp yalnızca nokta araması ve tüm geçmiş anlamlı konum kümeleri uygulandı. Cache-busting sürümü `2026081021` olarak yükseltildi; böylece Pages/PWA eski Panel-v2 CSS/JS dosyalarını kullanmamalı.
 
 ## Sıradaki Adım
 
@@ -77,6 +80,7 @@ Hata oluşmadı. Cache-busting sürümü `2026081020` olarak yükseltildi; böyl
 - `main` branch’e doğrudan push edildi; ayrı feature branch olmadığı için ayrı merge commit’i yok.
 - Code push commit’i `edcf69d`; Pages run `31366325299` SUCCESS.
 - Kullanıcı düzeltmesi code push commit’i `0ba4c4a`; Pages run `31367317356` SUCCESS.
-- Google Maps rota code push commit’i `5265a27`; Pages run `31367948256` SUCCESS.
+- İlk Google Maps düzeltmesi code push commit’i `5265a27`; Pages run `31367948256` SUCCESS.
+- Son konum geçmişi/Maps düzeltmesi code push commit’i `cb3ff72`; Pages run `31368984628` SUCCESS.
 - Tarayıcı açılmadı; doğrulama yalnızca headless Node fixture’ları, GitHub Actions ve canlı HTTP asset kontrolüyle yapılmalı.
 - `panel.html`, `panel.js`, `panel.css`, `app.js`, `sync.js`, `index.html`, `data/` ve `seyma-data` reposuna dokunulmadı.

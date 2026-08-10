@@ -194,6 +194,16 @@ assert(js.includes("today-view__intro"), "renderToday premium giriş başlığı
 assert(js.includes("today-view__secondary-grid ae-stagger"), "renderToday staggered ikincil alanı oluşturuyor");
 assert(js.includes('variant: "glass"'), "Today kartları glass varyantını kullanıyor");
 assert(js.includes("renderLocationTimeline(date)"), "Today konum kartına seçili tarih aktarılıyor");
+// ── Mobil bottom navigation ──
+mediaRule("max-width: 460px");
+assert(css.includes(".ae-tabs {\n    --ae-mobile-tabbar-height: 72px;"), "Mobil tab bar tokenı var");
+assert(css.includes("position: fixed;"), "Mobil tab bar fixed konumda");
+assert(css.includes("bottom: 0;"), "Mobil tab bar ekranın altında");
+assert(css.includes("env(safe-area-inset-bottom)"), "Mobil safe-area alt boşluğu var");
+assert(css.includes("--ae-mobile-tabbar-height, 72px"), "Gövde mobil tab bar yüksekliğini hesaba katıyor");
+assert(css.includes("scroll-padding-bottom"), "Mobil son içerik scroll padding'i var");
+assert(css.includes("backdrop-filter: blur(24px)"), "Mobil tab bar glass yüzeyi var");
+assert(css.includes("flex-direction: column"), "Mobil tab ikon ve etiketleri dikey hizalı");
 classRule("ae-grid--hero");
 classRule("ae-metric");
 classRule("ae-metric__sparkline");

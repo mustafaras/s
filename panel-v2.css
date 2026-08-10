@@ -3112,6 +3112,65 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 #root[data-density="spacious"] .ae-app__body { padding: var(--ae-space-lg) var(--ae-space-xl) var(--ae-space-xl); }
 #root[data-density="spacious"] .ae-card { padding: var(--ae-space-xl); }
 
+/* ── Mobil bottom navigation ── */
+@media (max-width: 460px) {
+  /* Üst akıştaki nav mobilde akıştan çıkar ve ekranın altına sabitlenir. */
+  .ae-tabs {
+    --ae-mobile-tabbar-height: 72px;
+    position: fixed;
+    z-index: 90;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: var(--ae-mobile-tabbar-height);
+    margin: 0;
+    padding: var(--ae-space-xs) var(--ae-space-sm) calc(var(--ae-space-xs) + env(safe-area-inset-bottom));
+    align-items: stretch;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--ae-radius-lg) var(--ae-radius-lg) 0 0;
+    background: color-mix(in srgb, var(--ae-surface) 88%, transparent);
+    box-shadow: var(--ae-shadow-xl), var(--ae-glow-accent);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  }
+
+  .ae-app__body {
+    padding-bottom: calc(var(--ae-mobile-tabbar-height, 72px) + var(--ae-space-lg) + env(safe-area-inset-bottom));
+    scroll-padding-bottom: calc(var(--ae-mobile-tabbar-height, 72px) + var(--ae-space-lg) + env(safe-area-inset-bottom));
+  }
+
+  .ae-tab {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    flex-direction: column;
+    gap: var(--ae-space-2xs);
+    padding: var(--ae-space-xs) var(--ae-space-2xs);
+    border-radius: var(--ae-radius-md);
+  }
+
+  .ae-tab__icon {
+    display: block;
+    margin-right: 0;
+    font-size: var(--ae-scale-lg);
+    line-height: 1;
+  }
+
+  .ae-tab__label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: var(--ae-scale-xs);
+    line-height: 1.1;
+    text-overflow: ellipsis;
+  }
+}
+
 /* Kontrast desteği: düşük tonlu metin */
 .ae-status--muted { opacity: 0.85; }
 

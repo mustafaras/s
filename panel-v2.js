@@ -1341,6 +1341,94 @@
            "</div>";
   }
 
+  function renderMoodTrendChart(endDate) {
+    var dates = lastNDates(30, endDate);
+    var width = 720;
+    var height = 280;
+    var pad = { top: 22, right: 16, bottom: 42, left: 42 };
+    var plotWidth = width - pad.left - pad.right;
+    var plotHeight = height - pad.top - pad.bottom;
+    var baseline = pad.top + plotHeight;
+    var values = dates.map(function(date) {
+      if (!date) return null;
+      var mood = getMood(getDay(date) || {}).value;
+      if (mood === null) return null;
+      var n = safeNumber(mood);
+      return n === null ? null : Math.max(1, Math.min(5, n));
+    });
+    var points = values.map(function(value, index) {
+      if (value === null) return null;
+      var x = dates.length === 1 ? width / 2 : pad.left + (index / (dates.length - 1)) * plotWidth;
+      var y = pad.top + ((5 - value) / 4) * plotHeight;
+      return { x: x, y: y, value: value, date: dates[index] };
+    });
+    var segments = [];
+    var segment = [];
+    points.forEach(function(point) {
+      if (point) {
+        segment.push(point);
+      } else if (segment.length) {
+        segments.push(segment);
+        segment = [];
+      }
+    });
+    if (segment.length) segments.push(segment);
+
+    var gridLines = [];
+    for (var moodLevel = 5; moodLevel >= 1; moodLevel--) {
+      var y = pad.top + ((5 - moodLevel) / 4) * plotHeight;
+      gridLines.push('<line class="ae-mood-chart__grid-line" x1="' + pad.left +
+        '" y1="' + y.toFixed(2) + '" x2="' + (width - pad.right) +
+        '" y2="' + y.toFixed(2) + '"></line>');
+      gridLines.push('<text class="ae-mood-chart__y-label" x="' + (pad.left - 10) +
+        '" y="' + (y + 4).toFixed(2) + '" text-anchor="end">' + moodLevel + '</text>');
+    }
+
+    var xLabels = dates.map(function(date, index) {
+      if (!date || (index % 5 !== 0 && index !== dates.length - 1)) return "";
+      var x = pad.left + (index / Math.max(1, dates.length - 1)) * plotWidth;
+      return '<text class="ae-mood-chart__x-label" data-day-index="' + index +
+        '" x="' + x.toFixed(2) + '" y="' + (height - 14) +
+        '" text-anchor="middle">' + escapeHtml(formatDateLabel(date).slice(0, 5)) + '</text>';
+    }).join("");
+
+    var areaPaths = segments.map(function(pointsInSegment) {
+      return '<path class="ae-mood-chart__area" d="' +
+        sparklineAreaPath(pointsInSegment, baseline) + '"></path>';
+    }).join("");
+    var linePaths = segments.map(function(pointsInSegment) {
+      return '<path class="ae-mood-chart__line" d="' + sparklinePath(pointsInSegment) + '"></path>';
+    }).join("");
+    var dots = points.filter(Boolean).map(function(point) {
+      var label = formatDateLabel(point.date) + ": " + point.value + "/5";
+      return '<circle class="ae-mood-chart__point" cx="' + point.x.toFixed(2) +
+        '" cy="' + point.y.toFixed(2) + '" r="4" tabindex="0" focusable="true"' +
+        ' data-date="' + escapeHtml(point.date) + '" data-value="' + point.value +
+        '" aria-label="' + escapeHtml(label) + '">' +
+        '<title>' + escapeHtml(label) + '</title></circle>';
+    }).join("");
+    var empty = points.filter(Boolean).length ? "" :
+      '<text class="ae-mood-chart__empty" x="' + (pad.left + plotWidth / 2) +
+      '" y="' + (pad.top + plotHeight / 2) + '" text-anchor="middle">Mod verisi yok</text>';
+
+    return AeCard({
+      variant: "glass",
+      className: "ae-mood-chart-card",
+      children: '<section class="ae-mood-chart" aria-labelledby="ae-mood-chart-title">' +
+        '<div class="ae-mood-chart__head">' +
+        '<div><div class="ae-label" id="ae-mood-chart-title">Mod Trendi</div>' +
+        '<div class="ae-mood-chart__subtitle">Son 30 gün · 1–5 arası ruh hali</div></div>' +
+        '<span class="ae-chip ae-chip--accent">30 gün</span>' +
+        '</div>' +
+        '<div class="ae-mood-chart__plot">' +
+        '<svg class="ae-mood-chart__svg" viewBox="0 0 ' + width + ' ' + height +
+        '" preserveAspectRatio="none" role="img" aria-label="Son 30 gün mod trendi" focusable="false">' +
+        gridLines.join("") + xLabels + areaPaths + linePaths + dots + empty +
+        '</svg></div>' +
+        '</section>'
+    });
+  }
+
   function renderAnomalies(endDate) {
     var anomalies = detectAnomalies(endDate);
     if (!anomalies.length) {
@@ -1455,6 +1543,7 @@
     return '<div class="trends-view ae-slide-up">' +
            renderWindowSelector() +
            renderSummaryGrid(date, windowDays) +
+           renderMoodTrendChart(date) +
            renderAnomalies(date) +
            "</div>";
   }

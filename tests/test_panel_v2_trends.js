@@ -70,6 +70,21 @@ assert(countMatches(/class="ae-sparkline ae-sparkline--warn"/g) === 1, "Eksik g�
 assert(countMatches(/class="ae-sparkline ae-sparkline--accent"/g) === 1, "MOH sparkline rengi accent");
 assert(/Uyku ort\. son 7 gün/.test(html), "Summary sparkline erişilebilir pencere etiketi var");
 
+// 3b. Büyük 30 günlük mod trendi SVG chart
+assert(/ae-mood-chart-card/.test(html), "Büyük mod trendi kartı render edildi");
+assert(/class="ae-mood-chart__svg"/.test(html), "Mod trendi SVG'si render edildi");
+assert(/viewBox="0 0 720 280"/.test(html), "Mod trendi responsive viewBox taşıyor");
+assert(/preserveAspectRatio="none"/.test(html), "Mod trendi SVG'si responsive oran ayarı taşıyor");
+assert(countMatches(/class="ae-mood-chart__grid-line"/g) === 5, "Mod trendi 5 yatay grid çizgisi taşıyor");
+assert(countMatches(/class="ae-mood-chart__y-label"/g) === 5, "Mod trendi Y ekseni 1-5 etiketlerini taşıyor");
+assert(countMatches(/class="ae-mood-chart__x-label"/g) === 7, "Mod trendi X ekseni 5 günlük etiketleri taşıyor");
+assert(/data-day-index="0"/.test(html) && /data-day-index="5"/.test(html), "Mod trendi X etiket indeksleri doğru");
+assert(countMatches(/class="ae-mood-chart__area"/g) >= 1, "Mod trendi area fill taşıyor");
+assert(countMatches(/class="ae-mood-chart__line"/g) >= 1, "Mod trendi line path taşıyor");
+assert(countMatches(/class="ae-mood-chart__point"/g) === 7, "Mod trendi seeded mood noktalarını taşıyor");
+assert(countMatches(/<title>/g) >= 7, "Mod trendi noktalarında hover tooltip başlıkları var");
+assert(/aria-label="Son 30 gün mod trendi"/.test(html), "Mod trendi erişilebilir grafik etiketi taşıyor");
+
 // 4. Pencere değişimi
 assert(AeonV2.ui.trendWindow === 7, "Varsayılan pencere 7 gün");
 AeonV2.setTrendWindow(14);

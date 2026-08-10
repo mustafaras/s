@@ -184,6 +184,23 @@ assert(js.includes("function AeDivider"), "AeDivider JS komponenti var");
 assert(js.includes("function AeToast"), "AeToast JS komponenti var");
 assert(js.includes("function showToast"), "showToast JS fonksiyonu var");
 
+// ── Büyük mood trend chart ──
+classRule("ae-mood-chart-card");
+classRule("ae-mood-chart__svg");
+classRule("ae-mood-chart__grid-line");
+classRule("ae-mood-chart__y-label");
+classRule("ae-mood-chart__x-label");
+classRule("ae-mood-chart__area");
+classRule("ae-mood-chart__line");
+classRule("ae-mood-chart__point");
+classRule("ae-mood-chart__empty");
+assert(css.includes(".ae-mood-chart__point:hover"), "Mood trend noktası hover/focus efekti var");
+assert(css.includes("filter: drop-shadow(0 0 5px"), "Mood trend line glow efekti var");
+assert(js.includes("function renderMoodTrendChart"), "Mood trend chart render fonksiyonu var");
+assert(js.includes("lastNDates(30, endDate)"), "Mood trend chart 30 günlük veri kullanıyor");
+assert(js.includes("sparklineAreaPath"), "Mood trend chart area path kullanıyor");
+assert(js.includes("<title>"), "Mood trend chart native SVG tooltip kullanıyor");
+
 // ── SVG sparklines ──
 classRule("trend-strip__sparkline");
 classRule("ae-sparkline");

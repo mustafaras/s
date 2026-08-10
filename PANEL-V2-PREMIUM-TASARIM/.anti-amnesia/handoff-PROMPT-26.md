@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-10`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `767804d`
-- **Bitiş Commit:** `c56480f`
+- **Bitiş Commit:** `c56480f` (uygulama; teslim metadata commit'i `e46f90b`)
 
 ## Yapılanlar
 
@@ -16,7 +16,7 @@
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
 - [x] Commit yapıldı
-- [ ] Push yapıldı — handoff commit'i sonrasında yapılacak
+- [x] Push yapıldı (`e46f90b` → `main`)
 
 ### Özet
 
@@ -53,6 +53,8 @@ Mobilde yalnızca `max-width: 460px` ortamında çalışan pull-to-refresh akı�
 - git diff --check                               → PASS
 - secret-pattern scan                             → PASS
 - panel-v2 emoji scan                             → 0 forbidden codepoints
+- GitHub Actions Pages run `31406100522`       → SUCCESS
+- Pages deployment `5835323205`                → success; live HTTP 200
 ```
 
 ### Hatalar ve Çözümleri
@@ -64,7 +66,7 @@ Mobilde yalnızca `max-width: 460px` ortamında çalışan pull-to-refresh akı�
 
 - **Bir sonraki prompt:** `27 — Touch-friendly Hit Areas`
 - **Tahmini risk:** Pull touch yüzeyi ile yeni hit-area düzenlemeleri birlikte değerlendirilmelidir; 44px hedefleri göstergenin fixed katmanını kapatmamalı.
-- **Öneri:** Önce bu handoff dosyasını ve `LEDGER.md` Prompt 26 satırını okuyup, push sonrası Pages deployment kanıtını doğrula. Prompt 27 henüz başlatılmadı.
+- **Öneri:** Önce bu handoff dosyasını ve `LEDGER.md` Prompt 26 satırını oku. Prompt 27 henüz başlatılmadı.
 
 ## Context / Token Notu
 
@@ -74,5 +76,5 @@ Mobilde yalnızca `max-width: 460px` ortamında çalışan pull-to-refresh akı�
 
 ## Ek Notlar
 
-- Commit/push/deploy otomatik teslim politikası gereği handoff metadata commit'i sonrasında `main` push ve Pages workflow doğrulaması yapılmalıdır.
+- Commit/push/deploy otomatik teslim politikası uygulandı; `main` push ve Pages workflow doğrulaması tamamlandı.
 - Sonraki ajanın okuyacağı handoff: `PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/handoff-PROMPT-26.md`

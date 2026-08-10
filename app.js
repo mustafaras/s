@@ -1650,7 +1650,12 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranVerseIdx:quranRandomVerseStart()};
+// Yeniden açılışta bekleyen bir uzak senkron varsa hatırlatıcı geri gelsin.
+try{
+  var _bootSaveStatus=data&&data.syncReceipt&&data.syncReceipt.status;
+  if(_bootSaveStatus&&_bootSaveStatus!=='idle'&&_bootSaveStatus!=='accepted') ui.saveState='dirty';
+}catch(e){}
 ui.zikrNoteOpen=true; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus='';
 ui.qiblaAccuracy=null; ui.qiblaSensorSource=''; ui.qiblaSensorError=''; ui.qiblaLastAt='';
 ui.quranRefreshing=false;
@@ -3032,6 +3037,29 @@ function currentStreak(){ var c=0,date=todayStr(); if(countRec(data.days[date])<
 function daysTracked(){ var n=0; for(var d in data.days){ var r=data.days[d]; if(countRec(r)>0||(r&&r.mood)||(r&&r.note)||(r&&r.intention)||(r&&r.meals&&(r.meals.breakfast||r.meals.lunch||r.meals.dinner||r.meals.snack))) n++; } return n; }
 function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRepo); }
 function savedToday(){ return data.lastSyncDate===todayStr(); }
+// Header kaydet düğmesi: uygulama her değişikliği önce cihazda korur; bu durum
+// uzak repoya henüz kabul edilmediyse kullanıcıya sakin ama net biçimde gösterilir.
+function headerSaveState(){
+  var s=ui.saveState||'clean';
+  if(s==='saving') return {cls:'is-saving',icon:'rotate-ccw',label:'Kaydediliyor…',aria:'Veriler kaydediliyor',title:'Veriler repoya gönderiliyor',busy:true,disabled:true};
+  if(s==='error') return {cls:'is-error',icon:'triangle-alert',label:'Tekrar dene',aria:'Kaydetme başarısız oldu, tekrar dene',title:'Kaydetme tamamlanamadı · tekrar denemek için dokun'};
+  if(s==='local') return {cls:'is-local',icon:'check',label:'Cihazda',aria:'Veriler cihaza kaydedildi',title:'Cihaza kaydedildi · repoya bağlanmadı'};
+  if(s==='dirty') return {cls:'is-dirty',icon:'save',label:'Kaydet',aria:'Değişiklikleri kaydet',title:'Kaydedilmemiş değişiklikler var · kaydetmek için dokun'};
+  return {cls:'is-clean',icon:'save',label:'Kaydet',aria:'Verileri kaydet',title:'Verileri şimdi kaydet'};
+}
+function saveButtonHTML(){
+  var s=headerSaveState();
+  return '<button id="sey-header-save" type="button" class="sey-header-save '+s.cls+'" onclick="App.saveNow()" aria-label="'+esc(s.aria)+'" title="'+esc(s.title)+'" aria-live="polite" aria-busy="'+(s.busy?'true':'false')+'"'+(s.disabled?' disabled':'')+' data-save-state="'+s.cls.slice(3)+'">'
+    +icon(s.icon,17,'sey-header-save__icon')+'<span class="sey-header-save__label">'+esc(s.label)+'</span></button>';
+}
+function updateHeaderSave(){
+  var el=document.getElementById('sey-header-save'); if(!el) return;
+  var s=headerSaveState();
+  el.className='sey-header-save '+s.cls;
+  el.setAttribute('aria-label',s.aria); el.setAttribute('title',s.title); el.setAttribute('aria-live','polite'); el.setAttribute('aria-busy',s.busy?'true':'false'); el.setAttribute('data-save-state',s.cls.slice(3));
+  el.disabled=!!s.disabled;
+  el.innerHTML=icon(s.icon,17,'sey-header-save__icon')+'<span class="sey-header-save__label">'+esc(s.label)+'</span>';
+}
 // Estetik "Gizle" pill'i; gizlenen kart Bugün'de kaybolur, Ayarlar > "Gizlenen kartlar"dan geri gelir.
 function hidePill(which){
   return '<button onclick="event.stopPropagation();App.hideBugunCard(\''+which+'\')" aria-label="Gizle" title="Gizle" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(150,110,120,0.12);color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.2px;padding:6px 12px;border-radius:999px;line-height:1;">Gizle</button>';
@@ -3099,8 +3127,11 @@ function editBanner(){
 window.SeyOnSyncState=function(receipt){
   if(!data) return;
   data.syncReceipt=normalizeSyncReceipt(receipt);
+  var st=data.syncReceipt.status;
+  if((st==='saving'||st==='queued'||st==='retrying')&&(ui.saveState==='dirty'||ui.saveState==='saving'||ui.saveState==='error')) ui.saveState=ui.saveActionPending?'saving':'dirty';
+  else if((st==='error'||st==='offline'||st==='permission'||st==='conflict'||st==='anti_clobber')&&(ui.saveState==='dirty'||ui.saveState==='saving'||ui.saveState==='error')) ui.saveState='error';
   try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
-  updateSaveBanner();
+  updateSaveBanner(); updateHeaderSave();
 };
 window.SeyOnSynced=function(receipt){
   if(!data) return;
@@ -3109,10 +3140,17 @@ window.SeyOnSynced=function(receipt){
   data.syncReceipt.status='accepted'; data.syncReceipt.lastErrorCode=null;
   if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; });
   if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; });
-  ui.keyEdit=false; try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
+  ui.keyEdit=false;
+  if(ui.saveActionPending){ ui.saveState='clean'; ui.saveActionPending=false; }
+  else if(ui.saveState==='saving') ui.saveState='dirty';
+  try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
+  updateHeaderSave();
   updateSaveBanner(); if(ui.tab==='ayarlar') render();
 };
 function save(touchSource,eventSpec){
+  // save(false) canlı oturum/boot metadata'sı içindir; eventSpec veya normal
+  // save() ise kullanıcı değişikliğidir ve header hatırlatıcısını uyandırır.
+  if(touchSource!==false||eventSpec) { ui.saveState='dirty'; updateHeaderSave(); }
   try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){}
   try{
     var _now=new Date().toISOString();
@@ -4757,7 +4795,28 @@ App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.g
 App.setHealthGistId=function(el){ if(!data.settings) data.settings={}; data.settings.healthGistId=normalizeToken(el.value||''); debounceSave('healthGistId',function(){ save(); },400); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
-App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); save(); if(!syncConfigured()){ toast('Önce Ayarlar\'dan repoya bağlan'); App.go('ayarlar'); return; } if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } };
+App.saveNow=function(){
+  ui.saveActionPending=true;
+  save();
+  if(!syncConfigured()){
+    ui.saveActionPending=false; ui.saveState='local'; updateHeaderSave();
+    toast('Cihazına kaydedildi · repoya bağlanırsan her yerden korunur',2600);
+    return;
+  }
+  if(window.SeySync&&typeof window.SeySync.pushNow==='function'){
+    ui.saveState='saving'; updateHeaderSave();
+    try{
+      var pending=window.SeySync.pushNow();
+      if(pending&&typeof pending.catch==='function') pending.catch(function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } });
+    }catch(e){ ui.saveActionPending=false; ui.saveState='error'; updateHeaderSave(); }
+    toast('Kaydediliyor…');
+  } else {
+    ui.saveActionPending=false;
+    ui.saveState='error'; updateHeaderSave();
+    toast('Senkron hazır değil · verin cihazında korundu',2600);
+  }
+};
+App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); App.saveNow(); };
 App.enableKeyEdit=function(){ ui.keyEdit=true; render(); };
 App.cancelKeyEdit=function(){ ui.keyEdit=false; render(); };
 
@@ -11171,7 +11230,7 @@ function appHeaderHTML(){
   var h='<header id="sey-appheader" class="sey-appheader" style="--hdr-accent:'+m.accent+';--hdr-accent2:'+m.accent2+';--hdr-ink:'+m.ink+';">';
   h+='<div class="sey-header-top">';
   h+='<button class="sey-header-brand" onclick="App.go(\'bugun\')" aria-label="Bugüne git"><span class="sey-wordmark">Şeyma</span><span class="sey-wordmark-flam">🦩</span></button>';
-  h+='<div class="sey-header-tools"><button class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
+  h+='<div class="sey-header-tools">'+saveButtonHTML()+'<button class="sey-header-mini" onclick="App.toggleTheme()" aria-label="Tema" title="Tema">'+icon(dark?'sun':'moon',16)+'</button></div>';
   h+='</div>';
   h+='<div class="sey-header-main">';
   h+='<span class="sey-header-icon">'+icon(m.icon,21)+'</span>';

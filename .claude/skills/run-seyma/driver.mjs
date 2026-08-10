@@ -243,6 +243,38 @@ if (sb2.App && typeof sb2.App.go === 'function') {
   assert('theme toggle re-rendered (dark)', appHTML.length > 500);
 }
 
+// Header kaydet düğmesi: gerçek kullanıcı değişikliğinde kırmızı hatırlatıcı,
+// bağlantısız cihazda güvenli yerel-kayıt teyidi ve tüm ana sekmelerde süreklilik.
+if (sb2.App && typeof sb2.App.setMood === 'function' && typeof sb2.App.go === 'function') {
+  sb2.App.setMood('iyi');
+  appHTML = '';
+  sb2.App.go('rapor');
+  assert('header save button exists on rapor', /id="sey-header-save"/.test(appHTML));
+  assert('header save button marks local changes as dirty', /class="sey-header-save is-dirty"/.test(appHTML));
+  sb2.App.saveNow();
+  appHTML = '';
+  sb2.App.go('ayarlar');
+  assert('header save button confirms device save when repo is not configured', /class="sey-header-save is-local"/.test(appHTML));
+
+  // Otomatik uzak kabul, kullanıcı header'a dokunmadıysa hatırlatıcıyı silmez;
+  // açık header eylemi kabul edilince temizler.
+  sb2.App.setMood('mükemmel');
+  sb2.SeyOnSyncState({ status: 'saving' });
+  sb2.SeyOnSynced({ status: 'accepted' });
+  appHTML = '';
+  sb2.App.go('bugun');
+  assert('automatic sync does not hide manual save reminder', /class="sey-header-save is-dirty"/.test(appHTML));
+
+  sb2.App.setGhToken({ value: 'fixture-token' });
+  sb2.App.setGhRepo({ value: 'fixture/seyma-data' });
+  sb2.SeySync = { schedule() {}, pushNow() { return Promise.resolve(null); } };
+  sb2.App.saveNow();
+  sb2.SeyOnSynced({ status: 'accepted' });
+  appHTML = '';
+  sb2.App.go('bugun');
+  assert('manual header save clears reminder after accepted sync', /class="sey-header-save is-clean"/.test(appHTML));
+}
+
 if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {
   appHTML = '';
   sb2.App.go(dumpTab);

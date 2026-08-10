@@ -126,6 +126,11 @@ assert(/Gün Detayı|Bugün/.test(html), "Gün Detayı sekmesi başlığı var")
 assert(/Ruh hali|Mod|Beslenme|İbadet|Hareket|İçerik|Terapi/.test(html), "Gün detayı bölüm başlıkları var");
 assert((html.match(/class="ae-divider ae-divider--label/g) || []).length >= 5, "Gün detayında divider bölücüleri var");
 assert(/Ruh hali &amp; Terapi/.test(html), "Gün detayı divider etiketi var");
+assert(/class="day-detail-groups ae-stagger"/.test(html), "Gün detay ana bölümleri stagger kabuğunda");
+assert((html.match(/class="day-detail-accordion ae-slide-up"/g) || []).length >= 8, "Ana bölümler native akordeon olarak render ediliyor");
+assert((html.match(/class="day-detail-accordion ae-slide-up" open/g) || []).length >= 8, "Akordeon bölümleri varsayılan olarak açık");
+assert((html.match(/class="day-detail-accordion__chevron"/g) || []).length >= 8, "Akordeon aç/kapat göstergeleri var");
+assert(/class="detail-section__chips"/.test(html), "Bölüm chip'leri bölüm içeriğinin üstünde render ediliyor");
 const requiredSectionOrder = ["Zamanlar", "Ruh Hali", "Alışkanlıklar", "Beslenme", "İbadet", "Hareket", "Konum", "Döngü"];
 const renderedSectionLabels = Array.from(html.matchAll(/class="ae-divider ae-divider--label"[^>]*>[\s\S]*?<span class="ae-divider__label">([^<]+)<\/span>/g)).map(function(match) {
   return match[1];

@@ -260,11 +260,12 @@
   function AeDivider(opts) {
     opts = opts || {};
     var label = safeText(opts.label || "", 80);
+    var tag = opts.inline ? "span" : "div";
     var classes = classNames(["ae-divider", label ? "ae-divider--label" : "", opts.className]);
     var aria = label ? ' aria-label="' + escapeHtml(label) + '"' : "";
-    return '<div class="' + escapeHtml(classes) + '" role="separator"' + aria + '>' +
+    return '<' + tag + ' class="' + escapeHtml(classes) + '" role="separator"' + aria + '>' +
            (label ? '<span class="ae-divider__label">' + escapeHtml(label) + "</span>" : "") +
-           "</div>";
+           "</" + tag + ">";
   }
 
   function AeToast(opts) {
@@ -2736,7 +2737,14 @@
     var content = parts.filter(function(part) {
       return part !== null && part !== undefined && String(part).trim();
     }).join("");
-    return content ? AeDivider({ label: label }) + content : "";
+    if (!content) return "";
+    return '<details class="day-detail-accordion ae-slide-up" open>' +
+           '<summary class="day-detail-accordion__summary" aria-label="' + escapeHtml(label + " bölümünü aç veya kapat") + '">' +
+           AeDivider({ label: label, inline: true }) +
+           '<span class="day-detail-accordion__chevron" aria-hidden="true">⌄</span>' +
+           '</summary>' +
+           '<div class="day-detail-accordion__body">' + content + '</div>' +
+           '</details>';
   }
 
   function renderDay() {
@@ -2759,18 +2767,21 @@
         message: "Bu tarihe ait kayıt yok. Takvimden başka bir gün seçebilirsin."
       })
     }) : "";
+    var groups = day ? '<div class="day-detail-groups ae-stagger">' +
+           renderDayGroup("Zamanlar", [renderDayTimestamps(date)]) +
+           renderDayGroup("Ruh Hali", [renderMoodTherapy(date), renderEnergyStress(date)]) +
+           renderDayGroup("Alışkanlıklar", [renderHabits(date), renderCraving(date), renderWindDown(date), renderMagnesium(date)]) +
+           renderDayGroup("Beslenme", [renderNutrition(date), renderNutri(date)]) +
+           renderDayGroup("İbadet", [renderPrayer(date)]) +
+           renderDayGroup("Hareket", [renderMovement(date)]) +
+           renderDayGroup("Konum", [renderDayLocation(date)]) +
+           renderDayGroup("Döngü", [renderCycle(date)]) +
+           renderDayGroup("İçerik", [renderContent(date)]) +
+           '</div>' : "";
     return '<div class="day-view ae-slide-up">' +
            renderDayDatePicker(date) +
            renderDayHeatmap(date) +
-           (day ? renderDayGroup("Zamanlar", [renderDayTimestamps(date)]) : "") +
-           (day ? renderDayGroup("Ruh Hali", [renderMoodTherapy(date), renderEnergyStress(date)]) : "") +
-           (day ? renderDayGroup("Alışkanlıklar", [renderHabits(date), renderCraving(date), renderWindDown(date), renderMagnesium(date)]) : "") +
-           (day ? renderDayGroup("Beslenme", [renderNutrition(date), renderNutri(date)]) : "") +
-           (day ? renderDayGroup("İbadet", [renderPrayer(date)]) : "") +
-           (day ? renderDayGroup("Hareket", [renderMovement(date)]) : "") +
-           (day ? renderDayGroup("Konum", [renderDayLocation(date)]) : "") +
-           (day ? renderDayGroup("Döngü", [renderCycle(date)]) : "") +
-           (day ? renderDayGroup("İçerik", [renderContent(date)]) : "") +
+           groups +
            emptyDay +
            "</div>";
   }

@@ -40,7 +40,12 @@
     sourceUpdatedAt: null,
     etag: null,
     lastSyncedAt: null,
-    notModifiedCount: 0
+    notModifiedCount: 0,
+    apiLimitRemaining: null,
+    apiLimitTotal: null,
+    apiLimitResetAt: null,
+    tokenExpiresAt: null,
+    tokenIssuedAt: null
   };
 
   var appData = null;
@@ -2585,7 +2590,7 @@
     if (!session) return "";
 
     return AeCard({
-      variant: "summary",
+      variant: "glass",
       children: '<div class="sess-section">' +
         '<div class="ae-label">📱 Uygulama Oturumu</div>' +
         '<div class="sess-grid">' +
@@ -2881,9 +2886,78 @@
     return isNaN(d.getTime()) ? String(ts) : d.toLocaleString("tr-TR");
   }
 
+  function firstStatusNumber(source, keys) {
+    source = source || {};
+    for (var i = 0; i < keys.length; i++) {
+      var raw = source[keys[i]];
+      var value = raw === null || raw === undefined || raw === "" ? null : safeNumber(raw);
+      if (value !== null) return value;
+    }
+    return null;
+  }
+
+  function renderSystemProgress(opts) {
+    opts = opts || {};
+    var pct = opts.value === null || opts.value === undefined || opts.value === "" ? null : safeNumber(opts.value);
+    var known = pct !== null;
+    pct = known ? Math.max(0, Math.min(100, pct)) : 0;
+    var tone = ["accent", "ok", "warn", "drop", "info", "muted"].indexOf(opts.tone) !== -1 ? opts.tone : "accent";
+    var label = safeText(opts.label || "İlerleme", 60);
+    var valueLabel = known ? Math.round(pct) + "%" : "Bilinmiyor";
+    var visualPct = known ? pct : 34;
+    var aria = known
+      ? ' role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct) + '" aria-valuetext="' + escapeHtml(valueLabel) + '"'
+      : ' role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Bilgi yok"';
+    return '<div class="system-progress system-progress--' + tone + (known ? "" : " system-progress--unknown") + '">' +
+           '<div class="system-progress__head"><span class="system-progress__label">' + escapeHtml(label) +
+           '</span><strong class="system-progress__value">' + escapeHtml(valueLabel) + "</strong></div>" +
+           '<div class="system-progress__track"' + aria + '><span class="system-progress__fill" style="width:' + visualPct.toFixed(2) + '%"></span></div>' +
+           (opts.detail ? '<div class="system-progress__detail">' + escapeHtml(safeText(opts.detail, 140)) + "</div>" : "") +
+           "</div>";
+  }
+
+  function tokenLifetimeInfo(status) {
+    status = status || {};
+    var expiresAt = status.tokenExpiresAt || status.tokenExpiry || status.tokenExpires;
+    var expiresMs = expiresAt ? new Date(expiresAt).getTime() : NaN;
+    if (!isFinite(expiresMs)) {
+      return {
+        value: null,
+        tone: "muted",
+        detail: ui.panelToken ? "GitHub token süresi panel tarafından okunamıyor." : "Token ayarlanmadı."
+      };
+    }
+    var issuedAt = status.tokenIssuedAt || status.tokenCreatedAt;
+    var issuedMs = issuedAt ? new Date(issuedAt).getTime() : NaN;
+    var now = Date.now();
+    var pct = isFinite(issuedMs) && expiresMs > issuedMs
+      ? ((expiresMs - now) / (expiresMs - issuedMs)) * 100
+      : expiresMs > now ? 100 : 0;
+    var daysLeft = Math.ceil((expiresMs - now) / 86400000);
+    return {
+      value: pct,
+      tone: daysLeft <= 7 ? "warn" : "ok",
+      detail: daysLeft > 0 ? daysLeft + " gün kaldı · Son: " + formatTs(new Date(expiresMs).toISOString()) : "Token süresi dolmuş görünüyor."
+    };
+  }
+
+  function renderSystemLiveMetric(label, value, tone) {
+    return '<div class="system-live-metric system-live-metric--' + (tone || "info") + '">' +
+           '<span class="system-live-metric__label">' + escapeHtml(label) + "</span>" +
+           '<strong class="system-live-metric__value">' + escapeHtml(String(value)) + "</strong></div>";
+  }
+
   function renderStatusDetail() {
     var s = syncStatus || {};
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
+    var apiRemaining = firstStatusNumber(s, ["apiLimitRemaining", "rateLimitRemaining", "limitRemaining"]);
+    var apiTotal = firstStatusNumber(s, ["apiLimitTotal", "rateLimitLimit", "limitTotal"]);
+    var apiPct = apiRemaining !== null && apiTotal > 0 ? (apiRemaining / apiTotal) * 100 : null;
+    var apiDetail = apiRemaining !== null
+      ? apiRemaining + (apiTotal !== null ? " / " + apiTotal + " istek" : " istek kaldı")
+      : "GitHub yanıtından limit bilgisi bekleniyor.";
+    if (s.apiLimitResetAt) apiDetail += " · Sıfırlanma: " + formatTs(s.apiLimitResetAt);
+    var tokenInfo = tokenLifetimeInfo(s);
     var rows = [
       { label: "Durum", value: s.status || "idle" },
       { label: "Son senkron", value: s.lastSyncedAt ? formatTs(s.lastSyncedAt) : "—" },
@@ -2898,15 +2972,28 @@
       return '<div class="status-row"><span class="status-row__label">' + escapeHtml(r.label) +
              '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
     }).join("");
+    var liveMetrics = '<div class="system-live-metrics ae-stagger" aria-label="Canlı sistem metrikleri">' +
+      renderSystemLiveMetric("Durum", s.status || "idle", s.status === "error" ? "drop" : "ok") +
+      renderSystemLiveMetric("p50 gecikme", s.p50LatencyMs ? s.p50LatencyMs + " ms" : "—", "info") +
+      renderSystemLiveMetric("p95 gecikme", s.p95LatencyMs ? s.p95LatencyMs + " ms" : "—", "info") +
+      renderSystemLiveMetric("304 yanıt", s.notModifiedCount !== undefined ? s.notModifiedCount : "—", "accent") +
+      "</div>";
+    var progress = '<div class="system-progress-list" aria-label="Sistem kaynak ilerlemeleri">' +
+      renderSystemProgress({ label: "API limit kalan", value: apiPct, tone: apiPct !== null && apiPct >= 25 ? "ok" : "warn", detail: apiDetail }) +
+      renderSystemProgress({ label: "Token ömrü", value: tokenInfo.value, tone: tokenInfo.tone, detail: tokenInfo.detail }) +
+      "</div>";
     var errorBox = s.lastErrorCode
-      ? '<div class="ae-card ae-card--solid ae-card--warn status-error">' +
+      ? AeCard({ variant: "glass", className: "status-error", children:
         '<div class="status-error__title">Son hata</div>' +
         '<div class="status-error__code">' + escapeHtml(String(s.lastErrorCode)) + "</div>" +
-        '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>' +
-        "</div>"
+        '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>'
+      })
       : "";
-    return '<div class="status-detail ae-slide-up">' +
-           AeCard({ className: "status-card", children: body }) +
+    return '<div class="status-detail ae-slide-up ae-stagger">' +
+           AeCard({ variant: "glass", className: "status-card", children:
+             '<div class="system-card__head"><div><div class="ae-label">Canlı sistem durumu</div><h2 class="system-card__title">Senkronizasyon ve kaynaklar</h2></div>' +
+             AeStatusBadge({ status: s.status || "idle" }) + "</div>" + liveMetrics + progress +
+             '<div class="status-rows">' + body + "</div>" }) +
            renderAppSessionInfo() +
            errorBox +
            "</div>";
@@ -2918,21 +3005,23 @@
     var redacted = Array.isArray(coverage.redacted) ? coverage.redacted.length : 0;
     var summary = Array.isArray(coverage.summary) ? coverage.summary.length : 0;
     var full = Array.isArray(coverage.full) ? coverage.full.length : 0;
-    var rows = [
-      { label: "Coverage durumu", value: (coverage.error ? "Hata" : "Hazır") },
-      { label: "Redacted alan", value: redacted },
-      { label: "Summary alan", value: summary },
-      { label: "Full alan", value: full },
-      { label: "Provenance", value: "observer-snapshot" },
-      { label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor" },
-      { label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—" }
+    var events = [
+      { icon: coverage.error ? "!" : "✓", label: "Coverage durumu", value: coverage.error ? "Hata" : "Hazır", meta: "Manifest kapsamı ve redaksiyon sözleşmesi" },
+      { icon: "◈", label: "Redacted alan", value: redacted, meta: "Ham hassas alanlar observer görünümünden çıkarıldı" },
+      { icon: "◌", label: "Summary alan", value: summary, meta: "Özetlenmiş alanlar güvenli projeksiyona açık" },
+      { icon: "◇", label: "Full alan", value: full, meta: "Tam görünürlükteki izinli alanlar" },
+      { icon: "↗", label: "Provenance", value: "observer-snapshot", meta: "Veri kaynağı ve redaksiyon izi" },
+      { icon: "↻", label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor", meta: syncStatus.lastSyncedAt ? "Son kontrol: " + formatTs(syncStatus.lastSyncedAt) : "Henüz canlı kontrol yapılmadı" },
+      { icon: "⌁", label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—", meta: "Kapsam dışı yol denetimi" }
     ];
-    var body = rows.map(function(r) {
-      return '<div class="status-row"><span class="status-row__label">' + escapeHtml(r.label) +
-             '</span><span class="status-row__value">' + escapeHtml(String(r.value)) + "</span></div>";
-    }).join("");
-    return '<div class="audit-detail ae-slide-up">' +
-           AeCard({ className: "audit-card", children: body }) +
+    var timeline = '<ol class="audit-timeline" aria-label="Audit zaman çizelgesi">' + events.map(function(event) {
+      return '<li class="audit-timeline__item"><span class="audit-timeline__marker" aria-hidden="true">' + escapeHtml(event.icon) + "</span>" +
+             '<div class="audit-timeline__body"><div class="audit-timeline__head"><strong>' + escapeHtml(event.label) +
+             '</strong><span class="audit-timeline__value">' + escapeHtml(String(event.value)) + "</span></div>" +
+             '<div class="audit-timeline__meta">' + escapeHtml(event.meta) + "</div></div></li>";
+    }).join("") + "</ol>";
+    return '<div class="audit-detail ae-slide-up ae-stagger">' +
+           AeCard({ variant: "glass", className: "audit-card", children: '<div class="system-card__head"><div><div class="ae-label">Güvenlik ve veri akışı</div><h2 class="system-card__title">Coverage zaman çizelgesi</h2></div><span class="audit-card__badge">LIVE</span></div>' + timeline }) +
            '<div class="audit-hint">Yalnızca izin verilen alanlar observer\'a yansıtılır. Detaylar panelCoverageManifest.js\'te tanımlı.</div>' +
            "</div>";
   }
@@ -2956,13 +3045,18 @@
     qa.forEach(function(q) { messages = messages.concat(makeQA(q)); });
     messages.sort(function(a, b) { return String(b.ts || "").localeCompare(String(a.ts || "")); });
 
+    var unreadCount = messages.filter(function(m) { return m.kind === "aeon_answer" && !m.readAt; }).length;
+    var summary = '<div class="message-summary"><span class="ae-chip">' + messages.length + " mesaj</span>" +
+                  (unreadCount ? '<span class="message-summary__unread">' + unreadCount + " okunmamış</span>" : '<span class="message-summary__quiet">Tüm mesajlar okundu</span>') +
+                  "</div>";
     var list = messages.length
       ? messages.map(function(m) {
           var status = "";
           if (m.kind === "aeon_answer" && !m.readAt) status = " · okunmamış";
           else if (m.readAt) status = " · okundu";
           else if (m.synced) status = " · sync";
-          return '<div class="message-bubble message-bubble--' + m.direction + '">' +
+          var unreadClass = m.kind === "aeon_answer" && !m.readAt ? " message-bubble--unread" : "";
+          return '<div class="message-bubble message-bubble--' + m.direction + unreadClass + '">' +
                  '<div class="message-bubble__meta">' + escapeHtml(m.from) + " · " + escapeHtml(formatTs(m.ts)) + " · " + escapeHtml(m.kind || "mesaj") + status + "</div>" +
                  (m.title ? '<div class="message-bubble__title">' + escapeHtml(safeText(m.title, 120)) + "</div>" : "") +
                  '<div class="message-bubble__text">' + nl2br(escapeHtml(safeText(m.text, 1200))) + "</div>" +
@@ -2974,14 +3068,14 @@
     var saveBtn = ui.panelToken
       ? AeButton({ label: "↻ Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
       : "";
-    return '<div class="messages-detail ae-slide-up">' +
-           AeCard({ className: "messages-card", children: list }) +
-           '<div class="ae-card ae-card--solid ae-card--summary token-card">' +
-           '<div class="ae-label">GitHub token</div>' +
-           '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
-           '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez. Değiştirip dışarıya tıkladığında kaydedilir.</div>' +
-           saveBtn +
-           "</div>" +
+    return '<div class="messages-detail ae-slide-up ae-stagger">' +
+           AeCard({ variant: "glass", className: "messages-card", children: summary + list }) +
+           AeCard({ variant: "glass", className: "token-card", children:
+             '<div class="ae-label">GitHub token</div>' +
+             '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
+             '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez. Değiştirip dışarıya tıkladığında kaydedilir.</div>' +
+             saveBtn
+           }) +
            "</div>";
   }
 
@@ -3000,20 +3094,10 @@
       ? AeButton({ label: "☀️ Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
       : AeButton({ label: "🌙 Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
 
-    return '<div class="settings-detail ae-slide-up">' +
-           AeCard({
-             className: "settings-card",
-             children: '<div class="settings-group">' +
-                       '<div class="ae-label">Yoğunluk</div>' +
-                       '<div class="density-select">' + densityButtons + "</div>" +
-                       "</div>" +
-                       '<div class="settings-group">' +
-                       '<div class="ae-label">Tema</div>' + themeBtn + "</div>" +
-                       '<div class="settings-group">' +
-                       '<div class="ae-label">Oturum</div>' +
-                       AeButton({ label: "Oturumu sonlandır", variant: "drop", onclick: "AeonV2.logout()" }) +
-                       "</div>"
-           }) +
+    return '<div class="settings-detail ae-slide-up ae-stagger">' +
+           AeCard({ variant: "glass", className: "settings-card settings-card--density", children: '<div class="settings-group"><div class="ae-label">Yoğunluk</div><div class="settings-card__title">Görünüm yoğunluğu</div><div class="density-select">' + densityButtons + "</div></div>" }) +
+           AeCard({ variant: "glass", className: "settings-card settings-card--theme", children: '<div class="settings-group"><div class="ae-label">Tema</div><div class="settings-card__title">Renk atmosferi</div>' + themeBtn + "</div>" }) +
+           AeCard({ variant: "glass", className: "settings-card settings-card--session", children: '<div class="settings-group"><div class="ae-label">Oturum</div><div class="settings-card__title">Güvenli çıkış</div>' + AeButton({ label: "Oturumu sonlandır", variant: "drop", onclick: "AeonV2.logout()" }) + "</div>" }) +
            "</div>";
   }
 
@@ -3032,7 +3116,7 @@
       settings: renderSettings
     };
     var renderFn = contentBySubTab[subTab] || renderStatusDetail;
-    return '<div class="system-view ae-slide-up">' +
+    return '<div class="system-view ae-slide-up ae-stagger">' +
            SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
            '<div class="system-panel">' + renderFn() + "</div></div>";
   }
@@ -3674,6 +3758,15 @@
     if (syncStatus.etag) H["If-None-Match"] = syncStatus.etag;
     return root.fetch(api, { headers: H, cache: "no-store" }).then(function(r) {
       var etag = responseHeader(r, "ETag");
+      var rateRemainingHeader = responseHeader(r, "X-RateLimit-Remaining");
+      var rateLimitHeader = responseHeader(r, "X-RateLimit-Limit");
+      var rateResetHeader = responseHeader(r, "X-RateLimit-Reset");
+      var rateRemaining = rateRemainingHeader === "" ? null : safeNumber(rateRemainingHeader);
+      var rateLimit = rateLimitHeader === "" ? null : safeNumber(rateLimitHeader);
+      var rateReset = rateResetHeader === "" ? null : safeNumber(rateResetHeader);
+      if (rateRemaining !== null) syncStatus.apiLimitRemaining = rateRemaining;
+      if (rateLimit !== null) syncStatus.apiLimitTotal = rateLimit;
+      if (rateReset !== null) syncStatus.apiLimitResetAt = new Date(rateReset * 1000).toISOString();
       if (r.status === 401 || r.status === 403) throw new Error("Token gecersiz veya yetkisiz.");
       if (r.status === 404) {
         var e = new Error("data/latest.json bulunamadi.");

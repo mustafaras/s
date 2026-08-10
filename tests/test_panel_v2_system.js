@@ -23,7 +23,7 @@ const seededData = {
   ],
   aeon: {
     qa: [
-      { question: "İyiyim, teşekkürler.", ts: "2026-08-04T08:05:00Z" }
+      { question: "İyiyim, teşekkürler.", ts: "2026-08-04T08:05:00Z", answer: "Bugün daha da iyi olacaksın.", answeredAt: "2026-08-04T08:06:00Z" }
     ]
   }
 };
@@ -44,6 +44,23 @@ assert(/Durum/.test(html), "Durum başlığı/bağlamı var");
 assert(/Bekliyor|idle/.test(html), "Sync durumu metni var");
 assert(/Gün sayısı/.test(html), "Gün sayısı satırı var");
 assert(/2/.test(html), "İki gün sayısı görünür");
+assert(/system-progress/.test(html), "Durum kartlarında progress bar var");
+assert(/API limit kalan/.test(html), "API limit progress metriği var");
+assert(/Token ömrü/.test(html), "Token ömrü progress metriği var");
+assert(/role=\"progressbar\"/.test(html), "Progress bar erişilebilir role taşıyor");
+assert(/system-live-metrics/.test(html), "Canlı sistem metrikleri var");
+assert(/ae-card--glass/.test(html), "Durum kartı glass varyantında");
+
+AeonV2.updateStatus({
+  status: "accepted",
+  apiLimitRemaining: 450,
+  apiLimitTotal: 500,
+  tokenIssuedAt: "2026-08-01T00:00:00Z",
+  tokenExpiresAt: "2026-09-01T00:00:00Z"
+});
+AeonV2.setSystemSubTab("status");
+html = dom.html;
+assert(/90%/.test(html), "API limit progress yüzdesi hesaplanıyor");
 
 // 3. Audit detayları
 AeonV2.setSystemSubTab("audit");
@@ -53,6 +70,9 @@ assert(/Redacted alan/.test(html), "Redacted alan sayısı var");
 assert(/Summary alan/.test(html), "Summary alan sayısı var");
 assert(/Full alan/.test(html), "Full alan sayısı var");
 assert(/Polling/.test(html), "Polling durumu var");
+assert(/audit-timeline/.test(html), "Audit timeline görünümü var");
+assert(/Coverage zaman çizelgesi/.test(html), "Audit timeline başlığı var");
+assert(/audit-timeline__marker/.test(html), "Audit timeline marker'ları var");
 
 // 4. Mesajlaşma UI
 AeonV2.setSystemSubTab("messages");
@@ -61,6 +81,9 @@ assert(/Observer/.test(html), "Inbox gönderen adı var");
 assert(/Bugün nasılsın\?/.test(html), "Inbox mesaj metni var");
 assert(/Sen/.test(html), "Outbox gönderen etiketi var");
 assert(/İyiyim, teşekkürler\./.test(html), "Outbox mesaj metni var");
+assert(/message-summary/.test(html), "Mesaj özeti var");
+assert(/message-bubble--unread/.test(html), "Okunmamış bildirim animasyon sınıfı var");
+assert(/ae-card--glass/.test(html), "Mesaj kartları glass varyantında");
 
 // 5. Token alanı var ve açık token görünmüyor
 assert(/GitHub token/.test(html), "Token kartı var");
@@ -76,6 +99,8 @@ assert(/Oturum/.test(html), "Oturum ayarı var");
 assert(/Sıkı/.test(html), "Sıkı yoğunluk butonu var");
 assert(/Rahat/.test(html), "Rahat yoğunluk butonu var");
 assert(/Geniş/.test(html), "Geniş yoğunluk butonu var");
+assert((html.match(/ae-card--glass/g) || []).length >= 3, "Ayar kartları glass varyantında");
+assert(/settings-detail[^"]*ae-stagger/.test(html), "Ayarlar stagger giriş sınıfı var");
 
 // 7. Density değişimi
 AeonV2.setDensity("compact");

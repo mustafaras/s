@@ -116,6 +116,20 @@ classRule("archive-list--grid");
 assert(css.includes(".archive-controls__summary"), "Arşiv filtre özeti stili var");
 assert(css.includes(".archive-list--grid .archive-row"), "Arşiv ızgara satır düzeni var");
 
+// ── System visual refresh ──
+classRule("system-progress");
+classRule("system-progress__track");
+classRule("system-live-metrics");
+classRule("status-error");
+classRule("audit-timeline");
+classRule("audit-timeline__marker");
+classRule("message-summary");
+classRule("message-bubble--unread");
+classRule("settings-card");
+assert(css.includes("@keyframes aeNotificationIn"), "Bildirim giriş animasyonu var");
+assert(css.includes("@keyframes aeNotificationPulse"), "Okunmamış bildirim pulse animasyonu var");
+assert(css.includes(".system-progress--unknown"), "Bilinmeyen progress durumu var");
+
 // ── Buttons ──
 classRule("ae-btn");
 classRule("ae-btn--glow");

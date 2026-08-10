@@ -57,7 +57,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 17 | Isı Haritası İyileştirme | ✅ TAMAMLANDI | `47a9cbb` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31364757144` SUCCESS | 30 günlük heatmap tooltip, Pzt–Paz başlıkları, boş gün noktalı desen, bugün/seçili gün vurgusu, klavye erişimi, reduced-motion ve küçük ekranda 5 sütun tamamlandı; cache bump `2026081017` |
 | 18 | Genel Bakış Sayfası Yenileme | ✅ TAMAMLANDI | `cb3ff72` (önceki düzeltmeler: `5265a27`, `0ba4c4a`) | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_today.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31368984628` SUCCESS | Kullanıcı düzeltmesi: rota kaldırıldı; güncel ve tüm geçmiş konumlar 120 m ardışık örnek kümeleriyle anlamlı noktalara indirgeniyor, her geçmiş nokta için Google Maps search bağlantısı ve ham örnek sayısı gösteriliyor; cache bump `2026081021` |
 | 19 | Trendler Sayfası Yenileme | ✅ TAMAMLANDI | `9e526d9` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_trends.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31378279269` SUCCESS | `renderTrends()` premium giriş ve semantik bölüm hiyerarşisiyle yeniden düzenlendi; 7/14/30 pill seçici, AeMetric özetleri, SVG mood/area chart grupları, gradient anomali kartları, stagger ve erişilebilir grup etiketleri tamamlandı; cache bump `2026081022` |
-| 20 | Gün Detayı Akordeon Düzeni | 🔒 BEKLEMEDE | - | - | - |
+| 20 | Gün Detayı Akordeon Düzeni | ✅ TAMAMLANDI | `4bb0321` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_day_detail.js`; `tests/test_panel_v2_*.js` (11/11 PASS); `git diff --check`; secret scan PASS; Pages run `31381630606` SUCCESS | Ana Gün Detayı bölümleri native details akordeonlarına alındı; inline AeDivider--label başlıkları, varsayılan açık/kapatılabilir içerik, chip üst yerleşimi, Zamanlar → Ruh Hali → Alışkanlıklar → Beslenme → İbadet → Hareket → Konum → Döngü sırası, stagger ve reduced-motion desteği tamamlandı; cache bump `2026081023` |
 | 21 | Arşivlere Arama & Filtre | 🔒 BEKLEMEDE | - | - | - |
 | 22 | Sistem Sayfası Görsel İyileştirme | 🔒 BEKLEMEDE | - | - | - |
 | 23 | Staggered Giriş & Sayfa Geçişleri | 🔒 BEKLEMEDE | - | - | - |
@@ -83,7 +83,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 20
+- **currentStep:** 21
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-10
 - **lastAgent:** OpenAI Codex (GPT-5)

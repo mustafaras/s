@@ -69,6 +69,13 @@ assert(countMatches(/class="ae-sparkline ae-sparkline--ok"/g) === 2, "Su ve sıf
 assert(countMatches(/class="ae-sparkline ae-sparkline--warn"/g) === 1, "Eksik gün sparkline rengi warn");
 assert(countMatches(/class="ae-sparkline ae-sparkline--accent"/g) === 1, "MOH sparkline rengi accent");
 assert(/Uyku ort\. son 7 gün/.test(html), "Summary sparkline erişilebilir pencere etiketi var");
+assert(/trends-view__intro/.test(html), "Trendler premium giriş başlığı var");
+assert(/trends-view__section--summary/.test(html), "Trendler özet bölümü var");
+assert(/trends-view__section--mood/.test(html), "Trendler mod bölümü var");
+assert(/trends-view__section--metrics/.test(html), "Trendler beden ritmi bölümü var");
+assert(/trends-view__section--anomalies/.test(html), "Trendler uyarı bölümü var");
+assert(/role="group" aria-label="Trend zaman penceresi"/.test(html), "Pencere seçici erişilebilir grup olarak render edildi");
+assert(/ae-metric-chart-grid ae-stagger/.test(html), "Area chart grubu stagger ile render ediliyor");
 
 // 3b. Büyük 30 günlük mod trendi SVG chart
 assert(/ae-mood-chart-card/.test(html), "Büyük mod trendi kartı render edildi");
@@ -149,6 +156,8 @@ AeonV2.setData(sleepDropData);
 html = dom.html;
 assert(/Uyku süresi son 7 günde %/.test(html), "Uyku düşüşü anomalisi tespit edildi");
 assert(/anomaly-card--risk/.test(html), "Uyku düşüşü risk olarak işaretlendi");
+assert(/ae-card--gradient[^>]*anomaly-card--risk/.test(html), "Anomali kartı gradient varyantıyla vurgulandı");
+assert(/anomaly-list ae-stagger/.test(html), "Anomali listesi stagger ile render ediliyor");
 
 // 6. SOS artışı anomalisi
 const sosRiseData = { settings: { targets: { steps: 10000, waterGlasses: 8 } }, days: {} };

@@ -1492,7 +1492,7 @@
                AeButton({ label: "Detay gör", variant: "text", onclick: "AeonV2.goToDayDetail('" + escapeHtml(a.linkDate || "") + "')" }) +
                "</div>";
     return AeCard({
-      variant: "solid",
+      variant: "gradient",
       className: "ae-card--summary anomaly-card anomaly-card--" + severity,
       children: body
     });
@@ -1745,7 +1745,7 @@
 
   function renderMetricCharts(endDate) {
     var summary = summaryForWindow(endDate, 30);
-    return '<div class="ae-metric-chart-grid" aria-label="Uyku, adım ve su trend grafikleri">' +
+    return '<div class="ae-metric-chart-grid ae-stagger" aria-label="Uyku, adım ve su trend grafikleri">' +
       renderMetricChart("sleep", { values: summary._sleepSeries, dates: summary.dates }, "info") +
       renderMetricChart("steps", { values: summary._stepsSeries, dates: summary.dates }, "info") +
       renderMetricChart("water", { values: summary._waterSeries, dates: summary.dates }, "ok") +
@@ -1761,7 +1761,7 @@
         message: "Seçili pencerede dikkat çeken bir durum tespit edilmedi."
       });
     }
-    return '<div class="anomaly-list">' +
+    return '<div class="anomaly-list ae-stagger">' +
            '<div class="ae-label">Tespit edilen durumlar</div>' +
            anomalies.map(AnomalyCard).join("") +
            "</div>";
@@ -1779,7 +1779,7 @@
         ariaLabel: d + " günlük pencere"
       });
     }).join("");
-    return '<div class="window-selector">' +
+    return '<div class="window-selector" role="group" aria-label="Trend zaman penceresi">' +
            '<div class="ae-label">Pencere</div>' +
            '<div class="window-selector__buttons">' + buttons + "</div>" +
            "</div>";
@@ -1884,11 +1884,33 @@
     }
     var windowDays = ui.trendWindow || 7;
     return '<div class="trends-view ae-slide-up">' +
-           renderWindowSelector() +
-           renderSummaryGrid(date, windowDays) +
-           renderMoodTrendChart(date) +
-           renderMetricCharts(date) +
-           renderAnomalies(date) +
+           '<header class="trends-view__intro">' +
+             '<div class="trends-view__intro-copy">' +
+               '<div class="trends-view__eyebrow">ÆON / TRENDLER</div>' +
+               '<h1 class="trends-view__title">Trendler &amp; Uyarılar</h1>' +
+               '<p class="trends-view__meta">Ruh hali, beden ritmi ve dikkat gerektiren sinyaller tek bir görünümde.</p>' +
+             '</div>' +
+             '<span class="trends-view__signal ae-status ae-status--info" role="status"><span class="ae-status__dot"></span><span class="ae-status__label">Analiz hazır</span></span>' +
+           '</header>' +
+           '<section class="trends-view__section trends-view__section--controls" aria-label="Trend zaman penceresi">' +
+             renderWindowSelector() +
+           '</section>' +
+           '<section class="trends-view__section trends-view__section--summary" aria-labelledby="trends-summary-title">' +
+             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-summary-title">Özet metrikler</div><p>Seçili pencerenin ortalamaları, yönü ve günlük mini trendi.</p></div><span class="ae-chip ae-chip--accent">' + windowDays + ' gün</span></div>' +
+             renderSummaryGrid(date, windowDays) +
+           '</section>' +
+           '<section class="trends-view__section trends-view__section--mood" aria-labelledby="trends-mood-title">' +
+             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-mood-title">Ruh hali eğrisi</div><p>Son 30 günün mod seviyesindeki değişim.</p></div><span class="ae-chip ae-chip--accent">1–5 ölçeği</span></div>' +
+             renderMoodTrendChart(date) +
+           '</section>' +
+           '<section class="trends-view__section trends-view__section--metrics" aria-labelledby="trends-metrics-title">' +
+             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-metrics-title">Beden ritmi</div><p>Uyku, adım ve su hedef çizgileriyle birlikte.</p></div><span class="ae-chip">30 gün</span></div>' +
+             renderMetricCharts(date) +
+           '</section>' +
+           '<section class="trends-view__section trends-view__section--anomalies" aria-labelledby="trends-anomalies-title">' +
+             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-anomalies-title">Dikkat sinyalleri</div><p>Rutin dışına çıkan veya takip gerektiren örüntüler.</p></div><span class="ae-chip ae-chip--warn">Kontrol</span></div>' +
+             renderAnomalies(date) +
+           '</section>' +
            "</div>";
   }
 

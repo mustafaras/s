@@ -29,7 +29,7 @@ assert(/ae-card--solid/.test(summary) && /summary-card--normal/.test(summary), "
 assert(!/summary-card__value/.test(summary), "SummaryCard legacy value markup üretmiyor");
 
 const anomaly = AeonV2.AnomalyCard({ severity: "risk", kind: "sleep", message: "Uyku düşüşü", linkDate: "2026-08-04" });
-assert(/ae-card--solid/.test(anomaly) && /anomaly-card--risk/.test(anomaly), "AnomalyCard solid/risk varyantını taşıyor");
+assert(/ae-card--gradient/.test(anomaly) && /anomaly-card--risk/.test(anomaly), "AnomalyCard gradient/risk varyantını taşıyor");
 assert(/anomaly-card__severity--risk/.test(anomaly), "AnomalyCard severity badge render ediyor");
 
 const detailSection = AeonV2.DetailSection({ title: "Ruh Hali", emptyText: "Kayıt yok." });

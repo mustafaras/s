@@ -7,7 +7,7 @@
 - **Uygulayan Ajan:** OpenAI Codex (GPT-5)
 - **Tarih:** 2026-08-10
 - **Başlangıç Commit:** c6e3463
-- **Bitiş Commit:** PENDING_COMMIT
+- **Bitiş Commit:** 2ebb707
 - **Pages Run:** Push sonrası doğrulanacak
 
 ## Yapılanlar

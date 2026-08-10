@@ -54,7 +54,7 @@ swipe(dom, 220, 120, 140, 124, interactiveTarget);
 assert(AeonV2.ui.date === "2026-08-10", "Etkileşimli eleman üzerindeki swipe yok sayılıyor");
 
 AeonV2.setTab("today");
-assert(dom.appListenerCount("touchstart") === 0, "Gün Detayı dışına çıkınca listener kaldırılıyor");
+assert(dom.appListenerCount("touchstart") === 1, "Gün Detayı dışına çıkınca swipe kapanıp mobil pull listener'ı korunuyor");
 swipe(dom, 220, 120, 140, 124);
 assert(AeonV2.ui.date === "2026-08-10", "Swipe yalnızca Gün Detayı'nda aktif");
 

@@ -65,6 +65,13 @@
     element: null,
     handlers: null
   };
+  var pullRefresh = {
+    mode: "idle",
+    distance: 0,
+    refreshing: false
+  };
+  var PULL_REFRESH_THRESHOLD = 60;
+  var PULL_REFRESH_MAX_DISTANCE = 112;
 
   function isoDate(d) {
     if (!d || isNaN(d.getTime())) d = new Date();
@@ -552,6 +559,70 @@
            '<span class="ae-loading__label">Veriler yükleniyor…</span>' +
            "</div>" +
            "</section>";
+  }
+
+  function pullRefreshLabel(mode) {
+    if (mode === "ready") return "Bırak ve yenile";
+    if (mode === "refreshing") return "Yenileniyor…";
+    if (mode === "pulling") return "Yenilemek için çek";
+    return "Yenilemek için aşağı çek";
+  }
+
+  function renderPullRefreshIndicator() {
+    var mode = pullRefresh.mode || "idle";
+    var visible = mode !== "idle";
+    var classes = classNames([
+      "ae-pull-refresh",
+      visible ? "is-visible" : "",
+      mode === "ready" ? "is-ready" : "",
+      mode === "refreshing" ? "is-refreshing" : ""
+    ]);
+    return '<div id="ae-pull-refresh" class="' + escapeHtml(classes) +
+           '" data-state="' + escapeHtml(mode) + '" role="status" aria-live="polite" aria-hidden="' +
+           (visible ? "false" : "true") + '" aria-label="' + escapeHtml(pullRefreshLabel(mode)) + '">' +
+           '<span class="ae-pull-refresh__icon" aria-hidden="true">' + renderIcon("refresh", 18) + "</span>" +
+           '<span class="ae-pull-refresh__label">' + escapeHtml(pullRefreshLabel(mode)) + "</span>" +
+           "</div>";
+  }
+
+  function updatePullRefreshIndicator(mode, distance) {
+    var allowed = ["idle", "pulling", "ready", "refreshing"];
+    pullRefresh.mode = allowed.indexOf(mode) !== -1 ? mode : "idle";
+    pullRefresh.distance = Math.max(0, Math.min(PULL_REFRESH_MAX_DISTANCE, safeNumber(distance) || 0));
+    var doc = root.document;
+    var indicator = doc && typeof doc.getElementById === "function" ? doc.getElementById("ae-pull-refresh") : null;
+    if (!indicator) return;
+    var visible = pullRefresh.mode !== "idle";
+    var label = pullRefreshLabel(pullRefresh.mode);
+    var offset = pullRefresh.mode === "refreshing"
+      ? 10
+      : -48 + Math.min(64, pullRefresh.distance);
+    if (indicator.style) {
+      indicator.style.transform = "translate3d(-50%, " + offset + "px, 0)";
+      indicator.style.opacity = visible ? "1" : "0";
+      if (typeof indicator.style.setProperty === "function") {
+        indicator.style.setProperty("--ae-pull-progress", String(Math.min(1, pullRefresh.distance / PULL_REFRESH_THRESHOLD)));
+      }
+    }
+    if (typeof indicator.setAttribute === "function") {
+      indicator.setAttribute("data-state", pullRefresh.mode);
+      indicator.setAttribute("aria-hidden", visible ? "false" : "true");
+      indicator.setAttribute("aria-label", label);
+    }
+    if (typeof indicator.querySelector === "function") {
+      var labelNode = indicator.querySelector(".ae-pull-refresh__label");
+      if (labelNode) labelNode.textContent = label;
+    }
+  }
+
+  function getPullRefreshState() {
+    return {
+      mode: pullRefresh.mode,
+      distance: pullRefresh.distance,
+      refreshing: pullRefresh.refreshing,
+      threshold: PULL_REFRESH_THRESHOLD,
+      mobileMaxWidth: 460
+    };
   }
 
   // ── Date helpers / state access ─────────────────────────────────────────
@@ -1380,6 +1451,27 @@
     }
   }
 
+  function pullRefreshAtTop(app) {
+    var doc = root.document;
+    var scrollValues = [];
+    if (app) {
+      scrollValues.push(app.scrollTop);
+      if (typeof app.querySelector === "function") {
+        var body = app.querySelector(".ae-app__body");
+        if (body) scrollValues.push(body.scrollTop);
+      }
+    }
+    scrollValues.push(root.scrollY, root.pageYOffset);
+    if (doc && doc.documentElement) scrollValues.push(doc.documentElement.scrollTop);
+    if (doc && doc.body) scrollValues.push(doc.body.scrollTop);
+    var top = 0;
+    scrollValues.forEach(function(value) {
+      var n = safeNumber(value);
+      if (n !== null) top = Math.max(top, n);
+    });
+    return top <= 0;
+  }
+
   function swipeExcludedTarget(target) {
     if (!target || typeof target.closest !== "function") return false;
     return !!target.closest("a,button,input,select,textarea,summary,[contenteditable=\"true\"],.loc-map,.ae-tabs,.sub-tabs");
@@ -1401,14 +1493,20 @@
 
   function initSwipeGestures(app) {
     clearSwipeBinding();
-    if (ui.tab !== "day" || !swipeViewportEnabled() || !app || typeof app.addEventListener !== "function") return;
+    var mobile = swipeViewportEnabled();
+    var swipeEnabled = ui.tab === "day" && mobile;
+    var pullEnabled = mobile;
+    if ((!swipeEnabled && !pullEnabled) || !app || typeof app.addEventListener !== "function") return;
 
     var gesture = {
       active: false,
       canceled: false,
       horizontal: false,
       startX: 0,
-      startY: 0
+      startY: 0,
+      pullCandidate: false,
+      pullActive: false,
+      pullDistance: 0
     };
     var threshold = 50;
 
@@ -1427,6 +1525,9 @@
       gesture.horizontal = false;
       gesture.startX = Number(touch.clientX) || 0;
       gesture.startY = Number(touch.clientY) || 0;
+      gesture.pullCandidate = pullEnabled && !pullRefresh.refreshing && pullRefreshAtTop(app);
+      gesture.pullActive = false;
+      gesture.pullDistance = 0;
     }
 
     function onTouchMove(event) {
@@ -1435,6 +1536,40 @@
       if (!touch) return;
       var dx = (Number(touch.clientX) || 0) - gesture.startX;
       var dy = (Number(touch.clientY) || 0) - gesture.startY;
+
+      if (gesture.pullActive) {
+        if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) {
+          gesture.pullActive = false;
+          gesture.pullCandidate = false;
+          gesture.canceled = true;
+          updatePullRefreshIndicator("idle", 0);
+          return;
+        }
+        gesture.pullDistance = Math.min(PULL_REFRESH_MAX_DISTANCE, dy);
+        updatePullRefreshIndicator(
+          gesture.pullDistance >= PULL_REFRESH_THRESHOLD ? "ready" : "pulling",
+          gesture.pullDistance
+        );
+        if (event && event.cancelable && typeof event.preventDefault === "function") event.preventDefault();
+        return;
+      }
+
+      if (gesture.pullCandidate && dy > 0 && Math.abs(dy) >= Math.abs(dx) && Math.abs(dy) >= 10) {
+        gesture.pullActive = true;
+        gesture.pullDistance = Math.min(PULL_REFRESH_MAX_DISTANCE, dy);
+        updatePullRefreshIndicator(
+          gesture.pullDistance >= PULL_REFRESH_THRESHOLD ? "ready" : "pulling",
+          gesture.pullDistance
+        );
+        if (event && event.cancelable && typeof event.preventDefault === "function") event.preventDefault();
+        return;
+      }
+
+      if (gesture.pullCandidate && (dy < 0 || Math.abs(dx) > Math.abs(dy))) {
+        gesture.pullCandidate = false;
+      }
+
+      if (!swipeEnabled) return;
       if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) >= 10) {
         gesture.canceled = true;
         gesture.horizontal = false;
@@ -1450,6 +1585,16 @@
       if (!gesture.active) return;
       var touch = pointFromTouchList(event && event.changedTouches) || pointFromTouchList(event && event.touches);
       var dx = touch ? (Number(touch.clientX) || 0) - gesture.startX : 0;
+      if (gesture.pullActive) {
+        var shouldRefresh = gesture.pullDistance >= PULL_REFRESH_THRESHOLD;
+        gesture.active = false;
+        gesture.pullActive = false;
+        gesture.pullCandidate = false;
+        gesture.pullDistance = 0;
+        if (shouldRefresh) refresh();
+        else updatePullRefreshIndicator("idle", 0);
+        return;
+      }
       var shouldShift = gesture.horizontal && !gesture.canceled && Math.abs(dx) >= threshold;
       gesture.active = false;
       if (!shouldShift) return;
@@ -1461,6 +1606,10 @@
       gesture.active = false;
       gesture.canceled = true;
       gesture.horizontal = false;
+      gesture.pullCandidate = false;
+      gesture.pullActive = false;
+      gesture.pullDistance = 0;
+      updatePullRefreshIndicator("idle", 0);
     }
 
     var handlers = { start: onTouchStart, move: onTouchMove, end: onTouchEnd, cancel: onTouchCancel };
@@ -4176,6 +4325,7 @@
     var projection = projectData(null);
     var activeContent = isFetching ? renderLoadingState() : renderActiveTab(Boolean(options.transition));
     app.innerHTML =
+      renderPullRefreshIndicator() +
       renderTopbar() +
       renderTabs() +
       '<main class="ae-app__body">' + activeContent + "</main>" +
@@ -4372,7 +4522,26 @@
   }
 
   function refresh() {
-    return load();
+    if (pullRefresh.refreshing) return Promise.resolve(null);
+    pullRefresh.refreshing = true;
+    updatePullRefreshIndicator("refreshing", PULL_REFRESH_THRESHOLD);
+    var result;
+    try {
+      result = load();
+    } catch (e) {
+      pullRefresh.refreshing = false;
+      updatePullRefreshIndicator("idle", 0);
+      throw e;
+    }
+    return Promise.resolve(result).then(function(value) {
+      pullRefresh.refreshing = false;
+      updatePullRefreshIndicator("idle", 0);
+      return value;
+    }, function(error) {
+      pullRefresh.refreshing = false;
+      updatePullRefreshIndicator("idle", 0);
+      throw error;
+    });
   }
 
   function logout() {
@@ -4449,6 +4618,7 @@
     AeTooltip: AeTooltip,
     animateCountUp: animateCountUp,
     renderLoadingState: renderLoadingState,
+    getPullRefreshState: getPullRefreshState,
     getEnergy: getEnergy,
     getStress: getStress,
     getHabitSummary: getHabitSummary,

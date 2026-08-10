@@ -62,13 +62,26 @@ assert(/6,[0-9]|7,0/.test(html), "Su ortalaması değeri doğru");
 assert(/SOS yoğ\./.test(html), "SOS yoğunluğu kartı var");
 assert(/Eksik gün/.test(html), "Eksik gün kartı var");
 assert(/MOH gün/.test(html), "MOH gün kartı var");
+assert(countMatches(/class="ae-metric__sparkline ae-metric__sparkline--svg"/g) === 6, "Her summary kartında SVG mini sparkline var");
+assert(countMatches(/data-sparkline-window="7"/g) === 6, "Summary sparklinelar 7 günlük pencereyi taşıyor");
+assert(countMatches(/class="ae-sparkline ae-sparkline--info"/g) === 2, "Uyku ve adım sparkline rengi info");
+assert(countMatches(/class="ae-sparkline ae-sparkline--ok"/g) === 2, "Su ve sıfır SOS sparkline rengi ok");
+assert(countMatches(/class="ae-sparkline ae-sparkline--warn"/g) === 1, "Eksik gün sparkline rengi warn");
+assert(countMatches(/class="ae-sparkline ae-sparkline--accent"/g) === 1, "MOH sparkline rengi accent");
+assert(/Uyku ort\. son 7 gün/.test(html), "Summary sparkline erişilebilir pencere etiketi var");
 
 // 4. Pencere değişimi
 assert(AeonV2.ui.trendWindow === 7, "Varsayılan pencere 7 gün");
 AeonV2.setTrendWindow(14);
 assert(AeonV2.ui.trendWindow === 14, "Pencere 14 güne geçti");
+html = dom.html;
+assert(countMatches(/data-sparkline-window="14"/g) === 6, "Summary sparklinelar 14 günlük pencereye geçti");
+assert(/Uyku ort\. son 14 gün/.test(html), "14 günlük sparkline etiketi güncellendi");
 AeonV2.setTrendWindow(30);
 assert(AeonV2.ui.trendWindow === 30, "Pencere 30 güne geçti");
+html = dom.html;
+assert(countMatches(/data-sparkline-window="30"/g) === 6, "Summary sparklinelar 30 günlük pencereye geçti");
+assert(/Uyku ort\. son 30 gün/.test(html), "30 günlük sparkline etiketi güncellendi");
 AeonV2.setTrendWindow(99);
 assert(AeonV2.ui.trendWindow === 30, "Aşırı pencere 30'a sınırlı");
 

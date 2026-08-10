@@ -346,7 +346,9 @@
       : "";
     var valueCountAttrs = opts.countBadge === true ? "" : countAttrs;
     var unit = opts.unit ? '<span class="ae-metric__unit">' + escapeHtml(opts.unit) + "</span>" : "";
-    var series = Array.isArray(opts.sparkline) ? opts.sparkline.slice(0, 7) : [];
+    var sparklineLimit = countNumber(opts.sparklineLimit);
+    sparklineLimit = sparklineLimit === null ? 7 : Math.max(1, Math.min(30, Math.round(sparklineLimit)));
+    var series = Array.isArray(opts.sparkline) ? opts.sparkline.slice(0, sparklineLimit) : [];
     var sparkPcts = metricSparkPcts(series);
     var spark = sparkPcts.map(function(item) {
       var sparkPct = Math.round(item.pct / 10) * 10;
@@ -374,14 +376,25 @@
                  label: opts.ring.label || title + " ilerlemesi"
                }) : "") +
                "</div>";
+    var sparkMarkup;
+    if (opts.sparklineType === "svg") {
+      var sparkColor = safeText(opts.sparklineColor || color, 20).replace(/[^A-Za-z0-9_-]/g, "") || "accent";
+      sparkMarkup = '<div class="ae-metric__sparkline ae-metric__sparkline--svg" data-sparkline-window="' +
+                    sparklineLimit + '">' +
+                    AeSparkline(series, sparkColor, opts.sparklineHeight || 28, sparkLabel) +
+                    "</div>";
+    } else {
+      sparkMarkup = '<span class="ae-metric__sparkline" role="img" aria-label="' + escapeHtml(sparkLabel) + '">' +
+                    (spark || '<span class="ae-metric__spark-empty" aria-hidden="true">—</span>') +
+                    "</span>";
+    }
     var footer = '<div class="ae-metric__footer">' +
                  '<span class="ae-metric__delta ae-metric__delta--' + deltaTone +
                  '" title="' + escapeHtml(deltaLabel) + '" aria-label="' + escapeHtml(deltaLabel) + '">' +
                  escapeHtml(deltaValue === undefined || deltaValue === null ? "—" : String(deltaValue)) +
                  "</span>" +
-                 '<span class="ae-metric__sparkline" role="img" aria-label="' + escapeHtml(sparkLabel) + '">' +
-                 (spark || '<span class="ae-metric__spark-empty" aria-hidden="true">—</span>') +
-                 "</span></div>";
+                 sparkMarkup +
+                 "</div>";
     return '<article class="' + escapeHtml(metricClass) + '">' +
            head +
            '<div class="ae-metric__value"><span class="ae-count-up"' + valueCountAttrs + '>' +
@@ -1084,18 +1097,34 @@
   function summaryForWindow(endDate, days) {
     var dates = lastNDates(days, endDate);
     var moods = [], sleeps = [], steps = [], waters = [], sosCounts = [], missing = 0, moh = 0, maxMoh = 0;
+    var moodSeries = [], sleepSeries = [], stepsSeries = [], waterSeries = [], sosSeries = [], missingSeries = [], mohSeries = [];
     dates.forEach(function(d) {
       var day = getDay(d);
-      if (!day) { missing++; maxMoh = 0; return; }
+      if (!day) {
+        missing++;
+        maxMoh = 0;
+        moodSeries.push(null);
+        sleepSeries.push(null);
+        stepsSeries.push(null);
+        waterSeries.push(null);
+        sosSeries.push(null);
+        missingSeries.push(1);
+        mohSeries.push(null);
+        return;
+      }
       missing = 0;
-      if (isQuickEntry(day)) { moh++; maxMoh = Math.max(maxMoh, moh); }
+      var quickEntry = isQuickEntry(day);
+      if (quickEntry) { moh++; maxMoh = Math.max(maxMoh, moh); }
       else { maxMoh = Math.max(maxMoh, moh); moh = 0; }
-      var m = getMood(day); if (m.value !== null) moods.push(m.value);
-      var sh = getSleepHours(day); if (sh !== null) sleeps.push(sh);
-      var s = getSteps(day); if (s !== null) steps.push(s);
-      var w = getWater(day); if (w !== null) waters.push(w);
+      var m = getMood(day); moodSeries.push(m.value); if (m.value !== null) moods.push(m.value);
+      var sh = getSleepHours(day); sleepSeries.push(sh); if (sh !== null) sleeps.push(sh);
+      var s = getSteps(day); stepsSeries.push(s); if (s !== null) steps.push(s);
+      var w = getWater(day); waterSeries.push(w); if (w !== null) waters.push(w);
       var sos = safeNumber(day.cravingSOSCount) || 0;
       sosCounts.push(sos);
+      sosSeries.push(sos);
+      missingSeries.push(0);
+      mohSeries.push(quickEntry ? 1 : 0);
     });
     return {
       dates: dates,
@@ -1110,7 +1139,14 @@
       _sleeps: sleeps,
       _steps: steps,
       _waters: waters,
-      _sos: sosCounts
+      _sos: sosCounts,
+      _moodSeries: moodSeries,
+      _sleepSeries: sleepSeries,
+      _stepsSeries: stepsSeries,
+      _waterSeries: waterSeries,
+      _sosSeries: sosSeries,
+      _missingSeries: missingSeries,
+      _mohSeries: mohSeries
     };
   }
 
@@ -1232,6 +1268,11 @@
       variant: opts.variant || "solid",
       status: status,
       sparkline: opts.sparkline,
+      sparklineType: opts.sparklineType,
+      sparklineColor: opts.sparklineColor,
+      sparklineLimit: opts.sparklineLimit || opts.windowDays,
+      sparklineHeight: opts.sparklineHeight,
+      sparklineLabel: opts.sparklineLabel || (String(opts.title || "Metrik") + " son " + String(opts.windowDays || 7) + " gün"),
       delta: {
         value: trend,
         tone: statusTone,
@@ -1291,12 +1332,12 @@
     var mohStatus = s.mohStreak >= 10 ? "risk" : s.mohStreak >= 5 ? "attention" : "normal";
 
     return '<div class="ae-grid--summary ae-stagger">' +
-           SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), countValue: s.sleepMean, countFormat: "decimal", unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus }) +
-           SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), countValue: s.stepsMean, countFormat: "integer", unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal" }) +
-           SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), countValue: s.waterMean, countFormat: "decimal", unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal" }) +
-           SummaryCard({ title: "SOS yoğ.", value: s.sosTotal, countValue: s.sosTotal, countFormat: "integer", unit: "kayıt", windowDays: windowDays, trend: sosTrend, status: sosStatus }) +
-           SummaryCard({ title: "Eksik gün", value: s.missingDays, countValue: s.missingDays, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: missingStatus }) +
-           SummaryCard({ title: "MOH gün", value: s.mohStreak, countValue: s.mohStreak, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: mohStatus }) +
+           SummaryCard({ title: "Uyku ort.", value: fmtMean(s.sleepMean, 1), countValue: s.sleepMean, countFormat: "decimal", unit: "sa", windowDays: windowDays, trend: sleepTrend, status: sleepStatus, color: "info", sparkline: s._sleepSeries, sparklineType: "svg", sparklineColor: "info" }) +
+           SummaryCard({ title: "Adım ort.", value: fmtMean(s.stepsMean, 0), countValue: s.stepsMean, countFormat: "integer", unit: "adım", windowDays: windowDays, trend: s.stepsMean !== null && prev.stepsMean !== null ? (s.stepsMean > prev.stepsMean ? "↑" : s.stepsMean < prev.stepsMean ? "↓" : "→") : "→", status: "normal", color: "info", sparkline: s._stepsSeries, sparklineType: "svg", sparklineColor: "info" }) +
+           SummaryCard({ title: "Su ort.", value: fmtMean(s.waterMean, 1), countValue: s.waterMean, countFormat: "decimal", unit: "bardak", windowDays: windowDays, trend: s.waterMean !== null && prev.waterMean !== null ? (s.waterMean > prev.waterMean ? "↑" : s.waterMean < prev.waterMean ? "↓" : "→") : "→", status: "normal", color: "ok", sparkline: s._waterSeries, sparklineType: "svg", sparklineColor: "ok" }) +
+           SummaryCard({ title: "SOS yoğ.", value: s.sosTotal, countValue: s.sosTotal, countFormat: "integer", unit: "kayıt", windowDays: windowDays, trend: sosTrend, status: sosStatus, color: s.sosTotal > 0 ? "drop" : "ok", sparkline: s._sosSeries, sparklineType: "svg", sparklineColor: s.sosTotal > 0 ? "drop" : "ok" }) +
+           SummaryCard({ title: "Eksik gün", value: s.missingDays, countValue: s.missingDays, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: missingStatus, color: missingStatus === "risk" ? "drop" : "warn", sparkline: s._missingSeries, sparklineType: "svg", sparklineColor: missingStatus === "risk" ? "drop" : "warn" }) +
+           SummaryCard({ title: "MOH gün", value: s.mohStreak, countValue: s.mohStreak, countFormat: "integer", unit: "gün", windowDays: windowDays, trend: "→", status: mohStatus, color: mohStatus === "risk" ? "drop" : "accent", sparkline: s._mohSeries, sparklineType: "svg", sparklineColor: mohStatus === "risk" ? "drop" : "accent" }) +
            "</div>";
   }
 

@@ -4,11 +4,11 @@
   "use strict";
 
   var TABS = [
-    { id: "today",    label: "Genel Bakış", icon: "◐" },
-    { id: "trends",   label: "Trendler",    icon: "◑" },
-    { id: "day",      label: "Gün Detayı",  icon: "◎" },
-    { id: "archives", label: "Arşivler",    icon: "◈" },
-    { id: "system",   label: "Sistem",      icon: "◉" }
+    { id: "today",    label: "Genel Bakış", icon: "dashboard" },
+    { id: "trends",   label: "Trendler",    icon: "trend" },
+    { id: "day",      label: "Gün Detayı",  icon: "calendar" },
+    { id: "archives", label: "Arşivler",    icon: "archive" },
+    { id: "system",   label: "Sistem",      icon: "settings" }
   ];
 
   var PTKEY = "seyma-panel-token";
@@ -30,7 +30,11 @@
     archiveFrom: "",
     archiveTo: "",
     archiveView: "list",
-    archivePage: 1
+    archivePage: 1,
+    historyWindow: 7,
+    historySource: "all",
+    historyDay: "all",
+    historyExpanded: {}
   };
 
   var syncStatus = {
@@ -82,6 +86,11 @@
   function safeNumber(v) {
     var n = Number(v);
     return isFinite(n) ? n : null;
+  }
+
+  function numberOrNull(v) {
+    if (v === null || v === undefined || String(v).trim() === "") return null;
+    return safeNumber(v);
   }
 
   function formatHours(h) {
@@ -188,6 +197,68 @@
     });
   }
 
+  // Panel-v2 ikonları metin emoji yerine tek, erişilebilir SVG yüzeyinden
+  // üretilir. Böylece veri etiketleri ile ikon sunumu birbirine karışmaz.
+  var ICON_PATHS = {
+    dashboard: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+    list: "M5 6h14M5 12h14M5 18h14",
+    grid: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+    clock: "M12 21a9 9 0 100-18 9 9 0 000 18zM12 7v5l3 2",
+    trend: "M4 17l5-5 4 3 7-8M15 7h5v5",
+    calendar: "M6 3v4M18 3v4M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z",
+    archive: "M4 7h16v13H4zM3 4h18v3H3zM9 11h6",
+    settings: "M12 8.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7zM19.4 15a1.7 1.7 0 00.3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5v.2h-2.6v-.2a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H6.3v-2.6h.2a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 001.9.3 1.7 1.7 0 001-1.5V4h2.6v.2a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 00-.3 1.9 1.7 1.7 0 001.5 1h.2v2.6h-.2a1.7 1.7 0 00-1.5 1z",
+    mood: "M4 14c2-5 5-7 8-7s6 2 8 7M7 17h.01M17 17h.01M8 20h8",
+    cloud: "M5 17h13a4 4 0 000-8 6 6 0 00-11.4 2A3 3 0 005 17z",
+    sun: "M12 5V3M12 21v-2M5 12H3M21 12h-2M6.3 6.3L4.9 4.9M19.1 19.1l-1.4-1.4M17.7 6.3l1.4-1.4M4.9 19.1l1.4-1.4M12 8a4 4 0 110 8 4 4 0 010-8z",
+    spark: "M12 3l1.4 6.6L20 12l-6.6 1.4L12 20l-1.4-6.6L4 12l6.6-2.4L12 3z",
+    leaf: "M20 4C11 4 5 8 5 14a6 6 0 006 6c6 0 9-7 9-16zM5 20c2-4 5-7 10-10",
+    sleep: "M19 14.5A7.5 7.5 0 019.5 5 7.5 7.5 0 1019 14.5z",
+    steps: "M6 4a2 2 0 110 4 2 2 0 010-4zM15 16a2 2 0 110 4 2 2 0 010-4zM8 8l7 8",
+    sos: "M12 4l8 16H4L12 4zM12 10v4M12 17h.01",
+    water: "M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z",
+    journal: "M5 4h10a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM8 4v16M10 9h5M10 13h5",
+    note: "M5 4h14v16H5zM8 8h8M8 12h8M8 16h5",
+    intention: "M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3z",
+    gratitude: "M12 20S5 16 5 10a4 4 0 017-2 4 4 0 017 2c0 6-7 10-7 10z",
+    shield: "M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3zM9 12l2 2 4-4",
+    reflection: "M5 5h14v11H9l-4 4V5zM8 9h8M8 12h5",
+    prayer: "M12 3v18M5 8h14M7 8v5M17 8v5M9 21h6",
+    saygi: "M12 3l2.2 5 5.3.5-4 3.5 1.2 5.2-4.7-2.8-4.7 2.8 1.2-5.2-4-3.5L9.8 8 12 3z",
+    book: "M5 4h8a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM16 7a3 3 0 013-3v16h-3",
+    watch: "M6 4h12v16H6zM9 7h6M9 17h6",
+    listen: "M6 9v6M10 6v12M14 4v16M18 9v6",
+    learning: "M4 6l8-3 8 3-8 3-8-3zM6 9v6l6 3 6-3V9M20 7v7",
+    soul: "M12 4a8 8 0 108 8M12 4v8h8",
+    meal: "M6 4v16M4 4v6a2 2 0 004 0V4M18 4v16M18 4c2 2 2 5 0 7",
+    caffeine: "M5 8h12v8a4 4 0 01-4 4H9a4 4 0 01-4-4V8zM17 10h2a2 2 0 010 4h-2M8 4h8",
+    medicine: "M7 5a3 3 0 014.2 0l7.8 7.8a3 3 0 01-4.2 4.2L7 9.2A3 3 0 017 5zM5 7l4 4",
+    anxiety: "M12 4v16M4 12h16M7 7l10 10M17 7L7 17",
+    crisis: "M12 4l8 16H4L12 4zM12 10v4M12 17h.01",
+    magnesium: "M5 7h14v10H5zM8 10h8M8 14h5",
+    cycle: "M5 12a7 7 0 0112-5l2 2M19 12a7 7 0 01-12 5l-2-2M19 7v3h-3M5 17v-3h3",
+    nutrition: "M5 4v16M3 4v6a2 2 0 004 0V4M18 4v16M18 4c2 2 2 5 0 7",
+    movement: "M5 18l4-6 3 3 4-7 3 3M16 5h3v3",
+    location: "M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11zM12 12a2 2 0 100-4 2 2 0 000 4z",
+    phone: "M7 3h10v18H7zM10 6h4M11 18h2",
+    messages: "M4 5h16v11H8l-4 4V5z",
+    check: "M5 12l4 4L19 6",
+    close: "M6 6l12 12M18 6L6 18",
+    arrowLeft: "M19 12H5M11 6l-6 6 6 6",
+    arrowRight: "M5 12h14M13 6l6 6-6 6",
+    refresh: "M20 11a8 8 0 00-14-4L4 9M4 5v4h4M4 13a8 8 0 0014 4l2-2M20 19v-4h-4",
+    lock: "M6 10h12v10H6zM8 10V7a4 4 0 018 0v3",
+    dot: "M12 12m-4 0a4 4 0 108 0 4 4 0 10-8 0"
+  };
+
+  function renderIcon(name, size, label) {
+    var key = safeText(name || "dot", 32).toLowerCase().replace(/[^a-z0-9_-]/g, "") || "dot";
+    var path = ICON_PATHS[key] || ICON_PATHS.dot;
+    var px = Math.max(12, Math.min(32, safeNumber(size) || 18));
+    var accessible = label ? ' role="img" aria-label="' + escapeHtml(label) + '"' : ' aria-hidden="true"';
+    return '<svg class="ae-icon ae-icon--' + key + '" width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"' + accessible + '><path d="' + path + '"></path></svg>';
+  }
+
   function nl2br(s) {
     return String(s || "").replace(/\n/g, "<br>");
   }
@@ -220,13 +291,13 @@
   // ── UI atoms ───────────────────────────────────────────────────────────
   function AeEmpty(opts) {
     opts = opts || {};
-    var icon = opts.icon || "◌";
+    var icon = opts.icon || "dot";
     var title = safeText(opts.title || "Henüz veri yok", 80);
     var message = safeText(opts.message || "Bu bölümde görüntülenecek veri şu an yok.", 240);
     var variant = safeText(opts.variant || "", 20).replace(/[^A-Za-z0-9_-]/g, "");
     var cls = classNames(["ae-empty", "ae-scale-in", variant ? "ae-empty--" + variant : "", opts.className]);
     return '<div class="' + escapeHtml(cls) + '" role="' + escapeHtml(opts.role || "status") + '" aria-live="polite">' +
-           '<div class="ae-empty__icon">' + escapeHtml(icon) + "</div>" +
+           '<div class="ae-empty__icon">' + renderIcon(icon, 24) + "</div>" +
            '<div class="ae-empty__title">' + escapeHtml(title) + "</div>" +
            '<div class="ae-empty__text">' + escapeHtml(message) + "</div>" +
            "</div>";
@@ -262,7 +333,7 @@
     var position = positions.indexOf(opts.position) !== -1 ? opts.position : "top";
     var id = String(opts.id || "ae-tooltip").replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 48) || "ae-tooltip";
     var text = safeText(opts.text || opts.message || "Daha fazla bilgi", 240);
-    var label = safeText(opts.label || "ⓘ", 24);
+    var label = safeText(opts.label || "i", 24);
     var triggerClass = classNames(["ae-tooltip-trigger", opts.triggerClass]);
     var ariaLabel = safeText(opts.ariaLabel || text, 120);
     return '<span class="ae-tooltip-wrap" data-tooltip-position="' + position + '">' +
@@ -290,13 +361,13 @@
     var type = allowedTypes.indexOf(opts.type) !== -1 ? opts.type : "info";
     var message = safeText(opts.message || opts.text || "Bildirim", 240);
     var id = String(opts.id || "toast").replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 48) || "toast";
-    var icons = { success: "✓", error: "!", info: "i" };
+    var icons = { success: "check", error: "crisis", info: "messages" };
     var role = type === "error" ? "alert" : "status";
     var close = opts.dismissible === false ? "" :
       '<button type="button" class="ae-toast__close" onclick="AeonV2.dismissToast(\'' + escapeHtml(id) + '\')" aria-label="Bildirimi kapat">×</button>';
     return '<div class="ae-toast ae-toast--' + type + '" id="ae-toast-' + escapeHtml(id) +
            '" role="' + role + '" aria-live="polite" aria-atomic="true">' +
-           '<span class="ae-toast__icon" aria-hidden="true">' + icons[type] + "</span>" +
+           '<span class="ae-toast__icon">' + renderIcon(icons[type], 16) + "</span>" +
            '<span class="ae-toast__message">' + escapeHtml(message) + "</span>" +
            close +
            "</div>";
@@ -385,7 +456,7 @@
       compact ? "summary-card--" + metricStatus : "hero-card--" + color, opts.className
     ]);
     var head = '<div class="ae-metric__head">' +
-               '<span class="ae-metric__icon" aria-hidden="true">' + escapeHtml(opts.icon || "◌") + "</span>" +
+               '<span class="ae-metric__icon">' + renderIcon(opts.icon || "dot", 18) + "</span>" +
                '<span class="ae-metric__title">' + escapeHtml(title) + "</span>" +
                (opts.ring ? AeProgressRing({
                  value: opts.ring.value,
@@ -430,7 +501,8 @@
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
     if (opts.ariaLabel) attrs += ' aria-label="' + escapeHtml(opts.ariaLabel) + '"';
-    return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + escapeHtml(label) + "</button>";
+    var content = opts.labelHtml ? String(opts.labelHtml) : escapeHtml(label);
+    return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + content + "</button>";
   }
 
   function AeStatusBadge(opts) {
@@ -490,8 +562,18 @@
     render();
   }
   function setData(data) {
-    appData = data;
+    appData = unwrapPanelData(data);
     render();
+  }
+
+  function unwrapPanelData(data) {
+    var value = isObject(data) ? data : {};
+    // latest.json doğrudan uygulama objesi olabilir; günlük snapshot/relay
+    // sarmalayıcıları da read-only panelde güvenle açılır.
+    if (isObject(value.data) && (value.data.days || value.data.settings)) value = value.data;
+    else if (isObject(value.app) && (value.app.days || value.app.settings)) value = value.app;
+    else if (isObject(value.payload) && (value.payload.days || value.payload.settings)) value = value.payload;
+    return value;
   }
   function getDay(date) {
     return isObject(appData) && isObject(appData.days) ? (appData.days[date] || null) : null;
@@ -518,14 +600,14 @@
     1: "Fırtınalı", 2: "Bulutlu", 3: "Durağan", 4: "Huzurlu",
     5: "Aydınlık", 6: "Neşeli", 7: "Coşkulu"
   };
-  var MOOD_ICONS = { 1: "⛈", 2: "☁️", 3: "🌫", 4: "🌤", 5: "☀️", 6: "🌈", 7: "✨" };
+  var MOOD_ICONS = { 1: "crisis", 2: "cloud", 3: "dot", 4: "mood", 5: "sun", 6: "trend", 7: "spark" };
   var MOOD_ID_LABELS = {
     "cok-iyi": "Çok iyi", "iyi": "İyi", "normal": "Normal",
     "zorlandim": "Zorlandım", "cok-zorlandim": "Çok zorlandım"
   };
   var MOOD_ID_ICONS = {
-    "cok-iyi": "☀️", "iyi": "🌸", "normal": "🍃",
-    "zorlandim": "🌧", "cok-zorlandim": "🌊"
+    "cok-iyi": "sun", "iyi": "gratitude", "normal": "leaf",
+    "zorlandim": "cloud", "cok-zorlandim": "water"
   };
   var MOOD_ORDER = ["cok-zorlandim", "zorlandim", "normal", "iyi", "cok-iyi"];
 
@@ -535,7 +617,7 @@
   }
 
   function getMood(day) {
-    if (!isObject(day)) return { value: null, label: null, icon: "◌", note: "" };
+    if (!isObject(day)) return { value: null, label: null, icon: "dot", note: "" };
     var raw = day.mood;
     var val = null, note = "";
     if (typeof raw === "string" && raw) {
@@ -546,29 +628,36 @@
       note = raw.note || "";
     }
     var label = (val ? (MOOD_LABELS[val] || "Bilinmiyor") : (MOOD_ID_LABELS[String(raw || "")] || null));
-    var icon = (val ? (MOOD_ICONS[val] || "◌") : (MOOD_ID_ICONS[String(raw || "")] || "◌"));
+    var icon = (val ? (MOOD_ICONS[val] || "dot") : (MOOD_ID_ICONS[String(raw || "")] || "dot"));
     return { value: val, raw: raw, label: label, icon: icon, note: note };
   }
 
   function getSteps(day) {
     if (!isObject(day)) return null;
     var h = day.health || {}, w = day.walk || {}, m = day.movement || {};
-    var v = safeNumber(h.steps);
-    if (v === null) v = safeNumber(w.steps);
-    if (v === null) v = safeNumber(m.walkM) !== null ? 0 : null; // movement exists but no step estimate
-    return v;
+    // app.js'nin kanonik önceliği: elle girilen walk.steps, Sağlık senkronu
+    // health.steps, son çare olarak gerçek walkM'den türetilen tahmin. Varsayılan
+    // movement.walkM=0 ölçüm değildir; onu sıfır olarak döndürmek grafiği sahte
+    // sıfırlarla doldurur.
+    var v = numberOrNull(w.steps);
+    if (v !== null) return Math.max(0, v);
+    v = numberOrNull(h.steps);
+    if (v !== null && (v > 0 || h.updatedAt)) return Math.max(0, v);
+    var walkM = numberOrNull(m.walkM);
+    if (walkM !== null && walkM > 0) return Math.round(walkM / 0.72);
+    return null;
   }
 
   function getWater(day) {
-    return isObject(day) ? safeNumber(day.water) : null;
+    return isObject(day) ? numberOrNull(day.water) : null;
   }
 
   function getSleepHours(day) {
-    return isObject(day) && isObject(day.sleep) ? safeNumber(day.sleep.hours) : null;
+    return isObject(day) && isObject(day.sleep) ? numberOrNull(day.sleep.hours) : null;
   }
 
   function getSleepQuality(day) {
-    return isObject(day) && isObject(day.sleep) ? safeNumber(day.sleep.quality) : null;
+    return isObject(day) && isObject(day.sleep) ? numberOrNull(day.sleep.quality) : null;
   }
 
   function getCaffeine(day) {
@@ -688,7 +777,7 @@
       '<div class="zikr-detail__empty">Bugün için tefekkür notu yok.</div>';
 
     return '<details class="zikr-detail"' + (reflections.length ? ' data-reflection-count="' + reflections.length + '"' : "") + '>' +
-      '<summary class="zikr-detail__summary"><span class="zikr-detail__summary-title">📿 Zikir ve Esmâ</span><span class="zikr-detail__summary-total">' + total.toLocaleString("tr-TR") + ' toplam</span><span class="zikr-detail__summary-chevron" aria-hidden="true">⌄</span></summary>' +
+      '<summary class="zikr-detail__summary"><span class="zikr-detail__summary-title">' + renderIcon("prayer", 16) + ' Zikir ve Esmâ</span><span class="zikr-detail__summary-total">' + total.toLocaleString("tr-TR") + ' toplam</span><span class="zikr-detail__summary-chevron" aria-hidden="true">' + renderIcon("arrowRight", 14) + '</span></summary>' +
       '<div class="zikr-detail__body">' + kpis + breakdown + reflectionHtml + '</div>' +
       '</details>';
   }
@@ -764,11 +853,11 @@
   }
 
   function getEnergy(day) {
-    return isObject(day) ? safeNumber(day.energy) : null;
+    return isObject(day) ? numberOrNull(day.energy) : null;
   }
 
   function getStress(day) {
-    return isObject(day) ? safeNumber(day.stress) : null;
+    return isObject(day) ? numberOrNull(day.stress) : null;
   }
 
   function getNutri(day) {
@@ -832,11 +921,11 @@
     caffeineOk: "Kafein limiti", magnesium: "Magnezyum"
   };
   var HABIT_ICONS = {
-    sweetManaged: "🍬", foodManaged: "🍽", coffeeManaged: "☕",
-    eveningControl: "🌙", walked20: "👟", protein: "🥩",
-    water: "💧", vitaminD: "💊", sleepReg: "😴", journaled: "📝",
-    mediaFed: "📚", freshAir: "🌿", selfKind: "💖",
-    caffeineOk: "✅", magnesium: "🧪"
+    sweetManaged: "meal", foodManaged: "nutrition", coffeeManaged: "caffeine",
+    eveningControl: "sleep", walked20: "steps", protein: "nutrition",
+    water: "water", vitaminD: "medicine", sleepReg: "sleep", journaled: "journal",
+    mediaFed: "book", freshAir: "leaf", selfKind: "gratitude",
+    caffeineOk: "check", magnesium: "magnesium"
   };
 
   function getHabitSummary(day) {
@@ -994,7 +1083,7 @@
 
   function getTarget(key, fallback) {
     if (!isObject(appData) || !isObject(appData.settings) || !isObject(appData.settings.targets)) return fallback;
-    var v = safeNumber(appData.settings.targets[key]);
+    var v = numberOrNull(appData.settings.targets[key]);
     return v !== null ? v : fallback;
   }
 
@@ -1033,7 +1122,7 @@
     var yesterday = getDay(dateOffset(date, -1)) || {};
 
     var mood = getMood(day);
-    var moodText = mood.label ? (mood.icon + " " + mood.label) : (mood.raw ? ("ID: " + mood.raw) : "—");
+    var moodText = mood.label ? mood.label : (mood.raw ? ("ID: " + mood.raw) : "—");
     var moodSub = mood.note ? mood.note : (mood.raw ? "ID: " + mood.raw : "");
 
     var sleepH = getSleepHours(yesterday);
@@ -1058,22 +1147,22 @@
 
     return '<div class="ae-grid--hero ae-stagger">' +
            AeMetric({
-             icon: "🌤", title: "Mod", value: moodText, countValue: mood.value, countFormat: "mood", countBadge: true, color: "mood", sub: moodSub,
+             icon: "mood", title: "Mod", value: moodText, countValue: mood.value, countFormat: "mood", countBadge: true, color: "mood", sub: moodSub,
              sparkline: moodSeries, delta: metricDelta(moodSeries),
              ring: { value: mood.value === null ? 0 : (mood.value / 7) * 100, color: "accent", label: "Mod ilerlemesi" }
            }) +
            AeMetric({
-             icon: "🌙", title: "Uyku", value: sleepText, countValue: sleepH, countFormat: "hours", color: "sleep", sub: sleepSub,
+             icon: "sleep", title: "Uyku", value: sleepText, countValue: sleepH, countFormat: "hours", color: "sleep", sub: sleepSub,
              sparkline: sleepSeries, delta: metricDelta(sleepSeries),
              ring: { value: sleepH === null ? 0 : (sleepH / 8) * 100, color: "info", label: "Uyku hedefi" }
            }) +
            AeMetric({
-             icon: "🆘", title: "SOS", value: sosText, countValue: sosCount > 0 ? sosCount : null, countFormat: "integer", color: sosCount > 0 ? "drop" : "ok", sub: sosSub,
+             icon: "sos", title: "SOS", value: sosText, countValue: sosCount > 0 ? sosCount : null, countFormat: "integer", color: sosCount > 0 ? "drop" : "ok", sub: sosSub,
              sparkline: sosSeries, delta: metricDelta(sosSeries, true),
              ring: { value: Math.min(100, sosCount * 20), color: sosCount > 0 ? "drop" : "ok", label: "SOS yoğunluğu" }
            }) +
            AeMetric({
-             icon: "👟", title: "Adım", value: stepsText, countValue: steps, countFormat: "integer", color: "info", unit: steps !== null ? "adım" : null,
+             icon: "steps", title: "Adım", value: stepsText, countValue: steps, countFormat: "integer", color: "info", unit: steps !== null ? "adım" : null,
              sparkline: stepsSeries, delta: metricDelta(stepsSeries),
              ring: { value: steps === null ? 0 : (steps / (getTarget("steps", 10000))) * 100, color: "info", label: "Adım hedefi" }
            }) +
@@ -1212,27 +1301,27 @@
   function renderQuickNotes(date) {
     var day = getDay(date) || {};
     var items = [];
-    if (day.journal && day.journal.text) items.push({ kind: "Günlük", icon: "📝", detail: String(day.journal.text || "") });
-    if (day.note) items.push({ kind: "Not", icon: "📌", detail: String(day.note || "") });
-    if (day.intention) items.push({ kind: "Niyet", icon: "🕯", detail: String(day.intention || "") });
+    if (day.journal && day.journal.text) items.push({ kind: "Günlük", icon: "journal", detail: String(day.journal.text || "") });
+    if (day.note) items.push({ kind: "Not", icon: "note", detail: String(day.note || "") });
+    if (day.intention) items.push({ kind: "Niyet", icon: "intention", detail: String(day.intention || "") });
     if (day.gratitude) {
       if (Array.isArray(day.gratitude)) {
-        items.push({ kind: "Şükür", icon: "🙏", detail: day.gratitude.map(function(x){ return "• " + String(x || ""); }).join("\n") });
+        items.push({ kind: "Şükür", icon: "gratitude", detail: day.gratitude.map(function(x){ return "• " + String(x || ""); }).join("\n") });
       } else {
-        items.push({ kind: "Şükür", icon: "🙏", detail: String(day.gratitude || "") });
+        items.push({ kind: "Şükür", icon: "gratitude", detail: String(day.gratitude || "") });
       }
     }
     var therapy = getTherapy(day);
     var share = therapy.share || {};
     if (share.text || share.note || share.summary) {
-      items.push({ kind: "Terapi paylaşımı", icon: "🛡", redacted: true, detail: "Ham terapi notu gizli; özet güvenli gösterilebilir." });
+      items.push({ kind: "Terapi paylaşımı", icon: "shield", redacted: true, detail: "Ham terapi notu gizli; özet güvenli gösterilebilir." });
     }
 
     if (!items.length) return "";
 
     var chips = items.map(function(it) {
       return '<span class="ae-chip ' + (it.redacted ? "ae-chip--redacted" : "") + '">' +
-             escapeHtml(it.icon + " " + it.kind) +
+             renderIcon(it.icon, 15) + escapeHtml(it.kind) +
              (it.redacted ? ' <span class="ae-chip__hint">redacted</span>' : "") +
              "</span>";
     }).join("");
@@ -1240,7 +1329,7 @@
     var list = items.map(function(it) {
       var body = it.detail ? '<div class="quick-notes__detail">' + nl2br(escapeHtml(it.detail)) + "</div>" : "";
       return '<div class="quick-notes__item ' + (it.redacted ? "quick-notes__item--redacted" : "") + '">' +
-             '<div class="quick-notes__kind">' + escapeHtml(it.icon + " " + it.kind) + (it.redacted ? ' <span class="ae-chip__hint">gizli</span>' : "") + "</div>" +
+             '<div class="quick-notes__kind">' + renderIcon(it.icon, 15) + escapeHtml(it.kind) + (it.redacted ? ' <span class="ae-chip__hint">gizli</span>' : "") + "</div>" +
              body +
              "</div>";
     }).join("");
@@ -1262,12 +1351,12 @@
     var isToday = ui.date === today;
     var dateText = isToday ? "Bugün" : formatDateLabel(ui.date);
     return '<div class="ae-card ae-card--outline ae-card--summary date-picker">' +
-           AeButton({ label: "◀", variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
+           AeButton({ labelHtml: renderIcon("arrowLeft", 16), variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
            '<div class="date-picker__display">' +
            '<div class="date-picker__label">' + escapeHtml(dateText) + "</div>" +
            '<div class="date-picker__iso">' + escapeHtml(ui.date) + "</div>" +
            "</div>" +
-           AeButton({ label: "▶", variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
+           AeButton({ labelHtml: renderIcon("arrowRight", 16), variant: "mini", className: "date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
            AeButton({ label: "Detay", variant: "text", onclick: "AeonV2.goToDayDetail()" }) +
            "</div>";
   }
@@ -1601,7 +1690,7 @@
     var severity = safeText(a.severity || "info", 16).replace(/[^A-Za-z0-9_-]/g, "") || "info";
     var dateLabel = a.linkDate ? formatDateLabel(a.linkDate) : "";
     var body = '<div class="anomaly-card__row">' +
-               '<div class="anomaly-card__icon" aria-hidden="true">' + escapeHtml({ sleep: "🌙", sos: "🆘", missing: "🕳", moh: "🌫", steps: "👟", water: "💧" }[a.kind] || "◌") + "</div>" +
+               '<div class="anomaly-card__icon">' + renderIcon({ sleep: "sleep", sos: "sos", missing: "dot", moh: "cloud", steps: "steps", water: "water" }[a.kind] || "dot", 18) + "</div>" +
                '<div class="anomaly-card__body">' +
                '<div class="anomaly-card__message">' + escapeHtml(a.message || "Dikkat gerektiren durum") + "</div>" +
                '<div class="anomaly-card__meta">' + escapeHtml(dateLabel) +
@@ -1744,14 +1833,16 @@
 
   function renderMetricChart(metricKey, data, color) {
     var configs = {
-      sleep: { key: "sleep", icon: "🌙", title: "Uyku Trendi", unit: "sa", min: 0, max: 12, targetKey: "sleepHours", target: 8 },
-      steps: { key: "steps", icon: "👟", title: "Adım Trendi", unit: "adım", min: 0, max: 12000, targetKey: "steps", target: 10000 },
-      water: { key: "water", icon: "💧", title: "Su Trendi", unit: "bardak", min: 0, max: 12, targetKey: "waterGlasses", target: 8 }
+      sleep: { key: "sleep", icon: "sleep", title: "Uyku Trendi", unit: "sa", min: 0, max: 12, targetKey: "sleepHours", target: 8 },
+      steps: { key: "steps", icon: "steps", title: "Adım Trendi", unit: "adım", min: 0, max: 12000, targetKey: "steps", target: 10000 },
+      water: { key: "water", icon: "water", title: "Su Trendi", unit: "bardak", min: 0, max: 12, targetKey: "waterGlasses", target: 8 }
     };
     var config = configs[String(metricKey)] || configs.sleep;
+    var windowDays = data && !Array.isArray(data) && safeNumber(data.windowDays) !== null
+      ? Math.max(1, Math.min(30, Math.round(safeNumber(data.windowDays)))) : 30;
     var sourceValues = Array.isArray(data) ? data : data && Array.isArray(data.values) ? data.values : [];
-    var sourceDates = data && Array.isArray(data.dates) ? data.dates : lastNDates(sourceValues.length || 30, todayStr());
-    var values = sourceValues.slice(0, 30).map(function(value) {
+    var sourceDates = data && Array.isArray(data.dates) ? data.dates : lastNDates(sourceValues.length || windowDays, todayStr());
+    var values = sourceValues.slice(0, windowDays).map(function(value) {
       if (value === null || value === undefined || value === "") return null;
       var n = safeNumber(value);
       return n === null ? null : Math.max(config.min, Math.min(config.max, n));
@@ -1848,11 +1939,11 @@
       className: "ae-metric-chart-card ae-metric-chart-card--" + config.key,
       children: '<section class="ae-metric-chart ae-metric-chart--' + colorKey + '" aria-labelledby="' + titleId + '">' +
         '<div class="ae-metric-chart__head">' +
-        '<div><div class="ae-label" id="' + titleId + '">' + config.icon + " " + escapeHtml(config.title) + '</div>' +
-        '<div class="ae-metric-chart__subtitle">Son 30 gün · 0–' + escapeHtml(formatValue(config.max)) + " " + escapeHtml(config.unit) + '</div></div>' +
+        '<div><div class="ae-label" id="' + titleId + '">' + renderIcon(config.icon, 16) + " " + escapeHtml(config.title) + '</div>' +
+        '<div class="ae-metric-chart__subtitle">Son ' + windowDays + ' gün · 0–' + escapeHtml(formatValue(config.max)) + " " + escapeHtml(config.unit) + '</div></div>' +
         '<span class="ae-chip ae-metric-chart__target-chip">Hedef ' + escapeHtml(formatValue(target)) + " " + escapeHtml(config.unit) + '</span>' +
         '</div><div class="ae-metric-chart__plot"><svg class="ae-metric-chart__svg" viewBox="0 0 ' + width + " " + height +
-        '" preserveAspectRatio="none" role="img" aria-label="' + escapeHtml(config.title + ", son 30 gün") + '" focusable="false">' +
+        '" preserveAspectRatio="none" role="img" aria-label="' + escapeHtml(config.title + ", son " + windowDays + " gün") + '" focusable="false">' +
         '<defs><linearGradient id="' + gradientId + '" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0%" stop-color="var(--ae-chart-color)" stop-opacity="0.32"></stop>' +
         '<stop offset="100%" stop-color="var(--ae-chart-color)" stop-opacity="0"></stop>' +
@@ -1862,19 +1953,337 @@
   }
 
   function renderMetricCharts(endDate) {
-    var summary = summaryForWindow(endDate, 30);
+    var windowDays = arguments.length > 1 && safeNumber(arguments[1]) !== null ? Math.round(safeNumber(arguments[1])) : 30;
+    windowDays = Math.max(1, Math.min(30, windowDays));
+    var summary = summaryForWindow(endDate, windowDays);
     return '<div class="ae-metric-chart-grid ae-stagger" aria-label="Uyku, adım ve su trend grafikleri">' +
-      renderMetricChart("sleep", { values: summary._sleepSeries, dates: summary.dates }, "info") +
-      renderMetricChart("steps", { values: summary._stepsSeries, dates: summary.dates }, "info") +
-      renderMetricChart("water", { values: summary._waterSeries, dates: summary.dates }, "ok") +
+      renderMetricChart("sleep", { values: summary._sleepSeries, dates: summary.dates, windowDays: windowDays }, "info") +
+      renderMetricChart("steps", { values: summary._stepsSeries, dates: summary.dates, windowDays: windowDays }, "info") +
+      renderMetricChart("water", { values: summary._waterSeries, dates: summary.dates, windowDays: windowDays }, "ok") +
       '</div>';
+  }
+
+  // ── Geçmiş kullanıcı kayıtları ────────────────────────────────────────
+  // Trend grafikleri ile metin/sayaç kayıtları aynı tarih penceresinden
+  // beslenir. Bu katman yalnızca appData'yı okur; hiçbir alanı normalize ederek
+  // kaynağa geri yazmaz.
+  function historyDate(value) {
+    var raw = String(value || "");
+    var match = raw.match(/\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : "";
+  }
+
+  function historyText(value, max) {
+    if (value === null || value === undefined) return "";
+    if (Array.isArray(value)) return value.map(function(item) { return historyText(item, max); }).filter(Boolean).join("\n");
+    if (isObject(value)) return "";
+    return safeText(String(value).trim(), max || 240);
+  }
+
+  function historyRecord(records, seen, opts) {
+    opts = opts || {};
+    var source = safeText(opts.source || "Kayıt", 40);
+    var title = safeText(opts.title || source, 120);
+    var text = historyText(opts.text, 1800);
+    var value = numberOrNull(opts.value);
+    var target = numberOrNull(opts.target);
+    var date = historyDate(opts.date);
+    if (!text && value === null && target === null && !opts.redacted) return;
+    var fingerprintText = String(opts.identity || text || title).toLocaleLowerCase("tr-TR").replace(/\s+/g, " ").trim();
+    var fingerprint = String(opts.id || "") || [date, source, title, fingerprintText, value === null ? "" : value].join("|");
+    if (seen[fingerprint]) return;
+    seen[fingerprint] = true;
+    records.push({
+      id: fingerprint,
+      date: date,
+      source: source,
+      title: title,
+      text: text,
+      value: value,
+      target: target,
+      meta: safeText(opts.meta || "", 180),
+      redacted: opts.redacted === true,
+      percent: target !== null && target > 0 && value !== null ? Math.max(0, Math.min(100, Math.round(value / target * 100))) : null
+    });
+  }
+
+  function historyWindowAllows(date, endDate, window) {
+    if (window === "all") return true;
+    if (!date) return false;
+    var n = safeNumber(window);
+    if (n === null) n = 7;
+    return date >= dateOffset(endDate, -(Math.max(1, n) - 1)) && date <= endDate;
+  }
+
+  function addHistoryText(records, seen, date, source, title, text, meta, identity) {
+    historyRecord(records, seen, {
+      date: date,
+      source: source,
+      title: title,
+      text: historyText(text, 1800) || (meta ? "Kayıtlı kullanıcı kaydı." : ""),
+      meta: meta,
+      identity: identity
+    });
+  }
+
+  function addHistoryEntries(records, seen, date, entries, source, fallbackTitle) {
+    if (!Array.isArray(entries)) return;
+    entries.forEach(function(entry, index) {
+      if (!isObject(entry)) return;
+      var title = historyText(entry.title || entry.name || entry.topic || fallbackTitle, 120) || fallbackTitle;
+      var note = historyText(entry.note || entry.text || "", 1800);
+      var meta = [entry.author, entry.artist, entry.kind, entry.pages ? entry.pages + " sayfa" : "", entry.minutes ? entry.minutes + " dk" : "", entry.episodes ? entry.episodes + " bölüm" : ""].filter(Boolean).join(" · ");
+      if (!note && !meta && !title) return;
+      historyRecord(records, seen, {
+        id: entry.id ? source + "|" + entry.id : "",
+        date: date,
+        source: source,
+        title: title,
+        text: note || "Kayıtlı içerik",
+        meta: meta,
+        value: numberOrNull(entry.pages !== undefined ? entry.pages : entry.minutes),
+        identity: title + "|" + note + "|" + index
+      });
+    });
+  }
+
+  function addHistoryRootArchive(records, seen, root) {
+    var library = isObject(root.library) ? root.library : {};
+    (Array.isArray(library.books) ? library.books : []).forEach(function(book) {
+      if (!isObject(book)) return;
+      var date = historyDate(book.finishedAt || book.startedAt || book.createdAt);
+      addHistoryText(records, seen, date, "Arşiv · Kütüphane", book.title || "Kitap notu", book.note, [book.author, book.status, book.rating ? book.rating + "/5" : ""].filter(Boolean).join(" · ") || "Kayıtlı kitap", book.id ? "archive-book|" + book.id : "");
+      (Array.isArray(book.quotes) ? book.quotes : []).forEach(function(quote) {
+        if (!isObject(quote)) return;
+        addHistoryText(records, seen, historyDate(quote.ts || date), "Arşiv · Alıntı", book.title || "Kitap alıntısı", quote.text, quote.page ? "Sayfa " + quote.page : "", quote.id ? "archive-quote|" + quote.id : "");
+      });
+    });
+    var watchlist = isObject(root.watchlist) ? root.watchlist : {};
+    (Array.isArray(watchlist.items) ? watchlist.items : []).forEach(function(item) {
+      if (!isObject(item)) return;
+      var date = historyDate(item.finishedAt || item.startedAt || item.createdAt);
+      addHistoryText(records, seen, date, "Arşiv · İzleme", item.title || "İzleme notu", item.note, [item.kind, item.status, item.rating ? item.rating + "/5" : ""].filter(Boolean).join(" · ") || "Kayıtlı izleme", item.id ? "archive-watch|" + item.id : "");
+      (Array.isArray(item.quotes) ? item.quotes : []).forEach(function(quote) {
+        if (!isObject(quote)) return;
+        addHistoryText(records, seen, historyDate(quote.ts || date), "Arşiv · Alıntı", item.title || "İzleme alıntısı", quote.text, quote.page ? "Sayfa " + quote.page : "", quote.id ? "archive-quote|" + quote.id : "");
+      });
+    });
+    var music = isObject(root.music) ? root.music : {};
+    (Array.isArray(music.items) ? music.items : []).forEach(function(item) {
+      if (!isObject(item)) return;
+      var date = historyDate(item.createdAt);
+      addHistoryText(records, seen, date, "Arşiv · Dinleme", item.title || "Dinleme notu", item.note, [item.artist, item.kind, item.rating ? item.rating + "/5" : ""].filter(Boolean).join(" · ") || "Kayıtlı dinleme", item.id ? "archive-music|" + item.id : "");
+      (Array.isArray(item.quotes) ? item.quotes : []).forEach(function(quote) {
+        if (!isObject(quote)) return;
+        addHistoryText(records, seen, historyDate(quote.ts || date), "Arşiv · Alıntı", item.title || "Müzik alıntısı", quote.text, item.artist || "", quote.id ? "archive-quote|" + quote.id : "");
+      });
+    });
+    var soulArchive = isObject(root.soulArchive) ? root.soulArchive : {};
+    var soulItems = Array.isArray(root.soulArchive) ? root.soulArchive : (Array.isArray(soulArchive.items) ? soulArchive.items : []);
+    soulItems.forEach(function(item) {
+      if (!isObject(item)) return;
+      addHistoryText(records, seen, historyDate(item.date || item.createdAt || item.savedAt), "Arşiv · Zihin-Beden", item.label || item.type || "Pratik", item.note, item.duration ? item.duration + " dk" : "Kayıtlı pratik", item.id ? "archive-soul|" + item.id : "");
+    });
+  }
+
+  function collectHistoryRecords(endDate, window) {
+    var root = isObject(appData) ? appData : {};
+    var records = [], seen = {}, days = isObject(root.days) ? root.days : {};
+    Object.keys(days).sort().forEach(function(date) {
+      if (!historyWindowAllows(date, endDate, window)) return;
+      var day = isObject(days[date]) ? days[date] : {};
+      if (day.note) addHistoryText(records, seen, date, "Günün Notu", "Günün notu", day.note, "", "");
+      var moodInfo = getMood(day);
+      if (moodInfo.note) addHistoryText(records, seen, date, "Ruh Hali Notu", "Ruh hali notu", moodInfo.note, moodInfo.label || "", "");
+      if (day.moodNote) addHistoryText(records, seen, date, "Ruh Hali Notu", "Ruh hali notu", day.moodNote, day.mood || "", "");
+      if (day.intention) addHistoryText(records, seen, date, "Niyet", "Günün niyeti", day.intention, "", "");
+      if (typeof day.journal === "string") addHistoryText(records, seen, date, "Günlük", "Günlük Işığı", day.journal, "", "");
+      if (day.journal && day.journal.text) addHistoryText(records, seen, date, "Günlük", "Günlük Işığı", day.journal.text, day.journal.mode || "", "");
+      ["notes", "otherNotes", "otherNote", "dailyNote", "freeNote", "noteText"].forEach(function(key) {
+        var value = day[key];
+        if (isObject(value)) value = value.text || value.note || value.body || "";
+        if (value) addHistoryText(records, seen, date, "Diğer Notlar", key, value, "", "");
+      });
+      if (day.gratitude) {
+        (Array.isArray(day.gratitude) ? day.gratitude : [day.gratitude]).forEach(function(item, index) {
+          addHistoryText(records, seen, date, "Şükür", "Şükür " + (index + 1), item, "", "");
+        });
+      }
+      var meals = getMeals(day);
+      ["breakfast", "lunch", "dinner", "snack"].forEach(function(key) {
+        if (meals[key]) addHistoryText(records, seen, date, "Beslenme", key, meals[key], "", "");
+      });
+      var mealItems = isObject(day.mealItems) ? day.mealItems : {};
+      Object.keys(mealItems).forEach(function(key) {
+        if (!Array.isArray(mealItems[key]) || !mealItems[key].length) return;
+        var itemText = mealItems[key].map(function(item) {
+          return isObject(item) ? [item.name, item.qty, item.unit].filter(Boolean).join(" ") : String(item || "");
+        }).filter(Boolean).join("\n");
+        addHistoryText(records, seen, date, "Beslenme", key + " içerikleri", itemText, mealItems[key].length + " kalem", "");
+      });
+      var caffeine = getCaffeine(day);
+      if (caffeine.drinks && caffeine.drinks.length) {
+        addHistoryText(records, seen, date, "Kafein", "Kafein kayıtları", caffeine.drinks.map(function(drink) {
+          return isObject(drink) ? [drink.type, drink.qty, drink.time].filter(Boolean).join(" ") : String(drink || "");
+        }).join("\n"), caffeine.drinks.length + " içecek", "");
+      } else if (caffeine.cups || caffeine.last) {
+        historyRecord(records, seen, { date: date, source: "Kafein", title: "Kafein toplamı", text: "Gün içi kafein kaydı", value: safeNumber(caffeine.cups) || 0, meta: caffeine.last ? "Son kayıt " + caffeine.last : "", identity: "caffeine|" + date });
+      }
+      if (day.cravingTriggerNote) addHistoryText(records, seen, date, "Kriz", "Tetikleyici notu", day.cravingTriggerNote, "", "");
+      if (Array.isArray(day.cravingTriggers) && day.cravingTriggers.length) addHistoryText(records, seen, date, "Kriz", "Tetikleyiciler", day.cravingTriggers.join("\n"), day.cravingTriggers.length + " tetikleyici", "");
+      if (safeNumber(day.cravingSOSCount) !== null && safeNumber(day.cravingSOSCount) > 0) {
+        historyRecord(records, seen, { date: date, source: "Kriz", title: "SOS kullanımı", text: "Gün içi SOS aktivasyonu", value: safeNumber(day.cravingSOSCount), meta: "Kriz kaydı", identity: "sos|" + date });
+      }
+      var energyValue = numberOrNull(day.energy);
+      var stressValue = numberOrNull(day.stress);
+      if (energyValue !== null) historyRecord(records, seen, { date: date, source: "Enerji", title: "Enerji seviyesi", text: "Günlük enerji ölçümü", value: energyValue, target: 5, meta: "1–5 ölçeği", identity: "energy|" + date });
+      if (stressValue !== null) historyRecord(records, seen, { date: date, source: "Stres", title: "Stres seviyesi", text: "Günlük stres ölçümü", value: stressValue, target: 5, meta: "1–5 ölçeği", identity: "stress|" + date });
+      var magnesium = isObject(day.magnesium) ? day.magnesium : {};
+      if (magnesium.taken || magnesium.skipped || magnesium.effectNote || magnesium.feedback) {
+        addHistoryText(records, seen, date, "Takviye", "Magnezyum kaydı", [magnesium.taken ? "Alındı" : "", magnesium.skipped ? "Atlandı" : "", magnesium.form, magnesium.mg ? magnesium.mg + " mg" : "", magnesium.effectNote, magnesium.feedback].filter(Boolean).join("\n"), "", "");
+      }
+      var saygi = getSaygiInfo(day);
+      if (saygi && (saygi.name || saygi.read)) {
+        addHistoryText(records, seen, date, "Saygı", saygi.name || "Günün öncüsü", saygi.read ? "Okundu olarak işaretlendi." : "Günün öncüsü kaydı", saygi.read ? "Okundu" : "", saygi.personId ? "saygi|" + saygi.personId + "|" + date : "");
+      }
+      if (Array.isArray(day.quranRequests) && day.quranRequests.length) {
+        day.quranRequests.forEach(function(request, index) {
+          if (!isObject(request)) return;
+          var requestText = [request.status, request.note, request.title, request.surahName].filter(Boolean).join("\n");
+          addHistoryText(records, seen, date, "Kur’an", request.surahName || request.title || "Kur’an talebi", requestText || "Kur’an yolculuğu kaydı", request.status || "", request.id ? "quran|" + request.id : "quran|" + date + "|" + index);
+        });
+      }
+      addHistoryEntries(records, seen, date, contentEntries(day, "reading"), "Okuma", "Kitap");
+      addHistoryEntries(records, seen, date, contentEntries(day, "watching"), "İzleme", "İzleme");
+      addHistoryEntries(records, seen, date, contentEntries(day, "listening"), "Dinleme", "Parça");
+      addHistoryEntries(records, seen, date, getLearningEntries(day), "Öğrenme", "Konu");
+      addHistoryEntries(records, seen, date, getSoulActivities(day), "Zihin-Beden", "Pratik");
+      (Array.isArray(day.quotes) ? day.quotes : []).forEach(function(quote) {
+        if (isObject(quote) && quote.text) addHistoryText(records, seen, historyDate(quote.ts || date), "Alıntı", quote.source || "Gün içi alıntı", quote.text, "", quote.id ? "day-quote|" + quote.id : "");
+      });
+      var discomfort = getDiscomfort(day);
+      if (discomfort.note) addHistoryText(records, seen, date, "Beden Notu", "Rahatsızlık notu", discomfort.note, "", "");
+      var sleep = isObject(day.sleep) ? day.sleep : {};
+      if (sleep.med && sleep.med.note) addHistoryText(records, seen, date, "Uyku Notu", "Uyku ilacı / takviye notu", sleep.med.note, sleep.med.type || "", "");
+      if (sleep.windDown && sleep.windDown.offloadNote) addHistoryText(records, seen, date, "Zihin Boşaltma", "Uykuya geçiş notu", sleep.windDown.offloadNote, "", "");
+      var therapy = getTherapy(day);
+      if ((therapy.thoughts && therapy.thoughts.length) || therapy.share && (therapy.share.note || therapy.share.sentAt)) {
+        historyRecord(records, seen, { date: date, source: "Terapi", title: "Terapi kaydı", text: "Hassas terapi içeriği gizli tutulur.", meta: "Kayıt özeti", redacted: true, identity: "therapy|" + date });
+      }
+      if (therapy.dailyWin && therapy.dailyWin.text) addHistoryText(records, seen, date, "Yansıma", "Günün kazanımı", therapy.dailyWin.text, "", "");
+      if (therapy.selfCompassion && therapy.selfCompassion.note) addHistoryText(records, seen, date, "Yansıma", "Öz şefkat notu", therapy.selfCompassion.note, "", "");
+      if (therapy.firstStep && therapy.firstStep.text) addHistoryText(records, seen, date, "Yansıma", "İlk adım", therapy.firstStep.text, "", "");
+
+      var prayer = getPrayer(day) || {};
+      var prayerKeys = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"];
+      var prayerCountKeys = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+      var prayerSeen = prayerKeys.some(function(key) { return isObject(prayer[key]) || typeof prayer[key] === "boolean"; });
+      if (prayerSeen) {
+        var prayerDone = prayerCountKeys.filter(function(key) { return prayer[key] === true || prayer[key] && prayer[key].performed; }).length;
+        var prayerNotes = prayerKeys.map(function(key) { return isObject(prayer[key]) && prayer[key].note ? PRAYER_LABELS[key] + ": " + prayer[key].note : ""; }).filter(Boolean).join("\n");
+        historyRecord(records, seen, { date: date, source: "İbadet", title: "Namaz kaydı", text: prayerNotes || "Vakit durumu kaydedildi.", value: prayerDone, target: 5, meta: prayerDone + "/5 vakit", identity: "prayer|" + date });
+      }
+      if (!getZikrSession(date) && isObject(day.zikr)) {
+        var legacyCount = numberOrNull(day.zikr.count);
+        if (legacyCount !== null) historyRecord(records, seen, { date: date, source: "Zikir", title: day.zikr.name || "Zikir", text: "Günlük zikir sayacı", value: legacyCount, meta: "Eski günlük kayıt", identity: "legacy-zikr|" + date });
+      }
+    });
+
+    var sessions = isObject(root.zikr) && isObject(root.zikr.sessions) ? root.zikr.sessions : {};
+    Object.keys(sessions).forEach(function(date) {
+      if (!historyWindowAllows(date, endDate, window) || !isObject(sessions[date])) return;
+      var session = sessions[date], total = numberOrNull(session.totalCount);
+      if (total === null) total = numberOrNull(session.total);
+      if (total === null) total = numberOrNull(session.count);
+      var perPreset = isObject(session.perPreset) ? session.perPreset : {};
+      var target = 0, names = [], derivedTotal = 0, hasDerivedTotal = false;
+      Object.keys(perPreset).forEach(function(id) {
+        var preset = getZikrPreset(date, id) || {};
+        var count = isObject(perPreset[id]) ? numberOrNull(perPreset[id].count) : numberOrNull(perPreset[id]);
+        var presetTarget = safeNumber(preset.ebced || preset.target);
+        if (presetTarget !== null && presetTarget > 0) target += presetTarget;
+        if (count !== null) { derivedTotal += Math.max(0, count); hasDerivedTotal = true; }
+        if (count !== null && count > 0) names.push((preset.name || id) + ": " + count.toLocaleString("tr-TR"));
+      });
+      if (total !== null) total = Math.max(0, total);
+      else if (hasDerivedTotal) total = derivedTotal;
+      historyRecord(records, seen, { date: date, source: "Zikir", title: "Esma / zikir kaydı", text: names.join("\n") || "Günlük zikir sayacı", value: total, target: target || null, meta: (session.completedSets || 0) + " tamamlanan tur" + (target ? " · hedef " + target.toLocaleString("tr-TR") : ""), identity: "zikr|" + date });
+    });
+    var reflections = isObject(root.zikr) && Array.isArray(root.zikr.reflections) ? root.zikr.reflections : [];
+    reflections.forEach(function(ref, index) {
+      if (!isObject(ref) || !historyWindowAllows(historyDate(ref.date || ref.updatedAt || ref.createdAt), endDate, window)) return;
+      var text = [ref.feelings, ref.thoughts, ref.intention].filter(Boolean).join("\n");
+      if (!text) return;
+      addHistoryText(records, seen, historyDate(ref.date || ref.updatedAt || ref.createdAt), "Tefekkür", ref.presetName || "Zikir tefekkürü", text, ref.wordCount ? ref.wordCount + " kelime" : "", ref.id ? "reflection|" + ref.id : "reflection|" + index);
+    });
+    addHistoryRootArchive(records, seen, root);
+    return records.filter(function(record) {
+      return historyWindowAllows(record.date, endDate, window);
+    }).sort(function(a, b) {
+      return String(b.date || "").localeCompare(String(a.date || "")) || String(a.source).localeCompare(String(b.source), "tr");
+    });
+  }
+
+  function historySourceLabel(source) { return safeText(source || "Kayıt", 40); }
+
+  function historyRecordHtml(record, index) {
+    var valueHtml = record.value !== null ? '<span class="history-record__value">' + record.value.toLocaleString("tr-TR") + (record.target !== null ? " / " + record.target.toLocaleString("tr-TR") : "") + '</span>' : "";
+    var progress = record.percent !== null ? '<div class="history-record__progress" aria-label="Tamamlanma yüzde ' + record.percent + '"><span style="width:' + record.percent + '%"></span></div>' : "";
+    var detail = record.redacted ? "Hassas içerik güvenlik nedeniyle gösterilmiyor; yalnızca kayıt özeti tutuluyor." : (record.text || "Ayrıntı yok.");
+    return '<details class="history-record ae-slide-up" data-history-index="' + index + '">' +
+      '<summary class="history-record__summary"><span class="history-record__source">' + escapeHtml(historySourceLabel(record.source)) + '</span><span class="history-record__date">' + escapeHtml(record.date ? formatDateLabel(record.date) : "Tarih bilgisi yok") + '</span>' + valueHtml + '<span class="history-record__chevron" aria-hidden="true">' + renderIcon("arrowRight", 14) + '</span></summary>' +
+      '<div class="history-record__content"><strong>' + escapeHtml(record.title) + '</strong>' + (record.meta ? '<span class="history-record__meta">' + escapeHtml(record.meta) + '</span>' : "") + '<p>' + nl2br(escapeHtml(detail)) + '</p>' + progress + '</div></details>';
+  }
+
+  function renderHistoryFilters(records, endDate) {
+    var sources = ["all"].concat(records.map(function(record) { return record.source; }).filter(function(source, index, arr) { return arr.indexOf(source) === index; }).sort(function(a, b) { return a.localeCompare(b, "tr"); }));
+    var days = ["all"].concat(records.map(function(record) { return record.date; }).filter(function(date, index, arr) { return date && arr.indexOf(date) === index; }).sort().reverse());
+    var source = sources.indexOf(ui.historySource) >= 0 ? ui.historySource : "all";
+    var day = days.indexOf(ui.historyDay) >= 0 ? ui.historyDay : "all";
+    var sourceOptions = sources.map(function(value) { return '<option value="' + escapeHtml(value) + '"' + (value === source ? " selected" : "") + '>' + escapeHtml(value === "all" ? "Tüm kaynaklar" : value) + '</option>'; }).join("");
+    var dayOptions = days.map(function(value) { return '<option value="' + escapeHtml(value) + '"' + (value === day ? " selected" : "") + '>' + escapeHtml(value === "all" ? "Tüm günler" : formatDateLabel(value)) + '</option>'; }).join("");
+    var options = [7, 14, 30, "all"].map(function(value) {
+      var active = String(ui.historyWindow) === String(value) ? "is-active" : "";
+      return AeButton({ label: value === "all" ? "Tümü" : value + " gün", variant: "pill", className: active, onclick: "AeonV2.setHistoryWindow('" + value + "')", ariaLabel: value === "all" ? "Tüm geçmiş" : value + " günlük kayıt penceresi" });
+    }).join("");
+    return '<div class="history-filters" role="group" aria-label="Geçmiş kayıt filtreleri"><div class="history-filters__window"><span class="ae-label">Kayıt penceresi</span><div class="history-filters__buttons">' + options + '</div></div><label class="history-filter"><span class="ae-label">Kaynak</span><select aria-label="Kayıt kaynağı" onchange="AeonV2.setHistoryFilter(\'source\',this.value)">' + sourceOptions + '</select></label><label class="history-filter"><span class="ae-label">Gün</span><select aria-label="Kayıt günü" onchange="AeonV2.setHistoryFilter(\'day\',this.value)">' + dayOptions + '</select></label></div>';
+  }
+
+  function renderHistorySection(endDate) {
+    var window = ui.historyWindow === "all" ? "all" : (safeNumber(ui.historyWindow) || ui.trendWindow || 7);
+    var allRecords = collectHistoryRecords(endDate, window);
+    var activeSource = allRecords.some(function(record) { return record.source === ui.historySource; }) ? ui.historySource : "all";
+    var activeDay = allRecords.some(function(record) { return record.date === ui.historyDay; }) ? ui.historyDay : "all";
+    var filtered = allRecords.filter(function(record) {
+      return (activeSource === "all" || record.source === activeSource) && (activeDay === "all" || record.date === activeDay);
+    });
+    var zikirTotal = filtered.filter(function(record) { return record.source === "Zikir"; }).reduce(function(sum, record) { return sum + (record.value || 0); }, 0);
+    var prayerCount = filtered.filter(function(record) { return record.source === "İbadet"; }).reduce(function(sum, record) { return sum + (record.value || 0); }, 0);
+    var body = filtered.length ? filtered.map(historyRecordHtml).join("") : AeEmpty({ icon: "note", title: "Bu aralıkta kayıt yok", message: "Seçili pencere veya filtreler için gösterilecek kullanıcı kaydı bulunamadı." });
+    return '<section class="trends-view__section trends-view__section--history" aria-labelledby="trends-history-title"><div class="trends-view__section-head"><div><div class="ae-label" id="trends-history-title">Notlar, Zikirler ve İbadetler</div><p>Tüm anlamlı kayıtlar kaynak ve tarih bilgisiyle korunur; hassas terapi metinleri özetlenir.</p></div><span class="ae-chip ae-chip--accent">' + filtered.length.toLocaleString("tr-TR") + ' kayıt</span></div>' +
+      '<div class="history-kpis"><div><span>Kayıt</span><strong>' + filtered.length.toLocaleString("tr-TR") + '</strong></div><div><span>Zikir toplamı</span><strong>' + zikirTotal.toLocaleString("tr-TR") + '</strong></div><div><span>Namaz vakti</span><strong>' + prayerCount.toLocaleString("tr-TR") + '</strong></div></div>' +
+      renderHistoryFilters(allRecords, endDate) + '<div class="history-records" aria-live="polite">' + body + '</div></section>';
+  }
+
+  function setHistoryWindow(value) {
+    if (String(value) === "all") ui.historyWindow = "all";
+    else { var n = safeNumber(value); if (n === null) return; ui.historyWindow = n === 14 ? 14 : n >= 30 ? 30 : 7; }
+    ui.historySource = "all";
+    ui.historyDay = "all";
+    render();
+  }
+
+  function setHistoryFilter(key, value) {
+    if (key === "source") ui.historySource = safeText(value || "all", 40) || "all";
+    if (key === "day") ui.historyDay = /^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : "all";
+    render();
   }
 
   function renderAnomalies(endDate) {
     var anomalies = detectAnomalies(endDate);
     if (!anomalies.length) {
       return AeEmpty({
-        icon: "✓",
+        icon: "check",
         title: "Uyarı yok",
         message: "Seçili pencerede dikkat çeken bir durum tespit edilmedi."
       });
@@ -1907,6 +2316,9 @@
     var n = safeNumber(days);
     if (n === null) return;
     ui.trendWindow = Math.max(7, Math.min(30, n === 14 ? 14 : n <= 7 ? 7 : 30));
+    ui.historyWindow = ui.trendWindow;
+    ui.historySource = "all";
+    ui.historyDay = "all";
     render();
   }
 
@@ -1921,8 +2333,8 @@
            '<button type="button" class="ae-status-btn" onclick="AeonV2.setTab(\'system\');AeonV2.setSystemSubTab(\'status\')" aria-label="Senkron durumu">' +
            AeStatusBadge({ status: syncStatus.status }) +
            "</button>" +
-           AeButton({ label: "↻", variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.refresh()", ariaLabel: "Yenile" }) +
-           AeButton({ label: "✕", variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.logout()", ariaLabel: "Oturumu sonlandır" }) +
+           AeButton({ labelHtml: renderIcon("refresh", 17), variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.refresh()", ariaLabel: "Yenile" }) +
+           AeButton({ labelHtml: renderIcon("close", 17), variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.logout()", ariaLabel: "Oturumu sonlandır" }) +
            "</div>" +
            "</header>";
   }
@@ -1938,7 +2350,7 @@
               'aria-selected="' + (t.id === ui.tab ? "true" : "false") + '" ' +
               'aria-controls="ae-panel-' + t.id + '" ' +
               'onclick="AeonV2.setTab(\'' + t.id + '\')">' +
-              '<span class="ae-tab__icon" aria-hidden="true">' + escapeHtml(t.icon) + "</span>" +
+              '<span class="ae-tab__icon">' + renderIcon(t.icon, 17) + "</span>" +
               '<span class="ae-tab__label">' + escapeHtml(safeText(t.label, 32)) + "</span>" +
               "</button>";
     });
@@ -1954,7 +2366,7 @@
       return '<div class="today-view ae-stagger">' +
              AeCard({
                children: AeEmpty({
-                 icon: "◐",
+                 icon: "dashboard",
                  title: "Genel Bakış",
                  message: "Henüz synced veri yok. Veri geldiğinde bugünün sinyal kartları burada görünecek."
                })
@@ -1993,11 +2405,12 @@
   function renderTrends() {
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
-    if (!dayCount) {
+    var historyCount = collectHistoryRecords(date, "all").length;
+    if (!dayCount && !historyCount) {
       return '<div class="trends-view ae-stagger">' +
              AeCard({
                children: AeEmpty({
-                 icon: "◑",
+                 icon: "trend",
                  title: "Trendler & Uyarılar",
                  message: "Henüz synced veri yok. Veri geldiğinde 7/14/30 günlük özetler ve anomaliler burada görünecek."
                })
@@ -2026,9 +2439,10 @@
              renderMoodTrendChart(date) +
            '</section>' +
            '<section class="trends-view__section trends-view__section--metrics" aria-labelledby="trends-metrics-title">' +
-             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-metrics-title">Beden ritmi</div><p>Uyku, adım ve su hedef çizgileriyle birlikte.</p></div><span class="ae-chip">30 gün</span></div>' +
-             renderMetricCharts(date) +
+             '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-metrics-title">Beden ritmi</div><p>Uyku, adım ve su hedef çizgileriyle birlikte.</p></div><span class="ae-chip">' + windowDays + ' gün</span></div>' +
+             renderMetricCharts(date, windowDays) +
            '</section>' +
+           renderHistorySection(date) +
            '<section class="trends-view__section trends-view__section--anomalies" aria-labelledby="trends-anomalies-title">' +
              '<div class="trends-view__section-head"><div><div class="ae-label" id="trends-anomalies-title">Dikkat sinyalleri</div><p>Rutin dışına çıkan veya takip gerektiren örüntüler.</p></div><span class="ae-chip ae-chip--warn">Kontrol</span></div>' +
              renderAnomalies(date) +
@@ -2040,7 +2454,7 @@
   function DetailSection(opts) {
     opts = opts || {};
     var title = safeText(opts.title || "Bölüm", 40);
-    var icon = safeText(opts.icon || "◌", 4);
+    var icon = safeText(opts.icon || "dot", 32);
     var emptyText = safeText(opts.emptyText || "Bu bölümde kayıt yok.", 160);
     var bodyHtml = opts.children && String(opts.children).trim()
       ? '<div class="detail-section__body">' + opts.children + "</div>"
@@ -2050,7 +2464,7 @@
       visualVariant: opts.visualVariant || "glass",
       className: "detail-section",
       children: '<div class="detail-section__head">' +
-                '<span class="detail-section__icon" aria-hidden="true">' + escapeHtml(icon) + "</span>" +
+                '<span class="detail-section__icon">' + renderIcon(icon, 19) + "</span>" +
                 '<span class="detail-section__title">' + escapeHtml(title) + "</span>" +
                 "</div>" + bodyHtml
     });
@@ -2058,14 +2472,14 @@
 
   function DetailBlock(opts) {
     opts = opts || {};
-    var icon = safeText(opts.icon || "◌", 4);
+    var icon = safeText(opts.icon || "dot", 32);
     var title = safeText(opts.title || "", 80);
     var body = opts.body || "";
     var meta = opts.meta ? '<div class="detail-block__meta">' + escapeHtml(opts.meta) + "</div>" : "";
     var classes = classNames(["detail-block", "ae-scale-in", opts.redacted ? "detail-block--redacted" : "", opts.className]);
     return '<div class="' + escapeHtml(classes) + '">' +
            '<div class="detail-block__head">' +
-           '<span class="detail-block__icon" aria-hidden="true">' + escapeHtml(icon) + "</span>" +
+           '<span class="detail-block__icon">' + renderIcon(icon, 17) + "</span>" +
            '<span class="detail-block__title">' + escapeHtml(title) + "</span>" +
            "</div>" +
            meta +
@@ -2073,9 +2487,9 @@
            "</div>";
   }
 
-  function renderChip(label, redacted) {
+  function renderChip(label, redacted, icon) {
     return '<span class="ae-chip ' + (redacted ? "ae-chip--redacted" : "") + '">' +
-           escapeHtml(label) +
+           (icon ? renderIcon(icon, 14) : "") + escapeHtml(label) +
            (redacted ? ' <span class="ae-chip__hint">redacted</span>' : "") +
            "</span>";
   }
@@ -2084,12 +2498,12 @@
     var today = isoDate(new Date());
     var label = date === today ? "Bugün" : formatDateLabel(date);
     return '<div class="ae-card ae-card--outline ae-card--summary day-date-picker">' +
-           AeButton({ label: "◀", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
+           AeButton({ labelHtml: renderIcon("arrowLeft", 16), variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(-1)", ariaLabel: "Önceki gün" }) +
            '<div class="day-date-picker__display">' +
            '<div class="day-date-picker__label">' + escapeHtml(label) + "</div>" +
            '<div class="day-date-picker__iso">' + escapeHtml(date) + "</div>" +
            "</div>" +
-           AeButton({ label: "▶", variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
+           AeButton({ labelHtml: renderIcon("arrowRight", 16), variant: "mini", className: "day-date-picker__nav", onclick: "AeonV2.shiftDate(1)", ariaLabel: "Sonraki gün" }) +
            "</div>";
   }
 
@@ -2145,32 +2559,32 @@
     var html = "";
 
     var chips = [];
-    if (mood.label) chips.push(renderChip(mood.icon + " " + mood.label + (mood.note ? " · " + mood.note : ""), false));
-    if (day.journal && day.journal.text) chips.push(renderChip("📝 Günlük", false));
-    if (day.note) chips.push(renderChip("📌 Not", false));
-    if (day.intention) chips.push(renderChip("🕯 Niyet", false));
-    if (day.gratitude) chips.push(renderChip("🙏 Şükür", false));
+    if (mood.label) chips.push(renderChip(mood.label + (mood.note ? " · " + mood.note : ""), false, mood.icon));
+    if (day.journal && day.journal.text) chips.push(renderChip("Günlük", false));
+    if (day.note) chips.push(renderChip("Not", false));
+    if (day.intention) chips.push(renderChip("Niyet", false));
+    if (day.gratitude) chips.push(renderChip("Şükür", false));
 
     var t = getTherapy(day);
     var thoughts = Array.isArray(t.thoughts) ? t.thoughts : [];
-    if (thoughts.length) chips.push(renderChip("💭 Düşünce (" + thoughts.length + ")", false));
-    if (isObject(t.decision) && (t.decision.choice || t.decision.optionA || t.decision.optionB)) chips.push(renderChip("✓ Karar: " + safeText(t.decision.choice || "", 40), false));
-    if (isObject(t.share) && (t.share.note || t.share.sentAt)) chips.push(renderChip("🛡 Terapi paylaşımı", true));
-    if (isObject(t.breath) && (t.breath.pattern || t.breath.seconds)) chips.push(renderChip("🌬 Nefes " + (t.breath.pattern || ""), false));
-    if (isObject(t.dailyWin) && t.dailyWin.text) chips.push(renderChip("🏆 Günlük kazanım", false));
-    if (isObject(t.selfCompassion) && (t.selfCompassion.prompt || t.selfCompassion.note)) chips.push(renderChip("💖 Kendi şefkati", false));
-    if (isObject(t.firstStep) && (t.firstStep.text || t.firstStep.completedAt)) chips.push(renderChip("👣 İlk adım", false));
+    if (thoughts.length) chips.push(renderChip("Düşünce (" + thoughts.length + ")", false));
+    if (isObject(t.decision) && (t.decision.choice || t.decision.optionA || t.decision.optionB)) chips.push(renderChip("Karar: " + safeText(t.decision.choice || "", 40), false));
+    if (isObject(t.share) && (t.share.note || t.share.sentAt)) chips.push(renderChip("Terapi paylaşımı", true));
+    if (isObject(t.breath) && (t.breath.pattern || t.breath.seconds)) chips.push(renderChip("Nefes " + (t.breath.pattern || ""), false));
+    if (isObject(t.dailyWin) && t.dailyWin.text) chips.push(renderChip("Günlük kazanım", false));
+    if (isObject(t.selfCompassion) && (t.selfCompassion.prompt || t.selfCompassion.note)) chips.push(renderChip("Kendi şefkati", false));
+    if (isObject(t.firstStep) && (t.firstStep.text || t.firstStep.completedAt)) chips.push(renderChip("İlk adım", false));
     if (chips.length) html += '<div class="detail-section__chips">' + chips.join("") + "</div>";
 
     if (day.journal && day.journal.text) {
-      html += DetailBlock({ icon: "📝", title: "Günlük", body: nl2br(escapeHtml(String(day.journal.text || ""))), meta: "Mod: " + (day.journal.mode || "free") + (day.journal.promptUsed ? " · " + day.journal.promptUsed : "") });
+      html += DetailBlock({ icon: "journal", title: "Günlük", body: nl2br(escapeHtml(String(day.journal.text || ""))), meta: "Mod: " + (day.journal.mode || "free") + (day.journal.promptUsed ? " · " + day.journal.promptUsed : "") });
     }
-    if (day.note) html += DetailBlock({ icon: "📌", title: "Not", body: nl2br(escapeHtml(String(day.note || ""))) });
-    if (day.intention) html += DetailBlock({ icon: "🕯", title: "Niyet", body: nl2br(escapeHtml(String(day.intention || ""))) });
+    if (day.note) html += DetailBlock({ icon: "note", title: "Not", body: nl2br(escapeHtml(String(day.note || ""))) });
+    if (day.intention) html += DetailBlock({ icon: "intention", title: "Niyet", body: nl2br(escapeHtml(String(day.intention || ""))) });
     if (day.gratitude) {
       var gList = Array.isArray(day.gratitude) ? day.gratitude : [day.gratitude];
       var gBody = gList.map(function(x){ return "• " + escapeHtml(String(x || "")); }).join("<br>");
-      html += DetailBlock({ icon: "🙏", title: "Şükür", body: gBody });
+      html += DetailBlock({ icon: "gratitude", title: "Şükür", body: gBody });
     }
     if (thoughts.length) {
       var thoughtsBody = thoughts.map(function(x, i) {
@@ -2178,34 +2592,34 @@
         return "<div class='detail-block__sub'><strong>" + escapeHtml(safeText(title, 120)) + "</strong>" +
                (x.altThought ? "<br>Alternatif: " + escapeHtml(x.altThought) : "") + "</div>";
       }).join("");
-      html += DetailBlock({ icon: "💭", title: "Bilişsel düşünce kayıtları (" + thoughts.length + ")", body: thoughtsBody });
+      html += DetailBlock({ icon: "reflection", title: "Bilişsel düşünce kayıtları (" + thoughts.length + ")", body: thoughtsBody });
     }
-    if (isObject(t.dailyWin) && t.dailyWin.text) html += DetailBlock({ icon: "🏆", title: "Günlük kazanım", body: nl2br(escapeHtml(t.dailyWin.text)) });
+    if (isObject(t.dailyWin) && t.dailyWin.text) html += DetailBlock({ icon: "saygi", title: "Günlük kazanım", body: nl2br(escapeHtml(t.dailyWin.text)) });
     if (isObject(t.decision) && (t.decision.choice || t.decision.note)) {
       var dBody = "";
       if (t.decision.optionA) dBody += "A: " + escapeHtml(t.decision.optionA) + "<br>";
       if (t.decision.optionB) dBody += "B: " + escapeHtml(t.decision.optionB) + "<br>";
       if (t.decision.choice) dBody += "Seçim: <strong>" + escapeHtml(t.decision.choice) + "</strong><br>";
       if (t.decision.note) dBody += "Not: " + escapeHtml(t.decision.note);
-      html += DetailBlock({ icon: "✓", title: "Karar", body: dBody });
+      html += DetailBlock({ icon: "check", title: "Karar", body: dBody });
     }
     if (isObject(t.selfCompassion) && (t.selfCompassion.prompt || t.selfCompassion.note)) {
-      html += DetailBlock({ icon: "💖", title: "Kendi şefkati", body: (t.selfCompassion.prompt ? "Prompt: " + escapeHtml(t.selfCompassion.prompt) + "<br>" : "") + nl2br(escapeHtml(t.selfCompassion.note || "")) });
+      html += DetailBlock({ icon: "gratitude", title: "Kendi şefkati", body: (t.selfCompassion.prompt ? "Prompt: " + escapeHtml(t.selfCompassion.prompt) + "<br>" : "") + nl2br(escapeHtml(t.selfCompassion.note || "")) });
     }
     if (isObject(t.breath) && t.breath.seconds) {
-      html += DetailBlock({ icon: "🌬", title: "Nefes", body: "Pattern: " + escapeHtml(t.breath.pattern || "4-7-8") + " · " + fmtDuration(t.breath.seconds) });
+      html += DetailBlock({ icon: "movement", title: "Nefes", body: "Pattern: " + escapeHtml(t.breath.pattern || "4-7-8") + " · " + fmtDuration(t.breath.seconds) });
     }
     if (isObject(t.firstStep) && t.firstStep.text) {
-      html += DetailBlock({ icon: "👣", title: "İlk adım", body: nl2br(escapeHtml(t.firstStep.text)) });
+      html += DetailBlock({ icon: "steps", title: "İlk adım", body: nl2br(escapeHtml(t.firstStep.text)) });
     }
     if (isObject(t.share) && (t.share.note || t.share.sentAt)) {
-      html += DetailBlock({ icon: "🛡", title: "Terapi paylaşımı", body: "Kullanıcı tarafından paylaşıldı · ham metin gizli", redacted: true });
+      html += DetailBlock({ icon: "shield", title: "Terapi paylaşımı", body: "Kullanıcı tarafından paylaşıldı · ham metin gizli", redacted: true });
     }
 
     return DetailSection({
       id: "mood-therapy",
       title: "Ruh hali & Terapi",
-      icon: "🌤",
+      icon: "mood",
       emptyText: "Bu gün için ruh hali veya terapi özeti kaydı yok.",
       children: html
     });
@@ -2215,20 +2629,20 @@
     var day = getDay(date) || {};
     var chips = [];
     var water = getWater(day);
-    if (water !== null && water > 0) chips.push(renderChip("💧 Su: " + water + " bardak", false));
+    if (water !== null && water > 0) chips.push(renderChip("Su: " + water + " bardak", false));
 
     var mealKeys = ["breakfast", "lunch", "dinner", "snack"];
     var mealLabels = { breakfast: "Kahvaltı", lunch: "Öğle", dinner: "Akşam", snack: "Ara" };
     var mealCount = 0;
     var meals = getMeals(day);
     mealKeys.forEach(function(k){ if (meals[k]) mealCount++; });
-    if (mealCount) chips.push(renderChip("🍽 Öğün: " + mealCount + "/4", false));
+    if (mealCount) chips.push(renderChip("Öğün: " + mealCount + "/4", false));
 
     var caf = getCaffeine(day);
-    if (caf.drinks && caf.drinks.length) chips.push(renderChip("☕ Kafein: " + caf.drinks.length + " içecek", false));
+    if (caf.drinks && caf.drinks.length) chips.push(renderChip("Kafein: " + caf.drinks.length + " içecek", false));
 
     var med = isObject(day.sleep) && isObject(day.sleep.med) ? day.sleep.med : null;
-    if (med && (med.type || med.note)) chips.push(renderChip("💊 Uyku ilacı", false));
+    if (med && (med.type || med.note)) chips.push(renderChip("Uyku ilacı", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
@@ -2241,28 +2655,28 @@
       if (items.length) {
         body += items.map(function(it){ return "• " + escapeHtml(String(it.name || "")) + (it.qty ? " · " + escapeHtml(String(it.qty)) + " " + escapeHtml(String(it.unit || "")) : ""); }).join("<br>");
       }
-      html += DetailBlock({ icon: "🍽", title: label, body: body });
+      html += DetailBlock({ icon: "meal", title: label, body: body });
     });
 
     var hasCaffeine = caf && ((caf.drinks && caf.drinks.length) || caf.last || caf.cups);
     if (water !== null || hasCaffeine) {
-      var fluidBody = water !== null ? "💧 Su: " + water + " bardak" : "";
+      var fluidBody = water !== null ? "Su: " + water + " bardak" : "";
       if (caf.drinks && caf.drinks.length) {
-        fluidBody += (fluidBody ? "<br>" : "") + caf.drinks.map(function(d){ return "☕ " + escapeHtml(String(d.type || "")) + (d.qty ? " ×" + d.qty : "") + (d.time ? " @" + escapeHtml(d.time) : ""); }).join("<br>");
+        fluidBody += (fluidBody ? "<br>" : "") + caf.drinks.map(function(d){ return escapeHtml(String(d.type || "")) + (d.qty ? " ×" + d.qty : "") + (d.time ? " @" + escapeHtml(d.time) : ""); }).join("<br>");
       } else if (caf.cups) {
         fluidBody += (fluidBody ? "<br>" : "") + "Kafein: " + caf.cups + " fincan" + (caf.last ? " (son @" + escapeHtml(caf.last) + ")" : "");
       }
-      html += DetailBlock({ icon: "🥤", title: "Sıvı & Kafein", body: fluidBody });
+      html += DetailBlock({ icon: "caffeine", title: "Sıvı & Kafein", body: fluidBody });
     }
 
     if (med && (med.type || med.note)) {
-      html += DetailBlock({ icon: "💊", title: "Uyku ilacı", body: (med.type ? escapeHtml(med.type) + "<br>" : "") + nl2br(escapeHtml(med.note || "")) });
+      html += DetailBlock({ icon: "medicine", title: "Uyku ilacı", body: (med.type ? escapeHtml(med.type) + "<br>" : "") + nl2br(escapeHtml(med.note || "")) });
     }
 
     return DetailSection({
       id: "nutrition",
       title: "Beslenme & Öğün",
-      icon: "🍽",
+      icon: "meal",
       emptyText: "Beslenme, su veya kafein kaydı yok.",
       children: html
     });
@@ -2277,17 +2691,17 @@
     var vakitNames = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"];
     var done = vakitNames.filter(function(k) { var e = p[k]; return e && e.performed; }).length;
     if (done > 0 || p.fajr != null || p.dhuhr != null || p.asr != null || p.maghrib != null || p.isha != null) {
-      chips.push(renderChip("🕌 Namaz: " + done + "/5", false));
+      chips.push(renderChip("Namaz: " + done + "/5", false));
     }
     var zCount = getZikrCount(date);
-    if (zCount !== null && zCount > 0) chips.push(renderChip("📿 Zikir: " + zCount.toLocaleString("tr-TR"), false));
+    if (zCount !== null && zCount > 0) chips.push(renderChip("Zikir: " + zCount.toLocaleString("tr-TR"), false));
     var s = getSaygiInfo(day);
     if (s && s.name) {
-      chips.push(renderChip("🌟 Öncü: " + safeText(s.name, 40), false));
-      if (s.read) chips.push(renderChip("✓ Okundu", false));
+      chips.push(renderChip("Öncü: " + safeText(s.name, 40), false));
+      if (s.read) chips.push(renderChip("Okundu", false));
     }
     var q = day.quranRequests || (day.quranJourney && day.quranJourney.requests) || [];
-    if (Array.isArray(q) && q.length) chips.push(renderChip("📖 Kur'an yolculuğu", false));
+    if (Array.isArray(q) && q.length) chips.push(renderChip("Kur'an yolculuğu", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
@@ -2296,31 +2710,31 @@
       if (!e || (!e.time && e.performed === false && !e.nafile && !e.note)) return;
       var label = PRAYER_LABELS[k] || k;
       var status = [];
-      if (e.performed) status.push("✓ Kılındı");
+      if (e.performed) status.push("Kılındı");
       if (e.inCongregation) status.push("Cemaat");
       if (e.late) status.push("Gecikti");
       if (e.madeUp) status.push("Telafi");
       if (e.nafile) status.push("Nafile " + e.nafile);
       var meta = (e.time ? "Vakit: " + e.time : "Vakit yok") + (status.length ? " · " + status.join(", ") : "");
-      html += DetailBlock({ icon: "🕌", title: label, body: meta + (e.note ? "<br>Not: " + escapeHtml(e.note) : "") });
+      html += DetailBlock({ icon: "prayer", title: label, body: meta + (e.note ? "<br>Not: " + escapeHtml(e.note) : "") });
     });
 
     var zikrDetail = renderZikrDetail(date);
     if (zikrDetail) html += zikrDetail;
 
     if (s && s.name) {
-      html += DetailBlock({ icon: "🌟", title: "Saygı", body: escapeHtml(s.name) + (s.read ? "<br>✓ Okundu" : "") });
+      html += DetailBlock({ icon: "saygi", title: "Saygı", body: escapeHtml(s.name) + (s.read ? "<br>Okundu" : "") });
     }
 
     if (Array.isArray(q) && q.length) {
       var qBody = q.map(function(r){ return "• " + escapeHtml(String(r.surah || r.verseRef || r.type || JSON.stringify(r).slice(0, 80))); }).join("<br>");
-      html += DetailBlock({ icon: "📖", title: "Kur'an yolculuğu", body: qBody });
+      html += DetailBlock({ icon: "book", title: "Kur'an yolculuğu", body: qBody });
     }
 
     return DetailSection({
       id: "prayer",
       title: "İbadet & Saygı",
-      icon: "🕌",
+      icon: "prayer",
       emptyText: "Bugün için ibadet, zikir veya Saygı kaydı yok.",
       children: html
     });
@@ -2331,27 +2745,27 @@
     var hs = getHabitSummary(day);
     var hasHabitData = Object.keys(getHabits(day)).length > 0;
     var chips = [];
-    if (hasHabitData) chips.push(renderChip("✅ " + hs.doneCount + "/" + hs.total + " alışkanlık", false));
+    if (hasHabitData) chips.push(renderChip(hs.doneCount + "/" + hs.total + " alışkanlık", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (hasHabitData && hs.done.length) {
       var doneBody = hs.done.map(function(k) {
-        return '<div class="habit-row habit-row--done"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "✅") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
+        return '<div class="habit-row habit-row--done"><span class="habit-row__icon">' + renderIcon(HABIT_ICONS[k] || "check", 16) + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
       }).join("");
-      html += DetailBlock({ icon: "✅", title: "Yapılan alışkanlıklar (" + hs.doneCount + ")", body: doneBody });
+      html += DetailBlock({ icon: "check", title: "Yapılan alışkanlıklar (" + hs.doneCount + ")", body: doneBody });
     }
     if (hasHabitData && hs.undone.length) {
       var undoneBody = hs.undone.map(function(k) {
-        return '<div class="habit-row habit-row--undone"><span class="habit-row__icon">' + (HABIT_ICONS[k] || "◻") + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
+        return '<div class="habit-row habit-row--undone"><span class="habit-row__icon">' + renderIcon(HABIT_ICONS[k] || "dot", 16) + '</span><span class="habit-row__label">' + escapeHtml(HABIT_LABELS[k] || k) + "</span></div>";
       }).join("");
-      html += DetailBlock({ icon: "◻", title: "Yapılmayan alışkanlıklar (" + hs.undone.length + ")", body: undoneBody });
+      html += DetailBlock({ icon: "dot", title: "Yapılmayan alışkanlıklar (" + hs.undone.length + ")", body: undoneBody });
     }
 
     return DetailSection({
       id: "habits",
       title: "Alışkanlıklar",
-      icon: "✅",
+      icon: "check",
       emptyText: "Bugün için alışkanlık kaydı yok.",
       children: html
     });
@@ -2363,24 +2777,24 @@
     var stress = getStress(day);
 
     var chips = [];
-    if (energy !== null) chips.push(renderChip("⚡ Enerji: " + energy + "/5", false));
-    if (stress !== null) chips.push(renderChip("😰 Stres: " + stress + "/5", false));
+    if (energy !== null) chips.push(renderChip("Enerji: " + energy + "/5", false));
+    if (stress !== null) chips.push(renderChip("Stres: " + stress + "/5", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (energy !== null) {
       var eBar = '<div class="scale-bar"><div class="scale-bar__fill scale-bar__fill--energy" style="width:' + (energy / 5 * 100) + '%"></div></div>';
-      html += DetailBlock({ icon: "⚡", title: "Enerji seviyesi", body: energy + "/5" + eBar });
+      html += DetailBlock({ icon: "spark", title: "Enerji seviyesi", body: energy + "/5" + eBar });
     }
     if (stress !== null) {
       var sBar = '<div class="scale-bar"><div class="scale-bar__fill scale-bar__fill--stress" style="width:' + (stress / 5 * 100) + '%"></div></div>';
-      html += DetailBlock({ icon: "😰", title: "Stres seviyesi", body: stress + "/5" + sBar });
+      html += DetailBlock({ icon: "anxiety", title: "Stres seviyesi", body: stress + "/5" + sBar });
     }
 
     return DetailSection({
       id: "energy-stress",
       title: "Enerji & Stres",
-      icon: "⚡",
+      icon: "spark",
       emptyText: "Bugün için enerji veya stres ölçümü yok.",
       children: html
     });
@@ -2390,37 +2804,37 @@
     var day = getDay(date) || {};
     var c = getCravingDetails(day);
     var chips = [];
-    if (c.sosCount > 0) chips.push(renderChip("🆘 SOS: " + c.sosCount, false));
-    if (c.tenMinDone) chips.push(renderChip("🍬 10 dk gecikme", false));
-    if (c.foodDone) chips.push(renderChip("🍽 Yemek krizi yönetildi", false));
-    if (c.coffeeDone) chips.push(renderChip("☕ Kahve krizi yönetildi", false));
+    if (c.sosCount > 0) chips.push(renderChip("SOS: " + c.sosCount, false));
+    if (c.tenMinDone) chips.push(renderChip("10 dk gecikme", false));
+    if (c.foodDone) chips.push(renderChip("Yemek krizi yönetildi", false));
+    if (c.coffeeDone) chips.push(renderChip("Kahve krizi yönetildi", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (c.sosCount > 0) {
-      html += DetailBlock({ icon: "🆘", title: "SOS aktivasyonları", body: c.sosCount + " kez SOS butonuna basıldı" });
+      html += DetailBlock({ icon: "sos", title: "SOS aktivasyonları", body: c.sosCount + " kez SOS butonuna basıldı" });
     }
     if (c.optionsUsed.length) {
-      html += DetailBlock({ icon: "🔧", title: "Kullanılan SOS seçenekleri", body: c.optionsUsed.map(function(o) { return "• " + escapeHtml(String(o)); }).join("<br>") });
+      html += DetailBlock({ icon: "settings", title: "Kullanılan SOS seçenekleri", body: c.optionsUsed.map(function(o) { return "• " + escapeHtml(String(o)); }).join("<br>") });
     }
     if (c.triggers.length) {
-      html += DetailBlock({ icon: "⚠️", title: "Tetikleyiciler", body: c.triggers.map(function(t) { return "• " + escapeHtml(String(t)); }).join("<br>") });
+      html += DetailBlock({ icon: "sos", title: "Tetikleyiciler", body: c.triggers.map(function(t) { return "• " + escapeHtml(String(t)); }).join("<br>") });
     }
     if (c.triggerNote) {
-      html += DetailBlock({ icon: "📝", title: "Tetikleyici notu", body: nl2br(escapeHtml(c.triggerNote)) });
+      html += DetailBlock({ icon: "note", title: "Tetikleyici notu", body: nl2br(escapeHtml(c.triggerNote)) });
     }
     if (c.tenMinDone || c.foodDone || c.coffeeDone) {
       var copingBody = [];
-      if (c.tenMinDone) copingBody.push("✅ Tatlı krizi: 10 dakika gecikme yapıldı");
-      if (c.foodDone) copingBody.push("✅ Yemek krizi yönetildi");
-      if (c.coffeeDone) copingBody.push("✅ Kahve krizi yönetildi");
-      html += DetailBlock({ icon: "💪", title: "Baş etme stratejileri", body: copingBody.join("<br>") });
+      if (c.tenMinDone) copingBody.push(renderIcon("check", 14) + " Tatlı krizi: 10 dakika gecikme yapıldı");
+      if (c.foodDone) copingBody.push(renderIcon("check", 14) + " Yemek krizi yönetildi");
+      if (c.coffeeDone) copingBody.push(renderIcon("check", 14) + " Kahve krizi yönetildi");
+      html += DetailBlock({ icon: "movement", title: "Baş etme stratejileri", body: copingBody.join("<br>") });
     }
 
     return DetailSection({
       id: "craving",
       title: "Kriz & Baş etme",
-      icon: "🆘",
+      icon: "sos",
       emptyText: "Bugün için istek veya SOS kaydı yok.",
       children: html
     });
@@ -2431,8 +2845,8 @@
     var mg = getMagnesium(day) || {};
 
     var chips = [];
-    if (mg.taken) chips.push(renderChip("🧪 Magnezyum alındı", false));
-    else if (mg.skipped) chips.push(renderChip("🧪 Magnezyum atlandı", false));
+    if (mg.taken) chips.push(renderChip("Magnezyum alındı", false));
+    else if (mg.skipped) chips.push(renderChip("Magnezyum atlandı", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
@@ -2443,15 +2857,15 @@
       if (mg.time) mgBody += "Saat: " + escapeHtml(mg.time) + "<br>";
       if (Array.isArray(mg.reason) && mg.reason.length) mgBody += "Neden: " + mg.reason.map(function(r) { return escapeHtml(String(r)); }).join(", ") + "<br>";
       if (mg.effectNote) mgBody += "Etki: " + nl2br(escapeHtml(mg.effectNote));
-      html += DetailBlock({ icon: "🧪", title: "Magnezyum takviyesi", body: mgBody || "Alındı" });
+      html += DetailBlock({ icon: "magnesium", title: "Magnezyum takviyesi", body: mgBody || "Alındı" });
     } else if (mg.skipped) {
-      html += DetailBlock({ icon: "🧪", title: "Magnezyum atlandı", body: mg.feedback ? "Geri bildirim: " + escapeHtml(String(mg.feedback)) : "Atlandı" });
+      html += DetailBlock({ icon: "magnesium", title: "Magnezyum atlandı", body: mg.feedback ? "Geri bildirim: " + escapeHtml(String(mg.feedback)) : "Atlandı" });
     }
 
     return DetailSection({
       id: "magnesium",
       title: "Magnezyum",
-      icon: "🧪",
+      icon: "magnesium",
       emptyText: "Bugün için magnezyum veya destek kaydı yok.",
       children: html
     });
@@ -2464,29 +2878,29 @@
 
     var chips = [];
     var stepCount = [wd.light, wd.breath, wd.dump, wd.cool].filter(Boolean).length;
-    if (windDown && stepCount > 0) chips.push(renderChip("🌙 Wind-down: " + stepCount + "/4 adım", false));
-    if (windDown && wd.lastMinutes) chips.push(renderChip("⏱ " + wd.lastMinutes + " dk", false));
+    if (windDown && stepCount > 0) chips.push(renderChip("Wind-down: " + stepCount + "/4 adım", false));
+    if (windDown && wd.lastMinutes) chips.push(renderChip(wd.lastMinutes + " dk", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (windDown) {
       var stepsBody = "";
-      stepsBody += (wd.light ? "✅" : "◻") + " Işık azaltma<br>";
-      stepsBody += (wd.breath ? "✅" : "◻") + " Nefes egzersizi<br>";
-      stepsBody += (wd.dump ? "✅" : "◻") + " Zihin boşaltma<br>";
-      stepsBody += (wd.cool ? "✅" : "◻") + " Serinleme<br>";
+      stepsBody += renderIcon(wd.light ? "check" : "dot", 14) + " Işık azaltma<br>";
+      stepsBody += renderIcon(wd.breath ? "check" : "dot", 14) + " Nefes egzersizi<br>";
+      stepsBody += renderIcon(wd.dump ? "check" : "dot", 14) + " Zihin boşaltma<br>";
+      stepsBody += renderIcon(wd.cool ? "check" : "dot", 14) + " Serinleme<br>";
       if (wd.lastMinutes) stepsBody += "<br>Süre: " + wd.lastMinutes + " dk";
-      html += DetailBlock({ icon: "🌙", title: "Wind-down adımları", body: stepsBody });
+      html += DetailBlock({ icon: "sleep", title: "Wind-down adımları", body: stepsBody });
     }
 
     if (windDown && wd.offloadNote) {
-      html += DetailBlock({ icon: "📤", title: "Zihin boşaltma notu", body: nl2br(escapeHtml(wd.offloadNote)) });
+      html += DetailBlock({ icon: "note", title: "Zihin boşaltma notu", body: nl2br(escapeHtml(wd.offloadNote)) });
     }
 
     return DetailSection({
       id: "winddown",
       title: "Wind-down (Uyku hazırlık)",
-      icon: "🌙",
+      icon: "sleep",
       emptyText: "Bugün için uyku rutini kaydı yok.",
       children: html
     });
@@ -2496,22 +2910,22 @@
     var day = getDay(date) || {};
     var cyc = getCycleInfo(day);
     var chips = [];
-    if (cyc.flow) chips.push(renderChip("🩸 Akış: " + escapeHtml(cyc.flow), false));
-    if (cyc.symptoms.length) chips.push(renderChip("🩺 Semptom: " + cyc.symptoms.length, false));
+    if (cyc.flow) chips.push(renderChip("Akış: " + escapeHtml(cyc.flow), false));
+    if (cyc.symptoms.length) chips.push(renderChip("Semptom: " + cyc.symptoms.length, false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (cyc.flow) {
-      html += DetailBlock({ icon: "🩸", title: "Adet akışı", body: escapeHtml(cyc.flow) });
+      html += DetailBlock({ icon: "cycle", title: "Adet akışı", body: escapeHtml(cyc.flow) });
     }
     if (cyc.symptoms.length) {
-      html += DetailBlock({ icon: "🩺", title: "Semptomlar", body: cyc.symptoms.map(function(s) { return "• " + escapeHtml(String(s)); }).join("<br>") });
+      html += DetailBlock({ icon: "anxiety", title: "Semptomlar", body: cyc.symptoms.map(function(s) { return "• " + escapeHtml(String(s)); }).join("<br>") });
     }
 
     return DetailSection({
       id: "cycle",
       title: "Döngü & Semptomlar",
-      icon: "🩸",
+      icon: "cycle",
       emptyText: "Bugün için döngü veya semptom kaydı yok.",
       children: html
     });
@@ -2523,25 +2937,25 @@
     var nutri = nutriData || {};
 
     var chips = [];
-    if (nutriData && nutri.calories) chips.push(renderChip("🔥 " + nutri.calories + " kcal", false));
-    if (nutriData && nutri.protein) chips.push(renderChip("🥩 Protein: " + nutri.protein + "g", false));
+    if (nutriData && nutri.calories) chips.push(renderChip(nutri.calories + " kcal", false));
+    if (nutriData && nutri.protein) chips.push(renderChip("Protein: " + nutri.protein + "g", false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (nutriData && Object.keys(nutriData).length) {
       var body = "";
-      if (nutri.calories) body += "🔥 Kalori: " + nutri.calories + " kcal<br>";
-      if (nutri.protein) body += "🥩 Protein: " + nutri.protein + "g<br>";
-      if (nutri.carbs) body += "🍚 Karbonhidrat: " + nutri.carbs + "g<br>";
-      if (nutri.fat) body += "🧈 Yağ: " + nutri.fat + "g<br>";
-      if (nutri.items) body += "📦 Öğün sayısı: " + nutri.items;
-      html += DetailBlock({ icon: "📊", title: "Makro besin özeti", body: body });
+      if (nutri.calories) body += "Kalori: " + nutri.calories + " kcal<br>";
+      if (nutri.protein) body += "Protein: " + nutri.protein + "g<br>";
+      if (nutri.carbs) body += "Karbonhidrat: " + nutri.carbs + "g<br>";
+      if (nutri.fat) body += "Yağ: " + nutri.fat + "g<br>";
+      if (nutri.items) body += "Öğün sayısı: " + nutri.items;
+      html += DetailBlock({ icon: "nutrition", title: "Makro besin özeti", body: body });
     }
 
     return DetailSection({
       id: "nutri",
       title: "Besin değerleri",
-      icon: "📊",
+      icon: "nutrition",
       emptyText: "Bugün için makro besin kaydı yok.",
       children: html
     });
@@ -2555,31 +2969,31 @@
     var dis = getDiscomfort(day);
     var disDetail = getDiscomfortDetail(day);
     var chips = [];
-    if (steps !== null && steps > 0) chips.push(renderChip("👟 Adım: " + steps.toLocaleString("tr-TR"), false));
-    if (m.walkM > 0) chips.push(renderChip("🚶 Yürüyüş: " + m.walkM + " m", false));
-    if (m.vehicleM > 0) chips.push(renderChip("🚗 Araç: " + m.vehicleM + " m", false));
-    if (m.totalM > 0) chips.push(renderChip("📍 Toplam: " + m.totalM + " m", false));
-    if (disDetail.totalRegions > 0) chips.push(renderChip("🩹 Rahatsızlık: " + disDetail.totalRegions + " bölge", false));
+    if (steps !== null && steps > 0) chips.push(renderChip("Adım: " + steps.toLocaleString("tr-TR"), false));
+    if (m.walkM > 0) chips.push(renderChip("Yürüyüş: " + m.walkM + " m", false));
+    if (m.vehicleM > 0) chips.push(renderChip("Araç: " + m.vehicleM + " m", false));
+    if (m.totalM > 0) chips.push(renderChip("Toplam: " + m.totalM + " m", false));
+    if (disDetail.totalRegions > 0) chips.push(renderChip("Rahatsızlık: " + disDetail.totalRegions + " bölge", false));
     var segs = Array.isArray(loc.segments) ? loc.segments : [];
     var cats = [];
     segs.forEach(function(seg) { if (seg && seg.category && cats.indexOf(seg.category) === -1) cats.push(seg.category); });
-    if (cats.length) chips.push(renderChip("🗺 Konum kategorileri: " + cats.join(", "), false));
+    if (cats.length) chips.push(renderChip("Konum kategorileri: " + cats.join(", "), false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
     if (steps !== null && steps > 0) {
-      html += DetailBlock({ icon: "👟", title: "Adım", body: steps.toLocaleString("tr-TR") + " adım" });
+      html += DetailBlock({ icon: "steps", title: "Adım", body: steps.toLocaleString("tr-TR") + " adım" });
     }
     if (m.walkM > 0 || m.vehicleM > 0 || m.totalM > 0) {
       var movBody = "";
-      if (m.walkM) movBody += "🚶 Yürüyüş: " + m.walkM + " m";
-      if (m.vehicleM) movBody += (movBody ? "<br>" : "") + "🚗 Araç: " + m.vehicleM + " m";
-      if (m.totalM) movBody += (movBody ? "<br>" : "") + "📍 Toplam: " + m.totalM + " m";
+      if (m.walkM) movBody += "Yürüyüş: " + m.walkM + " m";
+      if (m.vehicleM) movBody += (movBody ? "<br>" : "") + "Araç: " + m.vehicleM + " m";
+      if (m.totalM) movBody += (movBody ? "<br>" : "") + "Toplam: " + m.totalM + " m";
       if (m.maxSpeed) movBody += (movBody ? "<br>" : "") + "Max hız: " + m.maxSpeed + " m/sn";
       if (m.samples) movBody += (movBody ? "<br>" : "") + "Örnek: " + m.samples + " adet";
       if (m.walkSec) movBody += (movBody ? "<br>" : "") + "Yürüyüş süre: " + fmtDuration(m.walkSec / 60);
       if (m.vehicleSec) movBody += (movBody ? "<br>" : "") + "Araç süre: " + fmtDuration(m.vehicleSec / 60);
-      html += DetailBlock({ icon: "🛣", title: "Hareket", body: movBody });
+      html += DetailBlock({ icon: "movement", title: "Hareket", body: movBody });
     }
 
     if (disDetail.totalRegions > 0 || dis.note || (dis.meds && dis.meds.length)) {
@@ -2589,17 +3003,17 @@
       }).join("<br>");
       if (dis.note) regBody += (regBody ? "<br>" : "") + "Not: " + escapeHtml(dis.note);
       if (dis.meds && dis.meds.length) regBody += (regBody ? "<br>" : "") + "İlaç: " + dis.meds.map(function(med){ return escapeHtml(String(med)); }).join(", ");
-      html += DetailBlock({ icon: "🩹", title: "Rahatsızlık & İlaç (" + disDetail.totalRegions + " bölge)", body: regBody });
+      html += DetailBlock({ icon: "medicine", title: "Rahatsızlık & İlaç (" + disDetail.totalRegions + " bölge)", body: regBody });
     }
 
     if (cats.length) {
-      html += DetailBlock({ icon: "🗺", title: "Konum kategorileri", body: cats.map(function(c){ return "• " + escapeHtml(c); }).join("<br>"), redacted: false });
+      html += DetailBlock({ icon: "location", title: "Konum kategorileri", body: cats.map(function(c){ return "• " + escapeHtml(c); }).join("<br>"), redacted: false });
     }
 
     return DetailSection({
       id: "movement",
       title: "Hareket",
-      icon: "👟",
+      icon: "steps",
       emptyText: "Bugün için hareket veya adım kaydı yok.",
       children: html
     });
@@ -2629,15 +3043,15 @@
     });
     var mapsUrl = locationMapsUrl(navigationPoint);
     var mapsActionHtml = mapsUrl
-      ? '<div class="loc-actions"><a class="ae-btn ae-btn--primary loc-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Güncel noktayı Google Maps üzerinde aç">↗ Güncel noktayı Google Maps’te aç</a></div>'
+      ? '<div class="loc-actions"><a class="ae-btn ae-btn--primary loc-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Güncel noktayı Google Maps üzerinde aç">' + renderIcon("arrowRight", 14) + ' Güncel noktayı Google Maps’te aç</a></div>'
       : "";
 
     // Kompakt üst bilgi
     var infoHtml = '<div class="loc-info">' +
-      '<span class="loc-info__item">📍 ' + (locInfo.enabled ? "Açık" : "Kapalı") + '</span>' +
-      '<span class="loc-info__item">📡 ' + locInfo.mode + '</span>' +
-      '<span class="loc-info__item">🗺 ' + mapData.length.toLocaleString("tr-TR") + ' anlamlı nokta</span>' +
-      '<span class="loc-info__item">↳ ' + scopedHistory.length.toLocaleString("tr-TR") + ' örnek</span>' +
+      '<span class="loc-info__item">' + (locInfo.enabled ? "Açık" : "Kapalı") + '</span>' +
+      '<span class="loc-info__item">' + escapeHtml(locInfo.mode) + '</span>' +
+      '<span class="loc-info__item">' + mapData.length.toLocaleString("tr-TR") + ' anlamlı nokta</span>' +
+      '<span class="loc-info__item">' + scopedHistory.length.toLocaleString("tr-TR") + ' örnek</span>' +
       '</div>';
 
     // Harita konteyneri
@@ -2662,11 +3076,11 @@
           '<span class="loc-dot__time">' + escapeHtml(timeStr) + '</span>' +
           '<span class="loc-dot__coord">' + escapeHtml(latStr + ", " + lngStr) + '</span>' +
           (accStr ? '<span class="loc-dot__acc">' + escapeHtml(accStr) + '</span>' : '') +
-          (locationMapsUrl(h) ? '<a class="loc-dot__map" href="' + escapeHtml(locationMapsUrl(h)) + '" target="_blank" rel="noopener noreferrer" aria-label="Bu geçmiş konumu Google Maps üzerinde aç">↗ Maps</a>' : '') +
+          (locationMapsUrl(h) ? '<a class="loc-dot__map" href="' + escapeHtml(locationMapsUrl(h)) + '" target="_blank" rel="noopener noreferrer" aria-label="Bu geçmiş konumu Google Maps üzerinde aç">' + renderIcon("arrowRight", 13) + ' Maps</a>' : '') +
           '</div>';
       }).join("");
       timelineHtml = '<details class="loc-history-details">' +
-        '<summary class="loc-history-details__summary"><span class="loc-history-details__title">Tüm anlamlı konum geçmişi</span><span class="loc-history-details__count">' + mapData.length.toLocaleString("tr-TR") + ' nokta</span><span class="loc-history-details__chevron" aria-hidden="true">⌄</span></summary>' +
+        '<summary class="loc-history-details__summary"><span class="loc-history-details__title">Tüm anlamlı konum geçmişi</span><span class="loc-history-details__count">' + mapData.length.toLocaleString("tr-TR") + ' nokta</span><span class="loc-history-details__chevron" aria-hidden="true">' + renderIcon("arrowRight", 14) + '</span></summary>' +
         '<div class="loc-timeline-compact">' + items + '</div>' +
         '</details>';
     }
@@ -2674,17 +3088,17 @@
     // Ayar değişiklikleri (kompakt)
     var eventsHtml = '';
     if (locInfo.enabledAt) {
-      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">🔛</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.enabledAt)) + (locInfo.enabledReason ? ' · ' + escapeHtml(locInfo.enabledReason) : '') + '</span></div>';
+      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">' + renderIcon("check", 14) + '</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.enabledAt)) + (locInfo.enabledReason ? ' · ' + escapeHtml(locInfo.enabledReason) : '') + '</span></div>';
     }
     if (locInfo.disabledAt) {
-      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">🔒</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.disabledAt)) + (locInfo.disabledReason ? ' · ' + escapeHtml(locInfo.disabledReason) : '') + '</span></div>';
+      eventsHtml += '<div class="loc-event"><span class="loc-event__icon">' + renderIcon("lock", 14) + '</span><span class="loc-event__text">' + escapeHtml(formatTs(locInfo.disabledAt)) + (locInfo.disabledReason ? ' · ' + escapeHtml(locInfo.disabledReason) : '') + '</span></div>';
     }
 
     return AeCard({
       variant: "glass",
       className: "today-section-card today-section-card--location",
       children: '<div class="loc-section">' +
-        '<div class="ae-label">📍 Konum & Zaman Çizelgesi</div>' +
+        '<div class="ae-label">' + renderIcon("location", 16) + ' Konum & Zaman Çizelgesi</div>' +
         infoHtml +
         mapsActionHtml +
         mapHtml +
@@ -2701,7 +3115,7 @@
     return AeCard({
       variant: "glass",
       children: '<div class="sess-section">' +
-        '<div class="ae-label">📱 Uygulama Oturumu</div>' +
+        '<div class="ae-label">' + renderIcon("phone", 16) + ' Uygulama Oturumu</div>' +
         '<div class="sess-grid">' +
         (session.startDate ? '<div class="sess-item"><span class="sess-item__label">Başlangıç</span><span class="sess-item__value">' + escapeHtml(formatDateLabel(session.startDate)) + '</span></div>' : '') +
         (session.lastOpenedDate ? '<div class="sess-item"><span class="sess-item__label">Son açılış</span><span class="sess-item__value">' + escapeHtml(formatDateLabel(session.lastOpenedDate)) + '</span></div>' : '') +
@@ -2720,7 +3134,7 @@
       return DetailSection({
         id: "day-timestamps",
         title: "Kayıt zamanları",
-        icon: "⏱",
+        icon: "clock",
         emptyText: "Bu gün için kayıt zamanı bilgisi yok.",
         children: ""
       });
@@ -2734,7 +3148,7 @@
     return AeCard({
       variant: "summary",
       children: '<div class="sess-section">' +
-        '<div class="ae-label">⏱ Kayıt Zamanları</div>' +
+        '<div class="ae-label">' + renderIcon("clock", 16) + ' Kayıt Zamanları</div>' +
         '<div class="sess-grid">' + items + '</div></div>'
     });
   }
@@ -2743,7 +3157,7 @@
     return renderLocationTimeline(date) || DetailSection({
       id: "day-location",
       title: "Konum",
-      icon: "📍",
+      icon: "location",
       emptyText: "Bu gün için konum geçmişi kaydı yok.",
       children: ""
     });
@@ -2759,12 +3173,12 @@
     var quotes = Array.isArray(day.quotes) ? day.quotes : [];
 
     var chips = [];
-    if (reading.length) chips.push(renderChip("📖 Okuma: " + reading.length, false));
-    if (watching.length) chips.push(renderChip("🎬 İzleme: " + watching.length, false));
-    if (listening.length) chips.push(renderChip("🎧 Dinleme: " + listening.length, false));
-    if (learning.length) chips.push(renderChip("🎓 Öğrenme: " + learning.length, false));
-    if (soul.length) chips.push(renderChip("🧘 Ruh-beden: " + soul.length, false));
-    if (quotes.length) chips.push(renderChip("✍️ Alıntı: " + quotes.length, false));
+    if (reading.length) chips.push(renderChip("Okuma: " + reading.length, false));
+    if (watching.length) chips.push(renderChip("İzleme: " + watching.length, false));
+    if (listening.length) chips.push(renderChip("Dinleme: " + listening.length, false));
+    if (learning.length) chips.push(renderChip("Öğrenme: " + learning.length, false));
+    if (soul.length) chips.push(renderChip("Ruh-beden: " + soul.length, false));
+    if (quotes.length) chips.push(renderChip("Alıntı: " + quotes.length, false));
 
     var html = chips.length ? '<div class="detail-section__chips">' + chips.join("") + "</div>" : "";
 
@@ -2780,16 +3194,16 @@
       return DetailBlock({ icon: icon, title: title + " (" + items.length + ")", body: body });
     }
 
-    html += renderEntryList(reading, "📖", "Okuma", function(e) {
+    html += renderEntryList(reading, "book", "Okuma", function(e) {
       return { title: e.title || "Kitap", meta: (e.pages ? e.pages + " sayfa" : "") + (e.minutes ? " · " + e.minutes + " dk" : "") + (e.author ? " · " + e.author : ""), note: e.note || "" };
     });
-    html += renderEntryList(watching, "🎬", "İzleme", function(e) {
+    html += renderEntryList(watching, "watch", "İzleme", function(e) {
       return { title: e.title || "İzleme", meta: (e.episodes ? e.episodes + " bölüm" : "") + (e.minutes ? " · " + e.minutes + " dk" : "") + (e.kind ? " · " + e.kind : ""), note: e.note || "" };
     });
-    html += renderEntryList(listening, "🎧", "Dinleme", function(e) {
+    html += renderEntryList(listening, "listen", "Dinleme", function(e) {
       return { title: e.title || "Parça", meta: (e.artist ? e.artist : "") + (e.minutes ? " · " + e.minutes + " dk" : "") + (e.kind ? " · " + e.kind : ""), note: e.note || "" };
     });
-    html += renderEntryList(learning, "🎓", "Öğrenme", function(e) {
+    html += renderEntryList(learning, "learning", "Öğrenme", function(e) {
       return { title: e.title || "Konu", meta: (e.minutes ? e.minutes + " dk" : "") + (e.topic ? " · " + e.topic : ""), note: e.note || "" };
     });
     if (soul.length) {
@@ -2799,7 +3213,7 @@
                (a.note ? '<div class="detail-block__note">' + escapeHtml(a.note) + "</div>" : "") +
                "</div>";
       }).join("");
-      html += DetailBlock({ icon: "🧘", title: "Ruh-beden aktiviteleri (" + soul.length + ")", body: soulBody });
+      html += DetailBlock({ icon: "soul", title: "Ruh-beden aktiviteleri (" + soul.length + ")", body: soulBody });
     }
     if (quotes.length) {
       var quotesBody = quotes.map(function(q) {
@@ -2807,13 +3221,13 @@
                (q.source ? '<div class="detail-block__meta">— ' + escapeHtml(q.source) + "</div>" : "") +
                "</div>";
       }).join("");
-      html += DetailBlock({ icon: "✍️", title: "Alıntılar (" + quotes.length + ")", body: quotesBody });
+      html += DetailBlock({ icon: "note", title: "Alıntılar (" + quotes.length + ")", body: quotesBody });
     }
 
     return DetailSection({
       id: "content",
       title: "İçerik",
-      icon: "📖",
+      icon: "book",
       emptyText: "Okuma, izleme veya dinleme kaydı yok.",
       children: html
     });
@@ -2862,7 +3276,7 @@
     return '<details class="day-detail-accordion ae-slide-up" open>' +
            '<summary class="day-detail-accordion__summary" aria-label="' + escapeHtml(label + " bölümünü aç veya kapat") + '">' +
            AeDivider({ label: label, inline: true }) +
-           '<span class="day-detail-accordion__chevron" aria-hidden="true">⌄</span>' +
+           '<span class="day-detail-accordion__chevron" aria-hidden="true">' + renderIcon("arrowRight", 14) + '</span>' +
            '</summary>' +
            '<div class="day-detail-accordion__body">' + content + '</div>' +
            '</details>';
@@ -2875,7 +3289,7 @@
       return '<div class="day-view ae-stagger">' +
              AeCard({
                children: AeEmpty({
-                 icon: "◎",
+                 icon: "calendar",
                  title: "Gün Detayı",
                  message: "Henüz synced veri yok. Veri geldiğinde seçili gün burada görünecek."
                })
@@ -2885,7 +3299,7 @@
     var day = getDay(date);
     var emptyDay = !day ? '<div class="day-view__empty ae-stagger">' + AeCard({
       children: AeEmpty({
-        icon: "◎",
+        icon: "calendar",
         title: "Boş gün",
         message: "Bu tarihe ait kayıt yok. Takvimden başka bir gün seçebilirsin."
       })
@@ -3097,7 +3511,7 @@
       ? AeCard({ variant: "glass", className: "status-error", children:
         '<div class="status-error__title">Son hata</div>' +
         '<div class="status-error__code">' + escapeHtml(String(s.lastErrorCode)) + "</div>" +
-        '<div class="status-error__hint">Tekrar denemek için ↻ butonuna bas.</div>'
+        '<div class="status-error__hint">Tekrar denemek için Yenile düğmesine bas.</div>'
       })
       : "";
     return '<div class="status-detail ae-slide-up ae-stagger">' +
@@ -3117,16 +3531,16 @@
     var summary = Array.isArray(coverage.summary) ? coverage.summary.length : 0;
     var full = Array.isArray(coverage.full) ? coverage.full.length : 0;
     var events = [
-      { icon: coverage.error ? "!" : "✓", label: "Coverage durumu", value: coverage.error ? "Hata" : "Hazır", meta: "Manifest kapsamı ve redaksiyon sözleşmesi" },
-      { icon: "◈", label: "Redacted alan", value: redacted, meta: "Ham hassas alanlar observer görünümünden çıkarıldı" },
-      { icon: "◌", label: "Summary alan", value: summary, meta: "Özetlenmiş alanlar güvenli projeksiyona açık" },
-      { icon: "◇", label: "Full alan", value: full, meta: "Tam görünürlükteki izinli alanlar" },
-      { icon: "↗", label: "Provenance", value: "observer-snapshot", meta: "Veri kaynağı ve redaksiyon izi" },
-      { icon: "↻", label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor", meta: syncStatus.lastSyncedAt ? "Son kontrol: " + formatTs(syncStatus.lastSyncedAt) : "Henüz canlı kontrol yapılmadı" },
-      { icon: "⌁", label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—", meta: "Kapsam dışı yol denetimi" }
+      { icon: coverage.error ? "crisis" : "check", label: "Coverage durumu", value: coverage.error ? "Hata" : "Hazır", meta: "Manifest kapsamı ve redaksiyon sözleşmesi" },
+      { icon: "shield", label: "Redacted alan", value: redacted, meta: "Ham hassas alanlar observer görünümünden çıkarıldı" },
+      { icon: "note", label: "Summary alan", value: summary, meta: "Özetlenmiş alanlar güvenli projeksiyona açık" },
+      { icon: "archive", label: "Full alan", value: full, meta: "Tam görünürlükteki izinli alanlar" },
+      { icon: "arrowRight", label: "Provenance", value: "observer-snapshot", meta: "Veri kaynağı ve redaksiyon izi" },
+      { icon: "refresh", label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor", meta: syncStatus.lastSyncedAt ? "Son kontrol: " + formatTs(syncStatus.lastSyncedAt) : "Henüz canlı kontrol yapılmadı" },
+      { icon: "messages", label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—", meta: "Kapsam dışı yol denetimi" }
     ];
     var timeline = '<ol class="audit-timeline" aria-label="Audit zaman çizelgesi">' + events.map(function(event) {
-      return '<li class="audit-timeline__item"><span class="audit-timeline__marker" aria-hidden="true">' + escapeHtml(event.icon) + "</span>" +
+      return '<li class="audit-timeline__item"><span class="audit-timeline__marker" aria-hidden="true">' + renderIcon(event.icon, 16) + "</span>" +
              '<div class="audit-timeline__body"><div class="audit-timeline__head"><strong>' + escapeHtml(event.label) +
              '</strong><span class="audit-timeline__value">' + escapeHtml(String(event.value)) + "</span></div>" +
              '<div class="audit-timeline__meta">' + escapeHtml(event.meta) + "</div></div></li>";
@@ -3173,11 +3587,11 @@
                  '<div class="message-bubble__text">' + nl2br(escapeHtml(safeText(m.text, 1200))) + "</div>" +
                  "</div>";
         }).join("")
-      : AeEmpty({ icon: "💬", title: "Henüz mesaj yok", message: "Gelen ve giden mesajlar burada listelenecek." });
+      : AeEmpty({ icon: "messages", title: "Henüz mesaj yok", message: "Gelen ve giden mesajlar burada listelenecek." });
 
     var tokenValue = (ui.panelToken || "").replace(/./g, "•");
     var saveBtn = ui.panelToken
-      ? AeButton({ label: "↻ Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
+      ? AeButton({ labelHtml: renderIcon("refresh", 16) + " Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
       : "";
     return '<div class="messages-detail ae-slide-up ae-stagger">' +
            AeCard({ variant: "glass", className: "messages-card", children: summary + list }) +
@@ -3202,8 +3616,8 @@
     }).join("");
 
     var themeBtn = ui.theme === "dark"
-      ? AeButton({ label: "☀️ Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
-      : AeButton({ label: "🌙 Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
+      ? AeButton({ labelHtml: renderIcon("sun", 16) + " Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
+      : AeButton({ label: "Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
 
     return '<div class="settings-detail ae-slide-up ae-stagger">' +
            AeCard({ variant: "glass", className: "settings-card settings-card--density", children: '<div class="settings-group"><div class="ae-label">Yoğunluk</div><div class="settings-card__title">Görünüm yoğunluğu</div><div class="density-select">' + densityButtons + "</div></div>" }) +
@@ -3531,8 +3945,8 @@
     var statusValue = statusOptions.some(function(option) { return option.value === ui.archiveStatus; }) ? ui.archiveStatus : "all";
     var kindValue = kindOptions.some(function(option) { return option.value === ui.archiveKind; }) ? ui.archiveKind : "all";
     var active = archiveFiltersActive();
-    var viewList = AeButton({ label: "☰ Liste", variant: "pill", className: ui.archiveView === "list" ? "is-active" : "", onclick: "AeonV2.setArchiveView('list')", ariaLabel: "Liste görünümü" });
-    var viewGrid = AeButton({ label: "▦ Izgara", variant: "pill", className: ui.archiveView === "grid" ? "is-active" : "", onclick: "AeonV2.setArchiveView('grid')", ariaLabel: "Izgara görünümü" });
+    var viewList = AeButton({ labelHtml: renderIcon("list", 16) + " Liste", variant: "pill", className: ui.archiveView === "list" ? "is-active" : "", onclick: "AeonV2.setArchiveView('list')", ariaLabel: "Liste görünümü" });
+    var viewGrid = AeButton({ labelHtml: renderIcon("grid", 16) + " Izgara", variant: "pill", className: ui.archiveView === "grid" ? "is-active" : "", onclick: "AeonV2.setArchiveView('grid')", ariaLabel: "Izgara görünümü" });
     return '<section class="archive-controls" role="search" aria-label="Arşivlerde ara ve filtrele">' +
            '<label class="archive-search"><span class="ae-label">Arşivlerde ara</span>' +
            '<input type="search" value="' + escapeHtml(ui.archiveSearch || "") + '" placeholder="Kitap, film, müzik veya alıntı ara" aria-label="Arşivlerde ara" onchange="AeonV2.setArchiveSearch(this.value)" /></label>' +
@@ -3556,7 +3970,7 @@
     var buttons = "";
     if (state.hasPrev) {
       buttons += AeButton({
-        label: "◀",
+        labelHtml: renderIcon("arrowLeft", 16),
         variant: "mini",
         onclick: onClickPrefix + "(" + (state.page - 1) + ")",
         ariaLabel: "Önceki sayfa"
@@ -3565,7 +3979,7 @@
     buttons += '<span class="pagination__info">' + state.page + " / " + state.totalPages + "</span>";
     if (state.hasNext) {
       buttons += AeButton({
-        label: "▶",
+        labelHtml: renderIcon("arrowRight", 16),
         variant: "mini",
         onclick: onClickPrefix + "(" + (state.page + 1) + ")",
         ariaLabel: "Sonraki sayfa"
@@ -3619,7 +4033,7 @@
     opts = opts || {};
     return '<div class="archive-row">' +
            '<div class="archive-row__main">' +
-           (opts.icon ? '<span class="archive-row__icon" aria-hidden="true">' + escapeHtml(opts.icon) + "</span>" : "") +
+           (opts.icon ? '<span class="archive-row__icon">' + renderIcon(opts.icon, 18) + "</span>" : "") +
            '<div class="archive-row__body">' +
            '<div class="archive-row__title">' + escapeHtml(safeText(opts.title, 80)) + "</div>" +
            (opts.meta ? '<div class="archive-row__meta">' + escapeHtml(safeText(opts.meta, 120)) + "</div>" : "") +
@@ -3632,7 +4046,7 @@
     var items = getFilteredArchiveItems("library");
     var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
     if (!state.items.length) {
-      return renderArchiveEmpty("📚", "Kütüphane boş", "Henüz kitap veya okuma kaydı yok.");
+      return renderArchiveEmpty("book", "Kütüphane boş", "Henüz kitap veya okuma kaydı yok.");
     }
     var rows = state.items.map(function(b) {
       var progress = "";
@@ -3644,7 +4058,7 @@
       var archiveDate = archiveItemDate(b, "library");
       var meta = [b.author, archiveDate ? "Son: " + formatDateLabel(archiveDate) : "", progress].filter(Boolean).join(" · ");
       return ArchiveRow({
-        icon: b.emoji || "📖",
+        icon: "book",
         title: b.title,
         meta: meta,
         badge: { reading: "Okunuyor", finished: "Bitti", dropped: "Bırakıldı" }[b.status] || "Kayıtlı"
@@ -3657,7 +4071,7 @@
     var items = getFilteredArchiveItems("watch");
     var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
     if (!state.items.length) {
-      return renderArchiveEmpty("🎬", "İzleme listesi boş", "Henüz film/dizi veya izleme kaydı yok.");
+      return renderArchiveEmpty("watch", "İzleme listesi boş", "Henüz film/dizi veya izleme kaydı yok.");
     }
     var rows = state.items.map(function(it) {
       var progress = "";
@@ -3670,7 +4084,7 @@
       var archiveDate = archiveItemDate(it, "watch");
       var meta = [it.kind === "dizi" ? "Dizi" : "Film", archiveDate ? "Son: " + formatDateLabel(archiveDate) : "", progress].filter(Boolean).join(" · ");
       return ArchiveRow({
-        icon: it.emoji || (it.kind === "dizi" ? "📺" : "🎞"),
+        icon: it.kind === "dizi" ? "watch" : "book",
         title: it.title,
         meta: meta,
         badge: { watching: "İzleniyor", finished: "Bitti", dropped: "Bırakıldı" }[it.status] || "Kayıtlı"
@@ -3683,14 +4097,14 @@
     var items = getFilteredArchiveItems("listen");
     var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
     if (!state.items.length) {
-      return renderArchiveEmpty("🎧", "Dinleme listesi boş", "Henüz müzik/podcast veya dinleme kaydı yok.");
+      return renderArchiveEmpty("listen", "Dinleme listesi boş", "Henüz müzik/podcast veya dinleme kaydı yok.");
     }
     var rows = state.items.map(function(it) {
       var kindLabel = { sarki: "Şarkı", album: "Albüm", podcast: "Podcast" }[it.kind] || it.kind || "Müzik";
       var archiveDate = archiveItemDate(it, "listen");
       var meta = [it.artist, archiveDate ? "Son: " + formatDateLabel(archiveDate) : "", it._dailyMinutes ? it._dailyMinutes + " dk" : ""].filter(Boolean).join(" · ");
       return ArchiveRow({
-        icon: it.emoji || (it.kind === "podcast" ? "🎙" : "🎵"),
+        icon: "listen",
         title: it.title,
         meta: meta,
         badge: kindLabel
@@ -3703,7 +4117,7 @@
     var items = getFilteredArchiveItems("quotes");
     var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
     if (!state.items.length) {
-      return renderArchiveEmpty("✍️", "Alıntı yok", "Henüz kitap, film/dizi veya müzik alıntısı yok.");
+      return renderArchiveEmpty("note", "Alıntı yok", "Henüz kitap, film/dizi veya müzik alıntısı yok.");
     }
     var rows = state.items.map(function(q) {
       return '<div class="archive-row archive-row--quote">' +
@@ -3814,7 +4228,7 @@
         var ts = p.ts ? new Date(p.ts).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : "";
         var acc = p.acc ? " ±" + p.acc + "m" : "";
         var mapsUrl = locationMapsUrl(p);
-        var mapsPopup = mapsUrl ? '<br><a class="loc-popup-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer">↗ Google Maps’te aç</a>' : "";
+        var mapsPopup = mapsUrl ? '<br><a class="loc-popup-map-link" href="' + escapeHtml(mapsUrl) + '" target="_blank" rel="noopener noreferrer">' + renderIcon("arrowRight", 13) + ' Google Maps’te aç</a>' : "";
         root.L.circleMarker([p.lat, p.lng], {
           radius: i === points.length - 1 ? 8 : 5,
           color: color,
@@ -3910,7 +4324,7 @@
         syncStatus.status = "accepted";
         syncStatus.lastErrorCode = null;
         syncStatus.lastSyncedAt = new Date().toISOString();
-        appData = data;
+        appData = unwrapPanelData(data);
         render();
         return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       });
@@ -4001,6 +4415,8 @@
     shiftDate: shiftDate,
     goToDayDetail: goToDayDetail,
     setTrendWindow: setTrendWindow,
+    setHistoryWindow: setHistoryWindow,
+    setHistoryFilter: setHistoryFilter,
     setArchiveSubTab: setArchiveSubTab,
     setSystemSubTab: setSystemSubTab,
     setArchivePage: setArchivePage,
@@ -4046,6 +4462,10 @@
     HABIT_LABELS: HABIT_LABELS,
     HABIT_ICONS: HABIT_ICONS,
     getLocationInfo: getLocationInfo,
+    compressLocationHistory: compressLocationHistory,
+    locationMapsUrl: locationMapsUrl,
+    getSteps: getSteps,
+    collectHistoryRecords: collectHistoryRecords,
     getAppSessionInfo: getAppSessionInfo,
     getDaySavedAt: getDaySavedAt,
     SummaryCard: SummaryCard,

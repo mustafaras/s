@@ -76,17 +76,17 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 36 | WCAG AA Renk Kontrastı | ✅ TAMAMLANDI | `a4aacca` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `node tests/test_panel_v2_contrast.js`; `tests/test_panel_v2_*.js` (24/24 PASS); `tests/test_*.js` (56/56 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check` | Açık/koyu temada tüm metin tokenları 4.5:1 üstüne taşındı; heatmap ve drop butonu kontratları güvenceye alındı; cache-bust `20260811k`; final Pages run `31508837266` SUCCESS; final deployment `5853743427` success (SHA `92676d6`); canlı HTTP 200/cache `20260811k` |
 | 37 | Klavye Navigasyonu & Screen Reader | ✅ TAMAMLANDI | `1e36b76` (uygulama) + `6c91c4c` ve `6b09d10` (ledger/handoff teslim metadata) | `node --check app.js`; `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_accessibility.js` (27/27); `tests/test_panel_v2_*.js` (25/25 PASS); `tests/test_*.js` (57/57 PASS); `node .claude/skills/run-seyma/driver.mjs`; `node .claude/skills/run-seyma/zikr-harness.mjs` (90/90); `git diff --check` | Ana/alt tablarda roving tabindex ve ok/Home/End klavye navigasyonu, kalıcı screen-reader live region, render sonrası focus restore, modal olay drawerında Tab trap/Escape/trigger restore ve tüm button ad/tabindex kontratı; cache-bust `20260811l`; Pages run `31512982763` SUCCESS; deployment `5854502434` success (SHA `6b09d10`); canlı HTTP 200, CSS/JS SHA256 yerel ile eşleşti |
 | 38 | CSS Containment & Performans | ✅ TAMAMLANDI | 00dd1d0 (uygulama) + d811330 (ledger/handoff metadata) | node --check panel-v2.js; node --check panelCoverageManifest.js; node --check app.js; node tests/test_panel_v2_skeleton.js; node tests/test_panel_v2_performance.js; tests/test_panel_v2_*.js (26/26 PASS); tests/test_*.js (58/58 PASS); node .claude/skills/run-seyma/driver.mjs; git diff --check | Kartlarda contain: layout style paint, offscreen content-visibility, yalnız konum verisinde dinamik Leaflet/IntersectionObserver, aktif arşiv sayfası materyalizasyonu, scroll throttle/resize debounce, cache-bust 20260811m; Pages run 31520072993 SUCCESS; live CSS/JS byte eşit |
-| 39 | Yeni Komponent Testleri | 🔒 BEKLEMEDE | - | - | - |
+| 39 | Yeni Komponent Testleri | ✅ TAMAMLANDI | fd7e28a (test uygulaması; metadata teslim commit'i sonraki commit) | node --check panel-v2.js; node --check panelCoverageManifest.js; node --check app.js; node tests/test_panel_v2_component_contracts.js (47/47); tests/test_panel_v2_*.js (27/27 PASS); tests/test_*.js (59/59 PASS); node .claude/skills/run-seyma/driver.mjs; node .claude/skills/run-seyma/zikr-harness.mjs (90/90); git diff --check | AeMetric/AeSparkline/AeProgressRing/AeDivider/AeSkeleton/AeToast kontratları, polling p50/p95 lifecycle ve event-log filtre/sayfalama/drawer testleri tamamlandı; üretim runtime ve cache-bust değişmedi |
 | 40 | Son QA & Deploy | 🔒 BEKLEMEDE | - | - | - |
 
 ---
 
 ## Global Durum
 
-- **currentStep:** 39
+- **currentStep:** 40
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-11
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 38 CSS Containment & Performans
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 39 Yeni Komponent Testleri
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

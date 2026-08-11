@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-11`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `cedea14`
-- **Bitiş Commit:** `4a3fb80` (ledger/handoff metadata commit'i ayrıca)
+- **Bitiş Commit:** `4106605` (final ledger/handoff evidence commit'i ayrıca)
 
 ## Yapılanlar
 
@@ -57,21 +57,22 @@ Polling yaşam döngüsü, latency yüzdelikleri, GitHub API rate-limit header'l
 - node --check app.js; node --check sync.js             → PASS
 - node --check panelCoverageManifest.js                 → PASS
 - git diff --check                                      → PASS
-- Pages run 31503596816 (head 4a3fb80)                  → validate SUCCESS
-- Pages deploy                                        → yeni concurrency remediation commit'iyle yeniden tetiklenecek
-- canlı panel-v2 cache                                 → runtime deploy tamamlanana kadar eski `20260811i`
+- Pages run 31505127099 (head 4106605)                  → SUCCESS
+- Pages deployment 5853052269                           → SUCCESS
+- canlı panel-v2 HTTP/cache                            → 200 / `20260811j`
+- canlı 304 render-gate                                → `fetchLatest()` ve `load()` koşullu render doğrulandı
 - gerçek tarayıcı testi                                 → çalıştırılmadı (data-safety lock)
 ```
 
 ### Hatalar ve Çözümleri
 
-İlk kaynak incelemesinde 304 dalında iki ayrı render noktası bulundu: doğrudan `fetchLatest()` ve `load()` promise finalizer'ı. İkisi de `notModified` sözleşmesine göre kapılandı ve yeni fixture her iki yolu da render sayacıyla doğruluyor. Pages kuyruğunda eski `cedea14` run'ı stale kaldı ve normal/force cancel ile kapanmadı; güncel deploy'un beklememesi için concurrency remediation eklendi.
+İlk kaynak incelemesinde 304 dalında iki ayrı render noktası bulundu: doğrudan `fetchLatest()` ve `load()` promise finalizer'ı. İkisi de `notModified` sözleşmesine göre kapılandı ve yeni fixture her iki yolu da render sayacıyla doğruluyor. Pages kuyruğunda eski `cedea14` run'ı stale kaldı; `cancel-in-progress: true` remediation sonrası güncel run başarıyla deploy edildi ve canlı `20260811j` doğrulandı.
 
 ## Sıradaki Adım
 
 - **Bir sonraki prompt:** `36 — WCAG AA Renk Kontrastı`
 - **Tahmini risk:** Kontrast düzeltmeleri `panel-v2.css` ve render renk tokenlarını etkileyebilir; mevcut 23 Panel-v2 fixture'ı ve tam 55'li suite her değişiklikten sonra yeniden çalıştırılmalı.
-- **Öneri:** Concurrency remediation commit'inden oluşan son Pages run'ı ve deployment durumunu doğrula; canlı `panel-v2.html` içinde `20260811j` görünmeden deploy kanıtını tamamlanmış sayma.
+- **Öneri:** Bir sonraki ajan Prompt36 için bu handoff'u ve güncel `LEDGER.md` satırını okuyarak başlayabilir; canlı Prompt35 kanıtı tamamlandı.
 
 ## Context / Token Notu
 

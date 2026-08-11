@@ -5726,7 +5726,6 @@
         syncStatus.status = "accepted";
         syncStatus.lastSyncedAt = new Date().toISOString();
         syncStatus.notModifiedCount = (syncStatus.notModifiedCount || 0) + 1;
-        render();
         return { notModified: true, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }
       if (!r.ok) {
@@ -5779,8 +5778,7 @@
       })
       .then(function(res) {
         isFetching = false;
-        render();
-        if (res && res.notModified) return appData;
+        if (!(res && res.notModified)) render();
         return appData;
       })
       .catch(function(e) {

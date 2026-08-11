@@ -25,7 +25,7 @@ function mediaRule(query) {
   "--ae-page", "--ae-bg", "--ae-surface", "--ae-elevated",
   "--ae-text", "--ae-muted", "--ae-faint",
   "--ae-accent", "--ae-accent2", "--ae-accent3", "--ae-accent-soft", "--ae-accent-glow",
-  "--ae-ok", "--ae-warn", "--ae-drop", "--ae-info", "--ae-pause",
+  "--ae-ok", "--ae-warn", "--ae-drop", "--ae-drop-bg", "--ae-info", "--ae-pause",
   "--ae-glass", "--ae-glass-border", "--ae-glow-accent", "--ae-glow-ok", "--ae-glow-drop",
   "--ae-shadow-sm", "--ae-shadow-md", "--ae-shadow-lg", "--ae-shadow-xl", "--ae-shadow-glow",
   "--ae-card-bg", "--ae-card-bd", "--ae-card-shadow", "--ae-card-radius",
@@ -42,12 +42,12 @@ function mediaRule(query) {
 // ── Premium token values ──
 [
   "--ae-page: #F5F3EF", "--ae-bg: #FDFCFA", "--ae-surface: #FCFAF7", "--ae-elevated: #FAF7F2",
-  "--ae-accent: #B08D4E", "--ae-accent3: #A08040",
+  "--ae-accent: #795F2C", "--ae-accent3: #69501F",
   "--ae-space-2xs: 2px", "--ae-space-2xl: 32px", "--ae-space-3xl: 48px",
   "--ae-radius-xs: 6px", "--ae-radius-xl: 28px", "--ae-radius-full: 9999px",
   "--ae-page: #0C0A09", "--ae-bg: #11100E", "--ae-surface: #1A1815", "--ae-elevated: #221F1B",
-  "--ae-accent: #D4AF6E", "--ae-accent2: #F0D48A", "--ae-accent3: #A08040",
-  "--ae-ok: #4CAF7A", "--ae-warn: #D4A84C", "--ae-drop: #C86565", "--ae-info: #5E8AAA",
+  "--ae-accent: #D4AF6E", "--ae-accent2: #F0D48A", "--ae-accent3: #A88A50",
+  "--ae-ok: #4CAF7A", "--ae-warn: #D4A84C", "--ae-drop: #CE7070", "--ae-info: #6391B1",
   "--ae-glass: rgba(255,255,255,0.04)", "--ae-glass-border: rgba(255,255,255,0.06)",
   "--ae-glow-accent: 0 0 30px rgba(212,175,110,0.15)",
   "--ae-glow-ok: 0 0 20px rgba(76,175,122,0.12)",
@@ -165,7 +165,7 @@ assert(css.includes("background: linear-gradient(135deg, var(--ae-accent), var(-
 assert(css.includes("box-shadow: var(--ae-shadow-md), var(--ae-glow-accent);"), "Primary hover glow shadow var");
 assert(css.includes("transform: translateY(-1px) scale(1.02);"), "Primary hover spring scale var");
 assert(css.includes("transform: scale(0.97);"), "Button active spring scale var");
-assert(css.includes("background: linear-gradient(135deg, var(--ae-drop),"), "Drop button red gradient var");
+assert(css.includes("background: linear-gradient(135deg, var(--ae-drop-bg),"), "Drop button red gradient var");
 assert(css.includes(".ae-btn--pill.is-active"), "Active pill selector var");
 assert(css.includes("box-shadow: 0 0 8px var(--ae-ok);"), "OK status dot glow var");
 assert(css.includes("@keyframes aeStatusDropPulse"), "Drop status pulse animation var");

@@ -10,22 +10,23 @@
 
   /* Metin */
   --ae-text: #1C1916;
-  --ae-muted: #6E6862;
-  --ae-faint: #9B958E;
+  --ae-muted: #5E5852;
+  --ae-faint: #706A64;
 
   /* Vurgu — premium altın/bronz */
-  --ae-accent: #B08D4E;
-  --ae-accent2: #C9A86C;
-  --ae-accent3: #A08040;
+  --ae-accent: #795F2C;
+  --ae-accent2: #7A5C22;
+  --ae-accent3: #69501F;
   --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 18%, transparent);
   --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 28%, transparent);
 
   /* Durum renkleri */
-  --ae-ok: #4CAF7A;
-  --ae-warn: #D4A84C;
-  --ae-drop: #C86565;
-  --ae-info: #5E8AAA;
-  --ae-pause: #8A8496;
+  --ae-ok: #2E6F4E;
+  --ae-warn: #805A12;
+  --ae-drop: #9A3535;
+  --ae-drop-bg: #7C2E2E;
+  --ae-info: #35657D;
+  --ae-pause: #5B5665;
 
   /* Glassmorphism / glow */
   --ae-glass: rgba(0,0,0,0.02);
@@ -103,12 +104,18 @@
   --ae-elevated: #221F1B;
 
   --ae-text: #F5F0EB;
-  --ae-muted: #8A847D;
-  --ae-faint: #5E5852;
+  --ae-muted: #958F87;
+  --ae-faint: #8F8981;
 
   --ae-accent: #D4AF6E;
   --ae-accent2: #F0D48A;
-  --ae-accent3: #A08040;
+  --ae-accent3: #A88A50;
+  --ae-ok: #4CAF7A;
+  --ae-warn: #D4A84C;
+  --ae-drop: #CE7070;
+  --ae-drop-bg: #6B2A2A;
+  --ae-info: #6391B1;
+  --ae-pause: #8A8496;
   --ae-accent-soft: color-mix(in srgb, var(--ae-accent) 16%, transparent);
   --ae-accent-glow: color-mix(in srgb, var(--ae-accent) 24%, transparent);
 
@@ -2105,10 +2112,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .day-heatmap__cell--mood-1 .day-heatmap__day,
 .day-heatmap__cell--mood-2 .day-heatmap__day,
-.day-heatmap__cell--mood-3 .day-heatmap__day { color: #1F1C19; }
-#root[data-theme="dark"] .day-heatmap__cell--mood-1 .day-heatmap__day,
-#root[data-theme="dark"] .day-heatmap__cell--mood-2 .day-heatmap__day,
-#root[data-theme="dark"] .day-heatmap__cell--mood-3 .day-heatmap__day { color: #F4F0EA; }
+.day-heatmap__cell--mood-3 .day-heatmap__day,
+.day-heatmap__cell--mood-4 .day-heatmap__day,
+.day-heatmap__cell--mood-5 .day-heatmap__day,
+.day-heatmap__cell--mood-6 .day-heatmap__day,
+.day-heatmap__cell--mood-7 .day-heatmap__day { color: var(--ae-page); }
 
 @media (max-width: 374px) {
   .day-heatmap__weekdays,
@@ -4671,13 +4679,13 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   box-shadow: var(--ae-shadow-md), var(--ae-glow-accent);
 }
 .ae-btn--drop {
-  background: linear-gradient(135deg, var(--ae-drop), color-mix(in srgb, var(--ae-drop) 72%, #7c3434 28%));
+  background: linear-gradient(135deg, var(--ae-drop-bg), color-mix(in srgb, var(--ae-drop-bg) 82%, #4d1f1f 18%));
   border-color: transparent;
   color: #fff;
   box-shadow: var(--ae-shadow-sm);
 }
 .ae-btn--drop:hover {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ae-drop) 82%, #fff 18%), var(--ae-drop));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ae-drop-bg) 88%, #fff 12%), var(--ae-drop-bg));
   border-color: transparent;
   color: #fff;
   box-shadow: var(--ae-shadow-md), var(--ae-glow-drop);

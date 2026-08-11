@@ -66,7 +66,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 26 | Pull-to-Refresh | ✅ TAMAMLANDI | `c56480f` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (14/14 PASS); `git diff --check`; secret-pattern scan PASS; emoji scan PASS; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31406100522` SUCCESS; canlı HTTP 200 | Mobilde ortak touch gesture bağlayıcısına 60px pull-to-refresh eşiği, hazır/yenileniyor SVG göstergesi, fetch sonrası kapanış, üstte değilken/etkileşimli hedefte iptal ve desktop listener sınırı eklendi; Prompt 25 swipe sözleşmesi güncellendi; deployment `5835323205` success ile `https://mustafaras.github.io/s/` üzerinde doğrulandı |
 | 27 | Touch-friendly Hit Areas | ✅ TAMAMLANDI | `a92bf2c` + metadata `90b8121` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `node tests/test_panel_v2_hit_areas.js`; `tests/test_panel_v2_*.js` (15/15 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31470011231` SUCCESS; deployment `5846386966` success; canlı HTTP/Pages `https://mustafaras.github.io/s/` | Tüm buton, ana/alt sekme, density, tooltip, toast kapatma, disclosure/heatmap ve konum bağlantısı yüzeyleri 44×44px; chip'ler 32px; input/select yüzeyleri 44px; mobil 375/414/460 ve masaüstü 768 breakpoint kontratları eklendi; CSS cache-bust `20260811b` |
 | 28 | Polling & Telemetry Altyapısı | ✅ TAMAMLANDI | `bc37559` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_tabs.js`; `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_polling_telemetry.js`; `tests/test_panel_v2_*.js` (16/16 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31474396733` SUCCESS; deployment `5847191031` success; canlı URL `https://mustafaras.github.io/s/` | 60 saniyelik token-sınırlı polling, bounded p50/p95 latency (son 20), request/error sayaçları, last-success/freshness, GitHub rate-limit header telemetrisi ve logout stop lifecycle tamamlandı; cache-bust `20260811c` |
-| 29 | Olay Günlüğü Görüntüleyicisi | 🔒 BEKLEMEDE | - | - | - |
+| 29 | Olay Günlüğü Görüntüleyicisi | ✅ TAMAMLANDI | `941de60` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_event_log.js`; `node tests/test_panel_p2_event_log.js`; `node tests/test_panel_v2_system.js`; `tests/test_panel_v2_*.js` (17/17 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31475709131` SUCCESS; deployment `5847436381` success; canlı HTTP 200/cache `20260811d`; canlı URL `https://mustafaras.github.io/s/` | Sistem'e 5. Olaylar sub-tab'ı, PanelCoverageV1 normalize/parse tabanlı güvenli event log, bölüm/işlem/tarih filtreleri, 20/50/100 sayfalama ve eventId/correlationId/sequence/path/revision/kaynak/gizlilik drawer'ı eklendi; raw özet DOM'a taşınmıyor |
 | 30 | Senkron Sağlık Paneli | 🔒 BEKLEMEDE | - | - | - |
 | 31 | Bildirim Yaşam Döngüsü | 🔒 BEKLEMEDE | - | - | - |
 | 32 | Sıra Denetimi & Revizyon Geçmişi | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 29
+- **currentStep:** 30
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-11
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 28 Polling & Telemetry Altyapısı
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 29 Olay Günlüğü Görüntüleyicisi
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

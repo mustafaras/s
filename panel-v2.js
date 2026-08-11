@@ -149,6 +149,39 @@
     element: null,
     handlers: null
   };
+  var performanceState = {
+    resizeHandled: 0,
+    scrollHandled: 0,
+    lastScrollTop: 0,
+    lastResizeAt: null,
+    mapScheduleCount: 0,
+    mapInitCount: 0,
+    mapAssetLoadCount: 0,
+    scrollTargetBound: false,
+    rootListenersBound: false
+  };
+  var performanceBinding = {
+    resize: null,
+    scroll: null,
+    scrollElement: null
+  };
+  var mapState = {
+    observer: null,
+    leafletPromise: null,
+    leafletStatus: "idle"
+  };
+  var archivePageCache = {
+    key: "",
+    dataRef: null,
+    subTab: "",
+    page: 1,
+    items: [],
+    total: 0,
+    sourceTotal: 0,
+    totalPages: 1,
+    hasPrev: false,
+    hasNext: false
+  };
   var pullRefresh = {
     mode: "idle",
     distance: 0,
@@ -398,6 +431,128 @@
     if (!doc || typeof doc.addEventListener !== "function" || accessibilityState.keyboardBound) return;
     doc.addEventListener("keydown", handleKeyboardNavigation);
     accessibilityState.keyboardBound = true;
+  }
+
+  // Scroll/resize olayları render döngüsünü tetiklemez; yalnızca pahalı işi
+  // kontrollü aralıklarla çalıştırır. Bu, küçük ekranlarda ardışık touch ve
+  // viewport olaylarının harita/ölçüm işini yığmasını önler.
+  function throttle(fn, wait) {
+    var last = 0;
+    var timer = null;
+    var lastArgs = null;
+    var lastThis = null;
+    function invoke() {
+      last = Date.now();
+      timer = null;
+      if (lastArgs) {
+        fn.apply(lastThis, lastArgs);
+        lastArgs = null;
+        lastThis = null;
+      }
+    }
+    function wrapped() {
+      lastArgs = arguments;
+      lastThis = this;
+      var remaining = Math.max(0, (wait || 0) - (Date.now() - last));
+      if (!timer && remaining === 0) {
+        invoke();
+      } else if (!timer && typeof root.setTimeout === "function") {
+        timer = root.setTimeout(invoke, remaining || wait || 1);
+      }
+    }
+    wrapped.cancel = function() {
+      if (timer !== null && typeof root.clearTimeout === "function") root.clearTimeout(timer);
+      timer = null;
+      lastArgs = null;
+      lastThis = null;
+    };
+    return wrapped;
+  }
+
+  function debounce(fn, wait) {
+    var timer = null;
+    function wrapped() {
+      var args = arguments;
+      var context = this;
+      if (timer !== null && typeof root.clearTimeout === "function") root.clearTimeout(timer);
+      if (typeof root.setTimeout !== "function") {
+        fn.apply(context, args);
+        return;
+      }
+      timer = root.setTimeout(function() {
+        timer = null;
+        fn.apply(context, args);
+      }, wait || 0);
+    }
+    wrapped.cancel = function() {
+      if (timer !== null && typeof root.clearTimeout === "function") root.clearTimeout(timer);
+      timer = null;
+    };
+    return wrapped;
+  }
+
+  function currentScrollTop(event) {
+    var target = event && event.target;
+    var values = [target && target.scrollTop, root.scrollY, root.pageYOffset];
+    var doc = root.document;
+    if (doc && doc.documentElement) values.push(doc.documentElement.scrollTop);
+    if (doc && doc.body) values.push(doc.body.scrollTop);
+    for (var i = 0; i < values.length; i++) {
+      var value = safeNumber(values[i]);
+      if (value !== null) return Math.max(0, value);
+    }
+    return 0;
+  }
+
+  function handlePerformanceScroll(event) {
+    performanceState.scrollHandled++;
+    performanceState.lastScrollTop = currentScrollTop(event);
+  }
+
+  function invalidateMapSizes() {
+    var doc = root.document;
+    if (!doc || typeof doc.querySelectorAll !== "function") return;
+    var update = function() {
+      var containers = doc.querySelectorAll(".loc-map");
+      containers.forEach(function(el) {
+        var map = el && el._leaflet_map;
+        if (map && typeof map.invalidateSize === "function") map.invalidateSize({ pan: false });
+      });
+    };
+    if (typeof root.requestAnimationFrame === "function") root.requestAnimationFrame(update);
+    else update();
+  }
+
+  function handlePerformanceResize() {
+    performanceState.resizeHandled++;
+    performanceState.lastResizeAt = new Date().toISOString();
+    invalidateMapSizes();
+    scheduleMapInitialization();
+  }
+
+  function bindPerformanceScrollTarget(app) {
+    var next = null;
+    if (app && typeof app.querySelector === "function") next = app.querySelector(".ae-app__body");
+    if (next === performanceBinding.scrollElement) return;
+    if (performanceBinding.scrollElement && typeof performanceBinding.scrollElement.removeEventListener === "function" && performanceBinding.scroll) {
+      performanceBinding.scrollElement.removeEventListener("scroll", performanceBinding.scroll);
+    }
+    performanceBinding.scrollElement = next;
+    performanceState.scrollTargetBound = false;
+    if (next && typeof next.addEventListener === "function" && performanceBinding.scroll) {
+      next.addEventListener("scroll", performanceBinding.scroll, { passive: true });
+      performanceState.scrollTargetBound = true;
+    }
+  }
+
+  function bindPerformanceListeners() {
+    if (performanceState.rootListenersBound) return;
+    if (!root || typeof root.addEventListener !== "function") return;
+    performanceBinding.resize = debounce(handlePerformanceResize, 160);
+    performanceBinding.scroll = throttle(handlePerformanceScroll, 80);
+    root.addEventListener("resize", performanceBinding.resize, { passive: true });
+    root.addEventListener("scroll", performanceBinding.scroll, { passive: true });
+    performanceState.rootListenersBound = true;
   }
 
   function isoDate(d) {
@@ -1094,6 +1249,7 @@
   }
   function setData(data) {
     appData = unwrapPanelData(data);
+    resetArchivePageCache();
     announce("Panel verisi güncellendi.");
     render();
   }
@@ -5555,6 +5711,61 @@
     return filterArchiveItems(getArchiveItems(subTab), subTab);
   }
 
+  function resetArchivePageCache() {
+    archivePageCache.key = "";
+    archivePageCache.dataRef = null;
+    archivePageCache.subTab = "";
+    archivePageCache.page = 1;
+    archivePageCache.items = [];
+    archivePageCache.total = 0;
+    archivePageCache.sourceTotal = 0;
+    archivePageCache.totalPages = 1;
+    archivePageCache.hasPrev = false;
+    archivePageCache.hasNext = false;
+  }
+
+  function archiveCacheKey(subTab) {
+    return [
+      subTab,
+      ui.archiveSearch || "",
+      ui.archiveStatus || "all",
+      ui.archiveKind || "all",
+      ui.archiveFrom || "",
+      ui.archiveTo || ""
+    ].join("\u001f");
+  }
+
+  // Arşiv verisi snapshot içinde yerel olsa da DOM'a yalnızca aktif sayfanın
+  // satırlarını materyalize eder. Filtre/snapshot değişince anahtar kırılır;
+  // sayfa değişiminde yalnızca yeni dilim yeniden üretilir.
+  function getArchivePageState(subTab, page) {
+    var key = archiveCacheKey(subTab);
+    var requestedPage = Math.max(1, safeNumber(page) || 1);
+    if (archivePageCache.key === key && archivePageCache.dataRef === appData && archivePageCache.page === requestedPage) {
+      return archivePageCache;
+    }
+    var sourceItems = getArchiveItems(subTab);
+    var filteredItems = filterArchiveItems(sourceItems, subTab);
+    var state = paginate(filteredItems, requestedPage, ARCHIVE_PAGE_SIZE);
+    archivePageCache = {
+      key: key,
+      dataRef: appData,
+      subTab: subTab,
+      page: state.page,
+      items: state.items,
+      total: state.total,
+      sourceTotal: sourceItems.length,
+      totalPages: state.totalPages,
+      hasPrev: state.hasPrev,
+      hasNext: state.hasNext
+    };
+    return archivePageCache;
+  }
+
+  function archiveListAttrs(state) {
+    return ' data-archive-page="' + state.page + '" data-archive-total="' + state.total + '" data-archive-page-size="' + ARCHIVE_PAGE_SIZE + '"';
+  }
+
   function renderArchiveEmpty(icon, defaultTitle, defaultMessage) {
     return AeEmpty({
       icon: icon,
@@ -5685,8 +5896,7 @@
   }
 
   function renderArchiveLibrary(page) {
-    var items = getFilteredArchiveItems("library");
-    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    var state = getArchivePageState("library", page || ui.archivePage || 1);
     if (!state.items.length) {
       return renderArchiveEmpty("book", "Kütüphane boş", "Henüz kitap veya okuma kaydı yok.");
     }
@@ -5706,12 +5916,11 @@
         badge: { reading: "Okunuyor", finished: "Bitti", dropped: "Bırakıldı" }[b.status] || "Kayıtlı"
       });
     }).join("");
-    return '<div class="archive-list ae-slide-up' + archiveListClass() + '">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up' + archiveListClass() + '"' + archiveListAttrs(state) + '>' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveWatch(page) {
-    var items = getFilteredArchiveItems("watch");
-    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    var state = getArchivePageState("watch", page || ui.archivePage || 1);
     if (!state.items.length) {
       return renderArchiveEmpty("watch", "İzleme listesi boş", "Henüz film/dizi veya izleme kaydı yok.");
     }
@@ -5732,12 +5941,11 @@
         badge: { watching: "İzleniyor", finished: "Bitti", dropped: "Bırakıldı" }[it.status] || "Kayıtlı"
       });
     }).join("");
-    return '<div class="archive-list ae-slide-up' + archiveListClass() + '">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up' + archiveListClass() + '"' + archiveListAttrs(state) + '>' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveListen(page) {
-    var items = getFilteredArchiveItems("listen");
-    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    var state = getArchivePageState("listen", page || ui.archivePage || 1);
     if (!state.items.length) {
       return renderArchiveEmpty("listen", "Dinleme listesi boş", "Henüz müzik/podcast veya dinleme kaydı yok.");
     }
@@ -5752,12 +5960,11 @@
         badge: kindLabel
       });
     }).join("");
-    return '<div class="archive-list ae-slide-up' + archiveListClass() + '">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up' + archiveListClass() + '"' + archiveListAttrs(state) + '>' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchiveQuotes(page) {
-    var items = getFilteredArchiveItems("quotes");
-    var state = paginate(items, page || ui.archivePage || 1, ARCHIVE_PAGE_SIZE);
+    var state = getArchivePageState("quotes", page || ui.archivePage || 1);
     if (!state.items.length) {
       return renderArchiveEmpty("note", "Alıntı yok", "Henüz kitap, film/dizi veya müzik alıntısı yok.");
     }
@@ -5768,7 +5975,7 @@
              '<div class="archive-row__meta">' + escapeHtml(safeText(q.source + (q.title ? " · " + q.title : "") + (q.ts ? " · " + formatDateLabel(String(q.ts).slice(0, 10)) : ""), 100)) + "</div>" +
              "</div></div>";
     }).join("");
-    return '<div class="archive-list ae-slide-up' + archiveListClass() + '">' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
+    return '<div class="archive-list ae-slide-up' + archiveListClass() + '"' + archiveListAttrs(state) + '>' + rows + renderPagination(state, "AeonV2.setArchivePage") + "</div>";
   }
 
   function renderArchives() {
@@ -5786,8 +5993,9 @@
       quotes: renderArchiveQuotes
     };
     var renderFn = contentBySubTab[subTab] || renderArchiveLibrary;
-    var total = getArchiveItems(subTab).length;
-    var filtered = getFilteredArchiveItems(subTab).length;
+    var pageState = getArchivePageState(subTab, ui.archivePage);
+    var total = pageState.sourceTotal;
+    var filtered = pageState.total;
     return '<div class="archives-view ae-slide-up ae-stagger">' +
            SubTabs({ tabs: tabs, active: subTab, ariaLabel: "Arşiv alt sekmeleri", idPrefix: "ae-archive-subtab", panelPrefix: "ae-archive-panel", onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
            renderArchiveControls(subTab, total, filtered) +
@@ -5830,22 +6038,70 @@
     restoreFocusAfterRender();
 
     initSwipeGestures(app);
+    bindPerformanceScrollTarget(app);
     runCountUps();
-
-    // Leaflet haritaları başlat (bir sonraki tick'te DOM hazır olur)
-    setTimeout(initMaps, 50);
+    scheduleMapInitialization();
   }
 
-  function initMaps() {
+  function getMapContainers() {
+    var doc = root.document;
+    if (!doc || typeof doc.querySelectorAll !== "function") return [];
+    return Array.prototype.slice.call(doc.querySelectorAll(".loc-map"));
+  }
+
+  function ensureLeafletAssets() {
+    if (typeof root.L !== "undefined") return Promise.resolve(root.L);
+    if (mapState.leafletPromise) return mapState.leafletPromise;
+    var doc = root.document;
+    if (!doc || typeof doc.createElement !== "function") return Promise.resolve(null);
+    var parent = doc.head || doc.documentElement;
+    if (!parent || typeof parent.appendChild !== "function") return Promise.resolve(null);
+
+    mapState.leafletStatus = "loading";
+    performanceState.mapAssetLoadCount++;
+    var css = doc.querySelector && doc.querySelector("link[data-ae-leaflet-css]");
+    if (!css) {
+      css = doc.createElement("link");
+      css.rel = "stylesheet";
+      css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      css.setAttribute("data-ae-leaflet-css", "true");
+      css.setAttribute("crossorigin", "");
+      parent.appendChild(css);
+    }
+
+    mapState.leafletPromise = new Promise(function(resolve, reject) {
+      var script = doc.createElement("script");
+      script.async = true;
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.setAttribute("data-ae-leaflet-script", "true");
+      script.setAttribute("crossorigin", "");
+      script.onload = function() {
+        mapState.leafletStatus = typeof root.L === "undefined" ? "error" : "ready";
+        if (typeof root.L === "undefined") reject(new Error("Leaflet yüklenemedi."));
+        else resolve(root.L);
+      };
+      script.onerror = function() {
+        mapState.leafletStatus = "error";
+        reject(new Error("Leaflet ağına erişilemedi."));
+      };
+      parent.appendChild(script);
+    });
+    return mapState.leafletPromise;
+  }
+
+  function initMaps(containers) {
     if (typeof root.L === "undefined") return;
-    var containers = root.document.querySelectorAll(".loc-map");
-    containers.forEach(function(el) {
-      if (el._leaflet_map) return;
-      var raw = el.getAttribute("data-points");
-      if (!raw) return;
-      var points;
-      try { points = JSON.parse(raw); } catch(e) { return; }
-      if (!Array.isArray(points) || !points.length) return;
+    containers = containers || getMapContainers();
+    containers.forEach(initMapContainer);
+  }
+
+  function initMapContainer(el) {
+    if (typeof root.L === "undefined" || !el || el._leaflet_map) return;
+    var raw = el.getAttribute("data-points");
+    if (!raw) return;
+    var points;
+    try { points = JSON.parse(raw); } catch(e) { return; }
+    if (!Array.isArray(points) || !points.length) return;
 
       // Ortalama koordinat
       var latSum = 0, lngSum = 0, count = 0;
@@ -5902,7 +6158,48 @@
         map.scrollWheelZoom.enable();
         setTimeout(function() { map.scrollWheelZoom.disable(); }, 5000);
       });
+      performanceState.mapInitCount++;
+  }
+
+  function initializeMapWhenReady(el) {
+    return ensureLeafletAssets().then(function() {
+      initMapContainer(el);
+    }).catch(function() {
+      return false;
     });
+  }
+
+  function scheduleMapInitialization() {
+    var containers = getMapContainers();
+    if (!containers.length) {
+      if (mapState.observer && typeof mapState.observer.disconnect === "function") mapState.observer.disconnect();
+      mapState.observer = null;
+      return false;
+    }
+    performanceState.mapScheduleCount++;
+    if (mapState.observer && typeof mapState.observer.disconnect === "function") mapState.observer.disconnect();
+    mapState.observer = null;
+
+    if (typeof root.IntersectionObserver === "function") {
+      var observer = new root.IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry || (!entry.isIntersecting && !(entry.intersectionRatio > 0))) return;
+          if (typeof observer.unobserve === "function") observer.unobserve(entry.target);
+          initializeMapWhenReady(entry.target);
+        });
+      }, { rootMargin: "160px 0px" });
+      mapState.observer = observer;
+      containers.forEach(function(el) { observer.observe(el); });
+      return true;
+    }
+
+    var loadVisibleMaps = function() {
+      ensureLeafletAssets().then(function() { initMaps(containers); }).catch(function() {});
+    };
+    if (typeof root.requestAnimationFrame === "function") root.requestAnimationFrame(loadVisibleMaps);
+    else if (typeof root.setTimeout === "function") root.setTimeout(loadVisibleMaps, 0);
+    else loadVisibleMaps();
+    return true;
   }
 
   function setTab(id) {
@@ -6003,6 +6300,7 @@
         syncStatus.lastErrorCode = null;
         syncStatus.lastSyncedAt = new Date().toISOString();
         appData = unwrapPanelData(data);
+        resetArchivePageCache();
         render();
         return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }, function(error) {
@@ -6107,6 +6405,7 @@
     syncStatus.dataAgeMinutes = null;
     syncStatus._latencyWindow = [];
     appData = null;
+    resetArchivePageCache();
     ui.tab = "today";
     ui.subTab = null;
     render();
@@ -6191,6 +6490,7 @@
 
   function clearPanelCache() {
     appData = null;
+    resetArchivePageCache();
     syncStatus.etag = null;
     syncStatus.snapshotRevision = null;
     syncStatus.sourceUpdatedAt = null;
@@ -6240,6 +6540,24 @@
     };
   }
 
+  function getPerformanceState() {
+    return {
+      resizeHandled: performanceState.resizeHandled,
+      scrollHandled: performanceState.scrollHandled,
+      lastScrollTop: performanceState.lastScrollTop,
+      lastResizeAt: performanceState.lastResizeAt,
+      mapScheduleCount: performanceState.mapScheduleCount,
+      mapInitCount: performanceState.mapInitCount,
+      mapAssetLoadCount: performanceState.mapAssetLoadCount,
+      scrollTargetBound: performanceState.scrollTargetBound,
+      rootListenersBound: performanceState.rootListenersBound,
+      leafletStatus: mapState.leafletStatus,
+      archivePage: archivePageCache.page,
+      archivePageSize: ARCHIVE_PAGE_SIZE,
+      archiveTotal: archivePageCache.total
+    };
+  }
+
   function updateStatus(s) {
     if (s && typeof s === "object") {
       Object.keys(s).forEach(function(key) { syncStatus[key] = s[key]; });
@@ -6251,6 +6569,7 @@
     var rootEl = root.document && root.document.getElementById("root");
     if (rootEl && ui.theme) rootEl.setAttribute("data-theme", ui.theme);
     bindKeyboardNavigation();
+    bindPerformanceListeners();
     restorePollingPreferences();
     ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     render();
@@ -6321,6 +6640,7 @@
     forceSync: forceSync,
     getDiagnosticState: getDiagnosticState,
     getAccessibilityState: getAccessibilityState,
+    getPerformanceState: getPerformanceState,
     handleKeyboardNavigation: handleKeyboardNavigation,
     logout: logout,
     updateStatus: updateStatus,

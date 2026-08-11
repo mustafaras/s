@@ -166,6 +166,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 /* ── Kartlar ── */
 .ae-card {
+  contain: layout style paint;
   background: var(--ae-glass);
   backdrop-filter: blur(20px) saturate(1.1);
   -webkit-backdrop-filter: blur(20px) saturate(1.1);
@@ -2265,6 +2266,20 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   display: flex;
   flex-direction: column;
   gap: var(--ae-space-sm);
+}
+
+/* ── Prompt 38: görünmeyen bölümlerde çizim maliyetini ertele ── */
+.ae-panel > .ae-stagger > *,
+.day-detail-groups > .day-detail-accordion,
+.archive-list > .archive-row,
+.system-panel > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px;
+}
+
+.archive-list {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
 }
 
 @keyframes aeSystemSubtabEnter {

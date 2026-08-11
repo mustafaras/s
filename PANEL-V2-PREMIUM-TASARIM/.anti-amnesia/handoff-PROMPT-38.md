@@ -16,7 +16,7 @@
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
 - [x] Commit yapıldı
-- [ ] Push yapıldı (Pages teslimi bu handoff metadata commit'i sonrasında)
+- [x] Push yapıldı
 
 ### Özet
 
@@ -54,13 +54,13 @@ Kart yüzeylerine contain: layout style paint, görünürlük alanı dışındak
 
 ### Hatalar ve Çözümleri
 
-İlk tam Panel-v2 koşusunda test_panel_v2_hit_areas.js, önceki Prompt 37 cache-bust değeri 20260811l için bekliyordu; test 20260811m ile hizalandı ve tüm 26 Panel-v2 fixture’ı yeniden PASS oldu. Gerçek tarayıcı açılmadı; uygulama doğrulaması headless Node/VM sınırında tutuldu.
+İlk tam Panel-v2 koşusunda test_panel_v2_hit_areas.js, önceki Prompt 37 cache-bust değeri 20260811l için bekliyordu; test 20260811m ile hizalandı ve tüm 26 Panel-v2 fixture’ı yeniden PASS oldu. Gerçek tarayıcı açılmadı; uygulama doğrulaması headless Node/VM sınırında tutuldu. Push sonrası Pages run 31520072993 SUCCESS oldu; canlı panel HTTP 200 verdi ve canlı panel-v2.css/js?v=20260811m SHA256 değerleri yerel dosyalarla eşleşti.
 
 ## Sıradaki Adım
 
 - Bir sonraki prompt: 39 — Yeni Komponent Testleri
 - Tahmini risk: Prompt 38’in lazy DOM/Leaflet ve containment davranışı Prompt 39 testlerinin hedefi olabilir; gerçek tarayıcı yerine fixture sınırları korunmalı.
-- Öneri: Önce güncel LEDGER.md ve bu handoff’u okuyun. Prompt 39’a geçmeden Prompt 38’in Pages/live cache kanıtını tamamlayın; Prompt 39 başlatılmadı.
+- Öneri: Önce güncel LEDGER.md ve bu handoff’u okuyun. Prompt 38’in Pages/live cache kanıtı tamamlandı; Prompt 39 başlatılmadı.
 
 ## Context / Token Notu
 
@@ -71,6 +71,7 @@ Kart yüzeylerine contain: layout style paint, görünürlük alanı dışındak
 ## Ek Notlar
 
 - Kullanıcı verisi, token veya mustafaras/seyma-data okunmadı/yazılmadı.
+- Live panel: https://mustafaras.github.io/s/panel-v2.html — cache-bust: 20260811m.
 - İzinli kapsam dışındaki app.js, sync.js, index.html, panel.html, panel.js, panel.css, data/ ve mustafaras/seyma-data değiştirilmedi.
 - Prompt 39’a geçilmedi.
 
@@ -78,4 +79,4 @@ Kart yüzeylerine contain: layout style paint, görünürlük alanı dışındak
 
 | Step | Prompt Kısa Adı | Durum | Commit | Testler | Notlar |
 |------|-----------------|-------|--------|---------|--------|
-| 38 | CSS Containment & Performans | ✅ TAMAMLANDI | 00dd1d0 + d811330 | 26/26 Panel-v2; 58/58 kök test; driver PASS | CSS containment, offscreen rendering, lazy Leaflet/archive paging, throttled scroll/debounced resize; canlı deploy metadata commit'i sonrası doğrulanacak |
+| 38 | CSS Containment & Performans | ✅ TAMAMLANDI | 00dd1d0 + d811330 | 26/26 Panel-v2; 58/58 kök test; driver PASS; Pages run 31520072993 SUCCESS; live byte eşitliği PASS | CSS containment, offscreen rendering, lazy Leaflet/archive paging, throttled scroll/debounced resize; canlı cache 20260811m |

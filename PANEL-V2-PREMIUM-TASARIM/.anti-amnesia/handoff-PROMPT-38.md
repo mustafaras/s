@@ -8,14 +8,14 @@
 - Tarih: 2026-08-11
 - Oturum ID: belirtilmedi
 - Başlangıç Commit: 568cb1f
-- Bitiş Commit: 00dd1d0 (uygulama; ledger/handoff teslim metadata commit'i bunu izleyecek)
+- Bitiş Commit: 00dd1d0 (uygulama) + d811330 (ledger/handoff metadata)
 
 ## Yapılanlar
 
 - [x] Ana görev tamamlandı
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
-- [ ] Commit yapıldı (uygulama commit'i yapıldı; teslim metadata commit'i bu handoff sonrasında)
+- [x] Commit yapıldı
 - [ ] Push yapıldı (Pages teslimi bu handoff metadata commit'i sonrasında)
 
 ### Özet
@@ -78,4 +78,4 @@ Kart yüzeylerine contain: layout style paint, görünürlük alanı dışındak
 
 | Step | Prompt Kısa Adı | Durum | Commit | Testler | Notlar |
 |------|-----------------|-------|--------|---------|--------|
-| 38 | CSS Containment & Performans | ✅ TAMAMLANDI | 00dd1d0 + metadata teslim commit'i | 26/26 Panel-v2; 58/58 kök test; driver PASS | CSS containment, offscreen rendering, lazy Leaflet/archive paging, throttled scroll/debounced resize; canlı deploy metadata commit'i sonrası doğrulanacak |
+| 38 | CSS Containment & Performans | ✅ TAMAMLANDI | 00dd1d0 + d811330 | 26/26 Panel-v2; 58/58 kök test; driver PASS | CSS containment, offscreen rendering, lazy Leaflet/archive paging, throttled scroll/debounced resize; canlı deploy metadata commit'i sonrası doğrulanacak |

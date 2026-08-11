@@ -71,7 +71,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 31 | Bildirim Yaşam Döngüsü | ✅ TAMAMLANDI | `b23e978` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_notification_lifecycle.js` (22/22 PASS); `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_css.js`; `node tests/test_panel_v2_hit_areas.js`; `tests/test_panel_v2_*.js` (19/19 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; Pages run `31485940071` SUCCESS; deployment `5849363881` success; canlı HTTP 200/cache `20260811f` | Canonical `notificationEventProjection` ile beş aşamalı yaşam döngüsü, durum dot'ları, toplam süre ve ayrı `observer-inbox.json` mesaj composer'ı; localhost/file yazma koruması ve 409/422 bounded retry tamamlandı |
 | 32 | Sıra Denetimi & Revizyon Geçmişi | ✅ TAMAMLANDI | `9ad1ad3` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_p2_event_log.js` (11/11 PASS); `node tests/test_panel_v2_audit.js` (17/17 PASS); `tests/test_panel_v2_*.js` (20/20 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; Pages run `31487032434` SUCCESS; deploy işi SUCCESS; canlı HTTP 200/cache `20260811g` | Canonical `eventSequenceAudit` ile kronolojik out-of-order/gap/duplicate metrikleri ve sequence detay raporu; güvenli, tekilleştirilmiş son 20 `snapshotRevision` geçmişi; boş/malformed event akışında fail-safe görünüm |
 | 33 | Ayarlar & Tanı Araçları | ✅ TAMAMLANDI | `4f0fc1a` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_settings.js`; `tests/test_panel_v2_*.js` (21/21 PASS); `node tests/test_panel_p2_event_log.js` (11/11 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; Pages run `31489910967` SUCCESS; deploy işi SUCCESS; canlı HTTP 200/cache `20260811h` | Polling 30 sn/60 sn/5 dk/Kapalı seçici, otomatik yenileme toggle'ı ve yerel tercih saklama; bağlantı/veri doğrulama/cache temizleme/ETag'siz zorla senkron tanıları; sürüm-tarih-commit hakkında kartı; kullanıcı verisi ve token sınırı korunarak tamamlandı |
-| 34 | Sistem Sekmesi Sub-tab | 🔒 BEKLEMEDE | - | - | - |
+| 34 | Sistem Sekmesi Sub-tab | ✅ TAMAMLANDI | `8542b66` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (22/22 PASS); `node tests/test_panel_p2_event_log.js` (11/11 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; tüm `tests/test_*.js` (51/54; 3 değişiklik kapsamı dışı legacy cache kontratı); Pages run `31495640851` SUCCESS; deploy işi SUCCESS; canlı HTTP 200/cache `20260811i` | Kanonik `SYSTEM_SUB_TABS` ile Durum/Olaylar/Denetim/Mesajlar/Ayarlar sırası, her panel için ARIA id-controls bağı, render fonksiyon eşlemeleri ve tek-kullanımlık reduced-motion uyumlu sub-tab giriş animasyonu tamamlandı |
 | 35 | Polling & Telemetry Testleri | 🔒 BEKLEMEDE | - | - | - |
 | 36 | WCAG AA Renk Kontrastı | 🔒 BEKLEMEDE | - | - | - |
 | 37 | Klavye Navigasyonu & Screen Reader | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 34
+- **currentStep:** 35
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-11
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 33 Ayarlar & Tanı Araçları
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 34 Sistem Sekmesi Sub-tab Yeniden Düzenleme
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

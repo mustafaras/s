@@ -27,7 +27,7 @@
   var OBSERVER_MESSAGE_MAX = 200;
   var PANEL_VERSION = "2.0";
   var PANEL_BUILD_DATE = "2026-08-11";
-  var PANEL_SOURCE_COMMIT = "4f0fc1a";
+  var PANEL_SOURCE_COMMIT = "8542b66";
   var POLLING_OPTIONS = [
     { value: 30000, label: "30 sn" },
     { value: 60000, label: "60 sn" },

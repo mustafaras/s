@@ -66,6 +66,7 @@ function mediaRule(query) {
   "--ae-font: 'Inter', -apple-system, sans-serif",
   "--ae-mono: 'JetBrains Mono', 'SF Mono', monospace",
   "--ae-scale-xs: 10px", "--ae-scale-sm: 12px", "--ae-scale-md: 14px",
+  "--ae-scale-compact: 11px", "--ae-scale-base: 16px",
   "--ae-scale-lg: 18px", "--ae-scale-xl: 24px", "--ae-scale-2xl: 32px", "--ae-scale-3xl: 42px"
 ].forEach(function(token) {
   assert(css.includes(token), "Tipografi token değeri var: " + token);
@@ -76,7 +77,7 @@ function mediaRule(query) {
 ].forEach(function(selector) {
   assert(css.includes(selector), "Mono veri yüzeyi seçicisi var: " + selector);
 });
-assert(!/font-size:\s*[0-9]+px/.test(css), "Tüm font-size değerleri scale token kullanıyor");
+assert(!/font-size\s*:\s*[0-9.]+(?:px|rem|em)\b/.test(css), "Tüm font-size değerleri scale token kullanıyor");
 
 // ── Dark theme override block ──
 assert(css.includes('#root[data-theme="dark"]'), "Dark theme override bloğu var");

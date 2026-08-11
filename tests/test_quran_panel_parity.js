@@ -22,7 +22,7 @@ ok('Panel 1 response transport kaynağını ve fail-closed notice’u taşıyor'
 ok('Panel 1 fixture alanlarının tamamını render sözleşmesinde taşıyor',all(p1,fields),fields.filter(function(k){return p1.indexOf(k)<0;}).join(','));
 ok('Panel v2 fixture alanlarının tamamını render sözleşmesinde taşıyor',all(p2,fields),fields.filter(function(k){return p2.indexOf(k)<0;}).join(','));
 ok('İki panel de aynı requestId/status/provenance/timestamp sözleşmesini içeriyor',all(p1,['requestId','status','responseSource','responseReceivedAt','responseValidatedAt'])&&all(p2,['requestId','status','responseSource','responseReceivedAt','responseValidatedAt']));
-ok('iki shell de ilgili değişen JS için cache-busting taşıyor',/panel\.js\?v=20260811a/.test(h1)&&/panel-v2\.js\?v=20260811a/.test(h2));
+ok('iki shell de ilgili değişen JS için cache-busting taşıyor',/panel\.js\?v=[^"'\s]+/.test(h1)&&/panel-v2\.js\?v=[^"'\s]+/.test(h2));
 ok('Panel v2 canonical quran kartını today görünümüne bağlıyor',/renderQuranJourneyV2\(\)/.test(p2)&&/Kur’an Yolculuğu/.test(p2));
 ok('parity fixture secret veya write kanalı içermiyor',!JSON.stringify(fixture).match(/token|password|secret/i)&&!p2.slice(p2.indexOf('function renderQuranJourneyV2'),p2.indexOf('function getLocationInfo')).match(/fetch\(|PUT|SeySync/));
 

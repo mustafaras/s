@@ -79,6 +79,8 @@
   --ae-scale-xs: 10px;
   --ae-scale-sm: 12px;
   --ae-scale-md: 14px;
+  --ae-scale-compact: 11px;
+  --ae-scale-base: 16px;
   --ae-scale-lg: 18px;
   --ae-scale-xl: 24px;
   --ae-scale-2xl: 32px;
@@ -5281,10 +5283,10 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 /* QY-22 — Kur’an kanonik durum aynası (Panel 1 ile aynı latest.json kaynağı). */
 .ae-quran-card{gap:16px}
 .ae-quran-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
-.ae-quran-card__head h2{margin:4px 0 4px;font-size:1.1rem;color:var(--ae-text);letter-spacing:-.02em}
-.ae-quran-card__head p{margin:0;max-width:58ch;color:var(--ae-muted);font-size:.78rem;line-height:1.5}
-.ae-quran-card__head code,.ae-quran-card__row-meta code{font-family:"JetBrains Mono",monospace;font-size:.88em;color:var(--ae-accent2)}
-.ae-quran-card__status,.ae-quran-card__badge{display:inline-flex;align-items:center;justify-content:center;flex:none;border:1px solid var(--ae-glass-border);border-radius:999px;padding:5px 9px;font-size:.67rem;font-weight:800;white-space:nowrap}
+.ae-quran-card__head h2{margin:4px 0 4px;font-size:var(--ae-scale-lg);color:var(--ae-text);letter-spacing:-.02em}
+.ae-quran-card__head p{margin:0;max-width:58ch;color:var(--ae-muted);font-size:var(--ae-scale-sm);line-height:1.5}
+.ae-quran-card__head code,.ae-quran-card__row-meta code{font-family:var(--ae-mono);font-size:var(--ae-scale-sm);color:var(--ae-accent2)}
+.ae-quran-card__status,.ae-quran-card__badge{display:inline-flex;align-items:center;justify-content:center;flex:none;border:1px solid var(--ae-glass-border);border-radius:999px;padding:5px 9px;font-size:var(--ae-scale-compact);font-weight:800;white-space:nowrap}
 .ae-quran-card__status.is-ready,.ae-quran-card__badge.is-ready{color:var(--ae-ok);border-color:color-mix(in srgb,var(--ae-ok) 42%,var(--ae-glass-border));background:color-mix(in srgb,var(--ae-ok) 11%,transparent)}
 .ae-quran-card__status.is-done,.ae-quran-card__badge.is-done{color:var(--ae-accent2);border-color:color-mix(in srgb,var(--ae-accent2) 42%,var(--ae-glass-border));background:color-mix(in srgb,var(--ae-accent2) 11%,transparent)}
 .ae-quran-card__status.is-wait,.ae-quran-card__badge.is-wait{color:var(--ae-warn);border-color:color-mix(in srgb,var(--ae-warn) 42%,var(--ae-glass-border));background:color-mix(in srgb,var(--ae-warn) 10%,transparent)}
@@ -5292,9 +5294,9 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .ae-quran-card__metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ae-glass-border);border-bottom:1px solid var(--ae-glass-border)}
 .ae-quran-card__metrics span{display:flex;flex-direction:column;gap:3px;padding:10px 8px;border-right:1px solid var(--ae-glass-border)}
 .ae-quran-card__metrics span:last-child{border-right:0}
-.ae-quran-card__metrics b{font-size:1rem;color:var(--ae-text);font-variant-numeric:tabular-nums}.ae-quran-card__metrics small{font-size:.64rem;color:var(--ae-muted)}
+.ae-quran-card__metrics b{font-size:var(--ae-scale-base);color:var(--ae-text);font-variant-numeric:tabular-nums}.ae-quran-card__metrics small{font-size:var(--ae-scale-xs);color:var(--ae-muted)}
 .ae-quran-card__rows{display:flex;flex-direction:column;gap:8px}.ae-quran-card__row{padding:10px 11px;border:1px solid var(--ae-glass-border);border-radius:12px;background:color-mix(in srgb,var(--ae-surface) 80%,transparent)}
-.ae-quran-card__row-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.ae-quran-card__row-top strong{min-width:0;color:var(--ae-text);font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ae-quran-card__row-meta{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:6px;color:var(--ae-muted);font-size:.65rem;line-height:1.4}
-.ae-quran-card__foot{color:var(--ae-muted);font-size:.7rem;text-align:right}
+.ae-quran-card__row-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.ae-quran-card__row-top strong{min-width:0;color:var(--ae-text);font-size:var(--ae-scale-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ae-quran-card__row-meta{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:6px;color:var(--ae-muted);font-size:var(--ae-scale-compact);line-height:1.4}
+.ae-quran-card__foot{color:var(--ae-muted);font-size:var(--ae-scale-compact);text-align:right}
 @media(max-width:520px){.ae-quran-card__head{flex-direction:column}.ae-quran-card__status{align-self:flex-start}.ae-quran-card__row-top{align-items:flex-start;flex-direction:column;gap:6px}}

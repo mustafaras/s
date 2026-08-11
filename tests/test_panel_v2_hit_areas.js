@@ -25,6 +25,7 @@ function declaration(selector, property, value) {
   ".ae-tab",
   ".sub-tab",
   ".density-btn",
+  ".settings-choice",
   ".ae-status-btn",
   ".ae-toast__close",
   ".ae-tooltip-trigger",
@@ -33,6 +34,9 @@ function declaration(selector, property, value) {
   declaration(selector, "min-width", "44px");
   declaration(selector, "min-height", "44px");
 });
+
+declaration(".settings-toggle", "min-height", "44px");
+assert(/min-width:\s*92px/.test(bodyFor(".settings-toggle")), ".settings-toggle geniş hit-area taşıyor");
 
 declaration(".ae-chip", "min-height", "32px");
 declaration(".loc-map-link", "min-height", "44px");
@@ -49,7 +53,7 @@ assert(/\.archive-search input,[\s\S]*?min-height:\s*44px/.test(css), "Arşiv in
 assert(css.includes("@media (max-width: 460px)"), "375/414/460px mobil breakpoint'i var");
 assert(css.includes("@media (max-width: 374px)"), "Dar ekran heatmap fallback breakpoint'i var");
 assert(css.includes("@media (min-width: 768px)"), "768px masaüstü breakpoint'i var");
-assert(html.includes("panel-v2.css?v=20260811g"), "Panel-v2 CSS cache-bust sürümü güncel");
+assert(html.includes("panel-v2.css?v=20260811h"), "Panel-v2 CSS cache-bust sürümü güncel");
 assert(js.includes('class="ae-tab'), "Ana tablar gerçek button yüzeyi üretiyor");
 assert(js.includes('class="sub-tab'), "Alt tablar gerçek button yüzeyi üretiyor");
 

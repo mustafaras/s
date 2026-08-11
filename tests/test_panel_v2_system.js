@@ -112,6 +112,12 @@ assert(/Oturum/.test(html), "Oturum ayarı var");
 assert(/Sıkı/.test(html), "Sıkı yoğunluk butonu var");
 assert(/Rahat/.test(html), "Rahat yoğunluk butonu var");
 assert(/Geniş/.test(html), "Geniş yoğunluk butonu var");
+assert(/Polling yapılandırması/.test(html), "Polling yapılandırması var");
+assert(/30 sn/.test(html) && /60 sn/.test(html) && /5 dk/.test(html) && /Kapalı/.test(html), "Polling aralık seçenekleri var");
+assert(/Otomatik yenileme/.test(html) && /role="switch"/.test(html), "Otomatik yenileme toggle'ı var");
+assert(/Test Bağlantısı/.test(html) && /Veri Doğrulama/.test(html), "Tanı bağlantı ve doğrulama araçları var");
+assert(/Önbellek Temizle/.test(html) && /Zorla Senkron/.test(html), "Tanı cache ve zorla senkron araçları var");
+assert(/Hakkında/.test(html) && /Commit hash/.test(html), "Hakkında commit bilgisi var");
 assert((html.match(/ae-card--glass/g) || []).length >= 3, "Ayar kartları glass varyantında");
 assert(/settings-detail[^"]*ae-stagger/.test(html), "Ayarlar stagger giriş sınıfı var");
 

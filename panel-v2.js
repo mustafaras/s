@@ -12,11 +12,21 @@
   ];
 
   var PTKEY = "seyma-panel-token";
+  var PANEL_SETTINGS_KEY = "seyma-panel-settings-v1";
   var APPKEY = "seyma-reset-v1";
   var REPO = "mustafaras/seyma-data";
   var BRANCH = "main";
   var OBSERVER_INBOX_PATH = "data/observer-inbox.json";
   var OBSERVER_MESSAGE_MAX = 200;
+  var PANEL_VERSION = "2.0";
+  var PANEL_BUILD_DATE = "2026-08-11";
+  var PANEL_SOURCE_COMMIT = "9ad1ad3";
+  var POLLING_OPTIONS = [
+    { value: 30000, label: "30 sn" },
+    { value: 60000, label: "60 sn" },
+    { value: 300000, label: "5 dk" },
+    { value: 0, label: "Kapalı" }
+  ];
 
   var EVENT_SECTION_OPTIONS = [
     { value: "wellness", label: "Wellness" },
@@ -139,8 +149,17 @@
   var pollingState = {
     intervalId: null,
     intervalMs: 60000,
+    activeIntervalMs: null,
+    autoRefresh: true,
     isPaused: false,
     lastRunAt: null
+  };
+  var diagnosticState = {
+    running: false,
+    action: "",
+    status: "idle",
+    detail: "",
+    at: null
   };
   var PULL_REFRESH_THRESHOLD = 60;
   var PULL_REFRESH_MAX_DISTANCE = 112;
@@ -707,6 +726,7 @@
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
     if (opts.ariaLabel) attrs += ' aria-label="' + escapeHtml(opts.ariaLabel) + '"';
+    if (opts.disabled) attrs += ' disabled aria-disabled="true"';
     var content = opts.labelHtml ? String(opts.labelHtml) : escapeHtml(label);
     return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + content + "</button>";
   }
@@ -3926,6 +3946,69 @@
     } catch (e) {}
   }
 
+  function normalizePollingInterval(value) {
+    if (typeof value === "string" && /^(off|kapalı|kapali)$/i.test(value.trim())) return 0;
+    var n = safeNumber(value);
+    if (n === null) return null;
+    n = Math.round(n);
+    return POLLING_OPTIONS.some(function(option) { return option.value === n; }) ? n : null;
+  }
+
+  function pollingOptionLabel(intervalMs) {
+    var value = normalizePollingInterval(intervalMs);
+    for (var i = 0; i < POLLING_OPTIONS.length; i++) {
+      if (POLLING_OPTIONS[i].value === value) return POLLING_OPTIONS[i].label;
+    }
+    return "Kapalı";
+  }
+
+  function savePollingPreferences() {
+    try {
+      if (root.localStorage) root.localStorage.setItem(PANEL_SETTINGS_KEY, JSON.stringify({
+        intervalMs: pollingState.intervalMs,
+        autoRefresh: pollingState.autoRefresh
+      }));
+    } catch (e) {}
+  }
+
+  function restorePollingPreferences() {
+    var saved = null;
+    try {
+      if (root.localStorage) saved = JSON.parse(root.localStorage.getItem(PANEL_SETTINGS_KEY) || "null");
+    } catch (e) { saved = null; }
+    var intervalMs = saved && normalizePollingInterval(saved.intervalMs);
+    pollingState.intervalMs = intervalMs === null ? 60000 : intervalMs;
+    pollingState.autoRefresh = saved && typeof saved.autoRefresh === "boolean" ? saved.autoRefresh : pollingState.intervalMs > 0;
+    if (pollingState.intervalMs === 0) pollingState.autoRefresh = false;
+    syncStatus.pollingIntervalMs = pollingState.intervalMs;
+  }
+
+  function configurePolling(intervalMs, autoRefresh, shouldRender) {
+    var normalized = normalizePollingInterval(intervalMs);
+    if (normalized === null) return false;
+    pollingState.intervalMs = normalized;
+    pollingState.autoRefresh = normalized > 0 && autoRefresh !== false;
+    syncStatus.pollingIntervalMs = normalized;
+    savePollingPreferences();
+    if (pollingState.autoRefresh && ui.panelToken) startPolling();
+    else stopPolling();
+    if (shouldRender !== false) render();
+    return true;
+  }
+
+  function setPollingInterval(intervalMs) {
+    var normalized = normalizePollingInterval(intervalMs);
+    if (normalized === null) return false;
+    return configurePolling(normalized, normalized > 0, true);
+  }
+
+  function setAutoRefresh(enabled) {
+    enabled = enabled === true || String(enabled) === "true" || String(enabled) === "1";
+    var intervalMs = pollingState.intervalMs;
+    if (enabled && intervalMs === 0) intervalMs = 60000;
+    return configurePolling(intervalMs, enabled, true);
+  }
+
   function setPanelToken(token) {
     ui.panelToken = normalizeToken(token);
     if (ui.panelToken) {
@@ -3940,8 +4023,9 @@
   }
 
   function startPolling() {
-    if (!ui.panelToken || pollingState.intervalId !== null || typeof root.setInterval !== "function") return false;
-    pollingState.intervalMs = 60000;
+    if (!ui.panelToken || !pollingState.autoRefresh || pollingState.intervalMs <= 0 || typeof root.setInterval !== "function") return false;
+    if (pollingState.intervalId !== null && pollingState.activeIntervalMs === pollingState.intervalMs) return true;
+    if (pollingState.intervalId !== null) stopPolling();
     syncStatus.pollingIntervalMs = pollingState.intervalMs;
     pollingState.intervalId = root.setInterval(function() {
       if (pollingState.isPaused || !ui.panelToken) return;
@@ -3950,6 +4034,7 @@
       pollingState.lastRunAt = new Date().toISOString();
       load();
     }, pollingState.intervalMs);
+    pollingState.activeIntervalMs = pollingState.intervalMs;
     return true;
   }
 
@@ -3958,6 +4043,7 @@
       root.clearInterval(pollingState.intervalId);
     }
     pollingState.intervalId = null;
+    pollingState.activeIntervalMs = null;
     pollingState.lastRunAt = null;
     return true;
   }
@@ -3966,6 +4052,8 @@
     return {
       intervalId: pollingState.intervalId,
       intervalMs: pollingState.intervalMs,
+      activeIntervalMs: pollingState.activeIntervalMs,
+      autoRefresh: pollingState.autoRefresh,
       isPaused: pollingState.isPaused,
       lastRunAt: pollingState.lastRunAt
     };
@@ -4826,6 +4914,57 @@
            "</div>";
   }
 
+  function renderPollingSettings() {
+    var activeInterval = pollingState.intervalMs;
+    var intervalButtons = POLLING_OPTIONS.map(function(option) {
+      var active = activeInterval === option.value;
+      return '<button type="button" class="settings-choice' + (active ? ' is-active' : '') + '" aria-pressed="' + (active ? 'true' : 'false') + '" onclick="AeonV2.setPollingInterval(' + option.value + ')">' +
+             '<span>' + escapeHtml(option.label) + '</span>' + (active ? '<span class="settings-choice__check" aria-hidden="true">' + renderIcon("check", 14) + '</span>' : '') + '</button>';
+    }).join("");
+    var autoRefresh = pollingState.autoRefresh && pollingState.intervalMs > 0;
+    var toggleLabel = autoRefresh ? "Açık" : "Kapalı";
+    var syncButton = AeButton({
+      labelHtml: renderIcon("refresh", 16) + " Şimdi senkronize et",
+      variant: "secondary",
+      className: "settings-sync-button",
+      onclick: "AeonV2.refresh()",
+      ariaLabel: "Şimdi senkronize et",
+      disabled: diagnosticState.running
+    });
+    return AeCard({ variant: "glass", className: "settings-card settings-card--polling", children:
+      '<div class="settings-group"><div class="ae-label">Senkronizasyon</div><h2 class="settings-card__title">Polling yapılandırması</h2>' +
+      '<div class="settings-field"><div class="settings-field__head"><span>Polling aralığı</span><span class="settings-field__meta">' + escapeHtml(pollingOptionLabel(activeInterval)) + '</span></div>' +
+      '<div class="settings-polling-options" role="group" aria-label="Polling aralığı seçimi">' + intervalButtons + '</div></div>' +
+      '<div class="settings-toggle-row"><div><strong>Otomatik yenileme</strong><span>Token varken snapshotı periyodik kontrol eder.</span></div>' +
+      '<button type="button" class="settings-toggle" role="switch" aria-checked="' + (autoRefresh ? 'true' : 'false') + '" aria-label="Otomatik yenilemeyi ' + (autoRefresh ? 'kapat' : 'aç') + '" onclick="AeonV2.setAutoRefresh(' + (!autoRefresh) + ')">' +
+      '<span class="settings-toggle__track" aria-hidden="true"><span class="settings-toggle__thumb"></span></span><span class="settings-toggle__label">' + toggleLabel + '</span></button></div>' +
+      '<div class="settings-sync-actions">' + syncButton + '</div>' +
+      '<div class="settings-card__hint">Polling yalnızca panel tokenı varken çalışır; kapalı seçeneği timerı tamamen durdurur.</div></div>'
+    });
+  }
+
+  function renderDiagnosticButton(action, label, icon) {
+    return AeButton({
+      labelHtml: renderIcon(icon, 16) + " " + escapeHtml(label),
+      variant: "secondary",
+      className: "settings-diagnostic-button settings-diagnostic-button--" + action,
+      onclick: "AeonV2." + (action === "connection" ? "testConnection" : action === "validation" ? "runDataValidation" : action === "cache" ? "clearPanelCache" : "forceSync") + "()",
+      ariaLabel: label,
+      disabled: diagnosticState.running
+    });
+  }
+
+  function renderDiagnosticSummary() {
+    if (!diagnosticState.action) {
+      return '<div class="settings-diagnostic-result settings-diagnostic-result--idle" role="status">Henüz tanı aracı çalıştırılmadı.</div>';
+    }
+    var tone = diagnosticState.status === "ok" ? "ok" : diagnosticState.status === "error" ? "drop" : diagnosticState.status === "warn" ? "warn" : "info";
+    var statusLabel = diagnosticState.status === "ok" ? "Başarılı" : diagnosticState.status === "error" ? "Hata" : diagnosticState.status === "warn" ? "Beklemede" : diagnosticState.status === "running" ? "Çalışıyor" : "Bilgi";
+    return '<div class="settings-diagnostic-result settings-diagnostic-result--' + tone + '" role="status" aria-live="polite">' +
+           '<span class="settings-diagnostic-result__dot" aria-hidden="true"></span><div><strong>' + escapeHtml(diagnosticActionLabel(diagnosticState.action)) + ' · ' + statusLabel + '</strong>' +
+           '<span>' + escapeHtml(diagnosticState.detail || "—") + '</span>' + (diagnosticState.at ? '<time datetime="' + escapeHtml(diagnosticState.at) + '">' + escapeHtml(formatTs(diagnosticState.at)) + '</time>' : '') + '</div></div>';
+  }
+
   function renderSettings() {
     var densities = [
       { id: "compact", label: "Sıkı" },
@@ -4841,10 +4980,22 @@
       ? AeButton({ labelHtml: renderIcon("sun", 16) + " Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
       : AeButton({ label: "Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
 
+    var aboutRows = [
+      { label: "Sürüm", value: "ÆON Observer v" + PANEL_VERSION },
+      { label: "Panel-v2 tarihi", value: PANEL_BUILD_DATE },
+      { label: "Commit hash", value: PANEL_SOURCE_COMMIT }
+    ].map(function(row) {
+      return '<div class="settings-about-row"><span>' + escapeHtml(row.label) + '</span><strong>' + escapeHtml(row.value) + '</strong></div>';
+    }).join("");
+
     return '<div class="settings-detail ae-slide-up ae-stagger">' +
-           AeCard({ variant: "glass", className: "settings-card settings-card--density", children: '<div class="settings-group"><div class="ae-label">Yoğunluk</div><div class="settings-card__title">Görünüm yoğunluğu</div><div class="density-select">' + densityButtons + "</div></div>" }) +
-           AeCard({ variant: "glass", className: "settings-card settings-card--theme", children: '<div class="settings-group"><div class="ae-label">Tema</div><div class="settings-card__title">Renk atmosferi</div>' + themeBtn + "</div>" }) +
-           AeCard({ variant: "glass", className: "settings-card settings-card--session", children: '<div class="settings-group"><div class="ae-label">Oturum</div><div class="settings-card__title">Güvenli çıkış</div>' + AeButton({ label: "Oturumu sonlandır", variant: "drop", onclick: "AeonV2.logout()" }) + "</div>" }) +
+           AeCard({ variant: "glass", className: "settings-card settings-card--density", children: '<div class="settings-group"><div class="ae-label">Görünüm · Yoğunluk</div><h2 class="settings-card__title">Görünüm yoğunluğu</h2><div class="density-select" role="group" aria-label="Görünüm yoğunluğu">' + densityButtons + '</div><div class="settings-card__subsection"><span class="ae-label">Tema</span>' + themeBtn + '</div></div>' }) +
+           renderPollingSettings() +
+           AeCard({ variant: "glass", className: "settings-card settings-card--diagnostics", children: '<div class="settings-group"><div class="ae-label">Tanı</div><h2 class="settings-card__title">Tanı Araçları</h2><div class="settings-diagnostic-grid" role="group" aria-label="Tanı araçları">' +
+             renderDiagnosticButton("connection", "Test Bağlantısı", "arrowRight") + renderDiagnosticButton("validation", "Veri Doğrulama", "check") + renderDiagnosticButton("cache", "Önbellek Temizle", "close") + renderDiagnosticButton("forceSync", "Zorla Senkron", "refresh") +
+             '</div>' + renderDiagnosticSummary() + '<div class="settings-card__hint">Tanı araçları yalnızca panelin okuma durumunu ve yerel snapshot önbelleğini kontrol eder.</div></div>' }) +
+           AeCard({ variant: "glass", className: "settings-card settings-card--about", children: '<div class="settings-group"><div class="ae-label">Hakkında</div><h2 class="settings-card__title">ÆON Observer</h2><div class="settings-about-list">' + aboutRows + '</div></div>' }) +
+           AeCard({ variant: "glass", className: "settings-card settings-card--session", children: '<div class="settings-group"><div class="ae-label">Oturum</div><h2 class="settings-card__title">Güvenli çıkış</h2>' + AeButton({ label: "Oturumu sonlandır", variant: "drop", onclick: "AeonV2.logout()" }) + "</div>" }) +
            "</div>";
   }
 
@@ -5689,6 +5840,125 @@
     render();
   }
 
+  function diagnosticActionLabel(action) {
+    var labels = {
+      connection: "Test Bağlantısı",
+      validation: "Veri Doğrulama",
+      cache: "Önbellek Temizle",
+      forceSync: "Zorla Senkron"
+    };
+    return labels[action] || "Tanı aracı";
+  }
+
+  function recordDiagnostic(action, status, detail) {
+    diagnosticState.running = false;
+    diagnosticState.action = action || "";
+    diagnosticState.status = ["idle", "running", "ok", "error", "warn"].indexOf(status) !== -1 ? status : "idle";
+    diagnosticState.detail = safeText(detail || "", 240);
+    diagnosticState.at = new Date().toISOString();
+  }
+
+  function validatePanelData() {
+    var issues = [];
+    var dayCount = 0;
+    if (!isObject(appData)) {
+      issues.push("Henüz snapshot yüklenmedi.");
+    } else {
+      if (!isObject(appData.days)) issues.push("days alanı eksik veya geçersiz.");
+      else dayCount = Object.keys(appData.days).length;
+      if (appData.eventLog !== undefined && !isObject(appData.eventLog)) issues.push("eventLog alanı geçersiz.");
+      var projection = projectData(appData);
+      if (projection.coverage && projection.coverage.error) issues.push("Coverage projeksiyonu oluşturulamadı.");
+      if (appData.eventLog && eventAdapter()) {
+        var parsed = parsePanelEvents();
+        if (!parsed.ok && parsed.code !== "empty") issues.push("Event günlüğü doğrulanamadı.");
+      }
+    }
+    return {
+      ok: issues.length === 0,
+      issues: issues,
+      dayCount: dayCount,
+      snapshotRevision: auditRevisionValue(syncStatus.snapshotRevision) || null
+    };
+  }
+
+  function runDataValidation() {
+    var report = validatePanelData();
+    var detail = report.ok
+      ? "Veri doğrulaması başarılı · " + report.dayCount + " gün"
+      : "Veri doğrulaması: " + report.issues.join(" ");
+    recordDiagnostic("validation", report.ok ? "ok" : "error", detail);
+    showToast(detail, report.ok ? "success" : "error");
+    return report;
+  }
+
+  function testConnection() {
+    if (!ui.panelToken) {
+      recordDiagnostic("connection", "error", "Panel tokenı olmadan bağlantı test edilemez.");
+      showToast(diagnosticState.detail, "error");
+      return Promise.resolve(false);
+    }
+    if (isFetching) {
+      recordDiagnostic("connection", "warn", "Devam eden bir bağlantı isteği var.");
+      showToast(diagnosticState.detail, "info");
+      return Promise.resolve(false);
+    }
+    diagnosticState.running = true;
+    diagnosticState.action = "connection";
+    diagnosticState.status = "running";
+    diagnosticState.detail = "GitHub bağlantısı sınanıyor…";
+    render();
+    return load().then(function() {
+      var ok = syncStatus.status === "accepted" && !syncStatus.lastErrorCode;
+      var detail = ok ? "Bağlantı başarılı · snapshot erişilebilir." : "Bağlantı başarısız · " + safeText(syncStatus.lastErrorCode || "yanıt alınamadı", 120);
+      recordDiagnostic("connection", ok ? "ok" : "error", detail);
+      showToast(detail, ok ? "success" : "error");
+      return ok;
+    });
+  }
+
+  function clearPanelCache() {
+    appData = null;
+    syncStatus.etag = null;
+    syncStatus.snapshotRevision = null;
+    syncStatus.sourceUpdatedAt = null;
+    syncStatus.lastSyncedAt = null;
+    syncStatus.dataAgeMinutes = null;
+    recordDiagnostic("cache", "ok", "Panel snapshot ve ETag önbelleği temizlendi.");
+    showToast(diagnosticState.detail, "success");
+    return true;
+  }
+
+  function forceSync() {
+    if (!ui.panelToken) {
+      recordDiagnostic("forceSync", "error", "Zorla senkron için panel tokenı gerekli.");
+      showToast(diagnosticState.detail, "error");
+      return Promise.resolve(false);
+    }
+    if (isFetching) {
+      recordDiagnostic("forceSync", "warn", "Devam eden bir senkron isteği var.");
+      showToast(diagnosticState.detail, "info");
+      return Promise.resolve(false);
+    }
+    syncStatus.etag = null;
+    diagnosticState.running = true;
+    diagnosticState.action = "forceSync";
+    diagnosticState.status = "running";
+    diagnosticState.detail = "ETag atlanarak snapshot yenileniyor…";
+    render();
+    return refresh().then(function() {
+      var ok = syncStatus.status === "accepted" && !syncStatus.lastErrorCode;
+      var detail = ok ? "Zorla senkron tamamlandı." : "Zorla senkron başarısız · " + safeText(syncStatus.lastErrorCode || "yanıt alınamadı", 120);
+      recordDiagnostic("forceSync", ok ? "ok" : "error", detail);
+      showToast(detail, ok ? "success" : "error");
+      return ok;
+    });
+  }
+
+  function getDiagnosticState() {
+    return Object.assign({}, diagnosticState);
+  }
+
   function updateStatus(s) {
     if (s && typeof s === "object") {
       Object.keys(s).forEach(function(key) { syncStatus[key] = s[key]; });
@@ -5699,6 +5969,7 @@
   function init() {
     var rootEl = root.document && root.document.getElementById("root");
     if (rootEl && ui.theme) rootEl.setAttribute("data-theme", ui.theme);
+    restorePollingPreferences();
     ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     render();
     if (ui.panelToken) {
@@ -5749,6 +6020,8 @@
     setTheme: setTheme,
     setPanelToken: setPanelToken,
     savePanelToken: setPanelToken,
+    setPollingInterval: setPollingInterval,
+    setAutoRefresh: setAutoRefresh,
     load: load,
     fetchLatest: fetchLatest,
     refresh: refresh,
@@ -5758,6 +6031,12 @@
     updateLatencyTelemetry: updateLatencyTelemetry,
     dataAgeMinutes: dataAgeMinutes,
     dataFreshnessLabel: dataFreshnessLabel,
+    validatePanelData: validatePanelData,
+    runDataValidation: runDataValidation,
+    testConnection: testConnection,
+    clearPanelCache: clearPanelCache,
+    forceSync: forceSync,
+    getDiagnosticState: getDiagnosticState,
     logout: logout,
     updateStatus: updateStatus,
     showToast: showToast,

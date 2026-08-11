@@ -28,6 +28,7 @@ Polling yaşam döngüsü, latency yüzdelikleri, GitHub API rate-limit header'l
 - `panel-v2.html` — `panel-v2.css` ve `panel-v2.js` cache-bust `20260811j`
 - `tests/test_panel_v2_polling_tests.js` — Prompt35 lifecycle/telemetry/304 regression fixture'ı
 - `tests/test_panel_v2_hit_areas.js` — cache-bust sözleşmesi `20260811j` ile hizalandı
+- `.github/workflows/pages.yml` — stale Pages run'larının yeni `main` deploy'unu kilitlememesi için `cancel-in-progress: true`
 - `PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/LEDGER.md` — Prompt35 tamamlandı, `currentStep: 36`
 - `PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/handoff-PROMPT-35.md` — bu handoff
 
@@ -39,6 +40,7 @@ Polling yaşam döngüsü, latency yüzdelikleri, GitHub API rate-limit header'l
 | `load()` başlangıç render'ı korunuyor, final render yalnızca yeni veri için çalışıyor | Kullanıcı loading durumunu görmeli; 304 polling ise mevcut görünümü aynen korumalı |
 | Prompt35 fixture'ı mevcut Prompt28 telemetry fixture'ından ayrı tutuldu | Yeni kabul maddeleri, özellikle render sayısı ve start/stop lifecycle, bağımsız regresyon kanıtı olarak korunmalı |
 | Mock response header'ları ve fetch süreleri sentetik tutuldu | Gerçek token, kullanıcı verisi veya dış veri okunmadan rate-limit/p95 sözleşmesi doğrulanıyor |
+| Pages concurrency `cancel-in-progress: true` yapıldı | Eski, iptal edilemeyen deploy run'ı yeni production commit'ini süresiz bloke etmemeli; `main` her zaman en yeni statik çıktıyı yayınlamalı |
 
 ## Test Sonuçları
 
@@ -56,20 +58,20 @@ Polling yaşam döngüsü, latency yüzdelikleri, GitHub API rate-limit header'l
 - node --check panelCoverageManifest.js                 → PASS
 - git diff --check                                      → PASS
 - Pages run 31503596816 (head 4a3fb80)                  → validate SUCCESS
-- Pages deploy                                        → queued; previous stale run 31501148875 cancel edildi
+- Pages deploy                                        → yeni concurrency remediation commit'iyle yeniden tetiklenecek
 - canlı panel-v2 cache                                 → runtime deploy tamamlanana kadar eski `20260811i`
 - gerçek tarayıcı testi                                 → çalıştırılmadı (data-safety lock)
 ```
 
 ### Hatalar ve Çözümleri
 
-İlk kaynak incelemesinde 304 dalında iki ayrı render noktası bulundu: doğrudan `fetchLatest()` ve `load()` promise finalizer'ı. İkisi de `notModified` sözleşmesine göre kapılandı ve yeni fixture her iki yolu da render sayacıyla doğruluyor. Pages kuyruğunda eski `cedea14` run'ı stale kaldığı için iptal edildi; güncel run'ın validate kapısı geçti, deploy job'ı GitHub runner kuyruğunda bekliyor.
+İlk kaynak incelemesinde 304 dalında iki ayrı render noktası bulundu: doğrudan `fetchLatest()` ve `load()` promise finalizer'ı. İkisi de `notModified` sözleşmesine göre kapılandı ve yeni fixture her iki yolu da render sayacıyla doğruluyor. Pages kuyruğunda eski `cedea14` run'ı stale kaldı ve normal/force cancel ile kapanmadı; güncel deploy'un beklememesi için concurrency remediation eklendi.
 
 ## Sıradaki Adım
 
 - **Bir sonraki prompt:** `36 — WCAG AA Renk Kontrastı`
 - **Tahmini risk:** Kontrast düzeltmeleri `panel-v2.css` ve render renk tokenlarını etkileyebilir; mevcut 23 Panel-v2 fixture'ı ve tam 55'li suite her değişiklikten sonra yeniden çalıştırılmalı.
-- **Öneri:** Önce Pages run `31503596816` ve deployment `5852822850` durumunu doğrula; canlı `panel-v2.html` içinde `20260811j` görünmeden deploy kanıtını tamamlanmış sayma.
+- **Öneri:** Concurrency remediation commit'inden oluşan son Pages run'ı ve deployment durumunu doğrula; canlı `panel-v2.html` içinde `20260811j` görünmeden deploy kanıtını tamamlanmış sayma.
 
 ## Context / Token Notu
 

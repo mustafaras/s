@@ -91,6 +91,8 @@ assert(/İyiyim, teşekkürler\./.test(html), "Outbox mesaj metni var");
 assert(/message-summary/.test(html), "Mesaj özeti var");
 assert(/message-bubble--unread/.test(html), "Okunmamış bildirim animasyon sınıfı var");
 assert(/ae-card--glass/.test(html), "Mesaj kartları glass varyantında");
+assert(/notification-timeline/.test(html), "Bildirim yaşam döngüsü zaman çizelgesi var");
+assert(/message-composer/.test(html), "Observer mesaj gönderme arayüzü var");
 
 // 5. Token alanı var ve açık token görünmüyor
 assert(/GitHub token/.test(html), "Token kartı var");

@@ -375,17 +375,19 @@ function profileProgressProjection(source){
 }
 function notificationEventProjection(n,kind,receipt){
   if(!isObject(n)) return null;
-  var createdAt=safeIso(n.ts||n.createdAt), inboxAt=safeIso(n.inboxAt||n.queuedAt), deliveredAt=safeIso(n.deliveredAt||n.receivedAt), readAt=safeIso(n.readAt||n.seenAt), deletedAt=safeIso(n.deletedAt), syncedAt=safeIso(n.syncedAt||n.syncAt), retryAt=safeIso(n.retryAt||n.lastRetryAt), errorCode=safeErrorCode(n.errorCode||n.lastErrorCode||n.error), stages=[];
+  var createdAt=safeIso(n.ts||n.createdAt), sentAt=safeIso(n.sentAt||n.submittedAt||n.sent), inboxAt=safeIso(n.inboxAt||n.queuedAt), deliveredAt=safeIso(n.deliveredAt||n.receivedAt), readAt=safeIso(n.readAt||n.seenAt), repliedAt=safeIso(n.repliedAt||n.respondedAt||n.responseAt||n.answerAt||n.replyAt), deletedAt=safeIso(n.deletedAt), syncedAt=safeIso(n.syncedAt||n.syncAt), retryAt=safeIso(n.retryAt||n.lastRetryAt), errorCode=safeErrorCode(n.errorCode||n.lastErrorCode||n.error), stages=[];
   if(createdAt) stages.push({name:'oluşturuldu',at:createdAt,provenance:kind==='aeon_answer'?'delivery':'observer'});
+  if(sentAt) stages.push({name:'gönderildi',at:sentAt,provenance:'delivery'});
   if(inboxAt) stages.push({name:'inbox',at:inboxAt,provenance:'delivery'});
   if(deliveredAt) stages.push({name:'cihaza ulaştı',at:deliveredAt,provenance:'delivery'});
   if(readAt) stages.push({name:kind==='aeon_answer'?'görüldü':'okundu',at:readAt,provenance:'user_input'});
+  if(repliedAt) stages.push({name:'yanıtlandı',at:repliedAt,provenance:'user_input'});
   if(deletedAt) stages.push({name:'silindi',at:deletedAt,provenance:'user_input'});
   if(syncedAt||n.synced===true) stages.push({name:'sync edildi',at:syncedAt,provenance:'delivery'});
   if(retryAt||n.retryCount) stages.push({name:n.retryCount?'retry':'retry/error',at:retryAt,provenance:'delivery'});
   if(errorCode) stages.push({name:'error',at:retryAt||createdAt,provenance:'delivery'});
   var status=deletedAt||n.deleted===true?'deleted':readAt?'read':deliveredAt?'delivered':createdAt?'created':'missing';
-  return {id:safeText(n.id||n.responseId,120),kind:kind||'notification',status:status,createdAt:createdAt,inboxAt:inboxAt,deliveredAt:deliveredAt,readAt:readAt,answerReadAt:kind==='aeon_answer'?readAt:null,deletedAt:deletedAt,synced:n.synced===true,syncedAt:syncedAt,retryAt:retryAt,retryCount:validNumber(n.retryCount)||0,errorCode:errorCode,stages:stages,observerAcceptedAt:safeIso(receipt&&receipt.acceptedAt),provenance:kind==='aeon_answer'?'delivery':'observer',privacy:'metadata_only'};
+  return {id:safeText(n.id||n.responseId,120),kind:kind||'notification',status:status,createdAt:createdAt,sentAt:sentAt,inboxAt:inboxAt,deliveredAt:deliveredAt,readAt:readAt,repliedAt:repliedAt,answerReadAt:kind==='aeon_answer'?readAt:null,deletedAt:deletedAt,synced:n.synced===true,syncedAt:syncedAt,retryAt:retryAt,retryCount:validNumber(n.retryCount)||0,errorCode:errorCode,stages:stages,observerAcceptedAt:safeIso(receipt&&receipt.acceptedAt),provenance:kind==='aeon_answer'?'delivery':'observer',privacy:'metadata_only'};
 }
 function notificationTimelineProjection(source,receipt){
   var root=isObject(source)?source:{}, events=[], invalid=0;
@@ -505,6 +507,8 @@ root.PanelCoverageV1={
   parseEventLog:parseEventLog,
   mergeEventLogs:mergeEventLogs,
   eventSequenceAudit:eventSequenceAudit,
+  notificationEventProjection:notificationEventProjection,
+  notificationTimelineProjection:notificationTimelineProjection,
   normalizeReceipt:safeReceipt,
   FULL_DETAIL_ALLOW:FULL_DETAIL_ALLOW,
   redactedPaths:redactedPaths

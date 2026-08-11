@@ -15,6 +15,8 @@
   var APPKEY = "seyma-reset-v1";
   var REPO = "mustafaras/seyma-data";
   var BRANCH = "main";
+  var OBSERVER_INBOX_PATH = "data/observer-inbox.json";
+  var OBSERVER_MESSAGE_MAX = 200;
 
   var EVENT_SECTION_OPTIONS = [
     { value: "wellness", label: "Wellness" },
@@ -80,7 +82,10 @@
     eventTo: "",
     eventLimit: 20,
     eventPage: 1,
-    selectedEventId: ""
+    selectedEventId: "",
+    selectedNotificationId: "",
+    messageDraft: "",
+    messageSending: false
   };
 
   var syncStatus = {
@@ -391,6 +396,10 @@
     return String(s || "").replace(/[&<>"']/g, function(m) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
     });
+  }
+
+  function inlineArg(value) {
+    return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/[\r\n]/g, " ");
   }
 
   // Panel-v2 ikonları metin emoji yerine tek, erişilebilir SVG yüzeyinden
@@ -4303,50 +4312,361 @@
            "</div>";
   }
 
-  function renderMessages() {
-    var root = isObject(appData) ? appData : {};
-    var notifications = Array.isArray(root.notifications) ? root.notifications : [];
-    var qa = (root.aeon && Array.isArray(root.aeon.qa)) ? root.aeon.qa : [];
+  function notificationProjectionAdapter() {
+    var adapter = root.PanelCoverageV1 || root.SeymaPanelCoverage;
+    return adapter && typeof adapter.notificationEventProjection === "function" ? adapter : null;
+  }
 
-    function makeNotif(n) {
-      return { direction: "in", from: n.from || "Observer", kind: n.kind || "notification", text: n.text || n.body || "", title: n.title || "", ts: n.ts || n.createdAt || n.inboxAt || "", readAt: n.readAt, synced: !!n.synced };
+  function notificationProjection(raw, kind) {
+    var adapter = notificationProjectionAdapter();
+    if (!adapter) return null;
+    try {
+      return adapter.notificationEventProjection(raw, kind || "notification", {
+        acceptedAt: syncStatus.lastSyncedAt,
+        snapshotRevision: syncStatus.snapshotRevision
+      });
+    } catch (e) {
+      return null;
     }
-    function makeQA(q) {
-      var out = [];
-      if (q.question) out.push({ direction: "out", from: "Sen", kind: "aeon_ask", text: String(q.question), ts: q.ts || q.askedAt || "", readAt: null, synced: true });
-      if (q.answer) out.push({ direction: "in", from: "Observer", kind: "aeon_answer", text: String(q.answer), ts: q.answeredAt || q.answerReceivedAt || q.ts || "", readAt: q.answerReadAt, synced: !!q.answerSynced });
-      return out;
-    }
+  }
 
-    var messages = notifications.map(makeNotif);
-    qa.forEach(function(q) { messages = messages.concat(makeQA(q)); });
+  function notificationTimeLabel(ts) {
+    if (!ts) return "Bekliyor";
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+
+  function notificationDurationLabel(start, end) {
+    var startMs = start ? new Date(start).getTime() : NaN;
+    var endMs = end ? new Date(end).getTime() : NaN;
+    if (!isFinite(startMs) || !isFinite(endMs) || endMs < startMs) return "—";
+    var seconds = Math.max(0, Math.round((endMs - startMs) / 1000));
+    var days = Math.floor(seconds / 86400);
+    seconds -= days * 86400;
+    var hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
+    var parts = [];
+    if (days) parts.push(days + "g");
+    if (hours) parts.push(hours + "sa");
+    if (minutes || hours || days) parts.push(minutes + "dk");
+    if (seconds || !parts.length) parts.push(seconds + "sn");
+    return parts.join(" ");
+  }
+
+  function notificationStatusLabel(projection) {
+    projection = projection || {};
+    if (projection.errorCode) return "Hata";
+    if (projection.readAt) return "Okundu";
+    if (projection.deliveredAt) return "İletildi";
+    if (projection.sentAt) return "Gönderildi";
+    if (projection.createdAt) return "Oluşturuldu";
+    return "Bekliyor";
+  }
+
+  function notificationStatusTone(projection) {
+    projection = projection || {};
+    if (projection.errorCode) return "drop";
+    if (projection.readAt) return "ok";
+    if (projection.deliveredAt || projection.sentAt) return "info";
+    return "muted";
+  }
+
+  function buildNotificationMessages() {
+    var rootData = isObject(appData) ? appData : {};
+    var notifications = Array.isArray(rootData.notifications) ? rootData.notifications : [];
+    var qa = rootData.aeon && Array.isArray(rootData.aeon.qa) ? rootData.aeon.qa : [];
+    var messages = [];
+
+    notifications.forEach(function(n, index) {
+      if (!isObject(n)) return;
+      var projection = notificationProjection(n, "notification");
+      if (!projection) return;
+      var id = safeText(projection.id || n.id || "notification-" + index, 120) || "notification-" + index;
+      messages.push({
+        id: id,
+        direction: "in",
+        from: safeText(n.from || "Observer", 80) || "Observer",
+        kind: safeText(n.kind || "notification", 48) || "notification",
+        text: safeText(n.text || n.body || "", 1200),
+        title: safeText(n.title || "", 120),
+        ts: projection.createdAt || projection.inboxAt || "",
+        projection: projection
+      });
+    });
+
+    qa.forEach(function(q, index) {
+      if (!isObject(q)) return;
+      if (q.question) {
+        var questionProjection = notificationProjection({
+          id: q.id || "aeon-question-" + index,
+          ts: q.ts || q.askedAt,
+          sentAt: q.sentAt || q.submittedAt,
+          inboxAt: q.inboxAt || q.queuedAt,
+          deliveredAt: q.deliveredAt || q.receivedAt,
+          readAt: q.questionReadAt,
+          repliedAt: q.answeredAt
+        }, "aeon_question");
+        if (questionProjection) messages.push({
+          id: safeText(questionProjection.id || "aeon-question-" + index, 120) || "aeon-question-" + index,
+          direction: "out",
+          from: "Sen",
+          kind: "aeon_ask",
+          text: safeText(q.question, 1200),
+          title: safeText(q.title || "", 120),
+          ts: questionProjection.createdAt || "",
+          projection: questionProjection
+        });
+      }
+      if (q.answer) {
+        var answerProjection = notificationProjection({
+          id: q.answerMsgId || q.id || "aeon-answer-" + index,
+          ts: q.answeredAt || q.answerReceivedAt || q.ts,
+          sentAt: q.answerSentAt || q.answerSubmittedAt,
+          inboxAt: q.answerInboxAt,
+          receivedAt: q.answerReceivedAt,
+          deliveredAt: q.answerDeliveredAt,
+          readAt: q.answerReadAt,
+          synced: q.answerSynced,
+          errorCode: q.answerErrorCode
+        }, "aeon_answer");
+        if (answerProjection) messages.push({
+          id: safeText(answerProjection.id || "aeon-answer-" + index, 120) || "aeon-answer-" + index,
+          direction: "in",
+          from: "Observer",
+          kind: "aeon_answer",
+          text: safeText(q.answer, 1200),
+          title: safeText(q.answerTitle || "", 120),
+          ts: answerProjection.createdAt || "",
+          projection: answerProjection
+        });
+      }
+    });
     messages.sort(function(a, b) { return String(b.ts || "").localeCompare(String(a.ts || "")); });
+    return messages;
+  }
 
-    var unreadCount = messages.filter(function(m) { return m.kind === "aeon_answer" && !m.readAt; }).length;
+  function notificationStageSpecs(message) {
+    var projection = message && message.projection ? message.projection : {};
+    return [
+      { key: "createdAt", label: "Oluşturuldu", icon: "note", at: projection.createdAt },
+      { key: "sentAt", label: "Gönderildi", icon: "arrowRight", at: projection.sentAt },
+      { key: "deliveredAt", label: "Cihaza ulaştı", icon: "phone", at: projection.deliveredAt },
+      { key: "readAt", label: message && message.kind === "aeon_answer" ? "Görüldü" : "Okundu", icon: "check", at: projection.readAt },
+      { key: "repliedAt", label: "Yanıtlandı", icon: "messages", at: projection.repliedAt }
+    ];
+  }
+
+  function renderNotificationTimeline(message) {
+    if (!message || !message.projection) {
+      return AeEmpty({ icon: "messages", title: "Zaman çizelgesi bekleniyor", message: "Güvenli notification projection henüz hazır değil." });
+    }
+    var specs = notificationStageSpecs(message);
+    var currentIndex = -1;
+    specs.some(function(stage, index) {
+      if (!stage.at) { currentIndex = index; return true; }
+      return false;
+    });
+    var completed = specs.filter(function(stage) { return !!stage.at; });
+    var lastAt = completed.length ? completed[completed.length - 1].at : null;
+    var rows = specs.map(function(stage, index) {
+      var state = stage.at ? "complete" : (index === currentIndex ? "current" : "pending");
+      var time = stage.at ? notificationTimeLabel(stage.at) : "Bekliyor";
+      return '<li class="notification-timeline__item notification-timeline__item--' + state + '">' +
+             '<span class="notification-timeline__dot" aria-hidden="true"></span>' +
+             '<div class="notification-timeline__body"><div class="notification-timeline__head"><strong>' + escapeHtml(stage.label) +
+             '</strong><span class="notification-timeline__time">' + escapeHtml(time) + '</span></div>' +
+             '<div class="notification-timeline__meta">' + (stage.at ? escapeHtml(message.projection.provenance || "metadata") : "Henüz gerçekleşmedi") + '</div></div></li>';
+    }).join("");
+    return '<ol class="notification-timeline" aria-label="Bildirim yaşam döngüsü">' + rows + '</ol>' +
+           '<div class="notification-timeline__total"><span>Toplam süre</span><strong>' + escapeHtml(notificationDurationLabel(message.projection.createdAt, lastAt)) + '</strong></div>';
+  }
+
+  function selectNotification(id) {
+    var messages = buildNotificationMessages();
+    if (messages.some(function(message) { return message.id === String(id || ""); })) {
+      ui.selectedNotificationId = String(id);
+      render();
+    }
+  }
+
+  function setMessageDraft(value) {
+    ui.messageDraft = safeText(String(value || ""), OBSERVER_MESSAGE_MAX * 12);
+  }
+
+  function base64EncodeUtf8(value) {
+    var input = unescape(encodeURIComponent(String(value || "")));
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var output = "";
+    for (var i = 0; i < input.length; i += 3) {
+      var a = input.charCodeAt(i), b = i + 1 < input.length ? input.charCodeAt(i + 1) : NaN, c = i + 2 < input.length ? input.charCodeAt(i + 2) : NaN;
+      output += alphabet.charAt(a >> 2);
+      output += alphabet.charAt(((a & 3) << 4) | (isNaN(b) ? 0 : b >> 4));
+      output += isNaN(b) ? "=" : alphabet.charAt(((b & 15) << 2) | (isNaN(c) ? 0 : c >> 6));
+      output += isNaN(c) ? "=" : alphabet.charAt(c & 63);
+    }
+    return output;
+  }
+
+  function base64DecodeUtf8(value) {
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var input = String(value || "").replace(/\s/g, "");
+    var binary = "";
+    for (var i = 0; i < input.length; i += 4) {
+      var a = alphabet.indexOf(input.charAt(i)), b = alphabet.indexOf(input.charAt(i + 1)), c = alphabet.indexOf(input.charAt(i + 2)), d = alphabet.indexOf(input.charAt(i + 3));
+      if (a < 0 || b < 0) continue;
+      binary += String.fromCharCode((a << 2) | (b >> 4));
+      if (c >= 0) binary += String.fromCharCode(((b & 15) << 4) | (c >> 2));
+      if (d >= 0) binary += String.fromCharCode(((c & 3) << 6) | d);
+    }
+    try { return decodeURIComponent(escape(binary)); } catch (e) { return binary; }
+  }
+
+  function observerInboxApi() {
+    var p = String(REPO || "").split("/");
+    return "https://api.github.com/repos/" + encodeURIComponent(p[0]) + "/" + encodeURIComponent(p[1]) + "/contents/" + OBSERVER_INBOX_PATH;
+  }
+
+  function observerInboxHeaders() {
+    return { "Authorization": "Bearer " + ui.panelToken, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+  }
+
+  function observerWriteBlockedByOrigin() {
+    var location = root.location;
+    if (!location) return false;
+    var host = String(location.hostname || "").toLowerCase();
+    var protocol = String(location.protocol || "").toLowerCase();
+    var localOrigin = protocol === "file:" || host === "localhost" || host === "127.0.0.1" || host === "::1" || /\.local$/.test(host);
+    if (!localOrigin) return false;
+    var forced = String(location.search || "").indexOf("forceSync=1") !== -1;
+    try { forced = forced || root.localStorage.getItem("seyma-sync-force") === "1"; } catch (e) {}
+    return !forced;
+  }
+
+  function loadObserverInbox() {
+    return root.fetch(observerInboxApi() + "?ref=" + encodeURIComponent(BRANCH) + "&t=" + Date.now(), { headers: observerInboxHeaders(), cache: "no-store" }).then(function(response) {
+      if (response.status === 404) return { messages: [], receipts: {}, sha: null };
+      if (!response.ok) {
+        var missingError = new Error("inbox " + response.status);
+        missingError.status = response.status;
+        throw missingError;
+      }
+      return response.json().then(function(githubFile) {
+        var parsed = {};
+        try { parsed = JSON.parse(base64DecodeUtf8(githubFile && githubFile.content)); } catch (e) { parsed = {}; }
+        return { messages: Array.isArray(parsed.messages) ? parsed.messages : [], receipts: isObject(parsed.receipts) ? parsed.receipts : {}, sha: githubFile && githubFile.sha ? githubFile.sha : null };
+      });
+    });
+  }
+
+  function putObserverInbox(messages, sha, receipts) {
+    var payload = { messages: Array.isArray(messages) ? messages : [] };
+    if (isObject(receipts) && Object.keys(receipts).length) payload.receipts = receipts;
+    var body = { message: "observer: mesaj guncelle", content: base64EncodeUtf8(JSON.stringify(payload, null, 2)), branch: BRANCH };
+    if (sha) body.sha = sha;
+    var headers = observerInboxHeaders();
+    headers["Content-Type"] = "application/json";
+    return root.fetch(observerInboxApi(), { method: "PUT", headers: headers, body: JSON.stringify(body) }).then(function(response) {
+      if (response.ok) return response;
+      var error = new Error("inbox " + response.status);
+      error.status = response.status;
+      throw error;
+    });
+  }
+
+  function appendObserverMessage(entry, attempt) {
+    attempt = attempt || 0;
+    return loadObserverInbox().then(function(current) {
+      var messages = current.messages.slice();
+      if (!messages.some(function(message) { return message && message.id === entry.id; })) messages.push(entry);
+      if (messages.length > OBSERVER_MESSAGE_MAX) messages = messages.slice(-OBSERVER_MESSAGE_MAX);
+      return putObserverInbox(messages, current.sha, current.receipts);
+    }).catch(function(error) {
+      if ((error && (error.status === 409 || error.status === 422)) && attempt < 2) return appendObserverMessage(entry, attempt + 1);
+      throw error;
+    });
+  }
+
+  function sendMessage() {
+    if (ui.messageSending) return Promise.resolve(false);
+    var text = String(ui.messageDraft || "").trim();
+    if (!text) {
+      showToast("Önce bir mesaj yaz.", "info");
+      return Promise.resolve(false);
+    }
+    if (!ui.panelToken) {
+      showToast("Mesaj göndermek için panel tokenı gerekli.", "error");
+      return Promise.resolve(false);
+    }
+    if (observerWriteBlockedByOrigin()) {
+      showToast("Yerel ortamda mesaj yazımı kapalı; canlı Pages panelini kullan.", "error");
+      return Promise.resolve(false);
+    }
+    var now = new Date().toISOString();
+    var entry = { id: "m_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7), text: safeText(text, OBSERVER_MESSAGE_MAX * 6), ts: now, createdAt: now, sentAt: now, from: "Observer", kind: "observer_message" };
+    ui.messageSending = true;
+    render();
+    return Promise.resolve().then(function() { return appendObserverMessage(entry); }).then(function() {
+      ui.messageDraft = "";
+      ui.messageSending = false;
+      showToast("Mesaj observer-inbox kuyruğuna alındı.", "success");
+      render();
+      return true;
+    }).catch(function(error) {
+      ui.messageSending = false;
+      showToast("Mesaj gönderilemedi: " + safeText(error && error.message || "bağlantı hatası", 120), "error");
+      render();
+      return false;
+    });
+  }
+
+  function renderMessages() {
+    var messages = buildNotificationMessages();
+    var selected = messages.filter(function(message) { return message.id === ui.selectedNotificationId; })[0] || messages[0] || null;
+    if (selected && ui.selectedNotificationId !== selected.id) ui.selectedNotificationId = selected.id;
+    var unreadCount = messages.filter(function(message) { return message.direction === "in" && !message.projection.readAt; }).length;
     var summary = '<div class="message-summary"><span class="ae-chip">' + messages.length + " mesaj</span>" +
                   (unreadCount ? '<span class="message-summary__unread">' + unreadCount + " okunmamış</span>" : '<span class="message-summary__quiet">Tüm mesajlar okundu</span>') +
-                  "</div>";
+                  '<span class="message-summary__projection">PanelCoverageV1 projection</span></div>';
     var list = messages.length
-      ? messages.map(function(m) {
-          var status = "";
-          if (m.kind === "aeon_answer" && !m.readAt) status = " · okunmamış";
-          else if (m.readAt) status = " · okundu";
-          else if (m.synced) status = " · sync";
-          var unreadClass = m.kind === "aeon_answer" && !m.readAt ? " message-bubble--unread" : "";
-          return '<div class="message-bubble message-bubble--' + m.direction + unreadClass + '">' +
-                 '<div class="message-bubble__meta">' + escapeHtml(m.from) + " · " + escapeHtml(formatTs(m.ts)) + " · " + escapeHtml(m.kind || "mesaj") + status + "</div>" +
-                 (m.title ? '<div class="message-bubble__title">' + escapeHtml(safeText(m.title, 120)) + "</div>" : "") +
-                 '<div class="message-bubble__text">' + nl2br(escapeHtml(safeText(m.text, 1200))) + "</div>" +
-                 "</div>";
-        }).join("")
+      ? '<div class="message-list" role="list" aria-label="Bildirimler">' + messages.map(function(message) {
+          var status = notificationStatusLabel(message.projection);
+          var tone = notificationStatusTone(message.projection);
+          var selectedClass = selected && selected.id === message.id ? " is-selected" : "";
+          var unreadClass = message.direction === "in" && !message.projection.readAt ? " message-bubble--unread" : "";
+          return '<button type="button" class="message-bubble message-bubble--' + message.direction + unreadClass + selectedClass + ' notification-message-row" role="listitem" aria-pressed="' + (selected && selected.id === message.id ? "true" : "false") + '" onclick="AeonV2.selectNotification(\'' + escapeHtml(inlineArg(message.id)) + '\')">' +
+                 '<div class="message-bubble__meta"><span>' + escapeHtml(message.from) + " · " + escapeHtml(notificationTimeLabel(message.ts)) + " · " + escapeHtml(message.kind || "mesaj") + '</span><span class="notification-message-row__status notification-message-row__status--' + tone + '">' + escapeHtml(status) + "</span></div>" +
+                 (message.title ? '<div class="message-bubble__title">' + escapeHtml(message.title) + "</div>" : "") +
+                 '<div class="message-bubble__text">' + nl2br(escapeHtml(message.text || "(Metin yok)")) + "</div>" +
+                 "</button>";
+        }).join("") + "</div>"
       : AeEmpty({ icon: "messages", title: "Henüz mesaj yok", message: "Gelen ve giden mesajlar burada listelenecek." });
 
     var tokenValue = (ui.panelToken || "").replace(/./g, "•");
     var saveBtn = ui.panelToken
       ? AeButton({ labelHtml: renderIcon("refresh", 16) + " Şimdi senkronize et", variant: "primary", onclick: "AeonV2.refresh()", ariaLabel: "Şimdi senkronize et" })
       : "";
+    var draft = safeText(ui.messageDraft || "", OBSERVER_MESSAGE_MAX * 12);
+    var composerDisabled = !ui.panelToken || ui.messageSending;
+    var composer = AeCard({ variant: "glass", className: "message-composer", children:
+      '<div class="message-composer__head"><div><div class="ae-label">Observer → Şeyma</div><h3 class="message-composer__title">Yeni mesaj</h3></div>' +
+      '<span class="message-composer__privacy">Ayrı inbox kanalı</span></div>' +
+      '<textarea id="ae-message-draft" class="message-composer__input" maxlength="1200" rows="3" placeholder="Mesajını yaz…" aria-label="Yeni mesaj" oninput="AeonV2.setMessageDraft(this.value)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();AeonV2.sendMessage();}">' + escapeHtml(draft) + '</textarea>' +
+      '<div class="message-composer__foot"><span class="message-composer__hint">' + (ui.panelToken ? "Enter gönderir · Shift+Enter yeni satır" : "Önce GitHub tokenı ayarla") + '</span>' +
+      '<button type="button" class="ae-btn ae-btn--primary ae-btn--glow" onclick="AeonV2.sendMessage()"' + (composerDisabled ? " disabled" : "") + ' aria-label="Mesaj gönder">' + (ui.messageSending ? "Gönderiliyor…" : "Gönder") + "</button></div>"
+    });
     return '<div class="messages-detail ae-slide-up ae-stagger">' +
            AeCard({ variant: "glass", className: "messages-card", children: summary + list }) +
+           (selected ? AeCard({ variant: "glass", className: "notification-detail-card", children:
+             '<div class="system-card__head"><div><div class="ae-label">Seçili mesaj detayı</div><h2 class="system-card__title">Bildirim yaşam döngüsü</h2><div class="notification-detail-card__sender">' + escapeHtml(selected.from) + " → " + escapeHtml(selected.direction === "in" ? "Sen" : "Observer") + "</div></div>" +
+             '<span class="notification-detail-card__status notification-detail-card__status--' + notificationStatusTone(selected.projection) + '">' + escapeHtml(notificationStatusLabel(selected.projection)) + "</span></div>" +
+             (selected.title ? '<div class="notification-detail-card__title">' + escapeHtml(selected.title) + "</div>" : "") +
+             '<div class="notification-detail-card__text">' + nl2br(escapeHtml(selected.text || "(Metin yok)")) + "</div>" +
+             renderNotificationTimeline(selected)
+           }) : "") +
+           composer +
            AeCard({ variant: "glass", className: "token-card", children:
              '<div class="ae-label">GitHub token</div>' +
              '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
@@ -5262,6 +5582,12 @@
     clearEventFilters: clearEventFilters,
     parsePanelEvents: parsePanelEvents,
     renderEventLog: renderEventLog,
+    selectNotification: selectNotification,
+    setMessageDraft: setMessageDraft,
+    sendMessage: sendMessage,
+    buildNotificationMessages: buildNotificationMessages,
+    renderNotificationTimeline: renderNotificationTimeline,
+    notificationDurationLabel: notificationDurationLabel,
     setArchivePage: setArchivePage,
     setArchiveSearch: setArchiveSearch,
     setArchiveFilter: setArchiveFilter,

@@ -3063,6 +3063,13 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 .message-summary__unread { color: var(--ae-warn); }
 .message-summary__quiet { color: var(--ae-muted); }
+.message-summary__projection {
+  margin-left: auto;
+  color: var(--ae-faint);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  white-space: nowrap;
+}
 
 .message-bubble {
   animation: aeNotificationIn 0.38s var(--ae-ease) both;
@@ -4424,6 +4431,205 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   margin-bottom: 2px;
 }
 .message-bubble__text { word-break: break-word; }
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-sm);
+  margin-top: var(--ae-space-md);
+}
+
+.notification-message-row {
+  width: 92%;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: transform 0.18s var(--ae-ease), border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.notification-message-row:hover,
+.notification-message-row:focus-visible,
+.notification-message-row.is-selected {
+  border-color: var(--ae-accent);
+  box-shadow: var(--ae-glow-accent);
+  outline: none;
+  transform: translateY(-1px);
+}
+.notification-message-row--out { align-self: flex-end; }
+.notification-message-row__status {
+  float: right;
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 900;
+}
+.notification-message-row__status--ok { color: var(--ae-ok); }
+.notification-message-row__status--info { color: var(--ae-info); }
+.notification-message-row__status--drop { color: var(--ae-drop); }
+.notification-message-row__status--muted { color: var(--ae-muted); }
+
+.notification-detail-card__sender,
+.notification-detail-card__title,
+.notification-detail-card__text {
+  margin-top: var(--ae-space-xs);
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-sm);
+}
+.notification-detail-card__title {
+  color: var(--ae-text);
+  font-size: var(--ae-scale-md);
+  font-weight: 900;
+}
+.notification-detail-card__text {
+  padding: var(--ae-space-sm);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-empty-bg);
+  color: var(--ae-text);
+  line-height: 1.55;
+  white-space: normal;
+}
+.notification-detail-card__status {
+  flex: 0 0 auto;
+  padding: var(--ae-space-2xs) var(--ae-space-xs);
+  border: 1px solid currentColor;
+  border-radius: var(--ae-radius-full);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 900;
+}
+.notification-detail-card__status--ok { color: var(--ae-ok); }
+.notification-detail-card__status--info { color: var(--ae-info); }
+.notification-detail-card__status--drop { color: var(--ae-drop); }
+.notification-detail-card__status--muted { color: var(--ae-muted); }
+
+.notification-timeline {
+  position: relative;
+  display: grid;
+  gap: var(--ae-space-sm);
+  margin: var(--ae-space-lg) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.notification-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: var(--ae-space-sm);
+  min-height: 44px;
+}
+.notification-timeline__item:not(:last-child)::before {
+  position: absolute;
+  top: 20px;
+  bottom: -14px;
+  left: 9px;
+  width: 2px;
+  background: var(--ae-glass-border);
+  content: "";
+}
+.notification-timeline__dot {
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  margin: 3px;
+  border: 3px solid var(--ae-page);
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-muted);
+  box-shadow: 0 0 0 1px var(--ae-glass-border);
+}
+.notification-timeline__item--complete .notification-timeline__dot { background: var(--ae-ok); box-shadow: var(--ae-glow-ok); }
+.notification-timeline__item--current .notification-timeline__dot { background: var(--ae-info); box-shadow: var(--ae-glow-accent); }
+.notification-timeline__item--pending .notification-timeline__dot { background: var(--ae-muted); }
+.notification-timeline__body { min-width: 0; }
+.notification-timeline__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ae-space-sm);
+}
+.notification-timeline__head strong {
+  color: var(--ae-text);
+  font-size: var(--ae-scale-sm);
+  font-weight: 900;
+}
+.notification-timeline__time {
+  color: var(--ae-muted);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  text-align: right;
+  white-space: nowrap;
+}
+.notification-timeline__meta {
+  margin-top: var(--ae-space-2xs);
+  color: var(--ae-faint);
+  font-size: var(--ae-scale-xs);
+}
+.notification-timeline__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ae-space-sm);
+  margin-top: var(--ae-space-md);
+  padding-top: var(--ae-space-sm);
+  border-top: 1px solid var(--ae-glass-border);
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-sm);
+}
+.notification-timeline__total strong {
+  color: var(--ae-accent2);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-md);
+}
+
+.message-composer {
+  gap: var(--ae-space-md);
+}
+.message-composer__head,
+.message-composer__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+}
+.message-composer__title {
+  margin: var(--ae-space-2xs) 0 0;
+  color: var(--ae-text);
+  font-size: var(--ae-scale-lg);
+  font-weight: 900;
+}
+.message-composer__privacy {
+  color: var(--ae-info);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  text-align: right;
+}
+.message-composer__input {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  box-sizing: border-box;
+  padding: var(--ae-space-sm);
+  border: 1px solid var(--ae-card-bd);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-page);
+  color: var(--ae-text);
+  font: inherit;
+  line-height: 1.5;
+}
+.message-composer__input:focus {
+  border-color: var(--ae-accent);
+  outline: 2px solid color-mix(in srgb, var(--ae-accent) 28%, transparent);
+  outline-offset: 1px;
+}
+.message-composer__hint {
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-xs);
+}
+.message-composer__foot .ae-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+}
 
 /* ── SVG icon surface ── */
 .ae-icon {

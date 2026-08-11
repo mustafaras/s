@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-11`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `c6a97fe`
-- **Bitiş Commit:** `a4aacca` (ledger/handoff metadata commit'i ayrıca)
+- **Bitiş Commit:** `a4aacca` (metadata commit: `515ab7c`)
 
 ## Yapılanlar
 
@@ -16,7 +16,7 @@
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
 - [x] Uygulama commit'i yapıldı (`a4aacca`)
-- [ ] Push yapıldı (Pages doğrulaması bu handoff yazımından sonra)
+- [x] Push yapıldı (`a4aacca` + `515ab7c`)
 
 ### Özet
 
@@ -53,6 +53,9 @@ Açık ve koyu tema için `--ae-faint`, `--ae-muted`, vurgu ve durum tokenları 
 - tests/test_*.js                                   → 56/56 PASS
 - node .claude/skills/run-seyma/driver.mjs          → PASS
 - git diff --check                                  → PASS
+- GitHub Actions Pages run `31508524643`             → SUCCESS
+- GitHub Pages deployment `5853686831`              → success; SHA `515ab7c`
+- canlı `panel-v2.html`                              → HTTP 200; `panel-v2.css/js?v=20260811k`
 - gerçek tarayıcı testi                             → çalıştırılmadı (data-safety lock)
 ```
 
@@ -75,5 +78,6 @@ Açık ve koyu tema için `--ae-faint`, `--ae-muted`, vurgu ve durum tokenları 
 ## Ek Notlar
 
 - `panel-v2.html` gerçek tarayıcıda açılmadı; headless testler ve `run-seyma` VM harness'i kullanıldı.
+- Canlı deploy public HTML üzerinden doğrulandı; canlı panel-v2 runtime gerçek tarayıcıda açılmadı.
 - `panel-v2.js`, `panelCoverageManifest.js`, `app.js`, `sync.js`, `panel.html`, `panel.js`, `panel.css`, `index.html`, `data/` ve `mustafaras/seyma-data` değiştirilmedi.
 - Kullanıcı verisi veya gerçek GitHub token'ı okunmadı/yazılmadı.

@@ -2316,6 +2316,201 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .system-live-metric--accent .system-live-metric__value { color: var(--ae-accent2); }
 .system-live-metric--info .system-live-metric__value { color: var(--ae-info); }
 
+.sync-health-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ae-space-xs);
+  margin-bottom: var(--ae-space-md);
+}
+
+.sync-health-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2xs);
+  min-width: 0;
+  padding: var(--ae-space-md);
+  border: 1px solid var(--ae-glass-border);
+  border-radius: var(--ae-radius-md);
+  background: var(--ae-glass);
+  box-shadow: var(--ae-shadow-sm);
+  animation: aeSlideUp 0.34s var(--ae-ease) both;
+}
+
+.sync-health-metric__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ae-space-xs);
+}
+
+.sync-health-metric__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-empty-bg);
+  color: var(--ae-accent2);
+}
+
+.sync-health-metric__label {
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sync-health-metric__value {
+  overflow: hidden;
+  color: var(--ae-text);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-lg);
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sync-health-metric__meta {
+  overflow: hidden;
+  color: var(--ae-faint);
+  font-size: var(--ae-scale-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sync-health-metric--ok .sync-health-metric__value { color: var(--ae-ok); }
+.sync-health-metric--warn .sync-health-metric__value { color: var(--ae-warn); }
+.sync-health-metric--drop .sync-health-metric__value { color: var(--ae-drop); }
+.sync-health-metric--info .sync-health-metric__value { color: var(--ae-info); }
+.sync-health-metric--muted .sync-health-metric__value { color: var(--ae-muted); }
+
+.sync-health-secondary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ae-space-md);
+  margin-bottom: var(--ae-space-md);
+}
+
+.sync-health-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+  margin-bottom: var(--ae-space-md);
+}
+
+.sync-health-card__title {
+  margin: var(--ae-space-2xs) 0 0;
+  color: var(--ae-text);
+  font-size: var(--ae-scale-lg);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.sync-health-card__badge {
+  flex: 0 0 auto;
+  padding: var(--ae-space-2xs) var(--ae-space-xs);
+  border: 1px solid color-mix(in srgb, var(--ae-accent) 40%, transparent);
+  border-radius: var(--ae-radius-full);
+  color: var(--ae-accent2);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.sync-request-history__chart {
+  min-height: 56px;
+  padding: var(--ae-space-xs) 0;
+}
+
+.sync-request-history__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ae-space-sm);
+  margin-top: var(--ae-space-sm);
+  color: var(--ae-muted);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 800;
+}
+
+.sync-api-health__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-xs);
+  margin-bottom: var(--ae-space-md);
+}
+
+.sync-api-health__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ae-space-md);
+  padding-bottom: var(--ae-space-xs);
+  border-bottom: 1px solid var(--ae-glass-border);
+}
+
+.sync-api-health__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.sync-api-health__row span {
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-sm);
+  font-weight: 700;
+}
+.sync-api-health__row strong {
+  max-width: 65%;
+  color: var(--ae-text);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.sync-error-history__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ae-space-2xs);
+}
+
+.sync-error-history__row {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--ae-space-xs);
+  min-height: 32px;
+  padding: var(--ae-space-2xs) 0;
+  border-bottom: 1px solid var(--ae-glass-border);
+}
+
+.sync-error-history__row:last-child { border-bottom: 0; }
+.sync-error-history__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ae-radius-full);
+  background: var(--ae-drop);
+  box-shadow: var(--ae-glow-drop);
+}
+.sync-error-history__time {
+  overflow: hidden;
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sync-error-history__code,
+.sync-error-history__status {
+  color: var(--ae-drop);
+  font-family: var(--ae-mono);
+  font-size: var(--ae-scale-xs);
+  font-weight: 900;
+}
+.sync-error-history__status { color: var(--ae-faint); }
+.sync-error-history__empty {
+  padding: var(--ae-space-md) 0;
+  color: var(--ae-muted);
+  font-size: var(--ae-scale-sm);
+}
+
 .system-progress-list {
   display: grid;
   gap: var(--ae-space-md);
@@ -3478,6 +3673,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-toast,
   .message-bubble,
   .system-live-metric,
+  .sync-health-metric,
   .today-view__section--picker,
   .today-view__section--trend { animation: none !important; }
   .ae-card,
@@ -3523,6 +3719,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 @media (min-width: 768px) {
   .ae-grid--summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .today-view__secondary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sync-health-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .sync-health-secondary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .system-live-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ae-app__body { padding: var(--ae-space-lg) var(--ae-space-xl) var(--ae-space-xl); }
   .ae-topbar { padding: calc(env(safe-area-inset-top) + 12px) var(--ae-space-xl) 12px; }

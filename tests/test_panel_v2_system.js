@@ -52,6 +52,11 @@ assert(/Token ömrü/.test(html), "Token ömrü progress metriği var");
 assert(/role=\"progressbar\"/.test(html), "Progress bar erişilebilir role taşıyor");
 assert(/system-live-metrics/.test(html), "Canlı sistem metrikleri var");
 assert(/ae-card--glass/.test(html), "Durum kartı glass varyantında");
+assert(/sync-health-metrics/.test(html), "Senkron sağlık KPI paneli var");
+assert((html.match(/class="sync-health-metric(?:\s|")/g) || []).length === 4, "Dört senkron sağlık KPI kartı var");
+assert(/sync-request-history/.test(html), "İstek geçmişi sağlık kartı var");
+assert(/sync-api-health/.test(html), "API sağlık kartı var");
+assert(/sync-error-history/.test(html), "Hata geçmişi sağlık kartı var");
 
 AeonV2.updateStatus({
   status: "accepted",

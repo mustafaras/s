@@ -103,6 +103,9 @@
     errorCount: 0,
     consecutiveErrors: 0,
     lastSuccessAt: null,
+    lastErrorAt: null,
+    requestHistory: [],
+    errorHistory: [],
     dataAgeMinutes: null,
     pollingIntervalMs: 60000,
     _latencyWindow: [],
@@ -179,18 +182,89 @@
     syncStatus.p95LatencyMs = percentile(0.95);
   }
 
-  function recordFetchTelemetry(durationMs, success) {
+  function recordFetchTelemetry(durationMs, success, meta) {
     var duration = safeNumber(durationMs);
+    meta = meta || {};
+    var completedAt = new Date().toISOString();
     syncStatus.lastFetchDurationMs = duration === null ? null : Math.max(0, Math.round(duration));
     syncStatus.totalFetchCount = Math.max(0, Number(syncStatus.totalFetchCount) || 0) + 1;
     if (duration !== null) updateLatencyTelemetry(duration);
+    var requests = Array.isArray(syncStatus.requestHistory) ? syncStatus.requestHistory.slice() : [];
+    requests.push({
+      at: completedAt,
+      durationMs: duration === null ? null : Math.max(0, Math.round(duration)),
+      success: !!success,
+      status: safeNumber(meta.status)
+    });
+    syncStatus.requestHistory = requests.slice(-1440);
     if (success) {
       syncStatus.consecutiveErrors = 0;
       syncStatus.lastSuccessAt = new Date().toISOString();
     } else {
       syncStatus.errorCount = Math.max(0, Number(syncStatus.errorCount) || 0) + 1;
       syncStatus.consecutiveErrors = Math.max(0, Number(syncStatus.consecutiveErrors) || 0) + 1;
+      syncStatus.lastErrorAt = completedAt;
+      var errors = Array.isArray(syncStatus.errorHistory) ? syncStatus.errorHistory.slice() : [];
+      errors.push({
+        at: completedAt,
+        code: safeText(meta.code || "request_failed", 40),
+        status: safeNumber(meta.status)
+      });
+      syncStatus.errorHistory = errors.slice(-50);
     }
+  }
+
+  function requestHistory24h(nowMs) {
+    var now = safeNumber(nowMs);
+    if (now === null) now = Date.now();
+    var cutoff = now - (24 * 60 * 60 * 1000);
+    var sums = [], counts = [];
+    for (var i = 0; i < 24; i += 1) { sums.push(0); counts.push(0); }
+    (Array.isArray(syncStatus.requestHistory) ? syncStatus.requestHistory : []).forEach(function(item) {
+      var at = new Date(item && item.at).getTime();
+      var duration = safeNumber(item && item.durationMs);
+      if (!isFinite(at) || at < cutoff || at > now || duration === null) return;
+      var bucket = Math.min(23, Math.max(0, Math.floor((at - cutoff) / (60 * 60 * 1000))));
+      sums[bucket] += Math.max(0, duration);
+      counts[bucket] += 1;
+    });
+    return sums.map(function(sum, index) { return counts[index] ? Math.round(sum / counts[index]) : null; });
+  }
+
+  function requestCount24h(nowMs) {
+    var now = safeNumber(nowMs);
+    if (now === null) now = Date.now();
+    var cutoff = now - (24 * 60 * 60 * 1000);
+    return (Array.isArray(syncStatus.requestHistory) ? syncStatus.requestHistory : []).filter(function(item) {
+      var at = new Date(item && item.at).getTime();
+      return isFinite(at) && at >= cutoff && at <= now;
+    }).length;
+  }
+
+  function syncErrorRatePercent(status) {
+    status = status || syncStatus;
+    var total = Math.max(0, Number(status.totalFetchCount) || 0);
+    var errors = Math.max(0, Number(status.errorCount) || 0);
+    if (!total) return null;
+    return Math.min(100, Math.round((errors / total) * 1000) / 10);
+  }
+
+  function syncErrorRateLabel(status) {
+    var rate = syncErrorRatePercent(status);
+    return rate === null ? "—" : rate.toFixed(1).replace(".", ",") + "%";
+  }
+
+  function syncHealthInfo(status) {
+    status = status || {};
+    var code = String(status.status || "idle");
+    if (code === "accepted" && !(Number(status.consecutiveErrors) > 0)) return { label: "Sağlıklı", tone: "ok", meta: "Senkron kabul edildi" };
+    if (["error", "unauthorized", "forbidden", "not_found", "rate_limited"].indexOf(code) !== -1 || Number(status.consecutiveErrors) >= 3) {
+      return { label: "Kritik", tone: "drop", meta: code };
+    }
+    if (Number(status.errorCount) > 0 || Number(status.consecutiveErrors) > 0 || code === "saving" || code === "retrying") {
+      return { label: "Uyarı", tone: "warn", meta: code };
+    }
+    return { label: "Bekliyor", tone: "muted", meta: ui.panelToken ? "İlk kontrol bekleniyor" : "Token ayarlanmadı" };
   }
 
   function dataAgeMinutes(ts, nowMs) {
@@ -1414,7 +1488,9 @@
   }
 
   function AeSparkline(data, color, height, label) {
-    var values = Array.isArray(data) ? data.slice(0, 30).map(safeNumber) : [];
+    var values = Array.isArray(data) ? data.slice(0, 30).map(function(value) {
+      return value === null || value === undefined || value === "" ? null : safeNumber(value);
+    }) : [];
     var valid = values.filter(function(value) { return value !== null; });
     var colorKey = String(color || "accent").toLowerCase();
     if (colorKey === "mood") colorKey = "accent";
@@ -3947,6 +4023,69 @@
            '<strong class="system-live-metric__value">' + escapeHtml(String(value)) + "</strong></div>";
   }
 
+  function renderSyncHealthMetric(label, value, meta, tone, icon) {
+    return '<div class="sync-health-metric sync-health-metric--' + escapeHtml(tone || "info") + '">' +
+           '<div class="sync-health-metric__head"><span class="sync-health-metric__icon">' + renderIcon(icon || "dot", 18) +
+           '</span><span class="sync-health-metric__label">' + escapeHtml(label) + "</span></div>" +
+           '<strong class="sync-health-metric__value">' + escapeHtml(String(value)) + "</strong>" +
+           '<span class="sync-health-metric__meta">' + escapeHtml(String(meta || "—")) + "</span></div>";
+  }
+
+  function renderSyncRequestHistory() {
+    var series = requestHistory24h();
+    var count = requestCount24h();
+    var valid = series.filter(function(value) { return value !== null; });
+    var average = valid.length ? Math.round(valid.reduce(function(sum, value) { return sum + value; }, 0) / valid.length) : null;
+    return AeCard({ variant: "glass", className: "sync-request-history", children:
+      '<div class="sync-health-card__head"><div><div class="ae-label">İstek geçmişi</div><h3 class="sync-health-card__title">Son 24 saat</h3></div>' +
+      '<span class="sync-health-card__badge">SVG</span></div>' +
+      '<div class="sync-request-history__chart">' + AeSparkline(series, "info", 56, "İstek gecikmesi son 24 saat") + "</div>" +
+      '<div class="sync-request-history__meta"><span>' + count + " istek</span><span>Ortalama: " + (average === null ? "—" : average + " ms") + "</span></div>"
+    });
+  }
+
+  function syncErrorHistoryForRender(status) {
+    status = status || {};
+    var history = Array.isArray(status.errorHistory) ? status.errorHistory.slice() : [];
+    if (!history.length && status.lastErrorCode) {
+      history.push({ at: status.lastErrorAt, code: safeText(status.lastErrorCode, 60), status: null });
+    }
+    history.sort(function(a, b) { return String(b.at || "").localeCompare(String(a.at || "")); });
+    return history.slice(0, 10);
+  }
+
+  function renderSyncErrorHistory(status) {
+    var history = syncErrorHistoryForRender(status);
+    var content = history.length
+      ? '<div class="sync-error-history__list" role="list" aria-label="Son 10 senkron hatası">' + history.map(function(item) {
+          var code = safeText(item.code || "request_failed", 60);
+          var http = safeNumber(item.status);
+          return '<div class="sync-error-history__row" role="listitem"><span class="sync-error-history__dot" aria-hidden="true"></span>' +
+                 '<span class="sync-error-history__time">' + escapeHtml(formatTs(item.at)) + "</span>" +
+                 '<strong class="sync-error-history__code">' + escapeHtml(code) + "</strong>" +
+                 (http === null ? "" : '<span class="sync-error-history__status">HTTP ' + http + "</span>") +
+                 "</div>";
+        }).join("") + "</div>"
+      : '<div class="sync-error-history__empty" role="status">Henüz senkron hatası yok.</div>';
+    return AeCard({ variant: "glass", className: "sync-error-history", children:
+      '<div class="sync-health-card__head"><div><div class="ae-label">Tanı</div><h3 class="sync-health-card__title">Hata geçmişi</h3></div><span class="sync-health-card__badge">SON 10</span></div>' + content
+    });
+  }
+
+  function renderSyncApiHealth(status, apiRemaining, apiTotal, apiPct, apiReset, tokenInfo) {
+    var remainingLabel = apiRemaining === null ? "Bilinmiyor" : apiRemaining + (apiTotal === null ? "" : " / " + apiTotal);
+    var resetLabel = apiReset ? formatTs(apiReset) : "Bilinmiyor";
+    var tokenLabel = ui.panelToken ? "Token ayarlı" : "Token yok";
+    return AeCard({ variant: "glass", className: "sync-api-health", children:
+      '<div class="sync-health-card__head"><div><div class="ae-label">GitHub bağlantısı</div><h3 class="sync-health-card__title">API durumu</h3></div>' +
+      AeStatusBadge({ status: ui.panelToken ? (status.status || "idle") : "idle", label: tokenLabel }) + "</div>" +
+      '<div class="sync-api-health__rows"><div class="sync-api-health__row"><span>Kalan limit</span><strong>' + escapeHtml(remainingLabel) +
+      '</strong></div><div class="sync-api-health__row"><span>Sıfırlanma</span><strong>' + escapeHtml(resetLabel) +
+      '</strong></div><div class="sync-api-health__row"><span>Token durumu</span><strong>' + escapeHtml(tokenInfo.detail) + "</strong></div></div>" +
+      renderSystemProgress({ label: "API limiti", value: apiPct, tone: apiPct !== null && apiPct >= 25 ? "ok" : "warn", detail: apiRemaining === null ? "Rate-limit başlığı bekleniyor." : remainingLabel + " istek kaldı" })
+    });
+  }
+
   function renderStatusDetail() {
     var s = syncStatus || {};
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
@@ -3954,6 +4093,7 @@
     var apiTotal = firstStatusNumber(s, ["apiLimitTotal", "rateLimitLimit", "limitTotal"]);
     var apiPct = apiRemaining !== null && apiTotal > 0 ? (apiRemaining / apiTotal) * 100 : null;
     var freshness = dataFreshnessLabel(s.lastSyncedAt);
+    var freshnessMinutes = dataAgeMinutes(s.lastSyncedAt);
     var pollingActive = pollingState.intervalId !== null && !!ui.panelToken;
     var pollingLabel = pollingActive ? Math.round((s.pollingIntervalMs || 60000) / 1000) + " sn aktif" : "Kapalı";
     var apiDetail = apiRemaining !== null
@@ -3961,6 +4101,15 @@
       : "GitHub yanıtından limit bilgisi bekleniyor.";
     if (s.apiRateLimitReset || s.apiLimitResetAt) apiDetail += " · Sıfırlanma: " + formatTs(s.apiRateLimitReset || s.apiLimitResetAt);
     var tokenInfo = tokenLifetimeInfo(s);
+    var health = syncHealthInfo(s);
+    var latencyLabel = (s.p50LatencyMs !== null && s.p50LatencyMs !== undefined ? s.p50LatencyMs : "—") + " / " +
+      (s.p95LatencyMs !== null && s.p95LatencyMs !== undefined ? s.p95LatencyMs : "—") + " ms";
+    var healthMetrics = '<div class="sync-health-metrics ae-stagger" aria-label="Senkron sağlık metrikleri">' +
+      renderSyncHealthMetric("Durum", health.label, health.meta, health.tone, health.tone === "drop" ? "crisis" : "check") +
+      renderSyncHealthMetric("Gecikme", latencyLabel, "p50 / p95", "info", "clock") +
+      renderSyncHealthMetric("Hata oranı", syncErrorRateLabel(s), (s.errorCount || 0) + " / " + (s.totalFetchCount || 0) + " istek", syncErrorRatePercent(s) === null || syncErrorRatePercent(s) === 0 ? "ok" : syncErrorRatePercent(s) >= 10 ? "drop" : "warn", "crisis") +
+      renderSyncHealthMetric("Veri tazeliği", freshnessMinutes === null ? "—" : freshnessMinutes + " dk", freshness, freshnessMinutes === null ? "muted" : freshnessMinutes <= 5 ? "ok" : freshnessMinutes <= 60 ? "warn" : "drop", "refresh") +
+      "</div>";
     var rows = [
       { label: "Durum", value: s.status || "idle" },
       { label: "Son senkron", value: s.lastSyncedAt ? formatTs(s.lastSyncedAt) : "—" },
@@ -4003,6 +4152,9 @@
       })
       : "";
     return '<div class="status-detail ae-slide-up ae-stagger">' +
+           healthMetrics +
+           renderSyncRequestHistory() +
+           '<div class="sync-health-secondary">' + renderSyncApiHealth(s, apiRemaining, apiTotal, apiPct, s.apiRateLimitReset || s.apiLimitResetAt, tokenInfo) + renderSyncErrorHistory(s) + "</div>" +
            AeCard({ variant: "glass", className: "status-card", children:
              '<div class="system-card__head"><div><div class="ae-label">Canlı sistem durumu</div><h2 class="system-card__title">Senkronizasyon ve kaynaklar</h2></div>' +
              AeStatusBadge({ status: s.status || "idle" }) + "</div>" + liveMetrics + progress +
@@ -4897,16 +5049,16 @@
     if (syncStatus.etag) H["If-None-Match"] = syncStatus.etag;
     var requestStartedAt = Date.now();
     var telemetryRecorded = false;
-    function finishFetch(success) {
+    function finishFetch(success, meta) {
       if (telemetryRecorded) return;
       telemetryRecorded = true;
-      recordFetchTelemetry(Date.now() - requestStartedAt, success);
+      recordFetchTelemetry(Date.now() - requestStartedAt, success, meta);
     }
     var request;
     try {
       request = root.fetch(api, { headers: H, cache: "no-store" });
     } catch (e) {
-      finishFetch(false);
+      finishFetch(false, { code: "network" });
       return Promise.reject(e);
     }
     return request.then(function(r) {
@@ -4927,17 +5079,17 @@
         syncStatus.apiRateLimitReset = syncStatus.apiLimitResetAt;
       }
       if (r.status === 401 || r.status === 403) {
-        finishFetch(false);
+        finishFetch(false, { code: r.status === 403 && rateRemaining === 0 ? "rate_limited" : "unauthorized", status: r.status });
         throw new Error("Token gecersiz veya yetkisiz.");
       }
       if (r.status === 404) {
-        finishFetch(false);
+        finishFetch(false, { code: "not_found", status: r.status });
         var e = new Error("data/latest.json bulunamadi.");
         e.notFound = true;
         throw e;
       }
       if (r.status === 304) {
-        finishFetch(true);
+        finishFetch(true, { status: r.status });
         syncStatus.status = "accepted";
         syncStatus.lastSyncedAt = new Date().toISOString();
         syncStatus.notModifiedCount = (syncStatus.notModifiedCount || 0) + 1;
@@ -4945,11 +5097,11 @@
         return { notModified: true, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }
       if (!r.ok) {
-        finishFetch(false);
+        finishFetch(false, { code: r.status === 429 ? "rate_limited" : "http_" + r.status, status: r.status });
         throw new Error("Sunucu hatasi: " + r.status);
       }
       return r.json().then(function(data) {
-        finishFetch(true);
+        finishFetch(true, { status: r.status });
         syncStatus.etag = etag;
         syncStatus.snapshotRevision = (data && data.syncReceipt && data.syncReceipt.snapshotRevision) || null;
         syncStatus.sourceUpdatedAt = (data && data.syncReceipt && data.syncReceipt.sourceUpdatedAt) || null;
@@ -4960,11 +5112,11 @@
         render();
         return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }, function(error) {
-        finishFetch(false);
+        finishFetch(false, { code: "parse_error" });
         throw error;
       });
     }, function(error) {
-      finishFetch(false);
+      finishFetch(false, { code: "network" });
       throw error;
     });
   }
@@ -5056,6 +5208,9 @@
     syncStatus.errorCount = 0;
     syncStatus.consecutiveErrors = 0;
     syncStatus.lastSuccessAt = null;
+    syncStatus.lastErrorAt = null;
+    syncStatus.requestHistory = [];
+    syncStatus.errorHistory = [];
     syncStatus.dataAgeMinutes = null;
     syncStatus._latencyWindow = [];
     appData = null;

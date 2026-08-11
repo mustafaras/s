@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-11`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `94169c2`
-- **Bitiş Commit:** `1e36b76` (uygulama; ledger/handoff metadata `6c91c4c`)
+- **Bitiş Commit:** `6b09d10` (uygulama `1e36b76`; ledger/handoff teslim metadata `6c91c4c` ve `6b09d10`)
 
 ## Yapılanlar
 
@@ -16,7 +16,7 @@
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
 - [x] Commit yapıldı (`1e36b76`)
-- [x] Push yapıldı (`git push origin main`; local/origin `6c91c4c` eşit)
+- [x] Push yapıldı (`git push origin main`; remote eşitliği doğrulandı)
 
 ### Özet
 
@@ -52,8 +52,8 @@ Panel-v2 artık ana ve alt sekmelerde roving `tabindex` ile mantıksal focus ord
 - node .claude/skills/run-seyma/driver.mjs    → PASS
 - node .claude/skills/run-seyma/zikr-harness.mjs → PASS (90/90)
 - git diff --check                            → PASS
-- GitHub Actions Pages run `31512756323`      → SUCCESS
-- GitHub Pages deployment `5854464201`        → success; SHA `6c91c4c`
+- GitHub Actions Pages run `31512982763`      → SUCCESS
+- GitHub Pages deployment `5854502434`        → success; SHA `6b09d10`
 - canlı `panel-v2.html`                       → HTTP 200; `panel-v2.css/js?v=20260811l`
 - canlı CSS/JS SHA256                         → yerel dosyalarla eşleşti
 - gerçek tarayıcı/manual browser testi        → çalıştırılmadı (data-safety lock)

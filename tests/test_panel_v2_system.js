@@ -32,12 +32,14 @@ AeonV2.setData(seededData);
 AeonV2.setTab("system");
 html = dom.html;
 
-// 1. Sistem sekmesi 4 alt-sekme gösteriyor
+// 1. Sistem sekmesi 5 alt-sekme gösteriyor
 assert(/sub-tab/.test(html), "Sub-tab butonları var");
 assert(/Durum/.test(html), "Durum sub-tab var");
+assert(/Olaylar/.test(html), "Olaylar sub-tab var");
 assert(/Audit/.test(html), "Audit sub-tab var");
 assert(/Mesajlar/.test(html), "Mesajlar sub-tab var");
 assert(/Ayarlar/.test(html), "Ayarlar sub-tab var");
+assert((html.match(/<button[^>]+class="sub-tab/g) || []).length === 5, "Sistem 5 sub-tab render ediyor");
 
 // 2. Status detayı varsayılan açılıyor
 assert(/Durum/.test(html), "Durum başlığı/bağlamı var");

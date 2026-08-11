@@ -16,9 +16,48 @@
   var REPO = "mustafaras/seyma-data";
   var BRANCH = "main";
 
+  var EVENT_SECTION_OPTIONS = [
+    { value: "wellness", label: "Wellness" },
+    { value: "mood", label: "Ruh hali" },
+    { value: "sleep", label: "Uyku" },
+    { value: "nutrition", label: "Beslenme" },
+    { value: "content", label: "İçerik" },
+    { value: "therapy", label: "Terapi" },
+    { value: "profile", label: "Profil" },
+    { value: "notifications", label: "Bildirimler" },
+    { value: "location", label: "Konum" },
+    { value: "settings", label: "Ayarlar" },
+    { value: "quran", label: "Kur'an" },
+    { value: "faith", label: "İman" },
+    { value: "sync", label: "Senkron" },
+    { value: "system", label: "Sistem" },
+    { value: "unknown", label: "Diğer" }
+  ];
+  var EVENT_SECTION_ICONS = {
+    wellness: "leaf", mood: "mood", sleep: "sleep", nutrition: "nutrition", content: "book",
+    therapy: "reflection", profile: "shield", notifications: "messages", location: "location",
+    settings: "settings", quran: "book", faith: "prayer", sync: "refresh", system: "settings", unknown: "dot"
+  };
+  var EVENT_OPERATION_OPTIONS = [
+    { value: "create", label: "Oluştur" },
+    { value: "update", label: "Güncelle" },
+    { value: "delete", label: "Sil" },
+    { value: "complete", label: "Tamamla" },
+    { value: "record", label: "Kaydet" },
+    { value: "accepted", label: "Kabul" },
+    { value: "retry", label: "Yeniden dene" },
+    { value: "merge", label: "Birleştir" },
+    { value: "sync_submitted", label: "Senkron gönderildi" }
+  ];
+  var EVENT_OPERATION_LABELS = EVENT_OPERATION_OPTIONS.reduce(function(out, item) {
+    out[item.value] = item.label;
+    return out;
+  }, {});
+
   var ui = {
     tab: "today",
     subTab: null,
+    systemSubTab: "status",
     date: isoDate(new Date()),
     trendWindow: 7,
     density: "comfortable",
@@ -34,7 +73,14 @@
     historyWindow: 7,
     historySource: "all",
     historyDay: "all",
-    historyExpanded: {}
+    historyExpanded: {},
+    eventSection: "all",
+    eventOperation: "all",
+    eventFrom: "",
+    eventTo: "",
+    eventLimit: 20,
+    eventPage: 1,
+    selectedEventId: ""
   };
 
   var syncStatus = {
@@ -3616,9 +3662,136 @@
   }
 
   function setSystemSubTab(id) {
-    var valid = ["status", "audit", "messages", "settings"];
+    var valid = ["status", "events", "audit", "messages", "settings"];
     if (valid.indexOf(id) === -1) return;
     ui.systemSubTab = id;
+    render();
+  }
+
+  function eventAdapter() {
+    var adapter = root.PanelCoverageV1 || root.SeymaPanelCoverage;
+    return adapter && typeof adapter.parseEventLog === "function" && typeof adapter.normalizeEvent === "function" ? adapter : null;
+  }
+
+  function parsePanelEvents() {
+    var adapter = eventAdapter();
+    if (!adapter) return { ok: false, code: "event_adapter_missing", events: [] };
+    var rootData = isObject(appData) ? appData : {};
+    var raw = isObject(rootData.eventLog) ? rootData.eventLog : null;
+    var parsed;
+    try {
+      parsed = adapter.parseEventLog(raw, todayStr());
+    } catch (e) {
+      return { ok: false, code: "event_log_parse_failed", events: [] };
+    }
+    var events = [];
+    (parsed && Array.isArray(parsed.events) ? parsed.events : []).forEach(function(event) {
+      var normalized = adapter.normalizeEvent(event, event && event.sourceDeviceId);
+      if (normalized) events.push(normalized);
+    });
+    events.sort(function(a, b) {
+      return String(b.occurredAt || "").localeCompare(String(a.occurredAt || "")) || Number(b.sequence || 0) - Number(a.sequence || 0) || String(a.eventId).localeCompare(String(b.eventId));
+    });
+    return { ok: !!(parsed && parsed.ok), code: parsed && parsed.code || null, date: parsed && parsed.date || null, events: events };
+  }
+
+  function eventSectionLabel(section) {
+    var value = String(section || "unknown");
+    for (var i = 0; i < EVENT_SECTION_OPTIONS.length; i++) {
+      if (EVENT_SECTION_OPTIONS[i].value === value) return EVENT_SECTION_OPTIONS[i].label;
+    }
+    return "Diğer";
+  }
+
+  function eventOperationLabel(operation) {
+    var value = String(operation || "update");
+    return EVENT_OPERATION_LABELS[value] || safeText(value, 32) || "Güncelle";
+  }
+
+  function eventIcon(section) {
+    return EVENT_SECTION_ICONS[String(section || "unknown")] || EVENT_SECTION_ICONS.unknown;
+  }
+
+  function eventDateKey(ts) {
+    var date = new Date(ts);
+    return isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+  }
+
+  function eventTimeLabel(ts) {
+    var date = new Date(ts);
+    if (isNaN(date.getTime())) return "—";
+    return date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function eventDateTimeLabel(ts) {
+    var date = new Date(ts);
+    return isNaN(date.getTime()) ? "—" : date.toLocaleString("tr-TR");
+  }
+
+  function eventRevisionLabel(revision) {
+    var value = safeText(revision, 80);
+    return value ? "rev-" + value.slice(0, 8) : "—";
+  }
+
+  function eventJsArg(value) {
+    return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  }
+
+  function eventMatchesFilters(event) {
+    if (ui.eventSection !== "all" && event.section !== ui.eventSection) return false;
+    if (ui.eventOperation !== "all" && event.operation !== ui.eventOperation) return false;
+    var day = eventDateKey(event.occurredAt);
+    if (ui.eventFrom && (!day || day < ui.eventFrom)) return false;
+    if (ui.eventTo && (!day || day > ui.eventTo)) return false;
+    return true;
+  }
+
+  function filteredPanelEvents(parsed) {
+    return (parsed && Array.isArray(parsed.events) ? parsed.events : []).filter(eventMatchesFilters);
+  }
+
+  function setEventFilter(kind, value) {
+    value = String(value || "");
+    if (kind === "section") {
+      var sections = EVENT_SECTION_OPTIONS.map(function(item) { return item.value; });
+      ui.eventSection = value === "all" || sections.indexOf(value) !== -1 ? value : "all";
+    } else if (kind === "operation") {
+      var operations = EVENT_OPERATION_OPTIONS.map(function(item) { return item.value; });
+      ui.eventOperation = value === "all" || operations.indexOf(value) !== -1 ? value : "all";
+    } else if (kind === "from" || kind === "to") {
+      ui[kind === "from" ? "eventFrom" : "eventTo"] = /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
+    } else {
+      return;
+    }
+    ui.eventPage = 1;
+    render();
+  }
+
+  function setEventLimit(limit) {
+    limit = Math.round(safeNumber(limit) || 20);
+    if ([20, 50, 100].indexOf(limit) === -1) return;
+    ui.eventLimit = limit;
+    ui.eventPage = 1;
+    render();
+  }
+
+  function setEventPage(page) {
+    page = Math.max(1, Math.round(safeNumber(page) || 1));
+    ui.eventPage = page;
+    render();
+  }
+
+  function selectEvent(eventId) {
+    ui.selectedEventId = eventId ? String(eventId) : "";
+    render();
+  }
+
+  function clearEventFilters() {
+    ui.eventSection = "all";
+    ui.eventOperation = "all";
+    ui.eventFrom = "";
+    ui.eventTo = "";
+    ui.eventPage = 1;
     render();
   }
 
@@ -3839,6 +4012,118 @@
            "</div>";
   }
 
+  function eventOptionMarkup(options, selected, allLabel) {
+    var html = '<option value="all"' + (selected === "all" ? " selected" : "") + '>' + escapeHtml(allLabel || "Tümü") + "</option>";
+    (Array.isArray(options) ? options : []).forEach(function(item) {
+      html += '<option value="' + escapeHtml(item.value) + '"' + (selected === item.value ? " selected" : "") + '>' + escapeHtml(item.label) + "</option>";
+    });
+    return html;
+  }
+
+  function eventPageButton(labelHtml, page, disabled, ariaLabel) {
+    var attrs = ' aria-label="' + escapeHtml(ariaLabel || labelHtml) + '"';
+    if (disabled) attrs += ' disabled aria-disabled="true"';
+    else attrs += ' onclick="' + escapeHtml("AeonV2.setEventPage(" + page + ")") + '"';
+    return '<button type="button" class="ae-btn ae-btn--text event-log-page-btn"' + attrs + '>' + labelHtml + "</button>";
+  }
+
+  function renderEventFilters(total, filtered) {
+    var hasFilters = ui.eventSection !== "all" || ui.eventOperation !== "all" || ui.eventFrom || ui.eventTo;
+    return '<div class="event-log-controls" aria-label="Olay günlüğü filtreleri">' +
+           '<div class="event-log-controls__head"><div><div class="ae-label">Filtreler</div><div class="event-log-controls__summary">' +
+           total + " toplam · " + filtered + " gösteriliyor</div></div>" +
+           (hasFilters ? AeButton({ labelHtml: renderIcon("close", 14) + " Filtreleri temizle", variant: "text", className: "event-log-clear", onclick: "AeonV2.clearEventFilters()", ariaLabel: "Olay filtrelerini temizle" }) : "") +
+           "</div>" +
+           '<div class="event-log-filter-grid">' +
+           '<label class="event-log-filter"><span>Bölüm</span><select class="event-filter-section" aria-label="Olay bölümü" onchange="AeonV2.setEventFilter(\'section\', this.value)">' +
+           eventOptionMarkup(EVENT_SECTION_OPTIONS, ui.eventSection, "Tüm bölümler") + "</select></label>" +
+           '<label class="event-log-filter"><span>İşlem</span><select class="event-filter-operation" aria-label="Olay işlemi" onchange="AeonV2.setEventFilter(\'operation\', this.value)">' +
+           eventOptionMarkup(EVENT_OPERATION_OPTIONS, ui.eventOperation, "Tüm işlemler") + "</select></label>" +
+           '<label class="event-log-filter"><span>Başlangıç</span><input class="event-filter-from" type="date" aria-label="Olay başlangıç tarihi" value="' + escapeHtml(ui.eventFrom) + '" onchange="AeonV2.setEventFilter(\'from\', this.value)" /></label>' +
+           '<label class="event-log-filter"><span>Bitiş</span><input class="event-filter-to" type="date" aria-label="Olay bitiş tarihi" value="' + escapeHtml(ui.eventTo) + '" onchange="AeonV2.setEventFilter(\'to\', this.value)" /></label>' +
+           "</div></div>";
+  }
+
+  function renderEventDetail(event) {
+    if (!event) {
+      return '<div class="event-detail-drawer event-detail-drawer--empty" role="complementary" aria-label="Olay detay drawerı">' +
+             AeEmpty({ icon: "note", title: "Bir olay seç", message: "Detaylarını görmek için listedeki bir olaya dokun." }) +
+             "</div>";
+    }
+    var detailRows = [
+      { label: "Olay ID", value: event.eventId },
+      { label: "Korelasyon", value: event.correlationId },
+      { label: "Sıra", value: event.sequence },
+      { label: "Bölüm", value: eventSectionLabel(event.section) + " › " + event.path },
+      { label: "İşlem", value: eventOperationLabel(event.operation) },
+      { label: "Zaman", value: eventDateTimeLabel(event.occurredAt) },
+      { label: "Revizyon", value: eventRevisionLabel(event.snapshotRevision) },
+      { label: "Kaynak", value: (event.source || "app") + " · " + (event.sourceDeviceId || "—") },
+      { label: "Gizlilik", value: event.privacyClass || "summary" }
+    ];
+    var rows = detailRows.map(function(row) {
+      return '<div class="event-detail-row"><span class="event-detail-row__label">' + escapeHtml(row.label) +
+             '</span><span class="event-detail-row__value">' + escapeHtml(String(row.value)) + "</span></div>";
+    }).join("");
+    return '<aside class="event-detail-drawer ae-card ae-card--glass" role="complementary" aria-label="Seçili olay detayı" data-event-id="' + escapeHtml(event.eventId) + '">' +
+           '<div class="event-detail-drawer__head"><div><div class="ae-label">Seçili olay</div><h3 class="event-detail-drawer__title">' +
+           escapeHtml(eventSummaryLabel(event)) + '</h3></div>' +
+           AeButton({ labelHtml: renderIcon("close", 16) + " Kapat", variant: "text", className: "event-detail-drawer__close", onclick: "AeonV2.selectEvent('')", ariaLabel: "Olay detayını kapat" }) +
+           "</div>" +
+           '<div class="event-detail-drawer__meta"><span class="event-log-operation">' + escapeHtml(eventOperationLabel(event.operation)) + "</span> · " + escapeHtml(eventSectionLabel(event.section)) + "</div>" +
+           '<div class="event-detail-drawer__summary">' + escapeHtml(event.summary || "Güvenli kayıt özeti") + "</div>" +
+           '<div class="event-detail-rows">' + rows + "</div></aside>";
+  }
+
+  function eventSummaryLabel(event) {
+    var summary = safeText(event && event.summary, 96);
+    return summary || "Güvenli olay kaydı";
+  }
+
+  function renderEventRow(event) {
+    var selected = ui.selectedEventId === event.eventId;
+    var onclick = "AeonV2.selectEvent('" + eventJsArg(event.eventId) + "')";
+    return '<button type="button" class="event-log-row' + (selected ? " is-selected" : "") + '" data-event-id="' + escapeHtml(event.eventId) +
+           '" aria-pressed="' + (selected ? "true" : "false") + '" onclick="' + escapeHtml(onclick) + '">' +
+           '<span class="event-log-row__time">' + escapeHtml(eventTimeLabel(event.occurredAt)) + "</span>" +
+           '<span class="event-log-row__icon">' + renderIcon(eventIcon(event.section), 18) + "</span>" +
+           '<span class="event-log-row__body"><span class="event-log-row__head"><strong>' + escapeHtml(eventSectionLabel(event.section)) +
+           '</strong><span class="event-log-operation">' + escapeHtml(eventOperationLabel(event.operation)) + "</span></span>" +
+           '<span class="event-log-row__summary">' + escapeHtml(eventSummaryLabel(event)) + "</span></span>" +
+           '<span class="event-log-row__revision">' + escapeHtml(eventRevisionLabel(event.snapshotRevision)) + "</span></button>";
+  }
+
+  function renderEventLog() {
+    var parsed = parsePanelEvents();
+    var allEvents = parsed.events || [];
+    var filtered = filteredPanelEvents(parsed);
+    var limit = [20, 50, 100].indexOf(ui.eventLimit) !== -1 ? ui.eventLimit : 20;
+    var pageCount = Math.max(1, Math.ceil(filtered.length / limit));
+    var page = Math.min(Math.max(1, ui.eventPage || 1), pageCount);
+    ui.eventPage = page;
+    var start = (page - 1) * limit;
+    var pageEvents = filtered.slice(start, start + limit);
+    var selected = allEvents.filter(function(event) { return event.eventId === ui.selectedEventId; })[0] || null;
+    var list = pageEvents.length
+      ? '<div class="event-log-list" role="list" aria-label="Olay kayıtları">' + pageEvents.map(renderEventRow).join("") + "</div>"
+      : AeEmpty({ icon: "note", title: allEvents.length ? "Filtre sonucu yok" : "Henüz olay yok", message: allEvents.length ? "Seçtiğin filtrelere uyan güvenli olay bulunamadı." : "Manifest event log alanı henüz bir kayıt taşımıyor." });
+    var pagination = '<div class="event-log-pagination" aria-label="Olay sayfalama">' +
+      eventPageButton(renderIcon("arrowLeft", 16) + " Önceki", page - 1, page <= 1, "Önceki olay sayfası") +
+      '<span class="event-log-pagination__info">Sayfa ' + page + " / " + pageCount + "</span>" +
+      eventPageButton("Sonraki " + renderIcon("arrowRight", 16), page + 1, page >= pageCount, "Sonraki olay sayfası") +
+      '<div class="event-log-limit" aria-label="Sayfa boyutu">' + [20, 50, 100].map(function(value) {
+        return AeButton({ label: String(value), variant: "pill", className: "event-log-limit__button" + (limit === value ? " is-active" : ""), onclick: "AeonV2.setEventLimit(" + value + ")", ariaLabel: value + " olay göster" });
+      }).join("") + "</div></div>";
+    var sourceLabel = parsed.ok ? "PanelCoverageV1 normalize/parse" : "Event adapter bekleniyor";
+    return '<div class="event-log-detail ae-slide-up ae-stagger">' +
+           AeCard({ variant: "glass", className: "event-log-card", children:
+             '<div class="system-card__head"><div><div class="ae-label">Gözlemlenebilir değişiklikler</div><h2 class="system-card__title event-log-title">Olay Günlüğü</h2><div class="event-log-source">' + escapeHtml(sourceLabel) + "</div></div>" +
+             AeStatusBadge({ status: parsed.ok ? (allEvents.length ? "accepted" : "idle") : "error", label: parsed.ok ? "Güvenli" : "Bekliyor" }) +
+             "</div>" + renderEventFilters(allEvents.length, filtered.length) + list + pagination
+           }) + renderEventDetail(selected) +
+           "</div>";
+  }
+
   function renderAuditDetail() {
     var proj = projectData(appData);
     var coverage = proj && proj.coverage ? proj.coverage : {};
@@ -3945,12 +4230,14 @@
     var subTab = ui.systemSubTab || "status";
     var tabs = [
       { id: "status", label: "Durum" },
+      { id: "events", label: "Olaylar" },
       { id: "audit", label: "Audit" },
       { id: "messages", label: "Mesajlar" },
       { id: "settings", label: "Ayarlar" }
     ];
     var contentBySubTab = {
       status: renderStatusDetail,
+      events: renderEventLog,
       audit: renderAuditDetail,
       messages: renderMessages,
       settings: renderSettings
@@ -4813,6 +5100,13 @@
     setHistoryFilter: setHistoryFilter,
     setArchiveSubTab: setArchiveSubTab,
     setSystemSubTab: setSystemSubTab,
+    setEventFilter: setEventFilter,
+    setEventLimit: setEventLimit,
+    setEventPage: setEventPage,
+    selectEvent: selectEvent,
+    clearEventFilters: clearEventFilters,
+    parsePanelEvents: parsePanelEvents,
+    renderEventLog: renderEventLog,
     setArchivePage: setArchivePage,
     setArchiveSearch: setArchiveSearch,
     setArchiveFilter: setArchiveFilter,

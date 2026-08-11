@@ -3198,6 +3198,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 @media (min-width: 768px) {
   .ae-grid--summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .today-view__secondary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .system-live-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ae-app__body { padding: var(--ae-space-lg) var(--ae-space-xl) var(--ae-space-xl); }
   .ae-topbar { padding: calc(env(safe-area-inset-top) + 12px) var(--ae-space-xl) 12px; }
 }

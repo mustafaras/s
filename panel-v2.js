@@ -48,6 +48,18 @@
     apiLimitRemaining: null,
     apiLimitTotal: null,
     apiLimitResetAt: null,
+    apiRateLimitRemaining: null,
+    apiRateLimitReset: null,
+    p50LatencyMs: null,
+    p95LatencyMs: null,
+    lastFetchDurationMs: null,
+    totalFetchCount: 0,
+    errorCount: 0,
+    consecutiveErrors: 0,
+    lastSuccessAt: null,
+    dataAgeMinutes: null,
+    pollingIntervalMs: 60000,
+    _latencyWindow: [],
     tokenExpiresAt: null,
     tokenIssuedAt: null
   };
@@ -69,6 +81,12 @@
     mode: "idle",
     distance: 0,
     refreshing: false
+  };
+  var pollingState = {
+    intervalId: null,
+    intervalMs: 60000,
+    isPaused: false,
+    lastRunAt: null
   };
   var PULL_REFRESH_THRESHOLD = 60;
   var PULL_REFRESH_MAX_DISTANCE = 112;
@@ -93,6 +111,57 @@
   function safeNumber(v) {
     var n = Number(v);
     return isFinite(n) ? n : null;
+  }
+
+  function updateLatencyTelemetry(durationMs) {
+    var duration = safeNumber(durationMs);
+    if (duration === null || duration < 0) return;
+    var window = Array.isArray(syncStatus._latencyWindow) ? syncStatus._latencyWindow.slice() : [];
+    window.push(Math.round(duration));
+    if (window.length > 20) window.shift();
+    syncStatus._latencyWindow = window;
+    var sorted = window.slice().sort(function(a, b) { return a - b; });
+    if (!sorted.length) {
+      syncStatus.p50LatencyMs = null;
+      syncStatus.p95LatencyMs = null;
+      return;
+    }
+    var percentile = function(p) {
+      return sorted[Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * p) - 1))];
+    };
+    syncStatus.p50LatencyMs = percentile(0.5);
+    syncStatus.p95LatencyMs = percentile(0.95);
+  }
+
+  function recordFetchTelemetry(durationMs, success) {
+    var duration = safeNumber(durationMs);
+    syncStatus.lastFetchDurationMs = duration === null ? null : Math.max(0, Math.round(duration));
+    syncStatus.totalFetchCount = Math.max(0, Number(syncStatus.totalFetchCount) || 0) + 1;
+    if (duration !== null) updateLatencyTelemetry(duration);
+    if (success) {
+      syncStatus.consecutiveErrors = 0;
+      syncStatus.lastSuccessAt = new Date().toISOString();
+    } else {
+      syncStatus.errorCount = Math.max(0, Number(syncStatus.errorCount) || 0) + 1;
+      syncStatus.consecutiveErrors = Math.max(0, Number(syncStatus.consecutiveErrors) || 0) + 1;
+    }
+  }
+
+  function dataAgeMinutes(ts, nowMs) {
+    if (!ts) return null;
+    var thenMs = new Date(ts).getTime();
+    if (!isFinite(thenMs)) return null;
+    var now = safeNumber(nowMs);
+    if (now === null) now = Date.now();
+    return Math.max(0, Math.floor((now - thenMs) / 60000));
+  }
+
+  function dataFreshnessLabel(ts) {
+    var age = dataAgeMinutes(ts);
+    syncStatus.dataAgeMinutes = age;
+    if (age === null) return "Henüz senkron yok";
+    if (age < 1) return "Az önce";
+    return age + " dk önce";
   }
 
   function numberOrNull(v) {
@@ -3595,9 +3664,47 @@
 
   function setPanelToken(token) {
     ui.panelToken = normalizeToken(token);
-    if (ui.panelToken) setLocalToken(ui.panelToken);
+    if (ui.panelToken) {
+      setLocalToken(ui.panelToken);
+      startPolling();
+    } else {
+      removeLocalToken();
+      stopPolling();
+    }
     render();
     return true;
+  }
+
+  function startPolling() {
+    if (!ui.panelToken || pollingState.intervalId !== null || typeof root.setInterval !== "function") return false;
+    pollingState.intervalMs = 60000;
+    syncStatus.pollingIntervalMs = pollingState.intervalMs;
+    pollingState.intervalId = root.setInterval(function() {
+      if (pollingState.isPaused || !ui.panelToken) return;
+      var doc = root.document;
+      if (doc && doc.visibilityState === "hidden") return;
+      pollingState.lastRunAt = new Date().toISOString();
+      load();
+    }, pollingState.intervalMs);
+    return true;
+  }
+
+  function stopPolling() {
+    if (pollingState.intervalId !== null && typeof root.clearInterval === "function") {
+      root.clearInterval(pollingState.intervalId);
+    }
+    pollingState.intervalId = null;
+    pollingState.lastRunAt = null;
+    return true;
+  }
+
+  function getPollingState() {
+    return {
+      intervalId: pollingState.intervalId,
+      intervalMs: pollingState.intervalMs,
+      isPaused: pollingState.isPaused,
+      lastRunAt: pollingState.lastRunAt
+    };
   }
 
   function formatTs(ts) {
@@ -3670,22 +3777,32 @@
   function renderStatusDetail() {
     var s = syncStatus || {};
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
-    var apiRemaining = firstStatusNumber(s, ["apiLimitRemaining", "rateLimitRemaining", "limitRemaining"]);
+    var apiRemaining = firstStatusNumber(s, ["apiRateLimitRemaining", "apiLimitRemaining", "rateLimitRemaining", "limitRemaining"]);
     var apiTotal = firstStatusNumber(s, ["apiLimitTotal", "rateLimitLimit", "limitTotal"]);
     var apiPct = apiRemaining !== null && apiTotal > 0 ? (apiRemaining / apiTotal) * 100 : null;
+    var freshness = dataFreshnessLabel(s.lastSyncedAt);
+    var pollingActive = pollingState.intervalId !== null && !!ui.panelToken;
+    var pollingLabel = pollingActive ? Math.round((s.pollingIntervalMs || 60000) / 1000) + " sn aktif" : "Kapalı";
     var apiDetail = apiRemaining !== null
       ? apiRemaining + (apiTotal !== null ? " / " + apiTotal + " istek" : " istek kaldı")
       : "GitHub yanıtından limit bilgisi bekleniyor.";
-    if (s.apiLimitResetAt) apiDetail += " · Sıfırlanma: " + formatTs(s.apiLimitResetAt);
+    if (s.apiRateLimitReset || s.apiLimitResetAt) apiDetail += " · Sıfırlanma: " + formatTs(s.apiRateLimitReset || s.apiLimitResetAt);
     var tokenInfo = tokenLifetimeInfo(s);
     var rows = [
       { label: "Durum", value: s.status || "idle" },
       { label: "Son senkron", value: s.lastSyncedAt ? formatTs(s.lastSyncedAt) : "—" },
+      { label: "Veri tazeliği", value: freshness },
+      { label: "Son başarılı", value: s.lastSuccessAt ? formatTs(s.lastSuccessAt) : "—" },
       { label: "Gün sayısı", value: dayCount },
       { label: "Revision", value: s.snapshotRevision || "—" },
       { label: "ETag", value: s.etag || "—" },
-      { label: "p50 gecikme", value: s.p50LatencyMs ? s.p50LatencyMs + " ms" : "—" },
-      { label: "p95 gecikme", value: s.p95LatencyMs ? s.p95LatencyMs + " ms" : "—" },
+      { label: "p50 gecikme", value: s.p50LatencyMs !== null && s.p50LatencyMs !== undefined ? s.p50LatencyMs + " ms" : "—" },
+      { label: "p95 gecikme", value: s.p95LatencyMs !== null && s.p95LatencyMs !== undefined ? s.p95LatencyMs + " ms" : "—" },
+      { label: "Son istek", value: s.lastFetchDurationMs !== null && s.lastFetchDurationMs !== undefined ? s.lastFetchDurationMs + " ms" : "—" },
+      { label: "Toplam istek", value: s.totalFetchCount !== undefined ? s.totalFetchCount : "—" },
+      { label: "Hata sayısı", value: s.errorCount !== undefined ? s.errorCount : "—" },
+      { label: "Ardışık hata", value: s.consecutiveErrors !== undefined ? s.consecutiveErrors : "—" },
+      { label: "Polling", value: pollingLabel },
       { label: "304 sayısı", value: s.notModifiedCount !== undefined ? s.notModifiedCount : "—" }
     ];
     var body = rows.map(function(r) {
@@ -3694,8 +3811,11 @@
     }).join("");
     var liveMetrics = '<div class="system-live-metrics ae-stagger" aria-label="Canlı sistem metrikleri">' +
       renderSystemLiveMetric("Durum", s.status || "idle", s.status === "error" ? "drop" : "ok") +
-      renderSystemLiveMetric("p50 gecikme", s.p50LatencyMs ? s.p50LatencyMs + " ms" : "—", "info") +
-      renderSystemLiveMetric("p95 gecikme", s.p95LatencyMs ? s.p95LatencyMs + " ms" : "—", "info") +
+      renderSystemLiveMetric("p50 gecikme", s.p50LatencyMs !== null && s.p50LatencyMs !== undefined ? s.p50LatencyMs + " ms" : "—", "info") +
+      renderSystemLiveMetric("p95 gecikme", s.p95LatencyMs !== null && s.p95LatencyMs !== undefined ? s.p95LatencyMs + " ms" : "—", "info") +
+      renderSystemLiveMetric("Tazelik", freshness, freshness === "Henüz senkron yok" ? "muted" : "ok") +
+      renderSystemLiveMetric("Polling", pollingLabel, pollingActive ? "ok" : "muted") +
+      renderSystemLiveMetric("İstek / hata", (s.totalFetchCount || 0) + " / " + (s.errorCount || 0), s.errorCount ? "warn" : "accent") +
       renderSystemLiveMetric("304 yanıt", s.notModifiedCount !== undefined ? s.notModifiedCount : "—", "accent") +
       "</div>";
     var progress = '<div class="system-progress-list" aria-label="Sistem kaynak ilerlemeleri">' +
@@ -3731,7 +3851,7 @@
       { icon: "note", label: "Summary alan", value: summary, meta: "Özetlenmiş alanlar güvenli projeksiyona açık" },
       { icon: "archive", label: "Full alan", value: full, meta: "Tam görünürlükteki izinli alanlar" },
       { icon: "arrowRight", label: "Provenance", value: "observer-snapshot", meta: "Veri kaynağı ve redaksiyon izi" },
-      { icon: "refresh", label: "Polling", value: syncStatus.etag ? "ETag aktif" : "Bekliyor", meta: syncStatus.lastSyncedAt ? "Son kontrol: " + formatTs(syncStatus.lastSyncedAt) : "Henüz canlı kontrol yapılmadı" },
+      { icon: "refresh", label: "Polling", value: pollingState.intervalId !== null ? Math.round((syncStatus.pollingIntervalMs || 60000) / 1000) + " sn aktif" : "Kapalı", meta: syncStatus.lastSyncedAt ? "Son kontrol: " + dataFreshnessLabel(syncStatus.lastSyncedAt) : "Henüz canlı kontrol yapılmadı" },
       { icon: "messages", label: "Son log", value: Array.isArray(coverage.unmappedPaths) && coverage.unmappedPaths.length ? coverage.unmappedPaths.slice(0, 3).join(", ") : "—", meta: "Kapsam dışı yol denetimi" }
     ];
     var timeline = '<ol class="audit-timeline" aria-label="Audit zaman çizelgesi">' + events.map(function(event) {
@@ -4488,7 +4608,21 @@
       "X-GitHub-Api-Version": "2022-11-28"
     };
     if (syncStatus.etag) H["If-None-Match"] = syncStatus.etag;
-    return root.fetch(api, { headers: H, cache: "no-store" }).then(function(r) {
+    var requestStartedAt = Date.now();
+    var telemetryRecorded = false;
+    function finishFetch(success) {
+      if (telemetryRecorded) return;
+      telemetryRecorded = true;
+      recordFetchTelemetry(Date.now() - requestStartedAt, success);
+    }
+    var request;
+    try {
+      request = root.fetch(api, { headers: H, cache: "no-store" });
+    } catch (e) {
+      finishFetch(false);
+      return Promise.reject(e);
+    }
+    return request.then(function(r) {
       var etag = responseHeader(r, "ETag");
       var rateRemainingHeader = responseHeader(r, "X-RateLimit-Remaining");
       var rateLimitHeader = responseHeader(r, "X-RateLimit-Limit");
@@ -4496,24 +4630,39 @@
       var rateRemaining = rateRemainingHeader === "" ? null : safeNumber(rateRemainingHeader);
       var rateLimit = rateLimitHeader === "" ? null : safeNumber(rateLimitHeader);
       var rateReset = rateResetHeader === "" ? null : safeNumber(rateResetHeader);
-      if (rateRemaining !== null) syncStatus.apiLimitRemaining = rateRemaining;
+      if (rateRemaining !== null) {
+        syncStatus.apiLimitRemaining = rateRemaining;
+        syncStatus.apiRateLimitRemaining = rateRemaining;
+      }
       if (rateLimit !== null) syncStatus.apiLimitTotal = rateLimit;
-      if (rateReset !== null) syncStatus.apiLimitResetAt = new Date(rateReset * 1000).toISOString();
-      if (r.status === 401 || r.status === 403) throw new Error("Token gecersiz veya yetkisiz.");
+      if (rateReset !== null) {
+        syncStatus.apiLimitResetAt = new Date(rateReset * 1000).toISOString();
+        syncStatus.apiRateLimitReset = syncStatus.apiLimitResetAt;
+      }
+      if (r.status === 401 || r.status === 403) {
+        finishFetch(false);
+        throw new Error("Token gecersiz veya yetkisiz.");
+      }
       if (r.status === 404) {
+        finishFetch(false);
         var e = new Error("data/latest.json bulunamadi.");
         e.notFound = true;
         throw e;
       }
       if (r.status === 304) {
+        finishFetch(true);
         syncStatus.status = "accepted";
         syncStatus.lastSyncedAt = new Date().toISOString();
         syncStatus.notModifiedCount = (syncStatus.notModifiedCount || 0) + 1;
         render();
         return { notModified: true, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }
-      if (!r.ok) throw new Error("Sunucu hatasi: " + r.status);
+      if (!r.ok) {
+        finishFetch(false);
+        throw new Error("Sunucu hatasi: " + r.status);
+      }
       return r.json().then(function(data) {
+        finishFetch(true);
         syncStatus.etag = etag;
         syncStatus.snapshotRevision = (data && data.syncReceipt && data.syncReceipt.snapshotRevision) || null;
         syncStatus.sourceUpdatedAt = (data && data.syncReceipt && data.syncReceipt.sourceUpdatedAt) || null;
@@ -4523,7 +4672,13 @@
         appData = unwrapPanelData(data);
         render();
         return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
+      }, function(error) {
+        finishFetch(false);
+        throw error;
       });
+    }, function(error) {
+      finishFetch(false);
+      throw error;
     });
   }
 
@@ -4531,11 +4686,13 @@
     if (isFetching) return Promise.resolve(null);
     ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     if (!ui.panelToken) {
+      stopPolling();
       syncStatus.status = "idle";
       syncStatus.lastErrorCode = "no_token";
       render();
       return Promise.resolve(null);
     }
+    startPolling();
     isFetching = true;
     syncStatus.status = "saving";
     syncStatus.lastErrorCode = null;
@@ -4591,6 +4748,7 @@
   }
 
   function logout() {
+    stopPolling();
     removeLocalToken();
     ui.panelToken = "";
     syncStatus.status = "idle";
@@ -4599,6 +4757,20 @@
     syncStatus.snapshotRevision = null;
     syncStatus.sourceUpdatedAt = null;
     syncStatus.lastSyncedAt = null;
+    syncStatus.apiLimitRemaining = null;
+    syncStatus.apiLimitTotal = null;
+    syncStatus.apiLimitResetAt = null;
+    syncStatus.apiRateLimitRemaining = null;
+    syncStatus.apiRateLimitReset = null;
+    syncStatus.p50LatencyMs = null;
+    syncStatus.p95LatencyMs = null;
+    syncStatus.lastFetchDurationMs = null;
+    syncStatus.totalFetchCount = 0;
+    syncStatus.errorCount = 0;
+    syncStatus.consecutiveErrors = 0;
+    syncStatus.lastSuccessAt = null;
+    syncStatus.dataAgeMinutes = null;
+    syncStatus._latencyWindow = [];
     appData = null;
     ui.tab = "today";
     ui.subTab = null;
@@ -4606,7 +4778,9 @@
   }
 
   function updateStatus(s) {
-    if (s && typeof s === "object") syncStatus = s;
+    if (s && typeof s === "object") {
+      Object.keys(s).forEach(function(key) { syncStatus[key] = s[key]; });
+    }
     render();
   }
 
@@ -4615,7 +4789,12 @@
     if (rootEl && ui.theme) rootEl.setAttribute("data-theme", ui.theme);
     ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     render();
-    if (ui.panelToken) load();
+    if (ui.panelToken) {
+      startPolling();
+      load();
+    } else {
+      stopPolling();
+    }
   }
 
   root.AeonV2 = {
@@ -4646,6 +4825,12 @@
     load: load,
     fetchLatest: fetchLatest,
     refresh: refresh,
+    startPolling: startPolling,
+    stopPolling: stopPolling,
+    getPollingState: getPollingState,
+    updateLatencyTelemetry: updateLatencyTelemetry,
+    dataAgeMinutes: dataAgeMinutes,
+    dataFreshnessLabel: dataFreshnessLabel,
     logout: logout,
     updateStatus: updateStatus,
     showToast: showToast,

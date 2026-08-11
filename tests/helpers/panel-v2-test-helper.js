@@ -77,6 +77,7 @@ function boot(opts) {
   const dom = createDom(opts.theme, opts.density);
   global.document = dom;
   const pendingTimers = [];
+  const intervals = [];
 
   const ctx = {
     window: {},
@@ -93,9 +94,15 @@ function boot(opts) {
       return 0;
     },
     setImmediate: function(cb) { if (typeof cb === "function") cb(); return 0; },
-    setInterval: function() { return 0; },
+    setInterval: function(cb, ms) {
+      var entry = { id: intervals.length + 1, callback: cb, ms: ms, active: true };
+      intervals.push(entry);
+      return entry.id;
+    },
     clearTimeout: function() {},
-    clearInterval: function() {}
+    clearInterval: function(id) {
+      intervals.forEach(function(entry) { if (entry.id === id) entry.active = false; });
+    }
   };
   ctx.window = ctx;
 
@@ -125,6 +132,16 @@ function boot(opts) {
       pendingTimers.length = 0;
       cbs.forEach(function(cb) { try { cb(); } catch (e) {} });
       return cbs.length;
+    },
+    runIntervals: function() {
+      var active = intervals.filter(function(entry) { return entry.active; }).slice();
+      active.forEach(function(entry) { if (typeof entry.callback === "function") entry.callback(); });
+      return active.length;
+    },
+    intervalInfo: function() {
+      return intervals.map(function(entry) {
+        return { id: entry.id, ms: entry.ms, active: entry.active };
+      });
     },
     flushPromises: async function() {
       await new Promise(function(resolve) { setImmediate(resolve); });

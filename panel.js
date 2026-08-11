@@ -458,7 +458,7 @@ function hijriPanelCardP(){
 // disiplini burada da aynen uygulanır). replyToken/ghToken hiçbir zaman
 // DOM'a yazılmaz — outbox kaydı yeniden kuyruklanırken bile içeriği
 // olduğu gibi (parse edilmiş haliyle) taşınır, ekrana asla basılmaz.
-var QDELIVERY=null;
+var QDELIVERY=null, QRESPONSES=null, QTRANSPORT={delivery:'idle',responses:'idle',errors:[]};
 var QURAN_BUCKET_P={
   idle:'unrequested',
   submitting:'waiting',queued:'waiting',notified:'waiting',awaiting_reply:'waiting',validating_reply:'waiting',
@@ -507,7 +507,10 @@ function loadTransportFileP(path){
   return fetch(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"})
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(cache,r.status,etag);
-      if(decision.kind==='not_modified') return {raw:cache.raw||null,sha:cache.sha||null,etag:decision.etag,notModified:true};
+      if(decision.kind==='not_modified'){
+        if(!cache.raw) throw new Error("transport 304 cache miss");
+        return {raw:cache.raw,sha:cache.sha||null,etag:decision.etag,notModified:true};
+      }
       if(r.status===404){ PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:null,sha:null}; return {raw:null,sha:null,etag:etag}; }
       if(!r.ok) throw new Error("transport "+r.status);
       return r.json().then(function(g){ var raw=(g&&typeof g.content==="string")?b64dec(g.content):null, sha=(g&&g.sha)||null; PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:raw,sha:sha}; return {raw:raw,sha:sha,etag:etag}; });
@@ -575,9 +578,21 @@ function putTransportFileP(path,value,sha){
 // geldiği için bu, panelin geri kalanını hiç etkilemez.
 function loadDeliveryP(){
   var T=window.QuranTransportV1; if(!T) return Promise.resolve();
+  QTRANSPORT.delivery='checking';
   return loadTransportFileP(T.PATHS.delivery).then(function(cur){
-    QDELIVERY=T.parseDelivery(cur.raw).value;
-  }).catch(function(){});
+    var parsed=T.parseDelivery(cur.raw); QDELIVERY=parsed.value;
+    QTRANSPORT.delivery=parsed.errors.length?'error':'ready';
+    if(parsed.errors.length) QTRANSPORT.errors=QTRANSPORT.errors.concat(parsed.errors.map(function(e){return 'delivery:'+e;}));
+  }).catch(function(e){ QTRANSPORT.delivery='error'; QTRANSPORT.errors.push('delivery:network'); });
+}
+function loadResponsesP(){
+  var T=window.QuranTransportV1; if(!T) return Promise.resolve();
+  QTRANSPORT.responses='checking';
+  return loadTransportFileP(T.PATHS.responses).then(function(cur){
+    var parsed=T.parseResponses(cur.raw); QRESPONSES=parsed.value;
+    QTRANSPORT.responses=parsed.errors.length?'error':'ready';
+    if(parsed.errors.length) QTRANSPORT.errors=QTRANSPORT.errors.concat(parsed.errors.map(function(e){return 'responses:'+e;}));
+  }).catch(function(e){ QTRANSPORT.responses='error'; QTRANSPORT.errors.push('responses:network'); });
 }
 function quranDeliveryErrorsP(){
   var q=quranJourneyRootP(); if(!q) return [];
@@ -588,6 +603,16 @@ function quranDeliveryErrorsP(){
     if(rec&&rec.status==='failed') out.push({surahId:sid,error:rec.error||'bilinmeyen hata'});
   });
   return out;
+}
+function quranTransportNoticeP(){
+  var q=quranJourneyRootP(), rs=QRESPONSES&&QRESPONSES.responses||{}, pending=[];
+  if(q&&q.requests) Object.keys(q.requests).forEach(function(sid){
+    var req=q.requests[sid], remote=req&&req.requestId?rs[req.requestId]:null;
+    if(remote&&remote.status==='ready'&&req.status!=='ready'&&req.status!=='watching'&&req.status!=='watched'&&req.status!=='question_opened') pending.push(req.requestId);
+  });
+  if(QTRANSPORT.errors.length) return 'Transport kaynağı doğrulanamadı; son kanonik uygulama korunuyor.';
+  if(pending.length) return 'Uzak cevap hazır; kullanıcı uygulamasının pull/save adımı bekleniyor ('+pending.length+' istek).';
+  return '';
 }
 
 // ── tekrar bildirim: aynı outbox kaydını değiştirmeden yeniden PUT'lar —
@@ -713,6 +738,10 @@ function quranJourneyPanelCardHTML(){
   sum+='<div style="font-size:var(--f1);color:var(--t3);margin-top:8px;text-align:right;font-weight:700;">'+total+' sûre · '+deliveredRows.length+' kullanıcıya gönderilen video · '+noteTotal+' not · son etkinlik '+(lastActivity?esc(timeAgo(lastActivity)):'—')+'</div>';
 
   var det='';
+  var transportNotice=quranTransportNoticeP();
+  if(transportNotice){
+    det+='<div style="background:var(--ra);border:1px solid var(--rb);border-radius:12px;padding:10px 12px;margin-bottom:11px;color:var(--t1);font-size:var(--f2);line-height:1.45;">'+icon('info',14)+' '+esc(transportNotice)+'</div>';
+  }
   var errs=QD.errs;
   if(errs.length){
     det+='<div style="background:var(--ra);border:1px solid var(--rb);border-radius:12px;padding:10px 12px;margin-bottom:11px;">';
@@ -737,7 +766,10 @@ function quranJourneyPanelCardHTML(){
       det+='<div style="background:linear-gradient(135deg,var(--quranp-bg),var(--s2));border:1px solid rgba(91,135,196,.28);border-radius:12px;padding:11px 12px;">';
       det+='<div style="display:flex;align-items:flex-start;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-size:var(--f3);font-weight:800;color:var(--t1);">'+esc(r.x.nameAr)+' · '+esc(r.x.nameTr)+'</div><div style="font-size:var(--f1);color:var(--t4);">'+r.x.revelationOrder+'. durak · '+esc(r.req.videoId)+'</div></div><span class="'+quranBadgeClassP(rs.tone)+'" data-component="status-badge">'+esc(rs.label)+'</span></div>';
       det+='<div style="display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:8px;font-size:var(--f1);color:var(--t3);">';
-      det+='<span>Hazır: '+esc(tsShort(r.req.readyAt)||'—')+'</span><span>İzleme: '+esc(tsShort(r.req.startedWatchingAt)||'—')+'</span><span>Tamam: '+esc(tsShort(r.req.watchedAt)||'—')+'</span><span style="color:var(--quranp2);font-weight:800;">'+r.notes.length+' not</span></div>';
+      det+='<span>İstek: <code>'+esc(r.req.requestId||'—')+'</code></span><span>Yanıt: <code>'+esc(r.req.responseId||'—')+'</code></span><span>Teslim: '+esc(tsShort(r.req.deliverySentAt||r.req.notifiedAt)||'—')+'</span><span>Hazır: '+esc(tsShort(r.req.readyAt)||'—')+'</span><span>İzleme: '+esc(tsShort(r.req.startedWatchingAt)||'—')+'</span><span>Tamam: '+esc(tsShort(r.req.watchedAt)||'—')+'</span><span style="color:var(--quranp2);font-weight:800;">'+r.notes.length+' not</span></div>';
+      if(r.req.responseSource||r.req.responseReceivedAt||r.req.responseValidatedAt){
+        det+='<div style="display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:5px;font-size:var(--f1);color:var(--t3);"><span>Provenance: '+esc(r.req.responseSource||'isimsiz kaynak')+'</span><span>Alındı: '+esc(tsShort(r.req.responseReceivedAt)||'—')+'</span><span>Doğrulandı: '+esc(tsShort(r.req.responseValidatedAt)||'—')+'</span></div>';
+      }
       det+='<div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><a href="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(r.req.videoId)+'" target="_blank" rel="noopener noreferrer" style="font-size:var(--f2);color:var(--quranp2);font-weight:800;text-decoration:none;">'+icon('external-link',12)+' Videoyu aç</a>'+(last?'<span style="font-size:var(--f1);color:var(--t3);">Son not: '+esc(quranNoteKindP(last.kind))+(last.timestampSec!==null&&last.timestampSec!==undefined?' · '+esc(quranNoteTimeP(last.timestampSec)):'')+'</span>':'<span style="font-size:var(--f1);color:var(--t4);">Not bekleniyor</span>')+'</div>';
       if(r.notes.length){
         det+='<div style="margin-top:8px;border-top:1px solid var(--bd2);padding-top:7px;display:flex;flex-direction:column;gap:5px;">';
@@ -5071,14 +5103,15 @@ function load(){
       var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       setPanelLocationContextP(latestLegacy);
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
+      QTRANSPORT={delivery:'idle',responses:'idle',errors:[]};
       var previousEventRows=EVENT_LOG_STATE&&Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], hadPreviousSnapshot=!!D;
-      Promise.all([loadInbox(), loadDeliveryP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
+      Promise.all([loadInbox(), loadDeliveryP(), loadResponsesP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
-        var incomingEventState=res[4]||buildEventLogStateP(latestLegacy,[]), newEventCount=countNewEventChangesP(previousEventRows,incomingEventState.events);
+        var incomingEventState=res[5]||buildEventLogStateP(latestLegacy,[]), newEventCount=countNewEventChangesP(previousEventRows,incomingEventState.events);
         EVENT_LOG_STATE=incomingEventState;
-        SYNC_RECEIPT=res[2]||null;
-        var P=window.PanelCoverageV1, projection=res[3]&&res[3].snapshot||null;
+        SYNC_RECEIPT=res[3]||null;
+        var P=window.PanelCoverageV1, projection=res[4]&&res[4].snapshot||null;
         if(P&&typeof P.chooseProjection==='function'){
           var chosen=P.chooseProjection(projection,latestLegacy,SYNC_RECEIPT);
           if(chosen&&chosen.reason==='projection_missing'&&res[3]&&res[3].reason&&res[3].reason!=='projection_missing') chosen.reason=res[3].reason;
@@ -5129,7 +5162,7 @@ function load(){
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
 var LASTSIG=null;
-function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(PROJECTION)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
+function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(PROJECTION)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(QRESPONSES)+"\u0001"+JSON.stringify(QTRANSPORT)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
 window.load=load;
 try{
   if(!DEMO_MODE){

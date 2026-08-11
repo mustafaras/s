@@ -1021,6 +1021,48 @@
     return isObject(appData) && isObject(appData.quranJourney) ? appData.quranJourney : null;
   }
 
+  var QURAN_STATUS_V2={
+    idle:{label:"İstenebilir",tone:"muted"},submitting:{label:"İletiliyor",tone:"wait"},queued:{label:"İstek kaydedildi",tone:"wait"},
+    notified:{label:"Raşit’e haber verildi",tone:"wait"},awaiting_reply:{label:"Cevap bekleniyor",tone:"wait"},validating_reply:{label:"Cevap doğrulanıyor",tone:"wait"},
+    ready:{label:"Anlatım hazır",tone:"ready"},watching:{label:"İzleniyor",tone:"ready"},watched:{label:"İzlendi",tone:"done"},question_opened:{label:"Soru açıldı",tone:"done"},
+    request_error:{label:"İletilemedi",tone:"error"},notification_error:{label:"Bildirilemedi",tone:"error"},invalid_reply:{label:"Bağlantı doğrulanamadı",tone:"error"},video_unavailable:{label:"Anlatım erişilemiyor",tone:"error"}
+  };
+  function quranJourneyV2Rows(){
+    var q=getRootQuranJourney(), reqs=q&&q.requests&&typeof q.requests==='object'?q.requests:{};
+    var catalog=root.QuranRevelationOrderV1, rows=[];
+    Object.keys(reqs).forEach(function(surahId){
+      var req=reqs[surahId]; if(!isObject(req)) return;
+      var surah=catalog&&typeof catalog.byId==='function'?catalog.byId(surahId):null;
+      rows.push({surahId:surahId,req:req,name:surah&&surah.nameTr?surah.nameTr:surahId,order:surah&&surah.revelationOrder?surah.revelationOrder:null});
+    });
+    rows.sort(function(a,b){ return String((b.req&&b.req.updatedAt)||'').localeCompare(String((a.req&&a.req.updatedAt)||'')); });
+    return rows;
+  }
+  function renderQuranJourneyV2(){
+    var q=getRootQuranJourney(), rows=quranJourneyV2Rows();
+    if(!q||!rows.length) return AeCard({className:'ae-quran-card',children:AeEmpty({icon:'book',title:'Kur’an Yolculuğu',message:'Henüz senkronize edilmiş bir Kur’an isteği yok.'})});
+    var counts={requested:0,waiting:0,ready:0,watched:0};
+    rows.forEach(function(row){
+      var s=String(row.req.status||'idle'); if(s!=='idle') counts.requested++;
+      if(['submitting','queued','notified','awaiting_reply','validating_reply','request_error','notification_error','invalid_reply','video_unavailable'].indexOf(s)>=0) counts.waiting++;
+      if(['ready','watching'].indexOf(s)>=0) counts.ready++;
+      if(['watched','question_opened'].indexOf(s)>=0) counts.watched++;
+    });
+    var active=rows[0], meta=QURAN_STATUS_V2[active.req.status]||QURAN_STATUS_V2.idle;
+    var detail='<div class="ae-quran-card__head"><div><div class="ae-label">KUR’AN YOLCULUĞU · KANONİK DURUM</div><h2>Raşit’in anlatım akışı</h2><p>Panel 1 ile aynı <code>data.quranJourney</code> kaynağı; yalnızca senkronize edilmiş özet gösterilir.</p></div><span class="ae-quran-card__status is-'+escapeHtml(meta.tone)+'">'+escapeHtml(meta.label)+'</span></div>';
+    detail+='<div class="ae-quran-card__metrics"><span><b>'+counts.requested+'</b><small>istenen</small></span><span><b>'+counts.waiting+'</b><small>bekleyen</small></span><span><b>'+counts.ready+'</b><small>hazır</small></span><span><b>'+counts.watched+'</b><small>izlendi</small></span></div>';
+    detail+='<div class="ae-quran-card__rows">';
+    rows.slice(0,5).forEach(function(row){
+      var req=row.req, st=QURAN_STATUS_V2[req.status]||QURAN_STATUS_V2.idle;
+      detail+='<article class="ae-quran-card__row"><div class="ae-quran-card__row-top"><strong>'+escapeHtml(row.name)+'</strong><span class="ae-quran-card__badge is-'+escapeHtml(st.tone)+'">'+escapeHtml(st.label)+'</span></div>';
+      detail+='<div class="ae-quran-card__row-meta"><span>requestId: <code>'+escapeHtml(req.requestId||'—')+'</code></span><span>responseId: <code>'+escapeHtml(req.responseId||'—')+'</code></span><span>video: '+escapeHtml(req.videoId||'—')+'</span></div>';
+      detail+='<div class="ae-quran-card__row-meta"><span>teslim: '+escapeHtml(formatTs(req.deliverySentAt||req.notifiedAt||''))+'</span><span>provenance: '+escapeHtml(req.responseSource||'state')+'</span><span>alındı: '+escapeHtml(formatTs(req.responseReceivedAt||''))+'</span><span>doğrulandı: '+escapeHtml(formatTs(req.responseValidatedAt||''))+'</span></div></article>';
+    });
+    detail+='</div>';
+    if(rows.length>5) detail+='<div class="ae-quran-card__foot">+'+(rows.length-5)+' istek daha · en güncel 5 kayıt gösteriliyor</div>';
+    return AeCard({className:'ae-quran-card',visualVariant:'gradient',children:detail});
+  }
+
   function getLocationInfo() {
     if (!isObject(appData)) return null;
     var loc = appData.location || null;
@@ -2511,7 +2553,8 @@
   function renderToday() {
     var date = todayStr();
     var dayCount = isObject(appData) && isObject(appData.days) ? Object.keys(appData.days).length : 0;
-    if (!dayCount) {
+    var quranCount = quranJourneyV2Rows().length;
+    if (!dayCount && !quranCount) {
       return '<div class="today-view ae-stagger">' +
              AeCard({
                children: AeEmpty({
@@ -2539,7 +2582,7 @@
              renderDatePicker() +
            '</div>' +
            '<section class="today-view__section today-view__section--hero" aria-label="Günün metrikleri">' +
-             renderHeroGrid(date) +
+             (dayCount ? renderHeroGrid(date) : AeCard({children:AeEmpty({icon:"dashboard",title:"Günün sinyalleri",message:"Henüz günlük kayıt yok; Kur’an Yolculuğu özeti aşağıda hazır."})})) +
            '</section>' +
            '<section class="today-view__section today-view__section--trend" aria-label="Son yedi günlük trendler">' +
              renderTrendStrip(date) +
@@ -2547,6 +2590,9 @@
            '<section class="today-view__secondary-grid ae-stagger" aria-label="Günün notları ve konum akışı">' +
              renderQuickNotes(date) +
              renderLocationTimeline(date) +
+           '</section>' +
+           '<section class="today-view__section" aria-label="Kur’an Yolculuğu">' +
+             renderQuranJourneyV2() +
            '</section>' +
            "</div>";
   }

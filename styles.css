@@ -775,6 +775,10 @@
 .quran-v2-header .copy small{font-size:11px;font-weight:700;color:var(--qj-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quran-v2-header .close{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--qj-muted);cursor:pointer}
 .quran-v2-header .refresh{appearance:none;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--qj-line);background:var(--qj-panel);color:var(--qj-muted);cursor:pointer}
+.quran-v2-remote-status{max-width:132px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 8px;border:1px solid var(--qj-line);border-radius:999px;background:var(--qj-panel);color:var(--qj-muted);font-size:9px;font-weight:850;text-align:center}
+.quran-v2-remote-status.is-checking{color:var(--quran-gold)}
+.quran-v2-remote-status.is-updated{color:var(--quran-ok);border-color:color-mix(in srgb,var(--quran-ok) 38%,var(--qj-line));background:color-mix(in srgb,var(--quran-ok) 10%,var(--quran-surface))}
+.quran-v2-remote-status.is-warning,.quran-v2-remote-status.is-error{color:var(--quran-warn);border-color:color-mix(in srgb,var(--quran-warn) 42%,var(--qj-line));background:color-mix(in srgb,var(--quran-warn) 10%,var(--quran-surface))}
 .quran-v2-header .refresh:disabled{opacity:.6;cursor:default}
 .quran-v2-header .refresh.is-spinning svg{animation:seyQuranSpin .9s linear infinite}
 @keyframes seyQuranSpin{to{transform:rotate(360deg)}}

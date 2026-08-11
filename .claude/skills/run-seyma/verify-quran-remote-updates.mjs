@@ -63,6 +63,7 @@ function makeLS(seed) {
   return { getItem(k) { return k in store ? store[k] : null; }, setItem(k, v) { store[k] = String(v); }, removeItem(k) { delete store[k]; }, clear() { for (const k in store) delete store[k]; }, _store: store };
 }
 function buildSandbox(seedState) {
+  const windowListeners = {};
   const sandbox = {
     console, localStorage: makeLS({ 'seyma-reset-v1': JSON.stringify(seedState) }), document: doc, __SEYMA_TEST_ZIKR__: true,
     navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
@@ -77,12 +78,13 @@ function buildSandbox(seedState) {
     Blob: function () {}, File: function () {}, FileReader: function () {},
     TextDecoder, TextEncoder, atob, btoa,
     alert() {}, confirm() { return true; }, prompt() { return null; },
-    addEventListener() {}, removeEventListener() {},
+    addEventListener(type, fn) { (windowListeners[type] ||= []).push(fn); }, removeEventListener() {},
     Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error,
     parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent,
     Promise, Set, Map, Symbol, Intl,
   };
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
+  sandbox.__dispatchWindow = function(type) { (windowListeners[type] || []).slice().forEach((fn) => fn({ type })); };
   sandbox.AudioContext = function () { return { state: 'running', currentTime: 0, resume() {}, createOscillator() { return { type: '', frequency: { value: 0 }, connect() {}, start() {}, stop() {} }; }, createGain() { return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }, destination: {} }; };
   return sandbox;
 }
@@ -110,7 +112,9 @@ function bootWithPull(requests, pullResult) {
   const ctx = vm.createContext(sandbox);
   for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(REPO, f), 'utf8'), ctx, { filename: f });
   if (typeof sandbox.App.start === 'function') sandbox.App.start();
-  sandbox.SeySync = { pullQuranUpdates(cb) { cb(null, pullResult); } };
+  let pullCalls = 0;
+  sandbox.SeySync = { pullQuranUpdates(cb) { pullCalls++; cb(null, pullResult); } };
+  sandbox.__pullCalls = () => pullCalls;
   return sandbox;
 }
 
@@ -132,12 +136,13 @@ console.log('\n1. Teslim alındı bilgisi (delivery.json)');
 // ── 2) response_received + response_valid: awaiting_reply → ready, sonra idempotent ──
 console.log('\n2. Geçerli yanıt (responses.json) + idempotent tekrar');
 {
-  const pull = { delivery: { requests: {} }, responses: { responses: { qr_2: { responseId: 'qrr_2', requestId: 'qr_2', surahId: 'alak', videoId: VID, status: 'ready' } } } };
+  const pull = { delivery: { requests: {} }, responses: { responses: { qr_2: { responseId: 'qrr_2', requestId: 'qr_2', surahId: 'alak', videoId: VID, source: 'gmail_reply', receivedAt: ISO(11), validatedAt: ISO(12), status: 'ready' } } } };
   const sb = bootWithPull({ alak: req('qr_2', 'awaiting_reply') }, pull);
   sb.App.refreshQuranUpdates(true);
   let j = journey(sb);
   ok('durum ready oluyor', j.requests.alak.status === 'ready', j.requests.alak.status);
   ok('videoId ve responseId doğru yazıldı', j.requests.alak.videoId === VID && j.requests.alak.responseId === 'qrr_2');
+  ok('response provenance ve uzak zaman damgaları korunuyor', j.requests.alak.responseSource === 'gmail_reply' && j.requests.alak.responseReceivedAt === ISO(11) && j.requests.alak.responseValidatedAt === ISO(12));
 
   sb.App.refreshQuranUpdates(true); // aynı yanıtı ikinci kez uygula
   j = journey(sb);
@@ -203,16 +208,27 @@ console.log('\n6. SeySync yokken güvenli davranış');
   ok('durum değişmeden kalır', journey(sandbox).requests.alak.status === 'queued');
 }
 
-// ── 7) Arka planda agresif polling yok: setInterval kullanılmıyor ──
+// ── 7) Foreground/focus/pageshow/online + bounded polling ──
 console.log('\n7. Statik denetim: agresif arka plan polling yok');
 {
   const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
   const syncSource = fs.readFileSync(path.join(REPO, 'sync.js'), 'utf8');
   const appIdx = appSource.indexOf('quranApplyRemoteUpdates');
   const syncIdx = syncSource.indexOf('pullQuranUpdates');
-  ok('app.js QY-11 bloğunda setInterval yok', appIdx >= 0 && !/setInterval/.test(appSource.slice(appIdx, appIdx + 4000)));
-  ok('sync.js pullQuranUpdates bloğunda setInterval yok', syncIdx >= 0 && !/setInterval/.test(syncSource.slice(syncIdx, syncIdx + 2000)));
-  ok('açılış tetiği yalnız openQuranJourney içinde tek noktadan çağrılır', (appSource.match(/App\.refreshQuranUpdates\(true\)/g) || []).length === 1);
+  ok('app.js QY-11 bloğunda sınırsız timer yok', appIdx >= 0 && !/setInterval/.test(appSource.slice(appIdx, appIdx + 4000)));
+  ok('sync.js pullQuranUpdates bloğunda timer yok', syncIdx >= 0 && !/setInterval/.test(syncSource.slice(syncIdx, syncIdx + 2500)));
+  ok('foreground polling bounded 25 saniye kapısı var', /quranLastForegroundPullAt/.test(appSource) && /<25000/.test(appSource));
+  ok('focus/pageshow/online tetiği Kur’an pull yoluna bağlı', /addEventListener\('focus'.*onAppForeground/s.test(appSource) && /addEventListener\('pageshow'.*onAppForeground/s.test(appSource) && /addEventListener\('online'.*maybePullQuranForeground/s.test(appSource));
+  const opened = bootWithPull({ alak: req('qr_open', 'awaiting_reply') }, { delivery: { requests: {} }, responses: { responses: { qr_open: { responseId: 'qrr_open', requestId: 'qr_open', surahId: 'alak', videoId: VID, source: 'gmail_reply', receivedAt: ISO(13), validatedAt: ISO(14), status: 'ready' } } } });
+  opened.App.openQuranJourney();
+  ok('Kur’an ekranı açılışı response pull/apply/save zincirini çalıştırıyor', opened.__pullCalls() === 1 && journey(opened).requests.alak.status === 'ready');
+  const sb = bootWithPull({ alak: req('qr_fg', 'awaiting_reply') }, { delivery: { requests: {} }, responses: { responses: { qr_fg: { responseId: 'qrr_fg', requestId: 'qr_fg', surahId: 'alak', videoId: VID, source: 'gmail_reply', receivedAt: ISO(13), validatedAt: ISO(14), status: 'ready' } } } });
+  sb.__dispatchWindow('focus');
+  ok('focus dönüşü response pull/apply/save zincirini çalıştırıyor', sb.__pullCalls() === 1 && journey(sb).requests.alak.status === 'ready');
+  sb.__dispatchWindow('pageshow');
+  ok('tekrar focus/pageshow duplicate response üretmiyor', sb.__pullCalls() === 2 && journey(sb).requests.alak.status === 'ready' && journey(sb).requests.alak.responseId === 'qrr_fg');
+  sb.__dispatchWindow('online');
+  ok('online dönüşü aynı response’u tekil ve görünür tutuyor', sb.__pullCalls() === 3 && journey(sb).requests.alak.status === 'ready' && journey(sb).requests.alak.responseId === 'qrr_fg');
 }
 
 console.log('\n' + (failed ? '⚠️ ' + failed + ' başarısız, ' : '✅ ') + passed + '/' + (passed + failed) + ' assertion pass');

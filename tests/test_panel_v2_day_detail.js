@@ -22,6 +22,22 @@ AeonV2.init();
 let html;
 
 const seededData = {
+  quranJourney: {
+    requests: {
+      muddessir: {
+        requestId: "qr_muddessir_20260810",
+        status: "ready",
+        videoId: "dQw4w9WgXcQ",
+        responseId: "qrr_muddessir_20260810",
+        responseSource: "gmail_reply",
+        deliverySentAt: "2026-08-10T18:00:00Z",
+        notifiedAt: "2026-08-10T18:00:00Z",
+        responseReceivedAt: "2026-08-10T18:30:00Z",
+        responseValidatedAt: "2026-08-10T18:31:00Z",
+        updatedAt: "2026-08-10T18:31:00Z"
+      }
+    }
+  },
   zikr: {
     presets: [
       { id: "esma_01", name: "Ya Fettah", kind: "esma", ebced: 489, target: 489 },
@@ -117,6 +133,10 @@ const seededData = {
 
 AeonV2.setDate("2026-08-04");
 AeonV2.setData(seededData);
+AeonV2.setTab("today");
+html = dom.html;
+assert(/Kur’an Yolculuğu|KUR’AN YOLCULUĞU/.test(html), "Panel v2 kanonik Kur'an kartını gösteriyor");
+assert(/qr_muddessir_20260810/.test(html) && /qrr_muddessir_20260810/.test(html) && /gmail_reply/.test(html), "Panel v2 aynı requestId/responseId ve response provenance bilgisini gösteriyor");
 
 // 1. Seçili gün değişince render değişiyor
 AeonV2.setTab("day");

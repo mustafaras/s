@@ -656,7 +656,7 @@ var QURAN_SURAH_ID_RE=/^[a-z]+(-[a-z]+)*$/;
 // izinli gönderici) QY-10'un işidir; buraya çöp videoId yazılmasın diye var.
 var QURAN_VIDEO_ID_RE=/^[A-Za-z0-9_-]{11}$/;
 var QURAN_STATUSES=['idle','submitting','queued','notified','awaiting_reply','validating_reply','ready','watching','watched','question_opened','request_error','notification_error','invalid_reply','video_unavailable'];
-var QURAN_REQUEST_STAMPS=['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt','updatedAt'];
+var QURAN_REQUEST_STAMPS=['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt','updatedAt','deliverySentAt','responseReceivedAt','responseValidatedAt'];
 // videoHistory sync'e giden kalıcı veridir; sınırsız büyümesin.
 var QURAN_HISTORY_MAX=20;
 // Kullanıcının video içinde tuttuğu kişisel çalışma notları. Notlar aynı
@@ -727,6 +727,10 @@ function normQuranRequest(r){
   r.responseId=quranNullableStr(r.responseId);
   r.videoId=QURAN_VIDEO_ID_RE.test(String(r.videoId||''))?String(r.videoId):null;
   QURAN_REQUEST_STAMPS.forEach(function(k){ r[k]=quranNullableStr(r[k]); });
+  r.providerMessageId=quranNullableStr(r.providerMessageId);
+  r.responseSource=['gmail_reply','panel_manual'].indexOf(r.responseSource)>=0?r.responseSource:null;
+  r.responseStatus=['ready','revoked','invalid'].indexOf(r.responseStatus)>=0?r.responseStatus:null;
+  r.deliveryProvenance=['delivery_receipt','response_inferred'].indexOf(r.deliveryProvenance)>=0?r.deliveryProvenance:null;
   if(QURAN_STATUSES.indexOf(r.status)<0) r.status=quranStatusFromStamps(r);
   // Değişen/kaldırılan videoların geçmişi (plan §6/§13: yanıt geçmişi kaybolmaz).
   if(!Array.isArray(r.videoHistory)) r.videoHistory=[];
@@ -788,7 +792,7 @@ var QURAN_TRANSITIONS={
 
 function quranStatusRank(s){ return (typeof s==='string'&&typeof QURAN_RANK[s]==='number')?QURAN_RANK[s]:-1; }
 function quranNewRequest(){
-  return {requestId:null,status:'idle',requestedAt:null,notifiedAt:null,responseId:null,videoId:null,readyAt:null,startedWatchingAt:null,watchedAt:null,questionOpenedAt:null,updatedAt:null,videoHistory:[],notes:[],lastNoteAt:null};
+  return {requestId:null,status:'idle',requestedAt:null,notifiedAt:null,deliverySentAt:null,providerMessageId:null,responseId:null,responseSource:null,responseReceivedAt:null,responseValidatedAt:null,responseStatus:null,videoId:null,readyAt:null,startedWatchingAt:null,watchedAt:null,questionOpenedAt:null,updatedAt:null,videoHistory:[],notes:[],lastNoteAt:null};
 }
 // UI sözleşmesi (QY-07): "Raşit'ten iste" yalnız bu true iken etkin olur.
 function quranCanRequest(r){
@@ -817,17 +821,40 @@ function quranApplyEvent(cur,ev,to,at){
       // Yeniden istek: eski anlatım geçmişe düşer, bu turun izleri sıfırlanır.
       quranArchiveVideo(n,at,'yeniden istendi');
       if(typeof ev.requestId==='string'&&ev.requestId) n.requestId=ev.requestId;
-      n.requestedAt=at; n.notifiedAt=null; n.startedWatchingAt=null;
+      n.requestedAt=at; n.notifiedAt=null; n.deliverySentAt=null; n.providerMessageId=null;
+      n.deliveryProvenance=null; n.responseSource=null; n.responseReceivedAt=null;
+      n.responseValidatedAt=null; n.responseStatus=null; n.startedWatchingAt=null;
       break;
-    case 'delivery_receipt': n.notifiedAt=at; break;
+    case 'delivery_receipt':
+      n.notifiedAt=at;
+      if(typeof ev.sentAt==='string'&&ev.sentAt) n.deliverySentAt=ev.sentAt;
+      if(typeof ev.providerMessageId==='string'&&ev.providerMessageId) n.providerMessageId=ev.providerMessageId;
+      n.deliveryProvenance=ev.inferred?'response_inferred':'delivery_receipt';
+      break;
     case 'response_valid':
       quranArchiveVideo(n,at,'yeni anlatım geldi');
       n.responseId=(typeof ev.responseId==='string'&&ev.responseId)?ev.responseId:null;
+      n.responseSource=(typeof ev.source==='string'&&ev.source)?ev.source:null;
+      n.responseReceivedAt=(typeof ev.receivedAt==='string'&&ev.receivedAt)?ev.receivedAt:null;
+      n.responseValidatedAt=(typeof ev.validatedAt==='string'&&ev.validatedAt)?ev.validatedAt:at;
+      n.responseStatus='ready';
       n.videoId=ev.videoId; n.readyAt=at;
       break;
     case 'watch_start': n.startedWatchingAt=at; break;
     case 'watch_complete': n.watchedAt=at; break;
     case 'question_open': n.questionOpenedAt=at; break;
+    case 'response_invalid':
+      n.responseSource=(typeof ev.source==='string'&&ev.source)?ev.source:n.responseSource||null;
+      n.responseReceivedAt=(typeof ev.receivedAt==='string'&&ev.receivedAt)?ev.receivedAt:n.responseReceivedAt||null;
+      n.responseValidatedAt=(typeof ev.validatedAt==='string'&&ev.validatedAt)?ev.validatedAt:n.responseValidatedAt||null;
+      n.responseStatus=ev.responseStatus==='revoked'?'revoked':'invalid';
+      break;
+    case 'video_gone':
+      n.responseSource=(typeof ev.source==='string'&&ev.source)?ev.source:n.responseSource||null;
+      n.responseReceivedAt=(typeof ev.receivedAt==='string'&&ev.receivedAt)?ev.receivedAt:n.responseReceivedAt||null;
+      n.responseValidatedAt=(typeof ev.validatedAt==='string'&&ev.validatedAt)?ev.validatedAt:n.responseValidatedAt||null;
+      if(ev.responseStatus==='revoked') n.responseStatus='revoked';
+      break;
     // video_gone: videoId bilerek KORUNUR — kullanıcıya hangi anlatımın
     // erişilemediğini söyleyebilmek ve yeniden istemek için gerekli.
   }
@@ -1650,7 +1677,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrRemovePresetId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
 // Yeniden açılışta bekleyen bir uzak senkron varsa hatırlatıcı geri gelsin.
 try{
   var _bootSaveStatus=data&&data.syncReceipt&&data.syncReceipt.status;
@@ -10173,10 +10200,21 @@ function quranJourneyCardCopy(status,canReq,req,order,total){
 function quranJourneyOverlayHTML(){
   var head='<header class="quran-v2-header"><div id="quran-head-lead" class="lead">'+quranHeadLeadHTML()+'</div>';
   head+='<button id="quran-refresh-button" class="refresh'+(ui.quranRefreshing?' is-spinning':'')+'" onclick="App.refreshQuranUpdates()" aria-label="Güncellemeleri kontrol et" aria-busy="'+(!!ui.quranRefreshing)+'"'+(ui.quranRefreshing?' disabled':'')+'>'+icon('rotate-ccw',17)+'</button>';
+  head+=quranRemoteStatusHTML();
   head+='<button class="close" onclick="App.closeQuranJourney()" aria-label="Kur’an Yolculuğunu kapat">'+icon('x',18)+'</button></header>';
   return '<div id="quran-overlay" class="quran-v2-overlay" role="dialog" aria-modal="true" aria-label="Raşit ile Kur’an Yolculuğu">'
     +'<div id="quran-screen" class="quran-v2-screen" tabindex="-1" onkeydown="App.onQuranKeydown(event)">'
     +head+'<main id="quran-scroll" class="scroll quran-v2-scroll">'+quranViewBodyHTML()+'</main></div></div>';
+}
+function quranRemoteStatusHTML(){
+  var status=String(ui.quranRemoteStatus||'idle'), label='Uzak kayıt hazır', tone='idle';
+  if(status==='checking'){ label='Kontrol ediliyor…'; tone='checking'; }
+  else if(status==='updated'){ label='Yeni cevap alındı'; tone='updated'; }
+  else if(status==='updated_delivery'){ label='Yeni teslim kaydı'; tone='updated'; }
+  else if(status==='updated_warning'){ label='Cevap alındı · kaynak uyarısı'; tone='warning'; }
+  else if(status==='unchanged'){ label='Güncel'; tone='idle'; }
+  else if(status==='error'){ label='Kontrol başarısız'; tone='error'; }
+  return '<span id="quran-remote-status" class="quran-v2-remote-status is-'+tone+'" role="status" aria-live="polite" title="'+esc(ui.quranRemoteError||label)+'">'+esc(label)+'</span>';
 }
 function quranHeadLeadHTML(){
   if(ui.quranJourneyView==='detail'){
@@ -10594,6 +10632,19 @@ function quranPaintRefreshButton(){
     b.disabled=!!ui.quranRefreshing;
     if(b.setAttribute) b.setAttribute('aria-busy',ui.quranRefreshing?'true':'false');
     if(b.classList) b.classList.toggle('is-spinning',!!ui.quranRefreshing);
+    var statusEl=document.getElementById('quran-remote-status');
+    if(statusEl){
+      var status=String(ui.quranRemoteStatus||'idle'), tone='idle', label='Uzak kayıt hazır';
+      if(status==='checking'){ tone='checking'; label='Kontrol ediliyor…'; }
+      else if(status==='updated'){ tone='updated'; label='Yeni cevap alındı'; }
+      else if(status==='updated_delivery'){ tone='updated'; label='Yeni teslim kaydı'; }
+      else if(status==='updated_warning'){ tone='warning'; label='Cevap alındı · kaynak uyarısı'; }
+      else if(status==='error'){ tone='error'; label='Kontrol başarısız'; }
+      else if(status==='unchanged'){ label='Güncel'; }
+      statusEl.className='quran-v2-remote-status is-'+tone;
+      statusEl.textContent=label;
+      statusEl.title=String(ui.quranRemoteError||label);
+    }
     return true;
   }catch(e){ return false; }
 }
@@ -10659,7 +10710,10 @@ App.quranJourneySubmit=function(id){
     try{ setTimeout(settlePre,QURAN_PRECHECK_TIMEOUT_MS); }catch(e){}
     try{
       s.pullQuranUpdates(function(err,result){
-        if(!err&&result) quranApplyRemoteUpdates(result.delivery,result.responses);
+        if(!err&&result){
+          var remoteResult=quranApplyRemoteUpdates(result.delivery,result.responses);
+          if(remoteResult&&remoteResult.changed){ save(); quranRepaintAfterChange(sid); }
+        }
         settlePre();
       });
     }catch(e){ settlePre(); }
@@ -10790,57 +10844,96 @@ App.quranJourneyQuestion=function(id){
 // requestId eşleşmesi zaten sûre bazlı arama ile sağlanır; response.surahId
 // ayrıca çapraz doğrulanır (yanlış sûre eşleme tehdidi — plan §2/§9).
 function quranApplyRemoteUpdates(delivery,responses){
-  var q=ensureQuranJourney(data), changed=false, at=new Date().toISOString();
+  var q=ensureQuranJourney(data), changed=false, responseChanged=false, at=new Date().toISOString();
   var dl=(delivery&&delivery.requests)||{}, rs=(responses&&responses.responses)||{};
   Object.keys(q.requests).forEach(function(sid){
     var req=q.requests[sid];
     if(!req||!req.requestId) return;
-    function apply(ev){ var r=quranReduce(req,ev); if(r.changed){ req=r.request; q.requests[sid]=req; changed=true; } }
+    function apply(ev){ var r=quranReduce(req,ev); if(r.changed){ req=r.request; q.requests[sid]=req; changed=true; if(ev.type==='response_valid'||ev.type==='response_invalid'||(ev.type==='video_gone'&&ev.responseStatus==='revoked')) responseChanged=true; } }
     var receipt=dl[req.requestId];
-    if(receipt&&receipt.status==='sent'){ apply({type:'delivery_receipt',at:at}); apply({type:'await_reply',at:at}); }
+    if(receipt&&receipt.status==='sent'){
+      var deliveryAt=receipt.sentAt||at;
+      apply({type:'delivery_receipt',at:deliveryAt,sentAt:receipt.sentAt||null,providerMessageId:receipt.providerMessageId||null});
+      apply({type:'await_reply',at:deliveryAt});
+    }
     var resp=rs[req.requestId];
     if(resp&&resp.surahId===sid){
       // Doğrulanmış bir response, mail delivery kaydından daha güçlü kanıttır.
       // Workflow delivery.json yazamasa bile (gerçek üretim vakası), cevap
       // requestId+token+sûre+video doğrulamasından geçtiyse queued durumunu
       // monotonik ara geçişlerle awaiting_reply'e taşır; asla geriye çekmez.
-      apply({type:'delivery_receipt',at:at});
-      apply({type:'await_reply',at:at});
-      apply({type:'response_received',at:at});
+      var responseAt=resp.receivedAt||resp.validatedAt||at;
+      var validatedAt=resp.validatedAt||responseAt;
+      if(!receipt||receipt.status!=='sent'){
+        // Yanıtın varlığı, delivery dosyası gecikmiş olsa bile cevabın bu
+        // requestId'ye ait olduğunu kanıtlar; sentAt uydurulmaz.
+        apply({type:'delivery_receipt',at:responseAt,inferred:true});
+        apply({type:'await_reply',at:responseAt});
+      }
+      apply({type:'response_received',at:responseAt});
       if(resp.status==='ready'){
-        apply({type:'response_valid',responseId:resp.responseId,videoId:resp.videoId,at:at});
+        apply({type:'response_valid',responseId:resp.responseId,videoId:resp.videoId,source:resp.source,receivedAt:resp.receivedAt,validatedAt:validatedAt,at:validatedAt});
       } else if(resp.status==='revoked'){
         // Zaten ready/watching'e geçmişse videoyu geçmişe düşür (video_gone);
         // hâlâ doğrulama aşamasındaysa geçersiz say. quranReduce'un kendi
         // `from` listesi hangisinin uygulanabilir olduğuna karar verir —
         // uygulanamayan çağrı güvenle no-op'tur.
-        apply({type:'video_gone',at:at});
-        apply({type:'response_invalid',at:at});
+        apply({type:'video_gone',source:resp.source,receivedAt:resp.receivedAt,validatedAt:validatedAt,responseStatus:'revoked',at:validatedAt});
       }
     }
   });
-  return changed;
+  return {changed:changed,responseChanged:responseChanged};
 }
 var QURAN_REFRESH_TIMEOUT_MS=20000;
-App.refreshQuranUpdates=function(silent){
+function quranHasRemoteRequest(){
+  var q=ensureQuranJourney(data), reqs=q&&q.requests?q.requests:{};
+  return Object.keys(reqs).some(function(sid){
+    var req=reqs[sid];
+    return req&&req.requestId&&req.status!=='question_opened';
+  });
+}
+function quranRemoteErrorText(result,err){
+  if(err) return 'Ağ veya yetki hatası';
+  var errors=[];
+  if(result&&Array.isArray(result.deliveryErrors)) errors=errors.concat(result.deliveryErrors);
+  if(result&&Array.isArray(result.responseErrors)) errors=errors.concat(result.responseErrors);
+  return errors.length?'Uzak kayıt doğrulanamadı ('+errors.length+' uyarı)':'';
+}
+App.refreshQuranUpdates=function(silent,force){
   if(ui.quranRefreshing) return;
+  if(!force&&!quranHasRemoteRequest()){
+    ui.quranRemoteStatus='unchanged'; ui.quranRemoteError='Bekleyen Kur’an isteği yok'; ui.quranRemoteCheckedAt=new Date().toISOString();
+    quranPaintRefreshButton();
+    if(!silent) toast('Kontrol edilecek bekleyen Kur’an isteği yok.');
+    return;
+  }
   var s=(typeof window!=='undefined')?window.SeySync:null;
-  if(!s||typeof s.pullQuranUpdates!=='function'){ if(!silent) toast('Senkron yapılandırılmamış; güncelleme kontrol edilemedi.'); return; }
+  if(!s||typeof s.pullQuranUpdates!=='function'){
+    ui.quranRemoteStatus='error'; ui.quranRemoteError='Senkron yapılandırılmamış'; ui.quranRemoteCheckedAt=new Date().toISOString(); quranPaintRefreshButton();
+    if(!silent) toast('Senkron yapılandırılmamış; güncelleme kontrol edilemedi.');
+    return;
+  }
   ui.quranRefreshing=true;
+  ui.quranRemoteStatus='checking'; ui.quranRemoteError='';
   quranPaintRefreshButton();
   var settled=false;
-  function settle(fn){ if(settled) return; settled=true; ui.quranRefreshing=false; quranPaintRefreshButton(); fn(); }
-  try{ setTimeout(function(){ settle(function(){ if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); }); },QURAN_REFRESH_TIMEOUT_MS); }catch(e){}
+  function settle(fn){ if(settled) return; settled=true; ui.quranRefreshing=false; ui.quranRemoteCheckedAt=new Date().toISOString(); quranPaintRefreshButton(); fn(); }
+  try{ setTimeout(function(){ settle(function(){ ui.quranRemoteStatus='error'; ui.quranRemoteError='Uzak kayıt zaman aşımına uğradı'; quranPaintRefreshButton(); if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); }); },QURAN_REFRESH_TIMEOUT_MS); }catch(e){}
   try{
     s.pullQuranUpdates(function(err,result){
       settle(function(){
-        if(err||!result){ if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); return; }
-        var changed=quranApplyRemoteUpdates(result.delivery,result.responses);
-        if(changed){ save(); quranRepaintAfterChange(ui.quranJourneyView==='detail'?ui.quranDetailId:''); if(!silent) toast('Kur’an Yolculuğu güncellendi.'); }
-        else if(!silent) toast('Yeni bir güncelleme yok.');
+        if(err||!result){ ui.quranRemoteStatus='error'; ui.quranRemoteError=quranRemoteErrorText(result,err)||'Uzak kayıt okunamadı'; if(!silent) toast('Güncelleme kontrol edilemedi; bağlantını kontrol edip tekrar deneyebilirsin.'); quranPaintRefreshButton(); return; }
+        var remoteResult=quranApplyRemoteUpdates(result.delivery,result.responses), changed=!!(remoteResult&&remoteResult.changed);
+        if(changed){ save(); quranRepaintAfterChange(ui.quranJourneyView==='detail'?ui.quranDetailId:''); if(!silent) toast(remoteResult.responseChanged?'Kur’an cevabı geldi.':'Kur’an teslim kaydı güncellendi.'); }
+        var warning=quranRemoteErrorText(result,null);
+        ui.quranRemoteStatus=warning?(changed?'updated_warning':'error'):(changed?(remoteResult.responseChanged?'updated':'updated_delivery'):'unchanged');
+        ui.quranRemoteError=warning||'';
+        quranPaintRefreshButton();
+        if(!changed&&!silent&&!warning) toast('Yeni bir güncelleme yok.');
+        else if(warning&&!silent) toast(changed?'Yanıt alındı; kaynakta doğrulama uyarısı var.':'Güncelleme doğrulanamadı; tekrar deneyebilirsin.');
       });
     });
-  }catch(e){ settle(function(){}); }
+  }catch(e){ settle(function(){ ui.quranRemoteStatus='error'; ui.quranRemoteError='Uzak kayıt okunamadı'; quranPaintRefreshButton(); }); }
 };
 
 // ── Overlay ve kütüphane etkileşimleri ──
@@ -10854,11 +10947,9 @@ App.openQuranJourney=function(){
   render();
   quranLockBodyScroll();
   try{ var shell=document.getElementById('quran-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){}
-  // QY-11: "uygulama açılışında kontrol" — ekran her açıldığında SESSİZCE
-  // (toast'sız) bir kez teslim/yanıt kontrolü yapılır; arka planda tekrarlayan
-  // bir polling YOKTUR, yalnız bu açılış anı ve App.refreshQuranUpdates()'in
-  // kullanıcı eylemi.
-  App.refreshQuranUpdates(true);
+  // QY-11: ekran açılışında ve foreground dönüşünde sessiz, bounded bir
+  // teslim/yanıt kontrolü yapılır; gerçek zamanlı push iddiası yoktur.
+  App.refreshQuranUpdates(true,true);
 };
 App.closeQuranJourney=function(){
   ui.quranJourneyOpen=false;
@@ -12354,7 +12445,7 @@ function maybeRetrySync(){
     window.SeySync.retryIfPending();
   }catch(e){}
 }
-function pollRemote(){ fetchObserverInbox(); fetchHealthSync(); maybeRetrySync(); }
+function pollRemote(skipQuran){ fetchObserverInbox(); fetchHealthSync(); maybeRetrySync(); if(!skipQuran) maybePullQuranForeground(false); }
 function mergeInbox(msgs){
   if(!data) return;
   if(!Array.isArray(data.notifications)) data.notifications=[];
@@ -13761,8 +13852,17 @@ App.submitAuth=function(){
 App.toggleRememberAuth=function(){ ui.authRemember=!ui.authRemember; render(); };
 App.dismissAuthError=function(){ ui.authError=false; ui.authErrorMsg=''; render(); };
 
+var quranLastForegroundPullAt=0;
+function maybePullQuranForeground(force){
+  if(!data||!quranHasRemoteRequest()) return;
+  try{ if(document.hidden&&!force) return; }catch(e){}
+  var now=Date.now();
+  if(!force&&now-quranLastForegroundPullAt<25000) return;
+  quranLastForegroundPullAt=now;
+  App.refreshQuranUpdates(true,!!force);
+}
 setTimeout(pollRemote,1500);
-setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON yanıtları + sağlık senkronu daha hızlı görünsün)
+setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON + sağlık + Kur’an teslimleri)
 function onAppForeground(){
   // iOS PWA / tarayıcı: arka plandan dönüşte soğuk açılış sayılmaz;
   // yine de panelde "Son açılış" ve "Canlı takip" hemen güncellensin.
@@ -13771,13 +13871,14 @@ function onAppForeground(){
     data.lastOpenedAt=new Date().toISOString();
     save(false);
   }
-  pollRemote();
+  pollRemote(true);
+  maybePullQuranForeground(true);
   maybeFetchDailyPhoto();
 }
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ onAppForeground(); } });
 window.addEventListener('focus',function(){ onAppForeground(); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
 window.addEventListener('pageshow',function(){ onAppForeground(); }); // bfcache'ten geri dönüşte
-window.addEventListener('online',pollRemote);   // bağlantı gelince bekleyen makbuzu da gönderir
+window.addEventListener('online',function(){ pollRemote(true); maybePullQuranForeground(true); });   // bağlantı gelince teslimi hemen kontrol et
 
 render();
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır

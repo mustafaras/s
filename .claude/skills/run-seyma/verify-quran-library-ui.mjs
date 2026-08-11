@@ -758,7 +758,9 @@ section('9. CSS sözleşmesi (QY-06 layout + QY-17 erişilebilirlik/responsive/m
   // bırakmamak için kullanılan her ikon adı ICONS setinde OLMALI.
   const APPSRC = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
   const qSrc = APPSRC.slice(APPSRC.indexOf('function quranCatalog('), APPSRC.indexOf('function saygiHTML('));
-  const iconSet = APPSRC.slice(0, APPSRC.indexOf('function icon('));
+  // L2 extraction sonrası ikon gövdesi app.js'ten app/core/constants.js'e
+  // taşındı; kabul kapısı üretim script sırasındaki gerçek kaynağı okumalı.
+  const iconSet = fs.readFileSync(path.join(REPO, 'app/core/constants.js'), 'utf8');
   const usedIcons = Array.from(new Set(
     Array.from(qSrc.matchAll(/icon\('([a-z0-9-]+)'/g)).map((m) => m[1])
       .concat(Array.from(qSrc.matchAll(/icon:'([a-z0-9-]+)'/g)).map((m) => m[1]))));

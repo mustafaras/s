@@ -688,7 +688,7 @@ function mergeQuranRequest(localReq, remoteReq){
   else if((remoteReq.updatedAt||'')>(localReq.updatedAt||'')){ winner=remoteReq; loser=localReq; }
   else { winner=localReq; loser=remoteReq; }
   var out=JSON.parse(JSON.stringify(winner));
-  ['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt'].forEach(function(k){
+  ['requestedAt','notifiedAt','readyAt','startedWatchingAt','watchedAt','questionOpenedAt','deliverySentAt','responseReceivedAt','responseValidatedAt','providerMessageId','responseSource','responseStatus'].forEach(function(k){
     if(!out[k]&&loser[k]) out[k]=loser[k];
   });
   out.videoHistory=mergeQuranVideoHistory(winner.videoHistory,loser.videoHistory);
@@ -915,21 +915,37 @@ function pushQuranRequest(payload, cb){
 // ── QY-11: Kur’an Yolculuğu teslim/yanıt dosyalarını salt-okunur çek ────────
 // Yalnız GET; hiçbir dosyaya yazmaz. Guard 1/2 burada uygulanmaz — okumak
 // (yazmanın aksine) veri kaybı riski taşımaz, localhost'ta bile güvenlidir.
-// Cache-busting `&t=Date.now()` aynı desen (bkz. putLatestGuarded). Bozuk/eksik
-// dosya asla throw etmez: QuranTransportV1.parse* zaten tolerant; dosya hiç
-// yoksa (404/boş) hata değil, "henüz yok" sayılıp boş sözleşme döndürülür.
+// Cache-busting `&t=Date.now()` aynı desen (bkz. putLatestGuarded). 404/boş
+// dosya "henüz yok" sayılır; yetki, sunucu ve cache bütünlüğü hataları ise
+// çağırana taşınır. Aksi halde yeni cevap yerine boş sözleşme başarı sanılabilir.
+var quranTransportCache={};
 function ghGetTransportFile(c, path){
   var api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path;
   var H=ghHeaders(c);
-  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
-    .then(function(r){ if(r.status===200) return r.json(); return null; })
-    .then(function(g){ return (g&&typeof g.content==='string')?b64decodeUtf8(g.content):null; });
+  var cacheKey=c.owner+'/'+c.repo+'@'+c.branch+':'+path;
+  var cache=quranTransportCache[cacheKey]||{};
+  if(cache.etag) H['If-None-Match']=cache.etag;
+  return fetch(api+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H,cache:'no-store'})
+    .then(function(r){
+      var etag=''; try{ etag=r.headers&&typeof r.headers.get==='function'?(r.headers.get('ETag')||''):''; }catch(e){}
+      if(r.status===304){
+        if(typeof cache.raw==='string') return {raw:cache.raw,etag:etag||cache.etag,notModified:true,status:304};
+        throw new Error('quran_transport_cache_miss_304');
+      }
+      if(r.status===404){ quranTransportCache[cacheKey]={etag:etag,raw:null}; return {raw:null,etag:etag,missing:true,status:404}; }
+      if(!r.ok) throw new Error('quran_transport_http_'+r.status);
+      return r.json().then(function(g){
+        var raw=(g&&typeof g.content==='string')?b64decodeUtf8(g.content):null;
+        if(typeof raw!=='string'){ quranTransportCache[cacheKey]={etag:etag,raw:null}; throw new Error('quran_transport_empty_body'); }
+        quranTransportCache[cacheKey]={etag:etag,raw:raw};
+        return {raw:raw,etag:etag,notModified:false,status:200};
+      });
+    });
 }
 // cb(err, {delivery, responses, deliveryErrors, responseErrors}). Senkron
 // yapılandırılmamışsa veya QuranTransportV1 yüklü değilse sessizce boş
 // sözleşmeyle döner (err yok) — bu bir hata değil, "kontrol edilecek bir şey
-// yok" durumudur. Arka planda çağrılmaz; yalnız app.js QY-11 açık istekle
-// (ekran açılışı/kullanıcı yenilemesi) tetikler — burada polling YOKTUR.
+// yok" durumudur. Foreground'da app.js'in bounded QY polling'i de bu yolu kullanır.
 function pullQuranUpdates(cb){
   cb = typeof cb==='function' ? cb : function(){};
   var T = window.QuranTransportV1;
@@ -939,10 +955,11 @@ function pullQuranUpdates(cb){
   return Promise.all([
     ghGetTransportFile(c,T.PATHS.delivery),
     ghGetTransportFile(c,T.PATHS.responses)
-  ]).then(function(raw){
-    var d = raw[0]===null ? {value:T.emptyDelivery(),errors:[]} : T.parseDelivery(raw[0]);
-    var r = raw[1]===null ? {value:T.emptyResponses(),errors:[]} : T.parseResponses(raw[1]);
-    cb(null,{delivery:d.value,responses:r.value,deliveryErrors:d.errors,responseErrors:r.errors});
+  ]).then(function(files){
+    var rawD=files[0]&&files[0].raw, rawR=files[1]&&files[1].raw;
+    var d = rawD===null ? {value:T.emptyDelivery(),errors:[]} : T.parseDelivery(rawD);
+    var r = rawR===null ? {value:T.emptyResponses(),errors:[]} : T.parseResponses(rawR);
+    cb(null,{delivery:d.value,responses:r.value,deliveryErrors:d.errors,responseErrors:r.errors,transport:files});
   }).catch(function(e){
     cb(e,{delivery:T.emptyDelivery(),responses:T.emptyResponses()});
   });

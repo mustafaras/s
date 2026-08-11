@@ -5,6 +5,7 @@
 // Kapsam (QY-11 doğrulama listesinden birebir):
 //   · cache-busting  — her GET'te `&t=` parametresi var.
 //   · bozuk/eksik    — 404/boş/bozuk JSON asla throw etmez, boş sözleşme döner.
+//   · 200→304        — ETag cache gövdesi korunur; cache'siz 304 başarı sayılmaz.
 //   · salt-okunur    — hiçbir PUT/POST çağrısı yapılmaz (yalnız GET).
 //   · izolasyon      — localhost'ta bile OKUMA engellenmez (Guard 1 yalnız
 //                      YAZMAya özgüdür; okumak veri kaybı riski taşımaz).
@@ -118,6 +119,40 @@ function run(name, opts) {
     var deliveryDoc = { schemaVersion: 1, updatedAt: null, requests: {} };
     var r = await run('localhost-read', { hostname: 'localhost', byPath: { delivery: ghContentBody(deliveryDoc), responses: ghContentBody({ schemaVersion: 1, responses: {} }) } });
     ok('localhost kökeninde bile okuma çalışır (Guard 1 yalnız yazmaya özgü)', r.calls.length === 2 && r.err === null);
+  }
+
+  section('5. ETag / stale cache fail-closed davranışı');
+  {
+    var byPath = {
+      delivery: Object.assign(ghContentBody({ schemaVersion: 1, requests: {} }), { headers: { get: function () { return '"delivery-v1"'; } } }),
+      responses: Object.assign(ghContentBody({ schemaVersion: 1, responses: {} }), { headers: { get: function () { return '"response-v1"'; } } })
+    };
+    var env = setup({ byPath: byPath });
+    function pullEnv() { return new Promise(function (resolve) { env.sync.pullQuranUpdates(function (err, result) { resolve({ err: err, result: result }); }); }); }
+    var first = await pullEnv();
+    byPath.delivery = { status: 304, ok: false, headers: { get: function () { return '"delivery-v1"'; } } };
+    byPath.responses = { status: 304, ok: false, headers: { get: function () { return '"response-v1"'; } } };
+    var second = await pullEnv();
+    ok('200 sonrası 304 cached body ile güncel sözleşmeyi koruyor', first.err === null && second.err === null && second.result.delivery && second.result.responses);
+    ok('304 isteklerinde If-None-Match gönderiliyor', env.calls.slice(2).every(function (x) { return x.opts.headers && x.opts.headers['If-None-Match']; }));
+  }
+  {
+    var miss = await run('304-cache-miss', { byPath: { delivery: { status: 304, ok: false }, responses: { status: 304, ok: false } } });
+    ok('cache gövdesiz 304 sessiz başarı sayılmıyor', !!miss.err);
+  }
+  {
+    var server = await run('500', { byPath: { delivery: { status: 500, ok: false }, responses: ghContentBody({ schemaVersion: 1, responses: {} }) } });
+    ok('HTTP 500 boş cevap gibi gizlenmiyor', !!server.err);
+  }
+  {
+    var byPath = { delivery: ghContentBody({ schemaVersion: 1, requests: { qr_old: { status: 'sent' } } }), responses: ghContentBody({ schemaVersion: 1, responses: {} }) };
+    var env = setup({ byPath: byPath });
+    await new Promise(function (resolve) { env.sync.pullQuranUpdates(function () { resolve(); }); });
+    byPath.delivery = { status: 404, ok: false, headers: { get: function () { return null; } } };
+    await new Promise(function (resolve) { env.sync.pullQuranUpdates(function () { resolve(); }); });
+    byPath.delivery = { status: 304, ok: false, headers: { get: function () { return '"old-after-404"'; } } };
+    var stale = await new Promise(function (resolve) { env.sync.pullQuranUpdates(function (err, result) { resolve({ err: err, result: result }); }); });
+    ok('404 sonrası eski cache gövdesi 304 ile yeniden başarı sayılmıyor', !!stale.err);
   }
 
   console.log('\n' + (failed ? '⚠️ ' + failed + ' başarısız, ' : '✅ ') + passed + '/' + (passed + failed) + ' assertion pass');

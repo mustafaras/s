@@ -524,7 +524,9 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .ae-tab {
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
   border: none;
   background: transparent;
   color: var(--ae-muted);
@@ -660,12 +662,18 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .ae-tooltip-trigger {
   appearance: none;
   border: 0;
+  box-sizing: border-box;
   margin: 0;
-  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--ae-space-xs);
   background: transparent;
   color: inherit;
   font: inherit;
   cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .ae-tooltip {
   position: absolute;
@@ -817,6 +825,12 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .ae-status-btn {
   appearance: none;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--ae-glass-border);
   border-radius: var(--ae-radius-full);
   background: var(--ae-glass);
@@ -834,6 +848,12 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 /* ── Butonlar ── */
 .ae-btn {
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--ae-card-bd);
   background: var(--ae-elevated);
   color: var(--ae-text);
@@ -857,8 +877,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 .ae-btn--mini {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1645,6 +1665,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .ae-chip {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
+  min-height: 32px;
   gap: 4px;
   padding: var(--ae-space-xs) var(--ae-space-sm);
   border-radius: 999px;
@@ -1984,7 +2006,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .day-heatmap__cell {
   aspect-ratio: 1;
-  min-height: 28px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--ae-radius-sm);
   display: inline-flex;
   align-items: center;
@@ -2197,6 +2220,9 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .sub-tab {
   flex: 0 0 auto;
   appearance: none;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid var(--ae-tab-bd);
   background: var(--ae-page);
   color: var(--ae-muted);
@@ -2557,6 +2583,30 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   gap: var(--ae-space-xs);
 }
 
+.density-btn {
+  appearance: none;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--ae-space-md);
+  border: 1px solid var(--ae-tab-bd);
+  border-radius: var(--ae-radius-sm);
+  background: var(--ae-elevated);
+  color: var(--ae-text);
+  font: inherit;
+  font-size: var(--ae-scale-sm);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s var(--ae-ease);
+}
+
+.density-btn:hover,
+.density-btn.is-active {
+  background: var(--ae-nav-active);
+  color: var(--ae-nav-active-text);
+  border-color: color-mix(in srgb, var(--ae-accent) 42%, transparent);
+}
+
 @keyframes aeNotificationIn {
   from { opacity: 0; transform: translate3d(0, 8px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -2592,7 +2642,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .archive-filter input,
 .archive-filter select {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   appearance: none;
   border: 1px solid var(--ae-card-bd);
   border-radius: var(--ae-radius-sm);
@@ -2671,7 +2721,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 .archive-view-toggle .ae-btn--pill {
-  min-height: 34px;
+  min-height: 44px;
   padding: var(--ae-space-xs) var(--ae-space-sm);
 }
 
@@ -2999,8 +3049,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 
 .ae-toast__close {
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: var(--ae-radius-full);
@@ -3458,7 +3511,8 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
+  min-width: 44px;
+  min-height: 44px;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -3534,6 +3588,13 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .loc-dot__map,
 .loc-popup-map-link {
   flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 var(--ae-space-xs);
   color: var(--ae-accent2);
   font-size: var(--ae-scale-xs);
   font-weight: 800;
@@ -3651,7 +3712,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 
 /* Icon-only buton boyutu */
-.ae-btn--icon { width: 34px; height: 34px; padding: 0; }
+.ae-btn--icon { width: 44px; height: 44px; padding: 0; }
 
 /* Token card / input */
 .token-card {
@@ -3661,6 +3722,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .token-input {
   width: 100%;
   box-sizing: border-box;
+  min-height: 44px;
   padding: var(--ae-space-sm) var(--ae-space-md);
   border: 1px solid var(--ae-card-bd);
   border-radius: var(--ae-radius-sm);
@@ -3909,7 +3971,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 }
 .history-filter select {
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 var(--ae-space-sm);
   border: 1px solid var(--ae-card-bd);
   border-radius: var(--ae-radius-sm);

@@ -10,6 +10,13 @@
     { id: "archives", label: "Arşivler",    icon: "archive" },
     { id: "system",   label: "Sistem",      icon: "settings" }
   ];
+  var SYSTEM_SUB_TABS = [
+    { id: "status", label: "Durum" },
+    { id: "events", label: "Olaylar" },
+    { id: "audit", label: "Denetim" },
+    { id: "messages", label: "Mesajlar" },
+    { id: "settings", label: "Ayarlar" }
+  ];
 
   var PTKEY = "seyma-panel-token";
   var PANEL_SETTINGS_KEY = "seyma-panel-settings-v1";
@@ -75,6 +82,7 @@
     density: "comfortable",
     theme: "dark",
     panelToken: "",
+    systemSubTabTransition: false,
     archiveSearch: "",
     archiveStatus: "all",
     archiveKind: "all",
@@ -3743,11 +3751,19 @@
     opts = opts || {};
     var tabs = Array.isArray(opts.tabs) ? opts.tabs : [];
     var active = opts.active || (tabs[0] && tabs[0].id);
-    var html = '<div class="sub-tabs" role="tablist">';
+    var idPrefix = safeText(opts.idPrefix || "", 48).replace(/[^A-Za-z0-9_-]/g, "");
+    var panelPrefix = safeText(opts.panelPrefix || "", 48).replace(/[^A-Za-z0-9_-]/g, "");
+    var tablistLabel = safeText(opts.ariaLabel || "Alt sekmeler", 80);
+    var html = '<div class="sub-tabs" role="tablist" aria-label="' + escapeHtml(tablistLabel) + '">';
     tabs.forEach(function(t) {
       var isActive = t.id === active;
+      var tabId = idPrefix ? idPrefix + "-" + t.id : "";
+      var panelId = panelPrefix ? panelPrefix + "-" + t.id : "";
       html += '<button type="button" class="sub-tab' + (isActive ? " is-active" : "") + '" ' +
+              (tabId ? 'id="' + escapeHtml(tabId) + '" ' : "") +
               'role="tab" aria-selected="' + (isActive ? "true" : "false") + '" ' +
+              (panelId ? 'aria-controls="' + escapeHtml(panelId) + '" ' : "") +
+              'data-subtab-id="' + escapeHtml(String(t.id || "")) + '" ' +
               'onclick="' + escapeHtml(String(opts.onChange || "").replace(/\{id\}/g, t.id)) + '">' +
               escapeHtml(safeText(t.label, 24)) + "</button>";
     });
@@ -3768,8 +3784,9 @@
   }
 
   function setSystemSubTab(id) {
-    var valid = ["status", "events", "audit", "messages", "settings"];
+    var valid = SYSTEM_SUB_TABS.map(function(tab) { return tab.id; });
     if (valid.indexOf(id) === -1) return;
+    if (ui.systemSubTab !== id) ui.systemSubTabTransition = true;
     ui.systemSubTab = id;
     render();
   }
@@ -5001,13 +5018,8 @@
 
   function renderSystem() {
     var subTab = ui.systemSubTab || "status";
-    var tabs = [
-      { id: "status", label: "Durum" },
-      { id: "events", label: "Olaylar" },
-      { id: "audit", label: "Audit" },
-      { id: "messages", label: "Mesajlar" },
-      { id: "settings", label: "Ayarlar" }
-    ];
+    var transitionClass = ui.systemSubTabTransition ? " system-panel--subtab-enter" : "";
+    ui.systemSubTabTransition = false;
     var contentBySubTab = {
       status: renderStatusDetail,
       events: renderEventLog,
@@ -5017,8 +5029,8 @@
     };
     var renderFn = contentBySubTab[subTab] || renderStatusDetail;
     return '<div class="system-view ae-slide-up ae-stagger">' +
-           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
-           '<div class="system-panel">' + renderFn() + "</div></div>";
+           SubTabs({ tabs: SYSTEM_SUB_TABS, active: subTab, ariaLabel: "Sistem alt sekmeleri", idPrefix: "ae-system-subtab", panelPrefix: "ae-system-panel", onChange: "AeonV2.setSystemSubTab(\'{id}\')" }) +
+           '<div id="ae-system-panel-' + escapeHtml(subTab) + '" class="system-panel' + transitionClass + '" role="tabpanel" aria-labelledby="ae-system-subtab-' + escapeHtml(subTab) + '" tabindex="0">' + renderFn() + "</div></div>";
   }
 
   function getArchiveLibrary() {
@@ -5983,6 +5995,7 @@
   root.AeonV2 = {
     ui: ui,
     TABS: TABS,
+    SYSTEM_SUB_TABS: SYSTEM_SUB_TABS,
     syncStatus: syncStatus,
     projectData: projectData,
     render: render,

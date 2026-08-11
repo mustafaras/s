@@ -36,10 +36,13 @@ html = dom.html;
 assert(/sub-tab/.test(html), "Sub-tab butonları var");
 assert(/Durum/.test(html), "Durum sub-tab var");
 assert(/Olaylar/.test(html), "Olaylar sub-tab var");
-assert(/Audit/.test(html), "Audit sub-tab var");
+assert(/Denetim/.test(html), "Denetim sub-tab var");
 assert(/Mesajlar/.test(html), "Mesajlar sub-tab var");
 assert(/Ayarlar/.test(html), "Ayarlar sub-tab var");
 assert((html.match(/<button[^>]+class="sub-tab/g) || []).length === 5, "Sistem 5 sub-tab render ediyor");
+assert(/aria-label="Sistem alt sekmeleri"/.test(html), "Sistem sub-tab listesi erişilebilir etikete sahip");
+assert(/id="ae-system-subtab-status"/.test(html) && /aria-controls="ae-system-panel-status"/.test(html), "Durum sub-tab panel bağını taşıyor");
+assert(/id="ae-system-panel-status"/.test(html) && /aria-labelledby="ae-system-subtab-status"/.test(html), "Durum paneli ARIA bağlantısını taşıyor");
 
 // 2. Status detayı varsayılan açılıyor
 assert(/Durum/.test(html), "Durum başlığı/bağlamı var");
@@ -120,6 +123,15 @@ assert(/Önbellek Temizle/.test(html) && /Zorla Senkron/.test(html), "Tanı cach
 assert(/Hakkında/.test(html) && /Commit hash/.test(html), "Hakkında commit bilgisi var");
 assert((html.match(/ae-card--glass/g) || []).length >= 3, "Ayar kartları glass varyantında");
 assert(/settings-detail[^"]*ae-stagger/.test(html), "Ayarlar stagger giriş sınıfı var");
+
+// 6b. Sub-tab geçiş animasyonu yalnızca seçim değişiminde eklenir
+AeonV2.setSystemSubTab("events");
+html = dom.html;
+assert(/system-panel--subtab-enter/.test(html), "Sub-tab değişiminde giriş animasyonu ekleniyor");
+assert(/id="ae-system-panel-events"/.test(html) && /aria-labelledby="ae-system-subtab-events"/.test(html), "Olaylar paneli seçili sub-tab ile bağlanıyor");
+AeonV2.render();
+html = dom.html;
+assert(!/system-panel--subtab-enter/.test(html), "Sub-tab animasyon sınıfı sonraki renderda tek kullanımlık kalıyor");
 
 // 7. Density değişimi
 AeonV2.setDensity("compact");

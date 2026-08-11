@@ -143,8 +143,12 @@ classRule("settings-toggle");
 classRule("settings-diagnostic-grid");
 classRule("settings-diagnostic-result");
 classRule("settings-about-row");
+classRule("system-panel--subtab-enter");
 assert(css.includes("@keyframes aeNotificationIn"), "Bildirim giriş animasyonu var");
 assert(css.includes("@keyframes aeNotificationPulse"), "Okunmamış bildirim pulse animasyonu var");
+assert(css.includes("@keyframes aeSystemSubtabEnter"), "Sistem sub-tab giriş animasyonu var");
+assert(css.includes(".system-panel--subtab-enter"), "Sistem sub-tab geçiş sınıfı var");
+assert(/prefers-reduced-motion:[\s\S]*?system-panel--subtab-enter/.test(css), "Sistem sub-tab animasyonu reduced-motion ile kapanıyor");
 assert(css.includes(".system-progress--unknown"), "Bilinmeyen progress durumu var");
 
 // ── Buttons ──

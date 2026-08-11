@@ -2257,6 +2257,15 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   gap: var(--ae-space-sm);
 }
 
+@keyframes aeSystemSubtabEnter {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.system-panel--subtab-enter {
+  animation: aeSystemSubtabEnter 0.22s var(--ae-ease) both;
+}
+
 /* ── System view: live status, audit timeline and settings ── */
 .system-card__head {
   display: flex;
@@ -4113,6 +4122,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .ae-count-up,
   .ae-pulse,
   .ae-page-transition,
+  .system-panel--subtab-enter,
   .ae-stagger > *,
   .ae-toast,
   .message-bubble,

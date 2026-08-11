@@ -17,7 +17,7 @@ async function main() {
   assert(/Test Bağlantısı/.test(html) && /Veri Doğrulama/.test(html), "Bağlantı ve veri doğrulama tanı araçları var");
   assert(/Önbellek Temizle/.test(html) && /Zorla Senkron/.test(html), "Cache ve zorla senkron tanı araçları var");
   assert(/Hakkında/.test(html) && /ÆON Observer v2\.0/.test(html), "Hakkında sürüm bilgisi var");
-  assert(/2026-08-11/.test(html) && /9ad1ad3/.test(html), "Hakkında tarih ve commit hash var");
+  assert(/2026-08-11/.test(html) && /4f0fc1a/.test(html), "Hakkında tarih ve commit hash var");
   assert(/settings-diagnostic-result--idle/.test(html), "Tanı sonucu ilk durumda fail-safe boş görünür");
 
   assert(AeonV2.getPollingState().intervalMs === 60000, "Polling varsayılanı 60 saniye");

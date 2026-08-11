@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-11`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `94169c2`
-- **Bitiş Commit:** `1e36b76` (uygulama; metadata commit'i ayrıca)
+- **Bitiş Commit:** `1e36b76` (uygulama; ledger/handoff metadata `6c91c4c`)
 
 ## Yapılanlar
 
@@ -16,7 +16,7 @@
 - [x] Tüm alt maddeler tamamlandı
 - [x] Testler çalıştırıldı
 - [x] Commit yapıldı (`1e36b76`)
-- [ ] Push yapıldı (metadata ve Pages deploy sonrası tamamlanacak)
+- [x] Push yapıldı (`git push origin main`; local/origin `6c91c4c` eşit)
 
 ### Özet
 
@@ -52,12 +52,16 @@ Panel-v2 artık ana ve alt sekmelerde roving `tabindex` ile mantıksal focus ord
 - node .claude/skills/run-seyma/driver.mjs    → PASS
 - node .claude/skills/run-seyma/zikr-harness.mjs → PASS (90/90)
 - git diff --check                            → PASS
+- GitHub Actions Pages run `31512756323`      → SUCCESS
+- GitHub Pages deployment `5854464201`        → success; SHA `6c91c4c`
+- canlı `panel-v2.html`                       → HTTP 200; `panel-v2.css/js?v=20260811l`
+- canlı CSS/JS SHA256                         → yerel dosyalarla eşleşti
 - gerçek tarayıcı/manual browser testi        → çalıştırılmadı (data-safety lock)
 ```
 
 ### Hatalar ve Çözümleri
 
-Cache-bust doğrulaması Prompt 36’nın `20260811k` beklentisini taşıyordu; Panel-v2 HTML `20260811l` sürümüne alındı ve `test_panel_v2_hit_areas.js` aynı sürümü doğrulayacak şekilde güncellendi. Gerçek browser testi güvenlik kuralı gereği yapılmadı; aynı keyboard/focus akışı Node VM fixture’ında sentetik DOM ile yürütüldü.
+Cache-bust doğrulaması Prompt 36’nın `20260811k` beklentisini taşıyordu; Panel-v2 HTML `20260811l` sürümüne alındı ve `test_panel_v2_hit_areas.js` aynı sürümü doğrulayacak şekilde güncellendi. Gerçek browser testi güvenlik kuralı gereği yapılmadı; aynı keyboard/focus akışı Node VM fixture’ında sentetik DOM ile yürütüldü. Pages deployment ve canlı CSS/JS byte eşitliği push sonrası doğrulandı.
 
 ## Sıradaki Adım
 

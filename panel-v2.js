@@ -169,8 +169,236 @@
     detail: "",
     at: null
   };
+  var accessibilityState = {
+    keyboardBound: false,
+    liveMessage: "",
+    lastFocusKey: "",
+    pendingFocusId: "",
+    pendingFocusKey: "",
+    trapElement: null,
+    trapRestoreKey: ""
+  };
   var PULL_REFRESH_THRESHOLD = 60;
   var PULL_REFRESH_MAX_DISTANCE = 112;
+
+  function announce(message) {
+    var text = safeText(message || "", 240);
+    if (!text) return;
+    accessibilityState.liveMessage = text;
+    var doc = root.document;
+    var live = doc && typeof doc.getElementById === "function" ? doc.getElementById("ae-live-region") : null;
+    if (live) {
+      if (typeof live.textContent === "string") live.textContent = text;
+      else if (typeof live.innerText === "string") live.innerText = text;
+    }
+  }
+
+  function getAttribute(el, name) {
+    if (!el || typeof el.getAttribute !== "function") return "";
+    return el.getAttribute(name) || "";
+  }
+
+  function focusKeyForElement(el) {
+    if (!el) return "";
+    if (el.id) return "id:" + String(el.id);
+    var keys = ["data-focus-key", "data-tab", "data-subtab-id", "data-event-id", "data-notification-id"];
+    for (var i = 0; i < keys.length; i++) {
+      var value = getAttribute(el, keys[i]);
+      if (value) return keys[i] + ":" + value;
+    }
+    var aria = getAttribute(el, "aria-label");
+    return aria ? "aria-label:" + aria : "";
+  }
+
+  function rememberFocus() {
+    var doc = root.document;
+    var active = doc && doc.activeElement;
+    var key = focusKeyForElement(active);
+    if (key) accessibilityState.lastFocusKey = key;
+    return key;
+  }
+
+  function requestFocus(id, key) {
+    accessibilityState.pendingFocusId = id ? String(id) : "";
+    accessibilityState.pendingFocusKey = key ? String(key) : "";
+  }
+
+  function contains(parent, child) {
+    if (!parent || !child) return false;
+    if (parent === child) return true;
+    return typeof parent.contains === "function" ? parent.contains(child) : false;
+  }
+
+  function findFocusTarget(id, key) {
+    var doc = root.document;
+    if (!doc) return null;
+    if (id && typeof doc.getElementById === "function") {
+      var byId = doc.getElementById(id);
+      if (byId) return byId;
+    }
+    if (!key || typeof doc.querySelectorAll !== "function") return null;
+    var nodes;
+    try {
+      nodes = doc.querySelectorAll("button, a, input, select, textarea, summary, [tabindex]");
+    } catch (e) {
+      return null;
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      if (focusKeyForElement(nodes[i]) === key) return nodes[i];
+    }
+    return null;
+  }
+
+  function focusElement(el) {
+    if (!el || typeof el.focus !== "function") return false;
+    try { el.focus({ preventScroll: true }); } catch (e) { try { el.focus(); } catch (ignore) {} }
+    return true;
+  }
+
+  function focusableWithin(container) {
+    if (!container || typeof container.querySelectorAll !== "function") return [];
+    var nodes;
+    try {
+      nodes = container.querySelectorAll("a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex=\"-1\"])");
+    } catch (e) {
+      return [];
+    }
+    return Array.prototype.slice.call(nodes).filter(function(node) {
+      return !node.hidden && getAttribute(node, "aria-hidden") !== "true";
+    });
+  }
+
+  function findFocusTrap() {
+    var doc = root.document;
+    if (!doc || typeof doc.querySelector !== "function") return null;
+    try {
+      return doc.querySelector('[data-focus-trap="true"], [role="dialog"][aria-modal="true"]');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function restoreFocusAfterRender() {
+    var trap = findFocusTrap();
+    if (trap) {
+      if (accessibilityState.trapElement !== trap) {
+        accessibilityState.trapElement = trap;
+        var first = focusableWithin(trap)[0];
+        focusElement(first || trap);
+      }
+      accessibilityState.pendingFocusId = "";
+      accessibilityState.pendingFocusKey = "";
+      return;
+    }
+    if (accessibilityState.trapElement) {
+      var restore = findFocusTarget("", accessibilityState.trapRestoreKey);
+      accessibilityState.trapElement = null;
+      accessibilityState.trapRestoreKey = "";
+      if (restore) focusElement(restore);
+    }
+    var target = findFocusTarget(accessibilityState.pendingFocusId, accessibilityState.pendingFocusKey || accessibilityState.lastFocusKey);
+    if (target) focusElement(target);
+    accessibilityState.pendingFocusId = "";
+    accessibilityState.pendingFocusKey = "";
+  }
+
+  function focusTrapKeydown(event) {
+    var trap = accessibilityState.trapElement;
+    if (!trap || !event) return false;
+    var key = event.key || event.code;
+    if (key === "Escape") {
+      if (ui.selectedEventId) {
+        selectEvent("");
+      } else {
+        accessibilityState.trapElement = null;
+        render();
+      }
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      return true;
+    }
+    if (key !== "Tab") return false;
+    var items = focusableWithin(trap);
+    if (!items.length) {
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      focusElement(trap);
+      return true;
+    }
+    var active = root.document && root.document.activeElement;
+    var index = items.indexOf(active);
+    if (index === -1) index = event.shiftKey ? 0 : items.length - 1;
+    var next = event.shiftKey ? (index - 1 + items.length) % items.length : (index + 1) % items.length;
+    if (typeof event.preventDefault === "function") event.preventDefault();
+    focusElement(items[next]);
+    return true;
+  }
+
+  function closestRole(el, role) {
+    var node = el;
+    while (node) {
+      if (getAttribute(node, "role") === role) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function tabItems(tablist) {
+    if (!tablist || typeof tablist.querySelectorAll !== "function") return [];
+    return Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+  }
+
+  function activateKeyboardTab(target, tablist, index) {
+    var items = tabItems(tablist);
+    var next = items[index];
+    if (!next) return false;
+    var tabId = getAttribute(next, "data-tab");
+    var subTabId = getAttribute(next, "data-subtab-id");
+    var scope = getAttribute(next, "data-a11y-scope");
+    if (tabId) {
+      setTab(tabId);
+    } else if (scope === "system") {
+      setSystemSubTab(subTabId);
+    } else if (subTabId) {
+      setArchiveSubTab(subTabId);
+    }
+    return true;
+  }
+
+  function handleKeyboardNavigation(event) {
+    if (!event) return false;
+    if (accessibilityState.trapElement && focusTrapKeydown(event)) return true;
+    var key = event.key || event.code;
+    if (key === "Escape" && (ui.selectedEventId || ui.selectedNotificationId)) {
+      if (ui.selectedEventId) selectEvent("");
+      else {
+        ui.selectedNotificationId = "";
+        announce("Bildirim detayı kapatıldı.");
+        render();
+      }
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      return true;
+    }
+    if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].indexOf(key) === -1) return false;
+    var target = event.target;
+    if (getAttribute(target, "role") !== "tab") return false;
+    var tablist = closestRole(target, "tablist");
+    var items = tabItems(tablist);
+    var current = items.indexOf(target);
+    if (!items.length || current < 0) return false;
+    var next = current;
+    if (key === "Home") next = 0;
+    else if (key === "End") next = items.length - 1;
+    else if (key === "ArrowRight" || key === "ArrowDown") next = (current + 1) % items.length;
+    else if (key === "ArrowLeft" || key === "ArrowUp") next = (current - 1 + items.length) % items.length;
+    if (typeof event.preventDefault === "function") event.preventDefault();
+    return activateKeyboardTab(target, tablist, next);
+  }
+
+  function bindKeyboardNavigation() {
+    var doc = root.document;
+    if (!doc || typeof doc.addEventListener !== "function" || accessibilityState.keyboardBound) return;
+    doc.addEventListener("keydown", handleKeyboardNavigation);
+    accessibilityState.keyboardBound = true;
+  }
 
   function isoDate(d) {
     if (!d || isNaN(d.getTime())) d = new Date();
@@ -570,7 +798,7 @@
     var triggerClass = classNames(["ae-tooltip-trigger", opts.triggerClass]);
     var ariaLabel = safeText(opts.ariaLabel || text, 120);
     return '<span class="ae-tooltip-wrap" data-tooltip-position="' + position + '">' +
-           '<button type="button" class="' + escapeHtml(triggerClass) + '" aria-label="' + escapeHtml(ariaLabel) + '" aria-describedby="' + escapeHtml(id) + '">' +
+           '<button type="button" class="' + escapeHtml(triggerClass) + '" tabindex="0" aria-label="' + escapeHtml(ariaLabel) + '" aria-describedby="' + escapeHtml(id) + '">' +
            escapeHtml(label) +
            "</button>" +
            '<span class="ae-tooltip" id="' + escapeHtml(id) + '" role="tooltip">' + escapeHtml(text) + "</span>" +
@@ -597,7 +825,7 @@
     var icons = { success: "check", error: "crisis", info: "messages" };
     var role = type === "error" ? "alert" : "status";
     var close = opts.dismissible === false ? "" :
-      '<button type="button" class="ae-toast__close" onclick="AeonV2.dismissToast(\'' + escapeHtml(id) + '\')" aria-label="Bildirimi kapat">×</button>';
+      '<button type="button" class="ae-toast__close" tabindex="0" onclick="AeonV2.dismissToast(\'' + escapeHtml(id) + '\')" aria-label="Bildirimi kapat">×</button>';
     return '<div class="ae-toast ae-toast--' + type + '" id="ae-toast-' + escapeHtml(id) +
            '" role="' + role + '" aria-live="polite" aria-atomic="true">' +
            '<span class="ae-toast__icon">' + renderIcon(icons[type], 16) + "</span>" +
@@ -733,7 +961,11 @@
     var cls = classNames(["ae-btn", variant ? "ae-btn--" + variant : "", hasGlow ? "ae-btn--glow" : "", opts.className]);
     var label = safeText(opts.label, 80);
     var attrs = opts.onclick ? ' onclick="' + escapeHtml(opts.onclick) + '"' : "";
-    if (opts.ariaLabel) attrs += ' aria-label="' + escapeHtml(opts.ariaLabel) + '"';
+    var accessibleLabel = safeText(opts.ariaLabel || label, 120);
+    if (accessibleLabel) attrs += ' aria-label="' + escapeHtml(accessibleLabel) + '"';
+    var tabIndex = opts.tabIndex !== undefined && opts.tabIndex !== null ? Math.round(safeNumber(opts.tabIndex) || 0) : 0;
+    attrs += ' tabindex="' + (tabIndex < 0 ? "-1" : "0") + '"';
+    if (opts.focusKey) attrs += ' data-focus-key="' + escapeHtml(safeText(opts.focusKey, 120)) + '"';
     if (opts.disabled) attrs += ' disabled aria-disabled="true"';
     var content = opts.labelHtml ? String(opts.labelHtml) : escapeHtml(label);
     return '<button type="button" class="' + escapeHtml(cls) + '"' + attrs + '>' + content + "</button>";
@@ -857,10 +1089,12 @@
   function setDate(date) {
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
     ui.date = date;
+    announce("Gün seçildi: " + date);
     render();
   }
   function setData(data) {
     appData = unwrapPanelData(data);
+    announce("Panel verisi güncellendi.");
     render();
   }
 
@@ -2750,7 +2984,7 @@
            '<span class="ae-topbar__title">ÆON</span>' +
            "</div>" +
            '<div class="ae-topbar__tools">' +
-           '<button type="button" class="ae-status-btn" onclick="AeonV2.setTab(\'system\');AeonV2.setSystemSubTab(\'status\')" aria-label="Senkron durumu">' +
+           '<button type="button" class="ae-status-btn" tabindex="0" onclick="AeonV2.setTab(\'system\');AeonV2.setSystemSubTab(\'status\')" aria-label="Senkron durumu" data-focus-key="sync-status">' +
            AeStatusBadge({ status: syncStatus.status }) +
            "</button>" +
            AeButton({ labelHtml: renderIcon("refresh", 17), variant: "mini", className: "ae-btn--icon", onclick: "AeonV2.refresh()", ariaLabel: "Yenile" }) +
@@ -2764,11 +2998,14 @@
     var html = '<div class="ae-tabs" role="tablist" aria-label="Ana sekmeler">';
     TABS.forEach(function(t) {
       var active = t.id === ui.tab ? " is-active" : "";
-      html += '<button class="ae-tab' + active + '" ' +
+      html += '<button type="button" class="ae-tab' + active + '" ' +
               'id="ae-tab-' + t.id + '" ' +
               'role="tab" ' +
+              'tabindex="' + (t.id === ui.tab ? "0" : "-1") + '" ' +
               'aria-selected="' + (t.id === ui.tab ? "true" : "false") + '" ' +
               'aria-controls="ae-panel-' + t.id + '" ' +
+              'aria-label="' + escapeHtml(safeText(t.label, 32)) + '" ' +
+              'data-tab="' + escapeHtml(t.id) + '" ' +
               'onclick="AeonV2.setTab(\'' + t.id + '\')">' +
               '<span class="ae-tab__icon">' + renderIcon(t.icon, 17) + "</span>" +
               '<span class="ae-tab__label">' + escapeHtml(safeText(t.label, 32)) + "</span>" +
@@ -3754,7 +3991,8 @@
     var idPrefix = safeText(opts.idPrefix || "", 48).replace(/[^A-Za-z0-9_-]/g, "");
     var panelPrefix = safeText(opts.panelPrefix || "", 48).replace(/[^A-Za-z0-9_-]/g, "");
     var tablistLabel = safeText(opts.ariaLabel || "Alt sekmeler", 80);
-    var html = '<div class="sub-tabs" role="tablist" aria-label="' + escapeHtml(tablistLabel) + '">';
+    var scope = idPrefix.indexOf("ae-system-subtab") === 0 ? "system" : "archive";
+    var html = '<div class="sub-tabs" role="tablist" aria-label="' + escapeHtml(tablistLabel) + '" data-a11y-scope="' + scope + '">';
     tabs.forEach(function(t) {
       var isActive = t.id === active;
       var tabId = idPrefix ? idPrefix + "-" + t.id : "";
@@ -3762,7 +4000,10 @@
       html += '<button type="button" class="sub-tab' + (isActive ? " is-active" : "") + '" ' +
               (tabId ? 'id="' + escapeHtml(tabId) + '" ' : "") +
               'role="tab" aria-selected="' + (isActive ? "true" : "false") + '" ' +
+              'tabindex="' + (isActive ? "0" : "-1") + '" ' +
               (panelId ? 'aria-controls="' + escapeHtml(panelId) + '" ' : "") +
+              'aria-label="' + escapeHtml(safeText(t.label, 24)) + '" ' +
+              'data-a11y-scope="' + scope + '" ' +
               'data-subtab-id="' + escapeHtml(String(t.id || "")) + '" ' +
               'onclick="' + escapeHtml(String(opts.onChange || "").replace(/\{id\}/g, t.id)) + '">' +
               escapeHtml(safeText(t.label, 24)) + "</button>";
@@ -3780,6 +4021,8 @@
       ui.archiveKind = "all";
     }
     ui.subTab = id;
+    requestFocus("ae-archive-subtab-" + id);
+    announce("Arşiv alt sekmesi: " + id);
     render();
   }
 
@@ -3788,6 +4031,8 @@
     if (valid.indexOf(id) === -1) return;
     if (ui.systemSubTab !== id) ui.systemSubTabTransition = true;
     ui.systemSubTab = id;
+    requestFocus("ae-system-subtab-" + id);
+    announce("Sistem alt sekmesi: " + id);
     render();
   }
 
@@ -3910,7 +4155,16 @@
   }
 
   function selectEvent(eventId) {
-    ui.selectedEventId = eventId ? String(eventId) : "";
+    var nextId = eventId ? String(eventId) : "";
+    var wasOpen = !!ui.selectedEventId;
+    if (nextId && !wasOpen) {
+      rememberFocus();
+      accessibilityState.trapRestoreKey = accessibilityState.lastFocusKey;
+    } else if (!nextId && wasOpen) {
+      requestFocus("", accessibilityState.trapRestoreKey);
+    }
+    ui.selectedEventId = nextId;
+    announce(nextId ? "Olay detayı açıldı." : "Olay detayı kapatıldı.");
     render();
   }
 
@@ -4293,7 +4547,7 @@
   }
 
   function eventPageButton(labelHtml, page, disabled, ariaLabel) {
-    var attrs = ' aria-label="' + escapeHtml(ariaLabel || labelHtml) + '"';
+    var attrs = ' tabindex="0" aria-label="' + escapeHtml(ariaLabel || labelHtml) + '"';
     if (disabled) attrs += ' disabled aria-disabled="true"';
     else attrs += ' onclick="' + escapeHtml("AeonV2.setEventPage(" + page + ")") + '"';
     return '<button type="button" class="ae-btn ae-btn--text event-log-page-btn"' + attrs + '>' + labelHtml + "</button>";
@@ -4337,8 +4591,8 @@
       return '<div class="event-detail-row"><span class="event-detail-row__label">' + escapeHtml(row.label) +
              '</span><span class="event-detail-row__value">' + escapeHtml(String(row.value)) + "</span></div>";
     }).join("");
-    return '<aside class="event-detail-drawer ae-card ae-card--glass" role="complementary" aria-label="Seçili olay detayı" data-event-id="' + escapeHtml(event.eventId) + '">' +
-           '<div class="event-detail-drawer__head"><div><div class="ae-label">Seçili olay</div><h3 class="event-detail-drawer__title">' +
+    return '<aside class="event-detail-drawer ae-card ae-card--glass" role="dialog" aria-modal="true" aria-labelledby="ae-event-detail-title" tabindex="-1" data-focus-trap="true" aria-label="Seçili olay detayı" data-event-id="' + escapeHtml(event.eventId) + '">' +
+           '<div class="event-detail-drawer__head"><div><div class="ae-label">Seçili olay</div><h3 id="ae-event-detail-title" class="event-detail-drawer__title">' +
            escapeHtml(eventSummaryLabel(event)) + '</h3></div>' +
            AeButton({ labelHtml: renderIcon("close", 16) + " Kapat", variant: "text", className: "event-detail-drawer__close", onclick: "AeonV2.selectEvent('')", ariaLabel: "Olay detayını kapat" }) +
            "</div>" +
@@ -4355,8 +4609,8 @@
   function renderEventRow(event) {
     var selected = ui.selectedEventId === event.eventId;
     var onclick = "AeonV2.selectEvent('" + eventJsArg(event.eventId) + "')";
-    return '<button type="button" class="event-log-row' + (selected ? " is-selected" : "") + '" data-event-id="' + escapeHtml(event.eventId) +
-           '" aria-pressed="' + (selected ? "true" : "false") + '" onclick="' + escapeHtml(onclick) + '">' +
+    return '<button type="button" tabindex="0" class="event-log-row' + (selected ? " is-selected" : "") + '" data-event-id="' + escapeHtml(event.eventId) +
+           '" aria-pressed="' + (selected ? "true" : "false") + '" aria-label="' + escapeHtml(eventSummaryLabel(event)) + '" onclick="' + escapeHtml(onclick) + '">' +
            '<span class="event-log-row__time">' + escapeHtml(eventTimeLabel(event.occurredAt)) + "</span>" +
            '<span class="event-log-row__icon">' + renderIcon(eventIcon(event.section), 18) + "</span>" +
            '<span class="event-log-row__body"><span class="event-log-row__head"><strong>' + escapeHtml(eventSectionLabel(event.section)) +
@@ -4743,6 +4997,7 @@
     var messages = buildNotificationMessages();
     if (messages.some(function(message) { return message.id === String(id || ""); })) {
       ui.selectedNotificationId = String(id);
+      announce("Bildirim detayı seçildi.");
       render();
     }
   }
@@ -4891,7 +5146,7 @@
           var tone = notificationStatusTone(message.projection);
           var selectedClass = selected && selected.id === message.id ? " is-selected" : "";
           var unreadClass = message.direction === "in" && !message.projection.readAt ? " message-bubble--unread" : "";
-          return '<button type="button" class="message-bubble message-bubble--' + message.direction + unreadClass + selectedClass + ' notification-message-row" role="listitem" aria-pressed="' + (selected && selected.id === message.id ? "true" : "false") + '" onclick="AeonV2.selectNotification(\'' + escapeHtml(inlineArg(message.id)) + '\')">' +
+          return '<button type="button" tabindex="0" class="message-bubble message-bubble--' + message.direction + unreadClass + selectedClass + ' notification-message-row" role="listitem" data-notification-id="' + escapeHtml(message.id) + '" aria-pressed="' + (selected && selected.id === message.id ? "true" : "false") + '" aria-label="' + escapeHtml(safeText(message.title || message.text || "Bildirim", 120)) + '" onclick="AeonV2.selectNotification(\'' + escapeHtml(inlineArg(message.id)) + '\')">' +
                  '<div class="message-bubble__meta"><span>' + escapeHtml(message.from) + " · " + escapeHtml(notificationTimeLabel(message.ts)) + " · " + escapeHtml(message.kind || "mesaj") + '</span><span class="notification-message-row__status notification-message-row__status--' + tone + '">' + escapeHtml(status) + "</span></div>" +
                  (message.title ? '<div class="message-bubble__title">' + escapeHtml(message.title) + "</div>" : "") +
                  '<div class="message-bubble__text">' + nl2br(escapeHtml(message.text || "(Metin yok)")) + "</div>" +
@@ -4910,7 +5165,7 @@
       '<span class="message-composer__privacy">Ayrı inbox kanalı</span></div>' +
       '<textarea id="ae-message-draft" class="message-composer__input" maxlength="1200" rows="3" placeholder="Mesajını yaz…" aria-label="Yeni mesaj" oninput="AeonV2.setMessageDraft(this.value)" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();AeonV2.sendMessage();}">' + escapeHtml(draft) + '</textarea>' +
       '<div class="message-composer__foot"><span class="message-composer__hint">' + (ui.panelToken ? "Enter gönderir · Shift+Enter yeni satır" : "Önce GitHub tokenı ayarla") + '</span>' +
-      '<button type="button" class="ae-btn ae-btn--primary ae-btn--glow" onclick="AeonV2.sendMessage()"' + (composerDisabled ? " disabled" : "") + ' aria-label="Mesaj gönder">' + (ui.messageSending ? "Gönderiliyor…" : "Gönder") + "</button></div>"
+      '<button type="button" tabindex="0" class="ae-btn ae-btn--primary ae-btn--glow" onclick="AeonV2.sendMessage()"' + (composerDisabled ? " disabled" : "") + ' aria-label="Mesaj gönder">' + (ui.messageSending ? "Gönderiliyor…" : "Gönder") + "</button></div>"
     });
     return '<div class="messages-detail ae-slide-up ae-stagger">' +
            AeCard({ variant: "glass", className: "messages-card", children: summary + list }) +
@@ -4924,7 +5179,7 @@
            composer +
            AeCard({ variant: "glass", className: "token-card", children:
              '<div class="ae-label">GitHub token</div>' +
-             '<input type="password" class="token-input" id="ae-token-input" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
+             '<input type="password" class="token-input" id="ae-token-input" aria-label="GitHub panel tokenı" autocomplete="off" value="' + escapeHtml(tokenValue) + '" placeholder="github_pat_..." onchange="AeonV2.savePanelToken(this.value)" />' +
              '<div class="token-hint">Token yalnızca bu tarayıcıda kalır; DOM\'da veya test çıktısında asla açık görünmez. Değiştirip dışarıya tıkladığında kaydedilir.</div>' +
              saveBtn
            }) +
@@ -4935,7 +5190,7 @@
     var activeInterval = pollingState.intervalMs;
     var intervalButtons = POLLING_OPTIONS.map(function(option) {
       var active = activeInterval === option.value;
-      return '<button type="button" class="settings-choice' + (active ? ' is-active' : '') + '" aria-pressed="' + (active ? 'true' : 'false') + '" onclick="AeonV2.setPollingInterval(' + option.value + ')">' +
+      return '<button type="button" tabindex="0" class="settings-choice' + (active ? ' is-active' : '') + '" aria-label="Polling aralığı: ' + escapeHtml(option.label) + '" aria-pressed="' + (active ? 'true' : 'false') + '" onclick="AeonV2.setPollingInterval(' + option.value + ')">' +
              '<span>' + escapeHtml(option.label) + '</span>' + (active ? '<span class="settings-choice__check" aria-hidden="true">' + renderIcon("check", 14) + '</span>' : '') + '</button>';
     }).join("");
     var autoRefresh = pollingState.autoRefresh && pollingState.intervalMs > 0;
@@ -4953,7 +5208,7 @@
       '<div class="settings-field"><div class="settings-field__head"><span>Polling aralığı</span><span class="settings-field__meta">' + escapeHtml(pollingOptionLabel(activeInterval)) + '</span></div>' +
       '<div class="settings-polling-options" role="group" aria-label="Polling aralığı seçimi">' + intervalButtons + '</div></div>' +
       '<div class="settings-toggle-row"><div><strong>Otomatik yenileme</strong><span>Token varken snapshotı periyodik kontrol eder.</span></div>' +
-      '<button type="button" class="settings-toggle" role="switch" aria-checked="' + (autoRefresh ? 'true' : 'false') + '" aria-label="Otomatik yenilemeyi ' + (autoRefresh ? 'kapat' : 'aç') + '" onclick="AeonV2.setAutoRefresh(' + (!autoRefresh) + ')">' +
+      '<button type="button" tabindex="0" class="settings-toggle" role="switch" aria-checked="' + (autoRefresh ? 'true' : 'false') + '" aria-label="Otomatik yenilemeyi ' + (autoRefresh ? 'kapat' : 'aç') + '" onclick="AeonV2.setAutoRefresh(' + (!autoRefresh) + ')">' +
       '<span class="settings-toggle__track" aria-hidden="true"><span class="settings-toggle__thumb"></span></span><span class="settings-toggle__label">' + toggleLabel + '</span></button></div>' +
       '<div class="settings-sync-actions">' + syncButton + '</div>' +
       '<div class="settings-card__hint">Polling yalnızca panel tokenı varken çalışır; kapalı seçeneği timerı tamamen durdurur.</div></div>'
@@ -4990,12 +5245,12 @@
     ];
     var densityButtons = densities.map(function(d) {
       var active = ui.density === d.id ? " is-active" : "";
-      return '<button type="button" class="density-btn' + active + '" onclick="AeonV2.setDensity(\'' + d.id + '\')">' + escapeHtml(d.label) + "</button>";
+      return '<button type="button" tabindex="0" class="density-btn' + active + '" aria-label="Görünüm yoğunluğu: ' + escapeHtml(d.label) + '" aria-pressed="' + (ui.density === d.id ? "true" : "false") + '" onclick="AeonV2.setDensity(\'' + d.id + '\')">' + escapeHtml(d.label) + "</button>";
     }).join("");
 
     var themeBtn = ui.theme === "dark"
-      ? AeButton({ labelHtml: renderIcon("sun", 16) + " Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')" })
-      : AeButton({ label: "Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')" });
+      ? AeButton({ labelHtml: renderIcon("sun", 16) + " Aydınlık temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'light\')", ariaLabel: "Aydınlık temaya geç" })
+      : AeButton({ label: "Koyu temaya geç", variant: "secondary", onclick: "AeonV2.setTheme(\'dark\')", ariaLabel: "Koyu temaya geç" });
 
     var aboutRows = [
       { label: "Sürüm", value: "ÆON Observer v" + PANEL_VERSION },
@@ -5534,9 +5789,9 @@
     var total = getArchiveItems(subTab).length;
     var filtered = getFilteredArchiveItems(subTab).length;
     return '<div class="archives-view ae-slide-up ae-stagger">' +
-           SubTabs({ tabs: tabs, active: subTab, onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
+           SubTabs({ tabs: tabs, active: subTab, ariaLabel: "Arşiv alt sekmeleri", idPrefix: "ae-archive-subtab", panelPrefix: "ae-archive-panel", onChange: "AeonV2.setArchiveSubTab(\'{id}\')" }) +
            renderArchiveControls(subTab, total, filtered) +
-           '<div class="archive-panel">' + renderFn() + "</div>" +
+           '<div id="ae-archive-panel-' + escapeHtml(subTab) + '" class="archive-panel" role="tabpanel" aria-labelledby="ae-archive-subtab-' + escapeHtml(subTab) + '" tabindex="0">' + renderFn() + "</div>" +
            "</div>";
   }
 
@@ -5550,7 +5805,7 @@
     };
     var fn = panels[ui.tab] || renderToday;
     var transitionClass = withTransition ? " ae-page-transition" : "";
-    return '<div class="ae-panel ae-slide-up' + transitionClass + '" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '">' +
+    return '<div class="ae-panel ae-slide-up' + transitionClass + '" id="ae-panel-' + ui.tab + '" role="tabpanel" aria-labelledby="ae-tab-' + ui.tab + '" tabindex="0">' +
            fn() +
            "</div>";
   }
@@ -5560,15 +5815,19 @@
     var app = root.document && root.document.getElementById("app");
     if (!app) return;
     options = options || {};
+    rememberFocus();
     var projection = projectData(null);
     var activeContent = isFetching ? renderLoadingState() : renderActiveTab(Boolean(options.transition));
     app.innerHTML =
       renderPullRefreshIndicator() +
       renderTopbar() +
       renderTabs() +
-      '<main class="ae-app__body">' + activeContent + "</main>" +
+      '<main id="ae-main-content" class="ae-app__body" tabindex="-1">' + activeContent + "</main>" +
       renderToastHost() +
       '<div class="ae-projection-meta" id="ae-projection-meta" data-day-count="' + projection.dayCount + '"></div>';
+
+    if (typeof app.setAttribute === "function") app.setAttribute("aria-busy", isFetching ? "true" : "false");
+    restoreFocusAfterRender();
 
     initSwipeGestures(app);
     runCountUps();
@@ -5650,6 +5909,9 @@
     if (!id || !TABS.some(function(t) { return t.id === id; })) return;
     if (ui.tab === id) return;
     ui.tab = id;
+    requestFocus("ae-tab-" + id);
+    var tab = TABS.filter(function(item) { return item.id === id; })[0];
+    announce("Sekme açıldı: " + (tab ? tab.label : id));
     var doc = root.document;
     if (doc && typeof doc.startViewTransition === "function") {
       try {
@@ -5969,6 +6231,15 @@
     return Object.assign({}, diagnosticState);
   }
 
+  function getAccessibilityState() {
+    return {
+      keyboardBound: accessibilityState.keyboardBound,
+      liveMessage: accessibilityState.liveMessage,
+      lastFocusKey: accessibilityState.lastFocusKey,
+      focusTrapActive: !!accessibilityState.trapElement
+    };
+  }
+
   function updateStatus(s) {
     if (s && typeof s === "object") {
       Object.keys(s).forEach(function(key) { syncStatus[key] = s[key]; });
@@ -5979,6 +6250,7 @@
   function init() {
     var rootEl = root.document && root.document.getElementById("root");
     if (rootEl && ui.theme) rootEl.setAttribute("data-theme", ui.theme);
+    bindKeyboardNavigation();
     restorePollingPreferences();
     ui.panelToken = normalizeToken(ui.panelToken || getLocalToken());
     render();
@@ -6048,6 +6320,8 @@
     clearPanelCache: clearPanelCache,
     forceSync: forceSync,
     getDiagnosticState: getDiagnosticState,
+    getAccessibilityState: getAccessibilityState,
+    handleKeyboardNavigation: handleKeyboardNavigation,
     logout: logout,
     updateStatus: updateStatus,
     showToast: showToast,

@@ -4067,6 +4067,11 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 /* ── Faz 7: Premium polish — focus, hover, reduced-motion, responsive ── */
 
 /* Focus görünür */
+:where(button, a, input, select, textarea, summary, [tabindex="0"]):focus-visible {
+  outline: 3px solid var(--ae-accent2);
+  outline-offset: 3px;
+}
+
 .ae-tab:focus-visible,
 .sub-tab:focus-visible,
 .ae-btn:focus-visible,
@@ -4076,6 +4081,25 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .ae-toast__close:focus-visible {
   outline: 2px solid var(--ae-accent);
   outline-offset: 2px;
+}
+
+/* Screen reader-only live announcements; layoutı ve görsel hiyerarşiyi etkilemez. */
+.ae-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Modal drawer odağı görünür ve kapatılabilir kalır. */
+.event-detail-drawer[role="dialog"]:focus {
+  outline: 3px solid var(--ae-accent2);
+  outline-offset: 3px;
 }
 
 /* Hover lift */

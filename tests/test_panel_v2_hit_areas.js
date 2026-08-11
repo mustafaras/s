@@ -53,7 +53,7 @@ assert(/\.archive-search input,[\s\S]*?min-height:\s*44px/.test(css), "Arşiv in
 assert(css.includes("@media (max-width: 460px)"), "375/414/460px mobil breakpoint'i var");
 assert(css.includes("@media (max-width: 374px)"), "Dar ekran heatmap fallback breakpoint'i var");
 assert(css.includes("@media (min-width: 768px)"), "768px masaüstü breakpoint'i var");
-assert(html.includes("panel-v2.css?v=20260811k"), "Panel-v2 CSS cache-bust sürümü güncel");
+assert(html.includes("panel-v2.css?v=20260811l"), "Panel-v2 CSS cache-bust sürümü güncel");
 assert(js.includes('class="ae-tab'), "Ana tablar gerçek button yüzeyi üretiyor");
 assert(js.includes('class="sub-tab'), "Alt tablar gerçek button yüzeyi üretiyor");
 

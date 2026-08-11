@@ -68,7 +68,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 28 | Polling & Telemetry Altyapısı | ✅ TAMAMLANDI | `bc37559` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_tabs.js`; `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_polling_telemetry.js`; `tests/test_panel_v2_*.js` (16/16 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31474396733` SUCCESS; deployment `5847191031` success; canlı URL `https://mustafaras.github.io/s/` | 60 saniyelik token-sınırlı polling, bounded p50/p95 latency (son 20), request/error sayaçları, last-success/freshness, GitHub rate-limit header telemetrisi ve logout stop lifecycle tamamlandı; cache-bust `20260811c` |
 | 29 | Olay Günlüğü Görüntüleyicisi | ✅ TAMAMLANDI | `941de60` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_event_log.js`; `node tests/test_panel_p2_event_log.js`; `node tests/test_panel_v2_system.js`; `tests/test_panel_v2_*.js` (17/17 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31475709131` SUCCESS; deployment `5847436381` success; canlı HTTP 200/cache `20260811d`; canlı URL `https://mustafaras.github.io/s/` | Sistem'e 5. Olaylar sub-tab'ı, PanelCoverageV1 normalize/parse tabanlı güvenli event log, bölüm/işlem/tarih filtreleri, 20/50/100 sayfalama ve eventId/correlationId/sequence/path/revision/kaynak/gizlilik drawer'ı eklendi; raw özet DOM'a taşınmıyor |
 | 30 | Senkron Sağlık Paneli | ✅ TAMAMLANDI | `6455060` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_sync_health.js`; `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_polling_telemetry.js`; `tests/test_panel_v2_*.js` (18/18 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; gerçek tarayıcı testi güvenlik kuralı nedeniyle çalıştırılmadı; Pages run `31482936773` SUCCESS; deployment `5848785105` success; canlı HTTP 200/cache `20260811e` | Durum sekmesine Durum/Gecikme/Hata oranı/Veri tazeliği dört KPI, son 24 saat SVG istek gecikmesi grafiği, API kalan limit-reset-token kartı ve son 10 hata geçmişi eklendi; bounded request/error history, fetch hata sınıfları ve logout temizliği tamamlandı |
-| 31 | Bildirim Yaşam Döngüsü | 🔒 BEKLEMEDE | - | - | - |
+| 31 | Bildirim Yaşam Döngüsü | ✅ TAMAMLANDI | `b23e978` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_notification_lifecycle.js` (22/22 PASS); `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_css.js`; `node tests/test_panel_v2_hit_areas.js`; `tests/test_panel_v2_*.js` (19/19 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; Pages run `31485940071` SUCCESS; deployment `5849363881` success; canlı HTTP 200/cache `20260811f` | Canonical `notificationEventProjection` ile beş aşamalı yaşam döngüsü, durum dot'ları, toplam süre ve ayrı `observer-inbox.json` mesaj composer'ı; localhost/file yazma koruması ve 409/422 bounded retry tamamlandı |
 | 32 | Sıra Denetimi & Revizyon Geçmişi | 🔒 BEKLEMEDE | - | - | - |
 | 33 | Ayarlar & Tanı Araçları | 🔒 BEKLEMEDE | - | - | - |
 | 34 | Sistem Sekmesi Sub-tab | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 31
+- **currentStep:** 32
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-11
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 30 Senkron Sağlık Paneli
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 31 Bildirim Yaşam Döngüsü
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

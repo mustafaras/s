@@ -8,7 +8,7 @@
 - **Tarih:** `2026-08-11`
 - **Oturum ID:** *(yok)*
 - **Başlangıç Commit:** `c6a97fe`
-- **Bitiş Commit:** `18f3d98` (final evidence metadata commit'i ayrıca)
+- **Bitiş Commit:** `92676d6` (final evidence metadata commit'i ayrıca)
 
 ## Yapılanlar
 
@@ -53,8 +53,8 @@ Açık ve koyu tema için `--ae-faint`, `--ae-muted`, vurgu ve durum tokenları 
 - tests/test_*.js                                   → 56/56 PASS
 - node .claude/skills/run-seyma/driver.mjs          → PASS
 - git diff --check                                  → PASS
-- GitHub Actions Pages run `31508697906`             → SUCCESS
-- GitHub Pages deployment `5853715512`              → success; SHA `18f3d98`
+- GitHub Actions Pages run `31508837266`             → SUCCESS
+- GitHub Pages deployment `5853743427`              → success; SHA `92676d6`
 - canlı `panel-v2.html`                              → HTTP 200; `panel-v2.css/js?v=20260811k`
 - gerçek tarayıcı testi                             → çalıştırılmadı (data-safety lock)
 ```

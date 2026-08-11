@@ -80,6 +80,10 @@ assert(/Polling/.test(html), "Polling durumu var");
 assert(/audit-timeline/.test(html), "Audit timeline görünümü var");
 assert(/Coverage zaman çizelgesi/.test(html), "Audit timeline başlığı var");
 assert(/audit-timeline__marker/.test(html), "Audit timeline marker'ları var");
+assert(/Sıra Denetimi/.test(html), "Sıra denetimi başlığı var");
+assert(/audit-sequence-metrics/.test(html), "Sıra denetimi metrikleri var");
+assert(/Revizyon Geçmişi/.test(html), "Revizyon geçmişi başlığı var");
+assert(/audit-revision-list|Snapshot revision bekleniyor/.test(html), "Revizyon geçmişi listesi veya güvenli boş durumu var");
 
 // 4. Mesajlaşma UI
 AeonV2.setSystemSubTab("messages");

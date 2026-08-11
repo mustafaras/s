@@ -451,6 +451,7 @@
     close: "M6 6l12 12M18 6L6 18",
     arrowLeft: "M19 12H5M11 6l-6 6 6 6",
     arrowRight: "M5 12h14M13 6l6 6-6 6",
+    copy: "M8 8h10v10H8zM5 5h10v3H8v7H5z",
     refresh: "M20 11a8 8 0 00-14-4L4 9M4 5v4h4M4 13a8 8 0 0014 4l2-2M20 19v-4h-4",
     lock: "M6 10h12v10H6zM8 10V7a4 4 0 018 0v3",
     dot: "M12 12m-4 0a4 4 0 108 0 4 4 0 10-8 0"
@@ -3818,6 +3819,11 @@
     return value ? "rev-" + value.slice(0, 8) : "—";
   }
 
+  function auditRevisionValue(value) {
+    var revision = safeText(value, 128);
+    return /^[a-f0-9]{7,128}$/i.test(revision) ? revision : "";
+  }
+
   function eventJsArg(value) {
     return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   }
@@ -4285,8 +4291,151 @@
            "</div>";
   }
 
+  function auditChronologicalEvents(events) {
+    return (Array.isArray(events) ? events : []).slice().sort(function(a, b) {
+      return String(a && a.occurredAt || "").localeCompare(String(b && b.occurredAt || "")) ||
+             Number(a && a.sequence || 0) - Number(b && b.sequence || 0) ||
+             String(a && a.eventId || "").localeCompare(String(b && b.eventId || ""));
+    });
+  }
+
+  function auditIssueText(issue) {
+    issue = issue || {};
+    var device = safeText(issue.device || "cihaz", 96) || "cihaz";
+    var sequence = safeNumber(issue.sequence);
+    if (issue.kind === "out_of_order") {
+      return "Sıra dışı · " + device + " · seq " + (sequence === null ? "—" : sequence) + " (önceki " + (safeNumber(issue.previous) === null ? "—" : issue.previous) + ")";
+    }
+    if (issue.kind === "sequence_gap") {
+      var from = safeNumber(issue.from), to = safeNumber(issue.to);
+      var missing = from !== null && to !== null ? Math.max(0, to - from - 1) : 0;
+      return "Eksik · " + device + " · seq " + (from === null ? "—" : from) + " → " + (to === null ? "—" : to) + " (" + missing + " olay)";
+    }
+    if (issue.kind === "duplicate_sequence") {
+      return "Çift kayıt · " + device + " · seq " + (sequence === null ? "—" : sequence);
+    }
+    return "Bilinmeyen sıra sinyali · " + device;
+  }
+
+  function auditSequenceReport() {
+    var parsed = parsePanelEvents();
+    var events = auditChronologicalEvents(parsed && parsed.events);
+    var adapter = eventAdapter();
+    var audit = { ok: true, issueCount: 0, issues: [], deviceCount: 0 };
+    var adapterReady = !!(adapter && typeof adapter.eventSequenceAudit === "function");
+    if (adapterReady) {
+      try {
+        audit = adapter.eventSequenceAudit(events) || audit;
+      } catch (e) {
+        adapterReady = false;
+      }
+    }
+    var issues = Array.isArray(audit.issues) ? audit.issues.slice(0, 100) : [];
+    var counts = { outOfOrder: 0, missing: 0, duplicate: 0 };
+    issues.forEach(function(issue) {
+      if (!issue) return;
+      if (issue.kind === "out_of_order") counts.outOfOrder += 1;
+      else if (issue.kind === "duplicate_sequence") counts.duplicate += 1;
+      else if (issue.kind === "sequence_gap") {
+        var from = safeNumber(issue.from), to = safeNumber(issue.to);
+        counts.missing += from !== null && to !== null ? Math.max(0, to - from - 1) : 0;
+      }
+    });
+
+    var revisions = {};
+    function addRevision(value, event, current) {
+      var revision = auditRevisionValue(value);
+      if (!revision) return;
+      var row = revisions[revision];
+      if (!row) {
+        row = revisions[revision] = { revision: revision, eventCount: 0, lastAt: null, device: "", section: "", current: false };
+      }
+      row.current = row.current || current === true;
+      if (current === true && !row.lastAt) row.lastAt = syncStatus.lastSyncedAt || null;
+      if (event) {
+        row.eventCount += 1;
+        if (!row.lastAt || String(event.occurredAt || "") > String(row.lastAt)) {
+          row.lastAt = event.occurredAt || null;
+          row.device = safeText(event.sourceDeviceId || "", 96);
+          row.section = safeText(event.section || "", 40);
+        }
+      }
+    }
+    events.forEach(function(event) { addRevision(event && event.snapshotRevision, event, false); });
+    addRevision(syncStatus.snapshotRevision, null, true);
+    var revisionRows = Object.keys(revisions).map(function(key) { return revisions[key]; });
+    revisionRows.sort(function(a, b) {
+      return (b.current ? 1 : 0) - (a.current ? 1 : 0) ||
+             String(b.lastAt || "").localeCompare(String(a.lastAt || "")) ||
+             String(b.revision).localeCompare(String(a.revision));
+    });
+
+    var status = !adapterReady || (parsed && parsed.code) ? "missing" : !events.length ? "missing" : audit.issueCount ? "warning" : "ok";
+    return {
+      status: status,
+      source: adapterReady ? "PanelCoverageV1 eventSequenceAudit" : "Event sequence adapter bekleniyor",
+      parsed: parsed,
+      events: events,
+      audit: audit,
+      issues: issues,
+      issueTexts: issues.map(auditIssueText),
+      counts: counts,
+      revisions: revisionRows.slice(0, 20),
+      totalRevisionCount: revisionRows.length
+    };
+  }
+
+  function renderAuditSequenceReport(report) {
+    report = report || auditSequenceReport();
+    var statusLabel = report.status === "ok" ? "Temiz" : report.status === "warning" ? "Uyarı" : "Bekliyor";
+    var statusCode = report.status === "ok" ? "accepted" : report.status === "warning" ? "conflict" : "idle";
+    var counts = report.counts || { outOfOrder: 0, missing: 0, duplicate: 0 };
+    var metrics = [
+      { label: "Sıra dışı olay", value: counts.outOfOrder, tone: counts.outOfOrder ? "warn" : "ok", icon: "arrowRight" },
+      { label: "Eksik olay", value: counts.missing, tone: counts.missing ? "warn" : "ok", icon: "dot" },
+      { label: "Çift kayıt", value: counts.duplicate, tone: counts.duplicate ? "drop" : "ok", icon: "copy" }
+    ].map(function(metric) {
+      return '<div class="audit-sequence-metric audit-sequence-metric--' + metric.tone + '">' +
+             '<span class="audit-sequence-metric__icon">' + renderIcon(metric.icon, 16) + '</span>' +
+             '<span class="audit-sequence-metric__label">' + escapeHtml(metric.label) + '</span>' +
+             '<strong class="audit-sequence-metric__value">' + escapeHtml(String(metric.value)) + '</strong></div>';
+    }).join("");
+    var issueList = report.issues.length
+      ? '<ol class="audit-sequence-issues" aria-label="Sıra denetimi sorunları">' + report.issueTexts.slice(0, 20).map(function(text, index) {
+          return '<li class="audit-sequence-issue"><span class="audit-sequence-issue__index">' + (index + 1) + '</span><span>' + escapeHtml(text) + '</span></li>';
+        }).join("") + '</ol>' + (report.issues.length > 20 ? '<div class="audit-sequence-more">+' + (report.issues.length - 20) + ' sorun daha</div>' : "")
+      : '<div class="audit-sequence-empty" role="status">Sıra dışı, eksik veya çift sequence bulunmadı.</div>';
+    return AeCard({ variant: "glass", className: "audit-sequence-card", children:
+      '<div class="system-card__head"><div><div class="ae-label">Event zinciri · ' + escapeHtml(report.source) + '</div><h2 class="system-card__title">Sıra Denetimi</h2><div class="audit-sequence-summary">' +
+      (report.events.length ? report.events.length + ' olay · ' + (report.audit.deviceCount || 0) + ' cihaz' : 'Henüz normalize edilmiş olay yok') +
+      '</div></div>' + AeStatusBadge({ status: statusCode, label: statusLabel }) + '</div>' +
+      '<div class="audit-sequence-metrics" aria-label="Sıra denetimi metrikleri">' + metrics + '</div>' +
+      '<div class="audit-sequence-report"><div class="ae-label">Detaylı rapor</div>' + issueList + '</div>'
+    });
+  }
+
+  function renderAuditRevisions(report) {
+    report = report || auditSequenceReport();
+    var rows = Array.isArray(report.revisions) ? report.revisions : [];
+    var content = rows.length
+      ? '<ol class="audit-revision-list" aria-label="Son 20 snapshot revizyonu">' + rows.map(function(row) {
+          return '<li class="audit-revision-row' + (row.current ? ' is-current' : '') + '">' +
+                 '<div class="audit-revision-row__head"><strong>' + escapeHtml(eventRevisionLabel(row.revision)) + '</strong>' +
+                 (row.current ? '<span class="audit-revision-row__current">Güncel</span>' : '') +
+                 '<time datetime="' + escapeHtml(row.lastAt || "") + '">' + escapeHtml(formatTs(row.lastAt)) + '</time></div>' +
+                 '<div class="audit-revision-row__meta"><span>' + (row.eventCount ? row.eventCount + ' olay' : 'Receipt revision') + '</span>' +
+                 (row.device ? '<span>' + escapeHtml(row.device) + '</span>' : '') +
+                 (row.section ? '<span>' + escapeHtml(eventSectionLabel(row.section)) + '</span>' : '') + '</div></li>';
+        }).join("") + '</ol>' + (report.totalRevisionCount > 20 ? '<div class="audit-revision-more">+' + (report.totalRevisionCount - 20) + ' eski revizyon</div>' : '')
+      : '<div class="audit-revision-empty" role="status">Snapshot revision bekleniyor.</div>';
+    return AeCard({ variant: "glass", className: "audit-revision-card", children:
+      '<div class="system-card__head"><div><div class="ae-label">Snapshot geçmişi</div><h2 class="system-card__title">Revizyon Geçmişi</h2></div><span class="audit-card__badge">SON 20</span></div>' + content
+    });
+  }
+
   function renderAuditDetail() {
     var proj = projectData(appData);
+    var sequenceReport = auditSequenceReport();
     var coverage = proj && proj.coverage ? proj.coverage : {};
     var redacted = Array.isArray(coverage.redacted) ? coverage.redacted.length : 0;
     var summary = Array.isArray(coverage.summary) ? coverage.summary.length : 0;
@@ -4308,6 +4457,7 @@
     }).join("") + "</ol>";
     return '<div class="audit-detail ae-slide-up ae-stagger">' +
            AeCard({ variant: "glass", className: "audit-card", children: '<div class="system-card__head"><div><div class="ae-label">Güvenlik ve veri akışı</div><h2 class="system-card__title">Coverage zaman çizelgesi</h2></div><span class="audit-card__badge">LIVE</span></div>' + timeline }) +
+           renderAuditSequenceReport(sequenceReport) + renderAuditRevisions(sequenceReport) +
            '<div class="audit-hint">Yalnızca izin verilen alanlar observer\'a yansıtılır. Detaylar panelCoverageManifest.js\'te tanımlı.</div>' +
            "</div>";
   }
@@ -5582,6 +5732,8 @@
     clearEventFilters: clearEventFilters,
     parsePanelEvents: parsePanelEvents,
     renderEventLog: renderEventLog,
+    auditSequenceReport: auditSequenceReport,
+    renderAuditDetail: renderAuditDetail,
     selectNotification: selectNotification,
     setMessageDraft: setMessageDraft,
     sendMessage: sendMessage,

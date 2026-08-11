@@ -73,7 +73,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 | 33 | Ayarlar & Tanı Araçları | ✅ TAMAMLANDI | `4f0fc1a` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_system.js`; `node tests/test_panel_v2_settings.js`; `tests/test_panel_v2_*.js` (21/21 PASS); `node tests/test_panel_p2_event_log.js` (11/11 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; Pages run `31489910967` SUCCESS; deploy işi SUCCESS; canlı HTTP 200/cache `20260811h` | Polling 30 sn/60 sn/5 dk/Kapalı seçici, otomatik yenileme toggle'ı ve yerel tercih saklama; bağlantı/veri doğrulama/cache temizleme/ETag'siz zorla senkron tanıları; sürüm-tarih-commit hakkında kartı; kullanıcı verisi ve token sınırı korunarak tamamlandı |
 | 34 | Sistem Sekmesi Sub-tab | ✅ TAMAMLANDI | `8542b66` + kalite düzeltmesi `188bdbc` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `tests/test_panel_v2_*.js` (22/22 PASS); `node tests/test_panel_p2_event_log.js` (11/11 PASS); `node tests/test_panel_p4_provenance.js` (28/28 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check`; tüm `tests/test_*.js` (54/54 PASS); cache/parity kontratları sürüm-bağımsız hale getirildi; Kur’an kartı font-size değerleri tokenlaştırıldı; Pages run `31500908612` SUCCESS; deployment `5852262209` SUCCESS; canlı HTTP 200/cache `20260811i` | Kanonik `SYSTEM_SUB_TABS` ile Durum/Olaylar/Denetim/Mesajlar/Ayarlar sırası, her panel için ARIA id-controls bağı, render fonksiyon eşlemeleri ve tek-kullanımlık reduced-motion uyumlu sub-tab giriş animasyonu tamamlandı; audit sonrası tüm kalite kapıları kapatıldı |
 | 35 | Polling & Telemetry Testleri | ✅ TAMAMLANDI | `4a3fb80` + `52779b5` + `4106605` (final metadata commit'i ayrıca) | `node --check panel-v2.js`; `node tests/test_panel_v2_polling_tests.js` (19/19 PASS); `node tests/test_panel_v2_polling_telemetry.js` (27/27 PASS); `tests/test_panel_v2_*.js` (23/23 PASS); `tests/test_*.js` (55/55 PASS); `node .claude/skills/run-seyma/driver.mjs`; `node .claude/skills/run-seyma/zikr-harness.mjs` (90/90); state boundary fixtures PASS; `git diff --check`; Pages run `31505127099` SUCCESS; deployment `5853052269` SUCCESS; canlı HTTP 200/cache `20260811j` | Polling start/stop, p50/p95, rate-limit headers, veri tazeliği ve doğrudan/load 304 render-gate regresyonları eklendi; 304 akışında gereksiz render kaldırıldı; stale Pages workflow kuyruğunu önlemek için `cancel-in-progress: true` yapıldı; canlı runtime SHA `4106605` doğrulandı |
-| 36 | WCAG AA Renk Kontrastı | 🔒 BEKLEMEDE | - | - | - |
+| 36 | WCAG AA Renk Kontrastı | ✅ TAMAMLANDI | `a4aacca` | `node --check panel-v2.js`; `node --check panelCoverageManifest.js`; `node tests/test_panel_v2_css.js`; `node tests/test_panel_v2_contrast.js`; `tests/test_panel_v2_*.js` (24/24 PASS); `tests/test_*.js` (56/56 PASS); `node .claude/skills/run-seyma/driver.mjs`; `git diff --check` | Açık/koyu temada tüm metin tokenları 4.5:1 üstüne taşındı; heatmap ve drop butonu kontratları güvenceye alındı; cache-bust `20260811k`; Pages/live doğrulama push sonrası |
 | 37 | Klavye Navigasyonu & Screen Reader | 🔒 BEKLEMEDE | - | - | - |
 | 38 | CSS Containment & Performans | 🔒 BEKLEMEDE | - | - | - |
 | 39 | Yeni Komponent Testleri | 🔒 BEKLEMEDE | - | - | - |
@@ -83,10 +83,10 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 ## Global Durum
 
-- **currentStep:** 36
+- **currentStep:** 37
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-11
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 35 Polling & Telemetry Testleri
+- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 36 WCAG AA Renk Kontrastı
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)

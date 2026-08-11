@@ -7,7 +7,7 @@
 - **Uygulayan Ajan:** `OpenAI Codex (GPT-5)`
 - **Tarih:** `2026-08-11`
 - **Başlangıç Commit:** `085d330`
-- **Bitiş Commit:** `188bdbc` (ledger metadata commit'i ayrı)
+- **Bitiş Commit:** `188bdbc` (ledger metadata commit'i `4733e38`)
 
 ## Yapılanlar
 
@@ -43,6 +43,9 @@
 - Panel P2/P4 ve Quran transport fixtures   → PASS
 - git diff --check                            → PASS
 - sabit font-size taraması                    → PASS
+- Pages run `31500908612`                    → SUCCESS
+- deployment `5852262209`                   → SUCCESS
+- canlı panel-v2 HTTP/cache                  → 200 / `20260811i`
 ```
 
 ### Önceki Hatalar ve Çözümleri
@@ -53,7 +56,7 @@
 ## Sıradaki Adım
 
 - **Bir sonraki prompt:** `35 — Polling & Telemetry Testleri`
-- **Öneri:** Prompt 35'e geçmeden final Pages deployment SHA/cache doğrulamasını tamamla.
+- **Öneri:** Prompt 35'e geçmeden önce bu remediation handoff'unu oku; runtime kodu ve 54/54 kalite kapısı yeşil.
 
 ## Context / Token Notu
 

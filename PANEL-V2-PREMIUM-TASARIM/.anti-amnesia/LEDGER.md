@@ -86,7 +86,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 - **currentStep:** 41
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-12
-- **lastAgent:** OpenAI Codex (GPT-5) — post-close polling loading deadlock fix
+- **lastAgent:** OpenAI Codex (GPT-5) — post-close polling loading UX fix
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)
@@ -98,21 +98,22 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 ## Proje Tamamlandı
 
 - 40/40 prompt tamamlandı; Prompt 40 son QA/deploy kapısıdır.
-- Final üretim cache-bust: panel-v2.css/js?v=20260812b.
-- Prompt 40 sonrası bakım düzeltmesi commit'i: `97e5214`; Pages run `31572931763` SUCCESS.
+- Final üretim cache-bust: panel-v2.css/js?v=20260812c.
+- Prompt 40 sonrası bakım düzeltmeleri: `97e5214` + `9287adf`; Pages run `31574291704` SUCCESS.
 - Kullanıcı verisi, tokenlar ve mustafaras/seyma-data kapsam dışı ve dokunulmamıştır.
 - Tarayıcı açılmadan Node/VM headless doğrulama politikası korunmuştur.
 
-## Post-close Bugfix — Polling 304 Loading Deadlock
+## Post-close Bugfix — Polling Loading Deadlock ve Background Refresh UX
 
 - Prompt 40 tamamlanmış olarak korunmuştur; `currentStep` 41 ve `totalSteps` 40 kalmıştır. Prompt 41 başlatılmamıştır.
 - `304 Not Modified` sonrası final render yeniden etkinleştirildi; skeleton, `aria-busy` ve status DOM'u doğru kapanıyor.
 - GitHub fetch + JSON gövdesi için 20 saniyelik AbortController destekli timeout eklendi; timeout sonrası geç yanıtların DOM/state'i bozması engellendi.
 - Loading statusu yanlış `Gönderiliyor` yerine `Kontrol ediliyor` olarak ayrıştırıldı.
-- Uygulama commit'i: `97e5214` — `Fix panel polling loading deadlock`.
-- Cache-bust: `panel-v2.css/js?v=20260812b`.
+- Mevcut snapshot varken background polling artık içerik skeleton'la değiştirmiyor; mevcut panel korunuyor ve yalnızca status/`aria-busy` güncelleniyor.
+- Uygulama commit'leri: `97e5214` — `Fix panel polling loading deadlock`; `9287adf` — `Keep panel content during background polling`.
+- Cache-bust: `panel-v2.css/js?v=20260812c`.
 - Testler: Panel-v2 27/27, panel-P 11/11, kök 59/59, driver PASS, zikr 90/90, syntax ve `git diff --check` PASS.
-- Pages: code run `31572931763` ve final metadata run `31573076278` — validate/deploy SUCCESS; canlı CSS/JS byte eşitliği PASS.
+- Pages: code run `31572931763`, background UX code run `31574291704` — validate/deploy SUCCESS; canlı CSS/JS byte eşitliği PASS.
 
 ## Son Kararlar (Decision Log)
 

@@ -28,6 +28,7 @@
   var PANEL_VERSION = "2.0";
   var PANEL_BUILD_DATE = "2026-08-11";
   var PANEL_SOURCE_COMMIT = "8542b66";
+  var FETCH_TIMEOUT_MS = 20000;
   var POLLING_OPTIONS = [
     { value: 30000, label: "30 sn" },
     { value: 60000, label: "60 sn" },
@@ -676,7 +677,7 @@
     if (["error", "unauthorized", "forbidden", "not_found", "rate_limited"].indexOf(code) !== -1 || Number(status.consecutiveErrors) >= 3) {
       return { label: "Kritik", tone: "drop", meta: code };
     }
-    if (Number(status.errorCount) > 0 || Number(status.consecutiveErrors) > 0 || code === "saving" || code === "retrying") {
+    if (Number(status.errorCount) > 0 || Number(status.consecutiveErrors) > 0 || code === "saving" || code === "loading" || code === "retrying") {
       return { label: "Uyarı", tone: "warn", meta: code };
     }
     return { label: "Bekliyor", tone: "muted", meta: ui.panelToken ? "İlk kontrol bekleniyor" : "Token ayarlanmadı" };
@@ -1131,14 +1132,14 @@
     var status = opts.status || "idle";
     var labels = {
       idle: "Bekliyor", local_saved: "Kaydedildi", queued: "Sıraya alındı",
-      saving: "Gönderiliyor", retrying: "Yeniden deneniyor", accepted: "Senkronize",
+      saving: "Gönderiliyor", loading: "Kontrol ediliyor", retrying: "Yeniden deneniyor", accepted: "Senkronize",
       error: "Hata", offline: "Çevrimdışı", permission: "İzin hatası",
       unauthorized: "Yetkisiz", forbidden: "Yasak", not_found: "Bulunamadı",
       conflict: "Çakışma", anti_clobber: "Koruma", rate_limited: "Limit",
       receipt_failed: "Makbuz hatası"
     };
     var palette = {
-      idle: "muted", local_saved: "info", queued: "info", saving: "warn", retrying: "warn",
+      idle: "muted", local_saved: "info", queued: "info", saving: "warn", loading: "info", retrying: "warn",
       accepted: "ok", error: "drop", offline: "pause", permission: "drop",
       unauthorized: "drop", forbidden: "drop", not_found: "drop", conflict: "warn",
       anti_clobber: "warn", rate_limited: "warn", receipt_failed: "drop"
@@ -6246,14 +6247,47 @@
       telemetryRecorded = true;
       recordFetchTelemetry(Date.now() - requestStartedAt, success, meta);
     }
+    var requestController = null;
+    try {
+      if (typeof root.AbortController === "function") requestController = new root.AbortController();
+    } catch (e) {
+      requestController = null;
+    }
+    var requestOptions = { headers: H, cache: "no-store" };
+    if (requestController) requestOptions.signal = requestController.signal;
     var request;
     try {
-      request = root.fetch(api, { headers: H, cache: "no-store" });
+      request = root.fetch(api, requestOptions);
     } catch (e) {
       finishFetch(false, { code: "network" });
       return Promise.reject(e);
     }
-    return request.then(function(r) {
+    var timedOut = false;
+    var requestSettled = false;
+    var timeoutError = null;
+    var timeoutId = null;
+    function clearRequestTimeout() {
+      if (timeoutId !== null && typeof root.clearTimeout === "function") root.clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    var timeoutPromise = null;
+    if (typeof root.setTimeout === "function") {
+      timeoutPromise = new Promise(function(_resolve, reject) {
+        timeoutId = root.setTimeout(function() {
+          if (timedOut || requestSettled) return;
+          timedOut = true;
+          if (requestController && typeof requestController.abort === "function") {
+            try { requestController.abort(); } catch (e) {}
+          }
+          timeoutError = new Error("GitHub isteği zaman aşımına uğradı.");
+          timeoutError.code = "timeout";
+          finishFetch(false, { code: "timeout" });
+          reject(timeoutError);
+        }, FETCH_TIMEOUT_MS);
+      });
+    }
+    var requestFlow = Promise.resolve(request).then(function(r) {
+      if (timedOut) throw timeoutError;
       var etag = responseHeader(r, "ETag");
       var rateRemainingHeader = responseHeader(r, "X-RateLimit-Remaining");
       var rateLimitHeader = responseHeader(r, "X-RateLimit-Limit");
@@ -6292,6 +6326,7 @@
         throw new Error("Sunucu hatasi: " + r.status);
       }
       return r.json().then(function(data) {
+        if (timedOut) throw timeoutError;
         finishFetch(true, { status: r.status });
         syncStatus.etag = etag;
         syncStatus.snapshotRevision = (data && data.syncReceipt && data.syncReceipt.snapshotRevision) || null;
@@ -6304,11 +6339,23 @@
         render();
         return { notModified: false, data: data, meta: { etag: etag, completedAt: syncStatus.lastSyncedAt } };
       }, function(error) {
+        if (timedOut) throw timeoutError;
         finishFetch(false, { code: "parse_error" });
         throw error;
       });
     }, function(error) {
+      if (timedOut) throw timeoutError;
       finishFetch(false, { code: "network" });
+      throw error;
+    });
+    if (!timeoutPromise) return requestFlow;
+    return Promise.race([requestFlow, timeoutPromise]).then(function(value) {
+      requestSettled = true;
+      clearRequestTimeout();
+      return value;
+    }, function(error) {
+      requestSettled = true;
+      clearRequestTimeout();
       throw error;
     });
   }
@@ -6325,7 +6372,7 @@
     }
     startPolling();
     isFetching = true;
-    syncStatus.status = "saving";
+    syncStatus.status = "loading";
     syncStatus.lastErrorCode = null;
     render();
     return fetchLatest(REPO, BRANCH)
@@ -6336,9 +6383,12 @@
         }
         throw e;
       })
-      .then(function(res) {
+      .then(function() {
         isFetching = false;
-        if (!(res && res.notModified)) render();
+        // 304 yanıtında fetchLatest bilinçli olarak render yapmaz; final render
+        // skeleton'ı kapatıp kabul edilmiş snapshotı ve aria-busy durumunu
+        // görünür DOM'a geri taşır.
+        render();
         return appData;
       })
       .catch(function(e) {

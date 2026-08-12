@@ -46,7 +46,7 @@ function installRenderCounter(ctx) {
 }
 
 async function main() {
-  const { ctx, AeonV2, flushPromises, intervalInfo } = boot();
+  const { ctx, AeonV2, flushPromises, runTimers, intervalInfo } = boot();
   AeonV2.init();
 
   assert(AeonV2.getPollingState().intervalId === null, "Token yokken polling interval'ı başlamıyor");
@@ -107,7 +107,65 @@ async function main() {
   renders.reset();
   await AeonV2.load();
   await settle(flushPromises);
-  assert(renders.count() === 1, "load 304 akışında yalnızca başlangıç durumu render ediliyor");
+  assert(renders.count() === 2, "load 304 akışında başlangıç ve final durumları render ediliyor");
+  assert(!renders.html().includes("Veriler yükleniyor"), "load 304 akışında skeleton kapanıyor");
+  assert(renders.html().includes("Senkronize"), "load 304 akışında kabul edilmiş durum görünür kalıyor");
+
+  let resolveLate;
+  let abortCalled = false;
+  ctx.AbortController = function() {
+    this.signal = {};
+    this.abort = function() { abortCalled = true; };
+  };
+  ctx.fetch = function(_url, options) {
+    assert(options && options.signal, "Fetch isteğine AbortController sinyali bağlanıyor");
+    return new Promise(function(resolve) { resolveLate = resolve; });
+  };
+  renders.reset();
+  const timeoutLoad = AeonV2.load();
+  assert(renders.html().includes("Veriler yükleniyor"), "Yavaş istek başında loading görünür");
+  assert(renders.html().includes("Kontrol ediliyor"), "Yavaş istek statusu gönderim yerine kontrol olarak görünür");
+  runTimers();
+  await timeoutLoad;
+  await settle(flushPromises);
+  assert(abortCalled, "Fetch timeoutunda AbortController çağrılıyor");
+  assert(AeonV2.syncStatus.status === "error", "Fetch timeoutu hata durumuna geçiyor");
+  assert(/zaman aşımına uğradı/.test(AeonV2.syncStatus.lastErrorCode), "Fetch timeoutu kullanıcıya anlamlı hata kodu bırakıyor");
+  assert(!renders.html().includes("Veriler yükleniyor"), "Fetch timeoutu skeletonı kapatıyor");
+
+  resolveLate({
+    status: 200,
+    ok: true,
+    headers: { get: function() { return '"late-etag"'; } },
+    json: function() { return Promise.resolve({ days: { "2026-08-11": { mood: 5 } } }); }
+  });
+  await settle(flushPromises);
+  assert(AeonV2.syncStatus.status === "error", "Timeout sonrası geç gelen yanıt hata durumunu bozamıyor");
+  assert(!renders.html().includes("Veriler yükleniyor"), "Timeout sonrası geç yanıt skeletonı geri açmıyor");
+
+  let resolveJson;
+  ctx.fetch = function(_url, options) {
+    assert(options && options.signal, "JSON gövdesi isteğinde AbortController sinyali korunuyor");
+    return Promise.resolve({
+      status: 200,
+      ok: true,
+      headers: { get: function() { return '"body-etag"'; } },
+      json: function() { return new Promise(function(resolve) { resolveJson = resolve; }); }
+    });
+  };
+  renders.reset();
+  const bodyTimeoutLoad = AeonV2.load();
+  assert(renders.html().includes("Kontrol ediliyor"), "Yanıt gövdesi beklenirken kontrol durumu görünür");
+  await settle(flushPromises);
+  runTimers();
+  await bodyTimeoutLoad;
+  await settle(flushPromises);
+  assert(AeonV2.syncStatus.status === "error", "JSON gövdesi timeoutu hata durumuna geçiyor");
+  assert(/zaman aşımına uğradı/.test(AeonV2.syncStatus.lastErrorCode), "JSON gövdesi timeoutu aynı anlamlı hata kodunu kullanıyor");
+  assert(!renders.html().includes("Veriler yükleniyor"), "JSON gövdesi timeoutu skeletonı kapatıyor");
+  resolveJson({ days: { "2026-08-11": { mood: 4 } } });
+  await settle(flushPromises);
+  assert(AeonV2.syncStatus.status === "error", "Timeout sonrası geç JSON gövdesi hata durumunu bozamıyor");
 
   AeonV2.logout();
   assert(AeonV2.getPollingState().intervalId === null, "Logout polling'i durduruyor");

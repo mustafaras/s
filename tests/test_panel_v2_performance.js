@@ -11,8 +11,8 @@ assert(css.includes("contain: layout style paint"), "Kartlarda layout/style/pain
 assert(css.includes("content-visibility: auto"), "Offscreen bölümlerde content-visibility auto var");
 assert(css.includes("contain-intrinsic-size: auto 160px"), "Offscreen bölümler için intrinsic boyut var");
 assert(css.includes("contain-intrinsic-size: auto 420px"), "Arşiv listesi için intrinsic boyut var");
-assert(html.includes("panel-v2.css?v=20260812a"), "CSS cache-bust final QA sürümüne yükseltildi");
-assert(html.includes("panel-v2.js?v=20260812a"), "JS cache-bust final QA sürümüne yükseltildi");
+assert(html.includes("panel-v2.css?v=20260812b"), "CSS cache-bust final QA sürümüne yükseltildi");
+assert(html.includes("panel-v2.js?v=20260812b"), "JS cache-bust final QA sürümüne yükseltildi");
 assert(!html.includes("unpkg.com/leaflet@1.9.4/dist/leaflet.js"), "Leaflet script'i eager yüklenmiyor");
 assert(!html.includes("unpkg.com/leaflet@1.9.4/dist/leaflet.css"), "Leaflet CSS'i eager yüklenmiyor");
 assert(js.includes("function throttle("), "Scroll throttle helper'ı var");

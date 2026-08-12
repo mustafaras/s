@@ -25,6 +25,7 @@ function createDom(initialTheme, initialDensity) {
   let theme = initialTheme || "dark";
   let density = initialDensity || "comfortable";
   const appListeners = {};
+  const appAttributes = {};
   const appElement = {
     get innerHTML() { return html; },
     set innerHTML(v) { html = v; },
@@ -36,6 +37,8 @@ function createDom(initialTheme, initialDensity) {
       const listeners = appListeners[type] || [];
       appListeners[type] = listeners.filter(function(fn) { return fn !== listener; });
     },
+    setAttribute: function(name, value) { appAttributes[name] = String(value); },
+    getAttribute: function(name) { return appAttributes[name] === undefined ? null : appAttributes[name]; },
     dispatchEvent: function(event) {
       const listeners = (appListeners[event.type] || []).slice();
       listeners.forEach(function(listener) { listener.call(appElement, event); });
@@ -50,6 +53,7 @@ function createDom(initialTheme, initialDensity) {
     get density() { return density; },
     dispatchAppEvent: function(event) { return appElement.dispatchEvent(event); },
     appListenerCount: function(type) { return appElement.listenerCount(type); },
+    appAttribute: function(name) { return appElement.getAttribute(name); },
     getElementById: function(id) {
       if (id === "app") {
         return appElement;

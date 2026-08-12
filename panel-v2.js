@@ -6026,7 +6026,12 @@
     options = options || {};
     rememberFocus();
     var projection = projectData(null);
-    var activeContent = isFetching ? renderLoadingState() : renderActiveTab(Boolean(options.transition));
+    // İlk snapshot hiç yoksa skeleton göster; arka plan polling'i mevcut
+    // içeriği kaldırmamalı. Ağ gecikmesi kullanıcıyı boş/skeleton ekranda
+    // bırakmadan status + aria-busy üzerinden görünür kalır.
+    var activeContent = isFetching && !isObject(appData)
+      ? renderLoadingState()
+      : renderActiveTab(Boolean(options.transition));
     app.innerHTML =
       renderPullRefreshIndicator() +
       renderTopbar() +

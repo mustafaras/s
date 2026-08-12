@@ -46,7 +46,7 @@ function installRenderCounter(ctx) {
 }
 
 async function main() {
-  const { ctx, AeonV2, flushPromises, runTimers, intervalInfo } = boot();
+  const { ctx, dom, AeonV2, flushPromises, runTimers, intervalInfo } = boot();
   AeonV2.init();
 
   assert(AeonV2.getPollingState().intervalId === null, "Token yokken polling interval'ı başlamıyor");
@@ -117,6 +117,8 @@ async function main() {
     this.signal = {};
     this.abort = function() { abortCalled = true; };
   };
+  AeonV2.logout();
+  AeonV2.setPanelToken("ghp_prompt35_fixture");
   ctx.fetch = function(_url, options) {
     assert(options && options.signal, "Fetch isteğine AbortController sinyali bağlanıyor");
     return new Promise(function(resolve) { resolveLate = resolve; });
@@ -166,6 +168,16 @@ async function main() {
   resolveJson({ days: { "2026-08-11": { mood: 4 } } });
   await settle(flushPromises);
   assert(AeonV2.syncStatus.status === "error", "Timeout sonrası geç JSON gövdesi hata durumunu bozamıyor");
+
+  AeonV2.setData({ days: { "2026-08-11": { mood: 4 } }, startDate: "2026-01-01" });
+  ctx.fetch = function() { return new Promise(function() {}); };
+  renders.reset();
+  const backgroundLoad = AeonV2.load();
+  assert(!renders.html().includes("Veriler yükleniyor"), "Mevcut snapshot varken arka plan polling skeleton göstermiyor");
+  assert(renders.html().includes("Kontrol ediliyor"), "Arka plan polling statusu görünür kalıyor");
+  assert(renders.html().includes("Genel Bakış"), "Arka plan polling mevcut panel içeriğini koruyor");
+  assert(dom.appAttribute("aria-busy") === "true", "Arka plan polling aria-busy ile duyuruluyor");
+  void backgroundLoad;
 
   AeonV2.logout();
   assert(AeonV2.getPollingState().intervalId === null, "Logout polling'i durduruyor");

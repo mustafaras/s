@@ -2,7 +2,8 @@
 
 > **Hedef:** Panel-v2'nin bilgi akışı, senkronizasyon durumu, olay günlüğü ve kontrol mekanizmalarını profesyonel bir "komuta merkezi" seviyesine yükseltmek.
 > **Tarih:** 2026-08-04
-> **Durum:** Plan (henüz uygulanmadı)
+> **Durum:** ✅ Uygulandı — Faz A–F tamamlandı; Prompt 28–35 ve 40 QA kayıtları
+> `PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/LEDGER.md` içindedir (2026-08-12).
 
 ---
 
@@ -28,7 +29,10 @@
 - ✅ `data.eventLog.events[]` ve `data/events/<date>.json` ile olay kaydı
 - ✅ `syncStatus` nesnesi (status, etag, revision, lastSyncedAt)
 
-### 1.2. Zayıf Yanlar (İyileştirilecek)
+### 1.2. Tarihsel zayıf yanlar (2026-08-04 baseline)
+
+> Bu tablo uygulama öncesi baseline’dır; güncel durum için Faz A–F kapanış
+> kaydı ve `.anti-amnesia/CURRENT-STATE.md` esas alınır.
 
 | # | Sorun | Etki |
 |---|-------|------|
@@ -476,88 +480,96 @@ function updateLatencyTelemetry(durationMs) {
 
 ## 5. Uygulama Fazları
 
+> **Kapanış notu:** Polling, olay günlüğü, senkron sağlığı, bildirim yaşam
+> döngüsü, sıra/revizyon denetimi ve ayarlar/tanı yüzeyleri uygulandı. Güncel
+> test yolları `tests/panel-v2/` altındadır; eski handoff’lar tarihsel dosya
+> yollarını korur.
+
 ### Faz A: Polling & Telemetry Altyapısı (Tahmini: 1 oturum)
 
-- [ ] `syncStatus` nesnesini genişlet (p50, p95, errorCount, consecutiveErrors, apiRateLimit)
-- [ ] Otomatik polling motorunu ekle (`setInterval` tabanlı)
-- [ ] İstek süresi telemetrisini ekle (p50/p95 hesaplama)
-- [ ] Veri tazelik göstergesini ekle ("X dk önce")
-- [ ] API rate limit takibini ekle (GitHub `x-ratelimit-remaining` header'ı)
-- [ ] Polling'i token varlığına göre otomatik başlat/durdur
-- [ ] Mevcut testlerin geçtiğini doğrula
+- [x] `syncStatus` nesnesini genişlet (p50, p95, errorCount, consecutiveErrors, apiRateLimit)
+- [x] Otomatik polling motorunu ekle (`setInterval` tabanlı)
+- [x] İstek süresi telemetrisini ekle (p50/p95 hesaplama)
+- [x] Veri tazelik göstergesini ekle ("X dk önce")
+- [x] API rate limit takibini ekle (GitHub `x-ratelimit-remaining` header'ı)
+- [x] Polling'i token varlığına göre otomatik başlat/durdur
+- [x] Mevcut testlerin geçtiğini doğrula
 
 ### Faz B: Olay Günlüğü Görüntüleyicisi (Tahmini: 2 oturum)
 
-- [ ] `data.eventLog.events`'i okuyup render eden fonksiyon
-- [ ] Filtreleme (bölüm, işlem, tarih aralığı)
-- [ ] Sayfalama (20/50/100)
-- [ ] Olay detay drawer'ı (eventId, correlationId, sequence, path, revision)
-- [ ] `panelCoverageManifest.js`'deki `normalizeEvent` ve `parseEventLog`'u kullan
-- [ ] Sistem sekmesine "Olaylar" sub-tab'ı ekle
-- [ ] Test ekle
+- [x] `data.eventLog.events`'i okuyup render eden fonksiyon
+- [x] Filtreleme (bölüm, işlem, tarih aralığı)
+- [x] Sayfalama (20/50/100)
+- [x] Olay detay drawer'ı (eventId, correlationId, sequence, path, revision)
+- [x] `panelCoverageManifest.js`'deki `normalizeEvent` ve `parseEventLog`'u kullan
+- [x] Sistem sekmesine "Olaylar" sub-tab'ı ekle
+- [x] Test ekle
 
 ### Faz C: Senkron Sağlık Paneli (Tahmini: 1 oturum)
 
-- [ ] Sağlık metrik kartları (durum, gecikme, hata oranı, tazelik)
-- [ ] İstek geçmişi mini grafiği (son 24 saat)
-- [ ] API durumu kartı (limit, token, son başarı)
-- [ ] Hata geçmişi listesi
-- [ ] Test ekle
+- [x] Sağlık metrik kartları (durum, gecikme, hata oranı, tazelik)
+- [x] İstek geçmişi mini grafiği (son 24 saat)
+- [x] API durumu kartı (limit, token, son başarı)
+- [x] Hata geçmişi listesi
+- [x] Test ekle
 
 ### Faz D: Bildirim Yaşam Döngüsü (Tahmini: 1 oturum)
 
-- [ ] `panelCoverageManifest.js`'deki `notificationEventProjection`'u kullan
-- [ ] Bildirim zaman çizelgesi görselleştirmesi
-- [ ] Okunma/iletilme durumu göstergeleri
-- [ ] Mesaj gönderme arayüzü (observer-inbox.json'a yazma)
-- [ ] Test ekle
+- [x] `panelCoverageManifest.js`'deki `notificationEventProjection`'u kullan
+- [x] Bildirim zaman çizelgesi görselleştirmesi
+- [x] Okunma/iletilme durumu göstergeleri
+- [x] Mesaj gönderme arayüzü (observer-inbox.json'a yazma)
+- [x] Test ekle
 
 ### Faz E: Sıra Denetimi & Revizyon Geçmişi (Tahmini: 1 oturum)
 
-- [ ] `panelCoverageManifest.js`'deki `eventSequenceAudit`'i kullan
-- [ ] Sıra denetimi kartı (sıra dışı, eksik, çift olay tespiti)
-- [ ] Revizyon geçmişi listesi
-- [ ] Denetim sekmesini güncelle
-- [ ] Test ekle
+- [x] `panelCoverageManifest.js`'deki `eventSequenceAudit`'i kullan
+- [x] Sıra denetimi kartı (sıra dışı, eksik, çift olay tespiti)
+- [x] Revizyon geçmişi listesi
+- [x] Denetim sekmesini güncelle
+- [x] Test ekle
 
 ### Faz F: Ayarlar & Tanı Araçları (Tahmini: 1 oturum)
 
-- [ ] Polling yapılandırması (aralık, aç/kapa)
-- [ ] Tanı araçları (test bağlantısı, veri doğrulama, önbellek temizleme)
-- [ ] Hakkında bölümü
-- [ ] Ayarlar sekmesini güncelle
-- [ ] Test ekle
+- [x] Polling yapılandırması (aralık, aç/kapa)
+- [x] Tanı araçları (test bağlantısı, veri doğrulama, önbellek temizleme)
+- [x] Hakkında bölümü
+- [x] Ayarlar sekmesini güncelle
+- [x] Test ekle
 
 ---
 
 ## 6. Kabul Kriterleri
 
+> Kaynak ve headless/deploy kanıtı tamamlandı. Kullanıcı cihazı gözlemi bu
+> listenin dışında ayrı bir kanıt seviyesidir.
+
 ### 6.1. Fonksiyonel
 
-- [ ] Veri otomatik olarak her 60 saniyede güncelleniyor
-- [ ] Olay günlüğü filtrelenebiliyor ve sayfalanabiliyor
-- [ ] Olay detayları görüntülenebiliyor
-- [ ] Senkron sağlık metrikleri canlı gösteriliyor
-- [ ] Bildirim yaşam döngüsü görselleştiriliyor
-- [ ] Sıra denetimi çalışıyor
-- [ ] Revizyon geçmişi gösteriliyor
-- [ ] Tanı araçları çalışıyor
+- [x] Veri otomatik olarak her 60 saniyede güncelleniyor
+- [x] Olay günlüğü filtrelenebiliyor ve sayfalanabiliyor
+- [x] Olay detayları görüntülenebiliyor
+- [x] Senkron sağlık metrikleri canlı gösteriliyor
+- [x] Bildirim yaşam döngüsü görselleştiriliyor
+- [x] Sıra denetimi çalışıyor
+- [x] Revizyon geçmişi gösteriliyor
+- [x] Tanı araçları çalışıyor
 
 ### 6.2. Performans
 
-- [ ] Polling 304 yanıtında render tetiklemiyor
-- [ ] Olay günlüğü 200+ olayda akıcı
-- [ ] p50/p95 hesaplaması 20 istekte kararlı
-- [ ] Bellek kullanımı mevcut seviyeyi geçmiyor
+- [x] Polling 304 yanıtında render tetiklemiyor
+- [x] Olay günlüğü 200+ olayda akıcı
+- [x] p50/p95 hesaplaması 20 istekte kararlı
+- [x] Bellek kullanımı mevcut seviyeyi geçmiyor
 
 ### 6.3. Test
 
-- [ ] Tüm mevcut testler geçiyor
-- [ ] Yeni polling testleri
-- [ ] Yeni olay günlüğü testleri
-- [ ] Yeni sağlık paneli testleri
-- [ ] Yeni bildirim testleri
-- [ ] Yeni denetim testleri
+- [x] Tüm mevcut testler geçiyor
+- [x] Yeni polling testleri
+- [x] Yeni olay günlüğü testleri
+- [x] Yeni sağlık paneli testleri
+- [x] Yeni bildirim testleri
+- [x] Yeni denetim testleri
 
 ---
 

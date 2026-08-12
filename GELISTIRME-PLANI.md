@@ -132,6 +132,14 @@ ve fazlar arası anti-amnesia kayıtları eşli ledger’larda tutulur. Panel
 promptları tek faz/tek oturum kuralıyla çalıştırılır; bu link canlıya alma
 izni vermez.
 
+ÆON Panel-v2 Premium’un bağımsız 40 promptluk tasarım paketi
+[`archive/PANEL-V2-PREMIUM-TASARIM/`](archive/PANEL-V2-PREMIUM-TASARIM/) altında
+kapanmıştır:
+40/40 prompt ve final QA tamamlandı, güncel ajan başlangıç noktası
+[`CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md),
+Panel-v2 fixture’ları ise [`tests/panel-v2/`](tests/panel-v2/) altındadır.
+Kullanıcı cihazı kabulü ayrı bir kanıt seviyesidir; Prompt 41 başlatılmamıştır.
+
 Kök belge ve uzun runtime dosyalarının güvenli sınıflandırma/modülerleştirme
 planı ayrıca [`docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md`](docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md)
 dosyasındadır. Bu plan önce envanter ve bağımlılık haritası, sonra düşük riskli

@@ -82,6 +82,7 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 
 - Start new sessions with [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
 - Use [`.claude/skills/run-seyma/SKILL.md`](.claude/skills/run-seyma/SKILL.md) for data-safe app verification and [`tests/README.md`](tests/README.md) for the current root fixture inventory.
+- For Panel-v2 Premium work, read the archived canonical state in [`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) before the ledger; current fixtures live under [`tests/panel-v2/`](tests/panel-v2/). The public repository overview is [`README.md`](README.md).
 - Keep root guidance operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ## Repo layout
@@ -194,6 +195,8 @@ tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
 tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
                  Run: `node tests/test_panel_p2_polling.js`.
+tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
+                         see `tests/panel-v2/README.md` and its `helpers/`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network.
@@ -279,6 +282,14 @@ have some extremely long single lines — e.g. base64-embedded icons). Prefer
 read files in bounded line ranges rather than in full.
 
 ## Verification
+
+For the completed Panel-v2 Premium surface, the canonical fixture directory is
+`tests/panel-v2/` (27 headless Node/VM tests) with the shared helper at
+`tests/panel-v2/helpers/panel-v2-test-helper.js`. Run:
+
+```bash
+for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
+```
 
 There's no automated test suite or linter, but `node --check app.js` (or
 `sync.js`, `hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond

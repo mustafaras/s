@@ -4,7 +4,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const root = path.resolve(__dirname, "..", "..");
+// This helper lives at tests/panel-v2/helpers; always resolve from repository root.
+const root = path.resolve(__dirname, "..", "..", "..");
 const vm = require("vm");
 
 function read(rel) {

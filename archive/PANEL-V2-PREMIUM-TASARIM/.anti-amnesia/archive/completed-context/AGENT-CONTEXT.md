@@ -3,6 +3,9 @@
 > Bu dosya, herhangi bir ajan ilk defa bu projeyle karşılaştığında okuması gereken **minimum bağlamı** içerir.  
 > Ajan kimliği, oturum ID’si veya model versiyonu fark etmeksizin, yapıyı anlamak için bu dosya yeterlidir.
 
+> **Güncel kapanış:** Önce `.anti-amnesia/CURRENT-STATE.md` okunur. 40/40
+> prompt tamamlandı, `currentStep: 41`; bu dosya yeni Prompt 1 başlangıcı değildir.
+
 ---
 
 ## Proje Kimliği
@@ -32,27 +35,28 @@
 | `panel-v2.js` | Dashboard çalışma zamanı (IIFE, `window.AeonV2`) |
 | `panel-v2.css` | Dashboard stilleri (custom property design system) |
 | `panelCoverageManifest.js` | Veri kapsama / redaksiyon adaptörü |
-| `tests/test_panel_v2_*.js` | Headless VM test fixture’ları |
-| `tests/helpers/panel-v2-test-helper.js` | Test sandbox yardımcısı |
+| `tests/panel-v2/test_panel_v2_*.js` | 27 Panel-v2 headless VM fixture’ı |
+| `tests/panel-v2/helpers/panel-v2-test-helper.js` | Test sandbox yardımcısı |
+| `.anti-amnesia/CURRENT-STATE.md` | Güncel canonical ajan başlangıç noktası |
 
 ---
 
 ## Çalışma Düzeni
 
-1. **Önce `LEDGER.md`’yi oku.** `currentStep` değeri senin başlayacağın promptu söyler.
-2. **Sonra `04-40-PROMPT.md`’de ilgili Prompt’u oku.** Her promptun altında detaylı yapılacaklar listesi vardır.
-3. **Kod değişikliği yap.** `panel-v2.css`, `panel-v2.js`, `panel-v2.html` üzerinde çalış.
-4. **Test et.** Her promptun en altında hangi test(ler)i çalıştırman gerektiği yazar.
-5. **Commit ve push.** Her 5 promptta bir `git push origin main`; arada commitler lokalde tutulabilir.
-6. **Ledger güncelle.** `LEDGER.md`’de durumu, commit hash’ini, test sonucunu ve notları güncelle.
-7. **Handoff yaz.** `HANDOFF-TEMPLATE.md` şablonunu kullanarak `handoff-PROMPT-XX.md` oluştur.
+1. **Önce `CURRENT-STATE.md`’yi oku.** Güncel kapsam ve kalan işi söyler.
+2. **Sonra `LEDGER.md`’yi oku.** 40/40 kapanışını ve tarihsel kanıtı gör.
+3. Yeni istek varsa yalnızca ilgili plan bölümünü oku; Prompt 41 başlatma.
+4. **Kod değişikliği yap.** Yalnızca açıkça kapsama alınan Panel-v2 dosyalarında çalış.
+5. **Test et.** Güncel fixture yolu `tests/panel-v2/` altındadır.
+6. Commit/push/deploy yalnız kullanıcı ayrıca istediğinde yapılır.
+7. Post-close bakım için yeni handoff’u `CURRENT-STATE.md` ve ledger ile hizala.
 
 ---
 
 ## Veri Güvenliği — KATI KURAL
 
 - **Şeyma uygulamasını (`index.html`) asla tarayıcıda açma.** Eski `localStorage` durumu canlı `seyma-data` reposunu silebilir.
-- Panel-v2 testleri için sadece `tests/test_panel_v2_*.js` ve `run-seyma` skill harness’lerini kullan.
+- Panel-v2 testleri için sadece `tests/panel-v2/test_panel_v2_*.js` ve `run-seyma` skill harness’lerini kullan.
 - `panel-v2.html` kendi `localStorage` anahtarını (`aeon-v2-token`) kullanır ve uygulamadan ayrıdır.
 - `panelCoverageManifest.js` hiçbir ham profil, GPS, medya veya secret veri çıkarmaz.
 
@@ -72,7 +76,7 @@
 
 ```bash
 # Tüm panel-v2 testlerini çalıştır
-for f in tests/test_panel_v2_*.js; do node "$f"; done
+for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 
 # Tüm panel P* testlerini çalıştır
 for f in tests/test_panel_p*.js; do node "$f"; done
@@ -95,7 +99,7 @@ git log --oneline -5
 ## Sık Sorulanlar
 
 **Soru:** Önceki ajan bir şey yapmış ama göremiyorum?  
-**Cevap:** `LEDGER.md`’de `currentStep` ve `done` sütunlarına bak. Eğer bir adımın commit hash’i yoksa henüz bitmemiştir.
+**Cevap:** Önce `CURRENT-STATE.md`, sonra `LEDGER.md` ve son post-close handoff’u oku. Tarihsel prompt handoff’ları eski yolları koruyabilir.
 
 **Soru:** Aynı anda başka bir ajan çalışıyor mu?  
 **Cevap:** `LEDGER.md`’deki `lastUpdated` ve `lastAgent` alanlarına bak. Eğer şüphe varsa, `git status` ile çalışma ağacını kontrol et.
@@ -104,7 +108,7 @@ git log --oneline -5
 **Cevap:** `TOKEN-BUDGET.md`’ye göz at. Her 5 promptta bir `/compact` veya yeni oturum önerilir.
 
 **Soru:** Testlerden biri geçmiyor ama kodum doğru görünüyor?  
-**Cevap:** Test fixture’ını çalıştır ve çıktıyı oku. Testler VM içinde çalışır; DOM stub davranışlarını `tests/helpers/panel-v2-test-helper.js`’den öğren.
+**Cevap:** Test fixture’ını çalıştır ve çıktıyı oku. Testler VM içinde çalışır; DOM stub davranışlarını `tests/panel-v2/helpers/panel-v2-test-helper.js`’den öğren.
 
 ---
 
@@ -112,7 +116,7 @@ git log --oneline -5
 
 | Seviye | Anlamı | Örnek |
 |--------|--------|-------|
-| Source/test evidence | Kod/test ile kanıtlanmış | `node tests/test_panel_v2_css.js` PASS |
+| Source/test evidence | Kod/test ile kanıtlanmış | `node tests/panel-v2/test_panel_v2_css.js` PASS |
 | Deploy evidence | GitHub Pages’e yansıdı | commit push edildi, Pages build yeşil |
 | User-device confirmation | Kullanıcı canlıda gördü | kullanıcı panel-v2.html’i açıp doğruladı |
 

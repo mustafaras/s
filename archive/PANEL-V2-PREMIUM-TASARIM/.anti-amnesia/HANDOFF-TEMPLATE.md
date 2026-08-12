@@ -1,7 +1,8 @@
 # Handoff Şablonu — ÆON Panel-v2 Premium
 
-> Her prompt tamamlandığında bu şablonu kopyalayıp `.anti-amnesia/handoff-PROMPT-XX.md` olarak kaydet.  
-> XX yerine ilgili prompt numarasını yaz (örn. `handoff-PROMPT-01.md`).
+> Bu şablon tarihsel prompt serisi için korunmuştur. Prompt 1–40 kayıtları
+> `.anti-amnesia/archive/prompt-handoffs/` altındadır. Post-close bakım kaydı
+> gerekiyorsa kısa bir `handoff-POST-CLOSE-*.md` dosyası kökte oluşturulur.
 
 ---
 
@@ -50,9 +51,9 @@
 
 ```text
 Çalıştırılan testler:
-- node tests/test_panel_v2_xxx.js  → PASS / FAIL
-- node tests/test_panel_v2_yyy.js  → PASS / FAIL
-- for f in tests/test_panel_v2_*.js; do node "$f"; done  → X/X PASS
+- node tests/panel-v2/test_panel_v2_xxx.js  → PASS / FAIL
+- node tests/panel-v2/test_panel_v2_yyy.js  → PASS / FAIL
+- for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done  → X/X PASS
 ```
 
 ### Hatalar ve Çözümleri

@@ -1,21 +1,47 @@
 # Headless test fixtures
 
-Bu klasör, repository root’ta duran sentetik Node testlerini toplar. Testler
-uygulama runtime’ına yüklenmez; `repo-root.js` sayesinde komutun root’tan veya
-`tests/` klasöründen çalıştırılması aynı kaynak dosyalarını okur.
+Bu klasör, repository içindeki sentetik Node testlerini toplar. Testler uygulama
+runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` içinden
+çalıştırıldığında aynı kaynak dosyalarını okur.
 
-## Gruplar
+## Klasörler ve sınırlar
 
-- `test_panel_*.js`, `test_faz11_panel.js`: panel ve gözlemci fixture’ları
-- `test_faz10_sync.js`, `test_panel_p2_sync.js`: sync/anti-clobber fixture’ları
-- `test_quran_*.js`: Kur’an katalog, taşıma, merge, delivery ve a11y fixture’ları
+- `panel-v2/` — ÆON Panel-v2 Premium’un 27 headless VM fixture’ı ve ortak
+  sandbox yardımcısı. Panel-v2 dosyalarının tek canonical test konumudur.
+- `test_panel_*.js`, `test_faz11_panel.js` — legacy Panel 1 / observer fixture’ları.
+- `test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
+- `test_faz10_sync.js`, `test_quran_*.js` — sync, Kur’an taşıma ve katalog fixture’ları.
+- `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.
 
-Örnek:
+Panel-v2 testlerinin ayrıntılı envanteri ve çalıştırma kuralları:
+[`panel-v2/README.md`](panel-v2/README.md).
 
-```text
-node tests/test_panel_p6_qa_release.js
-node tests/test_quran_transport.js
+## Sık kullanılan komutlar
+
+Tek Panel-v2 fixture’ı:
+
+```bash
+node tests/panel-v2/test_panel_v2_css.js
 ```
 
-`.claude/skills/run-seyma/` altındaki doğrulama harness’leri kendi skill
-alanında kalır; bu klasör yalnız root test fixture’larını düzenler.
+Tüm Panel-v2 fixture’ları:
+
+```bash
+for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
+```
+
+Kök fixture’ları:
+
+```bash
+for f in tests/test_*.js; do node "$f"; done
+```
+
+Tam test kanıtı alınırken iki komut birlikte çalıştırılmalıdır; kök globu
+bilerek `tests/panel-v2/` altındaki fixture’ları içermez.
+
+## Tarihsel handoff notu
+
+`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/archive/prompt-handoffs/` altındaki
+`handoff-PROMPT-01.md`–`40.md` dosyaları, o tarihteki dosya yollarını koruyan
+append-only kayıtlardır. Güncel durum ve güncel yollar için
+`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md` okunur.

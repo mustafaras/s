@@ -8,6 +8,7 @@
 
 - Start new sessions with [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
 - Use [`.claude/skills/run-seyma/SKILL.md`](.claude/skills/run-seyma/SKILL.md) for data-safe app verification and [`tests/README.md`](tests/README.md) for the current root fixture inventory.
+- For Panel-v2 Premium work, read the archived canonical state in [`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) before the ledger; current fixtures live under [`tests/panel-v2/`](tests/panel-v2/). The public repository overview is [`README.md`](README.md).
 - Keep this file operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ---
@@ -217,6 +218,8 @@ tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
 tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
                  Run: `node tests/test_panel_p2_polling.js`.
+tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
+                         see `tests/panel-v2/README.md` and its `helpers/`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network. Run from repo root.
@@ -354,6 +357,7 @@ node tests/test_panel_p4_provenance.js # PANEL-04 therapy/notification/provenanc
 node tests/test_panel_p2_event_log.js # PANEL-05 event contract/panel timeline fixture
 node tests/test_panel_p2_sync.js # PANEL-05 daily event-file sync fixture
 node tests/test_panel_p2_polling.js # PANEL-06 ETag/polling/draft-safety fixture
+for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done # ÆON Panel-v2 Premium (27 fixture)
 node tests/test_quran_catalog.js # quranRevelationOrderV1.js katalog doğrulaması
 node tests/test_quran_transport.js # quranTransportV1.js taşıma sözleşmeleri
 node .claude/skills/run-seyma/verify-state-helper-boundary.mjs

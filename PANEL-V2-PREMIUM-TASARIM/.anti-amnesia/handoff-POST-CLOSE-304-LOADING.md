@@ -64,7 +64,7 @@ git diff --check                                  → PASS
 - Branch: `main`
 - Uygulama commit'i `97e5214`: validate/deploy SUCCESS.
 - Önceki metadata commit'leri `7f36ed1` ve `35ce33a`; background UX uygulama commit'i `9287adf` için Pages run `31574291704` SUCCESS.
-- Bu handoff/ledger güncellemesi de push sonrası ayrı Pages run ile doğrulanacaktır.
+- Son handoff/ledger metadata commit'i `d608d40`; Pages run `31574558631` SUCCESS; repository temiz ve origin ile eşit.
 - Canlı panel: https://mustafaras.github.io/s/panel-v2.html
 - Canlı HTML: `panel-v2.css/js?v=20260812c`.
 - Canlı CSS SHA256: `e6d72fd36dcf4a5226acfc4c1a6b68d0784837068af23114edad8cab0f8a94fe`.

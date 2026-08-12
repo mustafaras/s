@@ -100,6 +100,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 - 40/40 prompt tamamlandı; Prompt 40 son QA/deploy kapısıdır.
 - Final üretim cache-bust: panel-v2.css/js?v=20260812c.
 - Prompt 40 sonrası bakım düzeltmeleri: `97e5214` + `9287adf`; Pages run `31574291704` SUCCESS.
+- Son handoff/ledger metadata commit'i: `d608d40`; Pages run `31574558631` SUCCESS.
 - Kullanıcı verisi, tokenlar ve mustafaras/seyma-data kapsam dışı ve dokunulmamıştır.
 - Tarayıcı açılmadan Node/VM headless doğrulama politikası korunmuştur.
 

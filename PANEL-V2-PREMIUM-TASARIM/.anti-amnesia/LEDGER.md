@@ -112,7 +112,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 - Uygulama commit'i: `97e5214` — `Fix panel polling loading deadlock`.
 - Cache-bust: `panel-v2.css/js?v=20260812b`.
 - Testler: Panel-v2 27/27, panel-P 11/11, kök 59/59, driver PASS, zikr 90/90, syntax ve `git diff --check` PASS.
-- Pages: run `31572931763` — validate/deploy SUCCESS; canlı CSS/JS byte eşitliği PASS.
+- Pages: code run `31572931763` ve final metadata run `31573076278` — validate/deploy SUCCESS; canlı CSS/JS byte eşitliği PASS.
 
 ## Son Kararlar (Decision Log)
 

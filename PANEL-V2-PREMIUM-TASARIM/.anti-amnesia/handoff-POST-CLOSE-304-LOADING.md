@@ -8,7 +8,8 @@
 - Tarih: 2026-08-12
 - Başlangıç Commit: `8e398cc`
 - Uygulama Commit: `97e5214`
-- Pages Run: `31572931763`
+- Metadata Commit: `7f36ed1`
+- Pages Run: code `31572931763`; final metadata `31573076278`
 - Prompt 41 durumu: Başlatılmadı
 
 ## Yapılanlar
@@ -59,8 +60,8 @@ git diff --check                                  → PASS
 ## Deploy ve Canlı Kanıt
 
 - Branch: `main`
-- HEAD/origin: `97e5214` eşit.
-- Pages run `31572931763`: validate/deploy SUCCESS.
+- Uygulama commit'i `97e5214`: validate/deploy SUCCESS.
+- Final metadata commit'i `7f36ed1`: validate/deploy SUCCESS; repository temiz ve origin ile eşit.
 - Canlı panel: https://mustafaras.github.io/s/panel-v2.html
 - Canlı HTML: `panel-v2.css/js?v=20260812b`.
 - Canlı CSS SHA256: `e6d72fd36dcf4a5226acfc4c1a6b68d0784837068af23114edad8cab0f8a94fe`.

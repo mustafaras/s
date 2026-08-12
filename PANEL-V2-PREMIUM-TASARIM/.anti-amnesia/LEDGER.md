@@ -86,7 +86,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 - **currentStep:** 41
 - **totalSteps:** 40
 - **lastUpdated:** 2026-08-12
-- **lastAgent:** OpenAI Codex (GPT-5) — Prompt 40 Son QA & Deploy
+- **lastAgent:** OpenAI Codex (GPT-5) — post-close polling loading deadlock fix
 - **branch:** main
 - **baseCommit:** `704da96`
 - **dataSafetyLock:** true (tarayıcıda açma, headless VM/sandbox test kullan)
@@ -98,10 +98,21 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 ## Proje Tamamlandı
 
 - 40/40 prompt tamamlandı; Prompt 40 son QA/deploy kapısıdır.
-- Final üretim cache-bust: panel-v2.css/js?v=20260812a.
-- Prompt 40 uygulama commit'i: e71599b; ledger/handoff/live metadata zinciri a4a094d, 721a3ff, 0756ca0, b886e07 ve 0ce17d3 commit'leriyle tamamlandı; Pages run 31568700290 SUCCESS.
+- Final üretim cache-bust: panel-v2.css/js?v=20260812b.
+- Prompt 40 sonrası bakım düzeltmesi commit'i: `97e5214`; Pages run `31572931763` SUCCESS.
 - Kullanıcı verisi, tokenlar ve mustafaras/seyma-data kapsam dışı ve dokunulmamıştır.
 - Tarayıcı açılmadan Node/VM headless doğrulama politikası korunmuştur.
+
+## Post-close Bugfix — Polling 304 Loading Deadlock
+
+- Prompt 40 tamamlanmış olarak korunmuştur; `currentStep` 41 ve `totalSteps` 40 kalmıştır. Prompt 41 başlatılmamıştır.
+- `304 Not Modified` sonrası final render yeniden etkinleştirildi; skeleton, `aria-busy` ve status DOM'u doğru kapanıyor.
+- GitHub fetch + JSON gövdesi için 20 saniyelik AbortController destekli timeout eklendi; timeout sonrası geç yanıtların DOM/state'i bozması engellendi.
+- Loading statusu yanlış `Gönderiliyor` yerine `Kontrol ediliyor` olarak ayrıştırıldı.
+- Uygulama commit'i: `97e5214` — `Fix panel polling loading deadlock`.
+- Cache-bust: `panel-v2.css/js?v=20260812b`.
+- Testler: Panel-v2 27/27, panel-P 11/11, kök 59/59, driver PASS, zikr 90/90, syntax ve `git diff --check` PASS.
+- Pages: run `31572931763` — validate/deploy SUCCESS; canlı CSS/JS byte eşitliği PASS.
 
 ## Son Kararlar (Decision Log)
 

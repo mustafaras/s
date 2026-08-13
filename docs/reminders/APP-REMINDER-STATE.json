@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-05",
+  "activePrompt": "REM-06",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-04",
-  "nextSafeAction": "REM-05 Reminder Center shell ve erişilebilir bilgi mimarisi",
+  "lastCompletedPrompt": "REM-05",
+  "nextSafeAction": "REM-06 Profiles, category toggles ve permission explanation",
   "currentPhase": "R1",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,11 +35,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-04.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md G1-A/G1-B + evidence/REM-03.md",
-    "tests": "REM-04 migration PASS (5 case, 50 assertion); privacy PASS (2 case, 19 assertion); B2 PASS (32/32); run-seyma driver, app/sync/sw syntax and git diff --check PASS",
-    "commit": "15f1ba8 (REM-04: preference state ve additive migration)",
-    "remoteEquality": "not checked for REM-04; no push or remote write",
-    "deployment": "not run for REM-04; release approval not_approved",
+    "source": "docs/reminders/evidence/REM-05.md; app.js:3590-3657,5153,8600,12104; styles.css:1256-1272; tests/reminders/test_reminder_center.js",
+    "tests": "REM-05 center PASS (6 case, 97 assertion); catalog 423; contract 74; timezone 3; migration 50; privacy 19; B2 32/32; driver PASS; root tests/test_*.js loop and Panel-v2 loop exit 0; syntax and git diff --check PASS",
+    "commit": "6327c74 (REM-05: reminder center shell)",
+    "remoteEquality": "not checked; no push or remote write",
+    "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
   },
   "releaseApproval": {
@@ -50,5 +50,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-04 preference state ve additive migration"
+  "updatedBy": "Codex REM-05 Reminder Center shell"
 }

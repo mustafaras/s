@@ -1447,12 +1447,76 @@ function normalizeSyncReceipt(r){
   out.lastErrorCode=SYNC_ERROR_CODES[x.lastErrorCode]?x.lastErrorCode:null;
   return out;
 }
+var REMINDER_PREFERENCE_SCHEMA_VERSION=1;
+var REMINDER_CHANNELS={in_app:true,native:true};
+var REMINDER_PRIVACY_MODES={private:true,safe_summary:true};
+var REMINDER_QUIET_BEHAVIORS={suppress:true,defer:true,in_app:true};
+var REMINDER_SNOOZE_OPTIONS={
+  '10m':true,'30m':true,'1h':true,'todayOff':true,'thisEvening':true,'tomorrow':true
+};
+function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{}}; }
+function validReminderTime(value){
+  if(typeof value!=='string'||!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value)) return false;
+  return true;
+}
+function validReminderTimezone(value){
+  if(typeof value!=='string'||!value.trim()) return false;
+  try{ new Intl.DateTimeFormat('en-US',{timeZone:value}).format(new Date(0)); return true; }catch(e){ return false; }
+}
+function validReminderIso(value){ return typeof value==='string'&&!!value&&isFinite(Date.parse(value)); }
+function reminderEnumHas(map,value){ return typeof value==='string'&&Object.prototype.hasOwnProperty.call(map,value); }
+function normalizeReminderPreference(id,value){
+  var out=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+  // Map key is the canonical identity; a malformed/mismatched embedded ID cannot
+  // create a second owner for the same preference.
+  out.reminderId=String(id);
+  if(typeof out.enabled!=='boolean') out.enabled=false;
+  if(!reminderEnumHas(REMINDER_PRIVACY_MODES,out.privacyMode)) out.privacyMode='private';
+  if(Object.prototype.hasOwnProperty.call(out,'daysOfWeek')){
+    if(!Array.isArray(out.daysOfWeek)) delete out.daysOfWeek;
+    else {
+      var days=[], seenDays={};
+      out.daysOfWeek.forEach(function(day){
+        if(Number.isInteger(day)&&day>=0&&day<=6&&!seenDays[day]){ seenDays[day]=true; days.push(day); }
+      });
+      days.sort(function(a,b){ return a-b; }); out.daysOfWeek=days;
+    }
+  }
+  if(Object.prototype.hasOwnProperty.call(out,'timeWindow')){
+    if(!out.timeWindow||typeof out.timeWindow!=='object'||Array.isArray(out.timeWindow)) delete out.timeWindow;
+    else {
+      if(Object.prototype.hasOwnProperty.call(out.timeWindow,'start')&&!validReminderTime(out.timeWindow.start)) delete out.timeWindow.start;
+      if(Object.prototype.hasOwnProperty.call(out.timeWindow,'end')&&!validReminderTime(out.timeWindow.end)) delete out.timeWindow.end;
+    }
+  }
+  if(Object.prototype.hasOwnProperty.call(out,'offsetMinutes')&&
+     (!Number.isInteger(out.offsetMinutes)||out.offsetMinutes<-1440||out.offsetMinutes>1440)) delete out.offsetMinutes;
+  if(Object.prototype.hasOwnProperty.call(out,'timezone')&&!validReminderTimezone(out.timezone)) delete out.timezone;
+  if(Object.prototype.hasOwnProperty.call(out,'channel')&&!reminderEnumHas(REMINDER_CHANNELS,out.channel)) delete out.channel;
+  if(Object.prototype.hasOwnProperty.call(out,'quietHoursBehavior')&&!reminderEnumHas(REMINDER_QUIET_BEHAVIORS,out.quietHoursBehavior)) delete out.quietHoursBehavior;
+  if(Object.prototype.hasOwnProperty.call(out,'maxPerDay')&&
+     (!Number.isInteger(out.maxPerDay)||out.maxPerDay<0||out.maxPerDay>24)) delete out.maxPerDay;
+  if(Object.prototype.hasOwnProperty.call(out,'snoozeOptions')){
+    if(!Array.isArray(out.snoozeOptions)) delete out.snoozeOptions;
+    else out.snoozeOptions=out.snoozeOptions.filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,option); });
+  }
+  if(Object.prototype.hasOwnProperty.call(out,'lastEditedAt')&&!validReminderIso(out.lastEditedAt)) delete out.lastEditedAt;
+  return out;
+}
+function migrateReminderState(d){
+  if(!d.reminders||typeof d.reminders!=='object'||Array.isArray(d.reminders)) d.reminders=emptyReminderState();
+  var root=d.reminders;
+  if(!Number.isInteger(root.schemaVersion)||root.schemaVersion<REMINDER_PREFERENCE_SCHEMA_VERSION) root.schemaVersion=REMINDER_PREFERENCE_SCHEMA_VERSION;
+  if(!root.preferences||typeof root.preferences!=='object'||Array.isArray(root.preferences)) root.preferences={};
+  Object.keys(root.preferences).forEach(function(id){ root.preferences[id]=normalizeReminderPreference(id,root.preferences[id]); });
+}
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
 function migrate(d){
   if(!d) return d;
+  migrateReminderState(d);
   d.syncReceipt=normalizeSyncReceipt(d.syncReceipt);
   ensureEventLog(d);
   if(typeof d.savedAt!=='string') d.savedAt='';
@@ -3191,7 +3255,17 @@ function save(touchSource,eventSpec){
     }
     localStorage.setItem(KEY,JSON.stringify(data));
   }catch(e){}
-  if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} }
+  // REM-04: canonical preferences remain local app state until the dedicated
+  // sync sanitize contract is implemented. Fail closed if a JSON projection
+  // cannot be produced; never hand the private reminders subtree to sync.
+  var syncData=reminderSyncPayload(data);
+  if(window.SeySync&&syncData){ try{ window.SeySync.schedule(syncData); }catch(e){} }
+}
+function reminderSyncPayload(source){
+  var out;
+  try{ out=JSON.parse(JSON.stringify(source)); }catch(e){ return null; }
+  if(out&&typeof out==='object') delete out.reminders;
+  return out;
 }
 function commit(msg,meta){ save(undefined,{message:msg,meta:meta}); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
@@ -3495,7 +3569,7 @@ App.profileAnswer=function(itemId,value){
 
 function createDefaultData(){
   var t=todayStr(), nowIso=new Date().toISOString();
-  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),eventLog:emptyEventLog(),days:{},notifications:[],luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),eventLog:emptyEventLog(),days:{},notifications:[],reminders:emptyReminderState(),luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
 }
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.

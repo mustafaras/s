@@ -1,0 +1,164 @@
+"use strict";
+
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+const {
+  assert,
+  assertEqual,
+  deepEqual,
+  runTests
+} = require("./helpers/reminder-test-helper");
+
+const DELIVERY_KEY = "seyma-reminder-delivery-v1";
+const PRIVATE_ID = "reminder.catalog.v1.therapy";
+
+function fixtureElement(id) {
+  return {
+    id: id || "", _html: "", _text: "", style: { cssText: "", setProperty() {} },
+    classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+    dataset: {}, children: [], scrollTop: 0, offsetWidth: 0, value: "", files: [], parentNode: null,
+    get innerHTML() { return this._html; }, set innerHTML(value) { this._html = String(value); },
+    get textContent() { return this._text; }, set textContent(value) { this._text = String(value); },
+    setAttribute() {}, getAttribute() { return null; },
+    appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
+    removeChild() {}, remove() {}, replaceWith() {}, insertBefore(child) { return child; },
+    addEventListener() {}, removeEventListener() {}, click() {}, focus() {}, blur() {},
+    querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
+    replaceChildren() {}, contains() { return false; },
+    getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0 }; }
+  };
+}
+
+function bootAppWithState(seedData, options) {
+  const opts = options || {};
+  const counters = { fetches: 0, schedules: 0, lastScheduled: null };
+  const app = fixtureElement("app");
+  const root = fixtureElement("root");
+  const elements = { app, root };
+  const store = Object.assign({}, opts.storageSeed || {}, { "seyma-reset-v1": JSON.stringify(seedData) });
+  const localStorage = {
+    getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; },
+    setItem(key, value) { store[key] = String(value); },
+    removeItem(key) { delete store[key]; },
+    clear() { Object.keys(store).forEach((key) => delete store[key]); },
+    getJSON(key) { const raw = this.getItem(key); return raw === null ? null : JSON.parse(raw); }
+  };
+  const document = {
+    hidden: false, body: fixtureElement("body"), documentElement: root,
+    getElementById(id) { return elements[id] || null; }, querySelector() { return null; }, querySelectorAll() { return []; },
+    createElement() { return fixtureElement(""); }, createDocumentFragment() { return fixtureElement(""); },
+    addEventListener() {}, removeEventListener() {}
+  };
+  class DOMParserStub { parseFromString() { return { body: fixtureElement("body"), querySelector() { return null; }, querySelectorAll() { return []; } }; } }
+  const sandbox = {
+    console, localStorage, document,
+    navigator: { vibrate() {}, userAgent: "rem-04-privacy", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
+    matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
+    DOMParser: DOMParserStub,
+    fetch() { counters.fetches += 1; return new Promise(() => {}); },
+    setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},
+    requestAnimationFrame() { return 0; }, cancelAnimationFrame() {},
+    crypto: { getRandomValues(array) { return array; }, randomUUID() { return "rem-04-fixture-uuid"; } },
+    URL: Object.assign(function URL() {}, { createObjectURL() { return "blob:rem-04"; }, revokeObjectURL() {} }),
+    URLSearchParams, Blob: function Blob() {}, File: function File() {}, FileReader: function FileReader() {},
+    TextDecoder, TextEncoder, atob, btoa, alert() {}, confirm() { return true; }, prompt() { return null; },
+    addEventListener() {}, removeEventListener() {},
+    Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error, parseInt, parseFloat,
+    isNaN, isFinite, encodeURIComponent, decodeURIComponent, Promise, Set, Map, Symbol, Intl
+  };
+  if (opts.withSync) {
+    sandbox.SeySync = {
+      schedule(payload) { counters.schedules += 1; counters.lastScheduled = JSON.parse(JSON.stringify(payload)); },
+      pushNow() { return Promise.resolve(); }
+    };
+  }
+  sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
+  const context = vm.createContext(sandbox);
+  try {
+    ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app.js"].forEach((file) => {
+      vm.runInContext(fs.readFileSync(path.resolve(__dirname, "../..", file), "utf8"), context, { filename: file });
+    });
+    sandbox.App.start();
+    return { data: JSON.parse(localStorage.getItem("seyma-reset-v1")), storage: localStorage, counters, sandbox, error: null };
+  } catch (error) {
+    return { data: null, storage: localStorage, counters, sandbox, error: error && error.message ? error.message : "REMINDER_PRIVACY_FIXTURE_FAILED" };
+  }
+}
+
+function privacyState() {
+  return {
+    version: 2,
+    startDate: "2026-08-12",
+    lastOpenedDate: "2026-08-12",
+    days: {},
+    notifications: [{ id: "observer-fixture", kind: "observer", message: "observer-safe" }],
+    luna: { qa: [] },
+    aeon: { qa: [] },
+    settings: {
+      nickname: "REM-04 privacy fixture",
+      ghToken: "",
+      ghRepo: "",
+      ghBranch: "",
+      openaiKey: "",
+      profileAssessmentInactive: true
+    },
+    cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
+    reminders: {
+      schemaVersion: 1,
+      preferences: {
+        [PRIVATE_ID]: {
+          reminderId: PRIVATE_ID,
+          enabled: true,
+          privacyMode: "private",
+          privateDetail: "PRIVATE_DETAIL_FIXTURE",
+          therapyNote: "SENSITIVE_NOTE_FIXTURE",
+          secretFixture: "SECRET_FIXTURE"
+        }
+      }
+    }
+  };
+}
+
+const deliverySeed = JSON.stringify({ occurrenceId: "local-occurrence", status: "shown" });
+
+runTests([
+  ["canonical preference stays local while sync projection is redacted", () => {
+    const out = bootAppWithState(privacyState(), {
+      withSync: true,
+      storageSeed: { [DELIVERY_KEY]: deliverySeed }
+    });
+    assertEqual(out.error, null);
+    assert(out.data.reminders.preferences[PRIVATE_ID].privateDetail === "PRIVATE_DETAIL_FIXTURE");
+    assertEqual(out.data.notifications[0].id, "observer-fixture");
+
+    out.sandbox.App.saveNow();
+
+    assert(out.counters.schedules >= 1);
+    assert(out.counters.lastScheduled && !Object.prototype.hasOwnProperty.call(out.counters.lastScheduled, "reminders"));
+    const remoteFixtureText = JSON.stringify(out.counters.lastScheduled);
+    assert(!remoteFixtureText.includes("PRIVATE_DETAIL_FIXTURE"));
+    assert(!remoteFixtureText.includes("SENSITIVE_NOTE_FIXTURE"));
+    assert(!remoteFixtureText.includes("SECRET_FIXTURE"));
+    assert(!Object.prototype.hasOwnProperty.call(out.counters.lastScheduled, "delivery"));
+    assert(!Object.prototype.hasOwnProperty.call(out.counters.lastScheduled, "deliveryLog"));
+
+    const localAfterSave = out.storage.getJSON("seyma-reset-v1");
+    assert(localAfterSave.reminders.preferences[PRIVATE_ID].privateDetail === "PRIVATE_DETAIL_FIXTURE");
+    assert(deepEqual(localAfterSave.notifications, privacyState().notifications));
+    assertEqual(out.storage.getItem(DELIVERY_KEY), deliverySeed);
+    assertEqual(out.counters.fetches, 0);
+  }],
+  ["delivery log and observer notifications do not share a state owner", () => {
+    const out = bootAppWithState(privacyState(), {
+      withSync: true,
+      storageSeed: { [DELIVERY_KEY]: deliverySeed }
+    });
+    assertEqual(out.error, null);
+    assert(!Object.prototype.hasOwnProperty.call(out.data, "delivery"));
+    assert(!Object.prototype.hasOwnProperty.call(out.data, "deliveryLog"));
+    assert(Array.isArray(out.data.notifications));
+    assertEqual(out.storage.getItem(DELIVERY_KEY), deliverySeed);
+  }]
+]).catch(() => process.exitCode = 1);

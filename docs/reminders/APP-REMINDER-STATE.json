@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-04",
+  "activePrompt": "REM-05",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-03",
-  "nextSafeAction": "REM-04 preference state ve additive migration",
+  "lastCompletedPrompt": "REM-04",
+  "nextSafeAction": "REM-05 Reminder Center shell ve erişilebilir bilgi mimarisi",
   "currentPhase": "R1",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,11 +35,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section + evidence/REM-02.md + evidence/REM-03.md",
-    "tests": "REM-03 catalog PASS (7 case, 423 assertion); catalog/app syntax PASS; git diff --check PASS; production/runtime/data unchanged",
-    "commit": "4d4a0f1 (REM-03: versioned reminder catalog)",
-    "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
-    "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
+    "source": "docs/reminders/evidence/REM-04.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md G1-A/G1-B + evidence/REM-03.md",
+    "tests": "REM-04 migration PASS (5 case, 50 assertion); privacy PASS (2 case, 19 assertion); B2 PASS (32/32); run-seyma driver, app/sync/sw syntax and git diff --check PASS",
+    "commit": "87b64ec (REM-04: preference state ve additive migration)",
+    "remoteEquality": "not checked for REM-04; no push or remote write",
+    "deployment": "not run for REM-04; release approval not_approved",
     "deviceAcceptance": "not performed"
   },
   "releaseApproval": {
@@ -50,5 +50,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-03 reminder catalog ve private-copy sözleşmesi"
+  "updatedBy": "Codex REM-04 preference state ve additive migration"
 }

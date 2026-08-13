@@ -1454,6 +1454,15 @@ var REMINDER_QUIET_BEHAVIORS={suppress:true,defer:true,in_app:true};
 var REMINDER_SNOOZE_OPTIONS={
   '10m':true,'30m':true,'1h':true,'todayOff':true,'thisEvening':true,'tomorrow':true
 };
+var REMINDER_CAPACITY_MODES={balanced:true,light:true,silent:true,ritual:true};
+var REMINDER_PRIORITY_RANK={P0:0,P1:1,P2:2,P3:3};
+var REMINDER_POLICY_DEFAULTS={
+  quietHours:{start:'22:30',end:'07:30'},
+  nativeDailyCap:3,
+  lowPriorityNativeCap:1,
+  sameCategoryCooldownMinutes:360,
+  capacityMode:'balanced'
+};
 var REMINDER_PROFILE_IDS={calm:true,balanced:true,supportive:true,ritual:true,custom:true};
 var REMINDER_PROFILE_LIST=[
   {id:'calm',label:'Sakin',description:'Yalnızca uygulama içi günlük kartları; native kapalı.'},
@@ -1471,7 +1480,8 @@ var REMINDER_CATEGORY_META={
 var REMINDER_CATEGORY_ORDER=['ritual','support','reflection','system'];
 var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,'pwa-limited':true};
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
-function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding()}; }
+function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode}; }
+function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy()}; }
 function normalizeReminderProfile(value){ return reminderEnumHas(REMINDER_PROFILE_IDS,value)?value:'balanced'; }
 function normalizeReminderCategories(value){
   var out=[],seen={};
@@ -1629,6 +1639,143 @@ function normalizeReminderPreference(id,value){
   if(Object.prototype.hasOwnProperty.call(out,'lastEditedAt')&&!validReminderIso(out.lastEditedAt)) delete out.lastEditedAt;
   return out;
 }
+function reminderPolicyInteger(value,min,max,fallback){
+  return Number.isInteger(value)&&value>=min&&value<=max?value:fallback;
+}
+function normalizeReminderPolicy(value){
+  var out=value&&typeof value==='object'&&!Array.isArray(value)?value:emptyReminderPolicy();
+  var quiet=out.quietHours&&typeof out.quietHours==='object'&&!Array.isArray(out.quietHours)?out.quietHours:{};
+  if(!validReminderTime(quiet.start)) quiet.start=REMINDER_POLICY_DEFAULTS.quietHours.start;
+  if(!validReminderTime(quiet.end)) quiet.end=REMINDER_POLICY_DEFAULTS.quietHours.end;
+  out.quietHours=quiet;
+  var nativeCap=Object.prototype.hasOwnProperty.call(out,'nativeDailyCap')?out.nativeDailyCap:out.dailyCap;
+  var lowCap=Object.prototype.hasOwnProperty.call(out,'lowPriorityNativeCap')?out.lowPriorityNativeCap:out.lowPriorityCap;
+  var cooldown=Object.prototype.hasOwnProperty.call(out,'sameCategoryCooldownMinutes')?out.sameCategoryCooldownMinutes:out.categoryCooldownMinutes;
+  out.nativeDailyCap=reminderPolicyInteger(nativeCap,0,24,REMINDER_POLICY_DEFAULTS.nativeDailyCap);
+  out.lowPriorityNativeCap=reminderPolicyInteger(lowCap,0,24,REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap);
+  out.sameCategoryCooldownMinutes=reminderPolicyInteger(cooldown,0,1440,REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes);
+  if(!reminderEnumHas(REMINDER_CAPACITY_MODES,out.capacityMode)) out.capacityMode=REMINDER_POLICY_DEFAULTS.capacityMode;
+  return out;
+}
+// ── REM-07 Pure reminder policy ──
+// Bu blok yalnız açık input'tan deterministik karar üretir. Uygulama durumu,
+// saat, ağ, DOM ve kalıcı saklama bilgisi dışarıdan verilmedikçe okunmaz.
+function reminderPolicyTimeMinutes(value){
+  if(typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<1440) return Math.floor(value);
+  if(typeof value==='object'&&value&&Number.isInteger(value.hour)&&Number.isInteger(value.minute)&&value.hour>=0&&value.hour<=23&&value.minute>=0&&value.minute<=59) return value.hour*60+value.minute;
+  if(!validReminderTime(value)) return null;
+  return Number(value.slice(0,2))*60+Number(value.slice(3,5));
+}
+function reminderQuietHoursState(localTime,quietHours){
+  var minutes=reminderPolicyTimeMinutes(localTime), interval=quietHours&&typeof quietHours==='object'?quietHours:{};
+  var start=reminderPolicyTimeMinutes(interval.start), end=reminderPolicyTimeMinutes(interval.end);
+  if(minutes===null||start===null||end===null||start===end) return {quiet:false,minutes:minutes,start:start,end:end};
+  var quiet=start<end?(minutes>=start&&minutes<end):(minutes>=start||minutes<end);
+  return {quiet:quiet,minutes:minutes,start:start,end:end};
+}
+function reminderPolicySelectedCategories(context){
+  var out=[],seen={}, source=context&&Array.isArray(context.selectedCategories)?context.selectedCategories:[];
+  if(context&&typeof context.selectedCategory==='string') source=source.concat([context.selectedCategory]);
+  source.forEach(function(category){ category=String(category||''); if(category&&!seen[category]){ seen[category]=true; out.push(category); } });
+  return out;
+}
+function reminderPolicyRecentCategoryAge(entry,currentMinutes){
+  if(!entry||typeof entry!=='object') return null;
+  var age=entry.minutesAgo;
+  if(!Number.isFinite(age)) age=entry.ageMinutes;
+  if(!Number.isFinite(age)) age=entry.minutesSince;
+  if(Number.isFinite(age)&&age>=0) return age;
+  if(Number.isFinite(entry.atMinutes)&&Number.isFinite(currentMinutes)){
+    var delta=currentMinutes-entry.atMinutes;
+    if(delta<0) delta+=1440;
+    return delta>=0?delta:null;
+  }
+  if(entry.recent===true||entry.isRecent===true) return 0;
+  return null;
+}
+function reminderPolicyRecentCategoryCooldown(category,context,cooldownMinutes,currentMinutes){
+  if(!cooldownMinutes) return {active:false,remaining:0};
+  var deliveries=context&&Array.isArray(context.recentCategoryDeliveries)?context.recentCategoryDeliveries:[], latest=null;
+  deliveries.forEach(function(entry){
+    if(!entry||String(entry.category||'')!==category) return;
+    var age=reminderPolicyRecentCategoryAge(entry,currentMinutes);
+    if(age!==null&&(latest===null||age<latest)) latest=age;
+  });
+  if(context&&context.lastCategoryDeliveryMinutesAgo&&Number.isFinite(context.lastCategoryDeliveryMinutesAgo[category])){
+    var direct=context.lastCategoryDeliveryMinutesAgo[category];
+    if(direct>=0&&(latest===null||direct<latest)) latest=direct;
+  }
+  return {active:latest!==null&&latest<cooldownMinutes,remaining:latest===null?0:Math.max(0,cooldownMinutes-latest),ageMinutes:latest};
+}
+function reminderPolicyPriority(value){
+  var priority=String(value||'P3').toUpperCase();
+  return Object.prototype.hasOwnProperty.call(REMINDER_PRIORITY_RANK,priority)?priority:'P3';
+}
+function reminderPolicyMode(value){
+  return reminderEnumHas(REMINDER_CAPACITY_MODES,value)?value:'balanced';
+}
+function reminderPolicyInputParts(input){
+  var x=input&&typeof input==='object'?input:{}, definition=x.definition&&typeof x.definition==='object'?x.definition:x, preference=x.preference&&typeof x.preference==='object'?x.preference:(x.reminderPreference&&typeof x.reminderPreference==='object'?x.reminderPreference:{}), context=x.context&&typeof x.context==='object'?x.context:(x.suppressionContext&&typeof x.suppressionContext==='object'?x.suppressionContext:(x.suppression&&typeof x.suppression==='object'?x.suppression:{}));
+  return {input:x,definition:definition,preference:preference,context:context};
+}
+function reminderPolicyEvaluate(input){
+  var parts=reminderPolicyInputParts(input), definition=parts.definition, preference=parts.preference, context=parts.context;
+  var id=String(definition.id||preference.reminderId||''), category=String(definition.category||preference.category||''), priority=reminderPolicyPriority(definition.priority||preference.priority), mode=reminderPolicyMode(context.capacityMode||context.todayMode||context.mode), requestedChannel=reminderEnumHas(REMINDER_CHANNELS,preference.channel)?preference.channel:(reminderEnumHas(REMINDER_CHANNELS,definition.defaultChannel)?definition.defaultChannel:'in_app');
+  var enabled=preference.enabled===true||(!Object.keys(preference).length&&parts.input.enabled===true);
+  var quietHours=context.quietHours&&typeof context.quietHours==='object'?context.quietHours:REMINDER_POLICY_DEFAULTS.quietHours;
+  var quietState=typeof context.quietHours==='boolean'?{quiet:context.quietHours,minutes:reminderPolicyTimeMinutes(context.localTime||context.localTimeOfDay||context.time)}:reminderQuietHoursState(context.localTime||context.localTimeOfDay||context.time,quietHours), cap=reminderPolicyInteger(context.nativeDailyCap,0,24,REMINDER_POLICY_DEFAULTS.nativeDailyCap), used=reminderPolicyInteger(context.nativeBudgetUsed,0,100000,0), suppliedRemaining=reminderPolicyInteger(context.dailyBudgetRemaining,0,100000,-1), remaining=suppliedRemaining>=0?Math.min(cap,suppliedRemaining):Math.max(0,cap-used), lowCap=reminderPolicyInteger(context.lowPriorityNativeCap,0,24,REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap), lowUsed=reminderPolicyInteger(context.lowPriorityNativeUsed,0,100000,0), cooldownMinutes=reminderPolicyInteger(context.sameCategoryCooldownMinutes,0,1440,REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes), cooldown=reminderPolicyRecentCategoryCooldown(category,context,cooldownMinutes,quietState.minutes), selectedCategories=reminderPolicySelectedCategories(context), explicitlySelected=context.explicitlySelected===true||preference.explicitlySelected===true||preference.userScheduled===true||preference.userCreated===true, actionRequired=context.actionRequired===true||context.systemActionRequired===true||parts.input.actionRequired===true, permissionState=String(context.permissionState||'granted'), nativeRequested=requestedChannel==='native';
+  var result={id:id,category:category,priority:priority,mode:mode,requestedChannel:requestedChannel,allowed:false,inAppAllowed:false,nativeAllowed:false,nativeOccurrence:false,channel:'suppressed',suppressed:true,grouped:false,reason:'disabled',quietHours:quietState.quiet,quiet:quietState.quiet,budgetRemaining:remaining,lowPriorityBudgetRemaining:Math.max(0,lowCap-lowUsed),cooldownActive:cooldown.active,cooldownRemainingMinutes:cooldown.remaining,completionConsidered:false,completionNeutral:true,punitive:false,alarm:false};
+  if(!id||!category||!Object.prototype.hasOwnProperty.call(REMINDER_PRIORITY_RANK,priority)){ result.reason='invalid-definition'; return result; }
+  if(!enabled) return result;
+  var capacityBlocked=false;
+  if(mode==='silent'&&priority!=='P0') capacityBlocked=true;
+  if(mode==='light'&&priority!=='P0'&&!(priority==='P1'&&explicitlySelected)) capacityBlocked=true;
+  if(mode==='ritual'&&priority!=='P0'){
+    var ritualSelection=selectedCategories.length?selectedCategories.indexOf(category)>=0:category==='ritual';
+    if(!ritualSelection) capacityBlocked=true;
+  }
+  if(capacityBlocked){ result.reason='capacity-'+mode; result.grouped=mode==='ritual'; return result; }
+  if(priority==='P0'&&!actionRequired){ result.reason='p0-not-required'; return result; }
+  var behavior=REMINDER_QUIET_BEHAVIORS[preference.quietHoursBehavior]?preference.quietHoursBehavior:'defer';
+  var quietException=priority==='P1'&&explicitlySelected&&(preference.quietHoursException===true||context.allowQuietHoursException===true);
+  if(quietState.quiet&&!quietException&&priority!=='P0'&&behavior==='suppress'){ result.reason='quiet-hours-suppressed'; return result; }
+  if(quietState.quiet&&!quietException&&priority!=='P0'&&behavior!=='in_app'&&behavior!=='defer'){ result.reason='quiet-hours-suppressed'; return result; }
+  result.inAppAllowed=true; result.allowed=true; result.channel='in_app'; result.suppressed=false;
+  if(!nativeRequested) { result.reason=quietState.quiet?'quiet-hours-in-app':'in-app'; return result; }
+  if(mode==='silent'){ result.reason='capacity-silent'; return result; }
+  if(permissionState!=='granted'){ result.reason='permission-'+(permissionState||'unavailable'); return result; }
+  if(quietState.quiet&&!quietException){ result.reason=priority==='P0'?'p0-quiet-hours-in-app':(behavior==='in_app'?'quiet-hours-in-app':'quiet-hours-deferred'); return result; }
+  if(priority==='P3'&&preference.channel!=='native'&&preference.nativeOptIn!==true){ result.reason='p3-native-default-off'; return result; }
+  if(cooldown.active){ result.reason='category-cooldown'; return result; }
+  if(remaining<=0){ result.reason='native-daily-cap'; return result; }
+  if((priority==='P2'||priority==='P3')&&lowUsed>=lowCap){ result.reason='low-priority-native-cap'; return result; }
+  result.nativeAllowed=true; result.nativeOccurrence=true; result.channel='native'; result.reason='native-allowed';
+  return result;
+}
+function reminderPolicySelectNativeCandidates(input){
+  var source=Array.isArray(input)?input:((input&&Array.isArray(input.candidates))?input.candidates:[]), options=Array.isArray(input)?{}:((input&&typeof input==='object')?input:{}), cap=reminderPolicyInteger(options.nativeDailyCap,0,24,REMINDER_POLICY_DEFAULTS.nativeDailyCap), selected=[],rejected=[],candidates=[];
+  source.forEach(function(candidate,index){
+    if(!candidate||typeof candidate!=='object') return;
+    var policy=candidate.policy&&typeof candidate.policy==='object'?candidate.policy:reminderPolicyEvaluate({definition:candidate.definition||candidate,preference:candidate.preference||{enabled:candidate.enabled===true,channel:candidate.channel||candidate.defaultChannel},context:Object.assign({},options.context||{}, {nativeBudgetUsed:reminderPolicyInteger(options.nativeBudgetUsed,0,100000,0)+selected.length})});
+    candidates.push({candidate:candidate,policy:policy,index:index});
+  });
+  candidates.sort(function(left,right){
+    var rankLeft=Object.prototype.hasOwnProperty.call(REMINDER_PRIORITY_RANK,left.policy.priority)?REMINDER_PRIORITY_RANK[left.policy.priority]:99, rankRight=Object.prototype.hasOwnProperty.call(REMINDER_PRIORITY_RANK,right.policy.priority)?REMINDER_PRIORITY_RANK[right.policy.priority]:99;
+    if(rankLeft!==rankRight) return rankLeft-rankRight;
+    var explicitLeft=left.candidate.explicitlySelected===true||left.policy.requestedChannel==='native'?0:1, explicitRight=right.candidate.explicitlySelected===true||right.policy.requestedChannel==='native'?0:1;
+    if(explicitLeft!==explicitRight) return explicitLeft-explicitRight;
+    var timeLeft=String(left.candidate.scheduledAt||left.candidate.localTime||''), timeRight=String(right.candidate.scheduledAt||right.candidate.localTime||'');
+    if(timeLeft!==timeRight) return timeLeft<timeRight?-1:1;
+    var idLeft=String(left.policy.id||left.candidate.id||''), idRight=String(right.policy.id||right.candidate.id||'');
+    if(idLeft!==idRight) return idLeft<idRight?-1:1;
+    return left.index-right.index;
+  });
+  candidates.forEach(function(entry){
+    if(entry.policy.nativeAllowed&&selected.length<cap) selected.push(entry.candidate);
+    else rejected.push({candidate:entry.candidate,reason:entry.policy.nativeAllowed?'native-daily-cap':entry.policy.reason});
+  });
+  return {selected:selected,rejected:rejected,remaining:Math.max(0,cap-selected.length),nativeDailyCap:cap};
+}
 function migrateReminderState(d){
   if(!d.reminders||typeof d.reminders!=='object'||Array.isArray(d.reminders)) d.reminders=emptyReminderState();
   var root=d.reminders;
@@ -1637,6 +1784,7 @@ function migrateReminderState(d){
   Object.keys(root.preferences).forEach(function(id){ root.preferences[id]=normalizeReminderPreference(id,root.preferences[id]); });
   root.profile=normalizeReminderProfile(root.profile);
   root.onboarding=normalizeReminderOnboarding(root.onboarding);
+  root.policy=normalizeReminderPolicy(root.policy);
 }
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
@@ -3747,6 +3895,10 @@ function reminderCategoryChannelLabel(channel){
   if(channel==='mixed') return 'Karışık kanal';
   return 'Uygulama içi';
 }
+function reminderCapacityModeLabel(mode){
+  var labels={balanced:'Dengeli',light:'Hafif gün',silent:'Sessiz',ritual:'Ritüel odaklı'};
+  return labels[mode]||labels.balanced;
+}
 function reminderPermissionExplanationHTML(copy){
   var c=copy||reminderPermissionExplanation('temporary-error');
   return '<section class="sey-reminder-permission" data-reminder-permission-state="'+esc(c.state)+'" aria-labelledby="sey-reminder-permission-title"><div class="sey-reminder-permission-top"><span class="sey-reminder-permission-icon" aria-hidden="true">'+icon(c.state==='granted'?'circle-check':c.state==='denied'?'triangle-alert':'info',17)+'</span><div><span class="sey-reminder-eyebrow">İZİN DURUMUNU ANLAMA</span><h3 id="sey-reminder-permission-title">'+esc(c.label)+'</h3></div></div><p>'+esc(c.meaning)+'</p><small>'+esc(c.action)+'</small></section>';
@@ -3794,7 +3946,7 @@ function reminderCardHTML(def,index){
   return h;
 }
 function reminderCenterOverlayHTML(){
-  var root=reminderCurrentRoot()||emptyReminderState(), defs=reminderDefinitions(), muted=!!ui.reminderTodayMuted, remaining=muted?0:defs.length, permission=reminderPermissionExplanation(reminderPermissionSnapshot());
+  var root=reminderCurrentRoot()||emptyReminderState(), policy=normalizeReminderPolicy(root.policy), defs=reminderDefinitions(), muted=!!ui.reminderTodayMuted, remaining=muted?0:defs.length, permission=reminderPermissionExplanation(reminderPermissionSnapshot());
   var previewTarget=ui.reminderPreviewId&&defs.some(function(def){ return String(def.id||'')===String(ui.reminderPreviewId); });
   if(!previewTarget) ui.reminderPreviewId='';
   var h='<div id="sey-reminder-overlay" class="sey-reminder-overlay" role="dialog" aria-modal="true" aria-labelledby="sey-reminder-title" onclick="App.closeReminderCenter()">';
@@ -3804,7 +3956,7 @@ function reminderCenterOverlayHTML(){
   h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">Kontrol sende</h3><p>Native kanal bu shell’de açılmaz. Uygulama içi önizleme, izin vermeden çalışır.</p></div></section>';
   h+=reminderProfileSectionHTML(root);
   h+='<section class="sey-reminder-summary" aria-label="Bugünün hatırlatma özeti">';
-  [[ 'sun','Bugünün modu',reminderProfileById(root.profile).label,'Profil yalnızca eksik alanlara öneri ekler'],['check-check','Kalan öneri',String(remaining),'Katalog kapsamı · '+defs.length+' tanım'],['circle-check','Native izin',permission.label,permission.meaning],['moon','Sessiz saatler','22:30–07:30','Zaman politikası sonraki adımda'],['activity','Native bütçesi','0 / 3','Gönderim motoru henüz etkin değil']].forEach(function(item){
+  [[ 'sun','Bugünün modu',reminderCapacityModeLabel(policy.capacityMode),'Profil: '+reminderProfileById(root.profile).label],['check-check','Kalan öneri',String(remaining),'Katalog kapsamı · '+defs.length+' tanım'],['circle-check','Native izin',permission.label,permission.meaning],['moon','Sessiz saatler',policy.quietHours.start+'–'+policy.quietHours.end,'Kullanıcı tercihi · quiet interval'],['activity','Native bütçesi','0 / '+policy.nativeDailyCap,'Günlük üst sınır · düşük öncelik '+policy.lowPriorityNativeCap+' · cooldown '+policy.sameCategoryCooldownMinutes+' dk']].forEach(function(item){
     h+='<div class="sey-reminder-summary-item"><span class="sey-reminder-summary-icon" aria-hidden="true">'+icon(item[0],16)+'</span><span><small>'+esc(item[1])+'</small><strong>'+esc(item[2])+'</strong><em>'+esc(item[3])+'</em></span></div>';
   });
   h+='</section>';
@@ -3827,6 +3979,25 @@ App.openReminderCenter=function(){ var root=reminderCurrentRoot(); ui.reminderCe
 App.closeReminderCenter=function(){ ui.reminderCenterOpen=false; ui.reminderPreviewId=''; ui.reminderTodayMuted=false; render(); };
 App.reminderPermissionState=reminderPermissionState;
 App.reminderPermissionExplanation=reminderPermissionExplanation;
+App.reminderPolicyDefaults=function(){ return emptyReminderPolicy(); };
+App.reminderNormalizePolicy=normalizeReminderPolicy;
+App.reminderIsWithinQuietHours=function(localTime,quietHours){ return reminderQuietHoursState(localTime,quietHours).quiet; };
+App.reminderQuietHoursState=reminderQuietHoursState;
+App.reminderPolicyEvaluate=reminderPolicyEvaluate;
+App.reminderSelectNativeCandidates=reminderPolicySelectNativeCandidates;
+App.isReminderWithinQuietHours=App.reminderIsWithinQuietHours;
+App.evaluateReminderPolicy=App.reminderPolicyEvaluate;
+App.selectReminderNativeCandidates=App.reminderSelectNativeCandidates;
+App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
+function updateReminderPolicy(mutator){
+  var root=reminderCurrentRoot(); if(!root||typeof mutator!=='function') return;
+  var policy=normalizeReminderPolicy(root.policy); mutator(policy); root.policy=normalizeReminderPolicy(policy); save(); render();
+}
+App.setReminderCapacityMode=function(mode){ mode=String(mode||''); if(!REMINDER_CAPACITY_MODES[mode]) return; updateReminderPolicy(function(policy){ policy.capacityMode=mode; }); };
+App.setReminderQuietHours=function(start,end){ start=String(start||''); end=String(end||''); if(!validReminderTime(start)||!validReminderTime(end)) return; updateReminderPolicy(function(policy){ policy.quietHours.start=start; policy.quietHours.end=end; }); };
+App.setReminderNativeDailyCap=function(cap){ cap=Number(cap); if(!Number.isInteger(cap)||cap<0||cap>24) return; updateReminderPolicy(function(policy){ policy.nativeDailyCap=cap; }); };
+App.setReminderLowPriorityNativeCap=function(cap){ cap=Number(cap); if(!Number.isInteger(cap)||cap<0||cap>24) return; updateReminderPolicy(function(policy){ policy.lowPriorityNativeCap=cap; }); };
+App.setReminderSameCategoryCooldown=function(minutes){ minutes=Number(minutes); if(!Number.isInteger(minutes)||minutes<0||minutes>1440) return; updateReminderPolicy(function(policy){ policy.sameCategoryCooldownMinutes=minutes; }); };
 App.setReminderProfile=function(profileId){
   var root=reminderCurrentRoot(); profileId=String(profileId||'');
   if(!root||!REMINDER_PROFILE_IDS[profileId]) return;

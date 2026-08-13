@@ -71,12 +71,13 @@ durum kanıtı değildir.
 ## 4. Prompt durum tablosu
 
 `ready` satırı, yalnız önceki faz kapısı geçilmişse başlatılabilir. Başlangıçta
-yalnız `REM-00` ready’dir.
+yalnız `REM-00` ready’di; REM-00 kapanışıyla R0 içindeki sonraki güvenli satır
+`REM-01` ready durumuna alınmıştır.
 
 | ID | Faz | İş paketi | Durum | Commit | Test / kanıt | Blocker / not |
 |---|---|---|---|---|---|---|
-| REM-00 | R0 | Authority, baseline ve capability audit | `done` | `d34b42c` | `evidence/REM-00.md`; app.js/sync.js/sw.js syntax PASS; diff check PASS | REM-00 tamam; push/merge ayrı approval gate’e tabi; activePrompt canonical olarak REM-00 kaldı, sonraki güvenli adım REM-01 |
-| REM-01 | R0 | State / privacy / delivery contract freeze | `planned` | — | — | REM-00 sonrası |
+| REM-00 | R0 | Authority, baseline ve capability audit | `done` | `d34b42c`, `798b9ec`, `d880db4`, `a887dd6` | `evidence/REM-00.md`; source, syntax, headless, 32 root, 27 Panel-v2, remote ve Pages receipt’leri | Blocker yok; closure state `activePrompt=REM-01`; runtime uygulanmadı |
+| REM-01 | R0 | State / privacy / delivery contract freeze | `ready` | — | REM-00 evidence tamam | Sonraki güvenli adım |
 | REM-02 | R0 | Synthetic test harness contract | `planned` | — | — | Üretim kodu yok |
 | REM-03 | R1 | Reminder catalog ve private-copy sözleşmesi | `planned` | — | — | G1 başlangıcı |
 | REM-04 | R1 | Preference state + additive migration | `planned` | — | — | Privacy kararı sonrası |
@@ -237,5 +238,6 @@ Bir test, güvenlik veya kapsam sorunu olduğunda:
 | 2026-08-13 | Hatırlatma UX planı için yürütme kiti oluşturuldu | Docs-only; uygulama kodu, gerçek veri ve deploy değişmedi | REM-00 baseline ilk güvenli adım olarak açıldı |
 | 2026-08-13 | Kullanıcı approval hard gate’i, 44 prompt ve traceability validator eklendi | Docs-only; release `NOT_APPROVED`; push / merge / deploy / data write yapılmadı | REM-30–REM-43 planlandı; validator her prompt için zorunlu |
 | 2026-08-13 | App / panel surface map ve R12–R14 prompt hattı genişletildi | Docs-only; current app, current panel ve Panel-v2 ayrımı kanonikleştirildi; release `NOT_APPROVED` | REM-44–REM-72 planlandı; app / panel / integration gap’leri ayrı acceptance’a bağlandı |
+| 2026-08-13 | REM-00 kapanış parity’si düzeltildi | Evidence eski planning receipt’inden actual source/test/remote/Pages receipt’ine güncellendi; REM-00 `done`, REM-01 `ready`, release approval explicit user scope ile `approved` | REM-01 state/privacy/delivery contract freeze için hazır; reminder runtime hâlâ değişmedi |
 
 Yeni kayıtlar append-only eklenir. Ham kullanıcı verisi veya secret yazılmaz.

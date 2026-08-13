@@ -5,11 +5,14 @@
 - **Tarih:** `2026-08-13`
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `477c830b1d0e4406f1f64bc4dd3694eef6f31103`
-- **Local commit:** `d34b42c` (`REM-00: baseline capability audit`)
+- **Audit source HEAD:** `477c830b1d0e4406f1f64bc4dd3694eef6f31103`
+- **Commit series:** `d34b42c` (audit), `798b9ec` (receipt), `d880db4` (approval scope), `a887dd6` (docs publication)
+- **Final reconciliation commit:** recorded in the closing Git handoff
 - **Kapsam:** Yalnızca authority, mevcut kod yüzeyleri, capability sınırları ve test baseline’ı.
 - **Allowlist:** `APP-REMINDER-ANTI-AMNESIA-LEDGER.md`, `APP-REMINDER-STATE.json`, `APP-REMINDER-DECISIONS.md`, `evidence/REM-00.md`
 - **Protected paths changed:** `no`
-- **Canonical state:** `activePrompt=REM-00`, `blockedPrompt=null`, `currentPhase=R0`, `releaseApproval.status=not_approved`
+- **Baseline state:** `activePrompt=REM-00`, `blockedPrompt=null`, `currentPhase=R0`, `releaseApproval.status=not_approved`
+- **Closure state:** `activePrompt=REM-01`, `blockedPrompt=null`, `currentPhase=R0`, `releaseApproval.status=approved` with explicit `main` push + Pages scope
 
 ## 1. Authority ve güvenli çalışma kanıtı
 
@@ -179,18 +182,34 @@ bulunmadı; `belirsiz` = bu audit kanıt seviyesiyle karar verilemez.
 | Syntax | `node --check sync.js` | **PASS**, exit `0` |
 | Syntax | `node --check sw.js` | **PASS**, exit `0` |
 | Diff | `git diff --check` | **PASS**, exit `0` |
-| Context parity | `node docs/reminders/verify-reminder-context.mjs` | **PASS**, `73 prompts`, `65 local links`, `approval=not_approved` |
+| Context parity baseline | `node docs/reminders/verify-reminder-context.mjs` | **PASS**, `73 prompts`, `65 local links`, `approval=not_approved` |
+| Context parity approved release | `node docs/reminders/verify-reminder-context.mjs --release-approved` | **PASS**, `73 prompts`, `65 local links`, `approval=approved` |
+
+Full regression receipt, yeniden çalıştırılmıştır:
+
+| Katman | Komut / yüzey | Sonuç |
+|---|---|---|
+| Syntax | `node --check panel.js` | **PASS**, exit `0` |
+| Syntax | `node --check panelCoverageManifest.js` | **PASS**, exit `0` |
+| Headless app | `node .claude/skills/run-seyma/driver.mjs` | **PASS**, exit `0` |
+| Headless zikr / faith | `node .claude/skills/run-seyma/zikr-harness.mjs` | **PASS**, exit `0` |
+| Migration boundary | `node .claude/skills/run-seyma/verify-state-helper-boundary.mjs` | **PASS**, exit `0` |
+| Migration boundary | `node .claude/skills/run-seyma/verify-state-migration-boundary.mjs` | **PASS**, exit `0` |
+| Reminder fixtures | `tests/reminders/` inventory | **N/A**, directory absent because reminder runtime is not implemented |
+| Root fixtures | `for f in tests/test_*.js; do node "$f"; done` | **PASS**, `32/32` discovered fixtures exit `0` |
+| Panel-v2 fixtures | `for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done` | **PASS**, `27/27` discovered fixtures exit `0` |
+| Whitespace | `git diff --check` | **PASS**, exit `0` |
 
 REM-00 reminder runtime fixture’ı çalıştırılmadı; çünkü runtime uygulanmadı.
 Headless run-seyma sınırı korunmuş, browser/server/localStorage/device testi
 yapılmamıştır. Panel-v2 README ve fixture inventory’si kaynak kanıtı olarak
 okundu; reminder integration testi iddia edilmemektedir.
 
-Evidence seviyeleri: source `S0/S1`; synthetic reminder test `N/A`;
-commit/remote `S3` yalnız local commit varsa; CI/Pages `N/A`; user-device `S5`
-`N/A`.
+Evidence seviyeleri: source `S0/S1`; synthetic existing fixtures `S2`;
+commit/remote `S3`; CI/Pages `S4`; user-device `S5` `N/A`. Reminder-specific
+fixture evidence’i runtime uygulanmadığı için `N/A`.
 
-## 6. No-write ve release sınırı
+## 6. Remote, Pages ve no-write release receipt
 
 - `app.js`, `sync.js`, `sw.js`, `index.html`, `styles.css`, `panel*`,
   `data/` ve protected path’lerde değişiklik yapılmadı.
@@ -199,11 +218,23 @@ commit/remote `S3` yalnız local commit varsa; CI/Pages `N/A`; user-device `S5`
   değişikliği göstermedi; hedefli `git diff --name-only -- app.js sync.js
   sw.js ... data` çıktısı boştur.
 - Browser açılmadı, server başlatılmadı, gerçek localStorage kullanılmadı.
-- `mustafaras/seyma-data` okunmadı ve yazılmadı; GitHub Contents API, remote,
-  Pages, CI ve external system çağrısı yapılmadı.
-- Push, merge, deploy, tag ve canlı/device doğrulaması yapılmadı.
-- `releaseApproval.status` **`not_approved`** olarak korunmuştur; approval scope
-  boş, evidence ve approvedAt null’dır.
+- `mustafaras/seyma-data` okunmadı ve yazılmadı; token/secret ve gerçek kullanıcı
+  verisi kullanılmadı.
+- Kullanıcının exact scope onayıyla `main` push edildi; merge, tag ve data repo
+  write yapılmadı.
+- `a887dd653ede3468ab8625609ebaa928baba3abf == origin/main` remote equality
+  PASS olarak doğrulandı.
+- Pages workflow `31691645455` için `validate` ve `deploy` job’ları PASS oldu;
+  deployment status `success`, environment URL
+  `https://mustafaras.github.io/s/`.
+- Live HTTP read-only receipt: Pages URL HTTP `200`; `docs/reminders/README.md`
+  HTTP `200`, `APP-REMINDER-UX` ve `REM-00` marker’ları bulundu. Browser/device
+  acceptance yapılmadı.
+- GitHub Pages metadata endpointindeki `status=errored` eski build
+  `529d448...` kaydına aittir; güncel deployment ID `5884689099` status
+  `success` olduğu için iki evidence katmanı ayrıştırılmıştır.
+- `releaseApproval.status` actual user approval kapsamıyla **`approved`**;
+  scope yalnız `git push main`, Pages deployment ve merge gerekmemesiyle sınırlıdır.
 
 ## 7. Sonuç
 
@@ -211,7 +242,8 @@ commit/remote `S3` yalnız local commit varsa; CI/Pages `N/A`; user-device `S5`
   tamamlandı; en az beş gerçek discrepancy kaydedildi.
 - **Blocker:** `none`; fakat closed-app background guarantee ve reminder
   privacy/sync contract bilinçli olarak sonraki promptlara bırakıldı.
-- **Ledger / state:** REM-00 receipt’i ledger’a yazıldı; `activePrompt=REM-00`
-  kullanıcı tarafından sabitlenen canonical durum olarak kaldı; sonraki güvenli
-  adım `REM-01`.
-- **Release:** `NOT_APPROVED`.
+- **Ledger / state:** REM-00 `done`; `STATE.activePrompt=REM-01`,
+  `blockedPrompt=null`, `nextSafeAction=REM-01 state / privacy / delivery
+  contract freeze`; ledger ve state parity PASS.
+- **Release:** `APPROVED` yalnız kullanıcı tarafından verilen `main` push +
+  Pages scope’u için; device acceptance yapılmadı.

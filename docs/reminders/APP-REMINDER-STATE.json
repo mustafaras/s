@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-00",
+  "activePrompt": "REM-01",
   "blockedPrompt": null,
   "lastCompletedPrompt": "REM-00",
   "nextSafeAction": "REM-01 state / privacy / delivery contract freeze",
@@ -36,10 +36,10 @@
   ],
   "evidence": {
     "source": "docs/reminders/evidence/REM-00.md; source audit S0/S1",
-    "tests": "node --check app.js PASS; node --check sync.js PASS; node --check sw.js PASS; git diff --check PASS; context validator PASS",
-    "commit": "d34b42c",
-    "remoteEquality": "not revalidated in this planning turn",
-    "deployment": "not authorized / not performed",
+    "tests": "baseline syntax, headless app/zikr, migration boundaries, 32 root fixtures, 27 Panel-v2 fixtures and approved context validator PASS; reminder-specific fixtures absent because runtime not implemented",
+    "commit": "d34b42c, 798b9ec, d880db4, a887dd6; final reconciliation receipt commit recorded in Git handoff",
+    "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
+    "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
     "deviceAcceptance": "not performed"
   },
   "releaseApproval": {
@@ -54,5 +54,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-00 audit"
+  "updatedBy": "Codex REM-00 closure reconciliation"
 }

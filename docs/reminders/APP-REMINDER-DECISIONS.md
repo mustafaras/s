@@ -117,6 +117,40 @@ Bu program kapsamında aşağıdaki yaklaşımlar onay olmadan geri getirilemez:
 | Uygulama kapalıyken kesin local schedule iddiası | Yasak | Static PWA capability sınırı | Foreground + honest catch-up |
 | Reminder’ları data.notifications içine yazmak | Yasak | ÆON merge / social channel karışması | Ayrı reminder delivery contract |
 
+## 6. REM-00 closure reconciliation
+
+### REM-ADR-009 — REM-00 kapanışı pointer’ı REM-01’e taşır
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted
+- **Soru:** REM-00 audit’i tamamlandığında state aktif prompt olarak REM-00’da
+  kalmalı mı?
+- **Kanıt:** `APP-REMINDER-PROMPTLARI.md` REM-00 kapanış kuralı; ledger §8;
+  `APP-REMINDER-STATE.json`; `APP-REMINDER-ANTI-AMNESIA-LEDGER.md` REM-00 / REM-01 satırları.
+- **Karar:** Hayır. REM-00 `done`, `lastCompletedPrompt=REM-00`,
+  `activePrompt=REM-01`, `REM-01=ready` olmalıdır; blocker yoksa
+  `blockedPrompt=null` kalır.
+- **Etkiler:** Session bağımsız başlangıç bir sonraki güvenli contract promptuna
+  deterministik taşınır; REM-01 runtime uygulaması bu closure turunda yapılmaz.
+- **Sonraki adım:** REM-01 state / privacy / delivery contract freeze.
+
+### REM-DISC-006 — İlk REM-00 receipt’i release sonrasında stale kaldı
+
+- **Tarih:** 2026-08-13
+- **Durum:** discrepancy → reconciled
+- **Soru:** Baseline sırasında yazılan `not_approved / no remote / no deploy`
+  ifadeleri sonraki approved push ve Pages deployment’tan sonra final receipt
+  olarak bırakılabilir mi?
+- **Kanıt:** Eski `evidence/REM-00.md` receipt’i; state approval scope;
+  remote equality `a887dd653ede3468ab8625609ebaa928baba3abf`;
+  Pages workflow `31691645455`; deployment `5884689099`.
+- **Karar:** Hayır. Baseline ve closure evidence ayrıştırıldı; final receipt
+  actual approval, remote, CI/Pages ve live HTTP katmanlarını ayrı kaydediyor.
+- **Etkiler:** Source/test/deploy/device claims birbirine karıştırılmıyor;
+  historical baseline `not_approved` olarak korunurken closure state actual
+  approved scope’u gösteriyor.
+- **Sonraki adım:** REM-01; yeni release action ancak yeni exact scope ile.
+
 ## 5. REM-00 discrepancy kayıtları
 
 ### REM-DISC-001 — “PWA local notifications” genel reminder capability’si değil

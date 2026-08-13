@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-08",
+  "activePrompt": "REM-09",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-07",
-  "nextSafeAction": "REM-08 Occurrence, timezone, midnight ve DST engine",
+  "lastCompletedPrompt": "REM-08",
+  "nextSafeAction": "REM-09 Suppression, dedupe ve device delivery journal",
   "currentPhase": "R2",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-07.md; app.js:1454-1788,3946-4009; tests/reminders/test_reminder_policy.js; tests/reminders/test_reminder_quiet_hours.js",
-    "tests": "REM-07 policy PASS (8 case, 71 assertion); quiet-hours PASS (5 case, 28 assertion); full reminder suite PASS; driver PASS; syntax and git diff --check PASS",
-    "commit": "05a067d (REM-07: hatırlatma politika katmanı)",
+    "source": "docs/reminders/evidence/REM-08.md; app.js:1779-1881,4030-4040; tests/reminders/test_reminder_scheduler.js; tests/reminders/test_reminder_timezones.js",
+    "tests": "REM-08 scheduler PASS (8 case, 54 assertion); timezones PASS (5 case, 23 assertion); full reminder suite, root tests, Panel-v2, B2 migration, driver, syntax and git diff --check PASS",
+    "commit": "10870c0 (REM-08: deterministik reminder occurrence engine)",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -50,5 +50,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-07 closure; REM-08 started"
+  "updatedBy": "Codex REM-08 closure; REM-09 ready"
 }

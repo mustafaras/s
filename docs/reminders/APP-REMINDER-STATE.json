@@ -37,7 +37,7 @@
   "evidence": {
     "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section",
     "tests": "owner parity PASS (48 scoped fields, no conflict); JSON parse PASS; app/sync/sw syntax PASS; context validator PASS; git diff --check PASS; runtime code unchanged",
-    "commit": "ee0d3e5 (REM-01: freeze reminder state privacy contract)",
+    "commit": "ee0d3e5 (REM-01: freeze reminder state privacy contract); 1d38aab (program no-live policy)",
     "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
     "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
     "deviceAcceptance": "not performed"

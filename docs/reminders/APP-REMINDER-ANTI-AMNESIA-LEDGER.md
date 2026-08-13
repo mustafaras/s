@@ -77,7 +77,7 @@ yalnız `REM-00` ready’di; REM-00 kapanışıyla R0 içindeki sonraki güvenli
 | ID | Faz | İş paketi | Durum | Commit | Test / kanıt | Blocker / not |
 |---|---|---|---|---|---|---|
 | REM-00 | R0 | Authority, baseline ve capability audit | `done` | `d34b42c`, `798b9ec`, `d880db4`, `a887dd6`, `0d17a81` | `evidence/REM-00.md`; source, syntax, headless, 32 root, 27 Panel-v2, remote ve Pages receipt’leri | Blocker yok; closure state `activePrompt=REM-01`; runtime uygulanmadı |
-| REM-01 | R0 | State / privacy / delivery contract freeze | `done` | REM-01 closure commit recorded in Git handoff | `APP-REMINDER-DECISIONS.md` REM-ADR-010..015 / REM-DISC-007; `APP-REMINDER-TEST-MATRIX.md` REM-01 section; owner parity 48; syntax/JSON/context/diff PASS | Blocker yok; runtime kodu değişmedi; `activePrompt=REM-02` |
+| REM-01 | R0 | State / privacy / delivery contract freeze | `done` | `ee0d3e5` | `APP-REMINDER-DECISIONS.md` REM-ADR-010..015 / REM-DISC-007; `APP-REMINDER-TEST-MATRIX.md` REM-01 section; owner parity 48; syntax/JSON/context/diff PASS | Blocker yok; runtime kodu değişmedi; `activePrompt=REM-02` |
 | REM-02 | R0 | Synthetic test harness contract | `ready` | — | REM-01 contract tamam | Sonraki güvenli adım |
 | REM-03 | R1 | Reminder catalog ve private-copy sözleşmesi | `planned` | — | — | G1 başlangıcı |
 | REM-04 | R1 | Preference state + additive migration | `planned` | — | — | Privacy kararı sonrası |

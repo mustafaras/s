@@ -37,7 +37,7 @@
   "evidence": {
     "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section + evidence/REM-02.md + evidence/REM-03.md",
     "tests": "REM-03 catalog PASS (7 case, 423 assertion); catalog/app syntax PASS; git diff --check PASS; production/runtime/data unchanged",
-    "commit": "PENDING_LOCAL_COMMIT (REM-03 catalog)",
+    "commit": "4d4a0f1 (REM-03: versioned reminder catalog)",
     "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
     "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
     "deviceAcceptance": "not performed"

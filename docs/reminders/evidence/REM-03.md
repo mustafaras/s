@@ -64,3 +64,7 @@ ID için `null` döndürür.
 
 REM-03 blocker’sız kapandı. Sonraki güvenli adım `REM-04` preference state ve
 additive migration’dır.
+
+## Local commit receipt
+
+`4d4a0f1` — `REM-03: versioned reminder catalog`

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-01",
+  "activePrompt": "REM-02",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-00",
-  "nextSafeAction": "REM-01 state / privacy / delivery contract freeze",
+  "lastCompletedPrompt": "REM-01",
+  "nextSafeAction": "REM-02 synthetic test harness contract",
   "currentPhase": "R0",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-00.md; source audit S0/S1",
-    "tests": "baseline syntax, headless app/zikr, migration boundaries, 32 root fixtures, 27 Panel-v2 fixtures and approved context validator PASS; reminder-specific fixtures absent because runtime not implemented",
-    "commit": "d34b42c, 798b9ec, d880db4, a887dd6, 0d17a81; final receipt parity commit recorded in Git handoff",
+    "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section",
+    "tests": "owner parity PASS (48 scoped fields, no conflict); JSON parse PASS; app/sync/sw syntax PASS; context validator PASS; git diff --check PASS; runtime code unchanged",
+    "commit": "REM-01 closure commit recorded in Git handoff",
     "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
     "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
     "deviceAcceptance": "not performed"
@@ -54,5 +54,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-00 closure reconciliation"
+  "updatedBy": "Codex REM-01 contract freeze"
 }

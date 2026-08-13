@@ -222,3 +222,165 @@ Bu program kapsamında aşağıdaki yaklaşımlar onay olmadan geri getirilemez:
 - **Etkiler:** Panel capability yalnız mevcut surface için `kısmi`; reminder
   desteği REM-56–REM-64’te explicit no-op veya güvenli aggregate olmalıdır.
 - **Sonraki adım:** REM-55–REM-66 current panel hattı; REM-67–REM-72 integration.
+
+## 7. REM-01 state / privacy / delivery contract freeze
+
+### REM-ADR-010 — Tek reminder state ve privacy boundary’si
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted for planning
+- **Soru:** Reminder tanımı, kullanıcı tercihi, oluşum, teslimat ve susturma
+  bağlamı hangi tekil sahiplik sınırlarıyla tutulmalı?
+- **Kanıt:** UX planı §5.3, §8.1–8.8 ve §13.1–13.4; `app.js:1454` `migrate`,
+  `app.js:3177–3196` `save` / `commit`, `sync.js:495–557,716–775`
+  `merge*` / `sanitize`; REM-00 evidence.
+- **Karar:** `ReminderDefinition` statik katalog sahibidir;
+  `ReminderPreference` additive `data.reminders.preferences` canonical state
+  sahibidir ve remote payload’dan `sanitize` ile çıkarılır;
+  `ReminderOccurrence` scheduler’ın yeniden hesaplanabilir derived state’idir;
+  `ReminderDelivery` yalnız `seyma-reminder-delivery-v1` local key’inde bounded
+  cihaz logudur; `SuppressionContext` yalnız anlık evaluation context’idir.
+- **Etkiler:** Tek app `data` objesi korunur; private preference remote full-
+  replace zincirine çıkmaz; delivery logu sync/panel merge’ine girmez; yeni
+  alanlar runtime başlamadan önce owner, retention ve negative privacy testine
+  bağlanır.
+- **Sonraki adım:** REM-02 contract fixture; REM-04 migration; REM-09 delivery;
+  REM-25 sync privacy.
+
+### REM-ADR-011 — Contract alanları, owner, retention ve privacy sınıfları
+
+**Privacy sınıfları:** `P0 catalog-safe` kullanıcıya özel olmayan sabit katalog
+verisi; `P1 operational` kısa ömürlü cihaz/runtime metadata’sı; `P2
+private-local` kullanıcı rutini, zamanlaması veya davranışı; `P3
+sensitive-content` terapi, sağlık, mood, journal, prayer completion veya raw
+detail; `P4 secret` token / credential. `P2–P4` remote payload ve panel için
+varsayılan olarak yasaktır; native kanal yalnız güvenli `privateTitle` kullanır.
+
+| Contract | Alan | Zorunluluk | Tek owner | Saklama | Privacy |
+|---|---|---|---|---|---|
+| `ReminderDefinition` | `id` / `category` / `priority` | zorunlu | Product reminder catalog | Kod/katalog sürümleri boyunca | P0 |
+| `ReminderDefinition` | `purposeKey` / `titleKey` / `privateTitleKey` / `bodyKey` | zorunlu | Product reminder catalog | Katalog sürümü; raw rendered detail kalıcı state değildir | Key P0; rendered `body` P3 |
+| `ReminderDefinition` | `deepLink` / `triggerType` / `frequency` | zorunlu | Product reminder catalog | Katalog sürümü | P0 |
+| `ReminderDefinition` | `defaultWindow` / `defaultChannel` | zorunlu | Product reminder catalog | Katalog sürümü | P0 |
+| `ReminderDefinition` | `snoozeOptions` / `suppressionRules` | opsiyonel | Product reminder catalog + policy owner | Katalog sürümü | P0 |
+| `ReminderDefinition` | `definitionVersion` | zorunlu | Product reminder catalog | Her tanımla birlikte kalıcı | P0 |
+| `ReminderPreference` | `reminderId` | zorunlu | User preference map (`data.reminders.preferences`) | Kullanıcı değiştirene veya clear/reset’e kadar | P2 |
+| `ReminderPreference` | `enabled` / `privacyMode` | zorunlu | User preference map | Aynı | P2; default privacy-safe |
+| `ReminderPreference` | `daysOfWeek` / `timeWindow` / `offsetMinutes` | opsiyonel | User preference map | Aynı; absent = definition default | P2 |
+| `ReminderPreference` | `timezone` | opsiyonel | User preference map / injected clock boundary | Aynı; yalnız IANA timezone | P2 |
+| `ReminderPreference` | `channel` / `quietHoursBehavior` / `maxPerDay` / `snoozeOptions` | opsiyonel | User preference map | Aynı; absent = policy/default | P2 |
+| `ReminderPreference` | `lastEditedAt` | düzenlendiyse zorunlu | User preference map | Preference ile birlikte | P2 metadata |
+| `ReminderOccurrence` | `reminderId` / `occurrenceId` | zorunlu | Foreground scheduler (derived) | Evaluation/queue süresi; canonical history değil | `reminderId` P0; `occurrenceId` P2 |
+| `ReminderOccurrence` | `localDate` / `scheduledAt` / `timezone` | zorunlu | Foreground scheduler (derived) | Evaluation/queue süresi | P2 |
+| `ReminderOccurrence` | `sourceRevision` / `priority` | zorunlu | Foreground scheduler + definition catalog | Evaluation/queue süresi | P1 |
+| `ReminderDelivery` | `occurrenceId` / `channel` / `status` | zorunlu | Device delivery log (`seyma-reminder-delivery-v1`) | Son 30 gün veya son 200 occurrence | P2 |
+| `ReminderDelivery` | `shownAt` / `actedAt` | opsiyonel | Device delivery log | Aynı bounded retention | P2 |
+| `ReminderDelivery` | `reason` | opsiyonel; yalnız enum | Device delivery log / policy | Aynı; raw error yok | P1/P2 |
+| `SuppressionContext` | `quietHours` / `dailyBudgetRemaining` / `recentCategoryDeliveries` | evaluation için zorunlu | Policy evaluator (derived) | Yalnız tek evaluation | P2 |
+| `SuppressionContext` | `todayMode` / `completedSignals` / `staleDataSignals` | opsiyonel | Policy evaluator (derived from app state) | Yalnız tek evaluation | P2/P3; persist edilmez |
+| `SuppressionContext` | `permissionState` / `visibilityState` | evaluation için zorunlu | Device capability + app lifecycle | Yalnız tek evaluation | P1 |
+
+Bu tabloda her alanın tek bir canonical owner’ı vardır. `ReminderOccurrence`
+ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
+`ReminderDelivery` de `data.notifications` içine yazılmaz.
+
+### REM-ADR-012 — Canonical preference, local delivery logu ve sync ayrımı
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted for planning
+- **Soru:** Tek `data` objesi ilkesi ile local-only delivery logu nasıl
+  uzlaştırılacak?
+- **Kanıt:** Root teknik ilke; plan §8.2; `app.js:1451–1454,3177–3194`;
+  `sync.js:766–775`.
+- **Karar:** Kullanıcının reminder tercihleri gelecekte additive
+  `data.reminders.preferences` altında canonical app state olarak tutulur ve
+  mevcut `seyma-reset-v1` local persistence ile saklanır. `SeySync.schedule`
+  çağrısı bu tercihi remote payload’a taşımadan önce sanitize etmek zorundadır.
+  Delivery logu ayrı `seyma-reminder-delivery-v1` localStorage key’inde tutulur;
+  `data`, `data.notifications`, remote latest, event log ve panel projection’a
+  girmez. Cihazlar arası preference sync varsayılan değildir.
+- **Etkiler:** Local canonical preference ile remote sanitized projection
+  deliberately farklı olabilir; full-replace sync preference’ı silemez veya
+  başka cihazdan geri yazamaz. Açık “cihazlar arasında senkronize et” seçeneği
+  gelmeden merge/sync yapılmaz.
+- **Sonraki adım:** REM-04 additive migration; REM-09 bounded delivery log;
+  REM-25 sanitize / merge negative fixture.
+
+### REM-DISC-007 — Planın “ayrı localStorage key” ifadesi preference owner ile uzlaştırıldı
+
+- **Tarih:** 2026-08-13
+- **Durum:** discrepancy → resolved for planning
+- **Soru:** Plan §8.2’de kategori tercihlerinin ayrı localStorage key’inde
+  tutulması ile tek data objesi + additive canonical preference kararı çelişiyor
+  mu?
+- **Kanıt:** Plan §8.2; REM-01 kullanıcı talimatındaki “kullanıcı tercihleri
+  additive canonical state alanında, uzak payload sanitize dışında” kararı;
+  root data ilkesi; mevcut `app.js:1451–1454,3177–3194`.
+- **Karar:** Bu program için canonical owner `data.reminders.preferences`tir;
+  “ayrı local key” kuralı delivery logu ve browser permission gibi cihaz
+  metadata’sı için uygulanır. Preference’ın remote’dan sanitize edilmesi local
+  privacy sınırını sağlar. Plan sahibi ileride farklı storage seçerse bu
+  karar ve migration contract birlikte revize edilmelidir.
+- **Etkiler:** Aynı preference alanının iki sahibi oluşmaz; REM-04 fixture’ı
+  local deep parity ve remote absence’i birlikte test eder.
+- **Sonraki adım:** REM-02 schema fixture; REM-04 migration.
+
+### REM-ADR-013 — `data.notifications` ÆON sosyal kanalı olarak ayrıdır
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted for planning
+- **Soru:** Reminder delivery, mevcut `data.notifications` dizisine yazılabilir
+  mi?
+- **Kanıt:** `app.js:3496–3498` default `notifications`; `app.js:12260–12261`
+  `notifList`; `app.js:12449–12476` `mergeInbox`; `sync.js:495–557,716–762`
+  notification merge; REM-00 `REM-DISC-001`.
+- **Karar:** Hayır. `data.notifications` yalnız ÆON observer/inbox mesajları,
+  read/seen/synced yaşam döngüsü ve sosyal native notification akışının
+  sahibidir. Reminder delivery kendi key/status/occurrence/dedupe alanına
+  sahip olur ve ÆON bütçesiyle birleşmez.
+- **Etkiler:** `occurrenceId` ile ÆON `id` çakışmaz; mergeById, popup, native
+  cooldown, panel timeline ve remote receipt reminder geçmişini yanlışlıkla
+  tüketmez.
+- **Sonraki adım:** REM-09 delivery; REM-25 sync privacy; REM-55–REM-64 panel
+  no-op/redaction.
+
+### REM-ADR-014 — Native private title ve in-app detail body negatif sözleşmesi
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted for planning
+- **Soru:** Native bildirim ile uygulama içi ayrıntı hangi test edilebilir
+  sınırla ayrılmalı?
+- **Kanıt:** Plan §13.1, §13.3–13.4; plan §5.3; REM-00 native capability
+  `kısmi` bulgusu; mevcut `app.js:12647–12719` ÆON-only native yolu.
+- **Karar:** Native adapter yalnız allowlisted `privateTitleKey` sonucunu
+  kullanır; `bodyKey` ile çözülen detail body yalnız app içi card/detail
+  yüzeyine gider. Native title/body, delivery log, sync receipt, event log,
+  panel projection ve debug output içinde raw detail bulunamaz.
+- **Etkiler:** Therapy/mood/journal/prayer completion, medication name/dose,
+  GPS, personal note ve raw user text negative assertion ile yasaklanır;
+  permission reddedilse bile in-app detail çalışır.
+- **Sonraki adım:** REM-06 permission; REM-22/23 native; REM-25 sync privacy;
+  REM-26 panel projection.
+
+### REM-ADR-015 — Migration, timezone, duplicate, multi-tab ve retention invariant’ları
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted for planning
+- **Soru:** Contract runtime’a çevrilirken hangi veri bütünlüğü invariant’ları
+  zorunlu olmalı?
+- **Kanıt:** Plan §8.3–8.8, §13.2–13.4; test matrix required time/privacy
+  matrix; mevcut full-replace sync ve localStorage sınırları.
+- **Karar:** Migration additive ve unknown-preserving olmalı; malformed veya
+  missing reminder state güvenli default’a dönmeli; ikinci boot deep parity
+  vermeli. `occurrenceId` şu bileşenlerden deterministic türetilmeli:
+  `reminderId + localDate + scheduledAt + timezone + definitionVersion`.
+  Aynı occurrence iki tab, reopen veya retry ile ikinci delivery üretmemeli.
+  `scheduledAt` instant, `localDate` takvim günü, `timezone` açık IANA alanı
+  olarak test edilmeli; midnight, DST, Europe/Istanbul ve Hicri offset
+  senaryoları zorunlu. Delivery log yalnız son 30 gün veya 200 occurrence
+  tutulmalı; clear/reset bunu silmeli; raw body hiçbir yere yazılmamalı.
+- **Etkiler:** `merge` veya full-replace delivery history’yi uzaktan geri
+  getiremez; multi-tab race ve clock-backward durumları blocked/duplicate
+  üretmeden görünür status vermelidir.
+- **Sonraki adım:** REM-02 contract fixture; REM-04 migration; REM-08 timezone;
+  REM-09 delivery; REM-38 concurrency; REM-39 retention.

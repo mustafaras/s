@@ -211,3 +211,36 @@ production write, canlı browser doğrulaması ve dış sistem write yapılmaz.
 `mustafaras/seyma-data` için ayrıca açık veri yazma onayı gerekir. Release
 receipt’te approval status, scope ve evidence yoksa sonuç `NOT_APPROVED` olarak
 kalır.
+
+## REM-01 Contract Freeze — zorunlu invariant ve test sahipliği
+
+REM-01 kod yazmaz; aşağıdaki kayıtlar contract’ın tek sahibi ve sonraki
+fixture gate’lerinin bağlayıcı acceptance yüzeyidir.
+
+| REM-01 kapsamı | Beklenen negatif / deterministik assertion | Test sahibi / ilk prompt |
+|---|---|---|
+| Tek owner | Beş contract’ın alanı iki ayrı canonical state’te tanımlanamaz; unknown alanlar owner’sız kalamaz | `test_reminder_contract.js` / REM-02 |
+| Canonical preference | `data.reminders.preferences` additive migrate edilir; local state korunur; remote projectionda preference subtree yoktur | `test_reminder_migration.js` / REM-04 + `test_reminder_sync_privacy.js` / REM-25 |
+| Local delivery | `seyma-reminder-delivery-v1` dışında delivery kaydı yok; `data.notifications`, event log, latest ve panel delivery içermez | `test_reminder_delivery.js` / REM-09 + panel privacy / REM-26 |
+| Native privacy | Notification title yalnız allowlisted `privateTitleKey`; detail body, therapy, mood, journal, prayer completion, medication, GPS ve raw note native çağrıya girmez | `test_reminder_native.js` / REM-22–23 |
+| Migration | Minimal, malformed, rich, unknown-field ve second-boot fixture’larında additive deep parity; delivery log `data` migrationından import edilmez | `test_reminder_migration.js` / REM-04 |
+| Sanitize / merge | Token/secret ve `data.reminders.preferences`, delivery key, occurrence schedule/id, raw body/note remote payloada çıkmaz; existing state merge’i kayıp üretmez | `test_reminder_sync_privacy.js` / REM-25 |
+| Multi-tab | Aynı occurrence iki tabda tek dedupe kaydı ve tek terminal delivery üretir; preference değişikliği sessizce kaybolmaz | `test_reminder_concurrency.js` / REM-38 |
+| Timezone | `localDate`, `scheduledAt`, IANA `timezone` ayrımı; Europe/Istanbul, midnight, DST, clock-backward ve Hicri offset deterministic | `test_reminder_timezones.js` / REM-08 |
+| Duplicate / lifecycle | Stable occurrence ID aynı boot, reopen, visibility, pageshow, online ve retry akışında replay üretmez | `test_reminder_delivery.js` + `test_reminder_lifecycle.js` / REM-09–10 |
+| Retention | Delivery log son 30 gün veya 200 occurrence ile bounded; clear/reset sonrası private residue ve raw body kalmaz | `test_reminder_retention.js` / REM-39 |
+| Panel boundary | Panelde preference, schedule, occurrenceId, delivery body/status detail, therapy/medication/journal/routine görünmez; yalnız explicit safe aggregate veya no-op | `test_reminder_panel_projection.js` / REM-26 + REM-57–64 |
+
+### REM-01 contract acceptance rules
+
+1. Contract alanı eklenmeden önce owner, storage, retention ve privacy class
+   tablosuna eklenir; tablo dışı alan fixture’da fail eder.
+2. `ReminderDefinition` ve policy katalogları user payload taşımaz.
+3. `ReminderPreference` canonical app state’tir; remote sanitize sınırı
+   uygulanmadan cihazlar arası sync varsayılan olarak kapalıdır.
+4. `ReminderOccurrence` ve `SuppressionContext` derived/ephemeral’dır;
+   kalıcı ikinci state sahibi oluşturulamaz.
+5. `ReminderDelivery` yalnız local bounded logdur; `data.notifications` ile
+   ortak ID, budget, merge veya lifecycle kullanamaz.
+6. Native private title ile in-app detail body ayrımı her native/privacy,
+   sync ve panel fixture’ında negative assertion olarak tekrar edilir.

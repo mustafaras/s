@@ -68,3 +68,7 @@ environment ve second-call parity assertion’larını çalıştırdı.
 REM-02 için blocker yoktur. Yalnız REM-02 kapsamındaki test/helper ve kanıt
 dosyaları local commit’e alınır; push, merge, tag, Pages veya deploy yapılmaz.
 Sonraki güvenli adım `REM-03` catalog ve private-copy sözleşmesidir.
+
+## Local commit receipt
+
+`10d8010` — `REM-02: sentetik reminder test contract`

@@ -5,6 +5,7 @@
 - **Tarih:** `2026-08-13`
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `477c830b1d0e4406f1f64bc4dd3694eef6f31103`
+- **Local commit:** `d34b42c` (`REM-00: baseline capability audit`)
 - **Kapsam:** Yalnızca authority, mevcut kod yüzeyleri, capability sınırları ve test baseline’ı.
 - **Allowlist:** `APP-REMINDER-ANTI-AMNESIA-LEDGER.md`, `APP-REMINDER-STATE.json`, `APP-REMINDER-DECISIONS.md`, `evidence/REM-00.md`
 - **Protected paths changed:** `no`
@@ -206,7 +207,7 @@ commit/remote `S3` yalnız local commit varsa; CI/Pages `N/A`; user-device `S5`
 
 ## 7. Sonuç
 
-- **REM-00 sonucu:** `verified` — authority, baseline ve capability audit’i
+- **REM-00 sonucu:** `done` — authority, baseline ve capability audit’i
   tamamlandı; en az beş gerçek discrepancy kaydedildi.
 - **Blocker:** `none`; fakat closed-app background guarantee ve reminder
   privacy/sync contract bilinçli olarak sonraki promptlara bırakıldı.

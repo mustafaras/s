@@ -75,7 +75,7 @@ yalnız `REM-00` ready’dir.
 
 | ID | Faz | İş paketi | Durum | Commit | Test / kanıt | Blocker / not |
 |---|---|---|---|---|---|---|
-| REM-00 | R0 | Authority, baseline ve capability audit | `verified` | not committed | `evidence/REM-00.md`; app.js/sync.js/sw.js syntax PASS; diff check PASS | Blocker yok; activePrompt canonical olarak REM-00 kaldı, sonraki güvenli adım REM-01 |
+| REM-00 | R0 | Authority, baseline ve capability audit | `done` | `d34b42c` | `evidence/REM-00.md`; app.js/sync.js/sw.js syntax PASS; diff check PASS | REM-00 tamam; push/merge ayrı approval gate’e tabi; activePrompt canonical olarak REM-00 kaldı, sonraki güvenli adım REM-01 |
 | REM-01 | R0 | State / privacy / delivery contract freeze | `planned` | — | — | REM-00 sonrası |
 | REM-02 | R0 | Synthetic test harness contract | `planned` | — | — | Üretim kodu yok |
 | REM-03 | R1 | Reminder catalog ve private-copy sözleşmesi | `planned` | — | — | G1 başlangıcı |

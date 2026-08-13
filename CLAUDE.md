@@ -83,6 +83,9 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 - Start new sessions with [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
 - Use [`.claude/skills/run-seyma/SKILL.md`](.claude/skills/run-seyma/SKILL.md) for data-safe app verification and [`tests/README.md`](tests/README.md) for the current root fixture inventory.
 - For Panel-v2 Premium work, read the archived canonical state in [`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) before the ledger; current fixtures live under [`tests/panel-v2/`](tests/panel-v2/). The public repository overview is [`README.md`](README.md).
+- For the reminder / notification UX program, read [`docs/reminders/README.md`](docs/reminders/README.md) after the roadmap; follow its state, anti-amnesia ledger, prompt order, test matrix and blocked gates. Do not start a reminder prompt from chat history alone.
+- For reminder app / panel work, use [`docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md`](docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md): REM-44–54 are app runtime, REM-55–66 are current panel, REM-67–72 are integration; Panel-v2 remains a separate regression surface.
+- For any reminder release or live action, read [`docs/reminders/APP-REMINDER-APPROVAL-GATE.md`](docs/reminders/APP-REMINDER-APPROVAL-GATE.md). The default is `NOT_APPROVED`; without the user's explicit, current approval, never push, merge, deploy, tag, trigger Pages, or write an external system. `mustafaras/seyma-data` additionally requires explicit data-write consent.
 - Keep root guidance operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ## Repo layout

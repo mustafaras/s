@@ -1786,6 +1786,108 @@ function migrateReminderState(d){
   root.onboarding=normalizeReminderOnboarding(root.onboarding);
   root.policy=normalizeReminderPolicy(root.policy);
 }
+// ── REM-08 Pure occurrence / timezone engine ──
+// Oluşum üretimi yalnız explicit input kullanır. Burada uygulama saati,
+// network, DOM, localStorage veya native queue okunmaz; geçmiş oluşumlar da
+// hiçbir koşulda replay kuyruğuna dönüştürülmez.
+var REMINDER_ENGINE_VERSION='1';
+var REMINDER_ENGINE_DEFAULT_TIMEZONE='Europe/Istanbul';
+var REMINDER_ENGINE_DAY_PART_TIMES={morning:'08:00',day:'12:00',afternoon:'15:00',evening:'19:00',night:'22:00'};
+function reminderEngineValidDate(value){
+  if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  var p=value.split('-').map(Number), y=p[0],m=p[1],d=p[2];
+  if(m<1||m>12||d<1) return false;
+  var leap=(y%4===0&&y%100!==0)||y%400===0, days=[31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
+  return d<=days[m-1];
+}
+function reminderEngineParseTime(value){
+  if(typeof value!=='string'||!/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(value)) return null;
+  var p=value.split(':'); return {hour:Number(p[0]),minute:Number(p[1]),second:Number(p[2]||0),text:p[0]+':'+p[1],seconds:Number(p[0])*3600+Number(p[1])*60+Number(p[2]||0)};
+}
+function reminderEngineFormatTime(hour,minute){
+  return (hour<10?'0':'')+hour+':'+(minute<10?'0':'')+minute;
+}
+function reminderEngineAddDays(date,delta){
+  if(!reminderEngineValidDate(date)||!Number.isInteger(delta)) return null;
+  var p=date.split('-').map(Number), ms=Date.UTC(p[0],p[1]-1,p[2])+delta*86400000, d=new Date(ms);
+  return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1<10?'0':'')+(d.getUTCMonth()+1)+'-'+(d.getUTCDate()<10?'0':'')+d.getUTCDate();
+}
+function reminderEngineTimezoneValid(timezone){
+  try{ new Intl.DateTimeFormat('en-US',{timeZone:timezone}).format(new Date(0)); return true; }catch(e){ return false; }
+}
+function reminderEngineInstantMs(input){
+  var x=input&&typeof input==='object'?input:{};
+  var value=Object.prototype.hasOwnProperty.call(x,'instantMs')?x.instantMs:(Object.prototype.hasOwnProperty.call(x,'epochMs')?x.epochMs:(Object.prototype.hasOwnProperty.call(x,'instantIso')?x.instantIso:x.nowIso));
+  if(typeof value==='number'&&Number.isFinite(value)) return value;
+  if(typeof value==='string'&&value){ var ms=new Date(value).getTime(); return Number.isFinite(ms)?ms:null; }
+  return null;
+}
+function reminderEngineLocalParts(instantMs,timezone){
+  if(!Number.isFinite(instantMs)||!reminderEngineTimezoneValid(timezone)) return null;
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(instantMs)), out={};
+    parts.forEach(function(part){ if(part.type!=='literal') out[part.type]=part.value; });
+    var date=String(out.year)+'-'+String(out.month)+'-'+String(out.day), time=String(out.hour)+':'+String(out.minute)+':'+String(out.second);
+    return reminderEngineValidDate(date)&&reminderEngineParseTime(time)?{year:Number(out.year),month:Number(out.month),day:Number(out.day),hour:Number(out.hour),minute:Number(out.minute),second:Number(out.second),localDate:date,localTime:time}:null;
+  }catch(e){ return null; }
+}
+function reminderEngineCompareDateTime(date,time,otherDate,otherTime){
+  if(!reminderEngineValidDate(date)||!reminderEngineValidDate(otherDate)) return null;
+  var left=reminderEngineParseTime(time),right=reminderEngineParseTime(otherTime); if(!left||!right) return null;
+  if(date!==otherDate) return date<otherDate?-1:1;
+  return left.seconds<right.seconds?-1:(left.seconds>right.seconds?1:0);
+}
+function reminderEngineSource(input,definition){
+  var x=input&&typeof input==='object'?input:{}, d=definition&&typeof definition==='object'?definition:{};
+  return x.prayerData&&typeof x.prayerData==='object'?x.prayerData:(x.prayer&&typeof x.prayer==='object'?x.prayer:(d.prayerData&&typeof d.prayerData==='object'?d.prayerData:null));
+}
+function reminderEnginePrayerTime(input,definition,localDate,timezone){
+  var source=reminderEngineSource(input,definition), result={source:source,stale:false};
+  if(!source||source.stale===true||source.isStale===true){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  var times=source.times&&typeof source.times==='object'?source.times:(source.prayerTimes&&typeof source.prayerTimes==='object'?source.prayerTimes:source), key=String(input.prayerKey||input.prayerName||definition.prayerKey||definition.prayerName||'');
+  if(!key||!times||typeof times[key]!=='string'){ result.reason='missing-prayer-time'; return result; }
+  var parsed=reminderEngineParseTime(times[key]); if(!parsed){ result.reason='invalid-prayer-time'; return result; }
+  var sourceDate=source.localDate||source.date||source.fetchedForDate||'';
+  if(!sourceDate||sourceDate!==localDate){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  var fetchedAt=source.fetchedAt||source.updatedAt||'';
+  if(!fetchedAt||!Number.isFinite(new Date(fetchedAt).getTime())){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  var nowMs=reminderEngineInstantMs(input), fetchedMs=new Date(fetchedAt).getTime(), maxAgeHours=Number.isFinite(input.prayerMaxAgeHours)?Math.max(0,input.prayerMaxAgeHours):48;
+  if(nowMs!==null){ var ageHours=(nowMs-fetchedMs)/3600000; if(ageHours<0||ageHours>maxAgeHours){ result.stale=true; result.reason='stale-prayer-data'; return result; } }
+  if(input.locationHash&&String(input.locationHash)!==String(source.fetchedFor||'')){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  if(input.prayerMethod&&String(input.prayerMethod)!==String(source.method||'')){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  var offset=Number.isInteger(input.offsetMinutes)?input.offsetMinutes:(Number.isInteger(definition.offsetMinutes)?definition.offsetMinutes:0);
+  if(Number.isInteger(input.beforeMinutes)) offset=-Math.abs(input.beforeMinutes);
+  var total=parsed.hour*60+parsed.minute+offset, dayDelta=Math.floor(total/1440); total%=1440; if(total<0){ total+=1440; dayDelta--; }
+  result.time=reminderEngineFormatTime(Math.floor(total/60),total%60); result.localDate=dayDelta?reminderEngineAddDays(localDate,dayDelta):localDate; result.sourceRevision=String(source.revision||source.sourceRevision||definition.sourceRevision||definition.definitionVersion||''); result.key=key; return result;
+}
+function reminderEngineScheduledTime(input,definition,localDate,timezone){
+  var trigger=String(input.triggerType||definition.triggerType||'fixed-time').toLowerCase(), timeValue=input.scheduledAt||input.time||definition.scheduledAt||definition.time;
+  if(trigger==='prayer-offset'||trigger==='prayer' || input.prayerData||input.prayer){ return reminderEnginePrayerTime(input,definition,localDate,timezone); }
+  if(trigger==='day-part'||input.dayPart||definition.dayPart){
+    var part=String(input.dayPart||definition.dayPart||'day'), map=input.dayPartTimes||definition.dayPartTimes||REMINDER_ENGINE_DAY_PART_TIMES; timeValue=map[part]||REMINDER_ENGINE_DAY_PART_TIMES[part]||'';
+  }
+  if(!timeValue&&definition.defaultWindow&&typeof definition.defaultWindow==='object') timeValue=definition.defaultWindow.start||'';
+  var parsed=reminderEngineParseTime(String(timeValue||''));
+  return parsed?{time:parsed.text,localDate:localDate,sourceRevision:String(input.sourceRevision||definition.sourceRevision||definition.definitionVersion||''),stale:false}:null;
+}
+function reminderEngineOccurrenceId(reminderId,localDate,scheduledAt,timezone,definitionVersion){
+  var values=[reminderId,localDate,scheduledAt,timezone,definitionVersion].map(function(value){ return encodeURIComponent(String(value==null?'':value)); });
+  return 'reminder-occurrence-v'+REMINDER_ENGINE_VERSION+':'+values.join('|');
+}
+function reminderEngineGenerateOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, definition=x.definition&&typeof x.definition==='object'?x.definition:x, reminderId=String(x.reminderId||definition.id||''), timezone=String(x.timezone||definition.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), instantMs=reminderEngineInstantMs(x), instantParts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=reminderEngineValidDate(x.localDate)?x.localDate:(instantParts&&instantParts.localDate||''), nowLocalDate=reminderEngineValidDate(x.nowLocalDate)?x.nowLocalDate:(reminderEngineValidDate(x.currentLocalDate)?x.currentLocalDate:(instantParts&&instantParts.localDate)||localDate), nowLocalTime=x.nowLocalTime||x.currentLocalTime||(instantParts&&instantParts.localTime)||'';
+  var fail=function(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:reason,replay:false,nativeReplay:false,stale:false},extra||{}); };
+  if(!reminderId||!reminderEngineTimezoneValid(timezone)) return fail('invalid-timezone-or-reminder');
+  if(!localDate||!reminderEngineValidDate(localDate)) return fail('invalid-local-date');
+  var scheduled=reminderEngineScheduledTime(x,definition,localDate,timezone);
+  if(!scheduled) return fail('invalid-trigger');
+  if(scheduled.stale) return fail(scheduled.reason||'stale-prayer-data',{stale:true,sourceRevision:scheduled.sourceRevision||''});
+  if(!scheduled.time) return fail(scheduled.reason||'invalid-trigger');
+  if(!scheduled.localDate||!reminderEngineValidDate(scheduled.localDate)) return fail('invalid-scheduled-date');
+  var scheduledAt=scheduled.time, definitionVersion=String(x.definitionVersion||definition.definitionVersion||'1'), comparison=nowLocalTime?reminderEngineCompareDateTime(scheduled.localDate,scheduledAt,nowLocalDate,nowLocalTime):null, past=comparison!==null&&comparison<0, due=comparison!==null&&comparison<=0;
+  var occurrence={reminderId:reminderId,occurrenceId:reminderEngineOccurrenceId(reminderId,scheduled.localDate,scheduledAt,timezone,definitionVersion),localDate:scheduled.localDate,scheduledAt:scheduledAt,timezone:timezone,sourceRevision:String(x.sourceRevision||scheduled.sourceRevision||definition.sourceRevision||definitionVersion),priority:reminderPolicyPriority(definition.priority||x.priority||'P3'),definitionVersion:definitionVersion,triggerType:String(x.triggerType||definition.triggerType||'fixed-time'),hijriOffset:Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0,due:due,past:past,replay:false,nativeReplay:false,shouldReplay:false};
+  return Object.assign({ok:true,reason:null,occurrence:occurrence},occurrence);
+}
 var data=null;
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
@@ -3985,6 +4087,10 @@ App.reminderIsWithinQuietHours=function(localTime,quietHours){ return reminderQu
 App.reminderQuietHoursState=reminderQuietHoursState;
 App.reminderPolicyEvaluate=reminderPolicyEvaluate;
 App.reminderSelectNativeCandidates=reminderPolicySelectNativeCandidates;
+App.reminderEngineLocalParts=reminderEngineLocalParts;
+App.reminderOccurrenceId=reminderEngineOccurrenceId;
+App.reminderGenerateOccurrence=reminderEngineGenerateOccurrence;
+App.generateReminderOccurrence=reminderEngineGenerateOccurrence;
 App.isReminderWithinQuietHours=App.reminderIsWithinQuietHours;
 App.evaluateReminderPolicy=App.reminderPolicyEvaluate;
 App.selectReminderNativeCandidates=App.reminderSelectNativeCandidates;

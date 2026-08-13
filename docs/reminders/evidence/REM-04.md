@@ -65,4 +65,4 @@ shell’idir.
 
 ## Local commit receipt
 
-`87b64ec` — `REM-04: reminder preference migration`
+`15f1ba8` — `REM-04: reminder preference migration`

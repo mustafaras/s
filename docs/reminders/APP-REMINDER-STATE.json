@@ -37,7 +37,7 @@
   "evidence": {
     "source": "docs/reminders/evidence/REM-04.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md G1-A/G1-B + evidence/REM-03.md",
     "tests": "REM-04 migration PASS (5 case, 50 assertion); privacy PASS (2 case, 19 assertion); B2 PASS (32/32); run-seyma driver, app/sync/sw syntax and git diff --check PASS",
-    "commit": "87b64ec (REM-04: preference state ve additive migration)",
+    "commit": "15f1ba8 (REM-04: preference state ve additive migration)",
     "remoteEquality": "not checked for REM-04; no push or remote write",
     "deployment": "not run for REM-04; release approval not_approved",
     "deviceAcceptance": "not performed"

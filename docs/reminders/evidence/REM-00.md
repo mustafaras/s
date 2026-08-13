@@ -7,7 +7,8 @@
 - **Başlangıç HEAD:** `477c830b1d0e4406f1f64bc4dd3694eef6f31103`
 - **Audit source HEAD:** `477c830b1d0e4406f1f64bc4dd3694eef6f31103`
 - **Commit series:** `d34b42c` (audit), `798b9ec` (receipt), `d880db4` (approval scope), `a887dd6` (docs publication)
-- **Final reconciliation commit:** recorded in the closing Git handoff
+- **Final reconciliation commit:** `0d17a81` (`REM-00: close audit documentation parity`)
+- **Final receipt parity commit:** recorded as the final follow-up receipt in Git
 - **Kapsam:** Yalnızca authority, mevcut kod yüzeyleri, capability sınırları ve test baseline’ı.
 - **Allowlist:** `APP-REMINDER-ANTI-AMNESIA-LEDGER.md`, `APP-REMINDER-STATE.json`, `APP-REMINDER-DECISIONS.md`, `evidence/REM-00.md`
 - **Protected paths changed:** `no`

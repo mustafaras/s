@@ -212,6 +212,17 @@ production write, canlı browser doğrulaması ve dış sistem write yapılmaz.
 receipt’te approval status, scope ve evidence yoksa sonuç `NOT_APPROVED` olarak
 kalır.
 
+## Program release timing gate
+
+- `REM-02`–`REM-72` sırasında local commitler düzenli ve dar kapsamlı olabilir;
+  bu commitler remote equality, CI, Pages veya canlı davranış kanıtı sayılmaz.
+- Final release öncesi full test matrix, safe local server check ve kullanıcı
+  cihaz acceptance’ı ayrı evidence olarak tamamlanır.
+- Local server gerekiyorsa port `9000` kullanılır; kullanıcı açar, ajan browser
+  açmaz ve server kapanışı receipt’e yazılır.
+- Kullanıcının final kontrolü olmadan push, merge, tag, Pages, deploy veya
+  external write yapılamaz. Final action için yeni exact user approval gerekir.
+
 ## REM-01 Contract Freeze — zorunlu invariant ve test sahipliği
 
 REM-01 kod yazmaz; aşağıdaki kayıtlar contract’ın tek sahibi ve sonraki

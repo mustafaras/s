@@ -11,6 +11,23 @@ ortamına ulaşmasını kilitleyen canonical release authority belgesidir.
 **Gerçek veri repo’suna yazma:** ayrıca ve açık veri onayı olmadan yasak
 **Kullanıcı cihazı kabulü:** henüz yapılmadı
 
+## Program-level release timing policy
+
+2026-08-13 itibarıyla kullanıcı talimatı gereği programın geri kalanında:
+
+- `REM-02`–`REM-72` boyunca dar kapsamlı local commit’ler düzenli olarak
+  yapılabilir; local commit canlıya alma değildir.
+- Program zinciri, final testleri, local doğrulama ve kullanıcının kendi cihazı
+  kontrolü tamamlanmadan `git push`, merge, tag, Pages workflow, deploy veya
+  başka bir external write yapılmaz. Önceki bir approval scope bu kuralı
+  gevşetmez; yeni final approval gerekir.
+- Final local server doğrulaması gerekiyorsa yalnız repository güvenlik
+  kurallarındaki port `9000` istisnası kullanılır. Kullanıcı server’ı kendi
+  browser’ında açar; ajan browser açmaz ve başlattığı server’ı kapatır.
+- Kullanıcı kontrolünden sonra canlıya alma ancak mevcut konuşmada verilen yeni,
+  açık ve kapsamı belirli onayla başlatılabilir. O zamana kadar
+  `STATE.json.releaseApproval.status` `not_approved` kalır.
+
 Bu durum testlerin yeşil olmasıyla, local commit ile, eski bir sohbet mesajıyla
 veya ajanın kendi yorumu ile değişmez.
 

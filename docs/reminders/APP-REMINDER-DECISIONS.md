@@ -384,3 +384,26 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   üretmeden görünür status vermelidir.
 - **Sonraki adım:** REM-02 contract fixture; REM-04 migration; REM-08 timezone;
   REM-09 delivery; REM-38 concurrency; REM-39 retention.
+
+### REM-ADR-016 — Local commit serbest, canlıya alma program sonuna ertelenir
+
+- **Tarih:** 2026-08-13
+- **Durum:** accepted
+- **Soru:** Reminder programının geri kalanında commit, push ve canlıya alma
+  hangi sırayla yürütülecek?
+- **Kanıt:** Kullanıcının güncel talimatı: “bundan sonraki işlemleri commit
+  etmeyeceğiz ... hatta düzenli commit yapabilirsin ama canlıya almazsın ...
+  tüm zincir sonunda ben kontrol ettikten sonra canlıya alacağız”; mevcut
+  `APP-REMINDER-APPROVAL-GATE.md`, `APP-REMINDER-CONTEXT.md` ve root data-safety
+  kuralları.
+- **Karar:** `REM-02`–`REM-72` boyunca yalnız dar kapsamlı local commitler
+  yapılabilir. Program zinciri, final testleri, güvenli local server doğrulaması
+  ve kullanıcının kendi cihaz kontrolü bitmeden push, merge, tag, Pages, deploy
+  veya external write yapılmaz. Final canlı işlemi için yeni exact user approval
+  gerekir.
+- **Etkiler:** Local commit history ilerleyebilir; remote ve canlı kanıtı bilinçli
+  olarak geride kalır. Önceki `main`/Pages approval scope’u tüketilmiş sayılır;
+  `STATE.releaseApproval` tekrar `not_approved` tutulur. Port 9000 local server
+  istisnasında kullanıcı browser açar, ajan açmaz ve server durdurulur.
+- **Sonraki adım:** Her prompt local commit + no-push handoff; REM-41–43 final
+  release packet ve yalnız yeni final approval sonrası controlled release.

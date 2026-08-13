@@ -33,6 +33,9 @@ durum kanıtı değildir.
    commit veya eski mesaj onay yerine geçmez.
 10. `mustafaras/seyma-data` yazma izni release onayından ayrıdır; ayrıca açık
     veri yazma onayı yoksa bu depo değiştirilemez.
+11. `REM-02`–`REM-72` boyunca dar kapsamlı local commitler serbesttir; program
+    zinciri ve kullanıcı cihaz kontrolü bitmeden push, merge, tag, Pages, deploy
+    veya external write yapılamaz. Final canlı işlemi yeni exact approval ister.
 
 ## 2. Durum sözlüğü
 
@@ -239,6 +242,7 @@ Bir test, güvenlik veya kapsam sorunu olduğunda:
 | 2026-08-13 | Kullanıcı approval hard gate’i, 44 prompt ve traceability validator eklendi | Docs-only; release `NOT_APPROVED`; push / merge / deploy / data write yapılmadı | REM-30–REM-43 planlandı; validator her prompt için zorunlu |
 | 2026-08-13 | App / panel surface map ve R12–R14 prompt hattı genişletildi | Docs-only; current app, current panel ve Panel-v2 ayrımı kanonikleştirildi; release `NOT_APPROVED` | REM-44–REM-72 planlandı; app / panel / integration gap’leri ayrı acceptance’a bağlandı |
 | 2026-08-13 | REM-00 kapanış parity’si düzeltildi | Evidence eski planning receipt’inden actual source/test/remote/Pages receipt’ine güncellendi; REM-00 `done`, REM-01 `ready`, release approval explicit user scope ile `approved` | REM-01 state/privacy/delivery contract freeze için hazır; reminder runtime hâlâ değişmedi |
+| 2026-08-13 | Program release timing policy kullanıcı talimatıyla sıkılaştırıldı | REM-02–REM-72 için local commit serbest; full chain + local verification + user device check bitmeden push / merge / Pages / deploy yok; `STATE.releaseApproval=not_approved` resetlendi | Her prompt no-push handoff; final release yalnız yeni exact approval ile |
 | 2026-08-13 | REM-01 state/privacy/delivery contract freeze tamamlandı | Beş contract için tek owner, storage, retention ve privacy class kilitlendi; preference sanitize, local delivery, native negative rules ve risk-to-test mapping yazıldı; runtime/data değişmedi | REM-02 synthetic test harness contract için hazır |
 
 Yeni kayıtlar append-only eklenir. Ham kullanıcı verisi veya secret yazılmaz.

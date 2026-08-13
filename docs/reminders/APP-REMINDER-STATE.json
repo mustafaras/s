@@ -43,16 +43,12 @@
     "deviceAcceptance": "not performed"
   },
   "releaseApproval": {
-    "status": "approved",
-    "scope": [
-      "git push main",
-      "trigger GitHub Pages deployment",
-      "merge not required"
-    ],
-    "evidence": "User message on 2026-08-13: \"main’e push et, Pages tetiklensin; merge gerekmiyor.\"",
-    "approvedAt": "2026-08-13",
+    "status": "not_approved",
+    "scope": [],
+    "evidence": null,
+    "approvedAt": null,
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-01 contract freeze"
+  "updatedBy": "Codex program release timing policy"
 }

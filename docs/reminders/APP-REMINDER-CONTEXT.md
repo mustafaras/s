@@ -247,8 +247,14 @@ Her kayıtta şu beş alan zorunludur:
 ## 8. Commit / push / deploy politikası
 
 - Prompt başına dar commit.
+- `REM-02`–`REM-72` boyunca düzenli local commit serbesttir; local commit
+  remote veya canlı release kanıtı değildir.
 - Faz bitmeden `git push` yok. Faz bitse bile açık, güncel kullanıcı onayı
   yoksa `git push` yok.
+- Program zinciri, final testleri, port `9000` üzerindeki güvenli local server
+  doğrulaması ve kullanıcının kendi cihaz kontrolü tamamlanmadan hiçbir push,
+  merge, tag, Pages deploy veya external write yapılmaz. Önceki approval scope
+  sonraki promptlara taşınmaz.
 - Kullanıcı ayrıca açıkça ve kapsam belirterek istemedikçe bu program promptları
   `main`e push / merge / Pages deploy yapmaz; yalnız fazın release gate’i hazır
   olur.

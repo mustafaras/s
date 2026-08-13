@@ -81,8 +81,8 @@ yalnız `REM-00` ready’di; REM-00 kapanışıyla R0 içindeki sonraki güvenli
 |---|---|---|---|---|---|---|
 | REM-00 | R0 | Authority, baseline ve capability audit | `done` | `d34b42c`, `798b9ec`, `d880db4`, `a887dd6`, `0d17a81` | `evidence/REM-00.md`; source, syntax, headless, 32 root, 27 Panel-v2, remote ve Pages receipt’leri | Blocker yok; closure state `activePrompt=REM-01`; runtime uygulanmadı |
 | REM-01 | R0 | State / privacy / delivery contract freeze | `done` | `ee0d3e5` | `APP-REMINDER-DECISIONS.md` REM-ADR-010..015 / REM-DISC-007; `APP-REMINDER-TEST-MATRIX.md` REM-01 section; owner parity 48; syntax/JSON/context/diff PASS | Blocker yok; runtime kodu değişmedi; `activePrompt=REM-02` |
-| REM-02 | R0 | Synthetic test harness contract | `ready` | — | REM-01 contract tamam | Sonraki güvenli adım |
-| REM-03 | R1 | Reminder catalog ve private-copy sözleşmesi | `planned` | — | — | G1 başlangıcı |
+| REM-02 | R0 | Synthetic test harness contract | `done` | `PENDING_LOCAL_COMMIT` | `tests/reminders` contract PASS; timezone skeleton PASS; helper/contract syntax PASS; git diff --check PASS; evidence/REM-02.md | Blocker yok; production/runtime/data değişmedi; push/merge/deploy yok |
+| REM-03 | R1 | Reminder catalog ve private-copy sözleşmesi | `ready` | — | REM-02 sentetik contract tamam | G1 başlangıcı; canlı işlem yok |
 | REM-04 | R1 | Preference state + additive migration | `planned` | — | — | Privacy kararı sonrası |
 | REM-05 | R1 | Reminder Center shell ve erişilebilir bilgi mimarisi | `planned` | — | — | UI-only önce |
 | REM-06 | R1 | Profiles, category toggles ve permission explanation | `planned` | — | — | Native permission istemez |
@@ -244,5 +244,6 @@ Bir test, güvenlik veya kapsam sorunu olduğunda:
 | 2026-08-13 | REM-00 kapanış parity’si düzeltildi | Evidence eski planning receipt’inden actual source/test/remote/Pages receipt’ine güncellendi; REM-00 `done`, REM-01 `ready`, release approval explicit user scope ile `approved` | REM-01 state/privacy/delivery contract freeze için hazır; reminder runtime hâlâ değişmedi |
 | 2026-08-13 | Program release timing policy kullanıcı talimatıyla sıkılaştırıldı | REM-02–REM-72 için local commit serbest; full chain + local verification + user device check bitmeden push / merge / Pages / deploy yok; `STATE.releaseApproval=not_approved` resetlendi | Her prompt no-push handoff; final release yalnız yeni exact approval ile |
 | 2026-08-13 | REM-01 state/privacy/delivery contract freeze tamamlandı | Beş contract için tek owner, storage, retention ve privacy class kilitlendi; preference sanitize, local delivery, native negative rules ve risk-to-test mapping yazıldı; runtime/data değişmedi | REM-02 synthetic test harness contract için hazır |
+| 2026-08-13 | REM-02 synthetic test harness contract tamamlandı | 15 case / 74 assertion contract PASS; timezone skeleton 3 assertion PASS; helper ve contract syntax PASS; fetch gerçek ağ açmıyor, assertion raporu secret/raw payload taşımıyor; production/runtime/data değişmedi | REM-03 ready; yalnız local test commit; push/merge/Pages/deploy yok |
 
 Yeni kayıtlar append-only eklenir. Ham kullanıcı verisi veya secret yazılmaz.

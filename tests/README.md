@@ -11,6 +11,7 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `test_panel_*.js`, `test_faz11_panel.js` — legacy Panel 1 / observer fixture’ları.
 - `test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
 - `test_faz10_sync.js`, `test_quran_*.js` — sync, Kur’an taşıma ve katalog fixture’ları.
+- `reminders/` — REM-02+ ağsız sentetik reminder contract fixture’ları; runtime, browser ve gerçek veri kullanmaz.
 - `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.
 
 Panel-v2 testlerinin ayrıntılı envanteri ve çalıştırma kuralları:

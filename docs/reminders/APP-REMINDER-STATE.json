@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-02",
+  "activePrompt": "REM-03",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-01",
-  "nextSafeAction": "REM-02 synthetic test harness contract",
+  "lastCompletedPrompt": "REM-02",
+  "nextSafeAction": "REM-03 reminder catalog ve private-copy sözleşmesi",
   "currentPhase": "R0",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section",
-    "tests": "owner parity PASS (48 scoped fields, no conflict); JSON parse PASS; app/sync/sw syntax PASS; context validator PASS; git diff --check PASS; runtime code unchanged",
-    "commit": "ee0d3e5 (REM-01: freeze reminder state privacy contract); 1d38aab (program no-live policy)",
+    "source": "docs/reminders/evidence/REM-00.md + APP-REMINDER-DECISIONS.md REM-ADR-010..015 / REM-DISC-007 + APP-REMINDER-TEST-MATRIX.md REM-01 contract section + evidence/REM-02.md",
+    "tests": "REM-02 contract PASS (15 case, 74 assertion); timezone skeleton PASS (3 assertion); helper/contract node --check PASS; git diff --check PASS; production/runtime/data unchanged",
+    "commit": "PENDING_LOCAL_COMMIT (REM-02 test harness)",
     "remoteEquality": "PASS: a887dd653ede3468ab8625609ebaa928baba3abf == origin/main at last deployment receipt",
     "deployment": "GitHub Pages workflow 31691645455 PASS; deployment status success; live HTTP 200",
     "deviceAcceptance": "not performed"
@@ -50,5 +50,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex program release timing policy"
+  "updatedBy": "Codex REM-02 synthetic test harness contract"
 }

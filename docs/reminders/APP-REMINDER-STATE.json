@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-06",
+  "activePrompt": "REM-08",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-05",
-  "nextSafeAction": "REM-06 Profiles, category toggles ve permission explanation",
-  "currentPhase": "R1",
+  "lastCompletedPrompt": "REM-07",
+  "nextSafeAction": "REM-08 Occurrence, timezone, midnight ve DST engine",
+  "currentPhase": "R2",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-05.md; app.js:3590-3657,5153,8600,12104; styles.css:1256-1272; tests/reminders/test_reminder_center.js",
-    "tests": "REM-05 center PASS (6 case, 97 assertion); catalog 423; contract 74; timezone 3; migration 50; privacy 19; B2 32/32; driver PASS; root tests/test_*.js loop and Panel-v2 loop exit 0; syntax and git diff --check PASS",
-    "commit": "6327c74 (REM-05: reminder center shell)",
+    "source": "docs/reminders/evidence/REM-07.md; app.js:1454-1788,3946-4009; tests/reminders/test_reminder_policy.js; tests/reminders/test_reminder_quiet_hours.js",
+    "tests": "REM-07 policy PASS (8 case, 71 assertion); quiet-hours PASS (5 case, 28 assertion); full reminder suite PASS; driver PASS; syntax and git diff --check PASS",
+    "commit": "05a067d (REM-07: hatırlatma politika katmanı)",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -50,5 +50,5 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-05 Reminder Center shell"
+  "updatedBy": "Codex REM-07 closure; REM-08 started"
 }

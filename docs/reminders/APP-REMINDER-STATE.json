@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "done",
-  "activePrompt": "REM-09",
+  "activePrompt": "REM-12",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-08",
-  "nextSafeAction": "REM-09 Suppression, dedupe ve device delivery journal",
+  "lastCompletedPrompt": "REM-11",
+  "nextSafeAction": "REM-12 remains planned/not-ready; do not start it from this closure",
   "currentPhase": "R2",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "docs/reminders/evidence/REM-08.md; app.js:1779-1881,4030-4040; tests/reminders/test_reminder_scheduler.js; tests/reminders/test_reminder_timezones.js",
-    "tests": "REM-08 scheduler PASS (8 case, 54 assertion); timezones PASS (5 case, 23 assertion); full reminder suite, root tests, Panel-v2, B2 migration, driver, syntax and git diff --check PASS",
-    "commit": "10870c0 (REM-08: deterministik reminder occurrence engine)",
+    "source": "REM-09/REM-10/REM-11 implementation in app.js with scoped reminder fixtures and privacy negative coverage",
+    "tests": "REM-11 catch-up PASS (46 assertion); budget PASS (15 assertion); REM-09 delivery PASS (38); REM-10 lifecycle PASS (36); privacy PASS (30); full reminder/root/Panel-v2 suite; driver/context/syntax/diff PASS; no browser, real network or data write",
+    "commit": "82cea9d6663b5db7c75c675fe6069ccfc3ddddc7 (REM-11: reminder catch-up ve lifecycle kapanışı)",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -49,6 +49,6 @@
     "approvedAt": null,
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-13",
-  "updatedBy": "Codex REM-08 closure; REM-09 ready"
+  "updatedAt": "2026-08-14",
+  "updatedBy": "Codex REM-11 closure committed locally; REM-12 remains planned/not-ready"
 }

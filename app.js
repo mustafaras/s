@@ -1888,7 +1888,462 @@ function reminderEngineGenerateOccurrence(input){
   var occurrence={reminderId:reminderId,occurrenceId:reminderEngineOccurrenceId(reminderId,scheduled.localDate,scheduledAt,timezone,definitionVersion),localDate:scheduled.localDate,scheduledAt:scheduledAt,timezone:timezone,sourceRevision:String(x.sourceRevision||scheduled.sourceRevision||definition.sourceRevision||definitionVersion),priority:reminderPolicyPriority(definition.priority||x.priority||'P3'),definitionVersion:definitionVersion,triggerType:String(x.triggerType||definition.triggerType||'fixed-time'),hijriOffset:Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0,due:due,past:past,replay:false,nativeReplay:false,shouldReplay:false};
   return Object.assign({ok:true,reason:null,occurrence:occurrence},occurrence);
 }
+
+// REM-08 source boundary: delivery persistence helpers begin after the pure
+// occurrence engine block used by the scheduler contract fixture.
 var data=null;
+
+// ── REM-09 Device delivery journal ────────────────────────────────────────
+// Bu kayıt `data` nesnesinden, ÆON `data.notifications` kanalından ve sync/panel
+// zincirinden bilinçli olarak ayrıdır. Yalnız occurrence kimliği, kanal, durum,
+// güvenli zaman damgaları ve allowlist reason saklanır; native body veya kullanıcı
+// içeriği bu sözleşmeye hiç alınmaz.
+var REMINDER_DELIVERY_SCHEMA_VERSION=1;
+var REMINDER_DELIVERY_KEY='seyma-reminder-delivery-v1';
+var REMINDER_DELIVERY_MAX_AGE_MS=30*24*60*60*1000;
+var REMINDER_DELIVERY_MAX_ENTRIES=200;
+var REMINDER_DELIVERY_STATUSES={scheduled:true,shown:true,opened:true,snoozed:true,dismissed:true,suppressed:true,failed:true};
+var REMINDER_DELIVERY_STATUS_LIST=['scheduled','shown','opened','snoozed','dismissed','suppressed','failed'];
+var REMINDER_DELIVERY_STATUS_RANK={scheduled:0,shown:1,opened:2,snoozed:3,dismissed:3,suppressed:3,failed:3};
+var REMINDER_DELIVERY_CHANNELS={in_app:true,native:true};
+var REMINDER_DELIVERY_REASONS={
+  'quiet-hours':true,
+  'daily-budget':true,
+  'category-cooldown':true,
+  'permission-denied':true,
+  'not-visible':true,
+  'today-muted':true,
+  'stale-data':true,
+  'already-completed':true,
+  'duplicate':true,
+  'capacity':true,
+  'disabled':true,
+  'invalid':true,
+  'not-required':true,
+  'channel-policy':true,
+  'unsupported':true,
+  'catchup-grouped':true,
+  'catchup-expired':true,
+  'storage-error':true,
+  'native-error':true,
+  'unknown':true
+};
+var REMINDER_DELIVERY_BLOCKING_STATUSES={shown:true,opened:true,snoozed:true,dismissed:true,suppressed:true};
+
+function reminderDeliveryEmpty(){ return {schemaVersion:REMINDER_DELIVERY_SCHEMA_VERSION,entries:[]}; }
+function reminderDeliveryIso(value){
+  if(value instanceof Date){ var dateMs=value.getTime(); return Number.isFinite(dateMs)?new Date(dateMs).toISOString():null; }
+  if(typeof value==='number'&&Number.isFinite(value)) return new Date(value).toISOString();
+  if(typeof value!=='string'||!value.trim()) return null;
+  var parsed=Date.parse(value); return Number.isFinite(parsed)?new Date(parsed).toISOString():null;
+}
+function reminderDeliveryNow(value){ return reminderDeliveryIso(value)||new Date().toISOString(); }
+function reminderDeliveryText(value,max){
+  if(typeof value!=='string') return '';
+  var text=value.trim(); return text&&text.length<=(max||240)?text:'';
+}
+function reminderDeliveryChannel(value){
+  var channel=String(value||'').trim().toLowerCase();
+  if(channel==='app'||channel==='in-app') channel='in_app';
+  return REMINDER_DELIVERY_CHANNELS[channel]?channel:'in_app';
+}
+function reminderDeliveryStatus(value){
+  var status=String(value||'').trim().toLowerCase();
+  return REMINDER_DELIVERY_STATUSES[status]?status:null;
+}
+function reminderDeliveryReason(value){
+  var reason=String(value||'').trim().toLowerCase();
+  var direct={
+    'quiet-hours':'quiet-hours','quiet-hours-suppressed':'quiet-hours','quiet-hours-deferred':'quiet-hours','quiet-hours-in-app':'quiet-hours',
+    'native-daily-cap':'daily-budget','low-priority-native-cap':'daily-budget','daily-budget':'daily-budget',
+    'category-cooldown':'category-cooldown','same-category-cooldown':'category-cooldown',
+    'permission-denied':'permission-denied','permission-default':'permission-denied','permission-unavailable':'permission-denied',
+    'not-visible':'not-visible','visibility-hidden':'not-visible','today-muted':'today-muted',
+    'stale-data':'stale-data','stale-prayer-data':'stale-data','already-completed':'already-completed','completed':'already-completed',
+    'duplicate':'duplicate','capacity-silent':'capacity','capacity-light':'capacity','capacity-ritual':'capacity',
+    'disabled':'disabled','invalid-definition':'invalid','invalid-occurrence':'invalid','p0-not-required':'not-required',
+    'p3-native-default-off':'channel-policy','catch-up-grouped':'catchup-grouped','coalesced':'catchup-grouped','catch-up-expired':'catchup-expired','unsupported':'unsupported','storage-error':'storage-error','native-error':'native-error'
+  };
+  if(direct[reason]) return direct[reason];
+  return REMINDER_DELIVERY_REASONS[reason]?reason:'unknown';
+}
+function reminderDeliveryActionStatus(status){ return status==='opened'||status==='snoozed'||status==='dismissed'; }
+function reminderDeliveryEntry(raw,nowIso){
+  var x=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:null;
+  if(!x) return null;
+  var occurrenceId=reminderDeliveryText(x.occurrenceId||x.id,240), status=reminderDeliveryStatus(x.status);
+  if(!occurrenceId||!status) return null;
+  var recordedAt=reminderDeliveryIso(x.recordedAt||x.updatedAt||x.createdAt||x.occurredAt||x.at||x.timestamp||x.shownAt||x.actedAt)||nowIso;
+  if(!recordedAt) return null;
+  var out={occurrenceId:occurrenceId,channel:reminderDeliveryChannel(x.channel),status:status,recordedAt:recordedAt};
+  var shownAt=reminderDeliveryIso(x.shownAt), actedAt=reminderDeliveryIso(x.actedAt);
+  if(shownAt) out.shownAt=shownAt;
+  if(actedAt) out.actedAt=actedAt;
+  if(status==='shown'&&!out.shownAt) out.shownAt=recordedAt;
+  if(reminderDeliveryActionStatus(status)&&!out.actedAt) out.actedAt=recordedAt;
+  if(status==='suppressed'||status==='failed') out.reason=reminderDeliveryReason(x.reason);
+  return out;
+}
+function reminderDeliveryEntryRank(status){ return Object.prototype.hasOwnProperty.call(REMINDER_DELIVERY_STATUS_RANK,status)?REMINDER_DELIVERY_STATUS_RANK[status]:-1; }
+function reminderDeliveryMergeEntry(current,next){
+  if(!current) return next;
+  if(!next) return current;
+  var currentMs=Date.parse(current.recordedAt), nextMs=Date.parse(next.recordedAt), nextIsLater=nextMs>=currentMs;
+  var currentRank=reminderDeliveryEntryRank(current.status), nextRank=reminderDeliveryEntryRank(next.status);
+  var out=Object.assign({},current);
+  if(nextRank>currentRank||(nextRank===currentRank&&nextIsLater)){
+    out.status=next.status; out.channel=next.channel; out.recordedAt=next.recordedAt;
+    if(next.reason) out.reason=next.reason; else delete out.reason;
+  }
+  if(!out.shownAt&&next.shownAt) out.shownAt=next.shownAt;
+  if(!out.actedAt&&next.actedAt) out.actedAt=next.actedAt;
+  if(next.shownAt&&out.shownAt&&Date.parse(next.shownAt)<Date.parse(out.shownAt)) out.shownAt=next.shownAt;
+  if(next.actedAt&&out.actedAt&&Date.parse(next.actedAt)>Date.parse(out.actedAt)) out.actedAt=next.actedAt;
+  return out;
+}
+function reminderDeliveryNormalize(raw,now){
+  var nowIso=reminderDeliveryNow(now), source=[];
+  if(Array.isArray(raw)) source=raw;
+  else if(raw&&typeof raw==='object'){
+    if(Array.isArray(raw.entries)) source=raw.entries;
+    else if(Array.isArray(raw.deliveries)) source=raw.deliveries;
+    else if(Array.isArray(raw.records)) source=raw.records;
+    else if(raw.occurrenceId||raw.id) source=[raw];
+  }
+  var byId={};
+  source.forEach(function(item){
+    var entry=reminderDeliveryEntry(item,nowIso); if(!entry) return;
+    byId[entry.occurrenceId]=reminderDeliveryMergeEntry(byId[entry.occurrenceId],entry);
+  });
+  var cutoff=Date.parse(nowIso)-REMINDER_DELIVERY_MAX_AGE_MS;
+  var entries=Object.keys(byId).map(function(id){ return byId[id]; }).filter(function(entry){
+    var at=Date.parse(entry.recordedAt); return Number.isFinite(at)&&at>=cutoff;
+  });
+  entries.sort(function(a,b){ var delta=Date.parse(a.recordedAt)-Date.parse(b.recordedAt); return delta||a.occurrenceId.localeCompare(b.occurrenceId); });
+  if(entries.length>REMINDER_DELIVERY_MAX_ENTRIES) entries=entries.slice(-REMINDER_DELIVERY_MAX_ENTRIES);
+  return {schemaVersion:REMINDER_DELIVERY_SCHEMA_VERSION,entries:entries};
+}
+function reminderDeliveryFind(log,occurrenceId){
+  var id=reminderDeliveryText(occurrenceId,240), entries=log&&Array.isArray(log.entries)?log.entries:[];
+  for(var i=0;i<entries.length;i++) if(entries[i]&&entries[i].occurrenceId===id) return entries[i];
+  return null;
+}
+function reminderDeliveryCanShowPure(raw,occurrenceId){
+  var entry=reminderDeliveryFind(reminderDeliveryNormalize(raw),occurrenceId);
+  return !entry||entry.status==='scheduled'||entry.status==='failed';
+}
+function reminderDeliveryResult(log,entry,changed,duplicate,reason,created){
+  return {ok:!reason,changed:!!changed,created:!!created,duplicate:!!duplicate,reason:reason||null,entry:entry||null,log:log};
+}
+function reminderDeliveryRecordPure(raw,input,now){
+  var nowIso=reminderDeliveryNow(now), log=reminderDeliveryNormalize(raw,nowIso), x=input&&typeof input==='object'?input:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x;
+  var occurrenceId=reminderDeliveryText(x.occurrenceId||occurrence.occurrenceId||occurrence.id,240), status=reminderDeliveryStatus(x.status||'scheduled');
+  if(!occurrenceId||!status) return reminderDeliveryResult(log,null,false,false,'invalid');
+  var eventAt=reminderDeliveryNow(x.at||x.recordedAt||x.now||nowIso), incoming=reminderDeliveryEntry({occurrenceId:occurrenceId,channel:x.channel||occurrence.channel,status:status,recordedAt:eventAt,shownAt:x.shownAt,actedAt:x.actedAt,reason:x.reason},eventAt), current=reminderDeliveryFind(log,occurrenceId);
+  if(!incoming) return reminderDeliveryResult(log,null,false,false,'invalid');
+  if(!current){ log.entries.push(incoming); log=reminderDeliveryNormalize(log,nowIso); return reminderDeliveryResult(log,reminderDeliveryFind(log,occurrenceId),true,false,null,true); }
+  var currentRank=reminderDeliveryEntryRank(current.status), incomingRank=reminderDeliveryEntryRank(status), allowResurface=x.resurface===true||x.fromSnooze===true;
+  var hiddenResurface=current.status==='suppressed'&&current.reason==='not-visible'&&status==='shown'&&allowResurface;
+  if(status===current.status || (REMINDER_DELIVERY_BLOCKING_STATUSES[current.status]&&status==='shown'&&!allowResurface) || (status==='scheduled'&&current.status!=='scheduled'&&current.status!=='failed') || (current.status==='suppressed'&&status!=='failed'&&status!=='suppressed'&&!hiddenResurface)) return reminderDeliveryResult(log,current,false,true,null,false);
+  if(current.status==='failed'&&(status==='scheduled'||status==='shown')) currentRank=-1;
+  if(status!=='failed'&&status!=='shown'&&incomingRank<currentRank) return reminderDeliveryResult(log,current,false,true,null,false);
+  var before=JSON.stringify(current);
+  var merged=current.status==='failed'&&(status==='scheduled'||status==='shown')?Object.assign({},incoming):reminderDeliveryMergeEntry(current,incoming);
+  if(status==='shown'&&allowResurface&&(current.status==='snoozed'||hiddenResurface)){ merged.status='shown'; merged.channel=incoming.channel; merged.recordedAt=incoming.recordedAt; merged.shownAt=merged.shownAt||incoming.recordedAt; delete merged.reason; }
+  if(status==='failed'){ merged.status='failed'; merged.channel=incoming.channel; merged.recordedAt=incoming.recordedAt; merged.reason=incoming.reason||'unknown'; }
+  if(status==='suppressed'){ merged.status='suppressed'; merged.channel=incoming.channel; merged.recordedAt=incoming.recordedAt; merged.reason=incoming.reason||'unknown'; }
+  log.entries[log.entries.indexOf(current)]=merged; log=reminderDeliveryNormalize(log,nowIso);
+  var after=JSON.stringify(merged), changed=before!==after;
+  return reminderDeliveryResult(log,reminderDeliveryFind(log,occurrenceId),changed,!changed,null,false);
+}
+function reminderDeliveryStorageRead(){
+  try{ return typeof localStorage==='undefined'?null:localStorage.getItem(REMINDER_DELIVERY_KEY); }catch(e){ return null; }
+}
+function reminderDeliveryStorageWrite(log){
+  try{ if(typeof localStorage==='undefined') return false; localStorage.setItem(REMINDER_DELIVERY_KEY,JSON.stringify(log)); return true; }catch(e){ return false; }
+}
+function reminderDeliveryLoad(now,persist){
+  var raw=reminderDeliveryStorageRead(), parsed=null;
+  if(raw){ try{ parsed=JSON.parse(raw); }catch(e){ parsed=null; } }
+  var log=reminderDeliveryNormalize(parsed,now);
+  if(persist!==false&&raw!==JSON.stringify(log)) reminderDeliveryStorageWrite(log);
+  return log;
+}
+function reminderDeliveryCommit(input){
+  var x=input&&typeof input==='object'?input:{}, now=x.at||x.recordedAt||x.now, current=reminderDeliveryLoad(now,true), result=reminderDeliveryRecordPure(current,x,now);
+  if(result.changed) reminderDeliveryStorageWrite(result.log);
+  if(!result.ok&&!result.reason) result.reason='storage-error';
+  return result;
+}
+function reminderDeliveryAction(status,occurrence,options){
+  var input=occurrence&&typeof occurrence==='object'?Object.assign({},occurrence):{occurrenceId:occurrence};
+  if(options&&typeof options==='object') input=Object.assign(input,options);
+  input.status=status; return reminderDeliveryCommit(input);
+}
+function reminderDeliveryRecordAdapter(input,status,options){
+  var record;
+  if(typeof input==='string') record={occurrenceId:input};
+  else if(input&&typeof input==='object') record=Object.assign({},input);
+  else record={};
+  if(status&&typeof status==='object'){ options=status; status=options.status; }
+  if(status&&typeof status==='string') record.status=status;
+  if(options&&typeof options==='object') record=Object.assign(record,options);
+  return reminderDeliveryCommit(record);
+}
+function reminderDeliveryClear(){ try{ if(typeof localStorage!=='undefined') localStorage.removeItem(REMINDER_DELIVERY_KEY); return true; }catch(e){ return false; } }
+
+// ── REM-10 Foreground reminder scheduler ─────────────────────────────────
+// Bu katman yalnız occurrence -> policy -> device journal zincirini yürütür.
+// Native gönderim, ağ polling'i, data.notifications ve kullanıcı metni bu
+// sözleşmenin dışındadır. Aynı occurrence'ın ikinci kez görünmesini asıl
+// olarak delivery journal'ın tekil occurrence kaydı engeller.
+var REMINDER_LIFECYCLE_INTERVAL_MS=30000;
+var REMINDER_LIFECYCLE_VISIBILITY={visible:true,hidden:true};
+var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null};
+
+function reminderLifecycleVisibility(value){
+  var state=String(value||'').toLowerCase();
+  return REMINDER_LIFECYCLE_VISIBILITY[state]?state:'visible';
+}
+function reminderLifecycleOccurrenceId(value){
+  var x=value&&typeof value==='object'?value:{};
+  return reminderDeliveryText(x.occurrenceId||x.id,240);
+}
+function reminderLifecycleCandidateList(input){
+  var x=input&&typeof input==='object'?input:{}, source=Array.isArray(x.occurrences)?x.occurrences:(Array.isArray(x.candidates)?x.candidates:[]);
+  if(!source.length&&x.occurrence&&typeof x.occurrence==='object') source=[x.occurrence];
+  return source.filter(function(item){ return item&&typeof item==='object'&&!Array.isArray(item); });
+}
+function reminderLifecycleRecordResult(item,recordResult,extra){
+  var out={occurrenceId:reminderLifecycleOccurrenceId(item),status:recordResult&&recordResult.entry?recordResult.entry.status:null,reason:recordResult&&recordResult.entry?recordResult.entry.reason||null:(recordResult&&recordResult.reason||null),changed:!!(recordResult&&recordResult.changed),duplicate:!!(recordResult&&recordResult.duplicate)};
+  if(extra&&typeof extra==='object') Object.keys(extra).forEach(function(key){ out[key]=extra[key]; });
+  return out;
+}
+function reminderLifecycleRecordFailure(log,item,nowIso){
+  var occurrenceId=reminderLifecycleOccurrenceId(item), current=reminderDeliveryFind(log,occurrenceId);
+  // A terminal delivery must remain truthful; an evaluator failure cannot
+  // rewrite an already shown/opened/snoozed/dismissed/suppressed occurrence.
+  if(!occurrenceId||(current&&current.status!=='failed')) return {log:log,result:null};
+  var result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'failed',channel:'in_app',reason:'unknown',now:nowIso},nowIso);
+  return {log:result.log,result:result};
+}
+// ── REM-11 Catch-up / grouping / conflict resolution ─────────────────────
+// Catch-up is deliberately a separate pure layer. It returns one generic
+// in-app summary and never carries native title/body, user text, therapy text,
+// medication detail, or data.notifications records across the boundary.
+var REMINDER_CATCHUP_MAX_AGE_MS=24*60*60*1000;
+var REMINDER_CATCHUP_REASON='catchup-grouped';
+var REMINDER_CATCHUP_EXPIRED_REASON='catchup-expired';
+var REMINDER_CATCHUP_SUMMARY_VERSION=1;
+function reminderCatchupLocalDateTimeMs(localDate,localTime,timezone){
+  if(!reminderEngineValidDate(localDate)||!reminderEngineTimezoneValid(timezone)) return null;
+  var parsed=reminderEngineParseTime(localTime); if(!parsed) return null;
+  var parts=localDate.split('-').map(Number), desired=Date.UTC(parts[0],parts[1]-1,parts[2],parsed.hour,parsed.minute,parsed.second);
+  if(!Number.isFinite(desired)) return null;
+  var guess=desired;
+  for(var i=0;i<4;i++){
+    var seen=reminderEngineLocalParts(guess,timezone); if(!seen) return null;
+    var seenMs=Date.UTC(seen.year,seen.month-1,seen.day,seen.hour,seen.minute,seen.second), delta=desired-seenMs;
+    guess+=delta; if(Math.abs(delta)<1000) break;
+  }
+  return Number.isFinite(guess)?guess:null;
+}
+function reminderCatchupOccurrenceMs(item,timezone){
+  var x=item&&typeof item==='object'?item:{};
+  var direct=['scheduledAtIso','dueAt','occurredAt','triggeredAt'];
+  for(var i=0;i<direct.length;i++){
+    var value=x[direct[i]];
+    if(typeof value==='string'&&Number.isFinite(Date.parse(value))) return Date.parse(value);
+  }
+  var localDate=x.localDate||x.date, localTime=x.scheduledAt||x.localTime||x.time;
+  return reminderCatchupLocalDateTimeMs(String(localDate||''),String(localTime||''),String(x.timezone||timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE));
+}
+function reminderCatchupHash(value){
+  var text=String(value||''), hash=2166136261;
+  for(var i=0;i<text.length;i++){ hash^=text.charCodeAt(i); hash=Math.imul(hash,16777619); }
+  return ('00000000'+(hash>>>0).toString(16)).slice(-8);
+}
+function reminderCatchupPriority(candidate,definition,item){
+  return reminderPolicyPriority((item&&item.priority)||(definition&&definition.priority)||(candidate&&candidate.priority)||'P3');
+}
+function reminderCatchupPrecedence(candidate,definition,item){
+  var x=candidate&&typeof candidate==='object'?candidate:{}, occurrence=item&&typeof item==='object'?item:{}, def=definition&&typeof definition==='object'?definition:{};
+  var priority=reminderCatchupPriority(x,def,occurrence), category=String(occurrence.category||def.category||x.category||''), source=String(occurrence.source||def.source||x.source||occurrence.origin||def.origin||x.origin||occurrence.kind||def.kind||x.kind||'').toLowerCase();
+  var userCreated=x.userCreated===true||x.userScheduled===true||x.explicitlySelected===true||occurrence.userCreated===true||occurrence.userScheduled===true||occurrence.explicitlySelected===true||/(user|custom|personal|manual)/.test(source);
+  var ritual=category==='ritual'||source==='ritual'||source==='faith';
+  var discovery=category==='discovery'||source==='discovery'||x.discovery===true||occurrence.discovery===true;
+  if(priority==='P1'&&userCreated) return {rank:0,label:'user-created-p1',priority:priority,category:category||'custom'};
+  if(priority==='P2'&&ritual) return {rank:1,label:'ritual-p2',priority:priority,category:category||'ritual'};
+  if(priority==='P3'&&discovery) return {rank:2,label:'discovery-p3',priority:priority,category:category||'discovery'};
+  return {rank:3+(REMINDER_PRIORITY_RANK[priority]||3),label:'priority-'+priority.toLowerCase(),priority:priority,category:category||'other'};
+}
+function reminderCatchupPolicyAllowed(policy){
+  if(!policy||typeof policy!=='object') return false;
+  if(policy.allowed===true||policy.inAppAllowed===true) return true;
+  var reason=String(policy.reason||'');
+  return reason==='quiet-hours-suppressed'||reason==='quiet-hours-deferred'||reason==='native-daily-cap'||reason==='low-priority-native-cap'||reason==='category-cooldown'||reason.indexOf('permission-')===0;
+}
+function reminderCatchupBlockingEntry(entry){
+  if(!entry) return false;
+  if(entry.status==='shown'||entry.status==='opened'||entry.status==='snoozed'||entry.status==='dismissed') return true;
+  return entry.status==='suppressed'&&(entry.reason==='already-completed'||entry.reason===REMINDER_CATCHUP_REASON||entry.reason===REMINDER_CATCHUP_EXPIRED_REASON);
+}
+function reminderCatchupPlan(input){
+  var x=input&&typeof input==='object'?input:{}, context=x.context&&typeof x.context==='object'?x.context:{}, timezone=String(x.timezone||context.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), nowIso=reminderDeliveryNow(x.nowIso||x.now), nowMs=Date.parse(nowIso), windowMs=Number.isInteger(x.maxAgeMs)&&x.maxAgeMs>0?Math.min(x.maxAgeMs,REMINDER_CATCHUP_MAX_AGE_MS):REMINDER_CATCHUP_MAX_AGE_MS, source=Array.isArray(x.occurrences)?x.occurrences:(Array.isArray(x.candidates)?x.candidates:[]), log=reminderDeliveryNormalize(x.deliveryLog||x.journal||x.log,nowIso), seen={}, members=[], expired=[], historicalIds=[];
+  if(!Number.isFinite(nowMs)) return {summary:null,members:[],expired:[],historicalIds:[],nowIso:nowIso,timezone:timezone};
+  source.forEach(function(candidate){
+    if(!candidate||typeof candidate!=='object') return;
+    var item=candidate.occurrence&&typeof candidate.occurrence==='object'?candidate.occurrence:candidate, occurrenceId=reminderLifecycleOccurrenceId(item);
+    if(!occurrenceId||seen[occurrenceId]||item.due===false||candidate.due===false) return;
+    var scheduledMs=reminderCatchupOccurrenceMs(item,timezone), isPast=item.past===true;
+    if(!isPast) return;
+    seen[occurrenceId]=true; historicalIds.push(occurrenceId);
+    if(item.completed===true||candidate.completed===true){ expired.push({occurrenceId:occurrenceId,current:null,reason:'already-completed'}); return; }
+    var current=reminderDeliveryFind(log,occurrenceId);
+    if(reminderCatchupBlockingEntry(current)) return;
+    var ageMs=scheduledMs===null?null:nowMs-scheduledMs;
+    if(ageMs===null||ageMs<0||ageMs>windowMs){ expired.push({occurrenceId:occurrenceId,current:current}); return; }
+    var definition=candidate.definition&&typeof candidate.definition==='object'?candidate.definition:item, preference=candidate.preference&&typeof candidate.preference==='object'?candidate.preference:{}, policy=candidate.policy&&typeof candidate.policy==='object'?candidate.policy:reminderPolicyEvaluate({definition:definition,preference:preference,context:context});
+    if(!reminderCatchupPolicyAllowed(policy)) return;
+    var precedence=reminderCatchupPrecedence(candidate,definition,item), priority=reminderCatchupPriority(candidate,definition,item);
+    members.push({occurrenceId:occurrenceId,scheduledMs:scheduledMs,priority:priority,category:precedence.category,precedence:precedence.label,precedenceRank:precedence.rank});
+  });
+  members.sort(function(a,b){ return a.precedenceRank-b.precedenceRank||a.scheduledMs-b.scheduledMs||a.occurrenceId.localeCompare(b.occurrenceId); });
+  var summary=null;
+  if(members.length){
+    var primary=members[0], local=reminderEngineLocalParts(nowMs,timezone), localDate=local&&local.localDate||nowIso.slice(0,10), digest=reminderCatchupHash(localDate+'|'+members.map(function(member){ return member.occurrenceId; }).sort().join('|'));
+    summary={schemaVersion:REMINDER_CATCHUP_SUMMARY_VERSION,id:'reminder-catchup-v1:'+localDate+':'+digest,channel:'in_app',inAppOnly:true,nativeAllowed:false,nativeReplay:false,replay:false,priority:primary.priority,precedence:primary.precedence,category:members.length===1?primary.category:'mixed',count:members.length,window:'last-24h',reason:REMINDER_CATCHUP_REASON,copyKey:'catchup.generic',label:'Günün için birkaç küçük durak hazır'};
+  }
+  return {summary:summary,members:members,expired:expired,historicalIds:historicalIds,nowIso:nowIso,timezone:timezone};
+}
+function reminderCatchupPublic(plan){
+  var summary=plan&&plan.summary?Object.assign({},plan.summary):null;
+  return {ok:true,summaries:summary?[summary]:[],summary:summary,eligibleCount:plan&&plan.members?plan.members.length:0,expiredCount:plan&&plan.expired?plan.expired.length:0,reason:summary?summary.reason:null,nativeReplay:false,inAppOnly:true,timezone:plan&&plan.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE,nowIso:plan&&plan.nowIso||''};
+}
+function reminderEvaluateReminders(input){
+  var x=input&&typeof input==='object'?input:{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), suppliedContext=x.context&&typeof x.context==='object'?x.context:{}, context=Object.assign({},suppliedContext), visibility=reminderLifecycleVisibility(x.visibilityState||context.visibilityState), source=reminderLifecycleCandidateList(x), log=reminderDeliveryNormalize(x.deliveryLog||x.journal||x.log,nowIso), initialLog=JSON.stringify(log), results=[],errors=[],shownCount=0,suppressedCount=0,duplicateCount=0,scheduledCount=0,catchUpRequested=x.catchUp===true||x.reopen===true,catchUpPlan=catchUpRequested?reminderCatchupPlan({nowIso:nowIso,timezone:x.timezone||context.timezone,context:context,occurrences:source,deliveryLog:log}):null,catchUpIds={};
+  context.visibilityState=visibility;
+  if(!Array.isArray(context.recentCategoryDeliveries)) context.recentCategoryDeliveries=[];
+  if(catchUpPlan){
+    catchUpPlan.historicalIds.forEach(function(id){ catchUpIds[id]=true; });
+    catchUpPlan.expired.forEach(function(member){
+      var expiredResult=reminderDeliveryRecordPure(log,{occurrenceId:member.occurrenceId,status:'suppressed',channel:'in_app',reason:member.reason||REMINDER_CATCHUP_EXPIRED_REASON,now:nowIso},nowIso);
+      log=expiredResult.log; if(expiredResult.duplicate) duplicateCount++; else suppressedCount++;
+    });
+    if(catchUpPlan.summary){
+      var summaryRecord=reminderDeliveryRecordPure(log,{occurrenceId:catchUpPlan.summary.id,status:'shown',channel:'in_app',now:nowIso},nowIso);
+      log=summaryRecord.log; if(summaryRecord.duplicate) duplicateCount++; else if(summaryRecord.changed) shownCount++;
+      results.push({occurrenceId:catchUpPlan.summary.id,status:'shown',channel:'in_app',summary:true,count:catchUpPlan.summary.count,reason:REMINDER_CATCHUP_REASON,changed:!!summaryRecord.changed,duplicate:!!summaryRecord.duplicate});
+      catchUpPlan.members.forEach(function(member){
+        var memberResult=reminderDeliveryRecordPure(log,{occurrenceId:member.occurrenceId,status:'suppressed',channel:'in_app',reason:REMINDER_CATCHUP_REASON,now:nowIso},nowIso);
+        log=memberResult.log; if(memberResult.duplicate) duplicateCount++; else suppressedCount++;
+      });
+    }
+  }
+  source.forEach(function(candidate){
+    var item=candidate.occurrence&&typeof candidate.occurrence==='object'?candidate.occurrence:candidate, occurrenceId=reminderLifecycleOccurrenceId(item), result=null;
+    try{
+      if(!occurrenceId){
+        errors.push({occurrenceId:'',reason:'invalid'});
+        results.push({occurrenceId:'',status:'failed',reason:'invalid',changed:false,duplicate:false});
+        return;
+      }
+      if(catchUpIds[occurrenceId]) return;
+      var due=item.due!==false&&candidate.due!==false;
+      if(!due){
+        result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'scheduled',channel:candidate.channel||item.channel,now:nowIso},nowIso);
+        log=result.log; scheduledCount++; results.push(reminderLifecycleRecordResult(item,result,{status:'scheduled'}));
+        if(result.duplicate) duplicateCount++;
+        return;
+      }
+      var definition=candidate.definition&&typeof candidate.definition==='object'?candidate.definition:item, preference=candidate.preference&&typeof candidate.preference==='object'?candidate.preference:{}, policy=candidate.policy&&typeof candidate.policy==='object'?candidate.policy:reminderPolicyEvaluate({definition:definition,preference:preference,context:context});
+      if(!policy||typeof policy!=='object'){
+        result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'failed',channel:'in_app',reason:'invalid',now:nowIso},nowIso);
+        log=result.log; errors.push({occurrenceId:occurrenceId,reason:'invalid'}); results.push(reminderLifecycleRecordResult(item,result,{status:'failed',reason:'invalid'})); return;
+      }
+      var suppressedReason=null;
+      if(visibility==='hidden') suppressedReason='not-visible';
+      else if(candidate.completed===true||item.completed===true) suppressedReason='already-completed';
+      else if(policy.allowed!==true||policy.suppressed===true) suppressedReason=reminderDeliveryReason(policy.reason||'unknown');
+      if(suppressedReason){
+        result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'suppressed',channel:policy.channel||candidate.channel||item.channel,reason:suppressedReason,now:nowIso},nowIso);
+        log=result.log; suppressedCount++; if(result.duplicate) duplicateCount++; results.push(reminderLifecycleRecordResult(item,result,{status:'suppressed',reason:suppressedReason})); return;
+      }
+      var channel=policy.channel==='native'&&!item.nativeReplay&&!item.replay?'native':'in_app';
+      result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'shown',channel:channel,now:nowIso,resurface:visibility==='visible'},nowIso);
+      log=result.log; if(result.duplicate) duplicateCount++; else if(result.changed) shownCount++;
+      results.push(reminderLifecycleRecordResult(item,result,{status:result.entry&&result.entry.status||'shown',channel:channel}));
+      if(result.changed){
+        var category=String(definition.category||item.category||'');
+        if(category) context.recentCategoryDeliveries.push({category:category,minutesAgo:0});
+        if(channel==='native') context.nativeBudgetUsed=(Number(context.nativeBudgetUsed)||0)+1;
+      }
+    }catch(e){
+      var failure=reminderLifecycleRecordFailure(log,item,nowIso);
+      log=failure.log;
+      errors.push({occurrenceId:occurrenceId||'',reason:'unknown'});
+      results.push(failure.result?reminderLifecycleRecordResult(item,failure.result,{status:'failed',reason:'unknown'}):{occurrenceId:occurrenceId||'',status:'failed',reason:'unknown',changed:false,duplicate:false});
+    }
+  });
+  return {ok:errors.length===0,status:'evaluated',source:String(x.source||'manual'),evaluatedAt:nowIso,visibilityState:visibility,changed:JSON.stringify(log)!==initialLog,shownCount:shownCount,suppressedCount:suppressedCount,scheduledCount:scheduledCount,duplicateCount:duplicateCount,errors:errors,results:results,catchUpSummary:catchUpPlan&&catchUpPlan.summary?Object.assign({},catchUpPlan.summary):null,catchUpSummaries:catchUpPlan&&catchUpPlan.summary?[Object.assign({},catchUpPlan.summary)]:[],catchUpCount:catchUpPlan&&catchUpPlan.members?catchUpPlan.members.length:0,log:log};
+}
+function reminderLifecycleDefaultContext(input,nowIso){
+  var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), policy=root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(), timezone=String(x.timezone||((root&&root.timezone)||'')||'Europe/Istanbul'), instantMs=new Date(nowIso).getTime(), local=reminderEngineLocalParts(instantMs,timezone), requestedVisibility=x.visibilityState||(x.context&&x.context.visibilityState), visibility;
+  if(!requestedVisibility){ try{ requestedVisibility=document.hidden?'hidden':'visible'; }catch(e){ requestedVisibility='visible'; } }
+  visibility=reminderLifecycleVisibility(requestedVisibility);
+  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility},x.context&&typeof x.context==='object'?x.context:{});
+  context.visibilityState=visibility;
+  return context;
+}
+function reminderLifecycleWindowDue(definition,localTime){
+  var window=definition&&definition.defaultWindow;
+  if(!window||window.kind!=='time-range') return true;
+  var now=reminderPolicyTimeMinutes(localTime),start=reminderPolicyTimeMinutes(window.start),end=reminderPolicyTimeMinutes(window.end);
+  if(now===null||start===null||end===null) return false;
+  return start<end?now>=start&&now<=end:now>=start||now<=end;
+}
+function reminderLifecycleBuildCandidates(input,context,root){
+  var x=input&&typeof input==='object'?input:{}, explicit=reminderLifecycleCandidateList(x);
+  if(explicit.length) return explicit;
+  var defs=Array.isArray(x.definitions)?x.definitions:reminderDefinitions(), out=[],preferences=root&&root.preferences&&typeof root.preferences==='object'?root.preferences:{};
+  defs.forEach(function(definition){
+    if(!definition||typeof definition!=='object'||!definition.id) return;
+    var preference=preferences[definition.id];
+    if(!preference||preference.enabled!==true) return;
+    var timezone=String(preference.timezone||context.timezone||'Europe/Istanbul'), preferenceNow=reminderEngineLocalParts(Date.parse(context.nowIso||''),timezone), baseDate=preferenceNow&&preferenceNow.localDate||context.localDate, baseTime=preferenceNow&&preferenceNow.localTime?preferenceNow.localTime.slice(0,5):context.localTime;
+    if(!reminderEngineValidDate(baseDate)) return;
+    var datesForPreference=[baseDate];
+    if(x.catchUp===true){ var previousDate=reminderEngineAddDays(baseDate,-1); if(previousDate) datesForPreference.push(previousDate); }
+    datesForPreference.forEach(function(localDate){
+      var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:localDate,nowLocalDate:baseDate,nowLocalTime:baseTime,timezone:timezone,instantIso:context.nowIso,prayerData:x.prayerData,prayerKey:x.prayerKey,offsetMinutes:preference.offsetMinutes});
+      if(!generated.ok||!generated.occurrence) return;
+      var historicalDate=localDate!==baseDate;
+      generated.occurrence.due=generated.occurrence.due&&(historicalDate||reminderLifecycleWindowDue(definition,baseTime));
+      out.push({occurrence:generated.occurrence,definition:definition,preference:preference,due:generated.occurrence.due});
+    });
+  });
+  return out;
+}
+function reminderLifecycleEvaluate(source,input){
+  if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
+  var x=input&&typeof input==='object'?Object.assign({},input):{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), sourceName=String(source||x.source||'manual');
+  if(reminderLifecycleState.running) return {ok:true,status:'skipped',source:sourceName,reason:'duplicate',changed:false,results:[],errors:[]};
+  if(!data) return {ok:true,status:'skipped',source:sourceName,reason:'no-data',changed:false,results:[],errors:[]};
+  reminderLifecycleState.running=true;
+  try{
+    var root=reminderCurrentRoot(), context=reminderLifecycleDefaultContext(x,nowIso), catchUp=x.catchUp===true||sourceName==='boot'||sourceName==='foreground'||sourceName==='focus'||sourceName==='pageshow'||sourceName==='visibilitychange'||sourceName==='online', candidates=reminderLifecycleBuildCandidates(Object.assign({},x,{catchUp:catchUp}),context,root), current=reminderDeliveryLoad(nowIso,false), result=reminderEvaluateReminders({source:sourceName,nowIso:nowIso,visibilityState:context.visibilityState,context:context,occurrences:candidates,deliveryLog:current,catchUp:catchUp});
+    var persisted=true;
+    if(result.changed&&!reminderDeliveryStorageWrite(result.log)){ persisted=false; result.ok=false; result.errors=(result.errors||[]).concat([{occurrenceId:'',reason:'storage-error'}]); }
+    result.persisted=persisted;
+    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:result.status,source:result.source,visibilityState:result.visibilityState,shownCount:result.shownCount,suppressedCount:result.suppressedCount,scheduledCount:result.scheduledCount,duplicateCount:result.duplicateCount,errorCount:result.errors.length,persisted:persisted};
+    return result;
+  }catch(e){
+    var failed={ok:false,status:'failed',source:sourceName,reason:'unknown',changed:false,results:[],errors:[{occurrenceId:'',reason:'unknown'}],persisted:false};
+    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:'failed',source:sourceName,errorCount:1,persisted:false};
+    return failed;
+  }finally{ reminderLifecycleState.running=false; }
+}
+function reminderLifecycleTick(){ return reminderLifecycleEvaluate('timer'); }
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
@@ -3952,10 +4407,10 @@ function createDefaultData(){
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
   // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.
-  if(data){ ui.forceStart=false; ui.tab='bugun'; render(); return; }
+  if(data){ ui.forceStart=false; ui.tab='bugun'; render(); reminderLifecycleEvaluate('boot'); return; }
   data=migrate(createDefaultData());
   if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
-  ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım');
+  ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); reminderLifecycleEvaluate('boot');
 };
 App.go=function(id){
   // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
@@ -4090,10 +4545,73 @@ App.reminderSelectNativeCandidates=reminderPolicySelectNativeCandidates;
 App.reminderEngineLocalParts=reminderEngineLocalParts;
 App.reminderOccurrenceId=reminderEngineOccurrenceId;
 App.reminderGenerateOccurrence=reminderEngineGenerateOccurrence;
+// REM-09: device-local delivery journal. These adapters never touch data,
+// data.notifications or the ÆON shownNotificationIds list.
+App.reminderDeliveryKey=REMINDER_DELIVERY_KEY;
+App.REMINDER_DELIVERY_KEY=REMINDER_DELIVERY_KEY;
+App.REMINDER_DELIVERY_STATUSES=REMINDER_DELIVERY_STATUS_LIST.slice();
+App.REMINDER_DELIVERY_REASONS=Object.keys(REMINDER_DELIVERY_REASONS);
+App.reminderDeliveryEmpty=reminderDeliveryEmpty;
+App.reminderDeliveryStatuses=function(){ return REMINDER_DELIVERY_STATUS_LIST.slice(); };
+App.reminderDeliveryReasons=function(){ return Object.keys(REMINDER_DELIVERY_REASONS); };
+App.reminderDeliveryNormalize=function(raw,now){ return reminderDeliveryNormalize(raw,now); };
+App.reminderDeliveryStatus=reminderDeliveryStatus;
+App.reminderDeliveryReason=reminderDeliveryReason;
+App.reminderDeliveryRecord=reminderDeliveryRecordAdapter;
+App.reminderDeliveryTransition=reminderDeliveryRecordAdapter;
+App.reminderDeliveryLoad=function(now){ return reminderDeliveryLoad(now,true); };
+App.reminderDeliveryJournal=App.reminderDeliveryLoad;
+App.reminderDeliveryFromStorage=App.reminderDeliveryLoad;
+App.reminderDeliveryEntries=function(now){ return reminderDeliveryLoad(now,true).entries.slice(); };
+App.reminderDeliveryGet=function(occurrenceId,now){ var id=occurrenceId&&typeof occurrenceId==='object'?(occurrenceId.occurrenceId||occurrenceId.id):occurrenceId; return reminderDeliveryFind(reminderDeliveryLoad(now,true),id); };
+App.reminderDeliveryCanShow=function(occurrenceId,now){ var id=occurrenceId&&typeof occurrenceId==='object'?(occurrenceId.occurrenceId||occurrenceId.id):occurrenceId; return reminderDeliveryCanShowPure(reminderDeliveryLoad(now,true),id); };
+App.reminderDeliveryShouldShow=App.reminderDeliveryCanShow;
+App.reminderDeliveryCanDeliver=App.reminderDeliveryCanShow;
+App.reminderDeliveryIsDuplicate=function(occurrenceId,now){ return !App.reminderDeliveryCanShow(occurrenceId,now); };
+App.reminderDeliveryClaim=function(occurrence,options){ return reminderDeliveryAction('shown',occurrence,options); };
+App.claimReminderDelivery=App.reminderDeliveryClaim;
+App.reminderDeliveryWasDelivered=function(occurrenceId,now){ var entry=App.reminderDeliveryGet(occurrenceId,now); return !!(entry&&REMINDER_DELIVERY_BLOCKING_STATUSES[entry.status]); };
+App.reminderDeliverySchedule=function(occurrence,options){ return reminderDeliveryAction('scheduled',occurrence,options); };
+App.reminderDeliveryShow=function(occurrence,options){ return reminderDeliveryAction('shown',occurrence,options); };
+App.reminderDeliveryOpen=function(occurrence,options){ return reminderDeliveryAction('opened',occurrence,options); };
+App.reminderDeliverySnooze=function(occurrence,options){ return reminderDeliveryAction('snoozed',occurrence,options); };
+App.reminderDeliveryDismiss=function(occurrence,options){ return reminderDeliveryAction('dismissed',occurrence,options); };
+App.reminderDeliverySuppress=function(occurrence,options){ return reminderDeliveryAction('suppressed',occurrence,options); };
+App.reminderDeliveryFail=function(occurrence,options){ return reminderDeliveryAction('failed',occurrence,options); };
+App.reminderDeliveryRetain=function(now){ return reminderDeliveryLoad(now,true); };
+App.reminderDeliveryRetainLog=App.reminderDeliveryRetain;
+App.reminderDeliveryClear=reminderDeliveryClear;
+App.reminderDeliveryReset=App.reminderDeliveryClear;
+App.recordReminderDelivery=App.reminderDeliveryRecord;
+App.loadReminderDelivery=App.reminderDeliveryLoad;
+App.clearReminderDelivery=App.reminderDeliveryClear;
+App.scheduleReminderDelivery=App.reminderDeliverySchedule;
+App.showReminderDelivery=App.reminderDeliveryShow;
+App.openReminderDelivery=App.reminderDeliveryOpen;
+App.snoozeReminderDelivery=App.reminderDeliverySnooze;
+App.dismissReminderDelivery=App.reminderDeliveryDismiss;
+App.suppressReminderDelivery=App.reminderDeliverySuppress;
+App.failReminderDelivery=App.reminderDeliveryFail;
 App.generateReminderOccurrence=reminderEngineGenerateOccurrence;
 App.isReminderWithinQuietHours=App.reminderIsWithinQuietHours;
 App.evaluateReminderPolicy=App.reminderPolicyEvaluate;
 App.selectReminderNativeCandidates=App.reminderSelectNativeCandidates;
+App.reminderCatchup=function(input){ return reminderCatchupPublic(reminderCatchupPlan(input)); };
+App.buildReminderCatchup=App.reminderCatchup;
+App.resolveReminderCatchup=App.reminderCatchup;
+App.reminderCatchupMaxAge=REMINDER_CATCHUP_MAX_AGE_MS;
+// REM-10: pure evaluator + foreground lifecycle adapter. The adapter writes
+// only the device-local delivery journal; it never calls save() or fetch().
+App.reminderEvaluateReminders=reminderEvaluateReminders;
+App.evaluateReminders=reminderLifecycleEvaluate;
+App.evaluateRemindersPure=reminderEvaluateReminders;
+App.reminderLifecycleEvaluate=reminderLifecycleEvaluate;
+App.evaluateReminderLifecycle=reminderLifecycleEvaluate;
+App.reminderLifecycleTick=reminderLifecycleTick;
+App.reminderLifecycleInterval=REMINDER_LIFECYCLE_INTERVAL_MS;
+App.reminderLifecycleState=function(){
+  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
+};
 App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
 function updateReminderPolicy(mutator){
   var root=reminderCurrentRoot(); if(!root||typeof mutator!=='function') return;
@@ -14498,7 +15016,8 @@ function maybePullQuranForeground(force){
 }
 setTimeout(pollRemote,1500);
 setInterval(pollRemote,30000); // ön planda ~30 sn'de bir kontrol (ÆON + sağlık + Kur’an teslimleri)
-function onAppForeground(){
+setInterval(reminderLifecycleTick,REMINDER_LIFECYCLE_INTERVAL_MS); // yalnız yerel reminder checkpoint'i; ağ polling'i değişmez
+function onAppForeground(source){
   // iOS PWA / tarayıcı: arka plandan dönüşte soğuk açılış sayılmaz;
   // yine de panelde "Son açılış" ve "Canlı takip" hemen güncellensin.
   if(data){
@@ -14506,16 +15025,18 @@ function onAppForeground(){
     data.lastOpenedAt=new Date().toISOString();
     save(false);
   }
+  reminderLifecycleEvaluate(source||'foreground');
   pollRemote(true);
   maybePullQuranForeground(true);
   maybeFetchDailyPhoto();
 }
-document.addEventListener('visibilitychange',function(){ if(!document.hidden){ onAppForeground(); } });
-window.addEventListener('focus',function(){ onAppForeground(); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
-window.addEventListener('pageshow',function(){ onAppForeground(); }); // bfcache'ten geri dönüşte
-window.addEventListener('online',function(){ pollRemote(true); maybePullQuranForeground(true); });   // bağlantı gelince teslimi hemen kontrol et
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ reminderLifecycleEvaluate('hidden'); } else { onAppForeground('visibilitychange'); } });
+window.addEventListener('focus',function(){ onAppForeground('focus'); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
+window.addEventListener('pageshow',function(){ onAppForeground('pageshow'); }); // bfcache'ten geri dönüşte
+window.addEventListener('online',function(){ reminderLifecycleEvaluate('online'); pollRemote(true); maybePullQuranForeground(true); });   // bağlantı gelince teslimi hemen kontrol et
 
 render();
+if(data){ reminderLifecycleEvaluate('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 

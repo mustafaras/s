@@ -160,5 +160,26 @@ runTests([
     assert(!Object.prototype.hasOwnProperty.call(out.data, "deliveryLog"));
     assert(Array.isArray(out.data.notifications));
     assertEqual(out.storage.getItem(DELIVERY_KEY), deliverySeed);
+  }],
+  ["delivery adapter drops native and private content fields", () => {
+    const out = bootAppWithState(privacyState());
+    assertEqual(out.error, null);
+    out.sandbox.App.reminderDeliveryShow({
+      occurrenceId: "privacy-occurrence",
+      channel: "native",
+      nativeBody: "NATIVE_BODY_SECRET",
+      userNote: "USER_NOTE_SECRET",
+      therapyText: "THERAPY_TEXT_SECRET",
+      medicationName: "MEDICATION_SECRET",
+      dose: "DOSE_SECRET",
+      now: "2026-08-14T12:00:00.000Z"
+    });
+    const raw = out.storage.getItem(DELIVERY_KEY);
+    ["NATIVE_BODY_SECRET", "USER_NOTE_SECRET", "THERAPY_TEXT_SECRET", "MEDICATION_SECRET", "DOSE_SECRET"].forEach((secret) => assert(!raw.includes(secret)));
+    assert(!raw.includes("nativeBody"));
+    assert(!raw.includes("userNote"));
+    assert(!raw.includes("therapyText"));
+    assert(!raw.includes("medicationName"));
+    assert(!raw.includes("data.notifications"));
   }]
 ]).catch(() => process.exitCode = 1);

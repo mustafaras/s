@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-21",
+  "activePrompt": "REM-22",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-20",
-  "nextSafeAction": "REM-21 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-21",
+  "nextSafeAction": "REM-22 local implementation/verification; no release action",
   "currentPhase": "R5",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-20 bounded medication/supplement schedule adapter in app.js/styles.css with local private name/label/note, explicit safety copy, current-day user-owned occurrence, generic native boundary and no clinical decision logic",
-    "tests": "Medication 65; privacy 35; all 25 reminder fixtures; root tests; Panel-v2 27 fixtures; zikr harness 90/90; driver; B1/B2/B3; Faz10/Faz11; syntax/context/diff PASS; no browser, real network or data write",
-    "commit": "4660671255f363a086eeeccfa11e98a890c2bb66",
+    "source": "REM-21 Hicri / special-day adapter in app.js with all/selected/none preferences, native default off, offset-aware occurrence generation via existing HijriCalendarV1, generic optional copy and quiet/budget lifecycle boundary",
+    "tests": "Special-day 35; timezone 28; all 26 reminder fixtures; root 32 fixtures; Panel-v2 27 fixtures; zikr harness 90/90; driver; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
+    "commit": "7c2eb28e669d370f028801467ff5ba026996b2e4",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-20 closure; REM-21 ready; clinical safety gate PASS; release remains not_approved",
+  "updatedBy": "Codex REM-21 closure; REM-22 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-20",
-    "evidence": "docs/reminders/evidence/REM-20.md",
-    "commit": "4660671255f363a086eeeccfa11e98a890c2bb66"
+    "prompt": "REM-21",
+    "evidence": "docs/reminders/evidence/REM-21.md",
+    "commit": "7c2eb28e669d370f028801467ff5ba026996b2e4"
   }
 }

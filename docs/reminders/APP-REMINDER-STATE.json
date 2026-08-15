@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-18",
+  "activePrompt": "REM-19",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-17",
-  "nextSafeAction": "REM-18 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-18",
+  "nextSafeAction": "REM-19 local implementation/verification; no release action",
   "currentPhase": "R4",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-17 Saygı reading adapter in app.js with explicit user-selected window, deterministic daily occurrence, article readiness/read gate, selected-person race guard, generic private copy and modal deep-link",
-    "tests": "Saygı 71 assertions with real lifecycle loading/ready/duplicate and modal deep-link audit; zikr harness 90/90; privacy 30; therapy 82; deeplinks 63; inbox 40; all 22 reminder fixtures; app driver; root and Panel-v2 regressions; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
-    "commit": "fa359b6707f381aff3dcc535dd31f1b1551558fd",
+    "source": "REM-18 evening coalescing adapter in app.js/styles.css with deterministic one-occurrence grouping, user-selected primary, safe native copy, in-app alternatives, quiet/budget fallback and catch-up no-replay",
+    "tests": "Evening 44; catch-up 46; privacy 30; all 23 reminder fixtures; zikr harness 90/90; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
+    "commit": "feb0882e562d0d7c0e843f0007453bed90033046",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-17 closure; REM-18 ready; release remains not_approved",
+  "updatedBy": "Codex REM-18 closure; REM-19 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-17",
-    "evidence": "docs/reminders/evidence/REM-17.md",
-    "commit": "fa359b6707f381aff3dcc535dd31f1b1551558fd"
+    "prompt": "REM-18",
+    "evidence": "docs/reminders/evidence/REM-18.md",
+    "commit": "feb0882e562d0d7c0e843f0007453bed90033046"
   }
 }

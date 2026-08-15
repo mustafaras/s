@@ -1980,6 +1980,157 @@ function reminderPrayerLifecycleInput(preference,input,localDate,source){
   return out;
 }
 
+// ── REM-15 Zikir / tefekkür adapter ───────────────────────────────────────
+// Zikir reminderları yalnız kullanıcının reminder preference'ı üzerinden
+// oluşur. Zikr root'u ve reflection kayıtları occurrence'a kopyalanmaz;
+// özellikle reflection metni native veya device delivery journal sınırına
+// hiç girmez.
+var REMINDER_ZIKR_ID='reminder.catalog.v1.zikr';
+var REMINDER_ZIKR_FREQUENCIES={weekly:true,'selected-window':true};
+var REMINDER_ZIKR_MIN_INTERVAL_DAYS=7;
+function reminderZikrFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-zikr-data'),stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderZikrFeatureEnabled(input){
+  var x=input&&typeof input==='object'?input:{};
+  if(typeof x.featureEnabled==='boolean') return x.featureEnabled;
+  if(typeof x.featureVisible==='boolean') return x.featureVisible;
+  if(typeof x.zikrFeatureVisible==='boolean') return x.zikrFeatureVisible;
+  return ZIKR_V2_VISIBLE===true&& (typeof featuresLive!=='function'||featuresLive());
+}
+function reminderZikrPreferenceSelected(preference){ return !!(preference&&typeof preference==='object'&&!Array.isArray(preference)&&preference.enabled===true); }
+function reminderZikrDefinition(input){
+  var x=input&&typeof input==='object'?input:{}, fallback={id:REMINDER_ZIKR_ID,category:'ritual',priority:'P2',triggerType:'scheduled-window',deepLink:'zikr',definitionVersion:'1',defaultWindow:{kind:'time-range',timezone:'user',start:'09:00',end:'22:00'}};
+  if(x.definition&&typeof x.definition==='object') return x.definition;
+  if(typeof ReminderCatalogV1!=='undefined'&&ReminderCatalogV1.get){ var def=ReminderCatalogV1.get(REMINDER_ZIKR_ID); if(def) return def; }
+  return fallback;
+}
+function reminderZikrSource(input){
+  var x=input&&typeof input==='object'?input:{}, source=x.zikrData&&typeof x.zikrData==='object'?x.zikrData:(x.zikr&&typeof x.zikr==='object'?x.zikr:(data&&data.zikr&&typeof data.zikr==='object'?data.zikr:null));
+  return source&&typeof source==='object'&&!Array.isArray(source)?source:null;
+}
+function reminderZikrLocalContext(input,timezone){
+  var x=input&&typeof input==='object'?input:{}, nowValue=x.nowIso||x.instantIso||x.now||'', instantMs=reminderEngineInstantMs({instantIso:nowValue}), parts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=String(x.localDate||x.nowLocalDate||(parts&&parts.localDate)||''), localTime=String(x.localTime||x.nowLocalTime||(parts&&parts.localTime)||'');
+  return {nowIso:String(nowValue||''),instantMs:instantMs,localDate:localDate,localTime:localTime};
+}
+function reminderZikrWeekday(localDate){
+  if(!reminderEngineValidDate(localDate)) return -1;
+  var p=localDate.split('-').map(Number); return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();
+}
+function reminderZikrDaysAllowed(preference,journey,localDate){
+  var p=preference&&typeof preference==='object'?preference:{}, raw=journey?(Array.isArray(p.journeyDaysOfWeek)?p.journeyDaysOfWeek:(Array.isArray(p.daysOfWeek)?p.daysOfWeek:null)):(Array.isArray(p.daysOfWeek)?p.daysOfWeek:null);
+  if(!raw) return true;
+  var day=reminderZikrWeekday(localDate||'');
+  return day>=0&&raw.indexOf(day)>=0;
+}
+function reminderZikrWindow(preference,definition,journey){
+  var p=preference&&typeof preference==='object'?preference:{}, d=definition&&typeof definition==='object'?definition:{}, raw=journey?(p.journeyWindow||p.timeWindow):(p.timeWindow);
+  if(!raw) raw=d.defaultWindow;
+  if(!raw||typeof raw!=='object'||!validReminderTime(raw.start)||!validReminderTime(raw.end)) return null;
+  return {start:String(raw.start),end:String(raw.end)};
+}
+function reminderZikrWindowDue(window,localTime){
+  if(!window) return false;
+  var now=reminderPolicyTimeMinutes(localTime), start=reminderPolicyTimeMinutes(window.start), end=reminderPolicyTimeMinutes(window.end);
+  if(now===null||start===null||end===null||start===end) return false;
+  return start<end?now>=start&&now<=end:now>=start||now<=end;
+}
+function reminderZikrOccurrenceId(kind,parts){
+  var values=[kind].concat(parts||[]).map(function(value){ return encodeURIComponent(String(value==null?'':value)); });
+  return 'reminder-zikr-v1:'+values.join('|');
+}
+function reminderZikrMakeOccurrence(input,definition,context,window,kind,sourceRevision){
+  var x=input&&typeof input==='object'?input:{}, d=definition&&typeof definition==='object'?definition:{}, engineDefinition={id:REMINDER_ZIKR_ID,category:'ritual',priority:'P2',triggerType:'fixed-time',time:window&&window.start||'',definitionVersion:String(d.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_ZIKR_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:String(x.timezone||'Europe/Istanbul'),instantIso:context.nowIso,sourceRevision:sourceRevision||'zikr-reminder-v1'});
+  if(!generated.ok||!generated.occurrence) return generated;
+  var occurrence=Object.assign({},generated.occurrence,{occurrenceId:reminderZikrOccurrenceId(kind,[context.localDate,window.start,sourceRevision||'']),category:'ritual',deepLink:'zikr',triggerType:kind==='reflection'?'session-reflection':'scheduled-window',sourceRevision:String(sourceRevision||'zikr-reminder-v1'),past:false,replay:false,nativeReplay:false,shouldReplay:false,due:reminderZikrWindowDue(window,context.localTime)});
+  return Object.assign({},generated,occurrence,{occurrence:occurrence,kind:kind});
+}
+function reminderZikrDailyOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderZikrDefinition(x);
+  if(!reminderZikrFeatureEnabled(x)) return reminderZikrFailure('feature-disabled',{featureVisible:false});
+  if(!reminderZikrPreferenceSelected(preference)) return reminderZikrFailure('preference-not-selected');
+  if(preference.dailyEnabled===false||preference.dailyInvite===false) return reminderZikrFailure('daily-disabled');
+  var timezone=String(x.timezone||preference.timezone||'Europe/Istanbul'), context=reminderZikrLocalContext(x,timezone);
+  if(!reminderEngineValidDate(context.localDate)) return reminderZikrFailure('invalid-local-date');
+  if(!reminderZikrDaysAllowed(preference,false,context.localDate)) return reminderZikrFailure('outside-selected-days');
+  var window=reminderZikrWindow(preference,definition,false); if(!window) return reminderZikrFailure('invalid-zikr-window');
+  return reminderZikrMakeOccurrence(Object.assign({},x,{timezone:timezone}),definition,context,window,'daily','daily:'+context.localDate);
+}
+function reminderZikrJourneyActive(journey){
+  if(!journey||typeof journey!=='object') return false;
+  if(Array.isArray(journey.hatims)&&journey.hatims.length){
+    if(journey.activeHatimId){ for(var i=0;i<journey.hatims.length;i++) if(journey.hatims[i]&&journey.hatims[i].id===journey.activeHatimId) return journey.hatims[i].status==='active'; }
+    return journey.hatims.some(function(h){ return h&&h.status==='active'; });
+  }
+  return Number(journey.lifetimeCount)>0;
+}
+function reminderZikrJourneyEntry(input,preference){
+  var source=reminderZikrSource(input), journeys=source&&source.journeys&&typeof source.journeys==='object'?source.journeys:{}, p=preference&&typeof preference==='object'?preference:{}, requested=String(p.presetId||p.zikrPresetId||(source.settings&&source.settings.activePresetId)||''), ids=Object.keys(journeys).sort();
+  if(requested&&!journeys[requested]) return null;
+  if(requested) ids=[requested].concat(ids.filter(function(id){ return id!==requested; }));
+  for(var i=0;i<ids.length;i++){
+    var id=ids[i], journey=journeys[id]; if(!reminderZikrJourneyActive(journey)) continue;
+    var lastAt=String(journey.lastAt||''); if(!lastAt||!Number.isFinite(Date.parse(lastAt))) continue;
+    return {presetId:id,journey:journey,lastAt:lastAt};
+  }
+  return null;
+}
+function reminderZikrJourneyOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderZikrDefinition(x), frequency=String(preference.journeyFrequency||'weekly');
+  if(!reminderZikrFeatureEnabled(x)) return reminderZikrFailure('feature-disabled',{featureVisible:false});
+  if(!reminderZikrPreferenceSelected(preference)) return reminderZikrFailure('preference-not-selected');
+  if(preference.journeyEnabled!==true) return reminderZikrFailure('journey-not-selected');
+  if(!REMINDER_ZIKR_FREQUENCIES[frequency]) return reminderZikrFailure('invalid-journey-frequency');
+  var timezone=String(x.timezone||preference.timezone||'Europe/Istanbul'), context=reminderZikrLocalContext(x,timezone), entry=reminderZikrJourneyEntry(x,preference);
+  if(!entry) return reminderZikrFailure('no-active-journey');
+  if(!reminderEngineValidDate(context.localDate)||context.instantMs===null) return reminderZikrFailure('invalid-journey-clock');
+  var lastMs=Date.parse(entry.lastAt), ageMs=context.instantMs-lastMs, minDays=Number.isInteger(preference.journeyMinIntervalDays)?Math.max(REMINDER_ZIKR_MIN_INTERVAL_DAYS,Math.min(30,preference.journeyMinIntervalDays)):REMINDER_ZIKR_MIN_INTERVAL_DAYS;
+  if(ageMs<minDays*86400000) return reminderZikrFailure('journey-too-soon');
+  if(frequency==='selected-window'&&!preference.journeyWindow&&!preference.timeWindow) return reminderZikrFailure('journey-window-not-selected');
+  if(!reminderZikrDaysAllowed(preference,true,context.localDate)) return reminderZikrFailure('outside-selected-days');
+  var window=reminderZikrWindow(preference,definition,true); if(!window) return reminderZikrFailure('invalid-journey-window');
+  var result=reminderZikrMakeOccurrence(Object.assign({},x,{timezone:timezone}),definition,context,window,'journey','journey:'+entry.presetId+':'+entry.lastAt+':'+frequency), occurrence=result.occurrence;
+  if(!result.ok||!occurrence) return result;
+  occurrence.occurrenceId=reminderZikrOccurrenceId('journey',[entry.presetId,entry.lastAt,frequency,window.start,window.end]); occurrence.journeyPresetId=entry.presetId; occurrence.frequency=frequency; occurrence.due=reminderZikrWindowDue(window,context.localTime);
+  return Object.assign({},result,occurrence,{occurrence:occurrence,kind:'journey'});
+}
+function reminderZikrReflectionOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderZikrDefinition(x), source=reminderZikrSource(x), session=x.session&&typeof x.session==='object'?x.session:(source&&source.activeSession&&typeof source.activeSession==='object'?source.activeSession:null);
+  if(!reminderZikrFeatureEnabled(x)) return reminderZikrFailure('feature-disabled',{featureVisible:false});
+  if(!reminderZikrPreferenceSelected(preference)) return reminderZikrFailure('preference-not-selected');
+  if(preference.reflectionAfterSession!==true) return reminderZikrFailure('reflection-optional-off');
+  if(!session||Number(session.count)<=0) return reminderZikrFailure('no-ended-session');
+  var ended=!!(session.endedAt||session.completedAt||session.pausedAt||session.status==='ended'||session.status==='paused');
+  if(!ended) return reminderZikrFailure('session-still-open');
+  var timezone=String(x.timezone||preference.timezone||'Europe/Istanbul'), context=reminderZikrLocalContext(x,timezone), date=String(session.date||context.localDate), presetId=String(session.presetId||preference.presetId||'');
+  if(!reminderEngineValidDate(context.localDate)||!presetId) return reminderZikrFailure('invalid-session');
+  var reflections=source&&Array.isArray(source.reflections)?source.reflections:[];
+  if(reflections.some(function(ref){ return ref&&String(ref.date||'')===date&&String(ref.presetId||'')===presetId; })) return reminderZikrFailure('reflection-already-recorded');
+  var localTime=context.localTime&&context.localTime.slice(0,5); if(!validReminderTime(localTime)) return reminderZikrFailure('invalid-session-clock');
+  var result=reminderZikrMakeOccurrence(Object.assign({},x,{timezone:timezone}),definition,context,{start:localTime,end:localTime},'reflection','reflection:'+String(session.id||date+'|'+presetId)), occurrence=result.occurrence;
+  if(!result.ok||!occurrence) return result;
+  occurrence.occurrenceId=reminderZikrOccurrenceId('reflection',[String(session.id||date+'|'+presetId)]); occurrence.reflectionOptional=true; occurrence.due=true; occurrence.past=false; occurrence.nativeAllowed=false; occurrence.channel='in_app';
+  return Object.assign({},result,occurrence,{occurrence:occurrence,kind:'reflection'});
+}
+function reminderZikrOccurrences(input){
+  var x=input&&typeof input==='object'?input:{}, out=[], daily=reminderZikrDailyOccurrence(x), journey=reminderZikrJourneyOccurrence(x), reflection=reminderZikrReflectionOccurrence(x);
+  [daily,journey,reflection].forEach(function(result){ if(result&&result.ok&&result.occurrence) out.push(result); });
+  return out;
+}
+function reminderZikrReflectionPolicy(definition,preference,context){
+  var safePreference=Object.assign({},preference||{}, {channel:'in_app'}), policy=reminderPolicyEvaluate({definition:definition,preference:safePreference,context:context});
+  policy.requestedChannel='in_app'; policy.nativeAllowed=false; policy.nativeOccurrence=false; policy.channel='in_app'; return policy;
+}
+function reminderZikrLifecycleCandidates(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderZikrDefinition(x);
+  if(!reminderZikrFeatureEnabled(x)||!reminderZikrPreferenceSelected(preference)) return [];
+  var results=reminderZikrOccurrences(x), out=[];
+  results.forEach(function(result){
+    var candidate={occurrence:result.occurrence,definition:definition,preference:preference,due:result.occurrence.due,userSelected:true};
+    if(result.kind==='reflection') candidate.policy=reminderZikrReflectionPolicy(definition,preference,x.context||{});
+    out.push(candidate);
+  });
+  return out;
+}
+
 // ── REM-09 Device delivery journal ────────────────────────────────────────
 // Bu kayıt `data` nesnesinden, ÆON `data.notifications` kanalından ve sync/panel
 // zincirinden bilinçli olarak ayrıdır. Yalnız occurrence kimliği, kanal, durum,
@@ -2399,6 +2550,10 @@ function reminderLifecycleBuildCandidates(input,context,root){
     if(!preference||preference.enabled!==true) return;
     var timezone=String(preference.timezone||context.timezone||'Europe/Istanbul'), preferenceNow=reminderEngineLocalParts(Date.parse(context.nowIso||''),timezone), baseDate=preferenceNow&&preferenceNow.localDate||context.localDate, baseTime=preferenceNow&&preferenceNow.localTime?preferenceNow.localTime.slice(0,5):context.localTime;
     if(!reminderEngineValidDate(baseDate)) return;
+    if(String(definition.id)===REMINDER_ZIKR_ID){
+      reminderZikrLifecycleCandidates({preference:preference,definition:definition,timezone:timezone,nowIso:context.nowIso,localDate:baseDate,localTime:baseTime,zikrData:x.zikrData,featureEnabled:x.zikrFeatureEnabled,context:context}).forEach(function(candidate){ out.push(candidate); });
+      return;
+    }
     var datesForPreference=[baseDate];
     if(x.catchUp===true){ var previousDate=reminderEngineAddDays(baseDate,-1); if(previousDate) datesForPreference.push(previousDate); }
     datesForPreference.forEach(function(localDate){
@@ -4889,6 +5044,13 @@ App.reminderPrayerOccurrences=reminderPrayerOccurrences;
 App.generatePrayerReminderOccurrence=reminderPrayerOccurrence;
 App.generatePrayerReminderOccurrences=reminderPrayerOccurrences;
 App.reminderPrayerPrivateCopy=reminderPrayerPrivateCopy;
+App.reminderZikrFeatureEnabled=reminderZikrFeatureEnabled;
+App.reminderZikrOccurrence=reminderZikrDailyOccurrence;
+App.reminderZikrDailyOccurrence=reminderZikrDailyOccurrence;
+App.reminderZikrJourneyOccurrence=reminderZikrJourneyOccurrence;
+App.reminderZikrReflectionOccurrence=reminderZikrReflectionOccurrence;
+App.reminderZikrOccurrences=reminderZikrOccurrences;
+App.reminderZikrLifecycleCandidates=reminderZikrLifecycleCandidates;
 // REM-09: device-local delivery journal. These adapters never touch data,
 // data.notifications or the ÆON shownNotificationIds list.
 App.reminderDeliveryKey=REMINDER_DELIVERY_KEY;

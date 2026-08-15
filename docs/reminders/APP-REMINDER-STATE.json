@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-19",
+  "activePrompt": "REM-20",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-18",
-  "nextSafeAction": "REM-19 local implementation/verification; no release action",
-  "currentPhase": "R4",
+  "lastCompletedPrompt": "REM-19",
+  "nextSafeAction": "REM-20 local implementation/verification; no release action",
+  "currentPhase": "R5",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-18 evening coalescing adapter in app.js/styles.css with deterministic one-occurrence grouping, user-selected primary, safe native copy, in-app alternatives, quiet/budget fallback and catch-up no-replay",
-    "tests": "Evening 44; catch-up 46; privacy 30; all 23 reminder fixtures; zikr harness 90/90; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
-    "commit": "feb0882e562d0d7c0e843f0007453bed90033046",
+    "source": "REM-19 care catalog/policy adapter in app.js/styles.css with max-two native category selection, water/sleep/caffeine cadence, movement opt-in, existing-surface deep-links and shared budget/dedupe",
+    "tests": "Care 32; budget 18; all 24 reminder fixtures; zikr harness 90/90; driver; Faz10/Faz11; syntax/context/diff PASS; no browser, real network or data write",
+    "commit": "867283f92021897459cc071f39c387a93634804c",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-18 closure; REM-19 ready; release remains not_approved",
+  "updatedBy": "Codex REM-19 closure; REM-20 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-18",
-    "evidence": "docs/reminders/evidence/REM-18.md",
-    "commit": "feb0882e562d0d7c0e843f0007453bed90033046"
+    "prompt": "REM-19",
+    "evidence": "docs/reminders/evidence/REM-19.md",
+    "commit": "867283f92021897459cc071f39c387a93634804c"
   }
 }

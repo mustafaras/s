@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-14",
+  "activePrompt": "REM-15",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-13",
-  "nextSafeAction": "REM-14 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-14",
+  "nextSafeAction": "REM-15 local implementation/verification; no release action",
   "currentPhase": "R4",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-09/REM-10/REM-11 delivery-lifecycle contract plus REM-12 inbox and REM-13 action/deep-link implementation in app.js/styles.css with scoped reminder fixtures and privacy negative coverage",
-    "tests": "REM-12 inbox PASS (40); REM-13 actions PASS (39); REM-13 deeplinks PASS (63); REM-09 delivery PASS (38); REM-10 lifecycle PASS (36); REM-11 catch-up PASS (46); budget PASS (15); privacy PASS (30); full reminder/root/Panel-v2 suite; B1/B2/B3; driver/context/syntax/diff PASS; no browser, real network or data write",
-    "commit": "e5a1a6e56d3caaa6fc2d0b4fd9c58a81188507a6 (REM-12) and fdc66173ada83fe98c138a4f9d65b2dd41b22658 (REM-13)",
+    "source": "REM-14 prayer/İman Köşesi adapter in app.js with method/location-aware prayer cache metadata, faith deep-link and privacy-safe inbox copy",
+    "tests": "REM-14 prayer PASS (48); timezone PASS (28); zikr 90/90; scheduler PASS (54); full reminder/root/Panel-v2; B1/B2/B3; driver/context/syntax/diff PASS; no browser, real network or data write",
+    "commit": "494baab33a94db07ee31c025936799047e238692",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-12/REM-13 canonical reconciliation; REM-14 is next; release remains not_approved",
+  "updatedBy": "Codex REM-14 closure; REM-15 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-13",
-    "evidence": "docs/reminders/evidence/REM-13.md",
-    "commit": "897983b2b1871a8fc172e300da50a2a73cd94789"
+    "prompt": "REM-14",
+    "evidence": "docs/reminders/evidence/REM-14.md",
+    "commit": "494baab33a94db07ee31c025936799047e238692"
   }
 }

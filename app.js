@@ -1526,7 +1526,11 @@ var REMINDER_CATEGORY_META={
   system:{label:'Sistem durumu',description:'Yalnız gerçekten eylem gerektiğinde gösterilen güvenli durumlar',icon:'circle-check'}
 };
 var REMINDER_CATEGORY_ORDER=['ritual','support','reflection','system'];
-var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,'pwa-limited':true};
+var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,error:true,'pwa-limited':true};
+var REMINDER_PERMISSION_STORAGE_KEY='seyma-reminder-permission-v1';
+var REMINDER_NATIVE_PREVIEW_TAG='reminder-preview-v1';
+var reminderPermissionTransientState=null;
+var reminderPermissionRequestInFlight=null;
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
 function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
 function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[]}; }
@@ -1606,10 +1610,11 @@ function normalizeReminderOnboarding(value){
 }
 function reminderPermissionState(input){
   var x=input&&typeof input==='object'?input:{};
-  if(reminderEnumHas(REMINDER_PERMISSION_STATES,x.state)) return x.state;
+  if(x.state==='error'||x.error===true) return 'temporary-error';
+  if(reminderEnumHas(REMINDER_PERMISSION_STATES,x.state)&&x.state!=='error') return x.state;
+  if(x.supported===false) return 'unsupported';
   if(x.pwaLimited===true) return 'pwa-limited';
   if(x.temporaryError===true) return 'temporary-error';
-  if(x.supported===false) return 'unsupported';
   if(x.permission==='granted'||x.permission==='denied'||x.permission==='default') return x.permission;
   if(typeof x.permission==='undefined'&&typeof Notification==='undefined') return 'unsupported';
   return 'temporary-error';
@@ -1625,6 +1630,8 @@ function reminderPermissionSnapshot(){
     var displayStandalone=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;
     pwaLimited=!!(standalone||displayStandalone);
   }catch(e){ pwaLimited=false; }
+  if(reminderPermissionTransientState==='temporary-error'&&permission==='default') return 'temporary-error';
+  if(permission!=='default') reminderPermissionTransientState=null;
   return reminderPermissionState({supported:supported,permission:permission,pwaLimited:pwaLimited});
 }
 function reminderPermissionExplanation(state){
@@ -1638,6 +1645,62 @@ function reminderPermissionExplanation(state){
     'pwa-limited':{label:'PWA sınırlaması',meaning:'Uygulama kapalıyken zamanlama garanti edilemiyor.',action:'Uygulamayı açınca catch-up kartını görebilirsin.',tone:'caution'}
   };
   var out=copy[key]||copy['temporary-error']; out.state=key; return out;
+}
+function reminderPermissionStorageWrite(state){
+  try{ if(typeof localStorage!=='undefined'&&localStorage&&typeof localStorage.setItem==='function') localStorage.setItem(REMINDER_PERMISSION_STORAGE_KEY,JSON.stringify({state:state,updatedAt:new Date().toISOString()})); }catch(e){}
+}
+function reminderPermissionRecord(state){
+  var next=reminderPermissionState({state:state});
+  reminderPermissionTransientState=next==='temporary-error'?next:null;
+  reminderPermissionStorageWrite(next);
+  return next;
+}
+function reminderPermissionRequest(options){
+  var x=options&&typeof options==='object'?options:{}, state=reminderPermissionSnapshot();
+  if(state==='unsupported'||state==='pwa-limited'||state==='granted'||state==='denied') return Promise.resolve({ok:state==='granted',state:state,reason:'permission-'+state,requested:false,source:String(x.source||'explicit')});
+  if(reminderPermissionRequestInFlight) return reminderPermissionRequestInFlight;
+  if(typeof Notification==='undefined'||!Notification||typeof Notification.requestPermission!=='function'){
+    var unsupported=reminderPermissionRecord('unsupported');
+    return Promise.resolve({ok:false,state:unsupported,reason:'permission-unsupported',requested:false,source:String(x.source||'explicit')});
+  }
+  var requestResult;
+  try{ requestResult=Notification.requestPermission(); }catch(e){
+    var thrown=reminderPermissionRecord('temporary-error');
+    if(x.render!==false) render();
+    return Promise.resolve({ok:false,state:thrown,reason:'permission-request-error',requested:true,source:String(x.source||'explicit')});
+  }
+  reminderPermissionRequestInFlight=Promise.resolve(requestResult).then(function(permission){
+    var next=reminderPermissionState({permission:permission});
+    if(next==='temporary-error') next=reminderPermissionRecord('temporary-error');
+    else { reminderPermissionTransientState=null; next=reminderPermissionRecord(next); }
+    return {ok:next==='granted',state:next,permission:permission,reason:next==='granted'?null:'permission-'+next,requested:true,source:String(x.source||'explicit')};
+  }).catch(function(){
+    var failure=reminderPermissionRecord('temporary-error');
+    return {ok:false,state:failure,reason:'permission-request-error',requested:true,source:String(x.source||'explicit')};
+  }).then(function(result){
+    reminderPermissionRequestInFlight=null;
+    if(x.render!==false) render();
+    return result;
+  });
+  return reminderPermissionRequestInFlight;
+}
+function reminderNativeSafeCopy(input){
+  var x=input&&typeof input==='object'?input:{}, definition=x.definition&&typeof x.definition==='object'?x.definition:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:{};
+  var title=String(x.nativeTitle||occurrence.nativeTitle||definition.nativeTitle||'Şeyma’da küçük bir durak hazır').trim();
+  var body=String(x.nativeBody||occurrence.nativeBody||definition.nativeBody||'İstersen uygulamayı açıp bugünün küçük alanına bakabilirsin.').trim();
+  return {title:title.slice(0,80),body:body.slice(0,180),tag:REMINDER_NATIVE_PREVIEW_TAG,deepLink:String(x.deepLink||occurrence.deepLink||definition.deepLink||'settings')};
+}
+function reminderPreviewNotification(input){
+  var state=reminderPermissionSnapshot(), copy=reminderNativeSafeCopy(input);
+  if(state!=='granted') return {ok:false,state:state,reason:'permission-'+state,inAppFallback:true,copy:copy};
+  if(typeof Notification==='undefined'||!Notification) return {ok:false,state:'unsupported',reason:'permission-unsupported',inAppFallback:true,copy:copy};
+  try{
+    var notification=new Notification(copy.title,{body:copy.body,tag:copy.tag,renotify:false,silent:true,data:{type:'reminder-preview',deepLink:copy.deepLink}});
+    return {ok:true,state:state,reason:null,inAppFallback:false,copy:copy,notification:notification};
+  }catch(e){
+    var failure=reminderPermissionRecord('temporary-error');
+    return {ok:false,state:failure,reason:'native-preview-error',inAppFallback:true,copy:copy};
+  }
 }
 function reminderProfileById(id){
   var key=normalizeReminderProfile(id);
@@ -5361,7 +5424,15 @@ function reminderCapacityModeLabel(mode){
 }
 function reminderPermissionExplanationHTML(copy){
   var c=copy||reminderPermissionExplanation('temporary-error');
-  return '<section class="sey-reminder-permission" data-reminder-permission-state="'+esc(c.state)+'" aria-labelledby="sey-reminder-permission-title"><div class="sey-reminder-permission-top"><span class="sey-reminder-permission-icon" aria-hidden="true">'+icon(c.state==='granted'?'circle-check':c.state==='denied'?'triangle-alert':'info',17)+'</span><div><span class="sey-reminder-eyebrow">İZİN DURUMUNU ANLAMA</span><h3 id="sey-reminder-permission-title">'+esc(c.label)+'</h3></div></div><p>'+esc(c.meaning)+'</p><small>'+esc(c.action)+'</small></section>';
+  var h='<section class="sey-reminder-permission" data-reminder-permission-state="'+esc(c.state)+'" aria-labelledby="sey-reminder-permission-title"><div class="sey-reminder-permission-top"><span class="sey-reminder-permission-icon" aria-hidden="true">'+icon(c.state==='granted'?'circle-check':(c.state==='denied'||c.state==='temporary-error'||c.state==='pwa-limited')?'triangle-alert':'info',17)+'</span><div><span class="sey-reminder-eyebrow">İZİN DURUMUNU ANLAMA</span><h3 id="sey-reminder-permission-title">'+esc(c.label)+'</h3></div></div><p>'+esc(c.meaning)+'</p><small>'+esc(c.action)+'</small>';
+  if(c.state==='default') h+='<button type="button" class="sey-reminder-primary" data-reminder-permission-action="request" onclick="App.requestReminderPermission()">Native kanalı aç</button><small>İzin yalnız bu açık eylemden sonra istenir; ilk yüklemede istenmez.</small>';
+  else if(c.state==='denied') h+='<div class="sey-reminder-permission-help" data-reminder-permission-help="true"><strong>Tarayıcı ayarları rehberi</strong><small>Bu site için tarayıcı ayarlarında Bildirimler bölümünü açıp İzin ver seçeneğini seçebilirsin. O zamana kadar uygulama içi kartlar çalışır.</small></div>';
+  else if(c.state==='granted') h+='<button type="button" class="sey-reminder-secondary" data-reminder-permission-action="preview" onclick="App.previewReminderNotification()">Önizleme bildirimi</button>';
+  else if(c.state==='unsupported') h+='<small data-reminder-permission-fallback="in-app">Native yerine uygulama içi hatırlatmalar kullanılabilir.</small>';
+  else if(c.state==='temporary-error') h+='<button type="button" class="sey-reminder-secondary" data-reminder-permission-action="retry" onclick="App.requestReminderPermission()">Yeniden dene</button><small>Bu yeniden deneme yalnızca sen dokunduğunda yapılır.</small>';
+  else if(c.state==='pwa-limited') h+='<small data-reminder-permission-fallback="catch-up">Uygulama açıldığında uygulama içi catch-up kartı gösterilebilir.</small>';
+  h+='</section>';
+  return h;
 }
 function reminderProfileSectionHTML(root){
   var active=normalizeReminderProfile(root&&root.profile), setup=!!(root&&root.onboarding&&!root.onboarding.completed), selected=setup?normalizeReminderCategories(ui.reminderSetupCategories):[];
@@ -5741,7 +5812,7 @@ function reminderCenterOverlayHTML(){
   h+='<section class="sey-reminder-screen" onclick="event.stopPropagation()">';
   h+='<header class="sey-reminder-header"><div><span class="sey-reminder-eyebrow">ŞEYMA · RİTİM MERKEZİ</span><h2 id="sey-reminder-title">Hatırlatmalar ve bildirimler</h2><p>Günün küçük duraklarını burada sakince gözden geçir.</p></div><button class="sey-reminder-close" onclick="App.closeReminderCenter()" aria-label="Hatırlatmalar ve bildirimler merkezini kapat">'+icon('x',18)+'</button></header>';
   h+='<main class="sey-reminder-scroll">';
-  h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">Kontrol sende</h3><p>Native kanal bu shell’de açılmaz. Uygulama içi önizleme, izin vermeden çalışır.</p></div></section>';
+  h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">Kontrol sende</h3><p>Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.</p></div></section>';
   h+=reminderProfileSectionHTML(root);
   h+='<section class="sey-reminder-summary" aria-label="Bugünün hatırlatma özeti">';
   [[ 'sun','Bugünün modu',reminderCapacityModeLabel(policy.capacityMode),'Profil: '+reminderProfileById(root.profile).label],['check-check','Kalan öneri',String(remaining),'Katalog kapsamı · '+defs.length+' tanım'],['circle-check','Native izin',permission.label,permission.meaning],['moon','Sessiz saatler',policy.quietHours.start+'–'+policy.quietHours.end,'Kullanıcı tercihi · quiet interval'],['activity','Native bütçesi','0 / '+policy.nativeDailyCap,'Günlük üst sınır · düşük öncelik '+policy.lowPriorityNativeCap+' · cooldown '+policy.sameCategoryCooldownMinutes+' dk']].forEach(function(item){
@@ -5749,7 +5820,7 @@ function reminderCenterOverlayHTML(){
   });
   h+='</section>';
   h+='<section class="sey-reminder-actions" aria-label="Hatırlatma eylemleri"><button class="sey-reminder-primary" onclick="App.previewReminder()"'+(defs.length?'':' disabled')+'>'+icon('play',16)+'<span>Uygulama içi önizleme/test</span></button><button class="sey-reminder-mute'+(muted?' is-muted':'')+'" onclick="App.muteReminderToday()" aria-pressed="'+muted+'">'+icon('bell-off',16)+'<span>'+(muted?'Bugün susturuldu · geri getir':'Bugün tümünü sustur')+'</span></button></section>';
-  h+='<p class="sey-reminder-live-note" role="note">'+icon('info',14)+' Şimdilik yalnız uygulama içi kanal hazır. Native izin ve gerçek zamanlama, ayrı güvenlik kapılarından sonra ele alınacak.</p>';
+  h+='<p class="sey-reminder-live-note" role="note">'+icon('info',14)+' Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.</p>';
   h+=reminderPermissionExplanationHTML(permission);
   h+=reminderCategoryControlsHTML(root);
   h+=reminderSpecialDaysSectionHTML(root);
@@ -5769,7 +5840,11 @@ function reminderCenterOverlayHTML(){
 App.openReminderCenter=function(){ var root=reminderCurrentRoot(); ui.reminderCenterOpen=true; ui.reminderPreviewId=''; ui.reminderTodayMuted=false; ui.reminderSetupCategories=reminderCategorySelection(root); render(); };
 App.closeReminderCenter=function(){ ui.reminderCenterOpen=false; ui.reminderPreviewId=''; ui.reminderTodayMuted=false; render(); };
 App.reminderPermissionState=reminderPermissionState;
+App.reminderPermissionSnapshot=reminderPermissionSnapshot;
 App.reminderPermissionExplanation=reminderPermissionExplanation;
+App.requestReminderPermission=function(source){ return reminderPermissionRequest({source:source||'explicit-user-action'}); };
+App.reminderNativeSafeCopy=reminderNativeSafeCopy;
+App.previewReminderNotification=function(input){ return reminderPreviewNotification(input); };
 App.reminderPolicyDefaults=function(){ return emptyReminderPolicy(); };
 App.reminderNormalizePolicy=normalizeReminderPolicy;
 App.reminderIsWithinQuietHours=function(localTime,quietHours){ return reminderQuietHoursState(localTime,quietHours).quiet; };
@@ -5968,6 +6043,7 @@ App.toggleReminderCareNative=function(category){
   if(index>=0) current.splice(index,1);
   else { if(current.length>=2){ toast('Native için en fazla iki bakım alanı seçebilirsin.',1800); return; } current.push(category); }
   App.setReminderCareNativeCategories(current);
+  if(index<0) reminderPermissionRequest({source:'care:'+category});
 };
 App.setReminderCareMovementOptIn=function(flag){ updateReminderPolicy(function(policy){ policy.careMovementOptIn=flag===true; }); };
 App.setReminderProfile=function(profileId){
@@ -6022,9 +6098,11 @@ App.reminderDisable=function(reminderId,options){ return reminderSetEnabled(remi
 App.reminderEnable=function(reminderId,options){ return reminderSetEnabled(reminderId,true,options); };
 App.setReminderCategoryChannel=function(category,channel){
   var root=reminderCurrentRoot(), state=root&&reminderCategoryState(root,category); channel=String(channel||'');
-  if(!root||!state||!state.defs.length||!REMINDER_CHANNELS[channel]) return;
+  if(!root||!state||!state.defs.length||!REMINDER_CHANNELS[channel]) return {ok:false,reason:'invalid-category-or-channel'};
   state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.channel=channel; pref.lastEditedAt=new Date().toISOString(); root.preferences[def.id]=normalizeReminderPreference(def.id,pref); });
   save(); render();
+  var permissionRequest=channel==='native'?reminderPermissionRequest({source:'category:'+String(category||'')}):null;
+  return {ok:true,category:String(category||''),channel:channel,permissionRequest:permissionRequest};
 };
 App.reminderSpecialDayOptions=function(){ return REMINDER_SPECIAL_DAY_OPTIONS.map(function(option){ return {id:option.id,label:option.label}; }); };
 App.reminderSpecialDaysPreference=function(){ var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); return Object.assign({},state,{selectedDays:state.selectedDays.slice()}); };
@@ -6052,7 +6130,9 @@ App.setReminderSpecialDaysTime=function(time){
 };
 App.setReminderSpecialDaysChannel=function(channel){
   var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root), next=String(channel||''); if(!root||!REMINDER_CHANNELS[next]) return {ok:false,reason:'invalid-channel'};
-  state.channel=next; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+  state.channel=next; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render();
+  var permissionRequest=next==='native'?reminderPermissionRequest({source:'special-days'}):null;
+  return {ok:true,preference:App.reminderSpecialDaysPreference(),permissionRequest:permissionRequest};
 };
 App.previewReminder=function(id){
   var defs=reminderDefinitions(), target=String(id||'');
@@ -16525,8 +16605,8 @@ if(data){ reminderLifecycleEvaluate('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 
-// ÆON bildirim izni döngüsü: açık/kapa yok, izin verilene kadar 2 dk'da bir sessizce dener.
-startAeonPermissionLoop();
+// ÆON permission yalnızca mevcut banner üzerindeki açık kullanıcı eyleminden
+// sonra istenir; boot sırasında sessiz permission loop çalıştırılmaz.
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('message', function(e){

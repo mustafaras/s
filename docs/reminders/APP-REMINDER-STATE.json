@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
-  "status": "done",
-  "activePrompt": "REM-12",
+  "status": "in-progress",
+  "activePrompt": "REM-14",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-11",
-  "nextSafeAction": "REM-12 remains planned/not-ready; do not start it from this closure",
-  "currentPhase": "R2",
+  "lastCompletedPrompt": "REM-13",
+  "nextSafeAction": "REM-14 local implementation/verification; no release action",
+  "currentPhase": "R4",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -35,9 +35,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-09/REM-10/REM-11 implementation in app.js with scoped reminder fixtures and privacy negative coverage",
-    "tests": "REM-11 catch-up PASS (46 assertion); budget PASS (15 assertion); REM-09 delivery PASS (38); REM-10 lifecycle PASS (36); privacy PASS (30); full reminder/root/Panel-v2 suite; driver/context/syntax/diff PASS; no browser, real network or data write",
-    "commit": "82cea9d6663b5db7c75c675fe6069ccfc3ddddc7 (REM-11: reminder catch-up ve lifecycle kapanışı)",
+    "source": "REM-09/REM-10/REM-11 delivery-lifecycle contract plus REM-12 inbox and REM-13 action/deep-link implementation in app.js/styles.css with scoped reminder fixtures and privacy negative coverage",
+    "tests": "REM-12 inbox PASS (40); REM-13 actions PASS (39); REM-13 deeplinks PASS (63); REM-09 delivery PASS (38); REM-10 lifecycle PASS (36); REM-11 catch-up PASS (46); budget PASS (15); privacy PASS (30); full reminder/root/Panel-v2 suite; B1/B2/B3; driver/context/syntax/diff PASS; no browser, real network or data write",
+    "commit": "e5a1a6e56d3caaa6fc2d0b4fd9c58a81188507a6 (REM-12) and fdc66173ada83fe98c138a4f9d65b2dd41b22658 (REM-13)",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -49,6 +49,6 @@
     "approvedAt": null,
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-14",
-  "updatedBy": "Codex REM-11 closure committed locally; REM-12 remains planned/not-ready"
+  "updatedAt": "2026-08-15",
+  "updatedBy": "Codex REM-12/REM-13 canonical reconciliation; REM-14 is next; release remains not_approved"
 }

@@ -128,5 +128,16 @@ runTests([
     const state = JSON.parse(out.storage.getItem("seyma-reset-v1"));
     assertEqual(state.notifications.length, 1);
     assertEqual(state.notifications[0].id, "observer-fixture");
+  }],
+  ["care occurrences share the native daily cap and never expand the selected-category budget", () => {
+    const out = boot();
+    const careContext = Object.assign({}, context, { localDate: "2026-08-14", localTime: "18:30", nowIso: NOW });
+    const care = out.App.reminderCareLifecycleCandidates({ policy: { careNativeCategories: ["water", "caffeine", "sleep"] }, context: careContext });
+    const selectedCategories = new Set(care.filter((item) => item.preference.channel === "native").map((item) => item.careKey));
+    const result = out.App.reminderEvaluateReminders({ nowIso: NOW, visibilityState: "visible", context: careContext, occurrences: care, deliveryLog: { schemaVersion: 1, entries: [] } });
+    const nativeShown = result.results.filter((item) => item.status === "shown" && item.channel === "native");
+    assertEqual(selectedCategories.size, 2);
+    assert(nativeShown.length <= 3);
+    assert(result.results.some((item) => item.status === "suppressed" || item.channel === "in_app"));
   }]
 ]).catch(() => process.exitCode = 1);

@@ -1468,6 +1468,36 @@ var REMINDER_MEDICATION_MAX_SCHEDULES=24;
 var REMINDER_MEDICATION_NATIVE_TITLE='Bir küçük hatırlatman hazır';
 var REMINDER_MEDICATION_NATIVE_BODY='Seçtiğin saati kontrol etmek için Şeyma’yı açabilirsin.';
 var REMINDER_MEDICATION_SAFETY_COPY='Bu özellik yalnızca senin girdiğin zamanı hatırlatır; doz, tedavi veya tıbbi karar önermez. Sağlıkla ilgili kararlar için doktorunun veya eczacının yönlendirmesini takip et.';
+var REMINDER_SPECIAL_DAYS_ID='reminder.special.v1.hijri';
+var REMINDER_SPECIAL_DAYS_MODES={all:true,selected:true,none:true};
+var REMINDER_SPECIAL_DAY_OPTIONS=[
+  {id:'hijri-new-year',label:'Hicri Yeni Yıl'},
+  {id:'ashura',label:'Aşure Günü'},
+  {id:'regaip-kandili',label:'Regaip Kandili'},
+  {id:'beraat-kandili',label:'Beraat Kandili'},
+  {id:'ramadan-start',label:'Ramazan Başlangıcı'},
+  {id:'kadir-gecesi',label:'Kadir Gecesi'},
+  {id:'ramadan-bayrami',label:'Ramazan Bayramı'},
+  {id:'kurban-bayrami',label:'Kurban Bayramı'},
+  {id:'mevlid-kandili',label:'Mevlid Kandili'}
+];
+var REMINDER_SPECIAL_DAYS_DEFINITION={
+  id:REMINDER_SPECIAL_DAYS_ID,
+  category:'special',
+  priority:'P2',
+  triggerType:'special-day',
+  deepLink:'faith',
+  privateTitle:'Özel bir gün için sakin bir durak',
+  privateBody:'İstersen bugünü kendi ritminde anabilirsin.',
+  detailKeys:['specialDayLabel','hijriDate','hijriOffset'],
+  defaultWindow:{kind:'fixed-time',timezone:'user',time:'10:00',start:'10:00',end:null},
+  defaultChannel:'in_app',
+  snoozeOptions:['30m','1h','todayOff'],
+  suppressionRules:['completed','quietHours','categoryCooldown','groupedWithHigherPriority'],
+  definitionVersion:'1.0.0'
+};
+var REMINDER_SPECIAL_NATIVE_TITLE='Şeyma’da küçük bir durak hazır';
+var REMINDER_SPECIAL_NATIVE_BODY='İstersen uygulamayı açıp bugünün küçük alanına bakabilirsin.';
 var REMINDER_CARE_DEFINITIONS=[
   {id:'reminder.care.v1.water',careKey:'water',category:REMINDER_CARE_CATEGORY,priority:'P2',triggerType:'care-window',deepLink:'health',definitionVersion:'1',defaultChannel:'in_app',privateTitle:'Su için küçük bir ara',privateBody:'İstersen şimdi bir bardak suya uğrayabilirsin.',snoozeOptions:['30m','1h','todayOff'],existingSurface:'water'},
   {id:'reminder.care.v1.sleep',careKey:'sleep',category:REMINDER_CARE_CATEGORY,priority:'P2',triggerType:'care-window',deepLink:'health',definitionVersion:'1',defaultChannel:'in_app',privateTitle:'Uykuya hazırlık için küçük bir ara',privateBody:'İstersen akşam hazırlık alanını açabilirsin.',snoozeOptions:['30m','1h','thisEvening','todayOff'],existingSurface:'h-sleepprep'},
@@ -1499,7 +1529,7 @@ var REMINDER_CATEGORY_ORDER=['ritual','support','reflection','system'];
 var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,'pwa-limited':true};
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
 function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
-function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),medications:[]}; }
+function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[]}; }
 function reminderMedicationText(value,max){ return String(value==null?'':value).replace(/\u0000/g,'').replace(/\r\n?/g,'\n').trim().slice(0,max); }
 function reminderMedicationId(value){ var id=String(value||''); return /^reminder\.medication\.v1\.[A-Za-z0-9._%-]{1,160}$/.test(id)?id:''; }
 function reminderMedicationNewId(nowIso){
@@ -1540,6 +1570,34 @@ function normalizeReminderCareCategories(value){
   });
   return out;
 }
+function reminderSpecialDayOptionById(id){
+  var key=String(id||'');
+  for(var i=0;i<REMINDER_SPECIAL_DAY_OPTIONS.length;i++) if(REMINDER_SPECIAL_DAY_OPTIONS[i].id===key) return REMINDER_SPECIAL_DAY_OPTIONS[i];
+  return null;
+}
+function reminderSpecialDayId(label){
+  var text=String(label||'');
+  for(var i=0;i<REMINDER_SPECIAL_DAY_OPTIONS.length;i++) if(REMINDER_SPECIAL_DAY_OPTIONS[i].label===text) return REMINDER_SPECIAL_DAY_OPTIONS[i].id;
+  return '';
+}
+function normalizeReminderSpecialDaySelection(value){
+  var source=Array.isArray(value)?value:[], out=[], seen={};
+  source.forEach(function(item){
+    var id=reminderSpecialDayOptionById(item)?String(item):reminderSpecialDayId(item);
+    if(id&&!seen[id]){ seen[id]=true; out.push(id); }
+  });
+  return out;
+}
+function normalizeReminderSpecialDays(value){
+  var out=value&&typeof value==='object'&&!Array.isArray(value)?value:{};
+  if(!reminderEnumHas(REMINDER_SPECIAL_DAYS_MODES,out.mode)) out.mode='none';
+  out.selectedDays=normalizeReminderSpecialDaySelection(out.selectedDays);
+  if(!validReminderTime(out.time)) out.time='10:00';
+  if(!validReminderTimezone(out.timezone)) out.timezone='Europe/Istanbul';
+  if(!reminderEnumHas(REMINDER_CHANNELS,out.channel)) out.channel='in_app';
+  return out;
+}
+function emptyReminderSpecialDays(){ return {mode:'none',selectedDays:[],time:'10:00',timezone:'Europe/Istanbul',channel:'in_app'}; }
 function normalizeReminderOnboarding(value){
   var out=value&&typeof value==='object'&&!Array.isArray(value)?value:emptyReminderOnboarding();
   if(typeof out.completed!=='boolean') out.completed=false;
@@ -1600,6 +1658,7 @@ function reminderCategoryIds(){
 function reminderCategoryMeta(category){
   if(String(category||'')===REMINDER_CARE_CATEGORY) return {label:'Günlük bakım',description:'Su, uykuya hazırlık, kafein ve isteğe bağlı hareket',icon:'heart-pulse'};
   if(String(category||'')==='health') return {label:'Kişisel sağlık saati',description:'Yalnızca senin kurduğun ilaç veya takviye zamanı',icon:'pill'};
+  if(String(category||'')==='special') return {label:'Özel günler ve Hicri takvim',description:'Seçtiğin Hicri günler için sakin uygulama içi duraklar',icon:'moon-star'};
   return REMINDER_CATEGORY_META[category]||{label:category,description:'Hatırlatma kategorisi',icon:'bell-ring'};
 }
 function reminderCategorySelection(root){
@@ -1642,6 +1701,16 @@ function reminderEnsurePreference(root,id){
   if(!Object.prototype.hasOwnProperty.call(pref,'channel')) pref.channel='in_app';
   root.preferences[id]=normalizeReminderPreference(id,pref);
   return root.preferences[id];
+}
+function reminderSpecialDaysState(root){
+  var state=normalizeReminderSpecialDays(root&&root.specialDays); if(root) root.specialDays=state; return state;
+}
+function reminderSpecialDaysCommit(root,state,nowIso){
+  var next=normalizeReminderSpecialDays(state), pref=reminderEnsurePreference(root,REMINDER_SPECIAL_DAYS_ID), recordedAt=validReminderIso(nowIso)?nowIso:new Date().toISOString();
+  root.specialDays=next;
+  pref.enabled=next.mode!=='none'; pref.channel=next.channel; pref.timezone=next.timezone; pref.time=next.time; pref.lastEditedAt=recordedAt; pref.specialDayMode=next.mode; pref.selectedDays=next.selectedDays.slice();
+  root.preferences[REMINDER_SPECIAL_DAYS_ID]=normalizeReminderPreference(REMINDER_SPECIAL_DAYS_ID,pref);
+  return next;
 }
 function validReminderTime(value){
   if(typeof value!=='string'||!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value)) return false;
@@ -1841,6 +1910,18 @@ function migrateReminderState(d){
   root.profile=normalizeReminderProfile(root.profile);
   root.onboarding=normalizeReminderOnboarding(root.onboarding);
   root.policy=normalizeReminderPolicy(root.policy);
+  root.specialDays=normalizeReminderSpecialDays(root.specialDays);
+  if(Object.prototype.hasOwnProperty.call(root.preferences,REMINDER_SPECIAL_DAYS_ID)){
+    var specialPreference=root.preferences[REMINDER_SPECIAL_DAYS_ID];
+    if(!specialPreference||typeof specialPreference!=='object'||Array.isArray(specialPreference)) specialPreference={};
+    specialPreference.enabled=root.specialDays.mode!=='none';
+    specialPreference.channel=root.specialDays.channel;
+    specialPreference.timezone=root.specialDays.timezone;
+    specialPreference.time=root.specialDays.time;
+    root.preferences[REMINDER_SPECIAL_DAYS_ID]=normalizeReminderPreference(REMINDER_SPECIAL_DAYS_ID,specialPreference);
+  } else if(root.specialDays.mode!=='none'){
+    root.preferences[REMINDER_SPECIAL_DAYS_ID]=normalizeReminderPreference(REMINDER_SPECIAL_DAYS_ID,{reminderId:REMINDER_SPECIAL_DAYS_ID,enabled:true,privacyMode:'private',channel:root.specialDays.channel,timezone:root.specialDays.timezone,time:root.specialDays.time});
+  }
   var medicationSource=Array.isArray(root.medications)?root.medications:(Array.isArray(root.medicationSchedules)?root.medicationSchedules:[]);
   root.medications=normalizeReminderMedications(medicationSource);
   if(Object.prototype.hasOwnProperty.call(root,'medicationSchedules')) delete root.medicationSchedules;
@@ -1947,6 +2028,62 @@ function reminderEngineGenerateOccurrence(input){
   var scheduledAt=scheduled.time, definitionVersion=String(x.definitionVersion||definition.definitionVersion||'1'), comparison=nowLocalTime?reminderEngineCompareDateTime(scheduled.localDate,scheduledAt,nowLocalDate,nowLocalTime):null, past=comparison!==null&&comparison<0, due=comparison!==null&&comparison<=0;
   var occurrence={reminderId:reminderId,occurrenceId:reminderEngineOccurrenceId(reminderId,scheduled.localDate,scheduledAt,timezone,definitionVersion),localDate:scheduled.localDate,scheduledAt:scheduledAt,timezone:timezone,sourceRevision:String(x.sourceRevision||scheduled.sourceRevision||definition.sourceRevision||definitionVersion),priority:reminderPolicyPriority(definition.priority||x.priority||'P3'),definitionVersion:definitionVersion,triggerType:String(x.triggerType||definition.triggerType||'fixed-time'),hijriOffset:Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0,due:due,past:past,replay:false,nativeReplay:false,shouldReplay:false};
   return Object.assign({ok:true,reason:null,occurrence:occurrence},occurrence);
+}
+
+// ── REM-21 Hicri / özel gün adapterı ─────────────────────────────────────
+// HicriCalendarV1 ve mevcut badge lookup'ı kaynak olarak kalır. Offset,
+// yalnızca lookup için Miladi günü kaydırır: displayed Hicri gün D+offset'ten
+// geldiği için özel gün, offset kadar önce/sonra oluşur. Native copy her zaman
+// geneldir; seçilen günün adı yalnızca uygulama içi occurrence'a eklenir.
+function reminderSpecialDayFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-special-day'),stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderSpecialDayOffset(input){
+  var x=input&&typeof input==='object'?input:{}, value=Object.prototype.hasOwnProperty.call(x,'offsetDays')?x.offsetDays:x.hijriOffset;
+  return Number.isInteger(value)&&value>=-2&&value<=2?value:0;
+}
+function reminderSpecialDayLookup(localDate,offsetDays){
+  if(!reminderEngineValidDate(localDate)) return null;
+  var calendar=typeof window!=='undefined'&&window.HijriCalendarV1?window.HijriCalendarV1:null;
+  if(!calendar||typeof calendar.holyDay!=='function') return null;
+  var shiftedDate=reminderEngineAddDays(localDate,offsetDays);
+  if(!shiftedDate) return null;
+  var label=String(calendar.holyDay(shiftedDate,0)||'');
+  if(!label) return null;
+  var hijri=typeof calendar.hijriFrom==='function'?calendar.hijriFrom(localDate,offsetDays):null;
+  return {id:reminderSpecialDayId(label),label:label,lookupDate:shiftedDate,hijri:hijri};
+}
+function reminderSpecialDayDefinition(state){
+  var special=normalizeReminderSpecialDays(state), time=special.time;
+  return Object.assign({},REMINDER_SPECIAL_DAYS_DEFINITION,{defaultWindow:Object.assign({},REMINDER_SPECIAL_DAYS_DEFINITION.defaultWindow,{kind:'fixed-time',time:time,start:time,end:null})});
+}
+function reminderSpecialDayPolicyPreference(state){
+  var special=normalizeReminderSpecialDays(state);
+  return {reminderId:REMINDER_SPECIAL_DAYS_ID,enabled:special.mode!=='none',privacyMode:'private',channel:special.channel,timezone:special.timezone,time:special.time,quietHoursBehavior:'defer',specialDayMode:special.mode,selectedDays:special.selectedDays.slice(),explicitlySelected:true,userCreated:true};
+}
+function reminderSpecialDayOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, state=normalizeReminderSpecialDays(x.specialDays||x.preference), definition=reminderSpecialDayDefinition(state), timezone=String(x.timezone||state.timezone||'Europe/Istanbul'), instantMs=reminderEngineInstantMs(x), instantParts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=reminderEngineValidDate(x.localDate)?x.localDate:(instantParts&&instantParts.localDate||''), nowLocalDate=reminderEngineValidDate(x.nowLocalDate)?x.nowLocalDate:(instantParts&&instantParts.localDate)||localDate, nowLocalTime=String(x.nowLocalTime||x.currentLocalTime||(instantParts&&instantParts.localTime)||'').slice(0,5), offsetDays=reminderSpecialDayOffset(x);
+  if(state.mode==='none') return reminderSpecialDayFailure('preference-not-selected');
+  if(!localDate||!reminderEngineValidDate(localDate)||!reminderEngineTimezoneValid(timezone)) return reminderSpecialDayFailure('invalid-special-day-clock');
+  var special=reminderSpecialDayLookup(localDate,offsetDays);
+  if(!special) return reminderSpecialDayFailure('not-special-day');
+  if(state.mode==='selected'&&(special.id===''||state.selectedDays.indexOf(special.id)<0)) return reminderSpecialDayFailure('outside-selected-days',{specialDayId:special.id,specialDayLabel:special.label});
+  var generated=reminderEngineGenerateOccurrence({definition:{id:REMINDER_SPECIAL_DAYS_ID,triggerType:'fixed-time',time:state.time,definitionVersion:definition.definitionVersion,priority:definition.priority},reminderId:REMINDER_SPECIAL_DAYS_ID,localDate:localDate,nowLocalDate:nowLocalDate,nowLocalTime:nowLocalTime,timezone:timezone,instantIso:x.instantIso||x.nowIso,hijriOffset:offsetDays,sourceRevision:'hijri-calendar-v1'});
+  if(!generated.ok||!generated.occurrence) return generated;
+  var hijri=special.hijri, hijriDate=hijri&&hijri.day&&hijri.monthName?hijri.day+' '+hijri.monthName+' '+hijri.year:'';
+  var occurrence=Object.assign({},generated.occurrence,{reminderId:REMINDER_SPECIAL_DAYS_ID,category:'special',priority:'P2',deepLink:'faith',triggerType:'special-day',specialDayId:special.id,specialDayLabel:special.label,hijriDate:hijriDate,hijriOffset:offsetDays,nativeTitle:REMINDER_SPECIAL_NATIVE_TITLE,nativeBody:REMINDER_SPECIAL_NATIVE_BODY,replay:false,nativeReplay:false,shouldReplay:false});
+  return Object.assign({},generated,{occurrence:occurrence,definition:definition,preference:reminderSpecialDayPolicyPreference(state),specialDayId:special.id,specialDayLabel:special.label});
+}
+function reminderSpecialDayLifecycleCandidates(input){
+  var x=input&&typeof input==='object'?input:{}, root=x.root&&typeof x.root==='object'?x.root:(data&&data.reminders), state=normalizeReminderSpecialDays(root&&root.specialDays), context=x.context&&typeof x.context==='object'?x.context:{}, baseDate=String(x.localDate||context.localDate||''), baseTime=String(x.localTime||context.localTime||'12:00').slice(0,5), timezone=String(x.timezone||state.timezone||context.timezone||'Europe/Istanbul'), out=[];
+  var preference=root&&root.preferences&&root.preferences[REMINDER_SPECIAL_DAYS_ID];
+  if(state.mode==='none'||!preference||preference.enabled!==true||!reminderEngineValidDate(baseDate)) return out;
+  var dates=[baseDate]; if(x.catchUp===true){ var previous=reminderEngineAddDays(baseDate,-1); if(previous) dates.push(previous); }
+  dates.forEach(function(localDate){
+    var result=reminderSpecialDayOccurrence({specialDays:state,localDate:localDate,nowLocalDate:baseDate,nowLocalTime:baseTime,timezone:timezone,instantIso:context.nowIso,hijriOffset:x.hijriOffset,offsetDays:x.offsetDays});
+    if(!result.ok||!result.occurrence) return;
+    var occurrence=result.occurrence;
+    out.push({occurrence:occurrence,definition:result.definition,preference:reminderSpecialDayPolicyPreference(state),reminderId:REMINDER_SPECIAL_DAYS_ID,specialDayId:result.specialDayId,specialDayLabel:result.specialDayLabel,privateTitle:result.specialDayLabel+' için sakin bir durak',privateBody:REMINDER_SPECIAL_DAYS_DEFINITION.privateBody,nativeTitle:REMINDER_SPECIAL_NATIVE_TITLE,nativeBody:REMINDER_SPECIAL_NATIVE_BODY,explicitlySelected:true,userCreated:true,due:occurrence.due});
+  });
+  return out;
 }
 
 // ── REM-20 Medication / supplement guarded flow ───────────────────────────
@@ -3074,6 +3211,9 @@ function reminderLifecycleBuildCandidates(input,context,root){
   });
   reminderMedicationLifecycleCandidates({source:x,context:context,root:root}).forEach(function(candidate){ out.push(candidate); });
   reminderCareLifecycleCandidates({source:x,context:context,root:root}).forEach(function(candidate){ out.push(candidate); });
+  var specialOffset=0;
+  try{ var prayer=prayerSettings(); specialOffset=Number.isInteger(prayer&&prayer.hijriOffset)?Math.max(-2,Math.min(2,prayer.hijriOffset)):0; }catch(e){ specialOffset=0; }
+  reminderSpecialDayLifecycleCandidates({source:x,context:context,root:root,localDate:context.localDate,localTime:context.localTime,timezone:context.timezone,catchUp:x.catchUp===true,hijriOffset:specialOffset}).forEach(function(candidate){ out.push(candidate); });
   return reminderEveningCoalesceCandidates(out,context);
 }
 function reminderLifecycleEvaluate(source,input){
@@ -5194,6 +5334,7 @@ function reminderWindowLabel(def){
   var w=def&&def.defaultWindow;
   if(!w||typeof w!=='object') return 'Zaman penceresi hazırlanıyor';
   if(w.kind==='offset') return 'Vakit öncesi · '+Number(w.earliestMinutesBefore||0)+'–'+Number(w.latestMinutesBefore||0)+' dk';
+  if(w.time&&validReminderTime(String(w.time))) return 'Saat · '+String(w.time);
   if(w.start&&w.end) return String(w.start)+'–'+String(w.end);
   return 'Olayla birlikte';
 }
@@ -5247,6 +5388,22 @@ function reminderCategoryControlsHTML(root){
     h+='<article class="sey-reminder-category" data-reminder-category-control="'+esc(category)+'"><div class="sey-reminder-category-head"><span class="sey-reminder-category-icon" aria-hidden="true">'+icon(meta.icon,17)+'</span><div><h4>'+esc(meta.label)+'</h4><p>'+esc(meta.description)+'</p></div><button type="button" class="sey-reminder-category-toggle'+(state.allEnabled?' is-on':'')+'" onclick="App.setReminderCategoryEnabled(\''+esc(category)+'\')" aria-pressed="'+state.allEnabled+'">'+(state.allEnabled?'Açık':'Kapalı')+'</button></div><div class="sey-reminder-category-meta"><span>'+state.enabledCount+'/'+state.total+' durak açık</span><label><span>Kanal</span><select aria-label="'+esc(meta.label)+' kanalı" onchange="App.setReminderCategoryChannel(\''+esc(category)+'\',this.value)"><option value="in_app"'+(selectedChannel==='in_app'?' selected':'')+'>Uygulama içi</option><option value="native"'+(selectedChannel==='native'?' selected':'')+'>Native · izin varsa</option></select></label></div><small class="sey-reminder-category-channel">'+esc(reminderCategoryChannelLabel(state.channel))+'</small></article>';
   });
   return h+'</div></section>';
+}
+function reminderSpecialDaysSectionHTML(root){
+  var state=reminderSpecialDaysState(root), selected=state.selectedDays, offset=Number(prayerSettings()&&prayerSettings().hijriOffset)||0, modeOptions=[['all','Tüm özel günler','Kaynakta bulunan tüm Hicri / mübarek günler'],['selected','Yalnızca seçtiklerim','Sadece aşağıda işaretlediğin günler'],['none','Hiçbiri','Özel gün occurrence’ı üretme']];
+  var h='<section class="sey-reminder-profiles sey-reminder-special" aria-labelledby="sey-reminder-special-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">HİCRİ TAKVİM</span><h3 id="sey-reminder-special-title">Özel günler sende</h3></div><span class="sey-reminder-profile-active">'+esc(state.mode==='all'?'Tümü':state.mode==='selected'?'Seçtiklerim':'Hiçbiri')+'</span></div>';
+  h+='<p class="sey-reminder-profile-note">Hicri tarih ve mübarek gün bilgisi uygulamada görünmeye devam eder. Hatırlatma yalnızca sen seçersen oluşur; seçmediğin günler için hiçbir reminder üretilmez.</p><div class="sey-reminder-profile-list" role="radiogroup" aria-label="Özel gün tercihi">';
+  modeOptions.forEach(function(item){ var active=state.mode===item[0]; h+='<button type="button" class="sey-reminder-profile-choice'+(active?' is-active':'')+'" onclick="App.setReminderSpecialDaysMode(\''+item[0]+'\')" role="radio" aria-checked="'+active+'"><strong>'+item[1]+'</strong><small>'+item[2]+'</small></button>'; });
+  h+='</div>';
+  if(state.mode==='selected'){
+    h+='<div class="sey-reminder-setup" aria-labelledby="sey-reminder-special-list-title"><div class="sey-reminder-setup-head"><div><h4 id="sey-reminder-special-list-title">Gün seçimi</h4><p>Birden fazla gün seçebilirsin; bu liste yalnızca uygulama içi tercihini belirler.</p></div><strong>'+selected.length+'/'+REMINDER_SPECIAL_DAY_OPTIONS.length+'</strong></div><div class="sey-reminder-setup-list" role="group" aria-label="Seçilebilir özel günler">';
+    REMINDER_SPECIAL_DAY_OPTIONS.forEach(function(option){ var active=selected.indexOf(option.id)>=0; h+='<button type="button" class="sey-reminder-setup-choice'+(active?' is-selected':'')+'" onclick="App.toggleReminderSpecialDay(\''+option.id+'\')" aria-pressed="'+active+'"><span aria-hidden="true">'+icon(active?'circle-check':'moon-star',15)+'</span><span><strong>'+esc(option.label)+'</strong><small>'+(active?'Seçildi':'Seçmek için dokun')+'</small></span></button>'; });
+    h+='</div>'+(selected.length?'':'<p class="sey-reminder-profile-note" role="status">Henüz gün seçmedin; bu modda occurrence oluşmaz.</p>')+'</div>';
+  }
+  h+='<div class="sey-reminder-category-meta"><span>Hicri offset: <strong>'+(offset>0?'+':'')+offset+' gün</strong></span><label><span>Uygulama saati</span><input type="time" value="'+esc(state.time)+'" onchange="App.setReminderSpecialDaysTime(this.value)" aria-label="Özel gün hatırlatma saati" style="min-height:32px;padding:5px 7px;border:1px solid var(--field-bd);border-radius:9px;background:var(--card);color:var(--text);font:inherit;font-size:10px;"></label></div>';
+  h+='<div class="sey-reminder-category-meta"><span>Native kanal başlangıçta kapalıdır.</span><label><span>Kanal</span><select aria-label="Özel gün hatırlatma kanalı" onchange="App.setReminderSpecialDaysChannel(this.value)"><option value="in_app"'+(state.channel==='in_app'?' selected':'')+'>Uygulama içi</option><option value="native"'+(state.channel==='native'?' selected':'')+'>Native · izin varsa</option></select></label></div>';
+  h+='<small class="sey-reminder-category-channel">Offset değişirse occurrence tarihi yerel Hicri tercihe göre yeniden hesaplanır. Metin zorunluluk, puan veya ticari çağrı taşımaz.</small></section>';
+  return h;
 }
 function reminderCareControlsHTML(root){
   var policy=normalizeReminderPolicy(root&&root.policy), selected=reminderCareNativeCategories(policy.careNativeCategories), movement=policy.careMovementOptIn===true;
@@ -5469,6 +5626,7 @@ function reminderActionDefinition(reminderId){
   if(catalog&&typeof catalog.get==='function'){
     var catalogDefinition=catalog.get(id); if(catalogDefinition) return catalogDefinition;
   }
+  if(id===REMINDER_SPECIAL_DAYS_ID) return reminderSpecialDayDefinition(emptyReminderSpecialDays());
   for(var i=0;i<REMINDER_CARE_DEFINITIONS.length;i++) if(REMINDER_CARE_DEFINITIONS[i].id===id) return REMINDER_CARE_DEFINITIONS[i];
   var medication=reminderMedicationScheduleById(id); if(medication) return reminderMedicationDefinition(medication);
   return null;
@@ -5594,6 +5752,7 @@ function reminderCenterOverlayHTML(){
   h+='<p class="sey-reminder-live-note" role="note">'+icon('info',14)+' Şimdilik yalnız uygulama içi kanal hazır. Native izin ve gerçek zamanlama, ayrı güvenlik kapılarından sonra ele alınacak.</p>';
   h+=reminderPermissionExplanationHTML(permission);
   h+=reminderCategoryControlsHTML(root);
+  h+=reminderSpecialDaysSectionHTML(root);
   h+=reminderCareControlsHTML(root);
   h+=reminderMedicationSectionHTML(root);
   h+='<section class="sey-reminder-catalog" aria-labelledby="sey-reminder-catalog-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">KATALOGDAN GELEN DURAKLAR</span><h3 id="sey-reminder-catalog-title">Öneri alanları</h3></div><span class="sey-reminder-count">'+defs.length+'</span></div>';
@@ -5844,7 +6003,13 @@ function reminderSetEnabled(reminderId,enabled,options){
   if(!definition||!root) return {ok:false,changed:false,duplicate:false,reason:'unknown-reminder'};
   var hadPreference=!!(root.preferences&&Object.prototype.hasOwnProperty.call(root.preferences,id)), existingPreference=hadPreference?root.preferences[id]:null, currentEnabled=hadPreference?!(existingPreference&&existingPreference.enabled===false):true, pref=reminderEnsurePreference(root,id), next=enabled===true, already=hadPreference&&currentEnabled===next;
   if(!already){
-    pref.enabled=next; pref.lastEditedAt=nowIso; root.preferences[id]=normalizeReminderPreference(id,pref);
+    pref.enabled=next; pref.lastEditedAt=nowIso;
+    if(id===REMINDER_SPECIAL_DAYS_ID){
+      var specialState=reminderSpecialDaysState(root);
+      if(next){ if(specialState.mode==='none') specialState.mode=specialState.selectedDays.length?'selected':'all'; }
+      else specialState.mode='none';
+      reminderSpecialDaysCommit(root,specialState,nowIso);
+    } else root.preferences[id]=normalizeReminderPreference(id,pref);
     save();
   }
   var actionId='reminder-action-v1:'+(next?'enable':'disable')+':'+encodeURIComponent(id)+':'+encodeURIComponent(nowIso), action=reminderActionCommit({actionId:actionId,action:next?'enable':'disable',reminderId:id,recordedAt:nowIso,status:next?'enabled':'disabled'},nowIso);
@@ -5860,6 +6025,34 @@ App.setReminderCategoryChannel=function(category,channel){
   if(!root||!state||!state.defs.length||!REMINDER_CHANNELS[channel]) return;
   state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.channel=channel; pref.lastEditedAt=new Date().toISOString(); root.preferences[def.id]=normalizeReminderPreference(def.id,pref); });
   save(); render();
+};
+App.reminderSpecialDayOptions=function(){ return REMINDER_SPECIAL_DAY_OPTIONS.map(function(option){ return {id:option.id,label:option.label}; }); };
+App.reminderSpecialDaysPreference=function(){ var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); return Object.assign({},state,{selectedDays:state.selectedDays.slice()}); };
+App.reminderSpecialDayDefinition=function(){ return reminderSpecialDayDefinition(App.reminderSpecialDaysPreference()); };
+App.reminderSpecialDayOccurrence=reminderSpecialDayOccurrence;
+App.reminderSpecialDayLifecycleCandidates=function(input){ var x=input&&typeof input==='object'?Object.assign({},input):{}, root=reminderCurrentRoot(), context=x.context&&typeof x.context==='object'?x.context:{}; x.root=root; x.context=context; x.localDate=x.localDate||context.localDate; x.localTime=x.localTime||context.localTime; x.timezone=x.timezone||context.timezone; return reminderSpecialDayLifecycleCandidates(x); };
+App.reminderSpecialDayPolicyPreference=function(state){ return reminderSpecialDayPolicyPreference(state||App.reminderSpecialDaysPreference()); };
+App.setReminderSpecialDaysMode=function(mode){
+  var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root), next=String(mode||'');
+  if(!root||!REMINDER_SPECIAL_DAYS_MODES[next]) return {ok:false,reason:'invalid-mode'};
+  state.mode=next; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+};
+App.toggleReminderSpecialDay=function(id){
+  var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root), key=String(id||''), option=reminderSpecialDayOptionById(key); if(!root||!option) return {ok:false,reason:'unknown-special-day'};
+  var selected=state.selectedDays.slice(), index=selected.indexOf(key); if(index>=0) selected.splice(index,1); else selected.push(key);
+  state.mode='selected'; state.selectedDays=selected; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+};
+App.setReminderSpecialDaysSelection=function(selection){
+  var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); if(!root) return {ok:false,reason:'no-data'};
+  state.selectedDays=normalizeReminderSpecialDaySelection(selection); if(state.selectedDays.length&&state.mode==='none') state.mode='selected'; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+};
+App.setReminderSpecialDaysTime=function(time){
+  var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); if(!root||!validReminderTime(String(time||''))) return {ok:false,reason:'invalid-time'};
+  state.time=String(time); reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+};
+App.setReminderSpecialDaysChannel=function(channel){
+  var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root), next=String(channel||''); if(!root||!REMINDER_CHANNELS[next]) return {ok:false,reason:'invalid-channel'};
+  state.channel=next; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
 };
 App.previewReminder=function(id){
   var defs=reminderDefinitions(), target=String(id||'');

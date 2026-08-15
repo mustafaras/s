@@ -131,6 +131,42 @@ runTests([
     assertEqual(out.sandbox.App.reminderSaygiLifecycleCandidates(input).length, 1);
     assert(privateFree(first));
   }],
+  ["runtime lifecycle shows once and then deduplicates without canonical mutation", async () => {
+    const pref = preference({ channel: "in_app", timeWindow: { start: "21:00", end: "22:00" } });
+    const pending = [];
+    const out = boot(baseState(pref), { fetch(url) { return new Promise((resolve, reject) => pending.push({ url: String(url), resolve, reject, done: false })); } });
+    const person = personForDate(out, DATE);
+    out.sandbox.App.openSaygiCollectionPerson(person.id);
+    const unavailable = out.sandbox.App.evaluateReminderLifecycle({ source: "manual", nowIso: NOW, visibilityState: "visible" });
+    assertEqual(unavailable.ok, true); assertEqual(unavailable.shownCount, 0); assertEqual(unavailable.results.length, 0);
+    const response = (title) => ({
+      ok: true,
+      json() {
+        return Promise.resolve({ title, extract: `${title} için yeterince uzun, okunabilir bir biyografi metnidir.`, content_urls: { desktop: { page: `https://tr.wikipedia.org/wiki/${title}` } } });
+      }
+    });
+    const flush = async () => { for (let i = 0; i < 8; i += 1) await Promise.resolve(); };
+    const resolvePending = (needle, payload) => {
+      const item = pending.find((entry) => !entry.done && entry.url.includes(needle));
+      assert(item, `pending request not found: ${needle}`);
+      item.done = true;
+      item.resolve(payload);
+    };
+    resolvePending("tr.wikipedia.org/api/rest_v1/page/summary/", response(person.trTitle || person.name));
+    await flush();
+    const canonical = encodeURIComponent(String(person.trTitle || person.name).replace(/ /g, "_"));
+    resolvePending(`tr.wikipedia.org/w/rest.php/v1/page/${canonical}/with_html`, { ok: true, json() { return Promise.resolve({}); } });
+    await flush();
+    resolvePending("tr.wikipedia.org/w/api.php", { ok: true, json() { return Promise.resolve({ query: { pages: [{ extlinks: [] }] } }); } });
+    await flush();
+    assertEqual(out.sandbox.App.reminderSaygiArticleState(person, { localDate: DATE, article: null }).status, "ready");
+    const before = out.localStorage.getItem("seyma-reset-v1");
+    const first = out.sandbox.App.evaluateReminderLifecycle({ source: "manual", nowIso: NOW, visibilityState: "visible" });
+    assertEqual(first.ok, true); assertEqual(first.shownCount, 1); assertEqual(first.results.length, 1);
+    assertEqual(out.localStorage.getItem("seyma-reset-v1"), before);
+    const second = out.sandbox.App.evaluateReminderLifecycle({ source: "manual", nowIso: NOW, visibilityState: "visible" });
+    assertEqual(second.ok, true); assertEqual(second.shownCount, 0); assertEqual(second.duplicateCount, 1);
+  }],
   ["missing, loading, error and short articles fail closed and never count as read", () => {
     const out = boot(baseState());
     const person = out.sandbox.SaygiPeople[0];
@@ -179,6 +215,8 @@ runTests([
     assertEqual(out.sandbox.App.reminderSaygiArticleState(first, { localDate: DATE, article: articleFor(first, "2026-08-14") }).status, "missing");
     const target = out.sandbox.App.reminderDeepLinkTarget({ reminderId: SAYGI_ID, openDetail: true });
     assert(target.ok); assertEqual(target.deepLink, "saygi"); assertEqual(target.openDetail, true);
+    const opened = out.sandbox.App.openReminderTarget({ reminderId: SAYGI_ID, openDetail: true });
+    assert(opened.ok); assert(out.app.innerHTML.includes('id="sey-ov-back"')); assert(out.app.innerHTML.includes('id="saygi-read-button-modal"'));
   }],
   ["late article result cannot replace the selected person", async () => {
     const pending = [];

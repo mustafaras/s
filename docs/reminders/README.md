@@ -57,6 +57,7 @@ ledger’a blocker / discrepancy olarak yazılır.
 | [`SESSION-HANDOFF-TEMPLATE.md`](SESSION-HANDOFF-TEMPLATE.md) | Oturum kapanış formatı | Template değişirse |
 | [`EVIDENCE-RECEIPT-TEMPLATE.md`](EVIDENCE-RECEIPT-TEMPLATE.md) | Kanıt makbuzu formatı | Kanıt alanları değişirse |
 | [`verify-reminder-context.mjs`](verify-reminder-context.mjs) | State / prompt / ledger / link consistency checker | Her prompt gate’inden önce |
+| [`verify-reminder-closure.mjs`](verify-reminder-closure.mjs) | Prompt kapanışında evidence → ledger → STATE → next prompt parity gate’i | Her prompt kapanışında, commit/handoff öncesi |
 
 ## Sert yürütme kuralları
 
@@ -82,6 +83,10 @@ ledger’a blocker / discrepancy olarak yazılır.
   biçiminde özet verir; hassas veri yazmaz.
 - Her prompt öncesi `node docs/reminders/verify-reminder-context.mjs`
   çalıştırılır.
+- Her prompt kapanışında önce evidence dosyası, ledger satırı ve STATE birlikte
+  güncellenir; sonra `node docs/reminders/verify-reminder-closure.mjs REM-XX`
+  çalıştırılır. Bu gate PASS olmadan prompt `done`, sonraki prompt `ready` veya
+  handoff tamamlanmış sayılamaz.
 - REM-44–REM-54 yalnız Şeyma app runtime hattıdır; REM-55–REM-66 yalnız
   current ÆON observer panel hattıdır; REM-67–REM-72 iki yüzeyin integration
   acceptance hattıdır. Panel-v2 bu ayrımın dışında, ayrı fixture ve ayrı

@@ -79,6 +79,11 @@ Tüm testler geçmeden commit veya done yoktur. Başarılı ajan:
 - prompt ID'sini commit mesajına koyar;
 - ledger satırına SHA, test sonucu ve evidence path yazar;
 - STATE.json içindeki lastCompletedPrompt, activePrompt ve nextSafeAction alanlarını günceller;
+- state.closure içine kapanan prompt, evidence path ve canonical closure commit
+  SHA'sını yazar;
+- `node docs/reminders/verify-reminder-closure.mjs REM-XX` çalıştırır; bu gate
+  PASS olmadan promptu `done`, sonraki promptu `ready` veya handoff'u tamamlanmış
+  saymaz;
 - SESSION-HANDOFF-TEMPLATE.md ile kısa handoff verir.
 
 Hiçbir kapanış adımı `releaseApproval.status` değerini kendi kendine
@@ -94,6 +99,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-00 — Canlı baseline, authority ve capability audit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-00` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Yalnız dokümantasyon ve kanıt baseline'ı oluştur. app.js, sync.js, sw.js, styles.css, index.html ve data değişmeyecek.
 
@@ -125,6 +132,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-01` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** ReminderDefinition, ReminderPreference, ReminderOccurrence, ReminderDelivery ve SuppressionContext için tek sözleşme kilitle.
 
 **Oku:** UX planı §5.1–5.3, §8.1–8.8, §13.1–13.4 ve REM-00 evidence; app.js migrate/save/data; sync.js sanitize.
@@ -149,6 +158,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-02 — Synthetic test harness contract
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-02` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Üretim koduna dokunmadan tests/reminders altında ağsız sentetik fixture zemini kur.
 
@@ -183,6 +194,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-03` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Çekirdek reminder tanımlarını DOM, network ve persistence yan etkisi olmayan versioned catalog olarak oluştur.
 
 **Oku:** UX planı §5, §7, §9 ve §16; index.html classic script sırası; app/core/constants.js deseni.
@@ -211,6 +224,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-04 — Preference state ve additive migration
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-04` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Eski save'leri bozmadan reminder preference state'ini migrate et.
 
@@ -242,6 +257,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-05` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Native permission istemeden Ayarlar altında premium Reminder Center shell'i kur.
 
 **Oku:** UX planı §6, §9.4, §10, §12; app.js settings / overlay / inline App desenleri; styles.css token'ları.
@@ -272,6 +289,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-06` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Sakin, Dengeli, Destekleyici, Ritüel odaklı ve Özel profillerini ve kategori tercihlerinin açıklamasını ekle.
 
 **Oku:** UX planı §6.2, §6.5, §6.6, §11.1; mevcut settings controls.
@@ -300,6 +319,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-07 — Quiet hours, daily budget ve capacity mode
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-07` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Quiet interval, daily cap, cooldown, priority ve capacity mode kararlarını saf policy katmanında kur.
 
@@ -334,6 +355,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-08` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Aynı input'un her cihazda aynı occurrence ID ve local date üretmesini sağla.
 
 **Oku:** UX planı §8.3–8.4, §15.2; mevcut today, prayer parsing ve Hicri offset helpers.
@@ -362,6 +385,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-09 — Suppression, dedupe ve device delivery journal
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-09` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Focus, visibility, timer ve reopen tekrarlarında duplicate üretme; kısa cihaz teslim günlüğü tut.
 
@@ -392,6 +417,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-10` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Boot, visibility, focus, pageshow, online ve sınırlı timer kontrollerini idempotent scheduler ile birleştir.
 
 **Oku:** run-seyma/SKILL.md timer/fetch no-op bölümü; app.js lifecycle listener, render ve save.
@@ -420,6 +447,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-11 — Catch-up, grouping ve conflict resolution
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-11` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reopen sonrası reminder spam'i yerine anlamlı catch-up ve tek summary üret.
 
@@ -453,6 +482,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-12` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Native izin yokken bugünün reminder'larını sakin, gruplanmış ve erişilebilir card yüzeyinde göster.
 
 **Oku:** UX planı §6.1, §9.4, §10; app.js card/overlay/render ve styles.css.
@@ -481,6 +512,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-13 — Snooze, today mute, disable ve deep-link
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-13` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Kullanıcı reminder'ı erteleyebilsin, bugün susturabilsin, kalıcı kapatabilsin ve doğru ekrana gidebilsin.
 
@@ -515,6 +548,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-14` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Mevcut prayer timing ve İman Köşesi'ni kopyalamadan güvenli reminder occurrence / deep-link üret.
 
 **Oku:** GELISTIRME-PLANI §34; UX planı §7.1, §8.3, §18; prayer helpers, refreshPrayerTimes, nextPrayerInfo, stale cache ve togglePrayer.
@@ -544,6 +579,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-15` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** User-selected tek günlük zikir daveti ve düşük frekanslı journey dönüşü ekle; seri baskısı üretme.
 
 **Oku:** GELISTIRME-PLANI zikir bölümleri; UX planı §7.2; zikir state, reflection, overlay ve feature flag.
@@ -572,6 +609,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-16 — Terapi odası support integration
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-16` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** User-selected nefes / ilk adım / öz şefkat / CBT pratiğine nazik, düşük frekanslı dönüş sun; klinik iddia kurma.
 
@@ -603,6 +642,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-17` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Günlük ilham okumasına dönüşü kolaylaştır; article loading, race ve Okudum gate'ini bozma.
 
 **Oku:** UX planı §7.4–7.5; Saygı current code, modal, article, readAt, scroll gate ve harness.
@@ -631,6 +672,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-18 — Reading, journal ve tek akşam kapanışı
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-18` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Zikir, Saygı, kitap ve günlük için aynı akşam çoklu native bildirim yerine tek optional coalesced davet üret.
 
@@ -665,6 +708,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-19` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Mevcut care nudge'larını ortak budget'a bağla; ayrı alarm çoğalmasını engelle.
 
 **Oku:** UX planı §7.7, §8.6, §10.2, roadmap care nudge bölümleri; mevcut water, sleep, caffeine, magnesium, vitamin ve soul activity kodu.
@@ -693,6 +738,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-20 — Medication / supplement guarded flow
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-20` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Yalnız kullanıcının kurduğu zamanı hatırlat; doz, etkileşim, tedavi ve atlanan doz kararı verme.
 
@@ -723,6 +770,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-21 — Hicri / özel gün tercihleri
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-21` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Hicri / kandil reminder'larını opt-in ve offset-aware yap.
 
@@ -757,6 +806,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-22` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Permission request'i ilk yüklemede değil, kullanıcı açıkça native channel açtığında yap.
 
 **Oku:** UX planı §6.5–6.6, §9.1–9.3; mevcut ÆON permission functions ve permission key'leri.
@@ -786,6 +837,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-23` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Native notification yalnız permission, budget, privacy ve desteklenen foreground koşulunda göster.
 
 **Oku:** UX planı §8.3, §9.2–9.3; showNativeAeonNotification payload contract.
@@ -814,6 +867,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-24 — Service Worker click, retry ve no-spam boundary
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-24` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** sw.js yalnız click / open-client / güvenli event routing sınırında kalsın.
 
@@ -849,6 +904,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-25` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Gerçek data repo'ya yazmadan sync sanitize, merge ve local-only boundary'yi kanıtla.
 
 **Oku:** UX planı §8.2, §13.1–13.4, REM-01 decision; sync.js sanitize, merge ve receipt.
@@ -877,6 +934,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-26 — Panel mirror ve redacted system health
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-26` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Panelde yalnız gerekli ve redakte sistem aggregate'i göster; private routine göstermeme.
 
@@ -912,6 +971,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-27` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Hatırlatma katmanını WCAG AA, Türkçe copy, light/dark, mobile, reduced-motion ve privacy açısından denetle.
 
 **Oku:** UX planı §4.1, §9.3, §12, §16; styles.css token'ları ve mevcut accessibility fixtures.
@@ -942,6 +1003,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 ### REM-28 — Full regression, migration ve deterministic time matrix
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-28` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Programın mevcut Şeyma davranışını bozmadığını ve bütün zaman / privacy sınırlarını kanıtla.
 
@@ -979,6 +1042,8 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-29` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Push yapmadan source, test, remote, Pages ve device kanıtlarını birbirine karıştırmadan release packet hazırla.
 
 **Oku:** AGENTS Git/deploy ve evidence-level kuralları; tüm ledger; REM-28 receipt.
@@ -1013,6 +1078,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-30` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Planın “sakinlik, kontrol, mahremiyet ve eyleme geçiricilik” hedeflerini ölçülebilir ama kullanıcıyı izlemeyen kabul kriterlerine çevir.
 
 **Oku:** UX planı §2.1–2.3, §14.5 ve §17; REM-01, REM-07 ve REM-25 kararları.
@@ -1040,6 +1107,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-31 — Sabah, gün içi, akşam ve düşük kapasite akışları
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-31` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Hatırlatmaları tek tek kartlardan çıkarıp günün bağlamına göre sakin ve çakışmasız bir akışa yerleştir.
 
@@ -1070,6 +1139,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-32` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Kullanıcının reminder davranışını tek merkezden anlamasını, önizlemesini, test etmesini ve geri almasını sağla.
 
 **Oku:** UX planı §6.1–6.5, §9.4, §13.4 ve §14.4; REM-05, REM-06, REM-13, REM-22.
@@ -1098,6 +1169,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-33 — Sistem durumu, stale veri ve kullanıcıya dürüst uyarı
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-33` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Vakit verisi eskidiğinde, offline durumda, izin reddedildiğinde veya sync beklediğinde kullanıcıyı yanlış güvene sokmadan bilgilendir.
 
@@ -1129,6 +1202,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-34` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Kişiselleştirmeyi yalnız açık kullanıcı sinyaline dayalı, açıklanabilir ve geri alınabilir hale getir.
 
 **Oku:** UX planı §2.2, §4.2, §11.1–11.4, §13.3 ve §18; REM-01, REM-06, REM-30.
@@ -1158,6 +1233,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-35` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Daha fazla bildirim üretmeden haftalık reflection, “bu hafta” ve “on this day” deneyimini güvenli biçimde tasarla.
 
 **Oku:** UX planı §2.2, §7.8, §10.3, §14.5, §17 ve GELISTIRME-PLANI ilgili roadmap maddeleri.
@@ -1185,6 +1262,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-36 — Türkçe copy lexicon ve mahremiyet negatif dili
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-36` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Tüm reminder yüzeylerinde Şeyma’nın sıcak, saygılı ve klinik otorite iddiası taşımayan dilini standardize et.
 
@@ -1214,6 +1293,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-37 — Premium görsel sistem, responsive ve performans QA
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-37` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reminder yüzeyini mevcut premium Şeyma tasarımına uyumlu, iki temada erişilebilir ve düşük maliyetli hale getir.
 
@@ -1245,6 +1326,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-38` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** İki sekme, offline recovery ve local full-replace sync davranışlarında reminder state’in kaybolmasını veya duplicate oluşmasını engelle.
 
 **Oku:** UX planı §8.4, §8.5, §13.2; AGENTS data safety; sync.js save / schedule / sanitize / merge bounded sections; REM-04, REM-09, REM-25.
@@ -1273,6 +1356,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-39 — Retention, export, clear ve reset yaşam döngüsü
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-39` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Kullanıcının reminder preference, delivery history ve local log üzerinde anlama, silme, dışa aktarma ve sıfırlama kontrolünü tamamla.
 
@@ -1303,6 +1388,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-40` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** UX planındaki hiçbir ana bölümün prompt, test, allowlist, karar ve kanıt sahibi olmadan kalmadığını kanıtla.
 
 **Oku:** UX planı §1–§21; APP-REMINDER-TRACEABILITY-MATRIX.md; prompt seti; ledger; test matrix; decisions.
@@ -1330,6 +1417,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-41 — Release candidate freeze ve evidence packet
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-41` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Uygulama yapılmışsa release candidate’ın kaynak, test, privacy, panel, accessibility ve cihaz sınırlarını birleştir; canlıya alma yapma.
 
@@ -1364,6 +1453,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-42` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Release kararını ajanın yorumundan ayır ve yalnız mevcut kullanıcı mesajındaki açık eylem + kapsamı state’e kaydet.
 
 **Oku:** APP-REMINDER-APPROVAL-GATE.md tamamı; STATE.json; REM-41 evidence; SESSION-HANDOFF-TEMPLATE.
@@ -1390,6 +1481,8 @@ Gerçek browser açma, server başlatma, push veya deployment yapma.
 ### REM-43 — Açık kullanıcı onayı sonrası release execution
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-43` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Yalnız REM-42 tarafından exact current user approval ile onaylanmış ve scope’u belirlenmiş release işlemlerini, tam kanıt zinciriyle yürüt.
 
@@ -1437,6 +1530,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-44` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder catalog, state ve engine adapter’larının build step olmayan mevcut app boot zincirine güvenli biçimde bağlanacağı sözleşmeyi kanıtla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1; index.html script order; app/core/constants.js; app.js IIFE başlangıcı; AGENTS project structure.
@@ -1465,6 +1560,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 ### REM-45 — App state schema, ownership ve additive migration
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-45` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reminder alanlarının gerçek data / settings / local-only journal sınırlarını eski kullanıcı kayıtlarını bozmadan uygulamaya bağla.
 
@@ -1495,6 +1592,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-46` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Saf reminder occurrence / policy motorunu Şeyma’nın gerçek tarih, Hicri, prayer ve active-date yardımcılarına deterministik biçimde bağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1; app.js date helpers, activeDate, prayer helpers, HijriCalendarV1; UX planı §8.1–8.5.
@@ -1523,6 +1622,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 ### REM-47 — App save, commit ve event-log lifecycle
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-47` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reminder action’larının Şeyma’nın mevcut save / commit / event-log zincirine tekil, redacted ve replay-safe biçimde bağlanmasını sağla.
 
@@ -1553,6 +1654,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-48` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder Center’ı gerçek Şeyma Ayarlar / tab / overlay navigasyonuna bağla; her hedefe erişilebilir ve geri dönülebilir bir akış ver.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1; app.js App.go, settings render, overlay shell, openFaithCorner, openZikr, openReading, openJournalModal; UX planı §6 ve §9.4.
@@ -1581,6 +1684,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 ### REM-49 — App render lifecycle ve targeted update boundary
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-49` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reminder polling / action / timer değişikliklerinin büyük render fonksiyonunu gereksiz yere çalıştırıp input, modal veya scroll bozmasını engelle.
 
@@ -1611,6 +1716,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-50` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder scheduler’ı app’in mevcut pollRemote, onAppForeground, visibility, focus, pageshow, online ve timer akışlarına spam üretmeden bağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1; app.js onAppForeground, pollRemote, lifecycle listeners, timers; UX planı §8.6–8.8.
@@ -1639,6 +1746,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 ### REM-51 — App surface adapter ve feature deep-link conformance
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-51` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Namaz, zikir, terapi, Saygı, okuma, günlük, bakım ve kullanıcı kurduğu sağlık reminder’larının gerçek app surface’lerine doğru bağlandığını tek adapter sözleşmesinde kanıtla.
 
@@ -1671,6 +1780,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-52` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Personal reminder native permission / delivery akışını mevcut ÆON notification akışından ayır ve kullanıcı kontrolünü koru.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1; app.js canNotify, permission loop, showNativeAeonNotification, data.notifications; sw.js; UX planı §7.10 ve §9.
@@ -1701,6 +1812,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-53` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder preference, delivery journal, action history ve private detail’in app localStorage → sync → projection zincirinde yanlışlıkla sızmadığını kanıtla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1 ve §3; app.js save, saveLocal; sync.js sanitize, pushWithCfg, putLatestGuarded, event log; UX planı §13.
@@ -1729,6 +1842,8 @@ ilgili promptta açıkça belirtilmeden değiştirilemez.
 ### REM-54 — App module, cache-bust ve headless acceptance
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-54` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Uygulama tarafındaki reminder teslimini gerçek headless harness’larda, iki temada ve mevcut Şeyma feature regression’larıyla kapat.
 
@@ -1770,6 +1885,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-55` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Panelin latest, receipt, observer projection ve legacy fallback arasında hangi kaynağı neden seçtiğini reminder gözlemine uygun biçimde kanıtla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panel.js load, fetchLatest, loadObserverProjectionP; panelCoverageManifest.js chooseProjection; tests panel projection fixtures.
@@ -1800,6 +1917,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-56` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder projection alanlarının manifestte açıkça full, summary, redacted, missing veya unmapped olarak sınıflanmasını sağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panelCoverageManifest.js MANIFEST, coverageForData, redactedPaths; UX planı §13.2.
@@ -1828,6 +1947,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-57 — Panel redaction ve reminder no-op kararı
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-57` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** ÆON panelinde reminder verisinin hangi güvenli aggregate ile, hangi durumda tamamen no-op olarak kalacağını ürün ve privacy kanıtıyla kararlaştır.
 
@@ -1858,6 +1979,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-58` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder-related panel observation’ın conditional polling, not-modified, draft defer ve render signature sözleşmesini bozmamasını sağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panel.js loadTransportFileP, fetchLatest, pollConditionalDecisionP, panelDraftActiveP, applyPollRenderP, panelSig; tests panel polling.
@@ -1886,6 +2009,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-59 — Panel partial fetch, stale ve fail-closed durumları
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-59` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Projection, sync receipt, event log ve transport section’larından biri başarısız olduğunda panelin sağlıklı eski snapshot’ı yanlışlıkla yok etmesini engelle.
 
@@ -1916,6 +2041,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-60` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder gözlem durumunu panelde kaynak, tazelik, privacy, receipt ve capability olarak ayrıştır; tek yeşil rozetle maskeleme.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panel.js syncRibbonHTMLP, coverageRibbonHTMLP, canonicalStatusP, p3StatusP, stalenessBadgeP; UX planı §7.10 ve §14.
@@ -1944,6 +2071,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-61 — Panel reminder dashboard card veya explicit no-op
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-61` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Panelde reminder için gerçekten gerekli bir bento / module card olup olmadığını kanıtla; varsa yalnız redacted operational aggregate üret.
 
@@ -1974,6 +2103,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-62` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder lifecycle gözlem için gerekli ise event timeline’a safe, append-only ve filtrelenebilir biçimde bağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panel.js event helpers, eventLogCardHTMLP, eventFeatureForP, eventMatchesFilterP, selected date / day detail; sync.js event contract.
@@ -2003,6 +2134,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-63` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Panelin mevcut ÆON / Quran / media observer writes’ını korurken reminder preference, snooze, mute, delivery veya private state write etmesini kesin olarak engelle.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2 ve §4; panel.js putInbox, putTransportFileP, media writers, Quran actions; AGENTS read/write boundary.
@@ -2031,6 +2164,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-64 — Panel privacy, redaction ve secret scanner
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-64` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Reminder alanlarının projection JSON, panel DOM, error output, fixture ve exported summary kanallarının tamamında private kalmasını kanıtla.
 
@@ -2062,6 +2197,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-65` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Current ÆON panelde reminder status/card/timeline yüzeylerini premium, erişilebilir, responsive ve polling altında stabil tut.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §2; panel.css; panel.js render / panelDraftActiveP, panelSig; tests/panel-v2 accessibility only as separate reference.
@@ -2091,6 +2228,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-66 — Panel fixture architecture ve current / Panel-v2 regression gate
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-66` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Panel reminder acceptance’ının root panel fixture’ları ile Panel-v2 fixture’larını doğru scope’ta, tekrar üretilebilir ve ağsız çalıştırılmasını sağla.
 
@@ -2124,6 +2263,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-67` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Kullanıcı app action’ından paneldeki güvenli status/timeline çıktısına kadar reminder data lineage’ını tek synthetic fixture’da kanıtla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §3; REM-47, REM-53, REM-55–62; sync.js event / projection paths; panelCoverageManifest.
@@ -2152,6 +2293,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-68 — Cross-surface status ve failure semantics
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-68` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** App, sync receipt, projection manifest ve panel UI’ın aynı olay için çelişkili success / pending / stale / error iddiası üretmesini engelle.
 
@@ -2182,6 +2325,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-69` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder schema veya projection manifest değiştiğinde eski app save, eski latest snapshot ve eski panel fallback’in güvenli biçimde çalışmasını sağla.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md §1–2; app migrate; panelCoverageManifest schema / chooseProjection; sync receipt; UX planı §8.2 ve §13.2.
@@ -2210,6 +2355,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-70 — Integrated privacy, security ve no-write acceptance
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-70` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** App, native, SW, sync, projection, panel DOM, error, event ve external write boundary’lerinde tek bir integrated negative security gate oluştur.
 
@@ -2241,6 +2388,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
 
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-71` PASS olmadan done/ready/handoff verme.
+
 **Hedef:** Reminder’ın app ve panelde aynı veriyi farklı privacy / density / operator context ile estetik ve erişilebilir biçimde sunduğunu doğrula.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md; UX planı §9, §12, §16, §19; app / panel visual and a11y fixtures; Panel-v2 current state yalnız ayrı referans.
@@ -2270,6 +2419,8 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 ### REM-72 — App + panel release candidate ve user approval packet
 
 **Context güvenliği:** Bu prompt tek başına verildiğinde önce `AGENTS.md`, `GELISTIRME-PLANI.md`, `docs/reminders/README.md`, `docs/reminders/APP-REMINDER-CONTEXT.md`, güncel `APP-REMINDER-STATE.json`, ledger ve bu promptu oku; `git status --short --branch` ile `git rev-parse HEAD` çalıştır. Context daralırsa dur, kısa checkpoint / handoff yaz ve yeni sessiona geç; compact özeti veya eski sohbeti güncel kanıt sayma.
+
+**Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-72` PASS olmadan done/ready/handoff verme.
 
 **Hedef:** Uygulama ve panel birlikte release candidate seviyesine geldiyse kaynak, test, projection, privacy, CI, Pages ve cihaz kanıtlarını ayır; kullanıcı onayı olmadan hiçbir live action yapma.
 

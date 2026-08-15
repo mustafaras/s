@@ -43,6 +43,8 @@ discrepancy yazılır ve ilgili prompt `blocked` kalır.
    ve dış sistem işlemlerinin kullanıcı onayı kapısı.
 8. [`verify-reminder-context.mjs`](verify-reminder-context.mjs) — bu kaynakların
    makinece senkron olup olmadığını doğrulayan checker.
+9. [`verify-reminder-closure.mjs`](verify-reminder-closure.mjs) — prompt kapanışında
+   evidence, ledger, STATE, commit ve sonraki prompt geçişini doğrulayan gate.
 
 State, ledger ve prompt aynı durumu söylemiyorsa ajan hiçbir kod değişikliğine
 başlamaz.
@@ -223,7 +225,10 @@ Bir prompt “done” sayılmadan önce:
 9. Sonraki prompt faz kilidini kontrol et.
 10. `node docs/reminders/verify-reminder-context.mjs` ile prompt / ledger /
     state / traceability parity'yi yeniden doğrula.
-11. [`SESSION-HANDOFF-TEMPLATE.md`](SESSION-HANDOFF-TEMPLATE.md) ile kısa
+11. `node docs/reminders/verify-reminder-closure.mjs REM-XX` ile kapanan
+    promptun evidence, ledger, STATE, commit ve sonraki prompt geçişini
+    doğrula; FAIL ise done/ready/handoff verme.
+12. [`SESSION-HANDOFF-TEMPLATE.md`](SESSION-HANDOFF-TEMPLATE.md) ile kısa
     handoff ver.
 
 ## 6. Kanıt seviyeleri

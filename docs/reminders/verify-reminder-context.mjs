@@ -37,7 +37,8 @@ const required = [
   "docs/reminders/APP-REMINDER-DECISIONS.md",
   "docs/reminders/SESSION-HANDOFF-TEMPLATE.md",
   "docs/reminders/EVIDENCE-RECEIPT-TEMPLATE.md",
-  "docs/reminders/verify-reminder-context.mjs"
+  "docs/reminders/verify-reminder-context.mjs",
+  "docs/reminders/verify-reminder-closure.mjs"
 ];
 for (const file of required) read(file);
 
@@ -93,6 +94,7 @@ if (state) {
   assert(state.surfaceMap === "docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md", "state surfaceMap mismatch");
   assert(state.approvalGate === "docs/reminders/APP-REMINDER-APPROVAL-GATE.md", "state approvalGate mismatch");
   assert(state.contextValidator === "docs/reminders/verify-reminder-context.mjs", "state contextValidator mismatch");
+  assert(state.closureValidator === "docs/reminders/verify-reminder-closure.mjs", "state closureValidator mismatch");
   assert(expectedIds.includes(state.activePrompt), `state activePrompt invalid: ${state.activePrompt}`);
   assert(state.blockedPrompt === null || expectedIds.includes(state.blockedPrompt), "state blockedPrompt invalid");
   assert(state.releaseApproval && typeof state.releaseApproval === "object", "state releaseApproval missing");

@@ -15,6 +15,7 @@
   "surfaceMap": "docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md",
   "approvalGate": "docs/reminders/APP-REMINDER-APPROVAL-GATE.md",
   "contextValidator": "docs/reminders/verify-reminder-context.mjs",
+  "closureValidator": "docs/reminders/verify-reminder-closure.mjs",
   "authority": [
     "AGENTS.md",
     "CLAUDE.md",
@@ -25,7 +26,8 @@
     "docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md",
     "docs/reminders/APP-REMINDER-TRACEABILITY-MATRIX.md",
     "docs/reminders/APP-REMINDER-APPROVAL-GATE.md",
-    "docs/reminders/verify-reminder-context.mjs"
+    "docs/reminders/verify-reminder-context.mjs",
+    "docs/reminders/verify-reminder-closure.mjs"
   ],
   "protectedPaths": [
     "data/",
@@ -50,5 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-12/REM-13 canonical reconciliation; REM-14 is next; release remains not_approved"
+  "updatedBy": "Codex REM-12/REM-13 canonical reconciliation; REM-14 is next; release remains not_approved",
+  "closure": {
+    "prompt": "REM-13",
+    "evidence": "docs/reminders/evidence/REM-13.md",
+    "commit": "897983b2b1871a8fc172e300da50a2a73cd94789"
+  }
 }

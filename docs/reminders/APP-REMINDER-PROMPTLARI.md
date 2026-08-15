@@ -10,6 +10,28 @@ Plan ürün authority'sidir. Kod veya test planla çelişiyorsa ajan varsayım y
 
 Tüm promptlarda ortak sert sınırlar vardır: gerçek browser yok, gerçek veri repo'suna yazma yok, token veya özel veri isteme yok, testte gerçek ağ yok, kullanıcı açıkça ve kapsamı belirli şekilde onaylamadan push / merge / deploy yok.
 
+## Tüm promptlar için context / auto-compact güvenlik sözleşmesi
+
+Bu bölüm her REM promptunun ayrılmaz parçasıdır; prompt ayrı bir session'a
+kopyalandığında da birlikte taşınır.
+
+- Promptu chat geçmişine güvenerek değil, canonical dosyaları yeniden okuyarak
+  başlat. Eski sohbet özeti, eski SHA, eski state veya eski test sonucu tek
+  başına güncel kanıt sayılmaz.
+- Büyük dosyaları bütünüyle context'e alma. `rg` ile hedef fonksiyonu bul,
+  bounded line range oku; büyük diff ve uzun test çıktısını sohbete ham olarak
+  taşıma. Ayrıntılı çıktıyı geçici yerel logda tut, yalnız PASS/FAIL ve gerekli
+  hata bölümünü raporla.
+- Context daralmaya, otomatik compact yaklaşmaya veya görev geçmişi güvenilmez
+  hale gelmeye başlarsa kodlama / staging / commit işlemine devam etme. Önce
+  kısa bir checkpoint yaz: aktif prompt, HEAD, çalışma ağacı, değişen dosyalar,
+  son doğrulanan komutlar, açık blocker/discrepancy ve tek sonraki güvenli adım.
+- Checkpoint sonrasında yeni session'a geç. Yeni session canonical state,
+  ledger, prompt parity ve Git durumunu yeniden doğrulamadan önceki işin
+  tamamlandığını varsayamaz; sonraki REM'e otomatik ilerleyemez.
+- Handoff kompakt ve eyleme dönük olmalı; tam tarihçe append-only ledger veya
+  evidence dosyasında kalır. `releaseApproval.status` bu süreçte değişmez.
+
 Canlıya alma için canonical kilit [`APP-REMINDER-APPROVAL-GATE.md`](APP-REMINDER-APPROVAL-GATE.md)'dir. Varsayılan state `NOT_APPROVED` kalır. Yeşil test, local commit, `ready_for_user_acceptance`, “tamam”, “devam” veya eski sohbet mesajı kullanıcı onayı değildir. `mustafaras/seyma-data` yazımı için canlıya alma onayından bağımsız ayrıca açık veri yazma izni gerekir.
 
 Önerilen yeni test dosyaları mevcut olmayabilir; ilgili prompt onları oluşturur. Mevcut testler silinmez, taşınmaz ve sessizce zayıflatılmaz.

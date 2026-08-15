@@ -40,6 +40,13 @@ notification body veya gerçek sync payload’ı yazılmaz.
 
 - `none` veya exact ID + kısa açıklama.
 
+### Context / auto-compact checkpoint
+
+- **Context durumu:** normal / checkpoint alındı / yeni session gerekli
+- **Son güvenilir kanıt:** kısa komut + sonuç
+- **Yeni session ilk adımı:** canonical dosyaları ve Git durumunu yeniden oku;
+  önceki sohbet özetini tek başına kanıt sayma.
+
 ### Sonraki güvenli adım
 
 - Prompt ID ve ilk okunacak dosya / komut.

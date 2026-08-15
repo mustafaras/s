@@ -166,6 +166,21 @@ alt-prompt önerisini karar günlüğüne yazar.
   yeterlidir.
 - Gerçek kullanıcı metni veya veri örneği yerine sentetik fixture kullan.
 
+### 3.4. Context / auto-compact checkpoint
+
+- Otomatik compact yaklaşırsa veya ajan önceki görev geçmişini güvenilir biçimde
+  taşıyamayacağını fark ederse uygulama değişikliğine devam edilmez.
+- Önce `SESSION-HANDOFF-TEMPLATE.md` biçiminde kısa checkpoint yazılır:
+  aktif prompt, HEAD, çalışma ağacı, değişen dosyalar, son doğrulanmış
+  komutlar, blocker/discrepancy ve tek sonraki güvenli adım.
+- Checkpoint alındıktan sonra yeni session açılır. Yeni session canonical
+  dosyaları, prompt parity'sini ve Git durumunu yeniden doğrular.
+- Eski sohbet, compact özeti, eski SHA veya eski test çıktısı tek başına güncel
+  kanıt değildir; tamamlandı / done / ready iddiası yeniden doğrulama olmadan
+  verilemez.
+- Tam ayrıntı append-only ledger veya evidence dosyasında tutulur; checkpoint
+  kısa, kopyalanabilir ve yalnız devam etmek için gereken bilgiyi içerir.
+
 ## 4. Session giriş protokolü
 
 Her ajan, ilk değişiklikten önce aşağıdaki komutları çalıştırır:

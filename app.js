@@ -1459,6 +1459,15 @@ var REMINDER_CAPACITY_MODES={balanced:true,light:true,silent:true,ritual:true};
 var REMINDER_PRIORITY_RANK={P0:0,P1:1,P2:2,P3:3};
 var REMINDER_CARE_CATEGORY='care';
 var REMINDER_CARE_KEYS=['water','sleep','caffeine','movement'];
+var REMINDER_MEDICATION_SCHEMA_VERSION=1;
+var REMINDER_MEDICATION_ID_PREFIX='reminder.medication.v1.';
+var REMINDER_MEDICATION_NAME_MAX=80;
+var REMINDER_MEDICATION_LABEL_MAX=60;
+var REMINDER_MEDICATION_NOTE_MAX=240;
+var REMINDER_MEDICATION_MAX_SCHEDULES=24;
+var REMINDER_MEDICATION_NATIVE_TITLE='Bir küçük hatırlatman hazır';
+var REMINDER_MEDICATION_NATIVE_BODY='Seçtiğin saati kontrol etmek için Şeyma’yı açabilirsin.';
+var REMINDER_MEDICATION_SAFETY_COPY='Bu özellik yalnızca senin girdiğin zamanı hatırlatır; doz, tedavi veya tıbbi karar önermez. Sağlıkla ilgili kararlar için doktorunun veya eczacının yönlendirmesini takip et.';
 var REMINDER_CARE_DEFINITIONS=[
   {id:'reminder.care.v1.water',careKey:'water',category:REMINDER_CARE_CATEGORY,priority:'P2',triggerType:'care-window',deepLink:'health',definitionVersion:'1',defaultChannel:'in_app',privateTitle:'Su için küçük bir ara',privateBody:'İstersen şimdi bir bardak suya uğrayabilirsin.',snoozeOptions:['30m','1h','todayOff'],existingSurface:'water'},
   {id:'reminder.care.v1.sleep',careKey:'sleep',category:REMINDER_CARE_CATEGORY,priority:'P2',triggerType:'care-window',deepLink:'health',definitionVersion:'1',defaultChannel:'in_app',privateTitle:'Uykuya hazırlık için küçük bir ara',privateBody:'İstersen akşam hazırlık alanını açabilirsin.',snoozeOptions:['30m','1h','thisEvening','todayOff'],existingSurface:'h-sleepprep'},
@@ -1490,7 +1499,28 @@ var REMINDER_CATEGORY_ORDER=['ritual','support','reflection','system'];
 var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,'pwa-limited':true};
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
 function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
-function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy()}; }
+function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),medications:[]}; }
+function reminderMedicationText(value,max){ return String(value==null?'':value).replace(/\u0000/g,'').replace(/\r\n?/g,'\n').trim().slice(0,max); }
+function reminderMedicationId(value){ var id=String(value||''); return /^reminder\.medication\.v1\.[A-Za-z0-9._%-]{1,160}$/.test(id)?id:''; }
+function reminderMedicationNewId(nowIso){
+  var stamp=String(Date.parse(nowIso||'')||Date.now().valueOf()).replace(/[^0-9]/g,'');
+  return REMINDER_MEDICATION_ID_PREFIX+stamp+'-'+Math.floor(Math.random()*1000000).toString(36);
+}
+function normalizeReminderMedication(value,options){
+  var x=value&&typeof value==='object'&&!Array.isArray(value)?value:{}, opts=options&&typeof options==='object'?options:{}, nowIso=validReminderIso(opts.nowIso)?opts.nowIso:'';
+  var id=reminderMedicationId(x.id); if(!id&&opts.generateId===true) id=reminderMedicationNewId(nowIso); if(!id) return null;
+  var name=reminderMedicationText(x.name,REMINDER_MEDICATION_NAME_MAX), time=String(x.time||'').trim(), label=reminderMedicationText(x.privateLabel,REMINDER_MEDICATION_LABEL_MAX), note=reminderMedicationText(x.note,REMINDER_MEDICATION_NOTE_MAX);
+  if(!name||!validReminderTime(time)) return null;
+  var kind=String(x.kind||'medication'); if(kind!=='medication'&&kind!=='supplement') kind='medication';
+  var timezone=validReminderTimezone(x.timezone)?String(x.timezone):REMINDER_ENGINE_DEFAULT_TIMEZONE;
+  var createdAt=validReminderIso(x.createdAt)?new Date(x.createdAt).toISOString():nowIso, updatedAt=validReminderIso(x.updatedAt)?new Date(x.updatedAt).toISOString():createdAt;
+  return {id:id,kind:kind,name:name,privateLabel:label,time:time,note:note,timezone:timezone,enabled:x.enabled!==false,createdAt:createdAt,updatedAt:updatedAt};
+}
+function normalizeReminderMedications(value,options){
+  var source=Array.isArray(value)?value:[], out=[], seen={}, opts=options&&typeof options==='object'?options:{};
+  source.forEach(function(item){ var normalized=normalizeReminderMedication(item,opts); if(normalized&&!seen[normalized.id]&&out.length<REMINDER_MEDICATION_MAX_SCHEDULES){ seen[normalized.id]=true; out.push(normalized); } });
+  return out;
+}
 function normalizeReminderProfile(value){ return reminderEnumHas(REMINDER_PROFILE_IDS,value)?value:'balanced'; }
 function normalizeReminderCategories(value){
   var out=[],seen={};
@@ -1569,6 +1599,7 @@ function reminderCategoryIds(){
 }
 function reminderCategoryMeta(category){
   if(String(category||'')===REMINDER_CARE_CATEGORY) return {label:'Günlük bakım',description:'Su, uykuya hazırlık, kafein ve isteğe bağlı hareket',icon:'heart-pulse'};
+  if(String(category||'')==='health') return {label:'Kişisel sağlık saati',description:'Yalnızca senin kurduğun ilaç veya takviye zamanı',icon:'pill'};
   return REMINDER_CATEGORY_META[category]||{label:category,description:'Hatırlatma kategorisi',icon:'bell-ring'};
 }
 function reminderCategorySelection(root){
@@ -1756,6 +1787,7 @@ function reminderPolicyEvaluate(input){
   if(mode==='ritual'&&priority!=='P0'){
     var ritualSelection=selectedCategories.length?selectedCategories.indexOf(category)>=0:category==='ritual';
     if(category===REMINDER_CARE_CATEGORY&&explicitlySelected) ritualSelection=true;
+    if(category==='health'&&explicitlySelected) ritualSelection=true;
     if(!ritualSelection) capacityBlocked=true;
   }
   if(capacityBlocked){ result.reason='capacity-'+mode; result.grouped=mode==='ritual'; return result; }
@@ -1809,6 +1841,9 @@ function migrateReminderState(d){
   root.profile=normalizeReminderProfile(root.profile);
   root.onboarding=normalizeReminderOnboarding(root.onboarding);
   root.policy=normalizeReminderPolicy(root.policy);
+  var medicationSource=Array.isArray(root.medications)?root.medications:(Array.isArray(root.medicationSchedules)?root.medicationSchedules:[]);
+  root.medications=normalizeReminderMedications(medicationSource);
+  if(Object.prototype.hasOwnProperty.call(root,'medicationSchedules')) delete root.medicationSchedules;
 }
 // ── REM-08 Pure occurrence / timezone engine ──
 // Oluşum üretimi yalnız explicit input kullanır. Burada uygulama saati,
@@ -1912,6 +1947,58 @@ function reminderEngineGenerateOccurrence(input){
   var scheduledAt=scheduled.time, definitionVersion=String(x.definitionVersion||definition.definitionVersion||'1'), comparison=nowLocalTime?reminderEngineCompareDateTime(scheduled.localDate,scheduledAt,nowLocalDate,nowLocalTime):null, past=comparison!==null&&comparison<0, due=comparison!==null&&comparison<=0;
   var occurrence={reminderId:reminderId,occurrenceId:reminderEngineOccurrenceId(reminderId,scheduled.localDate,scheduledAt,timezone,definitionVersion),localDate:scheduled.localDate,scheduledAt:scheduledAt,timezone:timezone,sourceRevision:String(x.sourceRevision||scheduled.sourceRevision||definition.sourceRevision||definitionVersion),priority:reminderPolicyPriority(definition.priority||x.priority||'P3'),definitionVersion:definitionVersion,triggerType:String(x.triggerType||definition.triggerType||'fixed-time'),hijriOffset:Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0,due:due,past:past,replay:false,nativeReplay:false,shouldReplay:false};
   return Object.assign({ok:true,reason:null,occurrence:occurrence},occurrence);
+}
+
+// ── REM-20 Medication / supplement guarded flow ───────────────────────────
+// Bu adapter yalnızca kullanıcının kurduğu günlük saati üretir. İsim, özel
+// etiket, not, doz veya sağlık bağlamı occurrence/native/delivery sınırına
+// taşınmaz; yerel uygulama içi görünüm gerektiğinde schedule ID üzerinden
+// çözülür. Geçmiş gün catch-up'ı özellikle yoktur.
+function reminderMedicationFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-medication-schedule'),stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderMedicationDefinition(schedule){
+  var s=normalizeReminderMedication(schedule);
+  if(!s) return null;
+  return {id:s.id,category:'health',priority:'P1',triggerType:'medication-schedule',deepLink:'health',definitionVersion:String(REMINDER_MEDICATION_SCHEMA_VERSION),defaultChannel:'in_app',defaultWindow:{kind:'time-range',timezone:s.timezone,start:s.time,end:s.time},snoozeOptions:['30m','1h','todayOff'],privateTitle:REMINDER_MEDICATION_NATIVE_TITLE,privateBody:REMINDER_MEDICATION_NATIVE_BODY,userOwnedSchedule:true};
+}
+function reminderMedicationScheduleById(id,source){
+  var list=Array.isArray(source)?source:(data&&data.reminders&&Array.isArray(data.reminders.medications)?data.reminders.medications:[]), key=String(id||'');
+  for(var i=0;i<list.length;i++){ if(list[i]&&String(list[i].id||'')===key) return list[i]; }
+  return null;
+}
+function reminderMedicationOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, raw=x.schedule&&typeof x.schedule==='object'?x.schedule:(x.medication&&typeof x.medication==='object'?x.medication:x), schedule=normalizeReminderMedication(raw), nowValue=x.nowIso||x.instantIso||x.now||'', instantMs=reminderEngineInstantMs({instantIso:nowValue}), timezone=String(x.timezone||schedule&&schedule.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), parts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=String(x.localDate||x.nowLocalDate||(parts&&parts.localDate)||''), localTime=String(x.localTime||x.nowLocalTime||(parts&&parts.localTime)||'').slice(0,5);
+  if(!schedule) return reminderMedicationFailure('invalid-schedule');
+  if(schedule.enabled!==true) return reminderMedicationFailure('schedule-disabled');
+  if(instantMs===null||!reminderEngineValidDate(localDate)) return reminderMedicationFailure('invalid-medication-clock');
+  var definition=reminderMedicationDefinition(schedule), generated=reminderEngineGenerateOccurrence({definition:{id:schedule.id,triggerType:'fixed-time',time:schedule.time,definitionVersion:String(REMINDER_MEDICATION_SCHEMA_VERSION)},reminderId:schedule.id,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'medication-schedule-v1'});
+  if(!generated.ok||!generated.occurrence) return generated;
+  var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-medication-v1:'+encodeURIComponent(schedule.id)+':'+encodeURIComponent(localDate)+':'+encodeURIComponent(schedule.time)+':'+encodeURIComponent(timezone),reminderId:schedule.id,category:'health',priority:'P1',deepLink:'health',triggerType:'medication-schedule',medicationScheduleId:schedule.id,userOwnedSchedule:true,explicitlySelected:true,due:generated.occurrence.due&&!generated.occurrence.past,missed:generated.occurrence.past===true,replay:false,nativeReplay:false,shouldReplay:false,nativeTitle:REMINDER_MEDICATION_NATIVE_TITLE,nativeBody:REMINDER_MEDICATION_NATIVE_BODY,dataRequirement:'none'});
+  return Object.assign({},generated,{occurrence:occurrence,definition:definition,missed:occurrence.missed});
+}
+function reminderMedicationPolicyPreference(schedule){
+  var s=normalizeReminderMedication(schedule), out={reminderId:s?s.id:'',enabled:!!(s&&s.enabled),privacyMode:'private',channel:s&&s.channel==='native'?'native':'in_app',quietHoursBehavior:'defer',userScheduled:true,userCreated:true,explicitlySelected:true};
+  return out;
+}
+function reminderMedicationPrivateCopy(input,definition){
+  var x=input&&typeof input==='object'?input:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x, schedule=x.schedule&&typeof x.schedule==='object'?x.schedule:reminderMedicationScheduleById(x.medicationScheduleId||occurrence.medicationScheduleId||x.reminderId);
+  schedule=normalizeReminderMedication(schedule);
+  if(!schedule) return null;
+  var label=schedule.privateLabel||schedule.name, detail=schedule.name+' · '+schedule.time;
+  if(schedule.note) detail+=' · '+schedule.note;
+  return {title:label,detail:detail,deepLink:'health',private:true};
+}
+function reminderMedicationNativeCopy(){ return {title:REMINDER_MEDICATION_NATIVE_TITLE,detail:REMINDER_MEDICATION_NATIVE_BODY,deepLink:'health'}; }
+function reminderMedicationLifecycleCandidates(input){
+  var x=input&&typeof input==='object'?input:{}, root=x.root&&typeof x.root==='object'?x.root:(data&&data.reminders), list=root&&Array.isArray(root.medications)?root.medications:[], context=x.context&&typeof x.context==='object'?x.context:{}, out=[];
+  list.forEach(function(raw){
+    var schedule=normalizeReminderMedication(raw); if(!schedule||schedule.enabled!==true) return;
+    var result=reminderMedicationOccurrence({schedule:schedule,nowIso:context.nowIso,timezone:schedule.timezone});
+    if(!result.ok||!result.occurrence) return;
+    // REM-20: current-day schedule only. Missed occurrences are marked and
+    // never converted into catch-up, replacement or dose advice.
+    out.push({occurrence:result.occurrence,definition:result.definition,preference:reminderMedicationPolicyPreference(schedule),reminderId:schedule.id,medicationScheduleId:schedule.id,userScheduled:true,explicitlySelected:true,due:result.occurrence.due});
+  });
+  return out;
 }
 
 // REM-08 source boundary: delivery persistence helpers begin after the pure
@@ -2985,6 +3072,7 @@ function reminderLifecycleBuildCandidates(input,context,root){
       out.push({occurrence:generated.occurrence,definition:definition,preference:preference,due:generated.occurrence.due});
     });
   });
+  reminderMedicationLifecycleCandidates({source:x,context:context,root:root}).forEach(function(candidate){ out.push(candidate); });
   reminderCareLifecycleCandidates({source:x,context:context,root:root}).forEach(function(candidate){ out.push(candidate); });
   return reminderEveningCoalesceCandidates(out,context);
 }
@@ -3238,7 +3326,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderPreviewId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderPreviewId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
 // Yeniden açılışta bekleyen bir uzak senkron varsa hatırlatıcı geri gelsin.
 try{
   var _bootSaveStatus=data&&data.syncReceipt&&data.syncReceipt.status;
@@ -5171,6 +5259,37 @@ function reminderCareControlsHTML(root){
   h+='</div><div class="sey-reminder-care-optin"><div><strong>Hareket davetini ayrıca aç</strong><small>Kısa yürüyüş veya esneme için opt-in; kayıt girilmezse bu eksik veri sayılmaz.</small></div><button type="button" class="sey-reminder-care-toggle'+(movement?' is-on':'')+'" onclick="App.setReminderCareMovementOptIn('+(movement?'false':'true')+')" aria-pressed="'+movement+'">'+(movement?'Açık':'Kapalı')+'</button></div></section>';
   return h;
 }
+function reminderMedicationKindLabel(kind){ return kind==='supplement'?'Takviye':'İlaç'; }
+function reminderMedicationDraftState(){
+  var d=ui.reminderMedicationDraft&&typeof ui.reminderMedicationDraft==='object'?ui.reminderMedicationDraft:{};
+  return {kind:d.kind==='supplement'?'supplement':'medication',name:reminderMedicationText(d.name,REMINDER_MEDICATION_NAME_MAX),privateLabel:reminderMedicationText(d.privateLabel,REMINDER_MEDICATION_LABEL_MAX),time:validReminderTime(d.time)?d.time:'',note:reminderMedicationText(d.note,REMINDER_MEDICATION_NOTE_MAX)};
+}
+function reminderMedicationSectionHTML(root){
+  var list=root&&Array.isArray(root.medications)?root.medications:[], draft=reminderMedicationDraftState(), editingId=String(ui.reminderMedicationEditingId||''), editing=editingId!=='', h='<section class="sey-reminder-medications" data-reminder-medication-surface="local-only" aria-labelledby="sey-reminder-medication-title">';
+  h+='<div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">YALNIZCA SENİN KURDUĞUN SAAT</span><h3 id="sey-reminder-medication-title">İlaç / takviye saati</h3></div><span class="sey-reminder-count">'+list.length+'</span></div>';
+  h+='<p class="sey-reminder-medication-safety" role="note" data-reminder-medication-safety="true">'+esc(REMINDER_MEDICATION_SAFETY_COPY)+'</p>';
+  if(ui.reminderMedicationError) h+='<p role="alert" style="margin:0;padding:9px 10px;border-left:3px solid var(--drop);border-radius:4px 10px 10px 4px;background:color-mix(in srgb,var(--drop) 8%,var(--card));color:var(--text);font-size:11px;line-height:1.4;">'+esc(ui.reminderMedicationError)+'</p>';
+  h+='<div class="sey-reminder-medication-form" data-reminder-medication-form="true"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0;">';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:10px;font-weight:850;">Tür<select maxlength="12" onchange="App.setReminderMedicationDraftField(\'kind\',this.value)" style="width:100%;min-height:40px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"><option value="medication"'+(draft.kind==='medication'?' selected':'')+'>İlaç</option><option value="supplement"'+(draft.kind==='supplement'?' selected':'')+'>Takviye</option></select></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:10px;font-weight:850;">Saat<input type="time" maxlength="5" value="'+esc(draft.time)+'" onchange="App.setReminderMedicationDraftField(\'time\',this.value)" oninput="App.setReminderMedicationDraftField(\'time\',this.value)" aria-label="İlaç veya takviye hatırlatma saati" style="width:100%;min-height:40px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label></div>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Ad<input type="text" maxlength="'+REMINDER_MEDICATION_NAME_MAX+'" value="'+esc(draft.name)+'" oninput="App.setReminderMedicationDraftField(\'name\',this.value)" placeholder="Kendi adın" autocomplete="off" style="width:100%;min-height:40px;padding:9px 10px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Özel etiket <span style="font-weight:600;color:var(--faint);">yalnız uygulamada</span><input type="text" maxlength="'+REMINDER_MEDICATION_LABEL_MAX+'" value="'+esc(draft.privateLabel)+'" oninput="App.setReminderMedicationDraftField(\'privateLabel\',this.value)" placeholder="Özel bir etiket" autocomplete="off" style="width:100%;min-height:40px;padding:9px 10px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Not <span style="font-weight:600;color:var(--faint);">'+REMINDER_MEDICATION_NOTE_MAX+' karaktere kadar · yerel</span><textarea maxlength="'+REMINDER_MEDICATION_NOTE_MAX+'" oninput="App.setReminderMedicationDraftField(\'note\',this.value)" placeholder="İstersen kendin için kısa bir not">'+esc(draft.note)+'</textarea></label>';
+  h+='<div style="display:flex;gap:7px;flex-wrap:wrap;"><button type="button" class="sey-reminder-primary" onclick="App.saveReminderMedicationDraft()">'+(editing?'Düzenlemeyi kaydet':'Saati ekle')+'</button>'+(editing?'<button type="button" class="sey-reminder-secondary" onclick="App.cancelReminderMedicationEdit()">Vazgeç</button>':'')+'</div>';
+  h+='<p class="sey-reminder-medication-native-note" role="note">Native yüzey için varsayılan metin geneldir; ad, etiket, not ve doz bildirim gövdesine yazılmaz.</p></div>';
+  if(list.length){
+    h+='<div class="sey-reminder-medication-list" role="list" aria-label="Yerel ilaç ve takviye saatleri">';
+    list.forEach(function(schedule){
+      var title=schedule.privateLabel||schedule.name, kind=reminderMedicationKindLabel(schedule.kind);
+      h+='<article class="sey-reminder-medication-item" data-reminder-medication-id="'+esc(schedule.id)+'" role="listitem"><div style="min-width:0;flex:1;"><strong>'+esc(title)+'</strong><small>'+esc(kind+' · '+schedule.name+' · her gün '+schedule.time)+'</small>'+(schedule.note?'<p>'+esc(schedule.note)+'</p>':'')+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;"><button type="button" class="sey-reminder-secondary" onclick="App.editReminderMedication(\''+esc(schedule.id)+'\')">Düzenle</button><button type="button" class="sey-reminder-secondary" onclick="App.muteReminderMedicationToday(\''+esc(schedule.id)+'\')">Bugün sustur</button><button type="button" class="sey-reminder-secondary is-disabled" onclick="App.deleteReminderMedication(\''+esc(schedule.id)+'\')">Sil</button></div></article>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="sey-reminder-empty" data-reminder-medication-empty="true"><span aria-hidden="true">'+icon('pill',22)+'</span><strong>Henüz kişisel sağlık saati yok.</strong><p>Bir saat kurarsan yalnız o saati hatırlatırız; doz veya tedavi kararı üretmeyiz.</p></div>';
+  }
+  h+='<button type="button" class="sey-reminder-medication-clear" onclick="App.clearReminderMedicationLocal()"'+(list.length?'':' disabled')+'>Yerel ilaç / takviye kayıtlarını temizle</button></section>';
+  return h;
+}
 function reminderCardHTML(def,index){
   var id=String(def.id||'');
   var preview=ui.reminderPreviewId===id;
@@ -5261,10 +5380,10 @@ function reminderInboxBuildItems(input){
     var category=String(candidate.category||occurrence.category||(definition&&definition.category)||'system'), meta=reminderCategoryMeta(category), priority=reminderPolicyPriority(candidate.priority||occurrence.priority||(definition&&definition.priority)||'P3'), precedence=reminderCatchupPrecedence(Object.assign({},candidate,{priority:priority}),definition,Object.assign({},occurrence,{priority:priority}));
     var catalogSnoozeOptions=definition&&Array.isArray(definition.snoozeOptions)?definition.snoozeOptions:[];
     var snoozeOptions=(Array.isArray(candidate.snoozeOptions)?candidate.snoozeOptions:catalogSnoozeOptions).filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,String(option)); });
-    var prayerCopy=reminderPrayerPrivateCopy(candidate,definition), therapyCopy=reminderTherapyPrivateCopy({candidate:candidate,occurrence:occurrence},definition), safeCopy=therapyCopy||prayerCopy, title=safeCopy?safeCopy.title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'), detail=safeCopy?safeCopy.detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'), deepLink=safeCopy?safeCopy.deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||''), therapyToolId=therapyCopy?reminderTherapyToolId(occurrence):'';
+    var prayerCopy=reminderPrayerPrivateCopy(candidate,definition), therapyCopy=reminderTherapyPrivateCopy({candidate:candidate,occurrence:occurrence},definition), medicationCopy=reminderMedicationPrivateCopy({candidate:candidate,occurrence:occurrence,medicationScheduleId:candidate.medicationScheduleId||occurrence.medicationScheduleId},definition), safeCopy=therapyCopy||prayerCopy||medicationCopy, title=safeCopy?safeCopy.title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'), detail=safeCopy?safeCopy.detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'), deepLink=safeCopy?safeCopy.deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||''), therapyToolId=therapyCopy?reminderTherapyToolId(occurrence):'';
     // Inbox is an in-app surface; preserve the catalog's existing detail copy.
     // Native/private delivery uses reminderTherapyPrivateCopy separately.
-    safeCopy=prayerCopy;
+    safeCopy=prayerCopy||medicationCopy;
     if(!safeCopy){
       title=String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır');
       detail=String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.');
@@ -5351,6 +5470,7 @@ function reminderActionDefinition(reminderId){
     var catalogDefinition=catalog.get(id); if(catalogDefinition) return catalogDefinition;
   }
   for(var i=0;i<REMINDER_CARE_DEFINITIONS.length;i++) if(REMINDER_CARE_DEFINITIONS[i].id===id) return REMINDER_CARE_DEFINITIONS[i];
+  var medication=reminderMedicationScheduleById(id); if(medication) return reminderMedicationDefinition(medication);
   return null;
 }
 function reminderActionLocalTime(ms,timezone){
@@ -5407,8 +5527,10 @@ function reminderActionDueCandidates(nowIso,context,root){
     if(!definition||!local||local.localDate!==localDate) return;
     var delivery=reminderDeliveryFind(reminderDeliveryLoad(nowIso,false),entry.occurrenceId);
     if(delivery&&REMINDER_INBOX_HIDDEN_STATUSES[delivery.status]&&!delivery.reason) return;
-    var pref=root&&root.preferences?root.preferences[entry.reminderId]:null;
+    var medication=reminderMedicationScheduleById(entry.reminderId,root&&root.medications), pref=root&&root.preferences?root.preferences[entry.reminderId]:null;
+    if(!pref&&medication) pref=reminderMedicationPolicyPreference(medication);
     var occurrence={reminderId:entry.reminderId,occurrenceId:entry.occurrenceId,localDate:local.localDate,scheduledAt:local.localTime,timezone:timezone,due:true,past:false,replay:false,nativeReplay:false,priority:definition.priority,definitionVersion:definition.definitionVersion};
+    if(medication){ occurrence.medicationScheduleId=medication.id; occurrence.userOwnedSchedule=true; occurrence.explicitlySelected=true; occurrence.deepLink='health'; occurrence.nativeTitle=REMINDER_MEDICATION_NATIVE_TITLE; occurrence.nativeBody=REMINDER_MEDICATION_NATIVE_BODY; }
     if(entry.reminderId===REMINDER_THERAPY_ID){ var therapyToolId=reminderTherapySelectedTool(pref); if(therapyToolId){ occurrence.deepLink='room'; occurrence.therapyToolId=therapyToolId; occurrence.toolId=therapyToolId; occurrence.toolTarget='room:'+therapyToolId; } }
     out.push({reminderId:entry.reminderId,occurrence:occurrence,definition:definition,preference:pref||{enabled:true,channel:'in_app'},enabled:!(pref&&pref.enabled===false)});
   });
@@ -5473,6 +5595,7 @@ function reminderCenterOverlayHTML(){
   h+=reminderPermissionExplanationHTML(permission);
   h+=reminderCategoryControlsHTML(root);
   h+=reminderCareControlsHTML(root);
+  h+=reminderMedicationSectionHTML(root);
   h+='<section class="sey-reminder-catalog" aria-labelledby="sey-reminder-catalog-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">KATALOGDAN GELEN DURAKLAR</span><h3 id="sey-reminder-catalog-title">Öneri alanları</h3></div><span class="sey-reminder-count">'+defs.length+'</span></div>';
   if(!defs.length){
     h+='<div class="sey-reminder-empty" role="status"><span aria-hidden="true">'+icon('sparkles',22)+'</span><strong>Şimdilik katalogda etkin hatırlatma yok.</strong><p>Merkez hazır; yeni kayıtlar geldiğinde burada görünür.</p></div>';
@@ -5592,6 +5715,81 @@ App.reminderCareDefinitions=function(){ return reminderCareDefinitions(); };
 App.reminderCareNativeCategories=function(value){ return reminderCareNativeCategories(value); };
 App.reminderCareLifecycleCandidates=function(input){ return reminderCareLifecycleCandidates(input); };
 App.reminderCareNudgeSources=function(){ return reminderCareNudgeSources(); };
+App.reminderMedicationNormalize=function(value,options){ return normalizeReminderMedication(value,options); };
+App.reminderMedicationOccurrence=reminderMedicationOccurrence;
+App.reminderMedicationNativeCopy=reminderMedicationNativeCopy;
+App.reminderMedicationPrivateCopy=reminderMedicationPrivateCopy;
+App.reminderMedicationDefinition=reminderMedicationDefinition;
+App.reminderMedicationLifecycleCandidates=reminderMedicationLifecycleCandidates;
+App.reminderMedicationSafetyCopy=REMINDER_MEDICATION_SAFETY_COPY;
+App.reminderMedicationRetention=function(now){ return reminderDeliveryLoad(now,true); };
+App.reminderSyncPayload=reminderSyncPayload;
+App.reminderMedicationSchedules=function(){
+  var root=reminderCurrentRoot();
+  try{ return JSON.parse(JSON.stringify(root&&Array.isArray(root.medications)?root.medications:[])); }catch(e){ return []; }
+};
+function reminderMedicationCurrentList(){
+  var root=reminderCurrentRoot(); if(!root) return null;
+  if(!Array.isArray(root.medications)) root.medications=[];
+  return root.medications;
+}
+function reminderMedicationDraftFromSchedule(schedule){
+  var s=normalizeReminderMedication(schedule); return s?{kind:s.kind,name:s.name,privateLabel:s.privateLabel,time:s.time,note:s.note}:null;
+}
+function reminderMedicationHistoryMatches(entry,ids){
+  var text=String(entry&&entry.occurrenceId||''); if(!text) return false;
+  return ids.some(function(id){ return text.indexOf(String(id))>=0||text.indexOf(encodeURIComponent(String(id)))>=0; });
+}
+function reminderMedicationClearHistory(ids){
+  var result={delivery:0,actions:0}; if(!Array.isArray(ids)||!ids.length||typeof localStorage==='undefined') return result;
+  try{
+    var delivery=reminderDeliveryLoad(new Date().toISOString(),false), kept=delivery.entries.filter(function(entry){ return !reminderMedicationHistoryMatches(entry,ids); });
+    result.delivery=delivery.entries.length-kept.length; reminderDeliveryStorageWrite({schemaVersion:REMINDER_DELIVERY_SCHEMA_VERSION,entries:kept});
+  }catch(e){}
+  try{
+    var actions=reminderActionLoad(new Date().toISOString(),false), actionKept=actions.entries.filter(function(entry){ return ids.indexOf(String(entry.reminderId||''))<0&&!reminderMedicationHistoryMatches(entry,ids); });
+    result.actions=actions.entries.length-actionKept.length; reminderActionStorageWrite({schemaVersion:REMINDER_ACTION_SCHEMA_VERSION,entries:actionKept});
+  }catch(e){}
+  return result;
+}
+App.setReminderMedicationDraftField=function(field,value){
+  var allowed={kind:true,name:true,privateLabel:true,time:true,note:true}; if(!allowed[String(field)]) return;
+  if(!ui.reminderMedicationDraft||typeof ui.reminderMedicationDraft!=='object') ui.reminderMedicationDraft={kind:'medication',name:'',privateLabel:'',time:'',note:''};
+  ui.reminderMedicationDraft[String(field)]=String(value==null?'':value); if(field==='name') ui.reminderMedicationDraft.name=reminderMedicationText(value,REMINDER_MEDICATION_NAME_MAX); if(field==='privateLabel') ui.reminderMedicationDraft.privateLabel=reminderMedicationText(value,REMINDER_MEDICATION_LABEL_MAX); if(field==='note') ui.reminderMedicationDraft.note=reminderMedicationText(value,REMINDER_MEDICATION_NOTE_MAX);
+};
+App.saveReminderMedicationDraft=function(){
+  var list=reminderMedicationCurrentList(); if(!list) return {ok:false,reason:'no-data'};
+  var draft=reminderMedicationDraftState(), editingId=String(ui.reminderMedicationEditingId||''), existing=editingId?reminderMedicationScheduleById(editingId,list):null, nowIso=new Date().toISOString(), raw=Object.assign({},draft,existing?{id:existing.id,createdAt:existing.createdAt,enabled:existing.enabled,timezone:existing.timezone}:{}), normalized=normalizeReminderMedication(raw,{generateId:!existing,nowIso:nowIso});
+  if(!normalized){ ui.reminderMedicationError='Adını ve geçerli bir saati birlikte girer misin?'; render(); return {ok:false,reason:'invalid-schedule'}; }
+  if(existing) normalized.updatedAt=nowIso;
+  if(existing){ var index=list.indexOf(existing); if(index>=0) list[index]=normalized; }
+  else list.unshift(normalized);
+  list.splice(REMINDER_MEDICATION_MAX_SCHEDULES);
+  ui.reminderMedicationDraft=null; ui.reminderMedicationEditingId=''; ui.reminderMedicationError=''; save(); render();
+  return {ok:true,schedule:normalized,updated:!!existing};
+};
+App.editReminderMedication=function(id){
+  var schedule=reminderMedicationScheduleById(id); if(!schedule) return {ok:false,reason:'not-found'};
+  ui.reminderMedicationEditingId=schedule.id; ui.reminderMedicationDraft=reminderMedicationDraftFromSchedule(schedule); ui.reminderMedicationError=''; render(); return {ok:true,schedule:schedule};
+};
+App.cancelReminderMedicationEdit=function(){ ui.reminderMedicationEditingId=''; ui.reminderMedicationDraft=null; ui.reminderMedicationError=''; render(); };
+App.deleteReminderMedication=function(id){
+  var list=reminderMedicationCurrentList(), key=String(id||''), index=list?list.findIndex(function(item){ return item&&item.id===key; }):-1;
+  if(index<0) return {ok:false,reason:'not-found'};
+  if(typeof confirm==='function'&&!confirm('Bu yerel hatırlatma silinsin mi?')) return {ok:false,reason:'cancelled'};
+  list.splice(index,1); reminderMedicationClearHistory([key]); if(ui.reminderMedicationEditingId===key){ ui.reminderMedicationEditingId=''; ui.reminderMedicationDraft=null; } save(); render(); return {ok:true,deleted:key};
+};
+App.muteReminderMedicationToday=function(id,options){
+  var schedule=reminderMedicationScheduleById(id), x=options&&typeof options==='object'?options:{}, nowIso=reminderDeliveryNow(x.nowIso||x.now); if(!schedule) return {ok:false,reason:'not-found'};
+  var generated=reminderMedicationOccurrence({schedule:schedule,nowIso:nowIso}); if(!generated.ok||!generated.occurrence) return generated;
+  return App.reminderInboxTodayOff(generated.occurrence.occurrenceId,schedule.id,{occurrence:generated.occurrence,reminderId:schedule.id,nowIso:nowIso,timezone:schedule.timezone});
+};
+App.clearReminderMedicationLocal=function(){
+  var list=reminderMedicationCurrentList(); if(!list) return {ok:false,reason:'no-data'};
+  if(!list.length) return {ok:true,cleared:0,history:{delivery:0,actions:0}};
+  if(typeof confirm==='function'&&!confirm('Yerel ilaç ve takviye hatırlatmaları temizlensin mi?')) return {ok:false,reason:'cancelled'};
+  var ids=list.map(function(item){ return item.id; }), count=list.length; list.splice(0,list.length); ui.reminderMedicationEditingId=''; ui.reminderMedicationDraft=null; ui.reminderMedicationError=''; var history=reminderMedicationClearHistory(ids); save(); render(); return {ok:true,cleared:count,history:history};
+};
 function updateReminderPolicy(mutator){
   var root=reminderCurrentRoot(); if(!root||typeof mutator!=='function') return;
   var policy=normalizeReminderPolicy(root.policy); mutator(policy); root.policy=normalizeReminderPolicy(policy); save(); render();

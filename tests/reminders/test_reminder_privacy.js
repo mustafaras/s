@@ -116,7 +116,18 @@ function privacyState() {
           therapyNote: "SENSITIVE_NOTE_FIXTURE",
           secretFixture: "SECRET_FIXTURE"
         }
-      }
+      },
+      medications: [{
+        id: "reminder.medication.v1.privacy",
+        kind: "medication",
+        name: "MEDICATION_NAME_FIXTURE",
+        privateLabel: "PRIVATE_LABEL_FIXTURE",
+        time: "08:00",
+        note: "MEDICATION_NOTE_FIXTURE",
+        dose: "DOSE_FIXTURE",
+        healthText: "HEALTH_TEXT_FIXTURE",
+        enabled: false
+      }]
     }
   };
 }
@@ -132,6 +143,7 @@ runTests([
     assertEqual(out.error, null);
     assert(out.data.reminders.preferences[PRIVATE_ID].privateDetail === "PRIVATE_DETAIL_FIXTURE");
     assertEqual(out.data.notifications[0].id, "observer-fixture");
+    assertEqual(out.data.reminders.medications[0].name, "MEDICATION_NAME_FIXTURE");
 
     out.sandbox.App.saveNow();
 
@@ -141,6 +153,10 @@ runTests([
     assert(!remoteFixtureText.includes("PRIVATE_DETAIL_FIXTURE"));
     assert(!remoteFixtureText.includes("SENSITIVE_NOTE_FIXTURE"));
     assert(!remoteFixtureText.includes("SECRET_FIXTURE"));
+    assert(!remoteFixtureText.includes("MEDICATION_NAME_FIXTURE"));
+    assert(!remoteFixtureText.includes("PRIVATE_LABEL_FIXTURE"));
+    assert(!remoteFixtureText.includes("MEDICATION_NOTE_FIXTURE"));
+    assert(!remoteFixtureText.includes("HEALTH_TEXT_FIXTURE"));
     assert(!Object.prototype.hasOwnProperty.call(out.counters.lastScheduled, "delivery"));
     assert(!Object.prototype.hasOwnProperty.call(out.counters.lastScheduled, "deliveryLog"));
 

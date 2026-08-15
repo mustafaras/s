@@ -2087,9 +2087,9 @@ function reminderZikrJourneyOccurrence(input){
   if(frequency==='selected-window'&&!preference.journeyWindow&&!preference.timeWindow) return reminderZikrFailure('journey-window-not-selected');
   if(!reminderZikrDaysAllowed(preference,true,context.localDate)) return reminderZikrFailure('outside-selected-days');
   var window=reminderZikrWindow(preference,definition,true); if(!window) return reminderZikrFailure('invalid-journey-window');
-  var result=reminderZikrMakeOccurrence(Object.assign({},x,{timezone:timezone}),definition,context,window,'journey','journey:'+entry.presetId+':'+entry.lastAt+':'+frequency), occurrence=result.occurrence;
+  var intervalDays=frequency==='weekly'?REMINDER_ZIKR_MIN_INTERVAL_DAYS:minDays, intervalBucket=Math.floor(ageMs/(intervalDays*86400000)), result=reminderZikrMakeOccurrence(Object.assign({},x,{timezone:timezone}),definition,context,window,'journey','journey:'+entry.presetId+':'+entry.lastAt+':'+frequency+':'+intervalBucket), occurrence=result.occurrence;
   if(!result.ok||!occurrence) return result;
-  occurrence.occurrenceId=reminderZikrOccurrenceId('journey',[entry.presetId,entry.lastAt,frequency,window.start,window.end]); occurrence.journeyPresetId=entry.presetId; occurrence.frequency=frequency; occurrence.due=reminderZikrWindowDue(window,context.localTime);
+  occurrence.occurrenceId=reminderZikrOccurrenceId('journey',[entry.presetId,entry.lastAt,frequency,intervalBucket,window.start,window.end]); occurrence.journeyPresetId=entry.presetId; occurrence.frequency=frequency; occurrence.intervalBucket=intervalBucket; occurrence.due=reminderZikrWindowDue(window,context.localTime);
   return Object.assign({},result,occurrence,{occurrence:occurrence,kind:'journey'});
 }
 function reminderZikrReflectionOccurrence(input){

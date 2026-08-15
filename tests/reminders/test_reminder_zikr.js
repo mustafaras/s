@@ -115,6 +115,8 @@ runTests([
     const first = out.sandbox.App.reminderZikrJourneyOccurrence(input(out, weekly));
     const second = out.sandbox.App.reminderZikrJourneyOccurrence(input(out, weekly));
     assert(first.ok); assertEqual(first.occurrence.frequency, "weekly"); assertEqual(first.occurrence.occurrenceId, second.occurrence.occurrenceId);
+    const nextWeek = out.sandbox.App.reminderZikrJourneyOccurrence(input(out, weekly, { nowIso: "2026-08-22T18:30:00.000Z", localDate: "2026-08-22", localTime: "21:30" }));
+    assert(nextWeek.ok); assert(nextWeek.occurrence.intervalBucket > first.occurrence.intervalBucket); assert(nextWeek.occurrence.occurrenceId !== first.occurrence.occurrenceId);
     assert(!JSON.stringify(first).match(/streak|seri|ceza|doğru/i));
     const selected = Object.assign({}, weekly, { journeyFrequency: "selected-window", journeyWindow: { start: "20:00", end: "22:00" }, journeyDaysOfWeek: [6] });
     const selectedResult = out.sandbox.App.reminderZikrJourneyOccurrence(input(out, selected));

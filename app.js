@@ -2242,6 +2242,105 @@ function reminderTherapyLifecycleCandidates(input){
   return [{occurrence:result.occurrence,definition:definition,preference:reminderTherapyPolicyPreference(preference),due:result.occurrence.due,userSelected:true}];
 }
 
+// ── REM-17 Saygı / Günün Öncüsü reading adapter ────────────────────────────
+// Saygı hatırlatması yalnızca kullanıcının seçtiği pencere için, günde tek
+// occurrence üretir. Kişi adı, makale başlığı ve article gövdesi bu sınırdan
+// bilerek geçirilmez; native copy her zaman genel kalır.
+var REMINDER_SAYGI_ID='reminder.catalog.v1.saygi';
+var REMINDER_SAYGI_FREQUENCIES={daily:true};
+function reminderSaygiFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-saygi-preference'),articleStatus:'unknown',stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderSaygiDefinition(input){
+  var x=input&&typeof input==='object'?input:{};
+  if(x.definition&&typeof x.definition==='object') return x.definition;
+  if(typeof ReminderCatalogV1!=='undefined'&&ReminderCatalogV1.get){ var def=ReminderCatalogV1.get(REMINDER_SAYGI_ID); if(def) return def; }
+  return {id:REMINDER_SAYGI_ID,category:'ritual',priority:'P3',triggerType:'scheduled-window',deepLink:'saygi',definitionVersion:'1',defaultWindow:{kind:'time-range',timezone:'user',start:'09:00',end:'20:00'}};
+}
+function reminderSaygiFrequency(preference){
+  var p=preference&&typeof preference==='object'?preference:{}, frequency=String(p.frequency||p.readingFrequency||'daily');
+  return REMINDER_SAYGI_FREQUENCIES[frequency]?frequency:'';
+}
+function reminderSaygiWindow(preference,definition,frequency){
+  var p=preference&&typeof preference==='object'?preference:{}, d=definition&&typeof definition==='object'?definition:{}, explicit=p.readingWindow||p.timeWindow, raw=explicit||d.defaultWindow;
+  // A Saygı reminder must be user-selected; catalog defaults are preview-only.
+  if(!explicit) return null;
+  if(!raw||typeof raw!=='object'||!validReminderTime(raw.start)||!validReminderTime(raw.end)) return null;
+  return {start:String(raw.start),end:String(raw.end)};
+}
+function reminderSaygiWeekday(localDate){
+  if(!reminderEngineValidDate(localDate)) return -1;
+  var p=localDate.split('-').map(Number); return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();
+}
+function reminderSaygiDaysAllowed(preference,localDate){
+  var p=preference&&typeof preference==='object'?preference:{}, day=reminderSaygiWeekday(localDate);
+  if(day<0) return false;
+  if(!Array.isArray(p.daysOfWeek)) return true;
+  return p.daysOfWeek.some(function(value){ return Number.isInteger(value)&&value>=0&&value<=6&&value===day; });
+}
+function reminderSaygiWindowDue(window,localTime){
+  if(!window) return false;
+  var now=reminderPolicyTimeMinutes(localTime), start=reminderPolicyTimeMinutes(window.start), end=reminderPolicyTimeMinutes(window.end);
+  if(now===null||start===null||end===null||start===end) return false;
+  return start<end?now>=start&&now<=end:now>=start||now<=end;
+}
+function reminderSaygiPerson(input){
+  var x=input&&typeof input==='object'?input:{}, raw=x.person&&typeof x.person==='object'?x.person:null, id=String(x.personId||x.selectedPersonId||(raw&&raw.id)||'');
+  if(id){ var selected=saygiPersonById(id); return selected&&selected.id===id?selected:null; }
+  return saygiCurrentPerson();
+}
+function reminderSaygiArticleState(person,input){
+  var x=input&&typeof input==='object'?input:{}, article=x.article&&typeof x.article==='object'?x.article:null;
+  if(!article&&typeof ui!=='undefined'&&ui.saygiArticle&&typeof ui.saygiArticle==='object') article=ui.saygiArticle;
+  var localDate=String(x.localDate||todayStr());
+  if(article&&saygiArticleReadableFor(person,article,localDate)) return {status:'ready',article:article};
+  if(String(x.articleStatus||'')==='error'||(typeof ui!=='undefined'&&ui.saygiError)) return {status:'error',article:null};
+  if(String(x.articleStatus||'')==='loading'||(typeof ui!=='undefined'&&ui.saygiLoading)) return {status:'loading',article:null};
+  return {status:'missing',article:null};
+}
+function reminderSaygiReadState(person,input){
+  var x=input&&typeof input==='object'?input:{}, localDate=String(x.localDate||todayStr()), source=x.readState&&typeof x.readState==='object'?x.readState:x;
+  if(source.read===true||source.completed===true) return true;
+  if(source.personId&&String(source.personId)!==String(person&&person.id||'')) return false;
+  if(source.readAt&&String(source.readAt).slice(0,10)===localDate) return true;
+  var day=x.day&&typeof x.day==='object'?x.day:null, saygi=day&&day.saygi&&typeof day.saygi==='object'?day.saygi:null;
+  return !!(saygi&&String(saygi.personId||'')===String(person&&person.id||'')&&String(saygi.readAt||'').slice(0,10)===localDate);
+}
+function reminderSaygiOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderSaygiDefinition(x), frequency=reminderSaygiFrequency(preference), person=reminderSaygiPerson(x);
+  if(String(x.reminderId||definition.id||REMINDER_SAYGI_ID)!==REMINDER_SAYGI_ID) return reminderSaygiFailure('invalid-reminder-id');
+  if(preference.enabled!==true) return reminderSaygiFailure('preference-disabled');
+  if(!frequency) return reminderSaygiFailure('invalid-saygi-frequency');
+  if(preference.dailyEnabled===false) return reminderSaygiFailure('daily-disabled');
+  if(!person) return reminderSaygiFailure('invalid-person');
+  var timezone=String(x.timezone||preference.timezone||'Europe/Istanbul'), nowValue=x.nowIso||x.instantIso||x.now||'', instantMs=reminderEngineInstantMs({instantIso:nowValue}), parts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=String(x.localDate||x.nowLocalDate||(parts&&parts.localDate)||''), localTime=String(x.localTime||x.nowLocalTime||(parts&&parts.localTime)||'');
+  if(!reminderEngineValidDate(localDate)||instantMs===null) return reminderSaygiFailure('invalid-saygi-clock');
+  if(!reminderSaygiDaysAllowed(preference,localDate)) return reminderSaygiFailure('outside-selected-days');
+  var window=reminderSaygiWindow(preference,definition,frequency); if(!window) return reminderSaygiFailure('reading-window-not-selected');
+  var articleState=reminderSaygiArticleState(person,Object.assign({},x,{localDate:localDate}));
+  if(articleState.status!=='ready') return reminderSaygiFailure('article-unavailable',{articleStatus:articleState.status,stale:articleState.status==='error'});
+  if(reminderSaygiReadState(person,Object.assign({},x,{localDate:localDate}))) return reminderSaygiFailure('already-read',{articleStatus:'ready'});
+  var engineDefinition={id:REMINDER_SAYGI_ID,category:'ritual',priority:'P3',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_SAYGI_ID,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'saygi-reading-v1'});
+  if(!generated.ok||!generated.occurrence) return generated;
+  var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-saygi-v1:'+encodeURIComponent(localDate),category:'ritual',deepLink:'saygi',openDetail:true,personId:person.id,articleStatus:'ready',readAction:'markSaygiRead',frequency:frequency,userSelected:true,forced:false,readRequired:true,scheduledWindow:{start:window.start,end:window.end},due:reminderSaygiWindowDue(window,localTime),past:false,replay:false,nativeReplay:false,shouldReplay:false});
+  return Object.assign({},generated,occurrence,{occurrence:occurrence,personId:person.id,frequency:frequency,articleStatus:'ready'});
+}
+function reminderSaygiPrivateCopy(input,definition){
+  var d=definition&&typeof definition==='object'?definition:reminderSaygiDefinition(input);
+  if(String(d.id||'')!==REMINDER_SAYGI_ID&&String(d.deepLink||'')!=='saygi') return null;
+  return {title:'Bugünün ilham durağı hazır',detail:'Birkaç dakikan varsa bugünkü okumayı açabilirsin.',deepLink:'saygi',openDetail:true};
+}
+function reminderSaygiPolicyPreference(preference){
+  var p=preference&&typeof preference==='object'?preference:{}, out={reminderId:REMINDER_SAYGI_ID,enabled:p.enabled===true};
+  ['channel','nativeOptIn','quietHoursBehavior','quietHoursException','explicitlySelected','userScheduled','userCreated'].forEach(function(key){ if(Object.prototype.hasOwnProperty.call(p,key)) out[key]=p[key]; });
+  return out;
+}
+function reminderSaygiLifecycleCandidates(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderSaygiDefinition(x);
+  if(preference.enabled!==true) return [];
+  var result=reminderSaygiOccurrence(Object.assign({},x,{preference:preference,definition:definition,reminderId:REMINDER_SAYGI_ID}));
+  if(!result.ok||!result.occurrence) return [];
+  return [{occurrence:result.occurrence,definition:definition,preference:reminderSaygiPolicyPreference(preference),due:result.occurrence.due,userSelected:true}];
+}
+
 // ── REM-09 Device delivery journal ────────────────────────────────────────
 // Bu kayıt `data` nesnesinden, ÆON `data.notifications` kanalından ve sync/panel
 // zincirinden bilinçli olarak ayrıdır. Yalnız occurrence kimliği, kanal, durum,
@@ -2667,6 +2766,11 @@ function reminderLifecycleBuildCandidates(input,context,root){
     }
     if(String(definition.id)===REMINDER_THERAPY_ID){
       reminderTherapyLifecycleCandidates({preference:preference,definition:definition,timezone:timezone,nowIso:context.nowIso,localDate:baseDate,localTime:baseTime,context:context}).forEach(function(candidate){ out.push(candidate); });
+      return;
+    }
+    if(String(definition.id)===REMINDER_SAYGI_ID){
+      var saygiDay=data&&data.days&&data.days[baseDate]&&typeof data.days[baseDate]==='object'?data.days[baseDate]:null;
+      reminderSaygiLifecycleCandidates({preference:preference,definition:definition,timezone:timezone,nowIso:context.nowIso,localDate:baseDate,localTime:baseTime,day:saygiDay,article:x.saygiArticle,articleStatus:x.saygiArticleStatus,context:context}).forEach(function(candidate){ out.push(candidate); });
       return;
     }
     var datesForPreference=[baseDate];
@@ -3238,7 +3342,7 @@ function saygiPersonForDate(date){ var people=saygiPeople(); if(!people.length) 
 function saygiCurrentPerson(){ return saygiPersonForDate(todayStr()); }
 function saygiPersonById(id){ var people=saygiPeople(); for(var i=0;i<people.length;i++){ if(people[i].id===id) return people[i]; } return null; }
 function saygiModalPerson(){ return (ui.saygiPersonOpen&&ui.saygiBrowseId?saygiPersonById(ui.saygiBrowseId):null)||saygiCurrentPerson(); }
-function saygiDayKey(person){ return String(todayStr())+'|'+String(person&&person.id||''); }
+function saygiDayKey(person,date){ return String(date||todayStr())+'|'+String(person&&person.id||''); }
 function saygiCacheKey(lang,canonical,revision){ return SAYGI_CACHE_PREFIX+String(lang||'tr')+':'+encodeURIComponent(String(canonical||''))+':'+String(revision||'current'); }
 function saygiReadCache(key){
   if(saygiMemoryCache[key]) return saygiMemoryCache[key];
@@ -3324,23 +3428,33 @@ function saygiArticleFrom(person,summary,full,links){
   var license=(full&&full.license)||{}, licenseUrl=saygiSafeUrl(license.url)||'https://creativecommons.org/licenses/by-sa/4.0/deed.tr';
   return {personId:person.id,dailyKey:saygiDayKey(person),lang:lang,title:String(summary.title||person.name),canonical:String(canonical),description:saygiPlainText(summary.description||person.field||''),lead:saygiPlainText(summary.extract||''),blocks:blocks,thumbnail:thumbnail,sourceUrl:source,licenseTitle:String(license.title||'Creative Commons Attribution-Share Alike 4.0'),licenseUrl:licenseUrl,revision:(full&&full.latest&&full.latest.id)||summary.revision||null,links:links||[],fetchedAt:new Date().toISOString()};
 }
+function saygiArticleReadableFor(person,article,date){
+  if(!person||!article||typeof article!=='object'||article.personId!==person.id||article.dailyKey!==saygiDayKey(person,date||todayStr())) return false;
+  if(!Array.isArray(article.blocks)||!article.blocks.length) return false;
+  return article.blocks.some(function(block){ return block&&typeof block.text==='string'&&block.text.trim().length>=24; });
+}
+function saygiRequestIsCurrent(person,dailyKey,requestId){
+  if(requestId!==ui.saygiRequestId||dailyKey!==saygiDayKey(person)) return false;
+  return !ui.saygiPersonOpen||String(ui.saygiBrowseId||'')===String(person.id);
+}
 function saygiLoadArticle(person,force){
   if(!person) return;
   var dailyKey=saygiDayKey(person), requestId=(ui.saygiRequestId||0)+1;
-  ui.saygiRequestId=requestId; ui.saygiLoading=true; ui.saygiError=null;
+  ui.saygiRequestId=requestId; ui.saygiLoading=true; ui.saygiError=null; ui.saygiReadReady=false;
+  if(force||!ui.saygiArticle||ui.saygiArticle.personId!==person.id) ui.saygiArticle=null;
   saygiLoadSummary(person).then(function(summary){
     var canonical=(summary.titles&&summary.titles.canonical)||summary.title||person.name, lang=summary._saygiLang||'tr', cacheKey=saygiCacheKey(lang,canonical,summary.revision||'current');
     var cached=!force?saygiReadCache(cacheKey):null;
-    if(cached) return cached;
+    if(cached&&saygiArticleReadableFor(person,cached)) return cached;
     return saygiFetchJSON(saygiHtmlUrl(lang,canonical),20000).catch(function(){ return null; }).then(function(full){
-      return saygiExternalLinks(lang,canonical).then(function(links){ var article=saygiArticleFrom(person,summary,full,links); saygiWriteCache(cacheKey,article); return article; });
+      return saygiExternalLinks(lang,canonical).then(function(links){ var article=saygiArticleFrom(person,summary,full,links); if(!saygiArticleReadableFor(person,article)) throw new Error('Wikipedia maddesi okunabilir içerik taşımıyor'); saygiWriteCache(cacheKey,article); return article; });
     });
   }).then(function(article){
-    if(requestId!==ui.saygiRequestId||dailyKey!==saygiDayKey(person)) return;
+    if(!saygiRequestIsCurrent(person,dailyKey,requestId)) return;
     ui.saygiArticle=article; ui.saygiLoading=false; ui.saygiError=null;
     if(ui.tab==='saygi') render();
   }).catch(function(err){
-    if(requestId!==ui.saygiRequestId) return;
+    if(!saygiRequestIsCurrent(person,dailyKey,requestId)) return;
     ui.saygiLoading=false; ui.saygiError='Biyografi şu an yüklenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.';
     if(ui.tab==='saygi') render();
   });
@@ -5067,7 +5181,7 @@ function reminderDeepLinkTarget(input){
   if(deepLink&&deepLink!==String(definition.deepLink)) return {ok:false,reason:'target-mismatch',reminderId:reminderId,deepLink:'',targetId:'',kind:''};
   var therapyToolId=reminderTherapyToolId(Object.assign({},occurrence,x));
   var target=REMINDER_DEEP_LINK_TARGETS[String(definition.deepLink)];
-  return {ok:true,reason:null,reminderId:reminderId,deepLink:String(definition.deepLink),targetId:target.targetId,kind:target.kind,therapyToolId:reminderId===REMINDER_THERAPY_ID?therapyToolId:''};
+  return {ok:true,reason:null,reminderId:reminderId,deepLink:String(definition.deepLink),targetId:target.targetId,kind:target.kind,therapyToolId:reminderId===REMINDER_THERAPY_ID?therapyToolId:'',openDetail:String(definition.deepLink)==='saygi'?(x.openDetail!==false&&occurrence.openDetail!==false):false};
 }
 function reminderActionOccurrence(occurrenceId,reminderId,options){
   var x=options&&typeof options==='object'?options:{}, definition=reminderActionDefinition(reminderId), nowIso=reminderDeliveryNow(x.nowIso||x.now), context=reminderLifecycleDefaultContext({timezone:x.timezone,context:{nowIso:nowIso}},nowIso), localDate=String(x.localDate||context.localDate||''), localTime=String(x.localTime||context.localTime||'12:00').slice(0,5);
@@ -5181,6 +5295,10 @@ App.reminderTherapyOccurrence=reminderTherapyOccurrence;
 App.reminderTherapyLifecycleCandidates=reminderTherapyLifecycleCandidates;
 App.reminderTherapyPrivateCopy=reminderTherapyPrivateCopy;
 App.reminderTherapyToolId=reminderTherapyToolId;
+App.reminderSaygiOccurrence=reminderSaygiOccurrence;
+App.reminderSaygiLifecycleCandidates=reminderSaygiLifecycleCandidates;
+App.reminderSaygiPrivateCopy=reminderSaygiPrivateCopy;
+App.reminderSaygiArticleState=reminderSaygiArticleState;
 // REM-09: device-local delivery journal. These adapters never touch data,
 // data.notifications or the ÆON shownNotificationIds list.
 App.reminderDeliveryKey=REMINDER_DELIVERY_KEY;
@@ -5434,7 +5552,7 @@ App.openSaygiPreview=function(){
   ui.saygiBrowseId=person.id;
   ui.saygiPersonOpen=true;
   if(ui.saygiKey!==key||!ui.saygiArticle||ui.saygiArticle.personId!==person.id){
-    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; App.refreshSaygi();
+    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; ui.saygiReadReady=false; App.refreshSaygi();
   }
   else { render(); }
 };
@@ -5450,10 +5568,10 @@ App.browseSaygiPerson=function(delta){
   var idx=people.findIndex(function(x){ return x.id===person.id; }); if(idx<0) idx=0;
   App.openSaygiCollectionPerson(people[saygiPositiveMod(idx+(Number(delta)||0),people.length)].id);
 };
-App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; ui.saygiBrowseId=null; if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } render(); };
+App.closeSaygiPerson=function(){ ui.saygiPersonOpen=false; ui.saygiBrowseId=null; ui.saygiRequestId=(ui.saygiRequestId||0)+1; ui.saygiReadReady=false; if(saygiReadObserver){ try{ saygiReadObserver.disconnect(); }catch(e){} saygiReadObserver=null; } render(); };
 App.markSaygiRead=function(){
   var person=saygiModalPerson(), article=ui.saygiArticle;
-  if(!person||!article||article.dailyKey!==saygiDayKey(person)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
+  if(!person||!saygiArticleReadableFor(person,article)){ toast('Biyografi hazır olduğunda tekrar dene.'); return; }
   if(!ui.saygiReadReady&&!saygiHasRead(person)){ toast('Önce yazının sonuna kadar inelim; “Okudum” orada açılacak.'); return; }
   var day=getDay(data,todayStr(),dayIndexFor(todayStr()));
   if(!day.reading||typeof day.reading!=='object') day.reading=emptyReading();

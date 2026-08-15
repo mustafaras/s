@@ -2,7 +2,7 @@
 
 **Tarih:** 2026-08-15<br>
 **Durum:** tamamlandı<br>
-**Commit:** `7c095377111d87db14568c6fc3e34cc49bf05227`
+**Commit:** `e5a162fa081d41a577828a3f1a13a9c80e415c64`
 
 ## Uygulanan sözleşme
 
@@ -12,8 +12,9 @@
 - Journey dönüşü ayrıca `journeyEnabled: true` seçimini ister. Frekans yalnız
   `weekly` veya açıkça seçilen `selected-window` olabilir; son oturumdan en az
   yedi gün geçmeden ve seçilen gün/pencere dışında yeni aday üretilmez.
-  Historical catch-up bu adapterda devre dışıdır; aynı dönüş deterministik
-  occurrence ID ile tekrar oynatılmaz.
+  Historical catch-up bu adapterda devre dışıdır; aynı cadence bucket içindeki
+  dönüş deterministik occurrence ID ile tekrar oynatılmaz ve delivery-log
+  retention sonrasında bile günlük replay oluşmaz.
 - Session sonrası tefekkür `reflectionAfterSession: true` ile optional’dır.
   Reflection yalnız in-app kanala zorlanır; native body, delivery journal ve
   occurrence içine private reflection metni alınmaz.
@@ -28,7 +29,7 @@
 
 | Kapı | Kanıt |
 |---|---|
-| Zikir adapter | `node tests/reminders/test_reminder_zikr.js` — PASS, 5 case / 32 assertion |
+| Zikir adapter | `node tests/reminders/test_reminder_zikr.js` — PASS, 5 case / 35 assertion; aynı hafta idempotence ve sonraki hafta yeni bucket doğrulandı |
 | Privacy boundary | `node tests/reminders/test_reminder_privacy.js` — PASS, 3 case / 30 assertion |
 | Hidden / visible flag ve overlay | `node .claude/skills/run-seyma/zikr-harness.mjs` — PASS, 90/90 |
 | Journey / timezone regression | `node tests/reminders/test_reminder_timezones.js` — PASS, 6 case / 28 assertion |

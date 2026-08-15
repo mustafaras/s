@@ -2131,6 +2131,117 @@ function reminderZikrLifecycleCandidates(input){
   return out;
 }
 
+// ── REM-16 Terapi Odası support adapter ─────────────────────────────────
+// This boundary is deliberately preference-only: therapy-day records, CBT
+// notes, feelings, safe-share text and crisis text never participate in
+// occurrence generation, native copy or the delivery journal.
+var REMINDER_THERAPY_ID='reminder.catalog.v1.therapy';
+var REMINDER_THERAPY_TOOL_IDS={firstStep:true,selfCompassion:true,breath:true,thought:true};
+var REMINDER_THERAPY_TOOL_ALIASES={
+  'first-step':'firstStep','first_step':'firstStep','firststep':'firstStep',
+  'self-compassion':'selfCompassion','self_compassion':'selfCompassion','selfcare':'selfCompassion',
+  breathing:'breath','breathwork':'breath',
+  cbt:'thought','thought-record':'thought','thought_record':'thought','cognitive':'thought'
+};
+var REMINDER_THERAPY_FREQUENCIES={daily:true,weekly:true,'selected-window':true};
+function reminderTherapyFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-therapy-preference'),stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderTherapyDefinition(input){
+  var x=input&&typeof input==='object'?input:{}, fallback={id:REMINDER_THERAPY_ID,category:'support',priority:'P2',triggerType:'scheduled-window',deepLink:'room',definitionVersion:'1',defaultWindow:{kind:'time-range',timezone:'user',start:'10:00',end:'21:00'}};
+  if(x.definition&&typeof x.definition==='object') return x.definition;
+  if(typeof ReminderCatalogV1!=='undefined'&&ReminderCatalogV1.get){ var def=ReminderCatalogV1.get(REMINDER_THERAPY_ID); if(def) return def; }
+  return fallback;
+}
+function reminderTherapyToolFromValue(value){
+  var raw=String(value||'').trim(), key=raw.toLowerCase();
+  if(REMINDER_THERAPY_TOOL_IDS[raw]) return raw;
+  return REMINDER_THERAPY_TOOL_ALIASES[key]||'';
+}
+function reminderTherapyToolId(input){
+  var x=input&&typeof input==='object'?input:{};
+  return reminderTherapyToolFromValue(x.therapyToolId||x.toolId||x.practiceId||x.selectedPractice||x.selectedTool||x.practice||'');
+}
+function reminderTherapySelectedTool(preference){
+  var p=preference&&typeof preference==='object'&&!Array.isArray(preference)?preference:{};
+  return p.enabled===true?reminderTherapyToolId(p):'';
+}
+function reminderTherapyPreferenceSelected(preference){ return !!reminderTherapySelectedTool(preference); }
+function reminderTherapyLocalContext(input,timezone){
+  var x=input&&typeof input==='object'?input:{}, nowValue=x.nowIso||x.instantIso||x.now||'', instantMs=reminderEngineInstantMs({instantIso:nowValue}), parts=instantMs===null?null:reminderEngineLocalParts(instantMs,timezone), localDate=String(x.localDate||x.nowLocalDate||(parts&&parts.localDate)||''), localTime=String(x.localTime||x.nowLocalTime||(parts&&parts.localTime)||'');
+  return {nowIso:String(nowValue||''),instantMs:instantMs,localDate:localDate,localTime:localTime};
+}
+function reminderTherapyWeekday(localDate){
+  if(!reminderEngineValidDate(localDate)) return -1;
+  var p=localDate.split('-').map(Number); return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();
+}
+function reminderTherapyFrequency(preference){
+  var p=preference&&typeof preference==='object'?preference:{}, frequency=String(p.frequency||p.therapyFrequency||'weekly');
+  return REMINDER_THERAPY_FREQUENCIES[frequency]?frequency:'';
+}
+function reminderTherapyWindow(preference,definition,frequency){
+  var p=preference&&typeof preference==='object'?preference:{}, d=definition&&typeof definition==='object'?definition:{}, explicit=p.therapyWindow||p.timeWindow, raw=explicit||d.defaultWindow;
+  if(frequency==='selected-window'&&!explicit) return null;
+  if(!raw||typeof raw!=='object'||!validReminderTime(raw.start)||!validReminderTime(raw.end)) return null;
+  return {start:String(raw.start),end:String(raw.end),explicit:!!explicit};
+}
+function reminderTherapyDaysAllowed(preference,frequency,localDate){
+  var p=preference&&typeof preference==='object'?preference:{}, raw=Array.isArray(p.daysOfWeek)?p.daysOfWeek:null, day=reminderTherapyWeekday(localDate);
+  if(day<0) return false;
+  if(raw){ if(!raw.length) return frequency==='daily'; return raw.some(function(value){ return Number.isInteger(value)&&value>=0&&value<=6&&value===day; }); }
+  if(frequency==='selected-window') return false;
+  if(frequency==='weekly'){
+    var anchor=Number.isInteger(p.weeklyDay)?p.weeklyDay:(Number.isInteger(p.dayOfWeek)?p.dayOfWeek:1);
+    return anchor>=0&&anchor<=6&&anchor===day;
+  }
+  return true;
+}
+function reminderTherapyWindowDue(window,localTime){
+  if(!window) return false;
+  var now=reminderPolicyTimeMinutes(localTime), start=reminderPolicyTimeMinutes(window.start), end=reminderPolicyTimeMinutes(window.end);
+  if(now===null||start===null||end===null||start===end) return false;
+  return start<end?now>=start&&now<=end:now>=start||now<=end;
+}
+function reminderTherapyOccurrenceId(toolId,frequency,localDate,scheduledAt,timezone){
+  return 'reminder-therapy-v1:'+[toolId,frequency,localDate,scheduledAt,timezone].map(function(value){ return encodeURIComponent(String(value||'')); }).join('|');
+}
+function reminderTherapyOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderTherapyDefinition(x), toolId=reminderTherapySelectedTool(preference), frequency=reminderTherapyFrequency(preference);
+  if(String(x.reminderId||definition.id||REMINDER_THERAPY_ID)!==REMINDER_THERAPY_ID) return reminderTherapyFailure('invalid-reminder-id');
+  if(preference.enabled!==true) return reminderTherapyFailure('preference-disabled');
+  if(!toolId) return reminderTherapyFailure('preference-not-selected');
+  if(!frequency) return reminderTherapyFailure('invalid-therapy-frequency');
+  if(frequency==='daily'&&preference.dailyEnabled===false) return reminderTherapyFailure('daily-disabled');
+  var timezone=String(x.timezone||preference.timezone||'Europe/Istanbul'), context=reminderTherapyLocalContext(x,timezone);
+  if(!reminderEngineValidDate(context.localDate)||context.instantMs===null) return reminderTherapyFailure('invalid-therapy-clock');
+  if(!reminderTherapyDaysAllowed(preference,frequency,context.localDate)) return reminderTherapyFailure('outside-selected-days');
+  var window=reminderTherapyWindow(preference,definition,frequency); if(!window) return reminderTherapyFailure(frequency==='selected-window'?'therapy-window-not-selected':'invalid-therapy-window');
+  var capacity=String(x.capacityMode||x.todayMode||(x.context&&x.context.capacityMode)||'balanced');
+  if(capacity==='silent') return reminderTherapyFailure('capacity-silent',{suppressed:true});
+  // A light day can never turn a daily choice into more delivery. Let the
+  // shared policy suppress the remaining low-priority weekly candidate.
+  if(capacity==='light'&&frequency==='daily') return reminderTherapyFailure('capacity-light-reduced',{suppressed:true,reduced:true});
+  var engineDefinition={id:REMINDER_THERAPY_ID,category:'support',priority:'P2',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_THERAPY_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:timezone,instantIso:context.nowIso,sourceRevision:'therapy-reminder-v1'});
+  if(!generated.ok||!generated.occurrence) return generated;
+  var occurrence=Object.assign({},generated.occurrence,{occurrenceId:reminderTherapyOccurrenceId(toolId,frequency,context.localDate,window.start,timezone),category:'support',deepLink:'room',therapyToolId:toolId,toolId:toolId,toolTarget:'room:'+toolId,frequency:frequency,userSelected:true,forced:false,requiresForm:false,requiresResult:false,scheduledWindow:{start:window.start,end:window.end},due:reminderTherapyWindowDue(window,context.localTime),past:false,replay:false,nativeReplay:false,shouldReplay:false});
+  return Object.assign({},generated,occurrence,{occurrence:occurrence,toolId:toolId,frequency:frequency});
+}
+function reminderTherapyPrivateCopy(input,definition){
+  var d=definition&&typeof definition==='object'?definition:reminderTherapyDefinition(input), x=input&&typeof input==='object'?input:{};
+  if(String(d.id||'')!==REMINDER_THERAPY_ID&&String(d.deepLink||'')!=='room') return null;
+  return {title:'Şeyma’da sana ayırabileceğin sakin bir alan var.',detail:'İstersen küçük bir durak açabilirsin.',deepLink:'room',therapyToolId:reminderTherapyToolId(x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x)};
+}
+function reminderTherapyPolicyPreference(preference){
+  var p=preference&&typeof preference==='object'?preference:{}, out={reminderId:REMINDER_THERAPY_ID,enabled:p.enabled===true};
+  ['channel','nativeOptIn','quietHoursBehavior','quietHoursException','explicitlySelected','userScheduled','userCreated'].forEach(function(key){ if(Object.prototype.hasOwnProperty.call(p,key)) out[key]=p[key]; });
+  return out;
+}
+function reminderTherapyLifecycleCandidates(input){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{}, definition=reminderTherapyDefinition(x);
+  if(!reminderTherapyPreferenceSelected(preference)) return [];
+  var result=reminderTherapyOccurrence(Object.assign({},x,{preference:preference,definition:definition,reminderId:REMINDER_THERAPY_ID}));
+  if(!result.ok||!result.occurrence) return [];
+  return [{occurrence:result.occurrence,definition:definition,preference:reminderTherapyPolicyPreference(preference),due:result.occurrence.due,userSelected:true}];
+}
+
 // ── REM-09 Device delivery journal ────────────────────────────────────────
 // Bu kayıt `data` nesnesinden, ÆON `data.notifications` kanalından ve sync/panel
 // zincirinden bilinçli olarak ayrıdır. Yalnız occurrence kimliği, kanal, durum,
@@ -2552,6 +2663,10 @@ function reminderLifecycleBuildCandidates(input,context,root){
     if(!reminderEngineValidDate(baseDate)) return;
     if(String(definition.id)===REMINDER_ZIKR_ID){
       reminderZikrLifecycleCandidates({preference:preference,definition:definition,timezone:timezone,nowIso:context.nowIso,localDate:baseDate,localTime:baseTime,zikrData:x.zikrData,featureEnabled:x.zikrFeatureEnabled,context:context}).forEach(function(candidate){ out.push(candidate); });
+      return;
+    }
+    if(String(definition.id)===REMINDER_THERAPY_ID){
+      reminderTherapyLifecycleCandidates({preference:preference,definition:definition,timezone:timezone,nowIso:context.nowIso,localDate:baseDate,localTime:baseTime,context:context}).forEach(function(candidate){ out.push(candidate); });
       return;
     }
     var datesForPreference=[baseDate];
@@ -4829,8 +4944,16 @@ function reminderInboxBuildItems(input){
     var category=String(candidate.category||occurrence.category||(definition&&definition.category)||'system'), meta=reminderCategoryMeta(category), priority=reminderPolicyPriority(candidate.priority||occurrence.priority||(definition&&definition.priority)||'P3'), precedence=reminderCatchupPrecedence(Object.assign({},candidate,{priority:priority}),definition,Object.assign({},occurrence,{priority:priority}));
     var catalogSnoozeOptions=definition&&Array.isArray(definition.snoozeOptions)?definition.snoozeOptions:[];
     var snoozeOptions=(Array.isArray(candidate.snoozeOptions)?candidate.snoozeOptions:catalogSnoozeOptions).filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,String(option)); });
-    var prayerCopy=reminderPrayerPrivateCopy(candidate,definition), title=prayerCopy?prayerCopy.title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'), detail=prayerCopy?prayerCopy.detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'), deepLink=prayerCopy?prayerCopy.deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||'');
-    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:title,detail:detail,deepLink:deepLink,snoozeOptions:snoozeOptions,suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
+    var prayerCopy=reminderPrayerPrivateCopy(candidate,definition), therapyCopy=reminderTherapyPrivateCopy({candidate:candidate,occurrence:occurrence},definition), safeCopy=therapyCopy||prayerCopy, title=safeCopy?safeCopy.title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'), detail=safeCopy?safeCopy.detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'), deepLink=safeCopy?safeCopy.deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||''), therapyToolId=therapyCopy?reminderTherapyToolId(occurrence):'';
+    // Inbox is an in-app surface; preserve the catalog's existing detail copy.
+    // Native/private delivery uses reminderTherapyPrivateCopy separately.
+    safeCopy=prayerCopy;
+    if(!safeCopy){
+      title=String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır');
+      detail=String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.');
+      deepLink=String(candidate.deepLink||(definition&&definition.deepLink)||'');
+    }
+    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:title,detail:detail,deepLink:deepLink,therapyToolId:therapyToolId,snoozeOptions:snoozeOptions,suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
   });
   items.sort(function(a,b){ return (a.suppressed?1:0)-(b.suppressed?1:0)||a.precedenceRank-b.precedenceRank||a.scheduledAt.localeCompare(b.scheduledAt)||a.occurrenceId.localeCompare(b.occurrenceId); });
   return {items:items,active:items.filter(function(item){ return !item.suppressed; }),suppressed:items.filter(function(item){ return item.suppressed; }),muted:typeof x.todayMuted==='boolean'?x.todayMuted:!!ui.reminderInboxTodayMuted,nowIso:parts.nowIso,timezone:parts.context.timezone,localDate:parts.localDate};
@@ -4939,11 +5062,12 @@ function reminderSnoozePlan(input){
   return {ok:true,reason:null,actionId:actionId,option:option,timezone:timezone,scheduledAt:target.instantIso,localDate:target.localDate,occurrence:occurrenceOut};
 }
 function reminderDeepLinkTarget(input){
-  var x=typeof input==='string'?{deepLink:input}:input&&typeof input==='object'?input:{}, reminderId=String(x.reminderId||''), definition=reminderActionDefinition(reminderId), deepLink=String(x.deepLink||'');
+  var x=typeof input==='string'?{deepLink:input}:input&&typeof input==='object'?input:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:{}, reminderId=String(x.reminderId||occurrence.reminderId||''), definition=reminderActionDefinition(reminderId), deepLink=String(x.deepLink||occurrence.deepLink||'');
   if(!definition||!REMINDER_DEEP_LINK_TARGETS[String(definition.deepLink||'')]) return {ok:false,reason:'unknown-reminder-target',reminderId:'',deepLink:'',targetId:'',kind:''};
   if(deepLink&&deepLink!==String(definition.deepLink)) return {ok:false,reason:'target-mismatch',reminderId:reminderId,deepLink:'',targetId:'',kind:''};
+  var therapyToolId=reminderTherapyToolId(Object.assign({},occurrence,x));
   var target=REMINDER_DEEP_LINK_TARGETS[String(definition.deepLink)];
-  return {ok:true,reason:null,reminderId:reminderId,deepLink:String(definition.deepLink),targetId:target.targetId,kind:target.kind};
+  return {ok:true,reason:null,reminderId:reminderId,deepLink:String(definition.deepLink),targetId:target.targetId,kind:target.kind,therapyToolId:reminderId===REMINDER_THERAPY_ID?therapyToolId:''};
 }
 function reminderActionOccurrence(occurrenceId,reminderId,options){
   var x=options&&typeof options==='object'?options:{}, definition=reminderActionDefinition(reminderId), nowIso=reminderDeliveryNow(x.nowIso||x.now), context=reminderLifecycleDefaultContext({timezone:x.timezone,context:{nowIso:nowIso}},nowIso), localDate=String(x.localDate||context.localDate||''), localTime=String(x.localTime||context.localTime||'12:00').slice(0,5);
@@ -4962,14 +5086,16 @@ function reminderActionDueCandidates(nowIso,context,root){
     var delivery=reminderDeliveryFind(reminderDeliveryLoad(nowIso,false),entry.occurrenceId);
     if(delivery&&REMINDER_INBOX_HIDDEN_STATUSES[delivery.status]&&!delivery.reason) return;
     var pref=root&&root.preferences?root.preferences[entry.reminderId]:null;
-    out.push({reminderId:entry.reminderId,occurrence:{reminderId:entry.reminderId,occurrenceId:entry.occurrenceId,localDate:local.localDate,scheduledAt:local.localTime,timezone:timezone,due:true,past:false,replay:false,nativeReplay:false,priority:definition.priority,definitionVersion:definition.definitionVersion},definition:definition,preference:pref||{enabled:true,channel:'in_app'},enabled:!(pref&&pref.enabled===false)});
+    var occurrence={reminderId:entry.reminderId,occurrenceId:entry.occurrenceId,localDate:local.localDate,scheduledAt:local.localTime,timezone:timezone,due:true,past:false,replay:false,nativeReplay:false,priority:definition.priority,definitionVersion:definition.definitionVersion};
+    if(entry.reminderId===REMINDER_THERAPY_ID){ var therapyToolId=reminderTherapySelectedTool(pref); if(therapyToolId){ occurrence.deepLink='room'; occurrence.therapyToolId=therapyToolId; occurrence.toolId=therapyToolId; occurrence.toolTarget='room:'+therapyToolId; } }
+    out.push({reminderId:entry.reminderId,occurrence:occurrence,definition:definition,preference:pref||{enabled:true,channel:'in_app'},enabled:!(pref&&pref.enabled===false)});
   });
   return out;
 }
 function reminderInboxItemHTML(item,index){
-  var occurrenceArg=reminderInboxActionArg(item.occurrenceId), reminderArg=reminderInboxActionArg(item.reminderId), options=Array.isArray(item.snoozeOptions)?item.snoozeOptions:[], h='<article class="sey-reminder-inbox-item" data-reminder-inbox-occurrence="'+esc(item.occurrenceId)+'" data-reminder-inbox-category="'+esc(item.category)+'" role="listitem">';
+  var occurrenceArg=reminderInboxActionArg(item.occurrenceId), reminderArg=reminderInboxActionArg(item.reminderId), therapyToolArg=reminderInboxActionArg(item.therapyToolId||''), options=Array.isArray(item.snoozeOptions)?item.snoozeOptions:[], h='<article class="sey-reminder-inbox-item" data-reminder-inbox-occurrence="'+esc(item.occurrenceId)+'" data-reminder-inbox-category="'+esc(item.category)+'" role="listitem">';
   h+='<div class="sey-reminder-inbox-item-top"><span class="sey-reminder-inbox-icon" aria-hidden="true">'+icon(item.categoryIcon,17)+'</span><div class="sey-reminder-inbox-copy"><span class="sey-reminder-inbox-category">'+esc(item.categoryLabel)+'</span><h3>'+esc(item.title)+'</h3><p>'+esc(item.detail)+'</p></div><span class="sey-reminder-inbox-priority">'+esc(item.priority)+'</span></div>';
-  h+='<div class="sey-reminder-inbox-item-actions"><button type="button" class="sey-reminder-inbox-primary" onclick="App.reminderInboxPrimary(decodeURIComponent(\''+occurrenceArg+'\'),decodeURIComponent(\''+reminderArg+'\'))">Bu durağı aç</button><details class="sey-reminder-inbox-overflow"><summary aria-label="'+esc(item.title)+' için diğer seçenekler">Diğer seçenekler</summary><div class="sey-reminder-inbox-menu">';
+  h+='<div class="sey-reminder-inbox-item-actions"><button type="button" class="sey-reminder-inbox-primary" onclick="App.reminderInboxPrimary(decodeURIComponent(\''+occurrenceArg+'\'),decodeURIComponent(\''+reminderArg+'\'),decodeURIComponent(\''+therapyToolArg+'\'))">Bu durağı aç</button><details class="sey-reminder-inbox-overflow"><summary aria-label="'+esc(item.title)+' için diğer seçenekler">Diğer seçenekler</summary><div class="sey-reminder-inbox-menu">';
   if(options.length){ options.forEach(function(option){ var optionArg=reminderInboxActionArg(option); h+='<button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'snooze\',decodeURIComponent(\''+reminderArg+'\'),decodeURIComponent(\''+optionArg+'\'))">Ertele · '+esc(reminderActionOptionLabel(option))+'</button>'; }); }
   else h+='<button type="button" disabled aria-disabled="true">Ertele</button>';
   h+='<button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'todayOff\',decodeURIComponent(\''+reminderArg+'\'))">Bugün sustur · bugün bir daha gösterme</button><button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'settings\',decodeURIComponent(\''+reminderArg+'\'))">Ayrıntıları aç</button><button type="button" class="is-danger" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'disable\',decodeURIComponent(\''+reminderArg+'\'))">Kapat · bu hatırlatmayı kapat</button></div></details></div>';
@@ -5051,6 +5177,10 @@ App.reminderZikrJourneyOccurrence=reminderZikrJourneyOccurrence;
 App.reminderZikrReflectionOccurrence=reminderZikrReflectionOccurrence;
 App.reminderZikrOccurrences=reminderZikrOccurrences;
 App.reminderZikrLifecycleCandidates=reminderZikrLifecycleCandidates;
+App.reminderTherapyOccurrence=reminderTherapyOccurrence;
+App.reminderTherapyLifecycleCandidates=reminderTherapyLifecycleCandidates;
+App.reminderTherapyPrivateCopy=reminderTherapyPrivateCopy;
+App.reminderTherapyToolId=reminderTherapyToolId;
 // REM-09: device-local delivery journal. These adapters never touch data,
 // data.notifications or the ÆON shownNotificationIds list.
 App.reminderDeliveryKey=REMINDER_DELIVERY_KEY;
@@ -5223,7 +5353,10 @@ App.openReminderTarget=function(input){
   var x=input&&typeof input==='object'?input:{}; reminderCloseForTarget();
   if(target.deepLink==='faith') App.openFaithCorner();
   else if(target.deepLink==='zikr') App.openZikr();
-  else if(target.deepLink==='room') App.openRoom();
+  else if(target.deepLink==='room'){
+    App.openRoom();
+    if(target.therapyToolId&&ui.roomOpen){ ui.roomTab='tools'; ui.roomTool=target.therapyToolId; App.updateRoom(); }
+  }
   else if(target.deepLink==='saygi'){ App.go('saygi'); if(x.openDetail===true&&typeof App.openSaygiPreview==='function') App.openSaygiPreview(); }
   else if(target.deepLink==='reading') App.openReading();
   else if(target.deepLink==='gunluk') App.openJournalModal();
@@ -5238,9 +5371,9 @@ App.handleReminderNativeClick=function(payload){
 };
 App.reminderNativeClick=App.handleReminderNativeClick;
 App.handleReminderClick=App.handleReminderNativeClick;
-App.reminderInboxPrimary=function(occurrenceId,reminderId){
-  var nowIso=new Date().toISOString(), id=String(occurrenceId||''), reminder=String(reminderId||'');
-  var target=reminderDeepLinkTarget({occurrenceId:id,reminderId:reminder});
+App.reminderInboxPrimary=function(occurrenceId,reminderId,therapyToolId){
+  var nowIso=new Date().toISOString(), id=String(occurrenceId||''), reminder=String(reminderId||''), toolId=reminderTherapyToolFromValue(therapyToolId);
+  var target=reminderDeepLinkTarget({occurrenceId:id,reminderId:reminder,therapyToolId:toolId});
   if(!target.ok) return target;
   if(id) App.reminderDeliveryOpen({occurrenceId:id,channel:'in_app',now:nowIso});
   return App.openReminderTarget(target);

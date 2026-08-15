@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-17",
+  "activePrompt": "REM-18",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-16",
-  "nextSafeAction": "REM-17 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-17",
+  "nextSafeAction": "REM-18 local implementation/verification; no release action",
   "currentPhase": "R4",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-16 therapy support adapter in app.js with explicit practice gating, low-frequency cadence, capacity suppression, generic native/private copy, safe lifecycle policy metadata and tool-aware room deep-links",
-    "tests": "Therapy 82 assertions; privacy 30; deeplinks 63; inbox 40; zikr harness 90/90; all 21 reminder fixtures; app driver; root and Panel-v2 regressions; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
-    "commit": "8b9daf2e6d71b13d3bde7e69a35c03cb35976442",
+    "source": "REM-17 Saygı reading adapter in app.js with explicit user-selected window, deterministic daily occurrence, article readiness/read gate, selected-person race guard, generic private copy and modal deep-link",
+    "tests": "Saygı 54 assertions; zikr harness 90/90; privacy 30; therapy 82; deeplinks 63; inbox 40; all 22 reminder fixtures; app driver; root and Panel-v2 regressions; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
+    "commit": "58d84906f2c85500816853d96402d9f6a259ac7d",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-16 closure; REM-17 ready; release remains not_approved",
+  "updatedBy": "Codex REM-17 closure; REM-18 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-16",
-    "evidence": "docs/reminders/evidence/REM-16.md",
-    "commit": "8b9daf2e6d71b13d3bde7e69a35c03cb35976442"
+    "prompt": "REM-17",
+    "evidence": "docs/reminders/evidence/REM-17.md",
+    "commit": "58d84906f2c85500816853d96402d9f6a259ac7d"
   }
 }

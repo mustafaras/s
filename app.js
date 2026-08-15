@@ -93,7 +93,7 @@ function emptyPrayerEntry(time){
 function emptyPrayerDay(){
   var p={};
   PRAYER_ORDER.forEach(function(k){ p[k]=emptyPrayerEntry(); });
-  p.fetchedAt=''; p.fetchedFor=''; p.fetchError='';
+  p.fetchedAt=''; p.fetchedFor=''; p.fetchedMethod=''; p.fetchError='';
   return p;
 }
 function ensurePrayerDay(day){
@@ -101,7 +101,7 @@ function ensurePrayerDay(day){
   if(!day.prayer||typeof day.prayer!=='object') day.prayer=emptyPrayerDay();
   var p=day.prayer;
   PRAYER_ORDER.forEach(function(k){ if(!p[k]||typeof p[k]!=='object') p[k]=emptyPrayerEntry(); var e=p[k]; if(typeof e.time!=='string') e.time=''; if(typeof e.performed!=='boolean') e.performed=false; if(typeof e.inCongregation!=='boolean') e.inCongregation=false; if(typeof e.late!=='boolean') e.late=false; if(typeof e.madeUp!=='boolean') e.madeUp=false; if(typeof e.nafile!=='number'||isNaN(e.nafile)) e.nafile=0; if(typeof e.note!=='string') e.note=''; if(typeof e.savedAt!=='string') e.savedAt=''; });
-  if(typeof p.fetchedAt!=='string') p.fetchedAt=''; if(typeof p.fetchedFor!=='string') p.fetchedFor=''; if(typeof p.fetchError!=='string') p.fetchError='';
+  if(typeof p.fetchedAt!=='string') p.fetchedAt=''; if(typeof p.fetchedFor!=='string') p.fetchedFor=''; if(typeof p.fetchedMethod!=='string') p.fetchedMethod=''; if(typeof p.fetchError!=='string') p.fetchError='';
   return p;
 }
 function prayerSettings(){ return (data&&data.settings&&data.settings.prayer)||{}; }
@@ -118,8 +118,8 @@ function prayerReadCache(date,locHash){
   try{ var raw=localStorage.getItem(prayerCacheKey(date,locHash)); if(raw){ var v=JSON.parse(raw); if(v&&typeof v==='object'&&v.times) return v; } }catch(e){}
   return null;
 }
-function prayerWriteCache(date,locHash,val){
-  try{ localStorage.setItem(prayerCacheKey(date,locHash), JSON.stringify({date:date,locHash:locHash,times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
+function prayerWriteCache(date,locHash,method,val){
+  try{ localStorage.setItem(prayerCacheKey(date,locHash), JSON.stringify({date:date,locHash:locHash,method:method||'',times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
 }
 function prayerTimesFromDay(p){
   var out={}; PRAYER_ORDER.forEach(function(k){ out[k]=(p[k]&&p[k].time)||''; }); return out;
@@ -143,22 +143,23 @@ function fetchPrayerTimes(date, force){
   var loc=prayerLocation();
   if(!loc||typeof loc!=='object'||isNaN(+loc.lat)||isNaN(+loc.lon)) return Promise.reject(new Error('Konum ayarlanmamış'));
   var locHash=prayerLocationHash();
+  var method=prayerMethod();
   if(!force){
     var cached=prayerReadCache(date,locHash);
-    if(cached&&cached.times&&cached.fetchedAt){ var ageH=(Date.now()-new Date(cached.fetchedAt).getTime())/3600000; if(ageH<48) return Promise.resolve(cached.times); }
+    if(cached&&cached.times&&cached.fetchedAt&&String(cached.method||'')===method){ var ageH=(Date.now()-new Date(cached.fetchedAt).getTime())/3600000; if(ageH<48) return Promise.resolve(cached.times); }
     var day=getDay(data,date,dayIndexFor(date)); var p=(day&&day.prayer)||{};
-    if(p.fetchedAt&&p.fetchedFor===locHash){ var age2=(Date.now()-new Date(p.fetchedAt).getTime())/3600000; if(age2<48) return Promise.resolve(prayerTimesFromDay(p)); }
+    if(p.fetchedAt&&p.fetchedFor===locHash&&String(p.fetchedMethod||'')===method){ var age2=(Date.now()-new Date(p.fetchedAt).getTime())/3600000; if(age2<48) return Promise.resolve(prayerTimesFromDay(p)); }
   }
   return fetchAladhanTimes(date, loc.lat, loc.lon, prayerMethod()).then(function(j){
     if(!j||!j.data||!j.data.timings) return Promise.reject(new Error('Vakit verisi boş'));
     var t=j.data.timings; var map={fajr:t.Fajr, sunrise:t.Sunrise, dhuhr:t.Dhuhr, asr:t.Asr, maghrib:t.Maghrib, isha:t.Isha};
-    prayerWriteCache(date,locHash,map); return map;
+    prayerWriteCache(date,locHash,method,map); return map;
   });
 }
 function applyPrayerTimesToDay(date,times){
   var day=getDay(data,date,dayIndexFor(date)); var p=ensurePrayerDay(day);
   PRAYER_ORDER.forEach(function(k){ p[k].time=String(times[k]||''); });
-  p.fetchedAt=new Date().toISOString(); p.fetchedFor=prayerLocationHash(); p.fetchError='';
+  p.fetchedAt=new Date().toISOString(); p.fetchedFor=prayerLocationHash(); p.fetchedMethod=prayerMethod(); p.fetchError='';
   day.savedAt=new Date().toISOString(); save();
 }
 function prayerDaySummary(p){
@@ -1844,6 +1845,7 @@ function reminderEngineSource(input,definition){
 function reminderEnginePrayerTime(input,definition,localDate,timezone){
   var source=reminderEngineSource(input,definition), result={source:source,stale:false};
   if(!source||source.stale===true||source.isStale===true){ result.stale=true; result.reason='stale-prayer-data'; return result; }
+  if(input.offline===true&&(source.fallback===true||source.offlineFallback===true)&&source.fresh!==true){ result.stale=true; result.reason='offline-prayer-data'; return result; }
   var times=source.times&&typeof source.times==='object'?source.times:(source.prayerTimes&&typeof source.prayerTimes==='object'?source.prayerTimes:source), key=String(input.prayerKey||input.prayerName||definition.prayerKey||definition.prayerName||'');
   if(!key||!times||typeof times[key]!=='string'){ result.reason='missing-prayer-time'; return result; }
   var parsed=reminderEngineParseTime(times[key]); if(!parsed){ result.reason='invalid-prayer-time'; return result; }
@@ -1892,6 +1894,91 @@ function reminderEngineGenerateOccurrence(input){
 // REM-08 source boundary: delivery persistence helpers begin after the pure
 // occurrence engine block used by the scheduler contract fixture.
 var data=null;
+
+// ── REM-14 Prayer / İman Köşesi adapter ──────────────────────────────────
+// Prayer occurrences are derived from an explicit, redacted timing snapshot.
+// The adapter never copies performed/missed state, notes or other prayer-entry
+// fields into an occurrence or native-safe copy.
+var REMINDER_PRAYER_ID='reminder.catalog.v1.prayer';
+var REMINDER_PRAYER_KEYS=PRAYER_ORDER.slice();
+function reminderPrayerFailure(reason,extra){ return Object.assign({ok:false,occurrence:null,reason:String(reason||'invalid-prayer-data'),stale:false,replay:false,nativeReplay:false},extra||{}); }
+function reminderPrayerSource(input){
+  var x=input&&typeof input==='object'?input:{}, raw=x.prayerData&&typeof x.prayerData==='object'?x.prayerData:(x.source&&typeof x.source==='object'?x.source:null);
+  if(!raw) return null;
+  var source=Object.assign({},raw), times=raw.times&&typeof raw.times==='object'?Object.assign({},raw.times):(raw.prayerTimes&&typeof raw.prayerTimes==='object'?Object.assign({},raw.prayerTimes):{});
+  REMINDER_PRAYER_KEYS.forEach(function(key){ if(typeof times[key]!=='string'&&raw[key]&&typeof raw[key]==='object'&&typeof raw[key].time==='string') times[key]=raw[key].time; });
+  source.times=times;
+  source.localDate=String(raw.localDate||raw.date||raw.fetchedForDate||x.localDate||'');
+  source.fetchedAt=String(raw.fetchedAt||raw.updatedAt||'');
+  source.fetchedFor=String(raw.fetchedFor||raw.locationHash||raw.locationFingerprint||'');
+  source.method=String(raw.method||raw.fetchedMethod||'');
+  source.revision=String(raw.revision||raw.sourceRevision||([source.fetchedAt,source.fetchedFor,source.method].join('|')));
+  return source;
+}
+function reminderPrayerSelectedKeys(input){
+  var x=input&&typeof input==='object'?input:{}, raw=[];
+  if(Array.isArray(x.prayerKeys)) raw=x.prayerKeys;
+  else if(Array.isArray(x.selectedPrayerKeys)) raw=x.selectedPrayerKeys;
+  else if(x.prayerKey||x.prayerName||x.selectedPrayer) raw=[x.prayerKey||x.prayerName||x.selectedPrayer];
+  if(!raw.length) raw=REMINDER_PRAYER_KEYS.slice();
+  var out=[],seen={};
+  raw.forEach(function(key){ key=String(key||''); if(REMINDER_PRAYER_KEYS.indexOf(key)>=0&&!seen[key]){ seen[key]=true; out.push(key); } });
+  return out;
+}
+function reminderPrayerOffsetInput(input,definition){
+  var x=input&&typeof input==='object'?input:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{};
+  if(Number.isInteger(x.offsetMinutes)) return {offsetMinutes:x.offsetMinutes};
+  if(Number.isInteger(x.beforeMinutes)) return {beforeMinutes:Math.abs(x.beforeMinutes)};
+  if(Number.isInteger(preference.offsetMinutes)) return {offsetMinutes:preference.offsetMinutes};
+  if(Number.isInteger(preference.beforeMinutes)) return {beforeMinutes:Math.abs(preference.beforeMinutes)};
+  if(definition&&Number.isInteger(definition.offsetMinutes)) return {offsetMinutes:definition.offsetMinutes};
+  return {offsetMinutes:0};
+}
+function reminderPrayerOccurrence(input){
+  var x=input&&typeof input==='object'?input:{}, definition=x.definition&&typeof x.definition==='object'?x.definition:(typeof ReminderCatalogV1!=='undefined'&&ReminderCatalogV1.get?ReminderCatalogV1.get(REMINDER_PRAYER_ID):{id:REMINDER_PRAYER_ID,triggerType:'prayer-offset',definitionVersion:'1',deepLink:'faith'}), key=String(x.prayerKey||x.prayerName||x.selectedPrayer||'');
+  if(REMINDER_PRAYER_KEYS.indexOf(key)<0) return reminderPrayerFailure('invalid-prayer-key');
+  var source=reminderPrayerSource(x);
+  if(!source) return reminderPrayerFailure('missing-prayer-data');
+  var expectedLocation=String(x.locationHash||x.prayerLocationHash||''), expectedMethod=String(x.prayerMethod||x.method||'');
+  if(x.requireLocation===true&&(!expectedLocation||!source.fetchedFor||source.fetchedFor!==expectedLocation)) return reminderPrayerFailure('prayer-location-changed',{stale:true});
+  if(expectedLocation&&source.fetchedFor!==expectedLocation) return reminderPrayerFailure('prayer-location-changed',{stale:true});
+  if(x.requireMethod===true&&(!expectedMethod||!source.method||source.method!==expectedMethod)) return reminderPrayerFailure('prayer-method-changed',{stale:true});
+  if(expectedMethod&&source.method!==expectedMethod) return reminderPrayerFailure('prayer-method-changed',{stale:true});
+  if(x.offline===true&&(source.fallback===true||source.offlineFallback===true)&&source.fresh!==true) return reminderPrayerFailure('offline-prayer-data',{stale:true});
+  var offset=reminderPrayerOffsetInput(x,definition), hijriOffset=Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0;
+  var generated=reminderEngineGenerateOccurrence(Object.assign({},x,offset,{definition:definition,reminderId:String(x.reminderId||definition.id||REMINDER_PRAYER_ID),prayerKey:key,prayerData:source,hijriOffset:hijriOffset}));
+  if(!generated.ok||!generated.occurrence) return generated;
+  var occurrence=Object.assign({},generated.occurrence,{deepLink:String(definition.deepLink||'faith'),prayerKey:key,prayerName:PRAYER_NAMES[key]||key,offsetMinutes:Number.isInteger(offset.offsetMinutes)?offset.offsetMinutes:-Math.abs(offset.beforeMinutes||0)});
+  return Object.assign({},generated,occurrence);
+}
+function reminderPrayerOccurrences(input){
+  var x=input&&typeof input==='object'?input:{}, keys=reminderPrayerSelectedKeys(x), out=[];
+  keys.forEach(function(key){ out.push(reminderPrayerOccurrence(Object.assign({},x,{prayerKey:key}))); });
+  return out;
+}
+function reminderPrayerSourceForDate(date){
+  var day=data&&data.days&&data.days[date], p=day&&day.prayer;
+  if(!p||typeof p!=='object') return null;
+  var times={}; REMINDER_PRAYER_KEYS.forEach(function(key){ if(p[key]&&typeof p[key].time==='string') times[key]=p[key].time; });
+  return {localDate:String(date||''),fetchedAt:String(p.fetchedAt||''),fetchedFor:String(p.fetchedFor||''),method:String(p.fetchedMethod||p.method||''),times:times,revision:String(p.fetchedRevision||p.fetchedAt||''),fallback:!!p.offlineFallback};
+}
+function reminderPrayerLifecycleKeys(preference,input){
+  var source=preference&&typeof preference==='object'?preference:{}, x=input&&typeof input==='object'?input:{};
+  if(Array.isArray(source.prayerKeys)) return reminderPrayerSelectedKeys({prayerKeys:source.prayerKeys});
+  if(source.prayerKey) return reminderPrayerSelectedKeys({prayerKey:source.prayerKey});
+  if(x.prayerKey) return reminderPrayerSelectedKeys({prayerKey:x.prayerKey});
+  return REMINDER_PRAYER_KEYS.slice();
+}
+function reminderPrayerLifecycleInput(preference,input,localDate,source){
+  var x=input&&typeof input==='object'?input:{}, s=prayerSettings(), loc=prayerLocation(), out={prayerData:source,localDate:localDate,prayerMethod:prayerMethod(),locationHash:prayerLocationHash(),requireMethod:true,requireLocation:true,offline:x.offline===true};
+  if(preference&&Number.isInteger(preference.offsetMinutes)) out.offsetMinutes=preference.offsetMinutes;
+  else if(preference&&Number.isInteger(preference.beforeMinutes)) out.beforeMinutes=preference.beforeMinutes;
+  else if(s&&Number.isFinite(Number(s.reminderOffsetMinutes))) out.beforeMinutes=Math.abs(Number(s.reminderOffsetMinutes));
+  if(x.hijriOffset!==undefined) out.hijriOffset=x.hijriOffset;
+  else out.hijriOffset=s&&Number.isInteger(s.hijriOffset)&&s.hijriOffset>=-2&&s.hijriOffset<=2?s.hijriOffset:0;
+  if(!loc) out.requireLocation=true;
+  return out;
+}
 
 // ── REM-09 Device delivery journal ────────────────────────────────────────
 // Bu kayıt `data` nesnesinden, ÆON `data.notifications` kanalından ve sync/panel
@@ -2315,6 +2402,17 @@ function reminderLifecycleBuildCandidates(input,context,root){
     var datesForPreference=[baseDate];
     if(x.catchUp===true){ var previousDate=reminderEngineAddDays(baseDate,-1); if(previousDate) datesForPreference.push(previousDate); }
     datesForPreference.forEach(function(localDate){
+      if(String(definition.id)===REMINDER_PRAYER_ID||String(definition.triggerType||'')==='prayer-offset'){
+        var prayerSource=x.prayerData&&typeof x.prayerData==='object'?x.prayerData:reminderPrayerSourceForDate(localDate), prayerInput=reminderPrayerLifecycleInput(preference,x,localDate,prayerSource);
+        reminderPrayerLifecycleKeys(preference,x).forEach(function(prayerKey){
+          var prayerGenerated=reminderPrayerOccurrence(Object.assign({},prayerInput,{definition:definition,reminderId:definition.id,prayerKey:prayerKey,timezone:timezone,instantIso:context.nowIso,nowLocalDate:baseDate,nowLocalTime:baseTime}));
+          if(!prayerGenerated.ok||!prayerGenerated.occurrence) return;
+          var prayerHistoricalDate=localDate!==baseDate;
+          prayerGenerated.occurrence.due=prayerGenerated.occurrence.due&&(prayerHistoricalDate||reminderLifecycleWindowDue(definition,baseTime));
+          out.push({occurrence:prayerGenerated.occurrence,definition:definition,preference:preference,due:prayerGenerated.occurrence.due});
+        });
+        return;
+      }
       var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:localDate,nowLocalDate:baseDate,nowLocalTime:baseTime,timezone:timezone,instantIso:context.nowIso,prayerData:x.prayerData,prayerKey:x.prayerKey,offsetMinutes:preference.offsetMinutes});
       if(!generated.ok||!generated.occurrence) return;
       var historicalDate=localDate!==baseDate;
@@ -4541,6 +4639,11 @@ function reminderInboxDefinitionMap(input){
   defs.forEach(function(def){ if(def&&def.id) map[String(def.id)]=def; });
   return map;
 }
+function reminderPrayerPrivateCopy(candidate,definition){
+  var def=definition&&typeof definition==='object'?definition:{};
+  if(String(def.id||'')!==REMINDER_PRAYER_ID&&String(def.deepLink||'')!=='faith') return null;
+  return {title:String(def.privateTitle||'Küçük bir durak yaklaşırken'),detail:String(def.privateBody||'İstersen Şeyma’da sakin bir an açabilirsin.'),deepLink:'faith'};
+}
 function reminderInboxBuildItems(input){
   var x=input&&typeof input==='object'?input:{}, parts=reminderInboxContext(x), supplied=Object.prototype.hasOwnProperty.call(x,'occurrences')||Object.prototype.hasOwnProperty.call(x,'candidates')||Object.prototype.hasOwnProperty.call(x,'occurrence'), source;
   if(supplied){ source=Array.isArray(x.occurrences)?x.occurrences:Array.isArray(x.candidates)?x.candidates:(x.occurrence&&typeof x.occurrence==='object'?[x.occurrence]:[]); }
@@ -4571,7 +4674,8 @@ function reminderInboxBuildItems(input){
     var category=String(candidate.category||occurrence.category||(definition&&definition.category)||'system'), meta=reminderCategoryMeta(category), priority=reminderPolicyPriority(candidate.priority||occurrence.priority||(definition&&definition.priority)||'P3'), precedence=reminderCatchupPrecedence(Object.assign({},candidate,{priority:priority}),definition,Object.assign({},occurrence,{priority:priority}));
     var catalogSnoozeOptions=definition&&Array.isArray(definition.snoozeOptions)?definition.snoozeOptions:[];
     var snoozeOptions=(Array.isArray(candidate.snoozeOptions)?candidate.snoozeOptions:catalogSnoozeOptions).filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,String(option)); });
-    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'),detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'),deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||''),snoozeOptions:snoozeOptions,suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
+    var prayerCopy=reminderPrayerPrivateCopy(candidate,definition), title=prayerCopy?prayerCopy.title:String(candidate.privateTitle||candidate.title||(definition&&definition.privateTitle)||'Sakin bir durak hazır'), detail=prayerCopy?prayerCopy.detail:String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.'), deepLink=prayerCopy?prayerCopy.deepLink:String(candidate.deepLink||(definition&&definition.deepLink)||'');
+    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:title,detail:detail,deepLink:deepLink,snoozeOptions:snoozeOptions,suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
   });
   items.sort(function(a,b){ return (a.suppressed?1:0)-(b.suppressed?1:0)||a.precedenceRank-b.precedenceRank||a.scheduledAt.localeCompare(b.scheduledAt)||a.occurrenceId.localeCompare(b.occurrenceId); });
   return {items:items,active:items.filter(function(item){ return !item.suppressed; }),suppressed:items.filter(function(item){ return item.suppressed; }),muted:typeof x.todayMuted==='boolean'?x.todayMuted:!!ui.reminderInboxTodayMuted,nowIso:parts.nowIso,timezone:parts.context.timezone,localDate:parts.localDate};
@@ -4780,6 +4884,11 @@ App.reminderSelectNativeCandidates=reminderPolicySelectNativeCandidates;
 App.reminderEngineLocalParts=reminderEngineLocalParts;
 App.reminderOccurrenceId=reminderEngineOccurrenceId;
 App.reminderGenerateOccurrence=reminderEngineGenerateOccurrence;
+App.reminderPrayerOccurrence=reminderPrayerOccurrence;
+App.reminderPrayerOccurrences=reminderPrayerOccurrences;
+App.generatePrayerReminderOccurrence=reminderPrayerOccurrence;
+App.generatePrayerReminderOccurrences=reminderPrayerOccurrences;
+App.reminderPrayerPrivateCopy=reminderPrayerPrivateCopy;
 // REM-09: device-local delivery journal. These adapters never touch data,
 // data.notifications or the ÆON shownNotificationIds list.
 App.reminderDeliveryKey=REMINDER_DELIVERY_KEY;

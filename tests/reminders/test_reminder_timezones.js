@@ -79,6 +79,17 @@ runTests([
     const badDate = App.reminderGenerateOccurrence({ definition: { id: "r-invalid-date", triggerType: "fixed-time", time: "09:00" }, localDate: "2026-02-30", timezone: "Europe/Istanbul" });
     assertEqual(badZone.ok, false); assertEqual(badZone.occurrence, null); assertEqual(badDate.ok, false); assertEqual(badDate.occurrence, null);
   }],
+  ["prayer offset crosses the local midnight without changing timezone identity", () => {
+    const App = boot();
+    const result = App.reminderPrayerOccurrence({
+      prayerKey: "isha", offsetMinutes: 10, localDate: "2026-08-14", timezone: "Europe/Istanbul",
+      instantIso: "2026-08-14T12:00:00.000Z", prayerData: {
+        localDate: "2026-08-14", fetchedAt: "2026-08-14T10:00:00.000Z", fetchedFor: "41.0082,28.9784,İstanbul", method: "diyanet",
+        times: { isha: "23:55" }, revision: "prayer-midnight"
+      }, hijriOffset: -2
+    });
+    assert(result.ok); assertEqual(result.localDate, "2026-08-15"); assertEqual(result.scheduledAt, "00:05"); assertEqual(result.timezone, "Europe/Istanbul"); assertEqual(result.hijriOffset, -2);
+  }],
   ["Hicri offset is bounded metadata and does not alter deterministic occurrence identity", () => {
     const App = boot();
     const base = fixed(App, "2026-08-13T09:00:00.000Z", "Europe/Istanbul", "2026-08-13");

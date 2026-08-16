@@ -481,3 +481,29 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Sonraki adım:** REM-31 günlük akışları bu düşük yoğunluk ve çıkış sinyali
   sözleşmesini koruyarak ele alır; REM-40 traceability reconciliation’da
   ölçüm contract’ını yeniden kontrol eder.
+
+### REM-ADR-020 — Opt-in kişiselleştirme yalnız explicit ve öneri-tabanlıdır
+
+- **Tarih:** 2026-08-16
+- **Durum:** accepted
+- **Soru:** Reminder uyarlaması hangi sinyalleri kullanabilir ve ayarları ne
+  zaman değiştirebilir?
+- **Kanıt:** UX planı §2.2, §4.2, §11.1–§11.4, §13.3, §18; REM-ADR-010–012,
+  REM-ADR-019; `app.js` REM-34 personalization boundary;
+  `tests/reminders/test_reminder_personalization.js`,
+  `test_reminder_privacy.js` ve `test_reminder_policy.js`.
+- **Karar:** Uyarlama varsayılan olarak kapalıdır. Kullanıcı açıkça opt-in
+  edip yerel geçmişi açmadıkça kategori, saat, erteleme veya feedback sinyali
+  tutulmaz. Tutulan kayıtlar yalnız allowlist edilmiş kaynak/value alanlarını
+  taşır; mood, terapi, ibadet, sağlık, günlük metni ve sessizlik çıkarım
+  kaynağı olamaz. Motor yalnız daha düşük yoğunluklu veya uygulama içi kanal
+  önerir; hiçbir öneriyi kendiliğinden uygulamaz. Uygulama, neden + kaynak +
+  geri alma yolunu gösterir; reset/opt-out/no-history geçmişi temizler.
+- **Guardrail etkisi:** Öneri üretimi pure ve deterministiktir; native cap,
+  quiet hours, low-capacity ve günlük bütçe policy katmanına devredilir.
+  Uygulama yalnız `native -> in_app` veya mevcut modu `light` yapabilir;
+  mevcut kullanıcı değişikliği üzerine yazmaz ve undo sırasında değer değişmişse
+  fail-closed döner. Sinyaller `data.reminders` local-only sınırında kalır;
+  sync, panel, native copy ve external telemetry yüzeylerine çıkmaz.
+- **Sonraki adım:** REM-35 haftalık sakin özet bu opt-in, score-free ve
+  local-only sözleşmeyi değiştirmeden ele alır.

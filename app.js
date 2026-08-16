@@ -1537,11 +1537,19 @@ var REMINDER_NATIVE_ACTIONS={
   snooze:{title:'10 dk ertele'},
   todayOff:{title:'Bugün sustur'}
 };
+var REMINDER_PERSONALIZATION_SCHEMA_VERSION=1;
+var REMINDER_PERSONALIZATION_HISTORY_MODES={none:true,local:true};
+var REMINDER_PERSONALIZATION_SIGNAL_TYPES={category:true,time:true,snooze:true,feedback:true};
+var REMINDER_PERSONALIZATION_FEEDBACK={more_quiet:true,time_wrong:true,channel_wrong:true,keep:true};
+var REMINDER_PERSONALIZATION_MAX_SIGNALS=60;
+var REMINDER_PERSONALIZATION_MAX_DISMISSED=24;
+var REMINDER_PERSONALIZATION_MAX_APPLIED=24;
 var reminderPermissionTransientState=null;
 var reminderPermissionRequestInFlight=null;
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
 function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,dailyFlowBudget:REMINDER_POLICY_DEFAULTS.dailyFlowBudget,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
-function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[]}; }
+function emptyReminderPersonalization(){ return {schemaVersion:REMINDER_PERSONALIZATION_SCHEMA_VERSION,optIn:false,historyMode:'none',autoApply:false,signals:[],dismissed:[],applied:[],updatedAt:''}; }
+function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[],personalization:emptyReminderPersonalization()}; }
 function reminderMedicationText(value,max){ return String(value==null?'':value).replace(/\u0000/g,'').replace(/\r\n?/g,'\n').trim().slice(0,max); }
 function reminderMedicationId(value){ var id=String(value||''); return /^reminder\.medication\.v1\.[A-Za-z0-9._%-]{1,160}$/.test(id)?id:''; }
 function reminderMedicationNewId(nowIso){
@@ -2039,12 +2047,113 @@ function migrateReminderState(d){
   var medicationSource=Array.isArray(root.medications)?root.medications:(Array.isArray(root.medicationSchedules)?root.medicationSchedules:[]);
   root.medications=normalizeReminderMedications(medicationSource);
   if(Object.prototype.hasOwnProperty.call(root,'medicationSchedules')) delete root.medicationSchedules;
+  root.personalization=normalizeReminderPersonalization(root.personalization);
 }
 // ── REM-08 Pure occurrence / timezone engine ──
 // Oluşum üretimi yalnız explicit input kullanır. Burada uygulama saati,
 // network, DOM, localStorage veya native queue okunmaz; geçmiş oluşumlar da
 // hiçbir koşulda replay kuyruğuna dönüştürülmez.
+// ── REM-34 Opt-in personalization boundary ──────────────────────────────
+// This contract is local to data.reminders. Only explicit, low-sensitivity
+// choices are accepted; suggestions never read private journal domains.
+function reminderPersonalizationSafeToken(value,max){ var text=String(value==null?'':value); return text&&text.length<=(max||220)&&/^[A-Za-z0-9._:%-]+$/.test(text)?text:''; }
+function reminderPersonalizationReminderId(value){ var text=String(value==null?'':value); return /^reminder\.[A-Za-z0-9._:%-]{1,220}$/.test(text)?text:''; }
+function reminderPersonalizationSignalSource(type){ return {category:'explicit-category-choice',time:'explicit-time-choice',snooze:'explicit-snooze',feedback:'explicit-feedback'}[String(type||'')]||''; }
+function reminderPersonalizationSignalValue(type,value){
+  var key=String(type||''), text=String(value==null?'':value);
+  if(key==='category'&&['enabled','disabled','channel_in_app','channel_native'].indexOf(text)>=0) return text;
+  if(key==='time'&&(validReminderTime(text)||/^(?:[01]\d|2[0-3]):[0-5]\d-(?:[01]\d|2[0-3]):[0-5]\d$/.test(text))) return text;
+  if(key==='snooze'&&reminderEnumHas(REMINDER_SNOOZE_OPTIONS,text)) return text;
+  if(key==='feedback'&&reminderEnumHas(REMINDER_PERSONALIZATION_FEEDBACK,text)) return text;
+  return '';
+}
+function reminderPersonalizationSignalNormalize(value){
+  var x=value&&typeof value==='object'&&!Array.isArray(value)?value:{}, type=String(x.type||''), source=String(x.source||'');
+  if(!REMINDER_PERSONALIZATION_SIGNAL_TYPES[type]||source!==reminderPersonalizationSignalSource(type)) return null;
+  var signalValue=reminderPersonalizationSignalValue(type,x.value), reminderId=reminderPersonalizationReminderId(x.reminderId);
+  if(!signalValue||(type!=='feedback'&&!reminderId)||(type==='feedback'&&x.reminderId&&!reminderId)||!validReminderIso(x.recordedAt)) return null;
+  var recordedAt=new Date(x.recordedAt).toISOString(), signalId=reminderPersonalizationSafeToken(x.signalId,280);
+  if(!signalId) signalId='reminder-personalization-signal-v1:'+type+':'+(reminderId||'global')+':'+signalValue+':'+recordedAt;
+  return {signalId:signalId.slice(0,280),type:type,source:source,reminderId:reminderId,value:signalValue,recordedAt:recordedAt};
+}
+function reminderPersonalizationReasonLabel(code){
+  var labels={snooze_mismatch:'Aynı durak için üç açık erteleme seçimi, zamanın veya yoğunluğun sana uymadığını gösteriyor olabilir.',more_quiet:'Açık “daha sakin olsun” geri bildirimin, bugünün akışını hafifletmeyi öneriyor.',channel_wrong:'Açık kanal geri bildirimin, bu durağı uygulama içinde tutmayı öneriyor.'};
+  return labels[String(code||'')]||'Bu öneri yalnızca açık tercih sinyallerine dayanır.';
+}
+function reminderPersonalizationSourceLabel(source){ return ({'explicit-category-choice':'Açık kategori seçimi','explicit-time-choice':'Açık saat seçimi','explicit-snooze':'Açık erteleme seçimi','explicit-feedback':'Açık geri bildirim'})[String(source||'')]||'Açık kullanıcı seçimi'; }
+function reminderPersonalizationSourceSignals(value){ var source=Array.isArray(value)?value:[],out=[],seen={}; source.forEach(function(item){ var id=reminderPersonalizationSafeToken(item,280); if(id&&!seen[id]&&out.length<6){ seen[id]=true; out.push(id); } }); return out; }
+function reminderPersonalizationAppliedNormalize(value){
+  var x=value&&typeof value==='object'&&!Array.isArray(value)?value:{}, kind=String(x.kind||''), field=String(x.field||''), suggestionId=reminderPersonalizationSafeToken(x.suggestionId,280), reminderId=reminderPersonalizationReminderId(x.reminderId), previous=String(x.previousValue||''), proposed=String(x.proposedValue||'');
+  if((kind!=='channel'&&kind!=='capacity')||((kind==='channel'&&field!=='channel')||(kind==='capacity'&&field!=='capacityMode'))||!suggestionId||!validReminderIso(x.appliedAt)||['accepted','undone'].indexOf(String(x.status||''))<0) return null;
+  if(kind==='channel'&&(previous!=='native'||proposed!=='in_app'||!reminderId)) return null;
+  if(kind==='capacity'&&((previous!=='balanced'&&previous!=='ritual')||proposed!=='light')) return null;
+  return {suggestionId:suggestionId,kind:kind,reminderId:reminderId,field:field,previousValue:previous,proposedValue:proposed,reasonCode:reminderEnumHas({snooze_mismatch:true,more_quiet:true,channel_wrong:true},x.reasonCode)?String(x.reasonCode):'more_quiet',sourceSignals:reminderPersonalizationSourceSignals(x.sourceSignals),appliedAt:new Date(x.appliedAt).toISOString(),undoneAt:validReminderIso(x.undoneAt)?new Date(x.undoneAt).toISOString():'',status:String(x.status)};
+}
+function reminderPersonalizationClone(value){ try{ return JSON.parse(JSON.stringify(value)); }catch(e){ return {}; } }
+function normalizeReminderPersonalization(value){
+  var x=value&&typeof value==='object'&&!Array.isArray(value)?value:{}, out=emptyReminderPersonalization();
+  out.schemaVersion=Number.isInteger(x.schemaVersion)&&x.schemaVersion>=REMINDER_PERSONALIZATION_SCHEMA_VERSION?x.schemaVersion:REMINDER_PERSONALIZATION_SCHEMA_VERSION; out.optIn=x.optIn===true; out.historyMode=out.optIn&&reminderEnumHas(REMINDER_PERSONALIZATION_HISTORY_MODES,x.historyMode)?String(x.historyMode):'none'; out.autoApply=false; out.updatedAt=validReminderIso(x.updatedAt)?new Date(x.updatedAt).toISOString():'';
+  if(!out.optIn||out.historyMode!=='local') return out;
+  var signals=Array.isArray(x.signals)?x.signals:[],signalSeen={}; signals.forEach(function(item){ var normalized=reminderPersonalizationSignalNormalize(item); if(normalized&&!signalSeen[normalized.signalId]){ signalSeen[normalized.signalId]=true; out.signals.push(normalized); } }); if(out.signals.length>REMINDER_PERSONALIZATION_MAX_SIGNALS) out.signals=out.signals.slice(-REMINDER_PERSONALIZATION_MAX_SIGNALS);
+  var dismissed=Array.isArray(x.dismissed)?x.dismissed:[],dismissedSeen={}; dismissed.forEach(function(item){ var id=reminderPersonalizationSafeToken(item,280); if(id&&!dismissedSeen[id]){ dismissedSeen[id]=true; out.dismissed.push(id); } }); if(out.dismissed.length>REMINDER_PERSONALIZATION_MAX_DISMISSED) out.dismissed=out.dismissed.slice(-REMINDER_PERSONALIZATION_MAX_DISMISSED);
+  var applied=Array.isArray(x.applied)?x.applied:[],appliedSeen={}; applied.forEach(function(item){ var normalized=reminderPersonalizationAppliedNormalize(item); if(normalized&&!appliedSeen[normalized.suggestionId]){ appliedSeen[normalized.suggestionId]=true; out.applied.push(normalized); } }); if(out.applied.length>REMINDER_PERSONALIZATION_MAX_APPLIED) out.applied=out.applied.slice(-REMINDER_PERSONALIZATION_MAX_APPLIED);
+  return out;
+}
 var REMINDER_ENGINE_VERSION='1';
+function reminderPersonalizationPreference(preferences,reminderId){ var source=preferences&&typeof preferences==='object'?preferences:{}, pref=source[reminderId]; return pref&&typeof pref==='object'&&!Array.isArray(pref)?pref:{}; }
+function reminderPersonalizationSuggestions(input){
+  var x=input&&typeof input==='object'?input:{}, personalization=normalizeReminderPersonalization(x.personalization||x.state), preferences=x.preferences&&typeof x.preferences==='object'?x.preferences:{}, policy=normalizeReminderPolicy(reminderPersonalizationClone(x.policy||{})), suggestions=[];
+  if(!personalization.optIn||personalization.historyMode!=='local') return suggestions;
+  var dismissed={}, applied={}, seenSuggestions={}; personalization.dismissed.forEach(function(id){ dismissed[id]=true; }); personalization.applied.forEach(function(item){ if(item.status==='accepted') applied[item.suggestionId]=true; });
+  function add(candidate){ if(candidate&&!dismissed[candidate.id]&&!applied[candidate.id]&&!seenSuggestions[candidate.id]){ seenSuggestions[candidate.id]=true; suggestions.push(candidate); } }
+  var snoozes={}; personalization.signals.forEach(function(signal){ if(signal.type==='snooze'&&signal.reminderId){ if(!snoozes[signal.reminderId]) snoozes[signal.reminderId]=[]; snoozes[signal.reminderId].push(signal); } });
+  Object.keys(snoozes).sort().forEach(function(reminderId){
+    var pref=reminderPersonalizationPreference(preferences,reminderId), entries=snoozes[reminderId]; if(entries.length<3||pref.channel!=='native') return;
+    var id='reminder-personalization-v1:channel:'+encodeURIComponent(reminderId)+':in_app';
+    add({id:id,kind:'channel',field:'channel',reminderId:reminderId,previousValue:'native',proposedValue:'in_app',reasonCode:'snooze_mismatch',reason:reminderPersonalizationReasonLabel('snooze_mismatch'),source:'explicit-snooze',sourceLabel:reminderPersonalizationSourceLabel('explicit-snooze'),sourceSignals:entries.slice(-3).map(function(item){ return item.signalId; }),reversible:true,status:'pending'});
+  });
+  var quietSignals=personalization.signals.filter(function(signal){ return signal.type==='feedback'&&signal.value==='more_quiet'; });
+  if(quietSignals.length&&policy.capacityMode!=='light'&&policy.capacityMode!=='silent') add({id:'reminder-personalization-v1:capacity:light',kind:'capacity',field:'capacityMode',reminderId:'',previousValue:policy.capacityMode,proposedValue:'light',reasonCode:'more_quiet',reason:reminderPersonalizationReasonLabel('more_quiet'),source:'explicit-feedback',sourceLabel:reminderPersonalizationSourceLabel('explicit-feedback'),sourceSignals:quietSignals.slice(-3).map(function(item){ return item.signalId; }),reversible:true,status:'pending'});
+  var wrongChannels={}; personalization.signals.forEach(function(signal){ if(signal.type==='feedback'&&signal.value==='channel_wrong'&&signal.reminderId) wrongChannels[signal.reminderId]=signal; });
+  Object.keys(wrongChannels).sort().forEach(function(reminderId){ var pref=reminderPersonalizationPreference(preferences,reminderId); if(pref.channel!=='native') return; var signal=wrongChannels[reminderId], id='reminder-personalization-v1:channel:'+encodeURIComponent(reminderId)+':in_app'; add({id:id,kind:'channel',field:'channel',reminderId:reminderId,previousValue:'native',proposedValue:'in_app',reasonCode:'channel_wrong',reason:reminderPersonalizationReasonLabel('channel_wrong'),source:'explicit-feedback',sourceLabel:reminderPersonalizationSourceLabel('explicit-feedback'),sourceSignals:[signal.signalId],reversible:true,status:'pending'}); });
+  return suggestions;
+}
+function reminderPersonalizationState(root){ return normalizeReminderPersonalization(root&&root.personalization); }
+function reminderPersonalizationCommit(root,state){ if(!root) return null; root.personalization=normalizeReminderPersonalization(state); return root.personalization; }
+function reminderPersonalizationSignalRecord(root,signal,nowIso){
+  var state=normalizeReminderPersonalization(root&&root.personalization); if(!root||!state.optIn||state.historyMode!=='local') return {ok:false,changed:false,reason:state.optIn?'history-disabled':'opt-in-required',state:state};
+  var raw=Object.assign({},signal||{}, {recordedAt:validReminderIso(nowIso)?nowIso:(signal&&signal.recordedAt||'')}), normalized=reminderPersonalizationSignalNormalize(raw); if(!normalized) return {ok:false,changed:false,reason:'invalid-explicit-signal',state:state};
+  if(state.signals.some(function(item){ return item.signalId===normalized.signalId; })) return {ok:true,changed:false,duplicate:true,reason:null,state:state,signal:normalized};
+  state.signals.push(normalized); if(state.signals.length>REMINDER_PERSONALIZATION_MAX_SIGNALS) state.signals=state.signals.slice(-REMINDER_PERSONALIZATION_MAX_SIGNALS); state.updatedAt=normalized.recordedAt; reminderPersonalizationCommit(root,state); return {ok:true,changed:true,duplicate:false,reason:null,state:state,signal:normalized};
+}
+function reminderPersonalizationApplySuggestion(input){
+  var x=input&&typeof input==='object'?input:{}, root=x.root, state=normalizeReminderPersonalization(root&&root.personalization), suggestions=Array.isArray(x.suggestions)?x.suggestions:reminderPersonalizationSuggestions({personalization:state,preferences:root&&root.preferences,policy:root&&root.policy}), id=reminderPersonalizationSafeToken(x.suggestionId||x.id,280), suggestion=suggestions.find(function(item){ return item.id===id; });
+  if(!root||!state.optIn||state.historyMode!=='local') return {ok:false,changed:false,reason:'opt-in-required'}; if(!suggestion||suggestion.reversible!==true) return {ok:false,changed:false,reason:'suggestion-not-available'}; if(state.applied.some(function(item){ return item.suggestionId===suggestion.id&&item.status==='accepted'; })) return {ok:true,changed:false,duplicate:true,reason:null,suggestion:suggestion};
+  var changed=false, pref=null;
+  if(suggestion.kind==='channel'){ pref=reminderPersonalizationPreference(root.preferences,suggestion.reminderId); if(pref.channel!==suggestion.previousValue) return {ok:false,changed:false,reason:'setting-changed',suggestion:suggestion}; pref=reminderEnsurePreference(root,suggestion.reminderId); pref.channel='in_app'; pref.lastEditedAt=validReminderIso(x.nowIso)?x.nowIso:(state.updatedAt||''); root.preferences[suggestion.reminderId]=normalizeReminderPreference(suggestion.reminderId,pref); changed=true; }
+  else if(suggestion.kind==='capacity'){ var policy=normalizeReminderPolicy(root.policy); if(policy.capacityMode!==suggestion.previousValue) return {ok:false,changed:false,reason:'setting-changed',suggestion:suggestion}; policy.capacityMode='light'; root.policy=normalizeReminderPolicy(policy); changed=true; }
+  if(!changed) return {ok:false,changed:false,reason:'unsafe-suggestion',suggestion:suggestion};
+  var applied={suggestionId:suggestion.id,kind:suggestion.kind,reminderId:suggestion.reminderId||'',field:suggestion.field,previousValue:suggestion.previousValue,proposedValue:suggestion.proposedValue,reasonCode:suggestion.reasonCode,sourceSignals:suggestion.sourceSignals,appliedAt:validReminderIso(x.nowIso)?new Date(x.nowIso).toISOString():(state.updatedAt||'1970-01-01T00:00:00.000Z'),undoneAt:'',status:'accepted'};
+  state.applied=state.applied.filter(function(item){ return item.suggestionId!==suggestion.id; }); state.applied.push(applied); if(state.applied.length>REMINDER_PERSONALIZATION_MAX_APPLIED) state.applied=state.applied.slice(-REMINDER_PERSONALIZATION_MAX_APPLIED); state.updatedAt=applied.appliedAt; reminderPersonalizationCommit(root,state); return {ok:true,changed:true,duplicate:false,reason:null,suggestion:suggestion,applied:applied};
+}
+function reminderPersonalizationUndoSuggestion(input){
+  var x=input&&typeof input==='object'?input:{}, root=x.root, state=normalizeReminderPersonalization(root&&root.personalization), id=reminderPersonalizationSafeToken(x.suggestionId||x.id,280), entry=state.applied.find(function(item){ return item.suggestionId===id&&item.status==='accepted'; }); if(!root||!entry) return {ok:false,changed:false,reason:'applied-suggestion-not-found'};
+  if(entry.kind==='channel'){ var pref=reminderPersonalizationPreference(root.preferences,entry.reminderId); if(pref.channel!==entry.proposedValue) return {ok:false,changed:false,reason:'setting-changed'}; pref=reminderEnsurePreference(root,entry.reminderId); pref.channel=entry.previousValue; pref.lastEditedAt=validReminderIso(x.nowIso)?x.nowIso:(state.updatedAt||''); root.preferences[entry.reminderId]=normalizeReminderPreference(entry.reminderId,pref); }
+  else if(entry.kind==='capacity'){ var policy=normalizeReminderPolicy(root.policy); if(policy.capacityMode!==entry.proposedValue) return {ok:false,changed:false,reason:'setting-changed'}; policy.capacityMode=entry.previousValue; root.policy=normalizeReminderPolicy(policy); }
+  else return {ok:false,changed:false,reason:'unsafe-suggestion'};
+  entry.status='undone'; entry.undoneAt=validReminderIso(x.nowIso)?new Date(x.nowIso).toISOString():(state.updatedAt||'1970-01-01T00:00:00.000Z'); state.updatedAt=entry.undoneAt; reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,entry:entry};
+}
+function reminderPersonalizationDismissSuggestion(input){
+  var x=input&&typeof input==='object'?input:{}, root=x.root, state=normalizeReminderPersonalization(root&&root.personalization), id=reminderPersonalizationSafeToken(x.suggestionId||x.id,280); if(!root||!state.optIn||state.historyMode!=='local'||!id) return {ok:false,changed:false,reason:'opt-in-required'};
+  if(state.dismissed.indexOf(id)<0) state.dismissed.push(id); if(state.dismissed.length>REMINDER_PERSONALIZATION_MAX_DISMISSED) state.dismissed=state.dismissed.slice(-REMINDER_PERSONALIZATION_MAX_DISMISSED); if(validReminderIso(x.nowIso)) state.updatedAt=new Date(x.nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,suggestionId:id};
+}
+function reminderPersonalizationSetOptIn(root,optIn,options){
+  if(!root) return {ok:false,changed:false,reason:'no-data'}; var state=normalizeReminderPersonalization(root.personalization), next=optIn===true; state.optIn=next; state.historyMode=next&&options&&options.historyMode==='local'?'local':'none'; state.autoApply=false; if(!next||state.historyMode!=='local'){ state.signals=[]; state.dismissed=[]; state.applied=[]; } if(validReminderIso(options&&options.nowIso)) state.updatedAt=new Date(options.nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,state:state};
+}
+function reminderPersonalizationSetHistoryMode(root,mode,nowIso){
+  if(!root) return {ok:false,changed:false,reason:'no-data'}; var state=normalizeReminderPersonalization(root.personalization), next=String(mode||''); if(!REMINDER_PERSONALIZATION_HISTORY_MODES[next]) return {ok:false,changed:false,reason:'invalid-history-mode'}; if(next==='local'&&!state.optIn) return {ok:false,changed:false,reason:'opt-in-required'}; state.historyMode=next; if(next==='none'){ state.signals=[]; state.dismissed=[]; state.applied=[]; } if(validReminderIso(nowIso)) state.updatedAt=new Date(nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,state:state};
+}
+function reminderPersonalizationReset(root,nowIso){ if(!root) return {ok:false,changed:false,reason:'no-data'}; var state=emptyReminderPersonalization(); if(validReminderIso(nowIso)) state.updatedAt=new Date(nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,state:state}; }
 var REMINDER_ENGINE_DEFAULT_TIMEZONE='Europe/Istanbul';
 var REMINDER_ENGINE_DAY_PART_TIMES={morning:'08:00',day:'12:00',afternoon:'15:00',evening:'19:00',night:'22:00'};
 function reminderEngineValidDate(value){
@@ -5759,6 +5868,24 @@ function reminderCenterHistoryHTML(){
   h+='<div class="sey-reminder-history-actions"><button type="button" class="sey-reminder-secondary" onclick="App.clearReminderHistory()"'+(rows.length?'':' disabled')+'>Geçmişi temizle</button>'+(ui.reminderHistoryUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderHistory()">Geri al</button>':'')+'</div></section>';
   return h;
 }
+function reminderPersonalizationHTML(root){
+  var state=reminderPersonalizationState(root), suggestions=reminderPersonalizationSuggestions({personalization:state,preferences:root&&root.preferences,policy:root&&root.policy}), accepted=state.applied.filter(function(item){ return item.status==='accepted'; }), h='<section class="sey-reminder-personalization" data-reminder-personalization-state="'+(state.optIn&&state.historyMode==='local'?'local':'off')+'" aria-labelledby="sey-reminder-personalization-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">AÇIK SEÇİMLERLE UYARLAMA</span><h3 id="sey-reminder-personalization-title">Ritmini birlikte ayarlayalım</h3></div><span class="sey-reminder-profile-active">'+(state.optIn&&state.historyMode==='local'?'Açık':'Kapalı')+'</span></div>';
+  h+='<p class="sey-reminder-profile-note">Yalnız açık kategori, saat, erteleme ve geri bildirim seçimlerin kaynak alınır. Bu katman kendiliğinden ayar değiştirmez; öneriler yerel kalır ve her zaman geri alınabilir.</p>';
+  if(!state.optIn){
+    h+='<div class="sey-reminder-empty" data-reminder-personalization-history="none" role="status"><span aria-hidden="true">'+icon('sliders-horizontal',22)+'</span><strong>Uyarlama kapalı.</strong><p>Hiç sinyal tutulmuyor ve hiçbir öneri üretilmiyor.</p><button type="button" class="sey-reminder-primary" onclick="App.setReminderPersonalizationOptIn(true)">Açık seçimlerle uyarlamayı aç</button></div>';
+  } else {
+    h+='<div class="sey-reminder-personalization-controls"><div><strong>'+ (state.historyMode==='local'?'Yerel geçmiş açık':'Yerel geçmiş kapalı') +'</strong><small>Otomatik uygulama: her zaman kapalı. '+(state.historyMode==='local'?'Sadece bu cihazda sınırlı sinyal tutulur.':'Geçmiş tutulmaz; uyarlama çalışmaz.')+'</small></div><div class="sey-reminder-personalization-actions">'+(state.historyMode==='local'?'<button type="button" class="sey-reminder-secondary" onclick="App.setReminderPersonalizationHistoryMode(\'none\')">Geçmişi kapat</button>':'<button type="button" class="sey-reminder-primary" onclick="App.setReminderPersonalizationHistoryMode(\'local\')">Yerel geçmişi aç</button>')+'<button type="button" class="sey-reminder-secondary" onclick="App.setReminderPersonalizationOptIn(false)">Uyarlamayı kapat</button></div></div>';
+    if(state.historyMode==='local'){
+      h+='<div class="sey-reminder-personalization-sources" aria-label="Uyarlama kaynakları"><span><strong>'+state.signals.filter(function(item){ return item.type==='category'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-category-choice')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='time'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-time-choice')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='snooze'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-snooze')+'</small></span><span><strong>'+state.signals.filter(function(item){ return item.type==='feedback'; }).length+'</strong><small>'+reminderPersonalizationSourceLabel('explicit-feedback')+'</small></span></div>';
+      h+='<div class="sey-reminder-personalization-feedback"><strong>Açık geri bildirim ver</strong><small>Bir ayarı sessizce değiştirmez; yalnızca sen onaylarsan güvenli bir öneri hazırlanır.</small><div class="sey-reminder-personalization-actions"><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'more_quiet\')">Daha sakin olsun</button><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'time_wrong\')">Saat uygun değil</button><button type="button" class="sey-reminder-secondary" onclick="App.recordReminderPersonalizationFeedback(\'keep\')">Böyle kalsın</button></div></div>';
+      if(suggestions.length){ h+='<div class="sey-reminder-personalization-suggestions" role="list" aria-label="Uyarlama önerileri">'; suggestions.forEach(function(suggestion){ h+='<article class="sey-reminder-personalization-suggestion" role="listitem" data-reminder-personalization-suggestion="'+esc(suggestion.id)+'"><strong>'+(suggestion.kind==='capacity'?'Bugünün akışını hafiflet':'Bir durağı uygulama içinde tut')+'</strong><p>'+esc(suggestion.reason)+'</p><small>Kaynak: '+esc(suggestion.sourceLabel)+' · Kendiliğinden uygulanmaz · geri alınabilir</small><div class="sey-reminder-personalization-actions"><button type="button" class="sey-reminder-primary" onclick="App.applyReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Uygula</button><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderPersonalizationSuggestion(\''+esc(suggestion.id)+'\')">Şimdi değil</button></div></article>'; }); h+='</div>'; }
+      else h+='<div class="sey-reminder-empty" data-reminder-personalization-suggestions="empty" role="status"><strong>Şimdilik öneri yok.</strong><p>Açık seçimlerin güvenli bir değişiklik için yeterli ve tutarlı olduğunda burada nedenini görürsün.</p></div>';
+      if(accepted.length){ h+='<div class="sey-reminder-personalization-applied" role="list" aria-label="Uygulanmış uyarlamalar"><strong>Uygulanan öneriler</strong>'; accepted.forEach(function(entry){ h+='<div role="listitem"><span>'+esc(reminderPersonalizationReasonLabel(entry.reasonCode))+'</span><button type="button" class="sey-reminder-secondary" onclick="App.undoReminderPersonalizationSuggestion(\''+esc(entry.suggestionId)+'\')">Geri al</button></div>'; }); h+='</div>'; }
+      h+='<button type="button" class="sey-reminder-secondary" onclick="App.resetReminderPersonalization()">Uyarlama geçmişini ve tercihini sıfırla</button>';
+    }
+  }
+  return h+'</section>';
+}
 function reminderCenterPolicyHTML(root){
   var policy=normalizeReminderPolicy(root&&root.policy), h='<section class="sey-reminder-policy" aria-labelledby="sey-reminder-policy-title"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">BUGÜNÜN KAPASİTESİ</span><h3 id="sey-reminder-policy-title">Sessizlik ve bütçe</h3></div><span class="sey-reminder-profile-active">'+esc(reminderCapacityModeLabel(policy.capacityMode))+'</span></div><p class="sey-reminder-profile-note">Bu genel ayarlar kategori seçimlerini silmez. Bir kategoriye verdiğin kanal veya açık/kapalı kararı, profil ve genel bütçe değişse de korunur.</p><div class="sey-reminder-policy-grid">';
   h+='<label>Bugünün modu<select aria-label="Bugünün reminder modu" onchange="App.setReminderCapacityMode(this.value)"><option value="balanced"'+(policy.capacityMode==='balanced'?' selected':'')+'>Dengeli</option><option value="light"'+(policy.capacityMode==='light'?' selected':'')+'>Hafif gün</option><option value="silent"'+(policy.capacityMode==='silent'?' selected':'')+'>Sessiz</option><option value="ritual"'+(policy.capacityMode==='ritual'?' selected':'')+'>Ritüel odaklı</option></select></label>';
@@ -6185,6 +6312,7 @@ function reminderCenterOverlayHTML(){
   h+='<section class="sey-reminder-actions" aria-label="Hatırlatma eylemleri"><button type="button" class="sey-reminder-primary" onclick="App.testReminder()">'+icon('play',16)+'<span>Sentetik test reminder · Uygulama içi önizleme/test</span></button><button type="button" class="sey-reminder-mute'+(muted?' is-muted':'')+'" onclick="App.muteReminderToday()" aria-pressed="'+muted+'">'+icon('bell-off',16)+'<span>'+(muted?'Bugün susturuldu · geri getir':'Bugün tümünü sustur')+'</span></button></section>';
   h+=reminderTestPreviewHTML();
   h+=reminderCenterPolicyHTML(root);
+  h+=reminderPersonalizationHTML(root);
   h+='<p class="sey-reminder-live-note" role="status" aria-live="polite" aria-atomic="true">'+icon('info',14)+' Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.</p>';
   h+=reminderPermissionExplanationHTML(permission);
   h+=reminderCategoryControlsHTML(root);
@@ -6344,6 +6472,24 @@ App.reminderLifecycleState=function(){
   return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
 };
 App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
+App.reminderPersonalizationNormalize=normalizeReminderPersonalization;
+App.reminderPersonalizationEmpty=emptyReminderPersonalization;
+App.reminderPersonalizationSuggestions=function(input){
+  var x=input&&typeof input==='object'?Object.assign({},input):{}, root=reminderCurrentRoot();
+  if(!Object.prototype.hasOwnProperty.call(x,'personalization')) x.personalization=root&&root.personalization;
+  if(!Object.prototype.hasOwnProperty.call(x,'preferences')) x.preferences=root&&root.preferences;
+  if(!Object.prototype.hasOwnProperty.call(x,'policy')) x.policy=root&&root.policy;
+  return reminderPersonalizationSuggestions(x);
+};
+App.reminderPersonalizationState=function(){ var root=reminderCurrentRoot(); return reminderPersonalizationClone(root?root.personalization:emptyReminderPersonalization()); };
+App.reminderPersonalizationRecordSignal=function(signal,nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationSignalRecord(root,signal,nowIso); if(result.changed){ save(); render(); } return result; };
+App.setReminderPersonalizationOptIn=function(flag,options){ var root=reminderCurrentRoot(), x=options&&typeof options==='object'?options:{}, result=reminderPersonalizationSetOptIn(root,flag,{historyMode:flag===true&&x.historyMode==='none'?'none':'local',nowIso:x.nowIso||new Date().toISOString()}); if(result.ok){ save(); render(); } return result; };
+App.setReminderPersonalizationHistoryMode=function(mode,nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationSetHistoryMode(root,mode,nowIso||new Date().toISOString()); if(result.ok){ save(); render(); } return result; };
+App.recordReminderPersonalizationFeedback=function(bucket,reminderId,nowIso){ var root=reminderCurrentRoot(), value=String(bucket||''), id=String(reminderId||''), signal={type:'feedback',source:'explicit-feedback',value:value}; if(id) signal.reminderId=id; var result=reminderPersonalizationSignalRecord(root,signal,nowIso||new Date().toISOString()); if(result.changed){ save(); render(); } return result; };
+App.applyReminderPersonalizationSuggestion=function(id,nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationApplySuggestion({root:root,suggestionId:id,nowIso:nowIso||new Date().toISOString()}); if(result.changed){ save(); render(); } return result; };
+App.undoReminderPersonalizationSuggestion=function(id,nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationUndoSuggestion({root:root,suggestionId:id,nowIso:nowIso||new Date().toISOString()}); if(result.changed){ save(); render(); } return result; };
+App.dismissReminderPersonalizationSuggestion=function(id,nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationDismissSuggestion({root:root,suggestionId:id,nowIso:nowIso||new Date().toISOString()}); if(result.changed){ save(); render(); } return result; };
+App.resetReminderPersonalization=function(nowIso){ var root=reminderCurrentRoot(), result=reminderPersonalizationReset(root,nowIso||new Date().toISOString()); if(result.changed){ save(); render(); } return result; };
 App.reminderCareDefinitions=function(){ return reminderCareDefinitions(); };
 App.reminderCareNativeCategories=function(value){ return reminderCareNativeCategories(value); };
 App.reminderCareLifecycleCandidates=function(input){ return reminderCareLifecycleCandidates(input); };
@@ -6398,6 +6544,7 @@ App.saveReminderMedicationDraft=function(){
   if(existing){ var index=list.indexOf(existing); if(index>=0) list[index]=normalized; }
   else list.unshift(normalized);
   list.splice(REMINDER_MEDICATION_MAX_SCHEDULES);
+  reminderPersonalizationSignalRecord(reminderCurrentRoot(),{type:'time',source:'explicit-time-choice',reminderId:normalized.id,value:normalized.time},nowIso);
   ui.reminderMedicationDraft=null; ui.reminderMedicationEditingId=''; ui.reminderMedicationError=''; save(); render();
   return {ok:true,schedule:normalized,updated:!!existing};
 };
@@ -6466,12 +6613,12 @@ App.confirmReminderSetup=function(){
   var root=reminderCurrentRoot(); if(!root) return;
   var selected=normalizeReminderCategories(ui.reminderSetupCategories);
   root.onboarding.selectedCategories=selected; root.onboarding.completed=true;
-  reminderMergeProfileSuggestions(root,root.profile,selected); save(); render();
+  reminderMergeProfileSuggestions(root,root.profile,selected); var setupNow=new Date().toISOString(); selected.forEach(function(category){ reminderPersonalizationSignalRecord(root,{type:'category',source:'explicit-category-choice',reminderId:'reminder.category.v1.'+category,value:'enabled'},setupNow); }); save(); render();
 };
 App.setReminderCategoryEnabled=function(category,flag){
   var root=reminderCurrentRoot(), state=root&&reminderCategoryState(root,category); if(!root||!state||!state.defs.length) return;
-  var next=typeof flag==='boolean'?flag:!state.allEnabled;
-  state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.enabled=next; pref.lastEditedAt=new Date().toISOString(); root.preferences[def.id]=normalizeReminderPreference(def.id,pref); });
+  var next=typeof flag==='boolean'?flag:!state.allEnabled, nowIso=new Date().toISOString();
+  state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.enabled=next; pref.lastEditedAt=nowIso; root.preferences[def.id]=normalizeReminderPreference(def.id,pref); reminderPersonalizationSignalRecord(root,{type:'category',source:'explicit-category-choice',reminderId:String(def.id),value:next?'enabled':'disabled'},nowIso); });
   save(); render();
 };
 function reminderSetEnabled(reminderId,enabled,options){
@@ -6499,7 +6646,7 @@ App.reminderEnable=function(reminderId,options){ return reminderSetEnabled(remin
 App.setReminderCategoryChannel=function(category,channel){
   var root=reminderCurrentRoot(), state=root&&reminderCategoryState(root,category); channel=String(channel||'');
   if(!root||!state||!state.defs.length||!REMINDER_CHANNELS[channel]) return {ok:false,reason:'invalid-category-or-channel'};
-  state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.channel=channel; pref.lastEditedAt=new Date().toISOString(); root.preferences[def.id]=normalizeReminderPreference(def.id,pref); });
+  var nowIso=new Date().toISOString(); state.defs.forEach(function(def){ var pref=reminderEnsurePreference(root,def.id); pref.channel=channel; pref.lastEditedAt=nowIso; root.preferences[def.id]=normalizeReminderPreference(def.id,pref); reminderPersonalizationSignalRecord(root,{type:'category',source:'explicit-category-choice',reminderId:String(def.id),value:'channel_'+channel},nowIso); });
   save(); render();
   var permissionRequest=channel==='native'?reminderPermissionRequest({source:'category:'+String(category||'')}):null;
   return {ok:true,category:String(category||''),channel:channel,permissionRequest:permissionRequest};
@@ -6524,9 +6671,14 @@ App.setReminderSpecialDaysSelection=function(selection){
   var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); if(!root) return {ok:false,reason:'no-data'};
   state.selectedDays=normalizeReminderSpecialDaySelection(selection); if(state.selectedDays.length&&state.mode==='none') state.mode='selected'; reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
 };
+App.setReminderTimeWindow=function(reminderId,start,end){
+  var root=reminderCurrentRoot(), id=String(reminderId||''), definition=reminderActionDefinition(id), from=String(start||''), to=String(end||'');
+  if(!root||!definition||!validReminderTime(from)||(to&&!validReminderTime(to))) return {ok:false,reason:'invalid-time-window'};
+  var nowIso=new Date().toISOString(), pref=reminderEnsurePreference(root,id); pref.timeWindow={start:from}; if(to) pref.timeWindow.end=to; pref.lastEditedAt=nowIso; root.preferences[id]=normalizeReminderPreference(id,pref); reminderPersonalizationSignalRecord(root,{type:'time',source:'explicit-time-choice',reminderId:id,value:to?from+'-'+to:from},nowIso); save(); render(); return {ok:true,reminderId:id,timeWindow:pref.timeWindow};
+};
 App.setReminderSpecialDaysTime=function(time){
   var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root); if(!root||!validReminderTime(String(time||''))) return {ok:false,reason:'invalid-time'};
-  state.time=String(time); reminderSpecialDaysCommit(root,state,new Date().toISOString()); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
+  var nowIso=new Date().toISOString(); state.time=String(time); reminderSpecialDaysCommit(root,state,nowIso); reminderPersonalizationSignalRecord(root,{type:'time',source:'explicit-time-choice',reminderId:REMINDER_SPECIAL_DAYS_ID,value:String(time)},nowIso); save(); render(); return {ok:true,preference:App.reminderSpecialDaysPreference()};
 };
 App.setReminderSpecialDaysChannel=function(channel){
   var root=reminderCurrentRoot(), state=reminderSpecialDaysState(root), next=String(channel||''); if(!root||!REMINDER_CHANNELS[next]) return {ok:false,reason:'invalid-channel'};
@@ -6610,6 +6762,7 @@ App.reminderInboxSnooze=function(occurrenceId,option,reminderId,options){
   var original=App.reminderDeliverySnooze({occurrenceId:id,occurrence:occurrence,channel:'in_app',now:nowIso});
   var scheduled=App.reminderDeliverySchedule({occurrenceId:plan.occurrence.occurrenceId,occurrence:plan.occurrence,channel:'in_app',now:nowIso});
   var action=reminderActionCommit({actionId:plan.actionId,action:'snooze',occurrenceId:plan.occurrence.occurrenceId,parentOccurrenceId:id,reminderId:reminder,option:plan.option,scheduledAt:plan.scheduledAt,timezone:plan.timezone,recordedAt:nowIso,status:'scheduled'},nowIso);
+  if(original.ok&&scheduled.ok&&action.ok&&!existing) reminderPersonalizationSignalRecord(reminderCurrentRoot(),{type:'snooze',source:'explicit-snooze',reminderId:reminder,value:plan.option},nowIso);
   if(action.ok) render();
   return {ok:!!(original.ok&&scheduled.ok&&action.ok),duplicate:false,changed:true,reason:original.reason||scheduled.reason||action.reason||null,plan:plan,original:original,scheduled:scheduled,action:action,occurrence:plan.occurrence};
 };

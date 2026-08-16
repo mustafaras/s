@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-23",
+  "activePrompt": "REM-24",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-22",
-  "nextSafeAction": "REM-23 local implementation/verification; no release action",
-  "currentPhase": "R5",
+  "lastCompletedPrompt": "REM-23",
+  "nextSafeAction": "REM-24 local implementation/verification; no release action",
+  "currentPhase": "R6",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-22 permission state machine in app.js with explicit native-channel request, no boot request loop, denied/unsupported/PWA fallback, generic private preview and separate reminder-local permission state from ÆON permission",
-    "tests": "Permission 63; native 22; all 27 reminder fixtures; root 32 fixtures; Panel-v2 27 fixtures; zikr harness 90/90; driver; B1/B2/B3; syntax/context/diff PASS; no browser, real network or data write",
-    "commit": "60ea3d48bb0b2b324a95e9aaea819a65b3398c92",
+    "source": "REM-23 foreground reminder native display adapter in app.js is separate from delivery journal and ÆON notification flow; canonical private copy, occurrence-bound payload, policy/permission/visibility/duplicate gates and open/snooze/mute routing",
+    "tests": "Native 66; deep-links 77; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS. Wall-clock reminder matrix is 25/27 because two legacy date-pinned fixtures fail on 2026-08-16; prayer 48 and Saygı 71 pass with intended synthetic clocks. No browser, real network or data write",
+    "commit": "4618a67d0bfe9745ba103dea3944cf35a77b199a",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -51,11 +51,11 @@
     "approvedAt": null,
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-15",
-  "updatedBy": "Codex REM-22 closure; REM-23 ready; release remains not_approved",
+  "updatedAt": "2026-08-16",
+  "updatedBy": "Codex REM-23 closure; REM-24 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-22",
-    "evidence": "docs/reminders/evidence/REM-22.md",
-    "commit": "60ea3d48bb0b2b324a95e9aaea819a65b3398c92"
+    "prompt": "REM-23",
+    "evidence": "docs/reminders/evidence/REM-23.md",
+    "commit": "CLOSURE_COMMIT_SHA"
   }
 }

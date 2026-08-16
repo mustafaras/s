@@ -6,6 +6,8 @@ const vm = require("node:vm");
 const { assert, assertEqual, createNotificationMock, runTests } = require("./helpers/reminder-test-helper");
 
 const rootDir = path.resolve(__dirname, "../..");
+const PRAYER_ID = "reminder.catalog.v1.prayer";
+const NOW = "2026-08-13T12:34:56.000Z";
 
 function fixtureElement(id) {
   return {
@@ -72,6 +74,41 @@ function boot(permission, options) {
   return { sandbox, app, storage: localStorage, notification };
 }
 
+function candidate(out, occurrenceId, extra) {
+  const occurrence = Object.assign({
+    occurrenceId,
+    reminderId: PRAYER_ID,
+    category: "ritual",
+    priority: "P2",
+    deepLink: "faith",
+    localDate: "2026-08-13",
+    scheduledAt: "12:00",
+    timezone: "Europe/Istanbul",
+    definitionVersion: "1.0.0",
+    due: true,
+    past: false,
+    replay: false,
+    nativeReplay: false
+  }, extra || {});
+  return {
+    occurrence,
+    definition: out.sandbox.ReminderCatalogV1.get(PRAYER_ID),
+    preference: { reminderId: PRAYER_ID, enabled: true, channel: "native", privacyMode: "private" },
+    reminderId: PRAYER_ID,
+    due: true
+  };
+}
+
+function evaluate(out, item, extra) {
+  return out.sandbox.App.evaluateReminders("manual", Object.assign({
+    nowIso: NOW,
+    visibilityState: "visible",
+    catchUp: false,
+    context: { localTime: "12:34", timezone: "Europe/Istanbul" },
+    occurrences: [item]
+  }, extra || {}));
+}
+
 runTests([
   ["boot never requests native permission and native channel is explicit", async () => {
     const out = boot("default");
@@ -118,5 +155,76 @@ runTests([
     assert(!pwaResult.ok);
     assertEqual(pwaResult.state, "pwa-limited");
     assert(pwaResult.inAppFallback);
+  }],
+  ["pure evaluator stays display-free; persisted native delivery uses the separate adapter", () => {
+    const out = boot("granted");
+    const item = candidate(out, "rem-native-pure-1");
+    const pure = out.sandbox.App.evaluateRemindersPure({
+      nowIso: NOW, visibilityState: "visible", context: { localTime: "12:34", timezone: "Europe/Istanbul", permissionState: "granted" }, occurrences: [item]
+    });
+    assertEqual(pure.results[0].channel, "native");
+    assertEqual(out.notification.getCalls().length, 0);
+    const result = evaluate(out, item);
+    assert(result.nativeResults && result.nativeResults[0].status === "shown");
+    assertEqual(result.nativeShownCount, 1);
+    assertEqual(out.notification.getCalls().length, 1);
+    const journal = out.sandbox.App.reminderDeliveryGet("rem-native-pure-1", NOW);
+    assertEqual(journal.status, "shown");
+    assertEqual(journal.channel, "native");
+  }],
+  ["foreground native payload is private, tagged, actionable and occurrence-bound", () => {
+    const out = boot("granted");
+    const item = candidate(out, "rem-native-contract-1", { nativeTitle: "PRIVATE TITLE", nativeBody: "PRIVATE BODY" });
+    const result = evaluate(out, item);
+    const call = out.notification.getCalls()[0];
+    assert(result.nativeResults[0].status === "shown");
+    assertEqual(call.title, "Küçük bir durak yaklaşırken");
+    assert(call.options.body.includes("sakin bir an"));
+    assert(!call.options.body.includes("PRIVATE"));
+    assert(call.options.tag.startsWith("seyma-reminder-v1:"));
+    assertEqual(call.options.renotify, false);
+    assertEqual(call.options.data.type, "reminder");
+    assertEqual(call.options.data.occurrenceId, "rem-native-contract-1");
+    assertEqual(call.options.data.reminderId, PRAYER_ID);
+    assertEqual(call.options.data.deepLink, "faith");
+    assertEqual(call.options.data.mainAction, "open");
+    assertEqual(call.options.data.snoozeAction, "snooze");
+    assertEqual(call.options.data.muteAction, "todayOff");
+    assertEqual(call.options.actions[0].action, "open");
+    assertEqual(call.options.actions[1].action, "snooze");
+    assertEqual(call.options.actions[2].action, "todayOff");
+    assertEqual(call.options.data.snoozeOption, "10m");
+  }],
+  ["permission, budget, quiet, visibility and duplicate policy failures never call native", () => {
+    const blocked = [
+      ["denied", {}, "permission-denied"],
+      ["granted", { visibilityState: "hidden" }, "not-visible"],
+      ["granted", { context: { localTime: "23:00" } }, "quiet-hours-deferred"],
+      ["granted", { context: { nativeDailyCap: 0 } }, "native-daily-cap"]
+    ];
+    blocked.forEach(([permission, extra, reason]) => {
+      const out = boot(permission);
+      const result = evaluate(out, candidate(out, `rem-native-block-${reason}`), extra);
+      assertEqual(out.notification.getCalls().length, 0);
+      assert(result.nativeResults.length === 0);
+      assert(result.results[0].reason === reason || result.results[0].policyReason === reason || reason === "not-visible" && result.results[0].reason === "not-visible");
+    });
+    const duplicate = boot("granted");
+    const item = candidate(duplicate, "rem-native-duplicate-1");
+    evaluate(duplicate, item);
+    const second = evaluate(duplicate, item);
+    assertEqual(duplicate.notification.getCalls().length, 1);
+    assertEqual(second.nativeResults.length, 0);
+    assertEqual(second.results[0].duplicate, true);
+  }],
+  ["adapter rejects non-foreground and malformed policy without requesting permission", () => {
+    const out = boot("granted");
+    const item = candidate(out, "rem-native-direct-1");
+    const base = { source: "manual", visibilityState: "visible", occurrence: item.occurrence, definition: item.definition, reminderId: PRAYER_ID, policy: { nativeAllowed: true, channel: "native", reason: "native-allowed" } };
+    assertEqual(out.sandbox.App.reminderNativeDisplay(Object.assign({}, base, { source: "background" })).reason, "not-foreground");
+    assertEqual(out.sandbox.App.reminderNativeDisplay(Object.assign({}, base, { visibilityState: "hidden" })).reason, "not-visible");
+    assertEqual(out.sandbox.App.reminderNativeDisplay(Object.assign({}, base, { duplicate: true })).reason, "duplicate");
+    assertEqual(out.sandbox.App.reminderNativeDisplay(Object.assign({}, base, { policy: { nativeAllowed: false, channel: "in_app", reason: "native-daily-cap" } })).reason, "daily-budget");
+    assertEqual(out.notification.getCalls().length, 0);
   }]
 ]).catch(() => process.exitCode = 1);

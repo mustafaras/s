@@ -144,5 +144,44 @@ runTests([
       assertEqual(out.fetches(), 0);
       assertEqual(out.notificationCalls(), 0);
     });
+  }],
+  ["native open payload requires an occurrence and preserves the allowlisted target", () => {
+    const out = boot();
+    const calls = [];
+    const original = out.sandbox.App.openReminderTarget;
+    out.sandbox.App.openReminderTarget = (input) => { calls.push(input); return { ok: true }; };
+    const result = out.sandbox.App.handleReminderNativeClick({
+      type: "reminder", occurrenceId: "rem-native-click-1", reminderId: "reminder.catalog.v1.prayer", deepLink: "faith", action: "open"
+    });
+    out.sandbox.App.openReminderTarget = original;
+    assert(result.ok);
+    assertEqual(calls.length, 1);
+    assertEqual(calls[0].deepLink, "faith");
+    assertEqual(calls[0].occurrenceId, "rem-native-click-1");
+    assert(!out.sandbox.App.handleReminderNativeClick({ reminderId: "reminder.catalog.v1.prayer", deepLink: "faith", action: "open" }).ok);
+    assert(!out.sandbox.App.handleReminderNativeClick({ occurrenceId: "rem-native-click-2", reminderId: "reminder.catalog.v1.prayer", deepLink: "settings", action: "open" }).ok);
+  }],
+  ["native snooze and mute actions route to the local action contract without opening a wrong target", () => {
+    const snooze = boot();
+    let snoozeOpened = 0;
+    snooze.sandbox.App.openReminderTarget = () => { snoozeOpened += 1; return { ok: true }; };
+    const snoozeResult = snooze.sandbox.App.handleReminderNativeClick({
+      type: "reminder", occurrenceId: "rem-native-snooze-1", reminderId: "reminder.catalog.v1.prayer", deepLink: "faith", action: "snooze", snoozeOption: "10m"
+    });
+    assert(snoozeResult.ok);
+    assertEqual(snoozeOpened, 0);
+    assert(snoozeResult.action && snoozeResult.action.entry.action === "snooze");
+    assertEqual(snoozeResult.action.entry.option, "10m");
+
+    const mute = boot();
+    let muteOpened = 0;
+    mute.sandbox.App.openReminderTarget = () => { muteOpened += 1; return { ok: true }; };
+    const muteResult = mute.sandbox.App.handleReminderNativeClick({
+      type: "reminder", occurrenceId: "rem-native-mute-1", reminderId: "reminder.catalog.v1.prayer", deepLink: "faith", action: "mute"
+    });
+    assert(muteResult.ok);
+    assertEqual(muteOpened, 0);
+    assert(muteResult.action && muteResult.action.entry.action === "todayOff");
+    assertEqual(muteResult.action.entry.reason, "today-muted");
   }]
 ]);

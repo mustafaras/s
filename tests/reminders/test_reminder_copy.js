@@ -66,6 +66,21 @@ function assertNoSecret(value) {
   assert(!serialized.includes("SECRET_THERAPY_TEXT"));
 }
 
+function stringLeaves(value, pathName, out) {
+  const result = out || [];
+  if (typeof value === "string") {
+    result.push({ path: pathName, value });
+    return result;
+  }
+  if (!value || typeof value !== "object") return result;
+  Object.keys(value).forEach((key) => stringLeaves(value[key], pathName ? pathName + "." + key : key, result));
+  return result;
+}
+
+function hasTurkishOrLatinText(value) {
+  return /[A-Za-zÇĞİÖŞÜçğıöşü0-9]/u.test(value);
+}
+
 runTests([
   ["rich synthetic therapy, medication, mood, prayer and note fields never reach native delivery copy", () => {
     const out = boot(state());
@@ -94,7 +109,7 @@ runTests([
   }],
   ["generic native preview remains generic and private fields stay in-app only", () => {
     const out = boot(state());
-    const safe = out.sandbox.App.reminderNativeSafeCopy({ definition: out.sandbox.ReminderCatalogV1.get("reminder.catalog.v1.journal"), occurrence: { note: SECRET, mood: "SECRET_MOOD" } });
+    const safe = out.sandbox.App.reminderNativeSafeCopy({ nativeTitle: SECRET, nativeBody: SECRET, definition: out.sandbox.ReminderCatalogV1.get("reminder.catalog.v1.journal"), occurrence: { note: SECRET, mood: "SECRET_MOOD", nativeTitle: SECRET, nativeBody: SECRET } });
     assertNoSecret(safe);
     assertEqual(safe.title, "Şeyma’da küçük bir durak hazır");
     assert(safe.body.includes("uygulamayı açıp"));
@@ -109,6 +124,64 @@ runTests([
     const html = out.app.innerHTML;
     ["başarısız", "kaçırdın", "ceza", "zorundasın", "eksik"].forEach((term) => assert(!html.toLocaleLowerCase("tr-TR").includes(term)));
     ["İstersen", "Kontrol sende", "tıbbi gereklilik iddiası taşımaz", "doz, tedavi veya tıbbi karar önermez"].forEach((term) => assert(html.includes(term)));
+  }],
+  ["canonical lexicon covers private, native, empty, error, permission, stale, snooze, mute and recovery copy", () => {
+    const out = boot(state());
+    const catalog = out.sandbox.ReminderCatalogV1;
+    const required = [
+      "private.prayer.title", "private.journal.body", "native.generic.title", "native.medication.body",
+      "inApp.empty.digestBody", "inApp.error.nativeBody", "inApp.permission.default.action",
+      "inApp.status.overall.stale.detail", "inApp.snooze.30m", "inApp.mute.todayAll", "inApp.recovery.detail"
+    ];
+    assert(Object.isFrozen(catalog.copy));
+    required.forEach((key) => {
+      const value = catalog.getCopy(key);
+      assert(typeof value === "string" && value.length > 0);
+      assertEqual(out.sandbox.App.reminderCopy(key), value);
+    });
+    catalog.list().forEach((definition) => {
+      const shortId = definition.id.split(".").pop();
+      assertEqual(definition.privateTitle, catalog.getCopy("private." + shortId + ".title"));
+      assertEqual(definition.privateBody, catalog.getCopy("private." + shortId + ".body"));
+    });
+    stringLeaves(catalog.copy, "").forEach(({ value }) => {
+      assert(hasTurkishOrLatinText(value));
+      assert(!value.includes("\n"));
+      assert(value.length <= 480);
+    });
+  }],
+  ["negative copy suite rejects shame, blame and clinical-authority phrasing", () => {
+    const out = boot(state());
+    out.sandbox.App.go("ayarlar");
+    out.sandbox.App.openReminderCenter();
+    const lexiconText = stringLeaves(out.sandbox.ReminderCatalogV1.copy, "").map((entry) => entry.value).join("\n");
+    const surfaces = lexiconText + "\n" + out.app.innerHTML;
+    ["başarısız", "kaçırdın", "zorundasın", "tedavi et", "normal değilsin", "ceza", "borç", "başaramadın", "ihmal ettin", "yapmalısın"].forEach((term) => {
+      assert(!surfaces.toLocaleLowerCase("tr-TR").includes(term));
+    });
+    const native = [out.sandbox.App.reminderNativeSafeCopy({ nativeTitle: SECRET, nativeBody: SECRET, occurrence: { nativeTitle: SECRET, nativeBody: SECRET, note: SECRET } })];
+    out.sandbox.ReminderCatalogV1.list().forEach((definition) => {
+      const occurrence = { occurrenceId: "rem-36-negative-" + definition.id, reminderId: definition.id, deepLink: definition.deepLink, timezone: "Europe/Istanbul" };
+      if (definition.id === "reminder.catalog.v1.therapy") occurrence.therapyToolId = "breath";
+      const copy = out.sandbox.App.reminderNativeDeliveryCopy({ reminderId: definition.id, occurrence });
+      assert(copy.ok);
+      native.push(copy);
+    });
+    native.forEach((copy) => {
+      const text = JSON.stringify(copy).toLocaleLowerCase("tr-TR");
+      ["terapi", "ilaç", "mood", "ibadet", "not", "doz", "tedavi", SECRET.toLocaleLowerCase("tr-TR")].forEach((term) => assert(!text.includes(term)));
+    });
+  }],
+  ["long Turkish copy remains measurable and wrap-safe at the 460px surface boundary", () => {
+    const out = boot(state());
+    const css = fs.readFileSync(path.join(rootDir, "styles.css"), "utf8");
+    assert(css.includes("overflow-wrap:anywhere") || css.includes("overflow-wrap: anywhere"));
+    [".sey-reminder-card-copy", ".sey-reminder-system-copy", ".sey-reminder-permission", ".sey-reminder-digest-intro"].forEach((selector) => assert(css.includes(selector)));
+    const native = out.sandbox.ReminderCatalogV1.copy.native;
+    assert(native.generic.title.length <= 80);
+    assert(native.generic.body.length <= 180);
+    assert(native.medication.title.length <= 80);
+    assert(native.medication.body.length <= 180);
   }],
   ["native surface has no sync/network side effect in the synthetic fixture", () => {
     const out = boot(state());

@@ -1308,6 +1308,10 @@
 @media (prefers-reduced-motion:reduce){.sey-reminder-overlay,.sey-reminder-screen,.sey-reminder-settings-entry,.sey-reminder-actions button,.sey-reminder-card button,.sey-reminder-profile-choice,.sey-reminder-setup-choice,.sey-reminder-setup-confirm,.sey-reminder-category-toggle,.sey-reminder-care-choice,.sey-reminder-care-toggle{animation:none!important;transition:none!important}}
 #root[data-theme="dark"] .sey-reminder-profile-note,#root[data-theme="dark"] .sey-reminder-card-version,#root[data-theme="dark"] .sey-reminder-care-choice-copy small,#root[data-theme="dark"] .sey-reminder-care-optin small{--rr-muted:#D2CBD5}
 
+/* REM-36: Turkish copy must remain readable on the 460px mobile surface. */
+.sey-reminder-header>div,.sey-reminder-header p,.sey-reminder-intro>div:last-child,.sey-reminder-intro p,.sey-reminder-card-copy,.sey-reminder-card-copy h3,.sey-reminder-inbox-copy,.sey-reminder-inbox-copy h3,.sey-reminder-inbox-copy p,.sey-reminder-system-copy,.sey-reminder-system-copy strong,.sey-reminder-system-copy small,.sey-reminder-permission p,.sey-reminder-permission small,.sey-reminder-digest-intro,.sey-reminder-digest-intro strong,.sey-reminder-digest-intro p,.sey-reminder-digest-empty strong,.sey-reminder-digest-empty p,.sey-reminder-inbox-privacy{min-width:0;overflow-wrap:anywhere}
+.sey-reminder-summary-item strong,.sey-reminder-summary-item em{white-space:normal;overflow-wrap:anywhere}
+
 /* REM-31: daily-flow context stays calm and keeps the primary / now-not
    actions distinct on narrow screens and in both themes. */
 .sey-reminder-inbox-flow{display:block;margin-bottom:3px;color:var(--reminder-strong);font-size:8.5px;font-weight:950;letter-spacing:.1em;line-height:1.2;text-transform:uppercase}

@@ -53,9 +53,11 @@ var COPY_LEXICON={
     center:{
       title:'Hatırlatmalar ve bildirimler',
       subtitle:'Günün küçük duraklarını burada sakince gözden geçir.',
+      settingsSubtitle:'Günün duraklarını, uygulama içi önizlemeyi ve izin sınırını gör.',
       closeLabel:'Hatırlatmalar ve bildirimler merkezini kapat',
       introTitle:'Kontrol sende',
-      introBody:'Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.'
+      introBody:'Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.',
+      liveNote:'Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.'
     },
     inbox:{
       eyebrow:'BUGÜNÜN SAKİN DURAKLARI',
@@ -83,7 +85,9 @@ var COPY_LEXICON={
       bodySuffix:'Bu yalnızca uygulama içi bir önizlemedir; native izin, bildirim veya kayıt oluşturmaz. Hassas reminder gövdesi gösterilmez.',
       syntheticTitle:'Şeyma’da küçük bir durak hazır',
       syntheticBody:'Bu yalnızca uygulama içinde gösterildi. Gerçek Notificati\u006fn oluşturulmadı, dış sisteme gönderilmedi ve geçmişe yazılmadı.',
-      syntheticNote:'Hassas reminder gövdesi burada kullanılmaz.'
+      syntheticNote:'Hassas reminder gövdesi burada kullanılmaz.',
+      syntheticDetail:'için yalnızca uygulama içinde gösterilen sentetik test.',
+      syntheticResultBody:'Bu yalnızca uygulama içinde gösterilen sentetik bir testtir.'
     },
     empty:{
       catalogTitle:'Şimdilik katalogda etkin hatırlatma yok.',
@@ -102,7 +106,8 @@ var COPY_LEXICON={
       personalizationTitle:'Uyarlama kapalı.',
       personalizationBody:'Hiç sinyal tutulmuyor ve hiçbir öneri üretilmiyor.',
       medicationTitle:'Henüz kişisel sağlık saati yok.',
-      medicationBody:'Bir saat kurarsan yalnız o saati hatırlatırız; doz veya tedavi kararı üretmeyiz.'
+      medicationBody:'Bir saat kurarsan yalnız o saati hatırlatırız; doz veya tedavi kararı üretmeyiz.',
+      medicationClear:'Yerel ilaç / takviye kayıtlarını temizle'
     },
     medication:{
       safety:'Bu özellik yalnızca senin girdiğin zamanı hatırlatır; doz, tedavi veya tıbbi karar önermez. Sağlıkla ilgili kararlar için doktorunun veya eczacının yönlendirmesini takip et.'
@@ -116,6 +121,8 @@ var COPY_LEXICON={
       pwaLimited:{label:'PWA sınırlaması',meaning:'Uygulama kapalıyken zamanlama garanti edilemiyor.',action:'Uygulamayı açınca catch-up kartını görebilirsin.'},
       request:'Native kanalı aç',
       retry:'Yeniden dene',
+      retryNote:'Bu yeniden deneme yalnızca sen dokunduğunda yapılır.',
+      previewAction:'Uygulama içi test akışını gör',
       settingsTitle:'Tarayıcı ayarları rehberi',
       settingsBody:'Bu site için tarayıcı ayarlarında Bildirimler bölümünü açıp İzin ver seçeneğini seçebilirsin. O zamana kadar uygulama içi kartlar çalışır.',
       explicitNote:'İzin yalnız bu açık eylemden sonra istenir; ilk yüklemede istenmez.',
@@ -171,6 +178,10 @@ var COPY_LEXICON={
       nowNot:'Şimdi değil',
       more:'Diğer seçenekler',
       details:'Ayrıntıları aç',
+      previewOpen:'Uygulama içi önizleme',
+      previewClose:'Önizlemeyi kapat',
+      disableReminder:'Bu durağı kapat',
+      enableReminder:'Bu durağı tekrar aç',
       snooze:'Ertele',
       todayOff:'Bugün sustur · bugün bir daha gösterme',
       disable:'Kapat · bu hatırlatmayı kapat',
@@ -195,6 +206,23 @@ var COPY_LEXICON={
     recovery:{
       label:'Bağlantı geri geldi',
       detail:'Yerel kayıt korunur; yalnızca güvenli uygulama içi akış yeniden kontrol edilir.'
+    },
+    history:{
+      title:'Son reminder geçmişi',
+      note:'Yalnız durum, kanal ve zaman tutulur. Reminder gövdesi, kişisel not veya sağlık ayrıntısı burada gösterilmez.',
+      emptyTitle:'Henüz geçmiş yok.',
+      emptyBody:'Sentetik testler ve ayar değişiklikleri de dış sisteme gönderilmez.',
+      label:'Bir reminder durağı',
+      nativeChannel:'Native kanal meta verisi',
+      inAppChannel:'Uygulama içi kanal',
+      selection:'Seçim',
+      shortDuration:'kısa süre',
+      settingsAction:'Ayar eylemi',
+      unknownAction:'İşlem kaydı',
+      clear:'Geçmişi temizle',
+      undo:'Geri al',
+      status:{scheduled:'Planlandı',shown:'Gösterildi',opened:'Açıldı',snoozed:'Ertelendi',dismissed:'Kapatıldı',reopened:'Tekrar açıldı',suppressed:'Sakince tutuldu',failed:'Gönderilemedi'},
+      unknownStatus:'Kısa olay'
     }
   }
 };

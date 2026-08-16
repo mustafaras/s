@@ -144,6 +144,13 @@ runTests([
       assertEqual(definition.privateTitle, catalog.getCopy("private." + shortId + ".title"));
       assertEqual(definition.privateBody, catalog.getCopy("private." + shortId + ".body"));
     });
+    const synthetic = out.sandbox.App.testReminder();
+    assertEqual(synthetic.copy.title, catalog.getCopy("inApp.preview.syntheticTitle"));
+    assertEqual(synthetic.copy.body, catalog.getCopy("inApp.preview.syntheticResultBody"));
+    out.sandbox.App.go("ayarlar");
+    out.sandbox.App.openReminderCenter();
+    assert(out.app.innerHTML.includes(catalog.getCopy("inApp.history.title")));
+    assert(out.app.innerHTML.includes(catalog.getCopy("inApp.history.label")));
     stringLeaves(catalog.copy, "").forEach(({ value }) => {
       assert(hasTurkishOrLatinText(value));
       assert(!value.includes("\n"));

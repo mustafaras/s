@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-29",
+  "activePrompt": "REM-30",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-28",
-  "nextSafeAction": "REM-29 release packet ve kullanıcı cihazı kabul hazırlığı; no release action",
+  "lastCompletedPrompt": "REM-29",
+  "nextSafeAction": "REM-30 başarı ölçütleri ve privacy-safe observability; user-device acceptance S5 pending; no release action",
   "currentPhase": "R8",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,12 +37,12 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-28 deterministic test harness boundary for prayer inbox date context and Saygı fixed clock; no production runtime file changed",
-    "tests": "REM-28 syntax PASS for app.js, sync.js, sw.js, hijriCalendar.js, reminder/catalog and panel modules; driver PASS; zikr 90/90; B1 0 failure; B2 32/32; 33/33 reminder suites; 92/92 root fixtures; 27/27 Panel-v2 fixtures; exact threshold, midnight, quiet, Europe/Istanbul, DST, Hicri offset, stale prayer, offline/online, reopen, duplicate and privacy matrix PASS; no browser, server, real network or data write",
-    "commit": "2884fbe6020c83eb396bdfd1078080a2c29d1b7f",
-    "remoteEquality": "not checked; no push or remote write",
+    "source": "REM-29 release packet bound to source/test baseline c321505; production source unchanged during packet preparation",
+    "tests": "REM-27/REM-28 synthetic receipts remain canonical: syntax, driver, zikr 90/90, B1/B2, 33 reminder, 92 root, 27 Panel-v2, deterministic time/privacy/accessibility matrix PASS; REM-29 git status/head/diff and allowlist audit PASS; no browser, server, real network or data write",
+    "commit": "0a2a81d2ced54d9f48b4643b37b079654901fd09",
+    "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
-    "deviceAcceptance": "not performed"
+    "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
     "status": "not_approved",
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-28 closure; REM-29 ready; release remains not_approved",
+  "updatedBy": "Codex REM-29 closure; REM-30 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-28",
-    "evidence": "docs/reminders/evidence/REM-28.md",
-    "commit": "2884fbe6020c83eb396bdfd1078080a2c29d1b7f"
+    "prompt": "REM-29",
+    "evidence": "docs/reminders/evidence/REM-29.md",
+    "commit": "0a2a81d2ced54d9f48b4643b37b079654901fd09"
   }
 }

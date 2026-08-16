@@ -10,6 +10,7 @@ kanıtlarını birbirinden ayıran release packet.
 - **Repository:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç branch/status:** `main...origin/main [ahead 64]`; worktree temiz.
 - **Source/test baseline SHA:** `c32150576dbce50f495e5d5ef71990ace6e211c7`
+- **Packet commit:** `0a2a81d2ced54d9f48b4643b37b079654901fd09`
 - REM-27 ve REM-28 canonical evidence/ledger satırları `done`; REM-28
   closure gate daha önce `next=REM-29` ile PASS etti.
 - REM-29’da üretim source’u (`app.js`, `sync.js`, `sw.js`, `styles.css`,
@@ -146,7 +147,7 @@ Bu maddeler release-ready veya deployed olarak etiketlenmemiştir.
 - **S0/S1:** source baseline, canonical docs, syntax/scope evidence.
 - **S2:** REM-27/REM-28 synthetic regression, migration, privacy ve a11y
   receipts.
-- **S3:** local packet commit; remote equality değildir.
+- **S3:** `0a2a81d2ced54d9f48b4643b37b079654901fd09`; remote equality değildir.
 - **S4:** N/A — push/deploy yapılmadı.
 - **S5:** pending — kullanıcı cihazı acceptance’ı ajan tarafından yapılmadı.
 

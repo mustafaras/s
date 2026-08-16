@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-35",
+  "activePrompt": "REM-36",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-34",
-  "nextSafeAction": "REM-35 Haftalık sakin özet ve yansıma; S5 kullanıcı cihazı kabulü pending; no release action",
+  "lastCompletedPrompt": "REM-35",
+  "nextSafeAction": "REM-36 Türkçe copy lexicon ve mahremiyet negatif dili; S5 kullanıcı cihazı kabulü pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-34 explicit-source personalization boundary; opt-in/local-history gate; suggestion-only reversible adaptation; no sensitive inference; reset/opt-out/no-history clear; policy cap/quiet/low-capacity guardrails remain authoritative",
-    "tests": "test_reminder_personalization.js PASS (68 assertions); test_reminder_privacy.js PASS (35); test_reminder_policy.js PASS (71); test_reminder_lifecycle.js PASS (36); all reminder fixtures, driver, zikr 90/90, root fixture loop, syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "f749e5f429af20653d943a90bc700714995d1fe2",
+    "source": "REM-35 local presence-only weekly digest; user-invoked calm reflection; no raw daily/therapy/mood/worship/medication output; safe on-this-day detail boundary; no-op and retention/timezone states",
+    "tests": "test_reminder_digest.js PASS (66 assertions); test_reminder_privacy.js PASS (35); all reminder fixtures, root regression, Panel-11 50/50, driver, migration 32/32, syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "d5b627344da355e14edfcf942775aa7c7590383a",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-34 closure; REM-35 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-35 closure; REM-36 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-34",
-    "evidence": "docs/reminders/evidence/REM-34.md",
-    "commit": "f749e5f429af20653d943a90bc700714995d1fe2"
+    "prompt": "REM-35",
+    "evidence": "docs/reminders/evidence/REM-35.md",
+    "commit": "d5b627344da355e14edfcf942775aa7c7590383a"
   }
 }

@@ -428,3 +428,32 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   taşımaz; sync regression davranışı korunur. Bu karar gerçek data repo write
   veya canlı release izni vermez.
 - **Sonraki adım:** REM-26 panel mirror / redacted system health.
+
+### REM-ADR-018 — Current panel reminder mirror’ı bilinçli no-op
+
+- **Tarih:** 2026-08-16
+- **Durum:** accepted
+- **Soru:** Current Panel reminder tarafında enabled category count, stale
+  prayer flag, permission health veya scheduler health gösterilmeli mi?
+- **Kanıt:** REM-ADR-017; `sync.js` local-only root listesi ve sanitize/merge
+  sınırı; `panelCoverageManifest.js` mevcut projection sözleşmesi;
+  `tests/reminders/test_reminder_panel_projection.js` sentetik negative fixture;
+  mevcut Panel-v1 / Panel-v2 kapsam ayrımı.
+- **Karar:** Hayır, REM-26 için current Panel reminder mirror’ı bilinçli
+  no-op’tur. `data.reminders` ve delivery kökleri remote latest/projection’a
+  çıkmadığı için enabled category count güvenilir biçimde hesaplanamaz;
+  browser permission cihaz-local, foreground scheduler health geçici evaluation
+  state’idir. `settings.prayer.remindersEnabled` da tek başına capability veya
+  stale-prayer health kanıtı değildir (REM-DISC-002). Yokluğu `0`, `healthy` ya
+  da `stale=false` diye sunmak yanlış gözlem olur.
+- **Privacy sınırı:** Manifest, legacy veya hatalı sentetik input’ta bile
+  `reminders`, delivery log/delivery history köklerini fail-closed redacted
+  eder. Private schedule, therapy/medication detail, mood, notes, body,
+  secret, raw profile ve occurrence ID panel projection’a girmez.
+- **Etkiler:** Panel-v1’e yeni reminder kartı, app-state mutation, reminder
+  scheduler importu veya reminder-specific write network eklenmedi. Panel-v2
+  regression yüzeyi bu prompta dahil edilmedi. Gelecekte güvenilir aggregate
+  için önce yeni bir remote-safe schema ve açık ürün kararı gerekir.
+- **Sonraki adım:** REM-27 accessibility, copy ve theme QA; daha ayrıntılı
+  current-panel reminder kararları REM-55–REM-66 surface hattında yeniden
+  değerlendirilebilir.

@@ -66,6 +66,16 @@ var MANIFEST={
     {path:"days.*.media",owner:"media",source:"user_input",privacy:"raw_media",mode:"redacted",fallback:"summary_only"},
     {path:"aeon-media",owner:"media",source:"transport",privacy:"raw_media",mode:"redacted",fallback:"never"},
     {path:"notifications",owner:"app",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
+    // Reminder preferences and delivery are device-local by contract.  Keep
+    // the panel fail-closed even if a legacy/incorrect latest fixture carries
+    // one of these roots before the sync sanitizer has run.
+    {path:"reminders",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"delivery",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"deliveryLog",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reminderDelivery",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reminderDeliveries",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"reminderHistory",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
+    {path:"notificationDelivery",owner:"reminder",source:"device_local_state",privacy:"local_only",mode:"redacted",fallback:"never"},
     {path:"eventLog",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"eventLog.events",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"quranJourney",owner:"quran",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},

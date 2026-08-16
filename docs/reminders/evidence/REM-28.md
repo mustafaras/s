@@ -10,7 +10,7 @@ matrix ve reminder privacy boundary doğrulaması.
 - **Program:** APP-REMINDER-UX
 - **Prompt:** REM-28
 - **Başlangıç HEAD:** `4feffeeacdc6aee5cc80f0901b7ce6c9ec23b05e`
-- **Commit:** `2884fbeacdc6aee5cc80f0901b7ce6c9ec23b05e`
+- **Commit:** `2884fbe6020c83eb396bdfd1078080a2c29d1b7f`
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -90,7 +90,7 @@ matrix ve reminder privacy boundary doğrulaması.
 - **S0/S1 source:** canonical docs, syntax, harness ve diff scope.
 - **S2 synthetic:** full reminder/root/Panel-v2, app VM, migration/helper,
   time ve privacy matrix PASS.
-- **S3 local commit:** `2884fbeacdc6aee5cc80f0901b7ce6c9ec23b05e`; yalnız local kanıt,
+- **S3 local commit:** `2884fbe6020c83eb396bdfd1078080a2c29d1b7f`; yalnız local kanıt,
   remote equality veya release kanıtı değildir.
 - **S4 remote / Pages:** N/A.
 - **S5 user device:** N/A.

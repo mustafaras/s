@@ -2341,6 +2341,87 @@ function reminderPrayerLifecycleInput(preference,input,localDate,source){
   return out;
 }
 
+// ── REM-33: system capability / freshness contract ────────────────────────
+// Bu katman yalnız allowlisted durum ve genel açıklama üretir. Token, raw
+// hata, konum, vakit saati veya kullanıcı metni dışarıya dönmez.
+var REMINDER_SYSTEM_STATUS_VERSION=1;
+var REMINDER_SYSTEM_SYNC_STATES={disabled:true,idle:true,pending:true,synced:true,error:true,offline:true};
+function reminderSystemOffline(input){
+  var x=input&&typeof input==='object'?input:{};
+  if(x.offline===true) return true;
+  if(Object.prototype.hasOwnProperty.call(x,'online')) return x.online===false;
+  if(x.context&&typeof x.context==='object'&&Object.prototype.hasOwnProperty.call(x.context,'offline')) return x.context.offline===true;
+  try{ if(typeof navigator!=='undefined'&&navigator&&navigator.onLine===false) return true; }catch(e){}
+  return false;
+}
+function reminderSystemLocalDate(input,timezone){
+  var x=input&&typeof input==='object'?input:{}, direct=String(x.localDate||'');
+  if(reminderEngineValidDate(direct)) return direct;
+  var nowIso=String(x.nowIso||x.instantIso||''), ms=Date.parse(nowIso), local=Number.isFinite(ms)?reminderEngineLocalParts(ms,timezone):null;
+  return local&&reminderEngineValidDate(local.localDate)?local.localDate:'';
+}
+function reminderSystemPrayerStatus(input){
+  var x=input&&typeof input==='object'?input:{}, timezone=String(x.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), localDate=reminderSystemLocalDate(x,timezone), source=x.prayerData&&typeof x.prayerData==='object'?reminderPrayerSource({prayerData:x.prayerData,localDate:localDate}):(localDate?reminderPrayerSourceForDate(localDate):null);
+  if(!source||typeof source!=='object') return {state:'unavailable',canGenerate:false,reason:'missing-prayer-data'};
+  var times=source.times&&typeof source.times==='object'?source.times:{}, hasAny=false, complete=true;
+  REMINDER_PRAYER_KEYS.forEach(function(key){ if(typeof times[key]==='string'&&reminderEngineParseTime(times[key])) hasAny=true; else complete=false; });
+  if(!hasAny) return {state:'unavailable',canGenerate:false,reason:'missing-prayer-time'};
+  if(!complete) return {state:'unavailable',canGenerate:false,reason:'incomplete-prayer-data'};
+  if(!reminderEngineValidDate(localDate)||String(source.localDate||'')!==localDate) return {state:'stale',canGenerate:false,reason:'stale-prayer-data'};
+  var fetchedMs=Date.parse(String(source.fetchedAt||''));
+  if(!Number.isFinite(fetchedMs)) return {state:'stale',canGenerate:false,reason:'stale-prayer-data'};
+  var nowMs=Date.parse(String(x.nowIso||x.instantIso||'')), maxAgeHours=Number.isFinite(Number(x.prayerMaxAgeHours))?Math.max(0,Number(x.prayerMaxAgeHours)):48;
+  if(Number.isFinite(nowMs)){ var ageHours=(nowMs-fetchedMs)/3600000; if(ageHours<0||ageHours>maxAgeHours) return {state:'stale',canGenerate:false,reason:'stale-prayer-data'}; }
+  if(x.locationHash&&String(source.fetchedFor||'')!==String(x.locationHash)) return {state:'stale',canGenerate:false,reason:'prayer-location-changed'};
+  if(x.prayerMethod&&String(source.method||'')!==String(x.prayerMethod)) return {state:'stale',canGenerate:false,reason:'prayer-method-changed'};
+  if(x.offline===true&&(source.fallback===true||source.offlineFallback===true)&&source.fresh!==true) return {state:'stale',canGenerate:false,reason:'offline-prayer-data'};
+  return {state:'fresh',canGenerate:true,reason:null};
+}
+function reminderSystemSyncStatus(input){
+  var x=input&&typeof input==='object'?input:{}, configured=x.configured===true, receipt=normalizeSyncReceipt(x.receipt), status=String(receipt.status||'idle'), code=String(receipt.lastErrorCode||'');
+  if(!configured) return {state:'disabled',pending:false,ok:true,reason:'sync-not-configured'};
+  if(x.offline===true||status==='offline'||code==='offline') return {state:'offline',pending:false,ok:false,reason:'sync-offline'};
+  if(status==='queued'||status==='saving'||status==='retrying'||status==='local_saved') return {state:'pending',pending:true,ok:false,reason:'sync-pending'};
+  if(status==='error'||status==='permission'||status==='conflict'||status==='anti_clobber'||code) return {state:'error',pending:false,ok:false,reason:'sync-error'};
+  if(status==='accepted') return {state:'synced',pending:false,ok:true,reason:null};
+  return {state:REMINDER_SYSTEM_SYNC_STATES[status]?status:'idle',pending:false,ok:status==='idle',reason:null};
+}
+function reminderSystemStatus(input){
+  var x=input&&typeof input==='object'?input:{}, offline=reminderSystemOffline(x), timezone=String(x.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), localDate=reminderSystemLocalDate(x,timezone), permission=Object.prototype.hasOwnProperty.call(x,'permissionState')?reminderPermissionState({state:x.permissionState}):Object.prototype.hasOwnProperty.call(x,'permission')?reminderPermissionState({permission:x.permission}):reminderPermissionSnapshot(), prayer=reminderSystemPrayerStatus(Object.assign({},x,{offline:offline,timezone:timezone,localDate:localDate,locationHash:x.locationHash||prayerLocationHash(),prayerMethod:x.prayerMethod||prayerMethod()})), sync=reminderSystemSyncStatus({configured:x.configured===true,receipt:x.receipt|| (data&&data.syncReceipt),offline:offline}), recovery=x.recovery===true||x.source==='online';
+  var state=offline?'offline':recovery?'recovery':prayer.state==='stale'?'stale':prayer.state==='unavailable'?'unavailable':'fresh';
+  return {
+    schemaVersion:REMINDER_SYSTEM_STATUS_VERSION,
+    state:state,
+    networkState:offline?'offline':'online',
+    prayerState:prayer.state,
+    prayerCanGenerate:prayer.canGenerate===true,
+    permissionState:permission,
+    syncState:sync.state,
+    syncPending:sync.pending===true,
+    backgroundState:'unsupported',
+    recoveryState:recovery?'recovery':'idle',
+    capability:{inApp:'available',prayerInApp:prayer.canGenerate===true?'available':'blocked',native:!offline&&permission==='granted'&&prayer.canGenerate===true?'possible':'in_app_only'},
+    reasons:{overall:state,prayer:prayer.reason||null,sync:sync.reason||null}
+  };
+}
+function reminderSystemStatusCopy(kind,state){
+  var copy={
+    overall:{fresh:{label:'Durum güncel',detail:'Yerel reminder akışı kullanılabilir.'},stale:{label:'Vakit verisi eski',detail:'Yeni vakit reminderı üretilmiyor; güncel veri gelene kadar bekleniyor.'},unavailable:{label:'Vakit verisi hazır değil',detail:'Vakit verisi olmadan bu reminder oluşturulmaz; diğer uygulama içi alanlar açık kalır.'},offline:{label:'Çevrimdışısın',detail:'Yerel kayıt korunur; native kanal ve ağ gerektiren yenilemeler bağlantı dönene kadar bekler.'},recovery:{label:'Bağlantı geri geldi',detail:'Varsa son 24 saat tek kontrollü uygulama içi özette kalır; geçmiş native olarak yeniden oynatılmaz.'}},
+    prayer:{fresh:{label:'Vakit verisi güncel',detail:'Vakit kaynağı bu yerel gün için kullanılabilir.'},stale:{label:'Vakit verisi eski',detail:'Yeni vakitmiş gibi uygulama içi veya native reminder gösterilmiyor.'},unavailable:{label:'Vakit verisi kullanılamıyor',detail:'Tamamlanmamış veya doğrulanamayan veriyle reminder üretilmiyor.'}},
+    permission:{granted:{label:'Native izin açık',detail:'Native kanal yalnız desteklenen foreground koşullarında mümkün.'},denied:{label:'Native izin reddedildi',detail:'Uygulama içi reminderlar açık kalır; tarayıcı ayarları değiştirilmeden native kullanılmaz.'},unsupported:{label:'Native desteklenmiyor',detail:'Bu kurulumda uygulama içi reminderlar kullanılabilir.'},default:{label:'Native izin seçilmedi',detail:'İzin kendiliğinden istenmez; kullanıcı isterse ayarlardan karar verir.'},'temporary-error':{label:'Native geçici hata',detail:'Uygulama içi reminder korunur; daha sonra yeniden denenebilir.'},'pwa-limited':{label:'PWA zamanlama sınırı',detail:'Uygulama kapalıyken zamanlama garanti edilemiyor; açınca güvenli özet gösterilir.'}},
+    sync:{disabled:{label:'Yalnız cihazda',detail:'Senkron ayarlı değil; reminder deneyimi yerelde çalışır.'},idle:{label:'Senkron hazır',detail:'Henüz uzak kayıt işlemi beklemiyor.'},synced:{label:'Senkron tamamlandı',detail:'Son güvenli kayıt kabul edildi.'},pending:{label:'Senkron bekliyor',detail:'Yerel reminder deneyimi kilitlenmez; uzak kayıt sırası bekleniyor.'},offline:{label:'Senkron çevrimdışı',detail:'Yerel kayıt korunur; bağlantı dönünce tek kontrollü yeniden deneme yapılır.'},error:{label:'Senkron tamamlanamadı',detail:'Yerel kayıt korunur; teknik ayrıntı veya token gösterilmez. Yeniden denenebilir.'}},
+    background:{unsupported:{label:'Arka plan zamanlaması garanti değil',detail:'Uygulama kapalıyken kesin yerel alarm vaadi yok; foreground ve açılış catch-up sınırı kullanılır.'}}
+  };
+  var group=copy[kind]||copy.overall, value=group[state]||group.unavailable||group.idle||group.unsupported||group.fresh||{label:'Durum bilinmiyor',detail:'Uygulama içi güvenli akış korunur.'};
+  return {label:value.label,detail:value.detail};
+}
+function reminderSystemStatusHTML(){
+  var last=reminderLifecycleState.lastResult||{}, report=reminderSystemStatus({nowIso:new Date().toISOString(),online:!reminderSystemOffline(),permissionState:reminderPermissionSnapshot(),configured:syncConfigured(),receipt:data&&data.syncReceipt,recovery:last.recoveryState==='recovery'}), overall=reminderSystemStatusCopy('overall',report.state), entries=[{kind:'overall',state:report.state,label:'Genel durum'},{kind:'prayer',state:report.prayerState,label:'Vakit verisi'},{kind:'permission',state:report.permissionState,label:'Native izin'},{kind:'sync',state:report.syncState,label:'Senkron'},{kind:'background',state:report.backgroundState,label:'Arka plan'}], h='<section class="sey-reminder-system-status" data-reminder-system-state="'+esc(report.state)+'" aria-labelledby="sey-reminder-system-title" aria-describedby="sey-reminder-system-help"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">DÜRÜST SİSTEM DURUMU</span><h3 id="sey-reminder-system-title">Ne mümkün, ne bekliyor?</h3></div><span class="sey-reminder-status-pill" data-reminder-capability-state="'+esc(report.state)+'">'+esc(overall.label)+'</span></div><p id="sey-reminder-system-help" class="sey-reminder-profile-note">'+esc(overall.detail)+'</p><div class="sey-reminder-system-list" role="list" aria-label="Reminder capability durumları">';
+  entries.forEach(function(item){ var copy=reminderSystemStatusCopy(item.kind,item.state), attr=item.kind==='permission'?(item.state==='denied'?'permission-denied':item.state):item.kind==='sync'?'sync-'+item.state:item.state; h+='<div class="sey-reminder-system-row" role="listitem" data-reminder-capability="'+esc(item.kind)+'" data-reminder-capability-state="'+esc(attr)+'"><span class="sey-reminder-system-dot" aria-hidden="true"></span><span class="sey-reminder-system-copy"><strong>'+esc(item.label)+' · '+esc(copy.label)+'</strong><small>'+esc(copy.detail)+'</small></span></div>'; });
+  h+='</div><p class="sey-reminder-system-safe" role="status" aria-live="polite">'+icon(report.state==='fresh'?'circle-check':report.state==='recovery'?'rotate-ccw':'info',14)+' Reminder deneyimi yerelde devam eder; sistem verisi eskiyse yeni vakit reminderı sessizce uydurulmaz.</p></section>';
+  return h;
+}
+
 // ── REM-15 Zikir / tefekkür adapter ───────────────────────────────────────
 // Zikir reminderları yalnız kullanıcının reminder preference'ı üzerinden
 // oluşur. Zikr root'u ve reflection kayıtları occurrence'a kopyalanmaz;
@@ -2908,7 +2989,7 @@ function reminderDeliveryClear(){ try{ if(typeof localStorage!=='undefined') loc
 // olarak delivery journal'ın tekil occurrence kaydı engeller.
 var REMINDER_LIFECYCLE_INTERVAL_MS=30000;
 var REMINDER_LIFECYCLE_VISIBILITY={visible:true,hidden:true};
-var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null};
+var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null,recoveryPending:false};
 
 function reminderLifecycleVisibility(value){
   var state=String(value||'').toLowerCase();
@@ -3030,7 +3111,7 @@ function reminderCatchupPublic(plan){
   return {ok:true,summaries:summary?[summary]:[],summary:summary,eligibleCount:plan&&plan.members?plan.members.length:0,expiredCount:plan&&plan.expired?plan.expired.length:0,reason:summary?summary.reason:null,nativeReplay:false,inAppOnly:true,timezone:plan&&plan.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE,nowIso:plan&&plan.nowIso||''};
 }
 function reminderEvaluateReminders(input){
-  var x=input&&typeof input==='object'?input:{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), suppliedContext=x.context&&typeof x.context==='object'?x.context:{}, context=Object.assign({},suppliedContext), visibility=reminderLifecycleVisibility(x.visibilityState||context.visibilityState), source=reminderLifecycleCandidateList(x), log=reminderDeliveryNormalize(x.deliveryLog||x.journal||x.log,nowIso), initialLog=JSON.stringify(log), results=[],errors=[],shownCount=0,suppressedCount=0,duplicateCount=0,scheduledCount=0,catchUpRequested=x.catchUp===true||x.reopen===true,catchUpPlan=catchUpRequested?reminderCatchupPlan({nowIso:nowIso,timezone:x.timezone||context.timezone,context:context,occurrences:source,deliveryLog:log}):null,catchUpIds={};
+  var x=input&&typeof input==='object'?input:{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), suppliedContext=x.context&&typeof x.context==='object'?x.context:{}, context=Object.assign({},suppliedContext), visibility=reminderLifecycleVisibility(x.visibilityState||context.visibilityState), source=reminderLifecycleCandidateList(x), log=reminderDeliveryNormalize(x.deliveryLog||x.journal||x.log,nowIso), initialLog=JSON.stringify(log), results=[],errors=[],shownCount=0,suppressedCount=0,duplicateCount=0,scheduledCount=0,catchUpRequested=(x.catchUp===true||x.reopen===true)&&context.offline!==true,catchUpPlan=catchUpRequested?reminderCatchupPlan({nowIso:nowIso,timezone:x.timezone||context.timezone,context:context,occurrences:source,deliveryLog:log}):null,catchUpIds={};
   context.visibilityState=visibility;
   if(!Array.isArray(context.recentCategoryDeliveries)) context.recentCategoryDeliveries=[];
   if(catchUpPlan){
@@ -3078,7 +3159,7 @@ function reminderEvaluateReminders(input){
         result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'suppressed',channel:policy.channel||candidate.channel||item.channel,reason:suppressedReason,now:nowIso},nowIso);
         log=result.log; suppressedCount++; if(result.duplicate) duplicateCount++; results.push(reminderLifecycleRecordResult(item,result,{status:'suppressed',reason:suppressedReason,nativeAllowed:false,policyReason:policy.reason||suppressedReason})); return;
       }
-      var channel=policy.channel==='native'&&!item.nativeReplay&&!item.replay?'native':'in_app';
+      var channel=policy.channel==='native'&&!item.nativeReplay&&!item.replay&&context.offline!==true?'native':'in_app';
       result=reminderDeliveryRecordPure(log,{occurrenceId:occurrenceId,occurrence:item,status:'shown',channel:channel,now:nowIso,resurface:visibility==='visible'},nowIso);
       log=result.log; if(result.duplicate) duplicateCount++; else if(result.changed) shownCount++;
       results.push(reminderLifecycleRecordResult(item,result,{status:result.entry&&result.entry.status||'shown',channel:channel,nativeAllowed:policy.nativeAllowed===true&&channel==='native',policyReason:policy.reason||null}));
@@ -3100,8 +3181,9 @@ function reminderLifecycleDefaultContext(input,nowIso){
   var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), policy=root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(), timezone=String(x.timezone||((root&&root.timezone)||'')||'Europe/Istanbul'), instantMs=new Date(nowIso).getTime(), local=reminderEngineLocalParts(instantMs,timezone), requestedVisibility=x.visibilityState||(x.context&&x.context.visibilityState), visibility;
   if(!requestedVisibility){ try{ requestedVisibility=document.hidden?'hidden':'visible'; }catch(e){ requestedVisibility='visible'; } }
   visibility=reminderLifecycleVisibility(requestedVisibility);
-  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,dailyFlowBudget:policy.dailyFlowBudget,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility},x.context&&typeof x.context==='object'?x.context:{});
+  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,dailyFlowBudget:policy.dailyFlowBudget,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility,offline:reminderSystemOffline(x),online:!reminderSystemOffline(x)},x.context&&typeof x.context==='object'?x.context:{});
   context.visibilityState=visibility;
+  context.offline=reminderSystemOffline(Object.assign({},x,{context:context})); context.online=!context.offline;
   return context;
 }
 function reminderLifecycleWindowDue(definition,localTime){
@@ -3462,6 +3544,14 @@ function reminderLifecycleBuildCandidates(input,context,root){
   reminderSpecialDayLifecycleCandidates({source:x,context:context,root:root,localDate:context.localDate,localTime:context.localTime,timezone:context.timezone,catchUp:x.catchUp===true,hijriOffset:specialOffset}).forEach(function(candidate){ out.push(candidate); });
   return reminderDailyFlowCoalesceCandidates(reminderEveningCoalesceCandidates(out,context),context);
 }
+function reminderLifecycleIsPrayerCandidate(candidate){
+  var x=candidate&&typeof candidate==='object'?candidate:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x, definition=x.definition&&typeof x.definition==='object'?x.definition:{};
+  // A generated prayer occurrence carries its selected key.  Do not classify
+  // an arbitrary synthetic occurrence that merely reuses the catalog id as a
+  // live prayer source; older pure lifecycle fixtures and app-only previews
+  // must remain independently testable.
+  return !!occurrence.prayerKey&&(String(x.reminderId||occurrence.reminderId||definition.id||'')===REMINDER_PRAYER_ID||String(occurrence.triggerType||definition.triggerType||'')==='prayer-offset');
+}
 function reminderLifecycleEvaluate(source,input){
   if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
   var x=input&&typeof input==='object'?Object.assign({},input):{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), sourceName=String(source||x.source||'manual');
@@ -3469,7 +3559,9 @@ function reminderLifecycleEvaluate(source,input){
   if(!data) return {ok:true,status:'skipped',source:sourceName,reason:'no-data',changed:false,results:[],errors:[]};
   reminderLifecycleState.running=true;
   try{
-    var root=reminderCurrentRoot(), context=reminderLifecycleDefaultContext(x,nowIso), catchUp=x.catchUp===true||sourceName==='boot'||sourceName==='foreground'||sourceName==='focus'||sourceName==='pageshow'||sourceName==='visibilitychange'||sourceName==='online', candidates=reminderLifecycleBuildCandidates(Object.assign({},x,{catchUp:catchUp}),context,root), candidateById={};
+    var root=reminderCurrentRoot(), context=reminderLifecycleDefaultContext(x,nowIso), recoveryCatchUp=sourceName==='online'&&context.offline!==true&&reminderLifecycleState.recoveryPending===true, systemStatus=reminderSystemStatus({nowIso:nowIso,localDate:context.localDate,timezone:context.timezone,offline:context.offline,permissionState:context.permissionState,receipt:data&&data.syncReceipt,configured:syncConfigured(),prayerData:x.prayerData,recovery:recoveryCatchUp}), catchUp=(x.catchUp===true||sourceName==='boot'||sourceName==='foreground'||sourceName==='focus'||sourceName==='pageshow'||sourceName==='visibilitychange'||(sourceName==='online'&&recoveryCatchUp))&&context.offline!==true, candidateInput=Object.assign({},x,{catchUp:catchUp,offline:context.offline}), candidates=reminderLifecycleBuildCandidates(candidateInput,context,root), stalePrayerBlocked=0, candidateById={};
+    if(context.offline===true||sourceName==='offline') reminderLifecycleState.recoveryPending=true;
+    candidates=candidates.filter(function(candidate){ if(!reminderLifecycleIsPrayerCandidate(candidate)) return true; if(systemStatus.prayerState==='fresh') return true; stalePrayerBlocked++; return false; });
     candidates.forEach(function(candidate){ var candidateOccurrence=candidate&&candidate.occurrence&&typeof candidate.occurrence==='object'?candidate.occurrence:candidate, candidateId=reminderLifecycleOccurrenceId(candidateOccurrence); if(candidateId&&!candidateById[candidateId]) candidateById[candidateId]=candidate; });
     var current=reminderDeliveryLoad(nowIso,false), result=reminderEvaluateReminders({source:sourceName,nowIso:nowIso,visibilityState:context.visibilityState,context:context,occurrences:candidates,deliveryLog:current,catchUp:catchUp});
     var persisted=true;
@@ -3485,8 +3577,10 @@ function reminderLifecycleEvaluate(source,input){
       deliveryResult.nativeReason=native.reason||null;
       nativeResults.push({occurrenceId:deliveryResult.occurrenceId,status:deliveryResult.nativeStatus,reason:deliveryResult.nativeReason});
     });
-    result.nativeResults=nativeResults; result.nativeShownCount=nativeResults.filter(function(item){ return item.status==='shown'; }).length;
-    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:result.status,source:result.source,visibilityState:result.visibilityState,shownCount:result.shownCount,suppressedCount:result.suppressedCount,scheduledCount:result.scheduledCount,duplicateCount:result.duplicateCount,errorCount:result.errors.length,persisted:persisted};
+    result.nativeResults=nativeResults; result.nativeShownCount=nativeResults.filter(function(item){ return item.status==='shown'; }).length; result.systemStatus=systemStatus; result.stalePrayerBlocked=stalePrayerBlocked; result.recoveryState=recoveryCatchUp?'recovery':'idle'; result.catchUpPerformed=catchUp;
+    if(sourceName==='online'&&context.offline!==true&&result.ok===true&&persisted) reminderLifecycleState.recoveryPending=false;
+    else if(context.offline===true||sourceName==='offline') reminderLifecycleState.recoveryPending=true;
+    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:result.status,source:result.source,visibilityState:result.visibilityState,shownCount:result.shownCount,suppressedCount:result.suppressedCount,scheduledCount:result.scheduledCount,duplicateCount:result.duplicateCount,errorCount:result.errors.length,persisted:persisted,recoveryState:result.recoveryState,catchUpPerformed:result.catchUpPerformed};
     return result;
   }catch(e){
     var failed={ok:false,status:'failed',source:sourceName,reason:'unknown',changed:false,results:[],errors:[{occurrenceId:'',reason:'unknown'}],persisted:false};
@@ -5216,7 +5310,7 @@ window.SeyOnSyncState=function(receipt){
   if((st==='saving'||st==='queued'||st==='retrying')&&(ui.saveState==='dirty'||ui.saveState==='saving'||ui.saveState==='error')) ui.saveState=ui.saveActionPending?'saving':'dirty';
   else if((st==='error'||st==='offline'||st==='permission'||st==='conflict'||st==='anti_clobber')&&(ui.saveState==='dirty'||ui.saveState==='saving'||ui.saveState==='error')) ui.saveState='error';
   try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
-  updateSaveBanner(); updateHeaderSave();
+  updateSaveBanner(); updateHeaderSave(); if(ui.reminderCenterOpen) render();
 };
 window.SeyOnSynced=function(receipt){
   if(!data) return;
@@ -6081,6 +6175,7 @@ function reminderCenterOverlayHTML(){
   h+='<main class="sey-reminder-scroll">';
   h+=reminderCenterNoticeHTML();
   h+='<section class="sey-reminder-intro" aria-labelledby="sey-reminder-overview-title"><div class="sey-reminder-intro-mark" aria-hidden="true">'+icon('bell-ring',22)+'</div><div><h3 id="sey-reminder-overview-title">Kontrol sende</h3><p id="sey-reminder-overview-copy">Native kanal yalnız açık bir kullanıcı eylemiyle açılır; ilk yüklemede izin istenmez. Uygulama içi önizleme izin gerektirmez.</p></div></section>';
+  h+=reminderSystemStatusHTML();
   h+=reminderProfileSectionHTML(root);
   h+='<section class="sey-reminder-summary" aria-label="Bugünün hatırlatma özeti">';
   [[ 'sun','Bugünün modu',reminderCapacityModeLabel(policy.capacityMode),'Profil: '+reminderProfileById(root.profile).label],['check-check','Kalan öneri',String(remaining),'Katalog kapsamı · '+defs.length+' tanım'],['circle-check','Native izin',permission.label,permission.meaning],['moon','Sessiz saatler',policy.quietHours.start+'–'+policy.quietHours.end,'Kullanıcı tercihi · quiet interval'],['activity','Native bütçesi','0 / '+policy.nativeDailyCap,'Günlük üst sınır · düşük öncelik '+policy.lowPriorityNativeCap+' · cooldown '+policy.sameCategoryCooldownMinutes+' dk']].forEach(function(item){
@@ -6155,6 +6250,10 @@ App.reminderPrayerOccurrences=reminderPrayerOccurrences;
 App.generatePrayerReminderOccurrence=reminderPrayerOccurrence;
 App.generatePrayerReminderOccurrences=reminderPrayerOccurrences;
 App.reminderPrayerPrivateCopy=reminderPrayerPrivateCopy;
+App.reminderPrayerStatus=reminderSystemPrayerStatus;
+App.reminderSyncStatus=reminderSystemSyncStatus;
+App.reminderSystemStatus=reminderSystemStatus;
+App.reminderSystemStatusCopy=reminderSystemStatusCopy;
 App.reminderZikrFeatureEnabled=reminderZikrFeatureEnabled;
 App.reminderZikrOccurrence=reminderZikrDailyOccurrence;
 App.reminderZikrDailyOccurrence=reminderZikrDailyOccurrence;
@@ -6242,7 +6341,7 @@ App.evaluateReminderLifecycle=reminderLifecycleEvaluate;
 App.reminderLifecycleTick=reminderLifecycleTick;
 App.reminderLifecycleInterval=REMINDER_LIFECYCLE_INTERVAL_MS;
 App.reminderLifecycleState=function(){
-  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
+  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
 };
 App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
 App.reminderCareDefinitions=function(){ return reminderCareDefinitions(); };
@@ -16969,7 +17068,7 @@ function onAppForeground(source){
     data.lastOpenedAt=new Date().toISOString();
     save(false);
   }
-  reminderLifecycleEvaluate(source||'foreground');
+  reminderLifecycleEvaluate(source||'foreground',{offline:reminderSystemOffline()});
   pollRemote(true);
   maybePullQuranForeground(true);
   maybeFetchDailyPhoto();
@@ -16977,7 +17076,8 @@ function onAppForeground(source){
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ reminderLifecycleEvaluate('hidden'); } else { onAppForeground('visibilitychange'); } });
 window.addEventListener('focus',function(){ onAppForeground('focus'); });   // iOS PWA: sekmeye/uygulamaya dönünce hemen çek
 window.addEventListener('pageshow',function(){ onAppForeground('pageshow'); }); // bfcache'ten geri dönüşte
-window.addEventListener('online',function(){ reminderLifecycleEvaluate('online'); pollRemote(true); maybePullQuranForeground(true); });   // bağlantı gelince teslimi hemen kontrol et
+window.addEventListener('online',function(){ reminderLifecycleEvaluate('online',{online:true,offline:false}); pollRemote(true); maybePullQuranForeground(true); if(ui.reminderCenterOpen) render(); });   // bağlantı gelince teslimi hemen kontrol et
+window.addEventListener('offline',function(){ reminderLifecycleEvaluate('offline',{online:false,offline:true}); if(ui.reminderCenterOpen) render(); });
 
 render();
 if(data){ reminderLifecycleEvaluate('boot'); }

@@ -1317,6 +1317,22 @@
 #root[data-theme="dark"] .sey-reminder-inbox-now-not{color:var(--reminder-inbox-strong)}
 @media (prefers-reduced-motion:reduce){.sey-reminder-inbox-now-not{transition:none!important}}
 
+/* REM-33: explicit capability, freshness and recovery states. */
+.sey-reminder-system-status{display:flex;flex-direction:column;gap:10px;padding:13px;border:1px solid var(--card-bd);border-radius:17px;background:var(--field)}
+.sey-reminder-status-pill{display:inline-flex;align-items:center;max-width:46%;padding:5px 9px;border:1px solid color-mix(in srgb,var(--ok) 28%,var(--card-bd));border-radius:999px;color:var(--ok);font-size:10px;font-weight:850;text-align:right}
+.sey-reminder-system-list{display:flex;flex-direction:column;gap:7px}
+.sey-reminder-system-row{display:flex;align-items:flex-start;gap:8px;min-width:0;padding:8px 9px;border:1px solid color-mix(in srgb,var(--card-bd) 78%,transparent);border-radius:12px;background:var(--card)}
+.sey-reminder-system-dot{width:8px;height:8px;flex:0 0 8px;margin-top:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 14%,transparent)}
+.sey-reminder-system-row[data-reminder-capability-state="stale"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="offline"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="permission-denied"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="sync-error"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="sync-offline"] .sey-reminder-system-dot{background:var(--warn);box-shadow:0 0 0 3px color-mix(in srgb,var(--warn) 14%,transparent)}
+.sey-reminder-system-row[data-reminder-capability-state="unavailable"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="unsupported"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="sync-disabled"] .sey-reminder-system-dot{background:var(--muted);box-shadow:0 0 0 3px color-mix(in srgb,var(--muted) 14%,transparent)}
+.sey-reminder-system-row[data-reminder-capability-state="recovery"] .sey-reminder-system-dot,.sey-reminder-system-row[data-reminder-capability-state="sync-pending"] .sey-reminder-system-dot{background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.sey-reminder-system-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sey-reminder-system-copy strong{color:var(--text);font-size:11.5px;line-height:1.3}
+.sey-reminder-system-copy small{color:var(--muted);font-size:10.5px;line-height:1.4}
+.sey-reminder-system-safe{display:flex;align-items:flex-start;gap:6px;margin:0;color:var(--muted);font-size:10.5px;line-height:1.45}
+@media (max-width:390px){.sey-reminder-status-pill{max-width:42%;font-size:9px}.sey-reminder-system-copy strong{font-size:11px}}
+@media (prefers-reduced-motion:reduce){.sey-reminder-system-status *{transition:none!important;animation:none!important}}
+
 /* REM-32: one control surface for policy, synthetic preview and local history. */
 .sey-reminder-policy,.sey-reminder-history{display:flex;flex-direction:column;gap:11px;padding:13px;border:1px solid var(--card-bd);border-radius:17px;background:var(--field)}
 .sey-reminder-policy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}

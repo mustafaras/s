@@ -1307,3 +1307,12 @@
 .sey-reminder-care-choice{min-height:44px}
 @media (prefers-reduced-motion:reduce){.sey-reminder-overlay,.sey-reminder-screen,.sey-reminder-settings-entry,.sey-reminder-actions button,.sey-reminder-card button,.sey-reminder-profile-choice,.sey-reminder-setup-choice,.sey-reminder-setup-confirm,.sey-reminder-category-toggle,.sey-reminder-care-choice,.sey-reminder-care-toggle{animation:none!important;transition:none!important}}
 #root[data-theme="dark"] .sey-reminder-profile-note,#root[data-theme="dark"] .sey-reminder-card-version,#root[data-theme="dark"] .sey-reminder-care-choice-copy small,#root[data-theme="dark"] .sey-reminder-care-optin small{--rr-muted:#D2CBD5}
+
+/* REM-31: daily-flow context stays calm and keeps the primary / now-not
+   actions distinct on narrow screens and in both themes. */
+.sey-reminder-inbox-flow{display:block;margin-bottom:3px;color:var(--reminder-strong);font-size:8.5px;font-weight:950;letter-spacing:.1em;line-height:1.2;text-transform:uppercase}
+.sey-reminder-inbox-item-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sey-reminder-inbox-now-not{min-height:40px;padding:8px 11px;border:1px solid color-mix(in srgb,var(--reminder-focus) 34%,var(--field-bd));border-radius:11px;background:var(--field);color:var(--reminder-inbox-strong);font:inherit;font-size:11px;font-weight:900;cursor:pointer}
+.sey-reminder-inbox-now-not:focus-visible{outline:3px solid var(--reminder-focus);outline-offset:2px}
+#root[data-theme="dark"] .sey-reminder-inbox-now-not{color:var(--reminder-inbox-strong)}
+@media (prefers-reduced-motion:reduce){.sey-reminder-inbox-now-not{transition:none!important}}

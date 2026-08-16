@@ -1509,6 +1509,7 @@ var REMINDER_POLICY_DEFAULTS={
   nativeDailyCap:3,
   lowPriorityNativeCap:1,
   sameCategoryCooldownMinutes:360,
+  dailyFlowBudget:3,
   capacityMode:'balanced'
 };
 var REMINDER_PROFILE_IDS={calm:true,balanced:true,supportive:true,ritual:true,custom:true};
@@ -1539,7 +1540,7 @@ var REMINDER_NATIVE_ACTIONS={
 var reminderPermissionTransientState=null;
 var reminderPermissionRequestInFlight=null;
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
-function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
+function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,dailyFlowBudget:REMINDER_POLICY_DEFAULTS.dailyFlowBudget,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
 function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[]}; }
 function reminderMedicationText(value,max){ return String(value==null?'':value).replace(/\u0000/g,'').replace(/\r\n?/g,'\n').trim().slice(0,max); }
 function reminderMedicationId(value){ var id=String(value||''); return /^reminder\.medication\.v1\.[A-Za-z0-9._%-]{1,160}$/.test(id)?id:''; }
@@ -1887,6 +1888,7 @@ function normalizeReminderPolicy(value){
   out.nativeDailyCap=reminderPolicyInteger(nativeCap,0,24,REMINDER_POLICY_DEFAULTS.nativeDailyCap);
   out.lowPriorityNativeCap=reminderPolicyInteger(lowCap,0,24,REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap);
   out.sameCategoryCooldownMinutes=reminderPolicyInteger(cooldown,0,1440,REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes);
+  out.dailyFlowBudget=reminderPolicyInteger(out.dailyFlowBudget,0,24,REMINDER_POLICY_DEFAULTS.dailyFlowBudget);
   if(!reminderEnumHas(REMINDER_CAPACITY_MODES,out.capacityMode)) out.capacityMode=REMINDER_POLICY_DEFAULTS.capacityMode;
   out.careNativeCategories=normalizeReminderCareCategories(out.careNativeCategories);
   out.careMovementOptIn=out.careMovementOptIn===true;
@@ -3098,7 +3100,7 @@ function reminderLifecycleDefaultContext(input,nowIso){
   var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), policy=root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(), timezone=String(x.timezone||((root&&root.timezone)||'')||'Europe/Istanbul'), instantMs=new Date(nowIso).getTime(), local=reminderEngineLocalParts(instantMs,timezone), requestedVisibility=x.visibilityState||(x.context&&x.context.visibilityState), visibility;
   if(!requestedVisibility){ try{ requestedVisibility=document.hidden?'hidden':'visible'; }catch(e){ requestedVisibility='visible'; } }
   visibility=reminderLifecycleVisibility(requestedVisibility);
-  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility},x.context&&typeof x.context==='object'?x.context:{});
+  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,dailyFlowBudget:policy.dailyFlowBudget,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility},x.context&&typeof x.context==='object'?x.context:{});
   context.visibilityState=visibility;
   return context;
 }
@@ -3277,9 +3279,141 @@ function reminderEveningCoalesceCandidates(input,context){
   var coalesced={occurrence:occurrence,definition:definition,preference:primary.preference&&typeof primary.preference==='object'?primary.preference:{enabled:true,channel:'in_app'},reminderId:definition.id,eveningCoalesced:true,eveningGroup:group,due:occurrence.due,explicitlySelected:reminderEveningExplicitSelection(primary)};
   return source.filter(function(candidate){ var surface=reminderEveningSurface(candidate); return !surface||!selectedKeys[surface.key]; }).concat([coalesced]);
 }
+// REM-31: sabah / gün içi / akşam / hafif gün ortak akış policy'si.
+// Akış, tek tek kartların yerine aynı gün bağlamında bir primary davet ve
+// güvenli alternatifler üretir. Bu katman yalnız allowlist edilmiş hedefleri,
+// kategori kimliğini ve genel kopyayı taşır; note, mood, journal veya routine
+// gövdesi akış sınırından geçmez.
+var REMINDER_DAILY_FLOW_VERSION='1';
+var REMINDER_DAILY_FLOW_WINDOWS={
+  morning:{label:'Sabah açılışı',start:'00:00',end:'11:59'},
+  day:{label:'Gün içi küçük odak',start:'12:00',end:'17:59'},
+  evening:{label:'Akşam kapanışı',start:'18:00',end:'23:59'},
+  light:{label:'Hafif gün',start:'00:00',end:'23:59'}
+};
+var REMINDER_DAILY_FLOW_LABELS={
+  faith:'İman Köşesi',zikr:'Zikir',room:'Sakin destek',saygi:'İlham okuması',reading:'Kitaplık',gunluk:'Günlük Işığı',health:'Beden bakımı',settings:'Ayarlar'
+};
+var REMINDER_DAILY_FLOW_CARE_LABELS={water:'Su',sleep:'Uykuya hazırlık',caffeine:'Kafein',movement:'Hareket'};
+function reminderDailyFlowTime(value){
+  var minutes=reminderPolicyTimeMinutes(value);
+  return minutes===null?null:minutes;
+}
+function reminderDailyFlowIdForTime(localTime){
+  var minutes=reminderDailyFlowTime(localTime);
+  if(minutes===null||minutes<12*60) return 'morning';
+  return minutes<18*60?'day':'evening';
+}
+function reminderDailyFlowPolicy(input){
+  var x=input&&typeof input==='object'?input:{}, context=x.context&&typeof x.context==='object'?x.context:x, localTime=String(x.localTime||context.localTime||'12:00').slice(0,5), mode=reminderPolicyMode(x.capacityMode||context.capacityMode||context.todayMode||context.mode), flowId=mode==='light'?'light':(mode==='silent'?'light':reminderDailyFlowIdForTime(localTime)), window=REMINDER_DAILY_FLOW_WINDOWS[flowId]||REMINDER_DAILY_FLOW_WINDOWS.day, fallbackCap=reminderPolicyInteger(context.nativeDailyCap,0,24,REMINDER_POLICY_DEFAULTS.nativeDailyCap), budget=reminderPolicyInteger(x.dailyFlowBudget,0,24,reminderPolicyInteger(context.dailyFlowBudget,0,24,fallbackCap)), maxCandidates=mode==='silent'?0:(mode==='light'?Math.min(1,budget):budget);
+  return {id:'reminder.daily-flow.policy.v'+REMINDER_DAILY_FLOW_VERSION,version:REMINDER_DAILY_FLOW_VERSION,flowId:flowId,flowLabel:window.label,capacityMode:mode,localDate:String(x.localDate||context.localDate||''),localTime:localTime,timezone:String(x.timezone||context.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE),window:{start:window.start,end:window.end},candidateBudget:budget,maxCandidates:maxCandidates,primaryLimit:1,coalesce:true,nowNotAction:'todayOff',nativeReplay:false};
+}
+function reminderDailyFlowCandidateOccurrence(candidate){ return candidate&&candidate.occurrence&&typeof candidate.occurrence==='object'?candidate.occurrence:(candidate&&typeof candidate==='object'?candidate:{}); }
+function reminderDailyFlowCandidateDate(candidate,policy){ return String(reminderDailyFlowCandidateOccurrence(candidate).localDate||candidate.localDate||(policy&&policy.localDate)||''); }
+function reminderDailyFlowCandidateExplicit(candidate){
+  var x=candidate&&typeof candidate==='object'?candidate:{}, occurrence=reminderDailyFlowCandidateOccurrence(candidate), preference=x.preference&&typeof x.preference==='object'?x.preference:{};
+  return x.explicitlySelected===true||x.userSelected===true||x.userScheduled===true||x.userCreated===true||occurrence.explicitlySelected===true||occurrence.userSelected===true||occurrence.userScheduled===true||occurrence.userCreated===true||reminderEveningExplicitSelection(candidate);
+}
+function reminderDailyFlowCandidateDecision(candidate,context){
+  var occurrence=reminderDailyFlowCandidateOccurrence(candidate), definition=candidate&&candidate.definition&&typeof candidate.definition==='object'?candidate.definition:occurrence, preference=candidate&&candidate.preference&&typeof candidate.preference==='object'?candidate.preference:{enabled:candidate&&candidate.enabled===true,channel:candidate&&candidate.channel||definition.defaultChannel||'in_app'};
+  return reminderPolicyEvaluate({definition:definition,preference:preference,context:Object.assign({},context||{}, {nativeBudgetUsed:0,lowPriorityNativeUsed:0})});
+}
+function reminderDailyFlowCandidateEligible(candidate,policy,context){
+  if(!candidate||typeof candidate!=='object'||Array.isArray(candidate)) return false;
+  var occurrence=reminderDailyFlowCandidateOccurrence(candidate);
+  if(occurrence.past===true||occurrence.historical===true||candidate.historical===true||occurrence.due===false||candidate.due===false) return false;
+  if(policy&&policy.localDate&&reminderDailyFlowCandidateDate(candidate,policy)!==policy.localDate) return false;
+  var decision=reminderDailyFlowCandidateDecision(candidate,Object.assign({},context||{}, {capacityMode:policy&&policy.capacityMode||context&&context.capacityMode,localTime:policy&&policy.localTime||context&&context.localTime}));
+  return !!(decision&&decision.allowed===true&&decision.inAppAllowed===true);
+}
+function reminderDailyFlowCandidateCompare(left,right){
+  var a=left&&typeof left==='object'?left:{}, b=right&&typeof right==='object'?right:{}, ao=reminderDailyFlowCandidateOccurrence(a), bo=reminderDailyFlowCandidateOccurrence(b), ap=a.preference&&typeof a.preference==='object'?a.preference:{}, bp=b.preference&&typeof b.preference==='object'?b.preference:{};
+  var aExplicit=reminderDailyFlowCandidateExplicit(a), bExplicit=reminderDailyFlowCandidateExplicit(b);
+  if(aExplicit!==bExplicit) return aExplicit?-1:1;
+  var aPriority=REMINDER_PRIORITY_RANK[reminderPolicyPriority(ao.priority||(a.definition&&a.definition.priority)||'P3')]||3, bPriority=REMINDER_PRIORITY_RANK[reminderPolicyPriority(bo.priority||(b.definition&&b.definition.priority)||'P3')]||3;
+  if(aPriority!==bPriority) return aPriority-bPriority;
+  var aNative=ap.channel==='native', bNative=bp.channel==='native';
+  if(aNative!==bNative) return aNative?-1:1;
+  var aTime=String(ao.scheduledAt||ao.localTime||a.scheduledAt||a.localTime||''), bTime=String(bo.scheduledAt||bo.localTime||b.scheduledAt||b.localTime||'');
+  if(aTime!==bTime) return aTime<bTime?-1:1;
+  var aId=String(a.reminderId||ao.reminderId||(a.definition&&a.definition.id)||''), bId=String(b.reminderId||bo.reminderId||(b.definition&&b.definition.id)||'');
+  return aId.localeCompare(bId);
+}
+function reminderDailyFlowSafeValue(value){
+  var x=value&&typeof value==='object'?value:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x, definition=x.definition&&typeof x.definition==='object'?x.definition:{}, deepLink=String(x.deepLink||occurrence.deepLink||definition.deepLink||''), reminderId=String(x.reminderId||occurrence.reminderId||definition.id||''), surface=reminderEveningSurface(x), careKey=String(x.careKey||occurrence.careKey||''), category=String(x.category||occurrence.category||definition.category||'');
+  if(surface){ deepLink=surface.deepLink; reminderId=surface.reminderId; category=surface.category; }
+  if(!deepLink||!REMINDER_DAILY_FLOW_LABELS[deepLink]&&!careKey) return null;
+  var label=careKey&&REMINDER_DAILY_FLOW_CARE_LABELS[careKey]?REMINDER_DAILY_FLOW_CARE_LABELS[careKey]:(REMINDER_DAILY_FLOW_LABELS[deepLink]||'Küçük durak');
+  if(deepLink==='health'&&!careKey) label=REMINDER_DAILY_FLOW_LABELS.health;
+  return {reminderId:reminderId,deepLink:deepLink,label:label,detail:'İstersen bu küçük durağı uygulamanın içinde açabilirsin.',category:category||'ritual',priority:reminderPolicyPriority(x.priority||occurrence.priority||definition.priority||'P3')};
+}
+function reminderDailyFlowSafeMembers(candidate){
+  var occurrence=reminderDailyFlowCandidateOccurrence(candidate), group=occurrence.eveningGroup||occurrence.flowGroup||(candidate&&candidate.eveningGroup), raw=[];
+  if(group&&group.primary) raw.push(group.primary);
+  if(group&&Array.isArray(group.alternatives)) raw=raw.concat(group.alternatives);
+  if(!raw.length) raw=[candidate];
+  var out=[];
+  raw.forEach(function(value){ var safe=reminderDailyFlowSafeValue(value); if(safe&&!out.some(function(existing){ return existing.deepLink===safe.deepLink&&existing.reminderId===safe.reminderId; })) out.push(safe); });
+  return out;
+}
+function reminderDailyFlowGroup(candidates,policy){
+  var selected=Array.isArray(candidates)?candidates:[], primary=selected[0], primaryMembers=reminderDailyFlowSafeMembers(primary), safePrimary=primaryMembers[0]||null, alternatives=[];
+  selected.forEach(function(candidate,index){ reminderDailyFlowSafeMembers(candidate).forEach(function(safe){ if(index===0&&safe.reminderId===safePrimary.reminderId&&safe.deepLink===safePrimary.deepLink) return; if(!alternatives.some(function(existing){ return existing.deepLink===safe.deepLink; })) alternatives.push(safe); }); });
+  if(!safePrimary) return null;
+  return {flowId:policy.flowId,label:policy.flowLabel,primary:safePrimary,alternatives:alternatives,count:alternatives.length+1,nowNotAction:policy.nowNotAction};
+}
+function reminderDailyFlowCopy(policy){
+  if(policy.capacityMode==='light') return {title:'Bugün tek bir küçük adım yeterli olabilir',body:'İstersen Şeyma’da sana iyi gelen küçük alanlardan birini açabilirsin.'};
+  if(policy.flowId==='morning') return {title:'Güne küçük bir alan açabilirsin',body:'İstersen günün ilk sakin durağını uygulamanın içinde açabilirsin.'};
+  if(policy.flowId==='day') return {title:'Günün içinde kısa bir durak hazır',body:'İstersen şimdi tek bir küçük odağa uğrayabilirsin.'};
+  return {title:'Akşamı tek bir küçük davetle kapatabilirsin',body:'İstersen Şeyma’da seçtiğin küçük durağı açabilirsin.'};
+}
+function reminderDailyFlowDecorate(candidate,policy){
+  var occurrence=reminderDailyFlowCandidateOccurrence(candidate), nextOccurrence=Object.assign({},occurrence,{dailyFlowVersion:REMINDER_DAILY_FLOW_VERSION,flowId:policy.flowId,flowLabel:policy.flowLabel,flowCapacityMode:policy.capacityMode,nowNotAction:policy.nowNotAction,nativeReplay:false,replay:false}), next=Object.assign({},candidate,{occurrence:nextOccurrence,dailyFlow:policy.flowId,flowId:policy.flowId,flowLabel:policy.flowLabel,flowCapacityMode:policy.capacityMode,nowNotAction:policy.nowNotAction});
+  if(policy.capacityMode==='light'){
+    var copy=reminderDailyFlowCopy(policy);
+    next.occurrence=Object.assign({},nextOccurrence,{nativeTitle:copy.title,nativeBody:copy.body});
+    next.definition=Object.assign({},candidate.definition&&typeof candidate.definition==='object'?candidate.definition:{},{privateTitle:copy.title,privateBody:copy.body});
+    next.privateTitle=copy.title;
+    next.privateBody=copy.body;
+    next.title=copy.title;
+    next.detail=copy.body;
+  }
+  return next;
+}
+function reminderDailyFlowCoalesceCandidates(input,context){
+  var source=Array.isArray(input)?input.filter(function(item){ return item&&typeof item==='object'&&!Array.isArray(item); }):[], ctx=context&&typeof context==='object'?context:{}, policy=reminderDailyFlowPolicy({context:ctx});
+  if(policy.maxCandidates<=0) return source.filter(function(candidate){ return reminderDailyFlowCandidateDate(candidate,policy)!==policy.localDate||reminderDailyFlowCandidateOccurrence(candidate).past===true; });
+  var eligible=[], untouched=[];
+  source.forEach(function(candidate){
+    if(reminderDailyFlowCandidateDate(candidate,policy)!==policy.localDate||reminderDailyFlowCandidateOccurrence(candidate).past===true||reminderDailyFlowCandidateOccurrence(candidate).historical===true){ untouched.push(candidate); return; }
+    var decision=reminderDailyFlowCandidateDecision(candidate,Object.assign({},ctx,{capacityMode:policy.capacityMode,localTime:policy.localTime}));
+    if(decision&&decision.allowed===true&&decision.inAppAllowed===true) eligible.push(candidate);
+    else if(!decision||String(decision.reason||'').indexOf('capacity-')!==0) untouched.push(candidate);
+  });
+  if(!eligible.length) return untouched;
+  eligible.sort(reminderDailyFlowCandidateCompare);
+  if(!reminderDailyFlowSafeMembers(eligible[0]).length) return untouched.concat(eligible);
+  if(eligible.length===1) return untouched.concat([reminderDailyFlowDecorate(eligible[0],policy)]);
+  var primary=eligible[0], primaryOccurrence=reminderDailyFlowCandidateOccurrence(primary), primaryDefinition=primary.definition&&typeof primary.definition==='object'?primary.definition:primaryOccurrence, timezone=String(primaryOccurrence.timezone||policy.timezone||REMINDER_ENGINE_DEFAULT_TIMEZONE), earliest='';
+  eligible.forEach(function(candidate){ var occurrence=reminderDailyFlowCandidateOccurrence(candidate), time=String(occurrence.scheduledAt||occurrence.localTime||candidate.scheduledAt||candidate.localTime||''); if(validReminderTime(time)&&(!earliest||time<earliest)) earliest=time; });
+  if(!earliest) earliest=validReminderTime(policy.localTime)?policy.localTime:'12:00';
+  var group=reminderDailyFlowGroup(eligible,policy); if(!group) return untouched.concat(eligible);
+  var copy=reminderDailyFlowCopy(policy), primarySafe=reminderDailyFlowSafeMembers(primary)[0]||{}, category=String(primaryOccurrence.category||primaryDefinition.category||primarySafe.category||'ritual'), priority=reminderPolicyPriority(primaryOccurrence.priority||primaryDefinition.priority||primarySafe.priority||'P3'), coalescedSnoozeOptions=[];
+  eligible.forEach(function(candidate){ var candidateDefinition=candidate.definition&&typeof candidate.definition==='object'?candidate.definition:reminderDailyFlowCandidateOccurrence(candidate); (Array.isArray(candidateDefinition.snoozeOptions)?candidateDefinition.snoozeOptions:[]).forEach(function(option){ option=String(option); if(reminderEnumHas(REMINDER_SNOOZE_OPTIONS,option)&&coalescedSnoozeOptions.indexOf(option)<0) coalescedSnoozeOptions.push(option); }); });
+  if(!coalescedSnoozeOptions.length) coalescedSnoozeOptions=['30m','1h','todayOff'];
+  var definition={id:String(primary.reminderId||primaryOccurrence.reminderId||primaryDefinition.id||''),category:category,priority:priority,triggerType:'fixed-time',time:earliest,deepLink:String(primarySafe.deepLink||primaryOccurrence.deepLink||primaryDefinition.deepLink||'settings'),privateTitle:copy.title,privateBody:copy.body,defaultChannel:String(primary.preference&&primary.preference.channel||primaryDefinition.defaultChannel||'in_app'),snoozeOptions:coalescedSnoozeOptions,definitionVersion:'1'};
+  var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:policy.localDate,nowLocalDate:policy.localDate,nowLocalTime:policy.localTime,timezone:timezone,instantIso:ctx.nowIso||'',sourceRevision:'daily-flow-v1'});
+  if(!generated.ok||!generated.occurrence) return untouched.concat(eligible);
+  var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-daily-flow-v'+REMINDER_DAILY_FLOW_VERSION+':'+encodeURIComponent(policy.flowId)+':'+encodeURIComponent(policy.localDate)+':'+encodeURIComponent(earliest)+':'+encodeURIComponent(timezone),reminderId:definition.id,category:category,priority:priority,deepLink:definition.deepLink,flowId:policy.flowId,flowLabel:policy.flowLabel,flowCapacityMode:policy.capacityMode,dailyFlowVersion:REMINDER_DAILY_FLOW_VERSION,coalescedFromCount:eligible.length,flowGroup:group,nativeTitle:copy.title,nativeBody:copy.body,nowNotAction:policy.nowNotAction,quietHoursInherited:true,nativeReplay:false,replay:false,shouldReplay:false,past:false});
+  if(policy.flowId==='evening') occurrence.eveningGroup=group;
+  var allCare=eligible.every(function(candidate){ var item=reminderDailyFlowCandidateOccurrence(candidate); return String(item.category||candidate.category||'')===REMINDER_CARE_CATEGORY||!!(candidate.careKey||item.careKey); }), primaryPreference=Object.assign({},primary.preference&&typeof primary.preference==='object'?primary.preference:{enabled:true,channel:'in_app'});
+  if(allCare&&eligible.length>1) primaryPreference.channel='in_app';
+  return untouched.concat([{occurrence:occurrence,definition:definition,preference:primaryPreference,reminderId:definition.id,flowId:policy.flowId,flowLabel:policy.flowLabel,dailyFlow:policy.flowId,flowCapacityMode:policy.capacityMode,flowGroup:group,eveningGroup:policy.flowId==='evening'?group:null,eveningCoalesced:policy.flowId==='evening',due:occurrence.due,explicitlySelected:reminderDailyFlowCandidateExplicit(primary)}]);
+}
 function reminderLifecycleBuildCandidates(input,context,root){
   var x=input&&typeof input==='object'?input:{}, explicit=reminderLifecycleCandidateList(x);
-  if(explicit.length) return explicit;
+  if(explicit.length) return reminderDailyFlowCoalesceCandidates(explicit,context);
   var defs=Array.isArray(x.definitions)?x.definitions:reminderDefinitions(), out=[],preferences=root&&root.preferences&&typeof root.preferences==='object'?root.preferences:{};
   defs.forEach(function(definition){
     if(!definition||typeof definition!=='object'||!definition.id) return;
@@ -3326,7 +3460,7 @@ function reminderLifecycleBuildCandidates(input,context,root){
   var specialOffset=0;
   try{ var prayer=prayerSettings(); specialOffset=Number.isInteger(prayer&&prayer.hijriOffset)?Math.max(-2,Math.min(2,prayer.hijriOffset)):0; }catch(e){ specialOffset=0; }
   reminderSpecialDayLifecycleCandidates({source:x,context:context,root:root,localDate:context.localDate,localTime:context.localTime,timezone:context.timezone,catchUp:x.catchUp===true,hijriOffset:specialOffset}).forEach(function(candidate){ out.push(candidate); });
-  return reminderEveningCoalesceCandidates(out,context);
+  return reminderDailyFlowCoalesceCandidates(reminderEveningCoalesceCandidates(out,context),context);
 }
 function reminderLifecycleEvaluate(source,input){
   if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
@@ -5644,6 +5778,7 @@ function reminderInboxBuildItems(input){
   var x=input&&typeof input==='object'?input:{}, parts=reminderInboxContext(x), supplied=Object.prototype.hasOwnProperty.call(x,'occurrences')||Object.prototype.hasOwnProperty.call(x,'candidates')||Object.prototype.hasOwnProperty.call(x,'occurrence'), source;
   if(supplied){ source=Array.isArray(x.occurrences)?x.occurrences:Array.isArray(x.candidates)?x.candidates:(x.occurrence&&typeof x.occurrence==='object'?[x.occurrence]:[]); }
   else source=reminderLifecycleBuildCandidates({definitions:x.definitions,catchUp:false,prayerData:x.prayerData,prayerKey:x.prayerKey},parts.context,parts.root).concat(reminderActionDueCandidates(parts.nowIso,parts.context,parts.root));
+  if(supplied) source=reminderDailyFlowCoalesceCandidates(source,parts.context);
   var defs=reminderInboxDefinitionMap(x), rawLog=Object.prototype.hasOwnProperty.call(x,'deliveryLog')?x.deliveryLog:reminderDeliveryLoad(parts.nowIso,false), log=reminderDeliveryNormalize(rawLog,parts.nowIso), seen={}, items=[];
   source.forEach(function(candidate,index){
     if(!candidate||typeof candidate!=='object'||Array.isArray(candidate)) return;
@@ -5679,7 +5814,8 @@ function reminderInboxBuildItems(input){
       detail=String(candidate.detail||candidate.privateBody||candidate.body||(definition&&definition.privateBody)||'İstersen Şeyma’da küçük bir alan açabilirsin.');
       deepLink=String(candidate.deepLink||(definition&&definition.deepLink)||'');
     }
-    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:title,detail:detail,deepLink:deepLink,therapyToolId:therapyToolId,snoozeOptions:snoozeOptions,eveningGroup:reminderEveningSafeGroup(occurrence.eveningGroup||candidate.eveningGroup),suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
+    var flowId=String(candidate.flowId||occurrence.flowId||''), flowLabel=String(candidate.flowLabel||occurrence.flowLabel||''), flowGroup=occurrence.flowGroup||candidate.flowGroup||null;
+    items.push({occurrenceId:occurrenceId,reminderId:reminderId,category:category,categoryLabel:String(meta.label||category||'Hatırlatma'),categoryIcon:String(meta.icon||'bell-ring'),priority:priority,precedenceRank:precedence.rank,scheduledAt:String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),title:title,detail:detail,deepLink:deepLink,therapyToolId:therapyToolId,snoozeOptions:snoozeOptions,flowId:flowId,flowLabel:flowLabel,nowNotAction:String(candidate.nowNotAction||occurrence.nowNotAction||'todayOff'),flowGroup:flowGroup,eveningGroup:flowGroup||reminderEveningSafeGroup(occurrence.eveningGroup||candidate.eveningGroup),suppressed:suppressed,reason:reminderInboxReasonLabel(candidate.reason||occurrence.reason||policy.reason||(delivery&&delivery.reason)),status:status});
   });
   items.sort(function(a,b){ return (a.suppressed?1:0)-(b.suppressed?1:0)||a.precedenceRank-b.precedenceRank||a.scheduledAt.localeCompare(b.scheduledAt)||a.occurrenceId.localeCompare(b.occurrenceId); });
   return {items:items,active:items.filter(function(item){ return !item.suppressed; }),suppressed:items.filter(function(item){ return item.suppressed; }),muted:typeof x.todayMuted==='boolean'?x.todayMuted:!!ui.reminderInboxTodayMuted,nowIso:parts.nowIso,timezone:parts.context.timezone,localDate:parts.localDate};
@@ -5828,10 +5964,10 @@ function reminderActionDueCandidates(nowIso,context,root){
   return out;
 }
 function reminderInboxItemHTML(item,index){
-  var occurrenceArg=reminderInboxActionArg(item.occurrenceId), reminderArg=reminderInboxActionArg(item.reminderId), therapyToolArg=reminderInboxActionArg(item.therapyToolId||''), options=Array.isArray(item.snoozeOptions)?item.snoozeOptions:[], group=item.eveningGroup, h='<article class="sey-reminder-inbox-item" data-reminder-inbox-occurrence="'+esc(item.occurrenceId)+'" data-reminder-inbox-category="'+esc(item.category)+'" role="listitem">';
-  h+='<div class="sey-reminder-inbox-item-top"><span class="sey-reminder-inbox-icon" aria-hidden="true">'+icon(item.categoryIcon,17)+'</span><div class="sey-reminder-inbox-copy"><span class="sey-reminder-inbox-category">'+esc(item.categoryLabel)+'</span><h3>'+esc(item.title)+'</h3><p>'+esc(item.detail)+'</p></div><span class="sey-reminder-inbox-priority">'+esc(item.priority)+'</span></div>';
+  var occurrenceArg=reminderInboxActionArg(item.occurrenceId), reminderArg=reminderInboxActionArg(item.reminderId), therapyToolArg=reminderInboxActionArg(item.therapyToolId||''), options=Array.isArray(item.snoozeOptions)?item.snoozeOptions:[], group=item.eveningGroup||item.flowGroup, groupLabel=item.flowId==='evening'?'Bu akşam · tek davet':item.flowId==='light'?'Hafif gün · tek küçük adım':(item.flowLabel?item.flowLabel+' · ortak durak':'Bugünün ortak durağı'), h='<article class="sey-reminder-inbox-item" data-reminder-inbox-occurrence="'+esc(item.occurrenceId)+'" data-reminder-inbox-category="'+esc(item.category)+'" data-reminder-inbox-flow="'+esc(item.flowId||'')+'" role="listitem">';
+  h+='<div class="sey-reminder-inbox-item-top"><span class="sey-reminder-inbox-icon" aria-hidden="true">'+icon(item.categoryIcon,17)+'</span><div class="sey-reminder-inbox-copy">'+(item.flowLabel?'<span class="sey-reminder-inbox-flow">'+esc(item.flowLabel)+'</span>':'')+'<span class="sey-reminder-inbox-category">'+esc(item.categoryLabel)+'</span><h3>'+esc(item.title)+'</h3><p>'+esc(item.detail)+'</p></div><span class="sey-reminder-inbox-priority">'+esc(item.priority)+'</span></div>';
   if(group){
-    h+='<div class="sey-reminder-evening-group" role="group" aria-label="Bu akşamın gruplanmış küçük durakları"><span class="sey-reminder-evening-group-label">Bu akşam · tek davet</span><span class="sey-reminder-evening-group-primary">Ana durak: '+esc(group.primary.label)+'</span>';
+    h+='<div class="sey-reminder-evening-group" role="group" aria-label="'+esc(groupLabel)+'"><span class="sey-reminder-evening-group-label">'+esc(groupLabel)+'</span><span class="sey-reminder-evening-group-primary">Ana durak: '+esc(group.primary.label)+'</span>';
     if(group.alternatives.length){
       h+='<span class="sey-reminder-evening-group-help">Diğer küçük duraklar uygulamanın içinde:</span><div class="sey-reminder-evening-group-actions">';
       group.alternatives.forEach(function(alternative){ var altOccurrence=reminderInboxActionArg(item.occurrenceId), altReminder=reminderInboxActionArg(alternative.reminderId), altDeepLink=reminderInboxActionArg(alternative.deepLink); h+='<button type="button" onclick="App.reminderInboxEveningTarget(decodeURIComponent(\''+altOccurrence+'\'),decodeURIComponent(\''+altReminder+'\'),decodeURIComponent(\''+altDeepLink+'\'))">'+esc(alternative.label)+'</button>'; });
@@ -5839,7 +5975,7 @@ function reminderInboxItemHTML(item,index){
     }
     h+='</div>';
   }
-  h+='<div class="sey-reminder-inbox-item-actions"><button type="button" class="sey-reminder-inbox-primary" onclick="App.reminderInboxPrimary(decodeURIComponent(\''+occurrenceArg+'\'),decodeURIComponent(\''+reminderArg+'\'),decodeURIComponent(\''+therapyToolArg+'\'))">Bu durağı aç</button><details class="sey-reminder-inbox-overflow"><summary aria-label="'+esc(item.title)+' için diğer seçenekler">Diğer seçenekler</summary><div class="sey-reminder-inbox-menu">';
+  h+='<div class="sey-reminder-inbox-item-actions"><button type="button" class="sey-reminder-inbox-primary" onclick="App.reminderInboxPrimary(decodeURIComponent(\''+occurrenceArg+'\'),decodeURIComponent(\''+reminderArg+'\'),decodeURIComponent(\''+therapyToolArg+'\'))">Bu durağı aç</button><button type="button" class="sey-reminder-inbox-now-not" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'nowNot\',decodeURIComponent(\''+reminderArg+'\'))">Şimdi değil</button><details class="sey-reminder-inbox-overflow"><summary aria-label="'+esc(item.title)+' için diğer seçenekler">Diğer seçenekler</summary><div class="sey-reminder-inbox-menu">';
   if(options.length){ options.forEach(function(option){ var optionArg=reminderInboxActionArg(option); h+='<button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'snooze\',decodeURIComponent(\''+reminderArg+'\'),decodeURIComponent(\''+optionArg+'\'))">Ertele · '+esc(reminderActionOptionLabel(option))+'</button>'; }); }
   else h+='<button type="button" disabled aria-disabled="true">Ertele</button>';
   h+='<button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'todayOff\',decodeURIComponent(\''+reminderArg+'\'))">Bugün sustur · bugün bir daha gösterme</button><button type="button" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'settings\',decodeURIComponent(\''+reminderArg+'\'))">Ayrıntıları aç</button><button type="button" class="is-danger" onclick="App.reminderInboxOverflow(decodeURIComponent(\''+occurrenceArg+'\'),\'disable\',decodeURIComponent(\''+reminderArg+'\'))">Kapat · bu hatırlatmayı kapat</button></div></details></div>';
@@ -6019,6 +6155,10 @@ App.reminderCatchupMaxAge=REMINDER_CATCHUP_MAX_AGE_MS;
 App.reminderEveningId=REMINDER_EVENING_ID;
 App.reminderEveningCoalesce=function(candidates,context){ return reminderEveningCoalesceCandidates(candidates,context); };
 App.reminderEveningSafeGroup=function(group){ return reminderEveningSafeGroup(group); };
+App.reminderDailyFlowPolicy=reminderDailyFlowPolicy;
+App.reminderDailyFlowCoalesce=function(candidates,context){ return reminderDailyFlowCoalesceCandidates(candidates,context); };
+App.reminderDailyFlowCandidates=App.reminderDailyFlowCoalesce;
+App.reminderDailyFlowSafeGroup=function(candidates,context){ return reminderDailyFlowGroup(Array.isArray(candidates)?candidates:[],reminderDailyFlowPolicy({context:context||{}})); };
 // REM-10/23: pure evaluator + foreground lifecycle adapter. Delivery journal
 // writes and native display are separate steps; neither calls save() or fetch().
 App.reminderEvaluateReminders=reminderEvaluateReminders;
@@ -6118,6 +6258,7 @@ function updateReminderPolicy(mutator){
 App.setReminderCapacityMode=function(mode){ mode=String(mode||''); if(!REMINDER_CAPACITY_MODES[mode]) return; updateReminderPolicy(function(policy){ policy.capacityMode=mode; }); };
 App.setReminderQuietHours=function(start,end){ start=String(start||''); end=String(end||''); if(!validReminderTime(start)||!validReminderTime(end)) return; updateReminderPolicy(function(policy){ policy.quietHours.start=start; policy.quietHours.end=end; }); };
 App.setReminderNativeDailyCap=function(cap){ cap=Number(cap); if(!Number.isInteger(cap)||cap<0||cap>24) return; updateReminderPolicy(function(policy){ policy.nativeDailyCap=cap; }); };
+App.setReminderDailyFlowBudget=function(cap){ cap=Number(cap); if(!Number.isInteger(cap)||cap<0||cap>24) return; updateReminderPolicy(function(policy){ policy.dailyFlowBudget=cap; }); };
 App.setReminderLowPriorityNativeCap=function(cap){ cap=Number(cap); if(!Number.isInteger(cap)||cap<0||cap>24) return; updateReminderPolicy(function(policy){ policy.lowPriorityNativeCap=cap; }); };
 App.setReminderSameCategoryCooldown=function(minutes){ minutes=Number(minutes); if(!Number.isInteger(minutes)||minutes<0||minutes>1440) return; updateReminderPolicy(function(policy){ policy.sameCategoryCooldownMinutes=minutes; }); };
 App.setReminderCareNativeCategories=function(categories){
@@ -6328,6 +6469,7 @@ App.reminderInboxEveningTarget=function(occurrenceId,reminderId,deepLink){
 };
 App.reminderInboxOverflow=function(occurrenceId,action,reminderId,option){
   action=String(action||'');
+  if(action==='nowNot') return App.reminderInboxTodayOff(occurrenceId,reminderId);
   if(action==='mute') return App.reminderInboxTodayOff(occurrenceId,reminderId);
   if(action==='todayOff') return App.reminderInboxTodayOff(occurrenceId,reminderId);
   if(action==='snooze') return App.reminderInboxSnooze(occurrenceId,option,reminderId);

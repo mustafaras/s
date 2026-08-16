@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-36",
+  "activePrompt": "REM-37",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-35",
-  "nextSafeAction": "REM-36 Türkçe copy lexicon ve mahremiyet negatif dili; S5 kullanıcı cihazı kabulü pending; no release action",
+  "lastCompletedPrompt": "REM-36",
+  "nextSafeAction": "REM-37 Premium visual, responsive ve performans QA; S5 kullanıcı cihazı kabulü pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-35 local presence-only weekly digest; user-invoked calm reflection; no raw daily/therapy/mood/worship/medication output; safe on-this-day detail boundary; no-op and retention/timezone states",
-    "tests": "test_reminder_digest.js PASS (66 assertions); test_reminder_privacy.js PASS (35); all reminder fixtures, root regression, Panel-11 50/50, driver, migration 32/32, syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "d5b627344da355e14edfcf942775aa7c7590383a",
+    "source": "REM-36 frozen Turkish copy lexicon for private/in-app/native surfaces; generic native preview; shame and clinical-authority negative boundary; 460px wrap guard",
+    "tests": "test_reminder_copy.js PASS (690 assertions); test_reminder_privacy.js PASS (35); test_reminder_accessibility.js PASS (136); catalog 423; native 66; center 48; inbox 40; final full reminder fixture loop, syntax and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "7517b91d0c9c425c66f1ed2a0638f83d90d798f2",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-35 closure; REM-36 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-36 closure; REM-37 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-35",
-    "evidence": "docs/reminders/evidence/REM-35.md",
-    "commit": "d5b627344da355e14edfcf942775aa7c7590383a"
+    "prompt": "REM-36",
+    "evidence": "docs/reminders/evidence/REM-36.md",
+    "commit": "7517b91d0c9c425c66f1ed2a0638f83d90d798f2"
   }
 }

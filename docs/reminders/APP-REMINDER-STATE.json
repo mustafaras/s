@@ -4,8 +4,8 @@
   "status": "in-progress",
   "activePrompt": "REM-28",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-27",
-  "nextSafeAction": "REM-28 local full regression/migration/time matrix; no release action",
+  "lastCompletedPrompt": "REM-28",
+  "nextSafeAction": "REM-29 release packet ve kullanıcı cihazı kabul hazırlığı; no release action",
   "currentPhase": "R8",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-27 app.js Reminder Center semantic/focus/escape/live-region QA, styles.css dark AA and reduced-motion tokens, index.html app/style cache-bust, and synthetic accessibility/copy/contrast fixtures",
-    "tests": "REM-27 accessibility 127, copy/privacy 71, contrast 33; driver PASS; zikr 90/90; Faz 10 sync 64/64; Panel P6 16/16; reminder panel projection 28/28; context, syntax and diff PASS; 28/30 existing reminder suites PASS with two date-pinned prayer/Saygı discrepancies carried to REM-28; no browser, real network or data write",
-    "commit": "87842a1b2d64024f423808530e8173e679223b04",
+    "source": "REM-28 deterministic test harness boundary for prayer inbox date context and Saygı fixed clock; no production runtime file changed",
+    "tests": "REM-28 syntax PASS for app.js, sync.js, sw.js, hijriCalendar.js, reminder/catalog and panel modules; driver PASS; zikr 90/90; B1 0 failure; B2 32/32; 33/33 reminder suites; 92/92 root fixtures; 27/27 Panel-v2 fixtures; exact threshold, midnight, quiet, Europe/Istanbul, DST, Hicri offset, stale prayer, offline/online, reopen, duplicate and privacy matrix PASS; no browser, server, real network or data write",
+    "commit": "2884fbeacdc6aee5cc80f0901b7ce6c9ec23b05e",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-27 closure; REM-28 ready; release remains not_approved",
+  "updatedBy": "Codex REM-28 closure; REM-29 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-27",
-    "evidence": "docs/reminders/evidence/REM-27.md",
-    "commit": "87842a1b2d64024f423808530e8173e679223b04"
+    "prompt": "REM-28",
+    "evidence": "docs/reminders/evidence/REM-28.md",
+    "commit": "2884fbeacdc6aee5cc80f0901b7ce6c9ec23b05e"
   }
 }

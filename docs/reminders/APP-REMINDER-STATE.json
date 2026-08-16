@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-31",
+  "activePrompt": "REM-32",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-30",
-  "nextSafeAction": "REM-31 sabah / gün içi / akşam / düşük kapasite akışları; user-device acceptance S5 pending; no release action",
+  "lastCompletedPrompt": "REM-31",
+  "nextSafeAction": "REM-32 Reminder Center gelişmiş kontrol yüzeyi; user-device acceptance S5 pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-30 privacy-safe measurement contract; production runtime, data, sync and panel source unchanged",
-    "tests": "test_reminder_metrics.js PASS (81 assertions); context validator PASS (73 prompts / 67 local links); git diff --check PASS; synthetic only, no browser, server, real network or data write",
-    "commit": "de44daebb888a74bfec5aab73a9659117a6d9786",
+    "source": "REM-31 ortak daily-flow policy, morning/day/evening/light coalesce, lifecycle duplicate guard and safe exit; data, sync and panel source unchanged",
+    "tests": "test_reminder_daily_flows.js PASS (40 assertions); test_reminder_budget.js PASS (18 assertions); full reminder suite, driver, node --check app.js and git diff --check PASS; synthetic only, no browser, server, real network or data write",
+    "commit": "b4dfb579408c0ebe2eec1db9f3fe6d06d24998c8",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-30 closure; REM-31 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-31 closure; REM-32 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-30",
-    "evidence": "docs/reminders/evidence/REM-30.md",
-    "commit": "de44daebb888a74bfec5aab73a9659117a6d9786"
+    "prompt": "REM-31",
+    "evidence": "docs/reminders/evidence/REM-31.md",
+    "commit": "b4dfb579408c0ebe2eec1db9f3fe6d06d24998c8"
   }
 }

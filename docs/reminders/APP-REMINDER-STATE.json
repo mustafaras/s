@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-25",
+  "activePrompt": "REM-26",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-24",
-  "nextSafeAction": "REM-25 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-25",
+  "nextSafeAction": "REM-26 local implementation/verification; no release action",
   "currentPhase": "R7",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-24 sw.js reminder click boundary preserves ÆON routing, validates occurrence/target/action payloads, strips sensitive fields, routes one safe postMessage/openWindow path and blocks reminder-shaped push delivery; app.js performs a second allowlisted click-adapter validation",
-    "tests": "SW 57; deep-links 85; node --check sw.js/app.js; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS. Wall-clock reminder matrix is 25/27 because two legacy date-pinned fixtures fail on 2026-08-16; prayer 48 and Saygı 71 pass with intended synthetic clocks. No browser, real network or data write",
-    "commit": "25f8122c67f0a2782952daae6cec426396ea5236",
+    "source": "REM-25 sync.js sanitize and merge boundary removes reminder/delivery local-only roots, settings secrets, raw receipt detail and keeps the pre-push backup sanitized; app.js projection remains fail-closed",
+    "tests": "REM-25 privacy fixture 3 cases / 97 assertions; Faz 10 sync 64/64; node --check sync.js and fixture; git diff --check PASS. Fetch mock and delivery-key read count are zero; no browser, real network or data write",
+    "commit": "54d4d345584c5636727028a756be549ddf459564",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-24 closure; REM-25 ready; release remains not_approved",
+  "updatedBy": "Codex REM-25 closure; REM-26 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-24",
-    "evidence": "docs/reminders/evidence/REM-24.md",
-    "commit": "25f8122c67f0a2782952daae6cec426396ea5236"
+    "prompt": "REM-25",
+    "evidence": "docs/reminders/evidence/REM-25.md",
+    "commit": "54d4d345584c5636727028a756be549ddf459564"
   }
 }

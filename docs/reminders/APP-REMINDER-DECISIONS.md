@@ -407,3 +407,24 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   istisnasında kullanıcı browser açar, ajan açmaz ve server durdurulur.
 - **Sonraki adım:** Her prompt local commit + no-push handoff; REM-41–43 final
   release packet ve yalnız yeni final approval sonrası controlled release.
+
+### REM-ADR-017 — Sync sanitize ve local-only reminder sınırı
+
+- **Tarih:** 2026-08-16
+- **Durum:** accepted
+- **Soru:** Reminder preference, occurrence, delivery ve private copy mevcut
+  full-replace sync zincirinden nasıl kesin olarak ayrılmalı?
+- **Kanıt:** UX planı §8.2, §13.1–13.4; REM-ADR-010–012; `sync.js`
+  `mergeData` / `sanitize` / `pushWithCfg`; `tests/reminders/test_reminder_sync_privacy.js`.
+- **Karar:** `sanitize` remote projectiondan `data.reminders` ve bilinen
+  reminder/delivery köklerini çıkarır; settings secret’larını ve ham receipt
+  detail’ini normalize eder. `mergeData` remote girdiyi aynı sanitize
+  sınırından geçirir, local-only kökleri başka cihazdan import etmez ve boş
+  cihazda da secret taşımaz. Pre-push backup yalnız sanitized projectionı
+  kullanır. Local canonical state ve `seyma-reminder-delivery-v1` cihazda
+  kalır; cihazlar arası reminder preference sync varsayılan değildir.
+- **Etkiler:** Full-replace payload güvenli gün/observer alanlarını korurken
+  therapy, medication, occurrence, body, note ve delivery ayrıntılarını
+  taşımaz; sync regression davranışı korunur. Bu karar gerçek data repo write
+  veya canlı release izni vermez.
+- **Sonraki adım:** REM-26 panel mirror / redacted system health.

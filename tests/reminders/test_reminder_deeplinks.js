@@ -183,5 +183,29 @@ runTests([
     assertEqual(muteOpened, 0);
     assert(muteResult.action && muteResult.action.entry.action === "todayOff");
     assertEqual(muteResult.action.entry.reason, "today-muted");
+  }],
+  ["service worker adapter strips untrusted fields before the existing native click route", () => {
+    const out = boot();
+    const calls = [];
+    const original = out.sandbox.App.handleReminderNativeClick;
+    out.sandbox.App.handleReminderNativeClick = (input) => { calls.push(input); return { ok: true }; };
+    const result = out.sandbox.App.handleReminderServiceWorkerClick({
+      type: "reminder", occurrenceId: "rem-sw-adapter-1", reminderId: "reminder.catalog.v1.prayer",
+      deepLink: "faith", targetId: "faith", action: "open", timezone: "Europe/Istanbul",
+      body: "PRIVATE_BODY_SECRET", userNote: "PRIVATE_NOTE_SECRET", medicationName: "PRIVATE_MEDICATION_SECRET"
+    });
+    const invalid = out.sandbox.App.handleReminderServiceWorkerClick({
+      type: "reminder", occurrenceId: "rem-sw-adapter-2", reminderId: "reminder.catalog.v1.prayer",
+      deepLink: "settings", targetId: "faith", action: "open"
+    });
+    out.sandbox.App.handleReminderNativeClick = original;
+    assert(result.ok);
+    assertEqual(calls.length, 1);
+    assertEqual(calls[0].deepLink, "faith");
+    assertEqual(calls[0].targetId, "faith");
+    assert(!JSON.stringify(calls[0]).includes("PRIVATE_BODY_SECRET"));
+    assert(!JSON.stringify(calls[0]).includes("PRIVATE_NOTE_SECRET"));
+    assert(!JSON.stringify(calls[0]).includes("PRIVATE_MEDICATION_SECRET"));
+    assert(!invalid.ok);
   }]
 ]);

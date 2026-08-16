@@ -6257,6 +6257,25 @@ App.openReminderTarget=function(input){
   else if(target.deepLink==='settings') App.go('ayarlar');
   return target;
 };
+function reminderServiceWorkerClickPayload(input){
+  var x=input&&typeof input==='object'&&!Array.isArray(input)?input:null;
+  if(!x||x.type!=='reminder') return null;
+  var target=reminderDeepLinkTarget(x), occurrenceId=reminderActionSafeToken(x.occurrenceId,240), action=String(x.action||'open');
+  if(!target.ok||!occurrenceId||x.targetId!==target.targetId) return null;
+  if(x.openDetail!==undefined&&typeof x.openDetail!=='boolean') return null;
+  if(x.therapyToolId!==undefined&&String(x.therapyToolId)!==String(target.therapyToolId||'')) return null;
+  if(action==='mute') action='todayOff';
+  if(action!=='open'&&action!=='snooze'&&action!=='todayOff') return null;
+  var option=x.snoozeOption===undefined||x.snoozeOption===''?'':reminderActionOption(x.snoozeOption), timezone=x.timezone===undefined||x.timezone===''?'':String(x.timezone);
+  if(x.snoozeOption!==undefined&&x.snoozeOption!==''&&!option) return null;
+  if(timezone&&!reminderEngineTimezoneValid(timezone)) return null;
+  return {type:'reminder',occurrenceId:occurrenceId,reminderId:target.reminderId,deepLink:target.deepLink,targetId:target.targetId,openDetail:target.openDetail,therapyToolId:target.therapyToolId||'',action:action,snoozeOption:option,timezone:timezone};
+}
+App.handleReminderServiceWorkerClick=function(payload){
+  var safe=reminderServiceWorkerClickPayload(payload);
+  if(!safe) return {ok:false,reason:'invalid-service-worker-payload'};
+  return App.handleReminderNativeClick(safe);
+};
 App.handleReminderNativeClick=function(payload){
   var target=reminderDeepLinkTarget(payload), x=payload&&typeof payload==='object'?payload:{};
   if(!target.ok) return target;
@@ -16685,6 +16704,7 @@ setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yan�
 if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('message', function(e){
     if(e.data && e.data.type==='aeon-open-mesaj'){ App.openMesaj(); }
+    else if(e.data && e.data.type==='reminder-native-click'){ App.handleReminderServiceWorkerClick(e.data.payload); }
   });
 }
 })();

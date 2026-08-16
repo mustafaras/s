@@ -13,6 +13,15 @@ const SAYGI_ID = "reminder.catalog.v1.saygi";
 const ARTICLE_TITLE = "ARTICLE_TITLE_PRIVATE";
 const PERSON_NAME = "PERSON_NAME_PRIVATE";
 
+class FixedDate extends Date {
+  constructor(...args) {
+    super(...(args.length ? args : [NOW]));
+  }
+  static now() {
+    return Date.parse(NOW);
+  }
+}
+
 function element(id) {
   return {
     id: id || "", _html: "", _text: "", style: { cssText: "", setProperty() {} },
@@ -64,7 +73,7 @@ function boot(seed, options) {
     URL: Object.assign(function URL() {}, { createObjectURL() { return "blob:rem-17"; }, revokeObjectURL() {} }), URLSearchParams,
     Blob: function Blob() {}, File: function File() {}, FileReader: function FileReader() {}, TextDecoder, TextEncoder, atob, btoa,
     alert() {}, confirm() { return true; }, prompt() { return null; }, addEventListener() {}, removeEventListener() {},
-    Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error, parseInt, parseFloat, isNaN, isFinite,
+    Date: FixedDate, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error, parseInt, parseFloat, isNaN, isFinite,
     encodeURIComponent, decodeURIComponent, Promise, Set, Map, Symbol, Intl
   };
   function NotificationMock() {}

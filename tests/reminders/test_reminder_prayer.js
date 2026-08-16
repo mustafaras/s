@@ -132,7 +132,7 @@ runTests([
     const copy = out.sandbox.App.reminderPrayerPrivateCopy({ performed: true, missed: true, note: "PRIVATE_NOTE", privateBody: "Namazı kaçırdın" }, definition);
     const serialized = JSON.stringify(copy);
     assert(!serialized.includes("performed")); assert(!serialized.includes("missed")); assert(!serialized.includes("PRIVATE_NOTE")); assert(!serialized.includes("kaçırdın"));
-    const items = out.sandbox.App.reminderInboxItems({ occurrences: [{ occurrence: Object.assign({}, out.sandbox.App.reminderPrayerOccurrence(Object.assign(prayerInput(), { prayerKey: "fajr" })).occurrence, { due: true, past: false }), definition, privateBody: "Namazı kaçırdın", detail: "performed=true" }] });
+    const items = out.sandbox.App.reminderInboxItems({ nowIso: NOW, localDate: DATE, occurrences: [{ occurrence: Object.assign({}, out.sandbox.App.reminderPrayerOccurrence(Object.assign(prayerInput(), { prayerKey: "fajr" })).occurrence, { due: true, past: false }), definition, privateBody: "Namazı kaçırdın", detail: "performed=true" }] });
     assertEqual(items.items.length, 1); assert(!JSON.stringify(items.items).includes("kaçırdın")); assert(!JSON.stringify(items.items).includes("performed=true"));
   }],
   ["legacy prayer day is not a certain lifecycle source until method metadata is present", () => {

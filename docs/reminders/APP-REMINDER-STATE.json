@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-24",
+  "activePrompt": "REM-25",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-23",
-  "nextSafeAction": "REM-24 local implementation/verification; no release action",
-  "currentPhase": "R6",
+  "lastCompletedPrompt": "REM-24",
+  "nextSafeAction": "REM-25 local implementation/verification; no release action",
+  "currentPhase": "R7",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-23 foreground reminder native display adapter in app.js is separate from delivery journal and ÆON notification flow; canonical private copy, occurrence-bound payload, policy/permission/visibility/duplicate gates and open/snooze/mute routing",
-    "tests": "Native 66; deep-links 77; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS. Wall-clock reminder matrix is 25/27 because two legacy date-pinned fixtures fail on 2026-08-16; prayer 48 and Saygı 71 pass with intended synthetic clocks. No browser, real network or data write",
-    "commit": "4618a67d0bfe9745ba103dea3944cf35a77b199a",
+    "source": "REM-24 sw.js reminder click boundary preserves ÆON routing, validates occurrence/target/action payloads, strips sensitive fields, routes one safe postMessage/openWindow path and blocks reminder-shaped push delivery; app.js performs a second allowlisted click-adapter validation",
+    "tests": "SW 57; deep-links 85; node --check sw.js/app.js; driver; root/Panel-v2; B1/B2/B3; syntax/context/diff PASS. Wall-clock reminder matrix is 25/27 because two legacy date-pinned fixtures fail on 2026-08-16; prayer 48 and Saygı 71 pass with intended synthetic clocks. No browser, real network or data write",
+    "commit": "25f8122c67f0a2782952daae6cec426396ea5236",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-23 closure; REM-24 ready; release remains not_approved",
+  "updatedBy": "Codex REM-24 closure; REM-25 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-23",
-    "evidence": "docs/reminders/evidence/REM-23.md",
-    "commit": "84723aebec095eba5dd9933e00e7ba477e0aff43"
+    "prompt": "REM-24",
+    "evidence": "docs/reminders/evidence/REM-24.md",
+    "commit": "25f8122c67f0a2782952daae6cec426396ea5236"
   }
 }

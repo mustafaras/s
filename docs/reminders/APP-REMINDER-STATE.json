@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-38",
+  "activePrompt": "REM-39",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-37",
-  "nextSafeAction": "REM-38 Multi-tab concurrency ve anti-clobber; S5 kullanıcı cihazı kabulü pending; no release action",
+  "lastCompletedPrompt": "REM-38",
+  "nextSafeAction": "REM-39 Retention, export, clear ve reset lifecycle; S5 kullanıcı cihazı kabulü pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-37 semantic light/dark reminder tokens, shared card/banner/modal/native-preview/empty hierarchy, <=460px safe-area and long-copy layout, 44px focus and reduced-motion guards, and candidate-stable visible timer render no-op",
-    "tests": "test_reminder_visual.js PASS (30 assertions); test_reminder_contrast.js PASS (47); test_reminder_performance.js PASS (16; 3.60ms/25 no-op ticks); full reminder fixture loop, driver, app/sync syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "35c2c01b8a8fcd25d99512560f41a49707e922bb",
+    "source": "REM-38 scope-aware local reminder merge, delayed storage-event reconciliation, local receipt reminder preservation, separate delivery journal and synthetic GET-merge-PUT anti-clobber boundary",
+    "tests": "test_reminder_concurrency.js PASS (5 cases; 38 assertions); test_faz10_sync.js PASS (64/64); test_panel_p0_sync.js PASS (31/31); medication 65, migration 50; full reminder/root/Panel-v2 fixture loops, driver, app/sync/test syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "511348d81fa46abf5d1e879cb56cffafe5da116d",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-37 closure; REM-38 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-38 closure; G9-I complete; REM-39 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-37",
-    "evidence": "docs/reminders/evidence/REM-37.md",
-    "commit": "35c2c01b8a8fcd25d99512560f41a49707e922bb"
+    "prompt": "REM-38",
+    "evidence": "docs/reminders/evidence/REM-38.md",
+    "commit": "511348d81fa46abf5d1e879cb56cffafe5da116d"
   }
 }

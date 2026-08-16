@@ -1293,3 +1293,17 @@
 @media (max-width:390px){.sey-reminder-profile-list,.sey-reminder-setup-list{grid-template-columns:1fr}.sey-reminder-category-meta{align-items:flex-start;flex-direction:column}.sey-reminder-category-meta label{width:100%;justify-content:space-between}.sey-reminder-category select{max-width:63%}}
 @media (min-width:681px){.sey-reminder-profiles,.sey-reminder-categories,.sey-reminder-permission{padding:15px}.sey-reminder-profile-list{grid-template-columns:repeat(3,minmax(0,1fr))}.sey-reminder-setup-list{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.sey-reminder-profile-choice,.sey-reminder-setup-choice,.sey-reminder-setup-confirm,.sey-reminder-category-toggle{transition:none!important}}
+
+/* REM-27: reminder-only accessibility tokens.  The original light-theme
+   purple/green accents remain unchanged; dark theme gets readable text
+   variants instead of reusing light-theme ink on a near-black surface. */
+#root{--reminder-strong:#684B73;--reminder-focus:#76577F;--reminder-care-strong:#39766D;--reminder-inbox-strong:#684B73}
+#root[data-theme="dark"]{--reminder-strong:#E8D5F1;--reminder-focus:#E8D5F1;--reminder-care-strong:#9DE7D7;--reminder-inbox-strong:#E8D5F1}
+.sey-reminder-settings-icon,.sey-reminder-settings-action,.sey-reminder-eyebrow,.sey-reminder-intro-mark,.sey-reminder-summary-icon,.sey-reminder-count,.sey-reminder-card-index,.sey-reminder-card-category,.sey-reminder-card-state,.sey-reminder-card-meta b,.sey-reminder-secondary,.sey-reminder-profile-active,.sey-reminder-setup-head>strong,.sey-reminder-setup-choice>span:first-child,.sey-reminder-category-icon,.sey-reminder-category-toggle,.sey-reminder-permission-icon,.sey-reminder-preview-kicker,.sey-reminder-empty svg,.sey-reminder-live-note svg{color:var(--reminder-strong)}
+.sey-reminder-mute,.sey-reminder-inbox-menu button,.sey-reminder-evening-group-actions button{color:var(--reminder-inbox-strong)}
+.sey-reminder-care-count,.sey-reminder-care-choice-icon,.sey-reminder-care-choice.is-selected .sey-reminder-care-choice-state,.sey-reminder-care-toggle{color:var(--reminder-care-strong)}
+.sey-reminder-profile-note,.sey-reminder-card-version,.sey-reminder-care-choice-copy small,.sey-reminder-care-optin small{color:var(--rr-muted,#5F5058)}
+.sey-reminder-category-toggle:focus-visible,.sey-reminder-profile-choice:focus-visible,.sey-reminder-setup-choice:focus-visible,.sey-reminder-setup-confirm:focus-visible,.sey-reminder-category select:focus-visible,.sey-reminder-close:focus-visible,.sey-reminder-actions button:focus-visible,.sey-reminder-card button:focus-visible{outline-color:var(--reminder-focus)}
+.sey-reminder-care-choice{min-height:44px}
+@media (prefers-reduced-motion:reduce){.sey-reminder-overlay,.sey-reminder-screen,.sey-reminder-settings-entry,.sey-reminder-actions button,.sey-reminder-card button,.sey-reminder-profile-choice,.sey-reminder-setup-choice,.sey-reminder-setup-confirm,.sey-reminder-category-toggle,.sey-reminder-care-choice,.sey-reminder-care-toggle{animation:none!important;transition:none!important}}
+#root[data-theme="dark"] .sey-reminder-profile-note,#root[data-theme="dark"] .sey-reminder-card-version,#root[data-theme="dark"] .sey-reminder-care-choice-copy small,#root[data-theme="dark"] .sey-reminder-care-optin small{--rr-muted:#D2CBD5}

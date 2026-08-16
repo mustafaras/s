@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-27",
+  "activePrompt": "REM-28",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-26",
-  "nextSafeAction": "REM-27 local implementation/verification; no release action",
+  "lastCompletedPrompt": "REM-27",
+  "nextSafeAction": "REM-28 local full regression/migration/time matrix; no release action",
   "currentPhase": "R8",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-26 current Panel reminder mirror is a deliberate no-op because REM-25/REM-ADR-017 removes local-only reminder and delivery roots from the remote projection; panelCoverageManifest.js adds fail-closed redaction for legacy or malformed roots",
-    "tests": "REM-26 panel no-op/redaction fixture 28/28; P6 QA 16/16; Panel-v1 P0/P1/P2/P3/P4/Faz-11 related regressions PASS; panel.js and panelCoverageManifest.js syntax, panel.html script/cache-bust gate and git diff --check PASS; no browser, real network or data write",
-    "commit": "bc04224aaf19e9091844d03610d25dbb3b80fb80",
+    "source": "REM-27 app.js Reminder Center semantic/focus/escape/live-region QA, styles.css dark AA and reduced-motion tokens, index.html app/style cache-bust, and synthetic accessibility/copy/contrast fixtures",
+    "tests": "REM-27 accessibility 127, copy/privacy 71, contrast 33; driver PASS; zikr 90/90; Faz 10 sync 64/64; Panel P6 16/16; reminder panel projection 28/28; context, syntax and diff PASS; 28/30 existing reminder suites PASS with two date-pinned prayer/Saygı discrepancies carried to REM-28; no browser, real network or data write",
+    "commit": "87842a1b2d64024f423808530e8173e679223b04",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-26 closure; REM-27 ready; release remains not_approved",
+  "updatedBy": "Codex REM-27 closure; REM-28 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-26",
-    "evidence": "docs/reminders/evidence/REM-26.md",
-    "commit": "bc04224aaf19e9091844d03610d25dbb3b80fb80"
+    "prompt": "REM-27",
+    "evidence": "docs/reminders/evidence/REM-27.md",
+    "commit": "87842a1b2d64024f423808530e8173e679223b04"
   }
 }

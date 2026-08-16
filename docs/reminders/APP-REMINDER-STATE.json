@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-33",
+  "activePrompt": "REM-34",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-32",
-  "nextSafeAction": "REM-33 Sistem durumu, stale veri ve dürüst uyarı; user-device acceptance S5 pending; no release action",
+  "lastCompletedPrompt": "REM-33",
+  "nextSafeAction": "REM-34 Opt-in kişiselleştirme ve adaptasyon guardrail’leri; user-device acceptance S5 pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-32 centralized Reminder Center policy/profile/category/channel/mute/history controls; category overrides survive global reset; synthetic test is Notification-free; history is local metadata-only, short-lived, clearable and undoable; data, sync and panel source unchanged",
-    "tests": "test_reminder_center_advanced.js PASS (48 assertions); test_reminder_actions.js PASS (39 assertions); all reminder fixtures, headless driver, node --check app.js, context validator and git diff --check PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "68afed07c660cb006e0c7c86dbc35da41067925c",
+    "source": "REM-33 deterministic fresh/stale/unavailable/offline/recovery and permission/sync/background status contract; stale prayer fail-closed; offline in-app preservation and bounded recovery; generic sync error copy; no background scheduling promise",
+    "tests": "test_reminder_system_status.js PASS (65 assertions); test_reminder_prayer.js PASS (48); test_reminder_lifecycle.js PASS (36); test_reminder_native.js PASS (66); all reminder fixtures, driver, zikr 90/90, root fixture loop, syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "cbb8c8d82eeb2fcb9eb09c7def294f5df503d17a",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-32 closure; REM-33 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-33 closure; REM-34 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-32",
-    "evidence": "docs/reminders/evidence/REM-32.md",
-    "commit": "68afed07c660cb006e0c7c86dbc35da41067925c"
+    "prompt": "REM-33",
+    "evidence": "docs/reminders/evidence/REM-33.md",
+    "commit": "cbb8c8d82eeb2fcb9eb09c7def294f5df503d17a"
   }
 }

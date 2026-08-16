@@ -42,10 +42,16 @@ runTests([
     const strong = token(light, "--reminder-strong");
     const care = token(light, "--reminder-care-strong");
     const inbox = token(light, "--reminder-inbox-strong");
+    const action = token(light, "--reminder-action");
+    const actionInk = token(light, "--reminder-action-ink");
+    const statusOk = token(light, "--reminder-status-ok");
+    const statusCaution = token(light, "--reminder-status-caution");
     assertAA(strong, "#FFF8F3", 4.5, "light strong");
     assertAA(care, "#FFF8F3", 4.5, "light care");
     assertAA(inbox, "#FFF8F3", 4.5, "light inbox");
-    assertAA("#FFFFFF", "#76577F", 4.5, "light primary action");
+    assertAA(actionInk, action, 4.5, "light primary action");
+    assertAA(statusOk, "#FFF8F3", 4.5, "light status ok");
+    assertAA(statusCaution, "#FFF8F3", 4.5, "light status caution");
     assert(contrast(strong, "#FFF8F3") >= 3);
     assert(contrast(care, "#FFF8F3") >= 3);
   }],
@@ -54,11 +60,17 @@ runTests([
     const strong = token(dark, "--reminder-strong");
     const care = token(dark, "--reminder-care-strong");
     const inbox = token(dark, "--reminder-inbox-strong");
+    const action = token(dark, "--reminder-action");
+    const actionInk = token(dark, "--reminder-action-ink");
+    const statusOk = token(dark, "--reminder-status-ok");
+    const statusCaution = token(dark, "--reminder-status-caution");
     assertAA(strong, "#111114", 4.5, "dark strong");
     assertAA(care, "#111114", 4.5, "dark care");
     assertAA(inbox, "#111114", 4.5, "dark inbox");
     assertAA("#D2CBD5", "#111114", 4.5, "dark muted");
-    assertAA("#FFFFFF", "#76577F", 4.5, "dark primary action");
+    assertAA(actionInk, action, 4.5, "dark primary action");
+    assertAA(statusOk, "#111114", 4.5, "dark status ok");
+    assertAA(statusCaution, "#111114", 4.5, "dark status caution");
     assert(!dark.includes("#684B73"));
     assert(!dark.includes("#39766D"));
   }],
@@ -69,6 +81,8 @@ runTests([
     assert(css.includes(".sey-reminder-category select{min-height:32px"));
     assert(css.includes(".sey-reminder-category-toggle:focus-visible"));
     assert(css.includes(".sey-reminder-close:focus-visible"));
+    assert(css.includes(".sey-reminder-close,.sey-reminder-actions button"));
+    assert(css.includes(".sey-reminder-category select,.sey-reminder-policy select,.sey-reminder-policy input{min-height:44px}"));
     assert(css.includes("@media (prefers-reduced-motion:reduce){.sey-reminder-overlay,.sey-reminder-screen"));
     assert(css.includes(".sey-reminder-care-choice,.sey-reminder-care-toggle{animation:none!important;transition:none!important}"));
   }],

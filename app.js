@@ -3187,7 +3187,7 @@ function reminderDeliveryClear(){ try{ if(typeof localStorage!=='undefined') loc
 // olarak delivery journal'ın tekil occurrence kaydı engeller.
 var REMINDER_LIFECYCLE_INTERVAL_MS=30000;
 var REMINDER_LIFECYCLE_VISIBILITY={visible:true,hidden:true};
-var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null,recoveryPending:false};
+var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null,recoveryPending:false,candidateSignature:'',candidateChanged:false,renderCount:0,noOpCount:0,renderErrorCount:0,lastRenderReason:''};
 
 function reminderLifecycleVisibility(value){
   var state=String(value||'').toLowerCase();
@@ -3750,6 +3750,60 @@ function reminderLifecycleIsPrayerCandidate(candidate){
   // must remain independently testable.
   return !!occurrence.prayerKey&&(String(x.reminderId||occurrence.reminderId||definition.id||'')===REMINDER_PRAYER_ID||String(occurrence.triggerType||definition.triggerType||'')==='prayer-offset');
 }
+function reminderLifecycleCandidateSignature(candidates){
+  var rows=(Array.isArray(candidates)?candidates:[]).map(function(candidate){
+    var x=candidate&&typeof candidate==='object'?candidate:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:x, policy=x.policy&&typeof x.policy==='object'?x.policy:{}, preference=x.preference&&typeof x.preference==='object'?x.preference:{};
+    return [
+      reminderLifecycleOccurrenceId(occurrence),
+      String(x.reminderId||occurrence.reminderId||''),
+      String(occurrence.localDate||''),
+      String(occurrence.scheduledAt||occurrence.scheduledAtIso||occurrence.localTime||''),
+      String(occurrence.timezone||''),
+      String(occurrence.deepLink||''),
+      occurrence.due===true?'due':'window',
+      String(x.flowId||occurrence.flowId||''),
+      String(x.reason||occurrence.reason||policy.reason||''),
+      String(preference.channel||occurrence.channel||''),
+      preference.enabled===true?'enabled':'disabled',
+      policy.inAppAllowed===true?'in-app':'no-in-app',
+      policy.nativeAllowed===true?'native':'no-native'
+    ].join('~');
+  });
+  rows.sort();
+  return rows.join('|');
+}
+function reminderLifecycleRenderIfNeeded(result,signature,context,sourceName){
+  var candidateChanged=reminderLifecycleState.candidateSignature!==signature;
+  reminderLifecycleState.candidateSignature=signature;
+  reminderLifecycleState.candidateChanged=candidateChanged;
+  var changed=candidateChanged||!!(result&&result.changed)||!!(result&&result.nativeShownCount);
+  if(!changed){
+    reminderLifecycleState.noOpCount+=1;
+    reminderLifecycleState.lastRenderReason='candidate-stable';
+    return false;
+  }
+  // Timer paints only the visible app. Foreground/manual callers retain their
+  // existing targeted render ownership; a scheduler tick never repaints a
+  // hidden surface or an unchanged candidate.
+  if((sourceName!=='timer'&&sourceName!=='boot')||!context||context.visibilityState!=='visible'){
+    reminderLifecycleState.lastRenderReason='render-deferred';
+    return false;
+  }
+  if(typeof render!=='function'){
+    reminderLifecycleState.lastRenderReason='render-unavailable';
+    return false;
+  }
+  try{
+    render();
+    reminderLifecycleState.renderCount+=1;
+    reminderLifecycleState.lastRenderReason=candidateChanged?'candidate-changed':'delivery-changed';
+    return true;
+  }catch(e){
+    reminderLifecycleState.renderErrorCount+=1;
+    reminderLifecycleState.lastRenderReason='render-error';
+    return false;
+  }
+}
 function reminderLifecycleEvaluate(source,input){
   if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
   var x=input&&typeof input==='object'?Object.assign({},input):{}, nowIso=reminderDeliveryNow(x.nowIso||x.now), sourceName=String(source||x.source||'manual');
@@ -3776,9 +3830,12 @@ function reminderLifecycleEvaluate(source,input){
       nativeResults.push({occurrenceId:deliveryResult.occurrenceId,status:deliveryResult.nativeStatus,reason:deliveryResult.nativeReason});
     });
     result.nativeResults=nativeResults; result.nativeShownCount=nativeResults.filter(function(item){ return item.status==='shown'; }).length; result.systemStatus=systemStatus; result.stalePrayerBlocked=stalePrayerBlocked; result.recoveryState=recoveryCatchUp?'recovery':'idle'; result.catchUpPerformed=catchUp;
+    result.candidateSignature=reminderLifecycleCandidateSignature(candidates);
+    result.rendered=reminderLifecycleRenderIfNeeded(result,result.candidateSignature,context,sourceName);
+    result.candidateChanged=!!reminderLifecycleState.candidateChanged;
     if(sourceName==='online'&&context.offline!==true&&result.ok===true&&persisted) reminderLifecycleState.recoveryPending=false;
     else if(context.offline===true||sourceName==='offline') reminderLifecycleState.recoveryPending=true;
-    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:result.status,source:result.source,visibilityState:result.visibilityState,shownCount:result.shownCount,suppressedCount:result.suppressedCount,scheduledCount:result.scheduledCount,duplicateCount:result.duplicateCount,errorCount:result.errors.length,persisted:persisted,recoveryState:result.recoveryState,catchUpPerformed:result.catchUpPerformed};
+    reminderLifecycleState.lastSource=sourceName; reminderLifecycleState.lastEvaluatedAt=nowIso; reminderLifecycleState.lastResult={status:result.status,source:result.source,visibilityState:result.visibilityState,shownCount:result.shownCount,suppressedCount:result.suppressedCount,scheduledCount:result.scheduledCount,duplicateCount:result.duplicateCount,errorCount:result.errors.length,persisted:persisted,recoveryState:result.recoveryState,catchUpPerformed:result.catchUpPerformed,candidateChanged:!!result.candidateChanged,rendered:!!result.rendered,renderReason:reminderLifecycleState.lastRenderReason,candidateCount:candidates.length};
     return result;
   }catch(e){
     var failed={ok:false,status:'failed',source:sourceName,reason:'unknown',changed:false,results:[],errors:[{occurrenceId:'',reason:'unknown'}],persisted:false};
@@ -6615,7 +6672,7 @@ App.evaluateReminderLifecycle=reminderLifecycleEvaluate;
 App.reminderLifecycleTick=reminderLifecycleTick;
 App.reminderLifecycleInterval=REMINDER_LIFECYCLE_INTERVAL_MS;
 App.reminderLifecycleState=function(){
-  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
+  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,candidateSignature:reminderLifecycleState.candidateSignature,candidateChanged:!!reminderLifecycleState.candidateChanged,renderCount:reminderLifecycleState.renderCount,noOpCount:reminderLifecycleState.noOpCount,renderErrorCount:reminderLifecycleState.renderErrorCount,lastRenderReason:reminderLifecycleState.lastRenderReason,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
 };
 App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
 App.reminderPersonalizationNormalize=normalizeReminderPersonalization;

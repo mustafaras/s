@@ -84,6 +84,11 @@ frekansı artırımı değildir.
   üç izinli kaynak, aggregate-safe alanlar, secondary click/completion,
   dismiss/snooze/mute/düşük yoğunluk sinyalleri ve hassas boyut negatifleriyle
   doğrular.
+- İlk ölçüm sözleşmesi commit’i: `de44daebb888a74bfec5aab73a9659117a6d9786`
+  (`REM-30: define privacy-safe measurement contract`).
+- `node tests/reminders/test_reminder_metrics.js` →
+  `REM-30 METRICS PASS: 81 assertions; no external telemetry or sensitive
+  profile dimensions`.
 - Test matrix: `G9-A | test_reminder_metrics.js | Başarı ölçütleri | Ölçüm
   hassas profil / telemetry üretmiyor | REM-30`.
 - Traceability: `APP-REMINDER-TRACEABILITY-MATRIX.md` §2 Hedef / başarı satırı,

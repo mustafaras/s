@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-30",
+  "activePrompt": "REM-31",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-29",
-  "nextSafeAction": "REM-30 başarı ölçütleri ve privacy-safe observability; user-device acceptance S5 pending; no release action",
-  "currentPhase": "R8",
+  "lastCompletedPrompt": "REM-30",
+  "nextSafeAction": "REM-31 sabah / gün içi / akşam / düşük kapasite akışları; user-device acceptance S5 pending; no release action",
+  "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-29 release packet bound to source/test baseline c321505; production source unchanged during packet preparation",
-    "tests": "REM-27/REM-28 synthetic receipts remain canonical: syntax, driver, zikr 90/90, B1/B2, 33 reminder, 92 root, 27 Panel-v2, deterministic time/privacy/accessibility matrix PASS; REM-29 git status/head/diff and allowlist audit PASS; no browser, server, real network or data write",
-    "commit": "0a2a81d2ced54d9f48b4643b37b079654901fd09",
+    "source": "REM-30 privacy-safe measurement contract; production runtime, data, sync and panel source unchanged",
+    "tests": "test_reminder_metrics.js PASS (81 assertions); context validator PASS (73 prompts / 67 local links); git diff --check PASS; synthetic only, no browser, server, real network or data write",
+    "commit": "de44daebb888a74bfec5aab73a9659117a6d9786",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-29 closure; REM-30 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-30 closure; REM-31 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-29",
-    "evidence": "docs/reminders/evidence/REM-29.md",
-    "commit": "0a2a81d2ced54d9f48b4643b37b079654901fd09"
+    "prompt": "REM-30",
+    "evidence": "docs/reminders/evidence/REM-30.md",
+    "commit": "de44daebb888a74bfec5aab73a9659117a6d9786"
   }
 }

@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-26",
+  "activePrompt": "REM-27",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-25",
-  "nextSafeAction": "REM-26 local implementation/verification; no release action",
-  "currentPhase": "R7",
+  "lastCompletedPrompt": "REM-26",
+  "nextSafeAction": "REM-27 local implementation/verification; no release action",
+  "currentPhase": "R8",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-25 sync.js sanitize and merge boundary removes reminder/delivery local-only roots, settings secrets, raw receipt detail and keeps the pre-push backup sanitized; app.js projection remains fail-closed",
-    "tests": "REM-25 privacy fixture 3 cases / 97 assertions; Faz 10 sync 64/64; node --check sync.js and fixture; git diff --check PASS. Fetch mock and delivery-key read count are zero; no browser, real network or data write",
-    "commit": "54d4d345584c5636727028a756be549ddf459564",
+    "source": "REM-26 current Panel reminder mirror is a deliberate no-op because REM-25/REM-ADR-017 removes local-only reminder and delivery roots from the remote projection; panelCoverageManifest.js adds fail-closed redaction for legacy or malformed roots",
+    "tests": "REM-26 panel no-op/redaction fixture 28/28; P6 QA 16/16; Panel-v1 P0/P1/P2/P3/P4/Faz-11 related regressions PASS; panel.js and panelCoverageManifest.js syntax, panel.html script/cache-bust gate and git diff --check PASS; no browser, real network or data write",
+    "commit": "bc04224aaf19e9091844d03610d25dbb3b80fb80",
     "remoteEquality": "not checked; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "not performed"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-25 closure; REM-26 ready; release remains not_approved",
+  "updatedBy": "Codex REM-26 closure; REM-27 ready; release remains not_approved",
   "closure": {
-    "prompt": "REM-25",
-    "evidence": "docs/reminders/evidence/REM-25.md",
-    "commit": "54d4d345584c5636727028a756be549ddf459564"
+    "prompt": "REM-26",
+    "evidence": "docs/reminders/evidence/REM-26.md",
+    "commit": "bc04224aaf19e9091844d03610d25dbb3b80fb80"
   }
 }

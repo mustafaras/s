@@ -38,8 +38,8 @@
   ],
   "evidence": {
     "source": "REM-36 frozen Turkish copy lexicon for private/in-app/native surfaces; generic native preview; shame and clinical-authority negative boundary; 460px wrap guard",
-    "tests": "test_reminder_copy.js PASS (690 assertions); test_reminder_privacy.js PASS (35); test_reminder_accessibility.js PASS (136); catalog 423; native 66; center 48; inbox 40; final full reminder fixture loop, syntax and diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "7517b91d0c9c425c66f1ed2a0638f83d90d798f2",
+    "tests": "test_reminder_copy.js PASS (793 assertions); test_reminder_privacy.js PASS (35); test_reminder_accessibility.js PASS (136); catalog 423; native 66; center 48; inbox 40; final full reminder fixture loop, syntax and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "0ecf6e05064891b877b6ea12ad8c52067fa78ef8",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -56,6 +56,6 @@
   "closure": {
     "prompt": "REM-36",
     "evidence": "docs/reminders/evidence/REM-36.md",
-    "commit": "7517b91d0c9c425c66f1ed2a0638f83d90d798f2"
+    "commit": "0ecf6e05064891b877b6ea12ad8c52067fa78ef8"
   }
 }

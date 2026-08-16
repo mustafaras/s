@@ -56,6 +56,6 @@
   "closure": {
     "prompt": "REM-23",
     "evidence": "docs/reminders/evidence/REM-23.md",
-    "commit": "CLOSURE_COMMIT_SHA"
+    "commit": "84723aebec095eba5dd9933e00e7ba477e0aff43"
   }
 }

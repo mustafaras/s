@@ -38,11 +38,24 @@ function normalizeSyncReceipt(r){
   out.lastErrorDetail=safeReceiptDetail(x.lastErrorDetail);
   return out;
 }
+function preserveLocalReminderRoot(data){
+  if(!data||typeof data!=='object'||Object.prototype.hasOwnProperty.call(data,'reminders')) return data;
+  // app.js deliberately sends a reminder-free projection to schedule(). The
+  // sync receipt still writes to the app's local key, so preserve the local
+  // canonical owner instead of turning a remote-safe projection into a local
+  // data-loss write. This never changes the payload later passed to sanitize().
+  try{
+    var raw=localStorage.getItem(KEY), persisted=raw?JSON.parse(raw):null;
+    if(persisted&&persisted.reminders&&typeof persisted.reminders==='object') data.reminders=JSON.parse(JSON.stringify(persisted.reminders));
+  }catch(e){}
+  return data;
+}
 function localReceipt(data,patch){
   var out=normalizeSyncReceipt(data&&data.syncReceipt), p=patch||{};
   Object.keys(p).forEach(function(k){ if(k in out) out[k]=p[k]; });
   out=normalizeSyncReceipt(out);
   if(data&&typeof data==='object') data.syncReceipt=out;
+  preserveLocalReminderRoot(data);
   try{ if(data&&typeof data==='object') localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
   try{ if(window.SeyOnSyncState) window.SeyOnSyncState(out); }catch(e){}
   return out;
@@ -1032,6 +1045,9 @@ window.SeySync={
   mergeProfileAssessment:mergeProfileAssessment,
   // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).
   mergeData:mergeData,
+  // REM-38 synthetic gate — GET/merge/anti-clobber boundary is exercised
+  // against an in-memory fetch mock; it never authorizes a real write.
+  putLatestGuarded:putLatestGuarded,
   // Privacy boundary — headless fixture'lar gerçek remote projection'ı doğrudan
   // doğrular; bu fonksiyon dış ağa veya localStorage'a erişmez.
   sanitize:sanitize,

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-37",
+  "activePrompt": "REM-38",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-36",
-  "nextSafeAction": "REM-37 Premium visual, responsive ve performans QA; S5 kullanıcı cihazı kabulü pending; no release action",
+  "lastCompletedPrompt": "REM-37",
+  "nextSafeAction": "REM-38 Multi-tab concurrency ve anti-clobber; S5 kullanıcı cihazı kabulü pending; no release action",
   "currentPhase": "R9",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-36 frozen Turkish copy lexicon for private/in-app/native surfaces; generic native preview; shame and clinical-authority negative boundary; 460px wrap guard",
-    "tests": "test_reminder_copy.js PASS (793 assertions); test_reminder_privacy.js PASS (35); test_reminder_accessibility.js PASS (136); catalog 423; native 66; center 48; inbox 40; final full reminder fixture loop, syntax and diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "0ecf6e05064891b877b6ea12ad8c52067fa78ef8",
+    "source": "REM-37 semantic light/dark reminder tokens, shared card/banner/modal/native-preview/empty hierarchy, <=460px safe-area and long-copy layout, 44px focus and reduced-motion guards, and candidate-stable visible timer render no-op",
+    "tests": "test_reminder_visual.js PASS (30 assertions); test_reminder_contrast.js PASS (47); test_reminder_performance.js PASS (16; 3.60ms/25 no-op ticks); full reminder fixture loop, driver, app/sync syntax, context and diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "35c2c01b8a8fcd25d99512560f41a49707e922bb",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-16",
-  "updatedBy": "Codex REM-36 closure; REM-37 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-37 closure; REM-38 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-36",
-    "evidence": "docs/reminders/evidence/REM-36.md",
-    "commit": "0ecf6e05064891b877b6ea12ad8c52067fa78ef8"
+    "prompt": "REM-37",
+    "evidence": "docs/reminders/evidence/REM-37.md",
+    "commit": "35c2c01b8a8fcd25d99512560f41a49707e922bb"
   }
 }

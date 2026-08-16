@@ -457,3 +457,27 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Sonraki adım:** REM-27 accessibility, copy ve theme QA; daha ayrıntılı
   current-panel reminder kararları REM-55–REM-66 surface hattında yeniden
   değerlendirilebilir.
+
+### REM-ADR-019 — Privacy-safe measurement contract ve telemetry yasağı
+
+- **Tarih:** 2026-08-16
+- **Durum:** accepted
+- **Soru:** R9 ürün hedefleri kullanıcıyı izleyen bir engagement telemetry’si
+  olmadan nasıl ölçülebilir?
+- **Kanıt:** UX planı §2.1–§2.3, Faz R9 telemetry’siz observability çıkış
+  kapısı, §17 P0–P3; `tests/reminders/test_reminder_metrics.js`;
+  `docs/reminders/evidence/REM-30.md`; test matrix G9-A ve traceability §2.
+- **Karar:** REM-30 ölçüm sözleşmesi yalnız sentetik fixture, cihazda kalan
+  local aggregate ve kullanıcının açıkça verdiği geri bildirim bucket’larını
+  kullanır. Analytics servisi, production telemetry, gerçek kullanıcı verisi,
+  kimlik, kategori, mood, terapi, journal, ibadet/prayer, ilaç, raw metin,
+  reminder/occurrence ID ve cross-device profil çıkarımı yasaktır. Click-through
+  ve completion ikincil sinyaldir; dismiss, snooze, mute ve düşük bildirim
+  yoğunluğu güvenlik/kontrol sinyalidir ve daha fazla bildirim gerekçesi olamaz.
+- **Etkiler:** `data`, sync, panel ve release state’e yeni telemetry alanı
+  eklenmez; metrik sözleşmesi local-only ve no-write kalır. Her metrikte yanlış
+  yorum riski ve source/evidence seviyesi yazılır; source/test PASS deploy veya
+  cihaz PASS sayılmaz. `releaseApproval` `not_approved` kalır.
+- **Sonraki adım:** REM-31 günlük akışları bu düşük yoğunluk ve çıkış sinyali
+  sözleşmesini koruyarak ele alır; REM-40 traceability reconciliation’da
+  ölçüm contract’ını yeniden kontrol eder.

@@ -301,7 +301,7 @@ function pushWithCfg(c, data, pendingReceipt){
   if(!pending.sourceUpdatedAt) pending.sourceUpdatedAt=safeReceiptIso(data&&data.savedAt)||nowIso;
   if(!pending.submittedAt) pending.submittedAt=nowIso;
   // Her push öncesinde zaman damgalı yedek: bir şey ters giderse geri dönülebilir.
-  var backup=JSON.stringify({app:'seyma',type:'pre-push-backup',savedAt:nowIso,data:data},null,2);
+  var backup=JSON.stringify({app:'seyma',type:'pre-push-backup',savedAt:nowIso,data:safeForFiles},null,2);
   return ghPut(c,'data/backups/'+nowIso.replace(/[:.]/g,'-')+'.json',backup)
     .catch(function(){})
     .then(function(){ return putLatestGuarded(c,latest,data); })
@@ -546,16 +546,34 @@ function mergeDay(localDay, remoteDay){
 }
 function mergeSettings(localS, remoteS){
   if(!remoteS || typeof remoteS!=='object') return localS || {};
-  if(!localS || typeof localS!=='object') return JSON.parse(JSON.stringify(remoteS));
-  var merged=JSON.parse(JSON.stringify(localS));
   // Uzaktan asla alınmayacak cihaza özel alanlar
   var localOnlyKeys={ghToken:true, openaiKey:true, syncUrl:true, auth:true, pin:true};
+  if(!localS || typeof localS!=='object'){
+    var fresh={};
+    Object.keys(remoteS).forEach(function(k){ if(!localOnlyKeys[k]) fresh[k]=JSON.parse(JSON.stringify(remoteS[k])); });
+    return fresh;
+  }
+  var merged=JSON.parse(JSON.stringify(localS));
   Object.keys(remoteS).forEach(function(k){
     if(localOnlyKeys[k]) return; // local'deki değer korunur
     if(!(k in merged)) merged[k]=remoteS[k];
   });
   return merged;
 }
+// Hatırlatma tercihleri ve teslim günlüğü cihaz-yerel kalır. Bu liste hem
+// sanitize hem de conflict merge için ortak güvenlik sınırıdır: remote'da
+// eski/yanlışlıkla eklenmiş bir kök bulunsa bile full-replace zincirine geri
+// alınmaz.
+var LOCAL_ONLY_SYNC_KEYS={
+  reminders:true,
+  delivery:true,
+  deliveryLog:true,
+  reminderDelivery:true,
+  reminderDeliveries:true,
+  reminderHistory:true,
+  notificationDelivery:true
+};
+function isLocalOnlySyncKey(key){ return !!LOCAL_ONLY_SYNC_KEYS[String(key||'')]; }
 // Zikirmatik v2: sayaçlar monotoniktir. İki cihazın aynı yolculuğunu
 // birleştirirken daha yüksek sayım/tur/hatim korunur; hatim kimlikleri union
 // edilir. Böylece bayat bir cihaz aktif adı veya lifetime sayısını geriye
@@ -715,7 +733,15 @@ function mergeQuranJourney(localQ, remoteQ){
 }
 function mergeData(localData, remoteData){
   if(!remoteData || typeof remoteData!=='object') return localData;
-  if(!localData || typeof localData!=='object') return JSON.parse(JSON.stringify(remoteData));
+  // Merge yalnızca aynı remote projection'ı tüketir; böylece çağıran yanlışlıkla
+  // ham local state verse bile secret/local-only alanlar cihaza geri yazılmaz.
+  remoteData=sanitize(remoteData);
+  if(!localData || typeof localData!=='object'){
+    var freshData=JSON.parse(JSON.stringify(remoteData));
+    Object.keys(LOCAL_ONLY_SYNC_KEYS).forEach(function(k){ delete freshData[k]; });
+    if(freshData.settings) freshData.settings=mergeSettings(null,freshData.settings);
+    return freshData;
+  }
   var merged=JSON.parse(JSON.stringify(localData));
   // settings
   merged.settings=mergeSettings(merged.settings, remoteData.settings);
@@ -757,6 +783,7 @@ function mergeData(localData, remoteData){
   }
   // remote'de olup local'de olmayan üst seviye alanları ekle
   Object.keys(remoteData).forEach(function(k){
+    if(isLocalOnlySyncKey(k)) return;
     if(!(k in merged)) merged[k]=JSON.parse(JSON.stringify(remoteData[k]));
   });
   return merged;
@@ -766,6 +793,7 @@ function mergeData(localData, remoteData){
 function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
   if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; delete c.settings.openaiKey; delete c.settings.auth; }
+  if(c&&typeof c==='object') Object.keys(LOCAL_ONLY_SYNC_KEYS).forEach(function(k){ delete c[k]; });
   if(c&&typeof c==='object') c.syncReceipt=normalizeSyncReceipt(c.syncReceipt);
   if(c&&c.eventLog&&typeof c.eventLog==='object') c.eventLog=mergeEventLog(c.eventLog,{});
   if(c&&c.weather&&Array.isArray(c.weather.spots)){ c.weather.spots.forEach(function(sp){ if(sp&&typeof sp==="object") delete sp.emoji; }); }
@@ -1004,6 +1032,9 @@ window.SeySync={
   mergeProfileAssessment:mergeProfileAssessment,
   // Conflict-safe sync — genel veri birleştirme (headless testlerden çağrılır).
   mergeData:mergeData,
+  // Privacy boundary — headless fixture'lar gerçek remote projection'ı doğrudan
+  // doğrular; bu fonksiyon dış ağa veya localStorage'a erişmez.
+  sanitize:sanitize,
   mergeEventLog:mergeEventLog,
   normalizeEvent:normalizeSyncEvent,
   parseEventFile:parseEventFile,

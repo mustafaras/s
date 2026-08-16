@@ -1544,6 +1544,14 @@ var REMINDER_PERSONALIZATION_FEEDBACK={more_quiet:true,time_wrong:true,channel_w
 var REMINDER_PERSONALIZATION_MAX_SIGNALS=60;
 var REMINDER_PERSONALIZATION_MAX_DISMISSED=24;
 var REMINDER_PERSONALIZATION_MAX_APPLIED=24;
+var REMINDER_DIGEST_SCHEMA_VERSION=1;
+var REMINDER_DIGEST_WINDOW_DAYS=7;
+var REMINDER_DIGEST_DEFAULT_TIMEZONE='Europe/Istanbul';
+var REMINDER_DIGEST_REFLECTIONS=[
+  {id:'notice',label:'Bende ne kaldı?',prompt:'Bu hafta bende ne kaldı? İstersen tek bir kelimeyle durabilirsin.'},
+  {id:'soften',label:'Neyi yavaşlatabilirim?',prompt:'Neyi biraz yavaşlatmak bana iyi gelebilir?'},
+  {id:'space',label:'Kendime hangi alanı açabilirim?',prompt:'Kendime bu hafta hangi küçük alanı açabilirim?'}
+];
 var reminderPermissionTransientState=null;
 var reminderPermissionRequestInFlight=null;
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
@@ -2154,6 +2162,70 @@ function reminderPersonalizationSetHistoryMode(root,mode,nowIso){
   if(!root) return {ok:false,changed:false,reason:'no-data'}; var state=normalizeReminderPersonalization(root.personalization), next=String(mode||''); if(!REMINDER_PERSONALIZATION_HISTORY_MODES[next]) return {ok:false,changed:false,reason:'invalid-history-mode'}; if(next==='local'&&!state.optIn) return {ok:false,changed:false,reason:'opt-in-required'}; state.historyMode=next; if(next==='none'){ state.signals=[]; state.dismissed=[]; state.applied=[]; } if(validReminderIso(nowIso)) state.updatedAt=new Date(nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,state:state};
 }
 function reminderPersonalizationReset(root,nowIso){ if(!root) return {ok:false,changed:false,reason:'no-data'}; var state=emptyReminderPersonalization(); if(validReminderIso(nowIso)) state.updatedAt=new Date(nowIso).toISOString(); reminderPersonalizationCommit(root,state); return {ok:true,changed:true,reason:null,state:state}; }
+
+// ── REM-35 local weekly digest / reflection boundary ────────────────────
+// Bu katman yalnızca yerel gün kayıtlarının varlığını ve yerel tarih
+// penceresini kullanır. Ham gün, terapi, mood, ibadet, ilaç veya reminder
+// delivery içeriği hiçbir zaman digest çıktısına kopyalanmaz.
+function reminderDigestDateShift(date,delta){
+  if(!reminderEngineValidDate(date)) return '';
+  var p=String(date).split('-').map(Number), d=new Date(Date.UTC(p[0],p[1]-1,p[2]));
+  d.setUTCDate(d.getUTCDate()+Number(delta||0));
+  return d.toISOString().slice(0,10);
+}
+function reminderDigestDateDistance(from,to){
+  if(!reminderEngineValidDate(from)||!reminderEngineValidDate(to)) return null;
+  var a=String(from).split('-').map(Number), b=String(to).split('-').map(Number);
+  return Math.round((Date.UTC(b[0],b[1]-1,b[2])-Date.UTC(a[0],a[1]-1,a[2]))/86400000);
+}
+function reminderDigestTimezone(value){
+  var timezone=String(value||'');
+  if(reminderEngineTimezoneValid(timezone)) return timezone;
+  try{
+    var detected=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if(reminderEngineTimezoneValid(detected)) return detected;
+  }catch(e){}
+  return REMINDER_DIGEST_DEFAULT_TIMEZONE;
+}
+function reminderDigestLocalDate(input,timezone){
+  var x=input&&typeof input==='object'?input:{}, explicit=String(x.localDate||'');
+  if(reminderEngineValidDate(explicit)) return explicit;
+  var iso=String(x.nowIso||x.instantIso||'');
+  if(validReminderIso(iso)){
+    var parts=reminderEngineLocalParts(Date.parse(iso),timezone);
+    if(parts&&reminderEngineValidDate(parts.localDate)) return parts.localDate;
+  }
+  return todayStr();
+}
+function reminderDigestReflectionOption(id){
+  var key=String(id||'');
+  for(var i=0;i<REMINDER_DIGEST_REFLECTIONS.length;i++) if(REMINDER_DIGEST_REFLECTIONS[i].id===key) return REMINDER_DIGEST_REFLECTIONS[i];
+  return null;
+}
+function reminderDigestBuild(input){
+  var x=input&&typeof input==='object'?input:{}, source=x.data&&typeof x.data==='object'&&!Array.isArray(x.data)?x.data:(data&&typeof data==='object'?data:{}), timezone=reminderDigestTimezone(x.timezone), localDate=reminderDigestLocalDate(x,timezone), startDate=reminderEngineValidDate(source.startDate)?String(source.startDate):'', days=source.days&&typeof source.days==='object'&&!Array.isArray(source.days)?source.days:{}, start=reminderDigestDateShift(localDate,-(REMINDER_DIGEST_WINDOW_DAYS-1)), presenceDates=[];
+  for(var date=start;date&&reminderDigestDateDistance(date,localDate)!==null&&reminderDigestDateDistance(date,localDate)<REMINDER_DIGEST_WINDOW_DAYS;date=reminderDigestDateShift(date,1)){
+    if(Object.prototype.hasOwnProperty.call(days,date)&&days[date]&&typeof days[date]==='object'&&!Array.isArray(days[date])) presenceDates.push(date);
+  }
+  var historyCleared=x.historyCleared===true, hasHistory=presenceDates.length>0, sinceStart=startDate?reminderDigestDateDistance(startDate,localDate):null, firstWeek=!historyCleared&&hasHistory&&sinceStart!==null&&sinceStart>=0&&sinceStart<REMINDER_DIGEST_WINDOW_DAYS;
+  var state=historyCleared?'cleared-history':(!hasHistory?'empty':(firstWeek?'first-week':'available'));
+  return {
+    schemaVersion:REMINDER_DIGEST_SCHEMA_VERSION,
+    state:state,
+    localOnly:true,
+    userInitiated:true,
+    timezone:timezone,
+    window:{kind:'last-seven-local-days',startDate:start,endDate:localDate,days:REMINDER_DIGEST_WINDOW_DAYS},
+    hasLocalHistory:hasHistory,
+    historyState:historyCleared?'cleared':(hasHistory?'present':'empty'),
+    source:'local.days.presence-only',
+    reflectionOptions:REMINDER_DIGEST_REFLECTIONS.map(function(option){ return {id:option.id,label:option.label,prompt:option.prompt}; }),
+    privacyBoundary:{rawDaily:false,therapy:false,mood:false,worshipCompletion:false,medicationDetail:false,reminderBody:false},
+    deliveryBoundary:{nativeEligible:false,nativeOptInRequired:true,notificationCreated:false,sync:false,externalAnalytics:false},
+    policyBoundary:{consumesReminderBudget:false,quietHoursAffects:false,addsOccurrence:false,addsDelivery:false},
+    noOp:{available:true,persists:false,notifies:false}
+  };
+}
 var REMINDER_ENGINE_DEFAULT_TIMEZONE='Europe/Istanbul';
 var REMINDER_ENGINE_DAY_PART_TIMES={morning:'08:00',day:'12:00',afternoon:'15:00',evening:'19:00',night:'22:00'};
 function reminderEngineValidDate(value){
@@ -3928,7 +4000,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderHistoryUndo:null, reminderTestState:null, saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
 // Yeniden açılışta bekleyen bir uzak senkron varsa hatırlatıcı geri gelsin.
 try{
   var _bootSaveStatus=data&&data.syncReceipt&&data.syncReceipt.status;
@@ -5899,6 +5971,27 @@ function reminderCenterNoticeHTML(){
   if(!ui.reminderCenterNotice) return '';
   return '<div class="sey-reminder-center-notice" role="status" aria-live="polite"><span aria-hidden="true">'+icon('check-check',16)+'</span><span>'+esc(ui.reminderCenterNotice)+'</span>'+(ui.reminderCenterUndo?'<button type="button" class="sey-reminder-secondary" onclick="App.undoReminderCenterReset()">Geri al</button>':'')+'</div>';
 }
+function reminderDigestLauncherHTML(){
+  return '<section class="sey-reminder-digest-launcher" aria-labelledby="sey-reminder-digest-launcher-title"><div><span class="sey-reminder-eyebrow">İSTEĞE BAĞLI · YALNIZCA BU CİHAZDA</span><h3 id="sey-reminder-digest-launcher-title">Bu hafta ve eski bir gün</h3><p>Bildirim üretmeden, puan tutmadan, istersen haftana sakince bak.</p></div><button type="button" class="sey-reminder-primary" onclick="App.openReminderDigest()">Sakin alana bak</button></section>';
+}
+function reminderDigestHTML(){
+  var digest=reminderDigestBuild({data:data}), state=ui.reminderDigestState==='no-op'?'no-op':digest.state, selected=reminderDigestReflectionOption(ui.reminderDigestReflection), h='<section class="sey-reminder-digest" data-reminder-digest-state="'+esc(state)+'" aria-labelledby="sey-reminder-digest-title">';
+  h+='<div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">YEREL · KULLANICI İSTERSE</span><h3 id="sey-reminder-digest-title">Haftalık sakin alan</h3></div><button type="button" class="sey-reminder-secondary" onclick="App.dismissReminderDigest()">Şimdilik değil</button></div>';
+  h+='<p class="sey-reminder-digest-window">'+esc(digest.window.startDate)+' – '+esc(digest.window.endDate)+' · '+esc(digest.timezone)+'</p>';
+  if(state==='no-op'){
+    h+='<div class="sey-reminder-digest-empty" data-reminder-digest-no-op="true" role="status"><span aria-hidden="true">'+icon('pause-circle',23)+'</span><strong>Burada durmak da tamam.</strong><p>Hiçbir şey seçilmedi, kaydedilmedi ve bildirim üretilmedi.</p><button type="button" class="sey-reminder-secondary" onclick="App.openReminderDigest()">Alanı yeniden aç</button></div>';
+  } else if(state==='empty'||state==='cleared-history'){
+    h+='<div class="sey-reminder-digest-empty" role="status"><span aria-hidden="true">'+icon(state==='cleared-history'?'eraser':'sparkles',23)+'</span><strong>'+(state==='cleared-history'?'Geçmiş temizlendi.':'Bu hafta için sakin bir boşluk var.')+'</strong><p>'+(state==='cleared-history'?'Bu ekran yeniden boş ve yerel kalır.':'Burada gösterecek güvenli bir yerel özet yok. Hiçbir şey eklemen gerekmiyor.')+'</p></div>';
+  } else {
+    h+='<div class="sey-reminder-digest-intro"><strong>'+(state==='first-week'?'İlk haftan için yumuşak bir başlangıç.':'Bu hafta için bir durak.')+'</strong><p>Bu alan yaptın / yapmadın hesabı değildir. Yalnızca senin istediğinde açılır; günlük ayrıntılar, mood, ibadet, terapi ve ilaç bilgileri bu özete girmez.</p></div>';
+    h+='<div class="sey-reminder-digest-options" role="group" aria-label="Sakin reflection seçenekleri">';
+    digest.reflectionOptions.forEach(function(option){ h+='<button type="button" class="sey-reminder-digest-option'+(selected&&selected.id===option.id?' is-selected':'')+'" onclick="App.selectReminderDigestReflection(\''+option.id+'\')" aria-pressed="'+(selected&&selected.id===option.id)+'"><strong>'+esc(option.label)+'</strong><span>'+esc(option.prompt)+'</span></button>'; });
+    h+='</div>';
+    if(selected) h+='<div class="sey-reminder-digest-selected" role="status"><span aria-hidden="true">'+icon('feather',15)+'</span><span>'+esc(selected.prompt)+'</span><small>Bu cümle yalnızca bu ekranda; kaydedilmez.</small></div>';
+  }
+  h+='<p class="sey-reminder-digest-boundary" role="note">Bu alan yalnız cihaz içinde çalışır. Native opt-in’den bağımsızdır, reminder bütçesi ve sessiz saatlerden etkilenmez; sync, analytics ve delivery kaydı oluşturmaz.</p></section>';
+  return h;
+}
 function reminderPreviewSafeCopy(def){
   var category=reminderCategoryMeta(String(def&&def.category||''));
   return {title:'Şeyma’da küçük bir durak hazır',detail:category.label+' için yalnızca uygulama içinde gösterilen sentetik test.'};
@@ -6310,6 +6403,8 @@ function reminderCenterOverlayHTML(){
   });
   h+='</section>';
   h+='<section class="sey-reminder-actions" aria-label="Hatırlatma eylemleri"><button type="button" class="sey-reminder-primary" onclick="App.testReminder()">'+icon('play',16)+'<span>Sentetik test reminder · Uygulama içi önizleme/test</span></button><button type="button" class="sey-reminder-mute'+(muted?' is-muted':'')+'" onclick="App.muteReminderToday()" aria-pressed="'+muted+'">'+icon('bell-off',16)+'<span>'+(muted?'Bugün susturuldu · geri getir':'Bugün tümünü sustur')+'</span></button></section>';
+  h+=reminderDigestLauncherHTML();
+  if(ui.reminderDigestOpen) h+=reminderDigestHTML();
   h+=reminderTestPreviewHTML();
   h+=reminderCenterPolicyHTML(root);
   h+=reminderPersonalizationHTML(root);
@@ -6335,12 +6430,12 @@ App.openReminderCenter=function(){
   var root=reminderCurrentRoot(), active=null;
   try{ active=document.activeElement; }catch(e){ active=null; }
   ui.reminderReturnFocusId=active&&active.id?String(active.id):'sey-reminder-settings-entry';
-  ui.reminderCenterOpen=true; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; ui.reminderSetupCategories=reminderCategorySelection(root); render();
+  ui.reminderCenterOpen=true; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; ui.reminderDigestOpen=false; ui.reminderDigestState='idle'; ui.reminderDigestReflection=''; ui.reminderSetupCategories=reminderCategorySelection(root); render();
   try{ var screen=document.getElementById('sey-reminder-screen'); if(screen&&screen.focus) screen.focus(); }catch(e){}
 };
 App.closeReminderCenter=function(){
   var returnId=ui.reminderReturnFocusId||'sey-reminder-settings-entry';
-  ui.reminderCenterOpen=false; ui.reminderReturnFocusId=''; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; render();
+  ui.reminderCenterOpen=false; ui.reminderReturnFocusId=''; ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTodayMuted=false; ui.reminderCenterNotice=''; ui.reminderCenterUndo=null; ui.reminderHistoryUndo=null; ui.reminderTestState=null; ui.reminderDigestOpen=false; ui.reminderDigestState='idle'; ui.reminderDigestReflection=''; render();
   try{ var trigger=document.getElementById(returnId)||document.getElementById('sey-reminder-settings-entry'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){}
 };
 App.onReminderKeydown=function(e){
@@ -6352,6 +6447,22 @@ App.onReminderKeydown=function(e){
   var first=nodes[0], last=nodes[nodes.length-1], active=document.activeElement;
   if(e.shiftKey&&active===first){ if(e.preventDefault)e.preventDefault(); if(last.focus)last.focus(); }
   else if(!e.shiftKey&&active===last){ if(e.preventDefault)e.preventDefault(); if(first.focus)first.focus(); }
+};
+App.openReminderDigest=function(){
+  if(!ui.reminderCenterOpen) return {ok:false,reason:'center-closed'};
+  ui.reminderDigestOpen=true; ui.reminderDigestState='open'; ui.reminderDigestReflection=''; render();
+  return {ok:true,localOnly:true,userInitiated:true,notificationCreated:false,persisted:false};
+};
+App.selectReminderDigestReflection=function(id){
+  if(!ui.reminderDigestOpen) return {ok:false,reason:'digest-closed'};
+  var option=reminderDigestReflectionOption(id); if(!option) return {ok:false,reason:'unknown-reflection'};
+  ui.reminderDigestState='open'; ui.reminderDigestReflection=option.id; render();
+  return {ok:true,id:option.id,localOnly:true,persisted:false,notificationCreated:false};
+};
+App.dismissReminderDigest=function(){
+  if(!ui.reminderDigestOpen) return {ok:true,noOp:true,changed:false,persisted:false,notificationCreated:false};
+  ui.reminderDigestState='no-op'; ui.reminderDigestReflection=''; render();
+  return {ok:true,noOp:true,changed:true,persisted:false,notificationCreated:false};
 };
 App.reminderPermissionState=reminderPermissionState;
 App.reminderPermissionSnapshot=reminderPermissionSnapshot;
@@ -6459,6 +6570,9 @@ App.reminderDailyFlowPolicy=reminderDailyFlowPolicy;
 App.reminderDailyFlowCoalesce=function(candidates,context){ return reminderDailyFlowCoalesceCandidates(candidates,context); };
 App.reminderDailyFlowCandidates=App.reminderDailyFlowCoalesce;
 App.reminderDailyFlowSafeGroup=function(candidates,context){ return reminderDailyFlowGroup(Array.isArray(candidates)?candidates:[],reminderDailyFlowPolicy({context:context||{}})); };
+App.reminderDigest=reminderDigestBuild;
+App.reminderDigestBuild=reminderDigestBuild;
+App.reminderDigestReflections=function(){ return REMINDER_DIGEST_REFLECTIONS.map(function(option){ return {id:option.id,label:option.label,prompt:option.prompt}; }); };
 // REM-10/23: pure evaluator + foreground lifecycle adapter. Delivery journal
 // writes and native display are separate steps; neither calls save() or fetch().
 App.reminderEvaluateReminders=reminderEvaluateReminders;
@@ -9486,28 +9600,16 @@ CARD_BUILDERS['vacation']=vacationCardHTML;
 function onThisDayCard(){
   var today=todayStr(); var mmdd=today.slice(5); var curY=parseInt(today.slice(0,4),10);
   var best=null;
-  for(var k in data.days){ if(String(k).slice(5)!==mmdd) continue; var y=parseInt(String(k).slice(0,4),10); if(isNaN(y)||y>=curY) continue; var r=data.days[k]; if(!r) continue;
-    var hasG=Array.isArray(r.gratitude)&&r.gratitude.some(function(g){return String(g||'').trim();});
-    var has=(countRec(r)>0)||r.mood||(r.note&&String(r.note).trim())||(r.intention&&String(r.intention).trim())||hasG;
-    if(!has) continue;
-    if(!best||k>best.date){ best={date:k,rec:r,year:y}; }
+  for(var k in data.days){ if(String(k).slice(5)!==mmdd) continue; var y=parseInt(String(k).slice(0,4),10); if(isNaN(y)||y>=curY) continue; var r=data.days[k]; if(!r||typeof r!=='object'||Array.isArray(r)) continue;
+    if(!best||k>best.date){ best={date:k,year:y}; }
   }
   if(!best) return '';
-  var r=best.rec; var yearsAgo=curY-best.year;
-  var mo=r.mood?find(MOODS,'id',r.mood):null;
-  var cnt=countRec(r), tot=habitCountOn(best.date);
-  var h='<div class="glass" onclick="App.openDate(\''+best.date+'\')" style="cursor:pointer;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(160deg,rgba(201,184,255,0.16),rgba(255,225,154,0.10));">';
-  h+='<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:22px;line-height:1;display:inline-flex;">'+icon('lamp',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;">Bugün, '+yearsAgo+' yıl önce</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+esc(dateLabelTR(best.date))+'</div></div><span style="font-size:16px;color:var(--faint);flex-shrink:0;">›</span></div>';
-  var chips='';
-  if(mo) chips+='<span style="font-size:12.5px;background:var(--field);border:1px solid var(--field-bd);border-radius:999px;padding:4px 10px;color:var(--text2);display:inline-flex;align-items:center;gap:4px;">'+moodEmoji(mo.id,13)+' '+esc(mo.short||mo.label)+'</span>';
-  chips+='<span style="font-size:12.5px;background:var(--field);border:1px solid var(--field-bd);border-radius:999px;padding:4px 10px;color:var(--text2);display:inline-flex;align-items:center;gap:4px;">'+icon('circle-check',13)+' '+cnt+'/'+tot+'</span>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:7px;">'+chips+'</div>';
-  if(r.intention&&String(r.intention).trim()) h+='<div style="font-size:13.5px;color:var(--text2);line-height:1.5;display:flex;gap:5px;">'+icon('target',15)+' '+esc(String(r.intention).trim())+'</div>';
-  if(r.note&&String(r.note).trim()) h+='<div style="font-size:13.5px;color:var(--text2);line-height:1.5;background:rgba(255,232,163,0.22);border-radius:12px;padding:10px 12px;">'+esc(String(r.note).trim())+'</div>';
-  var gts=Array.isArray(r.gratitude)?r.gratitude.filter(function(g){return String(g||'').trim();}):[];
-  if(gts.length) h+='<div style="font-size:13px;color:var(--text2);line-height:1.6;display:flex;gap:5px;">'+icon('heart-handshake',14)+' '+gts.map(function(g){return esc(String(g).trim());}).join(' · ')+'</div>';
-  h+='<div style="font-size:11px;color:var(--faint);text-align:right;">O günü aç →</div>';
-  h+='</div>';
+  var yearsAgo=curY-best.year;
+  var h='<section class="glass sey-reminder-on-this-day" data-reminder-on-this-day="safe" aria-labelledby="sey-on-this-day-title">';
+  h+='<div class="sey-reminder-on-this-day-head"><span class="sey-reminder-on-this-day-icon" aria-hidden="true">'+icon('lamp',20)+'</span><div><span class="sey-reminder-eyebrow">BUGÜNÜN ESKİ BİR İZİ</span><h3 id="sey-on-this-day-title">Bugün, '+yearsAgo+' yıl önce</h3><small>'+esc(dateLabelTR(best.date))+'</small></div></div>';
+  h+='<p>O güne ait yerel bir kayıt alanı var. Puan, seri veya ayrıntı burada gösterilmez; istersen yalnız sen dokununca o güne bakabilirsin.</p>';
+  h+='<button type="button" class="sey-reminder-on-this-day-action" onclick="App.openDate(\''+best.date+'\')">O güne bak '+icon('arrow-up-right',14)+'</button>';
+  h+='</section>';
   return h;
 }
 // Motivasyon V2.1 kişiselleştirme yardımcıları — yalnızca gerçek app verisinden

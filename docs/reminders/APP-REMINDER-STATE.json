@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-46",
+  "activePrompt": "REM-47",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-45",
-  "nextSafeAction": "REM-46 App clock, timezone ve engine adapter; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "lastCompletedPrompt": "REM-46",
+  "nextSafeAction": "REM-47 App save, commit ve event-log lifecycle; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-45 owner contract: catalog definitionVersion, canonical local preference, derived occurrence/suppression, bounded local delivery journal and pre-sync privacy gate; protected paths preserved",
-    "tests": "app state 52, migration 50, B2 32/32, driver, full reminder/root/Panel-v2 loops, syntax/context/diff PASS",
-    "commit": "e4589435a1cd6421ae56e65b1e96ddac9e18973b",
-    "remoteEquality": "not re-verified after REM-45 local commit; origin remains the prior remote baseline",
-    "deployment": "not performed; REM-45 commit is local and no Pages/deploy action was triggered",
+    "source": "REM-46 pure ReminderEngineV1, app clock/timezone adapter, activeDate separation, Hicri offset stability and prayer freshness gate; protected paths preserved",
+    "tests": "app-engine 26, scheduler 54, timezone 28, special-day 35, lifecycle 36, driver, full reminder/root/Panel-v2 loops, syntax/context/diff PASS",
+    "commit": "a61f1f03d293a50b72db3c1f7e8242c7fdbfe384",
+    "remoteEquality": "not re-verified after REM-46 local commit; origin remains the prior remote baseline",
+    "deployment": "not performed; REM-46 commit is local and no Pages/deploy action was triggered",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-45 local implementation and closure evidence completed; release remains not_approved; REM-46 ready; S5 pending",
+  "updatedBy": "Codex REM-46 local implementation and closure evidence completed; release remains not_approved; REM-47 ready; S5 pending",
   "closure": {
-    "prompt": "REM-45",
-    "evidence": "docs/reminders/evidence/REM-45.md",
-    "commit": "e4589435a1cd6421ae56e65b1e96ddac9e18973b"
+    "prompt": "REM-46",
+    "evidence": "docs/reminders/evidence/REM-46.md",
+    "commit": "a61f1f03d293a50b72db3c1f7e8242c7fdbfe384"
   }
 }

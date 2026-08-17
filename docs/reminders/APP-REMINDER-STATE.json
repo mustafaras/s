@@ -40,8 +40,8 @@
     "source": "REM-46 pure ReminderEngineV1, app clock/timezone adapter, activeDate separation, Hicri offset stability and prayer freshness gate; protected paths preserved",
     "tests": "app-engine 26, scheduler 54, timezone 28, special-day 35, lifecycle 36, driver, full reminder/root/Panel-v2 loops, syntax/context/diff PASS",
     "commit": "a61f1f03d293a50b72db3c1f7e8242c7fdbfe384",
-    "remoteEquality": "PASS after approved push: local HEAD = origin/main = git ls-remote origin/main = f0c16cb6a81657455b123afb61d784b90c2656f2",
-    "deployment": "PASS: GitHub Actions workflow 32036680380 and GitHub Pages deployment 5946090608 succeeded; live URL HTTP 200 and cache-bust assets verified read-only",
+    "remoteEquality": "PASS at approved runtime push: f0c16cb6a81657455b123afb61d784b90c2656f2 matched local HEAD, origin/main and git ls-remote; canonical receipt dba29def100abbf1716cc2f0e3f682e4f55146bc was then pushed and re-verified equal",
+    "deployment": "PASS: runtime workflow 32036680380 / Pages deployment 5946090608 and canonical receipt workflow 32036960687 / deployment 5946121666 succeeded; live URL HTTP 200 and cache-bust assets verified read-only",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {

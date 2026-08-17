@@ -41,11 +41,16 @@
   validate and deploy jobs both passed.
 - **Deployment:** GitHub deployment `5946090608`, environment `github-pages`,
   status `success`; deployment status `16917414126` — **PASS**.
+- **Canonical receipt push:** `f0c16cb..dba29de main -> main` — **PASS**;
+  local tracking and `git ls-remote` were re-verified at
+  `dba29def100abbf1716cc2f0e3f682e4f55146bc`.
+- **Canonical receipt workflow:** [Deploy static content to Pages run 32036960687](https://github.com/mustafaras/s/actions/runs/32036960687) — **success**;
+  deployment `5946121666`, status `success`, deployment status `16917490513`.
 - **Live URL:** [https://mustafaras.github.io/s/](https://mustafaras.github.io/s/) —
   HTTP 200.
-- **Live asset/cache-bust:** `index.html` HTTP 200 with
+- **Live asset/cache-bust:** final canonical receipt `index.html` HTTP 200 with
   `styles.css?v=20260817b` and `app.js?v=20260817a`; `app.js` and `styles.css`
-  HTTP 200. Pages response `last-modified: Mon, 17 Aug 2026 13:49:04 GMT`.
+  HTTP 200. Pages response `last-modified: Mon, 17 Aug 2026 13:52:30 GMT`.
 - **Data safety:** no browser was opened, no server was started, and no write
   was made to `mustafaras/seyma-data`.
 

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-40",
+  "activePrompt": "REM-41",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-39",
-  "nextSafeAction": "REM-40 Planın tamamı için reconciliation ve traceability audit; runtime edit yok; S5 kullanıcı cihazı kabulü pending; no release action",
+  "lastCompletedPrompt": "REM-40",
+  "nextSafeAction": "REM-41 Release candidate freeze ve evidence packet; runtime/data edit yok; S5 kullanıcı cihazı kabulü pending; releaseApproval=not_approved; no release action",
   "currentPhase": "R10",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-39 separate preference/occurrence/delivery/action/digest retention, local clear boundary+tombstones, aggregate export, disable-all undo, full reminder reset lifecycle and deterministic date fixture",
-    "tests": "test_reminder_retention.js PASS (5 cases; 58 assertions); test_reminder_privacy.js PASS (4 cases; 58 assertions); test_reminder_migration.js PASS (5 cases; 50 assertions); test_reminder_digest.js PASS (7 cases; 66 assertions); full reminder, Panel-v2, root/P0–P6, driver and Zikirmatik loops PASS; syntax/context/diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "cd90fe36fbced6b6babce10af05c6da6ac0866a8",
+    "source": "REM-40 section-level reconciliation: plan §1–§21 each mapped to prompts, test gates, allowlists, evidence owners, decisions and next dependencies; R12–R14 source/test gaps explicitly deferred; no runtime/data edit",
+    "tests": "verify-reminder-context.mjs PASS (73 prompts, 66 local links, approval=not_approved); node --check docs/reminders/verify-reminder-context.mjs PASS; git diff --check PASS; traceability count PASS (21 sections, 73 prompt rows); source/test inventory confirms R12–R14 fixture families are not present and are not claimed",
+    "commit": "9369e6e3501da24e7ef13c16ac980d7717e1c4cc",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-39 closure; G9-J complete; REM-40 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-40 closure; G10-A complete; REM-41 ready; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-39",
-    "evidence": "docs/reminders/evidence/REM-39.md",
-    "commit": "cd90fe36fbced6b6babce10af05c6da6ac0866a8"
+    "prompt": "REM-40",
+    "evidence": "docs/reminders/evidence/REM-40.md",
+    "commit": "9369e6e3501da24e7ef13c16ac980d7717e1c4cc"
   }
 }

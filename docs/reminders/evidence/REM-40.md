@@ -73,8 +73,9 @@ git diff --check
 PASS
 
 node docs/reminders/verify-reminder-closure.mjs REM-40
-PASS bekleniyor: closure metadata ve REM-40 local commit’i yazıldıktan sonra
+REMINDER CLOSURE PASS: REM-40 closed; next=REM-41; release=not_approved
 ```
 
 Bu evidence, source/test/deploy/device kanıtlarını birbirine yükseltmez. S5
 kullanıcı cihazı kabulü pending’dir; release approval `not_approved` kalır.
+Closure commit pointer: `9369e6e3501da24e7ef13c16ac980d7717e1c4cc`.

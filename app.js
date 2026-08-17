@@ -1452,6 +1452,11 @@ var REMINDER_PREFERENCE_SCHEMA_VERSION=1;
 var REMINDER_CHANNELS={in_app:true,native:true};
 var REMINDER_PRIVACY_MODES={private:true,safe_summary:true};
 var REMINDER_QUIET_BEHAVIORS={suppress:true,defer:true,in_app:true};
+// REM-45: delivery/action geçmişi hiçbir koşulda canonical `data` state'ine
+// import edilmez. Bu isimler legacy veya yanlışlıkla eklenmiş kökleri de
+// kapsar; başka bilinmeyen alanlar additive migration ile korunur.
+var REMINDER_RESERVED_JOURNAL_ROOTS={delivery:true,deliveryLog:true,reminderDelivery:true,reminderDeliveries:true,reminderHistory:true,notificationDelivery:true};
+var REMINDER_SYNC_BLOCKED_ROOTS={reminders:true,delivery:true,deliveryLog:true,reminderDelivery:true,reminderDeliveries:true,reminderHistory:true,notificationDelivery:true};
 var REMINDER_SNOOZE_OPTIONS={
   '10m':true,'30m':true,'1h':true,'todayOff':true,'thisEvening':true,'tomorrow':true
 };
@@ -1571,6 +1576,11 @@ function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAUL
 function emptyReminderPersonalization(){ return {schemaVersion:REMINDER_PERSONALIZATION_SCHEMA_VERSION,optIn:false,historyMode:'none',autoApply:false,signals:[],dismissed:[],applied:[],updatedAt:''}; }
 function emptyReminderState(){ return {schemaVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,preferences:{},profile:'balanced',onboarding:emptyReminderOnboarding(),policy:emptyReminderPolicy(),specialDays:emptyReminderSpecialDays(),medications:[],personalization:emptyReminderPersonalization(),_localMeta:{}}; }
 function reminderLocalClone(value){ try{ return JSON.parse(JSON.stringify(value)); }catch(e){ return null; } }
+function stripReminderReservedRoots(target){
+  if(!target||typeof target!=='object'||Array.isArray(target)) return target;
+  Object.keys(REMINDER_RESERVED_JOURNAL_ROOTS).forEach(function(key){ if(Object.prototype.hasOwnProperty.call(target,key)) delete target[key]; });
+  return target;
+}
 function reminderRetentionPolicySnapshot(){ return reminderLocalClone(REMINDER_RETENTION_POLICY)||{schemaVersion:1,preference:{mode:'until-cleared',maxAgeDays:null,maxEntries:null},occurrence:{mode:'derived-ephemeral',maxAgeDays:1,maxEntries:200},deliveryJournal:{mode:'local-bounded',maxAgeDays:30,maxEntries:200},notificationHistory:{mode:'local-bounded',maxAgeDays:14,maxEntries:100},digest:{mode:'ephemeral-local',maxAgeDays:7,maxEntries:0}}; }
 function reminderLocalMeta(root){
   if(!root||typeof root!=='object'||Array.isArray(root)) return {};
@@ -2000,6 +2010,7 @@ function normalizeReminderPreference(id,value){
     else out.snoozeOptions=out.snoozeOptions.filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,option); });
   }
   if(Object.prototype.hasOwnProperty.call(out,'lastEditedAt')&&!validReminderIso(out.lastEditedAt)) delete out.lastEditedAt;
+  else if(Object.prototype.hasOwnProperty.call(out,'lastEditedAt')) out.lastEditedAt=new Date(out.lastEditedAt).toISOString();
   return out;
 }
 function reminderPolicyInteger(value,min,max,fallback){
@@ -2145,8 +2156,14 @@ function reminderPolicySelectNativeCandidates(input){
   return {selected:selected,rejected:rejected,remaining:Math.max(0,cap-selected.length),nativeDailyCap:cap};
 }
 function migrateReminderState(d){
+  if(!d||typeof d!=='object'||Array.isArray(d)) return d;
+  // Delivery/action/notification history has its own bounded local owner.
+  // Preserve unrelated future fields, but never resurrect a journal into the
+  // canonical reminder root during an additive migration.
+  stripReminderReservedRoots(d);
   if(!d.reminders||typeof d.reminders!=='object'||Array.isArray(d.reminders)) d.reminders=emptyReminderState();
   var root=d.reminders;
+  stripReminderReservedRoots(root);
   if(!Number.isInteger(root.schemaVersion)||root.schemaVersion<REMINDER_PREFERENCE_SCHEMA_VERSION) root.schemaVersion=REMINDER_PREFERENCE_SCHEMA_VERSION;
   if(!root.preferences||typeof root.preferences!=='object'||Array.isArray(root.preferences)) root.preferences={};
   Object.keys(root.preferences).forEach(function(id){ root.preferences[id]=normalizeReminderPreference(id,root.preferences[id]); });
@@ -3102,6 +3119,19 @@ function reminderSaygiLifecycleCandidates(input){
 // içeriği bu sözleşmeye hiç alınmaz.
 var REMINDER_DELIVERY_SCHEMA_VERSION=2;
 var REMINDER_DELIVERY_KEY='seyma-reminder-delivery-v1';
+// REM-45 owner contract: these are deliberately different storage/lifecycle
+// boundaries. Only the preference map is part of local canonical app state;
+// the other four owners are catalog, derived evaluation, or device-local log.
+var REMINDER_STATE_OWNER_CONTRACT={
+  schemaVersion:1,
+  definition:{owner:'ReminderCatalogV1',storage:'code/catalog',persisted:false,privacyClass:'P0'},
+  preference:{owner:'data.reminders.preferences',storage:'localStorage:seyma-reset-v1',persisted:true,sync:'blocked-before-sync',privacyClass:'P2'},
+  occurrence:{owner:'foreground-reminder-scheduler',storage:'derived-ephemeral',persisted:false,privacyClass:'P1/P2'},
+  deliveryJournal:{owner:'device-delivery-adapter',storage:'localStorage:seyma-reminder-delivery-v1',persisted:false,sync:'never',privacyClass:'P1/P2'},
+  suppression:{owner:'reminder-policy-evaluator',storage:'evaluation-context',persisted:false,privacyClass:'P2/P3'},
+  syncGate:{owner:'app.reminderSyncPayload',blockedRoots:Object.keys(REMINDER_SYNC_BLOCKED_ROOTS).sort()}
+};
+function reminderStateContract(){ return reminderLocalClone(REMINDER_STATE_OWNER_CONTRACT)||{}; }
 var REMINDER_DELIVERY_MAX_AGE_MS=REMINDER_RETENTION_POLICY.deliveryJournal.maxAgeDays*24*60*60*1000;
 var REMINDER_DELIVERY_MAX_ENTRIES=REMINDER_RETENTION_POLICY.deliveryJournal.maxEntries;
 var REMINDER_DELIVERY_STATUSES={scheduled:true,shown:true,opened:true,snoozed:true,dismissed:true,suppressed:true,failed:true};
@@ -4001,7 +4031,7 @@ try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e)
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
 function migrate(d){
-  if(!d) return d;
+  if(!d||typeof d!=='object'||Array.isArray(d)) return d;
   migrateReminderState(d);
   d.syncReceipt=normalizeSyncReceipt(d.syncReceipt);
   ensureEventLog(d);
@@ -5769,8 +5799,9 @@ function save(touchSource,eventSpec){
 }
 function reminderSyncPayload(source){
   var out;
+  if(!source||typeof source!=='object'||Array.isArray(source)) return null;
   try{ out=JSON.parse(JSON.stringify(source)); }catch(e){ return null; }
-  if(out&&typeof out==='object') delete out.reminders;
+  Object.keys(REMINDER_SYNC_BLOCKED_ROOTS).forEach(function(key){ if(Object.prototype.hasOwnProperty.call(out,key)) delete out[key]; });
   return out;
 }
 function commit(msg,meta){ save(undefined,{message:msg,meta:meta}); render(); if(msg) toast(msg); }
@@ -6905,6 +6936,7 @@ App.reminderMedicationDefinition=reminderMedicationDefinition;
 App.reminderMedicationLifecycleCandidates=reminderMedicationLifecycleCandidates;
 App.reminderMedicationSafetyCopy=REMINDER_MEDICATION_SAFETY_COPY;
 App.reminderMedicationRetention=function(now){ return reminderDeliveryLoad(now,true); };
+App.reminderStateContract=reminderStateContract;
 App.reminderSyncPayload=reminderSyncPayload;
 App.reminderMedicationSchedules=function(){
   var root=reminderCurrentRoot();

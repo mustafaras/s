@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-49",
+  "activePrompt": "REM-50",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-48",
-  "nextSafeAction": "REM-49 App render lifecycle ve targeted update boundary; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "lastCompletedPrompt": "REM-49",
+  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-48 existing Settings IA, App.go/render boundary, single target allowlist, overlay shell, focus return, scroll lock and draft-preserving deep-link handlers; protected paths preserved",
-    "tests": "navigation 40, deep-links 85; approval sonrası full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS; Pages validate ve deploy PASS",
-    "commit": "0f09d4a",
-    "remoteEquality": "local HEAD, origin/main and ls-remote matched 0f09d4a; receipt push and fast-forward PASS",
-    "deployment": "workflow 32040122205 success; GitHub deployment 5946481422 / status 16918582760 success; live HTTP 200",
+    "source": "REM-49 render policy, target markers, live regions, action receipts and reduced-motion boundary; protected paths preserved",
+    "tests": "app render 30, performance 20; full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS",
+    "commit": "97d7f5e",
+    "remoteEquality": "not performed; local-only commit",
+    "deployment": "not performed; release remains not_approved",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex recorded successful current main/Pages release 32040122205 / 5946481422 and consumed the single-use approval; S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "Codex recorded REM-49 local render lifecycle closure; no push/deploy/external write, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
-    "prompt": "REM-48",
-    "evidence": "docs/reminders/evidence/REM-48.md",
-    "commit": "0186402"
+    "prompt": "REM-49",
+    "evidence": "docs/reminders/evidence/REM-49.md",
+    "commit": "97d7f5e"
   }
 }

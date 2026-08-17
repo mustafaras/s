@@ -119,4 +119,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`REMINDER CLOSURE PASS: ${promptArg} closed; next=${nextPrompt}; release=not_approved`);
+console.log(`REMINDER CLOSURE PASS: ${promptArg} closed; next=${nextPrompt}; release=${state?.releaseApproval?.status || "unknown"}`);

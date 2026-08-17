@@ -9,8 +9,8 @@
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `00d1aaa0471d83da2c1fd0948ae5036431bc4f60`
 - **Bitiş source/test HEAD:** `a61f1f03d293a50b72db3c1f7e8242c7fdbfe384`
-- **Release approval:** `NOT_APPROVED`
-- **Approval evidence:** `none`
+- **Release approval after receipt:** `NOT_APPROVED` (single-use approval consumed after successful deployment)
+- **Approval evidence:** recorded in the release receipt below; state was reset after the receipt
 
 ## Kapsam
 
@@ -22,6 +22,32 @@
   - `tests/reminders/test_reminder_scheduler.js`
   - `docs/reminders/evidence/REM-46.md`
 - Protected paths changed: **no**
+
+## Release receipt — 2026-08-17
+
+- **Exact user approval:** `"onaylıyorum"` in response to the explicit scope of
+  `main` push and the GitHub Pages deployment it triggers.
+- **Approved scope:** `git push origin main` fast-forward only; the resulting
+  GitHub Pages workflow/deployment; read-only remote, Pages and live evidence.
+- **Out of scope:** `mustafaras/seyma-data`, other remotes, tag, force-push,
+  history rewrite, merge and user-device acceptance.
+- **Release candidate:** `f0c16cb6a81657455b123afb61d784b90c2656f2`
+  (`Release approval: main Pages deploy scope`).
+- **Push:** `git push origin main`; `42d9f08..f0c16cb main -> main` — **PASS**.
+- **Remote equality:** local `HEAD`, `origin/main` and
+  `git ls-remote origin refs/heads/main` all resolved to
+  `f0c16cb6a81657455b123afb61d784b90c2656f2` — **PASS**.
+- **Workflow:** [Deploy static content to Pages run 32036680380](https://github.com/mustafaras/s/actions/runs/32036680380) — **success**;
+  validate and deploy jobs both passed.
+- **Deployment:** GitHub deployment `5946090608`, environment `github-pages`,
+  status `success`; deployment status `16917414126` — **PASS**.
+- **Live URL:** [https://mustafaras.github.io/s/](https://mustafaras.github.io/s/) —
+  HTTP 200.
+- **Live asset/cache-bust:** `index.html` HTTP 200 with
+  `styles.css?v=20260817b` and `app.js?v=20260817a`; `app.js` and `styles.css`
+  HTTP 200. Pages response `last-modified: Mon, 17 Aug 2026 13:49:04 GMT`.
+- **Data safety:** no browser was opened, no server was started, and no write
+  was made to `mustafaras/seyma-data`.
 
 ## Uygulanan sınır
 
@@ -55,15 +81,19 @@
 - **Source evidence:** S1 — pure engine module, app clock boundary, active-date separation and prayer freshness gate.
 - **Synthetic test evidence:** S2 — Node VM / memory-only fixtures; browser, gerçek localStorage, token, ağ, native notification ve gerçek kullanıcı verisi yok.
 - **Commit evidence:** S3 — local commit `a61f1f03d293a50b72db3c1f7e8242c7fdbfe384`.
-- **CI / Pages evidence:** N/A — push veya deploy yapılmadı.
+- **CI / Pages evidence:** S4 — workflow `32036680380` and deployment
+  `5946090608` succeeded; live URL and cache-bust headers were read-only
+  verified.
 - **User-device evidence:** S5 pending — kullanıcı cihazında doğrulama yapılmadı.
 
 ## Release hard gate
 
-- Push / merge / tag / Pages / external write: **not performed**
+- Push / Pages deployment: **performed within the approved `main` scope**;
+  merge/tag/force-push/other remote/external data write: **not performed**
 - `mustafaras/seyma-data` write: **not performed**
 - Browser / generic server / real localStorage / real notification: **not used**
-- `releaseApproval`: **NOT_APPROVED**
+- `releaseApproval`: **NOT_APPROVED** after successful deployment; the exact
+  approval was consumed and reset in STATE.
 
 ## Sonuç
 

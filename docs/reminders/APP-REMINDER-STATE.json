@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-50",
+  "activePrompt": "REM-51",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-49",
-  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-50",
+  "nextSafeAction": "REM-51 App feature surface adapter ve deep-link conformance; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-49 render policy, target markers, live regions, action receipts and reduced-motion boundary; protected paths preserved",
-    "tests": "app render 30, performance 20; full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS",
-    "commit": "07468d5",
-    "remoteEquality": "local HEAD, origin/main and ls-remote matched 07468d5; approved fast-forward push PASS",
-    "deployment": "workflow 32043560167 success; GitHub Pages deployment 5946846653 / status 16919614871 success; live HTTP 200; query URL asset markers verified",
+    "source": "REM-50 deterministic foreground trigger matrix, burst coalescing, independent poll/reminder timers, foreground-only capability and bounded recovery catch-up; protected paths preserved",
+    "tests": "app lifecycle 51, existing lifecycle 36, catch-up 46; full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS",
+    "commit": "b0bba5d",
+    "remoteEquality": "pending standing after_each_prompt main/Pages delivery receipt",
+    "deployment": "pending standing after_each_prompt main/Pages delivery receipt",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,10 +75,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Standing after_each_prompt delivery policy recorded from current user instruction; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "REM-50 closure source/test evidence recorded; standing after_each_prompt delivery remains pending; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
-    "prompt": "REM-49",
-    "evidence": "docs/reminders/evidence/REM-49.md",
-    "commit": "97d7f5e"
+    "prompt": "REM-50",
+    "evidence": "docs/reminders/evidence/REM-50.md",
+    "commit": "b0bba5d"
   }
 }

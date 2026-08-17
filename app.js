@@ -4228,6 +4228,9 @@ function sha256(str){
 }
 
 var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+ui.locationGateState=(data&&data.settings&&data.settings.locationEnabled)?'checking':'required';
+ui.locationGateError='';
+ui.locationGateRequestInFlight=false;
 // Yeniden açılışta bekleyen bir uzak senkron varsa hatırlatıcı geri gelsin.
 try{
   var _bootSaveStatus=data&&data.syncReceipt&&data.syncReceipt.status;
@@ -8354,23 +8357,77 @@ App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=n
 App.askReset=function(){ ui.resetStep=1; render(); };
 App.cancelReset=function(){ ui.resetStep=0; render(); };
 App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
+function locationGateResetNudge(){ ui.locNudgeOpen=false; ui.locNudgeShown=[]; }
+function locationGateRequired(){ return !data||!data.settings||data.settings.locationEnabled!==true||ui.locationGateState!=='granted'; }
+function locationGateErrorText(code,reason){
+  if(reason==='unsupported') return 'Bu tarayıcıda konum hizmeti kullanılamıyor. Safari’yi güncelleyip tekrar dene.';
+  if(code===1) return isIOS()?(isStandalonePWA()?'Konum izni kapalı. Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken” seçeneğini aç.':'Konum izni kapalı. Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver yolunu aç.'):'Konum izni verilmedi. Tarayıcının site ayarlarında Konum → İzin Ver seçeneğini aç.';
+  if(code===2) return 'Konum bulunamadı. Cihazın Konum Servisleri açıkken yeniden dene.';
+  if(code===3) return 'Konum isteği zaman aşımına uğradı. Birkaç saniye sonra yeniden dene.';
+  return 'Konum izni doğrulanamadı. Safari ayarlarını kontrol edip yeniden dene.';
+}
+function locationGateFailure(code,reason){
+  ui.locationGateRequestInFlight=false;
+  ui.locationGateState=reason==='unsupported'?'unsupported':(code===1?'denied':'unavailable');
+  ui.locationGateError=locationGateErrorText(code,reason);
+  locationGateResetNudge();
+  stopLocationWatch();
+  if(data&&data.settings){
+    data.settings.locationEnabled=false;
+    data.settings.locationDisabledAt=new Date().toISOString();
+    data.settings.locationDisabledReason=reason||'permission-denied';
+    save(false);
+  }
+  render();
+}
+function locationGateGranted(pos,userInitiated){
+  var wasFresh=!data;
+  if(!data) data=migrate(createDefaultData());
+  if(!data.settings) data.settings={};
+  data.settings.locationEnabled=true;
+  if(!data.settings.locationEnabledAt) data.settings.locationEnabledAt=new Date().toISOString();
+  if(!data.settings.locationEnabledReason) data.settings.locationEnabledReason=userInitiated?'manual':'verified';
+  data.settings.locationDisabledAt='';
+  data.settings.locationDisabledReason='';
+  ui.locationGateState='granted';
+  ui.locationGateError='';
+  ui.locationGateRequestInFlight=false;
+  locationGateResetNudge();
+  if(wasFresh) ui.forceStart=true;
+  if(pos) onLocationFix(pos);
+  save(userInitiated?undefined:false);
+  render();
+}
+App.requestLocationGatePermission=function(){
+  if(ui.locationGateRequestInFlight) return;
+  stopLocationWatch();
+  ui.locationGateRequestInFlight=true;
+  ui.locationGateState='requesting';
+  ui.locationGateError='';
+  locationGateResetNudge();
+  if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
+  try{
+    // Safari native permission promptunu yalnızca bu açık kullanıcı eyleminden
+    // sonra çağırıyoruz; sayfa yüklenirken sessiz/tekrarlı prompt yok.
+    navigator.geolocation.getCurrentPosition(function(pos){
+      locationGateGranted(pos,true);
+      if(moveState.watchId==null) startLocationWatch(false);
+    },function(err){
+      var code=err&&Number(err.code);
+      locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'request-error');
+    },{enableHighAccuracy:true,timeout:20000,maximumAge:1000});
+  }catch(e){ locationGateFailure(0,'request-error'); return; }
+  if(ui.locationGateState==='requesting') render();
+};
 App.toggleLocation=function(){
   if(!data.settings) data.settings={};
-  if(data.settings.locationEnabled){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='manual'; stopLocationWatch(); save(); render(); toast('Konum paylaşımı kapatıldı'); return; }
+  if(data.settings.locationEnabled){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='manual'; ui.locationGateState='required'; ui.locationGateError=''; stopLocationWatch(); locationGateResetNudge(); save(); render(); toast('Konum paylaşımı kapatıldı'); return; }
   ui.locationConsent=true; render();
 };
 App.cancelLocationConsent=function(){ ui.locationConsent=false; render(); };
 App.confirmLocationConsent=function(){
   ui.locationConsent=false;
-  if(!data.settings) data.settings={};
-  if(!navigator.geolocation){ render(); toast('Bu cihaz konumu desteklemiyor'); return; }
-  data.settings.locationEnabled=true;
-  data.settings.locationEnabledAt=new Date().toISOString();
-  data.settings.locationEnabledReason='manual';
-  data.settings.locationDisabledAt='';
-  data.settings.locationDisabledReason='';
-  save(); render(); toast('Konum izni isteniyor…');
-  startLocationWatch(true);
+  App.requestLocationGatePermission();
 };
 App.setLocationMode=function(m){
   if(m!=='walk'&&m!=='vehicle'&&m!=='auto') return;
@@ -8421,6 +8478,7 @@ function ensureLocNudge(){
 }
 function locNudgeEligible(){
   if(!data||!data.settings) return false;
+  if(locationGateRequired()) return false;
   if(data.settings.locationEnabled) return false;        // konum açıksa asla
   if(ui.locNudgeOpen) return false;                      // zaten açık
   if(ui.tab!=='bugun'&&ui.tab!=='saglik') return false;  // yalnız sağlıkla ilgili sekmeler
@@ -8754,6 +8812,33 @@ function authGateHTML(){
   +'</div>';
 }
 
+function locationGateHTML(){
+  var state=ui.locationGateState||'required';
+  var busy=state==='requesting';
+  var title=state==='denied'?'Safari’de konum izni kapalı':state==='unavailable'?'Konum doğrulanamadı':state==='unsupported'?'Konum desteği gerekli':state==='checking'?'Konum izni doğrulanıyor…':'Şeyma için konum izni gerekli';
+  var detail=state==='denied'?'Şeyma’nın ana ekranını açmak için Safari’de bu siteye konum izni vermelisin.':state==='unavailable'?'İzin süreci açık görünüyor ama cihazdan geçerli bir konum alınamadı.':state==='unsupported'?'Bu cihaz veya tarayıcı konum hizmetini sunmadan Şeyma devam edemez.':'Konum izni olmadan günlük, sağlık ve diğer uygulama bölümleri açılmaz.';
+  var copy=ui.locationGateError||'Konum yalnızca Şeyma açıkken ölçülür; dilediğinde Safari ayarlarından kapatabilirsin.';
+  var help='';
+  if(state==='denied'){
+    var steps=isIOS()?(isStandalonePWA()?'Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken”':'Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver'):'Tarayıcı site ayarları → Konum → İzin Ver';
+    help='<div style="margin-top:16px;border:1px solid var(--field-bd);background:var(--field);border-radius:16px;padding:12px 13px;text-align:left;"><div style="font-size:11px;letter-spacing:.7px;font-weight:800;color:var(--faint);margin-bottom:5px;">SAFARİ AYARLARI</div><div style="font-size:13px;line-height:1.45;color:var(--text2);">'+esc(steps)+'</div><div style="font-size:11px;line-height:1.45;color:var(--faint);margin-top:5px;">Ayarı değiştirdikten sonra buraya dönüp tekrar dene.</div></div>';
+  }
+  var button=busy?'Safari izin ekranı bekleniyor…':state==='checking'?'Konum iznini yeniden doğrula':state==='denied'?'İzin verildi, tekrar dene':state==='unsupported'?'Safari desteğini yeniden kontrol et':'Safari’de konum iznini aç';
+  return '<div id="sey-location-gate" data-location-gate-state="'+esc(state)+'" role="dialog" aria-modal="true" aria-labelledby="sey-location-gate-title" tabindex="-1" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;overflow:auto;padding:24px;background:var(--page);color:var(--text);">'
+    +'<div style="width:100%;max-width:410px;border:1px solid var(--card-bd);border-radius:28px;padding:26px 22px 22px;background:var(--modal);box-shadow:0 24px 70px rgba(0,0,0,.22);text-align:center;backdrop-filter:blur(18px);">'
+      +'<div style="font-size:42px;line-height:1;margin-bottom:13px;">📍</div>'
+      +'<div style="font-size:10px;letter-spacing:1.3px;font-weight:900;color:var(--faint);margin-bottom:8px;">ŞEYMA · GÜVENLİ BAŞLANGIÇ</div>'
+      +'<h1 id="sey-location-gate-title" style="margin:0;font-size:24px;line-height:1.2;font-weight:850;color:var(--text);">'+esc(title)+'</h1>'
+      +'<p style="margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--muted);">'+esc(detail)+'</p>'
+      +'<div style="margin-top:15px;padding:12px 13px;border-radius:15px;background:color-mix(in srgb,#8FBF8A 14%,var(--modal));border:1px solid color-mix(in srgb,#6FB36A 28%,var(--card-bd));font-size:12.5px;line-height:1.5;color:var(--text2);text-align:left;">Konum ve hareket ölçümü yalnızca uygulama açıkken yapılır. Safari’nin izin penceresinde <b>İzin Ver</b> seçilmeden devam edilemez.</div>'
+      +(state==='denied'||state==='unavailable'||state==='unsupported'?'<div role="alert" style="margin-top:12px;font-size:12.5px;line-height:1.45;color:#A34F4D;">'+esc(copy)+'</div>':'')
+      +help
+      +'<button type="button" onclick="App.requestLocationGatePermission()" '+(busy?'disabled':'')+' style="margin-top:19px;border:none;cursor:'+(busy?'wait':'pointer')+';width:100%;padding:15px 16px;border-radius:16px;font-size:15px;font-weight:850;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);box-shadow:0 10px 24px rgba(111,179,106,.34);">'+esc(button)+'</button>'
+      +'<div style="margin-top:12px;font-size:11px;line-height:1.45;color:var(--faint);">Bu izin verilmeden günlük kayıtların ve diğer bölümlerin içeriği açılmaz.</div>'
+    +'</div>'
+  +'</div>';
+}
+
 function render(){
   var root=document.getElementById('root');
   root.setAttribute('data-theme', dark?'dark':'light');
@@ -8765,6 +8850,14 @@ function render(){
     lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false;
     // Hatayı görselleştirdikten sonra bayrağı sıfırla; sarsıntı sınıfı CSS animasyonu kaldırır.
     if(ui.authError) setTimeout(function(){ ui.authError=false; ui.authErrorMsg=''; },300);
+    return;
+  }
+
+  // Hard gate: Safari konum izni doğrulanmadan hiçbir uygulama yüzeyi açılmaz.
+  if(locationGateRequired()){
+    app.innerHTML=locationGateHTML();
+    lastRenderTab=null; lastOverlay=null; lastOverlayView=null; lastHeaderShown=false;
+    try{ var lg=document.getElementById('sey-location-gate'); if(lg&&lg.focus) lg.focus(); }catch(e){}
     return;
   }
 
@@ -15970,13 +16063,19 @@ function toastLocationDenied(){
   }
 }
 function startLocationWatch(announce){
-  if(!navigator.geolocation) return;
+  if(!navigator.geolocation){ locationGateFailure(0,'unsupported'); return; }
   if(moveState.watchId!=null) return;
   moveState.lastSyncTs=Date.now();
   var firstOk=false;
   moveState.watchId=navigator.geolocation.watchPosition(
-    function(pos){ if(announce && !firstOk){ firstOk=true; if(!psychActive()) toast('Konum paylaşımı açıldı ✓'); } onLocationFix(pos); },
-    function(err){ if(err&&err.code===1){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='permission-denied'; save(); } stopLocationWatch(); render(); if(!psychActive()) toastLocationDenied(); } else if(err&&err.code===2){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='position-unavailable'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum alınamadı'); } else if(err&&err.code===3){ if(data&&data.settings){ data.settings.locationEnabled=false; data.settings.locationDisabledAt=new Date().toISOString(); data.settings.locationDisabledReason='timeout'; save(); } stopLocationWatch(); render(); if(!psychActive()) toast('Konum zaman aşımı'); } },
+    function(pos){
+      if(ui.locationGateState!=='granted') locationGateGranted(pos,false); else onLocationFix(pos);
+      if(announce && !firstOk){ firstOk=true; if(!psychActive()) toast('Konum paylaşımı açıldı ✓'); }
+    },
+    function(err){
+      var code=err&&Number(err.code);
+      locationGateFailure(code===1||code===2||code===3?code:0,code===1?'permission-denied':code===2?'position-unavailable':code===3?'timeout':'watch-error');
+    },
     {enableHighAccuracy:true,timeout:20000,maximumAge:1000}
   );
 }

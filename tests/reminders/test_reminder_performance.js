@@ -27,7 +27,7 @@ function state() {
   return {
     version: 2, startDate: "2026-08-16", lastOpenedDate: "2026-08-16", days: {}, notifications: [],
     luna: { qa: [] }, aeon: { qa: [] }, reminders: { schemaVersion: 1, preferences: {} },
-    settings: { nickname: "REM-37 performance fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true,
+    settings: { nickname: "REM-37 performance fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto",
       auth: { rememberMe: true, usernameHash: "fixture-auth-hash", unlockedAt: NOW } },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 }
   };
@@ -48,7 +48,7 @@ function boot() {
   NotificationMock.permission = "granted";
   const sandbox = {
     console, localStorage, document, Notification: NotificationMock,
-    navigator: { vibrate() {}, userAgent: "rem-37-performance-fixture", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: "rem-37-performance-fixture", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { return new Promise(() => {}); }, setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},

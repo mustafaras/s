@@ -54,7 +54,7 @@ function bootAppWithState(seedData, options) {
   class DOMParserStub { parseFromString() { return { body: fixtureElement("body"), querySelector() { return null; }, querySelectorAll() { return []; } }; } }
   const sandbox = {
     console, localStorage, document,
-    navigator: { vibrate() {}, userAgent: "rem-04-migration", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: "rem-04-migration", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     DOMParser: DOMParserStub,
@@ -97,7 +97,7 @@ function baseState(extra) {
       ghRepo: "",
       ghBranch: "",
       openaiKey: "",
-      profileAssessmentInactive: true
+      profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto"
     },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
     __reminderFixture: { owner: "test", nested: { keep: true } }

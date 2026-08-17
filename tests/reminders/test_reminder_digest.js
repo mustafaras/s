@@ -29,13 +29,14 @@ function baseState(overrides) {
     lastOpenedDate: "2026-08-16",
     days: {},
     notifications: [],
+    weather: { mode: "live", fetchedAt: new Date().toISOString(), spots: [{ key: "live" }, { key: "ev" }, { key: "is" }], coords: { lat: 39.9334, lng: 32.8597 } },
     settings: {
       nickname: "REM-35 fixture",
       ghToken: "",
       ghRepo: "",
       ghBranch: "",
       openaiKey: "",
-      profileAssessmentInactive: true,
+      profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto",
       auth: { rememberMe: true, usernameHash: "fixture", unlockedAt: "2026-08-16T00:00:00.000Z" }
     },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
@@ -81,7 +82,7 @@ function boot(seed, options) {
   Notification.requestPermission = function requestPermission() { counters.permissionRequests += 1; return Promise.resolve("default"); };
   const sandbox = {
     console, localStorage, document, Notification,
-    navigator: { vibrate() {}, userAgent: "rem-35-digest", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: "rem-35-digest", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     DOMParser: DOMParserStub,
@@ -116,8 +117,8 @@ function sensitiveWeekState() {
   return baseState({
     startDate: "2026-08-12",
     days: {
-      "2026-08-12": { note: "RAW_DAILY_SECRET", mood: "sad", therapy: { note: "THERAPY_SECRET" }, prayer: { fajr: { done: true } }, medications: [{ name: "MEDICATION_SECRET", dose: "DOSE_SECRET" }] },
-      "2026-08-16": { note: "ANOTHER_DAILY_SECRET", mood: "happy", gratitude: ["GRATITUDE_SECRET"], prayer: { maghrib: { done: true } } }
+      "2026-08-12": { note: "RAW_DAILY_SECRET", mood: "sad", therapy: { note: "THERAPY_SECRET" }, prayer: { fajr: { done: true } }, medications: [{ name: "MEDICATION_SECRET", dose: "DOSE_SECRET" }], habits: {} },
+      "2026-08-16": { note: "ANOTHER_DAILY_SECRET", mood: "happy", gratitude: ["GRATITUDE_SECRET"], prayer: { maghrib: { done: true } }, habits: {} }
     }
   });
 }
@@ -193,7 +194,7 @@ runTests([
     assertEqual(out.counters.fetches, baselineFetches);
   }],
   ["timezone is calculated from the requested local zone", () => {
-    const state = baseState({ startDate: "2026-08-15", days: { "2026-08-16": { note: "LOCAL_SECRET" } } });
+    const state = baseState({ startDate: "2026-08-15", days: { "2026-08-16": { note: "LOCAL_SECRET", habits: {} } } });
     const out = boot(state);
     assertEqual(out.error, null);
     const istanbul = out.sandbox.App.reminderDigest({ data: state, nowIso: "2026-08-15T21:30:00.000Z", timezone: "Europe/Istanbul" });

@@ -34,7 +34,8 @@ function baseState(overrides) {
     lastOpenedDate: "2026-08-17",
     days: { "2026-08-12": { note: "daily-note-stays-outside-reminder-reset" } },
     notifications: [],
-    settings: { nickname: "REM-39 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true },
+    weather: { mode: "live", fetchedAt: new Date().toISOString(), spots: [{ key: "live" }, { key: "ev" }, { key: "is" }], coords: { lat: 39.9334, lng: 32.8597 } },
+    settings: { nickname: "REM-39 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto" },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
     reminders: {
       schemaVersion: 1,
@@ -72,7 +73,7 @@ function boot(seed, options) {
   let confirmResult = opts.confirmResult !== false;
   const sandbox = {
     console, localStorage, document, DOMParser: DOMParserStub,
-    navigator: { vibrate() {}, userAgent: "rem-39-retention", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: "rem-39-retention", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { throw new Error("REMINDER_TEST_NETWORK_DISABLED"); },

@@ -25,7 +25,7 @@ function boot(seed) {
   const state = Object.assign({
     version: 2, startDate: "2026-08-13", lastOpenedDate: "2026-08-13", days: {}, notifications: [], luna: { qa: [] }, aeon: { qa: [] },
     reminders: { schemaVersion: 1, preferences: {}, policy: { quietHours: { start: "22:30", end: "07:30" }, nativeDailyCap: 3, lowPriorityNativeCap: 1, sameCategoryCooldownMinutes: 0, capacityMode: "balanced" } },
-    settings: { nickname: "REM-21 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, prayer: { hijriOffset: 0 }, auth: { rememberMe: true, usernameHash: "fixture-auth", unlockedAt: "2026-08-13T08:00:00.000Z" } },
+    settings: { nickname: "REM-21 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto", prayer: { hijriOffset: 0 }, auth: { rememberMe: true, usernameHash: "fixture-auth", unlockedAt: "2026-08-13T08:00:00.000Z" } },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 }
   }, seed || {});
   const store = { "seyma-reset-v1": JSON.stringify(state) };
@@ -35,7 +35,7 @@ function boot(seed) {
   const document = { hidden: false, body: node("body"), documentElement: root, getElementById(id) { return { app, root }[id] || null; }, querySelector() { return null; }, querySelectorAll() { return []; }, createElement() { return node(""); }, createDocumentFragment() { return node(""); }, addEventListener() {}, removeEventListener() {} };
   const sandbox = {
     console, localStorage, document, Notification: NotificationMock,
-    navigator: { userAgent: "rem-21-special-days-fixture", vibrate() {}, clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { userAgent: "rem-21-special-days-fixture", vibrate() {}, clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} }, matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { return new Promise(() => {}); }, setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {}, requestAnimationFrame() { return 0; }, cancelAnimationFrame() {},
     crypto: { getRandomValues(array) { return array; }, randomUUID() { return "rem-21-special-uuid"; } }, URL: Object.assign(function URL() {}, { createObjectURL() { return "blob:rem-21"; }, revokeObjectURL() {} }), URLSearchParams,

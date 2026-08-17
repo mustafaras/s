@@ -112,10 +112,26 @@ function makeLocalStorage(seed) {
   };
 }
 
-function buildSandbox(seedData) {
+function buildSandbox(seedData, options = {}) {
   const seed = {};
   if (seedData) seed['seyma-reset-v1'] = JSON.stringify(seedData);
   const localStorage = makeLocalStorage(seed);
+  const geoMode = options.geolocation || 'success';
+  const geoPosition = { coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } };
+  const geolocation = geoMode === 'none' ? null : {
+    getCurrentPosition(success, error) {
+      if (geoMode === 'denied') error({ code: 1 });
+      else if (geoMode === 'timeout') error({ code: 3 });
+      else success(geoPosition);
+    },
+    watchPosition(success, error) {
+      if (geoMode === 'denied') error({ code: 1 });
+      else if (geoMode === 'timeout') error({ code: 3 });
+      else success(geoPosition);
+      return 1;
+    },
+    clearWatch() {},
+  };
   const sandbox = {
     console,
     localStorage,
@@ -123,7 +139,7 @@ function buildSandbox(seedData) {
     navigator: {
       vibrate() {}, userAgent: 'node-harness',
       clipboard: { writeText() { return Promise.resolve(); } },
-      geolocation: null,
+      geolocation,
     },
     location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
@@ -170,6 +186,7 @@ function seedState() {
     notifications: [], luna: { qa: [] }, aeon: { qa: [] },
     settings: {
       nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data',
+      locationEnabled: true, locationMode: 'auto',
       // app.js auth gate açılması için rememberMe + geçerli usernameHash + unlockedAt gerekli.
       auth: {
         rememberMe: true,
@@ -207,6 +224,24 @@ let sb1 = buildSandbox(null);
 let ctx1 = loadInto(sb1, FILES);
 assert('onboarding render produced HTML', appHTML.length > 200);
 assert('window.App exposed', typeof sb1.App === 'object' && !!sb1.App);
+
+console.log('\n== location hard gate ==');
+const gateState = seedState();
+gateState.settings.locationEnabled = false;
+appHTML = '';
+const sbGate = buildSandbox(gateState, { geolocation: 'success' });
+loadInto(sbGate, FILES);
+assert('location gate blocks app before permission', /id="sey-location-gate"/.test(appHTML) && /data-location-gate-state="required"/.test(appHTML));
+sbGate.App.requestLocationGatePermission();
+assert('location permission success unlocks app', !/id="sey-location-gate"/.test(appHTML) && /bugun/i.test(appHTML));
+
+const deniedState = seedState();
+deniedState.settings.locationEnabled = false;
+appHTML = '';
+const sbDenied = buildSandbox(deniedState, { geolocation: 'denied' });
+loadInto(sbDenied, FILES);
+sbDenied.App.requestLocationGatePermission();
+assert('denied location keeps the gate closed', /id="sey-location-gate"/.test(appHTML) && /data-location-gate-state="denied"/.test(appHTML));
 
 console.log('\n== boot: seeded state ==');
 appHTML = '';

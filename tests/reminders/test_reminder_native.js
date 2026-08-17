@@ -29,7 +29,7 @@ function seedState() {
   return {
     version: 2, startDate: "2026-08-13", lastOpenedDate: "2026-08-13", days: {},
     notifications: [], luna: { qa: [] }, aeon: { qa: [] }, reminders: { schemaVersion: 1, preferences: {} },
-    settings: { nickname: "REM-22 native fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, auth: { rememberMe: true, usernameHash: "fixture-auth", unlockedAt: "2026-08-13T08:00:00.000Z" } },
+    settings: { nickname: "REM-22 native fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto", auth: { rememberMe: true, usernameHash: "fixture-auth", unlockedAt: "2026-08-13T08:00:00.000Z" } },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 }
   };
 }
@@ -54,7 +54,7 @@ function boot(permission, options) {
   };
   const sandbox = {
     console, localStorage, document, Notification: notification.Notification,
-    navigator: { vibrate() {}, standalone: !!opts.pwaLimited, userAgent: "rem-22-native-fixture", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, standalone: !!opts.pwaLimited, userAgent: "rem-22-native-fixture", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: !!opts.pwaLimited, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { return new Promise(() => {}); }, setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},

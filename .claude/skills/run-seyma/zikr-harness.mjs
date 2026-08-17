@@ -67,9 +67,14 @@ function makeLS(seed) {
 function buildSandbox(seedData, fetchImpl) {
   const seed = seedData ? { 'seyma-reset-v1': JSON.stringify(seedData) } : {};
   const localStorage = makeLS(seed);
+  const geolocation = {
+    getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); },
+    watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; },
+    clearWatch() {},
+  };
   const sandbox = {
     console, localStorage, document: doc, __SEYMA_TEST_ZIKR__: true,
-    navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: 'node-harness', clipboard: { writeText() { return Promise.resolve(); } }, geolocation },
     location: { protocol: 'http:', hostname: 'localhost', search: '', href: 'http://localhost/', reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     DOMParser: DOMParserStub,
@@ -108,7 +113,7 @@ const seed = {
     [y]: { habits: {}, mood: null, saygi: { personId: 'ada-lovelace', readAt: new Date(Date.now() - 864e5).toISOString(), readingEntryId: 'x' } },
   },
   notifications: [], luna: { qa: [] }, aeon: { qa: [] },
-  settings: { nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data', auth: { rememberMe: true, usernameHash: 'ae9e1ed2b6abcbce74cc0c15719fdbba372a7dd62e6232510656bade7c201af4', unlockedAt: new Date().toISOString() } },
+  settings: { nickname: 'Sevgili Günışığı', ghToken: '', ghRepo: 'mustafaras/seyma-data', locationEnabled: true, locationMode: 'auto', auth: { rememberMe: true, usernameHash: 'ae9e1ed2b6abcbce74cc0c15719fdbba372a7dd62e6232510656bade7c201af4', unlockedAt: new Date().toISOString() } },
   cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
   profileAssessment: { schemaVersion: 2, status: 'completed', currentItemIndex: 1, responses: { i1: { value: 1, shownAt: t } } },
   saygi: { collection: { 'ada-lovelace': { name: 'Ada Lovelace', field: 'Matematik · Bilgisayar bilimi', readAt: new Date(Date.now() - 864e5).toISOString() } }, streak: 1, lastReadDate: y },

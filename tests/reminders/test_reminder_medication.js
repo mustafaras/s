@@ -53,7 +53,7 @@ function boot(seed, options) {
   };
   const sandbox = {
     console, localStorage, document,
-    navigator: { vibrate() {}, userAgent: "rem-20-medication", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: null },
+    navigator: { vibrate() {}, userAgent: "rem-20-medication", clipboard: { writeText() { return Promise.resolve(); } }, geolocation: { getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); }, watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; }, clearWatch() {} } },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { counters.fetches += 1; return new Promise(() => {}); },
@@ -90,7 +90,8 @@ function baseState(extra) {
   return Object.assign({
     version: 2, startDate: "2026-08-15", lastOpenedDate: "2026-08-15", days: {},
     notifications: [], luna: { qa: [] }, aeon: { qa: [] },
-    settings: { nickname: "REM-20 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true },
+    weather: { mode: "live", fetchedAt: new Date().toISOString(), spots: [{ key: "live" }, { key: "ev" }, { key: "is" }], coords: { lat: 39.9334, lng: 32.8597 } },
+    settings: { nickname: "REM-20 fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto" },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 },
     reminders: { schemaVersion: 1, preferences: {}, medications: [] }
   }, extra || {});

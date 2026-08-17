@@ -45,14 +45,18 @@
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "not_approved",
-    "scope": [],
-    "evidence": null,
-    "approvedAt": null,
+    "status": "approved",
+    "scope": [
+      "git push origin main (fast-forward only)",
+      "GitHub Pages workflow/deployment triggered by the main push",
+      "read-only remote equality and Pages/live evidence verification"
+    ],
+    "evidence": "Exact user message (2026-08-17): \"onaylıyorum\" in response to the explicit scope: main push and the GitHub Pages deployment it triggers; mustafaras/seyma-data remains out of scope",
+    "approvedAt": "2026-08-17T16:46:32+03:00",
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-46 local implementation and closure evidence completed; release remains not_approved; REM-47 ready; S5 pending",
+  "updatedBy": "Codex recorded the user's exact current main/Pages release approval; REM-47 remains next; S5 pending",
   "closure": {
     "prompt": "REM-46",
     "evidence": "docs/reminders/evidence/REM-46.md",

@@ -2493,7 +2493,7 @@ function reminderSpecialDayOccurrence(input){
   var special=reminderSpecialDayLookup(localDate,offsetDays);
   if(!special) return reminderSpecialDayFailure('not-special-day');
   if(state.mode==='selected'&&(special.id===''||state.selectedDays.indexOf(special.id)<0)) return reminderSpecialDayFailure('outside-selected-days',{specialDayId:special.id,specialDayLabel:special.label});
-  var generated=reminderEngineGenerateOccurrence({definition:{id:REMINDER_SPECIAL_DAYS_ID,triggerType:'fixed-time',time:state.time,definitionVersion:definition.definitionVersion,priority:definition.priority},reminderId:REMINDER_SPECIAL_DAYS_ID,localDate:localDate,nowLocalDate:nowLocalDate,nowLocalTime:nowLocalTime,timezone:timezone,instantIso:x.instantIso||x.nowIso,hijriOffset:offsetDays,sourceRevision:'hijri-calendar-v1'});
+  var generated=reminderEngineAdapterGenerateOccurrence({definition:{id:REMINDER_SPECIAL_DAYS_ID,triggerType:'fixed-time',time:state.time,definitionVersion:definition.definitionVersion,priority:definition.priority},reminderId:REMINDER_SPECIAL_DAYS_ID,localDate:localDate,nowLocalDate:nowLocalDate,nowLocalTime:nowLocalTime,timezone:timezone,instantIso:x.instantIso||x.nowIso,hijriOffset:offsetDays,sourceRevision:'hijri-calendar-v1'});
   if(!generated.ok||!generated.occurrence) return generated;
   var hijri=special.hijri, hijriDate=hijri&&hijri.day&&hijri.monthName?hijri.day+' '+hijri.monthName+' '+hijri.year:'';
   var occurrence=Object.assign({},generated.occurrence,{reminderId:REMINDER_SPECIAL_DAYS_ID,category:'special',priority:'P2',deepLink:'faith',triggerType:'special-day',specialDayId:special.id,specialDayLabel:special.label,hijriDate:hijriDate,hijriOffset:offsetDays,nativeTitle:REMINDER_SPECIAL_NATIVE_TITLE,nativeBody:REMINDER_SPECIAL_NATIVE_BODY,replay:false,nativeReplay:false,shouldReplay:false});
@@ -2534,7 +2534,7 @@ function reminderMedicationOccurrence(input){
   if(!schedule) return reminderMedicationFailure('invalid-schedule');
   if(schedule.enabled!==true) return reminderMedicationFailure('schedule-disabled');
   if(instantMs===null||!reminderEngineValidDate(localDate)) return reminderMedicationFailure('invalid-medication-clock');
-  var definition=reminderMedicationDefinition(schedule), generated=reminderEngineGenerateOccurrence({definition:{id:schedule.id,triggerType:'fixed-time',time:schedule.time,definitionVersion:String(REMINDER_MEDICATION_SCHEMA_VERSION)},reminderId:schedule.id,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'medication-schedule-v1'});
+  var definition=reminderMedicationDefinition(schedule), generated=reminderEngineAdapterGenerateOccurrence({definition:{id:schedule.id,triggerType:'fixed-time',time:schedule.time,definitionVersion:String(REMINDER_MEDICATION_SCHEMA_VERSION)},reminderId:schedule.id,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'medication-schedule-v1'});
   if(!generated.ok||!generated.occurrence) return generated;
   var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-medication-v1:'+encodeURIComponent(schedule.id)+':'+encodeURIComponent(localDate)+':'+encodeURIComponent(schedule.time)+':'+encodeURIComponent(timezone),reminderId:schedule.id,category:'health',priority:'P1',deepLink:'health',triggerType:'medication-schedule',medicationScheduleId:schedule.id,userOwnedSchedule:true,explicitlySelected:true,due:generated.occurrence.due&&!generated.occurrence.past,missed:generated.occurrence.past===true,replay:false,nativeReplay:false,shouldReplay:false,nativeTitle:REMINDER_MEDICATION_NATIVE_TITLE,nativeBody:REMINDER_MEDICATION_NATIVE_BODY,dataRequirement:'none'});
   return Object.assign({},generated,{occurrence:occurrence,definition:definition,missed:occurrence.missed});
@@ -2568,6 +2568,35 @@ function reminderMedicationLifecycleCandidates(input){
 // REM-08 source boundary: delivery persistence helpers begin after the pure
 // occurrence engine block used by the scheduler contract fixture.
 var data=null;
+
+// REM-46 app clock boundary: UI-selected historical date and wall-clock date
+// are deliberately returned as separate values.  The adapter never promotes
+// activeDate() into an occurrence localDate unless the caller explicitly does
+// so; scheduler calls therefore remain tied to the injected/current instant.
+function reminderAppClockBoundary(input){
+  var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), settings=data&&data.settings&&data.settings.prayer, configured=String(x.timezone||((root&&root.timezone)||'')||((settings&&settings.timezone)||'')||REMINDER_ENGINE_DEFAULT_TIMEZONE), raw=x.nowIso||x.instantIso||x.now, nowIso=reminderDeliveryIso(raw)||new Date().toISOString(), instantMs=Date.parse(nowIso), parts=reminderEngineAdapterLocalParts(instantMs,configured), selectedDate=reminderEngineValidDate(x.activeDate)?x.activeDate:'';
+  if(!selectedDate){ try{ if(typeof activeDate==='function') selectedDate=activeDate(); }catch(e){ selectedDate=''; } }
+  return {nowIso:nowIso,instantMs:instantMs,timezone:configured,wallClockDate:parts&&parts.localDate||'',wallClockTime:parts&&parts.localTime?parts.localTime.slice(0,5):'',activeDate:selectedDate,selectedDateIsHistorical:!!(selectedDate&&parts&&selectedDate!==parts.localDate)};
+}
+function reminderAppEngineInput(input){
+  var source=input&&typeof input==='object'?input:{}, out=Object.assign({},source), clock=reminderAppClockBoundary(source), hasInstant=Object.prototype.hasOwnProperty.call(out,'instantMs')||Object.prototype.hasOwnProperty.call(out,'epochMs')||Object.prototype.hasOwnProperty.call(out,'instantIso')||Object.prototype.hasOwnProperty.call(out,'nowIso'), hasExplicitLocalTime=!!(out.nowLocalTime||out.currentLocalTime);
+  if(!out.timezone) out.timezone=clock.timezone;
+  if((!hasInstant||!reminderDeliveryIso(out.instantIso||out.nowIso||out.now))&&!Object.prototype.hasOwnProperty.call(out,'localDate')) out.instantIso=clock.nowIso;
+  if(!reminderEngineValidDate(out.nowLocalDate)&&!reminderEngineValidDate(out.currentLocalDate)&&!hasExplicitLocalTime) out.nowLocalDate=clock.wallClockDate;
+  if(!out.nowLocalTime&&!out.currentLocalTime) out.nowLocalTime=clock.wallClockTime;
+  return {input:out,clock:clock};
+}
+function reminderEngineModule(){
+  try{ var key='ReminderEngineV1'; if(typeof window!=='undefined'&&window[key]&&typeof window[key].generateOccurrence==='function') return window[key]; }catch(e){}
+  return null;
+}
+function reminderEngineAdapterLocalParts(instantMs,timezone){
+  var engine=reminderEngineModule(); return engine&&typeof engine.localParts==='function'?engine.localParts(instantMs,timezone):reminderEngineLocalParts(instantMs,timezone);
+}
+function reminderEngineAdapterGenerateOccurrence(input){
+  var prepared=reminderAppEngineInput(input), engine=reminderEngineModule(), result=engine?engine.generateOccurrence(prepared.input):reminderEngineGenerateOccurrence(prepared.input);
+  return result;
+}
 
 // ── REM-14 Prayer / İman Köşesi adapter ──────────────────────────────────
 // Prayer occurrences are derived from an explicit, redacted timing snapshot.
@@ -2620,7 +2649,7 @@ function reminderPrayerOccurrence(input){
   if(expectedMethod&&source.method!==expectedMethod) return reminderPrayerFailure('prayer-method-changed',{stale:true});
   if(x.offline===true&&(source.fallback===true||source.offlineFallback===true)&&source.fresh!==true) return reminderPrayerFailure('offline-prayer-data',{stale:true});
   var offset=reminderPrayerOffsetInput(x,definition), hijriOffset=Number.isInteger(x.hijriOffset)&&x.hijriOffset>=-2&&x.hijriOffset<=2?x.hijriOffset:0;
-  var generated=reminderEngineGenerateOccurrence(Object.assign({},x,offset,{definition:definition,reminderId:String(x.reminderId||definition.id||REMINDER_PRAYER_ID),prayerKey:key,prayerData:source,hijriOffset:hijriOffset}));
+  var generated=reminderEngineAdapterGenerateOccurrence(Object.assign({},x,offset,{definition:definition,reminderId:String(x.reminderId||definition.id||REMINDER_PRAYER_ID),prayerKey:key,prayerData:source,hijriOffset:hijriOffset}));
   if(!generated.ok||!generated.occurrence) return generated;
   var occurrence=Object.assign({},generated.occurrence,{deepLink:String(definition.deepLink||'faith'),prayerKey:key,prayerName:PRAYER_NAMES[key]||key,offsetMinutes:Number.isInteger(offset.offsetMinutes)?offset.offsetMinutes:-Math.abs(offset.beforeMinutes||0)});
   return Object.assign({},generated,occurrence);
@@ -2809,7 +2838,7 @@ function reminderZikrOccurrenceId(kind,parts){
   return 'reminder-zikr-v1:'+values.join('|');
 }
 function reminderZikrMakeOccurrence(input,definition,context,window,kind,sourceRevision){
-  var x=input&&typeof input==='object'?input:{}, d=definition&&typeof definition==='object'?definition:{}, engineDefinition={id:REMINDER_ZIKR_ID,category:'ritual',priority:'P2',triggerType:'fixed-time',time:window&&window.start||'',definitionVersion:String(d.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_ZIKR_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:String(x.timezone||'Europe/Istanbul'),instantIso:context.nowIso,sourceRevision:sourceRevision||'zikr-reminder-v1'});
+  var x=input&&typeof input==='object'?input:{}, d=definition&&typeof definition==='object'?definition:{}, engineDefinition={id:REMINDER_ZIKR_ID,category:'ritual',priority:'P2',triggerType:'fixed-time',time:window&&window.start||'',definitionVersion:String(d.definitionVersion||'1')}, generated=reminderEngineAdapterGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_ZIKR_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:String(x.timezone||'Europe/Istanbul'),instantIso:context.nowIso,sourceRevision:sourceRevision||'zikr-reminder-v1'});
   if(!generated.ok||!generated.occurrence) return generated;
   var occurrence=Object.assign({},generated.occurrence,{occurrenceId:reminderZikrOccurrenceId(kind,[context.localDate,window.start,sourceRevision||'']),category:'ritual',deepLink:'zikr',triggerType:kind==='reflection'?'session-reflection':'scheduled-window',sourceRevision:String(sourceRevision||'zikr-reminder-v1'),past:false,replay:false,nativeReplay:false,shouldReplay:false,due:reminderZikrWindowDue(window,context.localTime)});
   return Object.assign({},generated,occurrence,{occurrence:occurrence,kind:kind});
@@ -2990,7 +3019,7 @@ function reminderTherapyOccurrence(input){
   // A light day can never turn a daily choice into more delivery. Let the
   // shared policy suppress the remaining low-priority weekly candidate.
   if(capacity==='light'&&frequency==='daily') return reminderTherapyFailure('capacity-light-reduced',{suppressed:true,reduced:true});
-  var engineDefinition={id:REMINDER_THERAPY_ID,category:'support',priority:'P2',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_THERAPY_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:timezone,instantIso:context.nowIso,sourceRevision:'therapy-reminder-v1'});
+  var engineDefinition={id:REMINDER_THERAPY_ID,category:'support',priority:'P2',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineAdapterGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_THERAPY_ID,localDate:context.localDate,nowLocalDate:context.localDate,nowLocalTime:context.localTime,timezone:timezone,instantIso:context.nowIso,sourceRevision:'therapy-reminder-v1'});
   if(!generated.ok||!generated.occurrence) return generated;
   var occurrence=Object.assign({},generated.occurrence,{occurrenceId:reminderTherapyOccurrenceId(toolId,frequency,context.localDate,window.start,timezone),category:'support',deepLink:'room',therapyToolId:toolId,toolId:toolId,toolTarget:'room:'+toolId,frequency:frequency,userSelected:true,forced:false,requiresForm:false,requiresResult:false,scheduledWindow:{start:window.start,end:window.end},due:reminderTherapyWindowDue(window,context.localTime),past:false,replay:false,nativeReplay:false,shouldReplay:false});
   return Object.assign({},generated,occurrence,{occurrence:occurrence,toolId:toolId,frequency:frequency});
@@ -3089,7 +3118,7 @@ function reminderSaygiOccurrence(input){
   var articleState=reminderSaygiArticleState(person,Object.assign({},x,{localDate:localDate}));
   if(articleState.status!=='ready') return reminderSaygiFailure('article-unavailable',{articleStatus:articleState.status,stale:articleState.status==='error'});
   if(reminderSaygiReadState(person,Object.assign({},x,{localDate:localDate}))) return reminderSaygiFailure('already-read',{articleStatus:'ready'});
-  var engineDefinition={id:REMINDER_SAYGI_ID,category:'ritual',priority:'P3',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_SAYGI_ID,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'saygi-reading-v1'});
+  var engineDefinition={id:REMINDER_SAYGI_ID,category:'ritual',priority:'P3',triggerType:'fixed-time',time:window.start,definitionVersion:String(definition.definitionVersion||'1')}, generated=reminderEngineAdapterGenerateOccurrence({definition:engineDefinition,reminderId:REMINDER_SAYGI_ID,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:nowValue,sourceRevision:'saygi-reading-v1'});
   if(!generated.ok||!generated.occurrence) return generated;
   var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-saygi-v1:'+encodeURIComponent(localDate),category:'ritual',deepLink:'saygi',openDetail:true,personId:person.id,articleStatus:'ready',readAction:'markSaygiRead',frequency:frequency,userSelected:true,forced:false,readRequired:true,scheduledWindow:{start:window.start,end:window.end},due:reminderSaygiWindowDue(window,localTime),past:false,replay:false,nativeReplay:false,shouldReplay:false});
   return Object.assign({},generated,occurrence,{occurrence:occurrence,personId:person.id,frequency:frequency,articleStatus:'ready'});
@@ -3559,10 +3588,10 @@ function reminderEvaluateReminders(input){
   return {ok:errors.length===0,status:'evaluated',source:String(x.source||'manual'),evaluatedAt:nowIso,visibilityState:visibility,changed:JSON.stringify(log)!==initialLog,shownCount:shownCount,suppressedCount:suppressedCount,scheduledCount:scheduledCount,duplicateCount:duplicateCount,errors:errors,results:results,catchUpSummary:catchUpPlan&&catchUpPlan.summary?Object.assign({},catchUpPlan.summary):null,catchUpSummaries:catchUpPlan&&catchUpPlan.summary?[Object.assign({},catchUpPlan.summary)]:[],catchUpCount:catchUpPlan&&catchUpPlan.members?catchUpPlan.members.length:0,log:log};
 }
 function reminderLifecycleDefaultContext(input,nowIso){
-  var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), policy=root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(), timezone=String(x.timezone||((root&&root.timezone)||'')||'Europe/Istanbul'), instantMs=new Date(nowIso).getTime(), local=reminderEngineLocalParts(instantMs,timezone), requestedVisibility=x.visibilityState||(x.context&&x.context.visibilityState), visibility;
+  var x=input&&typeof input==='object'?input:{}, root=reminderCurrentRoot(), policy=root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(), clock=reminderAppClockBoundary(Object.assign({},x,{nowIso:nowIso})), timezone=clock.timezone, requestedVisibility=x.visibilityState||(x.context&&x.context.visibilityState), visibility;
   if(!requestedVisibility){ try{ requestedVisibility=document.hidden?'hidden':'visible'; }catch(e){ requestedVisibility='visible'; } }
   visibility=reminderLifecycleVisibility(requestedVisibility);
-  var context=Object.assign({timezone:timezone,nowIso:nowIso,localDate:(local&&local.localDate)||todayStr(),localTime:(local&&local.localTime?local.localTime.slice(0,5):'12:00'),quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,dailyFlowBudget:policy.dailyFlowBudget,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility,offline:reminderSystemOffline(x),online:!reminderSystemOffline(x)},x.context&&typeof x.context==='object'?x.context:{});
+  var context=Object.assign({timezone:timezone,nowIso:clock.nowIso,localDate:clock.wallClockDate||todayStr(),localTime:clock.wallClockTime||'12:00',quietHours:policy.quietHours,nativeDailyCap:policy.nativeDailyCap,lowPriorityNativeCap:policy.lowPriorityNativeCap,sameCategoryCooldownMinutes:policy.sameCategoryCooldownMinutes,dailyFlowBudget:policy.dailyFlowBudget,capacityMode:policy.capacityMode,selectedCategories:root?reminderCategorySelection(root):[],permissionState:x.permissionState||reminderPermissionSnapshot(),visibilityState:visibility,offline:reminderSystemOffline(x),online:!reminderSystemOffline(x)},x.context&&typeof x.context==='object'?x.context:{});
   context.visibilityState=visibility;
   context.offline=reminderSystemOffline(Object.assign({},x,{context:context})); context.online=!context.offline;
   return context;
@@ -3634,7 +3663,7 @@ function reminderCareLifecycleCandidates(options){
     times.forEach(function(scheduledAt,index){
       if(!validReminderTime(scheduledAt)) return;
       var activeWindow=key==='water'||key==='movement'?inWake:evening;
-      var generated=reminderEngineGenerateOccurrence({definition:Object.assign({},definition,{time:scheduledAt}),reminderId:definition.id,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:context.nowIso||'',sourceRevision:'care-v1'});
+      var generated=reminderEngineAdapterGenerateOccurrence({definition:Object.assign({},definition,{time:scheduledAt}),reminderId:definition.id,localDate:localDate,nowLocalDate:localDate,nowLocalTime:localTime,timezone:timezone,instantIso:context.nowIso||'',sourceRevision:'care-v1'});
       if(!generated.ok||!generated.occurrence) return;
       var occurrence=Object.assign({},generated.occurrence,{occurrenceId:reminderCareOccurrenceId(key,localDate,scheduledAt,timezone),category:REMINDER_CARE_CATEGORY,careKey:key,careSlot:index+1,deepLink:'health',nativeTitle:definition.privateTitle,nativeBody:definition.privateBody,dataRequirement:'none',existingSurface:definition.existingSurface,careNudgeKey:'care:'+key+':'+index,replay:false,nativeReplay:false,shouldReplay:false});
       occurrence.due=occurrence.due&&activeWindow;
@@ -3734,7 +3763,7 @@ function reminderEveningCoalesceCandidates(input,context){
   eligible.forEach(function(candidate){ var item=candidate.occurrence&&typeof candidate.occurrence==='object'?candidate.occurrence:candidate, time=String(item.scheduledAt||item.localTime||''); if(!validReminderTime(time)) return; if(!earliest||time<earliest) earliest=time; });
   if(!earliest) return source.slice();
   var definition={id:String(primary.reminderId||primaryOccurrence.reminderId||primaryDefinition.id||primarySurface.reminderId),category:String(primaryOccurrence.category||primaryDefinition.category||primarySurface.category),priority:reminderPolicyPriority(primaryOccurrence.priority||primaryDefinition.priority||'P3'),triggerType:'fixed-time',time:earliest,deepLink:primarySurface.deepLink,privateTitle:'Akşamı tek bir küçük davetle kapatabilirsin',privateBody:'İstersen Şeyma’da seçtiğin küçük durağı açabilirsin.',defaultChannel:String((primary.preference&&primary.preference.channel)||primaryDefinition.defaultChannel||'in_app'),snoozeOptions:Array.isArray(primaryDefinition.snoozeOptions)?primaryDefinition.snoozeOptions.slice():['30m','1h','thisEvening','todayOff'],definitionVersion:'1'};
-  var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:String(ctx.localDate||primaryOccurrence.localDate||''),nowLocalDate:String(ctx.localDate||primaryOccurrence.localDate||''),nowLocalTime:String(ctx.localTime||'12:00'),timezone:timezone,instantIso:ctx.nowIso||'',sourceRevision:'evening-coalesced-v1'});
+  var generated=reminderEngineAdapterGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:String(ctx.localDate||primaryOccurrence.localDate||''),nowLocalDate:String(ctx.localDate||primaryOccurrence.localDate||''),nowLocalTime:String(ctx.localTime||'12:00'),timezone:timezone,instantIso:ctx.nowIso||'',sourceRevision:'evening-coalesced-v1'});
   if(!generated.ok||!generated.occurrence) return source.slice();
   var safeAlternatives=selected.map(reminderEveningSafeAlternative).filter(Boolean), safePrimary=safeAlternatives.shift(), group=reminderEveningSafeGroup({primary:safePrimary,alternatives:safeAlternatives});
   if(!group) return source.slice();
@@ -3866,7 +3895,7 @@ function reminderDailyFlowCoalesceCandidates(input,context){
   eligible.forEach(function(candidate){ var candidateDefinition=candidate.definition&&typeof candidate.definition==='object'?candidate.definition:reminderDailyFlowCandidateOccurrence(candidate); (Array.isArray(candidateDefinition.snoozeOptions)?candidateDefinition.snoozeOptions:[]).forEach(function(option){ option=String(option); if(reminderEnumHas(REMINDER_SNOOZE_OPTIONS,option)&&coalescedSnoozeOptions.indexOf(option)<0) coalescedSnoozeOptions.push(option); }); });
   if(!coalescedSnoozeOptions.length) coalescedSnoozeOptions=['30m','1h','todayOff'];
   var definition={id:String(primary.reminderId||primaryOccurrence.reminderId||primaryDefinition.id||''),category:category,priority:priority,triggerType:'fixed-time',time:earliest,deepLink:String(primarySafe.deepLink||primaryOccurrence.deepLink||primaryDefinition.deepLink||'settings'),privateTitle:copy.title,privateBody:copy.body,defaultChannel:String(primary.preference&&primary.preference.channel||primaryDefinition.defaultChannel||'in_app'),snoozeOptions:coalescedSnoozeOptions,definitionVersion:'1'};
-  var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:policy.localDate,nowLocalDate:policy.localDate,nowLocalTime:policy.localTime,timezone:timezone,instantIso:ctx.nowIso||'',sourceRevision:'daily-flow-v1'});
+  var generated=reminderEngineAdapterGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:policy.localDate,nowLocalDate:policy.localDate,nowLocalTime:policy.localTime,timezone:timezone,instantIso:ctx.nowIso||'',sourceRevision:'daily-flow-v1'});
   if(!generated.ok||!generated.occurrence) return untouched.concat(eligible);
   var occurrence=Object.assign({},generated.occurrence,{occurrenceId:'reminder-daily-flow-v'+REMINDER_DAILY_FLOW_VERSION+':'+encodeURIComponent(policy.flowId)+':'+encodeURIComponent(policy.localDate)+':'+encodeURIComponent(earliest)+':'+encodeURIComponent(timezone),reminderId:definition.id,category:category,priority:priority,deepLink:definition.deepLink,flowId:policy.flowId,flowLabel:policy.flowLabel,flowCapacityMode:policy.capacityMode,dailyFlowVersion:REMINDER_DAILY_FLOW_VERSION,coalescedFromCount:eligible.length,flowGroup:group,nativeTitle:copy.title,nativeBody:copy.body,nowNotAction:policy.nowNotAction,quietHoursInherited:true,nativeReplay:false,replay:false,shouldReplay:false,past:false});
   if(policy.flowId==='evening') occurrence.eveningGroup=group;
@@ -3911,7 +3940,7 @@ function reminderLifecycleBuildCandidates(input,context,root){
         });
         return;
       }
-      var generated=reminderEngineGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:localDate,nowLocalDate:baseDate,nowLocalTime:baseTime,timezone:timezone,instantIso:context.nowIso,prayerData:x.prayerData,prayerKey:x.prayerKey,offsetMinutes:preference.offsetMinutes});
+      var generated=reminderEngineAdapterGenerateOccurrence({definition:definition,reminderId:definition.id,localDate:localDate,nowLocalDate:baseDate,nowLocalTime:baseTime,timezone:timezone,instantIso:context.nowIso,prayerData:x.prayerData,prayerKey:x.prayerKey,offsetMinutes:preference.offsetMinutes});
       if(!generated.ok||!generated.occurrence) return;
       var historicalDate=localDate!==baseDate;
       generated.occurrence.due=generated.occurrence.due&&(historicalDate||reminderLifecycleWindowDue(definition,baseTime));
@@ -6801,9 +6830,11 @@ App.reminderIsWithinQuietHours=function(localTime,quietHours){ return reminderQu
 App.reminderQuietHoursState=reminderQuietHoursState;
 App.reminderPolicyEvaluate=reminderPolicyEvaluate;
 App.reminderSelectNativeCandidates=reminderPolicySelectNativeCandidates;
-App.reminderEngineLocalParts=reminderEngineLocalParts;
-App.reminderOccurrenceId=reminderEngineOccurrenceId;
-App.reminderGenerateOccurrence=reminderEngineGenerateOccurrence;
+  App.reminderClockBoundary=reminderAppClockBoundary;
+  App.reminderEngineInput=function(input){ return reminderAppEngineInput(input); };
+  App.reminderEngineLocalParts=reminderEngineAdapterLocalParts;
+  App.reminderOccurrenceId=function(reminderId,localDate,scheduledAt,timezone,definitionVersion){ var engine=reminderEngineModule(); return engine&&typeof engine.occurrenceId==='function'?engine.occurrenceId(reminderId,localDate,scheduledAt,timezone,definitionVersion):reminderEngineOccurrenceId(reminderId,localDate,scheduledAt,timezone,definitionVersion); };
+  App.reminderGenerateOccurrence=reminderEngineAdapterGenerateOccurrence;
 App.reminderPrayerOccurrence=reminderPrayerOccurrence;
 App.reminderPrayerOccurrences=reminderPrayerOccurrences;
 App.generatePrayerReminderOccurrence=reminderPrayerOccurrence;

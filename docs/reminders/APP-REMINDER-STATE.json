@@ -40,7 +40,7 @@
     "source": "REM-44 boot contract: catalog remains an optional pre-app classic module; state and engine remain app.js-owned App adapters; protected paths preserved",
     "tests": "boot 6 case / 38 assertion, contract 74, full reminder loop, driver, B2 32/32, Panel 50/50, syntax/context/diff PASS",
     "commit": "9d7f910",
-    "remoteEquality": "PASS: approved push origin/main completed at 64cb9177cd54aa375e64db3119488c3fef9ba6a8; final canonical receipt push equality re-verified",
+    "remoteEquality": "PASS: approved push origin/main completed at 64cb9177cd54aa375e64db3119488c3fef9ba6a8; canonical receipt commit 17aead0d0ed31e0b5c9639c3ebe76be394515670 also pushed and equality verified",
     "deployment": "not manually triggered; push to main may trigger the repository Pages workflow; CI/Pages result not separately claimed",
     "deviceAcceptance": "pending; not performed by agent"
   },

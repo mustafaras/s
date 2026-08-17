@@ -10,7 +10,7 @@
 - **Başlangıç HEAD:** `1c8c33c59521c6c7f13f9cf836d6e206b4fa634e`
 - **Bitiş source/test HEAD:** `9d7f910`; canonical closure pointers state/ledger’a işlendi
 - **Approved push receipt:** `64cb9177cd54aa375e64db3119488c3fef9ba6a8` (`git push origin main`)
-- **Final remote check:** approved push sonrası `HEAD = origin/main = remote`; canonical receipt reset commit’i de ayrıca pushlanacak
+- **Final remote check:** approved push sonrası ve canonical receipt reset push’u sonrasında `HEAD = origin/main = remote = 17aead0d0ed31e0b5c9639c3ebe76be394515670`
 - **Release approval:** exact `git push origin main` approval consumed/reset to `NOT_APPROVED` after successful push
 - **Approval evidence:** Exact user message (2026-08-17): “push et en güncel durum olacak şekilde karışıklıga izin verme”
 

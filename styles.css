@@ -1417,3 +1417,8 @@
 @media (max-width:460px){.sey-reminder-overlay{align-items:flex-end}.sey-reminder-screen{border-radius:24px 24px 0 0}.sey-reminder-header{padding-left:14px;padding-right:14px}.sey-reminder-scroll{padding-left:13px;padding-right:13px}.sey-reminder-actions{grid-template-columns:1fr}.sey-reminder-card-meta{grid-template-columns:1fr}.sey-reminder-card-meta span+span{border-left:0;border-top:1px solid var(--card-bd)}}
 @media (max-width:460px){.sey-reminder-retention{padding:13px}.sey-reminder-retention-grid{grid-template-columns:1fr}.sey-reminder-retention-primary-actions{grid-template-columns:1fr}.sey-reminder-retention-actions button{width:100%}}
 @media (prefers-reduced-motion:reduce){.sey-reminder-overlay,.sey-reminder-screen,.sey-reminder-screen *{animation:none!important;transition:none!important;scroll-behavior:auto!important}.sey-reminder-inbox-primary,.sey-reminder-primary{box-shadow:none}}
+
+/* REM-48: unavailable targets remain explicit and the active reminder surface
+   owns the page scroll while it is open. */
+.sey-reminder-unavailable{display:flex;flex-direction:column;gap:3px;padding:10px 11px;border:1px solid color-mix(in srgb,var(--reminder-status-neutral) 34%,var(--card-bd));border-left:3px solid var(--reminder-status-neutral);border-radius:11px;background:color-mix(in srgb,var(--reminder-status-neutral) 7%,var(--card));color:var(--text);font-size:11px;line-height:1.42}
+.sey-reminder-unavailable strong{font-size:11px;font-weight:850}.sey-reminder-unavailable span{color:var(--muted)}.sey-reminder-body-locked{overscroll-behavior:none}

@@ -39,7 +39,7 @@
   "evidence": {
     "source": "REM-43 approved-scope release: reminder retention design candidate and existing current main chain published; runtime/data repo boundaries preserved",
     "tests": "approval-mode full reminder/root/Panel-v2/headless/migration/boundary/syntax/context/diff chain PASS; Pages workflow validation success",
-    "commit": "9654c06",
+    "commit": "ee4c5c2",
     "remoteEquality": "PASS after primary push: local and origin/main both 9654c06c9ccec18e31e05d27bc47d93b51d5f9a4",
     "deployment": "PASS: workflow 32020308731; deployment 5943212723; environment_url https://mustafaras.github.io/s/; live HTTP/cache-bust PASS",
     "deviceAcceptance": "pending; not performed by agent"
@@ -56,6 +56,6 @@
   "closure": {
     "prompt": "REM-43",
     "evidence": "docs/reminders/evidence/REM-43.md",
-    "commit": "9654c06"
+    "commit": "ee4c5c2"
   }
 }

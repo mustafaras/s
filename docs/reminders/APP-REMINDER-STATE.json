@@ -5,7 +5,7 @@
   "activePrompt": "REM-50",
   "blockedPrompt": null,
   "lastCompletedPrompt": "REM-49",
-  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; current approval covers main push, merge path and GitHub Pages deploy only; S5 user-device acceptance remains pending",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -45,14 +45,19 @@
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "not_approved",
-    "scope": [],
-    "evidence": null,
-    "approvedAt": null,
+    "status": "approved",
+    "scope": [
+      "main",
+      "git push origin main",
+      "GitHub Pages workflow/deploy",
+      "read-only remote equality and deployment verification"
+    ],
+    "evidence": "push commit merge deploy — exact current user approval on 2026-08-17",
+    "approvedAt": "2026-08-17T18:49:17+03:00",
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex recorded REM-49 local render lifecycle closure; no push/deploy/external write, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "User approved push/commit/merge/Pages deploy for main; S5 pending, mustafaras/seyma-data remains untouched",
   "closure": {
     "prompt": "REM-49",
     "evidence": "docs/reminders/evidence/REM-49.md",

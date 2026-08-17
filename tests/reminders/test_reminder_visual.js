@@ -110,13 +110,17 @@ runTests([
     assert(visualBlock.includes("min-height:44px"));
     assert(visualBlock.includes("@media (prefers-reduced-motion:reduce)"));
     assert(visualBlock.includes("animation:none!important"));
-    assert(index.includes("styles.css?v=20260816c"));
+    assert(index.includes("styles.css?v=20260817b"));
     assert(index.includes("app.js?v=20260817a"));
   }],
   ["light and dark reminder center renders the same premium hierarchy", () => {
     const out = boot();
     const light = openCenter(out);
     ["sey-reminder-overlay", "sey-reminder-screen", "sey-reminder-header", "sey-reminder-card", "sey-reminder-preview", "sey-reminder-empty"].forEach((className) => assert(light.includes(className)));
+    ["sey-reminder-retention", "sey-reminder-retention-metric", "sey-reminder-retention-primary-actions", "sey-reminder-retention-danger"].forEach((className) => assert(light.includes(className)));
+    assert(light.includes("role=\"list\" aria-label=\"Hatırlatma saklama özeti\""));
+    assert(light.includes("sey-reminder-retention-danger-label"));
+    assert(light.includes("Dikkat · yerel temizleme"));
     assert(light.includes("role=\"dialog\""));
     assert(light.includes("uzun Türkçe metin" ) === false);
     out.sandbox.App.setTheme(true);

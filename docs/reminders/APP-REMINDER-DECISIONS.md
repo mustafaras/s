@@ -602,3 +602,20 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   olarak tutulur; deployment sonrası state tekrar `not_approved` yapılır.
   Source/test, remote/Pages ve S5 cihaz kanıtı birbirine yükseltilmez.
 - **Sonraki adım:** REM-43 yalnız bu scope ile yürütülecek.
+
+### REM-GATE-002 — Release tamamlandı, approval tekrar tüketildi
+
+- **Tarih:** 2026-08-17
+- **Durum:** decided
+- **Soru:** Approved scope release tamamlandıktan sonra release state nasıl
+  tutulmalı?
+- **Kanıt:** `docs/reminders/evidence/REM-43.md`; Pages workflow 32020308731;
+  deployment 5943212723; live `index.html`, `styles.css`, `app.js` HTTP receipt.
+- **Karar:** `main` push, remote equality, Pages success ve live cache-bust
+  kanıtlandıktan sonra approval tek kullanımlık kabul edilip
+  `STATE.releaseApproval` tekrar `not_approved`, boş scope, null evidence ve
+  null approvedAt olur. S5 kullanıcı cihazı kabulü ayrı pending kalır.
+- **Etkiler:** `mustafaras/seyma-data` değişmedi; yeni bir dış release için yeni
+  exact user approval gerekir. `REM-44` yalnız local/runtime prompt olarak
+  açılır, release yetkisi taşımaz.
+- **Sonraki adım:** REM-44 app runtime adapter preflight.

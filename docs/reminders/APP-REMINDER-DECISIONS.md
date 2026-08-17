@@ -507,3 +507,62 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   sync, panel, native copy ve external telemetry yüzeylerine çıkmaz.
 - **Sonraki adım:** REM-35 haftalık sakin özet bu opt-in, score-free ve
   local-only sözleşmeyi değiştirmeden ele alır.
+
+### REM-DISC-008 — R12–R14 fixture ve runtime sahipleri henüz uygulanmış kanıt değildir
+
+- **Tarih:** 2026-08-17
+- **Durum:** deferred
+- **Soru:** Prompt/test matrix’te sahipleri yazılı olan app runtime, current
+  panel ve cross-surface integration işleri mevcut source/test tree’de
+  uygulanmış sayılabilir mi?
+- **Kanıt:** UX planı §14 R12–R14; `APP-REMINDER-TEST-MATRIX.md` G12–G14;
+  `APP-REMINDER-APP-PANEL-SURFACE-MAP.md`; `tests/reminders/` envanteri;
+  `app.js`, `sync.js`, `sw.js`, `panel.js`; REM-39 evidence sınırı.
+- **Karar:** Hayır. `test_reminder_app_*`, gelecekteki
+  `test_reminder_panel_*` ve lineage/cross-surface/integrated fixture aileleri
+  henüz mevcut değil; prompt ve gate satırlarının bulunması PASS veya runtime
+  teslimi kanıtı değildir. REM-44–REM-72 planlı kalır ve her biri kendi
+  allowlist’i içinde source/test/evidence üretmeden ready/done sayılamaz.
+- **Etkiler:** R0–R9/REM-39 kanıtı yalnız mevcut reminder davranışını kapsar;
+  app runtime adapterı, current panel reminder surface’i ve
+  app→sync→projection→panel zinciri ileriye dönük bırakılır. Panel-v2 ayrı
+  regression kanıtıdır. Bu kayıt runtime/data değiştirme izni vermez.
+- **Sonraki adım:** REM-41 evidence freeze; daha sonra sıralı olarak REM-44,
+  REM-55 ve REM-67 hatları.
+
+### REM-DISC-009 — Plan §18 açık ürün kararları release approval değildir
+
+- **Tarih:** 2026-08-17
+- **Durum:** deferred
+- **Soru:** Plan §18’deki 17 açık ürün / release sorusu, mevcut planning
+  kararlarıyla kullanıcı tarafından karara bağlanmış kabul edilebilir mi?
+- **Kanıt:** UX planı §18; `APP-REMINDER-DECISIONS.md` REM-ADR-004/005/019/020;
+  `APP-REMINDER-APPROVAL-GATE.md`; `APP-REMINDER-STATE.json` release approval.
+- **Karar:** Hayır. Planning default’ları ve safety guardrail’leri karar
+  günlüğünde tutulur; bunlar exact kullanıcı release eylemi, branch kapsamı,
+  cihaz kabulü veya `releaseApproval=approved` yerine geçmez. Karar gerektiren
+  kapsamlar REM-41’de listelenir, REM-42’de exact approval olmadan açılmaz.
+- **Etkiler:** REM-40 yalnız traceability ve evidence sahipliğini kapatır;
+  REM-41 freeze olabilir, REM-42 `approval_required` kalır, REM-43
+  çalıştırılamaz. Push, merge, tag, Pages, canlı browser ve external write
+  yapılmaz.
+- **Sonraki adım:** REM-41 packet; kullanıcı kararı gerekiyorsa REM-42 exact
+  scope receipt.
+
+### REM-DISC-010 — G10-A ID sayısı 44 değil 73’tür
+
+- **Tarih:** 2026-08-17
+- **Durum:** discrepancy
+- **Soru:** G10-A test matrix satırındaki “44 ID” ifadesi canonical prompt
+  inventory ile uyumlu mu?
+- **Kanıt:** `APP-REMINDER-TEST-MATRIX.md` eski G10-A satırı;
+  `verify-reminder-context.mjs` içindeki `expectedIds` REM-00…REM-72;
+  prompt/ledger envanteri ve REM-40 traceability matrix.
+- **Karar:** Uyumlu değildi; REM-40 auditinde G10-A şartı `73 contiguous ID`
+  olarak düzeltildi. Validatorın beklediği prompt sayısı ve sırası değişmedi.
+- **Etkiler:** Test gate artık 73 prompt, link/pointer parity ve
+  `not_approved` default’unu açıkça ifade eder. Bu yalnız dokümantasyon
+  düzeltmesidir; prompt eklenmedi, runtime/data değişmedi.
+- **Sonraki adım:** REM-41 release packet içinde aynı 73-ID receipt’ini
+  kullanmak; yeni prompt eklenirse matrix, prompt, ledger, state ve validator
+  birlikte güncellenir.

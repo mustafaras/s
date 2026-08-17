@@ -43,6 +43,7 @@ Her reminder fixture şu mock boundary'leri kullanmalıdır:
 | G0-A | test_reminder_contract.js | Tanım ve helper şekli | Zorunlu alanlar, clone ve unknown preservation | REM-02 |
 | G0-B | test_reminder_catalog.js | Catalog id, copy ve deep-link | Tüm kayıtlar valid ve private copy safe | REM-03 |
 | G0-C | REM-00 audit receipt | Source / plan capability | Kodla plan uyumu kayıtlı | REM-00 |
+| G0-D | APP-REMINDER-DECISIONS.md + contract owner receipt | State / privacy / delivery contract authority | Her contract’ın owner, storage, retention ve privacy sınıfı kayıtlı; approval default korunuyor | REM-01 |
 | G1-A | test_reminder_migration.js | Minimal, malformed, rich, second boot | Additive deep parity | REM-04 |
 | G1-B | test_reminder_privacy.js | Local state ve hassas alanlar | Native / remote / log leakage yok | REM-04 |
 | G1-C | test_reminder_center.js | Settings shell | Permission istemeden render | REM-05 |
@@ -87,7 +88,7 @@ Her reminder fixture şu mock boundary'leri kullanmalıdır:
 | G9-H | test_reminder_visual.js + test_reminder_performance.js | Premium responsive / render cost | İki tema, <=460px, reduced motion, no-op render | REM-37 |
 | G9-I | test_reminder_concurrency.js | Multi-tab / offline / anti-clobber | Duplicate ve full-replace data loss yok | REM-38 |
 | G9-J | test_reminder_retention.js | Retention / export / clear / reset | Private residue ve replay yok | REM-39 |
-| G10-A | verify-reminder-context.mjs | Plan / prompt / ledger / state parity | 44 ID, link, pointer ve approval default PASS | REM-40 |
+| G10-A | verify-reminder-context.mjs | Plan / prompt / ledger / state parity | 73 contiguous ID, link, pointer ve approval default PASS | REM-40 |
 | G10-B | Release candidate receipt | Full evidence freeze | `not_approved`, canlı işlem yok | REM-41 |
 | G10-C | Approval scope receipt | Exact user approval | User evidence + exact scope kaydedilmiş | REM-42 |
 | G11-A | verify-reminder-context.mjs --release-approved | Approved release precondition | Yalnız user-approved scope açılır | REM-43 |
@@ -121,6 +122,26 @@ Her reminder fixture şu mock boundary'leri kullanmalıdır:
 | G14-D | test_reminder_integrated_privacy.js | End-to-end no-write / privacy | No browser, token, data repo or external write; negative suite PASS | REM-70 |
 | G14-E | test_reminder_integrated_ux.js | App / panel UX and a11y | User and operator surfaces remain distinct and accessible | REM-71 |
 | G14-F | REM-72 release packet | App / panel candidate evidence | Separate source, tests, deploy, live, device evidence; `not_approved` | REM-72 |
+
+## REM-40 live inventory reconciliation
+
+Bu bölüm test adının planlanmış olması ile dosyanın mevcut olması arasındaki
+farkı görünür tutar. REM-00–REM-39 için ledger/evidence ve mevcut reminder
+fixture zinciri vardır. G10-A validatorı bu auditte yeniden çalıştırılır.
+
+| Gate grubu | Current repository evidence | REM-40 sonucu |
+|---|---|---|
+| G0–G9 / REM-00–REM-39 | `tests/reminders/` içinde mevcut contract, catalog, state, engine, UX, privacy, native, panel projection, R9 ve retention fixture’ları; ilgili evidence ve ledger satırları mevcut | Executed prompt ownership covered; historical receipts yeniden release/deploy kanıtı sayılmaz |
+| G10-A / REM-40 | `verify-reminder-context.mjs` mevcut; prompt/ledger IDs validator tarafından 73 contiguous bekleniyor | Current audit gate; `G10-A` label corrected from 44 to 73 |
+| G10-B–C / REM-41–42 | Release receipt / exact approval prompt ve gate tanımlı; REM-41/42 evidence henüz yok | Planned / approval boundary; REM-40 bunları ready veya approved yapmaz |
+| G12-A–K / REM-44–54 | Test matrix ve promptlar `test_reminder_app_*` sahiplerini tanımlıyor; current `tests/reminders/` envanterinde bu app-runtime fixture ailesi yok | Deferred to R12; no app-runtime completion claim |
+| G13-A–L / REM-55–66 | Test matrix ve promptlar current-panel fixture sahiplerini tanımlıyor; current envanterde `test_reminder_panel_*` ailesi yok | Deferred to R13; REM-26 no-op evidence remains separate |
+| G14-A–F / REM-67–72 | Lineage / cross-surface / integrated fixture sahipleri tanımlı; current envanterde lineage/cross-surface/integrated files yok | Deferred to R14; no app→sync→projection→panel claim |
+| Panel-v2 | `tests/panel-v2/` ayrı regression scope’u | Current-panel veya integration acceptance yerine geçmez |
+
+Missing future fixture names are a tracked discrepancy/deferred finding in
+`APP-REMINDER-DECISIONS.md` (`REM-DISC-008`); they are not silently treated as
+passing because a prompt or gate row exists.
 
 ## Required time matrix
 

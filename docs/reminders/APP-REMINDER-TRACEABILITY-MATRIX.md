@@ -90,7 +90,7 @@ dosyanın henüz yazılmamış olması beklenen deferred durumdur.
 | REM-44 | §3, §6, §8, §12, §14–15, §19–20 | G12-A | PROMPT-44 exact | evidence/REM-44.md | REM-45 | planned; fixture deferred |
 | REM-45 | §3, §8, §13–14 | G12-B | PROMPT-45 exact | evidence/REM-45.md | REM-46 | planned; fixture deferred |
 | REM-46 | §8, §14–15 | G12-C | PROMPT-46 exact | evidence/REM-46.md | REM-47 | planned; fixture deferred |
-| REM-47 | §8–9, §14–15 | G12-D | PROMPT-47 exact | evidence/REM-47.md | REM-48 | planned; fixture deferred |
+| REM-47 | §8–9, §14–15 | G12-D | PROMPT-47 exact | evidence/REM-47.md | REM-48 | done; app/event lifecycle and sync contract fixtures closed |
 | REM-48 | §6, §9, §12, §15, §19 | G12-E | PROMPT-48 exact | evidence/REM-48.md | REM-49 | planned; fixture deferred |
 | REM-49 | §6, §9, §12, §15 | G12-F | PROMPT-49 exact | evidence/REM-49.md | REM-50 | planned; fixture deferred |
 | REM-50 | §8, §10, §14–15 | G12-G | PROMPT-50 exact | evidence/REM-50.md | REM-51 | planned; fixture deferred |

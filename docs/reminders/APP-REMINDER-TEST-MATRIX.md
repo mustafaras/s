@@ -96,7 +96,7 @@ Her reminder fixture şu mock boundary'leri kullanmalıdır:
 | G12-A | test_reminder_app_boot.js | App script order / global adapter | Constants, catalog, engine ve sync sırası deterministic | REM-44 |
 | G12-B | test_reminder_app_state.js | State ownership / migration | Additive migration, unknown preservation, local delivery ayrımı | REM-45 |
 | G12-C | test_reminder_app_engine.js | Clock / timezone / occurrence adapter | Injected clock, timezone, DST ve stale input deterministic | REM-46 |
-| G12-D | test_reminder_app_event_lifecycle.js | Save / commit / event log | One action, one safe event, no raw body, idempotent retry | REM-47 |
+| G12-D | test_reminder_app_events.js + test_reminder_event_log.js | Save / commit / event log | One action, one safe event, no raw body, idempotent retry | REM-47 |
 | G12-E | test_reminder_app_navigation.js | Center / overlay / deep-link | Focus, back, draft ve target contract PASS | REM-48 |
 | G12-F | test_reminder_app_render.js | Render lifecycle | Empty / stale / pending / error states; unchanged no-op render | REM-49 |
 | G12-G | test_reminder_app_lifecycle.js | Foreground scheduler integration | visibility, focus, pageshow, online ve timer duplicate üretmiyor | REM-50 |

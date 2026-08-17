@@ -38,27 +38,21 @@
   ],
   "evidence": {
     "source": "REM-48 existing Settings IA, App.go/render boundary, single target allowlist, overlay shell, focus return, scroll lock and draft-preserving deep-link handlers; protected paths preserved",
-    "tests": "navigation 40, deep-links 85; full reminder loop, driver, root/Panel-v2 regression, B1/B2/B3, syntax/context/diff PASS",
-    "commit": "0186402",
-    "remoteEquality": "not performed for REM-48; local-only commit and release remains not_approved",
-    "deployment": "not performed for REM-48",
+    "tests": "navigation 40, deep-links 85; approval sonrası full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS; Pages validate ve deploy PASS",
+    "commit": "0f09d4a",
+    "remoteEquality": "local HEAD, origin/main and ls-remote matched 0f09d4a; receipt push and fast-forward PASS",
+    "deployment": "workflow 32040122205 success; GitHub deployment 5946481422 / status 16918582760 success; live HTTP 200",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "approved",
-    "scope": [
-      "current main commit chain: origin/main..HEAD",
-      "git push origin main (fast-forward only)",
-      "main fast-forward / remote equality",
-      "GitHub Pages workflow and deployment verification",
-      "read-only live HTTP and asset cache-bust verification"
-    ],
-    "evidence": "Exact user message (2026-08-17): \"push commit merge canlıya al\"; current main/Pages scope; mustafaras/seyma-data excluded",
-    "approvedAt": "2026-08-17T17:44:15+03:00",
+    "status": "not_approved",
+    "scope": [],
+    "evidence": null,
+    "approvedAt": null,
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex recorded the exact current user approval for current main fast-forward and GitHub Pages release; mustafaras/seyma-data remains excluded",
+  "updatedBy": "Codex recorded successful current main/Pages release 32040122205 / 5946481422 and consumed the single-use approval; S5 pending, mustafaras/seyma-data untouched",
   "closure": {
     "prompt": "REM-48",
     "evidence": "docs/reminders/evidence/REM-48.md",

@@ -9,12 +9,12 @@
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `aba7c486ef825bc7a756e4e273442293d56067fb`
 - **Bitiş HEAD:** `0186402` (runtime/test closure commit)
-- **Release approval:** `NOT_APPROVED`
-- **Approval evidence:** `none`
+- **Release approval after receipt:** `NOT_APPROVED` (single-use approval consumed)
+- **Approval evidence:** exact current user message recorded in STATE; receipt below
 
 ## Kapsam
 
-- **Allowlist:** `app.js`, `styles.css`, `tests/reminders/test_reminder_app_navigation.js`; `index.html` değişmedi çünkü deploy yapılmadı ve mevcut sabit asset contract korunuyor.
+- **Allowlist:** `app.js`, `styles.css`, `tests/reminders/test_reminder_app_navigation.js`; `index.html` asset contract sürümleri korunarak değişmedi.
 - **Protected paths changed:** `no`
 
 ## Sonuç
@@ -47,6 +47,33 @@ canonical target çözümünü kullanıyor.
 | Syntax | `node --check app.js && node --check sync.js` | PASS | syntax temiz |
 | Context / diff | `node docs/reminders/verify-reminder-context.mjs`; `git diff --check` | PASS | 73 prompt, 66 link; whitespace hatası yok |
 
+## Release receipt — 2026-08-17
+
+- **Exact user approval:** `"push commit merge canlıya al"` in the current
+  conversation.
+- **Approved scope:** current `main` commit chain, `git push origin main`
+  fast-forward, resulting GitHub Pages workflow/deployment, remote equality and
+  read-only live HTTP/cache-bust verification.
+- **Out of scope:** `mustafaras/seyma-data`, other remotes, tag, force-push,
+  history rewrite and user-device acceptance. There was no separate PR merge;
+  current `main` was already the release chain and was fast-forward pushed.
+- **Release candidate:** `0f09d4a253202b48c68e0f52efc4d51d7ed9fc7a`.
+- **Push:** `git push origin main`; `b9c1f22..0f09d4a main -> main` — **PASS**.
+- **Remote equality:** local `HEAD`, `origin/main` and
+  `git ls-remote origin refs/heads/main` all resolved to
+  `0f09d4a253202b48c68e0f52efc4d51d7ed9fc7a` — **PASS**.
+- **Workflow:** [Deploy static content to Pages run 32040122205](https://github.com/mustafaras/s/actions/runs/32040122205) — **success**; validate and deploy jobs passed.
+- **Deployment:** GitHub deployment `5946481422`, environment `github-pages`,
+  status `16918582760` — **success**.
+- **Live URL:** [https://mustafaras.github.io/s/](https://mustafaras.github.io/s/) —
+  HTTP 200.
+- **Live assets:** live `index.html`, `app.js` and `styles.css` returned HTTP
+  200 with `last-modified: 2026-08-17 14:46:18 GMT`; live source contained
+  `sey-reminder-body-locked`, `reminderTargetReturnFocusId`,
+  `showReminderUnavailable` and `sey-reminder-unavailable`.
+- **Data safety:** no browser was opened, no generic local server was started,
+  and no write was made to `mustafaras/seyma-data`.
+
 ## Evidence seviyeleri
 
 - **Source evidence:** S1 — Ayarlar girişinin mevcut `App.go` / `render` kabuğunda
@@ -55,14 +82,17 @@ canonical target çözümünü kullanıyor.
 - **Synthetic test evidence:** S2 — fixture’lar memory-only; browser, network,
   Notification ve gerçek kullanıcı verisi kullanılmadı.
 - **Commit evidence:** S3 — `0186402` local commit.
-- **CI / Pages evidence:** N/A — push/deploy yapılmadı.
+- **CI / Pages evidence:** S4 — workflow `32040122205`, deployment
+  `5946481422`, deployment status `16918582760` and live HTTP/cache-bust
+  evidence succeeded.
 - **User-device evidence:** S5 pending — kullanıcı cihazı doğrulaması yapılmadı.
 
 ## Release hard gate
 
-- Push / merge / tag / Pages / external write: `not performed`
+- Push / Pages deployment: `performed within approved current main scope`
+- Separate PR merge / tag / force-push / other remote / external write: `not performed`
 - `mustafaras/seyma-data` write: `not performed`
-- Release state: `NOT_APPROVED`
+- Release state after receipt: `NOT_APPROVED` (approval consumed and reset)
 
 ## Sonraki güvenli adım
 

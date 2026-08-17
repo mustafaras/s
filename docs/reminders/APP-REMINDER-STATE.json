@@ -45,14 +45,20 @@
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "not_approved",
-    "scope": [],
-    "evidence": null,
-    "approvedAt": null,
+    "status": "approved",
+    "scope": [
+      "current main commit chain: origin/main..HEAD",
+      "git push origin main (fast-forward only)",
+      "main fast-forward / remote equality",
+      "GitHub Pages workflow and deployment verification",
+      "read-only live HTTP and asset cache-bust verification"
+    ],
+    "evidence": "Exact user message (2026-08-17): \"push commit merge canlıya al\"; current main/Pages scope; mustafaras/seyma-data excluded",
+    "approvedAt": "2026-08-17T17:44:15+03:00",
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex closed REM-48 with local runtime/test commit 0186402; release remains not_approved and S5 pending",
+  "updatedBy": "Codex recorded the exact current user approval for current main fast-forward and GitHub Pages release; mustafaras/seyma-data remains excluded",
   "closure": {
     "prompt": "REM-48",
     "evidence": "docs/reminders/evidence/REM-48.md",

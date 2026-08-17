@@ -197,5 +197,29 @@ runTests([
     assert(!raw.includes("therapyText"));
     assert(!raw.includes("medicationName"));
     assert(!raw.includes("data.notifications"));
+  }],
+  ["export summary is aggregate-only and contains no private or secret residue", () => {
+    const out = bootAppWithState(privacyState(), {
+      storageSeed: {
+        [DELIVERY_KEY]: JSON.stringify({ entries: [{ occurrenceId: "private-occurrence", status: "shown", recordedAt: "2026-08-14T12:00:00.000Z", nativeBody: "NATIVE_EXPORT_SECRET", therapyBody: "THERAPY_EXPORT_SECRET" }] }),
+        "seyma-reminder-actions-v1": JSON.stringify({ entries: [{ actionId: "private-action", action: "open", status: "completed", reminderId: PRIVATE_ID, recordedAt: "2026-08-14T12:00:00.000Z", medicationDose: "DOSE_EXPORT_SECRET" }] })
+      }
+    });
+    assertEqual(out.error, null);
+    const summary = out.sandbox.App.reminderExportSummary({ download: false, nowIso: "2026-08-17T12:00:00.000Z" });
+    const text = JSON.stringify(summary);
+    [
+      "PRIVATE_DETAIL_FIXTURE", "SENSITIVE_NOTE_FIXTURE", "SECRET_FIXTURE", "MEDICATION_NAME_FIXTURE",
+      "PRIVATE_LABEL_FIXTURE", "MEDICATION_NOTE_FIXTURE", "HEALTH_TEXT_FIXTURE", "DOSE_FIXTURE",
+      "NATIVE_EXPORT_SECRET", "THERAPY_EXPORT_SECRET", "DOSE_EXPORT_SECRET", "ghToken", "openaiKey", "syncUrl"
+    ].forEach((secret) => assert(!text.includes(secret)));
+    assertEqual(summary.localOnly, true);
+    assertEqual(summary.privacyBoundary.rawNote, false);
+    assertEqual(summary.privacyBoundary.therapyBody, false);
+    assertEqual(summary.privacyBoundary.medicationDose, false);
+    assertEqual(summary.privacyBoundary.token, false);
+    assertEqual(summary.privacyBoundary.syncSecret, false);
+    assert(!Object.prototype.hasOwnProperty.call(summary, "entries"));
+    assert(!Object.prototype.hasOwnProperty.call(summary, "preferencesRaw"));
   }]
 ]).catch(() => process.exitCode = 1);

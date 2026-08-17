@@ -40,19 +40,19 @@
     "source": "REM-44 boot contract: catalog remains an optional pre-app classic module; state and engine remain app.js-owned App adapters; protected paths preserved",
     "tests": "boot 6 case / 38 assertion, contract 74, full reminder loop, driver, B2 32/32, Panel 50/50, syntax/context/diff PASS",
     "commit": "9d7f910",
-    "remoteEquality": "not evaluated for REM-44; no push performed",
-    "deployment": "not performed",
+    "remoteEquality": "pending exact approved push to origin/main",
+    "deployment": "not manually triggered; a push to main may trigger the repository Pages workflow",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "not_approved",
-    "scope": [],
-    "evidence": null,
-    "approvedAt": null,
+    "status": "approved",
+    "scope": ["git push origin main"],
+    "evidence": "Exact user message (2026-08-17): push et en güncel durum olacak şekilde karışıklıga izin verme; scope current main -> origin/main only; mustafaras/seyma-data excluded",
+    "approvedAt": "2026-08-17T14:49:41+03:00",
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-44 boot contract closed locally; release remains not_approved; REM-45 ready; S5 pending",
+  "updatedBy": "Codex exact current user approval recorded for git push origin main; push pending; REM-45 ready; S5 pending",
   "closure": {
     "prompt": "REM-44",
     "evidence": "docs/reminders/evidence/REM-44.md",

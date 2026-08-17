@@ -9,8 +9,8 @@
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `1c8c33c59521c6c7f13f9cf836d6e206b4fa634e`
 - **Bitiş source/test HEAD:** `9d7f910`; canonical closure pointers state/ledger’a işlendi
-- **Release approval:** `NOT_APPROVED`
-- **Approval evidence:** `none`
+- **Release approval:** `approved` for `git push origin main` only; consumed/reset after push
+- **Approval evidence:** Exact user message (2026-08-17): “push et en güncel durum olacak şekilde karışıklıga izin verme”
 
 ## Kapsam
 
@@ -54,7 +54,7 @@
 
 ## Release hard gate
 
-- Push / merge / tag / Pages / external write: **not performed**
+- Push / merge / tag / Pages / external write: **push origin/main authorized; execution pending**
 - `mustafaras/seyma-data` write: **not performed**
 - Browser / real localStorage / real notification / network: **not used**
 - `releaseApproval`: **NOT_APPROVED**

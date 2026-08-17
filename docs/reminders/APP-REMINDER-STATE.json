@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-45",
+  "activePrompt": "REM-46",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-44",
-  "nextSafeAction": "REM-45 App state schema / ownership / additive migration; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "lastCompletedPrompt": "REM-45",
+  "nextSafeAction": "REM-46 App clock, timezone ve engine adapter; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-44 boot contract: catalog remains an optional pre-app classic module; state and engine remain app.js-owned App adapters; protected paths preserved",
-    "tests": "boot 6 case / 38 assertion, contract 74, full reminder loop, driver, B2 32/32, Panel 50/50, syntax/context/diff PASS",
-    "commit": "9d7f910",
-    "remoteEquality": "PASS: approved push origin/main completed at 64cb9177cd54aa375e64db3119488c3fef9ba6a8; canonical receipt commit 17aead0d0ed31e0b5c9639c3ebe76be394515670 also pushed and equality verified",
-    "deployment": "not manually triggered; push to main may trigger the repository Pages workflow; CI/Pages result not separately claimed",
+    "source": "REM-45 owner contract: catalog definitionVersion, canonical local preference, derived occurrence/suppression, bounded local delivery journal and pre-sync privacy gate; protected paths preserved",
+    "tests": "app state 52, migration 50, B2 32/32, driver, full reminder/root/Panel-v2 loops, syntax/context/diff PASS",
+    "commit": "e4589435a1cd6421ae56e65b1e96ddac9e18973b",
+    "remoteEquality": "not re-verified after REM-45 local commit; origin remains the prior remote baseline",
+    "deployment": "not performed; REM-45 commit is local and no Pages/deploy action was triggered",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex exact user-approved git push origin main completed at 64cb9177; approval consumed/reset; REM-45 ready; S5 pending",
+  "updatedBy": "Codex REM-45 local implementation and closure evidence completed; release remains not_approved; REM-46 ready; S5 pending",
   "closure": {
-    "prompt": "REM-44",
-    "evidence": "docs/reminders/evidence/REM-44.md",
-    "commit": "9d7f910"
+    "prompt": "REM-45",
+    "evidence": "docs/reminders/evidence/REM-45.md",
+    "commit": "e4589435a1cd6421ae56e65b1e96ddac9e18973b"
   }
 }

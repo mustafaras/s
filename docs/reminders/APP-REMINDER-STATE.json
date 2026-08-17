@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-41",
+  "activePrompt": "REM-42",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-40",
-  "nextSafeAction": "REM-41 Release candidate freeze ve evidence packet; runtime/data edit yok; S5 kullanıcı cihazı kabulü pending; releaseApproval=not_approved; no release action",
+  "lastCompletedPrompt": "REM-41",
+  "nextSafeAction": "REM-42 exact current user approval scope receipt; then REM-43 only for approved main/Pages release actions; mustafaras/seyma-data write remains out of scope",
   "currentPhase": "R10",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-40 section-level reconciliation: plan §1–§21 each mapped to prompts, test gates, allowlists, evidence owners, decisions and next dependencies; R12–R14 source/test gaps explicitly deferred; no runtime/data edit",
-    "tests": "verify-reminder-context.mjs PASS (73 prompts, 66 local links, approval=not_approved); node --check docs/reminders/verify-reminder-context.mjs PASS; git diff --check PASS; traceability count PASS (21 sections, 73 prompt rows); source/test inventory confirms R12–R14 fixture families are not present and are not claimed",
-    "commit": "9369e6e3501da24e7ef13c16ac980d7717e1c4cc",
+    "source": "REM-41 release candidate freeze: reminder retention card hierarchy, metric separation, responsive action grouping and isolated destructive area; behavior/data boundaries unchanged",
+    "tests": "full reminder/root/Panel-v2/headless/migration/boundary/syntax/context/diff chain PASS; context 73 prompts / 66 local links / approval=not_approved; retention visual fixture covers the new metric and danger-group markup",
+    "commit": "a0e8909",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-40 closure; G10-A complete; REM-41 ready; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-41 closure; G10-B complete; REM-42 approval_required; S5 pending; release remains not_approved",
   "closure": {
-    "prompt": "REM-40",
-    "evidence": "docs/reminders/evidence/REM-40.md",
-    "commit": "9369e6e3501da24e7ef13c16ac980d7717e1c4cc"
+    "prompt": "REM-41",
+    "evidence": "docs/reminders/evidence/REM-41.md",
+    "commit": "a0e8909"
   }
 }

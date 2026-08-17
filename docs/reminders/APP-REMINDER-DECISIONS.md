@@ -566,3 +566,22 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Sonraki adım:** REM-41 release packet içinde aynı 73-ID receipt’ini
   kullanmak; yeni prompt eklenirse matrix, prompt, ledger, state ve validator
   birlikte güncellenir.
+
+### REM-UX-011 — Retention kartında bilgi hiyerarşisi ve yıkıcı aksiyon ayrımı
+
+- **Tarih:** 2026-08-17
+- **Durum:** decided
+- **Soru:** Reminder Center “Saklama ve çıkış” kartındaki sıkışık metrikler ve
+  aynı ağırlıktaki aksiyonlar release candidate’a kalabilir mi?
+- **Kanıt:** Kullanıcının 2026-08-17 tarihli ekran görüntüsü; `app.js`
+  `reminderCenterRetentionHTML`; `styles.css` REM-37 visual block;
+  `tests/reminders/test_reminder_visual.js`; `evidence/REM-41.md`.
+- **Karar:** Hayır. Etiket/değer/meta blokları ayrılacak, güvenli ve geri
+  alınabilir işlemler birlikte gruplanacak, reminder-only sıfırlama ayrı dikkat
+  alanında gösterilecek. Copy kısa tutulacak; davranış ve privacy sınırı aynı
+  kalacak.
+- **Etkiler:** `a0e8909` yalnız reminder retention HTML/CSS/cache-bust ve
+  ilgili headless visual assertion’ını değiştirir; `data/`, sync sözleşmesi,
+  reset/undo davranışı ve gerçek veri deposu etkilenmez.
+- **Sonraki adım:** REM-42 exact user approval scope; sonra yalnız onaylanan
+  main/Pages release adımları.

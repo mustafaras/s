@@ -40,8 +40,8 @@
     "source": "REM-50 deterministic foreground trigger matrix, burst coalescing, independent poll/reminder timers, foreground-only capability and bounded recovery catch-up; protected paths preserved",
     "tests": "app lifecycle 51, existing lifecycle 36, catch-up 46; full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS",
     "commit": "b0bba5d",
-    "remoteEquality": "pending standing after_each_prompt main/Pages delivery receipt",
-    "deployment": "pending standing after_each_prompt main/Pages delivery receipt",
+    "remoteEquality": "local HEAD, origin/main and ls-remote matched 1bc3423; standing main fast-forward PASS",
+    "deployment": "workflow 32055069139 success; GitHub Pages deployment 5948958130 / status 16924647867 success; live HTTP 200; deployed app.js?v=20260817a lifecycle markers verified",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,7 +75,7 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "REM-50 closure source/test evidence recorded; standing after_each_prompt delivery remains pending; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "REM-50 closure and standing after_each_prompt main/Pages receipt recorded; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
     "prompt": "REM-50",
     "evidence": "docs/reminders/evidence/REM-50.md",

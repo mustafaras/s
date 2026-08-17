@@ -8,7 +8,7 @@
 - **Commit:** `b0bba5d`
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `986ce137c5e679cc49eea8d8ed613f253914c36b`
-- **Bitiş HEAD:** `b0bba5d` (runtime/test commit; closure receipt docs commit is recorded in STATE)
+- **Bitiş HEAD:** `1bc3423` (closure receipt docs commit)
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -52,16 +52,33 @@ catch-up üst sınırı 24 saat ve in-app only.
   localStorage, real network, notification, sync/data repo ve external telemetry
   kullanılmadı.
 - **Commit evidence:** S3 — local runtime/test commit `b0bba5d`.
-- **CI / Pages evidence:** S4 — closure sonrası standing main/Pages delivery
-  receipt’i ayrıca eklenecek.
+- **CI / Pages evidence:** S4 — standing main/Pages delivery receipt below;
+  workflow validation/deploy and live HTTP/cache-bust marker PASS.
 - **User-device evidence:** S5 pending — kullanıcı cihazında doğrulama yapılmadı.
+
+## Release receipt — 2026-08-17
+
+- **Standing scope:** current `main` fast-forward, `origin/main`, GitHub Pages
+  workflow/deploy, read-only remote equality and live HTTP/cache-bust check.
+- **Push:** `git push origin main`; `6256311..1bc3423 main -> main` — PASS.
+- **Remote equality:** local `HEAD`, `origin/main` and
+  `git ls-remote origin refs/heads/main` all equal `1bc3423` — PASS.
+- **Workflow:** [Deploy static content to Pages run 32055069139](https://github.com/mustafaras/s/actions/runs/32055069139) — validate and deploy success.
+- **Deployment:** GitHub Pages deployment `5948958130`, status
+  `16924647867`, environment `github-pages` — success.
+- **Live URL:** [https://mustafaras.github.io/s/](https://mustafaras.github.io/s/) — HTTP 200.
+- **Live asset:** `app.js?v=20260817a` contains `REMINDER_SCHEDULER_BURST_MS`,
+  `reminderSchedulerDispatch`, `backgroundScheduling:false` and
+  `trigger-burst` markers.
+- **Data safety:** browser açılmadı; `mustafaras/seyma-data` ve başka gerçek
+  data repo’suna yazılmadı; S5 cihaz acceptance yapılmadı.
 
 ## Release hard gate
 
-- **Push / merge / tag / Pages / external write:** closure sonrası standing
-  `after_each_prompt` delivery kapsamı dışında henüz yapılmadı.
+- **Push / merge / Pages:** `performed within standing after_each_prompt main/Pages scope`.
+- **Tag / force-push / history rewrite / other remote / arbitrary external write:** `not performed`.
 - **`mustafaras/seyma-data` write:** `not performed`.
-- **Release state:** `NOT_APPROVED`.
+- **Release state after receipt:** `NOT_APPROVED` (ad hoc release approval tüketilmedi).
 
 ## Sonuç
 

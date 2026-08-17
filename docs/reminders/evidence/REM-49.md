@@ -10,7 +10,7 @@
 - **Başlangıç HEAD:** `5ec31cdd2c4b7e8ee20b22b2024d0551468b02f9`
 - **Bitiş HEAD:** `97d7f5e54cffe960d6fada7870d6a066263f967e` (runtime/test closure commit)
 - **Release approval:** `NOT_APPROVED`
-- **Approval evidence:** `none`
+- **Approval evidence:** deployment sonrası tüketildi; exact current user approval receipt STATE’te kaydedildi
 
 ## Kapsam
 
@@ -47,14 +47,36 @@ focus/draft/overlay/tab bağlamını bounded history içinde taşıyor.
 - **Synthetic test evidence:** S2 — memory-only VM fixtures; browser, network,
   Notification ve gerçek kullanıcı verisi kullanılmadı.
 - **Commit evidence:** S3 — local commit `97d7f5e`.
-- **CI / Pages evidence:** N/A — push/deploy yapılmadı.
+- **CI / Pages evidence:** S4 — approved `main` push, workflow `32043560167`,
+  Pages deployment `5946846653`, deployment status `16919614871`, live HTTP 200
+  ve query URL asset marker kanıtı başarılı.
 - **User-device evidence:** S5 pending — kullanıcı cihazı doğrulaması yapılmadı.
+
+## Release receipt — 2026-08-17
+
+- **Approved scope:** current local `main` chain `07468d5`, `origin/main`
+  fast-forward, GitHub Pages workflow/deploy ve read-only remote/live verification.
+- **Push / merge path:** `git push origin main`; `5ec31cd..07468d5 main -> main`
+  — PASS. Ayrı branch/PR merge gerekmedi; `main` fast-forward edildi.
+- **Remote equality:** local `HEAD`, `origin/main` ve
+  `git ls-remote origin refs/heads/main` eşit `07468d5` — PASS.
+- **Workflow:** [Deploy static content to Pages run 32043560167](https://github.com/mustafaras/s/actions/runs/32043560167) — validate ve deploy success.
+- **Deployment:** GitHub Pages deployment `5946846653`, status
+  `16919614871`, environment `github-pages` — success.
+- **Live URL:** [https://mustafaras.github.io/s/](https://mustafaras.github.io/s/) — HTTP 200.
+- **Live assets:** `app.js?v=20260817a` REM-49 `reminderRenderAction`,
+  `data-reminder-render-target` ve `candidate-unchanged` marker’larını;
+  `styles.css?v=20260817b` REM-49 targeted-paint/reduced-motion marker’ını
+  taşıyor.
+- **Data safety:** browser açılmadı; `mustafaras/seyma-data` ve başka gerçek
+  veri deposuna yazılmadı; kullanıcı cihazı acceptance yapılmadı.
 
 ## Release hard gate
 
-- **Push / merge / tag / Pages / external write:** `not performed`
+- **Push / merge / Pages:** `performed within exact current approved main/Pages scope`
+- **Tag / force-push / history rewrite / other remote / external write:** `not performed`
 - **`mustafaras/seyma-data` write:** `not performed`
-- **Release state:** `NOT_APPROVED`
+- **Release state after receipt:** `NOT_APPROVED` (approval consumed)
 
 ## Sonuç
 

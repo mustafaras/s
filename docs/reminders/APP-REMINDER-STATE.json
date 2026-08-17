@@ -5,7 +5,7 @@
   "activePrompt": "REM-50",
   "blockedPrompt": null,
   "lastCompletedPrompt": "REM-49",
-  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; current approval covers main push, merge path and GitHub Pages deploy only; S5 user-device acceptance remains pending",
+  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -39,25 +39,20 @@
   "evidence": {
     "source": "REM-49 render policy, target markers, live regions, action receipts and reduced-motion boundary; protected paths preserved",
     "tests": "app render 30, performance 20; full reminder/root/Panel-v2/B1/B2/B3/driver/syntax/context/diff PASS",
-    "commit": "97d7f5e",
-    "remoteEquality": "not performed; local-only commit",
-    "deployment": "not performed; release remains not_approved",
+    "commit": "07468d5",
+    "remoteEquality": "local HEAD, origin/main and ls-remote matched 07468d5; approved fast-forward push PASS",
+    "deployment": "workflow 32043560167 success; GitHub Pages deployment 5946846653 / status 16919614871 success; live HTTP 200; query URL asset markers verified",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "approved",
-    "scope": [
-      "main",
-      "git push origin main",
-      "GitHub Pages workflow/deploy",
-      "read-only remote equality and deployment verification"
-    ],
-    "evidence": "push commit merge deploy — exact current user approval on 2026-08-17",
-    "approvedAt": "2026-08-17T18:49:17+03:00",
+    "status": "not_approved",
+    "scope": [],
+    "evidence": null,
+    "approvedAt": null,
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "User approved push/commit/merge/Pages deploy for main; S5 pending, mustafaras/seyma-data remains untouched",
+  "updatedBy": "REM-49 main/Pages release succeeded under exact current approval; approval consumed and reset, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
     "prompt": "REM-49",
     "evidence": "docs/reminders/evidence/REM-49.md",

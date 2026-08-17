@@ -5,7 +5,7 @@
   "activePrompt": "REM-50",
   "blockedPrompt": null,
   "lastCompletedPrompt": "REM-49",
-  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "nextSafeAction": "REM-50 App foreground lifecycle ve scheduler orchestration; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -51,8 +51,31 @@
     "approvedAt": null,
     "approvedBy": "user"
   },
+  "promptDeliveryPolicy": {
+    "status": "active",
+    "mode": "after_each_prompt",
+    "trigger": "successful prompt closure only",
+    "scope": [
+      "main",
+      "origin/main",
+      "GitHub Pages workflow/deploy",
+      "read-only remote equality, deployment and live HTTP/cache-bust receipt"
+    ],
+    "mergePath": "main fast-forward; no PR merge when current branch is main",
+    "excluded": [
+      "mustafaras/seyma-data",
+      "other remotes",
+      "tag",
+      "force-push",
+      "history rewrite",
+      "arbitrary external write",
+      "user-device acceptance"
+    ],
+    "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
+    "approvedBy": "user"
+  },
   "updatedAt": "2026-08-17",
-  "updatedBy": "REM-49 main/Pages release succeeded under exact current approval; approval consumed and reset, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "Standing after_each_prompt delivery policy recorded from current user instruction; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
     "prompt": "REM-49",
     "evidence": "docs/reminders/evidence/REM-49.md",

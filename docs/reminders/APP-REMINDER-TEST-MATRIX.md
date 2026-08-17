@@ -93,6 +93,7 @@ Her reminder fixture şu mock boundary'leri kullanmalıdır:
 | G10-C | Approval scope receipt | Exact user approval | User evidence + exact scope kaydedilmiş | REM-42 |
 | G11-A | verify-reminder-context.mjs --release-approved | Approved release precondition | Yalnız user-approved scope açılır | REM-43 |
 | G11-B | Remote / CI / Pages / live receipt | Deployment evidence | Kaynak, test, deploy ve device ayrı | REM-43 |
+| G11-C | promptDeliveryPolicy=after_each_prompt | Her başarılı prompt closure teslimatı | main fast-forward, Pages, remote equality, deployment status, live HTTP/cache-bust receipt; data repo ve S5 ayrı | REM-00…REM-72 |
 | G12-A | test_reminder_app_boot.js | App script order / global adapter | Constants, catalog, engine ve sync sırası deterministic | REM-44 |
 | G12-B | test_reminder_app_state.js | State ownership / migration | Additive migration, unknown preservation, local delivery ayrımı | REM-45 |
 | G12-C | test_reminder_app_engine.js | Clock / timezone / occurrence adapter | Injected clock, timezone, DST ve stale input deterministic | REM-46 |
@@ -218,18 +219,18 @@ Her prompt başlangıcında ve kapanışında çalıştır:
 
     node docs/reminders/verify-reminder-context.mjs
 
-Bu command prompt / ledger / traceability / state / local link parity’sini ve
-default approval lock’unu doğrular. `--release-approved` yalnız kullanıcıdan
-exact current approval alındıktan, scope state’e kaydedildikten ve REM-43
-precondition’ları sağlandıktan sonra kullanılabilir. Planlama sırasında bu
-flag’i kullanmak veya state’i `approved` yapmak kontrol ihlalidir.
+Bu command prompt / ledger / traceability / state / local link parity’sini,
+`promptDeliveryPolicy=after_each_prompt` kaydını ve default approval lock’unu
+doğrular. `--release-approved` yalnız standing scope dışındaki ad hoc/final
+release için exact current approval alındıktan sonra kullanılabilir. Planlama
+sırasında bu flag’i kullanmak veya state’i `approved` yapmak kontrol ihlalidir.
 
 ## Live release prohibition
 
-Bu matrisin PASS olması canlıya alma yetkisi değildir. Kullanıcının açık,
-güncel ve kapsamı belirli onayı yoksa `git push`, merge, tag, Pages deploy,
-production write, canlı browser doğrulaması ve dış sistem write yapılmaz.
-`mustafaras/seyma-data` için ayrıca açık veri yazma onayı gerekir. Release
+Bu matrisin PASS olması standing closure teslimatının yerine geçmez. `done` ve
+closure PASS sonrası standing policy `main` fast-forward + Pages receipt’ini
+kapsar; bunun dışındaki merge, tag, production write, canlı browser doğrulaması
+ve dış sistem write yapılmaz. `mustafaras/seyma-data` için ayrıca açık veri yazma onayı gerekir. Release
 receipt’te approval status, scope ve evidence yoksa sonuç `NOT_APPROVED` olarak
 kalır.
 

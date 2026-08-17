@@ -98,6 +98,14 @@ if (state) {
   assert(expectedIds.includes(state.activePrompt), `state activePrompt invalid: ${state.activePrompt}`);
   assert(state.blockedPrompt === null || expectedIds.includes(state.blockedPrompt), "state blockedPrompt invalid");
   assert(state.releaseApproval && typeof state.releaseApproval === "object", "state releaseApproval missing");
+  const delivery = state.promptDeliveryPolicy || {};
+  assert(delivery.status === "active", "state promptDeliveryPolicy.status must be active");
+  assert(delivery.mode === "after_each_prompt", "state promptDeliveryPolicy.mode must be after_each_prompt");
+  assert(Array.isArray(delivery.scope) && delivery.scope.includes("main") && delivery.scope.includes("GitHub Pages workflow/deploy"), "prompt delivery scope must include main and GitHub Pages");
+  assert(delivery.mergePath && delivery.mergePath.includes("fast-forward"), "prompt delivery mergePath must be fast-forward");
+  assert(Array.isArray(delivery.excluded) && delivery.excluded.includes("mustafaras/seyma-data") && delivery.excluded.includes("force-push"), "prompt delivery exclusions must protect data repo and force-push");
+  assert(delivery.approvedBy === "user", "prompt delivery policy must be user-authorized");
+  assert(delivery.evidence && delivery.evidence.includes("her prompttan sonra"), "prompt delivery policy must retain exact user evidence");
   assert(ledgerText.includes(`| ${state.activePrompt} |`), "state activePrompt missing from ledger");
 
   const approval = state.releaseApproval || {};
@@ -115,6 +123,7 @@ if (state) {
 }
 
 assert(read("docs/reminders/APP-REMINDER-APPROVAL-GATE.md").includes("NOT_APPROVED"), "approval gate must default to NOT_APPROVED");
+assert(read("docs/reminders/APP-REMINDER-APPROVAL-GATE.md").includes("after_each_prompt"), "approval gate must document after_each_prompt delivery");
 assert(read("docs/reminders/APP-REMINDER-CONTEXT.md").includes("Kullanıcı onayı olmadan canlılık kilidi"), "context must document the live approval lock");
 assert(read("docs/reminders/APP-REMINDER-TRACEABILITY-MATRIX.md").includes("Senkron güncelleme sırası"), "traceability matrix must document sync order");
 assert(read("docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md").includes("Gap register"), "app/panel surface map must contain the gap register");

@@ -619,3 +619,21 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   exact user approval gerekir. `REM-44` yalnız local/runtime prompt olarak
   açılır, release yetkisi taşımaz.
 - **Sonraki adım:** REM-44 app runtime adapter preflight.
+
+### REM-GATE-003 — Her başarılı prompt sonrası bounded main/Pages teslimatı
+
+- **Tarih:** 2026-08-17
+- **Durum:** decided
+- **Soru:** Kullanıcının “her prompttan sonra bu yapılsın bunu düzenler misin”
+  talimatı prompt zincirinin dış teslimat sırasını değiştiriyor mu?
+- **Kanıt:** exact current user message; `APP-REMINDER-APPROVAL-GATE.md`;
+  `APP-REMINDER-CONTEXT.md`; `APP-REMINDER-STATE.json`.
+- **Karar:** Evet. Her prompt closure validator PASS sonrası dar commit,
+  `main` fast-forward push/merge, GitHub Pages workflow/deploy, remote equality,
+  deployment status ve live HTTP/cache-bust receipt aynı kapanış akışının zorunlu
+  parçasıdır. `releaseApproval` bu standing scope için `approved` yapılmaz;
+  ad hoc/final release kilidi `not_approved` kalır.
+- **Dışarıda:** `mustafaras/seyma-data`, başka remote, tag, force-push, history
+  rewrite, arbitrary external write ve kullanıcı cihazı acceptance.
+- **Sonraki adım:** REM-50 ve sonraki her başarılı prompt bu delivery policy ile
+  kapanır; Pages/remote failure promptu blocked bırakır.

@@ -8,7 +8,7 @@ Her başlık altındaki prompt tek başına yeni bir session'a verilebilir. Ajan
 
 Plan ürün authority'sidir. Kod veya test planla çelişiyorsa ajan varsayım yapmaz; discrepancy yazar ve blocked olur.
 
-Tüm promptlarda ortak sert sınırlar vardır: gerçek browser yok, gerçek veri repo'suna yazma yok, token veya özel veri isteme yok, testte gerçek ağ yok, kullanıcı açıkça ve kapsamı belirli şekilde onaylamadan push / merge / deploy yok.
+Tüm promptlarda ortak sert sınırlar vardır: gerçek browser yok, gerçek veri repo'suna yazma yok, token veya özel veri isteme yok, testte gerçek ağ yok. Başarılı prompt closure’ından sonra `promptDeliveryPolicy=after_each_prompt` gereği yalnız `main` fast-forward → GitHub Pages teslimatı yapılır; `mustafaras/seyma-data`, tag, force-push, başka remote ve cihaz kabulü bu kapsama girmez.
 
 ## Tüm promptlar için context / auto-compact güvenlik sözleşmesi
 
@@ -30,9 +30,28 @@ kopyalandığında da birlikte taşınır.
   ledger, prompt parity ve Git durumunu yeniden doğrulamadan önceki işin
   tamamlandığını varsayamaz; sonraki REM'e otomatik ilerleyemez.
 - Handoff kompakt ve eyleme dönük olmalı; tam tarihçe append-only ledger veya
-  evidence dosyasında kalır. `releaseApproval.status` bu süreçte değişmez.
+  evidence dosyasında kalır. `releaseApproval.status` standing prompt delivery
+  sırasında `approved` yapılmaz.
 
-Canlıya alma için canonical kilit [`APP-REMINDER-APPROVAL-GATE.md`](APP-REMINDER-APPROVAL-GATE.md)'dir. Varsayılan state `NOT_APPROVED` kalır. Yeşil test, local commit, `ready_for_user_acceptance`, “tamam”, “devam” veya eski sohbet mesajı kullanıcı onayı değildir. `mustafaras/seyma-data` yazımı için canlıya alma onayından bağımsız ayrıca açık veri yazma izni gerekir.
+Canlıya alma için canonical kilit [`APP-REMINDER-APPROVAL-GATE.md`](APP-REMINDER-APPROVAL-GATE.md)'dir. Ad hoc/final release için state `NOT_APPROVED` kalır. Her başarılı prompt closure’ı için `promptDeliveryPolicy=after_each_prompt` main/Pages teslimatını açar; yeşil test veya local commit tek başına kanıt değildir. `mustafaras/seyma-data` yazımı için ayrıca açık veri yazma izni gerekir.
+
+## Her başarılı prompt sonrası otomatik teslimat sözleşmesi
+
+Prompt `done` olmadan ve closure validator PASS vermeden dış teslimat yapılmaz.
+Closure PASS sonrasında her prompt için aynı sıra uygulanır:
+
+1. Prompt’a özel testler, gerekli regresyonlar, `git diff --check` ve closure receipt.
+2. Prompt ID’li dar commit; yalnız allowlist ve closure kayıtları.
+3. `git push origin main`; current branch `main` ise ayrı PR merge açılmaz,
+   fast-forward merge yolu kullanılır.
+4. GitHub Pages validate/deploy workflow’unu bekle; geçici action download
+   hatasında bounded retry, kalıcı failure’da promptu blocked bırak.
+5. `HEAD == origin/main == git ls-remote` ve Pages deployment status doğrula.
+6. Live HTTP/cache-bust asset marker’larını read-only doğrula ve S4 receipt’e
+   yaz. S5 kullanıcı cihazı acceptance’ını ayrı pending tut.
+
+Bu sözleşme release approval’ı `approved` yapmaz; standing scope dışındaki
+release, tag, başka remote veya external write için yeni exact approval gerekir.
 
 Önerilen yeni test dosyaları mevcut olmayabilir; ilgili prompt onları oluşturur. Mevcut testler silinmez, taşınmaz ve sessizce zayıflatılmaz.
 
@@ -60,8 +79,9 @@ Sonra context senkronizasyonunu doğrula:
 
 Bu komut başarısızsa prompt başlatılmaz; prompt / ledger / state / traceability
 elle varsayımla düzeltilmez. Release veya canlı kelimesi geçen promptlarda
-approval gate ayrıca okunur ve `releaseApproval.status` `approved` değilse
-yalnız hazırlık yapılır.
+approval gate ayrıca okunur. Standing prompt delivery scope’u kullanılacaksa
+`promptDeliveryPolicy` ve closure gate doğrulanır; standing scope dışındaki
+işlem için `releaseApproval.status=approved` ve exact scope gerekir.
 
 State içindeki activePrompt ile seçilen prompt ID aynı değilse hiçbir edit yapma. blockedPrompt doluysa önce o blocker çözülür.
 
@@ -84,11 +104,15 @@ Tüm testler geçmeden commit veya done yoktur. Başarılı ajan:
 - `node docs/reminders/verify-reminder-closure.mjs REM-XX` çalıştırır; bu gate
   PASS olmadan promptu `done`, sonraki promptu `ready` veya handoff'u tamamlanmış
   saymaz;
+- closure PASS sonrası standing delivery checklist’ini çalıştırır: dar commit,
+  `main` fast-forward push/merge, Pages deploy, remote equality, deployment
+  status, live HTTP/cache-bust ve release receipt;
 - SESSION-HANDOFF-TEMPLATE.md ile kısa handoff verir.
 
 Hiçbir kapanış adımı `releaseApproval.status` değerini kendi kendine
-`approved` yapamaz. Onay verilmediyse kapanışta açıkça `NOT_APPROVED` ve
-`live action: not performed` yazılır.
+`approved` yapamaz. Standing delivery tamamlanırsa receipt’te
+`promptDeliveryPolicy=after_each_prompt`, release approval `NOT_APPROVED`,
+S5 pending ve data repo `not performed` açıkça yazılır.
 
 Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit etme. blockedPrompt ayarla, exact command / beklenen / gözlenen / etkiyi ledger ve decisions log'a yaz, sonraki prompta geçme.
 
@@ -1044,7 +1068,7 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 
 **Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-29` PASS olmadan done/ready/handoff verme.
 
-**Hedef:** Push yapmadan source, test, remote, Pages ve device kanıtlarını birbirine karıştırmadan release packet hazırla.
+**Hedef:** Closure öncesi source, test, remote, Pages ve device kanıtlarını birbirine karıştırmadan release packet hazırla; closure PASS sonrası standing delivery receipt’ini tamamla.
 
 **Oku:** AGENTS Git/deploy ve evidence-level kuralları; tüm ledger; REM-28 receipt.
 
@@ -1053,7 +1077,7 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
 **Görev:**
 
 1. Source SHA, test summary, migration/privacy/accessibility receipt ve allowlist audit'i ayrı bölümlerde yaz.
-2. Push / merge / deploy yapılmadığını veya açık yetki varsa sonraki ayrı işlemi belirt.
+2. Closure öncesi dış teslim yapılmadığını; closure PASS sonrası standing main/Pages teslimatını ayrı belirt.
 3. Clean/incognito user-device checklist hazırla: permission, lock-screen privacy, deep-link, quiet hours, app-closed limitation, iOS/Android farkı ve user confirmation.
 4. Evidence level kullan; definitely fixed deme.
 5. Deferred / blocked maddeleri release-ready diye etiketleme.
@@ -1064,11 +1088,13 @@ Fail, belirsizlik veya allowlist dışı ihtiyaçta üretim kodunu yarım commit
     git rev-parse HEAD
     git diff --check
 
-Gerçek browser açma, server başlatma, push veya deployment yapma.
+Gerçek browser açma veya server başlatma. Closure PASS olmadan push/deployment
+yapma; closure PASS sonrası standing delivery checklist’ini çalıştır.
 
 **Kabul:** Release packet source/test/deploy/device kanıtlarını ayırıyor; user-device testinin ajan tarafından yapılmadığı açık; açık risklerin owner ve next action'ı var.
 
-**Kapanış:** Program state ready_for_user_acceptance olabilir; deployed değildir. Kullanıcı ayrıca push commit merge deploy demeden dışa dönük Git / Pages işlemi yapma.
+**Kapanış:** Closure PASS sonrası `after_each_prompt` main/Pages teslimatı ve
+remote/live receipt tamamlanır; S5 kullanıcı cihazı kabulü ayrıca pending kalır.
 
 ---
 
@@ -2422,7 +2448,7 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 
 **Canonical kapanış gate’i:** Kapanışta evidence dosyasını, ledger satırını, STATE ve state.closure alanlarını güncelle; `node docs/reminders/verify-reminder-closure.mjs REM-72` PASS olmadan done/ready/handoff verme.
 
-**Hedef:** Uygulama ve panel birlikte release candidate seviyesine geldiyse kaynak, test, projection, privacy, CI, Pages ve cihaz kanıtlarını ayır; kullanıcı onayı olmadan hiçbir live action yapma.
+**Hedef:** Uygulama ve panel birlikte release candidate seviyesine geldiyse kaynak, test, projection, privacy, CI, Pages ve cihaz kanıtlarını ayır; closure PASS sonrası yalnız standing main/Pages delivery scope’unu uygula.
 
 **Oku:** APP-REMINDER-APP-PANEL-SURFACE-MAP.md tamamı; APP-REMINDER-APPROVAL-GATE.md; REM-54, REM-66–71 receipts; full test matrix; EVIDENCE-RECEIPT-TEMPLATE.
 
@@ -2433,8 +2459,10 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 1. App runtime, current panel, Panel-v2, root fixtures, reminder fixtures, schema, privacy, accessibility ve no-write suite’lerini yeniden çalıştır.
 2. App source, panel source, sync/projection, tests, local commit, remote, CI/Pages, live HTTP ve device acceptance kanıtlarını ayrı bölümlere ayır.
 3. Release candidate scope’unu app / panel / data repo eylemleri olarak ayrı yaz.
-4. releaseApproval.status not_approved kalırken release packet’i tamamla; push, merge, Pages, live browser ve external write yapma.
-5. Kullanıcıya sorulacak exact approval sentence’i ve scope seçeneklerini handoff’a yaz; approval’ı ajan üretmesin.
+4. `releaseApproval.status` not_approved kalırken standing main/Pages delivery
+   receipt’ini tamamla; live browser, data repo ve external write yapma.
+5. Standing scope dışındaki release için kullanıcıya sorulacak exact approval
+   sentence’i ve scope seçeneklerini handoff’a yaz; approval’ı ajan üretmesin.
 
 **Doğrulama:**
 
@@ -2449,7 +2477,9 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
     for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
     git diff --check
 
-**Kabul:** App + panel release packet eksiksiz; state not_approved; canlı, push, merge, Pages ve gerçek veri deposu write yapılmamış.
+**Kabul:** App + panel release packet eksiksiz; state not_approved; standing
+main/Pages delivery receipt’i ayrı, gerçek veri deposu write ve S5 acceptance
+ayrı pending.
 
 **Kapanış:** R14 gate kapanır; REM-42 approval_required zincirine dönülür. REM-43 yalnız exact user approval scope sonrası ayrı kalır.
 

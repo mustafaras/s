@@ -24,12 +24,12 @@ anlamına gelmez.
 | §11 Kişiselleştirme ve öneri | Minimum onboarding, explicit opt-in, safe signals, suggestion-only adaptation | REM-06/07/30/34/35/40, REM-45/51 | G1-D/F/G, G9-A/E/F, G10-A, G12-B/H | REM-ADR-019/020 | R12 state/surface conformance | covered through R9; app proof planned |
 | §12 Erişilebilirlik | Contrast, focus, motion, target size, semantic language and separate panel UX | REM-05/27/36/37/40, REM-48/49/54/65/71 | G1-C, G8-A–C, G9-G/H, G10-A, G12-E/F/K, G13-K, G14-E | REM-ADR-005; evidence owners per prompt | R12/R13 a11y fixtures | covered for current surfaces; future integration planned |
 | §13 Gizlilik, güvenlik ve etik | Native body, sync/panel boundary, crisis/clinical boundary, retention/clear/reset | REM-01/04/09/16/20/25/26/30/34/35/36/38/39/40, REM-52/53/57/63/64/70 | G0-D, G1-B, G2-C, G4-C, G5-B, G7-A/B, G9-A/E–J, G10-A, G12-I/J, G13-C/I/J, G14-D | REM-DISC-001–005/007; REM-ADR-002/003/005/008/014/017–020 | REM-41 privacy packet; future projection schema only by decision | covered through R9; panel/integration deferred |
-| §14 Uygulama planı ve fazlar | R0–R14 sequence, gates, release/device separation | REM-00–72; REM-40 owner | G0–G14 gate set; ledger + state + evidence | REM-ADR-006/007/016; REM-DISC-008 | Strict next-prompt order; no auto-advance | 21/21 phase sections mapped; R12–R14 planned |
+| §14 Uygulama planı ve fazlar | R0–R14 sequence, gates, release/device separation | REM-00–72; REM-40 owner | G0–G14 gate set; ledger + state + evidence | REM-ADR-006/007/016; REM-DISC-008 | Strict next-prompt order; after_each_prompt delivery; no auto-advance | 21/21 phase sections mapped; R12–R14 planned |
 | §15 Test ve kalite planı | Proposed fixtures, time matrix, headless boundary, S5 device acceptance | REM-02/28/40/41/54/66/72 | G0-A, G8-D/E, G10-A/B, G12-K, G13-L, G14-F | REM-ADR-006/016; REM-DISC-008 | Create future fixtures only in their prompt allowlist | current R0–R9 evidence; R12–R14 fixtures absent/deferred |
 | §16 İçerik ve marka | Turkish tone, category lexicon, attention intensity and visual calm | REM-03/27/36/37/40, REM-71 | G0-B, G8-A–C, G9-G/H, G10-A, G14-E | REM-ADR-014/019 | R14 integrated UX | covered through R9; integration planned |
 | §17 Önceliklendirme | P0–P3, first delivery package, later health/automation boundaries | REM-01/03/07/14–18/20/21/30/40/41 | G0-B, G1-F/G, G4/G5, G9-A, G10-A/B | REM-ADR-004/019; REM-DISC-008 | REM-41 freeze; no R12/R14 claim | covered as plan/ledger scope |
 | §18 Açık ürün kararları | 17 unresolved product/release questions and explicit defaults | REM-01/06/21/22/30/34/40–43 | G0-D, G9-A/E, G10-A–C | REM-ADR-005/019/020; REM-DISC-009 | Owner decision before any affected release scope | covered as decision inventory; unresolved items deferred |
-| §19 Kabul kapıları | Product, technical, privacy, a11y, clinical and delivery gates | REM-27–43, REM-54/66/70/72, REM-40/41 | G8-A–F, G9-G/H/J, G10-A–C, G12-K, G13-L, G14-D/F | REM-ADR-005/016; REM-DISC-008/009 | REM-41 packet; REM-42 exact approval; REM-43 only approved scope | gate owners present; release not approved |
+| §19 Kabul kapıları | Product, technical, privacy, a11y, clinical and delivery gates | REM-27–43, REM-54/66/70/72, REM-40/41 | G8-A–F, G9-G/H/J, G10-A–C, G11-C, G12-K, G13-L, G14-D/F | REM-ADR-005/016; REM-DISC-008/009 | REM-41 packet; REM-42 ad hoc approval; after_each_prompt standing delivery | gate owners present; ad hoc release not approved; prompt delivery active |
 | §20 İlk teslim paketi | Center, local policy, foreground core, native opt-in, core ritual and headless evidence | REM-05–24, REM-28/29/40/41/54/72 | G1–G6, G8-D/F, G10-A/B, G12-K, G14-F | REM-ADR-004/005/016 | R12 app acceptance then R14 packet | source/test core through R9; runtime acceptance planned |
 | §21 Sonuç | Control/privacy/in-app reliability before native, health and automation | REM-40–43, REM-67–72 | G10-A–C, G11-A/B, G14-A–F | REM-ADR-005/007/016; REM-DISC-008/009 | Exact approval is the only release dependency | mapped; not a release authorization |
 
@@ -145,8 +145,9 @@ birlikte güncellenir. Release kapsamı değişirse approval state yeniden
 - Plan kapsamı değişirse önce section table ve decisions, sonra prompt/test/
   ledger/state; fixture adı değişirse test matrix ve ilgili prompt birlikte
   güncellenir.
-- `verify-reminder-context.mjs` prompt/ledger/state/traceability parity’sini
-  ve `releaseApproval=not_approved` kilidini doğrular. Bu audit validatorın
+- `verify-reminder-context.mjs` prompt/ledger/state/traceability parity’sini,
+  `promptDeliveryPolicy=after_each_prompt` kaydını ve
+  `releaseApproval=not_approved` kilidini doğrular. Bu audit validatorın
   73 contiguous ID sözleşmesini değiştirmez.
 - App runtime (REM-44–54), current observer panel (REM-55–66), integration
   (REM-67–72) ve Panel-v2 regression evidence ayrı sahiplerdir; birinin PASS’ı

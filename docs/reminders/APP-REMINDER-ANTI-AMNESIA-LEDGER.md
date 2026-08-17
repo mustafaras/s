@@ -172,6 +172,16 @@ write ayrı ayrı scope edilmelidir. `mustafaras/seyma-data` yazımı bu scope�
 bağımsız, ayrıca açık veri yazma onayı ister. Ajan veya validator approval
 state’ini kendisi üretemez.
 
+### Standing prompt delivery policy — 2026-08-17
+
+Kullanıcının “her prompttan sonra bu yapılsın” talimatı ile başarılı her prompt
+closure’ından sonra `main` fast-forward → GitHub Pages → remote/CI/live receipt
+sırası zorunludur. Bu bounded prompt teslimatı `STATE.json.promptDeliveryPolicy`
+ile izlenir; `releaseApproval` yine `not_approved` kalır ve ad hoc/final release
+kilidi olarak çalışır. Fail/blocked prompt teslim edilmez. `data/`,
+`mustafaras/seyma-data`, tag, force-push, history rewrite, başka remote ve S5
+kullanıcı cihazı kabulü bu policy’nin dışındadır.
+
 ## 6. Prompt başlatma / bitirme parity’si
 
 Her prompt başlamadan ve kapanmadan şu validator çalışır:

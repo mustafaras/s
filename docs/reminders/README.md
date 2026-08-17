@@ -26,7 +26,8 @@ Yeni bir ajan şu sırayı izler:
     `panel.js` dosyalarını bütünüyle context'e alma.
 11. Release veya canlılık kelimesi geçiyorsa önce
     [`APP-REMINDER-APPROVAL-GATE.md`](APP-REMINDER-APPROVAL-GATE.md) dosyasını
-    oku; varsayılan durum `NOT_APPROVED`.
+    oku; prompt teslimatı için `promptDeliveryPolicy=after_each_prompt`, diğer
+    dış işlemler için varsayılan durum `NOT_APPROVED`.
 
 `STATE.json`, `LEDGER.md` ve prompt listesi çelişirse ajan durur. Öncelik:
 
@@ -66,12 +67,16 @@ ledger’a blocker / discrepancy olarak yazılır.
 - Her prompt tek dominant risk ve bağımsız done condition taşır.
 - Her prompt için ayrı, dar kapsamlı commit tercih edilir; `git add -A` ve
   ilgisiz dosya staging’i yasaktır.
-- Faz tamamlanmadan `main`e push / Pages deployment yapılmaz.
-- Kullanıcı bu konuşmada açık ve güncel şekilde istemeden canlıya alma,
-  `main` push, merge, Pages deploy, release tag veya dış sistem write yapılmaz.
-- Kullanıcının açık ve güncel onayı olmadan hiçbir koşulda canlı sürüm
-  değiştirilemez. Yeşil test, local commit, “hazır” durumu veya eski sohbet
-  mesajı bu onayın yerine geçmez.
+- Prompt kapanışı `done` ve closure validator PASS olmadan `main`e push /
+  Pages deployment yapılmaz. Başarılı her prompt kapanışından sonra
+  `promptDeliveryPolicy=after_each_prompt` gereği main fast-forward push,
+  Pages workflow/deploy ve remote/live receipt sırasıyla çalıştırılır.
+- Bu standing policy yalnız current `main` → `origin/main` → GitHub Pages
+  zincirini kapsar; ayrı PR merge yoksa fast-forward merge yolu kullanılır.
+  Tag, force-push, history rewrite, başka remote, dış sistem write ve
+  `mustafaras/seyma-data` bu kapsama dahil değildir.
+- Kullanıcı cihazı kabulü otomatik teslimattan ayrı S5 kanıtıdır; ajan bunu
+  tamamlanmış saymaz. Bir prompt fail/blocked olursa dış teslim yapılmaz.
 - `APP-REMINDER-APPROVAL-GATE.md` içindeki `NOT_APPROVED` durumu test veya
   local commit ile değiştirilemez. `mustafaras/seyma-data` için ayrıca açık
   veri yazma onayı gerekir; canlıya alma onayı veri yazma yetkisi vermez.

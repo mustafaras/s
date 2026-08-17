@@ -5,11 +5,33 @@ ortamına ulaşmasını kilitleyen canonical release authority belgesidir.
 
 ## Varsayılan durum
 
-**Release approval:** `NOT_APPROVED`
-**Pages / main push:** yasak
-**Merge / tag / release:** yasak
+**Release approval:** `NOT_APPROVED` (ad hoc/final release kilidi)
+**Standing prompt delivery:** `after_each_prompt` (yalnız closure PASS sonrası `main` → Pages)
+**Merge / tag / release:** standing scope dışında yasak
 **Gerçek veri repo’suna yazma:** ayrıca ve açık veri onayı olmadan yasak
 **Kullanıcı cihazı kabulü:** henüz yapılmadı
+
+## Standing prompt delivery policy — 2026-08-17
+
+Kullanıcının exact talimatı “her prompttan sonra bu yapılsın bunu düzenler
+misin” olarak kaydedilmiştir. `STATE.json.promptDeliveryPolicy` aktif olduğu
+sürece, başarılı her prompt closure’ından sonra aşağıdaki bounded sıra otomatik
+olarak uygulanır:
+
+1. Evidence, ledger, STATE ve `verify-reminder-closure.mjs REM-XX` PASS.
+2. Prompt ID’li dar commit ve temiz diff.
+3. `git push origin main`; mevcut branch `main` ise fast-forward merge yolu.
+4. GitHub Pages workflow validate/deploy; geçici action download hatasında
+   bounded retry, kalıcı hatada `blocked`.
+5. Remote equality, deployment status ve live HTTP/cache-bust receipt.
+6. Receipt commit gerekiyorsa aynı `main` zincirinde kaydedilir.
+
+Bu policy `releaseApproval` alanını `approved` yapmaz; ad hoc/final release
+kilidi her teslimattan sonra `not_approved` kalır. Scope yalnız current `main`,
+`origin/main`, GitHub Pages ve read-only release kanıtıdır. `mustafaras/seyma-data`,
+başka remote, tag, force-push, history rewrite, arbitrary external write ve
+kullanıcı cihazı acceptance kapsam dışıdır. Fail/blocked prompt dışarı teslim
+edilmez.
 
 ## Program-level release timing policy
 
@@ -17,24 +39,24 @@ ortamına ulaşmasını kilitleyen canonical release authority belgesidir.
 
 - `REM-02`–`REM-72` boyunca dar kapsamlı local commit’ler düzenli olarak
   yapılabilir; local commit canlıya alma değildir.
-- Program zinciri, final testleri, local doğrulama ve kullanıcının kendi cihazı
-  kontrolü tamamlanmadan `git push`, merge, tag, Pages workflow, deploy veya
-  başka bir external write yapılmaz. Önceki bir approval scope bu kuralı
-  gevşetmez; yeni final approval gerekir.
+- Her promptun kendi closure gate’i, ilgili testleri ve local doğrulaması
+  tamamlanmadan delivery çalışmaz. Kullanıcı cihazı kontrolü S5 kanıtıdır ve
+  otomatik prompt teslimatını bekletmez.
 - Final local server doğrulaması gerekiyorsa yalnız repository güvenlik
   kurallarındaki port `9000` istisnası kullanılır. Kullanıcı server’ı kendi
   browser’ında açar; ajan browser açmaz ve başlattığı server’ı kapatır.
-- Kullanıcı kontrolünden sonra canlıya alma ancak mevcut konuşmada verilen yeni,
-  açık ve kapsamı belirli onayla başlatılabilir. O zamana kadar
-  `STATE.json.releaseApproval.status` `not_approved` kalır.
+- Standing scope dışındaki canlıya alma ancak mevcut konuşmada verilen yeni,
+  açık ve kapsamı belirli onayla başlatılabilir. `STATE.json.releaseApproval.status`
+  standing teslimatlarda `not_approved` kalır.
 
-Bu durum testlerin yeşil olmasıyla, local commit ile, eski bir sohbet mesajıyla
-veya ajanın kendi yorumu ile değişmez.
+Standing policy exact kullanıcı kaydıyla değiştirilmiştir; bunun dışındaki
+testler, local commit, eski sohbet veya ajan yorumu yeni release yetkisi
+oluşturmaz.
 
 ## Kullanıcı onayı olmadan yasak olan işlemler
 
-Aşağıdaki işlemler, kullanıcı bu konuşmada açık ve güncel şekilde istemeden
-başlatılamaz:
+Aşağıdaki işlemler standing prompt teslimat scope’u dışında, kullanıcı bu
+konuşmada açık ve güncel şekilde istemeden başlatılamaz:
 
 - `git push` ile `main` veya herhangi bir dış remote’u değiştirmek,
 - branch merge, pull request merge veya release tag yayımlamak,
@@ -61,7 +83,7 @@ Release promptu ancak aşağıdaki üç şartın tamamı sağlanırsa yürütül
 ifadeler canlıya alma onayı sayılmaz. Belirsizlikte varsayılan `NOT_APPROVED`
 kalır.
 
-## Onaydan önce yapılabilecekler
+## Standing policy dışında onaydan önce yapılabilecekler
 
 - Local çalışma ve üretim kodu değişikliği,
 - sentetik test ve headless doğrulama,
@@ -72,7 +94,7 @@ kalır.
 Bunlar canlıya alınmış, remote’a gönderilmiş veya kullanıcı cihazında
 doğrulanmış sayılmaz.
 
-## Onay sonrası zorunlu sıra
+## Ad hoc approval sonrası zorunlu sıra
 
 Onay alındıktan sonra bile sıra şöyledir:
 

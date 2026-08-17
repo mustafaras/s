@@ -49,22 +49,26 @@ discrepancy yazılır ve ilgili prompt `blocked` kalır.
 State, ledger ve prompt aynı durumu söylemiyorsa ajan hiçbir kod değişikliğine
 başlamaz.
 
-### 1.1. Kullanıcı onayı olmadan canlılık kilidi
+### 1.1. Prompt teslimatı ve Kullanıcı onayı olmadan canlılık kilidi
 
-`APP-REMINDER-APPROVAL-GATE.md` canonical release authority'dir. Varsayılan
-durum `releaseApproval.status = not_approved` olarak kalır. Kullanıcı mevcut
-konuşmada açıkça eylem ve kapsam belirtmeden hiçbir ajan:
+`APP-REMINDER-APPROVAL-GATE.md` canonical release authority'dir. Ad hoc/final
+release için `releaseApproval.status = not_approved` korunur. Buna ek olarak
+STATE içindeki `promptDeliveryPolicy=after_each_prompt`, kullanıcının
+2026-08-17 tarihli standing talimatıyla her başarılı prompt closure’ından
+sonra yalnız `main` fast-forward + GitHub Pages teslimatını açar. Bu teslimat
+closure gate PASS olmadan çalışmaz. Kullanıcı ayrıca açıkça eylem ve kapsam
+belirtmeden hiçbir ajan:
 
-- `git push`, branch / PR merge, tag veya release yapamaz;
+- standing scope dışındaki `git push`, branch / PR merge, tag veya release yapamaz;
 - GitHub Pages workflow'unu tetikleyemez veya canlı dosyayı değiştiremez;
 - production webhook, deploy servisi veya dış bildirim sistemine yazamaz;
 - canlı browser / cihaz doğrulaması başlatamaz.
 
-Yeşil testler, local commit, `ready_for_user_acceptance`, “devam” veya eski
-sohbet mesajı onay değildir. `mustafaras/seyma-data` yazımı, canlıya alma
-onayından bağımsız olarak ayrıca açık veri yazma izni gerektirir. Ajan bu state'i
-kendi kararıyla `approved` yapamaz; release approval yalnız exact kullanıcı
-mesajı ve kapsamı kaydedilerek değiştirilebilir.
+Yeşil testler veya local commit tek başına teslimat kanıtı değildir; closure,
+push, workflow/deployment, remote equality ve live HTTP ayrı kaydedilir.
+`mustafaras/seyma-data` yazımı için ayrıca açık veri yazma izni gerekir.
+Standing policy ad hoc release approval değildir ve ajan bu policy kapsamını
+genişletemez.
 
 ## 2. Program kapsamı
 
@@ -266,21 +270,14 @@ Her kayıtta şu beş alan zorunludur:
 
 ## 8. Commit / push / deploy politikası
 
-- Prompt başına dar commit.
-- `REM-02`–`REM-72` boyunca düzenli local commit serbesttir; local commit
-  remote veya canlı release kanıtı değildir.
-- Faz bitmeden `git push` yok. Faz bitse bile açık, güncel kullanıcı onayı
-  yoksa `git push` yok.
-- Program zinciri, final testleri, port `9000` üzerindeki güvenli local server
-  doğrulaması ve kullanıcının kendi cihaz kontrolü tamamlanmadan hiçbir push,
-  merge, tag, Pages deploy veya external write yapılmaz. Önceki approval scope
-  sonraki promptlara taşınmaz.
-- Kullanıcı ayrıca açıkça ve kapsam belirterek istemedikçe bu program promptları
-  `main`e push / merge / Pages deploy yapmaz; yalnız fazın release gate’i hazır
-  olur.
-- Push yetkisi verildiğinde kaynak, test, remote equality, workflow, deploy ve
-  canlı HTTP kanıtı ayrı makbuzlara yazılır.
+- Prompt başına dar commit; closure PASS sonrası `after_each_prompt` teslimatı.
+- Sıra: closure evidence/ledger/STATE → closure validator → commit →
+  `git push origin main` / fast-forward merge → Pages validate+deploy → remote
+  equality → deployment status → live HTTP/cache-bust receipt.
+- Fail/blocked prompt dışarı teslim edilmez. Pages geçici hata verirse yalnız
+  bounded workflow retry yapılır; kalıcı hata blocked kaydıdır.
+- Tag, force-push, history rewrite, başka remote, external write ve
+  `mustafaras/seyma-data` standing scope dışıdır. S5 kullanıcı cihazı kabulü
+  ayrıca bekler.
 - Gerçek veri repo’suna hiçbir prompt yazmaz; `sync.js` testleri mock’la çalışır.
   `mustafaras/seyma-data` için ayrı ve açık veri yazma onayı olmadan istisna yoktur.
-- Onay state'i `approved` değilken release promptu çalıştırılmaz; yalnız release
-  packet, test, traceability ve kullanıcıya onay için hazırlık yapılabilir.

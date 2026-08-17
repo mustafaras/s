@@ -585,3 +585,20 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   reset/undo davranışı ve gerçek veri deposu etkilenmez.
 - **Sonraki adım:** REM-42 exact user approval scope; sonra yalnız onaylanan
   main/Pages release adımları.
+
+### REM-GATE-001 — Exact current approval main + Pages release ile sınırlı
+
+- **Tarih:** 2026-08-17
+- **Durum:** decided
+- **Soru:** Kullanıcının “tümünü push commit merge yapalım ... canlıya alarak
+  devam ederiz” mesajı hangi dış eylemleri yetkilendiriyor?
+- **Kanıt:** `docs/reminders/evidence/REM-42.md`; `APP-REMINDER-APPROVAL-GATE.md`;
+  güncel `APP-REMINDER-STATE.json`; kullanıcı mesajı.
+- **Karar:** Mevcut local `main` commit zincirinin `origin/main`e push edilmesi,
+  fast-forward remote eşitliği, Pages workflow/deployment ve canlı
+  HTTP/cache-bust kanıtı açıkça scope içidir. `mustafaras/seyma-data`, tag,
+  force-push, history rewrite, başka remote ve cihaz kabulü scope dışıdır.
+- **Etkiler:** `releaseApproval=approved` yalnız REM-43 execution precondition’ı
+  olarak tutulur; deployment sonrası state tekrar `not_approved` yapılır.
+  Source/test, remote/Pages ve S5 cihaz kanıtı birbirine yükseltilmez.
+- **Sonraki adım:** REM-43 yalnız bu scope ile yürütülecek.

@@ -88,7 +88,14 @@ if (state) {
   assert(state.activePrompt === nextPrompt, `state.activePrompt must advance to ${nextPrompt}`);
   assert(typeof state.nextSafeAction === "string" && state.nextSafeAction.includes(nextPrompt), `state.nextSafeAction must name ${nextPrompt}`);
   assert(state.blockedPrompt === null, "closure cannot leave blockedPrompt set");
-  assert(state.releaseApproval?.status === "not_approved", "closure must preserve releaseApproval=not_approved");
+  if (promptArg === "REM-42") {
+    assert(state.releaseApproval?.status === "approved", "REM-42 closure requires releaseApproval=approved");
+    assert(Array.isArray(state.releaseApproval?.scope) && state.releaseApproval.scope.length > 0, "REM-42 approved release must have a non-empty scope");
+    assert(state.releaseApproval?.evidence && state.releaseApproval?.approvedAt, "REM-42 approved release must have evidence and approvedAt");
+    assert(state.releaseApproval?.approvedBy === "user", "REM-42 release approval must be user-authorized");
+  } else {
+    assert(state.releaseApproval?.status === "not_approved", "closure must preserve releaseApproval=not_approved");
+  }
   assert(state.closure?.prompt === promptArg, `state.closure.prompt must be ${promptArg}`);
   assert(state.closure?.evidence === evidencePath, `state.closure.evidence must be ${evidencePath}`);
   const closureCommit = state.closure?.commit || "";

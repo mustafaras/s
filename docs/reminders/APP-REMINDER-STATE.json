@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-42",
+  "activePrompt": "REM-43",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-41",
-  "nextSafeAction": "REM-42 exact current user approval scope receipt; then REM-43 only for approved main/Pages release actions; mustafaras/seyma-data write remains out of scope",
+  "lastCompletedPrompt": "REM-42",
+  "nextSafeAction": "REM-43 execute only approved main push, fast-forward remote equality, Pages deployment and live cache-bust evidence; never write mustafaras/seyma-data",
   "currentPhase": "R10",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,25 +37,31 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-41 release candidate freeze: reminder retention card hierarchy, metric separation, responsive action grouping and isolated destructive area; behavior/data boundaries unchanged",
-    "tests": "full reminder/root/Panel-v2/headless/migration/boundary/syntax/context/diff chain PASS; context 73 prompts / 66 local links / approval=not_approved; retention visual fixture covers the new metric and danger-group markup",
+    "source": "REM-42 exact current user approval receipt recorded; release scope is limited to current main commit chain, origin/main push/fast-forward, Pages deployment and separate remote/live evidence; real data repo write excluded",
+    "tests": "REM-41 candidate freeze and full source/test chain PASS; approval precondition is validated with verify-reminder-context.mjs --release-approved",
     "commit": "a0e8909",
-    "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
-    "deployment": "not run; release approval not_approved",
+    "remoteEquality": "not checked; awaiting REM-43 execution",
+    "deployment": "not run; approved scope recorded, execution pending REM-43",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "not_approved",
-    "scope": [],
-    "evidence": null,
-    "approvedAt": null,
+    "status": "approved",
+    "scope": [
+      "current main commit chain: origin/main..HEAD",
+      "git push origin main",
+      "main fast-forward / remote equality",
+      "GitHub Pages workflow and deployment verification",
+      "live HTTP and asset cache-bust verification"
+    ],
+    "evidence": "docs/reminders/evidence/REM-42.md; exact user message on 2026-08-17; mustafaras/seyma-data write excluded",
+    "approvedAt": "2026-08-17T13:26:06+03:00",
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex REM-41 closure; G10-B complete; REM-42 approval_required; S5 pending; release remains not_approved",
+  "updatedBy": "Codex REM-42 exact user approval recorded; REM-43 release execution authorized only within scope; data repo write excluded",
   "closure": {
-    "prompt": "REM-41",
-    "evidence": "docs/reminders/evidence/REM-41.md",
-    "commit": "a0e8909"
+    "prompt": "REM-42",
+    "evidence": "docs/reminders/evidence/REM-42.md",
+    "commit": "0361a57"
   }
 }

@@ -45,6 +45,16 @@ function baseState(overrides) {
 
 function boot(seed, options) {
   const opts = options || {};
+  const realDate = Date;
+  const fixedNowMs = realDate.parse("2026-08-16T09:00:00.000Z");
+  function FixedDate(...args) {
+    if (!new.target) return new realDate(fixedNowMs).toString();
+    return args.length ? new realDate(...args) : new realDate(fixedNowMs);
+  }
+  FixedDate.now = () => fixedNowMs;
+  FixedDate.parse = realDate.parse;
+  FixedDate.UTC = realDate.UTC;
+  FixedDate.prototype = realDate.prototype;
   const counters = { fetches: 0, schedules: 0, permissionRequests: 0 };
   const app = fixtureElement("app");
   const root = fixtureElement("root");
@@ -83,7 +93,7 @@ function boot(seed, options) {
     URLSearchParams, Blob: function Blob() {}, File: function File() {}, FileReader: function FileReader() {},
     TextDecoder, TextEncoder, atob, btoa, alert() {}, confirm() { return true; }, prompt() { return null; },
     addEventListener() {}, removeEventListener() {},
-    Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error, parseInt, parseFloat,
+    Date: FixedDate, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error, parseInt, parseFloat,
     isNaN, isFinite, encodeURIComponent, decodeURIComponent, Promise, Set, Map, Symbol, Intl
   };
   if (opts.withSync) {

@@ -1422,3 +1422,9 @@
    owns the page scroll while it is open. */
 .sey-reminder-unavailable{display:flex;flex-direction:column;gap:3px;padding:10px 11px;border:1px solid color-mix(in srgb,var(--reminder-status-neutral) 34%,var(--card-bd));border-left:3px solid var(--reminder-status-neutral);border-radius:11px;background:color-mix(in srgb,var(--reminder-status-neutral) 7%,var(--card));color:var(--text);font-size:11px;line-height:1.42}
 .sey-reminder-unavailable strong{font-size:11px;font-weight:850}.sey-reminder-unavailable span{color:var(--muted)}.sey-reminder-body-locked{overscroll-behavior:none}
+
+/* REM-49: targeted reminder paints must stay visually quiet. A scheduler
+   checkpoint may replace a marked card/status node, but it never replays the
+   page-entry motion or steals the active modal scroll. */
+[data-reminder-render-target]{scroll-margin-block:8px}
+@media (prefers-reduced-motion:reduce){[data-reminder-render-target],[data-reminder-render-target] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

@@ -95,10 +95,13 @@ runTests([
     assertEqual(second.candidateChanged, false);
     assertEqual(second.rendered, false);
     assert(afterFirst.renderCount >= 1);
+    assert(afterFirst.renderReceipt && afterFirst.renderReceipt.fullRender === true);
     assertEqual(afterSecond.renderCount, afterFirst.renderCount);
     assert(afterSecond.noOpCount >= 1);
     assertEqual(afterSecond.renderErrorCount, 0);
     assertEqual(afterSecond.lastRenderReason, "candidate-stable");
+    assertEqual(afterSecond.renderReceipt.mode, "no-op");
+    assertEqual(afterSecond.renderReceipt.reason, "candidate-unchanged");
   }],
   ["repeated no-op scheduler ticks stay bounded and preserve the candidate signature", () => {
     const out = boot();
@@ -111,6 +114,7 @@ runTests([
     assert(elapsedMs < 1000);
     assertEqual(after.candidateSignature, before.candidateSignature);
     assertEqual(after.renderCount, before.renderCount);
+    assertEqual(after.targetedUpdateCount, before.targetedUpdateCount);
     assert(after.noOpCount >= before.noOpCount + 25);
     console.log(`REM-37 candidate no-op: ${elapsedMs.toFixed(2)}ms/25 ticks; renders=${after.renderCount}; noOps=${after.noOpCount}`);
   }],

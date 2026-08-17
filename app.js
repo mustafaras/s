@@ -2803,7 +2803,7 @@ function reminderSystemStatusCopy(kind,state){
   return {label:value.label,detail:value.detail};
 }
 function reminderSystemStatusHTML(){
-  var last=reminderLifecycleState.lastResult||{}, report=reminderSystemStatus({nowIso:new Date().toISOString(),online:!reminderSystemOffline(),permissionState:reminderPermissionSnapshot(),configured:syncConfigured(),receipt:data&&data.syncReceipt,recovery:last.recoveryState==='recovery'}), overall=reminderSystemStatusCopy('overall',report.state), entries=[{kind:'overall',state:report.state,label:'Genel durum'},{kind:'prayer',state:report.prayerState,label:'Vakit verisi'},{kind:'permission',state:report.permissionState,label:'Native izin'},{kind:'sync',state:report.syncState,label:'Senkron'},{kind:'background',state:report.backgroundState,label:'Arka plan'}], h='<section class="sey-reminder-system-status" data-reminder-system-state="'+esc(report.state)+'" aria-labelledby="sey-reminder-system-title" aria-describedby="sey-reminder-system-help"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">DÜRÜST SİSTEM DURUMU</span><h3 id="sey-reminder-system-title">Ne mümkün, ne bekliyor?</h3></div><span class="sey-reminder-status-pill" data-reminder-capability-state="'+esc(report.state)+'">'+esc(overall.label)+'</span></div><p id="sey-reminder-system-help" class="sey-reminder-profile-note">'+esc(overall.detail)+'</p><div class="sey-reminder-system-list" role="list" aria-label="Reminder capability durumları">';
+  var last=reminderLifecycleState.lastResult||{}, report=reminderSystemStatus({nowIso:new Date().toISOString(),online:!reminderSystemOffline(),permissionState:reminderPermissionSnapshot(),configured:syncConfigured(),receipt:data&&data.syncReceipt,recovery:last.recoveryState==='recovery'}), overall=reminderSystemStatusCopy('overall',report.state), entries=[{kind:'overall',state:report.state,label:'Genel durum'},{kind:'prayer',state:report.prayerState,label:'Vakit verisi'},{kind:'permission',state:report.permissionState,label:'Native izin'},{kind:'sync',state:report.syncState,label:'Senkron'},{kind:'background',state:report.backgroundState,label:'Arka plan'}], h='<section id="sey-reminder-system-status" class="sey-reminder-system-status" data-reminder-render-target="reminder-center-status" data-reminder-system-state="'+esc(report.state)+'" aria-labelledby="sey-reminder-system-title" aria-describedby="sey-reminder-system-help"><div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">DÜRÜST SİSTEM DURUMU</span><h3 id="sey-reminder-system-title">Ne mümkün, ne bekliyor?</h3></div><span class="sey-reminder-status-pill" data-reminder-capability-state="'+esc(report.state)+'">'+esc(overall.label)+'</span></div><p id="sey-reminder-system-help" class="sey-reminder-profile-note">'+esc(overall.detail)+'</p><div class="sey-reminder-system-list" role="list" aria-label="Reminder capability durumları">';
   entries.forEach(function(item){ var copy=reminderSystemStatusCopy(item.kind,item.state), attr=item.kind==='permission'?(item.state==='denied'?'permission-denied':item.state):item.kind==='sync'?'sync-'+item.state:item.state; h+='<div class="sey-reminder-system-row" role="listitem" data-reminder-capability="'+esc(item.kind)+'" data-reminder-capability-state="'+esc(attr)+'"><span class="sey-reminder-system-dot" aria-hidden="true"></span><span class="sey-reminder-system-copy"><strong>'+esc(item.label)+' · '+esc(copy.label)+'</strong><small>'+esc(copy.detail)+'</small></span></div>'; });
   h+='</div><p class="sey-reminder-system-safe" role="status" aria-live="polite">'+icon(report.state==='fresh'?'circle-check':report.state==='recovery'?'rotate-ccw':'info',14)+' '+esc(reminderCopy('inApp.status.safe','Reminder deneyimi yerelde devam eder; sistem verisi eskiyse yeni vakit reminderı sessizce uydurulmaz.'))+'</p></section>';
   return h;
@@ -3433,7 +3433,7 @@ function reminderDeliveryClear(now){
 // olarak delivery journal'ın tekil occurrence kaydı engeller.
 var REMINDER_LIFECYCLE_INTERVAL_MS=30000;
 var REMINDER_LIFECYCLE_VISIBILITY={visible:true,hidden:true};
-var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null,recoveryPending:false,candidateSignature:'',candidateChanged:false,renderCount:0,noOpCount:0,renderErrorCount:0,lastRenderReason:''};
+var reminderLifecycleState={running:false,lastSource:'',lastEvaluatedAt:'',lastResult:null,recoveryPending:false,candidateSignature:'',candidateChanged:false,renderCount:0,noOpCount:0,renderErrorCount:0,lastRenderReason:'',renderPolicy:'',renderTarget:'',targetedUpdateCount:0,deferredRenderCount:0,renderReceipt:null,renderReceiptHistory:[]};
 
 function reminderLifecycleVisibility(value){
   var state=String(value||'').toLowerCase();
@@ -4018,37 +4018,123 @@ function reminderLifecycleCandidateSignature(candidates){
   rows.sort();
   return rows.join('|');
 }
-function reminderLifecycleRenderIfNeeded(result,signature,context,sourceName){
+function reminderLifecycleDraftActive(){
+  if(typeof ui==='undefined'||!ui) return false;
+  var draftKeys=['journalText','lunaDraft','aeonDraft','readingDraft','watchDraft','quoteDraft','quranNoteDraft','motivationReflectionDraft','soulActivityDraft','reminderMedicationDraft'];
+  for(var i=0;i<draftKeys.length;i++){
+    var value=ui[draftKeys[i]];
+    if(typeof value==='string'&&value.length>0) return true;
+    if(value&&typeof value==='object'){
+      var keys=Object.keys(value);
+      for(var j=0;j<keys.length;j++) if(String(value[keys[j]]==null?'':value[keys[j]]).length>0) return true;
+    }
+  }
+  try{
+    var active=document&&document.activeElement, tag=active&&String(active.tagName||'').toUpperCase(), type=String(active&&active.type||'').toLowerCase();
+    if(tag==='TEXTAREA'||(tag==='INPUT'&&['button','checkbox','radio','submit','reset','file'].indexOf(type)<0)) return true;
+    if(active&&active.isContentEditable===true) return true;
+  }catch(e){}
+  return false;
+}
+function reminderLifecycleOverlayOpen(){
+  if(typeof ui==='undefined'||!ui) return false;
+  var keys=['readingOpen','watchOpen','listeningOpen','learningOpen','soulArchiveOpen','soulPracticePicker','soulActivityOpen','faithOpen','zikrOpen','qiblaOpen','saygiPersonOpen','quranJourneyOpen','roomOpen','crisisKind','dayDetail','emergency','resetStep','weatherOpen','locNudgeOpen'];
+  for(var i=0;i<keys.length;i++) if(ui[keys[i]]) return true;
+  return false;
+}
+function reminderLifecycleTarget(options){
+  var x=options&&typeof options==='object'?options:{};
+  if(typeof ui==='undefined'||!ui) return '';
+  if(x.target==='reminder-center'||x.target==='center') return ui.reminderCenterOpen?'reminder-center':'';
+  if(x.target==='reminder-inbox'||x.target==='inbox') return ui.tab==='bugun'&&!(typeof editing==='function'&&editing())?'reminder-inbox':'';
+  if(ui.reminderCenterOpen) return 'reminder-center';
+  if(ui.tab==='bugun'&&!(typeof editing==='function'&&editing())) return 'reminder-inbox';
+  return '';
+}
+function reminderLifecycleLiveHTML(result){
+  var x=result&&typeof result==='object'?result:{}, shown=Number(x.shownCount)||0, scheduled=Number(x.scheduledCount)||0, suppressed=Number(x.suppressedCount)||0;
+  var text=shown>0?'Yeni bir sakin reminder durağı hazır.':scheduled>0?'Bir reminder durağı planlandı.':suppressed>0?'Reminder durumu daha sakin tutuldu.':'Reminder durumu güncellendi.';
+  return icon(shown>0?'bell-ring':'info',14)+' <span>'+esc(text)+'</span>';
+}
+function reminderLifecycleReplaceTarget(id,html){
+  try{
+    var old=document.getElementById(id); if(!old) return false;
+    var holder=document.createElement('div'); holder.innerHTML=html;
+    var next=holder.firstElementChild||holder.firstChild; if(!next) return false;
+    if(old.parentNode&&typeof old.parentNode.replaceChild==='function') old.parentNode.replaceChild(next,old);
+    else if(typeof old.replaceWith==='function') old.replaceWith(next);
+    else return false;
+    return true;
+  }catch(e){ return false; }
+}
+function reminderLifecycleUpdateLive(id,result){
+  try{ var el=document.getElementById(id); if(!el) return false; el.innerHTML=reminderLifecycleLiveHTML(result); return true; }catch(e){ return false; }
+}
+function reminderLifecycleTargetedUpdate(target,result,draftActive){
+  if(target==='reminder-center'){
+    var changed=false;
+    // A draft or focused field makes the live region the only safe repaint.
+    // The capability block has no input and may be replaced otherwise.
+    if(!draftActive) changed=reminderLifecycleReplaceTarget('sey-reminder-system-status',reminderSystemStatusHTML())||changed;
+    return reminderLifecycleUpdateLive('sey-reminder-center-live-region',result)||changed;
+  }
+  if(target==='reminder-inbox'){
+    if(draftActive) return reminderLifecycleUpdateLive('sey-reminder-inbox-live',result);
+    return reminderLifecycleReplaceTarget('sey-reminder-inbox-card',reminderInboxCardHTML());
+  }
+  return false;
+}
+function reminderLifecycleRecordReceipt(receipt,nowIso){
+  var x=receipt&&typeof receipt==='object'?receipt:{}, at=validReminderIso(nowIso)?new Date(nowIso).toISOString():new Date().toISOString(), item={at:at,source:String(x.source||''),policy:String(x.policy||''),reason:String(x.reason||''),target:String(x.target||''),mode:String(x.mode||'none'),fullRender:x.fullRender===true,targetedUpdate:x.targetedUpdate===true,draftActive:x.draftActive===true,overlayOpen:x.overlayOpen===true,tabActive:x.tabActive===true};
+  reminderLifecycleState.renderPolicy=item.policy; reminderLifecycleState.renderTarget=item.target; reminderLifecycleState.renderReceipt=item;
+  reminderLifecycleState.renderReceiptHistory.push(item); if(reminderLifecycleState.renderReceiptHistory.length>12) reminderLifecycleState.renderReceiptHistory.shift();
+  return item;
+}
+function reminderLifecycleRenderPolicy(result,context,sourceName,options){
+  var x=options&&typeof options==='object'?options:{}, c=context&&typeof context==='object'?context:{visibilityState:'visible'}, changed=!!(result&&result.changed)||!!(result&&result.nativeShownCount)||x.force===true, actionAccepted=x.actionAccepted===true||(result&&result.actionAccepted===true)||sourceName==='action', draftActive=reminderLifecycleDraftActive(), overlayOpen=reminderLifecycleOverlayOpen(), target=reminderLifecycleTarget(x), tabActive=target!=='';
+  var base={changed:changed,actionAccepted:actionAccepted,draftActive:draftActive,overlayOpen:overlayOpen,tabActive:tabActive,target:target,mode:'defer',reason:'render-deferred',policy:'deferred'};
+  if(!changed) return Object.assign(base,{mode:'no-op',reason:'candidate-unchanged',policy:'candidate-unchanged',target:'',tabActive:false});
+  if(!tabActive) return Object.assign(base,{reason:'tab-inactive',policy:'tab-inactive',target:''});
+  if(overlayOpen&&!ui.reminderCenterOpen) return Object.assign(base,{reason:'overlay-open',policy:'overlay-open',target:''});
+  if(draftActive) return Object.assign(base,{mode:'targeted',reason:'draft-active',policy:'draft-active',target:target==='reminder-center'?'reminder-center-live':'reminder-inbox-live'});
+  if(x.requiresFullRender===true) return Object.assign(base,{mode:'full',reason:'action-accepted',policy:'action-accepted'});
+  if(target) return Object.assign(base,{mode:'targeted',reason:actionAccepted?'action-accepted-targeted':'targeted-update',policy:actionAccepted?'action-accepted-targeted':'targeted-update'});
+  if((sourceName==='timer'||sourceName==='boot'||actionAccepted)&&c.visibilityState==='visible') return Object.assign(base,{mode:'full',reason:actionAccepted?'action-accepted':'candidate-changed',policy:actionAccepted?'action-accepted':'candidate-changed'});
+  return base;
+}
+function reminderLifecycleRenderIfNeeded(result,signature,context,sourceName,options){
   var candidateChanged=reminderLifecycleState.candidateSignature!==signature;
   reminderLifecycleState.candidateSignature=signature;
   reminderLifecycleState.candidateChanged=candidateChanged;
-  var changed=candidateChanged||!!(result&&result.changed)||!!(result&&result.nativeShownCount);
-  if(!changed){
+  var x=options&&typeof options==='object'?options:{}, policy=reminderLifecycleRenderPolicy(result,context,sourceName,Object.assign({},x,{force:candidateChanged||x.force===true}));
+  var changed=candidateChanged||policy.changed;
+  if(!changed||policy.mode==='no-op'){
     reminderLifecycleState.noOpCount+=1;
     reminderLifecycleState.lastRenderReason='candidate-stable';
+    reminderLifecycleRecordReceipt({source:sourceName,policy:'candidate-unchanged',reason:'candidate-unchanged',target:'',mode:'no-op',draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso);
     return false;
   }
-  // Timer paints only the visible app. Foreground/manual callers retain their
-  // existing targeted render ownership; a scheduler tick never repaints a
-  // hidden surface or an unchanged candidate.
-  if((sourceName!=='timer'&&sourceName!=='boot')||!context||context.visibilityState!=='visible'){
-    reminderLifecycleState.lastRenderReason='render-deferred';
-    return false;
+  if(policy.mode==='targeted'){
+    var targeted=reminderLifecycleTargetedUpdate(policy.target==='reminder-center-live'?'reminder-center':policy.target==='reminder-inbox-live'?'reminder-inbox':policy.target,result,policy.draftActive);
+    if(targeted){ reminderLifecycleState.targetedUpdateCount+=1; reminderLifecycleState.lastRenderReason='targeted-update'; reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:policy.reason,target:policy.target,mode:'targeted',targetedUpdate:true,draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return true; }
+    if(policy.draftActive||policy.overlayOpen||!policy.tabActive){ reminderLifecycleState.deferredRenderCount+=1; reminderLifecycleState.lastRenderReason='render-deferred'; reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:policy.reason+'-target-missing',target:policy.target,mode:'defer',draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return false; }
+    policy=Object.assign(policy,{mode:'full',reason:policy.reason+'-target-missing',policy:policy.policy+'-fallback'});
+  }
+  if(policy.mode!=='full'||!context||context.visibilityState!=='visible'){
+    reminderLifecycleState.deferredRenderCount+=1; reminderLifecycleState.lastRenderReason='render-deferred'; reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:policy.reason,target:policy.target,mode:'defer',draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return false;
   }
   if(typeof render!=='function'){
-    reminderLifecycleState.lastRenderReason='render-unavailable';
-    return false;
+    reminderLifecycleState.lastRenderReason='render-unavailable'; reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:'render-unavailable',target:policy.target,mode:'defer',draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return false;
   }
   try{
-    render();
-    reminderLifecycleState.renderCount+=1;
-    reminderLifecycleState.lastRenderReason=candidateChanged?'candidate-changed':'delivery-changed';
-    return true;
+    render(); reminderLifecycleState.renderCount+=1; reminderLifecycleState.lastRenderReason=policy.reason==='action-accepted'?'action-accepted':(candidateChanged?'candidate-changed':'delivery-changed'); reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:policy.reason,target:policy.target,mode:'full',fullRender:true,draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return true;
   }catch(e){
-    reminderLifecycleState.renderErrorCount+=1;
-    reminderLifecycleState.lastRenderReason='render-error';
-    return false;
+    reminderLifecycleState.renderErrorCount+=1; reminderLifecycleState.lastRenderReason='render-error'; reminderLifecycleRecordReceipt({source:sourceName,policy:policy.policy,reason:'render-error',target:policy.target,mode:'defer',draftActive:policy.draftActive,overlayOpen:policy.overlayOpen,tabActive:policy.tabActive},context&&context.nowIso); return false;
   }
+}
+function reminderRenderAction(reason,options){
+  var x=options&&typeof options==='object'?options:{}, context={visibilityState:reminderLifecycleVisibility(x.visibilityState||'visible'),nowIso:x.nowIso||new Date().toISOString()}, result=Object.assign({changed:true,actionAccepted:true,shownCount:0,scheduledCount:0,suppressedCount:0},x.result||{});
+  return reminderLifecycleRenderIfNeeded(result,reminderLifecycleState.candidateSignature,context,'action',{actionAccepted:true,requiresFullRender:x.requiresFullRender===true,target:x.target||'',force:true});
 }
 function reminderLifecycleEvaluate(source,input){
   if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
@@ -4091,6 +4177,8 @@ function reminderLifecycleEvaluate(source,input){
     result.nativeResults=nativeResults; result.nativeShownCount=nativeResults.filter(function(item){ return item.status==='shown'; }).length; result.systemStatus=systemStatus; result.stalePrayerBlocked=stalePrayerBlocked; result.recoveryState=recoveryCatchUp?'recovery':'idle'; result.catchUpPerformed=catchUp;
     result.candidateSignature=reminderLifecycleCandidateSignature(candidates);
     result.rendered=reminderLifecycleRenderIfNeeded(result,result.candidateSignature,context,sourceName);
+    var renderReceipt=reminderLifecycleState.renderReceipt;
+    result.renderMode=renderReceipt?renderReceipt.mode:'none'; result.renderPolicy=renderReceipt?renderReceipt.policy:''; result.renderReason=renderReceipt?renderReceipt.reason:''; result.renderTarget=renderReceipt?renderReceipt.target:'';
     result.candidateChanged=!!reminderLifecycleState.candidateChanged;
     if(sourceName==='online'&&context.offline!==true&&result.ok===true&&persisted) reminderLifecycleState.recoveryPending=false;
     else if(context.offline===true||sourceName==='offline') reminderLifecycleState.recoveryPending=true;
@@ -6781,9 +6869,9 @@ function reminderInboxItemHTML(item,index){
   return h;
 }
 function reminderInboxCardHTML(input){
-  var view=reminderInboxBuildItems(input), active=view.active, suppressed=view.suppressed, muted=view.muted, state=muted?'muted':active.length?'active':suppressed.length?'suppressed':'empty', remaining=muted?0:active.length, h='<section class="sey-reminder-inbox glass" data-reminder-inbox-state="'+state+'" aria-labelledby="sey-reminder-inbox-title" aria-describedby="sey-reminder-inbox-help">';
-  h+='<div class="sey-reminder-inbox-head"><div class="sey-reminder-inbox-mark" aria-hidden="true">'+icon(state==='suppressed'?'moon':state==='empty'?'sparkles':'bell-ring',20)+'</div><div class="sey-reminder-inbox-heading"><span class="sey-reminder-inbox-eyebrow">'+esc(reminderCopy('inApp.inbox.eyebrow','BUGÜNÜN SAKİN DURAKLARI'))+'</span><h2 id="sey-reminder-inbox-title">'+esc(reminderCopy('inApp.inbox.title','Bugün için küçük duraklar'))+'</h2><p id="sey-reminder-inbox-help">'+(state==='active'?(active.length===1?esc(reminderCopy('inApp.inbox.activeOne','İstersen tek bir küçük adımla başlayabilirsin.')):active.length+' öneri aynı sakin yüzeyde gruplanıyor.') :state==='suppressed'?esc(reminderCopy('inApp.inbox.suppressed','Bugün daha sakin tutuldu; kendine yük bindirmeden burada kalabilirsin.')):state==='muted'?esc(reminderCopy('inApp.inbox.muted','Bugün için öneriler sessize alındı; dilediğinde geri getirebilirsin.')):esc(reminderCopy('inApp.inbox.empty','Şu an burada açılacak bir öneri yok; bu da tamam.')))+'</p></div><div class="sey-reminder-inbox-count" aria-label="Kalan öneri sayısı"><strong>'+remaining+'</strong><span>Kalan öneri</span></div></div>';
-  h+='<div class="sey-reminder-inbox-summary" role="status"><span>'+icon('clock-3',14)+'</span><span>'+ (muted?esc(reminderCopy('inApp.mute.today','Bugün susturuldu')):remaining+' '+esc(reminderCopy('inApp.inbox.remaining','sakin öneri hazır'))) + (suppressed.length&&!muted?' · '+suppressed.length+' '+esc(reminderCopy('inApp.inbox.suppressedCount','daha sakin tutuldu')):'') +'</span></div>';
+  var view=reminderInboxBuildItems(input), active=view.active, suppressed=view.suppressed, muted=view.muted, state=muted?'muted':active.length?'active':suppressed.length?'suppressed':'empty', remaining=muted?0:active.length, h='<section id="sey-reminder-inbox-card" class="sey-reminder-inbox glass" data-reminder-render-target="reminder-inbox" data-reminder-inbox-state="'+state+'" aria-labelledby="sey-reminder-inbox-title" aria-describedby="sey-reminder-inbox-help">';
+  h+='<div class="sey-reminder-inbox-head"><div class="sey-reminder-inbox-mark" aria-hidden="true">'+icon(state==='suppressed'?'moon':state==='empty'?'sparkles':'bell-ring',20)+'</div><div class="sey-reminder-inbox-heading"><span class="sey-reminder-inbox-eyebrow">'+esc(reminderCopy('inApp.inbox.eyebrow','BUGÜNÜN SAKİN DURAKLARI'))+'</span><h2 id="sey-reminder-inbox-title">'+esc(reminderCopy('inApp.inbox.title','Bugün için küçük duraklar'))+'</h2><p id="sey-reminder-inbox-help">'+(state==='active'?(active.length===1?esc(reminderCopy('inApp.inbox.activeOne','İstersen tek bir küçük adımla başlayabilirsin.')):active.length+' öneri aynı sakin yüzeyde gruplanıyor.') :state==='suppressed'?esc(reminderCopy('inApp.inbox.suppressed','Bugün daha sakin tutuldu; kendine yük bindirmeden burada kalabilirsin.')):state==='muted'?esc(reminderCopy('inApp.inbox.muted','Bugün için öneriler sessize alındı; dilediğinde geri getirebilirsin.')):esc(reminderCopy('inApp.inbox.empty','Şu an burada açılacak bir öneri yok; bu da tamam.')))+'</p></div><div id="sey-reminder-inbox-count" class="sey-reminder-inbox-count" aria-label="Kalan öneri sayısı"><strong>'+remaining+'</strong><span>Kalan öneri</span></div></div>';
+  h+='<div id="sey-reminder-inbox-live" class="sey-reminder-inbox-summary" role="status" aria-live="polite" aria-atomic="true"><span>'+icon('clock-3',14)+'</span><span>'+ (muted?esc(reminderCopy('inApp.mute.today','Bugün susturuldu')):remaining+' '+esc(reminderCopy('inApp.inbox.remaining','sakin öneri hazır'))) + (suppressed.length&&!muted?' · '+suppressed.length+' '+esc(reminderCopy('inApp.inbox.suppressedCount','daha sakin tutuldu')):'') +'</span></div>';
   if(active.length){
     h+='<div class="sey-reminder-inbox-list'+(active.length>1?' is-grouped':' is-single')+'" role="list" aria-label="Bugünün reminder önerileri">';
     if(active.length>1) h+='<div class="sey-reminder-inbox-group-note"><span>'+icon('layers-2',14)+'</span><span>'+esc(reminderCopy('inApp.inbox.groupNote','Bugün için küçük duraklar'))+' · '+active.length+' öneri</span></div>';
@@ -6823,7 +6911,7 @@ function reminderCenterOverlayHTML(){
   h+=reminderTestPreviewHTML();
   h+=reminderCenterPolicyHTML(root);
   h+=reminderPersonalizationHTML(root);
-  h+='<p class="sey-reminder-live-note" role="status" aria-live="polite" aria-atomic="true">'+icon('info',14)+' '+esc(reminderCopy('inApp.center.liveNote','Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.'))+'</p>';
+  h+='<p class="sey-reminder-live-note" role="status" aria-live="polite" aria-atomic="true" id="sey-reminder-center-live-region" data-reminder-render-target="reminder-center-live">'+icon('info',14)+' '+esc(reminderCopy('inApp.center.liveNote','Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.'))+'</p>';
   h+=reminderPermissionExplanationHTML(permission);
   h+=reminderCategoryControlsHTML(root);
   h+=reminderSpecialDaysSectionHTML(root);
@@ -7032,8 +7120,14 @@ App.evaluateReminderLifecycle=reminderLifecycleEvaluate;
 App.reminderLifecycleTick=reminderLifecycleTick;
 App.reminderLifecycleInterval=REMINDER_LIFECYCLE_INTERVAL_MS;
 App.reminderLifecycleState=function(){
-  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,candidateSignature:reminderLifecycleState.candidateSignature,candidateChanged:!!reminderLifecycleState.candidateChanged,renderCount:reminderLifecycleState.renderCount,noOpCount:reminderLifecycleState.noOpCount,renderErrorCount:reminderLifecycleState.renderErrorCount,lastRenderReason:reminderLifecycleState.lastRenderReason,lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
+  return {running:!!reminderLifecycleState.running,lastSource:reminderLifecycleState.lastSource,lastEvaluatedAt:reminderLifecycleState.lastEvaluatedAt,recoveryPending:!!reminderLifecycleState.recoveryPending,candidateSignature:reminderLifecycleState.candidateSignature,candidateChanged:!!reminderLifecycleState.candidateChanged,renderCount:reminderLifecycleState.renderCount,noOpCount:reminderLifecycleState.noOpCount,renderErrorCount:reminderLifecycleState.renderErrorCount,lastRenderReason:reminderLifecycleState.lastRenderReason,renderPolicy:reminderLifecycleState.renderPolicy,renderTarget:reminderLifecycleState.renderTarget,targetedUpdateCount:reminderLifecycleState.targetedUpdateCount,deferredRenderCount:reminderLifecycleState.deferredRenderCount,renderReceipt:reminderLifecycleState.renderReceipt?Object.assign({},reminderLifecycleState.renderReceipt):null,renderReceiptHistory:reminderLifecycleState.renderReceiptHistory.slice(),lastResult:reminderLifecycleState.lastResult?Object.assign({},reminderLifecycleState.lastResult):null};
 };
+App.reminderRenderPolicy=function(input){
+  var x=input&&typeof input==='object'?input:{}, result=x.result||x, context=x.context||{visibilityState:x.visibilityState||'visible'}, source=String(x.source||'manual');
+  return reminderLifecycleRenderPolicy(result,context,source,x);
+};
+App.reminderRenderReceipt=function(){ return reminderLifecycleState.renderReceipt?Object.assign({},reminderLifecycleState.renderReceipt):null; };
+App.reminderRenderAction=reminderRenderAction;
 App.reminderPolicyForState=function(){ var root=reminderCurrentRoot(); return root?normalizeReminderPolicy(root.policy):emptyReminderPolicy(); };
 App.reminderPersonalizationNormalize=normalizeReminderPersonalization;
 App.reminderPersonalizationEmpty=emptyReminderPersonalization;
@@ -7203,7 +7297,7 @@ function reminderSetEnabled(reminderId,enabled,options){
   var action=already?{ok:true,changed:false,duplicate:true,reason:null,entry:null,state:reminderActionLoad(nowIso,true)}:reminderActionCommit({actionId:'reminder-action-v1:'+(next?'enable':'disable')+':'+encodeURIComponent(id)+':'+encodeURIComponent(nowIso),action:next?'enable':'disable',reminderId:id,recordedAt:nowIso,status:next?'enabled':'disabled'},nowIso,{persistEvent:false});
   if(!already&&x.occurrenceId&&!next) reminderDeliverySuppress({occurrenceId:x.occurrenceId,now:nowIso,reason:'disabled',channel:'in_app'});
   if(!already) save();
-  if(!already||action.changed) render();
+  if(!already||action.changed) reminderRenderAction('action-accepted',{target:x.occurrenceId?'reminder-inbox':'reminder-center',requiresFullRender:!x.occurrenceId});
   return {ok:true,changed:!already,duplicate:already||action.duplicate,reason:null,reminderId:id,enabled:next,preference:pref,action:action};
 }
 App.setReminderEnabled=function(reminderId,flag,options){ return reminderSetEnabled(reminderId,flag===true,options); };
@@ -7365,7 +7459,7 @@ App.resetReminderData=App.reminderFullReset;
 App.fullResetReminders=App.reminderFullReset;
 App.reminderInboxItems=function(input){ return reminderInboxBuildItems(input); };
 App.reminderInboxCardHTML=function(input){ return reminderInboxCardHTML(input); };
-App.reminderInboxMuteToday=function(){ ui.reminderInboxTodayMuted=!ui.reminderInboxTodayMuted; render(); };
+App.reminderInboxMuteToday=function(){ ui.reminderInboxTodayMuted=!ui.reminderInboxTodayMuted; reminderRenderAction('action-accepted',{target:'reminder-inbox'}); };
 App.reminderActionState=function(now){ return reminderActionLoad(now,true); };
 App.reminderActionKey=REMINDER_ACTION_KEY;
 App.reminderSnoozePlan=reminderSnoozePlan;
@@ -7382,14 +7476,16 @@ App.reminderInboxSnooze=function(occurrenceId,option,reminderId,options){
   var scheduled=App.reminderDeliverySchedule({occurrenceId:plan.occurrence.occurrenceId,occurrence:plan.occurrence,channel:'in_app',now:nowIso});
   var action=reminderActionCommit({actionId:plan.actionId,action:'snooze',occurrenceId:plan.occurrence.occurrenceId,parentOccurrenceId:id,reminderId:reminder,option:plan.option,scheduledAt:plan.scheduledAt,timezone:plan.timezone,recordedAt:nowIso,status:'scheduled'},nowIso);
   if(original.ok&&scheduled.ok&&action.ok&&!existing) reminderPersonalizationSignalRecord(reminderCurrentRoot(),{type:'snooze',source:'explicit-snooze',reminderId:reminder,value:plan.option},nowIso);
-  if(action.ok) render();
+  var actionTarget=ui.reminderCenterOpen?'reminder-center':'reminder-inbox';
+  if(action.ok) reminderRenderAction('action-accepted',{target:actionTarget,requiresFullRender:actionTarget==='reminder-center'});
   return {ok:!!(original.ok&&scheduled.ok&&action.ok),duplicate:false,changed:true,reason:original.reason||scheduled.reason||action.reason||null,plan:plan,original:original,scheduled:scheduled,action:action,occurrence:plan.occurrence};
 };
 App.reminderInboxTodayOff=function(occurrenceId,reminderId,options){
   var x=options&&typeof options==='object'?options:{}, id=String(occurrenceId||''), reminder=String(reminderId||x.reminderId||''), nowIso=reminderDeliveryNow(x.nowIso||x.now), actionId='reminder-action-v1:todayOff:'+encodeURIComponent(id), existing=reminderActionFind(actionId,nowIso);
   if(existing) return {ok:true,duplicate:true,changed:false,reason:null,action:{entry:existing}};
   var occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:reminderActionOccurrence(id,reminder,Object.assign({},x,{nowIso:nowIso})), suppressed=App.reminderDeliverySuppress({occurrenceId:id,occurrence:occurrence,channel:'in_app',reason:'today-muted',now:nowIso}), action=reminderActionCommit({actionId:actionId,action:'todayOff',occurrenceId:id,reminderId:reminder,recordedAt:nowIso,status:'suppressed',reason:'today-muted'},nowIso);
-  if(action.ok) render();
+  var actionTarget=ui.reminderCenterOpen?'reminder-center':'reminder-inbox';
+  if(action.ok) reminderRenderAction('action-accepted',{target:actionTarget,requiresFullRender:actionTarget==='reminder-center'});
   return {ok:!!(suppressed.ok&&action.ok),duplicate:false,changed:true,reason:suppressed.reason||action.reason||null,suppressed:suppressed,action:action};
 };
 App.reminderInboxMuteOccurrence=App.reminderInboxTodayOff;

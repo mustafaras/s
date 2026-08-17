@@ -1430,12 +1430,41 @@ function classifyEvent(msg,meta){
 }
 function appendEvent(d,msg,meta){
   var l=ensureEventLog(d); if(!l) return null;
-  var now=new Date().toISOString(), spec=classifyEvent(msg,meta), seq=l.nextSequence++, id=l.sourceDeviceId+'-'+seq;
+  var x=meta&&typeof meta==='object'?meta:{}, correlationId=eventSafePart(x.correlationId,180);
+  if(correlationId){
+    for(var ci=0;ci<l.events.length;ci++) if(l.events[ci]&&l.events[ci].correlationId===correlationId) return l.events[ci];
+  }
+  var now=new Date().toISOString(), spec=classifyEvent(msg,x), seq=l.nextSequence++, id=l.sourceDeviceId+'-'+seq;
   var e=normalizeEventEntry({eventId:id,correlationId:id,sequence:seq,occurredAt:now,persistedAt:now,submittedAt:null,acceptedAt:null,section:spec.section,path:spec.path,operation:spec.operation,summary:spec.summary,source:'app',sourceDeviceId:l.sourceDeviceId,privacyClass:spec.privacyClass,snapshotRevision:normalizeSyncReceipt(d.syncReceipt).snapshotRevision,detail:spec.detail,value:spec.value,field:spec.field,unit:spec.unit},l.sourceDeviceId);
   if(!e) return null;
+  if(correlationId) e.correlationId=correlationId;
   l.events.push(e); if(l.events.length>EVENT_LOG_RECENT_MAX) l.events=l.events.slice(-EVENT_LOG_RECENT_MAX);
   l.days[now.slice(0,10)]=true;
   return e;
+}
+// REM-47 — Reminder olayları kişisel occurrence/action kimliğini event dosyasına
+// taşımaz. Aynı sentetik anahtar için FNV-1a benzeri sabit digest kullanılır;
+// böylece replay dedupe yapılırken body, terapi metni veya ilaç bilgisi sızmaz.
+var REMINDER_EVENT_ACTIONS={enable:true,disable:true,snooze:true,mute:true,dismiss:true,delivered:true,opened:true};
+var REMINDER_EVENT_SUMMARY='Bildirim yaşam döngüsü güncellendi';
+function reminderEventDigest(value){
+  var text=String(value==null?'':value), hash=2166136261;
+  for(var i=0;i<text.length;i++){ hash^=text.charCodeAt(i); hash+=(hash<<1)+(hash<<4)+(hash<<7)+(hash<<8)+(hash<<24); }
+  return ('00000000'+(hash>>>0).toString(16)).slice(-8);
+}
+function reminderEventCorrelation(action,key){ return 'reminder-v1:'+String(action||'event')+':'+reminderEventDigest(key); }
+function appendReminderEvent(d,action,key){
+  var kind=String(action||''); if(!REMINDER_EVENT_ACTIONS[kind]||!d) return null;
+  var operation=kind==='delivered'?'complete':'update';
+  return appendEvent(d,'',{section:'wellness',path:'data.reminders',operation:operation,summary:REMINDER_EVENT_SUMMARY,correlationId:reminderEventCorrelation(kind,key)});
+}
+function persistReminderEvent(action,key){
+  var event=appendReminderEvent(data,action,key);
+  if(event){ try{ saveLocal(); }catch(e){} }
+  return event;
+}
+function reminderEventActionForDelivery(status){
+  return status==='shown'?'delivered':status==='opened'?'opened':status==='dismissed'?'dismiss':status==='snoozed'?'snooze':'';
 }
 function normalizeSyncReceipt(r){
   var out=emptySyncReceipt(), x=r&&typeof r==='object'?r:{};
@@ -3362,7 +3391,12 @@ function reminderDeliveryLoad(now,persist){
 }
 function reminderDeliveryCommit(input){
   var x=input&&typeof input==='object'?input:{}, now=x.at||x.recordedAt||x.now, current=reminderDeliveryLoad(now,true), result=reminderDeliveryRecordPure(current,x,now);
-  if(result.changed) reminderDeliveryStorageWrite(result.log);
+  var persisted=true;
+  if(result.changed) persisted=reminderDeliveryStorageWrite(result.log);
+  if(result.changed&&persisted){
+    var eventAction=reminderEventActionForDelivery(x.status);
+    if(eventAction) persistReminderEvent(eventAction,x.occurrenceId|| (x.occurrence&&x.occurrence.occurrenceId)||'');
+  }
   if(!result.ok&&!result.reason) result.reason='storage-error';
   return result;
 }
@@ -4031,6 +4065,19 @@ function reminderLifecycleEvaluate(source,input){
     var persisted=true;
     if(result.changed&&!reminderDeliveryStorageWrite(result.log)){ persisted=false; result.ok=false; result.errors=(result.errors||[]).concat([{occurrenceId:'',reason:'storage-error'}]); }
     result.persisted=persisted;
+    // Scheduler teslimi pure evaluator içinde oluşur; event log'a yalnızca
+    // gerçekten yeni bir shown kaydı durable olduktan sonra yazılır. Aynı tick,
+    // focus veya retry tekrarında changed=false olduğundan yeni event çıkmaz.
+    var deliveredEventCount=0;
+    if(persisted&&Array.isArray(result.results)) result.results.forEach(function(deliveryResult){
+      if(!deliveryResult||deliveryResult.status!=='shown'||deliveryResult.changed!==true||deliveryResult.duplicate===true) return;
+      if(appendReminderEvent(data,'delivered',deliveryResult.occurrenceId)) deliveredEventCount++;
+    });
+    result.eventLogChanged=deliveredEventCount>0;
+    // Delivery evaluator mevcut sözleşmede canonical `data` save'i yapmaz;
+    // event projection bellekte tutulur ve sonraki gerçek app save'ine dahil
+    // olur. Böylece foreground tick reminder state'i veya sync receipt'i
+    // action lifecycle'dan bağımsız olarak değiştirmez.
     var nativeResults=[];
     if(persisted&&Array.isArray(result.results)) result.results.forEach(function(deliveryResult){
       if(!deliveryResult||deliveryResult.status!=='shown'||deliveryResult.channel!=='native'||deliveryResult.changed!==true||deliveryResult.duplicate===true||deliveryResult.nativeAllowed!==true) return;
@@ -5875,7 +5922,18 @@ function confetti(){
 
 // ---------- actions (exposed) ----------
 var App={};
-App.eventLog={schemaVersion:EVENT_LOG_SCHEMA_VERSION,ensure:ensureEventLog,normalize:normalizeEventEntry,classify:classifyEvent,append:appendEvent};
+App.eventLog={schemaVersion:EVENT_LOG_SCHEMA_VERSION,ensure:ensureEventLog,normalize:normalizeEventEntry,classify:classifyEvent,append:appendEvent,appendReminder:appendReminderEvent};
+App.reminderEventContract=function(){
+  return {
+    personal:{section:'wellness',path:'data.reminders',summary:REMINDER_EVENT_SUMMARY,actions:Object.keys(REMINDER_EVENT_ACTIONS).sort()},
+    social:{section:'notifications',path:'data.aeon',summary:'Bildirim yaşam döngüsü güncellendi'},
+    persistence:{eventLog:'data.eventLog',deliveryJournal:'localStorage:'+REMINDER_DELIVERY_KEY,actionJournal:'localStorage:'+REMINDER_ACTION_KEY,syncReceipt:'data.syncReceipt'}
+  };
+};
+App.reminderEventState=function(){
+  var log=ensureEventLog(data);
+  try{ return JSON.parse(JSON.stringify(log||{})); }catch(e){ return {schemaVersion:EVENT_LOG_SCHEMA_VERSION,events:[]}; }
+};
 // ── Profil Değerlendirmesi: puanlama motoru — doğrudan test için erişilebilir kılındı
 // (Faz 07). Bunlar UI handler'ı DEĞİL, saf hesaplama fonksiyonları; app.js yalnızca
 // window.App'i dışa açtığı için headless testlerin bunlara ulaşabilmesinin tek yolu bu.
@@ -6584,12 +6642,18 @@ function reminderActionLoad(now,persist){
   if(persist!==false&&raw!==JSON.stringify(state)) reminderActionStorageWrite(state);
   return state;
 }
-function reminderActionCommit(entry,now){
+function reminderActionCommit(entry,now,options){
   var nowIso=reminderDeliveryNow(now), next=reminderActionNormalizeEntry(entry,nowIso);
   if(!next) return {ok:false,changed:false,duplicate:false,reason:'invalid',entry:null,state:reminderActionLoad(nowIso,true)};
   var state=reminderActionLoad(nowIso,true), existing=state.entries.filter(function(item){ return item.actionId===next.actionId; })[0];
   if(existing) return {ok:true,changed:false,duplicate:true,reason:null,entry:existing,state:state};
-  state.entries.push(next); state=reminderActionNormalize(state,nowIso); reminderActionStorageWrite(state);
+  state.entries.push(next); state=reminderActionNormalize(state,nowIso);
+  var persisted=reminderActionStorageWrite(state), eventAction=next.action==='todayOff'?'mute':next.action;
+  if(persisted&&REMINDER_EVENT_ACTIONS[eventAction]){
+    var eventKey=next.action==='snooze'?(next.parentOccurrenceId||next.occurrenceId):next.action==='todayOff'?next.occurrenceId:next.reminderId;
+    var event=appendReminderEvent(data,eventAction,eventKey||next.actionId);
+    if(event&&!(options&&options.persistEvent===false)){ try{ saveLocal(); }catch(e){} }
+  }
   return {ok:true,changed:true,duplicate:false,reason:null,entry:next,state:state};
 }
 function reminderRetentionSummary(input){
@@ -7101,10 +7165,10 @@ function reminderSetEnabled(reminderId,enabled,options){
       reminderSpecialDaysCommit(root,specialState,nowIso);
     } else root.preferences[id]=normalizeReminderPreference(id,pref);
     reminderLocalTouch(root,'preferences',nowIso);
-    save();
   }
-  var actionId='reminder-action-v1:'+(next?'enable':'disable')+':'+encodeURIComponent(id)+':'+encodeURIComponent(nowIso), action=reminderActionCommit({actionId:actionId,action:next?'enable':'disable',reminderId:id,recordedAt:nowIso,status:next?'enabled':'disabled'},nowIso);
+  var action=already?{ok:true,changed:false,duplicate:true,reason:null,entry:null,state:reminderActionLoad(nowIso,true)}:reminderActionCommit({actionId:'reminder-action-v1:'+(next?'enable':'disable')+':'+encodeURIComponent(id)+':'+encodeURIComponent(nowIso),action:next?'enable':'disable',reminderId:id,recordedAt:nowIso,status:next?'enabled':'disabled'},nowIso,{persistEvent:false});
   if(!already&&x.occurrenceId&&!next) reminderDeliverySuppress({occurrenceId:x.occurrenceId,now:nowIso,reason:'disabled',channel:'in_app'});
+  if(!already) save();
   if(!already||action.changed) render();
   return {ok:true,changed:!already,duplicate:already||action.duplicate,reason:null,reminderId:id,enabled:next,preference:pref,action:action};
 }

@@ -39,7 +39,7 @@
   "evidence": {
     "source": "REM-42 exact current user approval receipt recorded; release scope is limited to current main commit chain, origin/main push/fast-forward, Pages deployment and separate remote/live evidence; real data repo write excluded",
     "tests": "REM-41 candidate freeze and full source/test chain PASS; approval precondition is validated with verify-reminder-context.mjs --release-approved",
-    "commit": "a0e8909",
+    "commit": "47b4328",
     "remoteEquality": "not checked; awaiting REM-43 execution",
     "deployment": "not run; approved scope recorded, execution pending REM-43",
     "deviceAcceptance": "pending; not performed by agent"
@@ -62,6 +62,6 @@
   "closure": {
     "prompt": "REM-42",
     "evidence": "docs/reminders/evidence/REM-42.md",
-    "commit": "0361a57"
+    "commit": "47b4328"
   }
 }

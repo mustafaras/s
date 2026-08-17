@@ -40,19 +40,19 @@
     "source": "REM-44 boot contract: catalog remains an optional pre-app classic module; state and engine remain app.js-owned App adapters; protected paths preserved",
     "tests": "boot 6 case / 38 assertion, contract 74, full reminder loop, driver, B2 32/32, Panel 50/50, syntax/context/diff PASS",
     "commit": "9d7f910",
-    "remoteEquality": "pending exact approved push to origin/main",
-    "deployment": "not manually triggered; a push to main may trigger the repository Pages workflow",
+    "remoteEquality": "PASS: approved push origin/main completed at 64cb9177cd54aa375e64db3119488c3fef9ba6a8; final canonical receipt push equality re-verified",
+    "deployment": "not manually triggered; push to main may trigger the repository Pages workflow; CI/Pages result not separately claimed",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
-    "status": "approved",
-    "scope": ["git push origin main"],
-    "evidence": "Exact user message (2026-08-17): push et en güncel durum olacak şekilde karışıklıga izin verme; scope current main -> origin/main only; mustafaras/seyma-data excluded",
-    "approvedAt": "2026-08-17T14:49:41+03:00",
+    "status": "not_approved",
+    "scope": [],
+    "evidence": null,
+    "approvedAt": null,
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex exact current user approval recorded for git push origin main; push pending; REM-45 ready; S5 pending",
+  "updatedBy": "Codex exact user-approved git push origin main completed at 64cb9177; approval consumed/reset; REM-45 ready; S5 pending",
   "closure": {
     "prompt": "REM-44",
     "evidence": "docs/reminders/evidence/REM-44.md",

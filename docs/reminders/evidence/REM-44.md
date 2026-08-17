@@ -9,7 +9,9 @@
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `1c8c33c59521c6c7f13f9cf836d6e206b4fa634e`
 - **Bitiş source/test HEAD:** `9d7f910`; canonical closure pointers state/ledger’a işlendi
-- **Release approval:** `approved` for `git push origin main` only; consumed/reset after push
+- **Approved push receipt:** `64cb9177cd54aa375e64db3119488c3fef9ba6a8` (`git push origin main`)
+- **Final remote check:** approved push sonrası `HEAD = origin/main = remote`; canonical receipt reset commit’i de ayrıca pushlanacak
+- **Release approval:** exact `git push origin main` approval consumed/reset to `NOT_APPROVED` after successful push
 - **Approval evidence:** Exact user message (2026-08-17): “push et en güncel durum olacak şekilde karışıklıga izin verme”
 
 ## Kapsam
@@ -48,16 +50,16 @@
 
 - **Source evidence:** S0/S1 — bounded index/app/catalog inspection, classic order ve owner ayrımı.
 - **Synthetic test evidence:** S2 — VM fixture gerçek browser, localStorage, sync, token veya network kullanmadan PASS.
-- **Commit / remote evidence:** S3 — yalnız local commit; remote eşitliği ve deploy bu promptta yapılmadı.
+- **Commit / remote evidence:** S3 — approved `origin/main` push receipt `64cb9177…`; local `HEAD`, tracking `origin/main` ve `git ls-remote` eşitti; final canonical receipt push’u bu kapanışın parçası.
 - **CI / Pages evidence:** N/A — push/deploy yok.
 - **User-device evidence:** S5 pending — agent browser açmadı.
 
 ## Release hard gate
 
-- Push / merge / tag / Pages / external write: **push origin/main authorized; execution pending**
+- Push / merge / tag / Pages / external write: **authorized `git push origin main` executed; merge/tag/manual Pages/external write yapılmadı**
 - `mustafaras/seyma-data` write: **not performed**
 - Browser / real localStorage / real notification / network: **not used**
-- `releaseApproval`: **NOT_APPROVED**
+- `releaseApproval`: **NOT_APPROVED** (exact push approval tüketildi/reset edildi)
 
 ## Sonuç
 

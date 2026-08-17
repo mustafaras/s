@@ -2,7 +2,7 @@
 
 Tarih: 2026-08-17  
 Faz/gate: R9 / G9-J  
-Kaynak commit: `dba9379f274032cb209c44854056813d5fd48a47`
+Kaynak commitleri: `dba9379f274032cb209c44854056813d5fd48a47`, `cd90fe36fbced6b6babce10af05c6da6ac0866a8`
 
 ## Kapsam
 
@@ -20,12 +20,12 @@ Source/test evidence:
 - `node tests/reminders/test_reminder_retention.js` — PASS; 5 case / 58 assertion: bounded retention, malformed defaults, confirmation, tombstone/no-replay, disable-all undo ve full reset residue boundary.
 - `node tests/reminders/test_reminder_privacy.js` — PASS; 4 case / 58 assertion: local-only sync projection, journal redaction ve export negative privacy boundary.
 - `node tests/reminders/test_reminder_migration.js` — PASS; 5 case / 50 assertion.
+- `node tests/reminders/test_reminder_digest.js` — PASS; 7 case / 66 assertion. Fixture wall-clock yerine zero/multi-argument uyumlu deterministic `FixedDate` kullanıyor; ürün davranışı değiştirilmedi.
 - Related regression: delivery 38, Reminder Center advanced 48, concurrency 38, sync/privacy 97 assertion — PASS.
+- Full reminder fixture loop — PASS. All reminder fixtures, 27 Panel-v2 fixtures, root/P0–P6 panel fixtures, Faz 10/Faz 11, driver and Zikirmatik harness — PASS.
 - `node .claude/skills/run-seyma/driver.mjs` — PASS; onboarding, seeded render, tab, dark theme ve header-save headless VM akışı.
 - `node docs/reminders/verify-reminder-context.mjs` — PASS; 73 prompt / 67 local link, `approval=not_approved`.
 - `git diff --check` — PASS.
-
-Full-suite note: mevcut `test_reminder_digest.js` içindeki “on this day” fixture’ı 2025-08-16’yı sabitliyor; çalışma tarihi 2026-08-17 olduğu için bu eski date-sensitive case kartı bekleyip fail oluyor. REM-39 allowlist’i digest testini veya bu feature’ın tarih sözleşmesini değiştirmedi; REM-39 hedef testleri ve ilgili reminder regresyonları PASS.
 
 Deployment/device evidence:
 
@@ -35,4 +35,4 @@ Deployment/device evidence:
 
 ## Handoff
 
-REM-39 kapanmıştır. G9-J kanıtı tamamlandı; `REM-40` plan reconciliation ve traceability audit için sıradaki güvenli prompt olarak hazırdır. Yeni prompt başlamadan önce canonical context/state/ledger tekrar okunmalıdır.
+REM-39 kapanmıştır. G9-J kanıtı ve tam fixture zinciri tamamlandı; `REM-40` plan reconciliation ve traceability audit için sıradaki güvenli prompt olarak hazırdır. Yeni prompt başlamadan önce canonical context/state/ledger tekrar okunmalıdır.

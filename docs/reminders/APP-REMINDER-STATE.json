@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-39 separate preference/occurrence/delivery/action/digest retention, local clear boundary+tombstones, aggregate export, disable-all undo and full reminder reset lifecycle",
-    "tests": "test_reminder_retention.js PASS (5 cases; 58 assertions); test_reminder_privacy.js PASS (4 cases; 58 assertions); test_reminder_migration.js PASS (5 cases; 50 assertions); delivery 38, center advanced 48, concurrency 38, sync privacy 97; driver/context/syntax/diff PASS; synthetic only, no browser, server, real network or external data write",
-    "commit": "dba9379f274032cb209c44854056813d5fd48a47",
+    "source": "REM-39 separate preference/occurrence/delivery/action/digest retention, local clear boundary+tombstones, aggregate export, disable-all undo, full reminder reset lifecycle and deterministic date fixture",
+    "tests": "test_reminder_retention.js PASS (5 cases; 58 assertions); test_reminder_privacy.js PASS (4 cases; 58 assertions); test_reminder_migration.js PASS (5 cases; 50 assertions); test_reminder_digest.js PASS (7 cases; 66 assertions); full reminder, Panel-v2, root/P0–P6, driver and Zikirmatik loops PASS; syntax/context/diff PASS; synthetic only, no browser, server, real network or external data write",
+    "commit": "cd90fe36fbced6b6babce10af05c6da6ac0866a8",
     "remoteEquality": "not checked; local tracking branch was ahead; no push or remote write",
     "deployment": "not run; release approval not_approved",
     "deviceAcceptance": "pending; not performed by agent"
@@ -56,6 +56,6 @@
   "closure": {
     "prompt": "REM-39",
     "evidence": "docs/reminders/evidence/REM-39.md",
-    "commit": "dba9379f274032cb209c44854056813d5fd48a47"
+    "commit": "cd90fe36fbced6b6babce10af05c6da6ac0866a8"
   }
 }

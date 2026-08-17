@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-48",
+  "activePrompt": "REM-49",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-47",
-  "nextSafeAction": "REM-48 App Reminder Center navigation, overlay ve deep-link; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
+  "lastCompletedPrompt": "REM-48",
+  "nextSafeAction": "REM-49 App render lifecycle ve targeted update boundary; release remains not_approved, S5 user-device acceptance remains pending, and future external writes require a new exact approval",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-47 app save/action event adapter; safe digest correlation, reminder wellness category, ÆON social separation and existing save/sync boundary preserved; protected paths preserved",
-    "tests": "app lifecycle 31, event/sync contract 22, Panel event 11, event sync 8; full reminder loop, driver, B2 migration, panel/root regression, syntax/context/diff PASS",
-    "commit": "db426b6",
-    "remoteEquality": "not performed for REM-47; local-only commit and release remains not_approved",
-    "deployment": "not performed for REM-47",
+    "source": "REM-48 existing Settings IA, App.go/render boundary, single target allowlist, overlay shell, focus return, scroll lock and draft-preserving deep-link handlers; protected paths preserved",
+    "tests": "navigation 40, deep-links 85; full reminder loop, driver, root/Panel-v2 regression, B1/B2/B3, syntax/context/diff PASS",
+    "commit": "0186402",
+    "remoteEquality": "not performed for REM-48; local-only commit and release remains not_approved",
+    "deployment": "not performed for REM-48",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -52,10 +52,10 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-17",
-  "updatedBy": "Codex closed REM-47 with local runtime/test commit db426b6; release remains not_approved and S5 pending",
+  "updatedBy": "Codex closed REM-48 with local runtime/test commit 0186402; release remains not_approved and S5 pending",
   "closure": {
-    "prompt": "REM-47",
-    "evidence": "docs/reminders/evidence/REM-47.md",
-    "commit": "db426b6"
+    "prompt": "REM-48",
+    "evidence": "docs/reminders/evidence/REM-48.md",
+    "commit": "0186402"
   }
 }

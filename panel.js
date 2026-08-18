@@ -1336,6 +1336,24 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
   return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
 }
+// REM-55: kaynak secim sozlesmesi tek, adlandirilmis ve test edilebilir bir
+// yerde yasar. `chooseProjection` yalnizca projection argumanina bakar; bir
+// projection HIC CEKILEMEDIYSE (401/403/ag/bozuk govde) ona `null` gelir ve
+// kaba `projection_missing` doner. Bu, 'projection yapilandirilmamis' gibi
+// ZARARSIZ okunur. Yukleyicinin daha ozgul nedeni burada geri kazandirilir.
+//
+// Onceki hâli `load()` icine gomuluydu ve yanlislikla sync RECEIPT'ini
+// (`res[3]`) okuyordu; normalize edilmis receipt'te `reason` alani hic
+// bulunmadigi icin yukseltme ASLA calismiyordu.
+function projectionSourceStateP(chosen,projectionLoad){
+  if(!chosen||typeof chosen!=='object') return chosen;
+  if(chosen.reason!=='projection_missing') return chosen;
+  var loaded=projectionLoad&&typeof projectionLoad==='object'?projectionLoad:null;
+  var reason=loaded&&typeof loaded.reason==='string'?loaded.reason:'';
+  if(!reason||reason==='projection_missing'||reason==='ready') return chosen;
+  chosen.reason=reason;
+  return chosen;
+}
 function projectionStatusP(state){
   var s=state&&state.source||'none', reason=state&&state.reason||'projection_missing';
   if(s==='projection') return {cls:'b-ok',label:'Projection hazır',note:'Panel güvenli observer read-modelini kullanıyor.'};
@@ -5138,7 +5156,7 @@ function load(){
         var P=window.PanelCoverageV1, projection=res[4]&&res[4].snapshot||null;
         if(P&&typeof P.chooseProjection==='function'){
           var chosen=P.chooseProjection(projection,latestLegacy,SYNC_RECEIPT);
-          if(chosen&&chosen.reason==='projection_missing'&&res[3]&&res[3].reason&&res[3].reason!=='projection_missing') chosen.reason=res[3].reason;
+          chosen=projectionSourceStateP(chosen,res[4]);
           PROJECTION.state=chosen||{source:'legacy_fallback',reason:'projection_invalid',snapshot:null,data:latestLegacy,coverage:null};
           D=PROJECTION.state.data||P.redactForObserver(latestLegacy);
           PROJECTION.snapshot=PROJECTION.state.snapshot||null;

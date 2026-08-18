@@ -65,7 +65,7 @@ function seedState() {
     },
     settings: {
       nickname: "REM-52 boundary fixture", ghToken: "", ghRepo: "", ghBranch: "", openaiKey: "",
-      aeonNotifyPermission: "", profileAssessmentInactive: true, locationEnabled: false, locationMode: "manual",
+      aeonNotifyPermission: "", profileAssessmentInactive: true, locationEnabled: true, locationMode: "auto",
       auth: { rememberMe: true, usernameHash: "fixture-auth", unlockedAt: "2026-08-18T08:00:00.000Z" }
     },
     cycle: { periods: [], avgCycle: 28, avgPeriod: 5 }
@@ -94,7 +94,17 @@ function boot(permission, options) {
   };
   const sandbox = {
     console, localStorage, document,
-    navigator: { vibrate() {}, standalone: false, userAgent: "rem-52-boundary-fixture", clipboard: { writeText() { return Promise.resolve(); } } },
+    navigator: {
+      vibrate() {}, standalone: false, userAgent: "rem-52-boundary-fixture",
+      clipboard: { writeText() { return Promise.resolve(); } },
+      // The app's location hard gate blocks every render until it is satisfied;
+      // without this the reminder-centre assertions below never see any markup.
+      geolocation: {
+        getCurrentPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); },
+        watchPosition(success) { success({ coords: { latitude: 39.9334, longitude: 32.8597, accuracy: 20, speed: 0 } }); return 1; },
+        clearWatch() {}
+      }
+    },
     location: { protocol: "http:", hostname: "localhost", search: "", href: "http://localhost/", reload() {} },
     matchMedia() { return { matches: false, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }; },
     fetch() { return new Promise(() => {}); }, setTimeout() { return 0; }, clearTimeout() {}, setInterval() { return 0; }, clearInterval() {},
@@ -351,6 +361,7 @@ runTests([
     for (let i = 0; i < 25; i += 1) prompt.sandbox.App.reminderPermissionSnapshot();
     prompt.sandbox.App.go("ayarlar");
     prompt.sandbox.App.openReminderCenter();
+    assert(prompt.app.innerHTML.indexOf('data-reminder-permission-state="default"') >= 0);
     assertEqual(prompt.notification.getRequestCount(), 0);
     assertEqual(prompt.sandbox.App.reminderPermissionCanRequest("default"), true);
   }],
@@ -372,6 +383,7 @@ runTests([
     for (let i = 0; i < 25; i += 1) out.sandbox.App.reminderPermissionSnapshot();
     out.sandbox.App.go("ayarlar");
     out.sandbox.App.openReminderCenter();
+    assert(out.app.innerHTML.indexOf('data-reminder-permission-state="revoked"') >= 0);
     assertEqual(out.notification.getRequestCount(), 0);
 
     // A single explicit user action may re-open the browser prompt.
@@ -388,6 +400,78 @@ runTests([
     assertEqual(fresh.sandbox.App.reminderPermissionState({ permission: "default", previouslyGranted: true }), "revoked");
   }],
 
+  ["every permission state renders exactly the control it can actually honour", async () => {
+    // Regression guard: `revoked` was computed, explained and reported but had
+    // no branch in the rendered permission block, so its copy promised a way
+    // back that the UI never drew. The invariant below is the real contract:
+    // a state offers a request control if and only if it can open the prompt.
+    function renderFor(out) {
+      out.sandbox.App.go("ayarlar");
+      out.sandbox.App.openReminderCenter();
+      return out.app.innerHTML;
+    }
+
+    const reachable = [];
+
+    const unsupported = boot(null);
+    reachable.push(["unsupported", renderFor(unsupported), unsupported]);
+
+    const denied = boot("denied");
+    reachable.push(["denied", renderFor(denied), denied]);
+
+    const granted = boot("granted");
+    reachable.push(["granted", renderFor(granted), granted]);
+
+    const prompt = boot("default");
+    reachable.push(["default", renderFor(prompt), prompt]);
+
+    const revoked = boot("granted");
+    assertEqual(revoked.sandbox.App.reminderPermissionSnapshot(), "granted");
+    revoked.notification.setPermission("default");
+    assertEqual(revoked.sandbox.App.reminderPermissionSnapshot(), "revoked");
+    reachable.push(["revoked", renderFor(revoked), revoked]);
+
+    // temporary-error is only reachable through a throwing requestPermission.
+    const failing = boot("default");
+    const throwing = { calls: 0 };
+    failing.sandbox.Notification.requestPermission = function () {
+      throwing.calls += 1;
+      throw new Error("synthetic-permission-failure");
+    };
+    await failing.sandbox.App.requestReminderPermission("boundary");
+    assertEqual(throwing.calls, 1);
+    assertEqual(failing.sandbox.App.reminderPermissionSnapshot(), "temporary-error");
+    reachable.push(["temporary-error", renderFor(failing), failing]);
+
+    assertEqual(reachable.length, 6);
+    reachable.forEach(([state, html, out]) => {
+      // The state is actually shown, with its own explanation copy.
+      assert(html.indexOf('data-reminder-permission-state="' + state + '"') >= 0);
+      const copy = out.sandbox.App.reminderPermissionExplanation(state);
+      assert(html.indexOf(copy.label) >= 0);
+
+      // The invariant.
+      const canRequest = out.sandbox.App.reminderPermissionCanRequest(state);
+      const offersRequest = html.indexOf('data-reminder-permission-action="request"') >= 0
+        || html.indexOf('data-reminder-permission-action="retry"') >= 0;
+      assertEqual(offersRequest, canRequest);
+
+      // Nothing renders a promise it cannot keep: a state that cannot ask must
+      // still tell the user what remains available.
+      if (!canRequest) assert(html.indexOf("sey-reminder-permission") >= 0 && copy.action.length > 0);
+    });
+
+    // And rendering the block never asks by itself, in any state. The only
+    // call in this whole case is the one explicit request that produced
+    // temporary-error; re-rendering does not repeat it.
+    reachable.forEach(([, , out]) => {
+      assertEqual(out.notification ? out.notification.getRequestCount() : 0, 0);
+    });
+    renderFor(failing);
+    renderFor(failing);
+    assertEqual(throwing.calls, 1);
+    assertEqual(failing.sandbox.App.reminderPermissionSnapshot(), "temporary-error");
+  }],
   ["boot and lifecycle triggers never start an ÆON or reminder permission loop", () => {
     // The ÆON 2-minute re-ask loop must remain unreferenced by any call site.
     const loopCallSites = appSource.split("startAeonPermissionLoop(").length - 1;

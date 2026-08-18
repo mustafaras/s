@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-53",
+  "activePrompt": "REM-54",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-52",
-  "nextSafeAction": "REM-53 App local privacy, sanitize ve sync adapter; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-53",
+  "nextSafeAction": "REM-54 App module, cache-bust ve headless acceptance; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-52 ReminderDeliveryV1 channel boundary contract, revoked/prompt permission vocabulary, reminder-namespace click allowlist and honest SW capability record; protected paths preserved",
-    "tests": "notification boundary 197 (11 scenarios), native 80, sw 95, permission 63, system-status 65; full reminder/root/Panel-v2 113/113, headless 5/5, node --check and context PASS",
-    "commit": "8ebd5e0",
-    "remoteEquality": "local HEAD, origin/main and ls-remote matched e2d6991; standing main fast-forward PASS",
-    "deployment": "workflow 32169076824 success; GitHub Pages deployment 5968443257 / status 16976686254 success; live HTTP 200; deployed app.js?v=20260818d and sw.js SW_VERSION 20260818a markers verified",
+    "source": "REM-53 five separate reminder privacy schemas (local-only key, canonical preference, safe event summary, projection summary, native copy), single reminderSyncPayload gate for every app sync path, and fail-closed payload production; sync.js sanitize/merge boundary deliberately unchanged and re-proved; protected paths preserved",
+    "tests": "app privacy 198 (10 scenarios), sync privacy 347, Faz10 64/64, Panel P0 31/31; full reminder/root/Panel-v2 114/114, headless 5/5, node --check and context PASS",
+    "commit": "6c1a4b0",
+    "remoteEquality": "pending; REM-53 standing delivery receipt not yet recorded",
+    "deployment": "pending; REM-53 standing delivery receipt not yet recorded",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,11 +75,11 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-18",
-  "updatedBy": "REM-52 closure and standing after_each_prompt main/Pages receipt recorded; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "REM-53 closure recorded; standing after_each_prompt main/Pages receipt still to run; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
-    "prompt": "REM-52",
-    "evidence": "docs/reminders/evidence/REM-52.md",
-    "commit": "8ebd5e0",
+    "prompt": "REM-53",
+    "evidence": "docs/reminders/evidence/REM-53.md",
+    "commit": "6c1a4b0",
     "status": "done",
     "validatedAt": "2026-08-18"
   }

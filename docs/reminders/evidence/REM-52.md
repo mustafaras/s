@@ -119,3 +119,17 @@ dosyanın teşhisi için `SW_VERSION` `20260718j` → `20260818a` bumplandı.
 APP-04 notification boundary kapandı. `activePrompt=REM-53`,
 `lastCompletedPrompt=REM-52`. Release `not_approved`; S5 kullanıcı-cihaz
 kabulü pending.
+
+## Standing delivery receipt
+
+- **Closure commit:** `e2d6991` — `HEAD` = `origin/main` = `git ls-remote origin main` (fast-forward, PR yok)
+- **Workflow:** `32169076824` · `success`
+- **Pages deployment:** `5968443257` · status `16976686254` · `success`
+- **Live:** `https://mustafaras.github.io/s/index.html` HTTP `200`, `app.js?v=20260818d`; `sw.js` HTTP `200`
+- **Deployed marker doğrulaması:** canlı `app.js` içinde `reminderNotificationBoundary`,
+  `reminderPermissionCanRequest`, `REMINDER_PERMISSION_ALIASES`, `everGranted`, `revoked`,
+  `channel-boundary`; canlı `sw.js` içinde `SW_CAPABILITIES`, `swNotificationChannel`,
+  `backgroundScheduling: false`, `SW_VERSION = '20260818a'` bulundu
+- **`mustafaras/seyma-data`:** bu teslimatta **yazılmadı**
+- **Kapsam:** standing `after_each_prompt` tüketildi; `releaseApproval` `not_approved` olarak kaldı;
+  S5 kullanıcı-cihaz kabulü pending

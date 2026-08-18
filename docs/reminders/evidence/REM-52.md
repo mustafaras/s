@@ -166,3 +166,13 @@ değil:
 **Regresyon kanıtı.** Dal geri alındığında yeni senaryo FAIL, geri konduğunda
 PASS. Boundary fixture 197 → 233 assertion; tüm fixture 114/114, headless 5/5,
 `node --check` PASS.
+
+### Düzeltmenin teslim makbuzu
+
+- **Commit:** `553354a` — `HEAD` = `origin/main` = `git ls-remote origin main`
+- **Workflow:** `32172164251` · `success`
+- **Pages deployment:** `5968978172` · status `16978041688` · `success`
+- **Live:** HTTP `200`, `app.js?v=20260818f`; canlı asset içinde
+  `c.state==='revoked'` dalı, `revokedAction`, `revokedNote` ve
+  "Native kanalı yeniden aç" düğme metni bulundu
+- **`mustafaras/seyma-data`:** yazılmadı

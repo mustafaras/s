@@ -40,8 +40,8 @@
     "source": "REM-55 gate found a real panel defect: the reason resolution inside load() read the sync receipt (res[3]) instead of the projection loader result (res[4]); a normalized receipt has no `reason` field, so the upgrade was dead code and a 401/403 or network failure rendered as the benign 'Projection yok' badge instead of 'Projection okunamadi'. The buried logic became the named, testable projectionSourceStateP() (only coarse projection_missing is upgraded; ready / projection_stale / receipt_missing are never overwritten; missing, empty or receipt-shaped input fails closed) and load() now passes res[4]. panelCoverageManifest.js deliberately unchanged and re-proved; app runtime, Panel-v2 and protected paths untouched",
     "tests": "panel source 319 assertions / 12 scenarios (new), Panel P1 and P0 regression PASS; full reminder/root/Panel-v2 116/116, headless 5/5, node --check panel.js + panelCoverageManifest.js and diff --check PASS",
     "commit": "0a3b819",
-    "remoteEquality": "REM-54 delivered: local HEAD, origin/main and ls-remote matched ff9d482; standing main fast-forward PASS. REM-55 delivery pending until closure validator PASS",
-    "deployment": "REM-54 delivery verified live: workflow 32174375024 success; https://mustafaras.github.io/s/index.html HTTP 200 serving app.js?v=20260818g and the three newly wired app/core reminder modules at ?v=20260818a, each returning HTTP 200 with its ReminderXV1 namespace",
+    "remoteEquality": "REM-54 delivered at ff9d482 and REM-55 at 3cc70eb; local HEAD, origin/main and ls-remote matched on both; standing main fast-forward PASS",
+    "deployment": "REM-54: workflow 32174375024 success; live index.html HTTP 200 serving app.js?v=20260818g and the three newly wired app/core reminder modules at ?v=20260818a, each HTTP 200 with its ReminderXV1 namespace. REM-55: workflow 32175033895 success; live panel.html HTTP 200 and deployed panel.js contains projectionSourceStateP with the res[4] call while the buggy res[3] pattern is gone; a follow-up delivery bumps panel.js?v=20260818b -> 20260818c in panel.html because the first REM-55 delivery missed that cache-bust",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,7 +75,7 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-18",
-  "updatedBy": "REM-55 closed: panel projection reason resolution fixed (res[3] -> res[4]) behind the named projectionSourceStateP contract; activePrompt advances to REM-56; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched",
+  "updatedBy": "REM-55 closed: panel projection reason resolution fixed (res[3] -> res[4]) behind the named projectionSourceStateP contract; activePrompt advances to REM-56; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery consumed for REM-54 and REM-55 with remote, workflow and live marker receipts recorded, plus a panel.js cache-bust follow-up",
   "closure": {
     "prompt": "REM-55",
     "evidence": "docs/reminders/evidence/REM-55.md",

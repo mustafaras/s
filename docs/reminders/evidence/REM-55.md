@@ -163,3 +163,22 @@ sahibini açıkça `REM-55` olarak verdiği için çelişki gerçek bir kapsam
 belirsizliği değil, gap register satırının eksik prompt listesidir. Belge
 allowlist dışında olduğu için burada **kayda geçirildi**, düzenlenmedi; REM-56
 gap register'a dokunduğunda `PANEL-01` prompt sütununa `REM-55` eklenmelidir.
+
+## Standing delivery receipt
+
+- **Closure commit:** `3cc70eb` — `HEAD` = `origin/main` = `git ls-remote origin main`
+  (fast-forward, PR yok)
+- **Workflow:** `32175033895` · `success`
+- **Live:** `https://mustafaras.github.io/s/panel.html` HTTP `200`
+- **Deployed marker doğrulaması:** canlı `panel.js` içinde
+  `function projectionSourceStateP` bulundu ve `projectionSourceStateP(chosen,res[4])`
+  çağrısı 1 kez geçiyor; hatalı `res[3]&&res[3].reason` deseni canlı asset içinde
+  **0** kez geçiyor
+- **Cache-bust düzeltmesi:** `panel.html` içindeki `panel.js?v=20260818b →
+  20260818c` (CLAUDE.md ilke 5). Bu bump ilk teslimatta atlanmıştı; bumplanmadan
+  önbelleğe alınmış tarayıcılar düzeltilmiş `panel.js`'i **almayacaktı**. Ayrı
+  bir teslimatla kapatıldı.
+- **`mustafaras/seyma-data`:** bu teslimatta **yazılmadı**
+- **Kapsam:** standing `after_each_prompt` tüketildi; `releaseApproval`
+  `not_approved` olarak kaldı; S5 kullanıcı-cihaz kabulü pending
+

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-51",
+  "activePrompt": "REM-52",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-50",
-  "nextSafeAction": "REM-51 App feature surface adapter ve deep-link conformance; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-51",
+  "nextSafeAction": "REM-52 App permission, native adapter ve ÆON boundary; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R12",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -74,11 +74,13 @@
     "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-08-18",
   "updatedBy": "REM-50 closure and standing after_each_prompt main/Pages receipt recorded; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
-    "prompt": "REM-50",
-    "evidence": "docs/reminders/evidence/REM-50.md",
-    "commit": "b0bba5d"
+    "prompt": "REM-51",
+    "evidence": "docs/reminders/evidence/REM-51.md",
+    "commit": "3a7fdfa",
+    "status": "done",
+    "validatedAt": "2026-08-18"
   }
 }

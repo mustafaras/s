@@ -307,7 +307,12 @@ if (sb2.App && typeof sb2.App.setMood === 'function' && typeof sb2.App.go === 'f
   sb2.SeyOnSynced({ status: 'accepted' });
   appHTML = '';
   sb2.App.go('bugun');
-  assert('manual header save clears reminder after accepted sync', /class="sey-header-save is-clean"/.test(appHTML));
+  // QY-22: elle esitleme artik once GORUNUR bir onay gosterir ('is-synced',
+  // 2.6 sn) ve ardindan 'is-clean'e doner. Testin asil derdi hatirlaticinin
+  // temizlenmesi; o aynen korunuyor, ustune onayin gerceklestigi de olculuyor.
+  assert('manual header sync clears reminder after accepted sync', !/class="sey-header-save is-dirty"/.test(appHTML));
+  assert('manual header sync shows a visible confirmation', /class="sey-header-save is-synced"/.test(appHTML));
+  assert('header action is labelled as sync, not save', /Eşitlendi|Eşitle/.test(appHTML));
 }
 
 if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {

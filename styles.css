@@ -94,8 +94,12 @@
   .sey-header-save.is-saving{border-color:color-mix(in srgb,var(--hdr-accent,#3A4048) 34%,var(--field-bd));opacity:.8;cursor:wait;}
   .sey-header-save.is-saving .sey-header-save__icon{animation:seySpin .85s linear infinite;}
   .sey-header-save.is-local{border-color:color-mix(in srgb,var(--ok) 38%,var(--field-bd));background:color-mix(in srgb,var(--ok) 9%,var(--field));color:color-mix(in srgb,var(--ok) 86%,var(--text));}
+  /* QY-22: elle eşitleme başarısının kısa, görünür onayı. 'local'den ayrı bir
+     ton kullanır — biri "cihazda kaldı", diğeri "panel gördü" demektir. */
+  .sey-header-save.is-synced{border-color:color-mix(in srgb,var(--ok) 62%,var(--field-bd));background:color-mix(in srgb,var(--ok) 15%,var(--field));color:color-mix(in srgb,var(--ok) 92%,var(--text));animation:seySyncedPop .32s var(--ease-premium,cubic-bezier(.16,1,.3,1));}
+  @keyframes seySyncedPop{0%{transform:scale(.94);}60%{transform:scale(1.03);}100%{transform:scale(1);}}
   .sey-header-save.is-error .sey-header-save__icon{stroke-width:2.3;}
-  @media (prefers-reduced-motion: reduce){.sey-header-save,.sey-header-save.is-saving .sey-header-save__icon{animation:none!important;transition:none!important;}}
+  @media (prefers-reduced-motion: reduce){.sey-header-save,.sey-header-save.is-synced,.sey-header-save.is-saving .sey-header-save__icon{animation:none!important;transition:none!important;}}
   @media (max-width:370px){.sey-header-action span,.sey-header-save__label{display:none;}.sey-header-action{padding:0;width:40px;}.sey-header-save{padding:0;width:40px;}.sey-header-title{font-size:20px;}.sey-header-icon{width:26px;height:26px;}}
   /* ── Premium sticky alt navigasyon — header'ın koyu/rafine cam kabuğunun devamı ── */
   /* Sticky davranış korunur. Kesin yükseklik + küçülebilen ana scroll alanı,

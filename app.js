@@ -5866,13 +5866,34 @@ function syncConfigured(){ var s=data.settings||{}; return !!(s.ghToken&&s.ghRep
 function savedToday(){ return data.lastSyncDate===todayStr(); }
 // Header kaydet düğmesi: uygulama her değişikliği önce cihazda korur; bu durum
 // uzak repoya henüz kabul edilmediyse kullanıcıya sakin ama net biçimde gösterilir.
+// QY-22: Bu dugme artik "Kaydet" degil "Esitle". Neden: veri zaten HER
+// degisiklikte cihaza yaziliyor -- "Kaydet" kullaniciya yapmadigi bir is
+// vaadediyordu. Gercek eksik olan sey iki yonlu esitlemeydi: uzaktakini
+// oku + birlestir + gonder. putLatestGuarded bunu zaten yapiyor, dugme de
+// artik onu adiyla cagiriyor. Otosenkron takildiginda kullanicinin paneli
+// canli uygulamayla elle esitleyebilecegi tek yer burasi.
+function headerSyncSubtitle(){
+  try{
+    var r=(data&&data.syncReceipt)||null;
+    if(!r||!r.acceptedAt) return '';
+    var mins=Math.floor((Date.now()-Date.parse(r.acceptedAt))/60000);
+    if(!isFinite(mins)||mins<0) return '';
+    if(mins<2) return 'az önce';
+    if(mins<60) return mins+' dk önce';
+    var hrs=Math.floor(mins/60);
+    if(hrs<24) return hrs+' sa önce';
+    return Math.floor(hrs/24)+' gün önce';
+  }catch(e){ return ''; }
+}
 function headerSaveState(){
-  var s=ui.saveState||'clean';
-  if(s==='saving') return {cls:'is-saving',icon:'rotate-ccw',label:'Kaydediliyor…',aria:'Veriler kaydediliyor',title:'Veriler repoya gönderiliyor',busy:true,disabled:true};
-  if(s==='error') return {cls:'is-error',icon:'triangle-alert',label:'Tekrar dene',aria:'Kaydetme başarısız oldu, tekrar dene',title:'Kaydetme tamamlanamadı · tekrar denemek için dokun'};
-  if(s==='local') return {cls:'is-local',icon:'check',label:'Cihazda',aria:'Veriler cihaza kaydedildi',title:'Cihaza kaydedildi · repoya bağlanmadı'};
-  if(s==='dirty') return {cls:'is-dirty',icon:'save',label:'Kaydet',aria:'Değişiklikleri kaydet',title:'Kaydedilmemiş değişiklikler var · kaydetmek için dokun'};
-  return {cls:'is-clean',icon:'save',label:'Kaydet',aria:'Verileri kaydet',title:'Verileri şimdi kaydet'};
+  var s=ui.saveState||'clean', last=headerSyncSubtitle();
+  var seen=last?(' · panelde son görünen: '+last):'';
+  if(s==='saving') return {cls:'is-saving',icon:'rotate-ccw',label:'Eşitleniyor…',aria:'Panel ile eşitleniyor',title:'Uzak kayıt okunuyor, birleştiriliyor ve gönderiliyor',busy:true,disabled:true};
+  if(s==='error') return {cls:'is-error',icon:'triangle-alert',label:'Tekrar dene',aria:'Eşitleme başarısız oldu, tekrar dene',title:'Eşitleme tamamlanamadı'+seen+' · tekrar denemek için dokun'};
+  if(s==='local') return {cls:'is-local',icon:'check',label:'Cihazda',aria:'Veriler cihaza kaydedildi',title:'Cihaza kaydedildi · panele göndermek için Ayarlar\'dan repoya bağlan'};
+  if(s==='synced') return {cls:'is-synced',icon:'circle-check',label:'Eşitlendi',aria:'Panel ile eşitlendi',title:'Panel bu ana kadarki her şeyi gördü'};
+  if(s==='dirty') return {cls:'is-dirty',icon:'rotate-ccw',label:'Eşitle',aria:'Panel ile şimdi eşitle',title:'Panele gitmemiş değişiklik var'+seen+' · eşitlemek için dokun'};
+  return {cls:'is-clean',icon:'rotate-ccw',label:'Eşitle',aria:'Panel ile şimdi eşitle',title:'Panel ile şimdi eşitle'+seen};
 }
 function saveButtonHTML(){
   var s=headerSaveState();
@@ -5969,7 +5990,13 @@ window.SeyOnSynced=function(receipt){
   if(data&&Array.isArray(data.notifications)) data.notifications.forEach(function(n){ if(n) n.synced=true; });
   if(data&&data.aeon&&Array.isArray(data.aeon.qa)) data.aeon.qa.forEach(function(x){ if(x&&x.answer) x.answerSynced=true; });
   ui.keyEdit=false;
-  if(ui.saveActionPending){ ui.saveState='clean'; ui.saveActionPending=false; }
+  // QY-22: elle eşitleme başarıya ulaştığında kullanıcı bunu GÖRSÜN; eskiden
+  // durum sessizce 'clean'e dönüyor, dokunuşun bir şey yaptığı belli olmuyordu.
+  if(ui.saveActionPending){
+    ui.saveState='synced'; ui.saveActionPending=false;
+    try{ clearTimeout(ui.syncedDecayTimer); ui.syncedDecayTimer=setTimeout(function(){ if(ui.saveState==='synced'){ ui.saveState='clean'; updateHeaderSave(); } },2600); }catch(e){}
+    try{ toast('Panel ile eşitlendi'); }catch(e){}
+  }
   else if(ui.saveState==='saving') ui.saveState='dirty';
   mergePersistedReminderState(new Date().toISOString());
   try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){}
@@ -9000,27 +9027,43 @@ App.setGhRepo=function(el){ if(!data.settings) data.settings={}; data.settings.g
 App.setHealthGistId=function(el){ if(!data.settings) data.settings={}; data.settings.healthGistId=normalizeToken(el.value||''); debounceSave('healthGistId',function(){ save(); },400); };
 App.setGhBranch=function(el){ if(!data.settings) data.settings={}; data.settings.ghBranch=(el.value||'').trim(); save(); syncFieldUpdate(); };
 App.syncNow=function(){ if(window.SeySync){ window.SeySync.pushNow(); toast('Kaydediliyor…'); } else { toast('Sync hazır değil'); } };
+// QY-22: Hata artik "olmadi" demekle yetinmez, NEDENINI soyler. Kullanici
+// panelde kirmizi bir duvar gorup sebebini bilememisti; sebep receipt'te
+// zaten yaziliydi, sadece hicbir yerde gosterilmiyordu.
+function syncFailureText(){
+  var code=''; try{ code=(data&&data.syncReceipt&&data.syncReceipt.lastErrorCode)||''; }catch(e){}
+  if(code==='conflict') return 'Başka bir cihaz aynı anda yazmış · birleştirip tekrar denedik, yine olmadı. Birazdan tekrar dene.';
+  if(code==='anti_clobber') return 'Uzakta seninkinden fazla gün var · veri kaybını önlemek için durduruldu.';
+  if(code==='remote_unreadable') return 'Uzak kayıt okunamadı · üzerine yazmamak için durduruldu.';
+  if(code==='unauthorized'||code==='forbidden'||code==='permission') return 'Bağlantı izni geçersiz · Ayarlar\'dan repo bağlantını yenile.';
+  if(code==='not_found') return 'Repo veya dosya bulunamadı · Ayarlar\'daki repo adını kontrol et.';
+  if(code==='rate_limited') return 'Sunucu sınırı · birkaç dakika sonra kendiliğinden yeniden denenecek.';
+  if(code==='offline'||code==='network') return 'Bağlantı yok · çevrimiçi olunca kendiliğinden gönderilecek.';
+  if(code==='receipt_failed') return 'Veri gitti ama uzak kabul makbuzu alınamadı · tekrar dene.';
+  return 'Eşitlenemedi · verin cihazında güvende, birazdan tekrar dene.';
+}
 App.saveNow=function(){
   ui.saveActionPending=true;
   save();
   if(!syncConfigured()){
     ui.saveActionPending=false; ui.saveState='local'; updateHeaderSave();
-    toast('Cihazına kaydedildi · repoya bağlanırsan her yerden korunur',2600);
+    toast('Cihazına kaydedildi · panele gitmesi için Ayarlar\'dan repoya bağlan',2800);
     return;
   }
   if(window.SeySync&&typeof window.SeySync.pushNow==='function'){
     ui.saveState='saving'; updateHeaderSave();
     try{
       var pending=window.SeySync.pushNow();
-      if(pending&&typeof pending.catch==='function') pending.catch(function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } });
-    }catch(e){ ui.saveActionPending=false; ui.saveState='error'; updateHeaderSave(); }
-    toast('Kaydediliyor…');
+      if(pending&&typeof pending.catch==='function') pending.catch(function(){ ui.saveActionPending=false; if(ui.saveState==='saving'){ ui.saveState='error'; updateHeaderSave(); } toast(syncFailureText(),3800); });
+    }catch(e){ ui.saveActionPending=false; ui.saveState='error'; updateHeaderSave(); toast(syncFailureText(),3800); }
+    toast('Panel ile eşitleniyor…');
   } else {
     ui.saveActionPending=false;
     ui.saveState='error'; updateHeaderSave();
-    toast('Senkron hazır değil · verin cihazında korundu',2600);
+    toast('Eşitleme hazır değil · verin cihazında korundu',2600);
   }
 };
+App.headerSync=App.saveNow;
 App.saveToday=function(){ getDay(data,todayStr(),dayIndexFor(todayStr())); App.saveNow(); };
 App.enableKeyEdit=function(){ ui.keyEdit=true; render(); };
 App.cancelKeyEdit=function(){ ui.keyEdit=false; render(); };

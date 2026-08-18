@@ -10,15 +10,15 @@ var KEY='seyma-reset-v1';
 // 4000ms). Yine de art arda hızlı etkileşimleri (birkaç habit tik'i,
 // mood/su/enerji ayarı) TEK push'a topluyor; her tık başına ayrı istek
 // atmaz.
-var DEBOUNCE=1500;
+var DEBOUNCE=2500;   // QY-22: yazma hacmini dusur; tek-ucus zaten coalesce ediyor
 var RECEIPT_PATH='data/sync-receipt.json';
 var PROJECTION_PATH='data/observer-snapshot.json';
 var timer=null, lastPayload=null;
 var state={status:'idle', last:null, error:null};
 
-var SYNC_STATUS_TEXT={idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
+var SYNC_STATUS_TEXT={remote_unreadable:'Uzak kayıt okunamadı · tekrar denenecek',idle:'Bağlı değil',local_saved:'Yerel kayıt bekliyor',queued:'Gönderilmek üzere bekliyor',saving:'Kaydediliyor…',retrying:'Yeniden deneniyor…',accepted:'Uzak kayda alındı',error:'Senkron hatası',offline:'Çevrimdışı',permission:'Yetki gerekli',unauthorized:'Yetki gerekli',forbidden:'Yetki gerekli',not_found:'Repo veya dosya bulunamadı',conflict:'Çakışma bekliyor',anti_clobber:'Veri kaybını önlemek için durduruldu',rate_limited:'Sunucu sınırı; sonra yeniden denenecek',receipt_failed:'Uzak kabul makbuzu alınamadı'};
 var SYNC_RECEIPT_STATUSES={idle:1,local_saved:1,queued:1,saving:1,retrying:1,accepted:1,error:1,offline:1,permission:1,conflict:1,anti_clobber:1};
-var SYNC_ERROR_CODES={offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
+var SYNC_ERROR_CODES={remote_unreadable:1,offline:1,unauthorized:1,forbidden:1,not_found:1,conflict:1,anti_clobber:1,validation:1,rate_limited:1,projection_failed:1,media_unavailable:1,network:1,receipt_failed:1,unknown:1};
 function emptySyncReceipt(){ return {schemaVersion:1,status:'idle',snapshotRevision:null,sourceUpdatedAt:null,submittedAt:null,acceptedAt:null,sourceLatestSha:null,lastErrorCode:null,lastErrorDetail:null}; }
 function safeReceiptString(v,max){ return typeof v==='string'&&v&&v.length<=(max||160)&&/^[a-f0-9]{7,128}$/i.test(v)?v:null; }
 function safeReceiptIso(v){ if(typeof v!=='string'||!v||v.length>40) return null; var t=Date.parse(v); return isNaN(t)?null:new Date(t).toISOString(); }
@@ -218,6 +218,43 @@ function syncForced(){
 }
 function dayCount(obj){ try{ return (obj&&obj.days&&typeof obj.days==='object') ? Object.keys(obj.days).length : 0; }catch(e){ return 0; } }
 function b64decodeUtf8(s){ try{ var bin=atob(String(s).replace(/\s+/g,'')); var by=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) by[i]=bin.charCodeAt(i); return new TextDecoder().decode(by); }catch(e){ return ''; } }
+// ── QY-22: 1 MB üstü dosyaları GERÇEKTEN okuyabilen güvenli okuyucu ────────
+// KEŞİF (2026-08-18): data/latest.json 1.51 MB'a ulaşınca GitHub Contents API
+// gövdeyi DÖNDÜRMEYİ BIRAKTI — 200 döner ama `encoding:"none"`, `content:""`.
+// Bu sessizce üç şeyi bozdu:
+//   • putLatestGuarded'ın uzak veriyi okuyup birleştirmesi (çoklu cihaz merge ÖLDÜ),
+//   • ANTI-CLOBBER Guard 2 (remoteDays hep 0 okundu → koruma DEVRE DIŞI kaldı —
+//     CLAUDE.md'nin 2026-07-10 veri kaybından sonra eklediği korumanın ta kendisi),
+//   • panelin latest.json/observer-snapshot okuması (degrade görünüm).
+// Çözüm: gövde boş gelirse Blobs API'ye düş. `git/blobs/<sha>` 100 MB'a kadar
+// ham içerik döndürür. YALNIZ GET; hiçbir yazma yapmaz.
+function ghGetFileSafe(c, path){
+  var base='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo);
+  var H=ghHeaders(c);
+  return fetch(base+'/contents/'+path+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
+    .then(function(r){ if(r.status===200) return r.json(); return null; })
+    .then(function(g){
+      if(!g) return {sha:null,text:null,viaBlob:false};
+      var sha=g.sha||null;
+      if(g.content){ return {sha:sha,text:b64decodeUtf8(g.content),viaBlob:false}; }
+      // Gövde yok (>1 MB). sha ile blob'u ham olarak çek.
+      if(!sha) return {sha:null,text:null,viaBlob:false};
+      var H2={}; for(var k in H) H2[k]=H[k]; H2['Accept']='application/vnd.github.raw';
+      return fetch(base+'/git/blobs/'+encodeURIComponent(sha)+'?t='+Date.now(),{headers:H2})
+        .then(function(r2){
+          if(!r2.ok) return {sha:sha,text:null,viaBlob:true};
+          return r2.text().then(function(t){
+            // Bazı vekiller raw Accept'i yok sayıp JSON döndürür; ikisini de karşıla.
+            if(t && t.charAt(0)==='{' && t.indexOf('"encoding"')>=0 && t.indexOf('"content"')>=0){
+              try{ var j=JSON.parse(t); if(j && j.encoding==='base64' && typeof j.content==='string') return {sha:sha,text:b64decodeUtf8(j.content),viaBlob:true}; }catch(e){}
+            }
+            return {sha:sha,text:t,viaBlob:true};
+          });
+        })
+        .catch(function(){ return {sha:sha,text:null,viaBlob:true}; });
+    });
+}
+
 function pad(n){ return (n<10?'0':'')+n; }
 function timeStr(iso){ try{ var d=new Date(iso); return pad(d.getHours())+':'+pad(d.getMinutes()); }catch(e){ return ''; } }
 function statusText(){
@@ -266,14 +303,21 @@ function persistBranch(branch){
 }
 // GUARD 2 — ANTI-CLOBBER: uzak latest.json'dan daha AZ güne düşecek push'u engelle.
 // Günler yalnızca birikir; local<remote ise bu bir veri kaybı/ezme demektir.
-function putLatestGuarded(c, latestStr, localData){
+function putLatestGuarded(c, latestStr, localData, attempt){
+  attempt = attempt||0;
   var base='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/data/latest.json';
   var H=ghHeaders(c);
-  return fetch(base+'?ref='+encodeURIComponent(c.branch)+'&t='+Date.now(),{headers:H})
-    .then(function(r){ if(r.status===200) return r.json(); return null; })
+  return ghGetFileSafe(c,'data/latest.json')
     .then(function(g){
       var sha=(g&&g.sha)||null, remoteDays=0, remoteObj=null;
-      if(g&&g.content){ try{ remoteObj=JSON.parse(b64decodeUtf8(g.content)); }catch(e){} }
+      // QY-22: gövde artık 1 MB üstünde de gelir (Blobs API fallback). Boş gövde
+      // "uzakta veri yok" DEMEK DEĞİLDİR; sha varken gövde okunamadıysa bu bir
+      // OKUMA HATASIDIR ve anti-clobber körleşmesin diye push iptal edilir.
+      if(g&&typeof g.text==='string'&&g.text){ try{ remoteObj=JSON.parse(g.text); }catch(e){} }
+      if(sha && !remoteObj && !syncForced()){
+        setStatus('error','remote_unreadable');
+        var ru=new Error('remote latest.json okunamadi (sha var, govde yok)'); ru.code='remote_unreadable'; throw ru;
+      }
       try{ remoteDays=dayCount(remoteObj); }catch(e){}
       // CONFLICT-SAFE SYNC: önce uzak veriyi yerel ile birleştir; bu sayede bayat/eksik
       // bir cihaz açıldığında uzaktaki yeni günler kaybolmaz. Anti-clobber kontrolü
@@ -300,7 +344,18 @@ function putLatestGuarded(c, latestStr, localData){
       var H2={}; for(var k in H) H2[k]=H[k]; H2['Content-Type']='application/json';
       return fetch(base,{method:'PUT',headers:H2,body:JSON.stringify(body)}).then(function(r){
         if(r.ok) return r.json().catch(function(){ return {}; });
-        return r.text().then(function(t){ var e=new Error(r.status+' '+t.slice(0,160)); e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown'); throw e; });
+        return r.text().then(function(t){
+          // QY-22: 409/422 = sha yarisi (iki push ust uste bindi). ghPut ve
+          // putQuranOutboxGuarded bunu zaten yeniden deniyordu; latest.json
+          // zincirinde retry YOKTU, bu yuzden yarisi kaybeden push KALICI
+          // conflict receipt yaziyordu ve panel surekli kirmizi kaliyordu.
+          // Yeniden deneme sha'yi ve uzak veriyi bastan okur: merge ve
+          // anti-clobber tekrar calisir, sessiz uzerine yazma olmaz.
+          if((r.status===409||r.status===422) && attempt<3){
+            return putLatestGuarded(c,latestStr,localData,attempt+1);
+          }
+          var e=new Error(r.status+' '+t.slice(0,160)); e.code=(r.status===401?'unauthorized':r.status===403?'forbidden':(r.status===409||r.status===422)?'conflict':r.status===429?'rate_limited':'unknown'); throw e;
+        });
       });
     });
 }
@@ -313,9 +368,12 @@ function pushWithCfg(c, data, pendingReceipt){
   var pending=normalizeSyncReceipt(pendingReceipt||data.syncReceipt);
   if(!pending.sourceUpdatedAt) pending.sourceUpdatedAt=safeReceiptIso(data&&data.savedAt)||nowIso;
   if(!pending.submittedAt) pending.submittedAt=nowIso;
-  // Her push öncesinde zaman damgalı yedek: bir şey ters giderse geri dönülebilir.
+  // Push oncesi yedek. QY-22: eskiden HER push'ta zaman damgali YENI bir dosya
+  // yaziliyordu; 2026-08-18'de data/backups/ 2135 dosya / ~2.1 GB'a ulasmisti ve
+  // her push ~1.5 MB'lik olu yazma daha ekliyordu. Artik GUNDE TEK dosya var ve
+  // gun icinde ustune yazilir: kurtarma noktasi korunur, sinirsiz buyume durur.
   var backup=JSON.stringify({app:'seyma',type:'pre-push-backup',savedAt:nowIso,data:safeForFiles},null,2);
-  return ghPut(c,'data/backups/'+nowIso.replace(/[:.]/g,'-')+'.json',backup)
+  return ghPut(c,'data/backups/'+nowIso.slice(0,10)+'.json',backup)
     .catch(function(){})
     .then(function(){ return putLatestGuarded(c,latest,data); })
     .then(function(latestResult){
@@ -815,7 +873,25 @@ function sanitize(data){
   if(c&&c.music&&Array.isArray(c.music.items)){ c.music.items.forEach(function(m){ if(m&&typeof m==="object") delete m.emoji; }); }
   return c;
 }
+// QY-22: TEK UÇUŞ. Onceki surumde debounce (1.5 sn) ile tetiklenen push'lar
+// ust uste binebiliyordu: iki push AYNI sha'yi okuyup sirayla PUT ediyor,
+// ikincisi bayat sha ile 409 aliyordu. Gozlenen sonuc: latest.json commit'leri
+// 5-6 saniye arayla yagiyor, arada kaybeden push kalici 'conflict' receipt
+// yaziyor ve panel surekli kirmizi kaliyordu. Artik ayni anda tek push ucar;
+// sirada bekleyen istek en guncel veriyle TEK seferde tekrarlanir.
+var inFlight=null, rerunPending=false;
 function doPush(data){
+  if(inFlight){ rerunPending=true; lastPayload=data||lastPayload; return inFlight; }
+  var chain=doPushInner(data);
+  inFlight=chain;
+  var done=function(){
+    inFlight=null;
+    if(rerunPending){ rerunPending=false; if(lastPayload) doPush(lastPayload); }
+  };
+  chain.then(done,done);
+  return chain;
+}
+function doPushInner(data){
   var c=cfg(); if(!c){ setStatus('idle'); return Promise.resolve(null); }
   // GUARD 1 — yerel/geliştirme ortamından (localhost/file:) push etme. Bayat bir
   // localStorage durumu gerçek veriyi ezebilir (bkz. CLAUDE.md → Veri Güvenliği).

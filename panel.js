@@ -513,7 +513,31 @@ function loadTransportFileP(path){
       }
       if(r.status===404){ PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:null,sha:null}; return {raw:null,sha:null,etag:etag}; }
       if(!r.ok) throw new Error("transport "+r.status);
-      return r.json().then(function(g){ var raw=(g&&typeof g.content==="string")?b64dec(g.content):null, sha=(g&&g.sha)||null; PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:raw,sha:sha}; return {raw:raw,sha:sha,etag:etag}; });
+      return r.json().then(function(g){
+        var raw=(g&&typeof g.content==="string"&&g.content)?b64dec(g.content):null, sha=(g&&g.sha)||null;
+        // QY-22: Contents API'nin JSON temsili 1 MB ile sinirli; ustundeki
+        // dosyalarda 200 doner ama encoding:"none" + content:"" gelir.
+        // data/observer-snapshot.json 2.98 MB'a ulasinca panel projeksiyonu
+        // tam da bu yuzden "Projection yok" deyip eski latest.json'a
+        // dusuyordu. Govde bos ve sha varsa Blobs API'den ham oku (100 MB'a
+        // kadar destekler). Yalniz GET; panel hicbir seyi yazmaz.
+        if(raw===null && sha){
+          var pr=REPO.split("/");
+          var blob="https://api.github.com/repos/"+encodeURIComponent(pr[0])+"/"+encodeURIComponent(pr[1])+"/git/blobs/"+encodeURIComponent(sha);
+          var H2=ghJsonHeaders(); H2["Accept"]="application/vnd.github.raw";
+          return fetch(blob,{headers:H2,cache:"no-store"}).then(function(r2){
+            if(!r2.ok) throw new Error("transport blob "+r2.status);
+            return r2.text();
+          }).then(function(t){
+            if(t && t.charAt(0)==="{" && t.indexOf('"encoding"')>=0 && t.indexOf('"content"')>=0){
+              try{ var j=JSON.parse(t); if(j && j.encoding==="base64" && typeof j.content==="string") t=b64dec(j.content); }catch(e){}
+            }
+            PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:t,sha:sha};
+            return {raw:t,sha:sha,etag:etag,viaBlob:true};
+          });
+        }
+        PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:raw,sha:sha}; return {raw:raw,sha:sha,etag:etag};
+      });
     });
 }
 function loadSyncReceiptP(){

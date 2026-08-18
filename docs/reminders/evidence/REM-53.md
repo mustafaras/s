@@ -115,3 +115,18 @@ Gerçek tarayıcı, gerçek ağ çağrısı, gerçek kullanıcı localStorage'ı
 APP-02 privacy ve APP-04 sync kısmı kapandı. `activePrompt=REM-54`,
 `lastCompletedPrompt=REM-53`. Release `not_approved`; S5 kullanıcı-cihaz kabulü
 pending.
+
+## Standing delivery receipt
+
+- **Closure commit:** `578fda2` — `HEAD` = `origin/main` = `git ls-remote origin main` (fast-forward, PR yok)
+- **Workflow:** `32170488637` · `success`
+- **Pages deployment:** `5968696473` · status `16977319676` · `success`
+- **Live:** `https://mustafaras.github.io/s/index.html` HTTP `200`, `app.js?v=20260818e`
+- **Deployed marker doğrulaması:** canlı `app.js` içinde `REMINDER_PRIVACY_SCHEMAS`,
+  `reminderPrivacyReport`, `reminderPrivacyHasContent`, `canonicalPreference`,
+  `safeEventSummary`, `projectionSummary`, `additive-local-only` bulundu;
+  düzeltilmiş `scheduleMoveSync` tek geçidi canlıda mevcut ve
+  `SeySync.schedule(data)` çağrısı canlı asset içinde **0** kez geçiyor
+- **`mustafaras/seyma-data`:** bu teslimatta **yazılmadı**
+- **Kapsam:** standing `after_each_prompt` tüketildi; `releaseApproval` `not_approved` olarak kaldı;
+  S5 kullanıcı-cihaz kabulü pending

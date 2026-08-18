@@ -40,8 +40,8 @@
     "source": "REM-53 five separate reminder privacy schemas (local-only key, canonical preference, safe event summary, projection summary, native copy), single reminderSyncPayload gate for every app sync path, and fail-closed payload production; sync.js sanitize/merge boundary deliberately unchanged and re-proved; protected paths preserved",
     "tests": "app privacy 198 (10 scenarios), sync privacy 347, Faz10 64/64, Panel P0 31/31; full reminder/root/Panel-v2 114/114, headless 5/5, node --check and context PASS",
     "commit": "6c1a4b0",
-    "remoteEquality": "pending; REM-53 standing delivery receipt not yet recorded",
-    "deployment": "pending; REM-53 standing delivery receipt not yet recorded",
+    "remoteEquality": "local HEAD, origin/main and ls-remote matched 578fda2; standing main fast-forward PASS",
+    "deployment": "workflow 32170488637 success; GitHub Pages deployment 5968696473 / status 16977319676 success; live HTTP 200; deployed app.js?v=20260818e privacy-schema markers and the fixed scheduleMoveSync gate verified",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,7 +75,7 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-18",
-  "updatedBy": "REM-53 closure recorded; standing after_each_prompt main/Pages receipt still to run; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
+  "updatedBy": "REM-53 closure and standing after_each_prompt main/Pages receipt recorded; releaseApproval remains not_approved, S5 pending, mustafaras/seyma-data untouched",
   "closure": {
     "prompt": "REM-53",
     "evidence": "docs/reminders/evidence/REM-53.md",

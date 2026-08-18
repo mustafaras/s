@@ -90,3 +90,14 @@ parçasıydı. İddianın niyeti ("cache-bust var") korunarak desen kontrolüne
 
 APP-05 kapandı. `activePrompt=REM-52`, `lastCompletedPrompt=REM-51`.
 Release `not_approved`; S5 kullanıcı-cihaz kabulü pending.
+
+## Standing delivery receipt
+
+- **Closure commit:** `777fcd5` — `origin/main` ile eşit (fast-forward, PR yok)
+- **Workflow:** `32139172090` · `success`
+- **Pages deployment:** `5963094719` · `success`
+- **Live:** `https://mustafaras.github.io/s/index.html` HTTP `200`, `app.js?v=20260818c`
+- **Deployed marker doğrulaması:** `reminderSurfaceTable`, `reminderSurfaceState`,
+  `reminderNativeTargetView`, `handler-missing`, `therapy-tool-unselected` canlı asset içinde bulundu
+- **`mustafaras/seyma-data`:** bu teslimatta **yazılmadı** (son commit REM-51 öncesi bakım commit'i)
+- **Kapsam:** standing `after_each_prompt` tüketildi; `releaseApproval` `not_approved` olarak kaldı

@@ -110,8 +110,9 @@ runTests([
     assert(visualBlock.includes("min-height:44px"));
     assert(visualBlock.includes("@media (prefers-reduced-motion:reduce)"));
     assert(visualBlock.includes("animation:none!important"));
-    assert(index.includes("styles.css?v=20260817b"));
-    assert(index.includes("app.js?v=20260817a"));
+    // Sabit surum degil, cache-bust'in VARLIGI aranir (bkz. test_reminder_boot.js).
+    assert(/styles\.css\?v=\d{8}[a-z]/.test(index));
+    assert(/app\.js\?v=\d{8}[a-z]/.test(index));
   }],
   ["light and dark reminder center renders the same premium hierarchy", () => {
     const out = boot();

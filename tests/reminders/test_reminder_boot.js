@@ -174,8 +174,10 @@ const cases = [
     assert(sandbox.ReminderCatalogV1 && sandbox.ReminderCatalogV1 !== sandbox.App);
   }],
   ["cache-bust covers the adapter assets without adding unrelated modules", () => {
-    assert(INDEX.includes('app/core/reminderCatalog.js?v=20260813a'));
-    assert(INDEX.includes('app.js?v=20260817a'));
+    // Cache-bust DAMGASI her deploy'da bumplanir (CLAUDE.md ilke 5); sabit
+    // surum beklemek testi her teslimatta kirardi. Sozlesme "cache-bust VAR"dir.
+    assert(/app\/core\/reminderCatalog\.js\?v=\d{8}[a-z]/.test(INDEX));
+    assert(/app\.js\?v=\d{8}[a-z]/.test(INDEX));
     assert(!INDEX.includes('app/core/reminderState.js'));
     assert(!INDEX.includes('app/core/reminderEngine.js'));
     assert(!APP_SOURCE.includes("window.ReminderStateV1"));

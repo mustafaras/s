@@ -1892,6 +1892,15 @@ function reminderNativeTag(occurrenceId){
   var id=reminderActionSafeToken(occurrenceId,240); if(!id) return '';
   return (REMINDER_NATIVE_TAG_PREFIX+encodeURIComponent(id)).slice(0,220);
 }
+// REM-51 — native sinir daraltmasi. Onceki surumde native kopya TUM target
+// nesnesini tasiyordu; REM-51 ile target'a eklenen surface teshis alanlari
+// (requiredState / surfaceState / unavailableReason) boylece native yuzeye
+// sizacakti. Native yuk generic kalmalidir: yalnizca yonlendirme icin gereken
+// alanlar gecer, ozellik durumu uygulama ICINDE kalir.
+function reminderNativeTargetView(target){
+  var t=target&&typeof target==='object'?target:{};
+  return {deepLink:String(t.deepLink||''),targetId:String(t.targetId||''),kind:String(t.kind||''),openDetail:t.openDetail===true,therapyToolId:String(t.therapyToolId||'')};
+}
 function reminderNativeDeliveryCopy(input){
   var x=input&&typeof input==='object'?input:{}, occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:{}, reminderId=String(x.reminderId||occurrence.reminderId||(x.definition&&x.definition.id)||''), occurrenceId=reminderActionSafeToken(x.occurrenceId||occurrence.occurrenceId||occurrence.id,240), definition=reminderActionDefinition(reminderId);
   if(!reminderId||!occurrenceId||!definition) return {ok:false,reason:'invalid-native-payload'};
@@ -1906,7 +1915,7 @@ function reminderNativeDeliveryCopy(input){
   if(!safe) safe={title:String(definition.privateTitle||''),detail:String(definition.privateBody||''),deepLink:canonicalDeepLink};
   if(!safe.title||!safe.detail) return {ok:false,reason:'missing-safe-copy'};
   var snoozeOptions=(Array.isArray(definition.snoozeOptions)?definition.snoozeOptions:[]).filter(function(option){ return reminderEnumHas(REMINDER_SNOOZE_OPTIONS,String(option)); }), defaultSnooze=snoozeOptions.indexOf('10m')>=0?'10m':(snoozeOptions[0]||'');
-  return {ok:true,reason:null,reminderId:reminderId,occurrenceId:occurrenceId,title:String(safe.title).slice(0,80),body:String(safe.detail).slice(0,180),tag:reminderNativeTag(occurrenceId),deepLink:target.deepLink,target:target,timezone:reminderEngineTimezoneValid(String(occurrence.timezone||''))?String(occurrence.timezone):REMINDER_ENGINE_DEFAULT_TIMEZONE,snoozeOptions:snoozeOptions,defaultSnoozeOption:defaultSnooze};
+  return {ok:true,reason:null,reminderId:reminderId,occurrenceId:occurrenceId,title:String(safe.title).slice(0,80),body:String(safe.detail).slice(0,180),tag:reminderNativeTag(occurrenceId),deepLink:target.deepLink,target:reminderNativeTargetView(target),timezone:reminderEngineTimezoneValid(String(occurrence.timezone||''))?String(occurrence.timezone):REMINDER_ENGINE_DEFAULT_TIMEZONE,snoozeOptions:snoozeOptions,defaultSnoozeOption:defaultSnooze};
 }
 function reminderNativePayload(copy){
   var target=copy&&copy.target&&typeof copy.target==='object'?copy.target:{};
@@ -6748,16 +6757,82 @@ var REMINDER_ACTION_MAX_ENTRIES=REMINDER_RETENTION_POLICY.notificationHistory.ma
 var REMINDER_ACTIONS={snooze:true,todayOff:true,disable:true,enable:true,open:true};
 var REMINDER_ACTION_STATUSES={scheduled:true,suppressed:true,disabled:true,enabled:true,completed:true,reverted:true};
 var REMINDER_ACTION_OPTION_LABELS={'10m':reminderCopy('inApp.snooze.10m','10 dakika'),'30m':reminderCopy('inApp.snooze.30m','30 dakika'),'1h':reminderCopy('inApp.snooze.1h','1 saat'),thisEvening:reminderCopy('inApp.snooze.thisEvening','Bu akşam'),tomorrow:reminderCopy('inApp.snooze.tomorrow','Yarın'),todayOff:reminderCopy('inApp.snooze.todayOff','Bugün bir daha gösterme')};
+// REM-51 — App surface adapter sozlesmesi. Her reminder hedefi icin: hangi tab/
+// overlay, hangi GERCEK App handler'i, hangi ozellik durumu gerekli ve geri
+// donusun nereye gittigi TEK yerde yazilidir. Onceki surumde yalniz
+// targetId/kind/handler vardi; requiredState ve backPath belge disindaydi.
 var REMINDER_DEEP_LINK_TARGETS={
-  faith:{targetId:'faith',kind:'overlay',handler:'openFaithCorner'},
-  zikr:{targetId:'zikr',kind:'overlay',handler:'openZikr'},
-  room:{targetId:'room',kind:'overlay',handler:'openRoom'},
-  saygi:{targetId:'saygi',kind:'tab',handler:'go'},
-  reading:{targetId:'reading',kind:'overlay',handler:'openReading'},
-  gunluk:{targetId:'gunluk',kind:'overlay',handler:'openJournalModal'},
-  health:{targetId:'saglik',kind:'tab',handler:'go'},
-  settings:{targetId:'ayarlar',kind:'tab',handler:'go'}
+  faith:{targetId:'faith',kind:'overlay',handler:'openFaithCorner',requiredState:'prayer-data',backPath:'bugun'},
+  zikr:{targetId:'zikr',kind:'overlay',handler:'openZikr',requiredState:'zikr-session',backPath:'bugun'},
+  room:{targetId:'room',kind:'overlay',handler:'openRoom',requiredState:'therapy-tool',backPath:'bugun'},
+  saygi:{targetId:'saygi',kind:'tab',handler:'go',requiredState:'saygi-content',backPath:'bugun'},
+  reading:{targetId:'reading',kind:'overlay',handler:'openReading',requiredState:'reading-library',backPath:'bugun'},
+  gunluk:{targetId:'gunluk',kind:'overlay',handler:'openJournalModal',requiredState:'none',backPath:'bugun'},
+  health:{targetId:'saglik',kind:'tab',handler:'go',requiredState:'care-config',backPath:'bugun'},
+  settings:{targetId:'ayarlar',kind:'tab',handler:'go',requiredState:'none',backPath:'bugun'}
 };
+// REM-51 gorev 2 — ozellik durumlari AYRI gosterilir, yol kapatilmaz.
+// Ayrim kasitlidir: "vakit verisi eski" kullaniciyi Vakit kosesinden men etmez,
+// ama uygulama taze veri varmis gibi de davranmaz. Yalniz bilinmeyen hedef /
+// handler / feature flag fail-closed'dir (gorev 5).
+var REMINDER_SURFACE_STATES={ready:1,degraded:1,unavailable:1};
+function reminderSurfaceRoot(){ try{ return (data&&data.reminders&&typeof data.reminders==='object')?data.reminders:{}; }catch(e){ return {}; } }
+function reminderSurfaceState(requiredState){
+  var d=null; try{ d=data; }catch(e){ d=null; }
+  if(!d||requiredState==='none') return {state:'ready',reason:null};
+  if(requiredState==='prayer-data'){
+    // Kanonik cozumleme reminderEngineSource ile AYNI sirayi izler: prayerData
+    // asil alandir, `prayer` geriye donuk esdegeridir.
+    var src=(d.prayerData&&typeof d.prayerData==='object')?d.prayerData:((d.prayer&&typeof d.prayer==='object')?d.prayer:null);
+    if(!src||!(src.times||src.prayerTimes)) return {state:'degraded',reason:'prayer-data-unavailable'};
+    // Sozlesme: reminderSystemPrayerStatus girdiyi `prayerData` alanindan okur.
+    var st=reminderSystemPrayerStatus({prayerData:src,nowIso:new Date().toISOString()});
+    if(st&&st.state==='stale') return {state:'degraded',reason:'prayer-data-stale'};
+    if(st&&st.state==='unavailable') return {state:'degraded',reason:'prayer-data-unavailable'};
+    return {state:'ready',reason:null};
+  }
+  if(requiredState==='zikr-session'){
+    var z=(d.zikr&&typeof d.zikr==='object')?d.zikr:null, sess=z&&z.session&&typeof z.session==='object'?z.session:null;
+    if(sess&&(sess.paused===true||sess.status==='paused')) return {state:'degraded',reason:'zikr-session-paused'};
+    return {state:'ready',reason:null};
+  }
+  if(requiredState==='therapy-tool'){
+    var root=reminderSurfaceRoot(), pref=root.preferences?root.preferences[REMINDER_THERAPY_ID]:null;
+    if(!reminderTherapyPreferenceSelected(pref)) return {state:'degraded',reason:'therapy-tool-unselected'};
+    return {state:'ready',reason:null};
+  }
+  if(requiredState==='saygi-content'){
+    if(!saygiPeople().length) return {state:'degraded',reason:'saygi-content-unavailable'};
+    return {state:'ready',reason:null};
+  }
+  if(requiredState==='reading-library'){
+    var books=(d.library&&Array.isArray(d.library.books))?d.library.books:[];
+    if(!books.length) return {state:'degraded',reason:'reading-library-empty'};
+    return {state:'ready',reason:null};
+  }
+  if(requiredState==='care-config'){
+    var meds=reminderSurfaceRoot().medications;
+    if(!Array.isArray(meds)||!meds.length) return {state:'degraded',reason:'care-unconfigured'};
+    return {state:'ready',reason:null};
+  }
+  return {state:'ready',reason:null};
+}
+// Gorev 1 — insan ve test tarafindan okunabilir tek tablo.
+function reminderSurfaceTable(){
+  var C=(typeof window!=='undefined'&&window.ReminderCatalogV1)||null;
+  var defs=(C&&typeof C.list==='function')?C.list():[];
+  return defs.map(function(def){
+    var link=String(def&&def.deepLink||''), t=REMINDER_DEEP_LINK_TARGETS[link]||null;
+    var st=t?reminderSurfaceState(t.requiredState):{state:'unavailable',reason:'unavailable-target'};
+    return {
+      reminderId:String(def&&def.id||''), deepLink:link,
+      targetId:t?t.targetId:'', kind:t?t.kind:'unavailable', handler:t?t.handler:'',
+      handlerBound:!!(t&&typeof App[t.handler]==='function'),
+      requiredState:t?t.requiredState:'', backPath:t?t.backPath:'',
+      surfaceState:st.state, unavailableReason:st.reason
+    };
+  });
+}
 function reminderActionSafeToken(value,max){
   var token=String(value==null?'':value);
   if(!token||token.length>(max||240)||!/^[A-Za-z0-9._:%|+\-]+$/.test(token)) return '';
@@ -6891,8 +6966,14 @@ function reminderDeepLinkTarget(input){
   var canonicalDeepLink=String(definition.deepLink||''), target=REMINDER_DEEP_LINK_TARGETS[canonicalDeepLink];
   if(!target) return {ok:false,available:false,reason:'unavailable-target',reminderId:reminderId,deepLink:canonicalDeepLink,targetId:'',kind:'unavailable',handler:''};
   if(deepLink&&deepLink!==canonicalDeepLink) return {ok:false,available:false,reason:'target-mismatch',reminderId:reminderId,deepLink:'',targetId:'',kind:'unavailable',handler:target.handler||''};
+  // REM-51 gorev 5 — kayitli handler App'te GERCEKTEN yoksa hedef acilmis gibi
+  // davranilmaz. Eskiden ok:true doner, sonra sessizce hicbir sey olmazdi.
+  if(!target.handler||typeof App[target.handler]!=='function')
+    return {ok:false,available:false,reason:'handler-missing',reminderId:reminderId,deepLink:canonicalDeepLink,targetId:target.targetId,kind:'unavailable',handler:String(target.handler||'')};
   var therapyToolId=reminderTherapyToolId(Object.assign({},occurrence,x));
-  return {ok:true,available:true,reason:null,reminderId:reminderId,deepLink:canonicalDeepLink,targetId:target.targetId,kind:target.kind,handler:target.handler||'',therapyToolId:reminderId===REMINDER_THERAPY_ID?therapyToolId:'',openDetail:canonicalDeepLink==='saygi'?(x.openDetail!==false&&occurrence.openDetail!==false):false};
+  // REM-51 gorev 2 — ozellik durumu AYRI alanlarda tasinir; ok'i dusurmez.
+  var surface=reminderSurfaceState(target.requiredState);
+  return {ok:true,available:true,reason:null,reminderId:reminderId,deepLink:canonicalDeepLink,targetId:target.targetId,kind:target.kind,handler:target.handler||'',requiredState:String(target.requiredState||'none'),backPath:String(target.backPath||''),surfaceState:surface.state,unavailableReason:surface.reason,therapyToolId:reminderId===REMINDER_THERAPY_ID?therapyToolId:'',openDetail:canonicalDeepLink==='saygi'?(x.openDetail!==false&&occurrence.openDetail!==false):false};
 }
 function reminderActionOccurrence(occurrenceId,reminderId,options){
   var x=options&&typeof options==='object'?options:{}, definition=reminderActionDefinition(reminderId), nowIso=reminderDeliveryNow(x.nowIso||x.now), context=reminderLifecycleDefaultContext({timezone:x.timezone,context:{nowIso:nowIso}},nowIso), localDate=String(x.localDate||context.localDate||''), localTime=String(x.localTime||context.localTime||'12:00').slice(0,5);
@@ -7537,6 +7618,8 @@ App.reminderActionState=function(now){ return reminderActionLoad(now,true); };
 App.reminderActionKey=REMINDER_ACTION_KEY;
 App.reminderSnoozePlan=reminderSnoozePlan;
 App.reminderDeepLinkTarget=reminderDeepLinkTarget;
+App.reminderSurfaceTable=reminderSurfaceTable;
+App.reminderSurfaceState=reminderSurfaceState;
 App.reminderDeepLinkTargets=function(){ return Object.keys(REMINDER_DEEP_LINK_TARGETS).map(function(key){ return {deepLink:key,targetId:REMINDER_DEEP_LINK_TARGETS[key].targetId,kind:REMINDER_DEEP_LINK_TARGETS[key].kind}; }); };
 App.reminderInboxSnooze=function(occurrenceId,option,reminderId,options){
   var x=options&&typeof options==='object'?Object.assign({},options):{}, id=String(occurrenceId||''), reminder=String(reminderId||x.reminderId||''), nowIso=reminderDeliveryNow(x.nowIso||x.now), occurrence=x.occurrence&&typeof x.occurrence==='object'?x.occurrence:reminderActionOccurrence(id,reminder,Object.assign({},x,{nowIso:nowIso}));

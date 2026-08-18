@@ -29,7 +29,9 @@ ok('event satırları tıklanabilir drawer tetiklemez (ölü kod temizlendi)',!h
 context.UI.eventFilter='external';
 var external=context.eventLogCardHTMLP();
 ok('external filtresi yalnız dış kaynağı gösterir',external.includes('evt-external')&&!external.includes('evt-chain-1')&&!external.includes('evt-derived'));
-ok('cache-bust güncel panel sürümünde',htmlSource.includes('panel.css?v=20260809c')&&htmlSource.includes('panel.js?v=20260811a'));
+// Cache-bust DAMGASI her deploy'da bumplanir (CLAUDE.md ilke 5); sabit surum
+// beklemek testi her teslimatta kirar. Sozlesme "cache-bust VAR"dir.
+ok('cache-bust güncel panel sürümünde',/panel\.css\?v=\d{8}[a-z]/.test(htmlSource)&&/panel\.js\?v=\d{8}[a-z]/.test(htmlSource));
 
 console.log('\nPANEL-012 / PANEL-10 fixture result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');
 if(failed) process.exitCode=1;

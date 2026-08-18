@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-55",
+  "activePrompt": "REM-56",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-54",
-  "nextSafeAction": "REM-55 Panel source authority ve projection seçim sözleşmesi; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-55",
+  "nextSafeAction": "REM-56 Panel coverage manifest ve reminder schema classification; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-54 acceptance gate found a real defect: app/core/reminderEngine.js, reminderScheduler.js and reminderDelivery.js were written and tested in REM-46/50/52 but never wired into index.html, so production always ran the inline fallback and the three modules shipped as dead code; it stayed invisible because the REM-44 boot fixture froze the opposite assertion and app.js used a window[key] string dodge. Module <-> fallback equivalence was proved BEFORE wiring (delivery: value-identical subset + identical classification; engine: identical occurrence/occurrenceId; scheduler: identical counters excluding wall-clock lastAtMs), then the three modules were loaded with cache-bust, the indirect lookup became a direct reference and the boot contract was flipped positive; both headless harnesses now boot the same set as index.html",
-    "tests": "acceptance 487 assertions / 19 scenarios (new), boot 40, driver +17 REM-54 assertions, zikr-harness 95/95 (from 90); full reminder/root/Panel-v2 115/115, headless 5/5, node --check 10/10, script tag balance 20/20, console error 0, diff --check and context PASS",
-    "commit": "78d17a8",
-    "remoteEquality": "pending; standing after_each_prompt delivery runs after closure validator PASS",
-    "deployment": "pending; no deployment performed during REM-54 verification",
+    "source": "REM-55 gate found a real panel defect: the reason resolution inside load() read the sync receipt (res[3]) instead of the projection loader result (res[4]); a normalized receipt has no `reason` field, so the upgrade was dead code and a 401/403 or network failure rendered as the benign 'Projection yok' badge instead of 'Projection okunamadi'. The buried logic became the named, testable projectionSourceStateP() (only coarse projection_missing is upgraded; ready / projection_stale / receipt_missing are never overwritten; missing, empty or receipt-shaped input fails closed) and load() now passes res[4]. panelCoverageManifest.js deliberately unchanged and re-proved; app runtime, Panel-v2 and protected paths untouched",
+    "tests": "panel source 319 assertions / 12 scenarios (new), Panel P1 and P0 regression PASS; full reminder/root/Panel-v2 116/116, headless 5/5, node --check panel.js + panelCoverageManifest.js and diff --check PASS",
+    "commit": "0a3b819",
+    "remoteEquality": "REM-54 delivered: local HEAD, origin/main and ls-remote matched ff9d482; standing main fast-forward PASS. REM-55 delivery pending until closure validator PASS",
+    "deployment": "REM-54 delivery verified live: workflow 32174375024 success; https://mustafaras.github.io/s/index.html HTTP 200 serving app.js?v=20260818g and the three newly wired app/core reminder modules at ?v=20260818a, each returning HTTP 200 with its ReminderXV1 namespace",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,11 +75,11 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-18",
-  "updatedBy": "REM-54 closed: reminder engine/scheduler/delivery modules wired into index.html after proving module<->fallback equivalence; app.js cache-bust bumped to 20260818g; activePrompt advances to REM-55 (R13 panel line); releaseApproval remains not_approved, S5 pending, panel files and mustafaras/seyma-data untouched",
+  "updatedBy": "REM-55 closed: panel projection reason resolution fixed (res[3] -> res[4]) behind the named projectionSourceStateP contract; activePrompt advances to REM-56; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched",
   "closure": {
-    "prompt": "REM-54",
-    "evidence": "docs/reminders/evidence/REM-54.md",
-    "commit": "78d17a8",
+    "prompt": "REM-55",
+    "evidence": "docs/reminders/evidence/REM-55.md",
+    "commit": "0a3b819",
     "status": "done",
     "validatedAt": "2026-08-18"
   }

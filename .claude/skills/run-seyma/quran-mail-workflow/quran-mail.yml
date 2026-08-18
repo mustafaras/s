@@ -52,14 +52,44 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python .github/scripts/quran_mail.py
 
-      - name: Delivery kaydını commit'le (yalnız değiştiyse)
+      # QY-21: çakışma-güvenli commit. Eski sürüm `git pull --rebase`
+      # kullanıyordu; iki eşzamanlı çalıştırma AYNI JSON satırlarına dokunduğu
+      # için rebase CONFLICT veriyor, adım düşüyor ve o çalıştırmanın teslim
+      # kaydı kayboluyordu — mail gitmiş olmasına rağmen istek "bekliyor"
+      # görünüp bir sonraki tetiklemede TEKRAR maillendi (gerçek vaka:
+      # fatiha isteği 15 ve 17 Ağustos'ta iki kez gönderildi). Artık çakışma
+      # metin düzeyinde değil, ALAN düzeyinde çözülür: merge_delivery.py
+      # iki tarafı birleştirir ve 'sent' kaydını asla geri almaz.
+      - name: Delivery kaydını commit'le (çakışmada alan düzeyinde birleştirir)
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git status --porcelain -- data/quran-delivery.json | grep -q .; then
-            git add data/quran-delivery.json
-            git commit -m "quran-delivery: istek teslim kaydı güncellendi"
-            git push
-          else
+          if ! git status --porcelain -- data/quran-delivery.json | grep -q .; then
             echo "data/quran-delivery.json değişmedi — commit atlanıyor."
+            exit 0
           fi
+          git add data/quran-delivery.json
+          git commit -m "quran-delivery: istek teslim kaydı güncellendi"
+          n=0
+          until git push; do
+            n=$((n+1))
+            if [ "$n" -ge 5 ]; then
+              echo "5 denemeden sonra push başarısız — teslim kaydı bu çalıştırmada kalıcı olmadı."
+              exit 1
+            fi
+            echo "push reddedildi (deneme $n/5) — uzak kayıtla birleştiriliyor…"
+            sleep $((n*3))
+            cp data/quran-delivery.json /tmp/quran-delivery.ours.json
+            git fetch origin main
+            git show origin/main:data/quran-delivery.json > /tmp/quran-delivery.theirs.json 2>/dev/null || echo '{}' > /tmp/quran-delivery.theirs.json
+            git reset --hard origin/main
+            python .github/scripts/merge_delivery.py \
+              /tmp/quran-delivery.ours.json /tmp/quran-delivery.theirs.json data/quran-delivery.json
+            if ! git status --porcelain -- data/quran-delivery.json | grep -q .; then
+              echo "birleştirmeden sonra fark kalmadı — uzak kayıt zaten güncel."
+              exit 0
+            fi
+            git add data/quran-delivery.json
+            git commit -m "quran-delivery: istek teslim kaydı güncellendi (birleştirildi)"
+          done

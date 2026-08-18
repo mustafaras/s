@@ -121,6 +121,26 @@ The other Kur'an gates are pure-function level and much faster:
 `verify-quran-state-machine.mjs` (QY-03 transitions), plus repo-root
 `node tests/test_quran_catalog.js` and `node tests/test_quran_transport.js`.
 
+### QY-21 delivery truth — "remote evidence beats local guess"
+
+```bash
+node .claude/skills/run-seyma/verify-quran-delivery-truth.mjs
+```
+
+Reproduces the 2026-08-17/18 production failure: three requests that *did*
+reach `data/quran-request-outbox.json` (and *were* emailed) showed up in the
+app as **"İletilemedi"**, because the verdict came from the app's own network
+result rather than from the outbox. Each wrong verdict re-opened retry and
+minted a **new** `requestId`, so the local id drifted away from the outbox id;
+and once a surah sat in `request_error`, the reducer could apply *no* delivery
+or response event, so the validated answer was silently dropped.
+
+The gate locks the repaired contract: `delivery_receipt`/`outbox_written` can
+rescue `request_error`, a submit failure is only recorded after
+`SeySync.confirmQuranRequest` says the outbox really lacks the id, and the
+requestId-drift repair stays narrow (same surah + validated after the open
+request only). All ids/videos in it are synthetic; `fetch` is dead.
+
 ### L2-b/B1 state helper boundary (read-only)
 
 ```bash

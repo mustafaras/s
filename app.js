@@ -777,9 +777,17 @@ var QURAN_RANK={idle:0,request_error:0,submitting:1,queued:2,notification_error:
 var QURAN_RETRYABLE=['idle','request_error','notification_error','invalid_reply','video_unavailable'];
 var QURAN_TRANSITIONS={
   request_submit:{from:QURAN_RETRYABLE,to:'submitting'},
-  outbox_written:{from:['submitting'],to:'queued'},
+  // QY-21 — request_error BURADA ÇIKMAZ SOKAK OLMAKTAN ÇIKAR. Uygulama
+  // "iletilemedi" hükmünü kendi ağ sonucundan verir ve bu hüküm YANILABİLİR:
+  // PUT sunucuda tamamlanmışken cevabı kaybolabilir ya da watchdog erken
+  // ateşleyebilir (gerçek üretim vakası: outbox'a yazılmış ve maili gitmiş üç
+  // istek uygulamada "İletilemedi" görünüyordu). Outbox/delivery/responses
+  // gerçeğin tek kaynağıdır; oradan gelen kanıt yerel tahmini EZER. Geçişler
+  // yine tek yönlüdür (rank 0/2 → 2/3), yani bu bir gevşetme değil,
+  // "kanıt tahmini yener" kuralıdır.
+  outbox_written:{from:['submitting','request_error'],to:'queued'},
   outbox_failed:{from:['submitting'],to:'request_error'},
-  delivery_receipt:{from:['queued'],to:'notified'},
+  delivery_receipt:{from:['queued','request_error','notification_error'],to:'notified'},
   delivery_failed:{from:['queued'],to:'notification_error'},
   await_reply:{from:['notified'],to:'awaiting_reply'},
   response_received:{from:['awaiting_reply'],to:'validating_reply'},
@@ -14883,7 +14891,13 @@ function quranOutboxWriter(){
   var s=(typeof window!=='undefined')?window.SeySync:null;
   return (s&&typeof s.pushQuranRequest==='function')?s:null;
 }
-var QURAN_SUBMIT_TIMEOUT_MS=20000;
+// Mobil şebekede GitHub'a GET+PUT turu 20 sn'yi rahatça aşabiliyor; eski
+// 20 sn'lik watchdog yazma hâlâ uçarken "iletilemedi" diyordu (gerçek üretim
+// vakası: mesed için 16:16–16:18 arası üç istek de outbox'a yazıldı ve maili
+// gitti, üçü de uygulamada hata göründü). Süre genişletildi; ama asıl güvence
+// süre değil, aşağıdaki outbox doğrulamasıdır.
+var QURAN_SUBMIT_TIMEOUT_MS=45000;
+var QURAN_CONFIRM_TIMEOUT_MS=12000;
 function quranOutboxErrorLabel(err){
   var msg=String((err&&err.message)||err||'');
   var http=msg.match(/(?:^|\s)(401|403|404|409|422)(?:\s|$)/);
@@ -14960,7 +14974,8 @@ function quranJourneySubmitProceed(sid){
     if(ret&&typeof ret.then==='function') ret.then(function(){ settle(true); },function(err){ settle(false,err); });
   }catch(e){ settle(false,e); }
 }
-function quranSettleSubmit(sid,okFlag,err){
+// QY-21: hükmü YAZAN tek yer. Buraya gelindiğinde karar çoktan verilmiştir.
+function quranRecordSubmitOutcome(sid,okFlag,err){
   var q=ensureQuranJourney(data), req=quranRequestOf(q,sid), at=new Date().toISOString();
   var res=quranReduce(req,{type:okFlag?'outbox_written':'outbox_failed',at:at});
   if(res.changed) q.requests[sid]=res.request;
@@ -14968,6 +14983,30 @@ function quranSettleSubmit(sid,okFlag,err){
   save();
   quranRepaintAfterChange(sid);
   toast(okFlag?'İsteğin kaydedildi.':'İstek şu an iletilemedi ('+quranOutboxErrorLabel(err)+'). Kaydın duruyor; yeniden deneyebilirsin.');
+}
+// QY-21: BAŞARISIZLIK HÜKMÜ ARTIK KANITSIZ VERİLMEZ. pushQuranRequest'in
+// hata bildirmesi yazının olmadığını KANITLAMAZ — cevabı kaybolmuş ama
+// sunucuda tamamlanmış bir PUT de, erken ateşleyen bir watchdog da aynı hatayı
+// üretir. Kullanıcıya "iletilemedi" demeden önce outbox'a bakılır: istek
+// oradaysa yazma GERÇEKTEN olmuştur (ve Raşit'e maili gitmiştir), o yüzden
+// doğru cevap "kaydedildi"dir. Yalnız outbox'ta gerçekten yoksa veya
+// doğrulama yapılamıyorsa hata kaydedilir — uygulama emin olmadığı şeyi
+// söylemez ve emin olmadığında da kullanıcıyı yanıltacak şekilde başarı demez.
+function quranSettleSubmit(sid,okFlag,err){
+  if(okFlag){ quranRecordSubmitOutcome(sid,true,null); return; }
+  var q=ensureQuranJourney(data), req=quranRequestOf(q,sid);
+  var rid=(req&&typeof req.requestId==='string')?req.requestId:'';
+  var s=(typeof window!=='undefined')?window.SeySync:null;
+  if(!rid||!s||typeof s.confirmQuranRequest!=='function'){ quranRecordSubmitOutcome(sid,false,err); return; }
+  var settled=false;
+  function done(confirmed){ if(settled) return; settled=true; quranRecordSubmitOutcome(sid,confirmed,err); }
+  // Doğrulama da asılı kalabilir; o zaman ilk hükme dönülür (güvenli taraf:
+  // "iletilemedi" + tekrar deneme açık). Doğrulama sürerken quranSubmittingId
+  // hâlâ dolu olduğu için çift dokunma engeli de bozulmaz.
+  try{ setTimeout(function(){ done(false); },QURAN_CONFIRM_TIMEOUT_MS); }catch(e){}
+  try{
+    s.confirmQuranRequest(rid,function(cerr,r){ done(!cerr&&!!(r&&r.found===true)); });
+  }catch(e){ done(false); }
 }
 App.quranJourneyRequest=function(){ App.quranJourneySubmit(ensureQuranJourney(data).activeSurahId); };
 // QY-13 (IFrame API ENDED izleme doğrulaması, "İzledim" yedeği) ve QY-14
@@ -15046,6 +15085,28 @@ App.quranJourneyQuestion=function(id){
 // teslim/yanıt tekrar tekrar uygulansa bile durum bozulmaz, geriye gitmez.
 // requestId eşleşmesi zaten sûre bazlı arama ile sağlanır; response.surahId
 // ayrıca çapraz doğrulanır (yanlış sûre eşleme tehdidi — plan §2/§9).
+// QY-21: requestId kayması onarımı. Uygulamanın yerel requestId'si ile
+// outbox'taki requestId ayrışabilir — yazma başarısız SANILIP yeniden
+// istendiğinde yerelde yeni bir id üretilir, oysa Gmail köprüsü cevabı
+// outbox'taki id ile yazar. Böyle bir durumda tam id eşleşmesi tutmaz ve
+// GERÇEK bir cevap sessizce düşerdi (gerçek üretim vakası: mesed).
+// Bu yedek yol kasıtlı olarak dar tutulmuştur:
+//   • yalnız AYNI sûre için (yanlış sûre eşleme hâlâ imkânsız),
+//   • yalnız açık isteğin istendiği andan SONRA doğrulanmış cevaplar
+//     (eski bir anlatım yeniden istendikten sonra geri canlanamaz),
+//   • zaman damgası olmayan kayıt asla kabul edilmez.
+function quranResponseForSurah(rs,sid,req){
+  var best=null, bestStamp='';
+  Object.keys(rs).forEach(function(rid){
+    var r=rs[rid];
+    if(!r||r.surahId!==sid) return;
+    var stamp=quranNullableStr(r.validatedAt)||quranNullableStr(r.receivedAt)||'';
+    if(!stamp) return;
+    if(req&&quranNullableStr(req.requestedAt)&&stamp<=req.requestedAt) return;
+    if(!best||stamp>bestStamp){ best=r; bestStamp=stamp; }
+  });
+  return best;
+}
 function quranApplyRemoteUpdates(delivery,responses){
   var q=ensureQuranJourney(data), changed=false, responseChanged=false, at=new Date().toISOString();
   var dl=(delivery&&delivery.requests)||{}, rs=(responses&&responses.responses)||{};
@@ -15059,7 +15120,7 @@ function quranApplyRemoteUpdates(delivery,responses){
       apply({type:'delivery_receipt',at:deliveryAt,sentAt:receipt.sentAt||null,providerMessageId:receipt.providerMessageId||null});
       apply({type:'await_reply',at:deliveryAt});
     }
-    var resp=rs[req.requestId];
+    var resp=rs[req.requestId]||quranResponseForSurah(rs,sid,req);
     if(resp&&resp.surahId===sid){
       // Doğrulanmış bir response, mail delivery kaydından daha güçlü kanıttır.
       // Workflow delivery.json yazamasa bile (gerçek üretim vakası), cevap

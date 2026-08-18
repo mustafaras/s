@@ -193,7 +193,10 @@ console.log('\n3. Bekleyen istekte çift gönderim engeli');
 console.log('\n4. Geçersiz sıçramaların reddi');
 {
   const cases = [
-    ['outbox_written', 'idle'], ['outbox_written', 'request_error'],
+    // NOT: ['outbox_written','request_error'] ve ['delivery_receipt','request_error']
+    // artık BURADA DEĞİL — QY-21 ile bilinçli olarak İZİNLİ hale geldiler
+    // ("uzak kanıt, yerel tahmini ezer"); aşağıdaki 4b bölümünde kanıtlanır.
+    ['outbox_written', 'idle'],
     ['outbox_failed', 'idle'], ['outbox_failed', 'queued'],
     ['delivery_receipt', 'idle'], ['delivery_receipt', 'submitting'],
     ['delivery_failed', 'idle'], ['delivery_failed', 'submitting'], ['delivery_failed', 'notified'],
@@ -210,8 +213,38 @@ console.log('\n4. Geçersiz sıçramaların reddi');
     const before = build(from);
     const res = quranReduce(before, ev(type, { videoId: VID2, responseId: 'qrr_Z', at: AT2 }));
     ok(`${from} –${type}→ reddedildi`, !res.ok && res.reason === 'invalid_transition', { reason: res.reason, got: res.request.status });
+    ok(`${from} –${type}→ reddedildi`, !res.ok && res.reason === 'invalid_transition', { reason: res.reason, got: res.request.status });
     ok(`${from} –${type}→ kayıt değişmedi`, JSON.stringify(res.request) === JSON.stringify(before));
   }
+}
+
+// ── 4b) QY-21: uzak kanıt yerel "iletilemedi" tahminini ezer ──
+// Gerçek üretim vakası: outbox'a yazılmış ve maili gitmiş bir istek, ağ
+// cevabı kaybolduğu için uygulamada request_error göründü; ardından gelen
+// delivery receipt ve doğrulanmış cevap ESKİ tabloda uygulanamıyordu ve
+// anlatım sessizce düşüyordu. Aşağısı bu kurtarma yolunun sözleşmesidir.
+console.log('\n4b. QY-21 kurtarma geçişleri (kanıt > tahmin)');
+{
+  const rescue = [
+    ['request_error', 'outbox_written', 'queued'],
+    ['request_error', 'delivery_receipt', 'notified'],
+    ['notification_error', 'delivery_receipt', 'notified'],
+  ];
+  for (const [from, type, to] of rescue) {
+    const before = build(from);
+    const res = quranReduce(before, ev(type, { at: AT2 }));
+    ok(`${from} –${type}→ ${to} (kurtarma kabul edildi)`, res.ok && res.changed && res.request.status === to, { reason: res.reason, got: res.request.status });
+  }
+  // Kurtarma tek yönlüdür: ilerleme geriye gitmez.
+  for (const from of ['notified', 'awaiting_reply', 'ready', 'watched']) {
+    const before = build(from);
+    const res = quranReduce(before, ev('delivery_receipt', { at: AT2 }));
+    ok(`${from} –delivery_receipt→ ilerlemeyi geri almaz`, res.ok && !res.changed && res.request.status === from, { reason: res.reason, got: res.request.status });
+  }
+  // outbox_failed hâlâ YALNIZ submitting'den gelir: bir kurtarma geri alınamaz.
+  const q = build('queued');
+  const back = quranReduce(q, ev('outbox_failed', { at: AT2 }));
+  ok('queued –outbox_failed→ reddedilir (kurtarma geri alınamaz)', !back.ok && back.request.status === 'queued', { reason: back.reason });
 }
 
 // ── 5) İdempotens: aynı olay iki kez ──

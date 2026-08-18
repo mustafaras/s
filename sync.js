@@ -953,6 +953,33 @@ function pushQuranRequest(payload, cb){
     .catch(function(e){ cb(e); throw e; });
 }
 
+// ── QY-21: "gerçekten yazıldı mı?" — salt-okunur outbox doğrulaması ─────────
+// pushQuranRequest'in hata bildirmesi, yazının GERÇEKTEN olmadığı anlamına
+// GELMEZ: PUT sunucuda tamamlanmışken cevabı yolda kaybolabilir ya da
+// çağıranın watchdog'u erken ateşleyebilir. Gerçek üretim vakasında bu yüzden
+// outbox'a yazılmış ve maili gitmiş istekler uygulamada "İletilemedi"
+// göründü. Bu fonksiyon o tahmini kanıtla değiştirir: outbox'u okur ve
+// requestId orada mı diye bakar. YALNIZ GET yapar, hiçbir dosyaya yazmaz —
+// bu yüzden Guard 1/2 kapsamı dışındadır (okumak veri kaybı riski taşımaz).
+// cb(err,{found}). Ağ/yetki hatasında found false DEĞİL null olur:
+// "yok" ile "bilinmiyor" birbirine karıştırılmaz. replyToken hiç okunmaz.
+function confirmQuranRequest(requestId, cb){
+  cb = typeof cb==='function' ? cb : function(){};
+  var T = window.QuranTransportV1;
+  if(!T || !T.isValidRequestId(requestId)){ cb(new Error('quran_outbox: geçersiz requestId'),{found:null}); return Promise.resolve(); }
+  var c=cfg();
+  if(!c){ cb(new Error('quran_outbox: senkron yapılandırılmamış'),{found:null}); return Promise.resolve(); }
+  var chain;
+  try{ chain=ghGetTransportFile(c, T.PATHS.outbox); }
+  catch(syncErr){ cb(syncErr,{found:null}); return Promise.resolve(); }
+  return chain.then(function(file){
+    var raw=file&&file.raw;
+    if(raw===null||typeof raw!=='string'){ cb(null,{found:false}); return; }
+    var parsed=T.parseOutbox(raw);
+    cb(null,{found:Object.prototype.hasOwnProperty.call(parsed.value.requests||{},requestId)});
+  }).catch(function(e){ cb(e,{found:null}); });
+}
+
 // ── QY-11: Kur’an Yolculuğu teslim/yanıt dosyalarını salt-okunur çek ────────
 // Yalnız GET; hiçbir dosyaya yazmaz. Guard 1/2 burada uygulanmaz — okumak
 // (yazmanın aksine) veri kaybı riski taşımaz, localhost'ta bile güvenlidir.
@@ -1034,6 +1061,8 @@ window.SeySync={
   // QY-08 — Kur’an Yolculuğu istek outbox yazıcısı. latest.json zincirinden
   // bağımsız; ayrıntı için yukarıdaki "QY-08" bloğunun yorumlarına bakın.
   pushQuranRequest:pushQuranRequest,
+  // QY-21 — "iletilemedi" demeden önce outbox'a bakan salt-okunur doğrulayıcı.
+  confirmQuranRequest:confirmQuranRequest,
   // QY-11 — Kur’an Yolculuğu teslim/yanıt salt-okunur çekici. Ayrıntı için
   // yukarıdaki "QY-11" bloğunun yorumlarına bakın.
   pullQuranUpdates:pullQuranUpdates,

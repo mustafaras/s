@@ -1569,7 +1569,11 @@ var REMINDER_CATEGORY_META={
   system:{label:'Sistem durumu',description:'Yalnız gerçekten eylem gerektiğinde gösterilen güvenli durumlar',icon:'circle-check'}
 };
 var REMINDER_CATEGORY_ORDER=['ritual','support','reflection','system'];
-var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,'temporary-error':true,error:true,'pwa-limited':true};
+var REMINDER_PERMISSION_STATES={unsupported:true,default:true,granted:true,denied:true,revoked:true,'temporary-error':true,error:true,'pwa-limited':true};
+// REM-52: `prompt` is the Permissions API spelling of the Notification API's
+// `default`; `revoked` is the granted -> default transition that no single
+// snapshot can express on its own.
+var REMINDER_PERMISSION_ALIASES={prompt:'default',error:'temporary-error'};
 var REMINDER_PERMISSION_STORAGE_KEY='seyma-reminder-permission-v1';
 var REMINDER_NATIVE_PREVIEW_TAG='reminder-preview-v1';
 var REMINDER_NATIVE_TAG_PREFIX='seyma-reminder-v1:';
@@ -1608,6 +1612,26 @@ var REMINDER_RETENTION_POLICY={
 };
 var reminderPermissionTransientState=null;
 var reminderPermissionRequestInFlight=null;
+var reminderPermissionEverGranted=null;
+var reminderPermissionGrantObserved=false;
+// REM-52: optional pure boundary module. When it is not loaded the inline
+// fallbacks below keep the exact same channel separation.
+function reminderDeliveryModule(){
+  try{ if(typeof window!=='undefined'&&window.ReminderDeliveryV1&&typeof window.ReminderDeliveryV1.channelForNotification==='function') return window.ReminderDeliveryV1; }catch(e){}
+  return null;
+}
+// A notification belongs to the reminder channel when EITHER its payload
+// type or its tag says so. Requiring both would let a malformed reminder
+// payload fall through to the AEON social route.
+function reminderNotificationChannel(input){
+  var module=reminderDeliveryModule();
+  if(module&&typeof module.channelForNotification==='function') return module.channelForNotification(input);
+  var x=input&&typeof input==='object'?input:{}, d=x.data&&typeof x.data==='object'?x.data:{};
+  var tag=String(x.tag!==undefined?x.tag:(d.tag||'')||''), type=String(d.type!==undefined?d.type:(x.type||'')||'');
+  if(type==='reminder'||type==='reminder-preview'||tag===REMINDER_NATIVE_PREVIEW_TAG||tag.indexOf(REMINDER_NATIVE_TAG_PREFIX)===0) return 'reminder';
+  if(type==='aeon-message'||type==='aeon-answer'||tag.indexOf('aeon-')===0) return 'aeon';
+  return '';
+}
 function emptyReminderOnboarding(){ return {completed:false,selectedCategories:[]}; }
 function emptyReminderPolicy(){ return {quietHours:{start:REMINDER_POLICY_DEFAULTS.quietHours.start,end:REMINDER_POLICY_DEFAULTS.quietHours.end},nativeDailyCap:REMINDER_POLICY_DEFAULTS.nativeDailyCap,lowPriorityNativeCap:REMINDER_POLICY_DEFAULTS.lowPriorityNativeCap,sameCategoryCooldownMinutes:REMINDER_POLICY_DEFAULTS.sameCategoryCooldownMinutes,dailyFlowBudget:REMINDER_POLICY_DEFAULTS.dailyFlowBudget,capacityMode:REMINDER_POLICY_DEFAULTS.capacityMode,careNativeCategories:[],careMovementOptIn:false}; }
 function emptyReminderPersonalization(){ return {schemaVersion:REMINDER_PERSONALIZATION_SCHEMA_VERSION,optIn:false,historyMode:'none',autoApply:false,signals:[],dismissed:[],applied:[],updatedAt:''}; }
@@ -1793,11 +1817,18 @@ function normalizeReminderOnboarding(value){
 function reminderPermissionState(input){
   var x=input&&typeof input==='object'?input:{};
   if(x.state==='error'||x.error===true) return 'temporary-error';
-  if(reminderEnumHas(REMINDER_PERMISSION_STATES,x.state)&&x.state!=='error') return x.state;
+  var declared=typeof x.state==='undefined'?'':String(x.state);
+  if(declared&&REMINDER_PERMISSION_ALIASES[declared]) declared=REMINDER_PERMISSION_ALIASES[declared];
+  if(reminderEnumHas(REMINDER_PERMISSION_STATES,declared)&&declared!=='error') return declared;
   if(x.supported===false) return 'unsupported';
   if(x.pwaLimited===true) return 'pwa-limited';
   if(x.temporaryError===true) return 'temporary-error';
-  if(x.permission==='granted'||x.permission==='denied'||x.permission==='default') return x.permission;
+  var live=typeof x.permission==='undefined'?'':String(x.permission);
+  if(live&&REMINDER_PERMISSION_ALIASES[live]) live=REMINDER_PERMISSION_ALIASES[live];
+  if(live==='granted'||live==='denied') return live;
+  // Only a remembered grant turns a bare `default` into `revoked`; a device
+  // that was never granted stays at `default` and is never re-asked on its own.
+  if(live==='default') return x.previouslyGranted===true?'revoked':'default';
   if(typeof x.permission==='undefined'&&typeof Notification==='undefined') return 'unsupported';
   return 'temporary-error';
 }
@@ -1812,9 +1843,10 @@ function reminderPermissionSnapshot(){
     var displayStandalone=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;
     pwaLimited=!!(standalone||displayStandalone);
   }catch(e){ pwaLimited=false; }
+  if(permission==='granted'&&!reminderPermissionGrantObserved&&!reminderPermissionEverGrantedRead()){ reminderPermissionGrantObserved=true; reminderPermissionStorageWrite('granted'); }
   if(reminderPermissionTransientState==='temporary-error'&&permission==='default') return 'temporary-error';
   if(permission!=='default') reminderPermissionTransientState=null;
-  return reminderPermissionState({supported:supported,permission:permission,pwaLimited:pwaLimited});
+  return reminderPermissionState({supported:supported,permission:permission,pwaLimited:pwaLimited,previouslyGranted:reminderPermissionEverGrantedRead()});
 }
 function reminderPermissionExplanation(state){
   var key=reminderPermissionState({state:state});
@@ -1824,12 +1856,30 @@ function reminderPermissionExplanation(state){
     granted:{label:reminderCopy('inApp.permission.granted.label','Verildi'),meaning:reminderCopy('inApp.permission.granted.meaning','Native kanal kullanılabilir.'),action:reminderCopy('inApp.permission.granted.action','Uygulama içi kartlar yine açık kalır; gerçek gönderim ayrı bir adımda yönetilir.'),tone:'positive'},
     denied:{label:reminderCopy('inApp.permission.denied.label','Reddedildi'),meaning:reminderCopy('inApp.permission.denied.meaning','Tarayıcı izni kapalı.'),action:reminderCopy('inApp.permission.denied.action','Tarayıcı ayarlarından açabilirsin; uygulama içi hatırlatmalar açık kalır.'),tone:'caution'},
     'temporary-error':{label:reminderCopy('inApp.permission.temporaryError.label','Geçici hata'),meaning:reminderCopy('inApp.permission.temporaryError.meaning','Bildirim gönderme anında geçici bir hata oldu.'),action:reminderCopy('inApp.permission.temporaryError.action','Yeniden denenebilir; uygulama içi kart korunur.'),tone:'caution'},
-    'pwa-limited':{label:reminderCopy('inApp.permission.pwaLimited.label','PWA sınırlaması'),meaning:reminderCopy('inApp.permission.pwaLimited.meaning','Uygulama kapalıyken zamanlama garanti edilemiyor.'),action:reminderCopy('inApp.permission.pwaLimited.action','Uygulamayı açınca catch-up kartını görebilirsin.'),tone:'caution'}
+    'pwa-limited':{label:reminderCopy('inApp.permission.pwaLimited.label','PWA sınırlaması'),meaning:reminderCopy('inApp.permission.pwaLimited.meaning','Uygulama kapalıyken zamanlama garanti edilemiyor.'),action:reminderCopy('inApp.permission.pwaLimited.action','Uygulamayı açınca catch-up kartını görebilirsin.'),tone:'caution'},
+    revoked:{label:reminderCopy('inApp.permission.revoked.label','Geri alındı'),meaning:reminderCopy('inApp.permission.revoked.meaning','Daha önce verilen native izin şu anda kapalı görünüyor.'),action:reminderCopy('inApp.permission.revoked.action','İstersen buradan yeniden verebilirsin; uygulama içi hatırlatmalar açık kalır.'),tone:'caution'}
   };
   var out=copy[key]||copy['temporary-error']; out.state=key; return out;
 }
+function reminderPermissionStorageRead(){
+  try{
+    if(typeof localStorage==='undefined'||!localStorage||typeof localStorage.getItem!=='function') return null;
+    var raw=localStorage.getItem(REMINDER_PERMISSION_STORAGE_KEY); if(!raw) return null;
+    var parsed=JSON.parse(raw);
+    return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:null;
+  }catch(e){ return null; }
+}
+function reminderPermissionEverGrantedRead(){
+  if(reminderPermissionEverGranted===null){
+    var stored=reminderPermissionStorageRead();
+    reminderPermissionEverGranted=!!(stored&&(stored.everGranted===true||stored.state==='granted'));
+  }
+  return reminderPermissionEverGranted===true;
+}
 function reminderPermissionStorageWrite(state){
-  try{ if(typeof localStorage!=='undefined'&&localStorage&&typeof localStorage.setItem==='function') localStorage.setItem(REMINDER_PERMISSION_STORAGE_KEY,JSON.stringify({state:state,updatedAt:new Date().toISOString()})); }catch(e){}
+  var everGranted=reminderPermissionEverGrantedRead()||state==='granted';
+  reminderPermissionEverGranted=everGranted;
+  try{ if(typeof localStorage!=='undefined'&&localStorage&&typeof localStorage.setItem==='function') localStorage.setItem(REMINDER_PERMISSION_STORAGE_KEY,JSON.stringify({state:state,everGranted:everGranted,updatedAt:new Date().toISOString()})); }catch(e){}
 }
 function reminderPermissionRecord(state){
   var next=reminderPermissionState({state:state});
@@ -1837,9 +1887,18 @@ function reminderPermissionRecord(state){
   reminderPermissionStorageWrite(next);
   return next;
 }
+// REM-52: only an explicit user action may open the browser prompt, and only
+// from a state the browser can still answer. Every other state is terminal for
+// this device until the user changes it in browser settings, so nothing here
+// re-asks on a timer, on boot or on render.
+function reminderPermissionCanRequest(state){
+  var key=reminderPermissionState({state:state}), module=reminderDeliveryModule();
+  if(module&&typeof module.canRequestPermission==='function') return module.canRequestPermission(key)===true;
+  return key==='default'||key==='revoked'||key==='temporary-error';
+}
 function reminderPermissionRequest(options){
   var x=options&&typeof options==='object'?options:{}, state=reminderPermissionSnapshot();
-  if(state==='unsupported'||state==='pwa-limited'||state==='granted'||state==='denied') return Promise.resolve({ok:state==='granted',state:state,reason:'permission-'+state,requested:false,source:String(x.source||'explicit')});
+  if(!reminderPermissionCanRequest(state)) return Promise.resolve({ok:state==='granted',state:state,reason:'permission-'+state,requested:false,source:String(x.source||'explicit')});
   if(reminderPermissionRequestInFlight) return reminderPermissionRequestInFlight;
   if(typeof Notification==='undefined'||!Notification||typeof Notification.requestPermission!=='function'){
     var unsupported=reminderPermissionRecord('unsupported');
@@ -1889,6 +1948,8 @@ function reminderNativeActionList(){
   return Object.keys(REMINDER_NATIVE_ACTIONS).map(function(action){ return {action:action,title:REMINDER_NATIVE_ACTIONS[action].title}; });
 }
 function reminderNativeTag(occurrenceId){
+  var module=reminderDeliveryModule();
+  if(module&&typeof module.deliveryTag==='function') return module.deliveryTag(occurrenceId);
   var id=reminderActionSafeToken(occurrenceId,240); if(!id) return '';
   return (REMINDER_NATIVE_TAG_PREFIX+encodeURIComponent(id)).slice(0,220);
 }
@@ -1931,6 +1992,8 @@ function reminderNativeDisplay(input){
   if(typeof Notification==='undefined'||!Notification) return {ok:false,reason:'unsupported'};
   var copy=reminderNativeDeliveryCopy(x); if(!copy.ok) return copy;
   var payload=reminderNativePayload(copy), options={body:copy.body,tag:copy.tag,renotify:false,silent:true,requireInteraction:false,data:payload,actions:reminderNativeActionList()};
+  // Fail closed rather than emit a reminder onto the AEON tag/id namespace.
+  if(reminderNotificationChannel({tag:copy.tag,data:payload})!=='reminder') return {ok:false,reason:'channel-boundary',copy:copy,payload:payload};
   try{
     var notification=new Notification(copy.title,options);
     return {ok:true,reason:null,copy:copy,payload:payload,options:options,notification:notification};
@@ -2810,8 +2873,13 @@ function reminderSystemStatusCopy(kind,state){
     sync:{},
     background:{unsupported:{label:reminderCopy('inApp.status.background.unsupported.label','Arka plan zamanlaması garanti değil'),detail:reminderCopy('inApp.status.background.unsupported.detail','Uygulama kapalıyken kesin yerel alarm vaadi yok; foreground ve açılış catch-up sınırı kullanılır.')}}
   };
-  ['granted','denied','unsupported','default','temporary-error','pwa-limited'].forEach(function(permissionState){
-    copy.permission[permissionState]={label:reminderCopy('inApp.status.permission.'+permissionState+'.label','Native durum'),detail:reminderCopy('inApp.status.permission.'+permissionState+'.detail','Uygulama içi reminder korunur.')};
+  // REM-52: `revoked` has no lexicon entry yet (the catalog is frozen content
+  // outside this prompt's scope), so it carries an explicit honest fallback
+  // instead of the generic one.
+  var permissionFallback={revoked:{label:'Native izin geri alınmış',detail:'Daha önce verilen izin şu anda kapalı; uygulama içi reminderlar açık kalır ve izin kendiliğinden yeniden istenmez.'}};
+  ['granted','denied','unsupported','default','revoked','temporary-error','pwa-limited'].forEach(function(permissionState){
+    var fb=permissionFallback[permissionState]||{label:'Native durum',detail:'Uygulama içi reminder korunur.'};
+    copy.permission[permissionState]={label:reminderCopy('inApp.status.permission.'+permissionState+'.label',fb.label),detail:reminderCopy('inApp.status.permission.'+permissionState+'.detail',fb.detail)};
   });
   ['disabled','idle','synced','pending','offline','error'].forEach(function(syncState){
     copy.sync[syncState]={label:reminderCopy('inApp.status.sync.'+syncState+'.label','Senkron durumu'),detail:reminderCopy('inApp.status.sync.'+syncState+'.detail','Yerel reminder deneyimi korunur.')};
@@ -7149,6 +7217,22 @@ App.dismissReminderDigest=function(){
   ui.reminderDigestState='no-op'; ui.reminderDigestReflection=''; render();
   return {ok:true,noOp:true,changed:true,persisted:false,notificationCreated:false};
 };
+// REM-52: the notification channel boundary as an inspectable surface. It
+// reports which fields each channel owns, proves they are disjoint and states
+// the real (foreground-only) capability instead of implying a background
+// scheduler that a static Pages service worker cannot provide.
+App.reminderNotificationChannel=reminderNotificationChannel;
+App.reminderNotificationBoundary=function(){
+  var module=reminderDeliveryModule();
+  var channels=module?module.channels:{
+    aeon:{id:'aeon',kind:'social',permissionField:'data.settings.aeonNotifyPermission',permissionScope:'synced-state',tagPrefix:'aeon-',capField:'AEON_NOTIFY_COOLDOWN_MS',historyField:'data.aeon.shownNotificationIds',historyScope:'synced-state',bodySource:'message-content',pushCapable:true,swRole:'show-and-route'},
+    reminder:{id:'reminder',kind:'personal',permissionField:'localStorage:'+REMINDER_PERMISSION_STORAGE_KEY,permissionScope:'local-only',tagPrefix:REMINDER_NATIVE_TAG_PREFIX,capField:'data.reminders.policy.nativeDailyCap',historyField:'localStorage:'+REMINDER_ACTION_KEY,historyScope:'local-only',bodySource:'catalog-private-copy',pushCapable:false,swRole:'click-transport-only'}
+  };
+  var capabilities=module?module.capabilities:{backgroundScheduling:false,backgroundReplay:false,closedAppTimedDelivery:false,reminderPush:false,aeonPush:true,foregroundOnly:true,serviceWorkerRole:'click-transport-only'};
+  var disjoint=module&&typeof module.disjointReport==='function'?module.disjointReport():{ok:true,shared:[]};
+  return {moduleLoaded:!!module,channels:channels,capabilities:capabilities,disjoint:disjoint,permissionStates:Object.keys(REMINDER_PERMISSION_STATES).filter(function(state){ return state!=='error'; }),permissionAliases:Object.assign({},REMINDER_PERMISSION_ALIASES)};
+};
+App.reminderPermissionCanRequest=reminderPermissionCanRequest;
 App.reminderPermissionState=reminderPermissionState;
 App.reminderPermissionSnapshot=reminderPermissionSnapshot;
 App.reminderPermissionExplanation=reminderPermissionExplanation;
@@ -7601,7 +7685,7 @@ App.reminderFullReset=function(options){
   if(!reminderConfirmAction('Reminder tercihleri, yerel geçmişi ve reminder izin durumu silinsin mi? Bu işlem Şeyma günlük kayıtlarına dokunmaz ve geri alınamaz.',x)) return {ok:false,changed:false,reason:'cancelled'};
   var keys=[REMINDER_DELIVERY_KEY,REMINDER_ACTION_KEY,REMINDER_PERMISSION_STORAGE_KEY], removed=[];
   keys.forEach(function(key){ if(reminderRemoveLocalKey(key)) removed.push(key); });
-  reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null;
+  reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; reminderPermissionEverGranted=null; reminderPermissionGrantObserved=false;
   if(data&&typeof data==='object'){
     data.reminders=emptyReminderState();
     try{ if(typeof localStorage!=='undefined') localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){ return {ok:false,changed:false,reason:'storage-error'}; }
@@ -8783,7 +8867,7 @@ App.importJson=function(el){ var f=el.files&&el.files[0]; if(!f) return; var r=n
 
 App.askReset=function(){ ui.resetStep=1; render(); };
 App.cancelReset=function(){ ui.resetStep=0; render(); };
-App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
+App.resetConfirm=function(){ if(ui.resetStep===1){ ui.resetStep=2; render(); return; } try{ localStorage.removeItem(KEY); }catch(e){} reminderRemoveLocalKey(REMINDER_DELIVERY_KEY); reminderRemoveLocalKey(REMINDER_ACTION_KEY); reminderRemoveLocalKey(REMINDER_PERMISSION_STORAGE_KEY); reminderPermissionTransientState=null; reminderPermissionRequestInFlight=null; reminderPermissionEverGranted=null; reminderPermissionGrantObserved=false; data=null; ui.resetStep=0; ui.tab='bugun'; ui.reminderMedicationDraft=null; ui.reminderHistoryUndo=null; ui.reminderAllUndo=null; render(); };
 function locationGateResetNudge(){ ui.locNudgeOpen=false; ui.locNudgeShown=[]; }
 function locationGateRequired(){ return !data||!data.settings||data.settings.locationEnabled!==true||ui.locationGateState!=='granted'; }
 function locationGateErrorText(code,reason){
@@ -17068,6 +17152,8 @@ function fallbackNativeNotify(title, options){
 function showNativeAeonNotification(opts){
   opts=opts||{};
   if(!canNotify() || aeonNotifyPermission()!=='granted') return;
+  // REM-52: the social channel may never borrow a reminder tag/id namespace.
+  if(reminderNotificationChannel({tag:opts.tag||'aeon-message'})==='reminder') return;
   // Kullanıcı zaten Mesaj sekmesini açık görüyorsa native bildirim göstermeye gerek yok.
   if(ui && ui.tab==='mesaj') return;
   var id=opts.id || (opts.tag+'-'+(opts.body||Date.now()));

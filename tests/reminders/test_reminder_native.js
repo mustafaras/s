@@ -217,6 +217,35 @@ runTests([
     assertEqual(second.nativeResults.length, 0);
     assertEqual(second.results[0].duplicate, true);
   }],
+  ["REM-52: a revoked grant blocks the native channel and keeps the in-app card", () => {
+    const out = boot("granted");
+    assertEqual(out.sandbox.App.reminderPermissionSnapshot(), "granted");
+    out.notification.setPermission("default");
+    assertEqual(out.sandbox.App.reminderPermissionSnapshot(), "revoked");
+
+    const result = evaluate(out, candidate(out, "rem-native-revoked-1"));
+    assertEqual(out.notification.getCalls().length, 0);
+    assertEqual(result.nativeResults.length, 0);
+    assertEqual(result.results[0].policyReason, "permission-revoked");
+    assertEqual(result.results[0].nativeAllowed, false);
+    assertEqual(result.results[0].channel, "in_app");
+    // The in-app surface is still delivered; only the native channel closed.
+    assertEqual(out.sandbox.App.reminderDeliveryGet("rem-native-revoked-1", NOW).channel, "in_app");
+    assertEqual(out.notification.getRequestCount(), 0);
+  }],
+  ["REM-52: the native adapter fails closed on an off-namespace tag", () => {
+    const out = boot("granted");
+    const item = candidate(out, "rem-native-channel-1");
+    const base = { source: "manual", visibilityState: "visible", occurrence: item.occurrence, definition: item.definition, reminderId: PRAYER_ID, occurrenceId: "rem-native-channel-1", policy: { nativeAllowed: true, channel: "native", reason: "native-allowed" } };
+    const ok = out.sandbox.App.reminderNativeDisplay(base);
+    assert(ok.ok);
+    assert(ok.copy.tag.startsWith("seyma-reminder-v1:"));
+    assertEqual(out.sandbox.App.reminderNotificationChannel({ tag: ok.copy.tag, data: ok.payload }), "reminder");
+    // An occurrence id that cannot produce a reminder tag never reaches the OS.
+    const untagged = out.sandbox.App.reminderNativeDisplay(Object.assign({}, base, { occurrenceId: "bad token!", occurrence: Object.assign({}, item.occurrence, { occurrenceId: "bad token!" }) }));
+    assertEqual(untagged.ok, false);
+    assertEqual(out.notification.getCalls().length, 1);
+  }],
   ["adapter rejects non-foreground and malformed policy without requesting permission", () => {
     const out = boot("granted");
     const item = candidate(out, "rem-native-direct-1");

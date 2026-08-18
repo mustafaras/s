@@ -71,6 +71,24 @@ async function fire(out, data, action) {
   return event;
 }
 
+// REM-52: same event, but with the notification tag the channel boundary uses.
+async function fireTagged(out, tag, data, action) {
+  const event = {
+    action: action || "",
+    notification: {
+      tag,
+      data,
+      closed: false,
+      close() { this.closed = true; }
+    },
+    waited: null,
+    waitUntil(promise) { this.waited = promise; }
+  };
+  out.click(event);
+  if (event.waited) await event.waited;
+  return event;
+}
+
 async function push(out, data) {
   const event = {
     data: { json() { return data; } },
@@ -167,6 +185,65 @@ runTests([
     assertEqual(out.state.showNotificationCalls, 0);
     await push(out, { type: "aeon-message", title: "ÆON", body: "Yeni mesaj" });
     assertEqual(out.state.showNotificationCalls, 1);
+  }],
+  ["REM-52: the reminder tag namespace is never downgraded to the ÆON route", async () => {
+    // A well-formed reminder click on a reminder tag still routes.
+    const ok = boot({ clients: [client("https://seyma.test/index.html")] });
+    await fireTagged(ok, "seyma-reminder-v1:rem-sw-occurrence-1", validReminderData(), "open");
+    assertEqual(ok.state.clients[0].messages.length, 1);
+    assertEqual(ok.state.clients[0].messages[0].type, "reminder-native-click");
+
+    // Reminder-owned notifications the SW cannot validate are dropped, not
+    // turned into an ÆON open. This covers the in-app preview notification,
+    // a broken reminder payload and a reminder body on an ÆON tag.
+    const dropped = [
+      ["reminder-preview-v1", { type: "reminder-preview", deepLink: "settings" }],
+      ["seyma-reminder-v1:rem-sw-occurrence-2", { type: "reminder", deepLink: "faith" }],
+      ["seyma-reminder-v1:rem-sw-occurrence-3", {}],
+      ["aeon-message", validReminderData()]
+    ];
+    for (const [tag, data] of dropped) {
+      const app = client("https://seyma.test/index.html");
+      const out = boot({ clients: [app] });
+      const event = await fireTagged(out, tag, data, "open");
+      assert(event.notification.closed);
+      assertEqual(event.waited, null);
+      assertEqual(out.state.matchAllCalls, 0);
+      assertEqual(out.state.openWindowCalls, 0);
+      assertEqual(app.messages.length, 0);
+    }
+
+    // The ÆON social route is unchanged on its own tags.
+    for (const tag of ["aeon-message", "aeon-answer"]) {
+      const app = client("https://seyma.test/index.html");
+      const out = boot({ clients: [app] });
+      await fireTagged(out, tag, { id: "m1" }, "");
+      assertEqual(app.messages.length, 1);
+      assertEqual(app.messages[0].type, "aeon-open-mesaj");
+    }
+  }],
+  ["REM-52: a reminder-namespaced push never becomes a background notification", async () => {
+    const byTag = boot();
+    await push(byTag, { title: "x", body: "y", tag: "seyma-reminder-v1:rem-sw-occurrence-9" });
+    assertEqual(byTag.state.showNotificationCalls, 0);
+    await push(byTag, { title: "x", body: "y", tag: "reminder-preview-v1" });
+    assertEqual(byTag.state.showNotificationCalls, 0);
+    await push(byTag, { title: "x", body: "y", data: { type: "reminder-preview" } });
+    assertEqual(byTag.state.showNotificationCalls, 0);
+    // An untagged ÆON push still works.
+    await push(byTag, { title: "ÆON", body: "Yeni mesaj" });
+    assertEqual(byTag.state.showNotificationCalls, 1);
+  }],
+  ["REM-52: the SW states its real capability instead of implying a scheduler", () => {
+    assert(swSource.includes("backgroundScheduling: false"));
+    assert(swSource.includes("backgroundReplay: false"));
+    assert(swSource.includes("closedAppTimedDelivery: false"));
+    assert(swSource.includes("reminderPush: false"));
+    assert(swSource.includes("aeonPush: true"));
+    assert(swSource.includes("reminderRole: 'click-transport-only'"));
+    // No API that would let the SW wake itself for a reminder.
+    assert(!/periodicSync|periodicsync|registration\.sync|Notification\.requestPermission/.test(swSource));
+    assert(!/showTrigger|TimestampTrigger/.test(swSource));
   }],
   ["SW has no reminder scheduler, network retry, token or local alarm surface", () => {
     assert(!/\bsetTimeout\s*\(/.test(swSource));

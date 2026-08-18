@@ -5,7 +5,7 @@
  * gösterilen native bildirimler sw.showNotification() üzerinden buradan geçer.
  */
 
-const SW_VERSION = '20260718j';
+const SW_VERSION = '20260818a';
 
 // Reminder notifications are delivered by the foreground app. The service
 // worker only transports an already-created click back to the app; it never
@@ -25,13 +25,47 @@ const SW_REMINDER_SNOOZE_OPTIONS = Object.freeze({ '10m': true, '30m': true, '1h
 const SW_SAFE_TOKEN_RE = /^[A-Za-z0-9._:%|+\-]+$/;
 const SW_SAFE_TIMEZONE_RE = /^[A-Za-z0-9_./+\-]{1,80}$/;
 
+// REM-52: the two notification channels own disjoint tag and payload-type
+// namespaces. Anything in the reminder namespace is reminder-owned even when
+// its payload is malformed; it is dropped, never downgraded to the ÆON route.
+const SW_REMINDER_TAG_PREFIX = 'seyma-reminder-v1:';
+const SW_REMINDER_PREVIEW_TAG = 'reminder-preview-v1';
+const SW_REMINDER_PAYLOAD_TYPES = Object.freeze({ reminder: true, 'reminder-preview': true });
+const SW_AEON_TAG_PREFIX = 'aeon-';
+
+// Honest capability statement. A static GitHub Pages service worker has no
+// alarm, no timer and no reminder push endpoint: it can only carry a click the
+// operating system already delivered back into the open app.
+const SW_CAPABILITIES = Object.freeze({
+  backgroundScheduling: false,
+  backgroundReplay: false,
+  closedAppTimedDelivery: false,
+  reminderPush: false,
+  aeonPush: true,
+  reminderRole: 'click-transport-only'
+});
+
+function swNotificationChannel(notification) {
+  const record = notification && typeof notification === 'object' ? notification : {};
+  const payload = record.data && typeof record.data === 'object' ? record.data : {};
+  const tag = String(record.tag == null ? '' : record.tag);
+  const type = String(payload.type == null ? '' : payload.type);
+  if (SW_REMINDER_PAYLOAD_TYPES[type] || tag === SW_REMINDER_PREVIEW_TAG || tag.indexOf(SW_REMINDER_TAG_PREFIX) === 0) return 'reminder';
+  if (tag.indexOf(SW_AEON_TAG_PREFIX) === 0) return 'aeon';
+  return '';
+}
+
 function swSafeToken(value, max) {
   const token = String(value == null ? '' : value);
   return token && token.length <= (max || 240) && SW_SAFE_TOKEN_RE.test(token) ? token : '';
 }
 
-function swReminderClickPayload(data, action) {
+function swReminderClickPayload(data, action, tag) {
   if (!data || typeof data !== 'object' || data.type !== 'reminder') return null;
+  // A reminder payload must carry a reminder tag; a reminder body riding an
+  // ÆON tag is a namespace collision, not a route.
+  const notificationTag = String(tag == null ? '' : tag);
+  if (notificationTag && notificationTag.indexOf(SW_REMINDER_TAG_PREFIX) !== 0) return null;
   const target = SW_REMINDER_TARGETS[String(data.deepLink || '')];
   const occurrenceId = swSafeToken(data.occurrenceId, 240);
   const reminderId = swSafeToken(data.reminderId, 240);
@@ -118,7 +152,7 @@ self.addEventListener('push', function (event) {
   try { payload = event.data.json(); } catch (e) { payload = { title: 'ÆON', body: 'Yeni mesaj' }; }
   // Reminder delivery is foreground-only. A reminder-shaped push must never
   // become a background alarm; the existing ÆON push channel stays intact.
-  if(payload && (payload.type==='reminder'||payload.data&&payload.data.type==='reminder')) return;
+  if (swNotificationChannel({ tag: payload && payload.tag, data: payload && (payload.data || payload) }) === 'reminder') return;
   event.waitUntil(
     self.registration.showNotification(payload.title || 'ÆON', {
       body: payload.body || 'Yeni bir ÆON mesajı var',
@@ -135,9 +169,11 @@ self.addEventListener('push', function (event) {
 
 self.addEventListener('notificationclick', function (event) {
   if (event.notification && typeof event.notification.close === 'function') event.notification.close();
-  const data = event.notification && event.notification.data;
-  const isReminder = !!(data && typeof data === 'object' && data.type === 'reminder');
-  const reminderPayload = isReminder ? swReminderClickPayload(data, event.action) : null;
+  const notification = event.notification;
+  const data = notification && notification.data;
+  const channel = swNotificationChannel(notification);
+  const isReminder = channel === 'reminder';
+  const reminderPayload = isReminder ? swReminderClickPayload(data, event.action, notification && notification.tag) : null;
   // Invalid reminder payloads are ignored, never downgraded to an ÆON route.
   if (isReminder && !reminderPayload) return;
   const message = reminderPayload

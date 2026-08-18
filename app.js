@@ -6115,6 +6115,115 @@ function reminderSyncPayload(source){
   Object.keys(REMINDER_SYNC_BLOCKED_ROOTS).forEach(function(key){ if(Object.prototype.hasOwnProperty.call(out,key)) delete out[key]; });
   return out;
 }
+// REM-53 — reminder privacy schema registry.
+//
+// Five surfaces carry reminder information and they are deliberately NOT the
+// same schema. A field that is fine on one is a leak on another, so each one
+// declares its own storage class, sync class and field rule:
+//
+//   localOnlyKey       device-local journals; never in `data`, never synced
+//   canonicalPreference user choices in `data.reminders`; local canonical,
+//                      additive (REM-45 preserves unknown fields) and for that
+//                      exact reason removed from every sync payload
+//   safeEventSummary   the only reminder trace that DOES sync: a fixed summary
+//                      string plus a hashed correlation id, no identity
+//   projectionSummary  aggregate counts for the observer / export surface
+//   nativeCopy         what leaves the device to the OS notification centre
+var REMINDER_PRIVACY_FORBIDDEN_FIELDS=[
+  'privateDetail','privateLabel','privateBody','rawBody','body','detail','note','notes','userNote',
+  'therapyNote','therapyDetail','medicationName','dose','doseText','mood','moodNote','journal',
+  'journalEntry','prayerCompletion','completedPrayers','ghToken','openaiKey','syncUrl','auth','token',
+  'lat','lng','coords','gps','location','locationHistory','nativeTitle','nativeBody'
+];
+var REMINDER_PRIVACY_SCHEMAS={
+  schemaVersion:1,
+  localOnlyKey:{
+    id:'localOnlyKey',
+    storage:'localStorage:seyma-reminder-delivery-v1 | seyma-reminder-actions-v1 | seyma-reminder-permission-v1',
+    synced:false,
+    inCanonicalData:false,
+    fieldRule:'allowlist',
+    allowedFields:['schemaVersion','generation','clearBoundaryAt','updatedAt','entries','tombstones','state','everGranted','occurrenceId','parentOccurrenceId','reminderId','channel','status','reason','action','actionId','option','timezone','recordedAt','actedAt','createdAt','scheduledAt','shownAt','openedAt','snoozedUntil','terminalAt'],
+    forbiddenFields:REMINDER_PRIVACY_FORBIDDEN_FIELDS
+  },
+  canonicalPreference:{
+    id:'canonicalPreference',
+    storage:'localStorage:seyma-reset-v1 -> data.reminders',
+    synced:false,
+    inCanonicalData:true,
+    fieldRule:'additive-local-only',
+    blockedSyncRoots:Object.keys(REMINDER_SYNC_BLOCKED_ROOTS).sort(),
+    forbiddenFields:[]
+  },
+  safeEventSummary:{
+    id:'safeEventSummary',
+    storage:'data.eventLog',
+    synced:true,
+    inCanonicalData:true,
+    fieldRule:'fixed-summary',
+    allowedFields:['section','path','operation','summary','correlationId','privacyClass'],
+    fixedSummary:REMINDER_EVENT_SUMMARY,
+    correlationPrefix:'reminder-v1:',
+    forbiddenFields:REMINDER_PRIVACY_FORBIDDEN_FIELDS
+  },
+  projectionSummary:{
+    id:'projectionSummary',
+    storage:'derived: reminderRetentionSummary / observer projection',
+    synced:false,
+    inCanonicalData:false,
+    fieldRule:'aggregate-only',
+    forbiddenFields:REMINDER_PRIVACY_FORBIDDEN_FIELDS
+  },
+  nativeCopy:{
+    id:'nativeCopy',
+    storage:'OS notification centre',
+    synced:false,
+    inCanonicalData:false,
+    fieldRule:'allowlist',
+    allowedFields:['title','body','tag','deepLink'],
+    source:'catalog-private-copy',
+    forbiddenFields:REMINDER_PRIVACY_FORBIDDEN_FIELDS
+  }
+};
+function reminderPrivacySchemas(){ return reminderLocalClone(REMINDER_PRIVACY_SCHEMAS)||{}; }
+function reminderPrivacyHasContent(value){
+  if(value===null||value===undefined||value===false||value==='') return false;
+  if(Array.isArray(value)) return value.length>0;
+  if(typeof value==='object') return Object.keys(value).length>0;
+  return true;
+}
+function reminderPrivacyWalk(value,visit,pathPrefix){
+  var path=String(pathPrefix||'');
+  if(!value||typeof value!=='object') return;
+  if(Array.isArray(value)){ value.forEach(function(item,index){ reminderPrivacyWalk(item,visit,path+'['+index+']'); }); return; }
+  Object.keys(value).forEach(function(key){ visit(key,value[key],path?path+'.'+key:key); reminderPrivacyWalk(value[key],visit,path?path+'.'+key:key); });
+}
+// Reports rather than throws: the caller (fixture or UI) decides what a
+// violation means. `samples` are synthetic private strings that must not
+// appear anywhere in the serialized value.
+function reminderPrivacyReport(schemaId,value,samples){
+  var schema=REMINDER_PRIVACY_SCHEMAS[String(schemaId||'')];
+  if(!schema) return {ok:false,schema:null,reason:'unknown-schema',forbiddenFields:[],unexpectedFields:[],leakedSamples:[]};
+  var forbidden=[], unexpected=[], allowed=Array.isArray(schema.allowedFields)?schema.allowedFields:null;
+  var blocked={}; (schema.forbiddenFields||[]).forEach(function(field){ blocked[field]=true; });
+  reminderPrivacyWalk(value,function(key,child,path){
+    // A declared boundary flag (`medicationName:false`) is a promise, not
+    // content; only a field that actually carries a value is a leak.
+    if(blocked[key]&&!(allowed&&allowed.indexOf(key)>=0)&&reminderPrivacyHasContent(child)) forbidden.push(path);
+    if(allowed&&allowed.indexOf(key)<0) unexpected.push(path);
+  },'');
+  var text=''; try{ text=JSON.stringify(value)||''; }catch(e){ text=''; }
+  var leaked=(Array.isArray(samples)?samples:[]).map(String).filter(Boolean).filter(function(sample){ return text.indexOf(sample)>=0; });
+  return {
+    ok:forbidden.length===0&&unexpected.length===0&&leaked.length===0,
+    schema:schema.id,
+    synced:schema.synced===true,
+    reason:null,
+    forbiddenFields:forbidden,
+    unexpectedFields:unexpected,
+    leakedSamples:leaked
+  };
+}
 function commit(msg,meta){ save(undefined,{message:msg,meta:meta}); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
 function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
@@ -7652,6 +7761,9 @@ App.undoReminderHistory=function(){
 };
 App.clearReminderDeliveryHistory=App.clearReminderHistory;
 App.reminderRetentionPolicy=reminderRetentionPolicySnapshot;
+App.reminderPrivacySchemas=reminderPrivacySchemas;
+App.reminderPrivacyReport=reminderPrivacyReport;
+App.reminderCurrentSyncPayload=function(){ return reminderSyncPayload(data); };
 App.reminderRetentionSummary=function(input){ return reminderRetentionSummary(input); };
 App.reminderExportSummary=function(input){ return reminderExportSummary(input); };
 App.exportReminderSummary=function(input){ return reminderExportSummary(input); };
@@ -16549,7 +16661,11 @@ function haversineM(a,b){
 }
 function autoModeLabel(){ return moveState.autoMode==='vehicle'?'Araç':moveState.autoMode==='walk'?'Yürüyüş':'algılanıyor…'; }
 function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); }catch(e){} }
-function scheduleMoveSync(){ if(window.SeySync){ try{ window.SeySync.schedule(data); }catch(e){} } moveState.distSinceSync=0; moveState.lastSyncTs=Date.now(); }
+// REM-53: hareket senkronu da reminder sync gate'inden geçer. Onceki surumde
+// ham `data` dogrudan SeySync'e veriliyordu; sync.js sanitize'i local-only
+// koklari yine siliyordu, fakat app tarafindaki tek gecit iki farkli sozlesme
+// uretiyordu. Tek gecit: reminderSyncPayload.
+function scheduleMoveSync(){ var payload=reminderSyncPayload(data); if(window.SeySync&&payload){ try{ window.SeySync.schedule(payload); }catch(e){} } moveState.distSinceSync=0; moveState.lastSyncTs=Date.now(); }
 function maybeSyncMovement(){ if((Date.now()-moveState.lastSyncTs)>=90000 || moveState.distSinceSync>=100) scheduleMoveSync(); }
 function downsampleTrack(arr,max){ if(arr.length<=max) return arr; var out=[],step=arr.length/max; for(var i=0;i<max;i++) out.push(arr[Math.floor(i*step)]); out[out.length-1]=arr[arr.length-1]; return out; }
 function markLatestLocation(fix){

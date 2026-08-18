@@ -227,5 +227,132 @@ runTests([
     assert(!Object.prototype.hasOwnProperty.call(newDevice, "reminders"));
     assertEqual(newDevice.settings.ghToken, undefined);
     assertNoPrivateText(newDevice);
+  }],
+  ["REM-53: every sync failure mode produces a distinct receipt without raw detail", () => {
+    const cases = [
+      ["idle", null],
+      ["queued", null],
+      ["saving", null],
+      ["retrying", null],
+      ["local_saved", null],
+      ["accepted", null],
+      ["error", "anti_clobber"],
+      ["error", "offline"],
+      ["error", "remote_unreadable"],
+      ["conflict", "conflict"],
+      ["permission", "permission"]
+    ];
+    const seenStatuses = {};
+    cases.forEach(([status, code]) => {
+      const receipt = sync.normalizeSyncReceipt({
+        status,
+        lastErrorCode: code,
+        lastErrorDetail: "RAW_ERROR_SECRET",
+        snapshotRevision: "abcdef1234567",
+        sourceUpdatedAt: "2026-08-16T08:00:00.000Z",
+        ghToken: "SYNC_TOKEN_SECRET"
+      });
+      seenStatuses[receipt.status] = true;
+      // The receipt is a fixed, whitelisted shape: no raw error text, no token,
+      // no free-form field can ride along.
+      assertNoPrivateText(receipt);
+      assert(!Object.prototype.hasOwnProperty.call(receipt, "ghToken"));
+      if (code && receipt.lastErrorCode !== null) assertEqual(typeof receipt.lastErrorCode, "string");
+      const text = sync.statusText ? String(sync.statusText()) : "";
+      assert(text.indexOf("SYNC_TOKEN_SECRET") < 0);
+    });
+    // Unknown statuses fail closed to `idle` rather than inventing a state.
+    assertEqual(sync.normalizeSyncReceipt({ status: "totally-made-up" }).status, "idle");
+    assertEqual(sync.normalizeSyncReceipt({ lastErrorCode: "made_up_code" }).lastErrorCode, null);
+    assert(Object.keys(seenStatuses).length >= 5);
+    assertEqual(loaded.counters.fetches, 0);
+  }],
+  ["REM-53: an accepted receipt still carries no reminder identity into the projection", () => {
+    const local = richState();
+    local.syncReceipt = {
+      status: "accepted",
+      snapshotRevision: "abcdef1234567",
+      sourceUpdatedAt: "2026-08-16T08:00:00.000Z",
+      acceptedAt: "2026-08-16T08:00:05.000Z",
+      lastErrorDetail: "RAW_ERROR_SECRET"
+    };
+    const payload = sync.sanitize(local);
+    assertEqual(payload.syncReceipt.status, "accepted");
+    assertEqual(payload.syncReceipt.acceptedAt, "2026-08-16T08:00:05.000Z");
+    assertEqual(payload.syncReceipt.lastErrorDetail, null);
+    assert(!Object.prototype.hasOwnProperty.call(payload, "reminders"));
+    assert(JSON.stringify(payload).indexOf("seyma-reminder-v1:") < 0);
+    assert(JSON.stringify(payload).indexOf("reminder-preview-v1") < 0);
+    assertNoPrivateText(payload);
+  }],
+  ["REM-53: only the fixed reminder event summary crosses the sync boundary", () => {
+    const local = richState();
+    local.eventLog = {
+      schemaVersion: 1,
+      sourceDeviceId: "synthetic-device",
+      nextSequence: 3,
+      days: {},
+      events: [
+        {
+          eventId: "synthetic-device-1", correlationId: "reminder-v1:snooze:deadbeef", sequence: 1,
+          occurredAt: "2026-08-16T08:00:00.000Z", persistedAt: "2026-08-16T08:00:00.000Z",
+          section: "wellness", path: "data.reminders", operation: "update",
+          summary: "Bildirim yaşam döngüsü güncellendi", source: "app",
+          sourceDeviceId: "synthetic-device", privacyClass: "summary"
+        },
+        {
+          eventId: "synthetic-device-2", correlationId: "reminder-v1:delivered:cafebabe", sequence: 2,
+          occurredAt: "2026-08-16T09:00:00.000Z", persistedAt: "2026-08-16T09:00:00.000Z",
+          section: "wellness", path: "data.reminders", operation: "complete",
+          summary: "THERAPY_DETAIL_SECRET", detail: "RAW_BODY_SECRET", body: "DELIVERY_BODY_SECRET",
+          occurrenceId: "OCCURRENCE_SECRET", source: "app",
+          sourceDeviceId: "synthetic-device", privacyClass: "summary"
+        }
+      ]
+    };
+    const payload = sync.sanitize(local);
+    const events = (payload.eventLog && payload.eventLog.events) || [];
+    assert(events.length > 0);
+    events.forEach((event) => {
+      // Free-form fields are dropped by the event normalizer, so a private
+      // body cannot ride into the synced event file on any path.
+      assert(!Object.prototype.hasOwnProperty.call(event, "detail"));
+      assert(!Object.prototype.hasOwnProperty.call(event, "body"));
+      assert(!Object.prototype.hasOwnProperty.call(event, "occurrenceId"));
+      assert(String(event.correlationId || "").indexOf("OCCURRENCE_SECRET") < 0);
+    });
+    assertNoPrivateText(payload);
+  }],
+  ["REM-53: a stale full-replace can neither delete nor resurrect reminder state", () => {
+    // A device that has been offline pushes a payload with no reminder root at
+    // all (the app-side gate removed it). Merging it back must not touch the
+    // local reminder subtree in either direction.
+    const local = richState();
+    const localBefore = deepClone(local.reminders);
+
+    const remoteWithoutReminders = sync.sanitize(richState());
+    assert(!Object.prototype.hasOwnProperty.call(remoteWithoutReminders, "reminders"));
+    const mergedFromClean = sync.mergeData(local, remoteWithoutReminders);
+    assert(deepEqual(mergedFromClean.reminders, localBefore));
+
+    // Even a hostile remote snapshot that DOES carry a reminder root is refused.
+    const hostileRemote = richState();
+    hostileRemote.reminders.preferences["reminder.catalog.v1.therapy"].privateDetail = "REMOTE_THERAPY_SECRET";
+    hostileRemote.deliveryLog = [{ occurrenceId: "OCCURRENCE_SECRET", body: "DELIVERY_BODY_SECRET" }];
+    const mergedFromHostile = sync.mergeData(deepClone(local), hostileRemote);
+    assert(deepEqual(mergedFromHostile.reminders, localBefore));
+    assert(JSON.stringify(mergedFromHostile.reminders).indexOf("REMOTE_THERAPY_SECRET") < 0);
+    // The device keeps its OWN journal root untouched but never adopts the
+    // remote one; the push projection then strips it entirely.
+    assert(deepEqual(mergedFromHostile.deliveryLog, local.deliveryLog));
+    assert(JSON.stringify(mergedFromHostile.deliveryLog || []).indexOf("DELIVERY_BODY_SECRET") >= 0 || local.deliveryLog === undefined);
+    assert(!Object.prototype.hasOwnProperty.call(sync.sanitize(mergedFromHostile), "deliveryLog"));
+
+    // A device with no local reminder state does not gain one from the remote.
+    const bareDevice = { version: 2, days: {}, notifications: [], settings: {} };
+    const mergedBare = sync.mergeData(bareDevice, hostileRemote);
+    assert(!Object.prototype.hasOwnProperty.call(mergedBare, "reminders"));
+    assertNoPrivateText(sync.sanitize(mergedBare));
+    assertEqual(loaded.counters.fetches, 0);
   }]
 ]).catch(() => { process.exitCode = 1; });

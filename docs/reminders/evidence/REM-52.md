@@ -133,3 +133,36 @@ kabulü pending.
 - **`mustafaras/seyma-data`:** bu teslimatta **yazılmadı**
 - **Kapsam:** standing `after_each_prompt` tüketildi; `releaseApproval` `not_approved` olarak kaldı;
   S5 kullanıcı-cihaz kabulü pending
+
+## Kapanış sonrası düzeltme (`fec66e4`)
+
+Kapanıştan sonra yapılan "tam ve kusursuz mu?" denetiminde REM-52'nin Görev 3'ü
+**eksik uygulanmış** bulundu ve düzeltildi.
+
+**Kusur.** `revoked` durumu hesaplanıyor, açıklanıyor ve raporlanıyordu; fakat
+`reminderPermissionExplanationHTML` içinde bu duruma ait bir dal yoktu. Tarayıcı
+izni geri aldığında kullanıcı açıklamayı görüyor, hiçbir düğme görmüyordu —
+üstelik metin "İstersen buradan yeniden verebilirsin" diyerek render edilmeyen
+bir eylemi vaat ediyordu. `reminderPermissionCanRequest('revoked')` `true`
+olduğu hâlde UI bunu kullanılabilir kılmıyordu.
+
+**Düzeltme.** `revoked` için açık istek düğmesi (yalnız kullanıcı dokunuşuyla)
+ve caution ikonu eklendi.
+
+**Fixture'daki iki zayıflık.** Kusurun kaçmasının sebebi testti, koda bakış
+değil:
+
+1. Boundary fixture'ının sandbox'ında `navigator.geolocation` yoktu, bu yüzden
+   uygulamanın **konum hard gate'i** her render'ı kesiyordu. "Reminder Center'ı
+   aç ve izin istenmediğini doğrula" iddiaları bu yüzden **boş doğruydu** —
+   merkez hiç render edilmiyordu. Gate artık karşılanıyor.
+2. Yeni değişmez eklendi: *bir durum, istek kontrolünü ancak ve ancak tarayıcı
+   diyalogunu gerçekten açabiliyorsa render eder.* Altı durumun tamamı
+   (`unsupported`, `denied`, `granted`, `default`, `revoked`,
+   `temporary-error`) gerçek markup üzerinde kontrol ediliyor; `temporary-error`
+   fırlatan bir `requestPermission` ile üretiliyor ve tekrar render tekrar
+   istek üretmiyor.
+
+**Regresyon kanıtı.** Dal geri alındığında yeni senaryo FAIL, geri konduğunda
+PASS. Boundary fixture 197 → 233 assertion; tüm fixture 114/114, headless 5/5,
+`node --check` PASS.

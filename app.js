@@ -2696,7 +2696,10 @@ function reminderAppEngineInput(input){
   return {input:out,clock:clock};
 }
 function reminderEngineModule(){
-  try{ var key='ReminderEngineV1'; if(typeof window!=='undefined'&&window[key]&&typeof window[key].generateOccurrence==='function') return window[key]; }catch(e){}
+  // REM-54: dolayli `window[key]` erisimi yerine dogrudan referans. Modul
+  // artik index.html tarafindan yukleniyor; asagidaki inline fallback yalnizca
+  // modul yuklenemezse devreye girer ve ayni sonucu uretir.
+  try{ if(typeof window!=='undefined'&&window.ReminderEngineV1&&typeof window.ReminderEngineV1.generateOccurrence==='function') return window.ReminderEngineV1; }catch(e){}
   return null;
 }
 function reminderEngineAdapterLocalParts(instantMs,timezone){

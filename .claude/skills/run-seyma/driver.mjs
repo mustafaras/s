@@ -216,7 +216,12 @@ function assert(name, cond) {
   if (!cond) process.exitCode = 1;
 }
 
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app/core/constants.js', 'app.js'];
+// REM-54: index.html'in gercek boot sirasi. Reminder modulleri uzun sure
+// diskte durup index.html'e hic baglanmamisti; harness da onlarsiz boot
+// ederek bunu gizliyordu. Artik uretimle ayni seti yukluyoruz.
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app/core/constants.js',
+  'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js',
+  'app/core/reminderDelivery.js', 'app.js'];
 
 console.log('== boot: onboarding (no saved data) ==');
 appHTML = '';
@@ -313,6 +318,65 @@ if (sb2.App && typeof sb2.App.setMood === 'function' && typeof sb2.App.go === 'f
   assert('manual header sync clears reminder after accepted sync', !/class="sey-header-save is-dirty"/.test(appHTML));
   assert('manual header sync shows a visible confirmation', /class="sey-header-save is-synced"/.test(appHTML));
   assert('header action is labelled as sync, not save', /Eşitlendi|Eşitle/.test(appHTML));
+}
+
+// ── REM-54: Reminder Center, ritual yuzeyleri ve bildirim aksiyonlari ──
+if (sb2.App && typeof sb2.App.openReminderCenter === 'function') {
+  console.log('\n== REM-54: reminder center, ritual surfaces, notification actions ==');
+
+  assert('reminder modules loaded in the same order as index.html',
+    ['ReminderCatalogV1', 'ReminderEngineV1', 'ReminderSchedulerV1', 'ReminderDeliveryV1']
+      .every((name) => sb2[name] && typeof sb2[name] === 'object'));
+
+  // Onceki blok SeySync'i minimal bir stub'la degistirmisti; 'ayarlar'
+  // sekmesi `statusText()` cagirdigi icin stub'i tamamliyoruz. Bu bir
+  // harness detayi; ag cagrisi yine yok.
+  sb2.SeySync = {
+    schedule() {}, pushNow() { return Promise.resolve(null); },
+    statusText() { return ''; }, retryIfPending() {}
+  };
+
+  appHTML = '';
+  sb2.App.go('ayarlar');
+  sb2.App.openReminderCenter();
+  assert('Reminder Center overlay renders', /id="sey-reminder-screen"/.test(appHTML) && appHTML.length > 1200);
+  assert('Reminder Center shows the system status block', /id="sey-reminder-system-status"/.test(appHTML));
+  assert('Reminder Center offers a close control', /class="sey-reminder-close"/.test(appHTML));
+
+  appHTML = '';
+  sb2.App.closeReminderCenter();
+  assert('Reminder Center closes back to the app', !/id="sey-reminder-screen"/.test(appHTML) && appHTML.length > 500);
+
+  // Ritual / okuma yuzeyleri: reminder deep-link hedefleri gercek handler'lar.
+  appHTML = '';
+  sb2.App.openFaithCorner();
+  assert('faith corner opens as a reminder deep-link target', appHTML.length > 500 && /faith|İman|iman/i.test(appHTML));
+  sb2.App.closeFaithCorner();
+
+  appHTML = '';
+  sb2.App.openReading();
+  assert('reading hub opens as a reminder deep-link target', appHTML.length > 500);
+  sb2.App.closeReading();
+
+  const targets = sb2.App.reminderDeepLinkTargets();
+  assert('every reminder deep-link target names a real handler kind',
+    Array.isArray(targets) && targets.length > 0 && targets.every((t) => t.deepLink && t.targetId && t.kind));
+
+  // Bildirim aksiyonu: hatirlatma tiklamasi AEON sosyal rotasina dusmez.
+  assert('reminder payload classifies to the reminder channel',
+    sb2.App.reminderNotificationChannel({ data: { type: 'reminder' }, tag: '' }) === 'reminder');
+  assert('AEON payload still classifies to the aeon channel',
+    sb2.App.reminderNotificationChannel({ data: { type: 'aeon-message' }, tag: 'aeon-message' }) === 'aeon');
+  assert('unknown notification payload is not silently routed',
+    sb2.App.reminderNotificationChannel({ data: { type: 'nope' }, tag: 'nope' }) === '');
+
+  const boundary = sb2.App.reminderNotificationBoundary();
+  assert('delivery module is the live boundary owner (not the inline fallback)', boundary.moduleLoaded === true);
+  assert('reminder and AEON channels stay disjoint', boundary.disjoint.ok === true);
+
+  const status = sb2.App.reminderSystemStatus();
+  assert('reminder background capability is still reported as unsupported', status.backgroundState === 'unsupported');
+  assert('reminder in-app path stays available', status.capability.inApp === 'available');
 }
 
 if (dumpTab && sb2.App && typeof sb2.App.go === 'function') {

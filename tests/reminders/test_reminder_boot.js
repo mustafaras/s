@@ -144,6 +144,9 @@ const cases = [
     assert(typeof out.sandbox.App.reminderGenerateOccurrence === "function");
     assert(out.sandbox.App !== out.sandbox.SeymaConstants);
     assert(out.sandbox.App !== out.sandbox.ReminderCatalogV1);
+    // Bu boot bilerek yalnizca constants + catalog yukler; app.js kendi basina
+    // bu global'leri UYDURMAZ (index.html'in yukledigi tam set REM-54
+    // acceptance fixture'inda ayrica dogrulanir).
     assert(!out.sandbox.ReminderStateV1 && !out.sandbox.ReminderEngineV1);
   }],
   ["seeded boot remains renderable and adapters are ready after app.js", () => {
@@ -178,10 +181,17 @@ const cases = [
     // surum beklemek testi her teslimatta kirardi. Sozlesme "cache-bust VAR"dir.
     assert(/app\/core\/reminderCatalog\.js\?v=\d{8}[a-z]/.test(INDEX));
     assert(/app\.js\?v=\d{8}[a-z]/.test(INDEX));
+    // REM-54: engine / scheduler / delivery modulleri REM-46/50/52'de yazildi
+    // ama index.html'e hic baglanmamisti; uretimde yalnizca inline fallback
+    // calisiyordu. REM-54 bunlari cache-bust ile yukledi, bu yuzden buradaki
+    // eski negatif iddia POZITIF sozlesmeye cevrildi.
+    ['reminderEngine', 'reminderScheduler', 'reminderDelivery'].forEach((name) => {
+      assert(new RegExp('app/core/' + name + '\\.js\\?v=\\d{8}[a-z]').test(INDEX));
+    });
+    assert(APP_SOURCE.includes("window.ReminderEngineV1"));
+    // Hic yazilmamis bir modul hala uydurulmuyor.
     assert(!INDEX.includes('app/core/reminderState.js'));
-    assert(!INDEX.includes('app/core/reminderEngine.js'));
     assert(!APP_SOURCE.includes("window.ReminderStateV1"));
-    assert(!APP_SOURCE.includes("window.ReminderEngineV1"));
   }]
 ];
 

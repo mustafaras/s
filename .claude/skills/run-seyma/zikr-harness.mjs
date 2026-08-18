@@ -126,7 +126,9 @@ function ok(name, cond, detail) {
 }
 
 console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app/core/constants.js', 'app.js'];
+// REM-54: index.html ile ayni boot seti; reminder modulleri de yuklenir ki
+// zikir / Saygi deep-link hedefleri uretimdeki gercek modul yolunda olculsun.
+const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'saygiPeople.js', 'hijriCalendar.js', 'esmaulHusnaV1.js', 'esmaulHusnaV2.js', 'zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app.js'];
 const styles = fs.readFileSync(path.join(REPO, 'styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 let sb = buildSandbox(seed);
@@ -744,6 +746,29 @@ ok('Geri al, son toplu sıfırlamayı tek dokunuşla eksiksiz geri yüklüyor',
   !resetRestored.zikr.activeSession.pausedAt);
 ok('Zikirmatik overlay toast geri bildirimi overlay katmanının üstünde görünür',
   /z-index:10000/.test(appSource)&&/Geri alınacak yeni bir sayım yok/.test(appSource));
+
+// ── REM-54: zikir ve Saygı reminder deep-link hedefleri ─────────────────
+const remSb = resetSb;
+if (remSb.App && typeof remSb.App.reminderDeepLinkTargets === 'function') {
+  const targets = remSb.App.reminderDeepLinkTargets();
+  const byLink = Object.fromEntries(targets.map((t) => [t.deepLink, t]));
+  ok('Reminder deep-link tablosu zikir hedefini gerçek bir handler ile taşıyor',
+    !!byLink.zikr && !!byLink.zikr.targetId && !!byLink.zikr.kind);
+  ok('Reminder deep-link tablosu Saygı hedefini gerçek bir handler ile taşıyor',
+    !!byLink.saygi && !!byLink.saygi.targetId && !!byLink.saygi.kind);
+
+  // Zikir hatırlatması açılışı bir tamamlama/streak yazmaz (REM-51 sözleşmesi).
+  const zikrBefore = JSON.stringify(JSON.parse(remSb.localStorage.getItem('seyma-reset-v1')).zikr);
+  remSb.App.openReminderTarget('zikr');
+  const zikrAfter = JSON.stringify(JSON.parse(remSb.localStorage.getItem('seyma-reset-v1')).zikr);
+  ok('Zikir hatırlatmasını açmak zikir sayımını/streak’ini değiştirmiyor', zikrBefore === zikrAfter);
+
+  ok('Reminder modülleri zikir harness boot’unda da canlı',
+    ['ReminderCatalogV1', 'ReminderEngineV1', 'ReminderSchedulerV1', 'ReminderDeliveryV1']
+      .every((name) => remSb[name] && typeof remSb[name] === 'object'));
+  ok('Zikir yüzeyinde de reminder/ÆON bildirim kanalları ayrık',
+    remSb.App.reminderNotificationBoundary().disjoint.ok === true);
+}
 
 console.log('\n' + (failed ? '⚠️ ' + failed + ' başarısız, ' : '✅ ') + passed + '/' + (passed + failed) + ' assertion pass');
 process.exit(failed ? 1 : 0);

@@ -235,6 +235,7 @@ denetim, REM-57 sınırında bir **boşluk** buldu ve kapatıldı.
 | Cache-bust | üç yüzey de `20260819a` → `20260819b`; aksi hâlde REM-56 sürümünü önbelleğe almış tarayıcı adoption düzeltmesini almazdı |
 | Canlı davranış | indirilen canlı dosya `vm`'de düşmanca projection'a karşı koşturuldu: uydurma `reminderHealth` düşüyor, özel gövde hiçbir çıkışta yok, ham coverage path'i maskeli; eski verbatim adoption satırı canlıda 0 kez |
 | `mustafaras/seyma-data` | yazılmadı |
+| Düzeltme teslimatı | kod `080132d`, docs+cache-bust `7136a0c`; workflow `32231527004` success; canlı `?v=20260819c`; canlı dosya beş `chooseProjection` dalında düşmanca projection'a karşı sıfır sızıntı, stale snapshot yalnız tanı metadata anahtarları |
 
 ## Sonuç
 

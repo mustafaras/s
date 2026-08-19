@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-59",
+  "activePrompt": "REM-60",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-58",
-  "nextSafeAction": "REM-59 Panel partial fetch, stale ve fail-closed; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-59",
+  "nextSafeAction": "REM-60 Panel status, provenance ve operational health; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,10 +37,10 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-58 gate locked the panel conditional-polling / transport / draft-safety contract. loadTransportFileP now classifies 429 (rate limit) distinctly from a generic transport error (rateLimited=true, transport rate_limited) so a rate-limited observer read is not mislabeled as a generic 5xx; the new panelInteractionActiveP() render gate extends applyPollRenderP deferral beyond text input to an open drawer (D4_DRAWER_RETURN_ID / UI.d4SelectedModule), an active filter (UI.eventFilter / UI.motivationFilter), a non-today selected date (UI.selectedDate !== today()) and an expanded card (UI.expandedCards) — data is still fetched, only the render is queued (panelDraftActiveP stays the fetch-skip gate, panelInteractionActiveP is the render gate). A deferred snapshot is applied exactly once when the interaction clears; an unchanged reminder status does not trigger a full panel render (only the poll ribbon updates) and UI.newChanges is driven by the real event delta, not a blind render. The polling/transport boundary carries no method:PUT/POST/PATCH/DELETE, no localStorage.setItem/removeItem and no reminder-preference write function; loadTransportFileP uses GET only — the panel remains a read surface. tests/test_panel_p2_polling.js render-gate context gained a panelInteractionActiveP stub for the new dependency (in-allowlist polling regression).",
-    "tests": "new panel polling fixture 82 assertions / 23 scenarios (200, 304 warm/cold cache, ETag changed, empty, malformed, network, 429 rate limit, generic 5xx; draft/textarea/drawer/filter/selected-date/expanded-card deferral; single controlled deferred apply; unchanged-no-render; no-write boundary), Panel P2 polling 15, Panel-v2 polling telemetry 27; all reminder panel fixtures, panel root P0/P1/P2/P3/P4/P6/staleness/Faz-11, all Panel-v2, all reminder suite, node --check panel.js, git diff --check and context validator PASS",
-    "commit": "63ccfb8",
-    "remoteEquality": "REM-58 closure commit pending; standing main fast-forward delivery receipt recorded separately after closure PASS",
+    "source": "REM-59 gate locked the panel partial-fetch / stale / fail-closed contract. The side-channel (section) fetch failure decision is now a single pure testable applySectionFailureP(): it PRESERVES any existing healthy sections and only marks the failure, falls back to the normal missing behavior on first load (no sections yet), and treats malformed/null sections input as an empty first load with no leak; sectionFetchState.lastError now holds ONLY a stable code (network/unauthorized/forbidden/not_found/rate_limited/conflict) instead of the prior String(err.message), so a raw network error, token or personal detail never enters panel state. Reminder system status is distinguished by emptyStateReasonP as unavailable/stale/error/pending/ok across three deterministic and disjoint kinds (unused/pending/error); while sectionFetchState.ok=false it never claims Hazir/success. fail() writes only the #app error screen and does NOT mutate the observer draft, token or selected UI state (verified with a brace-matching extractor); fail() and syncRibbonHTMLP carry no token sentinels. Recovery: a later successful poll clears sectionFetchState={ok:true,lastError:null,failedAt:null} (existing loop behavior).",
+    "tests": "new panel partial-state fixture 69 assertions / 10 scenarios (first-load missing, healthy, stale, partial failure, recovered, malformed; failure preserves healthy sections; reminder status unavailable/stale/error/pending/ok; fail() no-mutation of draft/token/UI; no raw network error/token/personal detail; honest partial-failure status), Panel P3 35, Panel P4 28, staleness 7; all reminder suite, panel root P0/P1/P2/P3/P4/P6/staleness/Faz-11, all Panel-v2, node --check panel.js, git diff --check and context validator PASS",
+    "commit": "2fb1068",
+    "remoteEquality": "REM-59 closure commit pending; standing main fast-forward delivery receipt recorded separately after closure PASS",
     "deployment": "not deployed; releaseApproval remains not_approved; standing after_each_prompt delivery receipt recorded separately after closure PASS",
     "deviceAcceptance": "pending; not performed by agent"
   },
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-19",
-  "updatedBy": "REM-58 closed: conditional polling / transport / draft-safety contract locked (429 rate-limit classified distinctly, panelInteractionActiveP render gate defers on drawer/filter/selected-date/expanded-card, deferred snapshot applied once, unchanged status no full render, no-write boundary); activePrompt advances to REM-59; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt recorded separately after closure PASS",
+  "updatedBy": "REM-59 closed: panel partial-fetch / stale / fail-closed contract locked (applySectionFailureP preserves healthy sections and stores a stable error code only, reminder system status distinguished as unavailable/stale/error/pending/ok, fail() does not mutate draft/token/selected UI, no raw network error/token/personal detail in status); activePrompt advances to REM-60; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt recorded separately after closure PASS",
 
   "closure": {
-    "prompt": "REM-58",
-    "evidence": "docs/reminders/evidence/REM-58.md",
-    "commit": "63ccfb8",
+    "prompt": "REM-59",
+    "evidence": "docs/reminders/evidence/REM-59.md",
+    "commit": "2fb1068",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

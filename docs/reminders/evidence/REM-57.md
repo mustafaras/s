@@ -146,7 +146,7 @@ coverage yüzeyi yalnız sayaç basıyor.
 | Katman | Komut | Sonuç | Kısa kanıt |
 |---|---|---|---|
 | Syntax | `node --check panelCoverageManifest.js` / `panel.js` | PASS | 2/2 |
-| Yeni gate | `node tests/reminders/test_reminder_panel_redaction.js` | PASS | 163 assertion / 6 senaryo |
+| Yeni gate | `node tests/reminders/test_reminder_panel_redaction.js` | PASS | 317 assertion / 8 senaryo (kapanış sonrası düzeltmeyle 163/6'dan) |
 | Panel P4 | `node tests/test_panel_p4_provenance.js` | PASS | 28 |
 | Panel P3 | `node tests/test_panel_p3_root_modules.js` | PASS | 35 |
 | REM-26 | `node tests/reminders/test_reminder_panel_projection.js` | PASS | 28 |
@@ -188,6 +188,41 @@ geri konduğunda 163/163 PASS.
   kapsamı closure PASS sonrası ayrı receipt olarak yürütülür
 - `mustafaras/seyma-data` write: not performed
 - `releaseApproval` `not_approved` olarak korunur
+
+## Kapanış sonrası düzeltme — stale dalı da sanitize edildi (`080132d`)
+
+Kullanıcının "tam ve kusursuz uygulandıklarından emin ol" talebiyle yapılan
+denetim, REM-57 sınırında bir **boşluk** buldu ve kapatıldı.
+
+- **Bulgu:** `chooseProjection`'ın `projection_stale` dalı dönen `snapshot`
+  alanında uzak projection'ı **hâlâ aynen** veriyordu; sanitizasyon yalnız
+  `ready` dalına uygulanmıştı.
+- **Fixture neden kaçırmıştı:** ilk REM-57 taraması stale dalını **temiz**
+  (kendi ürettiği) bir snapshot ile çalıştırıyordu; düşmanca projection yalnız
+  `ready` dalına veriliyordu. REM-54 ve REM-55'teki kaçışlarla aynı sınıf hata:
+  fixture yanlış tarafı donduruyordu.
+- **Dürüst etki:** DOM sızıntısı **yoktu** — `panel.js` `PROJECTION.snapshot`'ı
+  yalnız atıyor, hiçbir render yolunda okumuyor. Fakat receipt'in az önce
+  güvenmediği ham payload panel belleğinde ve `panelSig()` serileştirmesinde
+  tutuluyordu ve REM-57'nin "dönen snapshot yalnız metadata + sanitize edilmiş
+  payload taşır" sözleşmesi altı daldan yalnız biri için doğruydu.
+- **Düzeltme:** stale dalı artık yalnız **tanı metadata'sı** döndürür
+  (`schemaVersion`, `manifestVersion`, revision, sha, üç zaman damgası);
+  `data` / `sections` / `coverage` tamamen düşer. REM-55'in "stale snapshot
+  tanı için korunur, veri kaynağı olarak kullanılmaz" sözleşmesi aynen geçerli.
+- **Gate genişletildi:** fixture altı `chooseProjection` dalını da düşmanca
+  projection ile zorluyor; ayrıca bozuk/beklenmedik şekilli girdilerin
+  (null, sayı, metin, dizi, dizi içindeki reminder alanı, bozuk uzak coverage)
+  fail-closed kaldığını ve adapter'ın throw etmediğini doğruluyor.
+  **163 → 317 assertion, 6 → 8 senaryo.**
+- **Regresyon kanıtı:** düzeltme geri alındığında yeni senaryo FAIL, geri
+  konduğunda 317/317 PASS.
+- **Denetimde ayrıca doğrulandı:** `sync.js:393` observer projection'ı aynı
+  `P.buildObserverSnapshot` ile yazıyor, yani REM-56'nın fail-closed
+  sınıflandırması **yazma tarafında da** geçerli; Panel-v2'nin audit DOM'una
+  bastığı `unmappedPaths` token'ları maskeli ve `escapeHtml`'den geçiyor;
+  `tests/README.md` ve `tests/reminders/README.md` per-file envanter değildir,
+  bu yüzden yeni fixture'lar için envanter drift'i yoktur.
 
 ## Standing teslimat makbuzu (S3 / S4)
 

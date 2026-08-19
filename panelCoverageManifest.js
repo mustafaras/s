@@ -672,8 +672,9 @@ var RAW_DERIVED_SECTIONS={dailyPhoto:1,therapyProvenance:1,profileProgress:1,not
 // The locally rebuilt sections ARE the contract: a remote key the local builder
 // cannot produce (a reminder card, an invented health block) is dropped instead
 // of rendered, and a mirror section is never taken on trust.
+function newAdoptionReport(){ return {adoptedSectionKeys:[],rebuiltSectionKeys:[],droppedSectionKeys:[],droppedReminderKeys:[],droppedFields:0}; }
 function adoptSections(localSections,remoteSections){
-  var out={}, report={adoptedSectionKeys:[],rebuiltSectionKeys:[],droppedSectionKeys:[],droppedReminderKeys:[],droppedFields:0};
+  var out={}, report=newAdoptionReport();
   Object.keys(localSections).forEach(function(key){ out[key]=localSections[key]; });
   if(isObject(remoteSections)) Object.keys(remoteSections).forEach(function(key){
     if(!own(out,key)){ addUnique(report.droppedSectionKeys,safeKeyToken(key)); return; }
@@ -713,21 +714,28 @@ function adoptCoverage(remoteCoverage,fallbackData){
 // data / sections / coverage are replaced by their sanitized forms and any
 // unknown top-level key from the wire is dropped.
 var SNAPSHOT_META_KEYS=["schemaVersion","manifestVersion","reminderCoverageVersion","snapshotRevision","sourceLatestSha","sourceUpdatedAt","projectionBuiltAt","serverAcceptedAt"];
+// `data` / `sections` / `coverage` are omitted entirely when the caller passes
+// none: a STALE snapshot is kept for diagnosis (which revision/sha/time it
+// claimed) and must never carry its payload, because that payload is exactly
+// the one the receipt just refused to trust.
 function sanitizeAdoptedSnapshot(remote,data,sections,coverage,report){
   var out={};
   SNAPSHOT_META_KEYS.forEach(function(key){ if(own(remote,key)) out[key]=remote[key]; });
   if(isObject(remote.lag)) out.lag=sanitizeAdoptedValue(remote.lag,report,0);
   if(isObject(remote.sync)) out.sync=sanitizeAdoptedValue(remote.sync,report,0);
-  out.coverage=coverage;
-  out.sections=sections;
-  out.data=data;
+  if(coverage!==undefined) out.coverage=coverage;
+  if(sections!==undefined) out.sections=sections;
+  if(data!==undefined) out.data=data;
   return out;
 }
 function chooseProjection(projection,latest,receipt){
   var parsed=parseObserverSnapshot(projection), r=safeReceipt(receipt), legacy=redactForObserver(latest);
   if(!parsed.ok) return {source:'legacy_fallback',reason:projection?'projection_invalid': 'projection_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
   if(!r.acceptedAt||!r.sourceLatestSha) return {source:'legacy_fallback',reason:'receipt_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
-  if(parsed.value.sourceLatestSha!==r.sourceLatestSha||parsed.value.snapshotRevision!==r.snapshotRevision) return {source:'legacy_fallback',reason:'projection_stale',snapshot:parsed.value,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
+  if(parsed.value.sourceLatestSha!==r.sourceLatestSha||parsed.value.snapshotRevision!==r.snapshotRevision){
+    var staleReport=newAdoptionReport();
+    return {source:'legacy_fallback',reason:'projection_stale',snapshot:sanitizeAdoptedSnapshot(parsed.value,undefined,undefined,undefined,staleReport),data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest),adoption:staleReport};
+  }
   var parsedData=redactForObserver(parsed.value.data), adopted=adoptSections(sectionSnapshot(parsedData,r,parsedData),parsed.value.sections);
   var parsedCoverage=adoptCoverage(parsed.value.coverage,parsed.value.data);
   var safeSnapshot=sanitizeAdoptedSnapshot(parsed.value,parsedData,adopted.sections,parsedCoverage,adopted.report);

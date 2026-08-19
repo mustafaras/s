@@ -291,6 +291,100 @@ const cases = [
     assertEqual(outputs.redactForObserver.settings.prayer.remindersEnabled, true);
   }],
 
+  ["no chooseProjection branch leaks an untrusted payload, stale included", () => {
+    const P = loadCoverage();
+    const data = latestFixture();
+    const projection = untrustedProjection();
+    const staleSha = Object.assign(receipt(), { sourceLatestSha: SHA_OTHER });
+    const staleRevision = Object.assign(receipt(), { snapshotRevision: "9".repeat(40) });
+    const branches = {
+      ready: P.chooseProjection(projection, data, receipt()),
+      staleSha: P.chooseProjection(projection, data, staleSha),
+      staleRevision: P.chooseProjection(projection, data, staleRevision),
+      receiptMissing: P.chooseProjection(projection, data, null),
+      invalid: P.chooseProjection("{bozuk", data, receipt()),
+      missing: P.chooseProjection(null, data, receipt())
+    };
+    Object.keys(branches).forEach((name) => {
+      const branch = branches[name];
+      // Hiçbir dal, hiçbir alanında (snapshot dâhil) mahrem değer taşımaz.
+      assert(deepEqual(leaks(branch), []));
+      // Uydurma reminder bölümleri ne sections'ta ne snapshot'ta yer alır;
+      // adları YALNIZ denetim raporunda (droppedSectionKeys) görünebilir.
+      ["reminderHealth", "schedulerHealth"].forEach((key) => {
+        assert(!Object.prototype.hasOwnProperty.call(branch.sections || {}, key));
+        assert(!serialize(branch.sections || {}).includes(key));
+        assert(!serialize(branch.snapshot || {}).includes(key));
+        assert(!serialize(branch.data || {}).includes(key));
+        assert(!serialize(branch.coverage || {}).includes(key));
+      });
+    });
+    assertEqual(branches.staleSha.reason, "projection_stale");
+    assertEqual(branches.staleRevision.reason, "projection_stale");
+    // Stale snapshot TANI için korunur (REM-55) fakat PAYLOAD taşımaz:
+    // receipt'in az önce güvenmediği veri panel belleğinde tutulmaz.
+    const stale = branches.staleSha.snapshot;
+    assert(!!stale);
+    assertEqual(stale.snapshotRevision, REV_SNAPSHOT);
+    assertEqual(stale.sourceLatestSha, SHA_LATEST);
+    assertEqual(stale.projectionBuiltAt, BUILT_AT);
+    ["data", "sections", "coverage"].forEach((key) => {
+      assert(!Object.prototype.hasOwnProperty.call(stale, key));
+    });
+    // Kabul edilen dalda snapshot yalnız metadata + sanitize edilmiş payload.
+    const ready = branches.ready.snapshot;
+    assertEqual(ready.manifestVersion, "panel-coverage-v1");
+    assert(Object.prototype.hasOwnProperty.call(ready, "data"));
+    assert(!Object.prototype.hasOwnProperty.call(ready.sections, "reminderHealth"));
+    assert(!serialize(ready).includes(PRIVATE_TITLE));
+    // Wire'dan gelen bilinmeyen top-level anahtar dönen snapshot'a girmez.
+    const extra = deepClone(untrustedProjection());
+    extra.reminderDebugDump = { body: SENTINELS.body };
+    const withExtra = P.chooseProjection(extra, data, receipt());
+    assert(!Object.prototype.hasOwnProperty.call(withExtra.snapshot, "reminderDebugDump"));
+    assert(deepEqual(leaks(withExtra), []));
+  }],
+
+  ["malformed and hostile shapes fail closed instead of throwing", () => {
+    const P = loadCoverage();
+    // Sınır girdileri: adapter saf ve savunmacıdır, panel yükleme yolu çökemez.
+    [null, undefined, 42, "metin", [], {}].forEach((input) => {
+      const coverage = P.coverageForData(input);
+      ["full", "summary", "redacted", "missing", "unmappedPaths"].forEach((bucket) => {
+        assert(Array.isArray(coverage[bucket]));
+      });
+      assert(deepEqual(leaks(coverage), []));
+      const report = P.reminderCoverageReport(input);
+      assert(report.ok);
+      assertEqual(report.contractVersion, "panel-reminder-coverage-v1");
+      assert(deepEqual(leaks(P.redactForObserver(input)), []));
+    });
+    // Beklenmedik ŞEKİLDE gelen reminder içeriği de fail-closed kalır: sınır
+    // path tabanlıdır, kök nesnenin dizi mi obje mi olduğuna bağlı değildir.
+    [
+      [{ reminderBody: SENTINELS.body }],
+      { reminders: { preferences: { [PRIVATE_TITLE]: { body: SENTINELS.body } } } },
+      { reminderQueueV2: [{ body: SENTINELS.body, medicationName: SENTINELS.medication }] }
+    ].forEach((input) => {
+      assert(deepEqual(leaks(P.redactForObserver(input)), []));
+      assert(deepEqual(leaks(P.coverageForData(input)), []));
+      assert(deepEqual(leaks(P.buildObserverSnapshot(input, receipt(), BUILT_AT)), []));
+    });
+    assertEqual(P.classifyPath("").mode, "summary");
+    assertEqual(P.classifyPath([]).mode, "summary");
+    // Bozuk şekilli uzak coverage / sections girdileri de fail-closed.
+    const broken = deepClone(untrustedProjection());
+    broken.coverage = { full: "metin", summary: [null, 7, "reminders"], redacted: null, missing: undefined };
+    broken.sections = [{ body: SENTINELS.body }];
+    const chosen = P.chooseProjection(broken, latestFixture(), receipt());
+    assert(deepEqual(leaks(chosen), []));
+    assert(chosen.coverage.redacted.indexOf("reminders") >= 0);
+    ["full", "summary", "redacted", "missing", "unmappedPaths"].forEach((bucket) => {
+      assert(Array.isArray(chosen.coverage[bucket]));
+    });
+    assertEqual(typeof chosen.sections.today, "object");
+  }],
+
   ["redaction never mutates the source and is deterministic", () => {
     const P = loadCoverage();
     const data = latestFixture();

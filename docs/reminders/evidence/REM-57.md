@@ -1,0 +1,199 @@
+# REM-57 — Panel redaction ve reminder no-op kararı
+
+## Receipt
+
+- **Program:** APP-REMINDER-UX
+- **Prompt:** REM-57
+- **Tarih:** 2026-08-19
+- **Commit:** `b507c00`
+- **Repo:** `/Users/m_ras/Desktop/seyma`
+- **Başlangıç HEAD:** `dce1326` (REM-56 teslim makbuzu)
+- **Bitiş HEAD:** `b507c00`
+- **Release approval:** `NOT_APPROVED`
+- **Approval evidence:** `none` (standing `after_each_prompt` teslimatı ayrı kayıttır)
+
+## Kapsam
+
+- **Allowlist:** `panelCoverageManifest.js` (redaction / adoption),
+  `panel.js` projection consumer (**değiştirilmedi** — aşağıya bakınız),
+  `docs/reminders/APP-REMINDER-DECISIONS.md` (REM-ADR-021/022/023,
+  REM-DISC-011/012), `tests/reminders/test_reminder_panel_redaction.js` (yeni G13-C gate)
+- **Closure records:** `docs/reminders/evidence/REM-57.md`,
+  `docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md`,
+  `docs/reminders/APP-REMINDER-STATE.json`
+- **Protected paths changed:** `no`
+- **App runtime dosyası değişikliği:** `no`
+- **Panel runtime değişikliği:** `no` (`panel.js`, `panel.html`, `panel.css`)
+- **Panel-v2:** ayrı regression olarak koşuldu, değiştirilmedi
+
+## Görev 1 — Panelde reminder gösterilmeli mi? Hayır (REM-ADR-021)
+
+| Eksen | Gerekçe |
+|---|---|
+| Feature | Panelin sahip olduğu hiçbir kullanıcı akışı reminder tercihine bağlı değil; gözlemci hatırlatma kurmaz, ertelemez, kapatmaz. |
+| Operator | Yedi reminder kökü sync sınırını geçmiyor (REM-53). Panelde hesaplanabilecek her "sağlık" değeri kanıtsız tahmindir; yokluğu `0` / `healthy` diye sunmak yanlış gözlemdir. |
+| Privacy | Reminder yüzeyi kullanıcının kendi kelimeleriyle yazdığı başlık, gövde, ilaç adı, terapi notu ve ritüel saatini taşır; ikinci bir kişiye görünmesi için ürün gerekçesi yok (UX planı §13.2). |
+
+**Tek istisna (Görev 3'e cevap):** minimum redacted aggregate **reddedildi**.
+Panelin gördüğü tek reminder-türevi yüzey REM-53'ün `safeEventSummary`
+sözleşmesidir: `data.eventLog` içindeki sabit
+`Bildirim yaşam döngüsü güncellendi` özeti + `reminder-v1:` correlation
+prefix'i. Bu mevcut event log'un bir satırıdır; yeni alan, kart veya sayaç
+açmaz. `system health`, `enabled category count` ve `safe delivery status`
+üçü de ya cihaz-local veriden türetilemiyor ya da türetilse bile kategori
+kümesi üzerinden sağlık/iman rutinini ifşa ediyor.
+
+## Bulunan gerçek kusur — projection adoption fail-OPEN idi
+
+`chooseProjection` kabul edilen bir projection için `data`'yı yeniden redakte
+ediyordu (`redactForObserver(parsed.value.data)`), fakat:
+
+```js
+if(isObject(parsed.value.sections)) Object.keys(parsed.value.sections)
+  .forEach(function(k){ parsedSections[k]=parsed.value.sections[k]; });   // AYNEN
+return {..., snapshot:parsed.value,                                       // AYNEN
+        coverage:parsed.value.coverage||coverageForData(...), ...};       // AYNEN
+```
+
+`panel.js` bunu doğrudan tüketiyor: `PROJECTION.sections=PROJECTION.state.sections||{}`,
+ve bu sections dashboard kartlarına / drawer'lara render ediliyor.
+
+**Somut senaryo:** `data/observer-snapshot.json` veri deposunda yaşar ve **eski
+veya hatalı bir app sürümü** tarafından yazılmış olabilir. Sentetik düşmanca
+fixture ile ölçüldü — REM-57 öncesi:
+
+| Sızan | Nereye |
+|---|---|
+| `sections.reminderHealth.body` / `.medicationName` | panel `PROJECTION.sections` → kart |
+| `sections.schedulerHealth.title` (özel hatırlatma başlığı) | aynı |
+| `sections.today.record.reminderBody` | aynı |
+| `sections.therapyProvenance.reminderNote` / `.occurrenceId` / `.ghToken` | aynı |
+| `coverage.summary` içindeki `reminderQueueV2.<özel başlık>.body` | coverage yüzeyi + panel state |
+| `snapshot` (dönen ham projection) | `PROJECTION.snapshot` bellekte |
+
+Yani panelin sözleşmesi ("okuduğunu yeniden redakte et") yarısı uygulanmıştı.
+REM-26 fixture'ı bunu kaçırmıştı çünkü yalnız **kendi ürettiği** snapshot'ı
+test ediyordu; kendi ürettiği snapshot zaten sözleşmeye uygun olduğu için
+adoption yolu hiç zorlanmamıştı.
+
+## Uygulanan sözleşme (REM-ADR-022)
+
+1. **Ayna bölümler her zaman yerelden kurulur.** `today`, `therapy`,
+   `notifications`, `quran`, `saygi`, `location`, `archives`,
+   `roomContentHistory`, `saygiRoot`, `locNudge`, `locationTiming`,
+   `lifecycle` zaten redakte edilmiş veriden birebir yeniden üretilebilir;
+   uzak değere hiç bakılmaz (kayıp yok, risk yok).
+2. **Yalnız beş raw-derived bölüm adopt edilir:** `dailyPhoto`,
+   `therapyProvenance`, `profileProgress`, `notificationTimeline`,
+   `externalSources` — bunları app ham kaynaktan hesaplar ve panel yeniden
+   üretemez (ör. `thoughtCount`, `responseCount`, lifecycle sayaçları).
+3. **Adopt edilen değer sanitize edilir:** secret anahtarları, blob/base64
+   alanları ve reminder-namespace anahtarları özyinelemeli olarak düşer.
+   Manifestte explicit non-withheld kararı olan reminder-adlı alanlar
+   (`prayerRemindersEnabled`, `reminderOffsetMinutes`) izinli kalır — izin
+   listesi manifestten türetilir, elle tutulmaz.
+4. **Bilinmeyen section anahtarı düşer.** Manifestin üretmediği bir bölüm
+   (`reminderHealth`, `schedulerHealth`) adopt edilmez. Reminder no-op kararı
+   böylece belge değil **yapı** tarafından zorlanır.
+5. **Uzak coverage yeniden sınıflandırılır.** Her girdi güncel `classifyPath`
+   ile yeniden kovalanır ve reminder girdileri maskelenir; `missing` kendi
+   anlamını korur (yalnız maskelenir).
+6. **Dönen snapshot sanitize edilir.** Yalnız metadata anahtarları + sanitize
+   edilmiş `data` / `sections` / `coverage`; wire'dan gelen bilinmeyen
+   top-level anahtar düşer.
+7. **Denetlenebilirlik:** `chosen.adoption` = `{adoptedSectionKeys,
+   rebuiltSectionKeys, droppedSectionKeys, droppedReminderKeys, droppedFields}`.
+   Anahtar adları identifier-şekilli değilse `*` olarak maskelenir.
+
+## Görev 4 — Tüm çıkışların taranması
+
+Sekiz mahrem sınıf (therapy, medication, mood, prayer completion, note, body,
+schedule, private title) sentetik sentinel'lerle **17 çıkış yüzeyinde** arandı:
+`redactForObserver`, `buildObserverSnapshot`, `parseObserverSnapshot` round-trip,
+`chooseProjection` beş dalı (`ready`, `projection_missing`, `projection_invalid`,
+`projection_stale`, `receipt_missing`), düşmanca projection adoption,
+`coverageForData` (+`fullDetail`), `reminderCoverageReport`, `redactedPaths`,
+`parseEventLog`, `mergeEventLogs`, `notificationTimelineProjection`,
+`normalizeReceipt`. Hepsi temiz. Aynı taramada aşırı silme de kontrol edildi:
+`today.record.mood` / `.note` ve `settings.prayer.remindersEnabled` korunuyor.
+
+Event log yolu ayrıca zorlandı: özel başlık taşıyan düşmanca bir event
+`summary` → `Güvenli kayıt özeti`, `path` → `data` olarak indirgeniyor.
+
+## Görev 5 — Mutation ve parity
+
+`redactForObserver`, `buildObserverSnapshot` ve `chooseProjection` çağrıldıktan
+sonra kaynak state, receipt ve uzak projection nesnesi deep-equal korunuyor
+(`data.reminders...body` ve `projection.sections.reminderHealth.body` hâlâ
+yerinde). Aynı girdi iki kez → deep-equal aynı çıktı. Redaksiyon idempotent:
+`redactForObserver(redactForObserver(x))` = `redactForObserver(x)`.
+
+## `panel.js` bilinçli no-op
+
+Sanitizasyon saf adapter'a (`panelCoverageManifest.js`) kondu, `panel.js`'e
+değil. Üç neden: (a) `panel.js` zaten `chooseProjection`'ın çıktısını tüketiyor,
+sınır orada kapanınca panel otomatik olarak güvenli hâle geliyor; (b) aynı
+adapter'ı Panel-v2 ve fixture'lar da tüketiyor — panelde düzeltmek adapter'ı
+diğer tüketiciler için fail-open bırakırdı; (c) `panel.js` değişikliği
+`panel.html` cache-bust'ı gerektirirdi, o dosya REM-57 allowlist'inde değil
+(REM-55'te aynı eksiklik ayrı bir düzeltme commit'i gerektirmişti).
+Negatif olarak doğrulandı: panel reminder köklerini okumuyor, reminder yazma
+yolu yok, `PROJECTION.snapshot.data/sections` hiçbir render yolunda okunmuyor,
+coverage yüzeyi yalnız sayaç basıyor.
+
+## Komut sonuçları
+
+| Katman | Komut | Sonuç | Kısa kanıt |
+|---|---|---|---|
+| Syntax | `node --check panelCoverageManifest.js` / `panel.js` | PASS | 2/2 |
+| Yeni gate | `node tests/reminders/test_reminder_panel_redaction.js` | PASS | 163 assertion / 6 senaryo |
+| Panel P4 | `node tests/test_panel_p4_provenance.js` | PASS | 28 |
+| Panel P3 | `node tests/test_panel_p3_root_modules.js` | PASS | 35 |
+| REM-26 | `node tests/reminders/test_reminder_panel_projection.js` | PASS | 28 |
+| Context | `node docs/reminders/verify-reminder-context.mjs` | PASS | 73 prompt, 66 link |
+| Regression | tüm `tests/`, `tests/reminders/`, `tests/panel-v2/` | PASS | 118/118 |
+| Diff | `git diff --check` | PASS | temiz |
+
+**Regresyon kanıtı:** adoption sanitizasyonu geçici olarak eski verbatim-copy
+hâline döndürüldüğünde yeni fixture'ın 3. senaryosu FAIL veriyor
+(`an untrusted projection cannot smuggle reminder sections or raw paths`),
+geri konduğunda 163/163 PASS.
+
+## Discrepancy kayıtları
+
+- **REM-DISC-011** (karar günlüğü): surface map §5 `PANEL-01` satırı REM-55'i
+  saymıyor; test matrisi G13-B fixture adı `test_reminder_panel_manifest.js`
+  diyor, prompt `test_reminder_panel_coverage.js` diyor. İki dosya da
+  REM-55/56/57 allowlist'lerinde değil; owner REM-66 / matris sahibi.
+- **REM-DISC-012** (karar günlüğü, deferred): adopt edilen beş raw-derived
+  bölüm, **meşru anahtarlarının içine** konmuş reminder-dışı ham metni hâlâ
+  taşıyabilir (ör. `therapyProvenance.thoughts[*].summary`). Bugün gerçek bir
+  sızıntı değil (app sabit `Metin redacted` yazar, `days.*.therapy.*` zaten
+  redacted); risk yalnız eski/hatalı bir app sürümünün yazdığı projection için.
+  Owner: REM-64 (surface map §2 redaction satırı).
+
+## Evidence seviyeleri
+
+- Source evidence: S0 / S1 — surface map §2/§4, UX planı §13.2,
+  `panelCoverageManifest.js` `redact` / `redactForObserver` / `chooseProjection`,
+  `panel.js` `load()` projection tüketimi, REM-56 çıktısı
+- Synthetic test evidence: S2 — yukarıdaki tablo
+- Commit / remote evidence: S3 — `b507c00`
+- CI / Pages evidence: S4 — standing `after_each_prompt` teslimatında kaydedilir
+- User-device evidence: S5 — `N/A`
+
+## Release hard gate
+
+- Push / merge / tag / Pages / external write: standing `after_each_prompt`
+  kapsamı closure PASS sonrası ayrı receipt olarak yürütülür
+- `mustafaras/seyma-data` write: not performed
+- `releaseApproval` `not_approved` olarak korunur
+
+## Sonuç
+
+- **Durum:** done
+- **Blocker:** `none`
+- **Sonraki prompt:** REM-58
+- **Not:** PANEL-01 privacy yüzeyi kapandı. Reminder no-op kararı açık gerekçeyle
+  kayıtlı ve artık yapısal olarak zorlanıyor; ham/private veri panel projection,
+  sections, coverage, snapshot ve DOM yüzeylerinin hiçbirine girmiyor.

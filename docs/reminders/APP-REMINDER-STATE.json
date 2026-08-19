@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-57",
+  "activePrompt": "REM-58",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-56",
-  "nextSafeAction": "REM-57 Panel redaction ve reminder no-op karari; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-57",
+  "nextSafeAction": "REM-58 Panel transport, ETag / 304 ve draft safety; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-56 gate found a real fail-OPEN boundary in panelCoverageManifest.js: a reminder path with no explicit rule fell through to the final `*` catch-all and was classified `summary`, so any reminder root/key a future app version adds (reminderQueueV2, remindersV2, notifications.*.reminderBody, days.*.reminderCompletion) would have been copied raw into snapshot.data; worse, the coverage list published the RAW PATH, and because a user names their own reminders, a line like `reminderQueueV2.Anneme ilac ver.body` carried the private title itself into observer-snapshot.json; the declared `unmappedPaths` list was dead code and never populated. The reminder namespace is now fail-closed (`unmapped` + withheld) and that check runs BEFORE the fullDetail allowlist, so a reminder field landing inside an allowed root such as `notifications` can never become `full`; unmapped audit entries are masked to identifier-shaped tokens. MANIFEST.reminderCoverage freezes 12 field classes with one mode plus rationale, and new pure classifyPath() / reminderCoverageReport() APIs report declaration-vs-resolution parity. Wire contract unbroken: schemaVersion 1 and manifestVersion panel-coverage-v1 preserved, classification carries its own panel-reminder-coverage-v1 contractVersion written additively as reminderCoverageVersion. settings.prayer.remindersEnabled/reminderOffsetMinutes got explicit summary rules against over-capture; app runtime, panel runtime, Panel-v2 and protected paths untouched",
-    "tests": "panel coverage 405 assertions / 10 scenarios (new), Panel P1 43 (from 35), Panel P6 16; full reminder/root/Panel-v2 117/117, headless 5/5, node --check panelCoverageManifest.js + panel.js, git diff --check and context validator PASS; regression proof: removing the fail-closed line makes the new scenario FAIL, restoring it PASSes",
-    "commit": "654212d",
+    "source": "REM-57 gate found a real fail-OPEN adoption path in chooseProjection: `data` was re-redacted but the remote projection's `sections`, `coverage` and the returned `snapshot` were copied VERBATIM, and panel.js feeds those sections straight into PROJECTION.sections and the dashboard cards. So an observer-snapshot.json written by an older or buggy app build could carry a fabricated `reminderHealth` section, reminder fields smuggled inside a known section (reminderBody / occurrenceId / ghToken) and a raw coverage path holding the user's own reminder title into the panel; REM-26 missed it because it only tested the snapshot it built itself. Mirror sections are now always rebuilt locally, only the five raw-derived sections (dailyPhoto, therapyProvenance, profileProgress, notificationTimeline, externalSources) are adopted and are recursively stripped of secret/blob/reminder-namespace keys, unknown section keys are dropped, remote coverage is re-classified with reminder entries masked, and the returned snapshot carries metadata plus sanitized payload only; rich raw-derived values (thoughtCount, responseCount, lifecycle counters) survive and chosen.adoption reports the decision. DECISION REM-ADR-021: the panel reminder surface stays a no-op on separate feature, operator and privacy grounds; the minimum redacted aggregate was rejected; the only exception is REM-53's fixed lifecycle event summary. panel.js was a deliberate no-op because the boundary belongs in the pure adapter every consumer shares",
+    "tests": "panel redaction 163 assertions / 6 scenarios (new), Panel P4 28, Panel P3 35, REM-26 28; full reminder/root/Panel-v2 118/118, node --check 2/2, git diff --check and context validator PASS; eight private classes scanned across 17 output surfaces including all five chooseProjection branches; regression proof: restoring the verbatim adoption makes the untrusted-projection scenario FAIL",
+    "commit": "b507c00",
     "remoteEquality": "REM-56 delivered at 377f171; local HEAD, origin/main and git ls-remote refs/heads/main all matched; standing main fast-forward PASS (4af659b..377f171). Earlier: REM-54 at ff9d482, REM-55 at 3cc70eb",
     "deployment": "REM-56: workflow 32223147836 success; live index.html / panel.html HTTP 200 and both now request panelCoverageManifest.js?v=20260819a (bumped from 2026080402 / 20260816a; panel-v2.html bumped from 20260811b for the same shared asset). The deployed manifest HTTP 200 carries reminderSegmentIndex / maskReminderPath / WITHHELD_MODES / classifyPath / reminderCoverageReport / panel-reminder-coverage-v1 while the old fail-open `return ruleForPath(parts).mode||'summary'` line is gone (0 occurrences); running the LIVE file in a vm classifies an unknown reminder root as unmapped+withheld and keeps its private body out of redactForObserver. Earlier: REM-54 workflow 32174375024, REM-55 workflow 32175033895, both success with their own live markers",
     "deviceAcceptance": "pending; not performed by agent"
@@ -75,11 +75,11 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-19",
-  "updatedBy": "REM-56 closed: reminder namespace classification is fail-closed and single-mode in panelCoverageManifest.js (unmapped + masked audit token, 12 declared field classes, classifyPath/reminderCoverageReport); activePrompt advances to REM-57; releaseApproval remains not_approved, S5 pending, app runtime / panel runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt is recorded separately after closure PASS; standing after_each_prompt delivery consumed for REM-56 at 377f171 with remote, workflow 32223147836 and live behavior receipts recorded",
+  "updatedBy": "REM-57 closed: remote projections are treated as untrusted input (sanitized sections/coverage/snapshot) and the panel reminder no-op decision is recorded in REM-ADR-021 and structurally enforced; REM-ADR-022/023 and REM-DISC-011/012 appended to the decisions log; activePrompt advances to REM-58; releaseApproval remains not_approved, S5 pending, app runtime / panel runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt is recorded separately after closure PASS",
   "closure": {
-    "prompt": "REM-56",
-    "evidence": "docs/reminders/evidence/REM-56.md",
-    "commit": "654212d",
+    "prompt": "REM-57",
+    "evidence": "docs/reminders/evidence/REM-57.md",
+    "commit": "b507c00",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

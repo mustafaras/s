@@ -767,3 +767,48 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Sonraki adım:** REM-64 (panel redaction sahibi, surface map §2) bu beş
   bölümün alan düzeyinde yeniden doğrulanmasını üstlenir.
 
+### REM-ADR-024 — Panel reminder dashboard card bilinçli no-op (REM-61)
+
+- **Tarih:** 2026-08-19
+- **Durum:** accepted
+- **Soru:** ÆON panelinde reminder için ayrı bir bento / module dashboard card
+  açılmalı mı?
+- **Kanıt:** `panel.js` `reminderStatusCardHTMLP` (REM-60, render() içinde
+  `coverageRibbonHTMLP` sonrası çağrılır), `d4ModuleDescriptorsP`,
+  `d4ModuleAtlasHTMLP`, `coreModules`, `rootModulesCardHTMLP`,
+  `p4ProvenanceCardHTMLP`; `panelCoverageManifest.js`
+  `MANIFEST.reminderCoverage` (REM-56); REM-ADR-018 / REM-ADR-021;
+  `tests/reminders/test_reminder_panel_status.js` (REM-60 gate, 223 assertion);
+  surface map §2 (dashboard cards row) ve §4 (hard boundaries).
+- **Karar:** Hayır — ayrı bir reminder dashboard card **açılmaz** (bilinçli
+  no-op). Üç gerekçe ayrı ayrı geçerlidir: **feature** — panelin hiçbir mevcut
+  kullanıcı akışı reminder tercihine bağlı değildir; gözlemci hatırlatma
+  kurmaz/erteleme yapmaz (REM-ADR-021); **duplicate/operator** — REM-60'ın
+  `reminderStatusCardHTMLP` zaten beş ayrı boyutta (capability, kaynak
+  tazeliği, generic delivery sağlığı / receipt, privacy, cihaz kabulü) güvenli
+  aggregate'i aynı kart sözleşmesinde render eder; ayrı bir modül kartı bu
+  yüzeyi çoğaltır ve "kategori kümesi üzerinden sağlık/iman rutinini ifşa"
+  etme riskini (REM-ADR-021 reddedilen alternatif) geri getirir; **privacy** —
+  modül kartı yalnızca remote-safe aggregate'ten beslenebilir ama yedi reminder
+  kökü sync sınırını geçmediği için panelde hesaplanabilecek her "sağlık"
+  değeri kanıtsız tahmindir; REM-ADR-018 yokluğu `0`/`healthy` diye sunmayı
+  yanlış gözlem sayar.
+- **Yapısal olarak zorlanır:** `d4ModuleDescriptorsP` içinde hiçbir reminder
+  modülü descriptor'ı yoktur; `d4ModuleAtlasHTMLP` reminder kartı üretmez;
+  `coreModules` hiçbir reminder enabled-state göstergesi taşımaz. Panel,
+  manifestin üretmediği bir section anahtarını (`reminderHealth`,
+  `schedulerHealth`) uzak projection'dan gelse bile adopt etmez (REM-ADR-021 /
+  REM-57). Bu no-op ayrıca REM-61'in yeni `test_reminder_panel_card.js` G13-G
+  fixture'ı ile sabitlenir (d4ModuleDescriptorsP/coreModules/rootModulesCardHTMLP
+  /p4ProvenanceCardHTMLP'de reminder descriptor yokluğu; status kartı hâlâ tek
+  reminder dashboard yüzeyidir ve hiçbir raw reminder category / schedule / body
+  taşımaz).
+- **Etkiler:** `panel.js`, `panel.html`, `panel.css` ve
+  `panelCoverageManifest.js` bu promptta **değişmez** (bilinçli no-op).
+  Reminder gözleminin tek dashboard yüzeyi REM-60 status kartıdır; REM-61
+  yalnız karar + negative proof ekler. Reminder tercih/oluşum/teslim cihaz
+  yerel kalır; PANEL-03 dashboard gap'i kapanır.
+- **Sonraki adım:** REM-62 panel daily detail / event timeline, ardından
+  REM-63 observer action boundary. Yeni bir remote-safe reminder aggregate
+  schema'sı doğarsa önce açık ürün kararı, sonra REM-61 sonrası bir prompt.
+

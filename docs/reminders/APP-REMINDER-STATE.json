@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-61",
+  "activePrompt": "REM-62",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-60",
-  "nextSafeAction": "REM-61 Panel reminder dashboard card veya explicit no-op; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-61",
+  "nextSafeAction": "REM-62 Panel daily detail, event timeline ve reminder lifecycle; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-60 gate split reminder observation status on the panel into five SEPARATE dimensions (source freshness via reminderSourceStatusP, remote sync receipt via reminderReceiptStatusP, capability via reminderCapabilityStatusP, privacy via reminderPrivacyStatusP, and user-device/S5 acceptance via reminderDeviceAcceptanceStatusP) with no single-green-badge masking. A new reminderStatusToneMapP() maps the full eight tones (accepted/stale/pending/missing/projection_invalid/error/unsupported/redacted) from one source, unknown codes fail closed to muted, and each status card dimension renders text + icon + source time + privacy label, so color is never the only meaning. reminderStatusCardHTMLP() renders all five dimensions as one card (wired in render() right after coverageRibbonHTMLP); the 'reminder is working' claim is only true via reminderWorkingClaimP() when source + receipt + capability evidence all hold, otherwise a pending claim names the missing evidence (kaynak_kanit_yok / receipt_kanit_yok / capability_kanit_yok). The status card never carries a raw reminder category, schedule or body, and no reminder preference/localStorage/write path is introduced.",
-    "tests": "new G13-F panel status fixture 223 assertions / 14 scenarios (eight-tone deterministic fail-closed map; color-is-not-the-only-meaning; capability unsupported without projection contract; device acceptance always pending; privacy always local/redacted; working-claim true only with all three evidence; working-claim never ok on any missing evidence; card renders five separate dimensions; card never leaks raw reminder category/schedule/body; pending working-claim with reason; source time + privacy label pairing; no write path; no token sentinel; CSS present and balanced), staleness 7, panel P6 QA 16; all reminder suite, panel root suite, all Panel-v2, node --check panel.js + sync.js, git diff --check and context validator PASS",
-    "commit": "a35c16f",
-    "remoteEquality": "REM-60 delivered at f2d749d; local HEAD, origin/main and git ls-remote refs/heads/main all matched; standing main fast-forward PASS (49e66de..f2d749d). This push delivered REM-58 (63ccfb8/6261f63), REM-59 (2fb1068/00e9340/14b8c0d) and REM-60 (a35c16f/f2d749d) together.",
-    "deployment": "REM-60: workflow 32249456512 success (head f2d749d); live index.html / panel.html HTTP 200; panel.js?v=20260818c and panel.css?v=20260809c both HTTP 200 after deploy. panel.html cache-bust not bumped in this prompt (out of allowlist); panel-internal prompts REM-58/59/60 follow the consistent no-bump pattern.",
+    "source": "REM-61 KARAR (REM-ADR-024): panel reminder dashboard için AYRI bir bento/module card AÇILMAZ — bilinçli no-op. Feature (panelde reminder'a bağlı hiçbir kullanıcı akışı yok), duplicate/operator (REM-60 reminderStatusCardHTMLP zaten capability, kaynak tazeliği, generic delivery sağlığı/receipt, privacy ve cihaz kabulünü beş ayrı boyutta tek kart sözleşmesinde render eder) ve privacy (yedi reminder kökü sync sınırını geçmedi, REM-ADR-018 yokluğu 0/healthy diye sunmayı yanlış gözlem sayar) gerekçeleri ayrı ayrı. Yapısal zorlama: d4ModuleDescriptorsP yalnız 7 meşru modül içerir (reminder descriptor yok), d4ModuleAtlasHTMLP reminder modül kartı üretmez, rootModulesCardHTMLP/p4ProvenanceCardHTMLP/coreModules hiçbir reminder kartı/enabled-state üretmez; panel reminder yüzeyi yalnız reminderStatusCardHTMLP'dir. G13-G fixture'ı 8 case / 435 assertion ile dolu/empty/pending/stale/error/redacted durumlarının aynı kart sözleşmesinde fail-closed + privacy-safe render edildiğini, hiçbir raw reminder category/schedule/body sızmadığını (FORBIDDEN_NEEDLES negatif) ve hiçbir app state veya panel write endpoint'inin tetiklenmediğini (PUT/POST/PATCH/DELETE, localStorage.setItem/removeItem, SeySync.schedule, putInbox, putTransportFileP, token sentinel yokluğu) sabitler.",
+    "tests": "new G13-G panel card fixture 435 assertions / 8 scenarios (d4 module atlas carries no reminder descriptor and no reminder module card; coreModules reports no reminder enabled-state in the bento dashboard; root and provenance module cards render no reminder card; the single dashboard reminder surface is reminderStatusCardHTMLP with five dimensions; the dashboard reminder surface renders safe aggregates and never private routine detail; empty/pending/stale/error/redacted states render deterministically in the same card contract; the reminder dashboard surface and module card surfaces trigger no app state or panel write endpoints; no token sentinel + CSS balanced), module-cards 13, root-modules 35; all reminder suite 62, panel root 22, all Panel-v2 27, node --check panel.js, git diff --check and context validator PASS",
+    "commit": "16fe247",
+    "remoteEquality": "pending: delivered after this prompt's closure",
+    "deployment": "pending: standing after_each_prompt delivery after closure PASS",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-19",
-  "updatedBy": "REM-60 closed: panel reminder observation status split into five separate dimensions (source/receipt/capability/privacy/device), eight-tone deterministic fail-closed map with code/tone separation, status card renders text+icon+source-time+privacy (color not sole meaning), working-claim true only with source+receipt+capability evidence, no raw reminder category/schedule/body, no write path; activePrompt advances to REM-61; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery consumed for REM-60 at f2d749d with remote (49e66de..f2d749d), workflow 32249456512 and live HTTP receipts recorded",
+  "updatedBy": "REM-61 closed (REM-ADR-024): panel reminder dashboard için ayrı bir bento/module card AÇILMAZ — bilinçli no-op; feature/duplicate-operator/privacy gerekçeleri, panel reminder yüzeyi yalnız REM-60 reminderStatusCardHTMLP, G13-G fixture 435 assertion ile no-op yapısal olarak sabitlendi; panel.js/panel.css/panelCoverageManifest.js/panel.html değişmedi, yalnız decisions log + yeni fixture + closure records; activePrompt advances to REM-62; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery to run after closure PASS",
 
   "closure": {
-    "prompt": "REM-60",
-    "evidence": "docs/reminders/evidence/REM-60.md",
-    "commit": "a35c16f",
+    "prompt": "REM-61",
+    "evidence": "docs/reminders/evidence/REM-61.md",
+    "commit": "16fe247",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

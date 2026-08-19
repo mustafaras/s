@@ -46,10 +46,29 @@ ok('GPS kökü redacted sınıfında',cov.redacted.indexOf('location')>=0&&cov.r
 ok('hareket izi redacted sınıfında',cov.redacted.indexOf('days.2026-08-02.movement.track')>=0);
 ok('medya alanı redacted sınıfında',cov.redacted.indexOf('days.2026-08-02.media')>=0);
 ok('lab binary redacted sınıfında',cov.redacted.indexOf('labResults.0.data')>=0);
-ok('gelecek bilinmeyen alanlar unmapped kalmaz',Array.isArray(cov.unmappedPaths)&&cov.unmappedPaths.length===0);
+// REM-56: bu iddia yalnız reminder DIŞI bilinmeyen alanlar içindir; reminder
+// namespace'i bilinçli olarak fail-closed (unmapped) kalır — aşağıya bakınız.
+ok('reminder dışı bilinmeyen alan unmapped listesine düşmez',Array.isArray(cov.unmappedPaths)&&cov.unmappedPaths.length===0&&cov.summary.indexOf('userTextSentinel')>=0);
 ok('eksik kökler bilinçli listelenir',cov.missing.indexOf('locationHistory')<0&&cov.missing.indexOf('aeon')<0);
 var sparseCov=P.coverageForData({version:2,days:{},settings:{}});
 ok('eksik fixture alanları manifest missing listesine girer',sparseCov.missing.indexOf('profileAssessment')>=0&&sparseCov.missing.indexOf('location')>=0&&sparseCov.missing.indexOf('quranJourney')>=0);
+
+console.log('[1b] REM-56 reminder sınıflandırması ve fail-closed sınır');
+var reminderData=makeData();
+reminderData.reminders={preferences:{'Anneme ilac ver':{body:'RAW_REMINDER_BODY'}}};
+reminderData.reminderQueueV2={'Anneme ilac ver':{body:'RAW_REMINDER_BODY',dose:'RAW_REMINDER_DOSE'}};
+reminderData.notifications=[{id:'n1',status:'pending'},{id:'n2',reminderBody:'RAW_REMINDER_BODY'}];
+var reminderCov=P.coverageForData(reminderData);
+ok('manifest her reminder alan sınıfı için tek mode taşır',P.MANIFEST.reminderCoverage&&P.MANIFEST.reminderCoverage.fields.length===12&&P.MANIFEST.reminderCoverage.fields.every(function(f){return ['full','summary','redacted','missing','unmapped'].indexOf(f.mode)>=0;}));
+ok('bilinen reminder kökü redacted, bilinmeyen kök unmapped',reminderCov.redacted.indexOf('reminders')>=0&&reminderCov.unmappedPaths.indexOf('reminderQueueV2')>=0);
+ok('bilinmeyen reminder alanı full/summary sınıfına düşmez',reminderCov.full.concat(reminderCov.summary).every(function(x){return x.indexOf('reminderQueueV2')<0&&x.indexOf('reminderBody')<0;}));
+ok('coverage listesi ham reminder path’i veya özel başlık taşımaz',JSON.stringify(reminderCov).indexOf('Anneme ilac ver')<0&&JSON.stringify(reminderCov).indexOf('reminders.preferences')<0);
+ok('fullDetail allowlist’i reminder alanını full yapamaz',P.classifyPath('notifications.1.reminderBody',{fullDetail:true}).mode==='unmapped'&&P.classifyPath('notifications',{fullDetail:true}).mode==='full');
+var reminderReport=P.reminderCoverageReport(reminderData);
+ok('reminder coverage raporu deklarasyonla uyumlu',reminderReport.ok&&reminderReport.violations.length===0&&reminderReport.contractVersion==='panel-reminder-coverage-v1');
+var reminderSnapshot=P.buildObserverSnapshot(reminderData,receipt,'2026-08-02T15:00:05.000Z');
+ok('manifest ve projection schema sürümleri birlikte doğrulanır',reminderSnapshot.schemaVersion===1&&reminderSnapshot.manifestVersion==='panel-coverage-v1'&&reminderSnapshot.reminderCoverageVersion==='panel-reminder-coverage-v1');
+ok('reminder ham gövdesi projection JSON’una girmez',JSON.stringify(reminderSnapshot).indexOf('RAW_REMINDER_BODY')<0&&JSON.stringify(reminderSnapshot).indexOf('RAW_REMINDER_DOSE')<0);
 
 console.log('[2] Projection redaction ve güvenli receipt');
 var snapshot=P.buildObserverSnapshot(data,receipt,'2026-08-02T15:00:05.000Z');

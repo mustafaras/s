@@ -80,13 +80,52 @@ var MANIFEST={
     {path:"eventLog.events",owner:"sync",source:"event_log",privacy:"metadata",mode:"summary",fallback:"event_files"},
     {path:"quranJourney",owner:"quran",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
     {path:"saygi",owner:"saygi",source:"state",privacy:"summary",mode:"summary",fallback:"latest"},
+    // Prayer-time reminder toggle/offset are pre-existing *synced* preferences
+    // (data.settings.prayer), not personal reminder-engine state. They carry no
+    // private copy, so they stay explicitly summary instead of being swept up
+    // by the reminder fail-closed rule below.
+    {path:"settings.prayer.remindersEnabled",owner:"prayer",source:"user_pref",privacy:"preference_toggle",mode:"summary",fallback:"latest"},
+    {path:"settings.prayer.reminderOffsetMinutes",owner:"prayer",source:"user_pref",privacy:"preference_toggle",mode:"summary",fallback:"latest"},
     {path:"*",owner:"app",source:"state",privacy:"summary",mode:"summary",fallback:"latest"}
   ],
   expectedPaths:[
     "days","settings","profileAssessment","location","locationHistory",
     "notifications","quranJourney","saygi","dailyPhoto","roomContentHistory",
     "locNudge","locationLastTs","labResults","aeon","eventLog"
-  ]
+  ],
+  // REM-56 — every reminder-facing field class carries exactly ONE coverage
+  // mode, and `unmapped` is the fail-closed default for everything else in the
+  // reminder namespace. Reminder roots are deliberately NOT in expectedPaths:
+  // they are device-local by contract, so their absence is the healthy state,
+  // not a gap. Versioning: the wire contract is unchanged (schemaVersion 1,
+  // manifestVersion panel-coverage-v1 — this change only narrows what may be
+  // emitted and populates the already-declared unmappedPaths list), so the
+  // reminder classification carries its own contractVersion instead.
+  reminderCoverage:{
+    schemaVersion:1,
+    contractVersion:"panel-reminder-coverage-v1",
+    projectionSchemaVersion:1,
+    manifestVersion:"panel-coverage-v1",
+    decision:"local_only",
+    defaultMode:"unmapped",
+    expectedInProjection:false,
+    modes:["full","summary","redacted","missing","unmapped"],
+    coverageKeys:{full:"full",summary:"summary",redacted:"redacted",missing:"missing",unmapped:"unmappedPaths"},
+    fields:[
+      {field:"preference",mode:"redacted",paths:["reminders"],why:"Cihaz yerel tercih/zamanlama sozlesmesi; panel gozlemcidir, tercih otoritesi degildir"},
+      {field:"occurrence",mode:"redacted",paths:["reminders","reminderHistory"],why:"Deterministik occurrenceId gunluk ritual takvimini yeniden kurmaya yeter"},
+      {field:"delivery",mode:"redacted",paths:["delivery","deliveryLog","reminderDelivery","reminderDeliveries","notificationDelivery"],why:"Yerel teslim gunlugu (REM-53 localOnlyKey) hicbir zaman senkronlanmaz"},
+      {field:"category",mode:"redacted",paths:["reminders"],why:"Acik kategori kumesi saglik/iman rutinini ifsa eder"},
+      {field:"safeAggregate",mode:"summary",paths:["eventLog","eventLog.events"],why:"Sync sinirini gecen tek reminder yuzeyi: sabit lifecycle ozeti + reminder-v1 correlation; govde/saat/kategori tasimaz"},
+      {field:"privateDetail",mode:"redacted",paths:["reminders","delivery","deliveryLog","reminderDelivery","reminderDeliveries","reminderHistory","notificationDelivery"],why:"Ozel baslik/govde/not hicbir panel yuzeyine cikmaz"},
+      {field:"therapy",mode:"redacted",paths:["reminders"],appCounterpart:{mode:"redacted",paths:["days.*.therapy.thoughts","days.*.therapy.decision.note","days.*.therapy.share.note"]},why:"Terapi metni reminder yuzeyinde hic yok; app tarafinda yalniz sayac/meta projeksiyonu var"},
+      {field:"medication",mode:"redacted",paths:["reminders"],appCounterpart:{mode:"summary",paths:["days.*.discomfort.meds"]},why:"Ilac adi/dozu reminder yuzeyinde yasak; gunluk kayit ayri app sozlesmesidir"},
+      {field:"journal",mode:"redacted",paths:["reminders"],appCounterpart:{mode:"summary",paths:["days.*.journal"]},why:"Gunluk metni reminder tercih/teslim yuzeyine yazilamaz"},
+      {field:"mood",mode:"redacted",paths:["reminders"],appCounterpart:{mode:"summary",paths:["days.*.mood"]},why:"Ruh hali reminder yuzeyinden cikarsanamaz"},
+      {field:"prayerCompletion",mode:"redacted",paths:["reminders"],appCounterpart:{mode:"summary",paths:["days.*.prayer","settings.prayer.remindersEnabled","settings.prayer.reminderOffsetMinutes"]},why:"Namaz tamamlama reminder yuzeyinde tutulmaz; vakit tercihi ayri ve senkronlanan app ayaridir"},
+      {field:"token",mode:"redacted",paths:["settings.ghToken","settings.openaiKey","settings.syncUrl","settings.auth"],why:"Secret hicbir projeksiyona girmez; sanitize + SECRET_KEYS iki katmanli"}
+    ]
+  }
 };
 
 function isObject(v){ return !!v&&typeof v==='object'; }
@@ -100,15 +139,50 @@ function globMatches(pattern,parts){
   for(var i=0;i<pp.length;i++) if(pp[i]!=='*'&&pp[i]!==p[i]) return false;
   return true;
 }
-function ruleForPath(path){
-  var parts=Array.isArray(path)?path:pathParts(path), best=null, score=-1;
+// REM-56 — reminder namespace fail-closed classification.
+// The reminder contract (REM-53) keeps preference, occurrence and delivery
+// state device-local. A field that *looks* like reminder state but carries no
+// explicit manifest rule is therefore withheld and reported as `unmapped`
+// instead of falling through to the `*` summary rule: a future app version
+// must not be able to widen the observer surface by merely adding a key.
+var REMINDER_KEY_TOKEN=/reminder|occurrence|quiethours|catchup/;
+var REMINDER_ROOT_KEYS={delivery:1,deliveries:1,deliverylog:1,notificationdelivery:1,notificationdeliveries:1};
+var WITHHELD_MODES={redacted:1,unmapped:1};
+var SAFE_SEGMENT=/^[A-Za-z][A-Za-z0-9_]{0,39}$/;
+// Index of the first reminder-namespace segment, or -1. Root-only tokens
+// ("delivery", "deliveryLog") are matched at depth 0 so that unrelated leaf
+// keys such as `share.deliveredAt` are not swept in.
+function reminderSegmentIndex(parts){
+  for(var i=0;i<parts.length;i++){
+    var low=String(parts[i]).toLowerCase();
+    if(REMINDER_KEY_TOKEN.test(low)) return i;
+    if(i===0&&REMINDER_ROOT_KEYS[low]) return i;
+  }
+  return -1;
+}
+// A user names their own reminders, so a raw path can itself BE private
+// content ("reminderQueue.Anneme ilac ver.body"). Only identifier-shaped
+// segments survive; anything below the reminder segment collapses to `*`.
+function maskReminderPath(parts,index){
+  var head=parts.slice(0,index+1).map(function(seg){ return SAFE_SEGMENT.test(String(seg))?String(seg):'*'; });
+  return head.join('.')+(parts.length>index+1?'.*':'');
+}
+function catchAllRule(){ return MANIFEST.paths[MANIFEST.paths.length-1]; }
+// Explicit (non catch-all) rule for a path, or null. `null` is the signal that
+// nobody has made a decision about this path yet.
+function bestRuleForPath(parts){
+  var best=null, score=-1;
   MANIFEST.paths.forEach(function(rule){
+    if(rule.path==='*') return;
     if(!globMatches(rule.path,parts)) return;
     var rp=pathParts(rule.path), s=rp.reduce(function(n,x){return n+(x==='*'?0:2);},0)+rp.length;
     if(s>score){ best=rule; score=s; }
   });
-  if(!best) best=MANIFEST.paths[MANIFEST.paths.length-1];
   return best;
+}
+function ruleForPath(path){
+  var parts=Array.isArray(path)?path:pathParts(path);
+  return bestRuleForPath(parts)||catchAllRule();
 }
 var FULL_DETAIL_ALLOW={
   'days':1,'days.*':1,'days.*.habits':1,
@@ -149,29 +223,38 @@ function modeForPath(parts,key,value,opts){
   if(k==='base64'||k==='dataurl'||k==='contentbase64'||k==='raw') return 'redacted';
   if(/location|gps|movement|track/i.test(low)&&/^(lat|lng|lon|latitude|longitude|accuracy)$/.test(k)) return 'redacted';
   if((k==='data'||k==='content')&&(/media|attachment|upload|file|labresult|aeon/i.test(low)||typeof value!=='string'||String(value).length>40)) return 'redacted';
+  var rule=bestRuleForPath(parts);
+  // Fail-closed BEFORE the full-detail allowlist: a reminder field that lands
+  // inside an allowed root (e.g. `notifications`) must never become `full`.
+  if(parts.length&&reminderSegmentIndex(parts)>=0) return rule?(rule.mode||'redacted'):'unmapped';
   if(opts&&opts.fullDetail&&fullDetailAllowed(parts)) return 'full';
-  return ruleForPath(parts).mode||'summary';
+  return (rule||catchAllRule()).mode||'summary';
 }
 function addUnique(a,v){ if(a.indexOf(v)<0) a.push(v); }
+// One path, one bucket. `unmapped` is reported through the masked path so the
+// audit list itself can never carry a user-authored reminder title.
+function recordCoverage(out,mode,parts){
+  if(mode==='unmapped'){ addUnique(out.unmappedPaths,maskReminderPath(parts,reminderSegmentIndex(parts))); return; }
+  addUnique(out[mode]||out.summary,pathText(parts));
+}
 function walkCoverage(value,parts,out,opts){
-  var rule=ruleForPath(parts), mode=rule.mode||'summary';
-  if(opts&&opts.fullDetail) mode=modeForPath(parts,null,null,opts);
-  if(parts.length && mode==='redacted'){
-    addUnique(out.redacted,pathText(parts));
+  var mode=parts.length?modeForPath(parts,parts[parts.length-1],value,opts):'summary';
+  if(parts.length && WITHHELD_MODES[mode]){
+    recordCoverage(out,mode,parts);
     return;
   }
   if(!isObject(value)||Array.isArray(value)&&value.length===0){
-    if(parts.length) addUnique(out[mode]||out.summary,pathText(parts));
+    if(parts.length) recordCoverage(out,mode,parts);
     return;
   }
   var keys=Object.keys(value);
-  if(!keys.length){ if(parts.length) addUnique(out[mode]||out.summary,pathText(parts)); return; }
+  if(!keys.length){ if(parts.length) recordCoverage(out,mode,parts); return; }
   keys.forEach(function(k){
     var next=parts.concat([k]), childMode=modeForPath(next,k,value[k],opts);
-    if(childMode==='redacted') addUnique(out.redacted,pathText(next));
-    else if(childMode==='full'){ addUnique(out.full,pathText(next)); if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out,opts); }
+    if(WITHHELD_MODES[childMode]) recordCoverage(out,childMode,next);
+    else if(childMode==='full'){ recordCoverage(out,'full',next); if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out,opts); }
     else if(isObject(value[k])&&!(Array.isArray(value[k])&&value[k].length===0)) walkCoverage(value[k],next,out,opts);
-    else addUnique(out[childMode]||out.summary,pathText(next));
+    else recordCoverage(out,childMode,next);
   });
 }
 function hasPath(obj,path){
@@ -191,6 +274,55 @@ function coverageForData(data,opts){
   return out;
 }
 function redactedPaths(){ return MANIFEST.paths.filter(function(r){ return r.mode==='redacted'; }).map(function(r){ return r.path; }); }
+// Single-mode classification for one path. `mapped:false` + `mode:'unmapped'`
+// is the fail-closed reminder case; `masked` is the only form safe to publish.
+function classifyPath(path,opts){
+  var parts=Array.isArray(path)?path.slice():pathParts(path);
+  var index=reminderSegmentIndex(parts), rule=bestRuleForPath(parts);
+  var mode=parts.length?modeForPath(parts,parts[parts.length-1],null,opts):'summary';
+  return {
+    path:pathText(parts),
+    masked:index>=0?maskReminderPath(parts,index):pathText(parts),
+    mode:mode,
+    mapped:!!rule,
+    rule:rule?rule.path:null,
+    reminder:index>=0,
+    withheld:!!WITHHELD_MODES[mode]
+  };
+}
+// Declaration-vs-resolution audit for the reminder field classes. Emits only
+// declared (code-shaped) paths, counts and masked unmapped tokens — never a
+// value, never a data-derived raw path.
+function reminderCoverageReport(data,opts){
+  var contract=MANIFEST.reminderCoverage, coverage=coverageForData(data,opts), fields=[], violations=[], counts={full:0,summary:0,redacted:0,missing:0,unmapped:0};
+  contract.fields.forEach(function(entry){
+    var present=0, resolved=[];
+    entry.paths.forEach(function(p){
+      var info=classifyPath(p,opts);
+      if(info.mode!==entry.mode) violations.push({field:entry.field,path:p,declared:entry.mode,resolved:info.mode});
+      if(resolved.indexOf(info.mode)<0) resolved.push(info.mode);
+      if(hasPath(data,p)) present+=1;
+    });
+    var effective=present?entry.mode:'missing';
+    counts[effective]=(counts[effective]||0)+1;
+    fields.push({field:entry.field,declaredMode:entry.mode,effectiveMode:effective,declaredPathCount:entry.paths.length,presentPathCount:present,resolvedModes:resolved});
+  });
+  counts.unmapped=coverage.unmappedPaths.length;
+  return {
+    contractVersion:contract.contractVersion,
+    schemaVersion:contract.schemaVersion,
+    projectionSchemaVersion:contract.projectionSchemaVersion,
+    manifestVersion:MANIFEST.manifestVersion,
+    decision:contract.decision,
+    defaultMode:contract.defaultMode,
+    fields:fields,
+    modeCounts:counts,
+    unmapped:coverage.unmappedPaths.slice(),
+    unmappedCount:coverage.unmappedPaths.length,
+    violations:violations,
+    ok:violations.length===0
+  };
+}
 
 function safeIso(v){
   if(typeof v!=='string'||!v||v.length>ISO_MAX) return null;
@@ -423,7 +555,7 @@ function isBlobPath(path,key,value){
 }
 function redact(value,parts){
   var path=pathText(parts), key=parts.length?parts[parts.length-1]:'';
-  if(parts.length && modeForPath(parts,key,value)==='redacted'){
+  if(parts.length && WITHHELD_MODES[modeForPath(parts,key,value)]){
     if(path==='location') return locationSummary(value);
     if(path==='locationHistory') return historySummary(value);
     return undefined;
@@ -475,6 +607,7 @@ function buildObserverSnapshot(data,receipt,projectionBuiltAt){
   return {
     schemaVersion:1,
     manifestVersion:MANIFEST.manifestVersion,
+    reminderCoverageVersion:MANIFEST.reminderCoverage.contractVersion,
     snapshotRevision:r.snapshotRevision,
     sourceLatestSha:r.sourceLatestSha,
     sourceUpdatedAt:sourceUpdatedAt,
@@ -508,7 +641,10 @@ root.PanelCoverageV1={
   MANIFEST:MANIFEST,
   manifest:MANIFEST,
   ruleForPath:ruleForPath,
+  classifyPath:classifyPath,
   coverageForData:coverageForData,
+  reminderCoverageReport:reminderCoverageReport,
+  REMINDER_COVERAGE:MANIFEST.reminderCoverage,
   redactForObserver:redactForObserver,
   buildObserverSnapshot:buildObserverSnapshot,
   parseObserverSnapshot:parseObserverSnapshot,

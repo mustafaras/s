@@ -142,6 +142,19 @@ PASS (73 prompt, 66 link, approval=not_approved).
   no-op yapısal olarak G13-G fixture'ı ile sabitlenmiştir.
 - PANEL-03 dashboard gap kapanır; REM-62 ready.
 
+## Standing after_each_prompt teslimat makbuzu
+
+- **Remote equality:** `a7fbdbf..659c180` fast-forward; local HEAD, `origin/main`
+  ve `git ls-remote refs/heads/main` hepsi `659c180`. Bu push REM-61 kapanışını
+  (`c504866` kod+karar, `659c180` closure records) birlikte taşıdı.
+- **Deployment:** workflow `32254874571` success (head `659c180`); Pages deploy
+  tüm adımlarda ✓.
+- **Live HTTP receipt:** `https://mustafaras.github.io/s/index.html` ve
+  `/panel.html` HTTP 200; `panel.js?v=20260818c` ve `panel.css?v=20260809c` HTTP
+  200. `panel.html` cache-bust bu promptta değiştirilmedi (bilinçli no-op;
+  allowlist dışı).
+- **Cihaz kabulü (S5):** kullanıcı cihazı doğrulaması yapılmadı; `pending`.
+
 ## Notlar / discrepancy
 
 - Yeni bir remote-safe reminder aggregate schema'sı doğarsa önce açık ürün

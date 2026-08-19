@@ -39,7 +39,7 @@
   "evidence": {
     "source": "REM-58 gate locked the panel conditional-polling / transport / draft-safety contract. loadTransportFileP now classifies 429 (rate limit) distinctly from a generic transport error (rateLimited=true, transport rate_limited) so a rate-limited observer read is not mislabeled as a generic 5xx; the new panelInteractionActiveP() render gate extends applyPollRenderP deferral beyond text input to an open drawer (D4_DRAWER_RETURN_ID / UI.d4SelectedModule), an active filter (UI.eventFilter / UI.motivationFilter), a non-today selected date (UI.selectedDate !== today()) and an expanded card (UI.expandedCards) — data is still fetched, only the render is queued (panelDraftActiveP stays the fetch-skip gate, panelInteractionActiveP is the render gate). A deferred snapshot is applied exactly once when the interaction clears; an unchanged reminder status does not trigger a full panel render (only the poll ribbon updates) and UI.newChanges is driven by the real event delta, not a blind render. The polling/transport boundary carries no method:PUT/POST/PATCH/DELETE, no localStorage.setItem/removeItem and no reminder-preference write function; loadTransportFileP uses GET only — the panel remains a read surface. tests/test_panel_p2_polling.js render-gate context gained a panelInteractionActiveP stub for the new dependency (in-allowlist polling regression).",
     "tests": "new panel polling fixture 82 assertions / 23 scenarios (200, 304 warm/cold cache, ETag changed, empty, malformed, network, 429 rate limit, generic 5xx; draft/textarea/drawer/filter/selected-date/expanded-card deferral; single controlled deferred apply; unchanged-no-render; no-write boundary), Panel P2 polling 15, Panel-v2 polling telemetry 27; all reminder panel fixtures, panel root P0/P1/P2/P3/P4/P6/staleness/Faz-11, all Panel-v2, all reminder suite, node --check panel.js, git diff --check and context validator PASS",
-    "commit": "(REM-58 closure commit)",
+    "commit": "63ccfb8",
     "remoteEquality": "REM-58 closure commit pending; standing main fast-forward delivery receipt recorded separately after closure PASS",
     "deployment": "not deployed; releaseApproval remains not_approved; standing after_each_prompt delivery receipt recorded separately after closure PASS",
     "deviceAcceptance": "pending; not performed by agent"
@@ -80,7 +80,7 @@
   "closure": {
     "prompt": "REM-58",
     "evidence": "docs/reminders/evidence/REM-58.md",
-    "commit": "(REM-58 closure commit)",
+    "commit": "63ccfb8",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

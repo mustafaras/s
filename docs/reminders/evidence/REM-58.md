@@ -5,10 +5,10 @@
 - **Program:** APP-REMINDER-UX
 - **Prompt:** REM-58
 - **Tarih:** 2026-08-19
-- **Commit:** (REM-58 closure commit)
+- **Commit:** `63ccfb8`
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `49e66defe37eb1a54252b9ca7bc50d8fb050b48b`
-- **Bitiş HEAD:** (REM-58 closure commit)
+- **Bitiş HEAD:** `63ccfb8`
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none` (standing `after_each_prompt` teslimatı ayrı kayıttır)
 

@@ -152,10 +152,11 @@ var SAFE_SEGMENT=/^[A-Za-z][A-Za-z0-9_]{0,39}$/;
 // Index of the first reminder-namespace segment, or -1. Root-only tokens
 // ("delivery", "deliveryLog") are matched at depth 0 so that unrelated leaf
 // keys such as `share.deliveredAt` are not swept in.
+function isReminderKey(key){ return REMINDER_KEY_TOKEN.test(String(key).toLowerCase()); }
 function reminderSegmentIndex(parts){
   for(var i=0;i<parts.length;i++){
     var low=String(parts[i]).toLowerCase();
-    if(REMINDER_KEY_TOKEN.test(low)) return i;
+    if(isReminderKey(low)) return i;
     if(i===0&&REMINDER_ROOT_KEYS[low]) return i;
   }
   return -1;
@@ -627,14 +628,110 @@ function parseObserverSnapshot(raw){
   if(!safeHash(value.snapshotRevision)||!safeHash(value.sourceLatestSha)||!safeIso(value.projectionBuiltAt)) return {ok:false,code:'projection_invalid',value:null};
   return {ok:true,code:null,value:value};
 }
+// ── REM-57 untrusted projection adoption ───────────────────────────────────
+// `data/observer-snapshot.json` lives in the data repo and may have been
+// written by an older or buggy app build, so it is untrusted input. `data` was
+// already re-redacted; `sections` and `coverage` were adopted verbatim. Both
+// are now sanitized, which is also what keeps the reminder no-op decision
+// (REM-26 / REM-57) enforceable at the panel boundary rather than by trust.
+// A reminder-named key that carries an explicit non-withheld manifest decision
+// (e.g. settings.prayer.remindersEnabled) stays legal inside a section.
+var SECTION_REMINDER_ALLOW=(function(){
+  var allow={};
+  MANIFEST.paths.forEach(function(rule){
+    if(rule.path==='*') return;
+    var parts=pathParts(rule.path);
+    if(reminderSegmentIndex(parts)<0||WITHHELD_MODES[rule.mode]) return;
+    allow[String(parts[parts.length-1]).toLowerCase()]=1;
+  });
+  return allow;
+})();
+function safeKeyToken(key){ return SAFE_SEGMENT.test(String(key))?String(key):'*'; }
+// Recursively drops secrets, blobs and reminder-namespace keys from a section
+// value that came off the wire. Non-reminder content is left alone: this is a
+// reminder/secret boundary, not a general re-projection.
+function sanitizeAdoptedValue(value,report,depth){
+  if(depth>12) return undefined;
+  if(Array.isArray(value)) return value.map(function(item){ return sanitizeAdoptedValue(item,report,depth+1); }).filter(function(item){ return item!==undefined; });
+  if(!isObject(value)) return value;
+  var out={};
+  Object.keys(value).forEach(function(key){
+    var low=String(key).toLowerCase();
+    if(SECRET_KEYS[key]||SECRET_KEYS[low]||isBlobPath(key,key,value[key])){ report.droppedFields+=1; return; }
+    if(isReminderKey(low)&&!SECTION_REMINDER_ALLOW[low]){ report.droppedFields+=1; addUnique(report.droppedReminderKeys,safeKeyToken(key)); return; }
+    var next=sanitizeAdoptedValue(value[key],report,depth+1);
+    if(next!==undefined) out[key]=next;
+  });
+  return out;
+}
+// Only these five sections are worth adopting: the app builds them from the
+// RAW source it alone holds (counts and flags the panel cannot recompute from
+// already-redacted data). Every other section is a pure mirror of the redacted
+// data, so the local rebuild is identical and strictly safer.
+var RAW_DERIVED_SECTIONS={dailyPhoto:1,therapyProvenance:1,profileProgress:1,notificationTimeline:1,externalSources:1};
+// The locally rebuilt sections ARE the contract: a remote key the local builder
+// cannot produce (a reminder card, an invented health block) is dropped instead
+// of rendered, and a mirror section is never taken on trust.
+function adoptSections(localSections,remoteSections){
+  var out={}, report={adoptedSectionKeys:[],rebuiltSectionKeys:[],droppedSectionKeys:[],droppedReminderKeys:[],droppedFields:0};
+  Object.keys(localSections).forEach(function(key){ out[key]=localSections[key]; });
+  if(isObject(remoteSections)) Object.keys(remoteSections).forEach(function(key){
+    if(!own(out,key)){ addUnique(report.droppedSectionKeys,safeKeyToken(key)); return; }
+    if(!RAW_DERIVED_SECTIONS[key]){ addUnique(report.rebuiltSectionKeys,key); return; }
+    out[key]=sanitizeAdoptedValue(remoteSections[key],report,0);
+    addUnique(report.adoptedSectionKeys,key);
+  });
+  return {sections:out,report:report};
+}
+// Remote coverage is re-bucketed through the current classification so a list
+// produced before the reminder contract existed cannot publish a raw reminder
+// path (which may itself be a user-authored title). `missing` keeps its own
+// meaning and is only masked.
+function adoptCoverage(remoteCoverage,fallbackData){
+  if(!isObject(remoteCoverage)) return coverageForData(fallbackData);
+  var out={full:[],summary:[],redacted:[],missing:[],unmappedPaths:[]};
+  ["full","summary","redacted"].forEach(function(bucket){
+    var entries=Array.isArray(remoteCoverage[bucket])?remoteCoverage[bucket]:[];
+    entries.forEach(function(entry){
+      if(typeof entry!=='string'||!entry) return;
+      var info=classifyPath(entry);
+      if(info.mode==='unmapped') addUnique(out.unmappedPaths,info.masked);
+      else addUnique(out[info.mode]||out.summary,info.masked);
+    });
+  });
+  (Array.isArray(remoteCoverage.missing)?remoteCoverage.missing:[]).forEach(function(entry){
+    if(typeof entry==='string'&&entry) addUnique(out.missing,classifyPath(entry).masked);
+  });
+  (Array.isArray(remoteCoverage.unmappedPaths)?remoteCoverage.unmappedPaths:[]).forEach(function(entry){
+    if(typeof entry==='string'&&entry) addUnique(out.unmappedPaths,classifyPath(entry).masked);
+  });
+  ["full","summary","redacted","missing","unmappedPaths"].forEach(function(bucket){ out[bucket].sort(); });
+  return out;
+}
+// The returned snapshot is kept for its metadata (revisions, lag, sync state),
+// so it must not smuggle the raw remote payload back in through a side door:
+// data / sections / coverage are replaced by their sanitized forms and any
+// unknown top-level key from the wire is dropped.
+var SNAPSHOT_META_KEYS=["schemaVersion","manifestVersion","reminderCoverageVersion","snapshotRevision","sourceLatestSha","sourceUpdatedAt","projectionBuiltAt","serverAcceptedAt"];
+function sanitizeAdoptedSnapshot(remote,data,sections,coverage,report){
+  var out={};
+  SNAPSHOT_META_KEYS.forEach(function(key){ if(own(remote,key)) out[key]=remote[key]; });
+  if(isObject(remote.lag)) out.lag=sanitizeAdoptedValue(remote.lag,report,0);
+  if(isObject(remote.sync)) out.sync=sanitizeAdoptedValue(remote.sync,report,0);
+  out.coverage=coverage;
+  out.sections=sections;
+  out.data=data;
+  return out;
+}
 function chooseProjection(projection,latest,receipt){
   var parsed=parseObserverSnapshot(projection), r=safeReceipt(receipt), legacy=redactForObserver(latest);
   if(!parsed.ok) return {source:'legacy_fallback',reason:projection?'projection_invalid': 'projection_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
   if(!r.acceptedAt||!r.sourceLatestSha) return {source:'legacy_fallback',reason:'receipt_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
   if(parsed.value.sourceLatestSha!==r.sourceLatestSha||parsed.value.snapshotRevision!==r.snapshotRevision) return {source:'legacy_fallback',reason:'projection_stale',snapshot:parsed.value,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
-  var parsedData=redactForObserver(parsed.value.data), parsedSections=sectionSnapshot(parsedData,r,parsedData);
-  if(isObject(parsed.value.sections)) Object.keys(parsed.value.sections).forEach(function(k){ parsedSections[k]=parsed.value.sections[k]; });
-  return {source:'projection',reason:'ready',snapshot:parsed.value,data:parsedData,coverage:parsed.value.coverage||coverageForData(parsed.value.data),sections:parsedSections};
+  var parsedData=redactForObserver(parsed.value.data), adopted=adoptSections(sectionSnapshot(parsedData,r,parsedData),parsed.value.sections);
+  var parsedCoverage=adoptCoverage(parsed.value.coverage,parsed.value.data);
+  var safeSnapshot=sanitizeAdoptedSnapshot(parsed.value,parsedData,adopted.sections,parsedCoverage,adopted.report);
+  return {source:'projection',reason:'ready',snapshot:safeSnapshot,data:parsedData,coverage:parsedCoverage,sections:adopted.sections,adoption:adopted.report};
 }
 
 root.PanelCoverageV1={
@@ -655,6 +752,8 @@ root.PanelCoverageV1={
   eventSequenceAudit:eventSequenceAudit,
   notificationEventProjection:notificationEventProjection,
   notificationTimelineProjection:notificationTimelineProjection,
+  adoptSections:adoptSections,
+  adoptCoverage:adoptCoverage,
   normalizeReceipt:safeReceipt,
   FULL_DETAIL_ALLOW:FULL_DETAIL_ALLOW,
   redactedPaths:redactedPaths

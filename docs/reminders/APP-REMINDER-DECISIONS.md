@@ -637,3 +637,133 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   rewrite, arbitrary external write ve kullanıcı cihazı acceptance.
 - **Sonraki adım:** REM-50 ve sonraki her başarılı prompt bu delivery policy ile
   kapanır; Pages/remote failure promptu blocked bırakır.
+
+### REM-ADR-021 — Panel reminder yüzeyi no-op olarak yeniden onaylandı (REM-57)
+
+- **Tarih:** 2026-08-19
+- **Durum:** accepted
+- **Soru:** ÆON panelinde reminder verisi gösterilmeli mi; gösterilecekse
+  hangi minimum redacted aggregate ile?
+- **Kanıt:** `APP-REMINDER-APP-PANEL-SURFACE-MAP.md` §2 ve §4; UX planı §13.2;
+  REM-ADR-017 / REM-ADR-018; `app.js` `REMINDER_SYNC_BLOCKED_ROOTS` (yedi kök)
+  ve `REMINDER_PRIVACY_SCHEMAS`; `panelCoverageManifest.js`
+  `MANIFEST.reminderCoverage` (REM-56); `tests/reminders/test_reminder_panel_redaction.js`
+  (163 assertion / 6 senaryo).
+- **Karar:** Hayır — panel reminder yüzeyi **no-op** kalır. Üç gerekçe ayrı ayrı
+  geçerlidir: **feature** — panelin sahip olduğu hiçbir kullanıcı akışı reminder
+  tercihine bağlı değildir, gözlemci hatırlatma kurmaz/erteleme yapmaz;
+  **operator** — yedi reminder kökü sync sınırını geçmediği için panelde
+  hesaplanabilecek her "sağlık" değeri kanıtsız tahmindir (yokluğu `0` veya
+  `healthy` diye sunmak yanlış gözlemdir, REM-ADR-018); **privacy** — reminder
+  yüzeyi kullanıcının kendi kelimeleriyle yazdığı başlık, gövde, ilaç adı,
+  terapi notu ve ritüel saatini taşır, bunların hiçbirinin ikinci bir kişiye
+  görünmesi için ürün gerekçesi yoktur.
+- **Tek istisna:** REM-53'ün `safeEventSummary` sözleşmesi. `data.eventLog`
+  içindeki sabit `Bildirim yaşam döngüsü güncellendi` özeti + `reminder-v1:`
+  correlation prefix'i zaten sync sınırını geçer ve manifestte `summary`
+  sınıfındadır. Bu bir reminder aggregate'i değil, mevcut event log'un bir
+  satırıdır; yeni alan, sayaç veya kart açmaz.
+- **Reddedilen alternatif:** "minimum redacted aggregate" (system health,
+  enabled category count, safe delivery status). Üçü de ya cihaz-local veriden
+  türetilemez ya da türetilse bile kategori kümesi üzerinden sağlık/iman
+  rutinini ifşa eder. Coverage ribbon'ında bir `unmapped` sayacı göstermek
+  ileride değerlendirilebilir; bu REM-60 (status/provenance) kapsamıdır ve
+  `panel.html` cache-bust'ı gerektirdiği için REM-57'de yapılmadı.
+- **Etkiler:** `panel.js`, `panel.html` ve `panel.css` REM-57'de değişmedi
+  (bilinçli no-op). Karar artık yalnız belge değil, yapısal olarak zorlanıyor:
+  manifestin üretmediği bir section anahtarı (`reminderHealth`,
+  `schedulerHealth`) uzak projection'dan gelse bile panele adopt edilmez.
+- **Sonraki adım:** REM-58 transport; reminder aggregate ihtiyacı doğarsa önce
+  yeni remote-safe schema + açık ürün kararı, sonra REM-60/REM-61.
+
+### REM-ADR-022 — Uzak projection untrusted input'tur; sections/coverage/snapshot sanitize edilir
+
+- **Tarih:** 2026-08-19
+- **Durum:** accepted
+- **Soru:** `data/observer-snapshot.json` içeriğinin hangi kısmına güvenilir?
+- **Kanıt:** `panelCoverageManifest.js` `chooseProjection` (REM-57 öncesi hâli);
+  `panel.js` `PROJECTION.sections=PROJECTION.state.sections||{}`;
+  `tests/reminders/test_reminder_panel_redaction.js` 3. senaryo.
+- **Karar:** Hiçbirine körü körüne güvenilmez. `data` zaten yeniden redakte
+  ediliyordu; `sections`, `coverage` ve dönen `snapshot` **aynen kopyalanıyordu**.
+  Artık: (a) yerelde yeniden kurulabilen ayna bölümler her zaman yerelden
+  kurulur, (b) yalnız app'in ham kaynaktan hesapladığı beş bölüm
+  (`dailyPhoto`, `therapyProvenance`, `profileProgress`, `notificationTimeline`,
+  `externalSources`) adopt edilir ve bunlarda secret / blob / reminder-namespace
+  anahtarları ayıklanır, (c) manifestin üretmediği her section anahtarı düşer,
+  (d) uzak `coverage` güncel sınıflandırmadan yeniden geçirilir ve reminder
+  girdileri maskelenir, (e) dönen `snapshot` yalnız metadata + sanitize edilmiş
+  data/sections/coverage taşır.
+- **Gerekçe:** Projection dosyası veri deposunda yaşar ve **eski veya hatalı bir
+  app sürümü** tarafından yazılmış olabilir; panelin sözleşmesi "okuduğunu
+  yeniden redakte et"tir, yarısı uygulanmış hâli sözleşme değildir.
+- **Etkiler:** Zengin raw-derived değerler (thoughtCount, responseCount,
+  notification lifecycle sayaçları) korunur; 118/118 fixture PASS. Adoption
+  kararı `chosen.adoption` raporu ile denetlenebilir.
+- **Sonraki adım:** REM-58/REM-59 transport ve partial fetch bu sanitize edilmiş
+  sections sözleşmesinin üzerine kurulur.
+
+### REM-ADR-023 — Manifest ve projection schema sürüm politikası
+
+- **Tarih:** 2026-08-19
+- **Durum:** accepted
+- **Soru:** REM-56 sınıflandırma sözleşmesi `schemaVersion` / `manifestVersion`
+  bump'ı gerektiriyor mu?
+- **Kanıt:** `panelCoverageManifest.js` `MANIFEST.reminderCoverage`,
+  `buildObserverSnapshot`, `parseObserverSnapshot`;
+  `tests/test_panel_p1_projection.js` [1b]; `docs/reminders/evidence/REM-56.md`.
+- **Karar:** Hayır. Değişiklik yalnız yayımlanabilir alan kümesini **daraltıyor**
+  ve zaten deklare edilmiş `unmappedPaths` listesini dolduruyor; wire kırılmadı,
+  bu yüzden `schemaVersion` 1 ve `manifestVersion` `panel-coverage-v1` kalır.
+  Sınıflandırma kendi `contractVersion`'ını taşır
+  (`panel-reminder-coverage-v1`) ve projection'a additive
+  `reminderCoverageVersion` alanı olarak yazılır; `parseObserverSnapshot` bu
+  alanı zorunlu tutmaz, böylece eski projection dosyaları hâlâ okunur.
+- **Kural:** Gözlemci yüzeyini **genişleten** (daraltmayan) bir sonraki manifest
+  değişikliği `panel-coverage-v2` bump'ı ve panel tarafında explicit sürüm
+  kontrolü ister. Daraltıcı değişiklikler yalnız `contractVersion` bump'ı ile
+  gider.
+- **Etkiler:** Panel/Panel-v2 tüketicileri aynı adapter'ı sürüm kırılmadan
+  okumaya devam eder; teslimatta üç yüzeyin `?v=` cache-bust'ı bumplandı.
+- **Sonraki adım:** REM-60 status/provenance yüzeyi sürüm alanını görünür
+  kılmayı değerlendirebilir.
+
+### REM-DISC-011 — Belge parity farkları: surface map PANEL-01 satırı ve test matrisi G13-B adı
+
+- **Tarih:** 2026-08-19
+- **Durum:** discrepancy
+- **Soru:** Belgeler ile uygulanan gerçek arasındaki iki fark nasıl kapanacak?
+- **Kanıt:** `APP-REMINDER-APP-PANEL-SURFACE-MAP.md` §5 `PANEL-01` satırı
+  (prompt sütunu `REM-56, REM-57`), aynı belgenin §2 satırı (REM-55 sayılıyor);
+  `APP-REMINDER-TEST-MATRIX.md` G13-B satırı (`test_reminder_panel_manifest.js`)
+  ile REM-56 promptunun allowlist/doğrulama komutu
+  (`tests/reminders/test_reminder_panel_coverage.js`).
+- **Karar:** İkisi de belge tarafı farkıdır, kod tarafı prompt sözleşmesini
+  izler. Her iki dosya da REM-55/REM-56/REM-57 allowlist'lerinde olmadığı için
+  bu promptlarda düzeltilmedi.
+- **Etkiler:** Gerçek fixture yolları: `test_reminder_panel_source.js` (G13-A),
+  `test_reminder_panel_coverage.js` (G13-B), `test_reminder_panel_redaction.js`
+  (G13-C). PANEL-01 gap'i fiilen REM-55 + REM-56 + REM-57 ile kapandı.
+- **Sonraki adım:** Surface map / test matrisi allowlist'i açık olan ilk prompt
+  (REM-66 panel QA veya matris sahibi) iki satırı gerçek yola çeker.
+
+### REM-DISC-012 — Adopt edilen raw-derived bölümlerde reminder dışı ham metin hâlâ mümkün
+
+- **Tarih:** 2026-08-19
+- **Durum:** deferred
+- **Soru:** REM-57 sanitizasyonu uzak projection'daki TÜM hassas içeriği kapatıyor mu?
+- **Kanıt:** `panelCoverageManifest.js` `sanitizeAdoptedValue` (secret / blob /
+  reminder-namespace anahtarlarını düşürür); `tests/reminders/test_reminder_panel_redaction.js`
+  3. senaryo (reminder ve secret alanları düşüyor, `thoughtCount` korunuyor).
+- **Karar:** Hayır, tamamı değil. Beş raw-derived bölüm (`dailyPhoto`,
+  `therapyProvenance`, `profileProgress`, `notificationTimeline`,
+  `externalSources`) **meşru anahtarlarının içine** konmuş reminder-dışı ham
+  metni (ör. `therapyProvenance.thoughts[*].summary` alanına ham terapi cümlesi)
+  hâlâ adopt edebilir; bu alanların değer düzeyinde yeniden doğrulanması
+  reminder sınırı değil terapi/profil redaction sınırıdır.
+- **Etkiler:** Bugün gerçek bir sızıntı değildir — app tarafı bu alanlara sabit
+  `Metin redacted` yazar ve `days.*.therapy.*` kökleri zaten redacted'tır. Risk
+  yalnız eski/hatalı bir app sürümünün yazdığı projection dosyası için geçerlidir.
+- **Sonraki adım:** REM-64 (panel redaction sahibi, surface map §2) bu beş
+  bölümün alan düzeyinde yeniden doğrulanmasını üstlenir.
+

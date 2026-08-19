@@ -130,12 +130,17 @@ Guard üç yazma endpoint'ine bağlandı:
 
 ## Standing after_each_prompt teslimat makbuzu
 
-- **Remote equality:** bu prompt kapanışından sonra main fast-forward push
-  çalıştırılacak; local HEAD, `origin/main` ve `git ls-remote refs/heads/main`
-  eşitlenecek.
-- **Deployment:** Pages workflow / deploy receipt ayrı kayıt.
-- **Live HTTP receipt:** `index.html` / `panel.html` HTTP 200; `panel.js?v=`
-  cache-bust bumplandı (panel.js bu promptta değişti; panel.css değişmedi).
+- **Remote equality:** `602ff1f..2af352e` fast-forward; local HEAD, `origin/main`
+  ve `git ls-remote refs/heads/main` hepsi `2af352e`. Bu push REM-63 kapanışını
+  (`e6f7de1` kod, `2af352e` closure records) birlikte taşıdı.
+- **Deployment:** workflow `32270548283` success (head `2af352e`); Pages deploy
+  tüm adımlarda ✓.
+- **Live HTTP receipt:** `https://mustafaras.github.io/s/index.html` ve
+  `/panel.html` HTTP 200; `panel.js?v=20260820a` ve `panel.css?v=20260809c` HTTP
+  200. Deployed `panel.js?v=20260820a` içinde `panelWriteGuardP` 4 kez mevcut
+  (guard tanımı + 3 yazma endpoint'i) — guard canlıda. `panel.html` cache-bust
+  `panel.js?v=20260820a` olarak bumplandı (panel.js bu promptta değişti;
+  panel.css değişmedi).
 - **Cihaz kabulü (S5):** kullanıcı cihazı doğrulaması yapılmadı; `pending`.
 
 ## Notlar / discrepancy

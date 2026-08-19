@@ -5,7 +5,7 @@
 - **Program:** APP-REMINDER-UX
 - **Prompt:** REM-61
 - **Tarih:** 2026-08-19
-- **Commit:** `16fe247`
+- **Commit:** `c504866`
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `a7fbdbf` (REM-60 kapanış makbuzu)
 - **Release approval:** `NOT_APPROVED`

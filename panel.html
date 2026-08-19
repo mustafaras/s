@@ -16,6 +16,45 @@
 <body>
 <div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
 <script src="panelCoverageManifest.js?v=20260819c"></script>
-<script src="panel.js?v=20260819a"></script>
+<script src="panel.js?v=20260820a"></script>
+<script>
+// ── Panel boot watchdog ──
+// panel.js senkron bir IIFE'dir; yüklendiğinde window.load'u tanımlar. Eğer
+// tarayıcı eski/bozuk (kısmi) bir panel.js'i önbellekten sunarsa IIFE hiç
+// çalışmaz, window.load tanımlanmaz ve "Çekirdek başlatılıyor…" yer tutucusu
+// sessizce sonsuza kadar kalırdı. Bu watchdog panel.js'in başlayamamasını
+// yakalar ve gerçek bir tanı ekranı + önbellek temizleme sunar.
+(function(){
+  var fired=false;
+  var MIN_WAIT=3500; // panel.js başarılıysa milisaniyeler içinde tanımlanır.
+  function panic(){
+    if(fired) return; fired=true;
+    var a=document.getElementById("app"); if(!a) return;
+    a.innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;">'
+      +'<div class="card" style="padding:24px;">'
+      +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Çekirdek başlatılamadı</div>'
+      +'<div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Panel kodu yüklenemedi. En sık neden, tarayıcının eski ya da eksik bir panel.js sürümünü önbellekten sunmasıdır. Sayfayı yenileyin; olmazsa önbelleği temizleyip yeniden başlatın.</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      +'<button class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
+      +'<button class="btn" onclick="window.__panelHardReset()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Önbellek Temizle + Yeniden Başlat</button>'
+      +'</div>'
+      +'<div style="font-size:9px;color:var(--t3);margin-top:10px;line-height:1.5;">Hâlâ açılmazsa: tarayıcıda Cmd+Shift+R ile sert yenile yapın veya site verilerini (service worker / önbellek) temizleyip paneli yeniden açın.</div>'
+      +'</div></div>';
+  }
+  // panel.js başarıyla başladıysa window.load kısa sürede tanımlı olur → iptal.
+  setTimeout(function(){
+    if(typeof window.load==="function") return; // çekirdek ayakta, her şey yolunda
+    panic();
+  }, MIN_WAIT);
+  window.__panelHardReset=function(){
+    var done=function(){ location.reload(); };
+    var clearCaches=window.caches&&window.caches.keys?window.caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return window.caches.delete(k); })); }):Promise.resolve();
+    clearCaches.catch(function(){}).then(function(){
+      var unreg=navigator.serviceWorker&&navigator.serviceWorker.getRegistrations?navigator.serviceWorker.getRegistrations().then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); }):Promise.resolve();
+      return unreg.catch(function(){});
+    }).then(done).catch(done);
+  };
+})();
+</script>
 </body>
 </html>

@@ -5427,6 +5427,11 @@ function load(){
 var LASTSIG=null;
 function panelSig(){ try{ return JSON.stringify(D)+"\u0001"+JSON.stringify(PANEL_LOCATION_CONTEXT)+"\u0001"+JSON.stringify(SYNC_RECEIPT)+"\u0001"+JSON.stringify(PROJECTION)+"\u0001"+JSON.stringify(OBSINBOX)+"\u0001"+JSON.stringify(OBSRECEIPTS)+"\u0001"+JSON.stringify(QDELIVERY)+"\u0001"+JSON.stringify(QRESPONSES)+"\u0001"+JSON.stringify(QTRANSPORT)+"\u0001"+JSON.stringify(EVENT_LOG_STATE); }catch(e){ return null; } }
 window.load=load;
+// Boot watchdog iptali: panel.js IIFE'si buraya ulaştıysa çekirdek ayakta —
+// panel.html'deki watchdog'ın (seyma-panel-watchdog) yer tutucuyu değiştirmesine
+// gerek yok, normal boot akışı devam eder.
+try{ if(typeof localStorage!=="undefined") localStorage.removeItem("seyma-panel-watchdog"); }catch(e){}
+try{ if(typeof document!=="undefined"&&document.getElementById){ var __pa=document.getElementById("app"); if(__pa&&__pa.dataset) __pa.dataset.panelReady="1"; } }catch(e){}
 try{
   if(!DEMO_MODE){
     PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");

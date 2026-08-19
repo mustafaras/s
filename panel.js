@@ -1477,6 +1477,23 @@ function emptyStateReasonP(status){
   if(reason==='projection_invalid'||reason==='projection_load_failed') return {kind:'error',text:'Kaynak/projection hatası · önceki güvenli görünüm korunuyor.'};
   return {kind:'unused',text:'Bu özellik henüz kullanılmamış.'};
 }
+// REM-59: yan kanal (section) fetch hatasının kararını tek, saf ve test
+// edilebilir fonksiyonda toplar. Yapılmış başka sağlıklı sections varsa onları
+// KORUR ve hata durumunu isaretler; ilk yüklemede (hiç section yokken) normal
+// 'missing' davranışına düşer. Dönen sectionFetchState.lastError yalnız sabit
+// bir KOD'dur — ham network hatası, token veya kişisel ayrıntı asla burada
+// tutulmaz (panel gözlemcidir; hiçbir raw hata gövdesi panel durumuna girmez).
+function applySectionFailureP(currentSections,error){
+  var hadSections=!!(currentSections&&typeof currentSections==='object'&&Object.keys(currentSections).length>0);
+  var sections=hadSections?currentSections:{};
+  var m=String(error&&error.message||error||'').toLowerCase(), code='network';
+  if(m.indexOf('401')>=0||m.indexOf('unauthorized')>=0||m.indexOf('gecersiz')>=0||m.indexOf('yetkisiz')>=0) code='unauthorized';
+  else if(m.indexOf('403')>=0||m.indexOf('forbidden')>=0||m.indexOf('yetki')>=0) code='forbidden';
+  else if(m.indexOf('404')>=0||m.indexOf('not found')>=0||m.indexOf('bulunamad')>=0) code='not_found';
+  else if(m.indexOf('429')>=0||m.indexOf('rate')>=0) code='rate_limited';
+  else if(m.indexOf('409')>=0||m.indexOf('422')>=0||m.indexOf('conflict')>=0) code='conflict';
+  return {hadSections:hadSections,sections:sections,sectionFetchState:{ok:false,lastError:code,failedAt:new Date().toISOString()}};
+}
 function emptyStateNoteHTMLP(status){
   var r=emptyStateReasonP(status);
   return r?'<div class="p3-muted" data-component="empty-state-reason" data-empty-kind="'+r.kind+'">'+esc(r.text)+'</div>':'';
@@ -5201,12 +5218,13 @@ function load(){
         SYNC_RECEIPT=null;
         D=P&&typeof P.redactForObserver==='function'?P.redactForObserver(latestLegacy):latestLegacy;
         PROJECTION.snapshot=null; PROJECTION.state={source:'legacy_fallback',reason:'projection_load_failed',snapshot:null,data:D,coverage:P&&P.coverageForData?P.coverageForData(latestLegacy):null};
-        // Yan-kanal fetch hatasi: PROJECTION.sections zaten doluysa (önceki
-        // saglikli yüklemeden kalma) KORU, yalnizca hata durumunu isaretle.
-        // Ilk yüklemede (henüz hic veri yokken) normal "missing" davranisi.
-        var hadSections=Object.keys(PROJECTION.sections).length>0;
-        if(!hadSections) PROJECTION.sections={};
-        PROJECTION.sectionFetchState={ok:false,lastError:String(err&&err.message||err||'network'),failedAt:new Date().toISOString()};
+        // REM-59: yan-kanal (section) fetch hatasında önceki sağlıklı sections
+        // KORUNUR ve yalnızca sabit bir hata KODU tutulur (ham network hatası /
+        // token / kişisel ayrıntı asla panel durumuna girmez). İlk yüklemede
+        // (hiç section yokken) normal "missing" davranışı korunur.
+        var fx=applySectionFailureP(PROJECTION.sections,err);
+        PROJECTION.sections=fx.sections;
+        PROJECTION.sectionFetchState=fx.sectionFetchState;
         EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
         if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
         render();

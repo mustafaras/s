@@ -1494,6 +1494,26 @@ function applySectionFailureP(currentSections,error){
   else if(m.indexOf('409')>=0||m.indexOf('422')>=0||m.indexOf('conflict')>=0) code='conflict';
   return {hadSections:hadSections,sections:sections,sectionFetchState:{ok:false,lastError:code,failedAt:new Date().toISOString()}};
 }
+// REM-59: reminder system status'unu BEŞ ayrık durumla raporlar —
+// unavailable (projeksiyon çekilemedi / hiç kaynak yok), stale (kaynak veya
+// projeksiyon eski), error (projeksiyon açıkça bozuk/yüklenemedi),
+// pending (veri gelmiş olabilir ama henüz panelde görünmüyor / receipt yok)
+// ve ok (sağlıklı, güncel). Yalnızca sabit kod + sabit güvenli metin üretir;
+// ham network hatası, token veya kişisel ayrıntı asla dönmez. Panel
+// gözlemcidir; bu fonksiyon hiçbir reminder preference / localStorage /
+// app state yazmaz.
+function reminderSystemStatusP(projectionState,sectionFetchState){
+  var p=projectionState&&typeof projectionState==='object'?projectionState:null;
+  var reason=p&&typeof p.reason==='string'?p.reason:'';
+  var fetchFailed=!!(sectionFetchState&&typeof sectionFetchState==='object'&&sectionFetchState.ok===false);
+  if(reason==='projection_invalid'||reason==='projection_parse_failed') return {code:'error',kind:'error',text:'Projeksiyon bozuk · önceki güvenli görünüm korunuyor.'};
+  if(reason==='projection_stale') return {code:'stale',kind:'warning',text:'Kaynak veya projeksiyon eski · görünüm güncelmiş gibi sunulmuyor.'};
+  if(fetchFailed||reason==='projection_load_failed') return {code:'unavailable',kind:'error',text:'Projeksiyon çekilemedi · önceki güvenli görünüm korunuyor.'};
+  if(reason==='projection_missing'||reason==='projection_permission'||reason==='projection_network') return {code:'unavailable',kind:'muted',text:'Kaynak yok · projeksiyon henüz oluşmadı.'};
+  if(reason==='receipt_missing') return {code:'pending',kind:'pending',text:'Senkron bekleniyor · veri gelmiş olabilir, henüz panelde görünmüyor.'};
+  if(reason==='ready'||(p&&p.source==='projection')) return {code:'ok',kind:'ok',text:'Projeksiyon hazır ve güncel.'};
+  return {code:'unavailable',kind:'muted',text:'Kaynak yok · projeksiyon henüz oluşmadı.'};
+}
 function emptyStateNoteHTMLP(status){
   var r=emptyStateReasonP(status);
   return r?'<div class="p3-muted" data-component="empty-state-reason" data-empty-kind="'+r.kind+'">'+esc(r.text)+'</div>':'';

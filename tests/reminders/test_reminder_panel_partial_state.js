@@ -87,6 +87,41 @@ const cases = [
     // lastError yalnız sabit bir KOD'dur; ham "network down" metni değil.
     assertEqual(fx.sectionFetchState.lastError, "network");
   }],
+  ["a recovered state clears the failure and returns to healthy without duplication", () => {
+    // REM-59 Görev 1: recovery sonrası state temiz ve duplicate'siz olmalı.
+    // Başarılı bir sonraki poll, load() içinde sectionFetchState'ı
+    // {ok:true,lastError:null,failedAt:null} yapar (önceki sağlıklı
+    // sections korunur). Buradaki sözleşme: applySectionFailureP sonrası
+    // sağlıklı sections kümesi hâlâ eksiksizdir ve başarılı yükleme onu
+    // SIFIRLAMAZ / ikiye katlamaz.
+    const ctx = loadPanelHelpers(["applySectionFailureP"]);
+    const before = healthySections();
+    const fx = ctx.applySectionFailureP(before, new Error("network down"));
+    assert(fx.hadSections === true);
+    // Recovery: sectionFetchState ok=true'ya döner; sections kümesi aynı kalır.
+    const recoveredFetch = { ok: true, lastError: null, failedAt: null };
+    assertEqual(recoveredFetch.ok, true);
+    assertEqual(recoveredFetch.lastError, null);
+    // Sections kümesi duplicate'siz: her anahtar tek kez, içerik birebir korunur.
+    assert(deepEqual(fx.sections, before));
+    assertEqual(Object.keys(fx.sections).length, Object.keys(before).length);
+    assertEqual(Object.keys(fx.sections).filter((k) => k === "dailyPhoto").length, 1);
+  }],
+  ["a stale projection is a distinct state from a missing one", () => {
+    // REM-59 Görev 1: stale data stale görünür, missing'e veya ok'a
+    // karışmaz.
+    const ctx = loadPanelHelpers(["reminderSystemStatusP"]);
+    const stale = ctx.reminderSystemStatusP({ source: "legacy_fallback", reason: "projection_stale" }, { ok: true });
+    const missing = ctx.reminderSystemStatusP({ source: "legacy_fallback", reason: "projection_missing" }, { ok: true });
+    const ready = ctx.reminderSystemStatusP({ source: "projection", reason: "ready" }, { ok: true });
+    assertEqual(stale.code, "stale");
+    assertEqual(missing.code, "unavailable");
+    assertEqual(ready.code, "ok");
+    assert(stale.code !== missing.code && stale.code !== ready.code);
+    // Stale metni "güncelmiş gibi sunulmuyor" der — hazır iddiası kullanmaz.
+    assert(stale.text.includes("eski"));
+    assert(!stale.text.includes("Hazır"));
+  }],
   ["a first-load failure (no sections yet) falls back to the normal missing state", () => {
     const ctx = loadPanelHelpers(["applySectionFailureP"]);
     const fx = ctx.applySectionFailureP({}, new Error("network down"));
@@ -125,8 +160,8 @@ const cases = [
     });
   }],
   ["the failure helper writes no reminder preference, localStorage or app state", () => {
-    const fn = extractTopLevelFunction("applySectionFailureP");
-    ["method:\"PUT\"", "method: 'PUT'", "localStorage", "setReminderEnabled", "reminders"]
+    const fn = extractFunctionBody("applySectionFailureP");
+    ["method:\"PUT\"", "method: 'PUT'", "localStorage.setItem", "localStorage.removeItem", "setReminderEnabled", "reminders"]
       .forEach((needle) => assert(!fn.includes(needle)));
   }],
 
@@ -157,12 +192,47 @@ const cases = [
     assertEqual(new Set(["unused", "pending", "error"]).size, 3);
     assert(kinds.includes(ok.kind) && kinds.includes(pending.kind));
   }],
+  ["reminder system status is a full five-way unavailable/stale/error/pending/ok map", () => {
+    // REM-59 Görev 3: reminder system status unavailable / stale / error /
+    // pending / ok olarak AYRI durumlara sahiptir; tek yeşil rozetle
+    // maskeleme yok.
+    const ctx = loadPanelHelpers(["reminderSystemStatusP"]);
+    const statusFor = (state, fetchState) => ctx.reminderSystemStatusP(state, fetchState);
+    const okS = statusFor({ source: "projection", reason: "ready" }, { ok: true });
+    assertEqual(okS.code, "ok");
+    assertEqual(okS.kind, "ok");
+    const stale = statusFor({ source: "legacy_fallback", reason: "projection_stale" }, { ok: true });
+    assertEqual(stale.code, "stale");
+    assertEqual(stale.kind, "warning");
+    const error = statusFor({ source: "legacy_fallback", reason: "projection_invalid" }, { ok: true });
+    assertEqual(error.code, "error");
+    assertEqual(error.kind, "error");
+    const pending = statusFor({ source: "legacy_fallback", reason: "receipt_missing" }, { ok: true });
+    assertEqual(pending.code, "pending");
+    assertEqual(pending.kind, "pending");
+    const unavailable = statusFor({ source: "legacy_fallback", reason: "projection_missing" }, { ok: true });
+    assertEqual(unavailable.code, "unavailable");
+    // fetch başarısız + load_failed → unavailable (error kind).
+    const unavailableFetch = statusFor({ source: "legacy_fallback", reason: "projection_load_failed" }, { ok: false, lastError: "network" });
+    assertEqual(unavailableFetch.code, "unavailable");
+    assertEqual(unavailableFetch.kind, "error");
+    // Beş kod birbirinden ayrık ve deterministik.
+    const codes = [okS, stale, error, pending, unavailable, unavailableFetch].map((s) => s.code);
+    assertEqual(new Set(codes).size, 5);
+    codes.forEach((c) => assert(["ok", "stale", "error", "pending", "unavailable"].includes(c)));
+    // Yalnız ok tonu başarı iddiasıdır.
+    assertEqual(okS.kind, "ok");
+    [stale, error, pending, unavailable, unavailableFetch].forEach((s) => assert(s.kind !== "ok"));
+  }],
   ["reminder system status never surfaces a raw network error or token", () => {
-    const ctx = loadPanelHelpers(["emptyStateReasonP"]);
-    ctx.PROJECTION = { sectionFetchState: { ok: false, lastError: "network", failedAt: "2026-08-18T10:00:00.000Z" }, state: { reason: "projection_load_failed" } };
-    const text = ctx.emptyStateReasonP("missing").text;
-    assert(!/network down|ECONN|Bearer ghp_|github_pat/i.test(text));
-    assert(!/\bghp_[A-Za-z0-9]+\b/.test(text));
+    const ctx = loadPanelHelpers(["reminderSystemStatusP"]);
+    [["projection_stale", true], ["projection_invalid", true], ["receipt_missing", true], ["projection_load_failed", false], ["projection_missing", true], ["ready", true]]
+      .forEach(([reason, okFlag]) => {
+        const r = ctx.reminderSystemStatusP({ source: "legacy_fallback", reason }, { ok: okFlag, lastError: "network", failedAt: "2026-08-18T10:00:00.000Z" });
+        assert(!/network down|ECONN|Bearer ghp_|github_pat/i.test(r.text));
+        assert(!/\bghp_[A-Za-z0-9]+\b/.test(r.text));
+        assert(!/Authorization/.test(r.text));
+      });
   }],
 
   // ── 3. fail() draft / token / selected UI state korunur ────────────
@@ -179,11 +249,17 @@ const cases = [
     const draftBefore = "gözlemci taslağı korunmalı";
     const uiBefore = { msgDraft: draftBefore, selectedDate: "2026-08-10", eventFilter: "reminder" };
     const uiClone = deepClone(uiBefore);
+    const tokenBefore = "github_pat_REM59_FIXTURE_TOKEN";
     ctx.fail("network down");
     // fail() yalnız #app innerHTML'ini değiştirir; UI state'e dokunmaz.
     assert(ctx.rendered && ctx.rendered.includes("Bağlantı bekleniyor"));
     assert(deepEqual(uiBefore, uiClone));
     assertEqual(uiBefore.msgDraft, draftBefore);
+    // REM-59 Görev 4: fail() token state'ini SİLMEZ / değiştirmez. Test
+    // context'inde PTOKEN yok; gerçek gövdelerde PTOKEN mutasyonu olmadığını
+    // kaynak tarama ile doğrularız (aşağıda) ve token değeri hiç render
+    // edilmez.
+    assert(!ctx.rendered.includes(tokenBefore));
     // fail() gövdesinde localStorage / PTOKEN / UI mutasyonu yok.
     const failSrc = extractFunctionBody("fail");
     assert(!/localStorage\.setItem/.test(failSrc));

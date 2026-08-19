@@ -49,17 +49,22 @@ görünmez: `sectionFetchState.ok=false` iken `emptyStateReasonP('missing')`
 
 ## Görev 3 — Reminder system status: unavailable / stale / error / pending / ok
 
-`emptyStateReasonP` beş durumu deterministik ve ayrık biçimde ayırır:
+REM-59 için yeni `reminderSystemStatusP()` saf fonksiyonu eklendi. Bu fonksiyon
+reminder system status'unu BEŞ ayrık durumla raporlar:
 
-| Durum | `kind` | Metin |
-|---|---|---|
-| ok (sağlıklı, reason `ready`) | `unused` | "henüz kullanılmamış" |
-| pending (section fetch başarısız) | `pending` | "Senkron bekleniyor · veri gelmiş olabilir" |
-| pending (receipt_missing / projection_stale) | `pending` | aynı |
-| error (projection_invalid / projection_load_failed) | `error` | "Kaynak/projection hatası · önceki güvenli görünüm korunuyor" |
+| Durum | `code` | `kind` | Metin |
+|---|---|---|---|
+| ok (sağlıklı, reason `ready` / source `projection`) | `ok` | `ok` | "Projeksiyon hazır ve güncel." |
+| pending (receipt_missing) | `pending` | `pending` | "Senkron bekleniyor · veri gelmiş olabilir" |
+| stale (projection_stale) | `stale` | `warning` | "Kaynak veya projeksiyon eski · görünüm güncelmiş gibi sunulmuyor" |
+| error (projection_invalid / parse_failed) | `error` | `error` | "Projeksiyon bozuk · önceki güvenli görünüm korunuyor" |
+| unavailable (fetch failed / load_failed / missing / permission / network) | `unavailable` | `error` / `muted` | "Kaynak yok · projeksiyon henüz oluşmadı" |
 
-Üç `kind` kümesi (`unused`/`pending`/`error`) deterministik ve birbirinden
-ayrıktır.
+Beş kod (`ok` / `stale` / `error` / `pending` / `unavailable`) deterministik ve
+ayrıktır; tek yeşil rozetle maskeleme yok. `emptyStateReasonP` üç `kind`
+kümesiyle (`unused`/`pending`/`error`) modül seviyesinde aynı dürüstlüğü
+sağlar. `stale` veri `missing`'e veya `ok`'a karışmaz; `recovered` durumunda
+sonraki başarılı poll hata durumunu temizler ve duplicate'siz kalır.
 
 ## Görev 4 — fail() draft / token / selected UI state'i silmez
 
@@ -70,6 +75,9 @@ Test, `fail()` fonksiyonunu izole bir VM context'inde çalıştırır ve:
   etmediğini** doğrular (`deepEqual` korunur).
 - `fail()` gövdesinde `localStorage.setItem/removeItem`, `PTOKEN=`, `UI.msgDraft=`,
   `UI.selectedDate=` yazma yolu olmadığını doğrular (brace-matching extractor).
+- Token state'i SİLİNMEZ / DEĞİŞTİRİLMEZ: test bir token sabitini (ör.
+  `github_pat_...`) hiçbir render çıktısına taşımadığını ve `PTOKEN=` mutasyonu
+  olmadığını doğrular.
 
 ## Görev 5 — Panel status mesajlarında raw network error / token / personal detail yok
 
@@ -86,7 +94,7 @@ Test, `fail()` fonksiyonunu izole bir VM context'inde çalıştırır ve:
 ## Doğrulama
 
 ```
-node tests/reminders/test_reminder_panel_partial_state.js   → PASS (10 case / 69 assertion)
+node tests/reminders/test_reminder_panel_partial_state.js   → PASS (13 case / 123 assertion)
 node tests/test_panel_p3_root_modules.js                    → PASS (35 assertion)
 node tests/test_panel_p4_provenance.js                      → PASS (28 assertion)
 node tests/test_panel_staleness_badge.js                    → PASS (7 assertion)

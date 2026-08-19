@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-56",
+  "activePrompt": "REM-57",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-55",
-  "nextSafeAction": "REM-56 Panel coverage manifest ve reminder schema classification; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-56",
+  "nextSafeAction": "REM-57 Panel redaction ve reminder no-op karari; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-55 gate found a real panel defect: the reason resolution inside load() read the sync receipt (res[3]) instead of the projection loader result (res[4]); a normalized receipt has no `reason` field, so the upgrade was dead code and a 401/403 or network failure rendered as the benign 'Projection yok' badge instead of 'Projection okunamadi'. The buried logic became the named, testable projectionSourceStateP() (only coarse projection_missing is upgraded; ready / projection_stale / receipt_missing are never overwritten; missing, empty or receipt-shaped input fails closed) and load() now passes res[4]. panelCoverageManifest.js deliberately unchanged and re-proved; app runtime, Panel-v2 and protected paths untouched",
-    "tests": "panel source 319 assertions / 12 scenarios (new), Panel P1 and P0 regression PASS; full reminder/root/Panel-v2 116/116, headless 5/5, node --check panel.js + panelCoverageManifest.js and diff --check PASS",
-    "commit": "0a3b819",
+    "source": "REM-56 gate found a real fail-OPEN boundary in panelCoverageManifest.js: a reminder path with no explicit rule fell through to the final `*` catch-all and was classified `summary`, so any reminder root/key a future app version adds (reminderQueueV2, remindersV2, notifications.*.reminderBody, days.*.reminderCompletion) would have been copied raw into snapshot.data; worse, the coverage list published the RAW PATH, and because a user names their own reminders, a line like `reminderQueueV2.Anneme ilac ver.body` carried the private title itself into observer-snapshot.json; the declared `unmappedPaths` list was dead code and never populated. The reminder namespace is now fail-closed (`unmapped` + withheld) and that check runs BEFORE the fullDetail allowlist, so a reminder field landing inside an allowed root such as `notifications` can never become `full`; unmapped audit entries are masked to identifier-shaped tokens. MANIFEST.reminderCoverage freezes 12 field classes with one mode plus rationale, and new pure classifyPath() / reminderCoverageReport() APIs report declaration-vs-resolution parity. Wire contract unbroken: schemaVersion 1 and manifestVersion panel-coverage-v1 preserved, classification carries its own panel-reminder-coverage-v1 contractVersion written additively as reminderCoverageVersion. settings.prayer.remindersEnabled/reminderOffsetMinutes got explicit summary rules against over-capture; app runtime, panel runtime, Panel-v2 and protected paths untouched",
+    "tests": "panel coverage 405 assertions / 10 scenarios (new), Panel P1 43 (from 35), Panel P6 16; full reminder/root/Panel-v2 117/117, headless 5/5, node --check panelCoverageManifest.js + panel.js, git diff --check and context validator PASS; regression proof: removing the fail-closed line makes the new scenario FAIL, restoring it PASSes",
+    "commit": "654212d",
     "remoteEquality": "REM-54 delivered at ff9d482 and REM-55 at 3cc70eb; local HEAD, origin/main and ls-remote matched on both; standing main fast-forward PASS",
     "deployment": "REM-54: workflow 32174375024 success; live index.html HTTP 200 serving app.js?v=20260818g and the three newly wired app/core reminder modules at ?v=20260818a, each HTTP 200 with its ReminderXV1 namespace. REM-55: workflow 32175033895 success; live panel.html HTTP 200 and deployed panel.js contains projectionSourceStateP with the res[4] call while the buggy res[3] pattern is gone; a follow-up delivery bumps panel.js?v=20260818b -> 20260818c in panel.html because the first REM-55 delivery missed that cache-bust",
     "deviceAcceptance": "pending; not performed by agent"
@@ -74,13 +74,13 @@
     "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-18",
-  "updatedBy": "REM-55 closed: panel projection reason resolution fixed (res[3] -> res[4]) behind the named projectionSourceStateP contract; activePrompt advances to REM-56; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery consumed for REM-54 and REM-55 with remote, workflow and live marker receipts recorded, plus a panel.js cache-bust follow-up",
+  "updatedAt": "2026-08-19",
+  "updatedBy": "REM-56 closed: reminder namespace classification is fail-closed and single-mode in panelCoverageManifest.js (unmapped + masked audit token, 12 declared field classes, classifyPath/reminderCoverageReport); activePrompt advances to REM-57; releaseApproval remains not_approved, S5 pending, app runtime / panel runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt is recorded separately after closure PASS",
   "closure": {
-    "prompt": "REM-55",
-    "evidence": "docs/reminders/evidence/REM-55.md",
-    "commit": "0a3b819",
+    "prompt": "REM-56",
+    "evidence": "docs/reminders/evidence/REM-56.md",
+    "commit": "654212d",
     "status": "done",
-    "validatedAt": "2026-08-18"
+    "validatedAt": "2026-08-19"
   }
 }

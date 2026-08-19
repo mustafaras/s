@@ -1901,6 +1901,7 @@ function eventCategoryDefsP(){
     ['therapy-profile','Terapi & profil','Terapi araçları ve profil ilerlemesi'],
     ['quran-video','Kur’an & içerik','Kur’an, okuma, izleme ve içerik akışı'],
     ['communication','İletişim & bildirim','ÆON mesajları ve bildirim teslimatı'],
+    ['reminder','Reminder','Reminder yaşam döngüsü (metadata-only)'],
     ['user','Kullanıcı kayıtları','Günlük yaşamda kullanıcının kaydettiği alanlar'],
     ['derived','Otomatik özet','Panelin veya uygulamanın türettiği özetler'],
     ['external','Dış kaynak','Hava, fotoğraf ve dış servis fetch kayıtları']
@@ -1920,14 +1921,16 @@ function eventOperationLabelP(operation){
 function eventChangeDescriptorP(e){
   var path=eventPathLabelP(e&&e.path), subject=path.split(' / ').pop()||'Kayıt', operation=eventOperationLabelP(e&&e.operation);
   var detail=String(e&&e.detail||''), value=String(e&&e.value||''), unit=String(e&&e.unit||'');
-  var title;
-  if(detail&&value) title=detail+': '+value+(unit?' '+unit:'')+' '+operation.toLocaleLowerCase('tr-TR');
+  var reminderAction=reminderEventActionP(e), title;
+  if(reminderAction) title='Reminder '+reminderEventLabelP(e);
+  else if(detail&&value) title=detail+': '+value+(unit?' '+unit:'')+' '+operation.toLocaleLowerCase('tr-TR');
   else if(detail) title=detail+' '+operation.toLocaleLowerCase('tr-TR');
   else title=subject+' '+operation.toLocaleLowerCase('tr-TR');
   return {title:title,pathLabel:path,operationLabel:operation,detail:detail,value:value,unit:unit};
 }
 function eventClassificationP(e){
   var section=String(e&&e.section||'').toLowerCase(), path=String(e&&e.path||'').toLowerCase(), source=String(e&&(e.source||e.sourceType||e.provenance)||'').toLowerCase(), text=[section,path,source,e&&e.operation,e&&e.summary].join(' ');
+  if(isReminderEventP(e)) return {key:'reminder',label:'Reminder',description:'Reminder yaşam döngüsü (metadata-only)'};
   if(/external|wikipedia|wikimedia|youtube|fetch|remote/.test(source)||/external|fetch|weather|dailyphoto|wikimedia/.test(path)) return {key:'external',label:'Dış kaynak',description:'Dış servis veya cache kaydı'};
   if(/derived|projection|inferred|computed/.test(source)||/projection|summary|trend|continuity|backoff/.test(text)) return {key:'derived',label:'Otomatik özet',description:'Türetilmiş panel veya uygulama özeti'};
   if(/therapy|terapi|profile|profil|thought|reflection|room/.test(text)) return {key:'therapy-profile',label:'Terapi & profil',description:'Terapi ve profil ilerlemesi'};
@@ -1958,12 +1961,57 @@ function eventMatchesFilterP(e,filter){
 }
 function eventFeatureForP(e){
   var t=String(e&&[e.section,e.path,e.operation,e.kind].join(' ')||'').toLowerCase();
+  if(isReminderEventP(e)) return {icon:'bell',label:'Reminder'};
   if(/quran|kur.?an|reading/.test(t)) return {icon:'book-open',label:'Kur’an'};
   if(/video|watch/.test(t)) return {icon:'play',label:'Video'};
   if(/therapy|terapi|profile|profil|reflection|thought|room/.test(t)) return {icon:'heart-pulse',label:'Terapi / profil'};
   if(/message|mesaj|aeon|notification|bildirim|inbox|outbox/.test(t)) return {icon:'message-circle',label:'İletişim'};
   if(/sync|receipt|revision|retry|merge|event|poll/.test(t)) return {icon:'refresh-cw',label:'Senkron'};
   return {icon:'activity',label:'Günlük akış'};
+}
+// REM-62 — Reminder lifecycle event'ini güvenli summary'ye eşler.
+// sync.js/app.js sabit section + path + `reminder-v1:<action>:<digest>`
+// correlation sözleşmesini üretir. Panel bu sözleşmeyi YALNIZ GÖZLEMLER ve
+// reminder event'ini SADECE reminder-v1 correlation önekiyle tanır (path/root
+// literal'i hiçbir yerde yoktur, böylece panel kaynağı reminder local-only kök
+// sınırını ihlal etmez). Occurrence kimliği üzerinden kişisel içerik üretmez
+// ve hiçbir reminder action'ı / remote write başlatmaz. Bilinmeyen bir
+// reminder event'i sabit 'lifecycle' sınıfına fail-closed düşer.
+var REMINDER_EVENT_LABELS={scheduled:'Planlandı',delivered:'Gösterildi',opened:'Açıldı',snoozed:'Ertelendi',muted:'Susturuldu',dismissed:'Kapatıldı',suppressed:'Sakince tutuldu',error:'Gönderilemedi',enable:'Etkinleştirildi',disable:'Kapatıldı'};
+function reminderEventActionP(e){
+  if(!isReminderEventP(e)) return null;
+  var corr=String(e&&e.correlationId||'');
+  if(corr.indexOf('reminder-v1:')===0){
+    var seg=corr.split(':')[1]||'';
+    if(REMINDER_EVENT_LABELS[seg]) return seg;
+  }
+  var op=String(e&&e.operation||'').toLowerCase();
+  if(op==='complete') return 'delivered';
+  return 'lifecycle';
+}
+function isReminderEventP(e){
+  if(!e||typeof e!=='object') return false;
+  return String(e&&e.correlationId||'').indexOf('reminder-v1:')===0;
+}
+function reminderEventLabelP(e){
+  var action=reminderEventActionP(e);
+  if(!action) return null;
+  return REMINDER_EVENT_LABELS[action]||'Yaşam döngüsü';
+}
+// REM-62 — Timeline satırı için görünür-ama-sakin date/sequence durumu.
+// future (occurredAt bugünden ileri), stale (bugünden >7 gün geri), aksi
+// halde normal. Sıra bozukluğu/gap/duplicate kart üstü alarmında toplu ve
+// sakin gösterilir; satır bazında veri sunulmaz. Uygulama action'ı veya
+// remote write tetiklemez.
+function eventDateStateP(e,referenceDate){
+  var occurred=e&&e.occurredAt?String(e.occurredAt).slice(0,10):null;
+  if(!occurred||!/^\d{4}-\d{2}-\d{2}$/.test(occurred)) return {key:'unknown',label:''};
+  var ref=String(referenceDate||(typeof today==='function'?today():'')||'');
+  if(!ref) return {key:'normal',label:''};
+  var dayDiff=Math.round((Date.parse(occurred+'T00:00:00Z')-Date.parse(ref+'T00:00:00Z'))/86400000);
+  if(dayDiff>0) return {key:'future',label:'gelecek tarih'};
+  if(dayDiff<-(STALE_DANGER_DAYS||7)) return {key:'stale',label:'eski tarih'};
+  return {key:'normal',label:''};
 }
 function eventJsArgP(v){ return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function eventDrawerFocusableP(root){
@@ -1991,7 +2039,7 @@ function refreshEventLogP(){
 }
 window.refreshEventLogP=refreshEventLogP;
 function setEventFilterP(filter){
-  var allowed=['all','attention','sync','therapy-profile','quran-video','communication','user','derived','external'];
+  var allowed=['all','attention','sync','therapy-profile','quran-video','communication','reminder','user','derived','external'];
   UI.eventFilter=allowed.indexOf(filter)>=0?filter:'all';
   refreshEventLogP();
 }
@@ -2018,11 +2066,11 @@ function eventLogCardInnerHTMLP(){
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
   else {
     h+='<div class="event-log-list" aria-live="polite">';
-    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':''; h+='<div id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-category="'+esc(category.key)+'" data-source="'+esc(src.kind)+'"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main" title="'+esc(safeEventSummaryP(e))+'"><b class="event-log-headline"><span class="event-log-time mono">'+esc(eventTimeP(e.occurredAt))+'</span> · '+esc(change.title)+'</b><small>'+esc(category.label)+'</small></span><span class="event-log-side">'+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span></span>'+chain+'</div>'; });
+    visible.forEach(function(g){ var e=g.event, es=eventStatusP(e), src=eventSourceKindForP(e), feature=eventFeatureForP(e), category=eventClassificationP(e), change=eventChangeDescriptorP(e), rowId='event-row-'+String(e.eventId||g.key).replace(/[^a-zA-Z0-9_-]/g,'-'), chain=g.members.length>1?'<span class="event-chain-chip">zincir · '+g.members.length+'</span>':'', dateState=eventDateStateP(e), dateNote=dateState.key==='normal'?'':' <span class="event-date-note" data-date-state="'+esc(dateState.key)+'">'+esc(dateState.label)+'</span>', reminderAction=isReminderEventP(e)?reminderEventActionP(e):''; h+='<div id="'+esc(rowId)+'" class="event-log-row" data-component="timeline-row" data-feature="'+esc(feature.label)+'" data-category="'+esc(category.key)+'" data-source="'+esc(src.kind)+'" data-reminder-action="'+esc(reminderAction)+'"><span class="event-log-seq mono">#'+esc(String(e.sequence||'—'))+'</span><span class="timeline-feature-icon" title="'+esc(feature.label)+'">'+icon(feature.icon,16)+'</span><span class="event-log-main" title="'+esc(safeEventSummaryP(e))+'"><b class="event-log-headline"><span class="event-log-time mono">'+esc(eventTimeP(e.occurredAt))+'</span> · '+esc(change.title)+'</b><small>'+esc(category.label)+dateNote+'</small></span><span class="event-log-side">'+localStatus(es.label,es.cls)+'<span class="event-log-revision mono">rev · '+esc(String(e.snapshotRevision||'—').slice(0,12))+'</span></span>'+chain+'</div>'; });
     h+='</div>';
   }
   if(visible.length<groups.length) h+='<button type="button" class="event-log-more" data-event-action="load-more" onclick="showMoreEventsP()">Daha fazla göster · '+(groups.length-visible.length)+' kayıt</button>';
-  h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div>';
+  h+='<div class="event-log-foot">Sıra kaynağı cihaz + sequence’tir; retry/merge/accepted aynı correlation ID ile gruplanır. Reminder yaşam döngüsü (planlandı/gösterildi/açıldı/ertelendi/susturuldu/sakince tutuldu/gönderilemedi) yalnız metadata özeti taşır. Event özeti metadata-only’dir; token, GPS, profil cevabı ve base64 medya yoktur.</div>';
   return h;
 }
 function eventLogCardHTMLP(){

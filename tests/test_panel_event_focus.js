@@ -34,7 +34,7 @@ function load(names,ctx){
 
 console.log('\n=== PANEL event focus fixture ===\n');
 var descriptorCtx=contextFor();
-load(['eventStatusP','eventSourceKindForP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP'],descriptorCtx);
+load(['eventStatusP','eventSourceKindForP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','isReminderEventP','reminderEventActionP','reminderEventLabelP'],descriptorCtx);
 var mood=event({eventId:'mood-1',section:'mood',path:'data.days.*.mood',operation:'update',detail:'Ruh hali',value:'Normal'});
 var therapy=event({eventId:'therapy-1',section:'therapy',path:'data.days.*.therapy.thoughts',operation:'record'});
 var notice=event({eventId:'notice-1',section:'notifications',path:'data.notifications',operation:'accepted',source:'delivery'});
@@ -52,7 +52,7 @@ var events=[];
 for(var i=0;i<12;i++) events.push(event({eventId:'evt-'+i,correlationId:'evt-'+i,sequence:i+1,path:i%2?'data.days.*.journal':'data.days.*.mood',section:i%2?'wellness':'mood',operation:i%3?'update':'record',detail:i%2?'Günlük notu':'Ruh hali',value:i%2?'Kısa not':'Normal'}));
 var cardCtx=contextFor();
 cardCtx.EVENT_LOG_STATE.events=events;
-load(['eventStatusP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','eventJsArgP','eventTimeP','safeEventSummaryP','eventLogSourceP','statusToneP','panelStatusBadgeHTMLP','panelLegacyBadgeHTMLP','eventLogCardInnerHTMLP','eventLogCardHTMLP','refreshEventLogP','setEventFilterP','setEventLimitP','showMoreEventsP'],cardCtx);
+load(['eventStatusP','eventSourceKindForP','eventCategoryDefsP','eventClassificationP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP','eventMatchesFilterP','eventFeatureForP','isReminderEventP','reminderEventActionP','reminderEventLabelP','eventDateStateP','eventJsArgP','eventTimeP','safeEventSummaryP','eventLogSourceP','statusToneP','panelStatusBadgeHTMLP','panelLegacyBadgeHTMLP','eventLogCardInnerHTMLP','eventLogCardHTMLP','refreshEventLogP','setEventFilterP','setEventLimitP','showMoreEventsP'],cardCtx);
 var html=cardCtx.eventLogCardHTMLP();
 ok('Tümü görünümünde varsayılan son 5 değişiklik görünür',(html.match(/class="event-log-row"/g)||[]).length===5);
 ok('kart daha fazla göster seçeneği sunar',html.includes('Daha fazla göster')&&html.includes('data-event-action="load-more"'));

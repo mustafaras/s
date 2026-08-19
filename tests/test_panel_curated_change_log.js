@@ -23,6 +23,7 @@ console.log('\n=== D1.2 — curatedChangeLogCardHTMLP fixture ===\n');
 var FN_NAMES=['panelToneOverrideP','statusToneP','panelStatusBadgeHTMLP','panelStatusP','panelLegacyBadgeHTMLP',
   'eventLogSourceP','eventStatusP','eventCategoryDefsP','eventPathLabelP','eventOperationLabelP','eventChangeDescriptorP',
   'eventClassificationP','eventTimeP','safeEventSummaryP','eventSourceKindForP','eventMatchesFilterP','eventFeatureForP',
+  'isReminderEventP','reminderEventActionP','reminderEventLabelP','eventDateStateP',
   'eventLogCardInnerHTMLP','eventLogCardHTMLP','curatedChangeLogGroupsP','curatedChangeLogCardInnerHTMLP','curatedChangeLogCardHTMLP','toggleCuratedLogShowAllP'];
 
 function buildContext(events){

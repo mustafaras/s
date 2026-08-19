@@ -175,6 +175,18 @@ geçici olarak kaldırıldığında yeni fixture'ın 4. senaryosu FAIL veriyor
 - `mustafaras/seyma-data` write: not performed
 - `releaseApproval` `not_approved` olarak korunur
 
+## Standing teslimat makbuzu (S3 / S4)
+
+| Katman | Kanıt |
+|---|---|
+| Commit | kod `654212d`, kapanış docs `7e624ef`, cache-bust `377f171` |
+| Remote | `git push origin main` → `4af659b..377f171`; local HEAD = `origin/main` = `ls-remote refs/heads/main` |
+| CI | Pages workflow `32223147836` — completed / success |
+| Live HTTP | `index.html`, `panel.html`, `panelCoverageManifest.js?v=20260819a` → 200 |
+| Cache-bust | üç yüzey de (`index.html` `2026080402`, `panel.html` `20260816a`, `panel-v2.html` `20260811b`) → `20260819a`; aksi hâlde önbelleğe alınmış tarayıcı fail-OPEN adapter'ı kullanmaya devam ederdi (CLAUDE.md ilke 5) |
+| Canlı davranış | indirilen canlı dosya `vm`'de koşturuldu: `classifyPath('reminderQueueV2')` → `unmapped` + `withheld`, `redactForObserver` özel gövdeyi taşımıyor, `REMINDER_COVERAGE` 12 alan / `panel-reminder-coverage-v1`; eski `return ruleForPath(parts).mode||'summary'` satırı canlıda 0 kez |
+| `mustafaras/seyma-data` | yazılmadı |
+
 ## Sonuç
 
 - **Durum:** done

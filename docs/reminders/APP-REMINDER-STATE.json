@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-60",
+  "activePrompt": "REM-61",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-59",
-  "nextSafeAction": "REM-60 Panel status, provenance ve operational health; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-60",
+  "nextSafeAction": "REM-61 Panel reminder dashboard card veya explicit no-op; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,10 +37,10 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-59 gate locked the panel partial-fetch / stale / fail-closed contract. The side-channel (section) fetch failure decision is now a single pure testable applySectionFailureP(): it PRESERVES any existing healthy sections and only marks the failure, falls back to the normal missing behavior on first load (no sections yet), treats malformed/null sections input as an empty first load with no leak, and recovery after a later successful poll leaves the state clean and duplicate-free; sectionFetchState.lastError now holds ONLY a stable code (network/unauthorized/forbidden/not_found/rate_limited/conflict) instead of the prior String(err.message), so a raw network error, token or personal detail never enters panel state. A new pure reminderSystemStatusP() reports the reminder system status as a full FIVE-way map (unavailable/stale/error/pending/ok) with no single-green-badge masking: stale data is distinct from missing or ok, and load_failed/fetch-failed map to unavailable while projection_invalid maps to error. fail() writes only the #app error screen and does NOT mutate the observer draft, token or selected UI state (verified with a brace-matching extractor), and a token value is never rendered; fail() and syncRibbonHTMLP carry no token sentinels.",
-    "tests": "new panel partial-state fixture 123 assertions / 13 scenarios (first-load missing, healthy, stale, partial failure, recovered, malformed; failure preserves healthy sections; recovered state clean and duplicate-free; stale distinct from missing; five-way reminder status unavailable/stale/error/pending/ok; fail() no-mutation of draft/token/UI and no token render; no raw network error/token/personal detail; honest partial-failure status), Panel P3 35, Panel P4 28, staleness 7; all reminder suite, panel root P0/P1/P2/P3/P4/P6/staleness/Faz-11, all Panel-v2, node --check panel.js, git diff --check and context validator PASS",
-    "commit": "2fb1068",
-    "remoteEquality": "REM-59 closure commit pending; standing main fast-forward delivery receipt recorded separately after closure PASS",
+    "source": "REM-60 gate split reminder observation status on the panel into five SEPARATE dimensions (source freshness via reminderSourceStatusP, remote sync receipt via reminderReceiptStatusP, capability via reminderCapabilityStatusP, privacy via reminderPrivacyStatusP, and user-device/S5 acceptance via reminderDeviceAcceptanceStatusP) with no single-green-badge masking. A new reminderStatusToneMapP() maps the full eight tones (accepted/stale/pending/missing/projection_invalid/error/unsupported/redacted) from one source, unknown codes fail closed to muted, and each status card dimension renders text + icon + source time + privacy label, so color is never the only meaning. reminderStatusCardHTMLP() renders all five dimensions as one card (wired in render() right after coverageRibbonHTMLP); the 'reminder is working' claim is only true via reminderWorkingClaimP() when source + receipt + capability evidence all hold, otherwise a pending claim names the missing evidence (kaynak_kanit_yok / receipt_kanit_yok / capability_kanit_yok). The status card never carries a raw reminder category, schedule or body, and no reminder preference/localStorage/write path is introduced.",
+    "tests": "new G13-F panel status fixture 223 assertions / 14 scenarios (eight-tone deterministic fail-closed map; color-is-not-the-only-meaning; capability unsupported without projection contract; device acceptance always pending; privacy always local/redacted; working-claim true only with all three evidence; working-claim never ok on any missing evidence; card renders five separate dimensions; card never leaks raw reminder category/schedule/body; pending working-claim with reason; source time + privacy label pairing; no write path; no token sentinel; CSS present and balanced), staleness 7, panel P6 QA 16; all reminder suite, panel root suite, all Panel-v2, node --check panel.js + sync.js, git diff --check and context validator PASS",
+    "commit": "a35c16f",
+    "remoteEquality": "REM-60 closure commit pending; standing main fast-forward delivery receipt recorded separately after closure PASS",
     "deployment": "not deployed; releaseApproval remains not_approved; standing after_each_prompt delivery receipt recorded separately after closure PASS",
     "deviceAcceptance": "pending; not performed by agent"
   },
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-19",
-  "updatedBy": "REM-59 closed: panel partial-fetch / stale / fail-closed contract locked (applySectionFailureP preserves healthy sections and stores a stable error code only, reminder system status distinguished as unavailable/stale/error/pending/ok, fail() does not mutate draft/token/selected UI, no raw network error/token/personal detail in status); activePrompt advances to REM-60; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt recorded separately after closure PASS",
+  "updatedBy": "REM-60 closed: panel reminder observation status split into five separate dimensions (source/receipt/capability/privacy/device), eight-tone deterministic fail-closed map with code/tone separation, status card renders text+icon+source-time+privacy (color not sole meaning), working-claim true only with source+receipt+capability evidence, no raw reminder category/schedule/body, no write path; activePrompt advances to REM-61; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery receipt recorded separately after closure PASS",
 
   "closure": {
-    "prompt": "REM-59",
-    "evidence": "docs/reminders/evidence/REM-59.md",
-    "commit": "2fb1068",
+    "prompt": "REM-60",
+    "evidence": "docs/reminders/evidence/REM-60.md",
+    "commit": "a35c16f",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

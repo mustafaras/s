@@ -1514,6 +1514,117 @@ function reminderSystemStatusP(projectionState,sectionFetchState){
   if(reason==='ready'||(p&&p.source==='projection')) return {code:'ok',kind:'ok',text:'Projeksiyon hazır ve güncel.'};
   return {code:'unavailable',kind:'muted',text:'Kaynak yok · projeksiyon henüz oluşmadı.'};
 }
+// REM-60: Reminder gözlem durumunu panelde KAYNAK, RECEIPT, CAPABILITY, PRIVACY
+// ve CİHAZ (device acceptance) olarak AYRI boyutlara ayırır. Tek yeşil rozetle
+// maskeleme yok: her boyut kendi evidence'ını taşır; bir boyutun "ok" olması
+// diğerlerini ok yapmaz. Yalnızca sabit kod + sabit güvenli metin üretir; ham
+// network hatası, token, kişisel ayrıntı, reminder category/schedule/body asla
+// dönmez. Panel gözlemcidir; bu fonksiyonlar hiçbir reminder preference /
+// localStorage / app state yazmaz.
+//
+// 8 ton deterministik olarak haritalanır (Görev 2): accepted, stale, pending,
+// missing, projection_invalid, error, unsupported, redacted.
+function reminderStatusToneMapP(code){
+  var m={
+    accepted:{kind:'ok',tone:'ok',cls:'b-ok',label:'Kabul edildi',icon:'✓'},
+    stale:{kind:'warning',tone:'warning',cls:'b-warn',label:'Eski kaynak',icon:'△'},
+    pending:{kind:'pending',tone:'pending',cls:'b-warn',label:'Bekliyor',icon:'◷'},
+    missing:{kind:'muted',tone:'muted',cls:'b-dim',label:'Kaynak yok',icon:'·'},
+    projection_invalid:{kind:'danger',tone:'danger',cls:'b-danger',label:'Projection bozuk',icon:'!'},
+    error:{kind:'danger',tone:'danger',cls:'b-danger',label:'Hata',icon:'!'},
+    unsupported:{kind:'muted',tone:'muted',cls:'b-dim',label:'Destek yok',icon:'·'},
+    redacted:{kind:'ok',tone:'ok',cls:'b-ok',label:'Redacted korumalı',icon:'⌑'}
+  };
+  var x=m[code]||{kind:'muted',tone:'muted',cls:'b-dim',label:'Durum bekleniyor',icon:'·'};
+  return {code:code,kind:x.kind,tone:x.tone,cls:x.cls,label:x.label,icon:x.icon};
+}
+// Receipt boyutu: uzak kabul receipt + revision kanıtı yalnızca 'accepted'
+// tonunda başarı iddiası taşır. Eksik / hata / bekleme / yasak tonları ayrışır.
+function reminderReceiptStatusP(receipt){
+  var st=syncStatusP(receipt);
+  var toneMap={accepted:'accepted',missing:'missing',error:'error',conflict:'error',anti_clobber:'error',receipt_failed:'error',permission:'error',unauthorized:'error',forbidden:'error',not_found:'error',projection_failed:'error',projection_invalid:'error',network:'pending',rate_limited:'pending',offline:'pending',queued:'pending',saving:'pending',retrying:'pending',local_saved:'pending',idle:'missing'};
+  var tone=reminderStatusToneMapP(toneMap[st.code]||'pending');
+  return {code:st.code,tone:tone.code,kind:tone.kind,cls:tone.cls,label:tone.label,icon:tone.icon,text:st.code==='accepted'?'Uzak kabul receipt + revision kanıtı doğrulandı.':'Uzak kabul receipt bulunamadı; başarı iddiası yok.'};
+}
+// Capability boyutu: reminder tercih/oluşum/teslim cihaz yereldir (REM-53/REM-56).
+// Panel ancak projection contract'ı (reminderCoverageVersion) mevcutsa yalnız
+// redacted aggregate gözleyebilir; aksi hâlde capability doğrulanamaz.
+function reminderCapabilityStatusP(projectionState){
+  var p=projectionState&&typeof projectionState==='object'?projectionState:null;
+  var snap=p&&p.snapshot&&typeof p.snapshot==='object'?p.snapshot:null;
+  if(!snap||!snap.reminderCoverageVersion){
+    var unsupported=reminderStatusToneMapP('unsupported');
+    return {code:'unsupported',kind:unsupported.kind,tone:unsupported.tone,cls:unsupported.cls,label:unsupported.label,icon:unsupported.icon,text:'Reminder gözlemi için projection contract yok; capability doğrulanamaz.'};
+  }
+  var redacted=reminderStatusToneMapP('redacted');
+  return {code:'redacted',kind:redacted.kind,tone:redacted.tone,cls:redacted.cls,label:redacted.label,icon:redacted.icon,text:'Reminder tercih/oluşum/teslim cihaz yerel; panel yalnız redacted aggregate gözler.'};
+}
+// Kaynak boyutu: reminderSystemStatusP'un 5 durumunu 8 tona eşler. Yalnız 'ok'
+// → accepted tonu tazelik/başarı iddiası taşır; stale/error/pending/unavailable
+// ayrı tonlarda ve metinde kalır.
+function reminderSourceStatusP(projectionState,sectionFetchState){
+  var sys=reminderSystemStatusP(projectionState,sectionFetchState);
+  var fetchFailed=!!(sectionFetchState&&typeof sectionFetchState==='object'&&sectionFetchState.ok===false);
+  var tone;
+  if(sys.code==='ok') tone='accepted';
+  else if(sys.code==='stale') tone='stale';
+  else if(sys.code==='error') tone='projection_invalid';
+  else if(sys.code==='pending') tone='pending';
+  else tone=fetchFailed?'error':'missing';
+  var t=reminderStatusToneMapP(tone);
+  return {code:sys.code,tone:t.code,kind:t.kind,cls:t.cls,label:t.label,icon:t.icon,text:sys.text};
+}
+// Cihaz boyutu: S5 kullanıcı cihazı kabulü ajan tarafından üretilemez; her
+// durumda 'pending' kalır ve başarı iddiası taşımaz.
+function reminderDeviceAcceptanceStatusP(){
+  var t=reminderStatusToneMapP('pending');
+  return {code:'pending',kind:t.kind,tone:t.tone,cls:t.cls,label:'Cihaz kabulü doğrulanmadı',icon:t.icon,text:'Kullanıcı cihazı kabulü (S5) doğrulanmadı; ajan bu kanıtı üretemez.'};
+}
+// Privacy boyutu: status card hiçbir raw reminder category/schedule/body
+// taşımaz; etiket her zaman yerel/redacted koruma iddiasıdır.
+function reminderPrivacyStatusP(projectionState){
+  var t=reminderStatusToneMapP('redacted');
+  return {code:'redacted',kind:t.kind,tone:t.tone,cls:t.cls,label:'Yerel · redacted',icon:t.icon,text:'Hatırlatma raw ayrıntıları redacted; yalnız güvenli özet gösterilir.'};
+}
+// "Panelde reminder çalışıyor" iddiası (Görev 4): yalnız KAYNAK accepted +
+// RECEIPT accepted + CAPABILITY (projection) mevcut olduğunda doğru olabilir.
+// Aksi hâlde reason ile hangi kanıtın eksik olduğu açıkça söylenir; ok iddiası
+// kullanılmaz.
+function reminderWorkingClaimP(receipt,projectionState,sectionFetchState){
+  var src=reminderSourceStatusP(projectionState,sectionFetchState);
+  var rcpt=reminderReceiptStatusP(receipt);
+  var cap=reminderCapabilityStatusP(projectionState);
+  var ok=src.tone==='accepted'&&rcpt.tone==='accepted'&&cap.code==='redacted';
+  var reason=src.tone!=='accepted'?'kaynak_kanit_yok':rcpt.tone!=='accepted'?'receipt_kanit_yok':cap.code!=='redacted'?'capability_kanit_yok':null;
+  return {ok:ok,reason:reason};
+}
+// REM-60: Panel reminder durum kartını kaynak / receipt / capability / privacy /
+// cihaz boyutlarına ayırarak render eder. Tek yeşil rozet maskelemesi yok: her
+// boyut kendi badge + text + (kaynak/panel saati) taşır; working-claim yalnız
+// üç kanıt birlikte varsa gösterilir. Status card raw reminder category,
+// schedule veya body içermez (Görev 5).
+function reminderStatusCardHTMLP(receipt,pollAt,projectionState,sectionFetchState){
+  var d={
+    source:reminderSourceStatusP(projectionState,sectionFetchState),
+    receipt:reminderReceiptStatusP(receipt),
+    capability:reminderCapabilityStatusP(projectionState),
+    privacy:reminderPrivacyStatusP(projectionState),
+    device:reminderDeviceAcceptanceStatusP()
+  };
+  var wc=reminderWorkingClaimP(receipt,projectionState,sectionFetchState);
+  var snap=projectionState&&projectionState.snapshot&&typeof projectionState.snapshot==='object'?projectionState.snapshot:null;
+  var builtAt=snap&&snap.projectionBuiltAt||null;
+  var srcTime=d.source.tone==='accepted'&&builtAt?('projeksiyon · '+p3TimeP(builtAt)):(pollAt?('panel · '+tsShort(pollAt)):'—');
+  var rcptAt=normalizeSyncReceiptP(receipt).acceptedAt;
+  var rcptTime=d.receipt.tone==='accepted'&&rcptAt?('kabul · '+tsShort(rcptAt)):'—';
+  function cell(kind,label,time,text){
+    return '<div class="reminder-status-cell" data-reminder-dim="'+kind+'"><span class="reminder-status-cell-label">'+esc(label)+'</span><span class="reminder-status-cell-badge">'+panelStatusBadgeHTMLP(d[kind].label,d[kind].tone,d[kind].cls)+'</span><span class="reminder-status-cell-time">'+esc(time)+'</span><span class="reminder-status-cell-text">'+esc(text)+'</span></div>';
+  }
+  var claim=wc.ok
+    ?'<div class="reminder-working-claim reminder-working-ok" data-reminder-working="ok">Reminder gözlemi çalışıyor · kaynak + receipt + projection kanıtı birlikte doğrulandı.</div>'
+    :'<div class="reminder-working-claim reminder-working-pending" data-reminder-working="pending">Reminder çalışıyor iddiası yok · eksik kanıt: '+esc(wc.reason)+'.</div>';
+  return '<section class="reminder-status-card" data-component="reminder-status-card" aria-label="Reminder gözlem durumu"><div class="reminder-status-head">'+panelStatusBadgeHTMLP('Reminder gözlem durumu','muted','b-dim')+'<span class="reminder-status-head-note">'+esc(d.source.text)+'</span></div><div class="reminder-status-grid">'+cell('source','Kaynak',srcTime,d.source.text)+cell('receipt','Receipt',rcptTime,d.receipt.text)+cell('capability','Capability',snap?'contract v1':'projection yok',d.capability.text)+cell('privacy','Privacy','yerel',d.privacy.text)+cell('device','Cihaz kabulü','—',d.device.text)+'</div>'+claim+'</section>';
+}
 function emptyStateNoteHTMLP(status){
   var r=emptyStateReasonP(status);
   return r?'<div class="p3-muted" data-component="empty-state-reason" data-empty-kind="'+r.kind+'">'+esc(r.text)+'</div>':'';
@@ -3641,6 +3752,10 @@ function render(){
   var naTh=(PROJECTION.sections&&PROJECTION.sections.therapyProvenance)||{status:'missing',thoughts:[],windDown:{status:'missing',events:[]}};
   h+=milestoneRibbonHTMLP(currentStreak(),bestStreak(all),naTh.thoughtCount||0,sosFreeStreakP());
   h+=coverageRibbonHTMLP(PROJECTION.state);
+  // REM-60: reminder gözlem durumu kaynak / receipt / capability / privacy /
+  // cihaz boyutlarına ayrılmış tek kart olarak gösterilir; tek yeşil rozetle
+  // maskeleme yok, working-claim yalnız üç kanıt birlikteyse doğrulanır.
+  h+=reminderStatusCardHTMLP(SYNC_RECEIPT,PANEL_POLL_AT,PROJECTION.state,PROJECTION.sectionFetchState);
 
   // ── erişilebilir hızlı yönlendirme ─────────────────────────
   h+='<div class="d2-controls" data-component="command-actions">';

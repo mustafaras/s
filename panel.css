@@ -292,6 +292,20 @@
   .coverage-ribbon-cell b{font-size:var(--f3);color:var(--t1);font-weight:800}
   .coverage-ribbon-note{margin-top:8px;font-size:var(--f2);line-height:1.35;color:var(--t3)}
 
+  /* ── REM-60 reminder observer status card ── */
+  .reminder-status-card{margin:0 16px 14px;padding:10px 12px;border:1px solid var(--bd2);border-radius:12px;background:rgba(255,255,255,.018)}
+  .reminder-status-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+  .reminder-status-head-note{font-size:var(--f2);color:var(--t3)}
+  .reminder-status-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+  .reminder-status-cell{display:flex;flex-direction:column;gap:3px;min-width:0;padding:6px 7px;border:1px solid var(--bd2);border-radius:8px;background:rgba(0,0,0,.1)}
+  .reminder-status-cell-label{font-size:var(--f1);color:var(--t4);font-weight:700;text-transform:uppercase;letter-spacing:.35px}
+  .reminder-status-cell-badge .status-badge{font-size:var(--f1);min-height:22px;padding:2px 7px}
+  .reminder-status-cell-time{font-size:var(--f1);color:var(--t4);font-variant-numeric:tabular-nums}
+  .reminder-status-cell-text{font-size:var(--f2);line-height:1.35;color:var(--t3)}
+  .reminder-working-claim{margin-top:8px;padding:8px 10px;border-radius:9px;font-size:var(--f2);font-weight:750;line-height:1.35}
+  .reminder-working-ok{border:1px solid var(--status-ok-bd);background:var(--status-ok-bg);color:var(--status-ok-fg)}
+  .reminder-working-pending{border:1px solid var(--status-pending-bd);background:var(--status-pending-bg);color:var(--status-pending-fg)}
+
   /* ── P1 missing root modules ── */
   .p3-root-card{gap:10px}
   .p4-audit-card{gap:10px}
@@ -393,6 +407,8 @@
     .sync-ribbon-grid{grid-template-columns:repeat(2,1fr)}
     .coverage-ribbon{margin-left:12px;margin-right:12px}
     .coverage-ribbon-grid{grid-template-columns:repeat(2,1fr)}
+    .reminder-status-card{margin-left:12px;margin-right:12px}
+    .reminder-status-grid{grid-template-columns:repeat(2,1fr)}
     .p3-grid{grid-template-columns:1fr}
     .p3-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .audit-entry-grid{grid-template-columns:1fr}

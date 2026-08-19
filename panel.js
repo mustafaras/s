@@ -515,6 +515,48 @@ function quranPanelIdP(prefix){ return prefix+Date.now().toString(36)+Math.rando
 // ── transport dosyası okuma/yazma — observer-inbox.json ile AYNI Contents
 // API deseni (loadInbox/putInbox), yalnız yol parametrik ──
 function ghTransportApiP(path){ var p=REPO.split("/"); return "https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/"+path; }
+// REM-63 — Panel observer action boundary.
+// Panel gözlemcidir; reminder preference / occurrence / snooze / mute /
+// delivery / private state için yazma authority'si DEĞİLDİR. Mevcut scoped
+// observer writes (ÆON inbox, ÆON media, Quran transport) korunurken bu guard
+// her yazma endpoint'inde (putInbox / putAeonMediaP / putTransportFileP)
+// reminder-namespace anahtarlarını denylist / schema guard ile engeller ve
+// fail-closed durumları (demo, token yok, expired/malformed token, malformed
+// action) reddeder. Saf ve test edilebilir: ağ / DOM / localStorage yok.
+// Reminder-namespace token'ları panelCoverageManifest.js'teki reminder kök /
+// alan sınıflarıyla (preference, occurrence, delivery, category, privateDetail)
+// hizalıdır; Quran transport'un meşru alanlarıyla (deliverySentAt, notifiedAt,
+// readyAt, videoId, requestId, surahId, notes) ÇAKIŞMAZ.
+var REMINDER_WRITE_TOKENS=/reminder|occurrence|quiethours|catchup|snooze|mute|preference|deliverylog|notificationdelivery|reminderdelivery|reminderdeliveries|reminderhistory/;
+function panelTokenValidP(tok){
+  var s=String(tok||'').trim();
+  if(!s||s.length<20) return false;
+  if(/[\s\u0000-\u001f]/.test(s)) return false;
+  return true;
+}
+function findReminderKeyP(value){
+  if(Array.isArray(value)){
+    for(var i=0;i<value.length;i++){ var r=findReminderKeyP(value[i]); if(r) return r; }
+    return null;
+  }
+  if(value&&typeof value==='object'){
+    for(var k in value){
+      if(Object.prototype.hasOwnProperty.call(value,k)){
+        if(REMINDER_WRITE_TOKENS.test(String(k).toLowerCase())) return k;
+        var r2=findReminderKeyP(value[k]); if(r2) return r2;
+      }
+    }
+  }
+  return null;
+}
+function panelWriteGuardP(kind,payload){
+  if(DEMO_MODE) return {ok:false,reason:'demo_mode'};
+  if(!panelTokenValidP(PTOKEN)) return {ok:false,reason:'no_token'};
+  if(payload===null||payload===undefined) return {ok:false,reason:'malformed_action'};
+  var hit=findReminderKeyP(payload);
+  if(hit) return {ok:false,reason:'reminder_namespace',key:hit};
+  return {ok:true};
+}
 function loadTransportFileP(path){
   var cache=PANEL_TRANSPORT_CACHE[path]||{};
   var H=ghJsonHeaders(); if(cache.etag) H["If-None-Match"]=cache.etag;
@@ -611,6 +653,9 @@ function loadEventLogP(root){
 function putTransportFileP(path,value,sha){
   var T=window.QuranTransportV1;
   if(!T||!T.isWritableTransportPath(path)) return Promise.reject(new Error("geçersiz transport yolu"));
+  // REM-63: reminder-namespace payload'ı transport yazma yolundan geçemez.
+  var g=panelWriteGuardP('transport',value);
+  if(!g.ok) return Promise.reject(new Error("panel write engellendi: "+g.reason));
   var body={message:"panel: "+path.split("/").pop(),content:b64enc(JSON.stringify(value,null,2)),branch:BRANCH};
   if(sha) body.sha=sha;
   var H=ghJsonHeaders(); H["Content-Type"]="application/json";
@@ -4910,6 +4955,10 @@ function loadInbox(){
 }
 function putInbox(messages,sha,receipts){
   var payload={messages:messages}; if(receipts&&typeof receipts==="object"&&Object.keys(receipts).length) payload.receipts=receipts;
+  // REM-63: observer inbox yalnız ÆON mesaj kanalıdır; reminder payload'ı
+  // (preference / occurrence / snooze / mute / delivery) buraya yazılamaz.
+  var g=panelWriteGuardP('inbox',payload);
+  if(!g.ok) return Promise.reject(new Error("panel write engellendi: "+g.reason));
   var body={message:"observer: mesaj guncelle",content:b64enc(JSON.stringify(payload,null,2)),branch:BRANCH};
   if(sha) body.sha=sha;
   var H=ghJsonHeaders(); H["Content-Type"]="application/json";
@@ -5039,6 +5088,11 @@ window.closeAttachSheetP=function(){ var ex=document.getElementById("pm-attach-s
 function aeonMediaIdP(prefix){ return (prefix||"am")+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7); }
 function aeonMediaApiP(id){ var p=REPO.split("/"); return "https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/data/aeon-media/"+id+".json"; }
 function putAeonMediaP(id,payloadObj){
+  // REM-63: ÆON medya yalnız mime/data/peaks gibi medya alanları taşır;
+  // reminder-namespace anahtarı (preference / occurrence / delivery) içeren
+  // bir payload bu yazma yolundan geçemez.
+  var g=panelWriteGuardP('aeon_media',payloadObj);
+  if(!g.ok) return Promise.reject(new Error("panel write engellendi: "+g.reason));
   var body={message:"aeon-media: "+id,content:b64enc(JSON.stringify(payloadObj)),branch:BRANCH};
   var H=ghJsonHeaders(); H["Content-Type"]="application/json";
   return fetch(aeonMediaApiP(id),{method:"PUT",headers:H,body:JSON.stringify(body)}).then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status+" "+t.slice(0,160)); }); });

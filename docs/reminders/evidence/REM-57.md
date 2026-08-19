@@ -189,6 +189,18 @@ geri konduğunda 163/163 PASS.
 - `mustafaras/seyma-data` write: not performed
 - `releaseApproval` `not_approved` olarak korunur
 
+## Standing teslimat makbuzu (S3 / S4)
+
+| Katman | Kanıt |
+|---|---|
+| Commit | kod `b507c00`, kapanış docs `ea272aa`, cache-bust `0479c49` |
+| Remote | `git push origin main` → `dce1326..0479c49`; local HEAD = `origin/main` = `ls-remote` |
+| CI | Pages workflow `32225603625` — completed / success |
+| Live HTTP | `index.html`, `panel.html`, `panelCoverageManifest.js?v=20260819b` → 200 |
+| Cache-bust | üç yüzey de `20260819a` → `20260819b`; aksi hâlde REM-56 sürümünü önbelleğe almış tarayıcı adoption düzeltmesini almazdı |
+| Canlı davranış | indirilen canlı dosya `vm`'de düşmanca projection'a karşı koşturuldu: uydurma `reminderHealth` düşüyor, özel gövde hiçbir çıkışta yok, ham coverage path'i maskeli; eski verbatim adoption satırı canlıda 0 kez |
+| `mustafaras/seyma-data` | yazılmadı |
+
 ## Sonuç
 
 - **Durum:** done

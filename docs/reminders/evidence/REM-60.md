@@ -111,3 +111,16 @@ suite PASS, `node --check sync.js` PASS, `verify-reminder-context.mjs` PASS
   başarı iddiası taşımaz (STATE.deviceAcceptance ile tutarlı).
 - REM-61 (dashboard card / no-op) ayrı gate'tir; bu prompt yalnız status /
   provenance ayrımını kapsar.
+
+## Standing after_each_prompt teslimat makbuzu
+
+- **Remote equality:** `49e66de..f2d749d` fast-forward; local HEAD,
+  `origin/main` ve `git ls-remote refs/heads/main` hepsi `f2d749d`. Bu push
+  REM-58 (`63ccfb8`/`6261f63`), REM-59 (`2fb1068`/`00e9340`/`14b8c0d`) ve REM-60
+  (`a35c16f`/`f2d749d`) kapanışlarını birlikte taşıdı.
+- **Deployment:** workflow `32249456512` success (head `f2d749d`).
+- **Live HTTP receipt:** `https://mustafaras.github.io/s/panel.html` HTTP 200;
+  `panel.js?v=20260818c` ve `panel.css?v=20260809c` HTTP 200. `panel.html`
+  cache-bust bu promptta değiştirilmedi (allowlist dışı); REM-58/59/60 panel içi
+  promptlarında tutarlı no-bump deseni izlendi.
+- **Cihaz kabulü (S5):** kullanıcı cihazı doğrulaması yapılmadı; `pending`.

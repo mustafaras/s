@@ -180,6 +180,20 @@ function markPollSkippedP(reason){
   updatePollRibbonP();
 }
 function panelDraftActiveP(){ return !!(UI.msgSending||String(UI.msgDraft||'').trim()||panelBusyTyping()); }
+// REM-58: poll render'ı yalnızca metin girişi değil, gözlemcinin o an
+// etkileşimde olduğu tüm yüzeylerde ertelenir. Drawer, filtre, seçili tarih
+// ve açık kart varken tam re-render imleç/odak/scroll'u bozabilir; veri yine
+// çekilir (fetch-skip değil), yalnızca render kuyruğa alınır. panelDraftActiveP
+// metin girişi kapısıdır (fetch'i tamamen atlar); bu fonksiyon render kapısıdır.
+function panelInteractionActiveP(){
+  if(panelDraftActiveP()) return true;
+  if(D4_DRAWER_RETURN_ID||UI.d4SelectedModule) return true;                 // açık drawer
+  if(UI.eventFilter&&UI.eventFilter!=='all') return true;                   // event filtresi
+  if(UI.motivationFilter&&UI.motivationFilter!=='all') return true;         // motivasyon filtresi
+  if(UI.selectedDate&&UI.selectedDate!==today()) return true;               // bugün dışı seçili tarih
+  if(UI.expandedCards&&Object.keys(UI.expandedCards).length>0) return true;  // açık kart
+  return false;
+}
 function pollStatusP(){
   var s=PANEL_POLL_STATE||{}, o=s.lastOutcome||'idle';
   if(o==='skipped_input') return {code:o,cls:'b-warn',label:'Polling atlandı',note:'Input odağı korunuyor; sonraki güvenli tur beklenecek.'};
@@ -204,7 +218,7 @@ function updatePollRevisionsP(data,receipt,projectionState){
   return r;
 }
 function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
-  if(panelDraftActiveP()){
+  if(panelInteractionActiveP()){
     PANEL_POLL_STATE.pendingRender=true; pollRecordP('deferred_draft',startedAt,meta); return false;
   }
   var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP(outcome,startedAt,meta);
@@ -512,7 +526,13 @@ function loadTransportFileP(path){
         return {raw:cache.raw,sha:cache.sha||null,etag:decision.etag,notModified:true};
       }
       if(r.status===404){ PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:null,sha:null}; return {raw:null,sha:null,etag:etag}; }
-      if(!r.ok) throw new Error("transport "+r.status);
+      if(!r.ok){
+        // REM-58: 429 (rate limit) ayrı bir sınıftır; 5xx/network gibi genel
+        // "transport <status>" hatasına karışmaz. Gözlemci yalnız okur; bu
+        // sınıflandırma yazma yolu açmaz, yalnız hata nedenini dürüstleştirir.
+        if(r.status===429){ var rl=new Error("transport rate_limited"); rl.rateLimited=true; throw rl; }
+        throw new Error("transport "+r.status);
+      }
       return r.json().then(function(g){
         var raw=(g&&typeof g.content==="string"&&g.content)?b64dec(g.content):null, sha=(g&&g.sha)||null;
         // QY-22: Contents API'nin JSON temsili 1 MB ile sinirli; ustundeki
@@ -5140,7 +5160,7 @@ function load(){
         PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
         var pollSig=panelSig();
         if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
-        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
+        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ if(panelInteractionActiveP()){ PANEL_POLL_STATE.pendingRender=true; return D; } LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
       }
       var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       setPanelLocationContextP(latestLegacy);

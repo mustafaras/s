@@ -70,6 +70,7 @@ first.then(function(){
   var renderCalls=0,ribbonCalls=0,renderCtx={
     PANEL_POLL_STATE:{pendingRender:false},
     panelDraftActiveP:function(){return false;},
+    panelInteractionActiveP:function(){return false;},
     pollRecordP:function(){},
     updatePollRibbonP:function(){ribbonCalls++;},
     render:function(){renderCalls++;},
@@ -81,6 +82,7 @@ first.then(function(){
   renderCtx.applyPollRenderP('same-sig',false,'not_modified',Date.now()-10,{});
   ok('aynı snapshot 304 turunda tam render yapılmaz',renderCalls===0&&ribbonCalls===1);
   renderCtx.panelDraftActiveP=function(){return true;};
+  renderCtx.panelInteractionActiveP=function(){return true;};
   renderCtx.applyPollRenderP('new-sig',true,'changed',Date.now()-10,{});
   ok('taslak varken yeni snapshot render kuyruğuna alınır',renderCalls===0&&renderCtx.PANEL_POLL_STATE.pendingRender===true);
   console.log('\nPANEL-008 / PANEL-06 polling fixture result: '+(failed?'FAIL':'PASS')+' ('+passed+' passed, '+failed+' failed)');

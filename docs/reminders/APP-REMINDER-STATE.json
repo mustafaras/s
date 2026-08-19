@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-63",
+  "activePrompt": "REM-64",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-62",
-  "nextSafeAction": "REM-63 Panel observer action boundary; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-63",
+  "nextSafeAction": "REM-64 Panel privacy, redaction ve secret scanner; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-62: panel timeline reminder lifecycle event'leri (scheduled/delivered/opened/snoozed/muted/suppressed/error) güvenli summary'ye eşlendi. isReminderEventP reminder event'ini YALNIZ reminder-v1: correlation önekiyle tanır; path/root literal'i panel.js'te YOKTUR (REM-26/56/57 no-op kaynak sınırı korunur). reminderEventActionP/label güvenli Türkçe label eşler, bilinmeyen reminder fail-closed 'lifecycle'e düşer; eventChangeDescriptorP 'Reminder <label>' başlığı üretir; eventClassificationP/eventFeatureForP reminder'ı ayrı reminder sınıfına/bell ikonuna yönlendirir; eventCategoryDefsP/setEventFilterP timeline'a reminder filtresi ekler. eventDateStateP future/stale date durumlarını görünür-ama-sakin data-date-state notuyla render eder; duplicate/gap/out-of-order kart üstü role=alert sıra alarmıyla toplu-sakin gösterilir; missing boş durum sözleşmesiyle fail-closed. Event limit/filter/selected date/drawer focus davranışı korunur. Timeline reminder event'i hiçbir app action veya remote write başlatmaz (G13-H negative: PUT/POST/PATCH/DELETE, localStorage.setItem/removeItem, SeySync.schedule, putInbox, putTransportFileP, app/write onclick yok).",
-    "tests": "new G13-H panel timeline fixture 467 assertions / 5 scenarios (seven reminder lifecycle actions map to a safe summary and unknown fails closed; event id sequence source revision and feature metadata stay separate from private body; duplicate out-of-order gap future stale and missing states render calm; panel filter and event limit remain deterministic; timeline reminder event and helpers trigger no app action or remote write), p2_event_log 11, event_focus 12, p3_timeline_drawer 7, curated_change_log 8, p6_qa_release 16; all reminder suite 63, panel root 22, all Panel-v2 27, node --check panel.js, git diff --check and context validator PASS",
-    "commit": "b9f3189",
-    "remoteEquality": "REM-62 delivered at 80a9094; local HEAD, origin/main and git ls-remote refs/heads/main all matched (80a9094); standing main fast-forward PASS (4af0cfe..80a9094). This push delivered REM-62 code (b9f3189) and closure records (80a9094) together.",
-    "deployment": "REM-62: workflow 32257707545 success (head 80a9094); live index.html / panel.html HTTP 200; panel.js?v=20260819a and panel.css?v=20260809c both HTTP 200 after deploy. panel.html cache-bust bumped to panel.js?v=20260819a (panel.js changed in this prompt).",
+    "source": "REM-63: panel observer action boundary. Panel gözlemcidir; reminder preference/occurrence/snooze/mute/delivery/private state için yazma authority'si değildir. Yeni saf helpers panelWriteGuardP/findReminderKeyP/panelTokenValidP + REMINDER_WRITE_TOKENS denylist regex'i (reminder|occurrence|quiethours|catchup|snooze|mute|preference|deliverylog|notificationdelivery|reminderdelivery|reminderdeliveries|reminderhistory) panelCoverageManifest reminder kök/alan sınıflarıyla hizalı ve Quran transport meşru alanlarıyla (deliverySentAt/notifiedAt/readyAt/videoId/requestId/surahId/notes) çakışmaz. Guard üç yazma endpoint'ine bağlandı — putInbox (ÆON inbox yalnız mesaj kanalı), putAeonMediaP (yalnız mime/data/peaks), putTransportFileP (QuranTransportV1 isWritableTransportPath zaten kısıtlı) — reminder-namespace payload'ı fetch'e ulaşmadan 'panel write engellendi: reminder_namespace' ile reddedilir. Fail-closed durumlar ayrı ayrı: demo_mode, no_token (boş/expired/malformed token), malformed_action. Meşru ÆON inbox/media + Quran transport payload'ları guard'dan geçer ve fetch'e PUT üretir (regresyon yok). Read-only yüzeyler (loadTransportFileP/loadInbox/fetchAeonMediaP/loadObserverProjectionP/loadSyncReceiptP) guard çağırmaz ve write verb taşımaz. Reminder card/timeline/status/filter UI'ında write handler yok (G13-I negative: PUT/POST/PATCH/DELETE, localStorage.setItem/removeItem, SeySync.schedule, putInbox, putTransportFileP, putAeonMediaP sentinelleri yok). Panel.js data/latest.json veya data/reminder*'a PUT ile yazamaz; app reminder yazma fonksiyonları panelde yok.",
+    "tests": "new G13-I panel write boundary fixture 369 assertions / 7 scenarios (guard rejects every reminder-namespace payload and accepts legit observer payloads; guard fails closed on demo mode, no token, malformed token and malformed action; putInbox/putAeonMediaP/putTransportFileP reject reminder payload before any fetch; legit observer inbox/media/transport writes still reach fetch PUT; reminder card/timeline/status/filter UI emit no write handler; guard is wired only into the three write endpoints and read surfaces stay clean; panel.js owns no write path to reminder preference or delivery), p0_sync, quran_transport, p6_qa_release; all reminder suite 64, panel root 22, all Panel-v2 27, quran 9, node --check panel.js, git diff --check and context validator PASS",
+    "commit": "e6f7de1",
+    "remoteEquality": "REM-63 delivered after closure PASS; standing main fast-forward push to run after closure validator PASS.",
+    "deployment": "REM-63: Pages workflow/deploy receipt to be recorded after closure PASS; panel.html cache-bust bumped to panel.js?v=20260820a (panel.js changed in this prompt; panel.css unchanged).",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-19",
-  "updatedBy": "REM-62 closed: panel timeline reminder lifecycle event'leri güvenli summary'ye eşlendi; isReminderEventP yalnız reminder-v1 correlation önekiyle tanır (path literal'i yok, no-op kaynak sınırı korunur), reminder filter eklendi, eventDateStateP future/stale date durumlarını görünür-ama-sakin gösterir, G13-H fixture 467 assertion ile timeline append-only/redacted/sequence-audited ve hiçbir app action veya remote write tetiklemediği sabitlendi; panel.js event projection/labels + panel.html cache-bust değişti (panel.css/panelCoverageManifest.js değişmedi); activePrompt advances to REM-63; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery to run after closure PASS",
+  "updatedBy": "REM-63 closed: panel observer action boundary — panelWriteGuardP/findReminderKeyP/panelTokenValidP + REMINDER_WRITE_TOKENS denylist regex'i üç yazma endpoint'ine (putInbox/putAeonMediaP/putTransportFileP) bağlandı; reminder-namespace payload'ı fetch'e ulaşmadan reddedilir, fail-closed durumlar (demo/no token/expired token/malformed action) ayrı ayrı, meşru ÆON inbox/media + Quran transport writes regresyonsuz; G13-I fixture 369 assertion ile reminder surface'ın hiçbir write üretmediği ve read-only yüzeylerin temiz kaldığı sabitlendi; panel.js action guard + panel.html cache-bust değişti (panel.css/panelCoverageManifest.js değişmedi); activePrompt advances to REM-64; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery to run after closure PASS",
 
   "closure": {
-    "prompt": "REM-62",
-    "evidence": "docs/reminders/evidence/REM-62.md",
-    "commit": "b9f3189",
+    "prompt": "REM-63",
+    "evidence": "docs/reminders/evidence/REM-63.md",
+    "commit": "e6f7de1",
     "status": "done",
     "validatedAt": "2026-08-19"
   }

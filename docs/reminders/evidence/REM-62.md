@@ -107,9 +107,16 @@ kişisel içerik üretilmez.
 
 ## Standing after_each_prompt teslimat makbuzu
 
-- **Remote equality / push / deploy / live:** closure validator PASS sonrası
-  standing `main` fast-forward + GitHub Pages + live HTTP/cache-bust receipt
-  ayrı kaydedilecek. `panel.js?v=` bump `20260819a`.
+- **Remote equality:** `4af0cfe..80a9094` fast-forward; local HEAD, `origin/main`
+  ve `git ls-remote refs/heads/main` hepsi `80a9094`. Bu push REM-62 kapanışını
+  (`b9f3189` kod, `80a9094` closure records) birlikte taşıdı.
+- **Deployment:** workflow `32257707545` success (head `80a9094`); Pages deploy
+  tüm adımlarda ✓.
+- **Live HTTP receipt:** `https://mustafaras.github.io/s/index.html` ve
+  `/panel.html` HTTP 200; `panel.js?v=20260819a` ve `panel.css?v=20260809c` HTTP
+  200. `panel.html` cache-bust `panel.js?v=20260819a` olarak bumplandı (panel.js
+  bu promptta değişti; panel.css değişmedi).
+- **Cihaz kabulü (S5):** kullanıcı cihazı doğrulaması yapılmadı; `pending`.
 
 ## Notlar / discrepancy
 

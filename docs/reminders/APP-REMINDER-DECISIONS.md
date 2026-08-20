@@ -846,3 +846,24 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Etkiler:** `INT-02` privacy/security gap'i synthetic S2 kanıtıyla kapanır;
   `releaseApproval=not_approved`, S5 device acceptance `pending` kalır.
 - **Sonraki adım:** REM-71 integrated UX, accessibility ve visual acceptance.
+
+### REM-DISC-013 — REM-70 dışı panel cache-bust fixture drift'i
+
+- **Tarih:** 2026-08-20
+- **Durum:** deferred
+- **Soru:** Geniş reminder fixture envanterindeki a11y shell assertion'ı neden
+  REM-70 sırasında green değil?
+- **Kanıt:** `tests/reminders/test_reminder_panel_a11y.js` içindeki
+  `panel shell exposes current asset cache busts and no positive keyboard
+  tabindex` case'i `panel.js?v=20260820b` bekliyor; mevcut ve başlangıçtan beri
+  değişmeyen `panel.html` `panel.js?v=20260820c` yüklüyor. Aynı turdaki
+  `test_reminder_panel_source.js` 319 assertion PASS.
+- **Karar:** REM-70 allowlist'i yalnız integrated fixture/scanner ve docs
+  kayıtlarına izin verdiği için bu panel/test fixture drift'i bu promptta
+  değiştirilmedi. REM-70 evidence'ı geniş inventory'yi yanlışlıkla PASS diye
+  sunmaz; integrated privacy acceptance ayrı ve PASS olarak kalır.
+- **Etkiler:** Runtime privacy/security gate'i veya production asset'i değişmez;
+  panel QA/cache-bust owner'ı sonraki yetkili kapsamda test expectation'ını
+  current asset ile eşitlemelidir.
+- **Sonraki adım:** REM-71/REM-72 panel QA kapsamı açıldığında exact fixture
+  expectation'ı düzelt ve full reminder inventory'yi yeniden çalıştır.

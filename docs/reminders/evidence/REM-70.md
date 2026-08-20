@@ -60,6 +60,18 @@ assertion=<exact assertion>` biçiminde raporlanır.
 | Context | `node docs/reminders/verify-reminder-context.mjs` | **PASS** | 73 prompts / 66 links; approval `not_approved` |
 | Diff | `git diff --check` | **PASS** | whitespace temiz |
 
+## Supplemental regression discrepancy
+
+The broader serial `tests/reminders/test_reminder_*.js` inventory was not
+claimed as green because the pre-existing `tests/reminders/test_reminder_panel_a11y.js`
+case `panel shell exposes current asset cache busts and no positive keyboard
+tabindex` expects `panel.js?v=20260820b`, while the unchanged current
+`panel.html` loads `panel.js?v=20260820c`. The same mismatch is present at the
+REM-70 starting HEAD; the direct `test_reminder_panel_source.js` fixture passes
+(319 assertions). This is outside the REM-70 allowlist, so no panel/test
+fixture or production asset was changed. It is deferred to the panel QA/cache
+fixture owner and is not evidence for REM-70 output-channel acceptance.
+
 ## Evidence seviyeleri ve sınırlar
 
 - **S0/S1 source:** Static scanner production corpus, SW scheduler/network

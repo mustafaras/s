@@ -40,8 +40,8 @@
     "source": "REM-64: PANEL-01 privacy closure. panelCoverageManifest.js now redacts legacy notification body/title/text/message/note/detail fields and prayer completion/note text; the existing metadata-only lifecycle projection remains. panel.js uses quote/apostrophe/control-character-safe HTML escaping, JSON + HTML boundary encoding for inline media handlers, bounded media dimensions, escaped media URI/filename attributes, an allowlisted event summary, and stable error categories for fail()/Quran/ÆON/network alerts. G13-J negative corpus covers therapy, medication, mood, prayer completion, journal, note, private title, schedule, token, GPS, raw profile, media, XSS, attributes, malformed JSON, stale/legacy/error and exported summary paths.",
     "tests": "G13-J test_reminder_panel_privacy.js 121 assertions / 8 cases; PANEL-02 43, PANEL-04 28, PANEL-13 16; existing panel redaction 317, coverage 405, partial-state 123, timeline 467, card 435, status 223; all 65 reminder fixtures, root panel fixtures and Panel-v2 fixtures PASS; node --check panel.js, node --check panelCoverageManifest.js, git diff --check PASS",
     "commit": "d1c9ef8",
-    "remoteEquality": "pending closure delivery; after_each_prompt scope is limited to main/origin/main Pages equality and read-only deployment/live receipts; mustafaras/seyma-data and user-device acceptance remain excluded.",
-    "deployment": "pending closure delivery; panelCoverageManifest.js?v=20260820a and panel.js?v=20260820b are the release cache-busts.",
+    "remoteEquality": "REM-64 delivered: ef9c7ec..39532f0 fast-forward; local HEAD, origin/main and git ls-remote origin refs/heads/main all matched 39532f0d3b95ce3e62b921ce3261f2a9441df20e; mustafaras/seyma-data and other excluded remotes untouched.",
+    "deployment": "REM-64: workflow 32346442715 success (head 39532f0d3b95ce3e62b921ce3261f2a9441df20e), validate/deploy success; live index.html and panel.html HTTP 200; panel.js?v=20260820b and panelCoverageManifest.js?v=20260820a HTTP 200; deployed content contains safePanelErrorTextP/jsArgP/safeEventSummaryP and notification/prayer redaction rules.",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,7 +75,7 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-64 closed: panel privacy/redaction/secret scanner — G13-J negative corpus, notification/prayer redaction, safe HTML/attribute/media/error boundaries and allowlisted timeline summary verified; PANEL-01 privacy complete, REM-65 ready; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery pending",
+  "updatedBy": "REM-64 closed and delivered: panel privacy/redaction/secret scanner — G13-J negative corpus, notification/prayer redaction, safe HTML/attribute/media/error boundaries and allowlisted timeline summary verified; PANEL-01 privacy complete, REM-65 ready; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt main/Pages receipt 39532f0 success",
 
   "closure": {
     "prompt": "REM-64",

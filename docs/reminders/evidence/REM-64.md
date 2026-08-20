@@ -67,3 +67,21 @@ leak bulunmadı; redaction pure, deterministic ve source-state-preserving.
 - **Panel-v2:** değişmedi; regression olarak koşuldu
 - **`mustafaras/seyma-data`:** yazılmadı
 - **S5 user-device acceptance:** `pending`
+
+## Standing `after_each_prompt` teslimat makbuzu
+
+- **Remote equality:** `ef9c7ec..39532f0` fast-forward; local `HEAD`,
+  `origin/main` ve `git ls-remote origin refs/heads/main` üçü de
+  `39532f0d3b95ce3e62b921ce3261f2a9441df20e`.
+- **Workflow:** `32346442715` success, head
+  `39532f0d3b95ce3e62b921ce3261f2a9441df20e`; `validate` ve `deploy` job’ları
+  success. GitHub yalnız Node 20 deprecation annotation verdi, workflow
+  sonucu başarısız değil.
+- **Live HTTP:** `https://mustafaras.github.io/s/index.html` ve
+  `/panel.html` HTTP 200; `panel.js?v=20260820b` ve
+  `panelCoverageManifest.js?v=20260820a` HTTP 200.
+- **Live content:** deployed `panel.html` iki cache-bust sürümünü taşıyor;
+  deployed `panel.js` `safePanelErrorTextP`, `safeEventSummaryP` ve `jsArgP`
+  içeriyor; deployed manifest notification/prayer redaction rules içeriyor.
+- **Excluded:** `mustafaras/seyma-data`, other remotes, tags, force-push,
+  history rewrite ve user-device acceptance yapılmadı.

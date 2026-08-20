@@ -1338,6 +1338,7 @@ var SYNC_STATUS_P={
   network:{cls:'b-warn',label:'Ağ bekleniyor'},
   rate_limited:{cls:'b-warn',label:'Sunucu sınırı; sonra yeniden denenecek'},
   receipt_failed:{cls:'b-danger',label:'Uzak kabul makbuzu alınamadı'},
+  receipt_missing:{cls:'b-warn',label:'Receipt kanıtı eksik'},
   error:{cls:'b-danger',label:'Senkron hatası'},
   missing:{cls:'b-warn',label:'Uzak kabul makbuzu yok'}
 };
@@ -1352,12 +1353,36 @@ function normalizeSyncReceiptP(r){
   out.status=statuses[x.status]?x.status:'idle'; out.snapshotRevision=str(x.snapshotRevision,128); out.sourceUpdatedAt=iso(x.sourceUpdatedAt); out.submittedAt=iso(x.submittedAt); out.acceptedAt=iso(x.acceptedAt); out.sourceLatestSha=str(x.sourceLatestSha,128); out.lastErrorCode=errors[x.lastErrorCode]?x.lastErrorCode:null; out.lastErrorDetail=detail(x.lastErrorDetail);
   return out;
 }
+// REM-68: accepted receipt ancak revision + source SHA + acceptedAt birlikte
+// varsa kabul kanıtıdır. Panel bu kontrolü sync.js ile aynı salt-okunur
+// sözleşmede uygular; eksik synthetic receipt yeşile yükseltilmez.
+function syncReceiptEvidenceP(r){
+  var x=normalizeSyncReceiptP(r), missing=[];
+  ['snapshotRevision','sourceLatestSha','acceptedAt'].forEach(function(key){ if(!x[key]) missing.push(key); });
+  if(x.status==='accepted'&&missing.length) return {ok:false,code:'receipt_missing',reason:'accepted-proof-incomplete',missingProof:missing};
+  if(x.status==='accepted') return {ok:true,code:'accepted',reason:null,missingProof:[]};
+  if(x.status==='offline'||x.lastErrorCode==='offline') return {ok:false,code:'offline',reason:'sync-offline',missingProof:[]};
+  if(x.status==='conflict'||x.lastErrorCode==='conflict') return {ok:false,code:'conflict',reason:'sync-conflict',missingProof:[]};
+  if(x.status==='error'||x.lastErrorCode) return {ok:false,code:'error',reason:'sync-error',missingProof:[]};
+  if(x.status==='queued'||x.status==='saving'||x.status==='retrying'||x.status==='local_saved') return {ok:false,code:'pending',reason:'sync-pending',missingProof:[]};
+  return {ok:false,code:'missing',reason:'sync-not-accepted',missingProof:[]};
+}
 function syncStatusP(receipt){
   var r=normalizeSyncReceiptP(receipt);
   var code=r.lastErrorCode||r.status;
   if(code&&code!=='accepted'&&SYNC_STATUS_P[code]){
     var pending=SYNC_STATUS_P[code];
     return {code:code,cls:pending.cls,label:pending.label};
+  }
+  // Bazı eski headless extraction harness'ları yalnız syncStatusP +
+  // normalizeSyncReceiptP yükler. Ortak helper mevcutsa onu kullan; yoksa
+  // aynı fail-closed üç alan kontrolünü burada koru.
+  var evidence=typeof syncReceiptEvidenceP==='function'?syncReceiptEvidenceP(receipt):{ok:code!=='accepted'||!!(r.snapshotRevision&&r.sourceLatestSha&&r.acceptedAt)};
+  if(code==='accepted'&&!evidence.ok){
+    // Yeni panel yükleme grafiği receipt_missing ayrımını bilir; eski
+    // extraction fixture'larında geriye dönük canonical kod `missing` kalır.
+    var incompleteCode=typeof syncReceiptEvidenceP==='function'?'receipt_missing':'missing', incomplete=SYNC_STATUS_P[incompleteCode];
+    return {code:incompleteCode,cls:incomplete.cls,label:incomplete.label};
   }
   if(!receipt||!r.acceptedAt||!r.sourceLatestSha) return {code:'missing',cls:SYNC_STATUS_P.missing.cls,label:SYNC_STATUS_P.missing.label};
   if(code==='accepted') return {code:code,cls:SYNC_STATUS_P.accepted.cls,label:SYNC_STATUS_P.accepted.label};
@@ -1387,7 +1412,7 @@ function canonicalStatusP(receipt,projectionState){
   var st=syncStatusP(receipt), r=normalizeSyncReceiptP(receipt), reason=projectionState&&projectionState.reason||'';
   if(st.code==='anti_clobber'||st.code==='conflict') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical conflict',detail:'Uzak kabul bekleniyor; veri kaybı riskinde işlem durdu.',revision:r.snapshotRevision||null};
   if(st.code==='error'||st.code==='permission'||st.code==='unauthorized'||st.code==='forbidden'||st.code==='receipt_failed') return {code:st.code,kind:'danger',cls:'b-danger',label:'Canonical hata',detail:'Receipt/revision doğrulanamadı; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):''),revision:r.snapshotRevision||null};
-  if(st.code==='missing') return {code:st.code,kind:'warning',cls:'b-warn',label:'Canonical receipt bekleniyor',detail:'Uzak kabul makbuzu olmadan başarı iddiası yok.',revision:r.snapshotRevision||null};
+  if(st.code==='missing'||st.code==='receipt_missing') return {code:st.code,kind:'warning',cls:'b-warn',label:'Canonical receipt bekleniyor',detail:'Uzak kabul receipt kanıtı tamamlanmadan başarı iddiası yok.',revision:r.snapshotRevision||null};
   if(st.code==='accepted'&&(reason==='projection_stale'||reason==='projection_invalid'||reason==='projection_parse_failed'||reason==='projection_network'||reason==='projection_permission')) return {code:'projection',kind:'warning',cls:'b-warn',label:'Canonical kabul · projection bekliyor',detail:'Receipt kabul edildi; observer görünümü güvenli fallback ile sürüyor.',revision:r.snapshotRevision||null};
   if(st.code==='accepted') return {code:'accepted',kind:'ok',cls:'b-ok',label:'Canonical kabul edildi',detail:'Receipt + revision kanıtı doğrulandı.',revision:r.snapshotRevision||null};
   if(st.code==='queued'||st.code==='saving'||st.code==='retrying'||st.code==='offline'||st.code==='local_saved') return {code:st.code,kind:'pending',cls:'b-warn',label:'Canonical bekliyor',detail:'Yerel kayıt var; uzak kabul henüz oluşmadı.',revision:r.snapshotRevision||null};
@@ -1422,8 +1447,8 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
   var noteClass=errorState?' error-state':staleState?' stale-banner':sectionFetchFailed?' stale-banner':'';
   var noteComponent=errorState?'error-state':staleState?'stale-banner':sectionFetchFailed?'stale-banner':'sync-ribbon-note';
-  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?('Canonical hata; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):'')):staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
-  var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
+  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='receipt_missing'?'Receipt var ancak revision/SHA/zaman kanıtı eksik; başarı iddiası yok.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?('Canonical hata; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):'')):staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
+  var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha&&r.snapshotRevision?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
   var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
   return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
 }
@@ -1613,9 +1638,9 @@ function reminderStatusToneMapP(code){
 // tonunda başarı iddiası taşır. Eksik / hata / bekleme / yasak tonları ayrışır.
 function reminderReceiptStatusP(receipt){
   var st=syncStatusP(receipt);
-  var toneMap={accepted:'accepted',missing:'missing',error:'error',conflict:'error',anti_clobber:'error',receipt_failed:'error',permission:'error',unauthorized:'error',forbidden:'error',not_found:'error',projection_failed:'error',projection_invalid:'error',network:'pending',rate_limited:'pending',offline:'pending',queued:'pending',saving:'pending',retrying:'pending',local_saved:'pending',idle:'missing'};
+  var toneMap={accepted:'accepted',missing:'missing',receipt_missing:'pending',error:'error',conflict:'error',anti_clobber:'error',receipt_failed:'error',permission:'error',unauthorized:'error',forbidden:'error',not_found:'error',projection_failed:'error',projection_invalid:'error',network:'pending',rate_limited:'pending',offline:'pending',queued:'pending',saving:'pending',retrying:'pending',local_saved:'pending',idle:'missing'};
   var tone=reminderStatusToneMapP(toneMap[st.code]||'pending');
-  return {code:st.code,tone:tone.code,kind:tone.kind,cls:tone.cls,label:tone.label,icon:tone.icon,text:st.code==='accepted'?'Uzak kabul receipt + revision kanıtı doğrulandı.':'Uzak kabul receipt bulunamadı; başarı iddiası yok.'};
+  return {code:st.code,tone:tone.code,kind:tone.kind,cls:tone.cls,label:tone.label,icon:tone.icon,text:st.code==='accepted'?'Uzak kabul receipt + revision kanıtı doğrulandı.':st.code==='receipt_missing'?'Uzak kabul receipt var ancak kanıt alanları eksik; başarı iddiası yok.':'Uzak kabul receipt bulunamadı; başarı iddiası yok.'};
 }
 // Capability boyutu: reminder tercih/oluşum/teslim cihaz yereldir (REM-53/REM-56).
 // Panel ancak projection contract'ı (reminderCoverageVersion) mevcutsa yalnız

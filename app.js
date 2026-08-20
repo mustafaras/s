@@ -2858,6 +2858,61 @@ function reminderSystemStatus(input){
     reasons:{overall:state,prayer:prayer.reason||null,sync:sync.reason||null}
   };
 }
+// REM-68 — App -> sync -> projection -> panel zincirinin ayrık durum sözleşmesi.
+// Bu adapter legacy kullanıcı status'unu değiştirmez; her katmanın kanıtını
+// kendi sahibinde tutar. Bir katmanın green/accepted sonucu başka bir katmana
+// otomatik taşınmaz. Dönen nesne yalnız sabit kod, güvenli reason ve evidence
+// owner içerir; reminder body/category/schedule gibi ayrıntılar taşımaz.
+function reminderCrossSurfaceLayer(name,code,owner,reason,evidence){
+  return {name:name,code:code,owner:owner,reason:reason||null,evidence:evidence||'synthetic-boundary'};
+}
+function reminderCrossSurfaceReceiptEvidence(receipt){
+  var x=receipt&&typeof receipt==='object'?receipt:{}, status=String(x.status||'idle'), required=['snapshotRevision','sourceLatestSha','acceptedAt'], missing=[];
+  required.forEach(function(key){ if(typeof x[key]!=='string'||!x[key]) missing.push(key); });
+  if(status==='accepted'&&missing.length) return {ok:false,code:'receipt_missing',reason:'accepted-proof-incomplete',missingProof:missing};
+  if(status==='accepted') return {ok:true,code:'accepted',reason:null,missingProof:[]};
+  if(status==='offline') return {ok:false,code:'offline',reason:'sync-offline',missingProof:[]};
+  if(status==='conflict'||x.lastErrorCode==='conflict') return {ok:false,code:'conflict',reason:'sync-conflict',missingProof:[]};
+  if(status==='error'||x.lastErrorCode) return {ok:false,code:'error',reason:'sync-error',missingProof:[]};
+  if(status==='queued'||status==='saving'||status==='retrying'||status==='local_saved') return {ok:false,code:'pending',reason:'sync-pending',missingProof:[]};
+  return {ok:false,code:'missing',reason:'sync-not-accepted',missingProof:[]};
+}
+function reminderCrossSurfaceCapability(input){
+  var x=input&&typeof input==='object'?input:{}, c=x.capability&&typeof x.capability==='object'?x.capability:{}, permission=String(c.permissionState||x.permissionState||'granted'), prayer=String(c.prayerState||x.prayerState||'fresh'), inApp=c.inApp==='blocked'?'blocked':'available', native='possible';
+  if(permission==='denied'||permission==='unsupported'||permission==='temporary-error'||permission==='pwa-limited'||permission==='revoked') native='blocked';
+  if(prayer==='stale'||prayer==='unavailable'){ inApp='blocked'; return reminderCrossSurfaceLayer('capability','blocked','app-status','prayer-'+prayer,{inApp:inApp,native:native,prayer:'blocked'}); }
+  return reminderCrossSurfaceLayer('capability',inApp==='available'?'available':'blocked','app-status',native==='blocked'?'native-permission-denied':null,{inApp:inApp,native:native,prayer:'available'});
+}
+function reminderCrossSurfaceStatus(input){
+  var x=input&&typeof input==='object'?input:{}, local=x.local&&typeof x.local==='object'?x.local:{}, delivery=x.delivery&&typeof x.delivery==='object'?x.delivery:{}, sync=x.sync&&typeof x.sync==='object'?x.sync:{}, projection=x.projection&&typeof x.projection==='object'?x.projection:{}, panel=x.panel&&typeof x.panel==='object'?x.panel:{}, cap=reminderCrossSurfaceCapability(x), receiptEvidence=reminderCrossSurfaceReceiptEvidence(sync.receipt||x.receipt), configured=sync.configured!==false&&x.configured!==false;
+  var localScheduled=local.scheduled===true||x.localScheduled===true, localLayer=reminderCrossSurfaceLayer('localScheduled',localScheduled?'scheduled':'not_scheduled','local-scheduler',localScheduled?null:'schedule-not-created',{scheduled:localScheduled});
+  var deliveredStatus=String(delivery.status||''), delivered=delivery.delivered===true||deliveredStatus==='delivered'||deliveredStatus==='shown'||deliveredStatus==='opened', deliveryCode=delivered?'delivered':(deliveredStatus==='suppressed'||delivery.suppressed===true?'suppressed':deliveredStatus==='error'?'error':'not_delivered');
+  var deliveredLayer=reminderCrossSurfaceLayer('delivered',deliveryCode,'local-delivery',delivered?null:(deliveryCode==='error'?'delivery-error':'delivery-not-confirmed'),{channel:delivery.channel==='native'?'native':'in_app'});
+  var syncCode=!configured?'not_configured':x.offline===true?'offline':receiptEvidence.code==='accepted'?'accepted':receiptEvidence.code==='receipt_missing'?'unverified':receiptEvidence.code==='conflict'?'conflict':receiptEvidence.code==='error'?'error':receiptEvidence.code==='pending'?'pending':'missing';
+  var syncReason=syncCode==='accepted'?null:syncCode==='offline'?'sync-offline':syncCode==='not_configured'?'sync-not-configured':receiptEvidence.reason;
+  var syncLayer=reminderCrossSurfaceLayer('syncAccepted',syncCode,'sync-receipt',syncReason,{proof:syncCode==='accepted'?'complete':'incomplete'});
+  var projectionReason=String(projection.reason||projection.status||''), projectionCode=projection.built===true||projectionReason==='ready'||projection.status==='built'?'built':projectionReason==='projection_stale'||projection.stale===true?'stale':projectionReason==='projection_invalid'||projectionReason==='projection_parse_failed'||projection.error===true?'error':'missing';
+  var projectionLayer=reminderCrossSurfaceLayer('projectionBuilt',projectionCode,'projection',projectionCode==='built'?null:(projectionCode==='stale'?'projection-stale':projectionCode==='error'?'projection-error':'projection-missing'),{source:projection.source==='projection'?'projection':'fallback'});
+  var panelPoll=String(panel.pollStatus||panel.status||''), panelVisible=panel.visible===true, panelCode=panel.error===true||panelPoll==='error'?'error':panelPoll==='304'||panelPoll==='not_modified'?(panelVisible?'not_modified':'not_visible'):panelVisible?'visible':panel.deferred===true?'deferred':'not_visible';
+  var panelLayer=reminderCrossSurfaceLayer('panelVisible',panelCode,'observer-panel',panelCode==='not_modified'?'panel-304-preserved':panelCode==='visible'?null:panelCode==='error'?'panel-error':'panel-not-visible',{conditional:panelPoll==='304'||panelPoll==='not_modified'});
+  var deviceCode=x.device&&x.device.accepted===true||x.deviceAccepted===true?'accepted':'unverified', deviceLayer=reminderCrossSurfaceLayer('deviceAccepted',deviceCode,'user-device',deviceCode==='accepted'?null:'device-acceptance-unverified',{userEvidence:deviceCode==='accepted'});
+  var layers={capability:cap,localScheduled:localLayer,delivered:deliveredLayer,syncAccepted:syncLayer,projectionBuilt:projectionLayer,panelVisible:panelLayer,deviceAccepted:deviceLayer}, blockers=[];
+  function needs(name,codes){ if(codes.indexOf(layers[name].code)<0) blockers.push({layer:name,code:layers[name].code,reason:layers[name].reason}); }
+  needs('capability',['available']); needs('localScheduled',['scheduled']); needs('delivered',['delivered']); needs('syncAccepted',['accepted']); needs('projectionBuilt',['built']); needs('panelVisible',['visible','not_modified']); needs('deviceAccepted',['accepted']);
+  var claim=blockers.length===0, hasUnverified=blockers.some(function(b){return b.code==='unverified';}), overall=claim?'accepted':hasUnverified?'unverified':'partial';
+  var out={schemaVersion:1,layers:layers,overall:{code:overall,claim:claim,green:claim,blockers:blockers},blockers:blockers,claim:claim};
+  var previous=x.previousStatus||x.previous; if(previous) out.transition=reminderCrossSurfaceTransition(previous,out);
+  return out;
+}
+function reminderCrossSurfaceRank(layer,code){
+  var ranks={capability:{blocked:0,available:2},localScheduled:{not_scheduled:0,scheduled:2},delivered:{not_delivered:0,error:0,suppressed:1,delivered:2},syncAccepted:{missing:0,offline:0,conflict:0,error:0,not_configured:1,pending:1,unverified:1,accepted:2},projectionBuilt:{missing:0,error:0,stale:1,built:2},panelVisible:{not_visible:0,error:0,deferred:1,visible:2,not_modified:2},deviceAccepted:{unverified:0,accepted:2}};
+  return ranks[layer]&&Object.prototype.hasOwnProperty.call(ranks[layer],code)?ranks[layer][code]:0;
+}
+function reminderCrossSurfaceTransition(previous,current){
+  var p=previous&&previous.layers?previous.layers:{}, n=current&&current.layers?current.layers:{}, changes=[], rose=false, fell=false;
+  ['capability','localScheduled','delivered','syncAccepted','projectionBuilt','panelVisible','deviceAccepted'].forEach(function(name){ var from=p[name]&&p[name].code||'missing', to=n[name]&&n[name].code||'missing'; if(from===to) return; var fromRank=reminderCrossSurfaceRank(name,from), toRank=reminderCrossSurfaceRank(name,to), regression=toRank<fromRank; changes.push({layer:name,from:from,to:to,direction:regression?'regression':toRank>fromRank?'advance':'lateral',reason:n[name]&&n[name].reason||'status-changed'}); if(regression) fell=true; else if(toRank>fromRank) rose=true; });
+  return {direction:!changes.length?'unchanged':fell?'regression':rose?'advance':'lateral',nonMonotonic:fell,changes:changes};
+}
 function reminderSystemStatusCopy(kind,state){
   var copy={
     overall:{
@@ -7378,6 +7433,8 @@ App.reminderPrayerStatus=reminderSystemPrayerStatus;
 App.reminderSyncStatus=reminderSystemSyncStatus;
 App.reminderSystemStatus=reminderSystemStatus;
 App.reminderSystemStatusCopy=reminderSystemStatusCopy;
+App.reminderCrossSurfaceStatus=reminderCrossSurfaceStatus;
+App.reminderCrossSurfaceTransition=reminderCrossSurfaceTransition;
 App.reminderZikrFeatureEnabled=reminderZikrFeatureEnabled;
 App.reminderZikrOccurrence=reminderZikrDailyOccurrence;
 App.reminderZikrDailyOccurrence=reminderZikrDailyOccurrence;

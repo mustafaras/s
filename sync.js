@@ -38,6 +38,20 @@ function normalizeSyncReceipt(r){
   out.lastErrorDetail=safeReceiptDetail(x.lastErrorDetail);
   return out;
 }
+// REM-68: `accepted` tek başına başarı kanıtı değildir. Receipt'in kabul
+// iddiası snapshot revision, source SHA ve acceptedAt üçlüsüyle birlikte
+// değerlendirilir; eksik synthetic/bozuk receipt fail-closed kalır.
+function syncReceiptEvidence(r){
+  var x=normalizeSyncReceipt(r), missing=[];
+  ['snapshotRevision','sourceLatestSha','acceptedAt'].forEach(function(key){ if(!x[key]) missing.push(key); });
+  if(x.status==='accepted'&&missing.length) return {ok:false,code:'receipt_missing',reason:'accepted-proof-incomplete',missingProof:missing};
+  if(x.status==='accepted') return {ok:true,code:'accepted',reason:null,missingProof:[]};
+  if(x.status==='offline'||x.lastErrorCode==='offline') return {ok:false,code:'offline',reason:'sync-offline',missingProof:[]};
+  if(x.status==='conflict'||x.lastErrorCode==='conflict') return {ok:false,code:'conflict',reason:'sync-conflict',missingProof:[]};
+  if(x.status==='error'||x.lastErrorCode) return {ok:false,code:'error',reason:'sync-error',missingProof:[]};
+  if(x.status==='queued'||x.status==='saving'||x.status==='retrying'||x.status==='local_saved') return {ok:false,code:'pending',reason:'sync-pending',missingProof:[]};
+  return {ok:false,code:'missing',reason:'sync-not-accepted',missingProof:[]};
+}
 function preserveLocalReminderRoot(data){
   if(!data||typeof data!=='object'||Object.prototype.hasOwnProperty.call(data,'reminders')) return data;
   // app.js deliberately sends a reminder-free projection to schedule(). The
@@ -1144,6 +1158,7 @@ window.SeySync={
   pullQuranUpdates:pullQuranUpdates,
   statusText:statusText,
   normalizeSyncReceipt:normalizeSyncReceipt,
+  reminderReceiptEvidence:syncReceiptEvidence,
   syncErrorCode:errorCode,
   syncErrorDetail:errorDetail,
   // Faz 10 — saf conflict resolution fonksiyonu (headless testlerden çağrılır).

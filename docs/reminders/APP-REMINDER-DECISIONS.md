@@ -812,3 +812,13 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
   REM-63 observer action boundary. Yeni bir remote-safe reminder aggregate
   schema'sı doğarsa önce açık ürün kararı, sonra REM-61 sonrası bir prompt.
 
+### REM-ADR-025 — Cross-surface status katmanları ve receipt proof gate (REM-68)
+
+- **Tarih:** 2026-08-20
+- **Durum:** accepted
+- **Soru:** App, sync receipt, projection, panel ve device acceptance aynı olay için tek bir green/success iddiasına indirgenebilir mi?
+- **Kanıt:** `app.js` `reminderCrossSurfaceStatus` / `reminderCrossSurfaceTransition`; `sync.js` `syncReceiptEvidence`; `panel.js` `syncReceiptEvidenceP` / `syncStatusP`; `tests/reminders/test_reminder_cross_surface_status.js` (84 assertion); `tests/reminders/test_reminder_system_status.js`; `tests/reminders/test_reminder_panel_status.js`; `tests/test_panel_p0_sync.js`.
+- **Karar:** Hayır. Capability, local scheduled, delivered, sync accepted, projection built, panel visible ve device accepted yedi ayrı layer olarak kalır; her layer kendi `owner`, `code`, `reason` ve evidence alanını taşır. `accepted` receipt ancak `snapshotRevision + sourceLatestSha + acceptedAt` birlikte varsa kanıt sayılır. Panel 304 yalnız mevcut görünümü korur; yeni projection/panel success üretmez. Device acceptance explicit kullanıcı kanıtı yoksa `unverified` kalır.
+- **Failure semantics:** Offline, native permission denied, stale prayer, sync conflict, projection missing, panel 304 ve device unverified ayrı branch’lerdir. Geri dönüşler `regression/lateral/advance` yönü ve sabit reason ile raporlanır; bir layer PASS’i diğerine propagate edilmez. App kullanıcı copy’si ve operator panel copy’si raw/private detail paylaşmaz.
+- **Etkiler:** Legacy app system-status kontratı korunur; cross-surface adapter yalnız entegrasyon iddiası için yeni fail-closed kapıdır. `panel-v2` current panel acceptance yerine geçmez; current reminder, root panel ve Panel-v2 command setleri ayrı raporlanır. Release approval değişmez (`not_approved`), S5 device acceptance pending kalır.
+- **Sonraki adım:** REM-69 schema version, migration ve legacy panel compatibility.

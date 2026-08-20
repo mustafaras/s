@@ -39,7 +39,7 @@
   "evidence": {
     "source": "REM-66: current panel fixture ownership is explicit across source, coverage, projection, redaction, transport, event, status, responsive and release surfaces; root observer and Panel-v2 remain separate regression scopes.",
     "tests": "G13-L architecture fixture 454 assertions; current reminder-panel, root observer, legacy Faz11 and Panel-v2 command sets exit 0; static no-network/no-token/no-write/browser-persistence boundary PASS; syntax, headless driver, migration, context and diff PASS.",
-    "commit": "pending",
+    "commit": "c5e10a6",
     "remoteEquality": "pending closure delivery; no external write in fixture verification",
     "deployment": "pending closure delivery; no live claim from local fixture PASS",
     "deviceAcceptance": "pending; not performed by agent"
@@ -80,7 +80,7 @@
   "closure": {
     "prompt": "REM-66",
     "evidence": "docs/reminders/evidence/REM-66.md",
-    "commit": "pending",
+    "commit": "c5e10a6",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

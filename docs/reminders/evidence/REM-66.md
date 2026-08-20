@@ -7,7 +7,7 @@
 - **Tarih:** 2026-08-20
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `3e6fd4b8045cfecfa05a62b0bceadeed679ba5a4`
-- **Kod/test commit:** `pending — closure records below`
+- **Kod/test commit:** `c5e10a6`
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -57,4 +57,3 @@
 - **Sonraki prompt:** REM-67
 - **Live/device evidence:** not produced by this fixture gate; S5 remains pending.
 - **Release:** `not_approved`; no push/deploy is inferred by local fixture PASS.
-

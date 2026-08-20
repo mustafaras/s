@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-64",
+  "activePrompt": "REM-65",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-63",
-  "nextSafeAction": "REM-64 Panel privacy, redaction ve secret scanner; after closure PASS run the standing main/Pages delivery receipt; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-64",
+  "nextSafeAction": "REM-65 Panel responsive, accessibility ve render performance; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R13",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-63: panel observer action boundary. Panel gözlemcidir; reminder preference/occurrence/snooze/mute/delivery/private state için yazma authority'si değildir. Yeni saf helpers panelWriteGuardP/findReminderKeyP/panelTokenValidP + REMINDER_WRITE_TOKENS denylist regex'i (reminder|occurrence|quiethours|catchup|snooze|mute|preference|deliverylog|notificationdelivery|reminderdelivery|reminderdeliveries|reminderhistory) panelCoverageManifest reminder kök/alan sınıflarıyla hizalı ve Quran transport meşru alanlarıyla (deliverySentAt/notifiedAt/readyAt/videoId/requestId/surahId/notes) çakışmaz. Guard üç yazma endpoint'ine bağlandı — putInbox (ÆON inbox yalnız mesaj kanalı), putAeonMediaP (yalnız mime/data/peaks), putTransportFileP (QuranTransportV1 isWritableTransportPath zaten kısıtlı) — reminder-namespace payload'ı fetch'e ulaşmadan 'panel write engellendi: reminder_namespace' ile reddedilir. Fail-closed durumlar ayrı ayrı: demo_mode, no_token (boş/expired/malformed token), malformed_action. Meşru ÆON inbox/media + Quran transport payload'ları guard'dan geçer ve fetch'e PUT üretir (regresyon yok). Read-only yüzeyler (loadTransportFileP/loadInbox/fetchAeonMediaP/loadObserverProjectionP/loadSyncReceiptP) guard çağırmaz ve write verb taşımaz. Reminder card/timeline/status/filter UI'ında write handler yok (G13-I negative: PUT/POST/PATCH/DELETE, localStorage.setItem/removeItem, SeySync.schedule, putInbox, putTransportFileP, putAeonMediaP sentinelleri yok). Panel.js data/latest.json veya data/reminder*'a PUT ile yazamaz; app reminder yazma fonksiyonları panelde yok.",
-    "tests": "new G13-I panel write boundary fixture 369 assertions / 7 scenarios (guard rejects every reminder-namespace payload and accepts legit observer payloads; guard fails closed on demo mode, no token, malformed token and malformed action; putInbox/putAeonMediaP/putTransportFileP reject reminder payload before any fetch; legit observer inbox/media/transport writes still reach fetch PUT; reminder card/timeline/status/filter UI emit no write handler; guard is wired only into the three write endpoints and read surfaces stay clean; panel.js owns no write path to reminder preference or delivery), p0_sync, quran_transport, p6_qa_release; all reminder suite 64, panel root 22, all Panel-v2 27, quran 9, node --check panel.js, git diff --check and context validator PASS",
-    "commit": "e6f7de1",
-    "remoteEquality": "REM-63 delivered at 2af352e; local HEAD, origin/main and git ls-remote refs/heads/main all matched (2af352e); standing main fast-forward PASS (602ff1f..2af352e). This push delivered REM-63 code (e6f7de1) and closure records (2af352e) together.",
-    "deployment": "REM-63: workflow 32270548283 success (head 2af352e); live index.html / panel.html HTTP 200; panel.js?v=20260820a and panel.css?v=20260809c both HTTP 200 after deploy; deployed panel.js?v=20260820a contains panelWriteGuardP (4 occurrences). panel.html cache-bust bumped to panel.js?v=20260820a (panel.js changed in this prompt).",
+    "source": "REM-64: PANEL-01 privacy closure. panelCoverageManifest.js now redacts legacy notification body/title/text/message/note/detail fields and prayer completion/note text; the existing metadata-only lifecycle projection remains. panel.js uses quote/apostrophe/control-character-safe HTML escaping, JSON + HTML boundary encoding for inline media handlers, bounded media dimensions, escaped media URI/filename attributes, an allowlisted event summary, and stable error categories for fail()/Quran/ÆON/network alerts. G13-J negative corpus covers therapy, medication, mood, prayer completion, journal, note, private title, schedule, token, GPS, raw profile, media, XSS, attributes, malformed JSON, stale/legacy/error and exported summary paths.",
+    "tests": "G13-J test_reminder_panel_privacy.js 121 assertions / 8 cases; PANEL-02 43, PANEL-04 28, PANEL-13 16; existing panel redaction 317, coverage 405, partial-state 123, timeline 467, card 435, status 223; all 65 reminder fixtures, root panel fixtures and Panel-v2 fixtures PASS; node --check panel.js, node --check panelCoverageManifest.js, git diff --check PASS",
+    "commit": "d1c9ef8",
+    "remoteEquality": "pending closure delivery; after_each_prompt scope is limited to main/origin/main Pages equality and read-only deployment/live receipts; mustafaras/seyma-data and user-device acceptance remain excluded.",
+    "deployment": "pending closure delivery; panelCoverageManifest.js?v=20260820a and panel.js?v=20260820b are the release cache-busts.",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -74,14 +74,14 @@
     "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-19",
-  "updatedBy": "REM-63 closed: panel observer action boundary — panelWriteGuardP/findReminderKeyP/panelTokenValidP + REMINDER_WRITE_TOKENS denylist regex'i üç yazma endpoint'ine (putInbox/putAeonMediaP/putTransportFileP) bağlandı; reminder-namespace payload'ı fetch'e ulaşmadan reddedilir, fail-closed durumlar (demo/no token/expired token/malformed action) ayrı ayrı, meşru ÆON inbox/media + Quran transport writes regresyonsuz; G13-I fixture 369 assertion ile reminder surface'ın hiçbir write üretmediği ve read-only yüzeylerin temiz kaldığı sabitlendi; panel.js action guard + panel.html cache-bust değişti (panel.css/panelCoverageManifest.js değişmedi); activePrompt advances to REM-64; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery to run after closure PASS",
+  "updatedAt": "2026-08-20",
+  "updatedBy": "REM-64 closed: panel privacy/redaction/secret scanner — G13-J negative corpus, notification/prayer redaction, safe HTML/attribute/media/error boundaries and allowlisted timeline summary verified; PANEL-01 privacy complete, REM-65 ready; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt delivery pending",
 
   "closure": {
-    "prompt": "REM-63",
-    "evidence": "docs/reminders/evidence/REM-63.md",
-    "commit": "e6f7de1",
+    "prompt": "REM-64",
+    "evidence": "docs/reminders/evidence/REM-64.md",
+    "commit": "d1c9ef80296eb2717b2ff3f4a5a50aeaee70cd2f",
     "status": "done",
-    "validatedAt": "2026-08-19"
+    "validatedAt": "2026-08-20"
   }
 }

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-71",
+  "activePrompt": "REM-72",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-70",
-  "nextSafeAction": "REM-71 Integrated UX, accessibility ve visual acceptance; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-71",
+  "nextSafeAction": "REM-72 App + panel release candidate ve user approval packet; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-70: integrated synthetic negative security gate across app/native/SW/sync/projection/panel/error/event/export and write boundaries; browser local-user surface explicitly separated.",
-    "tests": "G14-D integrated 10 surface cases / 78 assertions; app privacy 198; panel privacy 121; Panel P6 16/16; context, syntax and diff PASS.",
-    "commit": "957053d (local source/test; no external delivery)",
-    "remoteEquality": "NOT_PERFORMED for REM-70; no external delivery or remote write",
-    "deployment": "NOT_PERFORMED for REM-70; no Pages/live/device evidence claimed",
+    "source": "REM-71: integrated synthetic UX/a11y/visual gate across app light/dark vs panel responsive light/dark/density, user vs operator copy privacy, focus/keyboard/live-region/reduced-motion/long-text and empty/stale/error/redacted states, app-action to panel-status transition and premium branding preservation.",
+    "tests": "G14-E integrated 9 surface cases / 73 assertions; app render 30; panel a11y 53 (deferred panel.js?v=20260820c cache-bust remediated); Panel P5 24/24; context, syntax and diff PASS.",
+    "commit": "REM-71 closure (local source/test; no external delivery)",
+    "remoteEquality": "NOT_PERFORMED for REM-71; no external delivery or remote write",
+    "deployment": "NOT_PERFORMED for REM-71; no Pages/live/device evidence claimed",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-70 local closure receipt: G14-D / INT-02 integrated privacy and no-write PASS; REM-71 ready; no external write; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-71 local closure receipt: G14-E / INT-02 integrated UX, accessibility ve visual acceptance PASS; REM-72 ready; no external write; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
-    "prompt": "REM-70",
-    "evidence": "docs/reminders/evidence/REM-70.md",
-    "commit": "957053d",
+    "prompt": "REM-71",
+    "evidence": "docs/reminders/evidence/REM-71.md",
+    "commit": "REM-71",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

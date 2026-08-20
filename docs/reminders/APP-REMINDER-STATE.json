@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-68",
+  "activePrompt": "REM-69",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-67",
-  "nextSafeAction": "REM-68 Cross-surface status ve failure semantics; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-68",
+  "nextSafeAction": "REM-69 Schema version, migration ve legacy panel compatibility; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-67: synthetic app action → local state → safe event → sync sanitize/receipt → projection → current panel status/timeline lineage; owners, source, revision, timestamp and privacy mode remain separate.",
-    "tests": "G14-A lineage 5 tests / 118 assertions; architecture 455 assertions with explicit missing-lineage gate; reminder privacy and panel source regression plus all reminder/current panel/root observer/Panel-v2 command sets exit 0; fixed clock, network calls 0, no private projection and no write boundary PASS; syntax, context and diff PASS.",
-    "commit": "0eccde5f042350dcac5d8e151f16114c218311c7",
-    "remoteEquality": "REM-67 closure delivery b289d4298de4ac9d4a404b81d1d1ef264a8924fe: HEAD = origin/main = git ls-remote origin refs/heads/main PASS",
-    "deployment": "workflow 32354282587 success (validate 96380025567, deploy 96380068662); Pages deployment 5999567559/status 17060694514 success; live index.html and panel.html HTTP 200; REM-67 markers present",
+    "source": "REM-68: app/sync/projection/panel cross-surface adapter; seven independent layers, complete receipt proof gate, panel 304 preservation and explicit non-monotonic transition reasons.",
+    "tests": "G14-B cross-surface 8 named cases / 84 assertions; system 65; panel status 223; root P0 31; all reminder/current root observer/Panel-v2 command sets exit 0; fixed synthetic VM, network calls 0, no private copy/write boundary; driver/zikr/B1/B2/B3, syntax, context and diff PASS.",
+    "commit": "17c1d2d0e6f45c1bf57c5f50da93decbd5e19231",
+    "remoteEquality": "pending standing after_each_prompt delivery after local closure gate",
+    "deployment": "pending standing after_each_prompt delivery after local closure gate",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-67 closed and standing delivery receipt recorded: G14-A synthetic app-to-panel lineage and INT-01 ownership/privacy branch gate PASS; REM-68 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-68 closed locally: G14-B / INT-02 cross-surface status and failure semantics PASS; REM-69 ready; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
-    "prompt": "REM-67",
-    "evidence": "docs/reminders/evidence/REM-67.md",
-    "commit": "0eccde5f042350dcac5d8e151f16114c218311c7",
+    "prompt": "REM-68",
+    "evidence": "docs/reminders/evidence/REM-68.md",
+    "commit": "17c1d2d0e6f45c1bf57c5f50da93decbd5e19231",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

@@ -1486,6 +1486,24 @@ function normalizeSyncReceipt(r){
   return out;
 }
 var REMINDER_PREFERENCE_SCHEMA_VERSION=1;
+// REM-69 — the persisted reminder root stays additive, but an unknown future
+// version must remain opaque to this build.  Compatibility is reported outside
+// the root so the report itself never becomes synced user state.
+var REMINDER_SCHEMA_STATUS={missing:1,legacy:1,current:1,future:1,malformed:1};
+var reminderMigrationStatus={code:'missing',supported:true,version:0,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'create_current_default'};
+function reminderSchemaCompatibility(value){
+  if(!value||typeof value!=='object'||Array.isArray(value)) return {code:'missing',supported:true,version:0,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'create_current_default'};
+  if(!Object.prototype.hasOwnProperty.call(value,'schemaVersion')) return {code:'legacy',supported:true,version:0,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'migrate_additively'};
+  var version=value.schemaVersion;
+  if(!Number.isInteger(version)||version<0) return {code:'malformed',supported:true,version:null,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'migrate_safely'};
+  if(version>REMINDER_PREFERENCE_SCHEMA_VERSION) return {code:'future',supported:false,version:version,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'preserve_and_require_update'};
+  if(version<REMINDER_PREFERENCE_SCHEMA_VERSION) return {code:'legacy',supported:true,version:version,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'migrate_additively'};
+  return {code:'current',supported:true,version:version,currentVersion:REMINDER_PREFERENCE_SCHEMA_VERSION,action:'use_current_runtime'};
+}
+function reminderSchemaStatusForData(owner){
+  var root=owner&&typeof owner==='object'?owner.reminders:null, compatibility=reminderSchemaCompatibility(root);
+  return {code:compatibility.code,supported:compatibility.supported,version:compatibility.version,currentVersion:compatibility.currentVersion,action:compatibility.action};
+}
 var REMINDER_CHANNELS={in_app:true,native:true};
 var REMINDER_PRIVACY_MODES={private:true,safe_summary:true};
 var REMINDER_QUIET_BEHAVIORS={suppress:true,defer:true,in_app:true};
@@ -1494,6 +1512,8 @@ var REMINDER_QUIET_BEHAVIORS={suppress:true,defer:true,in_app:true};
 // kapsar; başka bilinmeyen alanlar additive migration ile korunur.
 var REMINDER_RESERVED_JOURNAL_ROOTS={delivery:true,deliveryLog:true,reminderDelivery:true,reminderDeliveries:true,reminderHistory:true,notificationDelivery:true};
 var REMINDER_SYNC_BLOCKED_ROOTS={reminders:true,delivery:true,deliveryLog:true,reminderDelivery:true,reminderDeliveries:true,reminderHistory:true,notificationDelivery:true};
+var REMINDER_SYNC_BLOCKED_KEY=/reminder|occurrence|quiet.?hours|catch.?up|notification.?delivery/i;
+function isReminderSyncBlockedKey(key){ return !!REMINDER_SYNC_BLOCKED_ROOTS[String(key||'')]||REMINDER_SYNC_BLOCKED_KEY.test(String(key||'')); }
 var REMINDER_SNOOZE_OPTIONS={
   '10m':true,'30m':true,'1h':true,'todayOff':true,'thisEvening':true,'tomorrow':true
 };
@@ -1711,6 +1731,10 @@ function reminderLocalChooseList(localList,remoteList,localRoot,remoteRoot,local
 function mergeReminderLocalState(localRoot,remoteRoot,localSavedAt,remoteSavedAt){
   var local=localRoot&&typeof localRoot==='object'&&!Array.isArray(localRoot)?reminderLocalClone(localRoot):null;
   var remote=remoteRoot&&typeof remoteRoot==='object'&&!Array.isArray(remoteRoot)?reminderLocalClone(remoteRoot):null;
+  // A newer/malformed root is opaque. Do not flatten it into the v1 merge
+  // shape; a newer app can still recover the preserved local object later.
+  if(local&&!reminderSchemaCompatibility(local).supported) return local;
+  if(remote&&!reminderSchemaCompatibility(remote).supported) return local||remote;
   if(!local) return remote||emptyReminderState();
   if(!remote) return local;
   var out=local, localMeta=local._localMeta&&typeof local._localMeta==='object'?local._localMeta:{}, remoteMeta=remote._localMeta&&typeof remote._localMeta==='object'?remote._localMeta:{};
@@ -2050,6 +2074,7 @@ function reminderCurrentRoot(){
   if(!data||typeof data!=='object') return null;
   if(!data.reminders||typeof data.reminders!=='object'||Array.isArray(data.reminders)) data.reminders=emptyReminderState();
   migrateReminderState(data);
+  if(reminderMigrationStatus&&!reminderMigrationStatus.supported) return null;
   return data.reminders;
 }
 function reminderEnsurePreference(root,id){
@@ -2266,6 +2291,12 @@ function reminderPolicySelectNativeCandidates(input){
 }
 function migrateReminderState(d){
   if(!d||typeof d!=='object'||Array.isArray(d)) return d;
+  var compatibility=reminderSchemaCompatibility(d.reminders);
+  reminderMigrationStatus={code:compatibility.code,supported:compatibility.supported,version:compatibility.version,currentVersion:compatibility.currentVersion,action:compatibility.action};
+  // Future roots remain byte-for-byte opaque. Runtime callers observe a null
+  // root and therefore fail closed instead of claiming support. Malformed
+  // legacy roots continue through the established safe-default migration.
+  if(!compatibility.supported) return d;
   // Delivery/action/notification history has its own bounded local owner.
   // Preserve unrelated future fields, but never resurrect a journal into the
   // canonical reminder root during an additive migration.
@@ -6170,7 +6201,7 @@ function reminderSyncPayload(source){
   var out;
   if(!source||typeof source!=='object'||Array.isArray(source)) return null;
   try{ out=JSON.parse(JSON.stringify(source)); }catch(e){ return null; }
-  Object.keys(REMINDER_SYNC_BLOCKED_ROOTS).forEach(function(key){ if(Object.prototype.hasOwnProperty.call(out,key)) delete out[key]; });
+  Object.keys(out).forEach(function(key){ if(isReminderSyncBlockedKey(key)) delete out[key]; });
   return out;
 }
 // REM-53 — reminder privacy schema registry.
@@ -7569,6 +7600,11 @@ App.reminderMedicationSafetyCopy=REMINDER_MEDICATION_SAFETY_COPY;
 App.reminderMedicationRetention=function(now){ return reminderDeliveryLoad(now,true); };
 App.reminderStateContract=reminderStateContract;
 App.reminderSyncPayload=reminderSyncPayload;
+App.reminderSchemaStatus=function(){
+  var status=reminderSchemaStatusForData(data);
+  if(reminderMigrationStatus&&!reminderMigrationStatus.supported) status=Object.assign({},reminderMigrationStatus);
+  return status;
+};
 App.reminderMedicationSchedules=function(){
   var root=reminderCurrentRoot();
   try{ return JSON.parse(JSON.stringify(root&&Array.isArray(root.medications)?root.medications:[])); }catch(e){ return []; }

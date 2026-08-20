@@ -622,7 +622,7 @@ function loadObserverProjectionP(){
     var P=window.PanelCoverageV1;
     if(!P||typeof P.parseObserverSnapshot!=='function') return {snapshot:null,sha:x.sha||null,reason:'projection_unavailable'};
     var parsed=P.parseObserverSnapshot(x.raw);
-    return parsed&&parsed.ok?{snapshot:parsed.value,sha:x.sha||null,reason:'ready'}:{snapshot:null,sha:x.sha||null,reason:(parsed&&parsed.code)||'projection_invalid'};
+    return parsed&&parsed.ok?{snapshot:parsed.value,sha:x.sha||null,reason:'ready',compatibility:parsed.compatibility||null}:{snapshot:null,sha:x.sha||null,reason:(parsed&&parsed.code)||'projection_invalid',compatibility:parsed&&parsed.compatibility||null};
   }).catch(function(e){
     var m=String(e&&e.message||e).toLowerCase(), code='projection_network';
     if(m.indexOf('401')>=0||m.indexOf('unauthorized')>=0) code='projection_permission';
@@ -1447,7 +1447,8 @@ function syncRibbonHTMLP(receipt,pollAt,projectionState){
   var staleState=ps.code==='stale'||(projectionState&&projectionState.reason==='projection_stale');
   var noteClass=errorState?' error-state':staleState?' stale-banner':sectionFetchFailed?' stale-banner':'';
   var noteComponent=errorState?'error-state':staleState?'stale-banner':sectionFetchFailed?'stale-banner':'sync-ribbon-note';
-  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='receipt_missing'?'Receipt var ancak revision/SHA/zaman kanıtı eksik; başarı iddiası yok.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?('Canonical hata; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):'')):staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
+  var compatibility=projectionState&&projectionState.compatibility&&typeof projectionState.compatibility==='object'?projectionState.compatibility:{};
+  var note=st.code==='missing'?'Receipt yok; panel uzak sunucunun kabul ettiği son snapshot için başarı iddiası kullanmıyor.':st.code==='receipt_missing'?'Receipt var ancak revision/SHA/zaman kanıtı eksik; başarı iddiası yok.':st.code==='anti_clobber'?'Veri kaybı riskinde push durduruldu.':st.code==='conflict'?'Conflict var; eşleşen revision olmadan uzak kabul başarıya yükseltilmiyor.':errorState?('Canonical hata; önceki güvenli görünüm korunuyor.'+(r.lastErrorDetail?(' Ayrıntı: '+r.lastErrorDetail+'.'):'')):staleState?'Kaynak veya projection eski; görünüm güncelmiş gibi sunulmuyor.':compatibility.code==='schema_unsupported'||compatibility.code==='manifest_unsupported'?'Projection sürümü uyumsuz; panel asset güncellenmeli veya projection yeniden oluşturulmalı. Güvenli legacy fallback kullanılıyor.':compatibility.code==='partial_rebuilt'?'Projection kısmi; eksik alanlar güncel manifest ile yeniden kuruldu, başarı iddiası yok.':projectionState&&projectionState.reason==='projection_invalid'?'Projection bozuk; güvenli legacy fallback kullanılıyor.':sectionFetchFailed?'Bazı modüller geçici olarak yüklenemedi, otomatik yeniden denenecek.':'';
   var proof=st.code==='accepted'&&r.acceptedAt&&r.sourceLatestSha&&r.snapshotRevision?'Receipt kabul · '+syncTimeP(r.acceptedAt)+' · SHA '+String(r.sourceLatestSha).slice(0,12):'Receipt/revision kanıtı bekleniyor';
   var pollBadge=localStatus(ps.label,ps.cls).replace('data-component="status-badge"','id="poll-ribbon-status" data-component="status-badge"');
   return '<section class="sync-ribbon" data-component="sync-ribbon" aria-label="Senkron sağlık özeti" aria-live="polite"><div class="sync-ribbon-head">'+localStatus(st.label,st.cls)+pollBadge+'<span class="sync-ribbon-rev">revision · '+esc(rev)+'</span><span class="sync-ribbon-proof">'+esc(proof)+'</span></div><div class="sync-ribbon-grid">'+cells+'</div><div class="sync-ribbon-note'+noteClass+'" data-component="'+noteComponent+'">'+esc(note)+' <span id="poll-ribbon-note">'+esc(ps.note)+'</span><span class="poll-ribbon-meta">Kaynak revision · '+esc(rev)+' · görünür revision · '+esc(visible)+' · conditional · '+esc(pollState.conditionalMode||'etag')+'</span></div></section>';
@@ -1468,10 +1469,17 @@ function projectionSourceStateP(chosen,projectionLoad){
   var reason=loaded&&typeof loaded.reason==='string'?loaded.reason:'';
   if(!reason||reason==='projection_missing'||reason==='ready') return chosen;
   chosen.reason=reason;
+  if(loaded&&loaded.compatibility) chosen.compatibility=loaded.compatibility;
   return chosen;
 }
 function projectionStatusP(state){
   var s=state&&state.source||'none', reason=state&&state.reason||'projection_missing';
+  var compatibility=state&&state.compatibility&&typeof state.compatibility==='object'?state.compatibility:{};
+  if(compatibility.code==='schema_unsupported') return {cls:'b-danger',label:'Projection sürümü uyumsuz',note:'Bu panel projection şemasını tanımıyor; paneli güncelle veya projectionı yeniden oluştur. Güvenli legacy fallback kullanılıyor.'};
+  if(compatibility.code==='manifest_unsupported') return {cls:'b-danger',label:'Projection manifesti uyumsuz',note:'Projection manifesti bu panelden farklı; güncel asset ile yeniden üretilecek. Güvenli legacy fallback kullanılıyor.'};
+  if(compatibility.code==='malformed') return {cls:'b-danger',label:'Projection şeması bozuk',note:'Projection metadata alanı okunamadı; güvenli legacy fallback kullanılıyor.'};
+  if(compatibility.code==='legacy') return {cls:'b-warn',label:'Eski projection',note:'Eski projection sürümü başarı sayılmadı; güncel latest.json redaction fallback kullanılıyor.'};
+  if(s==='projection'&&compatibility.code==='partial_rebuilt') return {cls:'b-warn',label:'Projection kısmi',note:'Eksik alanlar güncel manifest ile yeniden kuruldu; tüm projection kanıtı hazır sayılmıyor.'};
   if(s==='projection') return {cls:'b-ok',label:'Projection hazır',note:'Panel güvenli observer read-modelini kullanıyor.'};
   if(reason==='projection_stale') return {cls:'b-warn',label:'Projection eski',note:'Revision/SHA eşleşmedi; güvenli legacy fallback kullanılıyor.'};
   if(reason==='projection_invalid'||reason==='projection_parse_failed') return {cls:'b-danger',label:'Projection bozuk',note:'Projection okunamadı; panel güvenli legacy fallback ile açık kaldı.'};
@@ -1601,7 +1609,10 @@ function applySectionFailureP(currentSections,error){
 function reminderSystemStatusP(projectionState,sectionFetchState){
   var p=projectionState&&typeof projectionState==='object'?projectionState:null;
   var reason=p&&typeof p.reason==='string'?p.reason:'';
+  var compatibility=p&&p.compatibility&&typeof p.compatibility==='object'?p.compatibility:{};
   var fetchFailed=!!(sectionFetchState&&typeof sectionFetchState==='object'&&sectionFetchState.ok===false);
+  if(['schema_unsupported','manifest_unsupported','malformed','legacy'].indexOf(compatibility.code)>=0) return {code:'error',kind:'error',text:'Projection sürümü/manifesti uyumsuz · güncel asset veya yeniden oluşturma gerekiyor; güvenli fallback korunuyor.'};
+  if(compatibility.code==='partial_rebuilt') return {code:'stale',kind:'warning',text:'Projection kısmi · eksik alanlar güncel manifest ile yeniden kuruldu; başarı iddiası yok.'};
   if(reason==='projection_invalid'||reason==='projection_parse_failed') return {code:'error',kind:'error',text:'Projeksiyon bozuk · önceki güvenli görünüm korunuyor.'};
   if(reason==='projection_stale') return {code:'stale',kind:'warning',text:'Kaynak veya projeksiyon eski · görünüm güncelmiş gibi sunulmuyor.'};
   if(fetchFailed||reason==='projection_load_failed') return {code:'unavailable',kind:'error',text:'Projeksiyon çekilemedi · önceki güvenli görünüm korunuyor.'};

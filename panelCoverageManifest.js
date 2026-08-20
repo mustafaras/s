@@ -633,12 +633,30 @@ function buildObserverSnapshot(data,receipt,projectionBuiltAt){
     data:safe
   };
 }
+// REM-69 — schema/manifest compatibility is explicit metadata, not a green
+// projection result. Missing v1-only fields remain readable for older
+// snapshots, while an actual future schema or manifest is routed to the safe
+// latest.json fallback with a concrete recovery action.
+function projectionCompatibility(value){
+  if(!isObject(value)) return {code:'malformed',action:'use_legacy_fallback',supported:false,detail:'projection_not_object'};
+  if(!own(value,'schemaVersion')) return {code:'legacy',action:'use_legacy_fallback',supported:false,detail:'schema_version_missing',received:null,expected:1};
+  if(!Number.isInteger(value.schemaVersion)||value.schemaVersion<0) return {code:'malformed',action:'use_legacy_fallback',supported:false,detail:'schema_version_malformed',received:null,expected:1};
+  if(value.schemaVersion===0) return {code:'legacy',action:'use_legacy_fallback',supported:false,detail:'schema_version_legacy',received:0,expected:1};
+  if(value.schemaVersion!==1) return {code:'schema_unsupported',action:'update_panel_or_rebuild_projection',supported:false,detail:'schema_version_mismatch',received:value.schemaVersion,expected:1};
+  if(own(value,'manifestVersion')&&value.manifestVersion!==MANIFEST.manifestVersion) return {code:'manifest_unsupported',action:'update_panel_or_rebuild_projection',supported:false,detail:'manifest_version_mismatch',received:safeText(value.manifestVersion,80),expected:MANIFEST.manifestVersion};
+  if(own(value,'reminderCoverageVersion')&&value.reminderCoverageVersion!==MANIFEST.reminderCoverage.contractVersion) return {code:'manifest_unsupported',action:'update_panel_or_rebuild_projection',supported:false,detail:'reminder_coverage_version_mismatch',received:safeText(value.reminderCoverageVersion,80),expected:MANIFEST.reminderCoverage.contractVersion};
+  var missing=[];
+  ['manifestVersion','reminderCoverageVersion','coverage','sections'].forEach(function(key){ if(!own(value,key)) missing.push(key); });
+  return {code:missing.length?'partial_rebuilt':'current',action:missing.length?'rebuild_with_current_manifest':'use_current_projection',supported:true,detail:missing.length?'optional_fields_missing':'schema_and_manifest_match',missingFields:missing,expected:1};
+}
 function parseObserverSnapshot(raw){
   var value=raw;
   try{ if(typeof raw==='string') value=JSON.parse(raw); }catch(e){ return {ok:false,code:'projection_parse_failed',value:null}; }
-  if(!isObject(value)||value.schemaVersion!==1||!isObject(value.data)) return {ok:false,code:'projection_invalid',value:null};
-  if(!safeHash(value.snapshotRevision)||!safeHash(value.sourceLatestSha)||!safeIso(value.projectionBuiltAt)) return {ok:false,code:'projection_invalid',value:null};
-  return {ok:true,code:null,value:value};
+  var compatibility=projectionCompatibility(value);
+  if(!compatibility.supported) return {ok:false,code:'projection_invalid',compatibility:compatibility,value:null};
+  if(!isObject(value.data)) return {ok:false,code:'projection_invalid',compatibility:{code:'malformed',action:'use_legacy_fallback',supported:false,detail:'data_missing_or_malformed'},value:null};
+  if(!safeHash(value.snapshotRevision)||!safeHash(value.sourceLatestSha)||!safeIso(value.projectionBuiltAt)) return {ok:false,code:'projection_invalid',compatibility:{code:'malformed',action:'use_legacy_fallback',supported:false,detail:'proof_metadata_malformed'},value:null};
+  return {ok:true,code:null,compatibility:compatibility,value:value};
 }
 // ── REM-57 untrusted projection adoption ───────────────────────────────────
 // `data/observer-snapshot.json` lives in the data repo and may have been
@@ -742,16 +760,16 @@ function sanitizeAdoptedSnapshot(remote,data,sections,coverage,report){
 }
 function chooseProjection(projection,latest,receipt){
   var parsed=parseObserverSnapshot(projection), r=safeReceipt(receipt), legacy=redactForObserver(latest);
-  if(!parsed.ok) return {source:'legacy_fallback',reason:projection?'projection_invalid': 'projection_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
+  if(!parsed.ok) return {source:'legacy_fallback',reason:projection?'projection_invalid': 'projection_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest),compatibility:parsed.compatibility||{code:projection?'malformed':'missing',action:projection?'use_legacy_fallback':'rebuild_projection',supported:false}};
   if(!r.acceptedAt||!r.sourceLatestSha) return {source:'legacy_fallback',reason:'receipt_missing',snapshot:null,data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest)};
   if(parsed.value.sourceLatestSha!==r.sourceLatestSha||parsed.value.snapshotRevision!==r.snapshotRevision){
     var staleReport=newAdoptionReport();
-    return {source:'legacy_fallback',reason:'projection_stale',snapshot:sanitizeAdoptedSnapshot(parsed.value,undefined,undefined,undefined,staleReport),data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest),adoption:staleReport};
+    return {source:'legacy_fallback',reason:'projection_stale',snapshot:sanitizeAdoptedSnapshot(parsed.value,undefined,undefined,undefined,staleReport),data:legacy,coverage:coverageForData(latest),sections:sectionSnapshot(legacy,r,latest),adoption:staleReport,compatibility:parsed.compatibility};
   }
   var parsedData=redactForObserver(parsed.value.data), adopted=adoptSections(sectionSnapshot(parsedData,r,parsedData),parsed.value.sections);
   var parsedCoverage=adoptCoverage(parsed.value.coverage,parsed.value.data);
   var safeSnapshot=sanitizeAdoptedSnapshot(parsed.value,parsedData,adopted.sections,parsedCoverage,adopted.report);
-  return {source:'projection',reason:'ready',snapshot:safeSnapshot,data:parsedData,coverage:parsedCoverage,sections:adopted.sections,adoption:adopted.report};
+  return {source:'projection',reason:'ready',snapshot:safeSnapshot,data:parsedData,coverage:parsedCoverage,sections:adopted.sections,adoption:adopted.report,compatibility:parsed.compatibility};
 }
 
 root.PanelCoverageV1={
@@ -764,6 +782,7 @@ root.PanelCoverageV1={
   REMINDER_COVERAGE:MANIFEST.reminderCoverage,
   redactForObserver:redactForObserver,
   buildObserverSnapshot:buildObserverSnapshot,
+  projectionCompatibility:projectionCompatibility,
   parseObserverSnapshot:parseObserverSnapshot,
   chooseProjection:chooseProjection,
   normalizeEvent:normalizeEvent,

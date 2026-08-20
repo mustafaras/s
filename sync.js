@@ -659,6 +659,11 @@ var LOCAL_ONLY_SYNC_KEYS={
   notificationDelivery:true
 };
 function isLocalOnlySyncKey(key){ return !!LOCAL_ONLY_SYNC_KEYS[String(key||'')]; }
+// Future reminder roots are not safe merely because this build has not named
+// them yet. Keep the sync boundary fail-closed for reminder-like top-level
+// keys; ordinary unknown application fields remain additive and preserved.
+var UNKNOWN_REMINDER_SYNC_KEY=/reminder|occurrence|quiet.?hours|catch.?up|notification.?delivery/i;
+function isReminderSyncKey(key){ return isLocalOnlySyncKey(key)||UNKNOWN_REMINDER_SYNC_KEY.test(String(key||'')); }
 // Zikirmatik v2: sayaçlar monotoniktir. İki cihazın aynı yolculuğunu
 // birleştirirken daha yüksek sayım/tur/hatim korunur; hatim kimlikleri union
 // edilir. Böylece bayat bir cihaz aktif adı veya lifetime sayısını geriye
@@ -878,7 +883,7 @@ function mergeData(localData, remoteData){
 function sanitize(data){
   var c; try{ c=JSON.parse(JSON.stringify(data)); }catch(e){ c=data; }
   if(c&&c.settings){ delete c.settings.ghToken; delete c.settings.syncUrl; delete c.settings.openaiKey; delete c.settings.auth; }
-  if(c&&typeof c==='object') Object.keys(LOCAL_ONLY_SYNC_KEYS).forEach(function(k){ delete c[k]; });
+  if(c&&typeof c==='object') Object.keys(c).forEach(function(k){ if(isReminderSyncKey(k)) delete c[k]; });
   if(c&&typeof c==='object') c.syncReceipt=normalizeSyncReceipt(c.syncReceipt);
   if(c&&c.eventLog&&typeof c.eventLog==='object') c.eventLog=mergeEventLog(c.eventLog,{});
   if(c&&c.weather&&Array.isArray(c.weather.spots)){ c.weather.spots.forEach(function(sp){ if(sp&&typeof sp==="object") delete sp.emoji; }); }

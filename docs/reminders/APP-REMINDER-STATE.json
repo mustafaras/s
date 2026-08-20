@@ -40,8 +40,8 @@
     "source": "REM-67: synthetic app action → local state → safe event → sync sanitize/receipt → projection → current panel status/timeline lineage; owners, source, revision, timestamp and privacy mode remain separate.",
     "tests": "G14-A lineage 5 tests / 118 assertions; architecture 455 assertions with explicit missing-lineage gate; reminder privacy and panel source regression plus all reminder/current panel/root observer/Panel-v2 command sets exit 0; fixed clock, network calls 0, no private projection and no write boundary PASS; syntax, context and diff PASS.",
     "commit": "0eccde5f042350dcac5d8e151f16114c218311c7",
-    "remoteEquality": "pending closure delivery; no external write in fixture verification",
-    "deployment": "pending closure delivery; no live claim from local fixture PASS",
+    "remoteEquality": "REM-67 closure delivery b289d4298de4ac9d4a404b81d1d1ef264a8924fe: HEAD = origin/main = git ls-remote origin refs/heads/main PASS",
+    "deployment": "workflow 32354282587 success (validate 96380025567, deploy 96380068662); Pages deployment 5999567559/status 17060694514 success; live index.html and panel.html HTTP 200; REM-67 markers present",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,7 +75,7 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-67 closed locally: G14-A synthetic app-to-panel lineage and INT-01 ownership/privacy branch gate PASS; REM-68 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-67 closed and standing delivery receipt recorded: G14-A synthetic app-to-panel lineage and INT-01 ownership/privacy branch gate PASS; REM-68 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
     "prompt": "REM-67",

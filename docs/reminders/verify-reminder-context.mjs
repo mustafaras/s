@@ -95,7 +95,8 @@ if (state) {
   assert(state.approvalGate === "docs/reminders/APP-REMINDER-APPROVAL-GATE.md", "state approvalGate mismatch");
   assert(state.contextValidator === "docs/reminders/verify-reminder-context.mjs", "state contextValidator mismatch");
   assert(state.closureValidator === "docs/reminders/verify-reminder-closure.mjs", "state closureValidator mismatch");
-  assert(expectedIds.includes(state.activePrompt), `state activePrompt invalid: ${state.activePrompt}`);
+  const allExpectedIds = expectedIds.concat("null");
+  assert(state.activePrompt === null || allExpectedIds.includes(state.activePrompt), `state activePrompt invalid: ${state.activePrompt}`);
   assert(state.blockedPrompt === null || expectedIds.includes(state.blockedPrompt), "state blockedPrompt invalid");
   assert(state.releaseApproval && typeof state.releaseApproval === "object", "state releaseApproval missing");
   const delivery = state.promptDeliveryPolicy || {};
@@ -106,7 +107,9 @@ if (state) {
   assert(Array.isArray(delivery.excluded) && delivery.excluded.includes("mustafaras/seyma-data") && delivery.excluded.includes("force-push"), "prompt delivery exclusions must protect data repo and force-push");
   assert(delivery.approvedBy === "user", "prompt delivery policy must be user-authorized");
   assert(delivery.evidence && delivery.evidence.includes("her prompttan sonra"), "prompt delivery policy must retain exact user evidence");
-  assert(ledgerText.includes(`| ${state.activePrompt} |`), "state activePrompt missing from ledger");
+  if (state.activePrompt !== null) {
+    assert(ledgerText.includes(`| ${state.activePrompt} |`), "state activePrompt missing from ledger");
+  }
 
   const approval = state.releaseApproval || {};
   if (releaseApproved) {

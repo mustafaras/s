@@ -6,21 +6,56 @@ const vm = require("node:vm");
 const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helper");
 
 function fixtureElement(id) {
-  return {
-    id: id || "", _html: "", _text: "", style: { cssText: "", setProperty() {} },
-    classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
-    dataset: {}, children: [], scrollTop: 0, offsetWidth: 0, value: "", files: [], parentNode: null,
-    get innerHTML() { return this._html; }, set innerHTML(value) { this._html = String(value); },
-    get textContent() { return this._text; }, set textContent(value) { this._text = String(value); },
-    setAttribute() {}, getAttribute() { return null; },
-    appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
-    removeChild() {}, remove() {}, replaceWith() {}, insertBefore(child) { return child; },
-    addEventListener() {}, removeEventListener() {}, click() {}, focus() {}, blur() {},
-    querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
-    replaceChildren() {}, contains() { return false; },
-    getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0 }; }
-  };
-}
+    const el = {
+      id: id || "", _html: "", _text: "", style: { cssText: "", setProperty() {} },
+      classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+      dataset: {}, children: [], scrollTop: 0, offsetWidth: 0, value: "", files: [], parentNode: null,
+      get innerHTML() { return this._html; }, set innerHTML(value) { this._html = String(value); },
+      get textContent() { return this._text; }, set textContent(value) { this._text = String(value); },
+      setAttribute() {}, getAttribute(name) { return name === "id" ? this.id || null : null; },
+      appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
+      removeChild() {}, remove() {},
+      replaceWith(newNode) { if (this.parentNode && typeof this.parentNode.replaceChild === "function") this.parentNode.replaceChild(newNode, this); },
+      insertBefore(child) { return child; },
+      addEventListener() {}, removeEventListener() {}, click() {}, focus() {}, blur() {},
+      querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
+      replaceChildren() {}, contains() { return false; },
+      getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0 }; },
+      get firstElementChild() { return this.children[0] || null; },
+      get firstChild() { return this.children[0] || null; }
+    };
+    el.replaceChild = function replaceChild(newNode, oldNode) {
+      const html = typeof newNode === "string" ? newNode : (newNode && newNode._html !== undefined ? newNode._html : String(newNode || ""));
+      if (!this._html) return;
+      const idx = this._html.indexOf('id="' + oldNode.id + '"');
+      if (idx < 0) return;
+      const afterOpen = this._html.indexOf(">", idx);
+      if (afterOpen < 0) return;
+      const openEnd = afterOpen + 1;
+      const openTagMatch = this._html.slice(idx - 50, idx + 50).match(/<([a-zA-Z0-9-]+)[\s>]/);
+      const tagName = openTagMatch ? openTagMatch[1] : null;
+      if (!tagName) {
+        this._html = this._html.slice(0, idx) + html + this._html.slice(openEnd);
+        return;
+      }
+      let depth = 1, pos = openEnd, limit = this._html.length;
+      while (depth > 0 && pos < limit) {
+        const nextOpen = this._html.indexOf("<" + tagName, pos);
+        const nextClose = this._html.indexOf("</" + tagName + ">", pos);
+        if (nextClose < 0) break;
+        if (nextOpen >= 0 && nextOpen < nextClose) { depth += 1; pos = nextOpen + tagName.length + 1; }
+        else { depth -= 1; pos = nextClose + tagName.length + 3; }
+      }
+      this._html = this._html.slice(0, idx) + html + this._html.slice(pos);
+      if (newNode && typeof newNode === "object") {
+        newNode.parentNode = this;
+        const childIdx = this.children.findIndex(c => c === oldNode);
+        if (childIdx >= 0) this.children[childIdx] = newNode;
+        else this.children.push(newNode);
+      }
+    };
+    return el;
+  }
 
 function baseState(overrides) {
   return Object.assign({
@@ -59,7 +94,20 @@ function boot(seed, options) {
   const counters = { fetches: 0, schedules: 0, permissionRequests: 0 };
   const app = fixtureElement("app");
   const root = fixtureElement("root");
+  // REM-72: targeted update calls document.getElementById on nested id attributes
+  // inside the rendered innerHTML. The original fixture only exposed app/root.
+  // We now lazily return a proxy element that can answer getAttribute('id') and
+  // whose replaceChild mutates the parent innerHTML string.
   const elements = { app, root };
+  function liveById(id) {
+    if (!app._html || !id) return null;
+    const needle = 'id="' + id + '"';
+    const idx = app._html.indexOf(needle);
+    if (idx < 0) return null;
+    const el = fixtureElement(id);
+    el.parentNode = app;
+    return el;
+  }
   const store = { "seyma-reset-v1": JSON.stringify(seed) };
   const localStorage = {
     getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; },
@@ -70,7 +118,7 @@ function boot(seed, options) {
   };
   const document = {
     hidden: false, body: fixtureElement("body"), documentElement: root, activeElement: null,
-    getElementById(id) { return elements[id] || null; }, querySelector() { return null; }, querySelectorAll() { return []; },
+    getElementById(id) { return elements[id] || liveById(id); }, querySelector() { return null; }, querySelectorAll() { return []; },
     createElement() { return fixtureElement(""); }, createDocumentFragment() { return fixtureElement(""); },
     addEventListener() {}, removeEventListener() {}
   };

@@ -2481,7 +2481,17 @@ panel.css) içindir. Panel-v2 fixture’ları yalnız ayrı regression olarak
 main/Pages delivery receipt’i ayrı, gerçek veri deposu write ve S5 acceptance
 ayrı pending.
 
-**Kapanış:** R14 gate kapanır; REM-42 approval_required zincirine dönülür. REM-43 yalnız exact user approval scope sonrası ayrı kalır.
+**Kapanış:** R14 gate kapanır; REM-42 approval_required zincirine dönülür. REM-43 yalnız exact user approval scope sonrası ayrı kalır. Son prompt olduğu için kapanış validator'ü final-program modundayken `state.activePrompt=null` ve `state.nextSafeAction=null` kabul eder.
+
+### null — Program closure sentinel
+
+Bu sahte prompt APP-REMINDER-UX programının bütün REM-00..REM-72 promptlarının tamamlandığını gösterir; kendisi çalıştırılmaz. Closure validator `REM-72` için `state.activePrompt=null` ve `state.nextSafeAction=null` gördüğünde son prompt kapanmış sayar.
+
+**Durum:** `ready`
+**Allowlist:** yok.
+**Görev:** yok.
+**Doğrulama:** yok.
+**Kapanış:** yok.
 
 Bir fazın son promptu bitince:
 

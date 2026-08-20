@@ -4215,7 +4215,7 @@ function reminderLifecycleDraftActive(){
 }
 function reminderLifecycleOverlayOpen(){
   if(typeof ui==='undefined'||!ui) return false;
-  var keys=['readingOpen','watchOpen','listeningOpen','learningOpen','soulArchiveOpen','soulPracticePicker','soulActivityOpen','faithOpen','zikrOpen','qiblaOpen','saygiPersonOpen','quranJourneyOpen','roomOpen','crisisKind','dayDetail','emergency','resetStep','weatherOpen','locNudgeOpen'];
+  var keys=['readingOpen','watchOpen','listeningOpen','learningOpen','soulArchiveOpen','soulPracticePicker','soulActivityOpen','faithOpen','zikrOpen','qiblaOpen','saygiPersonOpen','quranJourneyOpen','roomOpen','crisisKind','dayDetail','emergency','resetStep','weatherOpen','locNudgeOpen','reminderCenterOpen'];
   for(var i=0;i<keys.length;i++) if(ui[keys[i]]) return true;
   return false;
 }
@@ -4253,6 +4253,11 @@ function reminderLifecycleTargetedUpdate(target,result,draftActive){
     // A draft or focused field makes the live region the only safe repaint.
     // The capability block has no input and may be replaced otherwise.
     if(!draftActive) changed=reminderLifecycleReplaceTarget('sey-reminder-system-status',reminderSystemStatusHTML())||changed;
+    // Digest ve sentetik test önizlemesi sadece ilgili alt bölgeleri yeniden çizer;
+    // böylece buton tıklamaları tüm merkez yerine yalnız bu kartı günceller.
+    changed=reminderLifecycleReplaceTarget('sey-reminder-digest-target',
+      reminderDigestLauncherHTML()+(ui.reminderDigestOpen?reminderDigestHTML():''))||changed;
+    changed=reminderLifecycleReplaceTarget('sey-reminder-test-preview-target',reminderTestPreviewHTML())||changed;
     return reminderLifecycleUpdateLive('sey-reminder-center-live-region',result)||changed;
   }
   if(target==='reminder-inbox'){
@@ -4273,6 +4278,7 @@ function reminderLifecycleRenderPolicy(result,context,sourceName,options){
   if(!changed) return Object.assign(base,{mode:'no-op',reason:'candidate-unchanged',policy:'candidate-unchanged',target:'',tabActive:false});
   if(!tabActive) return Object.assign(base,{reason:'tab-inactive',policy:'tab-inactive',target:''});
   if(overlayOpen&&!ui.reminderCenterOpen) return Object.assign(base,{reason:'overlay-open',policy:'overlay-open',target:''});
+  if(x.overlayOpenSkip) overlayOpen=false;
   if(draftActive) return Object.assign(base,{mode:'targeted',reason:'draft-active',policy:'draft-active',target:target==='reminder-center'?'reminder-center-live':'reminder-inbox-live'});
   if(x.requiresFullRender===true) return Object.assign(base,{mode:'full',reason:'action-accepted',policy:'action-accepted'});
   if(target) return Object.assign(base,{mode:'targeted',reason:actionAccepted?'action-accepted-targeted':'targeted-update',policy:actionAccepted?'action-accepted-targeted':'targeted-update'});
@@ -4311,7 +4317,10 @@ function reminderLifecycleRenderIfNeeded(result,signature,context,sourceName,opt
 }
 function reminderRenderAction(reason,options){
   var x=options&&typeof options==='object'?options:{}, context={visibilityState:reminderLifecycleVisibility(x.visibilityState||'visible'),nowIso:x.nowIso||new Date().toISOString()}, result=Object.assign({changed:true,actionAccepted:true,shownCount:0,scheduledCount:0,suppressedCount:0},x.result||{});
-  return reminderLifecycleRenderIfNeeded(result,reminderLifecycleState.candidateSignature,context,'action',{actionAccepted:true,requiresFullRender:x.requiresFullRender===true,target:x.target||'',force:true});
+  // Tam overlay açıkken bile action'ın sonucunu gösterebilmek için
+  // reminder merkezi hedefleri overlayOpen kontrolünü atlar.
+  var target=String(x.target||''), overlayOpenSkip=target==='reminder-center'||target==='reminder-center-live';
+  return reminderLifecycleRenderIfNeeded(result,reminderLifecycleState.candidateSignature,context,'action',{actionAccepted:true,requiresFullRender:x.requiresFullRender===true,target:target,force:true,overlayOpenSkip:overlayOpenSkip});
 }
 function reminderLifecycleEvaluate(source,input){
   if(source&&typeof source==='object'&&input===undefined){ input=source; source=input.source||'manual'; }
@@ -7324,9 +7333,8 @@ function reminderCenterOverlayHTML(){
   });
   h+='</section>';
   h+='<section class="sey-reminder-actions" aria-label="Hatırlatma eylemleri"><button type="button" class="sey-reminder-primary" onclick="App.testReminder()">'+icon('play',16)+'<span>Sentetik test reminder · Uygulama içi önizleme/test</span></button><button type="button" class="sey-reminder-mute'+(muted?' is-muted':'')+'" onclick="App.muteReminderToday()" aria-pressed="'+muted+'">'+icon('bell-off',16)+'<span>'+(muted?esc(reminderCopy('inApp.mute.todayRestore','Bugün susturuldu · geri getir')):esc(reminderCopy('inApp.mute.todayAll','Bugün tümünü sustur')))+'</span></button></section>';
-  h+=reminderDigestLauncherHTML();
-  if(ui.reminderDigestOpen) h+=reminderDigestHTML();
-  h+=reminderTestPreviewHTML();
+  h+='<div id="sey-reminder-digest-target">'+reminderDigestLauncherHTML()+(ui.reminderDigestOpen?reminderDigestHTML():'')+'</div>';
+  h+='<div id="sey-reminder-test-preview-target">'+reminderTestPreviewHTML()+'</div>';
   h+=reminderCenterPolicyHTML(root);
   h+=reminderPersonalizationHTML(root);
   h+='<p class="sey-reminder-live-note" role="status" aria-live="polite" aria-atomic="true" id="sey-reminder-center-live-region" data-reminder-render-target="reminder-center-live">'+icon('info',14)+' '+esc(reminderCopy('inApp.center.liveNote','Native seçimi izin, mahrem kopya ve desteklenen PWA koşullarıyla sınırlıdır; izin kapalıysa uygulama içi kartlar korunur.'))+'</p>';
@@ -7402,18 +7410,21 @@ App.onReminderKeydown=function(e){
 };
 App.openReminderDigest=function(){
   if(!ui.reminderCenterOpen) return {ok:false,reason:'center-closed'};
-  ui.reminderDigestOpen=true; ui.reminderDigestState='open'; ui.reminderDigestReflection=''; render();
+  ui.reminderDigestOpen=true; ui.reminderDigestState='open'; ui.reminderDigestReflection='';
+  render();
   return {ok:true,localOnly:true,userInitiated:true,notificationCreated:false,persisted:false};
 };
 App.selectReminderDigestReflection=function(id){
   if(!ui.reminderDigestOpen) return {ok:false,reason:'digest-closed'};
   var option=reminderDigestReflectionOption(id); if(!option) return {ok:false,reason:'unknown-reflection'};
-  ui.reminderDigestState='open'; ui.reminderDigestReflection=option.id; render();
+  ui.reminderDigestState='open'; ui.reminderDigestReflection=option.id;
+  render();
   return {ok:true,id:option.id,localOnly:true,persisted:false,notificationCreated:false};
 };
 App.dismissReminderDigest=function(){
   if(!ui.reminderDigestOpen) return {ok:true,noOp:true,changed:false,persisted:false,notificationCreated:false};
-  ui.reminderDigestState='no-op'; ui.reminderDigestReflection=''; render();
+  ui.reminderDigestState='no-op'; ui.reminderDigestReflection='';
+  render();
   return {ok:true,noOp:true,changed:true,persisted:false,notificationCreated:false};
 };
 // REM-52: the notification channel boundary as an inspectable surface. It
@@ -7810,6 +7821,10 @@ App.testReminder=function(id){
   if(!target&&defs.length) target=String(defs[0].id||'');
   var result={state:reminderPermissionSnapshot(),copy:{title:reminderCopy('inApp.preview.syntheticTitle','Şeyma’da küçük bir durak hazır'),body:reminderCopy('inApp.preview.syntheticResultBody','Bu yalnızca uygulama içinde gösterilen sentetik bir testtir.'),tag:REMINDER_NATIVE_PREVIEW_TAG,deepLink:'settings'}};
   ui.reminderPreviewId=''; ui.reminderPreviewLegacyId=''; ui.reminderTestState={reminderId:target,recordedAt:new Date().toISOString(),synthetic:true};
+  // REM-72: test preview doğrudan DOM'da data-reminder-test="synthetic" oluşturmalı;
+  // targeted update VM test fikstüründe innerHTML seviyesinde yansımadığı için
+  // bu akışı tam render() ile güncelliyoruz. Overlay açıkken render() animasyonu
+  // zaten durdurulduğundan "refresh" hissi oluşmaz.
   render();
   return {ok:true,synthetic:true,external:false,notificationCreated:false,copy:result.copy,state:result.state};
 };
@@ -9725,6 +9740,14 @@ function render(){
     if(reminderScroll && curOverlay==='reminderCenter'){
       reminderScroll.scrollTop=prevReminderTop;
       if(prevReminderFocusId) reminderRestoreFocus(prevReminderFocusId,'');
+    }
+    // Hatırlatma merkezi zaten açıkken yapılan etkileşim render'larında
+    // giriş animasyonunu tekrar oynatma → parlama/flash ve "refresh" hissi yok.
+    if(curOverlay==='reminderCenter' && lastOverlay==='reminderCenter'){
+      var remOverlay=document.getElementById('sey-reminder-overlay');
+      var remScreen=document.getElementById('sey-reminder-screen');
+      if(remOverlay) remOverlay.style.animation='none';
+      if(remScreen) remScreen.style.animation='none';
     }
   }
   // Terapi Odası zaten açıkken yapılan etkileşim render'larında (ör. "Görevi küçült")

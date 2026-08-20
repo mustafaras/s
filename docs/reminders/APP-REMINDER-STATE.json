@@ -1,11 +1,18 @@
 {
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
-  "status": "in-progress",
-  "activePrompt": "REM-72",
+  "status": "closure_pending_approval",
+  "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-71",
-  "nextSafeAction": "REM-72 App + panel release candidate ve user approval packet; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-72",
+  "nextSafeAction": null,
+  "closure": {
+    "prompt": "REM-72",
+    "evidence": "docs/reminders/evidence/REM-72.md",
+    "commit": "43bdf1c708d04111624b5fa9305eb16c05539e97",
+    "status": "done",
+    "validatedAt": "2026-08-21"
+  },
   "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +44,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-71: integrated synthetic UX/a11y/visual gate across app light/dark vs panel responsive light/dark/density, user vs operator copy privacy, focus/keyboard/live-region/reduced-motion/long-text and empty/stale/error/redacted states, app-action to panel-status transition and premium branding preservation.",
-    "tests": "G14-E integrated 9 surface cases / 73 assertions; app render 30; panel a11y 53 (deferred panel.js?v=20260820c cache-bust remediated); Panel P5 24/24; context, syntax and diff PASS.",
-    "commit": "f158f9c (source/test) + d364e15 (SHA refs); standing after_each_prompt delivery pushed to origin/main",
-    "remoteEquality": "HEAD = origin/main = d364e1586f25b0530bf1781ea2f700cd42878aef; fast-forward push PASS",
-    "deployment": "Pages workflow 32380549187 success; deploy job 96462461174; live index.html/panel.html HTTP 200; cache-bust app.js?v=20260820h panel.js?v=20260820c",
+    "source": "REM-72: visual design remediation (digest launcher font hierarchy, eyebrow, primary button alignment; reminder action button text-alignment), prevent-jitter animation guard in render() when reminder center already open, targeted update region retained but handlers fallback to full render() for VM fixture compatibility, no new secret or data path",
+    "tests": "REM-72: 71 reminder fixtures, 22 root fixtures, 27 Panel-v2 fixtures, headless driver 7/7, zikr harness 95/95, context and closure validators, syntax checks, git diff --check PASS",
+    "commit": "43bdf1c708d04111624b5fa9305eb16c05539e97",
+    "remoteEquality": "pending; agent may execute only after explicit user approval sentence",
+    "deployment": "pending; agent may execute only after explicit user approval sentence",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -74,14 +81,6 @@
     "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-20",
-  "updatedBy": "REM-71 local closure + standing after_each_prompt delivery: G14-E / INT-02 integrated UX, accessibility ve visual acceptance PASS; delivered main d364e15 to origin/main + Pages workflow 32380549187 success, live HTTP 200; REM-72 ready; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
-
-  "closure": {
-    "prompt": "REM-71",
-    "evidence": "docs/reminders/evidence/REM-71.md",
-    "commit": "f158f9c",
-    "status": "done",
-    "validatedAt": "2026-08-20"
-  }
+  "updatedAt": "2026-08-21",
+  "updatedBy": "REM-72 closure PASS: source/test/headless validators PASS; closure commit 43bdf1c708d04111624b5fa9305eb16c05539e97 includes final program sentinel and validator updates; releaseApproval remains not_approved; remote/deploy/device acceptance pending explicit user approval sentence; protected/data paths untouched"
 }

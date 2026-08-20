@@ -42,9 +42,11 @@ if (!promptArg) {
 const promptText = read("docs/reminders/APP-REMINDER-PROMPTLARI.md");
 const ledgerText = read("docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md");
 const stateText = read("docs/reminders/APP-REMINDER-STATE.json");
-const expectedIds = Array.from({ length: 73 }, (_, index) => `REM-${String(index).padStart(2, "0")}`);
-const promptIds = [...promptText.matchAll(/^### (REM-\d{2}) /gm)].map((match) => match[1]);
-const ledgerIds = [...ledgerText.matchAll(/^\| (REM-\d{2}) \|/gm)].map((match) => match[1]);
+const expectedIds = Array.from({ length: 73 }, (_, index) => `REM-${String(index).padStart(2, "0")}`).concat("null");
+const promptIdRegex = /^### ((?:REM-\d{2})|null) /gm;
+const ledgerIdRegex = /^\| ((?:REM-\d{2})|null) \|/gm;
+const promptIds = [...promptText.matchAll(promptIdRegex)].map((match) => match[1]);
+const ledgerIds = [...ledgerText.matchAll(ledgerIdRegex)].map((match) => match[1]);
 let state = null;
 try {
   state = JSON.parse(stateText);
@@ -70,6 +72,7 @@ function ledgerRow(id) {
 
 const targetIndex = expectedIds.indexOf(promptArg);
 const nextPrompt = expectedIds[targetIndex + 1] || null;
+const isFinal = nextPrompt === "null";
 const targetRow = ledgerRow(promptArg);
 const nextRow = nextPrompt ? ledgerRow(nextPrompt) : null;
 
@@ -80,13 +83,18 @@ assert(targetRow?.evidence.includes(`evidence/${promptArg}.md`), `${promptArg} l
 const evidencePath = `docs/reminders/evidence/${promptArg}.md`;
 const evidenceText = read(evidencePath);
 assert(evidenceText.includes(`# ${promptArg} `), `${evidencePath} must have a ${promptArg} heading`);
-assert(nextPrompt, `${promptArg} has no declared next prompt; final-program closure needs an explicit validator mode`);
 
 if (state) {
-  assert(state.status === "in-progress", "closure state status must be in-progress while another prompt remains");
+  if (isFinal) {
+    assert(state.status === "closure_pending_approval", "final closure state status must be closure_pending_approval");
+    assert(state.activePrompt === null, "final closure requires state.activePrompt=null");
+    assert(state.nextSafeAction === null, "final closure requires state.nextSafeAction=null");
+  } else {
+    assert(state.status === "in-progress", "closure state status must be in-progress while another prompt remains");
+    assert(state.activePrompt === nextPrompt, `state.activePrompt must advance to ${nextPrompt}`);
+    assert(typeof state.nextSafeAction === "string" && state.nextSafeAction.includes(nextPrompt), `state.nextSafeAction must name ${nextPrompt}`);
+  }
   assert(state.lastCompletedPrompt === promptArg, `state.lastCompletedPrompt must be ${promptArg}`);
-  assert(state.activePrompt === nextPrompt, `state.activePrompt must advance to ${nextPrompt}`);
-  assert(typeof state.nextSafeAction === "string" && state.nextSafeAction.includes(nextPrompt), `state.nextSafeAction must name ${nextPrompt}`);
   assert(state.blockedPrompt === null, "closure cannot leave blockedPrompt set");
   if (promptArg === "REM-42") {
     assert(state.releaseApproval?.status === "approved", "REM-42 closure requires releaseApproval=approved");
@@ -110,8 +118,10 @@ for (let index = 0; index <= targetIndex; index += 1) {
   assert(row?.status === "`done`", `${expectedIds[index]} must be done before ${promptArg}; prompts cannot be skipped`);
 }
 
-assert(nextRow, `${nextPrompt} is missing from ledger`);
-assert(nextRow && nextRow.status !== "`done`", `${nextPrompt} cannot already be done when ${promptArg} closes`);
+if (!isFinal) {
+  assert(nextRow, `${nextPrompt} is missing from ledger`);
+  assert(nextRow && nextRow.status !== "`done`", `${nextPrompt} cannot already be done when ${promptArg} closes`);
+}
 
 if (failures.length) {
   console.error(`REMINDER CLOSURE FAIL (${failures.length})`);

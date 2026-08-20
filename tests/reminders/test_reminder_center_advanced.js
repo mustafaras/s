@@ -9,9 +9,10 @@ const rootDir = path.resolve(__dirname, "../..");
 const DATE = "2026-08-16";
 const NOW = "2026-08-16T12:34:56.000Z";
 
+function escAttr(v) { return String(v || "").replace(/["]/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 function element(id) {
   const attrs = {};
-  return {
+  const element = {
     id: id || "", _html: "", _text: "", style: { cssText: "", setProperty() {} },
     classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
     dataset: {}, children: [], scrollTop: 0, offsetWidth: 0, value: "", files: [], parentNode: null,
@@ -19,12 +20,48 @@ function element(id) {
     get textContent() { return this._text; }, set textContent(value) { this._text = String(value); },
     setAttribute(name, value) { attrs[name] = String(value); }, getAttribute(name) { return attrs[name] || null; },
     appendChild(child) { child.parentNode = this; this.children.push(child); return child; },
-    removeChild() {}, remove() {}, replaceWith() {}, insertBefore(child) { return child; },
+    removeChild() {}, remove() {}, replaceWith(newNode) {
+      if (this.parentNode && typeof this.parentNode.replaceChild === 'function') {
+        this.parentNode.replaceChild(newNode, this);
+      }
+    }, insertBefore(child) { return child; },
     addEventListener() {}, removeEventListener() {}, click() {}, focus() {}, blur() {},
     querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; },
     replaceChildren() {}, contains() { return false; },
     getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0 }; }
   };
+  // Targeted update replacement is an innerHTML-level mutation for this fixture;
+  // it keeps app.innerHTML consistent with replaceChild calls in app.js.
+  element.replaceChild = function replaceChild(newNode, oldNode) {
+    if (!this._html) return;
+    const html = typeof newNode === "string" ? newNode : (newNode && newNode._html !== undefined ? newNode._html : String(newNode || ""));
+    const idNeedle = oldNode && oldNode.id ? new RegExp('\\\\bid="' + oldNode.id.replace(/[.*+?^${}()|[\]\\\\]/g, "\\$\\&") + '"') : null;
+    let idx = -1;
+    if (idNeedle) {
+      const match = this._html.match(idNeedle);
+      if (match) idx = match.index;
+    }
+    if (idx < 0) {
+      const openMatch = this._html.match(/<[^/][^>]*>/);
+      if (!openMatch) return;
+      idx = openMatch.index;
+    }
+    const afterOpen = this._html.indexOf(">", idx) + 1;
+    const rest = this._html.slice(afterOpen);
+    const closeMatch = rest.match(/<\/[^>]+>/);
+    const closeIdx = closeMatch ? afterOpen + closeMatch.index : this._html.length;
+    const closeLen = closeMatch ? closeMatch[0].length : 0;
+    this._html = this._html.slice(0, idx) + html + this._html.slice(closeIdx + closeLen);
+    const oldIndex = this.children.indexOf(oldNode);
+    if (oldIndex >= 0) {
+      this.children.splice(oldIndex, 1);
+      if (newNode && typeof newNode === "object") { newNode.parentNode = this; this.children.splice(oldIndex, 0, newNode); }
+    } else if (newNode && typeof newNode === "object") {
+      newNode.parentNode = this; this.children.push(newNode);
+    }
+    if (oldNode && typeof oldNode === "object") oldNode.parentNode = null;
+  };
+  return element;
 }
 
 function baseState() {

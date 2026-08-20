@@ -726,7 +726,7 @@ window.quranRetryNotifyP=function(surahId){
       UI.quranBusyId=""; render(); alert("Bildirim yeniden kuyruklandı.");
     }).catch(function(e){
       if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
-      UI.quranBusyId=""; render(); alert("Kuyruklanamadı: "+String(e&&e.message||e));
+      UI.quranBusyId=""; render(); alert("Kuyruklanamadı: "+safePanelErrorTextP(e));
     });
   }
   attempt(1);
@@ -757,7 +757,7 @@ window.quranManualAddP=function(surahId){
       UI.quranBusyId=""; render(); alert("Video kaydedildi. Uygulama bir sonraki güncellemede görecek.");
     }).catch(function(e){
       if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
-      UI.quranBusyId=""; render(); alert("Kaydedilemedi: "+String(e&&e.message||e));
+      UI.quranBusyId=""; render(); alert("Kaydedilemedi: "+safePanelErrorTextP(e));
     });
   }
   attempt(1);
@@ -785,7 +785,7 @@ window.quranManualRevokeP=function(surahId){
       UI.quranBusyId=""; render(); alert("Video geri çekildi.");
     }).catch(function(e){
       if(e&&(e.status===409||e.status===422)&&n<3) return attempt(n+1);
-      UI.quranBusyId=""; render(); alert("Geri çekilemedi: "+String(e&&e.message||e));
+      UI.quranBusyId=""; render(); alert("Geri çekilemedi: "+safePanelErrorTextP(e));
     });
   }
   attempt(1);
@@ -1119,7 +1119,29 @@ function fmt(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDat
 function today(){ return fmt(new Date()); }
 function addDays(s,n){ var p=s.split("-").map(Number),d=new Date(p[0],p[1]-1,p[2]); d.setDate(d.getDate()+n); return fmt(d); }
 function diff(a,b){ var pa=a.split("-").map(Number),pb=b.split("-").map(Number); return Math.round((new Date(pb[0],pb[1]-1,pb[2])-new Date(pa[0],pa[1]-1,pa[2]))/86400000); }
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+// All panel output is assembled as HTML strings. Keep one context-safe escape
+// boundary for text and attributes; callers must not interpolate untrusted
+// values around this helper. Quotes are included because several observer
+// surfaces use data-* / aria-* / title attributes.
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,""); }
+// Inline handlers still exist in this legacy static panel. JSON-encode their
+// arguments, then HTML-escape at the attribute boundary. This prevents a
+// remote media id / filename from becoming executable JavaScript.
+function jsArgP(value){ return JSON.stringify(String(value==null?"":value)).replace(/</g,"\\u003C").replace(/>/g,"\\u003E").replace(/&/g,"\\u0026").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029"); }
+function mediaDimensionP(value){ var n=Number(value); return isFinite(n)&&n>0&&n<=10000?String(n):"1"; }
+// Network / transport errors are untrusted input. Render only stable,
+// allowlisted categories; never expose response bodies, tokens, filenames or
+// private user text in alerts or the fail screen.
+function safePanelErrorTextP(error,fallback){
+  var m=String(error&&error.message||error||'').toLowerCase();
+  if(/401|unauthorized|gecersiz|yetkisiz|forbidden|403/.test(m)) return 'Yetki doğrulanamadı.';
+  if(/404|not found|bulunamad/.test(m)) return 'Kaynak bulunamadı.';
+  if(/409|422|conflict|anti.?clobber/.test(m)) return 'Çakışma nedeniyle işlem durduruldu.';
+  if(/429|rate.?limit/.test(m)) return 'Sunucu sınırı nedeniyle sonra yeniden denenecek.';
+  if(/reminder_namespace|malformed_action/.test(m)) return 'Bu gözlemci yüzeyinde işlem desteklenmiyor.';
+  if(/offline|network|fetch|timeout|econn|failed|sunucu|transport/.test(m)) return 'Bağlantı kurulamadı; güvenli görünüm korunuyor.';
+  return fallback||'İşlem tamamlanamadı.';
+}
 function ucfirst(s){ return String(s==null?"":s).replace(/^\s*/,"").replace(/^(.)/,function(m){return m.toUpperCase();}); }
 function cleanEmojiText(s){
   return String(s==null?"":s)
@@ -1987,8 +2009,21 @@ function eventClassificationP(e){
 function eventTimeP(v){ return v?p3TimeP(v):'—'; }
 function safeEventSummaryP(e){
   var raw=String(e&&e.summary||'Güvenli kayıt özeti');
-  if(/ghp_|sk-[a-z0-9]|api[_ -]?key|lat(?:itude)?\s*[:=]|lon(?:gitude)?\s*[:=]|profile[_ -]?raw|raw[_ -]?response|base64|bearer\s+/i.test(raw)) return 'Güvenli kayıt özeti';
-  return raw;
+  var allowed={
+    'Kriz desteği kaydı güncellendi':1,
+    'Yansıtma/pratik kaydı güncellendi':1,
+    'İçerik/arşiv kaydı güncellendi':1,
+    'Profil ilerlemesi güncellendi':1,
+    'Bildirim yaşam döngüsü güncellendi':1,
+    'Konum/hareket kaydı güncellendi':1,
+    'İman/okuma kaydı güncellendi':1,
+    'Uyku/beden kaydı güncellendi':1,
+    'Beslenme kaydı güncellendi':1,
+    'Ayarlar güncellendi':1,
+    'Uygulama kaydı güncellendi':1,
+    'Güvenli kayıt özeti':1
+  };
+  return allowed[raw]&&!/ghp_|github_pat_|sk-[a-z0-9]|api[_ -]?key|lat(?:itude)?\s*[:=]|lon(?:gitude)?\s*[:=]|profile[_ -]?raw|raw[_ -]?response|base64|bearer\s+/i.test(raw)?raw:'Güvenli kayıt özeti';
 }
 function eventSourceKindForP(e){
   var s=String(e&&(e.source||e.sourceType||e.provenance)||'').toLowerCase();
@@ -2551,13 +2586,13 @@ function pmMsgActFeedback(el){
 function pmMediaSlotHTML(mediaKind,mediaId,w,h){
   var elId="pm-media-"+mediaId;
   if(mediaKind==="image"){
-    var ratio=(w&&h)?(w+"/"+h):"1/1";
-    return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP(\''+mediaId+'\')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
+    var ratio=(w&&h)?(mediaDimensionP(w)+"/"+mediaDimensionP(h)):"1/1";
+    return '<div id="'+esc(elId)+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(mediaId))+')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
   }
   if(mediaKind==="file"){
-    return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="file" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;display:flex;align-items:center;gap:5px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
+    return '<div id="'+esc(elId)+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="file" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;display:flex;align-items:center;gap:5px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
   }
-  return '<div id="'+elId+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
+  return '<div id="'+esc(elId)+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="voice" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
 }
 function pmRowMedia(side,tone,mediaKind,mediaId,w,h,footHtml,enter,grouped){
   var cls=side==="out"?("out-"+(tone||"aeon")):"in";
@@ -3740,9 +3775,9 @@ function panelLabCardHTML(){
       h+='<div style="display:flex;flex-wrap:wrap;gap:7px;">';
       files.forEach(function(f){
         if(/^image\//.test(f.mime||"")){
-          h+='<div id="pm-media-'+esc(f.mediaId)+'" class="pm-media-slot" data-media-id="'+esc(f.mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP(\''+esc(f.mediaId)+'\')" style="width:78px;height:78px;border-radius:9px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:9px;opacity:.7;">…</span></div>';
+          h+='<div id="pm-media-'+esc(f.mediaId)+'" class="pm-media-slot" data-media-id="'+esc(f.mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(f.mediaId))+')" style="width:78px;height:78px;border-radius:9px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:9px;opacity:.7;">…</span></div>';
         } else {
-          h+='<button onclick="openPdfP(\''+esc(f.mediaId)+'\',\''+esc(String(f.name||"tahlil.pdf").replace(/[\\\x27]/g,""))+'\')" style="display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--bd);color:var(--t1);border-radius:9px;padding:8px 11px;font:inherit;font-size:var(--f2);font-weight:700;cursor:pointer;">'+icon('book',14)+' PDF aç</button>';
+          h+='<button onclick="openPdfP('+esc(jsArgP(f.mediaId))+','+esc(jsArgP(String(f.name||"tahlil.pdf")))+')" style="display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--bd);color:var(--t1);border-radius:9px;padding:8px 11px;font:inherit;font-size:var(--f2);font-weight:700;cursor:pointer;">'+icon('book',14)+' PDF aç</button>';
         }
       });
       h+='</div></div>';
@@ -4915,7 +4950,8 @@ function initLocMap(){
 }
 
 function fail(msg){
-  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;">'+esc(msg)+'</div></div></div>';
+  var safeMsg=typeof safePanelErrorTextP==='function'?safePanelErrorTextP(msg):'İşlem tamamlanamadı.';
+  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;">'+esc(safeMsg)+'</div></div></div>';
 }
 window.savePanelToken=function(){
   var v=normalizeToken((document.getElementById("ptok")||{}).value||""); if(!v) return;
@@ -5044,7 +5080,7 @@ window.sendAeonChat=function(){
       return putInbox(msgs,res.sha,res.receipts);
     })
     .then(function(){ UI.msgDraft=""; UI.msgSending=false; return load(); })
-    .catch(function(e){ UI.msgSending=false; render(); alert("Mesaj gönderilemedi: "+String(e&&e.message||e)); });
+    .catch(function(e){ UI.msgSending=false; render(); alert("Mesaj gönderilemedi: "+safePanelErrorTextP(e)); });
 };
 window.delObserverMsg=function(id){
   if(DEMO_MODE){ alert("Demo modu: silme/yazma kapalı."); return; }
@@ -5054,7 +5090,7 @@ window.delObserverMsg=function(id){
   loadInbox()
     .then(function(res){ var msgs=(res.messages||[]).filter(function(m){ return m&&m.id!==id; }); return putInbox(msgs,res.sha,res.receipts); })
     .then(function(){ UI.msgSending=false; return load(); })
-    .catch(function(e){ UI.msgSending=false; render(); alert("Silinemedi: "+String(e&&e.message||e)); });
+    .catch(function(e){ UI.msgSending=false; render(); alert("Silinemedi: "+safePanelErrorTextP(e)); });
 };
 // ---------- ÆON ek gönderme sayfası (fotoğraf/belge/ses dosyası) — pm-lightbox ile aynı
 // imperatif desen (deklaratif modal sistemi yok, doğrudan document.body'e eklenip kaldırılır) ----------
@@ -5110,7 +5146,7 @@ function aeonEnsureMediaLoadedP(mediaId,kind,elId){
   function paint(m){
     if(!m){ el.innerHTML='<span style="opacity:.6;display:inline-flex;">'+icon('triangle-alert',15)+'</span>'; return; }
     var uri="data:"+(m.mime||"")+";base64,"+m.data;
-    if(kind==="image") el.innerHTML='<img src="'+uri+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
+    if(kind==="image") el.innerHTML='<img src="'+esc(uri)+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
     else if(kind==="voice") aeonPaintVoicePlayerP(el,mediaId,m,uri);
     else if(kind==="file") aeonPaintFileCardP(el,mediaId,m);
   }
@@ -5126,9 +5162,9 @@ function aeonPaintVoicePlayerP(container,mediaId,m,uri){
   var peaks=(m.peaks&&m.peaks.length)?m.peaks:[.3,.5,.4,.6,.35,.55,.45,.65,.3,.5,.4,.6,.35,.55,.45,.65];
   var bars=peaks.map(function(v){ return '<span style="flex:1;min-width:2px;border-radius:2px;background:currentColor;opacity:.55;height:'+Math.max(3,Math.round(v*20))+'px;"></span>'; }).join("");
   container.innerHTML='<div style="display:flex;align-items:center;gap:9px;">'
-    +'<button onclick="aeonToggleVoiceP(\''+mediaId+'\')" id="pm-voice-btn-'+mediaId+'" aria-label="Oynat/duraklat" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;"><span id="pm-voice-icon-'+mediaId+'" style="color:var(--bg);font-size:11px;">▶</span></button>'
+    +'<button onclick="aeonToggleVoiceP('+esc(jsArgP(mediaId))+')" id="pm-voice-btn-'+esc(mediaId)+'" aria-label="Oynat/duraklat" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;"><span id="pm-voice-icon-'+esc(mediaId)+'" style="color:var(--bg);font-size:11px;">▶</span></button>'
     +'<div style="flex:1;display:flex;align-items:center;gap:1.5px;height:22px;min-width:0;">'+bars+'</div>'
-    +'<span id="pm-voice-time-'+mediaId+'" style="flex-shrink:0;font-size:var(--f1);opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStrP(m.durationSec)+'</span>'
+    +'<span id="pm-voice-time-'+esc(mediaId)+'" style="flex-shrink:0;font-size:var(--f1);opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStrP(m.durationSec)+'</span>'
     +'</div>';
   if(!aeonAudioElsP[mediaId]) aeonAudioElsP[mediaId]={uri:uri,audio:null,durationSec:m.durationSec};
 }
@@ -5146,7 +5182,7 @@ window.aeonToggleVoiceP=function(mediaId){
 };
 function aeonPaintFileCardP(container,mediaId,m){
   var name=m.name||"Belge", size=m.size!=null?humanFileSizeP(m.size):"";
-  container.setAttribute("onclick","window.openPdfP('"+mediaId+"','"+String(name).replace(/[\\\x27]/g,"")+"')");
+  container.setAttribute("onclick","window.openPdfP("+jsArgP(mediaId)+","+jsArgP(name)+")");
   container.style.cursor="pointer";
   container.innerHTML='<div style="display:flex;align-items:center;gap:10px;min-width:190px;max-width:260px;">'
     +'<span style="flex-shrink:0;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:currentColor;"><span style="display:flex;color:var(--bg);">'+icon('file-text',16)+'</span></span>'
@@ -5174,9 +5210,9 @@ window.aeonOpenImageP=function(mediaId){
   var ex=document.getElementById("pm-lightbox"); if(ex) ex.remove();
   var d=document.createElement("div"); d.id="pm-lightbox";
   d.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(3,3,5,0.94);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;";
-  d.innerHTML='<img id="pm-lightbox-img" src="'+uri+'" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform .18s ease;">'
+  d.innerHTML='<img id="pm-lightbox-img" src="'+esc(uri)+'" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);cursor:zoom-in;transition:transform .18s ease;">'
     +'<div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">'
-    +'<a href="'+uri+'" download="aeon-foto.'+ext+'" aria-label="İndir" style="border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('download',16)+'</a>'
+    +'<a href="'+esc(uri)+'" download="aeon-foto.'+esc(ext)+'" aria-label="İndir" style="border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('download',16)+'</a>'
     +'<button aria-label="Kapat" style="border:none;background:rgba(255,255,255,0.12);color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button>'
     +'</div>';
   d.onclick=function(e){ if(e.target===d||e.target.tagName==="BUTTON"){ d.remove(); } };
@@ -5355,7 +5391,7 @@ window.sendAeonMediaP=function(kind,base64,mime,extra){
       return putInbox(msgs,res.sha,res.receipts);
     });
   }).then(function(){ UI.msgSending=false; return load(); })
-  .catch(function(e){ delete aeonMediaCacheP[id]; UI.msgSending=false; render(); alert((kind==="file"?"Belge":(kind==="voice"?"Ses":"Fotoğraf"))+" gönderilemedi: "+String((e&&e.message)||e)); });
+  .catch(function(e){ delete aeonMediaCacheP[id]; UI.msgSending=false; render(); alert((kind==="file"?"Belge":(kind==="voice"?"Ses":"Fotoğraf"))+" gönderilemedi: "+safePanelErrorTextP(e)); });
 };
 // Gözlemci paneli açıp kullanıcının cevaplanmamış ÆON sorusunu gördüğünde, kullanıcı tarafında
 // "⬡ AEON // EVALUATING INPUT…" durumu görünsün diye observer-inbox.json'a okundu (receipt) yazarız.

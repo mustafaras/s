@@ -57,6 +57,18 @@ var MANIFEST={
     {path:"days.*.therapy.share.note",owner:"therapy",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
     {path:"days.*.sleep.windDown.events",owner:"sleep",source:"user_input",privacy:"event_metadata",mode:"redacted",fallback:"summary_only"},
     {path:"days.*.prayer.fetchError",owner:"prayer",source:"external_api",privacy:"external_error",mode:"redacted",fallback:"summary_only"},
+    // Notification transport records may contain a reminder body/title or an
+    // observer message even when the legacy root itself is allowlisted. Keep
+    // lifecycle timestamps/counts available through the derived projection,
+    // but never carry user-authored notification copy in projection.data.
+    {path:"notifications.*.body",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"notifications.*.title",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"notifications.*.text",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"notifications.*.message",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"notifications.*.note",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"notifications.*.detail",owner:"notifications",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"days.*.prayer.completionNote",owner:"prayer",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
+    {path:"days.*.prayer.note",owner:"prayer",source:"user_input",privacy:"sensitive_raw",mode:"redacted",fallback:"summary_only"},
     {path:"weather.error",owner:"weather",source:"external_api",privacy:"external_error",mode:"redacted",fallback:"summary_only"},
     {path:"weather.fetchError",owner:"weather",source:"external_api",privacy:"external_error",mode:"redacted",fallback:"summary_only"},
     {path:"location",owner:"location",source:"device_sensor",privacy:"gps_raw",mode:"redacted",fallback:"summary_only"},

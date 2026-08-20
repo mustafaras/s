@@ -39,7 +39,7 @@
   "evidence": {
     "source": "REM-70: integrated synthetic negative security gate across app/native/SW/sync/projection/panel/error/event/export and write boundaries; browser local-user surface explicitly separated.",
     "tests": "G14-D integrated 10 surface cases / 78 assertions; app privacy 198; panel privacy 121; Panel P6 16/16; context, syntax and diff PASS.",
-    "commit": "PENDING_COMMIT (local source/test; closure record follows)",
+    "commit": "957053d (local source/test; no external delivery)",
     "remoteEquality": "NOT_PERFORMED for REM-70; no external delivery or remote write",
     "deployment": "NOT_PERFORMED for REM-70; no Pages/live/device evidence claimed",
     "deviceAcceptance": "pending; not performed by agent"
@@ -80,7 +80,7 @@
   "closure": {
     "prompt": "REM-70",
     "evidence": "docs/reminders/evidence/REM-70.md",
-    "commit": "PENDING_COMMIT",
+    "commit": "957053d",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

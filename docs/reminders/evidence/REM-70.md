@@ -7,7 +7,7 @@
 - **Tarih:** 2026-08-20
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `0dc1ff369aa2d1106902dfc1d4ca790245362535`
-- **Kod/test commit:** `PENDING_COMMIT` (`REM-70: integrated privacy gate`)
+- **Kod/test commit:** `957053d` (`REM-70: integrated privacy gate`)
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -68,7 +68,7 @@ assertion=<exact assertion>` biçiminde raporlanır.
   Notification / dead fetch ile çalıştı. Browser, generic server, real
   localStorage, real network, real token, external telemetry ve user device
   kullanılmadı.
-- **S3 commit:** `PENDING_COMMIT`; yalnız local commit planlandı.
+- **S3 commit:** `957053d`; yalnız local commit, push yapılmadı.
 - **S4 CI/Pages:** REM-70 için yapılmadı; prompt allowlist'i production write
   açmıyor. REM-69 teslim kanıtı bu promptun canlı kanıtı olarak yeniden
   kullanılmıyor.

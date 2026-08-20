@@ -40,8 +40,8 @@
     "source": "REM-68: app/sync/projection/panel cross-surface adapter; seven independent layers, complete receipt proof gate, panel 304 preservation and explicit non-monotonic transition reasons.",
     "tests": "G14-B cross-surface 8 named cases / 84 assertions; system 65; panel status 223; root P0 31; all reminder/current root observer/Panel-v2 command sets exit 0; fixed synthetic VM, network calls 0, no private copy/write boundary; driver/zikr/B1/B2/B3, syntax, context and diff PASS.",
     "commit": "17c1d2d0e6f45c1bf57c5f50da93decbd5e19231",
-    "remoteEquality": "pending standing after_each_prompt delivery after local closure gate",
-    "deployment": "pending standing after_each_prompt delivery after local closure gate",
+    "remoteEquality": "REM-68 closure delivery 709fa3cd2f12eb6b170604f51fa51ee4b09cea3d: HEAD = origin/main = git ls-remote origin refs/heads/main PASS; final receipt amendment remains docs-only",
+    "deployment": "workflow 32360638427 success (validate 96399268280, deploy 96399330959); Pages deployment 6000676282 success; live index.html and panel.html HTTP 200; app/panel/evidence REM-68 markers present",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {

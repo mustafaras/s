@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>ÆON · Orchestration Core</title>
-<link rel="stylesheet" href="panel.css?v=20260820c">
+<link rel="stylesheet" href="panel.css?v=20260820f">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="motivationProgramV2.js?v=20260718a"></script>
@@ -15,8 +18,30 @@
 </head>
 <body>
 <div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
-<script src="panelCoverageManifest.js?v=20260820d"></script>
-<script src="panel.js?v=20260820c"></script>
+<script>
+// Emergency cache reset: ?resetCache=1 or ?resetSw=1 wipes service workers and
+// caches, then reloads with a fresh URL. This lets a stuck panel recover from
+// a stale service worker or corrupted cache without opening DevTools.
+(function(){
+  var qs=new URLSearchParams(location.search);
+  if(qs.get('resetCache')==='1'||qs.get('resetSw')==='1'){
+    var next=function(){
+      var u=new URL(location.href);
+      u.searchParams.delete('resetCache');
+      u.searchParams.delete('resetSw');
+      u.searchParams.set('nocache','1');
+      location.replace(u.toString());
+    };
+    var clearCaches=window.caches&&window.caches.keys?window.caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return window.caches.delete(k); })); }):Promise.resolve();
+    var unreg=navigator.serviceWorker&&navigator.serviceWorker.getRegistrations?navigator.serviceWorker.getRegistrations().then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); }):Promise.resolve();
+    Promise.all([clearCaches.catch(function(){}), unreg.catch(function(){})]).then(next).catch(next);
+    // Keep placeholder visible while cleanup runs.
+    document.getElementById("app").innerHTML='<div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Önbellek temizleniyor…</div>';
+  }
+})();
+</script>
+<script src="panelCoverageManifest.js?v=20260820f"></script>
+<script src="panel.js?v=20260820f"></script>
 <script>
 // ── Panel boot watchdog ──
 // panel.js senkron bir IIFE'dir; yüklendiğinde window.load'u tanımlar. Eğer

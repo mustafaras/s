@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-70",
+  "activePrompt": "REM-71",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-69",
-  "nextSafeAction": "REM-70 Integrated privacy, security ve no-write acceptance; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-70",
+  "nextSafeAction": "REM-71 Integrated UX, accessibility ve visual acceptance; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-69: app migration, sync sanitize, projection manifest compatibility and panel actionable status; future schema opaque/fail-closed.",
-    "tests": "G14-C cross-surface schema 12 named cases / 65 assertions; B2 migration 32/32; Panel P1 43; P6 16; existing migration 50, panel source 319, panel privacy 121, sync privacy 347; 71 reminder + 21 root panel + 27 Panel-v2 fixtures; headless driver/zikr, syntax, context and diff PASS.",
-    "commit": "c67eb9c (source/test); 0898443 (cache-bust delivery)",
-    "remoteEquality": "PASS: HEAD = origin/main = git ls-remote origin refs/heads/main = 089844395d16c18bd6e5759ac6cae9373dbafc28",
-    "deployment": "PASS: workflow 32362653748 (validate 96405366566, deploy 96405405738); Pages deployment 6001046789/status 17065168960 success; live app/panel/manifest cache-bust assets HTTP 200",
+    "source": "REM-70: integrated synthetic negative security gate across app/native/SW/sync/projection/panel/error/event/export and write boundaries; browser local-user surface explicitly separated.",
+    "tests": "G14-D integrated 10 surface cases / 78 assertions; app privacy 198; panel privacy 121; Panel P6 16/16; context, syntax and diff PASS.",
+    "commit": "PENDING_COMMIT (local source/test; closure record follows)",
+    "remoteEquality": "NOT_PERFORMED for REM-70; no external delivery or remote write",
+    "deployment": "NOT_PERFORMED for REM-70; no Pages/live/device evidence claimed",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-69 delivery receipt: G14-C / INT-01 schema compatibility PASS; REM-70 ready; main/Pages/live receipt PASS; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-70 local closure receipt: G14-D / INT-02 integrated privacy and no-write PASS; REM-71 ready; no external write; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
-    "prompt": "REM-69",
-    "evidence": "docs/reminders/evidence/REM-69.md",
-    "commit": "5af671c",
+    "prompt": "REM-70",
+    "evidence": "docs/reminders/evidence/REM-70.md",
+    "commit": "PENDING_COMMIT",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

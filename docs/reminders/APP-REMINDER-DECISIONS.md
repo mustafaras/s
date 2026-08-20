@@ -822,3 +822,27 @@ ve `SuppressionContext` `data` içine kalıcı ikinci state olarak yazılmaz;
 - **Failure semantics:** Offline, native permission denied, stale prayer, sync conflict, projection missing, panel 304 ve device unverified ayrı branch’lerdir. Geri dönüşler `regression/lateral/advance` yönü ve sabit reason ile raporlanır; bir layer PASS’i diğerine propagate edilmez. App kullanıcı copy’si ve operator panel copy’si raw/private detail paylaşmaz.
 - **Etkiler:** Legacy app system-status kontratı korunur; cross-surface adapter yalnız entegrasyon iddiası için yeni fail-closed kapıdır. `panel-v2` current panel acceptance yerine geçmez; current reminder, root panel ve Panel-v2 command setleri ayrı raporlanır. Release approval değişmez (`not_approved`), S5 device acceptance pending kalır.
 - **Sonraki adım:** REM-69 schema version, migration ve legacy panel compatibility.
+
+### REM-ADR-026 — Integrated privacy gate ve no-write boundary (REM-70)
+
+- **Tarih:** 2026-08-20
+- **Durum:** accepted
+- **Soru:** App, native, SW, sync, projection, panel DOM/error/event/export ve
+  panel write boundary'leri tek bir negative acceptance altında nasıl
+  birleştirilecek?
+- **Kanıt:** `tests/reminders/test_reminder_integrated_privacy.js` ve
+  `tests/reminders/helpers/integrated-privacy-scanner.js`; REM-70 evidence;
+  `test_reminder_app_privacy.js`, `test_reminder_panel_privacy.js` ve
+  `test_panel_p6_qa_release.js` regression sonuçları.
+- **Karar:** Tek sentetik corpus her surface'te taranır. Browser yalnız
+  kullanıcıya ait local app surface olarak ayrı raporlanır; native, SW,
+  sanitized sync, projection, operator panel, error, event/export ve external
+  write boundary'leri strict fail-closed kalır. Panel reminder payload'ı
+  reddetmeli ve reddedilen payload için external call sayısı sıfır olmalıdır.
+- **Gerekçe:** Önceki REM-52/53/57/63/64 gate'leri ayrı yüzeylerde güçlüdür;
+  integrated gate bunların birbirine yanlış green veya private detail
+  propagation'ı yapmadığını tek receipt'te doğrular. Test production write,
+  gerçek network, token, browser ve cihaz kullanmaz.
+- **Etkiler:** `INT-02` privacy/security gap'i synthetic S2 kanıtıyla kapanır;
+  `releaseApproval=not_approved`, S5 device acceptance `pending` kalır.
+- **Sonraki adım:** REM-71 integrated UX, accessibility ve visual acceptance.

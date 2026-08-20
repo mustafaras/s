@@ -7,7 +7,7 @@
 - **Tarih:** 2026-08-20
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `a1740eccc11cdaa7cfb4f749e401896ce30a7d9c`
-- **Kod/test commit:** `REM-71` closure commit (bkz. ledger)
+- **Kod/test commit:** `f158f9c` (`REM-71: integrated UX accessibility visual acceptance`)
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -66,7 +66,7 @@ the expectation was corrected to `20260820c`. No production asset was changed.
 - **S2 synthetic:** All fixtures are Node VM / in-memory storage / mocked
   Notification / dead fetch. No browser, generic server, real localStorage,
   real network, real token, notification body or external write used.
-- **S3 commit:** REM-71 closure commit (local only; push not performed).
+- **S3 commit:** `f158f9c` (local only; push not performed).
 - **S4 CI/Pages:** Not performed for REM-71; prompt allowlist does not open a
   production write.
 - **S5 user-device:** `pending`; not produced by the agent.

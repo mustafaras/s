@@ -8,6 +8,7 @@
 - **Repo:** `/Users/m_ras/Desktop/seyma`
 - **Başlangıç HEAD:** `4c5970c26fc553d93172ad1ab2f6cc8289b202b0`
 - **Kod/test commit:** `c67eb9c` (`REM-69: schema compatibility`)
+- **Cache-bust / delivery commit:** `0898443` (`REM-69: refresh asset cache keys`)
 - **Release approval:** `NOT_APPROVED`
 - **Approval evidence:** `none`
 
@@ -71,10 +72,17 @@ ve gerçek data repo’su bu synthetic kanıtın parçası değildir.
   değiştirilmedi.
 - **S2 synthetic:** tüm fixture’lar in-memory/headless; gerçek browser,
   localStorage, token, network, notification body ve external write yok.
-- **S3 commit:** `c67eb9c` local source/test commit; remote equality ve Pages
-  teslimatı ayrı evidence seviyesidir.
-- **S4 CI/Pages:** closure sonrası standing `after_each_prompt` scope’unda
-  ayrıca kaydedilebilir; bu receipt tek başına deploy kanıtı değildir.
+- **S3 commit:** `c67eb9c` source/test ve `0898443` cache-bust commitleri;
+  remote equality ve Pages teslimatı ayrı evidence seviyesidir.
+- **S4 CI/Pages delivery:** `0898443` için `HEAD = origin/main =
+  git ls-remote origin refs/heads/main =
+  089844395d16c18bd6e5759ac6cae9373dbafc28`; workflow
+  `32362653748` success (validate `96405366566`, deploy `96405405738`);
+  Pages deployment `6001046789` / status `17065168960` success. Live
+  `index.html`, `panel.html`, `panel-v2.html`, `app.js?v=20260820h`,
+  `panel.js?v=20260820c` ve `panelCoverageManifest.js?v=20260820d` HTTP
+  200; canlı app/panel/manifest marker’ları REM-69 compatibility yollarını
+  taşıyor. `mustafaras/seyma-data` yazılmadı.
 - **S5 user-device:** pending; ajan tarafından üretilmedi.
 
 ## Sonuç

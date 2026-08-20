@@ -39,9 +39,9 @@
   "evidence": {
     "source": "REM-69: app migration, sync sanitize, projection manifest compatibility and panel actionable status; future schema opaque/fail-closed.",
     "tests": "G14-C cross-surface schema 12 named cases / 65 assertions; B2 migration 32/32; Panel P1 43; P6 16; existing migration 50, panel source 319, panel privacy 121, sync privacy 347; 71 reminder + 21 root panel + 27 Panel-v2 fixtures; headless driver/zikr, syntax, context and diff PASS.",
-    "commit": "c67eb9c",
-    "remoteEquality": "pending standing after_each_prompt delivery; local source/test evidence only",
-    "deployment": "pending standing after_each_prompt delivery; no live/device claim in this source/test receipt",
+    "commit": "c67eb9c (source/test); 0898443 (cache-bust delivery)",
+    "remoteEquality": "PASS: HEAD = origin/main = git ls-remote origin refs/heads/main = 089844395d16c18bd6e5759ac6cae9373dbafc28",
+    "deployment": "PASS: workflow 32362653748 (validate 96405366566, deploy 96405405738); Pages deployment 6001046789/status 17065168960 success; live app/panel/manifest cache-bust assets HTTP 200",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-69 closed locally: G14-C / INT-01 schema compatibility PASS; REM-70 ready; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-69 delivery receipt: G14-C / INT-01 schema compatibility PASS; REM-70 ready; main/Pages/live receipt PASS; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
     "prompt": "REM-69",
     "evidence": "docs/reminders/evidence/REM-69.md",
-    "commit": "c67eb9c",
+    "commit": "5af671c",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

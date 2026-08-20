@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-67",
+  "activePrompt": "REM-68",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-66",
-  "nextSafeAction": "REM-67 Uçtan uca reminder data lineage fixture; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "lastCompletedPrompt": "REM-67",
+  "nextSafeAction": "REM-68 Cross-surface status ve failure semantics; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
   "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
@@ -37,9 +37,9 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-66: current panel fixture ownership is explicit across source, coverage, projection, redaction, transport, event, status, responsive and release surfaces; root observer and Panel-v2 remain separate regression scopes.",
-    "tests": "G13-L architecture fixture 454 assertions; current reminder-panel, root observer, legacy Faz11 and Panel-v2 command sets exit 0; static no-network/no-token/no-write/browser-persistence boundary PASS; syntax, headless driver, migration, context and diff PASS.",
-    "commit": "c5e10a6",
+    "source": "REM-67: synthetic app action → local state → safe event → sync sanitize/receipt → projection → current panel status/timeline lineage; owners, source, revision, timestamp and privacy mode remain separate.",
+    "tests": "G14-A lineage 5 tests / 118 assertions; architecture 455 assertions with explicit missing-lineage gate; reminder privacy and panel source regression plus all reminder/current panel/root observer/Panel-v2 command sets exit 0; fixed clock, network calls 0, no private projection and no write boundary PASS; syntax, context and diff PASS.",
+    "commit": "0eccde5f042350dcac5d8e151f16114c218311c7",
     "remoteEquality": "pending closure delivery; no external write in fixture verification",
     "deployment": "pending closure delivery; no live claim from local fixture PASS",
     "deviceAcceptance": "pending; not performed by agent"
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-66 closed locally: G13-L current-panel fixture architecture and separate root/Panel-v2 regression gate PASS; REM-67 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
+  "updatedBy": "REM-67 closed locally: G14-A synthetic app-to-panel lineage and INT-01 ownership/privacy branch gate PASS; REM-68 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
-    "prompt": "REM-66",
-    "evidence": "docs/reminders/evidence/REM-66.md",
-    "commit": "c5e10a6",
+    "prompt": "REM-67",
+    "evidence": "docs/reminders/evidence/REM-67.md",
+    "commit": "0eccde5f042350dcac5d8e151f16114c218311c7",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

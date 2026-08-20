@@ -46,6 +46,7 @@ const ROOT_PANEL_MANIFEST = Object.freeze({
 });
 
 const REQUIRED_PANEL_V2_COUNT = 27;
+const REQUIRED_LINEAGE = ["test_reminder_end_to_end_lineage.js"];
 
 const STATIC_FORBIDDEN = Object.freeze([
   ["browser automation", /puppeteer|playwright|selenium|chromedriver|page\.goto|window\.open\s*\(/i],
@@ -134,6 +135,9 @@ runTests([
   ["current panel owner manifest has no missing fixture and includes the new G13-L gate", () => {
     currentReminderManifestFiles.forEach((name) => {
       assert(fs.existsSync(path.join(REMINDERS, name)), `missing reminder panel fixture: ${name}`);
+    });
+    REQUIRED_LINEAGE.forEach((name) => {
+      assert(fs.existsSync(path.join(REMINDERS, name)), `missing reminder lineage fixture: ${name}`);
     });
     assertEqual(reminderPanelFiles.length, currentReminderManifestFiles.length);
     assert(currentReminderManifestFiles.includes("test_reminder_panel_fixture_architecture.js"));

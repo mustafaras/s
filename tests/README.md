@@ -20,7 +20,8 @@ regression ailesi ve `tests/panel-v2/` ayrı Premium regression ailesidir.
 Panel-v2 fixture sayısı current panel acceptance’ının yerine geçmez. REM-66
 architecture gate’i `test_reminder_panel_fixture_architecture.js` ile dosya
 manifestlerini ve static boundary’leri kontrol eder. REM-67’de aynı ayrı scope’a
-app → sync → projection → panel lineage fixture’ı eklenecektir.
+app → sync → projection → panel lineage fixture’ı `test_reminder_end_to_end_lineage.js`
+ile sabit sentetik saat altında kontrol edilir.
 
 Panel-v2 testlerinin ayrıntılı envanteri ve çalıştırma kuralları:
 [`panel-v2/README.md`](panel-v2/README.md).
@@ -51,6 +52,12 @@ Current panel fixture’ları ayrı:
 for f in tests/reminders/test_reminder_panel_*.js; do node "$f"; done
 for f in tests/test_panel_*.js; do node "$f"; done
 node tests/test_faz11_panel.js
+```
+
+Lineage fixture’ı ayrıca:
+
+```bash
+node tests/reminders/test_reminder_end_to_end_lineage.js
 ```
 
 Kök fixture’ları:

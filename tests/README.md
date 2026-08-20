@@ -14,6 +14,14 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `reminders/` — REM-02+ ağsız sentetik reminder contract fixture’ları; runtime, browser ve gerçek veri kullanmaz.
 - `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.
 
+Reminder panel acceptance’ı üç ayrı scope olarak raporlanır: `tests/reminders/`
+app/reminder contract ailesi, root `tests/test_panel_*.js` current observer
+regression ailesi ve `tests/panel-v2/` ayrı Premium regression ailesidir.
+Panel-v2 fixture sayısı current panel acceptance’ının yerine geçmez. REM-66
+architecture gate’i `test_reminder_panel_fixture_architecture.js` ile dosya
+manifestlerini ve static boundary’leri kontrol eder. REM-67’de aynı ayrı scope’a
+app → sync → projection → panel lineage fixture’ı eklenecektir.
+
 Panel-v2 testlerinin ayrıntılı envanteri ve çalıştırma kuralları:
 [`panel-v2/README.md`](panel-v2/README.md).
 
@@ -31,14 +39,33 @@ Tüm Panel-v2 fixture’ları:
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 ```
 
+Reminder fixture’ları:
+
+```bash
+for f in tests/reminders/test_reminder_*.js; do node "$f"; done
+```
+
+Current panel fixture’ları ayrı:
+
+```bash
+for f in tests/reminders/test_reminder_panel_*.js; do node "$f"; done
+for f in tests/test_panel_*.js; do node "$f"; done
+node tests/test_faz11_panel.js
+```
+
 Kök fixture’ları:
 
 ```bash
 for f in tests/test_*.js; do node "$f"; done
 ```
 
-Tam test kanıtı alınırken iki komut birlikte çalıştırılmalıdır; kök globu
-bilerek `tests/panel-v2/` altındaki fixture’ları içermez.
+Tam panel kanıtında current-panel komutları ile Panel-v2 komutu ayrı exit code
+olarak kaydedilir; kök globu bilerek `tests/panel-v2/` altındaki fixture’ları
+içermez. Fixture sayısı tek başına başarı kanıtı değildir: test adları, exit
+code ve varsa failure signature birlikte raporlanır. Fixture’lar browser,
+gerçek ağ, gerçek token, gerçek localStorage ve data repo write kullanmaz;
+zaman duyarlı kontroller sabit/injected clock ya da açıkça bounded benchmark
+sınırıyla çalışır.
 
 ## Tarihsel handoff notu
 

@@ -340,8 +340,8 @@ async function runTests(cases) {
     try {
       await test();
       console.log(`PASS ${name}`);
-    } catch {
-      console.error(`FAIL ${name}`);
+    } catch (error) {
+      console.error(`FAIL ${name}: ${error && error.message ? error.message : String(error)}`);
       throw new Error("REMINDER_TEST_SUITE_FAILED");
     }
   }

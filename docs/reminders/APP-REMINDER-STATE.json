@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "programId": "APP-REMINDER-UX",
   "status": "in-progress",
-  "activePrompt": "REM-66",
+  "activePrompt": "REM-67",
   "blockedPrompt": null,
-  "lastCompletedPrompt": "REM-65",
-  "nextSafeAction": "REM-66 Panel fixture architecture ve current / Panel-v2 regression; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
-  "currentPhase": "R13",
+  "lastCompletedPrompt": "REM-66",
+  "nextSafeAction": "REM-67 Uçtan uca reminder data lineage fixture; releaseApproval remains not_approved and S5 user-device acceptance remains pending",
+  "currentPhase": "R14",
   "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
   "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
   "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
@@ -37,11 +37,11 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-65: PANEL-05 current-panel responsive/accessibility/performance closure. panel.css now wraps long status/timeline/drawer copy without ellipsis clipping, provides light system-theme tokens alongside the dark/gold default, and keeps focus/high-contrast/44px/reduced-motion contracts. panel.js names the timeline region, adds live status semantics, explicit button types, drawer-safe Escape/focus behavior and card/module inline-handler escaping; polling render boundaries remain unchanged-state no-op and draft/drawer/filter defer safe.",
-    "tests": "G13-K test_reminder_panel_a11y.js 53 assertions; test_reminder_panel_performance.js 37 assertions; test_panel_p5_responsive_a11y.js 24/24; required Panel-v2 accessibility/performance PASS; all reminder fixtures, root panel fixtures, Panel-v2 fixtures and legacy Faz10/Faz11 fixtures PASS; node --check panel.js, node --check panelCoverageManifest.js, git diff --check PASS",
-    "commit": "56988b3",
-    "remoteEquality": "REM-65 delivered: local HEAD, origin/main and git ls-remote origin refs/heads/main all matched d0847ef66c6b68639badfda45d55f9dffe61b730; mustafaras/seyma-data and other excluded remotes untouched.",
-    "deployment": "REM-65: workflow 32349963063 success (validate 96366758093, deploy 96366795949), Pages deployment 5998815322/status success; live index.html and panel.html HTTP 200; deployed panel.html carries panel.css?v=20260820c and panel.js?v=20260820b; live CSS light-theme and JS polling/status markers verified.",
+    "source": "REM-66: current panel fixture ownership is explicit across source, coverage, projection, redaction, transport, event, status, responsive and release surfaces; root observer and Panel-v2 remain separate regression scopes.",
+    "tests": "G13-L architecture fixture 454 assertions; current reminder-panel, root observer, legacy Faz11 and Panel-v2 command sets exit 0; static no-network/no-token/no-write/browser-persistence boundary PASS; syntax, headless driver, migration, context and diff PASS.",
+    "commit": "pending",
+    "remoteEquality": "pending closure delivery; no external write in fixture verification",
+    "deployment": "pending closure delivery; no live claim from local fixture PASS",
     "deviceAcceptance": "pending; not performed by agent"
   },
   "releaseApproval": {
@@ -75,12 +75,12 @@
     "approvedBy": "user"
   },
   "updatedAt": "2026-08-20",
-  "updatedBy": "REM-65 closed and delivered: G13-K current-panel responsive/accessibility/performance — six viewport contracts, light/dark tokens, focus/live-region/44px/reduced-motion, long-copy wrapping, drawer Escape/focus and unchanged/304/draft interaction-safe polling verified; PANEL-05 complete, REM-66 ready; releaseApproval remains not_approved, S5 pending, app runtime / Panel-v2 / mustafaras/seyma-data untouched; standing after_each_prompt main/Pages receipt d0847ef success",
+  "updatedBy": "REM-66 closed locally: G13-L current-panel fixture architecture and separate root/Panel-v2 regression gate PASS; REM-67 active; releaseApproval remains not_approved, S5 pending, protected/data paths untouched",
 
   "closure": {
-    "prompt": "REM-65",
-    "evidence": "docs/reminders/evidence/REM-65.md",
-    "commit": "56988b3792cc5fc9e606ee2f0780182516b9b24c",
+    "prompt": "REM-66",
+    "evidence": "docs/reminders/evidence/REM-66.md",
+    "commit": "pending",
     "status": "done",
     "validatedAt": "2026-08-20"
   }

@@ -1177,8 +1177,12 @@ function cardWrap(o){
   var key=o.key, open=!!UI.expandedCards[key];
   var span=o.span||12, order=o.order||30;
   var controlId='card-exp-body-'+String(key).replace(/[^a-zA-Z0-9_-]/g,'-');
+  // Inline handler legacy'sinde argümanı ayrı JS-string + HTML-attribute
+  // sınırlarında kaçır: kart anahtarı normalde sabit olsa da test/gelecek
+  // modül girdisi bir tırnak veya satır sonu taşısa XSS bağlamı oluşmasın.
+  var keyArg=String(key==null?'':key).replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r/g,'\\r').replace(/\n/g,'\\n');
   var s='<div class="card lift span-'+span+' pad card-exp'+(open?' is-open':'')+(o.cls?' '+o.cls:'')+'" style="order:'+order+';" data-card-key="'+esc(key)+'">';
-  s+='<button type="button" class="card-exp-head" aria-expanded="'+(open?'true':'false')+'" aria-controls="'+controlId+'" onclick="toggleCard(\''+key+'\')">';
+  s+='<button type="button" class="card-exp-head" aria-expanded="'+(open?'true':'false')+'" aria-controls="'+controlId+'" onclick=\'toggleCard("'+esc(keyArg)+'")\'>';
   s+='<div class="lbl" style="margin-bottom:0;flex:1;">'+(o.icon?o.icon+' ':'')+esc(o.title)+'</div>';
   if(o.badge) s+=o.badge;
   s+='<span class="card-exp-chevron">▾</span>';
@@ -1688,8 +1692,8 @@ function reminderStatusCardHTMLP(receipt,pollAt,projectionState,sectionFetchStat
     return '<div class="reminder-status-cell" data-reminder-dim="'+kind+'"><span class="reminder-status-cell-label">'+esc(label)+'</span><span class="reminder-status-cell-badge">'+panelStatusBadgeHTMLP(d[kind].label,d[kind].tone,d[kind].cls)+'</span><span class="reminder-status-cell-time">'+esc(time)+'</span><span class="reminder-status-cell-text">'+esc(text)+'</span></div>';
   }
   var claim=wc.ok
-    ?'<div class="reminder-working-claim reminder-working-ok" data-reminder-working="ok">Reminder gözlemi çalışıyor · kaynak + receipt + projection kanıtı birlikte doğrulandı.</div>'
-    :'<div class="reminder-working-claim reminder-working-pending" data-reminder-working="pending">Reminder çalışıyor iddiası yok · eksik kanıt: '+esc(wc.reason)+'.</div>';
+    ?'<div class="reminder-working-claim reminder-working-ok" data-reminder-working="ok" role="status" aria-live="polite">Reminder gözlemi çalışıyor · kaynak + receipt + projection kanıtı birlikte doğrulandı.</div>'
+    :'<div class="reminder-working-claim reminder-working-pending" data-reminder-working="pending" role="status" aria-live="polite">Reminder çalışıyor iddiası yok · eksik kanıt: '+esc(wc.reason)+'.</div>';
   return '<section class="reminder-status-card" data-component="reminder-status-card" aria-label="Reminder gözlem durumu"><div class="reminder-status-head">'+panelStatusBadgeHTMLP('Reminder gözlem durumu','muted','b-dim')+'<span class="reminder-status-head-note">'+esc(d.source.text)+'</span></div><div class="reminder-status-grid">'+cell('source','Kaynak',srcTime,d.source.text)+cell('receipt','Receipt',rcptTime,d.receipt.text)+cell('capability','Capability',snap?'contract v1':'projection yok',d.capability.text)+cell('privacy','Privacy','yerel',d.privacy.text)+cell('device','Cihaz kabulü','—',d.device.text)+'</div>'+claim+'</section>';
 }
 function emptyStateNoteHTMLP(status){
@@ -1916,7 +1920,7 @@ function d4ModuleDrawerHTMLP(module){
   if(!module) return '';
   var h='<div class="d4-drawer-backdrop" data-component="detail-drawer" data-open="true" role="presentation" onclick="if(event.target===this)closeD4ModuleDrawerP()">';
   h+='<aside id="d4-module-drawer" class="detail-drawer d4-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="d4-drawer-title" aria-describedby="d4-drawer-desc" tabindex="-1" onkeydown="eventDrawerKeydownP(event)">';
-  h+='<div class="d4-drawer-head"><div><span class="drawer-kicker">D4 modül ayrıntısı</span><h2 id="d4-drawer-title">'+esc(module.title)+'</h2></div><button class="btn d4-drawer-close" onclick="closeD4ModuleDrawerP()" aria-label="'+esc(module.title)+' ayrıntısını kapat">×</button></div>';
+  h+='<div class="d4-drawer-head"><div><span class="drawer-kicker">D4 modül ayrıntısı</span><h2 id="d4-drawer-title">'+esc(module.title)+'</h2></div><button type="button" class="btn d4-drawer-close" onclick="closeD4ModuleDrawerP()" aria-label="'+esc(module.title)+' ayrıntısını kapat">×</button></div>';
   h+='<p id="d4-drawer-desc" class="d4-drawer-decision">'+esc(module.decision)+'</p><div class="d4-drawer-status-row">'+p3StatusP(module.status)+' '+p3BadgeP(module.source,'source')+' '+p3BadgeP(module.privacy,'privacy')+' '+d4CoverageBadgeP(module.coverage)+'</div>';
   h+='<div class="d4-drawer-summary"><span>Güvenli özet</span><b>'+esc(module.summary)+'</b></div><div class="d4-drawer-grid">';
   (Array.isArray(module.rows)?module.rows:[]).forEach(function(row){ h+='<div class="d4-drawer-cell"><span>'+esc(row[0])+'</span><b>'+esc(row[1])+'</b></div>'; });
@@ -1928,7 +1932,7 @@ function d4ModuleAtlasHTMLP(){
   if(UI.d4SelectedModule) selected=modules.find(function(x){return x.key===UI.d4SelectedModule;})||null;
   var h='<section class="card lift span-12 pad d4-module-atlas" data-component="module-atlas" aria-labelledby="d4-module-atlas-title">';
   h+='<div class="d4-atlas-head"><div><span class="drawer-kicker">Observer coverage</span><h2 id="d4-module-atlas-title">Eksik ve özet modüller</h2><p>Her modül tek canonical metric, kaynak zamanı, durum ve güvenli ayrıntı yüzeyi taşır.</p></div><span class="d4-atlas-count">'+modules.length+' modül · metadata-first</span></div><div class="d4-module-grid">';
-  modules.forEach(function(m){ h+='<article class="d4-module-card d4-module-status-'+esc(m.status||'unknown')+'" data-component="module-card" data-module="'+esc(m.key)+'"><div class="d4-module-card-head"><span class="d4-module-icon">'+icon(m.icon,17)+'</span><div><h3>'+esc(m.title)+'</h3><p>'+esc(m.decision)+'</p></div>'+p3StatusP(m.status)+'</div><div class="d4-module-badges">'+p3BadgeP(m.source,'source')+p3BadgeP(m.privacy,'privacy')+d4CoverageBadgeP(m.coverage)+'</div><div class="d4-module-summary">'+esc(m.summary)+'</div><div class="d4-module-meta"><span>'+esc(m.time)+'</span><span class="d4-canonical-label">Canonical metric</span><b>'+esc(m.canonical)+'</b></div><div class="d4-module-cross">Cross-check · '+esc(m.crossCheck)+'</div><button type="button" class="d4-module-detail" aria-controls="d4-module-drawer" aria-expanded="'+(UI.d4SelectedModule===m.key?'true':'false')+'" onclick="openD4ModuleDrawerP(\''+esc(m.key)+'\',this)">Ayrıntıyı aç <span aria-hidden="true">→</span></button></article>'; });
+  modules.forEach(function(m){ var moduleKeyArg=String(m.key==null?'':m.key).replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r/g,'\\r').replace(/\n/g,'\\n'); h+='<article class="d4-module-card d4-module-status-'+esc(m.status||'unknown')+'" data-component="module-card" data-module="'+esc(m.key)+'"><div class="d4-module-card-head"><span class="d4-module-icon">'+icon(m.icon,17)+'</span><div><h3>'+esc(m.title)+'</h3><p>'+esc(m.decision)+'</p></div>'+p3StatusP(m.status)+'</div><div class="d4-module-badges">'+p3BadgeP(m.source,'source')+p3BadgeP(m.privacy,'privacy')+d4CoverageBadgeP(m.coverage)+'</div><div class="d4-module-summary">'+esc(m.summary)+'</div><div class="d4-module-meta"><span>'+esc(m.time)+'</span><span class="d4-canonical-label">Canonical metric</span><b>'+esc(m.canonical)+'</b></div><div class="d4-module-cross">Cross-check · '+esc(m.crossCheck)+'</div><button type="button" class="d4-module-detail" aria-controls="d4-module-drawer" aria-expanded="'+(UI.d4SelectedModule===m.key?'true':'false')+'" onclick=\'openD4ModuleDrawerP("'+esc(moduleKeyArg)+'",this)\'>Ayrıntıyı aç <span aria-hidden="true">→</span></button></article>'; });
   h+='</div>';
   if(selected) h+=d4ModuleDrawerHTMLP(selected);
   h+='<p class="d4-atlas-foot">Dolu, eski, eksik, bozuk ve redacted durumlar aynı kart sözleşmesiyle fail-closed gösterilir. Panel render’ı source data’yı backfill etmez.</p></section>';
@@ -2140,7 +2144,7 @@ function eventLogCardInnerHTMLP(){
   h+='<div class="lbl event-log-head">'+icon('activity',14)+' Son Değişiklikler <span style="margin-left:auto;">'+localStatus(st.label,st.cls)+'</span></div>';
   h+='<div class="event-log-meta"><span>'+esc(st.note)+'</span><span class="mono">'+all.length+' kayıt · '+(EVENT_LOG_STATE.loadedAt?esc(tsShort(EVENT_LOG_STATE.loadedAt)):'—')+'</span></div>';
   var filters=eventCategoryDefsP(), selectedFilter=filters.filter(function(x){return x[0]===filter;})[0]||filters[0];
-  h+='<div class="event-log-toolbar"><div class="timeline-filter" role="group" aria-label="Son değişiklik filtresi">'+filters.map(function(x){ var count=x[0]==='all'?all.length:all.filter(function(e){return eventMatchesFilterP(e,x[0]);}).length; return '<button class="timeline-filter-btn'+(filter===x[0]?' active':'')+'" data-filter="'+x[0]+'" aria-pressed="'+(filter===x[0]?'true':'false')+'" title="'+esc(x[2])+'" onclick="setEventFilterP(\''+x[0]+'\')">'+esc(x[1])+' <span>'+count+'</span></button>'; }).join('')+'</div><div class="seg event-limit-filter" aria-label="Event sayısı filtresi">'+[5,20,50,100].map(function(n){return '<button class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
+  h+='<div class="event-log-toolbar"><div class="timeline-filter" role="group" aria-label="Son değişiklik filtresi">'+filters.map(function(x){ var count=x[0]==='all'?all.length:all.filter(function(e){return eventMatchesFilterP(e,x[0]);}).length; return '<button type="button" class="timeline-filter-btn'+(filter===x[0]?' active':'')+'" data-filter="'+x[0]+'" aria-pressed="'+(filter===x[0]?'true':'false')+'" title="'+esc(x[2])+'" onclick="setEventFilterP(\''+x[0]+'\')">'+esc(x[1])+' <span>'+count+'</span></button>'; }).join('')+'</div><div class="seg event-limit-filter" role="group" aria-label="Event sayısı filtresi">'+[5,20,50,100].map(function(n){return '<button type="button" class="'+(UI.eventLimit===n?'active':'')+'" onclick="setEventLimitP('+n+')">son '+n+'</button>';}).join('')+'</div></div>';
   h+='<div class="event-log-filter-summary" aria-live="polite">'+esc(selectedFilter[1])+' · son '+Math.min(visible.length,groups.length)+' / '+groups.length+' değişiklik · '+filtered.length+' eşleşme</div>';
   if(!audit.ok) h+='<div class="event-log-alarm error-state" data-component="error-state" role="alert">⚠ Event sırası bozuk: '+esc(String(audit.issueCount))+' sıra/duplicate/gap sinyali. Cihaz bazında sequence doğrulaması başarısız.</div>';
   if(!visible.length) h+='<div class="empty empty-state" data-component="empty-state"><span class="ei">'+icon('clipboard-list',20)+'</span>Henüz güvenli event kaydı yok<span style="font-size:var(--f2);color:var(--t4);">Legacy latest snapshot yine kullanılabilir.</span></div>';
@@ -2154,7 +2158,7 @@ function eventLogCardInnerHTMLP(){
   return h;
 }
 function eventLogCardHTMLP(){
-  return '<div id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" style="order:8;display:flex;flex-direction:column;">'+eventLogCardInnerHTMLP()+'</div>';
+  return '<section id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" role="region" aria-label="Son değişiklikler" style="order:8;display:flex;flex-direction:column;">'+eventLogCardInnerHTMLP()+'</section>';
 }
 // D1.2 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §6.2) — aynı EVENT_LOG_STATE
 // kaynağını kullanan ama eventClassificationP(e).key==='user' (rutin gün

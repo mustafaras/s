@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ÆON · Orchestration Core</title>
-<link rel="stylesheet" href="panel.css?v=20260809c">
+<link rel="stylesheet" href="panel.css?v=20260820c">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="motivationProgramV2.js?v=20260718a"></script>
@@ -35,8 +35,8 @@
       +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Çekirdek başlatılamadı</div>'
       +'<div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Panel kodu yüklenemedi. En sık neden, tarayıcının eski ya da eksik bir panel.js sürümünü önbellekten sunmasıdır. Sayfayı yenileyin; olmazsa önbelleği temizleyip yeniden başlatın.</div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
-      +'<button class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
-      +'<button class="btn" onclick="window.__panelHardReset()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Önbellek Temizle + Yeniden Başlat</button>'
+      +'<button type="button" class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
+      +'<button type="button" class="btn" onclick="window.__panelHardReset()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Önbellek Temizle + Yeniden Başlat</button>'
       +'</div>'
       +'<div style="font-size:9px;color:var(--t3);margin-top:10px;line-height:1.5;">Hâlâ açılmazsa: tarayıcıda Cmd+Shift+R ile sert yenile yapın veya site verilerini (service worker / önbellek) temizleyip paneli yeniden açın.</div>'
       +'</div></div>';

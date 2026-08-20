@@ -295,7 +295,7 @@
   /* ── REM-60 reminder observer status card ── */
   .reminder-status-card{margin:0 16px 14px;padding:10px 12px;border:1px solid var(--bd2);border-radius:12px;background:rgba(255,255,255,.018)}
   .reminder-status-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
-  .reminder-status-head-note{font-size:var(--f2);color:var(--t3)}
+  .reminder-status-head-note{min-width:0;overflow-wrap:anywhere;font-size:var(--f2);color:var(--t3)}
   .reminder-status-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .reminder-status-cell{display:flex;flex-direction:column;gap:3px;min-width:0;padding:6px 7px;border:1px solid var(--bd2);border-radius:8px;background:rgba(0,0,0,.1)}
   .reminder-status-cell-label{font-size:var(--f1);color:var(--t4);font-weight:700;text-transform:uppercase;letter-spacing:.35px}
@@ -370,10 +370,10 @@
   .event-log-row{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:1px solid var(--bd2);border-radius:10px;background:rgba(0,0,0,.09);color:var(--t1);padding:8px}
   .event-log-seq{color:var(--gold);font-size:var(--f2);min-width:40px;font-variant-numeric:tabular-nums}
   .event-log-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-  .event-log-main b{font-size:var(--f3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .event-log-main b{font-size:var(--f3);overflow-wrap:anywhere;white-space:normal}
   .event-log-headline{display:inline-flex;align-items:baseline;gap:5px}
   .event-log-time{color:var(--gold);font-size:var(--f1);font-weight:700;flex:none}
-  .event-log-main small,.event-log-side small{color:var(--t4);font-size:var(--f1)}
+  .event-log-main small,.event-log-side small{color:var(--t4);font-size:var(--f1);overflow-wrap:anywhere;white-space:normal}
   .event-log-side{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
   .event-log-alarm{padding:7px 8px;border:1px solid rgba(251,113,133,.4);border-radius:8px;background:rgba(251,113,133,.08);color:var(--red);font-size:var(--f2);font-weight:750;line-height:1.35}
   .event-log-foot{font-size:var(--f1);line-height:1.35;color:var(--t4)}
@@ -487,7 +487,7 @@
   .topbar-brand{display:flex;align-items:center;gap:12px;min-width:190px;flex:0 1 245px}
   .brand-context{font-size:var(--f1);color:var(--t4);font-weight:800;letter-spacing:.45px;text-transform:uppercase;white-space:nowrap}
   .topbar-status{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;flex:1;flex-wrap:wrap}
-  .topbar-status-detail{font-size:var(--f2);color:var(--t3);font-weight:700;max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topbar-status-detail{font-size:var(--f2);color:var(--t3);font-weight:700;max-width:330px;min-width:0;overflow-wrap:anywhere;white-space:normal}
   .topbar-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:250px;flex:0 1 330px}
   .topbar-actions .density-toggle{flex-shrink:1}
   .command-action{padding:0 10px;flex-shrink:0}
@@ -589,7 +589,7 @@
   .event-log-more:hover,.event-log-more:focus-visible{border-color:var(--gold);background:var(--status-pending-bg);outline:none;box-shadow:var(--focus-ring)}
   .event-log-row{min-height:var(--touch-min);padding:9px 10px}
   .timeline-feature-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;color:var(--gold);background:var(--status-pending-bg);border:1px solid var(--status-pending-bd);flex:0 0 28px}
-  .event-log-main small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .event-log-main small{overflow-wrap:anywhere;white-space:normal}
   .event-log-side{min-width:125px}
   .event-log-revision{color:var(--gold);font-size:var(--f1);max-width:100%;overflow:hidden;text-overflow:ellipsis}
   .event-chain-chip{display:inline-flex;align-items:center;min-height:20px;padding:2px 6px;border-radius:999px;border:1px solid var(--status-warning-bd);background:var(--status-warning-bg);color:var(--status-warning-fg);font-size:var(--f1);font-weight:850;white-space:nowrap}
@@ -618,7 +618,7 @@
   .drawer-audit-chain{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding:9px;border:1px solid var(--status-warning-bd);border-radius:10px;background:var(--status-warning-bg)}
   .timeline-chain-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:baseline;gap:7px;padding:5px 0;border-bottom:1px solid var(--bd2);font-size:var(--f2)}
   .timeline-chain-row:last-child{border-bottom:0}
-  .timeline-chain-row span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t2)}
+  .timeline-chain-row span:nth-child(2){overflow-wrap:anywhere;white-space:normal;color:var(--t2)}
   .timeline-chain-row small{color:var(--status-warning-fg);font-size:var(--f1);font-weight:800}
   @keyframes d3DrawerIn{from{opacity:0}to{opacity:1}}
   @keyframes d3DrawerSlideIn{from{transform:translateX(24px);opacity:.72}to{transform:translateX(0);opacity:1}}
@@ -753,6 +753,30 @@
     .d4-module-card{min-height:0}
     .jumpnav{padding-left:0;padding-right:0}
     .section-header{padding-left:10px;padding-right:10px}
+  }
+  /* Sistem temasına göre aynı metadata-first yüzeyin açık varyantı. Panel
+     varsayılan olarak koyu/gold kalır; açık tercih, sabit renkleri değil aynı
+     semantik token'ları değiştirir. */
+  @media (prefers-color-scheme:light){
+    :root{
+      --bg:#f7f4ee;--s1:#fffdfa;--s2:#f1ece4;--s3:#e7dfd3;
+      --glass:linear-gradient(160deg,rgba(255,255,255,.96),rgba(248,244,237,.98));
+      --glass-hi:linear-gradient(160deg,#fffdfa,#f3ede4);
+      --bd:rgba(48,37,25,.16);--bd2:rgba(48,37,25,.10);--bd-gold:rgba(133,94,0,.34);
+      --t1:#211b16;--t2:#4e4339;--t3:#675b50;--t4:#76695d;
+      --gold:#805b00;--gold2:#956c00;--gold-d:#644700;
+      --ggrad:linear-gradient(135deg,#d6a51b,#a87500 55%,#805b00);
+      --ga:rgba(128,91,0,.10);--gb:rgba(128,91,0,.26);
+      --green:#167442;--gra:rgba(22,116,66,.10);--grb:rgba(22,116,66,.26);
+      --amber:#8a5a00;--aa:rgba(138,90,0,.10);--ab:rgba(138,90,0,.26);
+      --red:#b4233d;--ra:rgba(180,35,61,.09);--rb:rgba(180,35,61,.25);
+      --teal:#0b6870;--ta:rgba(11,104,112,.09);--tb:rgba(11,104,112,.25);
+      --surface-audit:rgba(128,91,0,.07);
+      --focus-ring:0 0 0 3px rgba(128,91,0,.30)
+    }
+    html,body{background:var(--bg)}
+    .topbar{background:rgba(255,253,250,.90)}
+    input[type="date"],input[type="month"],input[type="password"]{color-scheme:light}
   }
   @media(prefers-contrast:more){
     :root{--bd:rgba(255,255,255,.28);--bd2:rgba(255,255,255,.18);--t3:#d6cec4;--t4:#c1b8ad;--focus-ring:0 0 0 4px #fff,0 0 0 7px var(--gold)}

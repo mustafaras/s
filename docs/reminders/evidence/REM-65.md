@@ -69,3 +69,16 @@ ayrı PASS. **PANEL-05 tamamlandı. REM-66 ready.**
 - **App runtime / data repo:** değişmedi
 - **Panel-v2:** değişmedi; ayrı regression olarak koşuldu
 - **S5 user-device acceptance:** `pending`
+
+## Standing `after_each_prompt` teslimat makbuzu
+
+- **Remote equality:** `d0847ef66c6b68639badfda45d55f9dffe61b730`; local
+  `HEAD`, `origin/main` ve `git ls-remote origin refs/heads/main` üçü de aynı.
+- **Workflow:** `32349963063` success; validate job `96366758093` ve deploy
+  job `96366795949` success. Pages deployment `5998815322`, status `success`.
+- **Live HTTP:** `https://mustafaras.github.io/s/index.html` ve `/panel.html`
+  HTTP 200; canlı `panel.html` `panel.css?v=20260820c` ve
+  `panel.js?v=20260820b` asset'lerini taşıyor. Canlı CSS light-theme marker'ı
+  ve canlı JS polling/status marker'ları doğrulandı.
+- **Excluded:** `mustafaras/seyma-data`, other remotes, tags, force-push,
+  history rewrite ve user-device acceptance yapılmadı.

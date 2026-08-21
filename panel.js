@@ -146,6 +146,10 @@ var PANEL_POLL_BASE_MS=5000, PANEL_POLL_MAX_MS=60000, PANEL_POLL_BACKOFF_STEPS=4
 // Denemeler kademeli uzar (30 → 45 → 67 sn) ki hızlı arıza erken yüzeye çıksın.
 var PANEL_FETCH_TIMEOUT_MS=30000, PANEL_TRANSPORT_TIMEOUT_MS=30000, PANEL_BOOT_STALL_MS=20000;
 var PANEL_FETCH_ATTEMPTS=3, PANEL_RETRY_DELAY_MS=1200, PANEL_TIMEOUT_GROWTH=1.5;
+// Panel her arızayı tek bir "Bağlantı kurulamadı" metnine indirgiyordu; HTTP
+// durumu gizli kaldığı için saha teşhisi imkânsızdı. Bu kayıt YALNIZ durum
+// kodu / hata sınıfı / sınır sıfırlanma zamanı tutar — token, veri, URL yok.
+var PANEL_LAST_DIAG={status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null};
 var PANEL_EVENT_FETCH_CONCURRENCY=4, PANEL_EVENT_REFRESH_DAYS=2;
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
@@ -211,6 +215,42 @@ function panelAttemptP(run,attempts,delayMs){
 function panelAttemptTimeoutP(base,attempt){
   var b=typeof base==='number'&&base>0?base:PANEL_FETCH_TIMEOUT_MS;
   return Math.round(b*Math.pow(PANEL_TIMEOUT_GROWTH,Math.max(0,(attempt||1)-1)));
+}
+// GitHub, hem birincil (403 + x-ratelimit-remaining: 0) hem ikincil (429)
+// sınırı bildirir ve bu başlıkları CORS ile tarayıcıya açar. Panel bunları
+// okumadığı için 403'ü "token gecersiz" sanıp gözlemciyi boş yere giriş
+// ekranına atıyordu. Yalnız sayısal sınır bilgisi okunur.
+function panelRateInfoP(response){
+  var rem=responseHeaderP(response,'X-RateLimit-Remaining');
+  var reset=responseHeaderP(response,'X-RateLimit-Reset');
+  var ra=responseHeaderP(response,'Retry-After');
+  var remaining=rem===null?null:parseInt(rem,10);
+  var resetAt=reset===null?null:(parseInt(reset,10)*1000);
+  var retryAfterMs=ra===null?null:(parseInt(ra,10)*1000);
+  if(isNaN(remaining)) remaining=null;
+  if(isNaN(resetAt)) resetAt=null;
+  if(isNaN(retryAfterMs)) retryAfterMs=null;
+  return {remaining:remaining,resetAt:resetAt,retryAfterMs:retryAfterMs};
+}
+function panelRateLimitedP(status,info){
+  if(status===429) return true;
+  return status===403&&!!info&&info.remaining===0;
+}
+function panelNoteDiagP(status,kind,attempt,info){
+  PANEL_LAST_DIAG={status:typeof status==='number'?status:null,kind:kind||null,
+    attempts:attempt||0,at:new Date().toISOString(),
+    resetAt:info&&info.resetAt||null,retryAfterMs:info&&info.retryAfterMs||null};
+  return PANEL_LAST_DIAG;
+}
+function panelDiagTextP(){
+  var d=PANEL_LAST_DIAG||{}, bits=[];
+  if(d.status) bits.push('HTTP '+d.status);
+  if(d.kind) bits.push(d.kind);
+  if(d.attempts) bits.push(d.attempts+' deneme');
+  if(d.resetAt){
+    try{ bits.push('sınır '+new Date(d.resetAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+'\u2019de sıfırlanır'); }catch(e){}
+  }
+  return bits.join(' \u00B7 ');
 }
 function pollConditionalDecisionP(cache,status,etag){
   var known=cache&&typeof cache.etag==='string'&&cache.etag;
@@ -5089,7 +5129,12 @@ function initLocMap(){
 
 function fail(msg){
   var safeMsg=typeof safePanelErrorTextP==='function'?safePanelErrorTextP(msg):'İşlem tamamlanamadı.';
-  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;">'+esc(safeMsg)+'</div></div></div>';
+  // Teşhis satırı: yalnız HTTP durum kodu, hata sınıfı, deneme sayısı ve sınır
+  // sıfırlanma saati. Token, URL, kullanıcı verisi ASLA yazılmaz.
+  var diag=typeof panelDiagTextP==='function'?panelDiagTextP():'';
+  var limited=PANEL_LAST_DIAG&&PANEL_LAST_DIAG.kind==='rate_limited';
+  if(limited) safeMsg='Sunucu isteği sınırına takıldı; sınır sıfırlanınca panel kendiliğinden açılır.';
+  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;line-height:1.6;">'+esc(safeMsg)+(diag?'<br><span style="opacity:.85;">Tanı: '+esc(diag)+'</span>':'')+'</div></div></div>';
 }
 window.savePanelToken=function(){
   var v=normalizeToken((document.getElementById("ptok")||{}).value||""); if(!v) return;
@@ -5110,15 +5155,29 @@ function fetchLatest(repo,branch){
   return panelFetchP(api,{headers:H,cache:"no-store"},panelAttemptTimeoutP(PANEL_FETCH_TIMEOUT_MS,attempt))
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(PANEL_LATEST_CACHE,r.status,etag);
-      if(decision.kind==='not_modified') return {notModified:true,meta:{etag:decision.etag,completedAt:new Date().toISOString()}};
-      if(r.status===401||r.status===403){ var a=new Error("Token gecersiz veya yetkisiz."); a.noRetry=true; throw a; }
-      if(r.status===404){ var e=new Error("data/latest.json bulunamadi."); e.notFound=true; e.noRetry=true; throw e; }
-      if(!r.ok){ var h=new Error("Sunucu hatasi: "+r.status); if(r.status<500) h.noRetry=true; throw h; }
+      var rate=panelRateInfoP(r);
+      if(decision.kind==='not_modified'){ panelNoteDiagP(304,'not_modified',attempt,rate); return {notModified:true,meta:{etag:decision.etag,completedAt:new Date().toISOString()}}; }
+      // ÖNCE sınır kontrolü: GitHub birincil sınırı 403 ile bildirir. Eskiden
+      // bu "token gecersiz" sayılıp gözlemci boş yere giriş ekranına atılıyor,
+      // hatta token'ını yeniletiyordu. Sınır kendiliğinden sıfırlanır.
+      if(panelRateLimitedP(r.status,rate)){
+        panelNoteDiagP(r.status,'rate_limited',attempt,rate);
+        var rl=new Error("Sunucu sinirina takildi (rate limit)."); rl.rateLimited=true; rl.noRetry=true; rl.rateInfo=rate; throw rl;
+      }
+      if(r.status===401||r.status===403){ panelNoteDiagP(r.status,'unauthorized',attempt,rate); var a=new Error("Token gecersiz veya yetkisiz."); a.noRetry=true; throw a; }
+      if(r.status===404){ panelNoteDiagP(404,'not_found',attempt,rate); var e=new Error("data/latest.json bulunamadi."); e.notFound=true; e.noRetry=true; throw e; }
+      if(!r.ok){ panelNoteDiagP(r.status,'http_error',attempt,rate); var h=new Error("Sunucu hatasi: "+r.status); if(r.status<500) h.noRetry=true; throw h; }
+      panelNoteDiagP(r.status,'ok',attempt,rate);
       // Gövde yarıda kesildiyse r.json() burada reddeder (bozuk JSON ya da
       // akış hatası); panelAttemptP bunu yeniden denenebilir sayar.
       return r.json().then(function(data){ PANEL_LATEST_CACHE.etag=etag; PANEL_LATEST_CACHE.sourceRevision=(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||null; PANEL_LATEST_CACHE.sourceUpdatedAt=(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||null; PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached'; return {notModified:false,data:data,meta:{etag:etag,completedAt:new Date().toISOString()}}; });
     });
-  },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS);
+  },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS).catch(function(err){
+    if(!PANEL_LAST_DIAG||PANEL_LAST_DIAG.kind===null||PANEL_LAST_DIAG.kind==='ok'){
+      panelNoteDiagP(null,err&&err.code==='timeout'?'timeout':'network',PANEL_FETCH_ATTEMPTS,err&&err.rateInfo);
+    }
+    throw err;
+  });
 }
 // ---------- observer → kullanici mesaj kanali (data/observer-inbox.json) ----------
 function b64enc(str){ var bytes=new TextEncoder().encode(str); var bin=""; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
@@ -5711,6 +5770,17 @@ function panelBusyTyping(){ var el=document.activeElement; if(!el) return false;
 // bir sonraki turu ancak öncekinin bitişinden sonra kurar ve ardışık hatada
 // üstel olarak yavaşlar (5s → 10 → 20 → 40 → 60 tavan).
 function panelPollDelayP(){
+  // Sunucu sınırına takıldıysak sınır sıfırlanana kadar beklemek, üstel
+  // backoff'tan daha doğrudur: erken denemeler sınırı uzatabilir. Retry-After
+  // varsa ona, yoksa X-RateLimit-Reset'e uyulur; PANEL_POLL_MAX_MS ile sınırlanır
+  // ki panel hiçbir durumda sessizce ölmesin.
+  var d=PANEL_LAST_DIAG||{};
+  if(d.kind==='rate_limited'){
+    var waitMs=null;
+    if(typeof d.retryAfterMs==='number'&&d.retryAfterMs>0) waitMs=d.retryAfterMs;
+    else if(typeof d.resetAt==='number'&&d.resetAt>0) waitMs=d.resetAt-Date.now();
+    if(typeof waitMs==='number'&&waitMs>0) return Math.min(PANEL_POLL_MAX_MS,Math.max(PANEL_POLL_BASE_MS,waitMs));
+  }
   if(!(PANEL_CONSECUTIVE_ERRORS>0)) return PANEL_POLL_BASE_MS;
   var steps=Math.min(PANEL_CONSECUTIVE_ERRORS,PANEL_POLL_BACKOFF_STEPS);
   return Math.min(PANEL_POLL_MAX_MS,PANEL_POLL_BASE_MS*Math.pow(2,steps));

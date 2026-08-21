@@ -69,12 +69,20 @@ var step2=step1.then(function(){
 // ── [2] Backoff eğrisi ────────────────────────────────────────────────
 var step3=step2.then(function(){
   console.log('[2] Ardışık hata backoff eğrisi');
-  var ctx={Math:Math,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:60000,PANEL_POLL_BACKOFF_STEPS:4};
+  var ctx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:60000,PANEL_POLL_BACKOFF_STEPS:4,
+    PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null}};
   vm.runInNewContext(extractFunction('panelPollDelayP'),ctx,{filename:'panel-boot-backoff.js'});
   ok('hata yokken taban aralık korunur',ctx.panelPollDelayP()===5000);
   ctx.PANEL_CONSECUTIVE_ERRORS=1; var d1=ctx.panelPollDelayP();
   ctx.PANEL_CONSECUTIVE_ERRORS=3; var d3=ctx.panelPollDelayP();
   ctx.PANEL_CONSECUTIVE_ERRORS=50; var dMax=ctx.panelPollDelayP();
+  var rlCtx={Math:Math,Date:Date,PANEL_CONSECUTIVE_ERRORS:0,PANEL_POLL_BASE_MS:5000,PANEL_POLL_MAX_MS:60000,PANEL_POLL_BACKOFF_STEPS:4,
+    PANEL_LAST_DIAG:{kind:'rate_limited',retryAfterMs:null,resetAt:Date.now()+40000}};
+  vm.runInNewContext(extractFunction('panelPollDelayP'),rlCtx,{filename:'panel-boot-ratedelay.js'});
+  var rlDelay=rlCtx.panelPollDelayP();
+  ok('sınıra takılınca sıfırlanma zamanına kadar beklenir',rlDelay>=30000&&rlDelay<=60000,'rlDelay='+rlDelay);
+  rlCtx.PANEL_LAST_DIAG={kind:'rate_limited',retryAfterMs:12000,resetAt:null};
+  ok('Retry-After başlığı önceliklidir',rlCtx.panelPollDelayP()===12000,'='+rlCtx.panelPollDelayP());
   ok('ilk hatada aralık büyür',d1>5000&&d1<=20000,'d1='+d1);
   ok('ardışık hatada üstel yavaşlar',d3>d1,'d1='+d1+' d3='+d3);
   ok('backoff üst sınırı aşmaz',dMax<=60000&&dMax>=d3,'dMax='+dMax);
@@ -230,7 +238,7 @@ var step5b=step5.then(function(){
     var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,
       isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,
       AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:30000,PANEL_FETCH_ATTEMPTS:3,PANEL_RETRY_DELAY_MS:1,
-      PANEL_TIMEOUT_GROWTH:1.5,PTOKEN:'test-token-not-real',
+      PANEL_TIMEOUT_GROWTH:1.5,PTOKEN:'test-token-not-real',PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null},parseInt:parseInt,isNaN:isNaN,
       PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},
       fetch:function(){
         attempts++;
@@ -241,7 +249,8 @@ var step5b=step5.then(function(){
             ? Promise.reject(new SyntaxError('Unterminated string in JSON at position 438122'))
             : Promise.resolve(latest); }});
       }};
-    vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelFetchP')+'\n'+
+    vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelRateInfoP')+'\n'+
+      extractFunction('panelRateLimitedP')+'\n'+extractFunction('panelNoteDiagP')+'\n'+extractFunction('panelFetchP')+'\n'+
       extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+
       extractFunction('panelAttemptTimeoutP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+
       extractFunction('fetchLatest'),ctx,{filename:'panel-boot-truncation.js'});
@@ -257,8 +266,62 @@ var step5b=step5.then(function(){
   });
 });
 
+// ── [4c] Sunucu sınırı, yetkisizlikten ayrılır ────────────────────────
+var step5c=step5b.then(function(){
+  console.log('[4c] 403-sınır ile 403-yetkisiz ayrımı');
+  function latestCtx(status,headers){
+    var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,
+      isFinite:isFinite,isNaN:isNaN,parseInt:parseInt,Error:Error,encodeURIComponent:encodeURIComponent,
+      setTimeout:setTimeout,clearTimeout:clearTimeout,AbortController:AbortController,
+      PANEL_FETCH_TIMEOUT_MS:30000,PANEL_FETCH_ATTEMPTS:2,PANEL_RETRY_DELAY_MS:1,PANEL_TIMEOUT_GROWTH:1.5,
+      PTOKEN:'test-token-not-real',calls:0,
+      PANEL_LAST_DIAG:{status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null},
+      PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'}};
+    ctx.fetch=function(){
+      ctx.calls++;
+      return Promise.resolve({status:status,ok:false,headers:{get:function(k){
+        var v=headers[String(k).toLowerCase()]; return v===undefined?null:v; }}});
+    };
+    vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelRateInfoP')+'\n'+
+      extractFunction('panelRateLimitedP')+'\n'+extractFunction('panelNoteDiagP')+'\n'+extractFunction('panelFetchP')+'\n'+
+      extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+
+      extractFunction('panelAttemptTimeoutP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+
+      extractFunction('fetchLatest'),ctx,{filename:'panel-boot-ratelimit.js'});
+    return ctx;
+  }
+  var reset=Math.floor((Date.now()+900000)/1000);
+  var c1=latestCtx(403,{'x-ratelimit-remaining':'0','x-ratelimit-reset':String(reset)});
+  return c1.fetchLatest('mustafaras/seyma-data','main').then(function(){
+    ok('403+sınır hata vermeli',false);
+  },function(err){
+    ok('403 + remaining:0 sunucu sınırı sayılır, token gecersiz DEĞİL',
+      err&&err.rateLimited===true&&!/gecersiz|yetkisiz/i.test(String(err.message)),String(err&&err.message));
+    ok('sınır durumunda tanı kaydı sıfırlanma zamanını taşır',
+      c1.PANEL_LAST_DIAG.kind==='rate_limited'&&c1.PANEL_LAST_DIAG.status===403&&c1.PANEL_LAST_DIAG.resetAt===reset*1000);
+    ok('sınır hatası yeniden denemeyle büyütülmez',c1.calls===1,'istek='+c1.calls);
+  }).then(function(){
+    var c2=latestCtx(429,{'retry-after':'60'});
+    return c2.fetchLatest('mustafaras/seyma-data','main').catch(function(err){
+      ok('429 ikincil sınır olarak sınıflanır',err&&err.rateLimited===true);
+      ok('Retry-After tanıya yazılır',c2.PANEL_LAST_DIAG.retryAfterMs===60000);
+    });
+  }).then(function(){
+    var c3=latestCtx(403,{'x-ratelimit-remaining':'4712'});
+    return c3.fetchLatest('mustafaras/seyma-data','main').catch(function(err){
+      ok('kota doluyken DEĞİL de gerçek 403 ise yetkisizlik sayılır',
+        /gecersiz|yetkisiz/i.test(String(err&&err.message))&&!err.rateLimited);
+      ok('yetkisizlik tanısı doğru sınıflanır',c3.PANEL_LAST_DIAG.kind==='unauthorized');
+    });
+  }).then(function(){
+    var c4=latestCtx(401,{});
+    return c4.fetchLatest('mustafaras/seyma-data','main').catch(function(err){
+      ok('401 her zaman yetkisizliktir',/gecersiz|yetkisiz/i.test(String(err&&err.message)));
+    });
+  });
+});
+
 // ── [5] Kaynak sözleşmesi ─────────────────────────────────────────────
-var step6=step5b.then(function(){
+var step6=step5c.then(function(){
   console.log('[5] Kaynak sözleşmesi');
   ok('latest.json okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(api,/.test(source));
   ok('transport okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(ghTransportApiP\(path\)/.test(source));
@@ -273,6 +336,12 @@ var step6=step5b.then(function(){
   ok('4xx yanıtlar noRetry ile işaretlenir',/a\.noRetry=true/.test(source)&&/e\.noRetry=true/.test(source)&&/te\.noRetry=true/.test(source));
   ok('indirme sürerken yanlış hata yerine ilerleme gösterilir',source.indexOf('PANEL_BOOT_WAIT_MARK')>=0&&/Veri indiriliyor/.test(source));
   ok('zaman bütçesi ölçülen yavaş hatta yetecek kadar geniş',/PANEL_FETCH_TIMEOUT_MS=30000/.test(source));
+  ok('hata kartı HTTP durumunu görünür kılar',/Tanı: /.test(source)&&source.indexOf('panelDiagTextP')>=0);
+  ok('tanı kaydı gizli veri taşımaz',(function(){
+    var f=extractFunction('panelNoteDiagP')+extractFunction('panelDiagTextP');
+    return ['PTOKEN','ghToken','localStorage','api.github.com','D.days'].every(function(n){ return f.indexOf(n)<0; });
+  })());
+  ok('sınıra takılınca poll sıfırlanma zamanına saygı duyar',/d\.kind==='rate_limited'/.test(source));
   var vis=(source.match(/addEventListener\((["'])visibilitychange\1/g)||[]).length;
   ok('yinelenen visibilitychange dinleyicisi yok',vis===1,'sayı='+vis);
   ok('panel kabuğu watchdog\'u panel.js\'ten önce çalışır',

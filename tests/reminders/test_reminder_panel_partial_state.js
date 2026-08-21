@@ -237,8 +237,10 @@ const cases = [
 
   // ── 3. fail() draft / token / selected UI state korunur ────────────
   ["fail() writes the error screen without touching draft, token or selected UI state", () => {
-    const ctx = loadPanelHelpers(["fail"], {
+    const ctx = loadPanelHelpers(["panelDiagTextP", "fail"], {
       window: {},
+      Date,
+      PANEL_LAST_DIAG: { status: 429, kind: "rate_limited", attempts: 1, at: null, resetAt: null, retryAfterMs: null },
       document: {
         getElementById: () => {
           return { set innerHTML(v) { ctx.rendered = v; } };

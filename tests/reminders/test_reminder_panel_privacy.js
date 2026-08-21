@@ -182,9 +182,20 @@ function loadMediaSlot() {
   return ctx;
 }
 
-function loadFail() {
+function loadFail(diag) {
   const app = { innerHTML: "" };
-  const ctx = loadHtmlBoundary({ document: { getElementById: () => app } });
+  const ctx = loadHtmlBoundary({
+    document: { getElementById: () => app },
+    Date,
+    // REM: fail() artık HTTP durum kodunu görünür kılan bir tanı satırı yazar.
+    // Bu satır YALNIZ durum/sınıf/deneme/sıfırlanma saati taşır; token, URL ve
+    // kullanıcı verisi taşımadığı aşağıdaki redaction testleriyle doğrulanır.
+    PANEL_LAST_DIAG: Object.assign(
+      { status: null, kind: null, attempts: 0, at: null, resetAt: null, retryAfterMs: null },
+      diag || {}
+    )
+  });
+  vm.runInNewContext(extractTopLevelFunction("panelDiagTextP"), ctx, { filename: "panel-rem64-diag.js" });
   vm.runInNewContext(extractFunctionBody("fail"), ctx, { filename: "panel-rem64-fail.js" });
   return { ctx, app };
 }

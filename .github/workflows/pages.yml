@@ -56,10 +56,46 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Depo koku oldugu gibi yayinlaniyordu: docs/ (1.0 MB), tests/ (1.8 MB),
+      # .claude/ (692 KB ajan harness'lari) ve archive/ (528 KB) dahil ~4.2 MB
+      # ic malzeme herkese acik URL'de servis ediliyordu. Calisma zamaninda
+      # hicbiri kullanilmiyor; app.js'in cektigi tek .md dosyasi Pages'ten degil
+      # veri repo'sundan GitHub API ile geliyor.
+      - name: Stage runtime-only site
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '.claude' \
+            --exclude 'docs' \
+            --exclude 'tests' \
+            --exclude 'archive' \
+            --exclude '_site' \
+            --exclude '*.md' \
+            ./ _site/
+          echo "--- staged size ---"
+          du -sh _site
+
+      # Yanlislikla bir calisma zamani dosyasi dislanirsa deploy SESSIZCE bozuk
+      # site yayinlamasin: temel varliklar yoksa is burada duser.
+      - name: Guard runtime assets present
+        run: |
+          for f in index.html panel.html app.js panel.js sync.js styles.css \
+                   panel.css sw.js manifest.json app/core/constants.js \
+                   panelCoverageManifest.js profileAssessmentV1.js; do
+            [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
+          done
+          [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }
+          for d in docs tests archive .claude; do
+            [ ! -e "_site/$d" ] || { echo "_site icinde $d kaldi"; exit 1; }
+          done
+          echo "runtime guard OK"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

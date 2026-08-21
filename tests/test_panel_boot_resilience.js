@@ -342,6 +342,16 @@ var step6=step5c.then(function(){
     return ['PTOKEN','ghToken','localStorage','api.github.com','D.days'].every(function(n){ return f.indexOf(n)<0; });
   })());
   ok('sınıra takılınca poll sıfırlanma zamanına saygı duyar',/d\.kind==='rate_limited'/.test(source));
+  // Öz-tanı: gözlemciyi döngüden çıkarır ama gizlilik sınırını genişletmez.
+  ok('hata kartı öz-tanı yolu sunar',source.indexOf('window.runPanelSelfTest=runPanelSelfTestP')>=0&&/Tanı çalıştır/.test(source)&&source.indexOf('id="panel-selftest"')>=0);
+  var probe=extractFunction('panelSelfTestP')+extractFunction('panelProbeP')+extractFunction('runPanelSelfTestP');
+  ['method:"PUT"',"method:'PUT'","method:\"POST\"",'localStorage.setItem','localStorage.removeItem'].forEach(function(n){
+    ok('öz-tanı yazma yolu açmaz ('+n+')',probe.indexOf(n)<0);
+  });
+  ok('öz-tanı yalnız GET kullanır',!/method\s*:/.test(probe));
+  ok('öz-tanı token içeriğini çıktıya yazmaz',!/detail\s*:\s*[^,}]*PTOKEN/.test(probe));
+  ok('öz-tanı gövde bütünlüğünü bayt olarak kontrol eder',/Content-Length/.test(probe)&&/YARIDA KESİLDİ/.test(probe));
+  ok('öz-tanı kota adımı sınırı tüketmez (/rate_limit)',probe.indexOf('api.github.com/rate_limit')>=0);
   var vis=(source.match(/addEventListener\((["'])visibilitychange\1/g)||[]).length;
   ok('yinelenen visibilitychange dinleyicisi yok',vis===1,'sayı='+vis);
   ok('panel kabuğu watchdog\'u panel.js\'ten önce çalışır',

@@ -5134,7 +5134,7 @@ function fail(msg){
   var diag=typeof panelDiagTextP==='function'?panelDiagTextP():'';
   var limited=PANEL_LAST_DIAG&&PANEL_LAST_DIAG.kind==='rate_limited';
   if(limited) safeMsg='Sunucu isteği sınırına takıldı; sınır sıfırlanınca panel kendiliğinden açılır.';
-  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;line-height:1.6;">'+esc(safeMsg)+(diag?'<br><span style="opacity:.85;">Tanı: '+esc(diag)+'</span>':'')+'</div></div></div>';
+  document.getElementById("app").innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Bağlantı bekleniyor</div><div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri okunamadı.</div><div style="display:flex;gap:6px;"><button class="btn" onclick="load()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;">Tekrar Dene</button><button class="btn" onclick="resetPanelToken()" style="padding:8px 16px;font-size:12px;">Yeni Anahtar</button><button class="btn" onclick="runPanelSelfTest()" style="padding:8px 16px;font-size:12px;">Tanı çalıştır</button></div><div id="panel-selftest"></div><div style="font-size:9px;color:var(--t3);margin-top:10px;font-variant-numeric:tabular-nums;line-height:1.6;">'+esc(safeMsg)+(diag?'<br><span style="opacity:.85;">Tanı: '+esc(diag)+'</span>':'')+'</div></div></div>';
 }
 window.savePanelToken=function(){
   var v=normalizeToken((document.getElementById("ptok")||{}).value||""); if(!v) return;
@@ -5145,6 +5145,94 @@ window.resetPanelToken=function(){ try{ localStorage.removeItem(PTKEY);}catch(e)
 function tokenPrompt(msg){
   document.getElementById("app").innerHTML='<div style="max-width:380px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;"><div style="font-size:17px;font-weight:800;margin-bottom:4px;">ÆON · Giriş</div><div style="font-size:11px;line-height:1.5;color:var(--t2);margin-bottom:12px;">GitHub token gir — panel yakın takibe geçer.</div>'+(msg?'<div class="badge b-warn" style="margin-bottom:10px;border-radius:7px;padding:6px 10px;font-size:10px;">'+esc(msg)+'</div>':'')+'<input id="ptok" type="password" placeholder="github_pat_…" style="width:100%;margin-bottom:8px;padding:9px 10px;font-size:12px;"><button class="btn" onclick="savePanelToken()" style="width:100%;padding:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Başlat</button></div></div>';
 }
+// ── Öz-tanı ──────────────────────────────────────────────────────────
+// Gözlemci hata kartında "Tanı çalıştır"a bastığında dört basamak sırayla
+// denenir ve HANGİ basamağın kırıldığı sayıyla gösterilir. Hepsi salt GET.
+// Çıktı yalnız durum kodu, bayt, süre ve sınır sayacı içerir; token, URL
+// imzası ve kullanıcı verisi ASLA yazılmaz.
+function panelProbeP(name,run){
+  var t0=Date.now();
+  return Promise.resolve().then(run).then(function(d){
+    return {name:name,ok:d&&d.ok!==false,detail:(d&&d.detail)||"",ms:Date.now()-t0};
+  },function(e){
+    var m=String(e&&e.message||e);
+    return {name:name,ok:false,detail:(e&&e.code==='timeout')?'zaman aşımı':(/failed to fetch|networkerror/i.test(m)?'ağa ulaşılamadı':'hata'),ms:Date.now()-t0};
+  });
+}
+function panelSelfTestP(){
+  var pr=String(REPO||"").split("/"), owner=encodeURIComponent(pr[0]||""), repo=encodeURIComponent(pr[1]||"");
+  var base="https://api.github.com/repos/"+owner+"/"+repo;
+  var steps=[];
+  // 1) Ağ: kimliksiz erişim — CORS ve erişilebilirlik.
+  steps.push(function(){ return panelProbeP("1 · Ağ / CORS",function(){
+    return panelFetchP("https://api.github.com/",{cache:"no-store"},15000).then(function(r){
+      return {ok:r.status>0,detail:"HTTP "+r.status};
+    });
+  }); });
+  // 2) Anahtar + kota: /rate_limit kotadan DÜŞMEZ, en ucuz kimlikli sinyal.
+  steps.push(function(){ return panelProbeP("2 · Anahtar & kota",function(){
+    return panelFetchP("https://api.github.com/rate_limit",{headers:{"Authorization":"Bearer "+PTOKEN,"Accept":"application/vnd.github+json"},cache:"no-store"},15000).then(function(r){
+      if(r.status===401) return {ok:false,detail:"HTTP 401 · anahtar geçersiz/süresi dolmuş"};
+      if(!r.ok) return {ok:false,detail:"HTTP "+r.status};
+      return r.json().then(function(j){
+        var c=(j&&j.resources&&j.resources.core)||j&&j.rate||{};
+        var left=typeof c.remaining==='number'?c.remaining:null, lim=typeof c.limit==='number'?c.limit:null;
+        var when=""; try{ if(c.reset) when=" · sıfırlanma "+new Date(c.reset*1000).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}); }catch(e){}
+        return {ok:left===null||left>0,detail:"kalan "+(left===null?"?":left)+"/"+(lim===null?"?":lim)+when};
+      });
+    });
+  }); });
+  // 3) Dosya meta: küçük JSON yanıtı — yetki ve dosya boyutu.
+  steps.push(function(){ return panelProbeP("3 · Dosya erişimi",function(){
+    return panelFetchP(base+"/contents/data/latest.json?ref="+encodeURIComponent(BRANCH),{headers:{"Authorization":"Bearer "+PTOKEN,"Accept":"application/vnd.github+json"},cache:"no-store"},20000).then(function(r){
+      var rate=panelRateInfoP(r);
+      if(panelRateLimitedP(r.status,rate)) return {ok:false,detail:"HTTP "+r.status+" · sunucu sınırı"};
+      if(!r.ok) return {ok:false,detail:"HTTP "+r.status};
+      return r.json().then(function(g){
+        var kb=g&&typeof g.size==='number'?Math.round(g.size/1024):null;
+        return {ok:true,detail:"HTTP 200 · "+(kb===null?"?":kb)+" KB"};
+      });
+    });
+  }); });
+  // 4) Gövde: asıl indirme — kaç bayt geldi, beklenen kaçtı?
+  steps.push(function(){ return panelProbeP("4 · Gövde indirme",function(){
+    return panelFetchP(base+"/contents/data/latest.json?ref="+encodeURIComponent(BRANCH),{headers:{"Authorization":"Bearer "+PTOKEN,"Accept":"application/vnd.github.raw"},cache:"no-store"},90000).then(function(r){
+      var rate=panelRateInfoP(r);
+      if(panelRateLimitedP(r.status,rate)) return {ok:false,detail:"HTTP "+r.status+" · sunucu sınırı"};
+      if(!r.ok) return {ok:false,detail:"HTTP "+r.status};
+      var expected=parseInt(responseHeaderP(r,"Content-Length")||"0",10);
+      return r.arrayBuffer().then(function(buf){
+        var got=buf&&buf.byteLength||0, eKB=Math.round((expected||0)/1024), gKB=Math.round(got/1024);
+        if(expected&&got<expected) return {ok:false,detail:"YARIDA KESİLDİ · "+gKB+"/"+eKB+" KB"};
+        return {ok:true,detail:"tam · "+gKB+" KB"};
+      });
+    });
+  }); });
+  var out=[];
+  return steps.reduce(function(chain,step){
+    return chain.then(function(){ return step().then(function(r){ out.push(r); }); });
+  },Promise.resolve()).then(function(){ return out; });
+}
+function runPanelSelfTestP(){
+  var box=document.getElementById("panel-selftest"); if(!box) return;
+  box.innerHTML='<div style="font-size:10px;color:var(--t2);">Tanı çalışıyor… (gövde indirme adımı yavaş hatta bir dakikayı bulabilir)</div>';
+  panelSelfTestP().then(function(rows){
+    var h='<div style="margin-top:4px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;">';
+    rows.forEach(function(r){
+      h+='<div style="display:flex;gap:6px;align-items:baseline;font-size:10px;line-height:1.7;">'
+        +'<span style="color:'+(r.ok?"var(--ok,#7DD389)":"var(--danger,#E9899F)")+';">'+(r.ok?"OK":"HATA")+'</span>'
+        +'<span style="color:var(--t2);flex:1;">'+esc(r.name)+'</span>'
+        +'<span style="color:var(--t3);font-variant-numeric:tabular-nums;">'+esc(r.detail)+' · '+r.ms+'ms</span>'
+        +'</div>';
+    });
+    var bad=rows.filter(function(r){return !r.ok;})[0];
+    h+='<div style="font-size:10px;color:var(--t2);margin-top:8px;line-height:1.6;">'
+      +(bad?("İlk kırılan adım: <b>"+esc(bad.name)+"</b> — "+esc(bad.detail)):"Tüm adımlar geçti; panel bir sonraki turda açılmalı.")
+      +'</div></div>';
+    box.innerHTML=h;
+  },function(){ box.innerHTML='<div style="font-size:10px;color:var(--t2);">Tanı tamamlanamadı.</div>'; });
+}
+window.runPanelSelfTest=runPanelSelfTestP;
 function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
   var api="https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/data/latest.json?ref="+encodeURIComponent(branch), H={"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"};

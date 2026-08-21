@@ -8,22 +8,38 @@
 <meta http-equiv="Expires" content="0">
 <title>ÆON · Orchestration Core</title>
 <link rel="stylesheet" href="panel.css?v=20260820f">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="motivationProgramV2.js?v=20260718a"></script>
-<script src="saygiPeople.js?v=20260715a"></script>
-<script src="hijriCalendar.js?v=20260730j"></script>
-<script src="quranRevelationOrderV1.js?v=20260801a"></script>
-<script src="quranTransportV1.js?v=20260801a"></script>
+<!-- Leaflet yalnızca harita kartı içindir; panel çekirdeğinin parser'ını bloke
+     etmemesi için CSS asenkron, JS bağımsız yüklenir. -->
+<link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style" crossorigin="" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""></noscript>
+<script async src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
 <body>
 <div id="app"><div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Çekirdek başlatılıyor…</div></div>
 <script>
-// Emergency cache reset: ?resetCache=1 or ?resetSw=1 wipes service workers and
-// caches, then reloads with a fresh URL. This lets a stuck panel recover from
-// a stale service worker or corrupted cache without opening DevTools.
+// ── Panel boot watchdog / safe cache reset ──
+// Bu blok, bütün panel modüllerinden ÖNCE çalışır. Böylece eksik/bozuk bir
+// panel.js veya erişilemeyen harita CDN'i yer tutucuyu sonsuza dek bırakamaz.
 (function(){
   var qs=new URLSearchParams(location.search);
+  var fired=false;
+  var CHECK_MS=400;      // çekirdek hazır mı diye yoklama aralığı
+  var MAX_WAIT=12000;    // panel.js indirme + parse için üst bütçe (yavaş mobil)
+  function panic(){
+    if(fired) return; fired=true;
+    var a=document.getElementById("app"); if(!a) return;
+    a.innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;">'
+      +'<div class="card" style="padding:24px;">'
+      +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Çekirdek başlatılamadı</div>'
+      +'<div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Panel kodu zamanında yüklenemedi. Sayfayı yenileyin; olmazsa önbelleği temizleyip yeniden başlatın.</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+      +'<button type="button" class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
+      +'<button type="button" class="btn" onclick="window.__panelHardReset()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Önbellek Temizle + Yeniden Başlat</button>'
+      +'</div>'
+      +'<div style="font-size:9px;color:var(--t3);margin-top:10px;line-height:1.5;">Hâlâ açılmazsa: tarayıcıda Cmd+Shift+R ile sert yenile yapın veya site verilerini (service worker / önbellek) temizleyip paneli yeniden açın.</div>'
+      +'</div></div>';
+  }
+  window.__panelBootFailure=function(){ panic(); };
   if(qs.get('resetCache')==='1'||qs.get('resetSw')==='1'){
     var next=function(){
       var u=new URL(location.href);
@@ -37,40 +53,8 @@
     Promise.all([clearCaches.catch(function(){}), unreg.catch(function(){})]).then(next).catch(next);
     // Keep placeholder visible while cleanup runs.
     document.getElementById("app").innerHTML='<div class="card" style="padding:18px;text-align:center;margin:40px 16px;">Önbellek temizleniyor…</div>';
+    return;
   }
-})();
-</script>
-<script src="panelCoverageManifest.js?v=20260820f"></script>
-<script src="panel.js?v=20260820f"></script>
-<script>
-// ── Panel boot watchdog ──
-// panel.js senkron bir IIFE'dir; yüklendiğinde window.load'u tanımlar. Eğer
-// tarayıcı eski/bozuk (kısmi) bir panel.js'i önbellekten sunarsa IIFE hiç
-// çalışmaz, window.load tanımlanmaz ve "Çekirdek başlatılıyor…" yer tutucusu
-// sessizce sonsuza kadar kalırdı. Bu watchdog panel.js'in başlayamamasını
-// yakalar ve gerçek bir tanı ekranı + önbellek temizleme sunar.
-(function(){
-  var fired=false;
-  var MIN_WAIT=3500; // panel.js başarılıysa milisaniyeler içinde tanımlanır.
-  function panic(){
-    if(fired) return; fired=true;
-    var a=document.getElementById("app"); if(!a) return;
-    a.innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;">'
-      +'<div class="card" style="padding:24px;">'
-      +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Çekirdek başlatılamadı</div>'
-      +'<div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Panel kodu yüklenemedi. En sık neden, tarayıcının eski ya da eksik bir panel.js sürümünü önbellekten sunmasıdır. Sayfayı yenileyin; olmazsa önbelleği temizleyip yeniden başlatın.</div>'
-      +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
-      +'<button type="button" class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
-      +'<button type="button" class="btn" onclick="window.__panelHardReset()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Önbellek Temizle + Yeniden Başlat</button>'
-      +'</div>'
-      +'<div style="font-size:9px;color:var(--t3);margin-top:10px;line-height:1.5;">Hâlâ açılmazsa: tarayıcıda Cmd+Shift+R ile sert yenile yapın veya site verilerini (service worker / önbellek) temizleyip paneli yeniden açın.</div>'
-      +'</div></div>';
-  }
-  // panel.js başarıyla başladıysa window.load kısa sürede tanımlı olur → iptal.
-  setTimeout(function(){
-    if(typeof window.load==="function") return; // çekirdek ayakta, her şey yolunda
-    panic();
-  }, MIN_WAIT);
   window.__panelHardReset=function(){
     var done=function(){ location.reload(); };
     var clearCaches=window.caches&&window.caches.keys?window.caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return window.caches.delete(k); })); }):Promise.resolve();
@@ -79,7 +63,25 @@
       return unreg.catch(function(){});
     }).then(done).catch(done);
   };
+  function coreReady(){
+    var a=document.getElementById("app");
+    return !!(a&&a.dataset&&a.dataset.panelReady==="1"&&typeof window.load==="function");
+  }
+  var waited=0;
+  var poll=setInterval(function(){
+    if(coreReady()){ clearInterval(poll); return; }
+    waited+=CHECK_MS;
+    if(waited>=MAX_WAIT){ clearInterval(poll); panic(); }
+  },CHECK_MS);
 })();
 </script>
+<!-- Yerel modüller defer ile sırayı korur; watchdog ve panel kabuğu bunları beklemez. -->
+<script defer src="motivationProgramV2.js?v=20260718a"></script>
+<script defer src="saygiPeople.js?v=20260715a"></script>
+<script defer src="hijriCalendar.js?v=20260730j"></script>
+<script defer src="quranRevelationOrderV1.js?v=20260801a"></script>
+<script defer src="quranTransportV1.js?v=20260801a"></script>
+<script defer src="panelCoverageManifest.js?v=20260820f"></script>
+<script defer src="panel.js?v=20260821b" onerror="window.__panelBootFailure()"></script>
 </body>
 </html>

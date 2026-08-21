@@ -221,6 +221,13 @@ tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
 tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
                  Run: `node tests/test_panel_p2_polling.js`.
+tests/test_panel_boot_resilience.js Headless Node fixture guarding the panel
+                 boot/poll resilience contract: per-request fetch timeout with a
+                 real AbortController cancel, the `load()` single-flight lock,
+                 bounded concurrency for `data/events/<date>.json` day files,
+                 consecutive-error backoff, and the "stuck on Çekirdek
+                 başlatılıyor…" regression. Run:
+                 `node tests/test_panel_boot_resilience.js`.
 tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
                          see `tests/panel-v2/README.md` and its `helpers/`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
@@ -360,6 +367,7 @@ node tests/test_panel_p4_provenance.js # PANEL-04 therapy/notification/provenanc
 node tests/test_panel_p2_event_log.js # PANEL-05 event contract/panel timeline fixture
 node tests/test_panel_p2_sync.js # PANEL-05 daily event-file sync fixture
 node tests/test_panel_p2_polling.js # PANEL-06 ETag/polling/draft-safety fixture
+node tests/test_panel_boot_resilience.js # panel boot/poll dayanıklılık fixture
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done # ÆON Panel-v2 Premium (27 fixture)
 node tests/test_quran_catalog.js # quranRevelationOrderV1.js katalog doğrulaması
 node tests/test_quran_transport.js # quranTransportV1.js taşıma sözleşmeleri

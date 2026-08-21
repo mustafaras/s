@@ -198,6 +198,13 @@ tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
 tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
                  Run: `node tests/test_panel_p2_polling.js`.
+tests/test_panel_boot_resilience.js Headless Node fixture guarding the panel
+                 boot/poll resilience contract: per-request fetch timeout with a
+                 real AbortController cancel, the `load()` single-flight lock,
+                 bounded concurrency for `data/events/<date>.json` day files,
+                 consecutive-error backoff, and the "stuck on Çekirdek
+                 başlatılıyor…" regression. Run:
+                 `node tests/test_panel_boot_resilience.js`.
 tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
                          see `tests/panel-v2/README.md` and its `helpers/`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs

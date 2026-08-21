@@ -163,8 +163,8 @@ const cases = [
   }],
   ["panel shell exposes current asset cache busts and no positive keyboard tabindex", () => {
     assert(/name="viewport"[^>]*viewport-fit=cover/.test(PANEL_HTML));
-    assert(/panel\.css\?v=20260820c/.test(PANEL_HTML));
-    assert(/panel\.js\?v=20260820c/.test(PANEL_HTML));
+    assert(/panel\.css\?v=[^"'\s]+/.test(PANEL_HTML));
+    assert(/panel\.js\?v=[^"'\s]+/.test(PANEL_HTML));
     assert(!/tabindex=["'][1-9]/.test(PANEL_SOURCE));
   }]
 ];

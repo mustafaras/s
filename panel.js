@@ -132,6 +132,17 @@ var PANEL_POLL_AT=null;
 var PANEL_POLL_STATE={status:'idle',lastOutcome:'idle',lastPollAt:null,lastFetchStartedAt:null,lastFetchCompletedAt:null,lastDurationMs:null,sourceRevision:null,visibleRevision:null,sourceUpdatedAt:null,etag:null,conditionalMode:'etag',fetchCount:0,notModifiedCount:0,skippedCount:0,draftDeferredCount:0,lastErrorCode:null,pendingRender:false,samples:[]};
 var PANEL_LATEST_CACHE={etag:null,sourceRevision:null,sourceUpdatedAt:null};
 var PANEL_TRANSPORT_CACHE={};
+// Boot dayanıklılığı: takılı bir GitHub akışı paneli "Çekirdek başlatılıyor…"
+// yer tutucusunda sonsuza kadar bırakabiliyordu. Tek-uçuş kilidi eş zamanlı
+// poll yığılmasını, backoff ardışık hatada istek selini, ilk-boyama bayrağı da
+// hata ekranının taslak korumasıyla yutulmasını engeller.
+var PANEL_LOAD_INFLIGHT=null;
+var PANEL_FIRST_PAINT=false;
+var PANEL_CONSECUTIVE_ERRORS=0;
+var PANEL_POLL_TIMER=null;
+var PANEL_POLL_BASE_MS=5000, PANEL_POLL_MAX_MS=60000, PANEL_POLL_BACKOFF_STEPS=4;
+var PANEL_FETCH_TIMEOUT_MS=20000, PANEL_TRANSPORT_TIMEOUT_MS=15000, PANEL_BOOT_STALL_MS=25000;
+var PANEL_EVENT_FETCH_CONCURRENCY=4, PANEL_EVENT_REFRESH_DAYS=2;
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
 // Kart tazelik rozeti eşikleri: <1 gün "güncel", 1-7 gün "N gün önce" (uyarı),
@@ -145,6 +156,29 @@ var HT=HABITS.length;
 function responseHeaderP(response,name){
   try{ if(response&&response.headers&&typeof response.headers.get==='function') return response.headers.get(name)||null; }catch(e){}
   return null;
+}
+// Panelin TÜM ağ istekleri buradan geçer. fetch()'in kendi zaman aşımı yoktur:
+// api.github.com'a giden bir HTTP/2 akışı takılırsa promise ne çözülür ne
+// reddedilir; poll döngüsü de ilerleyemez. AbortController varsa istek gerçekten
+// iptal edilir, yoksa yarış ile reddedilir. Yalnız GET yolları kullanır.
+function panelFetchP(url,opts,timeoutMs){
+  var ms=typeof timeoutMs==='number'&&timeoutMs>0?timeoutMs:PANEL_FETCH_TIMEOUT_MS;
+  var o={},k; if(opts){ for(k in opts){ if(Object.prototype.hasOwnProperty.call(opts,k)) o[k]=opts[k]; } }
+  var ctrl=null;
+  try{ if(typeof AbortController==='function'){ ctrl=new AbortController(); o.signal=ctrl.signal; } }catch(e){ ctrl=null; }
+  return new Promise(function(resolve,reject){
+    var settled=false;
+    var timer=setTimeout(function(){
+      if(settled) return; settled=true;
+      try{ if(ctrl&&typeof ctrl.abort==='function') ctrl.abort(); }catch(e){}
+      var err=new Error('panel istegi zaman asimina ugradi (timeout)'); err.code='timeout'; err.timeout=true; reject(err);
+    },ms);
+    fetch(url,o).then(function(r){
+      if(settled) return; settled=true; try{ clearTimeout(timer); }catch(e){} resolve(r);
+    },function(e){
+      if(settled) return; settled=true; try{ clearTimeout(timer); }catch(e){} reject(e);
+    });
+  });
 }
 function pollConditionalDecisionP(cache,status,etag){
   var known=cache&&typeof cache.etag==='string'&&cache.etag;
@@ -170,6 +204,9 @@ function pollRecordP(outcome,startedAt,meta){
   if(m.etag) PANEL_POLL_STATE.etag=m.etag;
   if(m.errorCode) PANEL_POLL_STATE.lastErrorCode=m.errorCode;
   else if(outcome!=='error') PANEL_POLL_STATE.lastErrorCode=null;
+  // Gerçekten sunucuya ulaşan tur backoff'u sıfırlar; ertelenen (deferred /
+  // skipped) turlar bağlantı kanıtı değildir, sayacı sıfırlamaz.
+  if(outcome==='changed'||outcome==='unchanged'||outcome==='not_modified') PANEL_CONSECUTIVE_ERRORS=0;
   if(duration!==null){ PANEL_POLL_STATE.samples.push(duration); if(PANEL_POLL_STATE.samples.length>100) PANEL_POLL_STATE.samples=PANEL_POLL_STATE.samples.slice(-100); }
   updatePollRibbonP();
   return pollLatencyStatsP(PANEL_POLL_STATE.samples);
@@ -560,7 +597,7 @@ function panelWriteGuardP(kind,payload){
 function loadTransportFileP(path){
   var cache=PANEL_TRANSPORT_CACHE[path]||{};
   var H=ghJsonHeaders(); if(cache.etag) H["If-None-Match"]=cache.etag;
-  return fetch(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"})
+  return panelFetchP(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"},PANEL_TRANSPORT_TIMEOUT_MS)
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(cache,r.status,etag);
       if(decision.kind==='not_modified'){
@@ -587,7 +624,7 @@ function loadTransportFileP(path){
           var pr=REPO.split("/");
           var blob="https://api.github.com/repos/"+encodeURIComponent(pr[0])+"/"+encodeURIComponent(pr[1])+"/git/blobs/"+encodeURIComponent(sha);
           var H2=ghJsonHeaders(); H2["Accept"]="application/vnd.github.raw";
-          return fetch(blob,{headers:H2,cache:"no-store"}).then(function(r2){
+          return panelFetchP(blob,{headers:H2,cache:"no-store"},PANEL_TRANSPORT_TIMEOUT_MS).then(function(r2){
             if(!r2.ok) throw new Error("transport blob "+r2.status);
             return r2.text();
           }).then(function(t){
@@ -645,10 +682,34 @@ function buildEventLogStateP(root,files){
   var audit=P&&typeof P.eventSequenceAudit==='function'?P.eventSequenceAudit(events):{ok:true,issueCount:0,issues:[],deviceCount:0};
   return {source:external.length||foundFile?'event_files':(events.length?'latest_fallback':(hadError?'error':'missing')),events:events,audit:audit,loadedAt:new Date().toISOString(),days:eventDayKeysP(root)};
 }
+// Gün dosyaları kapandıkları anda değişmez. Eski hâli her poll turunda 120
+// güne kadar EŞ ZAMANLI GitHub isteği açıyordu (5 sn'de bir ≈ 25 istek/sn);
+// bu tek HTTP/2 bağlantısını doyurup akış sıfırlamalarına (ERR_HTTP2_PROTOCOL_ERROR)
+// ve secondary rate limit'e yol açıyordu. Artık yalnız en yeni birkaç gün
+// tazelenir, kapanmış günler transport önbelleğinden gelir ve önbellekte
+// olmayanlar sınırlı eşzamanlılıkla çekilir. Okuma sınırı değişmez (salt GET).
 function loadEventLogP(root){
-  var keys=eventDayKeysP(root), files=[];
-  if(!keys.length) return Promise.resolve(buildEventLogStateP(root,files));
-  return Promise.all(keys.map(function(day){ return loadTransportFileP(EVENT_LOG_DIR+'/'+day+'.json').then(function(x){ return {date:day,raw:x&&x.raw,sha:x&&x.sha}; }).catch(function(e){ var m=String(e&&e.message||e).toLowerCase(); return {date:day,raw:null,error:!(m.indexOf('404')>=0||m.indexOf('not found')>=0)}; }); })).then(function(rows){ return buildEventLogStateP(root,rows); });
+  var keys=eventDayKeysP(root);
+  if(!keys.length) return Promise.resolve(buildEventLogStateP(root,[]));
+  var results=new Array(keys.length), queue=[];
+  keys.forEach(function(day,i){
+    var path=EVENT_LOG_DIR+'/'+day+'.json', cached=PANEL_TRANSPORT_CACHE[path];
+    if(i>=PANEL_EVENT_REFRESH_DAYS&&cached&&typeof cached.raw==='string'){ results[i]={date:day,raw:cached.raw,sha:cached.sha||null,fromCache:true}; return; }
+    queue.push({i:i,day:day,path:path});
+  });
+  var lane=function(){
+    if(!queue.length) return Promise.resolve();
+    var job=queue.shift();
+    return loadTransportFileP(job.path).then(function(x){
+      results[job.i]={date:job.day,raw:x&&x.raw,sha:x&&x.sha};
+    },function(e){
+      var m=String(e&&e.message||e).toLowerCase();
+      results[job.i]={date:job.day,raw:null,error:!(m.indexOf('404')>=0||m.indexOf('not found')>=0)};
+    }).then(lane);
+  };
+  var lanes=[], laneCount=Math.min(PANEL_EVENT_FETCH_CONCURRENCY,queue.length);
+  for(var w=0;w<laneCount;w++) lanes.push(lane());
+  return Promise.all(lanes).then(function(){ return buildEventLogStateP(root,results); });
 }
 function putTransportFileP(path,value,sha){
   var T=window.QuranTransportV1;
@@ -3829,6 +3890,7 @@ function panelLabCardHTML(){
   return h;
 }
 function render(){
+  PANEL_FIRST_PAINT=true;
   var all=allDays(), saved=lastSavedAt(), opened=lastOpenedAt(), fresh=syncFreshnessP(SYNC_RECEIPT,PANEL_POLL_AT), selected=UI.selectedDate&&recOf(UI.selectedDate)?UI.selectedDate:today();
   if(!UI.month) UI.month=monthKey(selected);
   UI.selectedDate=selected;
@@ -5004,9 +5066,9 @@ function tokenPrompt(msg){
 }
 function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
-  var api="https://api.github.com/repos/"+p[0]+"/"+p[1]+"/contents/data/latest.json?ref="+branch, H={"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"};
+  var api="https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/data/latest.json?ref="+encodeURIComponent(branch), H={"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"};
   if(PANEL_LATEST_CACHE.etag) H["If-None-Match"]=PANEL_LATEST_CACHE.etag;
-  return fetch(api,{headers:H,cache:"no-store"})
+  return panelFetchP(api,{headers:H,cache:"no-store"},PANEL_FETCH_TIMEOUT_MS)
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(PANEL_LATEST_CACHE,r.status,etag);
       if(decision.kind==='not_modified') return {notModified:true,meta:{etag:decision.etag,completedAt:new Date().toISOString()}};
@@ -5479,10 +5541,15 @@ function load(){
     PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
     PANEL_POLL_AT=new Date().toISOString(); OBSINBOX=[]; OBSRECEIPTS={}; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state); PANEL_POLL_STATE.lastOutcome='demo'; if(!UI.selectedDate)UI.selectedDate=today(); if(!UI.month)UI.month=monthKey(UI.selectedDate); render(); return Promise.resolve(D);
   }
-  PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return; }
-  return fetchLatest(REPO,BRANCH)
+  PTOKEN=normalizeToken(PTOKEN); if(!PTOKEN){ tokenPrompt(); return Promise.resolve(D); }
+  // Tek uçuş kilidi: interval, visibilitychange ve focus tetikleyicileri aynı
+  // anda ateşlediğinde eskiden her biri yeni bir tam poll turu (latest.json +
+  // yan kanallar) başlatıyordu. Uçuştaki tur varken yenisi açılmaz.
+  if(PANEL_LOAD_INFLIGHT) return PANEL_LOAD_INFLIGHT;
+  var cycle=Promise.resolve().then(function(){ return fetchLatest(REPO,BRANCH); })
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
     .then(function(j){
+      PANEL_CONSECUTIVE_ERRORS=0; // sunucu yanıt verdi: backoff sıfırlanır
       var pollMeta=j&&j.meta||{}, pollCompleted=pollMeta.completedAt||new Date().toISOString();
       if(j&&j.notModified){
         PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state); PANEL_POLL_STATE.notModifiedCount++;
@@ -5497,7 +5564,7 @@ function load(){
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
       QTRANSPORT={delivery:'idle',responses:'idle',errors:[]};
       var previousEventRows=EVENT_LOG_STATE&&Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], hadPreviousSnapshot=!!D;
-      Promise.all([loadInbox(), loadDeliveryP(), loadResponsesP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
+      return Promise.all([loadInbox(), loadDeliveryP(), loadResponsesP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
         var incomingEventState=res[5]||buildEventLogStateP(latestLegacy,[]), newEventCount=countNewEventChangesP(previousEventRows,incomingEventState.events);
@@ -5544,13 +5611,18 @@ function load(){
       });
     })
     .catch(function(e){
+      PANEL_CONSECUTIVE_ERRORS++;
       pollRecordP('error',pollStartedAt,{errorCode:e&&e.code||'network'});
       var m=String(e&&e.message||e);
       if(/headers.+RequestInit|non ISO-8859-1|String contains/i.test(m)){ tokenPrompt("Anahtar bicimi hatali, yeniden yapistir."); return; }
       if(/gecersiz|yetkisiz/i.test(m)){ tokenPrompt("Anahtar gecersiz veya yetki yok."); return; }
-      if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; markPollSkippedP('deferred_draft'); return; }
+      // İlk boyama yapılmadıysa taslak koruması hata ekranını YUTAMAZ; aksi
+      // hâlde panel açılış yer tutucusunda sessizce asılı kalırdı.
+      if(PANEL_FIRST_PAINT&&panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; markPollSkippedP('deferred_draft'); return; }
       fail(m);
     });
+  PANEL_LOAD_INFLIGHT=cycle.then(function(v){ PANEL_LOAD_INFLIGHT=null; return v; },function(err){ PANEL_LOAD_INFLIGHT=null; throw err; });
+  return PANEL_LOAD_INFLIGHT;
 }
 // Yeniden-çizim imzası: yalnızca sunucudan gelen veriye bağlı (D + inbox + receipts).
 // UI-içi durum (sekme, kart açma) render'ı doğrudan çağırır; bu imza yalnızca poll turunda kullanılır.
@@ -5562,6 +5634,9 @@ window.load=load;
 // gerek yok, normal boot akışı devam eder.
 try{ if(typeof localStorage!=="undefined") localStorage.removeItem("seyma-panel-watchdog"); }catch(e){}
 try{ if(typeof document!=="undefined"&&document.getElementById){ var __pa=document.getElementById("app"); if(__pa&&__pa.dataset) __pa.dataset.panelReady="1"; } }catch(e){}
+// Leaflet isteğe bağlıdır. CDN geç gelirse çekirdek render'ı tamamlar; pencere
+// tamamen yüklendiğinde harita kartı bir kez daha güvenle başlatılır.
+try{ window.addEventListener("load",function(){ try{ initLocMap(); }catch(e){} }); }catch(e){}
 try{
   if(!DEMO_MODE){
     PTOKEN=normalizeToken(localStorage.getItem(PTKEY)||"");
@@ -5589,7 +5664,38 @@ initDevModeUrlTriggerP();
 // ama gözlemci bir metin alanına yazarken (ya da gönderim sürerken) o turu atla —
 // yanıt yazarken imleç/taslak kesilmesin. Veri değişmediyse load() zaten render etmez.
 function panelBusyTyping(){ var el=document.activeElement; if(!el) return false; var tag=(el.tagName||"").toUpperCase(); return tag==="TEXTAREA"||tag==="INPUT"; }
-setInterval(function(){ if(DEMO_MODE||!PTOKEN) return; if(UI.msgSending||panelBusyTyping()){ markPollSkippedP(UI.msgSending?'skipped_input':'skipped_input'); return; } load(); },5000);
+// Sabit setInterval, bir tur tamamlanmadan bir sonrakini başlatıyordu; hata
+// hâlinde de aynı hızda istek üretmeye devam ediyordu. Zincirleme zamanlayıcı
+// bir sonraki turu ancak öncekinin bitişinden sonra kurar ve ardışık hatada
+// üstel olarak yavaşlar (5s → 10 → 20 → 40 → 60 tavan).
+function panelPollDelayP(){
+  if(!(PANEL_CONSECUTIVE_ERRORS>0)) return PANEL_POLL_BASE_MS;
+  var steps=Math.min(PANEL_CONSECUTIVE_ERRORS,PANEL_POLL_BACKOFF_STEPS);
+  return Math.min(PANEL_POLL_MAX_MS,PANEL_POLL_BASE_MS*Math.pow(2,steps));
+}
+function schedulePanelPollP(){
+  if(PANEL_POLL_TIMER){ try{ clearTimeout(PANEL_POLL_TIMER); }catch(e){} }
+  PANEL_POLL_TIMER=setTimeout(function(){
+    PANEL_POLL_TIMER=null;
+    if(DEMO_MODE||!PTOKEN){ schedulePanelPollP(); return; }
+    if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); schedulePanelPollP(); return; }
+    var r; try{ r=load(); }catch(e){ r=null; }
+    if(r&&typeof r.then==='function') r.then(schedulePanelPollP,schedulePanelPollP);
+    else schedulePanelPollP();
+  },panelPollDelayP());
+}
+schedulePanelPollP();
+// Boot durma emniyeti: ilk tur hiç sonuçlanmazsa (takılı akış, iptal edilemeyen
+// istek, beklenmedik istisna) gözlemci yer tutucuda bırakılmaz; teşhis ekranı
+// ve yeniden deneme yolu gösterilir.
+setTimeout(function(){
+  if(PANEL_FIRST_PAINT||DEMO_MODE||!PTOKEN) return;
+  try{
+    var a=document.getElementById("app");
+    if(!a||String(a.innerHTML||"").indexOf("Çekirdek başlatılıyor")<0) return;
+    fail("boot timeout: panel ilk veri turunu tamamlayamadi");
+  }catch(e){}
+},PANEL_BOOT_STALL_MS);
 // Sekme arka plana alınıp geri dönüldüğünde bir sonraki 5sn'lik turu
 // beklemeden anında yenile — "eş zamanlı" hissi asıl burada kurulur, çünkü
 // gözlemci genelde panele "az önce ne oldu" diye bakmak için döner.
@@ -5601,6 +5707,8 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
   });
 }
 document.addEventListener("keydown",eventDrawerKeydownP);
-document.addEventListener("visibilitychange",function(){ if(!DEMO_MODE&&!document.hidden&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
+// NOT: ikinci bir visibilitychange dinleyicisi vardı; sekmeye dönüşte load()
+// iki kez (focus ile üç kez) tetikleniyordu. Tek uçuş kilidi bunu zaten
+// zararsızlaştırır, yine de yinelenen kayıt kaldırıldı.
 window.addEventListener("focus",function(){ if(!DEMO_MODE&&PTOKEN){ if(UI.msgSending||panelBusyTyping()){ markPollSkippedP('skipped_input'); return; } load(); } });
 })();

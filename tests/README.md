@@ -10,6 +10,11 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   sandbox yardımcısı. Panel-v2 dosyalarının tek canonical test konumudur.
 - `test_panel_*.js`, `test_faz11_panel.js` — legacy Panel 1 / observer fixture’ları.
 - `test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
+- `test_panel_boot_resilience.js` — panel boot/poll dayanıklılık fixture’ı:
+  fetch zaman aşımı + gerçek iptal, `load()` tek uçuş kilidi, event-log gün
+  dosyalarında sınırlı eşzamanlılık, ardışık hata backoff’u ve “yer tutucuda
+  takılı kalma” regresyonu. 2026-08-21’de sahada görülen `ERR_HTTP2_PROTOCOL_ERROR`
+  istek seli + “Çekirdek başlatılıyor…” kilitlenmesini kalıcı olarak kapatır.
 - `test_faz10_sync.js`, `test_quran_*.js` — sync, Kur’an taşıma ve katalog fixture’ları.
 - `reminders/` — REM-02+ ağsız sentetik reminder contract fixture’ları; runtime, browser ve gerçek veri kullanmaz.
 - `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.

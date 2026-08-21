@@ -23,13 +23,14 @@ function normalizeReceipt(r){
 console.log('\n=== PANEL-008 / PANEL-06 — polling fixture ===\n');
 console.log('[1] ETag conditional fetch — 200 sonra 304');
 var calls=[],jsonCalls=0,latest={version:2,startDate:'2026-08-03',days:{},syncReceipt:{snapshotRevision:'a'.repeat(40),sourceUpdatedAt:'2026-08-03T10:00:00.000Z'}};
-var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,isFinite:isFinite,Error:Error,PTOKEN:'test-token',PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},responseHeaderP:null,pollConditionalDecisionP:null,fetch:null};
+var aborted=[];
+var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:20000,PTOKEN:'test-token',PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},responseHeaderP:null,pollConditionalDecisionP:null,panelFetchP:null,fetch:null};
 ctx.fetch=function(url,opts){
   calls.push({url:url,opts:opts});
   if(calls.length===1) return Promise.resolve(response(200,'"v1"',latest));
   return Promise.resolve(response(304,'"v1"'));
 };
-vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+extractFunction('fetchLatest'),ctx,{filename:'panel-p2-polling.js'});
+vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelFetchP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+extractFunction('fetchLatest'),ctx,{filename:'panel-p2-polling.js'});
 ctx.responseHeaderP=ctx.responseHeaderP;
 var first=ctx.fetchLatest('owner/repo','main').then(function(x){
   jsonCalls++;
@@ -41,6 +42,7 @@ var first=ctx.fetchLatest('owner/repo','main').then(function(x){
   ok('304 turunda JSON body tekrar parse edilmez',jsonCalls===1);
   ok('ikinci istek If-None-Match taşır',calls[1].opts.headers['If-None-Match']==='"v1"');
   ok('cache-busting t parametresiyle conditional bozulmaz',calls[0].url.indexOf('&t=')<0&&calls[1].url.indexOf('&t=')<0);
+  ok('her latest isteği iptal sinyali taşır (takılı akış kilitlenemez)',!!calls[0].opts.signal&&!!calls[1].opts.signal);
 });
 
 first.then(function(){

@@ -5166,7 +5166,12 @@ function panelSelfTestP(){
   // 1) Ağ: kimliksiz erişim — CORS ve erişilebilirlik.
   steps.push(function(){ return panelProbeP("1 · Ağ / CORS",function(){
     return panelFetchP("https://api.github.com/",{cache:"no-store"},15000).then(function(r){
-      return {ok:r.status>0,detail:"HTTP "+r.status};
+      // Yanıt gelmesi tek başına "sağlıklı" demek değildir: sunucu sınırı da
+      // bir yanıttır. Bu adım yalnız ağın/CORS'un çalıştığını, sınıra
+      // takılmadığımızı doğrular.
+      var rate=panelRateInfoP(r);
+      if(panelRateLimitedP(r.status,rate)) return {ok:false,detail:"HTTP "+r.status+" · sunucu sınırı"};
+      return {ok:r.status>=200&&r.status<500,detail:"HTTP "+r.status};
     });
   }); });
   // 2) Anahtar + kota: /rate_limit kotadan DÜŞMEZ, en ucuz kimlikli sinyal.

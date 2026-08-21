@@ -50,6 +50,7 @@ function load(names, extra) {
     isNaN, isFinite,
     PANEL_LAST_DIAG: { status: null, kind: null, attempts: 0, at: null, resetAt: null, retryAfterMs: null, stage: null, errName: null },
     PANEL_STAGE: 'idle',
+    PANEL_FIRST_PAINT: true, PANEL_DEFER_SINCE: null, PANEL_DEFER_MAX_MS: 60000,
     UI: { msgSending: false, msgDraft: "", eventFilter: "all", motivationFilter: "all", selectedDate: null, expandedCards: {}, d4SelectedModule: null },
     D4_DRAWER_RETURN_ID: null,
     document: { activeElement: null },
@@ -69,7 +70,7 @@ function freshPollContext() {
   const records = [];
   let renders = 0;
   let ribbonUpdates = 0;
-  const ctx = load(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+  const ctx = load(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
     pollRecordP: (outcome) => records.push(outcome),
     updatePollRibbonP: () => { ribbonUpdates += 1; },
     render: () => { renders += 1; }
@@ -141,8 +142,14 @@ const cases = [
   }],
   ["304 and polling defer branches are explicit and avoid an unconditional render", () => {
     assert(PANEL_SOURCE.includes("if(j&&j.notModified)"));
-    assert(PANEL_SOURCE.includes("if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }"));
-    assert(PANEL_SOURCE.includes("if(hadPending){ if(panelInteractionActiveP())"));
+    // 304 taslak kapısı da ilk boyamadan önce devre dışıdır: boot'ta ertelenecek
+    // bir görünüm yoktur ve erteleme panelin hiç açılmamasına yol açardı.
+    assert(PANEL_SOURCE.includes("if(PANEL_FIRST_PAINT&&panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }"));
+    // KÖK SEBEP regresyonu: erteleme kararı tek kapıdan (panelShouldDeferRenderP)
+    // geçer ve İLK boyamadan önce asla ertelemez. Doğrudan
+    // panelInteractionActiveP() çağrısı bu dalda artık kullanılmaz.
+    assert(PANEL_SOURCE.includes("if(hadPending){ if(panelShouldDeferRenderP())"));
+    assert(PANEL_SOURCE.includes("if(!PANEL_FIRST_PAINT){ PANEL_DEFER_SINCE=null; return false; }"));
     assert(PANEL_SOURCE.includes("else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); }"));
     // Poll turundaki her render KORUMALI çağrılır: render içindeki bir istisna
     // artık zincirin ağ hatası dalına düşüp "Bağlantı bekleniyor" göstermez.

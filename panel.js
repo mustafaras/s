@@ -158,6 +158,16 @@ var PANEL_STAGE='idle';
 // fetchLatest başarıyla döndüğünde ham anlık görünüm burada tutulur. Sonraki
 // aşamalardan biri patlarsa panel boş kalmaz: son çare olarak bu veriyle çizilir.
 var PANEL_LAST_GOOD=null;
+// KÖK SEBEP (2026-08-21): applyPollRenderP, panelInteractionActiveP() doğruysa
+// render'ı erteliyordu. O fonksiyon UI.expandedCards dolu olduğunda "gözlemci
+// etkileşimde" diyor; ama expandedCards boot'ta localStorage'dan (CARDEXPKEY)
+// GERİ YÜKLENİYOR. Daha önce bir kart açık bırakılmışsa ilk render sonsuza
+// kadar erteleniyor, panel yer tutucuda kalıyor ve boot emniyeti bunu
+// "Bağlantı kurulamadı" diye gösteriyordu — oysa veri 200 ile gelmişti.
+// Kalıcı çözüm: ilk boyamadan önce ASLA erteleme yok; ayrıca kalıcı görünüm
+// tercihleri (açık kart/filtre/tarih) render'ı süresiz kilitleyemez.
+var PANEL_DEFER_SINCE=null;
+var PANEL_DEFER_MAX_MS=60000;
 var PANEL_EVENT_FETCH_CONCURRENCY=4, PANEL_EVENT_REFRESH_DAYS=2;
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
@@ -370,8 +380,22 @@ function updatePollRevisionsP(data,receipt,projectionState){
   PANEL_POLL_STATE.sourceRevision=r.sourceRevision; PANEL_POLL_STATE.sourceUpdatedAt=r.sourceUpdatedAt; PANEL_POLL_STATE.visibleRevision=r.visibleRevision;
   return r;
 }
+// Render ertelenmeli mi? İki sert kural:
+//  1) İlk boyama yapılmadıysa ASLA ertelenmez — ertelenecek bir görünüm yok.
+//  2) Geçici olmayan (kalıcı) görünüm tercihleri render'ı süresiz kilitleyemez;
+//     PANEL_DEFER_MAX_MS sonra bir tur zorlanır. Metin girişi/taslak bu
+//     zorlamadan MUAFtır: gözlemcinin yazdığı asla kesilmez.
+function panelShouldDeferRenderP(){
+  if(!PANEL_FIRST_PAINT){ PANEL_DEFER_SINCE=null; return false; }
+  if(!panelInteractionActiveP()){ PANEL_DEFER_SINCE=null; return false; }
+  if(panelDraftActiveP()) return true;
+  var now=Date.now();
+  if(PANEL_DEFER_SINCE===null){ PANEL_DEFER_SINCE=now; return true; }
+  if(now-PANEL_DEFER_SINCE>=PANEL_DEFER_MAX_MS){ PANEL_DEFER_SINCE=now; return false; }
+  return true;
+}
 function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
-  if(panelInteractionActiveP()){
+  if(panelShouldDeferRenderP()){
     PANEL_POLL_STATE.pendingRender=true; pollRecordP('deferred_draft',startedAt,meta); return false;
   }
   var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP(outcome,startedAt,meta);
@@ -5801,8 +5825,8 @@ function load(){
         // 304 yaniti: section fetch state'ini sifirla (önceki hata varsa uyari sönsün).
         PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
         var pollSig=panelSig();
-        if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
-        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ if(panelInteractionActiveP()){ PANEL_POLL_STATE.pendingRender=true; return D; } LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; panelNoteStageP('render',null); panelSafeRenderP(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
+        if(PANEL_FIRST_PAINT&&panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
+        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ if(panelShouldDeferRenderP()){ PANEL_POLL_STATE.pendingRender=true; return D; } LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; panelNoteStageP('render',null); panelSafeRenderP(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
       }
       var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
       PANEL_LAST_GOOD=latestLegacy;
@@ -5854,7 +5878,7 @@ function load(){
         PROJECTION.sections=fx.sections;
         PROJECTION.sectionFetchState=fx.sectionFetchState;
         EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
-        if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
+        if(PANEL_FIRST_PAINT&&panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
         panelNoteStageP('render',err);
         panelSafeRenderP();
       });

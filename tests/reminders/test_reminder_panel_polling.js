@@ -37,6 +37,7 @@ function loadPanelHelpers(names, extra) {
     Date, Math, String, Number, Boolean, Object, Array, JSON, isNaN, isFinite, RegExp,
     PANEL_LAST_DIAG: { status: null, kind: null, attempts: 0, at: null, resetAt: null, retryAfterMs: null, stage: null, errName: null },
     PANEL_STAGE: 'idle',
+    PANEL_FIRST_PAINT: true, PANEL_DEFER_SINCE: null, PANEL_DEFER_MAX_MS: 60000,
     TextEncoder, TextDecoder, atob, btoa,
     Promise, Error, setTimeout, clearTimeout, AbortController, encodeURIComponent,
     PANEL_FETCH_TIMEOUT_MS: 30000, PANEL_TRANSPORT_TIMEOUT_MS: 30000,
@@ -221,7 +222,7 @@ const cases = [
 
   // ── 2. Kullanıcı etkileşimi sırasında render erteleme ──────────────
   ["a message draft defers the poll render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "taslak korunmalı", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -234,7 +235,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["a focused textarea defers the poll render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => true, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -247,7 +248,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["an open drawer defers the poll render even without a text draft", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: "module-x", panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -260,7 +261,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["an active filter defers the poll render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "reminder", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -273,7 +274,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["a non-today selected date defers the poll render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: "2026-08-10", eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -286,7 +287,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["an expanded card defers the poll render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: { "d2-mood": true } },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -299,7 +300,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === true);
   }],
   ["a clean idle panel renders immediately (no deferral)", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -314,7 +315,7 @@ const cases = [
 
   // ── 3. Deferred snapshot tek kontrollü uygulanır ──────────────────
   ["a deferred render is applied exactly once when the interaction clears", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: true }, pollRecordP: () => {},
@@ -334,7 +335,7 @@ const cases = [
     assert(ctx.PANEL_POLL_STATE.pendingRender === false);
   }],
   ["a deferred render is not applied while the interaction persists", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: "module-y", panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: true }, pollRecordP: () => {},
@@ -350,7 +351,7 @@ const cases = [
 
   // ── 4. Değişmeyen reminder status'unda tam render yapılmaz ─────────
   ["an unchanged snapshot does not trigger a full panel render", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -365,7 +366,7 @@ const cases = [
     assertEqual(ribbonCount, 1);
   }],
   ["a changed snapshot renders and updates the visible status", () => {
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -383,7 +384,7 @@ const cases = [
     // panel.js load() içinde: hadPreviousSnapshot && changed ise
     // UI.newChanges = min(99, max(1, newEventCount)). Bu, değişmeyen
     // snapshot'ta ribbon'ı artırmaz; yalnız gerçek yeni event sayısını yansıtır.
-    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
+    const ctx = loadPanelHelpers(["panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
       UI: { msgSending: false, msgDraft: "", selectedDate: null, eventFilter: "all", motivationFilter: "all", expandedCards: {} },
       D4_DRAWER_RETURN_ID: null, panelBusyTyping: () => false, today: () => "2026-08-18",
       PANEL_POLL_STATE: { pendingRender: false }, pollRecordP: () => {},
@@ -406,7 +407,7 @@ const cases = [
     // localStorage'ı veya app state'i yazamaz.
     const pollingBoundary = [
       "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP", "fetchLatest", "pollConditionalDecisionP",
-      "panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"
+      "panelDraftActiveP", "panelInteractionActiveP", "panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"
     ].map(extractTopLevelFunction).join("\n");
     ["method:\"PUT\"", "method: 'PUT'", "localStorage.setItem", "localStorage.removeItem"]
       .forEach((needle) => assert(!pollingBoundary.includes(needle)));
@@ -415,7 +416,7 @@ const cases = [
       .forEach((needle) => assert(!pollingBoundary.includes(needle)));
     // applyPollRenderP yalnızca render / ribbon / pendingRender durumunu değiştirir;
     // veri nesnesine (D) veya reminder tercihine dokunmaz.
-    const apply = extractTopLevelFunction("panelNoteStageP", "panelSafeRenderP", "applyPollRenderP");
+    const apply = extractTopLevelFunction("panelShouldDeferRenderP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP");
     assert(!/D\.[a-zA-Z]/.test(apply));
     assert(!/reminders/.test(apply));
   }],

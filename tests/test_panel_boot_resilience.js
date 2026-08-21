@@ -122,7 +122,7 @@ var step4=step3.then(function(){
 });
 
 // ── [4] Tam boot: takılı ağ paneli yer tutucuda bırakmaz ──────────────
-function bootPanel(mode){
+function bootPanel(mode,seed){
   var src=source
     .replace('PANEL_FETCH_TIMEOUT_MS=30000','PANEL_FETCH_TIMEOUT_MS=60')
     .replace('PANEL_TRANSPORT_TIMEOUT_MS=30000','PANEL_TRANSPORT_TIMEOUT_MS=60')
@@ -137,6 +137,7 @@ function bootPanel(mode){
     focus:function(){},querySelector:function(){return null;},querySelectorAll:function(){return [];},isConnected:true,textContent:''}; }
   var app=el(); app.innerHTML='<div class="card">Çekirdek başlatılıyor…</div>';
   var log=[],store={'seyma-panel-token':'test-token-not-real'};
+  if(seed) Object.keys(seed).forEach(function(k){ store[k]=seed[k]; });
   var sandbox={
     console:{log:function(){},warn:function(){},error:function(){}},
     Date:Date,Math:Math,JSON:JSON,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,Boolean:Boolean,
@@ -149,7 +150,17 @@ function bootPanel(mode){
     localStorage:{getItem:function(k){return k in store?store[k]:null;},setItem:function(k,v){store[k]=String(v);},removeItem:function(k){delete store[k];}},
     setTimeout:setTimeout,clearTimeout:clearTimeout,setInterval:setInterval,clearInterval:clearInterval,
     requestAnimationFrame:function(){},
-    fetch:function(url){ log.push(String(url)); return mode==='hang'?new Promise(function(){}):Promise.reject(new TypeError('Failed to fetch')); },
+    fetch:function(url){
+      log.push(String(url));
+      if(mode==='hang') return new Promise(function(){});
+      if(mode==='ok'){
+        if(String(url).indexOf('latest.json')<0) return Promise.resolve({status:404,ok:false,headers:{get:function(){return null;}},json:function(){return Promise.resolve({});},text:function(){return Promise.resolve('{}');}});
+        var days={}; for(var i=0;i<10;i++){ days['2026-08-'+String(i+1).padStart(2,'0')]={mood:3,energy:3,ticks:{water:true}}; }
+        var body={version:2,startDate:'2026-08-01',days:days,settings:{},syncReceipt:{schemaVersion:1,status:'accepted',snapshotRevision:'a'.repeat(40),sourceUpdatedAt:'2026-08-21T07:00:00.000Z'}};
+        return Promise.resolve({status:200,ok:true,headers:{get:function(k){return String(k).toLowerCase()==='etag'?'"ok1"':null;}},json:function(){return Promise.resolve(body);},text:function(){return Promise.resolve(JSON.stringify(body));}});
+      }
+      return Promise.reject(new TypeError('Failed to fetch'));
+    },
     document:{activeElement:null,body:{contains:function(){return true;}},
       getElementById:function(id){ return id==='app'?app:null; },
       querySelector:function(){return null;},querySelectorAll:function(){return [];},
@@ -320,8 +331,59 @@ var step5c=step5b.then(function(){
   });
 });
 
+// ── [4d] İlk render erteleme kilidi (KÖK SEBEP regresyonu) ───────────
+// Saha arızası: gözlemci daha önce bir kartı açık bırakınca UI.expandedCards
+// boot'ta localStorage'dan geri yükleniyor, panelInteractionActiveP() bunu
+// "aktif etkileşim" sayıyor ve İLK render sonsuza dek erteleniyordu. Panel
+// yer tutucuda kalıyor, boot emniyeti bunu "Bağlantı kurulamadı" diye
+// gösteriyordu — oysa veri HTTP 200 ile gelmişti.
+var step5d=step5c.then(function(){
+  console.log('[4d] İlk render erteleme kilidi');
+  function deferCtx(over){
+    var ctx=Object.assign({Date:Date,Object:Object,String:String,
+      PANEL_FIRST_PAINT:false,PANEL_DEFER_SINCE:null,PANEL_DEFER_MAX_MS:60000,
+      D4_DRAWER_RETURN_ID:null,
+      UI:{msgSending:false,msgDraft:'',eventFilter:'all',motivationFilter:'all',selectedDate:null,expandedCards:{},d4SelectedModule:null},
+      document:{activeElement:null},
+      panelBusyTyping:function(){return false;},
+      today:function(){return '2026-08-21';}},over||{});
+    vm.runInNewContext(extractFunction('panelDraftActiveP')+'\n'+extractFunction('panelInteractionActiveP')+'\n'+extractFunction('panelShouldDeferRenderP'),ctx,{filename:'panel-boot-defer.js'});
+    return ctx;
+  }
+  var a=deferCtx({UI:{msgSending:false,msgDraft:'',eventFilter:'all',motivationFilter:'all',selectedDate:null,expandedCards:{ruh:true,beden:true},d4SelectedModule:null}});
+  ok('geri yüklenmiş açık kartlar İLK render\'ı ERTELEYEMEZ',a.panelShouldDeferRenderP()===false);
+  ok('bu durum gerçekten "etkileşim" sayılıyor (kapı ilk boyamada devre dışı)',a.panelInteractionActiveP()===true);
+
+  var b=deferCtx({PANEL_FIRST_PAINT:true,UI:{msgSending:false,msgDraft:'',eventFilter:'all',motivationFilter:'all',selectedDate:null,expandedCards:{ruh:true},d4SelectedModule:null}});
+  ok('ilk boyamadan SONRA açık kart REM-58 gereği ertelemeyi korur',b.panelShouldDeferRenderP()===true);
+  b.PANEL_DEFER_SINCE=Date.now()-70000;
+  ok('kalıcı görünüm tercihi render\'ı süresiz kilitleyemez (zorlama turu)',b.panelShouldDeferRenderP()===false);
+
+  var c=deferCtx({PANEL_FIRST_PAINT:true,PANEL_DEFER_SINCE:Date.now()-999999,
+    UI:{msgSending:false,msgDraft:'gözlemci yazıyor',eventFilter:'all',motivationFilter:'all',selectedDate:null,expandedCards:{},d4SelectedModule:null}});
+  ok('taslak yazarken ASLA zorlanmaz (gözlemcinin yazdığı kesilmez)',c.panelShouldDeferRenderP()===true);
+
+  var d=deferCtx({PANEL_FIRST_PAINT:true});
+  ok('etkileşim yokken erteleme olmaz',d.panelShouldDeferRenderP()===false);
+
+  ok('applyPollRenderP tek erteleme kapısını kullanır',/if\(panelShouldDeferRenderP\(\)\)\{/.test(source));
+  ok('304 dalı da aynı kapıyı kullanır',/if\(hadPending\)\{ if\(panelShouldDeferRenderP\(\)\)/.test(source));
+});
+
+// ── [4e] Uçtan uca: açık kart hatırlanırken panel yine de açılır ─────
+var step5e=step5d.then(function(){
+  console.log('[4e] Uçtan uca — hatırlanan açık kartlarla boot');
+  var b=bootPanel('ok',{'seyma-panel-expand-v1':JSON.stringify({ruh:true,beden:true,sureklilik:true})});
+  return wait(700).then(function(){
+    var html=b.app.innerHTML;
+    ok('hatırlanan açık kartlar paneli yer tutucuda kilitlemez',html.indexOf('Çekirdek başlatılıyor')<0,html.slice(0,80));
+    ok('hatırlanan açık kartlar sahte bağlantı hatası üretmez',html.indexOf('Bağlantı bekleniyor')<0);
+    ok('panel gerçekten çizilir',html.length>5000,'html='+html.length);
+  });
+});
+
 // ── [5] Kaynak sözleşmesi ─────────────────────────────────────────────
-var step6=step5c.then(function(){
+var step6=step5e.then(function(){
   console.log('[5] Kaynak sözleşmesi');
   ok('latest.json okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(api,/.test(source));
   ok('transport okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(ghTransportApiP\(path\)/.test(source));

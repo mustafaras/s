@@ -69,7 +69,7 @@ first.then(function(){
   statusCtx.PANEL_POLL_STATE.lastOutcome='deferred_draft';
   ok('taslak defer UI’da görünür',statusCtx.pollStatusP().label==='Taslak korunuyor');
   console.log('[4] Değişmeyen snapshot rerender kapısı');
-  var renderCalls=0,ribbonCalls=0,renderCtx={
+  var renderCalls=0,ribbonCalls=0,renderCtx={PANEL_FIRST_PAINT:true,PANEL_DEFER_SINCE:null,PANEL_DEFER_MAX_MS:60000,Date:Date,
     PANEL_POLL_STATE:{pendingRender:false},
     panelDraftActiveP:function(){return false;},
     panelInteractionActiveP:function(){return false;},
@@ -80,7 +80,7 @@ first.then(function(){
     LAST_RENDERED_POLL_OUTCOME:'changed',
     Date:Date
   };
-  vm.runInNewContext(extractFunction('applyPollRenderP'),renderCtx,{filename:'panel-p2-render-gate.js'});
+  vm.runInNewContext(extractFunction('panelShouldDeferRenderP')+'\n'+extractFunction('applyPollRenderP'),renderCtx,{filename:'panel-p2-render-gate.js'});
   renderCtx.applyPollRenderP('same-sig',false,'not_modified',Date.now()-10,{});
   ok('aynı snapshot 304 turunda tam render yapılmaz',renderCalls===0&&ribbonCalls===1);
   renderCtx.panelDraftActiveP=function(){return true;};

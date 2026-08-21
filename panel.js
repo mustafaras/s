@@ -141,7 +141,11 @@ var PANEL_FIRST_PAINT=false;
 var PANEL_CONSECUTIVE_ERRORS=0;
 var PANEL_POLL_TIMER=null;
 var PANEL_POLL_BASE_MS=5000, PANEL_POLL_MAX_MS=60000, PANEL_POLL_BACKOFF_STEPS=4;
-var PANEL_FETCH_TIMEOUT_MS=20000, PANEL_TRANSPORT_TIMEOUT_MS=15000, PANEL_BOOT_STALL_MS=25000;
+// data/latest.json 1,6 MB, data/observer-snapshot.json 3,1 MB. Ölçülen yavaş
+// hat 18-25 KB/sn: 20 sn'lik bütçe ilerleyen bir indirmeyi haksız yere kesiyordu.
+// Denemeler kademeli uzar (30 → 45 → 67 sn) ki hızlı arıza erken yüzeye çıksın.
+var PANEL_FETCH_TIMEOUT_MS=30000, PANEL_TRANSPORT_TIMEOUT_MS=30000, PANEL_BOOT_STALL_MS=20000;
+var PANEL_FETCH_ATTEMPTS=3, PANEL_RETRY_DELAY_MS=1200, PANEL_TIMEOUT_GROWTH=1.5;
 var PANEL_EVENT_FETCH_CONCURRENCY=4, PANEL_EVENT_REFRESH_DAYS=2;
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
@@ -179,6 +183,34 @@ function panelFetchP(url,opts,timeoutMs){
       if(settled) return; settled=true; try{ clearTimeout(timer); }catch(e){} reject(e);
     });
   });
+}
+// GitHub akışı 1 MB'ın üzerindeki dosyalarda yavaş hatta yarıda kopabiliyor:
+// başlıklar 200 gelir, gövde eksik biter (Chrome: ERR_HTTP2_PROTOCOL_ERROR,
+// curl: 'stream not closed cleanly'). Aynı istek hemen tekrar denendiğinde
+// genelde tamamlanıyor. Bu yüzden ağ/timeout/bozuk-gövde hataları sınırlı
+// sayıda yeniden denenir; SINIFLANDIRILMIŞ HTTP hataları (401/403/404, 304,
+// rate limit) `noRetry` ile işaretlenir ve asla tekrarlanmaz.
+function panelRetryableErrorP(err){
+  if(!err) return false;
+  if(err.noRetry||err.notFound||err.rateLimited) return false;
+  var m=String(err.message||err);
+  if(/gecersiz|yetkisiz|bulunamad/i.test(m)) return false;
+  return true;
+}
+function panelAttemptP(run,attempts,delayMs){
+  var total=typeof attempts==='number'&&attempts>0?attempts:PANEL_FETCH_ATTEMPTS;
+  var pause=typeof delayMs==='number'&&delayMs>=0?delayMs:PANEL_RETRY_DELAY_MS;
+  var go=function(n){
+    return Promise.resolve().then(function(){ return run(n); }).catch(function(err){
+      if(n>=total||!panelRetryableErrorP(err)) throw err;
+      return new Promise(function(res){ setTimeout(res,pause); }).then(function(){ return go(n+1); });
+    });
+  };
+  return go(1);
+}
+function panelAttemptTimeoutP(base,attempt){
+  var b=typeof base==='number'&&base>0?base:PANEL_FETCH_TIMEOUT_MS;
+  return Math.round(b*Math.pow(PANEL_TIMEOUT_GROWTH,Math.max(0,(attempt||1)-1)));
 }
 function pollConditionalDecisionP(cache,status,etag){
   var known=cache&&typeof cache.etag==='string'&&cache.etag;
@@ -597,7 +629,10 @@ function panelWriteGuardP(kind,payload){
 function loadTransportFileP(path){
   var cache=PANEL_TRANSPORT_CACHE[path]||{};
   var H=ghJsonHeaders(); if(cache.etag) H["If-None-Match"]=cache.etag;
-  return panelFetchP(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"},PANEL_TRANSPORT_TIMEOUT_MS)
+  // data/observer-snapshot.json 3,1 MB; latest.json ile aynı akış kopması
+  // riskini taşır, aynı sınırlı yeniden deneme uygulanır. Salt GET.
+  return panelAttemptP(function(attempt){
+  return panelFetchP(ghTransportApiP(path)+"?ref="+encodeURIComponent(BRANCH),{headers:H,cache:"no-store"},panelAttemptTimeoutP(PANEL_TRANSPORT_TIMEOUT_MS,attempt))
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(cache,r.status,etag);
       if(decision.kind==='not_modified'){
@@ -610,7 +645,7 @@ function loadTransportFileP(path){
         // "transport <status>" hatasına karışmaz. Gözlemci yalnız okur; bu
         // sınıflandırma yazma yolu açmaz, yalnız hata nedenini dürüstleştirir.
         if(r.status===429){ var rl=new Error("transport rate_limited"); rl.rateLimited=true; throw rl; }
-        throw new Error("transport "+r.status);
+        var te=new Error("transport "+r.status); if(r.status<500) te.noRetry=true; throw te;
       }
       return r.json().then(function(g){
         var raw=(g&&typeof g.content==="string"&&g.content)?b64dec(g.content):null, sha=(g&&g.sha)||null;
@@ -638,6 +673,7 @@ function loadTransportFileP(path){
         PANEL_TRANSPORT_CACHE[path]={etag:etag,raw:raw,sha:sha}; return {raw:raw,sha:sha,etag:etag};
       });
     });
+  },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS);
 }
 function loadSyncReceiptP(){
   return loadTransportFileP(SYNC_RECEIPT_PATH).then(function(x){
@@ -5068,15 +5104,21 @@ function fetchLatest(repo,branch){
   var p=repo.split("/"); if(p.length!==2||!p[0]||!p[1]) throw new Error("Repo bicimi gecersiz.");
   var api="https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/data/latest.json?ref="+encodeURIComponent(branch), H={"Accept":"application/vnd.github.raw","Authorization":"Bearer "+PTOKEN,"X-GitHub-Api-Version":"2022-11-28"};
   if(PANEL_LATEST_CACHE.etag) H["If-None-Match"]=PANEL_LATEST_CACHE.etag;
-  return panelFetchP(api,{headers:H,cache:"no-store"},PANEL_FETCH_TIMEOUT_MS)
+  // 1,6 MB'lık gövde yavaş hatta yarıda kopabiliyor; kopan deneme yeniden
+  // denenir, sınıflandırılmış 4xx ise anında yukarı taşınır.
+  return panelAttemptP(function(attempt){
+  return panelFetchP(api,{headers:H,cache:"no-store"},panelAttemptTimeoutP(PANEL_FETCH_TIMEOUT_MS,attempt))
     .then(function(r){
       var etag=responseHeaderP(r,"ETag"), decision=pollConditionalDecisionP(PANEL_LATEST_CACHE,r.status,etag);
       if(decision.kind==='not_modified') return {notModified:true,meta:{etag:decision.etag,completedAt:new Date().toISOString()}};
-      if(r.status===401||r.status===403) throw new Error("Token gecersiz veya yetkisiz.");
-      if(r.status===404){ var e=new Error("data/latest.json bulunamadi."); e.notFound=true; throw e; }
-      if(!r.ok) throw new Error("Sunucu hatasi: "+r.status);
+      if(r.status===401||r.status===403){ var a=new Error("Token gecersiz veya yetkisiz."); a.noRetry=true; throw a; }
+      if(r.status===404){ var e=new Error("data/latest.json bulunamadi."); e.notFound=true; e.noRetry=true; throw e; }
+      if(!r.ok){ var h=new Error("Sunucu hatasi: "+r.status); if(r.status<500) h.noRetry=true; throw h; }
+      // Gövde yarıda kesildiyse r.json() burada reddeder (bozuk JSON ya da
+      // akış hatası); panelAttemptP bunu yeniden denenebilir sayar.
       return r.json().then(function(data){ PANEL_LATEST_CACHE.etag=etag; PANEL_LATEST_CACHE.sourceRevision=(data&&data.syncReceipt&&data.syncReceipt.snapshotRevision)||null; PANEL_LATEST_CACHE.sourceUpdatedAt=(data&&data.syncReceipt&&data.syncReceipt.sourceUpdatedAt)||null; PANEL_POLL_STATE.conditionalMode=etag?'etag':'uncached'; return {notModified:false,data:data,meta:{etag:etag,completedAt:new Date().toISOString()}}; });
     });
+  },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS);
 }
 // ---------- observer → kullanici mesaj kanali (data/observer-inbox.json) ----------
 function b64enc(str){ var bytes=new TextEncoder().encode(str); var bin=""; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
@@ -5685,17 +5727,30 @@ function schedulePanelPollP(){
   },panelPollDelayP());
 }
 schedulePanelPollP();
-// Boot durma emniyeti: ilk tur hiç sonuçlanmazsa (takılı akış, iptal edilemeyen
-// istek, beklenmedik istisna) gözlemci yer tutucuda bırakılmaz; teşhis ekranı
-// ve yeniden deneme yolu gösterilir.
-setTimeout(function(){
+// Boot durma emniyeti. İki ayrı durum vardır ve karıştırılmamalıdır:
+//  • İstek HÂLÂ uçuşta → indirme gerçekten sürüyor olabilir (ilk açılışta
+//    anlık görünüm ~1,6 MB; ölçülen yavaş hatta bu dakikalar sürebilir).
+//    Gözlemciye yanlışlıkla "hata" gösterilmez, dürüst bir ilerleme metni
+//    yazılır ve kontrol yeniden kurulur.
+//  • Uçuşta istek YOK ve hâlâ boyanmadıysa → gerçek durma; teşhis ekranı.
+var PANEL_BOOT_WAIT_MARK="Veri indiriliyor";
+function panelBootStallCheckP(){
   if(PANEL_FIRST_PAINT||DEMO_MODE||!PTOKEN) return;
   try{
-    var a=document.getElementById("app");
-    if(!a||String(a.innerHTML||"").indexOf("Çekirdek başlatılıyor")<0) return;
+    var a=document.getElementById("app"); if(!a) return;
+    var html=String(a.innerHTML||"");
+    if(html.indexOf("Çekirdek başlatılıyor")<0&&html.indexOf(PANEL_BOOT_WAIT_MARK)<0) return;
+    if(PANEL_LOAD_INFLIGHT){
+      a.innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;">'
+        +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Veri indiriliyor…</div>'
+        +'<div style="font-size:12px;line-height:1.5;color:var(--t2);">Bağlantı yavaş görünüyor. İlk açılışta anlık görünümün tamamı indirilir; bu birkaç dakika sürebilir. Sekmeyi açık bırakman yeterli.</div>'
+        +'</div></div>';
+      setTimeout(panelBootStallCheckP,PANEL_BOOT_STALL_MS); return;
+    }
     fail("boot timeout: panel ilk veri turunu tamamlayamadi");
   }catch(e){}
-},PANEL_BOOT_STALL_MS);
+}
+setTimeout(panelBootStallCheckP,PANEL_BOOT_STALL_MS);
 // Sekme arka plana alınıp geri dönüldüğünde bir sonraki 5sn'lik turu
 // beklemeden anında yenile — "eş zamanlı" hissi asıl burada kurulur, çünkü
 // gözlemci genelde panele "az önce ne oldu" diye bakmak için döner.

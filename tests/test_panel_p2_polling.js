@@ -24,13 +24,13 @@ console.log('\n=== PANEL-008 / PANEL-06 — polling fixture ===\n');
 console.log('[1] ETag conditional fetch — 200 sonra 304');
 var calls=[],jsonCalls=0,latest={version:2,startDate:'2026-08-03',days:{},syncReceipt:{snapshotRevision:'a'.repeat(40),sourceUpdatedAt:'2026-08-03T10:00:00.000Z'}};
 var aborted=[];
-var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:20000,PTOKEN:'test-token',PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},responseHeaderP:null,pollConditionalDecisionP:null,panelFetchP:null,fetch:null};
+var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:20000,PANEL_FETCH_ATTEMPTS:3,PANEL_RETRY_DELAY_MS:5,PANEL_TIMEOUT_GROWTH:1.5,panelAttemptP:null,panelAttemptTimeoutP:null,panelRetryableErrorP:null,PTOKEN:'test-token',PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},responseHeaderP:null,pollConditionalDecisionP:null,panelFetchP:null,fetch:null};
 ctx.fetch=function(url,opts){
   calls.push({url:url,opts:opts});
   if(calls.length===1) return Promise.resolve(response(200,'"v1"',latest));
   return Promise.resolve(response(304,'"v1"'));
 };
-vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelFetchP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+extractFunction('fetchLatest'),ctx,{filename:'panel-p2-polling.js'});
+vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelFetchP')+'\n'+extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+extractFunction('panelAttemptTimeoutP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+extractFunction('fetchLatest'),ctx,{filename:'panel-p2-polling.js'});
 ctx.responseHeaderP=ctx.responseHeaderP;
 var first=ctx.fetchLatest('owner/repo','main').then(function(x){
   jsonCalls++;

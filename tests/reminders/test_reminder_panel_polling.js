@@ -37,7 +37,8 @@ function loadPanelHelpers(names, extra) {
     Date, Math, String, Number, Boolean, Object, Array, JSON, isNaN, isFinite, RegExp,
     TextEncoder, TextDecoder, atob, btoa,
     Promise, Error, setTimeout, clearTimeout, AbortController, encodeURIComponent,
-    PANEL_FETCH_TIMEOUT_MS: 20000, PANEL_TRANSPORT_TIMEOUT_MS: 15000,
+    PANEL_FETCH_TIMEOUT_MS: 30000, PANEL_TRANSPORT_TIMEOUT_MS: 30000,
+    PANEL_FETCH_ATTEMPTS: 3, PANEL_RETRY_DELAY_MS: 5, PANEL_TIMEOUT_GROWTH: 1.5,
     esc: (value) => String(value == null ? "" : value)
   }, extra || {});
   vm.runInNewContext(code, context, { filename: "panel-rem58-helpers.js" });
@@ -87,7 +88,7 @@ function makeLatest(overrides) {
 const cases = [
   // ── 1. Transport yanıt sınıfları ayrı ve deterministik ─────────────
   ["200 returns the body and caches the ETag", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: {}, ghJsonHeaders: () => ({})
     });
@@ -105,7 +106,7 @@ const cases = [
     });
   }],
   ["304 with a warm cache returns notModified and does not re-parse the body", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: { "data/observer-snapshot.json": { etag: '"v1"', raw: "cached-raw", sha: "sha1" } },
       ghJsonHeaders: () => ({})
@@ -123,7 +124,7 @@ const cases = [
     // Gerçek "304 cache miss" yolu: cache'te etag var (If-None-Match gönderildi),
     // sunucu 304 döndü ama cache.raw yok. Panel bu durumda hayalet gövde
     // üretemez; fail-closed olarak reddeder.
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: { "data/observer-snapshot.json": { etag: '"v1"', raw: null, sha: null } },
       ghJsonHeaders: () => ({})
@@ -135,7 +136,7 @@ const cases = [
     );
   }],
   ["ETag changed returns a fresh body and updates the cache", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: { "data/observer-snapshot.json": { etag: '"v1"', raw: "old", sha: "oldsha" } },
       ghJsonHeaders: () => ({})
@@ -149,7 +150,7 @@ const cases = [
     });
   }],
   ["empty body is served as null raw and never treated as a valid snapshot", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: {}, ghJsonHeaders: () => ({})
     });
@@ -163,7 +164,7 @@ const cases = [
     // loadTransportFileP yalnız ham string döndürür; JSON parse tüketicide
     // (loadSyncReceiptP) olur. Bozuk gövde orada fail-closed: null döner,
     // hayalet receipt üretilmez.
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP", "loadSyncReceiptP", "normalizeSyncReceiptP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP", "loadSyncReceiptP", "normalizeSyncReceiptP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: {}, ghJsonHeaders: () => ({}), SYNC_RECEIPT_PATH: "data/sync-receipt.json"
     });
@@ -173,7 +174,7 @@ const cases = [
     });
   }],
   ["network failure rejects and leaves the previous cache intact", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: { "data/observer-snapshot.json": { etag: '"v1"', raw: "old", sha: "oldsha" } },
       ghJsonHeaders: () => ({})
@@ -188,7 +189,7 @@ const cases = [
     );
   }],
   ["rate limit (429) is classified distinctly from a generic transport error", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: {}, ghJsonHeaders: () => ({})
     });
@@ -202,7 +203,7 @@ const cases = [
     );
   }],
   ["a generic 5xx is not mislabeled as rate limit", () => {
-    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "loadTransportFileP"], {
+    const ctx = loadPanelHelpers(["responseHeaderP", "pollConditionalDecisionP", "ghTransportApiP", "b64dec", "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP"], {
       REPO: "owner/repo", BRANCH: "main", PTOKEN: "test-token",
       PANEL_TRANSPORT_CACHE: {}, ghJsonHeaders: () => ({})
     });
@@ -402,7 +403,7 @@ const cases = [
     // Panel gözlemcidir: polling / transport sınırı hiçbir reminder tercihini,
     // localStorage'ı veya app state'i yazamaz.
     const pollingBoundary = [
-      "panelFetchP", "loadTransportFileP", "fetchLatest", "pollConditionalDecisionP",
+      "panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP", "fetchLatest", "pollConditionalDecisionP",
       "panelDraftActiveP", "panelInteractionActiveP", "applyPollRenderP"
     ].map(extractTopLevelFunction).join("\n");
     ["method:\"PUT\"", "method: 'PUT'", "localStorage.setItem", "localStorage.removeItem"]
@@ -417,7 +418,7 @@ const cases = [
     assert(!/reminders/.test(apply));
   }],
   ["the transport boundary never writes to the data repo", () => {
-    const transport = extractTopLevelFunction("panelFetchP", "loadTransportFileP");
+    const transport = extractTopLevelFunction("panelFetchP", "panelRetryableErrorP", "panelAttemptP", "panelAttemptTimeoutP", "loadTransportFileP");
     assert(!/method:\s*["']PUT/.test(transport));
     assert(!/method:\s*["']POST/.test(transport));
     assert(!/method:\s*["']PATCH/.test(transport));

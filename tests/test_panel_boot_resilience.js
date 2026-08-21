@@ -116,9 +116,11 @@ var step4=step3.then(function(){
 // ── [4] Tam boot: takılı ağ paneli yer tutucuda bırakmaz ──────────────
 function bootPanel(mode){
   var src=source
-    .replace('PANEL_FETCH_TIMEOUT_MS=20000','PANEL_FETCH_TIMEOUT_MS=120')
-    .replace('PANEL_TRANSPORT_TIMEOUT_MS=15000','PANEL_TRANSPORT_TIMEOUT_MS=120')
-    .replace('PANEL_BOOT_STALL_MS=25000','PANEL_BOOT_STALL_MS=700')
+    .replace('PANEL_FETCH_TIMEOUT_MS=30000','PANEL_FETCH_TIMEOUT_MS=60')
+    .replace('PANEL_TRANSPORT_TIMEOUT_MS=30000','PANEL_TRANSPORT_TIMEOUT_MS=60')
+    .replace('PANEL_BOOT_STALL_MS=20000','PANEL_BOOT_STALL_MS=250')
+    .replace('PANEL_FETCH_ATTEMPTS=3','PANEL_FETCH_ATTEMPTS=2')
+    .replace('PANEL_RETRY_DELAY_MS=1200','PANEL_RETRY_DELAY_MS=10')
     .replace('PANEL_POLL_BASE_MS=5000','PANEL_POLL_BASE_MS=80')
     .replace('PANEL_POLL_MAX_MS=60000','PANEL_POLL_MAX_MS=800');
   function el(){ return {_html:'',dataset:{},style:{},classList:{contains:function(){return false;},add:function(){},remove:function(){}},children:[],
@@ -158,23 +160,105 @@ function bootPanel(mode){
 var step5=step4.then(function(){
   console.log('[4] Tam boot — takılı ve hatalı ağ');
   var hang=bootPanel('hang');
-  return wait(600).then(function(){
-    ok('takılı ağda panel yer tutucuda kalmaz',hang.app.innerHTML.indexOf('Çekirdek başlatılıyor')<0,hang.app.innerHTML.slice(0,80));
-    ok('takılı ağda gözlemciye teşhis/yeniden deneme yolu sunulur',/Tekrar Dene|Çekirdek başlatılamadı|Bağlantı bekleniyor/.test(hang.app.innerHTML));
+  return wait(400).then(function(){
+    // Yer tutucu, istek uçuştayken dürüst bir ilerleme metnine dönmüş olmalı.
+    ok('takılı ağda yer tutucu bırakılmaz (ilerleme ya da teşhis gösterilir)',
+      hang.app.innerHTML.indexOf('Çekirdek başlatılıyor')<0,hang.app.innerHTML.slice(0,90));
+    ok('indirme sürerken yanlışlıkla hata gösterilmez, dürüst ilerleme yazılır',
+      /Veri indiriliyor|Tekrar Dene|Çekirdek başlatılamadı|Bağlantı bekleniyor/.test(hang.app.innerHTML));
+    return wait(900);
+  }).then(function(){
+    ok('takılı ağda sonunda teşhis/yeniden deneme yolu sunulur',
+      /Tekrar Dene|Çekirdek başlatılamadı|Bağlantı bekleniyor/.test(hang.app.innerHTML),hang.app.innerHTML.slice(0,90));
     var latest=hang.log.filter(function(u){return u.indexOf('latest.json')>=0;}).length;
-    ok('takılı ağda istek seli oluşmaz',latest>0&&latest<=8,'latest istekleri='+latest);
+    ok('takılı ağda istek seli oluşmaz',latest>0&&latest<=14,'latest istekleri='+latest);
   });
 }).then(function(){
   var err=bootPanel('neterr');
-  return wait(600).then(function(){
+  return wait(1200).then(function(){
     ok('ağ hatasında panel yer tutucuda kalmaz',err.app.innerHTML.indexOf('Çekirdek başlatılıyor')<0);
+    ok('ağ hatasında gözlemciye teşhis yolu sunulur',/Tekrar Dene|Bağlantı bekleniyor|Çekirdek başlatılamadı/.test(err.app.innerHTML));
     var latest=err.log.filter(function(u){return u.indexOf('latest.json')>=0;}).length;
-    ok('ağ hatasında backoff istek sayısını sınırlar',latest>0&&latest<=10,'latest istekleri='+latest);
+    ok('ağ hatasında retry+backoff istek sayısını sınırlar',latest>0&&latest<=20,'latest istekleri='+latest);
+  });
+});
+
+// ── [4b] Yeniden deneme semantiği ─────────────────────────────────────
+var step5b=step5.then(function(){
+  console.log('[4b] Kopan gövde yeniden denenir, 4xx denenmez');
+  function retryCtx(){
+    var ctx={Promise:Promise,Math:Math,Error:Error,String:String,setTimeout:setTimeout,
+      PANEL_FETCH_ATTEMPTS:3,PANEL_RETRY_DELAY_MS:1,PANEL_TIMEOUT_GROWTH:1.5,PANEL_FETCH_TIMEOUT_MS:30000};
+    vm.runInNewContext(extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+extractFunction('panelAttemptTimeoutP'),ctx,{filename:'panel-boot-retry.js'});
+    return ctx;
+  }
+  var c=retryCtx();
+  // Yavaş hatta ölçülen gerçek arıza: gövde yarıda kopar, JSON parse patlar.
+  var tries=0;
+  return c.panelAttemptP(function(){
+    tries++;
+    if(tries<3) return Promise.reject(new SyntaxError('Unterminated string in JSON at position 438122'));
+    return Promise.resolve('tam-govde');
+  }).then(function(v){
+    ok('kopan gövde yeniden denenir ve sonunda tamamlanır',v==='tam-govde'&&tries===3,'deneme='+tries);
+  }).then(function(){
+    var c2=retryCtx(), n=0;
+    var auth=new Error('Token gecersiz veya yetkisiz.'); auth.noRetry=true;
+    return c2.panelAttemptP(function(){ n++; return Promise.reject(auth); }).then(function(){
+      ok('yetki hatası yeniden denenmemeli',false);
+    },function(){
+      ok('yetki hatası (4xx) asla yeniden denenmez',n===1,'deneme='+n);
+    });
+  }).then(function(){
+    var c3=retryCtx(), n=0;
+    var nf=new Error('data/latest.json bulunamadi.'); nf.notFound=true; nf.noRetry=true;
+    return c3.panelAttemptP(function(){ n++; return Promise.reject(nf); }).catch(function(){
+      ok('404 asla yeniden denenmez',n===1,'deneme='+n);
+    });
+  }).then(function(){
+    var c4=retryCtx(), n=0;
+    var rl=new Error('transport rate_limited'); rl.rateLimited=true;
+    return c4.panelAttemptP(function(){ n++; return Promise.reject(rl); }).catch(function(){
+      ok('rate limit yeniden denemeyle büyütülmez',n===1,'deneme='+n);
+    });
+  }).then(function(){
+    // Sahada ölçülen arızanın birebir modeli: başlıklar 200, gövde yarıda
+    // kopuk (1.662.015 bayt beklenirken ~440 KB gelip akış CANCEL oluyor).
+    // İlk iki deneme parse'ta patlar, üçüncüsü tamamlanır.
+    var attempts=0;
+    var latest={version:2,startDate:'2026-06-24',days:{},syncReceipt:{snapshotRevision:'a'.repeat(40),sourceUpdatedAt:'2026-08-21T07:00:00.000Z'}};
+    var ctx={Date:Date,Math:Math,Promise:Promise,String:String,Number:Number,Object:Object,Array:Array,
+      isFinite:isFinite,Error:Error,encodeURIComponent:encodeURIComponent,setTimeout:setTimeout,clearTimeout:clearTimeout,
+      AbortController:AbortController,PANEL_FETCH_TIMEOUT_MS:30000,PANEL_FETCH_ATTEMPTS:3,PANEL_RETRY_DELAY_MS:1,
+      PANEL_TIMEOUT_GROWTH:1.5,PTOKEN:'test-token-not-real',
+      PANEL_LATEST_CACHE:{etag:null,sourceRevision:null,sourceUpdatedAt:null},PANEL_POLL_STATE:{conditionalMode:'etag'},
+      fetch:function(){
+        attempts++;
+        var truncated=attempts<3;
+        return Promise.resolve({status:200,ok:true,
+          headers:{get:function(k){ return k.toLowerCase()==='etag'?'"v9"':null; }},
+          json:function(){ return truncated
+            ? Promise.reject(new SyntaxError('Unterminated string in JSON at position 438122'))
+            : Promise.resolve(latest); }});
+      }};
+    vm.runInNewContext(extractFunction('responseHeaderP')+'\n'+extractFunction('panelFetchP')+'\n'+
+      extractFunction('panelRetryableErrorP')+'\n'+extractFunction('panelAttemptP')+'\n'+
+      extractFunction('panelAttemptTimeoutP')+'\n'+extractFunction('pollConditionalDecisionP')+'\n'+
+      extractFunction('fetchLatest'),ctx,{filename:'panel-boot-truncation.js'});
+    return ctx.fetchLatest('mustafaras/seyma-data','main').then(function(res){
+      ok('yarıda kopan snapshot yeniden denenerek tam alınır',!!res&&res.notModified===false&&res.data===latest,'deneme='+attempts);
+      ok('kopan denemeler ETag önbelleğini kirletmez',ctx.PANEL_LATEST_CACHE.etag==='"v9"');
+    });
+  }).then(function(){
+    var c5=retryCtx();
+    ok('deneme zaman aşımı kademeli büyür',
+      c5.panelAttemptTimeoutP(30000,1)===30000&&c5.panelAttemptTimeoutP(30000,2)===45000&&c5.panelAttemptTimeoutP(30000,3)===67500,
+      [c5.panelAttemptTimeoutP(30000,1),c5.panelAttemptTimeoutP(30000,2),c5.panelAttemptTimeoutP(30000,3)].join('/'));
   });
 });
 
 // ── [5] Kaynak sözleşmesi ─────────────────────────────────────────────
-var step6=step5.then(function(){
+var step6=step5b.then(function(){
   console.log('[5] Kaynak sözleşmesi');
   ok('latest.json okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(api,/.test(source));
   ok('transport okuma yolu zaman aşımı sarmalayıcısını kullanır',/return panelFetchP\(ghTransportApiP\(path\)/.test(source));
@@ -183,6 +267,12 @@ var step6=step5.then(function(){
   ok('sabit 5 sn poll interval kaldırıldı',source.indexOf('},5000);')<0);
   ok('poll zincirleme zamanlayıcıyla kurulur',source.indexOf('schedulePanelPollP();')>=0);
   ok('boot durma emniyeti mevcut',source.indexOf('PANEL_BOOT_STALL_MS')>=0&&/boot timeout/.test(source));
+  ok('latest okuma yolu sınırlı yeniden deneme kullanır',/return panelAttemptP\(function\(attempt\)/.test(source));
+  ok('transport okuma yolu sınırlı yeniden deneme kullanır',(source.match(/return panelAttemptP\(function\(attempt\)/g)||[]).length===2);
+  ok('deneme zaman aşımı kademeli',source.indexOf('panelAttemptTimeoutP(PANEL_FETCH_TIMEOUT_MS,attempt)')>=0);
+  ok('4xx yanıtlar noRetry ile işaretlenir',/a\.noRetry=true/.test(source)&&/e\.noRetry=true/.test(source)&&/te\.noRetry=true/.test(source));
+  ok('indirme sürerken yanlış hata yerine ilerleme gösterilir',source.indexOf('PANEL_BOOT_WAIT_MARK')>=0&&/Veri indiriliyor/.test(source));
+  ok('zaman bütçesi ölçülen yavaş hatta yetecek kadar geniş',/PANEL_FETCH_TIMEOUT_MS=30000/.test(source));
   var vis=(source.match(/addEventListener\((["'])visibilitychange\1/g)||[]).length;
   ok('yinelenen visibilitychange dinleyicisi yok',vis===1,'sayı='+vis);
   ok('panel kabuğu watchdog\'u panel.js\'ten önce çalışır',

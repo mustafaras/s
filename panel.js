@@ -149,7 +149,15 @@ var PANEL_FETCH_ATTEMPTS=3, PANEL_RETRY_DELAY_MS=1200, PANEL_TIMEOUT_GROWTH=1.5;
 // Panel her arızayı tek bir "Bağlantı kurulamadı" metnine indirgiyordu; HTTP
 // durumu gizli kaldığı için saha teşhisi imkânsızdı. Bu kayıt YALNIZ durum
 // kodu / hata sınıfı / sınır sıfırlanma zamanı tutar — token, veri, URL yok.
-var PANEL_LAST_DIAG={status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null};
+var PANEL_LAST_DIAG={status:null,kind:null,attempts:0,at:null,resetAt:null,retryAfterMs:null,stage:null,errName:null};
+// Poll turunun hangi aşamada olduğunu izler. Kanıtlanmış arıza: veri BAŞARIYLA
+// indiyor (Tanı: HTTP 200 · ok), sonra alt aşamalardan biri patlıyor ve panel
+// bunu "Bağlantı bekleniyor" diye gösteriyordu — yani elinde veri varken
+// gözlemciye yanlış bir ağ hatası gösteriyordu.
+var PANEL_STAGE='idle';
+// fetchLatest başarıyla döndüğünde ham anlık görünüm burada tutulur. Sonraki
+// aşamalardan biri patlarsa panel boş kalmaz: son çare olarak bu veriyle çizilir.
+var PANEL_LAST_GOOD=null;
 var PANEL_EVENT_FETCH_CONCURRENCY=4, PANEL_EVENT_REFRESH_DAYS=2;
 var LAST_RENDERED_POLL_OUTCOME='idle';
 var EVENT_LOG_STATE={source:'missing',events:[],audit:{ok:true,issueCount:0,issues:[],deviceCount:0},loadedAt:null,days:[]};
@@ -247,10 +255,46 @@ function panelDiagTextP(){
   if(d.status) bits.push('HTTP '+d.status);
   if(d.kind) bits.push(d.kind);
   if(d.attempts) bits.push(d.attempts+' deneme');
+  if(d.stage) bits.push('aşama: '+d.stage);
+  if(d.errName) bits.push(d.errName);
   if(d.resetAt){
     try{ bits.push('sınır '+new Date(d.resetAt).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+'\u2019de sıfırlanır'); }catch(e){}
   }
   return bits.join(' \u00B7 ');
+}
+function panelNoteStageP(stage,err){
+  PANEL_STAGE=stage||PANEL_STAGE;
+  if(PANEL_LAST_DIAG){
+    PANEL_LAST_DIAG.stage=stage||null;
+    // Yalnız HATA SINIFI adı (TypeError/SyntaxError...). Hata METNİ asla
+    // saklanmaz: kullanıcı verisi ya da yol içerebilir.
+    PANEL_LAST_DIAG.errName=err&&err.name?String(err.name).slice(0,40):null;
+  }
+  return PANEL_LAST_DIAG;
+}
+// render() bir poll turunun içinden çağrılır. Eskiden render içindeki bir
+// istisna zincirin dış .catch'ine düşüyor ve AĞ HATASI gibi raporlanıyordu.
+// Artık render hatası kendi dürüst kartını gösterir; ağ hatasıyla karışmaz.
+function panelSafeRenderP(){
+  try{ render(); return true; }
+  catch(err){
+    panelNoteStageP('render',err);
+    try{ panelRenderFailCardP(); }catch(e){}
+    return false;
+  }
+}
+function panelRenderFailCardP(){
+  var a=document.getElementById('app'); if(!a) return;
+  var diag=typeof panelDiagTextP==='function'?panelDiagTextP():'';
+  a.innerHTML='<div style="max-width:420px;margin:80px auto;padding:0 16px;"><div class="card" style="padding:24px;">'
+    +'<div style="font-weight:800;font-size:17px;margin-bottom:6px;color:var(--t1);">Görünüm oluşturulamadı</div>'
+    +'<div style="font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;">Veri alındı ancak ekran çizilirken bir hata oluştu. Bu bir bağlantı sorunu değil; veri güvende.</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+    +'<button type="button" class="btn" onclick="location.reload()" style="padding:8px 16px;font-size:12px;background:linear-gradient(135deg,#6b4e13,#d4af37);border:none;color:#fff;border-radius:7px;cursor:pointer;">Sayfayı Yenile</button>'
+    +'<button type="button" class="btn" onclick="runPanelSelfTest()" style="padding:8px 16px;font-size:12px;border-radius:7px;cursor:pointer;">Tanı çalıştır</button>'
+    +'</div><div id="panel-selftest"></div>'
+    +(diag?'<div style="font-size:9px;color:var(--t3);margin-top:10px;line-height:1.6;">Tanı: '+esc(diag)+'</div>':'')
+    +'</div></div>';
 }
 function pollConditionalDecisionP(cache,status,etag){
   var known=cache&&typeof cache.etag==='string'&&cache.etag;
@@ -333,7 +377,7 @@ function applyPollRenderP(sig,dataChanged,outcome,startedAt,meta){
   var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP(outcome,startedAt,meta);
   var shouldRender=!!dataChanged||hadPending;
   LAST_RENDERED_POLL_OUTCOME=outcome;
-  if(shouldRender){ LASTSIG=sig; render(); } else updatePollRibbonP();
+  if(shouldRender){ LASTSIG=sig; panelNoteStageP('render',null); panelSafeRenderP(); } else updatePollRibbonP();
   return shouldRender;
 }
 // ── İman Köşesi — panel aynası ──
@@ -5278,12 +5322,18 @@ function b64dec(b64){ var bin=atob(String(b64||"").replace(/\s/g,"")); var bytes
 function inboxApi(){ var p=REPO.split("/"); return "https://api.github.com/repos/"+encodeURIComponent(p[0])+"/"+encodeURIComponent(p[1])+"/contents/data/observer-inbox.json"; }
 function ghJsonHeaders(){ return {"Authorization":"Bearer "+PTOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}; }
 function loadInbox(){
-  return fetch(inboxApi()+"?ref="+encodeURIComponent(BRANCH)+"&t="+Date.now(),{headers:ghJsonHeaders()})
+  return panelAttemptP(function(attempt){
+  return panelFetchP(inboxApi()+"?ref="+encodeURIComponent(BRANCH)+"&t="+Date.now(),{headers:ghJsonHeaders()},panelAttemptTimeoutP(PANEL_TRANSPORT_TIMEOUT_MS,attempt))
     .then(function(r){
       if(r.status===404) return {messages:[],receipts:{},sha:null};
-      if(!r.ok) throw new Error("inbox "+r.status);
+      if(!r.ok){ var ie=new Error("inbox "+r.status); if(r.status<500) ie.noRetry=true; throw ie; }
       return r.json().then(function(g){ var obj={messages:[]}; try{ obj=JSON.parse(b64dec(g.content)); }catch(e){} return {messages:Array.isArray(obj.messages)?obj.messages:[],receipts:(obj.receipts&&typeof obj.receipts==="object")?obj.receipts:{},sha:g.sha}; });
     });
+  },PANEL_FETCH_ATTEMPTS,PANEL_RETRY_DELAY_MS).catch(function(){
+    // Mesaj kanalı okunamazsa panelin GERİ KALANI düşmez: boş mesaj listesiyle
+    // devam edilir. sha null bırakılır ki hiçbir yazma yanlış sha ile gitmesin.
+    return {messages:[],receipts:{},sha:null,unavailable:true};
+  });
 }
 function putInbox(messages,sha,receipts){
   var payload={messages:messages}; if(receipts&&typeof receipts==="object"&&Object.keys(receipts).length) payload.receipts=receipts;
@@ -5744,6 +5794,7 @@ function load(){
     .catch(function(e){ if(e&&e.notFound&&BRANCH!=="main"){ BRANCH="main"; return fetchLatest(REPO,BRANCH);} throw e; })
     .then(function(j){
       PANEL_CONSECUTIVE_ERRORS=0; // sunucu yanıt verdi: backoff sıfırlanır
+      panelNoteStageP('shape',null);
       var pollMeta=j&&j.meta||{}, pollCompleted=pollMeta.completedAt||new Date().toISOString();
       if(j&&j.notModified){
         PANEL_POLL_AT=pollCompleted; updatePollRevisionsP(D,SYNC_RECEIPT,PROJECTION.state); PANEL_POLL_STATE.notModifiedCount++;
@@ -5751,14 +5802,17 @@ function load(){
         PROJECTION.sectionFetchState={ok:true,lastError:null,failedAt:null};
         var pollSig=panelSig();
         if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }
-        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ if(panelInteractionActiveP()){ PANEL_POLL_STATE.pendingRender=true; return D; } LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; render(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
+        var hadPending=PANEL_POLL_STATE.pendingRender; PANEL_POLL_STATE.pendingRender=false; pollRecordP('not_modified',pollStartedAt,pollMeta); if(hadPending){ if(panelInteractionActiveP()){ PANEL_POLL_STATE.pendingRender=true; return D; } LASTSIG=pollSig; LAST_RENDERED_POLL_OUTCOME='not_modified'; panelNoteStageP('render',null); panelSafeRenderP(); } else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); } return D;
       }
       var latestLegacy=j&&j.data?j.data:j; SYNC_RECEIPT=null; if(!latestLegacy||!latestLegacy.days||!latestLegacy.startDate) throw new Error("Beklenen veri yapisi yok.");
+      PANEL_LAST_GOOD=latestLegacy;
       setPanelLocationContextP(latestLegacy);
       if(!UI.selectedDate) UI.selectedDate=today(); if(!UI.month) UI.month=monthKey(UI.selectedDate);
       QTRANSPORT={delivery:'idle',responses:'idle',errors:[]};
       var previousEventRows=EVENT_LOG_STATE&&Array.isArray(EVENT_LOG_STATE.events)?EVENT_LOG_STATE.events.slice():[], hadPreviousSnapshot=!!D;
+      panelNoteStageP('sections',null);
       return Promise.all([loadInbox(), loadDeliveryP(), loadResponsesP(), loadSyncReceiptP(), loadObserverProjectionP(), loadEventLogP(latestLegacy)]).then(function(res){
+        panelNoteStageP('project',null);
         var ib=res[0]||{};
         OBSINBOX=ib.messages||[]; OBSSHA=ib.sha; OBSRECEIPTS=ib.receipts||{};
         var incomingEventState=res[5]||buildEventLogStateP(latestLegacy,[]), newEventCount=countNewEventChangesP(previousEventRows,incomingEventState.events);
@@ -5801,13 +5855,45 @@ function load(){
         PROJECTION.sectionFetchState=fx.sectionFetchState;
         EVENT_LOG_STATE=buildEventLogStateP(latestLegacy,[]);
         if(panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; return; }
-        render();
+        panelNoteStageP('render',err);
+        panelSafeRenderP();
       });
     })
     .catch(function(e){
       PANEL_CONSECUTIVE_ERRORS++;
       pollRecordP('error',pollStartedAt,{errorCode:e&&e.code||'network'});
       var m=String(e&&e.message||e);
+      // KANITLANMIŞ ARIZA SINIFI: latest.json 200 ile indi (Tanı: HTTP 200 · ok)
+      // ama sonraki bir aşama patladı. Eskiden bu "Bağlantı bekleniyor" olarak
+      // gösteriliyordu; gözlemci elinde veri varken ağ hatası sanıyordu. Artık
+      // veri alındıysa bağlantı kartı GÖSTERİLMEZ: dürüst görünüm hatası kartı
+      // çıkar ve hangi aşamada kırıldığı yazılır.
+      var veriAlindi=PANEL_LAST_DIAG&&PANEL_LAST_DIAG.kind==='ok';
+      if(veriAlindi&&!/gecersiz|yetkisiz/i.test(m)){
+        panelNoteStageP(PANEL_STAGE,e);
+        if(PANEL_FIRST_PAINT&&panelDraftActiveP()){ PANEL_POLL_STATE.pendingRender=true; markPollSkippedP('deferred_draft'); return; }
+        // SON ÇARE: elimizdeki ham veriyle çizmeyi dene. Projeksiyon/yan-kanal
+        // aşaması patlasa bile gözlemci panelini görür; ancak bu da olmazsa
+        // dürüst görünüm hatası kartı gösterilir (asla sahte ağ hatası).
+        if(PANEL_LAST_GOOD){
+          try{
+            var PC=window.PanelCoverageV1;
+            var safeD=null;
+            try{ safeD=PC&&typeof PC.redactForObserver==='function'?PC.redactForObserver(PANEL_LAST_GOOD):PANEL_LAST_GOOD; }catch(e3){ safeD=null; }
+            if(safeD){
+              D=safeD;
+              PROJECTION.snapshot=null;
+              PROJECTION.state={source:'legacy_fallback',reason:'stage_failure',snapshot:null,data:D,coverage:null};
+              PROJECTION.sections=PROJECTION.sections||{};
+              if(!UI.selectedDate) UI.selectedDate=today();
+              if(!UI.month) UI.month=monthKey(UI.selectedDate);
+              if(panelSafeRenderP()) return;
+            }
+          }catch(e4){}
+        }
+        try{ panelRenderFailCardP(); }catch(e2){ fail(m); }
+        return;
+      }
       if(/headers.+RequestInit|non ISO-8859-1|String contains/i.test(m)){ tokenPrompt("Anahtar bicimi hatali, yeniden yapistir."); return; }
       if(/gecersiz|yetkisiz/i.test(m)){ tokenPrompt("Anahtar gecersiz veya yetki yok."); return; }
       // İlk boyama yapılmadıysa taslak koruması hata ekranını YUTAMAZ; aksi

@@ -48,6 +48,8 @@ function load(names, extra) {
   const context = Object.assign({
     Date, Math, String, Number, Boolean, Object, Array, JSON, RegExp,
     isNaN, isFinite,
+    PANEL_LAST_DIAG: { status: null, kind: null, attempts: 0, at: null, resetAt: null, retryAfterMs: null, stage: null, errName: null },
+    PANEL_STAGE: 'idle',
     UI: { msgSending: false, msgDraft: "", eventFilter: "all", motivationFilter: "all", selectedDate: null, expandedCards: {}, d4SelectedModule: null },
     D4_DRAWER_RETURN_ID: null,
     document: { activeElement: null },
@@ -67,7 +69,7 @@ function freshPollContext() {
   const records = [];
   let renders = 0;
   let ribbonUpdates = 0;
-  const ctx = load(["panelDraftActiveP", "panelInteractionActiveP", "applyPollRenderP"], {
+  const ctx = load(["panelDraftActiveP", "panelInteractionActiveP", "panelNoteStageP", "panelSafeRenderP", "applyPollRenderP"], {
     pollRecordP: (outcome) => records.push(outcome),
     updatePollRibbonP: () => { ribbonUpdates += 1; },
     render: () => { renders += 1; }
@@ -142,7 +144,10 @@ const cases = [
     assert(PANEL_SOURCE.includes("if(panelDraftActiveP()){ markPollSkippedP('deferred_draft'); PANEL_POLL_STATE.pendingRender=true; return D; }"));
     assert(PANEL_SOURCE.includes("if(hadPending){ if(panelInteractionActiveP())"));
     assert(PANEL_SOURCE.includes("else { LAST_RENDERED_POLL_OUTCOME='not_modified'; updatePollRibbonP(); }"));
-    assert(PANEL_SOURCE.includes("if(shouldRender){ LASTSIG=sig; render(); } else updatePollRibbonP();"));
+    // Poll turundaki her render KORUMALI çağrılır: render içindeki bir istisna
+    // artık zincirin ağ hatası dalına düşüp "Bağlantı bekleniyor" göstermez.
+    assert(PANEL_SOURCE.includes("if(shouldRender){ LASTSIG=sig; panelNoteStageP('render',null); panelSafeRenderP(); } else updatePollRibbonP();"));
+    assert(!/\brender\(\);\s*\}\s*else updatePollRibbonP/.test(PANEL_SOURCE));
   }],
   ["panel signature is data-bound, UI interaction changes do not cause false polling changes", () => {
     const ctx = load(["panelSig"], {

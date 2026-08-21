@@ -331,7 +331,18 @@ var step6=step5c.then(function(){
   ok('poll zincirleme zamanlayıcıyla kurulur',source.indexOf('schedulePanelPollP();')>=0);
   ok('boot durma emniyeti mevcut',source.indexOf('PANEL_BOOT_STALL_MS')>=0&&/boot timeout/.test(source));
   ok('latest okuma yolu sınırlı yeniden deneme kullanır',/return panelAttemptP\(function\(attempt\)/.test(source));
-  ok('transport okuma yolu sınırlı yeniden deneme kullanır',(source.match(/return panelAttemptP\(function\(attempt\)/g)||[]).length===2);
+  ok('transport ve mesaj okuma yolları da sınırlı yeniden deneme kullanır',(source.match(/return panelAttemptP\(function\(attempt\)/g)||[]).length===3);
+  ok('boot yolunda korumasız okuma kalmadı',!/function loadInbox\(\)\{\s*return fetch\(/.test(source));
+  ok('mesaj kanalı arızası paneli düşürmez',/unavailable:true/.test(source));
+  // Aşama takibi: veri elde varken ağ hatası kartı gösterilmemeli.
+  ok('poll turu aşama işaretliyor',['shape','sections','project','render'].every(function(x){ return source.indexOf("panelNoteStageP('"+x+"'")>=0; }));
+  ok('render istisnası ağ hatasıyla karıştırılmaz',source.indexOf('function panelSafeRenderP()')>=0&&/Görünüm oluşturulamadı/.test(source));
+  ok('veri alındıysa bağlantı kartı gösterilmez',/var veriAlindi=PANEL_LAST_DIAG&&PANEL_LAST_DIAG\.kind==='ok'/.test(source));
+  ok('tanı hata METNİNİ değil yalnız SINIF adını saklar',/errName=err&&err\.name/.test(source)&&!/errName=err&&err\.message/.test(source));
+  ok('son iyi anlık görünüm saklanır',source.indexOf('PANEL_LAST_GOOD=latestLegacy;')>=0);
+  ok('aşama hatasında son çare ham veriyle çizilir',/if\(panelSafeRenderP\(\)\) return;/.test(source)&&/reason:'stage_failure'/.test(source));
+  ok('son çare bile başarısızsa dürüst kart gösterilir',/try\{ panelRenderFailCardP\(\); \}catch\(e2\)\{ fail\(m\); \}/.test(source));
+  ok('son çare redaction sınırını atlamaz',/PC\.redactForObserver/.test(source));
   ok('deneme zaman aşımı kademeli',source.indexOf('panelAttemptTimeoutP(PANEL_FETCH_TIMEOUT_MS,attempt)')>=0);
   ok('4xx yanıtlar noRetry ile işaretlenir',/a\.noRetry=true/.test(source)&&/e\.noRetry=true/.test(source)&&/te\.noRetry=true/.test(source));
   ok('indirme sürerken yanlış hata yerine ilerleme gösterilir',source.indexOf('PANEL_BOOT_WAIT_MARK')>=0&&/Veri indiriliyor/.test(source));

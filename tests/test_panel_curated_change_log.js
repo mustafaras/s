@@ -1,4 +1,4 @@
-// D1.2 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md) — curatedChangeLogCardHTMLP fixture.
+// D1.2 (legacy Panel 1 çalışma özeti) — curatedChangeLogCardHTMLP fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

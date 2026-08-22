@@ -1,4 +1,4 @@
-// D1.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md) — needsAttentionCardHTMLP fixture.
+// D1.1 (legacy Panel 1 çalışma özeti) — needsAttentionCardHTMLP fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

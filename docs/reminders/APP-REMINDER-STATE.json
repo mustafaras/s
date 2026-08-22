@@ -5,36 +5,30 @@
   "activePrompt": null,
   "blockedPrompt": null,
   "lastCompletedPrompt": "REM-72",
-  "nextSafeAction": null,
+  "nextSafeAction": "No active reminder prompt. New work requires a new explicit scoped request and current source/test preflight.",
   "closure": {
     "prompt": "REM-72",
-    "evidence": "docs/reminders/evidence/REM-72.md",
+    "summary": "docs/reminders/APP-REMINDER-WORK-SUMMARY.md",
     "commit": "43bdf1c708d04111624b5fa9305eb16c05539e97",
     "status": "done",
     "validatedAt": "2026-08-21"
   },
   "currentPhase": "R14",
-  "plan": "docs/plans/APP-HATIRLATMA-VE-BILDIRIM-UX-PLANI.md",
-  "promptSet": "docs/reminders/APP-REMINDER-PROMPTLARI.md",
-  "ledger": "docs/reminders/APP-REMINDER-ANTI-AMNESIA-LEDGER.md",
-  "testMatrix": "docs/reminders/APP-REMINDER-TEST-MATRIX.md",
-  "traceability": "docs/reminders/APP-REMINDER-TRACEABILITY-MATRIX.md",
+  "summary": "docs/reminders/APP-REMINDER-WORK-SUMMARY.md",
   "surfaceMap": "docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md",
   "approvalGate": "docs/reminders/APP-REMINDER-APPROVAL-GATE.md",
-  "contextValidator": "docs/reminders/verify-reminder-context.mjs",
-  "closureValidator": "docs/reminders/verify-reminder-closure.mjs",
+  "freezeValidator": "docs/reminders/verify-reminder-freeze.mjs",
   "authority": [
     "AGENTS.md",
     "CLAUDE.md",
     "GELISTIRME-PLANI.md",
     ".claude/skills/run-seyma/SKILL.md",
     "tests/README.md",
-    "docs/reminders/APP-REMINDER-CONTEXT.md",
+    "docs/reminders/README.md",
+    "docs/reminders/APP-REMINDER-WORK-SUMMARY.md",
     "docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md",
-    "docs/reminders/APP-REMINDER-TRACEABILITY-MATRIX.md",
     "docs/reminders/APP-REMINDER-APPROVAL-GATE.md",
-    "docs/reminders/verify-reminder-context.mjs",
-    "docs/reminders/verify-reminder-closure.mjs"
+    "docs/reminders/verify-reminder-freeze.mjs"
   ],
   "protectedPaths": [
     "data/",
@@ -44,8 +38,8 @@
     ".github/workflows/"
   ],
   "evidence": {
-    "source": "REM-72: visual design remediation (digest launcher font hierarchy, eyebrow, primary button alignment; reminder action button text-alignment), prevent-jitter animation guard in render() when reminder center already open, targeted update region retained but handlers fallback to full render() for VM fixture compatibility, no new secret or data path",
-    "tests": "REM-72: 71 reminder fixtures, 22 root fixtures, 27 Panel-v2 fixtures, headless driver 7/7, zikr harness 95/95, context and closure validators, syntax checks, git diff --check PASS",
+    "source": "REM-00..REM-72 completed; app runtime, current panel and integration remain separate; privacy, no-write, headless and release boundaries are preserved",
+    "tests": "20 curated reminder fixtures via run-reminder-smoke.mjs; root/current-panel and 27 Panel-v2 fixtures run separately; freeze, syntax, driver and harness gates are rerun locally",
     "commit": "43bdf1c708d04111624b5fa9305eb16c05539e97",
     "remoteEquality": "pending; agent may execute only after explicit user approval sentence",
     "deployment": "pending; agent may execute only after explicit user approval sentence",
@@ -59,16 +53,10 @@
     "approvedBy": "user"
   },
   "promptDeliveryPolicy": {
-    "status": "active",
-    "mode": "after_each_prompt",
-    "trigger": "successful prompt closure only",
-    "scope": [
-      "main",
-      "origin/main",
-      "GitHub Pages workflow/deploy",
-      "read-only remote equality, deployment and live HTTP/cache-bust receipt"
-    ],
-    "mergePath": "main fast-forward; no PR merge when current branch is main",
+    "status": "retired",
+    "mode": "frozen_summary",
+    "trigger": "none; no active prompt",
+    "scope": [],
     "excluded": [
       "mustafaras/seyma-data",
       "other remotes",
@@ -78,9 +66,9 @@
       "arbitrary external write",
       "user-device acceptance"
     ],
-    "evidence": "her prompttan sonra bu yapılsın bunu düzenler misin — exact current user instruction on 2026-08-17",
+    "evidence": "REM-00..REM-72 prompt chain frozen during repository hygiene on 2026-08-22",
     "approvedBy": "user"
   },
-  "updatedAt": "2026-08-21",
-  "updatedBy": "REM-72 closure PASS: source/test/headless validators PASS; closure commit 43bdf1c708d04111624b5fa9305eb16c05539e97 includes final program sentinel and validator updates; releaseApproval remains not_approved; remote/deploy/device acceptance pending explicit user approval sentence; protected/data paths untouched"
+  "updatedAt": "2026-08-22",
+  "updatedBy": "Repository hygiene freeze: old prompt/evidence chain retired from worktree; summary, state, safety map and curated tests remain; releaseApproval remains not_approved; protected/data paths untouched"
 }

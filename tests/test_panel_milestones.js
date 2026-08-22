@@ -1,4 +1,4 @@
-// D1.5 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A6) — milestoneRibbonHTMLP fixture.
+// D1.5 (legacy Panel 1 çalışma özeti §12.1 A6) — milestoneRibbonHTMLP fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

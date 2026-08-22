@@ -1,9 +1,9 @@
 # ÆON Panel-v2 Premium — Güncel Ajan Durumu
 
 > Bu dosya, 40 promptluk uygulama kapandıktan sonraki canonical başlangıç
-> noktasıdır. Yeni ajan önce bu dosyayı, sonra `LEDGER.md`’yi okur. Eski
-> prompt/handoff kayıtları `.anti-amnesia/archive/` altında append-only tarihsel
-> kanıt olarak tutulur; yeni ajanın ilk okuma akışına dahil değildir.
+> noktasıdır. Yeni ajan önce bu dosyayı, sonra `LEDGER.md`’yi okur. Ayrıntılı
+> prompt/handoff kayıtları repo hijyeni kapsamında çalışma ağacından çıkarıldı;
+> kısa kapanış özeti `../WORK-SUMMARY.md`, gerekirse ayrıntılı Git geçmişidir.
 
 ## Durum
 
@@ -41,14 +41,12 @@ Legacy Panel 1 / Şeyma uygulaması kapsamı bu düzenleme sırasında değişti
 2. Kök [`CLAUDE.md`](../../../CLAUDE.md) — ayrıntılı doğrulama sınırları
 3. Bu dosya — güncel kapsam ve kalan iş
 4. [`LEDGER.md`](LEDGER.md) — prompt/commit/test/Pages kanıtı
-5. Son post-close handoff: [`handoff-POST-CLOSE-REPO-ORGANIZATION.md`](handoff-POST-CLOSE-REPO-ORGANIZATION.md)
+5. [`../WORK-SUMMARY.md`](../WORK-SUMMARY.md) — tamamlanan kapsamın kısa özeti
 6. Yeni bir değişiklik istenirse ilgili plan bölümü; Prompt 41 yoktur
 
-Arşivdeki tamamlanmış plan, prompt, context ve handoff dosyaları yalnızca geçmiş
-kanıt veya eski kararların izlenmesi gerektiğinde açılır:
-
-- `PANEL-V2-PREMIUM-TASARIM/archive/`
-- `.anti-amnesia/archive/`
+Eski plan, prompt, context ve handoff dosyalarının ayrıntılı bytes'ı Git
+geçmişindedir; çalışma ağacında yalnızca canonical state/ledger ve kısa iş
+özeti tutulur.
 
 ## Güvenli doğrulama
 
@@ -81,6 +79,7 @@ yetkilendirilmelidir.
 - Root test rehberi, Panel-v2 README’si ve ajan talimatları güncel yolları
   gösterecek şekilde hizalandı.
 - Plan dokümanlarının eski “henüz uygulanmadı” durumu kapanış kanıtıyla
-  güncellendi; tarihsel handoff dosyaları geriye dönük değiştirilmedi.
+  güncellendi; tarihsel içerik kısa iş özetine indirgenmiştir.
 - Tamamlanmış promptbook, tasarım referansı, eski context/token kartları ve
-  tarihsel handoff’lar arşive taşındı; canlı başlangıç yüzeyi küçültüldü.
+  tarihsel handoff’lar çalışma ağacından kaldırıldı; ayrıntılı Git geçmişi
+  korunuyor.

@@ -1,4 +1,4 @@
-// D1.3 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A4) — weeklyDigestCardHTMLP fixture.
+// D1.3 (legacy Panel 1 çalışma özeti §12.1 A4) — weeklyDigestCardHTMLP fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

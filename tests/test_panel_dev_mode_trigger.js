@@ -1,4 +1,4 @@
-// D2.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §5) — gizli dev-mode giriş noktası fixture.
+// D2.1 (legacy Panel 1 çalışma özeti §5) — gizli dev-mode giriş noktası fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

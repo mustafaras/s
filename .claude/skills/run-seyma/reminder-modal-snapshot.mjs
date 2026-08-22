@@ -139,7 +139,7 @@ function renderModal() {
   const ctx = vm.createContext(sb);
   for (const f of FILES) vm.runInContext(fs.readFileSync(path.join(REPO, f), 'utf8'), ctx, { filename: f });
   if (!sb.App || typeof sb.App.openReminderCenter !== 'function') throw new Error('App.openReminderCenter yok');
-  // Modal, ayarlar sekmesinden açılır (tests/reminders/test_reminder_app_render.js
+  // Modal, ayarlar sekmesinden açılır (tests/reminders/test_reminder_app_acceptance.js
   // ile aynı sıra): önce sekmeye geç, sonra merkezi aç.
   sb.App.go('ayarlar');
   sb.App.openReminderCenter();

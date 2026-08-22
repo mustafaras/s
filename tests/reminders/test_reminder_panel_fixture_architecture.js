@@ -26,12 +26,12 @@ const COMMANDS = Object.freeze({
 const REMINDER_PANEL_MANIFEST = Object.freeze({
   source: ["test_reminder_panel_source.js"],
   coverage: ["test_reminder_panel_coverage.js"],
-  projection: ["test_reminder_panel_projection.js", "test_reminder_panel_partial_state.js", "test_reminder_panel_card.js"],
+  projection: ["test_reminder_panel_coverage.js"],
   redaction: ["test_reminder_panel_redaction.js", "test_reminder_panel_privacy.js"],
-  transport: ["test_reminder_panel_polling.js", "test_reminder_panel_write_boundary.js"],
-  event: ["test_reminder_panel_timeline.js"],
+  transport: ["test_reminder_panel_polling.js"],
+  event: ["test_reminder_panel_polling.js"],
   responsive: ["test_reminder_panel_a11y.js", "test_reminder_panel_performance.js"],
-  status: ["test_reminder_panel_status.js"],
+  status: ["test_reminder_panel_coverage.js"],
   release: ["test_reminder_panel_fixture_architecture.js"]
 });
 

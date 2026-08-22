@@ -1,4 +1,4 @@
-// D1.4 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A2) — monthlyHeatmapCardHTMLP fixture.
+// D1.4 (legacy Panel 1 çalışma özeti §12.1 A2) — monthlyHeatmapCardHTMLP fixture.
 // Yalnızca sentetik vm verisi; gerçek ağ, browser, token ve kişisel veri yok.
 'use strict';
 var fs=require('fs');

@@ -46,7 +46,7 @@ context.PROJECTION={sections:{dailyPhoto:{status:'ready',title:'Fotoğraf'},room
 vm.runInNewContext(extractFunction('p3TimeP')+'\n'+extractFunction('statusToneP')+'\n'+extractFunction('panelToneOverrideP')+'\n'+extractFunction('panelStatusP')+'\n'+extractFunction('panelStatusBadgeHTMLP')+'\n'+extractFunction('p3StatusP')+'\n'+extractFunction('auditRollupStatusP')+'\n'+extractFunction('auditEntryHTMLP'),context,{filename:'panel-audit-entry.js'});
 var auditHtml=context.auditEntryHTMLP();
 ok('kompakt audit girişi gerçek HTML üretir',auditHtml.includes('Eksik Kök Modüller')&&auditHtml.includes('Terapi · Bildirim · Provenance')&&auditHtml.includes('174 cevap anahtarı')&&auditHtml.includes('Denetim Merkezi'));
-// D3.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §4/§9 Faz 3) — auditEntryHTMLP()
+// D3.1 (legacy Panel 1 çalışma özeti §4/§9 Faz 3) — auditEntryHTMLP()
 // artık render()'ın birincil akışından da çıkarıldı (dev-mode'a taşındı,
 // bkz. toggleAuditPage/setAuditTab). Bu assertion'ın özgün amacı korunuyor
 // (ağır audit fragmanlarının render()'da tekrar basılmaması) ama artık

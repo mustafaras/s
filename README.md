@@ -498,24 +498,16 @@ new agent to ingest completed promptbooks or dozens of historical handoffs.
 ~~~text
 archive/
 ├── README.md
-├── panel-denetim-merkezi/              completed legacy Panel 1 documents
-└── PANEL-V2-PREMIUM-TASARIM/          40/40 design package and ledgers
-    ├── 00-PLAN.md
-    ├── 01-GOREV-LISTESI.md
-    ├── 03-BILGI-AKISI-KONTROL-TAKIP.md
-    ├── archive/
-    │   ├── 02-TASARIM-REFERANSI.md
-    │   └── 04-40-PROMPT.md
+├── panel-denetim-merkezi/              legacy Panel 1 work summary
+└── PANEL-V2-PREMIUM-TASARIM/
+    ├── WORK-SUMMARY.md                  40/40 completion summary
     └── .anti-amnesia/
-        ├── CURRENT-STATE.md
-        ├── LEDGER.md
-        └── archive/
-            ├── completed-context/
-            └── prompt-handoffs/
+        ├── CURRENT-STATE.md              canonical current state
+        └── LEDGER.md                     canonical prompt evidence ledger
 ~~~
 
-Archiving preserves history; it changes the default context. A completed
-document belongs in the archive even when it remains valuable as evidence.
+The working tree keeps only agent-useful summaries and canonical state. Detailed
+historical plans, promptbooks and handoffs remain recoverable from Git history.
 
 ---
 

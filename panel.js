@@ -2102,7 +2102,7 @@ function toggleAuditPage(show){
   if(typeof requestAnimationFrame==='function') requestAnimationFrame(restoreScroll); else setTimeout(restoreScroll,0);
 }
 window.toggleAuditPage=toggleAuditPage;
-// D2.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §5) — audit apparatus'un tam
+// D2.1 (legacy Panel 1 çalışma özeti §5) — audit apparatus'un tam
 // sayfa görünümüne (auditPageHTMLP/toggleAuditPage, YUKARIDA, DEĞİŞMEDİ)
 // gizli bir ikinci giriş yolu. Görünür hiçbir buton/link yok; localStorage'a
 // iz bırakmaz, yalnızca bellekte (UI) tutulur, sayfa yenilenince sıfırlanır.
@@ -2401,7 +2401,7 @@ function eventLogCardInnerHTMLP(){
 function eventLogCardHTMLP(){
   return '<section id="event-log-card" class="card lift span-12 pad event-log-card" data-component="timeline" role="region" aria-label="Son değişiklikler" style="order:8;display:flex;flex-direction:column;">'+eventLogCardInnerHTMLP()+'</section>';
 }
-// D1.2 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §6.2) — aynı EVENT_LOG_STATE
+// D1.2 (legacy Panel 1 çalışma özeti §6.2) — aynı EVENT_LOG_STATE
 // kaynağını kullanan ama eventClassificationP(e).key==='user' (rutin gün
 // kaydı — 132 kayıttan 129'unu oluşturan gürültü kaynağı) olan grupları
 // varsayılan olarak süzen küratörlü liste. eventLogSourceP/loadEventLogP
@@ -2437,7 +2437,7 @@ function toggleCuratedLogShowAllP(){
   card.innerHTML=curatedChangeLogCardInnerHTMLP();
 }
 window.toggleCuratedLogShowAllP=toggleCuratedLogShowAllP;
-// D1.4 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A2) — aylık mood/tik/SOS
+// D1.4 (legacy Panel 1 çalışma özeti §12.1 A2) — aylık mood/tik/SOS
 // ısı haritası. Yalnızca render — data'ya UI.month (zaten var, panel.js
 // içindeki render() UI.month=monthKey(selected) satırı) dışında hiçbir
 // kalıcı alan yazılmaz.
@@ -2465,7 +2465,7 @@ function setPanelMonthP(mk){
   card.innerHTML=monthlyYearlyRowHTMLP(mk);
 }
 window.setPanelMonthP=setPanelMonthP;
-// D1.5 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A6) — yalnız gerçekten bir
+// D1.5 (legacy Panel 1 çalışma özeti §12.1 A6) — yalnız gerçekten bir
 // kilometre taşı geçildiğinde beliren, "her zaman görünen kart" OLMAYAN
 // kutlama şeridi. `data`'ya "gösterildi mi" bayrağı YAZMAZ, her render'da
 // mevcut duruma göre yeniden hesaplanır.
@@ -2976,7 +2976,7 @@ function commandRiskHTMLP(riskState,canonical,projectionState){
   else if(poll.code==='stale'||(projectionState&&projectionState.reason==='projection_stale')){ kind='warning'; title='Görünüm eski olabilir'; detail='Kaynak veya projection yaşı nedeniyle karar verirken zamanı kontrol et.'; }
   return '<section class="d2-risk-band d2-risk-'+kind+'" data-component="risk-banner" role="'+(kind==='danger'?'alert':'status')+'" aria-live="polite"><div class="d2-risk-copy"><span class="d2-risk-icon" aria-hidden="true">'+(kind==='danger'?'!':kind==='ok'?'✓':'△')+'</span><div><b>'+esc(title)+'</b><span>'+esc(detail)+'</span></div></div><div class="d2-risk-meta">'+d2StatusBadgeP(riskState&&riskState.txt||'Risk bekleniyor',kind,'b-'+(kind==='warning'?'warn':kind==='danger'?'danger':'ok'))+'<span>'+esc(poll.label||'Yakın takip bekleniyor')+'</span></div></section>';
 }
-// D1.1 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §6.1) — audit apparatus'un yerini
+// D1.1 (legacy Panel 1 çalışma özeti §6.1) — audit apparatus'un yerini
 // alacak, zaten hesaplanan sinyallerden (risk/moodDist/sosRows/missingDays/
 // uyku trendi/terapi son kayıt) türetilen, insan-odaklı "bugüne bak" özeti.
 // Yeni bir risk motoru DEĞİL — risk()'in kendi eşikleriyle (panel.js:1729)
@@ -3006,7 +3006,7 @@ function needsAttentionCardHTMLP(riskState,moodDist,sosRows,missingCount,curSlee
   h+='</div>';
   return h;
 }
-// D1.3 (PANEL-DENETIM-MERKEZI-PROMPTLARI.md §12.1 A4) — cur/prev pencere
+// D1.3 (legacy Panel 1 çalışma özeti §12.1 A4) — cur/prev pencere
 // karşılaştırmalarından türetilmiş, insan diliyle yazılmış haftalık özet.
 // LLM/network yok — düz string birleştirme. tc()'nin (render() içi,
 // panel.js:3175 civarı) kullandığı fark<0.05 → "→" eşiğiyle tutarlı.

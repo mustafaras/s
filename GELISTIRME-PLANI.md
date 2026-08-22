@@ -107,7 +107,8 @@ _Son güncelleme: 2026-08-17 · Kaynak: `app.js` + `panel.html` + `panel-v2.html
 İlham & İbadet hub'ını tek, premium "manevi sığınak"a dönüştüren devam planı —
 içinde tam işlevsel **Zikirmatik**, sıradaki vakit geri sayımı, hicri takvim +
 mübarek gün rozeti, kıble gülü, Saygı koleksiyon serisi ve İbadet Rapor sekmesi
-ile. Ayrıntılı uygulama planı: **[ILHAM-IBADET-GELISTIRME-PLANI.md](docs/roadmaps/ILHAM-IBADET-GELISTIRME-PLANI.md)**.
+ile. Güncel durum ve ilgili kaynaklar bu roadmap'in ilgili bölümleri ile
+`saygiPeople.js`, `app.js` ve headless fixture'larda tutulur.
 
 | Faz | Başlık | Öncelik | Durum | Notlar |
 |-----|--------|---------|-------|--------|
@@ -125,13 +126,12 @@ headless harness doğrulama zincirini takip eder.
 
 ### ÆON panel özel paketleri
 
-Panel görünürlük/senkron araştırması ile panel tasarım prompt’larının canonical
-okuma sırası [`docs/panel/README.md`](docs/panel/README.md) içindedir. Teknik
-plan [`docs/panel/plans/PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md`](docs/panel/plans/PANEL-GOZLEMLENEBILIRLIK-VE-SENKRON-PLANI.md),
-tasarım planı [`docs/panel/plans/PANEL-TASARIM-VE-GELISTIRME-PLANI.md`](docs/panel/plans/PANEL-TASARIM-VE-GELISTIRME-PLANI.md)
-ve fazlar arası anti-amnesia kayıtları eşli ledger’larda tutulur. Panel
-promptları tek faz/tek oturum kuralıyla çalıştırılır; bu link canlıya alma
-izni vermez.
+Panel görünürlük/senkron ve tasarım çalışmalarının güncel kısa özeti
+[`docs/WORK-SUMMARY.md`](docs/WORK-SUMMARY.md) içindedir. Current observer panel
+ile Panel-v2 ayrı yüzeylerdir; Panel-v2'nin canonical başlangıcı
+[`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md),
+test envanteri ise [`tests/panel-v2/README.md`](tests/panel-v2/README.md)
+dosyasıdır. Bu linkler canlıya alma izni değildir.
 
 ÆON Panel-v2 Premium’un bağımsız 40 promptluk tasarım paketi
 [`archive/PANEL-V2-PREMIUM-TASARIM/`](archive/PANEL-V2-PREMIUM-TASARIM/) altında
@@ -141,10 +141,10 @@ kapanmıştır:
 Panel-v2 fixture’ları ise [`tests/panel-v2/`](tests/panel-v2/) altındadır.
 Kullanıcı cihazı kabulü ayrı bir kanıt seviyesidir; Prompt 41 başlatılmamıştır.
 
-Kök belge ve uzun runtime dosyalarının güvenli sınıflandırma/modülerleştirme
-planı ayrıca [`docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md`](docs/REPO-ORGANIZASYON-VE-MODULERLESTIRME-PLANI.md)
-dosyasındadır. Bu plan önce envanter ve bağımlılık haritası, sonra düşük riskli
-belge taşıma ve en son kademeli runtime ayrıştırması öngörür.
+Kök belge ve uzun runtime dosyalarının güncel sınırları
+[`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md) ve
+[`docs/WORK-SUMMARY.md`](docs/WORK-SUMMARY.md) içinde tutulur. Ayrıntılı
+tarihsel planlar çalışma ağacında tekrar edilmez; Git geçmişinden incelenir.
 
 ---
 

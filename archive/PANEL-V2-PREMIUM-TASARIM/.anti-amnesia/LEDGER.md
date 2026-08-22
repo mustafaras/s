@@ -10,7 +10,7 @@
 - **Repo:** `mustafaras/s` (GitHub Pages statik deploy)
 - **Hedef:** `panel-v2.html/js/css`’i profesyonel, premium bir ÆON Observer Dashboard’a dönüştürmek.
 - **Plan klasörü:** `PANEL-V2-PREMIUM-TASARIM/`
-- **40 sıralı prompt (tarihsel arşiv):** `PANEL-V2-PREMIUM-TASARIM/archive/04-40-PROMPT.md`
+- **40 sıralı prompt (özet):** `PANEL-V2-PREMIUM-TASARIM/WORK-SUMMARY.md`; ayrıntılı promptbook Git geçmişindedir.
 - **Veri güvenliği kuralı:** Şeyma uygulamasını asla tarayıcıda açma; testler için `run-seyma` skill’inin headless VM harness’lerini veya `tests/panel-v2/test_panel_v2_*.js`’leri kullan.
 
 ---
@@ -23,7 +23,8 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 2. Bu ledger’daki tamamlanmış kanıtları yeniden üretmeye çalışma.
 3. Kullanıcı tarafından ayrıca tanımlanmış bakım kapsamını uygula.
 4. Testleri çalıştır ve sonucu bu ledger’a ekle.
-5. Güncel handoff gerekiyorsa `handoff-POST-CLOSE-*.md` olarak kısa bir kayıt oluştur.
+5. Güncel handoff gerekiyorsa kısa özeti `CURRENT-STATE.md` veya
+   `WORK-SUMMARY.md` ile ilişkilendir; tarihsel prompt handoff dosyası üretme.
 
 ```markdown
 | Step | Prompt | Durum | Commit | Testler | Notlar |
@@ -165,6 +166,7 @@ Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
 
 1. `currentStep` değerine bak.
 2. `CURRENT-STATE.md`’deki kapsam ve güvenlik sınırlarını doğrula.
-3. Gerekliyse arşivdeki eski plan/handoff kanıtını hedefli olarak incele.
+3. Gerekliyse Git geçmişindeki eski plan/handoff kanıtını hedefli olarak incele.
 4. Değişikliği uygula, test et ve kanıtı bu ledger’a ekle.
-5. Güncel handoff gerekiyorsa `handoff-POST-CLOSE-*.md` olarak kısa bir kayıt oluştur.
+5. Güncel handoff gerekiyorsa kısa özeti `CURRENT-STATE.md` veya
+   `WORK-SUMMARY.md` ile ilişkilendir; tarihsel prompt handoff dosyası üretme.

@@ -16,17 +16,18 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   takılı kalma” regresyonu. 2026-08-21’de sahada görülen `ERR_HTTP2_PROTOCOL_ERROR`
   istek seli + “Çekirdek başlatılıyor…” kilitlenmesini kalıcı olarak kapatır.
 - `test_faz10_sync.js`, `test_quran_*.js` — sync, Kur’an taşıma ve katalog fixture’ları.
-- `reminders/` — REM-02+ ağsız sentetik reminder contract fixture’ları; runtime, browser ve gerçek veri kullanmaz.
+- `reminders/` — dondurulmuş reminder programı için 20 seçilmiş ağsız sentetik
+  bakım fixture’ı; runtime, browser ve gerçek veri kullanmaz.
 - `repo-root.js` — root kaynaklarına güvenli, cwd’den bağımsız erişim yardımcısı.
 
-Reminder panel acceptance’ı üç ayrı scope olarak raporlanır: `tests/reminders/`
-app/reminder contract ailesi, root `tests/test_panel_*.js` current observer
-regression ailesi ve `tests/panel-v2/` ayrı Premium regression ailesidir.
-Panel-v2 fixture sayısı current panel acceptance’ının yerine geçmez. REM-66
-architecture gate’i `test_reminder_panel_fixture_architecture.js` ile dosya
-manifestlerini ve static boundary’leri kontrol eder. REM-67’de aynı ayrı scope’a
-app → sync → projection → panel lineage fixture’ı `test_reminder_end_to_end_lineage.js`
-ile sabit sentetik saat altında kontrol edilir.
+Reminder acceptance’ı üç ayrı scope olarak raporlanır: `tests/reminders/`
+app/reminder contract bakım ailesi, root `tests/test_panel_*.js` current
+observer regression ailesi ve `tests/panel-v2/` ayrı Premium regression
+ailesidir. Panel-v2 fixture sayısı current panel acceptance’ının yerine
+geçmez. Reminder setinin tamamı `run-reminder-smoke.mjs` ile exit-code bazlı
+çalışır; `test_reminder_panel_fixture_architecture.js` static boundary ve
+scope ayrımını, `test_reminder_end_to_end_lineage.js` ise sentetik app → sync →
+projection → panel hattını kontrol eder.
 
 Panel-v2 testlerinin ayrıntılı envanteri ve çalıştırma kuralları:
 [`panel-v2/README.md`](panel-v2/README.md).
@@ -45,24 +46,18 @@ Tüm Panel-v2 fixture’ları:
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 ```
 
-Reminder fixture’ları:
+Reminder bakım regression:
 
 ```bash
-for f in tests/reminders/test_reminder_*.js; do node "$f"; done
+node docs/reminders/verify-reminder-freeze.mjs
+node tests/reminders/run-reminder-smoke.mjs
 ```
 
-Current panel fixture’ları ayrı:
+Current panel fixture’ları ayrıca:
 
 ```bash
-for f in tests/reminders/test_reminder_panel_*.js; do node "$f"; done
 for f in tests/test_panel_*.js; do node "$f"; done
 node tests/test_faz11_panel.js
-```
-
-Lineage fixture’ı ayrıca:
-
-```bash
-node tests/reminders/test_reminder_end_to_end_lineage.js
 ```
 
 Kök fixture’ları:
@@ -79,9 +74,10 @@ gerçek ağ, gerçek token, gerçek localStorage ve data repo write kullanmaz;
 zaman duyarlı kontroller sabit/injected clock ya da açıkça bounded benchmark
 sınırıyla çalışır.
 
-## Tarihsel handoff notu
+## Panel-v2 kapanış notu
 
-`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/archive/prompt-handoffs/` altındaki
-`handoff-PROMPT-01.md`–`40.md` dosyaları, o tarihteki dosya yollarını koruyan
-append-only kayıtlardır. Güncel durum ve güncel yollar için
-`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md` okunur.
+Panel-v2 40/40 tamamlanmıştır. Güncel durum ve güncel yollar için
+`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`, kısa iş
+özeti için `archive/PANEL-V2-PREMIUM-TASARIM/WORK-SUMMARY.md` okunur.
+Ayrıntılı prompt/handoff bytes'ı Git geçmişinde tutulur; test fixture'ları
+çalıştırmak için bu tarihsel dosyalara gerek yoktur.

@@ -118,10 +118,10 @@ Run the focused Panel-v2 suite:
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 ```
 
-Run the root fixture suite:
+Run the app, panel and Quran fixture suites:
 
 ```bash
-for f in tests/test_*.js; do node "$f"; done
+for f in tests/app/test_*.js tests/panel/test_*.js tests/quran/test_*.js; do node "$f"; done
 ```
 
 Run syntax and safe application harness checks when the change requires them:
@@ -294,8 +294,8 @@ They are not decorative UI metadata.
 | Polling and telemetry | <code>polling_tests</code>, <code>polling_telemetry</code>, <code>sync_health</code> | Are 304, timeout, freshness, latency and lifecycle states correct? |
 | Event and audit | <code>event_log</code>, <code>audit</code>, <code>history</code> | Are sequence, revision, filtering and redaction contracts preserved? |
 | Accessibility | <code>accessibility</code>, <code>contrast</code> | Do both themes and keyboard/screen-reader surfaces meet the contract? |
-| Legacy Panel / sync | <code>tests/test_panel_*.js</code>, <code>tests/test_panel_p*.js</code> | Does the existing observer and projection surface remain stable? |
-| Quran transport | <code>tests/test_quran_*.js</code> | Are catalog, outbox, response, merge and parity contracts safe? |
+| Legacy Panel / sync | <code>tests/panel/test_panel_*.js</code>, <code>tests/panel/test_panel_p*.js</code> | Does the existing observer and projection surface remain stable? |
+| Quran transport | <code>tests/quran/test_quran_*.js</code> | Are catalog, outbox, response, merge and parity contracts safe? |
 | Şeyma harnesses | <code>.claude/skills/run-seyma/</code> | Can the app and state boundaries be exercised without a browser? |
 
 ### Minimal validation matrix
@@ -517,7 +517,7 @@ historical plans, promptbooks and handoffs remain recoverable from Git history.
 | --- | --- |
 | Inspect dirty state | <code>git status --short --branch</code> |
 | Run Panel-v2 suite | <code>for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done</code> |
-| Run root fixtures | <code>for f in tests/test_*.js; do node "$f"; done</code> |
+| Run app, panel and Quran fixtures | <code>for f in tests/app/test_*.js tests/panel/test_*.js tests/quran/test_*.js; do node "$f"; done</code> |
 | Check Panel-v2 syntax | <code>node --check panel-v2.js</code> |
 | Check projection syntax | <code>node --check panelCoverageManifest.js</code> |
 | Check Şeyma runtime | <code>node --check app.js && node --check sync.js</code> |

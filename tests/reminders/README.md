@@ -21,7 +21,7 @@ Runner şu sahiplikleri birlikte korur:
 - App → sync → projection → panel lineage, schema/status ve integrated
   privacy/UX
 
-Root panel fixture'ları `tests/test_panel_*.js`, Panel-v2 fixture'ları ise
+Root panel fixture'ları `tests/panel/test_panel_*.js`, Panel-v2 fixture'ları ise
 `tests/panel-v2/` altında ayrıca çalıştırılır. Fixture sayısı tek başına
 başarı kanıtı değildir; runner exit code'u ve ilgili fixture çıktısı birlikte
 değerlendirilir.

@@ -13,13 +13,14 @@ const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helpe
 const ROOT = path.resolve(__dirname, "../..");
 const TESTS = path.join(ROOT, "tests");
 const REMINDERS = path.join(TESTS, "reminders");
+const ROOT_PANEL_DIR = path.join(TESTS, "panel");
 const PANEL_V2 = path.join(TESTS, "panel-v2");
 
 const COMMANDS = Object.freeze({
   reminder: "for f in tests/reminders/test_reminder_*.js; do node \"$f\"; done",
   currentReminderPanel: "for f in tests/reminders/test_reminder_panel_*.js; do node \"$f\"; done",
-  currentRootPanel: "for f in tests/test_panel_*.js; do node \"$f\"; done",
-  legacyRootPanel: "node tests/test_faz11_panel.js",
+  currentRootPanel: "for f in tests/panel/test_panel_*.js; do node \"$f\"; done",
+  legacyRootPanel: "node tests/panel/test_faz11_panel.js",
   panelV2: "for f in tests/panel-v2/test_panel_v2_*.js; do node \"$f\"; done"
 });
 
@@ -105,7 +106,7 @@ function staticBoundary(rel) {
 function printInventory() {
   const reminderFiles = filesMatching(REMINDERS, "test_reminder_");
   const reminderPanelFiles = filesMatching(REMINDERS, "test_reminder_panel_");
-  const rootPanelFiles = filesMatching(TESTS, "test_panel_");
+  const rootPanelFiles = filesMatching(ROOT_PANEL_DIR, "test_panel_");
   const panelV2Files = filesMatching(PANEL_V2, "test_panel_v2_");
   console.log("REM-66 inventory (counts are inventory only, not PASS evidence)");
   console.log(`scope=reminder command=${COMMANDS.reminder} files=${reminderFiles.length}`);
@@ -118,14 +119,14 @@ function printInventory() {
 
 const reminderFiles = filesMatching(REMINDERS, "test_reminder_");
 const reminderPanelFiles = filesMatching(REMINDERS, "test_reminder_panel_");
-const rootPanelFiles = filesMatching(TESTS, "test_panel_");
+const rootPanelFiles = filesMatching(ROOT_PANEL_DIR, "test_panel_");
 const panelV2Files = filesMatching(PANEL_V2, "test_panel_v2_");
 const rootAll = [...rootPanelFiles, "test_faz11_panel.js"];
 const currentReminderManifestFiles = allManifestFiles(REMINDER_PANEL_MANIFEST);
 const rootManifestFiles = allManifestFiles(ROOT_PANEL_MANIFEST);
 const boundaryFiles = [
   ...reminderFiles.map((name) => path.join("tests/reminders", name)),
-  ...rootAll.map((name) => name === "test_faz11_panel.js" ? `tests/${name}` : `tests/${name}`),
+  ...rootAll.map((name) => path.join("tests/panel", name)),
   ...panelV2Files.map((name) => path.join("tests/panel-v2", name))
 ].filter((rel) => !rel.endsWith("test_reminder_panel_fixture_architecture.js"));
 
@@ -146,7 +147,7 @@ runTests([
     assert(rootPanelFiles.length > 0);
     rootPanelFiles.forEach((name) => assert(name.startsWith("test_panel_")));
     rootManifestFiles.forEach((name) => assert(rootPanelFiles.includes(name), `missing root panel fixture: ${name}`));
-    assert(fs.existsSync(path.join(TESTS, "test_faz11_panel.js")));
+    assert(fs.existsSync(path.join(ROOT_PANEL_DIR, "test_faz11_panel.js")));
     const unclassified = rootPanelFiles.filter((name) => !rootManifestFiles.includes(name));
     console.log(`root-legacy-explicit=${unclassified.join(",") || "none"}`);
     assert(unclassified.every((name) => name.startsWith("test_panel_")));
@@ -189,7 +190,7 @@ runTests([
   ["suite command contract names exit-code evidence rather than fixture counts", () => {
     Object.values(COMMANDS).forEach((command) => assert(/node /.test(command)));
     assert(COMMANDS.currentReminderPanel.includes("test_reminder_panel_*.js"));
-    assert(COMMANDS.currentRootPanel.includes("tests/test_panel_*.js"));
+    assert(COMMANDS.currentRootPanel.includes("tests/panel/test_panel_*.js"));
     assert(COMMANDS.panelV2.includes("tests/panel-v2/test_panel_v2_*.js"));
     assert(!/assert.*count|count.*PASS/i.test(COMMANDS.reminder));
     assert(read("tests/README.md").includes("fixture sayısı"));

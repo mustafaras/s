@@ -171,40 +171,40 @@ GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
                  item ships.
-tests/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
+tests/app/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
-                 Run: `node tests/test_faz10_sync.js`.
-tests/test_faz11_panel.js  Headless Node harness for panel.html helper/render
-                 logic. Run: `node tests/test_faz11_panel.js`.
-tests/test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
+                 Run: `node tests/app/test_faz10_sync.js`.
+tests/panel/test_faz11_panel.js  Headless Node harness for panel.html helper/render
+                 logic. Run: `node tests/panel/test_faz11_panel.js`.
+tests/panel/test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
                  anti-clobber and panel time/status projection. Run:
-                 `node tests/test_panel_p0_sync.js`.
-tests/test_panel_p1_projection.js Headless Node fixture for PANEL-02 coverage,
+                 `node tests/panel/test_panel_p0_sync.js`.
+tests/panel/test_panel_p1_projection.js Headless Node fixture for PANEL-02 coverage,
                  redaction, stale projection and legacy fallback. Run:
-                 `node tests/test_panel_p1_projection.js`.
-tests/test_panel_p3_root_modules.js Headless Node fixture for PANEL-03 root-module
+                 `node tests/panel/test_panel_p1_projection.js`.
+tests/panel/test_panel_p3_root_modules.js Headless Node fixture for PANEL-03 root-module
                  projection/render, stale/missing/broken states, Saygı mismatch,
                  settings summary, privacy and no-mutation boundary. Run:
-                 `node tests/test_panel_p3_root_modules.js`.
-tests/test_panel_p4_provenance.js Headless Node fixture for PANEL-04 therapy
+                 `node tests/panel/test_panel_p3_root_modules.js`.
+tests/panel/test_panel_p4_provenance.js Headless Node fixture for PANEL-04 therapy
                  redaction, profile progress, notification lifecycle and
-                 external fetch provenance. Run: `node tests/test_panel_p4_provenance.js`.
-tests/test_panel_p2_event_log.js Headless Node fixture for PANEL-05 event contract,
+                 external fetch provenance. Run: `node tests/panel/test_panel_p4_provenance.js`.
+tests/panel/test_panel_p2_event_log.js Headless Node fixture for PANEL-05 event contract,
                  redaction, sequence audit, panel filters and revision drawer.
-                 Run: `node tests/test_panel_p2_event_log.js`.
-tests/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
+                 Run: `node tests/panel/test_panel_p2_event_log.js`.
+tests/panel/test_panel_p2_sync.js Headless Node fixture for PANEL-05 daily event-file
                  merge, duplicate idempotence and receipt-bound push. Run:
-                 `node tests/test_panel_p2_sync.js`.
-tests/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
+                 `node tests/panel/test_panel_p2_sync.js`.
+tests/panel/test_panel_p2_polling.js Headless Node fixture for PANEL-06 conditional
                  polling, ETag/304, draft safety, status map and p50/p95.
-                 Run: `node tests/test_panel_p2_polling.js`.
-tests/test_panel_boot_resilience.js Headless Node fixture guarding the panel
+                 Run: `node tests/panel/test_panel_p2_polling.js`.
+tests/panel/test_panel_boot_resilience.js Headless Node fixture guarding the panel
                  boot/poll resilience contract: per-request fetch timeout with a
                  real AbortController cancel, the `load()` single-flight lock,
                  bounded concurrency for `data/events/<date>.json` day files,
                  consecutive-error backoff, and the "stuck on Çekirdek
                  başlatılıyor…" regression. Run:
-                 `node tests/test_panel_boot_resilience.js`.
+                 `node tests/panel/test_panel_boot_resilience.js`.
 tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
                          see `tests/panel-v2/README.md` and its `helpers/`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs

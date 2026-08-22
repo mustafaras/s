@@ -54,7 +54,7 @@ state. Ardından gerçek `App.go()`, tema ve kart etkileşimlerini sürer.
 `zikr-harness.mjs` aynı VM yaklaşımıyla faith hub davranışını kontrol eder.
 
 Panel `app.js` ile aynı uygulama değildir. Panel değişikliğinde browser yerine
-syntax, script-tag balance ve root `tests/test_panel_*.js` fixture'ları kullanılır;
+syntax, script-tag balance ve `tests/panel/test_panel_*.js` fixture'ları kullanılır;
 Panel-v2 ayrıca `tests/panel-v2/` altında çalıştırılır.
 
 ## Harness kuralları

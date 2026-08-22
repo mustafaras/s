@@ -35,6 +35,7 @@
 | --- | --- |
 | Understand the product and its scientific posture | [Product thesis](#product-thesis) and [Evidence architecture](#evidence-architecture) |
 | Read the formal model and limitations | [Scientific method](#scientific-method) and [Threats to validity](#threats-to-validity) |
+| Understand the Quran learning protocol | [Quran Journey](#quran-journey) |
 | See the interface language | [Interface gallery](#interface-gallery) |
 | Understand the system | [Architecture](#architecture) and [Data lifecycle](#data-lifecycle) |
 | Resume safe repository work | [Agent entrypoint](#agent-entrypoint) and [`AGENTS.md`](AGENTS.md) |
@@ -186,11 +187,11 @@ $$
 
 These quantities can describe recorded change. They do not identify a cause,
 diagnosis, treatment effect or counterfactual outcome. Missingness is preserved
-as missingness; it is not silently converted into a zero observation:
+as missingness; it is not silently converted into a zero observation. In the
+notation below, $\bot$ means that no valid value is available:
 
 $$
-\operatorname{mean}(\varnothing) = \text{missing}, \qquad
-\operatorname{mean}(\{x_i\}_{i\in W}) \text{ is reported with } n_W
+\bar{x}_{\emptyset} = \bot
 $$
 
 The UI therefore distinguishes `fresh`, `stale`, `missing`, `error` and
@@ -213,14 +214,18 @@ partial, rich, malformed and future-shaped synthetic inputs.
 ### 4. Projection is an allowlisted function
 
 The observer does not receive the local object by default. A simplified safe
-projection is:
+projection is defined in two explicit stages. Let $A$ be the allowlist of
+fields that the observer contract permits:
 
 $$
-P = \pi_{allow}\Bigl(\operatorname{sanitize}
-  \bigl(\operatorname{merge}(S_{local}, S_{remote})\bigr)\Bigr)
+S^{\prime} = sanitize(merge(S_{local}, S_{remote}))
 $$
 
-where $\pi_{allow}$ is an explicit allowlist/redaction projection. The
+$$
+P = \pi_{A}(S^{\prime})
+$$
+
+where $\pi_A$ is an explicit allowlist/redaction projection. The
 privacy condition is set containment, not obscurity:
 
 $$
@@ -482,122 +487,267 @@ green badge.
 | `error` | Transport, parse or compatibility failure | Show a bounded diagnosis and retry path |
 | `redacted` | Presence is known but content is intentionally withheld | Explain privacy without implying data loss |
 
-## Quran Journey: a provenance-preserving transport protocol
+## Quran Journey
 
-**Raşit ile Kur’an Yolculuğu** is not implemented as a field hidden inside the
-ordinary `data/latest.json` chain. It is a deliberately separated transport
-protocol with three bounded documents, a pure schema module and an explicit
-state machine. The product surface can therefore show a user-owned learning
-journey while the transport remains auditable and cannot accidentally perform a
-full replacement of the main snapshot.
+**Raşit ile Kur’an Yolculuğu** is a first-class product surface and a separate
+technical chapter in this repository. It combines a frozen 114-surah revelation
+order catalogue, an explicit user request, a guarded message transport, a
+validated video response, private learning notes and a provenance-aware panel
+projection. It is a learning workflow, not a theological authority layer and
+not a clinical or behavioral scoring system.
 
-### The three-document topology
+> **Core promise:** one requested surah, one auditable request identity, one
+> validated answer at a time — with uncertainty, retries and replacement
+> history kept visible.
+
+### 1. Product surface and learning model
+
+The user enters the journey through the Şeyma faith/learning hub. The catalogue
+is ordered by revelation order and retains the canonical Mushaf order as a
+secondary fact. Each surah detail view can expose Arabic and Turkish names,
+revelation place, ayah count, a bounded theme description, current lifecycle
+state and the next valid action.
+
+| Surface capability | Product meaning | Evidence boundary |
+| --- | --- | --- |
+| 114-stop catalogue | A navigable revelation-order learning map | Frozen catalog module; structural checks only |
+| Surah detail | Context before any request is made | Catalog metadata plus local request state |
+| “Raşit’ten iste” | An explicit user-owned action | Creates one request record; no background request |
+| Delivery status | Whether the message workflow accepted the request | `sent` or `failed` receipt; not a claim that a person watched it |
+| Video response | A validated YouTube video identity | HTTPS allowlist, one video, token/request/surah match |
+| Watching | An intentional media action | Click-to-load player; iframe load alone is not completion |
+| Learning notes | User-owned timestamped reflection | Local canonical state; bounded text and note count |
+| Question action | A deliberate handoff to Raşit | Opens the configured external question path; no automatic send claim |
+| Panel projection | Cross-surface operational visibility | Same status, timestamps and provenance; no private reply token |
+
+The current implementation keeps the catalogue in
+`app/content/quranRevelationOrderV1.js`, the optional rotating verse content in
+`app/content/quranStrikingVersesV1.js`, the transport contract in
+`app/content/quranTransportV1.js` and the user-facing runtime in `app.js`.
+The archived deterministic demo is [`archive/demos/quran-flow-demo.html`](archive/demos/quran-flow-demo.html).
+
+### 2. The three-document transport topology
+
+The transport receipts are deliberately independent from the ordinary
+`data/latest.json` full-snapshot chain. The app may later carry the applied
+user-owned `quranJourney` state through the normal guarded canonical merge, but
+the Quran automation itself has exactly three writable documents.
 
 ```mermaid
 flowchart LR
-    APP["Şeyma app<br/>user action"] -->|write only| OUT["quran-request-outbox.json<br/>requestId + replyToken"]
+    CATALOG["Frozen 114-surah catalogue"] --> APP["Şeyma app<br/>explicit user action"]
+    APP -->|write only| OUT["data/quran-request-outbox.json<br/>requestId + replyToken"]
     OUT --> ACTION["GitHub Actions / mail workflow"]
-    ACTION -->|write only| DEL["quran-delivery.json<br/>sent / failed receipt"]
-    HUMAN["Gmail reply or panel manual input"] --> VALID["QY-10 validation<br/>sender + token + single URL"]
-    VALID -->|write only| RES["quran-responses.json<br/>responseId + videoId"]
+    ACTION -->|write only| DEL["data/quran-delivery.json<br/>sent / failed receipt"]
+    HUMAN["Gmail reply or panel manual input"] --> VALID["QY-10 validator<br/>sender + token + single URL"]
+    VALID -->|write only| RES["data/quran-responses.json<br/>responseId + videoId"]
     DEL --> PULL["read-only pull"]
     RES --> PULL
     PULL --> APPLY["quranReduce + canonical apply"]
-    APPLY --> CANON["data.quranJourney<br/>status + timestamps + history"]
+    APPLY --> CANON["data.quranJourney<br/>status + stamps + notes"]
     CANON --> PANEL1["Current Panel"]
     CANON --> PANEL2["Panel-v2 Premium"]
+    CANON --> USER["surah detail<br/>video + learning note"]
 
-    FORBIDDEN["FORBIDDEN WRITE SURFACES<br/>latest.json · gunluk · observer inbox<br/>AEON outbox · profile outbox · media"]
-    OUT -. "must never write" .-> FORBIDDEN
-    VALID -. "must never write" .-> FORBIDDEN
+    FORBIDDEN["FORBIDDEN AUTOMATION WRITES<br/>latest.json · gunluk · observer inbox<br/>AEON outbox · profile outbox · media"]
+    OUT -. "never" .-> FORBIDDEN
+    ACTION -. "never" .-> FORBIDDEN
+    VALID -. "never" .-> FORBIDDEN
 
     classDef app fill:#34262e,stroke:#ff7c8d,color:#fff;
     classDef transport fill:#24362f,stroke:#73d6b2,color:#fff;
     classDef validate fill:#302a42,stroke:#b9a0ff,color:#fff;
     classDef observer fill:#3a3022,stroke:#e9bb70,color:#fff;
     classDef forbidden fill:#2d2023,stroke:#e8959e,color:#fff;
-    class APP,CANON app;
+    class CATALOG,APP,CANON,USER app;
     class OUT,DEL,RES,PULL transport;
     class ACTION,VALID,APPLY validate;
     class PANEL1,PANEL2 observer;
     class FORBIDDEN forbidden;
 ```
 
-The write-path invariant is intentionally simple:
+The path invariant is a set-separation rule. $W_Q$ is the Quran transport
+allowlist; $W_M$ is the main snapshot and observer write denylist:
 
 $$
-W_{allowed} = \{outbox,\ delivery,\ responses\}
-$$
-
-$$
-W_{forbidden} = \{latest.json,\ gunluk,\ observer\text{-}inbox,
-AEON\text{-}outbox,\ profile\text{-}outbox,\ media\}
+W_Q = \{q_{outbox},\; q_{delivery},\; q_{responses}\}
 $$
 
 $$
-W_{allowed} \cap W_{forbidden} = \varnothing
-$$
-
-`QuranTransportV1.isWritableTransportPath()` is the shared gate. A valid
-Quran transport write is not merely “a PUT that happened to succeed”; it is a
-write to one of the three authorized documents with a schema-valid payload.
-
-### Request, delivery and response schemas
-
-| Document | Producer | Consumer | Security/provenance role |
-| --- | --- | --- | --- |
-| `data/quran-request-outbox.json` | Şeyma app | GitHub Actions/mail workflow | Carries the request identity and reply token; never rendered to the user or panel |
-| `data/quran-delivery.json` | GitHub Actions | Şeyma app + panels | Carries only short delivery status, timestamp, provider message id and bounded error code |
-| `data/quran-responses.json` | Gmail Apps Script or panel manual path | Şeyma app + panels | Carries validated response identity, source, YouTube video id and sender fingerprint |
-| `data.quranJourney` | App canonical apply | App + panels | User-facing state, monotonic stamps, response provenance, video history and notes |
-
-The core join key is `requestId`. The response itself has a separate
-`responseId`; this allows a new validated response to supersede a prior video
-without creating a second logical request.
-
-### Validation predicates
-
-QY-04 keeps the parser pure: no network, storage, DOM, clock or exception-based
-control flow. Invalid documents return an empty safe contract plus an error
-list. The principal predicates are:
-
-$$
-\operatorname{pattern}(requestId) = \texttt{qr\_[A-Za-z0-9\_\-]\{8,64\}}
+W_M = \{latest,\; gunluk,\; observerInbox,\; aeonOutbox,\;
+profileOutbox,\; media\}
 $$
 
 $$
-\operatorname{pattern}(responseId) = \texttt{qrr\_[A-Za-z0-9\_\-]\{8,64\}}
+W_Q \cap W_M = \emptyset
+$$
+
+`QuranTransportV1.isWritableTransportPath()` is the shared gate. A successful
+HTTP PUT is not sufficient evidence of a valid Quran write: the path must be
+one of the three exact allowlisted paths and the payload must pass its parser.
+
+### 3. Write/read responsibility matrix
+
+| Actor | Operation | Exact path or state | Allowed payload | Explicit prohibition |
+| --- | --- | --- | --- | --- |
+| Şeyma app | write | `data/quran-request-outbox.json` | request identity, surah metadata, timestamp, reply token | no `latest.json` replacement; no panel or media write |
+| GitHub Actions | read | `data/quran-request-outbox.json` | pending requests without a `sent` receipt | no second mail for a sent `requestId` |
+| GitHub Actions | write | `data/quran-delivery.json` | `sent`/`failed`, bounded receipt metadata | no raw email body, token, stack trace or address |
+| Şeyma app / panels | read | delivery document | status, provider id, bounded error | no delivery inference from a missing file |
+| Gmail Apps Script | write | `data/quran-responses.json` | validated response identity, video id, source, fingerprint | no raw sender address or unvalidated URL |
+| Panel manual path | write | response document through the same contract | explicit `panel_manual` response | no alternate response schema |
+| App reducer | write | local `data.quranJourney` | canonical state transition with supplied timestamp | no direct status mutation outside `quranReduce` |
+| Current Panel / Panel-v2 | read | approved canonical projection | shared status/stamps/provenance | no panel-specific lifecycle meaning |
+
+The separation prevents a Quran retry from behaving like a general sync. A
+failed or ambiguous answer can be visible as a bounded error without becoming a
+reason to overwrite the user’s ordinary mood, notes, reminders or panel inbox.
+
+### 4. Versioned document contracts
+
+All three transport documents carry `schemaVersion`, `updatedAt` and a bounded
+map. Parsers return `{ ok, value, errors }`; they do not throw on empty files,
+invalid JSON, missing roots, old schema versions or future schema versions.
+Known valid records survive with an error list so the caller can keep a safe
+state and explain the boundary.
+
+#### Request outbox
+
+`data/quran-request-outbox.json` is keyed by `requestId` and capped at 50
+requests. Its required record semantics are:
+
+| Field | Constraint | Why it exists |
+| --- | --- | --- |
+| `requestId` | `qr_` plus 8–64 URL-safe characters | Stable idempotency and join key |
+| `surahId` | lowercase slug, for example `al-alaq` | Catalog identity without display-text parsing |
+| `revelationOrder` | integer from 1 through 114 | Preserves the learning route |
+| `mushafOrder` | optional integer from 1 through 114 | Supplies the secondary canonical order |
+| `surahName` | bounded display fallback | Human-readable mail context; not a join key |
+| `requestedAt` | UTC ISO-8601 timestamp | Ordering, audit and retry evidence |
+| `replyToken` | 32–128 URL-safe characters | User-present correlation secret; never rendered in a panel |
+
+The token is not a password requested from the user in chat and is not a
+display field. It exists only at the intended transport boundary. The README
+uses placeholders in examples; it never embeds a real token.
+
+#### Delivery receipt
+
+`data/quran-delivery.json` is keyed by the same `requestId`. The only transport
+statuses are `sent` and `failed`. A receipt may carry `sentAt`, a provider
+message id and a short bounded error code. It must not carry an email address,
+message body, token, stack trace, local file path or private note.
+
+The retry rule is explicit: a pending outbox request is eligible for delivery
+until a receipt with `status = sent` exists. Once that receipt exists, the same
+request is not posted again merely because a device polls or retries.
+
+#### Response record
+
+`data/quran-responses.json` is keyed by `requestId`, capped at 200 responses and
+stores the latest validated response for that logical request:
+
+| Field | Accepted values or shape | Privacy role |
+| --- | --- | --- |
+| `responseId` | `qrr_` plus 8–64 URL-safe characters | Separates answer identity from request identity |
+| `requestId` | Existing `qr_...` key | Prevents cross-request attachment |
+| `surahId` | Catalog slug | Prevents a valid video for another surah being attached |
+| `videoId` | Exactly 11 YouTube id characters | Stores the minimum identity needed to embed/watch |
+| `source` | `gmail_reply` or `panel_manual` | Provenance of the answer path |
+| `status` | `ready` or `revoked` | Validated availability, not theological correctness |
+| `receivedAt` | Optional UTC timestamp | Transport arrival evidence |
+| `validatedAt` | Required UTC timestamp | Validation boundary evidence |
+| `senderFingerprint` | Optional 16–64 lowercase hex characters | Correlates a sender without publishing the address |
+
+The local canonical reducer may additionally use `invalid` as an internal
+failure state while validating a response. That internal state is not written
+as an accepted `ready` transport record.
+
+### 5. Pure validation boundary
+
+QY-04 is intentionally a pure module: no network, storage, DOM, timers,
+`Date.now()`, token logging or exception-driven control flow. Every timestamp is
+passed by the caller. The same input therefore produces the same normalized
+output and the same error list in the headless fixtures.
+
+The implementation-level identity checks are:
+
+```js
+requestId   = /^qr_[A-Za-z0-9_-]{8,64}$/
+responseId  = /^qrr_[A-Za-z0-9_-]{8,64}$/
+surahId     = /^[a-z]+(-[a-z]+)*$/
+videoId     = /^[A-Za-z0-9_-]{11}$/
+replyToken  = /^[A-Za-z0-9_-]{32,128}$/
+timestamp   = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/
+fingerprint = /^[a-f0-9]{16,64}$/
+```
+
+Only these HTTPS URL families may produce a video id:
+
+```text
+https://www.youtube.com/watch?v=<11-character-id>
+https://m.youtube.com/watch?v=<11-character-id>
+https://youtu.be/<11-character-id>
+https://www.youtube.com/shorts/<11-character-id>
+```
+
+Channel pages, playlists, profiles, `javascript:` URLs, `data:` URLs, other
+hosts and malformed identifiers are rejected. Free-text replies are tokenized,
+punctuation is trimmed at URL edges and all extracted ids are deduplicated.
+The acceptance rule is:
+
+$$
+|V(m)| = 1 \Rightarrow accept
 $$
 
 $$
-\operatorname{pattern}(videoId) = \texttt{[A-Za-z0-9\_\-]\{11\}}
+|V(m)| = 0 \lor |V(m)| > 1 \Rightarrow reject
 $$
 
-$$
-\operatorname{pattern}(replyToken) = \texttt{[A-Za-z0-9\_\-]\{32,128\}}
-$$
+where $V(m)$ is the set of distinct accepted YouTube ids extracted from message
+$m$. This avoids silently choosing one link when a reply contains two competing
+videos. `requestId`, `surahId` and `replyToken` must also agree before a response
+can reach the `ready` state. Client comparison uses a length-checked XOR loop;
+the server-side Apps Script remains the authoritative secret comparison point.
 
-Additional constraints require an `https` YouTube watch/shorts/short-link
-form, a valid ISO timestamp, a slug-shaped `surahId`, and at most one distinct
-video id extracted from free text:
+### 6. Canonical request record
 
-$$
-|Videos(text)| = 1 \Rightarrow extract(text) = videoId
-$$
+The runtime stores one normalized request record per surah in
+`data.quranJourney.requests`. `ensureQuranJourney()` repairs missing containers,
+preserves unknown future fields and removes only malformed records that cannot
+be safely identified. The canonical request shape is:
 
-$$
-|Videos(text)| \in \{0,\;>1\} \Rightarrow reject(text)
-$$
+```text
+requestId, status, requestedAt, notifiedAt, deliverySentAt,
+providerMessageId, responseId, responseSource, responseReceivedAt,
+responseValidatedAt, responseStatus, videoId, readyAt,
+startedWatchingAt, watchedAt, questionOpenedAt, updatedAt,
+videoHistory[], notes[], lastNoteAt
+```
 
-This rejects ambiguous replies, multiple competing links, non-YouTube links,
-channel/playlist links and malformed identifiers before they can produce a
-`ready` state.
+The runtime status vocabulary is deliberately explicit:
 
-### Monotonic state machine
+| Status | Rank | Meaning | Retry or next action |
+| --- | ---: | --- | --- |
+| `idle` | 0 | No request has been made | Request is allowed |
+| `submitting` | 1 | Local action is being persisted | Wait for outbox result |
+| `queued` | 2 | Outbox record exists | Wait for delivery receipt |
+| `notification_error` | 2 | Delivery failed | Retry request |
+| `notified` | 3 | Delivery receipt says sent | Await response |
+| `awaiting_reply` | 4 | Response window is open | Pull updates |
+| `validating_reply` | 5 | A response is being checked | Wait for validator result |
+| `invalid_reply` | 5 | Response did not satisfy the contract | Request a new link |
+| `ready` | 6 | One validated video is available | Explicitly load/watch |
+| `video_unavailable` | 6 | Existing video is revoked/unavailable | Request a replacement |
+| `watching` | 7 | User opened the player | Continue or use visible fallback |
+| `watched` | 8 | Completion was recorded | Open an optional question |
+| `question_opened` | 9 | Question handoff was opened | No automatic send claim |
+| `request_error` | 0 | Local/outbox write did not complete | Retry without losing intent |
 
-The request lifecycle is a partially ordered state machine. The rank is not a
-quality score; it is a safety ordering that prevents a stale device or late
-error from moving a completed learning journey backwards.
+### 7. Monotonic state machine
+
+The lifecycle is a partially ordered state machine. Rank is not a quality score;
+it is a safety ordering that stops stale devices and late errors from erasing
+completed learning evidence.
 
 ```mermaid
 stateDiagram-v2
@@ -619,70 +769,265 @@ stateDiagram-v2
     watched --> question_opened: question_open
     ready --> video_unavailable: video_gone
     watching --> video_unavailable: video_gone
-    watched --> watched: response_valid(new video) / supersede history
-    question_opened --> question_opened: duplicate event / idempotent no-op
+    watched --> watched: response_valid(new video) / archive old video
+    question_opened --> question_opened: duplicate event / no-op
 ```
 
-Define the rank $\rho$ over the canonical states:
+The rank function is defined by the runtime and copied into `sync.js` so the
+merge layer cannot drift from the reducer:
 
 $$
-\rho(idle)=0,\; \rho(submitting)=1,\; \rho(queued)=2,
-\; \rho(notified)=3,\; \rho(awaiting\_reply)=4,
-\; \rho(validating\_reply)=5,\; \rho(ready)=6,
-\; \rho(watching)=7,\; \rho(watched)=8,
-\; \rho(question\_opened)=9
+\rho(idle)=0,\; \rho(request\_error)=0,\; \rho(submitting)=1
 $$
 
-For ordinary events, the reducer enforces:
-
 $$
-\rho(s_{t+1}) \geq \rho(s_t) \quad \text{unless the transition is an explicitly retryable failure}
+\rho(queued)=2,\; \rho(notification\_error)=2,\; \rho(notified)=3
 $$
 
-The `watched` rank is terminal with respect to destructive regression. If a
-new valid video arrives after watching, the old video is moved into bounded
-`videoHistory` and the current state remains at least `watched`:
+$$
+\rho(awaiting\_reply)=4,\; \rho(validating\_reply)=5,
+\; \rho(invalid\_reply)=5
+$$
 
 $$
-history_{t+1} = history_t \cup \{video_t\}, \qquad
+\rho(ready)=6,\; \rho(video\_unavailable)=6,\; \rho(watching)=7
+$$
+
+$$
+\rho(watched)=8,\; \rho(question\_opened)=9
+$$
+
+For ordinary progress events:
+
+$$
 \rho(s_{t+1}) \geq \rho(s_t)
 $$
 
-### Idempotence, supersession and bounded history
-
-The transport is designed for retries and multi-device races:
+Retryable failures share the rank of the point they failed at, so a retry does
+not invent progress and an error does not delete the attempted request. A
+`watched` record is never destructively downgraded by `video_gone`. A new valid
+response after watching archives the old video and retains the current rank:
 
 $$
-apply(apply(S,e),e) = apply(S,e)
+history_{t+1} = history_t \cup \{video_t\}
 $$
 
-The same `requestId` occupies one outbox slot, the same response event is a
-no-op, and a second response replaces the current response for that request
-while preserving the prior video in history. The implementation bounds history
-to 20 videos and notes to 100 records; boundedness is a resource invariant,
-not permission to discard the active record or its provenance.
+$$
+\rho(s_{t+1}) \geq \rho(s_t)
+$$
 
-### Quran evidence record
+### 8. Reducer, idempotence and multi-device merge
 
-For every visible delivery, the panel should be able to distinguish:
+`quranReduce(request, event)` is a pure single-event reducer. It clones the
+input, requires a supplied timestamp, validates a response video before the
+transition, rejects unknown events and rejects transitions that are not in the
+explicit transition table. Side effects such as save, sync, outbox writes and
+external handoff belong to the caller.
 
-```text
-requestId            = logical request identity
-responseId           = validated answer identity
-surahId              = catalog identity
-responseSource       = gmail_reply | panel_manual
-deliverySentAt       = provider-side delivery evidence
-responseReceivedAt   = transport receipt timestamp
-responseValidatedAt  = validation boundary timestamp
-videoId              = validated YouTube identity
-status               = canonical user-facing lifecycle state
-videoHistory         = bounded supersession history
-notes                = user-owned, timestamped learning notes
+For a duplicate event $e$, the reducer must converge without adding a second
+record:
+
+$$
+q^{\prime} = R(q,e),\qquad R(q^{\prime},e) = q^{\prime}
+$$
+
+The returned result distinguishes `ok: false` validation/transition failure
+from `ok: true, changed: false` idempotent replay. This distinction is important
+for retries: a safe no-op is not the same as a broken request.
+
+The guarded sync merge applies the same rank table independently of `app.js`:
+
+1. Higher rank wins; a completed `watched` record beats a stale `ready` record.
+2. Equal rank uses the newest `updatedAt` as the last-writer tie-breaker.
+3. Missing timestamps and provenance fields are filled from the losing side
+   when the winning side is empty.
+4. `videoHistory` is unioned and deduplicated by response/video/replacement
+   identity, then capped at 20 records.
+5. Notes are unioned by note id; the newest `updatedAt` version wins and the
+   result is capped at 100 notes.
+6. `startedAt` is the earliest journey start, not a last-writer field.
+7. Different surahs merge independently, so one request cannot replace another.
+
+The merge contract can be summarized as:
+
+$$
+rank(q_{merged}) \geq max(rank(q_{local}),\; rank(q_{remote}))
+$$
+
+unless both records are malformed and the safe empty contract must be used. The
+merge is not a blind object replacement; it is a field-aware, bounded union.
+
+### 9. Watch integrity and click-to-load privacy
+
+The video surface has two separate events: opening a player and completing a
+video. The first is not treated as the second.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Şeyma
+    participant Y as youtube-nocookie
+    participant Q as quranReduce
+
+    U->>S: Tap “İzlemeye başla”
+    S->>S: Validate videoId and explicit intent
+    S->>Y: Lazy-load iframe with origin and sandbox
+    Y-->>S: Player ready or unavailable
+    S->>Q: watch_start(at)
+    Y-->>S: ENDED event, if API is available
+    S->>Q: watch_complete(at)
+    S-->>U: Visible “İzledim” fallback if API is blocked
 ```
 
-The Current Panel and Panel-v2 consume the same canonical `data.quranJourney`
-shape. They may use different layouts, but they must not invent different
-status meanings, timestamps or provenance sources.
+The player contract is intentionally narrow:
+
+- no iframe is rendered on the first detail render;
+- the iframe is injected only after the user chooses to watch;
+- the host is `youtube-nocookie.com`;
+- `enablejsapi=1` and an origin are supplied for completion detection;
+- autoplay is not requested;
+- a sandbox and restricted `allow` list are used;
+- a blocked API does not silently claim completion; the visible fallback is
+  available only while the request is `watching`.
+
+The thumbnail is a presentation aid, not evidence that the video is reachable.
+If the video is unavailable, its identity remains available for diagnosis and
+the user sees a replacement action rather than a broken empty player.
+
+### 10. Learning notes and user-owned reflection
+
+Notes are attached to the surah request, not to the global mood record. They can
+be classified as `watch`, `listen` or `reflection`, and may carry an optional
+non-negative video-second position and a short tag. The current UI enforces:
+
+| Note property | Bound |
+| --- | ---: |
+| Note text | 2,000 characters |
+| Tag | 40 characters |
+| Timestamp | Optional integer seconds, never negative |
+| Stored notes per surah | 100 |
+| Visible notes in the detail view | Latest 12 |
+
+Notes are not sent as delivery metadata, sender evidence or panel secrets. A
+panel can show safe note counts and lifecycle context only where its projection
+contract allows it; the content remains user-owned detail.
+
+### 11. Failure matrix and honest UI states
+
+The protocol treats failure as a state with a recovery path, not as an empty
+success card:
+
+| Failure or ambiguity | Rejected/held at | Canonical state | User-facing action |
+| --- | --- | --- | --- |
+| Empty or invalid JSON | Parser | safe empty contract | Explain unavailable transport and retry pull |
+| Unknown request key | Parser | no accepted record | Keep the user’s existing state |
+| Bad token or mismatched surah | Response validator | `invalid_reply` | Request a new response |
+| Multiple distinct video links | Free-text extraction | `invalid_reply` | Ask for one direct video link |
+| Non-YouTube or playlist link | URL parser | `invalid_reply` | Show accepted link formats |
+| Delivery receipt `failed` | Delivery merge | `notification_error` | Retry without duplicate success mail |
+| 404/blocked YouTube video | Player/response refresh | `video_unavailable` | Preserve id and request replacement |
+| Duplicate request event | Reducer | unchanged | Safe no-op; no second outbox slot |
+| Duplicate response event | Reducer/merge | unchanged | Safe no-op; no duplicate history item |
+| Stale device push | Guarded merge | higher-rank state retained | Preserve newer request/video evidence |
+| Forbidden transport path | Write gate | write denied | Zero write to main snapshot or observer files |
+
+This table is also a reporting rule: `missing`, `error`, `invalid` and
+`unavailable` must not be rendered as `ready`, a zero, or a completed learning
+event.
+
+### 12. Panel parity and provenance projection
+
+The Current Panel and Panel-v2 can use different visual systems, but they read
+the same canonical fields. Neither panel is allowed to create a local Quran
+state machine or to infer a delivery from a timestamp alone.
+
+```mermaid
+flowchart TB
+    Q["data.quranJourney"] --> F["field allowlist"]
+    F --> P1["Current Panel<br/>status + receipt + timeline"]
+    F --> P2["Panel-v2<br/>journey card + history + notes count"]
+    Q --> APP["Şeyma detail<br/>video + notes + next action"]
+    SECRET["replyToken / raw sender / raw message"] -. blocked .-> F
+    classDef state fill:#34262e,stroke:#ff7c8d,color:#fff;
+    classDef view fill:#3a3022,stroke:#e9bb70,color:#fff;
+    classDef blocked fill:#2d2023,stroke:#e8959e,color:#fff;
+    class Q,APP state;
+    class F,P1,P2 view;
+    class SECRET blocked;
+```
+
+The minimum safe evidence record for a visible Quran row is:
+
+```text
+surahId              = frozen catalogue identity
+requestId            = logical request identity
+responseId           = validated answer identity, if any
+status               = canonical lifecycle state
+deliverySentAt       = provider receipt time, if sent
+responseReceivedAt   = response arrival time, if known
+responseValidatedAt  = validation boundary time, if ready/revoked
+responseSource       = gmail_reply | panel_manual
+videoId              = validated 11-character identity, if present
+videoHistoryCount    = bounded replacement count
+noteCount            = bounded user-owned note count
+```
+
+A panel may say “response validated at …” only when the matching field exists.
+It may say “waiting for response” when the state is `awaiting_reply`, but it
+must not claim that a person received or watched a message without that evidence.
+
+### 13. Deterministic Quran test matrix
+
+The Quran suite is intentionally layered. It proves software contracts with
+synthetic fixtures; it does not prove the truth of religious interpretation or
+the behavior of a private user device.
+
+| Fixture | Contract tested | Boundary |
+| --- | --- | --- |
+| `test_quran_catalog.js` | 114 records, revelation order, cross-links and frozen catalog shape | isolated `node:vm` |
+| `test_quran_striking_verses.js` | 100 structural verse entries and surah references | isolated `node:vm` |
+| `test_quran_transport.js` | path gate, IDs, token shape, URL extraction, parse safety and caps | pure module, no network |
+| `test_quran_outbox_sync.js` | allowlisted outbox PUT, no `latest.json`, token containment and retry | mocked fetch |
+| `test_quran_pull_sync.js` | read-only pull, cache busting, 404/304/invalid payload handling | mocked fetch |
+| `test_quran_flow_demo.js` | end-to-end synthetic request → delivery → response → watch flow | VM/demo fixture |
+| `test_quran_merge.js` | rank merge, stale-device recovery, supersession and note/history union | pure merge fixtures |
+| `test_quran_panel_parity.js` | Current Panel and Panel-v2 canonical field parity | static contract scan |
+| `test_quran_a11y_contrast.js` | Quran color tokens and WCAG AA contrast calculations | deterministic color math |
+
+Run the whole focused surface from the repository root:
+
+```bash
+for f in tests/quran/test_*.js; do node "$f" || exit $?; done
+```
+
+The fixture boundary is fail-closed: no browser boot, real localStorage, real
+GitHub token, live private data, outbound mail or real sync repository is needed
+to prove these contracts.
+
+### 14. Reproducible demo storyline
+
+The README’s visual language should use the following synthetic storyline when a
+user captures runtime screenshots. The values are illustrative and contain no
+private account data:
+
+1. **Library:** the user is at revelation-order stop `01 / 114`; the library
+   displays filters for `Tümü`, `İstenmedi`, `Bekleniyor`, `Hazır` and `İzlendi`.
+2. **Request:** the user opens a surah detail and taps `Raşit’ten iste`; the
+   UI disables a second request while the first is `submitting` or `queued`.
+3. **Delivery:** a synthetic receipt changes the row to `notified`, then the
+   app displays `awaiting_reply` without inventing a video.
+4. **Validated response:** one synthetic `youtube.com/watch?v=...` identity
+   reaches `ready`; two distinct links would instead reach `invalid_reply`.
+5. **Watch:** the screenshot shows the consent-like click-to-load cover before
+   the iframe and the visible fallback during `watching`.
+6. **Reflection:** after completion, the user adds one `reflection` note with a
+   short tag and optionally opens the question handoff.
+7. **Observer:** the panel shows status, provenance and counts, never the reply
+   token, raw sender, private message or hidden personal detail.
+
+The archived page is a structural demo, not proof of a private live account.
+For real runtime captures, use a clean user-owned demo profile and record the
+fixture id, viewport, theme, commit and capture time alongside the image.
 
 ## Privacy and safety contracts
 

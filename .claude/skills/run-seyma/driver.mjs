@@ -198,7 +198,8 @@ function seedState() {
     // Faz 05: render() artık `profileAssessment.status!=='completed'` iken ana sekmeleri
     // (bugun/rapor/vb.) kilitler. Bu driver bugun/rapor/tema gibi GENEL render akışını test
     // ettiği için, "mevcut kullanıcı" tohumu zaten TAMAMLAMIŞ sayılır — gate'in kendi
-    // davranışı (kilit/rıza/soru ekranı) ayrı `verify-profile-assessment-gate.mjs`'de test edilir.
+    // davranışı bu minimal smoke harness'ının kapsamı dışındadır; ayrı faz
+    // validatorları çalışma ağacında tutulmaz.
     profileAssessment: {
       schemaVersion: 2, deliveryMode: 'single_session', status: 'completed',
       startedAt: t + 'T09:00:00.000Z', completedAt: t + 'T09:30:00.000Z', currentItemIndex: 174,

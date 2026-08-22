@@ -582,8 +582,8 @@ function zikrJourneyProgress(preset){
 // Dokunma kaynağı: tek `onclick="App.zikrTap()"` (bkz. zikrCounterViewHTML) —
 // ayrı bir pointerdown/touchstart bağlayıcısı YOKTUR, bu yüzden gerçek
 // tarayıcıda pointerup/click/touch sentezinden çift sayım yapısal olarak
-// mümkün değildir (rule 4); verify-zikir-state-machine.mjs bunu regex ile
-// de doğrular.
+// mümkün değildir (rule 4); bu sözleşme güncel faith-hub harness'ında
+// sentetik etkileşimlerle korunur.
 function zikrSessionState(preset){
   var p=preset||zikrActivePreset(); if(!p) return 'error-recoverable';
   var curHatimId='';

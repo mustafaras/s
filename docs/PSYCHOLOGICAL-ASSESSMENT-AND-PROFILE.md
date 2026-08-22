@@ -197,10 +197,10 @@ Any personal psychological profile should be generated only from consented asses
 
 - [Profile assessment item bank and scoring map](../profileAssessmentV1.js)
 - [Scoring and deterministic report generator](../app.js)
-- [Headless scoring verification](../.claude/skills/run-seyma/verify-profile-assessment-scoring.mjs)
-- [Headless report verification](../.claude/skills/run-seyma/verify-profile-assessment-report.mjs)
-- [Response-quality verification](../.claude/skills/run-seyma/verify-profile-assessment-quality.mjs)
-- [Consent verification](../.claude/skills/run-seyma/verify-profile-assessment-consent.mjs)
+- [Data-safe app verification skill](../.claude/skills/run-seyma/SKILL.md)
+- [Core app VM driver](../.claude/skills/run-seyma/driver.mjs)
+- Profile-specific phase validators are historical Git records, not current
+  runtime authority; no personal response data is stored in this repository.
 - [Repository data-safety rules](../AGENTS.md)
 
 **Bottom line:** Şeyma provides a broad, careful and psychologically responsible self-reflection profile. Its strongest contribution is the combination of multidimensional coverage and restrained interpretation. Its next scientific maturity step would be formal psychometric validation, including reliability, construct validity, criterion validity and norm development.

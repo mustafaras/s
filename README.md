@@ -1,14 +1,6 @@
 <div align="center">
 
-<img src="assets/aeon-icon-192.png" alt="ÆON mark" width="104" height="104">
-
-# ŞEYMA · ÆON
-
-### A private, evidence-aware personal signal system.
-
-Personal reflection for Şeyma. Evidence-first observation for ÆON. A static,
-local-first product designed to help a person notice patterns without turning
-their life into a dashboard of guesses.
+<img src="docs/media/readme-header.svg" alt="ŞEYMA · ÆON — private signals and evidence-first observation" width="100%">
 
 <p>
   <a href="https://mustafaras.github.io/s/"><img src="https://img.shields.io/badge/live-GitHub%20Pages-111827?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live on GitHub Pages"></a>
@@ -20,7 +12,13 @@ their life into a dashboard of guesses.
   <img src="https://img.shields.io/badge/build-none-64748b?style=for-the-badge" alt="No build step">
 </p>
 
-<p><sub>Turkish-language product surfaces · English engineering contracts · no backend in this repository</sub></p>
+<table>
+  <tr>
+    <td align="center"><b>PRIVATE BY DEFAULT</b><br><sub>personal detail stays local</sub></td>
+    <td align="center"><b>STATIC BY DESIGN</b><br><sub>inspectable source, no hidden server</sub></td>
+    <td align="center"><b>EVIDENCE-GATED</b><br><sub>claims retain their provenance</sub></td>
+  </tr>
+</table>
 
 </div>
 

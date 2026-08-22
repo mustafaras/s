@@ -222,7 +222,7 @@ function bootTab(shared, owner, notificationLog) {
   sandbox.self = sandbox;
   sandbox.globalThis = sandbox;
   const context = vm.createContext(sandbox);
-  ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app.js"].forEach((file) => {
+  ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app.js"].forEach((file) => {
     vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file });
   });
   sandbox.App.start();

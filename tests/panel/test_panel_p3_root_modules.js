@@ -5,14 +5,14 @@ var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
 var repoRoot=require('../repo-root');
-var manifestSource=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
-var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var manifestSource=fs.readFileSync(path.join(repoRoot,'panel/panelCoverageManifest.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
 var HASH_A='a'.repeat(40), HASH_B='b'.repeat(40), HASH_C='c'.repeat(40);
 var receipt={status:'accepted',snapshotRevision:HASH_C,sourceLatestSha:HASH_B,sourceUpdatedAt:'2026-08-02T14:58:00.000Z',submittedAt:'2026-08-02T14:59:00.000Z',acceptedAt:'2026-08-02T15:00:00.000Z'};
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 var manifestContext={window:{},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Boolean:Boolean,Math:Math,isNaN:isNaN};
-vm.runInNewContext(manifestSource,manifestContext,{filename:'panelCoverageManifest.js'});
+vm.runInNewContext(manifestSource,manifestContext,{filename:'panel/panelCoverageManifest.js'});
 var P=manifestContext.window.PanelCoverageV1;
 if(!P){console.error('PanelCoverageV1 yüklenemedi');process.exit(1);}
 function base(){

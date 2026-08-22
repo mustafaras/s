@@ -4,7 +4,7 @@
 
 const { read, assert } = require("./helpers/panel-v2-test-helper");
 
-const css = read("panel-v2.css");
+const css = read("panel/v2/panel-v2.css");
 
 function blockFor(selector) {
   const selectorStart = css.indexOf(selector);

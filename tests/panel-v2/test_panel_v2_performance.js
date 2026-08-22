@@ -4,8 +4,8 @@
 const { boot, read, assert } = require("./helpers/panel-v2-test-helper");
 
 const html = read("panel-v2.html");
-const css = read("panel-v2.css");
-const js = read("panel-v2.js");
+const css = read("panel/v2/panel-v2.css");
+const js = read("panel/v2/panel-v2.js");
 
 assert(css.includes("contain: layout style paint"), "Kartlarda layout/style/paint containment var");
 assert(css.includes("content-visibility: auto"), "Offscreen bölümlerde content-visibility auto var");

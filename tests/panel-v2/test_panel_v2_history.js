@@ -122,7 +122,7 @@ const directChart = AeonV2.renderMetricChart("steps", {
 assert(stepPointCount(directChart) === 1, "Eksik seri değerleri SVG'de nokta olarak çizilmiyor");
 assert(!/class="ae-metric-chart__point"[^>]*data-value="0"/.test(directChart), "Boş seri doğrudan chart çağrısında da sıfıra çevrilmiyor");
 
-const source = require("fs").readFileSync(require("path").resolve(__dirname, "..", "..", "panel-v2.js"), "utf8");
+const source = require("fs").readFileSync(require("path").resolve(__dirname, "..", "..", "panel/v2/panel-v2.js"), "utf8");
 assert(!/\p{Extended_Pictographic}/u.test(source), "Panel-v2 JS kaynak kodunda emoji yok");
 
 console.log("Panel-v2 history/steps fixture tamamlandı.");

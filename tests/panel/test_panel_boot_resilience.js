@@ -16,9 +16,9 @@ var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
 var repoRoot=require('../repo-root');
-var source=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var source=fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
 var panelHtml=fs.readFileSync(path.join(repoRoot,'panel.html'),'utf8');
-var manifestSource=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
+var manifestSource=fs.readFileSync(path.join(repoRoot,'panel/panelCoverageManifest.js'),'utf8');
 
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
@@ -171,8 +171,8 @@ function bootPanel(mode,seed){
   };
   sandbox.window=sandbox; sandbox.window.addEventListener=function(){}; sandbox.self=sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(manifestSource,sandbox,{filename:'panelCoverageManifest.js'});
-  vm.runInContext(src,sandbox,{filename:'panel.js'});
+  vm.runInContext(manifestSource,sandbox,{filename:'panel/panelCoverageManifest.js'});
+  vm.runInContext(src,sandbox,{filename:'panel/panel.js'});
   return {app:app,log:log};
 }
 
@@ -428,7 +428,7 @@ var step6=step5e.then(function(){
   var vis=(source.match(/addEventListener\((["'])visibilitychange\1/g)||[]).length;
   ok('yinelenen visibilitychange dinleyicisi yok',vis===1,'sayı='+vis);
   ok('panel kabuğu watchdog\'u panel.js\'ten önce çalışır',
-    panelHtml.indexOf('__panelBootFailure')>=0&&panelHtml.indexOf('__panelBootFailure')<panelHtml.indexOf('panel.js?v='));
+    panelHtml.indexOf('__panelBootFailure')>=0&&panelHtml.indexOf('__panelBootFailure')<panelHtml.indexOf('panel/panel.js?v='));
   // Gözlemci sınırı: dayanıklılık yaması hiçbir yazma yolu açmaz.
   var wrapper=extractFunction('panelFetchP');
   ['method:','PUT','POST','PATCH','DELETE','body:','localStorage'].forEach(function(needle){

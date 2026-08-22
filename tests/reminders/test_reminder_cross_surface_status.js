@@ -16,7 +16,7 @@ const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helpe
 const ROOT = path.resolve(__dirname, "../..");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
 const SYNC_SOURCE = fs.readFileSync(path.join(ROOT, "sync.js"), "utf8");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 
 function extractFunction(source, name) {
   const start = source.indexOf("function " + name + "(");

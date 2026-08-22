@@ -80,7 +80,7 @@ function setup(seedOutbox, opts) {
   };
 
   // quranTransportV1 önce yüklenmeli (window.QuranTransportV1 kurulur), sonra sync.js.
-  var transportSrc = fs.readFileSync(path.join(repoRoot, 'quranTransportV1.js'), 'utf8');
+  var transportSrc = fs.readFileSync(path.join(repoRoot, 'app/content/quranTransportV1.js'), 'utf8');
   eval(transportSrc);
   var syncSrc = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
   eval(syncSrc);

@@ -259,7 +259,7 @@ function bootApp() {
   sandbox.globalThis = sandbox;
   sandbox.SeySync = sync;
   const context = vm.createContext(sandbox);
-  ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
+  ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
     .forEach((file) => vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file }));
   vm.runInContext(fs.readFileSync(path.join(ROOT, "app.js"), "utf8"), context, { filename: "app.js" });
   sandbox.App.start();
@@ -326,7 +326,7 @@ function loadSync() {
 
 function loadCoverage() {
   const context = { window: {}, Date, JSON, Array, Object, String, Number, Boolean, Math, RegExp, isNaN, isFinite };
-  vm.runInNewContext(fs.readFileSync(path.join(ROOT, "panelCoverageManifest.js"), "utf8"), context, { filename: "panelCoverageManifest.js" });
+  vm.runInNewContext(fs.readFileSync(path.join(ROOT, "panel/panelCoverageManifest.js"), "utf8"), context, { filename: "panel/panelCoverageManifest.js" });
   return context.window.PanelCoverageV1;
 }
 
@@ -338,7 +338,7 @@ function receipt() {
 }
 
 function loadPanelStatus() {
-  const source = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+  const source = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
   const names = [
     "panelStatusBadgeHTMLP", "panelLegacyBadgeHTMLP", "reminderStatusToneMapP",
     "reminderSystemStatusP", "reminderReceiptStatusP", "reminderCapabilityStatusP",
@@ -357,14 +357,14 @@ function loadPanelStatus() {
 }
 
 function loadPanelError() {
-  const source = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+  const source = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
   const context = { Date, Math, String, Number, Boolean, Object, Array, JSON, RegExp };
   vm.runInNewContext(extractTopLevelFunction(source, "safePanelErrorTextP"), context, { filename: "rem70-panel-error.js" });
   return context;
 }
 
 function loadPanelWriteBoundary() {
-  const source = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+  const source = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
   const names = ["panelTokenValidP", "findReminderKeyP", "panelWriteGuardP", "b64enc", "ghJsonHeaders", "ghTransportApiP", "inboxApi", "aeonMediaApiP", "putTransportFileP", "putInbox", "putAeonMediaP"];
   const context = {
     Date, Math, String, Number, Boolean, Object, Array, JSON, isNaN, isFinite, RegExp,
@@ -514,7 +514,7 @@ const cases = [
     const event = P.parseEventLog(JSON.stringify(remote.eventLog), "2026-08-20");
     failIfLeaks("panel.dom.event-log", event, []);
     if (!serialize(event).includes("Güvenli kayıt özeti")) throw new Error(`REM-70 BLOCKED surface=panel.dom.event-log assertion=safe-summary-missing value=${serialize(event).slice(0, 240)}`);
-    const panelSource = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+    const panelSource = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
     ["reminderStatusCardHTMLP", "eventLogCardInnerHTMLP"].forEach((name) => {
       const source = extractTopLevelFunction(panelSource, name);
       failIfStatic(source, `panel.dom.${name}`, [/method\s*:\s*["'](?:PUT|POST|PATCH|DELETE)["']/, /localStorage\.(?:setItem|removeItem)\s*\(/, /SeySync\.schedule\s*\(/]);
@@ -529,7 +529,7 @@ const cases = [
     assert(!output.includes("401"));
     assert(!output.includes("<img"));
     assert(output.length > 0);
-    const panelSource = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+    const panelSource = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
     failIfStatic(panelSource, "panel.error.raw-alert", [/alert\([^\n]*e&&e\.message/, /alert\([^\n]*\(e&&e\.message\)/]);
   }],
 
@@ -574,13 +574,13 @@ const cases = [
   }],
 
   ["static integrated scanner has no production corpus or unsafe cross-surface escape hatch", () => {
-    ["app.js", "sync.js", "sw.js", "panel.js", "panelCoverageManifest.js", "panel.html"].forEach((file) => {
+    ["app.js", "sync.js", "sw.js", "panel/panel.js", "panel/panelCoverageManifest.js", "panel.html"].forEach((file) => {
       const source = fs.readFileSync(path.join(ROOT, file), "utf8");
       failIfStatic(source, `source.${file}.synthetic-corpus`, CORPUS);
     });
     const sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
     failIfStatic(sw, "source.sw.external-write", [/\bfetch\s*\(/, /localStorage/, /Authorization/]);
-    const panel = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+    const panel = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
     assert(panel.includes("panelWriteGuardP"));
     assert(panel.includes("putInbox"));
     assert(panel.includes("putAeonMediaP"));

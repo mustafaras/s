@@ -117,7 +117,7 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 
-const FILES = ['profileAssessmentV1.js', 'esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
+const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
 
 function defaultSettings() {
   return {

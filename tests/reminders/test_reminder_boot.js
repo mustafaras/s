@@ -105,7 +105,7 @@ function boot({ catalog = true, seed = null } = {}) {
   sandbox.self = sandbox;
   sandbox.globalThis = sandbox;
   const context = vm.createContext(sandbox);
-  ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js"].forEach((file) => {
+  ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js"].forEach((file) => {
     vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file });
   });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });

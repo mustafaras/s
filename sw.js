@@ -156,8 +156,8 @@ self.addEventListener('push', function (event) {
   event.waitUntil(
     self.registration.showNotification(payload.title || 'ÆON', {
       body: payload.body || 'Yeni bir ÆON mesajı var',
-      icon: payload.icon || './aeon-icon-192.png',
-      badge: payload.badge || './aeon-icon-192.png',
+      icon: payload.icon || './assets/aeon-icon-192.png',
+      badge: payload.badge || './assets/aeon-icon-192.png',
       tag: payload.tag || 'aeon-message',
       renotify: !!payload.renotify,
       requireInteraction: !!payload.requireInteraction,

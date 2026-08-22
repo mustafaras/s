@@ -24,7 +24,7 @@ kopyalamaz; bağlantı verir.
 
 | İhtiyaç | Oku | Sonra doğrula |
 |---|---|---|
-| Genel Şeyma geliştirmesi | [`../GELISTIRME-PLANI.md`](../GELISTIRME-PLANI.md) | İlgili kaynak dosya ve headless fixture |
+| Genel Şeyma geliştirmesi | [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md) | İlgili kaynak dosya ve headless fixture |
 | Uygulama çalıştırma / render | [`../.claude/skills/run-seyma/SKILL.md`](../.claude/skills/run-seyma/SKILL.md) | `driver.mjs`, ilgili harness ve syntax |
 | Panel-v2 Premium | [`../archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](../archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) | [`../tests/panel-v2/`](../tests/panel-v2/) |
 | Hatırlatma / bildirim UX çalışması | [`reminders/README.md`](reminders/README.md) ve [`reminders/APP-REMINDER-WORK-SUMMARY.md`](reminders/APP-REMINDER-WORK-SUMMARY.md) | Dondurulmuş durum, yüzey özeti ve 20 fixture bakım seti |

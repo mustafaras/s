@@ -20,7 +20,7 @@ const vm = require("node:vm");
 const { assert, assertEqual, deepClone, deepEqual, runTests } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 
 // panel.js tek büyük IIFE; p0/p1/REM-55 fixture'larının yaptığı gibi yalnız
 // ilgili top-level fonksiyonları çıkarıp izole bir context'te çalıştırıyoruz.

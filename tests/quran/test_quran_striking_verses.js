@@ -16,8 +16,8 @@ var path = require('path');
 var vm = require('vm');
 var repoRoot = require('../repo-root');
 
-var SRC_FILE = 'quranStrikingVersesV1.js';
-var CATALOG_FILE = 'quranRevelationOrderV1.js';
+var SRC_FILE = 'app/content/quranStrikingVersesV1.js';
+var CATALOG_FILE = 'app/content/quranRevelationOrderV1.js';
 var EXPECTED_TOTAL = 100;
 var ARABIC_RE = /[؀-ۿ]/;
 

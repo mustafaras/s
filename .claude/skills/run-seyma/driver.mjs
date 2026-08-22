@@ -34,10 +34,10 @@ function today() {
 
 // Gerçek 174 itemId sırasını al (seedState()'in "tamamlanmış" tohum verisini gerçek
 // itemId'lerle tutarlı kurabilmesi için — bkz. profileAssessmentComputeCurrentIndex).
-const _paSrc = fs.readFileSync(path.join(REPO, 'profileAssessmentV1.js'), 'utf8');
+const _paSrc = fs.readFileSync(path.join(REPO, 'app/content/profileAssessmentV1.js'), 'utf8');
 const _paSandbox = { window: {}, console };
 vm.createContext(_paSandbox);
-vm.runInContext(_paSrc, _paSandbox, { filename: 'profileAssessmentV1.js' });
+vm.runInContext(_paSrc, _paSandbox, { filename: 'app/content/profileAssessmentV1.js' });
 const PROFILE_ITEM_IDS = _paSandbox.window.ProfileAssessmentV1.sessions[0].items.map((it) => it.id);
 
 // ── Fake DOM ────────────────────────────────────────────────────────────────
@@ -220,7 +220,7 @@ function assert(name, cond) {
 // REM-54: index.html'in gercek boot sirasi. Reminder modulleri uzun sure
 // diskte durup index.html'e hic baglanmamisti; harness da onlarsiz boot
 // ederek bunu gizliyordu. Artik uretimle ayni seti yukluyoruz.
-const FILES = ['motivationProgramV2.js', 'profileAssessmentV1.js', 'app/core/constants.js',
+const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/core/constants.js',
   'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js',
   'app/core/reminderDelivery.js', 'app.js'];
 

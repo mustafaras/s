@@ -16,8 +16,8 @@ const vm = require("node:vm");
 const { assert, assertEqual, deepClone, deepEqual, runTests } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const COVERAGE_SOURCE = fs.readFileSync(path.join(ROOT, "panelCoverageManifest.js"), "utf8");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const COVERAGE_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panelCoverageManifest.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 
 const SHA_LATEST = "b".repeat(40);
 const SHA_OTHER = "f".repeat(40);
@@ -32,7 +32,7 @@ function loadCoverage() {
   const context = {
     window: {}, Date, JSON, Array, Object, String, Number, Boolean, Math, isNaN, isFinite
   };
-  vm.runInNewContext(COVERAGE_SOURCE, context, { filename: "panelCoverageManifest.js" });
+  vm.runInNewContext(COVERAGE_SOURCE, context, { filename: "panel/panelCoverageManifest.js" });
   const api = context.window.PanelCoverageV1;
   if (!api) throw new Error("PanelCoverageV1 yüklenemedi");
   return api;

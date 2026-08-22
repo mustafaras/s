@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>ÆON · Orchestration Core</title>
-<link rel="stylesheet" href="panel.css?v=20260820f">
+<link rel="stylesheet" href="panel/panel.css?v=20260820f">
 <!-- Leaflet yalnızca harita kartı içindir; panel çekirdeğinin parser'ını bloke
      etmemesi için CSS asenkron, JS bağımsız yüklenir. -->
 <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style" crossorigin="" onload="this.onload=null;this.rel='stylesheet'">
@@ -76,12 +76,12 @@
 })();
 </script>
 <!-- Yerel modüller defer ile sırayı korur; watchdog ve panel kabuğu bunları beklemez. -->
-<script defer src="motivationProgramV2.js?v=20260718a"></script>
-<script defer src="saygiPeople.js?v=20260715a"></script>
-<script defer src="hijriCalendar.js?v=20260730j"></script>
-<script defer src="quranRevelationOrderV1.js?v=20260801a"></script>
-<script defer src="quranTransportV1.js?v=20260801a"></script>
-<script defer src="panelCoverageManifest.js?v=20260820f"></script>
-<script defer src="panel.js?v=20260821h" onerror="window.__panelBootFailure()"></script>
+<script defer src="app/content/motivationProgramV2.js?v=20260718a"></script>
+<script defer src="app/content/saygiPeople.js?v=20260715a"></script>
+<script defer src="app/content/hijriCalendar.js?v=20260730j"></script>
+<script defer src="app/content/quranRevelationOrderV1.js?v=20260801a"></script>
+<script defer src="app/content/quranTransportV1.js?v=20260801a"></script>
+<script defer src="panel/panelCoverageManifest.js?v=20260820f"></script>
+<script defer src="panel/panel.js?v=20260821h" onerror="window.__panelBootFailure()"></script>
 </body>
 </html>

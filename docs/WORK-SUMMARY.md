@@ -9,9 +9,9 @@ canonical state, ledger, source ve test dosyaları yeniden doğrulanır.
 
 - Şeyma: vanilla JS/HTML/CSS, statik GitHub Pages uygulaması; ana runtime
   `app.js`, senkron sınırı `sync.js` ve kullanıcı state'i tek `data` objesidir.
-- ÆON current observer panel: `panel.html`, `panel.js`, `panel.css` ve
-  `panelCoverageManifest.js`; Şeyma runtime'ından bağımsız gözlem yüzeyidir.
-- ÆON Panel-v2 Premium: `panel-v2.html`, `panel-v2.js`, `panel-v2.css` ve
+- ÆON current observer panel: `panel.html`, `panel/panel.js`, `panel/panel.css` ve
+  `panel/panelCoverageManifest.js`; Şeyma runtime'ından bağımsız gözlem yüzeyidir.
+- ÆON Panel-v2 Premium: `panel-v2.html`, `panel/v2/panel-v2.js`, `panel/v2/panel-v2.css` ve
   `tests/panel-v2/`; current observer panel ile ayrı regression scope'udur.
 - `data/`, kullanıcı localStorage'ı, tokenlar, `mustafaras/seyma-data` ve
   kullanıcı cihazı kabulü bu dokümantasyon çalışmasının kapsamı dışındadır.
@@ -55,7 +55,7 @@ canonical state, ledger, source ve test dosyaları yeniden doğrulanır.
 ## Yeni ajan için kısa okuma sırası
 
 1. [`AGENTS.md`](../AGENTS.md) ve [`CLAUDE.md`](../CLAUDE.md)
-2. [`GELISTIRME-PLANI.md`](../GELISTIRME-PLANI.md)
+2. [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md)
 3. İlgili yüzey için run skill, current state/ledger ve test README
 4. Reminder işi ise [`docs/reminders/README.md`](reminders/README.md) ve
    [`APP-REMINDER-STATE.json`](reminders/APP-REMINDER-STATE.json)

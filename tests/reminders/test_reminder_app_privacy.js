@@ -162,7 +162,7 @@ function boot(options) {
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   sandbox.SeySync = sync;
   const context = vm.createContext(sandbox);
-  ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
+  ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app/core/reminderDelivery.js"]
     .forEach((file) => vm.runInContext(fs.readFileSync(path.join(rootDir, file), "utf8"), context, { filename: file }));
   vm.runInContext(appSource, context, { filename: "app.js" });
   sandbox.App.start();

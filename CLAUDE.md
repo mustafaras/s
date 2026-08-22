@@ -80,7 +80,7 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 
 ## Agent Routing
 
-- Start new sessions with [`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
+- Start new sessions with [`docs/GELISTIRME-PLANI.md`](docs/GELISTIRME-PLANI.md); treat it as the product roadmap and technical-principles source.
 - Use [`.claude/skills/run-seyma/SKILL.md`](.claude/skills/run-seyma/SKILL.md) for data-safe app verification and [`tests/README.md`](tests/README.md) for the current root fixture inventory.
 - For Panel-v2 Premium work, read the archived canonical state in [`archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md`](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) before the ledger; current fixtures live under [`tests/panel-v2/`](tests/panel-v2/). The public repository overview is [`README.md`](README.md).
 - For the frozen reminder / notification UX program, read [`docs/reminders/README.md`](docs/reminders/README.md) and [`docs/reminders/APP-REMINDER-WORK-SUMMARY.md`](docs/reminders/APP-REMINDER-WORK-SUMMARY.md). `APP-REMINDER-STATE.json` is the machine-readable status; do not revive the retired REM-00..REM-72 prompt chain from chat history or old Git files.
@@ -91,7 +91,7 @@ answers, tokens, etc.) — that all lives in `seyma-data` or the user's own
 ## Repo layout
 
 ```
-index.html      Thin HTML shell. Loads styles.css, data modules,
+index.html      Thin HTML shell. Loads app/styles.css, data modules,
                  app/core/constants.js, app.js, sync.js with cache-busting
                  `?v=YYYYMMDDx` query strings. Registers sw.js.
 app/core/constants.js  Classic script loaded immediately before app.js;
@@ -100,26 +100,26 @@ app/core/constants.js  Classic script loaded immediately before app.js;
 app.js           The Şeyma runtime (single IIFE). It retains state, rendering,
                  feature logic, and the existing `App` surface during the
                  incremental L2 extraction.
-motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
+app/content/motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
                  program" content (per-day Faz/task objects) plus helpers,
                  exposed as `window.MotivationProgramV2`. Loaded before
                  app.js but not yet consumed by it — UI/data-model
                  integration into app.js and panel.html is still in
                  progress (rollout plan lives in the untracked, local-only
                  `seyma_motivation_v2_package/` directory — don't commit it).
-motivationNarratives.js Standalone narrative content module
+app/content/motivationNarratives.js Standalone narrative content module
                  (`window.MotivationNarratives`) for the program.
-saygiPeople.js   Frozen data module of 100 "günün öncüsü" inspirational
+app/content/saygiPeople.js   Frozen data module of 100 "günün öncüsü" inspirational
                  figures (`window.SaygiPeople`) powering the Saygı /
                  İlham & İbadet tab (daily figure, Wikipedia fetch,
                  read-tracking).
-profileAssessmentV1.js Frozen, hand-authored data module: single-session
+app/content/profileAssessmentV1.js Frozen, hand-authored data module: single-session
                  174-item scientific profile assessment
                  (`window.ProfileAssessmentV1`) — sessions, consent schema,
                  instruments. Consumed by app.js's profile engine and merged
                  across devices by sync.js's `SeySync.mergeProfileAssessment`.
                  Do not hand-edit item content; it is versioned (`version`).
-hijriCalendar.js Standalone Hicri (Islamic) calendar module
+app/content/hijriCalendar.js Standalone Hicri (Islamic) calendar module
                  (`window.HijriCalendarV1`) — offset-based Miladi→Hicri
                  conversion + mübarek gün (holy day) lookup, consumed by
                  app.js's `hijriTodayStr`/`kandilBadgeFor`. User-adjustable
@@ -137,7 +137,7 @@ sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  30s foreground poll loop as a throttled (5 min) watchdog,
                  so a push stuck in error state doesn't sit unresolved
                  indefinitely if the tab is never backgrounded/refocused.
-quranTransportV1.js  Pure QY-04 transport contract for "Raşit ile Kur'an
+app/content/quranTransportV1.js  Pure QY-04 transport contract for "Raşit ile Kur'an
                  Yolculuğu": three files fully independent of the
                  latest.json chain — `data/quran-request-outbox.json`
                  (app writes, GitHub Actions in the seyma-data repo reads
@@ -150,7 +150,7 @@ quranTransportV1.js  Pure QY-04 transport contract for "Raşit ile Kur'an
                  allowing a new request, so a stale tab/device can't refire
                  a duplicate request+email for a surah already answered
                  elsewhere.
-panelCoverageManifest.js  Pure P1 coverage/redaction adapter. Defines the
+panel/panelCoverageManifest.js  Pure P1 coverage/redaction adapter. Defines the
                  manifest and builds/parses `data/observer-snapshot.json`;
                  no network, DOM, localStorage or raw secret/GPS/profile/media
                  output.
@@ -159,14 +159,17 @@ panel.html       Standalone "ÆON · Orchestration Core" observer dashboard.
                  data/latest.json from GitHub with its own token/localStorage
                  key, dark/gold theme, can write to
                  data/observer-inbox.json / data/aeon-outbox.json.
-panel.css        Panel-only stylesheet extracted from panel.html.
-panel.js         Panel observer IIFE extracted from panel.html; helper names
+panel/panel.css        Panel-only stylesheet extracted from panel.html.
+panel/panel.js         Panel observer IIFE extracted from panel.html; helper names
                  and API flow remain compatible with the panel harness.
-styles.css       Shared CSS variables (light/dark theme) + small set of
+panel/v2/panel-v2.js   Premium observer runtime; independent from current panel.
+panel/v2/panel-v2.css  Premium observer design tokens, components and responsive rules.
+app/styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
+assets/aeon-icon-*.png PWA and ÆON panel icon assets referenced by manifest.json.
 sw.js            Service worker (PWA install + notificationclick routing);
                  manifest.json is the PWA manifest, aeon-icon-*.png the icons.
-GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
+docs/GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
                  table (✅/🟡/❌) and the "teknik ilkeler" (technical
                  principles) new features must follow. Read it before adding
                  a feature; update its status table/changelog when a listed
@@ -258,7 +261,7 @@ JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px design).
   copy-paste template: `openX()`/`closeX()` + `ui.xView` + `segTabs`. Reuse
   this pattern for any new full-screen hub rather than inventing a new one.
 
-## Conventions (see `GELISTIRME-PLANI.md` §"Uyulacak teknik ilkeler" for the
+## Conventions (see `docs/GELISTIRME-PLANI.md` §"Uyulacak teknik ilkeler" for the
 canonical Turkish version)
 
 1. **One `data` object** — add new fields to `data`, not a separate store,
@@ -266,13 +269,13 @@ canonical Turkish version)
 2. **Theme via CSS variables**, not hardcoded hex — use `--read`, `--watch`,
    `--listen`, `--ok`, `--drop`, `--pause`, `--text`, `--muted`, etc. New
    accents need definitions in both the light block and the
-   `#root[data-theme="dark"]` block in `styles.css`.
+   `#root[data-theme="dark"]` block in `app/styles.css`.
 3. **Overlay pattern** for new hubs: mirror the reading/watching/listening
    template exactly (open/close handlers, `ui.xView`, segmented tabs).
 4. **Panel mirror** — any new persistent user record should also render
    somewhere in `panel.html` (a bento card or a day-detail row), since the
    observer only ever sees what's reflected there.
-5. **Cache busting** — bump the `?v=` query string on `styles.css`,
+5. **Cache busting** — bump the `?v=` query string on `app/styles.css`,
    `app.js`, and/or `sync.js` in `index.html` on every deploy that changes
    them, or the PWA/Pages CDN can serve stale assets.
 6. **Privacy** — secrets (`ghToken`, `openaiKey`, `syncUrl`) must stay out
@@ -302,7 +305,7 @@ for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done
 ```
 
 There's no automated test suite or linter, but `node --check app.js` (or
-`sync.js`, `hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond
+`sync.js`, `app/content/hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond
 that, **do not serve+open the app in a browser** (see "DATA SAFETY" above) —
 use the `run-seyma` skill's headless Node `vm` harnesses instead:
 
@@ -337,6 +340,6 @@ use the `run-seyma` skill's headless Node `vm` harnesses instead:
 - `main` is the production branch — every push to it redeploys GitHub Pages
   via `.github/workflows/pages.yml` (no build, no tests gate the deploy).
 - Feature branches are commonly named after the "Faz" (phase) of
-  `GELISTIRME-PLANI.md` being implemented; commit messages are short,
+  `docs/GELISTIRME-PLANI.md` being implemented; commit messages are short,
   Turkish, and describe the phase/feature (e.g. `"Faz 7: iki haftada bir
   psikolojik tarama anketi"`).

@@ -113,7 +113,7 @@ function loadSyncAdapter() {
 
 function loadCoverage() {
   const context = { window: {}, Date, JSON, Array, Object, String, Number, Boolean, Math, isNaN, isFinite };
-  vm.runInNewContext(source("panelCoverageManifest.js"), context, { filename: "panelCoverageManifest.js" });
+  vm.runInNewContext(source("panel/panelCoverageManifest.js"), context, { filename: "panel/panelCoverageManifest.js" });
   if (!context.window.PanelCoverageV1) throw new Error("PanelCoverageV1 yüklenemedi");
   return context.window.PanelCoverageV1;
 }
@@ -126,7 +126,7 @@ function extractPanelFunction(panelSource, name) {
 }
 
 function loadPanelTimeline(events, projection) {
-  const panelSource = source("panel.js");
+  const panelSource = source("panel/panel.js");
   const names = [
     "projectionStatusP",
     "applySectionFailureP",

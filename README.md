@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="aeon-icon-192.png" alt="ÆON" width="96" height="96">
+<img src="assets/aeon-icon-192.png" alt="ÆON" width="96" height="96">
 
 # ŞEYMA · ÆON
 
@@ -94,17 +94,17 @@ fixtures and a low-friction deployment surface.
 
 ```text
 .
-├── index.html                 Şeyma application shell
-├── app.js / sync.js           app runtime and guarded synchronization
-├── panel-v2.html              ÆON observer shell
-├── panel-v2.js / panel-v2.css Premium observer runtime and design system
-├── panelCoverageManifest.js   redaction and coverage projection contract
-├── tests/                     committed headless Node fixtures
-├── .claude/skills/run-seyma/  data-safe VM verification harnesses
-├── archive/                   completed plans, ledgers and historical context
-├── AGENTS.md                  operational rules for AI agents
-├── CLAUDE.md                  detailed engineering guidance
-└── GELISTIRME-PLANI.md        living Turkish roadmap and technical principles
+├── index.html / panel.html    public application and current-panel shells
+├── panel-v2.html              Premium observer shell
+├── app/                      app core, content modules and shared styles
+├── panel/                    current panel + Panel-v2 implementation assets
+├── app.js / sync.js / sw.js   runtime entrypoints and guarded synchronization
+├── tests/                    committed headless Node fixtures
+├── docs/                     roadmap, summaries and reminder contracts
+├── archive/                  completed work and historical context
+├── .claude/skills/run-seyma/ data-safe VM verification harnesses
+├── AGENTS.md / CLAUDE.md     operational and engineering guidance
+└── README.md                repository map and verification entrypoint
 ```
 
 The archived design package is historical context, not a new implementation
@@ -127,8 +127,8 @@ for f in tests/app/test_*.js tests/panel/test_*.js tests/quran/test_*.js; do nod
 Run syntax and safe application harness checks when the change requires them:
 
 ```bash
-node --check panel-v2.js
-node --check panelCoverageManifest.js
+node --check panel/v2/panel-v2.js
+node --check panel/panelCoverageManifest.js
 node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
 git diff --check
@@ -148,7 +148,7 @@ full data replacement. Use the headless VM fixtures instead.
 - Preserve dirty worktrees, frozen evidence and user-owned files.
 
 Read [`AGENTS.md`](AGENTS.md) before changing the repository and
-[`GELISTIRME-PLANI.md`](GELISTIRME-PLANI.md) before adding a feature.
+[`docs/GELISTIRME-PLANI.md`](docs/GELISTIRME-PLANI.md) before adding a feature.
 
 ---
 
@@ -197,10 +197,10 @@ opened after a context change.
 | --- | --- | --- |
 | <code>app.js</code> | Şeyma UI, state reads/writes, migration entrypoint, App handlers | Panel-v2 rendering or a second persistent store |
 | <code>sync.js</code> | Sanitized transport, receipts and conflict/merge helpers | Raw secret output or unapproved data-repo writes |
-| <code>panel.js</code> | Legacy Panel 1 projection and observer UI | Panel-v2 component contracts |
-| <code>panel-v2.js</code> | Premium observer rendering, polling, charts and controls | Şeyma’s local save semantics |
-| <code>panel-v2.css</code> | Premium tokens, layout, motion and responsive rules | Hard-coded theme behavior outside the token system |
-| <code>panelCoverageManifest.js</code> | Coverage, redaction and safe projection adapter | Network, DOM mutation or secret discovery |
+| <code>panel/panel.js</code> | Legacy Panel 1 projection and observer UI | Panel-v2 component contracts |
+| <code>panel/v2/panel-v2.js</code> | Premium observer rendering, polling, charts and controls | Şeyma’s local save semantics |
+| <code>panel/v2/panel-v2.css</code> | Premium tokens, layout, motion and responsive rules | Hard-coded theme behavior outside the token system |
+| <code>panel/panelCoverageManifest.js</code> | Coverage, redaction and safe projection adapter | Network, DOM mutation or secret discovery |
 | <code>tests/panel-v2/</code> | Panel-v2 headless contracts and shared helper | Production runtime behavior |
 
 ### State contract
@@ -351,7 +351,7 @@ After editing:
 ### Cache busting
 
 The static app uses explicit <code>?v=...</code> asset versions. When
-<code>panel-v2.css</code>, <code>panel-v2.js</code>, <code>styles.css</code>,
+<code>panel/v2/panel-v2.css</code>, <code>panel/v2/panel-v2.js</code>, <code>app/styles.css</code>,
 <code>app.js</code> or <code>sync.js</code> changes:
 
 1. Identify the exact asset reference in the relevant HTML shell.
@@ -379,7 +379,7 @@ Panel-v2 work treats these as contracts, not optional polish:
 
 1. [AGENTS.md](AGENTS.md) — data safety and repository boundaries.
 2. [CLAUDE.md](CLAUDE.md) — architecture and verification detail.
-3. [GELISTIRME-PLANI.md](GELISTIRME-PLANI.md) — roadmap and technical principles.
+3. [docs/GELISTIRME-PLANI.md](docs/GELISTIRME-PLANI.md) — roadmap and technical principles.
 4. [tests/README.md](tests/README.md) — current fixture inventory.
 5. [tests/panel-v2/README.md](tests/panel-v2/README.md) — Panel-v2 test scope.
 6. [CURRENT-STATE.md](archive/PANEL-V2-PREMIUM-TASARIM/.anti-amnesia/CURRENT-STATE.md) — only for Panel-v2 work.
@@ -409,7 +409,7 @@ Reports use separate evidence layers:
 
 | Level | Meaning | Example |
 | --- | --- | --- |
-| **S0 · Source** | File content, diff and syntax | <code>node --check panel-v2.js</code> |
+| **S0 · Source** | File content, diff and syntax | <code>node --check panel/v2/panel-v2.js</code> |
 | **S1 · Headless** | Deterministic fixture or VM harness | Panel-v2 27/27 |
 | **S2 · CI / deploy** | Workflow and deployment record | Pages workflow run |
 | **S3 · Live** | HTTP, asset bytes, cache and runtime observation | Cache-busted asset verification |
@@ -518,8 +518,8 @@ historical plans, promptbooks and handoffs remain recoverable from Git history.
 | Inspect dirty state | <code>git status --short --branch</code> |
 | Run Panel-v2 suite | <code>for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done</code> |
 | Run app, panel and Quran fixtures | <code>for f in tests/app/test_*.js tests/panel/test_*.js tests/quran/test_*.js; do node "$f"; done</code> |
-| Check Panel-v2 syntax | <code>node --check panel-v2.js</code> |
-| Check projection syntax | <code>node --check panelCoverageManifest.js</code> |
+| Check Panel-v2 syntax | <code>node --check panel/v2/panel-v2.js</code> |
+| Check projection syntax | <code>node --check panel/panelCoverageManifest.js</code> |
 | Check Şeyma runtime | <code>node --check app.js && node --check sync.js</code> |
 | Run app VM harness | <code>node .claude/skills/run-seyma/driver.mjs</code> |
 | Run faith hub harness | <code>node .claude/skills/run-seyma/zikr-harness.mjs</code> |

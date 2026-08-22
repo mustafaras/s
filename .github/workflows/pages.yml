@@ -31,7 +31,7 @@ jobs:
           node --check app.js
           node --check sync.js
           node --check sw.js
-          node --check motivationProgramV2.js
+          node --check app/content/motivationProgramV2.js
 
       - name: Check panel.html script tag balance
         run: |
@@ -81,9 +81,13 @@ jobs:
       # site yayinlamasin: temel varliklar yoksa is burada duser.
       - name: Guard runtime assets present
         run: |
-          for f in index.html panel.html app.js panel.js sync.js styles.css \
-                   panel.css sw.js manifest.json app/core/constants.js \
-                   panelCoverageManifest.js profileAssessmentV1.js; do
+          for f in index.html panel.html panel-v2.html app.js sync.js app/styles.css \
+                   panel/panel.js panel/panel.css sw.js manifest.json \
+                   app/core/constants.js panel/panelCoverageManifest.js \
+                   panel/v2/panel-v2.js panel/v2/panel-v2.css \
+                   app/content/profileAssessmentV1.js \
+                   app/content/quranRevelationOrderV1.js \
+                   assets/aeon-icon-192.png assets/aeon-icon-512.png; do
             [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
           done
           [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }

@@ -3,11 +3,11 @@
 'use strict';
 var fs=require('fs'),path=require('path'),vm=require('vm');
 var root=require('../repo-root');
-var panelSource=fs.readFileSync(path.join(root,'panel.js'),'utf8');
-var cssSource=fs.readFileSync(path.join(root,'panel.css'),'utf8');
+var panelSource=fs.readFileSync(path.join(root,'panel/panel.js'),'utf8');
+var cssSource=fs.readFileSync(path.join(root,'panel/panel.css'),'utf8');
 var htmlSource=fs.readFileSync(path.join(root,'panel.html'),'utf8');
 var syncSource=fs.readFileSync(path.join(root,'sync.js'),'utf8');
-var manifestSource=fs.readFileSync(path.join(root,'panelCoverageManifest.js'),'utf8');
+var manifestSource=fs.readFileSync(path.join(root,'panel/panelCoverageManifest.js'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){ var start=panelSource.indexOf('function '+name+'('); if(start<0) throw new Error(name+' bulunamadı'); var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end); }
@@ -31,20 +31,20 @@ console.log('\n=== PANEL-015 / PANEL-13 — D6 QA + release gate fixture ===\n')
 console.log('[1] Kod ve sözleşme gate’leri');
 ok('CSS brace balance temiz',braceBalance(cssSource));
 ok('panel inline script/script-tag balance temiz',(htmlSource.match(/<script\b/g)||[]).length===(htmlSource.match(/<\/script>/g)||[]).length);
-ok('D5 cache-bust sürümleri release surface’te',/panel\.css\?v=[^"'\s]+/.test(htmlSource)&&/panel\.js\?v=[^"'\s]+/.test(htmlSource));
+ok('D5 cache-bust sürümleri release surface’te',/panel\/panel\.css\?v=[^"'\s]+/.test(htmlSource)&&/panel\/panel\.js\?v=[^"'\s]+/.test(htmlSource));
 var bootWatchdogAt=htmlSource.indexOf('window.__panelBootFailure');
-var panelScriptAt=htmlSource.indexOf('panel.js?v=');
+var panelScriptAt=htmlSource.indexOf('panel/panel.js?v=');
 var leafletScriptAt=htmlSource.indexOf('leaflet@1.9.4/dist/leaflet.js');
 ok('panel watchdog gerçek panel yükleyicilerinden önce çalışıyor',bootWatchdogAt>=0&&panelScriptAt>bootWatchdogAt&&leafletScriptAt>=0&&htmlSource.includes('leaflet@1.9.4/dist/leaflet.js" crossorigin=""/>')===false);
-ok('Leaflet panel çekirdeğinin parser’ını bloke etmiyor',/<script async src="https:\/\/unpkg\.com\/leaflet@1\.9\.4\/dist\/leaflet\.js"/.test(htmlSource)&&/panel\.js\?v=[^"'\s]+" onerror=/.test(htmlSource));
-ok('yerel panel modülleri sıralı defer ile yükleniyor',/defer src="panelCoverageManifest\.js\?v=/.test(htmlSource)&&/defer src="panel\.js\?v=/.test(htmlSource));
+ok('Leaflet panel çekirdeğinin parser’ını bloke etmiyor',/<script async src="https:\/\/unpkg\.com\/leaflet@1\.9\.4\/dist\/leaflet\.js"/.test(htmlSource)&&/panel\/panel\.js\?v=[^"'\s]+" onerror=/.test(htmlSource));
+ok('yerel panel modülleri sıralı defer ile yükleniyor',/defer src="panel\/panelCoverageManifest\.js\?v=/.test(htmlSource)&&/defer src="panel\/panel\.js\?v=/.test(htmlSource));
 ok('coverage manifest validator export ve schema v1 mevcut',manifestSource.includes('PanelCoverageV1')&&manifestSource.includes('schemaVersion:1'));
 ok('sync retry 409/422 bounded ve anti-clobber guard mevcut',/r\.status===409\|\|r\.status===422/.test(syncSource)&&/attempt<3/.test(syncSource)&&syncSource.includes('anti_clobber'));
 ok('offline/reconnect ve localhost push guard mevcut',syncSource.includes("retryIfPending:function")&&syncSource.includes("addEventListener('online'")&&syncSource.includes('devOrigin'));
 
 console.log('[2] Coverage, projection redaction ve secret scanner');
 var manifestContext={window:{},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Boolean:Boolean,Math:Math,isNaN:isNaN};
-vm.runInNewContext(manifestSource,manifestContext,{filename:'panelCoverageManifest.js'});
+vm.runInNewContext(manifestSource,manifestContext,{filename:'panel/panelCoverageManifest.js'});
 var P=manifestContext.window.PanelCoverageV1, data=makeProjectionData(), receipt={schemaVersion:1,status:'accepted',snapshotRevision:'b'.repeat(40),sourceUpdatedAt:'2026-08-03T10:00:00.000Z',submittedAt:'2026-08-03T10:00:01.000Z',acceptedAt:'2026-08-03T10:00:02.000Z',sourceLatestSha:'c'.repeat(40),lastErrorCode:null};
 ok('manifest validator sentetik fixture’ı unmapped bırakmıyor',!!P&&P.coverageForData(data).unmappedPaths.length===0);
 var snapshot=P&&P.buildObserverSnapshot(data,receipt,'2026-08-03T10:00:03.000Z'), snapshotJson=JSON.stringify(snapshot||{});

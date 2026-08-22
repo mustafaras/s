@@ -31,7 +31,7 @@ başlar.
 ## Güncel canonical yüzey
 
 - Ürün kaynağı: `app.js`, `sync.js`, `sw.js`, `app/core/reminder*.js`,
-  `panel.js`, `panel.css`, `panel.html`, `panelCoverageManifest.js`.
+  `panel/panel.js`, `panel/panel.css`, `panel.html`, `panel/panelCoverageManifest.js`.
 - Güvenlik ve release sınırı: [`APP-REMINDER-APPROVAL-GATE.md`](APP-REMINDER-APPROVAL-GATE.md).
 - App/current-panel/Panel-v2 sahipliği: [`APP-REMINDER-APP-PANEL-SURFACE-MAP.md`](APP-REMINDER-APP-PANEL-SURFACE-MAP.md).
 - Dondurma doğrulaması: [`verify-reminder-freeze.mjs`](verify-reminder-freeze.mjs).

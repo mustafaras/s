@@ -17,8 +17,8 @@ const vm = require("node:vm");
 const { assert, assertEqual, deepClone, deepEqual, runTests } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const COVERAGE_SOURCE = fs.readFileSync(path.join(ROOT, "panelCoverageManifest.js"), "utf8");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const COVERAGE_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panelCoverageManifest.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 
 const SHA_LATEST = "b".repeat(40);
 const REV_SNAPSHOT = "c".repeat(40);
@@ -46,7 +46,7 @@ function loadCoverage() {
   const context = {
     window: {}, Date, JSON, Array, Object, String, Number, Boolean, Math, isNaN, isFinite
   };
-  vm.runInNewContext(COVERAGE_SOURCE, context, { filename: "panelCoverageManifest.js" });
+  vm.runInNewContext(COVERAGE_SOURCE, context, { filename: "panel/panelCoverageManifest.js" });
   const api = context.window.PanelCoverageV1;
   if (!api) throw new Error("PanelCoverageV1 yüklenemedi");
   return api;
@@ -366,13 +366,13 @@ const cases = [
   ["the current panel manifest is not mixed with the Panel-v2 surface", () => {
     const P = loadCoverage();
     // Bu fixture yalnız repo kökündeki current panel adapter'ını yükler.
-    assert(fs.existsSync(path.join(ROOT, "panelCoverageManifest.js")));
+    assert(fs.existsSync(path.join(ROOT, "panel/panelCoverageManifest.js")));
     assertEqual(P.MANIFEST.manifestVersion, "panel-coverage-v1");
     assert(!COVERAGE_SOURCE.includes("panel-v2"));
     assert(!PANEL_SOURCE.includes("panel-v2"));
     // Panel-v2 ayrı bir tüketicidir ve unmappedPaths token'larını kendi audit
     // DOM'una basar; maskeleme bu yüzden kaynakta yapılır, tüketicide değil.
-    const panelV2 = fs.readFileSync(path.join(ROOT, "panel-v2.js"), "utf8");
+    const panelV2 = fs.readFileSync(path.join(ROOT, "panel/v2/panel-v2.js"), "utf8");
     assert(panelV2.includes("coverage.unmappedPaths"));
     // Panel-v2'nin ayrı bir coverage manifesti yoktur; aynı saf adapter'ı okur.
     assert(!fs.existsSync(path.join(ROOT, "panelCoverageManifestV2.js")));

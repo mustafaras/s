@@ -9,7 +9,7 @@ const vm = require("node:vm");
 const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 
 function extractTopLevelFunction(name) {
   const start = PANEL_SOURCE.indexOf("function " + name + "(");

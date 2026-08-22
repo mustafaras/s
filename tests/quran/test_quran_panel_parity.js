@@ -5,8 +5,8 @@
 'use strict';
 var fs=require('fs'),path=require('path');
 var root=require('../repo-root');
-var p1=fs.readFileSync(path.join(root,'panel.js'),'utf8');
-var p2=fs.readFileSync(path.join(root,'panel-v2.js'),'utf8');
+var p1=fs.readFileSync(path.join(root,'panel/panel.js'),'utf8');
+var p2=fs.readFileSync(path.join(root,'panel/v2/panel-v2.js'),'utf8');
 var h1=fs.readFileSync(path.join(root,'panel.html'),'utf8');
 var h2=fs.readFileSync(path.join(root,'panel-v2.html'),'utf8');
 var passed=0,failed=0;

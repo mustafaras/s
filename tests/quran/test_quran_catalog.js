@@ -10,7 +10,7 @@ var path = require('path');
 var vm = require('vm');
 var repoRoot = require('../repo-root');
 
-var SRC_FILE = 'quranRevelationOrderV1.js';
+var SRC_FILE = 'app/content/quranRevelationOrderV1.js';
 var TOTAL = 114;
 // Kûfe (Hafs) sayımına göre Kur’an’ın toplam âyet sayısı. Tek bir kayıttaki
 // yazım hatasını bile yakalayan çapraz bütünlük kontrolü.

@@ -9,7 +9,7 @@ var path = require('path');
 var vm = require('vm');
 var repoRoot = require('../repo-root');
 
-var SRC_FILE = 'quranTransportV1.js';
+var SRC_FILE = 'app/content/quranTransportV1.js';
 var AT = '2026-07-30T12:00:00.000Z';
 var AT2 = '2026-07-30T13:00:00.000Z';
 var RID = 'qr_abcd1234', RID2 = 'qr_efgh5678', RID3 = 'qr_ijkl9012';

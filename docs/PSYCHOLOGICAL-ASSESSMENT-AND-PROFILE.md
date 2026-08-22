@@ -195,7 +195,7 @@ Any personal psychological profile should be generated only from consented asses
 
 ## 6. Evidence and Source Files
 
-- [Profile assessment item bank and scoring map](../profileAssessmentV1.js)
+- [Profile assessment item bank and scoring map](../app/content/profileAssessmentV1.js)
 - [Scoring and deterministic report generator](../app.js)
 - [Data-safe app verification skill](../.claude/skills/run-seyma/SKILL.md)
 - [Core app VM driver](../.claude/skills/run-seyma/driver.mjs)

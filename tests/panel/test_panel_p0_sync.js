@@ -11,8 +11,8 @@ var vm = require('vm');
 var repoRoot = require('../repo-root');
 
 var syncSource = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
-var coverageSource = fs.readFileSync(path.join(repoRoot, 'panelCoverageManifest.js'), 'utf8');
-var panelSource = fs.readFileSync(path.join(repoRoot, 'panel.js'), 'utf8');
+var coverageSource = fs.readFileSync(path.join(repoRoot, 'panel/panelCoverageManifest.js'), 'utf8');
+var panelSource = fs.readFileSync(path.join(repoRoot, 'panel/panel.js'), 'utf8');
 var KEY = 'seyma-reset-v1';
 var HASH_A = 'a'.repeat(40);
 var HASH_B = 'b'.repeat(40);
@@ -115,7 +115,7 @@ function makeContext(seed, remoteDays, latestSha, revision){
     btoa:function(value){ return Buffer.from(String(value),'binary').toString('base64'); },
     Buffer:Buffer
   };
-  vm.runInNewContext(coverageSource,context,{filename:'panelCoverageManifest.js'});
+  vm.runInNewContext(coverageSource,context,{filename:'panel/panelCoverageManifest.js'});
   vm.runInNewContext(syncSource,context,{filename:'sync.js'});
   return {context:context,storage:storage,calls:calls,stateReceipts:stateReceipts,acceptedReceipts:acceptedReceipts};
 }

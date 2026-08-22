@@ -9,7 +9,7 @@ var path = require('path');
 var repoRoot = require('../repo-root');
 
 // Ayrıştırılmış panel JS kaynağını oku
-var html = fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var html = fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
 
 // ICONS map'i çıkar (icon() fonksiyonu için)
 var iconsMatch = html.match(/var ICONS\s*=\s*\{[\s\S]*?\};/);

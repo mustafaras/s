@@ -19,7 +19,7 @@ const { assert, assertEqual, deepEqual, runTests } = require("./helpers/reminder
 const ROOT = path.resolve(__dirname, "../..");
 const INDEX = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
-const STYLES = fs.readFileSync(path.join(ROOT, "styles.css"), "utf8");
+const STYLES = fs.readFileSync(path.join(ROOT, "app/styles.css"), "utf8");
 const MOBILE_MAX_WIDTH = 460;
 
 // app.js'in çalışma anında tercih ettiği saf modüller. Her satır bir
@@ -31,7 +31,7 @@ const RUNTIME_MODULES = [
   { global: "ReminderSchedulerV1", file: "app/core/reminderScheduler.js" }
 ];
 
-const BASE_FILES = ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js"];
+const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js"];
 
 function readSource(file) {
   return fs.readFileSync(path.join(ROOT, file), "utf8");
@@ -673,8 +673,8 @@ const cases = [
       impureApis.forEach((pattern) => assert(!pattern.test(source)));
     });
     const bare = scriptSources().map((src) => src.split("?")[0]);
-    assert(!bare.includes("panel.js"));
-    assert(!bare.includes("panel.css"));
+    assert(!bare.includes("panel/panel.js"));
+    assert(!bare.includes("panel/panel.css"));
   }]
 ];
 

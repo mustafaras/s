@@ -5,8 +5,8 @@ var fs=require('fs');
 var path=require('path');
 var vm=require('vm');
 var repoRoot=require('../repo-root');
-var manifestSource=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
-var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var manifestSource=fs.readFileSync(path.join(repoRoot,'panel/panelCoverageManifest.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){
@@ -20,7 +20,7 @@ function event(seq,id,device,when,summary){
 }
 
 var manifestContext={window:{},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Boolean:Boolean,Math:Math,isNaN:isNaN};
-vm.runInNewContext(manifestSource,manifestContext,{filename:'panelCoverageManifest.js'});
+vm.runInNewContext(manifestSource,manifestContext,{filename:'panel/panelCoverageManifest.js'});
 var P=manifestContext.window.PanelCoverageV1;
 if(!P){console.error('PanelCoverageV1 yüklenemedi');process.exit(1);}
 

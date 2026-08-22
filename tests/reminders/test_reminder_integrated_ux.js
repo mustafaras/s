@@ -24,10 +24,10 @@ const vm = require("node:vm");
 const { assert, assertEqual, runTests } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const APP_CSS = fs.readFileSync(path.join(ROOT, "styles.css"), "utf8");
+const APP_CSS = fs.readFileSync(path.join(ROOT, "app/styles.css"), "utf8");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
-const PANEL_CSS = fs.readFileSync(path.join(ROOT, "panel.css"), "utf8");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const PANEL_CSS = fs.readFileSync(path.join(ROOT, "panel/panel.css"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 const NOW = "2026-08-20T10:00:00.000Z";
 const PRIVATE = "REM71_PRIVATE_THERAPY_NOTE_MED_MOOD_PRAYER_JOURNAL";
 
@@ -185,7 +185,7 @@ function bootApp(options) {
   };
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   const context = vm.createContext(sandbox);
-  ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app.js"]
+  ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/reminderCatalog.js", "app.js"]
     .forEach((file) => vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file }));
   sandbox.App.start();
   sandbox.App.requestLocationGatePermission();

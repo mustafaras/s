@@ -92,7 +92,7 @@ async function main() {
   assert((html.match(/tabindex="-1"/g) || []).length >= 4, "pasif ana tablar tab sırasından çıkarılıyor");
   assert(html.includes('id="ae-live-region"') === false, "canlı bölge app içeriğiyle yeniden yaratılmıyor");
   assert(read("panel-v2.html").includes('id="ae-live-region"') && read("panel-v2.html").includes('aria-live="polite"'), "kalıcı screen-reader canlı bölgesi shell içinde");
-  assert(read("panel-v2.css").includes(".ae-sr-only"), "canlı bölge görsel olarak gizli yardımcı sınıfa sahip");
+  assert(read("panel/v2/panel-v2.css").includes(".ae-sr-only"), "canlı bölge görsel olarak gizli yardımcı sınıfa sahip");
 
   const tablist = { getAttribute: function(name) { return name === "role" ? "tablist" : ""; }, querySelectorAll: function() { return tabs; } };
   const today = makeNode({ role: "tab", "data-tab": "today", id: "ae-tab-today", parentElement: tablist }, a11yDoc);

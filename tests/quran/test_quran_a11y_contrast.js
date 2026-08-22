@@ -53,7 +53,7 @@ function composite(colorHex, alpha, backdropHex) {
 }
 
 // ── styles.css'ten gerçek değerleri çıkar ────────────────────────────────
-var CSS = fs.readFileSync(path.join(repoRoot, 'styles.css'), 'utf8');
+var CSS = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
 
 section('1. styles.css içinden gerçek renk değerleri okunuyor');
 function pickVar(block, name) {

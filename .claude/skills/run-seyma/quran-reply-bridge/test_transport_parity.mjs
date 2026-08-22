@@ -30,7 +30,7 @@ function section(t) { console.log('\n' + t); }
 const appSandbox = { console, window: {} };
 appSandbox.window.window = appSandbox.window;
 vm.createContext(appSandbox);
-vm.runInContext(fs.readFileSync(path.join(REPO, 'quranTransportV1.js'), 'utf8'), appSandbox, { filename: 'quranTransportV1.js' });
+vm.runInContext(fs.readFileSync(path.join(REPO, 'app/content/quranTransportV1.js'), 'utf8'), appSandbox, { filename: 'app/content/quranTransportV1.js' });
 const RealT = appSandbox.window.QuranTransportV1;
 
 // Apps Script kopyası hiçbir ambient global beklemez — düz üst seviye var.

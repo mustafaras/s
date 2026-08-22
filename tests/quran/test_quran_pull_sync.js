@@ -62,7 +62,7 @@ function setup(opts) {
     return Promise.resolve(mockRes(res));
   };
 
-  eval(fs.readFileSync(path.join(repoRoot, 'quranTransportV1.js'), 'utf8'));
+  eval(fs.readFileSync(path.join(repoRoot, 'app/content/quranTransportV1.js'), 'utf8'));
   eval(fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8'));
   return { sync: global.window.SeySync, calls: calls };
 }

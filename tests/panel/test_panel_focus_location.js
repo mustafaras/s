@@ -2,8 +2,8 @@
 
 var fs=require('fs'),path=require('path'),vm=require('vm');
 var repoRoot=require('../repo-root');
-var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
-var manifestSource=fs.readFileSync(path.join(repoRoot,'panelCoverageManifest.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
+var manifestSource=fs.readFileSync(path.join(repoRoot,'panel/panelCoverageManifest.js'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){ var start=panelSource.indexOf('function '+name+'('); if(start<0) throw new Error(name+' bulunamadı'); var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end); }
@@ -32,7 +32,7 @@ ok('konum bağlamı yalnız harita için gerekli alanları taşır',Object.keys(
 ok('Google Maps URL helper koordinatları encode eder',context.googleMapsUrlP?context.googleMapsUrlP(41.01,28.97)==='https://www.google.com/maps/search/?api=1&query=41.01,28.97':false);
 
 var manifestContext={window:{},Date:Date,JSON:JSON,Array:Array,Object:Object,String:String,Number:Number,Boolean:Boolean,Math:Math,isNaN:isNaN};
-vm.runInNewContext(manifestSource,manifestContext,{filename:'panelCoverageManifest.js'});
+vm.runInNewContext(manifestSource,manifestContext,{filename:'panel/panelCoverageManifest.js'});
 var safe=manifestContext.window.PanelCoverageV1.redactForObserver(source);
 ok('observer projection raw GPS redaction sınırını korur',safe.location&&!('lat' in safe.location)&&safe.locationHistory.every(function(x){return !('lat' in x)&&!('lng' in x);}));
 

@@ -21,7 +21,7 @@
   "authority": [
     "AGENTS.md",
     "CLAUDE.md",
-    "GELISTIRME-PLANI.md",
+    "docs/GELISTIRME-PLANI.md",
     ".claude/skills/run-seyma/SKILL.md",
     "tests/README.md",
     "docs/reminders/README.md",

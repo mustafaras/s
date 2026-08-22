@@ -4,9 +4,9 @@
 
 const { read, assert } = require("./helpers/panel-v2-test-helper");
 
-const css = read("panel-v2.css");
+const css = read("panel/v2/panel-v2.css");
 const html = read("panel-v2.html");
-const js = read("panel-v2.js");
+const js = read("panel/v2/panel-v2.js");
 
 function bodyFor(selector) {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -4,8 +4,8 @@
 
 const { read, assert } = require("./helpers/panel-v2-test-helper");
 
-const css = read("panel-v2.css");
-const js = read("panel-v2.js");
+const css = read("panel/v2/panel-v2.css");
+const js = read("panel/v2/panel-v2.js");
 
 function varRule(name, fallback) {
   const re = new RegExp(name + "s*:");

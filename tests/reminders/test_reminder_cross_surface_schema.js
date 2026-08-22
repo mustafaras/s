@@ -16,11 +16,11 @@ const {
 } = require("./helpers/reminder-test-helper");
 
 const ROOT = path.resolve(__dirname, "../..");
-const APP_FILES = ["profileAssessmentV1.js", "esmaulHusnaV1.js", "app/core/constants.js", "app.js"];
+const APP_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app.js"];
 const APP_SOURCE = APP_FILES.map((file) => ({ file, source: fs.readFileSync(path.join(ROOT, file), "utf8") }));
-const MANIFEST_SOURCE = fs.readFileSync(path.join(ROOT, "panelCoverageManifest.js"), "utf8");
+const MANIFEST_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panelCoverageManifest.js"), "utf8");
 const SYNC_SOURCE = fs.readFileSync(path.join(ROOT, "sync.js"), "utf8");
-const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel.js"), "utf8");
+const PANEL_SOURCE = fs.readFileSync(path.join(ROOT, "panel/panel.js"), "utf8");
 const HASH_SOURCE = "a".repeat(40);
 const HASH_LATEST = "b".repeat(40);
 const NOW = "2026-08-20T10:00:00.000Z";
@@ -104,7 +104,7 @@ function bootApp(seed) {
 
 function loadManifest() {
   const context = { window: {}, Date, JSON, Array, Object, String, Number, Boolean, Math, RegExp, isNaN, isFinite };
-  vm.runInNewContext(MANIFEST_SOURCE, context, { filename: "panelCoverageManifest.js" });
+  vm.runInNewContext(MANIFEST_SOURCE, context, { filename: "panel/panelCoverageManifest.js" });
   return context.window.PanelCoverageV1;
 }
 

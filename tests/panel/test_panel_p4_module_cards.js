@@ -3,7 +3,7 @@
 'use strict';
 var fs=require('fs'),path=require('path'),vm=require('vm');
 var repoRoot=require('../repo-root');
-var panelSource=fs.readFileSync(path.join(repoRoot,'panel.js'),'utf8');
+var panelSource=fs.readFileSync(path.join(repoRoot,'panel/panel.js'),'utf8');
 var passed=0,failed=0;
 function ok(name,condition,detail){ if(condition){passed++;console.log('  ✓ '+name);}else{failed++;console.log('  ✗ '+name+(detail?' — '+detail:''));} }
 function extractFunction(name){ var start=panelSource.indexOf('function '+name+'('); if(start<0) throw new Error(name+' bulunamadı'); var end=panelSource.indexOf('\nfunction ',start+10); return panelSource.slice(start,end<0?panelSource.length:end); }

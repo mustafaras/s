@@ -7,16 +7,16 @@ const { boot, read, assert } = require("./helpers/panel-v2-test-helper");
 const { dom, ctx, flushPromises } = boot();
 
 const panelHtml = read("panel-v2.html");
-const panelCss = read("panel-v2.css");
+const panelCss = read("panel/v2/panel-v2.css");
 
 assert(panelHtml.includes('<!DOCTYPE html>'), "panel-v2.html DOCTYPE var");
 assert(panelHtml.includes('html lang="tr"'), "panel-v2.html lang=tr");
 assert(panelHtml.includes('id="app"'), "panel-v2.html #app var");
-assert(panelHtml.includes('panel-v2.css'), "panel-v2.html CSS yükleniyor");
-assert(panelHtml.includes('panel-v2.js'), "panel-v2.html JS yükleniyor");
+assert(panelHtml.includes('panel/v2/panel-v2.css'), "panel-v2.html CSS yükleniyor");
+assert(panelHtml.includes('panel/v2/panel-v2.js'), "panel-v2.html JS yükleniyor");
 assert(panelHtml.includes('fonts.googleapis.com/css2?family=Inter'), "Inter font link'i var");
 assert(panelHtml.includes('JetBrains+Mono'), "JetBrains Mono font link'i var");
-assert(panelHtml.includes('panelCoverageManifest.js'), "panel-v2.html coverage manifest yükleniyor");
+assert(panelHtml.includes('panel/panelCoverageManifest.js'), "panel-v2.html coverage manifest yükleniyor");
 
 assert(panelCss.includes('.ae-card'), "panel-v2.css .ae-card var");
 assert(panelCss.includes('.ae-card--glass'), "panel-v2.css glass kart varyantı var");

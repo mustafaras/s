@@ -16,8 +16,8 @@ Eski `PANEL-DENETIM-MERKEZI` plan/prompt/ledger üçlüsü, current observer pan
 
 ## Güncel doğrulama
 
-- Current panel kaynakları `panel.html`, `panel.js`, `panel.css` ve
-  `panelCoverageManifest.js` dosyalarıdır.
+- Current panel kaynakları `panel.html`, `panel/panel.js`, `panel/panel.css` ve
+  `panel/panelCoverageManifest.js` dosyalarıdır.
 - `tests/panel/test_panel_*.js` fixture'ları current observer regression yüzeyidir.
 - Panel-v2 ayrı bir ürün/test scope'udur; iki panel yüzeyi birbirine
   karıştırılmaz.

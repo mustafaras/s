@@ -8,7 +8,7 @@ olarak yeniden canlandırmaz.
 ## Okuma sırası
 
 1. Root [`AGENTS.md`](../../AGENTS.md) ve gerekiyorsa [`CLAUDE.md`](../../CLAUDE.md)
-2. [`GELISTIRME-PLANI.md`](../../GELISTIRME-PLANI.md)
+2. [`GELISTIRME-PLANI.md`](../GELISTIRME-PLANI.md)
 3. [`.claude/skills/run-seyma/SKILL.md`](../../.claude/skills/run-seyma/SKILL.md)
    ve [`tests/README.md`](../../tests/README.md)
 4. Bu dosya, [`APP-REMINDER-STATE.json`](APP-REMINDER-STATE.json) ve

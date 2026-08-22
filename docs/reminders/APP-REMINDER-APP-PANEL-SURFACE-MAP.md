@@ -9,7 +9,7 @@ yüzeyleridir.
 | Aralık | Yüzey | Ana sahipler |
 |---|---|---|
 | REM-44..54 | Şeyma app runtime | `index.html`, `app.js`, `sync.js`, `sw.js`, `app/core/reminder*.js` |
-| REM-55..66 | Current ÆON observer panel | `panel.html`, `panel.js`, `panel.css`, `panelCoverageManifest.js` |
+| REM-55..66 | Current ÆON observer panel | `panel.html`, `panel/panel.js`, `panel/panel.css`, `panel/panelCoverageManifest.js` |
 | REM-67..72 | App → sync → projection → panel entegrasyonu | App, sync ve current panel sınırları |
 | Ayrı | ÆON Panel-v2 Premium | `panel-v2.*`, `tests/panel-v2/` |
 

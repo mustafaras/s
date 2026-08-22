@@ -123,8 +123,8 @@ function boot(opts) {
   ctx.fetch = function() { return Promise.resolve({ status: 200, ok: true, headers: {}, json: function() { return Promise.resolve({ days: {}, startDate: "2026-01-01" }); } }); };
 
   vm.createContext(ctx);
-  vm.runInContext(read("panelCoverageManifest.js"), ctx);
-  vm.runInContext(read("panel-v2.js"), ctx);
+  vm.runInContext(read("panel/panelCoverageManifest.js"), ctx);
+  vm.runInContext(read("panel/v2/panel-v2.js"), ctx);
 
   const helper = {
     dom: dom,

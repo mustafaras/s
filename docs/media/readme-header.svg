@@ -2,11 +2,20 @@
   <title id="title">ŞEYMA 🦩 and ÆON project header</title>
   <desc id="desc">A premium flamingo-inspired typographic header with flowing signal lines representing private observation, evidence and protected context.</desc>
   <defs>
+    <clipPath id="frameClip">
+      <rect width="1600" height="480" rx="32"/>
+    </clipPath>
     <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#111827"/>
-      <stop offset=".52" stop-color="#1a1a2a"/>
-      <stop offset="1" stop-color="#2b1d2a"/>
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset=".46" stop-color="#151c2f"/>
+      <stop offset=".78" stop-color="#211b30"/>
+      <stop offset="1" stop-color="#321d2b"/>
     </linearGradient>
+    <radialGradient id="flamingoGlow" cx="42%" cy="42%" r="64%">
+      <stop offset="0" stop-color="#ff8fa8" stop-opacity=".16"/>
+      <stop offset=".46" stop-color="#e65f8b" stop-opacity=".06"/>
+      <stop offset="1" stop-color="#e65f8b" stop-opacity="0"/>
+    </radialGradient>
     <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#73d6b2"/>
       <stop offset=".48" stop-color="#8fbce9"/>
@@ -28,12 +37,18 @@
       .eyebrow{fill:#abb4c2;font-size:14px;letter-spacing:.22em}
       .subtitle{fill:#d7dce4;font-size:20px;letter-spacing:.005em}
       .micro{fill:#8994a4;font-size:11px;letter-spacing:.16em}
+      .kicker{fill:#ffafbd;font-size:11px;font-weight:700;letter-spacing:.18em}
+      .chartMeta{fill:#aab5c5;font-size:11px;font-weight:700;letter-spacing:.15em}
     </style>
   </defs>
   <rect width="1600" height="480" rx="32" fill="url(#surface)"/>
   <rect x="1" y="1" width="1598" height="478" rx="31" fill="none" stroke="#354154"/>
+  <rect x="22" y="22" width="1556" height="436" rx="24" fill="none" stroke="#fff" stroke-opacity=".045"/>
+  <circle cx="606" cy="196" r="340" fill="url(#flamingoGlow)" clip-path="url(#frameClip)"/>
+  <path d="M52 296 C196 206 352 198 514 258 S780 340 924 250" fill="none" stroke="#ff91a7" stroke-opacity=".045" stroke-width="2"/>
   <path d="M0 382 C190 322 282 424 463 364 S765 254 951 322 S1255 422 1600 255" fill="none" stroke="#fff" stroke-opacity=".035" stroke-width="1"/>
   <path d="M0 410 C194 350 304 445 488 377 S772 281 965 343 S1284 443 1600 280" fill="none" stroke="#fff" stroke-opacity=".035" stroke-width="1"/>
+  <rect x="950" y="48" width="610" height="364" rx="24" fill="#08101d" fill-opacity=".18" stroke="#fff" stroke-opacity=".065"/>
   <g opacity=".42" stroke="#718098" stroke-width="1">
     <path d="M1010 76V402M1090 76V402M1170 76V402M1250 76V402M1330 76V402M1410 76V402M1490 76V402"/>
     <path d="M972 116H1542M972 176H1542M972 236H1542M972 296H1542M972 356H1542"/>
@@ -50,11 +65,14 @@
     <text x="88" y="226" class="wordmark" font-size="92">ŞEYMA</text>
     <text x="398" y="226" class="wordmark brandEmoji" font-size="112">🦩</text>
     <text x="540" y="226" class="wordmark" font-size="92">· ÆON</text>
+    <path d="M96 248 H824" fill="none" stroke="#ff91a7" stroke-opacity=".34" stroke-width="2"/>
     <text x="96" y="278" class="subtitle">A quiet system for noticing patterns without flattening a life into a score.</text>
-    <rect x="96" y="334" width="198" height="34" rx="17" fill="#3b2935" stroke="#87506a"/>
-    <circle cx="116" cy="351" r="5" fill="#ff91a7"/><text x="131" y="355" fill="#ffc1cb" font-size="11" letter-spacing=".12em">FLAMINGO-LED</text>
-    <rect x="310" y="334" width="198" height="34" rx="17" fill="#2c283e" stroke="#5a4e80"/>
-    <circle cx="330" cy="351" r="5" fill="#b9a0ff"/><text x="345" y="355" fill="#d2c6ff" font-size="11" letter-spacing=".12em">EVIDENCE-GATED</text>
+    <text x="96" y="321" class="kicker">FLAMINGO SIGNAL / PRIVATE BY DEFAULT</text>
+    <rect x="96" y="342" width="198" height="34" rx="17" fill="#3b2935" stroke="#87506a"/>
+    <circle cx="116" cy="359" r="5" fill="#ff91a7"/><text x="131" y="363" fill="#ffc1cb" font-size="11" letter-spacing=".12em">FLAMINGO-LED</text>
+    <rect x="310" y="342" width="198" height="34" rx="17" fill="#2c283e" stroke="#5a4e80"/>
+    <circle cx="330" cy="359" r="5" fill="#b9a0ff"/><text x="345" y="363" fill="#d2c6ff" font-size="11" letter-spacing=".12em">EVIDENCE-GATED</text>
+    <text x="978" y="88" class="chartMeta">PRIVATE SIGNAL FIELD / 04</text>
     <text x="96" y="414" class="micro">STATIC WEB · DETERMINISTIC QA · PROTECTED CONTEXT</text>
     <text x="1504" y="80" text-anchor="end" class="micro">README / SYSTEM BRIEF</text>
     <text x="1504" y="425" text-anchor="end" class="micro">OBSERVE → PROTECT → PROJECT → VERIFY</text>

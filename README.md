@@ -1,6 +1,7 @@
 <div align="center">
 
 <img src="docs/media/readme-header.svg" alt="ŞEYMA 🦩 · ÆON — flamingo-led private signals and evidence-first observation" width="100%">
+<br>
 
 <p>
   <a href="https://mustafaras.github.io/s/"><img src="https://img.shields.io/badge/live-GitHub%20Pages-111827?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live on GitHub Pages"></a>

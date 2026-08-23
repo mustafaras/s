@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-16",
-  "nextPrompt": "AD-17",
+  "lastCompletedPrompt": "AD-17",
+  "nextPrompt": "AD-18",
   "currentWave": "4",
   "totalPrompts": 52,
-  "completedPrompts": 16,
+  "completedPrompts": 17,
   "updatedAt": "2026-08-23",
-  "nextSafeAction": "Siradaki prompt: AD-17. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
+  "nextSafeAction": "Siradaki prompt: AD-18. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -60,7 +60,7 @@
       "prompts": "AD-17..AD-25",
       "topic": "keyboard access div->button",
       "approvalRequired": false,
-      "completed": 0,
+      "completed": 1,
       "total": 9
     },
     {

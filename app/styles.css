@@ -205,6 +205,9 @@
   /* Görsel boyut korunur, dokunma alanı 44pt'ye tamamlanır. */
   .sey-tiny-hit{position:relative;}
   .sey-tiny-hit::after{content:"";position:absolute;inset:-14px;}
+  /* Buton semantiği, div görünümü. */
+  .sey-asbtn{appearance:none;-webkit-appearance:none;background:none;border:0;padding:0;margin:0;
+    font:inherit;color:inherit;text-align:inherit;width:100%;display:block;cursor:pointer;}
   #root{
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
     --bg:var(--page);

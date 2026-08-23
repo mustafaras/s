@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-14` — Küçük hedefleri şeffaf alanla büyüt |
-| **Sıradaki** | `AD-15` |
+| **Son tamamlanan** | `AD-15` — 40px hedefleri 44px'e çıkar |
+| **Sıradaki** | `AD-16` |
 | **Güncel dalga** | `3` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-14. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-15. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 

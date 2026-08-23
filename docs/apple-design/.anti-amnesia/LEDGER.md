@@ -69,7 +69,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-13 | Kontrast doğrulayıcı + dalga 2 kapanışı | ✅ TAMAMLANDI | `7f99ad1` | S4+S5 geçti | verify-contrast.mjs eklendi (salt okuma, exit 1 = ihlal). Script kendi hesabımdaki 3 yuvarlama hatasını yakaladı: ok/watch/listen-ink 4.49'da kalmıştı, güvenlik payıyla düzeltildi. 20/20 token AA+. |
 
-| AD-14 | Küçük hedefleri şeffaf alanla büyüt | ✅ TAMAMLANDI | `PENDING` | S4+S5 geçti | Dört `min-height:16px` yüzeyine `.sey-tiny-hit` eklendi; görsel HTML farkı yalnızca class attribute'u, dokunma alanı şeffaf olarak genişliyor. |
+| AD-14 | Küçük hedefleri şeffaf alanla büyüt | ✅ TAMAMLANDI | `a4d72ab` | S4+S5 geçti | Dört `min-height:16px` yüzeyine `.sey-tiny-hit` eklendi; görsel HTML farkı yalnızca class attribute'u, dokunma alanı şeffaf olarak genişliyor. |
+
+| AD-15 | 40px hedefleri 44px'e çıkar | ✅ TAMAMLANDI | `PENDING` | S4+S5 geçti | Beş `min-height:40px` kontrolü `min-height:44px` oldu; başka 40px kontrolü app.js içinde kalmadı. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
@@ -81,7 +83,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | --- | --- | --- | --- |
 | 1 · Sıfır risk erişilebilirlik | AD-01 … AD-05 | 5/5 | ✅ tamamlandı |
 | 2 · `-ink` renk tokenları | AD-06 … AD-13 | 8/8 | ✅ tamamlandı |
-| 3 · Dokunma hedefleri | AD-14 … AD-16 | 1/3 | devam ediyor |
+| 3 · Dokunma hedefleri | AD-14 … AD-16 | 2/3 | devam ediyor |
 | 4 · Klavye erişimi | AD-17 … AD-25 | 0/9 | beklemede |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
@@ -89,7 +91,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **14/52** | |
+| | **Toplam** | **15/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

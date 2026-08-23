@@ -73,7 +73,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-15 | 40px hedefleri 44px'e çıkar | ✅ TAMAMLANDI | `10d34b0` | S4+S5 geçti | Beş `min-height:40px` kontrolü `min-height:44px` oldu; başka 40px kontrolü app.js içinde kalmadı. |
 
-| AD-16 | Dalga 3 kapanışı | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Cache-bust, tam headless doğrulama, değişmezlik karşılaştırması ve canonical S6 kayıtları tamamlandı; dalga 3 3/3, sıradaki AD-17. |
+| AD-16 | Dalga 3 kapanışı | ✅ TAMAMLANDI | `236e409` | S8+S4+S5 geçti | Cache-bust, tam headless doğrulama, değişmezlik karşılaştırması ve canonical S6 kayıtları tamamlandı; dalga 3 3/3, sıradaki AD-17. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

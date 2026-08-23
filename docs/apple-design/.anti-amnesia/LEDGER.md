@@ -91,7 +91,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-24 | Panel v1 dönüşümü | ✅ TAMAMLANDI | `5ac350b` | S8+S4+S5 geçti | Panel/panel.js içindeki 8 hedef dönüştürüldü; native yüzeyler `button.sey-asbtn`, nested-control kabukları klavye destekli role olarak kaldı. Panel CSS helper/cache-bust eklendi; panel testleri 50/50, handler/call dağılımı değişmedi. |
 
-| AD-25 | Dalga 4 kapanışı | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5+S6+S7 geçti | `index.html` ve `panel.html` cache-bust'ları güncel; tam headless gate geçti, app handler/call dağılımı ve I1–I5 sınırları değişmedi. Literal app `<div onclick>` 0, panel `<div onclick>` 2 role kabuğu. State dalga sayaçları düzeltilerek Dalga 4 9/9 ve `currentWave=5` yapıldı; açık kapı yok. |
+| AD-25 | Dalga 4 kapanışı | ✅ TAMAMLANDI | `d6c33b8` | S8+S4+S5+S6+S7 geçti | `index.html` ve `panel.html` cache-bust'ları güncel; tam headless gate geçti, app handler/call dağılımı ve I1–I5 sınırları değişmedi. Literal app `<div onclick>` 0, panel `<div onclick>` 2 role kabuğu. State dalga sayaçları düzeltilerek Dalga 4 9/9 ve `currentWave=5` yapıldı; açık kapı yok. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

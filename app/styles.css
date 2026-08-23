@@ -208,6 +208,11 @@
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);
     --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#816F76;
     --choc:#6B4A3A; --accent:#C77D93;
+    /* -ink: aynı rengin METİN varyantı. Dolgu/kenarlık değerleri yukarıda
+       olduğu gibi kalır (WCAG dolgu eşiği 3:1); yalnızca yazı 4.5:1'e çekilir.
+       Hue ve saturation korundu, yalnızca lightness düşürüldü. */
+    --accent-ink:#B55471; --warn-ink:#E0252B; --ok-ink:#368343;
+    --watch-ink:#A16729;  --listen-ink:#0D808C; --drop-ink:#9F6647;
     --field:rgba(255,248,243,0.7); --field-bd:rgba(108,74,58,0.15);
     --nav:rgba(255,255,255,0.85); --modal:#FFF8F3; --icon:rgba(255,248,243,0.8);
     --chatbar:rgba(252,247,250,0.28);
@@ -284,6 +289,9 @@
     --card:rgba(17,17,20,0.96); --card-bd:rgba(255,255,255,0.17);
     --text:#F8F8FA; --text2:#D8D8DE; --muted:#AFAFB9; --faint:#858590;
     --choc:#FFD9AA; --accent:#FFB1CF;
+    /* Koyu temada tüm tokenlar zaten AAA — ink doğrudan tokenı işaret eder. */
+    --accent-ink:var(--accent); --warn-ink:var(--warn); --ok-ink:var(--ok);
+    --watch-ink:var(--watch);   --listen-ink:var(--listen); --drop-ink:var(--drop);
     --field:#0B0B0E; --field-bd:rgba(255,255,255,0.20);
     --nav:rgba(5,5,7,0.97); --modal:#070709; --icon:#18181D;
     --chatbar:rgba(0,0,0,0.94);

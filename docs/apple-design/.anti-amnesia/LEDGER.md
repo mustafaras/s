@@ -53,7 +53,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-05 | Dalga 1 kapanışı | ✅ TAMAMLANDI | `9472187` | S4+S5 geçti | Cache-bust styles.css?v=20260823a; --faint 4.50:1 doğrulandı; dalga 1 tablosu 5/5. S4 tam kapı yeşil. |
 
-| AD-06 | -ink token tanımları | ✅ TAMAMLANDI | `f9e22bc` | S4+S5 geçti | Açık temaya 6 metin varyantı (accent/warn/ok/watch/listen/drop), koyu temaya var() alias. Hiçbir kullanım değişmedi; render birebir aynı. |
+| AD-06 | -ink token tanımları | ✅ TAMAMLANDI | `f9e22bc` | S4+S5 geçti | Açık temaya 6 metin varyantı (accent/warn/ok/watch/listen/drop), koyu temaya var() alias. Hiçbir kullanım değişmedi; render birebir aynı. NOT: ilk commit yalnızca defter içeriyordu (guard yanlış eşleşti — repoda zaten --qibla-ink/--saygi-ink vardı); CSS bir sonraki commit'te eklendi. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

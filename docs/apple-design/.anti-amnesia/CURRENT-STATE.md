@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-15` — 40px hedefleri 44px'e çıkar |
-| **Sıradaki** | `AD-16` |
-| **Güncel dalga** | `3` |
+| **Son tamamlanan** | `AD-16` — Dalga 3 kapanışı |
+| **Sıradaki** | `AD-17` |
+| **Güncel dalga** | `4` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-15. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-16. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 

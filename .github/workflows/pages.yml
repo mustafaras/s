@@ -74,6 +74,11 @@ jobs:
             --exclude '_site' \
             --exclude '*.md' \
             ./ _site/
+          # This standalone page is intentionally kept under archive/ in the
+          # repository, but is published at the stable public URL expected by
+          # existing links.
+          install -Dm644 archive/demos/profil-degerlendirme-174.html \
+            _site/profil-degerlendirme-174.html
           echo "--- staged size ---"
           du -sh _site
 
@@ -87,7 +92,8 @@ jobs:
                    panel/v2/panel-v2.js panel/v2/panel-v2.css \
                    app/content/profileAssessmentV1.js \
                    app/content/quranRevelationOrderV1.js \
-                   assets/aeon-icon-192.png assets/aeon-icon-512.png; do
+                   assets/aeon-icon-192.png assets/aeon-icon-512.png \
+                   profil-degerlendirme-174.html; do
             [ -f "_site/$f" ] || { echo "EKSIK: $f"; exit 1; }
           done
           [ -z "$(find _site -name '*.md' -print -quit)" ] || { echo "_site icinde .md kaldi"; exit 1; }

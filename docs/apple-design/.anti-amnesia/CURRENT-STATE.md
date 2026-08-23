@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-17` — `.sey-asbtn` yardımcı sınıfı |
-| **Sıradaki** | `AD-18` |
+| **Son tamamlanan** | `AD-18` — `div onclick` dönüşüm envanteri |
+| **Sıradaki** | `AD-19` |
 | **Güncel dalga** | `4` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-17. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-18. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 

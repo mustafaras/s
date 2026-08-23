@@ -77,6 +77,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-17 | `.sey-asbtn` yardımcı sınıfı | ✅ TAMAMLANDI | `b84f099` | S8+S4+S5 geçti | Yalnızca div görünümünü koruyan buton yardımcı sınıfı eklendi; hiçbir öğe dönüştürülmedi, handler/call yüzeyi değişmedi. |
 
+| AD-18 | Dönüşüm envanteri çıkar | ✅ TAMAMLANDI | `PENDING` | S4+S5 geçti | `app.js` 54 + `panel/panel.js` 8 olmak üzere 62 kayıt çıkarıldı; `button`/`role` stratejileri belirlendi, kod dosyaları değiştirilmedi. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -88,14 +90,14 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 1 · Sıfır risk erişilebilirlik | AD-01 … AD-05 | 5/5 | ✅ tamamlandı |
 | 2 · `-ink` renk tokenları | AD-06 … AD-13 | 8/8 | ✅ tamamlandı |
 | 3 · Dokunma hedefleri | AD-14 … AD-16 | 3/3 | ✅ tamamlandı |
-| 4 · Klavye erişimi | AD-17 … AD-25 | 1/9 | devam ediyor |
+| 4 · Klavye erişimi | AD-17 … AD-25 | 2/9 | devam ediyor |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 0/5 | onay bekliyor |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **17/52** | |
+| | **Toplam** | **18/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

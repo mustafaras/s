@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-09",
-  "nextPrompt": "AD-10",
+  "lastCompletedPrompt": "AD-10",
+  "nextPrompt": "AD-11",
   "currentWave": "2",
   "totalPrompts": 52,
-  "completedPrompts": 9,
+  "completedPrompts": 10,
   "updatedAt": "2026-08-23",
-  "nextSafeAction": "Siradaki prompt: AD-10. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
+  "nextSafeAction": "Siradaki prompt: AD-11. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -44,7 +44,7 @@
       "prompts": "AD-06..AD-13",
       "topic": "-ink colour token family",
       "approvalRequired": false,
-      "completed": 4,
+      "completed": 5,
       "total": 8
     },
     {

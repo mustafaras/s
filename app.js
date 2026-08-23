@@ -12931,7 +12931,7 @@ function magnesiumBannerHTML(date){
   h+='</div>';
   h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent-ink);">400 mg magnezyum</span> almayı unutma.</div>';
   if(nudge.blocked){
-    h+='<div style="font-size:12px;color:var(--watch);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
+    h+='<div style="font-size:12px;color:var(--watch-ink);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
   } else {
     h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
     h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
@@ -12972,7 +12972,7 @@ function magnesiumCardHTML(date){
   h+='</div>';
 
   if(s.kidneyDisease){
-    h+='<div style="font-size:13px;color:var(--watch);">Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.</div>';
+    h+='<div style="font-size:13px;color:var(--watch-ink);">Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.</div>';
   } else {
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
     h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:10.5px;color:var(--faint);">Kullanılan gün</div><div style="font-size:18px;font-weight:800;">'+stats.totalDays+'</div></div>';
@@ -13002,7 +13002,7 @@ function magnesiumCardHTML(date){
         h+='<div style="font-size:12.5px;color:var(--text2);">Etki / not</div>';
         h+='<input type="text" value="'+esc(mg.effectNote||'')+'" oninput="App.saveMgNote(this.value)" placeholder="Bugünkü etkisini kısaca yaz..." style="border:1px solid var(--field-bd);background:var(--field);border-radius:10px;padding:9px 10px;font-size:13px;outline:none;">';
         h+='<button onclick="App.editMagnesium()" style="align-self:flex-start;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-size:12px;font-weight:800;">Tamam</button>';
-        h+='<button onclick="App.deleteMgEntry()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--watch);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:700;">Sil</button>';
+        h+='<button onclick="App.deleteMgEntry()" style="align-self:flex-start;background:transparent;border:1.5px solid var(--card-bd);color:var(--watch-ink);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:700;">Sil</button>';
         h+='</div>';
       } else {
         if(mg.effectNote) h+='<div style="font-size:12px;color:var(--faint);padding:8px 10px;background:var(--card);border-radius:10px;">Not: '+esc(mg.effectNote)+'</div>';
@@ -16287,7 +16287,7 @@ function watchTodayView(){
   if(wEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+wEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
-    wEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--watch);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    wEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch-ink);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--watch-ink);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için izleme eklemedin. Bir bölüm bile keyiftir.</div>';
@@ -16297,7 +16297,7 @@ function watchTodayView(){
 function titleCard(t){
   var pct=titlePct(t); var meta=[]; meta.push(t.kind==='dizi'?'Dizi':'Film'); if(t.genre) meta.push(esc(t.genre));
   var h='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:9px;">';
-  h+='<div style="display:flex;align-items:flex-start;gap:11px;"><div style="width:44px;height:44px;border-radius:12px;background:var(--icon);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--watch);">'+icon('clapperboard',22)+'</div>';
+  h+='<div style="display:flex;align-items:flex-start;gap:11px;"><div style="width:44px;height:44px;border-radius:12px;background:var(--icon);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--watch-ink);">'+icon('clapperboard',22)+'</div>';
   h+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;"><span style="font-size:14.5px;font-weight:800;color:var(--text);">'+esc(t.title)+'</span>'+titleStatusChip(t.status)+'</div><div style="font-size:11.5px;color:var(--faint);margin-top:1px;">'+meta.join(' · ')+'</div></div>';
   h+='<button onclick="App.openTitleEdit(\''+esc(t.id)+'\')" aria-label="Düzenle" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:30px;height:30px;border-radius:9px;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('pen-line',13)+'</button></div>';
   if(t.status!=='finished'){
@@ -16305,22 +16305,22 @@ function titleCard(t){
       h+='<div style="display:flex;align-items:center;gap:9px;">';
       h+='<button onclick="App.advanceTitle(\''+esc(t.id)+'\',-1)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:var(--muted);background:var(--card);flex-shrink:0;">−</button>';
       h+='<div style="flex:1;min-width:0;">'+progBar(pct,'linear-gradient(90deg,#C88F4C,#E9AFC1)')+'<div style="font-size:11px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;"><span>'+t.watchedEp+(t.totalEp?' / '+t.totalEp+' bölüm':' bölüm')+'</span><span>%'+pct+'</span></div></div>';
-      h+='<button onclick="App.advanceTitle(\''+esc(t.id)+'\',1)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:var(--watch);background:var(--card);flex-shrink:0;">+</button>';
+      h+='<button onclick="App.advanceTitle(\''+esc(t.id)+'\',1)" style="border:1px solid var(--field-bd);cursor:pointer;width:30px;height:30px;border-radius:9px;font-size:15px;font-weight:800;color:var(--watch-ink);background:var(--card);flex-shrink:0;">+</button>';
       h+='</div>';
     }
     h+='<div style="display:flex;gap:7px;"><button onclick="App.finishTitle(\''+esc(t.id)+'\')" style="flex:1;border:none;cursor:pointer;padding:9px;border-radius:11px;font-size:12.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);display:flex;align-items:center;justify-content:center;gap:5px;">'+icon('check',13)+' Bitirdim</button>';
     if(t.status==='watching') h+='<button onclick="App.setTitleStatus(\''+esc(t.id)+'\',\'dropped\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--card);">Yarıda bıraktım</button>';
-    else h+='<button onclick="App.setTitleStatus(\''+esc(t.id)+'\',\'watching\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--watch);background:var(--card);">Devam et</button>';
+    else h+='<button onclick="App.setTitleStatus(\''+esc(t.id)+'\',\'watching\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:9px 12px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--watch-ink);background:var(--card);">Devam et</button>';
     h+='</div>';
   } else {
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'+starRow(t.rating,'App.rateTitle',t.id,17)+'<button onclick="App.reopenTitle(\''+esc(t.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:7px 12px;border-radius:11px;font-size:12px;font-weight:700;color:var(--watch);background:var(--card);">Yeniden izle</button></div>';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'+starRow(t.rating,'App.rateTitle',t.id,17)+'<button onclick="App.reopenTitle(\''+esc(t.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;padding:7px 12px;border-radius:11px;font-size:12px;font-weight:700;color:var(--watch-ink);background:var(--card);">Yeniden izle</button></div>';
     if(t.finishedAt) h+='<div style="font-size:11px;color:var(--faint);display:flex;align-items:center;gap:4px;">'+icon('trophy',12)+' '+esc(shortDate(fmt(new Date(t.finishedAt))))+' tarihinde bitti</div>';
   }
   return h+'</div>';
 }
 function watchArchiveView(){
   var W=ensureWatchlist();
-  var h='<button onclick="App.openTitleEdit(\'\')" style="border:1px dashed var(--watch);cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--watch);background:rgba(224,176,128,0.10);">＋ Film / dizi ekle</button>';
+  var h='<button onclick="App.openTitleEdit(\'\')" style="border:1px dashed var(--watch);cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--watch-ink);background:rgba(224,176,128,0.10);">＋ Film / dizi ekle</button>';
   var order={watching:0,finished:1,dropped:2};
   var items=W.items.slice().sort(function(a,b){ return (order[a.status]-order[b.status])||String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
   if(!items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Arşivin henüz boş<br>İzlemeye başladığın yapımı ekle, ilerlemen burada birik.</div>'; return h; }
@@ -16344,7 +16344,7 @@ function watchStatsView(){
 }
 function watchQuotesView(){
   var qs=allReplicas(); var W=ensureWatchlist();
-  var h='<button onclick="App.openReplicaAdd(\'\')" '+(W.items.length?'':'disabled ')+'style="border:1px dashed var(--watch);cursor:'+(W.items.length?'pointer':'not-allowed')+';width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--watch);background:rgba(224,176,128,0.10);opacity:'+(W.items.length?'1':'0.5')+';">＋ Replik ekle</button>';
+  var h='<button onclick="App.openReplicaAdd(\'\')" '+(W.items.length?'':'disabled ')+'style="border:1px dashed var(--watch);cursor:'+(W.items.length?'pointer':'not-allowed')+';width:100%;padding:12px;border-radius:14px;font-size:13.5px;font-weight:800;color:var(--watch-ink);background:rgba(224,176,128,0.10);opacity:'+(W.items.length?'1':'0.5')+';">＋ Replik ekle</button>';
   if(!W.items.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:16px 10px;">Replik eklemek için önce arşivine bir yapım ekle</div>'; return h; }
   if(!qs.length){ h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.6;padding:22px 10px;">Henüz replik yok<br>O unutamadığın repliği buraya bırak.</div>'; return h; }
   h+='<div style="display:flex;flex-direction:column;gap:10px;">';

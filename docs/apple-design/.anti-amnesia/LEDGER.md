@@ -89,7 +89,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-23 | Dönüşüm partisi 5/5 | ✅ TAMAMLANDI | `8a0696a` | S8+S4+S5 geçti | Envanter 45–54: kalan izin/reset/AEON overlay'leri klavye destekli hale geldi; AEON görsel yüzeyi native `button.sey-asbtn` oldu. Literal `<div onclick>` sayısı 0; role kabuklarında pointer ve Enter/Space davranışı korundu. `App` handler ve onclick dağılımı değişmedi. |
 
-| AD-24 | Panel v1 dönüşümü | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Panel/panel.js içindeki 8 hedef dönüştürüldü; native yüzeyler `button.sey-asbtn`, nested-control kabukları klavye destekli role olarak kaldı. Panel CSS helper/cache-bust eklendi; panel testleri 50/50, handler/call dağılımı değişmedi. |
+| AD-24 | Panel v1 dönüşümü | ✅ TAMAMLANDI | `5ac350b` | S8+S4+S5 geçti | Panel/panel.js içindeki 8 hedef dönüştürüldü; native yüzeyler `button.sey-asbtn`, nested-control kabukları klavye destekli role olarak kaldı. Panel CSS helper/cache-bust eklendi; panel testleri 50/50, handler/call dağılımı değişmedi. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

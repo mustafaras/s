@@ -206,7 +206,7 @@
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
     --bg:var(--page);
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);
-    --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#9C8C92;
+    --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#816F76;
     --choc:#6B4A3A; --accent:#C77D93;
     --field:rgba(255,248,243,0.7); --field-bd:rgba(108,74,58,0.15);
     --nav:rgba(255,255,255,0.85); --modal:#FFF8F3; --icon:rgba(255,248,243,0.8);

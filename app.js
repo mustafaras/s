@@ -5391,7 +5391,7 @@ function renderProfileItem(index){
   h+='</div>';
   h+='</div>';
   // alt: otomatik kayıt göstergesi + erişim linkleri
-  h+='<div style="min-height:16px;text-align:center;font-size:12px;font-weight:700;color:var(--ok,#6bbf7a);">'+(locked?'Kaydedildi ✓':'')+'</div>';
+  h+='<div class="sey-tiny-hit" style="min-height:16px;text-align:center;font-size:12px;font-weight:700;color:var(--ok,#6bbf7a);">'+(locked?'Kaydedildi ✓':'')+'</div>';
   if(isReview) h+='<div style="text-align:center;font-size:12px;color:var(--faint);">Önceki cevabını gözden geçiriyorsun — yeni bir seçim yaparsan güncellenir.</div>';
   h+='<div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;">';
   h+='<button onclick="App.profileAssessmentSOS()" style="border:none;background:transparent;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum</button>';
@@ -11905,7 +11905,7 @@ function heroPremiumStatsHTML(viewDate){
   h+=vline;
   h+=cell(null,'%'+wpct,'7 Günlük ritim');
   h+=vline;
-  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
+  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="sey-tiny-hit" style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:9px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
   h+='</div>';
   if(best&&worst&&best.key!==worst.key){
     h+='<div style="display:flex;gap:8px;border-top:1px solid var(--card-bd);padding-top:9px;font-size:11px;">';
@@ -13160,7 +13160,7 @@ function ayarlarHTML(){
   // repoya otomatik kayıt — ortak durum
   var sg=data.settings||{};
   h+='<div style="padding:6px 4px 0;"><div style="font-size:16px;font-weight:800;display:flex;align-items:center;gap:6px;">Repoya otomatik kayıt '+icon('save',15)+'</div></div>';
-  h+='<div id="sey-sync-status" style="font-size:12.5px;color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
+  h+='<div id="sey-sync-status" class="sey-tiny-hit" style="font-size:12.5px;color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
   // Doğrudan GitHub bağlantısı
   var connected=syncConfigured();
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Repoya bağlan '+(connected?'<span style="font-size:12px;font-weight:700;color:#3F8A4F;background:rgba(143,191,138,0.2);padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
@@ -13759,7 +13759,7 @@ function healthAppleCard(rec){
   _b+='<div style="font-size:13px;line-height:1.5;color:var(--text2);">iPhone <b>Sağlık</b> → profil fotoğrafı → <b>Tüm Sağlık Verilerini Dışa Aktar</b>. Oluşan <b>export.zip</b> içindeki <b>export.xml</b> dosyasını seç; bugünün adımı ve uykusu otomatik dolsun.</div>';
   _b+='<button onclick="App.importHealthClick()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:16px;font-size:15px;font-weight:700;color:var(--text);background:var(--card);display:flex;align-items:center;justify-content:center;gap:6px;">export.xml seç '+icon('download',15)+'</button>';
   _b+='<input type="file" id="sey-health-file" accept=".xml,text/xml,application/xml,.zip" onchange="App.importHealthFile(this)" style="display:none;">';
-  _b+='<div id="sey-health-status" style="font-size:12.5px;color:var(--faint);min-height:16px;"></div>';
+  _b+='<div id="sey-health-status" class="sey-tiny-hit" style="font-size:12.5px;color:var(--faint);min-height:16px;"></div>';
   return collapsibleCardHTML({key:'h-apple', icon:icon('apple',18), accent:A, title:'Apple Sağlık\'tan içe aktar', subtitle:'export.xml · adım & uyku otomatik', badge:'', open:cardOpen('h-apple'), body:_b, hint:'içe aktarmayı aç'});
 }
 CARD_BUILDERS['h-apple']=healthAppleCard;

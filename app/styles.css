@@ -202,6 +202,9 @@
   @media (prefers-reduced-motion: reduce){ .msg-enter,.aeon-typing-dots span,.aeon-scrollfab{animation:none!important;} }
   .dz-region{cursor:pointer;transition:fill .25s ease,opacity .25s ease;}
   .dz-on{animation:dzPulse 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box;}
+  /* Görsel boyut korunur, dokunma alanı 44pt'ye tamamlanır. */
+  .sey-tiny-hit{position:relative;}
+  .sey-tiny-hit::after{content:"";position:absolute;inset:-14px;}
   #root{
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
     --bg:var(--page);

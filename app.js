@@ -17321,8 +17321,8 @@ function replayAnswerPopup(){
 // iOS 16.4+ PWA ve modern Android/Chrome'da AEON'dan gelen mesaj/yanıt için
 // native kilit-ekranı / merkez bildirimi gösterir. Aç/kapa düğmesi yoktur;
 // izin verilene kadar 2 dk'da bir sessizce tekrar sorar.
-var AEON_ICON_URL='./aeon-icon-192.png';
-var AEON_BADGE_URL='./aeon-icon-192.png';
+var AEON_ICON_URL='./assets/aeon-icon-192.png';
+var AEON_BADGE_URL='./assets/aeon-icon-192.png';
 var aeonPermTimer=null;
 var aeonPermPrompted=false;
 var aeonShownThisSession={}; // aynı oturumda tekrar bildirim göstermemek için (id bazlı)

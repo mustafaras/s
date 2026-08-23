@@ -87,7 +87,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-22 | Dönüşüm partisi 4/5 | ✅ TAMAMLANDI | `a55f008` | S8+S4+S5 geçti | Envanter 34–44: düzenleme modalları ve acil durum/detay overlay'leri klavye destekli `role=button` oldu; iç form kontrolleri korunarak nested native button üretilmedi. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
 
-| AD-23 | Dönüşüm partisi 5/5 | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Envanter 45–54: kalan izin/reset/AEON overlay'leri klavye destekli hale geldi; AEON görsel yüzeyi native `button.sey-asbtn` oldu. Literal `<div onclick>` sayısı 0; role kabuklarında pointer ve Enter/Space davranışı korundu. `App` handler ve onclick dağılımı değişmedi. |
+| AD-23 | Dönüşüm partisi 5/5 | ✅ TAMAMLANDI | `8a0696a` | S8+S4+S5 geçti | Envanter 45–54: kalan izin/reset/AEON overlay'leri klavye destekli hale geldi; AEON görsel yüzeyi native `button.sey-asbtn` oldu. Literal `<div onclick>` sayısı 0; role kabuklarında pointer ve Enter/Space davranışı korundu. `App` handler ve onclick dağılımı değişmedi. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

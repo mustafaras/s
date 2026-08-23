@@ -10,11 +10,11 @@
 | | |
 | --- | --- |
 | **Program** | `APPLE-DESIGN-IOS27` |
-| **Durum** | `not_started` — hiçbir prompt uygulanmadı |
+| **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-00` (yalnızca kurulum: plan + promptbook + anti-amnesia dosyaları) |
-| **Sıradaki** | `AD-01` — `index.html` viewport yakınlaştırma kilidini kaldır |
-| **Güncel dalga** | `1` (sıfır risk erişilebilirlik) |
+| **Son tamamlanan** | `AD-01` — Yakınlaştırma kilidi kaldırıldı |
+| **Sıradaki** | `AD-02` |
+| **Güncel dalga** | `1` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 

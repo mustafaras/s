@@ -41,7 +41,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | Prompt | Kısa Ad | Durum | Commit | Testler | Notlar |
 |--------|---------|-------|--------|---------|--------|
-| AD-00 | Program kurulumu | ✅ TAMAMLANDI | _(bu commit)_ | — | Plan, 52 promptluk promptbook, anti-amnesia + ledger + state.json oluşturuldu. Uygulama koduna dokunulmadı. |
+| AD-00 | Program kurulumu | ✅ TAMAMLANDI | `b151d09` | — | Plan, 52 promptluk promptbook, anti-amnesia + ledger + state.json oluşturuldu. Uygulama koduna dokunulmadı. |
+
+| AD-01 | Yakınlaştırma kilidi kaldırıldı | ✅ TAMAMLANDI | `4a11a3a` | S4+S5 geçti | index.html:5 maximum-scale=1 silindi; viewport-fit=cover korundu. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

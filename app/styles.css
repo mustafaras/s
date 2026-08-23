@@ -1451,3 +1451,10 @@
     --card-bd:rgba(0,0,0,.28);
   }
 }
+
+/* Zorlanmış renk modunda (Windows High Contrast, macOS Increase Contrast +
+   renk filtreleri) cam ve gölge okunabilirliği bozar; sistem renklerine bırak. */
+@media (forced-colors: active){
+  .glass{backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText;}
+  button{forced-color-adjust:none;}
+}

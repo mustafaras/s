@@ -49,6 +49,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-03 | Increase Contrast desteği | ✅ TAMAMLANDI | `af08fd3` | S4+S5 geçti | Dosya sonuna @media (prefers-contrast: more) bloğu; --muted->--text2, --faint->--muted, kenarlık koyulaştı. Varsayılan yol değişmedi. |
 
+| AD-04 | forced-colors güvenlik ağı | ✅ TAMAMLANDI | `d048692` | S4+S5 geçti | @media (forced-colors: active): cam kapanır, kenarlık CanvasText'e döner, buton forced-color-adjust:none. Yalnızca zorlanmış renk modunda etkin. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

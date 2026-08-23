@@ -16703,8 +16703,8 @@ function modalsHTML(){
     h+='</div></div>';
   }
   if(ui.locationConsent){
-    h+='<div onclick="App.cancelLocationConsent()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
+    h+='<div role="button" tabindex="0" onclick="App.cancelLocationConsent()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelLocationConsent();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
     h+='<div style="font-size:19px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
     h+='<p style="margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
     h+='<p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
@@ -16713,8 +16713,8 @@ function modalsHTML(){
   }
   if(ui.locNudgeOpen){
     var lnB=(ui.locNudgeShown&&ui.locNudgeShown.length)?ui.locNudgeShown:[LOC_BENEFITS[0]];
-    h+='<div onclick="App.locNudgeDismiss()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
+    h+='<div role="button" tabindex="0" onclick="App.locNudgeDismiss()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.locNudgeDismiss();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
     h+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:2px;">';
     h+='<div style="flex-shrink:0;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#3F8A4F;background:linear-gradient(135deg,#DFF5DA,#C9E8C4);box-shadow:0 6px 16px rgba(125,190,119,0.35);">'+icon('map-pin',22)+'</div>';
     h+='<div style="flex:1;min-width:0;"><div style="font-size:18.5px;font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:12.5px;color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir.</div></div>';
@@ -16731,8 +16731,8 @@ function modalsHTML(){
   }
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
-    h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:19px;font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:14.5px;line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+    h+='<div role="button" tabindex="0" onclick="App.cancelReset()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelReset();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:19px;font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:14.5px;line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
   }
   return h;
 }
@@ -18245,7 +18245,7 @@ function aeonMediaSlotHTML(it,bg,fg){
   var elId='aeon-media-'+it.mediaId;
   if(it.mediaKind==='image'){
     var ratio=(it.w&&it.h)?(it.w+'/'+it.h):'1/1';
-    return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="image" onclick="App.aeonOpenImage(\''+it.mediaId+'\')" style="width:210px;max-width:58vw;aspect-ratio:'+ratio+';border-radius:14px;overflow:hidden;background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;color:'+fg+';"><span style="font-size:12.5px;opacity:.75;">Yükleniyor…</span></div>';
+    return '<button type="button" id="'+elId+'" class="aeon-media-slot sey-asbtn" data-media-id="'+esc(it.mediaId)+'" data-media-kind="image" onclick="App.aeonOpenImage(\''+it.mediaId+'\')" style="width:210px;max-width:58vw;aspect-ratio:'+ratio+';border-radius:14px;overflow:hidden;background:'+bg+';display:flex;align-items:center;justify-content:center;cursor:pointer;color:'+fg+';"><span style="font-size:12.5px;opacity:.75;">Yükleniyor…</span></button>';
   }
   if(it.mediaKind==='file'){
     return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="file" style="color:'+fg+';min-width:170px;"><span style="font-size:12.5px;opacity:.75;display:flex;align-items:center;gap:4px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
@@ -18292,8 +18292,8 @@ function aeonAttachSheetHTML(){
     {ic:'file-text',label:'Belge',sub:'PDF, Word, Excel ve diğer dosyalar',kind:'file'},
     {ic:'music',label:'Ses dosyası',sub:'Cihazından hazır bir ses kaydı yükle',kind:'audio'}
   ];
-  var h='<div id="aeon-attach-back" onclick="App.aeonCloseAttachSheet()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:24px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .22s ease;">';
+  var h='<div id="aeon-attach-back" role="button" tabindex="0" onclick="App.aeonCloseAttachSheet()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.aeonCloseAttachSheet();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:420px;background:var(--modal);border-radius:24px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .22s ease;">';
   h+='<div style="padding:12px 12px 8px;font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">ÆON’a gönder</div>';
   items.forEach(function(it){
     h+='<button onclick="App.aeonSheetPick(\''+it.kind+'\')" style="display:flex;align-items:center;gap:13px;text-align:left;border:none;background:none;cursor:pointer;padding:10px 12px;border-radius:16px;width:100%;">';

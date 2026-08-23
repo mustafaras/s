@@ -55,6 +55,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-06 | -ink token tanımları | ✅ TAMAMLANDI | `f9e22bc` | S4+S5 geçti | Açık temaya 6 metin varyantı (accent/warn/ok/watch/listen/drop), koyu temaya var() alias. Hiçbir kullanım değişmedi; render birebir aynı. NOT: ilk commit yalnızca defter içeriyordu (guard yanlış eşleşti — repoda zaten --qibla-ink/--saygi-ink vardı); CSS bir sonraki commit'te eklendi. |
 
+| AD-07 | --accent metin taşındı | ✅ TAMAMLANDI | `d03ed57` | S4+S5 geçti | 36 metin kullanımı color:var(--accent-ink) oldu (2.97:1 -> 4.50:1). Dolgu/kenarlık kullanımları dokunulmadı. Negatif lookbehind ile background-color/border-color korundu. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

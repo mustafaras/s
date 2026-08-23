@@ -5131,7 +5131,7 @@ function habitRowHTML(o){
   h+='<button onclick="'+esc(o.onclick)+'"'+(o.warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(o.pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;">';
   h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(o.locked?hexA(o.accent,0.12):'var(--icon)')+';color:'+(o.locked?o.accent:'var(--text)')+';">'+o.icon+'</div>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(o.title)+(o.derived?'<span style="font-size:9px;font-weight:800;letter-spacing:.6px;color:'+(o.done?'#3F8A4F':o.accent)+';background:'+(o.done?'rgba(143,191,138,0.2)':hexA(o.accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
-  if(o.done){ h+='<div style="font-size:13px;color:var(--accent);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(o.msg)+'</div>'; }
+  if(o.done){ h+='<div style="font-size:13px;color:var(--accent-ink);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(o.msg)+'</div>'; }
   else if(o.locked){ var pct=Math.min(100,Math.max(0,Math.round(((o.prog.cur||0)/o.prog.goal)*100))); h+='<div style="font-size:12.5px;color:'+o.accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(o.key,o.prog))+'</div>'; if(!o.prog.binary){ h+='<div style="height:6px;border-radius:999px;background:'+hexA(o.accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(o.accent,0.65)+','+o.accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
   else { h+='<div style="font-size:13px;color:'+(o.warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(o.sub)+'</div>'; }
   h+='</div>';
@@ -10018,8 +10018,8 @@ function psychHTML(){
   h+='<div style="flex:1;height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .35s cubic-bezier(.4,1.2,.5,1);position:relative;overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.5) 50%,transparent 70%);animation:seyShine 2.4s ease-in-out infinite;"></span></div></div>';
   h+='<div style="flex-shrink:0;font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;">'+(idx+1)+'/'+T+'</div>';
   h+='</div>';
-  h+='<div style="font-size:12.5px;font-weight:700;color:var(--accent);text-align:center;margin-top:-4px;animation:seyFade .45s ease;">'+psychMotiv(idx,T)+'</div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><span style="font-size:20px;">'+s.icon+'</span><span style="font-size:12.5px;font-weight:800;letter-spacing:0.5px;color:var(--accent);text-transform:uppercase;">'+esc(s.title)+'</span></div>';
+  h+='<div style="font-size:12.5px;font-weight:700;color:var(--accent-ink);text-align:center;margin-top:-4px;animation:seyFade .45s ease;">'+psychMotiv(idx,T)+'</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><span style="font-size:20px;">'+s.icon+'</span><span style="font-size:12.5px;font-weight:800;letter-spacing:0.5px;color:var(--accent-ink);text-transform:uppercase;">'+esc(s.title)+'</span></div>';
   if(qi===0) h+='<div style="font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:-6px;">'+esc(s.intro)+'</div>';
   h+='<div style="animation:seyFloatIn .32s ease both;">';
   h+='<div style="font-size:19px;font-weight:700;line-height:1.45;color:var(--text);margin:2px 0 10px;">'+esc(node.item.q)+'</div>';
@@ -10089,7 +10089,7 @@ function nutriInsightHTML(rec,nu){
   var items=nu.items||0;
   var pg=proteinGoal();
   var wrap=function(inner){ return '<div style="background:linear-gradient(160deg,rgba(201,184,255,0.10),transparent);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:11px;">'
-    +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('brain',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--accent);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
+    +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('brain',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--accent-ink);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
   var row=function(ic,col,title,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;">'
     +'<span style="width:26px;height:26px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%, var(--icon));">'+icon(ic,14)+'</span>'
     +'<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:800;color:var(--text);line-height:1.3;">'+title+'</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:1px;">'+text+'</div></div></div>'; };
@@ -10138,7 +10138,7 @@ function beslenmeCardHTML(rec){
     var items=Array.isArray(mi[m.key])?mi[m.key]:[];
     var sub=mealNutr(rec,m.key);
     b+='<div style="display:flex;flex-direction:column;gap:8px;">';
-    b+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:11.5px;font-weight:700;color:var(--accent);">'+Math.round(sub.protein)+'g P · '+Math.round(sub.calories)+' kcal</div></div>';
+    b+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:11.5px;font-weight:700;color:var(--accent-ink);">'+Math.round(sub.protein)+'g P · '+Math.round(sub.calories)+' kcal</div></div>';
     items.forEach(function(it,idx){
       b+='<div style="display:flex;gap:6px;align-items:center;">';
       b+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:13.5px;outline:none;">';
@@ -10168,7 +10168,7 @@ function targetsCardHTML(rec){
   var sleep=tOk?t.sleepHours:sleepGoalHours();
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
-  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',17)+'</span>Hedeflerim</div>';
+  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',17)+'</span>Hedeflerim</div>';
   if(tOk) h+='<div style="font-size:10.5px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
   else h+='<div style="font-size:10.5px;color:var(--warn);">henüz hesaplanmadı</div>';
   h+='</div>';
@@ -10201,7 +10201,7 @@ function waterCard(rec){
   var g=waterGoalCups(activeDate());
   var pct=Math.min(100,Math.round(w/g*100));
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent);font-size:16px;">'+w+'</b> / '+g+' bardak</div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent-ink);font-size:16px;">'+w+'</b> / '+g+' bardak</div></div>';
   h+='<div style="display:flex;gap:5px;">';
   for(var i=0;i<g;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);color:#fff;':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?icon('droplet',14):'')+'</div>'; }
   h+='</div>';
@@ -10224,7 +10224,7 @@ function energyStressBlock(rec){
   var en=rec?rec.energy:null, st=rec?rec.stress:null;
   function scale(label,ic,cur,fn,lo,hi,grad){
     var s='<div style="display:flex;flex-direction:column;gap:6px;">';
-    s+='<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--text);"><span style="display:inline-flex;color:var(--muted);">'+ic+'</span>'+label+(cur!=null?'<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent);">'+cur+'/5</span>':'')+'</div>';
+    s+='<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--text);"><span style="display:inline-flex;color:var(--muted);">'+ic+'</span>'+label+(cur!=null?'<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent-ink);">'+cur+'/5</span>':'')+'</div>';
     s+='<div style="display:flex;gap:6px;">';
     for(var v=1;v<=5;v++){ var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:38px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:800;transition:all .18s;'+(sel?'background:linear-gradient(135deg,'+grad+');border:1px solid transparent;color:#fff;box-shadow:0 6px 14px rgba(150,110,120,0.28);transform:translateY(-2px);':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+'">'+v+'</button>'; }
     s+='</div>';
@@ -10255,7 +10255,7 @@ function moodCardHTML(rec){
   var open=cardOpen('mood', !allSet);
   var ed=editing();
   var mo0=curMood?find(MOODS,'id',curMood):null;
-  var badge=mo0?('<span style="display:inline-flex;color:var(--accent);">'+icon(mo0.icon,22)+'</span>'):'';
+  var badge=mo0?('<span style="display:inline-flex;color:var(--accent-ink);">'+icon(mo0.icon,22)+'</span>'):'';
   var subParts=[];
   if(mo0) subParts.push(esc(mo0.short));
   if(en!=null) subParts.push('Enerji '+en);
@@ -10271,7 +10271,7 @@ function moodCardHTML(rec){
   if(mo0) b+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo0.resp)+'</div>';
   b+=energyStressBlock(rec);
   var interp=moodInterp(curMood,en,st);
-  if(interp) b+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:linear-gradient(160deg,rgba(201,184,255,0.12),transparent);border-radius:12px;padding:10px 12px;display:flex;gap:7px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent);">'+icon('lightbulb',14)+'</span><span>'+esc(interp)+'</span></div>';
+  if(interp) b+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:linear-gradient(160deg,rgba(201,184,255,0.12),transparent);border-radius:12px;padding:10px 12px;display:flex;gap:7px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('lightbulb',14)+'</span><span>'+esc(interp)+'</span></div>';
   return collapsibleCardHTML({key:'mood', id:'card-mood', icon:icon('cloud-sun',18), accent:'var(--pause)', title:(ed?'O günün modu':'Bugünün modu'), subtitle:subtitle, badge:badge, open:open, body:b, hint:'modunu işaretle'});
 }
 CARD_BUILDERS.mood=moodCardHTML;
@@ -10293,19 +10293,19 @@ function reflectionCardHTML(rec){
   var gratFilled=gratArr.filter(function(g){return String(g||'').trim();}).length;
   var filled=(String(note).trim()?1:0)+gratFilled;
   var open=cardOpen('reflection', filled===0);
-  var badge=filled>0?'<span style="font-size:11px;font-weight:800;color:var(--accent);">'+filled+'</span>':'';
+  var badge=filled>0?'<span style="font-size:11px;font-weight:800;color:var(--accent-ink);">'+filled+'</span>':'';
   var refParts=[]; if(String(note).trim()) refParts.push('not'); if(gratFilled>0) refParts.push(gratFilled+' güzel şey');
   var refSub=refParts.length?refParts.join(' · '):'birkaç cümle bırak, kendine iyi gelsin';
   var prompt=REFLECT_PROMPTS[(Math.max(1,dayIndexFor(activeDate()))-1)%REFLECT_PROMPTS.length]||REFLECT_PROMPTS[0];
   var gratPh=['örn. Sabah kahvem','örn. Bir arkadaşın mesajı','örn. Güneşli hava'];
   var b='';
   b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Duyguları yazıya dökmek ve minnet, ruh hâlini toparlamanın en kanıtlı iki yoludur. Birkaç cümle bile bugüne iyi gelir.</div>';
-  b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent);">'+icon('feather',15)+'</span><div style="font-size:13px;color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
+  b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('feather',15)+'</span><div style="font-size:13px;color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
   var hasJournal=rec&&rec.journal&&String(rec.journal.text||'').trim();
   b+='<button onclick="App.openJournalModal()" style="border:none;cursor:pointer;width:100%;padding:14px 15px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 65%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .12s ease,box-shadow .2s ease;">'+(hasJournal?'<span>Bugünün ışığı yazıldı ✨</span>':'<span>Günlük Işığı\'nı aç 🦩</span>')+'</button>';
   b+='<div><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;">'+(ed?'O gün kendine notun':'Bugün kendime notum')+'</div>';
   b+='<textarea oninput="App.onNote(this)" placeholder="Aklından geçeni serbestçe yaz…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;color:var(--text);">'+esc(note)+'</textarea></div>';
-  b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:13px;font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11px;color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
+  b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:13px;font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11px;color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
   for(var i=0;i<3;i++){ var gv=(gratArr[i]!=null)?gratArr[i]:''; b+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span><input type="text" value="'+esc(gv)+'" oninput="App.onGratitude('+i+',this)" placeholder="'+gratPh[i]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14.5px;outline:none;color:var(--text);"></div>'; }
   b+='</div>';
   return collapsibleCardHTML({key:'reflection', id:'card-reflection', icon:icon('pen-line',18), accent:'var(--sun)', title:(ed?'O günün yansıması':'Günün yansıması'), subtitle:refSub, badge:badge, open:open, body:b, hint:'yansımanı yaz', cardStyle:'background:linear-gradient(160deg,rgba(246,193,119,0.10),rgba(233,175,193,0.06));'});
@@ -11888,7 +11888,7 @@ function heroPremiumStatsHTML(viewDate){
   var streak=currentStreak();
   // mod eğilimi (son 7 gün, eski → yeni)
   var moodDots='';
-  for(var j=6;j>=0;j--){ var dd=addDays(viewDate,-j); if(diffDays(data.startDate,dd)<0) continue; var r=data.days[dd]; var m=r&&r.mood?r.mood:null; if(m){ var moo=find(MOODS,'id',m); moodDots+='<span style="display:inline-flex;color:var(--accent);">'+icon(moo?moo.icon:'circle',13)+'</span>'; } else { moodDots+='<span style="width:6px;height:6px;border-radius:50%;background:var(--field-bd);display:inline-block;"></span>'; } }
+  for(var j=6;j>=0;j--){ var dd=addDays(viewDate,-j); if(diffDays(data.startDate,dd)<0) continue; var r=data.days[dd]; var m=r&&r.mood?r.mood:null; if(m){ var moo=find(MOODS,'id',m); moodDots+='<span style="display:inline-flex;color:var(--accent-ink);">'+icon(moo?moo.icon:'circle',13)+'</span>'; } else { moodDots+='<span style="width:6px;height:6px;border-radius:50%;background:var(--field-bd);display:inline-block;"></span>'; } }
   if(!moodDots) moodDots='<span style="font-size:12px;color:var(--faint);">—</span>';
   // son 14 günün tik başarımı → en güçlü / destek isteyen
   var win=14,stt={};
@@ -11910,7 +11910,7 @@ function heroPremiumStatsHTML(viewDate){
   if(best&&worst&&best.key!==worst.key){
     h+='<div style="display:flex;gap:8px;border-top:1px solid var(--card-bd);padding-top:9px;font-size:11px;">';
     h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:#3F8A4F;flex-shrink:0;">'+best.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[best.key]||best.key)+'</b> en güçlü <span style="color:#3F8A4F;font-weight:800;">%'+Math.round(best.rate*100)+'</span></span></div>';
-    h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:var(--accent);flex-shrink:0;">'+worst.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[worst.key]||worst.key)+'</b>\'e destek <span style="color:var(--accent);font-weight:800;">%'+Math.round(worst.rate*100)+'</span></span></div>';
+    h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:var(--accent-ink);flex-shrink:0;">'+worst.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[worst.key]||worst.key)+'</b>\'e destek <span style="color:var(--accent-ink);font-weight:800;">%'+Math.round(worst.rate*100)+'</span></span></div>';
     h+='</div>';
   }
   h+='</div>';
@@ -11947,11 +11947,11 @@ function heroScienceLine(rec){
   else if(isVacationDay(activeDate())) txt='Tatil modunda esneklik var; küçük bir adım, bir bardak su ve kendi kendine nazik bir cümle yeter.';
   else txt='Küçük ve tutarlı adımlar, güçlü iradeden daha kalıcıdır — beyin (nöroplastisite) böyle öğrenir.';
   return '<div style="display:flex;align-items:flex-start;gap:8px;">'
-    +'<span style="flex-shrink:0;color:var(--accent);display:inline-flex;margin-top:1px;">'+icon('brain',14)+'</span>'
+    +'<span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',14)+'</span>'
     +'<span style="font-size:11.5px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>';
 }
 // Sayfalar arası tutarlı bilimsel mikro-bilgi rozeti (Rapor/Sağlık/Takvim vb.).
-function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:11px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
+function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:11px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
 // Ortak sayfa başlığı (bugün sayfası dışındaki sekmelerle görsel uyum için).
 function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:13px;color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
 // ── Raşit'in Kriz Odaları: üçlü, Raşit-temalı buton. Her biri süreli-bilimsel bir modal açar. ──
@@ -12112,7 +12112,7 @@ function bugunHTML(){
   // ── Niyet + bilimsel mikro-bilgi — hafif, üstten ayraçlı (fazla çerçeve yok) ──
   h+='<div style="border-top:1px solid var(--card-bd);padding-top:13px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;flex-direction:column;gap:7px;">';
-  h+='<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">'+(ed?'O GÜNÜN NİYETİ':'BUGÜNÜN NİYETİ')+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">'+(ed?'O GÜNÜN NİYETİ':'BUGÜNÜN NİYETİ')+'</span></div>';
   h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="'+(ed?'O günün niyeti…':'örn. Bugün kendime nazik olacağım')+'" maxlength="140" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px 13px;font-size:15px;font-weight:700;outline:none;color:var(--text);">';
   h+='</div>';
   h+=heroScienceLine(rec);
@@ -12691,7 +12691,7 @@ function weekSelfCard(){
   h+='<div style="display:flex;flex-direction:column;gap:9px;">';
   rows.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:11px;"><span style="width:24px;display:flex;justify-content:center;">'+r[0]+'</span><span style="flex:1;font-size:13.5px;color:var(--text2);">'+r[1]+'</span><span style="font-size:14px;font-weight:800;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
   h+='</div>';
-  if(moodLink) h+='<div style="font-size:13px;font-weight:600;color:var(--accent);background:var(--card);border-radius:14px;padding:11px 13px;">'+moodLink+'</div>';
+  if(moodLink) h+='<div style="font-size:13px;font-weight:600;color:var(--accent-ink);background:var(--card);border-radius:14px;padding:11px 13px;">'+moodLink+'</div>';
   h+='</div>';
   return h;
 }
@@ -12731,7 +12731,7 @@ function consistencyMomentumCard(){
   var momTxt=momentum==null?'—':((momentum>0?'+':'')+String(momentum).replace('.',','));
   var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:10px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
+  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
   h+='<div style="display:flex;gap:8px;">'+tile('%'+consist,'Tutarlılık (30g)','var(--accent)')+tile(active30+'/30','Aktif gün','#5BA85B')+tile(momTxt,'Momentum (7g)',momCol)+'</div>';
   if(hasWd){
     h+='<div style="display:flex;flex-direction:column;gap:6px;"><div style="font-size:11.5px;font-weight:700;color:var(--muted);">Haftanın günleri (son 8 hafta)</div>';
@@ -12900,7 +12900,7 @@ function magnesiumFeedbackHTML(date){
   var form=find(MG_FORMS,'id',yRec.magnesium.form)||MG_FORMS[0];
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">DÜNÜN ETKİSİ</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',20)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">DÜNÜN ETKİSİ</span></div>';
   h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">Dün '+esc(form.label)+' almıştın. Uykuna, krampına veya genel hissetine yardımcı oldu mu?</div>';
   h+='<div style="display:flex;gap:8px;">';
   h+='<button onclick="App.saveMgFeedback(true)" style="flex:1;background:rgba(143,191,138,0.15);border:1.5px solid rgba(143,191,138,0.4);color:#3F8A4F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Evet, faydalıydı</button>';
@@ -12925,11 +12925,11 @@ function magnesiumBannerHTML(date){
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',20)+'</span>';
-  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent);">MAGNESYUM HATIRLATICISI</span>';
+  h+='<span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',20)+'</span>';
+  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">MAGNESYUM HATIRLATICISI</span>';
   h+='<span style="margin-left:auto;font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
   h+='</div>';
-  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent);">400 mg magnezyum</span> almayı unutma.</div>';
+  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent-ink);">400 mg magnezyum</span> almayı unutma.</div>';
   if(nudge.blocked){
     h+='<div style="font-size:12px;color:var(--watch);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
   } else {
@@ -12961,7 +12961,7 @@ function magnesiumCardHTML(date){
   var h='';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
-  h+='<span style="display:inline-flex;color:var(--accent);">'+icon('pill',22)+'</span>';
+  h+='<span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',22)+'</span>';
   h+='<div style="flex:1;">';
   h+='<div style="font-size:14px;font-weight:800;color:var(--text);">Magnezyum Hatırlatıcısı</div>';
   h+='<div style="font-size:12px;color:var(--muted);">Güçlü sinyal · Skor '+nudge.score+'/100</div>';
@@ -13052,7 +13052,7 @@ function raporHTML(){
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+htToday()+'</div></div>';
   h+=trendBars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)')+'</div>';
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Alışkanlık oranları (30 gün)</div>';
-  HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
+  HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent-ink);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
   h+=sciNote('Bir alışkanlık ne kadar sık tekrarlanırsa nöral yolu o kadar güçlenir (nöroplastisite); %60+ oran, davranışın otomatikleşmeye başladığını gösterir.');
   h+='</div>';
   // ── Ruhsal eğilim (30 gün) — fiziksel trendlerin yanında zihinsel sağlık ──
@@ -13091,7 +13091,7 @@ function raporHTML(){
   var months=monthlySummary();
   if(months.length){ var moN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
     h+='<div style="padding:4px 4px 0;"><div style="font-size:17px;font-weight:800;">Aylık özet</div></div>';
-    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="glass" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
+    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="glass" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent-ink);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
   }
   h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Minik Kurallar '+icon('leaf',20)+'</div></div>';
   h+='<div class="glass" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
@@ -13113,7 +13113,7 @@ function ayarlarHTML(){
   var _lastSync=data.lastSyncDate?(data.lastSyncDate===todayStr()?'bugün':esc(data.lastSyncDate)):'henüz yok';
   var _conn=syncConfigured();
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
+  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
   [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
   h+='</div>';
@@ -13148,8 +13148,8 @@ function ayarlarHTML(){
   var sgh=data.settings||{};
   if(sgh.hideLocationCard||sgh.hideRepoBanner){
     h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Gizlenen kartlar '+icon('sparkles',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Bugün ekranında sakladığın kartları tek dokunuşla geri getir.</div>';
-    if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:12.5px;font-weight:800;color:var(--accent);">Geri getir</span></button>';
-    if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:12.5px;font-weight:800;color:var(--accent);">Geri getir</span></button>';
+    if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:12.5px;font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
+    if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:12.5px;font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
     h+='</div>';
   }
   h+=settingsBtn('App.printReport()','Rapor oluştur / PDF',icon('file-text',17));
@@ -13494,7 +13494,7 @@ function bodyCard(rec){
   var targets=data.settings.targets||{};
   var tOk=(typeof targets.calories==='number'&&typeof targets.protein==='number');
   h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:16px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent);">'+icon('target',13)+'</span>Kişiselleştirilmiş hedefler</div>';
+  h+='<div style="font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',13)+'</span>Kişiselleştirilmiş hedefler</div>';
   if(tOk){
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
     h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:9px;color:var(--faint);">Kalori</div><div style="font-size:14px;font-weight:800;color:var(--text);">'+targets.calories+'</div><div style="font-size:9px;color:var(--faint);">kcal</div></div>';

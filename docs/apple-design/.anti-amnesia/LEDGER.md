@@ -43,31 +43,31 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 |--------|---------|-------|--------|---------|--------|
 | AD-00 | Program kurulumu | ✅ TAMAMLANDI | `b151d09` | — | Plan, 52 promptluk promptbook, anti-amnesia + ledger + state.json oluşturuldu. Uygulama koduna dokunulmadı. |
 
-| AD-01 | Yakınlaştırma kilidi kaldırıldı | ✅ TAMAMLANDI | `4a11a3a` | S4+S5 geçti | index.html:5 maximum-scale=1 silindi; viewport-fit=cover korundu. |
+| AD-01 | Yakınlaştırma kilidi kaldırıldı | ✅ TAMAMLANDI | `a02284c` | S4+S5 geçti | index.html:5 maximum-scale=1 silindi; viewport-fit=cover korundu. `cb3d2df` yalnızca AD-01 durum metadata düzeltmesidir; ledger artık erişilebilir commit'i gösterir. |
 
-| AD-02 | --faint kontrastı AA | ✅ TAMAMLANDI | `bcf0f1b` | S4+S5 geçti | Açık tema --faint #9C8C92 (3.06:1) -> #816F76 (4.50:1). Hue/saturation korundu, 316 metin kullanımı etkilendi. Koyu tema #858590 dokunulmadı. |
+| AD-02 | --faint kontrastı AA | ✅ TAMAMLANDI | `6acbf57` | S4+S5 geçti | Açık tema --faint #9C8C92 (3.06:1) -> #816F76 (4.50:1). Hue/saturation korundu, 316 metin kullanımı etkilendi. Koyu tema #858590 dokunulmadı. |
 
-| AD-03 | Increase Contrast desteği | ✅ TAMAMLANDI | `af08fd3` | S4+S5 geçti | Dosya sonuna @media (prefers-contrast: more) bloğu; --muted->--text2, --faint->--muted, kenarlık koyulaştı. Varsayılan yol değişmedi. |
+| AD-03 | Increase Contrast desteği | ✅ TAMAMLANDI | `c4a36a0` | S4+S5 geçti | Dosya sonuna @media (prefers-contrast: more) bloğu; --muted->--text2, --faint->--muted, kenarlık koyulaştı. Varsayılan yol değişmedi. |
 
-| AD-04 | forced-colors güvenlik ağı | ✅ TAMAMLANDI | `d048692` | S4+S5 geçti | @media (forced-colors: active): cam kapanır, kenarlık CanvasText'e döner, buton forced-color-adjust:none. Yalnızca zorlanmış renk modunda etkin. |
+| AD-04 | forced-colors güvenlik ağı | ✅ TAMAMLANDI | `ce1d358` | S4+S5 geçti | @media (forced-colors: active): cam kapanır, kenarlık CanvasText'e döner, buton forced-color-adjust:none. Yalnızca zorlanmış renk modunda etkin. |
 
-| AD-05 | Dalga 1 kapanışı | ✅ TAMAMLANDI | `9472187` | S4+S5 geçti | Cache-bust styles.css?v=20260823a; --faint 4.50:1 doğrulandı; dalga 1 tablosu 5/5. S4 tam kapı yeşil. |
+| AD-05 | Dalga 1 kapanışı | ✅ TAMAMLANDI | `1d5671b` | S4+S5 geçti | Cache-bust styles.css?v=20260823a; --faint 4.50:1 doğrulandı; dalga 1 tablosu 5/5. S4 tam kapı yeşil. |
 
-| AD-06 | -ink token tanımları | ✅ TAMAMLANDI | `f9e22bc` | S4+S5 geçti | Açık temaya 6 metin varyantı (accent/warn/ok/watch/listen/drop), koyu temaya var() alias. Hiçbir kullanım değişmedi; render birebir aynı. NOT: ilk commit yalnızca defter içeriyordu (guard yanlış eşleşti — repoda zaten --qibla-ink/--saygi-ink vardı); CSS bir sonraki commit'te eklendi. |
+| AD-06 | -ink token tanımları | ✅ TAMAMLANDI | `c1c4d4f` | S4+S5 geçti | Açık temaya 6 metin varyantı (accent/warn/ok/watch/listen/drop), koyu temaya var() alias. Hiçbir kullanım değişmedi; render birebir aynı. `a8609af` metadata-only ilk denemeydi; final CSS commit'i olarak erişilebilir `c1c4d4f` kaydedildi. |
 
-| AD-07 | --accent metin taşındı | ✅ TAMAMLANDI | `d03ed57` | S4+S5 geçti | 36 metin kullanımı color:var(--accent-ink) oldu (2.97:1 -> 4.50:1). Dolgu/kenarlık kullanımları dokunulmadı. Negatif lookbehind ile background-color/border-color korundu. |
+| AD-07 | --accent metin taşındı | ✅ TAMAMLANDI | `c2d86dc` | S4+S5 geçti | 36 metin kullanımı color:var(--accent-ink) oldu (2.97:1 -> 4.50:1). Dolgu/kenarlık kullanımları dokunulmadı. Negatif lookbehind ile background-color/border-color korundu. |
 
-| AD-08 | --warn metin taşındı | ✅ TAMAMLANDI | `19a8f29` | S4+S5 geçti | 8 metin kullanımı taşındı (3.76:1 -> 4.50:1). 4 adet background-color/border-color kullanımı bilinçli olarak korundu — dolgu WCAG eşiği 3:1. |
+| AD-08 | --warn metin taşındı | ✅ TAMAMLANDI | `2730918` | S4+S5 geçti | 8 metin kullanımı taşındı (3.76:1 -> 4.50:1). 4 adet background-color/border-color kullanımı bilinçli olarak korundu — dolgu WCAG eşiği 3:1. |
 
-| AD-09 | --ok metin taşındı | ✅ TAMAMLANDI | `7929ca0` | S4+S5 geçti | 11 metin kullanımı taşındı (3.39:1 -> 4.50:1). 4 dolgu/kenarlık kullanımı ve --ok-bg dokunulmadı. |
+| AD-09 | --ok metin taşındı | ✅ TAMAMLANDI | `b8d5138` | S4+S5 geçti | 11 metin kullanımı taşındı (3.39:1 -> 4.50:1). 4 dolgu/kenarlık kullanımı ve --ok-bg dokunulmadı. |
 
-| AD-10 | --watch metin taşındı | ✅ TAMAMLANDI | `e1cade4` | S4+S5 geçti | 11 metin kullanımı taşındı (3.69:1 -> 4.50:1). --watch-bg dokunulmadı. |
+| AD-10 | --watch metin taşındı | ✅ TAMAMLANDI | `0642668` | S4+S5 geçti | 11 metin kullanımı taşındı (3.69:1 -> 4.50:1). --watch-bg dokunulmadı. |
 
-| AD-11 | --listen metin taşındı | ✅ TAMAMLANDI | `1bbd0d3` | S4+S5 geçti | 5 metin kullanımı taşındı (3.71:1 -> 4.50:1). --listen-bg dokunulmadı. |
+| AD-11 | --listen metin taşındı | ✅ TAMAMLANDI | `d6e4c09` | S4+S5 geçti | 5 metin kullanımı taşındı (3.71:1 -> 4.50:1). --listen-bg dokunulmadı. |
 
-| AD-12 | --drop metin taşındı | ✅ TAMAMLANDI | `5ca60dc` | S4+S5 geçti | 1 metin kullanımı taşındı (3.79:1 -> 4.50:1). --drop-bg ve dolgu kullanımları dokunulmadı. |
+| AD-12 | --drop metin taşındı | ✅ TAMAMLANDI | `2161154` | S4+S5 geçti | 1 metin kullanımı taşındı (3.79:1 -> 4.50:1). --drop-bg ve dolgu kullanımları dokunulmadı. |
 
-| AD-13 | Kontrast doğrulayıcı + dalga 2 kapanışı | ✅ TAMAMLANDI | `fd7f38b` | S4+S5 geçti | verify-contrast.mjs eklendi (salt okuma, exit 1 = ihlal). Script kendi hesabımdaki 3 yuvarlama hatasını yakaladı: ok/watch/listen-ink 4.49'da kalmıştı, güvenlik payıyla düzeltildi. 20/20 token AA+. |
+| AD-13 | Kontrast doğrulayıcı + dalga 2 kapanışı | ✅ TAMAMLANDI | `7f99ad1` | S4+S5 geçti | verify-contrast.mjs eklendi (salt okuma, exit 1 = ihlal). Script kendi hesabımdaki 3 yuvarlama hatasını yakaladı: ok/watch/listen-ink 4.49'da kalmıştı, güvenlik payıyla düzeltildi. 20/20 token AA+. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

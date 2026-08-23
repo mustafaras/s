@@ -18,7 +18,7 @@
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-13. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alinabilir (I6).
+**Uygulanan promptlar:** AD-01 … AD-13. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 

@@ -85,7 +85,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-21 | Dönüşüm partisi 3/5 | ✅ TAMAMLANDI | `0b83430` | S8+S4+S5 geçti | Envanter 23–33: kıble, Saygı, okuma/ruh ve kitap/alinti modal kabukları iç içe kontroller nedeniyle klavye destekli `role=button` oldu; mevcut callback/handler çağrıları korundu. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
 
-| AD-22 | Dönüşüm partisi 4/5 | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Envanter 34–44: düzenleme modalları ve acil durum/detay overlay'leri klavye destekli `role=button` oldu; iç form kontrolleri korunarak nested native button üretilmedi. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
+| AD-22 | Dönüşüm partisi 4/5 | ✅ TAMAMLANDI | `a55f008` | S8+S4+S5 geçti | Envanter 34–44: düzenleme modalları ve acil durum/detay overlay'leri klavye destekli `role=button` oldu; iç form kontrolleri korunarak nested native button üretilmedi. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

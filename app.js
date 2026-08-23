@@ -6120,12 +6120,22 @@ function collapsibleCardHTML(o){
     : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
   var h='<div id="'+esc(o.id||('card-'+o.key))+'" class="glass sey-ccard" data-cardkey="'+esc(o.key)+'" data-open="'+(open?'1':'0')+'" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+(o.cardStyle||'')+'">';
   h+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+accent+',transparent);"></span>';
-  h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  // Başlık satırı: aç/kapa butonu rozeti SARMAZ. Rozet kendi içinde buton
+  // taşıyabiliyor (ör. konum kartındaki "Gizle" + açma anahtarı); buton içinde
+  // buton HTML5'te geçersizdir, ayrıştırıcı dış butonu erken kapatıp açık
+  // div'leri de yutuyor ve kart yığını kaydırma kabının dışına düşüyordu.
+  h+='<div class="sey-ccard-head" style="display:flex;align-items:center;gap:11px;">';
+  h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;flex:1;min-width:0;width:auto;">';
   if(o.icon) h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+o.icon+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
+  h+='</button>';
   if(o.badge) h+='<div style="flex-shrink:0;">'+o.badge+'</div>';
+  // Chevron da dokunulabilir kalsın diye buton; klavye/ekran okuyucu için tek
+  // kontrol yeterli olduğundan sıradan çıkarılır (tabindex=-1 + aria-hidden).
+  h+='<button type="button" class="sey-asbtn" tabindex="-1" aria-hidden="true" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;display:flex;align-items:center;flex-shrink:0;width:auto;">';
   h+='<span class="sey-collchev" style="color:'+accent+';display:inline-flex;flex-shrink:0;transition:transform .25s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
   h+='</button>';
+  h+='</div>';
   if(open){
     h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
   } else if(o.hint!==false){
@@ -10909,7 +10919,7 @@ function motivationTodayCardHTML(){
   h+='</div>';
   if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
   h+='<span style="color:'+pu+';font-size:20px;font-weight:700;line-height:1;flex-shrink:0;">›</span>';
-  h+='</button>';
+  h+='</div>';
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<div style="flex:1;min-width:0;font-size:13px;line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
@@ -10917,7 +10927,7 @@ function motivationTodayCardHTML(){
   h+='</div>';
   h+='<div style="height:6px;border-radius:999px;background:var(--icon);overflow:hidden;position:relative;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
   h+='<div style="text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
-  h+='</div>';
+  h+='</button>';
   return h;
 }
 // Tam ekran "Terapi Odası" — dokununca animasyonlu açılır; el yazısı imza (büyük

@@ -81,6 +81,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-19 | Dönüşüm partisi 1/5 | ✅ TAMAMLANDI | `d598a3b` | S8+S4+S5 geçti | Envanter 1–11: güvenli yüzeyler native `button.sey-asbtn`, iç içe etkileşimli yüzeyler klavye destekli `role=button`; `App` handler ve onclick dağılımı değişmedi. app.js cache-bust `20260823d`; kaynakta 48 `<div onclick>` kaldı. |
 
+| AD-19-FIX | AD-19 iç içe buton regresyonu | ✅ TAMAMLANDI | — (commit bekliyor) | S4 kapısı geçti; 7 sekmede yapı taraması temiz | Konum kartı rozeti (`hidePill` + anahtar) native başlık butonunun içinde kalınca buton-içinde-buton oluştu; ayrıştırıcı Bugün kart yığınını `.sey-main-scroll` dışına düşürdü, `overflow:hidden` kartlar 2–34px'e ezildi. Rozet başlık butonunun dışına, chevron `tabindex=-1 aria-hidden` ayrı butona alındı; görsel sıra ve 11px boşluk korundu. `motivationTodayCardHTML` içindeki yer değişmiş `</div>`/`</button>` de düzeltildi. Cache-bust `20260823i`; I1–I4 dokunulmadı. |
+
 | AD-20 | Dönüşüm partisi 2/5 | ✅ TAMAMLANDI | `510aaeb` | S8+S4+S5 geçti | Envanter 12–22: günlük fotoğrafı/overlay yüzeyleri klavye destekli `role=button`, güvenli kart ve dropdown başlıkları native `button.sey-asbtn`; ısı hücreleri yalnız tıklanabilir durumda native buton oldu. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
 
 | AD-21 | Dönüşüm partisi 3/5 | ✅ TAMAMLANDI | `0b83430` | S8+S4+S5 geçti | Envanter 23–33: kıble, Saygı, okuma/ruh ve kitap/alinti modal kabukları iç içe kontroller nedeniyle klavye destekli `role=button` oldu; mevcut callback/handler çağrıları korundu. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
@@ -148,6 +150,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | Panel-v2 token kontrastı | tümü AA+ | Referans uygulama |
 | `App.<name>` handler sayısı | sabit | I2 |
 | `onclick="App.…"` dağılımı | sabit | I2 |
+| Render çıktısında iç içe `<button>` | 0 | Ayrıştırıcı kart yığınını kabından düşürüyor (AD-19-FIX) |
 | `safe-area-inset` kullanımı | app 35, panel 4+7 | Zaten doğru |
 | Panel-v2 fixture sayısı | 27 geçer | Regresyon kapısı |
 

@@ -20,6 +20,8 @@
 
 **Uygulanan promptlar:** AD-01 … AD-25. Dalga 4 tamamen kapandı; ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır. AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
+**Program dışı onarım — `AD-19-FIX` (2026-08-23):** AD-19'un native `<button>` dönüşümü, kart başlığında iç içe buton üretiyordu (konum kartı rozeti). HTML5 ayrıştırıcı kart yığınını `.sey-main-scroll` dışına düşürdüğü için Bugün sekmesindeki `overflow:hidden` kartlar eziliyordu. Rozet başlık butonunun dışına alındı, chevron ayrı `tabindex=-1 aria-hidden` butona taşındı; `motivationTodayCardHTML` içindeki yer değiştirmiş `</div>`/`</button>` düzeltildi. Ayrıntı ve kanıt: [`LEDGER.md`](LEDGER.md) `AD-19-FIX` satırı. Prompt sayacı değişmedi — bu bir onarım, yeni prompt değil.
+
 ---
 
 ## Canonical kapsam

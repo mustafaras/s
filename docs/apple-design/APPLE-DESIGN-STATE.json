@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-21",
-  "nextPrompt": "AD-22",
+  "lastCompletedPrompt": "AD-22",
+  "nextPrompt": "AD-23",
   "currentWave": "4",
   "totalPrompts": 52,
-  "completedPrompts": 21,
+  "completedPrompts": 22,
   "updatedAt": "2026-08-23",
-  "nextSafeAction": "Siradaki prompt: AD-22. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
+  "nextSafeAction": "Siradaki prompt: AD-23. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -36,7 +36,7 @@
       "prompts": "AD-01..AD-05",
       "topic": "zero-risk accessibility",
       "approvalRequired": false,
-      "completed": 5,
+      "completed": 6,
       "total": 5
     },
     {

@@ -12375,7 +12375,7 @@ function journalModalHTML(){
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
   h+='<div id="sey-journal-streak" style="font-size:12px;font-weight:800;color:var(--journal);background:color-mix(in srgb,var(--journal) 12%,var(--card));border:1px solid color-mix(in srgb,var(--journal) 25%,var(--card-bd));border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('flame',13)+streak+' günlük seri</div>';
   h+='<div style="font-size:12px;font-weight:800;color:var(--text2);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('target',13)+(met?'Hedef tamamlandı':'Hedef: '+goal.words+' kelime')+'</div>';
-  if(hasSaved) h+='<div style="font-size:12px;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--card));border:1px solid color-mix(in srgb,var(--ok) 25%,var(--card-bd));border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('check-circle',13)+'Bugün kaydedildi</div>';
+  if(hasSaved) h+='<div style="font-size:12px;font-weight:800;color:var(--ok-ink);background:color-mix(in srgb,var(--ok) 12%,var(--card));border:1px solid color-mix(in srgb,var(--ok) 25%,var(--card-bd));border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:5px;">'+icon('check-circle',13)+'Bugün kaydedildi</div>';
   h+='</div>';
 
   h+='</div>';
@@ -12984,7 +12984,7 @@ function magnesiumCardHTML(date){
     if(mg && mg.taken){
       var todayPct=Math.min(100,Math.round((mg.mg||0)/recDose*100));
       h+='<div style="display:flex;flex-direction:column;gap:8px;">';
-      h+='<div style="font-size:15px;font-weight:700;color:var(--ok);display:flex;align-items:center;gap:6px;">'+icon('circle-check',16)+' Bugün '+esc(form.label)+' kaydedildi.</div>';
+      h+='<div style="font-size:15px;font-weight:700;color:var(--ok-ink);display:flex;align-items:center;gap:6px;">'+icon('circle-check',16)+' Bugün '+esc(form.label)+' kaydedildi.</div>';
       h+='<div style="font-size:13px;color:var(--muted);">Alınan: '+esc((mg.mg||0)+' mg')+' · Günlük hedefin %'+todayPct+'\'si · Saat: '+esc(mg.time||'—')+'</div>';
       if(ui.mgEditing){
         h+='<div style="display:flex;flex-direction:column;gap:10px;">';

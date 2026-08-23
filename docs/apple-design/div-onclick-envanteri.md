@@ -39,16 +39,16 @@
 | 21 | `app.js:14158` | `App.closeFaithCorner` | evet | `role` |
 | 22 | `app.js:14158` | `event.stopPropagation` | evet | `role` |
 | 23 | `app.js:15799` | `App.closeQibla` | evet | `role` |
-| 24 | `app.js:15915` | `App.closeSaygiPerson` | hayır | `button` |
-| 25 | `app.js:15915` | `event.stopPropagation` | hayır | `button` |
-| 26 | `app.js:16093` | `closeFn` değişken callback'i | hayır | `button` |
-| 27 | `app.js:16094` | `event.stopPropagation` | hayır | `button` |
-| 28 | `app.js:16104` | `closeFn` değişken callback'i | hayır | `button` |
-| 29 | `app.js:16105` | `event.stopPropagation` | hayır | `button` |
-| 30 | `app.js:16234` | `App.closeBookEdit` | hayır | `button` |
-| 31 | `app.js:16234` | `event.stopPropagation` | hayır | `button` |
-| 32 | `app.js:16243` | `App.closeQuoteAdd` | hayır | `button` |
-| 33 | `app.js:16243` | `event.stopPropagation` | hayır | `button` |
+| 24 | `app.js:15915` | `App.closeSaygiPerson` | evet | `role` |
+| 25 | `app.js:15915` | `event.stopPropagation` | evet | `role` |
+| 26 | `app.js:16093` | `closeFn` değişken callback'i | evet | `role` |
+| 27 | `app.js:16094` | `event.stopPropagation` | evet | `role` |
+| 28 | `app.js:16104` | `closeFn` değişken callback'i | evet | `role` |
+| 29 | `app.js:16105` | `event.stopPropagation` | evet | `role` |
+| 30 | `app.js:16234` | `App.closeBookEdit` | evet | `role` |
+| 31 | `app.js:16234` | `event.stopPropagation` | evet | `role` |
+| 32 | `app.js:16243` | `App.closeQuoteAdd` | evet | `role` |
+| 33 | `app.js:16243` | `event.stopPropagation` | evet | `role` |
 | 34 | `app.js:16364` | `App.closeTitleEdit` | hayır | `button` |
 | 35 | `app.js:16364` | `event.stopPropagation` | hayır | `button` |
 | 36 | `app.js:16372` | `App.closeReplicaAdd` | hayır | `button` |

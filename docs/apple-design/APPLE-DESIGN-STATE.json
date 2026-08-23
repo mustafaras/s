@@ -10,7 +10,7 @@
   "totalPrompts": 52,
   "completedPrompts": 1,
   "updatedAt": "2026-08-23",
-  "nextSafeAction": "Run AD-01 (remove maximum-scale=1 from index.html). Waves 1-5 need no extra approval; waves 6-9 require explicit user approval before their first prompt.",
+  "nextSafeAction": "Siradaki prompt: AD-02. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",

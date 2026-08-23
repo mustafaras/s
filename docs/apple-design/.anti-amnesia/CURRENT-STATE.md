@@ -18,7 +18,7 @@
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulama kodu bu programda henüz hiç değiştirilmedi.** `app.js`, `app/styles.css`, `index.html`, `panel*` dosyalarının hiçbirine dokunulmadı. Değişen tek şey: yeni `docs/apple-design/` klasörü ve CLAUDE.md/AGENTS.md'ye eklenen birer yönlendirme satırı.
+**Uygulanan promptlar:** AD-01 … AD-01. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir (I6).
 
 ---
 
@@ -104,4 +104,4 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü. Hiçbiri uygulanmadı.
+Bulgular 52 sıralı prompta dönüştürüldü; 1 tanesi uygulandı.

@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-18` — `div onclick` dönüşüm envanteri |
-| **Sıradaki** | `AD-19` |
+| **Son tamamlanan** | `AD-19` — `div onclick` dönüşüm partisi 1/5 |
+| **Sıradaki** | `AD-20` |
 | **Güncel dalga** | `4` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-18. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-19. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 
@@ -100,8 +100,8 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bu düzenlemenin özeti
 
-2026-08-23 — `apple-design` skill'iyle Şeyma ve ÆON yüzeylerinde HIG denetimi yapıldı. Ölçülen: açık temada 9 renk tokenı 4.5:1'in altında (`--faint` 3.06:1 ve 316 metin kullanımı), 65 adet 11pt altı font, `maximum-scale=1` yakınlaştırma kilidi, 54 klavye-erişilemez `<div onclick>`, ve Liquid Glass'ın içerik katmanında kullanımı (69 site) — HIG'in açıkça yasakladığı kalıp.
+2026-08-23 — `apple-design` skill'iyle Şeyma ve ÆON yüzeylerinde HIG denetimi yapıldı. Ölçülen: açık temada 9 renk tokenı 4.5:1'in altında (`--faint` 3.06:1 ve 316 metin kullanımı), 65 adet 11pt altı font, `maximum-scale=1` yakınlaştırma kilidi, 54 klavye-erişilemez `<div onclick>`, ve Liquid Glass'ın içerik katmanında kullanımı (69 site) — HIG'in açıkça yasakladığı kalıp. AD-19'da ilk 11 app.js kaydı işlendi; kaynakta 48 kayıt kaldı.
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 13 tanesi uygulandı.
+Bulgular 52 sıralı prompta dönüştürüldü; 19 tanesi uygulandı.

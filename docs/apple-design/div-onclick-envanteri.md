@@ -16,7 +16,7 @@
 
 | # | Dosya:satır | Handler | İçinde başka `<button>` var mı | Strateji |
 | ---: | --- | --- | :---: | --- |
-| 1 | `app.js:6093` | `App.go` | hayır | `button` |
+| 1 | `app.js:6093` | `App.go` | evet | `role` |
 | 2 | `app.js:6123` | `App.toggleCard` | hayır | `button` |
 | 3 | `app.js:6132` | `App.toggleCard` | hayır | `button` |
 | 4 | `app.js:7322` | `App.closeReminderCenter` | evet | `role` |

@@ -6090,7 +6090,7 @@ function hidePill(which){
 function saveBanner(){
   if(!syncConfigured()){
     if(data.settings&&data.settings.hideRepoBanner) return '';
-    return '<div id="sey-save-banner" class="glass" onclick="App.go(\'ayarlar\')" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:12px;color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:20px;color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
+    return '<div id="sey-save-banner" class="glass" onclick="App.go(\'ayarlar\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'ayarlar\');}" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:12px;color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:20px;color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
   }
   if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:13px;font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
   return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:12px;color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:13px;padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
@@ -6120,16 +6120,16 @@ function collapsibleCardHTML(o){
     : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
   var h='<div id="'+esc(o.id||('card-'+o.key))+'" class="glass sey-ccard" data-cardkey="'+esc(o.key)+'" data-open="'+(open?'1':'0')+'" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+(o.cardStyle||'')+'">';
   h+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+accent+',transparent);"></span>';
-  h+='<div onclick="App.toggleCard(\''+esc(o.key)+'\')" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;">';
   if(o.icon) h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+o.icon+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
   if(o.badge) h+='<div style="flex-shrink:0;">'+o.badge+'</div>';
   h+='<span class="sey-collchev" style="color:'+accent+';display:inline-flex;flex-shrink:0;transition:transform .25s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
-  h+='</div>';
+  h+='</button>';
   if(open){
     h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
   } else if(o.hint!==false){
-    h+='<div onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</div>';
+    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
   }
   h+='</div>';
   return h;
@@ -7319,7 +7319,7 @@ function reminderCenterOverlayHTML(){
   var root=reminderCurrentRoot()||emptyReminderState(), policy=normalizeReminderPolicy(root.policy), defs=reminderDefinitions(), muted=!!ui.reminderTodayMuted, remaining=muted?0:reminderCenterEnabledCount(root,defs), permission=reminderPermissionExplanation(reminderPermissionSnapshot());
   var previewTarget=ui.reminderPreviewId&&defs.some(function(def){ return String(def.id||'')===String(ui.reminderPreviewId); });
   if(!previewTarget) ui.reminderPreviewId='';
-  var h='<div id="sey-reminder-overlay" class="sey-reminder-overlay" role="dialog" aria-modal="true" aria-labelledby="sey-reminder-title" aria-describedby="sey-reminder-overview-copy" onclick="App.closeReminderCenter()">';
+  var h='<div id="sey-reminder-overlay" class="sey-reminder-overlay" role="dialog" aria-modal="true" aria-labelledby="sey-reminder-title" aria-describedby="sey-reminder-overview-copy" tabindex="0" onclick="App.closeReminderCenter()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeReminderCenter();}">';
   h+='<section id="sey-reminder-screen" class="sey-reminder-screen" tabindex="-1" onkeydown="App.onReminderKeydown(event)" onclick="event.stopPropagation()">';
   h+='<header class="sey-reminder-header"><div><span class="sey-reminder-eyebrow">ŞEYMA · RİTİM MERKEZİ</span><h2 id="sey-reminder-title">'+esc(reminderCopy('inApp.center.title','Hatırlatmalar ve bildirimler'))+'</h2><p>'+esc(reminderCopy('inApp.center.subtitle','Günün küçük duraklarını burada sakince gözden geçir.'))+'</p></div><button type="button" class="sey-reminder-close" onclick="App.closeReminderCenter()" aria-label="'+esc(reminderCopy('inApp.center.closeLabel','Hatırlatmalar ve bildirimler merkezini kapat'))+'">'+icon('x',18)+'</button></header>';
   h+='<main id="sey-reminder-scroll" class="sey-reminder-scroll">';
@@ -10166,7 +10166,7 @@ function targetsCardHTML(rec){
   var water=tOk?t.waterCups:waterGoalCups(activeDate());
   var steps=tOk?t.steps:stepsGoal();
   var sleep=tOk?t.sleepHours:sleepGoalHours();
-  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')">';
+  var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'saglik\');}">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
   h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',17)+'</span>Hedeflerim</div>';
   if(tOk) h+='<div style="font-size:10.5px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
@@ -10694,7 +10694,7 @@ function weatherHeaderHTML(greet){
   var primary=null;
   if(spots){ primary=spots[0]; for(var i=1;i<spots.length;i++){ var b=spots[i]; var sv=(b.uv||0)+(b.feels!=null?b.feels:b.temp||0); var ps=(primary.uv||0)+(primary.feels!=null?primary.feels:primary.temp||0); if(sv>ps) primary=b; } }
   var pm=primary?wxMeta(primary.code,primary.isDay):null;
-  var h='<div class="wxcard"'+(dark?' data-dark-variant="weather"':'')+' onclick="App.toggleWeather()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;overflow:hidden;border:1px solid '+W.bd+';border-radius:24px;padding:15px 16px;background:'+W.bg+';box-shadow:'+W.shadow+';">';
+  var h='<button type="button" class="sey-asbtn wxcard"'+(dark?' data-dark-variant="weather"':'')+' onclick="App.toggleWeather()" aria-expanded="'+(open?'true':'false')+'" style="position:relative;overflow:hidden;border:1px solid '+W.bd+';border-radius:24px;padding:15px 16px;background:'+W.bg+';box-shadow:'+W.shadow+';">';
   h+='<div style="position:absolute;top:-32px;right:-16px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,'+W.orb1+',transparent 70%);pointer-events:none;"></div>';
   h+='<div style="position:absolute;bottom:-42px;left:30px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,'+W.orb2+',transparent 70%);pointer-events:none;"></div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
@@ -10737,7 +10737,7 @@ function weatherHeaderHTML(greet){
     if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:10px;color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
     h+='</div>';
   }
-  h+='</div>';
+  h+='</button>';
   return h;
 }
 // ── Tatil Modu kartı: Günışığı hava kartının hemen üstünde, açıkken tarih/preset/reason girişi.
@@ -10756,7 +10756,7 @@ function vacationCardHTML(rec){
     : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 6px 18px rgba(42,157,143,0.08),inset 0 1px 0 rgba(255,255,255,0.28);';
   var h='<div class="glass sey-vacation-card" data-cardkey="vacation" data-open="'+(open?'1':'0')+'" style="position:relative;overflow:hidden;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+'">';
   h+='<span class="sey-vacation-sheen" style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);animation:seyShimmer 3.2s ease-in-out infinite;pointer-events:none;"></span>';
-  h+='<div onclick="App.toggleVacationCard()" role="button" aria-expanded="'+(open?'true':'false')+'" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  h+='<button type="button" class="sey-asbtn" onclick="App.toggleVacationCard()" aria-expanded="'+(open?'true':'false')+'" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:11px;">';
   h+='<span style="display:inline-flex;color:'+accent+';">'+icon('plane',20)+'</span>';
   var badgeColor=active?accentHex:(planned?hexA(accentHex,0.85):(dark?'rgba(169,160,155,0.85)':'rgba(120,113,108,0.8)'));
   var badgeBg=active?hexA(accentHex,0.14):(planned?hexA(accentHex,0.09):(dark?'rgba(169,160,155,0.18)':'rgba(120,113,108,0.12)'));
@@ -10769,7 +10769,7 @@ function vacationCardHTML(rec){
   if(v.startAt&&v.endAt) sub+=' · '+esc(shortDate(v.startAt))+'–'+esc(shortDate(v.endAt))+(v.reason?' · '+esc(v.reason):'');
   h+='<div style="font-size:12px;color:var(--faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sub+'</div></div>';
   h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
-  h+='</div>';
+  h+='</button>';
   if(open){
     h+='<div style="position:relative;display:flex;flex-direction:column;gap:12px;animation:seyFade .2s ease;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:13px;font-weight:700;color:var(--text2);">Tatil modunu aç</div><button onclick="App.setVacationEnabled('+(v.enabled?'false':'true')+')" style="border:none;cursor:pointer;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;color:'+(v.enabled?'#fff':'var(--text2)')+';background:'+(v.enabled?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';" data-on="'+(v.enabled?'1':'0')+'">'+(v.enabled?'Kapat':'Aç')+'</button></div>';
@@ -10900,7 +10900,7 @@ function motivationTodayCardHTML(){
   var doneToday=!!(st&&(st.status==='completed'||st.status==='minimum_completed'));
   var pct=sum.programComplete?100:Math.max(2,sum.percent);
   var pu=dark?'#B7A8F2':'#6E5FCB';
-  var h='<div id="sey-motivation-card" class="glass sey-room-card" onclick="App.openRoom()" role="button" aria-label="Terapi Odası\'nı aç" style="cursor:pointer;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
+  var h='<button type="button" id="sey-motivation-card" class="glass sey-room-card sey-asbtn" onclick="App.openRoom()" aria-label="Terapi Odası\'nı aç" style="cursor:pointer;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,'+pu+' 20%, var(--card-bd));">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('compass',19)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
@@ -10909,7 +10909,7 @@ function motivationTodayCardHTML(){
   h+='</div>';
   if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
   h+='<span style="color:'+pu+';font-size:20px;font-weight:700;line-height:1;flex-shrink:0;">›</span>';
-  h+='</div>';
+  h+='</button>';
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<div style="flex:1;min-width:0;font-size:13px;line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
@@ -10946,8 +10946,8 @@ function roomOverlayHTML(){
   var nar=(window.MotivationNarratives&&window.MotivationNarratives.dayNarrative)?window.MotivationNarratives.dayNarrative(mot):null;
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
 
-  var h='<div id="sey-room-overlay" onclick="App.closeRoom()" style="position:fixed;inset:0;z-index:360;background:rgba(30,22,30,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .22s ease;">';
-  h+='<div id="sey-room-sheet" onclick="event.stopPropagation()" style="width:100%;max-width:480px;height:100%;background:var(--modal);display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,0.4);animation:seyPop .34s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;transform-origin:center;overflow:hidden;">';
+  var h='<div id="sey-room-overlay" onclick="App.closeRoom()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeRoom();}" style="position:fixed;inset:0;z-index:360;background:rgba(30,22,30,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .22s ease;">';
+  h+='<div id="sey-room-sheet" onclick="event.stopPropagation()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:480px;height:100%;background:var(--modal);display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,0.4);animation:seyPop .34s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;transform-origin:center;overflow:hidden;">';
   // ── Sticky başlık: parlayan "Terapi Odası" + el yazısı imza (geri geldi) ──
   h+='<div style="flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid color-mix(in srgb,var(--room) 22%,var(--card-bd));background:linear-gradient(160deg,var(--room-bg),transparent);display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden;">';
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.10) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;pointer-events:none;"></span>';
@@ -11779,12 +11779,12 @@ function hubTilesHTML(){
 // Raşit'in sözü — hemen Günışığı kartının altında; dokununca söz değişir (App.cycleRasit).
 function rasitNoteIdx(curIdx){ var n=NOTES.length; return (((curIdx-1)+(ui.noteIndex||0))%n+n)%n; }
 function rasitBubbleHTML(curIdx){
-  var h='<div onclick="App.cycleRasit()" role="button" aria-label="Raşit\'in sözü — dokun, değişsin" style="cursor:pointer;display:flex;align-items:flex-start;gap:11px;">';
+  var h='<button type="button" class="sey-asbtn" onclick="App.cycleRasit()" aria-label="Raşit\'in sözü — dokun, değişsin" style="cursor:pointer;display:flex;align-items:flex-start;gap:11px;">';
   h+='<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 6px 16px var(--room-glow);">'+icon('heart',20)+'</div>';
   h+='<div class="glass" style="position:relative;flex:1;min-width:0;border-radius:6px 20px 20px 20px;padding:12px 15px;border:1px solid color-mix(in srgb,var(--room) 28%, var(--card-bd));box-shadow:0 8px 22px var(--room-glow);">';
   h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:12px;">🦩</span><span style="margin-left:auto;font-size:10px;color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
   h+='<div id="sey-rasit-note" style="font-size:14.5px;line-height:1.5;color:var(--text2);transition:opacity .18s ease;">'+esc(NOTES[rasitNoteIdx(curIdx)])+'</div>';
-  h+='</div></div>';
+  h+='</div></button>';
   return h;
 }
 // ── Hero dashboard: kullanıcının bugünkü girdilerinin sakin, premium özeti ──

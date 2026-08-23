@@ -465,12 +465,12 @@ function zikrReflectionArchiveCardP(){
   if(!list.length) h+='<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Henüz zikir notu yok</div>';
   else list.slice(0,40).forEach(function(n){
     var mood=n.mood?'<span style="padding:3px 7px;border-radius:999px;background:var(--s2);color:var(--zikr);font-size:var(--f1);font-weight:850;">'+esc(n.mood)+'</span>':'';
-    h+='<div onclick="pickDay(\''+esc(n.date)+'\')" style="cursor:pointer;padding:10px 11px;border:1px solid var(--bd2);border-radius:11px;background:var(--s1);">';
+    h+='<button type="button" class="sey-asbtn" onclick="pickDay(\''+esc(n.date)+'\')" style="cursor:pointer;padding:10px 11px;border:1px solid var(--bd2);border-radius:11px;background:var(--s1);">';
     h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;"><div><span style="display:block;color:var(--t4);font-size:var(--f1);font-weight:750;">'+esc(shortD(n.date))+'</span><strong style="display:block;margin-top:2px;color:var(--t1);font-size:var(--f3);">'+esc(n.presetName||((zikrPresetP(n.presetId)||{}).name)||n.presetId)+'</strong></div>'+mood+'</div>';
     if(n.feelings) h+='<div style="margin-top:7px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Hislerim · </b>'+esc(n.feelings)+'</div>';
     if(n.thoughts) h+='<div style="margin-top:5px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--zikr);">Düşüncelerim · </b>'+esc(n.thoughts)+'</div>';
     if(n.intention) h+='<div style="margin-top:5px;color:var(--t2);font-size:var(--f2);line-height:1.45;white-space:pre-wrap;word-break:break-word;"><b style="color:var(--amber);">Duam · niyetim · </b>'+esc(n.intention)+'</div>';
-    h+='<div style="margin-top:6px;color:var(--t4);font-size:var(--f1);font-weight:700;">'+(Number(n.wordCount)||0)+' kelime · '+esc(String(n.updatedAt||'').slice(11,16))+'</div></div>';
+    h+='<div style="margin-top:6px;color:var(--t4);font-size:var(--f1);font-weight:700;">'+(Number(n.wordCount)||0)+' kelime · '+esc(String(n.updatedAt||'').slice(11,16))+'</div></button>';
   });
   h+='</div></div>'; return h;
 }
@@ -2159,7 +2159,7 @@ function d4ModuleDescriptorsP(){
 }
 function d4ModuleDrawerHTMLP(module){
   if(!module) return '';
-  var h='<div class="d4-drawer-backdrop" data-component="detail-drawer" data-open="true" role="presentation" onclick="if(event.target===this)closeD4ModuleDrawerP()">';
+  var h='<div class="d4-drawer-backdrop" data-component="detail-drawer" data-open="true" role="presentation" tabindex="0" onclick="if(event.target===this)closeD4ModuleDrawerP()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();closeD4ModuleDrawerP();}">';
   h+='<aside id="d4-module-drawer" class="detail-drawer d4-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="d4-drawer-title" aria-describedby="d4-drawer-desc" tabindex="-1" onkeydown="eventDrawerKeydownP(event)">';
   h+='<div class="d4-drawer-head"><div><span class="drawer-kicker">D4 modül ayrıntısı</span><h2 id="d4-drawer-title">'+esc(module.title)+'</h2></div><button type="button" class="btn d4-drawer-close" onclick="closeD4ModuleDrawerP()" aria-label="'+esc(module.title)+' ayrıntısını kapat">×</button></div>';
   h+='<p id="d4-drawer-desc" class="d4-drawer-decision">'+esc(module.decision)+'</p><div class="d4-drawer-status-row">'+p3StatusP(module.status)+' '+p3BadgeP(module.source,'source')+' '+p3BadgeP(module.privacy,'privacy')+' '+d4CoverageBadgeP(module.coverage)+'</div>';
@@ -2832,7 +2832,7 @@ function pmMediaSlotHTML(mediaKind,mediaId,w,h){
   var elId="pm-media-"+mediaId;
   if(mediaKind==="image"){
     var ratio=(w&&h)?(mediaDimensionP(w)+"/"+mediaDimensionP(h)):"1/1";
-    return '<div id="'+esc(elId)+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(mediaId))+')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></div>';
+    return '<button type="button" id="'+esc(elId)+'" class="pm-media-slot sey-asbtn" data-media-id="'+esc(mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(mediaId))+')" style="width:220px;max-width:70vw;aspect-ratio:'+ratio+';border-radius:12px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:var(--f2);opacity:.75;">Yükleniyor…</span></button>';
   }
   if(mediaKind==="file"){
     return '<div id="'+esc(elId)+'" class="pm-media-slot" data-media-id="'+esc(mediaId)+'" data-media-kind="file" style="min-width:190px;color:var(--gold);"><span style="font-size:var(--f2);opacity:.75;display:flex;align-items:center;gap:5px;">'+icon('file-text',13)+' Yükleniyor…</span></div>';
@@ -3036,7 +3036,7 @@ function coreStripHTML(){
   var notifAge=lastNotif?(Date.now()-new Date(lastNotif).getTime()):null;
   var s='<div class="card pad d2-core-strip span-12" data-component="command-center" style="order:1;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--bd-gold);background:linear-gradient(135deg,rgba(212,175,55,.07),rgba(28,28,40,.74));">';
   s+='<div style="display:flex;align-items:center;gap:11px;min-width:0;">';
-  s+='<div onclick="devLogoTapP()" style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);cursor:default;">⬡</div>';
+  s+='<button type="button" class="sey-asbtn" onclick="devLogoTapP()" style="width:38px;height:38px;border-radius:11px;background:var(--ggrad);display:flex;align-items:center;justify-content:center;font-size:18px;color:#1a1404;font-weight:800;box-shadow:0 3px 12px rgba(212,175,55,.4);cursor:default;">⬡</button>';
   s+='<div style="line-height:1.2;"><div style="font-size:var(--f4);font-weight:800;color:var(--t1);letter-spacing:2px;">ÆON</div><div style="font-size:var(--f1);color:var(--gold);font-weight:800;letter-spacing:.7px;text-transform:uppercase;">Orchestration Core</div></div>';
   s+='</div>';
   s+='<div style="display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0;">';
@@ -4020,7 +4020,7 @@ function panelLabCardHTML(){
       h+='<div style="display:flex;flex-wrap:wrap;gap:7px;">';
       files.forEach(function(f){
         if(/^image\//.test(f.mime||"")){
-          h+='<div id="pm-media-'+esc(f.mediaId)+'" class="pm-media-slot" data-media-id="'+esc(f.mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(f.mediaId))+')" style="width:78px;height:78px;border-radius:9px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:9px;opacity:.7;">…</span></div>';
+          h+='<button type="button" id="pm-media-'+esc(f.mediaId)+'" class="pm-media-slot sey-asbtn" data-media-id="'+esc(f.mediaId)+'" data-media-kind="image" onclick="aeonOpenImageP('+esc(jsArgP(f.mediaId))+')" style="width:78px;height:78px;border-radius:9px;overflow:hidden;background:var(--s3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);"><span style="font-size:9px;opacity:.7;">…</span></button>';
         } else {
           h+='<button onclick="openPdfP('+esc(jsArgP(f.mediaId))+','+esc(jsArgP(String(f.name||"tahlil.pdf")))+')" style="display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--bd);color:var(--t1);border-radius:9px;padding:8px 11px;font:inherit;font-size:var(--f2);font-weight:700;cursor:pointer;">'+icon('book',14)+' PDF aç</button>';
         }
@@ -4230,7 +4230,7 @@ function render(){
       if(t&&t.count>0) parts.push(cat.label+' '+t.count+'x'+(t.mins>0?' '+fmtDurationP(t.mins):''));
     });
     var cap=parts.length?parts.map(function(s){return '<span>'+s+'</span>';}).join('')+(totalSessions>0?'<span style="color:var(--t3);">toplam '+esc(totalSessions+' seans · '+val)+'</span>':''):'<span>Arşivde kayıt yok · uygulamadan pratik eklendiğinde dolar</span>';
-    h+='<div class="card lift kpi span-2" style="--accent:var(--soul);order:18;cursor:pointer;" onclick="toggleSoulArchiveP()">';
+    h+='<div class="card lift kpi span-2" style="--accent:var(--soul);order:18;cursor:pointer;" role="button" tabindex="0" onclick="toggleSoulArchiveP()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleSoulArchiveP();}">';
     h+='<div class="kpi-top"><span class="kpi-l">Zihin-Beden Arşivi</span><span class="tchip fl">'+icon(UI.soulArchiveExpanded?'chevron-up':'chevron-down',12)+' '+esc(UI.soulArchiveExpanded?'kapat':'aç')+'</span></div>';
     h+='<div class="kpi-v mono">'+val+'</div>';
     h+='<div style="font-size:var(--f1);color:var(--t4);font-weight:600;margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;line-height:1.3;">'+cap+'</div>';
@@ -4890,13 +4890,13 @@ function render(){
   h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">Son Notlar'+(noteRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--t3);font-weight:700;letter-spacing:0;text-transform:none;">'+noteRows.length+'</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
-  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);var nt=String(r.note||'').trim();var jt=(r.journal&&r.journal.text)?String(r.journal.text).trim():'';var txt=jt||nt;var isJournal=!!jt;var jMode=(r.journal&&r.journal.mode)?String(r.journal.mode):'';var jLbl=(isJournal?(jMode?('🪶 '+journalModeLabel(jMode)):'🪶 Günlük Işığı'):'📝 Not');return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:6px;font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;"><span>'+shortD(d)+'</span><span style="font-size:var(--f2);color:var(--journal);font-weight:800;">'+jLbl+'</span></div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(txt)+'</div></div>';}).join(""):'<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Not yok</div>';
+  h+=noteRows.length?noteRows.map(function(d){var r=recOf(d);var nt=String(r.note||'').trim();var jt=(r.journal&&r.journal.text)?String(r.journal.text).trim():'';var txt=jt||nt;var isJournal=!!jt;var jMode=(r.journal&&r.journal.mode)?String(r.journal.mode):'';var jLbl=(isJournal?(jMode?('🪶 '+journalModeLabel(jMode)):'🪶 Günlük Işığı'):'📝 Not');return '<button type="button" class="sey-asbtn" onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:6px;font-size:var(--f1);color:var(--t4);font-weight:700;margin-bottom:3px;"><span>'+shortD(d)+'</span><span style="font-size:var(--f2);color:var(--journal);font-weight:800;">'+jLbl+'</span></div><div style="color:var(--t2);font-size:var(--f3);line-height:1.45;word-break:break-word;white-space:pre-wrap;">'+esc(txt)+'</div></button>';}).join(""):'<div class="empty"><span class="ei">'+icon('file-text',20)+'</span>Not yok</div>';
   h+='</div></div>';
 
   h+='<div class="card lift span-4 pad" style="order:40;">';
   h+='<div class="lbl">SOS Geçmişi'+(sosRows.length?'<span style="margin-left:auto;font-size:var(--f3);color:var(--red);font-weight:800;letter-spacing:0;text-transform:none;">'+sosRows.length+' gün</span>':'')+'</div>';
   h+='<div class="scroll" style="max-height:240px;display:flex;flex-direction:column;gap:7px;">';
-  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · ")+'</div>':'';return '<div onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</div>';}).join(""):'<div class="empty"><span class="ei">'+icon('life-buoy',20)+'</span>Kriz kaydı yok</div>';
+  h+=sosRows.length?sosRows.map(function(d){var r=recOf(d);var opts=(Array.isArray(r.cravingOptionsUsed)&&r.cravingOptionsUsed.length)?'<div style="color:var(--t2);font-size:var(--f2);line-height:1.4;margin-top:3px;word-break:break-word;white-space:pre-wrap;">'+r.cravingOptionsUsed.map(function(x){return esc(cleanEmojiText(x));}).filter(Boolean).join(" · ")+'</div>':'';return '<button type="button" class="sey-asbtn" onclick="pickDay(\''+d+'\')" style="cursor:pointer;background:var(--s1);border:1px solid var(--bd2);border-radius:10px;padding:8px 10px;"><div style="display:flex;align-items:center;gap:8px;"><span class="rd mono" style="color:var(--t4);font-weight:700;font-size:var(--f1);">'+shortD(d)+'</span><span style="color:var(--red);font-weight:800;font-size:var(--f3);">SOS ×'+r.cravingSOSCount+'</span></div>'+opts+'</button>';}).join(""):'<div class="empty"><span class="ei">'+icon('life-buoy',20)+'</span>Kriz kaydı yok</div>';
   h+='</div></div>';
 
   // ROW 5: Pro insights — 4 ayrı kart (Kullanım/Konum/Hareket/Risk) tek "Gelişmiş

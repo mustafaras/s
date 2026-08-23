@@ -67,6 +67,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-12 | --drop metin taşındı | ✅ TAMAMLANDI | `5ca60dc` | S4+S5 geçti | 1 metin kullanımı taşındı (3.79:1 -> 4.50:1). --drop-bg ve dolgu kullanımları dokunulmadı. |
 
+| AD-13 | Kontrast doğrulayıcı + dalga 2 kapanışı | ✅ TAMAMLANDI | `fd7f38b` | S4+S5 geçti | verify-contrast.mjs eklendi (salt okuma, exit 1 = ihlal). Script kendi hesabımdaki 3 yuvarlama hatasını yakaladı: ok/watch/listen-ink 4.49'da kalmıştı, güvenlik payıyla düzeltildi. 20/20 token AA+. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -76,7 +78,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | Dalga | Promptlar | Tamamlanan | Durum |
 | --- | --- | --- | --- |
 | 1 · Sıfır risk erişilebilirlik | AD-01 … AD-05 | 5/5 | ✅ tamamlandı |
-| 2 · `-ink` renk tokenları | AD-06 … AD-13 | 0/8 | beklemede |
+| 2 · `-ink` renk tokenları | AD-06 … AD-13 | 8/8 | ✅ tamamlandı |
 | 3 · Dokunma hedefleri | AD-14 … AD-16 | 0/3 | beklemede |
 | 4 · Klavye erişimi | AD-17 … AD-25 | 0/9 | beklemede |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
@@ -85,7 +87,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **5/52** | |
+| | **Toplam** | **13/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

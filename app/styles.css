@@ -211,8 +211,8 @@
     /* -ink: aynı rengin METİN varyantı. Dolgu/kenarlık değerleri yukarıda
        olduğu gibi kalır (WCAG dolgu eşiği 3:1); yalnızca yazı 4.5:1'e çekilir.
        Hue ve saturation korundu, yalnızca lightness düşürüldü. */
-    --accent-ink:#B55471; --warn-ink:#E0252B; --ok-ink:#368343;
-    --watch-ink:#A16729;  --listen-ink:#0D808C; --drop-ink:#9F6647;
+    --accent-ink:#B55471; --warn-ink:#E0252B; --ok-ink:#368243;
+    --watch-ink:#A06629;  --listen-ink:#0D7F8B; --drop-ink:#9F6647;
     --field:rgba(255,248,243,0.7); --field-bd:rgba(108,74,58,0.15);
     --nav:rgba(255,255,255,0.85); --modal:#FFF8F3; --icon:rgba(255,248,243,0.8);
     --chatbar:rgba(252,247,250,0.28);

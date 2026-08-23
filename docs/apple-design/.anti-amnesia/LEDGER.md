@@ -75,7 +75,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-16 | Dalga 3 kapanışı | ✅ TAMAMLANDI | `236e409` | S8+S4+S5 geçti | Cache-bust, tam headless doğrulama, değişmezlik karşılaştırması ve canonical S6 kayıtları tamamlandı; dalga 3 3/3, sıradaki AD-17. |
 
-| AD-17 | `.sey-asbtn` yardımcı sınıfı | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Yalnızca div görünümünü koruyan buton yardımcı sınıfı eklendi; hiçbir öğe dönüştürülmedi, handler/call yüzeyi değişmedi. |
+| AD-17 | `.sey-asbtn` yardımcı sınıfı | ✅ TAMAMLANDI | `b84f099` | S8+S4+S5 geçti | Yalnızca div görünümünü koruyan buton yardımcı sınıfı eklendi; hiçbir öğe dönüştürülmedi, handler/call yüzeyi değişmedi. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

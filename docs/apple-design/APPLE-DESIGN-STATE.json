@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "programId": "APPLE-DESIGN-IOS27",
+  "status": "not_started",
+  "activePrompt": null,
+  "blockedPrompt": null,
+  "lastCompletedPrompt": "AD-00",
+  "nextPrompt": "AD-01",
+  "currentWave": "1",
+  "totalPrompts": 52,
+  "completedPrompts": 0,
+  "updatedAt": "2026-08-23",
+  "nextSafeAction": "Run AD-01 (remove maximum-scale=1 from index.html). Waves 1-5 need no extra approval; waves 6-9 require explicit user approval before their first prompt.",
+  "codeTouched": false,
+  "authority": [
+    "CLAUDE.md",
+    "AGENTS.md",
+    "docs/apple-design/IOS27-TASARIM-PLANI.md",
+    "docs/apple-design/UYGULAMA-PROMPTLARI.md",
+    "docs/apple-design/.anti-amnesia/CURRENT-STATE.md",
+    "docs/apple-design/.anti-amnesia/LEDGER.md",
+    ".claude/skills/run-seyma/SKILL.md",
+    "docs/GELISTIRME-PLANI.md"
+  ],
+  "invariants": {
+    "I1": "data object shape unchanged",
+    "I2": "App.<name> handler surface unchanged",
+    "I3": "migrate() untouched",
+    "I4": "render() call graph unchanged",
+    "I5": "sync.js, Guard 1 and Guard 2 untouched",
+    "I6": "one prompt = one commit, individually revertable"
+  },
+  "waves": [
+    { "id": "1",  "prompts": "AD-01..AD-05", "topic": "zero-risk accessibility",     "approvalRequired": false, "completed": 0, "total": 5 },
+    { "id": "2",  "prompts": "AD-06..AD-13", "topic": "-ink colour token family",    "approvalRequired": false, "completed": 0, "total": 8 },
+    { "id": "3",  "prompts": "AD-14..AD-16", "topic": "touch targets",               "approvalRequired": false, "completed": 0, "total": 3 },
+    { "id": "4",  "prompts": "AD-17..AD-25", "topic": "keyboard access div->button", "approvalRequired": false, "completed": 0, "total": 9 },
+    { "id": "5",  "prompts": "AD-26..AD-29", "topic": "material consistency",        "approvalRequired": false, "completed": 0, "total": 4 },
+    { "id": "6",  "prompts": "AD-30..AD-32", "topic": "system theme following",      "approvalRequired": true,  "completed": 0, "total": 3 },
+    { "id": "7",  "prompts": "AD-33..AD-37", "topic": "11pt typography floor",       "approvalRequired": true,  "completed": 0, "total": 5 },
+    { "id": "8",  "prompts": "AD-38..AD-42", "topic": "Liquid Glass layer split",    "approvalRequired": true,  "completed": 0, "total": 5 },
+    { "id": "9",  "prompts": "AD-43..AD-50", "topic": "type scale / Dynamic Type",   "approvalRequired": true,  "completed": 0, "total": 8 },
+    { "id": "10", "prompts": "AD-51..AD-52", "topic": "panel + closure",             "approvalRequired": false, "completed": 0, "total": 2 }
+  ],
+  "verificationGate": [
+    "node --check app.js && node --check sync.js",
+    "node .claude/skills/run-seyma/driver.mjs",
+    "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node tests/app/test_faz10_sync.js",
+    "node tests/panel/test_faz11_panel.js",
+    "for f in tests/panel-v2/test_panel_v2_*.js; do node \"$f\"; done"
+  ],
+  "separatelyGated": [
+    "git push to main (redeploys GitHub Pages)",
+    "any write to mustafaras/seyma-data",
+    "opening the app in a browser (forbidden - use run-seyma harnesses)"
+  ]
+}

@@ -1,0 +1,114 @@
+# iOS 27 Tasarım Programı — Anti-Amnesia Ledger
+
+> Bu dosya, [`../UYGULAMA-PROMPTLARI.md`](../UYGULAMA-PROMPTLARI.md) içindeki 52 promptluk uygulamanın **gerçek kaynak durumunu (source of truth)** tutar.
+> Her bağımsız ajan, oturum veya model değişimi sonrası **önce bunu okur**, kendi adımını çalıştırır, bitince **buraya satır ekler.**
+
+---
+
+## Program özeti
+
+- **Repo:** `mustafaras/s` (GitHub Pages, build yok, `main`'e push = deploy)
+- **Hedef:** Şeyma ve ÆON yüzeylerini Apple HIG erişilebilirlik tabanına ve iOS 26/27 Liquid Glass katman sözleşmesine hizalamak — **görsel kimliği ve işlevselliği bozmadan.**
+- **Plan:** [`../IOS27-TASARIM-PLANI.md`](../IOS27-TASARIM-PLANI.md)
+- **Promptbook:** [`../UYGULAMA-PROMPTLARI.md`](../UYGULAMA-PROMPTLARI.md) — 52 prompt, 10 dalga
+- **Makine durumu:** [`../APPLE-DESIGN-STATE.json`](../APPLE-DESIGN-STATE.json)
+- **Veri güvenliği:** Şeyma'yı asla tarayıcıda açma; `run-seyma` headless harness'leri ve `tests/` fixture'ları kullan.
+
+---
+
+## Ledger formatı
+
+Her satır bir prompta karşılık gelir. Yeni bir ajan devraldığında:
+
+1. `../APPLE-DESIGN-STATE.json` içindeki `lastCompletedPrompt` / `activePrompt` / `blockedPrompt` değerlerini oku.
+2. Bu ledger'daki tamamlanmış kanıtları yeniden üretmeye çalışma.
+3. Sıradaki promptu (`lastCompletedPrompt` + 1) çalıştır — **atlama yok.**
+4. Doğrulama kapısını (promptbook §S4) çalıştır ve sonucu bu ledger'a ekle.
+5. `CURRENT-STATE.md` **Durum** tablosunu ve `APPLE-DESIGN-STATE.json`'ı aynı commit'te güncelle.
+
+```markdown
+| Prompt | Kısa Ad | Durum | Commit | Testler | Notlar |
+|--------|---------|-------|--------|---------|--------|
+```
+
+**Durum değerleri:** `✅ TAMAMLANDI` · `❌ BLOKE` · `⏭️ ATLANDI (onay yok)` · `↩️ GERİ ALINDI`
+
+Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yazılır, `CURRENT-STATE.md`'nin "Bilinen açık kapı" bölümüne bir paragraf düşülür ve **sonraki prompta geçilmez.**
+
+---
+
+## Prompt durum tablosu
+
+| Prompt | Kısa Ad | Durum | Commit | Testler | Notlar |
+|--------|---------|-------|--------|---------|--------|
+| AD-00 | Program kurulumu | ✅ TAMAMLANDI | _(bu commit)_ | — | Plan, 52 promptluk promptbook, anti-amnesia + ledger + state.json oluşturuldu. Uygulama koduna dokunulmadı. |
+
+<!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
+
+---
+
+## Dalga ilerleme özeti
+
+| Dalga | Promptlar | Tamamlanan | Durum |
+| --- | --- | --- | --- |
+| 1 · Sıfır risk erişilebilirlik | AD-01 … AD-05 | 0/5 | beklemede |
+| 2 · `-ink` renk tokenları | AD-06 … AD-13 | 0/8 | beklemede |
+| 3 · Dokunma hedefleri | AD-14 … AD-16 | 0/3 | beklemede |
+| 4 · Klavye erişimi | AD-17 … AD-25 | 0/9 | beklemede |
+| 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
+| 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
+| 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 0/5 | onay bekliyor |
+| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
+| 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
+| | **Toplam** | **0/52** | |
+
+> Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
+
+---
+
+## Ölçüm başlangıç değerleri (2026-08-23)
+
+Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma varsa kod denetimden sonra değişmiş demektir — **önce nedenini araştır, sonra devam et.**
+
+| Ölçüm | Başlangıç | Hedef | İlgili prompt |
+| --- | --- | --- | --- |
+| `maximum-scale` (index.html) | 1 | 0 | AD-01 |
+| `--faint` açık tema kontrastı | 3.06:1 | ≥4.50:1 | AD-02 |
+| 4.5:1 altı metin tokenı (açık) | 9 | 0 | AD-02, AD-06…AD-12 |
+| `prefers-contrast` kuralı | 0 | 1 | AD-03 |
+| `forced-colors` kuralı | 0 | 1 | AD-04 |
+| `min-height:16px` kontrol | 4 | 0 (hepsi `.sey-tiny-hit`) | AD-14 |
+| `min-height:40px` kontrol | 5 | 0 | AD-15 |
+| `<div onclick>` — app.js | 54 | 0 | AD-19 … AD-23 |
+| `<div onclick>` — panel.js | 8 | 0 | AD-24 |
+| Koyu temada `.glass` kapalı | evet | hayır | AD-26 |
+| `prefers-color-scheme` (app) | 0 | 1 | AD-31 |
+| 11px altı font — styles.css | var | 0 | AD-33 |
+| 11px altı font — app.js | 65 | 0 | AD-34 … AD-36 |
+| `.glass` içerik katmanında | 69 | 0 | AD-39 … AD-41 |
+| Ham `font-size:NNpx` — app.js | ~1400 | 0 | AD-45 … AD-49 |
+| `prefers-reduced-motion` — panel-v2 | 1 | kapsam genişletildi | AD-51 |
+
+**Değişmemesi gerekenler** (regresyon nöbetçileri):
+
+| Ölçüm | Değer | Neden |
+| --- | --- | --- |
+| Koyu tema token kontrastı | 14/14 AAA veya AA | En iyi ölçülen yüzey; bozulmamalı |
+| Panel-v2 token kontrastı | tümü AA+ | Referans uygulama |
+| `App.<name>` handler sayısı | sabit | I2 |
+| `onclick="App.…"` dağılımı | sabit | I2 |
+| `safe-area-inset` kullanımı | app 35, panel 4+7 | Zaten doğru |
+| Panel-v2 fixture sayısı | 27 geçer | Regresyon kapısı |
+
+---
+
+## Geri alma
+
+Her prompt tek commit'tir (I6). Sorun çıkaran bir prompt:
+
+```bash
+git revert <commit>
+```
+
+Sonra bu ledger'da o satırı `↩️ GERİ ALINDI` yap, gerekçeyi not düş, `APPLE-DESIGN-STATE.json` içindeki `lastCompletedPrompt`'u bir öncekine çek.

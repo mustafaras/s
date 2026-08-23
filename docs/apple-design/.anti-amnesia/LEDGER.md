@@ -57,6 +57,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-07 | --accent metin taşındı | ✅ TAMAMLANDI | `d03ed57` | S4+S5 geçti | 36 metin kullanımı color:var(--accent-ink) oldu (2.97:1 -> 4.50:1). Dolgu/kenarlık kullanımları dokunulmadı. Negatif lookbehind ile background-color/border-color korundu. |
 
+| AD-08 | --warn metin taşındı | ✅ TAMAMLANDI | `19a8f29` | S4+S5 geçti | 8 metin kullanımı taşındı (3.76:1 -> 4.50:1). 4 adet background-color/border-color kullanımı bilinçli olarak korundu — dolgu WCAG eşiği 3:1. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-24` — Panel v1 dönüşümü |
-| **Sıradaki** | `AD-25` |
-| **Güncel dalga** | `4` |
+| **Son tamamlanan** | `AD-25` — Dalga 4 kapanışı |
+| **Sıradaki** | `AD-26` |
+| **Güncel dalga** | `5` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-24. Ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır; AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-25. Dalga 4 tamamen kapandı; ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır. AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
 ---
 
@@ -94,14 +94,14 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-Şu an yok. Bir prompt bir öğeyi `ERTELENDI` işaretlerse veya düzeltilemeyen bir düzen taşması bırakırsa **buraya yazılır** — ledger satırı tek başına yeterli değildir, sonraki ajan bu bölümü okur.
+Şu an yok. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
 
 ---
 
 ## Bu düzenlemenin özeti
 
-2026-08-23 — `apple-design` skill'iyle Şeyma ve ÆON yüzeylerinde HIG denetimi yapıldı. Ölçülen: açık temada 9 renk tokenı 4.5:1'in altında (`--faint` 3.06:1 ve 316 metin kullanımı), 65 adet 11pt altı font, `maximum-scale=1` yakınlaştırma kilidi, 54 klavye-erişilemez `<div onclick>`, ve Liquid Glass'ın içerik katmanında kullanımı (69 site) — HIG'in açıkça yasakladığı kalıp. AD-19…AD-23 dönüşümleri tamamlandı; literal app `<div onclick>` sayısı 0. AD-24 ile panel v1’in 8 hedefi de klavye güvenli hale getirildi; iki nested-control kabuğu role tabanlı kaldı.
+2026-08-23 — `apple-design` skill'iyle Şeyma ve ÆON yüzeylerinde HIG denetimi yapıldı. Ölçülen: açık temada 9 renk tokenı 4.5:1'in altında (`--faint` 3.06:1 ve 316 metin kullanımı), 65 adet 11pt altı font, `maximum-scale=1` yakınlaştırma kilidi, 54 klavye-erişilemez `<div onclick>`, ve Liquid Glass'ın içerik katmanında kullanımı (69 site) — HIG'in açıkça yasakladığı kalıp. AD-19…AD-23 app dönüşümleri ve AD-24 panel v1 dönüşümü tamamlandı; literal app `<div onclick>` sayısı 0, panelde iki nested-control role kabuğu kaldı. AD-25 kapanış gate'leri S8+S4+S5+S6+S7 olarak yeniden çalıştırıldı.
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 24 tanesi uygulandı.
+Bulgular 52 sıralı prompta dönüştürüldü; 25 tanesi uygulandı.

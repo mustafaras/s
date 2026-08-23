@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-24",
-  "nextPrompt": "AD-25",
-  "currentWave": "4",
+  "lastCompletedPrompt": "AD-25",
+  "nextPrompt": "AD-26",
+  "currentWave": "5",
   "totalPrompts": 52,
-  "completedPrompts": 24,
+  "completedPrompts": 25,
   "updatedAt": "2026-08-23",
-  "nextSafeAction": "Siradaki prompt: AD-25. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
+  "nextSafeAction": "Siradaki prompt: AD-26. Dalga 1-5 ek onay istemez; dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -36,7 +36,7 @@
       "prompts": "AD-01..AD-05",
       "topic": "zero-risk accessibility",
       "approvalRequired": false,
-      "completed": 8,
+      "completed": 5,
       "total": 5
     },
     {
@@ -52,7 +52,7 @@
       "prompts": "AD-14..AD-16",
       "topic": "touch targets",
       "approvalRequired": false,
-      "completed": 5,
+      "completed": 3,
       "total": 3
     },
     {
@@ -60,7 +60,7 @@
       "prompts": "AD-17..AD-25",
       "topic": "keyboard access div->button",
       "approvalRequired": false,
-      "completed": 3,
+      "completed": 9,
       "total": 9
     },
     {

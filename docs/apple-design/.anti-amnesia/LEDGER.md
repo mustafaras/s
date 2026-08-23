@@ -91,6 +91,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-24 | Panel v1 dönüşümü | ✅ TAMAMLANDI | `5ac350b` | S8+S4+S5 geçti | Panel/panel.js içindeki 8 hedef dönüştürüldü; native yüzeyler `button.sey-asbtn`, nested-control kabukları klavye destekli role olarak kaldı. Panel CSS helper/cache-bust eklendi; panel testleri 50/50, handler/call dağılımı değişmedi. |
 
+| AD-25 | Dalga 4 kapanışı | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5+S6+S7 geçti | `index.html` ve `panel.html` cache-bust'ları güncel; tam headless gate geçti, app handler/call dağılımı ve I1–I5 sınırları değişmedi. Literal app `<div onclick>` 0, panel `<div onclick>` 2 role kabuğu. State dalga sayaçları düzeltilerek Dalga 4 9/9 ve `currentWave=5` yapıldı; açık kapı yok. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -102,14 +104,14 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 1 · Sıfır risk erişilebilirlik | AD-01 … AD-05 | 5/5 | ✅ tamamlandı |
 | 2 · `-ink` renk tokenları | AD-06 … AD-13 | 8/8 | ✅ tamamlandı |
 | 3 · Dokunma hedefleri | AD-14 … AD-16 | 3/3 | ✅ tamamlandı |
-| 4 · Klavye erişimi | AD-17 … AD-25 | 2/9 | devam ediyor |
+| 4 · Klavye erişimi | AD-17 … AD-25 | 9/9 | ✅ tamamlandı |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 0/5 | onay bekliyor |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **18/52** | |
+| | **Toplam** | **25/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

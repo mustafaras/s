@@ -36,8 +36,8 @@
 | 18 | `app.js:12530` | `App.toggleCrisisDropdown` | hayır | `button` |
 | 19 | `app.js:12557` | `App.toggleCrisisDropdown` | hayır | `button` |
 | 20 | `app.js:12877` | `App.heatOpen` | hayır | `button` |
-| 21 | `app.js:14158` | `App.closeFaithCorner` | hayır | `button` |
-| 22 | `app.js:14158` | `event.stopPropagation` | hayır | `button` |
+| 21 | `app.js:14158` | `App.closeFaithCorner` | evet | `role` |
+| 22 | `app.js:14158` | `event.stopPropagation` | evet | `role` |
 | 23 | `app.js:15799` | `App.closeQibla` | evet | `role` |
 | 24 | `app.js:15915` | `App.closeSaygiPerson` | hayır | `button` |
 | 25 | `app.js:15915` | `event.stopPropagation` | hayır | `button` |

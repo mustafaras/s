@@ -81,6 +81,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-19 | Dönüşüm partisi 1/5 | ✅ TAMAMLANDI | `d598a3b` | S8+S4+S5 geçti | Envanter 1–11: güvenli yüzeyler native `button.sey-asbtn`, iç içe etkileşimli yüzeyler klavye destekli `role=button`; `App` handler ve onclick dağılımı değişmedi. app.js cache-bust `20260823d`; kaynakta 48 `<div onclick>` kaldı. |
 
+| AD-20 | Dönüşüm partisi 2/5 | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5 geçti | Envanter 12–22: günlük fotoğrafı/overlay yüzeyleri klavye destekli `role=button`, güvenli kart ve dropdown başlıkları native `button.sey-asbtn`; ısı hücreleri yalnız tıklanabilir durumda native buton oldu. `App` handler ve onclick dağılımı değişmedi; kaynakta 44 `<div onclick>` kaldı. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

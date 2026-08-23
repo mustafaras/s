@@ -12008,7 +12008,7 @@ function dailyPhotoCardHTML(){
   var cardBg=dark?'linear-gradient(145deg,#141012,#0B0B0D)':'linear-gradient(145deg,#FFF8F0,#FDF6ED)';
   var border=dark?'1px solid rgba(244,201,128,0.20)':'1px solid rgba(138,90,43,0.16)';
   var muted=dark?'#C8B9A6':'#8A6A52';
-  var h='<div class="glass sey-daily-photo" onclick="App.toggleDailyPhoto()" role="button" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
+  var h='<div class="glass sey-daily-photo" onclick="App.toggleDailyPhoto()" role="button" tabindex="0" aria-expanded="'+(open?'true':'false')+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.toggleDailyPhoto();}" style="cursor:pointer;position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
   // Başlık şeridi (Günışığı kartıyla aynı aç/kapa deseni)
   h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
   h+='<div style="display:flex;align-items:center;gap:9px;">';
@@ -12303,7 +12303,7 @@ function journalLightCardHTML(rec, streak){
   var has=rec&&rec.journal&&String(rec.journal.text||'').trim();
   var title=has?'Bugünün ışığı parlıyor ✨':'Bugünün ışığı henüz yazılmadı 🪶';
   var sub=has?(rec.journal.wordCount+' kelime · '+fmtDateShort(rec.journal.savedAt)):(streak>1?(streak+' günlük seri · yazmak seriyi korur'):'Birkaç satır yaz, kendine ışık tut');
-  return '<div onclick="App.openJournalModal()" class="sgl-journal-card"><span class="sgl-journal-icon">'+icon('sparkles',17)+'</span><div class="sgl-journal-text"><div class="sgl-journal-title">'+esc(title)+'</div><div class="sgl-journal-sub">'+esc(sub)+'</div></div><span class="sgl-journal-action">'+(has?'Görüntüle':'Aç')+' '+icon('chevron-right',12)+'</span></div>';
+  return '<button type="button" onclick="App.openJournalModal()" class="sgl-journal-card sey-asbtn"><span class="sgl-journal-icon">'+icon('sparkles',17)+'</span><div class="sgl-journal-text"><div class="sgl-journal-title">'+esc(title)+'</div><div class="sgl-journal-sub">'+esc(sub)+'</div></div><span class="sgl-journal-action">'+(has?'Görüntüle':'Aç')+' '+icon('chevron-right',12)+'</span></button>';
 }
 function journalModalHTML(){
   var date=activeDate();
@@ -12320,8 +12320,8 @@ function journalModalHTML(){
   var mObj=find(JOURNAL_MODES,'id',mode)||JOURNAL_MODES[0];
   var hasSaved=(data.days[date]&&data.days[date].journal&&data.days[date].journal.savedAt);
 
-  var h='<div onclick="App.closeJournalModal()" style="position:fixed;inset:0;z-index:350;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
-  h+='<div onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
+  var h='<div role="button" tabindex="0" onclick="App.closeJournalModal()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeJournalModal();}" style="position:fixed;inset:0;z-index:350;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
 
   h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,var(--journal),var(--journal2));color:#fff;box-shadow:0 8px 22px color-mix(in srgb,var(--journal) 32%, transparent);overflow:hidden;">';
   h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
@@ -12466,8 +12466,8 @@ function crisisModalHTML(){
 
   // Tam sayfa modal: alttan-sayfa yerine tüm ekranı kaplar → uzun expander gövdeleri
   // artık dar bir çerçeveye sıkışmaz, serbestçe kaydırılır. Birincil eylem sabit alt bar'da.
-  var h='<div id="sey-crisis-back" onclick="App.closeCrisis()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
-  h+='<div id="sey-crisis-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
+  var h='<div id="sey-crisis-back" role="button" tabindex="0" onclick="App.closeCrisis()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeCrisis();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div id="sey-crisis-card" role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
 
   // sticky header (gradient accent, Raşit branding, safe-area üst boşluğu)
   h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,'+A+','+A2+');color:#fff;box-shadow:0 8px 22px color-mix(in srgb,'+A+' 32%, transparent);overflow:hidden;">';
@@ -12527,11 +12527,11 @@ function crisisModalHTML(){
     '<div id="crisis-trig-drop" style="display:flex;flex-direction:column;gap:9px;'+(trigOpen?'':'display:none;')+'">'+trigDropBody+'</div>';
   var trigCard =
     '<div style="display:flex;flex-direction:column;gap:9px;background:var(--card);border:1px solid '+(trigCount>0?A:'var(--card-bd)')+';border-radius:20px;padding:13px 14px 14px;box-shadow:'+(trigCount>0?'0 8px 22px color-mix(in srgb,'+A+' 18%, transparent)':'0 5px 16px rgba(108,74,58,0.05)')+';">'
-    +'<div onclick="App.toggleCrisisDropdown(\'trig\')" style="cursor:pointer;display:flex;align-items:center;gap:11px;">'
+    +'<button type="button" class="sey-asbtn" onclick="App.toggleCrisisDropdown(\'trig\')" style="cursor:pointer;display:flex;align-items:center;gap:11px;">'
     +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('zap',16)+'</span>'
     +'<div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.15;">Bu krizi ne tetikliyor?</div><div style="font-size:11.5px;color:'+(trigCount>0?A:'var(--faint)')+';margin-top:2px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(trigSummary)+'</div></div>'
     +'<span style="color:'+A+';display:inline-flex;transition:transform .25s var(--ease-premium,ease);transform:rotate('+trigChevRot+');">'+icon('chevron-down',16)+'</span>'
-    +'</div>'
+    +'</button>'
     +trigDrop
     +'<div style="font-size:11px;color:var(--faint);line-height:1.5;padding-top:1px;">İşaretlediğin tetikleyiciler Rapor’da örüntünü çıkarmama yardımcı olur.</div>'
     +'</div>';
@@ -12554,11 +12554,11 @@ function crisisModalHTML(){
     '<div id="crisis-tried-drop" style="display:flex;flex-direction:column;gap:9px;'+(triedOpen?'':'display:none;')+'">'+triedDropBody+'</div>';
   var triedCard =
     '<div style="display:flex;flex-direction:column;gap:9px;background:var(--card);border:1px solid '+(triedN>0?A:'var(--card-bd)')+';border-radius:20px;padding:13px 14px 14px;box-shadow:'+(triedN>0?'0 8px 22px color-mix(in srgb,'+A+' 18%, transparent)':'0 5px 16px rgba(108,74,58,0.05)')+';">'
-    +'<div onclick="App.toggleCrisisDropdown(\'tried\')" style="cursor:pointer;display:flex;align-items:center;gap:11px;">'
+    +'<button type="button" class="sey-asbtn" onclick="App.toggleCrisisDropdown(\'tried\')" style="cursor:pointer;display:flex;align-items:center;gap:11px;">'
     +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+A+';background:color-mix(in srgb,'+A+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('heart-handshake',16)+'</span>'
     +'<div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:800;color:var(--text);line-height:1.15;">Şu an ne denedin?</div><div style="font-size:11.5px;color:'+(triedN>0?A:'var(--faint)')+';margin-top:2px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(triedSummary)+'</div></div>'
     +'<span style="color:'+A+';display:inline-flex;transition:transform .25s var(--ease-premium,ease);transform:rotate('+triedChevRot+');">'+icon('chevron-down',16)+'</span>'
-    +'</div>'
+    +'</button>'
     +triedDrop
     +'<div style="font-size:11px;color:var(--faint);line-height:1.5;padding-top:1px;">Küçük bir hamle bile prefrontal korteksi devreye sokar; bu da kriz şiddetini düşürür.</div>'
     +'</div>';
@@ -12874,7 +12874,7 @@ function moodHeatmapCard(){
       else if(rec){ bg=dark?'rgba(233,175,193,0.30)':'rgba(150,110,120,0.24)'; clk=true; recDays++; tip+=' · kayıt var'; }
       else { bg=dark?'rgba(255,255,255,0.05)':'rgba(150,110,120,0.10)'; clk=true; tip+=' · kayıt yok'; }
       var isT=ds===today;
-      h+='<div '+(clk?'onclick="App.heatOpen(\''+ds+'\')" ':'')+'title="'+tip+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';cursor:'+(clk?'pointer':'default')+';'+(isT?'box-shadow:0 0 0 1.5px var(--accent);':'')+'"></div>';
+      h+=(clk?'<button type="button" class="sey-asbtn" onclick="App.heatOpen(\''+ds+'\')" ':'<div ')+'title="'+tip+'" style="width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;background:'+bg+';cursor:'+(clk?'pointer':'default')+';'+(isT?'box-shadow:0 0 0 1.5px var(--accent);':'')+'">'+(clk?'</button>':'</div>');
     }
     h+='</div>';
   }
@@ -14155,7 +14155,7 @@ function faithCornerOverlayHTML(){
   body+='<div style="border-radius:12px;padding:11px 12px;background:var(--faith-bg);border:1px solid color-mix(in srgb,var(--faith) 18%, var(--card-bd));font-size:12px;line-height:1.45;color:var(--text2);">';
   body+=icon('sparkles',13)+' Vakitler Aladhan API ile Diyanet (method 13) hesabına göre çekilir. Şehir değişince otomatik yenilenir; offline son cache kullanılır.';
   body+='</div>';
-  return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" onclick="App.closeFaithCorner()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
+  return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" role="button" tabindex="0" onclick="App.closeFaithCorner()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeFaithCorner();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" role="button" tabindex="0" onclick="event.stopPropagation()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();}" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
 }
 
 function saygiPreviewHubHTML(person,article,done){

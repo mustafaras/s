@@ -1440,3 +1440,14 @@
    page-entry motion or steals the active modal scroll. */
 [data-reminder-render-target]{scroll-margin-block:8px}
 @media (prefers-reduced-motion:reduce){[data-reminder-render-target],[data-reminder-render-target] *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Sistem "Increase Contrast" açıkken ikincil metinleri yükselt.
+   #root[data-theme="dark"] daha spesifik olduğu için koyu tema etkilenmez —
+   koyu tokenlar zaten AAA seviyesinde. */
+@media (prefers-contrast: more){
+  #root{
+    --muted:var(--text2);
+    --faint:var(--muted);
+    --card-bd:rgba(0,0,0,.28);
+  }
+}

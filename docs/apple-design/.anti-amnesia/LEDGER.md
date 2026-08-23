@@ -47,6 +47,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-02 | --faint kontrastı AA | ✅ TAMAMLANDI | `bcf0f1b` | S4+S5 geçti | Açık tema --faint #9C8C92 (3.06:1) -> #816F76 (4.50:1). Hue/saturation korundu, 316 metin kullanımı etkilendi. Koyu tema #858590 dokunulmadı. |
 
+| AD-03 | Increase Contrast desteği | ✅ TAMAMLANDI | `af08fd3` | S4+S5 geçti | Dosya sonuna @media (prefers-contrast: more) bloğu; --muted->--text2, --faint->--muted, kenarlık koyulaştı. Varsayılan yol değişmedi. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

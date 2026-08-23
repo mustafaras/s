@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-10` — --watch metin taşındı |
-| **Sıradaki** | `AD-11` |
+| **Son tamamlanan** | `AD-11` — --listen metin taşındı |
+| **Sıradaki** | `AD-12` |
 | **Güncel dalga** | `2` |
 | **Bloke** | yok |
 | **Son güncelleme** | 2026-08-23 |
 
-**Uygulanan promptlar:** AD-01 … AD-10. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alinabilir (I6).
+**Uygulanan promptlar:** AD-01 … AD-11. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alinabilir (I6).
 
 ---
 
@@ -104,4 +104,4 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 10 tanesi uygulandı.
+Bulgular 52 sıralı prompta dönüştürüldü; 11 tanesi uygulandı.

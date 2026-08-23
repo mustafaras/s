@@ -63,6 +63,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-10 | --watch metin taşındı | ✅ TAMAMLANDI | `e1cade4` | S4+S5 geçti | 11 metin kullanımı taşındı (3.69:1 -> 4.50:1). --watch-bg dokunulmadı. |
 
+| AD-11 | --listen metin taşındı | ✅ TAMAMLANDI | `1bbd0d3` | S4+S5 geçti | 5 metin kullanımı taşındı (3.71:1 -> 4.50:1). --listen-bg dokunulmadı. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---

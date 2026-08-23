@@ -77,7 +77,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-17 | `.sey-asbtn` yardımcı sınıfı | ✅ TAMAMLANDI | `b84f099` | S8+S4+S5 geçti | Yalnızca div görünümünü koruyan buton yardımcı sınıfı eklendi; hiçbir öğe dönüştürülmedi, handler/call yüzeyi değişmedi. |
 
-| AD-18 | Dönüşüm envanteri çıkar | ✅ TAMAMLANDI | `PENDING` | S4+S5 geçti | `app.js` 54 + `panel/panel.js` 8 olmak üzere 62 kayıt çıkarıldı; `button`/`role` stratejileri belirlendi, kod dosyaları değiştirilmedi. |
+| AD-18 | Dönüşüm envanteri çıkar | ✅ TAMAMLANDI | `4f676e7` | S4+S5 geçti | `app.js` 54 + `panel/panel.js` 8 olmak üzere 62 kayıt çıkarıldı; `button`/`role` stratejileri belirlendi, kod dosyaları değiştirilmedi. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

@@ -12020,7 +12020,7 @@ function rasitActionsHTML(){
       +badge
       +'<span style="width:38px;height:38px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+(dark?C.accent2:'#fff')+';background:'+(dark?'color-mix(in srgb,'+C.accent+' 13%, rgba(255,255,255,.035))':'rgba(255,255,255,0.22)')+';border:'+(dark?'1px solid color-mix(in srgb,'+C.accent+' 24%, transparent)':'none')+';box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.4)')+';">'+icon(C.icon,19)+'</span>'
       +'<span style="font-size:12.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;">'+C.short+'</span>'
-      +'<span style="font-size:8.5px;font-weight:800;letter-spacing:.4px;color:'+(dark?C.accent2:'currentColor')+';opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
+      +'<span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:'+(dark?C.accent2:'currentColor')+';opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
   };
   var h='<div class="glass"'+(dark?' data-dark-variant="crisis"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#121013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,#E9899F '+(dark?'34':'26')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px rgba(233,137,159,0.16)')+';">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
@@ -12905,7 +12905,7 @@ function moodHeatmapCard(){
   h+='</div>';
   h+='<div style="display:flex;gap:'+GAP+'px;">';
   h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
-  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:8.5px;color:var(--faint);text-align:right;">'+dayLab[r]+'</div>'; }
+  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:11px;color:var(--faint);text-align:right;">'+dayLab[r]+'</div>'; }
   h+='</div>';
   var recDays=0;
   for(var w2=0; w2<nW; w2++){

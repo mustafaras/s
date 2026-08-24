@@ -5312,7 +5312,7 @@ function profileConsentMandatoryOk(c){ return !!(c&&c.read&&c.processing&&c.sens
 function profileConsentRow(key,label,checked){
   return '<button onclick="App.profileConsentToggle(\''+key+'\')" style="display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;border:none;text-align:left;padding:12px 13px;border-radius:15px;cursor:pointer;transition:all .18s;'+(checked?'background:color-mix(in srgb,#C9B8FF 12%, var(--card));border:1px solid #C9B8FF;':'background:var(--card);border:1px solid var(--card-bd);')+'">'
     +'<span style="width:22px;height:22px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;color:#fff;background:'+(checked?'linear-gradient(135deg,#E9899F,#C9B8FF)':'transparent')+';border:'+(checked?'none':'2px solid var(--field-bd)')+';">'+(checked?icon('check',13):'')+'</span>'
-    +'<span style="flex:1;font-size:13.5px;line-height:1.45;color:var(--text);font-weight:600;">'+label+'</span></button>';
+    +'<span style="flex:1;font-size:var(--f-footnote);line-height:1.45;color:var(--text);font-weight:600;">'+label+'</span></button>';
 }
 function renderProfileConsent(){
   ensureProfileAssessment(data);
@@ -6172,7 +6172,7 @@ function collapsibleCardHTML(o){
   return h;
 }
 // Sağlık bölümü başlığında glance-edilen metrik rozeti (iOS-27: kapalıyken bile değer görünür).
-function hBadge(txt,col){ col=col||'var(--muted)'; return '<span style="font-size:11px;font-weight:800;color:'+col+';background:color-mix(in srgb,'+col+' 13%, var(--card));border:1px solid color-mix(in srgb,'+col+' 28%, var(--card-bd));border-radius:999px;padding:3px 9px;white-space:nowrap;">'+txt+'</span>'; }
+function hBadge(txt,col){ col=col||'var(--muted)'; return '<span style="font-size:var(--f-caption2);font-weight:800;color:'+col+';background:color-mix(in srgb,'+col+' 13%, var(--card));border:1px solid color-mix(in srgb,'+col+' 28%, var(--card-bd));border-radius:999px;padding:3px 9px;white-space:nowrap;">'+txt+'</span>'; }
 // ---- geçmiş gün düzenleme: tarih etiketi + kalıcı uyarı şeridi ----
 function dateLabelTR(s){ if(!s) return ''; var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); var mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']; var wd=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']; return p[2]+' '+mo[p[1]-1]+' '+wd[dt.getDay()]; }
 function editBanner(){
@@ -6907,7 +6907,7 @@ function reminderSpecialDaysSectionHTML(root){
     REMINDER_SPECIAL_DAY_OPTIONS.forEach(function(option){ var active=selected.indexOf(option.id)>=0; h+='<button type="button" class="sey-reminder-setup-choice'+(active?' is-selected':'')+'" onclick="App.toggleReminderSpecialDay(\''+option.id+'\')" aria-pressed="'+active+'"><span aria-hidden="true">'+icon(active?'circle-check':'moon-star',15)+'</span><span><strong>'+esc(option.label)+'</strong><small>'+(active?'Seçildi':'Seçmek için dokun')+'</small></span></button>'; });
     h+='</div>'+(selected.length?'':'<p class="sey-reminder-profile-note" role="status">Henüz gün seçmedin; bu modda occurrence oluşmaz.</p>')+'</div>';
   }
-  h+='<div class="sey-reminder-category-meta"><span>Hicri offset: <strong>'+(offset>0?'+':'')+offset+' gün</strong></span><label><span>Uygulama saati</span><input type="time" value="'+esc(state.time)+'" onchange="App.setReminderSpecialDaysTime(this.value)" aria-label="Özel gün hatırlatma saati" style="min-height:44px;padding:5px 7px;border:1px solid var(--field-bd);border-radius:9px;background:var(--card);color:var(--text);font:inherit;font-size:11px;"></label></div>';
+  h+='<div class="sey-reminder-category-meta"><span>Hicri offset: <strong>'+(offset>0?'+':'')+offset+' gün</strong></span><label><span>Uygulama saati</span><input type="time" value="'+esc(state.time)+'" onchange="App.setReminderSpecialDaysTime(this.value)" aria-label="Özel gün hatırlatma saati" style="min-height:44px;padding:5px 7px;border:1px solid var(--field-bd);border-radius:9px;background:var(--card);color:var(--text);font:inherit;font-size:var(--f-caption2);"></label></div>';
   h+='<div class="sey-reminder-category-meta"><span>Native kanal başlangıçta kapalıdır.</span><label><span>Kanal</span><select aria-label="Özel gün hatırlatma kanalı" onchange="App.setReminderSpecialDaysChannel(this.value)"><option value="in_app"'+(state.channel==='in_app'?' selected':'')+'>Uygulama içi</option><option value="native"'+(state.channel==='native'?' selected':'')+'>Native · izin varsa</option></select></label></div>';
   h+='<small class="sey-reminder-category-channel">Offset değişirse occurrence tarihi yerel Hicri tercihe göre yeniden hesaplanır. Metin zorunluluk, puan veya ticari çağrı taşımaz.</small></section>';
   return h;
@@ -6932,13 +6932,13 @@ function reminderMedicationSectionHTML(root){
   var list=root&&Array.isArray(root.medications)?root.medications:[], draft=reminderMedicationDraftState(), editingId=String(ui.reminderMedicationEditingId||''), editing=editingId!=='', h='<section class="sey-reminder-medications" data-reminder-medication-surface="local-only" aria-labelledby="sey-reminder-medication-title">';
   h+='<div class="sey-reminder-section-head"><div><span class="sey-reminder-eyebrow">YALNIZCA SENİN KURDUĞUN SAAT</span><h3 id="sey-reminder-medication-title">İlaç / takviye saati</h3></div><span class="sey-reminder-count">'+list.length+'</span></div>';
   h+='<p class="sey-reminder-medication-safety" role="note" data-reminder-medication-safety="true">'+esc(REMINDER_MEDICATION_SAFETY_COPY)+'</p>';
-  if(ui.reminderMedicationError) h+='<p role="alert" style="margin:0;padding:9px 10px;border-left:3px solid var(--drop);border-radius:4px 10px 10px 4px;background:color-mix(in srgb,var(--drop) 8%,var(--card));color:var(--text);font-size:11px;line-height:1.4;">'+esc(ui.reminderMedicationError)+'</p>';
+  if(ui.reminderMedicationError) h+='<p role="alert" style="margin:0;padding:9px 10px;border-left:3px solid var(--drop);border-radius:4px 10px 10px 4px;background:color-mix(in srgb,var(--drop) 8%,var(--card));color:var(--text);font-size:var(--f-caption2);line-height:1.4;">'+esc(ui.reminderMedicationError)+'</p>';
   h+='<div class="sey-reminder-medication-form" data-reminder-medication-form="true"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0;">';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:11px;font-weight:850;">Tür<select id="sey-reminder-medication-kind" aria-label="Hatırlatma türü" maxlength="12" onchange="App.setReminderMedicationDraftField(\'kind\',this.value)" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"><option value="medication"'+(draft.kind==='medication'?' selected':'')+'>İlaç</option><option value="supplement"'+(draft.kind==='supplement'?' selected':'')+'>Takviye</option></select></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:11px;font-weight:850;">Saat<input id="sey-reminder-medication-time" type="time" maxlength="5" value="'+esc(draft.time)+'" onchange="App.setReminderMedicationDraftField(\'time\',this.value)" oninput="App.setReminderMedicationDraftField(\'time\',this.value)" aria-label="İlaç veya takviye hatırlatma saati" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label></div>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Ad<input id="sey-reminder-medication-name" aria-label="İlaç veya takviye adı" type="text" maxlength="'+REMINDER_MEDICATION_NAME_MAX+'" value="'+esc(draft.name)+'" oninput="App.setReminderMedicationDraftField(\'name\',this.value)" placeholder="Kendi adın" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Özel etiket <span style="font-weight:600;color:var(--faint);">yalnız uygulamada</span><input id="sey-reminder-medication-label" aria-label="İlaç veya takviye özel etiketi" type="text" maxlength="'+REMINDER_MEDICATION_LABEL_MAX+'" value="'+esc(draft.privateLabel)+'" oninput="App.setReminderMedicationDraftField(\'privateLabel\',this.value)" placeholder="Özel bir etiket" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Not <span style="font-weight:600;color:var(--faint);">'+REMINDER_MEDICATION_NOTE_MAX+' karaktere kadar · yerel</span><textarea id="sey-reminder-medication-note" aria-label="İlaç veya takviye yerel notu" maxlength="'+REMINDER_MEDICATION_NOTE_MAX+'" oninput="App.setReminderMedicationDraftField(\'note\',this.value)" placeholder="İstersen kendin için kısa bir not">'+esc(draft.note)+'</textarea></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:var(--f-caption2);font-weight:850;">Tür<select id="sey-reminder-medication-kind" aria-label="Hatırlatma türü" maxlength="12" onchange="App.setReminderMedicationDraftField(\'kind\',this.value)" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:var(--f-caption1);"><option value="medication"'+(draft.kind==='medication'?' selected':'')+'>İlaç</option><option value="supplement"'+(draft.kind==='supplement'?' selected':'')+'>Takviye</option></select></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:var(--f-caption2);font-weight:850;">Saat<input id="sey-reminder-medication-time" type="time" maxlength="5" value="'+esc(draft.time)+'" onchange="App.setReminderMedicationDraftField(\'time\',this.value)" oninput="App.setReminderMedicationDraftField(\'time\',this.value)" aria-label="İlaç veya takviye hatırlatma saati" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:var(--f-caption1);"></label></div>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:var(--f-caption2);font-weight:850;">Ad<input id="sey-reminder-medication-name" aria-label="İlaç veya takviye adı" type="text" maxlength="'+REMINDER_MEDICATION_NAME_MAX+'" value="'+esc(draft.name)+'" oninput="App.setReminderMedicationDraftField(\'name\',this.value)" placeholder="Kendi adın" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:var(--f-caption1);"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:var(--f-caption2);font-weight:850;">Özel etiket <span style="font-weight:600;color:var(--faint);">yalnız uygulamada</span><input id="sey-reminder-medication-label" aria-label="İlaç veya takviye özel etiketi" type="text" maxlength="'+REMINDER_MEDICATION_LABEL_MAX+'" value="'+esc(draft.privateLabel)+'" oninput="App.setReminderMedicationDraftField(\'privateLabel\',this.value)" placeholder="Özel bir etiket" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:var(--f-caption1);"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:var(--f-caption2);font-weight:850;">Not <span style="font-weight:600;color:var(--faint);">'+REMINDER_MEDICATION_NOTE_MAX+' karaktere kadar · yerel</span><textarea id="sey-reminder-medication-note" aria-label="İlaç veya takviye yerel notu" maxlength="'+REMINDER_MEDICATION_NOTE_MAX+'" oninput="App.setReminderMedicationDraftField(\'note\',this.value)" placeholder="İstersen kendin için kısa bir not">'+esc(draft.note)+'</textarea></label>';
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;"><button type="button" class="sey-reminder-primary" onclick="App.saveReminderMedicationDraft()">'+(editing?'Düzenlemeyi kaydet':'Saati ekle')+'</button>'+(editing?'<button type="button" class="sey-reminder-secondary" onclick="App.cancelReminderMedicationEdit()">Vazgeç</button>':'')+'</div>';
   h+='<p class="sey-reminder-medication-native-note" role="note">Native yüzey için varsayılan metin geneldir; ad, etiket, not ve doz bildirim gövdesine yazılmaz.</p></div>';
   if(list.length){
@@ -9510,25 +9510,25 @@ function reportHTML(){
   var range=shortDate(data.startDate)+' – '+shortDate(todayStr());
   var h='';
   h+='<div style="text-align:center;padding:30px 0 24px;border-bottom:2px solid #F2E1DA;margin-bottom:26px;">';
-  h+='<div style="font-size:34px;font-weight:800;">Şeyma 🦩</div>';
-  h+='<div style="font-size:16px;color:#7A6B70;margin-top:6px;">Minik Denge Günlüğü</div>';
-  h+='<div style="font-size:14px;color:#9C8C92;margin-top:12px;">'+range+'</div>';
-  h+='<div style="font-size:14px;color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
-  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Özet</div>';
+  h+='<div style="font-size:var(--f-large);font-weight:800;">Şeyma 🦩</div>';
+  h+='<div style="font-size:var(--f-callout);color:#7A6B70;margin-top:6px;">Minik Denge Günlüğü</div>';
+  h+='<div style="font-size:var(--f-subhead);color:#9C8C92;margin-top:12px;">'+range+'</div>';
+  h+='<div style="font-size:var(--f-subhead);color:#6B4A3A;margin-top:10px;font-style:italic;">Diyet değil. Küçük kontrol notları.</div></div>';
+  h+='<div style="font-size:var(--f-title3);font-weight:800;margin:0 0 14px;">Özet</div>';
   var stats=[['Toplam tamamlanan tik',st.total],['Tatlı kontrolü günü',st.tot.sweetManaged],['Akşam kontrolü günü',st.tot.eveningControl],['Yürüyüş günü',st.tot.walked20],['Protein günü',st.tot.protein],['Su günü',st.tot.water],['D₃K₂ damla günü',st.tot.vitaminD],['Kendine iyi davranma günü',st.tot.selfKind],['En iyi seri',st.best+' gün'],['En sık mod',st.mood]];
   h+='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;">';
-  stats.forEach(function(s){ h+='<div style="flex:1 1 30%;min-width:150px;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:12px 14px;"><div style="font-size:12px;color:#9C8C92;">'+esc(s[0])+'</div><div style="font-size:20px;font-weight:800;margin-top:3px;">'+esc(s[1])+'</div></div>'; });
+  stats.forEach(function(s){ h+='<div style="flex:1 1 30%;min-width:150px;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:12px 14px;"><div style="font-size:var(--f-caption1);color:#9C8C92;">'+esc(s[0])+'</div><div style="font-size:var(--f-title3);font-weight:800;margin-top:3px;">'+esc(s[1])+'</div></div>'; });
   h+='</div>';
-  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">İlk 3 Hafta</div><div style="display:flex;gap:12px;margin-bottom:26px;">';
-  [0,1,2].forEach(function(w){ var b=weekBlock(w,days); h+='<div style="flex:1;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:14px;"><div style="font-size:15px;font-weight:800;margin-bottom:8px;">'+esc(b.title)+'</div>'; b.rows.forEach(function(r){ h+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:#5A4D52;">'+esc(r.label)+'</span><b>'+esc(r.val)+'</b></div>'; }); h+='<div style="font-size:11px;color:#7A6B70;margin-top:6px;border-top:1px solid #F2E1DA;padding-top:6px;">Ort. '+esc(b.avg)+' · Seri '+esc(b.best)+'</div></div>'; });
+  h+='<div style="font-size:var(--f-title3);font-weight:800;margin:0 0 14px;">İlk 3 Hafta</div><div style="display:flex;gap:12px;margin-bottom:26px;">';
+  [0,1,2].forEach(function(w){ var b=weekBlock(w,days); h+='<div style="flex:1;background:#FFF8F3;border:1px solid #F2E1DA;border-radius:12px;padding:14px;"><div style="font-size:var(--f-subhead);font-weight:800;margin-bottom:8px;">'+esc(b.title)+'</div>'; b.rows.forEach(function(r){ h+='<div style="display:flex;justify-content:space-between;font-size:var(--f-caption1);margin-bottom:5px;"><span style="color:#5A4D52;">'+esc(r.label)+'</span><b>'+esc(r.val)+'</b></div>'; }); h+='<div style="font-size:var(--f-caption2);color:#7A6B70;margin-top:6px;border-top:1px solid #F2E1DA;padding-top:6px;">Ort. '+esc(b.avg)+' · Seri '+esc(b.best)+'</div></div>'; });
   h+='</div>';
-  h+='<div style="font-size:20px;font-weight:800;margin:0 0 14px;">Günlük Tablo (tüm kayıt)</div>';
-  h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
+  h+='<div style="font-size:var(--f-title3);font-weight:800;margin:0 0 14px;">Günlük Tablo (tüm kayıt)</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:var(--f-caption1);margin-bottom:24px;"><thead><tr style="background:#F7DDE5;">';
   ['Gün','Tarih','Tik','Mod','Adım','Uyku','Kriz','Kısa not'].forEach(function(x){ h+='<th style="text-align:left;padding:7px 9px;border:1px solid #F2E1DA;">'+x+'</th>'; });
   h+='</tr></thead><tbody>';
   days.forEach(function(o){ var rec=o.rec; var mood=rec&&rec.mood?find(MOODS,'id',rec.mood):null; var esr=effSteps(rec); var st=esr.steps!=null?(esr.steps.toLocaleString('tr-TR')+(esr.source==='tracked'?'~':'')):'—'; var sh=(rec&&rec.sleep&&rec.sleep.hours!=null)?(rec.sleep.hours+' sa'):'—'; h+='<tr><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+o.i+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+shortDate(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+countRec(rec)+'/'+habitCountOn(o.date)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(mood?esc(mood.short):'—')+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(st)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc(sh)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+(rec?rec.cravingSOSCount||0:0)+'</td><td style="padding:6px 9px;border:1px solid #F2E1DA;">'+esc((rec&&rec.note)?String(rec.note).slice(0,42):'')+'</td></tr>'; });
   h+='</tbody></table>';
-  h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:15px;font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
+  h+='<div style="background:#FFE8A3;border-radius:12px;padding:18px;text-align:center;font-size:var(--f-subhead);font-weight:600;color:#6B4A3A;">Küçük seçimler görünmez gibi durur ama birikince ritim olur.</div>';
   return h;
 }
 function getStats(){
@@ -9545,7 +9545,7 @@ function openReport(){
   }
   var doc='<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Şeyma 🦩 Rapor</title>'
     +'<style>@page{margin:14mm;}body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#2C2426;margin:0;padding:24px;}@media print{.noprint{display:none;}}</style></head><body>'
-    +'<div class="noprint" style="text-align:center;margin-bottom:18px;"><button onclick="window.print()" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;cursor:pointer;">Yazdır / PDF kaydet</button></div>'
+    +'<div class="noprint" style="text-align:center;margin-bottom:18px;"><button onclick="window.print()" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:var(--f-subhead);padding:12px 22px;border-radius:12px;cursor:pointer;">Yazdır / PDF kaydet</button></div>'
     +reportHTML()+'</body></html>';
   w.document.open(); w.document.write(doc); w.document.close();
   setTimeout(function(){ try{ w.focus(); w.print(); }catch(e){} },500);
@@ -9555,8 +9555,8 @@ function inlinePrint(){
   var ov2=document.createElement('div'); ov2.id='sey-print';
   ov2.innerHTML='<style>@media print{body *{visibility:hidden;}#sey-print,#sey-print *{visibility:visible;}#sey-print{position:absolute;left:0;top:0;width:100%;}#sey-print .pbar{display:none;}}</style>'
     +'<div class="pbar" style="position:sticky;top:0;display:flex;gap:10px;justify-content:center;padding:12px;background:#fff;border-bottom:1px solid #eee;">'
-    +'<button id="sey-print-do" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:15px;padding:12px 22px;border-radius:12px;">Yazdır / PDF kaydet</button>'
-    +'<button id="sey-print-close" style="border:1px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:15px;padding:12px 18px;border-radius:12px;">Kapat</button></div>'
+    +'<button id="sey-print-do" style="border:none;background:#E9AFC1;color:#fff;font-weight:700;font-size:var(--f-subhead);padding:12px 22px;border-radius:12px;">Yazdır / PDF kaydet</button>'
+    +'<button id="sey-print-close" style="border:1px solid #ddd;background:#fff;color:#555;font-weight:600;font-size:var(--f-subhead);padding:12px 18px;border-radius:12px;">Kapat</button></div>'
     +'<div style="max-width:780px;margin:0 auto;padding:24px;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#2C2426;">'+reportHTML()+'</div>';
   ov2.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;';
   document.body.appendChild(ov2);
@@ -9956,11 +9956,11 @@ function psychBuildQA(ans){
 function psychOptions(sid,qi,s,cur){
   var h='';
   if(s.anchors){
-    h+='<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint);margin-bottom:9px;padding:0 2px;"><span>'+esc(s.anchors[0])+'</span><span style="text-align:right;">'+esc(s.anchors[1])+'</span></div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:var(--f-caption1);color:var(--faint);margin-bottom:9px;padding:0 2px;"><span>'+esc(s.anchors[0])+'</span><span style="text-align:right;">'+esc(s.anchors[1])+'</span></div>';
     h+='<div style="display:flex;gap:6px;justify-content:space-between;">';
     s.scale.forEach(function(lbl,oi){
       var sel=cur===oi;
-      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="flex:1;min-width:0;height:46px;border-radius:14px;cursor:pointer;font-size:15px;font-weight:800;transition:all .15s;'+(sel?'color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);border:none;box-shadow:0 6px 14px rgba(233,175,193,0.4);':'color:var(--text2);background:var(--card);border:1px solid var(--field-bd);')+'">'+lbl+'</button>';
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="flex:1;min-width:0;height:46px;border-radius:14px;cursor:pointer;font-size:var(--f-subhead);font-weight:800;transition:all .15s;'+(sel?'color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);border:none;box-shadow:0 6px 14px rgba(233,175,193,0.4);':'color:var(--text2);background:var(--card);border:1px solid var(--field-bd);')+'">'+lbl+'</button>';
     });
     h+='</div>';
   } else {
@@ -9968,7 +9968,7 @@ function psychOptions(sid,qi,s,cur){
     s.scale.forEach(function(lbl,oi){
       var sel=cur===oi;
       var st=sel?'background:linear-gradient(135deg,rgba(255,232,163,0.6),rgba(247,221,229,0.75));border:1px solid #E9AFC1;color:#5A2E2A;box-shadow:0 6px 14px rgba(233,175,193,0.3);':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="display:flex;align-items:center;gap:11px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .18s;'+st+'"><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span><span style="flex:1;text-align:left;font-size:15px;font-weight:600;">'+esc(lbl)+'</span></button>';
+      h+='<button onclick="App.psychAnswer(\''+sid+'\','+qi+','+oi+')" style="display:flex;align-items:center;gap:11px;width:100%;padding:14px 16px;border-radius:16px;cursor:pointer;transition:all .18s;'+st+'"><span style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:'+(sel?'linear-gradient(135deg,#E9AFC1,#C9B8FF)':'transparent')+';border:'+(sel?'none':'2px solid var(--field-bd)')+';">'+(sel?icon('check',13):'')+'</span><span style="flex:1;text-align:left;font-size:var(--f-subhead);font-weight:600;">'+esc(lbl)+'</span></button>';
     });
     h+='</div>';
   }
@@ -9999,16 +9999,16 @@ function psychSosHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;padding:6px 6px 12px;">';
   h+='<div style="width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,#FFD9E1,#C9B8FF);box-shadow:0 12px 30px rgba(233,175,193,0.45);animation:seyPop .35s ease;display:flex;align-items:center;justify-content:center;">'+(sent?icon('heart',34):icon('heart-handshake',34))+'</div>';
   if(!sent){
-    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Yalnız değilsin</h2>';
-    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Raşit’e <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
-    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:16px;font-weight:800;">Zor hissediyorum Raşit</span><span style="font-size:11.5px;font-weight:600;opacity:0.92;">Bu buton yaratıcıya — Raşit’in tüm cihazlarını — doğrudan tetikler</span></button>';
-    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15.5px;font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">'+icon('phone',16)+' Raşit’i ara</a>';
-    h+='<div class="surface" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+    h+='<h2 style="margin:0;font-size:var(--f-title2);font-weight:800;">Yalnız değilsin</h2>';
+    h+='<p style="margin:0;font-size:var(--f-callout);line-height:1.6;color:var(--text2);max-width:350px;">Şu an zorlanıyorsan bunu tek başına taşımak zorunda değilsin. Aşağıdaki butona dokunursan Raşit’e <b>doğrudan</b> haber gider ve en kısa sürede yanında olur.</p>';
+    h+='<button onclick="App.psychReachCreator()" style="border:none;cursor:pointer;width:100%;max-width:360px;padding:16px 18px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#E9899F,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:var(--f-callout);font-weight:800;">Zor hissediyorum Raşit</span><span style="font-size:var(--f-caption1);font-weight:600;opacity:0.92;">Bu buton yaratıcıya — Raşit’in tüm cihazlarını — doğrudan tetikler</span></button>';
+    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f-callout);font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">'+icon('phone',16)+' Raşit’i ara</a>';
+    h+='<div class="surface" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:var(--f-footnote);line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
   } else {
-    h+='<h2 style="margin:0;font-size:23px;font-weight:800;">Raşit’e haber verildi</h2>';
-    h+='<p style="margin:0;font-size:15.5px;line-height:1.6;color:var(--text2);max-width:350px;">Doğrudan bir bildirim gönderildi — birazdan yanında olacak. Derin bir nefes al; buradayım.</p>';
-    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15.5px;font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">'+icon('phone',16)+' Raşit’i ara</a>';
-    h+='<div class="surface" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
+    h+='<h2 style="margin:0;font-size:var(--f-title2);font-weight:800;">Raşit’e haber verildi</h2>';
+    h+='<p style="margin:0;font-size:var(--f-callout);line-height:1.6;color:var(--text2);max-width:350px;">Doğrudan bir bildirim gönderildi — birazdan yanında olacak. Derin bir nefes al; buradayım.</p>';
+    h+='<a href="tel:05066020098" style="text-decoration:none;border:1px solid rgba(233,175,193,0.6);cursor:pointer;width:100%;max-width:360px;padding:15px 18px;border-radius:20px;color:#B5566A;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--f-callout);font-weight:800;box-shadow:0 6px 14px rgba(233,175,193,0.2);">'+icon('phone',16)+' Raşit’i ara</a>';
+    h+='<div class="surface" style="border-radius:20px;padding:14px 16px;max-width:360px;"><p style="margin:0;font-size:var(--f-footnote);line-height:1.6;color:var(--text2);">Ani ve yoğun bir tehlike hissediyorsan lütfen <b>112</b>’yi ara. Tek başına taşımak zorunda değilsin.</p></div>';
   }
   h+='</div>';
   return h;
@@ -10019,7 +10019,7 @@ function psychHTML(){
   var flat=psychFlat(), T=flat.length;
   if(ui.psychSOS){
     var hs='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px);display:flex;flex-direction:column;gap:14px;">';
-    hs+='<button onclick="App.psychSOSClose()" style="align-self:flex-start;border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:9px 15px;font-size:14px;font-weight:700;color:var(--muted);">‹ Ankete dön</button>';
+    hs+='<button onclick="App.psychSOSClose()" style="align-self:flex-start;border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:9px 15px;font-size:var(--f-subhead);font-weight:700;color:var(--muted);">‹ Ankete dön</button>';
     hs+=psychSosHTML();
     hs+='</div>';
     return hs;
@@ -10029,27 +10029,27 @@ function psychHTML(){
     var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-start;padding:calc(env(safe-area-inset-top) + 24px) 22px calc(env(safe-area-inset-bottom) + 26px);gap:17px;">';
     h+='<div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:11px;animation:seyFloatIn .5s ease both;">';
     h+='<div style="position:relative;width:78px;height:78px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#8A6A2E;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 14px 34px rgba(233,175,193,0.45);overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>'+icon('brain',36)+'</div>';
-    h+='<h1 style="margin:0;font-size:27px;font-weight:800;letter-spacing:-0.5px;">Seni biraz tanıyalım</h1>';
-    h+='<div style="font-size:15px;color:var(--muted);line-height:1.5;">İki haftada bir tekrarlanır — tamamen dokunmayla, hiç yazı yok.</div></div>';
+    h+='<h1 style="margin:0;font-size:var(--f-title1);font-weight:800;letter-spacing:-0.5px;">Seni biraz tanıyalım</h1>';
+    h+='<div style="font-size:var(--f-subhead);color:var(--muted);line-height:1.5;">İki haftada bir tekrarlanır — tamamen dokunmayla, hiç yazı yok.</div></div>';
     h+='<div class="surface" style="border-radius:22px;padding:16px 17px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .06s ease both;">';
     h+='<div style="display:flex;gap:12px;align-items:flex-start;">';
     h+='<div style="flex-shrink:0;width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--aeon2,#E6C15A),var(--aeon,#C99A3A));display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 6px 15px rgba(201,160,60,0.4);">'+icon('hexagon',19)+'</div>';
-    h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;letter-spacing:0.5px;color:#8A6A2E;">ÆON HAZIRLADI</div>';
-    h+='<p style="margin:5px 0 0;font-size:14.5px;line-height:1.6;color:var(--text2);">Bu anketi senin için ben hazırladım — dünyada yaygın kullanılan, <b>bilimsel olarak geçerli</b> tarama araçlarından yararlanarak. Yaratıcımdan bunun için onay aldım.</p></div></div>';
-    h+='<button onclick="App.psychToggleSrc()" style="margin-top:12px;width:100%;border:1px solid rgba(201,160,60,0.4);cursor:pointer;background:rgba(230,193,90,0.12);border-radius:12px;padding:9px 12px;font-size:12.8px;font-weight:700;color:#8A6A2E;display:flex;align-items:center;justify-content:center;gap:6px;">'+(srcOpen?('Kaynakları gizle '+icon('chevron-up',13)):('Kullanılan bilimsel kaynaklar '+icon('chevron-down',13)))+'</button>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:800;letter-spacing:0.5px;color:#8A6A2E;">ÆON HAZIRLADI</div>';
+    h+='<p style="margin:5px 0 0;font-size:var(--f-subhead);line-height:1.6;color:var(--text2);">Bu anketi senin için ben hazırladım — dünyada yaygın kullanılan, <b>bilimsel olarak geçerli</b> tarama araçlarından yararlanarak. Yaratıcımdan bunun için onay aldım.</p></div></div>';
+    h+='<button onclick="App.psychToggleSrc()" style="margin-top:12px;width:100%;border:1px solid rgba(201,160,60,0.4);cursor:pointer;background:rgba(230,193,90,0.12);border-radius:12px;padding:9px 12px;font-size:var(--f-footnote);font-weight:700;color:#8A6A2E;display:flex;align-items:center;justify-content:center;gap:6px;">'+(srcOpen?('Kaynakları gizle '+icon('chevron-up',13)):('Kullanılan bilimsel kaynaklar '+icon('chevron-down',13)))+'</button>';
     if(srcOpen){
       var srcs=['ASRS-v1.1 · Dünya Sağlık Örgütü','ECR · Brennan, Clark & Shaver','GAD-7 · Spitzer ve ark.','PHQ-9 · Kroenke ve ark.','WHO-5 · Dünya Sağlık Örgütü','SCS-SF · Kristin Neff'];
       h+='<div style="margin-top:11px;display:flex;flex-direction:column;gap:7px;animation:seyFade .25s ease;">';
-      srcs.forEach(function(sr){ h+='<div style="display:flex;gap:9px;align-items:baseline;font-size:12.8px;line-height:1.4;"><span style="flex-shrink:0;color:#C99A3A;">◆</span><span style="color:var(--text2);flex:1;font-weight:600;">'+esc(sr)+'</span></div>'; });
-      h+='<div style="font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.5;">Hepsi kamuya açık / akademik kullanımı serbest, doğrulanmış tarama ölçekleridir.</div></div>';
+      srcs.forEach(function(sr){ h+='<div style="display:flex;gap:9px;align-items:baseline;font-size:var(--f-footnote);line-height:1.4;"><span style="flex-shrink:0;color:#C99A3A;">◆</span><span style="color:var(--text2);flex:1;font-weight:600;">'+esc(sr)+'</span></div>'; });
+      h+='<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:4px;line-height:1.5;">Hepsi kamuya açık / akademik kullanımı serbest, doğrulanmış tarama ölçekleridir.</div></div>';
     }
     h+='</div>';
     h+='<div class="surface" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
-    h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Dikkat, yakın ilişkilerde güven, ruh hâli ve kendine şefkat gibi alanlarda seni daha iyi tanımam için. Böylece sana daha isabetli ve nazik eşlik edebilirim.</p>';
-    h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Doğru ya da yanlış cevap yok; aklına ilk geleni seç, yeter. Her soru için bir seçeneğe dokunman kâfi — yaklaşık 5 dakika.</p></div>';
-    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="display:inline-flex;">'+icon('heart',16)+'</span><div style="font-size:12.8px;line-height:1.55;color:var(--text2);"><b>Yanıtların, seni daha iyi tanıyıp sana nazikçe eşlik edebilmem için bana yardımcı olur.</b> Bir karne gibi ortaya dökülüp yargılanmaz; doğru ya da yanlış cevap yok. Bu bir tıbbi teşhis değil, seni tanımaya yarayan bir tarama aracıdır.</div></div>';
-    h+='<button onclick="App.psychBegin()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .24s ease both;display:flex;align-items:center;justify-content:center;gap:6px;">Başlayalım '+icon('sparkles',15)+'</button>';
-    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit</button>';
+    h+='<p style="margin:0;font-size:var(--f-subhead);line-height:1.65;color:var(--text2);">Dikkat, yakın ilişkilerde güven, ruh hâli ve kendine şefkat gibi alanlarda seni daha iyi tanımam için. Böylece sana daha isabetli ve nazik eşlik edebilirim.</p>';
+    h+='<p style="margin:0;font-size:var(--f-subhead);line-height:1.65;color:var(--text2);">Doğru ya da yanlış cevap yok; aklına ilk geleni seç, yeter. Her soru için bir seçeneğe dokunman kâfi — yaklaşık 5 dakika.</p></div>';
+    h+='<div style="display:flex;gap:11px;align-items:flex-start;background:rgba(201,184,255,0.14);border:1px solid rgba(201,184,255,0.35);border-radius:16px;padding:13px 14px;animation:seyFloatIn .5s .18s ease both;"><span style="display:inline-flex;">'+icon('heart',16)+'</span><div style="font-size:var(--f-footnote);line-height:1.55;color:var(--text2);"><b>Yanıtların, seni daha iyi tanıyıp sana nazikçe eşlik edebilmem için bana yardımcı olur.</b> Bir karne gibi ortaya dökülüp yargılanmaz; doğru ya da yanlış cevap yok. Bu bir tıbbi teşhis değil, seni tanımaya yarayan bir tarama aracıdır.</div></div>';
+    h+='<button onclick="App.psychBegin()" style="border:none;cursor:pointer;width:100%;padding:17px;border-radius:20px;font-size:var(--f-body);font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .24s ease both;display:flex;align-items:center;justify-content:center;gap:6px;">Başlayalım '+icon('sparkles',15)+'</button>';
+    h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:var(--f-footnote);font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit</button>';
     h+='</div>';
     return h;
   }
@@ -10059,21 +10059,21 @@ function psychHTML(){
   var pct=Math.round(idx/T*100);
   var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:15px;animation:seyFade .22s ease;">';
   h+='<div style="display:flex;align-items:center;gap:10px;">';
-  h+='<button onclick="App.psychSOS()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.5);cursor:pointer;background:rgba(247,221,229,0.4);border-radius:12px;padding:7px 11px;font-size:12.5px;font-weight:700;color:#B5566A;">Zor an</button>';
+  h+='<button onclick="App.psychSOS()" style="flex-shrink:0;border:1px solid rgba(233,175,193,0.5);cursor:pointer;background:rgba(247,221,229,0.4);border-radius:12px;padding:7px 11px;font-size:var(--f-footnote);font-weight:700;color:#B5566A;">Zor an</button>';
   h+='<div style="flex:1;height:9px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .35s cubic-bezier(.4,1.2,.5,1);position:relative;overflow:hidden;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.5) 50%,transparent 70%);animation:seyShine 2.4s ease-in-out infinite;"></span></div></div>';
-  h+='<div style="flex-shrink:0;font-size:12px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;">'+(idx+1)+'/'+T+'</div>';
+  h+='<div style="flex-shrink:0;font-size:var(--f-caption1);font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;">'+(idx+1)+'/'+T+'</div>';
   h+='</div>';
-  h+='<div style="font-size:12.5px;font-weight:700;color:var(--accent-ink);text-align:center;margin-top:-4px;animation:seyFade .45s ease;">'+psychMotiv(idx,T)+'</div>';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><span style="font-size:20px;">'+s.icon+'</span><span style="font-size:12.5px;font-weight:800;letter-spacing:0.5px;color:var(--accent-ink);text-transform:uppercase;">'+esc(s.title)+'</span></div>';
-  if(qi===0) h+='<div style="font-size:13.5px;line-height:1.5;color:var(--muted);margin-top:-6px;">'+esc(s.intro)+'</div>';
+  h+='<div style="font-size:var(--f-footnote);font-weight:700;color:var(--accent-ink);text-align:center;margin-top:-4px;animation:seyFade .45s ease;">'+psychMotiv(idx,T)+'</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-top:2px;"><span style="font-size:var(--f-title3);">'+s.icon+'</span><span style="font-size:var(--f-footnote);font-weight:800;letter-spacing:0.5px;color:var(--accent-ink);text-transform:uppercase;">'+esc(s.title)+'</span></div>';
+  if(qi===0) h+='<div style="font-size:var(--f-footnote);line-height:1.5;color:var(--muted);margin-top:-6px;">'+esc(s.intro)+'</div>';
   h+='<div style="animation:seyFloatIn .32s ease both;">';
-  h+='<div style="font-size:19px;font-weight:700;line-height:1.45;color:var(--text);margin:2px 0 10px;">'+esc(node.item.q)+'</div>';
-  h+='<div style="display:inline-flex;align-items:center;gap:7px;background:rgba(233,175,193,0.16);border:1px solid rgba(233,175,193,0.4);border-radius:999px;padding:6px 13px;margin-bottom:11px;font-size:12.8px;font-weight:700;color:#B5566A;display:inline-flex;align-items:center;gap:5px;">'+icon('search',13)+' '+esc(s.prompt||s.intro)+'</div>';
+  h+='<div style="font-size:var(--f-title3);font-weight:700;line-height:1.45;color:var(--text);margin:2px 0 10px;">'+esc(node.item.q)+'</div>';
+  h+='<div style="display:inline-flex;align-items:center;gap:7px;background:rgba(233,175,193,0.16);border:1px solid rgba(233,175,193,0.4);border-radius:999px;padding:6px 13px;margin-bottom:11px;font-size:var(--f-footnote);font-weight:700;color:#B5566A;display:inline-flex;align-items:center;gap:5px;">'+icon('search',13)+' '+esc(s.prompt||s.intro)+'</div>';
   h+=psychOptions(s.id,qi,s,cur);
   h+='</div>';
   h+='<div style="margin-top:auto;padding-top:16px;display:flex;align-items:center;">';
-  h+='<button onclick="App.psychBack()" style="border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:11px 18px;font-size:14px;font-weight:700;color:var(--muted);">‹ Geri</button>';
-  if(cur!=null) h+='<button onclick="App.psychFwd()" style="margin-left:auto;border:none;cursor:pointer;border-radius:14px;padding:11px 22px;font-size:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 6px 14px rgba(233,175,193,0.35);">İleri ›</button>';
+  h+='<button onclick="App.psychBack()" style="border:1px solid var(--card-bd);cursor:pointer;background:var(--card);border-radius:14px;padding:11px 18px;font-size:var(--f-subhead);font-weight:700;color:var(--muted);">‹ Geri</button>';
+  if(cur!=null) h+='<button onclick="App.psychFwd()" style="margin-left:auto;border:none;cursor:pointer;border-radius:14px;padding:11px 22px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 6px 14px rgba(233,175,193,0.35);">İleri ›</button>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -10082,14 +10082,14 @@ function psychResultHTML(){
   // Sonuçlar Şeyma'ya GÖSTERİLMEZ; yalnızca nazik bir teşekkür + ÆON'un değerlendirdiği bilgisi.
   var h='<div data-scroll class="scroll" style="flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 26px) 22px calc(env(safe-area-inset-bottom) + 26px);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:18px;animation:seyFade .35s ease;">';
   h+='<div style="position:relative;width:82px;height:82px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);box-shadow:0 14px 34px rgba(233,175,193,0.45);overflow:hidden;animation:seyPop .4s ease;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:seyShine 3.6s ease-in-out infinite;"></span>'+icon('flower-2',36)+'</div>';
-  h+='<h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.5px;animation:seyFloatIn .5s .05s ease both;display:flex;align-items:center;justify-content:center;gap:8px;">Teşekkürler '+icon('flower-2',22)+'</h1>';
+  h+='<h1 style="margin:0;font-size:var(--f-title1);font-weight:800;letter-spacing:-0.5px;animation:seyFloatIn .5s .05s ease both;display:flex;align-items:center;justify-content:center;gap:8px;">Teşekkürler '+icon('flower-2',22)+'</h1>';
   h+='<div class="surface" style="border-radius:22px;padding:18px;max-width:400px;display:flex;flex-direction:column;gap:13px;box-shadow:0 10px 26px rgba(108,74,58,0.07);animation:seyFloatIn .5s .12s ease both;">';
   h+='<div style="display:flex;gap:11px;align-items:flex-start;text-align:left;">';
   h+='<div style="flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--aeon2,#E6C15A),var(--aeon,#C99A3A));display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 6px 15px rgba(201,160,60,0.4);">'+icon('hexagon',18)+'</div>';
-  h+='<p style="margin:0;font-size:15px;line-height:1.65;color:var(--text2);">Yanıtlarını aldım. Şimdi bunları senin için sessizce değerlendiriyorum — sana daha iyi eşlik edebilmem için.</p></div>';
-  h+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;font-size:13.8px;line-height:1.6;color:var(--muted);text-align:left;">Bu küçük tanışmayı <b>iki haftada bir</b> tekrarlayacağız; böylece değişimleri birlikte nazikçe fark edebiliriz.</div></div>';
-  h+='<button onclick="App.psychFinish()" style="border:none;cursor:pointer;width:100%;max-width:400px;padding:17px;border-radius:20px;font-size:16.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .2s ease both;display:flex;align-items:center;justify-content:center;gap:6px;">Uygulamaya dön '+icon('sun',15)+'</button>';
-  h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:13px;font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit</button>';
+  h+='<p style="margin:0;font-size:var(--f-subhead);line-height:1.65;color:var(--text2);">Yanıtlarını aldım. Şimdi bunları senin için sessizce değerlendiriyorum — sana daha iyi eşlik edebilmem için.</p></div>';
+  h+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;font-size:var(--f-footnote);line-height:1.6;color:var(--muted);text-align:left;">Bu küçük tanışmayı <b>iki haftada bir</b> tekrarlayacağız; böylece değişimleri birlikte nazikçe fark edebiliriz.</div></div>';
+  h+='<button onclick="App.psychFinish()" style="border:none;cursor:pointer;width:100%;max-width:400px;padding:17px;border-radius:20px;font-size:var(--f-body);font-weight:800;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);box-shadow:0 12px 28px rgba(233,175,193,0.5);animation:seyFloatIn .5s .2s ease both;display:flex;align-items:center;justify-content:center;gap:6px;">Uygulamaya dön '+icon('sun',15)+'</button>';
+  h+='<button onclick="App.psychSOS()" style="border:none;cursor:pointer;background:transparent;font-size:var(--f-footnote);font-weight:600;color:var(--faint);text-decoration:underline;">Zor hissediyorum Raşit</button>';
   h+='</div>';
   return h;
 }
@@ -10213,29 +10213,29 @@ function targetsCardHTML(rec){
   var sleep=tOk?t.sleepHours:sleepGoalHours();
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'saglik\');}">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
-  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',17)+'</span>Hedeflerim</div>';
-  if(tOk) h+='<div style="font-size:11px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
-  else h+='<div style="font-size:11px;color:var(--warn-ink);">henüz hesaplanmadı</div>';
+  h+='<div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',17)+'</span>Hedeflerim</div>';
+  if(tOk) h+='<div style="font-size:var(--f-caption2);color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
+  else h+='<div style="font-size:var(--f-caption2);color:var(--warn-ink);">henüz hesaplanmadı</div>';
   h+='</div>';
   if(tOk){
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.calories+'<span style="font-size:11px;color:var(--faint);">/'+cal+'</span></div><div style="font-size:11px;color:var(--faint);">kcal</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.protein+'<span style="font-size:11px;color:var(--faint);">/'+pro+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Su</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+(rec&&typeof rec.water==='number'?rec.water:0)+'<span style="font-size:11px;color:var(--faint);">/'+water+'</span></div><div style="font-size:11px;color:var(--faint);">bardak</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Karbonhidrat</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.carbs+'<span style="font-size:11px;color:var(--faint);">/'+t.carbs+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Yağ</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.fat+'<span style="font-size:11px;color:var(--faint);">/'+t.fat+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Lif</div><div style="font-size:15px;font-weight:800;color:var(--text);">—<span style="font-size:11px;color:var(--faint);">/'+t.fiber+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Kalori</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">'+nu.calories+'<span style="font-size:var(--f-caption2);color:var(--faint);">/'+cal+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">kcal</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Protein</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">'+nu.protein+'<span style="font-size:var(--f-caption2);color:var(--faint);">/'+pro+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Su</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">'+(rec&&typeof rec.water==='number'?rec.water:0)+'<span style="font-size:var(--f-caption2);color:var(--faint);">/'+water+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">bardak</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Karbonhidrat</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">'+nu.carbs+'<span style="font-size:var(--f-caption2);color:var(--faint);">/'+t.carbs+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Yağ</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">'+nu.fat+'<span style="font-size:var(--f-caption2);color:var(--faint);">/'+t.fat+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:var(--f-caption2);color:var(--faint);">Lif</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">—<span style="font-size:var(--f-caption2);color:var(--faint);">/'+t.fiber+'</span></div><div style="font-size:var(--f-caption2);color:var(--faint);">g</div></div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
-    h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">Adım</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+steps.toLocaleString('tr-TR')+'</div></div>';
-    h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">Uyku</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+sleep+' saat</div></div>';
-    h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">Kafein</div><div style="font-size:13px;font-weight:800;color:var(--text);">≤'+t.caffeineMaxMg+' mg</div></div>';
-    h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">D vit.</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+t.vitaminDIU+' IU</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);">Adım</div><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+steps.toLocaleString('tr-TR')+'</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);">Uyku</div><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+sleep+' saat</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);">Kafein</div><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">≤'+t.caffeineMaxMg+' mg</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);">D vit.</div><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+t.vitaminDIU+' IU</div></div>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Tüm kişiselleştirilmiş hedeflerin için dokun · boy, kilo, yaş ve aktivite seviyene göre hesaplanır.</div>';
+    h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.45;">Tüm kişiselleştirilmiş hedeflerin için dokun · boy, kilo, yaş ve aktivite seviyene göre hesaplanır.</div>';
   } else {
-    h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Kişiselleştirilmiş makro ve mikro hedeflerini görmek için Sağlık sayfasından boy, kilo, doğum tarihi ve günlük aktivite seviyeni girmen yeterli.</div>';
-    h+='<button onclick="event.stopPropagation();App.go(\'saglik\')" style="border:none;cursor:pointer;background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;font-weight:800;font-size:14px;padding:12px;border-radius:12px;">Sağlık sayfasına git</button>';
+    h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Kişiselleştirilmiş makro ve mikro hedeflerini görmek için Sağlık sayfasından boy, kilo, doğum tarihi ve günlük aktivite seviyeni girmen yeterli.</div>';
+    h+='<button onclick="event.stopPropagation();App.go(\'saglik\')" style="border:none;cursor:pointer;background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;font-weight:800;font-size:var(--f-subhead);padding:12px;border-radius:12px;">Sağlık sayfasına git</button>';
   }
   h+='</div>';
   return h;
@@ -11998,7 +11998,7 @@ function heroScienceLine(rec){
 // Sayfalar arası tutarlı bilimsel mikro-bilgi rozeti (Rapor/Sağlık/Takvim vb.).
 function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:var(--f-caption2);line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
 // Ortak sayfa başlığı (bugün sayfası dışındaki sekmelerle görsel uyum için).
-function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:13px;color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
+function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:var(--f-title2);font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:var(--f-footnote);color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
 // ── Raşit'in Kriz Odaları: üçlü, Raşit-temalı buton. Her biri süreli-bilimsel bir modal açar. ──
 function rasitActionsHTML(){
   if(isVacationDay(todayStr())){
@@ -12466,7 +12466,7 @@ function updateJournalScience(){
   var el=document.getElementById('sey-journal-science');
   if(!el) return;
   var mode=ui.journalMode||'free';
-  el.innerHTML='<span style="flex-shrink:0;color:var(--journal);display:inline-flex;margin-top:1px;">'+icon('brain',18)+'</span><div style="font-size:12.5px;line-height:1.6;color:var(--text2);"><b style="color:var(--text);">Bilimsel ipucu:</b> '+journalScienceHint(mode)+'</div>';
+  el.innerHTML='<span style="flex-shrink:0;color:var(--journal);display:inline-flex;margin-top:1px;">'+icon('brain',18)+'</span><div style="font-size:var(--f-footnote);line-height:1.6;color:var(--text2);"><b style="color:var(--text);">Bilimsel ipucu:</b> '+journalScienceHint(mode)+'</div>';
 }
 function updateJournalCounts(){
   var text=String(ui.journalText||'').trim();
@@ -13372,7 +13372,7 @@ function gaugeBadge(pct,color,big,small,size){
   s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="rgba(130,110,160,0.16)" stroke-width="'+sw+'"/>';
   s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="transition:stroke-dashoffset .55s var(--ease-premium,ease);"/>';
   s+='</svg>';
-  s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
+  s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:var(--f-caption2);color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
   s+='</div>';
   return s;
 }
@@ -17094,9 +17094,9 @@ function aeonPaintVoicePlayer(container,mediaId,m,uri){
   var peaks=(m.peaks&&m.peaks.length)?m.peaks:[.3,.5,.4,.6,.35,.55,.45,.65,.3,.5,.4,.6,.35,.55,.45,.65];
   var bars=peaks.map(function(v){ return '<span style="flex:1;min-width:2px;border-radius:2px;background:currentColor;opacity:.55;height:'+Math.max(3,Math.round(v*22))+'px;"></span>'; }).join('');
   container.innerHTML='<div style="display:flex;align-items:center;gap:9px;min-width:170px;">'
-    +'<button onclick="App.aeonToggleVoice(\''+mediaId+'\')" id="aeon-voice-btn-'+mediaId+'" aria-label="Oynat/duraklat" style="flex-shrink:0;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;"><span id="aeon-voice-icon-'+mediaId+'" style="color:var(--card);font-size:12px;">▶</span></button>'
+    +'<button onclick="App.aeonToggleVoice(\''+mediaId+'\')" id="aeon-voice-btn-'+mediaId+'" aria-label="Oynat/duraklat" style="flex-shrink:0;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;"><span id="aeon-voice-icon-'+mediaId+'" style="color:var(--card);font-size:var(--f-caption1);">▶</span></button>'
     +'<div style="flex:1;display:flex;align-items:center;gap:1.5px;height:24px;min-width:0;">'+bars+'</div>'
-    +'<span id="aeon-voice-time-'+mediaId+'" style="flex-shrink:0;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStr(m.durationSec)+'</span>'
+    +'<span id="aeon-voice-time-'+mediaId+'" style="flex-shrink:0;font-size:var(--f-caption2);opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStr(m.durationSec)+'</span>'
     +'</div>';
   if(!aeonAudioEls[mediaId]) aeonAudioEls[mediaId]={uri:uri,audio:null,durationSec:m.durationSec};
 }
@@ -17130,8 +17130,8 @@ function aeonPaintFileCard(container,mediaId,m){
   container.style.cursor='pointer';
   container.innerHTML='<div style="display:flex;align-items:center;gap:11px;min-width:170px;max-width:260px;">'
     +'<span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:currentColor;color:inherit;"><span style="display:flex;color:var(--card);">'+icon('file-text',17)+'</span></span>'
-    +'<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(name)+'</div>'
-    +'<div style="font-size:11px;opacity:.7;margin-top:1px;">'+(size?esc(size)+' · ':'')+'aç / indir</div></div>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(name)+'</div>'
+    +'<div style="font-size:var(--f-caption2);opacity:.7;margin-top:1px;">'+(size?esc(size)+' · ':'')+'aç / indir</div></div>'
     +'<span style="flex-shrink:0;display:inline-flex;opacity:.75;">'+icon('download',15)+'</span>'
     +'</div>';
 }
@@ -17307,11 +17307,11 @@ function aeonPopupHTML(o){
   inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
   inner+='<div style="flex-shrink:0;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#F0D274,#C99A3A);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 8px 22px rgba(201,160,60,0.5),inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('hexagon',20)+'</div>';
   inner+='<div style="flex:1;min-width:0;">';
-  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:14px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(180deg,#F3E4B0,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ÆON</span><span style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:700;">· '+o.label+'</span>'+(o.when?'<span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);font-weight:600;">'+esc(o.when)+'</span>':'')+'</div>';
-  inner+='<div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,0.92);margin-top:5px;word-break:break-word;">'+esc(o.txt)+(o.trunc?'…':'')+'</div>';
-  if(o.more>0) inner+='<div style="font-size:11.5px;color:#E6C15A;margin-top:6px;font-weight:700;">+'+o.more+' '+o.moreLabel+'</div>';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:var(--f-subhead);font-weight:800;letter-spacing:1.5px;background:linear-gradient(180deg,#F3E4B0,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ÆON</span><span style="font-size:var(--f-caption2);color:rgba(255,255,255,0.5);font-weight:700;">· '+o.label+'</span>'+(o.when?'<span style="margin-left:auto;font-size:var(--f-caption2);color:rgba(255,255,255,0.45);font-weight:600;">'+esc(o.when)+'</span>':'')+'</div>';
+  inner+='<div style="font-size:var(--f-subhead);line-height:1.5;color:rgba(255,255,255,0.92);margin-top:5px;word-break:break-word;">'+esc(o.txt)+(o.trunc?'…':'')+'</div>';
+  if(o.more>0) inner+='<div style="font-size:var(--f-caption1);color:#E6C15A;margin-top:6px;font-weight:700;">+'+o.more+' '+o.moreLabel+'</div>';
   inner+='<div style="display:flex;gap:8px;margin-top:13px;">';
-  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#F0D274,#C99A3A);color:#1a1404;font-weight:800;font-size:13.5px;padding:10px;border-radius:13px;box-shadow:0 8px 18px rgba(201,160,60,0.4);font-family:inherit;">Gör</button>';
+  inner+='<button onclick="App.openMesaj()" style="flex:1;border:none;cursor:pointer;background:linear-gradient(135deg,#F0D274,#C99A3A);color:#1a1404;font-weight:800;font-size:var(--f-footnote);padding:10px;border-radius:13px;box-shadow:0 8px 18px rgba(201,160,60,0.4);font-family:inherit;">Gör</button>';
   inner+='<button onclick="'+o.copyFn+'" aria-label="Kopyala" style="flex-shrink:0;border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;">'+icon('copy',16)+'</button>';
   inner+='<button onclick="'+o.shareFn+'" aria-label="Paylaş" style="flex-shrink:0;border:1px solid rgba(255,255,255,0.14);cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);width:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;">'+icon('share-2',16)+'</button>';
   inner+='</div></div>';
@@ -18107,7 +18107,7 @@ App.filterAeonSearch=function(el){
   if(q && totalMatches===0){
     if(!hint){
       hint=document.createElement('div'); hint.id='aeon-search-noresult';
-      hint.style.cssText='text-align:center;padding:16px 10px;color:var(--faint);font-size:13px;font-weight:600;';
+      hint.style.cssText='text-align:center;padding:16px 10px;color:var(--faint);font-size:var(--f-footnote);font-weight:600;';
       hint.textContent='Eşleşen mesaj bulunamadı';
       thread.appendChild(hint);
     }
@@ -18118,11 +18118,11 @@ function notifCardHTML(n){
   var unread=!n.read, s='';
   s+='<div style="position:relative;background:var(--card);border:1px solid '+(unread?'rgba(201,160,60,0.5)':'rgba(150,110,120,0.14)')+';border-radius:18px;padding:13px 14px;box-shadow:0 4px 14px rgba(150,110,120,0.08);margin-bottom:9px;'+(unread?'border-left:3px solid #D4AF37;':'')+'">';
   s+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-  s+='<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;letter-spacing:.8px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:3px 11px;">'+icon('hexagon',12)+' ÆON</span>';
+  s+='<span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f-caption1);font-weight:800;letter-spacing:.8px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:3px 11px;">'+icon('hexagon',12)+' ÆON</span>';
   if(unread) s+='<span style="width:8px;height:8px;border-radius:50%;background:#E9576F;box-shadow:0 0 7px #E9576F;"></span>';
-  s+='<span style="font-size:11.5px;color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span></div>';
-  s+='<div style="font-size:14.5px;line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
-  s+='<div style="display:flex;align-items:center;gap:4px;margin-top:10px;"><span style="font-size:11px;color:var(--faint);font-weight:600;display:flex;align-items:center;gap:3px;">'+(n.read?(icon('check-check',12)+' Okundu'):'• Yeni')+'</span>';
+  s+='<span style="font-size:var(--f-caption1);color:var(--faint);margin-left:auto;font-weight:600;">'+esc(when)+'</span></div>';
+  s+='<div style="font-size:var(--f-subhead);line-height:1.5;color:var(--text2);word-break:break-word;white-space:pre-wrap;">'+esc(String(n.text||''))+'</div>';
+  s+='<div style="display:flex;align-items:center;gap:4px;margin-top:10px;"><span style="font-size:var(--f-caption2);color:var(--faint);font-weight:600;display:flex;align-items:center;gap:3px;">'+(n.read?(icon('check-check',12)+' Okundu'):'• Yeni')+'</span>';
   s+='<button onclick="App.deleteNotif(\''+n.id+'\')" style="margin-left:auto;border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:6px 12px;border-radius:10px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',12)+' Sil</button></div></div>';
   return s;
 }

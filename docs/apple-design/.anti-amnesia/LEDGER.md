@@ -149,6 +149,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-48 | Overlay hub'ları | ✅ TAMAMLANDI | `45cfd99` | **zikr-harness 95/95** (prompt bunu zorunlu kılıyor); driver 0 hata; S4 tam yeşil | 📖 okuma, 🎬 izleme, 🎧 dinleme, 🎓 öğrenme, 🧘 zihin-beden ve **İlham & İbadet** (Saygı, İman Köşesi, kıble, Kur'an Yolculuğu) + oda overlay'i — 11 kök fonksiyondan çağrı grafiği. **329 site** eşlendi. Muaf sayacı 8 gösteriyor ama bunlar **8 farklı site değil**: 42/44/48/130px AD-45'ten, 72px filigran bu grafikte ilk kez göründü; muaf siteler ham kaldığı için her kapsayan grafikte yeniden sayılıyor. Toplam benzersiz dekoratif muafiyet hâlâ AD-43'te belirlenen listede. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
 
+| AD-49 | Kalan yüzeyler | ✅ TAMAMLANDI | `<commit>` | **app.js ham px 1262 → 10** (hepsi belgeli dekoratif muafiyet); 5 sekme dump'ında ham px **0**; S4 tam yeşil; S5 sabit 699 | Ayarlar, modal'lar, rozetler ve önceki dört partiye girmeyen her şey — **128 site** daha eşlendi. **Sonuç: `app.js` 1262 → 10, token kullanımı 0 → 1252.** ⚠️ **Prompt'un kabul ölçütü (`grep -c 'font-size:[0-9]' app.js` → 0) kasıtlı olarak sağlanmadı** — AD-43'te kullanıcı onayıyla belirlenen dekoratif muafiyet yüzünden. **Kalan 10 sitenin tamamı denetlendi:** 130px + 72px + 3 × 44px kıvrık tırnak filigranı, 48px 🦩 marka flaması, 42px 📍 emoji, 40px + 38px ikon kapsayıcısı — dokuzu saf grafik. Onuncusu **44px "Şeyma" marka kelimesi** (onboarding hero); bu *metin* ama 34px `--f-large` tavanının üstünde bir **display** boyu ve kullanıcı metin boyutuyla ölçeklenmesi onboarding hero düzenini bozar. [CLAUDE.md](../../../CLAUDE.md)'nin koruduğu görsel kimliğin parçası olduğu için muaf bırakıldı. **Doğrulama:** Bugün/Rapor/Mesaj/Ayarlar/Sağlık dump'larının **hepsinde ham px 0** (sırasıyla 150/113/9/60/106 token). **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -165,9 +167,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 6/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 7/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **48/52** | |
+| | **Toplam** | **49/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

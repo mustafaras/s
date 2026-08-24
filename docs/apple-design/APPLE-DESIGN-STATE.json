@@ -116,6 +116,7 @@
     "node --check app.js && node --check sync.js",
     "node .claude/skills/run-seyma/driver.mjs",
     "node .claude/skills/run-seyma/zikr-harness.mjs",
+    "node docs/apple-design/verify-theme-tristate.mjs",
     "node tests/app/test_faz10_sync.js",
     "node tests/panel/test_faz11_panel.js",
     "for f in tests/panel-v2/test_panel_v2_*.js; do node \"$f\"; done"

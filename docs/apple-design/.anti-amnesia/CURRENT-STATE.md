@@ -20,6 +20,8 @@
 
 **Uygulanan promptlar:** AD-01 … AD-32 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–6 tamamlandı: 32/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
+**Program dışı onarım — `AD-31-FIX` (2026-08-24):** Dalga 6 kapanışı yeşildi ama AD-31'in yeni çalışma zamanı mantığını koruyan kalıcı bir fixture yoktu (doğrulama yalnızca oturum scratchpad'indeydi) ve [`../IOS27-TASARIM-PLANI.md`](../IOS27-TASARIM-PLANI.md) başlığı hâlâ "uygulama başlamadı" diyordu. `docs/apple-design/verify-theme-tristate.mjs` (18 assertion) commit edildi ve doğrulama kapısına eklendi; plan başlığı düzeltilip §4 puan tablosunun dondurulmuş denetim kaydı olduğu yazıldı. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
+
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
 **Program dışı onarım — `AD-19-FIX` (2026-08-23):** AD-19'un native `<button>` dönüşümü, kart başlığında iç içe buton üretiyordu (konum kartı rozeti). HTML5 ayrıştırıcı kart yığınını `.sey-main-scroll` dışına düşürdüğü için Bugün sekmesindeki `overflow:hidden` kartlar eziliyordu. Rozet başlık butonunun dışına alındı, chevron ayrı `tabindex=-1 aria-hidden` butona taşındı; `motivationTodayCardHTML` içindeki yer değiştirmiş `</div>`/`</button>` düzeltildi. Ayrıntı ve kanıt: [`LEDGER.md`](LEDGER.md) `AD-19-FIX` satırı. Prompt sayacı değişmedi — bu bir onarım, yeni prompt değil.
@@ -70,6 +72,7 @@ Planın tamamını okumak gerekmez; her prompt kendi bağlamını taşır.
 node --check app.js && node --check sync.js
 node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
+node docs/apple-design/verify-theme-tristate.mjs
 node tests/app/test_faz10_sync.js
 node tests/panel/test_faz11_panel.js
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f" || echo "FAIL: $f"; done

@@ -1,6 +1,9 @@
 # Şeyma 🦩 & ÆON — iOS 27 Uyumlu Tasarım İyileştirme Planı
 
-> **Durum:** Denetim tamamlandı, uygulama başlamadı.
+> **Durum:** Denetim tamamlandı. **Uygulama sürüyor** — canlı ilerleme için
+> [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) ve [`APPLE-DESIGN-STATE.json`](APPLE-DESIGN-STATE.json).
+> ⚠️ Aşağıdaki bulgular ve **§4 puan tablosu 2026-08-23 denetim anının kaydıdır** —
+> kasıtlı olarak dondurulmuştur, güncel durumu göstermez.
 > **Tarih:** 2026-08-23 · **Denetim yöntemi:** statik analiz + hesaplanmış kontrast (tarayıcı açılmadı)
 > **Yüzeyler:** `index.html` + `app.js` + `app/styles.css` (kullanıcı) · `panel.html` + `panel/panel.css` (ÆON v1) · `panel-v2.html` + `panel/v2/panel-v2.css` (ÆON v2 Premium)
 

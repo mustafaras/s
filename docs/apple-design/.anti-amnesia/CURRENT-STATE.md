@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-30` — `data-theme` denetimi (salt okuma) |
-| **Sıradaki** | `AD-31` ⚠️ **ayrı onay gerekir** (AD-30 bulgusu: durum modeli değişikliği şart) |
+| **Son tamamlanan** | `AD-31` — sistem teması takibi (üç durumlu tercih) |
+| **Sıradaki** | `AD-32` — dalga 6 kapanışı (ek onay istemez) |
 | **Güncel dalga** | `6` (kullanıcı onayı alındı 2026-08-24) |
-| **Bloke** | yok — ama AD-31 yeniden onay ister, aşağıya bak |
+| **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-30 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı, dalga 6 başladı: 30/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-31 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı, dalga 6'da 2/3: 31/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -87,7 +87,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 | Dalga | İlk prompt | Neden onay |
 | --- | --- | --- |
-| 6 | AD-30 | ✅ onaylandı 2026-08-24. AD-30 salt okumaydı; **AD-31 ayrıca onay ister** (aşağı bak) |
+| 6 | AD-30 | ✅ onaylandı 2026-08-24. AD-31 için ikinci onay da alındı (A seçeneği — aşağı bak) |
 | 7 | AD-33 | 11pt tabanı dar rozetlerde düzen taşması yapabilir |
 | 8 | AD-38 | Planın görsel olarak en görünür değişikliği; reddedilmesi meşru |
 | 9 | AD-43 | 1400+ site; aylara yayılır |
@@ -98,24 +98,36 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**AD-31 ikinci bir onay bekliyor — bu, AD-30 promptunun kendi öngördüğü koşuldur.**
+**Şu an bloke bir şey yok.** AD-32 dalga 6'yı kapatır ve ek onay istemez; **dalga 7 (AD-33) yeni onay ister.**
 
-AD-30 denetimi (kod değişmedi) şunu buldu: uygulamanın teması **iki durumlu** bir `dark`
-boolean'ıdır; `data-theme` attribute'u *her zaman* `light` ya da `dark` olarak yazılır ve
-hiçbir zaman kaldırılmaz — kullanıcı hiç seçim yapmamışsa bile değeri `light` olur
-([index.html:17](../../../index.html#L17) statiği + [app.js:4595](../../../app.js#L4595)
-`null==='dark'` → `false`). "Seçilmemiş" diye bir durum yok.
+**AD-31 promptun yazıldığı hâlinden saparak uygulandı — kullanıcı onaylı.** AD-30 denetimi,
+`data-theme` attribute'unun *her zaman* `light` ya da `dark` yazıldığını ve hiç kaldırılmadığını
+ölçtü; "seçilmemiş" diye bir durum yoktu. Bu yüzden AD-31'in prompt gövdesindeki
+`#root:not([data-theme="light"])` koruma seçicisi **ölü** olurdu, üstelik reçete 124 koyu
+token'ı ikinci bir bloğa kopyalamayı gerektiriyordu. Kullanıcıya üç seçenek sunuldu; **A —
+JS ile çözümleme** seçildi:
 
-Sonuç: AD-31'in prompt dosyasında yazılı CSS'i **ölüdür** — `#root:not([data-theme="light"])`
-koruma seçicisi hiçbir zaman eşleşmez. Çalışması için tema iki durumdan üçe çıkmalı; bu
-`App.setTheme` semantiğine (**I2**) ve `render()`'ın attribute yazımına (**I4**) dokunur,
-ayrıca `dark`'ın 57 satırdaki 93 okumasının *tercihi* değil *çözülmüş* değeri okuması gerekir.
-Prompt gövdesi bu durumu açıkça öngörüp "ayrı onay ister" diyor. **Kullanıcıya seçenekler
-sunulmadan AD-31 çalıştırılmamalıdır.**
+- `themePref` üç durumlu: `'system'` (varsayılan) / `'light'` / `'dark'`; `dark` onun *çözülmüş* hâli.
+- `render()` yine yalnızca `data-theme="dark|light"` yazar → **`app/styles.css` hiç değişmedi**,
+  `#root[data-theme="dark"]` tek kaynak olarak kaldı, senkron borcu oluşmadı.
+- `'system'` = `seyma-theme` anahtarının **yokluğu**; eski açık/koyu seçimleri korunur.
+- `matchMedia` change dinleyicisi yalnızca `themePref==='system'` iken yeniden boyar.
 
-Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu.
+**Sonuç olarak `UYGULAMA-PROMPTLARI.md` içindeki AD-31 gövdesi artık uygulanan koddan farklı.**
+Prompt dosyası tarihsel kayıt olarak **değiştirilmedi**; gerçek uygulama LEDGER'daki AD-31
+satırında tam gerekçesiyle duruyor. Sonraki ajan CSS'te `@media (prefers-color-scheme: dark)`
+bloğu **aramamalıdır** — kasıtlı olarak yok.
 
-Bir sonraki ajan AD-31'i **ancak yeni onaydan sonra** çalıştırır.
+**Açık kalan küçük gözlem (AD-31 kapsamı dışı):** [index.html:17](../../../index.html#L17) hâlâ
+statik `data-theme="light"` taşıyor; app.js boot etmeden önce kısa bir açık tema anı var. Mevcut
+bir durumdu (koyu seçmiş kullanıcılar da yaşıyordu) ama artık sistemi koyu olan kullanıcıları da
+kapsıyor. Gidermek statik shell'e satır içi script ister — ayrı karar.
+
+Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı.
+AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
+buton yerine klavye destekli `role=button` olarak korundu.
+
+Bir sonraki ajan **AD-32**'yi çalıştırır.
 
 ---
 
@@ -125,4 +137,4 @@ Bir sonraki ajan AD-31'i **ancak yeni onaydan sonra** çalıştırır.
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 30 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).
+Bulgular 52 sıralı prompta dönüştürüldü; 31 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).

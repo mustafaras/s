@@ -4592,7 +4592,34 @@ function migrate(d){
   d.version=2;
   return d;
 }
-var dark=false; try{ dark=localStorage.getItem(TKEY)==='dark'; }catch(e){}
+// ── Tema: üç durumlu tercih, tek durumlu çıktı (AD-31) ──
+// `themePref` üç değer alır: 'system' (varsayılan) | 'light' | 'dark'.
+// `dark` bunun ÇÖZÜLMÜŞ hâlidir. Uygulamadaki ~93 okuma yeri (inline stiller,
+// onboarding paleti, render()'ın data-theme yazımı) tercihi değil bu boolean'ı
+// okur — bu yüzden CSS'te ikinci bir koyu token bloğu GEREKMEZ:
+// `#root[data-theme="dark"]` (app/styles.css) tek kaynak olarak kalır.
+// Kalıcılık: 'system' = anahtarın YOKLUĞU, böylece hiç seçim yapmamış eski
+// kayıtlar otomatik olarak sistemi takip eder; açık/koyu seçmiş olanlar korunur.
+var themePref='system';
+try{ var _tp=localStorage.getItem(TKEY); if(_tp==='dark'||_tp==='light') themePref=_tp; }catch(e){}
+function systemPrefersDark(){ return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+function resolveDark(){ return themePref==='dark' ? true : themePref==='light' ? false : systemPrefersDark(); }
+var dark=resolveDark();
+// Cihaz teması uygulama açıkken değişirse yalnızca 'system' tercihinde yeniden boya.
+try{
+  if(window.matchMedia){
+    var _mq=matchMedia('(prefers-color-scheme: dark)');
+    var _onSchemeChange=function(){
+      if(themePref!=='system') return;
+      var next=resolveDark();
+      if(next===dark) return;
+      dark=next;
+      try{ if(document.getElementById('root')) render(); }catch(e){}
+    };
+    if(_mq.addEventListener) _mq.addEventListener('change',_onSchemeChange);
+    else if(_mq.addListener) _mq.addListener(_onSchemeChange);
+  }
+}catch(e){}
 
 // ── Kilit ekranı: statik sadece hash, düz metin kaynak kodda yok ──
 var AUTH_HASH='ae9e1ed2b6abcbce74cc0c15719fdbba372a7dd62e6232510656bade7c201af4';
@@ -8143,7 +8170,15 @@ App.markSaygiRead=function(){
   syncDerivedHabits(day); save(); haptic([10,24,10]); render();
   toast('Okudum kaydedildi · Zihnimi besledim tiki de seninle yeşerdi.',2800);
 };
-App.setTheme=function(d){ dark=d; try{ localStorage.setItem(TKEY,d?'dark':'light'); }catch(e){} render(); };
+// AD-31: argüman alanı geriye dönük uyumlu genişledi — `false`/`true` eskisi gibi
+// açık/koyu'yu SABİTLER, `'system'` cihaz temasını takip eder. Ad ve arity korunur (I2).
+App.setTheme=function(d){
+  themePref = (d==='system') ? 'system' : (d ? 'dark' : 'light');
+  dark=resolveDark();
+  // 'system' = anahtarın yokluğu (bkz. themePref başlatıcısı).
+  try{ if(themePref==='system') localStorage.removeItem(TKEY); else localStorage.setItem(TKEY,themePref); }catch(e){}
+  render();
+};
 App.toggleTheme=function(){ App.setTheme(!dark); };
 App.toggleHabit=function(key){
   var date=activeDate(), idx=dayIndexFor(date), day=getDay(data,date,idx);
@@ -13137,11 +13172,13 @@ function ayarlarHTML(){
   h+='</div>';
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
   // appearance
-  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="display:flex;gap:8px;">';
+  h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Sistem, telefonunun görünüm ayarını takip eder; açık veya koyu seçersen o sabit kalır.</div><div style="display:flex;gap:8px;">';
   var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
   var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
-  h+='<button onclick="App.setTheme(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(dark?offS:onS)+'">'+icon('sun',15)+' Açık</button>';
-  h+='<button onclick="App.setTheme(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(dark?onS:offS)+'">'+icon('moon',15)+' Koyu</button></div></div>';
+  var _tbtn='flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;';
+  h+='<button onclick="App.setTheme(false)" aria-pressed="'+(themePref==='light')+'" style="'+_tbtn+(themePref==='light'?onS:offS)+'">'+icon('sun',15)+' Açık</button>';
+  h+='<button onclick="App.setTheme(true)" aria-pressed="'+(themePref==='dark')+'" style="'+_tbtn+(themePref==='dark'?onS:offS)+'">'+icon('moon',15)+' Koyu</button>';
+  h+='<button onclick="App.setTheme(\'system\')" aria-pressed="'+(themePref==='system')+'" style="'+_tbtn+(themePref==='system'?onS:offS)+'">'+icon('smartphone',15)+' Sistem</button></div></div>';
   // titreşim / haptik geri bildirimi
   var hapOn=!(data.settings&&data.settings.haptics===false);
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';

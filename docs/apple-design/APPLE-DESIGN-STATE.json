@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-30",
-  "nextPrompt": "AD-31",
+  "lastCompletedPrompt": "AD-31",
+  "nextPrompt": "AD-32",
   "currentWave": "6",
   "totalPrompts": 52,
-  "completedPrompts": 30,
+  "completedPrompts": 31,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 6 kullanici onayi alindi (2026-08-24) ve AD-30 salt-okuma denetimi tamamlandi (30/52). AD-31 CALISTIRILMAMALIDIR: AD-30, temanin iki durumlu bir 'dark' boolean oldugunu ve data-theme attribute'unun her zaman light/dark yazildigini (hic kaldirilmadigini) buldu; bu yuzden AD-31'in yazili CSS'i olu kalir. Calismasi icin durum modeli 3 duruma cikmali, bu da App.setTheme (I2) ve render() attribute yazimina (I4) dokunur. Promptun kendi sarti geregi AYRI ONAY gerekir - kullaniciya secenekleri sun.",
+  "nextSafeAction": "Dalga 6'da 2/3 (31/52). AD-31 kullanici onayiyla 'A' secenegi olarak uygulandi: tema uc durumlu (themePref system/light/dark), dark cozulmus deger, matchMedia JS'te cozer. ONEMLI: app/styles.css DEGISMEDI ve CSS'te @media (prefers-color-scheme: dark) blogu KASITLI OLARAK YOK - arama. Prompt dosyasindaki AD-31 govdesi tarihsel kayit olarak degistirilmedi, uygulanan kod ondan farkli; gerekce LEDGER AD-31 satirinda. SIRADAKI AD-32 dalga 6 kapanisi, ek onay istemez; S8 cache-bust AD-32'de yapilacak (app.js + app/core/constants.js degisti). Dalga 7 (AD-33) YENI ONAY ister.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -76,7 +76,7 @@
       "prompts": "AD-30..AD-32",
       "topic": "system theme following",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 3
     },
     {

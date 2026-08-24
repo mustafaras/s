@@ -119,6 +119,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-35 | `app.js` 9px partisi (52 site) | ✅ TAMAMLANDI | `957ba2a` | Kalan 9px = 0, 9.5px×11 dokunulmadan korundu; S4 tam yeşil; S5 sabit 699 | Plan sayısı **birebir doğru** (52 site). **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark; `9.5px` siteleri yanlışlıkla yakalanmadı (11 tanesi AD-36'ya sağlam devredildi). **Risk taraması:** 52 sitenin **51'i** bayraksız — `nowrap`, sabit genişlik, mutlak konum ya da ellipsis yok, yani sığmazsa serbestçe satır sarar ve yatay taşma üretemez. Tek bayraklı site **ısı haritası ay etiketi** ([app.js:12904](../../../app.js#L12904)): `position:absolute;top:0;white-space:nowrap`, hafta adımına göre `left` alıyor. `STEP=16px` ve aylar ~4.3 hafta arayla → komşu etiketler arası ~69px; 3 karakterli ay kısaltması 11px'te ~20px, çakışma yok. Kapsayıcı `height:12px` olduğu için 11px yazı dikeyde sıkı, ama `overflow:hidden` yok ve altında `gap:4px` var — kırılma değil, sıkışıklık. **Kalan 11px altı (dump ölçümü):** Bugün 26, Rapor 19 — hepsi 9.5/10/10.5 grupları, AD-36 ve AD-36-FIX'e kalıyor. |
 
+| AD-36 | `app.js` 9.5px partisi (11 site) | ✅ TAMAMLANDI | `<commit>` | Prompt kabulü sağlandı: 8.5+9+9.5 = **0**; S4 tam yeşil; S5 sabit 699 | Plan sayısı **birebir doğru** (11 site). **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. **Risk taraması:** 11 sitenin **10'u** bayraksız (serbest sarma). Tek bayraklı site **kategori sayaç rozeti** ([app.js:11809](../../../app.js#L11809)): `position:absolute;min-width:18px;height:18px;padding:0 4px;display:flex;align-items:center;justify-content:center`. `min-width` + yatay padding sayesinde iki haneli sayıda genişler (zaten öyleydi), 11px yazı 18px dairede flex ile ortalanır — kırılma yok. ⚠️ **Dalganın prompt kabulü sağlandı ama HEDEFİ sağlanmadı:** `app.js`'te 8.5/9/9.5 sıfırlandı, fakat **102 site 11px altında duruyor** (48 × 10px, 54 × 10.5px). Plan bu iki grubu hiç saymamıştı (taban "65" diyordu, gerçek 167). Kullanıcı **tam kapsamı onayladı**; kalan 102 site bir sonraki satırda `AD-36-FIX` olarak kapatılıyor. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -133,11 +135,11 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 4 · Klavye erişimi | AD-17 … AD-25 | 9/9 | ✅ tamamlandı |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
-| 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 3/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 4/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **35/52** | |
+| | **Toplam** | **36/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

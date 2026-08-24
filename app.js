@@ -6054,7 +6054,7 @@ function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) ret
 function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,var(--watch),color-mix(in srgb,var(--watch) 72%,#E0B080))':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,var(--listen))':(accent==='zikr')?'linear-gradient(135deg,var(--zikr),var(--zikr2))':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':(accent==='zikr')?'0 6px 14px var(--zikr-glow)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:12px;font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
 function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
 function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;color:'+(on?'#F2B65A':'var(--faint)')+';opacity:'+(on?'1':'0.45')+';display:inline-flex;">'+icon('star',size)+'</button>'; } h+='</div>'; return h; }
-function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:9.5px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:11px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
+function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:11px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:11px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
 function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:10px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
@@ -10158,7 +10158,7 @@ function beslenmeCardHTML(rec){
   var incomplete=!(hasName('breakfast')&&hasName('lunch')&&hasName('dinner'));
   var open=cardOpen('beslenme', incomplete);
   var pPct=Math.min(100,Math.round(nu.protein/pg*100));
-  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:9.5px;color:var(--faint);">kcal</div></div>';
+  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);">kcal</div></div>';
   var subtitle='<span id="nutri-subtitle">'+nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ</span>';
   var b='';
   // Makro özeti
@@ -10806,7 +10806,7 @@ function vacationCardHTML(rec){
   var badgeColor=active?accentHex:(planned?hexA(accentHex,0.85):(dark?'rgba(169,160,155,0.85)':'rgba(120,113,108,0.8)'));
   var badgeBg=active?hexA(accentHex,0.14):(planned?hexA(accentHex,0.09):(dark?'rgba(169,160,155,0.18)':'rgba(120,113,108,0.12)'));
   var badgeText=active?'AKTİF':(planned?'Planlandı':'Kapalı');
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;">Tatil Modu <span style="font-size:9.5px;font-weight:800;letter-spacing:.6px;color:'+badgeColor+';background:'+badgeBg+';border-radius:6px;padding:1.5px 5px;">'+badgeText+'</span></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;">Tatil Modu <span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:'+badgeColor+';background:'+badgeBg+';border-radius:6px;padding:1.5px 5px;">'+badgeText+'</span></div>';
   var sub;
   if(active) sub='Tatildesin — su hedefi '+VACATION_WATER_GOAL+' bardak · seri duraklatıldı';
   else if(planned) sub='Tatil planlandı — belirttiğin günlerde su 10 bardak, seri duraklar';
@@ -11806,7 +11806,7 @@ function hubTilesHTML(){
   h+='<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;">';
   cats.forEach(function(c){
     var done=c.n>0;
-    var badge=done?'<span style="position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:#fff;background:'+c.col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.28)')+';z-index:2;">'+(c.n>1?c.n:icon('check',10))+'</span>':'';
+    var badge=done?'<span style="position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;background:'+c.col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.28)')+';z-index:2;">'+(c.n>1?c.n:icon('check',10))+'</span>':'';
     var surface=dark?'color-mix(in srgb,'+c.col+' '+(done?'18':'10')+'%, #0B0B0E)':c.bg;
     var borderOp=done?'58':(dark?'30':'22');
     var sh=done?'0 8px 20px color-mix(in srgb,'+c.col+' 28%, transparent)':(dark?'none':'0 4px 12px rgba(108,74,58,0.06)');
@@ -11842,7 +11842,7 @@ function heroStatTile(ic,val,label,accent,met){
   return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:15px;background:'+bg+';border:1px solid '+(met?'rgba(143,191,138,0.34)':'transparent')+';">'
     +'<span style="display:inline-flex;color:'+(filled?col:'var(--faint)')+';">'+icon(ic,15)+'</span>'
     +'<span style="font-size:13px;font-weight:800;line-height:1.05;color:'+(filled?'var(--text)':'var(--faint)')+';white-space:nowrap;">'+val+'</span>'
-    +'<span style="font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
+    +'<span style="font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
 }
 function heroStatsHTML(rec){
   var mo=(rec&&rec.mood)?find(MOODS,'id',rec.mood):null;
@@ -12657,7 +12657,7 @@ function haritaHTML(){
     var clickable=!future;
     h+='<button '+(clickable?'onclick="App.openDate(\''+date+'\')"':'')+' style="position:relative;aspect-ratio:1;border-radius:12px;border:1px solid var(--card-bd);background:'+tint+';color:var(--text);cursor:'+(clickable?'pointer':'default')+';opacity:'+((future||before)?'0.4':'1')+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;'+(isToday?'box-shadow:0 0 0 2px #E9AFC1;':'')+'">';
     h+='<div style="font-size:12.5px;font-weight:700;line-height:1;">'+dnum+'</div>';
-    h+='<div style="font-size:12px;height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:9.5px;color:var(--muted);font-weight:700;">'+cnt+'/'+htc+'</span>':''))+'</div>';
+    h+='<div style="font-size:12px;height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:11px;color:var(--muted);font-weight:700;">'+cnt+'/'+htc+'</span>':''))+'</div>';
     h+='</button>';
   }
   h+='</div>';
@@ -12783,7 +12783,7 @@ function consistencyMomentumCard(){
     h+='<div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
     wdPct.forEach(function(pc){ var hh=pc!=null?Math.max(6,Math.round(pc/100*40)):4; var col=pc==null?'rgba(150,110,120,0.18)':(pc>=66?'#8FBF8A':(pc>=33?'#E9AFC1':'#C9B8FF')); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:20px;height:'+hh+'px;border-radius:5px;background:'+col+';"></div></div>'; });
     h+='</div>';
-    h+='<div style="display:flex;gap:5px;">'; wdLabels.forEach(function(l){ h+='<div style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);font-weight:700;">'+l+'</div>'; }); h+='</div>';
+    h+='<div style="display:flex;gap:5px;">'; wdLabels.forEach(function(l){ h+='<div style="flex:1;text-align:center;font-size:11px;color:var(--faint);font-weight:700;">'+l+'</div>'; }); h+='</div>';
     h+='</div>';
   }
   h+=sciNote('Tutarlılık, tekil zirvelerden değerlidir: davranışın otomatikleşmesi (habit formation) tekrar sıklığına bağlıdır. Momentum, son 7 günün önceki 7 güne göre yönü — küçük pozitif ivme bile bileşik olarak birikir.');
@@ -13372,7 +13372,7 @@ function gaugeBadge(pct,color,big,small,size){
   s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="rgba(130,110,160,0.16)" stroke-width="'+sw+'"/>';
   s+='<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" style="transition:stroke-dashoffset .55s var(--ease-premium,ease);"/>';
   s+='</svg>';
-  s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:9.5px;color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
+  s+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;"><div style="font-size:'+(size>=88?'21px':'17px')+';font-weight:800;color:var(--text);line-height:1;">'+big+'</div>'+(small?'<div style="font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.2px;margin-top:2px;">'+small+'</div>':'')+'</div>';
   s+='</div>';
   return s;
 }
@@ -13442,7 +13442,7 @@ function caffeineBlock(rec){
   if(total>limit){ var warnMsg=isVacationDay(date)?('Tatil modunda günlük limit esnetildi ('+total+'/'+limit+' mg). Normal günlerde üst sınır '+baseLimit+' mg.'):('Günlük limit aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+baseLimit+' mg.'); h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">'+warnMsg+'</div>'; }
   if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg. Aralara zaman koy.</div>'; }
   if(lastCaf&&!timingOk){ h+='<div style="font-size:11px;color:#9A6A2A;line-height:1.4;display:flex;gap:5px;"><span style="flex-shrink:0;">'+icon('clock',12)+'</span><span>Son kahve '+lastCaf+' — önerilen kesim '+cut+' (yatmadan '+CAFFEINE_CUTOFF_H+' sa önce). Bu saat uykuya geçişi zorlaştırabilir.</span></div>'; }
-  h+='<div style="font-size:9.5px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa. mg ortalama serving başına.</div>';
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Kaynak: EFSA 2015 kafein paneli · FDA · yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa. mg ortalama serving başına.</div>';
   return collapsibleCardHTML({key:'h-caffeine', icon:icon('coffee',18), accent:A, title:'Kafein', subtitle:'Bilimsel takip · mg · yarı ömür · uyku', badge:hBadge(total+' mg',barCol), open:cardOpen('h-caffeine'), body:h, hint:'kafein takibini aç'});
 }
 CARD_BUILDERS['h-caffeine']=caffeineBlock;
@@ -13524,7 +13524,7 @@ function bodyCard(rec){
     h+='<div style="display:flex;align-items:flex-end;gap:5px;height:40px;">';
     ws.forEach(function(w){ var hh=Math.round(8+((w.kg-mn)/rng)*30); h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:40px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,'+A+',#9BC7EC);"></div></div>'; });
     h+='</div>';
-    h+='<div style="display:flex;gap:5px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:9.5px;color:var(--faint);">'+new Date(w.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</span>'; }).join('')+'</div>';
+    h+='<div style="display:flex;gap:5px;">'+ws.map(function(w){ return '<span style="flex:1;text-align:center;font-size:11px;color:var(--faint);">'+new Date(w.ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+'</span>'; }).join('')+'</div>';
     h+='</div>';
   }
   // ---- Profil: doğum tarihi + aktivite seviyesi (hedef hesaplamanın girdileri) ----
@@ -13722,7 +13722,7 @@ function mentalBalanceCard(rec){
   h+='<div style="display:flex;align-items:center;gap:10px;">';
   h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 15%,var(--icon));">'+icon('brain',18)+'</span>';
   h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;">Ruhsal Denge</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;">Zihinsel sağlığın · son 7 gün</div></div>';
-  if(ms.score!=null) h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:23px;font-weight:800;color:'+tcol+';line-height:1;font-variant-numeric:tabular-nums;">'+ms.score+'</div><div style="font-size:9.5px;color:var(--faint);">/100</div></div>';
+  if(ms.score!=null) h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:23px;font-weight:800;color:'+tcol+';line-height:1;font-variant-numeric:tabular-nums;">'+ms.score+'</div><div style="font-size:11px;color:var(--faint);">/100</div></div>';
   h+='</div>';
   h+='<div style="display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-size:12px;font-weight:800;color:'+tcol+';background:color-mix(in srgb,'+tcol+' 13%,var(--icon));padding:5px 11px;border-radius:999px;"><span style="display:inline-flex;">'+icon('sparkles',12)+'</span>'+tier+'</div>';
   // 7 günlük mod noktaları

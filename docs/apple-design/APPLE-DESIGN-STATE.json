@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-32",
-  "nextPrompt": "AD-33",
+  "lastCompletedPrompt": "AD-33",
+  "nextPrompt": "AD-34",
   "currentWave": "7",
   "totalPrompts": 52,
-  "completedPrompts": 32,
+  "completedPrompts": 33,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 1-6 TAMAMLANDI (32/52). SIRADAKI AD-33 dalga 7'nin ilk promptu ve ACIK KULLANICI ONAYI ister; onay alinmadan calistirma (11pt tabani dar rozetlerde duzen tasmasi yapabilir). Dalga 6 notu: AD-31 'A' secenegi olarak uygulandi - tema uc durumlu (themePref system/light/dark), matchMedia JS'te cozer, app/styles.css DEGISMEDI ve CSS'te @media (prefers-color-scheme: dark) blogu KASITLI OLARAK YOK - arama. Prompt dosyasindaki AD-31 govdesi tarihsel kayit olarak degistirilmedi; uygulanan kod ondan farkli, gerekce LEDGER AD-31 satirinda. Cache-bust guncel: app.js?v=20260824a, app/core/constants.js?v=20260824a, app/styles.css?v=20260823d (dalga 6'da degismedi).",
+  "nextSafeAction": "Dalga 7 onaylandi, 1/5 (33/52). AD-33 app/styles.css'te 119 siteyi 11px'e cikardi - promptun kabul regex'i yalnizca 112'sini yakaliyordu (6px/7px/7.5px/8.1px kaciyordu), sayisal tarama kullanildi. SIRADAKI AD-34 (app.js 8.5px). ONEMLI: headless harness'ta layout motoru YOK, dolayisiyla dump ciktisi duzen tasmasini gosteremez - AD-34..36'nin 'gorsel denetim' adimi tasma olcumu degil, isaretleme okumasidir. Dalga 5+6 04b83ca ile deploy edildi. Dalga 7 sonunda (AD-37) S8 cache-bust yapilacak; push/deploy ayrica onaya tabi.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -84,7 +84,7 @@
       "prompts": "AD-33..AD-37",
       "topic": "11pt typography floor",
       "approvalRequired": true,
-      "completed": 0,
+      "completed": 1,
       "total": 5
     },
     {

@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-32` — dalga 6 kapanışı |
-| **Sıradaki** | `AD-33` ⚠️ **onay gerekir** (dalga 7 · 11pt tipografi tabanı) |
-| **Güncel dalga** | `7` (onay bekliyor) |
+| **Son tamamlanan** | `AD-33` — `app/styles.css` 11px tabanı (119 site) |
+| **Sıradaki** | `AD-34` — `app.js` 8.5px partisi |
+| **Güncel dalga** | `7` (onay alındı 2026-08-24) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-32 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–6 tamamlandı: 32/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-33 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX onarımları). **Dalga 1–6 tamamlandı, dalga 7'de 1/5: 33/52.** Dalga 5 ve 6 `04b83ca` ile GitHub Pages'e deploy edildi (2026-08-24). Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-31-FIX` (2026-08-24):** Dalga 6 kapanışı yeşildi ama AD-31'in yeni çalışma zamanı mantığını koruyan kalıcı bir fixture yoktu (doğrulama yalnızca oturum scratchpad'indeydi) ve [`../IOS27-TASARIM-PLANI.md`](../IOS27-TASARIM-PLANI.md) başlığı hâlâ "uygulama başlamadı" diyordu. `docs/apple-design/verify-theme-tristate.mjs` (18 assertion) commit edildi ve doğrulama kapısına eklendi; plan başlığı düzeltilip §4 puan tablosunun dondurulmuş denetim kaydı olduğu yazıldı. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -102,8 +102,13 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Dalga 7 (AD-33) kullanıcı onayı bekliyor — onay alınmadan çalıştırma.** 11pt tipografi tabanı dar rozetlerde
-satır kaydırma/düzen taşması yapabilir; bu yüzden ayrı onaya bağlı. Dalga 6 tamamlandı, bloke bir şey yok.
+**Dalga 7 onaylandı ve sürüyor.** Bloke bir şey yok. Sıradaki AD-34 (`app.js` 8.5px partisi).
+
+⚠️ **Dalga 7 boyunca geçerli dürüst sınır:** headless harness'ta **layout motoru yok** — CSS uygulanmıyor,
+dolayısıyla `--dump` çıktısı düzen taşmasını **gösteremez**. AD-34…AD-36'nın "zorunlu görsel denetim"
+adımı, taşmanın ölçülmesi değil, üretilen işaretlemenin okunması anlamına gelir. Taşma riski yalnızca
+**analitik** değerlendirilebilir (kapsayıcının `min-width:0`, `minmax(0,1fr)`, `nowrap`+`ellipsis`,
+`overflow:hidden` zincirine bakarak). Cihaz üstü doğrulama ayrı bir kanıt seviyesidir ve yapılmadı.
 
 **AD-31 promptun yazıldığı hâlinden saparak uygulandı — kullanıcı onaylı.** AD-30 denetimi,
 `data-theme` attribute'unun *her zaman* `light` ya da `dark` yazıldığını ve hiç kaldırılmadığını

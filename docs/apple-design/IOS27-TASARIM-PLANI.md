@@ -71,7 +71,7 @@ Kaynaklar: [MacRumors — 250+ değişiklik listesi](https://www.macrumors.com/2
 | --- | --- | --- | --- | --- |
 | Metin kontrastı | ✅ 10/10 AA/AAA | ✅ 10/10 AA/AAA | 🟡 denetlenmedi | ✅ tümü AA+ |
 | Tipografi ölçeği | ✅ 1687 site rem; 13 dekoratif muaf | ✅ 1687 site rem; 13 dekoratif muaf | 🟡 ham px | ✅ adlandırılmış ölçek |
-| Dynamic Type | ✅ rem tabanı + metin ölçeği | ✅ rem tabanı + metin ölçeği | ❌ yok | ✅ rem tabanı + ölçek |
+| Dynamic Type | ✅ rem tabanı + metin ölçeği | ✅ rem tabanı + metin ölçeği | ❌ yok | 🟡 adlandırılmış ölçek, px tabanı |
 | Dokunma hedefi | ✅ 44px kapısı | ✅ 44px kapısı | ✅ | ✅ |
 | Safe area | ✅ 35 kullanım | ✅ | ✅ 4 | ✅ 7 |
 | Reduced motion | ✅ 29 kural | ✅ | ✅ 5 | ✅ 2 blok + global güvenlik ağı |

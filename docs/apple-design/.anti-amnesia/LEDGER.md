@@ -103,6 +103,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-28 | Kaydırma kenarı efekti | ✅ TAMAMLANDI | `3466a55` | S4+S5+yapı geçti | `.sey-appheader` blur'ü `--hdr-blur` değişkenine alındı; **dinlenme değeri 26px'te bırakıldı** (istenmeyen görsel değişiklik olmasın), `.is-scrolled` durumunda 34px'e çıkıyor. `backdrop-filter` mevcut transition listesine eklendi. Yeni JS yok — `is-scrolled` sınıfını yazan `app.js:16051` dokunulmadı (I4). **Yan bulgu:** header'ın kendi `transition`'ı hiçbir `prefers-reduced-motion` bloğunda kapatılmıyordu (mevcut boşluk); blur'ü transition'a eklemek boşluğu büyütecekti — header için reduced-motion kuralı eklendi. **Gözlem (uygulanmadı):** koyu temada header hâlâ `backdrop-filter:none` + opak `#050506`. Opak navigasyon çubuğu meşru bir iOS kalıbı olduğu için AD-26 kapsamı dışında bırakıldı; istenirse ayrı bir karar. |
 
+| AD-29 | Dalga 5 kapanışı | ✅ TAMAMLANDI | `PENDING` | S8+S4+S5+yapı geçti; kontrast 30/30 | Cache-bust `styles.css?v=20260823d` (dalga 5'te yalnızca `app/styles.css` değişti; `app.js` dokunulmadı). Tam kapı yeşil: 8 doğrulama + 2 değişmezlik kanıtı + 5 sekme yapı taraması. Dalga 5 tablosu 4/4, toplam 29/52. **Dalga 6'dan itibaren açık kullanıcı onayı gerekir** — `blockedPrompt` boş bırakıldı ama `nextSafeAction` onay şartını taşıyor. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -115,13 +117,13 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 2 · `-ink` renk tokenları | AD-06 … AD-13 | 8/8 | ✅ tamamlandı |
 | 3 · Dokunma hedefleri | AD-14 … AD-16 | 3/3 | ✅ tamamlandı |
 | 4 · Klavye erişimi | AD-17 … AD-25 | 9/9 | ✅ tamamlandı |
-| 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 0/4 | beklemede |
+| 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 0/5 | onay bekliyor |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **25/52** | |
+| | **Toplam** | **29/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

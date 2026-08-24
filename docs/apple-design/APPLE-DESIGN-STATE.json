@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-28",
-  "nextPrompt": "AD-29",
-  "currentWave": "5",
+  "lastCompletedPrompt": "AD-29",
+  "nextPrompt": "AD-30",
+  "currentWave": "6",
   "totalPrompts": 52,
-  "completedPrompts": 28,
+  "completedPrompts": 29,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Siradaki prompt: AD-29 (dalga 5 kapanisi). Dalga 6-9 ilk promptundan once acik kullanici onayi ister.",
+  "nextSafeAction": "Dalga 1-5 tamamlandi (29/52). AD-30 dalga 6'nin ilk promptu ve ACIK KULLANICI ONAYI ister; onay alinmadan calistirma.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -68,7 +68,7 @@
       "prompts": "AD-26..AD-29",
       "topic": "material consistency",
       "approvalRequired": false,
-      "completed": 3,
+      "completed": 4,
       "total": 4
     },
     {

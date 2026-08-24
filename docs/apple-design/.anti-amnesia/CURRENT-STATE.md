@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-28` — Kaydırma kenarı efekti |
-| **Sıradaki** | `AD-29` |
-| **Güncel dalga** | `5` |
+| **Son tamamlanan** | `AD-29` — Dalga 5 kapanışı |
+| **Sıradaki** | `AD-30` ⚠️ **onay gerekir** |
+| **Güncel dalga** | `6` (onay bekliyor) |
 | **Bloke** | yok |
 P26-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-28 (+ AD-19-FIX, AD-25-FIX onarımları). Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-29 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı: 29/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -98,7 +98,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-Şu an yok. AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
+Şu an yok. **AD-30 onay bekliyor** — dalga 6 kullanıcı onayı olmadan başlatılamaz. AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
 
 ---
 

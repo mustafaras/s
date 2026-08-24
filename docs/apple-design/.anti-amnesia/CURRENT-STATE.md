@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-25` — Dalga 4 kapanışı |
-| **Sıradaki** | `AD-26` |
+| **Son tamamlanan** | `AD-26` — Koyu tema cam paritesi |
+| **Sıradaki** | `AD-27` |
 | **Güncel dalga** | `5` |
 | **Bloke** | yok |
-| **Son güncelleme** | 2026-08-23 |
+P26-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-25. Dalga 4 tamamen kapandı; ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır. AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-26 (+ AD-19-FIX, AD-25-FIX onarımları). Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 

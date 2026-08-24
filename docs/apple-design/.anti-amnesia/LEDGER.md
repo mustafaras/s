@@ -97,6 +97,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-25-FIX | Dalga 4 erişilebilirlik onarımı | ✅ TAMAMLANDI | `803d532` | S4+S5 geçti; 5 sekmede yapı taraması temiz | Dalga 4 denetiminde iki kusur bulundu. (1) `onclick="event.stopPropagation()"` taşıyan **19 kapsayıcıya** (sey-room-sheet, sey-crisis-card, 4× sey-ov-card, 13 modal yüzeyi) `role="button"`+`tabindex="0"`+boş `onkeydown` verilmişti; VoiceOver modal panelleri "buton" diye duyuruyor, tab sırasına 19 ölü durak giriyordu — program öncesinden **daha kötü**. Üç attribute kaldırıldı, `onclick` korundu (role 42→23, tabindex 49→30, onkeydown 48→29; her biri tam −19). (2) Hatırlatıcı overlay'i (`role="dialog" aria-modal`) Enter/Space ile kapanıyordu, Escape yoktu → `onkeydown` Escape'e alındı, `tabindex` 0→−1 (odak yönetimine açık, tab sırasında değil). Cache-bust `20260823j`. I1–I5 dokunulmadı. |
 
+| AD-26 | Koyu tema cam paritesi | ✅ TAMAMLANDI | `9264977` | S4+S5+yapı geçti | `#root[data-theme="dark"] .glass` kapatma kuralı koyu cam varyantıyla değiştirildi (`rgba(22,22,26,.72)` + `blur(24px) saturate(130%)` + `1px rgba(255,255,255,.12)`). `box-shadow:none!important` **bilinçli korundu** — koyu yüzeyler gölgeyle değil kenarlıkla ayrışır. **Yan bulgu:** `#root[data-theme="dark"] .glass`, AD-04'ün `forced-colors` içindeki `.glass` kuralından daha spesifik; cam geri açılınca zorlanmış renk modunda blur geri gelecekti — `forced-colors` kuralına `!important` eklendi, AD-04 tekrar etkin. **Defter notu:** CSS `9264977`'de commit edildi, bu satır sonraki commit'te eklendi (guard satır başına sabitlenmemişti, ölçüm tablosundaki `| AD-26 |` hücresine takıldı). |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -136,7 +138,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | `min-height:40px` kontrol | 5 | 0 | AD-15 |
 | `<div onclick>` — app.js | 54 | 0 | AD-19 … AD-23 |
 | `<div onclick>` — panel.js | 8 | 0 | AD-24 |
-| Koyu temada `.glass` kapalı | evet | hayır | AD-26 |
+| Koyu temada `.glass` kapalı | evet | ✅ hayır (AD-26) | AD-26 |
 | `prefers-color-scheme` (app) | 0 | 1 | AD-31 |
 | 11px altı font — styles.css | var | 0 | AD-33 |
 | 11px altı font — app.js | 65 | 0 | AD-34 … AD-36 |

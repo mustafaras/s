@@ -151,6 +151,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-49 | Kalan yüzeyler | ✅ TAMAMLANDI | `938872f` | **app.js ham px 1262 → 10** (hepsi belgeli dekoratif muafiyet); 5 sekme dump'ında ham px **0**; S4 tam yeşil; S5 sabit 699 | Ayarlar, modal'lar, rozetler ve önceki dört partiye girmeyen her şey — **128 site** daha eşlendi. **Sonuç: `app.js` 1262 → 10, token kullanımı 0 → 1252.** ⚠️ **Prompt'un kabul ölçütü (`grep -c 'font-size:[0-9]' app.js` → 0) kasıtlı olarak sağlanmadı** — AD-43'te kullanıcı onayıyla belirlenen dekoratif muafiyet yüzünden. **Kalan 10 sitenin tamamı denetlendi:** 130px + 72px + 3 × 44px kıvrık tırnak filigranı, 48px 🦩 marka flaması, 42px 📍 emoji, 40px + 38px ikon kapsayıcısı — dokuzu saf grafik. Onuncusu **44px "Şeyma" marka kelimesi** (onboarding hero); bu *metin* ama 34px `--f-large` tavanının üstünde bir **display** boyu ve kullanıcı metin boyutuyla ölçeklenmesi onboarding hero düzenini bozar. [CLAUDE.md](../../../CLAUDE.md)'nin koruduğu görsel kimliğin parçası olduğu için muaf bırakıldı. **Doğrulama:** Bugün/Rapor/Mesaj/Ayarlar/Sağlık dump'larının **hepsinde ham px 0** (sırasıyla 150/113/9/60/106 token). **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
 
+| AD-50 | Dalga 9 kapanışı | ✅ TAMAMLANDI | `<commit>` | S8 + S4 (8 kapı) + S5; **ham px 1696 → 13** (belgeli muafiyet) | **S8 cache-bust:** `app.js` ve `app/styles.css` → **`?v=20260824d`**. **S4 tam yeşil:** syntax 3/3, driver 31/0, zikr 95/95, tema 26/26, kontrast 30/30, sync 64/64, panel v1 50/50, panel-v2 27/27. **S5 dalga geneli (`4030530` → HEAD):** handler **699 sabit**, çağrı dağılımı **birebir aynı** — dalga 9 yalnızca `font-size` değeri düzeyinde kaldığı için **sıfır I2 etkisi**. **Sonuç:** `app.js` **1262 → 10**, `app/styles.css` **434 → 3**; toplam **1696 → 13** ham px, **1687 site** adlandırılmış `rem` ölçeğine taşındı. Token kullanımı **0 → 1687**. 5 sekmenin render çıktısında ham px **0**. **Dynamic Type kazanıldı:** `html`/`body`/`:root`'ta `font-size` tanımı olmadığı için `rem` tabanı tarayıcı varsayılanıdır ve kullanıcının metin boyutu ayarıyla ölçeklenir. **13 muafiyet (bilinçli, kullanıcı onaylı):** app.js'te 130/72/3×44px kıvrık tırnak filigranları, 48px 🦩 marka flaması, 42px 📍 emoji, 40/38px ikon kapsayıcıları, 44px "Şeyma" marka kelimesi; `app/styles.css`'te 54px maskot, 46/38px zikir parıltıları. Ayrıca 4 display `clamp()` (vw tabanlı hero boyutları). Hepsi 34px `--f-large` tavanının üstünde ve metin değil **display/grafik**; Dynamic Type ile ölçeklenmeleri düzeni bozar. **Dalga 9 tablosu 8/8, toplam 50/52.** `currentWave` → **10**. Dalga 10 (AD-51 panel-v2 reduced-motion, AD-52 program kapanışı) **ek onay istemez**. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -167,9 +169,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 7/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 8/8 | ✅ tamamlandı |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **49/52** | |
+| | **Toplam** | **50/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

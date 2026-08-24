@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-42` — dalga 8 kapanışı |
-| **Sıradaki** | `AD-43` ⚠️ **onay gerekir** (dalga 9 · tipografi ölçeği) |
-| **Güncel dalga** | `9` (onay bekliyor) |
+| **Son tamamlanan** | `AD-50` — dalga 9 kapanışı |
+| **Sıradaki** | `AD-51` — panel-v2 reduced-motion (ek onay istemez) |
+| **Güncel dalga** | `10` (ek onay istemez) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-42 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-36-FIX onarımları). **Dalga 1–8 tamamlandı: 42/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d` ile deploy edildi (2026-08-24); **dalga 8 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-50 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-31-FIX-2, AD-36-FIX onarımları). **Dalga 1–9 tamamlandı: 50/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d`, dalga 8 `4030530` ile deploy edildi (2026-08-24); **dalga 9 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-31-FIX-2` (2026-08-24):** AD-31'in "uygulanmadı" gözlemi kapatıldı. `index.html` `#root`'a statik `data-theme="light"` yazdığı için sistemi koyu olan kullanıcı her açılışta kısa bir **beyaz flaş** görüyordu — dalga 6'nın kendi özelliğinin altını oyan bir kusur. `#root`'tan hemen sonra, boyamadan önce çalışan satır içi bir çözümleyici eklendi (app.js'teki `resolveDark()` ile aynı mantık). ⚠️ Mantık artık **iki yerde** (`app.js:4595` + `index.html`); `verify-theme-tristate.mjs` grup [8] bu senkronu 8 assertion ile bekliyor (fixture 18 → 26). Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX-2`. Prompt sayacı değişmedi.
 
@@ -96,7 +96,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 | 6 | AD-30 | ✅ onaylandı + tamamlandı 2026-08-24. AD-31 için ikinci onay da alındı (A seçeneği — aşağı bak) |
 | 7 | AD-33 | ✅ onaylandı + tamamlandı 2026-08-24. Kapsam 65 → 167 siteye genişletildi (ayrı onay) |
 | 8 | AD-38 | ✅ onaylandı + tamamlandı 2026-08-24. Görsel etki beklenenden çok küçük çıktı (aşağı bak) |
-| 9 | AD-43 | 1400+ site; aylara yayılır |
+| 9 | AD-43 | ✅ onaylandı + tamamlandı 2026-08-24. Merdiven uzatıldı, dekoratif muafiyet (ayrı onay) |
 
 **Push, deploy, tag ve `mustafaras/seyma-data` yazımı bu programın kapsamı dışında ve ayrıca onaya tabidir.**
 
@@ -104,36 +104,24 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Dalga 9 (AD-43) kullanıcı onayı bekliyor — onay alınmadan çalıştırma.** 1400+ site, planın kendi
-ifadesiyle **"acil değil"**: dalga 1–8 sonrası uygulama zaten erişilebilir; dalga 9 onu *sürdürülebilir*
-yapar (ham px → adlandırılmış ölçek tokenları, Panel-v2'deki kalıp). Dalga 8 tamamlandı, bloke bir şey yok.
+**Bloke bir şey yok. Sıradaki AD-51/AD-52 (dalga 10) ek onay istemez.**
 
-**Dalga 8 sonucu ve sürpriz:** `.glass` içerik katmanında **68 → 0**. Ama görsel etki beklenenden **çok
-küçük** çıktı, çünkü [`app/styles.css:397`](../../../app/styles.css#L397) boot sonrası `.glass` blur'ünü
-**zaten kapatıyordu** (2026-07-28 flaş düzeltmesi). Yani dalga 8 pratikte "cam kaldırma" değil,
-**saydamlığı opaklaştırma** oldu: açık temada kart (254,250,250) → (255,253,252), koyu temada fark
-**1.008:1** yani ayırt edilemez. Fonksiyonel katman (header, alt nav, chatbar, yüzen aksiyon) `.glass`
-kullanmıyordu zaten — kendi `backdrop-filter` kuralları var ve **camlı kaldılar**.
+**Dalga 9 sonucu:** ham `font-size` **1696 → 13**; **1687 site** adlandırılmış `rem` ölçeğine taşındı.
+`html`/`body`/`:root`'ta `font-size` tanımı olmadığı için `rem` tabanı tarayıcı varsayılanıdır ve
+kullanıcının metin boyutu ayarıyla ölçeklenir — **Dynamic Type'ın ön koşulu sağlandı.**
 
-**Kontrast opaklaşmayla İYİLEŞTİ:** `--faint` ve üç `-ink` tokenı 4.5:1 eşiğinin 0.01 üstünde
-(4.51:1) duruyordu; opak zeminde 4.63:1'e çıktılar. `verify-contrast.mjs` artık kart zeminini
-`--card-solid` tokenından okuyor ve token kaybolursa uyarı basıyor.
-
-⚠️ **`.glass` kuralı artık kullanıcısız ölü CSS** — bilinçli olarak silinmedi (AD-39 kararı): sınıf,
-ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşıyor. Sonraki ajan bunu "unutulmuş kod"
-sanıp temizlemesin.
-
-✅ **Kapatıldı (AD-31-FIX-2):** AD-31'in boot-öncesi tema flaşı gözlemi artık çözüldü — `index.html`
-boyamadan önce temayı çözüyor. Mantık iki yerde yaşıyor; fixture grup [8] senkronu koruyor.
-
-⚠️ **Görsel doğrulama hâlâ cihazda yapılmadı.** Kart sınırları **sayısal** olarak doğrulandı
-(kart↔zemin kontrastı 1.10 → 1.12, yani sınır korundu ve hafifçe belirginleşti), gözle değil.
+⚠️ **Prompt'un eşleme tablosu kusurluydu ve genişletildi (kullanıcı onaylı).** Tablo `22+ → title2`
+diyordu; bu, 23–130px arasındaki 26 siteyi 22px'e çökertirdi — 🦩 marka flaması ve filigran rakamlar
+dâhil. Merdivene `callout`(16), `headline`(18), `title1`(28), `large`(34) eklendi ve **34px üstü
+metin değil display/grafik olan 13 site + 4 display `clamp()` muaf tutuldu.**
+**Bu yüzden AD-49'un kabul ölçütü (`font-size:[0-9]` → 0) kasıtlı olarak sağlanmadı** — sonraki ajan
+bunu eksik iş sanmasın: muafiyet listesi LEDGER `AD-49`/`AD-50` satırlarında, her biri denetlendi.
 
 Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı.
 AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
 buton yerine klavye destekli `role=button` olarak korundu.
 
-Bir sonraki ajan **AD-43**'ü ancak kullanıcı onayından sonra çalıştırır.
+Bir sonraki ajan **AD-51**'i doğrudan çalıştırabilir (dalga 10 ek onay istemez).
 
 ---
 
@@ -143,4 +131,4 @@ Bir sonraki ajan **AD-43**'ü ancak kullanıcı onayından sonra çalıştırır
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 42 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).
+Bulgular 52 sıralı prompta dönüştürüldü; 50 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).

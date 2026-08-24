@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-49",
-  "nextPrompt": "AD-50",
-  "currentWave": "9",
+  "lastCompletedPrompt": "AD-50",
+  "nextPrompt": "AD-51",
+  "currentWave": "10",
   "totalPrompts": 52,
-  "completedPrompts": 49,
+  "completedPrompts": 50,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 1-8 TAMAMLANDI (42/52). SIRADAKI AD-43 dalga 9'un ilk promptu ve ACIK KULLANICI ONAYI ister (tipografi olcegi, 1400+ site; planin kendi ifadesiyle 'acil degil'). Dalga 8 notu: .glass icerik katmaninda 68->0, ama gorsel etki cok kucuk cikti cunku app/styles.css:397 boot sonrasi .glass blur'unu ZATEN kapatiyordu; degisiklik saydam->opak oldu. Fonksiyonel katman (header/nav/chatbar/fab) .glass kullanmiyordu, camli kaldi. .glass kurali artik KULLANICISIZ olu CSS - bilincli olarak silinmedi (AD-39 karari), temizleme. Kontrast opaklasmayla IYILESTI (faint 4.51->4.63). verify-contrast.mjs artik --card-solid tokenini okuyor. Cache-bust guncel: app.js?v=20260824c, app/styles.css?v=20260824c, app/core/constants.js?v=20260824a. DALGA 8 HENUZ DEPLOY EDILMEDI - push/deploy ayrica onaya tabi.",
+  "nextSafeAction": "Dalga 1-9 TAMAMLANDI (50/52). SIRADAKI AD-51 (panel-v2 reduced-motion) ve AD-52 (program kapanisi) - dalga 10 EK ONAY ISTEMEZ. Dalga 9 notu: ham font-size 1696 -> 13; 1687 site rem olcegine tasindi. Promptun esleme tablosu kusurluydu (22+ -> title2, 26 siteyi cokertirdi); merdiven callout/headline/title1/large ile uzatildi ve 34px ustu 13 site + 4 display clamp KASITLI OLARAK MUAF tutuldu (dekoratif grafik, Dynamic Type ile olceklenmemeli). Bu yuzden AD-49 kabul olcutu (font-size:[0-9] -> 0) bilerek saglanmadi - eksik is degil. Cache-bust guncel: app.js?v=20260824d, app/styles.css?v=20260824d. DALGA 9 HENUZ DEPLOY EDILMEDI.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -100,7 +100,7 @@
       "prompts": "AD-43..AD-50",
       "topic": "type scale / Dynamic Type",
       "approvalRequired": true,
-      "completed": 7,
+      "completed": 8,
       "total": 8
     },
     {

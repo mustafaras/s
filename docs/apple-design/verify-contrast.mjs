@@ -100,6 +100,25 @@ const surfaces = [
   { label: 'KOYU · kart', map: dark, bg: composite(hexToRgb('#111114'), 0.96, hexToRgb('#000000')) },
 ];
 
+/**
+ * Koyu cam yüzeyi CSS'ten okunur, sabitlenmez — AD-26 malzemeyi değiştirdiğinde
+ * denetim sessizce eski zemini ölçmeye devam etmesin diye.
+ */
+const darkGlass = css
+  .match(/#root\[data-theme="dark"\]\s*\.glass\{[^}]*background:\s*rgba\(([^)]+)\)/)
+  ?.[1]
+  .split(',')
+  .map((n) => Number(n.trim()));
+
+if (darkGlass?.length === 4 && darkGlass.every(Number.isFinite)) {
+  const [r, g, b, a] = darkGlass;
+  surfaces.push({
+    label: 'KOYU · cam',
+    map: dark,
+    bg: composite([r, g, b], a, hexToRgb('#000000')),
+  });
+}
+
 let failed = 0;
 let checked = 0;
 

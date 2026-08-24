@@ -95,6 +95,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-25 | Dalga 4 kapanışı | ✅ TAMAMLANDI | `d6c33b8` | S8+S4+S5+S6+S7 geçti | `index.html` ve `panel.html` cache-bust'ları güncel; tam headless gate geçti, app handler/call dağılımı ve I1–I5 sınırları değişmedi. Literal app `<div onclick>` 0, panel `<div onclick>` 2 role kabuğu. State dalga sayaçları düzeltilerek Dalga 4 9/9 ve `currentWave=5` yapıldı; açık kapı yok. |
 
+| AD-25-FIX | Dalga 4 erişilebilirlik onarımı | ✅ TAMAMLANDI | `PENDING` | S4+S5 geçti; 5 sekmede yapı taraması temiz | Dalga 4 denetiminde iki kusur bulundu. (1) `onclick="event.stopPropagation()"` taşıyan **19 kapsayıcıya** (sey-room-sheet, sey-crisis-card, 4× sey-ov-card, 13 modal yüzeyi) `role="button"`+`tabindex="0"`+boş `onkeydown` verilmişti; VoiceOver modal panelleri "buton" diye duyuruyor, tab sırasına 19 ölü durak giriyordu — program öncesinden **daha kötü**. Üç attribute kaldırıldı, `onclick` korundu (role 42→23, tabindex 49→30, onkeydown 48→29; her biri tam −19). (2) Hatırlatıcı overlay'i (`role="dialog" aria-modal`) Enter/Space ile kapanıyordu, Escape yoktu → `onkeydown` Escape'e alındı, `tabindex` 0→−1 (odak yönetimine açık, tab sırasında değil). Cache-bust `20260823j`. I1–I5 dokunulmadı. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -141,6 +143,8 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | `.glass` içerik katmanında | 69 | 0 | AD-39 … AD-41 |
 | Ham `font-size:NNpx` — app.js | ~1400 | 0 | AD-45 … AD-49 |
 | `prefers-reduced-motion` — panel-v2 | 1 | kapsam genişletildi | AD-51 |
+
+**Kayda geçmiş taban kayması — `App.toggleCard` 2 → 3 (AD-19-FIX):** iç içe buton onarımı, konum kartı başlığını asıl kontrol (`aria-expanded`, odaklanabilir) ile chevron (`tabindex="-1" aria-hidden="true"`) olarak ikiye böldü. Ekran okuyucu ve klavye hâlâ **tek** kontrol görür; sapma meşrudur. S5 karşılaştırması bu tek farkı bekler — başka herhangi bir fark I2 ihlalidir.
 
 **Değişmemesi gerekenler** (regresyon nöbetçileri):
 

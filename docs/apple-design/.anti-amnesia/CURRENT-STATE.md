@@ -20,6 +20,8 @@
 
 **Uygulanan promptlar:** AD-01 … AD-25. Dalga 4 tamamen kapandı; ledger'daki commit referansları mevcut branch üzerinde erişilebilir durumdadır. AD-01 ve AD-06 için metadata/düzeltme takipleri ayrıca not edilmiştir. Uygulama commitleri `git revert <commit>` ile tek tek geri alınabilir.
 
+**Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
+
 **Program dışı onarım — `AD-19-FIX` (2026-08-23):** AD-19'un native `<button>` dönüşümü, kart başlığında iç içe buton üretiyordu (konum kartı rozeti). HTML5 ayrıştırıcı kart yığınını `.sey-main-scroll` dışına düşürdüğü için Bugün sekmesindeki `overflow:hidden` kartlar eziliyordu. Rozet başlık butonunun dışına alındı, chevron ayrı `tabindex=-1 aria-hidden` butona taşındı; `motivationTodayCardHTML` içindeki yer değiştirmiş `</div>`/`</button>` düzeltildi. Ayrıntı ve kanıt: [`LEDGER.md`](LEDGER.md) `AD-19-FIX` satırı. Prompt sayacı değişmedi — bu bir onarım, yeni prompt değil.
 
 ---
@@ -96,7 +98,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-Şu an yok. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
+Şu an yok. AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
 
 ---
 

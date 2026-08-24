@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-29` — Dalga 5 kapanışı |
-| **Sıradaki** | `AD-30` ⚠️ **onay gerekir** |
-| **Güncel dalga** | `6` (onay bekliyor) |
-| **Bloke** | yok |
-P26-08-24 |
+| **Son tamamlanan** | `AD-30` — `data-theme` denetimi (salt okuma) |
+| **Sıradaki** | `AD-31` ⚠️ **ayrı onay gerekir** (AD-30 bulgusu: durum modeli değişikliği şart) |
+| **Güncel dalga** | `6` (kullanıcı onayı alındı 2026-08-24) |
+| **Bloke** | yok — ama AD-31 yeniden onay ister, aşağıya bak |
+| **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-29 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı: 29/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-30 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı, dalga 6 başladı: 30/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -87,7 +87,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 | Dalga | İlk prompt | Neden onay |
 | --- | --- | --- |
-| 6 | AD-30 | Tema davranışı değişiyor; handler'a dokunma ihtimali var (I2 riski) |
+| 6 | AD-30 | ✅ onaylandı 2026-08-24. AD-30 salt okumaydı; **AD-31 ayrıca onay ister** (aşağı bak) |
 | 7 | AD-33 | 11pt tabanı dar rozetlerde düzen taşması yapabilir |
 | 8 | AD-38 | Planın görsel olarak en görünür değişikliği; reddedilmesi meşru |
 | 9 | AD-43 | 1400+ site; aylara yayılır |
@@ -98,7 +98,24 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-Şu an yok. **AD-30 onay bekliyor** — dalga 6 kullanıcı onayı olmadan başlatılamaz. AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu. Bir sonraki ajan AD-26'dan devam eder.
+**AD-31 ikinci bir onay bekliyor — bu, AD-30 promptunun kendi öngördüğü koşuldur.**
+
+AD-30 denetimi (kod değişmedi) şunu buldu: uygulamanın teması **iki durumlu** bir `dark`
+boolean'ıdır; `data-theme` attribute'u *her zaman* `light` ya da `dark` olarak yazılır ve
+hiçbir zaman kaldırılmaz — kullanıcı hiç seçim yapmamışsa bile değeri `light` olur
+([index.html:17](../../../index.html#L17) statiği + [app.js:4595](../../../app.js#L4595)
+`null==='dark'` → `false`). "Seçilmemiş" diye bir durum yok.
+
+Sonuç: AD-31'in prompt dosyasında yazılı CSS'i **ölüdür** — `#root:not([data-theme="light"])`
+koruma seçicisi hiçbir zaman eşleşmez. Çalışması için tema iki durumdan üçe çıkmalı; bu
+`App.setTheme` semantiğine (**I2**) ve `render()`'ın attribute yazımına (**I4**) dokunur,
+ayrıca `dark`'ın 57 satırdaki 93 okumasının *tercihi* değil *çözülmüş* değeri okuması gerekir.
+Prompt gövdesi bu durumu açıkça öngörüp "ayrı onay ister" diyor. **Kullanıcıya seçenekler
+sunulmadan AD-31 çalıştırılmamalıdır.**
+
+Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı. AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native buton yerine klavye destekli `role=button` olarak korundu.
+
+Bir sonraki ajan AD-31'i **ancak yeni onaydan sonra** çalıştırır.
 
 ---
 
@@ -108,4 +125,4 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 25 tanesi uygulandı.
+Bulgular 52 sıralı prompta dönüştürüldü; 30 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).

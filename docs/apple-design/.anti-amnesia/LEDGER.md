@@ -105,6 +105,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-29 | Dalga 5 kapanışı | ✅ TAMAMLANDI | `a99f752` | S8+S4+S5+yapı geçti; kontrast 30/30 | Cache-bust `styles.css?v=20260823d` (dalga 5'te yalnızca `app/styles.css` değişti; `app.js` dokunulmadı). Tam kapı yeşil: 8 doğrulama + 2 değişmezlik kanıtı + 5 sekme yapı taraması. Dalga 5 tablosu 4/4, toplam 29/52. **Dalga 6'dan itibaren açık kullanıcı onayı gerekir** — `blockedPrompt` boş bırakıldı ama `nextSafeAction` onay şartını taşıyor. |
 
+| AD-30 | `data-theme` denetimi (salt okuma) | ✅ TAMAMLANDI | `<commit>` | S4 geçti (kod değişmedi); S5 sabit: 699 handler, çağrı dağılımı `5bcbb0f1…` | **Kod değişmedi.** Üç sorunun cevabı: **(1) Hangi handler yazıyor?** Hiçbiri — attribute'u doğrudan `render()` yazıyor ([app.js:9607](../../../app.js#L9607)); handler'lar yalnızca *durumu* değiştirir: `App.setTheme(d)` ([app.js:8146](../../../app.js#L8146)) modül kapsamındaki `dark` boolean'ını yazar, `localStorage['seyma-theme']` (`TKEY`) anahtarına kalıcılaştırır ve `render()` çağırır; `App.toggleTheme()` ([app.js:8147](../../../app.js#L8147)) onu sarar. Tema **`data` nesnesinin dışında** yaşar — ayrı localStorage anahtarı, senkronlanmıyor (I1 kapsamı dışı). **(2) Üç durum ayırt ediliyor mu?** **Hayır — yalnızca iki.** `dark` bir boolean; üçüncü (“sistemi takip et”) durumu temsil edecek değer yok. **(3) Kullanıcı hiç seçim yapmamışsa attribute ne oluyor?** `data-theme="light"` — iki bağımsız nedenle: (a) [index.html:17](../../../index.html#L17) statiği `#root`'a `data-theme="light"` yazar, yani ilk boyamadan önce bile attribute vardır; (b) `dark=localStorage.getItem(TKEY)==='dark'` ([app.js:4595](../../../app.js#L4595)) anahtar yokken `null==='dark'` → `false` üretir, `render()` de `"light"` yazar. Attribute **hiçbir zaman kaldırılmıyor.** ⚠️ **AD-31 için sonuç (promptun kendi şartı):** “seçilmemiş” durumu olmadığı için AD-31'in yazıldığı hâliyle CSS'i **ölüdür** — `#root:not([data-theme="light"])` koruma seçicisi hiçbir zaman eşleşmez, `@media (prefers-color-scheme: dark)` bloguna hiç girilmez. Çalışması için durum modeli iki durumdan üçe çıkmalı, bu da 6 yerde değişiklik ister: `dark` başlatıcısı (4595), `App.setTheme` semantiği (8146 — **I2**), `render()` attribute yazımı (9607 — **I4**), statik [index.html:17](../../../index.html#L17), ayarlardaki iki düğmeli seçici ([app.js:13143-13144](../../../app.js#L13143-L13144)) ve `dark`'ın **57 satırda 93 okuma** yeri (inline stil dallanmaları) — bunlar tercihi değil *çözülmüş* değeri okumak zorunda kalır. **Bu nedenle AD-31 ayrı onaya tabidir; bu promptun çıktısı onu başlatmaz.** **Yan bulgular:** koyu token bloğu `app/styles.css` 293-350 arası, **124 özel özellik** — AD-31'in “birebir kopya” şartı 124 token'ı ikileştirir (senkron borcu, promptun SENKRON UYARISI yorumu bunun için). `window.matchMedia` app.js'te zaten savunmacı kalıpla kullanılıyor (`prefersReducedMotion`, [app.js:9275](../../../app.js#L9275)) ve üç harness'ta da stub'lı (`matches:false`) — yani üçüncü durum eklenirse harness varsayılanı açık tema olur, mevcut fixture'lar kırılmaz. Panel v1'de `panel/panel.css:761` zaten bir `@media (prefers-color-scheme:light)` bloğu taşıyor (komşu yüzeyde emsal). |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -118,12 +120,12 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 3 · Dokunma hedefleri | AD-14 … AD-16 | 3/3 | ✅ tamamlandı |
 | 4 · Klavye erişimi | AD-17 … AD-25 | 9/9 | ✅ tamamlandı |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
-| 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 0/3 | onay bekliyor |
+| 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 1/3 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 0/5 | onay bekliyor |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **29/52** | |
+| | **Toplam** | **30/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 
@@ -146,6 +148,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | `<div onclick>` — panel.js | 8 | 0 | AD-24 |
 | Koyu temada `.glass` kapalı | evet | ✅ hayır (AD-26) | AD-26 |
 | `prefers-color-scheme` (app) | 0 | 1 | AD-31 |
+| Tema durum sayısı (`dark` boolean) | 2 | AD-31 için 3 gerekir | AD-30 denetimi |
 | 11px altı font — styles.css | var | 0 | AD-33 |
 | 11px altı font — app.js | 65 | 0 | AD-34 … AD-36 |
 | `.glass` içerik katmanında | 69 | 0 | AD-39 … AD-41 |

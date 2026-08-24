@@ -214,6 +214,9 @@
     --page:linear-gradient(170deg,#FFF8F3 0%,#FCEDEE 45%,#F1EBFF 100%);
     --bg:var(--page);
     --card:rgba(255,255,255,0.72); --card-bd:rgba(255,255,255,0.75);
+    /* AD-38: içerik katmanı yüzeyi. HIG Liquid Glass'ı içerik katmanında yasaklar;
+       kartlar opak --card-solid'e taşınır, cam yalnızca fonksiyonel katmanda kalır. */
+    --card-solid:#FFFDFC;
     --text:#2C2426; --text2:#5A4D52; --muted:#7A6B70; --faint:#816F76;
     --choc:#6B4A3A; --accent:#C77D93;
     /* -ink: aynı rengin METİN varyantı. Dolgu/kenarlık değerleri yukarıda
@@ -295,6 +298,7 @@
     --page:#000000;
     --bg:var(--page);
     --card:rgba(17,17,20,0.96); --card-bd:rgba(255,255,255,0.17);
+    --card-solid:#111114;
     --text:#F8F8FA; --text2:#D8D8DE; --muted:#AFAFB9; --faint:#858590;
     --choc:#FFD9AA; --accent:#FFB1CF;
     /* Koyu temada tüm tokenlar zaten AAA — ink doğrudan tokenı işaret eder. */
@@ -349,6 +353,9 @@
     --reminder-inbox:#D9BFE7; --reminder-inbox-strong:#E8D5F1; --reminder-inbox-soft:rgba(217,191,231,.12); --reminder-inbox-focus:#F1DDF7;
   }
   .glass{background:var(--card);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--card-bd);}
+  /* AD-38: içerik kartlarının cam olmayan karşılığı. Cam yok, blur yok — yalnızca opak
+     zemin + aynı kenarlık. .glass ile aynı kutu modeli, böylece sınıf takası düzen değiştirmez. */
+  .surface{background:var(--card-solid);border:1px solid var(--card-bd);}
   /* Açılır kartlar: iOS 26 liquid-glass — açık/kapalı hâl arası yumuşak geçiş, hafif renk çerçeve */
   .sey-ccard{position:relative;transition:box-shadow .34s var(--ease-premium),border-color .34s var(--ease-premium),background-color .3s ease;}
   .sey-ccard>.sey-ccard-sheen{position:absolute;top:0;left:14px;right:14px;height:2px;border-radius:2px;pointer-events:none;opacity:0;transition:opacity .34s ease;}
@@ -384,6 +391,7 @@
   .sey-app-booted .sey-ccard>.sey-ccard-sheen,
   .sey-app-booted .wxcard,
   .sey-app-booted .glass,
+  .sey-app-booted .surface,
   .sey-app-booted .sey-soul-ov-back,
   .sey-app-booted .sey-soul-ov-card,
   .sey-app-booted .sey-soul-ov-card *,
@@ -1477,5 +1485,6 @@
 @media (forced-colors: active){
   /* !important gerekli: #root[data-theme="dark"] .glass bu seçiciden daha spesifik. */
   .glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid CanvasText!important;}
+  .surface{border:1px solid CanvasText!important;}
   button{forced-color-adjust:none;}
 }

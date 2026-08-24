@@ -131,6 +131,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-40 | İçerik kartları — parti 1 (34 site) | ✅ TAMAMLANDI | `d123e8a` | glass 68 → 34, surface 34; S4 tam yeşil; S5 sabit 699 | Satır sırasına göre ilk 34 kullanımda `glass` **tokenı** `surface` ile değiştirildi. Takas token düzeyinde yapıldı (sınıf listesi ayrıştırılıp yalnızca `glass` kelimesi değiştirildi), böylece bileşik sınıflar (`glass sey-room-card` → `surface sey-room-card`) korundu ve `sg-glass` gibi benzer adlara **dokunulmadı**. **Cerrahi kanıt:** `class` nitelikleri maskelenip iki sürüm karşılaştırıldı → **`class` dışında sıfır fark**. `app/styles.css` bu promptta değişmedi. **Kabul — kart sınırları görünür mü? Evet, ölçüldü.** Açık temada eski kart `rgba(255,255,255,0.72)` gradyan üzerine bileşiklenince **(254,250,250)**; yeni opak `#FFFDFC` = **(255,253,252)** — neredeyse aynı. Kart↔zemin kontrastı gradyanın üç noktasında **1.01→1.04**, **1.10→1.12**, **1.12→1.15** yani sınır kaybolmadı, hafifçe **belirginleşti**. Koyu temada eski `rgba(17,17,20,0.96)` siyah üzerine = **(16,16,19)**, yeni opak `#111114` = **(17,17,20)**; aradaki kontrast oranı **1.008:1** — görsel olarak ayırt edilemez. **Neden bu kadar küçük bir değişiklik:** AD-38'de bulunduğu gibi [`app/styles.css:397`](../../../app/styles.css#L397) boot sonrası `.glass` blur'ünü zaten kapatıyordu. Dolayısıyla dalga 8 pratikte "cam kaldırma" değil, **saydamlığı opaklaştırma**. HIG'in "içerik katmanında Liquid Glass kullanma" kuralı sağlanıyor, görsel kimlik ise korunuyor. |
 
+| AD-41 | İçerik kartları — parti 2 (34 site) | ✅ TAMAMLANDI | `<commit>` | **`.glass` içerik katmanında 0**; `.surface` 68; 5 sekmede glass=0; S4 tam yeşil; S5 sabit 699 | Kalan 34 kullanım takas edildi. **`app.js`'te `glass` sınıf tokenı taşıyan öğe kalmadı (68 → 0).** `sg-glass` (1 adet, ayrı sınıf) bilinçli olarak **dokunulmadı**. **Cerrahi kanıt:** `class` maskeli diff → `class` dışında sıfır fark. **Kabul — beş sekme dump'ında doğrulandı:** Bugün `surface`=15, Rapor 15, Ayarlar 9, Sağlık 13, Mesaj 0 (bu sekmede kart yok); **hepsinde `glass`=0**, iç içe `<button>` ihlali 0, 11px altı font 0. **Sonuç:** HIG'in "Don't use Liquid Glass in the content layer" kuralı sağlandı. Fonksiyonel katman (`.sey-appheader`, `.sey-bottomnav-surface`, chatbar, `.aeon-scrollfab`) kendi `backdrop-filter` kurallarıyla **camlı kalmaya devam ediyor** — AD-39 envanterinde gösterildiği gibi bu yüzeyler `.glass` kullanmıyordu. **`.glass` kuralı artık kullanıcısız** ama silinmedi (AD-39 kararı): sınıf, ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşıyor. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -146,10 +148,10 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
-| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 3/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 4/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **40/52** | |
+| | **Toplam** | **41/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

@@ -137,6 +137,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-31-FIX-2 | Boot öncesi tema flaşı | ✅ TAMAMLANDI | `d75607f` | Tema fixture'ı **26/26** (18 → 26, yeni grup [8]); S4 tam yeşil; `app.js`/`app/styles.css` diff'i boş | **Program dışı onarım — prompt sayacı değişmedi (42/52).** AD-31'de "uygulanmadı" diye kayda geçirilen gözlem kapatıldı. **Sorun:** [`index.html`](../../../index.html) `#root`'a statik `data-theme="light"` yazıyordu ve app.js boot edene kadar bu değer geçerliydi; `#root`'un satır içi `background:var(--page)` stili de o yüzden açık tema gradyanını çiziyordu. Sonuç: **sistemi koyu olan kullanıcı her açılışta kısa bir beyaz flaş görüyordu.** Bu mevcut bir durumdu (koyu tema seçenler de yaşıyordu) ama **dalga 6 kapsamı genişletti** — artık hiç seçim yapmamış, telefonu koyu olan kullanıcıları da vuruyordu. Yani dalga 6'nın kendi özelliğinin altını oyan bir kusurdu. **Çözüm:** `#root` kapandıktan hemen sonra, modül scriptlerinden önce **ayrıştırıcıyı bloklayan satır içi script** eklendi. app.js'teki `resolveDark()` ile **aynı** mantığı uygular (`seyma-theme` anahtarı → üç durum → `matchMedia`), `data-theme`'i boyamadan önce yazar ve `theme-color` metasını da senkronlar. `try/catch` + `window.matchMedia &&` korumalı. `#root`'taki statik `data-theme="light"` **JS'siz yedek olarak korundu** (script sonradan üzerine yazıyor). ⚠️ **Senkron borcu (kabul edilmiş):** çözümleme mantığı artık **iki yerde** — `app.js:4595` ve `index.html`. Bu, AD-31'in A seçeneğinde kaçınılan CSS ikizlemesinden farklı: burada ikizlenen 124 token değil, **6 satırlık bir karar ağacı**, ve alternatifi (flaşı kabul etmek) az önce yayınlanan özelliği bozuyordu. Borç **nöbetçiyle** korundu: `verify-theme-tristate.mjs`'e grup [8] eklendi (8 assertion) — blok var mı, aynı anahtarı mı okuyor, üç durumu mu ayırt ediyor, `matchMedia` kullanıyor mu, korumalı mı, `data-theme` yazıyor mu, `theme-color` senkronluyor mu, JS'siz yedek duruyor mu. Fixture **18 → 26 assertion**. **Cache-bust gerekmedi:** yalnızca `index.html` değişti; `index.html` kendisi `?v=` ile önbelleklenmiyor (giriş belgesi), `app.js`/`app/styles.css` dokunulmadı. |
 
+| AD-43 | Ölçek tokenlarını tanımla | ✅ TAMAMLANDI | `<commit>` | Salt ekleme: `var(--f-*)` kullanımı 0 → render birebir aynı; S4 tam yeşil | **11 token tanımlandı, prompt 7 istiyordu.** Ölçüm dalga 9'un eşleme tablosunda yapısal bir kusur ortaya çıkardı ve kullanıcı genişletmeyi onayladı. **Kusur:** prompt'un tablosu `22+ → title2 (22px)` diyordu; bu, **23–130px arasındaki 26 siteyi 22px'e çökertirdi** — [app.js:9885](../../../app.js#L9885) 48px 🦩 marka flaması, [app.js:10913](../../../app.js#L10913) 72px filigran ve [app.js:12191](../../../app.js#L12191) 130px filigran rakam dâhil. [CLAUDE.md](../../../CLAUDE.md) görsel kimliği (flamingo, sıcak pastel gradyan) **denetim konusu dışında ve korunuyor** ilan ettiği için bu kabul edilemezdi. Ayrıca tablo **8 boyu hiç kapsamıyordu**: 12.8, 13.8, 16.5, 17.5, 18, 18.5, 19, 21px. **Çözüm:** merdiven Apple'ın gerçek metin stilleriyle uzatıldı — `--f-callout` (16), `--f-headline` (18), `--f-title1` (28), `--f-large` (34) eklendi. **Muafiyet (bilinçli):** 34px üstü **13 ham px sitesi** + **4 display `clamp()`** token almaz. Gerekçe: o boyutlar metin değil **dekoratif grafiktir** (hepsi `position:absolute` + `opacity`), ve kullanıcı metin boyutunu büyüttüğünde 130px filigranın 200px olması istenmez — Dynamic Type metne uygulanır, grafiğe değil. Bu yüzden **AD-49'un kabul ölçütü değişiyor:** `grep -c 'font-size:[0-9]' app.js` → `0` yerine **belgeli muafiyet sayısı**. **`rem` tabanı doğrulandı:** `html`/`body`/`:root`'ta `font-size` tanımı **yok**, yani taban tarayıcı varsayılanıdır (16px) ve kullanıcının metin boyutu ayarıyla ölçeklenir — Dynamic Type'ın ön koşulu sağlanıyor. **Ölçülen gerçek taban:** app.js **1262** + `app/styles.css` **434** = **1696** ham px bildirimi (plan styles.css için ~380, app.js için ~1400 diyordu). Bu promptta hiçbir kural token kullanmıyor (`var(--f-*)` = 0), render birebir aynı. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -153,9 +155,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 1/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **42/52** | |
+| | **Toplam** | **43/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 
@@ -182,7 +184,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | 11px altı font — styles.css | **119** (denetimde "var" yazıyordu) | ✅ 0 | AD-33 |
 | 11px altı font — app.js | **167** (plan 65 diyordu; 10px×48 + 10.5px×54 sayılmamış) | ✅ 0 | AD-34…AD-36 + AD-36-FIX |
 | `.glass` içerik katmanında | **68** (plan 69 diyordu; `sg-glass` ayrı sınıf) | 0 | AD-39 … AD-41 |
-| Ham `font-size:NNpx` — app.js | ~1400 | 0 | AD-45 … AD-49 |
+| Ham `font-size:NNpx` — app.js | **1262** (+ styles.css 434 = 1696) | 13 belgeli dekoratif muafiyet | AD-44 … AD-49 |
 | `prefers-reduced-motion` — panel-v2 | 1 | kapsam genişletildi | AD-51 |
 
 **Kayda geçmiş taban kayması — `App.toggleCard` 2 → 3 (AD-19-FIX):** iç içe buton onarımı, konum kartı başlığını asıl kontrol (`aria-expanded`, odaklanabilir) ile chevron (`tabindex="-1" aria-hidden="true"`) olarak ikiye böldü. Ekran okuyucu ve klavye hâlâ **tek** kontrol görür; sapma meşrudur. S5 karşılaştırması bu tek farkı bekler — başka herhangi bir fark I2 ihlalidir.

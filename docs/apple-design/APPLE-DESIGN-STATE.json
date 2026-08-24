@@ -4,11 +4,11 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-34",
-  "nextPrompt": "AD-35",
+  "lastCompletedPrompt": "AD-35",
+  "nextPrompt": "AD-36",
   "currentWave": "7",
   "totalPrompts": 52,
-  "completedPrompts": 34,
+  "completedPrompts": 35,
   "updatedAt": "2026-08-24",
   "nextSafeAction": "Dalga 7 onaylandi, 1/5 (33/52). AD-33 app/styles.css'te 119 siteyi 11px'e cikardi - promptun kabul regex'i yalnizca 112'sini yakaliyordu (6px/7px/7.5px/8.1px kaciyordu), sayisal tarama kullanildi. SIRADAKI AD-34 (app.js 8.5px). ONEMLI: headless harness'ta layout motoru YOK, dolayisiyla dump ciktisi duzen tasmasini gosteremez - AD-34..36'nin 'gorsel denetim' adimi tasma olcumu degil, isaretleme okumasidir. Dalga 5+6 04b83ca ile deploy edildi. Dalga 7 sonunda (AD-37) S8 cache-bust yapilacak; push/deploy ayrica onaya tabi.",
   "codeTouched": true,
@@ -84,7 +84,7 @@
       "prompts": "AD-33..AD-37",
       "topic": "11pt typography floor",
       "approvalRequired": true,
-      "completed": 2,
+      "completed": 3,
       "total": 5
     },
     {

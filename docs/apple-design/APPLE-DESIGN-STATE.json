@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-31",
-  "nextPrompt": "AD-32",
-  "currentWave": "6",
+  "lastCompletedPrompt": "AD-32",
+  "nextPrompt": "AD-33",
+  "currentWave": "7",
   "totalPrompts": 52,
-  "completedPrompts": 31,
+  "completedPrompts": 32,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 6'da 2/3 (31/52). AD-31 kullanici onayiyla 'A' secenegi olarak uygulandi: tema uc durumlu (themePref system/light/dark), dark cozulmus deger, matchMedia JS'te cozer. ONEMLI: app/styles.css DEGISMEDI ve CSS'te @media (prefers-color-scheme: dark) blogu KASITLI OLARAK YOK - arama. Prompt dosyasindaki AD-31 govdesi tarihsel kayit olarak degistirilmedi, uygulanan kod ondan farkli; gerekce LEDGER AD-31 satirinda. SIRADAKI AD-32 dalga 6 kapanisi, ek onay istemez; S8 cache-bust AD-32'de yapilacak (app.js + app/core/constants.js degisti). Dalga 7 (AD-33) YENI ONAY ister.",
+  "nextSafeAction": "Dalga 1-6 TAMAMLANDI (32/52). SIRADAKI AD-33 dalga 7'nin ilk promptu ve ACIK KULLANICI ONAYI ister; onay alinmadan calistirma (11pt tabani dar rozetlerde duzen tasmasi yapabilir). Dalga 6 notu: AD-31 'A' secenegi olarak uygulandi - tema uc durumlu (themePref system/light/dark), matchMedia JS'te cozer, app/styles.css DEGISMEDI ve CSS'te @media (prefers-color-scheme: dark) blogu KASITLI OLARAK YOK - arama. Prompt dosyasindaki AD-31 govdesi tarihsel kayit olarak degistirilmedi; uygulanan kod ondan farkli, gerekce LEDGER AD-31 satirinda. Cache-bust guncel: app.js?v=20260824a, app/core/constants.js?v=20260824a, app/styles.css?v=20260823d (dalga 6'da degismedi).",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -76,7 +76,7 @@
       "prompts": "AD-30..AD-32",
       "topic": "system theme following",
       "approvalRequired": true,
-      "completed": 2,
+      "completed": 3,
       "total": 3
     },
     {

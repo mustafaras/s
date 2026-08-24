@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-31` — sistem teması takibi (üç durumlu tercih) |
-| **Sıradaki** | `AD-32` — dalga 6 kapanışı (ek onay istemez) |
-| **Güncel dalga** | `6` (kullanıcı onayı alındı 2026-08-24) |
+| **Son tamamlanan** | `AD-32` — dalga 6 kapanışı |
+| **Sıradaki** | `AD-33` ⚠️ **onay gerekir** (dalga 7 · 11pt tipografi tabanı) |
+| **Güncel dalga** | `7` (onay bekliyor) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-31 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–5 tamamlandı, dalga 6'da 2/3: 31/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-32 (+ AD-19-FIX, AD-25-FIX onarımları). **Dalga 1–6 tamamlandı: 32/52.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -82,12 +82,13 @@ Görsel inceleme: `node .claude/skills/run-seyma/driver.mjs --dump <sekme>`
 ## Onay kapıları
 
 Dalga 1–5 (AD-01 … AD-29) ek onay istemez: ölçülmüş ihlaller, düşük risk, görsel kimliğe dokunmuyor.
+**Dalga 6 (AD-30 … AD-32) 2026-08-24'te onaylandı ve tamamlandı.**
 
 Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalıştırma:
 
 | Dalga | İlk prompt | Neden onay |
 | --- | --- | --- |
-| 6 | AD-30 | ✅ onaylandı 2026-08-24. AD-31 için ikinci onay da alındı (A seçeneği — aşağı bak) |
+| 6 | AD-30 | ✅ onaylandı + tamamlandı 2026-08-24. AD-31 için ikinci onay da alındı (A seçeneği — aşağı bak) |
 | 7 | AD-33 | 11pt tabanı dar rozetlerde düzen taşması yapabilir |
 | 8 | AD-38 | Planın görsel olarak en görünür değişikliği; reddedilmesi meşru |
 | 9 | AD-43 | 1400+ site; aylara yayılır |
@@ -98,7 +99,8 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Şu an bloke bir şey yok.** AD-32 dalga 6'yı kapatır ve ek onay istemez; **dalga 7 (AD-33) yeni onay ister.**
+**Dalga 7 (AD-33) kullanıcı onayı bekliyor — onay alınmadan çalıştırma.** 11pt tipografi tabanı dar rozetlerde
+satır kaydırma/düzen taşması yapabilir; bu yüzden ayrı onaya bağlı. Dalga 6 tamamlandı, bloke bir şey yok.
 
 **AD-31 promptun yazıldığı hâlinden saparak uygulandı — kullanıcı onaylı.** AD-30 denetimi,
 `data-theme` attribute'unun *her zaman* `light` ya da `dark` yazıldığını ve hiç kaldırılmadığını
@@ -127,7 +129,7 @@ Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirl
 AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
 buton yerine klavye destekli `role=button` olarak korundu.
 
-Bir sonraki ajan **AD-32**'yi çalıştırır.
+Bir sonraki ajan **AD-33**'ü ancak kullanıcı onayından sonra çalıştırır.
 
 ---
 
@@ -137,4 +139,4 @@ Bir sonraki ajan **AD-32**'yi çalıştırır.
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 31 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).
+Bulgular 52 sıralı prompta dönüştürüldü; 32 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).

@@ -10,15 +10,15 @@
 | | |
 | --- | --- |
 | **Program** | `APPLE-DESIGN-IOS27` |
-| **Durum** | `in_progress` |
+| **Durum** | `completed` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-51` — panel-v2 reduced-motion kapsamı |
-| **Sıradaki** | `AD-52` — program kapanışı (ek onay istemez) |
+| **Son tamamlanan** | `AD-52` — program kapanışı |
+| **Sıradaki** | yok — program tamamlandı |
 | **Güncel dalga** | `10` (ek onay istemez) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-51 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-31-FIX-2, AD-36-FIX onarımları). **Dalga 1–9 tamamlandı; Dalga 10'da AD-51 tamamlandı: 51/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d`, dalga 8 `4030530` ile deploy edildi (2026-08-24); **dalga 9–10 henüz deploy edilmedi.** AD-51, `panel/v2/panel-v2.css` sonundaki global reduced-motion güvenlik ağıyla dosyanın sonuna eklenen bileşenleri de kapsar; Panel-v2 CSS cache-bust `20260824a` oldu. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-52 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-31-FIX-2, AD-36-FIX onarımları). **Dalga 1–10 tamamlandı: 52/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d`, dalga 8 `4030530` ile deploy edildi (2026-08-24); **dalga 9–10 henüz deploy edilmedi.** AD-51, `panel/v2/panel-v2.css` sonundaki global reduced-motion güvenlik ağıyla dosyanın sonuna eklenen bileşenleri de kapsadı; AD-52 ile S4, kontrast ve kanonik belgeler uzlaştırıldı. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-31-FIX-2` (2026-08-24):** AD-31'in "uygulanmadı" gözlemi kapatıldı. `index.html` `#root`'a statik `data-theme="light"` yazdığı için sistemi koyu olan kullanıcı her açılışta kısa bir **beyaz flaş** görüyordu — dalga 6'nın kendi özelliğinin altını oyan bir kusur. `#root`'tan hemen sonra, boyamadan önce çalışan satır içi bir çözümleyici eklendi (app.js'teki `resolveDark()` ile aynı mantık). ⚠️ Mantık artık **iki yerde** (`app.js:4595` + `index.html`); `verify-theme-tristate.mjs` grup [8] bu senkronu 8 assertion ile bekliyor (fixture 18 → 26). Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX-2`. Prompt sayacı değişmedi.
 
@@ -75,6 +75,7 @@ node --check app.js && node --check sync.js
 node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
 node docs/apple-design/verify-theme-tristate.mjs
+node docs/apple-design/verify-contrast.mjs
 node tests/app/test_faz10_sync.js
 node tests/panel/test_faz11_panel.js
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f" || echo "FAIL: $f"; done
@@ -87,7 +88,7 @@ Görsel inceleme: `node .claude/skills/run-seyma/driver.mjs --dump <sekme>`
 ## Onay kapıları
 
 Dalga 1–5 (AD-01 … AD-29) ek onay istemez: ölçülmüş ihlaller, düşük risk, görsel kimliğe dokunmuyor.
-**Dalga 6, 7, 8 ve 9 (AD-30 … AD-50) 2026-08-24'te onaylandı ve tamamlandı.**
+**Dalga 6, 7, 8 ve 9 (AD-30 … AD-50) 2026-08-24'te onaylandı ve tamamlandı. Dalga 10 (AD-51 … AD-52) ek onay gerektirmeden tamamlandı.**
 
 Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalıştırma:
 
@@ -104,9 +105,18 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Bloke bir şey yok. Sıradaki AD-52 (dalga 10) ek onay istemez.**
+**Bloke bir şey yok. Program tamamlandı: AD-01 … AD-52, 52/52.**
 
 **AD-51 sonucu:** Panel-v2 CSS'te daha önce tek yerde bulunan reduced-motion kapsamı, dosyanın sonundaki güvenlik ağıyla tüm animasyon/geçişleri ve kalan hover/lift dönüşümlerini kapsıyor. 27/27 Panel-v2 fixture geçti; gerçek cihaz kabulü yapılmadı.
+
+**AD-52 kapanış sonucu:** S4 tam kapısı yeşil: syntax 2/2; driver 31/0; Zikirmatik 95/95; tema 26/26; kontrast 30/30; sync 64/64; panel v1 50/50; Panel-v2 27/27. S5'te app handler sayısı 699 ve dağılımı sabit kaldı. `IOS27-TASARIM-PLANI.md` §4, `docs/GELISTIRME-PLANI.md`, ledger ve state gerçek kapanış durumuna getirildi.
+
+### Atlanmayanlar ve ayrı kanıt isteyenler
+
+- AD-01 … AD-52 arasında prompt atlanmadı veya bloke kalmadı; AD-30 salt-okuma promptu olarak uygulandı.
+- AD-43/AD-49'da belgelenen 13 dekoratif ham `px` sitesi ve 4 display `clamp()` kasıtlı muafiyettir; eksik iş değildir.
+- Gerçek tarayıcı/telefon kabulü yapılmadı; Şeyma için bu repo kuralı gereği headless kanıt kullanıldı. Panel-v2 reduced-motion gerçek cihaz algısı da ayrıca cihaz kanıtı ister.
+- `main` push'u, GitHub Pages deploy'u, tag/remote işlemleri ve `mustafaras/seyma-data` yazımı yapılmadı; bunlar ayrı onay kapılarıdır.
 
 **Dalga 9 sonucu:** ham `font-size` **1696 → 13**; **1687 site** adlandırılmış `rem` ölçeğine taşındı.
 `html`/`body`/`:root`'ta `font-size` tanımı olmadığı için `rem` tabanı tarayıcı varsayılanıdır ve
@@ -123,7 +133,7 @@ Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirl
 AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
 buton yerine klavye destekli `role=button` olarak korundu.
 
-Bir sonraki ajan **AD-52**'yi doğrudan çalıştırabilir (dalga 10 ek onay istemez).
+Bir sonraki ajan için bu programda prompt kalmadı. Yeni bir değişiklik ancak yeni ve açık bir kapsam/onayla başlatılmalıdır.
 
 ---
 
@@ -133,4 +143,4 @@ Bir sonraki ajan **AD-52**'yi doğrudan çalıştırabilir (dalga 10 ek onay ist
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 51 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez). AD-52 yalnızca program kapanışını ve kanonik dokümanların son uzlaştırmasını yapacaktır.
+Bulgular 52 sıralı prompta dönüştürüldü ve tamamı uygulandı. Program, kanonik kaynak/ledger/state/plan/roadmap uzlaştırması ve headless kapanış kapılarıyla `completed` durumundadır.

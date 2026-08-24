@@ -1,10 +1,11 @@
 # Şeyma 🦩 & ÆON — iOS 27 Uyumlu Tasarım İyileştirme Planı
 
-> **Durum:** Denetim tamamlandı. **Uygulama sürüyor** — canlı ilerleme için
-> [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) ve [`APPLE-DESIGN-STATE.json`](APPLE-DESIGN-STATE.json).
-> ⚠️ Aşağıdaki bulgular ve **§4 puan tablosu 2026-08-23 denetim anının kaydıdır** —
-> kasıtlı olarak dondurulmuştur, güncel durumu göstermez.
-> **Tarih:** 2026-08-23 · **Denetim yöntemi:** statik analiz + hesaplanmış kontrast (tarayıcı açılmadı)
+> **Durum:** Denetim ve uygulama programı **tamamlandı (AD-01 … AD-52, 52/52)**. Ayrıntılı
+> kanıt ve geri alınabilir commit zinciri için [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md)
+> ve [`APPLE-DESIGN-STATE.json`](APPLE-DESIGN-STATE.json) kanonik kayıtlardır.
+> **§4 puan tablosu 2026-08-24 kapanışındaki kaynak/fixture durumunu gösterir.** Başlangıç
+> denetiminin tarihsel bulguları aşağıdaki ilgili bölümlerde korunur.
+> **Tarih:** 2026-08-24 · **Denetim yöntemi:** statik analiz + hesaplanmış kontrast + headless fixture (tarayıcı açılmadı)
 > **Yüzeyler:** `index.html` + `app.js` + `app/styles.css` (kullanıcı) · `panel.html` + `panel/panel.css` (ÆON v1) · `panel-v2.html` + `panel/v2/panel-v2.css` (ÆON v2 Premium)
 
 ---
@@ -13,7 +14,9 @@
 
 Bu bir yeniden tasarım önerisi **değil**. Şeyma'nın görsel kimliği — flamingo, sıcak pastel gradyan, "Sevgili Günışığı" tonu — denetimin konusu dışında ve korunuyor. Burada ölçülen tek şey, o kimliğin Apple'ın erişilebilirlik ve malzeme kurallarıyla nerede çeliştiği.
 
-Denetim sırasında **hiçbir dosya değiştirilmedi**. Aşağıdaki her madde ayrı ayrı onaylanmayı bekliyor.
+Başlangıç denetimi sırasında **hiçbir dosya değiştirilmedi**; sonrasında 52 sıralı prompt,
+I1–I6 sözleşmesi ve headless doğrulama kapılarıyla uygulandı. Gerçek cihaz/tarayıcı kabulü
+ve Pages deploy'u bu kaydın dışında, ayrı kanıt ve onay kapılarıdır.
 
 ---
 
@@ -66,18 +69,20 @@ Kaynaklar: [MacRumors — 250+ değişiklik listesi](https://www.macrumors.com/2
 
 | Eksen | Şeyma (açık) | Şeyma (koyu) | ÆON v1 | ÆON v2 |
 | --- | --- | --- | --- | --- |
-| Metin kontrastı | ❌ 9 token başarısız | ✅ 14/14 AAA/AA | 🟡 denetlenmedi | ✅ tümü AA+ |
-| Tipografi ölçeği | ❌ 1400+ ham px | ❌ aynı | 🟡 ham px | ✅ adlandırılmış ölçek (221 kullanım) |
-| Dynamic Type | ❌ yok | ❌ yok | ❌ yok | 🟡 kısmi |
-| Dokunma hedefi | 🟡 çoğu ✅, birkaç ihlal | 🟡 aynı | ✅ | ✅ |
+| Metin kontrastı | ✅ 10/10 AA/AAA | ✅ 10/10 AA/AAA | 🟡 denetlenmedi | ✅ tümü AA+ |
+| Tipografi ölçeği | ✅ 1687 site rem; 13 dekoratif muaf | ✅ 1687 site rem; 13 dekoratif muaf | 🟡 ham px | ✅ adlandırılmış ölçek |
+| Dynamic Type | ✅ rem tabanı + metin ölçeği | ✅ rem tabanı + metin ölçeği | ❌ yok | ✅ rem tabanı + ölçek |
+| Dokunma hedefi | ✅ 44px kapısı | ✅ 44px kapısı | ✅ | ✅ |
 | Safe area | ✅ 35 kullanım | ✅ | ✅ 4 | ✅ 7 |
-| Reduced motion | ✅ 29 kural | ✅ | ✅ 5 | 🟡 1 kural |
-| Increase Contrast | ❌ yok | ❌ yok | ✅ 1 | ❌ yok |
-| Sistem teması takibi | ❌ yok | ❌ yok | ✅ | ❌ yok |
-| Liquid Glass katmanı | ❌ içerik katmanında | ❌ tamamen kapalı | 🟡 2 kullanım | 🟡 20 kullanım |
-| Semantik / ARIA | 🟡 394 buton / 54 div | — | 🟡 8 div | ✅ 139 aria |
+| Reduced motion | ✅ 29 kural | ✅ | ✅ 5 | ✅ 2 blok + global güvenlik ağı |
+| Increase Contrast | ✅ `prefers-contrast` | ✅ `prefers-contrast` | ✅ 1 | ❌ yok |
+| Sistem teması takibi | ✅ 3 durum | ✅ 3 durum | ✅ | ❌ yok |
+| Liquid Glass katmanı | ✅ içerik/işlev ayrımı | ✅ içerik/işlev ayrımı | 🟡 2 kullanım | 🟡 20 kullanım |
+| Semantik / ARIA | ✅ 413 native + role yüzeyleri | ✅ 413 native + role yüzeyleri | ✅ 53 native + role yüzeyi | ✅ 139 aria |
 
-**Tek cümlelik özet:** Koyu tema ve Panel-v2 örnek düzeyde; açık tema ve tipografi ölçeği sistematik olarak geride. Bu bir kalite sorunu değil, **iki farklı olgunluk seviyesinin aynı repoda yaşaması** — Panel-v2'de zaten var olan kalıbı diğer yüzeylere taşımak yeterli.
+**Tek cümlelik özet:** 52/52 uygulama ve headless kapı kapanışıyla Şeyma'nın erişilebilirlik tabanı
+ile ÆON yüzeyleri kanıtlanmış duruma getirildi; Panel-v2 reduced-motion kapsamı artık global
+güvenlik ağıyla gelecekteki sonradan eklenen bileşenlere de fail-safe uygulanıyor.
 
 ---
 
@@ -426,7 +431,9 @@ Panel-v2'nin adlandırma kalıbına uyumlu, HIG tabanına oturan yedi basamak:
 
 Ölçülen: her iki temada **tüm tokenlar AA veya üstü**, adlandırılmış tipografi ölçeği, 139 `aria-*`, 53 `role`, 24 `tabindex`, 7 safe-area kullanımı.
 
-**Aksiyon: yok.** Panel-v2 bu repodaki referans uygulama. Eksik tek şey `prefers-reduced-motion` (1 kural) — 5349 satırlık bir stil sayfası için az. Animasyonlu bileşenler taranıp kapsam genişletilmeli.
+**Aksiyon: tamamlandı (AD-51).** Panel-v2 bu repodaki referans uygulama olarak korunuyor;
+`panel/v2/panel-v2.css` içindeki reduced-motion kapsamı iki medya bloğu ve dosya sonundaki
+global güvenlik ağıyla tüm animasyon/geçişleri kapsıyor. 27 Panel-v2 fixture'ının tamamı geçti.
 
 Panel-v2'nin 27 fixture'lık test takımı bu yüzeydeki her değişikliğin kapısıdır:
 ```bash

@@ -21,6 +21,8 @@
   /* Açılır kart gövdesi: JS ölçülü max-height akordeon (animateCardExpand/Collapse). */
   .sey-collbody{will-change:max-height,opacity;}
   @media (prefers-reduced-motion: reduce){ .sey-collbody{transition:none!important;} }
+  /* Kaydırma kenarı efekti dahil header geçişleri hareket duyarlılığında kapanır. */
+  @media (prefers-reduced-motion: reduce){ .sey-appheader{transition:none!important;} }
   /* QY-17: toast() (app.js) inline style ile seyToast animasyonu uygular —
      tüm uygulamadaki toast'lar (Kur'an Yolculuğu'nun durum bildirimleri
      dahil) etkilenir. Inline stili ezmek için burada !important şart. */
@@ -41,7 +43,7 @@
   @keyframes seySynapseDrift{0%{background-position:0 0,18px 12px,0 0,0 0,0 0;transform:translate3d(0,0,0) scale(1);}50%{background-position:42px 24px,-20px 34px,24px -12px,-18px 18px,36px 0;transform:translate3d(-5px,2px,0) scale(1.025);}100%{background-position:0 0,18px 12px,0 0,0 0,0 0;transform:translate3d(0,0,0) scale(1);}}
   @keyframes seySynapsePulse{0%,100%{opacity:.38;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--hdr-accent,var(--room)) 18%,transparent));transform:translate3d(0,0,0);}45%{opacity:.78;filter:drop-shadow(0 0 9px color-mix(in srgb,var(--hdr-accent2,var(--room2)) 34%,transparent));transform:translate3d(10px,-3px,0);}70%{opacity:.52;transform:translate3d(-6px,2px,0);}}
   @keyframes seyHeaderIn{0%{opacity:0;transform:translateY(-6px);}100%{opacity:1;transform:translateY(0);}}
-  .sey-appheader{flex-shrink:0;position:relative;z-index:30;padding:calc(env(safe-area-inset-top) + 9px) 16px 10px;background:linear-gradient(135deg,color-mix(in srgb,var(--nav) 88%,var(--hdr-accent,#3A4048)),color-mix(in srgb,var(--nav) 90%,var(--hdr-accent2,#A4824C)) 56%,color-mix(in srgb,var(--nav) 92%,#2F3437));backdrop-filter:blur(26px) saturate(1.42);-webkit-backdrop-filter:blur(26px) saturate(1.42);border-bottom:1px solid color-mix(in srgb,var(--hdr-accent,#3A4048) 22%,rgba(70,66,64,0.16));box-shadow:0 12px 30px rgba(45,43,40,0.10),inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 color-mix(in srgb,var(--hdr-accent,#3A4048) 18%,transparent);overflow:hidden;animation:seyHeaderIn .5s var(--ease-premium,cubic-bezier(.16,1,.3,1));transition:padding .28s var(--ease-premium,cubic-bezier(.16,1,.3,1)),box-shadow .28s ease,border-color .28s ease;}
+  .sey-appheader{flex-shrink:0;position:relative;z-index:30;padding:calc(env(safe-area-inset-top) + 9px) 16px 10px;background:linear-gradient(135deg,color-mix(in srgb,var(--nav) 88%,var(--hdr-accent,#3A4048)),color-mix(in srgb,var(--nav) 90%,var(--hdr-accent2,#A4824C)) 56%,color-mix(in srgb,var(--nav) 92%,#2F3437));--hdr-blur:26px;backdrop-filter:blur(var(--hdr-blur)) saturate(1.42);-webkit-backdrop-filter:blur(var(--hdr-blur)) saturate(1.42);border-bottom:1px solid color-mix(in srgb,var(--hdr-accent,#3A4048) 22%,rgba(70,66,64,0.16));box-shadow:0 12px 30px rgba(45,43,40,0.10),inset 0 1px 0 rgba(255,255,255,0.34),inset 0 -1px 0 color-mix(in srgb,var(--hdr-accent,#3A4048) 18%,transparent);overflow:hidden;animation:seyHeaderIn .5s var(--ease-premium,cubic-bezier(.16,1,.3,1));transition:padding .28s var(--ease-premium,cubic-bezier(.16,1,.3,1)),box-shadow .28s ease,border-color .28s ease,backdrop-filter .28s ease,-webkit-backdrop-filter .28s ease;}
   .sey-appheader::before{content:"";position:absolute;inset:-42px -34px -28px;pointer-events:none;background:
     linear-gradient(32deg,transparent 0 45%,color-mix(in srgb,var(--hdr-accent,var(--room)) 22%,transparent) 46% 47%,transparent 48% 100%),
     linear-gradient(148deg,transparent 0 43%,color-mix(in srgb,var(--hdr-accent2,var(--room2)) 20%,transparent) 44% 45%,transparent 46% 100%),
@@ -56,7 +58,7 @@
     radial-gradient(circle at 58% 30%,color-mix(in srgb,#A4824C 48%,transparent) 0 2px,transparent 3px),
     radial-gradient(circle at 86% 70%,color-mix(in srgb,var(--hdr-accent2,var(--room2)) 54%,transparent) 0 2.5px,transparent 3.5px);
     background-size:132px 76px,120px 82px,144px 90px,106px 68px,158px 96px;animation:seySynapsePulse 5.2s ease-in-out infinite;}
-  .sey-appheader.is-scrolled{padding-bottom:7px;box-shadow:0 8px 22px rgba(108,74,58,0.10),inset 0 1px 0 rgba(255,255,255,0.28);}
+  .sey-appheader.is-scrolled{--hdr-blur:34px;padding-bottom:7px;box-shadow:0 8px 22px rgba(108,74,58,0.10),inset 0 1px 0 rgba(255,255,255,0.28);}
   .sey-header-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:29px;}
   .sey-header-brand{position:relative;border:none;background:transparent;padding:0;display:flex;align-items:center;gap:7px;min-width:0;cursor:pointer;color:var(--text);overflow:visible;}
   .sey-header-brand .sey-wordmark{position:relative;z-index:1;font-size:29px;}

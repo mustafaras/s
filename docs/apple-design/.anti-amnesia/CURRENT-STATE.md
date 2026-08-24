@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-27` — Koyu tema kontrast yeniden ölçüm |
-| **Sıradaki** | `AD-28` |
+| **Son tamamlanan** | `AD-28` — Kaydırma kenarı efekti |
+| **Sıradaki** | `AD-29` |
 | **Güncel dalga** | `5` |
 | **Bloke** | yok |
 P26-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-27 (+ AD-19-FIX, AD-25-FIX onarımları). Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-28 (+ AD-19-FIX, AD-25-FIX onarımları). Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 

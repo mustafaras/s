@@ -397,7 +397,11 @@
   .sey-app-booted .sey-faith-ov-back{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
   html,body,#app{background:var(--bg);}
   /* Koyu tema: renkli dış haleler yerine net sınırlar ve gerçek siyah derinlik. */
-  #root[data-theme="dark"] .glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none!important;}
+  /* Koyu tema cam varyantı: açık temaya göre daha az doygun, daha koyu.
+     box-shadow:none korunur — koyu yüzeyler gölgeyle değil kenarlıkla ayrışır.
+     rgba(22,22,26,.72) siyah üzerinde ~#101013, yani mevcut --card ile aynı;
+     kontrast tokenları değişmez (AD-27 doğrular). */
+  #root[data-theme="dark"] .glass{background:rgba(22,22,26,0.72);backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%);border:1px solid rgba(255,255,255,0.12);box-shadow:none!important;}
   #root[data-theme="dark"] .sey-appheader{background:#050506;border-bottom-color:rgba(255,255,255,.15);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 8px 18px rgba(0,0,0,.52),inset 0 -1px 0 rgba(255,255,255,.04);}
   #root[data-theme="dark"] .sey-appheader::before,#root[data-theme="dark"] .sey-appheader::after{display:none;}
   #root[data-theme="dark"] .sey-appheader.is-scrolled{box-shadow:0 6px 14px rgba(0,0,0,.48);}
@@ -1469,6 +1473,7 @@
 /* Zorlanmış renk modunda (Windows High Contrast, macOS Increase Contrast +
    renk filtreleri) cam ve gölge okunabilirliği bozar; sistem renklerine bırak. */
 @media (forced-colors: active){
-  .glass{backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText;}
+  /* !important gerekli: #root[data-theme="dark"] .glass bu seçiciden daha spesifik. */
+  .glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid CanvasText!important;}
   button{forced-color-adjust:none;}
 }

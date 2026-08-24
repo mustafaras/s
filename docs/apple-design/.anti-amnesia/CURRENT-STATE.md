@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-37` — dalga 7 kapanışı |
-| **Sıradaki** | `AD-38` ⚠️ **onay gerekir** (dalga 8 · Liquid Glass katman ayrımı) |
-| **Güncel dalga** | `8` (onay bekliyor) |
+| **Son tamamlanan** | `AD-42` — dalga 8 kapanışı |
+| **Sıradaki** | `AD-43` ⚠️ **onay gerekir** (dalga 9 · tipografi ölçeği) |
+| **Güncel dalga** | `9` (onay bekliyor) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-37 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-36-FIX onarımları). **Dalga 1–7 tamamlandı: 37/52.** Dalga 5 ve 6 `04b83ca` ile GitHub Pages'e deploy edildi (2026-08-24); **dalga 7 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-42 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-36-FIX onarımları). **Dalga 1–8 tamamlandı: 42/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d` ile deploy edildi (2026-08-24); **dalga 8 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-31-FIX` (2026-08-24):** Dalga 6 kapanışı yeşildi ama AD-31'in yeni çalışma zamanı mantığını koruyan kalıcı bir fixture yoktu (doğrulama yalnızca oturum scratchpad'indeydi) ve [`../IOS27-TASARIM-PLANI.md`](../IOS27-TASARIM-PLANI.md) başlığı hâlâ "uygulama başlamadı" diyordu. `docs/apple-design/verify-theme-tristate.mjs` (18 assertion) commit edildi ve doğrulama kapısına eklendi; plan başlığı düzeltilip §4 puan tablosunun dondurulmuş denetim kaydı olduğu yazıldı. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
@@ -85,7 +85,7 @@ Görsel inceleme: `node .claude/skills/run-seyma/driver.mjs --dump <sekme>`
 ## Onay kapıları
 
 Dalga 1–5 (AD-01 … AD-29) ek onay istemez: ölçülmüş ihlaller, düşük risk, görsel kimliğe dokunmuyor.
-**Dalga 6 (AD-30 … AD-32) ve dalga 7 (AD-33 … AD-37) 2026-08-24'te onaylandı ve tamamlandı.**
+**Dalga 6, 7 ve 8 (AD-30 … AD-42) 2026-08-24'te onaylandı ve tamamlandı.**
 
 Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalıştırma:
 
@@ -93,7 +93,7 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 | --- | --- | --- |
 | 6 | AD-30 | ✅ onaylandı + tamamlandı 2026-08-24. AD-31 için ikinci onay da alındı (A seçeneği — aşağı bak) |
 | 7 | AD-33 | ✅ onaylandı + tamamlandı 2026-08-24. Kapsam 65 → 167 siteye genişletildi (ayrı onay) |
-| 8 | AD-38 | Planın görsel olarak en görünür değişikliği; reddedilmesi meşru |
+| 8 | AD-38 | ✅ onaylandı + tamamlandı 2026-08-24. Görsel etki beklenenden çok küçük çıktı (aşağı bak) |
 | 9 | AD-43 | 1400+ site; aylara yayılır |
 
 **Push, deploy, tag ve `mustafaras/seyma-data` yazımı bu programın kapsamı dışında ve ayrıca onaya tabidir.**
@@ -102,26 +102,33 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Dalga 8 (AD-38) kullanıcı onayı bekliyor — onay alınmadan çalıştırma.** Liquid Glass katman ayrımı
-planın görsel olarak en görünür değişikliği; **reddedilmesi meşru** bir karardır (o hâlde dalga 9'a atlanır).
-Dalga 7 tamamlandı, bloke bir şey yok.
+**Dalga 9 (AD-43) kullanıcı onayı bekliyor — onay alınmadan çalıştırma.** 1400+ site, planın kendi
+ifadesiyle **"acil değil"**: dalga 1–8 sonrası uygulama zaten erişilebilir; dalga 9 onu *sürdürülebilir*
+yapar (ham px → adlandırılmış ölçek tokenları, Panel-v2'deki kalıp). Dalga 8 tamamlandı, bloke bir şey yok.
 
-**Dalga 7 sonucu:** `app/styles.css` 119 → 0, `app.js` 167 → 0 — toplam **286 site** 11px tabanına çekildi.
-Planın taban sayıları **iki kez eksikti**: styles.css'te kabul regex'i 7 siteyi kaçırıyordu (AD-33), app.js'te
-ise 10px/10.5px grupları (102 site) hiç sayılmamıştı (AD-36-FIX, kullanıcı onaylı kapsam genişletmesi).
+**Dalga 8 sonucu ve sürpriz:** `.glass` içerik katmanında **68 → 0**. Ama görsel etki beklenenden **çok
+küçük** çıktı, çünkü [`app/styles.css:397`](../../../app/styles.css#L397) boot sonrası `.glass` blur'ünü
+**zaten kapatıyordu** (2026-07-28 flaş düzeltmesi). Yani dalga 8 pratikte "cam kaldırma" değil,
+**saydamlığı opaklaştırma** oldu: açık temada kart (254,250,250) → (255,253,252), koyu temada fark
+**1.008:1** yani ayırt edilemez. Fonksiyonel katman (header, alt nav, chatbar, yüzen aksiyon) `.glass`
+kullanmıyordu zaten — kendi `backdrop-filter` kuralları var ve **camlı kaldılar**.
 
-⚠️ **Ölçülmemiş olan — dalga 7'nin dürüst sınırı:** headless harness'ta **layout motoru yok**, CSS uygulanmıyor.
-Hiçbir düzen taşması *ölçülmedi*; hepsi **analitik** değerlendirildi (kapsayıcıların `min-width:0`,
-`minmax(0,1fr)`, `nowrap`+`ellipsis`, `overflow:hidden` emniyet zincirleri okunarak). Yapısal taşma bulunmadı.
-**Cihaz üstü doğrulama ayrı bir kanıt seviyesidir ve yapılmadı.** Telefonda göz atılırsa izlenecek üç yer:
-dar ekranda alt navigasyon etiketi `İlham·İbadet`, `.sg-person-preview-caption` küçük resim altyazısı,
-ve Rapor'daki ısı haritası ay etiketleri.
+**Kontrast opaklaşmayla İYİLEŞTİ:** `--faint` ve üç `-ink` tokenı 4.5:1 eşiğinin 0.01 üstünde
+(4.51:1) duruyordu; opak zeminde 4.63:1'e çıktılar. `verify-contrast.mjs` artık kart zeminini
+`--card-solid` tokenından okuyor ve token kaybolursa uyarı basıyor.
+
+⚠️ **`.glass` kuralı artık kullanıcısız ölü CSS** — bilinçli olarak silinmedi (AD-39 kararı): sınıf,
+ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşıyor. Sonraki ajan bunu "unutulmuş kod"
+sanıp temizlemesin.
+
+⚠️ **Görsel doğrulama hâlâ cihazda yapılmadı.** Kart sınırları **sayısal** olarak doğrulandı
+(kart↔zemin kontrastı 1.10 → 1.12, yani sınır korundu ve hafifçe belirginleşti), gözle değil.
 
 Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirlik kusuru kapatıldı.
 AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
 buton yerine klavye destekli `role=button` olarak korundu.
 
-Bir sonraki ajan **AD-38**'i ancak kullanıcı onayından sonra çalıştırır.
+Bir sonraki ajan **AD-43**'ü ancak kullanıcı onayından sonra çalıştırır.
 
 ---
 
@@ -131,4 +138,4 @@ Bir sonraki ajan **AD-38**'i ancak kullanıcı onayından sonra çalıştırır.
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 37 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).
+Bulgular 52 sıralı prompta dönüştürüldü; 42 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).

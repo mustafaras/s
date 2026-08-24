@@ -92,17 +92,41 @@ const light = tokens(blockBody(css, '#root'));
 const dark = { ...light, ...tokens(blockBody(css, '#root[data-theme="dark"]')) };
 
 /**
- * Zeminler. Açık temada kart yarı saydam olduğu için sayfa gradyanının EN KOYU
- * durağı üzerine bindirilir — en zor durum raporlanır.
+ * Zeminler.
+ *
+ * AD-38/40/41 (dalga 8) içerik kartlarını `.glass`'tan opak `.surface`'e taşıdı.
+ * İçerik metni artık yarı saydam `--card` üzerinde DEĞİL, opak `--card-solid`
+ * üzerinde duruyor — bu yüzden kart zemini CSS'ten okunur, sabitlenmez.
+ * Token kaybolursa denetim sessizce eski (artık var olmayan) zemini ölçmesin
+ * diye eski bileşik değere düşerken uyarı basılır.
  */
+function solidOrComposite(map, label, fallbackFg, fallbackA, fallbackBg) {
+  const solid = map['card-solid'];
+  if (solid && /^#[0-9a-f]{6}$/i.test(solid.trim())) return hexToRgb(solid.trim());
+  console.warn(`  ! uyarı: ${label} için --card-solid bulunamadı; eski yarı saydam zemine düşülüyor.`);
+  return composite(hexToRgb(fallbackFg), fallbackA, hexToRgb(fallbackBg));
+}
+
 const surfaces = [
-  { label: 'AÇIK · kart', map: light, bg: composite(hexToRgb('#FFFFFF'), 0.72, hexToRgb('#F1EBFF')) },
-  { label: 'KOYU · kart', map: dark, bg: composite(hexToRgb('#111114'), 0.96, hexToRgb('#000000')) },
+  {
+    label: 'AÇIK · kart (opak)',
+    map: light,
+    bg: solidOrComposite(light, 'açık tema', '#FFFFFF', 0.72, '#F1EBFF'),
+  },
+  {
+    label: 'KOYU · kart (opak)',
+    map: dark,
+    bg: solidOrComposite(dark, 'koyu tema', '#111114', 0.96, '#000000'),
+  },
 ];
 
 /**
  * Koyu cam yüzeyi CSS'ten okunur, sabitlenmez — AD-26 malzemeyi değiştirdiğinde
  * denetim sessizce eski zemini ölçmeye devam etmesin diye.
+ *
+ * AD-41 sonrası `.glass` içerik katmanında KULLANILMIYOR (68 → 0); kural yalnızca
+ * fonksiyonel katman sözleşmesi olarak duruyor. Ölçüm yine de korunuyor: kural
+ * CSS'te olduğu sürece biri onu yeniden kullanabilir, o gün kontrastı bilinmeli.
  */
 const darkGlass = css
   .match(/#root\[data-theme="dark"\]\s*\.glass\{[^}]*background:\s*rgba\(([^)]+)\)/)
@@ -113,7 +137,7 @@ const darkGlass = css
 if (darkGlass?.length === 4 && darkGlass.every(Number.isFinite)) {
   const [r, g, b, a] = darkGlass;
   surfaces.push({
-    label: 'KOYU · cam',
+    label: 'KOYU · cam (kullanılmıyor, sözleşme)',
     map: dark,
     bg: composite([r, g, b], a, hexToRgb('#000000')),
   });

@@ -133,6 +133,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-41 | İçerik kartları — parti 2 (34 site) | ✅ TAMAMLANDI | `25aba85` | **`.glass` içerik katmanında 0**; `.surface` 68; 5 sekmede glass=0; S4 tam yeşil; S5 sabit 699 | Kalan 34 kullanım takas edildi. **`app.js`'te `glass` sınıf tokenı taşıyan öğe kalmadı (68 → 0).** `sg-glass` (1 adet, ayrı sınıf) bilinçli olarak **dokunulmadı**. **Cerrahi kanıt:** `class` maskeli diff → `class` dışında sıfır fark. **Kabul — beş sekme dump'ında doğrulandı:** Bugün `surface`=15, Rapor 15, Ayarlar 9, Sağlık 13, Mesaj 0 (bu sekmede kart yok); **hepsinde `glass`=0**, iç içe `<button>` ihlali 0, 11px altı font 0. **Sonuç:** HIG'in "Don't use Liquid Glass in the content layer" kuralı sağlandı. Fonksiyonel katman (`.sey-appheader`, `.sey-bottomnav-surface`, chatbar, `.aeon-scrollfab`) kendi `backdrop-filter` kurallarıyla **camlı kalmaya devam ediyor** — AD-39 envanterinde gösterildiği gibi bu yüzeyler `.glass` kullanmıyordu. **`.glass` kuralı artık kullanıcısız** ama silinmedi (AD-39 kararı): sınıf, ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşıyor. |
 
+| AD-42 | Dalga 8 kapanışı | ✅ TAMAMLANDI | `<commit>` | S8 + S4 (8 kapı) + S5 + kontrast **öncesi/sonrası karşılaştırmalı** | **S8 cache-bust:** `app.js` ve `app/styles.css` → **`?v=20260824c`**. `app/core/constants.js` dalga 8'de değişmedi, `?v=20260824a`'da bırakıldı. **`verify-contrast.mjs` güncellendi (prompt bunu zorunlu kılıyordu).** Script açık tema kart zeminini `composite(#FFFFFF, 0.72, #F1EBFF)` olarak **sabitliyordu** — dalga 8'den sonra bu zemin artık **var değil**. Zemin artık CSS'ten `--card-solid` tokenı okunarak alınıyor; token kaybolursa eski bileşik değere düşerken **uyarı basıyor**, yani denetim bir daha sessizce var olmayan bir zemini ölçemez. `KOYU · cam` satırı korundu ama `(kullanılmıyor, sözleşme)` diye etiketlendi — kural CSS'te durduğu sürece biri yeniden kullanabilir. **Kontrast öncesi/sonrası (açık tema, opaklaşmanın gerçek etkisi):** `text` 14.52→**14.93**, `text2` 7.70→**7.91**, `muted` 4.84→**4.97**, `faint` 4.51→**4.63**, `accent/warn-ink` 4.51→**4.63**, `ok-ink` 4.55→**4.67**, `watch/listen-ink` 4.55→**4.68**, `drop-ink` 4.51→**4.64**. **Her token iyileşti.** Önemli olan: `--faint` ve üç `-ink` tokenı 4.5:1 eşiğinin **0.01 üstünde** duruyordu; opak zemin onları 4.63'e taşıyarak marjı rahatlattı. Dalga 8 erişilebilirliği bozmadı, **artırdı**. **S4 tam yeşil:** syntax 3/3, driver 31/0, zikr 95/95, tema 18/18, kontrast 30/30, sync 64/64, panel v1 50/50, panel-v2 27/27. **S5 dalga geneli (`dd5f50d` → HEAD):** handler **699 sabit**, çağrı dağılımı **birebir aynı** — dalga 8 yalnızca `class` niteliği ve CSS düzeyinde kaldığı için **sıfır I2 etkisi**. **Sonuç:** `.glass` içerik katmanında **68 → 0**; fonksiyonel katman (header, alt nav, chatbar, yüzen aksiyon) camlı kaldı. HIG "Don't use Liquid Glass in the content layer" sağlandı. **Dalga 8 tablosu 5/5, toplam 42/52.** `currentWave` → **9**. ⚠️ **Dalga 9 (AD-43) yeni onay ister** — 1400+ site, planın kendi ifadesiyle "acil değil", uygulama dalga 1–8 sonrası zaten erişilebilir. **Açık kapı:** `.glass` kuralı artık kullanıcısız ölü CSS (bilinçli, AD-39 kararı). Görsel doğrulama yine **cihazda yapılmadı** — kart sınırları sayısal olarak doğrulandı (kart↔zemin 1.10→1.12), gözle değil. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -148,10 +150,10 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
-| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 4/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **41/52** | |
+| | **Toplam** | **42/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

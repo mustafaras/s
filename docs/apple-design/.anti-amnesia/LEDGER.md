@@ -141,6 +141,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-44 | `app/styles.css` eşlemesi | ✅ TAMAMLANDI | `6ca3321` | 431 kural token'a eşlendi, 3 dekoratif muaf; S4 tam yeşil | **434 ham px bildiriminin 431'i** AD-43 merdivenine eşlendi (plan ~380 diyordu). Eşleme beraberlikte **yukarı** yuvarlar — prompt'un kendi eğilimiyle tutarlı (14→15, 16→17). Ayrıca gövde aralığındaki **4 akışkan `clamp(16px,.5vw + 15px,17px)`** de `clamp(1rem,.5vw + 0.9375rem,var(--f-body))` olarak rem'e taşındı; akışkanlık korundu, Dynamic Type kazanıldı. **3 muafiyet — hepsi dekoratif grafik, gerekçe doğrulandı:** [`:479`](../../../app/styles.css#L479) `.sey-auth-mascot` 54px (maskot emoji), [`:1139`](../../../app/styles.css#L1139) `.zikr-done-spark b` 46px ve [`:1175`](../../../app/styles.css#L1175) `.zikr-v2-complete .spark` 38px (zikir tamamlama parıltıları). Bunlar metin değil süs glifi; kullanıcı metin boyutuyla ölçeklenmeleri istenmez. **4 display `clamp()`** (24/30/54/68px tabanlı, `vw` ile akışkan hero boyutları) da aynı gerekçeyle ham bırakıldı. **Cerrahi kanıt:** `font-size` bildirimleri maskelenip iki sürüm karşılaştırıldı → **font-size dışında sıfır fark**. Süslü parantez 1925/1925. **Sonuç:** `app/styles.css` ham px **434 → 3** (belgeli dekoratif muafiyet), token kullanımı **0 → 435**. |
 
+| AD-45 | `bugun` sekmesi | ✅ TAMAMLANDI | `<commit>` | Bugün dump'ında ham px **0**, token 150; S4 tam yeşil; S5 sabit 699 | `bugunHTML()` **ve çağırdığı yardımcılar** — çağrı grafiği 4 seviye izlenerek **182 fonksiyon** kapsandı. Yalnızca `bugunHTML` gövdesi alınsaydı sadece 13 site dönüşecekti; sekmenin asıl işaretlemesi kart yardımcılarında. **365 site** eşlendi. **4 dekoratif muafiyet:** 42px, 44px, 48px (🦩 marka flaması) ve 130px (filigran rakam). **Yöntem notu:** sekme çağrı grafikleri birbiriyle örtüşüyor (paylaşılan yardımcılar); sıralı işlendiği ve dönüşüm idempotent olduğu için (token'a çevrilmiş site regex'e uymaz) her prompt kendinden öncekilerin bırakuğı diliмi alır — çift dönüşüm imkânsız. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -157,9 +159,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 2/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 3/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **44/52** | |
+| | **Toplam** | **45/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

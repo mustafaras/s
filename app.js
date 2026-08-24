@@ -5157,10 +5157,10 @@ function habitRowHTML(o){
   var h='';
   h+='<button onclick="'+esc(o.onclick)+'"'+(o.warn?' class="sey-habit-warn"':'')+' style="display:flex;align-items:center;gap:13px;padding:14px;width:100%;text-align:left;cursor:pointer;border-radius:20px;color:var(--text);border:1px solid '+bd+';background:'+bg+';box-shadow:'+sh+';transform:scale('+(o.pulsing?'1.03':'1')+');transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,background .25s,border-color .25s;">';
   h+='<div style="width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:'+(o.locked?hexA(o.accent,0.12):'var(--icon)')+';color:'+(o.locked?o.accent:'var(--text)')+';">'+o.icon+'</div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(o.title)+(o.derived?'<span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:'+(o.done?'#3F8A4F':o.accent)+';background:'+(o.done?'rgba(143,191,138,0.2)':hexA(o.accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
-  if(o.done){ h+='<div style="font-size:13px;color:var(--accent-ink);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(o.msg)+'</div>'; }
-  else if(o.locked){ var pct=Math.min(100,Math.max(0,Math.round(((o.prog.cur||0)/o.prog.goal)*100))); h+='<div style="font-size:12.5px;color:'+o.accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(o.key,o.prog))+'</div>'; if(!o.prog.binary){ h+='<div style="height:6px;border-radius:999px;background:'+hexA(o.accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(o.accent,0.65)+','+o.accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
-  else { h+='<div style="font-size:13px;color:'+(o.warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(o.sub)+'</div>'; }
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:700;line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+esc(o.title)+(o.derived?'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.6px;color:'+(o.done?'#3F8A4F':o.accent)+';background:'+(o.done?'rgba(143,191,138,0.2)':hexA(o.accent,0.14))+';border-radius:6px;padding:1.5px 5px;">OTO</span>':'')+'</div>';
+  if(o.done){ h+='<div style="font-size:var(--f-footnote);color:var(--accent-ink);font-weight:600;margin-top:4px;line-height:1.35;">'+esc(o.msg)+'</div>'; }
+  else if(o.locked){ var pct=Math.min(100,Math.max(0,Math.round(((o.prog.cur||0)/o.prog.goal)*100))); h+='<div style="font-size:var(--f-footnote);color:'+o.accent+';font-weight:600;margin-top:3px;line-height:1.35;">'+esc(derivedProgText(o.key,o.prog))+'</div>'; if(!o.prog.binary){ h+='<div style="height:6px;border-radius:999px;background:'+hexA(o.accent,0.16)+';overflow:hidden;margin-top:7px;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,'+hexA(o.accent,0.65)+','+o.accent+');transition:width .45s cubic-bezier(.34,1.2,.64,1);"></div></div>'; } }
+  else { h+='<div style="font-size:var(--f-footnote);color:'+(o.warn?'var(--warn)':'var(--faint)')+';margin-top:3px;line-height:1.35;">'+esc(o.sub)+'</div>'; }
   h+='</div>';
   if(o.done){ h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">'+icon('check',15)+'</div>'; }
   else if(o.locked){ h+='<div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:'+hexA(o.accent,0.85)+';border:2px solid '+hexA(o.accent,0.4)+';background:'+hexA(o.accent,0.06)+';">'+icon('lock',12)+'</div>'; }
@@ -6112,15 +6112,15 @@ function updateHeaderSave(){
 }
 // Estetik "Gizle" pill'i; gizlenen kart Bugün'de kaybolur, Ayarlar > "Gizlenen kartlar"dan geri gelir.
 function hidePill(which){
-  return '<button onclick="event.stopPropagation();App.hideBugunCard(\''+which+'\')" aria-label="Gizle" title="Gizle" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(150,110,120,0.12);color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.2px;padding:6px 12px;border-radius:999px;line-height:1;">Gizle</button>';
+  return '<button onclick="event.stopPropagation();App.hideBugunCard(\''+which+'\')" aria-label="Gizle" title="Gizle" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(150,110,120,0.12);color:var(--muted);font-size:var(--f-caption2);font-weight:800;letter-spacing:.2px;padding:6px 12px;border-radius:999px;line-height:1;">Gizle</button>';
 }
 function saveBanner(){
   if(!syncConfigured()){
     if(data.settings&&data.settings.hideRepoBanner) return '';
-    return '<div id="sey-save-banner" class="surface" onclick="App.go(\'ayarlar\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'ayarlar\');}" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:12px;color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:20px;color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
+    return '<div id="sey-save-banner" class="surface" onclick="App.go(\'ayarlar\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'ayarlar\');}" style="cursor:pointer;border-radius:18px;padding:13px 15px;display:flex;align-items:center;gap:11px;border:1px solid color-mix(in srgb,var(--warn) 48%, var(--card-bd));box-shadow:0 8px 22px rgba(229,72,77,0.10),inset 0 1px 0 rgba(255,255,255,0.3);"><span style="width:34px;height:34px;border-radius:11px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--warn-ink);background:color-mix(in srgb,var(--warn) 14%, var(--icon));">'+icon('link-2',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);">Repoya bağlan</div><div style="font-size:var(--f-caption1);color:var(--muted);line-height:1.35;">Verilerin kaydedilsin diye Ayarlar\'dan bir kez bağlan.</div></div>'+hidePill('repo')+'<span style="font-size:var(--f-title3);color:var(--warn-ink);font-weight:700;line-height:1;">›</span></div>';
   }
-  if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:13px;font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
-  return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:12px;color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:13px;padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
+  if(savedToday()) return '<div id="sey-save-banner" style="background:rgba(143,191,138,0.16);border:1px solid rgba(143,191,138,0.4);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:9px;"><span style="color:#3F8A4F;display:inline-flex;">'+icon('circle-check',17)+'</span><span style="font-size:var(--f-footnote);font-weight:600;color:var(--text2);">Bugün repoya kaydedildi. Harika.</span></div>';
+  return '<div id="sey-save-banner" style="background:linear-gradient(135deg,#E9899F,#C9B8FF);border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(220,130,150,0.4);"><span style="display:inline-flex;">'+icon('map-pin',20)+'</span><div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Bugünü kaydet</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.92);line-height:1.35;">Günlük kayıt önemli — tek dokunuşla repoya gönder.</div></div><button onclick="App.saveToday()" style="border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#B05070;font-weight:800;font-size:var(--f-footnote);padding:9px 15px;border-radius:12px;flex-shrink:0;">Kaydet</button></div>';
 }
 function updateSaveBanner(){ var el=document.getElementById('sey-save-banner'); if(el){ var t=document.createElement('div'); t.innerHTML=saveBanner(); if(t.firstChild) el.replaceWith(t.firstChild); } }
 
@@ -6154,7 +6154,7 @@ function collapsibleCardHTML(o){
   h+='<div class="sey-ccard-head" style="display:flex;align-items:center;gap:11px;">';
   h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;flex:1;min-width:0;width:auto;">';
   if(o.icon) h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+o.icon+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
   h+='</button>';
   if(o.badge) h+='<div style="flex-shrink:0;">'+o.badge+'</div>';
   // Chevron da dokunulabilir kalsın diye buton; klavye/ekran okuyucu için tek
@@ -6166,7 +6166,7 @@ function collapsibleCardHTML(o){
   if(open){
     h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
   } else if(o.hint!==false){
-    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
+    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:var(--f-caption2);font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
   }
   h+='</div>';
   return h;
@@ -6180,8 +6180,8 @@ function editBanner(){
   var idx=dayIndexFor(d);
   return '<div style="position:sticky;top:0;z-index:60;background:linear-gradient(135deg,#F6A93B,#EC6A5B);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 10px 24px rgba(236,120,80,0.4);">'
     +'<span style="line-height:1;display:inline-flex;">'+icon('calendar',20)+'</span>'
-    +'<div style="flex:1;min-width:0;color:#fff;"><div style="font-size:14.5px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(idx>=1?'Gün '+idx+' · ':'')+esc(dateLabelTR(d))+'</div><div style="font-size:11.5px;line-height:1.35;opacity:0.95;">Geçmiş günü düzenliyorsun — girdiğin veriler bu güne yazılır.</div></div>'
-    +'<button onclick="App.exitEdit()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#C24A2E;font-weight:800;font-size:12.5px;padding:9px 13px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Bugüne dön '+icon('sun',13)+'</button>'
+    +'<div style="flex:1;min-width:0;color:#fff;"><div style="font-size:var(--f-subhead);font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(idx>=1?'Gün '+idx+' · ':'')+esc(dateLabelTR(d))+'</div><div style="font-size:var(--f-caption1);line-height:1.35;opacity:0.95;">Geçmiş günü düzenliyorsun — girdiğin veriler bu güne yazılır.</div></div>'
+    +'<button onclick="App.exitEdit()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#C24A2E;font-weight:800;font-size:var(--f-footnote);padding:9px 13px;border-radius:12px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Bugüne dön '+icon('sun',13)+'</button>'
     +'</div>';
 }
 window.SeyOnSyncState=function(receipt){
@@ -9619,20 +9619,20 @@ function locationGateHTML(){
   var help='';
   if(state==='denied'){
     var steps=isIOS()?(isStandalonePWA()?'Ayarlar → Şeyma → Konum → “Uygulamayı Kullanırken”':'Safari’de aA → Web Sitesi Ayarları → Konum → İzin Ver'):'Tarayıcı site ayarları → Konum → İzin Ver';
-    help='<div style="margin-top:16px;border:1px solid var(--field-bd);background:var(--field);border-radius:16px;padding:12px 13px;text-align:left;"><div style="font-size:11px;letter-spacing:.7px;font-weight:800;color:var(--faint);margin-bottom:5px;">SAFARİ AYARLARI</div><div style="font-size:13px;line-height:1.45;color:var(--text2);">'+esc(steps)+'</div><div style="font-size:11px;line-height:1.45;color:var(--faint);margin-top:5px;">Ayarı değiştirdikten sonra buraya dönüp tekrar dene.</div></div>';
+    help='<div style="margin-top:16px;border:1px solid var(--field-bd);background:var(--field);border-radius:16px;padding:12px 13px;text-align:left;"><div style="font-size:var(--f-caption2);letter-spacing:.7px;font-weight:800;color:var(--faint);margin-bottom:5px;">SAFARİ AYARLARI</div><div style="font-size:var(--f-footnote);line-height:1.45;color:var(--text2);">'+esc(steps)+'</div><div style="font-size:var(--f-caption2);line-height:1.45;color:var(--faint);margin-top:5px;">Ayarı değiştirdikten sonra buraya dönüp tekrar dene.</div></div>';
   }
   var button=busy?'Safari izin ekranı bekleniyor…':state==='checking'?'Konum iznini yeniden doğrula':state==='denied'?'İzin verildi, tekrar dene':state==='unsupported'?'Safari desteğini yeniden kontrol et':'Safari’de konum iznini aç';
   return '<div id="sey-location-gate" data-location-gate-state="'+esc(state)+'" role="dialog" aria-modal="true" aria-labelledby="sey-location-gate-title" tabindex="-1" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;overflow:auto;padding:24px;background:var(--page);color:var(--text);">'
     +'<div style="width:100%;max-width:410px;border:1px solid var(--card-bd);border-radius:28px;padding:26px 22px 22px;background:var(--modal);box-shadow:0 24px 70px rgba(0,0,0,.22);text-align:center;backdrop-filter:blur(18px);">'
       +'<div style="font-size:42px;line-height:1;margin-bottom:13px;">📍</div>'
-      +'<div style="font-size:11px;letter-spacing:1.3px;font-weight:900;color:var(--faint);margin-bottom:8px;">ŞEYMA · GÜVENLİ BAŞLANGIÇ</div>'
-      +'<h1 id="sey-location-gate-title" style="margin:0;font-size:24px;line-height:1.2;font-weight:850;color:var(--text);">'+esc(title)+'</h1>'
-      +'<p style="margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--muted);">'+esc(detail)+'</p>'
-      +'<div style="margin-top:15px;padding:12px 13px;border-radius:15px;background:color-mix(in srgb,#8FBF8A 14%,var(--modal));border:1px solid color-mix(in srgb,#6FB36A 28%,var(--card-bd));font-size:12.5px;line-height:1.5;color:var(--text2);text-align:left;">Konum ve hareket ölçümü yalnızca uygulama açıkken yapılır. Safari’nin izin penceresinde <b>İzin Ver</b> seçilmeden devam edilemez.</div>'
-      +(state==='denied'||state==='unavailable'||state==='unsupported'?'<div role="alert" style="margin-top:12px;font-size:12.5px;line-height:1.45;color:#A34F4D;">'+esc(copy)+'</div>':'')
+      +'<div style="font-size:var(--f-caption2);letter-spacing:1.3px;font-weight:900;color:var(--faint);margin-bottom:8px;">ŞEYMA · GÜVENLİ BAŞLANGIÇ</div>'
+      +'<h1 id="sey-location-gate-title" style="margin:0;font-size:var(--f-title2);line-height:1.2;font-weight:850;color:var(--text);">'+esc(title)+'</h1>'
+      +'<p style="margin:12px 0 0;font-size:var(--f-subhead);line-height:1.55;color:var(--muted);">'+esc(detail)+'</p>'
+      +'<div style="margin-top:15px;padding:12px 13px;border-radius:15px;background:color-mix(in srgb,#8FBF8A 14%,var(--modal));border:1px solid color-mix(in srgb,#6FB36A 28%,var(--card-bd));font-size:var(--f-footnote);line-height:1.5;color:var(--text2);text-align:left;">Konum ve hareket ölçümü yalnızca uygulama açıkken yapılır. Safari’nin izin penceresinde <b>İzin Ver</b> seçilmeden devam edilemez.</div>'
+      +(state==='denied'||state==='unavailable'||state==='unsupported'?'<div role="alert" style="margin-top:12px;font-size:var(--f-footnote);line-height:1.45;color:#A34F4D;">'+esc(copy)+'</div>':'')
       +help
-      +'<button type="button" onclick="App.requestLocationGatePermission()" '+(busy?'disabled':'')+' style="margin-top:19px;border:none;cursor:'+(busy?'wait':'pointer')+';width:100%;padding:15px 16px;border-radius:16px;font-size:15px;font-weight:850;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);box-shadow:0 10px 24px rgba(111,179,106,.34);">'+esc(button)+'</button>'
-      +'<div style="margin-top:12px;font-size:11px;line-height:1.45;color:var(--faint);">Bu izin verilmeden günlük kayıtların ve diğer bölümlerin içeriği açılmaz.</div>'
+      +'<button type="button" onclick="App.requestLocationGatePermission()" '+(busy?'disabled':'')+' style="margin-top:19px;border:none;cursor:'+(busy?'wait':'pointer')+';width:100%;padding:15px 16px;border-radius:16px;font-size:var(--f-subhead);font-weight:850;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);box-shadow:0 10px 24px rgba(111,179,106,.34);">'+esc(button)+'</button>'
+      +'<div style="margin-top:12px;font-size:var(--f-caption2);line-height:1.45;color:var(--faint);">Bu izin verilmeden günlük kayıtların ve diğer bölümlerin içeriği açılmaz.</div>'
     +'</div>'
   +'</div>';
 }
@@ -9873,8 +9873,8 @@ function onboardingHTML(){
   h+='<div style="position:absolute;top:-9%;left:50%;transform:translateX(-50%);width:min(480px,150%);height:320px;background:radial-gradient(closest-side,'+P.topGlow+',transparent 74%);pointer-events:none;z-index:0;"></div>';
   h+='<div style="position:absolute;top:20%;right:-16%;width:240px;height:240px;background:radial-gradient(circle,'+P.sideGlow+',transparent 70%);pointer-events:none;z-index:0;"></div>';
   // ── üst: build strip ──
-  h+='<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:11px;letter-spacing:1px;color:'+P.strip+';animation:seyFloatIn .5s ease both;">';
-  h+='<span>SEYMA_OS</span><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#3F9E63;box-shadow:0 0 6px rgba(63,158,99,.42);animation:seyTwinkle 1.6s ease-in-out infinite;"></span>build · aeon</span><button onclick="App.toggleTheme()" aria-label="Başlangıç temasını değiştir" style="border:1px solid '+P.themeBd+';background:'+P.themeBg+';color:'+P.themeText+';border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-family:'+MONO+';font-size:11px;font-weight:800;letter-spacing:.35px;">'+icon(dark?'moon':'sun',11)+' '+P.mode+'</button></span>';
+  h+='<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:var(--f-caption2);letter-spacing:1px;color:'+P.strip+';animation:seyFloatIn .5s ease both;">';
+  h+='<span>SEYMA_OS</span><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#3F9E63;box-shadow:0 0 6px rgba(63,158,99,.42);animation:seyTwinkle 1.6s ease-in-out infinite;"></span>build · aeon</span><button onclick="App.toggleTheme()" aria-label="Başlangıç temasını değiştir" style="border:1px solid '+P.themeBd+';background:'+P.themeBg+';color:'+P.themeText+';border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-family:'+MONO+';font-size:var(--f-caption2);font-weight:800;letter-spacing:.35px;">'+icon(dark?'moon':'sun',11)+' '+P.mode+'</button></span>';
   h+='</div>';
   // ── orta blok (dikey ortalı): hero + terminal paneli ──
   h+='<div style="position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:15px;">';
@@ -9883,18 +9883,18 @@ function onboardingHTML(){
   h+='<div style="position:relative;width:90px;height:90px;border-radius:28px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFE8A3,#F7DDE5 52%,#E9CBFF);box-shadow:0 22px 52px rgba(230,193,90,0.28),0 0 0 1px rgba(255,255,255,0.10),inset 0 1.5px 0 rgba(255,255,255,0.7);overflow:hidden;animation:seyPop .6s var(--ease-premium,ease) both;">';
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 3.8s ease-in-out infinite;"></span>';
   h+='<span style="position:relative;font-size:48px;line-height:1;filter:drop-shadow(0 8px 14px rgba(190,108,139,0.4));">🦩</span></div>';
-  h+='<div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-top:2px;animation:seyFloatIn .5s .06s ease both;"><span class="sey-wordmark" style="font-size:44px;background:'+P.wordGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.wordShadow+';">Şeyma</span><span class="sey-wordmark-flam" style="font-size:26px;">🦩</span></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:center;gap:9px;margin-top:2px;animation:seyFloatIn .5s .06s ease both;"><span class="sey-wordmark" style="font-size:44px;background:'+P.wordGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.wordShadow+';">Şeyma</span><span class="sey-wordmark-flam" style="font-size:var(--f-title1);">🦩</span></div>';
   // "super-black" — imza fontunda metalik gümüş alt-imza
-  h+='<div style="display:flex;align-items:center;gap:9px;margin-top:-4px;animation:seyFloatIn .5s .09s ease both;"><span style="width:26px;height:1px;background:linear-gradient(90deg,transparent,'+P.metal+');"></span><span class="sey-wordmark" style="font-size:25px;background:'+P.superGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.superShadow+';">'+P.mode+'</span><span style="width:26px;height:1px;background:linear-gradient(90deg,'+P.metal+',transparent);"></span></div>';
-  h+='<div style="display:flex;align-items:center;gap:10px;margin-top:2px;animation:seyFloatIn .5s .12s ease both;"><span style="font-size:12px;letter-spacing:1.5px;color:'+P.tag+';text-transform:uppercase;">minik denge günlüğü</span><span style="font-size:11.5px;font-weight:800;letter-spacing:.5px;color:#140C10;background:linear-gradient(135deg,#F2D98C,#E9AEC6);border-radius:999px;padding:3px 11px;box-shadow:0 6px 18px rgba(230,193,90,0.20);">v2.0</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:9px;margin-top:-4px;animation:seyFloatIn .5s .09s ease both;"><span style="width:26px;height:1px;background:linear-gradient(90deg,transparent,'+P.metal+');"></span><span class="sey-wordmark" style="font-size:var(--f-title1);background:'+P.superGrad+';-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:'+P.superShadow+';">'+P.mode+'</span><span style="width:26px;height:1px;background:linear-gradient(90deg,'+P.metal+',transparent);"></span></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-top:2px;animation:seyFloatIn .5s .12s ease both;"><span style="font-size:var(--f-caption1);letter-spacing:1.5px;color:'+P.tag+';text-transform:uppercase;">minik denge günlüğü</span><span style="font-size:var(--f-caption1);font-weight:800;letter-spacing:.5px;color:#140C10;background:linear-gradient(135deg,#F2D98C,#E9AEC6);border-radius:999px;padding:3px 11px;box-shadow:0 6px 18px rgba(230,193,90,0.20);">v2.0</span></div>';
   h+='</div>';
   // TERMINAL PANEL — modüller boot-log + ÆON imzası
   h+='<div style="border:1px solid '+P.panelBd+';border-radius:18px;overflow:hidden;background:'+P.panelBg+';box-shadow:'+P.panelShadow+';animation:seyFloatIn .5s .16s ease both;">';
   // titlebar
   h+='<div style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid '+P.titleBd+';background:'+P.titleBg+';">';
   ['#FF5F57','#FEBC2E','#28C840'].forEach(function(c){ h+='<span style="width:9px;height:9px;border-radius:50%;background:'+c+';box-shadow:0 0 6px '+c+'66;"></span>'; });
-  h+='<span style="margin-left:7px;font-size:11px;color:'+P.titleText+';">seyma — denge.sys</span>';
-  h+='<span style="margin-left:auto;font-size:11px;color:#3F9E63;letter-spacing:.5px;">● ready</span>';
+  h+='<span style="margin-left:7px;font-size:var(--f-caption2);color:'+P.titleText+';">seyma — denge.sys</span>';
+  h+='<span style="margin-left:auto;font-size:var(--f-caption2);color:#3F9E63;letter-spacing:.5px;">● ready</span>';
   h+='</div>';
   // body: modül satırları
   h+='<div style="padding:11px 14px;display:flex;flex-direction:column;gap:8px;">';
@@ -9902,34 +9902,34 @@ function onboardingHTML(){
     var delay=(0.24+i*0.05).toFixed(2);
     h+='<div style="display:grid;grid-template-columns:7px 1fr auto;column-gap:9px;row-gap:2px;align-items:center;animation:seyFloatIn .5s '+delay+'s ease both;">';
     h+='<span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+m[0]+';box-shadow:0 0 8px '+m[0]+';"></span>';
-    h+='<span style="min-width:0;color:'+m[0]+';font-size:11.5px;line-height:1.2;font-weight:700;">'+m[1]+'</span>';
-    h+='<span style="color:#3F9E63;font-size:11px;">ok</span>';
-    h+='<span style="grid-column:2 / 4;min-width:0;color:'+P.desc+';font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m[2]+'</span>';
+    h+='<span style="min-width:0;color:'+m[0]+';font-size:var(--f-caption1);line-height:1.2;font-weight:700;">'+m[1]+'</span>';
+    h+='<span style="color:#3F9E63;font-size:var(--f-caption2);">ok</span>';
+    h+='<span style="grid-column:2 / 4;min-width:0;color:'+P.desc+';font-size:var(--f-caption2);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m[2]+'</span>';
     h+='</div>';
   });
   h+='</div>';
   // teknik özet — saklama ve eşlik modelini kısa, açık ve doğru anlatır.
-  h+='<div style="padding:10px 14px 9px;border-top:1px dashed '+P.dash+';display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:11px;animation:seyFloatIn .5s .44s ease both;">';
+  h+='<div style="padding:10px 14px 9px;border-top:1px dashed '+P.dash+';display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:var(--f-caption2);animation:seyFloatIn .5s .44s ease both;">';
   [['günlük','önce bu cihazda'],['yedek','sen bağlarsan GitHub'],['program','120 gün · 4 faz'],['eşlik','Luna + ÆON']].forEach(function(s){
     h+='<div style="min-width:0;"><div style="color:'+P.specLabel+';margin-bottom:2px;">'+s[0]+'</div><div style="color:'+P.specVal+';line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s[1]+'</div></div>';
   });
   h+='</div>';
   // hazır göstergesi
-  h+='<div style="display:flex;align-items:center;gap:7px;padding:2px 14px 10px;font-size:11px;letter-spacing:.2px;color:'+P.status+';white-space:nowrap;animation:seyFloatIn .5s .48s ease both;"><span style="color:#3F9E63;">▷</span><span>store·local</span><span style="color:'+P.statusSep+';">·</span><span>sync·github</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#3F9E63;flex-shrink:0;">hazır <span style="width:26px;height:4px;border-radius:999px;overflow:hidden;background:'+(dark?'rgba(255,255,255,0.08)':'rgba(91,72,98,0.10)')+';display:inline-block;"><span style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#E6C15A,#E9899F,#9B7FC9);"></span></span> 100%</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:7px;padding:2px 14px 10px;font-size:var(--f-caption2);letter-spacing:.2px;color:'+P.status+';white-space:nowrap;animation:seyFloatIn .5s .48s ease both;"><span style="color:#3F9E63;">▷</span><span>store·local</span><span style="color:'+P.statusSep+';">·</span><span>sync·github</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#3F9E63;flex-shrink:0;">hazır <span style="width:26px;height:4px;border-radius:999px;overflow:hidden;background:'+(dark?'rgba(255,255,255,0.08)':'rgba(91,72,98,0.10)')+';display:inline-block;"><span style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#E6C15A,#E9899F,#9B7FC9);"></span></span> 100%</span></div>';
   // ÆON imzası — terminali ezmeyen küçük, beyaz ve sakin güven rozeti.
   h+='<div style="display:flex;align-items:center;gap:12px;padding:12px 14px 13px;border-top:1px solid '+P.aeonBd+';background:'+P.aeonBg+';animation:seyFloatIn .5s .54s ease both;">';
   h+='<div style="position:relative;width:52px;height:52px;border-radius:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#101017;background:linear-gradient(145deg,#FFFFFF,#E9E9EF);border:1px solid '+(dark?'rgba(255,255,255,0.10)':'rgba(91,72,98,0.12)')+';box-shadow:'+(dark?'0 10px 25px rgba(255,255,255,0.12)':'0 10px 25px rgba(91,65,78,0.14)')+',inset 0 1px 0 #FFFFFF,inset 0 -2px 5px rgba(40,40,55,0.12);overflow:hidden;">';
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.9) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;"></span>';
   h+='<span style="position:relative;display:inline-flex;">'+icon('hexagon',25)+'</span></div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-family:-apple-system,system-ui,\'Segoe UI\',sans-serif;font-size:18px;font-weight:850;letter-spacing:3px;color:'+P.aeonWord+';">ÆON</div>';
-  h+='<div style="font-size:11px;letter-spacing:.25px;color:'+P.aeonSub+';line-height:1.45;margin-top:2px;">Paylaştığın kayıtları anlamlandırır; mesaj, ses ve fotoğraflarında güvenilir bir gözlemci eşlik eder.</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-family:-apple-system,system-ui,\'Segoe UI\',sans-serif;font-size:var(--f-headline);font-weight:850;letter-spacing:3px;color:'+P.aeonWord+';">ÆON</div>';
+  h+='<div style="font-size:var(--f-caption2);letter-spacing:.25px;color:'+P.aeonSub+';line-height:1.45;margin-top:2px;">Paylaştığın kayıtları anlamlandırır; mesaj, ses ve fotoğraflarında güvenilir bir gözlemci eşlik eder.</div></div>';
   h+='</div>';
   h+='</div>'; // terminal panel
   h+='</div>'; // orta blok
   // ── alt: CTA + gizlilik ──
   h+='<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:9px;animation:seyFloatIn .5s .56s ease both;">';
-  h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:16px;border-radius:16px;font-family:'+MONO+';font-size:15px;font-weight:800;letter-spacing:.3px;color:#180D14;background:linear-gradient(135deg,#F4DCA0,#E9AEC6 52%,#CBB8FF);box-shadow:0 18px 40px rgba(233,137,159,0.30),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.5) 50%,transparent 65%);animation:seyShine 4.2s ease-in-out infinite;"></span><span style="position:relative;">❯ Tamam Raşit, başlayalım</span></button>';
-  h+='<p style="margin:0;text-align:center;font-size:11px;line-height:1.5;color:'+P.privacy+';">Günlüğün önce bu cihazda saklanır. Yedekleme ancak sen bağlarsan açılır; kontrol her zaman sende kalır. 🔒</p>';
+  h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:16px;border-radius:16px;font-family:'+MONO+';font-size:var(--f-subhead);font-weight:800;letter-spacing:.3px;color:#180D14;background:linear-gradient(135deg,#F4DCA0,#E9AEC6 52%,#CBB8FF);box-shadow:0 18px 40px rgba(233,137,159,0.30),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.5) 50%,transparent 65%);animation:seyShine 4.2s ease-in-out infinite;"></span><span style="position:relative;">❯ Tamam Raşit, başlayalım</span></button>';
+  h+='<p style="margin:0;text-align:center;font-size:var(--f-caption2);line-height:1.5;color:'+P.privacy+';">Günlüğün önce bu cihazda saklanır. Yedekleme ancak sen bağlarsan açılır; kontrol her zaman sende kalır. 🔒</p>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -10134,10 +10134,10 @@ function nutriInsightHTML(rec,nu){
   var items=nu.items||0;
   var pg=proteinGoal();
   var wrap=function(inner){ return '<div style="background:linear-gradient(160deg,rgba(201,184,255,0.10),transparent);border:1px solid var(--card-bd);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:11px;">'
-    +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('brain',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--accent-ink);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
+    +'<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('brain',15)+'</span><span style="font-size:var(--f-caption1);font-weight:800;letter-spacing:.4px;color:var(--accent-ink);text-transform:uppercase;">Bilimsel değerlendirme</span></div>'+inner+'</div>'; };
   var row=function(ic,col,title,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;">'
     +'<span style="width:26px;height:26px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%, var(--icon));">'+icon(ic,14)+'</span>'
-    +'<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:800;color:var(--text);line-height:1.3;">'+title+'</div><div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:1px;">'+text+'</div></div></div>'; };
+    +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);line-height:1.3;">'+title+'</div><div style="font-size:var(--f-caption1);color:var(--muted);line-height:1.5;margin-top:1px;">'+text+'</div></div></div>'; };
   if(items===0) return wrap(row('utensils','var(--accent)','Öğünlerini ekle, birlikte bakalım','Yediklerini yazınca protein, makro dengesi ve kan şekeri açısından kısa bilimsel bir okuma çıkarırım. Ölçmek, farkındalığın ilk adımıdır.'));
   var inner='';
   if(nu.protein>=pg) inner+=row('activity','#3F8A4F','Protein hedefi tuttu · '+nu.protein+'g','Yeterli protein tokluk hormonlarını (GLP-1, PYY) artırır, kası korur ve kan şekerini dengeler — tatlı isteğini azaltan en güçlü kaldıraç.');
@@ -10158,23 +10158,23 @@ function beslenmeCardHTML(rec){
   var incomplete=!(hasName('breakfast')&&hasName('lunch')&&hasName('dinner'));
   var open=cardOpen('beslenme', incomplete);
   var pPct=Math.min(100,Math.round(nu.protein/pg*100));
-  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:16px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);">kcal</div></div>';
+  var badge='<div style="text-align:right;"><div id="nutri-badgecal" style="font-size:var(--f-callout);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">kcal</div></div>';
   var subtitle='<span id="nutri-subtitle">'+nu.protein+'g protein · '+nu.carbs+'g karb · '+nu.fat+'g yağ</span>';
   var b='';
   // Makro özeti
   b+='<div style="background:var(--icon);border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px;">';
   b+='<div style="display:flex;align-items:flex-end;gap:12px;">';
-  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11.5px;color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:11.5px;color:var(--faint);">/ '+pg+'g</span></div>';
+  b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:var(--f-caption1);color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:var(--f-title2);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:var(--f-caption1);color:var(--faint);">/ '+pg+'g</span></div>';
   b+='<div style="height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:5px;"><div id="nutri-bar" style="height:100%;width:'+pPct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
-  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
+  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:var(--f-title3);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
   b+='</div>';
   b+='<div id="nutri-macrobar">'+macroBarHTML(nu)+'</div>';
-  b+='<div style="display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;">';
+  b+='<div style="display:flex;gap:12px;font-size:var(--f-caption2);color:var(--muted);flex-wrap:wrap;">';
   b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#E9899F;"></span>Protein <b id="nutri-lp" style="color:var(--text);">'+nu.protein+'g</b></span>';
   b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#F6C177;"></span>Karbonhidrat <b id="nutri-carb" style="color:var(--text);">'+nu.carbs+'g</b></span>';
   b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#9B7FC9;"></span>Yağ <b id="nutri-fat" style="color:var(--text);">'+nu.fat+'g</b></span>';
   b+='</div>';
-  b+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kalori, girdiğin yiyeceklerin makrolarından hesaplanır (protein & karbonhidrat ×4, yağ ×9 kcal). Değerler tahminidir; yiyecek adı ve miktar netleştikçe isabet artar.</div>';
+  b+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.45;">Kalori, girdiğin yiyeceklerin makrolarından hesaplanır (protein & karbonhidrat ×4, yağ ×9 kcal). Değerler tahminidir; yiyecek adı ve miktar netleştikçe isabet artar.</div>';
   b+='</div>';
   // Bilimsel değerlendirme (protein · makro dengesi · glisemik) — canlı güncellenir
   b+='<div id="nutri-insight">'+nutriInsightHTML(rec,nu)+'</div>';
@@ -10183,18 +10183,18 @@ function beslenmeCardHTML(rec){
     var items=Array.isArray(mi[m.key])?mi[m.key]:[];
     var sub=mealNutr(rec,m.key);
     b+='<div style="display:flex;flex-direction:column;gap:8px;">';
-    b+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--icon);">'+m.icon+'</div><div style="font-size:13px;font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:11.5px;font-weight:700;color:var(--accent-ink);">'+Math.round(sub.protein)+'g P · '+Math.round(sub.calories)+' kcal</div></div>';
+    b+='<div style="display:flex;align-items:center;gap:9px;"><div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:var(--f-callout);background:var(--icon);">'+m.icon+'</div><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+m.label+'</div><div id="meal-sub-'+m.key+'" style="margin-left:auto;font-size:var(--f-caption1);font-weight:700;color:var(--accent-ink);">'+Math.round(sub.protein)+'g P · '+Math.round(sub.calories)+' kcal</div></div>';
     items.forEach(function(it,idx){
       b+='<div style="display:flex;gap:6px;align-items:center;">';
-      b+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:13.5px;outline:none;">';
-      b+='<input type="number" inputmode="decimal" min="0" step="0.5" value="'+(it.qty===''||it.qty==null?'':esc(it.qty))+'" onchange="App.setMealItemQty(\''+m.key+'\','+idx+',this)" style="width:50px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:13.5px;text-align:center;outline:none;">';
-      b+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:60px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:12.5px;outline:none;color:var(--text);">';
+      b+='<input data-meal="'+m.key+'" data-idx="'+idx+'" value="'+esc(it.name||'')+'" oninput="App.setMealItemName(\''+m.key+'\','+idx+',this)" placeholder="'+esc(m.ph.split(',')[0].replace('örn. ',''))+'…" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 11px;font-size:var(--f-footnote);outline:none;">';
+      b+='<input type="number" inputmode="decimal" min="0" step="0.5" value="'+(it.qty===''||it.qty==null?'':esc(it.qty))+'" onchange="App.setMealItemQty(\''+m.key+'\','+idx+',this)" style="width:50px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:var(--f-footnote);text-align:center;outline:none;">';
+      b+='<select onchange="App.setMealItemUnit(\''+m.key+'\','+idx+',this)" style="width:60px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px 4px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
       MEAL_UNITS.forEach(function(u){ b+='<option value="'+u.id+'"'+(it.unit===u.id?' selected':'')+'>'+u.label+'</option>'; });
       b+='</select>';
-      b+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">×</button>';
+      b+='<button onclick="App.removeMealItem(\''+m.key+'\','+idx+')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:30px;height:30px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:var(--f-subhead);">×</button>';
       b+='</div>';
     });
-    b+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
+    b+='<button onclick="App.addMealItem(\''+m.key+'\')" style="align-self:flex-start;border:1px dashed var(--field-bd);cursor:pointer;padding:7px 13px;border-radius:11px;font-size:var(--f-footnote);font-weight:700;color:var(--muted);background:transparent;">+ '+m.label.toLowerCase()+'\'a ekle</button>';
     b+='</div>';
   });
   return collapsibleCardHTML({key:'beslenme', id:'card-beslenme', icon:icon('utensils',18), accent:'var(--watch)', title:'Beslenme', subtitle:subtitle, badge:badge, open:open, body:b, hint:'öğünleri gör / ekle'});
@@ -10246,21 +10246,21 @@ function waterCard(rec){
   var g=waterGoalCups(activeDate());
   var pct=Math.min(100,Math.round(w/g*100));
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:12.5px;color:var(--faint);"><b style="color:var(--accent-ink);font-size:16px;">'+w+'</b> / '+g+' bardak</div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:7px;">Su '+icon('droplet',17)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);"><b style="color:var(--accent-ink);font-size:var(--f-callout);">'+w+'</b> / '+g+' bardak</div></div>';
   h+='<div style="display:flex;gap:5px;">';
   for(var i=0;i<g;i++){ var on=i<w; h+='<div style="flex:1;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;'+(on?'background:linear-gradient(135deg,#9CC9F0,#C9B8FF);box-shadow:0 4px 10px rgba(120,160,220,0.3);color:#fff;':'background:rgba(150,170,200,0.12);border:1px solid var(--card-bd);')+'">'+(on?icon('droplet',14):'')+'</div>'; }
   h+='</div>';
-  if(w>g){ h+='<div style="font-size:11.5px;color:var(--faint);">+'+(w-g)+' bardak ekstra, harika</div>'; }
+  if(w>g){ h+='<div style="font-size:var(--f-caption1);color:var(--faint);">+'+(w-g)+' bardak ekstra, harika</div>'; }
   var waterTicked=!!(rec&&rec.habits&&rec.habits.water);
   if(waterTicked&&w<g&&!ui.waterNudgeHidden){
     h+='<div style="display:flex;gap:9px;align-items:flex-start;background:linear-gradient(135deg,rgba(127,179,232,0.16),rgba(155,127,201,0.12));border:1px solid rgba(127,179,232,0.4);border-radius:14px;padding:11px 12px;">';
     h+='<span style="flex-shrink:0;display:inline-flex;">'+icon('droplet',18)+'</span>';
-    h+='<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);line-height:1.45;">Su tikin işaretli. Kaç bardak içtiğini de girersen takibin daha net olur. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
+    h+='<div style="flex:1;min-width:0;font-size:var(--f-footnote);color:var(--text2);line-height:1.45;">Su tikin işaretli. Kaç bardak içtiğini de girersen takibin daha net olur. <span style="color:var(--faint);">(zorunlu değil)</span></div>';
     h+='<button onclick="App.hideWaterNudge()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
   }
   h+='<div style="display:flex;gap:9px;">';
-  h+='<button onclick="App.waterAdd(-1)" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:18px;font-weight:800;color:var(--muted);background:var(--card);">−</button>';
-  h+='<button onclick="App.waterAdd(1)" style="flex:2;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7FB3E8,#9B7FC9);box-shadow:0 8px 18px rgba(120,160,220,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">+1 bardak içtim '+icon('droplet',15)+'</button>';
+  h+='<button onclick="App.waterAdd(-1)" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-headline);font-weight:800;color:var(--muted);background:var(--card);">−</button>';
+  h+='<button onclick="App.waterAdd(1)" style="flex:2;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#7FB3E8,#9B7FC9);box-shadow:0 8px 18px rgba(120,160,220,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">+1 bardak içtim '+icon('droplet',15)+'</button>';
   h+='</div></div>';
   return h;
 }
@@ -10269,16 +10269,16 @@ function energyStressBlock(rec){
   var en=rec?rec.energy:null, st=rec?rec.stress:null;
   function scale(label,ic,cur,fn,lo,hi,grad){
     var s='<div style="display:flex;flex-direction:column;gap:6px;">';
-    s+='<div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--text);"><span style="display:inline-flex;color:var(--muted);">'+ic+'</span>'+label+(cur!=null?'<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent-ink);">'+cur+'/5</span>':'')+'</div>';
+    s+='<div style="display:flex;align-items:center;gap:6px;font-size:var(--f-footnote);font-weight:800;color:var(--text);"><span style="display:inline-flex;color:var(--muted);">'+ic+'</span>'+label+(cur!=null?'<span style="margin-left:auto;font-size:var(--f-caption2);font-weight:700;color:var(--accent-ink);">'+cur+'/5</span>':'')+'</div>';
     s+='<div style="display:flex;gap:6px;">';
-    for(var v=1;v<=5;v++){ var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:38px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:800;transition:all .18s;'+(sel?'background:linear-gradient(135deg,'+grad+');border:1px solid transparent;color:#fff;box-shadow:0 6px 14px rgba(150,110,120,0.28);transform:translateY(-2px);':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+'">'+v+'</button>'; }
+    for(var v=1;v<=5;v++){ var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:38px;border-radius:12px;cursor:pointer;font-size:var(--f-footnote);font-weight:800;transition:all .18s;'+(sel?'background:linear-gradient(135deg,'+grad+');border:1px solid transparent;color:#fff;box-shadow:0 6px 14px rgba(150,110,120,0.28);transform:translateY(-2px);':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+'">'+v+'</button>'; }
     s+='</div>';
-    s+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--faint);"><span>'+lo+'</span><span>'+hi+'</span></div>';
+    s+='<div style="display:flex;justify-content:space-between;font-size:var(--f-caption2);color:var(--faint);"><span>'+lo+'</span><span>'+hi+'</span></div>';
     s+='</div>';
     return s;
   }
   var h='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.4;">Enerji ve stres, ruh hâlinin iki ayrı ekseni; ikisini de işaretlemek moduna daha net bakmanı sağlar.</div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);line-height:1.4;">Enerji ve stres, ruh hâlinin iki ayrı ekseni; ikisini de işaretlemek moduna daha net bakmanı sağlar.</div>';
   h+=scale('Enerji',icon('zap',14),en,'setEnergy','tükenmiş','çok dinç','#FFD37A,#F5A623');
   h+=scale('Stres',icon('wind',14),st,'setStress','sakin','çok gergin','#C9B8FF,#7C5CC4');
   h+='</div>';
@@ -10310,13 +10310,13 @@ function moodCardHTML(rec){
   MOODS.forEach(function(m){
     var sel=curMood===m.id;
     var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 8px 18px rgba(233,175,193,0.4);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);';
-    b+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,22)+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
+    b+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:11px 4px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,22)+'</span><span style="font-size:var(--f-caption2);font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>';
   });
   b+='</div>';
-  if(mo0) b+='<div style="font-size:14px;color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo0.resp)+'</div>';
+  if(mo0) b+='<div style="font-size:var(--f-subhead);color:var(--text2);background:rgba(255,232,163,0.3);border-radius:14px;padding:10px 12px;line-height:1.4;">'+esc(mo0.resp)+'</div>';
   b+=energyStressBlock(rec);
   var interp=moodInterp(curMood,en,st);
-  if(interp) b+='<div style="font-size:12px;color:var(--text2);line-height:1.45;background:linear-gradient(160deg,rgba(201,184,255,0.12),transparent);border-radius:12px;padding:10px 12px;display:flex;gap:7px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('lightbulb',14)+'</span><span>'+esc(interp)+'</span></div>';
+  if(interp) b+='<div style="font-size:var(--f-caption1);color:var(--text2);line-height:1.45;background:linear-gradient(160deg,rgba(201,184,255,0.12),transparent);border-radius:12px;padding:10px 12px;display:flex;gap:7px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('lightbulb',14)+'</span><span>'+esc(interp)+'</span></div>';
   return collapsibleCardHTML({key:'mood', id:'card-mood', icon:icon('cloud-sun',18), accent:'var(--pause)', title:(ed?'O günün modu':'Bugünün modu'), subtitle:subtitle, badge:badge, open:open, body:b, hint:'modunu işaretle'});
 }
 CARD_BUILDERS.mood=moodCardHTML;
@@ -10338,20 +10338,20 @@ function reflectionCardHTML(rec){
   var gratFilled=gratArr.filter(function(g){return String(g||'').trim();}).length;
   var filled=(String(note).trim()?1:0)+gratFilled;
   var open=cardOpen('reflection', filled===0);
-  var badge=filled>0?'<span style="font-size:11px;font-weight:800;color:var(--accent-ink);">'+filled+'</span>':'';
+  var badge=filled>0?'<span style="font-size:var(--f-caption2);font-weight:800;color:var(--accent-ink);">'+filled+'</span>':'';
   var refParts=[]; if(String(note).trim()) refParts.push('not'); if(gratFilled>0) refParts.push(gratFilled+' güzel şey');
   var refSub=refParts.length?refParts.join(' · '):'birkaç cümle bırak, kendine iyi gelsin';
   var prompt=REFLECT_PROMPTS[(Math.max(1,dayIndexFor(activeDate()))-1)%REFLECT_PROMPTS.length]||REFLECT_PROMPTS[0];
   var gratPh=['örn. Sabah kahvem','örn. Bir arkadaşın mesajı','örn. Güneşli hava'];
   var b='';
-  b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.5;">Duyguları yazıya dökmek ve minnet, ruh hâlini toparlamanın en kanıtlı iki yoludur. Birkaç cümle bile bugüne iyi gelir.</div>';
-  b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('feather',15)+'</span><div style="font-size:13px;color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
+  b+='<div style="font-size:var(--f-caption1);color:var(--faint);line-height:1.5;">Duyguları yazıya dökmek ve minnet, ruh hâlini toparlamanın en kanıtlı iki yoludur. Birkaç cümle bile bugüne iyi gelir.</div>';
+  b+='<div style="display:flex;gap:8px;align-items:flex-start;background:linear-gradient(160deg,rgba(255,225,154,0.20),rgba(201,184,255,0.10));border-radius:14px;padding:11px 12px;"><span style="flex-shrink:0;display:inline-flex;color:var(--accent-ink);">'+icon('feather',15)+'</span><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.4;font-style:italic;">'+esc(prompt)+'</div></div>';
   var hasJournal=rec&&rec.journal&&String(rec.journal.text||'').trim();
-  b+='<button onclick="App.openJournalModal()" style="border:none;cursor:pointer;width:100%;padding:14px 15px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 65%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .12s ease,box-shadow .2s ease;">'+(hasJournal?'<span>Bugünün ışığı yazıldı ✨</span>':'<span>Günlük Işığı\'nı aç 🦩</span>')+'</button>';
-  b+='<div><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;">'+(ed?'O gün kendine notun':'Bugün kendime notum')+'</div>';
-  b+='<textarea oninput="App.onNote(this)" placeholder="Aklından geçeni serbestçe yaz…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:15px;resize:none;outline:none;line-height:1.5;color:var(--text);">'+esc(note)+'</textarea></div>';
-  b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:13px;font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:11px;color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
-  for(var i=0;i<3;i++){ var gv=(gratArr[i]!=null)?gratArr[i]:''; b+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span><input type="text" value="'+esc(gv)+'" oninput="App.onGratitude('+i+',this)" placeholder="'+gratPh[i]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14.5px;outline:none;color:var(--text);"></div>'; }
+  b+='<button onclick="App.openJournalModal()" style="border:none;cursor:pointer;width:100%;padding:14px 15px;border-radius:16px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,var(--journal),var(--journal2));box-shadow:0 10px 24px color-mix(in srgb,var(--journal-glow) 65%,transparent),inset 0 1px 0 rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .12s ease,box-shadow .2s ease;">'+(hasJournal?'<span>Bugünün ışığı yazıldı ✨</span>':'<span>Günlük Işığı\'nı aç 🦩</span>')+'</button>';
+  b+='<div><div style="font-size:var(--f-footnote);font-weight:700;color:var(--muted);margin-bottom:6px;">'+(ed?'O gün kendine notun':'Bugün kendime notum')+'</div>';
+  b+='<textarea oninput="App.onNote(this)" placeholder="Aklından geçeni serbestçe yaz…" rows="3" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:14px;padding:12px;font-size:var(--f-subhead);resize:none;outline:none;line-height:1.5;color:var(--text);">'+esc(note)+'</textarea></div>';
+  b+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('heart-handshake',16)+'</span><div><div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+(ed?'O günün 3 güzel şeyi':'Bugünün 3 güzel şeyi')+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">Küçük de olsa minnet duyduğun 3 şey</div></div></div>';
+  for(var i=0;i<3;i++){ var gv=(gratArr[i]!=null)?gratArr[i]:''; b+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#F6C177,#E9AFC1);color:#fff;font-size:var(--f-footnote);font-weight:800;display:flex;align-items:center;justify-content:center;">'+(i+1)+'</span><input type="text" value="'+esc(gv)+'" oninput="App.onGratitude('+i+',this)" placeholder="'+gratPh[i]+'" maxlength="160" style="flex:1;min-width:0;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);outline:none;color:var(--text);"></div>'; }
   b+='</div>';
   return collapsibleCardHTML({key:'reflection', id:'card-reflection', icon:icon('pen-line',18), accent:'var(--sun)', title:(ed?'O günün yansıması':'Günün yansıması'), subtitle:refSub, badge:badge, open:open, body:b, hint:'yansımanı yaz', cardStyle:'background:linear-gradient(160deg,rgba(246,193,119,0.10),rgba(233,175,193,0.06));'});
 }
@@ -10367,7 +10367,7 @@ function habitsCardHTML(rec){
   var circ=2*Math.PI*11;
   var off=circ*(1-(ht>0?completed/ht:0));
   var ring='<div style="position:relative;width:30px;height:30px;flex-shrink:0;"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="3.5"></circle><circle cx="15" cy="15" r="11" fill="none" stroke="#E9AFC1" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 15 15)"></circle></svg></div>';
-  var badge='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:13px;font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
+  var badge='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
   var b='';
   HABITS.forEach(function(hb){
     var derived=!!DERIVED_HABITS[hb.key];
@@ -10395,7 +10395,7 @@ function habitsCardHTML(rec){
     b+=habitRowHTML({key:hb.key,title:hb.title,sub:sub,msg:hb.msg,icon:hb.icon,derived:derived,prog:prog,done:done,pulsing:pulsing,accent:accent,locked:locked,warn:warn,onclick:'App.toggleHabit(\''+hb.key+'\')'});
   });
   completed=countRec(rec); ht=habitCountOn(viewDate); allDone=ht>0&&completed>=ht;
-  var badge2='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:13px;font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
+  var badge2='<div style="display:flex;align-items:center;gap:7px;">'+ring+'<span style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+completed+'/'+ht+'</span></div>';
   return collapsibleCardHTML({key:'habits', id:'card-habits', icon:icon('circle-check',18), accent:'var(--ok)', title:(ed?'O günün tikleri':'Bugünün tikleri'), subtitle:(allDone?'hepsi tamam, harika':completed+'/'+ht+' tamamlandı'), badge:badge2, open:open, body:b, hint:'tikleri gör'});
 }
 CARD_BUILDERS.habits=habitsCardHTML;
@@ -10406,8 +10406,8 @@ function eveningNudge(rec){
   if(rd.count>0) return '';
   return '<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);border-radius:20px;padding:15px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 26px rgba(110,85,191,0.35);">'
     +'<span style="flex-shrink:0;display:inline-flex;">'+icon('book-open',24)+'</span>'
-    +'<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:12px;color:rgba(255,255,255,0.9);line-height:1.35;">Bugün ne okudun? Birkaç sayfa, uykuya geçişi yumuşatır.</div></div>'
-    +'<button onclick="App.openReading()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:13px;padding:9px 14px;border-radius:12px;">Ekle</button></div>';
+    +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:800;color:#fff;">Gece yaklaşıyor</div><div style="font-size:var(--f-caption1);color:rgba(255,255,255,0.9);line-height:1.35;">Bugün ne okudun? Birkaç sayfa, uykuya geçişi yumuşatır.</div></div>'
+    +'<button onclick="App.openReading()" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.95);color:#6E55BF;font-weight:800;font-size:var(--f-footnote);padding:9px 14px;border-radius:12px;">Ekle</button></div>';
 }
 
 function stepReminder(rec){
@@ -10418,8 +10418,8 @@ function stepReminder(rec){
   if(!stepsEmpty) return '';
   return '<div style="display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,rgba(230,193,90,0.14),rgba(155,127,201,0.10));border:1px solid rgba(201,160,60,0.35);border-radius:16px;padding:12px 14px;">'
     +'<span style="flex-shrink:0;display:inline-flex;">'+icon('footprints',20)+'</span>'
-    +'<div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">Bugünün adımını eklemek ister misin?</div><div style="font-size:11.5px;color:var(--muted);line-height:1.35;">Telefonundaki adımı yazman ya da Sağlık’tan çekmen yeter — zorunlu değil.</div></div>'
-    +'<button onclick="App.go(\'saglik\')" style="flex-shrink:0;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:12.5px;padding:9px 13px;border-radius:12px;">Ekle</button>'
+    +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">Bugünün adımını eklemek ister misin?</div><div style="font-size:var(--f-caption1);color:var(--muted);line-height:1.35;">Telefonundaki adımı yazman ya da Sağlık’tan çekmen yeter — zorunlu değil.</div></div>'
+    +'<button onclick="App.go(\'saglik\')" style="flex-shrink:0;border:none;cursor:pointer;background:linear-gradient(135deg,#E6C15A,#C99A3A);color:#1a1404;font-weight:800;font-size:var(--f-footnote);padding:9px 13px;border-radius:12px;">Ekle</button>'
     +'<button onclick="App.hideStepRemind()" aria-label="Kapat" style="flex-shrink:0;border:none;background:none;cursor:pointer;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button></div>';
 }
 function fmtDist(m){ m=Math.max(0,Number(m)||0); return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
@@ -10433,34 +10433,34 @@ function healthSetupCardHTML(connectedHealth){
   h+='<button onclick="App.toggleHealthSetup()" style="width:100%;border:none;cursor:pointer;background:none;display:flex;align-items:center;gap:10px;padding:12px;text-align:left;">';
   h+='<span style="flex-shrink:0;display:inline-flex;">'+icon('apple',20)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
-  h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
-  h+='<div style="font-size:11.5px;color:var(--muted);">'+(connectedHealth?'Kurulum adımlarını gör':'Arka planda çalışır · pil dostu · tek seferlik kurulum')+'</div>';
+  h+='<div style="font-size:var(--f-footnote);font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:var(--f-caption2);font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--muted);">'+(connectedHealth?'Kurulum adımlarını gör':'Arka planda çalışır · pil dostu · tek seferlik kurulum')+'</div>';
   h+='</div>';
-  h+='<span style="font-size:13px;color:var(--faint);flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">'+(open?('Gizle '+icon('chevron-up',13)):('Göster '+icon('chevron-down',13)))+'</span>';
+  h+='<span style="font-size:var(--f-footnote);color:var(--faint);flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">'+(open?('Gizle '+icon('chevron-up',13)):('Göster '+icon('chevron-down',13)))+'</span>';
   h+='</button>';
   if(open){
     var sg=data.settings||{};
     var gid=(sg.healthGistId||'').trim();
-    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:11px;">'+hint+'</span></span><span style="flex-shrink:0;display:inline-flex;">'+icon('copy',14)+'</span></button>'; }
-    function step(n,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(143,191,138,0.3);color:#2F7A3F;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;">'+n+'</span><span style="flex:1;font-size:12.5px;line-height:1.55;color:var(--text2);padding-top:2px;">'+text+'</span></div>'; }
+    function chip(id,label,hint){ return '<button onclick="App.'+id+'()" style="text-align:left;border:1px solid var(--field-bd);background:var(--field);cursor:pointer;border-radius:10px;padding:9px 11px;font-size:var(--f-caption1);color:var(--text2);display:flex;align-items:center;gap:8px;width:100%;"><span style="flex:1;min-width:0;"><b style="color:var(--text);">'+label+'</b><br><span style="color:var(--faint);font-size:var(--f-caption2);">'+hint+'</span></span><span style="flex-shrink:0;display:inline-flex;">'+icon('copy',14)+'</span></button>'; }
+    function step(n,text){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(143,191,138,0.3);color:#2F7A3F;font-size:var(--f-caption1);font-weight:800;display:flex;align-items:center;justify-content:center;">'+n+'</span><span style="flex:1;font-size:var(--f-footnote);line-height:1.55;color:var(--text2);padding-top:2px;">'+text+'</span></div>'; }
     h+='<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:11px;">';
-    h+='<div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--text2);line-height:1.4;">';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;font-size:var(--f-footnote);color:var(--text2);line-height:1.4;">';
     h+='<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;margin-top:1px;">'+icon('battery-low',14)+'</span><span><b>Pil dostu</b> — GPS\'i sürekli açık tutmaz, telefonun kendi adım sayacını kullanır.</span></div>';
     h+='<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;margin-top:1px;">'+icon('moon',14)+'</span><span><b>Gerçekten arka planda</b> — uygulama kapalıyken, ekran kilitliyken bile veri toplanmaya devam eder.</span></div>';
     h+='<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;margin-top:1px;">'+icon('target',14)+'</span><span><b>Daha doğru</b> — Sağlık\'ın hassas pedometresi, GPS tahmininden daha güvenilir.</span></div>';
     h+='<div style="display:flex;align-items:flex-start;gap:6px;"><span style="flex-shrink:0;margin-top:1px;">'+icon('lock',14)+'</span><span><b>Gizli kalır</b> — veriler doğrudan senin GitHub hesabında tutulur, başka bir sunucuya gitmez.</span></div>';
     h+='</div>';
 
-    h+='<div style="font-size:12px;font-weight:800;color:var(--text);">Bölüm 1 — Küçük bir kutu oluştur (tarayıcıda, bir kere):</div>';
+    h+='<div style="font-size:var(--f-caption1);font-weight:800;color:var(--text);">Bölüm 1 — Küçük bir kutu oluştur (tarayıcıda, bir kere):</div>';
     h+=step('1','<a href="https://gist.github.com" target="_blank" style="color:#2F7A3F;font-weight:700;">gist.github.com</a> adresini aç (GitHub hesabınla giriş yapmış ol).');
     h+=step('2','"Filename" kutusuna yaz: <b>health-sync.json</b>');
     h+=step('3','Büyük metin kutusuna aşağıdaki "Başlangıç içeriği" çipine dokunup yapıştır.');
     h+=chip('copyHealthStarter','Başlangıç içeriği','Dokun, panoya kopyalanır');
     h+=step('4','Yeşil <b>"Create secret gist"</b> butonuna bas.');
     h+=step('5','Açılan sayfanın adres çubuğundaki son parçayı (uzun kod) kopyala, aşağıya yapıştır:');
-    h+='<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(gid)+'" oninput="App.setHealthGistId(this)" placeholder="Gist ID (adres çubuğunun sonundaki kod)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+    h+='<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(gid)+'" oninput="App.setHealthGistId(this)" placeholder="Gist ID (adres çubuğunun sonundaki kod)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:var(--f-footnote);outline:none;">';
 
-    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 2 — Kısayolu kur (Kısayollar uygulamasında, bir kere):</div>';
+    h+='<div style="font-size:var(--f-caption1);font-weight:800;color:var(--text);margin-top:2px;">Bölüm 2 — Kısayolu kur (Kısayollar uygulamasında, bir kere):</div>';
     h+=step('1','Kısayollar → + (yeni kısayol) → isim ver: <b>Şeyma Sağlık</b>');
     h+=step('2','Eylem ekle: <i>Sağlık Örneği Al</i> → Adım Sayısı, bugün, toplam.');
     h+=step('3','Eylem ekle: <i>Sağlık Örneği Al</i> → Yürüme + Koşu Mesafesi, bugün, toplam, birim metre.');
@@ -10470,12 +10470,12 @@ function healthSetupCardHTML(connectedHealth){
     h+=chip('copyHealthUrl','URL','Dokun, panoya kopyalanır');
     h+=chip('copyHealthAuth','Yetki (Authorization)','Dokun, jetonun panoya kopyalanır — ekranda hiç görünmez');
 
-    h+='<div style="font-size:12px;font-weight:800;color:var(--text);margin-top:2px;">Bölüm 3 — Otomatik çalışsın (bir kere):</div>';
+    h+='<div style="font-size:var(--f-caption1);font-weight:800;color:var(--text);margin-top:2px;">Bölüm 3 — Otomatik çalışsın (bir kere):</div>';
     h+=step('1','Kısayollar → Otomasyon → + → Kişisel Otomasyon → <i>Saatin Zamanı</i> (günde birkaç kez tekrarlı).');
     h+=step('2','"Şeyma Sağlık" kısayolunu çalıştır olarak seç, <b>"Çalıştırmadan Önce Sor"u kapat</b>. Bitti — bundan sonra kimse hiçbir şey yapmaz.');
 
-    h+='<div style="font-size:11px;color:var(--faint);line-height:1.5;background:var(--field);border-radius:10px;padding:8px 10px;">Not: Bu jetonun "gist" iznine de sahip olması gerekir. İnce ayarlı (fine-grained) jetonlar Gist\'i desteklemiyor — Ayarlar\'da <b>classic</b> bir jeton (repo + gist izinli) kullan.</div>';
-    h+='<a href="shortcuts://" style="text-align:center;text-decoration:none;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);display:flex;align-items:center;justify-content:center;gap:6px;">Kısayollar\'ı Aç '+icon('link-2',15)+'</a>';
+    h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.5;background:var(--field);border-radius:10px;padding:8px 10px;">Not: Bu jetonun "gist" iznine de sahip olması gerekir. İnce ayarlı (fine-grained) jetonlar Gist\'i desteklemiyor — Ayarlar\'da <b>classic</b> bir jeton (repo + gist izinli) kullan.</div>';
+    h+='<a href="shortcuts://" style="text-align:center;text-decoration:none;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#7DBE77,#5BA85B);display:flex;align-items:center;justify-content:center;gap:6px;">Kısayollar\'ı Aç '+icon('link-2',15)+'</a>';
     h+='</div>';
   }
   h+='</div>';
@@ -10500,42 +10500,42 @@ function locationCardHTML(){
     if(hs.updatedAt){ var hm=Math.round((Date.now()-new Date(hs.updatedAt).getTime())/60000); hsAge=hm<1?'az önce':hm<60?hm+' dk önce':hm<1440?Math.round(hm/60)+' sa önce':Math.round(hm/1440)+' g önce'; }
     hsBlock='<div style="display:flex;align-items:center;gap:10px;background:rgba(143,191,138,0.10);border:1px solid rgba(143,191,138,0.28);border-radius:14px;padding:10px 12px;">'
       +'<span style="flex-shrink:0;display:inline-flex;">'+icon('apple',18)+'</span>'
-      +'<div style="flex:1;min-width:0;font-size:12.5px;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu:</b> '
+      +'<div style="flex:1;min-width:0;font-size:var(--f-footnote);color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu:</b> '
       +(hs.steps>0?hs.steps.toLocaleString('tr-TR')+' adım':'')+(hs.steps>0&&hs.walkM>0?' · ':'')+(hs.walkM>0?fmtDist(hs.walkM):'')
-      +'<div style="font-size:11px;color:var(--faint);margin-top:1px;">Telefon arka planda topladı'+(hsAge?' · '+hsAge:'')+'</div></div>'
+      +'<div style="font-size:var(--f-caption2);color:var(--faint);margin-top:1px;">Telefon arka planda topladı'+(hsAge?' · '+hsAge:'')+'</div></div>'
       +'</div>';
   }
   // Açık/kapalı anahtarı başlıkta rozet olarak; anahtara dokunmak kartı açmasın (stopPropagation).
   var toggle='<button onclick="event.stopPropagation();App.toggleLocation()" aria-label="Konum aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:50px;height:28px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+(on?'25px':'3px')+';width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
-  var statusPill='<span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span>';
+  var statusPill='<span style="font-size:var(--f-caption2);font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span>';
   var badge='<div style="display:flex;align-items:center;gap:8px;">'+hidePill('location')+statusPill+toggle+'</div>';
   var subtitle=on?('Bugün '+fmtDist(mv.totalM)+' · ölçüm açık'):'GPS kapalı · açmak için sağdaki anahtar';
   var open=cardOpen('location', on);
   var b='';
   if(!on){
     b+=hsBlock;
-    b+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür (yalnızca uygulama açıkken).</div>';
+    b+='<div style="font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">Açtığında yürüyüş ve araç hareketlerin ölçülür (yalnızca uygulama açıkken).</div>';
     b+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
     return collapsibleCardHTML({key:'location', id:'card-location', icon:icon('map-pin',18), accent:'#3F9A4F', title:'Konum & Hareket', subtitle:subtitle, badge:badge, open:open, body:b, hint:'ayrıntıları gör'});
   }
-  function mbtn(id,emoji,label){ var act=mode===id; return '<button onclick="App.setLocationMode(\''+id+'\')" style="flex:1;border:1px solid '+(act?'#8FBF8A':'var(--card-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:12.5px;font-weight:700;color:'+(act?'#2F7A3F':'var(--text2)')+';background:'+(act?'rgba(143,191,138,0.18)':'transparent')+';">'+emoji+' '+label+'</button>'; }
+  function mbtn(id,emoji,label){ var act=mode===id; return '<button onclick="App.setLocationMode(\''+id+'\')" style="flex:1;border:1px solid '+(act?'#8FBF8A':'var(--card-bd)')+';cursor:pointer;padding:9px 4px;border-radius:12px;font-size:var(--f-footnote);font-weight:700;color:'+(act?'#2F7A3F':'var(--text2)')+';background:'+(act?'rgba(143,191,138,0.18)':'transparent')+';">'+emoji+' '+label+'</button>'; }
   b+='<div style="display:flex;gap:7px;">'+mbtn('walk',icon('footprints',14),'Yürüyüş')+mbtn('vehicle',icon('car',14),'Araç')+mbtn('auto',icon('sparkles',14),'Oto')+'</div>';
   b+='<div style="display:flex;gap:10px;">';
-  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün toplam</div><div id="loc-dist-today" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+fmtDist(mv.totalM)+'</div></div>';
-  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Anlık hız</div><div id="loc-speed" style="font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">0 km/sa</div></div>';
+  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">Bugün toplam</div><div id="loc-dist-today" style="font-size:var(--f-headline);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+fmtDist(mv.totalM)+'</div></div>';
+  b+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">Anlık hız</div><div id="loc-speed" style="font-size:var(--f-headline);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">0 km/sa</div></div>';
   b+='</div>';
-  b+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  b+='<div style="display:flex;gap:8px;font-size:var(--f-footnote);">';
   b+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('footprints',14)+' Yürüyüş <b id="loc-walk" style="margin-left:auto;">'+fmtDist(mv.walkM)+'</b></span>';
   b+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('car',14)+' Araç <b id="loc-vehicle" style="margin-left:auto;">'+fmtDist(mv.vehicleM)+'</b></span>';
   b+='</div>';
-  b+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  b+='<div style="display:flex;gap:8px;font-size:var(--f-footnote);">';
   b+='<span style="flex:1;background:rgba(143,191,138,0.10);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Ayakta <b id="loc-walk-dur" style="margin-left:auto;">'+fmtDur(mv.walkSec)+'</b></span>';
   b+='<span style="flex:1;background:rgba(201,184,255,0.11);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('clock',14)+' Yolda <b id="loc-veh-dur" style="margin-left:auto;">'+fmtDur(mv.vehicleSec)+'</b></span>';
   b+='</div>';
-  if(mode==='auto') b+='<div style="font-size:12px;color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
-  else b+='<div style="font-size:12px;color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  if(mode==='auto') b+='<div style="font-size:var(--f-caption1);color:var(--faint);">Oto-mod: <b id="loc-auto-mode" style="color:var(--text2);">'+autoModeLabel()+'</b> · son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
+  else b+='<div style="font-size:var(--f-caption1);color:var(--faint);">Son güncelleme <span id="loc-updated">'+esc(upd)+'</span></div>';
   b+=hsBlock;
-  b+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır; Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
+  b+='<div style="font-size:var(--f-caption1);color:var(--faint);line-height:1.45;">GPS ölçümü yalnızca uygulama açıkken yapılır; Sağlık senkronu varsa tam günü tamamlar. Hareketler korunur, silinmez.</div>';
   b+=healthSetupCardHTML(!!hs&&(hs.steps>0||hs.walkM>0));
   return collapsibleCardHTML({key:'location', id:'card-location', icon:icon('map-pin',18), accent:'#3F9A4F', title:'Konum & Hareket', subtitle:subtitle, badge:badge, open:open, body:b, hint:'ayrıntıları gör'});
 }
@@ -10723,9 +10723,9 @@ var WX_QUIPS={
 };
 function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
 function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
-function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay),fg=dark?'#FFE1BC':'#7A3E1E',sub=dark?'#D6A57E':'#A85E3C'; return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:900;color:'+sub+';">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
-function wxLocationPendingChip(label){ var fg=dark?'#D6A57E':'#A85E3C'; return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11px;font-weight:800;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:'+(dark?'none':'0 0 0 3px rgba(199,119,73,.14)')+';"></span></div>'; }
-function wxDetail(icon,label,val){ var bg=dark?'rgba(255,255,255,0.055)':'rgba(255,255,255,0.45)',lab=dark?'#D6A57E':'#A85E3C',fg=dark?'#FFE1BC':'#7A3E1E'; return '<div style="flex:1;min-width:0;background:'+bg+';border:'+(dark?'1px solid rgba(255,210,160,.09)':'none')+';border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:11px;color:'+lab+';font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:'+fg+';margin-top:2px;">'+val+'</div></div>'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay),fg=dark?'#FFE1BC':'#7A3E1E',sub=dark?'#D6A57E':'#A85E3C'; return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:var(--f-footnote);font-weight:850;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:var(--f-caption2);font-weight:900;color:'+sub+';">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxLocationPendingChip(label){ var fg=dark?'#D6A57E':'#A85E3C'; return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:var(--f-caption2);font-weight:800;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:'+(dark?'none':'0 0 0 3px rgba(199,119,73,.14)')+';"></span></div>'; }
+function wxDetail(icon,label,val){ var bg=dark?'rgba(255,255,255,0.055)':'rgba(255,255,255,0.45)',lab=dark?'#D6A57E':'#A85E3C',fg=dark?'#FFE1BC':'#7A3E1E'; return '<div style="flex:1;min-width:0;background:'+bg+';border:'+(dark?'1px solid rgba(255,210,160,.09)':'none')+';border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:var(--f-caption2);color:'+lab+';font-weight:800;">'+icon+' '+label+'</div><div style="font-size:var(--f-subhead);font-weight:800;color:'+fg+';margin-top:2px;">'+val+'</div></div>'; }
 function weatherHeaderHTML(greet){
   var open=!!ui.weatherOpen;
   var W=dark?{bg:'linear-gradient(120deg,#15120F,#211815 52%,#22131A)',bd:'rgba(255,199,142,.22)',shadow:'0 14px 30px rgba(0,0,0,.42)',orb1:'rgba(255,199,142,.09)',orb2:'rgba(242,154,184,.07)',icon:'drop-shadow(0 3px 6px rgba(0,0,0,.52))',title:'#FFD2A1',sub:'#D6A57E',chev:'#E0AD82',hint:'rgba(255,220,184,.58)',divider:'rgba(255,210,160,.14)',noteBg:'rgba(255,255,255,.05)',note:'#F0D8BC',foot:'rgba(235,205,174,.48)'}:{bg:'linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7)',bd:'transparent',shadow:'0 12px 28px var(--sun-glow)',orb1:'rgba(255,255,255,0.55)',orb2:'rgba(255,255,255,0.28)',icon:'drop-shadow(0 3px 7px rgba(240,150,70,0.55))',title:'#8A4426',sub:'#A85E3C',chev:'#B5673A',hint:'rgba(122,62,30,0.6)',divider:'rgba(138,68,38,0.16)',noteBg:'rgba(255,255,255,0.42)',note:'#7A3E1E',foot:'rgba(122,62,30,0.55)'};
@@ -10745,41 +10745,41 @@ function weatherHeaderHTML(greet){
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
   h+='<span style="display:inline-flex;filter:'+W.icon+';">'+(pm?pm.emoji:icon('sun',28))+'</span>';
   var sub=greet; if(pm) sub+=' · '+pm.label;
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:20px;font-weight:900;letter-spacing:0.3px;color:'+W.title+';line-height:1.12;">Günışığı</div><div style="font-size:12px;font-weight:700;color:'+W.sub+';letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-title3);font-weight:900;letter-spacing:0.3px;color:'+W.title+';line-height:1.12;">Günışığı</div><div style="font-size:var(--f-caption1);font-weight:700;color:'+W.sub+';letter-spacing:.2px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(sub)+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:9px;flex-shrink:0;">';
   if(spots||locationPending){
     h+='<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-end;">';
     if(locationPending) h+=wxLocationPendingChip(locationPendingLabel);
     if(spots){ for(var ci=0; ci<Math.min(spots.length,locationPending?2:3); ci++){ h+=wxSpotChip(spots[ci]); } }
     h+='</div>';
-  } else { h+='<div style="font-size:11.5px;font-weight:700;color:'+W.sub+';">hava…</div>'; }
+  } else { h+='<div style="font-size:var(--f-caption1);font-weight:700;color:'+W.sub+';">hava…</div>'; }
   h+='<span style="color:'+W.chev+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</div></div>';
-  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.3px;color:'+W.hint+';display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
+  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:var(--f-caption2);font-weight:700;letter-spacing:.3px;color:'+W.hint+';display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
   if(open && spots){
     h+='<div style="position:relative;margin-top:12px;animation:seyFade .25s ease;">';
     if(locationPending){
-      h+='<div data-wx-location-pending style="display:flex;align-items:center;gap:8px;padding:10px 0 11px;color:'+W.title+';font-size:12.5px;font-weight:800;">'+icon('map-pin',17)+' <span>'+esc(locationPendingLabel)+'</span></div>';
+      h+='<div data-wx-location-pending style="display:flex;align-items:center;gap:8px;padding:10px 0 11px;color:'+W.title+';font-size:var(--f-footnote);font-weight:800;">'+icon('map-pin',17)+' <span>'+esc(locationPendingLabel)+'</span></div>';
     }
     for(var si=0; si<spots.length; si++){
       var sp=spots[si]; var m=wxMeta(sp.code,sp.isDay);
       h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;'+(si>0?'margin-top:11px;':'')+'">';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="display:inline-flex;">'+wxSpotIcon(sp,20)+'</span>';
-      h+='<div style="flex:1;min-width:0;"><div style="font-size:14.5px;font-weight:900;color:'+W.title+';">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:'+W.sub+';">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:11.5px;font-weight:700;color:'+W.sub+';">'+m.emoji+' '+m.label+'</div></div>';
-      h+='<div style="font-size:22px;font-weight:900;color:'+(dark?'#FFE1BC':'#7A3E1E')+';">'+sp.temp+'°</div></div>';
+      h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-subhead);font-weight:900;color:'+W.title+';">'+esc(sp.label)+(sp.place?' · <span style="font-weight:700;color:'+W.sub+';">'+esc(sp.place)+'</span>':'')+'</div><div style="font-size:var(--f-caption1);font-weight:700;color:'+W.sub+';">'+m.emoji+' '+m.label+'</div></div>';
+      h+='<div style="font-size:var(--f-title2);font-weight:900;color:'+(dark?'#FFE1BC':'#7A3E1E')+';">'+sp.temp+'°</div></div>';
       h+='<div style="display:flex;gap:6px;margin-bottom:6px;">'+wxDetail(icon('thermometer',13),'Hissedilen',sp.feels+'°')+wxDetail(icon('droplet',13),'Nem','%'+sp.hum)+wxDetail(icon('wind',13),'Rüzgâr',sp.wind+' km/sa')+'</div>';
       h+='<div style="display:flex;gap:6px;">'+wxDetail(icon('sun',13),'UV',(sp.uv!=null?sp.uv:'—'))+wxDetail(icon('arrow-up-down',13),'En Y/D',(sp.hi!=null?sp.hi+'°/'+sp.lo+'°':'—'))+wxDetail(icon('sunrise',13),'Doğ/Bat',wxHm(sp.sunrise)+'·'+wxHm(sp.sunset))+'</div>';
       h+='</div>';
     }
     if(primary){
       var adv=wxAdvice(primary);
-      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;"><div style="font-size:12.5px;font-weight:900;color:'+W.title+';margin-bottom:7px;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',13)+' Sağlık notları</div>';
-      for(var ai=0; ai<adv.length; ai++){ h+='<div style="display:flex;gap:8px;align-items:flex-start;background:'+W.noteBg+';border:'+(dark?'1px solid rgba(255,210,160,.08)':'none')+';border-radius:12px;padding:8px 10px;'+(ai>0?'margin-top:6px;':'')+'"><span style="font-size:15px;line-height:1.3;">'+adv[ai].i+'</span><span style="flex:1;font-size:12.5px;font-weight:600;color:'+W.note+';line-height:1.4;">'+esc(adv[ai].t)+'</span></div>'; }
+      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;"><div style="font-size:var(--f-footnote);font-weight:900;color:'+W.title+';margin-bottom:7px;display:flex;align-items:center;gap:5px;">'+icon('lightbulb',13)+' Sağlık notları</div>';
+      for(var ai=0; ai<adv.length; ai++){ h+='<div style="display:flex;gap:8px;align-items:flex-start;background:'+W.noteBg+';border:'+(dark?'1px solid rgba(255,210,160,.08)':'none')+';border-radius:12px;padding:8px 10px;'+(ai>0?'margin-top:6px;':'')+'"><span style="font-size:var(--f-subhead);line-height:1.3;">'+adv[ai].i+'</span><span style="flex:1;font-size:var(--f-footnote);font-weight:600;color:'+W.note+';line-height:1.4;">'+esc(adv[ai].t)+'</span></div>'; }
       h+='</div>';
       var q=wxQuip(pm?pm.cat:'clear');
-      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;font-size:12.5px;font-style:italic;font-weight:600;color:'+W.title+';line-height:1.5;">❝ '+esc(q)+' ❞</div>';
+      h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;font-size:var(--f-footnote);font-style:italic;font-weight:600;color:'+W.title+';line-height:1.5;">❝ '+esc(q)+' ❞</div>';
     }
-    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:11px;color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
+    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:var(--f-caption2);color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
     h+='</div>';
   }
   h+='</button>';
@@ -10806,37 +10806,37 @@ function vacationCardHTML(rec){
   var badgeColor=active?accentHex:(planned?hexA(accentHex,0.85):(dark?'rgba(169,160,155,0.85)':'rgba(120,113,108,0.8)'));
   var badgeBg=active?hexA(accentHex,0.14):(planned?hexA(accentHex,0.09):(dark?'rgba(169,160,155,0.18)':'rgba(120,113,108,0.12)'));
   var badgeText=active?'AKTİF':(planned?'Planlandı':'Kapalı');
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;">Tatil Modu <span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:'+badgeColor+';background:'+badgeBg+';border-radius:6px;padding:1.5px 5px;">'+badgeText+'</span></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;">Tatil Modu <span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.6px;color:'+badgeColor+';background:'+badgeBg+';border-radius:6px;padding:1.5px 5px;">'+badgeText+'</span></div>';
   var sub;
   if(active) sub='Tatildesin — su hedefi '+VACATION_WATER_GOAL+' bardak · seri duraklatıldı';
   else if(planned) sub='Tatil planlandı — belirttiğin günlerde su 10 bardak, seri duraklar';
   else sub='Tatil günlerinde su hedefi 10 bardak, seri duraklar';
   if(v.startAt&&v.endAt) sub+=' · '+esc(shortDate(v.startAt))+'–'+esc(shortDate(v.endAt))+(v.reason?' · '+esc(v.reason):'');
-  h+='<div style="font-size:12px;color:var(--faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sub+'</div></div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sub+'</div></div>';
   h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</button>';
   if(open){
     h+='<div style="position:relative;display:flex;flex-direction:column;gap:12px;animation:seyFade .2s ease;">';
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:13px;font-weight:700;color:var(--text2);">Tatil modunu aç</div><button onclick="App.setVacationEnabled('+(v.enabled?'false':'true')+')" style="border:none;cursor:pointer;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:800;color:'+(v.enabled?'#fff':'var(--text2)')+';background:'+(v.enabled?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';" data-on="'+(v.enabled?'1':'0')+'">'+(v.enabled?'Kapat':'Aç')+'</button></div>';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text2);">Tatil modunu aç</div><button onclick="App.setVacationEnabled('+(v.enabled?'false':'true')+')" style="border:none;cursor:pointer;border-radius:999px;padding:7px 13px;font-size:var(--f-footnote);font-weight:800;color:'+(v.enabled?'#fff':'var(--text2)')+';background:'+(v.enabled?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';" data-on="'+(v.enabled?'1':'0')+'">'+(v.enabled?'Kapat':'Aç')+'</button></div>';
     h+='<div style="display:flex;gap:8px;">';
-    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Başlangıç</label><input type="date" value="'+esc(v.startAt)+'" onchange="App.setVacationStart(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
-    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Bitiş</label><input type="date" value="'+esc(v.endAt)+'" onchange="App.setVacationEnd(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">Başlangıç</label><input type="date" value="'+esc(v.startAt)+'" onchange="App.setVacationStart(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='<div style="flex:1;display:flex;flex-direction:column;gap:4px;"><label style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">Bitiş</label><input type="date" value="'+esc(v.endAt)+'" onchange="App.setVacationEnd(this.value)" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);"></div>';
     h+='</div>';
     h+='<div style="display:flex;gap:8px;">';
-    for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:12.5px;font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
+    for(var i=0;i<presets.length;i++){ var p=presets[i],sel=v.preset===p.id; h+='<button onclick="App.setVacationPreset(\''+p.id+'\')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:none;cursor:pointer;border-radius:12px;padding:10px 6px;font-size:var(--f-footnote);font-weight:700;color:'+(sel?'#fff':'var(--text2)')+';background:'+(sel?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';border:1px solid '+(sel?hexA(accentHex,0.4):'var(--field-bd)')+';" data-preset="'+p.id+'">'+icon(p.icon,14)+p.label+'</button>'; }
     h+='</div>';
-    h+='<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:11px;font-weight:700;color:var(--faint);">Nereye / not</label><input type="text" value="'+esc(v.reason)+'" oninput="App.setVacationReason(this.value)" placeholder="örn. Bodrum, aile tatili" maxlength="80" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;outline:none;color:var(--text);"></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:4px;"><label style="font-size:var(--f-caption2);font-weight:700;color:var(--faint);">Nereye / not</label><input type="text" value="'+esc(v.reason)+'" oninput="App.setVacationReason(this.value)" placeholder="örn. Bodrum, aile tatili" maxlength="80" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);"></div>';
     var vacInfoAccent='var(--vacation)';
     var sleepG=String(sleepGoalHours(activeDate())).replace('.',',');
     var stepG=stepsGoal(activeDate()).toLocaleString('tr-TR');
-    h+='<div style="font-size:12px;color:var(--text2);line-height:1.55;background:var(--icon);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px;">';
+    h+='<div style="font-size:var(--f-caption1);color:var(--text2);line-height:1.55;background:var(--icon);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px;">';
     h+='<div style="font-weight:800;color:'+vacInfoAccent+';display:flex;align-items:center;gap:6px;">'+icon('info',13)+' Tatilde neler esnetildi?</div>';
     h+='<div>'+icon('droplet',13)+' Su hedefi <b>'+VACATION_WATER_GOAL+' bardak</b> · seri sayacı duraklar</div>';
     h+='<div>'+icon('coffee',13)+' Kafein limiti %25 yukarı · Standart 400→500 mg</div>';
     h+='<div>'+icon('bed',13)+' Uyku hedefi <b>'+sleepG+' saat</b></div>';
     h+='<div>'+icon('footprints',13)+' Adım hedefi <b>'+stepG+' adım</b></div>';
     h+='<div>'+icon('heart-handshake',13)+' Kriz odası butonları dinleniyor</div>';
-    h+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">💡 Yatmadan 6 saat önce son kafein tavsiyesi hâlâ geçerli.</div>';
+    h+='<div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">💡 Yatmadan 6 saat önce son kafein tavsiyesi hâlâ geçerli.</div>';
     h+='</div>';
     h+='</div>';
   }
@@ -10925,10 +10925,10 @@ function motivationComingSoonCardHTML(){
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('clock',19)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
-  h+='<div style="font-size:15.5px;font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
-  h+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
+  h+='<div style="font-size:var(--f-callout);font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
   h+='</div></div>';
-  h+='<div style="font-size:13px;line-height:1.4;color:var(--muted);">13 Temmuz sabahı, <b style="color:var(--text);">1. gün</b>le birlikte açılıyor.</div>';
+  h+='<div style="font-size:var(--f-footnote);line-height:1.4;color:var(--muted);">13 Temmuz sabahı, <b style="color:var(--text);">1. gün</b>le birlikte açılıyor.</div>';
   h+='</div>';
   return h;
 }
@@ -10949,19 +10949,19 @@ function motivationTodayCardHTML(){
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+pu+';background:color-mix(in srgb,'+pu+' 15%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('compass',19)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
-  h+='<div style="font-size:15.5px;font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
-  h+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
+  h+='<div style="font-size:var(--f-callout);font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
   h+='</div>';
-  if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
-  h+='<span style="color:'+pu+';font-size:20px;font-weight:700;line-height:1;flex-shrink:0;">›</span>';
+  if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:var(--f-caption2);font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
+  h+='<span style="color:'+pu+';font-size:var(--f-title3);font-weight:700;line-height:1;flex-shrink:0;">›</span>';
   h+='</div>';
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
   h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<div style="flex:1;min-width:0;font-size:13px;line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
-  h+='<div style="flex-shrink:0;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
+  h+='<div style="flex:1;min-width:0;font-size:var(--f-footnote);line-height:1.35;"><b style="color:var(--text);font-weight:800;">'+esc(motDayText)+'</b><span style="color:var(--muted);font-weight:700;"> · '+esc(mot.phaseTitle)+' · '+esc(mot.domainLabel)+'</span></div>';
+  h+='<div style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
   h+='</div>';
   h+='<div style="height:6px;border-radius:999px;background:var(--icon);overflow:hidden;position:relative;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
-  h+='<div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
+  h+='<div style="text-align:center;font-size:var(--f-caption2);font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
   h+='</button>';
   return h;
 }
@@ -11791,22 +11791,22 @@ function hubTilesHTML(){
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.35) 50%,transparent 70%);animation:seyShimmer 2.8s linear infinite;"></span>';
   h+=icon('sparkles',21);
   h+='</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:17px;font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · İzledim · Dinledim · Öğrendim · Pratik</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-body);font-weight:800;line-height:1.15;color:var(--text);">Zihnimi Besledim</div><div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">Okudum · İzledim · Dinledim · Öğrendim · Pratik</div></div>';
   h+='</div>';
   // alt başlık satırı: bugün X/5 + durum chip
   var chip=allFed
-    ? '<span style="flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Bugün beslendim</span>'
-    : '<span style="flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
+    ? '<span style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Bugün beslendim</span>'
+    : '<span style="flex-shrink:0;font-size:var(--f-caption2);font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
-  h+='<span style="font-size:11px;font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
-  h+='<button onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
+  h+='<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
+  h+='<button onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:var(--f-caption2);font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
   h+=chip;
   h+='</div>';
   // 5 kategori butonu: 3+2 grid (mobilde otomatik wrap)
   h+='<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;">';
   cats.forEach(function(c){
     var done=c.n>0;
-    var badge=done?'<span style="position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;background:'+c.col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.28)')+';z-index:2;">'+(c.n>1?c.n:icon('check',10))+'</span>':'';
+    var badge=done?'<span style="position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:var(--f-caption2);font-weight:800;color:#fff;background:'+c.col+';box-shadow:'+(dark?'none':'0 2px 6px rgba(108,74,58,0.28)')+';z-index:2;">'+(c.n>1?c.n:icon('check',10))+'</span>':'';
     var surface=dark?'color-mix(in srgb,'+c.col+' '+(done?'18':'10')+'%, #0B0B0E)':c.bg;
     var borderOp=done?'58':(dark?'30':'22');
     var sh=done?'0 8px 20px color-mix(in srgb,'+c.col+' 28%, transparent)':(dark?'none':'0 4px 12px rgba(108,74,58,0.06)');
@@ -11814,7 +11814,7 @@ function hubTilesHTML(){
     h+='<button onclick="'+click+'" style="position:relative;min-width:0;cursor:pointer;padding:12px 3px 10px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px;background:'+surface+';border:1.5px solid color-mix(in srgb,'+c.col+' '+borderOp+'%, transparent);box-shadow:'+sh+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">';
     h+=badge;
     h+='<span style="width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:'+c.col+';background:color-mix(in srgb,'+c.col+' '+(dark?'16':'19')+'%, transparent);box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.35)')+';">'+icon(c.icon,17)+'</span>';
-    h+='<span style="font-size:11px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+(done?c.col:'var(--muted)')+';">'+c.label+'</span>';
+    h+='<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+(done?c.col:'var(--muted)')+';">'+c.label+'</span>';
     h+='</button>';
   });
   h+='</div>';
@@ -11827,8 +11827,8 @@ function rasitBubbleHTML(curIdx){
   var h='<button type="button" class="sey-asbtn" onclick="App.cycleRasit()" aria-label="Raşit\'in sözü — dokun, değişsin" style="cursor:pointer;display:flex;align-items:flex-start;gap:11px;">';
   h+='<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 6px 16px var(--room-glow);">'+icon('heart',20)+'</div>';
   h+='<div class="surface" style="position:relative;flex:1;min-width:0;border-radius:6px 20px 20px 20px;padding:12px 15px;border:1px solid color-mix(in srgb,var(--room) 28%, var(--card-bd));box-shadow:0 8px 22px var(--room-glow);">';
-  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:12px;">🦩</span><span style="margin-left:auto;font-size:11px;color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
-  h+='<div id="sey-rasit-note" style="font-size:14.5px;line-height:1.5;color:var(--text2);transition:opacity .18s ease;">'+esc(NOTES[rasitNoteIdx(curIdx)])+'</div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:var(--f-caption1);">🦩</span><span style="margin-left:auto;font-size:var(--f-caption2);color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
+  h+='<div id="sey-rasit-note" style="font-size:var(--f-subhead);line-height:1.5;color:var(--text2);transition:opacity .18s ease;">'+esc(NOTES[rasitNoteIdx(curIdx)])+'</div>';
   h+='</div></button>';
   return h;
 }
@@ -11841,8 +11841,8 @@ function heroStatTile(ic,val,label,accent,met){
   var filled=(val!=='—');
   return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:15px;background:'+bg+';border:1px solid '+(met?'rgba(143,191,138,0.34)':'transparent')+';">'
     +'<span style="display:inline-flex;color:'+(filled?col:'var(--faint)')+';">'+icon(ic,15)+'</span>'
-    +'<span style="font-size:13px;font-weight:800;line-height:1.05;color:'+(filled?'var(--text)':'var(--faint)')+';white-space:nowrap;">'+val+'</span>'
-    +'<span style="font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
+    +'<span style="font-size:var(--f-footnote);font-weight:800;line-height:1.05;color:'+(filled?'var(--text)':'var(--faint)')+';white-space:nowrap;">'+val+'</span>'
+    +'<span style="font-size:var(--f-caption2);font-weight:700;letter-spacing:.3px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>';
 }
 function heroStatsHTML(rec){
   var mo=(rec&&rec.mood)?find(MOODS,'id',rec.mood):null;
@@ -11878,7 +11878,7 @@ function heroTargetsHTML(rec){
     var r=18, c=Math.round(2*Math.PI*r*100)/100;
     var off=Math.round(c*(1-pct/100)*100)/100;
     var col=met?'#3F8A4F':accent;
-    var curTxt=has?('<span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:11px;color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):('<span style="font-size:15px;font-weight:800;color:var(--faint);">—</span>');
+    var curTxt=has?('<span style="font-size:var(--f-subhead);font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:var(--f-caption2);color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):('<span style="font-size:var(--f-subhead);font-weight:800;color:var(--faint);">—</span>');
     var grad='linear-gradient(180deg,'+accent+'22 0%,'+accent+'08 100%)';
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 2px 10px;border-radius:20px;background:'+grad+';border:1px solid '+accent+'33;box-shadow:0 4px 14px '+accent+'1A;">'
       +'<div style="position:relative;width:52px;height:52px;filter:drop-shadow(0 2px 4px '+accent+'26);">'
@@ -11890,21 +11890,21 @@ function heroTargetsHTML(rec){
       +'<span style="display:inline-flex;color:'+col+';">'+icon(icName,icSize||13)+'</span>'
       +'</div></div>'
       +'<div style="display:flex;align-items:baseline;gap:2px;line-height:1;white-space:nowrap;">'+curTxt+'</div>'
-      +'<span style="font-size:11px;font-weight:800;letter-spacing:.35px;color:var(--faint);text-transform:uppercase;">'+label+'</span>'
+      +'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.35px;color:var(--faint);text-transform:uppercase;">'+label+'</span>'
       +'</div>';
   };
 
   var header='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">'
-    +'<span style="font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--faint);text-transform:uppercase;">Hedeflerim</span>'
-    +'<span style="font-size:11px;font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
+    +'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:1.2px;color:var(--faint);text-transform:uppercase;">Hedeflerim</span>'
+    +'<span style="font-size:var(--f-caption2);font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
   var h='<div style="display:flex;flex-direction:column;gap:7px;">';
   h+=header;
   if(isVacationDay(activeDate())){
     h+='<div style="display:flex;flex-direction:column;gap:8px;background:var(--icon);border:1px solid var(--vacation);border-radius:18px;padding:13px 12px;">';
-    h+='<div style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:var(--vacation);">'+icon('sun',14)+' Tatil modunda beslenme hedefleri esnetildi</div>';
-    h+='<div style="font-size:12px;color:var(--text2);line-height:1.5;">Bugün yemekleri <b>keyif notu</b> olarak kaydetmek yeterli; kalori/protein/karbonhidrat halkaları dinleniyor.</div>';
+    h+='<div style="display:flex;align-items:center;gap:7px;font-size:var(--f-caption1);font-weight:800;color:var(--vacation);">'+icon('sun',14)+' Tatil modunda beslenme hedefleri esnetildi</div>';
+    h+='<div style="font-size:var(--f-caption1);color:var(--text2);line-height:1.5;">Bugün yemekleri <b>keyif notu</b> olarak kaydetmek yeterli; kalori/protein/karbonhidrat halkaları dinleniyor.</div>';
     if(nu.calories>0||nu.protein>0||nu.carbs>0){
-      h+='<div style="display:flex;gap:10px;font-size:11px;color:var(--muted);">';
+      h+='<div style="display:flex;gap:10px;font-size:var(--f-caption2);color:var(--muted);">';
       if(nu.calories>0) h+='<span>'+Math.round(nu.calories)+' kcal</span>';
       if(nu.protein>0) h+='<span>'+Math.round(nu.protein)+' g protein</span>';
       if(nu.carbs>0) h+='<span>'+Math.round(nu.carbs)+' g karb</span>';
@@ -11934,15 +11934,15 @@ function heroPremiumStatsHTML(viewDate){
   // mod eğilimi (son 7 gün, eski → yeni)
   var moodDots='';
   for(var j=6;j>=0;j--){ var dd=addDays(viewDate,-j); if(diffDays(data.startDate,dd)<0) continue; var r=data.days[dd]; var m=r&&r.mood?r.mood:null; if(m){ var moo=find(MOODS,'id',m); moodDots+='<span style="display:inline-flex;color:var(--accent-ink);">'+icon(moo?moo.icon:'circle',13)+'</span>'; } else { moodDots+='<span style="width:6px;height:6px;border-radius:50%;background:var(--field-bd);display:inline-block;"></span>'; } }
-  if(!moodDots) moodDots='<span style="font-size:12px;color:var(--faint);">—</span>';
+  if(!moodDots) moodDots='<span style="font-size:var(--f-caption1);color:var(--faint);">—</span>';
   // son 14 günün tik başarımı → en güçlü / destek isteyen
   var win=14,stt={};
   for(var k=0;k<win;k++){ var d2=addDays(viewDate,-k); if(diffDays(data.startDate,d2)<0) break; var r2=data.days[d2]; HABITS.forEach(function(hb){ if(hb.since&&d2<hb.since) return; if(!stt[hb.key]) stt[hb.key]={done:0,act:0,icon:hb.icon}; stt[hb.key].act++; if(r2&&r2.habits&&r2.habits[hb.key]) stt[hb.key].done++; }); }
   var best=null,worst=null;
   for(var key in stt){ var s=stt[key]; if(s.act<1) continue; var rate=s.done/s.act; if(best===null||rate>best.rate||(rate===best.rate&&s.done>best.done)) best={key:key,rate:rate,done:s.done,icon:s.icon}; if(worst===null||rate<worst.rate||(rate===worst.rate&&s.done<worst.done)) worst={key:key,rate:rate,done:s.done,icon:s.icon}; }
   var cell=function(ic,val,label,col){ return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;">'
-    +'<div style="display:flex;align-items:center;gap:4px;color:'+(col||'var(--text)')+';">'+(ic?'<span style="display:inline-flex;color:'+(col||'var(--muted)')+';">'+ic+'</span>':'')+'<span style="font-size:16px;font-weight:800;line-height:1;color:var(--text);white-space:nowrap;">'+val+'</span></div>'
-    +'<span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>'; };
+    +'<div style="display:flex;align-items:center;gap:4px;color:'+(col||'var(--text)')+';">'+(ic?'<span style="display:inline-flex;color:'+(col||'var(--muted)')+';">'+ic+'</span>':'')+'<span style="font-size:var(--f-callout);font-weight:800;line-height:1;color:var(--text);white-space:nowrap;">'+val+'</span></div>'
+    +'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">'+label+'</span></div>'; };
   var vline='<span style="width:1px;align-self:stretch;background:var(--card-bd);margin:2px 0;"></span>';
   var h='<div style="background:var(--icon);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;">';
@@ -11950,10 +11950,10 @@ function heroPremiumStatsHTML(viewDate){
   h+=vline;
   h+=cell(null,'%'+wpct,'7 Günlük ritim');
   h+=vline;
-  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="sey-tiny-hit" style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
+  h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="sey-tiny-hit" style="display:flex;align-items:center;gap:3px;min-height:16px;">'+moodDots+'</div><span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">Mod · 7 gün</span></div>';
   h+='</div>';
   if(best&&worst&&best.key!==worst.key){
-    h+='<div style="display:flex;gap:8px;border-top:1px solid var(--card-bd);padding-top:9px;font-size:11px;">';
+    h+='<div style="display:flex;gap:8px;border-top:1px solid var(--card-bd);padding-top:9px;font-size:var(--f-caption2);">';
     h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:#3F8A4F;flex-shrink:0;">'+best.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[best.key]||best.key)+'</b> en güçlü <span style="color:#3F8A4F;font-weight:800;">%'+Math.round(best.rate*100)+'</span></span></div>';
     h+='<div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);"><span style="display:inline-flex;color:var(--accent-ink);flex-shrink:0;">'+worst.icon+'</span><span style="min-width:0;"><b style="color:var(--text);font-weight:800;">'+esc(SHORT_HABIT[worst.key]||worst.key)+'</b>\'e destek <span style="color:var(--accent-ink);font-weight:800;">%'+Math.round(worst.rate*100)+'</span></span></div>';
     h+='</div>';
@@ -11993,7 +11993,7 @@ function heroScienceLine(rec){
   else txt='Küçük ve tutarlı adımlar, güçlü iradeden daha kalıcıdır — beyin (nöroplastisite) böyle öğrenir.';
   return '<div style="display:flex;align-items:flex-start;gap:8px;">'
     +'<span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',14)+'</span>'
-    +'<span style="font-size:11.5px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>';
+    +'<span style="font-size:var(--f-caption1);line-height:1.5;color:var(--muted);">'+txt+'</span></div>';
 }
 // Sayfalar arası tutarlı bilimsel mikro-bilgi rozeti (Rapor/Sağlık/Takvim vb.).
 function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:11px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
@@ -12006,7 +12006,7 @@ function rasitActionsHTML(){
     return '<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;border:1px solid color-mix(in srgb,'+vacAccent+' 28%, var(--card-bd));box-shadow:0 12px 30px color-mix(in srgb,'+vacAccent+' 14%, transparent);">'
       +'<div style="display:flex;align-items:center;gap:11px;">'
       +'<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--vacation2),var(--vacation));box-shadow:0 6px 16px var(--vacation-glow);">'+icon('heart-handshake',19)+'</span>'
-      +'<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Tatil modunda kriz odası dinleniyor <span style="font-size:14px;">🦩</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit şu an uzakta; keyfini çıkar, bir şeyler sarpa sarılırsa yarın tekrar burada olur.</div></div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Tatil modunda kriz odası dinleniyor <span style="font-size:var(--f-subhead);">🦩</span></div><div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">Raşit şu an uzakta; keyfini çıkar, bir şeyler sarpa sarılırsa yarın tekrar burada olur.</div></div>'
       +'</div></div>';
   }
   var day=(data&&data.days)?data.days[todayStr()]:null;
@@ -12019,13 +12019,13 @@ function rasitActionsHTML(){
       +darkLine
       +badge
       +'<span style="width:38px;height:38px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;color:'+(dark?C.accent2:'#fff')+';background:'+(dark?'color-mix(in srgb,'+C.accent+' 13%, rgba(255,255,255,.035))':'rgba(255,255,255,0.22)')+';border:'+(dark?'1px solid color-mix(in srgb,'+C.accent+' 24%, transparent)':'none')+';box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.4)')+';">'+icon(C.icon,19)+'</span>'
-      +'<span style="font-size:12.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;">'+C.short+'</span>'
-      +'<span style="font-size:11px;font-weight:800;letter-spacing:.4px;color:'+(dark?C.accent2:'currentColor')+';opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
+      +'<span style="font-size:var(--f-footnote);font-weight:800;letter-spacing:.1px;white-space:nowrap;">'+C.short+'</span>'
+      +'<span style="font-size:var(--f-caption2);font-weight:800;letter-spacing:.4px;color:'+(dark?C.accent2:'currentColor')+';opacity:.92;text-transform:uppercase;">'+(done?'yönetildi ✓':'kriz odası')+'</span></button>';
   };
   var h='<div class="surface"'+(dark?' data-dark-variant="crisis"':'')+' style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:13px;'+(dark?'background:linear-gradient(145deg,#121013,#0B0B0D);':'')+'border:1px solid color-mix(in srgb,#E9899F '+(dark?'34':'26')+'%, var(--card-bd));box-shadow:'+(dark?'none':'0 12px 30px rgba(233,137,159,0.16)')+';">';
   h+='<div style="display:flex;align-items:center;gap:11px;">';
   h+='<span style="width:38px;height:38px;border-radius:13px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(dark?'linear-gradient(135deg,#9B5870,#68577E)':'linear-gradient(135deg,#E9899F,#C9B8FF)')+';box-shadow:'+(dark?'none':'0 6px 16px rgba(233,137,159,0.4)')+';">'+icon('heart-handshake',19)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Kriz mi geldi? Raşit yetişiyor <span style="font-size:14px;">🦩</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Süreli, bilimsel bir odaya gir — bastırma, yönet.</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:800;line-height:1.15;color:var(--text);display:flex;align-items:center;gap:6px;">Kriz mi geldi? Raşit yetişiyor <span style="font-size:var(--f-subhead);">🦩</span></div><div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">Süreli, bilimsel bir odaya gir — bastırma, yönet.</div></div>';
   h+='</div>';
   h+='<div style="display:flex;gap:9px;">'+tile('sweet')+tile('food')+tile('coffee')+'</div>';
   h+='</div>';
@@ -12036,7 +12036,7 @@ function rasitContactHTML(){
   var btn=function(href,attr,ic,label,sub){
     return '<a href="'+href+'"'+attr+' style="text-decoration:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--room) 14%, var(--card)),color-mix(in srgb,var(--room) 6%, var(--card)));border:1px solid color-mix(in srgb,var(--room) 34%, var(--card-bd));box-shadow:0 8px 20px color-mix(in srgb,var(--room) 16%, transparent);color:var(--room);">'
       +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 4px 12px var(--room-glow);">'+icon(ic,17)+'</span>'
-      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:11px;font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
+      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:var(--f-subhead);font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:var(--f-caption2);font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
   };
   var h='<div style="display:flex;gap:9px;margin-top:-4px;">';
   h+=btn(WA,' target="_blank" rel="noopener"','send-horizontal','Raşit\'e yaz','WhatsApp\'tan mesaj');
@@ -12058,7 +12058,7 @@ function dailyPhotoCardHTML(){
   h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
   h+='<div style="display:flex;align-items:center;gap:9px;">';
   h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' '+(dark?'16':'18')+'%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,'+(dark?'0.08':'0.45')+');">'+icon('camera',17)+'</span>';
-  h+='<div><div style="font-size:12px;font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:11px;color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
+  h+='<div><div style="font-size:var(--f-caption1);font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:var(--f-caption2);color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;gap:4px;">';
   h+='<button onclick="event.stopPropagation();App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
@@ -12072,19 +12072,19 @@ function dailyPhotoCardHTML(){
      h+='<img src="'+esc(p.url)+'" alt="'+esc(p.title||'Günün fotoğrafı')+'" loading="eager" onload="this.style.opacity=1" style="display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;">';
      h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.28) 40%,transparent 70%);pointer-events:none;"></div>';
      h+='<div style="position:absolute;left:0;right:0;bottom:0;padding:14px 14px 12px;color:#fff;">';
-     if(p.title) h+='<div style="font-size:15px;font-weight:800;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.45);">'+esc(p.title)+'</div>';
+     if(p.title) h+='<div style="font-size:var(--f-subhead);font-weight:800;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.45);">'+esc(p.title)+'</div>';
      var meta=[];
      if(p.artist) meta.push('© '+esc(p.artist));
      if(p.license) meta.push(esc(p.license));
-     if(meta.length) h+='<div style="margin-top:5px;font-size:11px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
+     if(meta.length) h+='<div style="margin-top:5px;font-size:var(--f-caption2);font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
      h+='</div>';
      if(p.pageUrl){
-       h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
+       h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:var(--f-caption2);font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
      }
     }else{
      h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
      h+='<span style="opacity:.7;">'+icon('image',40)+'</span>';
-     h+='<div style="font-size:13px;font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
+     h+='<div style="font-size:var(--f-footnote);font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
      h+='</div>';
     }
     h+='</div>';
@@ -12097,8 +12097,8 @@ function dailyPhotoCardHTML(){
       h+='<div style="width:52px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;background:'+(dark?'#0F0D0E':'#EDE5DB')+';display:flex;align-items:center;justify-content:center;color:'+muted+';">'+icon('image',20)+'</div>';
     }
     h+='<div style="flex:1;min-width:0;">';
-    if(p.title) h+='<div style="font-size:13px;font-weight:800;color:'+(dark?'#F7F0E8':'#5A3A26')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.title)+'</div>';
-    h+='<div style="font-size:11px;color:'+muted+';font-weight:600;">Dokun, açalım · '+(p.source||'Wikimedia Commons')+'</div>';
+    if(p.title) h+='<div style="font-size:var(--f-footnote);font-weight:800;color:'+(dark?'#F7F0E8':'#5A3A26')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.title)+'</div>';
+    h+='<div style="font-size:var(--f-caption2);color:'+muted+';font-weight:600;">Dokun, açalım · '+(p.source||'Wikimedia Commons')+'</div>';
     h+='</div>';
     h+='<span style="color:'+accent+';">'+icon('chevron-down',14)+'</span>';
     h+='</div>';
@@ -12141,13 +12141,13 @@ function bugunHTML(){
   // ── HERO: bugünün canlı özeti (dashboard) · niyet vurgulu ──
   h+='<div class="surface" style="border-radius:26px;padding:18px;box-shadow:0 10px 28px rgba(108,74,58,0.08);display:flex;flex-direction:column;gap:15px;">';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-  h+='<div><div style="font-size:13px;letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:14px;color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
+  h+='<div><div style="font-size:var(--f-footnote);letter-spacing:1px;color:var(--faint);font-weight:700;">ŞEYMA 🦩</div><div style="font-size:var(--f-subhead);color:var(--muted);margin-top:3px;">'+(ed?esc(dateLabelTR(viewDate)):'Minik Denge Günlüğü')+'</div></div>';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
-  h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:13px;padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
+  h+='<div style="background:rgba(201,184,255,0.28);color:var(--choc);font-weight:700;font-size:var(--f-footnote);padding:7px 13px;border-radius:999px;white-space:nowrap;display:flex;align-items:center;gap:5px;">Gün '+curIdx+(!ed&&streak>1?('<span style="display:inline-flex;align-items:center;gap:2px;">'+icon('flame',13)+streak+'</span>'):'')+'</div></div></div>';
   h+='<div style="display:flex;align-items:center;gap:18px;">';
   h+='<div style="position:relative;width:96px;height:96px;flex-shrink:0;"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="42" fill="none" stroke="rgba(150,110,120,0.18)" stroke-width="9"></circle><circle cx="48" cy="48" r="42" fill="none" stroke="#E9AFC1" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .6s ease"></circle></svg>';
-  h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:25px;font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:11px;color:var(--faint);margin-top:2px;">'+(ed?'o gün':'bugün')+'</div></div></div>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:19px;font-weight:800;line-height:1.25;">'+esc(badge)+'</div><div style="font-size:12px;color:var(--muted);margin-top:5px;font-weight:600;">'+completed+'/'+ht+' tik bugün</div></div></div>';
+  h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:var(--f-title1);font-weight:800;line-height:1;">'+pct+'%</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:2px;">'+(ed?'o gün':'bugün')+'</div></div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);color:var(--faint);margin-bottom:6px;">'+(ed?'O günün havası':'Bugünün havası')+'</div><div style="font-size:var(--f-title3);font-weight:800;line-height:1.25;">'+esc(badge)+'</div><div style="font-size:var(--f-caption1);color:var(--muted);margin-top:5px;font-weight:600;">'+completed+'/'+ht+' tik bugün</div></div></div>';
   // premium istatistik şeridi (seri · 7 günlük ritim · mod eğilimi · en güçlü/zayıf tik)
   h+=heroPremiumStatsHTML(viewDate);
   // bugünkü girdi özeti (Mod · Su · Uyku · Adım)
@@ -12157,8 +12157,8 @@ function bugunHTML(){
   // ── Niyet + bilimsel mikro-bilgi — hafif, üstten ayraçlı (fazla çerçeve yok) ──
   h+='<div style="border-top:1px solid var(--card-bd);padding-top:13px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;flex-direction:column;gap:7px;">';
-  h+='<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',15)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">'+(ed?'O GÜNÜN NİYETİ':'BUGÜNÜN NİYETİ')+'</span></div>';
-  h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="'+(ed?'O günün niyeti…':'örn. Bugün kendime nazik olacağım')+'" maxlength="140" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px 13px;font-size:15px;font-weight:700;outline:none;color:var(--text);">';
+  h+='<div style="display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',15)+'</span><span style="font-size:var(--f-caption1);font-weight:800;letter-spacing:1px;color:var(--accent-ink);">'+(ed?'O GÜNÜN NİYETİ':'BUGÜNÜN NİYETİ')+'</span></div>';
+  h+='<input type="text" value="'+esc(rec&&rec.intention?rec.intention:'')+'" oninput="App.onIntention(this)" placeholder="'+(ed?'O günün niyeti…':'örn. Bugün kendime nazik olacağım')+'" maxlength="140" style="width:100%;box-sizing:border-box;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px 13px;font-size:var(--f-subhead);font-weight:700;outline:none;color:var(--text);">';
   h+='</div>';
   h+=heroScienceLine(rec);
   h+='</div>';
@@ -12189,8 +12189,8 @@ function bugunHTML(){
   if(!window.MotivationProgramV2){
     h+='<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#FFE19A,#FFC9A3 55%,#F7B7C9);border-radius:24px;padding:22px 22px 20px;box-shadow:0 12px 28px rgba(255,180,140,0.32);">';
     h+='<div style="position:absolute;top:-26px;right:10px;font-size:130px;line-height:1;font-weight:800;color:#fff;opacity:0.22;">\u201d</div>';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="display:inline-flex;">'+icon('sun',16)+'</span><span style="font-size:11.5px;letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
-    h+='<div style="position:relative;font-size:19px;font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[(curIdx-1)%DAILY.length])+'</div></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;position:relative;"><span style="display:inline-flex;">'+icon('sun',16)+'</span><span style="font-size:var(--f-caption1);letter-spacing:1.5px;font-weight:800;color:#9A5A3C;">GÜNÜN MESAJI</span></div>';
+    h+='<div style="position:relative;font-size:var(--f-title3);font-weight:800;line-height:1.36;color:#5A2E2A;">'+esc(DAILY[(curIdx-1)%DAILY.length])+'</div></div>';
   }
 
   // günün niyeti artık hero kartının içinde (yukarıda).
@@ -12218,7 +12218,7 @@ function bugunHTML(){
 
   // dağıldı
   if(!ed) h+=onThisDayCard();
-  if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:15px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;">Bugün biraz dağıldı '+icon('heart-handshake',15)+'</button>';
+  if(!ed) h+='<button onclick="App.openEmergency()" style="border:1px dashed rgba(150,110,120,0.3);background:var(--card);cursor:pointer;width:100%;padding:14px;border-radius:18px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;">Bugün biraz dağıldı '+icon('heart-handshake',15)+'</button>';
   h+='</div>';
   return h;
 }
@@ -12641,9 +12641,9 @@ function haritaHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   h+=sciNote('Tutarlılık, mükemmellikten güçlüdür: aralıklı ama sürekli tekrar (spaced repetition), davranışı kalıcı kılan sinaptik pekişmeyi besler. Boş günler bir kusur değil, ritmin parçasıdır.');
   h+='<div class="surface" style="border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><button onclick="App.calMove(-1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:18px;">‹</button><div style="font-size:16px;font-weight:800;">'+monthNames[M-1]+' '+Y+'</div><button onclick="App.calMove(1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:18px;">›</button></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;"><button onclick="App.calMove(-1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:var(--f-headline);">‹</button><div style="font-size:var(--f-callout);font-weight:800;">'+monthNames[M-1]+' '+Y+'</div><button onclick="App.calMove(1)" style="border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;background:var(--icon);color:var(--text);font-size:var(--f-headline);">›</button></div>';
   h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;">';
-  ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(function(d){ h+='<div style="text-align:center;font-size:11px;font-weight:700;color:var(--faint);">'+d+'</div>'; });
+  ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(function(d){ h+='<div style="text-align:center;font-size:var(--f-caption2);font-weight:700;color:var(--faint);">'+d+'</div>'; });
   for(var b=0;b<firstDow;b++){ h+='<div></div>'; }
   for(var dnum=1;dnum<=daysInMonth;dnum++){
     var date=Y+'-'+pad(M)+'-'+pad(dnum);
@@ -12656,12 +12656,12 @@ function haritaHTML(){
     else if(cnt>0) tint=dark?'rgba(201,184,255,0.12)':'rgba(247,221,229,0.32)';
     var clickable=!future;
     h+='<button '+(clickable?'onclick="App.openDate(\''+date+'\')"':'')+' style="position:relative;aspect-ratio:1;border-radius:12px;border:1px solid var(--card-bd);background:'+tint+';color:var(--text);cursor:'+(clickable?'pointer':'default')+';opacity:'+((future||before)?'0.4':'1')+';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;'+(isToday?'box-shadow:0 0 0 2px #E9AFC1;':'')+'">';
-    h+='<div style="font-size:12.5px;font-weight:700;line-height:1;">'+dnum+'</div>';
-    h+='<div style="font-size:12px;height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:11px;color:var(--muted);font-weight:700;">'+cnt+'/'+htc+'</span>':''))+'</div>';
+    h+='<div style="font-size:var(--f-footnote);font-weight:700;line-height:1;">'+dnum+'</div>';
+    h+='<div style="font-size:var(--f-caption1);height:14px;line-height:1;">'+(moodE||(cnt>0?'<span style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">'+cnt+'/'+htc+'</span>':''))+'</div>';
     h+='</button>';
   }
   h+='</div>';
-  h+='<div style="display:flex;gap:13px;justify-content:center;font-size:11px;color:var(--faint);flex-wrap:wrap;padding-top:2px;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid var(--card-bd);"></span> tam gün</span><span style="display:inline-flex;align-items:center;gap:4px;">'+icon('flower-2',12)+' güçlü</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #E9AFC1;"></span> bugün çerçeveli</span></div>';
+  h+='<div style="display:flex;gap:13px;justify-content:center;font-size:var(--f-caption2);color:var(--faint);flex-wrap:wrap;padding-top:2px;"><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid var(--card-bd);"></span> tam gün</span><span style="display:inline-flex;align-items:center;gap:4px;">'+icon('flower-2',12)+' güçlü</span><span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #E9AFC1;"></span> bugün çerçeveli</span></div>';
   h+='</div>';
   // ay özeti
   var isCurMonth=(ui.calMonth===today.slice(0,7));
@@ -12672,14 +12672,14 @@ function haritaHTML(){
   var bStreak=bestStreak(mrecs.slice().sort(function(a,b){return a.date<b.date?-1:1;}));
   var md=moodDist(mrecs);
   h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:15.5px;font-weight:700;">'+monthNames[M-1]+' özeti</div>'+(isCurMonth?'':'<button onclick="App.calToday()" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">Bugüne git '+icon('sun',13)+'</button>')+'</div>';
-  if(recCount===0){ h+='<div style="font-size:13px;color:var(--faint);line-height:1.5;">Bu ayda henüz kayıt yok. Bir güne dokunup “Bu günü düzenle” ile geçmişe de ekleyebilirsin.</div>'; }
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:var(--f-callout);font-weight:700;">'+monthNames[M-1]+' özeti</div>'+(isCurMonth?'':'<button onclick="App.calToday()" style="border:1px solid var(--field-bd);cursor:pointer;background:var(--card);color:var(--text2);font-weight:700;font-size:var(--f-caption1);padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">Bugüne git '+icon('sun',13)+'</button>')+'</div>';
+  if(recCount===0){ h+='<div style="font-size:var(--f-footnote);color:var(--faint);line-height:1.5;">Bu ayda henüz kayıt yok. Bir güne dokunup “Bu günü düzenle” ile geçmişe de ekleyebilirsin.</div>'; }
   else {
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
     var cells=[['Kayıtlı gün',recCount+' / '+daysInMonth],['Ortalama tik',avgPct+'%'],['En iyi seri',bStreak+' gün']];
-    cells.forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 10px;text-align:center;"><div style="font-size:11px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:17px;font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
+    cells.forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 10px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:var(--f-body);font-weight:800;margin-top:3px;">'+c[1]+'</div></div>'; });
     h+='</div>';
-    var moodKeys=Object.keys(md); if(moodKeys.length){ h+='<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;"><span style="font-size:11.5px;color:var(--faint);">Mod dağılımı:</span>'; MOODS.forEach(function(m){ if(md[m.id]) h+='<span style="font-size:12.5px;background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+md[m.id]+'</span>'; }); h+='</div>'; }
+    var moodKeys=Object.keys(md); if(moodKeys.length){ h+='<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;"><span style="font-size:var(--f-caption1);color:var(--faint);">Mod dağılımı:</span>'; MOODS.forEach(function(m){ if(md[m.id]) h+='<span style="font-size:var(--f-footnote);background:var(--card);border:1px solid var(--card-bd);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+md[m.id]+'</span>'; }); h+='</div>'; }
     // ── Teknik detay: haftanın en tutarlı günü · geçen aya göre · faz ilerlemesi ──
     var wdSum=[0,0,0,0,0,0,0], wdMax=[0,0,0,0,0,0,0];
     mrecs.forEach(function(o){ var p=o.date.split('-').map(Number); var wd=(new Date(p[0],p[1]-1,p[2]).getDay()+6)%7; wdSum[wd]+=countRec(o.rec); wdMax[wd]+=habitCountOn(o.date); });
@@ -12694,11 +12694,11 @@ function haritaHTML(){
     if(window.MotivationProgramV2 && featuresLive()){ var _ms=window.MotivationProgramV2.progressSummary(data); detail.push([icon('compass',15),'İçsel Pusula','Gün '+_ms.currentProgramDay+'/'+_ms.totalDays+' · %'+_ms.percent,'#6E5FCB']); }
     if(detail.length){
       h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
-      detail.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;display:flex;justify-content:center;color:'+r[3]+';">'+r[0]+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+r[1]+'</span><span style="font-size:13.5px;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
+      detail.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;display:flex;justify-content:center;color:'+r[3]+';">'+r[0]+'</span><span style="flex:1;font-size:var(--f-footnote);color:var(--text2);">'+r[1]+'</span><span style="font-size:var(--f-footnote);color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
       h+='</div>';
     }
   }
-  h+='<div style="font-size:11.5px;color:var(--faint);line-height:1.45;border-top:1px solid var(--card-bd);padding-top:10px;display:flex;gap:5px;">'+icon('lightbulb',13)+' Geçmiş bir güne dokun → “Bu günü düzenle” ile o günün verilerini düzeltebilirsin. Konum, oturum ve canlı ölçümler her zaman bugüne yazılır.</div>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);line-height:1.45;border-top:1px solid var(--card-bd);padding-top:10px;display:flex;gap:5px;">'+icon('lightbulb',13)+' Geçmiş bir güne dokun → “Bu günü düzenle” ile o günün verilerini düzeltebilirsin. Konum, oturum ve canlı ölçümler her zaman bugüne yazılır.</div>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -12945,11 +12945,11 @@ function magnesiumFeedbackHTML(date){
   var form=find(MG_FORMS,'id',yRec.magnesium.form)||MG_FORMS[0];
   var h='';
   h+='<div class="surface" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
-  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',20)+'</span><span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">DÜNÜN ETKİSİ</span></div>';
-  h+='<div style="font-size:14px;font-weight:700;line-height:1.35;color:var(--text);">Dün '+esc(form.label)+' almıştın. Uykuna, krampına veya genel hissetine yardımcı oldu mu?</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',20)+'</span><span style="font-size:var(--f-caption1);font-weight:800;letter-spacing:1px;color:var(--accent-ink);">DÜNÜN ETKİSİ</span></div>';
+  h+='<div style="font-size:var(--f-subhead);font-weight:700;line-height:1.35;color:var(--text);">Dün '+esc(form.label)+' almıştın. Uykuna, krampına veya genel hissetine yardımcı oldu mu?</div>';
   h+='<div style="display:flex;gap:8px;">';
-  h+='<button onclick="App.saveMgFeedback(true)" style="flex:1;background:rgba(143,191,138,0.15);border:1.5px solid rgba(143,191,138,0.4);color:#3F8A4F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Evet, faydalıydı</button>';
-  h+='<button onclick="App.saveMgFeedback(false)" style="flex:1;background:rgba(217,83,79,0.08);border:1.5px solid rgba(217,83,79,0.3);color:#C0605F;border-radius:12px;padding:10px;font-size:13px;font-weight:800;">Pek fark görmedim</button>';
+  h+='<button onclick="App.saveMgFeedback(true)" style="flex:1;background:rgba(143,191,138,0.15);border:1.5px solid rgba(143,191,138,0.4);color:#3F8A4F;border-radius:12px;padding:10px;font-size:var(--f-footnote);font-weight:800;">Evet, faydalıydı</button>';
+  h+='<button onclick="App.saveMgFeedback(false)" style="flex:1;background:rgba(217,83,79,0.08);border:1.5px solid rgba(217,83,79,0.3);color:#C0605F;border-radius:12px;padding:10px;font-size:var(--f-footnote);font-weight:800;">Pek fark görmedim</button>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -12971,24 +12971,24 @@ function magnesiumBannerHTML(date){
   h+='<div class="surface" style="border-radius:22px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;">';
   h+='<div style="display:flex;align-items:center;gap:8px;">';
   h+='<span style="display:inline-flex;color:var(--accent-ink);">'+icon('pill',20)+'</span>';
-  h+='<span style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--accent-ink);">MAGNESYUM HATIRLATICISI</span>';
-  h+='<span style="margin-left:auto;font-size:11px;font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
+  h+='<span style="font-size:var(--f-caption1);font-weight:800;letter-spacing:1px;color:var(--accent-ink);">MAGNESYUM HATIRLATICISI</span>';
+  h+='<span style="margin-left:auto;font-size:var(--f-caption2);font-weight:700;background:rgba(233,175,193,0.25);color:var(--choc);padding:3px 8px;border-radius:999px;">'+nudge.score+'/100</span>';
   h+='</div>';
-  h+='<div style="font-size:15px;font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent-ink);">400 mg magnezyum</span> almayı unutma.</div>';
+  h+='<div style="font-size:var(--f-subhead);font-weight:700;line-height:1.35;color:var(--text);">Günışığı, bugün <span style="color:var(--accent-ink);">400 mg magnezyum</span> almayı unutma.</div>';
   if(nudge.blocked){
-    h+='<div style="font-size:12px;color:var(--watch-ink);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
+    h+='<div style="font-size:var(--f-caption1);color:var(--watch-ink);">Böbrek rahatsızlığı veya tolerans sorunu bildirdin; önce hekimine danış.</div>';
   } else {
-    h+='<div style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;">';
+    h+='<div style="font-size:var(--f-footnote);color:var(--muted);display:flex;align-items:center;gap:6px;">';
     h+='<span style="display:inline-flex;">'+(form.icon||icon('flask',15))+'</span>';
     h+='<span>Önerilen form: <b>'+esc(form.label)+'</b> · '+esc(form.note)+(sebep.length?' · Sinyaller: '+esc(sebep.slice(0,3).join(' · ')):'')+'</span>';
     h+='</div>';
   }
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">';
   if(!nudge.blocked){
-    h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:800;">Aldım · 400 mg</button>';
+    h+='<button onclick="App.takeMagnesium(\''+nudge.form+'\','+recDose+')" style="flex:1;min-width:100px;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 12px;font-size:var(--f-footnote);font-weight:800;">Aldım · 400 mg</button>';
   }
-  h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;">Bugün almayacağım</button>';
-  h+='<button onclick="App.snoozeMg()" style="min-width:60px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 10px;font-size:13px;font-weight:700;">Sonra</button>';
+  h+='<button onclick="App.skipMagnesium()" style="flex:1;min-width:90px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 12px;font-size:var(--f-footnote);font-weight:700;">Bugün almayacağım</button>';
+  h+='<button onclick="App.snoozeMg()" style="min-width:60px;background:transparent;border:1.5px solid var(--card-bd);color:var(--muted);border-radius:12px;padding:9px 10px;font-size:var(--f-footnote);font-weight:700;">Sonra</button>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -13086,18 +13086,18 @@ function raporHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   var chips=[[icon('flame',13)+' Güncel seri',cur+' gün'],[icon('trophy',13)+' En iyi seri',best+' gün'],[icon('calendar',13)+' Takip günü',tracked],[icon('circle-check',13)+' Toplam tik',totalTicks]];
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">';
-  chips.forEach(function(c){ h+='<div class="surface" style="border-radius:16px;padding:13px;"><div style="font-size:11.5px;color:var(--faint);display:flex;align-items:center;gap:4px;">'+c[0]+'</div><div style="font-size:21px;font-weight:800;margin-top:3px;">'+esc(c[1])+'</div></div>'; });
+  chips.forEach(function(c){ h+='<div class="surface" style="border-radius:16px;padding:13px;"><div style="font-size:var(--f-caption1);color:var(--faint);display:flex;align-items:center;gap:4px;">'+c[0]+'</div><div style="font-size:var(--f-title2);font-weight:800;margin-top:3px;">'+esc(c[1])+'</div></div>'; });
   h+='</div>';
-  var msx=nextMilestone(cur); if(msx) h+='<div style="background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:16px;padding:12px 15px;font-size:13px;font-weight:700;color:#7A4A2E;display:flex;align-items:center;gap:7px;">'+icon('target',15)+' Sonraki kilometre taşı: '+msx.target+' gün · yolun %'+msx.pct+'</div>';
+  var msx=nextMilestone(cur); if(msx) h+='<div style="background:linear-gradient(135deg,#FFE19A,#F7C9B0);border-radius:16px;padding:12px 15px;font-size:var(--f-footnote);font-weight:700;color:#7A4A2E;display:flex;align-items:center;gap:7px;">'+icon('target',15)+' Sonraki kilometre taşı: '+msx.target+' gün · yolun %'+msx.pct+'</div>';
   h+=consistencyMomentumCard();
   h+=weekSelfCard();
   h+=distanceRecapCard();
   h+=weeklyStepRecap();
   var avg30=(last30.reduce(function(a,o){return a+countRec(o.rec);},0)/30).toFixed(1);
-  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:12px;color:var(--faint);">ort. '+avg30+'/'+htToday()+'</div></div>';
+  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:var(--f-callout);font-weight:700;">Son 30 gün — günlük tik</div><div style="font-size:var(--f-caption1);color:var(--faint);">ort. '+avg30+'/'+htToday()+'</div></div>';
   h+=trendBars(last30,function(o){return countRec(o.rec);},'linear-gradient(180deg,#E9899F,#C9B8FF)')+'</div>';
-  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;">Alışkanlık oranları (30 gün)</div>';
-  HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent-ink);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
+  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:var(--f-callout);font-weight:700;">Alışkanlık oranları (30 gün)</div>';
+  HABITS.forEach(function(hb){ var pct=habitRate(last30,hb.key); h+='<div style="display:flex;flex-direction:column;gap:4px;"><div style="display:flex;justify-content:space-between;font-size:var(--f-footnote);"><span style="color:var(--text2);">'+hb.icon+' '+esc(hb.title)+'</span><span style="font-weight:700;color:var(--accent-ink);">%'+pct+'</span></div><div style="height:7px;border-radius:999px;background:rgba(150,110,120,0.13);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:linear-gradient(90deg,#E9AFC1,#C9B8FF);"></div></div></div>'; });
   h+=sciNote('Bir alışkanlık ne kadar sık tekrarlanırsa nöral yolu o kadar güçlenir (nöroplastisite); %60+ oran, davranışın otomatikleşmeye başladığını gösterir.');
   h+='</div>';
   // ── Ruhsal eğilim (30 gün) — fiziksel trendlerin yanında zihinsel sağlık ──
@@ -13105,8 +13105,8 @@ function raporHTML(){
   last30.forEach(function(o){ if(!o.rec) return; var _ms=moodScore(o.rec.mood); if(_ms!=null) _mv.push(_ms); if(o.rec.energy!=null) _ev.push(Number(o.rec.energy)); if(o.rec.stress!=null) _sv.push(Number(o.rec.stress)); });
   var _mA=avgOf(_mv),_eA=avgOf(_ev),_sA=avgOf(_sv);
   if(_mA!=null||_eA!=null||_sA!=null){
-    var rtile=function(label,val,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+(val!=null?val.toFixed(1).replace('.',','):'—')+'</div><div style="font-size:11px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
-    h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:#8A75C8;">'+icon('brain',16)+'</span>Ruhsal eğilim — 30 gün</div>';
+    var rtile=function(label,val,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:var(--f-title3);font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+(val!=null?val.toFixed(1).replace('.',','):'—')+'</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+    h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:#8A75C8;">'+icon('brain',16)+'</span>Ruhsal eğilim — 30 gün</div>';
     h+='<div style="display:flex;gap:8px;">'+rtile('Mod /5',_mA,'#C97FA8')+rtile('Enerji /5',_eA,'#F5A623')+rtile('Stres /5',_sA,'#7C5CC4')+'</div>';
     h+=sciNote('Ruh hâli fiziksel alışkanlıklardan bağımsız değil: iyi uyku ve düzenli hareket modu yükseltir, kronik stres ise iştahı ve şeker isteğini besler. Bu üç ekseni birlikte izlemek, bedeni ve zihni tek sistem olarak görmeni sağlar.');
     h+='</div>';
@@ -13114,35 +13114,35 @@ function raporHTML(){
   var pAvg=avgOf(last30.filter(function(o){return o.rec;}).map(function(o){return dayNutrition(o.rec).protein;}).filter(function(v){return v>0;}));
   var wAvg=avgOf(last30.filter(function(o){return o.rec&&typeof o.rec.water==='number'&&o.rec.water>0;}).map(function(o){return o.rec.water;}));
   h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;">';
-  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('egg',16)+' Protein trendi (30 gün)</div><div style="font-size:12px;color:var(--faint);">ort. '+(pAvg!=null?Math.round(pAvg)+' g':'—')+'</div></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('egg',16)+' Protein trendi (30 gün)</div><div style="font-size:var(--f-caption1);color:var(--faint);">ort. '+(pAvg!=null?Math.round(pAvg)+' g':'—')+'</div></div>';
   h+=trendBars(last30,function(o){return o.rec?dayNutrition(o.rec).protein:0;},'linear-gradient(180deg,#F2B65A,#E9899F)');
-  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('droplet',16)+' Su trendi (30 gün)</div><div style="font-size:12px;color:var(--faint);">ort. '+(wAvg!=null?(Math.round(wAvg*10)/10)+' bardak':'—')+'</div></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('droplet',16)+' Su trendi (30 gün)</div><div style="font-size:var(--f-caption1);color:var(--faint);">ort. '+(wAvg!=null?(Math.round(wAvg*10)/10)+' bardak':'—')+'</div></div>';
   h+=trendBars(last30,function(o){return o.rec&&typeof o.rec.water==='number'?o.rec.water:0;},'linear-gradient(180deg,#7FC9E9,#C9B8FF)');
   h+='</div>';
   var ins=corrInsights();
-  if(ins.length){ h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">Senin örüntülerin '+icon('search',16)+'</div>';
-    ins.forEach(function(c){ h+='<div style="display:flex;gap:11px;align-items:flex-start;background:var(--card);border-radius:14px;padding:12px 13px;"><span style="flex-shrink:0;display:flex;">'+c[0]+'</span><span style="flex:1;font-size:13.5px;line-height:1.5;color:var(--text2);">'+esc(c[1])+'</span></div>'; });
-    h+='<div style="font-size:11px;color:var(--faint);line-height:1.5;">Bunlar senin kayıtlarından çıkan eğilimler; tıbbi tavsiye değil, küçük ipuçları.</div></div>';
+  if(ins.length){ h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;">Senin örüntülerin '+icon('search',16)+'</div>';
+    ins.forEach(function(c){ h+='<div style="display:flex;gap:11px;align-items:flex-start;background:var(--card);border-radius:14px;padding:12px 13px;"><span style="flex-shrink:0;display:flex;">'+c[0]+'</span><span style="flex:1;font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">'+esc(c[1])+'</span></div>'; });
+    h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.5;">Bunlar senin kayıtlarından çıkan eğilimler; tıbbi tavsiye değil, küçük ipuçları.</div></div>';
   }
   var md=moodDist(last30); var mtot=0; for(var mkk in md) mtot+=md[mkk];
-  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15.5px;font-weight:700;">Mod dağılımı (30 gün)</div>';
+  h+='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-callout);font-weight:700;">Mod dağılımı (30 gün)</div>';
   if(mtot){ var mcol={'cok-iyi':'#FFD37A','iyi':'#F2B65A','normal':'#8FBF8A','zorlandim':'#9BB0D9','cok-zorlandim':'#B89BD9'};
     h+='<div style="display:flex;height:14px;border-radius:999px;overflow:hidden;">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<div style="width:'+(v/mtot*100)+'%;background:'+(mcol[m.id]||'#C9B8FF')+';"></div>'; }); h+='</div>';
-    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span style="display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
-  } else h+='<div style="font-size:13px;color:var(--faint);">Bu dönemde mod kaydı yok.</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:var(--f-caption1);color:var(--muted);">'; MOODS.forEach(function(m){ var v=md[m.id]||0; if(v) h+='<span style="display:inline-flex;align-items:center;gap:4px;">'+icon(m.icon,13)+' '+esc(m.short)+' <b>'+v+'</b></span>'; }); h+='</div>';
+  } else h+='<div style="font-size:var(--f-footnote);color:var(--faint);">Bu dönemde mod kaydı yok.</div>';
   h+='</div>';
   h+=moodHeatmapCard();
   h+=badgesGrid();
   var months=monthlySummary();
   if(months.length){ var moN=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-    h+='<div style="padding:4px 4px 0;"><div style="font-size:17px;font-weight:800;">Aylık özet</div></div>';
-    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="surface" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:15px;font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:12px;color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--accent-ink);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:12px;color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
+    h+='<div style="padding:4px 4px 0;"><div style="font-size:var(--f-body);font-weight:800;">Aylık özet</div></div>';
+    months.slice(0,12).forEach(function(m){ var p=m.month.split('-'); h+='<div class="surface" style="border-radius:16px;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:var(--f-subhead);font-weight:800;">'+moN[+p[1]-1]+' '+p[0]+'</div><div style="font-size:var(--f-caption1);color:var(--faint);">'+m.days+' gün kayıt</div></div><div style="text-align:right;"><div style="font-size:var(--f-footnote);color:var(--accent-ink);font-weight:700;">ort. '+m.avg.toFixed(1)+'/'+htToday()+'</div><div style="font-size:var(--f-caption1);color:var(--muted);">en iyi seri '+m.best+'</div></div></div>'; });
   }
-  h+='<div style="padding:8px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">Minik Kurallar '+icon('leaf',20)+'</div></div>';
+  h+='<div style="padding:8px 4px 0;"><div style="font-size:var(--f-title2);font-weight:800;display:flex;align-items:center;gap:8px;">Minik Kurallar '+icon('leaf',20)+'</div></div>';
   h+='<div class="surface" style="border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:11px;">';
-  [[icon('leaf',17),'Aç kalmak yok.'],[icon('cookie',17),'Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],[icon('moon',17),'Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],[icon('egg',17),'Her öğüne protein eklemek krizleri sakinleştirir.'],[icon('sun',17),'D₃K₂ damla da küçük ritmin bir parçası.'],[icon('dumbbell',17),'Bir gün zor geçti diye sistem bitmez.'],[icon('footprints',17),'Yürüyüş kısa da olsa sayılır.'],[icon('heart',17),'Kendine kötü konuşmak yok.'],[icon('sun',17),'Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:14.5px;line-height:1.45;"><span style="display:inline-flex;flex-shrink:0;">'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
+  [[icon('leaf',17),'Aç kalmak yok.'],[icon('cookie',17),'Tatlı hayatımızdan silinmiyor; sadece otomatik pilottan çıkıyor.'],[icon('moon',17),'Akşam 7\'den sonra önce şunu sor: gerçekten aç mıyım?'],[icon('egg',17),'Her öğüne protein eklemek krizleri sakinleştirir.'],[icon('sun',17),'D₃K₂ damla da küçük ritmin bir parçası.'],[icon('dumbbell',17),'Bir gün zor geçti diye sistem bitmez.'],[icon('footprints',17),'Yürüyüş kısa da olsa sayılır.'],[icon('heart',17),'Kendine kötü konuşmak yok.'],[icon('sun',17),'Kontrol, kendine sert davranmak değildir.']].forEach(function(r){ h+='<div style="display:flex;gap:10px;font-size:var(--f-subhead);line-height:1.45;"><span style="display:inline-flex;flex-shrink:0;">'+r[0]+'</span><span>'+esc(r[1])+'</span></div>'; });
   h+='</div>';
-  h+='<button onclick="App.printReport()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#6B4A3A,#A07A52);box-shadow:0 10px 22px rgba(107,74,58,0.3);margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;">Rapor Oluştur / PDF '+icon('file-text',16)+'</button>';
+  h+='<button onclick="App.printReport()" style="border:none;cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:var(--f-callout);font-weight:700;color:#fff;background:linear-gradient(135deg,#6B4A3A,#A07A52);box-shadow:0 10px 22px rgba(107,74,58,0.3);margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;">Rapor Oluştur / PDF '+icon('file-text',16)+'</button>';
   h+='</div>';
   return h;
 }
@@ -13158,34 +13158,34 @@ function ayarlarHTML(){
   var _lastSync=data.lastSyncDate?(data.lastSyncDate===todayStr()?'bugün':esc(data.lastSyncDate)):'henüz yok';
   var _conn=syncConfigured();
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
+  h+='<div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
-  [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:11px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
+  [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:var(--f-callout);font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
   h+='</div>';
-  var _srow=function(ic,label,val,col){ return '<div style="display:flex;align-items:center;gap:10px;"><span style="width:22px;display:flex;justify-content:center;color:'+(col||'var(--muted)')+';">'+icon(ic,14)+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+label+'</span><span style="font-size:13px;font-weight:700;text-align:right;">'+val+'</span></div>'; };
+  var _srow=function(ic,label,val,col){ return '<div style="display:flex;align-items:center;gap:10px;"><span style="width:22px;display:flex;justify-content:center;color:'+(col||'var(--muted)')+';">'+icon(ic,14)+'</span><span style="flex:1;font-size:var(--f-footnote);color:var(--text2);">'+label+'</span><span style="font-size:var(--f-footnote);font-weight:700;text-align:right;">'+val+'</span></div>'; };
   h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
   h+=_srow(_conn?'circle-check':'link-2','Repo bağlantısı',(_conn?'<span style="color:#3F8A4F;">bağlı</span>':'<span style="color:#E9899F;">bağlı değil</span>'),_conn?'#3F8A4F':'#E9899F');
   h+=_srow('save','Son repoya kayıt','<span style="color:var(--text);">'+_lastSync+'</span>');
   if(_prog) h+=_srow('compass','İçsel Pusula','<span style="color:var(--text);">Gün '+_prog.currentProgramDay+'/'+_prog.totalDays+' · %'+_prog.percent+'</span>','#6E5FCB');
   h+='</div>';
-  h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
+  h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.45;">Kayıt boyutu, bu cihazdaki verinin yaklaşık büyüklüğü. Sırlar (anahtarlar) repoya asla gönderilmez.</div>';
   h+='</div>';
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:15px;font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:15px;outline:none;"></div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;"><div style="font-size:var(--f-subhead);font-weight:700;">Başlangıç tarihi</div><input type="date" value="'+esc(data.startDate)+'" onchange="App.startDateChange(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:12px;font-size:var(--f-subhead);outline:none;"></div>';
   // appearance
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;">Görünüm</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Sistem, telefonunun görünüm ayarını takip eder; açık veya koyu seçersen o sabit kalır.</div><div style="display:flex;gap:8px;">';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;">Görünüm</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Sistem, telefonunun görünüm ayarını takip eder; açık veya koyu seçersen o sabit kalır.</div><div style="display:flex;gap:8px;">';
   var onS='background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;border:1px solid #E9AFC1;';
   var offS='background:transparent;color:var(--muted);border:1px solid var(--card-bd);';
-  var _tbtn='flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;';
+  var _tbtn='flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px;';
   h+='<button onclick="App.setTheme(false)" aria-pressed="'+(themePref==='light')+'" style="'+_tbtn+(themePref==='light'?onS:offS)+'">'+icon('sun',15)+' Açık</button>';
   h+='<button onclick="App.setTheme(true)" aria-pressed="'+(themePref==='dark')+'" style="'+_tbtn+(themePref==='dark'?onS:offS)+'">'+icon('moon',15)+' Koyu</button>';
   h+='<button onclick="App.setTheme(\'system\')" aria-pressed="'+(themePref==='system')+'" style="'+_tbtn+(themePref==='system'?onS:offS)+'">'+icon('smartphone',15)+' Sistem</button></div></div>';
   // titreşim / haptik geri bildirimi
   var hapOn=!(data.settings&&data.settings.haptics===false);
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
-  h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
-  h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
+  h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
   // D vitamini takviyesi — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';
   var vdForm=esc((data.settings&&data.settings.vitaminDForm)||'D₃K₂ damla');
   var vdDose=esc((data.settings&&data.settings.vitaminDDose)||'1 damla (D3 1000 IU + K2 100 mcg)');
   h+=_srow('pill','Form',vdForm);
@@ -13194,33 +13194,33 @@ function ayarlarHTML(){
   // Gizlenen kartlar — yalnızca kullanıcı bir kartı sakladıysa görünür (kilitlenme yok).
   var sgh=data.settings||{};
   if(sgh.hideLocationCard||sgh.hideRepoBanner){
-    h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">Gizlenen kartlar '+icon('sparkles',15)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Bugün ekranında sakladığın kartları tek dokunuşla geri getir.</div>';
-    if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:12.5px;font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
-    if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:14px;font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:12.5px;font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
+    h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">Gizlenen kartlar '+icon('sparkles',15)+'</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Bugün ekranında sakladığın kartları tek dokunuşla geri getir.</div>';
+    if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:var(--f-subhead);font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:var(--f-footnote);font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
+    if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:var(--f-subhead);font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:var(--f-footnote);font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
     h+='</div>';
   }
   h+=settingsBtn('App.printReport()','Rapor oluştur / PDF',icon('file-text',17));
   h+=settingsBtn('App.exportJson()','Yedek indir',icon('save',17));
   h+=settingsBtn('App.importClick()','Yedek yükle',icon('repeat',17));
   h+='<input type="file" id="sey-file" accept="application/json,.json" onchange="App.importJson(this)" style="display:none;">';
-  h+='<div style="font-size:12.5px;color:var(--faint);line-height:1.5;padding:0 4px;">Yedek dosyanı saklarsan telefon/tarayıcı değişse bile kayıtlarını geri alabilirsin.</div>';
+  h+='<div style="font-size:var(--f-footnote);color:var(--faint);line-height:1.5;padding:0 4px;">Yedek dosyanı saklarsan telefon/tarayıcı değişse bile kayıtlarını geri alabilirsin.</div>';
   // repoya otomatik kayıt — ortak durum
   var sg=data.settings||{};
-  h+='<div style="padding:6px 4px 0;"><div style="font-size:16px;font-weight:800;display:flex;align-items:center;gap:6px;">Repoya otomatik kayıt '+icon('save',15)+'</div></div>';
-  h+='<div id="sey-sync-status" class="sey-tiny-hit" style="font-size:12.5px;color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
+  h+='<div style="padding:6px 4px 0;"><div style="font-size:var(--f-callout);font-weight:800;display:flex;align-items:center;gap:6px;">Repoya otomatik kayıt '+icon('save',15)+'</div></div>';
+  h+='<div id="sey-sync-status" class="sey-tiny-hit" style="font-size:var(--f-footnote);color:var(--faint);min-height:16px;padding:0 4px;">'+esc(window.SeySync?window.SeySync.statusText():'')+'</div>';
   // Doğrudan GitHub bağlantısı
   var connected=syncConfigured();
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Repoya bağlan '+(connected?'<span style="font-size:12px;font-weight:700;color:#3F8A4F;background:rgba(143,191,138,0.2);padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
-  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Günlük kayıtlar her günün tarihine yazılır; aynı gün içindeki değişiklikler o günün kaydını günceller. Tüm günler korunur ve izlenir.</div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:8px;">Repoya bağlan '+(connected?'<span style="font-size:var(--f-caption1);font-weight:700;color:#3F8A4F;background:rgba(143,191,138,0.2);padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
+  h+='<div style="font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">Günlük kayıtlar her günün tarihine yazılır; aynı gün içindeki değişiklikler o günün kaydını günceller. Tüm günler korunur ve izlenir.</div>';
   if(!connected || ui.keyEdit){
-    h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(ui.keyEdit?'':(sg.ghToken||''))+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
+    h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(ui.keyEdit?'':(sg.ghToken||''))+'" oninput="App.setGhToken(this)" placeholder="github_pat_… (Contents: Read and write)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:var(--f-footnote);outline:none;">';
     h+='<div style="display:flex;gap:8px;">';
-    h+='<button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Bağla ve kaydet ⬆️</button>';
-    if(connected) h+='<button onclick="App.cancelKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">İptal</button>';
+    h+='<button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Bağla ve kaydet ⬆️</button>';
+    if(connected) h+='<button onclick="App.cancelKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:var(--card);">İptal</button>';
     h+='</div>';
   } else {
-    h+='<div style="font-size:12.5px;color:#3F8A4F;background:rgba(143,191,138,0.12);border:1px solid rgba(143,191,138,0.35);padding:10px 12px;border-radius:12px;">Bağlantı doğrulandı. Kayıtlar otomatik devam ediyor.</div>';
-    h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:14.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:14px;font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
+    h+='<div style="font-size:var(--f-footnote);color:#3F8A4F;background:rgba(143,191,138,0.12);border:1px solid rgba(143,191,138,0.35);padding:10px 12px;border-radius:12px;">Bağlantı doğrulandı. Kayıtlar otomatik devam ediyor.</div>';
+    h+='<div style="display:flex;gap:8px;"><button onclick="App.syncNow()" style="flex:1;border:none;cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);">Şimdi kaydet ⬆️</button><button onclick="App.enableKeyEdit()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:var(--card);">Yeni anahtar gir</button></div>';
   }
   h+='</div>';
   // Sağlık senkronu kurulumu artık Bugün ekranındaki Konum & Hareket kartında
@@ -13229,36 +13229,36 @@ function ayarlarHTML(){
   if(connected){
     h+='<button onclick="App.go(\'bugun\')" style="text-align:left;border:1px solid rgba(143,191,138,0.32);cursor:pointer;background:rgba(143,191,138,0.06);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:10px;">';
     h+='<span style="flex-shrink:0;display:inline-flex;">'+icon('apple',18)+'</span>';
-    h+='<span style="flex:1;font-size:12.5px;line-height:1.4;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu</b> kurulumu Bugün ekranındaki Konum & Hareket kartına taşındı.</span>';
-    h+='<span style="flex-shrink:0;color:var(--faint);font-size:14px;">›</span>';
+    h+='<span style="flex:1;font-size:var(--f-footnote);line-height:1.4;color:var(--text2);"><b style="color:var(--text);">Sağlık senkronu</b> kurulumu Bugün ekranındaki Konum & Hareket kartına taşındı.</span>';
+    h+='<span style="flex-shrink:0;color:var(--faint);font-size:var(--f-subhead);">›</span>';
     h+='</button>';
   }
   // Luna · kişisel asistan (OpenAI anahtarı)
   var hasOaKey=!!(sg.openaiKey&&String(sg.openaiKey).trim());
   var oaBadge='';
-  if(ui.openaiKeyState==='checking') oaBadge='<span style="font-size:12px;font-weight:700;color:#8A6A2A;background:rgba(220,180,90,0.2);padding:2px 9px;border-radius:999px;">doğrulanıyor…</span>';
-  else if(ui.openaiKeyState==='invalid') oaBadge='<span style="font-size:12px;font-weight:700;color:#fff;background:#D9534F;padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('x',11)+' API key hatalı</span>';
-  else if(ui.openaiKeyState==='valid') oaBadge='<span style="font-size:12px;font-weight:700;color:#fff;background:#3F8A4F;padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>';
-  else if(hasOaKey) oaBadge='<span style="font-size:12px;font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>';
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan <span style="color:#9B7FC9;display:inline-flex;">'+icon('moon',16)+'</span> '+oaBadge+'</div>';
-  h+='<div style="font-size:12.5px;line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 5 soru hakkın olur — Luna olabildiğince detaylı yanıtlar.</div>';
-  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.openaiKey||'')+'" oninput="App.setOpenaiKey(this)" placeholder="sk-… (OpenAI API anahtarı)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:13px;outline:none;">';
-  if(ui.openaiKeyState==='invalid') h+='<div style="font-size:12px;color:#C0605F;background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.3);border-radius:12px;padding:9px 11px;">Anahtar geçersiz görünüyor. platform.openai.com’dan doğru anahtarı yapıştırıp tekrar kaydet.</div>';
-  h+='<button onclick="App.saveOpenaiKey()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:14.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 8px 18px rgba(155,127,201,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">Kaydet ve doğrula '+icon('check',14)+'</button>';
-  h+='<div style="font-size:11.5px;color:var(--faint);">platform.openai.com → API keys bölümünden alınır.</div>';
+  if(ui.openaiKeyState==='checking') oaBadge='<span style="font-size:var(--f-caption1);font-weight:700;color:#8A6A2A;background:rgba(220,180,90,0.2);padding:2px 9px;border-radius:999px;">doğrulanıyor…</span>';
+  else if(ui.openaiKeyState==='invalid') oaBadge='<span style="font-size:var(--f-caption1);font-weight:700;color:#fff;background:#D9534F;padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('x',11)+' API key hatalı</span>';
+  else if(ui.openaiKeyState==='valid') oaBadge='<span style="font-size:var(--f-caption1);font-weight:700;color:#fff;background:#3F8A4F;padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>';
+  else if(hasOaKey) oaBadge='<span style="font-size:var(--f-caption1);font-weight:700;color:#6A4FA0;background:rgba(155,127,201,0.18);padding:2px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:8px;">Luna · kişisel asistan <span style="color:#9B7FC9;display:inline-flex;">'+icon('moon',16)+'</span> '+oaBadge+'</div>';
+  h+='<div style="font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">Luna sorularını yanıtlayabilsin diye OpenAI API anahtarı gerekir. Anahtar <b>yalnızca bu cihazda</b> saklanır, repoya gönderilmez. Günde 5 soru hakkın olur — Luna olabildiğince detaylı yanıtlar.</div>';
+  h+='<input type="password" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(sg.openaiKey||'')+'" oninput="App.setOpenaiKey(this)" placeholder="sk-… (OpenAI API anahtarı)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px;font-size:var(--f-footnote);outline:none;">';
+  if(ui.openaiKeyState==='invalid') h+='<div style="font-size:var(--f-caption1);color:#C0605F;background:rgba(217,83,79,0.1);border:1px solid rgba(217,83,79,0.3);border-radius:12px;padding:9px 11px;">Anahtar geçersiz görünüyor. platform.openai.com’dan doğru anahtarı yapıştırıp tekrar kaydet.</div>';
+  h+='<button onclick="App.saveOpenaiKey()" style="border:none;cursor:pointer;width:100%;padding:12px;border-radius:14px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);box-shadow:0 8px 18px rgba(155,127,201,0.35);display:flex;align-items:center;justify-content:center;gap:6px;">Kaydet ve doğrula '+icon('check',14)+'</button>';
+  h+='<div style="font-size:var(--f-caption1);color:var(--faint);">platform.openai.com → API keys bölümünden alınır.</div>';
   h+='</div>';
-  h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:15.5px;font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span style="display:inline-flex;">'+icon('trash-2',16)+'</span></button>';
+  h+='<button onclick="App.askReset()" style="border:1px solid rgba(220,120,120,0.25);cursor:pointer;width:100%;padding:16px;border-radius:18px;font-size:var(--f-callout);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.08);text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>Verileri sıfırla</span><span style="display:inline-flex;">'+icon('trash-2',16)+'</span></button>';
   h+=settingsBtn('App.goStart()','Başlangıç ekranına dön',icon('rotate-ccw',17));
   // add to home guide
-  h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:15.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:14px;line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
-  h+='<div class="surface" style="border-radius:20px;padding:16px;"><div style="font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:13.5px;line-height:1.55;color:var(--muted);">Kilit ekranı seni korur; parola ve kullanıcı adı düz metin olarak hiçbir yere yazılmaz. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
+  h+='<div style="background:linear-gradient(135deg,rgba(255,232,163,0.4),rgba(247,221,229,0.45));border:1px solid var(--card-bd);border-radius:20px;padding:18px;"><div style="font-size:var(--f-callout);font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px;">'+icon('phone',16)+' Ana ekrana ekleme rehberi</div><div style="font-size:var(--f-subhead);line-height:1.7;color:var(--text2);">iPhone\'da tek dokunuşla açmak için:<br>1. Bu sayfayı <b>Safari</b>\'de aç<br>2. Paylaş butonuna bas<br>3. <b>Ana Ekrana Ekle</b> seç<br>4. Adı: <b>Şeyma 🦩</b><br>5. Ekle</div></div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;"><div style="font-size:var(--f-subhead);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">'+icon('lock',14)+' Gizlilik</div><div style="font-size:var(--f-footnote);line-height:1.55;color:var(--muted);">Kilit ekranı seni korur; parola ve kullanıcı adı düz metin olarak hiçbir yere yazılmaz. Kayıtlar bu cihazdaki tarayıcıda saklanır. Daha garanti olsun diye ara ara yedek indir.</div></div>';
   // ── Hakkında / sürüm ──
   var _mpv=window.MotivationProgramV2?window.MotivationProgramV2.version:'—';
   var _mnv=window.MotivationNarratives?window.MotivationNarratives.version:'—';
-  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',14)+' Hakkında</div>';
-  h+='<div style="font-size:13px;color:var(--text2);line-height:1.55;">Şeyma 🦩 · <b>v2.0</b> — Minik Denge Günlüğü. İçsel Pusula &amp; Terapi Odası sürümü.</div>';
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sparkles',14)+' Hakkında</div>';
+  h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.55;">Şeyma 🦩 · <b>v2.0</b> — Minik Denge Günlüğü. İçsel Pusula &amp; Terapi Odası sürümü.</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-  [['Program',_mpv],['Anlatı',_mnv]].forEach(function(v){ h+='<span style="font-size:11px;font-weight:700;color:var(--muted);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:3px 10px;">'+v[0]+' '+esc(v[1])+'</span>'; });
+  [['Program',_mpv],['Anlatı',_mnv]].forEach(function(v){ h+='<span style="font-size:var(--f-caption2);font-weight:700;color:var(--muted);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:3px 10px;">'+v[0]+' '+esc(v[1])+'</span>'; });
   h+='</div></div>';
   h+='</div>';
   return h;
@@ -16727,35 +16727,35 @@ function modalsHTML(){
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
     h+='<div role="button" tabindex="0" onclick="App.closeEmergency()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeEmergency();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:21px;font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15px;font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:var(--f-title2);font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:var(--f-callout);line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
   }
   if(ui.dayDetail){
     var d=ui.dayDetail;
     h+='<div role="button" tabindex="0" onclick="App.closeDetail()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeDetail();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:80vh;overflow-y:auto;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:20px;font-weight:800;">'+esc(d.title)+'</div><div style="font-size:13px;color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--muted);">\u2715</button></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:var(--f-title3);font-weight:800;">'+esc(d.title)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:var(--f-callout);color:var(--muted);">\u2715</button></div>';
     h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
-    d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:14.5px;"><span style="font-size:17px;">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
-    h+='</div><div style="display:flex;gap:14px;font-size:14px;color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Kriz (SOS): <b>'+d.sosCount+'</b></span></div>';
+    d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:var(--f-subhead);"><span style="font-size:var(--f-body);">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
+    h+='</div><div style="display:flex;gap:14px;font-size:var(--f-subhead);color:var(--muted);border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;flex-wrap:wrap;"><span>Mod: <b>'+esc(d.moodLabel)+'</b></span><span>Kriz (SOS): <b>'+d.sosCount+'</b></span></div>';
     var hl=[]; if(d.steps!=null) hl.push({i:'footprints',t:d.steps+' adım'}); if(d.mins!=null) hl.push({i:'timer',t:d.mins+' dk'}); if(d.sleepH!=null) hl.push({i:'moon',t:d.sleepH+' sa'}); if(d.flow) hl.push({i:'droplet',t:d.flow});
-    if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:12.5px;background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);display:inline-flex;align-items:center;gap:5px;">'+icon(x.i,12)+esc(x.t)+'</span>';}).join('')+'</div>';
-    if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:12.5px;color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
-    if(d.meals&&d.meals.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">'; d.meals.forEach(function(m){ h+='<div style="font-size:13.5px;line-height:1.4;"><span>'+m.icon+'</span> <b style="color:var(--text2);">'+esc(m.label)+':</b> <span style="color:var(--muted);">'+esc(m.text)+'</span></div>'; }); h+='</div>'; }
-    if(d.hasIntention) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:linear-gradient(160deg,rgba(255,225,154,0.24),rgba(201,184,255,0.14));border-radius:14px;padding:12px;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('target',14)+'</span><span><b>Niyet:</b> '+esc(d.intention)+'</span></div>';
-    if(d.hasNote) h+='<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
-    if(d.gratitude&&d.gratitude.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;"><div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',13)+' O günün güzel şeyleri</div><div style="display:flex;flex-direction:column;gap:5px;">'+d.gratitude.map(function(g,i){return '<div style="font-size:13.5px;line-height:1.45;color:var(--text2);">'+(i+1)+'. '+esc(String(g).trim())+'</div>';}).join('')+'</div></div>'; }
+    if(hl.length) h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">'+hl.map(function(x){return '<span style="font-size:var(--f-footnote);background:var(--icon);border:1px solid var(--card-bd);border-radius:999px;padding:5px 11px;color:var(--text2);display:inline-flex;align-items:center;gap:5px;">'+icon(x.i,12)+esc(x.t)+'</span>';}).join('')+'</div>';
+    if(d.syms&&d.syms.length) h+='<div style="margin-top:8px;font-size:var(--f-footnote);color:var(--muted);">Belirti: '+esc(d.syms.join(' · '))+'</div>';
+    if(d.meals&&d.meals.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:10px;display:flex;flex-direction:column;gap:6px;">'; d.meals.forEach(function(m){ h+='<div style="font-size:var(--f-footnote);line-height:1.4;"><span>'+m.icon+'</span> <b style="color:var(--text2);">'+esc(m.label)+':</b> <span style="color:var(--muted);">'+esc(m.text)+'</span></div>'; }); h+='</div>'; }
+    if(d.hasIntention) h+='<div style="margin-top:12px;font-size:var(--f-subhead);line-height:1.5;color:var(--text2);background:linear-gradient(160deg,rgba(255,225,154,0.24),rgba(201,184,255,0.14));border-radius:14px;padding:12px;display:flex;gap:6px;"><span style="flex-shrink:0;">'+icon('target',14)+'</span><span><b>Niyet:</b> '+esc(d.intention)+'</span></div>';
+    if(d.hasNote) h+='<div style="margin-top:12px;font-size:var(--f-subhead);line-height:1.5;color:var(--text2);background:rgba(255,232,163,0.28);border-radius:14px;padding:12px;">'+esc(d.note)+'</div>';
+    if(d.gratitude&&d.gratitude.length){ h+='<div style="margin-top:12px;border-top:1px solid rgba(150,110,120,0.15);padding-top:12px;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:5px;">'+icon('heart-handshake',13)+' O günün güzel şeyleri</div><div style="display:flex;flex-direction:column;gap:5px;">'+d.gratitude.map(function(g,i){return '<div style="font-size:var(--f-footnote);line-height:1.45;color:var(--text2);">'+(i+1)+'. '+esc(String(g).trim())+'</div>';}).join('')+'</div></div>'; }
     var isTod=!!d.isToday;
-    h+='<button onclick="App.editDay(\''+d.date+'\')" style="margin-top:16px;border:none;cursor:pointer;width:100%;padding:14px;border-radius:16px;font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9A23C,#E9899F);box-shadow:0 10px 24px rgba(233,150,90,0.38);">'+(isTod?('Bugüne git '+icon('sun',15)):(icon('pen-line',15)+' Bu günü düzenle'))+'</button>';
-    if(!isTod) h+='<div style="margin-top:8px;font-size:11.5px;color:var(--faint);line-height:1.45;text-align:center;">Geçmiş günü düzenlerken üstte uyarı görürsün; işin bitince “Bugüne dön”e bas. Konum, oturum ve canlı veriler her zaman bugüne yazılır.</div>';
+    h+='<button onclick="App.editDay(\''+d.date+'\')" style="margin-top:16px;border:none;cursor:pointer;width:100%;padding:14px;border-radius:16px;font-size:var(--f-subhead);font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#E9A23C,#E9899F);box-shadow:0 10px 24px rgba(233,150,90,0.38);">'+(isTod?('Bugüne git '+icon('sun',15)):(icon('pen-line',15)+' Bu günü düzenle'))+'</button>';
+    if(!isTod) h+='<div style="margin-top:8px;font-size:var(--f-caption1);color:var(--faint);line-height:1.45;text-align:center;">Geçmiş günü düzenlerken üstte uyarı görürsün; işin bitince “Bugüne dön”e bas. Konum, oturum ve canlı veriler her zaman bugüne yazılır.</div>';
     h+='</div></div>';
   }
   if(ui.locationConsent){
     h+='<div role="button" tabindex="0" onclick="App.cancelLocationConsent()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelLocationConsent();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
-    h+='<div style="font-size:19px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
-    h+='<p style="margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
-    h+='<p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
-    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
+    h+='<div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
+    h+='<p style="margin:0 0 14px;font-size:var(--f-subhead);line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
+    h+='<p style="margin:0 0 18px;font-size:var(--f-footnote);line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
+    h+='<div style="display:flex;gap:10px;"><button onclick="App.cancelLocationConsent()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.confirmLocationConsent()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);">Onaylıyorum</button></div>';
     h+='</div></div>';
   }
   if(ui.locNudgeOpen){
@@ -16764,22 +16764,22 @@ function modalsHTML(){
     h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
     h+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:2px;">';
     h+='<div style="flex-shrink:0;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#3F8A4F;background:linear-gradient(135deg,#DFF5DA,#C9E8C4);box-shadow:0 6px 16px rgba(125,190,119,0.35);">'+icon('map-pin',22)+'</div>';
-    h+='<div style="flex:1;min-width:0;"><div style="font-size:18.5px;font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:12.5px;color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir.</div></div>';
+    h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-headline);font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir.</div></div>';
     h+='<button onclick="App.locNudgeDismiss()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center;">'+icon('x',14)+'</button>';
     h+='</div>';
     h+='<div style="display:flex;flex-direction:column;gap:9px;margin:14px 0 16px;">';
-    lnB.forEach(function(b){ h+='<div style="display:flex;gap:10px;align-items:flex-start;background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.15;flex-shrink:0;color:#3F8A4F;">'+icon(b.icon||'map-pin',18)+'</span><span style="font-size:13.5px;line-height:1.5;color:var(--text2);">'+esc(b.t)+'</span></div>'; });
+    lnB.forEach(function(b){ h+='<div style="display:flex;gap:10px;align-items:flex-start;background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.15;flex-shrink:0;color:#3F8A4F;">'+icon(b.icon||'map-pin',18)+'</span><span style="font-size:var(--f-footnote);line-height:1.5;color:var(--text2);">'+esc(b.t)+'</span></div>'; });
     h+='</div>';
-    h+='<button onclick="App.locNudgeOpenConsent()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:15.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);box-shadow:0 10px 24px rgba(111,179,106,0.4);display:flex;align-items:center;justify-content:center;gap:8px;">Konumu aç '+icon('sparkles',15)+'</button>';
-    h+='<button onclick="App.locNudgeSnooze()" style="margin-top:9px;border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:14px;font-size:14.5px;font-weight:700;color:var(--text2);background:transparent;">Belki sonra</button>';
-    h+='<div style="text-align:center;margin-top:10px;"><button onclick="App.locNudgeOptOut()" style="border:none;background:none;cursor:pointer;color:var(--faint);font-size:12px;font-weight:600;text-decoration:underline;">Bugün gösterme</button></div>';
-    h+='<div style="margin-top:10px;font-size:11px;color:var(--faint);line-height:1.45;text-align:center;">Ölçüm yalnızca uygulama açıkken yapılır; dilediğinde kapatırsın.</div>';
+    h+='<button onclick="App.locNudgeOpenConsent()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:800;color:#fff;background:linear-gradient(135deg,#8FBF8A,#6FB36A);box-shadow:0 10px 24px rgba(111,179,106,0.4);display:flex;align-items:center;justify-content:center;gap:8px;">Konumu aç '+icon('sparkles',15)+'</button>';
+    h+='<button onclick="App.locNudgeSnooze()" style="margin-top:9px;border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:13px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:var(--text2);background:transparent;">Belki sonra</button>';
+    h+='<div style="text-align:center;margin-top:10px;"><button onclick="App.locNudgeOptOut()" style="border:none;background:none;cursor:pointer;color:var(--faint);font-size:var(--f-caption1);font-weight:600;text-decoration:underline;">Bugün gösterme</button></div>';
+    h+='<div style="margin-top:10px;font-size:var(--f-caption2);color:var(--faint);line-height:1.45;text-align:center;">Ölçüm yalnızca uygulama açıkken yapılır; dilediğinde kapatırsın.</div>';
     h+='</div></div>';
   }
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
     h+='<div role="button" tabindex="0" onclick="App.cancelReset()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelReset();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:19px;font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:14.5px;line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
   }
   return h;
 }

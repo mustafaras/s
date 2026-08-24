@@ -143,6 +143,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-45 | `bugun` sekmesi | ✅ TAMAMLANDI | `8fb8b61` | Bugün dump'ında ham px **0**, token 150; S4 tam yeşil; S5 sabit 699 | `bugunHTML()` **ve çağırdığı yardımcılar** — çağrı grafiği 4 seviye izlenerek **182 fonksiyon** kapsandı. Yalnızca `bugunHTML` gövdesi alınsaydı sadece 13 site dönüşecekti; sekmenin asıl işaretlemesi kart yardımcılarında. **365 site** eşlendi. **4 dekoratif muafiyet:** 42px, 44px, 48px (🦩 marka flaması) ve 130px (filigran rakam). **Yöntem notu:** sekme çağrı grafikleri birbiriyle örtüşüyor (paylaşılan yardımcılar); sıralı işlendiği ve dönüşüm idempotent olduğu için (token'a çevrilmiş site regex'e uymaz) her prompt kendinden öncekilerin bıraktığı dilimi alır — çift dönüşüm imkânsız. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
 
+| AD-46 | `rapor` sekmesi | ✅ TAMAMLANDI | `<commit>` | Rapor dump'ında ham px **0**, token 113; muafiyet yok; S4 tam yeşil | `raporHTML()` ve çağırdığı yardımcılar (çağrı grafiği 4 seviye, 65 fonksiyon). AD-45 paylaşılan yardımcıların çoğunu zaten dönüştürdüğü için bu partide **44 site** kaldı. Dekoratif muafiyet **yok** — rapor yüzeyinde 34px üstü boy bulunmuyor. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -159,9 +161,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 3/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 4/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **45/52** | |
+| | **Toplam** | **46/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

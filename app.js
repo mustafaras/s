@@ -11996,7 +11996,7 @@ function heroScienceLine(rec){
     +'<span style="font-size:var(--f-caption1);line-height:1.5;color:var(--muted);">'+txt+'</span></div>';
 }
 // Sayfalar arası tutarlı bilimsel mikro-bilgi rozeti (Rapor/Sağlık/Takvim vb.).
-function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:11px;line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
+function sciNote(txt){ return '<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(201,184,255,0.10);border:1px solid rgba(201,184,255,0.22);border-radius:12px;padding:9px 11px;"><span style="flex-shrink:0;color:var(--accent-ink);display:inline-flex;margin-top:1px;">'+icon('brain',13)+'</span><span style="font-size:var(--f-caption2);line-height:1.5;color:var(--muted);">'+txt+'</span></div>'; }
 // Ortak sayfa başlığı (bugün sayfası dışındaki sekmelerle görsel uyum için).
 function pageHeader(title,ic,sub){ return '<div style="padding:4px 4px 0;"><div style="font-size:23px;font-weight:800;display:flex;align-items:center;gap:8px;">'+esc(title)+' '+icon(ic,20)+'</div>'+(sub?'<div style="font-size:13px;color:var(--faint);margin-top:4px;line-height:1.4;">'+esc(sub)+'</div>':'')+'</div>'; }
 // ── Raşit'in Kriz Odaları: üçlü, Raşit-temalı buton. Her biri süreli-bilimsel bir modal açar. ──
@@ -12732,11 +12732,11 @@ function weekSelfCard(){
   if(pa!=null) rows.push([icon('egg',16),'Ortalama protein', Math.round(pa)+' g']);
   if(medFree>0) rows.push([icon('moon',16),'İlaçsız gece', medFree+' gece']);
   var h='<div style="background:linear-gradient(135deg,rgba(255,225,154,0.4),rgba(247,221,229,0.55));border:1px solid var(--card-bd);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:17px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;">Bu hafta sen '+icon('sparkles',16)+'</div>';
+  h+='<div style="font-size:var(--f-body);font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;">Bu hafta sen '+icon('sparkles',16)+'</div>';
   h+='<div style="display:flex;flex-direction:column;gap:9px;">';
-  rows.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:11px;"><span style="width:24px;display:flex;justify-content:center;">'+r[0]+'</span><span style="flex:1;font-size:13.5px;color:var(--text2);">'+r[1]+'</span><span style="font-size:14px;font-weight:800;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
+  rows.forEach(function(r){ h+='<div style="display:flex;align-items:center;gap:11px;"><span style="width:24px;display:flex;justify-content:center;">'+r[0]+'</span><span style="flex:1;font-size:var(--f-footnote);color:var(--text2);">'+r[1]+'</span><span style="font-size:var(--f-subhead);font-weight:800;color:var(--text);text-align:right;">'+r[2]+'</span></div>'; });
   h+='</div>';
-  if(moodLink) h+='<div style="font-size:13px;font-weight:600;color:var(--accent-ink);background:var(--card);border-radius:14px;padding:11px 13px;">'+moodLink+'</div>';
+  if(moodLink) h+='<div style="font-size:var(--f-footnote);font-weight:600;color:var(--accent-ink);background:var(--card);border-radius:14px;padding:11px 13px;">'+moodLink+'</div>';
   h+='</div>';
   return h;
 }
@@ -12774,16 +12774,16 @@ function consistencyMomentumCard(){
   var momIcon=momentum==null?'minus':(momentum>0?'trending-up':(momentum<0?'chart-column':'minus'));
   var momCol=momentum==null?'var(--muted)':(momentum>0?'#3F8A4F':(momentum<0?'#E9899F':'var(--muted)'));
   var momTxt=momentum==null?'—':((momentum>0?'+':'')+String(momentum).replace('.',','));
-  var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+  var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:var(--f-title3);font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:var(--f-caption2);color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
-  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
+  h+='<div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
   h+='<div style="display:flex;gap:8px;">'+tile('%'+consist,'Tutarlılık (30g)','var(--accent)')+tile(active30+'/30','Aktif gün','#5BA85B')+tile(momTxt,'Momentum (7g)',momCol)+'</div>';
   if(hasWd){
-    h+='<div style="display:flex;flex-direction:column;gap:6px;"><div style="font-size:11.5px;font-weight:700;color:var(--muted);">Haftanın günleri (son 8 hafta)</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;"><div style="font-size:var(--f-caption1);font-weight:700;color:var(--muted);">Haftanın günleri (son 8 hafta)</div>';
     h+='<div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
     wdPct.forEach(function(pc){ var hh=pc!=null?Math.max(6,Math.round(pc/100*40)):4; var col=pc==null?'rgba(150,110,120,0.18)':(pc>=66?'#8FBF8A':(pc>=33?'#E9AFC1':'#C9B8FF')); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="width:100%;max-width:20px;height:'+hh+'px;border-radius:5px;background:'+col+';"></div></div>'; });
     h+='</div>';
-    h+='<div style="display:flex;gap:5px;">'; wdLabels.forEach(function(l){ h+='<div style="flex:1;text-align:center;font-size:11px;color:var(--faint);font-weight:700;">'+l+'</div>'; }); h+='</div>';
+    h+='<div style="display:flex;gap:5px;">'; wdLabels.forEach(function(l){ h+='<div style="flex:1;text-align:center;font-size:var(--f-caption2);color:var(--faint);font-weight:700;">'+l+'</div>'; }); h+='</div>';
     h+='</div>';
   }
   h+=sciNote('Tutarlılık, tekil zirvelerden değerlidir: davranışın otomatikleşmesi (habit formation) tekrar sıklığına bağlıdır. Momentum, son 7 günün önceki 7 güne göre yönü — küçük pozitif ivme bile bileşik olarak birikir.');
@@ -12804,9 +12804,9 @@ function badgesGrid(){
     {e:icon('book-open',20),l:'Okuma tutkunu',done:readingDays>=7,sub:readingDays>=7?'tamam':readingDays+'/7'},
     {e:icon('sparkles',20),l:'7/7 mükemmel',done:perfect>=1,sub:perfect>0?perfect+' gün':'henüz yok'}
   ];
-  var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Rozetler '+icon('trophy',17)+'</div>';
+  var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:7px;">Rozetler '+icon('trophy',17)+'</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">';
-  badges.forEach(function(b){ var on=b.done; h+='<div style="display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;'+(on?'background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid #E9AFC1;':'background:var(--card);border:1px solid var(--card-bd);opacity:0.62;')+'"><span style="display:inline-flex;'+(on?'':'filter:grayscale(1);')+'">'+b.e+'</span><div style="min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+esc(b.l)+'</div><div style="font-size:11px;color:var(--faint);">'+esc(b.sub)+'</div></div></div>'; });
+  badges.forEach(function(b){ var on=b.done; h+='<div style="display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;'+(on?'background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid #E9AFC1;':'background:var(--card);border:1px solid var(--card-bd);opacity:0.62;')+'"><span style="display:inline-flex;'+(on?'':'filter:grayscale(1);')+'">'+b.e+'</span><div style="min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+esc(b.l)+'</div><div style="font-size:var(--f-caption2);color:var(--faint);">'+esc(b.sub)+'</div></div></div>'; });
   h+='</div></div>';
   return h;
 }
@@ -12817,11 +12817,11 @@ function weeklyStepRecap(){
   var last7=lastNDays(7);
   var prev7=[]; for(var i=13;i>=7;i--){ var d=addDays(t,-i); prev7.push({date:d,rec:data.days[d]||null}); }
   var cov=last7.filter(function(o){return stepOf(o)>0;});
-  var head='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;letter-spacing:.8px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:3px 10px;">'+icon('hexagon',12)+' ÆON</span><span style="font-size:14.5px;font-weight:700;color:var(--text);">Haftalık adım özeti</span>';
+  var head='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:var(--f-caption1);font-weight:800;letter-spacing:.8px;color:#1a1404;background:linear-gradient(135deg,#E6C15A,#C99A3A);border-radius:999px;padding:3px 10px;">'+icon('hexagon',12)+' ÆON</span><span style="font-size:var(--f-subhead);font-weight:700;color:var(--text);">Haftalık adım özeti</span>';
   if(!cov.length){
     return '<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;border:1px solid rgba(201,160,60,0.30);background:linear-gradient(135deg,rgba(230,193,90,0.10),rgba(155,127,201,0.07));">'
       +head+'</div>'
-      +'<div style="font-size:13px;color:var(--text2);line-height:1.5;">Bu hafta henüz adım kaydın yok. Eklemen 5 saniye — ya da <b style="display:inline-flex;align-items:center;gap:4px;">'+icon('apple',13)+' Sağlık’tan çek</b> ile otomatik gelsin. Küçük bir veri, büyük resmi netleştirir.</div></div>';
+      +'<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Bu hafta henüz adım kaydın yok. Eklemen 5 saniye — ya da <b style="display:inline-flex;align-items:center;gap:4px;">'+icon('apple',13)+' Sağlık’tan çek</b> ile otomatik gelsin. Küçük bir veri, büyük resmi netleştirir.</div></div>';
   }
   var avg=Math.round(cov.reduce(function(a,o){return a+stepOf(o);},0)/cov.length);
   var peak=last7.reduce(function(m,o){return Math.max(m,stepOf(o));},0);
@@ -12832,13 +12832,13 @@ function weeklyStepRecap(){
   else if(avg>=4000) msg='Güzel gidiyor; bu aralıkta bile kazanç net. Küçük artışlar büyük fark yapar.';
   else msg='Başlangıç senin hızında — yarın 500 adım fazlası bile ilerlemedir. Kendine yüklenme.';
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;border:1px solid rgba(201,160,60,0.30);background:linear-gradient(135deg,rgba(230,193,90,0.08),rgba(155,127,201,0.06));">';
-  h+=head+'<span style="margin-left:auto;font-size:12px;color:var(--faint);font-weight:700;">'+cov.length+'/7 gün</span></div>';
-  h+='<div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;"><div><span style="font-size:24px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+avg.toLocaleString('tr-TR')+'</span><span style="font-size:12px;color:var(--faint);"> ort. adım/gün</span></div>';
-  if(peak>0) h+='<div style="font-size:12.5px;color:var(--muted);">Tepe <b style="color:var(--text2);">'+peak.toLocaleString('tr-TR')+'</b></div>';
-  if(prevAvg!=null){ var d2=avg-prevAvg, pct=prevAvg?Math.round(d2/prevAvg*100):0; h+='<div style="font-size:12.5px;font-weight:700;margin-left:auto;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
+  h+=head+'<span style="margin-left:auto;font-size:var(--f-caption1);color:var(--faint);font-weight:700;">'+cov.length+'/7 gün</span></div>';
+  h+='<div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;"><div><span style="font-size:var(--f-title2);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+avg.toLocaleString('tr-TR')+'</span><span style="font-size:var(--f-caption1);color:var(--faint);"> ort. adım/gün</span></div>';
+  if(peak>0) h+='<div style="font-size:var(--f-footnote);color:var(--muted);">Tepe <b style="color:var(--text2);">'+peak.toLocaleString('tr-TR')+'</b></div>';
+  if(prevAvg!=null){ var d2=avg-prevAvg, pct=prevAvg?Math.round(d2/prevAvg*100):0; h+='<div style="font-size:var(--f-footnote);font-weight:700;margin-left:auto;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
   h+='</div>';
   h+=trendBars(last7,function(o){return stepOf(o);},'linear-gradient(180deg,#E6C15A,#E9899F)');
-  h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">'+msg+'</div>';
+  h+='<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">'+msg+'</div>';
   h+='</div>';
   return h;
 }
@@ -12852,26 +12852,26 @@ function distanceRecapCard(){
   var todayM=dayMovement(data.days[t]||null);
   var last30=lastNDays(30); var mTot=sum(last30,'total');
   var any=mTot>0||wTot>0||todayM.total>0;
-  var head='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">Mesafe & Hareket '+icon('map-pin',16)+'</span></div>';
+  var head='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:var(--f-callout);font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">Mesafe & Hareket '+icon('map-pin',16)+'</span></div>';
   if(!any){
     return '<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;">'+head
-      +'<div style="font-size:13px;color:var(--text2);line-height:1.5;">Henüz kayıtlı hareket yok. Bugün ekranındaki <b>Konum & Hareket</b> kartından takibi açarsan, kat ettiğin mesafe burada günlük, haftalık ve zaman içinde birikir.</div></div>';
+      +'<div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Henüz kayıtlı hareket yok. Bugün ekranındaki <b>Konum & Hareket</b> kartından takibi açarsan, kat ettiğin mesafe burada günlük, haftalık ve zaman içinde birikir.</div></div>';
   }
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">'+head;
   h+='<div style="display:flex;gap:10px;">';
-  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bugün</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(todayM.total)+'</div></div>';
-  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">Bu hafta</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(wTot)+'</div></div>';
-  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;">30 gün</div><div style="font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(mTot)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">Bugün</div><div style="font-size:var(--f-headline);font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(todayM.total)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">Bu hafta</div><div style="font-size:var(--f-headline);font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(wTot)+'</div></div>';
+  h+='<div style="flex:1;background:var(--icon);border-radius:14px;padding:11px;text-align:center;"><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;">30 gün</div><div style="font-size:var(--f-headline);font-weight:800;font-variant-numeric:tabular-nums;">'+fmtDist(mTot)+'</div></div>';
   h+='</div>';
-  if(pTot>0){ var d2=wTot-pTot, pct=Math.round(d2/pTot*100); h+='<div style="font-size:12.5px;font-weight:700;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
-  h+='<div style="font-size:12px;color:var(--muted);">Günlük mesafe (son 7 gün)</div>';
+  if(pTot>0){ var d2=wTot-pTot, pct=Math.round(d2/pTot*100); h+='<div style="font-size:var(--f-footnote);font-weight:700;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
+  h+='<div style="font-size:var(--f-caption1);color:var(--muted);">Günlük mesafe (son 7 gün)</div>';
   h+=trendBars(last7,function(o){return dayMovement(o.rec).total;},'linear-gradient(180deg,#7DBE77,#9B7FC9)');
-  h+='<div style="display:flex;gap:5px;">'; last7.forEach(function(o){ h+='<div style="flex:1;text-align:center;font-size:11px;color:var(--faint);">'+o.date.slice(8)+'</div>'; }); h+='</div>';
-  h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
+  h+='<div style="display:flex;gap:5px;">'; last7.forEach(function(o){ h+='<div style="flex:1;text-align:center;font-size:var(--f-caption2);color:var(--faint);">'+o.date.slice(8)+'</div>'; }); h+='</div>';
+  h+='<div style="display:flex;gap:8px;font-size:var(--f-footnote);">';
   h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('footprints',14)+' Yürüyüş <b style="margin-left:auto;">'+fmtDist(wWalk)+'</b></span>';
   h+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('car',14)+' Araç <b style="margin-left:auto;">'+fmtDist(wVeh)+'</b></span>';
   h+='</div>';
-  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">Ölçüm yalnızca uygulama açıkken birikir. Hareketler korunur, silinmez.</div>';
+  h+='<div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.4;">Ölçüm yalnızca uygulama açıkken birikir. Hareketler korunur, silinmez.</div>';
   h+='</div>';
   return h;
 }
@@ -12891,21 +12891,21 @@ function moodHeatmapCard(){
   var nW=weeks.length;
   var h='<div class="surface" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
-  h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;">Mod ısı haritası '+icon('calendar',16)+'</div>';
+  h+='<div style="font-size:var(--f-callout);font-weight:700;display:flex;align-items:center;gap:6px;">Mod ısı haritası '+icon('calendar',16)+'</div>';
   var prevOk=curY>startY, nextOk=curY<nowY;
   h+='<div style="display:flex;align-items:center;gap:6px;">';
-  h+='<button '+(prevOk?'onclick="App.heatYear(-1)"':'disabled')+' style="border:none;cursor:'+(prevOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:16px;opacity:'+(prevOk?'1':'0.3')+';">‹</button>';
-  h+='<div style="font-size:14px;font-weight:800;min-width:46px;text-align:center;">'+curY+'</div>';
-  h+='<button '+(nextOk?'onclick="App.heatYear(1)"':'disabled')+' style="border:none;cursor:'+(nextOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:16px;opacity:'+(nextOk?'1':'0.3')+';">›</button>';
+  h+='<button '+(prevOk?'onclick="App.heatYear(-1)"':'disabled')+' style="border:none;cursor:'+(prevOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:var(--f-callout);opacity:'+(prevOk?'1':'0.3')+';">‹</button>';
+  h+='<div style="font-size:var(--f-subhead);font-weight:800;min-width:46px;text-align:center;">'+curY+'</div>';
+  h+='<button '+(nextOk?'onclick="App.heatYear(1)"':'disabled')+' style="border:none;cursor:'+(nextOk?'pointer':'default')+';width:28px;height:28px;border-radius:50%;background:var(--card);color:var(--text);font-size:var(--f-callout);opacity:'+(nextOk?'1':'0.3')+';">›</button>';
   h+='</div></div>';
   h+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">';
   h+='<div style="display:inline-flex;flex-direction:column;gap:4px;">';
   h+='<div style="position:relative;height:12px;margin-left:'+(DAYLABW+GAP)+'px;width:'+(nW*STEP)+'px;">';
-  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ h+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:11px;font-weight:700;color:var(--faint);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
+  for(var w=0; w<nW; w++){ for(var di=0; di<7; di++){ var dd=weeks[w][di]; if(dd.getFullYear()===curY && dd.getDate()===1){ h+='<span style="position:absolute;left:'+(w*STEP)+'px;top:0;font-size:var(--f-caption2);font-weight:700;color:var(--faint);white-space:nowrap;">'+monN[dd.getMonth()]+'</span>'; } } }
   h+='</div>';
   h+='<div style="display:flex;gap:'+GAP+'px;">';
   h+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:'+DAYLABW+'px;">';
-  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:11px;color:var(--faint);text-align:right;">'+dayLab[r]+'</div>'; }
+  for(var r=0; r<7; r++){ h+='<div style="height:'+CELL+'px;line-height:'+CELL+'px;font-size:var(--f-caption2);color:var(--faint);text-align:right;">'+dayLab[r]+'</div>'; }
   h+='</div>';
   var recDays=0;
   for(var w2=0; w2<nW; w2++){
@@ -12925,12 +12925,12 @@ function moodHeatmapCard(){
   }
   h+='</div></div></div>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">';
-  h+='<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--faint);">zor';
+  h+='<div style="display:flex;align-items:center;gap:5px;font-size:var(--f-caption2);color:var(--faint);">zor';
   ['cok-zorlandim','zorlandim','normal','iyi','cok-iyi'].forEach(function(mid){ h+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
   h+='iyi</div>';
-  h+='<div style="font-size:11px;color:var(--faint);">'+recDays+' gün kayıtlı · dokun → düzenle</div>';
+  h+='<div style="font-size:var(--f-caption2);color:var(--faint);">'+recDays+' gün kayıtlı · dokun → düzenle</div>';
   h+='</div>';
-  if(recDays===0) h+='<div style="font-size:12px;color:var(--faint);line-height:1.5;">'+curY+' için henüz mod kaydı yok. Bir kareye dokunup o günü açabilirsin.</div>';
+  if(recDays===0) h+='<div style="font-size:var(--f-caption1);color:var(--faint);line-height:1.5;">'+curY+' için henüz mod kaydı yok. Bir kareye dokunup o günü açabilirsin.</div>';
   h+='</div>';
   return h;
 }

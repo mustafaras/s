@@ -147,6 +147,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-47 | `mesaj` sekmesi ve sohbet bileşenleri | ✅ TAMAMLANDI | `65178c6` | Mesaj dump'ında ham px **0**; S4 tam yeşil; S5 sabit 699 | `mesajHTML()` ve sohbet bileşenleri (çağrı grafiği 4 seviye, 247 fonksiyon — en geniş grafik, paylaşılan modal/rozet yardımcılarının çoğunu kapsıyor). **373 site** eşlendi. **Muafiyet sayacı notu:** 42/44/48/130px yine listelendi ama bunlar AD-45'te muaf tutulan **aynı** sitelerdir; muaf siteler ham px olarak kaldığı için kendilerini kapsayan her çağrı grafiğinde yeniden sayılırlar — yeni muafiyet eklenmedi. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
 
+| AD-48 | Overlay hub'ları | ✅ TAMAMLANDI | `<commit>` | **zikr-harness 95/95** (prompt bunu zorunlu kılıyor); driver 0 hata; S4 tam yeşil | 📖 okuma, 🎬 izleme, 🎧 dinleme, 🎓 öğrenme, 🧘 zihin-beden ve **İlham & İbadet** (Saygı, İman Köşesi, kıble, Kur'an Yolculuğu) + oda overlay'i — 11 kök fonksiyondan çağrı grafiği. **329 site** eşlendi. Muaf sayacı 8 gösteriyor ama bunlar **8 farklı site değil**: 42/44/48/130px AD-45'ten, 72px filigran bu grafikte ilk kez göründü; muaf siteler ham kaldığı için her kapsayan grafikte yeniden sayılıyor. Toplam benzersiz dekoratif muafiyet hâlâ AD-43'te belirlenen listede. **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -163,9 +165,9 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
-| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 5/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 6/8 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **47/52** | |
+| | **Toplam** | **48/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

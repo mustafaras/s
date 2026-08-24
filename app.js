@@ -4666,7 +4666,7 @@ function sha256(str){
   return out;
 }
 
-var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
 ui.locationGateState=(data&&data.settings&&data.settings.locationEnabled)?'checking':'required';
 ui.locationGateError='';
 ui.locationGateRequestInFlight=false;
@@ -17849,7 +17849,9 @@ function submitAeonQuestion(question){
   ui.aeonDraft=''; ui.aeonError=null; ui.aeonScrollBottom=true; // appendAeonOutgoing render()'a düşerse de en alta insin
   haptic(14);
   save();
-  appendAeonOutgoing({sort:ts,kind:'out',text:question,time:ts,answered:false,reviewing:false});
+  // qaId/qaField, tam render'ın ürettiği balon anahtarıyla BİREBİR aynı olmalı;
+  // yoksa uzun bir soruyu gönderip hemen açtığında ilk tam render'da kapanır.
+  appendAeonOutgoing({sort:ts,kind:'out',text:question,time:ts,answered:false,reviewing:false,qaId:qid,qaField:'question'});
   // Gönderim sonrası odağı girdi kutusuna geri ver — sohbet akışı kesilmesin (WhatsApp-tarzı)
   try{ setTimeout(function(){ var el=document.getElementById('aeon-input'); if(el) el.focus(); },30); }catch(e){}
   // Soru anında panele iletilsin diye senkronu zorla (4 sn debounce'u beklemeden)
@@ -17881,7 +17883,7 @@ function submitAeonMedia(kind,base64,mime,extra,captionFallback){
     ui.aeonUploading=false; ui.aeonScrollBottom=true;
     haptic(14);
     save();
-    appendAeonOutgoing({sort:ts,kind:'out',text:captionFallback,time:ts,answered:false,reviewing:false,mediaKind:kind,mediaId:id,mediaMime:mime,durationSec:qaItem.durationSec,peaks:qaItem.peaks,w:qaItem.w,h:qaItem.h,mediaName:qaItem.mediaName,mediaSize:qaItem.mediaSize});
+    appendAeonOutgoing({sort:ts,kind:'out',text:captionFallback,time:ts,answered:false,reviewing:false,qaId:qid,qaField:'question',mediaKind:kind,mediaId:id,mediaMime:mime,durationSec:qaItem.durationSec,peaks:qaItem.peaks,w:qaItem.w,h:qaItem.h,mediaName:qaItem.mediaName,mediaSize:qaItem.mediaSize});
     try{ if(window.SeySync&&typeof window.SeySync.pushNow==='function') window.SeySync.pushNow(); }catch(e){}
     try{ if(window.SeySync&&typeof window.SeySync.pushPing==='function') window.SeySync.pushPing({id:qid,question:captionFallback,ts:ts}); }catch(e){}
     toast((kind==='file'?'Belge':(kind==='voice'?(extra&&extra.viaUpload?'Ses dosyası':'Sesli mesaj'):'Fotoğraf'))+' ÆON’a iletildi ⬡',2200);
@@ -18128,9 +18130,9 @@ function notifCardHTML(n){
 }
 // Luna = OpenAI destekli kişisel sohbet. WhatsApp tarzı balonlar: kullanıcı sorusu
 // sağ (mor) balon, Luna yanıtı sol balon. Günde LUNA_DAILY_LIMIT soru hakkı.
-function lunaBubbleOut(text,time){
+function lunaBubbleOut(text,time,key){
   var h='<div style="align-self:flex-end;max-width:88%;display:flex;flex-direction:column;align-items:flex-end;">';
-  h+='<div style="background:#7E62B8;color:#fff;border-radius:17px 17px 5px 17px;padding:10px 13px;font-size:var(--f-subhead);line-height:1.5;box-shadow:0 3px 10px rgba(126,98,184,0.28);">'+clampBubble(text,'#7E62B8')+'</div>';
+  h+='<div style="background:#7E62B8;color:#fff;border-radius:17px 17px 5px 17px;padding:10px 13px;font-size:var(--f-subhead);line-height:1.5;box-shadow:0 3px 10px rgba(126,98,184,0.28);">'+clampBubble(text,'#7E62B8',key||('l-q-'+String(time||'')))+'</div>';
   h+='<div style="font-size:var(--f-caption2);margin-top:3px;color:var(--faint);">'+esc(aeonTime(time))+'</div></div>';
   return h;
 }
@@ -18165,8 +18167,9 @@ function lunaChatHTML(){
     h+='<div style="text-align:center;padding:26px 18px;border-radius:20px;background:linear-gradient(160deg,rgba(155,127,201,0.12),rgba(233,175,193,0.08));border:1px solid rgba(155,127,201,0.18);"><div style="margin-bottom:7px;color:#9B7FC9;display:flex;justify-content:center;">'+icon('moon',30)+'</div><div style="font-size:var(--f-subhead);font-weight:800;color:var(--text);margin-bottom:5px;">Luna burada, seni dinlemeye hazır</div><div style="font-size:var(--f-footnote);color:var(--muted);line-height:1.6;">İçinden ne geçiyorsa — bir soru, bir dert ya da küçük bir sevinç… Aşağıya yazman yeterli. Acelen olmasın, ben buradayım.</div></div>';
   }
   qa.forEach(function(x){ if(!x) return;
-    h+=lunaBubbleOut(String(x.question||''),x.ts||x.date);
-    h+=lunaBubbleIn(clampBubble(String(x.answer||''),'var(--card)'),x.ts||x.date,false);
+    var lunaKey=String(x.ts||x.date||'');
+    h+=lunaBubbleOut(String(x.question||''),x.ts||x.date,'l-q-'+lunaKey);
+    h+=lunaBubbleIn(clampBubble(String(x.answer||''),'var(--card)','l-a-'+lunaKey),x.ts||x.date,false);
   });
   if(asking){
     h+=lunaBubbleOut(String(ui.askQuestion||''),new Date().toISOString());
@@ -18228,61 +18231,88 @@ function mdLite(safe){
   safe=safe.replace(/(^|[^_])_([^\n_]+?)_(?!_)/g,'$1<i>$2</i>');
   return safe;
 }
-function clampBubble(text,fadeColor){
-  var t=String(text==null?'':text);
-  var long=t.length>240||t.split('\n').length>7;
-  var safe=mdLite(esc(t));
-  if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
-  var h='<div style="position:relative;">';
-  h+='<div data-clamp="140" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
-  h+='<div class="seyfade" style="position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(180deg,rgba(0,0,0,0),'+fadeColor+' 92%);pointer-events:none;"></div></div>';
-  h+='<button onclick="App.toggleMsg(this)" style="margin-top:5px;border:none;background:none;cursor:pointer;font-size:var(--f-footnote);font-weight:800;color:inherit;opacity:.92;padding:2px 0;">Devamını göster ⌄</button>';
-  return h;
-}
-// ÆON sohbet balonlarında uzun metinler için kullanıcı kontrollü Tümünü göster / Daralt toggle'ı.
-// clampBubble()'dan farklı olarak butona basılmadan balon kendi kendine daralmaz; durum render sırasında
-// belirlenir ve her balon kendi indeksine göre bağımsız toggle'lanır.
+// ── Uzun sohbet balonlarının "Tümünü göster" durumu ───────────────────
+// Bu durum RENDER'DAN RENDER'A YAŞAMALIDIR. Eskiden yalnızca DOM'da (inline
+// style + data-exp) tutuluyor, ÆON balonunun id'si de her render'da artan bir
+// sayaçtan (aeon-bubble-<n>) üretiliyordu. render() #app.innerHTML'i baştan
+// kurduğu için 30 sn'lik ÆON poll'ü, reminder lifecycle timer'ı, foreground
+// dönüşü, yeni mesaj (mergeInbox) veya panel makbuzu (applyReceipts) kaynaklı
+// HER arka plan render'ı açılmış mesajı kullanıcı okurken kapatıyordu
+// (kullanıcı şikâyeti: "tam iki satır okucam mesaj kapanıyor").
+// Çözüm: kimlik mesajın kendisinden türetilir (render'lar arasında sabit) ve
+// açık/kapalı durumu ui.aeonExpanded'da tutulur. ui kalıcı değildir; data'ya,
+// migrate()'e ve senkronizasyona dokunmaz.
 var AEON_BUBBLE_MAX_LINES=7;
 var AEON_BUBBLE_MAX_CHARS=240;
-function aeonBubbleText(text,kind){
-  var t=String(text==null?'':text).trim();
-  var safe=mdLite(esc(t));
-  var long=t.length>AEON_BUBBLE_MAX_CHARS||t.split('\n').length>AEON_BUBBLE_MAX_LINES;
-  if(!long) return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
-  var id='aeon-bubble-'+((++aeonBubbleCounter)|0);
-  var isDarkOut=kind==='out';
-  var btnColor=isDarkOut?'rgba(255,255,255,0.88)':'var(--muted)';
-  var h='<div id="'+id+'" style="position:relative;">';
-  h+='<div data-aeon-bubble="1" data-exp="0" style="max-height:140px;overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
-  h+='<div data-aeon-fade="1" style="position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.18));pointer-events:none;"></div></div>';
-  h+='<button onclick="App.toggleAeonBubble(\''+id+'\')" style="margin-top:6px;border:none;background:none;cursor:pointer;font-size:var(--f-caption1);font-weight:800;color:'+btnColor+';opacity:.95;padding:2px 0;display:flex;align-items:center;gap:4px;">Tümünü göster ⌄</button>';
-  return h;
+var AEON_BUBBLE_CLAMP_PX='140px';
+var aeonBubbleCounter=0;
+// Kimliksiz bir balon kalmasın diye son çare sayaç; gerçek mesajların hepsinin
+// (ÆON bildirimi/soru/yanıtı, Luna kaydı) kararlı bir anahtarı vardır.
+function chatBubbleDomId(key){
+  var k=String(key==null?'':key).replace(/[^A-Za-z0-9_-]/g,'_');
+  return 'aeon-bubble-'+(k||('x'+(++aeonBubbleCounter)));
 }
-App.toggleAeonBubble=function(id){
+function chatBubbleExpanded(id){ return !!(ui.aeonExpanded&&ui.aeonExpanded[id]); }
+// Açık/kapalı görünümü DOM'da yerinde uygular — tam render'a gerek yok, böylece
+// kaydırma konumu ve odak korunur.
+function chatBubbleApply(id,open,openLabel,closedLabel){
   var wrap=document.getElementById(id); if(!wrap) return;
   var content=wrap.querySelector('[data-aeon-bubble="1"]');
   var fade=wrap.querySelector('[data-aeon-fade="1"]');
-  var btn=wrap.nextElementSibling;
-  if(!content) return;
-  if(content.getAttribute('data-exp')==='1'){
-    content.style.maxHeight='140px';
-    content.setAttribute('data-exp','0');
-    if(fade) fade.style.display='';
-    if(btn) btn.innerHTML='Tümünü göster ⌄';
-  } else {
-    content.style.maxHeight='none';
-    content.setAttribute('data-exp','1');
-    if(fade) fade.style.display='none';
-    if(btn) btn.innerHTML='Daralt ⌃';
-  }
-};
-var aeonBubbleCounter=0;
-App.toggleMsg=function(btn){
-  var wrap=btn.previousElementSibling; if(!wrap) return;
-  var content=wrap.querySelector('[data-clamp]'), fade=wrap.querySelector('.seyfade'); if(!content) return;
-  if(content.getAttribute('data-exp')==='1'){ content.style.maxHeight=content.getAttribute('data-clamp')+'px'; content.setAttribute('data-exp','0'); if(fade) fade.style.display=''; btn.textContent='Devamını göster ⌄'; }
-  else { content.style.maxHeight='none'; content.setAttribute('data-exp','1'); if(fade) fade.style.display='none'; btn.textContent='Daha az göster ⌃'; }
-};
+  var btn=document.getElementById(id+'-btn');
+  if(content){ content.style.maxHeight=open?'none':AEON_BUBBLE_CLAMP_PX; content.setAttribute('data-exp',open?'1':'0'); }
+  if(fade) fade.style.display=open?'none':'';
+  if(btn) btn.innerHTML=open?openLabel:closedLabel;
+}
+function chatBubbleToggle(id,openLabel,closedLabel){
+  if(!id) return;
+  if(!ui.aeonExpanded||typeof ui.aeonExpanded!=='object') ui.aeonExpanded={};
+  var open=!chatBubbleExpanded(id);
+  // Durum ÖNCE ui'ya yazılır; sonraki her render bu değeri okuyup balonu açık kurar.
+  if(open) ui.aeonExpanded[id]=true; else delete ui.aeonExpanded[id];
+  chatBubbleApply(id,open,openLabel,closedLabel);
+}
+// Kesilmiş balon gövdesi: render ile toggle aynı markup sözleşmesini paylaşır.
+function chatClampHTML(o){
+  var t=String(o.text==null?'':o.text);
+  var safe=mdLite(esc(o.trim?t.trim():t));
+  var raw=o.trim?t.trim():t;
+  if(!(raw.length>AEON_BUBBLE_MAX_CHARS||raw.split('\n').length>AEON_BUBBLE_MAX_LINES))
+    return '<div style="white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  var id=chatBubbleDomId(o.key), open=chatBubbleExpanded(id);
+  var h='<div id="'+id+'" style="position:relative;">';
+  h+='<div data-aeon-bubble="1" data-exp="'+(open?'1':'0')+'" style="max-height:'+(open?'none':AEON_BUBBLE_CLAMP_PX)+';overflow:hidden;white-space:pre-wrap;word-break:break-word;">'+safe+'</div>';
+  h+='<div data-aeon-fade="1" style="'+(open?'display:none;':'')+'position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(180deg,rgba(0,0,0,0),'+o.fade+');pointer-events:none;"></div></div>';
+  h+='<button id="'+id+'-btn" onclick="'+o.onclick.replace('%ID%',id)+'" style="'+o.btnStyle+'">'+(open?o.openLabel:o.closedLabel)+'</button>';
+  return h;
+}
+// Luna sohbeti — aynı "mesaj" sekmesinde yaşar, aynı kapanma hatasına açıktı.
+// Luna kayıtlarının id'si yok; kararlı anahtar ts + rol üzerinden kurulur.
+function clampBubble(text,fadeColor,key){
+  return chatClampHTML({text:text,key:key,fade:fadeColor+' 92%',trim:false,
+    onclick:"App.toggleMsg('%ID%')",
+    btnStyle:'margin-top:5px;border:none;background:none;cursor:pointer;font-size:var(--f-footnote);font-weight:800;color:inherit;opacity:.92;padding:2px 0;',
+    closedLabel:'Devamını göster ⌄', openLabel:'Daha az göster ⌃'});
+}
+App.toggleMsg=function(id){ chatBubbleToggle(id,'Daha az göster ⌃','Devamını göster ⌄'); };
+// ÆON sohbet balonlarında uzun metinler için kullanıcı kontrollü Tümünü göster / Daralt toggle'ı.
+// Butona basılmadan balon kendi kendine ne açılır ne daralır; her balon kendi
+// kararlı kimliğine göre bağımsız toggle'lanır.
+function aeonBubbleText(text,kind,key){
+  var isDarkOut=kind==='out';
+  return chatClampHTML({text:text,key:key,fade:'rgba(0,0,0,0.18)',trim:true,
+    onclick:"App.toggleAeonBubble('%ID%')",
+    btnStyle:'margin-top:6px;border:none;background:none;cursor:pointer;font-size:var(--f-caption1);font-weight:800;color:'+(isDarkOut?'rgba(255,255,255,0.88)':'var(--muted)')+';opacity:.95;padding:2px 0;display:flex;align-items:center;gap:4px;',
+    closedLabel:'Tümünü göster ⌄', openLabel:'Daralt ⌃'});
+}
+App.toggleAeonBubble=function(id){ chatBubbleToggle(id,'Daralt ⌃','Tümünü göster ⌄'); };
+// Bir ÆON akış öğesinin render'dan render'a değişmeyen balon anahtarı.
+function aeonBubbleKey(it){
+  if(!it) return '';
+  if(it.observer&&it.id) return 'n-'+it.id;
+  if(it.qaId) return (it.qaField==='answer'?'a-':'q-')+it.qaId;
+  return 't-'+String(it.time||'')+'-'+String(it.text||'').length;
+}
 // Tek bir ÆON sohbet balonu (giden soru ya da gelen yanıt/bildirim) için HTML üretir.
 // aeonChatHTML() tam listeyi bu yardımcıyla kurar; appendAeonOutgoing() ise tam render
 // yapmadan yalnızca YENİ mesajı DOM'a eklerken aynı markup'ı (sapma riski olmadan) tekrar kullanır.
@@ -18300,13 +18330,13 @@ function aeonMediaSlotHTML(it,bg,fg){
   return '<div id="'+elId+'" class="aeon-media-slot" data-media-id="'+esc(it.mediaId)+'" data-media-kind="voice" style="color:'+fg+';min-width:170px;"><span style="font-size:var(--f-footnote);opacity:.75;display:flex;align-items:center;gap:4px;">'+icon('mic',13)+' Yükleniyor…</span></div>';
 }
 function aeonItemHTML(it,enterCls){
-  var h='';
+  var h='', bubbleKey=aeonBubbleKey(it);
   if(it.kind==='out'){
     h+='<div class="msg-row out'+enterCls+'">';
     if(it.mediaKind){
       h+='<div class="msg-bubble out" style="padding:'+(it.mediaKind==='image'?'4px':'10px 13px')+';">'+aeonMediaSlotHTML(it,'rgba(255,255,255,0.16)','#fff')+'</div>';
     } else {
-      h+='<div class="msg-bubble out">'+aeonBubbleText(it.text,'out')+'</div>';
+      h+='<div class="msg-bubble out">'+aeonBubbleText(it.text,'out',bubbleKey)+'</div>';
     }
     var foot;
     if(it.answered) foot='<span style="color:var(--faint);display:inline-flex;align-items:center;gap:3px;">'+icon('check-check',11)+' yanıtlandı</span>';
@@ -18318,7 +18348,7 @@ function aeonItemHTML(it,enterCls){
     h+='<div class="msg-bubble in">';
     h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:var(--f-caption2);font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:var(--f-caption2);color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
     if(it.mediaKind) h+=aeonMediaSlotHTML(it,'var(--icon)','var(--aeon)');
-    else h+='<div style="font-size:var(--f-subhead);line-height:1.55;">'+aeonBubbleText(it.text,'in')+'</div>';
+    else h+='<div style="font-size:var(--f-subhead);line-height:1.55;">'+aeonBubbleText(it.text,'in',bubbleKey)+'</div>';
     var delBtn=(it.observer&&it.id)?('<button onclick="App.deleteNotif(\''+it.id+'\')" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button>'):'';
     var textActions='';
     if(!it.mediaKind&&it.text){

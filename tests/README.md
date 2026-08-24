@@ -11,6 +11,12 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `panel/` — legacy Panel 1 / observer fixture’ları (`test_panel_*.js` ve
   `test_faz11_panel.js`).
 - `app/` — sync ve büyük dosya davranışı için uygulama fixture’ları.
+- `app/test_aeon_message_expand.js` — ÆON/Luna sohbetinde uzun mesajın
+  “Tümünü göster” durumunun render’lar arasında yaşadığını doğrular. Kırpılmış
+  balonun kimliği eskiden her render’da artan bir sayaçtan üretiliyor ve açık/kapalı
+  bilgisi yalnızca DOM’da tutuluyordu; her arka plan render’ı (30 sn ÆON yoklaması,
+  reminder timer’ı, foreground dönüşü, yeni mesaj, panel makbuzu) mesajı kullanıcı
+  okurken kapatıyordu. Ağsız, sentetik, `node:vm` tabanlı.
 - `quran/` — Kur’an taşıma, katalog ve demo sözleşmesi fixture’ları.
 - `panel/test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
 - `panel/test_panel_boot_resilience.js` — panel boot/poll dayanıklılık fixture’ı:

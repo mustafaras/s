@@ -365,6 +365,23 @@ notlarını buraya ekleyebiliriz._
 
 ## 🗒️ Değişiklik günlüğü
 
+- **2026-08-24** — **🐛 ÆON mesajı okunmadan kapanıyordu (kalıcı düzeltme)**:
+  Uzun ÆON/Luna mesajları `max-height:140px` ile kırpılıyor, "Tümünü göster" ile açılan
+  balonun **açık durumu yalnızca DOM'da** (inline style + `data-exp`) tutuluyordu. Üstelik
+  balonun id'si her çizimde artan bir sayaçtan üretildiği için (`aeon-bubble-1` → `aeon-bubble-4`)
+  geri yüklenebilecek bir kimlik de yoktu. `render()` her çağrıldığında `#app.innerHTML`
+  baştan kurulduğundan, 30 sn'lik ÆON yoklaması, reminder lifecycle timer'ı, foreground
+  dönüşü (`focus`/`pageshow`/`visibilitychange`), yeni mesaj (`mergeInbox`) veya panel
+  makbuzu (`applyReceipts`) kaynaklı **her** arka plan render'ı mesajı kullanıcı okurken
+  kapatıyordu. 2026-08-09'daki `8f9ba4b` yalnızca üstteki bildirim balonunun silinip
+  yeniden kurulmasını düzeltmişti; sohbet akışındaki bu kapanma açıkta kalmıştı.
+  Artık balon kimliği mesajın kendisinden türüyor (`aeon-bubble-n-<msgId>`,
+  `-q-`/`-a-<qaId>`, Luna için `-l-q-`/`-l-a-<ts>`) ve açık/kapalı durumu `ui.aeonExpanded`'da
+  tutuluyor — kalıcı `data`'ya, `migrate()`'e ve senkronizasyona dokunmadan. Hızlı ekleme
+  yolu (`appendAeonOutgoing`) da tam render ile aynı anahtarı taşıyor. Regresyon fixture'ı:
+  `tests/app/test_aeon_message_expand.js` (18 assertion; düzeltme öncesi kodda 11 fail).
+  Cache-bust: `app.js?v=20260824e`.
+
 - **2026-07-20** — **🔒 Conflict-safe sync + PWA altyapı güçlendirme + CI ön doğrulama**:
   `origin/main` ile dal birleştirildi; `manifest.json`, `sw.js`, Faz 12 PWA bildirimleri ve Faz 30 spam fix bu dala geldi.
   `sync.js` artık her push öncesinde uzak `data/latest.json`'u çekip yerel veriyle **zaman damgasına göre birleştirme**

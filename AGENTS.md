@@ -201,6 +201,14 @@ docs/GELISTIRME-PLANI.md  Living Turkish roadmap/spec doc with a feature status
 tests/app/test_faz10_sync.js   Committed headless Node harness: sync.js conflict-merge
                  tests with mocked window/localStorage/fetch (no network).
                  Run: `node tests/app/test_faz10_sync.js`.
+tests/app/test_aeon_message_expand.js  ÆON/Luna sohbetinde uzun mesajın "Tümünü
+                 göster" durumunun render'lar arasında yaşadığını doğrulayan ağsız
+                 node:vm fixture'ı. Kırpılmış balonun kimliği eskiden her render'da
+                 artan bir sayaçtan üretiliyor, açık/kapalı bilgisi yalnızca DOM'da
+                 tutuluyordu; bu yüzden her arka plan render'ı (30 sn ÆON yoklaması,
+                 reminder timer'ı, foreground dönüşü, yeni mesaj, panel makbuzu)
+                 mesajı kullanıcı okurken kapatıyordu.
+                 Run: `node tests/app/test_aeon_message_expand.js`.
 tests/panel/test_faz11_panel.js  Headless Node harness for panel.html helper/render
                  logic. Run: `node tests/panel/test_faz11_panel.js`.
 tests/panel/test_panel_p0_sync.js Headless Node fixture for PANEL-01 receipt/revision,
@@ -363,6 +371,7 @@ node --check sync.js
 ### Committed headless tests (no network, safe to run)
 ```bash
 node tests/app/test_faz10_sync.js   # sync.js conflict-merge harness (mocked fetch)
+node tests/app/test_aeon_message_expand.js  # ÆON/Luna uzun mesaj okuma kalıcılığı
 node tests/panel/test_faz11_panel.js  # panel.html helper/render harness
 node tests/panel/test_panel_p0_sync.js # PANEL-01 receipt/revision + anti-clobber fixture
 node tests/panel/test_panel_p1_projection.js # PANEL-02 coverage/redaction/projection fixture

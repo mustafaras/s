@@ -139,5 +139,20 @@ t('app/styles.css içinde @media (prefers-color-scheme: dark) yok (AD-31 A seçe
 const mainDarkBlocks = (css.match(/#root\[data-theme="dark"\]\s*\{[^}]*--page\s*:/g) || []).length;
 t(`ana koyu token bloğu tek (--page tanımlayan), bulunan: ${mainDarkBlocks}`, mainDarkBlocks === 1);
 
+console.log('\n[8] Boot öncesi flaş koruması (AD-31-FIX-2)');
+const html = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+const boot = html.match(/AD-31-FIX-2[\s\S]*?\}\)\(\);/);
+t('index.html boyamadan önce temayı çözen blok taşıyor', !!boot);
+if (boot) {
+  const b = boot[0];
+  t('  aynı localStorage anahtarını okuyor', b.includes("'seyma-theme'"));
+  t('  aynı üç durumu ayırt ediyor', b.includes("'dark'") && b.includes("'light'") && b.includes('system'));
+  t('  matchMedia ile sistemi çözüyor', /prefers-color-scheme:\s*dark/.test(b));
+  t('  matchMedia yoksa çökmeyecek şekilde korumalı', b.includes('window.matchMedia &&'));
+  t('  #root üzerine data-theme yazıyor', /setAttribute\('data-theme'/.test(b));
+  t('  theme-color metasını da senkronluyor', b.includes('theme-color'));
+}
+t('#root JS\'siz yedek olarak hâlâ bir data-theme taşıyor', /<div id="root"[^>]*data-theme="/.test(html));
+
 console.log(`\n=== ${pass} geçti, ${fail} kaldı ===`);
 process.exit(fail ? 1 : 0);

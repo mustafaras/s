@@ -20,6 +20,8 @@
 
 **Uygulanan promptlar:** AD-01 … AD-42 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-36-FIX onarımları). **Dalga 1–8 tamamlandı: 42/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d` ile deploy edildi (2026-08-24); **dalga 8 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
+**Program dışı onarım — `AD-31-FIX-2` (2026-08-24):** AD-31'in "uygulanmadı" gözlemi kapatıldı. `index.html` `#root`'a statik `data-theme="light"` yazdığı için sistemi koyu olan kullanıcı her açılışta kısa bir **beyaz flaş** görüyordu — dalga 6'nın kendi özelliğinin altını oyan bir kusur. `#root`'tan hemen sonra, boyamadan önce çalışan satır içi bir çözümleyici eklendi (app.js'teki `resolveDark()` ile aynı mantık). ⚠️ Mantık artık **iki yerde** (`app.js:4595` + `index.html`); `verify-theme-tristate.mjs` grup [8] bu senkronu 8 assertion ile bekliyor (fixture 18 → 26). Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX-2`. Prompt sayacı değişmedi.
+
 **Program dışı onarım — `AD-31-FIX` (2026-08-24):** Dalga 6 kapanışı yeşildi ama AD-31'in yeni çalışma zamanı mantığını koruyan kalıcı bir fixture yoktu (doğrulama yalnızca oturum scratchpad'indeydi) ve [`../IOS27-TASARIM-PLANI.md`](../IOS27-TASARIM-PLANI.md) başlığı hâlâ "uygulama başlamadı" diyordu. `docs/apple-design/verify-theme-tristate.mjs` (18 assertion) commit edildi ve doğrulama kapısına eklendi; plan başlığı düzeltilip §4 puan tablosunun dondurulmuş denetim kaydı olduğu yazıldı. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
 
 **Program dışı onarım — `AD-25-FIX` (2026-08-23):** Dalga 4 doğrulamasında iki erişilebilirlik kusuru bulundu ve düzeltildi: 19 olay-yutan kapsayıcıdan yanlış `role="button"`/`tabindex`/`onkeydown` kaldırıldı, `role="dialog"` overlay'i Enter/Space yerine Escape ile kapanır oldu. Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-25-FIX`. Prompt sayacı değişmedi — onarım, yeni prompt değil.
@@ -120,6 +122,9 @@ kullanmıyordu zaten — kendi `backdrop-filter` kuralları var ve **camlı kald
 ⚠️ **`.glass` kuralı artık kullanıcısız ölü CSS** — bilinçli olarak silinmedi (AD-39 kararı): sınıf,
 ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşıyor. Sonraki ajan bunu "unutulmuş kod"
 sanıp temizlemesin.
+
+✅ **Kapatıldı (AD-31-FIX-2):** AD-31'in boot-öncesi tema flaşı gözlemi artık çözüldü — `index.html`
+boyamadan önce temayı çözüyor. Mantık iki yerde yaşıyor; fixture grup [8] senkronu koruyor.
 
 ⚠️ **Görsel doğrulama hâlâ cihazda yapılmadı.** Kart sınırları **sayısal** olarak doğrulandı
 (kart↔zemin kontrastı 1.10 → 1.12, yani sınır korundu ve hafifçe belirginleşti), gözle değil.

@@ -153,6 +153,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-50 | Dalga 9 kapanışı | ✅ TAMAMLANDI | `bb56086` | S8 + S4 (8 kapı) + S5; **ham px 1696 → 13** (belgeli muafiyet) | **S8 cache-bust:** `app.js` ve `app/styles.css` → **`?v=20260824d`**. **S4 tam yeşil:** syntax 3/3, driver 31/0, zikr 95/95, tema 26/26, kontrast 30/30, sync 64/64, panel v1 50/50, panel-v2 27/27. **S5 dalga geneli (`4030530` → HEAD):** handler **699 sabit**, çağrı dağılımı **birebir aynı** — dalga 9 yalnızca `font-size` değeri düzeyinde kaldığı için **sıfır I2 etkisi**. **Sonuç:** `app.js` **1262 → 10**, `app/styles.css` **434 → 3**; toplam **1696 → 13** ham px, **1687 site** adlandırılmış `rem` ölçeğine taşındı. Token kullanımı **0 → 1687**. 5 sekmenin render çıktısında ham px **0**. **Dynamic Type kazanıldı:** `html`/`body`/`:root`'ta `font-size` tanımı olmadığı için `rem` tabanı tarayıcı varsayılanıdır ve kullanıcının metin boyutu ayarıyla ölçeklenir. **13 muafiyet (bilinçli, kullanıcı onaylı):** app.js'te 130/72/3×44px kıvrık tırnak filigranları, 48px 🦩 marka flaması, 42px 📍 emoji, 40/38px ikon kapsayıcıları, 44px "Şeyma" marka kelimesi; `app/styles.css`'te 54px maskot, 46/38px zikir parıltıları. Ayrıca 4 display `clamp()` (vw tabanlı hero boyutları). Hepsi 34px `--f-large` tavanının üstünde ve metin değil **display/grafik**; Dynamic Type ile ölçeklenmeleri düzeni bozar. **Dalga 9 tablosu 8/8, toplam 50/52.** `currentWave` → **10**. Dalga 10 (AD-51 panel-v2 reduced-motion, AD-52 program kapanışı) **ek onay istemez**. |
 
+| AD-51 | Panel-v2 reduced-motion kapsamı | ✅ TAMAMLANDI | `<commit>` | Panel-v2 27/27 fixture geçti; `git diff --check` temiz | `panel/v2/panel-v2.css` içindeki önceki hedefli kurallara ek olarak dosyanın sonuna global reduced-motion güvenlik ağı eklendi: tüm animasyon/geçişler ve scroll davranışı kapanıyor, kalan hover/lift dönüşümleri anlık oluyor. Panel-v2 CSS cache-bust `20260824a`; S5 app handler yüzeyi 699 ve çağrı dağılımı değişmedi. |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -170,8 +172,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 5/5 | ✅ tamamlandı |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 8/8 | ✅ tamamlandı |
-| 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **50/52** | |
+| 10 · Panel + kapanış | AD-51 … AD-52 | 1/2 | sürüyor |
+| | **Toplam** | **51/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 
@@ -199,7 +201,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | 11px altı font — app.js | **167** (plan 65 diyordu; 10px×48 + 10.5px×54 sayılmamış) | ✅ 0 | AD-34…AD-36 + AD-36-FIX |
 | `.glass` içerik katmanında | **68** (plan 69 diyordu; `sg-glass` ayrı sınıf) | 0 | AD-39 … AD-41 |
 | Ham `font-size:NNpx` — app.js | **1262** (+ styles.css 434 = 1696) | 13 belgeli dekoratif muafiyet | AD-44 … AD-49 |
-| `prefers-reduced-motion` — panel-v2 | 1 | kapsam genişletildi | AD-51 |
+| `prefers-reduced-motion` — panel-v2 | 1 hedefli blok | 2 blok + global güvenlik ağı | AD-51 |
 
 **Kayda geçmiş taban kayması — `App.toggleCard` 2 → 3 (AD-19-FIX):** iç içe buton onarımı, konum kartı başlığını asıl kontrol (`aria-expanded`, odaklanabilir) ile chevron (`tabindex="-1" aria-hidden="true"`) olarak ikiye böldü. Ekran okuyucu ve klavye hâlâ **tek** kontrol görür; sapma meşrudur. S5 karşılaştırması bu tek farkı bekler — başka herhangi bir fark I2 ihlalidir.
 

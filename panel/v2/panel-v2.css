@@ -5327,6 +5327,7 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   .history-kpis { grid-template-columns: 1fr; }
   .day-detail-accordion__body { padding-inline: var(--ae-space-sm); }
 }
+
 /* QY-22 — Kur’an kanonik durum aynası (Panel 1 ile aynı latest.json kaynağı). */
 .ae-quran-card{gap:16px}
 .ae-quran-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
@@ -5347,3 +5348,36 @@ html, body { margin: 0; padding: 0; overscroll-behavior: none; }
 .ae-quran-card__row-meta{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:6px;color:var(--ae-muted);font-size:var(--ae-scale-compact);line-height:1.4}
 .ae-quran-card__foot{color:var(--ae-muted);font-size:var(--ae-scale-compact);text-align:right}
 @media(max-width:520px){.ae-quran-card__head{flex-direction:column}.ae-quran-card__status{align-self:flex-start}.ae-quran-card__row-top{align-items:flex-start;flex-direction:column;gap:6px}}
+
+/* AD-51 — dosyanın sonuna eklenen bileşenler için reduced-motion güvenlik ağı.
+   Yeni bir yüzey hedefli listeye eklenmeyi unutsa bile sistem tercihi tüm
+   animasyon ve geçişleri kapatır; işlevsel durum dönüşümleri anlık kalır. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(aeon-root),
+  ::view-transition-new(aeon-root) {
+    animation: none !important;
+  }
+
+  .ae-card:hover,
+  .anomaly-card:hover,
+  .ae-status-btn:hover,
+  .ae-btn:hover,
+  .ae-btn:active,
+  .detail-block:hover,
+  .notification-message-row:hover,
+  .notification-message-row:focus-visible,
+  .day-heatmap__cell:hover,
+  .day-heatmap__cell:focus,
+  .event-log-row:hover,
+  .settings-choice:active {
+    transform: none !important;
+  }
+}

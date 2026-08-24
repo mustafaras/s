@@ -12,13 +12,13 @@
 | **Program** | `APPLE-DESIGN-IOS27` |
 | **Durum** | `in_progress` |
 | **Aktif prompt** | yok |
-| **Son tamamlanan** | `AD-50` — dalga 9 kapanışı |
-| **Sıradaki** | `AD-51` — panel-v2 reduced-motion (ek onay istemez) |
+| **Son tamamlanan** | `AD-51` — panel-v2 reduced-motion kapsamı |
+| **Sıradaki** | `AD-52` — program kapanışı (ek onay istemez) |
 | **Güncel dalga** | `10` (ek onay istemez) |
 | **Bloke** | yok |
 | **Güncellendi** | 2026-08-24 |
 
-**Uygulanan promptlar:** AD-01 … AD-50 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-31-FIX-2, AD-36-FIX onarımları). **Dalga 1–9 tamamlandı: 50/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d`, dalga 8 `4030530` ile deploy edildi (2026-08-24); **dalga 9 henüz deploy edilmedi.** Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
+**Uygulanan promptlar:** AD-01 … AD-51 (+ AD-19-FIX, AD-25-FIX, AD-31-FIX, AD-31-FIX-2, AD-36-FIX onarımları). **Dalga 1–9 tamamlandı; Dalga 10'da AD-51 tamamlandı: 51/52.** Dalga 5+6 `04b83ca`, dalga 7 `dd5f50d`, dalga 8 `4030530` ile deploy edildi (2026-08-24); **dalga 9–10 henüz deploy edilmedi.** AD-51, `panel/v2/panel-v2.css` sonundaki global reduced-motion güvenlik ağıyla dosyanın sonuna eklenen bileşenleri de kapsar; Panel-v2 CSS cache-bust `20260824a` oldu. Her biri kendi commit'inde; `git revert <commit>` ile tek tek geri alınabilir.
 
 **Program dışı onarım — `AD-31-FIX-2` (2026-08-24):** AD-31'in "uygulanmadı" gözlemi kapatıldı. `index.html` `#root`'a statik `data-theme="light"` yazdığı için sistemi koyu olan kullanıcı her açılışta kısa bir **beyaz flaş** görüyordu — dalga 6'nın kendi özelliğinin altını oyan bir kusur. `#root`'tan hemen sonra, boyamadan önce çalışan satır içi bir çözümleyici eklendi (app.js'teki `resolveDark()` ile aynı mantık). ⚠️ Mantık artık **iki yerde** (`app.js:4595` + `index.html`); `verify-theme-tristate.mjs` grup [8] bu senkronu 8 assertion ile bekliyor (fixture 18 → 26). Ayrıntı: [`LEDGER.md`](LEDGER.md) `AD-31-FIX-2`. Prompt sayacı değişmedi.
 
@@ -87,7 +87,7 @@ Görsel inceleme: `node .claude/skills/run-seyma/driver.mjs --dump <sekme>`
 ## Onay kapıları
 
 Dalga 1–5 (AD-01 … AD-29) ek onay istemez: ölçülmüş ihlaller, düşük risk, görsel kimliğe dokunmuyor.
-**Dalga 6, 7 ve 8 (AD-30 … AD-42) 2026-08-24'te onaylandı ve tamamlandı.**
+**Dalga 6, 7, 8 ve 9 (AD-30 … AD-50) 2026-08-24'te onaylandı ve tamamlandı.**
 
 Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalıştırma:
 
@@ -104,7 +104,9 @@ Dalga 6–9 **kullanıcı onayı ister.** Onay alınmadan ilk promptu çalışt�
 
 ## Bilinen açık kapı
 
-**Bloke bir şey yok. Sıradaki AD-51/AD-52 (dalga 10) ek onay istemez.**
+**Bloke bir şey yok. Sıradaki AD-52 (dalga 10) ek onay istemez.**
+
+**AD-51 sonucu:** Panel-v2 CSS'te daha önce tek yerde bulunan reduced-motion kapsamı, dosyanın sonundaki güvenlik ağıyla tüm animasyon/geçişleri ve kalan hover/lift dönüşümlerini kapsıyor. 27/27 Panel-v2 fixture geçti; gerçek cihaz kabulü yapılmadı.
 
 **Dalga 9 sonucu:** ham `font-size` **1696 → 13**; **1687 site** adlandırılmış `rem` ölçeğine taşındı.
 `html`/`body`/`:root`'ta `font-size` tanımı olmadığı için `rem` tabanı tarayıcı varsayılanıdır ve
@@ -121,7 +123,7 @@ Kapanmış kapılar (kayıt için): AD-25-FIX ile Dalga 4'ün iki erişilebilirl
 AD-19…AD-24 boyunca hiçbir hedef `ERTELENDI` olarak bırakılmadı; nested-control yüzeyleri native
 buton yerine klavye destekli `role=button` olarak korundu.
 
-Bir sonraki ajan **AD-51**'i doğrudan çalıştırabilir (dalga 10 ek onay istemez).
+Bir sonraki ajan **AD-52**'yi doğrudan çalıştırabilir (dalga 10 ek onay istemez).
 
 ---
 
@@ -131,4 +133,4 @@ Bir sonraki ajan **AD-51**'i doğrudan çalıştırabilir (dalga 10 ek onay iste
 
 Koyu tema (14/14 AAA/AA) ve Panel-v2 (her iki temada tümü AA+, adlandırılmış tipografi ölçeği) denetimden temiz çıktı; ikisi de bu programda **referans**, değiştirilmiyor.
 
-Bulgular 52 sıralı prompta dönüştürüldü; 50 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez).
+Bulgular 52 sıralı prompta dönüştürüldü; 51 tanesi uygulandı (AD-30 salt okuma denetimidir, kod değiştirmez). AD-52 yalnızca program kapanışını ve kanonik dokümanların son uzlaştırmasını yapacaktır.

@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-50",
-  "nextPrompt": "AD-51",
+  "lastCompletedPrompt": "AD-51",
+  "nextPrompt": "AD-52",
   "currentWave": "10",
   "totalPrompts": 52,
-  "completedPrompts": 50,
+  "completedPrompts": 51,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 1-9 TAMAMLANDI (50/52). SIRADAKI AD-51 (panel-v2 reduced-motion) ve AD-52 (program kapanisi) - dalga 10 EK ONAY ISTEMEZ. Dalga 9 notu: ham font-size 1696 -> 13; 1687 site rem olcegine tasindi. Promptun esleme tablosu kusurluydu (22+ -> title2, 26 siteyi cokertirdi); merdiven callout/headline/title1/large ile uzatildi ve 34px ustu 13 site + 4 display clamp KASITLI OLARAK MUAF tutuldu (dekoratif grafik, Dynamic Type ile olceklenmemeli). Bu yuzden AD-49 kabul olcutu (font-size:[0-9] -> 0) bilerek saglanmadi - eksik is degil. Cache-bust guncel: app.js?v=20260824d, app/styles.css?v=20260824d. DALGA 9 HENUZ DEPLOY EDILMEDI.",
+  "nextSafeAction": "Dalga 1-9 TAMAMLANDI; Dalga 10 AD-51 ile 51/52. SIRADAKI AD-52 program kapanisi - ek onay istemez. AD-51: panel-v2 reduced-motion kapsamli global guvenlik agi eklendi, CSS cache-bust panel-v2.css?v=20260824a, 27/27 fixture PASS. Dalga 9-10 HENUZ DEPLOY EDILMEDI. Dalga 9 notu: ham font-size 1696 -> 13; 1687 site rem olcegine tasindi. Promptun esleme tablosu kusurluydu (22+ -> title2, 26 siteyi cokertirdi); merdiven callout/headline/title1/large ile uzatildi ve 34px ustu 13 site + 4 display clamp KASITLI OLARAK MUAF tutuldu (dekoratif grafik, Dynamic Type ile olceklenmemeli). Bu yuzden AD-49 kabul olcutu (font-size:[0-9] -> 0) bilerek saglanmadi - eksik is degil. Cache-bust guncel: app.js?v=20260824d, app/styles.css?v=20260824d, panel-v2.css?v=20260824a.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -108,7 +108,7 @@
       "prompts": "AD-51..AD-52",
       "topic": "panel + closure",
       "approvalRequired": false,
-      "completed": 0,
+      "completed": 1,
       "total": 2
     }
   ],

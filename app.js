@@ -6055,7 +6055,7 @@ function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gra
 function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
 function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;color:'+(on?'#F2B65A':'var(--faint)')+';opacity:'+(on?'1':'0.45')+';display:inline-flex;">'+icon('star',size)+'</button>'; } h+='</div>'; return h; }
 function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:11px;color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:11px;color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
-function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:10px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
+function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:11px;color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else if(isVacationDay(d.date)){ /* seri dondur; sayaç artmaz, kırılmaz */ } else c=0; }); return b; }
@@ -6166,7 +6166,7 @@ function collapsibleCardHTML(o){
   if(open){
     h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
   } else if(o.hint!==false){
-    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
+    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
   }
   h+='</div>';
   return h;
@@ -6907,7 +6907,7 @@ function reminderSpecialDaysSectionHTML(root){
     REMINDER_SPECIAL_DAY_OPTIONS.forEach(function(option){ var active=selected.indexOf(option.id)>=0; h+='<button type="button" class="sey-reminder-setup-choice'+(active?' is-selected':'')+'" onclick="App.toggleReminderSpecialDay(\''+option.id+'\')" aria-pressed="'+active+'"><span aria-hidden="true">'+icon(active?'circle-check':'moon-star',15)+'</span><span><strong>'+esc(option.label)+'</strong><small>'+(active?'Seçildi':'Seçmek için dokun')+'</small></span></button>'; });
     h+='</div>'+(selected.length?'':'<p class="sey-reminder-profile-note" role="status">Henüz gün seçmedin; bu modda occurrence oluşmaz.</p>')+'</div>';
   }
-  h+='<div class="sey-reminder-category-meta"><span>Hicri offset: <strong>'+(offset>0?'+':'')+offset+' gün</strong></span><label><span>Uygulama saati</span><input type="time" value="'+esc(state.time)+'" onchange="App.setReminderSpecialDaysTime(this.value)" aria-label="Özel gün hatırlatma saati" style="min-height:44px;padding:5px 7px;border:1px solid var(--field-bd);border-radius:9px;background:var(--card);color:var(--text);font:inherit;font-size:10px;"></label></div>';
+  h+='<div class="sey-reminder-category-meta"><span>Hicri offset: <strong>'+(offset>0?'+':'')+offset+' gün</strong></span><label><span>Uygulama saati</span><input type="time" value="'+esc(state.time)+'" onchange="App.setReminderSpecialDaysTime(this.value)" aria-label="Özel gün hatırlatma saati" style="min-height:44px;padding:5px 7px;border:1px solid var(--field-bd);border-radius:9px;background:var(--card);color:var(--text);font:inherit;font-size:11px;"></label></div>';
   h+='<div class="sey-reminder-category-meta"><span>Native kanal başlangıçta kapalıdır.</span><label><span>Kanal</span><select aria-label="Özel gün hatırlatma kanalı" onchange="App.setReminderSpecialDaysChannel(this.value)"><option value="in_app"'+(state.channel==='in_app'?' selected':'')+'>Uygulama içi</option><option value="native"'+(state.channel==='native'?' selected':'')+'>Native · izin varsa</option></select></label></div>';
   h+='<small class="sey-reminder-category-channel">Offset değişirse occurrence tarihi yerel Hicri tercihe göre yeniden hesaplanır. Metin zorunluluk, puan veya ticari çağrı taşımaz.</small></section>';
   return h;
@@ -6934,11 +6934,11 @@ function reminderMedicationSectionHTML(root){
   h+='<p class="sey-reminder-medication-safety" role="note" data-reminder-medication-safety="true">'+esc(REMINDER_MEDICATION_SAFETY_COPY)+'</p>';
   if(ui.reminderMedicationError) h+='<p role="alert" style="margin:0;padding:9px 10px;border-left:3px solid var(--drop);border-radius:4px 10px 10px 4px;background:color-mix(in srgb,var(--drop) 8%,var(--card));color:var(--text);font-size:11px;line-height:1.4;">'+esc(ui.reminderMedicationError)+'</p>';
   h+='<div class="sey-reminder-medication-form" data-reminder-medication-form="true"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0;">';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:10px;font-weight:850;">Tür<select id="sey-reminder-medication-kind" aria-label="Hatırlatma türü" maxlength="12" onchange="App.setReminderMedicationDraftField(\'kind\',this.value)" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"><option value="medication"'+(draft.kind==='medication'?' selected':'')+'>İlaç</option><option value="supplement"'+(draft.kind==='supplement'?' selected':'')+'>Takviye</option></select></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:10px;font-weight:850;">Saat<input id="sey-reminder-medication-time" type="time" maxlength="5" value="'+esc(draft.time)+'" onchange="App.setReminderMedicationDraftField(\'time\',this.value)" oninput="App.setReminderMedicationDraftField(\'time\',this.value)" aria-label="İlaç veya takviye hatırlatma saati" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label></div>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Ad<input id="sey-reminder-medication-name" aria-label="İlaç veya takviye adı" type="text" maxlength="'+REMINDER_MEDICATION_NAME_MAX+'" value="'+esc(draft.name)+'" oninput="App.setReminderMedicationDraftField(\'name\',this.value)" placeholder="Kendi adın" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Özel etiket <span style="font-weight:600;color:var(--faint);">yalnız uygulamada</span><input id="sey-reminder-medication-label" aria-label="İlaç veya takviye özel etiketi" type="text" maxlength="'+REMINDER_MEDICATION_LABEL_MAX+'" value="'+esc(draft.privateLabel)+'" oninput="App.setReminderMedicationDraftField(\'privateLabel\',this.value)" placeholder="Özel bir etiket" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
-  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:10px;font-weight:850;">Not <span style="font-weight:600;color:var(--faint);">'+REMINDER_MEDICATION_NOTE_MAX+' karaktere kadar · yerel</span><textarea id="sey-reminder-medication-note" aria-label="İlaç veya takviye yerel notu" maxlength="'+REMINDER_MEDICATION_NOTE_MAX+'" oninput="App.setReminderMedicationDraftField(\'note\',this.value)" placeholder="İstersen kendin için kısa bir not">'+esc(draft.note)+'</textarea></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:11px;font-weight:850;">Tür<select id="sey-reminder-medication-kind" aria-label="Hatırlatma türü" maxlength="12" onchange="App.setReminderMedicationDraftField(\'kind\',this.value)" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"><option value="medication"'+(draft.kind==='medication'?' selected':'')+'>İlaç</option><option value="supplement"'+(draft.kind==='supplement'?' selected':'')+'>Takviye</option></select></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;min-width:0;color:var(--muted);font-size:11px;font-weight:850;">Saat<input id="sey-reminder-medication-time" type="time" maxlength="5" value="'+esc(draft.time)+'" onchange="App.setReminderMedicationDraftField(\'time\',this.value)" oninput="App.setReminderMedicationDraftField(\'time\',this.value)" aria-label="İlaç veya takviye hatırlatma saati" style="width:100%;min-height:44px;padding:8px 9px;border:1px solid var(--field-bd);border-radius:10px;background:var(--field);color:var(--text);font:inherit;font-size:12px;"></label></div>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Ad<input id="sey-reminder-medication-name" aria-label="İlaç veya takviye adı" type="text" maxlength="'+REMINDER_MEDICATION_NAME_MAX+'" value="'+esc(draft.name)+'" oninput="App.setReminderMedicationDraftField(\'name\',this.value)" placeholder="Kendi adın" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Özel etiket <span style="font-weight:600;color:var(--faint);">yalnız uygulamada</span><input id="sey-reminder-medication-label" aria-label="İlaç veya takviye özel etiketi" type="text" maxlength="'+REMINDER_MEDICATION_LABEL_MAX+'" value="'+esc(draft.privateLabel)+'" oninput="App.setReminderMedicationDraftField(\'privateLabel\',this.value)" placeholder="Özel bir etiket" autocomplete="off" style="width:100%;min-height:44px;padding:9px 10px;border:1px solid var(--field-bd);background:var(--field);border-radius:10px;color:var(--text);font:inherit;font-size:12px;"></label>';
+  h+='<label style="display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px;font-weight:850;">Not <span style="font-weight:600;color:var(--faint);">'+REMINDER_MEDICATION_NOTE_MAX+' karaktere kadar · yerel</span><textarea id="sey-reminder-medication-note" aria-label="İlaç veya takviye yerel notu" maxlength="'+REMINDER_MEDICATION_NOTE_MAX+'" oninput="App.setReminderMedicationDraftField(\'note\',this.value)" placeholder="İstersen kendin için kısa bir not">'+esc(draft.note)+'</textarea></label>';
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;"><button type="button" class="sey-reminder-primary" onclick="App.saveReminderMedicationDraft()">'+(editing?'Düzenlemeyi kaydet':'Saati ekle')+'</button>'+(editing?'<button type="button" class="sey-reminder-secondary" onclick="App.cancelReminderMedicationEdit()">Vazgeç</button>':'')+'</div>';
   h+='<p class="sey-reminder-medication-native-note" role="note">Native yüzey için varsayılan metin geneldir; ad, etiket, not ve doz bildirim gövdesine yazılmaz.</p></div>';
   if(list.length){
@@ -9625,7 +9625,7 @@ function locationGateHTML(){
   return '<div id="sey-location-gate" data-location-gate-state="'+esc(state)+'" role="dialog" aria-modal="true" aria-labelledby="sey-location-gate-title" tabindex="-1" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;overflow:auto;padding:24px;background:var(--page);color:var(--text);">'
     +'<div style="width:100%;max-width:410px;border:1px solid var(--card-bd);border-radius:28px;padding:26px 22px 22px;background:var(--modal);box-shadow:0 24px 70px rgba(0,0,0,.22);text-align:center;backdrop-filter:blur(18px);">'
       +'<div style="font-size:42px;line-height:1;margin-bottom:13px;">📍</div>'
-      +'<div style="font-size:10px;letter-spacing:1.3px;font-weight:900;color:var(--faint);margin-bottom:8px;">ŞEYMA · GÜVENLİ BAŞLANGIÇ</div>'
+      +'<div style="font-size:11px;letter-spacing:1.3px;font-weight:900;color:var(--faint);margin-bottom:8px;">ŞEYMA · GÜVENLİ BAŞLANGIÇ</div>'
       +'<h1 id="sey-location-gate-title" style="margin:0;font-size:24px;line-height:1.2;font-weight:850;color:var(--text);">'+esc(title)+'</h1>'
       +'<p style="margin:12px 0 0;font-size:14px;line-height:1.55;color:var(--muted);">'+esc(detail)+'</p>'
       +'<div style="margin-top:15px;padding:12px 13px;border-radius:15px;background:color-mix(in srgb,#8FBF8A 14%,var(--modal));border:1px solid color-mix(in srgb,#6FB36A 28%,var(--card-bd));font-size:12.5px;line-height:1.5;color:var(--text2);text-align:left;">Konum ve hareket ölçümü yalnızca uygulama açıkken yapılır. Safari’nin izin penceresinde <b>İzin Ver</b> seçilmeden devam edilemez.</div>'
@@ -9873,7 +9873,7 @@ function onboardingHTML(){
   h+='<div style="position:absolute;top:-9%;left:50%;transform:translateX(-50%);width:min(480px,150%);height:320px;background:radial-gradient(closest-side,'+P.topGlow+',transparent 74%);pointer-events:none;z-index:0;"></div>';
   h+='<div style="position:absolute;top:20%;right:-16%;width:240px;height:240px;background:radial-gradient(circle,'+P.sideGlow+',transparent 70%);pointer-events:none;z-index:0;"></div>';
   // ── üst: build strip ──
-  h+='<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;color:'+P.strip+';animation:seyFloatIn .5s ease both;">';
+  h+='<div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:11px;letter-spacing:1px;color:'+P.strip+';animation:seyFloatIn .5s ease both;">';
   h+='<span>SEYMA_OS</span><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#3F9E63;box-shadow:0 0 6px rgba(63,158,99,.42);animation:seyTwinkle 1.6s ease-in-out infinite;"></span>build · aeon</span><button onclick="App.toggleTheme()" aria-label="Başlangıç temasını değiştir" style="border:1px solid '+P.themeBd+';background:'+P.themeBg+';color:'+P.themeText+';border-radius:999px;padding:5px 8px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-family:'+MONO+';font-size:11px;font-weight:800;letter-spacing:.35px;">'+icon(dark?'moon':'sun',11)+' '+P.mode+'</button></span>';
   h+='</div>';
   // ── orta blok (dikey ortalı): hero + terminal paneli ──
@@ -9894,7 +9894,7 @@ function onboardingHTML(){
   h+='<div style="display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid '+P.titleBd+';background:'+P.titleBg+';">';
   ['#FF5F57','#FEBC2E','#28C840'].forEach(function(c){ h+='<span style="width:9px;height:9px;border-radius:50%;background:'+c+';box-shadow:0 0 6px '+c+'66;"></span>'; });
   h+='<span style="margin-left:7px;font-size:11px;color:'+P.titleText+';">seyma — denge.sys</span>';
-  h+='<span style="margin-left:auto;font-size:10px;color:#3F9E63;letter-spacing:.5px;">● ready</span>';
+  h+='<span style="margin-left:auto;font-size:11px;color:#3F9E63;letter-spacing:.5px;">● ready</span>';
   h+='</div>';
   // body: modül satırları
   h+='<div style="padding:11px 14px;display:flex;flex-direction:column;gap:8px;">';
@@ -9903,33 +9903,33 @@ function onboardingHTML(){
     h+='<div style="display:grid;grid-template-columns:7px 1fr auto;column-gap:9px;row-gap:2px;align-items:center;animation:seyFloatIn .5s '+delay+'s ease both;">';
     h+='<span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+m[0]+';box-shadow:0 0 8px '+m[0]+';"></span>';
     h+='<span style="min-width:0;color:'+m[0]+';font-size:11.5px;line-height:1.2;font-weight:700;">'+m[1]+'</span>';
-    h+='<span style="color:#3F9E63;font-size:10px;">ok</span>';
-    h+='<span style="grid-column:2 / 4;min-width:0;color:'+P.desc+';font-size:10.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m[2]+'</span>';
+    h+='<span style="color:#3F9E63;font-size:11px;">ok</span>';
+    h+='<span style="grid-column:2 / 4;min-width:0;color:'+P.desc+';font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m[2]+'</span>';
     h+='</div>';
   });
   h+='</div>';
   // teknik özet — saklama ve eşlik modelini kısa, açık ve doğru anlatır.
-  h+='<div style="padding:10px 14px 9px;border-top:1px dashed '+P.dash+';display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:10px;animation:seyFloatIn .5s .44s ease both;">';
+  h+='<div style="padding:10px 14px 9px;border-top:1px dashed '+P.dash+';display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:11px;animation:seyFloatIn .5s .44s ease both;">';
   [['günlük','önce bu cihazda'],['yedek','sen bağlarsan GitHub'],['program','120 gün · 4 faz'],['eşlik','Luna + ÆON']].forEach(function(s){
     h+='<div style="min-width:0;"><div style="color:'+P.specLabel+';margin-bottom:2px;">'+s[0]+'</div><div style="color:'+P.specVal+';line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s[1]+'</div></div>';
   });
   h+='</div>';
   // hazır göstergesi
-  h+='<div style="display:flex;align-items:center;gap:7px;padding:2px 14px 10px;font-size:10px;letter-spacing:.2px;color:'+P.status+';white-space:nowrap;animation:seyFloatIn .5s .48s ease both;"><span style="color:#3F9E63;">▷</span><span>store·local</span><span style="color:'+P.statusSep+';">·</span><span>sync·github</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#3F9E63;flex-shrink:0;">hazır <span style="width:26px;height:4px;border-radius:999px;overflow:hidden;background:'+(dark?'rgba(255,255,255,0.08)':'rgba(91,72,98,0.10)')+';display:inline-block;"><span style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#E6C15A,#E9899F,#9B7FC9);"></span></span> 100%</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:7px;padding:2px 14px 10px;font-size:11px;letter-spacing:.2px;color:'+P.status+';white-space:nowrap;animation:seyFloatIn .5s .48s ease both;"><span style="color:#3F9E63;">▷</span><span>store·local</span><span style="color:'+P.statusSep+';">·</span><span>sync·github</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#3F9E63;flex-shrink:0;">hazır <span style="width:26px;height:4px;border-radius:999px;overflow:hidden;background:'+(dark?'rgba(255,255,255,0.08)':'rgba(91,72,98,0.10)')+';display:inline-block;"><span style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#E6C15A,#E9899F,#9B7FC9);"></span></span> 100%</span></div>';
   // ÆON imzası — terminali ezmeyen küçük, beyaz ve sakin güven rozeti.
   h+='<div style="display:flex;align-items:center;gap:12px;padding:12px 14px 13px;border-top:1px solid '+P.aeonBd+';background:'+P.aeonBg+';animation:seyFloatIn .5s .54s ease both;">';
   h+='<div style="position:relative;width:52px;height:52px;border-radius:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#101017;background:linear-gradient(145deg,#FFFFFF,#E9E9EF);border:1px solid '+(dark?'rgba(255,255,255,0.10)':'rgba(91,72,98,0.12)')+';box-shadow:'+(dark?'0 10px 25px rgba(255,255,255,0.12)':'0 10px 25px rgba(91,65,78,0.14)')+',inset 0 1px 0 #FFFFFF,inset 0 -2px 5px rgba(40,40,55,0.12);overflow:hidden;">';
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.9) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;"></span>';
   h+='<span style="position:relative;display:inline-flex;">'+icon('hexagon',25)+'</span></div>';
   h+='<div style="flex:1;min-width:0;"><div style="font-family:-apple-system,system-ui,\'Segoe UI\',sans-serif;font-size:18px;font-weight:850;letter-spacing:3px;color:'+P.aeonWord+';">ÆON</div>';
-  h+='<div style="font-size:10px;letter-spacing:.25px;color:'+P.aeonSub+';line-height:1.45;margin-top:2px;">Paylaştığın kayıtları anlamlandırır; mesaj, ses ve fotoğraflarında güvenilir bir gözlemci eşlik eder.</div></div>';
+  h+='<div style="font-size:11px;letter-spacing:.25px;color:'+P.aeonSub+';line-height:1.45;margin-top:2px;">Paylaştığın kayıtları anlamlandırır; mesaj, ses ve fotoğraflarında güvenilir bir gözlemci eşlik eder.</div></div>';
   h+='</div>';
   h+='</div>'; // terminal panel
   h+='</div>'; // orta blok
   // ── alt: CTA + gizlilik ──
   h+='<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:9px;animation:seyFloatIn .5s .56s ease both;">';
   h+='<button onclick="App.start()" style="position:relative;overflow:hidden;border:none;cursor:pointer;width:100%;padding:16px;border-radius:16px;font-family:'+MONO+';font-size:15px;font-weight:800;letter-spacing:.3px;color:#180D14;background:linear-gradient(135deg,#F4DCA0,#E9AEC6 52%,#CBB8FF);box-shadow:0 18px 40px rgba(233,137,159,0.30),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,0.5) 50%,transparent 65%);animation:seyShine 4.2s ease-in-out infinite;"></span><span style="position:relative;">❯ Tamam Raşit, başlayalım</span></button>';
-  h+='<p style="margin:0;text-align:center;font-size:10px;line-height:1.5;color:'+P.privacy+';">Günlüğün önce bu cihazda saklanır. Yedekleme ancak sen bağlarsan açılır; kontrol her zaman sende kalır. 🔒</p>';
+  h+='<p style="margin:0;text-align:center;font-size:11px;line-height:1.5;color:'+P.privacy+';">Günlüğün önce bu cihazda saklanır. Yedekleme ancak sen bağlarsan açılır; kontrol her zaman sende kalır. 🔒</p>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -10166,7 +10166,7 @@ function beslenmeCardHTML(rec){
   b+='<div style="display:flex;align-items:flex-end;gap:12px;">';
   b+='<div style="flex:1;min-width:0;"><div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11.5px;color:var(--muted);font-weight:700;">Protein</span><span id="nutri-protein" style="font-size:22px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;">'+nu.protein+'g</span><span style="font-size:11.5px;color:var(--faint);">/ '+pg+'g</span></div>';
   b+='<div style="height:8px;border-radius:999px;background:rgba(150,110,120,0.14);overflow:hidden;margin-top:5px;"><div id="nutri-bar" style="height:100%;width:'+pPct+'%;border-radius:999px;background:linear-gradient(90deg,#E9899F,#C9B8FF);transition:width .4s ease;"></div></div></div>';
-  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:10px;color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
+  b+='<div style="text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--card-bd);"><div id="nutri-cal" style="font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;">'+nu.calories+'</div><div style="font-size:11px;color:var(--faint);margin-top:2px;">/ '+cg+' kcal</div></div>';
   b+='</div>';
   b+='<div id="nutri-macrobar">'+macroBarHTML(nu)+'</div>';
   b+='<div style="display:flex;gap:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;">';
@@ -10174,7 +10174,7 @@ function beslenmeCardHTML(rec){
   b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#F6C177;"></span>Karbonhidrat <b id="nutri-carb" style="color:var(--text);">'+nu.carbs+'g</b></span>';
   b+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:3px;background:#9B7FC9;"></span>Yağ <b id="nutri-fat" style="color:var(--text);">'+nu.fat+'g</b></span>';
   b+='</div>';
-  b+='<div style="font-size:10.5px;color:var(--faint);line-height:1.45;">Kalori, girdiğin yiyeceklerin makrolarından hesaplanır (protein & karbonhidrat ×4, yağ ×9 kcal). Değerler tahminidir; yiyecek adı ve miktar netleştikçe isabet artar.</div>';
+  b+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Kalori, girdiğin yiyeceklerin makrolarından hesaplanır (protein & karbonhidrat ×4, yağ ×9 kcal). Değerler tahminidir; yiyecek adı ve miktar netleştikçe isabet artar.</div>';
   b+='</div>';
   // Bilimsel değerlendirme (protein · makro dengesi · glisemik) — canlı güncellenir
   b+='<div id="nutri-insight">'+nutriInsightHTML(rec,nu)+'</div>';
@@ -10214,17 +10214,17 @@ function targetsCardHTML(rec){
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="App.go(\'saglik\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.go(\'saglik\');}">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;">';
   h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('target',17)+'</span>Hedeflerim</div>';
-  if(tOk) h+='<div style="font-size:10.5px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
-  else h+='<div style="font-size:10.5px;color:var(--warn-ink);">henüz hesaplanmadı</div>';
+  if(tOk) h+='<div style="font-size:11px;color:var(--faint);">BMR '+t.bmr+' · TDEE '+t.tdee+'</div>';
+  else h+='<div style="font-size:11px;color:var(--warn-ink);">henüz hesaplanmadı</div>';
   h+='</div>';
   if(tOk){
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.calories+'<span style="font-size:10px;color:var(--faint);">/'+cal+'</span></div><div style="font-size:11px;color:var(--faint);">kcal</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.protein+'<span style="font-size:10px;color:var(--faint);">/'+pro+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Su</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+(rec&&typeof rec.water==='number'?rec.water:0)+'<span style="font-size:10px;color:var(--faint);">/'+water+'</span></div><div style="font-size:11px;color:var(--faint);">bardak</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Karbonhidrat</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.carbs+'<span style="font-size:10px;color:var(--faint);">/'+t.carbs+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Yağ</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.fat+'<span style="font-size:10px;color:var(--faint);">/'+t.fat+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
-    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Lif</div><div style="font-size:15px;font-weight:800;color:var(--text);">—<span style="font-size:10px;color:var(--faint);">/'+t.fiber+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Kalori</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.calories+'<span style="font-size:11px;color:var(--faint);">/'+cal+'</span></div><div style="font-size:11px;color:var(--faint);">kcal</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Protein</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.protein+'<span style="font-size:11px;color:var(--faint);">/'+pro+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Su</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+(rec&&typeof rec.water==='number'?rec.water:0)+'<span style="font-size:11px;color:var(--faint);">/'+water+'</span></div><div style="font-size:11px;color:var(--faint);">bardak</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Karbonhidrat</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.carbs+'<span style="font-size:11px;color:var(--faint);">/'+t.carbs+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Yağ</div><div style="font-size:15px;font-weight:800;color:var(--text);">'+nu.fat+'<span style="font-size:11px;color:var(--faint);">/'+t.fat+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
+    h+='<div style="text-align:center;background:var(--card);border:1px solid var(--card-bd);border-radius:12px;padding:9px 4px;"><div style="font-size:11px;color:var(--faint);">Lif</div><div style="font-size:15px;font-weight:800;color:var(--text);">—<span style="font-size:11px;color:var(--faint);">/'+t.fiber+'</span></div><div style="font-size:11px;color:var(--faint);">g</div></div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
     h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">Adım</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+steps.toLocaleString('tr-TR')+'</div></div>';
@@ -10232,7 +10232,7 @@ function targetsCardHTML(rec){
     h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">Kafein</div><div style="font-size:13px;font-weight:800;color:var(--text);">≤'+t.caffeineMaxMg+' mg</div></div>';
     h+='<div style="text-align:center;"><div style="font-size:11px;color:var(--faint);">D vit.</div><div style="font-size:13px;font-weight:800;color:var(--text);">'+t.vitaminDIU+' IU</div></div>';
     h+='</div>';
-    h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.45;">Tüm kişiselleştirilmiş hedeflerin için dokun · boy, kilo, yaş ve aktivite seviyene göre hesaplanır.</div>';
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.45;">Tüm kişiselleştirilmiş hedeflerin için dokun · boy, kilo, yaş ve aktivite seviyene göre hesaplanır.</div>';
   } else {
     h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.5;">Kişiselleştirilmiş makro ve mikro hedeflerini görmek için Sağlık sayfasından boy, kilo, doğum tarihi ve günlük aktivite seviyeni girmen yeterli.</div>';
     h+='<button onclick="event.stopPropagation();App.go(\'saglik\')" style="border:none;cursor:pointer;background:linear-gradient(135deg,#FFE8A3,#E9AFC1);color:#5A2E2A;font-weight:800;font-size:14px;padding:12px;border-radius:12px;">Sağlık sayfasına git</button>';
@@ -10273,7 +10273,7 @@ function energyStressBlock(rec){
     s+='<div style="display:flex;gap:6px;">';
     for(var v=1;v<=5;v++){ var sel=cur===v; s+='<button onclick="App.'+fn+'('+v+')" aria-label="'+v+'" style="flex:1;height:38px;border-radius:12px;cursor:pointer;font-size:13px;font-weight:800;transition:all .18s;'+(sel?'background:linear-gradient(135deg,'+grad+');border:1px solid transparent;color:#fff;box-shadow:0 6px 14px rgba(150,110,120,0.28);transform:translateY(-2px);':'background:var(--card);border:1px solid var(--card-bd);color:var(--faint);')+'">'+v+'</button>'; }
     s+='</div>';
-    s+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--faint);"><span>'+lo+'</span><span>'+hi+'</span></div>';
+    s+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--faint);"><span>'+lo+'</span><span>'+hi+'</span></div>';
     s+='</div>';
     return s;
   }
@@ -10433,7 +10433,7 @@ function healthSetupCardHTML(connectedHealth){
   h+='<button onclick="App.toggleHealthSetup()" style="width:100%;border:none;cursor:pointer;background:none;display:flex;align-items:center;gap:10px;padding:12px;text-align:left;">';
   h+='<span style="flex-shrink:0;display:inline-flex;">'+icon('apple',20)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
-  h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
+  h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);">'+(connectedHealth?'Sağlık senkronu':'Sağlık\'tan otomatik veri ekle')+(connectedHealth?' <span style="font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.22);padding:1px 8px;border-radius:999px;margin-left:2px;display:inline-flex;align-items:center;gap:3px;">'+icon('check',11)+' bağlı</span>':'')+'</div>';
   h+='<div style="font-size:11.5px;color:var(--muted);">'+(connectedHealth?'Kurulum adımlarını gör':'Arka planda çalışır · pil dostu · tek seferlik kurulum')+'</div>';
   h+='</div>';
   h+='<span style="font-size:13px;color:var(--faint);flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">'+(open?('Gizle '+icon('chevron-up',13)):('Göster '+icon('chevron-down',13)))+'</span>';
@@ -10507,7 +10507,7 @@ function locationCardHTML(){
   }
   // Açık/kapalı anahtarı başlıkta rozet olarak; anahtara dokunmak kartı açmasın (stopPropagation).
   var toggle='<button onclick="event.stopPropagation();App.toggleLocation()" aria-label="Konum aç/kapat" style="border:none;cursor:pointer;flex-shrink:0;width:50px;height:28px;border-radius:999px;position:relative;transition:background .2s;background:'+swBg+';"><span style="position:absolute;top:3px;left:'+(on?'25px':'3px')+';width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:left .2s;"></span></button>';
-  var statusPill='<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span>';
+  var statusPill='<span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;color:#fff;background:'+(on?'#3F9A4F':'#D9534F')+';">'+(on?'AÇIK':'KAPALI')+'</span>';
   var badge='<div style="display:flex;align-items:center;gap:8px;">'+hidePill('location')+statusPill+toggle+'</div>';
   var subtitle=on?('Bugün '+fmtDist(mv.totalM)+' · ölçüm açık'):'GPS kapalı · açmak için sağdaki anahtar';
   var open=cardOpen('location', on);
@@ -10723,9 +10723,9 @@ var WX_QUIPS={
 };
 function wxQuip(cat){ var arr=WX_QUIPS[cat]||WX_QUIPS.clear; var seed=0,t=todayStr(); for(var i=0;i<t.length;i++) seed+=t.charCodeAt(i); return arr[seed%arr.length]; }
 function wxHm(iso){ if(!iso) return '—'; var p=(iso.split('T')[1]||''); return p.slice(0,5)||'—'; }
-function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay),fg=dark?'#FFE1BC':'#7A3E1E',sub=dark?'#D6A57E':'#A85E3C'; return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:10.5px;font-weight:900;color:'+sub+';">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
+function wxSpotChip(sp){ var m=wxMeta(sp.code,sp.isDay),fg=dark?'#FFE1BC':'#7A3E1E',sub=dark?'#D6A57E':'#A85E3C'; return '<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12.5px;font-weight:850;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:62px;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:900;color:'+sub+';">'+esc(sp.label||'')+'</span><span style="opacity:.85;display:inline-flex;">'+wxSpotIcon(sp,15)+'</span><span style="display:inline-flex;">'+m.emoji+'</span><span>'+sp.temp+'°</span></div>'; }
 function wxLocationPendingChip(label){ var fg=dark?'#D6A57E':'#A85E3C'; return '<div data-wx-location-pending style="display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:11px;font-weight:800;color:'+fg+';line-height:1.25;white-space:nowrap;"><span style="max-width:112px;overflow:hidden;text-overflow:ellipsis;">'+esc(label)+'</span><span style="display:inline-flex;opacity:.78;">'+icon('map-pin',14)+'</span><span style="width:6px;height:6px;border-radius:50%;background:#C77749;box-shadow:'+(dark?'none':'0 0 0 3px rgba(199,119,73,.14)')+';"></span></div>'; }
-function wxDetail(icon,label,val){ var bg=dark?'rgba(255,255,255,0.055)':'rgba(255,255,255,0.45)',lab=dark?'#D6A57E':'#A85E3C',fg=dark?'#FFE1BC':'#7A3E1E'; return '<div style="flex:1;min-width:0;background:'+bg+';border:'+(dark?'1px solid rgba(255,210,160,.09)':'none')+';border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:10.5px;color:'+lab+';font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:'+fg+';margin-top:2px;">'+val+'</div></div>'; }
+function wxDetail(icon,label,val){ var bg=dark?'rgba(255,255,255,0.055)':'rgba(255,255,255,0.45)',lab=dark?'#D6A57E':'#A85E3C',fg=dark?'#FFE1BC':'#7A3E1E'; return '<div style="flex:1;min-width:0;background:'+bg+';border:'+(dark?'1px solid rgba(255,210,160,.09)':'none')+';border-radius:12px;padding:8px 9px;text-align:center;"><div style="font-size:11px;color:'+lab+';font-weight:800;">'+icon+' '+label+'</div><div style="font-size:14px;font-weight:800;color:'+fg+';margin-top:2px;">'+val+'</div></div>'; }
 function weatherHeaderHTML(greet){
   var open=!!ui.weatherOpen;
   var W=dark?{bg:'linear-gradient(120deg,#15120F,#211815 52%,#22131A)',bd:'rgba(255,199,142,.22)',shadow:'0 14px 30px rgba(0,0,0,.42)',orb1:'rgba(255,199,142,.09)',orb2:'rgba(242,154,184,.07)',icon:'drop-shadow(0 3px 6px rgba(0,0,0,.52))',title:'#FFD2A1',sub:'#D6A57E',chev:'#E0AD82',hint:'rgba(255,220,184,.58)',divider:'rgba(255,210,160,.14)',noteBg:'rgba(255,255,255,.05)',note:'#F0D8BC',foot:'rgba(235,205,174,.48)'}:{bg:'linear-gradient(120deg,#FFE7A8,#FFC891 52%,#F7B3C7)',bd:'transparent',shadow:'0 12px 28px var(--sun-glow)',orb1:'rgba(255,255,255,0.55)',orb2:'rgba(255,255,255,0.28)',icon:'drop-shadow(0 3px 7px rgba(240,150,70,0.55))',title:'#8A4426',sub:'#A85E3C',chev:'#B5673A',hint:'rgba(122,62,30,0.6)',divider:'rgba(138,68,38,0.16)',noteBg:'rgba(255,255,255,0.42)',note:'#7A3E1E',foot:'rgba(122,62,30,0.55)'};
@@ -10755,7 +10755,7 @@ function weatherHeaderHTML(greet){
   } else { h+='<div style="font-size:11.5px;font-weight:700;color:'+W.sub+';">hava…</div>'; }
   h+='<span style="color:'+W.chev+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</div></div>';
-  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.3px;color:'+W.hint+';display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
+  if(!open && spots){ h+='<div style="position:relative;margin-top:8px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.3px;color:'+W.hint+';display:flex;align-items:center;justify-content:center;gap:4px;">detaylar için dokun '+icon('chevron-down',11)+'</div>'; }
   if(open && spots){
     h+='<div style="position:relative;margin-top:12px;animation:seyFade .25s ease;">';
     if(locationPending){
@@ -10779,7 +10779,7 @@ function weatherHeaderHTML(greet){
       var q=wxQuip(pm?pm.cat:'clear');
       h+='<div style="border-top:1px solid '+W.divider+';padding-top:11px;margin-top:11px;font-size:12.5px;font-style:italic;font-weight:600;color:'+W.title+';line-height:1.5;">❝ '+esc(q)+' ❞</div>';
     }
-    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:10px;color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
+    if(wx.fetchedAt){ var am=Math.round((Date.now()-new Date(wx.fetchedAt).getTime())/60000); var us=am<1?'az önce':am<60?am+' dk önce':Math.round(am/60)+' sa önce'; h+='<div style="margin-top:9px;text-align:right;font-size:11px;color:'+W.foot+';">Open-Meteo · '+us+'</div>'; }
     h+='</div>';
   }
   h+='</button>';
@@ -10952,7 +10952,7 @@ function motivationTodayCardHTML(){
   h+='<div style="font-size:15.5px;font-weight:800;color:'+pu+';line-height:1.15;letter-spacing:.2px;">İçsel Pusula</div>';
   h+='<div style="font-size:11.5px;color:var(--faint);margin-top:2px;line-height:1.3;">Raşit\'le küçük ama gerçek adımlar</div>';
   h+='</div>';
-  if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
+  if(doneToday) h+='<span style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#3F8A4F;background:rgba(143,191,138,0.18);padding:3px 9px;border-radius:999px;">'+icon('check',11)+' bugün</span>';
   h+='<span style="color:'+pu+';font-size:20px;font-weight:700;line-height:1;flex-shrink:0;">›</span>';
   h+='</div>';
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
@@ -10961,7 +10961,7 @@ function motivationTodayCardHTML(){
   h+='<div style="flex-shrink:0;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;color:'+(sum.programComplete?'#fff':'var(--muted)')+';background:'+(sum.programComplete?'linear-gradient(135deg,var(--room2),var(--room))':'var(--icon)')+';">%'+pct+'</div>';
   h+='</div>';
   h+='<div style="height:6px;border-radius:999px;background:var(--icon);overflow:hidden;position:relative;box-shadow:0 0 10px var(--room-glow);"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--room2),var(--room));border-radius:999px;position:relative;overflow:hidden;transition:width .4s var(--ease-premium,ease);"><span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);animation:seyShine 2.6s ease-in-out infinite;"></span></div></div>';
-  h+='<div style="text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
+  h+='<div style="text-align:center;font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--room);display:flex;align-items:center;justify-content:center;gap:5px;">Terapi Odası\'nı tam ekran aç '+icon('sparkles',11)+'</div>';
   h+='</button>';
   return h;
 }
@@ -11090,7 +11090,7 @@ function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){
     h+='</div>';
   }
   h+='<input id="sey-mot-reflection-main" type="text" maxlength="280" value="'+esc(ui.motivationReflectionDraft||'')+'" oninput="App.setMotivationReflection(this)" placeholder="Bu odaya bugün ne bırakmak istersin?" style="border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 13px;font-size:14px;outline:none;color:var(--text);">';
-  h+='<div style="font-size:10.5px;color:var(--faint);margin-top:-3px;">'+(doneToday?'Kaydını dilediğin an düzenleyip güncelleyebilirsin.':'Kısa da olsa yeter — bu oda seni duyuyor.')+'</div>';
+  h+='<div style="font-size:11px;color:var(--faint);margin-top:-3px;">'+(doneToday?'Kaydını dilediğin an düzenleyip güncelleyebilirsin.':'Kısa da olsa yeter — bu oda seni duyuyor.')+'</div>';
   var pEnabled=hasReflection;
   var saveStatus=doneToday?((st&&st.status==='minimum_completed')?'minimum_completed':'completed'):'completed';
   var pOnclick=minMode?"App.confirmMotivationMinimum()":("App.completeMotivationTask('"+saveStatus+"')");
@@ -11108,7 +11108,7 @@ function roomPathHTML(M,mot,sum,st,doneToday,nar,fi){
   h+=roomFlexNudgeHTML(mot,fi, doneToday?0.18:0.17);
   // Sabah / Akşam / Zor gün notları
   if(mot.appNudge&&(mot.appNudge.morning||mot.appNudge.evening||mot.appNudge.hardDay)){
-    var nudgeRow=function(ic,label,txt,col){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="width:28px;height:28px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%,var(--icon));">'+icon(ic,14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">'+label+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-top:1px;">'+esc(txt)+'</div></div></div>'; };
+    var nudgeRow=function(ic,label,txt,col){ return '<div style="display:flex;gap:9px;align-items:flex-start;"><span style="width:28px;height:28px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+col+';background:color-mix(in srgb,'+col+' 15%,var(--icon));">'+icon(ic,14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.3px;">'+label+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.5;margin-top:1px;">'+esc(txt)+'</div></div></div>'; };
     h+='<div style="'+fi(doneToday?0.2:0.19)+'display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--card-bd);padding-top:13px;">';
     h+='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--faint);">GÜN BOYU EŞLİK</div>';
     if(mot.appNudge.morning) h+=nudgeRow('sunrise','SABAH',mot.appNudge.morning,'#E8A53C');
@@ -11279,7 +11279,7 @@ function roomToolsHTML(fi){
       cbBody+='<div style="background:var(--icon);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.45;">';
       cbBody+='<div style="font-weight:800;color:var(--room);margin-bottom:3px;">'+esc(th.situation)+'</div>';
       cbBody+='<div>'+esc(th.thought)+' → '+esc(th.altThought)+'</div>';
-      cbBody+='<div style="font-size:10.5px;color:var(--faint);margin-top:3px;">'+fmtWhen(th.createdAt)+'</div>';
+      cbBody+='<div style="font-size:11px;color:var(--faint);margin-top:3px;">'+fmtWhen(th.createdAt)+'</div>';
       cbBody+='</div>';
     });
     cbBody+='</div>';
@@ -11512,8 +11512,8 @@ function roomDailyContentHTML(p,fi){
     h+='<span style="width:34px;height:34px;border-radius:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,'+it.col+');">'+icon(it.ic,17)+'</span>';
     h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;">';
     h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
-    h+='<span style="font-size:10px;font-weight:800;color:var(--room);text-transform:uppercase;">'+esc(it.type)+'</span>';
-    h+='<span style="font-size:10px;color:var(--faint);">'+esc(it.item.source)+' · '+esc(String(it.item.year))+'</span>';
+    h+='<span style="font-size:11px;font-weight:800;color:var(--room);text-transform:uppercase;">'+esc(it.type)+'</span>';
+    h+='<span style="font-size:11px;color:var(--faint);">'+esc(it.item.source)+' · '+esc(String(it.item.year))+'</span>';
     h+='</div>';
     h+='<div style="font-size:13.5px;font-weight:800;color:var(--text);line-height:1.2;">'+esc(it.item.title)+'</div>';
     h+='<div style="font-size:11px;color:var(--muted);line-height:1.3;">'+esc(it.item.creator)+'</div>';
@@ -11795,8 +11795,8 @@ function hubTilesHTML(){
   h+='</div>';
   // alt başlık satırı: bugün X/5 + durum chip
   var chip=allFed
-    ? '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Bugün beslendim</span>'
-    : '<span style="flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
+    ? '<span style="flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:.2px;color:#3F8A4F;background:rgba(143,191,138,0.2);border:1px solid rgba(143,191,138,0.4);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px;">'+icon('check',11)+' Bugün beslendim</span>'
+    : '<span style="flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:.2px;color:'+mc+';background:color-mix(in srgb,'+mc+' 12%, transparent);border:1px solid color-mix(in srgb,'+mc+' 30%, transparent);border-radius:999px;padding:3px 9px;">birini doldur → tik yeşil</span>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">';
   h+='<span style="font-size:11px;font-weight:800;letter-spacing:.45px;color:var(--muted);">BUGÜN '+filled+'/5 ALAN</span>';
   h+='<button onclick="App.openSoulArchive()" style="border:none;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:var(--soul);display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border-radius:6px;">Arşiv '+icon('archive',12)+'</button>';
@@ -11814,7 +11814,7 @@ function hubTilesHTML(){
     h+='<button onclick="'+click+'" style="position:relative;min-width:0;cursor:pointer;padding:12px 3px 10px;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:6px;background:'+surface+';border:1.5px solid color-mix(in srgb,'+c.col+' '+borderOp+'%, transparent);box-shadow:'+sh+';transition:transform .18s var(--ease-premium,ease),border-color .2s,box-shadow .25s;">';
     h+=badge;
     h+='<span style="width:36px;height:36px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:'+c.col+';background:color-mix(in srgb,'+c.col+' '+(dark?'16':'19')+'%, transparent);box-shadow:'+(dark?'none':'inset 0 1px 0 rgba(255,255,255,0.35)')+';">'+icon(c.icon,17)+'</span>';
-    h+='<span style="font-size:10.5px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+(done?c.col:'var(--muted)')+';">'+c.label+'</span>';
+    h+='<span style="font-size:11px;font-weight:800;letter-spacing:.1px;white-space:nowrap;color:'+(done?c.col:'var(--muted)')+';">'+c.label+'</span>';
     h+='</button>';
   });
   h+='</div>';
@@ -11827,7 +11827,7 @@ function rasitBubbleHTML(curIdx){
   var h='<button type="button" class="sey-asbtn" onclick="App.cycleRasit()" aria-label="Raşit\'in sözü — dokun, değişsin" style="cursor:pointer;display:flex;align-items:flex-start;gap:11px;">';
   h+='<div style="width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 6px 16px var(--room-glow);">'+icon('heart',20)+'</div>';
   h+='<div class="glass" style="position:relative;flex:1;min-width:0;border-radius:6px 20px 20px 20px;padding:12px 15px;border:1px solid color-mix(in srgb,var(--room) 28%, var(--card-bd));box-shadow:0 8px 22px var(--room-glow);">';
-  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:12px;">🦩</span><span style="margin-left:auto;font-size:10px;color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--room);">RAŞİT</span><span style="font-size:12px;">🦩</span><span style="margin-left:auto;font-size:11px;color:var(--faint);font-weight:700;display:inline-flex;align-items:center;gap:3px;">dokun '+icon('sparkles',10)+'</span></div>';
   h+='<div id="sey-rasit-note" style="font-size:14.5px;line-height:1.5;color:var(--text2);transition:opacity .18s ease;">'+esc(NOTES[rasitNoteIdx(curIdx)])+'</div>';
   h+='</div></button>';
   return h;
@@ -11878,7 +11878,7 @@ function heroTargetsHTML(rec){
     var r=18, c=Math.round(2*Math.PI*r*100)/100;
     var off=Math.round(c*(1-pct/100)*100)/100;
     var col=met?'#3F8A4F':accent;
-    var curTxt=has?('<span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:10px;color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):('<span style="font-size:15px;font-weight:800;color:var(--faint);">—</span>');
+    var curTxt=has?('<span style="font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;">'+Math.round(cur)+'</span><span style="font-size:11px;color:var(--faint);font-weight:700;">/'+Math.round(goal)+'</span>'):('<span style="font-size:15px;font-weight:800;color:var(--faint);">—</span>');
     var grad='linear-gradient(180deg,'+accent+'22 0%,'+accent+'08 100%)';
     return '<div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 2px 10px;border-radius:20px;background:'+grad+';border:1px solid '+accent+'33;box-shadow:0 4px 14px '+accent+'1A;">'
       +'<div style="position:relative;width:52px;height:52px;filter:drop-shadow(0 2px 4px '+accent+'26);">'
@@ -11896,7 +11896,7 @@ function heroTargetsHTML(rec){
 
   var header='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">'
     +'<span style="font-size:11px;font-weight:800;letter-spacing:1.2px;color:var(--faint);text-transform:uppercase;">Hedeflerim</span>'
-    +'<span style="font-size:10px;font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
+    +'<span style="font-size:11px;font-weight:700;color:var(--muted);">Bugün · makro üçlü</span></div>';
   var h='<div style="display:flex;flex-direction:column;gap:7px;">';
   h+=header;
   if(isVacationDay(activeDate())){
@@ -12036,7 +12036,7 @@ function rasitContactHTML(){
   var btn=function(href,attr,ic,label,sub){
     return '<a href="'+href+'"'+attr+' style="text-decoration:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:18px;background:linear-gradient(135deg,color-mix(in srgb,var(--room) 14%, var(--card)),color-mix(in srgb,var(--room) 6%, var(--card)));border:1px solid color-mix(in srgb,var(--room) 34%, var(--card-bd));box-shadow:0 8px 20px color-mix(in srgb,var(--room) 16%, transparent);color:var(--room);">'
       +'<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 4px 12px var(--room-glow);">'+icon(ic,17)+'</span>'
-      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:10.5px;font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
+      +'<span style="min-width:0;display:flex;flex-direction:column;line-height:1.15;"><span style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;">'+label+'</span><span style="font-size:11px;font-weight:600;color:var(--faint);white-space:nowrap;">'+sub+'</span></span></a>';
   };
   var h='<div style="display:flex;gap:9px;margin-top:-4px;">';
   h+=btn(WA,' target="_blank" rel="noopener"','send-horizontal','Raşit\'e yaz','WhatsApp\'tan mesaj');
@@ -12058,7 +12058,7 @@ function dailyPhotoCardHTML(){
   h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
   h+='<div style="display:flex;align-items:center;gap:9px;">';
   h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' '+(dark?'16':'18')+'%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,'+(dark?'0.08':'0.45')+');">'+icon('camera',17)+'</span>';
-  h+='<div><div style="font-size:12px;font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:10.5px;color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
+  h+='<div><div style="font-size:12px;font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:11px;color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;gap:4px;">';
   h+='<button onclick="event.stopPropagation();App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
@@ -12076,10 +12076,10 @@ function dailyPhotoCardHTML(){
      var meta=[];
      if(p.artist) meta.push('© '+esc(p.artist));
      if(p.license) meta.push(esc(p.license));
-     if(meta.length) h+='<div style="margin-top:5px;font-size:10.5px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
+     if(meta.length) h+='<div style="margin-top:5px;font-size:11px;font-weight:700;opacity:.82;text-shadow:0 1px 2px rgba(0,0,0,0.35);">'+meta.join(' · ')+'</div>';
      h+='</div>';
      if(p.pageUrl){
-       h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:10px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
+       h+='<a href="'+esc(p.pageUrl)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.45);color:#fff;font-size:11px;font-weight:800;text-decoration:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">'+icon('external-link',11)+' Kaynak</a>';
      }
     }else{
      h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
@@ -12372,12 +12372,12 @@ function journalModalHTML(){
   h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
   h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('book-open',23)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">GÜNLÜK IŞIĞI <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Günışığı\'nın Günlüğü</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">GÜNLÜK IŞIĞI <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Günışığı\'nın Günlüğü</div></div>';
   h+='<button onclick="App.closeJournalModal()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
   h+='</div>';
 
   h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
-  h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:10.5px;font-weight:900;">'+ph.phaseCode.replace('F','')+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+esc(phaseShortTitle(ph))+'</span></div>';
+  h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:11px;font-weight:900;">'+ph.phaseCode.replace('F','')+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+esc(phaseShortTitle(ph))+'</span></div>';
   h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="display:inline-flex;">'+icon('flame',14)+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+streak+' günlük seri</span></div>';
   h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="display:inline-flex;">'+icon('sun',14)+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">Gün '+dayIdx+'</span></div>';
   h+='</div>';
@@ -12394,7 +12394,7 @@ function journalModalHTML(){
     var col=active?'#fff':'var(--text2)';
     var bd=active?'transparent':'var(--card-bd)';
     var sh=active?'0 6px 16px color-mix(in srgb,var(--journal-glow) 60%,transparent)':'none';
-    h+='<button id="sey-journal-mode-'+m.id+'" onclick="App.setJournalMode(\''+m.id+'\')" style="border:'+bd+';cursor:pointer;background:'+bg+';color:'+col+';border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:'+sh+';transition:transform .12s ease,box-shadow .2s ease;"><span style="font-size:16px;">'+icon(m.icon,16)+'</span><span style="font-size:10px;font-weight:800;line-height:1.15;text-align:center;">'+esc(m.label)+'</span><span style="font-size:11px;opacity:.8;">'+esc(m.hint)+'</span></button>';
+    h+='<button id="sey-journal-mode-'+m.id+'" onclick="App.setJournalMode(\''+m.id+'\')" style="border:'+bd+';cursor:pointer;background:'+bg+';color:'+col+';border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:'+sh+';transition:transform .12s ease,box-shadow .2s ease;"><span style="font-size:16px;">'+icon(m.icon,16)+'</span><span style="font-size:11px;font-weight:800;line-height:1.15;text-align:center;">'+esc(m.label)+'</span><span style="font-size:11px;opacity:.8;">'+esc(m.hint)+'</span></button>';
   });
   h+='</div>';
 
@@ -12519,13 +12519,13 @@ function crisisModalHTML(){
   h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
   h+='<div style="position:relative;display:flex;align-items:center;gap:12px;">';
   h+='<span style="width:46px;height:46px;border-radius:15px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.22);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+icon(C.icon,23)+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
+  h+='<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:800;letter-spacing:1px;opacity:.92;display:flex;align-items:center;gap:5px;">'+C.tag+' <span style="font-size:12px;">🦩</span></div><div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px;">Raşit\'in Kriz Odası</div></div>';
   h+='<button onclick="App.closeCrisis()" aria-label="Kapat" style="flex-shrink:0;border:none;cursor:pointer;background:rgba(255,255,255,0.22);width:36px;height:36px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
   h+='</div>';
   // 3 adımlı mikro-müdahale rayı: Dur → Dene → Karar ver
   h+='<div style="position:relative;display:flex;gap:6px;margin-top:13px;">';
   [['1','Dur'],['2','Dene'],['3','Karar ver']].forEach(function(st){
-    h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:10.5px;font-weight:900;">'+st[0]+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+st[1]+'</span></div>';
+    h+='<div style="flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.16);border-radius:11px;padding:7px 9px;"><span style="width:20px;height:20px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.28);font-size:11px;font-weight:900;">'+st[0]+'</span><span style="font-size:11.5px;font-weight:800;white-space:nowrap;">'+st[1]+'</span></div>';
   });
   h+='</div>';
   h+='</div>';
@@ -12534,7 +12534,7 @@ function crisisModalHTML(){
   h+='<div id="sey-crisis-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 15px 22px;display:flex;flex-direction:column;gap:13px;">';
 
   // Raşit intro bubble
-  h+='<div style="display:flex;align-items:flex-start;gap:10px;"><span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 5px 14px var(--room-glow);">'+icon('heart',17)+'</span><div class="glass" style="flex:1;min-width:0;border-radius:6px 18px 18px 18px;padding:12px 14px;border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));"><div style="font-size:10px;font-weight:800;letter-spacing:.8px;color:var(--room);margin-bottom:4px;">RAŞİT 🦩</div><div style="font-size:14px;line-height:1.5;color:var(--text2);">'+esc(C.hero)+'</div></div></div>';
+  h+='<div style="display:flex;align-items:flex-start;gap:10px;"><span style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,var(--room2),var(--room));box-shadow:0 5px 14px var(--room-glow);">'+icon('heart',17)+'</span><div class="glass" style="flex:1;min-width:0;border-radius:6px 18px 18px 18px;padding:12px 14px;border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));"><div style="font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--room);margin-bottom:4px;">RAŞİT 🦩</div><div style="font-size:14px;line-height:1.5;color:var(--text2);">'+esc(C.hero)+'</div></div></div>';
 
   // ── Şu an kendimi nasıl hissediyorum? — Raşit sözünün hemen altında, belirgin ve teşvik edici ──
   var noteHas=!!(ui.crisisNote&&String(ui.crisisNote).trim());
@@ -12774,7 +12774,7 @@ function consistencyMomentumCard(){
   var momIcon=momentum==null?'minus':(momentum>0?'trending-up':(momentum<0?'chart-column':'minus'));
   var momCol=momentum==null?'var(--muted)':(momentum>0?'#3F8A4F':(momentum<0?'#E9899F':'var(--muted)'));
   var momTxt=momentum==null?'—':((momentum>0?'+':'')+String(momentum).replace('.',','));
-  var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:10px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+  var tile=function(val,label,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:11px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('microscope',16)+'</span>Tutarlılık & Momentum</div>';
   h+='<div style="display:flex;gap:8px;">'+tile('%'+consist,'Tutarlılık (30g)','var(--accent)')+tile(active30+'/30','Aktif gün','#5BA85B')+tile(momTxt,'Momentum (7g)',momCol)+'</div>';
@@ -12806,7 +12806,7 @@ function badgesGrid(){
   ];
   var h='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:7px;">Rozetler '+icon('trophy',17)+'</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">';
-  badges.forEach(function(b){ var on=b.done; h+='<div style="display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;'+(on?'background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid #E9AFC1;':'background:var(--card);border:1px solid var(--card-bd);opacity:0.62;')+'"><span style="display:inline-flex;'+(on?'':'filter:grayscale(1);')+'">'+b.e+'</span><div style="min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+esc(b.l)+'</div><div style="font-size:10.5px;color:var(--faint);">'+esc(b.sub)+'</div></div></div>'; });
+  badges.forEach(function(b){ var on=b.done; h+='<div style="display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;'+(on?'background:linear-gradient(135deg,rgba(255,232,163,0.55),rgba(247,221,229,0.6));border:1px solid #E9AFC1;':'background:var(--card);border:1px solid var(--card-bd);opacity:0.62;')+'"><span style="display:inline-flex;'+(on?'':'filter:grayscale(1);')+'">'+b.e+'</span><div style="min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);">'+esc(b.l)+'</div><div style="font-size:11px;color:var(--faint);">'+esc(b.sub)+'</div></div></div>'; });
   h+='</div></div>';
   return h;
 }
@@ -12866,7 +12866,7 @@ function distanceRecapCard(){
   if(pTot>0){ var d2=wTot-pTot, pct=Math.round(d2/pTot*100); h+='<div style="font-size:12.5px;font-weight:700;color:'+(d2>=0?'#3F8A4F':'#B0764F')+';">'+(d2>=0?'▲ +':'▼ ')+Math.abs(pct)+'% <span style="color:var(--faint);font-weight:600;">geçen haftaya göre</span></div>'; }
   h+='<div style="font-size:12px;color:var(--muted);">Günlük mesafe (son 7 gün)</div>';
   h+=trendBars(last7,function(o){return dayMovement(o.rec).total;},'linear-gradient(180deg,#7DBE77,#9B7FC9)');
-  h+='<div style="display:flex;gap:5px;">'; last7.forEach(function(o){ h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--faint);">'+o.date.slice(8)+'</div>'; }); h+='</div>';
+  h+='<div style="display:flex;gap:5px;">'; last7.forEach(function(o){ h+='<div style="flex:1;text-align:center;font-size:11px;color:var(--faint);">'+o.date.slice(8)+'</div>'; }); h+='</div>';
   h+='<div style="display:flex;gap:8px;font-size:12.5px;">';
   h+='<span style="flex:1;background:rgba(143,191,138,0.14);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('footprints',14)+' Yürüyüş <b style="margin-left:auto;">'+fmtDist(wWalk)+'</b></span>';
   h+='<span style="flex:1;background:rgba(201,184,255,0.16);border-radius:10px;padding:8px 10px;color:var(--text2);display:flex;align-items:center;gap:5px;">'+icon('car',14)+' Araç <b style="margin-left:auto;">'+fmtDist(wVeh)+'</b></span>';
@@ -12925,7 +12925,7 @@ function moodHeatmapCard(){
   }
   h+='</div></div></div>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">';
-  h+='<div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--faint);">zor';
+  h+='<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--faint);">zor';
   ['cok-zorlandim','zorlandim','normal','iyi','cok-iyi'].forEach(function(mid){ h+='<span style="width:11px;height:11px;border-radius:3px;background:'+mcol[mid]+';display:inline-block;"></span>'; });
   h+='iyi</div>';
   h+='<div style="font-size:11px;color:var(--faint);">'+recDays+' gün kayıtlı · dokun → düzenle</div>';
@@ -13020,10 +13020,10 @@ function magnesiumCardHTML(date){
     h+='<div style="font-size:13px;color:var(--watch-ink);">Magnezyum önerileri doktor kontrolü gerektiren durum için filtreleniyor.</div>';
   } else {
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:10.5px;color:var(--faint);">Kullanılan gün</div><div style="font-size:18px;font-weight:800;">'+stats.totalDays+'</div></div>';
-    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:10.5px;color:var(--faint);">Toplam magnezyum</div><div style="font-size:18px;font-weight:800;">'+stats.totalMg+' mg</div></div>';
-    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:10.5px;color:var(--faint);">Ortalama doz</div><div style="font-size:18px;font-weight:800;">'+(stats.avgDose?stats.avgDose+' mg':'—')+'</div></div>';
-    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:10.5px;color:var(--faint);">Güncel seri</div><div style="font-size:18px;font-weight:800;">'+stats.streak+' gün</div></div>';
+    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:11px;color:var(--faint);">Kullanılan gün</div><div style="font-size:18px;font-weight:800;">'+stats.totalDays+'</div></div>';
+    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:11px;color:var(--faint);">Toplam magnezyum</div><div style="font-size:18px;font-weight:800;">'+stats.totalMg+' mg</div></div>';
+    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:11px;color:var(--faint);">Ortalama doz</div><div style="font-size:18px;font-weight:800;">'+(stats.avgDose?stats.avgDose+' mg':'—')+'</div></div>';
+    h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px;"><div style="font-size:11px;color:var(--faint);">Güncel seri</div><div style="font-size:18px;font-weight:800;">'+stats.streak+' gün</div></div>';
     h+='</div>';
 
     if(mg && mg.taken){
@@ -13105,7 +13105,7 @@ function raporHTML(){
   last30.forEach(function(o){ if(!o.rec) return; var _ms=moodScore(o.rec.mood); if(_ms!=null) _mv.push(_ms); if(o.rec.energy!=null) _ev.push(Number(o.rec.energy)); if(o.rec.stress!=null) _sv.push(Number(o.rec.stress)); });
   var _mA=avgOf(_mv),_eA=avgOf(_ev),_sA=avgOf(_sv);
   if(_mA!=null||_eA!=null||_sA!=null){
-    var rtile=function(label,val,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+(val!=null?val.toFixed(1).replace('.',','):'—')+'</div><div style="font-size:10px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
+    var rtile=function(label,val,col){ return '<div style="flex:1;min-width:0;background:var(--icon);border-radius:14px;padding:12px 8px;text-align:center;"><div style="font-size:20px;font-weight:800;color:'+col+';line-height:1;font-variant-numeric:tabular-nums;">'+(val!=null?val.toFixed(1).replace('.',','):'—')+'</div><div style="font-size:11px;color:var(--faint);margin-top:4px;font-weight:700;letter-spacing:.2px;">'+label+'</div></div>'; };
     h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:11px;"><div style="font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:#8A75C8;">'+icon('brain',16)+'</span>Ruhsal eğilim — 30 gün</div>';
     h+='<div style="display:flex;gap:8px;">'+rtile('Mod /5',_mA,'#C97FA8')+rtile('Enerji /5',_eA,'#F5A623')+rtile('Stres /5',_sA,'#7C5CC4')+'</div>';
     h+=sciNote('Ruh hâli fiziksel alışkanlıklardan bağımsız değil: iyi uyku ve düzenli hareket modu yükseltir, kronik stres ise iştahı ve şeker isteğini besler. Bu üç ekseni birlikte izlemek, bedeni ve zihni tek sistem olarak görmeni sağlar.');
@@ -13160,7 +13160,7 @@ function ayarlarHTML(){
   h+='<div class="glass" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;">';
   h+='<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('chart-column',15)+'</span>Veri & senkron özeti</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;">';
-  [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:10.5px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
+  [['Takip günü',_dtracked],['Toplam tik',_totalTicks],['Kayıt boyutu','~'+_sizeKB+' KB']].forEach(function(c){ h+='<div style="background:var(--icon);border:1px solid var(--card-bd);border-radius:14px;padding:11px 8px;text-align:center;"><div style="font-size:11px;color:var(--faint);line-height:1.3;">'+c[0]+'</div><div style="font-size:16px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums;">'+c[1]+'</div></div>'; });
   h+='</div>';
   var _srow=function(ic,label,val,col){ return '<div style="display:flex;align-items:center;gap:10px;"><span style="width:22px;display:flex;justify-content:center;color:'+(col||'var(--muted)')+';">'+icon(ic,14)+'</span><span style="flex:1;font-size:13px;color:var(--text2);">'+label+'</span><span style="font-size:13px;font-weight:700;text-align:right;">'+val+'</span></div>'; };
   h+='<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--card-bd);padding-top:11px;">';
@@ -13299,7 +13299,7 @@ function activityRings(rec){
   var legend='<div style="flex:1;display:flex;flex-direction:column;gap:8px;">';
   rings.forEach(function(r){ legend+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:10px;height:10px;border-radius:50%;background:'+r.color+';display:inline-block;flex-shrink:0;"></span><span style="color:var(--muted);">'+r.label+'</span><b style="margin-left:auto;color:var(--text);font-variant-numeric:tabular-nums;">'+(r.val!=null?r.val+r.unit:'—')+'</b></div>'; });
   legend+='<div style="font-size:11px;color:var(--faint);margin-top:2px;">'+mealCount+'/4 öğün · '+dayNutrition(rec).protein+'g protein</div>';
-  if(es.source==='tracked'){ var dm=dayMovement(rec); legend+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;display:flex;align-items:flex-start;gap:4px;">'+icon('footprints',12)+' <span>Adım, konum takibinden tahmini ('+fmtDist(dm.walk)+' yürüyüş). Elle girersen o geçerli olur.</span></div>'; }
+  if(es.source==='tracked'){ var dm=dayMovement(rec); legend+='<div style="font-size:11px;color:var(--faint);line-height:1.4;display:flex;align-items:flex-start;gap:4px;">'+icon('footprints',12)+' <span>Adım, konum takibinden tahmini ('+fmtDist(dm.walk)+' yürüyüş). Elle girersen o geçerli olur.</span></div>'; }
   legend+='</div>';
   return '<div class="glass" style="border-radius:22px;padding:16px;display:flex;align-items:center;gap:16px;"><div style="flex-shrink:0;">'+svg+'</div>'+legend+'</div>';
 }
@@ -13315,7 +13315,7 @@ function sparkCard(){
   h+='<div><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Uyku (saat)</div><div style="display:flex;align-items:flex-end;gap:5px;height:46px;">';
   arr.forEach(function(a){ var hh=a.sleep?Math.max(6,Math.round(a.sleep/maxSl*46)):3; h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:46px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,#9B7FC9,#B8A0E0);opacity:'+(a.sleep?1:0.3)+';"></div></div>'; });
   h+='</div></div>';
-  h+='<div style="display:flex;gap:5px;">'; arr.forEach(function(a){ h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--faint);">'+a.d.slice(8)+'</div>'; }); h+='</div>';
+  h+='<div style="display:flex;gap:5px;">'; arr.forEach(function(a){ h+='<div style="flex:1;text-align:center;font-size:11px;color:var(--faint);">'+a.d.slice(8)+'</div>'; }); h+='</div>';
   h+='</div>';
   return h;
 }
@@ -13423,7 +13423,7 @@ function caffeineBlock(rec){
   h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;"><span style="font-size:11px;color:var(--faint);">Son kahve · kesim</span><span style="font-size:11.5px;font-weight:700;color:'+(timingOk?'var(--text2)':'#C2803A')+';">'+(lastCaf||'—')+' · '+(cut||'—')+'</span></div>';
   h+='</div></div>';
   var curve=caffeineCurveSVG(rec,bed);
-  if(curve){ h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px 12px 8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:10px;font-weight:800;letter-spacing:.3px;color:var(--muted);">METABOLİZMA · YATANA KADAR</span><span style="font-size:11px;color:#5BA85B;display:inline-flex;align-items:center;gap:3px;"><span style="width:12px;border-top:1.4px dashed #5BA85B;display:inline-block;"></span>50 mg eşik</span></div>'+curve+'</div>'; }
+  if(curve){ h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px 12px 8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><span style="font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);">METABOLİZMA · YATANA KADAR</span><span style="font-size:11px;color:#5BA85B;display:inline-flex;align-items:center;gap:3px;"><span style="width:12px;border-top:1.4px dashed #5BA85B;display:inline-block;"></span>50 mg eşik</span></div>'+curve+'</div>'; }
   h+='<div style="display:flex;flex-wrap:wrap;gap:5px;">';
   CAFFEINE_TYPES.forEach(function(t){ h+='<button onclick="App.addCaffeineDrink(\''+t.id+'\')" style="border:1px solid var(--field-bd);background:var(--card);border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">+ '+t.label+' <span style="color:var(--faint);font-weight:500;">'+t.mg+'mg</span></button>'; });
   h+='</div>';
@@ -13435,9 +13435,9 @@ function caffeineBlock(rec){
     h+='<div style="font-size:11.5px;color:var(--faint);background:var(--card);border:1px dashed var(--card-bd);border-radius:11px;padding:9px 11px;">Bugün henüz kafein eklenmedi. Yukarıdaki chip\'lerden başlat — mg, kalıntı ve eğri otomatik hesaplanır.</div>';
   }
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">';
-  h+='<span style="font-size:10.5px;color:var(--faint);">Profil:</span>';
-  [['standard','Standart'],['sensitive','Hassas'],['pregnant','Gebe']].forEach(function(m){ var on=mode===m[0]; var lbl=m[1]+' '+caffeineLimit(date,m[0]); h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?A:'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,'+A+' 12%, var(--field))':'var(--field)')+';color:'+(on?A:'var(--muted)')+';border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:700;cursor:pointer;">'+lbl+'</button>'; });
-  h+='<div style="margin-left:auto;display:flex;align-items:center;gap:5px;"><span style="font-size:10.5px;color:var(--faint);">Yatma</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div>';
+  h+='<span style="font-size:11px;color:var(--faint);">Profil:</span>';
+  [['standard','Standart'],['sensitive','Hassas'],['pregnant','Gebe']].forEach(function(m){ var on=mode===m[0]; var lbl=m[1]+' '+caffeineLimit(date,m[0]); h+='<button onclick="App.setCaffeineMode(\''+m[0]+'\')" style="border:1px solid '+(on?A:'var(--field-bd)')+';background:'+(on?'color-mix(in srgb,'+A+' 12%, var(--field))':'var(--field)')+';color:'+(on?A:'var(--muted)')+';border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">'+lbl+'</button>'; });
+  h+='<div style="margin-left:auto;display:flex;align-items:center;gap:5px;"><span style="font-size:11px;color:var(--faint);">Yatma</span><input type="time" value="'+esc(bed)+'" onchange="App.setTargetBed(this)" style="border:1px solid var(--field-bd);background:var(--field);border-radius:8px;padding:4px 7px;font-size:12px;color:var(--text);outline:none;"></div>';
   h+='</div>';
   if(total>limit){ var warnMsg=isVacationDay(date)?('Tatil modunda günlük limit esnetildi ('+total+'/'+limit+' mg). Normal günlerde üst sınır '+baseLimit+' mg.'):('Günlük limit aşıldı ('+total+'/'+limit+' mg). EFSA & FDA yetişkin üst sınırı '+baseLimit+' mg.'); h+='<div style="font-size:11px;color:#C2453A;background:rgba(226,91,106,0.12);border:1px solid rgba(226,91,106,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">'+warnMsg+'</div>'; }
   if(maxSingle>CAFFEINE_SINGLE_DOSE){ h+='<div style="font-size:11px;color:#9A6A2A;background:rgba(255,210,130,0.18);border:1px solid rgba(220,170,80,0.35);border-radius:10px;padding:7px 10px;line-height:1.4;">Tek doz '+maxSingle+' mg — EFSA güvenli tek doz 200 mg. Aralara zaman koy.</div>'; }
@@ -13463,14 +13463,14 @@ function sleepPrepCard(rec){
   var rf=readiness.factors||{};
   var fdefs=[['Uyku süresi',rf.duration||0,26],['Kalite',rf.quality||0,18],['Kafein',rf.caffeine||0,18],['Okuma',rf.reading||0,16],['Wind-down',rf.winddown||0,14],['İlaçsızlık',rf.medication||0,8]];
   h+='<div style="display:flex;flex-direction:column;gap:7px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;">';
-  fdefs.forEach(function(f){ var fp=Math.round(f[1]/f[2]*100); var bc=fp>=80?'#6E9C6A':(fp>=50?A:'#E0A93C'); h+='<div style="display:flex;align-items:center;gap:9px;"><div style="font-size:11px;font-weight:600;color:var(--muted);width:86px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:7px;border-radius:999px;background:color-mix(in srgb,'+A+' 12%, var(--icon));overflow:hidden;"><div style="height:100%;width:'+fp+'%;background:linear-gradient(90deg,'+bc+',color-mix(in srgb,'+bc+' 55%, #E9AFC1));border-radius:999px;transition:width .4s;"></div></div><div style="font-size:10.5px;font-weight:700;color:var(--faint);width:32px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
+  fdefs.forEach(function(f){ var fp=Math.round(f[1]/f[2]*100); var bc=fp>=80?'#6E9C6A':(fp>=50?A:'#E0A93C'); h+='<div style="display:flex;align-items:center;gap:9px;"><div style="font-size:11px;font-weight:600;color:var(--muted);width:86px;flex-shrink:0;">'+f[0]+'</div><div style="flex:1;height:7px;border-radius:999px;background:color-mix(in srgb,'+A+' 12%, var(--icon));overflow:hidden;"><div style="height:100%;width:'+fp+'%;background:linear-gradient(90deg,'+bc+',color-mix(in srgb,'+bc+' 55%, #E9AFC1));border-radius:999px;transition:width .4s;"></div></div><div style="font-size:11px;font-weight:700;color:var(--faint);width:32px;text-align:right;flex-shrink:0;">'+f[1]+'/'+f[2]+'</div></div>'; });
   h+='</div>';
   var srTip=!readiness.hasCaf?'Kafeinsiz gün uykuyu kolaylaştırır.':(readiness.residue<CAFFEINE_SLEEP_SAFE_MG?'Kafein temiz — uykuya hazırsın.':'Son kahveyi erkene çek, yarı ömür ~'+CAFFEINE_HALFLIFE_H+' sa.');
   h+='<div style="display:flex;gap:8px;align-items:flex-start;background:color-mix(in srgb,'+A+' 9%, var(--card));border:1px solid color-mix(in srgb,'+A+' 24%, var(--card-bd));border-radius:12px;padding:10px 12px;"><span style="flex-shrink:0;color:'+A+';display:inline-flex;margin-top:1px;">'+icon('brain',15)+'</span><div style="font-size:11.5px;line-height:1.5;color:var(--text2);"><b>Bu gece:</b> '+srTip+' <span style="color:var(--faint);">Kaynak EFSA/FDA.</span></div></div>';
   var rdEntries=readingStats(rec).entries;
   if(rdEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:10px 11px;">';
-    h+='<div style="font-size:10.5px;letter-spacing:.4px;font-weight:800;color:var(--muted);">BUGÜN OKUDUKLARIM</div>';
+    h+='<div style="font-size:11px;letter-spacing:.4px;font-weight:800;color:var(--muted);">BUGÜN OKUDUKLARIM</div>';
     rdEntries.forEach(function(e){ var meta=[]; if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk'); h+='<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;color:'+A+';">'+icon('book-open',14)+'</span><div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(e.title||'(başlıksız)')+(e.author?' <span style=\"font-weight:500;color:var(--faint);\">· '+esc(e.author)+'</span>':'')+'</div>'+(meta.length?'<div style="font-size:11px;color:var(--faint);">'+meta.join(' · ')+'</div>':'')+'</div></div>'; });
     h+='</div>';
   }
@@ -13498,7 +13498,7 @@ function bodyCard(rec){
     h+='<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">';
     h+='<div style="font-size:16px;font-weight:800;color:'+cat.col+';line-height:1.1;">'+cat.label+'</div>';
     h+='<div style="font-size:11.5px;color:var(--muted);">Boy '+b.heightCm+' cm · Kilo '+lw.kg+' kg</div>';
-    h+='<div style="font-size:10px;color:var(--faint);line-height:1.4;">BMI bilgi amaçlıdır; kas/kemik oranını ayırmaz, tıbbi teşhis değildir.</div>';
+    h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;">BMI bilgi amaçlıdır; kas/kemik oranını ayırmaz, tıbbi teşhis değildir.</div>';
     h+='</div></div>';
   }
   if(b.heightCm==null||ui.heightEdit){
@@ -13520,7 +13520,7 @@ function bodyCard(rec){
     var delta=ws.length>=2?(ws[ws.length-1].kg-ws[ws.length-2].kg):0;
     var dCol=delta<0?'#6E9C6A':(delta>0?'#E28A6A':'var(--faint)');
     h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:10.5px;font-weight:800;letter-spacing:.3px;color:var(--muted);">KİLO TRENDİ</span>'+(ws.length>=2?'<span style="font-size:11px;font-weight:800;color:'+dCol+';">'+(delta>0?'+':'')+(Math.round(delta*10)/10)+' kg</span>':'')+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--muted);">KİLO TRENDİ</span>'+(ws.length>=2?'<span style="font-size:11px;font-weight:800;color:'+dCol+';">'+(delta>0?'+':'')+(Math.round(delta*10)/10)+' kg</span>':'')+'</div>';
     h+='<div style="display:flex;align-items:flex-end;gap:5px;height:40px;">';
     ws.forEach(function(w){ var hh=Math.round(8+((w.kg-mn)/rng)*30); h+='<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:40px;"><div style="height:'+hh+'px;border-radius:5px;background:linear-gradient(180deg,'+A+',#9BC7EC);"></div></div>'; });
     h+='</div>';
@@ -13593,7 +13593,7 @@ function labCard(){
       h+='<div style="background:var(--card);border:1px solid var(--card-bd);border-radius:13px;padding:10px 12px;display:flex;align-items:center;gap:10px;">';
       h+='<span style="width:30px;height:30px;border-radius:9px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+kindCol+';background:color-mix(in srgb,'+kindCol+' 15%, var(--icon));">'+icon(r.kind==='blood'?'droplet':'flask',15)+'</span>';
       h+='<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;color:var(--text);">'+kindLbl+' tahlili · <span style="font-weight:600;color:var(--faint);">'+nfiles+' dosya</span></div><div style="font-size:11px;color:var(--faint);">'+when+'</div></div>';
-      h+='<span style="flex-shrink:0;font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;color:'+statusCol+';background:color-mix(in srgb,'+statusCol+' 15%, transparent);border:1px solid color-mix(in srgb,'+statusCol+' 40%, transparent);white-space:nowrap;">'+statusLbl+'</span>';
+      h+='<span style="flex-shrink:0;font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;color:'+statusCol+';background:color-mix(in srgb,'+statusCol+' 15%, transparent);border:1px solid color-mix(in srgb,'+statusCol+' 40%, transparent);white-space:nowrap;">'+statusLbl+'</span>';
       h+='</div>';
     });
     h+='</div>';
@@ -13736,7 +13736,7 @@ function mentalBalanceCard(rec){
   h+=gauge('Mod',ms.moodA,5,'#E9899F,#C9B8FF');
   h+=gauge('Enerji',ms.enA,5,'#FFD37A,#F5A623');
   h+=gauge('Stres',ms.stA,5,'#C9B8FF,#7C5CC4');
-  h+='<div style="font-size:10.5px;color:var(--faint);line-height:1.4;margin-top:1px;">Stres için düşük değer daha iyi; mod ve enerjide yüksek değer daha iyi.</div>';
+  h+='<div style="font-size:11px;color:var(--faint);line-height:1.4;margin-top:1px;">Stres için düşük değer daha iyi; mod ve enerjide yüksek değer daha iyi.</div>';
   h+='</div>';
   // dinamik bilimsel yorum
   var sci;
@@ -13750,7 +13750,7 @@ function mentalBalanceCard(rec){
   h+='<div style="border-top:1px solid var(--card-bd);padding-top:12px;display:flex;flex-direction:column;gap:9px;">';
   h+='<div style="font-size:12.5px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;"><span style="display:inline-flex;color:'+accent+';">'+icon('heart',14)+'</span>Bugün nasılsın?</div>';
   h+='<div style="display:flex;gap:6px;">';
-  MOODS.forEach(function(m){ var sel=curMood===m.id; var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.35);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);'; h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:9px 3px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,19)+'</span><span style="font-size:10px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>'; });
+  MOODS.forEach(function(m){ var sel=curMood===m.id; var style=sel?'background:linear-gradient(135deg,#FFE8A3,#F7DDE5);border:1px solid #E9AFC1;box-shadow:0 6px 14px rgba(233,175,193,0.35);transform:translateY(-2px);color:#5A2E2A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);'; h+='<button onclick="App.setMood(\''+m.id+'\')" style="flex:1;min-width:0;padding:9px 3px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .2s;'+style+'"><span style="display:inline-flex;">'+icon(m.icon,19)+'</span><span style="font-size:11px;font-weight:600;text-align:center;line-height:1.1;">'+esc(m.short)+'</span></button>'; });
   h+='</div>';
   h+=energyStressBlock(rec);
   h+='</div>';
@@ -13770,7 +13770,7 @@ function healthSleepCard(rec){
   _b+='<div style="border-top:1px solid var(--card-bd);padding-top:11px;display:flex;flex-direction:column;gap:8px;">';
   _b+='<div style="font-size:12.5px;font-weight:700;color:var(--muted);">Bu gece uyku ilacı / takviyesi kullandın mı?</div>';
   _b+='<div style="display:flex;gap:8px;">';
-  SLEEP_MED.forEach(function(o){ var sel=med.type===o.id; _b+='<button onclick="App.setSleepMed(\''+o.id+'\')" style="flex:1;padding:9px 4px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#E3ECFF,#EFE7FB);border:1px solid #93A7D9;color:#3A4565;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+o.emoji+'</span><span style="font-size:10.5px;font-weight:700;line-height:1.2;text-align:center;">'+o.label+'</span></button>'; });
+  SLEEP_MED.forEach(function(o){ var sel=med.type===o.id; _b+='<button onclick="App.setSleepMed(\''+o.id+'\')" style="flex:1;padding:9px 4px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#E3ECFF,#EFE7FB);border:1px solid #93A7D9;color:#3A4565;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+o.emoji+'</span><span style="font-size:11px;font-weight:700;line-height:1.2;text-align:center;">'+o.label+'</span></button>'; });
   _b+='</div>';
   if(med.type==='herbal'||med.type==='rx'){
     _b+='<input type="text" value="'+(med.note?esc(med.note):'')+'" oninput="App.setSleepMedNote(this)" placeholder="'+(med.type==='rx'?'İlaç adı / doz (örn. trazodon 50mg)':'Takviye adı (örn. melatonin 3mg)')+'" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none;">';
@@ -14041,7 +14041,7 @@ function cycleHTML(){
   }
   h+='<div class="glass" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;"><div style="font-size:15.5px;font-weight:700;">'+(edC?esc(dateLabelTR(vd)):'Bugün')+'</div>';
   h+='<div><div style="font-size:12.5px;color:var(--muted);margin-bottom:6px;">Akış</div><div style="display:flex;gap:7px;">';
-  FLOW.forEach(function(f){ var sel=curFlow===f.id; h+='<button onclick="App.setFlow(\''+f.id+'\')" style="flex:1;padding:9px 3px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#FBE3E8,#F7DDE5);border:1px solid #E58B9B;color:#7A2E3A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+f.emoji+'</span><span style="font-size:10.5px;font-weight:600;">'+f.label+'</span></button>'; });
+  FLOW.forEach(function(f){ var sel=curFlow===f.id; h+='<button onclick="App.setFlow(\''+f.id+'\')" style="flex:1;padding:9px 3px;border-radius:13px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;'+(sel?'background:linear-gradient(135deg,#FBE3E8,#F7DDE5);border:1px solid #E58B9B;color:#7A2E3A;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text);')+'"><span style="font-size:18px;">'+f.emoji+'</span><span style="font-size:11px;font-weight:600;">'+f.label+'</span></button>'; });
   h+='</div></div>';
   h+='<div><div style="font-size:12.5px;color:var(--muted);margin-bottom:6px;">Belirtiler</div><div style="display:flex;flex-wrap:wrap;gap:7px;">';
   SYMPTOMS.forEach(function(s){ var sel=curSym.indexOf(s.id)>=0; h+='<button onclick="App.toggleSymptom(\''+s.id+'\')" style="padding:8px 11px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;'+(sel?'background:linear-gradient(135deg,#EFE4FF,#FBE3E8);border:1px solid #B89BD9;color:#5A3D55;':'background:var(--card);border:1px solid var(--card-bd);color:var(--text2);')+'"><span>'+s.emoji+'</span><span>'+s.label+'</span></button>'; });
@@ -14661,13 +14661,13 @@ function faithRaporCardHTML(){
   var h='<div class="sg-faith-hero sg-gradient-border sg-glow">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">';
   h+='<div><div style="font-size:15px;font-weight:800;color:var(--faith);display:flex;align-items:center;gap:7px;">'+icon('bar-chart',16)+' Bu Haftanın İbadet Ritmi</div><div style="font-size:12px;color:var(--faint);margin-top:2px;">Vakit · cemaat · zikir · seri</div></div>';
-  h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:26px;font-weight:800;color:var(--faith);">%'+pct+'</div><div style="font-size:10px;color:var(--faint);">uyum</div></div>';
+  h+='<div style="text-align:right;flex-shrink:0;"><div style="font-size:26px;font-weight:800;color:var(--faith);">%'+pct+'</div><div style="font-size:11px;color:var(--faint);">uyum</div></div>';
   h+='</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">';
-  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith);">'+k.prays+'/'+k.maxPrays+'</div><div style="font-size:10.5px;color:var(--faint);">vakit</div></div>';
-  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith2);">'+k.cong+'</div><div style="font-size:10.5px;color:var(--faint);">cemaat</div></div>';
-  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--zikr);">'+k.zikrTotal+'</div><div style="font-size:10.5px;color:var(--faint);">zikir</div></div>';
-  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--kandil);">'+(streak||0)+'</div><div style="font-size:10.5px;color:var(--faint);">seri</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith);">'+k.prays+'/'+k.maxPrays+'</div><div style="font-size:11px;color:var(--faint);">vakit</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--faith2);">'+k.cong+'</div><div style="font-size:11px;color:var(--faint);">cemaat</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--zikr);">'+k.zikrTotal+'</div><div style="font-size:11px;color:var(--faint);">zikir</div></div>';
+  h+='<div class="sg-faith-kpi"><div style="font-size:20px;font-weight:800;color:var(--kandil);">'+(streak||0)+'</div><div style="font-size:11px;color:var(--faint);">seri</div></div>';
   h+='</div>';
   // Haftalık bar (7 gün) — performed count
   h+='<div style="display:flex;align-items:flex-end;gap:5px;height:64px;margin-top:4px;">';
@@ -15970,7 +15970,7 @@ function saygiFloatingReadHTML(){
   var sub=done?'Ne okudum kaydını aç':(!article?(ui.saygiLoading?'Biyografi hazırlanıyor':'Biyografi yüklenince açılır'):(ready?'Bugünün kaydına ekle':'Yazının sonuna inince açılır'));
   return '<button id="saygi-read-button-modal" class="sg-person-read-fab'+(done?' is-done':(ready?' is-ready':' is-locked'))+'" '+(disabled?'disabled':'')+' onclick="'+(done?'App.openSaygiReading()':'App.markSaygiRead()')+'" style="position:fixed!important;z-index:2147483640!important;left:50%!important;bottom:24px!important;transform:translateX(-50%)!important;display:flex!important;visibility:visible!important;opacity:'+(disabled?'.72':'1')+'!important;pointer-events:auto!important;box-sizing:border-box!important;width:calc(100vw - 64px)!important;max-width:484px!important;min-height:58px!important;align-items:center!important;justify-content:center!important;gap:10px!important;border:1px solid rgba(255,255,255,.34)!important;border-radius:18px!important;padding:10px 16px calc(10px + env(safe-area-inset-bottom))!important;color:#FFF9EC!important;background:linear-gradient(135deg,#C4A35A,#826936)!important;box-shadow:0 14px 34px rgba(52,39,18,.38)!important;font:inherit!important;cursor:'+(disabled?'not-allowed':'pointer')+'!important;">'
     +'<span class="saygi-read-button-icon" style="display:inline-flex!important;">'+icon(done?'circle-check':'book-open',20)+'</span>'
-    +'<span style="display:flex!important;flex-direction:column!important;align-items:flex-start!important;text-align:left!important;"><strong data-saygi-read-copy style="font-size:14px!important;line-height:1.1!important;">Okudum</strong><small data-saygi-read-sub style="margin-top:3px!important;color:rgba(255,249,236,.84)!important;font-size:10.5px!important;font-weight:700!important;">'+esc(sub)+'</small></span></button>';
+    +'<span style="display:flex!important;flex-direction:column!important;align-items:flex-start!important;text-align:left!important;"><strong data-saygi-read-copy style="font-size:14px!important;line-height:1.1!important;">Okudum</strong><small data-saygi-read-sub style="margin-top:3px!important;color:rgba(255,249,236,.84)!important;font-size:11px!important;font-weight:700!important;">'+esc(sub)+'</small></span></button>';
 }
 function saygiUnlockReadButton(btn){
   if(!btn||btn.disabled===false&&ui.saygiReadReady) return;
@@ -16155,7 +16155,7 @@ function soulOverlayShell(closeFn, sticky, body, maxw, fixedH){
   h+='</div></div>';
   return h;
 }
-function bookStatusChip(st){ var m={reading:['Okunuyor','var(--read)','var(--read-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--drop)','var(--drop-bg)']}; var c=m[st]||m.reading; return '<span style="font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
+function bookStatusChip(st){ var m={reading:['Okunuyor','var(--read)','var(--read-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--drop)','var(--drop-bg)']}; var c=m[st]||m.reading; return '<span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
 function readingOverlayHTML(){
   var view=ui.readingView||'today';
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Ne okudum? '+icon('book-open',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugünkü okuman, kitaplığın ve alıntıların tek yerde.</div></div><button onclick="App.closeReading()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
@@ -16198,7 +16198,7 @@ function readingTodayView(){
     rEntries.slice().reverse().forEach(function(e){
       var meta=[], linked=e.bookId?findBook(e.bookId):null, isSaygi=e&&e.source==='saygi', sourceUrl=isSaygi?saygiSafeUrl(e.sourceUrl):'';
       if(e.pages) meta.push(e.pages+' sayfa'); if(e.minutes) meta.push(e.minutes+' dk');
-      var chip=isSaygi?'<span style="font-size:10px;color:#77602D;background:rgba(197,163,90,.16);border:1px solid rgba(138,109,54,.26);font-weight:850;letter-spacing:.35px;border-radius:999px;padding:2px 7px;margin-left:5px;">SAYGI</span>':(linked?' <span style="font-size:10.5px;color:var(--read);font-weight:700;">· kitaplıkta</span>':'');
+      var chip=isSaygi?'<span style="font-size:11px;color:#77602D;background:rgba(197,163,90,.16);border:1px solid rgba(138,109,54,.26);font-weight:850;letter-spacing:.35px;border-radius:999px;padding:2px 7px;margin-left:5px;">SAYGI</span>':(linked?' <span style="font-size:11px;color:var(--read);font-weight:700;">· kitaplıkta</span>':'');
       h+='<div style="display:flex;align-items:flex-start;gap:10px;background:'+(isSaygi?'linear-gradient(135deg,rgba(197,163,90,.10),var(--card))':'var(--card)')+';border:1px solid '+(isSaygi?'rgba(138,109,54,.25)':'var(--card-bd)')+';border-radius:14px;padding:11px 12px;">';
       h+='<span style="line-height:1.2;display:inline-flex;color:'+(isSaygi?'#826936':'var(--read)')+';">'+icon(isSaygi?'trophy':'book-open',18)+'</span><div style="flex:1;min-width:0;">';
       h+='<div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+chip+'</div>'+(e.author?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.author)+'</div>':'')+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'');
@@ -16291,7 +16291,7 @@ function quoteAddModal(){
 }
 
 // ================= NE İZLEDİM HUB (overlay) =================
-function titleStatusChip(st){ var m={watching:['İzleniyor','var(--watch)','var(--watch-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--pause)','var(--pause-bg)']}; var c=m[st]||m.watching; return '<span style="font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
+function titleStatusChip(st){ var m={watching:['İzleniyor','var(--watch)','var(--watch-bg)'],finished:['Bitti','var(--ok)','var(--ok-bg)'],dropped:['Bırakıldı','var(--pause)','var(--pause-bg)']}; var c=m[st]||m.watching; return '<span style="font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;color:'+c[1]+';background:'+c[2]+';">'+c[0]+'</span>'; }
 function watchOverlayHTML(){
   var view=ui.watchView||'today';
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:20px;font-weight:800;display:flex;align-items:center;gap:8px;">Ne izledim? '+icon('clapperboard',19)+'</div><div style="font-size:12.5px;color:var(--faint);margin-top:3px;">Bugün izlediklerin, arşivin ve unutulmaz replikler.</div></div><button onclick="App.closeWatching()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
@@ -16334,7 +16334,7 @@ function watchTodayView(){
   if(wEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+wEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
-    wEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch-ink);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--watch-ink);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    wEntries.slice().reverse().forEach(function(e){ var meta=[]; if(e.kind==='dizi'&&e.episodes) meta.push(e.episodes+' bölüm'); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTitle(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--watch-ink);">'+icon('clapperboard',18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:11px;color:var(--watch-ink);font-weight:700;">· arşivde</span>':'')+'</div>'+(meta.length?'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>':'')+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeWatching(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için izleme eklemedin. Bir bölüm bile keyiftir.</div>';
@@ -16464,7 +16464,7 @@ function listeningTodayView(){
   if(lEntries.length>0){
     h+='<div style="display:flex;flex-direction:column;gap:8px;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;">BUGÜN ('+lEntries.length+')</div><div style="font-size:11.5px;color:var(--faint);">toplam '+fmtDur(totMin)+'</div></div>';
-    lEntries.slice().reverse().forEach(function(e){ var meta=[]; var km=listenKindMeta(e.kind); meta.push(km.label); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTrack(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--listen-ink);">'+icon(km.icon,18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:10.5px;color:var(--listen-ink);font-weight:700;">· favori</span>':'')+'</div>'+(e.artist?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.artist)+'</div>':'')+'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>'+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeListening(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
+    lEntries.slice().reverse().forEach(function(e){ var meta=[]; var km=listenKindMeta(e.kind); meta.push(km.label); if(e.minutes) meta.push(e.minutes+' dk'); var linked=e.itemId?findTrack(e.itemId):null; h+='<div style="display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--card-bd);border-radius:14px;padding:11px 12px;"><span style="line-height:1.2;display:inline-flex;color:var(--listen-ink);">'+icon(km.icon,18)+'</span><div style="flex:1;min-width:0;"><div style="font-size:13.5px;font-weight:700;color:var(--text);">'+esc(e.title||'(başlıksız)')+(linked?' <span style="font-size:11px;color:var(--listen-ink);font-weight:700;">· favori</span>':'')+'</div>'+(e.artist?'<div style="font-size:11.5px;color:var(--faint);">'+esc(e.artist)+'</div>':'')+'<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">'+meta.join(' · ')+'</div>'+(e.note?'<div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.4;">'+esc(e.note)+'</div>':'')+'</div><button onclick="App.removeListening(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.12);cursor:pointer;width:28px;height:28px;border-radius:8px;color:var(--faint);display:flex;align-items:center;justify-content:center;">'+icon('trash-2',13)+'</button></div>'; });
     h+='</div>';
   } else {
     h+='<div style="text-align:center;font-size:12.5px;color:var(--faint);line-height:1.5;padding:4px 8px;">Henüz bugün için dinleme eklemedin. Bir şarkı bile sayılır.</div>';
@@ -16539,7 +16539,7 @@ function learningEntryCard(e){
   h+='<div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.35;">'+esc(e.topic||'')+'</div>';
   if(e.source&&String(e.source).trim()) h+='<div style="font-size:12px;color:var(--learn);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px;">'+icon('bookmark',11)+' '+esc(e.source)+'</div>';
   if(e.note&&String(e.note).trim()) h+='<div style="font-size:12.5px;color:var(--text2);line-height:1.45;margin-top:5px;">'+esc(e.note)+'</div>';
-  if(when) h+='<div style="font-size:10.5px;color:var(--faint);margin-top:5px;">'+esc(when)+'</div>';
+  if(when) h+='<div style="font-size:11px;color:var(--faint);margin-top:5px;">'+esc(when)+'</div>';
   h+='</div>';
   h+='<button onclick="App.removeLearning(\''+esc(e.id)+'\')" aria-label="Sil" style="flex-shrink:0;border:none;cursor:pointer;width:28px;height:28px;border-radius:9px;background:rgba(220,120,120,0.1);color:#C0605F;font-size:14px;">\u00d7</button>';
   h+='</div>';
@@ -17096,7 +17096,7 @@ function aeonPaintVoicePlayer(container,mediaId,m,uri){
   container.innerHTML='<div style="display:flex;align-items:center;gap:9px;min-width:170px;">'
     +'<button onclick="App.aeonToggleVoice(\''+mediaId+'\')" id="aeon-voice-btn-'+mediaId+'" aria-label="Oynat/duraklat" style="flex-shrink:0;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;background:currentColor;display:flex;align-items:center;justify-content:center;"><span id="aeon-voice-icon-'+mediaId+'" style="color:var(--card);font-size:12px;">▶</span></button>'
     +'<div style="flex:1;display:flex;align-items:center;gap:1.5px;height:24px;min-width:0;">'+bars+'</div>'
-    +'<span id="aeon-voice-time-'+mediaId+'" style="flex-shrink:0;font-size:10.5px;opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStr(m.durationSec)+'</span>'
+    +'<span id="aeon-voice-time-'+mediaId+'" style="flex-shrink:0;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums;">'+aeonRecTimeStr(m.durationSec)+'</span>'
     +'</div>';
   if(!aeonAudioEls[mediaId]) aeonAudioEls[mediaId]={uri:uri,audio:null,durationSec:m.durationSec};
 }
@@ -17131,7 +17131,7 @@ function aeonPaintFileCard(container,mediaId,m){
   container.innerHTML='<div style="display:flex;align-items:center;gap:11px;min-width:170px;max-width:260px;">'
     +'<span style="flex-shrink:0;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:currentColor;color:inherit;"><span style="display:flex;color:var(--card);">'+icon('file-text',17)+'</span></span>'
     +'<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(name)+'</div>'
-    +'<div style="font-size:10.5px;opacity:.7;margin-top:1px;">'+(size?esc(size)+' · ':'')+'aç / indir</div></div>'
+    +'<div style="font-size:11px;opacity:.7;margin-top:1px;">'+(size?esc(size)+' · ':'')+'aç / indir</div></div>'
     +'<span style="flex-shrink:0;display:inline-flex;opacity:.75;">'+icon('download',15)+'</span>'
     +'</div>';
 }
@@ -17307,7 +17307,7 @@ function aeonPopupHTML(o){
   inner+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
   inner+='<div style="flex-shrink:0;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#F0D274,#C99A3A);display:flex;align-items:center;justify-content:center;color:#1a1404;box-shadow:0 8px 22px rgba(201,160,60,0.5),inset 0 1px 0 rgba(255,255,255,0.4);">'+icon('hexagon',20)+'</div>';
   inner+='<div style="flex:1;min-width:0;">';
-  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:14px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(180deg,#F3E4B0,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ÆON</span><span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;">· '+o.label+'</span>'+(o.when?'<span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);font-weight:600;">'+esc(o.when)+'</span>':'')+'</div>';
+  inner+='<div style="display:flex;align-items:center;gap:7px;"><span style="font-size:14px;font-weight:800;letter-spacing:1.5px;background:linear-gradient(180deg,#F3E4B0,#D4AF37);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">ÆON</span><span style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:700;">· '+o.label+'</span>'+(o.when?'<span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);font-weight:600;">'+esc(o.when)+'</span>':'')+'</div>';
   inner+='<div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,0.92);margin-top:5px;word-break:break-word;">'+esc(o.txt)+(o.trunc?'…':'')+'</div>';
   if(o.more>0) inner+='<div style="font-size:11.5px;color:#E6C15A;margin-top:6px;font-weight:700;">+'+o.more+' '+o.moreLabel+'</div>';
   inner+='<div style="display:flex;gap:8px;margin-top:13px;">';
@@ -18137,7 +18137,7 @@ function lunaBubbleOut(text,time){
 function lunaBubbleIn(inner,time,streaming){
   var h='<div style="align-self:flex-start;max-width:88%;">';
   h+='<div style="background:var(--card);color:var(--text);border:1px solid rgba(155,127,201,0.28);border-left:3px solid #9B7FC9;border-radius:5px 17px 17px 17px;padding:10px 13px;box-shadow:0 3px 10px rgba(150,110,120,0.08);">';
-  h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);border-radius:999px;padding:2px 9px;">'+icon('moon',11)+' Luna</span>'+(streaming?'<span style="font-size:11px;color:#7A5AA0;font-weight:700;">düşünüyor…</span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(time))+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#9B7FC9,#E9AFC1);border-radius:999px;padding:2px 9px;">'+icon('moon',11)+' Luna</span>'+(streaming?'<span style="font-size:11px;color:#7A5AA0;font-weight:700;">düşünüyor…</span>':'')+'<span style="margin-left:auto;font-size:11px;color:var(--faint);font-weight:600;">'+esc(aeonTime(time))+'</span></div>';
   h+='<div style="font-size:14.5px;line-height:1.55;">'+inner+'</div>';
   h+='</div></div>';
   return h;
@@ -18316,7 +18316,7 @@ function aeonItemHTML(it,enterCls){
   } else {
     h+='<div class="msg-row in'+enterCls+'">';
     h+='<div class="msg-bubble in">';
-    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:10.5px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#1a1404;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:999px;padding:2px 9px;">'+icon('hexagon',11)+' ÆON</span>'+(it.unread?'<span style="width:7px;height:7px;border-radius:50%;background:#E9576F;box-shadow:0 0 6px #E9576F;"></span>':'')+'<span style="margin-left:auto;font-size:11px;color:var(--faint);font-weight:600;">'+esc(aeonTime(it.time))+'</span></div>';
     if(it.mediaKind) h+=aeonMediaSlotHTML(it,'var(--icon)','var(--aeon)');
     else h+='<div style="font-size:14.5px;line-height:1.55;">'+aeonBubbleText(it.text,'in')+'</div>';
     var delBtn=(it.observer&&it.id)?('<button onclick="App.deleteNotif(\''+it.id+'\')" style="border:1px solid rgba(150,110,120,0.2);cursor:pointer;background:none;color:#C77;font-weight:700;padding:4px 10px;border-radius:9px;display:flex;align-items:center;gap:4px;">'+icon('trash-2',11)+' Sil</button>'):'';
@@ -18420,7 +18420,7 @@ function aeonChatHTML(){
   h+='<button id="aeon-scroll-fab" class="aeon-scrollfab" style="top:-52px;right:4px;" onclick="App.aeonScrollToBottom()" aria-label="En alta in">⌄</button>';
   if(ui.aeonError) h+='<div style="font-size:12.5px;color:#C0605F;background:rgba(220,120,120,0.1);border:1px solid rgba(220,120,120,0.25);border-radius:12px;padding:9px 11px;margin-bottom:8px;">'+esc(ui.aeonError)+'</div>';
   var draftLen=String(ui.aeonDraft||'').length, leftChars=600-draftLen;
-  h+='<div id="aeon-char-count" style="display:'+(leftChars<100?'block':'none')+';font-size:10.5px;color:var(--faint);text-align:right;margin-bottom:3px;">'+leftChars+' karakter kaldı</div>';
+  h+='<div id="aeon-char-count" style="display:'+(leftChars<100?'block':'none')+';font-size:11px;color:var(--faint);text-align:right;margin-bottom:3px;">'+leftChars+' karakter kaldı</div>';
   if(ui.aeonRecActive){
     h+='<div style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--aeon2),var(--aeon));border-radius:26px;padding:7px 8px 7px 14px;box-shadow:0 8px 20px var(--aeon-glow);">';
     h+='<span style="width:9px;height:9px;border-radius:50%;background:#1a1404;flex-shrink:0;animation:seyTwinkle 1s ease-in-out infinite;"></span>';

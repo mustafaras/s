@@ -123,6 +123,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-36-FIX | Planın saymadığı 102 site | ✅ TAMAMLANDI | `174da91` | **`app.js`'te 11px altı = 0**; 5 sekmenin render çıktısında da 0; S4 tam yeşil; S5 sabit 699 | **Program dışı onarım — prompt sayacı değişmedi.** Plan `app.js` tabanını **65** olarak veriyordu (8.5px×2 + 9px×52 + 9.5px×11) ve bu üç sayı birebir doğruydu; ama **48 × 10px ve 54 × 10.5px** hiç sayılmamıştı. Gerçek taban **167**. AD-34…AD-36 harfiyen çalıştırılsaydı AD-37 dalgayı "11pt tabanı sağlandı" diye kapatırken `app.js`'te **102 ihlal ayakta kalacaktı** — dalganın kendi amacı gerçekleşmeyecekti. Kullanıcıya üç seçenek sunuldu, **tam kapsam (167 site)** onaylandı. **Risk taraması:** 102 sitenin **92'si** bayraksız (serbest sarma). 10 bayraklı sitenin hepsi incelendi ve güvenli bulundu: `max-width:62px`+ellipsis (kısalır), iki adet `width:20px;height:20px` daire (11px glif 20px dairede sığar), `width:32px;text-align:right` kesir etiketi (içerik `f[1]/f[2]`, en fazla ~30px), mutlak konumlu hap (padding ile büyür), kalanlar `nowrap` ama serbest kapsayıcıda. Büyüme oranı zaten en düşük gruptu: **10px→11px %10, 10.5px→11px %5.** **Cerrahi kanıt:** font-size maskeli diff → font-size dışında sıfır fark. **Kapsam bütünlüğü:** `app.js`'te `rem`/`em`/`pt` cinsinden font-size yok, `clamp()` ile font-size yok. **Sonuç:** `app.js` 11px altı **167 → 0**; `app/styles.css` (AD-33) **119 → 0**. Dalga 7'nin hedefi iki dosyada da sağlandı. |
 
+| AD-37 | Dalga 7 kapanışı | ✅ TAMAMLANDI | `<commit>` | S8 + S4 (8 kapı) + S5 + yapı taraması; **11px altı: her iki dosyada ve 5 sekmede 0** | **S8 cache-bust:** dalga 7'de `app.js` ve `app/styles.css` değişti → `app.js?v=20260824a` → **`?v=20260824b`**, `app/styles.css?v=20260823d` → **`?v=20260824b`**. `app/core/constants.js` dalga 7'de değişmediği için `?v=20260824a`'da bırakıldı. **S4 tam yeşil:** syntax 3/3, driver 31 PASS / 0 fail, zikr 95/95, tema 18/18, kontrast 30/30, sync 64/64, panel v1 50/50, panel-v2 27/27. **S5 dalga geneli (`04b83ca` → HEAD):** handler **699 sabit** ve çağrı dağılımı **birebir aynı** — dalga 7 tamamen `font-size` değeri düzeyinde kaldığı için **sıfır I2 etkisi** (dalga 6'daki `setTheme` sapmasının aksine). **Yapı taraması:** 5 sekmede iç içe `<button>` maks derinlik 1 / ihlal 0 **ve** render edilmiş işaretlemede 11px altı font **0**. **Sonuç:** `app/styles.css` 119 → 0, `app.js` 167 → 0, toplam **286 site** 11px tabanına çekildi. Plan 65+"var" öngörüyordu; gerçek sayı ölçülüp tamamı kapatıldı. **Dalga 7 tablosu 5/5, toplam 37/52.** `currentWave` → **8**. ⚠️ **Dalga 8 (AD-38) yeni kullanıcı onayı ister** — Liquid Glass katman ayrımı, planın görsel olarak en görünür değişikliği; reddedilmesi meşru bir karardır (dalga 9'a atlanır). **Açık kapı — düzeltilemeyen taşma yok, ama ölçülemeyen var:** headless harness'ta layout motoru olmadığı için hiçbir taşma *ölçülmedi*; hepsi analitik değerlendirildi ve emniyet zincirleri (`min-width:0`, `minmax(0,1fr)`, `nowrap`+`ellipsis`, `overflow:hidden`) doğrulandı. Cihaz üstü doğrulama ayrı bir kanıt seviyesidir ve **yapılmadı**. İzlenmesi önerilen üç yer: dar ekranda alt navigasyon etiketi `İlham·İbadet` (AD-33), `.sg-person-preview-caption` (AD-33), ısı haritası ay etiketi (AD-35). |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -137,11 +139,11 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 4 · Klavye erişimi | AD-17 … AD-25 | 9/9 | ✅ tamamlandı |
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
-| 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 4/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
 | 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 0/5 | onay bekliyor |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **36/52** | |
+| | **Toplam** | **37/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 

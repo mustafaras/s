@@ -4,13 +4,13 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-36-FIX",
-  "nextPrompt": "AD-37",
-  "currentWave": "7",
+  "lastCompletedPrompt": "AD-37",
+  "nextPrompt": "AD-38",
+  "currentWave": "8",
   "totalPrompts": 52,
-  "completedPrompts": 36,
+  "completedPrompts": 37,
   "updatedAt": "2026-08-24",
-  "nextSafeAction": "Dalga 7 onaylandi, 1/5 (33/52). AD-33 app/styles.css'te 119 siteyi 11px'e cikardi - promptun kabul regex'i yalnizca 112'sini yakaliyordu (6px/7px/7.5px/8.1px kaciyordu), sayisal tarama kullanildi. SIRADAKI AD-34 (app.js 8.5px). ONEMLI: headless harness'ta layout motoru YOK, dolayisiyla dump ciktisi duzen tasmasini gosteremez - AD-34..36'nin 'gorsel denetim' adimi tasma olcumu degil, isaretleme okumasidir. Dalga 5+6 04b83ca ile deploy edildi. Dalga 7 sonunda (AD-37) S8 cache-bust yapilacak; push/deploy ayrica onaya tabi.",
+  "nextSafeAction": "Dalga 1-7 TAMAMLANDI (37/52). SIRADAKI AD-38 dalga 8'in ilk promptu ve ACIK KULLANICI ONAYI ister (Liquid Glass katman ayrimi; reddedilmesi mesru, o halde dalga 9'a atlanir). Dalga 7 notu: 11px tabani app/styles.css'te 119->0, app.js'te 167->0 (toplam 286 site). Planin taban sayilari iki kez eksikti; app.js'te 10px/10.5px gruplari (102 site) hic sayilmamisti, kullanici tam kapsami onayladi (AD-36-FIX). UYARI: headless harness'ta layout motoru YOK - hicbir tasma olculmedi, hepsi analitik degerlendirildi. Cihaz ustu dogrulama yapilmadi. Cache-bust guncel: app.js?v=20260824b, app/styles.css?v=20260824b, app/core/constants.js?v=20260824a. DALGA 7 HENUZ DEPLOY EDILMEDI - push/deploy ayrica onaya tabi.",
   "codeTouched": true,
   "authority": [
     "CLAUDE.md",
@@ -84,7 +84,7 @@
       "prompts": "AD-33..AD-37",
       "topic": "11pt typography floor",
       "approvalRequired": true,
-      "completed": 4,
+      "completed": 5,
       "total": 5
     },
     {

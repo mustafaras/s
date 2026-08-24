@@ -155,7 +155,7 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-51 | Panel-v2 reduced-motion kapsamı | ✅ TAMAMLANDI | `81207d1` | Panel-v2 27/27 fixture geçti; `git diff --check` temiz | `panel/v2/panel-v2.css` içindeki önceki hedefli kurallara ek olarak dosyanın sonuna global reduced-motion güvenlik ağı eklendi: tüm animasyon/geçişler ve scroll davranışı kapanıyor, kalan hover/lift dönüşümleri anlık oluyor. Panel-v2 CSS cache-bust `20260824a`; S5 app handler yüzeyi 699 ve çağrı dağılımı değişmedi. |
 
-| AD-52 | Program kapanışı | ✅ TAMAMLANDI | `<commit>` | S4 tam kapısı + `verify-contrast.mjs` geçti; S5 sabit | `node --check` 2/2; driver 31/0; Zikirmatik 95/95; tema 26/26; kontrast 30/30; sync 64/64; panel v1 50/50; Panel-v2 27/27. `IOS27-TASARIM-PLANI.md` §4 gerçek final durumla, `docs/GELISTIRME-PLANI.md` Apple Design satırıyla güncellendi; state `completed`, toplam 52/52. Atlanan prompt yok; gerçek cihaz/tarayıcı, push/deploy ve `mustafaras/seyma-data` yazımı ayrı kapılarda kaldı. |
+| AD-52 | Program kapanışı | ✅ TAMAMLANDI | `9331a1d` | S4 tam kapısı + `verify-contrast.mjs` geçti; S5 sabit | `node --check` 2/2; driver 31/0; Zikirmatik 95/95; tema 26/26; kontrast 30/30; sync 64/64; panel v1 50/50; Panel-v2 27/27. `IOS27-TASARIM-PLANI.md` §4 gerçek final durumla, `docs/GELISTIRME-PLANI.md` Apple Design satırıyla güncellendi; state `completed`, toplam 52/52. Atlanan prompt yok; gerçek cihaz/tarayıcı, push/deploy ve `mustafaras/seyma-data` yazımı ayrı kapılarda kaldı. |
 
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 

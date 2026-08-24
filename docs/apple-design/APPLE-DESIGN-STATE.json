@@ -4,11 +4,11 @@
   "status": "in_progress",
   "activePrompt": null,
   "blockedPrompt": null,
-  "lastCompletedPrompt": "AD-38",
-  "nextPrompt": "AD-39",
+  "lastCompletedPrompt": "AD-39",
+  "nextPrompt": "AD-40",
   "currentWave": "8",
   "totalPrompts": 52,
-  "completedPrompts": 38,
+  "completedPrompts": 39,
   "updatedAt": "2026-08-24",
   "nextSafeAction": "Dalga 1-7 TAMAMLANDI (37/52). SIRADAKI AD-38 dalga 8'in ilk promptu ve ACIK KULLANICI ONAYI ister (Liquid Glass katman ayrimi; reddedilmesi mesru, o halde dalga 9'a atlanir). Dalga 7 notu: 11px tabani app/styles.css'te 119->0, app.js'te 167->0 (toplam 286 site). Planin taban sayilari iki kez eksikti; app.js'te 10px/10.5px gruplari (102 site) hic sayilmamisti, kullanici tam kapsami onayladi (AD-36-FIX). UYARI: headless harness'ta layout motoru YOK - hicbir tasma olculmedi, hepsi analitik degerlendirildi. Cihaz ustu dogrulama yapilmadi. Cache-bust guncel: app.js?v=20260824b, app/styles.css?v=20260824b, app/core/constants.js?v=20260824a. DALGA 7 HENUZ DEPLOY EDILMEDI - push/deploy ayrica onaya tabi.",
   "codeTouched": true,
@@ -92,7 +92,7 @@
       "prompts": "AD-38..AD-42",
       "topic": "Liquid Glass layer split",
       "approvalRequired": true,
-      "completed": 1,
+      "completed": 2,
       "total": 5
     },
     {

@@ -127,6 +127,8 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 
 | AD-38 | İçerik katmanı yüzeyini tanıt | ✅ TAMAMLANDI | `8528dc1` | Salt ekleme; `surface` tokenı taşıyan öğe = 0 → render birebir aynı; S4 tam yeşil; `app.js` diff'i boş | Prompt'un üç eklemesi yapıldı: `--card-solid:#FFFDFC` (açık), `--card-solid:#111114` (koyu), `.surface{background:var(--card-solid);border:1px solid var(--card-bd)}`. Koyu değer mevcut `--card:rgba(17,17,20,0.96)` ile **birebir aynı ton**, yani koyu temada takas görsel olarak neredeyse fark yaratmayacak. ⚠️ **Prompt'ta olmayan iki ekleme — sınıf takasının davranış kaybetmemesi için zorunlu.** Denetimde `.glass`'ın CSS'te **beş** ayrı davranış taşıdığı görüldü; ikisi salt görsel değil: **(a) [`app/styles.css:386`](../../../app/styles.css#L386) `.sey-app-booted .glass{animation:none!important;transition:none!important}`** — bu, 2026-07-28'de dört pass'te çözülen **sekme geçişi flaş/flicker düzeltmesinin** parçası ([GELISTIRME-PLANI](../../GELISTIRME-PLANI.md) madde 32). `.glass` → `.surface` takası bu kuralı düşürseydi flicker geri gelecekti. `.surface` aynı seçici listesine eklendi. **(b) [`app/styles.css:1479`](../../../app/styles.css#L1479) forced-colors ağı (AD-04)** — `.surface{border:1px solid CanvasText!important}` eklendi. `.surface`'in blur'ü olmadığı için `backdrop-filter` override'ı gereksiz, yalnızca kenarlık taşındı. **Yan bulgu — cam zaten kapalıydı:** [`app/styles.css:397`](../../../app/styles.css#L397) `.sey-app-booted .glass{backdrop-filter:none!important}` boot sonrası blur'ü **zaten** kapatıyor. Yani içerik kartları ilk boyamadan sonra çoktan cam değil, yalnızca yarı saydam `var(--card)`. Dalga 8'in gerçek görsel etkisi bu yüzden beklenenden **küçük**: saydam → opak, blur kaybı değil. **Yan bulgu — fonksiyonel katman zaten ayrık:** `.sey-appheader`, `.sey-bottomnav-surface`, chatbar ve yüzen aksiyonların **hiçbiri** `class="glass"` taşımıyor; kendi `backdrop-filter` kurallarına sahipler. Bu, AD-39'un envanterini baştan sadeleştiriyor (aşağı bak). |
 
+| AD-39 | `.glass` envanteri (salt okuma) | ✅ TAMAMLANDI | `<commit>` | Kod değişmedi; envanter aşağıda; S4 tam yeşil | **Sayım:** `app.js`'te `glass` sınıf tokenı taşıyan **68** öğe (61 × yalın `class="glass"`, 7 × bileşik: `sey-ccard`, `sey-vacation-card`, `sey-room-card`, `sey-room-card sey-asbtn`, `sey-daily-photo`, `sey-reminder-on-this-day`, `sey-reminder-inbox`). Plan **69** diyordu; fark `sg-spirit-bar sg-glass` — bu **ayrı bir sınıf** (`sg-glass`), `.glass` seçicisiyle eşleşmez ve dalga 8 kapsamı dışıdır. Doğru taban **68**. **Sınıflandırma sonucu — fonksiyonel katman adayı: 0, içerik katmanı: 68.** Yani prompt'un "`.glass` yalnızca `.sey-appheader`, alt sekme çubuğu, `--nav`/`--chatbar` yüzeyleri ve yüzen aksiyonlarda kalır" listesindeki öğelerin **hiçbiri `.glass` kullanmıyor** — `.sey-appheader` ve `.sey-bottomnav-surface` kendi `backdrop-filter` kurallarına sahip ([`app/styles.css:407`](../../../app/styles.css#L407), [`:414`](../../../app/styles.css#L414)), chatbar ve `.aeon-scrollfab` de öyle. **Sonuç:** fonksiyonel/içerik ayrımı bu uygulamada zaten yapılmış; dalga 8 yalnızca içerik katmanını opak hâle getiriyor. AD-40/41 sonrası `.glass` **sıfır kullanıcıya** düşecek. **Karar:** `.glass` kuralı **silinmiyor** — prompt silmeyi istemiyor ve sınıf, ileride eklenecek fonksiyonel yüzeyler için sözleşmeyi taşımaya devam ediyor. Ölü CSS olarak kalması bilinçli; AD-42'de not düşülecek. **Panel etkilenmiyor:** `panel/v2/panel-v2.js` `ae-card--glass` (ayrı BEM sınıfı) kullanıyor; ne `panel/panel.css` ne `panel/v2/panel-v2.css` `.glass` tanımlıyor. Dalga 8 tamamen `app` yüzeyine kapalı. **Parti bölümü:** 68 = AD-40 (satır sırasına göre ilk 34) + AD-41 (kalan 34). |
+
 <!-- Yeni satırlar buraya, sırayla eklenir. AD-01'den başlar. -->
 
 ---
@@ -142,10 +144,10 @@ Bir prompt `❌ BLOKE` ise: `APPLE-DESIGN-STATE.json` içine `blockedPrompt` yaz
 | 5 · Malzeme tutarlılığı | AD-26 … AD-29 | 4/4 | ✅ tamamlandı |
 | 6 · Sistem teması ⚠️ onay | AD-30 … AD-32 | 3/3 | ✅ tamamlandı |
 | 7 · 11pt tabanı ⚠️ onay | AD-33 … AD-37 | 5/5 | ✅ tamamlandı (+ AD-36-FIX) |
-| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 1/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
+| 8 · Liquid Glass katmanı ⚠️ onay | AD-38 … AD-42 | 2/5 | 🟡 sürüyor (onay alındı 2026-08-24) |
 | 9 · Tipografi ölçeği ⚠️ onay | AD-43 … AD-50 | 0/8 | onay bekliyor |
 | 10 · Panel + kapanış | AD-51 … AD-52 | 0/2 | beklemede |
-| | **Toplam** | **38/52** | |
+| | **Toplam** | **39/52** | |
 
 > Bu tablo her dalga kapanış promptunda (AD-05, AD-13, AD-16, AD-25, AD-29, AD-32, AD-37, AD-42, AD-50, AD-52) güncellenir.
 
@@ -171,7 +173,7 @@ Denetim anındaki sayımlar. Promptlar bunları hedef olarak kullanır; sapma va
 | Tema durum sayısı | 2 | ✅ 3 (`themePref`) | AD-30 denetimi → AD-31 |
 | 11px altı font — styles.css | **119** (denetimde "var" yazıyordu) | ✅ 0 | AD-33 |
 | 11px altı font — app.js | **167** (plan 65 diyordu; 10px×48 + 10.5px×54 sayılmamış) | ✅ 0 | AD-34…AD-36 + AD-36-FIX |
-| `.glass` içerik katmanında | 69 | 0 | AD-39 … AD-41 |
+| `.glass` içerik katmanında | **68** (plan 69 diyordu; `sg-glass` ayrı sınıf) | 0 | AD-39 … AD-41 |
 | Ham `font-size:NNpx` — app.js | ~1400 | 0 | AD-45 … AD-49 |
 | `prefers-reduced-motion` — panel-v2 | 1 | kapsam genişletildi | AD-51 |
 

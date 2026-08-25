@@ -6687,6 +6687,7 @@ App.go=function(id){
   // aynı sekmedeyken tetiklenen alakasız re-render'larda DEĞİL) Kur'an
   // Yolculuğu kartının âyet vitrini bir sonrakine geçer.
   if(id==='saygi'&&ui.tab!=='saygi'&&typeof quranAdvanceVerseIndex==='function') quranAdvanceVerseIndex();
+  if(id==='mesaj'&&ui.tab!=='mesaj') ui.aeonScrollBottom=true;
   ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab');
 };
 
@@ -17224,11 +17225,17 @@ function mergeInbox(msgs){
       var q=null, qa=data.aeon.qa; for(var i=0;i<qa.length;i++){ if(qa[i]&&qa[i].id===m.replyTo){ q=qa[i]; break; } }
       if(q){
         if(q.answerMsgId!==m.id){
-          q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerMsgId=m.id; q.answerSynced=false;
+          q.answer=String(m.text||''); q.answeredAt=nowIso; q.answerTs=m.ts||nowIso; q.answerMsgId=m.id; q.answerSynced=false;
           if(m.kind==='voice'||m.kind==='image'||m.kind==='file'){ q.answerKind=m.kind; q.answerMediaId=m.mediaId; q.answerMediaMime=m.mediaMime; q.answerDurationSec=m.durationSec; q.answerPeaks=m.peaks; q.answerW=m.w; q.answerH=m.h; if(m.name) q.answerMediaName=m.name; if(m.size!=null) q.answerMediaSize=m.size; }
           answeredCount++; answeredText=q.answer; lastAnswer=q;
         }
-        else if(q.answerSynced!==true){ needPush=true; } // yanıt cihaza indi ama repoya işlenmemişse tekrar dene
+        else {
+          // Eski kayıtlarda cevap cihazın aldığı anla damgalanmış olabilir. Kaynak
+          // mesajın zamanı varsa kronolojik akış için onu kalıcılaştır; answeredAt
+          // teslim/alınma zamanı olarak ayrı kalır.
+          if(!q.answerTs&&m.ts){ q.answerTs=m.ts; q.answerSynced=false; needPush=true; }
+          if(q.answerSynced!==true){ needPush=true; } // yanıt cihaza indi ama repoya işlenmemişse tekrar dene
+        }
         return;
       }
       // eşleşen soru yoksa normal mesaj gibi işle
@@ -18405,17 +18412,30 @@ function aeonChatHTML(){
   h+='<button onclick="App.clearAeonSearch()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--faint);line-height:1;padding:4px;display:flex;align-items:center;">'+icon('x',14)+'</button>';
   h+='</div>';
   // ÆON akışı: bildirimler (gelen/gözlemci) + kullanıcı soruları + ÆON yanıtları
-  // tek kronolojik thread'de birleştirilir. Zaman damgası sayısal, aynı saniyedeki
-  // mesajlar ekleme sırasıyla kararlı kalır; böylece soru her zaman kendi yanıtından önce.
+  // tek kronolojik thread'de birleştirilir. Eski cevaplarda `answeredAt` cihazın
+  // cevabı aldığı an olabilir; `answerMsgId` ile kaynak bildirimin `ts` değerini
+  // bulup sohbet olayının gerçek zamanını kullanırız.
   function tsNum(t){ var d=new Date(t||0); return isNaN(d.getTime())?Infinity:d.getTime(); }
-  var items=[], seq=0;
-  notifList().filter(function(n){ return n&&!n.deleted; }).forEach(function(n){ var t=n.ts||n.receivedAt||''; items.push({sort:String(t),tsNum:tsNum(t),_idx:seq++,kind:'in',text:n.text,time:t,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize}); });
+  var items=[], seq=0, allNotifications=notifList(), notificationById={}, replyNotificationIds={};
+  allNotifications.forEach(function(n){ if(n&&n.id) notificationById[String(n.id)]=n; });
   var qa=(data.aeon&&Array.isArray(data.aeon.qa))?data.aeon.qa:[];
+  qa.forEach(function(x){ if(x&&x.answer&&x.answerMsgId) replyNotificationIds[String(x.answerMsgId)]=true; });
+  function addThreadItem(item,tie){ item._idx=seq++; item._tie=tie; items.push(item); }
+  allNotifications.filter(function(n){ return n&&!n.deleted&&(!n.id||!replyNotificationIds[String(n.id)]); }).forEach(function(n){ var t=n.ts||n.receivedAt||''; addThreadItem({sort:String(t),tsNum:tsNum(t),kind:'in',text:n.text,time:t,observer:true,id:n.id,unread:!n.read,mediaKind:n.kind,mediaId:n.mediaId,mediaMime:n.mediaMime,durationSec:n.durationSec,peaks:n.peaks,w:n.w,h:n.h,mediaName:n.mediaName,mediaSize:n.mediaSize},1); });
+  function answerThreadTime(x){
+    if(x.answerTs) return String(x.answerTs);
+    var source=x.answerMsgId?notificationById[String(x.answerMsgId)]:null;
+    if(source) return String(source.ts||source.receivedAt||'');
+    return String(x.answeredAt||x.ts||'');
+  }
   qa.forEach(function(x){ if(!x) return;
-    var qt=x.ts||''; items.push({sort:String(qt),tsNum:tsNum(qt),_idx:seq++,kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize,qaId:x.id,qaField:'question'});
-    if(x.answer){ var at=x.answeredAt||qt||''; items.push({sort:String(at),tsNum:tsNum(at),_idx:seq++,kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize,qaId:x.id,qaField:'answer'}); }
+    var qt=x.ts||''; addThreadItem({sort:String(qt),tsNum:tsNum(qt),kind:'out',text:x.question,time:qt,answered:!!x.answer,reviewing:!!x.reviewingAt,mediaKind:x.kind,mediaId:x.mediaId,mediaMime:x.mediaMime,durationSec:x.durationSec,peaks:x.peaks,w:x.w,h:x.h,mediaName:x.mediaName,mediaSize:x.mediaSize,qaId:x.id,qaField:'question'},0);
+    if(x.answer){ var at=answerThreadTime(x); addThreadItem({sort:String(at),tsNum:tsNum(at),kind:'in',text:x.answer,time:at,mediaKind:x.answerKind,mediaId:x.answerMediaId,mediaMime:x.answerMediaMime,durationSec:x.answerDurationSec,peaks:x.answerPeaks,w:x.answerW,h:x.answerH,mediaName:x.answerMediaName,mediaSize:x.answerMediaSize,qaId:x.id,qaField:'answer'},2); }
   });
-  items.sort(function(a,b){ return (a.tsNum-b.tsNum)||(a._idx-b._idx); });
+  // Eski -> yeni akış: geçmiş yukarıda, yeni mesajlar aşağıda. Aynı anda gelen
+  // olaylarda soru önce, bağımsız bildirim sonra, cevabı en son olacak şekilde
+  // kararlı bir bağlayıcı kullanılır.
+  items.sort(function(a,b){ return (a.tsNum-b.tsNum)||(a._tie-b._tie)||(a._idx-b._idx); });
   // Geçmiş çok uzadıysa (ör. aylarca birikmiş yüzlerce mesaj) her tam render'da TÜMÜNÜ
   // yeniden kurmak yerine yalnızca son AEON_PAGE_SIZE öğeyi göster; üstte "daha eski
   // mesajları göster" düğmesiyle kullanıcı isterse tam geçmişi açabilir (veri kaybı yok —

@@ -43,7 +43,7 @@ function makeEl(id){
   return { id:id||'', _html:'',
     style:{cssText:'',setProperty:function(){},width:'',display:''},
     classList:{add:function(){},remove:function(){},toggle:function(){},contains:function(){return false;}},
-    dataset:{}, children:[], scrollTop:0, offsetWidth:0, value:'', files:[],
+    dataset:{}, children:[], scrollTop:0, scrollHeight:0, clientHeight:0, firstElementChild:null, offsetWidth:0, value:'', files:[],
     get innerHTML(){ return this._html; },
     set innerHTML(v){ this._html=String(v); if(this.id==='app') appHTML=this._html; },
     get textContent(){ return this._text||''; }, set textContent(v){ this._text=String(v); },
@@ -52,6 +52,7 @@ function makeEl(id){
     removeChild:function(){}, remove:function(){}, replaceWith:function(){},
     insertBefore:function(c){ return c; }, addEventListener:function(){},
     removeEventListener:function(){}, click:function(){}, focus:function(){}, blur:function(){},
+    scrollTo:function(o){ this.scrollTop=typeof o==='number'?o:(o&&typeof o.top==='number'?o.top:this.scrollHeight); },
     querySelector:function(){ return null; }, querySelectorAll:function(){ return []; },
     closest:function(){ return null; }, replaceChildren:function(){}, contains:function(){ return false; },
     getBoundingClientRect:function(){ return {top:0,left:0,width:0,height:0}; } };
@@ -60,9 +61,10 @@ var appEl=makeEl('app'), rootEl=makeEl('root'), elCache={app:appEl,root:rootEl};
 
 function buildSandbox(seedData){
   var store={}; if(seedData) store['seyma-reset-v1']=JSON.stringify(seedData);
+  var scrollEl=makeEl('main-scroll'); scrollEl.scrollHeight=1000; scrollEl.clientHeight=400;
   var doc={ hidden:false, body:makeEl('body'), documentElement:rootEl,
     getElementById:function(id){ return elCache[id]||null; },
-    querySelector:function(){ return null; }, querySelectorAll:function(){ return []; },
+    querySelector:function(sel){ return sel==='[data-scroll]'?scrollEl:null; }, querySelectorAll:function(){ return []; },
     createElement:function(){ return makeEl(''); }, createDocumentFragment:function(){ return makeEl(''); },
     addEventListener:function(){}, removeEventListener:function(){} };
   var sandbox={
@@ -96,6 +98,7 @@ function buildSandbox(seedData){
     decodeURIComponent:decodeURIComponent, Promise:Promise, Set:Set, Map:Map, Symbol:Symbol, Intl:Intl
   };
   sandbox.window=sandbox; sandbox.self=sandbox; sandbox.globalThis=sandbox;
+  sandbox.__scrollEl=scrollEl;
   return sandbox;
 }
 
@@ -143,8 +146,12 @@ function seedState(extras){
   if(extras){
     base.luna.qa.push({date:t,question:'Uzun bir soru: '+LONG_TEXT,
       answer:'Uzun bir yanıt: '+LONG_TEXT,ts:t+'T18:00:00.000Z'});
+    base.notifications.push({id:'reply-source-1',text:'Kaynak cevap kaydı',ts:t+'T19:25:00.000Z',from:'observer',read:true,readAt:nowIso,
+      deleted:false,deletedAt:null,receivedAt:nowIso,seen:true,synced:true});
+    base.notifications.push({id:'after-reply-1',text:'Cevaptan sonra gelen yeni mesaj',ts:t+'T19:27:00.000Z',from:'observer',read:true,readAt:nowIso,
+      deleted:false,deletedAt:null,receivedAt:nowIso,seen:true,synced:true});
     base.aeon.qa.push({id:'q_abc123',question:'Uzun soru: '+LONG_TEXT,ts:t+'T19:20:00.000Z',
-      answer:'Uzun yanıt: '+LONG_TEXT,answeredAt:t+'T19:30:00.000Z',answerMsgId:'am_1',
+      answer:'Uzun yanıt: '+LONG_TEXT,answeredAt:t+'T19:30:00.000Z',answerMsgId:'reply-source-1',
       answerReadAt:nowIso,answerNotified:true,answerSynced:true});
   }
   return base;
@@ -180,6 +187,14 @@ FILES.forEach(function(f){ vm.runInContext(fs.readFileSync(path.join(repoRoot,f)
 sb.App.start();                 // onboarding kapağını geç
 appHTML=''; sb.App.go('mesaj'); // ÆON akışını aç
 var render1=appHTML;
+
+assert('0. mesaj sekmesine ilk girişte en alta konumlanıyor', sb.__scrollEl.scrollTop===sb.__scrollEl.scrollHeight,
+  'scrollTop: '+sb.__scrollEl.scrollTop+' / scrollHeight: '+sb.__scrollEl.scrollHeight);
+sb.__scrollEl.scrollTop=123;
+sb.App.setTheme(true);
+assert('0b. kullanıcı geçmişi okurken alakasız render scroll konumunu koruyor', sb.__scrollEl.scrollTop===123,
+  'render sonrası scrollTop: '+sb.__scrollEl.scrollTop);
+sb.App.setTheme(false);
 
 var b1=observerBubbles(render1);
 assert('1. uzun ÆON mesajı kırpılmış balon olarak render ediliyor', b1.length===2,
@@ -255,6 +270,16 @@ FILES.forEach(function(f){ vm.runInContext(fs.readFileSync(path.join(repoRoot,f)
 sb2.App.start(); appHTML=''; sb2.App.go('mesaj');
 var allIds=extractBubbles(appHTML).map(function(x){ return x.id; });
 
+var qOrder=appHTML.indexOf('aeon-bubble-q-q_abc123');
+var answerOrder=appHTML.indexOf('aeon-bubble-a-q_abc123');
+var sourceOrder=appHTML.indexOf('Kaynak cevap kaydı');
+var afterOrder=appHTML.indexOf('Cevaptan sonra gelen yeni mesaj');
+assert('19. cevap kaynak bildirimi ikinci bir balon olarak tekrarlanmıyor', sourceOrder===-1,
+  'kaynak bildirim HTML konumu: '+sourceOrder);
+assert('20. cevap gerçek kaynak zamanı ile sorudan sonra, sonraki mesajdan önce akıyor',
+  qOrder>-1 && answerOrder>qOrder && afterOrder>answerOrder,
+  'soru: '+qOrder+' | cevap: '+answerOrder+' | sonraki mesaj: '+afterOrder);
+
 var lunaIds=allIds.filter(function(id){ return id.indexOf('aeon-bubble-l-')===0; });
 assert('12. Luna\'nın uzun soru/yanıtı da kararlı kimlikli balon üretiyor', lunaIds.length===2,
   'bulunan Luna balonu: '+JSON.stringify(lunaIds)+' | tüm kimlikler: '+JSON.stringify(allIds));
@@ -286,6 +311,10 @@ assert('17. aynı soru-yanıt çiftinde soru balonu bağımsız kalıyor',
 // (Bu yollar IIFE içinde olduğu için dışarıdan çağrılamaz; varlıkları kaynaktan
 // doğrulanır — böylece "mesaj kendiliğinden kapanıyor" penceresi belgelenmiş olur.)
 var appSrc=fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+assert('21. yeni mesaj sekmesine giriş akışı en alta işaretleniyor',
+  /if\(id==='mesaj'&&ui\.tab!=='mesaj'\) ui\.aeonScrollBottom=true/.test(appSrc));
+assert('22. yeni cevapta kaynak mesaj zamanı answerTs olarak korunuyor',
+  /q\.answerTs=m\.ts\|\|nowIso/.test(appSrc));
 var triggers=[
   ['mergeInbox → render()', /added>0\|\|answeredCount>0\)\{\s*\n?\s*render\(\)/],
   ['applyReceipts → render()', /if\(changed\)\{ save\(\); render\(\); \}/],

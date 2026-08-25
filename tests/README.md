@@ -17,6 +17,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   bilgisi yalnızca DOM’da tutuluyordu; her arka plan render’ı (30 sn ÆON yoklaması,
   reminder timer’ı, foreground dönüşü, yeni mesaj, panel makbuzu) mesajı kullanıcı
   okurken kapatıyordu. Ağsız, sentetik, `node:vm` tabanlı.
+- `app/test_motivation_room_accessibility.js` — Terapi Odası dialog semantiği,
+  Tab/Shift+Tab focus sarma, Escape kapanışı ve yansıma taslağında yeniden render
+  olmaması için ağsız sentetik regresyon fixture’ı.
 - `quran/` — Kur’an taşıma, katalog ve demo sözleşmesi fixture’ları.
 - `panel/test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
 - `panel/test_panel_boot_resilience.js` — panel boot/poll dayanıklılık fixture’ı:

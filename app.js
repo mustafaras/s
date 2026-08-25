@@ -7438,7 +7438,12 @@ App.closeReminderCenter=function(){
 };
 App.onReminderKeydown=function(e){
   if(!e) return;
-  if(e.key==='Escape'){ if(e.preventDefault)e.preventDefault(); App.closeReminderCenter(); return; }
+  var isRoomDialog=!!(e.currentTarget&&e.currentTarget.id==='sey-room-dialog');
+  if(e.key==='Escape'){
+    if(e.preventDefault)e.preventDefault();
+    if(isRoomDialog) App.closeRoom(); else App.closeReminderCenter();
+    return;
+  }
   if(e.key!=='Tab'||!e.currentTarget||!e.currentTarget.querySelectorAll) return;
   var nodes=e.currentTarget.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"]');
   if(!nodes||!nodes.length) return;
@@ -9370,24 +9375,29 @@ function updateMotivationCard(){
 // İçsel Pusula kartına döner.
 App.openRoom=function(){
   if(!featuresLive()){ toast('İçsel Pusula 13 Temmuz\'da açılıyor'); return; }
+  if(!ui.reminderTargetReturnFocusId){
+    var activeRoomFocusId=reminderActiveElementId();
+    if(activeRoomFocusId) ui.reminderTargetReturnFocusId=activeRoomFocusId;
+  }
   ui.roomOpen=true; ui.motivationMinimumOpen=false; ui.roomTab='path'; ui.roomTool=null;
   // Kaydedilmiş günü düzenleyebilmek için: bugünün kaydı varsa yansımayı input'a getir.
   var M=window.MotivationProgramV2, stt=M?M.dayState(data,activeDate()):null;
   var done=!!(stt&&(stt.status==='completed'||stt.status==='minimum_completed'));
   if(done) ui.motivationReflectionDraft=String(stt.reflection||'');
   haptic(12); reminderLockBodyScroll(); render();
+  try{ var roomDialog=document.getElementById('sey-room-dialog'); if(roomDialog&&roomDialog.focus) roomDialog.focus(); }catch(e){}
 };
 App.closeRoom=function(){
-  var targetFocusId=ui.reminderTargetReturnFocusId;
+  var targetFocusId=ui.reminderTargetReturnFocusId||'sey-motivation-card';
   clearRoomTimers();
   reminderUnlockBodyScroll();
-  var ov=document.getElementById('sey-room-overlay'), sh=document.getElementById('sey-room-sheet');
+  var ov=document.getElementById('sey-room-overlay'), sh=document.getElementById('sey-room-dialog');
   if(ov&&sh&&!prefersReducedMotion()){
     sh.style.transition='transform .26s var(--ease-premium,cubic-bezier(.16,1,.3,1)),opacity .24s ease';
     sh.style.transform='scale(.965)'; sh.style.opacity='0';
     ov.style.transition='opacity .24s ease'; ov.style.opacity='0';
-    setTimeout(function(){ ui.roomOpen=false; ui.reminderTargetReturnFocusId=''; render(); if(targetFocusId) reminderRestoreFocus(targetFocusId,''); },240);
-  } else { ui.roomOpen=false; ui.reminderTargetReturnFocusId=''; render(); if(targetFocusId) reminderRestoreFocus(targetFocusId,''); }
+    setTimeout(function(){ ui.roomOpen=false; ui.reminderTargetReturnFocusId=''; render(); reminderRestoreFocus(targetFocusId,'sey-motivation-card'); },240);
+  } else { ui.roomOpen=false; ui.reminderTargetReturnFocusId=''; render(); reminderRestoreFocus(targetFocusId,'sey-motivation-card'); }
   haptic(8);
 };
 function clearRoomTimers(){
@@ -9800,7 +9810,7 @@ function render(){
   // tek-seferlik giriş animasyonlarını (seyPop/seyFloatIn/seyFade) sustur → parlama/flash yok.
   // İlk açılışta (lastRoomOpen=false) animasyonlar normal oynar; sürekli seyShine parıltısı etkilenmez.
   if(ui.roomOpen && lastRoomOpen){
-    var roomSheet=document.getElementById('sey-room-sheet');
+    var roomSheet=document.getElementById('sey-room-dialog');
     var roomBack=document.getElementById('sey-room-overlay');
     if(roomBack) roomBack.style.animation='none';
     if(roomSheet){
@@ -10992,15 +11002,15 @@ function roomOverlayHTML(){
   var nar=(window.MotivationNarratives&&window.MotivationNarratives.dayNarrative)?window.MotivationNarratives.dayNarrative(mot):null;
   var motDayText=sum.programComplete?'120 günlük yol tamamlandı':('Gün '+sum.currentProgramDay+'/'+sum.totalDays);
 
-  var h='<div id="sey-room-overlay" onclick="App.closeRoom()" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeRoom();}" style="position:fixed;inset:0;z-index:360;background:rgba(30,22,30,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .22s ease;">';
-  h+='<div id="sey-room-sheet" onclick="event.stopPropagation()" style="width:100%;max-width:480px;height:100%;background:var(--modal);display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,0.4);animation:seyPop .34s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;transform-origin:center;overflow:hidden;">';
+  var h='<div id="sey-room-overlay" onclick="App.closeRoom()" style="position:fixed;inset:0;z-index:360;background:rgba(30,22,30,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .22s ease;">';
+  h+='<section id="sey-room-dialog" role="dialog" aria-modal="true" aria-labelledby="sey-room-title" tabindex="-1" onkeydown="App.onReminderKeydown(event)" onclick="event.stopPropagation()" style="width:100%;max-width:480px;height:100%;background:var(--modal);display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,0.4);animation:seyPop .34s var(--ease-premium,cubic-bezier(.16,1,.3,1)) both;transform-origin:center;overflow:hidden;">';
   // ── Sticky başlık: parlayan "Terapi Odası" + el yazısı imza (geri geldi) ──
   h+='<div style="flex-shrink:0;padding:calc(env(safe-area-inset-top) + 14px) 18px 14px;border-bottom:1px solid color-mix(in srgb,var(--room) 22%,var(--card-bd));background:linear-gradient(160deg,var(--room-bg),transparent);display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden;">';
   h+='<span style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,0.10) 50%,transparent 70%);animation:seyShine 4s ease-in-out infinite;pointer-events:none;"></span>';
   h+='<div style="position:relative;display:flex;align-items:flex-start;gap:12px;">';
   h+='<span style="animation:seyPop .34s var(--ease-premium,ease) both;">'+motivationBadgeHTML(46)+'</span>';
   h+='<div style="flex:1;min-width:0;">';
-  h+='<div class="sey-room-title" style="font-size:var(--f-title2);letter-spacing:2.5px;animation:seyFloatIn .4s .04s ease both;">Terapi Odası</div>';
+  h+='<div id="sey-room-title" class="sey-room-title" style="font-size:var(--f-title2);letter-spacing:2.5px;animation:seyFloatIn .4s .04s ease both;">Terapi Odası</div>';
   h+=motivationSignHTML(0.12);
   h+='</div>';
   h+='<button onclick="App.closeRoom()" aria-label="Kapat" style="flex-shrink:0;border:none;background:rgba(150,110,120,0.16);cursor:pointer;width:36px;height:36px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',17)+'</button>';
@@ -11018,7 +11028,7 @@ function roomOverlayHTML(){
   // ── Kaydırılabilir gövde ──
   h+='<div id="sey-room-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;padding:16px 18px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:14px;">';
   h+=roomBodyHTML(M,mot,sum,st,doneToday,nar,fi);
-  h+='</div></div></div>';
+  h+='</section></div>';
   return h;
 }
 function roomBodyHTML(M,mot,sum,st,doneToday,nar,fi){

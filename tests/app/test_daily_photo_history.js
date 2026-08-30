@@ -24,7 +24,8 @@ var TODAY='2026-08-30', PREVIOUS='2026-08-29', requested=[], saves=0, renders=0,
 var data={dailyPhoto:{
   date:TODAY, url:'https://images.example/current.jpg', title:'Bugünün kaydı', artist:'Sanatçı', license:'CC BY',
   description:'', source:'Wikimedia Commons Picture of the Day', pageUrl:'https://commons.example/current', fetchedAt:'2026-08-30T08:00:00.000Z',
-  history:{[TODAY]:{date:TODAY,url:'https://images.example/current.jpg',title:'Bugünün kaydı',artist:'Sanatçı',license:'CC BY',description:'',source:'Wikimedia Commons Picture of the Day',pageUrl:'https://commons.example/current',fetchedAt:'2026-08-30T08:00:00.000Z'}}
+  // potdDate yok: eski kodun bugünün tarihiyle önbelleğe aldığı bayat kayıt.
+  history:{[TODAY]:{date:TODAY,url:'https://images.example/old-chimpanzee.jpg',title:'Eski maymun kaydı',artist:'Sanatçı',license:'CC BY',description:'',source:'Wikimedia Commons Picture of the Day',pageUrl:'https://commons.example/current',fetchedAt:'2026-08-30T08:00:00.000Z'}}
 }};
 var ui={tab:'bugun',dailyPhotoOpen:true,dailyPhotoDate:PREVIOUS};
 var context={
@@ -61,7 +62,7 @@ function settled(){ return new Promise(function(resolve){ setImmediate(resolve);
   // history'ye taşırken, geçiş anında bu fallback de fotoğrafı kaybetmez.
   var legacy={date:PREVIOUS,url:'https://images.example/legacy.jpg',title:'Eski kayıt',history:{unexpected:true}};
   var copied=context.dailyPhotoCopy(legacy);
-  assert('eski kaydın tarih/URL metadatası kayıpsız kopyalanır',copied.date===PREVIOUS&&copied.url===legacy.url&&!('history' in copied));
+  assert('eski kaydın tarih/URL metadatası kayıpsız kopyalanır',copied.date===PREVIOUS&&copied.url===legacy.url&&copied.potdDate===''&&!('history' in copied));
 
   context.fetchDailyPhoto(PREVIOUS);
   await settled(); await settled();
@@ -70,22 +71,23 @@ function settled(){ return new Promise(function(resolve){ setImmediate(resolve);
   assert('geçmiş fotoğraf tarih anahtarıyla saklanır',previous&&previous.url==='https://images.example/previous.jpg'&&previous.title==='Dünün fotoğrafı');
   assert('geçmişe giderken bugünün kök özeti değiştirilmez',data.dailyPhoto.date===TODAY&&data.dailyPhoto.url==='https://images.example/current.jpg');
 
+  // Kullanıcının gördüğü hata: eski yöntem bugün tarihini taşısa bile gerçek
+  // tarihli kaynak doğrulaması yoktu; taze görünse dahi hemen yenilenmeli.
+  context.maybeFetchDailyPhoto(TODAY);
+  await settled(); await settled();
+  assert('eski maymun cache’i taze zaman damgasına rağmen tarihli kaynaktan yenilenir',requested[1]&&requested[1].indexOf('Template%3APotd%2F'+TODAY)>=0,requested[1]);
+  assert('yenilenen bugünün kaydı tarihli POTD doğrulaması taşır',data.dailyPhoto.url==='https://images.example/today.jpg'&&data.dailyPhoto.potdDate===TODAY&&data.dailyPhoto.history[TODAY].potdDate===TODAY);
+  context.maybeFetchDailyPhoto(TODAY);
+  assert('doğrulanmış bugünün fotoğrafı tekrar istenmez',requested.length===2);
+
   ui.dailyPhotoDate=TODAY;
   context.App.dailyPhotoMove(-1);
-  assert('önceki gün düğmesi seçimi geriye taşır ve cachedeki fotoğrafı yeniden çekmez',ui.dailyPhotoDate===PREVIOUS&&requested.length===1);
+  assert('önceki gün düğmesi seçimi geriye taşır ve cachedeki fotoğrafı yeniden çekmez',ui.dailyPhotoDate===PREVIOUS&&requested.length===2);
 
   var html=context.dailyPhotoCardHTML();
   assert('kart seçilmiş geçmiş tarih ve iki yönlü gezinme kontrolünü gösterir',html.indexOf(PREVIOUS)>=0&&html.indexOf('App.dailyPhotoMove(-1)')>=0&&html.indexOf('App.dailyPhotoMove(1)')>=0);
   assert('kart geçmiş seçildiğinde geçmiş görseli gösterir',html.indexOf('https://images.example/previous.jpg')>=0);
 
-  // Günün kaydı yoksa günlük fetch mevcut template yerine bugünün tarihli
-  // template'ini sorgular ve kökteki geriye-uyumlu özeti günceller.
-  delete data.dailyPhoto.history[TODAY];
-  data.dailyPhoto.date=PREVIOUS; data.dailyPhoto.url='https://images.example/previous-root.jpg';
-  context.maybeFetchDailyPhoto(TODAY);
-  await settled(); await settled();
-  assert('yeni gün kendi tarihli POTD kaynağını sorgular',requested[1]&&requested[1].indexOf('Template%3APotd%2F'+TODAY)>=0,requested[1]);
-  assert('yeni gün kök özeti ve tarihçesi birlikte güncellenir',data.dailyPhoto.date===TODAY&&data.dailyPhoto.url==='https://images.example/today.jpg'&&data.dailyPhoto.history[TODAY]);
   assert('fotoğraf fetchi yalnız sentetik save/render sınırını kullanır',saves===2&&renders===3,'save='+saves+', render='+renders);
 
   console.log('\n'+passes+'/'+(passes+failures)+' geçti.');

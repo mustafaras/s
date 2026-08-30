@@ -4511,6 +4511,10 @@ function migrate(d){
   if(typeof d.dailyPhoto.source!=='string') d.dailyPhoto.source='Wikimedia Commons';
   if(typeof d.dailyPhoto.pageUrl!=='string') d.dailyPhoto.pageUrl='';
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
+  // Eski Commons:Picture_of_the_day sorgusu aynı gün için bayat bir görsel
+  // bırakabildi. Yalnız tarihli Template:Potd/YYYY-MM-DD kaynağından gelen
+  // kayıtlar cache bakımından doğrulanmış kabul edilir.
+  if(typeof d.dailyPhoto.potdDate!=='string') d.dailyPhoto.potdDate='';
   // Önceki sürüm yalnız tek bir fotoğraf tutuyordu. Eski kaydı tarihçeye
   // ekleyerek hem koru hem de gün gün gezinebilir bir cache başlat.
   if(!d.dailyPhoto.history||typeof d.dailyPhoto.history!=='object'||Array.isArray(d.dailyPhoto.history)) d.dailyPhoto.history={};
@@ -10653,9 +10657,10 @@ function stripHtml(s){
 }
 function dailyPhotoCopy(p){
   p=p&&typeof p==='object'?p:{};
-  return {date:String(p.date||''),url:String(p.url||''),title:String(p.title||''),artist:String(p.artist||''),license:String(p.license||''),description:String(p.description||''),source:String(p.source||'Wikimedia Commons Picture of the Day'),pageUrl:String(p.pageUrl||''),fetchedAt:String(p.fetchedAt||'')};
+  return {date:String(p.date||''),potdDate:String(p.potdDate||''),url:String(p.url||''),title:String(p.title||''),artist:String(p.artist||''),license:String(p.license||''),description:String(p.description||''),source:String(p.source||'Wikimedia Commons Picture of the Day'),pageUrl:String(p.pageUrl||''),fetchedAt:String(p.fetchedAt||'')};
 }
 function dailyPhotoDateValid(date){ return /^\d{4}-\d{2}-\d{2}$/.test(String(date||'')); }
+function dailyPhotoIsVerified(photo,date){ return !!(photo&&photo.url&&photo.potdDate===date); }
 function dailyPhotoSelectedDate(){
   var today=todayStr(), selected=ui&&ui.dailyPhotoDate;
   return dailyPhotoDateValid(selected)&&selected<=today?selected:today;
@@ -10673,7 +10678,7 @@ function storeDailyPhoto(photo){
   // Panel ve mevcut sözleşme bugünün özetini kökte bekliyor; geçmişe gidince
   // bu özetin yerini değiştirme.
   if(record.date===todayStr()){
-    root.date=record.date; root.url=record.url; root.title=record.title; root.artist=record.artist;
+    root.date=record.date; root.potdDate=record.potdDate; root.url=record.url; root.title=record.title; root.artist=record.artist;
     root.license=record.license; root.description=record.description; root.source=record.source;
     root.pageUrl=record.pageUrl; root.fetchedAt=record.fetchedAt;
   }
@@ -10693,7 +10698,7 @@ function fetchDailyPhoto(date,force){
   if(typeof fetch!=='function' || !data) return;
   var target=dailyPhotoDateValid(date)?date:todayStr();
   // Aynı tarihin mevcut kaydını koru; yenileme düğmesi açıkça force geçirir.
-  if(!force){ var cached=dailyPhotoForDate(target); if(cached&&cached.url) return; }
+  if(!force){ var cached=dailyPhotoForDate(target); if(dailyPhotoIsVerified(cached,target)) return; }
   if(DAILY_PHOTO_FETCHING[target]) return;
   DAILY_PHOTO_FETCHING[target]=true;
   // Template:Potd/YYYY-MM-DD, Commons'un tarihli arşiv sözleşmesidir:
@@ -10709,6 +10714,7 @@ function fetchDailyPhoto(date,force){
     if(!title && p.title){ title=stripHtml(p.title.replace(/^File:/,'').replace(/_/g,' ').replace(/\.[^.]+$/,'')); }
     storeDailyPhoto({
       date:target,
+      potdDate:target,
       url:ii.url||'',
       title:title,
       artist:stripHtml(em.Artist&&em.Artist.value),
@@ -10729,9 +10735,8 @@ function fetchDailyPhoto(date,force){
 function maybeFetchDailyPhoto(date){
   if(!data || !data.dailyPhoto) return;
   var target=dailyPhotoDateValid(date)?date:todayStr(), photo=dailyPhotoForDate(target);
-  var last=photo&&photo.fetchedAt?new Date(photo.fetchedAt).getTime():0;
-  var stale=!photo || !photo.url;
-  var recent=Date.now()-last < 10*60*1000;
+  var verified=dailyPhotoIsVerified(photo,target), last=verified&&photo.fetchedAt?new Date(photo.fetchedAt).getTime():0;
+  var stale=!verified, recent=verified&&Date.now()-last < 10*60*1000;
   if(!stale) return; // istenen günün fotoğrafı önbellekteyse tekrar çekme
   if(!recent && !DAILY_PHOTO_FETCHING[target]) fetchDailyPhoto(target);
 }

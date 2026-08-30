@@ -183,7 +183,7 @@ Mevcut `haptic(p)` (`app.js:6375`) korunur; FX modülü buna ek katman olarak ç
 ## 1.6 Reduce Motion Uyumu
 
 - Sesler `prefers-reduced-motion` ile doğrudan ilişkili değil; ama `settings.uiSounds` kullanıcı kontrolüne tabi.
-- Haptik `settings.richHaptics` ile kontrol edilir; reduce motion aktifse `richHaptics` otomatik false olabilir (tercih meselesi, spec’ta netleştirilecek).
+- Haptik `settings.richHaptics` ile kontrol edilir; reduce motion aktifse `SeyHaptics` otomatik no-op olur (`SeyFx.isPremiumFxEnabled()` helper'ı bu durumu çözer).
 
 ---
 
@@ -192,5 +192,5 @@ Mevcut `haptic(p)` (`app.js:6375`) korunur; FX modülü buna ek katman olarak ç
 - [ ] `app/core/mediaFx.js` modülü (Faz 1 implementasyonunda)
 - [ ] `app.js` bağlantı noktalarına `SeyAudio` / `SeyHaptics` çağrıları
 - [ ] İlk bağlantı noktaları listesi
-- [ ] `tests/app/test_premium_audio_fx.js` skeleton
-- [ ] `tests/app/test_premium_haptics_fx.js` skeleton
+- [x] `tests/app/test_premium_audio_fx.js` oluşturuldu (13/13 PASS)
+- [x] `tests/app/test_premium_haptics_fx.js` oluşturuldu (12/12 PASS)

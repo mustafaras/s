@@ -173,6 +173,6 @@ Planı uygulamadan önce şu maddelerin tamamı onaylanmalı:
 - [ ] `migrate()` güncelleme spec’i yazıldı.
 - [ ] `prefers-reduced-motion` ve `premiumAtmosphere` pasif durumları belgelendi.
 - [ ] Sesler kullanıcı etkileşimiyle tetikleniyor.
-- [ ] Yeni test fixture’ları skeleton olarak oluşturuldu.
+- [x] Yeni test fixture’ları oluşturuldu ve çalıştırıldı.
 - [ ] Kontrast ve erişilebilirlik kontrolü planlandı.
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var.

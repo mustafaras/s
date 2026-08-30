@@ -179,4 +179,4 @@ function updateSplashGreeting(){
 - [ ] `app/styles.css` splash CSS spec’i
 - [ ] `app.js` splash JS entegrasyonu spec’i
 - [ ] Karşılama mesajları matrisi
-- [ ] Test skeleton
+- [x] `tests/app/test_premium_launch_splash.js` oluşturuldu (11/11 PASS)

@@ -227,4 +227,4 @@ function rippleEffect(event, element, color){
 - [ ] `seyNavBounce` keyframe
 - [ ] `seyTabChange` geçiş spec’i
 - [ ] Habits shimmer spec’i
-- [ ] Test skeleton’ları
+- [x] `tests/app/test_premium_reduced_motion.js` oluşturuldu (22/22 PASS)

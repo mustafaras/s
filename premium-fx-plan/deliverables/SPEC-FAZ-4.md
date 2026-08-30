@@ -161,4 +161,4 @@ Sadece accent tonlarında hafif değişim; ana arka planı değiştirmemeli.
 - [ ] Aurora arka plan katmanı spec’i
 - [ ] Seasonal theme class’ları ve renk override’ları
 - [ ] Hijri Ramazan entegrasyonu kontrolü
-- [ ] Test skeleton
+- [x] `tests/app/test_premium_time_theme.js` oluşturuldu (24/24 PASS)

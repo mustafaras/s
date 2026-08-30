@@ -165,4 +165,4 @@ function openJournalModal(){
 - [ ] Gece selamı entegrasyonu
 - [ ] Motivasyon kartı onay seslendirmesi
 - [ ] Nefes eşlikçisi spec’i
-- [ ] Test skeleton’ları
+- [x] `test_premium_reduced_motion.js` ile nefes rehberi animasyonları reduce-motion altında no-op doğrulandı (22/22 PASS bölümü).

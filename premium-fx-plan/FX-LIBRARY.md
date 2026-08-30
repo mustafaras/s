@@ -3,7 +3,7 @@
 **Sürüm:** 2.0
 **Tarih:** 2026-08-30
 **Amaç:** Uygulanacak tüm ses ve görsel efektlerin teknik detaylarını, parametrelerini ve kullanım koşullarını tanımlamak.
-**Temel:** Mevcut `zikrTickSound()` (~app.js:8502) ve `haptic(ms)` (~app.js:6375) üzerine kurulur; yeni modüller (`app/core/mediaFx.js`, `app/core/timeTheme.js`) bu kataloğu implemente eder.
+**Temel:** Mevcut `zikrTickSound()` (~app.js:8502) ve `haptic(ms)` (~app.js:6375) üzerine kurulur; yeni modüller (`app/core/mediaFx.js`, `app/core/timeTheme.js`) bu kataloğu implemente eder. `mediaFx.js` içinde `SeyAudio`, `SeyHaptics` ve `SeyFx` utility yüzeyleri tek çatı altında tanımlanır.
 
 ---
 
@@ -117,7 +117,7 @@ function speak(text){
 
 ## 2. Haptik Kataloğu (`SeyHaptics.*`)
 
-`navigator.vibrate` kullanılarak. Mevcut `haptic(ms)` (~app.js:6375) yerine geçer.
+`navigator.vibrate` kullanılarak. Mevcut `haptic(ms)` (~app.js:6375) kalıcı olarak korunur; zenginleştirilmiş pattern'ler `SeyHaptics` üzerinden çağrılır.
 
 | Method | Pattern (ms) | Kullanım |
 |--------|--------------|----------|

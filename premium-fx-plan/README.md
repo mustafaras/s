@@ -2,7 +2,7 @@
 
 **Proje:** Şeyma 🦩 uygulaması için premium görsel ve işitsel efekt yükseltme planı.
 **Kapsam:** Sadece plan ve belgeler; uygulama kodu (`/Users/m_ras/Desktop/seyma`) bu klasörde değiştirilmeyecek.
-**Durum:** Taslak / inceleme bekliyor.
+**Durum:** Plan/spec/test aşaması tamamlandı; uygulama koduna henüz dokunulmadı. Kullanıcı onayı bekleniyor.
 
 ## Hızlı Bağlantılar
 

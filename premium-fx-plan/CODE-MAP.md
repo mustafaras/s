@@ -78,8 +78,8 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 | `App.markSaygiRead()` | 8195 | Saygı öncüsünü okundu işaretle | `SeyAudio.success()` + `SeyHaptics.success()` |
 | `App.openQibla()` | 15932 | Kıble pusulası aç | `SeyAudio.tap()` + `seyFloatIn` |
 | `App.setHijriOffset(...)` | ~15900 civarı | Hicri ofset | `SeyAudio.tap()` |
-| `App.sendAeonMessage(...)` | ~17.000–17.500 | ÆON mesaj gönder | `SeyAudio.tap()` + balon pop |
-| `App.sendLunaVoice(...)` | ~17.500 | Luna ses | `SeyAudio.tap()` |
+| `App.askAeon()` | ~18129 | ÆON mesaj gönder | `SeyAudio.tap()` + balon pop |
+| `App.askLuna()` | ~18128 | Luna metin gönder | `SeyAudio.tap()` |
 | `App.syncNow()` | 9513 | Anlık senkronizasyon | `SeyAudio.tap()` + spinner |
 
 **Not:** Handler adları değişmeyecek; yalnızca gövdelerine FX çağrıları eklenecek.
@@ -210,7 +210,7 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 | `zikrHistoryViewHTML(z)` | 14527 | Zikir geçmişi | - |
 | `zikrSettingsViewHTML(z)` | 14553 | Zikir ayarları | Toggle feedback |
 | `zikroverlayHTML()` | 14579 | Zikir overlay kabuğu | `seyFloatIn` |
-| `App.zikirTap()` | ~8500 civarı | Sayaç artırma | Mevcut `zikrTickSound()`; eklenecek `SeyHaptics.tap()` |
+| `App.zikrTap()` | ~8589 | Sayaç artırma | Mevcut `zikrTickSound()`; eklenecek `SeyHaptics.tap()` |
 
 ### 9b. Kur'an Yolculuğu (~14902–15658)
 
@@ -286,8 +286,8 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 | `modalsHTML()` | 16781 | Tüm modalları birleştiren katman | Modal yönetimi |
 | `aeonChatHTML()` | 18474 | ÆON/Luna sohbet balonları | Balon pop, uzun mesaj expand kalıcılığı |
 | `mesajHTML()` | 18567 | Mesaj sekmesi ana builder | New message badge pop |
-| `App.sendAeonMessage(...)` | ~17756–17761 | ÆON mesajı gönder ve sync et | Send whoosh, success bell |
-| `App.sendLunaVoice(...)` | ~17936–17939 | Luna ses mesajı gönder | Record/send feedback |
+| `App.askAeon()` | ~18129 | ÆON mesajı gönder ve sync et | Send whoosh, success bell |
+| `App.askLuna()` | ~18128 | Luna metin mesajı gönder | Send feedback |
 
 **FX giriş noktası:** Yeni mesaj algılandığında `SeyAudio.bell()` + badge `seyPop`.
 
@@ -357,7 +357,7 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 7. **`SeyOnSynced` (6208)** → `SeyAudio.bell()` + header check morph.
 8. **`App.markSaygiRead` (8195)** → `SeyAudio.success()` + read-button morph.
 9. **`App.openQibla` (15932)** → `SeyAudio.tap()` + `seyFloatIn`.
-10. **Overlay açılışları** → `seyFloatIn` zaten var; class yönetimi `fxUtils.js` içinde merkezileştirilecek.
+10. **Overlay açılışları** → `seyFloatIn` zaten var; class yönetimi `app/core/mediaFx.js` içindeki `SeyFx` utility yüzeyinde merkezileştirilecek.
 
 ---
 

@@ -11,13 +11,13 @@
 **Hedef:** ~18.805 satırlık monoliti, FX katmanının güvenli büyüyebileceği modüllere ayırmak. **Davranış korunur, sadece fiziksel yer değişir.**
 
 ### -1.1 Hazırlık
-- [ ] `app-function-map.json` nihai gözden geçirme.
-- [ ] Yeni `tests/app/test_modularization_boundary.js` skeleton.
-- [ ] `index.html` script sırası spec’ini belirle.
+- [x] `app-function-map.json` nihai gözden geçirme.
+- [x] Yeni `tests/app/test_modularization_boundary.js` oluşturuldu (16/16 PASS).
+- [ ] `index.html` script sırası implementasyon sırasında güncellenecek.
 
 ### -1.2 Merkezileştirme
-- [ ] `window.SeymaState = { data, ui, dark }` oluştur.
-- [ ] `save()` ve `migrate()` State modülünde kalır; dışa `window.SeymaSave`/`window.SeymaMigrate` expose edilebilir.
+- [ ] `window.SeymaState = { data, ui, dark }` oluştur (Faz -1 sonunda).
+- [ ] `save()` `syncGlue.js` içinde, `migrate()` `state.js` içinde kalır; `window.SeymaSave`/`window.SeymaMigrate` expose edilebilir.
 
 ### -1.3 Modül Ayırma Sırası
 | Sıra | Modül | Gerekçe |
@@ -64,7 +64,7 @@
 |-------|-------|--------|
 | 0.1 | `SAFEGUARDS.md` nihai hali | Erişilebilirlik, veri güvenliği, test kuralları net |
 | 0.2 | `migrate()` güncelleme spec’i | Yeni `settings.*` alanlarının varsayılan değerleri tanımlı |
-| 0.3 | Test fixture şablonları | `tests/app/test_premium_audio_fx.js`, `test_premium_haptics_fx.js`, `test_modularization_boundary.js` skeleton |
+| 0.3 | Test fixture’ları | `tests/app/test_premium_audio_fx.js`, `test_premium_haptics_fx.js`, `test_modularization_boundary.js`, `test_premium_reduced_motion.js`, `test_premium_launch_splash.js`, `test_premium_time_theme.js` (hepsi PASS) |
 | 0.4 | `prefers-reduced-motion` genişletme spec’i | CSS’ta yeni animasyonların reduce moduna nasıl gireceği |
 
 ---

@@ -23,7 +23,7 @@
 ## 2. Temel İlkeler
 
 1. **Plan önce, kod sonra:** Bu klasörde yalnızca belge, spec ve test iskelesi üretilir.
-2. **Modülerleştirme = FX’nin ön koşulu:** Yeni ses/hareket katmanları, mevcut 18.805 satırlık `app.js` içine gömülmek yerine `app/core/audioFx.js`, `app/core/hapticsFx.js` gibi modüllerde yaşayacak.
+2. **Modülerleştirme = FX’nin ön koşulu:** Yeni ses/hareket katmanları, mevcut 18.805 satırlık `app.js` içine gömülmek yerine `app/core/mediaFx.js` ve `app/core/timeTheme.js` gibi modüllerde yaşayacak.
 3. **Erişilebilirlik öncelikli:** `prefers-reduced-motion: reduce` ve kullanıcı ayarlarına tam uyum.
 4. **Veri güvenliği:** Hiçbir efekt `data`, `migrate()`, `sync.js`, `save()` veya GitHub Contents API akışını değiştirmemeli.
 5. **Yerel / offline:** Ses ve görsel efektler tamamen tarayıcı içinde üretilmeli; harici kaynaklara bağımlılık minimumda tutulmalı.
@@ -146,9 +146,7 @@ FX uygulanmadan önce aşağıdaki modüller oluşturulmalı:
 
 | Modül | Görevi | Bağımlılığı |
 |-------|--------|-------------|
-| `app/core/audioFx.js` | `SeyAudio.tap/success/warning/bell/voice` | `settings`, `prefers-reduced-motion` |
-| `app/core/hapticsFx.js` | `SeyHaptics.tap/success/error/refresh/streak/water` | `settings`, `navigator.vibrate` |
-| `app/core/fxUtils.js` | `countUp`, `ripple`, `shouldAnimate` | `settings`, `matchMedia` |
+| `app/core/mediaFx.js` | `SeyAudio.tap/success/warning/bell/voice`, `SeyHaptics.tap/success/error/refresh/streak/water`, `SeyFx.countUp/ripple/isPremiumFxEnabled` | `settings`, `prefers-reduced-motion` |
 | `app/core/timeTheme.js` | Saat/season bazlı tema class | `settings` |
 
 Bu modüller `app.js` IIFE'sine `window.SeyAudio`, `window.SeyHaptics` olarak expose edilecek; böylece inline `onclick` handler'ları (`App.*`) değişmeden kullanabilir.

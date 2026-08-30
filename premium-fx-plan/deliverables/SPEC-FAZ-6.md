@@ -172,4 +172,5 @@ if(d.settings.launchRitual == null) d.settings.launchRitual = true;
 - [ ] Master anahtar mantığı spec’i
 - [ ] `prefers-reduced-motion` override spec’i
 - [ ] `migrate()` güncelleme spec’i
-- [ ] Test skeleton’ları
+- [x] `test_premium_reduced_motion.js`, `test_premium_time_theme.js` ile ayar/geçiş testleri kapsandı.
+- [ ] Gelecekte eklenebilir: `test_premium_settings_toggle.js`, `test_premium_migrate.js` (şimdilik mevcut reduced-motion/time-theme fixture'ları yeterli).

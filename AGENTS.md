@@ -29,20 +29,20 @@ replace*, not a merge, so any device/tab that saves overwrites the whole file.
 
 **Hard rules — every agent, every session:**
 
-1. **NEVER open the Şeyma app in a browser yourself, and never serve+open it
-   generically to "check it runs."** Use the headless Node `vm` render
-   harness instead (see "Verification" below and `CLAUDE.md`). Opening the
-   app is the single most dangerous thing you can do here.
-   **Narrow exception (2026-08-01, standing user permission):** if the user
-   asks you to serve the app on **port 9000**, you may start a plain static
-   file server bound to that port (e.g. `python3 -m http.server 9000` from
-   the repo root) — this is pre-approved, no need to ask again each time.
-   You still must never navigate a browser to it yourself; the user opens it
-   in their own browser. Tell them to prefer a clean/incognito profile (no
-   prior `seyma-reset-v1` in that profile's localStorage) so Guard 1/2 below
-   aren't the only line of defense. Stop the server per rule 4 before ending
-   your turn. This exception is scoped to port 9000 only — other ports/generic
-   "let's just run it" requests are still covered by the rule above.
+1. **Never serve or open Şeyma generically to "check it runs."** The headless
+   Node `vm` render harness remains the canonical default (see "Verification"
+   below and `CLAUDE.md`). **Controlled local visual QA exception:** when the
+   user asks for agent-taken screenshots, an agent may start a plain static
+   server bound only to `127.0.0.1:9000` and open it in a disposable,
+   agent-controlled browser profile. Before doing so, verify the current
+   `sync.js` Guard 1 source/test, use a URL without `forceSync=1`, never set
+   `seyma-sync-force`, and never attach/read/fill any real token, password or
+   existing browser profile. Guard 1 blocks remote pushes from localhost
+   independently of token state; token absence is not itself a safety control.
+   Capture only redacted local screenshots, report them separately from device
+   acceptance, and stop the server per rule 4 before ending the turn. This
+   exception is scoped to port 9000 only; it does not authorize production,
+   file:, non-loopback, force-sync or real-account browser actions.
 2. If you *must* use a real browser, it now self-protects: `sync.js` **blocks
    all pushes from `localhost`/`127.0.0.1`/`file:`/`*.local`** (Guard 1) and
    **blocks any push whose day-count is lower than the remote** (Guard 2,
@@ -292,6 +292,14 @@ JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px design).
 - Overlay/hub features (📖 reading, 🎬 watching, 🎧 listening) follow a
   copy-paste template: `openX()`/`closeX()` + `ui.xView` + `segTabs`. Reuse
   this pattern for any new full-screen hub rather than inventing a new one.
+- **Modal keyboard contract** — every dismissible overlay uses the shared
+  `App.onModalKeydown` path: its backdrop is never focusable, the inner
+  `role="dialog" aria-modal="true"` owns Tab/Escape, and the focus list includes
+  enabled buttons, inputs, selects, textareas, links and positive tabindex
+  nodes. Opening transfers focus to the dialog or its intended first field.
+  Add a headless Tab, Shift+Tab and Escape regression (including a text field
+  when present) before adding another modal; never make a backdrop
+  `role="button" tabindex="0"`.
 
 ## Conventions
 
@@ -392,10 +400,11 @@ node .claude/skills/run-seyma/verify-state-adapter-contract.mjs
                             # L2-b/B3 scratch dependency-bag contract
 ```
 
-### Local server (use sparingly — see DATA SAFETY)
+### Controlled local visual QA (see DATA SAFETY)
 ```bash
-python3 -m http.server 8765
-# Access: http://localhost:8765/index.html (app), /panel.html (observer)
+python3 -m http.server 9000 --bind 127.0.0.1
+# Agent-only disposable browser: http://127.0.0.1:9000/
+# Never use forceSync=1 or a persistent/user browser profile.
 ```
 
 ### Git checks
@@ -411,8 +420,8 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 
 > ⚠️ **Prefer the headless render harness** over browser testing — see the
 > `.claude/skills/run-seyma/` skill (`driver.mjs` renders `app.js` inside a
-> Node `vm` sandbox with mocked DOM/localStorage, both themes). Never open
-> the app in a real browser to "check it runs" (see DATA SAFETY).
+> Node `vm` sandbox with mocked DOM/localStorage, both themes). Browser visual
+> QA is permitted only through the controlled port-9000 protocol above.
 
 ---
 

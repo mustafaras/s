@@ -20,6 +20,12 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_motivation_room_accessibility.js` — Terapi Odası dialog semantiği,
   Tab/Shift+Tab focus sarma, Escape kapanışı ve yansıma taslağında yeniden render
   olmaması için ağsız sentetik regresyon fixture’ı.
+- `app/test_modal_focus_containment.js` — Tüm ortak modal ailesinin odak
+  sözleşmesini, metin alanı dahil Tab/Shift+Tab sarma, Escape kapanışı, semantik
+  dialog kabuğu ve focusable arka plan regresyonunu ağsız sentetik olarak doğrular.
+- `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
+  QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
+  düzeyinde ağsız doğrular.
 - `quran/` — Kur’an taşıma, katalog ve demo sözleşmesi fixture’ları.
 - `panel/test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
 - `panel/test_panel_boot_resilience.js` — panel boot/poll dayanıklılık fixture’ı:

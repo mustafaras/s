@@ -12,7 +12,7 @@ const roomEnd = source.indexOf('\nfunction roomBodyHTML', roomStart);
 assert(roomStart >= 0 && roomEnd > roomStart, 'roomOverlayHTML bulunamadı');
 const roomSource = source.slice(roomStart, roomEnd);
 
-const handlerStart = source.indexOf('App.onReminderKeydown=function(e){');
+const handlerStart = source.indexOf('var MODAL_FOCUS_SELECTOR=');
 const handlerEnd = source.indexOf('\nApp.openReminderDigest=', handlerStart);
 assert(handlerStart >= 0 && handlerEnd > handlerStart, 'ortak modal keydown handler bulunamadı');
 const handlerSource = source.slice(handlerStart, handlerEnd);
@@ -35,6 +35,10 @@ ok('modal içeriği gerçek dialog semantiği taşıyor',
   roomSource.includes('tabindex="-1"'));
 ok('dialog ortak Escape/Tab handlerına bağlı',
   roomSource.includes('onkeydown="App.onReminderKeydown(event)"'));
+ok('ortak handler textarea/select/link odaklarını da kapsıyor',
+  handlerSource.includes('textarea:not([disabled])') &&
+  handlerSource.includes('select:not([disabled])') &&
+  handlerSource.includes('a[href]'));
 ok('kapanış animasyonu yeni dialog kabuğunu hedefliyor',
   source.includes("getElementById('sey-room-dialog')") && !source.includes("getElementById('sey-room-sheet')"));
 ok('oda açılırken dialog focus alıyor',

@@ -514,7 +514,7 @@ node tests/app/test_faz10_sync.js
 
 - **Cache busting.** Konvansiyon 5: `app/styles.css`, `app.js` veya `sync.js` değiştiyse [index.html](../../index.html)'deki `?v=YYYYMMDDx` bump edilmeli, yoksa PWA eski varlığı servis eder.
 
-- **Tarayıcı açılmaz.** [CLAUDE.md](../../CLAUDE.md) veri güvenliği kuralı 1. Görsel doğrulama `driver.mjs --dump <sekme>` çıktısı okunarak yapılır. Cihazda görmek isteniyorsa: port 9000'de statik sunucu (önceden onaylı), kullanıcı kendi tarayıcısında açar, ajan açmaz, iş bitince sunucu durdurulur.
+- **Tarayıcı varsayılan değildir.** [CLAUDE.md](../../CLAUDE.md) veri güvenliği kuralı 1. Görsel doğrulama önce `driver.mjs --dump <sekme>` çıktısıyla yapılır. Kullanıcı açıkça isterse ajan; Guard 1 preflight'ı, geçici boş profil ve `127.0.0.1:9000` sınırıyla yerel ekran görüntüsü alabilir. `forceSync=1`, `seyma-sync-force`, gerçek profil/token ve non-loopback adresler kesinlikle kapsam dışıdır; iş bitince sunucu durdurulur.
 
 ---
 

@@ -7447,20 +7447,48 @@ App.closeReminderCenter=function(){
   var trigger=document.getElementById(returnId);
   if(trigger&&trigger.focus) trigger.focus(); else reminderRestoreFocus(returnId,'sey-reminder-settings-entry');
 };
-App.onReminderKeydown=function(e){
+// Tüm gerçek modallar tek bir klavye sözleşmesini kullanır. Arka plan yalnızca
+// fare/dokunma ile kapatılabilir; odağın kendisi daima role=dialog içindedir.
+// Bu seçici, yazı yazılan textarea/select alanlarını ve bağlantıları da kapsar.
+var MODAL_FOCUS_SELECTOR='button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
+function modalFocusableNodes(dialog){
+  if(!dialog||!dialog.querySelectorAll) return [];
+  var candidates=dialog.querySelectorAll(MODAL_FOCUS_SELECTOR), nodes=[];
+  for(var i=0;i<candidates.length;i++){
+    var node=candidates[i];
+    if(!node||node.disabled||node.hidden) continue;
+    try{ if(node.getAttribute&&node.getAttribute('aria-hidden')==='true') continue; }catch(e){}
+    nodes.push(node);
+  }
+  return nodes;
+}
+function focusModalDialog(id){
+  var focus=function(){
+    try{ var dialog=document.getElementById(id); if(dialog&&dialog.focus) dialog.focus(); }catch(e){}
+  };
+  if(typeof setTimeout==='function') setTimeout(focus,0); else focus();
+}
+App.onModalKeydown=function(e,onClose){
   if(!e) return;
-  var isRoomDialog=!!(e.currentTarget&&e.currentTarget.id==='sey-room-dialog');
   if(e.key==='Escape'){
-    if(e.preventDefault)e.preventDefault();
-    if(isRoomDialog) App.closeRoom(); else App.closeReminderCenter();
+    if(e.preventDefault) e.preventDefault();
+    if(e.stopPropagation) e.stopPropagation();
+    if(typeof onClose==='function') onClose();
     return;
   }
-  if(e.key!=='Tab'||!e.currentTarget||!e.currentTarget.querySelectorAll) return;
-  var nodes=e.currentTarget.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex="0"]');
-  if(!nodes||!nodes.length) return;
+  if(e.key!=='Tab'||!e.currentTarget) return;
+  // İç içe bir düzenleme sayfası açıkken Tab olayı dış modalın dinleyicisine
+  // taşınmasın; varsayılan sonraki-odak davranışı yine korunur.
+  if(e.stopPropagation) e.stopPropagation();
+  var nodes=modalFocusableNodes(e.currentTarget);
+  if(!nodes.length) return;
   var first=nodes[0], last=nodes[nodes.length-1], active=document.activeElement;
   if(e.shiftKey&&active===first){ if(e.preventDefault)e.preventDefault(); if(last.focus)last.focus(); }
   else if(!e.shiftKey&&active===last){ if(e.preventDefault)e.preventDefault(); if(first.focus)first.focus(); }
+};
+App.onReminderKeydown=function(e){
+  var isRoomDialog=!!(e&&e.currentTarget&&e.currentTarget.id==='sey-room-dialog');
+  return App.onModalKeydown(e,isRoomDialog?App.closeRoom:App.closeReminderCenter);
 };
 App.openReminderDigest=function(){
   if(!ui.reminderCenterOpen) return {ok:false,reason:'center-closed'};
@@ -8147,16 +8175,16 @@ App.openSaygiPreview=function(){
   ui.saygiBrowseId=person.id;
   ui.saygiPersonOpen=true;
   if(ui.saygiKey!==key||!ui.saygiArticle||ui.saygiArticle.personId!==person.id){
-    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; ui.saygiReadReady=false; App.refreshSaygi();
+    ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; ui.saygiReadReady=false; App.refreshSaygi(); focusModalDialog('sey-ov-card');
   }
-  else { render(); }
+  else { render(); focusModalDialog('sey-ov-card'); }
 };
 App.openSaygiCollectionPerson=function(id){
   var person=saygiPersonById(id); if(!person) return;
   var key=saygiDayKey(person);
   ui.saygiBrowseId=person.id; ui.saygiPersonOpen=true; ui.saygiReadReady=false;
   if(ui.saygiKey!==key||!ui.saygiArticle){ ui.saygiKey=key; ui.saygiArticle=null; ui.saygiError=null; ui.saygiLoading=false; saygiLoadArticle(person,false); }
-  render();
+  render(); focusModalDialog('sey-ov-card');
 };
 App.browseSaygiPerson=function(delta){
   var people=saygiPeople(), person=saygiModalPerson(); if(!people.length||!person) return;
@@ -8297,7 +8325,7 @@ App.setSleepHours=function(el){ var raw=el.value; debounceSave('sleepH',function
 App.setSleepQuality=function(id){ var day=curDay(); day.sleep.quality=(day.sleep.quality===id?null:id); day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMed=function(type){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.type=(day.sleep.med.type===type?null:type); if(day.sleep.med.type!=='herbal'&&day.sleep.med.type!=='rx') day.sleep.med.note=''; day.savedAt=new Date().toISOString(); commit(); };
 App.setSleepMedNote=function(el){ var v=el.value; debounceSave('sleepMedNote',function(){ var day=curDay(); if(!day.sleep.med) day.sleep.med={type:null,note:''}; day.sleep.med.note=v; day.savedAt=new Date().toISOString(); save(); },300); };
-App.openReading=function(options){ var preserve=options&&options.preserveDraft===true; ui.readingOpen=true; if(!preserve) ui.readingView='today'; if(!preserve) ui.logBookId=null; if(!preserve||!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; reminderLockBodyScroll(); render(); };
+App.openReading=function(options){ var preserve=options&&options.preserveDraft===true; ui.readingOpen=true; if(!preserve) ui.readingView='today'; if(!preserve) ui.logBookId=null; if(!preserve||!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; reminderLockBodyScroll(); render(); focusModalDialog('sey-ov-card'); };
 App.closeReading=function(){ var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.readingOpen=false; ui.readingDraft=null; ui.bookEdit=null; ui.quoteDraft=null; ui.logBookId=null; ui.reminderTargetReturnFocusId=''; render(); if(targetFocusId) reminderRestoreFocus(targetFocusId,''); };
 App.setReadingView=function(v){ ui.readingView=v; ui.bookEdit=null; ui.quoteDraft=null; render(); };
 App.onReadingField=function(field,el){ if(!ui.readingDraft) ui.readingDraft={title:'',author:'',pages:'',minutes:'',note:''}; ui.readingDraft[field]=el.value; };
@@ -8326,7 +8354,7 @@ App.removeReading=function(id){
   if(day.reading&&Array.isArray(day.reading.entries)){ var i=day.reading.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.reading.entries[i]; if(e&&e.bookId&&e.pages>0){ var bk=findBook(e.bookId); if(bk){ bk.currentPage=Math.max(0,bk.currentPage-e.pages); if(bk.status==='finished'&&bk.totalPages&&bk.currentPage<bk.totalPages){ bk.status='reading'; bk.finishedAt=null; } } } day.reading.entries.splice(i,1); if(e&&e.source==='saygi'&&day.saygi&&day.saygi.readingEntryId===id) day.saygi=emptySaygi(); syncDerivedHabits(day); day.savedAt=new Date().toISOString(); commit('Okuma kaydı silindi'); } }
 };
 // ---- kitap CRUD ----
-App.openBookEdit=function(id){ ensureLibrary(); ui.bookEdit = id ? clone(findBook(id)||{}) : {id:'',title:'',author:'',genre:'',emoji:'',totalPages:'',currentPage:0,status:'reading',rating:null,quotes:[]}; render(); };
+App.openBookEdit=function(id){ ensureLibrary(); ui.bookEdit = id ? clone(findBook(id)||{}) : {id:'',title:'',author:'',genre:'',emoji:'',totalPages:'',currentPage:0,status:'reading',rating:null,quotes:[]}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeBookEdit=function(){ ui.bookEdit=null; render(); };
 App.onBookEditField=function(field,el){ if(!ui.bookEdit) return; ui.bookEdit[field]=el.value; };
 App.pickBookEmoji=function(e){ if(!ui.bookEdit) return; ui.bookEdit.emoji=e; render(); };
@@ -8341,7 +8369,7 @@ App.finishBook=function(id){ var b=findBook(id); if(!b) return; b.status='finish
 App.reopenBook=function(id){ var b=findBook(id); if(!b) return; b.status='reading'; b.finishedAt=null; commit(); };
 App.setReadGoal=function(field,el){ var L=ensureLibrary(); var raw=el.value; debounceSave('readgoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); L.goal[field]=v; save(); render(); },500); };
 // ---- alıntılar ----
-App.openQuoteAdd=function(bookId){ var L=ensureLibrary(); if(!bookId){ var reading=L.books.filter(function(b){return b.status!=='dropped';}); bookId=(reading[0]&&reading[0].id)||(L.books[0]&&L.books[0].id)||''; } ui.quoteDraft={bookId:bookId,text:'',page:''}; render(); };
+App.openQuoteAdd=function(bookId){ var L=ensureLibrary(); if(!bookId){ var reading=L.books.filter(function(b){return b.status!=='dropped';}); bookId=(reading[0]&&reading[0].id)||(L.books[0]&&L.books[0].id)||''; } ui.quoteDraft={bookId:bookId,text:'',page:''}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeQuoteAdd=function(){ ui.quoteDraft=null; render(); };
 App.onQuoteField=function(field,el){ if(!ui.quoteDraft) return; ui.quoteDraft[field]=el.value; };
 App.pickQuoteBook=function(id){ if(!ui.quoteDraft) return; ui.quoteDraft.bookId=id; render(); };
@@ -8358,7 +8386,7 @@ App.copyQuoteById=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.is
 App.copyReplicaById=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var q=t.quotes.find(function(x){return x&&x.id===qid;}); if(!q) return; var txt='“'+q.text+'”\n— '+t.title; App.copyQuote(txt); };
 
 // ================= NE İZLEDİM =================
-App.openWatching=function(){ ui.watchOpen=true; ui.watchView='today'; ui.logItemId=null; ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; render(); };
+App.openWatching=function(){ ui.watchOpen=true; ui.watchView='today'; ui.logItemId=null; ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
 App.closeWatching=function(){ ui.watchOpen=false; ui.watchDraft=null; ui.titleEdit=null; ui.replicaDraft=null; ui.logItemId=null; render(); };
 App.setWatchView=function(v){ ui.watchView=v; ui.titleEdit=null; ui.replicaDraft=null; render(); };
 App.onWatchField=function(field,el){ if(!ui.watchDraft) ui.watchDraft={title:'',kind:'film',episodes:'',minutes:'',note:''}; ui.watchDraft[field]=el.value; };
@@ -8389,7 +8417,7 @@ App.removeWatching=function(id){
   if(day.watching&&Array.isArray(day.watching.entries)){ var i=day.watching.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ var e=day.watching.entries[i]; if(e&&e.itemId&&e.kind==='dizi'&&e.episodes>0){ var it=findTitle(e.itemId); if(it){ it.watchedEp=Math.max(0,it.watchedEp-e.episodes); if(it.status==='finished'&&it.totalEp&&it.watchedEp<it.totalEp){ it.status='watching'; it.finishedAt=null; } } } day.watching.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('İzleme kaydı silindi'); } }
 };
 // ---- yapım CRUD ----
-App.openTitleEdit=function(id){ ensureWatchlist(); ui.titleEdit = id ? clone(findTitle(id)||{}) : {id:'',title:'',kind:'film',genre:'',emoji:'',totalEp:'',watchedEp:0,status:'watching',rating:null,quotes:[]}; render(); };
+App.openTitleEdit=function(id){ ensureWatchlist(); ui.titleEdit = id ? clone(findTitle(id)||{}) : {id:'',title:'',kind:'film',genre:'',emoji:'',totalEp:'',watchedEp:0,status:'watching',rating:null,quotes:[]}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeTitleEdit=function(){ ui.titleEdit=null; render(); };
 App.onTitleEditField=function(field,el){ if(!ui.titleEdit) return; ui.titleEdit[field]=el.value; };
 App.pickTitleEmoji=function(e){ if(!ui.titleEdit) return; ui.titleEdit.emoji=e; render(); };
@@ -8405,7 +8433,7 @@ App.finishTitle=function(id){ var t=findTitle(id); if(!t) return; t.status='fini
 App.reopenTitle=function(id){ var t=findTitle(id); if(!t) return; t.status='watching'; t.finishedAt=null; commit(); };
 App.setWatchGoal=function(field,el){ var W=ensureWatchlist(); var raw=el.value; debounceSave('watchgoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); W.goal[field]=v; save(); render(); },500); };
 // ---- replikler ----
-App.openReplicaAdd=function(itemId){ var W=ensureWatchlist(); if(!itemId){ var act=W.items.filter(function(t){return t.status!=='dropped';}); itemId=(act[0]&&act[0].id)||(W.items[0]&&W.items[0].id)||''; } ui.replicaDraft={itemId:itemId,text:''}; render(); };
+App.openReplicaAdd=function(itemId){ var W=ensureWatchlist(); if(!itemId){ var act=W.items.filter(function(t){return t.status!=='dropped';}); itemId=(act[0]&&act[0].id)||(W.items[0]&&W.items[0].id)||''; } ui.replicaDraft={itemId:itemId,text:''}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeReplicaAdd=function(){ ui.replicaDraft=null; render(); };
 App.onReplicaField=function(field,el){ if(!ui.replicaDraft) return; ui.replicaDraft[field]=el.value; };
 App.pickReplicaTitle=function(id){ if(!ui.replicaDraft) return; ui.replicaDraft.itemId=id; render(); };
@@ -8413,7 +8441,7 @@ App.saveReplica=function(){ if(!ui.replicaDraft) return; var t=findTitle(ui.repl
 App.removeReplica=function(itemId,qid){ var t=findTitle(itemId); if(!t||!Array.isArray(t.quotes)) return; var i=t.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ t.quotes.splice(i,1); commit('Replik silindi'); } };
 
 // ================= NE DİNLEDİM =================
-App.openListening=function(){ ui.listeningOpen=true; ui.listeningView='today'; ui.logTrackId=null; ui.trackEdit=null; ui.lyricDraft=null; if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; render(); };
+App.openListening=function(){ ui.listeningOpen=true; ui.listeningView='today'; ui.logTrackId=null; ui.trackEdit=null; ui.lyricDraft=null; if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
 App.closeListening=function(){ ui.listeningOpen=false; ui.listeningDraft=null; ui.trackEdit=null; ui.lyricDraft=null; ui.logTrackId=null; render(); };
 App.setListeningView=function(v){ ui.listeningView=v; ui.trackEdit=null; ui.lyricDraft=null; render(); };
 App.onListeningField=function(field,el){ if(!ui.listeningDraft) ui.listeningDraft={title:'',artist:'',kind:'sarki',minutes:'',note:''}; ui.listeningDraft[field]=el.value; };
@@ -8438,7 +8466,7 @@ App.addListening=function(){
 };
 App.removeListening=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day.listening&&Array.isArray(day.listening.entries)){ var i=day.listening.entries.findIndex(function(e){ return e&&e.id===id; }); if(i>=0){ day.listening.entries.splice(i,1); day.savedAt=new Date().toISOString(); commit('Dinleme kaydı silindi'); } } };
 // ---- favori CRUD ----
-App.openTrackEdit=function(id){ ensureMusic(); ui.trackEdit = id ? clone(findTrack(id)||{}) : {id:'',title:'',artist:'',kind:'sarki',genre:'',emoji:'',rating:null,quotes:[]}; render(); };
+App.openTrackEdit=function(id){ ensureMusic(); ui.trackEdit = id ? clone(findTrack(id)||{}) : {id:'',title:'',artist:'',kind:'sarki',genre:'',emoji:'',rating:null,quotes:[]}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeTrackEdit=function(){ ui.trackEdit=null; render(); };
 App.onTrackEditField=function(field,el){ if(!ui.trackEdit) return; ui.trackEdit[field]=el.value; };
 App.pickTrackEmoji=function(e){ if(!ui.trackEdit) return; ui.trackEdit.emoji=e; render(); };
@@ -8449,7 +8477,7 @@ App.deleteTrack=function(id){ var M=ensureMusic(); var i=M.items.findIndex(funct
 App.rateTrack=function(id,n){ var x=findTrack(id); if(!x) return; x.rating=(x.rating===n?null:n); commit(); };
 App.setListenGoal=function(field,el){ var M=ensureMusic(); var raw=el.value; debounceSave('listengoal_'+field,function(){ var v=raw===''?null:Math.max(0,Math.round(Number(raw)||0)); M.goal[field]=v; save(); render(); },500); };
 // ---- favori sözler ----
-App.openLyricAdd=function(itemId){ var M=ensureMusic(); if(!itemId){ itemId=(M.items[0]&&M.items[0].id)||''; } ui.lyricDraft={itemId:itemId,text:''}; render(); };
+App.openLyricAdd=function(itemId){ var M=ensureMusic(); if(!itemId){ itemId=(M.items[0]&&M.items[0].id)||''; } ui.lyricDraft={itemId:itemId,text:''}; render(); focusModalDialog('sey-compact-modal'); };
 App.closeLyricAdd=function(){ ui.lyricDraft=null; render(); };
 App.onLyricField=function(field,el){ if(!ui.lyricDraft) return; ui.lyricDraft[field]=el.value; };
 App.pickLyricTrack=function(id){ if(!ui.lyricDraft) return; ui.lyricDraft.itemId=id; render(); };
@@ -8556,14 +8584,7 @@ App.setZikrView=function(v){
 };
 App.toggleZikrDetail=function(){ ui.zikrDetailOpen=!ui.zikrDetailOpen; if(!zikrPaintDetail()) if(!zikrPaintView('counter',true)) render(); };
 App.onZikrKeydown=function(e){
-  if(!e) return;
-  if(e.key==='Escape'){ if(e.preventDefault)e.preventDefault(); App.closeZikr(); return; }
-  if(e.key==='Tab'&&e.currentTarget&&e.currentTarget.querySelectorAll){
-    var nodes=e.currentTarget.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]'); if(!nodes||!nodes.length) return;
-    var first=nodes[0], last=nodes[nodes.length-1], active=document.activeElement;
-    if(e.shiftKey&&active===first){ if(e.preventDefault)e.preventDefault(); if(last.focus)last.focus(); }
-    else if(!e.shiftKey&&active===last){ if(e.preventDefault)e.preventDefault(); if(first.focus)first.focus(); }
-  }
+  return App.onModalKeydown(e,App.closeZikr);
 };
 App.zikrTap=function(){
   var r=zikrTouchTick(); if(!r) return;
@@ -8898,12 +8919,12 @@ App.openFaithHeatDay=function(date){ App.heatOpen(date); };
 App.openSoulActivity=function(type){
   ui.soulActivityOpen=true;
   ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
-  render();
+  render(); focusModalDialog('sey-ov-card');
 };
 // Yeni: Pratik butonu ilk dokunuşta alt seçim açar (Pilates/Ney/Binicilik)
 App.openSoulPracticePicker=function(){
   ui.soulPracticePicker=true;
-  render();
+  render(); focusModalDialog('sey-ov-card');
 };
 App.closeSoulPracticePicker=function(){
   ui.soulPracticePicker=false;
@@ -8914,7 +8935,7 @@ App.pickSoulPractice=function(type){
   ui.soulPracticePicker=false;
   ui.soulActivityOpen=true;
   ui.soulActivityDraft={type:type||'pilates',duration:'',note:''};
-  render();
+  render(); focusModalDialog('sey-ov-card');
 };
 App.closeSoulActivity=function(){ ui.soulActivityOpen=false; ui.soulActivityDraft=null; render(); };
 App.onSoulField=function(field,el){ if(!ui.soulActivityDraft) ui.soulActivityDraft={type:'pilates',duration:'',note:''}; ui.soulActivityDraft[field]=el.value; };
@@ -8939,13 +8960,13 @@ App.saveSoulActivity=function(){
 App.removeSoulActivity=function(id){ var day=getDay(data,todayStr(),dayIndexFor(todayStr())); if(day&&Array.isArray(day.soulActivities)){ var i=day.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=day.soulActivities[i]; unsyncSoulEntry(removed); day.soulActivities.splice(i,1); day.savedAt=new Date().toISOString(); commit('Pratik kaydı silindi'); } } };
 
 // ================= ZİHİN-BEDEN ARŞİVİ =================
-App.openSoulArchive=function(){ ui.soulArchiveOpen=true; ui.soulArchiveFilter=null; render(); };
+App.openSoulArchive=function(){ ui.soulArchiveOpen=true; ui.soulArchiveFilter=null; render(); focusModalDialog('sey-ov-card'); };
 App.closeSoulArchive=function(){ ui.soulArchiveOpen=false; ui.soulArchiveFilter=null; render(); };
 App.setSoulArchiveFilter=function(type){ ui.soulArchiveFilter=(ui.soulArchiveFilter===type?null:type); render(); };
 App.removeSoulArchiveSession=function(id){ var found=false; if(!data.days||typeof data.days!=='object') return; Object.keys(data.days).forEach(function(date){ var rec=data.days[date]; if(!rec||!Array.isArray(rec.soulActivities)) return; var i=rec.soulActivities.findIndex(function(a){ return a&&a.id===id; }); if(i>=0){ var removed=rec.soulActivities[i]; unsyncSoulEntry(removed); rec.soulActivities.splice(i,1); rec.savedAt=new Date().toISOString(); found=true; } }); if(found){ commit('Pratik kaydı arşivden silindi'); } };
 
 // ================= İMAN KÖŞESİ =================
-App.openFaithCorner=function(){ ui.faithOpen=true; reminderLockBodyScroll(); render(); if(prayerLocation()){ setTimeout(function(){ App.refreshPrayerTimes(); },80); } };
+App.openFaithCorner=function(){ ui.faithOpen=true; reminderLockBodyScroll(); render(); focusModalDialog('sey-ov-card'); if(prayerLocation()){ setTimeout(function(){ App.refreshPrayerTimes(); },80); } };
 App.closeFaithCorner=function(){ var targetFocusId=ui.reminderTargetReturnFocusId; reminderUnlockBodyScroll(); ui.faithOpen=false; ui.reminderTargetReturnFocusId=''; render(); if(!targetFocusId||!reminderRestoreFocus(targetFocusId,'')){ try{ var trigger=document.getElementById('faith-preview-card'); if(trigger&&trigger.focus) trigger.focus(); }catch(e){} } };
 App.setPrayerCity=function(name){
   var c=prayerCityByName(name);
@@ -9000,7 +9021,7 @@ App.changeNafile=function(type,delta){
 };
 
 // ================= NE ÖĞRENDİM =================
-App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); };
+App.openLearning=function(){ ui.learningOpen=true; ui.learningDraft={topic:'',source:'',note:''}; render(); focusModalDialog('sey-ov-card'); };
 App.closeLearning=function(){ ui.learningOpen=false; ui.learningDraft=null; render(); };
 App.onLearningField=function(field,el){ if(!ui.learningDraft) ui.learningDraft={topic:'',source:'',note:''}; ui.learningDraft[field]=el.value; };
 App.addLearning=function(){
@@ -9075,7 +9096,7 @@ App.setDiscomfortMed=function(idx,field,el){ var v=el.value; debounceSave('dzMed
 App.removeDiscomfortMed=function(idx){ var day=curDay(); if(day.discomfort&&day.discomfort.meds&&day.discomfort.meds[idx]!=null){ day.discomfort.meds.splice(idx,1); day.savedAt=new Date().toISOString(); commit(); } };
 function recalcCycle(){ var st=cycleStats(); data.cycle.avgCycle=st.avgCycle; data.cycle.avgPeriod=st.avgPeriod; }
 // ── Kriz odaları (modal): Tatlı · Yemek · Kahve ──
-App.openCrisis=function(kind){ if(!CRISES[kind]) return; if(isVacationDay(todayStr())) return; haptic([16,40,16]); var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day.savedAt=new Date().toISOString(); save(); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; ui.crisisTrigOpen=false; ui.crisisTriedOpen=false; lastCrisisKind=null; render(); };
+App.openCrisis=function(kind){ if(!CRISES[kind]) return; if(isVacationDay(todayStr())) return; haptic([16,40,16]); var date=todayStr(), day=getDay(data,date,dayIndexFor(date)); day.cravingSOSCount=(day.cravingSOSCount||0)+1; day.savedAt=new Date().toISOString(); save(); ui.crisisKind=kind; ui.crisisOpts=[]; ui.crisisTriggers=[]; ui.crisisNote=''; ui.crisisDone=false; ui.crisisTrigOpen=false; ui.crisisTriedOpen=false; lastCrisisKind=null; render(); focusModalDialog('sey-crisis-card'); };
 App.closeCrisis=function(){ ui.crisisKind=null; render(); };
 App.toggleCrisisDropdown=function(which){ if(which==='trig') ui.crisisTrigOpen=!ui.crisisTrigOpen; else ui.crisisTriedOpen=!ui.crisisTriedOpen; render(); };
 App.toggleCrisisOpt=function(o){ var i=ui.crisisOpts.indexOf(o); if(i>=0) ui.crisisOpts.splice(i,1); else ui.crisisOpts.push(o); render(); App.completeCrisis(); };
@@ -9100,7 +9121,7 @@ App.setVacationEnd=function(val){ var v=ensureVacationSettings(); v.endAt=String
 App.setVacationPreset=function(preset){ var v=ensureVacationSettings(); var was=v.enabled; v.preset=String(preset||'active'); if(!v.enabled){ v.enabled=true; v.enabledAt=new Date().toISOString(); if(!v.startAt||!v.endAt){ var t=todayStr(); v.startAt=t; v.endAt=addDays(t,7); } } save(); render(); };
 App.setVacationReason=function(reason){ var v=ensureVacationSettings(); v.reason=String(reason||'').trim(); save(); updateCardByKey('vacation'); };
 
-App.openEmergency=function(){ ui.emergency=true; render(); };
+App.openEmergency=function(){ ui.emergency=true; render(); focusModalDialog('sey-emergency-dialog'); };
 App.closeEmergency=function(){ ui.emergency=false; render(); };
 App.continueEmergency=function(){ ui.emergency=false; render(); toast('İşte bu. Reset dediğin bazen sadece bir sonraki doğru hamledir.',3000); };
 App.emergencyNote=function(){ ui.emergency=false; ui.tab='bugun'; render(); setTimeout(function(){ var ta=document.querySelector('textarea'); if(ta) ta.focus(); },150); };
@@ -12415,8 +12436,8 @@ function journalModalHTML(){
   var mObj=find(JOURNAL_MODES,'id',mode)||JOURNAL_MODES[0];
   var hasSaved=(data.days[date]&&data.days[date].journal&&data.days[date].journal.savedAt);
 
-  var h='<div role="button" tabindex="0" onclick="App.closeJournalModal()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeJournalModal();}" style="position:fixed;inset:0;z-index:350;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
-  h+='<div onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
+  var h='<div onclick="App.closeJournalModal()" style="position:fixed;inset:0;z-index:350;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div id="sey-journal-dialog" role="dialog" aria-modal="true" aria-label="Günışığı’nın Günlüğü" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeJournalModal)" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
 
   h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,var(--journal),var(--journal2));color:#fff;box-shadow:0 8px 22px color-mix(in srgb,var(--journal) 32%, transparent);overflow:hidden;">';
   h+='<div style="position:absolute;top:-40px;right:-34px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 70%);pointer-events:none;"></div>';
@@ -12561,8 +12582,8 @@ function crisisModalHTML(){
 
   // Tam sayfa modal: alttan-sayfa yerine tüm ekranı kaplar → uzun expander gövdeleri
   // artık dar bir çerçeveye sıkışmaz, serbestçe kaydırılır. Birincil eylem sabit alt bar'da.
-  var h='<div id="sey-crisis-back" role="button" tabindex="0" onclick="App.closeCrisis()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeCrisis();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
-  h+='<div id="sey-crisis-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
+  var h='<div id="sey-crisis-back" onclick="App.closeCrisis()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:stretch;justify-content:center;animation:seyFade .2s ease;">';
+  h+='<div id="sey-crisis-card" role="dialog" aria-modal="true" aria-label="Kriz odası" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeCrisis)" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:480px;height:100%;background:var(--modal);box-shadow:0 0 60px rgba(0,0,0,0.32);animation:seyFloatIn .32s var(--ease-premium,ease);display:flex;flex-direction:column;overflow:hidden;">';
 
   // sticky header (gradient accent, Raşit branding, safe-area üst boşluğu)
   h+='<div style="flex-shrink:0;position:relative;padding:calc(env(safe-area-inset-top) + 15px) 15px 15px;background:linear-gradient(135deg,'+A+','+A2+');color:#fff;box-shadow:0 8px 22px color-mix(in srgb,'+A+' 32%, transparent);overflow:hidden;">';
@@ -14253,7 +14274,7 @@ function faithCornerOverlayHTML(){
   body+='<div style="border-radius:12px;padding:11px 12px;background:var(--faith-bg);border:1px solid color-mix(in srgb,var(--faith) 18%, var(--card-bd));font-size:var(--f-caption1);line-height:1.45;color:var(--text2);">';
   body+=icon('sparkles',13)+' Vakitler Aladhan API ile Diyanet (method 13) hesabına göre çekilir. Şehir değişince otomatik yenilenir; offline son cache kullanılır.';
   body+='</div>';
-  return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" role="button" tabindex="0" onclick="App.closeFaithCorner()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeFaithCorner();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
+  return '<div id="sey-ov-back" class="sey-faith-ov-back sg-faith-ov-back" onclick="App.closeFaithCorner()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sey-faith-ov-card sg-faith-ov-card" role="dialog" aria-modal="true" aria-label="İman köşesi" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeFaithCorner)" onclick="event.stopPropagation()" style="width:100%;max-width:460px;max-height:88vh;background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;"><div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+head+'</div><div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+body+'</div></div></div>';
 }
 
 function saygiPreviewHubHTML(person,article,done){
@@ -15827,15 +15848,11 @@ App.onQuranKeydown=function(e){
   if(!e) return;
   if(e.key==='Escape'){
     if(e.preventDefault) e.preventDefault();
+    if(e.stopPropagation) e.stopPropagation();
     if(ui.quranJourneyView==='detail') App.backToQuranLibrary(); else App.closeQuranJourney();
     return;
   }
-  if(e.key==='Tab'&&e.currentTarget&&e.currentTarget.querySelectorAll){
-    var nodes=e.currentTarget.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex="0"]'); if(!nodes||!nodes.length) return;
-    var first=nodes[0], last=nodes[nodes.length-1], active=document.activeElement;
-    if(e.shiftKey&&active===first){ if(e.preventDefault)e.preventDefault(); if(last.focus)last.focus(); }
-    else if(!e.shiftKey&&active===last){ if(e.preventDefault)e.preventDefault(); if(first.focus)first.focus(); }
-  }
+  return App.onModalKeydown(e,App.closeQuranJourney);
 };
 var _quranBodyLocked=false,_quranBodyPrevOverflow='';
 function quranLockBodyScroll(){
@@ -15894,8 +15911,8 @@ function qiblaOverlayHTML(){
   var m=qiblaMetrics(prayerLocation(),ui.qiblaHeading), loc=m.location||{}, align=qiblaAlignmentCopy(m);
   var sensor=ui.qiblaListening?(ui.qiblaSensorSource==='magnetic'?'Manyetik pusula · yerel sapma olabilir':'Mutlak cihaz yönü'):('Sensör kapalı');
   if(ui.qiblaAccuracy!=null) sensor+=' · ±'+Math.round(ui.qiblaAccuracy)+'°';
-  var h='<div id="qibla-overlay" class="qibla-v2-back" role="button" tabindex="0" onclick="App.closeQibla()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeQibla();}">';
-  h+='<section class="qibla-v2-sheet" role="dialog" aria-modal="true" aria-labelledby="qibla-v2-title" onclick="event.stopPropagation()">';
+  var h='<div id="qibla-overlay" class="qibla-v2-back" onclick="App.closeQibla()">';
+  h+='<section id="qibla-dialog" class="qibla-v2-sheet" role="dialog" aria-modal="true" aria-labelledby="qibla-v2-title" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeQibla)" onclick="event.stopPropagation()">';
   h+='<header class="qibla-v2-head"><div><span>'+icon('compass',14)+' BİLİMSEL YÖN HESABI</span><h2 id="qibla-v2-title">Kıble pusulası</h2><p>Konumdan Kâbe’ye başlangıç büyük-daire azimutu</p></div><button onclick="App.closeQibla()" aria-label="Kıble pusulasını kapat">'+icon('x',18)+'</button></header>';
   h+='<div class="qibla-v2-scroll">';
   h+='<div class="qibla-v2-target"><div><span>HEDEF DOĞRULTU</span><strong>'+m.bearing.toLocaleString('tr-TR')+'°</strong><small>gerçek kuzeyden saat yönünde · '+esc(m.direction)+'</small></div><div><span>KÂBE MESAFESİ</span><strong>'+m.distanceKm.toLocaleString('tr-TR')+' km</strong><small>'+esc(loc.cityName||'Konum')+' merkezli</small></div></div>';
@@ -15912,7 +15929,7 @@ function qiblaOverlayHTML(){
   h+='</div></section></div>';
   return h;
 }
-App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); };
+App.openQibla=function(){ ui.qiblaOpen=true; ui.qiblaSensorError=''; render(); focusModalDialog('qibla-dialog'); };
 var _qiblaOrientationHandler=null, _qiblaLastPaint=0, _qiblaSmoothHeading=null, _qiblaAbsoluteSeen=false;
 function qiblaSmoothAngle(previous,next,weight){
   if(previous==null) return next;
@@ -16010,7 +16027,7 @@ function saygiPersonModalHTML(){
     body+=saygiArticleBodyHTML(person,article,done,'saygi-article-modal',false);
     body+='<div id="saygi-read-sentinel-modal" class="saygi-read-sentinel" aria-hidden="true"></div>';
   }
-  return '<div id="sey-ov-back" class="sg-person-ov-back" role="button" tabindex="0" onclick="App.closeSaygiPerson()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeSaygiPerson();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:92vh;max-height:900px;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 104px;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';
+  return '<div id="sey-ov-back" class="sg-person-ov-back" onclick="App.closeSaygiPerson()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.45);display:flex;align-items:flex-end;justify-content:center;padding:14px;"><div id="sey-ov-card" class="sg-person-ov-card" role="dialog" aria-modal="true" aria-label="Günün öncüsü" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeSaygiPerson)" onclick="event.stopPropagation()" style="position:relative;width:100%;max-width:520px;height:92vh;max-height:900px;background:var(--modal);border-radius:28px;padding:0;box-shadow:0 -12px 50px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;"><div style="flex-shrink:0;padding:14px 18px 12px;border-bottom:1px solid var(--card-bd);">'+head+'</div><div id="sey-ov-body" class="sg-person-ov-body scroll" style="flex:1;min-height:0;overflow-y:auto;padding:18px 18px 104px;display:flex;flex-direction:column;gap:14px;">'+body+'</div></div></div>';
 }
 function saygiFloatingReadHTML(){
   var person=saygiModalPerson();
@@ -16184,23 +16201,23 @@ function navHTML(){
 }
 
 // ================= OKUMA HUB (overlay) =================
-function overlayShell(closeFn, sticky, body, maxw, fixedH){
+function overlayShell(closeFn, sticky, body, maxw, fixedH, label){
   // fixedH: sekmeli hub'larda kart yüksekliğini sabitler → sekme değişince modal
   // boyu zıplamaz (gövde kaydırılır, kabuk sabit kalır).
   var sizeCss=fixedH?'height:88vh;max-height:88vh;':'max-height:88vh;';
-  var h='<div id="sey-ov-back" role="button" tabindex="0" onclick="'+closeFn+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+closeFn+';}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div id="sey-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
+  var h='<div id="sey-ov-back" onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div id="sey-ov-card" role="dialog" aria-modal="true" aria-label="'+esc(label||'Şeyma penceresi')+'" tabindex="-1" onkeydown="App.onModalKeydown(event,'+closeFn.replace('()','')+')" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);animation:seyPop .25s ease;display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
   h+='<div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+(sticky||'')+'</div>';
   h+='<div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+(body||'')+'</div>';
   h+='</div></div>';
   return h;
 }
-function soulOverlayShell(closeFn, sticky, body, maxw, fixedH){
+function soulOverlayShell(closeFn, sticky, body, maxw, fixedH, label){
   // Zihin-Beden (soul) modalları için animasyonsuz, anlık açılış shell.
   // Picker → aktivite geçişlerinde ve tab değişimlerinde flash/flicker oluşmasın.
   var sizeCss=fixedH?'height:88vh;max-height:88vh;':'max-height:88vh;';
-  var h='<div id="sey-ov-back" class="sey-soul-ov-back" role="button" tabindex="0" onclick="'+closeFn+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'+closeFn+';}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;">';
-  h+='<div id="sey-ov-card" class="sey-soul-ov-card" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
+  var h='<div id="sey-ov-back" class="sey-soul-ov-back" onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);display:flex;align-items:flex-end;justify-content:center;padding:14px;">';
+  h+='<div id="sey-ov-card" class="sey-soul-ov-card" role="dialog" aria-modal="true" aria-label="'+esc(label||'Zihin ve beden penceresi')+'" tabindex="-1" onkeydown="App.onModalKeydown(event,'+closeFn.replace('()','')+')" onclick="event.stopPropagation()" style="width:100%;max-width:'+(maxw||460)+'px;'+sizeCss+'background:var(--modal);border-radius:26px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,0.22);display:flex;flex-direction:column;gap:13px;overflow:hidden;">';
   h+='<div style="flex-shrink:0;display:flex;flex-direction:column;gap:13px;">'+(sticky||'')+'</div>';
   h+='<div id="sey-ov-body" class="scroll" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin:0 -4px;padding:4px 4px 2px;">'+(body||'')+'</div>';
   h+='</div></div>';
@@ -16216,7 +16233,7 @@ function readingOverlayHTML(){
   else if(view==='library') body=readingLibraryView();
   else if(view==='stats') body=readingStatsView();
   else if(view==='quotes') body=readingQuotesView();
-  var h=overlayShell('App.closeReading()', head+tabs, body, null, true);
+  var h=overlayShell('App.closeReading()', head+tabs, body, null, true,'Okuma günlüğü');
   if(ui.bookEdit) h+=bookEditModal();
   if(ui.quoteDraft) h+=quoteAddModal();
   return h;
@@ -16320,6 +16337,10 @@ function readingQuotesView(){
   h+='</div>';
   return h;
 }
+function compactModalShell(closeFn,label,inner){
+  var closeRef=String(closeFn||'').replace('()','');
+  return '<div onclick="'+closeFn+'" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div id="sey-compact-modal" role="dialog" aria-modal="true" aria-label="'+esc(label||'Şeyma penceresi')+'" tabindex="-1" onkeydown="App.onModalKeydown(event,'+closeRef+')" onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+(inner||'')+'</div></div>';
+}
 function bookEditModal(){
   var b=ui.bookEdit; var isNew=!b.id;
   var inner='<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:var(--f-body);font-weight:800;display:flex;align-items:center;gap:7px;">'+(isNew?(icon('book',16)+' Kitap ekle'):'Kitabı düzenle')+'</div><button onclick="App.closeBookEdit()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:32px;height:32px;border-radius:50%;color:var(--muted);display:flex;align-items:center;justify-content:center;">'+icon('x',15)+'</button></div>';
@@ -16329,7 +16350,7 @@ function bookEditModal(){
   inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:var(--f-footnote);color:var(--text2);flex:1;">Toplam sayfa <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(b.totalPages!=null&&b.totalPages!==''?esc(b.totalPages):'')+'" oninput="App.onBookEditField(\'totalPages\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:var(--f-subhead);text-align:center;outline:none;"></div>';
   inner+='<button onclick="App.saveBook()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);">Kaydet</button>';
   if(!isNew) inner+='<button onclick="App.deleteBook(\''+esc(b.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Kitabı sil</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeBookEdit()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeBookEdit();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeBookEdit()','Kitap düzenleme',inner);
 }
 function quoteAddModal(){
   var q=ui.quoteDraft; var L=ensureLibrary(); var books=L.books;
@@ -16338,7 +16359,7 @@ function quoteAddModal(){
   inner+='<textarea rows="3" oninput="App.onQuoteField(\'text\',this)" placeholder="Seni durduran o cümle…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);outline:none;resize:none;line-height:1.5;">'+esc(q.text||'')+'</textarea>';
   inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:var(--f-footnote);color:var(--text2);flex:1;">Sayfa <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(q.page!=null&&q.page!==''?esc(q.page):'')+'" oninput="App.onQuoteField(\'page\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:var(--f-subhead);text-align:center;outline:none;"></div>';
   inner+='<button onclick="App.saveQuote()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#6E55BF,#9B7FC9 55%,#E9AFC1);">Kaydet</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeQuoteAdd()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeQuoteAdd();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeQuoteAdd()','Alıntı ekleme',inner);
 }
 
 // ================= NE İZLEDİM HUB (overlay) =================
@@ -16352,7 +16373,7 @@ function watchOverlayHTML(){
   else if(view==='archive') body=watchArchiveView();
   else if(view==='stats') body=watchStatsView();
   else if(view==='quotes') body=watchQuotesView();
-  var h=overlayShell('App.closeWatching()', head+tabs, body, null, true);
+  var h=overlayShell('App.closeWatching()', head+tabs, body, null, true,'İzleme günlüğü');
   if(ui.titleEdit) h+=titleEditModal();
   if(ui.replicaDraft) h+=replicaAddModal();
   return h;
@@ -16459,7 +16480,7 @@ function titleEditModal(){
   if(kind==='dizi') inner+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:var(--f-footnote);color:var(--text2);flex:1;">Toplam bölüm <span style="color:var(--faint);">(opsiyonel)</span></span><input type="number" inputmode="numeric" min="0" value="'+(t.totalEp!=null&&t.totalEp!==''?esc(t.totalEp):'')+'" oninput="App.onTitleEditField(\'totalEp\',this)" placeholder="—" style="width:90px;border:1px solid var(--field-bd);background:var(--field);border-radius:11px;padding:9px;font-size:var(--f-subhead);text-align:center;outline:none;"></div>';
   inner+='<button onclick="App.saveTitle()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);">Kaydet</button>';
   if(!isNew) inner+='<button onclick="App.deleteTitle(\''+esc(t.id)+'\')" style="border:none;cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:#C0605F;background:rgba(220,120,120,0.1);">Yapımı sil</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeTitleEdit()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeTitleEdit();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeTitleEdit()','İzleme kaydı düzenleme',inner);
 }
 function replicaAddModal(){
   var q=ui.replicaDraft; var W=ensureWatchlist(); var items=W.items;
@@ -16467,7 +16488,7 @@ function replicaAddModal(){
   inner+='<div style="font-size:var(--f-caption1);font-weight:700;color:var(--muted);">Yapım</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'; items.forEach(function(t){ var on=q.itemId===t.id; inner+='<button onclick="App.pickReplicaTitle(\''+esc(t.id)+'\')" style="border:1px solid '+(on?'var(--watch)':'var(--card-bd)')+';cursor:pointer;padding:7px 10px;border-radius:11px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#C88F4C,#E0B080)':'var(--card)')+';display:flex;align-items:center;gap:4px;">'+icon('clapperboard',12)+' '+esc(t.title.length>16?t.title.slice(0,15)+'…':t.title)+'</button>'; }); inner+='</div>';
   inner+='<textarea rows="3" oninput="App.onReplicaField(\'text\',this)" placeholder="O unutamadığın replik…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);outline:none;resize:none;line-height:1.5;">'+esc(q.text||'')+'</textarea>';
   inner+='<button onclick="App.saveReplica()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#C88F4C,#E0B080 55%,#E9AFC1);">Kaydet</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeReplicaAdd()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeReplicaAdd();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeReplicaAdd()','İzleme kaydı ekleme',inner);
 }
 
 // ================= NE DİNLEDİM HUB (overlay) =================
@@ -16483,7 +16504,7 @@ function listeningOverlayHTML(){
   else if(view==='favs') body=listeningFavsView();
   else if(view==='stats') body=listeningStatsView();
   else if(view==='lyrics') body=listeningLyricsView();
-  var h=overlayShell('App.closeListening()', head+tabs, body, null, true);
+  var h=overlayShell('App.closeListening()', head+tabs, body, null, true,'Dinleme günlüğü');
   if(ui.trackEdit) h+=trackEditModal();
   if(ui.lyricDraft) h+=lyricAddModal();
   return h;
@@ -16571,7 +16592,7 @@ function trackEditModal(){
   inner+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'; MUSIC_GENRES.forEach(function(g){ var on=x.genre===g; inner+='<button onclick="App.pickTrackGenre(\''+esc(g)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:6px 10px;border-radius:999px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';">'+esc(g)+'</button>'; }); inner+='</div>';
   inner+='<button onclick="App.saveTrack()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4);">Kaydet</button>';
   if(!isNew) inner+='<button onclick="App.deleteTrack(\''+esc(x.id)+'\')" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:11px;border-radius:13px;font-size:var(--f-footnote);font-weight:700;color:var(--drop-ink);background:var(--card);">Sil</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeTrackEdit()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeTrackEdit();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeTrackEdit()','Favori düzenleme',inner);
 }
 function lyricAddModal(){
   var M=ensureMusic(); var dr=ui.lyricDraft||{itemId:'',text:''};
@@ -16579,7 +16600,7 @@ function lyricAddModal(){
   inner+='<div style="font-size:var(--f-caption1);font-weight:700;color:var(--muted);">Parça</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'; M.items.forEach(function(x){ var on=dr.itemId===x.id; inner+='<button onclick="App.pickLyricTrack(\''+esc(x.id)+'\')" style="border:1px solid '+(on?'var(--listen)':'var(--card-bd)')+';cursor:pointer;padding:7px 10px;border-radius:11px;font-size:var(--f-caption1);font-weight:700;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?'linear-gradient(135deg,#0E9AA7,#2BC4C4)':'var(--card)')+';display:flex;align-items:center;gap:4px;">'+icon('music',12)+' '+esc(x.title.length>16?x.title.slice(0,15)+'…':x.title)+'</button>'; }); inner+='</div>';
   inner+='<textarea rows="4" oninput="App.onLyricField(\'text\',this)" placeholder="İçine işleyen o dize…" style="width:100%;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:11px 12px;font-size:var(--f-subhead);outline:none;resize:none;line-height:1.5;">'+esc(dr.text||'')+'</textarea>';
   inner+='<button onclick="App.saveLyric()" style="border:none;cursor:pointer;width:100%;padding:13px;border-radius:13px;font-size:var(--f-subhead);font-weight:800;color:#fff;background:linear-gradient(135deg,#0E9AA7,#2BC4C4 55%,#E9AFC1);display:flex;align-items:center;justify-content:center;gap:6px;">Kaydet '+icon('quote',15)+'</button>';
-  return '<div role="button" tabindex="0" onclick="App.closeLyricAdd()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeLyricAdd();}" style="position:fixed;inset:0;z-index:360;background:rgba(44,36,38,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;animation:seyFade .2s ease;"><div onclick="event.stopPropagation()" style="width:100%;max-width:400px;background:var(--modal);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:11px;max-height:86vh;overflow-y:auto;animation:seyPop .22s ease;">'+inner+'</div></div>';
+  return compactModalShell('App.closeLyricAdd()','Söz ekleme',inner);
 }
 
 function learningEntryCard(e){
@@ -16619,7 +16640,7 @@ function learningTodayView(){
 }
 function learningOverlayHTML(){
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Ne öğrendim? '+icon('graduation-cap',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Bugün öğrendiğin küçük ya da büyük her şey, tek yerde.</div></div><button onclick="App.closeLearning()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
-  return overlayShell('App.closeLearning()', head, learningTodayView());
+  return overlayShell('App.closeLearning()', head, learningTodayView(),null,false,'Öğrenme günlüğü');
 }
 
 function soulActivityTodayView(){
@@ -16686,12 +16707,12 @@ function soulPracticePickerHTML(){
     body+='</button>';
   });
   body+='</div>';
-  return soulOverlayShell('App.closeSoulPracticePicker()', head, body);
+  return soulOverlayShell('App.closeSoulPracticePicker()', head, body,null,false,'Zihin ve beden pratiği seçimi');
 }
 
 function soulActivityOverlayHTML(){
   var head='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;"><div><div style="font-size:var(--f-title3);font-weight:800;display:flex;align-items:center;gap:8px;">Kurs & Pratik '+icon('heart-handshake',19)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:3px;">Pilates, ney, binicilik — beden ve zihni birlikte besleyen ritimler.</div></div><button onclick="App.closeSoulActivity()" style="border:none;background:color-mix(in srgb,var(--soul) 16%, transparent);cursor:pointer;width:34px;height:34px;border-radius:50%;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+icon('x',16)+'</button></div>';
-  return soulOverlayShell('App.closeSoulActivity()', head, soulActivityTodayView());
+  return soulOverlayShell('App.closeSoulActivity()', head, soulActivityTodayView(),null,false,'Zihin ve beden pratiği');
 }
 function soulArchiveSessions(type){
   var list=[];
@@ -16754,7 +16775,7 @@ function soulArchiveOverlayHTML(){
     body+='<div style="font-size:var(--f-caption1);color:var(--text2);line-height:1.45;">'+icon('sparkles',13)+' Arşiv, her kaydettiğin pratiği otomatik toplar. Pilates, ney ve binicilik dışında yoga, keman, seramik gibi türler eklendiğinde bu ekran kendiliğinden büyür.</div>';
     body+='</div>';
   }
-  return soulOverlayShell('App.closeSoulArchive()', head, body);
+  return soulOverlayShell('App.closeSoulArchive()', head, body,null,false,'Zihin ve beden arşivi');
 }
 
 function modalsHTML(){
@@ -16777,13 +16798,13 @@ function modalsHTML(){
   if(ui.saygiPersonOpen){ h+=saygiPersonModalHTML(); h+=saygiFloatingReadHTML(); }
   if(ui.aeonAttachOpen){ h+=aeonAttachSheetHTML(); }
   if(ui.emergency){
-    h+='<div role="button" tabindex="0" onclick="App.closeEmergency()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeEmergency();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:var(--f-title2);font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:var(--f-callout);line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
+    h+='<div onclick="App.closeEmergency()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:seyFade .2s ease;">';
+    h+='<div id="sey-emergency-dialog" role="dialog" aria-modal="true" aria-label="Zor an desteği" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeEmergency)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:24px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;"><div style="font-size:var(--f-title2);font-weight:800;margin-bottom:12px;">Dramatize etmiyoruz.</div><p style="margin:0 0 18px;font-size:var(--f-callout);line-height:1.6;color:var(--text2);">Olur Sevgili Günışığı. Bir gün dağıldı diye 21 gün çöpe gitmez. Şimdi sadece bir bardak su iç, sonraki öğünde normale dön. Tatlı mahkemesi kurulmadı, hayat devam ediyor.</p><div style="display:flex;flex-direction:column;gap:10px;"><button onclick="App.continueEmergency()" style="border:none;cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-callout);font-weight:700;color:#fff;background:linear-gradient(135deg,#E9AFC1,#C9B8FF);display:flex;align-items:center;justify-content:center;gap:6px;">Tamam, devam '+icon('sparkles',15)+'</button><button onclick="App.emergencyNote()" style="border:1px solid var(--field-bd);cursor:pointer;width:100%;padding:15px;border-radius:16px;font-size:var(--f-subhead);font-weight:600;color:var(--muted);background:transparent;">Bugüne minicik not düş</button></div></div></div>';
   }
   if(ui.dayDetail){
     var d=ui.dayDetail;
-    h+='<div role="button" tabindex="0" onclick="App.closeDetail()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.closeDetail();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:80vh;overflow-y:auto;">';
+    h+='<div onclick="App.closeDetail()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Gün ayrıntısı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.closeDetail)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;max-height:80vh;overflow-y:auto;">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div style="font-size:var(--f-title3);font-weight:800;">'+esc(d.title)+'</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">'+esc(d.dateLabel)+' \u00b7 '+esc(d.status)+'</div></div><button onclick="App.closeDetail()" style="border:none;background:rgba(150,110,120,0.15);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:var(--f-callout);color:var(--muted);">\u2715</button></div>';
     h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">';
     d.habits.forEach(function(hb){ h+='<div style="display:flex;align-items:center;gap:10px;font-size:var(--f-subhead);"><span style="font-size:var(--f-body);">'+hb.mark+'</span><span style="color:var(--text2);">'+esc(hb.label)+'</span></div>'; });
@@ -16801,8 +16822,8 @@ function modalsHTML(){
     h+='</div></div>';
   }
   if(ui.locationConsent){
-    h+='<div role="button" tabindex="0" onclick="App.cancelLocationConsent()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelLocationConsent();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
+    h+='<div onclick="App.cancelLocationConsent()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Konum paylaşımı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelLocationConsent)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;">';
     h+='<div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+icon('map-pin',18)+' Konum paylaşımı</div>';
     h+='<p style="margin:0 0 14px;font-size:var(--f-subhead);line-height:1.55;color:var(--muted);">Açarsan konumun ve hareketlerin (yürüyüş/araç, kat edilen mesafe) <b>uygulama açıkken</b> ölçülür.</p>';
     h+='<p style="margin:0 0 18px;font-size:var(--f-footnote);line-height:1.5;color:var(--faint);">Devam edince tarayıcın ayrıca konum izni isteyecek.</p>';
@@ -16811,8 +16832,8 @@ function modalsHTML(){
   }
   if(ui.locNudgeOpen){
     var lnB=(ui.locNudgeShown&&ui.locNudgeShown.length)?ui.locNudgeShown:[LOC_BENEFITS[0]];
-    h+='<div role="button" tabindex="0" onclick="App.locNudgeDismiss()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.locNudgeDismiss();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
+    h+='<div onclick="App.locNudgeDismiss()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:18px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Konum hatırlatıcısı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.locNudgeDismiss)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:26px;padding:22px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .25s ease;">';
     h+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:2px;">';
     h+='<div style="flex-shrink:0;width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#3F8A4F;background:linear-gradient(135deg,#DFF5DA,#C9E8C4);box-shadow:0 6px 16px rgba(125,190,119,0.35);">'+icon('map-pin',22)+'</div>';
     h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-headline);font-weight:800;line-height:1.25;">Hareketini görünür kılalım mı?</div><div style="font-size:var(--f-footnote);color:var(--faint);margin-top:2px;">Küçük bir dokunuş, sağlığına iyi gelir.</div></div>';
@@ -16829,8 +16850,8 @@ function modalsHTML(){
   }
   if(ui.resetStep>0){
     var two=ui.resetStep===2;
-    h+='<div role="button" tabindex="0" onclick="App.cancelReset()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.cancelReset();}" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
-    h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
+    h+='<div onclick="App.cancelReset()" style="position:fixed;inset:0;z-index:300;background:rgba(44,36,38,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;animation:seyFade .2s ease;">';
+    h+='<div role="dialog" aria-modal="true" aria-label="Verileri sıfırlama onayı" tabindex="-1" onkeydown="App.onModalKeydown(event,App.cancelReset)" onclick="event.stopPropagation()" style="width:100%;max-width:380px;background:var(--modal);border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:seyPop .25s ease;"><div style="font-size:var(--f-title3);font-weight:800;margin-bottom:8px;">'+(two?'Son adım':'Emin misin?')+'</div><p style="margin:0 0 18px;font-size:var(--f-subhead);line-height:1.5;color:var(--muted);">'+(two?'Tüm günlük kayıtların kalıcı olarak silinecek.':'Bu işlem günlük kayıtlarını siler.')+'</p><div style="display:flex;gap:10px;"><button onclick="App.cancelReset()" style="flex:1;border:1px solid var(--field-bd);cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:600;color:var(--text2);background:transparent;">Vazgeç</button><button onclick="App.resetConfirm()" style="flex:1;border:none;cursor:pointer;padding:14px;border-radius:14px;font-size:var(--f-subhead);font-weight:700;color:#fff;background:#C0605F;">'+(two?'Evet, sıfırla':'Devam et')+'</button></div></div></div>';
   }
   return h;
 }
@@ -18426,8 +18447,8 @@ function aeonAttachSheetHTML(){
     {ic:'file-text',label:'Belge',sub:'PDF, Word, Excel ve diğer dosyalar',kind:'file'},
     {ic:'music',label:'Ses dosyası',sub:'Cihazından hazır bir ses kaydı yükle',kind:'audio'}
   ];
-  var h='<div id="aeon-attach-back" role="button" tabindex="0" onclick="App.aeonCloseAttachSheet()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.aeonCloseAttachSheet();}" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
-  h+='<div onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:24px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .22s ease;">';
+  var h='<div id="aeon-attach-back" onclick="App.aeonCloseAttachSheet()" style="position:fixed;inset:0;z-index:340;background:rgba(44,36,38,0.42);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;padding:14px;animation:seyFade .2s ease;">';
+  h+='<div id="aeon-attach-dialog" role="dialog" aria-modal="true" aria-label="ÆON’a ek gönder" tabindex="-1" onkeydown="App.onModalKeydown(event,App.aeonCloseAttachSheet)" onclick="event.stopPropagation()" style="width:100%;max-width:420px;background:var(--modal);border-radius:24px;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:seyPop .22s ease;">';
   h+='<div style="padding:12px 12px 8px;font-size:var(--f-caption1);font-weight:800;letter-spacing:.4px;color:var(--faint);text-transform:uppercase;">ÆON’a gönder</div>';
   items.forEach(function(it){
     h+='<button onclick="App.aeonSheetPick(\''+it.kind+'\')" style="display:flex;align-items:center;gap:13px;text-align:left;border:none;background:none;cursor:pointer;padding:10px 12px;border-radius:16px;width:100%;">';
@@ -18439,7 +18460,7 @@ function aeonAttachSheetHTML(){
   h+='</div></div>';
   return h;
 }
-App.aeonOpenAttachSheet=function(){ if(ui.aeonUploading||aeonRec) return; ui.aeonAttachOpen=true; render(); };
+App.aeonOpenAttachSheet=function(){ if(ui.aeonUploading||aeonRec) return; ui.aeonAttachOpen=true; render(); focusModalDialog('aeon-attach-dialog'); };
 App.aeonCloseAttachSheet=function(){ ui.aeonAttachOpen=false; render(); };
 App.aeonSheetPick=function(kind){
   ui.aeonAttachOpen=false; render();

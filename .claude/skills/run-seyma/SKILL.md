@@ -1,19 +1,20 @@
 ---
 name: run-seyma
-description: Run and verify the Şeyma app safely with headless Node VM harnesses; never open the app in a browser.
+description: Run and verify the Şeyma app safely with headless Node VM harnesses and controlled local visual QA.
 ---
 
 # Şeyma — Güvenli Headless Doğrulama
 
-Şeyma statik vanilla JS/HTML/CSS uygulamasıdır. Bu skill'in amacı uygulamayı
-gerçek tarayıcıda açmadan `app.js` render yolunu ve dar state sınırlarını
-kontrol etmektir.
+Şeyma statik vanilla JS/HTML/CSS uygulamasıdır. Bu skill'in amacı başta
+headless `node:vm` ile `app.js` render yolunu ve dar state sınırlarını kontrol
+etmek; açıkça istenen görsel kabulde ise kontrollü yerel QA yürütmektir.
 
 ## Kritik veri güvenliği
 
-Uygulama browser'da açılmaz ve generic local server ile test edilmez. Eski bir
-browser profili `seyma-reset-v1` içinde gerçek token taşıyabilir; uygulama
-açılışında `save()` çalışarak `mustafaras/seyma-data` deposunu clobber edebilir.
+Uygulama generic local server veya kalıcı/gerçek browser profiliyle test
+edilmez. Eski bir browser profili `seyma-reset-v1` içinde gerçek token
+taşıyabilir; uygulama açılışında `save()` çalışarak `mustafaras/seyma-data`
+deposunu clobber edebilir.
 
 Tüm canonical harness'lar:
 
@@ -78,5 +79,18 @@ node .claude/skills/run-seyma/driver.mjs
 node .claude/skills/run-seyma/zikr-harness.mjs
 ```
 
-Gerçek browser açılmaz. Live davranış, deploy veya kullanıcı cihazı kabulü bu
-skill'in local headless PASS sonucu değildir.
+Live davranış, deploy veya kullanıcı cihazı kabulü headless PASS sonucu
+değildir. Aşağıdaki yerel görsel QA yalnız kaynak-görsel kanıtıdır.
+
+## Kontrollü ajan yerel görsel QA istisnası
+
+Kullanıcı açıkça istediğinde ajan yalnız repo kökünde, yalnız `127.0.0.1:9000`
+üzerinde statik sunucu başlatıp onu **geçici, boş ajan tarayıcı profiliyle**
+açabilir; ekran görüntüsü alabilir. Önce güncel `sync.js` Guard 1 kaynağını
+veya ilgili fixture'ı doğrula. URL `forceSync=1` içermez; profile
+`seyma-sync-force` yazılmaz. Gerçek Chrome/Safari profili, token alanları,
+parola alanları ve gerçek hesaplar asla açılmaz ya da otomatikleştirilmez.
+Güvenlik gerekçesi tokenın yokluğu değildir: Guard 1, `localhost`ta uzaktaki
+push'u token durumundan bağımsız engeller. Guard 1/2 değiştirilmez; görseller
+redakte edilir, kaynak-görsel kanıt olarak raporlanır ve ajan tur bitmeden
+sunucu durdurulur.

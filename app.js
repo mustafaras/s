@@ -4511,6 +4511,10 @@ function migrate(d){
   if(typeof d.dailyPhoto.source!=='string') d.dailyPhoto.source='Wikimedia Commons';
   if(typeof d.dailyPhoto.pageUrl!=='string') d.dailyPhoto.pageUrl='';
   if(typeof d.dailyPhoto.fetchedAt!=='string') d.dailyPhoto.fetchedAt='';
+  // Önceki sürüm yalnız tek bir fotoğraf tutuyordu. Eski kaydı tarihçeye
+  // ekleyerek hem koru hem de gün gün gezinebilir bir cache başlat.
+  if(!d.dailyPhoto.history||typeof d.dailyPhoto.history!=='object'||Array.isArray(d.dailyPhoto.history)) d.dailyPhoto.history={};
+  if(d.dailyPhoto.date&&d.dailyPhoto.url&&!d.dailyPhoto.history[d.dailyPhoto.date]) d.dailyPhoto.history[d.dailyPhoto.date]=dailyPhotoCopy(d.dailyPhoto);
   // Gün değişmişse fetchedAt'ı sıfırla, böylece stale koruması gece yarısı sonrası ilk fırsatta yeni fotoğraf çeker.
   if(d.dailyPhoto.date!==todayStr()) d.dailyPhoto.fetchedAt='';
   // Bilimsel profil değerlendirmesi (runtime'da seyma-data'dan çekilir; backfill sadece iskelet).
@@ -4667,6 +4671,7 @@ function sha256(str){
 }
 
 var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
+ui.dailyPhotoOpen=false; ui.dailyPhotoDate='';
 ui.locationGateState=(data&&data.settings&&data.settings.locationEnabled)?'checking':'required';
 ui.locationGateError='';
 ui.locationGateRequestInFlight=false;
@@ -9311,8 +9316,13 @@ App.locNudgeSnooze=function(){ closeLocNudge('later'); };
 App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
 App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optOutDay=todayStr(); ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Tamam, bugünlük kapattım — yarın yine buradayım'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
-App.toggleDailyPhoto=function(){ ui.dailyPhotoOpen=!ui.dailyPhotoOpen; render(); };
-App.refreshDailyPhoto=function(){ data.dailyPhoto.date=''; data.dailyPhoto.url=''; fetchDailyPhoto(); };
+App.toggleDailyPhoto=function(){ ui.dailyPhotoOpen=!ui.dailyPhotoOpen; render(); if(ui.dailyPhotoOpen) maybeFetchDailyPhoto(dailyPhotoSelectedDate()); };
+App.dailyPhotoMove=function(delta){
+  var step=Number(delta)<0?-1:1, target=addDays(dailyPhotoSelectedDate(),step);
+  if(target>todayStr()) return;
+  ui.dailyPhotoDate=target; ui.dailyPhotoOpen=true; render(); maybeFetchDailyPhoto(target);
+};
+App.refreshDailyPhoto=function(){ fetchDailyPhoto(dailyPhotoSelectedDate(),true); };
 function prefersReducedMotion(){ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
 // Premium akordeon: gövdeyi (.sey-collbody) ölçülmüş max-height ile yumuşakça aç/kapat.
 // Layout sıçraması yok; kapanınca DOM'u yeni (kapalı) hâle çevirir.
@@ -10635,11 +10645,39 @@ function reverseGeocodeLive(lat,lng){
 // Ücretsiz, CORS-destekli, keyless; her gün değişen, ödüllü doğa/hayvan/manzara
 // fotoğrafları. National Geographic'in resmi API'si olmadığı için en yakın,
 // yasal ve estetik eşdeğer kaynak olarak kullanılır.
-var DAILY_PHOTO_FETCHING=false;
+var DAILY_PHOTO_FETCHING={};
 var DAILY_PHOTO_NATURE_RE=new RegExp('animals|birds|mammals|insects|reptiles|amphibians|fish|marine life|wildlife|nature|landscapes|national parks|mountains|rivers|seas|lakes|forests|flowers|plants|trees|clouds|sky|water|beaches|sunrise|sunset','i');
 function stripHtml(s){
   if(s==null) return '';
   return String(s).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').replace(/&nbsp;/g,' ').trim();
+}
+function dailyPhotoCopy(p){
+  p=p&&typeof p==='object'?p:{};
+  return {date:String(p.date||''),url:String(p.url||''),title:String(p.title||''),artist:String(p.artist||''),license:String(p.license||''),description:String(p.description||''),source:String(p.source||'Wikimedia Commons Picture of the Day'),pageUrl:String(p.pageUrl||''),fetchedAt:String(p.fetchedAt||'')};
+}
+function dailyPhotoDateValid(date){ return /^\d{4}-\d{2}-\d{2}$/.test(String(date||'')); }
+function dailyPhotoSelectedDate(){
+  var today=todayStr(), selected=ui&&ui.dailyPhotoDate;
+  return dailyPhotoDateValid(selected)&&selected<=today?selected:today;
+}
+function dailyPhotoForDate(date){
+  var root=data&&data.dailyPhoto&&typeof data.dailyPhoto==='object'?data.dailyPhoto:{}, history=root.history&&typeof root.history==='object'&&!Array.isArray(root.history)?root.history:{};
+  if(history[date]&&typeof history[date]==='object') return history[date];
+  return root.date===date?root:null;
+}
+function storeDailyPhoto(photo){
+  if(!data.dailyPhoto||typeof data.dailyPhoto!=='object') data.dailyPhoto={};
+  var root=data.dailyPhoto, record=dailyPhotoCopy(photo);
+  if(!root.history||typeof root.history!=='object'||Array.isArray(root.history)) root.history={};
+  root.history[record.date]=record;
+  // Panel ve mevcut sözleşme bugünün özetini kökte bekliyor; geçmişe gidince
+  // bu özetin yerini değiştirme.
+  if(record.date===todayStr()){
+    root.date=record.date; root.url=record.url; root.title=record.title; root.artist=record.artist;
+    root.license=record.license; root.description=record.description; root.source=record.source;
+    root.pageUrl=record.pageUrl; root.fetchedAt=record.fetchedAt;
+  }
+  return record;
 }
 function pickNaturePhoto(pages){
   var keys=Object.keys(pages), best=null;
@@ -10651,23 +10689,26 @@ function pickNaturePhoto(pages){
   }
   return best||null;
 }
-function fetchDailyPhoto(){
-  if(DAILY_PHOTO_FETCHING || typeof fetch!=='function' || !data) return;
-  var today=todayStr();
-  // Aynı gün için zaten geçerli bir kayıt varsa tekrar çekme.
-  if(data.dailyPhoto && data.dailyPhoto.date===today && data.dailyPhoto.url) return;
-  DAILY_PHOTO_FETCHING=true;
-  var url='https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles=Commons:Picture_of_the_day&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*';
+function fetchDailyPhoto(date,force){
+  if(typeof fetch!=='function' || !data) return;
+  var target=dailyPhotoDateValid(date)?date:todayStr();
+  // Aynı tarihin mevcut kaydını koru; yenileme düğmesi açıkça force geçirir.
+  if(!force){ var cached=dailyPhotoForDate(target); if(cached&&cached.url) return; }
+  if(DAILY_PHOTO_FETCHING[target]) return;
+  DAILY_PHOTO_FETCHING[target]=true;
+  // Template:Potd/YYYY-MM-DD, Commons'un tarihli arşiv sözleşmesidir:
+  // gün değişince farklı, geçmişe gidince o günün gerçek POTD'si gelir.
+  var url='https://commons.wikimedia.org/w/api.php?action=query&generator=images&prop=imageinfo&titles='+encodeURIComponent('Template:Potd/'+target)+'&iiprop=url|extmetadata&gimlimit=12&format=json&origin=*';
   fetch(url).then(function(r){ return r.ok?r.json():Promise.reject(r.status); }).then(function(j){
     var pages=j&&j.query&&j.query.pages?j.query.pages:{};
     var p=pickNaturePhoto(pages);
-    if(!p || !p.imageinfo || !p.imageinfo[0]){ DAILY_PHOTO_FETCHING=false; return; }
+    if(!p || !p.imageinfo || !p.imageinfo[0]){ delete DAILY_PHOTO_FETCHING[target]; return; }
     var ii=p.imageinfo[0], em=ii.extmetadata||{};
     var title=stripHtml(em.ObjectName&&em.ObjectName.value) || stripHtml(em.ImageDescription&&em.ImageDescription.value) || '';
     var desc=stripHtml(em.ImageDescription&&em.ImageDescription.value) || title;
     if(!title && p.title){ title=stripHtml(p.title.replace(/^File:/,'').replace(/_/g,' ').replace(/\.[^.]+$/,'')); }
-    data.dailyPhoto={
-      date:today,
+    storeDailyPhoto({
+      date:target,
       url:ii.url||'',
       title:title,
       artist:stripHtml(em.Artist&&em.Artist.value),
@@ -10676,23 +10717,23 @@ function fetchDailyPhoto(){
       source:'Wikimedia Commons Picture of the Day',
       pageUrl:ii.descriptionurl||'',
       fetchedAt:new Date().toISOString()
-    };
-    DAILY_PHOTO_FETCHING=false;
+    });
+    delete DAILY_PHOTO_FETCHING[target];
     save();
     if(ui.tab==='bugun') render();
   }).catch(function(e){
-    DAILY_PHOTO_FETCHING=false;
+    delete DAILY_PHOTO_FETCHING[target];
     // Hata durumunda eski fotoğrafı koru; kart "yine de göster" mantığıyla çalışmaya devam eder.
   });
 }
-function maybeFetchDailyPhoto(){
+function maybeFetchDailyPhoto(date){
   if(!data || !data.dailyPhoto) return;
-  var today=todayStr();
-  var last=data.dailyPhoto.fetchedAt?new Date(data.dailyPhoto.fetchedAt).getTime():0;
-  var stale=!data.dailyPhoto.date || data.dailyPhoto.date!==today;
+  var target=dailyPhotoDateValid(date)?date:todayStr(), photo=dailyPhotoForDate(target);
+  var last=photo&&photo.fetchedAt?new Date(photo.fetchedAt).getTime():0;
+  var stale=!photo || !photo.url;
   var recent=Date.now()-last < 10*60*1000;
-  if(!stale) return; // bugünün fotoğrafı güncelse hiçbir şey yapma
-  if(!recent && !DAILY_PHOTO_FETCHING){ fetchDailyPhoto(); }
+  if(!stale) return; // istenen günün fotoğrafı önbellekteyse tekrar çekme
+  if(!recent && !DAILY_PHOTO_FETCHING[target]) fetchDailyPhoto(target);
 }
 function wxMeta(code,isDay){
   var c=code;
@@ -12057,7 +12098,7 @@ function rasitContactHTML(){
 }
 // ── Günün Fotoğrafı kartı: Wikimedia Commons POTD, National Geographic estetiğinde ──
 function dailyPhotoCardHTML(){
-  var p=data.dailyPhoto||{};
+  var photoDate=dailyPhotoSelectedDate(), isTodayPhoto=photoDate===todayStr(), p=dailyPhotoForDate(photoDate)||{};
   var hasUrl=!!p.url;
   var open=!!ui.dailyPhotoOpen;
   var accent=dark?'#F4C980':'#8A5A2B';
@@ -12077,6 +12118,13 @@ function dailyPhotoCardHTML(){
   h+='</div>';
   h+='</div>';
   if(open){
+    // Tarihçe yalnız görünüm durumudur; kaydedilen fotoğraflar tarih anahtarıyla
+    // data.dailyPhoto.history altında kalır. Geleceğe geçiş kapalıdır.
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 16px 11px;">';
+    h+='<button type="button" onclick="event.stopPropagation();App.dailyPhotoMove(-1)" aria-label="Önceki günün fotoğrafı" title="Önceki gün" style="width:32px;height:32px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-left',16)+'</button>';
+    h+='<div aria-live="polite" style="flex:1;text-align:center;font-size:var(--f-caption1);font-weight:800;color:'+muted+';">'+esc(dateLabelTR(photoDate))+(isTodayPhoto?' · Bugün':'')+'</div>';
+    h+='<button type="button" onclick="event.stopPropagation();App.dailyPhotoMove(1)" aria-label="Sonraki günün fotoğrafı" title="Sonraki gün"'+(isTodayPhoto?' disabled':'')+' style="width:32px;height:32px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:'+(isTodayPhoto?'default':'pointer')+';opacity:'+(isTodayPhoto?'.38':'1')+';display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-right',16)+'</button>';
+    h+='</div>';
     // Görsel alanı (açıkken göster)
     h+='<div class="sey-collbody" style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
     if(hasUrl){
@@ -12095,7 +12143,7 @@ function dailyPhotoCardHTML(){
     }else{
      h+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:'+muted+';">';
      h+='<span style="opacity:.7;">'+icon('image',40)+'</span>';
-     h+='<div style="font-size:var(--f-footnote);font-weight:700;">Bugünün fotoğrafı yükleniyor…</div>';
+     h+='<div style="font-size:var(--f-footnote);font-weight:700;">'+(isTodayPhoto?'Bugünün':'Bu günün')+' fotoğrafı yükleniyor…</div>';
      h+='</div>';
     }
     h+='</div>';

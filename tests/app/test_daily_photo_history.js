@@ -84,9 +84,12 @@ function settled(){ return new Promise(function(resolve){ setImmediate(resolve);
   context.App.dailyPhotoMove(-1);
   assert('önceki gün düğmesi seçimi geriye taşır ve cachedeki fotoğrafı yeniden çekmez',ui.dailyPhotoDate===PREVIOUS&&requested.length===2);
 
+  // Kart, eski görünüm durumu "kapalı" gelse bile her zaman açık kalır.
+  ui.dailyPhotoOpen=false;
   var html=context.dailyPhotoCardHTML();
   assert('kart seçilmiş geçmiş tarih ve iki yönlü gezinme kontrolünü gösterir',html.indexOf(PREVIOUS)>=0&&html.indexOf('App.dailyPhotoMove(-1)')>=0&&html.indexOf('App.dailyPhotoMove(1)')>=0);
   assert('kart geçmiş seçildiğinde geçmiş görseli gösterir',html.indexOf('https://images.example/previous.jpg')>=0);
+  assert('kart kapalı görünüm durumu gelse de açık içerik ve görseli gösterir',html.indexOf('sey-collbody')>=0&&html.indexOf('Dokun, açalım')<0&&html.indexOf('App.toggleDailyPhoto()')<0);
 
   assert('fotoğraf fetchi yalnız sentetik save/render sınırını kullanır',saves===2&&renders===3,'save='+saves+', render='+renders);
 

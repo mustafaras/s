@@ -4445,6 +4445,7 @@ function migrate(d){
   if(typeof d.settings.healthGistId!=='string') d.settings.healthGistId='';
   if(typeof d.settings.hideLocationCard!=='boolean') d.settings.hideLocationCard=false;
   if(typeof d.settings.hideRepoBanner!=='boolean') d.settings.hideRepoBanner=false;
+  if(typeof d.settings.hideVacationCard!=='boolean') d.settings.hideVacationCard=false;
   if(typeof d.settings.profileAssessmentInactive!=='boolean') d.settings.profileAssessmentInactive=true;
   if(d.settings.caffeineMode!=='standard'&&d.settings.caffeineMode!=='sensitive'&&d.settings.caffeineMode!=='pregnant') d.settings.caffeineMode='standard';
   if(typeof d.settings.targetBed!=='string'||!/^\d{2}:\d{2}$/.test(d.settings.targetBed)) d.settings.targetBed=CAFFEINE_DEFAULT_BED;
@@ -4675,7 +4676,7 @@ function sha256(str){
 }
 
 var ui={tab:'bugun', crisisKind:null, crisisOpts:[], crisisTriggers:[], crisisNote:'', crisisDone:false, crisisTrigOpen:false, crisisTriedOpen:false, dayDetail:null, emergency:false, resetStep:0, noteIndex:0, forceStart:false, authRemember:false, authError:false, authErrorMsg:'', authUnlocked:false, pendingAuth:null, pulse:null, keyEdit:false, saveState:'clean', saveActionPending:false, readingOpen:false, readingDraft:null, readingView:'today', bookEdit:null, logBookId:null, quoteDraft:null, watchOpen:false, watchDraft:null, watchView:'today', titleEdit:null, logItemId:null, replicaDraft:null, lunaDraft:'', aeonDraft:'', askKind:null, askQuestion:'', lunaError:null, aeonError:null, openaiKeyState:null, stepNudgeHidden:false, stepRemindHidden:false, waterNudgeHidden:false, bodyView:'front', aeonScrollBottom:false, locationConsent:false, editDate:null, editStartMs:0, weatherOpen:false, heatYear:null, locNudgeOpen:false, locNudgeShown:[], aeonShowAllHistory:false, aeonExpanded:{}, healthSetupOpen:false, aeonRecActive:false, aeonUploading:false, aeonAttachOpen:false, motivationMinimumOpen:false, motivationReflectionDraft:'', motivationCardOpen:false, learningOpen:false, learningDraft:null, soulArchiveOpen:false, soulPracticePicker:false, soulActivityOpen:false, soulActivityDraft:null, faithOpen:false, faithTab:'oz', faithHeatYear:null, zikrView:'counter', zikrPresetFilter:'', zikrTopic:'all', zikrFiltersOpen:false, zikrResetPending:false, zikrResetPresetId:'', zikrLastReset:null, zikrActionNote:'', zikrSettingsNote:'', zikrRemoveHatimId:'', zikrPresetDraft:null, zikrOpen:false, qiblaOpen:false, qiblaHeading:null, qiblaListening:false, saygiKey:null, saygiBrowseId:null, saygiArticle:null, saygiLoading:false, saygiError:null, saygiReadReady:false, saygiRequestId:0, roomTab:'path', roomTool:null, roomProfileFetchState:'idle', roomProfileError:null, roomBreathActive:false, roomBreathTimer:null, roomDecisionTimer:null, roomFirstTimer:null, cards:{}, cardsInit:false, reminderCenterOpen:false, reminderReturnFocusId:'', reminderTargetReturnFocusId:'', reminderPreviewId:'', reminderPreviewLegacyId:'', reminderTodayMuted:false, reminderInboxTodayMuted:false, reminderSetupCategories:[], reminderMedicationDraft:null, reminderMedicationEditingId:'', reminderMedicationError:'', reminderCenterNotice:'', reminderCenterUndo:null, reminderAllUndo:null, reminderHistoryUndo:null, reminderTestState:null, reminderDigestOpen:false, reminderDigestState:'idle', reminderDigestReflection:'', saygiPersonOpen:false, quranJourneyOpen:false, quranJourneyView:'library', quranDetailId:'', quranQuery:'', quranFilter:'all', quranFiltersOpen:false, quranListScroll:0, quranSubmittingId:'', quranNoteDraft:null, quranRemoteStatus:'idle', quranRemoteError:'', quranRemoteCheckedAt:null, quranRefreshing:false, quranVerseIdx:quranRandomVerseStart()};
-ui.dailyPhotoOpen=false; ui.dailyPhotoDate='';
+ui.dailyPhotoOpen=true; ui.dailyPhotoDate='';
 ui.locationGateState=(data&&data.settings&&data.settings.locationEnabled)?'checking':'required';
 ui.locationGateError='';
 ui.locationGateRequestInFlight=false;
@@ -4905,6 +4906,7 @@ function waterGoalCups(date){
 }
 function vacationSettings(){ return (data&&data.settings&&data.settings.vacation)||{enabled:false,startAt:'',endAt:'',preset:'active',reason:'',enabledAt:''}; }
 function ensureVacationSettings(){ if(!data.settings) data.settings={}; if(!data.settings.vacation||typeof data.settings.vacation!=='object') data.settings.vacation={enabled:false,startAt:'',endAt:'',preset:'active',reason:'',enabledAt:''}; return data.settings.vacation; }
+function vacationCardHidden(){ return !!(data&&data.settings&&data.settings.hideVacationCard); }
 function isVacationDay(date){ var v=vacationSettings(); if(!v.enabled||!v.startAt||!v.endAt) return false; var d=(date||todayStr()); return d>=v.startAt&&d<=v.endAt; }
 function stepsGoal(date){ var d=date||todayStr(); if(isVacationDay(d)){ var p=(vacationSettings().preset||'relaxed'); return p==='active'?12000:(p==='moderate'?9000:5000); } var t=(data.settings&&data.settings.targets)||{}; return (typeof t.steps==='number'&&!isNaN(t.steps))?t.steps:9000; }
 function sleepGoalHours(date){ var d=date||todayStr(); if(isVacationDay(d)) return SLEEP_TICK_MIN-0.5; var t=(data.settings&&data.settings.targets)||{}; return (typeof t.sleepHours==='number'&&!isNaN(t.sleepHours))?t.sleepHours:SLEEP_TICK_MIN; }
@@ -9023,8 +9025,8 @@ App.onGratitude=function(i,el){ var v=el.value; i=Number(i)||0; debounceSave('gr
 App.setWalkSteps=function(el){ var raw=el.value; debounceSave('walkS',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.steps=(v==null||isNaN(v))?null:Math.round(v); var nw=syncDerivedHabits(day); if(nw.indexOf('walked20')>=0){ haptic(16); toast('Yürüyüş tiki kendiliğinden yeşillendi. 4.500+ adım, harika!'); } day.savedAt=new Date().toISOString(); save(); }); };
 App.hideStepNudge=function(){ ui.stepNudgeHidden=true; render(); };
 // Kalıcı kart gizleme/geri getirme (settings'te tutulur; Ayarlar > Gizlenen kartlar'dan geri gelir).
-App.hideBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location'){ data.settings.hideLocationCard=true; toast('Konum & Hareket gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='repo'){ data.settings.hideRepoBanner=true; toast('Repoya bağlan gizlendi · Ayarlar’dan geri getirebilirsin'); } haptic(10); save(); render(); };
-App.showBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location') data.settings.hideLocationCard=false; else if(which==='repo') data.settings.hideRepoBanner=false; haptic(10); save(); render(); };
+App.hideBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location'){ data.settings.hideLocationCard=true; toast('Konum & Hareket gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='repo'){ data.settings.hideRepoBanner=true; toast('Repoya bağlan gizlendi · Ayarlar’dan geri getirebilirsin'); } else if(which==='vacation'){ data.settings.hideVacationCard=true; toast('Tatil Modu gizlendi · Ayarlar’dan geri getirebilirsin'); } haptic(10); save(); render(); };
+App.showBugunCard=function(which){ if(!data.settings) data.settings={}; if(which==='location') data.settings.hideLocationCard=false; else if(which==='repo') data.settings.hideRepoBanner=false; else if(which==='vacation') data.settings.hideVacationCard=false; haptic(10); save(); render(); };
 App.hideStepRemind=function(){ ui.stepRemindHidden=true; render(); };
 App.hideWaterNudge=function(){ ui.waterNudgeHidden=true; render(); };
 App.setWalkMinutes=function(el){ var raw=el.value; debounceSave('walkM',function(){ var day=curDay(); var v=raw===''?null:Number(raw); day.walk.minutes=(v==null||isNaN(v))?null:Math.round(v); day.savedAt=new Date().toISOString(); save(); }); };
@@ -9320,7 +9322,7 @@ App.locNudgeSnooze=function(){ closeLocNudge('later'); };
 App.locNudgeDismiss=function(){ closeLocNudge('dismiss'); };
 App.locNudgeOptOut=function(){ var ln=ensureLocNudge(); if(ln) ln.optOutDay=todayStr(); ui.locNudgeOpen=false; ui.locNudgeShown=[]; save(); render(); toast('Tamam, bugünlük kapattım — yarın yine buradayım'); };
 App.toggleWeather=function(){ ui.weatherOpen=!ui.weatherOpen; render(); };
-App.toggleDailyPhoto=function(){ ui.dailyPhotoOpen=!ui.dailyPhotoOpen; render(); if(ui.dailyPhotoOpen) maybeFetchDailyPhoto(dailyPhotoSelectedDate()); };
+App.toggleDailyPhoto=function(){ ui.dailyPhotoOpen=true; render(); maybeFetchDailyPhoto(dailyPhotoSelectedDate()); };
 App.dailyPhotoMove=function(delta){
   var step=Number(delta)<0?-1:1, target=addDays(dailyPhotoSelectedDate(),step);
   if(target>todayStr()) return;
@@ -10858,7 +10860,8 @@ function vacationCardHTML(rec){
     : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 6px 18px rgba(42,157,143,0.08),inset 0 1px 0 rgba(255,255,255,0.28);';
   var h='<div class="surface sey-vacation-card" data-cardkey="vacation" data-open="'+(open?'1':'0')+'" style="position:relative;overflow:hidden;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+'">';
   h+='<span class="sey-vacation-sheen" style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);animation:seyShimmer 3.2s ease-in-out infinite;pointer-events:none;"></span>';
-  h+='<button type="button" class="sey-asbtn" onclick="App.toggleVacationCard()" aria-expanded="'+(open?'true':'false')+'" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:11px;">';
+  h+='<div style="position:relative;display:flex;align-items:center;gap:9px;">';
+  h+='<button type="button" class="sey-asbtn" onclick="App.toggleVacationCard()" aria-expanded="'+(open?'true':'false')+'" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:center;gap:11px;">';
   h+='<span style="display:inline-flex;color:'+accent+';">'+icon('plane',20)+'</span>';
   var badgeColor=active?accentHex:(planned?hexA(accentHex,0.85):(dark?'rgba(169,160,155,0.85)':'rgba(120,113,108,0.8)'));
   var badgeBg=active?hexA(accentHex,0.14):(planned?hexA(accentHex,0.09):(dark?'rgba(169,160,155,0.18)':'rgba(120,113,108,0.12)'));
@@ -10872,6 +10875,8 @@ function vacationCardHTML(rec){
   h+='<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sub+'</div></div>';
   h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',14)+'</span>';
   h+='</button>';
+  h+='<button type="button" onclick="App.hideBugunCard(\'vacation\')" aria-label="Tatil Modu kartını gizle" title="Gizle" style="flex-shrink:0;min-height:44px;border:none;cursor:pointer;background:rgba(150,110,120,0.12);color:var(--muted);font-size:var(--f-caption2);font-weight:800;letter-spacing:.2px;padding:6px 12px;border-radius:999px;line-height:1;">Gizle</button>';
+  h+='</div>';
   if(open){
     h+='<div style="position:relative;display:flex;flex-direction:column;gap:12px;animation:seyFade .2s ease;">';
     h+='<div style="display:flex;align-items:center;justify-content:space-between;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text2);">Tatil modunu aç</div><button onclick="App.setVacationEnabled('+(v.enabled?'false':'true')+')" style="border:none;cursor:pointer;border-radius:999px;padding:7px 13px;font-size:var(--f-footnote);font-weight:800;color:'+(v.enabled?'#fff':'var(--text2)')+';background:'+(v.enabled?'linear-gradient(135deg,'+accentHex+','+hexA(accentHex,0.75)+')':'var(--field)')+';" data-on="'+(v.enabled?'1':'0')+'">'+(v.enabled?'Kapat':'Aç')+'</button></div>';
@@ -12105,33 +12110,29 @@ function rasitContactHTML(){
 function dailyPhotoCardHTML(){
   var photoDate=dailyPhotoSelectedDate(), isTodayPhoto=photoDate===todayStr(), p=dailyPhotoForDate(photoDate)||{};
   var hasUrl=!!p.url;
-  var open=!!ui.dailyPhotoOpen;
   var accent=dark?'#F4C980':'#8A5A2B';
   var cardBg=dark?'linear-gradient(145deg,#141012,#0B0B0D)':'linear-gradient(145deg,#FFF8F0,#FDF6ED)';
   var border=dark?'1px solid rgba(244,201,128,0.20)':'1px solid rgba(138,90,43,0.16)';
   var muted=dark?'#C8B9A6':'#8A6A52';
-  var h='<div class="surface sey-daily-photo" onclick="App.toggleDailyPhoto()" role="button" tabindex="0" aria-expanded="'+(open?'true':'false')+'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();App.toggleDailyPhoto();}" style="cursor:pointer;position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
-  // Başlık şeridi (Günışığı kartıyla aynı aç/kapa deseni)
+  var h='<section class="surface sey-daily-photo" aria-label="Günün Fotoğrafı" style="position:relative;overflow:hidden;border-radius:24px;background:'+cardBg+';border:'+border+';box-shadow:'+(dark?'0 16px 38px rgba(0,0,0,0.42)':'0 14px 32px rgba(138,90,43,0.16)')+';display:flex;flex-direction:column;">';
+  // Başlık şeridi
   h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">';
   h+='<div style="display:flex;align-items:center;gap:9px;">';
   h+='<span style="width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' '+(dark?'16':'18')+'%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,'+(dark?'0.08':'0.45')+');">'+icon('camera',17)+'</span>';
   h+='<div><div style="font-size:var(--f-caption1);font-weight:900;letter-spacing:1.2px;color:'+accent+';">GÜNÜN FOTOĞRAFI</div><div style="font-size:var(--f-caption2);color:'+muted+';font-weight:700;">Wikimedia Commons · Picture of the Day</div></div>';
   h+='</div>';
   h+='<div style="display:flex;align-items:center;gap:4px;">';
-  h+='<button onclick="event.stopPropagation();App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
-  h+='<span style="color:'+accent+';transition:transform .2s;display:inline-flex;transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
+  h+='<button type="button" onclick="App.refreshDailyPhoto()" aria-label="Yenile" title="Yenile" style="flex-shrink:0;border:none;background:transparent;cursor:pointer;width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';transition:transform .2s;">'+icon('rotate-ccw',16)+'</button>';
   h+='</div>';
   h+='</div>';
-  if(open){
-    // Tarihçe yalnız görünüm durumudur; kaydedilen fotoğraflar tarih anahtarıyla
-    // data.dailyPhoto.history altında kalır. Geleceğe geçiş kapalıdır.
-    h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 16px 11px;">';
-    h+='<button type="button" onclick="event.stopPropagation();App.dailyPhotoMove(-1)" aria-label="Önceki günün fotoğrafı" title="Önceki gün" style="width:32px;height:32px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-left',16)+'</button>';
-    h+='<div aria-live="polite" style="flex:1;text-align:center;font-size:var(--f-caption1);font-weight:800;color:'+muted+';">'+esc(dateLabelTR(photoDate))+(isTodayPhoto?' · Bugün':'')+'</div>';
-    h+='<button type="button" onclick="event.stopPropagation();App.dailyPhotoMove(1)" aria-label="Sonraki günün fotoğrafı" title="Sonraki gün"'+(isTodayPhoto?' disabled':'')+' style="width:32px;height:32px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:'+(isTodayPhoto?'default':'pointer')+';opacity:'+(isTodayPhoto?'.38':'1')+';display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-right',16)+'</button>';
-    h+='</div>';
-    // Görsel alanı (açıkken göster)
-    h+='<div class="sey-collbody" style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
+  // Tarihçe yalnız görünüm durumudur; kaydedilen fotoğraflar tarih anahtarıyla
+  // data.dailyPhoto.history altında kalır. Geleceğe geçiş kapalıdır.
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 16px 11px;">';
+  h+='<button type="button" onclick="App.dailyPhotoMove(-1)" aria-label="Önceki günün fotoğrafı" title="Önceki gün" style="width:44px;height:44px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-left',16)+'</button>';
+  h+='<div aria-live="polite" style="flex:1;text-align:center;font-size:var(--f-caption1);font-weight:800;color:'+muted+';">'+esc(dateLabelTR(photoDate))+(isTodayPhoto?' · Bugün':'')+'</div>';
+  h+='<button type="button" onclick="App.dailyPhotoMove(1)" aria-label="Sonraki günün fotoğrafı" title="Sonraki gün"'+(isTodayPhoto?' disabled':'')+' style="width:44px;height:44px;border-radius:50%;border:1px solid '+border+';background:transparent;cursor:'+(isTodayPhoto?'default':'pointer')+';opacity:'+(isTodayPhoto?'.38':'1')+';display:inline-flex;align-items:center;justify-content:center;color:'+accent+';">'+icon('chevron-right',16)+'</button>';
+  h+='</div>';
+  h+='<div class="sey-collbody" style="position:relative;margin:0 12px 12px;border-radius:18px;overflow:hidden;background:'+(dark?'#0F0D0E':'#EDE5DB')+';aspect-ratio:4/3;">';
     if(hasUrl){
      h+='<img src="'+esc(p.url)+'" alt="'+esc(p.title||'Günün fotoğrafı')+'" loading="eager" onload="this.style.opacity=1" style="display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease;">';
      h+='<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.28) 40%,transparent 70%);pointer-events:none;"></div>';
@@ -12151,23 +12152,8 @@ function dailyPhotoCardHTML(){
      h+='<div style="font-size:var(--f-footnote);font-weight:700;">'+(isTodayPhoto?'Bugünün':'Bu günün')+' fotoğrafı yükleniyor…</div>';
      h+='</div>';
     }
-    h+='</div>';
-  } else {
-    // Kapalıyken minimal önizleme: küçük thumbnail + başlık
-    h+='<div style="display:flex;align-items:center;gap:10px;padding:0 16px 12px;margin-top:-4px;">';
-    if(hasUrl){
-      h+='<div style="width:52px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;background:'+(dark?'#0F0D0E':'#EDE5DB')+';"><img src="'+esc(p.url)+'" alt="" style="width:100%;height:100%;object-fit:cover;"></div>';
-    } else {
-      h+='<div style="width:52px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;background:'+(dark?'#0F0D0E':'#EDE5DB')+';display:flex;align-items:center;justify-content:center;color:'+muted+';">'+icon('image',20)+'</div>';
-    }
-    h+='<div style="flex:1;min-width:0;">';
-    if(p.title) h+='<div style="font-size:var(--f-footnote);font-weight:800;color:'+(dark?'#F7F0E8':'#5A3A26')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.title)+'</div>';
-    h+='<div style="font-size:var(--f-caption2);color:'+muted+';font-weight:600;">Dokun, açalım · '+(p.source||'Wikimedia Commons')+'</div>';
-    h+='</div>';
-    h+='<span style="color:'+accent+';">'+icon('chevron-down',14)+'</span>';
-    h+='</div>';
-  }
   h+='</div>';
+  h+='</section>';
   return h;
 }
 function bugunHTML(){
@@ -12191,14 +12177,14 @@ function bugunHTML(){
   var h='<div style="animation:seyFade .3s ease;display:flex;flex-direction:column;gap:14px;">';
   // ── En üst: repoya bağlan şeridi → hava (Günışığı) → Raşit'in sözü → konum → hero ──
   if(!ed){
+    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — günün ilk kartı, her zaman açık
     h+=saveBanner();
     if(shouldShowAeonNotifyBanner()) h+=aeonNotifyBannerHTML({context:'bugun'});
     h+=locationCardHTML(); // Konum & Hareket: repoya bağlan şeridinin hemen altında
-    h+=vacationCardHTML(); // Tatil Modu — Günışığı hava kartının hemen üstünde
+    if(!vacationCardHidden()) h+=vacationCardHTML(); // Tatil Modu — kullanıcı isterse Ayarlar'dan geri getirir
     h+=weatherHeaderHTML(_greet);
     h+=journalLightCardHTML(rec, streak); // Günlük Işığı — Günışığı hava kartının hemen altında
     h+=reminderInboxCardHTML(); // REM-12 — native kanal olmadan bugünün sakin inbox yüzeyi
-    h+=dailyPhotoCardHTML(); // Günün Fotoğrafı — Günlük Işığı kartının hemen altında
     h+=rasitBubbleHTML(curIdx);
     h+=rasitContactHTML(); // Raşit'e yaz / ara — notlar kartının hemen altında (premium ikili)
   }
@@ -13257,10 +13243,11 @@ function ayarlarHTML(){
   h+='</div>';
   // Gizlenen kartlar — yalnızca kullanıcı bir kartı sakladıysa görünür (kilitlenme yok).
   var sgh=data.settings||{};
-  if(sgh.hideLocationCard||sgh.hideRepoBanner){
+  if(sgh.hideLocationCard||sgh.hideRepoBanner||sgh.hideVacationCard){
     h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">Gizlenen kartlar '+icon('sparkles',15)+'</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Bugün ekranında sakladığın kartları tek dokunuşla geri getir.</div>';
     if(sgh.hideRepoBanner) h+='<button onclick="App.showBugunCard(\'repo\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:var(--f-subhead);font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--accent-ink);">'+icon('link-2',16)+'</span><span style="flex:1;text-align:left;">Repoya bağlan şeridi</span><span style="font-size:var(--f-footnote);font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
     if(sgh.hideLocationCard) h+='<button onclick="App.showBugunCard(\'location\')" style="display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:var(--f-subhead);font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:#3F9A4F;">'+icon('map-pin',16)+'</span><span style="flex:1;text-align:left;">Konum & Hareket kartı</span><span style="font-size:var(--f-footnote);font-weight:800;color:var(--accent-ink);">Geri getir</span></button>';
+    if(sgh.hideVacationCard) h+='<button onclick="App.showBugunCard(\'vacation\')" style="min-height:44px;display:flex;align-items:center;gap:9px;border:1px solid var(--field-bd);cursor:pointer;padding:12px 13px;border-radius:13px;font-size:var(--f-subhead);font-weight:700;color:var(--text);background:var(--card);"><span style="display:inline-flex;color:var(--vacation);">'+icon('plane',16)+'</span><span style="flex:1;text-align:left;">Tatil Modu kartı</span><span style="font-size:var(--f-footnote);font-weight:800;color:var(--accent-ink);">Tatil Modunu Göster</span></button>';
     h+='</div>';
   }
   h+=settingsBtn('App.printReport()','Rapor oluştur / PDF',icon('file-text',17));

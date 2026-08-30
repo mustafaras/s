@@ -3,7 +3,7 @@
 **Tarih:** 2026-08-30
 **Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme Planı
 **Kaynak uygulama:** `/Users/m_ras/Desktop/seyma` (kod değiştirilmiyor)
-**Plan sürümü:** 2.2
+**Plan sürümü:** 2.3
 
 ## Durum
 
@@ -22,13 +22,14 @@ Planlama/spec aşaması tamamlandı; kod değiştirilmedi. Plan, FX’ten önce 
 - `SAFEGUARDS.md` v2.1 — `mediaFx.js` referansları ve 6 test fixture listesi eklendi.
 - `REVIEW-CHECKLIST.md` v2.1 — `App.*` yüzeyi ve inline `onclick` korunması güncellendi.
 - `NEXT-STEPS.md` v2.2 — tamamlananlar/görevler güncellendi.
-- `tests/app/` altına 6 çalışan headless test fixture'ı eklendi:
+- `tests/app/` altına 7 çalışan headless test fixture'ı eklendi:
   - `test_premium_audio_fx.js` (13/13)
   - `test_premium_haptics_fx.js` (12/12)
   - `test_premium_reduced_motion.js` (22/22)
   - `test_premium_launch_splash.js` (11/11)
   - `test_premium_time_theme.js` (24/24)
-  - `test_modularization_boundary.js` (16/16) ← yeni Faz -1 sınır fixture'ı
+  - `test_modularization_boundary.js` (16/16) ← Faz -1 sınır fixture'ı
+  - `test_faz_minus11_boundary.js` (13/13) ← PR -1.1 öncesi expose sınır fixture'ı
 
 ## Devam Eden
 

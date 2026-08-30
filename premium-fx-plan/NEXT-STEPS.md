@@ -24,8 +24,10 @@
 
 ## Sırada Yapılacaklar
 
-1. [ ] Kullanıcı onayı alındıktan sonra Faz -1 (`app.js` modülerleştirme) implementasyonuna başla.
-2. [ ] İlk PR: `dateUtils.js` + `helpers.js` + `mediaFx.js` + `timeTheme.js` + `test_modularization_boundary.js` güncellemeleri.
+1. [x] Kod değiştirilmeden modül API yüzeyi ve geçiş PR rehberi tamamlandı (`API-TRANSITION-GUIDE.md`).
+2. [x] PR -1.1 öncesi sınır testi eklendi (`test_faz_minus11_boundary.js`).
+3. [ ] Kullanıcı onayı alındıktan sonra Faz -1 (`app.js` modülerleştirme) implementasyonuna başla.
+4. [ ] İlk PR: `dateUtils.js` + `helpers.js` + `mediaFx.js` + `timeTheme.js` + `index.html` yükleme sırası.
 
 ## Kısıtlamalar
 

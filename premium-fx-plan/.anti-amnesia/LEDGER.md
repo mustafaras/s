@@ -18,3 +18,5 @@
 | 12 | 2026-08-30 | GitHub Copilot | tests-v2.2 | `tests/app/test_modularization_boundary.js` eklendi: Faz -1 modül sınırı, `index.html` yükleme sırası, `App.*` yüzeyi ve IIFE/global expose kontrollerini içerir; 16/16 PASS. |
 | 13 | 2026-08-30 | GitHub Copilot | validation-v2.2 | Tüm mevcut headless testler (`test_faz10_sync.js`, `driver.mjs`, `zikr-harness.mjs`) ve 6 yeni premium FX fixture'ı başarıyla çalıştırıldı. |
 | 14 | 2026-08-30 | GitHub Copilot | anti-amnesia-v2.2 | `CURRENT-STATE.md`, `NEXT-STEPS.md` ve `LEDGER.md` v2.2 güncellendi; Opus 5 devir iptali yansıtıldı, planlama tamamlandı, kullanıcı onayı bekleniyor. |
+| 15 | 2026-08-30 | GitHub Copilot | deep-plan-v2.3 | Kod değiştirilmeden `API-TRANSITION-GUIDE.md` eklendi: her modül için `window.*` API yüzeyleri, geçiş PR dizilimi, test stratejisi ve `index.html` son hali tanımlandı. |
+| 16 | 2026-08-30 | GitHub Copilot | tests-v2.3 | `tests/app/test_faz_minus11_boundary.js` eklendi: PR -1.1 öncesi yeni modüllerin henüz var olmadığını, `index.html`'de yüklenmediğini ve `App.*` içinde `SeyAudio/SeyHaptics/SeyTimeTheme/SeymaDateUtils/SeymaHelpers` çağrılmadığını doğrular; 13/13 PASS. |

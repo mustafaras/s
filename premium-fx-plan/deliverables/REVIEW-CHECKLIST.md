@@ -42,6 +42,7 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [ ] `node tests/app/test_premium_launch_splash.js` geçiyor.
 - [ ] `node tests/app/test_premium_time_theme.js` geçiyor.
 - [ ] `node tests/app/test_modularization_boundary.js` geçiyor.
+- [ ] `node tests/app/test_faz_minus11_boundary.js` geçiyor.
 - [ ] `node docs/apple-design/verify-contrast.mjs` geçiyor.
 - [ ] `node docs/apple-design/verify-theme-tristate.mjs` geçiyor.
 - [ ] Yeni premium fixture'ları çalışıyor.

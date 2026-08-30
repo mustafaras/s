@@ -127,6 +127,7 @@ node tests/app/test_premium_reduced_motion.js
 node tests/app/test_premium_launch_splash.js
 node tests/app/test_premium_time_theme.js
 node tests/app/test_modularization_boundary.js
+node tests/app/test_faz_minus11_boundary.js
 node docs/apple-design/verify-contrast.mjs
 node docs/apple-design/verify-theme-tristate.mjs
 ```
@@ -139,6 +140,7 @@ node docs/apple-design/verify-theme-tristate.mjs
 - `tests/app/test_premium_launch_splash.js`
 - `tests/app/test_premium_time_theme.js`
 - `tests/app/test_modularization_boundary.js`
+- `tests/app/test_faz_minus11_boundary.js`
 
 Mevcut kontrast ve tema fixture'ları:
 - `docs/apple-design/verify-contrast.mjs`

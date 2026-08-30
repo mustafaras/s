@@ -1,5 +1,7 @@
 # Şeyma Premium FX Planı — Güvenlik, Erişilebilirlik ve Veri Kısıtları
 
+**Sürüm:** v2.1 — 2026-08-30
+
 **Amaç:** Planın uygulanması sırasında asla kırılmaması gereken kuralları netleştirmek.
 
 ---
@@ -26,7 +28,17 @@ settings.launchRitual
 
 ### 1.3 Sync Payload Kuralı
 
-`sync.js` içindeki `sanitize()` fonksiyonu, yeni `settings` alanlarını zaten default olarak senkronize eder (settings zaten sync içinde). Bu alanlar kişisel tercihlerdir; senkronize edilebilir.
+`sync.js` içindeki `sanitize()` fonksiyonu, `data.settings.*` altındaki tüm alanları zaten varsayılan olarak senkronize eder (`settings` zaten sync payload’ının içinde). Bu nedenle yeni premium tercih alanları da mutlaka `settings` altında tanımlanmalı; başka bir kök/namespace altına eklenmemeli.
+
+```js
+// Doğru: tercihler settings altında kalır, sync.js onları zaten senkronize eder
+settings.premiumAtmosphere
+settings.uiSounds
+settings.voiceGuidance
+settings.ambientSounds
+settings.richHaptics
+settings.launchRitual
+```
 
 **Asla sync payload’a eklenmemesi gerekenler:**
 - Audio context state
@@ -48,7 +60,16 @@ Tüm yeni animasyon ve geçişler, `@media (prefers-reduced-motion: reduce)` alt
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .sey-fx-animated {
+  .sey-fx-animated,
+  .sey-fx-shimmer,
+  .sey-fx-ripple,
+  .sey-fx-float,
+  .sey-fx-count,
+  .sey-fx-bounce,
+  .sey-fx-splash,
+  .sey-fx-time-theme,
+  .sey-fx-aurora,
+  .sey-fx-nav-bounce {
     animation: none !important;
     transition: none !important;
   }
@@ -67,7 +88,7 @@ Tüm yeni animasyon ve geçişler, `@media (prefers-reduced-motion: reduce)` alt
 
 ### 2.4 Görsel Kontrast
 
-- Tüm yeni gradient, glow ve arka plan efektleri, mevcut kontrast fixture’larından (`verify-contrast.mjs`) geçmeli.
+- Tüm yeni gradient, glow ve arka plan efektleri, mevcut kontrast fixture’larından (`docs/apple-design/verify-contrast.mjs`) geçmeli.
 - Metin okunabilirliği asla riske atılmamalı.
 
 ---
@@ -96,11 +117,18 @@ GitHub Pages statik hosting için CSP etkisi sınırlı; ama yeni inline script/
 
 ```bash
 node --check app.js
-node --check app/core/audioFx.js   # varsa
+node --check app/core/mediaFx.js
 node .claude/skills/run-seyma/driver.mjs
+node .claude/skills/run-seyma/zikr-harness.mjs
+node tests/panel/test_faz11_panel.js
 node tests/app/test_premium_audio_fx.js
 node tests/app/test_premium_haptics_fx.js
 node tests/app/test_premium_reduced_motion.js
+node tests/app/test_premium_launch_splash.js
+node tests/app/test_premium_time_theme.js
+node tests/app/test_modularization_boundary.js
+node docs/apple-design/verify-contrast.mjs
+node docs/apple-design/verify-theme-tristate.mjs
 ```
 
 ### 4.2 Yeni Testler
@@ -110,6 +138,11 @@ node tests/app/test_premium_reduced_motion.js
 - `tests/app/test_premium_reduced_motion.js`
 - `tests/app/test_premium_launch_splash.js`
 - `tests/app/test_premium_time_theme.js`
+- `tests/app/test_modularization_boundary.js`
+
+Mevcut kontrast ve tema fixture'ları:
+- `docs/apple-design/verify-contrast.mjs`
+- `docs/apple-design/verify-theme-tristate.mjs`
 
 ### 4.3 Manuel / Görsel QA
 

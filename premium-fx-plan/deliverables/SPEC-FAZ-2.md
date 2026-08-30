@@ -1,5 +1,7 @@
 # Faz 2: Mikro-animasyon ve Shimmer Genişlemesi — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** Görsel geri bildirim zenginliği kazandırmak.
 
 ---
@@ -8,7 +10,7 @@
 
 **Yeni yardımcı:** `animateNumber(elementId, from, to, duration, formatter)`
 
-**Konum:** `app.js` içine veya `app/core/fxUtils.js` modülüne.
+**Yeni modül alternatifi:** `app/core/mediaFx.js` içinde `SeyFx.countUp()` olarak tanımlanabilir; `app.js` monolitinde kalırsa `helpers` bölümünün yakınına yerleştir.
 
 **Parametreler:**
 
@@ -22,12 +24,11 @@
 
 **Easing:** `cubic-bezier(.16,1,.3,1)` — JS’te `easeOutCubic` uygulanır.
 
-**Kullanım alanları:**
-- Su sayısı (`waterCard` içindeki `w/g` metni).
-- Gün indexi (hero dashboard).
-- Streak (hero dashboard).
-- Tamamlanmış tik sayısı (habits badge).
-- Adım sayısı (sağlık sekmesi, varsa).
+**Kullanım alanları (app.js builder konumları):**
+- Su sayısı: `waterCard()` — `app.js:10292`.
+- Gün indexi / streak: `heroPremiumStatsHTML()` — `app.js:12011`.
+- Tamamlanmış tik sayısı: `habitsCardHTML()` — `app.js:10408`.
+- Adım sayısı: `saglikHTML()` — `app.js:13886` (varsa `walk.steps` gösterimi).
 
 **Reduce motion uyumu:** `prefers-reduced-motion` veya `settings.premiumAtmosphere === false` ise anında güncelle, animasyon yapma.
 
@@ -41,7 +42,7 @@
 
 ### 2.2.1 Habits SVG Progress Ring
 
-**Konum:** `habitsCardHTML()` içindeki SVG `circle` elementi.
+**Konum:** `habitsCardHTML()` — `app.js:10408` içindeki SVG `circle` elementi.
 
 **Değişiklik:** Progress ring üzerine shimmer pseudo-element veya ikinci bir overlay circle ekle.
 
@@ -60,16 +61,14 @@
 
 ### 2.2.2 Premium Atmosfer Açıkken Tüm Progress Bar’lar
 
-- Su barı (zaten shimmer var; güçlendirilebilir).
-- Günlük Işığı hedef barı (zaten var).
-- Motivation ilerleme barı (zaten var).
-- Header sync durum çubuğu (yeni).
+- Su barı: `waterCard()` — `app.js:10292` (zaten shimmer var; güçlendirilebilir).
+- Günlük Işığı hedef barı: `habitsCardHTML()` — `app.js:10408`.
+- Motivation ilerleme barı: `motivationTodayCardHTML()` — `app.js:11018`.
+- Header sync durum çubuğu: `appHeaderHTML()` — `app.js:16140` (yeni).
 
 ### 2.2.3 Header Accent Çizgileri
 
-**Konum:** `.sey-appheader`
-
-**Değişiklik:** Header synapse desenine yavaş shimmer eklenmesi (düşük opacity, 8 sn döngü).
+**Konum:** `.sey-appheader` — tanım `app/styles.css` içinde; JS etkisi yok. Header synapse desenine yavaş shimmer eklenmesi (düşük opacity, 8 sn döngü).
 
 ---
 
@@ -93,7 +92,7 @@
 }
 ```
 
-**JS entegrasyonu:**
+**JS entegrasyonu:** `rippleEffect()` helper `app/core/mediaFx.js` içinde tanımlanır; `app.js` handler’ları event objesini geçirir.
 
 ```js
 function rippleEffect(event, element, color){
@@ -113,10 +112,10 @@ function rippleEffect(event, element, color){
 }
 ```
 
-**Kullanım:**
-- Tüm `.surface` kart butonlarına.
-- Bottom nav item’lara.
-- Header mini butonlara.
+**Kullanım (app.js builder / handler konumları):**
+- `.surface` kart butonları: `habitsCardHTML()` — `app.js:10408`, `waterCard()` — `app.js:10292`.
+- Bottom nav item’lar: `navHTML()` — `app.js:16159`; aktif sekme değişikliğinde `App.go(tab)` tetikler.
+- Header mini butonlar: `appHeaderHTML()` — `app.js:16140`.
 
 **Reduce motion:** Aktifse ripple hiç oluşturulmamalı.
 
@@ -182,8 +181,8 @@ function rippleEffect(event, element, color){
 - Ancak her render’da animasyon tekrarlanmamalı; sadece tab değişiminde.
 
 **Yaklaşım:**
-- `App.go(tab)` çağrıldığında `#app` class’ına `is-tab-changing` ekle.
-- CSS’te 0.2 sn fade/float uygula.
+- `App.go(tab)` çağrıldığında (boot sonu ve bottom-nav handler zinciri) `#app` class’ına `is-tab-changing` ekle.
+- CSS’te 0.24 sn fade/float uygula.
 - Animasyon bitince class kaldır.
 
 ```css
@@ -209,6 +208,7 @@ function rippleEffect(event, element, color){
 2. Ripple elementi oluşturulmuyor.
 3. Bottom nav bounce animation yok.
 4. Tab change animation class’ı uygulanmıyor.
+5. Yeni `@keyframes seyRipple` tanımı reduce modunda `animation: none` ile devre dışı.
 
 ### `tests/app/test_premium_count_up.js`
 

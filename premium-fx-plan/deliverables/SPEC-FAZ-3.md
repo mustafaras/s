@@ -1,5 +1,7 @@
 # Faz 3: Premium Açılış Ritüeli — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** Uygulama ilk izlenimini yükseltmek.
 
 ---
@@ -23,7 +25,7 @@
 </div>
 ```
 
-**Kural:** Splash, uygulama verisi yüklenene kadar görünür. `app.js` boot sonunda gizlenir.
+**Kural:** Splash, uygulama verisi yüklenene kadar görünür. `app.js` boot sonunda (dosya sonu, ~satır 18790 civarı) gizlenir.
 
 ---
 
@@ -122,16 +124,17 @@ function updateSplashGreeting(){
   var el = document.getElementById('sey-splash-greeting');
   if(el) el.textContent = g;
 }
-
-// app.js boot sırasında:
-updateSplashGreeting();
-// localStorage okunduktan / migrate sonrası:
-// hideSplash() çağrılır.
 ```
+
+**JS entegrasyon konumları:**
+- `hideSplash()` ve `updateSplashGreeting()` tanımları: `app.js` içinde boot/yardımcılar bölümüne yakın (örn. `onboardingHTML()` — `app.js:9890` civarı veya `render()` — `app.js:9688` yakını).
+- `updateSplashGreeting()`: localStorage okunmadan / migrate çağrılmadan önce çağrılır (`migrate(d)` — `app.js:4415` sonrası).
+- `hideSplash()`: `app.js` boot sonunda, ilk `render()` çağrısından sonra (dosya sonu ~satır 18750–18800 arası; mevcut foreground poll timer `setInterval` — `app.js:18752`).
 
 **Koşullar:**
 - `settings.launchRitual === false` ise splash hiç gösterilmemeli (CSS’te `display:none` veya JS’te hemen `hideSplash`).
 - Splash, `localStorage` okunana kadar görünür; ama maksimum 3 saniye sonra otomatik kapanmalı (timeout güvenlik duvarı).
+- `render()` — `app.js:9688` her çalıştığında splash kontrol edilmeli; zaten gizlendiyse no-op.
 
 ---
 

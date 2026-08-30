@@ -1,6 +1,9 @@
 # Şeyma Premium FX — migrate() Güncelleme Spec'i
 
-**Dosya:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)` fonksiyonu.
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30
+
+**Dosya:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)` fonksiyonu (satır 4415).
 
 **Amaç:** Yeni premium efekt ayarlarının eski verilere güvenli şekilde eklenmesini sağlamak.
 

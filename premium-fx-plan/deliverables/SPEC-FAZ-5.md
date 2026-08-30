@@ -1,5 +1,7 @@
 # Faz 5: Sesli Rehberlik Anları — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** Duygusal bağ ve mindfulness desteği kazandırmak.
 
 ---
@@ -8,7 +10,7 @@
 
 ### 5.1.1 `SeyAudio.voice()` Fonksiyonu
 
-**Dosya:** `app/core/audioFx.js` içine eklenir.
+**Dosya:** `app/core/mediaFx.js` içine eklenir (`SeyAudio` artık `mediaFx.js` modülünde tanımlı).
 
 ```js
 function speak(text){
@@ -45,9 +47,9 @@ function speak(text){
 
 ### 5.2.1 Günlük Işığı Açılış Sorusu
 
-**Konum:** `journalModalHTML()` açılışında veya `openJournalModal()` içinde.
+**Konum:** `App.openJournalModal(options)` — `app.js:9109` açılışında.
 
-**Mesaj:** `ui.journalPromptUsed` veya `journalPhasePrompt(mode)` değeri.
+**Mesaj:** `ui.journalPromptUsed` veya `journalPhasePrompt(mode)` — tanım `app.js:12366` civarı.
 
 ```js
 function openJournalModal(){
@@ -63,7 +65,7 @@ function openJournalModal(){
 
 ### 5.2.2 Mod / Stres Yüksekse Yatıştırıcı Mesaj
 
-**Konum:** `setStress(v)` veya `moodInterp()` sonrası.
+**Konum:** `App.setStress(v)` — `app.js:8310` veya `App.setMood(id)` — `app.js:8291` sonrası.
 
 **Koşullar:**
 - `st >= 4` veya `st >= 4 && en <= 2`
@@ -95,7 +97,7 @@ function openJournalModal(){
 
 ### 5.2.4 Motivasyon Kartı Onay Mesajı
 
-**Konum:** `motivationTodayCardHTML()` üzerindeki “Tamamladım” aksiyonu veya `roomOverlayHTML` içindeki kayıt butonu.
+**Konum:** `motivationTodayCardHTML()` — `app.js:11018` üzerindeki “Tamamladım” aksiyonu veya `roomOverlayHTML()` — `app.js:11062` içindeki kayıt butonu (`App.completeMotivationTask()` — `app.js:11812`).
 
 **Mesaj:** `motivationPersonalLine()` çıktısı özetlenebilir.
 

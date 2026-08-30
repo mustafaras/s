@@ -1,12 +1,14 @@
 # Faz 6: Premium Atmosfer Anahtarı ve Ayarlar Yüzeyi — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** Tüm efektleri tek, kullanıcı kontrollü anahtar altında toplamak.
 
 ---
 
 ## 6.1 Ayarlar Bölümü Tasarımı
 
-**Konum:** `app.js` içindeki ayarlar render fonksiyonu (mevcut ayarlar ekranı).
+**Konum:** `app.js` içindeki ayarlar render fonksiyonu: `ayarlarHTML()` — `app.js:13221`.
 
 **Yeni bölüm başlığı:** `Görünüm & Ses` veya `Premium Atmosfer`.
 
@@ -37,6 +39,18 @@
     <span class="sey-toggle-knob"></span>
   </button>
 </div>
+```
+
+**Handler:** Mevcut `app.js`’de `App.toggleSetting` tanımı yok. Faz 6 implementasyonunda `App.toggleSetting=function(key){ ... }` eklenmeli (yeni `App.*` handler’ı). Örnek implementasyon:
+
+```js
+App.toggleSetting=function(key){
+  if(!data.settings) data.settings={};
+  data.settings[key]=!data.settings[key];
+  haptic(10);
+  save();
+  render();
+};
 ```
 
 **CSS:**
@@ -97,26 +111,13 @@ Alt ayarlar kullanıcının son tercihlerine döner:
 
 ### 6.3.3 Reduce Motion Override
 
-```js
-function prefersReducedMotion(){
-  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function isPremiumFxEnabled(){
-  var s = data.settings || {};
-  if(prefersReducedMotion()) return false;
-  if(s.premiumAtmosphere === false) return false;
-  return true;
-}
-```
-
-**Kural:** `prefers-reduced-motion: reduce` aktifse `premiumAtmosphere` otomatik olarak devre dışı sayılır. Kullanıcıya bilgi mesajı gösterilebilir.
+**Yeni modül helper:** `isPremiumFxEnabled()` ve `prefersReducedMotion()` `app/core/mediaFx.js` içinde tanımlanır (veya `app/core/timeTheme.js` modül sınırına göre). `app.js` bu helper’ları `window.SeyFx.isPremiumFxEnabled()` olarak çağırır.
 
 ---
 
 ## 6.4 `migrate()` Güncellemesi
 
-**Dosya:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)`.
+**Dosya:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)` — satır 4415.
 
 **Eklenecek satırlar:**
 
@@ -136,7 +137,7 @@ if(d.settings.launchRitual == null) d.settings.launchRitual = true;
 
 ## 6.5 Ayarlar Ekranı Entegrasyonu
 
-**Konum:** Ayarlar render fonksiyonu içinde, muhtemelen “Senkron” veya “Gizlilik” bölümünden sonra.
+**Konum:** `ayarlarHTML()` — `app.js:13221` içinde, muhtemelen “Senkron” veya “Gizlilik” bölümünden sonra.
 
 **Önerilen ek metin:**
 

@@ -1,8 +1,13 @@
 # Reduced Motion Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30
+
 Tüm yeni premium efektler, kullanıcı `prefers-reduced-motion: reduce` ayarını seçtiğinde pasif olmalıdır.
 
 ## CSS Kuralları
+
+Mevcut `app/styles.css` içinde zaten 30+ reduce-motion bloğu var; bunların yanına eklenecek:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -27,6 +32,15 @@ Tüm yeni premium efektler, kullanıcı `prefers-reduced-motion: reduce` ayarın
     transition: none !important;
   }
   .surface:hover, .surface:active { transform: none !important; }
+}
+
+/* Faz 2’de tanımlanacak yeni keyframe’ler de aynı şekilde kapatılmalı: */
+@media (prefers-reduced-motion: reduce) {
+  .sey-ripple,
+  .sey-ripple::after,
+  .sey-nav-bounce,
+  .sey-count-up,
+  .sey-shimmer-ring { animation: none !important; transition: none !important; }
 }
 ```
 

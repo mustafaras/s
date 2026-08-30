@@ -1,12 +1,14 @@
 # Faz 0: Altyapı ve Güvenlik Duvarı — Detay Spec
 
-**Hedef:** Kod değişikliği başlamadan önce test ve güvenlik iskelesini kurmak.
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
+**Amaç:** Kod değişikliği başlamadan önce test ve güvenlik iskelesini kurmak.
 
 ---
 
 ## 0.1 SAFEGUARDS.md Son Haline Getirme
 
-**Dosya:** `/Users/m_ras/Desktop/seyma-premium-fx-plan/SAFEGUARDS.md`
+**Dosya:** `/Users/m_ras/Desktop/seyma/premium-fx-plan/SAFEGUARDS.md`
 
 **Yapılacaklar:**
 - Mevcut SAFEGUARDS.md’yi gözden geçir.
@@ -20,7 +22,7 @@
 
 ## 0.2 `migrate()` Güncelleme Spec’i
 
-**Kaynak:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)` fonksiyonu.
+**Kaynak:** `/Users/m_ras/Desktop/seyma/app.js` içindeki `migrate(d)` fonksiyonu (satır 4415).
 
 **Eklenecek varsayılan alanlar:**
 

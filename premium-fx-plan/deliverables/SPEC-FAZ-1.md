@@ -1,12 +1,16 @@
 # Faz 1: UI Ses Dili + Haptik Alfabesi — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** En hızlı hissedilir premiumlik kazandırmak.
 
 ---
 
-## 1.1 `app/core/audioFx.js` Modülü
+## 1.1 `app/core/mediaFx.js` Modülü
 
-**Yeni dosya:** `/Users/m_ras/Desktop/seyma/app/core/audioFx.js`
+**Yeni dosya:** `/Users/m_ras/Desktop/seyma/app/core/mediaFx.js`
+
+> **Not:** Planın güncel hali (PLAN.md §7, MODULARIZATION.md §3.1, FX-LIBRARY.md) tek birleşik medya modülü `app/core/mediaFx.js` olarak belirler. SPEC-FAZ-1'in önceki sürümlerinde ayrı `audioFx.js` / `hapticsFx.js` dosyalarından bahsediliyordu; uygulama aşamasında tek modül `mediaFx.js` tercih edilecek.
 
 **Yapısı:**
 
@@ -71,13 +75,24 @@
   function warning(){ playTone({type:'triangle', freq:150, gain:0.04, duration:0.12}); }
   function bell(){ playTone({type:'sine', freq:1047, gain:0.05, duration:0.5}); }
 
+    // Uygulamada: window.SeyAudio ve window.SeyHaptics aynı dosyada tanımlanır.
   window.SeyAudio = {
     tap: tap,
     success: success,
     warning: warning,
     bell: bell,
+    voice: speak,
     setMaster: function(v){ masterEnabled = !!v; },
     isAllowed: isAllowed
+  };
+
+  window.SeyHaptics = {
+    tap: function(){ vibrate([15]); },
+    success: function(){ vibrate([20, 30, 50]); },
+    error: function(){ vibrate([40, 20, 40]); },
+    refresh: function(){ vibrate([10, 20, 10, 20, 10]); },
+    streak: function(){ vibrate([30, 50, 80]); },
+    water: function(){ vibrate([10, 15, 10]); }
   };
 })();
 ```
@@ -85,7 +100,7 @@
 **İndex.html’e ekleme:**
 - `app/core/constants.js` yüklendikten sonra, `app.js` öncesinde:
   ```html
-  <script src="app/core/audioFx.js?v=202608301"></script>
+  <script src="app/core/mediaFx.js?v=202608301"></script>
   ```
 
 **Cache-bump:** `index.html` içinde `?v=` sürümü güncellenecek.
@@ -94,30 +109,24 @@
 
 ## 1.2 `app.js` Haptik Haritası
 
-**Mevcut fonksiyon:** `haptic()`
+**Mevcut fonksiyon:** `haptic()` — `app.js:6375`
+
+**Yeni modül karşılığı:** `window.SeyHaptics.*` — `app/core/mediaFx.js` içinde tanımlanır.
 
 **Güncellenmiş versiyon (spec):**
 
 ```js
-function haptic(type){
+function vibrate(pattern){
   if(!window.SeymaConstants || !window.SeymaConstants.data) return;
   var s = window.SeymaConstants.data.settings || {};
   if(s.richHaptics === false || s.haptics === false) return;
   if(!navigator.vibrate) return;
-  var patterns = {
-    tap: [15],
-    success: [20, 30, 50],
-    error: [40, 20, 40],
-    refresh: [10, 20, 10, 20, 10],
-    streak: [30, 50, 80],
-    water: [10, 15, 10]
-  };
-  var p = patterns[type] || patterns.tap;
-  try { navigator.vibrate(p); } catch(e){}
+  try { navigator.vibrate(pattern); } catch(e){}
 }
 ```
 
-**Not:** iOS’ta `navigator.vibrate` desteği yok; bu durumda görsel feedback fallback olarak kullanılır.
+**Not:** iOS’ta `navigator.vibrate` desteği yok; bu durumda görsel feedback fallback olarak kullanılır.  
+Mevcut `haptic(p)` (`app.js:6375`) korunur; FX modülü buna ek katman olarak çalışır.
 
 ---
 
@@ -125,15 +134,20 @@ function haptic(type){
 
 | Fonksiyon | Konum | Ses | Haptik |
 |-----------|-------|-----|--------|
-| `toggleHabit(key)` | app.js | `SeyAudio.success()` (sadece tamamlandığında) | `haptic('success')` |
-| `waterAdd(delta)` | app.js | `SeyAudio.tap()` (delta > 0) | `haptic('water')` |
-| `saveToday()` | app.js | `SeyAudio.tap()` | `haptic('tap')` |
-| `SeyOnSynced()` | app.js | `SeyAudio.bell()` | `haptic('success')` |
-| Uyarı banner gösterimi | app.js | `SeyAudio.warning()` | `haptic('error')` |
-| `setMood(id)` | app.js | `SeyAudio.tap()` | `haptic('tap')` |
-| `setEnergy(v)` / `setStress(v)` | app.js | `SeyAudio.tap()` | `haptic('tap')` |
+| `App.toggleHabit(key)` | `app.js:8228` | `SeyAudio.success()` (sadece tamamlandığında) | `SeyHaptics.success()` |
+| `App.waterAdd(delta)` | `app.js:8306` | `SeyAudio.tap()` (delta > 0) | `SeyHaptics.water()` |
+| `App.saveToday()` | `app.js:9551` | `SeyAudio.tap()` | `SeyHaptics.tap()` |
+| `window.SeyOnSynced()` | `app.js:6208` | `SeyAudio.bell()` | `SeyHaptics.success()` |
+| Uyarı banner gösterimi (`toast()`) | `app.js:6395` | `SeyAudio.warning()` | `SeyHaptics.error()` |
+| `App.setMood(id)` | `app.js:8291` | `SeyAudio.tap()` | `SeyHaptics.tap()` |
+| `App.setEnergy(v)` | `app.js:8309` | `SeyAudio.tap()` | `SeyHaptics.tap()` |
+| `App.setStress(v)` | `app.js:8310` | `SeyAudio.tap()` | `SeyHaptics.tap()` |
+| `App.markSaygiRead()` | `app.js:8195` | `SeyAudio.success()` | `SeyHaptics.success()` |
+| `App.openCrisis(kind)` | `app.js:9099` | `SeyAudio.warning()` | `SeyHaptics.error()` |
+| `App.saveJournal()` | `app.js:9114` | `SeyAudio.success()` | `SeyHaptics.success()` |
+| `App.completeMotivationTask(status)` | `app.js:11812` | `SeyAudio.success()` | `SeyHaptics.success()` |
 
-**Kural:** `SeyAudio` tanımlı değilse (modül yüklenmemişse) hiçbir şey çalışmamalı; `if(window.SeyAudio)` kontrolü ekle.
+**Kural:** `SeyAudio`/`SeyHaptics` tanımlı değilse (modül yüklenmemişse) hiçbir şey çalışmamalı; `if(window.SeyAudio)` / `if(window.SeyHaptics)` kontrolü ekle.
 
 ---
 
@@ -160,7 +174,7 @@ function haptic(type){
 
 **Seneryolar:**
 1. `navigator.vibrate` stub’lanır.
-2. `haptic('success')` doğru pattern ile çağrılır.
+2. `SeyHaptics.success()` doğru pattern ile çağrılır.
 3. `settings.richHaptics = false` iken çağrılmaz.
 4. `navigator.vibrate` yoksa hata fırlatmaz.
 
@@ -175,8 +189,8 @@ function haptic(type){
 
 ## 1.7 Çıktı Listesi
 
-- [ ] `app/core/audioFx.js` modülü (Faz 1 implementasyonunda)
-- [ ] `app.js` haptik haritası güncellemesi spec’i
+- [ ] `app/core/mediaFx.js` modülü (Faz 1 implementasyonunda)
+- [ ] `app.js` bağlantı noktalarına `SeyAudio` / `SeyHaptics` çağrıları
 - [ ] İlk bağlantı noktaları listesi
 - [ ] `tests/app/test_premium_audio_fx.js` skeleton
 - [ ] `tests/app/test_premium_haptics_fx.js` skeleton

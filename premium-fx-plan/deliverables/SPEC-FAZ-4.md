@@ -1,5 +1,7 @@
 # Faz 4: Canlı Arka Plan + Saat Bazlı Tema — Detay Spec
 
+**Sürüm:** 2.1  
+**Güncellendi:** 2026-08-30  
 **Hedef:** Atmosferik derinlik kazandırmak.
 
 ---
@@ -28,25 +30,23 @@
 
 ### 4.1.3 JS Uygulaması
 
+**Yeni modül:** `app/core/timeTheme.js` (MODULARIZATION.md §3.2). `window.SeyTimeTheme.apply()` olarak expose edilir; tüm çağrılar oradan yönlendirilir.
+
+**Çağrı noktaları (app.js gerçek satırları):**
+- Uygulama boot sonunda: `app.js` dosya sonu, ~satır 18750–18800 (mevcut ilk `render()` + foreground poll timer `setInterval` — `app.js:18752`).
+- Her tab değişiminde: `render()` — `app.js:9688` başlangıcı.
+- 30 saniyede bir kontrol: foreground poll loop `setInterval` — `app.js:18752` içinde `window.SeyTimeTheme.apply()` çağrısı eklenebilir.
+
 ```js
-function updateTimeTheme(){
-  if(!settings.premiumAtmosphere) return;
+// app/core/timeTheme.js içindeki reference implementasyon
+function timeClass(){
+  if(!settings.premiumAtmosphere) return '';
   var h = new Date().getHours();
-  var cls = (h >= 5 && h < 9) ? 'theme-time-dawn' :
-            (h < 17) ? 'theme-time-day' :
-            (h < 21) ? 'theme-time-dusk' : 'theme-time-night';
-  var root = document.getElementById('root');
-  if(!root) return;
-  var classes = ['theme-time-dawn','theme-time-day','theme-time-dusk','theme-time-night'];
-  classes.forEach(function(c){ root.classList.remove(c); });
-  root.classList.add(cls);
+  return (h >= 5 && h < 9) ? 'theme-time-dawn' :
+         (h < 17) ? 'theme-time-day' :
+         (h < 21) ? 'theme-time-dusk' : 'theme-time-night';
 }
 ```
-
-**Çağrı noktaları:**
-- Uygulama boot sonunda.
-- Her tab değişiminde (eğer gece/geçiş anındaysa).
-- Belki 30 saniyede bir kontrol (app.js foreground poll loop).
 
 ---
 
@@ -108,7 +108,7 @@ function seasonalThemeClass(){
 }
 ```
 
-**Not:** Ramazan tarihi mevcut `HijriCalendarV1` modülüne göre hesaplanmalı.
+**Hijri Ramazan entegrasyonu:** `window.HijriCalendarV1` zaten yüklü (`app/content/hijriCalendar.js`). `seasonalThemeClass()` helper'ı `app/core/timeTheme.js` içinde kalır ve `App.adjustHijriOffset(delta)` — `app.js:8996` ile ayarlanan `settings.prayer.hijriOffset` dikkate alınır.
 
 ### 4.3.3 CSS Kuralları
 

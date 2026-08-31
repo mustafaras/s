@@ -8,10 +8,11 @@
 
 ## Durum
 
-Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. **Kapsamlı denetimde 3 kırık fonksiyon bulundu** (seq 24): `dateUtils.js` `dayIndexFor`/`activeDate`/`curDay` closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybetti — yalnızca Faz 0 canlı getter'larıyla çalışır hale gelir. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03 (ama önce seq 24 bulguları çözülmeli).
+Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. **Kapsamlı denetimde 3 kırık fonksiyon bulundu** (seq 24): `dateUtils.js` `dayIndexFor`/`activeDate`/`curDay` closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybetti. **FX-P-03'te bu 3 fonksiyon B1 canlı-getter yüzeyine hizalandı** (seq 25): `dayIndexFor` → `SeymaState.data.startDate`, `activeDate` → `SeymaState.ui.editDate`, `curDay` → `SeymaState.getDay(SeymaState.data, d, idx)`; `state.js` yorumu B1'e göre güncellendi; `test_date_utils_boundary.js` (58/58) ve `test_helpers_boundary.js` (30/30) genişletildi. FX-P-03 tamamlandı; sıradaki FX-P-04.
 
 ## Tamamlananlar (v2.3)
 
+- FX-P-03 — `dateUtils.js`'teki 3 kırık fonksiyon (seq 24) B1 canlı-getter yüzeyine hizalandı; `state.js` yorumu B1'e göre güncellendi; `test_date_utils_boundary.js` (58/58) ve `test_helpers_boundary.js` (30/30) genişletildi (seq 24 fonksiyonları + state/syncGlue yüzeyleri + haptic closure). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 - FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
 - FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave` getter'ları tanımlandı; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 - **Plan audit-fix (seq 22)** — plan belgeleri ve promptlar gerçek koda hizalandı: MODULARIZATION.md, API-TRANSITION-GUIDE, ROADMAP, CODE-MAP, FX-P-01/02/03/04/05, PROMPT-CATALOG, TEST-SKELETONS (7 dosya, vm2→global-mock). Uygulama koduna dokunulmadı.
@@ -44,7 +45,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- FX-P-03: `tests/app/test_date_utils_boundary.js` ve `test_helpers_boundary.js` test fixture'ları **genişletilecek** (dosyalar FX-P-01'de oluşturuldu; state.js/syncGlue.js yüzeylerini de kapsayacak şekilde). Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
+- FX-P-04: `tests/app/test_modularization_boundary.js` güncellenecek (yeni modüllerin `window.*` altında expose edildiğini ve `app.js`'in hâlâ yüklü olduğunu assert edecek) ve S5/S6 değişmezlik kanıtları çalıştırılacak. Faz -1.1 tamamlandığında Faz 0'a (state/service extraction) geçilebilir.
 
 ## Engeller
 

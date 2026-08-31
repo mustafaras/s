@@ -21,9 +21,27 @@
     var aylar=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
     return d.getDate()+' '+aylar[d.getMonth()]+' '+d.getFullYear();
   }
-  function dayIndexFor(date){ return diffDays(window.SeymaConstants ? window.SeymaConstants.START_DATE : data.startDate, date)+1; }
-  function activeDate(){ return (window.ui && window.ui.editDate) ? window.ui.editDate : todayStr(); }
-  function curDay(){ var d=activeDate(); return window.SeymaState ? window.SeymaState.getDay(d, dayIndexFor(d)) : null; }
+  // seq 24 düzeltmesi (B1): Bu üç fonksiyon app.js orijinallerine hizalanır ve
+  // `window.SeymaState` merkezi yüzeyine bağımlı hale getirilir. `SeymaState`
+  // getter'ları `window[name]` üzerinden çözümlenir; Faz 0'da (FX-P-05) app.js'e
+  // canlı getter eklendiğinde `SeymaState.data`/`ui`/`getDay` otomatik olarak
+  // gerçek değerleri döndürür. Henüz expose edilmediği sürece güvenle fallback
+  // döner (kırılmaz).
+  function dayIndexFor(date){
+    var st = window.SeymaState;
+    var start = (st && st.data && st.data.startDate) ? st.data.startDate : '2026-01-01';
+    return diffDays(start, date)+1;
+  }
+  function activeDate(){
+    var st = window.SeymaState;
+    return (st && st.ui && st.ui.editDate) ? st.ui.editDate : todayStr();
+  }
+  function curDay(){
+    var d = activeDate();
+    var st = window.SeymaState;
+    if (!st || typeof st.getDay !== 'function') return null;
+    return st.getDay(st.data, d, dayIndexFor(d));
+  }
 
   window.SeymaDateUtils = {
     pad: pad,

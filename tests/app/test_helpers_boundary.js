@@ -32,6 +32,8 @@ var w = ctx.window;
 
 vm.runInContext('var window = this; ' + load('app/core/constants.js'), ctx, { filename:'constants.js' });
 vm.runInContext(load('app/core/dateUtils.js'), ctx, { filename:'dateUtils.js' });
+vm.runInContext(load('app/core/state.js'), ctx, { filename:'state.js' });
+vm.runInContext(load('app/core/syncGlue.js'), ctx, { filename:'syncGlue.js' });
 vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
 
 (function(){
@@ -55,6 +57,46 @@ vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
   ok('progBar yüzde render ediyor', w.SeymaHelpers.progBar(50, 'red').indexOf('50%') >= 0);
   ok('statTile değer gösteriyor', w.SeymaHelpers.statTile('Test', 42).indexOf('42') >= 0);
   ok('miniBars dizi uzunluğu kadar çubuk üretiyor', (w.SeymaHelpers.miniBars([1,2,3],{}).match(/style=/g) || []).length >= 3);
+})();
+
+// ── seq 24: haptic closure sorunu — SeymaState.data yokken kapatma kontrolü devre dışı kalır ama kırılmaz ──
+// Faz 0'da (FX-P-05) app.js canlı getter'ı window.data'yı expose eder; SeymaState.data
+// getter'ı bunu window['data'] üzerinden çözer. Bu test, Faz 0 davranışını simüle
+// etmek için window.data'yı doğrudan kurar (SeymaState getter nesnesini değiştirmez).
+(function(){
+  // window.data yok → SeymaState.data undefined → haptic exception atmamalı
+  w.data = undefined;
+  w.SeymaHelpers.haptic(10);
+  ok('haptic SeymaState.data yokken exception atmıyor', true);
+
+  // data.settings.haptics === false → vibrate çağrılmamalı
+  var vibrateCalls = 0;
+  w.navigator.vibrate = function(){ vibrateCalls++; return true; };
+  w.data = { settings: { haptics: false } };
+  w.SeymaHelpers.haptic(10);
+  ok('haptic haptics=false iken vibrate çağırmıyor', vibrateCalls === 0);
+
+  // data.settings.haptics !== false → vibrate çağrılmalı
+  w.data = { settings: { haptics: true } };
+  w.SeymaHelpers.haptic(10);
+  ok('haptic haptics=true iken vibrate çağırıyor', vibrateCalls === 1);
+
+  // Sonraki bölümler için window.data'yı temizle (Faz -1.1 durumuna dön)
+  w.data = undefined;
+})();
+
+// ── state.js / syncGlue.js yüzeyleri (Faz -1.1) ──
+(function(){
+  ok('SeymaState expose edilmiş', typeof w.SeymaState === 'object');
+  ok('SeymaState.data getter tanımlı', 'data' in w.SeymaState);
+  ok('SeymaState.ui getter tanımlı', 'ui' in w.SeymaState);
+  ok('SeymaState.dark getter tanımlı', 'dark' in w.SeymaState);
+  ok('SeymaState.migrate getter tanımlı', 'migrate' in w.SeymaState);
+  ok('SeymaState.getDay getter tanımlı', 'getDay' in w.SeymaState);
+  ok('SeymaState.createDefaultData getter tanımlı', 'createDefaultData' in w.SeymaState);
+  ok('SeymaState.data henüz undefined (Faz -1.1)', w.SeymaState.data === undefined);
+  ok('SeymaSave getter tanımlı', 'SeymaSave' in w);
+  ok('SeymaSave henüz undefined (save window\'da değil)', w.SeymaSave === undefined);
 })();
 
 console.log('\n=== Özet ===');

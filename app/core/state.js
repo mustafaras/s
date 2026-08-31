@@ -10,12 +10,19 @@
   // `createDefaultData` hâlâ `app.js`'in IIFE kapsamında tanımlıdır ve henüz
   // `window` üzerinde expose edilmemiştir. Bu modül `app.js`'ten ÖNCE yüklenir.
   //
-  // Bu yüzden burada "yumuşak bağ" (soft-bind) kullanılır: her üye, `window`
-  // üzerinden çözümlenen bir lazy getter'dır. `app.js` ilgili yüzeyi `window`'a
-  // expose ettiğinde (Faz 0'da) bu getter'lar otomatik olarak gerçek değeri
-  // döndürür; henüz expose edilmediği sürece güvenle `null`/`undefined` döner.
-  // Böylece mevcut davranış bozulmaz ve modüller `window.SeymaState.data`
-  // üzerinden ileride tek kaynağa geçebilir.
+  // MİMARİ KARAR B1 (seq 23) — CANLI GETTER: `data` mutable bir bağlamadır ve
+  // boot'tan sonra 6+ kez yeniden atanır (app.js 4412/4413/6692/9203/18724/
+  // 9173/9177). Tek seferlik `window.data = data` bayat kalır. Doğru çözüm,
+  // Faz 0'da (FX-P-05) `app.js`'e `Object.defineProperty(window, 'data',
+  // { get: () => data, configurable: true })` biçiminde CANLI GETTER eklemektir
+  // — her okumada closure'daki taze değeri döndürür.
+  //
+  // Bu modül, Faz 0'dan ÖNCE (Faz -1.1) yüklendiği için burada "yumuşak bağ"
+  // (soft-bind) köprüsü kullanılır: her üye, `window[name]` üzerinden çözümlenen
+  // bir getter'dır. Faz 0'da canlı getter'lar eklendiğinde `SeymaState.data`
+  // otomatik olarak gerçek değeri döndürür; henüz expose edilmediği sürece
+  // güvenle `null`/`undefined` döner. Böylece mevcut davranış bozulmaz ve
+  // modüller `window.SeymaState.data` üzerinden ileride tek kaynağa geçebilir.
   //
   // Not: `emptyDay` plan belgelerinde geçer ancak `app.js`'te böyle bir
   // fonksiyon YOKTUR (yalnızca `getDay` içinde satır içi day şablonu vardır).

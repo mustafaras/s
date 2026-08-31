@@ -8130,6 +8130,7 @@ App.reminderInboxPrimary=function(occurrenceId,reminderId,therapyToolId){
   var target=reminderDeepLinkTarget({occurrenceId:id,reminderId:reminder,therapyToolId:toolId});
   if(!target.ok) return target;
   if(id) App.reminderDeliveryOpen({occurrenceId:id,channel:'in_app',now:nowIso});
+  if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell();
   return App.openReminderTarget(Object.assign({},target,{returnFocusId:reminderActiveElementId()}));
 };
 App.reminderInboxEveningTarget=function(occurrenceId,reminderId,deepLink){
@@ -8612,6 +8613,7 @@ App.zikrTap=function(){
   if(r.doneNow){
     spark=true;
     _zikrCompleteFlash=true;
+    if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell();
     if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
     if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
     else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
@@ -11843,7 +11845,7 @@ App.completeMotivationTask=function(status){
   render();
   var msg;
   if(wasDone) msg='Kaydın güncellendi';
-  else msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi');
+  else { if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell(); msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi'); }
   if(courageGained) msg+=' · bir cesaret kanıtı daha';
   toast(msg);
 };

@@ -8508,7 +8508,6 @@ App.removeLyric=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isA
 App.copyLyricById=function(itemId,qid){ var x=findTrack(itemId); if(!x||!Array.isArray(x.quotes)) return; var q=x.quotes.find(function(z){return z&&z.id===qid;}); if(!q) return; App.copyQuote('“'+q.text+'”\n— '+x.title+(x.artist?', '+x.artist:'')); };
 
 // ================= İLHAM & İBADET: ZİKİRMATİK (Faz 35) =================
-var _zikrAudio=null;
 var _zikrWakeLock=null;
 function zikrSyncWakeLock(){
   var want=!!(ui.zikrOpen&&ensureZikrRoot().settings.keepAwake);
@@ -8523,17 +8522,11 @@ function zikrSyncWakeLock(){
 }
 function zikrTickSound(){
   if(!ensureZikrRoot().settings.soundOn) return;
-  try{
-    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    if(!_zikrAudio) _zikrAudio=new AC();
-    if(_zikrAudio.state==='suspended') _zikrAudio.resume();
-    var o=_zikrAudio.createOscillator(), g=_zikrAudio.createGain();
-    o.type='sine'; o.frequency.value=660;
-    g.gain.setValueAtTime(0.06,_zikrAudio.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,_zikrAudio.currentTime+0.09);
-    o.connect(g); g.connect(_zikrAudio.destination);
-    o.start(); o.stop(_zikrAudio.currentTime+0.09);
-  }catch(e){}
+  // FX-P-12: ses üretimi SeyAudio.tap()'e yönlendirildi.
+  // Eski AudioContext/osilatör kodu kaldırıldı; SeyAudio yoksa sessizce no-op.
+  if(window.SeyAudio && typeof window.SeyAudio.tap === 'function'){
+    window.SeyAudio.tap();
+  }
 }
 var _zikrCompleteFlash=false;
 var ZIKR_RING_RADIUS=108;

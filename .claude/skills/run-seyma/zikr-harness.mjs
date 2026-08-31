@@ -128,7 +128,7 @@ function ok(name, cond, detail) {
 console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
 // REM-54: index.html ile ayni boot seti; reminder modulleri de yuklenir ki
 // zikir / Saygi deep-link hedefleri uretimdeki gercek modul yolunda olculsun.
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app.js'];
+const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/state.js', 'app/core/mediaFx.js', 'app.js'];
 const styles = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 let sb = buildSandbox(seed);

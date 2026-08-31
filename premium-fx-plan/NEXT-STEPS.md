@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-08-31
-**Durum:** Faz 0 tamamlandı (FX-P-05, FX-P-06). Dalga 1 (FX-P-11) için kullanıcı onayı bekleniyor.
+**Durum:** Faz 1 devam ediyor (FX-P-11 tamamlandı). Sıradaki FX-P-12.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -21,6 +21,7 @@
 - [x] **Faz -1.1 tamamlandı (FX-P-01…FX-P-04):** temel modül iskeletleri (dateUtils/helpers/mediaFx/timeTheme/state/syncGlue), seq 24'teki 3 kırık fonksiyonun B1 canlı-getter yüzeyine hizalanması, boundary testleri (date_utils 58, helpers 30, modularization 42) ve S5/S6 değişmezlik kanıtları.
 - [x] **FX-P-05 (Faz 0):** `migrate()`'e 6 premium FX settings alanı eklendi (premiumAtmosphere/uiSounds/voiceGuidance/ambientSounds/richHaptics/launchRitual) ve B1 canlı getter'lar `app.js`'e eklendi (window.data/ui/dark/migrate/getDay/createDefaultData/save). S5/S6 geçti.
 - [x] **FX-P-06 (Faz 0):** `mediaFx.js` API yüzeyi ve master gating tanımlandı (SeyAudio.ctx lazy init, SeyHaptics gating, SeyFx master gating). S5/S6 geçti.
+- [x] **FX-P-11 (Faz 1):** `SeyAudio` temel UI sesleri implemente edildi (tap/success/warning/bell + vibrato, premiumAtmosphere+uiSounds+prefers-reduced-motion gating). S5/S6 geçti.
 
 ## Sırada Yapılacaklar
 
@@ -30,9 +31,10 @@
 4. [x] FX-P-01…FX-P-04 ile Faz -1.1 implementasyonu tamamlandı (yerel commitler, push yok).
 5. [x] FX-P-05 ile Dalga 0 başladı (migrate backfill + B1 canlı getter'lar).
 6. [x] FX-P-06 ile Dalga 0 tamamlandı (mediaFx.js API yüzeyi + master gating).
-7. [ ] **Dalga 1 (FX-P-11) için kullanıcı onayı alın.** Onay gelene kadar hiçbir yeni uygulama kodu yazılmamalı.
-8. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-9. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+7. [x] FX-P-11 ile Dalga 1 başladı (SeyAudio temel UI sesleri).
+8. [ ] FX-P-12: mevcut `zikrTickSound` çağrı noktasını `SeyAudio.tap()` kullanacak şekilde yönlendir (ilk `app.js` değişikliği; I2/I3/I4 korunmalı).
+9. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+10. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

@@ -54,14 +54,43 @@
       });
     }catch(e){}
   }
+  // FX-P-11: yumuşak zil/kutu sesi — 880Hz sine + hafif vibrato (600ms).
+  function playBell(freq, duration){
+    if (!allowed()) return;
+    var ctx = bootCtx(); if (!ctx) return;
+    try{
+      if (ctx.state === 'suspended') ctx.resume();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      var lfo = ctx.createOscillator();
+      var lfoGain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      // Hafif vibrato: LFO ~6Hz, ±6Hz frekans modülasyonu.
+      lfo.type = 'sine';
+      lfo.frequency.setValueAtTime(6, ctx.currentTime);
+      lfoGain.gain.setValueAtTime(6, ctx.currentTime);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime);
+      lfo.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+      lfo.stop(ctx.currentTime + duration);
+    }catch(e){}
+  }
 
   window.SeyAudio = {
     // ctx lazy init: her erişimde bootCtx() çağrılır; AudioContext yoksa null döner.
     get ctx(){ return bootCtx(); },
-    tap: function(){ playTone(880, 0.12, 'sine', 0.08); },
-    success: function(){ playArpeggio([523, 659, 784], 0.35, 'sine'); },
-    warning: function(){ playTone(220, 0.25, 'sawtooth', 0.1); },
-    bell: function(){ playTone(880, 0.6, 'sine', 0.1); },
+    tap: function(){ playTone(880, 0.15, 'sine', 0.08); },
+    success: function(){ playArpeggio([523, 784], 0.2, 'sine'); },
+    warning: function(){ playTone(200, 0.25, 'sawtooth', 0.1); },
+    bell: function(){ playBell(880, 0.6); },
     voice: function(text){
       if (!window.speechSynthesis || !text) return;
       try{

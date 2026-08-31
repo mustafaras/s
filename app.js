@@ -8259,8 +8259,8 @@ App.toggleHabit=function(key){
   var msg='Kaydedildi'; if(day.habits[key]){ var h=find(HABITS,'key',key); if(h) msg=h.msg; }
   commit(msg);
   if(editing()) return;
-  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
-  else if(day.habits[key]){ maybeStreak(); }
+  var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); }
+  else if(day.habits[key]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); maybeStreak(); }
 };
 App.toggleMgHabit=function(){
   var date=activeDate(), day=getDay(data,date,dayIndexFor(date));
@@ -8309,7 +8309,7 @@ App.explainDerivedHabit=function(key,day){
   else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
 };
-function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
+function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
 App.setMood=function(id){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); day.savedAt=new Date().toISOString(); var labels={normal:'Normal',iyi:'İyi',mükemmel:'Mükemmel',yorgun:'Yorgun',üzgün:'Üzgün',sinirli:'Sinirli','çok-zorlandim':'Çok zorlandım',kaygili:'Kaygılı', 'huzursuz':'Huzursuz', 'sakin':'Sakin'}; haptic(14); save(false,{message:'Ruh hali güncellendi',meta:{section:'mood',path:'data.days.*.mood',operation:'update',summary:'Ruh hali güncellendi',detail:'Ruh hali',value:labels[id]||id,field:'mood'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(false,{message:'Duygu notu güncellendi',meta:{section:'wellness',path:'data.days.*.note',operation:'update',summary:'Duygu notu güncellendi',detail:'Duygu notu',value:String(v||'').trim().slice(0,60),field:'note'}}); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(false,{message:'Günün niyeti güncellendi',meta:{section:'wellness',path:'data.days.*.intention',operation:'update',summary:'Günün niyeti güncellendi',detail:'Günün niyeti',value:day.intention,field:'intention'}}); },500); };

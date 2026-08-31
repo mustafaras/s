@@ -9,14 +9,19 @@
     return CTX;
   }
   function settings(){ return (window.SeymaState && window.SeymaState.data && window.SeymaState.data.settings) || {}; }
-  function allowed(){
+  // FX-P-12: `allowReducedMotion` opsiyonel parametresi — kullanıcının bilinçli
+  // tetiklediği kısa etkileşim sesleri (örn. zikir tıklama `tap()`) reduce-motion
+  // altında da çalabilir; diğer sesler (success/warning/bell) sessiz kalır.
+  function allowed(allowReducedMotion){
     var s = settings();
-    return !!s.premiumAtmosphere && !!s.uiSounds && !reducedMotion();
+    if (!s.premiumAtmosphere || !s.uiSounds) return false;
+    if (reducedMotion() && !allowReducedMotion) return false;
+    return true;
   }
   function reducedMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 
-  function playTone(freq, duration, type, gainValue){
-    if (!allowed()) return;
+  function playTone(freq, duration, type, gainValue, allowReducedMotion){
+    if (!allowed(allowReducedMotion)) return;
     var ctx = bootCtx(); if (!ctx) return;
     try{
       if (ctx.state === 'suspended') ctx.resume();
@@ -87,7 +92,7 @@
   window.SeyAudio = {
     // ctx lazy init: her erişimde bootCtx() çağrılır; AudioContext yoksa null döner.
     get ctx(){ return bootCtx(); },
-    tap: function(){ playTone(880, 0.15, 'sine', 0.08); },
+    tap: function(){ playTone(523, 0.18, 'triangle', 0.09, true); },
     success: function(){ playArpeggio([523, 784], 0.2, 'sine'); },
     warning: function(){ playTone(200, 0.25, 'sawtooth', 0.1); },
     bell: function(){ playBell(880, 0.6); },

@@ -8271,7 +8271,7 @@ App.toggleMgHabit=function(){
   after=countRec(day);
   ui.pulse='magnesium'; clearTimeout(pulseTimer); pulseTimer=setTimeout(function(){ ui.pulse=null; render(); },240);
   // confetti / tamam bildirimi, sadece bugünkü toplam eşiği aşıldıysa
-  if(!editing()){ var ht=htToday(); if(after>=ht&&before<ht){ confetti(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); } }
+  if(!editing()){ var ht=htToday(); if(after>=ht&&before<ht){ confetti(); if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); setTimeout(function(){ toast('Bugün '+ht+'/'+ht+'. Şeyma hanım kontrolü ele aldı.',2600); },250); } }
 };
 // Türetilmiş tik'e dokunulduğunda: eşik tutuyorsa sıcak onay, tutmuyorsa ne yapılacağını kibarca anlat.
 App.explainDerivedHabit=function(key,day){

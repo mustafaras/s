@@ -25,9 +25,9 @@ Tüm hareketler davranışı koruyarak, yalnızca fiziksel konumu değiştirir.
 
 | # | Dosya | İçeriği | Mevcut `app.js` satır aralığı | Bağımlı olduğu modüller |
 |---|-------|---------|-------------------------------|------------------------|
-| 1 | `app/core/constants.js` | `SEYMA_CONSTANTS`, `KEY`, `TKEY`, feature gate, `icon()`, `HABITS`, `SOUL_ACTIVITY_CATALOG`, temel yardımcılar | ~1–400 | — (zaten var) |
-| 2 | `app/core/dateUtils.js` | `fmt`, `todayStr`, `addDays`, `diffDays`, `pad`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR`, hafta/ay hesapları | ~4720–4750, ~6188 | constants |
-| 3 | `app/core/state.js` | `data`, `ui`, `dark`, `migrate()`, `createDefaultData()`, `getDay`, `emptyDay` ve diğer state helpers; **save() burada değil, syncGlue.js içinde kalır** | ~4415 (migrate), ~4922 (getDay/emptyDay) | constants, dateUtils |
+| 1 | `app/core/constants.js` | `SeymaConstants = { KEY, TKEY, FEATURE_GATE_TS, ICONS }` — **yalnızca bunlar**. `icon()`, `HABITS`, `SOUL_ACTIVITY_CATALOG` constants.js'te DEĞİL, `app.js`'in IIFE kapsamındadır (grep doğrulandı). | — (zaten var) | — |
+| 2 | `app/core/dateUtils.js` | `fmt`, `todayStr`, `addDays`, `diffDays`, `pad`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR`, hafta/ay hesapları | app.js'te dağınık (helpers/dateUtils ayrı); FX-P-01'de yeni dosya olarak oluşturuldu | constants |
+| 3 | `app/core/state.js` | `data`, `ui`, `dark`, `migrate()`, `createDefaultData()`, `getDay` ve diğer state helpers; **save() burada değil, syncGlue.js içinde kalır**. **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR (yalnızca `getDay` içinde satır içi day şablonu vardır) — expose edilmez. `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData` closure-scoped'tır, `window`'da değildir; bu yüzden `window.SeymaState` lazy getter (yumuşak bağ) ile expose edilir. | ~4415 (migrate), ~4922 (getDay), ~6684 (createDefaultData) | constants, dateUtils |
 | 4 | `app/core/helpers.js` | `segTabs`, `progBar`, `starRow`, `miniBars`, `statTile`, `collapsibleCardHTML`, `toast`, `confetti`, `haptic` | ~4000–5300, ~6000–6400 | constants, state |
 | 5 | `app/core/mediaFx.js` | **Yeni**: `SeyAudio`, `SeyHaptics`, animasyon utilities (FX planının merkezi) | yeni | constants, state |
 | 6 | `app/core/timeTheme.js` | **Yeni**: saat/season bazlı tema class yönetimi | yeni | constants, state |
@@ -45,7 +45,7 @@ Tüm hareketler davranışı koruyarak, yalnızca fiziksel konumu değiştirir.
 | 18 | `app/core/profile.js` | Profil değerlendirmesi, `psychHTML`, `profileGateHTML`, puanlama ve UI akışı | ~10064 civarı | constants, state, helpers, content/profileAssessmentV1 |
 | 19 | `app/core/settings.js` | Ayarlar render (`ayarlarHTML`) + `migrate()` eklentileri | ~13221–13886 | constants, state, helpers |
 | 20 | `app/core/reminders.js` | Reminder UI merkezi (engine/scheduler/delivery zaten `app/core/reminder*.js` içinde) | dağılmış, toplanacak | constants, state, helpers |
-| 21 | `app/core/syncGlue.js` | `window.SeyOnSyncState`, `window.SeyOnSynced`, `save()` (sync.js ile köprü) | ~6208 (SeyOnSynced), ~6229 (save) | state |
+| 21 | `app/core/syncGlue.js` | `window.SeyOnSyncState`, `window.SeyOnSynced`, `save()` (sync.js ile köprü). **Not:** `SeyOnSyncState`/`SeyOnSynced` zaten `app.js` tarafından `window`'a atanır (6198/6208); `save()` closure-scoped'tır (6229) ve `window`'da değildir — `window.SeymaSave` lazy getter ile expose edilir. | ~6208 (SeyOnSynced), ~6229 (save) | state |
 | 22 | `app/core/messaging.js` | ÆON/Luna sohbet, ses/fotoğraf/belge, balonlar, `mesajHTML` | ~18567 son civarı | constants, state, helpers |
 | 23 | `app/core/render.js` | `render()` ve tab builder'lar: `onboardingHTML`, `bugunHTML`, `saglikHTML`, `saygiHTML`, `raporHTML`, `ayarlarHTML`, `haritaHTML`, `mesajHTML`, `appHeaderHTML`, `navHTML`, overlay shell'ler, `modalsHTML` | ~9688–18810 | hepsi (en son) |
 | 24 | `app/core/appSurface.js` | `App.*` handler'ları, timer kayıtları, event listener, boot sonu `render()` | ~8000–18810 arası dağınık | hepsi (en son) |
@@ -55,17 +55,20 @@ Tüm hareketler davranışı koruyarak, yalnızca fiziksel konumu değiştirir.
 Her adımda **bir modül** taşınır ve hemen ardından tüm güvenlik ağı çalıştırılır. Büyük PR’lar yok.
 
 1. **Önce helpers + constants** — en az bağımlılıklı, güvenli kazanım. `constants.js` zaten var; `dateUtils.js` ve `helpers.js` ilk ayrılacak.
-2. **state.js** — `migrate()`, `getDay`, `save()` helper’ları. Her şey buna bağımlı; hata riski yüksek, testle ilerlenecek.
-3. **Yeni FX modülleri (mediaFx.js + timeTheme.js)** — henüz bağlanmadan önce varlıklarını ve API’lerini test et.
+2. **state.js** — `migrate()`, `getDay`, `createDefaultData` helper'ları. Her şey buna bağımlı; hata riski yüksek, testle ilerlenecek. `save()` buraya taşınmaz.
+3. **Yeni FX modülleri (mediaFx.js + timeTheme.js)** — henüz bağlanmadan önce varlıklarını ve API'lerini test et.
 4. **Domain modülleri** — prayer, zikir, quran, motivation, crisis, journal, health, library, report, map, messaging, reminders, profile, settings.
 5. **syncGlue.js** — `save()` ve `SeyOnSynced` köprüsü son domain modüllerden sonra taşınır.
-6. **render.js** — tüm HTML builder’ları (tab + overlay + modals). En büyük parça; tek seferde veya 2–3 alt parçada taşınabilir.
-7. **appSurface.js** — `App.*` handler’ları, event listener, boot sonu `render()`. En son, çünkü diğer tüm modülleri bir araya getirir.
+6. **render.js** — tüm HTML builder'ları (tab + overlay + modals). En büyük parça; tek seferde veya 2–3 alt parçada taşınabilir.
+7. **appSurface.js** — `App.*` handler'ları, event listener, boot sonu `render()`. En son, çünkü diğer tüm modülleri bir araya getirir.
+
+> **Sıra notu:** `syncGlue.js` (5. sıra) ile `render.js`/`appSurface.js` (6–7) arasındaki sıra, ROADMAP §-1.3'teki 24 modül listesiyle tutarlıdır. `syncGlue.js` domain modüllerden sonra, render/appSurface'ten önce taşınır.
 
 ### 2.3 Global Bağımlılık Yönetimi
 
 - `var data`, `var ui`, `var dark` gibi global değişkenler, geçiş aşamasında önce mevcut isimlerle kalır; sadece fonksiyon tanımlamaları farklı dosyalara taşınır.
-- Faz -1’in sonunda `window.SeymaState = { data, ui, dark }` merkezileştirmesi yapılabilir. Bu, modüllerin `window.SeymaState.data` okumasını sağlar.
+- **Kritik gerçek:** `data` (2710), `ui` (4678), `dark` (4616), `migrate` (4415), `getDay` (4922), `createDefaultData` (6684), `save` (6229) **hepsi `app.js`'in IIFE kapsamındadır ve `window` üzerinde DEĞİLDİR** (grep doğrulandı). `app.js`'te `window`'a atanan yalnızca `SeyOnSyncState` (6198), `SeyOnSynced` (6208) ve `App` (16888)'dir.
+- Bu yüzden `window.SeymaState` ve `window.SeymaSave` **lazy getter (yumuşak bağ)** ile expose edilir: her üye `window[name]` üzerinden çözümlenir. `app.js` ilgili yüzeyi `window`'a expose ettiğinde (Faz 0'da) getter'lar otomatik canlanır; henüz yoksa güvenle `null`/`undefined` döner. **`app.js`'e `window.data = data` gibi expose satırı EKLENMEZ** — bu I2/I3/I4'ü ihlal eder.
 - Yazma işlemleri yine `save()` üzerinden; `save()` `syncGlue.js` içinde kalır.
 - `App.*` handler yüzeyi **değişmeyecek**; inline `onclick="App.xxx(...)"` referansları bozulmayacak.
 

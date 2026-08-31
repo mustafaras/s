@@ -18,23 +18,23 @@ Faz -1 modülerleştirmesi sırasında `app.js`’ten çıkarılacak her yeni mo
 
 ```js
 window.SeymaDateUtils = {
-  fmt: fmt,               // existing line ~4727
-  todayStr: todayStr,     // existing line ~4728
-  addDays: addDays,       // existing line ~4736
-  diffDays: diffDays,     // existing line ~4740
-  pad: pad2,              // existing line ~4720
+  fmt: fmt,               // app.js'te dağınık; FX-P-01'de yeni dosyaya kopyalandı
+  todayStr: todayStr,
+  addDays: addDays,
+  diffDays: diffDays,
+  pad: pad,               // not: app.js'te `pad2` değil `pad` adı kullanılır
   shortDate: shortDate,
-  dayIndexFor: dayIndexFor, // existing line ~6188
+  dayIndexFor: dayIndexFor,
   activeDate: activeDate,
   curDay: curDay,
   dateLabelTR: dateLabelTR
 };
 ```
 
-**Bağımlılık:** `app/core/constants.js` (`SEYMA_CONSTANTS`, `KEY`, `TKEY`).
+**Bağımlılık:** `app/core/constants.js` (`SeymaConstants`), `state.js` (yumuşak bağ).
 
 **Test stratejisi:**
-- `tests/app/test_date_utils_boundary.js` **(Faz -1 uygulama aşamasında oluşturulacak)**.
+- `tests/app/test_date_utils_boundary.js` **(FX-P-01'de oluşturuldu, FX-P-03'te genişletilecek)**.
 
 ---
 
@@ -57,7 +57,7 @@ window.SeymaHelpers = {
 **Bağımlılık:** `constants.js`, `state.js` (`data`, `ui`), `dateUtils.js`.
 
 **Test stratejisi:**
-- `tests/app/test_helpers_boundary.js` **(Faz -1 uygulama aşamasında oluşturulacak)**.
+- `tests/app/test_helpers_boundary.js` **(FX-P-01'de oluşturuldu, FX-P-03'te genişletilecek)**.
 
 ---
 
@@ -124,19 +124,21 @@ window.SeyTimeTheme = {
 ### 2.5 `app/core/state.js`
 
 ```js
+// data, ui, dark, migrate, getDay, createDefaultData closure-scoped'tır ve
+// window'da DEĞİLDİR (app.js IIFE). Bu yüzden lazy getter (yumuşak bağ) kullanılır.
 window.SeymaState = {
-  data: data,
-  ui: ui,
-  dark: dark,
-  getDay: getDay,           // existing line ~4922
-  emptyDay: emptyDay,       // existing line ~4922
-  createDefaultData: createDefaultData, // existing line ~6686
-  migrate: migrate          // existing line ~4415
+  get data(){ return window.data; },              // app.js expose edince canlanır
+  get ui(){ return window.ui; },
+  get dark(){ return window.dark; },
+  get migrate(){ return window.migrate; },        // existing line ~4415
+  get getDay(){ return window.getDay; },          // existing line ~4922
+  get createDefaultData(){ return window.createDefaultData; } // existing line ~6684
 };
 
 // `save()` stays in syncGlue.js and is exposed as window.SeymaSave.
 // `migrate()` stays in state.js and is exposed as window.SeymaState.migrate.
 // We do NOT expose a separate window.SeymaMigrate; use window.SeymaState.migrate.
+// NOT: `emptyDay` fonksiyonu app.js'te YOKTUR; expose edilmez.
 ```
 
 **Bağımlılık:** `constants.js`, `dateUtils.js`.
@@ -150,9 +152,11 @@ window.SeymaState = {
 ### 2.6 `app/core/syncGlue.js`
 
 ```js
-window.SeyOnSyncState = SeyOnSyncState; // existing ~6208
-window.SeyOnSynced = SeyOnSynced;       // existing ~6208
-window.SeymaSave = save;                // existing ~6229
+// SeyOnSyncState/SeyOnSynced zaten app.js tarafından window'a atanır (6198/6208).
+// save() closure-scoped'tır (6229); window.SeymaSave lazy getter ile expose edilir.
+window.SeymaSave = function(){ return window.save; };   // existing ~6229
+window.SeyOnSyncState = window.SeyOnSyncState;           // existing ~6208
+window.SeyOnSynced = window.SeyOnSynced;                // existing ~6208
 ```
 
 **Bağımlılık:** `state.js`.

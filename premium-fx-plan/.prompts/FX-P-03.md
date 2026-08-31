@@ -27,23 +27,26 @@ forbidden:
 
 Yeni `dateUtils.js` ve `helpers.js` modüllerinin `window.SeymaDateUtils` ve `window.SeymaHelpers` yüzeylerini, `app.js` hâlâ yüklüyken doğrulayan headless Node test fixture’ları oluştur.
 
+> **Not:** `test_date_utils_boundary.js` ve `test_helpers_boundary.js` FX-P-01'de zaten oluşturuldu (commit `316e24c`). Bu prompt bunları **genişletir/doğrular**, sıfırdan oluşturmaz. Dosyalar yoksa oluştur; varsa mevcut yapıyı koruyup eksik assertion'ları ekle.
+
 ## Girdi
 
 - Mevcut `tests/app/test_modularization_boundary.js` yapısı (VM, mock localStorage/fetch/DOM).
 - `dateUtils.js` ve `helpers.js` API yüzeyleri.
+- Mevcut `tests/app/test_date_utils_boundary.js` ve `test_helpers_boundary.js` (FX-P-01'de oluşturuldu).
 
 ## Adımlar
 
 1. `FX-PROMPT-STATE.json` güncelle: `activePrompt: "FX-P-03"`.
 
-2. `tests/app/test_date_utils_boundary.js` oluştur:
+2. `tests/app/test_date_utils_boundary.js` **gözden geçir/genişlet**:
    - `node:vm` ile `app.js` + `constants.js` + `dateUtils.js` + `state.js` + `syncGlue.js` yükle (sırayla).
    - `window.SeymaDateUtils`’nin var olduğunu assert et.
    - `todayStr()` string döndüğünü, `addDays('2026-08-31', 1) === '2026-09-01'` olduğunu, `diffDays` doğru işaret döndürdüğünü test et.
-   - `pad2(3) === '03'` gibi sınır durumları test et.
+   - `pad(3) === '03'` gibi sınır durumları test et (not: fonksiyon adı `pad2` değil `pad`).
    - `app.js`’teki orijinal fonksiyonlar hâlâ `window`’da tanımlı ve çalışıyor olmalı (değişmez I2).
 
-3. `tests/app/test_helpers_boundary.js` oluştur:
+3. `tests/app/test_helpers_boundary.js` **gözden geçir/genişlet**:
    - Aynı VM kurulumu.
    - `window.SeymaHelpers` varlığı ve `segTabs`, `progBar`, `starRow`, `miniBars`, `statTile`, `collapsibleCardHTML`, `toast`, `confetti`, `haptic` fonksiyonları assert et.
    - `haptic()`’in `navigator.vibrate` olmadığında exception atmadığını doğrula.

@@ -25,6 +25,8 @@ forbidden:
 
 Eski `data` kayıtlarına yeni premium FX ayar alanlarını `migrate(d)` içinde güvenli şekilde backfill et. Sadece `settings.*` altına alan eklenecek; `data` şekli değişmeyecek.
 
+> **I3 netleştirmesi:** I3 "`migrate()` dokunulmaz" der; bu, **mevcut backfill mantığını değiştirmemek** anlamına gelir. FX-P-05 ise `migrate()`'e **yeni, additive backfill alanları ekler** — bu I3'ü ihlal etmez, çünkü mevcut davranış korunur ve yalnızca yeni `settings.*` alanları eklenir. `migrate()` idempotent kalır.
+
 ## Girdi
 
 - `app.js` içinde `migrate(d)` fonksiyonu (line ~4415).

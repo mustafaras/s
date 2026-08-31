@@ -18,10 +18,12 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 | `HABITS` | ~120 | Ana alışkanlık listesi | Tik sesleri her biri için aynı |
 | `SOUL_ACTIVITY_CATALOG` | ~130 | Ruhsal aktivite kataloğu | - |
 | `PRAYER_NAMES` / `PRAYER_CITIES` | ~160–190 | Namaz vakitleri sabitleri | - |
-| `data` / `ui` / `dark` | boot bölümü | Global durumlar | `settings.*` FX anahtarları burada |
-| `migrate(d)` | boot bölümü (~4400–4600) | Geriye dönük uyumluluk | Tüm FX ayarları varsayılan değer eklenmeli |
-| `save()` | boot civarı | LocalStorage + sync schedule | FX değişiklikleri `save()` sonrası sync etmezse panelde görünmez |
+| `data` / `ui` / `dark` | 2710 / 4678 / 4616 | Global durumlar — **closure-scoped, `window`'da DEĞİL** | `settings.*` FX anahtarları burada |
+| `migrate(d)` | 4415 | Geriye dönük uyumluluk — **closure-scoped** | Tüm FX ayarları varsayılan değer eklenmeli |
+| `save()` | 6229 | LocalStorage + sync schedule — **closure-scoped** | FX değişiklikleri `save()` sonrası sync etmezse panelde görünmez |
 | `render()` | 9688 | Tüm uygulama render motoru | FX modülleri `render`’den önce yüklenmeli |
+
+> **Kritik not:** `data`, `ui`, `dark`, `migrate`, `save`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window` üzerinde DEĞİLDİR. `app.js`'te `window`'a atanan yalnızca `SeyOnSyncState` (6198), `SeyOnSynced` (6208) ve `App` (16888)'dir. Yeni modüller bu yüzeylere **lazy getter (yumuşak bağ)** ile erişir; `app.js`'e expose satırı eklenmez.
 
 ---
 

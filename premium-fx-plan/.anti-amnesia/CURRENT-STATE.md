@@ -8,12 +8,13 @@
 
 ## Durum
 
-Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. Uygulama prompt kataloğu (`.prompts/`) ve makine-readable prompt durumu (`.anti-amnesia/FX-PROMPT-STATE.json`) oluşturuldu. Uygulama koduna henüz dokunulmadı. Kullanıcı onayı bekleniyor: FX-P-01 ile Faz -1.1 implementasyonuna başlamak.
+Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22): `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` closure-scoped olduğu için `window.SeymaState`/`window.SeymaSave` lazy getter (yumuşak bağ) ile expose edilir; `emptyDay` yoktur; TEST-SKELETONS'taki `vm2` bağımlılığı kaldırıldı. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03.
 
 ## Tamamlananlar (v2.3)
 
 - FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
 - FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave`/`SeyOnSyncState`/`SeyOnSynced` yumuşak bağ (lazy getter) ile expose edildi; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+- **Plan audit-fix (seq 22)** — plan belgeleri ve promptlar gerçek koda hizalandı: MODULARIZATION.md, API-TRANSITION-GUIDE, ROADMAP, CODE-MAP, FX-P-01/02/03/04/05, PROMPT-CATALOG, TEST-SKELETONS (7 dosya, vm2→global-mock). Uygulama koduna dokunulmadı.
 - `PLAN.md` v2.3 — yerel-only uygulama kuralı ve `SeyOnSynced()` satır numarası düzeltmesi eklendi.
 - `CODE-MAP.md` v2.1 — gerçek fonksiyon/satır referanslarıyla güncellendi.
 - `ROADMAP.md` v2.3 — context-load sırası, yerel-only kuralı, Faz 7 kapanış notu eklendi.
@@ -42,7 +43,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- FX-P-03: `tests/app/test_date_utils_boundary.js` ve `test_helpers_boundary.js` test fixture'ları eklenecek (state.js/syncGlue.js yüzeylerini de kapsayacak şekilde). Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
+- FX-P-03: `tests/app/test_date_utils_boundary.js` ve `test_helpers_boundary.js` test fixture'ları **genişletilecek** (dosyalar FX-P-01'de oluşturuldu; state.js/syncGlue.js yüzeylerini de kapsayacak şekilde). Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
 
 ## Engeller
 

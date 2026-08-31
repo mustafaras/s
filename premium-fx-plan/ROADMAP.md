@@ -28,8 +28,8 @@ Herhangi bir uygulama veya planlama oturumuna başlamadan önce bu dosyalar **s�
 - [ ] `index.html` script sırası implementasyon sırasında güncellenecek.
 
 ### -1.2 Merkezileştirme
-- [ ] `window.SeymaState = { data, ui, dark, getDay, emptyDay, createDefaultData, migrate }` oluştur (Faz -1 sonunda).
-- [ ] `save()` `syncGlue.js` içinde kalır ve `window.SeymaSave = save;` olarak expose edilir.
+- [ ] `window.SeymaState = { data, ui, dark, getDay, createDefaultData, migrate }` oluştur (Faz -1 sonunda). **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR; expose edilmez. `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData` closure-scoped'tır, `window`'da değildir — bu yüzden `window.SeymaState` lazy getter (yumuşak bağ) ile expose edilir.
+- [ ] `save()` `syncGlue.js` içinde kalır ve `window.SeymaSave` olarak expose edilir (lazy getter).
 - [ ] `migrate()` `state.js` içinde kalır ve `window.SeymaState.migrate` olarak expose edilir; ayrı `window.SeymaMigrate` olmaz.
 
 ### -1.3 Modül Ayırma Sırası

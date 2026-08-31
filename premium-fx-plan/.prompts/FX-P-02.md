@@ -26,48 +26,49 @@ forbidden:
 
 ## Amaç
 
-`data`, `ui`, `dark`, `migrate`, `getDay`, `emptyDay`, `createDefaultData` yüzeylerini `app/core/state.js`’e; `save()`, `SeyOnSyncState`, `SeyOnSynced` yüzeylerini `app/core/syncGlue.js`’e taşı ve `window.*` altında expose et. `app.js`’i değiştirme; bu prompt sadece yeni dosyalar yazıyor.
+`data`, `ui`, `dark`, `migrate`, `getDay`, `createDefaultData` yüzeylerini `app/core/state.js`’e; `save()`, `SeyOnSyncState`, `SeyOnSynced` yüzeylerini `app/core/syncGlue.js`’e taşı ve `window.*` altında expose et. `app.js`’i değiştirme; bu prompt sadece yeni dosyalar yazıyor.
 
 ## Girdi
 
 - `app.js`’teki ilgili satırlar:
-  - `data`, `ui`, `dark` global tanımlar
-  - `migrate(d)` → line ~4415
-  - `getDay`, `emptyDay` → line ~4922
-  - `createDefaultData` → line ~6686
-  - `save()` → line ~6229
-  - `SeyOnSyncState`, `SeyOnSynced` → line ~6208
+  - `data` (2710), `ui` (4678), `dark` (4616) global tanımlar — **closure-scoped, `window`'da DEĞİL**
+  - `migrate(d)` → line 4415
+  - `getDay` → line 4922
+  - `createDefaultData` → line 6684
+  - `save()` → line 6229
+  - `SeyOnSyncState`, `SeyOnSynced` → line 6198/6208 (zaten `window`'a atanıyor)
 
 ## Adımlar
 
 1. `FX-PROMPT-STATE.json` güncelle: `activePrompt: "FX-P-02"`.
 
 2. `app/core/state.js` oluştur:
-   - IIFE veya doğrudan `window.SeymaState = { ... }`.
+   - IIFE; `window.SeymaState = { ... }`.
+   - **Kritik:** `data`, `ui`, `dark`, `migrate`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window`'da DEĞİLDİR. Bu yüzden **lazy getter (yumuşak bağ)** kullanılır — her üye `window[name]` üzerinden çözümlenir. `app.js` ilgili yüzeyi `window`'a expose ettiğinde getter'lar otomatik canlanır; henüz yoksa güvenle `null`/`undefined` döner.
    - İçerik:
      ```js
      window.SeymaState = {
-       data: (typeof data !== 'undefined') ? data : null,
-       ui: (typeof ui !== 'undefined') ? ui : null,
-       dark: (typeof dark !== 'undefined') ? dark : false,
-       getDay: getDay,
-       emptyDay: emptyDay,
-       createDefaultData: createDefaultData,
-       migrate: migrate
+       get data(){ return window.data; },
+       get ui(){ return window.ui; },
+       get dark(){ return window.dark; },
+       get migrate(){ return window.migrate; },
+       get getDay(){ return window.getDay; },
+       get createDefaultData(){ return window.createDefaultData; }
      };
      ```
-   - Fonksiyon implementasyonlarını `app.js`’ten kopyala.
-   - `data`/`ui`/`dark` tanımları `app.js`’te kalmaya devam edecek (değişmez I2). Yeni modülde referansları `window`’dan alacak şekilde yumuşak bağ kur.
+   - **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR (yalnızca `getDay` içinde satır içi day şablonu vardır). Expose edilmez; `getDay` yüzeyi yeterlidir.
+   - Fonksiyon implementasyonlarını `app.js`'ten **kopyalama** — closure'da oldukları için kopyalanamaz ve kopyalanırsa bağımlılıklar kırılır. Yumuşak bağ yeterlidir.
 
 3. `app/core/syncGlue.js` oluştur:
    - IIFE.
+   - `SeyOnSyncState`/`SeyOnSynced` zaten `app.js` tarafından `window`'a atanır (6198/6208). `save()` closure-scoped'tır (6229) ve `window`'da değildir.
    - İçerik:
      ```js
-     window.SeymaSave = save;
-     window.SeyOnSyncState = SeyOnSyncState;
-     window.SeyOnSynced = SeyOnSynced;
+     window.SeymaSave = function(){ return window.save; };
+     window.SeyOnSyncState = window.SeyOnSyncState;
+     window.SeyOnSynced = window.SeyOnSynced;
      ```
-   - Fonksiyon implementasyonlarını `app.js`’ten kopyala.
+   - Fonksiyon implementasyonlarını `app.js`'ten **kopyalama** — `save()` onlarca closure helper'a bağımlıdır; kopyalanırsa uygulama kırılır.
 
 4. `index.html` güncelle:
    - `app/core/dateUtils.js`’ten hemen sonra ekle:

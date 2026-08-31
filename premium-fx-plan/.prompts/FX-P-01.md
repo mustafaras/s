@@ -36,7 +36,7 @@ forbidden:
 ## Girdi
 
 - `app.js` içindeki mevcut fonksiyonlar:
-  - `fmt`, `todayStr`, `addDays`, `diffDays`, `pad2`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR` → `dateUtils.js`
+  - `fmt`, `todayStr`, `addDays`, `diffDays`, `pad`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR` → `dateUtils.js` (not: fonksiyon adı `pad2` değil `pad`)
   - `segTabs`, `progBar`, `starRow`, `miniBars`, `statTile`, `collapsibleCardHTML`, `toast`, `confetti`, `haptic` → `helpers.js`
   - `SeyAudio`, `SeyHaptics`, `SeyFx` iskeleti → `mediaFx.js` (henüz boş fonksiyonlar)
   - `SeyTimeTheme` iskeleti → `timeTheme.js`
@@ -62,7 +62,7 @@ forbidden:
 
 3. `app/core/dateUtils.js` oluştur:
    - IIFE veya nesne literal; `window.SeymaDateUtils = { ... }` expose et.
-   - İçinde `fmt`, `todayStr`, `addDays`, `diffDays`, `pad2`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR` fonksiyonları yer alsın.
+   - İçinde `fmt`, `todayStr`, `addDays`, `diffDays`, `pad`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR` fonksiyonları yer alsın.
    - Fonksiyonların **implementasyonunu `app.js`’ten kopyala** (satır numaraları `CODE-MAP.md`§2.1’de).
    - Hiçbir yeni davranış ekleme.
 

@@ -30,7 +30,7 @@ Faz -1.1 kapanışı. Tüm yeni modüllerin `window.*` altında expose edildiği
 
 2. `tests/app/test_modularization_boundary.js` güncelle:
    - `window.SeymaDateUtils`, `SeymaHelpers`, `SeymaState`, `SeymaSave`, `SeyOnSyncState`, `SeyOnSynced`, `SeyAudio`, `SeyHaptics`, `SeyFx`, `SeyTimeTheme` varlığını assert et.
-   - `app.js`’in hâlâ yüklü olduğunu (`window.data`, `window.ui`, `window.App` gibi referanslar) doğrula.
+   - `app.js`’in hâlâ yüklü olduğunu doğrula. **Kritik:** `data`/`ui`/`dark`/`migrate`/`save` `window`'da DEĞİLDİR (closure-scoped) — `window.data`/`window.ui` varlığını assert ETME. Bunun yerine `window.App` varlığını ve `window.SeymaState`/`window.SeymaSave` lazy getter'larının tanımlı olduğunu doğrula.
    - `index.html` parse ederek `app.js` tag’inin hâlâ olduğunu ve yeni modüllerin `app.js`’ten önce yüklendiğini doğrula.
 
 3. S5/S6 değişmezlik kanıtlarını çalıştır ve önce/sonra çıktıları kaydet:

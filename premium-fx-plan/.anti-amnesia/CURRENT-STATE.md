@@ -12,6 +12,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Tamamlananlar (v2.3)
 
+- FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
 - `PLAN.md` v2.3 — yerel-only uygulama kuralı ve `SeyOnSynced()` satır numarası düzeltmesi eklendi.
 - `CODE-MAP.md` v2.1 — gerçek fonksiyon/satır referanslarıyla güncellendi.
 - `ROADMAP.md` v2.3 — context-load sırası, yerel-only kuralı, Faz 7 kapanış notu eklendi.
@@ -40,8 +41,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- Kullanıcı onayı bekleniyor: Faz -1 (`app.js` modülerleştirme) implementasyonuna başlamak.
-- Onay sonrası ilk adım: yerel branch oluştur (`git checkout -b premium-fx-local`), ardından `dateUtils.js` + `helpers.js` + `mediaFx.js` + `timeTheme.js` + `index.html` yükleme sırası.
+- FX-P-02: `app/core/state.js` (global `data`/`ui` dependency-bag) ve `app/core/syncGlue.js` (SeyOnSynced, save, localStorage, sync.js bridge) iskeletleri oluşturulacak. Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
 
 ## Engeller
 

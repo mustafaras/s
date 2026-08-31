@@ -17,6 +17,24 @@ function ok(name, cond, detail){
 
 console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
 
+// [0] FX-P-04: yeni Faz -1.1 modülleri expose edilmiş ve app.js hâlâ yüklü
+(function(){
+  var expectedLoaded = [
+    'app/core/dateUtils.js',
+    'app/core/state.js',
+    'app/core/helpers.js',
+    'app/core/mediaFx.js',
+    'app/core/timeTheme.js'
+  ];
+  var html = fs.readFileSync(path.join(repoRoot,'index.html'),'utf8');
+  expectedLoaded.forEach(function(m){
+    var idx = html.indexOf('src="'+m);
+    ok(m + ' index.html\'de yüklü (cache-busting dahil)', idx >= 0);
+    var appIdx = html.indexOf('src="app.js');
+    ok(m + ' app.js\'den önce yükleniyor', idx < appIdx);
+  });
+})();
+
 // [1] app.js hâlâ var ve büyük monolit
 (function(){
   var appPath = path.join(repoRoot,'app.js');

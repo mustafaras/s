@@ -1,8 +1,8 @@
 {
-  "lastCompletedPrompt": null,
+  "lastCompletedPrompt": "FX-P-01",
   "activePrompt": null,
   "blockedPrompt": null,
-  "currentPhase": null,
+  "currentPhase": "Faz -1.1",
   "updatedAt": "2026-08-31",
   "localBranch": "premium-fx-local",
   "planVersion": "2.3"

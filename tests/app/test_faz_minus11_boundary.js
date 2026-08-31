@@ -26,15 +26,15 @@ var expectedModules = [
 (function(){
   expectedModules.forEach(function(m){
     var p = path.join(repoRoot,m);
-    ok(m+' henüz mevcut değil (PR -1.1 öncesi)', !fs.existsSync(p));
+    ok(m+' mevcut (Faz -1.1 sonrası)', fs.existsSync(p));
   });
 })();
 
 (function(){
   var html = fs.readFileSync(path.join(repoRoot,'index.html'),'utf8');
   expectedModules.forEach(function(m){
-    var ref = 'src="'+m+'"';
-    ok(m+' henüz index.html\'de yüklenmiyor', html.indexOf(ref) < 0);
+    var ref = 'src="'+m;
+    ok(m+' index.html\'de yükleniyor (cache-busting dahil)', html.indexOf(ref) >= 0);
   });
 })();
 

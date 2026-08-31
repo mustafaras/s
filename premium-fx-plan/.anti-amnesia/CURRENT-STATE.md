@@ -13,6 +13,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 ## Tamamlananlar (v2.3)
 
 - FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
+- FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave`/`SeyOnSyncState`/`SeyOnSynced` yumuşak bağ (lazy getter) ile expose edildi; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 - `PLAN.md` v2.3 — yerel-only uygulama kuralı ve `SeyOnSynced()` satır numarası düzeltmesi eklendi.
 - `CODE-MAP.md` v2.1 — gerçek fonksiyon/satır referanslarıyla güncellendi.
 - `ROADMAP.md` v2.3 — context-load sırası, yerel-only kuralı, Faz 7 kapanış notu eklendi.
@@ -41,7 +42,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- FX-P-02: `app/core/state.js` (global `data`/`ui` dependency-bag) ve `app/core/syncGlue.js` (SeyOnSynced, save, localStorage, sync.js bridge) iskeletleri oluşturulacak. Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
+- FX-P-03: `tests/app/test_date_utils_boundary.js` ve `test_helpers_boundary.js` test fixture'ları eklenecek (state.js/syncGlue.js yüzeylerini de kapsayacak şekilde). Faz -1.1 tamamlandığında artık Faz 0'a (state/service extraction) geçilebilir. |
 
 ## Engeller
 

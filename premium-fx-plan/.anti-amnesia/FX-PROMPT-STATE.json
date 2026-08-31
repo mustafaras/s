@@ -1,9 +1,9 @@
 {
-  "lastCompletedPrompt": "FX-P-05",
+  "lastCompletedPrompt": "FX-P-06",
   "activePrompt": null,
   "blockedPrompt": null,
-  "currentPhase": "Faz 0",
-  "lastCompletedFaz": "Faz -1.1",
+  "currentPhase": "Faz 0 tamamlandı",
+  "lastCompletedFaz": "Faz 0",
   "updatedAt": "2026-08-31",
   "localBranch": "premium-fx-local",
   "planVersion": "2.3"

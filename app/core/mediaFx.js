@@ -56,7 +56,8 @@
   }
 
   window.SeyAudio = {
-    ctx: CTX,
+    // ctx lazy init: her erişimde bootCtx() çağrılır; AudioContext yoksa null döner.
+    get ctx(){ return bootCtx(); },
     tap: function(){ playTone(880, 0.12, 'sine', 0.08); },
     success: function(){ playArpeggio([523, 659, 784], 0.35, 'sine'); },
     warning: function(){ playTone(220, 0.25, 'sawtooth', 0.1); },

@@ -10,7 +10,9 @@
 
 ### 1.1 Temel Kural
 
-Hiçbir efekt, `data` objesinin, `migrate()` fonksiyonunun, `sync.js` akışının veya GitHub Contents API çağrılarının davranışını değiştirmemeli.
+Hiçbir efekt, `data` objesinin, `migrate()` fonksiyonunun, `sync.js` akışının veya GitHub Contents API çağrılarının **davranışını** değiştirmemeli.
+
+> **B1 kararı (canlı getter):** Faz 0'da `app.js`'e yalnızca **canlı getter** tanımları eklenir: `Object.defineProperty(window, 'data', { get: () => data, configurable: true })` (ve `ui`, `dark`, `migrate`, `getDay`, `createDefaultData`, `save` için aynı). Bu, mevcut fonksiyonların davranışını/imzasını değiştirmez; yalnızca `window` üzerinden okunabilir kılar. `data` mutable bir bağlama olduğu için (6+ kez yeniden atanır: 4412/4413/6692/9203/18724/9173/9177) tek seferlik `window.data = data` bayat kalır; canlı getter her okumada taze değer döndürür (VM'de kanıtlandı). Bu, I2/I3/I4'ü ihlal etmez çünkü "dokunulmaz" = "davranış değiştirmez", "hiç satır eklenmez" değil.
 
 ### 1.2 Yeni Veri Alanları
 

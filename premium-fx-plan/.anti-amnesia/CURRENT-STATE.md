@@ -8,13 +8,14 @@
 
 ## Durum
 
-Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22): `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` closure-scoped olduğu için `window.SeymaState`/`window.SeymaSave` lazy getter (yumuşak bağ) ile expose edilir; `emptyDay` yoktur; TEST-SKELETONS'taki `vm2` bağımlılığı kaldırıldı. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03.
+Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03.
 
 ## Tamamlananlar (v2.3)
 
 - FX-P-01 — Faz -1.1 temel modül iskeletleri uygulandı ve yerel commitlendi (`premium-fx-local`).
-- FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave`/`SeyOnSyncState`/`SeyOnSynced` yumuşak bağ (lazy getter) ile expose edildi; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+- FX-P-02 — `app/core/state.js` ve `app/core/syncGlue.js` iskeletleri oluşturuldu; `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData) ve `window.SeymaSave` getter'ları tanımlandı; `index.html`'e `syncGlue.js` eklendi. `app.js`/`save()`/`migrate()` dokunulmadı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 - **Plan audit-fix (seq 22)** — plan belgeleri ve promptlar gerçek koda hizalandı: MODULARIZATION.md, API-TRANSITION-GUIDE, ROADMAP, CODE-MAP, FX-P-01/02/03/04/05, PROMPT-CATALOG, TEST-SKELETONS (7 dosya, vm2→global-mock). Uygulama koduna dokunulmadı.
+- **B1 kararı (seq 23)** — canlı getter yaklaşımı benimsendi; plan belgeleri ve promptlar buna göre güncellendi. Uygulama koduna dokunulmadı.
 - `PLAN.md` v2.3 — yerel-only uygulama kuralı ve `SeyOnSynced()` satır numarası düzeltmesi eklendi.
 - `CODE-MAP.md` v2.1 — gerçek fonksiyon/satır referanslarıyla güncellendi.
 - `ROADMAP.md` v2.3 — context-load sırası, yerel-only kuralı, Faz 7 kapanış notu eklendi.

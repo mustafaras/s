@@ -153,7 +153,7 @@ Her prompt şunları içermeli:
 | Kod | Ad | Ajan | Çıktı Dosyaları | Kısa Amaç |
 | --- | --- | --- | --- | --- |
 | FX-P-01 | Yerel branch oluştur ve temel modül iskeletini hazırla | herhangi | `app/core/dateUtils.js`, `app/core/helpers.js`, `app/core/mediaFx.js`, `app/core/timeTheme.js`, `index.html` (script tagleri) | `app.js` kaldırılmadan, yeni modüller `window.*` altında expose edilir; hiçbir handler bunları kullanmaz. |
-| FX-P-02 | `state.js` ve `syncGlue.js` iskeletini hazırla | mimar/state uzmanı | `app/core/state.js`, `app/core/syncGlue.js` | `data`, `ui`, `migrate`, `save`, `SeyOnSynced` doğru modüllere ayrılır; `save()` `syncGlue.js`’de kalır. **Not:** `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` closure-scoped'tır, `window`'da değildir; `window.SeymaState`/`window.SeymaSave` lazy getter (yumuşak bağ) ile expose edilir. `emptyDay` yoktur. |
+| FX-P-02 | `state.js` ve `syncGlue.js` iskeletini hazırla | mimar/state uzmanı | `app/core/state.js`, `app/core/syncGlue.js` | `data`, `ui`, `migrate`, `save`, `SeyOnSynced` doğru modüllere ayrılır; `save()` `syncGlue.js`’de kalır. **Not (B1):** `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` closure-scoped'tır, `window`'da değildir; `window.SeymaState`/`window.SeymaSave` getter'ları Faz 0'da eklenecek canlı getter'ları okur. `emptyDay` yoktur. |
 | FX-P-03 | `test_date_utils_boundary.js` ve `test_helpers_boundary.js` ekle | test uzmanı | `tests/app/test_date_utils_boundary.js`, `tests/app/test_helpers_boundary.js` | Yeni modüllerin `app.js` yüklüyken doğru `window.*` yüzeyini sunduğunu doğrula. **Not:** dosyalar FX-P-01'de oluşturuldu; bu prompt genişletir. |
 | FX-P-04 | `test_modularization_boundary.js` güncelle ve S5/S6 kanıtlarını çalıştır | genel | `tests/app/test_modularization_boundary.js` | I2/I5 değişmezlik kanıtları PASS; `app.js` hâlâ yüklü. **Not:** `window.data`/`window.ui` varlığı assert edilmez (closure-scoped); `window.App` + lazy getter'lar doğrulanır. |
 
@@ -161,7 +161,7 @@ Her prompt şunları içermeli:
 
 | Kod | Ad | Ajan | Çıktı Dosyaları | Kısa Amaç |
 | --- | --- | --- | --- | --- |
-| FX-P-05 | `settings.premiumAtmosphere` alanını `migrate()`’a ekle | state/data uzmanı | `app.js` (sadece `migrate()` bölümü) | Eski datalara `settings.premiumAtmosphere = true` ve `uiSounds=true` backfill yap; I3 korunur. |
+| FX-P-05 | `settings.premiumAtmosphere` alanını `migrate()`’a ekle | state/data uzmanı | `app.js` (sadece `migrate()` bölümü) | Eski datalara `settings.premiumAtmosphere = true` ve `uiSounds=true` backfill yap; I3 korunur. **Not (B1):** Aynı promptta `app.js`'e canlı getter'lar eklenir (`Object.defineProperty(window, 'data', { get: () => data, configurable: true })` ve diğerleri) — `data` mutable olduğu için tek seferlik referans bayat kalır; canlı getter her okumada taze değer döndürür. |
 | FX-P-06 | `mediaFx.js` iskeletini oluştur: `SeyAudio`, `SeyHaptics`, `SeyFx` boş fonksiyonları | FX uzmanı | `app/core/mediaFx.js` | Tüm API yüzeyi tanımlanır; implementasyon sonraki fazlarda doldurulur. |
 
 ### Dalga 1: Audio

@@ -53,9 +53,21 @@ Eski `data` kayıtlarına yeni premium FX ayar alanlarını `migrate(d)` içinde
    if (d.settings.launchRitual == null) d.settings.launchRitual = true;
    ```
 
-3. `node --check app.js` çalıştır.
+3. **Canlı getter'ları ekle (B1 kararı):** `app.js`'in IIFE kapsamında, `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` tanımlarının **sonrasına** (boot bölümünde, `data` yüklendikten sonra) şu canlı getter'ları ekle:
+   ```js
+   Object.defineProperty(window, 'data', { get: function(){ return data; }, configurable: true });
+   Object.defineProperty(window, 'ui',   { get: function(){ return ui; },   configurable: true });
+   Object.defineProperty(window, 'dark', { get: function(){ return dark; }, configurable: true });
+   Object.defineProperty(window, 'migrate', { get: function(){ return migrate; }, configurable: true });
+   Object.defineProperty(window, 'getDay',  { get: function(){ return getDay; },  configurable: true });
+   Object.defineProperty(window, 'createDefaultData', { get: function(){ return createDefaultData; }, configurable: true });
+   Object.defineProperty(window, 'save', { get: function(){ return save; }, configurable: true });
+   ```
+   **Neden canlı getter?** `data` mutable bir bağlamadır (6+ kez yeniden atanır: 4412/4413/6692/9203/18724/9173/9177). Tek seferlik `window.data = data` bayat kalır; canlı getter her okumada taze değer döndürür (VM'de kanıtlandı). Bu, mevcut fonksiyonların davranışını/imzasını değiştirmez — yalnızca `window` üzerinden okunabilir kılar. I2/I3/I4'ü ihlal etmez ("dokunulmaz" = "davranış değiştirmez").
 
-4. `verify-state-migration-boundary.mjs` çalıştır; eski/partial/zengin state’lerin doğru migrate edildiğini doğrula.
+4. `node --check app.js` çalıştır.
+
+5. `verify-state-migration-boundary.mjs` çalıştır; eski/partial/zengin state’lerin doğru migrate edildiğini doğrula.
 
 ## Test / Kanıt
 

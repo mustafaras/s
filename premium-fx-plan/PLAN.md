@@ -27,7 +27,7 @@
 1. **Plan önce, kod sonra:** Bu klasörde yalnızca belge, spec ve test iskelesi üretilir.
 2. **Modülerleştirme = FX’nin ön koşulu:** Yeni ses/hareket katmanları, mevcut 18.805 satırlık `app.js` içine gömülmek yerine `app/core/mediaFx.js` ve `app/core/timeTheme.js` gibi modüllerde yaşayacak.
 3. **Erişilebilirlik öncelikli:** `prefers-reduced-motion: reduce` ve kullanıcı ayarlarına tam uyum.
-4. **Veri güvenliği:** Hiçbir efekt `data`, `migrate()`, `sync.js`, `save()` veya GitHub Contents API akışını değiştirmemeli.
+4. **Veri güvenliği:** Hiçbir efekt `data`, `migrate()`, `sync.js`, `save()` veya GitHub Contents API akışının **davranışını** değiştirmemeli. **Not (B1 kararı):** Faz 0'da `app.js`'e yalnızca **canlı getter** tanımları eklenir (`Object.defineProperty(window, 'data', { get: () => data, configurable: true })` ve diğerleri) — bu, mevcut fonksiyonların davranışını/imzasını değiştirmez, yalnızca `window` üzerinden okunabilir kılar. `data` mutable bir bağlama olduğu için (6+ kez yeniden atanır) tek seferlik `window.data = data` bayat kalır; canlı getter her okumada taze değer döndürür.
 5. **Yerel / offline:** Ses ve görsel efektler tamamen tarayıcı içinde üretilmeli; harici kaynaklara bağımlılık minimumda tutulmalı.
 6. **Türkçe ve sıcak ton:** Tüm kullanıcıya dönük metinler uygulamanın mevcut sesiyle uyumlu olmalı.
 7. **Test edilebilir:** Her efekt headless `run-seyma` testleri ve `prefers-reduced-motion` fixture’larıyla doğrulanabilmeli.

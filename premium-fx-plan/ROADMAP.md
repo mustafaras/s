@@ -28,9 +28,11 @@ Herhangi bir uygulama veya planlama oturumuna başlamadan önce bu dosyalar **s�
 - [ ] `index.html` script sırası implementasyon sırasında güncellenecek.
 
 ### -1.2 Merkezileştirme
-- [ ] `window.SeymaState = { data, ui, dark, getDay, createDefaultData, migrate }` oluştur (Faz -1 sonunda). **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR; expose edilmez. `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData` closure-scoped'tır, `window`'da değildir — bu yüzden `window.SeymaState` lazy getter (yumuşak bağ) ile expose edilir.
-- [ ] `save()` `syncGlue.js` içinde kalır ve `window.SeymaSave` olarak expose edilir (lazy getter).
+- [ ] `app.js`'e **canlı getter (live getter)** ekle: `Object.defineProperty(window, 'data', { get: () => data, configurable: true })` (ve `ui`, `dark`, `migrate`, `getDay`, `createDefaultData`, `save` için aynı). **Neden:** `data` mutable bir bağlamadır (6+ kez yeniden atanır); tek seferlik `window.data = data` bayat kalır. Canlı getter her okumada taze değer döndürür (VM'de kanıtlandı).
+- [ ] `window.SeymaState = { data, ui, dark, getDay, createDefaultData, migrate }` oluştur (Faz -1 sonunda). **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR; expose edilmez. `window.SeymaState` getter'ları `window.data`/`window.ui`/vb. canlı getter'larından okur.
+- [ ] `save()` `syncGlue.js` içinde kalır ve `window.SeymaSave` olarak expose edilir (canlı getter).
 - [ ] `migrate()` `state.js` içinde kalır ve `window.SeymaState.migrate` olarak expose edilir; ayrı `window.SeymaMigrate` olmaz.
+- [ ] **Değişmezlik yeniden tanımı:** I2/I3/I4 "dokunulmaz" = "davranış değiştirmez". Faz 0'da `app.js`'e yalnızca canlı getter tanımları eklenir; mevcut fonksiyon davranışı, imzası, `App.*` yüzeyi ve `save()`/`migrate()` mantığı değişmez.
 
 ### -1.3 Modül Ayırma Sırası
 | Sıra | Modül | Gerekçe |

@@ -44,7 +44,7 @@ forbidden:
 
 2. `app/core/state.js` oluştur:
    - IIFE; `window.SeymaState = { ... }`.
-   - **Kritik:** `data`, `ui`, `dark`, `migrate`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window`'da DEĞİLDİR. Bu yüzden **lazy getter (yumuşak bağ)** kullanılır — her üye `window[name]` üzerinden çözümlenir. `app.js` ilgili yüzeyi `window`'a expose ettiğinde getter'lar otomatik canlanır; henüz yoksa güvenle `null`/`undefined` döner.
+   - **Kritik (B1 kararı):** `data`, `ui`, `dark`, `migrate`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window`'da DEĞİLDİR. Faz 0'da `app.js`'e **canlı getter** eklenecek (`Object.defineProperty(window, 'data', { get: () => data, configurable: true })` ve diğerleri). `window.SeymaState` getter'ları bu canlı getter'ları okur. Bu prompt (Faz -1.1) yalnızca iskeleti kurar; canlı getter'lar Faz 0'da (FX-P-05 sonrası) eklenir.
    - İçerik:
      ```js
      window.SeymaState = {
@@ -57,16 +57,17 @@ forbidden:
      };
      ```
    - **Not:** `emptyDay` fonksiyonu `app.js`'te YOKTUR (yalnızca `getDay` içinde satır içi day şablonu vardır). Expose edilmez; `getDay` yüzeyi yeterlidir.
-   - Fonksiyon implementasyonlarını `app.js`'ten **kopyalama** — closure'da oldukları için kopyalanamaz ve kopyalanırsa bağımlılıklar kırılır. Yumuşak bağ yeterlidir.
+   - Fonksiyon implementasyonlarını `app.js`'ten **kopyalama** — closure'da oldukları için kopyalanamaz ve kopyalanırsa bağımlılıklar kırılır. Getter'lar yeterlidir.
 
 3. `app/core/syncGlue.js` oluştur:
    - IIFE.
-   - `SeyOnSyncState`/`SeyOnSynced` zaten `app.js` tarafından `window`'a atanır (6198/6208). `save()` closure-scoped'tır (6229) ve `window`'da değildir.
+   - `SeyOnSyncState`/`SeyOnSynced` zaten `app.js` tarafından `window`'a atanır (6198/6208) — **bunları yeniden tanımlama** (getter-only accessor yapılırsa app.js'in strict-mode ataması THROW eder). `save()` closure-scoped'tır (6229) ve `window`'da değildir; Faz 0'da canlı getter eklenecek.
    - İçerik:
      ```js
-     window.SeymaSave = function(){ return window.save; };
-     window.SeyOnSyncState = window.SeyOnSyncState;
-     window.SeyOnSynced = window.SeyOnSynced;
+     Object.defineProperty(window, 'SeymaSave', {
+       get: function(){ return window.save; },
+       configurable: true
+     });
      ```
    - Fonksiyon implementasyonlarını `app.js`'ten **kopyalama** — `save()` onlarca closure helper'a bağımlıdır; kopyalanırsa uygulama kırılır.
 

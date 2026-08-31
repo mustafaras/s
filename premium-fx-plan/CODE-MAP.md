@@ -23,7 +23,7 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 | `save()` | 6229 | LocalStorage + sync schedule — **closure-scoped** | FX değişiklikleri `save()` sonrası sync etmezse panelde görünmez |
 | `render()` | 9688 | Tüm uygulama render motoru | FX modülleri `render`’den önce yüklenmeli |
 
-> **Kritik not:** `data`, `ui`, `dark`, `migrate`, `save`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window` üzerinde DEĞİLDİR. `app.js`'te `window`'a atanan yalnızca `SeyOnSyncState` (6198), `SeyOnSynced` (6208) ve `App` (16888)'dir. Yeni modüller bu yüzeylere **lazy getter (yumuşak bağ)** ile erişir; `app.js`'e expose satırı eklenmez.
+> **Kritik not:** `data`, `ui`, `dark`, `migrate`, `save`, `getDay`, `createDefaultData` `app.js`'in IIFE kapsamındadır ve `window` üzerinde DEĞİLDİR. `app.js`'te `window`'a atanan yalnızca `SeyOnSyncState` (6198), `SeyOnSynced` (6208) ve `App` (16888)'dir. `data` mutable bir bağlamadır (6+ kez yeniden atanır: 4412/4413/6692/9203/18724/9173/9177). Faz 0'da `app.js`'e **canlı getter** eklenir (`Object.defineProperty(window, 'data', { get: () => data, configurable: true })` ve diğerleri) — her okumada taze değer döndürür, tek seferlik referans bayat kalır. Yeni modüller `window.SeymaState`/`window.SeymaSave` getter'ları üzerinden bu canlı getter'ları okur.
 
 ---
 

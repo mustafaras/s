@@ -125,9 +125,17 @@ window.SeyTimeTheme = {
 
 ```js
 // data, ui, dark, migrate, getDay, createDefaultData closure-scoped'tır ve
-// window'da DEĞİLDİR (app.js IIFE). Bu yüzden lazy getter (yumuşak bağ) kullanılır.
+// window'da DEĞİLDİR (app.js IIFE). Faz 0'da app.js'e CANLI GETTER eklenir:
+//   Object.defineProperty(window, 'data', { get: () => data, configurable: true });
+//   Object.defineProperty(window, 'ui',   { get: () => ui,   configurable: true });
+//   Object.defineProperty(window, 'dark', { get: () => dark, configurable: true });
+//   Object.defineProperty(window, 'migrate', { get: () => migrate, configurable: true });
+//   Object.defineProperty(window, 'getDay',  { get: () => getDay,  configurable: true });
+//   Object.defineProperty(window, 'createDefaultData', { get: () => createDefaultData, configurable: true });
+// data mutable bir bağlamadır (6+ kez yeniden atanır); canlı getter her okumada
+// taze değer döndürür, tek seferlik referans bayat kalır (VM'de kanıtlandı).
 window.SeymaState = {
-  get data(){ return window.data; },              // app.js expose edince canlanır
+  get data(){ return window.data; },              // Faz 0 getter'ından okur
   get ui(){ return window.ui; },
   get dark(){ return window.dark; },
   get migrate(){ return window.migrate; },        // existing line ~4415
@@ -152,11 +160,14 @@ window.SeymaState = {
 ### 2.6 `app/core/syncGlue.js`
 
 ```js
-// SeyOnSyncState/SeyOnSynced zaten app.js tarafından window'a atanır (6198/6208).
-// save() closure-scoped'tır (6229); window.SeymaSave lazy getter ile expose edilir.
-window.SeymaSave = function(){ return window.save; };   // existing ~6229
-window.SeyOnSyncState = window.SeyOnSyncState;           // existing ~6208
-window.SeyOnSynced = window.SeyOnSynced;                // existing ~6208
+// SeyOnSyncState/SeyOnSynced zaten app.js tarafından window'a atanır (6198/6208);
+// syncGlue.js bunları yeniden tanımlamaz (getter-only accessor yapılırsa app.js'in
+// strict-mode ataması THROW eder). save() closure-scoped'tır (6229); Faz 0'da
+// app.js'e canlı getter eklenir ve SeymaSave bu getter'ı okur.
+Object.defineProperty(window, 'SeymaSave', {
+  get: function(){ return window.save; },   // existing ~6229
+  configurable: true
+});
 ```
 
 **Bağımlılık:** `state.js`.

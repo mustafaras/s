@@ -130,7 +130,7 @@ function speak(text){
 
 **iOS:** iOS Safari `navigator.vibrate` desteği yok (sadece WebView/standalone PWA). Android odaklı; iOS’ta görsel fallback zorunlu.
 
-**Kontrol:** `settings.richHaptics === true` ve `settings.premiumAtmosphere === true` ise çalışır.
+**Kontrol:** `settings.richHaptics === true` **ve** `settings.premiumAtmosphere === true` ise çalışır. Eski `settings.haptics` alanı varsa `haptic()` onu da kontrol eder; `SeyHaptics` zenginleştirilmiş pattern'leri ise `richHaptics` ile gating yapar.
 
 ---
 

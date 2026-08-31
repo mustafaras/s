@@ -32,6 +32,8 @@
     if(!masterEnabled) return false;
     if(!window.SeymaConstants || !window.SeymaConstants.data) return true; // default açık
     var s = window.SeymaConstants.data.settings || {};
+    if(s.premiumAtmosphere === false) return false;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
     return s.uiSounds !== false;
   }
 
@@ -81,7 +83,8 @@
     success: success,
     warning: warning,
     bell: bell,
-    voice: speak,
+    voice: speak,                // tek sesli rehberlik girişi; speak adı kullanılmaz
+    ambient: ambient,            // Faz 4: günün saatine göre ambient sesler
     setMaster: function(v){ masterEnabled = !!v; },
     isAllowed: isAllowed
   };
@@ -119,7 +122,8 @@
 function vibrate(pattern){
   if(!window.SeymaConstants || !window.SeymaConstants.data) return;
   var s = window.SeymaConstants.data.settings || {};
-  if(s.richHaptics === false || s.haptics === false) return;
+  // Mevcut haptic() ayarı da korunur; SeyHaptics richHaptics + premiumAtmosphere ile gating yapar.
+  if(s.richHaptics === false || s.haptics === false || s.premiumAtmosphere === false) return;
   if(!navigator.vibrate) return;
   try { navigator.vibrate(pattern); } catch(e){}
 }
@@ -147,7 +151,7 @@ Mevcut `haptic(p)` (`app.js:6375`) korunur; FX modülü buna ek katman olarak ç
 | `App.saveJournal()` | `app.js:9114` | `SeyAudio.success()` | `SeyHaptics.success()` |
 | `App.completeMotivationTask(status)` | `app.js:11812` | `SeyAudio.success()` | `SeyHaptics.success()` |
 
-**Kural:** `SeyAudio`/`SeyHaptics` tanımlı değilse (modül yüklenmemişse) hiçbir şey çalışmamalı; `if(window.SeyAudio)` / `if(window.SeyHaptics)` kontrolü ekle.
+**Kural:** `SeyAudio`/`SeyHaptics` tanımlı değilse (modül yüklenmemişse) hiçbir şey çalışmamalı; `if(window.SeyAudio)` / `if(window.SeyHaptics)` kontrolü ekle. `SeyAudio`/`SeyHaptics` fonksiyonlarının kendi içinde `isAllowed()` / `premiumAtmosphere` kontrolü de vardır; böylece reduced-motion kapalıyken veya master anahtar kapalıyken çift güvenlik sağlanır.
 
 ---
 
@@ -182,8 +186,10 @@ Mevcut `haptic(p)` (`app.js:6375`) korunur; FX modülü buna ek katman olarak ç
 
 ## 1.6 Reduce Motion Uyumu
 
-- Sesler `prefers-reduced-motion` ile doğrudan ilişkili değil; ama `settings.uiSounds` kullanıcı kontrolüne tabi.
-- Haptik `settings.richHaptics` ile kontrol edilir; reduce motion aktifse `SeyHaptics` otomatik no-op olur (`SeyFx.isPremiumFxEnabled()` helper'ı bu durumu çözer).
+- Tüm FX ses/haptik/animasyon çağrıları `SeyFx.isPremiumFxEnabled()` veya `SeyAudio.isAllowed()` gating’inden geçer.
+- `prefers-reduced-motion: reduce` aktifse `isPremiumFxEnabled()` false döner; böylece ses, haptik ve animasyonlar pasif olur.
+- `settings.premiumAtmosphere === false` olduğunda da aynı pasif davranış uygulanır.
+- Tek istisna: `voiceGuidance` kendi ayarı (`settings.voiceGuidance === true`) ile çalışır; reduced-motion onu doğrudan engellemez (erişilebilirlik gereği).
 
 ---
 

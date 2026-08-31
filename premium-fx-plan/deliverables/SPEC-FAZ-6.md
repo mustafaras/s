@@ -46,8 +46,9 @@
 ```js
 App.toggleSetting=function(key){
   if(!data.settings) data.settings={};
+  // Mevcut haptics ayarı (settings.haptics) varsa onu da koruruz; zengin haptik ayrı kontrol.
   data.settings[key]=!data.settings[key];
-  haptic(10);
+  if(window.SeyHaptics) SeyHaptics.tap();
   save();
   render();
 };
@@ -111,7 +112,7 @@ Alt ayarlar kullanıcının son tercihlerine döner:
 
 ### 6.3.3 Reduce Motion Override
 
-**Yeni modül helper:** `isPremiumFxEnabled()` ve `prefersReducedMotion()` `app/core/mediaFx.js` içinde tanımlanır (veya `app/core/timeTheme.js` modül sınırına göre). `app.js` bu helper’ları `window.SeyFx.isPremiumFxEnabled()` olarak çağırır.
+**Yeni modül helper:** `isPremiumFxEnabled()` ve `prefersReducedMotion()` `app/core/mediaFx.js` içinde tanımlanır. `app.js` bu helper’ları `window.SeyFx.isPremiumFxEnabled()` olarak çağırır. `prefers-reduced-motion: reduce` aktifse veya `premiumAtmosphere === false` ise tüm animasyon/ses/haptik (voiceGuidance hariç) pasif olur.
 
 ---
 

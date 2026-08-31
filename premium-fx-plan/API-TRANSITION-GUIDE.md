@@ -34,7 +34,7 @@ window.SeymaDateUtils = {
 **Bağımlılık:** `app/core/constants.js` (`SEYMA_CONSTANTS`, `KEY`, `TKEY`).
 
 **Test stratejisi:**
-- `tests/app/test_date_utils_boundary.js`: her fonksiyon `window.SeymaDateUtils` üzerinden çağrılabilir, `todayStr()` ISO formatında döner, `addDays` bozulmaz.
+- `tests/app/test_date_utils_boundary.js` **(Faz -1 uygulama aşamasında oluşturulacak)**.
 
 ---
 
@@ -57,7 +57,7 @@ window.SeymaHelpers = {
 **Bağımlılık:** `constants.js`, `state.js` (`data`, `ui`), `dateUtils.js`.
 
 **Test stratejisi:**
-- `tests/app/test_helpers_boundary.js`: `toast()` HTML üretir, `haptic()` `navigator.vibrate`’i çağırır (stub), `progBar` geçerli HTML döner.
+- `tests/app/test_helpers_boundary.js` **(Faz -1 uygulama aşamasında oluşturulacak)**.
 
 ---
 
@@ -70,9 +70,9 @@ window.SeyAudio = {
   success: function(){},
   warning: function(){},
   bell: function(){},
-  voice: function(text){},
-  ambient: function(type){},
-  speak: function(text){}   // alias for voice
+  voice: function(text){},    // preferred name
+  ambient: function(type){},   // Faz 4 ambient sound katmanı
+  // speak intentionally removed; use voice() to avoid dual naming
 };
 
 window.SeyHaptics = {
@@ -85,12 +85,13 @@ window.SeyHaptics = {
 };
 
 window.SeyFx = {
-  isPremiumFxEnabled: function(){},
-  prefersReducedMotion: function(){},
-  countUp: function(options){},   // { from, to, duration, el, formatter }
-  ripple: function(event, color){},
-  shimmer: function(element){},
-  shouldAnimate: function(){}
+  isPremiumFxEnabled: function(){},   // premiumAtmosphere + !prefers-reduced-motion
+  prefersReducedMotion: function(){}, // window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  countUp: function(options){},     // { from, to, duration, el, formatter }
+  ripple: function(event, color){},  // touch coordinate ripple
+  shimmer: function(element){},       // CSS shimmer trigger helper
+  shouldAnimate: function(){},        // alias wrapper for isPremiumFxEnabled
+  ambientAllowed: function(){}        // true if ambientSounds && premiumAtmosphere
 };
 ```
 
@@ -133,15 +134,16 @@ window.SeymaState = {
   migrate: migrate          // existing line ~4415
 };
 
-// Dışa açılmayacak (internal only):
-// - save() stays in syncGlue.js
+// `save()` stays in syncGlue.js and is exposed as window.SeymaSave.
+// `migrate()` stays in state.js and is exposed as window.SeymaState.migrate.
+// We do NOT expose a separate window.SeymaMigrate; use window.SeymaState.migrate.
 ```
 
 **Bağımlılık:** `constants.js`, `dateUtils.js`.
 
 **Test stratejisi:**
 - `test_modularization_boundary.js` zaten `migrate(d)` ve `save()`’in `app.js` içinde kaldığını doğruluyor.
-- Gelecekte `test_state_boundary.js`: `window.SeymaState.data` okunabilir, `migrate()` idempotent.
+- `test_state_boundary.js` **(Faz -1 uygulama aşamasında oluşturulacak)**.
 
 ---
 
@@ -170,8 +172,8 @@ window.SeymaSave = save;                // existing ~6229
 - `app/core/mediaFx.js` (yeni)
 - `app/core/timeTheme.js` (yeni)
 - `index.html` (yeni script tag'ler, henüz `app.js`’i kaldırmadan)
-- `tests/app/test_date_utils_boundary.js` (yeni)
-- `tests/app/test_helpers_boundary.js` (yeni)
+- `tests/app/test_date_utils_boundary.js` (yeni — Faz -1 uygulama aşamasında)
+- `tests/app/test_helpers_boundary.js` (yeni — Faz -1 uygulama aşamasında)
 - `tests/app/test_modularization_boundary.js` güncellenir
 
 **Davranış değişikliği:** Yok. `app.js` hâlâ yüklü ve çalışıyor; yeni modüller sadece `window.*` altında expose ediliyor, hiçbir handler onları kullanmıyor.
@@ -182,6 +184,7 @@ window.SeymaSave = save;                // existing ~6229
 - `node .claude/skills/run-seyma/driver.mjs` PASS.
 - `node .claude/skills/run-seyma/zikr-harness.mjs` PASS.
 - `node tests/app/test_faz10_sync.js` PASS.
+- Tüm değişiklikler yerel commit olarak kalır; bu PR aşamasında push yapılmaz ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ---
 

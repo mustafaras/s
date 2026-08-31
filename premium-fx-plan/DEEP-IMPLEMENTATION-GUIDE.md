@@ -268,12 +268,12 @@ node tests/app/test_faz10_sync.js
 **Kaynak:** `app.js` satır ~4415 (modülerleştirmeden sonra `state.js` içinde)
 **Eklenecek alanlar:**
 ```js
-if(typeof d.settings.premiumAtmosphere !== 'boolean') d.settings.premiumAtmosphere = true;
-if(typeof d.settings.uiSounds !== 'boolean') d.settings.uiSounds = true;
-if(typeof d.settings.voiceGuidance !== 'boolean') d.settings.voiceGuidance = false;
-if(typeof d.settings.ambientSounds !== 'boolean') d.settings.ambientSounds = false;
-if(typeof d.settings.richHaptics !== 'boolean') d.settings.richHaptics = true;
-if(typeof d.settings.launchRitual !== 'boolean') d.settings.launchRitual = true;
+if(d.settings.premiumAtmosphere == null) d.settings.premiumAtmosphere = true;
+if(d.settings.uiSounds == null) d.settings.uiSounds = true;
+if(d.settings.voiceGuidance == null) d.settings.voiceGuidance = false;
+if(d.settings.ambientSounds == null) d.settings.ambientSounds = false;
+if(d.settings.richHaptics == null) d.settings.richHaptics = true;
+if(d.settings.launchRitual == null) d.settings.launchRitual = true;
 ```
 
 **Test:**

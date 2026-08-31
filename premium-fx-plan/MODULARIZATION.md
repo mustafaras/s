@@ -27,7 +27,7 @@ Tüm hareketler davranışı koruyarak, yalnızca fiziksel konumu değiştirir.
 |---|-------|---------|-------------------------------|------------------------|
 | 1 | `app/core/constants.js` | `SEYMA_CONSTANTS`, `KEY`, `TKEY`, feature gate, `icon()`, `HABITS`, `SOUL_ACTIVITY_CATALOG`, temel yardımcılar | ~1–400 | — (zaten var) |
 | 2 | `app/core/dateUtils.js` | `fmt`, `todayStr`, `addDays`, `diffDays`, `pad`, `shortDate`, `dayIndexFor`, `activeDate`, `curDay`, `dateLabelTR`, hafta/ay hesapları | ~4720–4750, ~6188 | constants |
-| 3 | `app/core/state.js` | `data`, `ui`, `dark`, `migrate()`, `createDefaultData()`, `getDay`, `emptyDay`, `save()` çağrısı olmadan state helpers | ~4415 (migrate), ~4922 (getDay/emptyDay), ~6229 (save) | constants, dateUtils |
+| 3 | `app/core/state.js` | `data`, `ui`, `dark`, `migrate()`, `createDefaultData()`, `getDay`, `emptyDay` ve diğer state helpers; **save() burada değil, syncGlue.js içinde kalır** | ~4415 (migrate), ~4922 (getDay/emptyDay) | constants, dateUtils |
 | 4 | `app/core/helpers.js` | `segTabs`, `progBar`, `starRow`, `miniBars`, `statTile`, `collapsibleCardHTML`, `toast`, `confetti`, `haptic` | ~4000–5300, ~6000–6400 | constants, state |
 | 5 | `app/core/mediaFx.js` | **Yeni**: `SeyAudio`, `SeyHaptics`, animasyon utilities (FX planının merkezi) | yeni | constants, state |
 | 6 | `app/core/timeTheme.js` | **Yeni**: saat/season bazlı tema class yönetimi | yeni | constants, state |
@@ -157,7 +157,7 @@ window.SeyHaptics={
 ```js
 (function(){
 "use strict";
-function timeClass(){ /* 05-09 dawn, 09-17 day, 17-21 dusk, 21-05 night */ }
+function timeClass(){ /* 05-08 dawn, 09-16 day, 17-20 dusk, 21-04 night */ }
 function seasonalClass(){ /* Ramazan / ilkbahar / sonbahar / yılbaşı */ }
 window.SeyTimeTheme={ apply:function(){ /* #root class ekle */ }, classForHour:timeClass };
 })();

@@ -15,7 +15,7 @@
 ```js
 function speak(text){
   if(!window.speechSynthesis) return;
-  if(!isAllowed()) return;
+  // voiceGuidance kendi ayarı ile çalışır; reduced-motion onu engellemez.
   var s = (window.SeymaConstants && window.SeymaConstants.data && window.SeymaConstants.data.settings) || {};
   if(s.voiceGuidance !== true) return;
   var u = new SpeechSynthesisUtterance(text);
@@ -55,7 +55,7 @@ function speak(text){
 function openJournalModal(){
   // ... mevcut kod ...
   var prompt = ui.journalPromptUsed || journalPhasePrompt(mode);
-  if(window.SeyAudio) SeyAudio.speak(prompt);
+  if(window.SeyAudio) SeyAudio.voice(prompt);
 }
 ```
 

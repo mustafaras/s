@@ -1,8 +1,20 @@
 # Şeyma Premium FX Planı — Uygulama Yol Haritası
 
-**Toplam Faz:** 7 (Faz -1: modülerleştirme + Faz 0..6)
+**Toplam Faz:** -1 ile 6 arasında 8 uygulama fazı + "Faz 7" kapanış/doğrulama (raporlama, README güncelleme, son testler).
 **Yaklaşık Toplam Çalışma Süresi:** 6–8 hafta (tek geliştirici, yarı zamanlı)
 **Her faz:** Plan → Spec → Implement → Test → Review → Belge güncelle
+**Kural:** Uygulama aşaması başlayana kadar `premium-fx-plan` dışındaki hiçbir uygulama dosyası değiştirilmez. Uygulama aşamasında tüm commitler sadece yerel (local) kalır; push/PR/deploy yapılmaz. Detaylar için [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
+
+## 0. Context Load Sırası (Her Oturum İçin)
+
+Herhangi bir uygulama veya planlama oturumuna başlamadan önce bu dosyalar **sırayla** okunmalı:
+
+1. [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) — şu an nerede durulduğu, son geçerli kararlar, engeller.
+2. [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) — tarihsel kararlar; yalnızca okunur, eski satırlar değiştirilmez.
+3. [NEXT-STEPS.md](NEXT-STEPS.md) — bekleyen iş listesi ve kısıtlamalar.
+4. [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md) — yerel-only kuralı.
+5. İlgili Faz spec'i (`deliverables/SPEC-FAZ-*.md`) — o oturumda çalışılacak fazın detayları.
+6. [SAFEGUARDS.md](SAFEGUARDS.md) — veri güvenliği ve erişilebilirlik kısıtları.
 
 ---
 
@@ -16,8 +28,9 @@
 - [ ] `index.html` script sırası implementasyon sırasında güncellenecek.
 
 ### -1.2 Merkezileştirme
-- [ ] `window.SeymaState = { data, ui, dark }` oluştur (Faz -1 sonunda).
-- [ ] `save()` `syncGlue.js` içinde, `migrate()` `state.js` içinde kalır; `window.SeymaSave`/`window.SeymaMigrate` expose edilebilir.
+- [ ] `window.SeymaState = { data, ui, dark, getDay, emptyDay, createDefaultData, migrate }` oluştur (Faz -1 sonunda).
+- [ ] `save()` `syncGlue.js` içinde kalır ve `window.SeymaSave = save;` olarak expose edilir.
+- [ ] `migrate()` `state.js` içinde kalır ve `window.SeymaState.migrate` olarak expose edilir; ayrı `window.SeymaMigrate` olmaz.
 
 ### -1.3 Modül Ayırma Sırası
 | Sıra | Modül | Gerekçe |
@@ -81,10 +94,11 @@
 - `prefers-reduced-motion` ve sessiz mod uyumu.
 
 ### 1.2 İlk Bağlantılar
-- `App.toggleHabit()`: success sound + haptic.
+- `App.toggleHabit()`: success sound + haptic (sadece tamamlandığında).
 - `App.waterAdd()`: tap sound + haptic.
 - `saveToday()` / `SeyOnSynced()`: bell + success haptic.
 - Uyarı bannerları: warning sound + error haptic.
+- `settings.richHaptics` ile mevcut `settings.haptics` aynı anda varsa: `haptic()` her iki alanı da kontrol eder; `SeyHaptics.*` yalnızca `richHaptics && premiumAtmosphere` kontrol eder.
 
 ### 1.3 Test
 - Yeni ses fixture’ları.

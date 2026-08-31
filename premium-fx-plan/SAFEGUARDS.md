@@ -46,6 +46,10 @@ settings.launchRitual
 - Geçici UI durumları (`ui.*`)
 - Herhangi bir medya dosyası
 
+### 1.5 Uygulama Aşaması Veri Güvenliği Kuralı
+
+Uygulama aşamasında (`Faz -1` ile `Faz 6` arası) hiçbir commit uzak repoya gönderilmez. Tüm değişiklikler yerel `main` veya `premium-fx` dalında tutulur. Bu sayede canlı `seyma` GitHub Pages sitesi, canlı `seyma-data` reposu ve kullanıcı verisi uygulama denemelerinden etkilenmez. Detaylar [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
+
 ### 1.4 localStorage Kuralı
 
 Efektler sadece `settings` altında kaydedilebilir. `ui` objesine yeni alan eklenebilir ama bu alanlar **asla** `localStorage`’a ve repoya gitmemeli.
@@ -74,6 +78,9 @@ Tüm yeni animasyon ve geçişler, `@media (prefers-reduced-motion: reduce)` alt
     transition: none !important;
   }
 }
+
+/* Reduced-motion açıkken ses/haptik de pasif olur: tüm SeyAudio/SeyHaptics çağrıları
+   isPremiumFxEnabled() helper’ından geçer; bu helper prefers-reduced-motion’ı da kontrol eder. */
 ```
 
 ### 2.2 Kullanıcı Kontrolü
@@ -177,4 +184,5 @@ Planı uygulamadan önce şu maddelerin tamamı onaylanmalı:
 - [ ] Sesler kullanıcı etkileşimiyle tetikleniyor.
 - [x] Yeni test fixture’ları oluşturuldu ve çalıştırıldı.
 - [ ] Kontrast ve erişilebilirlik kontrolü planlandı.
+- [ ] Uygulama aşamasında sadece yerel commitler yapılacağı onaylandı ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var.

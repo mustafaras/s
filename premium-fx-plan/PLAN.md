@@ -4,7 +4,9 @@
 **Tarih:** 2026-08-30
 **Hedef:** Şeyma uygulamasına pro-premium görsel ve işitsel efekt stratejisi hazırlamak; bu plan aynı zamanda ~18.800 satırlık `app.js` monolitinin modülerleştirme yolunu da çizmek.
 
-> **Kural:** Bu plan aşamasında **uygulama koduna dokunulmuyor** (planlama + spec + test iskelesi). İlk uygulama aşaması, bu planın `MODULARIZATION.md` bölümünde belirtilen modül sınırına göre başlayacak.
+> **Kural (plan aşaması):** Bu plan aşamasında **uygulama koduna dokunulmuyor** (planlama + spec + test iskelesi). İlk uygulama aşaması, bu planın `MODULARIZATION.md` bölümünde belirtilen modül sınırına göre başlayacak.
+>
+> **Kural (uygulama aşaması):** Uygulama aşamasında (`Faz -1`…`Faz 6`) yapılan tüm commitler **sadece yerel** kalır; `git push`, PR veya deploy yapılmaz. Canlı `seyma` reposuna yazılmaz, canlı `seyma-data` verisi etkilenmez. Detaylar için bkz. [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
 
 ---
 
@@ -41,7 +43,7 @@
 | Merkezi render motoru | `render()` ~satır 9688 | `app.js` |
 | Tek ses üreteci | `zikrTickSound()` ~satır 8502 | `app.js` |
 | Haptic sarmalayıcı | `haptic()` ~satır 6375 | `app.js` |
-| Başarı/toast kapısı | `SeyOnSynced()` ~satır 17999 | `app.js` |
+| Başarı/toast kapısı | `SeyOnSynced()` ~satır 6208 | `app.js` |
 | Mevcut animasyon CSS | `seyPop`, `seyFloatIn`, `seyShine`, `seyAurora`, `seyRoomGlow`, `seyWordSheen`, `seySynapseDrift` | `app/styles.css` |
 | Reduced-motion desteği | Zaten mevcut `@media (prefers-reduced-motion: reduce)` | `app/styles.css` |
 

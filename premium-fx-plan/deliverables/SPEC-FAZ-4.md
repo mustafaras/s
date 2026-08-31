@@ -17,6 +17,8 @@
 | 17:00–20:59 | `theme-time-dusk` | Yumuşak mor → turuncu |
 | 21:00–04:59 | `theme-time-night` | İndigo → koyu gri-lacivert |
 
+> Saat sınırları: 05–08 dawn, 09–16 day, 17–20 dusk, 21–04 night. 09:00, 17:00 ve 21:00 yeni dilimin ilk saatidir.
+
 ### 4.1.2 CSS Kuralları
 
 ```css
@@ -35,7 +37,7 @@
 **Çağrı noktaları (app.js gerçek satırları):**
 - Uygulama boot sonunda: `app.js` dosya sonu, ~satır 18750–18800 (mevcut ilk `render()` + foreground poll timer `setInterval` — `app.js:18752`).
 - Her tab değişiminde: `render()` — `app.js:9688` başlangıcı.
-- 30 saniyede bir kontrol: foreground poll loop `setInterval` — `app.js:18752` içinde `window.SeyTimeTheme.apply()` çağrısı eklenebilir.
+- 30 saniyede bir kontrol: foreground poll loop `setInterval` — `app.js` dosya sonu (~18750–18800 arası) içinde `window.SeyTimeTheme.apply()` çağrısı eklenebilir.
 
 ```js
 // app/core/timeTheme.js içindeki reference implementasyon

@@ -1,8 +1,8 @@
 # Şeyma Premium FX — Uygulama Prompt Kataloğu
 
-**Sürüm:** 1.0
+**Sürüm:** 1.1
 **Tarih:** 2026-08-31
-**Amaç:** `premium-fx-plan/` içindeki planı uygulayan her ajanın, soğuk başlangıçtan en yüksek kalitede sonuç üretebilmesi için tasarlanmış, detaylı, tutarlı ve anti-amnesi uyumlu prompt seti.
+**Amaç:** `premium-fx-plan/` içindeki planı uygulayan her ajanın, soğuk başlangıçtan en yüksek kalitede sonuç üretebilmesi için tasarlanmış, detaylı, tutarlı ve anti-amnesi uyumlu prompt seti. Katalog toplam **54 prompt** (Dalga -1: 4, Dalga 0: 2, Dalga 1–6: 6’şar, Dalga 7: 4) içerir.
 **Kural:** Uygulama aşamasındaki tüm commitler sadece yerel kalır. Bkz. [`LOCAL-ONLY-IMPLEMENTATION.md`](../LOCAL-ONLY-IMPLEMENTATION.md).
 
 ---
@@ -137,11 +137,11 @@ Her prompt şunları içermeli:
 | -1 | FX-P-01 … FX-P-04 | `app.js` modülerleştirme altyapısı | — (şu anki onay kapsar) |
 | 0 | FX-P-05 … FX-P-06 | Premium FX master switch & iskelet | — |
 | 1 | FX-P-11 … FX-P-16 | Audio: UI sesleri, başarı/uyarı, zil | — |
-| 2 | FX-P-21 … FX-P-26 | Haptics: tap/success/error/refresh/streak/water | — |
-| 3 | FX-P-31 … FX-P-38 | Visual micro-FX: ripple, shimmer, count-up, transitions | — |
-| 4 | FX-P-41 … FX-P-48 | Time theme: dawn/day/dusk/night + seasonal | — |
-| 5 | FX-P-51 … FX-P-58 | Voice guidance: ayarlar, onboarding, sekmeler | — |
-| 6 | FX-P-61 … FX-P-68 | Settings/master switch UI, A/B toggle, launch ritual | — |
+| 2 | FX-P-21 … FX-P-26 | Haptics: tap/success/error/refresh/streak/water + audit | — |
+| 3 | FX-P-31 … FX-P-38 | Visual micro-FX: ripple, shimmer, count-up, transitions, performance | — |
+| 4 | FX-P-41 … FX-P-48 | Time theme: dawn/day/dusk/night + seasonal + quiet-time + panel badge | — |
+| 5 | FX-P-51 … FX-P-58 | Voice guidance: TTS wrapper, onboarding, greeting, settings, audit | — |
+| 6 | FX-P-61 … FX-P-68 | Settings/master switch UI, A/B toggle, launch ritual, E2E audit | — |
 | 7 | FX-P-71 … FX-P-74 | Kapatma, cache busting, son panel testleri, yerel branch değerlendirmesi | — |
 
 ---
@@ -183,6 +183,8 @@ Her prompt şunları içermeli:
 | FX-P-22 | Buton/kart tıklamalarına `SeyHaptics.tap()` ekle | integration | `app.js`, `app/core/mediaFx.js` | Inline `onclick` handler’lar içinden çağrı. |
 | FX-P-23 | Streak/water haptics entegrasyonu | integration | `app.js`, `app/core/mediaFx.js` | Uzun seri ve hidrasyon hatırlatma noktaları. |
 | FX-P-24 | Haptics test fixture’larını güncelle | test uzmanı | `tests/app/test_premium_haptics_fx.js` | Titreşim desenleri ve gating testleri. |
+| FX-P-25 | Scroll/refresh ve sınır haptics + reduced-motion edge cases | haptics uzmanı | `app/core/mediaFx.js`, `app.js` | List scroll, pull-to-refresh, quiet time için haptic desenleri. |
+| FX-P-26 | Haptics final audit + FX-LIBRARY.md catalog güncellemesi | QA lead | `premium-fx-plan/FX-LIBRARY.md`, `REVIEW-CHECKLIST.md` | Tüm desenler kataloglanır, wave 2 kapanır. |
 
 ### Dalga 3: Visual Micro-FX
 
@@ -194,6 +196,8 @@ Her prompt şunları içermeli:
 | FX-P-34 | Count-up animasyonu: sayaçlar yumuşak artış | FX uzmanı | `app/core/mediaFx.js` | `countUp(options)` implementasyonu. |
 | FX-P-35 | Micro-FX entegrasyonu: kart toggle, streak, su | integration | `app.js`, `app/core/mediaFx.js`, `app/styles.css` | Gating ve temaya uygun çağrı noktaları. |
 | FX-P-36 | Visual FX test fixture’ları | test uzmanı | `tests/app/test_premium_fx_utils.js` | `isPremiumFxEnabled` kombinasyonları. |
+| FX-P-37 | CSS transitions ve sayfa seviyesi enter animasyonları | CSS/FX uzmanı | `app/styles.css`, `app.js` | Sekme geçişleri fade/slide, reduced-motion’a saygılı. |
+| FX-P-38 | Visual FX performance audit + reduced-motion final review | performance uzmanı | `app/styles.css`, `app/core/mediaFx.js`, `REVIEW-CHECKLIST.md` | `will-change`/`contain`, paint/metric log, Dalga 3 kapanış. |
 
 ### Dalga 4: Time Theme
 
@@ -203,6 +207,10 @@ Her prompt şunları içermeli:
 | FX-P-42 | `SeyTimeTheme.apply()` ve `#root` class güncellemesi | integration | `app/core/timeTheme.js`, `app.js` | Her render sonrası veya 1 saatlik poll. |
 | FX-P-43 | Seasonal class: Ramazan, ilkbahar, sonbahar, yılbaşı | time theme uzmanı | `app/core/timeTheme.js` | Hicri offset ve miladi tarihe göre. |
 | FX-P-44 | Time theme test fixture’ları | test uzmanı | `tests/app/test_premium_time_theme.js` | Saat ve mevsim sınırları. |
+| FX-P-45 | Quiet-time guard: gece sesleri sustur, voice/ambient ile senkronize çalış | integration | `app/core/mediaFx.js`, `app.js` | 23:00–07:00 arası sesli FX kapalı. |
+| FX-P-46 | Time/season CSS değişkenleri bağlama: `--surface`, `--accent`, `--glow` | CSS/theme uzmanı | `app/styles.css`, `app/core/timeTheme.js` | Dinamik tema değişkenleri light/dark ve mevsim için. |
+| FX-P-47 | Panel time/season badge: panel.html zaman teması göstergesi | panel integration | `panel.html`, `panel/panel.js` | Observer mevcut time/season bilgisini görür. |
+| FX-P-48 | Time theme final audit + FX-LIBRARY.md time catalog güncellemesi | QA lead | `premium-fx-plan/FX-LIBRARY.md`, `REVIEW-CHECKLIST.md` | Dalga 4 kapanış. |
 
 ### Dalga 5: Voice Guidance
 
@@ -212,6 +220,10 @@ Her prompt şunları içermeli:
 | FX-P-52 | Voice guidance onboarding akışı | integration | `app.js` | İlk açılışta nazik tanıtım. |
 | FX-P-53 | Sekme değişimlerinde sesli ipucu | integration | `app.js`, `app/core/mediaFx.js` | `settings.voiceGuidance` gating. |
 | FX-P-54 | Voice guidance test fixture’ları | test uzmanı | `tests/app/test_premium_voice_guidance.js` | TTS çağrı ve gating. |
+| FX-P-55 | Zikir/sura tap sonrası kısa sesli ipuçları | voice/Islamic UX uzmanı | `app.js`, `app/core/mediaFx.js` | Zikirmatik ve Kur’an yolculuğu noktalarında nazik sesli rehberlik. |
+| FX-P-56 | Günün zamanına göre sesli selamlaşma (dawn/day/dusk/night) | voice UX uzmanı | `app.js`, `app/core/mediaFx.js`, `app/core/timeTheme.js` | Quiet-time dışında nazik "Günaydın Günışığı" vb. |
+| FX-P-57 | Voice settings UI: dil/hız/seçim kontrolleri | UI uzmanı | `app.js`, `app/styles.css` | `settings.voiceGuidance` alt seçenekleri. |
+| FX-P-58 | Voice guidance final audit + FX-LIBRARY.md voice catalog güncellemesi | QA lead | `premium-fx-plan/FX-LIBRARY.md`, `REVIEW-CHECKLIST.md` | Dalga 5 kapanış. |
 
 ### Dalga 6: Settings & Master Switch UI
 
@@ -222,6 +234,9 @@ Her prompt şunları içermeli:
 | FX-P-63 | Master switch (premiumAtmosphere) diğer FX’leri cascade etme | integration | `app.js`, `app/core/mediaFx.js` | Kapalıyken tüm FX sessiz. |
 | FX-P-64 | Launch ritual: açılış animasyonu ve sesi | FX/UX uzmanı | `app.js`, `app/core/mediaFx.js`, `app/styles.css` | `settings.launchRitual`; reduced-motion’a saygılı. |
 | FX-P-65 | Settings test fixture’ları | test uzmanı | `tests/app/test_premium_settings.js` | Toggle doğruluk ve cascade. |
+| FX-P-66 | A/B premium toggle experiment UI (soft opt-in/opt-out) | UX/product | `app.js`, `app/core/mediaFx.js` | Yeni kullanıcılar için nazik premium tanıtım; mevcut kullanıcılar için dokunulmaz. |
+| FX-P-67 | Launch ritual full implementation: splash sequence, sound, animation | FX/UX uzmanı | `app.js`, `app/core/mediaFx.js`, `app/styles.css` | Tam açılış ritüeli; reduced-motion’a saygılı. |
+| FX-P-68 | Final settings/panel audit + master switch cascade E2E test | QA lead | `tests/app/test_premium_settings_e2e.js`, `REVIEW-CHECKLIST.md` | Dalga 6 kapanış. |
 
 ### Dalga 7: Kapatma
 

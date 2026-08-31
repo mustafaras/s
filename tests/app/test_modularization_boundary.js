@@ -167,6 +167,66 @@ var expectedNewModules = [
   ok('save() hâlâ app.js içinde', /function save\(touchSource,eventSpec\)\{/.test(src));
 })();
 
+// [9] FX-P-04: app.js hâlâ window.App ve SeyOnSyncState/SeyOnSynced'i expose ediyor
+// (B1: data/ui/dark/migrate/save henüz window'da DEĞİL — canlı getter'lar Faz 0'da)
+(function(){
+  var src = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+  ok('app.js window.App expose ediyor', /window\.App\s*=\s*App/.test(src));
+  ok('app.js window.SeyOnSyncState expose ediyor', /window\.SeyOnSyncState\s*=/.test(src));
+  ok('app.js window.SeyOnSynced expose ediyor', /window\.SeyOnSynced\s*=/.test(src));
+  // B1: Faz -1.1'de window.data/ui/dark/migrate/save YOKTUR (canlı getter Faz 0'da)
+  ok('app.js window.data atamıyor (B1: Faz 0\'da canlı getter)', !/window\.data\s*=/.test(src));
+  ok('app.js window.ui atamıyor (B1: Faz 0\'da canlı getter)', !/window\.ui\s*=/.test(src));
+  ok('app.js window.save atamıyor (B1: Faz 0\'da canlı getter)', !/window\.save\s*=/.test(src));
+})();
+
+// [10] FX-P-04: yeni modüller window.* yüzeylerini expose ediyor (VM boot)
+// app.js YÜKLENMEZ; yalnızca Faz -1.1 modülleri boot edilir. SeymaState/SeymaSave
+// getter'ları tanımlı olmalı; data/ui henüz undefined (B1).
+(function(){
+  var vm = require('vm');
+  var timers = [];
+  var win = {
+    console: console,
+    navigator: { vibrate: function(p){ return true; } },
+    matchMedia: function(q){ return { matches: false, addEventListener: function(){}, removeEventListener: function(){} }; },
+    localStorage: { getItem: function(){ return null; }, setItem: function(){}, removeItem: function(){} },
+    addEventListener: function(){},
+    removeEventListener: function(){},
+    setTimeout: function(fn,t){ timers.push(fn); return timers.length; },
+    clearTimeout: function(){},
+    setInterval: function(){ return 0; },
+    clearInterval: function(){},
+    document: { getElementById: function(){ return null; }, createElement: function(){ return { style:{}, setAttribute:function(){}, appendChild:function(){}, remove:function(){}, parentNode:null }; }, body: { appendChild:function(){} }, querySelector: function(){ return null; }, querySelectorAll: function(){ return []; } },
+    AudioContext: function(){ this.state='running'; this.resume=function(){ return Promise.resolve(); }; this.createOscillator=function(){ return { type:'', frequency:{setValueAtTime:function(){}}, connect:function(){}, start:function(){}, stop:function(){} }; }; this.createGain=function(){ return { gain:{setValueAtTime:function(){}, linearRampToValueAtTime:function(){}, exponentialRampToValueAtTime:function(){}}, connect:function(){} }; }; this.currentTime=0; },
+    webkitAudioContext: function(){ return new win.AudioContext(); },
+    speechSynthesis: { speak: function(){} },
+    SpeechSynthesisUtterance: function(t){ this.text=t; this.lang=''; this.rate=1; this.pitch=1; }
+  };
+  win.window = win;
+  var ctx = vm.createContext(win);
+  var load = function(rel){ return fs.readFileSync(path.join(repoRoot, rel), 'utf8'); };
+  vm.runInContext('var window = this; ' + load('app/core/constants.js'), ctx, { filename:'constants.js' });
+  vm.runInContext(load('app/core/dateUtils.js'), ctx, { filename:'dateUtils.js' });
+  vm.runInContext(load('app/core/state.js'), ctx, { filename:'state.js' });
+  vm.runInContext(load('app/core/syncGlue.js'), ctx, { filename:'syncGlue.js' });
+  vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
+  vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
+  vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
+
+  ok('window.SeymaDateUtils expose edilmiş', typeof win.SeymaDateUtils === 'object');
+  ok('window.SeymaHelpers expose edilmiş', typeof win.SeymaHelpers === 'object');
+  ok('window.SeymaState expose edilmiş', typeof win.SeymaState === 'object');
+  ok('window.SeymaSave getter tanımlı', 'SeymaSave' in win);
+  ok('window.SeyAudio expose edilmiş', typeof win.SeyAudio === 'object');
+  ok('window.SeyHaptics expose edilmiş', typeof win.SeyHaptics === 'object');
+  ok('window.SeyFx expose edilmiş', typeof win.SeyFx === 'object');
+  ok('window.SeyTimeTheme expose edilmiş', typeof win.SeyTimeTheme === 'object');
+  // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
+  ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);
+  ok('window.SeymaSave henüz undefined (B1)', win.SeymaSave === undefined);
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 if (failed > 0) { process.exit(1); }

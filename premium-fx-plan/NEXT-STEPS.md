@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-08-31
-**Durum:** Plan/spec/test senkronizasyonu tamamlandı; uygulama koduna henüz dokunulmadı.
+**Durum:** Faz -1.1 tamamlandı (FX-P-01…FX-P-04). Dalga 0 (FX-P-05…FX-P-06) için kullanıcı onayı bekleniyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -18,15 +18,17 @@
 - [x] `.anti-amnesia/FX-PROMPT-STATE.json` makine-readable prompt durumu eklendi.
 - [x] Mevcut headless testler ve tüm premium fixture'lar geçmeye devam ediyor.
 - [x] Anti-amnesia ledger/CURRENT-STATE v2.3 güncellendi.
+- [x] **Faz -1.1 tamamlandı (FX-P-01…FX-P-04):** temel modül iskeletleri (dateUtils/helpers/mediaFx/timeTheme/state/syncGlue), seq 24'teki 3 kırık fonksiyonun B1 canlı-getter yüzeyine hizalanması, boundary testleri (date_utils 58, helpers 30, modularization 42) ve S5/S6 değişmezlik kanıtları.
 
 ## Sırada Yapılacaklar
 
 1. [x] Plan belgeleri arasındaki tutarsızlıklar giderildi; API yüzeyi, settings alanları, faz/PR sırası, reduced-motion/ses/haptik kuralları ve time-theme saat aralıkları senkronize edildi.
 2. [x] Yerel-only uygulama kuralı eklendi ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 3. [x] Uygulama prompt kataloğu (`.prompts/PROMPT-CATALOG.md` + FX-P-01…FX-P-14) ve makine-readable prompt durumu (`.anti-amnesia/FX-PROMPT-STATE.json`) oluşturuldu.
-4. [ ] Kullanıcı onayı alındıktan sonra FX-P-01 ile Faz -1.1 implementasyonuna başla.
-5. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-6. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+4. [x] FX-P-01…FX-P-04 ile Faz -1.1 implementasyonu tamamlandı (yerel commitler, push yok).
+5. [ ] **Dalga 0 (FX-P-05…FX-P-06) için kullanıcı onayı alın.** Onay gelene kadar hiçbir yeni uygulama kodu yazılmamalı.
+6. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+7. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

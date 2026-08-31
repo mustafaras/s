@@ -8333,7 +8333,7 @@ App.setStress=function(v){ var day=curDay(); day.stress=(day.stress===v?null:v);
 
 // ---- kafein ----
 // ---- kafein (bilimsel takip: drinks dizisi) ----
-App.addCaffeineDrink=function(typeId){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(day.caffeine.drinks)) day.caffeine.drinks=[]; var now=new Date(); var t=pad(now.getHours())+':'+pad(now.getMinutes()); day.caffeine.drinks.push({type:typeId,time:t,qty:1}); day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.caffeine.cups=day.caffeine.drinks.length; var nw=syncDerivedHabits(day); if(nw.indexOf('caffeineOk')>=0){ haptic(16); toast('Kafein tiki kendiliğinden yeşillendi — limit ve saat tamam.'); } day.savedAt=new Date().toISOString(); commit(); };
+App.addCaffeineDrink=function(typeId){ var day=curDay(); if(!day.caffeine) day.caffeine={last:null,cups:null,drinks:[]}; if(!Array.isArray(day.caffeine.drinks)) day.caffeine.drinks=[]; var now=new Date(); var t=pad(now.getHours())+':'+pad(now.getMinutes()); day.caffeine.drinks.push({type:typeId,time:t,qty:1}); day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.caffeine.cups=day.caffeine.drinks.length; var nw=syncDerivedHabits(day); if(nw.indexOf('caffeineOk')>=0){ haptic(16); toast('Kafein tiki kendiliğinden yeşillendi — limit ve saat tamam.'); } else if(caffeineTotalMg(day)>caffeineLimit(activeDate())){ if(window.SeyAudio&&typeof window.SeyAudio.warning==='function') window.SeyAudio.warning(); } day.savedAt=new Date().toISOString(); commit(); };
 App.removeCaffeineDrink=function(i){ var day=curDay(); if(!day.caffeine||!Array.isArray(day.caffeine.drinks)) return; if(day.caffeine.drinks[i]==null) return; day.caffeine.drinks.splice(i,1); day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.caffeine.cups=day.caffeine.drinks.length; day.savedAt=new Date().toISOString(); commit(); };
 App.setCaffeineDrinkTime=function(i,el){ var day=curDay(); if(!day.caffeine||!Array.isArray(day.caffeine.drinks)) return; var d=day.caffeine.drinks[i]; if(!d) return; d.time=el.value||''; day.caffeine.last=caffeineLastTime({caffeine:day.caffeine}); day.savedAt=new Date().toISOString(); commit(); };
 App.setCaffeineMode=function(m){ if(!data.settings) data.settings={}; data.settings.caffeineMode=(m==='sensitive'||m==='pregnant')?m:'standard'; data.savedAt=new Date().toISOString(); haptic(10); commit(); };
@@ -8395,7 +8395,7 @@ App.openQuoteAdd=function(bookId){ var L=ensureLibrary(); if(!bookId){ var readi
 App.closeQuoteAdd=function(){ ui.quoteDraft=null; render(); };
 App.onQuoteField=function(field,el){ if(!ui.quoteDraft) return; ui.quoteDraft[field]=el.value; };
 App.pickQuoteBook=function(id){ if(!ui.quoteDraft) return; ui.quoteDraft.bookId=id; render(); };
-App.saveQuote=function(){ if(!ui.quoteDraft) return; var b=findBook(ui.quoteDraft.bookId); if(!b){ toast('Önce bir kitap seç'); return; } var text=String(ui.quoteDraft.text||'').trim(); if(!text){ toast('Alıntıyı yaz'); return; } var page=parseInt(ui.quoteDraft.page,10); if(isNaN(page)||page<0) page=null; if(!Array.isArray(b.quotes)) b.quotes=[]; b.quotes.push({id:uid('q'),text:text.slice(0,400),page:page,ts:new Date().toISOString()}); ui.quoteDraft=null; commit('Alıntı eklendi'); };
+App.saveQuote=function(){ if(!ui.quoteDraft) return; var b=findBook(ui.quoteDraft.bookId); if(!b){ if(window.SeyAudio&&typeof window.SeyAudio.warning==='function') window.SeyAudio.warning(); toast('Önce bir kitap seç'); return; } var text=String(ui.quoteDraft.text||'').trim(); if(!text){ if(window.SeyAudio&&typeof window.SeyAudio.warning==='function') window.SeyAudio.warning(); toast('Alıntıyı yaz'); return; } var page=parseInt(ui.quoteDraft.page,10); if(isNaN(page)||page<0) page=null; if(!Array.isArray(b.quotes)) b.quotes=[]; b.quotes.push({id:uid('q'),text:text.slice(0,400),page:page,ts:new Date().toISOString()}); ui.quoteDraft=null; commit('Alıntı eklendi'); };
 App.removeQuote=function(bookId,qid){ var b=findBook(bookId); if(!b||!Array.isArray(b.quotes)) return; var i=b.quotes.findIndex(function(q){return q&&q.id===qid;}); if(i>=0){ b.quotes.splice(i,1); commit('Alıntı silindi'); } };
 App.copyQuote=function(text){ try{ navigator.clipboard.writeText(text); toast('Kopyalandı'); }catch(e){ toast('Kopyalanamadı'); } };
 App.toggleHealthSetup=function(){ ui.healthSetupOpen=!ui.healthSetupOpen; render(); };
@@ -11828,7 +11828,7 @@ App.completeMotivationTask=function(status){
   var M=window.MotivationProgramV2;
   if(!M||!data||!featuresLive()) return;
   var reflection=String(ui.motivationReflectionDraft||'').trim();
-  if(!reflection){ toast('Devam etmeden önce bir cümle yaz — kısa da olsa yeter.'); return; }
+  if(!reflection){ if(window.SeyAudio&&typeof window.SeyAudio.warning==='function') window.SeyAudio.warning(); toast('Devam etmeden önce bir cümle yaz — kısa da olsa yeter.'); return; }
   status=(status==='minimum_completed')?'minimum_completed':'completed';
   var mot=M.activeDay(data);
   var prev=M.dayState(data,activeDate());
@@ -17871,7 +17871,7 @@ function streamAsk(kind,question){
   var nm=kind==='aeon'?'ÆON':'Luna';
   var key=(data.settings&&data.settings.openaiKey)?sanitizeApiKey(data.settings.openaiKey):'';
   if(!key){ toast('Önce Ayarlar’dan OpenAI anahtarı gir',2600); App.go('ayarlar'); return; }
-  if(!assistCanAsk(kind)){ toast(kind==='aeon'?(nm+' için bugünün soru hakkını kullandın'):('Bugünlük '+LUNA_DAILY_LIMIT+' soru hakkını kullandın — yarın devam')); return; }
+  if(!assistCanAsk(kind)){ if(window.SeyAudio&&typeof window.SeyAudio.warning==='function') window.SeyAudio.warning(); toast(kind==='aeon'?(nm+' için bugünün soru hakkını kullandın'):('Bugünlük '+LUNA_DAILY_LIMIT+' soru hakkını kullandın — yarın devam')); return; }
   if(ui.askKind) return;
   ui.askKind=kind; ui.askQuestion=question; ui.lunaError=null; ui.aeonError=null; render();
   var sc=document.querySelector('[data-scroll]'); if(sc) sc.scrollTop=0;

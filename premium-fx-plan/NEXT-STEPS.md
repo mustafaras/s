@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-08-31
-**Durum:** Faz -1.1 tamamlandı (FX-P-01…FX-P-04). Dalga 0 (FX-P-05…FX-P-06) için kullanıcı onayı bekleniyor.
+**Durum:** Faz 0 devam ediyor (FX-P-05 tamamlandı). Sıradaki FX-P-06.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -19,6 +19,7 @@
 - [x] Mevcut headless testler ve tüm premium fixture'lar geçmeye devam ediyor.
 - [x] Anti-amnesia ledger/CURRENT-STATE v2.3 güncellendi.
 - [x] **Faz -1.1 tamamlandı (FX-P-01…FX-P-04):** temel modül iskeletleri (dateUtils/helpers/mediaFx/timeTheme/state/syncGlue), seq 24'teki 3 kırık fonksiyonun B1 canlı-getter yüzeyine hizalanması, boundary testleri (date_utils 58, helpers 30, modularization 42) ve S5/S6 değişmezlik kanıtları.
+- [x] **FX-P-05 (Faz 0):** `migrate()`'e 6 premium FX settings alanı eklendi (premiumAtmosphere/uiSounds/voiceGuidance/ambientSounds/richHaptics/launchRitual) ve B1 canlı getter'lar `app.js`'e eklendi (window.data/ui/dark/migrate/getDay/createDefaultData/save). S5/S6 geçti.
 
 ## Sırada Yapılacaklar
 
@@ -26,13 +27,13 @@
 2. [x] Yerel-only uygulama kuralı eklendi ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 3. [x] Uygulama prompt kataloğu (`.prompts/PROMPT-CATALOG.md` + FX-P-01…FX-P-14) ve makine-readable prompt durumu (`.anti-amnesia/FX-PROMPT-STATE.json`) oluşturuldu.
 4. [x] FX-P-01…FX-P-04 ile Faz -1.1 implementasyonu tamamlandı (yerel commitler, push yok).
-5. [ ] **Dalga 0 (FX-P-05…FX-P-06) için kullanıcı onayı alın.** Onay gelene kadar hiçbir yeni uygulama kodu yazılmamalı.
-6. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-7. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+5. [x] FX-P-05 ile Dalga 0 başladı (migrate backfill + B1 canlı getter'lar).
+6. [ ] FX-P-06: `mediaFx.js` iskeletini gerçek API yüzeyiyle doldur.
+7. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+8. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 
-- Uygulama koduna dokunma (onay alınana kadar).
 - Uygulama aşamasında tüm commitler **sadece yerel**; push/PR/deploy yok.
 - `data`, `migrate()`, `sync.js`, `save()`, `localStorage` key'leri değişmez.
 - Erişilebilirlik ve reduced-motion kurallarına uy.

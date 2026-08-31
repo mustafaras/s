@@ -4412,6 +4412,19 @@ function reminderLifecycleTick(){ return reminderSchedulerDispatch('timer'); }
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
+// FX-P-05 (Faz 0) · B1 kararı — CANLI GETTER'lar.
+// `data` mutable bir bağlamadır (6+ kez yeniden atanır: 4412/4413/6692/9203/
+// 18724/9173/9177). Tek seferlik düz atama bayat kalır; canlı getter
+// her okumada closure'daki taze değeri döndürür. Mevcut fonksiyonların
+// davranışını/imzasını değiştirmez — yalnızca `window` üzerinden okunabilir
+// kılar. I2/I3/I4'ü ihlal etmez ("dokunulmaz" = "davranış değiştirmez").
+Object.defineProperty(window, 'data', { get: function(){ return data; }, configurable: true });
+Object.defineProperty(window, 'ui',   { get: function(){ return ui; },   configurable: true });
+Object.defineProperty(window, 'dark', { get: function(){ return dark; }, configurable: true });
+Object.defineProperty(window, 'migrate', { get: function(){ return migrate; }, configurable: true });
+Object.defineProperty(window, 'getDay',  { get: function(){ return getDay; },  configurable: true });
+Object.defineProperty(window, 'createDefaultData', { get: function(){ return createDefaultData; }, configurable: true });
+Object.defineProperty(window, 'save', { get: function(){ return save; }, configurable: true });
 function migrate(d){
   if(!d||typeof d!=='object'||Array.isArray(d)) return d;
   migrateReminderState(d);
@@ -4598,6 +4611,15 @@ function migrate(d){
   if(typeof prSet.reminderOffsetMinutes!=='number'||isNaN(prSet.reminderOffsetMinutes)) prSet.reminderOffsetMinutes=15;
   if(typeof prSet.hijriOffset!=='number'||isNaN(prSet.hijriOffset)) prSet.hijriOffset=0;
   if(d.days&&typeof d.days==='object') Object.keys(d.days).forEach(function(k){ var day=d.days[k]; if(day&&typeof day==='object') ensurePrayerDay(day); });
+  // FX-P-05 (Faz 0): Premium FX ayar alanları — additive backfill, idempotent.
+  // Yalnızca settings.* altına alan eklenir; data şekli değişmez (I1/I3).
+  if(d.settings==null) d.settings={};
+  if(d.settings.premiumAtmosphere==null) d.settings.premiumAtmosphere=true;
+  if(d.settings.uiSounds==null) d.settings.uiSounds=true;
+  if(d.settings.voiceGuidance==null) d.settings.voiceGuidance=false;
+  if(d.settings.ambientSounds==null) d.settings.ambientSounds=false;
+  if(d.settings.richHaptics==null) d.settings.richHaptics=true;
+  if(d.settings.launchRitual==null) d.settings.launchRitual=true;
   d.version=2;
   return d;
 }

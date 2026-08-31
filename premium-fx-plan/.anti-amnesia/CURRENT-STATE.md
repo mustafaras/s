@@ -8,7 +8,7 @@
 
 ## Durum
 
-Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03.
+Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. **Kapsamlı denetimde 3 kırık fonksiyon bulundu** (seq 24): `dateUtils.js` `dayIndexFor`/`activeDate`/`curDay` closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybetti — yalnızca Faz 0 canlı getter'larıyla çalışır hale gelir. Uygulama koduna dokunulmadı. FX-P-02 tamamlandı; sıradaki FX-P-03 (ama önce seq 24 bulguları çözülmeli).
 
 ## Tamamlananlar (v2.3)
 

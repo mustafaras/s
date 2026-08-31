@@ -9,6 +9,7 @@
 
 Herhangi bir uygulama veya planlama oturumuna başlamadan önce bu dosyalar **sırayla** okunmalı:
 
+0. [SESSION-STARTER.md](SESSION-STARTER.md) — **yeni oturumlar için kapsamlı soğuk başlangıç rehberi** (ground truth, B1 kararı, seq 24 kırık fonksiyonlar, sıradaki iş).
 1. [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) — şu an nerede durulduğu, son geçerli kararlar, engeller.
 2. [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) — tarihsel kararlar; yalnızca okunur, eski satırlar değiştirilmez.
 3. [NEXT-STEPS.md](NEXT-STEPS.md) — bekleyen iş listesi ve kısıtlamalar.

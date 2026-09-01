@@ -40,7 +40,14 @@ var expectedModules = [
 
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
-  ok('SeyAudio henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyAudio') < 0);
+  // FX-P-12..15: SeyAudio artık app.js içinde çağrılıyor (zikr tap, success,
+  // warning, bell). "henüz çağrılmıyor" testi kalktı; yerine çağrı noktalarının
+  // varlığı ve güvenli wrapper deseni doğrulanır.
+  ok('SeyAudio.tap çağrı noktası var (FX-P-12)', appSrc.indexOf('SeyAudio.tap') >= 0);
+  ok('SeyAudio.success çağrı noktası var (FX-P-13)', appSrc.indexOf('SeyAudio.success') >= 0);
+  ok('SeyAudio.warning çağrı noktası var (FX-P-14)', appSrc.indexOf('SeyAudio.warning') >= 0);
+  ok('SeyAudio.bell çağrı noktası var (FX-P-15)', appSrc.indexOf('SeyAudio.bell') >= 0);
+  // Diğer yeni modüller henüz App.* içinde çağrılmıyor (davranış değişmez).
   ok('SeyHaptics henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyHaptics') < 0);
   ok('SeyTimeTheme henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyTimeTheme') < 0);
   ok('SeymaDateUtils henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaDateUtils') < 0);

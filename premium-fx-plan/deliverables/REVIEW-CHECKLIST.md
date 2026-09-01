@@ -47,6 +47,14 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [ ] `node docs/apple-design/verify-theme-tristate.mjs` geçiyor.
 - [ ] Yeni premium fixture'ları çalışıyor.
 
+## Dalga 1 Audio (FX-P-16)
+
+- [x] `SeyAudio.tap()` entegre edildi (app.js çağrı noktaları: `zikrTickSound` → `SeyAudio.tap()`).
+- [x] `SeyAudio.success()` entegre edildi (app.js çağrı noktaları: `App.toggleHabit` tek kart, `maybeStreak` kilometre taşı, `App.toggleHabit`/`App.toggleMgHabit` tüm hedefler).
+- [x] `SeyAudio.warning()` entegre edildi (app.js çağrı noktaları: `streamAsk` limit, `App.addCaffeineDrink` kafein limiti, `App.saveQuote` geçersiz giriş, `App.completeMotivationTask` reflection boş).
+- [x] `SeyAudio.bell()` entegre edildi (app.js çağrı noktaları: `App.zikrTap` tur/hatim, `App.completeMotivationTask` başarılı yol, `App.reminderInboxPrimary` hatırlatma kapanışı).
+- [x] Audio test fixture PASS (`tests/app/test_premium_audio_fx.js` — gerçek `mediaFx.js` yüklenir, 26/26).
+
 ## Dokümantasyon
 
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var; şu an için güncelleme yalnızca plan/spec/test aşamasında, canlı `app.js` dokümanı bu aşamada değiştirilmiyor.

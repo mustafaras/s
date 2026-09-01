@@ -1,6 +1,6 @@
 # Anti-amnesi: Şeyma Premium FX Planı — Mevcut Durum
 
-**Tarih:** 2026-08-31
+**Tarih:** 2026-09-01
 **Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme Planı
 **Kaynak uygulama:** `/Users/m_ras/Desktop/seyma` (kod değiştirilmiyor)
 **Plan sürümü:** 2.3
@@ -12,6 +12,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Tamamlananlar (v2.3)
 
+- FX-P-16 — Dalga 1 Audio kapanışı: `test_premium_audio_fx.js` gerçek `app/core/mediaFx.js` modülünü yükleyecek şekilde yeniden yazıldı (26/26). `SeyAudio` yüzeyi (`tap`/`success`/`warning`/`bell`/`voice`/`ambient` + `ctx` getter) ve `app.js` çağrı noktaları doğrulandı; `premiumAtmosphere=false`, `uiSounds=false`, `prefers-reduced-motion: reduce` gating'leri ve `tap()` erişilebilirlik istisnası test edildi; AudioContext stub ile osilatör/gain oluşum sayıları ölçüldü. `test_faz_minus11_boundary.js` (16/16) "henüz çağrılmıyor" testlerini kaldırıp `SeyAudio.tap/success/warning/bell` çağrı noktalarının varlığını assert edecek şekilde güncellendi. `REVIEW-CHECKLIST.md`'e "Dalga 1 Audio" kapsam satırları eklendi. S5 (syntax, driver, zikr 95/95, faz10 64, faz11 50, modularization 42, premium audio 26/26, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
 - FX-P-15 — bell entegrasyonu: zikir tamamlama, hatim, motivasyon görevi tamamlama ve hatırlatma kapanış noktalarına `SeyAudio.bell()` eklendi. `app.js` içinde 3 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `App.zikrTap` `r.doneNow` dalında (tur/hatim tamamlandığında, haptic'ten önce), (2) `App.completeMotivationTask` başarılı yolunda (`wasDone` false iken, yeni kayıt), (3) `App.reminderInboxPrimary` hatırlatma kapanışında (kullanıcı hatırlatmayı ele aldığında). Snooze/todayOff'ta çalmaz. Çağrılar ritüel koşulu sağlandığında; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22, haptics 12/12, launch splash 11/11, time theme 24/24, faz11 50) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi.
 - FX-P-14 — Uyarı durumlarına `SeyAudio.warning()` entegre edildi. `app.js` içinde 4 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `streamAsk` günlük soru limiti aşıldığında (Luna/AEON), (2) `App.addCaffeineDrink` kafein limiti aşıldığında (`caffeineTotalMg>caffeineLimit`), (3) `App.saveQuote` geçersiz girişte (kitap seçilmedi / alıntı boş), (4) `App.completeMotivationTask` reflection boşken. Çağrılar uyarı koşulu sağlandığında ve toast'tan önce; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22, haptics 12/12, launch splash 11/11, time theme 24/24) geçti; yerel commit yapıldı, push edilmedi.
 - FX-P-13 — Olumlu kullanıcı eylemlerine `SeyAudio.success()` entegre edildi. `app.js` içinde 3 noktaya güvenli wrapper (`window.SeyAudio && typeof ... === 'function'`) eklendi: (1) `App.toggleHabit` tek kart tamamlandığında (`day.habits[key]` dalı), (2) `maybeStreak` kilometre taşı (`m[s]`) dalında, (3) `App.toggleHabit` tüm hedefler tamamlandığında (`after>=ht && before<ht`, confetti ile eşzamanlı). Çağrılar eylemin sonunda ve başarı koşulu sağlandığında; `App.*` yüzeyi, `data/settings` şekli ve fonksiyon imzaları değişmedi. **Tutarlılık düzeltmesi (seq 33):** `App.toggleMgHabit` (magnezyum yolu) da "tüm hedefler tamamlandığında" kutlaması yapıyordu (confetti + toast) ama `SeyAudio.success()` eksikti; aynı koşul için eklendi — toplam 4 `SeyAudio.success()` noktası. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, premium audio 13/13, reduced-motion 22/22) geçti; yerel commit yapıldı, push edilmedi.
@@ -53,7 +54,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- **Faz 1 devam ediyor.** FX-P-15 tamamlandı (zil `bell` entegrasyonu — zikir tamamlama, motivasyon görevi, hatırlatma kapanış). Sıradaki **FX-P-16**.
+- **Faz 1 tamamlandı.** FX-P-16 kapanışı: `SeyAudio` yüzeyi ve `app.js` entegrasyonu gerçek `mediaFx.js` üzerinden testlendi (audio 26/26), boundary testi çağrı noktalarına göre güncellendi (16/16), REVIEW-CHECKLIST'e "Dalga 1 Audio" kapsamı eklendi. Sıradaki **Dalga 2 / FX-P-21** (Haptics) — ayrı kullanıcı onayı bekleniyor.
 
 ## Engeller
 

@@ -114,18 +114,25 @@
   };
 
   window.SeyHaptics = {
-    tap: function(){ haptic([12]); },
-    success: function(){ haptic([20, 60, 20]); },
-    error: function(){ haptic([30, 30, 30]); },
-    refresh: function(){ haptic([10, 40, 10]); },
-    streak: function(){ haptic([15, 30, 15, 30, 15]); },
-    water: function(){ haptic([8, 16, 24, 16, 8]); }
+    tap: function(){ haptic([15]); },
+    success: function(){ haptic([20, 30, 50]); },
+    error: function(){ haptic([40, 20, 40]); },
+    refresh: function(){ haptic([10, 20, 10, 20, 10]); },
+    streak: function(){ haptic([30, 50, 80]); },
+    water: function(){ haptic([10, 15, 10]); }
   };
 
+  // FX-P-21: `haptic()` — SeyHaptics desenlerini navigator.vibrate üzerinden
+  // çalar. Gating: premiumAtmosphere + richHaptics (zenginleştirilmiş pattern)
+  // + eski `haptics` alanı (legacy uyum) + prefers-reduced-motion. iOS Safari
+  // navigator.vibrate desteklemediği için sessizce no-op (görsel fallback
+  // zorunlu — bkz. FX-LIBRARY.md §2).
   function haptic(pattern){
     var s = settings();
     var motionOk = !reducedMotion();
     var hapticsOn = !!s.richHaptics;
+    // Eski `settings.haptics` alanı varsa onu da kontrol et (legacy uyum).
+    if (s.haptics === false) return;
     if (!navigator.vibrate || !s.premiumAtmosphere || !hapticsOn || !motionOk) return;
     try{ navigator.vibrate(pattern); }catch(e){}
   }

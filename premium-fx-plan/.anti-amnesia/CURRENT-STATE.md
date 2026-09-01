@@ -66,7 +66,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
 
 ## Devam Eden
 
-- **Faz 3 tamamlandı.** Dalga 3 (Visual micro-FX) kapanışı: `SeyFx` gating utility'leri (FX-P-31), ripple (FX-P-32), shimmer (FX-P-33), count-up (FX-P-34), micro-FX entegrasyonu (FX-P-35), test fixture + kapsam (FX-P-36), enter/transition CSS (FX-P-37), performans audit (FX-P-38) tamamlandı. `test_premium_fx_utils.js` gerçek `mediaFx.js`'i VM'de yükler (26/26). `VISUAL-FX-AUDIT.md` raporu oluşturuldu. Cache-busting: `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. S5 (syntax, driver, zikr 95/95, faz10 64, modularization 42, fx_utils 26/26, haptics 25/25, audio 26/26, faz11 50, Panel-v2 27) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commitler yapıldı, push edilmedi. Sıradaki **Dalga 4 / FX-P-41** (Time theme) — ayrı kullanıcı onayı bekleniyor.
+- **Faz 4 başladı (FX-P-41).** Dalga 4 (Time theme) başlangıcı: `app/core/timeTheme.js`'in `classForHour(h)` fonksiyonu güncellendi — `h == null` ise `new Date().getHours()` default uygulanır; saat aralıkları `theme-time-dawn`(05-08) / `theme-time-day`(09-16) / `theme-time-dusk`(17-20) / `theme-time-night`(21-04) sınıflarına eşleştirildi. `window.SeyTimeTheme` expose (classForHour/apply/seasonalClass/applySeasonal) korundu, app.js davranışı değişmedi. S5 (time_theme 24/24, fx_utils 26/26, haptics 25/25, driver, zikr 95/95, faz10, faz11 50, Panel-v2) ve S6 (App.* 701, onclick 320, tek app.js) geçti; yerel commit yapıldı, push edilmedi. Sıradaki **FX-P-42** (`#root` class güncellemesi + `SeyTimeTheme.apply()`).
 
 ## Engeller
 

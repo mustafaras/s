@@ -3,6 +3,7 @@
   function settings(){ return (window.SeymaState && window.SeymaState.data && window.SeymaState.data.settings) || {}; }
 
   function classForHour(h){
+    if (h == null) h = new Date().getHours();
     if (h >= 5 && h <= 8) return 'theme-time-dawn';
     if (h >= 9 && h <= 16) return 'theme-time-day';
     if (h >= 17 && h <= 20) return 'theme-time-dusk';

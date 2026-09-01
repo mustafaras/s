@@ -47,8 +47,12 @@ var expectedModules = [
   ok('SeyAudio.success çağrı noktası var (FX-P-13)', appSrc.indexOf('SeyAudio.success') >= 0);
   ok('SeyAudio.warning çağrı noktası var (FX-P-14)', appSrc.indexOf('SeyAudio.warning') >= 0);
   ok('SeyAudio.bell çağrı noktası var (FX-P-15)', appSrc.indexOf('SeyAudio.bell') >= 0);
+  // FX-P-22..23: SeyHaptics artık app.js içinde çağrılıyor (tap/streak/water).
+  // "henüz çağrılmıyor" testi kalktı; yerine çağrı noktalarının varlığı doğrulanır.
+  ok('SeyHaptics.tap çağrı noktası var (FX-P-22)', appSrc.indexOf('SeyHaptics.tap') >= 0);
+  ok('SeyHaptics.streak çağrı noktası var (FX-P-23)', appSrc.indexOf('SeyHaptics.streak') >= 0);
+  ok('SeyHaptics.water çağrı noktası var (FX-P-23)', appSrc.indexOf('SeyHaptics.water') >= 0);
   // Diğer yeni modüller henüz App.* içinde çağrılmıyor (davranış değişmez).
-  ok('SeyHaptics henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyHaptics') < 0);
   ok('SeyTimeTheme henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyTimeTheme') < 0);
   ok('SeymaDateUtils henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaDateUtils') < 0);
   ok('SeymaHelpers henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaHelpers') < 0);

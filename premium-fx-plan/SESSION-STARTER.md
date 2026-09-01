@@ -30,8 +30,8 @@ git log --oneline -8
 - **Repo:** `mustafaras/s` → yerel kopya `/Users/m_ras/Desktop/seyma`
 - **Branch:** `premium-fx-local` (sadece yerel commitler, **push yok**)
 - **Plan:** `premium-fx-plan/` — 74 prompt (FX-P-01 … FX-P-74), 7 dalga
-- **Son durum:** **Faz 4 tamamlandı** (FX-P-44). Dalga 4 (Time theme) bitti.
-- **Sıradaki:** **Dalga 5 / FX-P-51** (Voice guidance) — ayrı kullanıcı onayı bekleniyor.
+- **Son durum:** **Faz 5 başladı** (FX-P-51). Dalga 5 (Voice guidance) devam ediyor.
+- **Sıradaki:** **Dalga 5 / FX-P-52** (sesli rehberlik entegrasyon noktaları).
 
 > **⚠️ FX sonrası (modularization) el feneri:** Tüm FX dalgaları (`FX-PROMPT-STATE.json` → `lastCompletedPrompt: "FX-P-74"`, `currentPhase: "Faz 8 tamamlandı"`) bitince modularization prompt'ları üretecek ajanın **ilk okuması** [`docs/monolit-bolumlenme-haritasi.md`](../docs/monolit-bolumlenme-haritasi.md) olmalıdır (graphify kanıtı: app.js gerçek iş alanı kırılımı + neden topluluk etiketleri yanıltıcı). Sonra [`premium-fx-plan/MODULARIZATION.md`](MODULARIZATION.md) hedef modül listesiyle çapraz doğrula (yukarıdaki satır aralıkları gerçeği yansıtır). Böylece FX→modülerleştirme devri, graphify haritasının canlı girdisiyle başlar.
 
@@ -124,18 +124,18 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 
 ---
 
-## 7. Sıradaki İş: Dalga 5 / FX-P-51 (Voice guidance)
+## 7. Sıradaki İş: Dalga 5 / FX-P-52 (Sesli rehberlik entegrasyon noktaları)
 
-**Durum:** Faz 4 (Time theme) tamamlandı. **FX-P-44 zaman teması test fixture'ları + Faz 4 kapanışı tamamlandı.** Sıradaki **FX-P-51** — `SeyAudio.voice()` (Voice guidance). **Ayrı kullanıcı onayı bekleniyor.**
+**Durum:** Faz 5 (Voice guidance) başladı. **FX-P-51 `SeyAudio.voice()` API iskeleti tamamlandı.** Sıradaki **FX-P-52** — sesli rehberlik entegrasyon noktaları.
 
-**FX-P-51 kapsamı (`.prompts/FX-P-51.md`):**
-- `SeyAudio.voice()` implemente et (SpeechSynthesis / sesli rehberlik).
+**FX-P-52 kapsamı (`.prompts/FX-P-52.md`):**
+- `SeyAudio.voice()`'i app.js'teki uygun çağrı noktalarına entegre et.
 - `voiceGuidance` settings gating'i.
 - **I2/I5 koru:** `App.*` yüzeyi (701) ve tek `app.js` tag değişmez.
 
 **Başlamadan önce:**
-- `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-51"` yap.
-- `.prompts/FX-P-51.md` dosyasını oku ve uygula.
+- `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-52"` yap.
+- `.prompts/FX-P-52.md` dosyasını oku ve uygula.
 
 ---
 
@@ -212,6 +212,6 @@ Fark varsa → `git checkout -- .` ve kullanıcıya bildir.
 | Dalga 2 (Haptics) | FX-P-21…24 | ✅ |
 | Dalga 3 (Visual micro-FX) | FX-P-31…38 | ✅ |
 | **Dalga 4 (Time theme)** | **FX-P-41…48** | ✅ Tamamlandı |
-| Dalga 5+ (voice, settings…) | FX-P-51… | ⏳ FX-P-51 onay bekliyor |
+| **Dalga 5 (Voice guidance)** | **FX-P-51…** | 🔄 FX-P-52 sırada |
 
 ---

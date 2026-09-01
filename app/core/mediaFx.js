@@ -19,6 +19,8 @@
     return true;
   }
   function reducedMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  // FX-P-51: sesli rehberlik için değer sınırlama helper'ı.
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
   function playTone(freq, duration, type, gainValue, allowReducedMotion){
     if (!allowed(allowReducedMotion)) return;
@@ -96,17 +98,34 @@
     success: function(){ playArpeggio([523, 784], 0.2, 'sine'); },
     warning: function(){ playTone(200, 0.25, 'sawtooth', 0.1); },
     bell: function(){ playBell(880, 0.6); },
-    voice: function(text){
-      if (!window.speechSynthesis || !text) return;
-      try{
-        var s = settings();
-        if (!s.voiceGuidance || !s.premiumAtmosphere) return;
-        var u = new SpeechSynthesisUtterance(text);
-        u.lang = 'tr-TR';
-        u.rate = 1.0;
-        u.pitch = 1.0;
+    // FX-P-51: metin tabanlı sesli rehberlik. Web Speech API (speechSynthesis)
+    // üzerinden çalışır; yoksa veya gating kapalıysa sessizce false döner.
+    isVoiceEnabled: function(){
+      return !!(settings() && settings().voiceGuidance && typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis);
+    },
+    voice: function(text, opts){
+      opts = opts || {};
+      if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;
+      if (typeof window.speechSynthesis === 'undefined' || !window.speechSynthesis) return false;
+      if (window.speechSynthesis.speaking){
+        if (!opts.force) return false;
+        try { window.speechSynthesis.cancel(); }catch(e){}
+      }
+      var u = new SpeechSynthesisUtterance(text);
+      var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      if (opts.lang) u.lang = opts.lang;
+      if (opts.rate) u.rate = clamp(opts.rate, 0.5, 2);
+      if (opts.pitch) u.pitch = clamp(opts.pitch, 0.5, 2);
+      if (Array.isArray(opts.voiceNames) && voices.length){
+        var preferred = voices.find(function(v){ return opts.voiceNames.indexOf(v.name) >= 0 || opts.voiceNames.indexOf(v.lang) >= 0; });
+        if (preferred) u.voice = preferred;
+      }
+      try {
         window.speechSynthesis.speak(u);
-      }catch(e){}
+        return true;
+      }catch(e){
+        return false;
+      }
     },
     ambient: function(type){
       // Faz 4'te doldurulacak.

@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 3 devam ediyor (FX-P-32 tamamlandı). Sıradaki **FX-P-33** (Shimmer efekti).
+**Durum:** Faz 3 tamamlandı (FX-P-38 kapanışı). Sıradaki **Dalga 4 / FX-P-41** (Time theme) — ayrı kullanıcı onayı bekleniyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -46,9 +46,10 @@
 14. [x] **FX-P-24 (Dalga 2 kapanışı):** haptics test fixture gerçek `mediaFx.js` üzerinden yeniden yazıldı (25/25), REVIEW-CHECKLIST'e "Dalga 2 Haptics" kapsamı eklendi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 15. [x] **FX-P-31 (Dalga 3 başlangıcı):** `SeyFx` master gating utility'leri implemente edildi (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/isSoundAllowed). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 16. [x] **FX-P-32:** Ripple efekti — `.sey-ripple` CSS + `SeyFx.ripple(event,color)` (dokunma koordinatlarına göre dalga, isPremiumFxEnabled gating, reduced-motion'a saygılı). Cache-busting `app/styles.css?v=20260901a`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-17. [ ] **FX-P-33:** Shimmer efekti.
-18. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-19. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+17. [x] **FX-P-33..38 (Dalga 3 kapanışı):** shimmer (FX-P-33), count-up (FX-P-34), micro-FX entegrasyonu (FX-P-35), test+kapsam (FX-P-36, fx_utils 26/26), enter/transition (FX-P-37), performans audit (FX-P-38, will-change + katalog + VISUAL-FX-AUDIT.md). Cache-busting `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. S5/S6 geçti; yerel commitler yapıldı, push edilmedi.
+18. [ ] **Dalga 4 (Time theme) — FX-P-41:** `SeyTimeTheme.classForHour()`. **Kullanıcı onayı bekleniyor.**
+19. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+20. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

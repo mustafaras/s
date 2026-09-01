@@ -137,19 +137,40 @@
     try{ navigator.vibrate(pattern); }catch(e){}
   }
 
+  // FX-P-31: SeyFx — tüm görsel micro-FX için master gating tek noktada.
+  // `settings()` helper'ı (window.SeymaState.data.settings) gerçek kaynaktır;
+  // prompt'taki `currentSettings()` (SeymaConstants.data) gerçek kodda yoktur.
+  function prefersReducedMotion(){ return reducedMotion(); }
+  function isPremiumFxEnabled(){
+    var s = settings();
+    if (s.premiumAtmosphere === false) return false;
+    if (prefersReducedMotion()) return false;
+    return true;
+  }
+  function shouldAnimate(){ return isPremiumFxEnabled(); }
+  function ambientAllowed(){
+    var s = settings();
+    return isPremiumFxEnabled() && s.ambientSounds === true;
+  }
+  function isSoundAllowed(){
+    var s = settings();
+    return isPremiumFxEnabled() && s.uiSounds !== false;
+  }
+
   window.SeyFx = {
-    isPremiumFxEnabled: function(){ return !!settings().premiumAtmosphere && !reducedMotion(); },
-    prefersReducedMotion: reducedMotion,
-    shouldAnimate: function(){ return window.SeyFx.isPremiumFxEnabled(); },
-    ambientAllowed: function(){ return !!settings().premiumAtmosphere && !!settings().ambientSounds; },
+    isPremiumFxEnabled: isPremiumFxEnabled,
+    prefersReducedMotion: prefersReducedMotion,
+    shouldAnimate: shouldAnimate,
+    ambientAllowed: ambientAllowed,
+    isSoundAllowed: isSoundAllowed,
     countUp: function(options){
-      // Faz 3'te doldurulacak.
+      // FX-P-34'te doldurulacak.
     },
     ripple: function(event, color){
-      // Faz 3'te doldurulacak.
+      // FX-P-32'te doldurulacak.
     },
     shimmer: function(element){
-      // Faz 3'te doldurulacak.
+      // FX-P-33'te doldurulacak.
     }
   };
 })();

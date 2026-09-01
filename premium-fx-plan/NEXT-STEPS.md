@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 3 tamamlandı (FX-P-38 kapanışı). Sıradaki **Dalga 4 / FX-P-41** (Time theme) — ayrı kullanıcı onayı bekleniyor.
+**Durum:** Faz 4 başladı (FX-P-41 tamamlandı). Sıradaki **Dalga 4 / FX-P-42** (`#root` class güncellemesi + `SeyTimeTheme.apply()`).
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar

@@ -33,6 +33,8 @@ git log --oneline -8
 - **Son durum:** **Faz 1 tamamlandı** (FX-P-16 kapanışı). Dalga 1 Audio bitti.
 - **Sıradaki:** **Dalga 2 / FX-P-21** (Haptics) — **ayrı kullanıcı onayı bekleniyor.**
 
+> **⚠️ FX sonrası (modularization) el feneri:** Tüm FX dalgaları (`FX-PROMPT-STATE.json` → `lastCompletedPrompt: "FX-P-74"`, `currentPhase: "Faz 8 tamamlandı"`) bitince modularization prompt'ları üretecek ajanın **ilk okuması** [`docs/monolit-bolumlenme-haritasi.md`](../docs/monolit-bolumlenme-haritasi.md) olmalıdır (graphify kanıtı: app.js gerçek iş alanı kırılımı + neden topluluk etiketleri yanıltıcı). Sonra [`premium-fx-plan/MODULARIZATION.md`](MODULARIZATION.md) hedef modül listesiyle çapraz doğrula (yukarıdaki satır aralıkları gerçeği yansıtır). Böylece FX→modülerleştirme devri, graphify haritasının canlı girdisiyle başlar.
+
 ---
 
 ## 2. ⚠️ KRİTİK: VERİ GÜVENLİĞİ (Şeyma CLAUDE.md / AGENTS.md)

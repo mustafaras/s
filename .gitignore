@@ -3,4 +3,5 @@ files/
 .impeccable/
 __pycache__/
 *.pyc
+graphify-out/
 

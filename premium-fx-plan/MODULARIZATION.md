@@ -4,7 +4,11 @@
 **Tarih:** 2026-08-30
 **Hedef:** ~18.805 satırlık `app.js` monolitini, FX katmanının güvenli şekilde büyüyebileceği bir modül ailesine dönüştürmek. **Kod değiştirilmeden** planlanmıştır.
 
-> **Güncelleme:** v2.1'de `app.js`’in tüm user-facing bölümleri okundu ve gerçek satır aralıkları belirlendi. Mevcut `app/core/constants.js` ile `app/core/*reminder*` ve `app/content/*` modülleri korunacak.
+> **Güncelleme:** v2.1'de `app.js`'in tüm user-facing bölümleri okundu ve gerçek satır aralıkları belirlendi. Mevcut `app/core/constants.js` ile `app/core/*reminder*` ve `app/content/*` modülleri korunacak.
+
+> **⚠️ FX tamamlanınca İLK GİRDİ — modülerleştirme prompt'ları buradan başlar:**
+> graphify tarafından üretilen [`docs/monolit-bolumlenme-haritasi.md`](../docs/monolit-bolumlenme-haritasi.md), app.js'in **gerçek iş alanı kırılımını** (reminder %28, zikir/kur'an/saygı/aeon vb.) ve graphify topluluk etiketlerinin neden monolit içinde yanıltıcı olduğunu rakamla gösterir. Bu harita, aşağıdaki hedef modül listesiyle hizalanır ve hangi fonksiyonun hangi modüle gideceğine dair kanıt temelini sağlar.
+> - **Ajanlar FX dalgalarını (örn. Dalga 8 sonu) bitirdiğinde:** sıradaki modularization prompt'unu üretirken önce `docs/monolit-bolumlenme-haritasi.md`'yi oku, buradaki hedef modül listesini o haritayla doğrula ve FX→modülerleştirme devrini bu referansla başlat.
 
 ---
 

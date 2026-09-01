@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 2 devam ediyor (FX-P-23 tamamlandı). Sıradaki **FX-P-24** (haptics test fixture'larını güncelle).
+**Durum:** Faz 2 tamamlandı (FX-P-24 kapanışı). Sıradaki **Dalga 3 / FX-P-31** (Visual micro-FX) — ayrı kullanıcı onayı bekleniyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -43,9 +43,10 @@
 11. [x] **Dalga 2 (Haptics) — FX-P-21:** `SeyHaptics` desenleri FX-LIBRARY.md §2'ye hizalandı (tap/success/error/refresh/streak/water) + legacy `haptics === false` kapısı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 12. [x] **FX-P-22:** Buton/kart tıklamalarına `SeyHaptics.tap()` entegre edildi (17 nokta: setMood, setEnergy, setStress, toggleHabit, waterAdd, saveToday, overlay aç/kapa, yıldız puanlama, segmented tab, toggleTheme). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 13. [x] **FX-P-23:** streak/water haptics entegrasyonu — `SeyHaptics.streak()` 3 noktaya (maybeStreak, zikir tur/hatim, motivasyon görevi), `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-14. [ ] **FX-P-24:** haptics test fixture'larını güncelle.
-15. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-16. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+14. [x] **FX-P-24 (Dalga 2 kapanışı):** haptics test fixture gerçek `mediaFx.js` üzerinden yeniden yazıldı (25/25), REVIEW-CHECKLIST'e "Dalga 2 Haptics" kapsamı eklendi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+15. [ ] **Dalga 3 (Visual micro-FX) — FX-P-31:** `SeyFx` utility iskeleti. **Kullanıcı onayı bekleniyor.**
+16. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+17. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

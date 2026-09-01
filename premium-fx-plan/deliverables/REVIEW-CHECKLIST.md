@@ -55,6 +55,15 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] `SeyAudio.bell()` entegre edildi (app.js çağrı noktaları: `App.zikrTap` tur/hatim, `App.completeMotivationTask` başarılı yol, `App.reminderInboxPrimary` hatırlatma kapanışı).
 - [x] Audio test fixture PASS (`tests/app/test_premium_audio_fx.js` — gerçek `mediaFx.js` yüklenir, 26/26).
 
+## Dalga 2 Haptics (FX-P-24)
+
+- [x] `SeyHaptics.tap()` uygulandı ve temel etkileşimlere entegre edildi (app.js çağrı noktaları: `setMood`, `setEnergy`, `setStress`, `toggleHabit`, `saveToday`, overlay aç/kapa, yıldız puanlama, `setRoomTab`, `toggleTheme`).
+- [x] `SeyHaptics.success/error/refresh/streak/water` uygulandı (desenler FX-LIBRARY.md §2'ye hizalı).
+- [x] `SeyHaptics.streak()` entegre edildi (app.js çağrı noktaları: `maybeStreak` kilometre taşı, zikir tur/hatim tamamlama, motivasyon görevi tamamlama).
+- [x] `SeyHaptics.water()` entegre edildi (app.js çağrı noktası: `App.waterAdd` pozitif delta — `tap()` yerine `water()`, aynı event'te tek haptik).
+- [x] `richHaptics + haptics + premiumAtmosphere + reduced-motion` gating çalışıyor.
+- [x] Haptics test fixture PASS (`tests/app/test_premium_haptics_fx.js` — gerçek `mediaFx.js` yüklenir, desenler + gating + app.js çağrı noktaları doğrulanır).
+
 ## Dokümantasyon
 
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var; şu an için güncelleme yalnızca plan/spec/test aşamasında, canlı `app.js` dokümanı bu aşamada değiştirilmiyor.

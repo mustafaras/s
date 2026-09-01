@@ -9897,6 +9897,12 @@ function render(){
   // İlk açılış sonrası sabit animasyon kipine geç; böylece sonraki sekme değişimlerinde
   // header shimmer, wordmark sheen veya sayfa-giriş fade'ı yeniden başlamaz.
   if(root) root.classList.add('sey-app-booted');
+  // Faz 4 (Time theme): #root'a mevcut saat aralığı sınıfını uygula. render() her
+  // boot'ta ve 30 sn'lik poll loop'ta çağrıldığı için tema değişiklikleri otomatik
+  // senkronize olur. SeyTimeTheme yoksa veya premiumAtmosphere kapalıysa no-op.
+  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.apply==='function'){
+    try{ window.SeyTimeTheme.apply(); }catch(e){}
+  }
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
   // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
   var tcm=document.querySelector('meta[name="theme-color"]');

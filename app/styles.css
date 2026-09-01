@@ -316,6 +316,15 @@
        grafiktir (marka flaması, filigran rakamlar) ve kullanıcı metin boyutuyla
        ölçeklenmemelidir. Ham px olarak kalırlar; muafiyet listesi LEDGER'da. */
 
+    /* ── Faz 4 (Time theme): saat aralığı vurgu tonları ────────────────────
+       Yalnızca ince yüzey vurgusu; tüm rengi değiştirmez. #root'a
+       theme-time-* sınıfı eklendiğinde --surface-* tokenları kullanılabilir.
+       premiumAtmosphere kapalıyken bu sınıflar eklenmez (no-op). */
+    --surface-dawn:rgba(255,193,105,0.10);
+    --surface-day:rgba(110,85,191,0.06);
+    --surface-dusk:rgba(190,108,139,0.10);
+    --surface-night:rgba(110,113,145,0.10);
+
     color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;
   }
@@ -377,11 +386,35 @@
     --aeon:#F0CD78; --aeon2:#F6DC91; --aeon-bg:rgba(240,205,120,0.11); --aeon-glow:rgba(246,220,145,0.09);
     --user-bubble:#715DA8; --user-bubble2:#8872BD;
     --reminder-inbox:#D9BFE7; --reminder-inbox-strong:#E8D5F1; --reminder-inbox-soft:rgba(217,191,231,.12); --reminder-inbox-focus:#F1DDF7;
+    /* Faz 4 (Time theme): koyu tema saat aralığı vurgu tonları — parlak ama
+       düşük yoğunluklu, yalnızca ince yüzey vurgusu. */
+    --surface-dawn:rgba(255,193,105,0.10);
+    --surface-day:rgba(203,184,255,0.08);
+    --surface-dusk:rgba(240,170,199,0.10);
+    --surface-night:rgba(154,156,192,0.10);
   }
   .glass{background:var(--card);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border:1px solid var(--card-bd);}
   /* AD-38: içerik kartlarının cam olmayan karşılığı. Cam yok, blur yok — yalnızca opak
      zemin + aynı kenarlık. .glass ile aynı kutu modeli, böylece sınıf takası düzen değiştirmez. */
   .surface{background:var(--card-solid);border:1px solid var(--card-bd);}
+  /* ── Faz 4 (Time theme): saat aralığı sınıfları ─────────────────────────
+     #root'a SeyTimeTheme.apply() ile eklenir. Yalnızca ince yüzey vurgusu —
+     tüm rengi değiştirmez; premiumAtmosphere kapalıyken sınıf eklenmez. */
+  #root.theme-time-dawn{--surface-accent:var(--surface-dawn);}
+  #root.theme-time-day{--surface-accent:var(--surface-day);}
+  #root.theme-time-dusk{--surface-accent:var(--surface-dusk);}
+  #root.theme-time-night{--surface-accent:var(--surface-night);}
+  #root.theme-time-dawn .sey-appheader,
+  #root.theme-time-day .sey-appheader,
+  #root.theme-time-dusk .sey-appheader,
+  #root.theme-time-night .sey-appheader{box-shadow:0 8px 18px var(--surface-accent),inset 0 -1px 0 var(--card-bd);}
+  #root.theme-time-dawn .sey-bottomnav-surface,
+  #root.theme-time-day .sey-bottomnav-surface,
+  #root.theme-time-dusk .sey-bottomnav-surface,
+  #root.theme-time-night .sey-bottomnav-surface{box-shadow:0 10px 22px var(--surface-accent),inset 0 1px 0 var(--card-bd);}
+  @media (prefers-reduced-motion: reduce){
+    #root.theme-time-dawn,#root.theme-time-day,#root.theme-time-dusk,#root.theme-time-night{transition:none;}
+  }
   /* Açılır kartlar: iOS 26 liquid-glass — açık/kapalı hâl arası yumuşak geçiş, hafif renk çerçeve */
   .sey-ccard{position:relative;transition:box-shadow .34s var(--ease-premium),border-color .34s var(--ease-premium),background-color .3s ease;}
   .sey-ccard>.sey-ccard-sheen{position:absolute;top:0;left:14px;right:14px;height:2px;border-radius:2px;pointer-events:none;opacity:0;transition:opacity .34s ease;}

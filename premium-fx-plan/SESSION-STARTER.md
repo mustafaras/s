@@ -1,8 +1,9 @@
-# ŞEYMA PREMIUM FX — YENİ SESSION STARTER (v2, 2026-08-31)
+# ŞEYMA PREMIUM FX — YENİ SESSION STARTER (v3, 2026-09-01)
 
-> **Bu dosya, FX-P-03'e geçmeden önce yeni bir oturumun soğuk başlangıçta okuması gereken her şeyi içerir.**
-> Önceki oturumda plan belgeleri denetlendi, mimari karar B1 alındı ve **3 kırık fonksiyon bulundu**.
-> Bu bulgular çözülmeden FX-P-03'e geçilmemelidir.
+> **Bu dosya, her yeni oturumun soğuk başlangıçta okuması gereken her şeyi içerir.**
+> Amaç: context'ten kopmadan, kaldığımız yerden devam etmek. Anti-amnesi dosyaları
+> (`CURRENT-STATE.md`, `LEDGER.md`, `FX-PROMPT-STATE.json`, `NEXT-STEPS.md`) her
+> prompt sonunda güncellenir; bu starter onları nasıl okuyup nereden devam edeceğini söyler.
 
 ---
 
@@ -14,86 +15,37 @@ git checkout premium-fx-local
 git status --short --branch
 cat premium-fx-plan/.anti-amnesia/FX-PROMPT-STATE.json
 sed -n '1,40p' premium-fx-plan/.anti-amnesia/CURRENT-STATE.md
-sed -n '20,30p' premium-fx-plan/.anti-amnesia/LEDGER.md   # seq 22, 23, 24'ü oku
 git log --oneline -8
 ```
 
+**Durum makinesi okuma:**
 - `blockedPrompt` doluysa → **DUR**, kullanıcıdan çözüm iste.
 - `activePrompt` doluysa → yarım kalmış prompt var; `git status` ile incele, ya tamamla ya `git checkout -- .` ile geri al.
-- Aksi halde sıradaki prompt = `lastCompletedPrompt` + 1.
+- Aksi halde sıradaki prompt = `lastCompletedPrompt` + 1 (veya `NEXT-STEPS.md`'deki "Sırada Yapılacaklar" listesine bak).
 
 ---
 
 ## 1. Proje Özeti
 
 - **Repo:** `mustafaras/s` → yerel kopya `/Users/m_ras/Desktop/seyma`
-- **Branch:** `premium-fx-local` (sadece yerel commitler, push yok)
-- **Plan:** `premium-fx-plan/` — 54 prompt (FX-P-01 … FX-P-74)
-- **Son durum:** FX-P-01 ✅, FX-P-02 ✅, plan audit-fix ✅, B1 kararı ✅
-- **Sıradaki:** FX-P-03 (ama önce seq 24 bulguları çözülmeli)
+- **Branch:** `premium-fx-local` (sadece yerel commitler, **push yok**)
+- **Plan:** `premium-fx-plan/` — 74 prompt (FX-P-01 … FX-P-74), 7 dalga
+- **Son durum:** **Faz 1 tamamlandı** (FX-P-16 kapanışı). Dalga 1 Audio bitti.
+- **Sıradaki:** **Dalga 2 / FX-P-21** (Haptics) — **ayrı kullanıcı onayı bekleniyor.**
 
 ---
 
-## 2. ⚠️ KRİTİK: ÇÖZÜLMESİ GEREKEN 3 KIRIK FONKSİYON (seq 24)
+## 2. ⚠️ KRİTİK: VERİ GÜVENLİĞİ (Şeyma CLAUDE.md / AGENTS.md)
 
-**Kök neden:** FX-P-01'in "fonksiyonları kopyala" talimatı, closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybettirdi. Bu fonksiyonlar **yalnızca Faz 0'da canlı getter eklendiğinde (B1) çalışır hale gelir.** Şu an iskelet; çağrılırsa kırılır.
-
-| # | Dosya | Fonksiyon | Sorun | app.js orijinali |
-|---|-------|-----------|-------|------------------|
-| 1 | `app/core/dateUtils.js` | `dayIndexFor` | `window.SeymaConstants.START_DATE` kullanıyor ama `START_DATE` constants.js'te **YOK**; `data` closure'da → ReferenceError | `diffDays(data.startDate, date)+1` (app.js 4732) |
-| 2 | `app/core/dateUtils.js` | `activeDate` | `window.ui` kullanıyor ama `ui` closure'da → her zaman `todayStr()` döner | `(ui.editDate)?ui.editDate:todayStr()` (app.js 4736) |
-| 3 | `app/core/dateUtils.js` | `curDay` | `window.SeymaState.getDay` kullanıyor ama `getDay` closure'da → TypeError | `getDay(data,d,dayIndexFor(d))` (app.js 4738) |
-
-**Çözüm seçenekleri:**
-- **A)** Bu 3 fonksiyonu app.js orijinallerine hizala (Faz 0 canlı getter'larına bağımlı hale getir): `dayIndexFor` → `window.SeymaState.data.startDate`; `activeDate` → `window.SeymaState.ui.editDate`; `curDay` → `window.SeymaState.getDay(window.SeymaState.data, d, ...)`.
-- **B)** FX-P-03 testlerini bu duruma göre yaz (fonksiyonların şu an iskelet olduğunu, Faz 0'da canlanacağını doğrula).
-
-**Ayrıca:**
-- `state.js` yorumu hâlâ eski "lazy getter" yaklaşımını anlatıyor → B1'e göre güncellenmeli.
-- `helpers.js` `haptic` aynı closure sorununu taşıyor (`window.SeymaState.data` → `undefined` → kapatma kontrolü devre dışı). Şu an kırıcı değil ama Faz 0'da düzeltilecek.
+- Uygulamayı **tarayıcıda açma** ("çalışıyor mu" kontrolü için).
+- Görsel QA için `driver.mjs --dump <sekme>` kullan.
+- `mustafaras/seyma-data` deposuna **yazma yok** (okuma serbest).
+- Localhost server sadece kullanıcı ajan-tarafından ekran görüntüsü istediğinde, port `9000` ile açılır; sonunda `pkill -f http.server`.
+- `sync.js` Guard 1 (localhost push engeli) ve Guard 2 (anti-clobber) **devre dışı bırakılmaz**.
 
 ---
 
-## 3. Mimari Karar B1 (seq 23) — CANLI GETTER
-
-**Sorun:** `data` mutable bir bağlama — boot'tan sonra **6+ kez yeniden atanıyor** (4412/4413/6692/9203/18724/9173/9177). Tek seferlik `window.data = data` bayat kalır.
-
-**Çözüm (B1):** Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir:
-```js
-Object.defineProperty(window, 'data', { get: function(){ return data; }, configurable: true });
-Object.defineProperty(window, 'ui',   { get: function(){ return ui; },   configurable: true });
-Object.defineProperty(window, 'dark', { get: function(){ return dark; }, configurable: true });
-Object.defineProperty(window, 'migrate', { get: function(){ return migrate; }, configurable: true });
-Object.defineProperty(window, 'getDay',  { get: function(){ return getDay; },  configurable: true });
-Object.defineProperty(window, 'createDefaultData', { get: function(){ return createDefaultData; }, configurable: true });
-Object.defineProperty(window, 'save', { get: function(){ return save; }, configurable: true });
-```
-Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtlandı (6/6):** boot/reset/import sonrası `window.data` taze, `SeymaState.data` doğru.
-
-**Değişmezlik yeniden tanımı:** I2/I3/I4 "dokunulmaz" = **"davranış değiştirmez"**, "hiç satır eklenmez" değil. Canlı getter'lar mevcut fonksiyon davranışını/imzasını değiştirmez.
-
-**Kritik uyarı:** `syncGlue.js`'te `SeyOnSyncState`/`SeyOnSynced` **yeniden tanımlanmaz** — getter-only accessor yapılırsa app.js'in strict-mode ataması THROW eder. Yalnızca `SeymaSave` getter olarak tanımlanır.
-
----
-
-## 4. Ground Truth (grep ile doğrulandı)
-
-**`app.js`'te `window`'a atanan yalnızca 3 şey:**
-- `window.SeyOnSyncState` (6198)
-- `window.SeyOnSynced` (6208)
-- `window.App` (16888)
-
-**Closure-scoped (window'da DEĞİL):** `data`(2710), `ui`(4678), `dark`(4616), `migrate`(4415), `getDay`(4922), `createDefaultData`(6684), `save`(6229).
-
-**`emptyDay` fonksiyonu YOK** (plan belgeleri yanlış varsayıyordu; düzeltildi).
-
-**`pad` fonksiyonu** (pad2 değil) → app.js 4726.
-
-**`constants.js` expose:** `SeymaConstants = { KEY, TKEY, FEATURE_GATE_TS, ICONS }` — SADECE bunlar. `icon()`, `HABITS`, `SOUL_ACTIVITY_CATALOG` constants.js'te YOK (app.js'te).
-
----
-
-## 5. Hard Rules (İhlali Geri Alma / Kullanıcıya Bildirme)
+## 3. Hard Rules (İhlali Geri Alma / Kullanıcıya Bildirme)
 
 | Kural | Açıklama | Kanıt |
 |---|---|---|
@@ -107,10 +59,54 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 
 ---
 
+## 4. Mimari Karar B1 (seq 23) — CANLI GETTER
+
+**Sorun:** `data` mutable bir bağlama — boot'tan sonra **6+ kez yeniden atanıyor**. Tek seferlik `window.data = data` bayat kalır.
+
+**Çözüm (B1):** Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklendi:
+```js
+Object.defineProperty(window, 'data', { get: function(){ return data; }, configurable: true });
+Object.defineProperty(window, 'ui',   { get: function(){ return ui; },   configurable: true });
+Object.defineProperty(window, 'dark', { get: function(){ return dark; }, configurable: true });
+Object.defineProperty(window, 'migrate', { get: function(){ return migrate; }, configurable: true });
+Object.defineProperty(window, 'getDay',  { get: function(){ return getDay; },  configurable: true });
+Object.defineProperty(window, 'createDefaultData', { get: function(){ return createDefaultData; }, configurable: true });
+Object.defineProperty(window, 'save', { get: function(){ return save; }, configurable: true });
+```
+Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtlandı (6/6).**
+
+**Değişmezlik yeniden tanımı:** I2/I3/I4 "dokunulmaz" = **"davranış değiştirmez"**, "hiç satır eklenmez" değil.
+
+**Kritik uyarı:** `syncGlue.js`'te `SeyOnSyncState`/`SeyOnSynced` **yeniden tanımlanmaz** — getter-only accessor yapılırsa app.js'in strict-mode ataması THROW eder. Yalnızca `SeymaSave` getter olarak tanımlanır.
+
+---
+
+## 5. Ground Truth (grep ile doğrulandı)
+
+**`app.js`'te `window`'a atanan yalnızca 3 şey:**
+- `window.SeyOnSyncState` (6198)
+- `window.SeyOnSynced` (6208)
+- `window.App` (16888)
+
+**Closure-scoped (window'da DEĞİL):** `data`(2710), `ui`(4678), `dark`(4616), `migrate`(4415), `getDay`(4922), `createDefaultData`(6684), `save`(6229).
+
+**`emptyDay` fonksiyonu YOK.** **`pad` fonksiyonu** (pad2 değil) → app.js 4726.
+
+**`constants.js` expose:** `SeymaConstants = { KEY, TKEY, FEATURE_GATE_TS, ICONS }` — SADECE bunlar.
+
+**`mediaFx.js` API yüzeyi (FX-P-06/11):**
+- `SeyAudio`: `ctx` (lazy getter), `tap`/`success`/`warning`/`bell`/`voice`/`ambient`
+- `SeyHaptics`: `tap`/`success`/`error`/`refresh`/`streak`/`water`
+- `SeyFx`: `isPremiumFxEnabled`/`prefersReducedMotion`/`shouldAnimate`/`ambientAllowed`/`countUp`/`ripple`/`shimmer`
+
+**Settings alanları (FX-P-05 migrate backfill):** `premiumAtmosphere`/`uiSounds`/`voiceGuidance`/`ambientSounds`/`richHaptics`/`launchRitual`.
+
+---
+
 ## 6. Context Load Sırası (Her Prompt Öncesi)
 
 1. `.anti-amnesia/CURRENT-STATE.md`
-2. `.anti-amnesia/LEDGER.md` (özellikle seq 22, 23, 24)
+2. `.anti-amnesia/LEDGER.md` (özellikle son seq'ler)
 3. `premium-fx-plan/NEXT-STEPS.md`
 4. `premium-fx-plan/LOCAL-ONLY-IMPLEMENTATION.md`
 5. `premium-fx-plan/.prompts/PROMPT-CATALOG.md`
@@ -121,11 +117,14 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 
 ---
 
-## 7. Sıradaki İş: FX-P-03 (ama önce seq 24'ü çöz)
+## 7. Sıradaki İş: Dalga 2 / FX-P-21 (Haptics)
 
-**FX-P-03:** `test_date_utils_boundary.js` ve `test_helpers_boundary.js` **genişlet** (dosyalar FX-P-01'de oluştu; "oluştur" değil "genişlet").
+**Durum:** Faz 1 (Audio) tamamlandı. **FX-P-21 `SeyHaptics` implementasyonu** sırada, ama **ayrı kullanıcı onayı bekleniyor.**
 
-**ÖN KOŞUL:** seq 24'teki 3 kırık fonksiyonu çöz (Bölüm 2'deki A veya B seçeneği). Aksi halde FX-P-03 testleri bu kırık fonksiyonları çağırırsa başarısız olur.
+**Başlamadan önce:**
+- Kullanıcıdan Dalga 2 onayı al.
+- `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-21"` yap.
+- `.prompts/FX-P-21.md` dosyasını oku ve uygula.
 
 ---
 
@@ -136,7 +135,7 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 3. `node --check <degisen>.js` çalıştır.
 4. S5 test kapısını çalıştır.
 5. S6 değişmezlik kanıtını çalıştır.
-6. **Anti-amnesi güncelle:** LEDGER + CURRENT-STATE + FX-PROMPT-STATE.
+6. **Anti-amnesi güncelle:** LEDGER + CURRENT-STATE + FX-PROMPT-STATE + NEXT-STEPS.
 7. **Yerel commit:** `git add -A && git commit -m "premium-fx: FX-P-NN <kısa Türkçe açıklama>"`
 8. **Push yapma.**
 
@@ -154,7 +153,7 @@ node tests/panel/test_faz11_panel.js
 for f in tests/panel-v2/test_panel_v2_*.js; do node "$f" || echo "FAIL: $f"; done
 ```
 
-Prompta özel test varsa (örn. `test_premium_audio_fx.js`) onu da çalıştır.
+Prompta özel test varsa (örn. `test_premium_audio_fx.js`, `test_premium_haptics_fx.js`) onu da çalıştır.
 
 ---
 
@@ -172,20 +171,11 @@ Fark varsa → `git checkout -- .` ve kullanıcıya bildir.
 
 ---
 
-## 11. Veri Güvenliği (Şeyma CLAUDE.md / AGENTS.md)
-
-- Uygulamayı **tarayıcıda açma**.
-- Görsel QA için `driver.mjs --dump <sekme>` kullan.
-- `mustafaras/seyma-data` deposuna **yazma yok**.
-- Localhost server sadece kullanıcı ajan-tarafından ekran görüntüsü istediğinde, port `9000` ile açılır; sonunda `pkill -f http.server`.
-
----
-
-## 12. Anti-Amnesi Güncellemesi (Her Prompt Sonu Zorunlu)
+## 11. Anti-Amnesi Güncellemesi (Her Prompt Sonu Zorunlu)
 
 ### LEDGER.md satırı
 ```markdown
-| FX-P-NN | 2026-08-31 | GitHub Copilot | <kısa ad> | ✅ TAMAMLANDI | <yerel commit> | S5/S6 geçti | <bir cümle sonuç> |
+| FX-P-NN | 2026-09-01 | GitHub Copilot | <kısa ad> | ✅ TAMAMLANDI | <yerel commit> | S5/S6 geçti | <bir cümle sonuç> |
 ```
 
 ### CURRENT-STATE.md
@@ -196,22 +186,19 @@ Fark varsa → `git checkout -- .` ve kullanıcıya bildir.
 - Başlatırken: `activePrompt: "FX-P-NN"`
 - Bitirirken: `activePrompt: null`, `lastCompletedPrompt: "FX-P-NN"`, `currentPhase: "Faz X"`
 
----
-
-## 13. Rollback (Bir Şey Ters Giderse)
-
-```bash
-cd /Users/m_ras/Desktop/seyma
-git checkout -- .
-git clean -fd
-git checkout premium-fx-local
-```
+### NEXT-STEPS.md
+- "Sırada Yapılacaklar" listesini güncelle.
 
 ---
 
-## 14. İletişim Kuralı
+## 12. Tamamlanan Dalgalar (Hızlı Referans)
 
-- Her adım sonunda kısa durum raporu ver.
-- "Tamamlandı" demeden önce test çıktılarını göster.
-- Kullanıcıdan **her dalga öncesi** ayrı onay al.
-- Şüpheye düştüğünde dur ve kullanıcıya sor.
+| Dalga | Promptlar | Durum |
+|---|---|---|
+| Faz -1.1 (modül iskeletleri) | FX-P-01…04 | ✅ |
+| Dalga 0 (migrate + getter + API) | FX-P-05, FX-P-06 | ✅ |
+| Dalga 1 (Audio) | FX-P-11…16 | ✅ |
+| **Dalga 2 (Haptics)** | **FX-P-21…** | ⏳ onay bekliyor |
+| Dalga 3+ (count-up, ripple, shimmer, time-theme, launch, voice, ambient) | FX-P-31… | ⏳ |
+
+---

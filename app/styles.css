@@ -1514,3 +1514,26 @@
   .surface{border:1px solid CanvasText!important;}
   button{forced-color-adjust:none;}
 }
+
+/* FX-P-32: Dokunma ripple efekti — SeyFx.ripple() tarafından üretilen dalga.
+   Master switch (premiumAtmosphere) ve reduced-motion'a saygılıdır. */
+.sey-ripple {
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0,0,0);
+}
+.sey-ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: sey-ripple-spread 0.55s linear forwards;
+  pointer-events: none;
+  background: currentColor;
+  opacity: 0.18;
+}
+@keyframes sey-ripple-spread {
+  to { transform: scale(4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sey-ripple-wave { animation: none !important; opacity: 0; }
+}

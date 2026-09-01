@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 3 başladı (FX-P-31 tamamlandı). Sıradaki **FX-P-32** (Ripple efekti CSS + JS).
+**Durum:** Faz 3 devam ediyor (FX-P-32 tamamlandı). Sıradaki **FX-P-33** (Shimmer efekti).
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -45,9 +45,10 @@
 13. [x] **FX-P-23:** streak/water haptics entegrasyonu — `SeyHaptics.streak()` 3 noktaya (maybeStreak, zikir tur/hatim, motivasyon görevi), `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 14. [x] **FX-P-24 (Dalga 2 kapanışı):** haptics test fixture gerçek `mediaFx.js` üzerinden yeniden yazıldı (25/25), REVIEW-CHECKLIST'e "Dalga 2 Haptics" kapsamı eklendi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 15. [x] **FX-P-31 (Dalga 3 başlangıcı):** `SeyFx` master gating utility'leri implemente edildi (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/isSoundAllowed). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-16. [ ] **FX-P-32:** Ripple efekti CSS + JS implementasyonu.
-17. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-18. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+16. [x] **FX-P-32:** Ripple efekti — `.sey-ripple` CSS + `SeyFx.ripple(event,color)` (dokunma koordinatlarına göre dalga, isPremiumFxEnabled gating, reduced-motion'a saygılı). Cache-busting `app/styles.css?v=20260901a`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+17. [ ] **FX-P-33:** Shimmer efekti.
+18. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+19. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

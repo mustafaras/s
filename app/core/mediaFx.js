@@ -167,7 +167,23 @@
       // FX-P-34'te doldurulacak.
     },
     ripple: function(event, color){
-      // FX-P-32'te doldurulacak.
+      // FX-P-32: dokunma koordinatlarına göre CSS ripple dalgası üretir.
+      // Master switch (premiumAtmosphere) + reduced-motion kapalıyken sessiz.
+      if (!isPremiumFxEnabled()) return;
+      var el = event && event.currentTarget;
+      if (!el) return;
+      var rect = el.getBoundingClientRect();
+      var x = (event.clientX || rect.left + rect.width/2) - rect.left;
+      var y = (event.clientY || rect.top + rect.height/2) - rect.top;
+      var d = Math.max(rect.width, rect.height) * 2;
+      var wave = document.createElement('span');
+      wave.className = 'sey-ripple-wave';
+      wave.style.left = (x - d/2) + 'px';
+      wave.style.top = (y - d/2) + 'px';
+      wave.style.width = wave.style.height = d + 'px';
+      if (color) wave.style.background = color;
+      el.appendChild(wave);
+      setTimeout(function(){ wave.remove(); }, 600);
     },
     shimmer: function(element){
       // FX-P-33'te doldurulacak.

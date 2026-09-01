@@ -412,8 +412,38 @@
   #root.theme-time-day .sey-bottomnav-surface,
   #root.theme-time-dusk .sey-bottomnav-surface,
   #root.theme-time-night .sey-bottomnav-surface{box-shadow:0 10px 22px var(--surface-accent),inset 0 1px 0 var(--card-bd);}
+  /* ── Faz 4 (Time theme): mevsimsel vurgu tonları ─────────────────────────
+     SeyTimeTheme.applySeasonal() ile #root'a theme-season-* sınıfı eklenir.
+     Yalnızca ince yüzey vurgusu (--season-accent); tüm rengi değiştirmez.
+     premiumAtmosphere kapalıyken sınıf eklenmez (no-op). */
+  #root{--season-accent:var(--ok);}
+  #root.theme-season-spring{--season-accent:#a3e635;}
+  #root.theme-season-summer{--season-accent:#facc15;}
+  #root.theme-season-autumn{--season-accent:#fb923c;}
+  #root.theme-season-winter{--season-accent:#60a5fa;}
+  #root.theme-season-newyear{--season-accent:#f472b6;}
+  #root.theme-season-ramazan{--season-accent:#34d399;}
+  #root[data-theme="dark"].theme-season-spring{--season-accent:#bef264;}
+  #root[data-theme="dark"].theme-season-summer{--season-accent:#fde047;}
+  #root[data-theme="dark"].theme-season-autumn{--season-accent:#fdba74;}
+  #root[data-theme="dark"].theme-season-winter{--season-accent:#93c5fd;}
+  #root[data-theme="dark"].theme-season-newyear{--season-accent:#f9a8d4;}
+  #root[data-theme="dark"].theme-season-ramazan{--season-accent:#6ee7b7;}
+  #root.theme-season-spring .sey-appheader,
+  #root.theme-season-summer .sey-appheader,
+  #root.theme-season-autumn .sey-appheader,
+  #root.theme-season-winter .sey-appheader,
+  #root.theme-season-newyear .sey-appheader,
+  #root.theme-season-ramazan .sey-appheader{box-shadow:0 8px 18px color-mix(in srgb,var(--season-accent) 22%,transparent),inset 0 -1px 0 var(--card-bd);}
+  #root.theme-season-spring .sey-bottomnav-surface,
+  #root.theme-season-summer .sey-bottomnav-surface,
+  #root.theme-season-autumn .sey-bottomnav-surface,
+  #root.theme-season-winter .sey-bottomnav-surface,
+  #root.theme-season-newyear .sey-bottomnav-surface,
+  #root.theme-season-ramazan .sey-bottomnav-surface{box-shadow:0 10px 22px color-mix(in srgb,var(--season-accent) 22%,transparent),inset 0 1px 0 var(--card-bd);}
   @media (prefers-reduced-motion: reduce){
     #root.theme-time-dawn,#root.theme-time-day,#root.theme-time-dusk,#root.theme-time-night{transition:none;}
+    #root.theme-season-spring,#root.theme-season-summer,#root.theme-season-autumn,#root.theme-season-winter,#root.theme-season-newyear,#root.theme-season-ramazan{transition:none;}
   }
   /* Açılır kartlar: iOS 26 liquid-glass — açık/kapalı hâl arası yumuşak geçiş, hafif renk çerçeve */
   .sey-ccard{position:relative;transition:box-shadow .34s var(--ease-premium),border-color .34s var(--ease-premium),background-color .3s ease;}

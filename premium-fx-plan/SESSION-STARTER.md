@@ -30,8 +30,8 @@ git log --oneline -8
 - **Repo:** `mustafaras/s` → yerel kopya `/Users/m_ras/Desktop/seyma`
 - **Branch:** `premium-fx-local` (sadece yerel commitler, **push yok**)
 - **Plan:** `premium-fx-plan/` — 74 prompt (FX-P-01 … FX-P-74), 7 dalga
-- **Son durum:** **Faz 4 devam ediyor** (FX-P-42 tamamlandı). Dalga 4 (Time theme) devam ediyor.
-- **Sıradaki:** **Dalga 4 / FX-P-43** (mevsimsel renk fonksiyonu).
+- **Son durum:** **Faz 4 devam ediyor** (FX-P-43 tamamlandı). Dalga 4 (Time theme) devam ediyor.
+- **Sıradaki:** **Dalga 4 / FX-P-44** (zaman teması test fixture'ları + Faz 4 kapanışı).
 
 > **⚠️ FX sonrası (modularization) el feneri:** Tüm FX dalgaları (`FX-PROMPT-STATE.json` → `lastCompletedPrompt: "FX-P-74"`, `currentPhase: "Faz 8 tamamlandı"`) bitince modularization prompt'ları üretecek ajanın **ilk okuması** [`docs/monolit-bolumlenme-haritasi.md`](../docs/monolit-bolumlenme-haritasi.md) olmalıdır (graphify kanıtı: app.js gerçek iş alanı kırılımı + neden topluluk etiketleri yanıltıcı). Sonra [`premium-fx-plan/MODULARIZATION.md`](MODULARIZATION.md) hedef modül listesiyle çapraz doğrula (yukarıdaki satır aralıkları gerçeği yansıtır). Böylece FX→modülerleştirme devri, graphify haritasının canlı girdisiyle başlar.
 
@@ -124,20 +124,18 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 
 ---
 
-## 7. Sıradaki İş: Dalga 4 / FX-P-43 (Mevsimsel renk fonksiyonu)
+## 7. Sıradaki İş: Dalga 4 / FX-P-44 (Zaman teması test fixture'ları + Faz 4 kapanışı)
 
-**Durum:** Faz 4 (Time theme) devam ediyor. **FX-P-42 `SeyTimeTheme.apply()` root uygulaması tamamlandı.** Sıradaki **FX-P-43** — `SeyTimeTheme.seasonalClass()` + `applySeasonal()` entegrasyonu.
+**Durum:** Faz 4 (Time theme) devam ediyor. **FX-P-43 `seasonalClass(d)`/`applySeasonal(d)` mevsimsel renk fonksiyonu tamamlandı.** Sıradaki **FX-P-44** — zaman teması test fixture'ları ve Faz 4 kapanışı.
 
-**FX-P-43 kapsamı (`.prompts/FX-P-43.md`):**
-- `SeyTimeTheme.seasonalClass()` mevsimsel sınıfı döndürür (spring/autumn/ramazan/newyear — `timeTheme.js`'te zaten dolu; önce oku, duplike etme).
-- `app.js` boot/poll'de `applySeasonal()` çağır (render sonunda, `apply()` ile birlikte).
-- `app/styles.css`'te opsiyonel `--surface-season-*` vurgu tonları.
-- `index.html`'de `app/styles.css` + `timeTheme.js` cache-bump.
+**FX-P-44 kapsamı (`.prompts/FX-P-44.md`):**
+- Zaman teması test fixture'larını tamamla (saat + mevsim + Hicri entegrasyonu).
+- Faz 4 kapanışı: `REVIEW-CHECKLIST.md`'ye "Dalga 4 Time theme" kapsam satırları.
 - **I2/I5 koru:** `App.*` yüzeyi (701) ve tek `app.js` tag değişmez.
 
 **Başlamadan önce:**
-- `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-43"` yap.
-- `.prompts/FX-P-43.md` dosyasını oku ve uygula.
+- `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-44"` yap.
+- `.prompts/FX-P-44.md` dosyasını oku ve uygula.
 
 ---
 
@@ -213,7 +211,7 @@ Fark varsa → `git checkout -- .` ve kullanıcıya bildir.
 | Dalga 1 (Audio) | FX-P-11…16 | ✅ |
 | Dalga 2 (Haptics) | FX-P-21…24 | ✅ |
 | Dalga 3 (Visual micro-FX) | FX-P-31…38 | ✅ |
-| **Dalga 4 (Time theme)** | **FX-P-41…48** | 🔄 FX-P-43 sırada |
+| **Dalga 4 (Time theme)** | **FX-P-41…48** | 🔄 FX-P-44 sırada |
 | Dalga 5+ (voice, settings…) | FX-P-51… | ⏳ |
 
 ---

@@ -140,6 +140,70 @@ console.log('\n[4] CSS’te theme-time-* class tanımları');
   });
 })();
 
+// ── Test 5: Gerçek timeTheme.js modülü — mevsimsel fonksiyonlar ─────────────
+console.log('\n[5] Gerçek timeTheme.js — seasonalClass(d) / applySeasonal(d)');
+(function(){
+  var vm = require('vm');
+  var src = fs.readFileSync(path.join(repoRoot, 'app/core/timeTheme.js'), 'utf8');
+  var sandbox = { window: {}, document: null, console: console };
+  sandbox.window.SeymaState = { data: { settings: { premiumAtmosphere: true } } };
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox);
+  var ST = sandbox.window.SeyTimeTheme;
+  ok('SeyTimeTheme expose edildi', !!ST && typeof ST.seasonalClass === 'function' && typeof ST.applySeasonal === 'function');
+
+  // seasonalClass(d) — dört mevsim (deterministik, d verilince özel günler atlanır)
+  var seasonCases = [
+    [new Date(2026, 2, 15), 'theme-season-spring'],   // Mart
+    [new Date(2026, 4, 1),  'theme-season-spring'],   // Mayıs
+    [new Date(2026, 5, 15), 'theme-season-summer'],   // Haziran
+    [new Date(2026, 7, 1),  'theme-season-summer'],   // Ağustos
+    [new Date(2026, 8, 15), 'theme-season-autumn'],   // Eylül
+    [new Date(2026, 10, 1), 'theme-season-autumn'],   // Kasım
+    [new Date(2026, 11, 15),'theme-season-winter'],   // Aralık
+    [new Date(2026, 1, 1),  'theme-season-winter']     // Şubat
+  ];
+  seasonCases.forEach(function(c){
+    var cls = ST.seasonalClass(c[0]);
+    ok('seasonalClass('+c[0].getMonth()+1+'/…) → '+c[1], cls === c[1], 'gerçek: '+cls);
+  });
+
+  // applySeasonal(d) — root class listesini günceller
+  var classes = [];
+  var root = { classList: {
+    add: function(c){ if(classes.indexOf(c)===-1) classes.push(c); },
+    remove: function(){ for(var i=0;i<arguments.length;i++){ classes = classes.filter(function(x){ return x!==arguments[i]; }); } },
+    contains: function(c){ return classes.indexOf(c) > -1; }
+  }};
+  sandbox.document = { getElementById: function(id){ return id==='root' ? root : null; } };
+  ST.applySeasonal(new Date(2026, 5, 15)); // yaz
+  ok('applySeasonal yaz sınıfını ekler', root.classList.contains('theme-season-summer'));
+  ok('diğer mevsim sınıfları temizlendi',
+    !root.classList.contains('theme-season-spring') &&
+    !root.classList.contains('theme-season-autumn') &&
+    !root.classList.contains('theme-season-winter'));
+  ST.applySeasonal(new Date(2026, 11, 15)); // kış
+  ok('applySeasonal kışa geçer', root.classList.contains('theme-season-winter') && !root.classList.contains('theme-season-summer'));
+
+  // premiumAtmosphere=false iken sınıf eklenmez
+  sandbox.window.SeymaState.data.settings.premiumAtmosphere = false;
+  classes = [];
+  ST.applySeasonal(new Date(2026, 5, 15));
+  ok('premiumAtmosphere=false iken mevsim sınıfı eklenmez', classes.length === 0);
+})();
+
+// ── Test 6: CSS'te mevsimsel class tanımları ────────────────────────────────
+console.log('\n[6] CSS’te theme-season-* class tanımları');
+(function(){
+  var cssPath = path.join(repoRoot, 'app/styles.css');
+  var css = fs.readFileSync(cssPath, 'utf8');
+  var expectedClasses = ['.theme-season-spring', '.theme-season-summer', '.theme-season-autumn', '.theme-season-winter'];
+  expectedClasses.forEach(function(cls){
+    var found = css.indexOf(cls) > -1;
+    ok(cls+' CSS’te tanımlı', found, found ? '' : 'eksik');
+  });
+})();
+
 console.log('\n=== Özet ===');
 console.log('Passed: '+passed+' / '+(passed+failed));
 process.exit(failed ? 1 : 0);

@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 4 devam ediyor (FX-P-42 tamamlandı). Sıradaki **Dalga 4 / FX-P-43** (mevsimsel renk fonksiyonu).
+**Durum:** Faz 4 devam ediyor (FX-P-43 tamamlandı). Sıradaki **Dalga 4 / FX-P-44** (zaman teması test fixture'ları + Faz 4 kapanışı).
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -49,7 +49,8 @@
 17. [x] **FX-P-33..38 (Dalga 3 kapanışı):** shimmer (FX-P-33), count-up (FX-P-34), micro-FX entegrasyonu (FX-P-35), test+kapsam (FX-P-36, fx_utils 26/26), enter/transition (FX-P-37), performans audit (FX-P-38, will-change + katalog + VISUAL-FX-AUDIT.md). Cache-busting `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. S5/S6 geçti; yerel commitler yapıldı, push edilmedi.
 18. [x] **Dalga 4 (Time theme) — FX-P-41:** `SeyTimeTheme.classForHour()` güncellendi (h==null default). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 19. [x] **FX-P-42:** `SeyTimeTheme.apply()` render() sonunda güvenli guard ile çağrıldı (boot + 30 sn poll loop otomatik senkron); `app/styles.css`'e `--surface-dawn/day/dusk/night` vurgu tokenları (açık+koyu) ve `#root.theme-time-*` sınıf kuralları eklendi; `index.html` cache-busting `app/styles.css?v=20260901c` + `timeTheme.js?v=20260901a`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-20. [ ] **FX-P-43:** Mevsimsel renk fonksiyonu (`SeyTimeTheme.seasonalClass()` + `applySeasonal()` entegrasyonu).
+20. [x] **FX-P-43:** `seasonalClass(d)` dört mevsimi (spring/summer/autumn/winter) döndürecek şekilde tamamlandı — özel günler (newyear/ramazan) yalnızca `d` verilmediğinde uygulanır; `applySeasonal(d)` tüm mevsim+özel sınıfları temizleyip yenisini ekler. `app/styles.css`'e `--season-accent` tokenları (açık+koyu) ve `#root.theme-season-*` sınıf kuralları eklendi. `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip doğrular (41/41). `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+21. [ ] **FX-P-44:** Zaman teması test fixture'ları + Faz 4 kapanışı.
 19. [ ] **Dalga 4 — FX-P-42:** `#root` class güncellemesi + `SeyTimeTheme.apply()` çağrısı (render sonrası / 1 saat poll).
 20. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
 21. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.

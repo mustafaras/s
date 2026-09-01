@@ -19,31 +19,37 @@
     root.classList.remove('theme-time-dawn','theme-time-day','theme-time-dusk','theme-time-night');
     root.classList.add(cls);
   }
-  function seasonalClass(){
-    var now = new Date();
-    var m = now.getMonth() + 1;
-    var d = now.getDate();
-    // Yılbaşı: 1 Ocak
-    if (m === 1 && d === 1) return 'theme-season-newyear';
-    // Ramazan: Hicri 9. ay yaklaşık hesabı; tam hesaplama için hijriCalendar.js kullanılacak.
-    if (window.HijriCalendarV1){
-      var h = window.HijriCalendarV1.todayStr ? window.HijriCalendarV1.todayStr() : null;
-      if (h){
-        var hm = Number(h.split('-')[1]);
-        if (hm === 9) return 'theme-season-ramazan';
+  function seasonalClass(d){
+    var date = d || new Date();
+    var m = date.getMonth() + 1;
+    var day = date.getDate();
+    // Özel günler yalnızca gerçek "bugün" için (d parametresi verilmediğinde):
+    // deterministik testler için d verilirse özel günler atlanır.
+    if (!d){
+      // Yılbaşı: 1 Ocak
+      if (m === 1 && day === 1) return 'theme-season-newyear';
+      // Ramazan: Hicri 9. ay yaklaşık hesabı; tam hesaplama için hijriCalendar.js kullanılır.
+      if (window.HijriCalendarV1){
+        var h = window.HijriCalendarV1.todayStr ? window.HijriCalendarV1.todayStr() : null;
+        if (h){
+          var hm = Number(h.split('-')[1]);
+          if (hm === 9) return 'theme-season-ramazan';
+        }
       }
     }
+    // Dört mevsim (Miladi): spring(3-5) / summer(6-8) / autumn(9-11) / winter(12-2)
     if (m >= 3 && m <= 5) return 'theme-season-spring';
+    if (m >= 6 && m <= 8) return 'theme-season-summer';
     if (m >= 9 && m <= 11) return 'theme-season-autumn';
-    return '';
+    return 'theme-season-winter';
   }
-  function applySeasonal(){
+  function applySeasonal(d){
     var root = document.getElementById('root');
     if (!root) return;
     var s = settings();
     if (!s.premiumAtmosphere) return;
-    root.classList.remove('theme-season-ramazan','theme-season-spring','theme-season-autumn','theme-season-newyear');
-    var cls = seasonalClass();
+    root.classList.remove('theme-season-ramazan','theme-season-spring','theme-season-summer','theme-season-autumn','theme-season-winter','theme-season-newyear');
+    var cls = seasonalClass(d);
     if (cls) root.classList.add(cls);
   }
 

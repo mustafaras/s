@@ -64,6 +64,18 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] `richHaptics + haptics + premiumAtmosphere + reduced-motion` gating çalışıyor.
 - [x] Haptics test fixture PASS (`tests/app/test_premium_haptics_fx.js` — gerçek `mediaFx.js` yüklenir, desenler + gating + app.js çağrı noktaları doğrulanır).
 
+## Dalga 3 Visual FX (FX-P-36)
+
+- [x] `SeyFx.isPremiumFxEnabled` / `prefersReducedMotion` / `shouldAnimate` / `ambientAllowed` / `isSoundAllowed` uygulandı
+- [x] Ripple efekti implemente edildi
+- [x] Shimmer efekti implemente edildi
+- [x] Count-up animasyonu implemente edildi
+- [x] Micro-FX entegrasyonu yapıldı
+- [x] Visual FX test fixture PASS (`tests/app/test_premium_fx_utils.js` — gerçek `mediaFx.js` VM'de yüklenir, gating kombinasyonları + micro-FX davranışı doğrulanır)
+- [x] `will-change` / `contain` kullanımı gözden geçirildi (ripple/shimmer'a `will-change: transform, opacity` eklendi)
+- [x] `prefers-reduced-motion` tüm animasyonları kapatıyor
+- [x] FX-LIBRARY.md visual FX katalogu güncellendi
+
 ## Dokümantasyon
 
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var; şu an için güncelleme yalnızca plan/spec/test aşamasında, canlı `app.js` dokümanı bu aşamada değiştirilmiyor.

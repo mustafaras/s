@@ -225,6 +225,23 @@ animation: seyShine 2.6s ease-in-out infinite;
 
 ---
 
+### 3.8 Visual FX Catalog (`window.SeyFx`)
+
+| Function | Effect | Gating | Performance notes |
+|----------|--------|--------|-------------------|
+| `isPremiumFxEnabled` | Master switch: `premiumAtmosphere && !reduced-motion` | `settings.premiumAtmosphere`, `prefers-reduced-motion` | — |
+| `prefersReducedMotion` | `matchMedia('(prefers-reduced-motion: reduce)')` | sistem | — |
+| `shouldAnimate` | `isPremiumFxEnabled()` | premium + reduced-motion | — |
+| `ambientAllowed` | `isPremiumFxEnabled() && ambientSounds === true` | premium + ambient | — |
+| `isSoundAllowed` | `isPremiumFxEnabled() && uiSounds !== false` | premium + uiSounds | — |
+| `countUp` | Sayaç yumuşak artış (0–2000ms) | `premiumAtmosphere !== false`; reduced-motion'da doğrudan hedef | rAF with early exit; reduced-motion'da animasyonsuz |
+| `ripple` | Dokunma yayılan dalga (0.55s) | premium + !reduced-motion | `will-change: transform, opacity`; 600ms sonra DOM'dan kaldırılır |
+| `shimmer` | Işık süpürmesi (1.4s) | premium + !reduced-motion | CSS keyframes; 1400ms sonra class kaldırılır |
+| `enter` | Fade/slide stagger (220ms, 60-180ms delay) | premium + !reduced-motion | class tabanlı; reduced-motion override |
+| `transition` | Tek property CSS transition helper | premium + !reduced-motion | property scoped; 200-1000ms |
+
+---
+
 ## 4. Reduce Motion ve Erişilebilirlik
 
 Tüm yeni efektler için şu kurallar geçerli:

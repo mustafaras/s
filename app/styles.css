@@ -1521,6 +1521,7 @@
   position: relative;
   overflow: hidden;
   transform: translate3d(0,0,0);
+  will-change: transform, opacity;
 }
 .sey-ripple-wave {
   position: absolute;
@@ -1530,10 +1531,55 @@
   pointer-events: none;
   background: currentColor;
   opacity: 0.18;
+  will-change: transform, opacity;
 }
 @keyframes sey-ripple-spread {
   to { transform: scale(4); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sey-ripple-wave { animation: none !important; opacity: 0; }
+}
+
+/* FX-P-33: Shimmer efekti — yükleme ve kutlama durumları için yumuşak ışık süpürmesi. */
+.sey-shimmer {
+  position: relative;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+.sey-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.14) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: sey-shimmer-sweep 1.4s ease-in-out infinite;
+}
+@keyframes sey-shimmer-sweep {
+  to { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sey-shimmer::after { animation: none !important; transform: translateX(0); opacity: 0; }
+}
+#root[data-theme="dark"] .sey-shimmer::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.07) 50%, transparent 100%);
+}
+
+/* FX-P-37: Sayfa geçişlerinde ve önemli kartların ekrana gelişinde yumuşak
+   fade/slide animasyonları. prefers-reduced-motion ve premium gating'e tabidir. */
+@keyframes sey-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.sey-enter {
+  animation: sey-fade-in 220ms ease-out forwards;
+}
+.sey-enter-delay-1 { animation-delay: 60ms; }
+.sey-enter-delay-2 { animation-delay: 120ms; }
+.sey-enter-delay-3 { animation-delay: 180ms; }
+@media (prefers-reduced-motion: reduce) {
+  .sey-enter, .sey-enter * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

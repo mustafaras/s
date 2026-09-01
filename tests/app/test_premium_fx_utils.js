@@ -1,0 +1,139 @@
+// Faz 3 — Headless Visual FX utility fixture'ı (sentetik veri, gerçek network YOK)
+// FX-P-36: gerçek app/core/mediaFx.js modülünü VM'de yükler ve SeyFx yüzeyini
+// (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/
+// isSoundAllowed/countUp/ripple/shimmer) + gating kombinasyonlarını doğrular.
+// Çalıştırma: node tests/app/test_premium_fx_utils.js
+
+'use strict';
+var fs = require('fs');
+var path = require('path');
+var vm = require('vm');
+var repoRoot = require('../repo-root');
+
+console.log('\n=== Premium Visual FX Utils Tests (gerçek mediaFx.js) ===\n');
+
+var passed = 0, failed = 0;
+function ok(name, cond, detail){
+  if (cond) { passed++; console.log('  ✓ '+name); }
+  else { failed++; console.log('  ✗ '+name + (detail ? ' — '+detail : '')); }
+}
+
+// ── Gerçek mediaFx.js'yi VM'de yükler; dönüşte window.SeyFx döner ──────────
+function loadMediaFx(opts){
+  opts = opts || {};
+  var src = fs.readFileSync(path.join(repoRoot,'app/core/mediaFx.js'),'utf8');
+  var document = {
+    createElement: function(tag){ return { className:'', style:{}, classList:{ add:function(){}, remove:function(){} }, remove:function(){}, appendChild:function(){} }; },
+    querySelector: function(){ return null; },
+    querySelectorAll: function(){ return []; },
+    getElementById: function(){ return null; }
+  };
+  var win = {
+    matchMedia: function(q){ return { matches: !!opts.reducedMotion }; },
+    SeymaState: { data: { settings: opts.settings || {} } },
+    SeymaConstants: null,
+    SeyAudio: null, SeyHaptics: null, SeyFx: null,
+    requestAnimationFrame: function(fn){ return setTimeout(function(){ fn(Date.now()); }, 0); },
+    setTimeout: setTimeout,
+    clearTimeout: clearTimeout
+  };
+  var ctx = vm.createContext({ window: win, navigator: { vibrate: function(){ return true; } }, document: document, performance: globalThis.performance, setTimeout: setTimeout, clearTimeout: clearTimeout, Math: Math, Date: Date, Number: Number, String: String, JSON: JSON, Object: Object, Array: Array, Promise: Promise });
+  vm.runInContext(src, ctx, { timeout: 5000 });
+  return ctx.window;
+}
+
+// ── Test 1: API yüzeyi tanımlı ve çağrılabilir ──────────────────────────────
+console.log('[1] SeyFx API yüzeyi tanımlı');
+(function(){
+  var win = loadMediaFx({ settings: {} });
+  var SeyFx = win.SeyFx;
+  ok('SeyFx var', !!SeyFx);
+  ['isPremiumFxEnabled','prefersReducedMotion','shouldAnimate','ambientAllowed','isSoundAllowed'].forEach(function(f){
+    ok('SeyFx.'+f+' fonksiyonu var', typeof SeyFx[f] === 'function');
+  });
+  ['countUp','ripple','shimmer'].forEach(function(f){
+    ok('SeyFx.'+f+' fonksiyonu var', typeof SeyFx[f] === 'function');
+  });
+})();
+
+// ── Test 2: isPremiumFxEnabled kombinasyonları ──────────────────────────────
+console.log('\n[2] isPremiumFxEnabled gating kombinasyonları');
+(function(){
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false });
+  ok('premiumAtmosphere=true + reduced-motion=false → true', win.SeyFx.isPremiumFxEnabled() === true);
+
+  win = loadMediaFx({ settings: { premiumAtmosphere: false }, reducedMotion: false });
+  ok('premiumAtmosphere=false → false', win.SeyFx.isPremiumFxEnabled() === false);
+
+  win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: true });
+  ok('premiumAtmosphere=true + reduced-motion=true → false', win.SeyFx.isPremiumFxEnabled() === false);
+})();
+
+// ── Test 3: shouldAnimate / prefersReducedMotion ────────────────────────────
+console.log('\n[3] shouldAnimate / prefersReducedMotion');
+(function(){
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false });
+  ok('shouldAnimate true (premium açık)', win.SeyFx.shouldAnimate() === true);
+  ok('prefersReducedMotion false', win.SeyFx.prefersReducedMotion() === false);
+
+  win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: true });
+  ok('prefersReducedMotion true (reduce)', win.SeyFx.prefersReducedMotion() === true);
+  ok('shouldAnimate false (reduce)', win.SeyFx.shouldAnimate() === false);
+})();
+
+// ── Test 4: ambientAllowed / isSoundAllowed ─────────────────────────────────
+console.log('\n[4] ambientAllowed / isSoundAllowed');
+(function(){
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true, ambientSounds: true, uiSounds: false }, reducedMotion: false });
+  ok('ambientAllowed true (ambient açık)', win.SeyFx.ambientAllowed() === true);
+  ok('isSoundAllowed false (uiSounds kapalı)', win.SeyFx.isSoundAllowed() === false);
+
+  win = loadMediaFx({ settings: { premiumAtmosphere: true, ambientSounds: false, uiSounds: true }, reducedMotion: false });
+  ok('ambientAllowed false (ambient kapalı)', win.SeyFx.ambientAllowed() === false);
+  ok('isSoundAllowed true (uiSounds açık)', win.SeyFx.isSoundAllowed() === true);
+
+  win = loadMediaFx({ settings: { premiumAtmosphere: false, ambientSounds: true, uiSounds: true }, reducedMotion: false });
+  ok('ambientAllowed false (premium kapalı)', win.SeyFx.ambientAllowed() === false);
+  ok('isSoundAllowed false (premium kapalı)', win.SeyFx.isSoundAllowed() === false);
+})();
+
+// ── Test 5: ripple gating kapalıyken sessiz ─────────────────────────────────
+console.log('\n[5] ripple gating kapalıyken hiçbir şey yapmaz');
+(function(){
+  var created = 0;
+  var win = loadMediaFx({ settings: { premiumAtmosphere: false }, reducedMotion: false });
+  // document.createElement'ı saymak için win.SeyFx.ripple öncesi DOM'u izole edelim:
+  // SeyFx.ripple gating kapalıyken currentTarget'ı hiç kullanmamalı.
+  var fakeEvent = { currentTarget: { getBoundingClientRect: function(){ return {left:0,top:0,width:100,height:100}; }, appendChild: function(){ created++; } } };
+  win.SeyFx.ripple(fakeEvent, 'red');
+  ok("premium kapalıyken ripple DOM'a dalga eklemez", created === 0, 'created: '+created);
+})();
+
+// ── Test 6: countUp reduced-motion'da doğrudan hedef yazar ──────────────────
+console.log('\n[6] countUp reduced-motion\'da doğrudan hedef yazar');
+(function(){
+  var textVal = '';
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: true });
+  var fakeEl = { set textContent(v){ textVal = v; }, get textContent(){ return textVal; } };
+  win.SeyFx.countUp({ el: fakeEl, from: 0, to: 1500, duration: 500 });
+  ok('reduced-motion\'da doğrudan 1500 yazar', String(textVal) === '1500', 'text: '+textVal);
+})();
+
+// ── Test 7: shimmer gating açıkken class ekler, kapalıyken eklemez ──────────
+console.log('\n[7] shimmer gating');
+(function(){
+  var added = [], removed = [];
+  function fakeEl(){ return { classList: { add: function(c){ added.push(c); }, remove: function(c){ removed.push(c); } } }; }
+  var win = loadMediaFx({ settings: { premiumAtmosphere: true }, reducedMotion: false });
+  win.SeyFx.shimmer(fakeEl());
+  ok("premium açıkken sey-shimmer class'ı eklenir", added.indexOf('sey-shimmer') >= 0);
+
+  added = []; removed = [];
+  win = loadMediaFx({ settings: { premiumAtmosphere: false }, reducedMotion: false });
+  win.SeyFx.shimmer(fakeEl());
+  ok('premium kapalıyken sey-shimmer eklenmez', added.length === 0);
+})();
+
+console.log('\n=== Özet ===');
+console.log('Passed: '+passed+' / '+(passed+failed));
+process.exit(failed ? 1 : 0);

@@ -164,7 +164,34 @@
     ambientAllowed: ambientAllowed,
     isSoundAllowed: isSoundAllowed,
     countUp: function(options){
-      // FX-P-34'te doldurulacak.
+      // FX-P-34: sayaç değerlerini yumuşak artışla günceller.
+      // reduced-motion'da doğrudan hedef değeri yazar (animasyonu atlar).
+      // Not: isPremiumFxEnabled yerine settings().premiumAtmosphere'u kontrol
+      // ederiz — reduced-motion'da animasyonu atlayıp hedef değeri yazmak
+      // gerekir (gating'i tamamen atlamaz, sadece animasyonu atlar).
+      if (typeof options !== 'object' || !options.el) return;
+      var s = settings();
+      if (s.premiumAtmosphere === false) return;
+      var from = Number(options.from) || 0;
+      var to = Number(options.to) || 0;
+      var duration = Math.max(0, Math.min(Number(options.duration) || 800, 2000));
+      var formatter = typeof options.formatter === 'function' ? options.formatter : function(v){ return Math.round(v); };
+      // Reduced-motion: animasyonu atla, hedef değeri doğrudan yaz.
+      if (prefersReducedMotion()){
+        try{ options.el.textContent = formatter(to); }catch(e){}
+        return;
+      }
+      var start = performance && performance.now ? performance.now() : Date.now();
+      var raf = window.requestAnimationFrame || window.setTimeout;
+      function tick(now){
+        var t = (now - start) / duration;
+        if (t < 0) t = 0;
+        if (t > 1) t = 1;
+        var v = from + (to - from) * t;
+        try { options.el.textContent = formatter(v); } catch(e){}
+        if (t < 1) raf(tick);
+      }
+      raf(tick);
     },
     ripple: function(event, color){
       // FX-P-32: dokunma koordinatlarına göre CSS ripple dalgası üretir.
@@ -186,7 +213,31 @@
       setTimeout(function(){ wave.remove(); }, 600);
     },
     shimmer: function(element){
-      // FX-P-33'te doldurulacak.
+      // FX-P-33: kutlama/yükleme durumunda geçici shimmer sınıfı ekler.
+      if (!isPremiumFxEnabled() || !element) return;
+      element.classList.add('sey-shimmer');
+      setTimeout(function(){ element.classList.remove('sey-shimmer'); }, 1400);
+    },
+    enter: function(selector, staggerMs){
+      // FX-P-37: sayfa/kart giriş animasyonu — fade/slide, staggered.
+      if (!shouldAnimate() || !document.querySelectorAll) return;
+      var nodes = typeof selector === 'string' ? document.querySelectorAll(selector) : [selector];
+      staggerMs = Math.max(0, Math.min(Number(staggerMs) || 60, 200));
+      Array.prototype.forEach.call(nodes, function(el, i){
+        if (!el || !el.classList) return;
+        el.classList.remove('sey-enter');
+        el.style.animationDelay = (i * staggerMs) + 'ms';
+        void el.offsetWidth;
+        el.classList.add('sey-enter');
+      });
+    },
+    transition: function(el, property, durationMs){
+      // FX-P-37: tek property için CSS transition helper.
+      if (!shouldAnimate()) return;
+      if (!el || !el.style) return el;
+      durationMs = Math.max(0, Math.min(Number(durationMs) || 200, 1000));
+      el.style.transition = property + ' ' + durationMs + 'ms ease';
+      return el;
     }
   };
 })();

@@ -1,4 +1,4 @@
-# ŞEYMA PREMIUM FX — YENİ SESSION STARTER (v4, 2026-09-01)
+# ŞEYMA PREMIUM FX — YENİ SESSION STARTER (v5, 2026-09-01)
 
 > **Bu dosya, her yeni oturumun soğuk başlangıçta okuması gereken her şeyi içerir.**
 > Amaç: context'ten kopmadan, kaldığımız yerden devam etmek. Anti-amnesi dosyaları
@@ -96,8 +96,10 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 
 **`constants.js` expose:** `SeymaConstants = { KEY, TKEY, FEATURE_GATE_TS, ICONS }` — SADECE bunlar.
 
-**`mediaFx.js` API yüzeyi (FX-P-06/11):**
+**`mediaFx.js` API yüzeyi (FX-P-06/11/51):**
 - `SeyAudio`: `ctx` (lazy getter), `tap`/`success`/`warning`/`bell`/`voice`/`ambient`
+- `SeyAudio.voice(text, opts)` (FX-P-51): `isPremiumFxEnabled` + `isVoiceEnabled` gating; `speechSynthesis` yoksa `false`; `speaking` iken `opts.force`/`cancel`; `lang`/`rate`/`pitch` clamp (0.5-2); `voiceNames` tercihi; `speak` try/catch.
+- `SeyAudio.isVoiceEnabled()` (FX-P-51): `voiceGuidance` + `speechSynthesis` varlığı.
 - `SeyHaptics`: `tap`/`success`/`error`/`refresh`/`streak`/`water`
 - `SeyFx`: `isPremiumFxEnabled`/`prefersReducedMotion`/`shouldAnimate`/`ambientAllowed`/`countUp`/`ripple`/`shimmer`
 
@@ -129,9 +131,12 @@ Her okumada closure'daki `data`'nın taze değerini döndürür. **VM'de kanıtl
 **Durum:** Faz 5 (Voice guidance) başladı. **FX-P-51 `SeyAudio.voice()` API iskeleti tamamlandı.** Sıradaki **FX-P-52** — sesli rehberlik entegrasyon noktaları.
 
 **FX-P-52 kapsamı (`.prompts/FX-P-52.md`):**
-- `SeyAudio.voice()`'i app.js'teki uygun çağrı noktalarına entegre et.
-- `voiceGuidance` settings gating'i.
-- **I2/I5 koru:** `App.*` yüzeyi (701) ve tek `app.js` tag değişmez.
+- **Onboarding voice prompt:** ilk açılışta (`data.meta.firstRun === true`) karşılama mesajını sesli oku (`window.SeyAudio.voice('Sevgili Günışığı, hoş geldin…', { lang: 'tr-TR', rate: 1 })`).
+- **Streak / kutlama sesli tebrik:** seri/başarı oluştuğunda kısa sesli mesaj; günde en fazla 1 kez throttle.
+- **Zikir hedefi tamamlandığında:** `window.SeyAudio.voice('Allah hu. Güzel bir mola vermek ister misin?', { lang: 'tr-TR' })` benzeri kısa mesaj; sessiz zaman diliminde (23:00-07:00) çalışmasın.
+- **Hatırlatma sesli özet:** hatırlatma gösterildiğinde sesli özet (opsiyonel; ayar açıksa + gündüzse).
+- **Silent-window guard:** `mediaFx.js` içinde `SeyAudio.isQuietTime()` yardımcısı ekle (23:00-07:00 arası `voice` otomatik `false`).
+- **I2/I5 koru:** `App.*` yüzeyi (701), inline onclick imzaları ve tek `app.js` tag değişmez.
 
 **Başlamadan önce:**
 - `FX-PROMPT-STATE.json`'da `activePrompt: "FX-P-52"` yap.

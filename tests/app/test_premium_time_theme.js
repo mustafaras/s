@@ -140,8 +140,8 @@ console.log('\n[4] CSS’te theme-time-* class tanımları');
   });
 })();
 
-// ── Test 5: Gerçek timeTheme.js modülü — mevsimsel fonksiyonlar ─────────────
-console.log('\n[5] Gerçek timeTheme.js — seasonalClass(d) / applySeasonal(d)');
+// ── Test 5: Gerçek timeTheme.js modülü — classForHour / apply / mevsim ─────
+console.log('\n[5] Gerçek timeTheme.js — classForHour / apply / seasonalClass / applySeasonal');
 (function(){
   var vm = require('vm');
   var src = fs.readFileSync(path.join(repoRoot, 'app/core/timeTheme.js'), 'utf8');
@@ -150,7 +150,40 @@ console.log('\n[5] Gerçek timeTheme.js — seasonalClass(d) / applySeasonal(d)'
   vm.createContext(sandbox);
   vm.runInContext(src, sandbox);
   var ST = sandbox.window.SeyTimeTheme;
-  ok('SeyTimeTheme expose edildi', !!ST && typeof ST.seasonalClass === 'function' && typeof ST.applySeasonal === 'function');
+  ok('SeyTimeTheme expose edildi', !!ST && typeof ST.classForHour === 'function' && typeof ST.apply === 'function' && typeof ST.seasonalClass === 'function' && typeof ST.applySeasonal === 'function');
+
+  // classForHour(h) — gerçek modül üzerinden (FX-P-44 sözleşmesi)
+  var hourCases = [
+    [5, 'theme-time-dawn'],
+    [9, 'theme-time-day'],
+    [17, 'theme-time-dusk'],
+    [21, 'theme-time-night'],
+    [4, 'theme-time-night']
+  ];
+  hourCases.forEach(function(c){
+    var cls = ST.classForHour(c[0]);
+    ok('classForHour('+c[0]+') → '+c[1], cls === c[1], 'gerçek: '+cls);
+  });
+
+  // apply() — mock document.getElementById ile root class listesini günceller
+  var classes = [];
+  var root = { classList: {
+    add: function(c){ if(classes.indexOf(c)===-1) classes.push(c); },
+    remove: function(){ for(var i=0;i<arguments.length;i++){ classes = classes.filter(function(x){ return x!==arguments[i]; }); } },
+    contains: function(c){ return classes.indexOf(c) > -1; }
+  }};
+  sandbox.document = { getElementById: function(id){ return id==='root' ? root : null; } };
+  ST.apply();
+  var applied = classes.filter(function(c){ return c.indexOf('theme-time-')===0; });
+  ok('apply() bir saat sınıfı ekler', applied.length === 1, 'sınıflar: '+classes.join(','));
+  ok('apply() theme-time-* sınıfı ekler', applied.length === 1 && applied[0].indexOf('theme-time-')===0);
+
+  // premiumAtmosphere=false iken apply() sınıf eklemez
+  sandbox.window.SeymaState.data.settings.premiumAtmosphere = false;
+  classes = [];
+  ST.apply();
+  ok('premiumAtmosphere=false iken apply() sınıf eklemez', classes.length === 0);
+  sandbox.window.SeymaState.data.settings.premiumAtmosphere = true;
 
   // seasonalClass(d) — dört mevsim (deterministik, d verilince özel günler atlanır)
   var seasonCases = [
@@ -169,13 +202,7 @@ console.log('\n[5] Gerçek timeTheme.js — seasonalClass(d) / applySeasonal(d)'
   });
 
   // applySeasonal(d) — root class listesini günceller
-  var classes = [];
-  var root = { classList: {
-    add: function(c){ if(classes.indexOf(c)===-1) classes.push(c); },
-    remove: function(){ for(var i=0;i<arguments.length;i++){ classes = classes.filter(function(x){ return x!==arguments[i]; }); } },
-    contains: function(c){ return classes.indexOf(c) > -1; }
-  }};
-  sandbox.document = { getElementById: function(id){ return id==='root' ? root : null; } };
+  classes = [];
   ST.applySeasonal(new Date(2026, 5, 15)); // yaz
   ok('applySeasonal yaz sınıfını ekler', root.classList.contains('theme-season-summer'));
   ok('diğer mevsim sınıfları temizlendi',

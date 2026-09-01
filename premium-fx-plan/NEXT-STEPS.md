@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 4 devam ediyor (FX-P-43 tamamlandı). Sıradaki **Dalga 4 / FX-P-44** (zaman teması test fixture'ları + Faz 4 kapanışı).
+**Durum:** Faz 4 tamamlandı (FX-P-44). Sıradaki **Dalga 5 / FX-P-51** (Voice guidance) — ayrı kullanıcı onayı bekleniyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -50,7 +50,8 @@
 18. [x] **Dalga 4 (Time theme) — FX-P-41:** `SeyTimeTheme.classForHour()` güncellendi (h==null default). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 19. [x] **FX-P-42:** `SeyTimeTheme.apply()` render() sonunda güvenli guard ile çağrıldı (boot + 30 sn poll loop otomatik senkron); `app/styles.css`'e `--surface-dawn/day/dusk/night` vurgu tokenları (açık+koyu) ve `#root.theme-time-*` sınıf kuralları eklendi; `index.html` cache-busting `app/styles.css?v=20260901c` + `timeTheme.js?v=20260901a`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 20. [x] **FX-P-43:** `seasonalClass(d)` dört mevsimi (spring/summer/autumn/winter) döndürecek şekilde tamamlandı — özel günler (newyear/ramazan) yalnızca `d` verilmediğinde uygulanır; `applySeasonal(d)` tüm mevsim+özel sınıfları temizleyip yenisini ekler. `app/styles.css`'e `--season-accent` tokenları (açık+koyu) ve `#root.theme-season-*` sınıf kuralları eklendi. `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip doğrular (41/41). `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-21. [ ] **FX-P-44:** Zaman teması test fixture'ları + Faz 4 kapanışı.
+21. [x] **FX-P-44 (Faz 4 kapanışı):** `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip `classForHour`/`apply`/`seasonalClass`/`applySeasonal`'i doğrular (49/49); `REVIEW-CHECKLIST.md`'ye "Dalga 4 Time theme" kapsam satırları eklendi. `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi. **Faz 4 tamamlandı.**
+22. [ ] **Dalga 5 / FX-P-51 (Voice guidance):** `SeyAudio.voice()` — ayrı kullanıcı onayı bekleniyor.
 19. [ ] **Dalga 4 — FX-P-42:** `#root` class güncellemesi + `SeyTimeTheme.apply()` çağrısı (render sonrası / 1 saat poll).
 20. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
 21. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.

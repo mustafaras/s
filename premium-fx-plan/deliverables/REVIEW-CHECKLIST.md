@@ -76,6 +76,13 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] `prefers-reduced-motion` tüm animasyonları kapatıyor
 - [x] FX-LIBRARY.md visual FX katalogu güncellendi
 
+## Dalga 4 Time theme (FX-P-44)
+
+- [x] `SeyTimeTheme.classForHour` uygulandı (saat aralıkları: dawn 5-8 / day 9-16 / dusk 17-20 / night 21-4)
+- [x] `#root` zaman teması sınıfı `apply()` ile güncelleniyor (render() sonunda güvenli guard ile çağrılır; boot + 30 sn poll loop otomatik senkron)
+- [x] Mevsimsel renk fonksiyonu uygulandı (`seasonalClass(d)` dört mevsim + özel günler; `applySeasonal(d)` root sınıfını günceller)
+- [x] Zaman teması test fixture PASS (`tests/app/test_premium_time_theme.js` — gerçek `timeTheme.js` VM'de yüklenir, classForHour/apply/seasonalClass/applySeasonal + CSS tanımları doğrulanır, 49/49)
+
 ## Dokümantasyon
 
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var; şu an için güncelleme yalnızca plan/spec/test aşamasında, canlı `app.js` dokümanı bu aşamada değiştirilmiyor.

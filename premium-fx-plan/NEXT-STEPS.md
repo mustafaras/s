@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-01
-**Durum:** Faz 2 devam ediyor (FX-P-22 tamamlandı). Sıradaki **FX-P-23** (streak/water haptics entegrasyonu).
+**Durum:** Faz 2 devam ediyor (FX-P-23 tamamlandı). Sıradaki **FX-P-24** (haptics test fixture'larını güncelle).
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -42,9 +42,10 @@
 10. [x] FX-P-16: Dalga 1 Audio kapanışı — audio test fixture gerçek `mediaFx.js` üzerinden (26/26), boundary güncellemesi (16/16), REVIEW-CHECKLIST kapsamı.
 11. [x] **Dalga 2 (Haptics) — FX-P-21:** `SeyHaptics` desenleri FX-LIBRARY.md §2'ye hizalandı (tap/success/error/refresh/streak/water) + legacy `haptics === false` kapısı. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 12. [x] **FX-P-22:** Buton/kart tıklamalarına `SeyHaptics.tap()` entegre edildi (17 nokta: setMood, setEnergy, setStress, toggleHabit, waterAdd, saveToday, overlay aç/kapa, yıldız puanlama, segmented tab, toggleTheme). S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-13. [ ] **FX-P-23:** streak/water haptics entegrasyonu (`SeyHaptics.streak()`/`water()`).
-14. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-15. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+13. [x] **FX-P-23:** streak/water haptics entegrasyonu — `SeyHaptics.streak()` 3 noktaya (maybeStreak, zikir tur/hatim, motivasyon görevi), `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()`. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
+14. [ ] **FX-P-24:** haptics test fixture'larını güncelle.
+15. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
+16. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
 
 ## Kısıtlamalar
 

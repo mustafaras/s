@@ -8311,7 +8311,7 @@ App.explainDerivedHabit=function(key,day){
   else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
 };
-function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
+function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); if(big[s]) confetti(); setTimeout(function(){ toast(m[s],2800); },300); } }
 App.setMood=function(id){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); day.savedAt=new Date().toISOString(); var labels={normal:'Normal',iyi:'İyi',mükemmel:'Mükemmel',yorgun:'Yorgun',üzgün:'Üzgün',sinirli:'Sinirli','çok-zorlandim':'Çok zorlandım',kaygili:'Kaygılı', 'huzursuz':'Huzursuz', 'sakin':'Sakin'}; haptic(14); save(false,{message:'Ruh hali güncellendi',meta:{section:'mood',path:'data.days.*.mood',operation:'update',summary:'Ruh hali güncellendi',detail:'Ruh hali',value:labels[id]||id,field:'mood'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(false,{message:'Duygu notu güncellendi',meta:{section:'wellness',path:'data.days.*.note',operation:'update',summary:'Duygu notu güncellendi',detail:'Duygu notu',value:String(v||'').trim().slice(0,60),field:'note'}}); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(false,{message:'Günün niyeti güncellendi',meta:{section:'wellness',path:'data.days.*.intention',operation:'update',summary:'Günün niyeti güncellendi',detail:'Günün niyeti',value:day.intention,field:'intention'}}); },500); };
@@ -8327,7 +8327,7 @@ App.setMealItemQty=function(key,idx,el){ var day=curDay(); var it=day.mealItems[
 App.setMealItemUnit=function(key,idx,el){ var day=curDay(); var it=day.mealItems[key]&&day.mealItems[key][idx]; if(!it) return; it.unit=el.value; syncMealText(day,key); day.savedAt=new Date().toISOString(); commit(null,mealItemEventMeta(key,day)); };
 
 // ---- su ----
-App.waterAdd=function(n){ if (n>0 && window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ var g=waterGoalCups(); haptic(16); toast('Su tamam — '+g+'/'+g+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(null,{section:'nutrition',path:'data.days.*.water',operation:'update',summary:'Beslenme kaydı güncellendi',detail:'Su',value:String(day.water)+' bardak',field:'water'}); };
+App.waterAdd=function(n){ if (n>0 && window.SeyHaptics && typeof window.SeyHaptics.water === 'function') { window.SeyHaptics.water(); } var day=curDay(); var v=(Number(day.water)||0)+n; day.water=Math.max(0,Math.min(20,v)); var nw=syncDerivedHabits(day); if(nw.indexOf('water')>=0){ var g=waterGoalCups(); haptic(16); toast('Su tamam — '+g+'/'+g+' bardak! Su tiki kendiliğinden yeşillendi.'); } day.savedAt=new Date().toISOString(); commit(null,{section:'nutrition',path:'data.days.*.water',operation:'update',summary:'Beslenme kaydı güncellendi',detail:'Su',value:String(day.water)+' bardak',field:'water'}); };
 
 // ---- enerji / stres ----
 App.setEnergy=function(v){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var day=curDay(); day.energy=(day.energy===v?null:v); day.savedAt=new Date().toISOString(); var labels={'1':'Düşük','2':'Az','3':'Orta','4':'Yüksek','5':'Zirve'}; haptic(10); save(false,{message:'Enerji seviyesi güncellendi',meta:{section:'wellness',path:'data.days.*.energy',operation:'update',summary:'Enerji seviyesi güncellendi',detail:'Enerji',value:labels[v]||v,field:'energy'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
@@ -8615,6 +8615,7 @@ App.zikrTap=function(){
     spark=true;
     _zikrCompleteFlash=true;
     if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell();
+    if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak();
     if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
     if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
     else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
@@ -11846,7 +11847,7 @@ App.completeMotivationTask=function(status){
   render();
   var msg;
   if(wasDone) msg='Kaydın güncellendi';
-  else { if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell(); msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi'); }
+  else { if(window.SeyAudio&&typeof window.SeyAudio.bell==='function') window.SeyAudio.bell(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); msg=status==='minimum_completed'?'Minimum görev kaydedildi — bu da ilerleme':((mot&&mot.successMeaning)||'Bugünkü görev kaydedildi'); }
   if(courageGained) msg+=' · bir cesaret kanıtı daha';
   toast(msg);
 };

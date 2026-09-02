@@ -30,6 +30,23 @@
     hour = ((Math.floor(hour) % 24) + 24) % 24;
     return hour >= 23 || hour < 7;
   }
+  // Doğal ses seçimi: aynı dilde birden çok ses varsa en iyi kaliteyi seç.
+  // Öncelik: (1) Enhanced/Premium etiketli varyant, (2) tam dil eşleşmesi,
+  // (3) aynı dil ailesi. FX-LIBRARY §1.6'ya göre doğal prosodi hedefler.
+  function pickVoice(voices, lang){
+    if (!voices || !voices.length) return null;
+    var langPrefix = String(lang || 'tr').slice(0, 2).toLowerCase();
+    var exact = voices.filter(function(v){ return v.lang && v.lang.toLowerCase() === String(lang).toLowerCase(); });
+    var pool = exact.length ? exact : voices.filter(function(v){ return v.lang && v.lang.toLowerCase().slice(0, 2) === langPrefix; });
+    if (!pool.length) return null;
+    // Kalite varyantı: adında Enhanced/Premium/Neural/Siri geçen sesler daha doğaldır.
+    var premium = pool.filter(function(v){ return /enhanced|premium|neural|natural/i.test(v.name); });
+    if (premium.length) return premium[0];
+    // Yerel (offline) sesler network seslerinden genelde daha tutarlıdır.
+    var local = pool.filter(function(v){ return v.localService; });
+    if (local.length) return local[0];
+    return pool[0];
+  }
 
   function playTone(freq, duration, type, gainValue, allowReducedMotion){
     if (!allowed(allowReducedMotion)) return;
@@ -155,14 +172,25 @@
       // (settings.voiceLang / settings.voiceRate), ayar yoksa güvenli default.
       var s = settings();
       var lang = opts.lang || (s && s.voiceLang) || 'tr-TR';
-      var rate = (opts.rate != null) ? opts.rate : ((s && s.voiceRate != null) ? Number(s.voiceRate) : 1);
+      // FX-LIBRARY §1.6 doğal prosodi: tempo biraz yavaş (0.92), ton hafif
+      // yumuşak (1.05), ses düzeyi biraz kısık (0.7). opts ile aşılabilir.
+      var rate = (opts.rate != null) ? opts.rate : ((s && s.voiceRate != null) ? Number(s.voiceRate) : 0.92);
       if (lang) u.lang = lang;
-      if (rate) u.rate = clamp(Number(rate) || 1, 0.75, 1.5);
-      if (opts.pitch) u.pitch = clamp(opts.pitch, 0.5, 2);
+      if (rate) u.rate = clamp(Number(rate) || 0.92, 0.75, 1.5);
+      u.pitch = clamp(opts.pitch != null ? opts.pitch : (s && s.voicePitch != null ? Number(s.voicePitch) : 1.05), 0.5, 2);
+      u.volume = clamp(opts.volume != null ? opts.volume : 0.7, 0, 1);
+      // Ses seçimi önceliği: (1) opts.voiceNames, (2) settings.voiceVoiceName,
+      // (3) pickVoice ile otomatik en-doğal seçim. Ses listesi Chrome'da
+      // asenkron dolar; ilk çağrıda boşsa varsayılana bırakılır (kabul edilebilir).
+      var chosen = null;
       if (Array.isArray(opts.voiceNames) && voices.length){
-        var preferred = voices.find(function(v){ return opts.voiceNames.indexOf(v.name) >= 0 || opts.voiceNames.indexOf(v.lang) >= 0; });
-        if (preferred) u.voice = preferred;
+        chosen = voices.find(function(v){ return opts.voiceNames.indexOf(v.name) >= 0 || opts.voiceNames.indexOf(v.lang) >= 0; }) || null;
       }
+      if (!chosen && s && s.voiceVoiceName && voices.length){
+        chosen = voices.find(function(v){ return v.name === s.voiceVoiceName; }) || null;
+      }
+      if (!chosen) chosen = pickVoice(voices, lang);
+      if (chosen) u.voice = chosen;
       try {
         window.speechSynthesis.speak(u);
         return true;

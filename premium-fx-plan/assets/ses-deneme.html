@@ -70,8 +70,28 @@
   </div>
 
   <div class="group">
+    <h2>🎤 Ses & Prosodi Ayarı</h2>
+    <div class="note" style="margin:0;">Hangi ses daha doğal geliyorsa onu seç — seçimin anında tüm örnek cümlelere uygulanır. Varsayılan artık <b>Yelda</b> (Türkçe, yerel) + doğal prosodi (tempo 0.92, ton 1.05, ses 0.7).</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label for="voice-sel" style="font-size:13px;font-weight:700;color:#6A5A5E;flex-shrink:0;">Ses:</label>
+      <select id="voice-sel" onchange="setVoice(this.value)" style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(180,150,160,.4);background:#fff;font-size:13.5px;color:#4A3A3E;"></select>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label for="rate-sel" style="font-size:13px;font-weight:700;color:#6A5A5E;flex-shrink:0;">Tempo:</label>
+      <input id="rate-sel" type="range" min="0.75" max="1.25" step="0.05" value="0.92" oninput="setRate(this.value)" style="flex:1;">
+      <span id="rate-val" style="font-size:12.5px;font-weight:800;min-width:40px;text-align:right;">0.92x</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label for="pitch-sel" style="font-size:13px;font-weight:700;color:#6A5A5E;flex-shrink:0;">Ton:</label>
+      <input id="pitch-sel" type="range" min="0.7" max="1.4" step="0.05" value="1.05" oninput="setPitch(this.value)" style="flex:1;">
+      <span id="pitch-val" style="font-size:12.5px;font-weight:800;min-width:40px;text-align:right;">1.05</span>
+    </div>
+    <button class="btn" onclick="sample()" style="justify-content:center;"><span class="em">🔊</span><span>Bu sesle örnek dinle</span></button>
+  </div>
+
+  <div class="group">
     <h2>Sesli Rehberlik (Faz 5 · TTS)</h2>
-    <div class="note" style="margin:0;">Gerçek uygulamada sesli rehberlik Ayarlar'dan açılır. Bu demo sayfasında geçici olarak açık: <label style="font-weight:700;"><input type="checkbox" id="vg" onchange="toggleVG(this.checked)"> sesli rehberliği aç</label></div>
+    <div class="note" style="margin:0;">Gerçek uygulamada sesli rehberlik Ayarlar'dan açılır. Bu demo sayfasında geçici olarak açık: <label style="font-weight:700;"><input type="checkbox" id="vg" onchange="toggleVG(this.checked)" checked> sesli rehberliği aç</label></div>
     <button class="btn" onclick="tts('Sevgili Günışığı, hoş geldin. Bugün neler hissediyorsun?')" id="t-onb"><span class="em">🌅</span><span>Onboarding karşılaması<small>"Sevgili Günışığı, hoş geldin…"</small></span></button>
     <button class="btn" onclick="tts('Harikasın! Serin büyüyor. Bu ritmi koru.')" id="t-str"><span class="em">🔥</span><span>Streak tebriği<small>"Harikasın! Serin büyüyor…"</small></span></button>
     <button class="btn" onclick="tts('Allah kabul etsin. Güzel bir mola vermek ister misin?')" id="t-zik"><span class="em">📿</span><span>Zikir tamamlama<small>"Allah kabul etsin…"</small></span></button>
@@ -102,9 +122,38 @@
     el.textContent = ok === false ? '⚠️ Başlatılamadı (sessiz saat / destek yok)' : (st.isPlaying() ? '● çalıyor: ' + st.currentType() : '○ kapalı');
   }
   function toggleVG(on){ window.SeymaState.data.settings.voiceGuidance = !!on; }
+  // ── Ses & prosodi seçimi ──
+  var _voice = null, _rate = 0.92, _pitch = 1.05;
+  function fillVoices(){
+    var sel = document.getElementById('voice-sel');
+    var vs = (window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : []);
+    var tr = vs.filter(function(v){ return /tr/i.test(v.lang); });
+    var others = vs.filter(function(v){ return !/tr/i.test(v.lang) && /^(en|ar)/i.test(v.lang); });
+    var h = '<option value="">(otomatik — en doğal seçim)</option>';
+    tr.forEach(function(v){ h += '<option value="' + v.name + '">' + v.name + ' · ' + v.lang + (v.localService ? ' · yerel' : ' · ağ') + '</option>'; });
+    if (tr.length){
+      h += '<optgroup label="Diğer diller">';
+      others.slice(0, 20).forEach(function(v){ h += '<option value="' + v.name + '">' + v.name + ' · ' + v.lang + '</option>'; });
+      h += '</optgroup>';
+    }
+    var sel = document.getElementById('voice-sel');
+    sel.innerHTML = h;
+  }
+  // speechSynthesis.getVoices() asenkron dolar — hem hemen hem voiceschanged'da dene.
+  try { fillVoices(); window.speechSynthesis.onvoiceschanged = fillVoices; setTimeout(fillVoices, 400); } catch(e){}
+  function setVoice(name){ window.SeymaState.data.settings.voiceVoiceName = name || null; if(name){ try{ window.speechSynthesis.cancel(); window.SeyAudio.voice('Merhaba, benim adım ' + name + '.', { force: true }); }catch(e){} } }
+  function setRate(v){ _rate = Number(v) || 0.92; document.getElementById('rate-val').textContent = (Math.round(_rate*100)/100) + 'x'; }
+  function setPitch(v){ _pitch = Number(v) || 1.05; document.getElementById('pitch-val').textContent = String(_pitch); }
+  function sample(){
+    window.SeyAudio.voice('Merhaba Günışığı. Bu sesle sana gün içinde kısa yolculuklarda eşlik edeceğim.', { lang: 'tr-TR', rate: _rate, pitch: _pitch, force: true, voiceNames: getSelVoice() });
+  }
+  function getSelVoice(){ var v = document.getElementById('voice-sel').value; return v ? [v] : undefined; }
   function tts(txt){
     if(!document.getElementById('vg').checked){ document.getElementById('vg').closest('.note').style.outline='2px solid #E9AFC1'; return; }
-    window.SeyAudio.voice(txt, { lang: 'tr-TR', rate: 1 });
+    var o = { lang: 'tr-TR', force: true, voiceNames: getSelVoice() };
+    if (document.getElementById('rate-sel')) o.rate = _rate;
+    if (document.getElementById('pitch-sel')) o.pitch = _pitch;
+    window.SeyAudio.voice(txt, o);
   }
   function greet(){
     if(!document.getElementById('vg').checked){ document.getElementById('vg').checked=true; toggleVG(true); }
@@ -118,7 +167,10 @@
       'theme-time-night': 'İyi geceler, Sevgili Günışığı. Huzurla dinlen.'
     };
     document.getElementById('saat').textContent = h + ':00 → ' + cls;
-    window.SeyAudio.voice(map[cls], { lang: 'tr-TR', rate: 1 });
+    var o = { lang: 'tr-TR', force: true, voiceNames: getSelVoice() };
+    if (document.getElementById('rate-sel')) o.rate = _rate;
+    if (document.getElementById('pitch-sel')) o.pitch = _pitch;
+    window.SeyAudio.voice(map[cls], o);
   }
   (function(){ var h=new Date().getHours(); document.getElementById('saat').textContent=h+':00'; })();
   // Sessiz zaman (23:00-07:00) uyarısı

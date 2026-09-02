@@ -242,6 +242,30 @@ animation: seyShine 2.6s ease-in-out infinite;
 
 ---
 
+### 3.9 Voice / Audio Catalog (`window.SeyAudio`) — Dalga 5
+
+| Function | Effect | Gating | Notes |
+|----------|--------|--------|-------|
+| `voice(text, opts)` | Metin okuma (Web Speech API) | `premiumAtmosphere && voiceGuidance && !quiet-time && speechSynthesis` | `opts.lang`/`opts.rate` verilmezse `settings.voiceLang`/`settings.voiceRate` okunur; speaking iken `force` ile cancel |
+| `isVoiceEnabled()` | Sesli rehberlik hazır mı | `voiceGuidance && speechSynthesis` | Gating kontrolü için ayrı yardımcı |
+| `isQuietTime(h)` | Sessiz zaman penceresi (23:00–07:00) | — | `h==null` → gerçek saat; voice ve ambient bu pencerede `false` |
+| `greeting()` | Zaman dilimi selamlaması | voice gating + 4h throttle + günde max 2 | dawn/day/dusk/night mesajları (`SeyTimeTheme.classForHour`) |
+| `guides.zikirStart / zikirHalf / zikirComplete` | Kısa zikir ipuçları | voice gating | start: oturum başına 1; half: oturum başına 1; complete: günde 1 |
+| `guides.suraOpen(name) / suraBookmark` | Sure okuma ipuçları | voice gating | Entegrasyon noktaları statik doğrulanır |
+| `ambient.start(type, url?)` | Arka plan ses döngüsü | `premiumAtmosphere && ambientSounds && !quiet-time && !voice.speaking` | rain/wave/ney/nakar/birds/breeze/crickets; URL verilirse `<audio loop>` fallback; fade-in 1.2s |
+| `ambient.stop()` | Arka plan sesini durdurur | — | Çalınamazsa güvenli no-op |
+
+**Quiet-time matrisi (FX-P-58):**
+
+| Efekt ailesi | 23:00–07:00 | Not |
+|--------------|-------------|-----|
+| `voice` / `greeting` / `guides` | ❌ engelli | `SeyAudio.voice` pencere içinde `false` döner |
+| `ambient.start` | ❌ engelli | Zaten çalan ambient `stop()` ile kapatılabilir |
+| Haptics (`SeyHaptics.*`) | ✅ etkilenmez | Kendi gating'i (richHaptics/reduced-motion) geçerli |
+| Görsel FX (`SeyFx.*`) | ✅ etkilenmez | premium + reduced-motion gating yeterli |
+
+---
+
 ## 4. Reduce Motion ve Erişilebilirlik
 
 Tüm yeni efektler için şu kurallar geçerli:

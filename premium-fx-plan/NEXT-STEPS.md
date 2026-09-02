@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
-**Tarih:** 2026-09-01
-**Durum:** Faz 5 başladı (FX-P-51). Sıradaki **Dalga 5 / FX-P-52** (sesli rehberlik entegrasyon noktaları).
+**Tarih:** 2026-09-02
+**Durum:** Faz 5 (Voice guidance) TAMAMLANDI (FX-P-51…FX-P-58). Sıradaki **Dalga 6 / FX-P-61** (Settings & master switch UI) — ayrı kullanıcı onayı bekliyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar
@@ -52,10 +52,15 @@
 20. [x] **FX-P-43:** `seasonalClass(d)` dört mevsimi (spring/summer/autumn/winter) döndürecek şekilde tamamlandı — özel günler (newyear/ramazan) yalnızca `d` verilmediğinde uygulanır; `applySeasonal(d)` tüm mevsim+özel sınıfları temizleyip yenisini ekler. `app/styles.css`'e `--season-accent` tokenları (açık+koyu) ve `#root.theme-season-*` sınıf kuralları eklendi. `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip doğrular (41/41). `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
 21. [x] **FX-P-44 (Faz 4 kapanışı):** `test_premium_time_theme.js` gerçek `timeTheme.js`'i VM'de yükleyip `classForHour`/`apply`/`seasonalClass`/`applySeasonal`'i doğrular (49/49); `REVIEW-CHECKLIST.md`'ye "Dalga 4 Time theme" kapsam satırları eklendi. `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi. **Faz 4 tamamlandı.**
 22. [x] **FX-P-51 (Dalga 5 başlangıcı):** `SeyAudio.voice(text, opts)` + `isVoiceEnabled()` + `clamp` implemente edildi (Speech API gating). `app.js` değişmedi. S5/S6 geçti; yerel commit yapıldı, push edilmedi.
-23. [ ] **FX-P-52:** Sesli rehberlik entegrasyon noktaları.
-19. [ ] **Dalga 4 — FX-P-42:** `#root` class güncellemesi + `SeyTimeTheme.apply()` çağrısı (render sonrası / 1 saat poll).
-20. [ ] Her prompt için `.prompts/FX-P-NN.md` dosyasını takip et; commitler sadece yerel kalır.
-21. [ ] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellenecek.
+23. [x] **FX-P-52:** Sesli rehberlik entegrasyonu — `SeyAudio.isQuietTime()` (23:00–07:00), onboarding tek seferlik karşılama (App.start), streak tebriği (günde 1), zikir tamamlama ipucu (günde 1); migrate backfill. Yerel commit, push yok.
+24. [x] **FX-P-53:** Ambiyans ses motoru — `SeyAudio.ambient` (start/stop/isSupported/isEnabled; rain/wave/ney/nakar/birds/breeze/crickets; `<audio loop>` fallback; fade-in) + `.ambient-control` CSS. Yerel commit, push yok.
+25. [x] **FX-P-54:** Voice test fixture (`tests/app/test_premium_voice.js`) + REVIEW-CHECKLIST ara kapsam + cache bump (`?v=20260902a`). Yerel commit, push yok.
+26. [x] **FX-P-55:** Zikir/sure sesli ipuçları — `SeyAudio.guides` (zikirStart/zikirHalf/zikirComplete/suraOpen/suraBookmark); `App.zikrTap` entegrasyonu (sessionStarted/halfNow olayları, oturum- ve gün-level throttle). Yerel commit, push yok.
+27. [x] **FX-P-56:** Zaman dilimi selamlaması — `SeyAudio.greeting()` (dawn/day/dusk/night); `maybeVoiceGreeting()` boot (2.2sn) + foreground'da, 4 saat throttle + günde max 2. Yerel commit, push yok.
+28. [x] **FX-P-57:** Sesli rehberlik ayarları UI — Ayarlar kartı (toggle + dil select + hız slider), `App.setVoiceGuidance/setVoiceLang/setVoiceRate`, `SeyAudio.voice()` settings defaults (voiceLang/voiceRate backfill). Yerel commit, push yok.
+29. [x] **FX-P-58 (Faz 5 kapanışı):** FX-LIBRARY.md §3.9 voice catalog + quiet-time matrisi; REVIEW-CHECKLIST Faz 5 final satırları; tüm premium fixture + sync/panel/panel-v2/quran/reminders regression PASS (58/58 voice dahil). Yerel commit, push yok.
+30. [ ] **Dalga 6 — FX-P-61:** `App.toggleSetting()` güvenli wrapper'ı (ayrı kullanıcı onayı bekliyor).
+21. [x] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellendi (Faz 5 kapanışı dahil).
 
 ## Kısıtlamalar
 

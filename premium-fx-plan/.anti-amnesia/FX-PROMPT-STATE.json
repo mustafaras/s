@@ -1,9 +1,9 @@
 {
-  "lastCompletedPrompt": "FX-P-52",
-  "activePrompt": "FX-P-57",
+  "lastCompletedPrompt": "FX-P-58",
+  "activePrompt": null,
   "blockedPrompt": null,
-  "currentPhase": "Faz 5",
-  "lastCompletedFaz": "Faz 4",
+  "currentPhase": "Faz 5 tamamlandı",
+  "lastCompletedFaz": "Faz 5",
   "updatedAt": "2026-09-02",
   "localBranch": "premium-fx-local",
   "planVersion": "2.3"

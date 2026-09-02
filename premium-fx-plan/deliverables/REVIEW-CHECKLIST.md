@@ -83,13 +83,17 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] Mevsimsel renk fonksiyonu uygulandı (`seasonalClass(d)` dört mevsim + özel günler; `applySeasonal(d)` root sınıfını günceller)
 - [x] Zaman teması test fixture PASS (`tests/app/test_premium_time_theme.js` — gerçek `timeTheme.js` VM'de yüklenir, classForHour/apply/seasonalClass/applySeasonal + CSS tanımları doğrulanır, 49/49)
 
-## Dalga 5 Voice (FX-P-54 ara kapsam; kapanış FX-P-58'de)
+## Dalga 5 Voice (FX-P-58 — Faz 5 kapanış)
 
-- [x] `SeyAudio.voice` API uygulandı (FX-P-51: gating + clamp + force/cancel + voiceNames)
+- [x] `SeyAudio.voice` API uygulandı (FX-P-51: gating + clamp + force/cancel + voiceNames; FX-P-57: settings defaults)
 - [x] Sesli rehberlik uygulama noktalarına entegre edildi (FX-P-52: onboarding tek seferlik, streak günde 1 kez, zikir tamamlama günde 1 kez)
-- [x] Ambiyans ses motoru iskeleti uygulandı (FX-P-53: `SeyAudio.ambient` start/stop/isSupported/isEnabled, Web Audio + `<audio>` fallback, `.ambient-control` CSS)
-- [x] `SeyAudio.isQuietTime()` uygulandı (23:00–07:00; voice ve ambient bu pencerede sessiz)
-- [x] Voice test fixture oluşturuldu (`tests/app/test_premium_voice.js` — FX-P-54 kapsamı PASS; guides/greeting/settings satırları FX-P-55/56/57 ile yeşillenir)
+- [x] Zikir/sure kısa sesli ipuçları eklendi (FX-P-55: `SeyAudio.guides` — zikirStart/zikirHalf/zikirComplete/suraOpen/suraBookmark; app.js zikrTap entegrasyonu)
+- [x] Zaman dilimine göre selamlama eklendi (FX-P-56: `SeyAudio.greeting()`; boot + foreground, 4h throttle + günde max 2)
+- [x] Voice language/rate ayarları UI'ya açıldı (FX-P-57: Ayarlar > "🎙️ Sesli rehberlik" kartı; `App.setVoiceGuidance/setVoiceLang/setVoiceRate`)
+- [x] Ambiyans ses motoru iskeleti uygulandı (FX-P-53: `SeyAudio.ambient` Web Audio + `<audio>` fallback + `.ambient-control` CSS)
+- [x] Quiet-time guard 23:00–07:00 çalışıyor (`SeyAudio.isQuietTime`; voice + ambient engelli, haptics/görsel FX etkilenmez)
+- [x] Voice guidance test fixture PASS (`tests/app/test_premium_voice.js` — gerçek `mediaFx.js` VM'de yüklenir; API yüzeyi + gating + quiet-time + guides + greeting + ambient gating + statik app.js çağrı noktaları, 58/58)
+- [x] FX-LIBRARY.md voice catalog güncellendi (§3.9 + quiet-time matrisi)
 
 ## Dokümantasyon
 

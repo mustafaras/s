@@ -1646,3 +1646,45 @@
     transform: none !important;
   }
 }
+
+/* FX-P-53: Ambiyans ses kontrol butonları — sakin glass buton; koyu tema ve
+   hover/aktif durumları destekli. Görsel FX gibi premium gating'e tabidir. */
+.ambient-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 15px;
+  border-radius: 14px;
+  border: 1px solid var(--card-bd);
+  background: var(--card);
+  color: var(--text2);
+  font-size: var(--f-footnote);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .25s var(--ease-premium, ease), border-color .25s var(--ease-premium, ease), transform .15s ease;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.ambient-control:hover { background: color-mix(in srgb, var(--accent) 8%, var(--card)); }
+.ambient-control:active { transform: scale(0.97); }
+.ambient-control.is-on {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--card-bd));
+  color: var(--accent-ink);
+  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+}
+#root[data-theme="dark"] .ambient-control {
+  background: color-mix(in srgb, #ffffff 6%, var(--card));
+  border-color: rgba(255, 255, 255, 0.12);
+}
+#root[data-theme="dark"] .ambient-control:hover {
+  background: color-mix(in srgb, #ffffff 10%, var(--card));
+}
+#root[data-theme="dark"] .ambient-control.is-on {
+  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-control { transition: none; }
+  .ambient-control:active { transform: none; }
+}

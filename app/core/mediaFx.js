@@ -140,9 +140,101 @@
         return false;
       }
     },
-    ambient: function(type){
-      // Faz 4'te doldurulacak.
-    }
+    ambient: (function(){
+      // FX-P-53: düşük bantlı ambiyans ses motoru — harici dosya gerekmez;
+      // Web Audio API destekliyorsa noise/osilatör üretimi, yoksa <audio>
+      // element fallback'i (URL verilirse). Tümü quiet-time + master gating
+      // (premiumAtmosphere + ambientSounds) altında çalışır.
+      var A={ _ctx:null, _nodes:[], _playing:false, _type:null, _el:null, _url:null,
+        isSupported: function(){ return !!(window.AudioContext || window.webkitAudioContext); },
+        isEnabled: function(){ var s=settings(); return !!(s && s.ambientSounds === true && A.isSupported()); },
+        // Aktif sesli rehberlik varken ambiyans susturulur (FX-P-53 adım 5).
+        voiceBusy: function(){ try{ return !!(window.speechSynthesis && window.speechSynthesis.speaking); }catch(e){ return false; } },
+        start: function(type, url){
+          if (!isPremiumFxEnabled() || !A.isEnabled()) return false;
+          if (isQuietTime()) return false;
+          if (A.voiceBusy()) return false;
+          if (A._playing && A._type === type) return true;
+          A.stop();
+          A._type = type; A._playing = true;
+          if (typeof url === 'string' && url){
+            // HTML5 <audio> fallback: harici URL verildiyse loop ile çal.
+            try{
+              var el = document.createElement('audio');
+              el.loop = true; el.volume = 0.28; el.preload = 'auto';
+              el.src = url;
+              A._el = el; A._url = url;
+              var p = el.play(); if (p && p.catch) p.catch(function(){});
+            }catch(e){}
+            return true;
+          }
+          // Osilatör tabanlı minimal üretim (yalnız Web Audio destekliyorsa).
+          try{
+            var ctx = bootCtx(); if (!ctx) { A._playing=false; A._type=null; return false; }
+            if (ctx.state === 'suspended') ctx.resume();
+            var out = ctx.createGain();
+            out.gain.setValueAtTime(0, ctx.currentTime);
+            out.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 1.2); // yavaş fade-in
+            out.connect(ctx.destination);
+            var src=null, filter=null;
+            if (type === 'rain' && ctx.createBufferSource){
+              // Yağmur: white noise + lowpass ~900Hz + hafif LFO modülasyonu.
+              var len = 2 * ctx.sampleRate, buf = ctx.createBuffer(1, len, ctx.sampleRate), ch = buf.getChannelData(0);
+              for (var i=0;i<len;i++) ch[i] = (Math.random()*2-1) * 0.6;
+              src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+              filter = ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value = 900;
+              src.connect(filter); filter.connect(out);
+              try{ src.start(); }catch(e){}
+            } else if (type === 'wave' && ctx.createOscillator){
+              // Dalga: yavaş iki LFO ile modüle edilen alçak sinüs (0.13/0.07 Hz).
+              src = ctx.createOscillator(); src.type='sine'; src.frequency.value = 180;
+              var g2 = ctx.createGain(); g2.gain.value = 0.5;
+              var lfo1 = ctx.createOscillator(); lfo1.frequency.value = 0.13;
+              var lg1 = ctx.createGain(); lg1.gain.value = 0.4;
+              var lfo2 = ctx.createOscillator(); lfo2.frequency.value = 0.07;
+              var lg2 = ctx.createGain(); lg2.gain.value = 0.35;
+              lfo1.connect(lg1); lg1.connect(g2.gain);
+              lfo2.connect(lg2); lg2.connect(g2.gain);
+              src.connect(g2); g2.connect(out);
+              try{ src.start(); lfo1.start(); lfo2.start(); }catch(e){}
+            } else if ((type === 'ney' || type === 'nakar' || type === 'birds' || type === 'breeze' || type === 'crickets') && ctx.createOscillator){
+              // Ney/nakar hissi: yumuşak üçgen dalga + çok yavaş vibrato; diğer
+              // tipler için aynı düşük-bantlı yumuşak temel.
+              src = ctx.createOscillator(); src.type = 'triangle';
+              src.frequency.value = (type === 'birds') ? 660 : (type === 'crickets' ? 4200 : 320);
+              var vg = ctx.createGain(); vg.gain.value = 0.35;
+              var vlfo = ctx.createOscillator(); vlfo.frequency.value = 0.4;
+              var vlg = ctx.createGain(); vlg.gain.value = 6;
+              vlfo.connect(vlg); vlg.connect(src.frequency);
+              filter = ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value = 1200;
+              src.connect(vg); vg.connect(filter); filter.connect(out);
+              try{ src.start(); vlfo.start(); }catch(e){}
+            } else {
+              src = null;
+            }
+            A._nodes = [out, src, filter].filter(Boolean);
+            if (!src){ A._playing = true; } // sadece fade-in gain'i bırak (sessiz)
+          }catch(e){ A._playing=false; A._type=null; return false; }
+          return true;
+        },
+        stop: function(){
+          try{
+            A._nodes.forEach(function(n){
+              try{ if (typeof n.stop === 'function') n.stop(); }catch(e){}
+              try{ if (typeof n.disconnect === 'function') n.disconnect(); }catch(e){}
+            });
+          }catch(e){}
+          A._nodes = [];
+          try{ if (A._el){ A._el.pause(); A._el.src=''; A._el=null; } }catch(e){}
+          A._url = null;
+          A._playing = false; A._type = null;
+          return true;
+        },
+        isPlaying: function(){ return A._playing; },
+        currentType: function(){ return A._type; }
+      };
+      return A;
+    })()
   };
 
   window.SeyHaptics = {

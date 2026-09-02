@@ -8354,6 +8354,18 @@ App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.setting
 App.setVoiceGuidance=function(on){ if(!data.settings) data.settings={}; data.settings.voiceGuidance=!!on; save(); render(); };
 App.setVoiceLang=function(lang){ if(['tr-TR','en-US','ar-SA'].indexOf(lang)<0) return; if(!data.settings) data.settings={}; data.settings.voiceLang=lang; save(); render(); };
 App.setVoiceRate=function(rate){ var v=Number(rate); if(isNaN(v)) return; v=Math.max(0.75,Math.min(1.5,v)); if(!data.settings) data.settings={}; data.settings.voiceRate=v; var lbl=document.getElementById('voice-rate-val'); if(lbl) lbl.textContent=(v===1?'1x':v+'x'); save(false); };
+// FX-P-61: Premium FX boolean alanları için ortak toggle. Yalnız beyaz listeli
+// settings.* anahtarlarını çevirir; data şekli değişmez (I1), App.* yüzeyine
+// EKLEME (I2 uyumlu). Master switch kapatıldığında alt FX'ler gating'te otomatik
+// sessizleşir (mediaFx/timeTheme), alanları tek tek sıfırlamaya gerek yok.
+App.toggleSetting=function(key){
+  var allowed={premiumAtmosphere:1,uiSounds:1,richHaptics:1,launchRitual:1,voiceGuidance:1,ambientSounds:1,voiceCloudTts:1};
+  if(!allowed[key]||!data.settings) return;
+  data.settings[key]=!data.settings[key];
+  if(window.SeyHaptics&&typeof window.SeyHaptics.tap==='function'&&data.settings.premiumAtmosphere) window.SeyHaptics.tap();
+  save();
+  render();
+};
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); var mealLabels={kahvalti:'Kahvaltı',ara1:'Ara öğün',ogle:'Öğle yemeği',ara2:'Ara öğün',aksam:'Akşam yemeği',gece:'Gece atıştırması'}; save(false,{message:mealLabels[key]+' güncellendi',meta:{section:'nutrition',path:'data.days.*.meals.'+key,operation:'update',summary:mealLabels[key]+' güncellendi',detail:mealLabels[key]||key,value:v.slice(0,60),field:key}}); },500); };
 
 // ---- öğün detay (tabak/gr/adet) ----
@@ -13342,6 +13354,27 @@ function ayarlarHTML(){
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
   h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
   h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
+  // FX-P-61: Premium Atmosfer master switch + alt FX anahtarları. Tek kart,
+  // master kapalıyken alt satırlar kilitli görünür (gating mediaFx/timeTheme'de).
+  var paOn=!(data.settings&&data.settings.premiumAtmosphere===false);
+  var fxRows=[
+    ['uiSounds','🔊 Arayüz sesleri','Tıklama, başarı ve uyarı tonları'],
+    ['richHaptics','📳 Dokunmatik geri bildirim','Zenginleştirilmiş titreşim desenleri'],
+    ['launchRitual','🌅 Açılış ritüeli','Uygulama açılış animasyonu ve sesi'],
+    ['voiceGuidance','🎙️ Sesli rehberlik','Kritik anlarda kısa sesli yönlendirmeler'],
+    ['ambientSounds','🌧️ Ambiyans sesleri','Yağmur, dalga, ney gibi arka plan sesleri']
+  ];
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">✨ Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\')" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
+  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\')" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
+  fxRows.forEach(function(row){
+    var on=!!(data.settings&&data.settings[row[0]]);
+    var lockStyle=paOn?'':'opacity:.45;pointer-events:none;';
+    h+='<div style="display:flex;align-items:center;gap:10px;'+lockStyle+'"><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+row[1]+'</div><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.35;">'+row[2]+'</div></div>';
+    h+='<button onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
+  });
+  h+='</div>';
   // FX-P-57: sesli rehberlik ayarları — toggle + dil + konuşma hızı.
   var vgOn=!!(data.settings&&data.settings.voiceGuidance);
   var vLang=(data.settings&&data.settings.voiceLang)||'tr-TR';

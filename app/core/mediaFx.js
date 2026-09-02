@@ -47,6 +47,66 @@
     if (local.length) return local[0];
     return pool[0];
   }
+  // ── Bulut TTS (premium sinirsel sesler) ──
+  // Yerel sistem sesleri (Yelda vb.) robotik kaldığı için, kullanıcı OpenAI
+  // anahtarı girdiyse OpenAI TTS API'si (gpt-4o-mini-tts/tts-1) üzerinden
+  // sinirsel sesle okunur; anahtar yoksa veya ağ hatasında yerel TTS'e düşer.
+  // Ses üretimi kullanıcı etkileşimiyle tetiklenen akışlarda çağrılır (SAFEGUARDS).
+  var CLOUD_TTS = {
+    enabled: function(){
+      var s = settings();
+      return !!(s && s.voiceCloudTts && s.openaiKey && String(s.openaiKey).trim());
+    },
+    key: function(){
+      var s = settings();
+      return s && s.openaiKey ? String(s.openaiKey).trim() : '';
+    },
+    // voiceName: 'nova'|'shimmer'|'coral'|'sage'|'juniper'|… (settings.voiceCloudVoice)
+    speak: function(text, opts, onDone){
+      var self = this;
+      var s = settings();
+      var model = (s && s.voiceCloudModel) || 'gpt-4o-mini-tts';
+      var voiceName = (opts && opts.cloudVoice) || (s && s.voiceCloudVoice) || 'shimmer';
+      var speed = clamp((opts && opts.rate) || (s && s.voiceRate) || 0.95, 0.75, 1.5);
+      var key = this.key();
+      try{
+        if (window.SeyAudio._cloudAbort) { try{ window.SeyAudio._cloudAbort.abort(); }catch(e){} }
+        var ac = new (window.AudioContext || window.webkitAudioContext)();
+        window.SeyAudio._cloudAbort = ac._ctrl = null;
+        var ctrl = new AbortController();
+        window.SeyAudio._cloudAbort = ctrl;
+        fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          signal: ctrl.signal,
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          body: JSON.stringify({ model: model, voice: voiceName, input: String(text).slice(0, 400), speed: speed, response_format: 'mp3' })
+        }).then(function(r){
+          if (!r.ok) throw new Error('tts_http_' + r.status);
+          return r.blob();
+        }).then(function(blob){
+          var url = URL.createObjectURL(blob);
+          var el = new Audio(url);
+          el.volume = (opts && opts.volume != null) ? opts.volume : 0.85;
+          el.onended = function(){ try{ URL.revokeObjectURL(url); }catch(e){} if (onDone) onDone(true); };
+          el.onerror = function(){ try{ URL.revokeObjectURL(url); }catch(e){} if (onDone) onDone(false); };
+          window.SeyAudio._cloudAudio = el;
+          var p = el.play();
+          if (p && p.catch) p.catch(function(){ if (onDone) onDone(false); });
+        }).catch(function(){
+          if (onDone) onDone(false); // çağıran yerel TTS'e düşer
+        });
+        return true;
+      }catch(e){ if (onDone) onDone(false); return false; }
+    },
+    stop: function(){
+      try{ if (window.SeyAudio._cloudAbort) window.SeyAudio._cloudAbort.abort(); }catch(e){}
+      try{ if (window.SeyAudio._cloudAudio) window.SeyAudio._cloudAudio.pause(); }catch(e){}
+      window.SeyAudio._cloudAudio = null;
+    },
+    isPlaying: function(){
+      try{ return !!(window.SeyAudio._cloudAudio && !window.SeyAudio._cloudAudio.paused); }catch(e){ return false; }
+    }
+  };
 
   function playTone(freq, duration, type, gainValue, allowReducedMotion){
     if (!allowed(allowReducedMotion)) return;
@@ -161,6 +221,23 @@
       if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;
       // FX-P-52: quiet-time (23:00–07:00) penceresinde sesli rehberlik sessiz.
       if (isQuietTime()) return false;
+      // ── Bulut TTS önceliği: OpenAI anahtarı + voiceCloudTts açıksa sinirsel
+      // sesle oku; başarısızsa (ağ/hata) yerel TTS'e sessizce düş.
+      if (CLOUD_TTS.enabled() && !opts.localOnly){
+        var self = this;
+        try{ if (window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+        CLOUD_TTS.speak(text, opts, function(ok){
+          if (!ok && !opts.noFallback){
+            try{ window.SeyAudio.speakLocal(text, opts); }catch(e){}
+          }
+        });
+        return true;
+      }
+      return window.SeyAudio.speakLocal(text, opts);
+    },
+    // Yerel (tarayıcı) TTS — bulut kullanılamadığında yedek. FX-P-51 davranışı.
+    speakLocal: function(text, opts){
+      opts = opts || {};
       if (typeof window.speechSynthesis === 'undefined' || !window.speechSynthesis) return false;
       if (window.speechSynthesis.speaking){
         if (!opts.force) return false;
@@ -198,6 +275,11 @@
         return false;
       }
     },
+    // Bulut TTS alt yardımcıları (demo/ayarlar yüzeyi için).
+    cloudTtsEnabled: function(){ return CLOUD_TTS.enabled(); },
+    cloudTtsSpeak: function(text, opts, onDone){ return CLOUD_TTS.speak(text, opts, onDone); },
+    cloudTtsStop: function(){ CLOUD_TTS.stop(); },
+    cloudTtsPlaying: function(){ return CLOUD_TTS.isPlaying(); },
     ambient: (function(){
       // FX-P-53: düşük bantlı ambiyans ses motoru — harici dosya gerekmez;
       // Web Audio API destekliyorsa noise/osilatör üretimi, yoksa <audio>

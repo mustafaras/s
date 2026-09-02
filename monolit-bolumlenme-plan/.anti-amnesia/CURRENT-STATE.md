@@ -106,8 +106,8 @@ noktası (reminderDelivery'den sonra, coverage manifest'ten önce) sabit.
 | Saf çekirdek | (dateUtils/helpers genişletmesi) | MON-07..10 |
 | Mutable çekirdek (1) | state | MON-11..15 |
 | Senkron köprü (1) | syncGlue genişletmesi | MON-16..18 |
-| Domain (12) | prayer, zikir, quran, saygi, motivation, crisis, journal, health, library, report, map, profile, settings | MON-19..35 |
-| Reminder UI + messaging (2) | reminders, messaging | MON-40..43 |
+| Domain (12) | prayer, zikir, quran, saygi, motivation, crisis, journal, health, library, report, map, profile, settings | MON-19..37 (tek tek kart başlığına hizalı: MON-S3 §7) |
+| Reminder UI + messaging (2) | reminders, messaging | MON-40..42 (43 kapanış kartı) |
 | Birleştirme (2) | render, appSurface | MON-44..54 |
 
 ## MON-03 kapanışı — sahiplik matrisi

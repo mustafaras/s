@@ -33,29 +33,33 @@ fonksiyon adını sahiplenemez; iki sahip tespit edilirse prompt halt (§7).
 | # | Modül (dosya) | Etiket | Registry adı | Bağımlılıklar (okuma yönü) | Dalga / kart | Forbidden reverse dependency | Index ekleme noktası |
 |---|---|---|---|---|---|---|---|
 | 1 | `app/core/constants.js` | KORU | `window.SeymaConstants` (mevcut) | — | — / FX-P-01 | constants'ı kimse değiştiremez; alt modüller constants'tan okur | 54 (mevcut) |
-| 2 | `app/core/dateUtils.js` | KORU→genişlet | `window.SeymaDateUtils` | constants, `SeymaState` (guard'lı) | 2 / MON-07..09 | dateUtils helpers'a/state'e yazamaz | 55 (mevcut) |
+| 2 | `app/core/dateUtils.js` | KORU→genişlet | `window.SeymaDateUtils` | constants, `SeymaState` (guard'lı) | 2 / MON-07..08 | dateUtils helpers'a/state'e yazamaz | 55 (mevcut) |
 | 3 | `app/core/state.js` | YENİ (iskelet var) | `window.SeymaState` | constants, dateUtils | 3 / MON-11..15 | state, helpers/save/callback'lere yazamaz; `data=` yazması yasak (M2) | 56 (mevcut) |
-| 4 | `app/core/helpers.js` | KORU→genişlet | `window.SeymaHelpers` | constants, `SeymaState`, `SeymaDateUtils` | 2 / MON-10 | helpers, state rebind'ine dokunamaz | 58 (mevcut) |
+| 4 | `app/core/helpers.js` | KORU→genişlet | `window.SeymaHelpers` | constants, `SeymaState`, `SeymaDateUtils` | 2 / MON-09..10 | helpers, state rebind'ine dokunamaz | 58 (mevcut) |
 | 5 | `app/core/mediaFx.js` | KORU | `window.SeyAudio/SeyHaptics/SeyFx` (mevcut) | constants, DOM/SesAPI | — / FX tamam | MON-S2 §5: hiçbir registry FX modüllerini yeniden tanımlayamaz/sarmalayamaz | 59 (mevcut) |
 | 6 | `app/core/timeTheme.js` | KORU | `window.SeyTimeTheme` (mevcut) | constants | — / FX tamam | timeTheme, FX modüllerine yazamaz | 60 (mevcut) |
-| 7 | `app/core/prayer.js` | YENİ | `window.SeymaPrayer` | constants, dateUtils, `SeymaState` | 5 / MON-19..21 | prayer, settings'e yazamaz; vakit cache modül-özel | helper.js sonrası, core bloğunun ilki |
-| 8 | `app/core/zikir.js` | YENİ | `window.SeymaZikr` | constants, dateUtils, state, helpers, zikirCoreContentV1 | 5 / MON-22..25 | zikir, sync union matematiğine (V5) dokunamaz (I5) | prayer'dan sonra |
-| 9 | `app/core/quran.js` | YENİ | `window.SeymaQuran` | constants, state, helpers, quranTransportV1/Revelation/Verses | 5 / MON-22..25 | quran, transport dosyalarına yazamaz; outbox/delivery salt akış | prayer/zikir'den sonra |
-| 10 | `app/core/saygi.js` | YENİ | `window.SeymaSaygi` | constants, state, helpers, prayer, library, saygiPeople | 5 / MON-19..21 | saygi, prayer cache'ine yazamaz | prayer'dan sonra |
-| 11 | `app/core/motivation.js` | YENİ | `window.SeymaMotivation` | constants, state, helpers, MotivationProgramV2 | 6 / MON-26..28 | motivation, profileAssessment'a yazamaz | domain bloğu |
-| 12 | `app/core/crisis.js` | YENİ | `window.SeymaCrisis` | constants, state, helpers | 6 / MON-26..28 | crisis, settings'e yazamaz | domain bloğu |
-| 13 | `app/core/journal.js` | YENİ | `window.SeymaJournal` | constants, state, helpers | 6 / MON-26..28 | journal, crisis'e yazamaz | domain bloğu |
-| 14 | `app/core/health.js` | YENİ | `window.SeymaHealth` | constants, state, helpers, dateUtils | 6 / MON-26..28 | health, report hesaplarına yazamaz | domain bloğu |
-| 15 | `app/core/library.js` | YENİ | `window.SeymaLibrary` | constants, state, helpers | 7 / MON-29..30 | library, saygi/quran hesaplarına yazamaz | domain bloğu |
-| 16 | `app/core/report.js` | YENİ | `window.SeymaReport` | constants, state, helpers, dateUtils | 7 / MON-29..31 | report, day kayıtlarına yazamaz (salt-okur B1) | domain bloğu |
-| 17 | `app/core/map.js` | YENİ | `window.SeymaMap` | constants, state, helpers | 7 / MON-29..31 | map, geolocation iznini resetlemez | domain bloğu |
-| 18 | `app/core/profile.js` | YENİ | `window.SeymaProfile` | constants, state, helpers, profileAssessmentV1 | 7 / MON-32..33 | profile, assessment içeriğini (versioned) düzenleyemez | domain bloğu |
-| 19 | `app/core/settings.js` | YENİ | `window.SeymaSettings` | constants, state, helpers | 7 / MON-33..35 | settings, secret alanlarını (`ghToken` vb.) yazamaz/dışa yazamaz (I5) | domain bloğu |
+| 7 | `app/core/prayer.js` | YENİ | `window.SeymaPrayer` | constants, dateUtils, `SeymaState` | 5 / MON-19 | prayer, settings'e yazamaz; vakit cache modül-özel | helper.js sonrası, core bloğunun ilki |
+| 8 | `app/core/zikir.js` | YENİ | `window.SeymaZikr` | constants, dateUtils, state, helpers, zikirCoreContentV1 | 5 / MON-20..21 | zikir, sync union matematiğine (V5) dokunamaz (I5) | prayer'dan sonra |
+| 9 | `app/core/quran.js` | YENİ | `window.SeymaQuran` | constants, state, helpers, quranTransportV1/Revelation/Verses | 5 / MON-22 | quran, transport dosyalarına yazamaz; outbox/delivery salt akış | prayer/zikir'den sonra |
+| 10 | `app/core/saygi.js` | YENİ | `window.SeymaSaygi` | constants, state, helpers, prayer, library, saygiPeople | 5 / MON-23 | saygi, prayer cache'ine yazamaz | prayer'dan sonra |
+| 11 | `app/core/motivation.js` | YENİ | `window.SeymaMotivation` | constants, state, helpers, MotivationProgramV2 | 6 / MON-26 | motivation, profileAssessment'a yazamaz | domain bloğu |
+| 12 | `app/core/crisis.js` | YENİ | `window.SeymaCrisis` | constants, state, helpers | 6 / MON-27 | crisis, settings'e yazamaz | domain bloğu |
+| 13 | `app/core/journal.js` | YENİ | `window.SeymaJournal` | constants, state, helpers | 6 / MON-28 | journal, crisis'e yazamaz | domain bloğu |
+| 14 | `app/core/health.js` | YENİ | `window.SeymaHealth` | constants, state, helpers, dateUtils | 6 / MON-29..31 | health, report hesaplarına yazamaz | domain bloğu |
+| 15 | `app/core/library.js` | YENİ | `window.SeymaLibrary` | constants, state, helpers | 7 / MON-33 | library, saygi/quran hesaplarına yazamaz | domain bloğu |
+| 16 | `app/core/report.js` | YENİ | `window.SeymaReport` | constants, state, helpers, dateUtils | 7 / MON-34 | report, day kayıtlarına yazamaz (salt-okur B1) | domain bloğu |
+| 17 | `app/core/map.js` | YENİ | `window.SeymaMap` | constants, state, helpers | 7 / MON-35 | map, geolocation iznini resetlemez | domain bloğu |
+| 18 | `app/core/profile.js` | YENİ | `window.SeymaProfile` | constants, state, helpers, profileAssessmentV1 | 7 / MON-36 | profile, assessment içeriğini (versioned) düzenleyemez | domain bloğu |
+| 19 | `app/core/settings.js` | YENİ | `window.SeymaSettings` | constants, state, helpers | 7 / MON-37 | settings, secret alanlarını (`ghToken` vb.) yazamaz/dışa yazamaz (I5) | domain bloğu |
 | 20 | `app/core/reminders.js` | YENİ | `window.SeymaReminderUI` | constants, state, helpers, Reminder dörtlüsü | 8 / MON-40..41 | reminderUI, frozen motorlara yazamaz; yalnız okur | reminderDelivery'den sonra |
 | 21 | `app/core/syncGlue.js` | KORU→genişlet | `window.SeymaSave` | state | 4 / MON-16..18 | **M3:** `SeyOnSyncState/SeyOnSynced` app.js sahipliğinde kalır; syncGlue getter-only tuzak kuramaz | 57 (mevcut) |
-| 22 | `app/core/messaging.js` | YENİ | `window.SeymaMessaging` | constants, state, helpers | 8 / MON-42..43 | messaging, panel dosyalarına (observer-inbox/outbox) yazamaz | domain bloğu sonu |
+| 22 | `app/core/messaging.js` | YENİ | `window.SeymaMessaging` | constants, state, helpers | 8 / MON-42 | messaging, panel dosyalarına (observer-inbox/outbox) yazamaz | domain bloğu sonu |
 | 23 | `app/core/render.js` | YENİ | `window.SeymaRender` | hepsi (yukarıdakiler) | 9 / MON-44..49 | render, App handler yüzeyine yazamaz; onclick dizgisi üretir (I2/I4) | app.js'ten hemen önce |
 | 24 | `app/core/appSurface.js` | YENİ | `window.SeymaAppSurface` | hepsi + render | 10 / MON-50..54 | appSurface, `data` rebind'ine dokunamaz (M2/M2prime); `window.App=App` app.js'te kalır | app.js'ten hemen önce, render.js'ten sonra |
+
+> **Kart ataması kaynağı:** `UYGULAMA-PROMPTLARI.md` kart başlıkları (MON-07..54
+> canlı grep ile çekildi; 2026-09-02 düzeltmesi). MON-24/25, 32, 38/39, 43
+> çapraz regression/kabul kartlarıdır — tek modül sahiplenmez.
 
 ### 3b. Frozen reminder dörtlüsü — KORU (matris dışı ama yükleme sırasında sabit)
 
@@ -109,6 +113,13 @@ Matris, gelecek her taşıma kartının index/FILES etkisini §4 ile ölçer.
 - Matris **24 benzersiz hedef** içerir (yukarıdaki tablo; reminders dahil,
   timeTheme MODULARIZATION.md'nin eski tablosunda 24. satırda tekrarlanmıştı —
   bu matris v2.1 tabloyu kaynak alır ve tekrarı eler).
+- **Kart ataması** `UYGULAMA-PROMPTLARI.md` başlıklarıyla hizalanmıştır:
+  dateUtils MON-07..08, helpers MON-09..10, state MON-11..15, syncGlue
+  MON-16..18, prayer MON-19, zikir MON-20..21, quran MON-22, saygi MON-23,
+  motivation MON-26, crisis MON-27, journal MON-28, health MON-29..31,
+  library MON-33, report MON-34, map MON-35, profile MON-36, settings
+  MON-37, reminders MON-40..41, messaging MON-42, render MON-44..49,
+  appSurface MON-50..54.
 - Index core sırası (54–64) kaynakla karşılaştırıldı: birebir.
 - Tek fonksiyonun iki sahibi yok; M1–M4 çelişkisi yok (M3 syncGlue satırı
   ve MON-S2 FX yasağı açıkça işlendi).

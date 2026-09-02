@@ -1942,7 +1942,7 @@ function emptyStateNoteHTMLP(status){
   return r?'<div class="p3-muted" data-component="empty-state-reason" data-empty-kind="'+r.kind+'">'+esc(r.text)+'</div>':'';
 }
 function p3SettingsSummaryP(settings){
-  var t=settings&&settings.tracked||{}, labels={locationEnabled:'Konum',locationMode:'Konum modu',caffeineMode:'Kafein modu',targetBed:'Hedef uyku',hideLocationCard:'Konum kartı',hideRepoBanner:'Repo bandı',profileAssessmentInactive:'Profil pasif',aeonNotifyPermission:'ÆON bildirim',prayerMethod:'Namaz yöntemi',prayerRemindersEnabled:'Namaz hatırlatıcı',magnesiumEnabled:'Magnezyum'};
+  var t=settings&&settings.tracked||{}, labels={locationEnabled:'Konum',locationMode:'Konum modu',caffeineMode:'Kafein modu',targetBed:'Hedef uyku',hideLocationCard:'Konum kartı',hideRepoBanner:'Repo bandı',profileAssessmentInactive:'Profil pasif',aeonNotifyPermission:'ÆON bildirim',prayerMethod:'Namaz yöntemi',prayerRemindersEnabled:'Namaz hatırlatıcı',magnesiumEnabled:'Magnezyum',premiumAtmosphere:'Premium Atmosfer',uiSounds:'Arayüz sesleri',richHaptics:'Dokunmatik FX',launchRitual:'Açılış ritüeli',voiceGuidance:'Sesli rehberlik',ambientSounds:'Ambiyans sesleri',voiceCloudTts:'Bulut sesi'};
   var keys=Object.keys(labels), out=[];
   keys.forEach(function(k){ if(t[k]===null||t[k]===undefined) return; var v=typeof t[k]==='boolean'?(t[k]?'açık':'kapalı'):String(t[k]); out.push('<span><small>'+esc(labels[k])+'</small><b>'+esc(v)+'</b></span>'); });
   return out.length?'<div class="p3-settings-grid">'+out.join('')+'</div>':'<div class="p3-muted">İzinli ayar özeti yok.</div>';

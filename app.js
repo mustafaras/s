@@ -13372,7 +13372,7 @@ function ayarlarHTML(){
     var on=!!(data.settings&&data.settings[row[0]]);
     var lockStyle=paOn?'':'opacity:.45;pointer-events:none;';
     h+='<div style="display:flex;align-items:center;gap:10px;'+lockStyle+'"><div style="flex:1;min-width:0;"><div style="font-size:var(--f-footnote);font-weight:700;color:var(--text);">'+row[1]+'</div><div style="font-size:var(--f-caption2);color:var(--faint);line-height:1.35;">'+row[2]+'</div></div>';
-    h+='<button onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
+    h+='<button onclick="App.toggleSetting(\''+row[0]+'\')" aria-pressed="'+on+'" aria-label="'+row[1].replace(/^[^A-Za-zÇĞİÖŞÜğöşüı]+ /,'')+' '+(on?'açık':'kapalı')+'" style="flex-shrink:0;min-width:74px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:var(--f-caption1);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px;'+(on?onS:offS)+'">'+(on?'Açık':'Kapalı')+'</button></div>';
   });
   h+='</div>';
   // FX-P-57: sesli rehberlik ayarları — toggle + dil + konuşma hızı.

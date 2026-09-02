@@ -1688,3 +1688,14 @@
   .ambient-control { transition: none; }
   .ambient-control:active { transform: none; }
 }
+
+/* FX-P-63: Global reduced-motion guard — tüm animasyon/geçişleri anlık yapar.
+   Mevcut öğe-özel kuralların ötesinde genel emniyet ağı (time-theme dahil). */
+@media (prefers-reduced-motion: reduce) {
+  #root, #root *, .ambient-control {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

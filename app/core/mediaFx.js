@@ -114,6 +114,16 @@
     },
     // FX-P-52: sessiz zaman penceresi (23:00–07:00) yardımcısı.
     isQuietTime: isQuietTime,
+    // FX-P-55: kısa, sıcak ve saygılı sesli ipucu yardımcıları. Tümü
+    // SeyAudio.voice'e delege eder — quiet-time ve voiceGuidance gating'i
+    // orada uygulanır; çağıran tarafın ekstra kontrolü gerekmez.
+    guides: {
+      zikirStart: function(){ return window.SeyAudio.voice('Başla, kalbin yumuşasın.', { lang: 'tr-TR', rate: 1 }); },
+      zikirHalf: function(){ return window.SeyAudio.voice('Yarısı bitti, nefes al.', { lang: 'tr-TR', rate: 1 }); },
+      zikirComplete: function(){ return window.SeyAudio.voice('Tamamladın. Allah kabul etsin.', { lang: 'tr-TR', rate: 1 }); },
+      suraOpen: function(name){ return window.SeyAudio.voice(String(name || 'Sure') + ' açıldı. Huşuyla oku.', { lang: 'tr-TR', rate: 1 }); },
+      suraBookmark: function(){ return window.SeyAudio.voice('Yer işareti koydun.', { lang: 'tr-TR', rate: 1 }); }
+    },
     voice: function(text, opts){
       opts = opts || {};
       if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;

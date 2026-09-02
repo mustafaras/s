@@ -624,7 +624,10 @@ function zikrTouchTick(){
     z.streak = (zikrDayCompleted(yester)||z.streakDate===yester) ? (z.streak+1) : 1;
     z.streakDate=date;
   }
-  return {preset:p,count:pd.count,total:day.totalCount,doneNow:doneNow,target:zikrBaseTarget(p),hatimDone:p.kind==='esma'&&after.complete,math:after,journey:j,hatim:h};
+  return {preset:p,count:pd.count,total:day.totalCount,doneNow:doneNow,target:zikrBaseTarget(p),hatimDone:p.kind==='esma'&&after.complete,math:after,journey:j,hatim:h,
+    // FX-P-55: sesli ipucu olayları — sessionStarted yalnız oturumun ilk
+    // dokunuşunda (yeni session id), halfNow bu turun ortasına tam geçişte.
+    sessionStarted:session.count===1, halfNow:(!doneNow&&after.cyclePosition===Math.ceil(zikrBaseTarget(p)/2))};
 }
 function syncZikrDayMirror(date,day){
   try{
@@ -8630,6 +8633,10 @@ App.zikrTap=function(){
   if(r.hatimComplete){ toast('Bu Ebced² Tam Hatim tamamlandı. Hatimlerim’den yeni bir hatim başlatabilirsin.',2800); return; }
   ui.zikrLastReset=null; ui.zikrActionNote=''; zikrPaintActionNote();
   zikrTickSound();
+  // FX-P-55: oturumun ilk dokunuşunda nazik başlangıç ipucu (oturum başına 1).
+  try{
+    if(r.sessionStarted && window.SeyAudio && typeof window.SeyAudio.guides==='object' && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirStart==='function') window.SeyAudio.guides.zikirStart();
+  }catch(e){}
   if(ensureZikrRoot().settings.haptic){ try{ haptic([8]); }catch(e){} }
   var spark=false;
   if(r.doneNow){
@@ -8641,12 +8648,14 @@ App.zikrTap=function(){
     if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
     else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
     // FX-P-52: zikir hedefi tamamlandığında kısa nazik sesli ipucu — günde en
-    // fazla 1 kez (settings.voiceZikrDate damgası). Quiet-time ve
+    // fazla 1 kez (settings.voiceZikrDate damgası). FX-P-55: kopya artık
+    // SeyAudio.guides.zikirComplete üzerinden gider (tek kaynak). Quiet-time ve
     // voiceGuidance gating'i SeyAudio.voice içinde.
     try{
       if(data&&data.settings&&data.settings.voiceZikrDate!==todayStr()){
         data.settings.voiceZikrDate=todayStr();
-        if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Allah kabul etsin. Güzel bir mola vermek ister misin?', { lang:'tr-TR', rate:1 });
+        if(window.SeyAudio&&typeof window.SeyAudio.guides==='object'&&window.SeyAudio.guides&&typeof window.SeyAudio.guides.zikirComplete==='function') window.SeyAudio.guides.zikirComplete();
+        else if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Allah kabul etsin. Güzel bir mola vermek ister misin?', { lang:'tr-TR', rate:1 });
         save(false);
       }
     }catch(e){}
@@ -8664,6 +8673,14 @@ App.zikrTap=function(){
   save();
   if(!zikrPaintLive(r)) render();
   zikrPaintPauseButton();
+  // FX-P-55: tur ortası (yarı hedefe geçiş) kısa nefes ipucu — oturum başına
+  // bir kez (ui._voiceZikirHalfGiven oturum-level bayrağı). doneNow ile çakışmaz.
+  try{
+    if(r.halfNow && !ui._voiceZikirHalfGiven){
+      ui._voiceZikirHalfGiven=true;
+      if(window.SeyAudio && window.SeyAudio.guides && typeof window.SeyAudio.guides.zikirHalf==='function') window.SeyAudio.guides.zikirHalf();
+    }
+  }catch(e){}
   if(spark){
     try{ var sparkEl=document.querySelector('.zikr-done-spark'); if(sparkEl&&sparkEl.classList) sparkEl.classList.add('on'); }catch(e){}
     setTimeout(function(){ _zikrCompleteFlash=false; try{ var el=document.querySelector('.zikr-done-spark'); if(el&&el.classList) el.classList.remove('on'); }catch(e){} },1200);

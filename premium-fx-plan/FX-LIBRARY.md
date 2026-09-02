@@ -242,9 +242,9 @@ animation: seyShine 2.6s ease-in-out infinite;
 
 ---
 
-### 3.9 Voice / Audio Catalog (`window.SeyAudio`) — Dalga 5
+### 3.9 Ses / Sesli Rehberlik Kataloğu (`window.SeyAudio`) — Dalga 5
 
-| Function | Effect | Gating | Notes |
+| Fonksiyon | Efekt | Gating | Notlar |
 |----------|--------|--------|-------|
 | `voice(text, opts)` | Metin okuma (Web Speech API) | `premiumAtmosphere && voiceGuidance && !quiet-time && speechSynthesis` | `opts.lang`/`opts.rate` verilmezse `settings.voiceLang`/`settings.voiceRate` okunur; speaking iken `force` ile cancel |
 | `isVoiceEnabled()` | Sesli rehberlik hazır mı | `voiceGuidance && speechSynthesis` | Gating kontrolü için ayrı yardımcı |
@@ -255,7 +255,7 @@ animation: seyShine 2.6s ease-in-out infinite;
 | `ambient.start(type, url?)` | Arka plan ses döngüsü | `premiumAtmosphere && ambientSounds && !quiet-time && !voice.speaking` | rain/wave/ney/nakar/birds/breeze/crickets; URL verilirse `<audio loop>` fallback; fade-in 1.2s |
 | `ambient.stop()` | Arka plan sesini durdurur | — | Çalınamazsa güvenli no-op |
 
-**Quiet-time matrisi (FX-P-58):**
+**Sessiz zaman (quiet-time) matrisi (FX-P-58):**
 
 | Efekt ailesi | 23:00–07:00 | Not |
 |--------------|-------------|-----|

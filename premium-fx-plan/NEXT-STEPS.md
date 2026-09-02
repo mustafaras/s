@@ -1,7 +1,7 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-02
-**Durum:** Faz 5 (Voice guidance) TAMAMLANDI (FX-P-51…FX-P-58). Sıradaki **Dalga 6 / FX-P-61** (Settings & master switch UI) — ayrı kullanıcı onayı bekliyor.
+**Durum:** Faz 5 (Sesli rehberlik) TAMAMLANDI (FX-P-51…FX-P-58). Sıradaki **Dalga 6 / FX-P-61** (Ayarlar & ana anahtar arayüzü) — ayrı kullanıcı onayı bekliyor.
 **Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
 
 ## Tamamlananlar

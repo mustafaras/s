@@ -83,7 +83,7 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] Mevsimsel renk fonksiyonu uygulandı (`seasonalClass(d)` dört mevsim + özel günler; `applySeasonal(d)` root sınıfını günceller)
 - [x] Zaman teması test fixture PASS (`tests/app/test_premium_time_theme.js` — gerçek `timeTheme.js` VM'de yüklenir, classForHour/apply/seasonalClass/applySeasonal + CSS tanımları doğrulanır, 49/49)
 
-## Dalga 5 Voice (FX-P-58 — Faz 5 kapanış)
+## Dalga 5 Sesli Rehberlik (FX-P-58 — Faz 5 kapanış)
 
 - [x] `SeyAudio.voice` API uygulandı (FX-P-51: gating + clamp + force/cancel + voiceNames; FX-P-57: settings defaults)
 - [x] Sesli rehberlik uygulama noktalarına entegre edildi (FX-P-52: onboarding tek seferlik, streak günde 1 kez, zikir tamamlama günde 1 kez)
@@ -93,7 +93,7 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] Ambiyans ses motoru iskeleti uygulandı (FX-P-53: `SeyAudio.ambient` Web Audio + `<audio>` fallback + `.ambient-control` CSS)
 - [x] Quiet-time guard 23:00–07:00 çalışıyor (`SeyAudio.isQuietTime`; voice + ambient engelli, haptics/görsel FX etkilenmez)
 - [x] Voice guidance test fixture PASS (`tests/app/test_premium_voice.js` — gerçek `mediaFx.js` VM'de yüklenir; API yüzeyi + gating + quiet-time + guides + greeting + ambient gating + statik app.js çağrı noktaları, 58/58)
-- [x] FX-LIBRARY.md voice catalog güncellendi (§3.9 + quiet-time matrisi)
+- [x] FX-LIBRARY.md ses/sesli rehberlik kataloğu güncellendi (§3.9 + sessiz zaman matrisi)
 
 ## Dokümantasyon
 

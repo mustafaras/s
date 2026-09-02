@@ -72,10 +72,10 @@ function loadTimeTheme(){
   (0, eval)(src);
 }
 
-console.log('\n=== Premium Voice Guidance Tests (gerçek mediaFx.js) ===\n');
+console.log('\n=== Sesli Rehberlik Testleri (gerçek mediaFx.js) ===\n');
 
 // ── Test 1: API yüzeyi ──────────────────────────────────────────────────────
-console.log('[1] Voice API yüzeyi tanımlı');
+console.log('[1] Sesli rehberlik API yüzeyi tanımlı');
 (function(){
   window.speechSynthesis = makeMockSpeech();
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });
@@ -107,7 +107,7 @@ console.log('\n[2] voiceGuidance=false iken sessiz');
 })();
 
 // ── Test 3: voiceGuidance=true + speechSynthesis varken voice true ──────────
-console.log('\n[3] voiceGuidance=true iken voice çalışır');
+console.log('\n[3] voiceGuidance=true iken sesli rehberlik çalışır');
 (function(){
   resetSpeech();
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });
@@ -122,7 +122,7 @@ console.log('\n[3] voiceGuidance=true iken voice çalışır');
 })();
 
 // ── Test 4: speechSynthesis hiç yoksa graceful false ────────────────────────
-console.log('\n[4] speechSynthesis yoksa graceful');
+console.log('\n[4] speechSynthesis yoksa zarif çıkış');
 (function(){
   resetSpeech();
   window.speechSynthesis = undefined;
@@ -155,7 +155,7 @@ console.log('\n[5] isQuietTime saat aralıkları');
 })();
 
 // ── Test 6: speaking iken force olmadan false ───────────────────────────────
-console.log('\n[6] speaking iken force davranışı');
+console.log('\n[6] konuşma sürerken force davranışı');
 (function(){
   window.speechSynthesis = makeMockSpeech();
   resetSpeech();
@@ -208,7 +208,7 @@ console.log('\n[8] guides sesli ipuçları');
 })();
 
 // ── Test 9: greeting zaman dilimi haritalaması (FX-P-56 sonrası yeşil) ──────
-console.log('\n[9] greeting zaman dilimi haritalaması');
+console.log('\n[9] selamlama zaman dilimi haritalaması');
 (function(){
   if (typeof window.SeyAudio.greeting !== 'function'){
     console.log('  ~ FX-P-56 henüz uygulanmadı — greeting testleri atlandı');
@@ -232,7 +232,7 @@ console.log('\n[9] greeting zaman dilimi haritalaması');
 })();
 
 // ── Test 10: ambient gating ─────────────────────────────────────────────────
-console.log('\n[10] ambient motor gating');
+console.log('\n[10] ambiyans motoru gating');
 (function(){
   // AudioContext desteğiyle: premiumAtmosphere+ambientSounds açık → isEnabled true
   window.AudioContext = function(){ this.state='running'; this.currentTime=1; this.destination='dest';
@@ -267,7 +267,7 @@ console.log('\n[10] ambient motor gating');
 })();
 
 // ── Test 11: app.js voice çağrı noktaları (statik) ──────────────────────────
-console.log('\n[11] app.js SeyAudio.voice çağrı noktaları (statik)');
+console.log('\n[11] app.js sesli çağrı noktaları (statik)');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
   ok('onboarding sesli karşılama çağrısı var (FX-P-52)', appSrc.indexOf("voice('Sevgili Günışığı, hoş geldin") >= 0);
@@ -280,7 +280,7 @@ console.log('\n[11] app.js SeyAudio.voice çağrı noktaları (statik)');
 })();
 
 // ── Test 12: reduced-motion voice'i kapatmaz (TTS ayrı gating) ──────────────
-console.log('\n[12] reduced-motion voice gating');
+console.log('\n[12] azaltılmış harekette ses gatingi');
 (function(){
   resetSpeech();
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });

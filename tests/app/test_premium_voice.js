@@ -113,8 +113,12 @@ console.log('\n[3] voiceGuidance=true iken sesli rehberlik çalışır');
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });
   setReducedMotion(false);
   loadMediaFx();
+  // Bulut-önce mimarisi: anahtar/voiceCloudTts yokken voice() false döner
+  // (yerel sese düşmez — kullanıcı kararı). speakLocal ise doğrudan çalışır.
   var r = window.SeyAudio.voice('test', { lang: 'tr-TR', rate: 1 });
-  ok('voiceGuidance=true + speechSynthesis iken voice() true döner', r === true);
+  ok('bulut ayarı yokken voice() false (yerel sese düşmez)', r === false);
+  var rl = window.SeyAudio.speakLocal('test', { lang: 'tr-TR', rate: 1 });
+  ok('speakLocal true döner', rl === true);
   ok('speak tam 1 kez çağrıldı', _speakCalls.length === 1, 'calls: ' + _speakCalls.length);
   ok('speak edilen metin doğru', _speakCalls[0] && _speakCalls[0].text === 'test');
   ok('speak edilen dil tr-TR', _speakCalls[0] && _speakCalls[0].lang === 'tr-TR');
@@ -163,11 +167,11 @@ console.log('\n[6] konuşma sürerken force davranışı');
   setSettings({ premiumAtmosphere: true, voiceGuidance: true });
   setReducedMotion(false);
   loadMediaFx();
-  var r1 = window.SeyAudio.voice('bir', {});
-  ok('speaking iken force olmadan voice() false', r1 === false);
+  var r1 = window.SeyAudio.speakLocal('bir', {});
+  ok('speaking iken force olmadan speakLocal false', r1 === false);
   ok('cancel çağrılmadı', _cancelCalls === 0);
-  var r2 = window.SeyAudio.voice('iki', { force: true });
-  ok('speaking iken force ile voice() true', r2 === true);
+  var r2 = window.SeyAudio.speakLocal('iki', { force: true });
+  ok('speaking iken force ile speakLocal true', r2 === true);
   ok('force ile cancel çağrıldı', _cancelCalls === 1, 'cancels: ' + _cancelCalls);
   setSpeaking(false);
 })();
@@ -195,16 +199,23 @@ console.log('\n[8] guides sesli ipuçları');
     console.log('  ~ FX-P-55 henüz uygulanmadı — guides testleri atlandı');
     return;
   }
+  // Bulut-önce mimarisi: guides voice() üzerinden gider; bulut ayarı yokken
+  // false döner (yerel sese düşmez) — API yüzeyi doğru şeklide false dönmeli.
   var r1 = window.SeyAudio.guides.zikirStart();
-  ok('guides.zikirStart voice tetikler', r1 === true && _speakCalls.length === 1);
-  var r2 = window.SeyAudio.guides.zikirHalf();
-  ok('guides.zikirHalf voice tetikler', r2 === true && _speakCalls.length === 2);
-  var r3 = window.SeyAudio.guides.zikirComplete();
-  ok('guides.zikirComplete voice tetikler', r3 === true && _speakCalls.length === 3);
+  ok('guides.zikirStart bulut yokken false (yerel sese düşmez)', r1 === false && _speakCalls.length === 0);
+  // voiceLocalFallback=true ile guides yerel TTS'e düşer ve speak çağrılır.
+  setSettings({ premiumAtmosphere: true, voiceGuidance: true, voiceLocalFallback: true });
+  loadMediaFx();
+  var r2 = window.SeyAudio.guides.zikirStart();
+  ok('guides.zikirStart fallback ile speak tetikler', r2 === true && _speakCalls.length === 1);
+  var r3 = window.SeyAudio.guides.zikirHalf();
+  ok('guides.zikirHalf speak tetikler', r3 === true && _speakCalls.length === 2);
+  var r3b = window.SeyAudio.guides.zikirComplete();
+  ok('guides.zikirComplete speak tetikler', r3b === true && _speakCalls.length === 3);
   var r4 = window.SeyAudio.guides.suraOpen('Bakara');
-  ok('guides.suraOpen isimle voice tetikler', r4 === true && _speakCalls.length === 4 && /Bakara/.test(_speakCalls[3] && _speakCalls[3].text));
+  ok('guides.suraOpen isimle speak tetikler', r4 === true && _speakCalls.length === 4 && /Bakara/.test(_speakCalls[3] && _speakCalls[3].text));
   var r5 = window.SeyAudio.guides.suraBookmark();
-  ok('guides.suraBookmark voice tetikler', r5 === true && _speakCalls.length === 5);
+  ok('guides.suraBookmark speak tetikler', r5 === true && _speakCalls.length === 5);
 })();
 
 // ── Test 9: greeting zaman dilimi haritalaması (FX-P-56 sonrası yeşil) ──────

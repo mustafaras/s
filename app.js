@@ -4634,6 +4634,12 @@ function migrate(d){
   // FX-P-57: sesli rehberlik dil ve hız tercihleri.
   if(d.settings.voiceLang==null) d.settings.voiceLang='tr-TR';
   if(d.settings.voiceRate==null) d.settings.voiceRate=1;
+  // Bulut TTS (premium sinirsel sesler) — varsayılan AÇIK: kullanıcı istedi
+  // ki hep bulut sesi kullanılsın, yerel sese düşülmesin. openaiKey sanitize
+  // ile repoya asla gitmez (sync.js delete c.settings.openaiKey).
+  if(d.settings.voiceCloudTts==null) d.settings.voiceCloudTts=true;
+  if(d.settings.voiceCloudVoice==null) d.settings.voiceCloudVoice='shimmer';
+  if(d.settings.voiceLocalFallback==null) d.settings.voiceLocalFallback=false;
   d.version=2;
   return d;
 }

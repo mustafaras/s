@@ -221,19 +221,22 @@
       if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;
       // FX-P-52: quiet-time (23:00–07:00) penceresinde sesli rehberlik sessiz.
       if (isQuietTime()) return false;
-      // ── Bulut TTS önceliği: OpenAI anahtarı + voiceCloudTts açıksa sinirsel
-      // sesle oku; başarısızsa (ağ/hata) yerel TTS'e sessizce düş.
+      // ── Bulut TTS: anahtar varsa HER ZAMAN sinirsel ses kullanılır.
+      // Kullanıcı kararı: yerel sese düşme YOK (voiceLocalFallback=false ile
+      // sessizce atlanır; bulut başarısızsa ses çalmaz, robotik ses duyulmaz).
       if (CLOUD_TTS.enabled() && !opts.localOnly){
-        var self = this;
+        var allowFallback = !!(settings() && settings().voiceLocalFallback);
         try{ if (window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
         CLOUD_TTS.speak(text, opts, function(ok){
-          if (!ok && !opts.noFallback){
+          if (!ok && allowFallback && !opts.noFallback){
             try{ window.SeyAudio.speakLocal(text, opts); }catch(e){}
           }
         });
         return true;
       }
-      return window.SeyAudio.speakLocal(text, opts);
+      // Bulut ayarı yoksa: yalnız voiceLocalFallback=true ise yerel, aksi halde sessiz.
+      if (settings() && settings().voiceLocalFallback) return window.SeyAudio.speakLocal(text, opts);
+      return false;
     },
     // Yerel (tarayıcı) TTS — bulut kullanılamadığında yedek. FX-P-51 davranışı.
     speakLocal: function(text, opts){

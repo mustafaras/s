@@ -94,7 +94,7 @@
         <option value="fable">Fable · anlatıcı (erkek)</option>
       </select>
     </div>
-    <input type="password" id="oai-key" placeholder="sk-… (OpenAI anahtarı — yalnız bu oturumda)" style="border:1px solid rgba(180,150,160,.4);border-radius:12px;padding:10px;font-size:13px;outline:none;color:#4A3A3E;background:#fff;" oninput="setKey(this.value)">
+    <input type="password" id="oai-key" placeholder="sk-… (OpenAI anahtarı — bu sayfada kalıcı saklanır)" style="border:1px solid rgba(180,150,160,.4);border-radius:12px;padding:10px;font-size:13px;outline:none;color:#4A3A3E;background:#fff;" oninput="setKey(this.value)">
     <div class="state" id="cloud-state" style="font-size:12px;color:#7A6A70;"></div>
   </div>
 
@@ -119,8 +119,8 @@
   </div>
 
   <div class="group">
-    <h2>Sesli Rehberlik (Faz 5 · TTS)</h2>
-    <div class="note" style="margin:0;">Gerçek uygulamada sesli rehberlik Ayarlar'dan açılır. Bu demo sayfasında geçici olarak açık: <label style="font-weight:700;"><input type="checkbox" id="vg" onchange="toggleVG(this.checked)" checked> sesli rehberliği aç</label></div>
+    <h2>🎙️ Sesli Rehberlik (Faz 5 · Bulut TTS)</h2>
+    <div class="note" style="margin:0;">Hep bulut sesi kullanılır — yerel sese düşme yok. Anahtar bu sayfada kalıcı saklanır (yalnızca bu demo için, <code>localStorage</code>'da — gerçek uygulamada Ayarlar > Luna anahtarı kullanılır ve repoya asla gönderilmez).</div>
     <button class="btn" onclick="tts('Sevgili Günışığı, hoş geldin. Bugün neler hissediyorsun?')" id="t-onb"><span class="em">🌅</span><span>Onboarding karşılaması<small>"Sevgili Günışığı, hoş geldin…"</small></span></button>
     <button class="btn" onclick="tts('Harikasın! Serin büyüyor. Bu ritmi koru.')" id="t-str"><span class="em">🔥</span><span>Streak tebriği<small>"Harikasın! Serin büyüyor…"</small></span></button>
     <button class="btn" onclick="tts('Allah kabul etsin. Güzel bir mola vermek ister misin?')" id="t-zik"><span class="em">📿</span><span>Zikir tamamlama<small>"Allah kabul etsin…"</small></span></button>
@@ -157,7 +157,30 @@
     if (on && !k.value.trim()){ k.focus(); document.getElementById('cloud-state').textContent = '⚠️ önce OpenAI anahtarını gir (sk-…)'; setTimeout(function(){ document.getElementById('cloud').checked = false; }, 100); }
   }
   function setCloudVoice(v){ window.SeymaState.data.settings.voiceCloudVoice = v; }
-  function setKey(v){ window.SeymaState.data.settings.openaiKey = String(v || '').trim(); window.SeymaState.data.settings.voiceCloudTts = true; }
+  function setKey(v){
+    window.SeymaState.data.settings.openaiKey = String(v || '').trim();
+    window.SeymaState.data.settings.voiceCloudTts = true;
+    // Kalıcı: bu demo sayfasının localStorage'ında sakla (yalnız demo; gerçek
+    // uygulamada anahtar settings.openaiKey'te, sanitize ile repoya gitmez).
+    try{
+      if (String(v||'').trim()) localStorage.setItem('seyma_fx_demo_key', String(v).trim());
+      else localStorage.removeItem('seyma_fx_demo_key');
+    }catch(e){}
+  }
+  // Açılışta kayıtlı anahtarı geri yükle — her seferinde girmek gerekmez.
+  (function(){
+    try{
+      var saved = localStorage.getItem('seyma_fx_demo_key');
+      if (saved){
+        document.getElementById('oai-key').value = saved;
+        window.SeymaState.data.settings.openaiKey = saved;
+        window.SeymaState.data.settings.voiceCloudTts = true;
+        document.getElementById('cloud').checked = true;
+      }
+      var sv = localStorage.getItem('seyma_fx_demo_voice');
+      if (sv) document.getElementById('cloud-voice').value = sv;
+    }catch(e){}
+  })();
   // ── Ses & prosodi seçimi ──
   var _voice = null, _rate = 0.92, _pitch = 1.05;
   function fillVoices(){
@@ -217,14 +240,10 @@
   }
   function getSelVoice(){ var v = document.getElementById('voice-sel').value; return v ? [v] : undefined; }
   function tts(txt){
-    if(!document.getElementById('vg').checked){ document.getElementById('vg').closest('.note').style.outline='2px solid #E9AFC1'; return; }
-    var o = { lang: 'tr-TR', force: true, voiceNames: getSelVoice() };
-    if (document.getElementById('rate-sel')) o.rate = _rate;
-    if (document.getElementById('pitch-sel')) o.pitch = _pitch;
-    window.SeyAudio.voice(txt, o);
+    // Hep bulut sesi — checkbox yok, gating yok (demo sayfası).
+    speakDirect(txt);
   }
   function greet(){
-    if(!document.getElementById('vg').checked){ document.getElementById('vg').checked=true; toggleVG(true); }
     // Gerçek timeTheme modülünü yüklemeden sınıfı burada hesapla (aynı mantık).
     var h = new Date().getHours();
     var cls = (h>=5&&h<=8)?'theme-time-dawn':(h>=9&&h<=16)?'theme-time-day':(h>=17&&h<=20)?'theme-time-dusk':'theme-time-night';
@@ -235,10 +254,7 @@
       'theme-time-night': 'İyi geceler, Sevgili Günışığı. Huzurla dinlen.'
     };
     document.getElementById('saat').textContent = h + ':00 → ' + cls;
-    var o = { lang: 'tr-TR', force: true, voiceNames: getSelVoice() };
-    if (document.getElementById('rate-sel')) o.rate = _rate;
-    if (document.getElementById('pitch-sel')) o.pitch = _pitch;
-    window.SeyAudio.voice(map[cls], o);
+    speakDirect(map[cls]);
   }
   (function(){ var h=new Date().getHours(); document.getElementById('saat').textContent=h+':00'; })();
   // Sessiz zaman (23:00-07:00) uyarısı

@@ -94,6 +94,15 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] Quiet-time guard 23:00–07:00 çalışıyor (`SeyAudio.isQuietTime`; voice + ambient engelli, haptics/görsel FX etkilenmez)
 - [x] Voice guidance test fixture PASS (`tests/app/test_premium_voice.js` — gerçek `mediaFx.js` VM'de yüklenir; API yüzeyi + gating + quiet-time + guides + greeting + ambient gating + statik app.js çağrı noktaları, 58/58)
 - [x] FX-LIBRARY.md ses/sesli rehberlik kataloğu güncellendi (§3.9 + sessiz zaman matrisi)
+- [x] Bulut TTS motoru eklendi (kullanıcı talebi sonrası: OpenAI `gpt-4o-mini-tts` sinirsel sesler; `voiceCloudTts=true` varsayılan, `voiceLocalFallback=false` — robotik yerel sese düşme yok; anahtar `settings.openaiKey` üzerinden, sanitize ile repoya gitmez)
+
+## Dalga 6 Ayarlar (FX-P-65 — Faz 6 kapanış)
+
+- [x] Premium Atmosfer master switch UI uygulandı (FX-P-61: Ayarlar kartı + 5 alt FX satırı + `App.toggleSetting` beyaz liste toggle'ı; master kapalıyken alt satırlar kilitli)
+- [x] Settings persistence ve gating testleri PASS (`tests/app/test_premium_settings.js` — 31/31: SeyFx/SeyAudio/ambient/timeTheme/haptics gating matrisi + bulut-önce voice kontratı + app.js statik yüzey + persistence simülasyonu)
+- [x] Reduced-motion ve accessibility uyumu uygulandı (FX-P-63: global `#root *` reduced-motion CSS emniyet ağı + FX satır butonlarına `aria-pressed` + `aria-label`)
+- [x] Panel senkronizasyonu güncellendi (FX-P-64: `panelCoverageManifest.js` settings tracked alanlarına 7 premium FX toggle'ı eklendi; `p3SettingsSummaryP` Türkçe etiketlerle görüntülüyor; secrets hâlâ redakte)
+- [x] Full regression suite PASS (23 panel + 27 panel-v2 + quran + reminders + 13 app fixture + 7 syntax — tümü exit=0; App.* 705, tek app.js)
 
 ## Dokümantasyon
 

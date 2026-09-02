@@ -1,9 +1,27 @@
 # Şeyma Premium FX Planı
 
 **Proje:** Şeyma 🦩 uygulaması için premium görsel ve işitsel efekt yükseltme planı.
-**Kapsam:** Sadece plan ve belgeler; uygulama kodu (`/Users/m_ras/Desktop/seyma`) bu klasörde değiştirilmeyecek.
-**Durum:** Plan/spec/test aşaması tamamlandı; uygulama koduna henüz dokunulmadı. Kullanıcı onayı bekleniyor.
-**Kural:** Uygulama aşamasında (`Faz -1`…`Faz 6`) tüm commitler sadece yerel kalır. Detaylar için [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
+**Kapsam:** Plan + uygulama; uygulama kodu (`/Users/m_ras/Desktop/seyma`) `premium-fx-local` dalında güncellendi.
+**Durum:** 🟢 **Implementation tamamlandı** — Faz −1.1 (modüler çekirdek) + 6 ana dalga (Audio, Haptics, Visual FX, Time theme, Voice guidance, Ayarlar) + bulut TTS eklentisi uygulandı; FX-P-70 tam denetimi "DEPLOY-A-HAZIR" kararı verdi. Dalga 7 (kapatma) yürütülüyor. Deploy/push **yapılmadı**.
+**Kural:** Tüm commitler sadece yerel kalır. Detaylar için [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md).
+
+## Implementation Status
+
+| Aşama | Durum |
+|-------|-------|
+| Faz −1.1 — modüler çekirdek (`app/core/*`, B1 canlı getter) | ✅ |
+| Faz 0 — master switch iskeleti + migrate backfill | ✅ |
+| Faz 1 — Audio (tap/success/warning/bell) | ✅ |
+| Faz 2 — Haptics (6 desen, 17+ nokta) | ✅ |
+| Faz 3 — Visual micro-FX (ripple/shimmer/count-up/enter) | ✅ |
+| Faz 4 — Time theme (dawn/day/dusk/night + mevsimsel) | ✅ |
+| Faz 5 — Voice guidance (TTS + guides + greeting + ayarlar + **bulut TTS**) | ✅ |
+| Faz 6 — Ayarlar master switch + panel + a11y | ✅ |
+| Faz 6.5 — FX-P-70 tam denetim | ✅ (DEPLOY-A-HAZIR) |
+| Faz 7 — Kapatma (doküman senkronu, cache-bump, handoff) | 🟡 yürütülüyor |
+| Deploy/push | ⛔ kullanıcı onayı bekleniyor |
+
+Bağımsız denetim raporu: [deliverables/FX-VERIFY-RAPORU.md](deliverables/FX-VERIFY-RAPORU.md) — tüm dalgalar kanıtlandı, ~70 fixture sıfır FAIL.
 
 ## Bu Klasörü Okuyan Ajan İçin Context Yükü Sırası
 

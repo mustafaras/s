@@ -1,8 +1,23 @@
 # Şeyma Premium FX Planı — Devam Eden İşler
 
 **Tarih:** 2026-09-02
-**Durum:** Faz 5 (Sesli rehberlik) TAMAMLANDI (FX-P-51…FX-P-58). Sıradaki **Dalga 6 / FX-P-61** (Ayarlar & ana anahtar arayüzü) — ayrı kullanıcı onayı bekliyor.
-**Kural:** Plan aşamasında uygulama koduna dokunulmuyor. Uygulama aşamasında tüm commitler sadece yerel kalır ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
+**Durum:** 🟢 **IMPLEMENTATION TAMAMLANDI** — Dalga −1…6 + FX-P-70 denetimi (DEPLOY-A-HAZIR) + Dalga 7 kapatma (FX-P-71…74) tamamlandı. Tüm commitler `premium-fx-local` dalında **yerel**; push/merge/deploy kullanıcı onayı bekliyor ([LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).
+
+## Sonraki Adımlar (kullanıcı için)
+
+1. **Gözden geçirme:** `premium-fx-local` dalını gözden geçir; Ayarlar > "✨ Premium Atmosfer" kartından FX'leri deneyin; ses deneme sayfası (`premium-fx-plan/assets/ses-deneme.html`) ile bulut sesleri duyun.
+2. **İstenirse küçük UI polish:** renk tonu, metin, ses varyantı (varsayılan Shimmer — Coral/Marin vb. tercih edilebilir).
+3. **Merge kararı:** `premium-fx-local` → `main` merge ÖNCE tam regression'ın son bir kez çalıştırılması ve **kullanıcı onayı** ile yapılır. Push/deploy `LOCAL-ONLY-IMPLEMENTATION.md` kuralına tabidir.
+
+## Before Merge Checklist
+
+- [ ] Kullanıcı UI/UX gözden geçirmesi yaptı
+- [ ] Son full regression suite çalıştırıldı (FX-P-70 raporu: sıfır FAIL)
+- [ ] `LOCAL-ONLY-IMPLEMENTATION.md` kuralları okundu
+- [ ] Kullanıcı merge onayı verdi
+- [ ] (opsiyonel) FX-P-66/67 ertelenen zenginleştirmeleri isteniyorsa uygula
+
+**Yasak (onaysız):** `git push`, `gh pr create`, deploy pipeline tetikleme, `seyma-data` reposuna yazma.
 
 ## Tamamlananlar
 
@@ -59,7 +74,10 @@
 27. [x] **FX-P-56:** Zaman dilimi selamlaması — `SeyAudio.greeting()` (dawn/day/dusk/night); `maybeVoiceGreeting()` boot (2.2sn) + foreground'da, 4 saat throttle + günde max 2. Yerel commit, push yok.
 28. [x] **FX-P-57:** Sesli rehberlik ayarları UI — Ayarlar kartı (toggle + dil select + hız slider), `App.setVoiceGuidance/setVoiceLang/setVoiceRate`, `SeyAudio.voice()` settings defaults (voiceLang/voiceRate backfill). Yerel commit, push yok.
 29. [x] **FX-P-58 (Faz 5 kapanışı):** FX-LIBRARY.md §3.9 voice catalog + quiet-time matrisi; REVIEW-CHECKLIST Faz 5 final satırları; tüm premium fixture + sync/panel/panel-v2/quran/reminders regression PASS (58/58 voice dahil). Yerel commit, push yok.
-30. [ ] **Dalga 6 — FX-P-61:** `App.toggleSetting()` güvenli wrapper'ı (ayrı kullanıcı onayı bekliyor).
+30. [x] **Dalga 6 — FX-P-61:** `App.toggleSetting()` güvenli wrapper'ı + Premium Atmosfer master switch UI (kullanıcı onayı alındı).
+31. [x] **FX-P-62:** Ayarlar persistence/gating fixture (31/31). **FX-P-63:** reduced-motion global ağı + aria-pressed/aria-label. **FX-P-64:** panel settings senkronu (manifest + P3 özeti). **FX-P-65:** Faz 6 full regression + kapanış.
+32. [x] **FX-P-70:** Dalga −1…6 tam denetim — FX-VERIFY-RAPORU: DEPLOY-A-HAZIR (sıfır FAIL).
+33. [x] **Dalga 7 (FX-P-71…74):** Doküman senkronu, anti-amnesia final, CODE-MAP mimari kararları, LOCAL-ONLY kapanış özeti. Implementation tamamlandı.
 21. [x] CURRENT-STATE.md ve LEDGER.md uygulama ilerledikçe güncellendi (Faz 5 kapanışı dahil).
 
 ## Kısıtlamalar

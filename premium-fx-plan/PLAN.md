@@ -173,3 +173,25 @@ Bu modüller `app.js` IIFE'sine `window.SeyAudio`, `window.SeyHaptics` olarak ex
 - [FX-LIBRARY.md](FX-LIBRARY.md) — ses/hareket parametre kataloğu.
 - [MODULARIZATION.md](MODULARIZATION.md) — `app.js` bölme stratejisi.
 - [SAFEGUARDS.md](SAFEGUARDS.md) — veri güvenliği ve erişilebilirlik kuralları.
+
+---
+
+## 10. Uygulama Durumu (2026-09-02 — FX-P-74 itibarıyla)
+
+- [x] Faz −1.1 — modüler çekirdek: `app/core/{constants,dateUtils,helpers,mediaFx,timeTheme,state,syncGlue}.js` + B1 canlı getter'lar (FX-P-01…04)
+- [x] Faz 0 — `migrate()` premium FX settings backfill + `mediaFx.js` API yüzeyi (FX-P-05…06)
+- [x] Faz 1 — Audio: tap/success/warning/bell + zikir/streak/kafein/Luna entegrasyonları (FX-P-11…16)
+- [x] Faz 2 — Haptics: 6 desen + 17+ çağrı noktası (FX-P-21…24)
+- [x] Faz 3 — Visual micro-FX: ripple/shimmer/count-up/enter/transition + performans audit (FX-P-31…38)
+- [x] Faz 4 — Time theme: saat dilimleri + mevsimsel renkler (FX-P-41…44)
+- [x] Faz 5 — Voice guidance: TTS + isQuietTime + guides + greeting + ayarlar + **bulut TTS (OpenAI sinirsel sesler, yerel sene düşme yok)** (FX-P-51…58; 52–58 kullanıcı turunda tamamlandı)
+- [x] Faz 6 — Ayarlar master switch + settings fixture + a11y + panel senkronu + full regression (FX-P-61…65)
+- [x] Faz 6.5 — FX-P-70 tam denetim: FX-VERIFY-RAPORU → DEPLOY-A-HAZIR
+- [x] Faz 7 — Kapatma: doküman senkronu, anti-amnesia final, CODE-MAP kararları, LOCAL-ONLY özeti (FX-P-71…74)
+
+## 10. Erteleme / Kapsam Dışı
+
+- **FX-P-66/67** (A/B toggle kopya deneyi, launch-ritual genişletmesi): kataloğda FX-P-65 "kapanış" promptundan SONRA sıralı; kapsamları 61–65'te karşılandığından **isteğe bağlı** olarak ertelendi. İstenirse ayrı promptlarla uygulanır.
+- **Panel-v2 Premium FX badge'leri:** panel.html (P3) settings özeti eklendi; panel-v2 dokunulmadı (ayrı premium yüzey).
+
+**Kural (hatırlatma):** Tüm commitler `premium-fx-local` dalında **yerel** kalır; push/merge/deploy kullanıcı onayı gerektirir (bkz. [LOCAL-ONLY-IMPLEMENTATION.md](LOCAL-ONLY-IMPLEMENTATION.md)).

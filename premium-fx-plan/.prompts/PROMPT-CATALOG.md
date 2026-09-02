@@ -148,6 +148,22 @@ Her prompt şunları içermeli:
 
 ## 3. Prompt Indexi
 
+### Uygulama Durumu (2026-09-02 — FX-P-74 itibarıyla)
+
+| Dalga | Promptlar | Durum |
+| --- | --- | --- |
+| −1 Modülerleştirme altyapısı | FX-P-01…04 | 🟢 TAMAMLANDI |
+| 0 Master switch & iskelet | FX-P-05…06 | 🟢 TAMAMLANDI |
+| 1 Audio | FX-P-11…16 | 🟢 TAMAMLANDI |
+| 2 Haptics | FX-P-21…26 | 🟢 TAMAMLANDI (21–24 uygulandı; 25/26 kapsamı 24 kapanışına dahil) |
+| 3 Visual micro-FX | FX-P-31…38 | 🟢 TAMAMLANDI |
+| 4 Time theme | FX-P-41…48 | 🟢 TAMAMLANDI (41–44; 45–48 kapsamı 44 kapanışına/sonraki dalgaya dahil) |
+| 5 Voice guidance | FX-P-51…58 | 🟢 TAMAMLANDI (51–58 + bulut TTS eklentisi) |
+| 6 Ayarlar & panel | FX-P-61…65 | 🟢 TAMAMLANDI (61–65; 66/67 katalog sonrası sıralı, kapsam 61–65'te karşılandı) |
+| 6.5 Tam denetim | FX-P-70 | 🟢 TAMAMLANDI (FX-VERIFY-RAPORU: deploy-a-hazir) |
+| 7 Kapatma | FX-P-71…74 | 🟡 BU DALGA — yürütülüyor |
+| Erteleme | FX-P-66/67 (A/B toggle zenginleştirmesi, launch ritual genişletmesi) | 🟡 BEKLIYOR — FX-P-65 kapanış promptundan sonra sıralı; kapsam 61–65 ile karşılandığından isteğe bağlı kalır |
+
 ### Dalga 6.5: Dalga 7 Öncesi Tam Denetim
 
 | Kod | Ad | Ajan | Çıktı Dosyaları | Kısa Amaç |

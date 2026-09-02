@@ -9,15 +9,15 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-01 tamamlandı |
+| Durum | `in_progress` — MON-02 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-01` / `MON-02` |
-| Dalga / ilerleme | 1 / 1/60 |
-| Dal | `premium-fx-local` — LOCAL-ONLY |
+| Son / sıradaki | `MON-02` / `MON-03` |
+| Dalga / ilerleme | 1 / 2/60 |
+| Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-02 |
 
-**Bağlayıcı durak:** `MON-01` yalnız karar/baseline promptu olarak tamamlandı;
-üretim kodu taşınmadı. `MON-02` yeni açık kullanıcı onayı olmadan başlamaz.
+**Bağlayıcı durak:** `MON-02` yalnız ölçüm/manifest promptu olarak tamamlandı;
+üretim kodu taşınmadı. `MON-03` yeni açık kullanıcı onayı olmadan başlamaz.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -38,24 +38,44 @@ tamamlanan promptların gerçek kaydıyla güncellenir.
 - Kod/harness/index/sync/panel/content/veri değişmedi. Bu yalnız yerel,
   başsız kaynak kanıtıdır; deploy veya cihaz kabulü değildir.
 
-## Canlı baseline (2026-09-02)
+## Canlı baseline (2026-09-02, ZP-10 sonrası — MON-02 güncellemesi)
+
+> MON-01 baseline'ı ZP-10 (`cf88f83`) öncesi dosyaya aittir; satır numaraları
+> kaymıştır. Bu tablo `MON-S2-FX-HANDLER-MANIFESTI.md` ile senkronizedir.
 
 Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapılır.
 
 | Çıpa | Canlı değer | Koruma |
 |---|---:|---|
-| `app.js` | 18.957 satır, IIFE sonu 18.957 | tek IIFE geçiş boyunca korunur |
-| `var data=null` | 2713 | M2, app.js sahibi |
-| yükleme / migrate | 4415 / 4416 | M2, app.js sahibi |
-| B1 getter'ları | 4424–4430, yedi getter | canlı bağ köprüsü |
-| `migrate` / `getDay` | 4431 / 4964 | MON-11..15 yüksek risk |
-| geçici `data=d` | 6079 | `finally` geri dönüşü korunur |
-| `save` / `var App` | 6271 / 6456 | MON-16..18 / MON-50..54 |
-| `createDefaultData` | 6726 | MON-13..15 |
-| import / reset / unlock | 9266 / 9270 / 9296 | M2prime, app.js'te kalır |
-| `window.App=App` | 17021; atamalar sonra da sürer | I2, erken taşınmaz |
-| late-boot guard | 18857 | M2, app.js'te kalır |
-| `App.x=function` | 545 | baseline, her promptta değişmezlik kanıtı |
+| `app.js` | 19.247 satır, IIFE sonu 19.247 | tek IIFE geçiş boyunca korunur |
+| `var data=null` | 2772 | M2, app.js sahibi |
+| yükleme / migrate | 4474 / 4475 | M2, app.js sahibi |
+| B1 getter'ları | 4483 civarı, yedi getter | canlı bağ köprüsü |
+| `migrate` / `getDay` | 4490 / 5023 | MON-11..15 yüksek risk |
+| geçici `data=d` + finally | 6138 | `finally{data=savedData}` zinciri korunur |
+| `SeyOnSyncState` / `SeyOnSynced` | 6299 / 6309 | M3, app.js sahipliği |
+| `save` / `var App` | 6330 / 6515 | MON-16..18 / MON-50..54 |
+| `createDefaultData` / `App.start` | 6785 / 6789 | MON-13..15 |
+| import / reset / late-boot data= | 9460 / 9464 / 19147 | M2prime, app.js'te kalır |
+| `window.App=App` | 17311; atamalar sonra da sürer | I2, erken taşınmaz |
+| `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
+| inline onclick | satır 385 / occurrence 423 / eşsiz 326 | I2 için üç ayrı görünüm ölçüsü |
+| FX satır / occurrence | SeyAudio 27/53, SeyHaptics 21/42, SeyFx 2/4, SeyTimeTheme 2/2 | M4, 48 satır tablo MANIFESTI.md §4.2 |
+
+## MON-02 kapanışı — FX/handler manifesti
+
+- Manifest: [`../deliverables/MON-S2-FX-HANDLER-MANIFESTI.md`](../deliverables/MON-S2-FX-HANDLER-MANIFESTI.md).
+- Baseline bayatlığı ZP-10 delta mutabakatıyla çözüldü: FX +2 occurrence
+  tek yeni satırdır (`App.saveZikrManual` içi hatim `SeyAudio.bell`, 8996).
+- Üç ölçüm metodu ayrı kaydedildi: satır/occurrence/eşsiz-ad karıştırılmaz.
+- 48 FX satırının sahiplik fonksiyonu + guard türü tabloya bağlandı;
+  gelecek registry'lerin FX modüllerini yeniden tanımlama/sarma yasağı
+  MON-S2 kararı olarak kilitlendi.
+- Manuel zikir yüzeyi (9 App handler + 9 serbest fonksiyon +
+  `data.zikr.manualEntries`) zikir domainine sahiplendi; MON-02'de yalnız
+  ölçüldü. `sync.js mergeZikr` V5 union matematiği I5 altında dokunulmaz.
+- 12 doğrulama kapısı tümü PASS; kod, index, harness, fixture, data,
+  browser, remote ve deploy değişmedi.
 
 ## Mevcut yükleme ve harness gerçeği
 
@@ -85,10 +105,14 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 ## Premium FX mirası
 
 `FX-SERI-KAPANIS-BELGESI.md` tamamlanmış LOCAL-ONLY serinin kaynağıdır.
-`SeyAudio` (app.js'te 26 nitelikli referans), `SeyHaptics` (21),
-`SeyTimeTheme` (2), `SeyFx` (2) çağrılarının adı, guard biçimi ve kullanıcı
-ayar anlamı korunur. Her kod dalgası `test_premium_*.js` ailesini çalıştırır.
-FX-P-66/67 ertelenmiştir; bu serinin kapsamı değildir.
+MON-02 manifesti 48 çağrı satırını sahiplik fonksiyonu + guard türüyle
+sabitledi (`MON-S2-FX-HANDLER-MANIFESTI.md` §4): `SeyAudio` (27 satır / 53
+occurrence), `SeyHaptics` (21/42), `SeyTimeTheme` (2/2), `SeyFx` (2/4)
+çağrılarının adı, guard biçimi ve kullanıcı ayar anlamı korunur. MON-S2
+kararı: gelecekteki herhangi bir `window.Seyma<Module>` registry'si FX
+modüllerini yeniden tanımlayamaz/sarmalayamaz. Her kod dalgası
+`test_premium_*.js` ailesini çalıştırır. FX-P-66/67 ertelenmiştir; bu
+serinin kapsamı değildir.
 
 ## Değişmez kararlar ve tuzaklar
 
@@ -101,5 +125,6 @@ FX-P-66/67 ertelenmiştir; bu serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-Kullanıcı uygulamaya açıkça onay verirse `MON-01`: canlı ön-uçuş +
-`deliverables/MON-S1-...` karar taslağı. Aksi halde bu durum değişmez.
+Kullanıcı uygulamaya açıkça onay verirse `MON-03`: 24 modül sahiplik ve
+yükleme matrisi (`deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md`). Aksi
+halde bu durum değişmez.

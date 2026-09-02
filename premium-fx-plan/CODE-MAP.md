@@ -371,3 +371,41 @@ Bu belge, FX planının uygulanacağı gerçek fonksiyon/satır noktalarını e�
 - Yeni ses/haptik modülleri `window.SeyAudio` / `window.SeyHaptics` olarak expose edilecek.
 - Tüm yeni `settings.*` anahtarları `migrate()` ile varsayılan değer alacak.
 - Mevcut CSS keyframes (`seyPop`, `seyFloatIn`, `seyShine`, `seyAurora`, `seyRoomGlow`, `seyWordSheen`, `seySynapseDrift`) önce tüketilecek; yalnızca gerçekten yeni hareket gerekirse eklenecek.
+
+---
+
+## 18. Uygulanan Premium FX Modülleri (Faz −1…6 sonrası — FX-P-73)
+
+Uygulama tamamlandığında kod tabanına giren modüller ve yüzeyleri. Tümü `window.*` altında expose edilen IIFE modüllerdir.
+
+| Modül | Sorumluluk (tek cümle) | Dışa açılan API | Bağımlılıklar | Tüketiciler |
+|-------|------------------------|-----------------|---------------|-------------|
+| `app/core/mediaFx.js` | Tüm premium efekt motorunu (ses/haptic/görsel/voice/ambient/bulut TTS) tek gating çatısında barındırır | `window.SeyAudio` (tap/success/warning/bell/voice/isVoiceEnabled/isQuietTime/greeting/speakLocal/cloudTts*/guides×5/ambient.start/stop/isSupported/isEnabled/isPlaying/currentType/ctx), `window.SeyHaptics` (tap/success/error/refresh/streak/water), `window.SeyFx` (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/isSoundAllowed/countUp/ripple/shimmer/enter/transition) | `window.SeymaState.data.settings`, `window.speechSynthesis`, `navigator.vibrate`, Web Audio API, OpenAI TTS API (bulut, opsiyonel) | `app.js` (17 haptic, 10+ audio, 5 voice noktası), `tests/app/test_premium_*.js`, `ses-deneme.html` |
+| `app/core/timeTheme.js` | Saate ve mevsime göre `#root` tema sınıflarını (dawn/day/dusk/night + 4 mevsim + özel günler) yönetir | `window.SeyTimeTheme` (classForHour/apply/seasonalClass/applySeasonal) | `window.SeymaState.data.settings.premiumAtmosphere`, `HijriCalendarV1` (ramazan) | `app.js` render() sonunda guard'lı çağrı, `tests/app/test_premium_time_theme.js` |
+| `app/core/state.js` | `data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save` closure'larını B1 canlı getter'ları üzerinden dışarıya okur | `window.SeymaState` (data/ui/dark/migrate/getDay/createDefaultData), `window.SeymaSave` | `app.js` canlı getter tanımları (FX-P-05) | `mediaFx.js`, `timeTheme.js`, tüm premium fixture'lar |
+| `app/core/syncGlue.js` | Sync olay köprülerini (`SeyOnSyncState`/`SeyOnSynced`) yumuşak bağ ile sunar | `window.SeyOnSyncState`, `window.SeyOnSynced` | `app.js` (gerçek tanımlar app.js'te kalır) | `sync.js`, panel |
+| `app/core/dateUtils.js` / `helpers.js` | Ortak tarih ve yardımcı fonksiyonları monolit dışına taşır (B1 canlı-getter yüzeyine hizalı) | `window.SeymaDateUtils`, `window.SeymaHelpers` | constants.js, state.js | Faz −1 boundary testleri, ilerideki modülerleştirme PR'ları |
+
+### Voice/Audio yüzeyi özeti (bulut-önce mimari — kullanıcı kararı)
+
+- `SeyAudio.voice(text, opts)`: `premiumAtmosphere && voiceGuidance && !quiet-time` gating'i; `voiceCloudTts=true` + `settings.openaiKey` varsa **OpenAI TTS** (`gpt-4o-mini-tts`, sinirsel ses — varsayılan `shimmer`) ile okur; **`voiceLocalFallback=false` iken asla robotik yerel sene düşmez** (başarısızlıkta sessiz kalır).
+- `SeyAudio.speakLocal`: yalnız `voiceLocalFallback=true` iken devreye giren yerel Web Speech yedeği.
+- Quiet-time (23:00–07:00) hem voice hem ambient'i engeller; haptics/görsel FX etkilenmez.
+- `settings.openaiKey` `sync.js sanitize()` ile repoya asla gitmez.
+
+## 19. Decisions (Mimari Kararlar — FX-P-73)
+
+**D1 · Neden IIFE + `window.*` global modül paternini koruduk?**
+Şeyma bilinçli olarak paketleyici/build adımı olmayan statik GitHub Pages uygulaması. ES module'ler `type="module"` scope'u ve CORS kısıtları gerektirir; classic script + IIFE + `window.*` expose, hem `node --check` ile syntax doğrulamayı hem de `node:vm` headless fixture'larla modül başına testi mümkün kılar. Modülerleştirme (Faz −1.1+) bu paternin *içinde* dosya bölerek ilerler; davranış/yükleme sırası değişmez.
+
+**D2 · Neden settings gating tüm FX'lerin ortasında?**
+Tek doğruluk kaynağı `data.settings` olduğundan her efekt motoru girişinde tek noktadan sorgulanır (`isPremiumFxEnabled` → `premiumAtmosphere` + `prefers-reduced-motion`; dal bazlı ekstra: `uiSounds`/`richHaptics`/`ambientSounds`/`voiceGuidance`). Böylece master switch kapatıldığında ek koşulsuz kod olmadan tüm FX'ler sessizleşir ve A/B/ayar değişiklikleri anında tüm yüzeylere yayılır.
+
+**D3 · Neden ses + haptic + görsel FX tek dosyada (`mediaFx.js`)?**
+Üçünün de davranışı aynı karar ağacına bağlı (premium master switch, reduced-motion, quiet-time ayrımı). Tek dosya: (1) gating'i kopyalamayı engeller, (2) AudioContext'i tek paylaşır (iOS Safari limiti), (3) fixture'ların tek VM yükleme noktası olur. Dosya ~350 satırdadır; bölüm başlıklarıyla okunabilir kalır.
+
+**D4 · Bulut TTS neden varsayılan açık ve yerel sene düşüş kapalı?**
+Kullanıcı kararı (2026-09-02): yerel sistem sesleri (Yelda) robotik algılanıyor; ChatGPT kalitesi yalnız sinirsel bulut sesiyle mümkün. `voiceCloudTts=true` + `voiceLocalFallback=false` → bulut başarısızsa ses sessiz kalır, çirkin ses asla duyulmaz. Anahtar `settings.openaiKey` (Luna ile paylaşımlı), `sync.js sanitize()` repoya çıkışını engeller.
+
+**D5 · Neden canlı getter (B1)?**
+`data` mutable bağlamdır ve 6+ kez yeniden atanır; tek seferlik `window.data = data` bayat referans bırakırdı. `Object.defineProperty(window,'data',{get})` her okumada taze değer verir ve mevcut fonksiyon davranışını hiç değiştirmez — modüller ile monolit arasındaki köprü budur.

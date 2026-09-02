@@ -322,3 +322,29 @@ Object.defineProperty(window, 'SeymaSave', {
 ## 7. Sonraki Adımlar
 
 Bu rehber onaylandıktan sonra PR -1.1 ile başlanabilir. PR -1.1’de uygulama kodu değişir ama davranış değişmez; sadece yeni modüller eklenir ve test edilir.
+
+---
+
+## UYGULAMA SONRASI DOĞRULAMA (FX-P-73 — 2026-09-02)
+
+Aşağıdaki API imzaları uygulandığı haliyle teyit edilmiştir; testler bu imzaları kilitlemektedir.
+
+| API | İmza | Dönüş | Gating |
+|-----|------|-------|--------|
+| `SeyAudio.voice(text, opts?)` | opts: `{lang?, rate?, pitch?, volume?, force?, voiceNames?, localOnly?, noFallback?, cloudVoice?}` | `boolean` (tetiklendi=true) | premium && voiceGuidance && !quiet-time; bulut (voiceCloudTts+openaiKey) öncelikli, `voiceLocalFallback=false` iken yerel düşüş YOK |
+| `SeyAudio.speakLocal(text, opts?)` | Web Speech fallback (yalnız voiceLocalFallback=true iken voice() içinden) | `boolean` | speechSynthesis varlığı |
+| `SeyAudio.isVoiceEnabled()` / `isQuietTime(h?)` | h==null → gerçek saat | `boolean` | voiceGuidance && speechSynthesis / 23:00–07:00 |
+| `SeyAudio.greeting()` | param yok | `boolean` | voice gating + SeyTimeTheme |
+| `SeyAudio.guides.{zikirStart,zikirHalf,zikirComplete,suraOpen(name),suraBookmark}` | — | `boolean` (delege: voice) | voice gating |
+| `SeyAudio.cloudTtsEnabled/cloudTtsSpeak(text,opts,onDone)/cloudTtsStop/cloudTtsPlaying` | opts: `{cloudVoice?, rate?, volume?}` | `boolean` / void | voiceCloudTts && openaiKey |
+| `SeyAudio.ambient.{start(type,url?),stop,isSupported,isEnabled,isPlaying,currentType,voiceBusy}` | type: rain/wave/ney/nakar/birds/breeze/crickets; url opsiyonel `<audio>` fallback | `boolean`/`string` | premium && ambientSounds && !quiet-time && !voice.speaking |
+| `SeyHaptics.{tap,success,error,refresh,streak,water}` | — | void (vibrate yoksa no-op) | richHaptics && premium && !reduced-motion (+legacy `haptics===false` kapısı) |
+| `SeyFx.{isPremiumFxEnabled,prefersReducedMotion,shouldAnimate,ambientAllowed,isSoundAllowed}` | — | `boolean` | premium master + reduced-motion |
+| `SeyFx.{countUp,ripple,shimmer,enter,transition}` | bkz. FX-LIBRARY §3.8 | void/DOM | premium && !reduced-motion |
+| `SeyTimeTheme.{classForHour(h?),apply,seasonalClass(d?),applySeasonal(d?)}` | h/d verilmezse gerçek zaman | `string`/`void` | premiumAtmosphere (apply/applySeasonal) |
+| `App.toggleSetting(key)` | key beyaz liste: premiumAtmosphere/uiSounds/richHaptics/launchRitual/voiceGuidance/ambientSounds/voiceCloudTts | void (save+render) | — (I2 ekleme) |
+| `App.setVoiceGuidance(on)` / `setVoiceLang(lang)` / `setVoiceRate(rate)` | lang: tr-TR/en-US/ar-SA; rate clamp 0.75–1.5 | void | — (I2 ekleme) |
+
+**Settings alanları (tümü `data.settings.*`, migrate backfill'li, additive):** premiumAtmosphere, uiSounds, voiceGuidance, ambientSounds, richHaptics, launchRitual, voiceCloudTts (default true), voiceLocalFallback (default **false** — yerel sene düşme yok), voiceCloudVoice (default 'shimmer'), voiceLang (default 'tr-TR'), voiceRate, voicePitch, voiceVoiceName, voiceOnboardedAt, lastVoiceGreetingAt, voiceGreetingDate/Count, voiceStreakDate, voiceZikrDate.
+
+**Panel görünürlüğü:** `panelCoverageManifest.js` settings.tracked içinde yukarıdaki toggle boolean'ları preference_toggle olarak izinli; `openaiKey`/`ghToken` redacted kalmaya devam eder.

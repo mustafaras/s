@@ -53,7 +53,9 @@ var expectedModules = [
   ok('SeyHaptics.streak çağrı noktası var (FX-P-23)', appSrc.indexOf('SeyHaptics.streak') >= 0);
   ok('SeyHaptics.water çağrı noktası var (FX-P-23)', appSrc.indexOf('SeyHaptics.water') >= 0);
   // Diğer yeni modüller henüz App.* içinde çağrılmıyor (davranış değişmez).
-  ok('SeyTimeTheme henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeyTimeTheme') < 0);
+  // FX-P-42: SeyTimeTheme artık app.js render() sonunda güvenli guard ile
+  // çağrılıyor (onaylı entegrasyon); eski "henüz çağrılmıyor" kontratı bayat.
+  ok('SeyTimeTheme guard\'lı çağrı noktası var (FX-P-42)', appSrc.indexOf('window.SeyTimeTheme && typeof window.SeyTimeTheme.apply') >= 0);
   ok('SeymaDateUtils henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaDateUtils') < 0);
   ok('SeymaHelpers henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaHelpers') < 0);
 })();

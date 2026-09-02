@@ -4620,6 +4620,14 @@ function migrate(d){
   if(d.settings.ambientSounds==null) d.settings.ambientSounds=false;
   if(d.settings.richHaptics==null) d.settings.richHaptics=true;
   if(d.settings.launchRitual==null) d.settings.launchRitual=true;
+  // FX-P-52/56 (Faz 5): sesli rehberlik state alanları — additive backfill,
+  // idempotent. Yalnızca settings.* altına eklenir; data şekli değişmez (I1/I3).
+  if(d.settings.voiceOnboardedAt==null) d.settings.voiceOnboardedAt='';
+  if(d.settings.lastVoiceGreetingAt==null) d.settings.lastVoiceGreetingAt='';
+  if(d.settings.voiceGreetingDate==null) d.settings.voiceGreetingDate='';
+  if(d.settings.voiceGreetingCount==null) d.settings.voiceGreetingCount=0;
+  if(d.settings.voiceStreakDate==null) d.settings.voiceStreakDate='';
+  if(d.settings.voiceZikrDate==null) d.settings.voiceZikrDate='';
   d.version=2;
   return d;
 }
@@ -6714,6 +6722,18 @@ App.start=function(){
   data=migrate(createDefaultData());
   if(window.MotivationProgramV2 && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
   ui.forceStart=false; ui.tab='bugun'; commit('Hadi başlayalım'); reminderSchedulerDispatch('boot');
+  // FX-P-52: onboarding sonrası nazik sesli karşılama. Yalnızca bir kez
+  // (settings.voiceOnboardedAt damgası ile), voiceGuidance kapalıysa veya
+  // quiet-time'da sessizce atlanır (SeyAudio.voice zaten false döner).
+  try{
+    if(data && data.settings && !data.settings.voiceOnboardedAt){
+      data.settings.voiceOnboardedAt=new Date().toISOString();
+      if(window.SeyAudio && typeof window.SeyAudio.voice==='function'){
+        window.SeyAudio.voice('Sevgili Günışığı, hoş geldin. Bugün neler hissediyorsun?', { lang:'tr-TR', rate:1 });
+      }
+      save(false);
+    }
+  }catch(e){}
 };
 App.go=function(id){
   // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
@@ -8311,7 +8331,8 @@ App.explainDerivedHabit=function(key,day){
   else { msg=derivedProgText(key,p)||'Bu tik otomatik — ilgili veriyi girince kendiliğinden yeşillenir.'; }
   toast(msg,2800);
 };
-function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); if(big[s]) confetti(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ setTimeout(function(){ var el=document.querySelector('.sey-streak-area')||document.getElementById('app'); if(el) window.SeyFx.shimmer(el); },250); } setTimeout(function(){ toast(m[s],2800); },300); } }
+function maybeStreak(){ var s=currentStreak(); var m={3:'3 gün oldu. Ritim kendini belli ediyor.',7:'7 gün. Bu artık tesadüf değil.',14:'14 gün. Tatlı lobisi toplantı yapıyor olabilir.',21:'21 gün! İlk büyük eşik.',30:'30 gün. Bir ay kesintisiz, bu ciddi iş.',50:'50 gün. Yarım yüz, tam disiplin.',100:'100 gün! Üç haneye geçtin.',200:'200 gün. Efsane modu.',365:'365 gün. Tam bir yıl.'}; var big={7:1,14:1,21:1,30:1,50:1,100:1,200:1,365:1,500:1,1000:1}; if(m[s]){ if(window.SeyAudio&&typeof window.SeyAudio.success==='function') window.SeyAudio.success(); if(window.SeyHaptics&&typeof window.SeyHaptics.streak==='function') window.SeyHaptics.streak(); if(big[s]) confetti(); if(window.SeyFx&&typeof window.SeyFx.shimmer==='function'){ setTimeout(function(){ var el=document.querySelector('.sey-streak-area')||document.getElementById('app'); if(el) window.SeyFx.shimmer(el); },250); } setTimeout(function(){ toast(m[s],2800); },300); // FX-P-52: kilometre taşında kısa sesli tebrik — günde en fazla 1 kez.
+  try{ if(data&&data.settings&&data.settings.voiceStreakDate!==todayStr()){ data.settings.voiceStreakDate=todayStr(); if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Harikasın! Serin büyüyor. Bu ritmi koru.', { lang:'tr-TR', rate:1 }); save(false); } }catch(e){} } }
 App.setMood=function(id){ if (window.SeyHaptics && typeof window.SeyHaptics.tap === 'function') { window.SeyHaptics.tap(); } var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.mood=(day.mood===id?null:id); day.savedAt=new Date().toISOString(); var labels={normal:'Normal',iyi:'İyi',mükemmel:'Mükemmel',yorgun:'Yorgun',üzgün:'Üzgün',sinirli:'Sinirli','çok-zorlandim':'Çok zorlandım',kaygili:'Kaygılı', 'huzursuz':'Huzursuz', 'sakin':'Sakin'}; haptic(14); save(false,{message:'Ruh hali güncellendi',meta:{section:'mood',path:'data.days.*.mood',operation:'update',summary:'Ruh hali güncellendi',detail:'Ruh hali',value:labels[id]||id,field:'mood'}}); updateCardByKey('mood'); updateCardByKey('mental'); };
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(false,{message:'Duygu notu güncellendi',meta:{section:'wellness',path:'data.days.*.note',operation:'update',summary:'Duygu notu güncellendi',detail:'Duygu notu',value:String(v||'').trim().slice(0,60),field:'note'}}); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(false,{message:'Günün niyeti güncellendi',meta:{section:'wellness',path:'data.days.*.intention',operation:'update',summary:'Günün niyeti güncellendi',detail:'Günün niyeti',value:day.intention,field:'intention'}}); },500); };
@@ -8619,6 +8640,16 @@ App.zikrTap=function(){
     if(ensureZikrRoot().settings.haptic){ try{ haptic([10,40,10]); }catch(e){} }
     if(r.hatimDone) toast('Mâşallah · '+r.preset.name+' Ebced² Tam Hatmi tamamlandı.',3200);
     else toast('Mâşallah · '+r.math.completedCycles+'. tur tamamlandı ('+r.target+')',2300);
+    // FX-P-52: zikir hedefi tamamlandığında kısa nazik sesli ipucu — günde en
+    // fazla 1 kez (settings.voiceZikrDate damgası). Quiet-time ve
+    // voiceGuidance gating'i SeyAudio.voice içinde.
+    try{
+      if(data&&data.settings&&data.settings.voiceZikrDate!==todayStr()){
+        data.settings.voiceZikrDate=todayStr();
+        if(window.SeyAudio&&typeof window.SeyAudio.voice==='function') window.SeyAudio.voice('Allah kabul etsin. Güzel bir mola vermek ister misin?', { lang:'tr-TR', rate:1 });
+        save(false);
+      }
+    }catch(e){}
     // Esmâ'da bir ebced turu, Ebced² tam hatmin yalnızca bir parçasıdır;
     // 489. sayımda başka isme geçmek Fettâh yolculuğunu böler. Otomatik
     // ilerleme yalnız normal/core preset turlarında çalışır.

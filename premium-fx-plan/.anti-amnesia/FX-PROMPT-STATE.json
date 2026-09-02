@@ -1,10 +1,10 @@
 {
   "lastCompletedPrompt": "FX-P-51",
-  "activePrompt": null,
+  "activePrompt": "FX-P-52",
   "blockedPrompt": null,
   "currentPhase": "Faz 5",
   "lastCompletedFaz": "Faz 4",
-  "updatedAt": "2026-09-01",
+  "updatedAt": "2026-09-02",
   "localBranch": "premium-fx-local",
   "planVersion": "2.3"
 }

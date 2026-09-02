@@ -21,6 +21,15 @@
   function reducedMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
   // FX-P-51: sesli rehberlik için değer sınırlama helper'ı.
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  // FX-P-52: sessiz zaman penceresi (23:00–07:00). `h` verilmezse gerçek saat
+  // okunur; voice ve ambient bu pencerede sessiz kalır (haptics/görsel FX
+  // etkilenmez — bkz. FX-P-58 quiet-time matrisi).
+  function isQuietTime(h){
+    var hour = (h == null) ? (new Date().getHours()) : Number(h);
+    if (isNaN(hour)) return false;
+    hour = ((Math.floor(hour) % 24) + 24) % 24;
+    return hour >= 23 || hour < 7;
+  }
 
   function playTone(freq, duration, type, gainValue, allowReducedMotion){
     if (!allowed(allowReducedMotion)) return;
@@ -103,9 +112,13 @@
     isVoiceEnabled: function(){
       return !!(settings() && settings().voiceGuidance && typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis);
     },
+    // FX-P-52: sessiz zaman penceresi (23:00–07:00) yardımcısı.
+    isQuietTime: isQuietTime,
     voice: function(text, opts){
       opts = opts || {};
       if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;
+      // FX-P-52: quiet-time (23:00–07:00) penceresinde sesli rehberlik sessiz.
+      if (isQuietTime()) return false;
       if (typeof window.speechSynthesis === 'undefined' || !window.speechSynthesis) return false;
       if (window.speechSynthesis.speaking){
         if (!opts.force) return false;

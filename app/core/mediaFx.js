@@ -151,8 +151,13 @@
       }
       var u = new SpeechSynthesisUtterance(text);
       var voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-      if (opts.lang) u.lang = opts.lang;
-      if (opts.rate) u.rate = clamp(opts.rate, 0.5, 2);
+      // FX-P-57: lang/rate verilmezse kullanıcı ayarlarından okunur
+      // (settings.voiceLang / settings.voiceRate), ayar yoksa güvenli default.
+      var s = settings();
+      var lang = opts.lang || (s && s.voiceLang) || 'tr-TR';
+      var rate = (opts.rate != null) ? opts.rate : ((s && s.voiceRate != null) ? Number(s.voiceRate) : 1);
+      if (lang) u.lang = lang;
+      if (rate) u.rate = clamp(Number(rate) || 1, 0.75, 1.5);
       if (opts.pitch) u.pitch = clamp(opts.pitch, 0.5, 2);
       if (Array.isArray(opts.voiceNames) && voices.length){
         var preferred = voices.find(function(v){ return opts.voiceNames.indexOf(v.name) >= 0 || opts.voiceNames.indexOf(v.lang) >= 0; });

@@ -4631,6 +4631,9 @@ function migrate(d){
   if(d.settings.voiceGreetingCount==null) d.settings.voiceGreetingCount=0;
   if(d.settings.voiceStreakDate==null) d.settings.voiceStreakDate='';
   if(d.settings.voiceZikrDate==null) d.settings.voiceZikrDate='';
+  // FX-P-57: sesli rehberlik dil ve hız tercihleri.
+  if(d.settings.voiceLang==null) d.settings.voiceLang='tr-TR';
+  if(d.settings.voiceRate==null) d.settings.voiceRate=1;
   d.version=2;
   return d;
 }
@@ -8340,6 +8343,11 @@ App.setMood=function(id){ if (window.SeyHaptics && typeof window.SeyHaptics.tap 
 App.onNote=function(el){ var v=el.value; clearTimeout(noteTimer); noteTimer=setTimeout(function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.note=v; var nw=syncDerivedHabits(day); save(false,{message:'Duygu notu güncellendi',meta:{section:'wellness',path:'data.days.*.note',operation:'update',summary:'Duygu notu güncellendi',detail:'Duygu notu',value:String(v||'').trim().slice(0,60),field:'note'}}); updateCardByKey('habits'); if(nw.indexOf('journaled')>=0){ haptic(14); toast('Duygu notu tiki kendiliğinden yeşillendi.'); } },500); };
 App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(){ var day=curDay(); day.intention=String(v||'').slice(0,140); day.savedAt=new Date().toISOString(); save(false,{message:'Günün niyeti güncellendi',meta:{section:'wellness',path:'data.days.*.intention',operation:'update',summary:'Günün niyeti güncellendi',detail:'Günün niyeti',value:day.intention,field:'intention'}}); },500); };
 App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.settings.haptics=!!on; if(on) haptic(18); save(); render(); };
+// FX-P-57: sesli rehberlik ayar handler'ları — yalnız mevcut settings.* alanlarını
+// yönetir; data şekli değişmez (I1). Konuşma hızı 0.75–1.5 aralığına kelepçelenir.
+App.setVoiceGuidance=function(on){ if(!data.settings) data.settings={}; data.settings.voiceGuidance=!!on; save(); render(); };
+App.setVoiceLang=function(lang){ if(['tr-TR','en-US','ar-SA'].indexOf(lang)<0) return; if(!data.settings) data.settings={}; data.settings.voiceLang=lang; save(); render(); };
+App.setVoiceRate=function(rate){ var v=Number(rate); if(isNaN(v)) return; v=Math.max(0.75,Math.min(1.5,v)); if(!data.settings) data.settings={}; data.settings.voiceRate=v; var lbl=document.getElementById('voice-rate-val'); if(lbl) lbl.textContent=(v===1?'1x':v+'x'); save(false); };
 App.onMeal=function(key,el){ var v=el.value; debounceSave('meal-'+key,function(){ var date=activeDate(), day=getDay(data,date,dayIndexFor(date)); day.meals[key]=v; day.savedAt=new Date().toISOString(); var mealLabels={kahvalti:'Kahvaltı',ara1:'Ara öğün',ogle:'Öğle yemeği',ara2:'Ara öğün',aksam:'Akşam yemeği',gece:'Gece atıştırması'}; save(false,{message:mealLabels[key]+' güncellendi',meta:{section:'nutrition',path:'data.days.*.meals.'+key,operation:'update',summary:mealLabels[key]+' güncellendi',detail:mealLabels[key]||key,value:v.slice(0,60),field:key}}); },500); };
 
 // ---- öğün detay (tabak/gr/adet) ----
@@ -13328,6 +13336,19 @@ function ayarlarHTML(){
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">Titreşim geri bildirimi '+icon('vibrate',15)+'</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tik, mod ve kriz dokunuşlarında minik bir titreşim (destekleyen cihazlarda hissedilir).</div><div style="display:flex;gap:8px;">';
   h+='<button onclick="App.toggleHaptic(true)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?onS:offS)+'">'+icon('vibrate',14)+' Açık</button>';
   h+='<button onclick="App.toggleHaptic(false)" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(hapOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div></div>';
+  // FX-P-57: sesli rehberlik ayarları — toggle + dil + konuşma hızı.
+  var vgOn=!!(data.settings&&data.settings.voiceGuidance);
+  var vLang=(data.settings&&data.settings.voiceLang)||'tr-TR';
+  var vRate=(data.settings&&data.settings.voiceRate!=null)?Number(data.settings.voiceRate):1;
+  h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">🎙️ Sesli rehberlik</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Kritik anlarda kısa ve nazik sesli yönlendirmeler (onboarding, seri kutlaması, zikir tamamlama). Gece 23:00–07:00 arası sessiz kalır.</div>';
+  h+='<div style="display:flex;gap:8px;">';
+  h+='<button onclick="App.setVoiceGuidance(true)" aria-pressed="'+vgOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(vgOn?onS:offS)+'">'+icon('mic',14)+' Açık</button>';
+  h+='<button onclick="App.setVoiceGuidance(false)" aria-pressed="'+(!vgOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(vgOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><label for="sey-voice-lang" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Dil</label><select id="sey-voice-lang" onchange="App.setVoiceLang(this.value)" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
+  [['tr-TR','Türkçe'],['en-US','English'],['ar-SA','العربية']].forEach(function(o){ h+='<option value="'+o[0]+'"'+(vLang===o[0]?' selected':'')+'>'+o[1]+'</option>'; });
+  h+='</select></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;"><label for="sey-voice-rate" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Hız</label><input id="sey-voice-rate" type="range" min="0.75" max="1.5" step="0.25" value="'+vRate+'" oninput="App.setVoiceRate(this.value)" style="flex:1;accent-color:var(--accent-ink);"><span id="voice-rate-val" style="font-size:var(--f-caption1);font-weight:800;color:var(--text);min-width:44px;text-align:right;font-variant-numeric:tabular-nums;">'+vRate.toFixed(2).replace(/0$/,'').replace(/\.$/,'')+'x</span></div>';
+  h+='</div>';
   // D vitamini takviyesi — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';
   var vdForm=esc((data.settings&&data.settings.vitaminDForm)||'D₃K₂ damla');

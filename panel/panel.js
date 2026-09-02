@@ -567,6 +567,10 @@ function zikrDetailCardP(){
   h+='<div style="display:flex;gap:8px;margin:2px 0 12px;flex-wrap:wrap;">';
   h+='<span class="tchip fl">Güncel seri · <b style="color:var(--zikr);">'+streak+'</b> gün</span>';
   h+='<span class="tchip fl">En uzun seri · <b style="color:var(--zikr);">'+longest+'</b> gün</span>';
+  // ZP-10: bugün elle eklenen sayım varsa dürüst provenance çipi — sayının
+  // yalnızca dokunuşlardan gelmediğini gözlemciye bildirir.
+  var manualToday=zikrManualTodayP();
+  if(manualToday>0) h+='<span class="tchip fl" title="Sayaç dışı (tespih/cemaat vb.) elle eklenen bugünkü sayım">Bugün <b style="color:var(--amber);">+'+manualToday.toLocaleString('tr-TR')+'</b> elle</span>';
   h+='</div>';
   h+='<div style="display:flex;flex-direction:column;gap:8px;">';
   breakdown.slice(0,14).forEach(function(x){
@@ -593,6 +597,15 @@ function zikrWeekTotalP(date){
   date=date||today(); var total=0, days=0;
   for(var i=0;i<7;i++){ var d=addDays(date,-i); var v=zikrDayTotalP(d); if(v>0) days++; total+=v; }
   return {total:total,days:days};
+}
+// ZP-10: bugüne dair elle eklenen toplam — manualEntries'ten reverted hariç.
+// Panel salt-okunurdur; yalnız okur, hiçbir alan yazmaz.
+function zikrManualTodayP(date){
+  date=date||today();
+  var z=zikrRootP(); if(!z||!Array.isArray(z.manualEntries)) return 0;
+  var total=0;
+  z.manualEntries.forEach(function(e){ if(e&&!e.revertedAt&&e.date===date) total+=Math.max(0,Number(e.amount)||0); });
+  return total;
 }
 function faithWeekKPIsP(date){
   date=date||today();

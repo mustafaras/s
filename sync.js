@@ -686,42 +686,115 @@ function mergeZikr(localZ, remoteZ){
   // günler ve farklı zikirler union olarak eksiksiz kalır.
   out.reflections=mergeById(Array.isArray(out.reflections)?out.reflections:[],Array.isArray(remoteZ.reflections)?remoteZ.reflections:[],'id');
   out.settings=mergeSettings(out.settings||{},remoteZ.settings||{});
+  // ── ZP-10 · Manuel kayıt union'ı ve düzeltilmiş sayaç matematiği ──
+  // Elle sayım bir OLAY GÜNLÜĞÜDÜR: iki cihazdaki kayıtlar id bazında
+  // birleştirilir (aynı kayıt iki kez eklenmez), updatedAt ile en yeni hâli
+  // kazanılır (geri alma/revizyon diğer cihaza da taşınır).
+  function manualUnion(a,b){
+    var list=(Array.isArray(a)?a:[]).concat(Array.isArray(b)?b:[]), byId={};
+    list.forEach(function(e){
+      if(!e||typeof e!=='object'||!e.id||!(e.date&&e.presetId)) return;
+      var ts=String(e.updatedAt||e.createdAt||''), prev=byId[e.id];
+      if(!prev||ts>String(prev.updatedAt||prev.createdAt||'')) byId[e.id]=JSON.parse(JSON.stringify(e));
+    });
+    var out2=Object.keys(byId).map(function(k){ return byId[k]; });
+    out2.sort(function(x,y){ return String(y.updatedAt||y.createdAt||'').localeCompare(String(x.updatedAt||x.createdAt||'')); });
+    return out2.slice(0,100);
+  }
+  function manualSum(entries,date,presetId){
+    // date boş string ise gün filtresi uygulanmaz (tüm günler) — journeys
+    // rebalance'ı ömürlük toplam üzerinden çalışır.
+    var total=0;
+    (entries||[]).forEach(function(e){ if(e&&!e.revertedAt&&(!date||e.date===date)&&e.presetId===presetId) total+=num(e.amount); });
+    return total;
+  }
+  var manual=manualUnion(out.manualEntries,remoteZ.manualEntries);
+  out.manualEntries=manual;
+  // Sayaç düzeltmesi — eski max kuralının eşzamanlı-artış körlüğünü kapatır:
+  //   lifetime = max(local - manuelL, remote - manuelR) + manuelUnion
+  // "base" değerleri manuel kayıtları HÂLİHAZIRDA içerdikleri için önce
+  // çıkarılır; daha sonra iki cihazın bağımsız dokunuş birikimi max ile
+  // korunur ve manuel toplam TEK SEFER eklenir. Reverted kayıtlar toplamda
+  // yok sayılır. Böylece A'da elle +33 giren kayıt, hiç senkronlaşmamış
+  // B'nin 50 dokunuşuyla birleştiğinde 83 olur; çift sayım da kayıp da yok.
+  function rebalanceJourney(pid){
+    var l=out.journeys[pid], r=(remoteZ.journeys&&typeof remoteZ.journeys==='object')?remoteZ.journeys[pid]:null;
+    if(!l||typeof l!=='object'){
+      if(!r||typeof r!=='object') return;
+      out.journeys[pid]=JSON.parse(JSON.stringify(r));
+      // Tek taraflı yolculuk: manuel kayıtların tamamı bu cihazdan geliyorsa
+      // zaten lifetime içinde; yoksa remote değeri birebir alınır (kayip yok).
+      return;
+    }
+    if(!r||typeof r!=='object'){
+      // Uzakta yolculuk yok ama uzak manuel kayıtları bu preseti gösteriyor olabilir:
+      // union'dan gelen, local'de OLMAYAN kayıtlar remote'un katkısıdır.
+      var localManualAll=manualSum(Array.isArray(out.manualEntries)?out.manualEntries:[] ,'',pid);
+      var incoming=manualSum(manual,'',pid)-manualSum(Array.isArray(localZ.manualEntries)?localZ.manualEntries:[],'',pid);
+      if(incoming>0) l.lifetimeCount=num(l.lifetimeCount)+incoming;
+      return;
+    }
+    var mL=manualSum(Array.isArray(localZ.manualEntries)?localZ.manualEntries:[],'',pid);
+    var mR=manualSum((remoteZ.manualEntries&&Array.isArray(remoteZ.manualEntries))?remoteZ.manualEntries:[],'',pid);
+    var mU=manualSum(manual,'',pid);
+    var baseMax=Math.max(Math.max(0,num(l.lifetimeCount)-mL),Math.max(0,num(r.lifetimeCount)-mR));
+    l.lifetimeCount=baseMax+mU;
+    // Aktif hatim (esma) sayıları mevcut max kuralında kalır: hatim başına olay
+    // ayrıştırması bu fazın kapsamı dışıdır — bkz. plan notu.
+    if(Array.isArray(l.hatims)||Array.isArray(r.hatims)){
+      var lh=Array.isArray(l.hatims)?l.hatims:[], rh=Array.isArray(r.hatims)?r.hatims:[], map={};
+      lh.forEach(function(h){ if(h&&h.id) map[h.id]=JSON.parse(JSON.stringify(h)); });
+      rh.forEach(function(h){
+        if(!h||!h.id) return;
+        if(!map[h.id]){ map[h.id]=JSON.parse(JSON.stringify(h)); return; }
+        var x=map[h.id]; x.count=Math.max(num(x.count),num(h.count)); x.baseTarget=Math.max(num(x.baseTarget),num(h.baseTarget)); x.target=Math.max(num(x.target),num(h.target));
+        if(x.status==='completed'||h.status==='completed'){ x.status='completed'; x.completedAt=later(x.completedAt,h.completedAt)||x.completedAt||h.completedAt||null; }
+        else if((h.lastAt||h.startedAt||'')>(x.lastAt||x.startedAt||'')){ x.status=h.status||x.status; }
+        x.lastAt=later(x.lastAt,h.lastAt)||x.lastAt||h.lastAt||null;
+      });
+      l.hatims=Object.keys(map).map(function(k){return map[k];});
+      var actualDone=l.hatims.filter(function(h){return h&&h.status==='completed';}).length;
+      l.completedHatims=Math.max(num(l.completedHatims),num(r.completedHatims),actualDone);
+      l.legacyCompletedHatims=Math.max(num(l.legacyCompletedHatims),num(r.legacyCompletedHatims));
+      // DİKKAT: lastAt karşılaştırmasını l.lastAt'ı GÜNCELLEMEDEN ÖNCE yap —
+      // eski koddaki gibi. lastAt önce birleşirse "r>l" karşılaştırması
+      // her zaman yanlış olur ve remote activeHatimId kaybedilirdi.
+      var remoteNewer=(r.lastAt||'')>(l.lastAt||'');
+      l.lastAt=later(l.lastAt,r.lastAt)||'';
+      if(remoteNewer) l.activeHatimId=r.activeHatimId||l.activeHatimId;
+    }
+  }
+  out.journeys=out.journeys&&typeof out.journeys==='object'?out.journeys:{};
+  if(remoteZ.journeys&&typeof remoteZ.journeys==='object'){
+    var pids={}; Object.keys(out.journeys).forEach(function(k){pids[k]=1;});
+    Object.keys(remoteZ.journeys).forEach(function(k){pids[k]=1;});
+    Object.keys(pids).forEach(rebalanceJourney);
+  }
   out.sessions=out.sessions&&typeof out.sessions==='object'?out.sessions:{};
   if(remoteZ.sessions&&typeof remoteZ.sessions==='object') Object.keys(remoteZ.sessions).forEach(function(date){
     var l=out.sessions[date], r=remoteZ.sessions[date];
     if(!l||typeof l!=='object'){ out.sessions[date]=JSON.parse(JSON.stringify(r)); return; }
     var m=JSON.parse(JSON.stringify(l)), lp=l.perPreset||{}, rp=r&&r.perPreset||{}, per={}, sum=0, sets=0;
     var ids={}; Object.keys(lp).forEach(function(k){ids[k]=1;}); Object.keys(rp).forEach(function(k){ids[k]=1;});
+    // Gün düzeyinde manuel düzeltmesi: aynı rebalance formülünün günlük izdüşümü.
+    var manualL=0, manualR=0, manualU=0;
+    Object.keys(ids).forEach(function(pid){
+      manualL+=manualSum(Array.isArray(localZ.manualEntries)?localZ.manualEntries:[],date,pid);
+      manualR+=manualSum((remoteZ.manualEntries&&Array.isArray(remoteZ.manualEntries))?remoteZ.manualEntries:[],date,pid);
+      manualU+=manualSum(manual,date,pid);
+    });
     Object.keys(ids).forEach(function(pid){
       var a=lp[pid], b=rp[pid], ao=a&&typeof a==='object'?a:{count:a}, bo=b&&typeof b==='object'?b:{count:b};
-      var rec={count:Math.max(num(ao&&ao.count),num(bo&&bo.count)),completedCycles:Math.max(num(ao&&ao.completedCycles),num(bo&&bo.completedCycles)),lastAt:later(ao&&ao.lastAt,bo&&bo.lastAt)||null};
+      var mLp=manualSum(Array.isArray(localZ.manualEntries)?localZ.manualEntries:[],date,pid);
+      var mRp=manualSum((remoteZ.manualEntries&&Array.isArray(remoteZ.manualEntries))?remoteZ.manualEntries:[],date,pid);
+      var mUp=manualSum(manual,date,pid);
+      var tapMax=Math.max(Math.max(0,num(ao&&ao.count)-mLp),Math.max(0,num(bo&&bo.count)-mRp));
+      var rec={count:tapMax+mUp,completedCycles:Math.max(num(ao&&ao.completedCycles),num(bo&&bo.completedCycles)),lastAt:later(ao&&ao.lastAt,bo&&bo.lastAt)||null};
       per[pid]=rec; sum+=rec.count; sets+=rec.completedCycles;
     });
-    m.perPreset=per; m.totalCount=Math.max(num(l.totalCount),num(r&&r.totalCount),sum); m.completedSets=Math.max(num(l.completedSets),num(r&&r.completedSets),sets); m.lastAt=later(l.lastAt,r&&r.lastAt)||null;
+    var dayMax=Math.max(Math.max(0,num(l.totalCount)-manualL),Math.max(0,num(r&&r.totalCount)-manualR));
+    m.perPreset=per; m.totalCount=dayMax+manualU; m.completedSets=Math.max(num(l.completedSets),num(r&&r.completedSets),sets); m.lastAt=later(l.lastAt,r&&r.lastAt)||null;
     out.sessions[date]=m;
-  });
-  out.journeys=out.journeys&&typeof out.journeys==='object'?out.journeys:{};
-  if(remoteZ.journeys&&typeof remoteZ.journeys==='object') Object.keys(remoteZ.journeys).forEach(function(pid){
-    var l=out.journeys[pid], r=remoteZ.journeys[pid];
-    if(!l||typeof l!=='object'){ out.journeys[pid]=JSON.parse(JSON.stringify(r)); return; }
-    var m=JSON.parse(JSON.stringify(l)), lh=Array.isArray(l.hatims)?l.hatims:[], rh=Array.isArray(r.hatims)?r.hatims:[], map={};
-    lh.forEach(function(h){ if(h&&h.id) map[h.id]=JSON.parse(JSON.stringify(h)); });
-    rh.forEach(function(h){
-      if(!h||!h.id) return;
-      if(!map[h.id]){ map[h.id]=JSON.parse(JSON.stringify(h)); return; }
-      var x=map[h.id]; x.count=Math.max(num(x.count),num(h.count)); x.baseTarget=Math.max(num(x.baseTarget),num(h.baseTarget)); x.target=Math.max(num(x.target),num(h.target));
-      if(x.status==='completed'||h.status==='completed'){ x.status='completed'; x.completedAt=later(x.completedAt,h.completedAt)||x.completedAt||h.completedAt||null; }
-      else if((h.lastAt||h.startedAt||'')>(x.lastAt||x.startedAt||'')){ x.status=h.status||x.status; }
-      x.lastAt=later(x.lastAt,h.lastAt)||x.lastAt||h.lastAt||null;
-    });
-    m.hatims=Object.keys(map).map(function(k){return map[k];});
-    m.lifetimeCount=Math.max(num(l.lifetimeCount),num(r.lifetimeCount));
-    var actualDone=m.hatims.filter(function(h){return h&&h.status==='completed';}).length;
-    m.completedHatims=Math.max(num(l.completedHatims),num(r.completedHatims),actualDone);
-    m.legacyCompletedHatims=Math.max(num(l.legacyCompletedHatims),num(r.legacyCompletedHatims));
-    m.lastAt=later(l.lastAt,r.lastAt)||'';
-    if((r.lastAt||'')>(l.lastAt||'')) m.activeHatimId=r.activeHatimId||m.activeHatimId;
-    out.journeys[pid]=m;
   });
   out.streak=Math.max(num(out.streak),num(remoteZ.streak));
   if((remoteZ.streakDate||'')>(out.streakDate||'')) out.streakDate=remoteZ.streakDate;

@@ -26,6 +26,12 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
   QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
   düzeyinde ağsız doğrular.
+- `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
+  ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
+  doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,
+  geri alma, V4→V5 migration idempotentliği ve `mergeZikr` union matematiği
+  (manuel + dokunuş birleşimi, çift sayım yok, reverted hariç, gün düzeyi
+  rebalance). `node tests/app/test_zikr_manual_entry.js`.
 - `quran/` — Kur’an taşıma, katalog ve demo sözleşmesi fixture’ları.
 - `panel/test_panel_p*.js` — Panel-01–06 kontrol, projection, event ve polling fixture’ları.
 - `panel/test_panel_boot_resilience.js` — panel boot/poll dayanıklılık fixture’ı:

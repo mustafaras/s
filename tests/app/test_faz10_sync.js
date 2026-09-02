@@ -403,6 +403,54 @@ console.log('[16] Zikirmatik V4 — tefekkür notları last-write-wins + union')
   ok('Farklı zikirlerin notları union olarak eksiksiz kalır', merged.reflections.length===2&&!!merged.reflections.find(function(x){return x.presetId==='esma_02';}));
 })();
 
+// ── Test 17: ZP-10 — Manuel zikir kayıtları union + sayaç rebalance ────────
+console.log('[17] ZP-10 — manuel zikir olay günlüğü merge matematiği');
+(function(){
+  var mergeZikr=global.window.SeySync.mergeZikr;
+  var t='2026-07-30';
+
+  // KABUL: A cihazı elle +33, B cihazı (asla senkronlaşmamış) 50 dokunuş → 83
+  var manualA={schemaVersion:5,migrationVersion:'zikr_v2',presets:[{id:'subhanallah',name:'S',target:33}],settings:{},sessions:{},
+    manualEntries:[{id:'zm_a',date:t,presetId:'subhanallah',amount:33,note:'tespih',source:'manual',createdAt:iso(1000),updatedAt:iso(1000),revertedAt:null}],
+    journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:33,activeHatimId:'',lastAt:iso(1000),completedHatims:0,hatims:[]}},
+    streak:1,streakDate:t};
+  var tapsB={schemaVersion:5,migrationVersion:'zikr_v2',presets:[{id:'subhanallah',name:'S',target:33}],settings:{},sessions:{},
+    manualEntries:[],
+    journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:50,activeHatimId:'',lastAt:iso(2000),completedHatims:0,hatims:[]}},
+    streak:0,streakDate:''};
+  var manualMerged=mergeZikr(manualA,tapsB);
+  ok('manuel + dokunuş birleşimi 83 olur (50 değil, 33+50)', manualMerged.journeys.subhanallah.lifetimeCount===83);
+
+  // Aynı manuel kayıt iki cihazda → çift sayım yok
+  var same1=JSON.parse(JSON.stringify(manualA));
+  var same2=JSON.parse(JSON.stringify(manualA));
+  var dedup=mergeZikr(same1,same2);
+  ok('aynı manuel kayıt iki kez → tek kayıt + lifetime 33', dedup.manualEntries.length===1 && dedup.journeys.subhanallah.lifetimeCount===33);
+
+  // Reverted kayıt merge toplamına katılmaz (en yeni updatedAt'li reverted kazanır)
+  var revertLocal={schemaVersion:5,presets:[],settings:{},sessions:{},journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:0,activeHatimId:'',lastAt:'',completedHatims:0,hatims:[]}},
+    manualEntries:[{id:'zm_r',date:t,presetId:'subhanallah',amount:33,note:'',source:'manual',createdAt:iso(1000),updatedAt:iso(9000),revertedAt:iso(9000)}],streak:0,streakDate:''};
+  var revertRemote={schemaVersion:5,presets:[],settings:{},sessions:{},journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:33,activeHatimId:'',lastAt:'',completedHatims:0,hatims:[]}},
+    manualEntries:[{id:'zm_r',date:t,presetId:'subhanallah',amount:33,note:'',source:'manual',createdAt:iso(1000),updatedAt:iso(1000),revertedAt:null}],streak:0,streakDate:''};
+  var revMerged=mergeZikr(revertLocal,revertRemote);
+  ok('reverted hâli daha yeni ise toplam 0 olur', revMerged.manualEntries.length===1 && revMerged.journeys.subhanallah.lifetimeCount===0);
+
+  // Manuel yokken eski max kuralı aynen çalışır
+  var tapLocal={schemaVersion:5,presets:[],settings:{},sessions:{},manualEntries:[],journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:100,activeHatimId:'',lastAt:'',completedHatims:0,hatims:[]}},streak:0,streakDate:''};
+  var tapRemote={schemaVersion:5,presets:[],settings:{},sessions:{},journeys:{subhanallah:{presetId:'subhanallah',lifetimeCount:120,activeHatimId:'',lastAt:'',completedHatims:0,hatims:[]}},manualEntries:[],streak:0,streakDate:''};
+  ok('manuel yokken dokunuş max kuralı (100,120→120)', mergeZikr(tapLocal,tapRemote).journeys.subhanallah.lifetimeCount===120);
+
+  // Gün düzeyi rebalance: A'da elle +10 aynı gün, B'de 20 dokunuş → 30
+  var dayA={schemaVersion:5,presets:[{id:'subhanallah',name:'S',target:33}],settings:{},manualEntries:[{id:'zm_d',date:t,presetId:'subhanallah',amount:10,note:'',source:'manual',createdAt:iso(1000),updatedAt:iso(1000),revertedAt:null}],
+    sessions:{},journeys:{},streak:0,streakDate:''};
+  dayA.sessions[t]={totalCount:10,completedSets:0,perPreset:{subhanallah:{count:10,completedCycles:0,lastAt:iso(1000)}},lastAt:iso(1000)};
+  var dayB={schemaVersion:5,presets:[{id:'subhanallah',name:'S',target:33}],settings:{},manualEntries:[],
+    sessions:{},journeys:{},streak:0,streakDate:''};
+  dayB.sessions[t]={totalCount:20,completedSets:0,perPreset:{subhanallah:{count:20,completedCycles:0,lastAt:iso(2000)}},lastAt:iso(2000)};
+  var dayMerged=mergeZikr(dayA,dayB);
+  ok('gün düzeyi: elle 10 + dokunuş 20 → 30', dayMerged.sessions[t].totalCount===30 && dayMerged.sessions[t].perPreset.subhanallah.count===30);
+})();
+
 // ── Özet ────────────────────────────────────────────────────────────────────
 console.log('\n=== Özet: '+passed+' geçti, '+failed+' kaldı ===');
 if (failed > 0) {

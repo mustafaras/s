@@ -235,7 +235,7 @@ legacySeed.zikr={
 const legacySb=buildSandbox(legacySeed);
 loadInto(legacySb,FILES); legacySb.App.start();
 const migratedOnce=JSON.parse(legacySb.localStorage.getItem('seyma-reset-v1'));
-ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===4 &&
+ok('v1 sayımı v2 nesne kaydına dönüşür', migratedOnce.zikr.schemaVersion===5 &&
   migratedOnce.zikr.migrationVersion==='zikr_v2' &&
   migratedOnce.zikr.sessions[t].perPreset.esma_19.count===978 &&
   migratedOnce.zikr.journeys.esma_19.lifetimeCount===978);
@@ -609,8 +609,8 @@ const noteSb=buildSandbox(noteSeed);
 loadInto(noteSb,FILES);
 if(noteSb.App&&typeof noteSb.App.start==='function') noteSb.App.start();
 let noteMigrated=JSON.parse(noteSb.localStorage.getItem('seyma-reset-v1'));
-ok('V3 kayıt additive biçimde V4 tefekkür şemasına taşınıyor',
-  noteMigrated.zikr.schemaVersion===4&&Array.isArray(noteMigrated.zikr.reflections));
+ok('V3 kayıt additive biçimde V4/V5 tefekkür şemasına taşınıyor',
+  noteMigrated.zikr.schemaVersion===5&&Array.isArray(noteMigrated.zikr.reflections)&&Array.isArray(noteMigrated.zikr.manualEntries));
 noteSb.App.go('saygi'); noteSb.App.openZikr(); noteSb.App.setZikrPreset('esma_01');
 ok('Sayaç altında zikir adına ve güne bağlı gelişmiş tefekkür editörü render ediliyor',
   /TEFEKKÜR GÜNLÜĞÜ[\s\S]*Hislerim[\s\S]*Düşüncelerim[\s\S]*Duam · niyetim/.test(zikrScrollEl.innerHTML)&&

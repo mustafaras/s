@@ -289,16 +289,54 @@ var ZIKR_V2_VISIBLE=true;
 // çalıştırıp gerçek hatims[] geçmişini ezerdi — bkz. ZIKIRMATIK-REDESIGN-
 // DENETIMI.md §1.2. V3'e özgü yükseltme tamamen ayrı, additive bir fonksiyonda
 // (migrateZikrV3) ve schemaVersion<3 kontrolüyle yürütülür.
-var ZIKR_SCHEMA_VERSION=4, ZIKR_MIGRATION_VERSION='zikr_v2', _zikrNormalizedRef=null;
+//
+// V5 (manuel zikir): schemaVersion 4→5. ZIKR_MIGRATION_VERSION hâlâ 'zikr_v2'
+// kalır — aynı nedenle. Manuel kayıtların merge matematiği (sync.js mergeZikr)
+// schemaVersion'a değil, manualEntries dizisinin VARLIĞINA bağlıdır; iki cihaz
+// farklı şema sürümündeyse bile union doğru çalışır.
+var ZIKR_SCHEMA_VERSION=5, ZIKR_MIGRATION_VERSION='zikr_v2', _zikrNormalizedRef=null;
 function zikrUid(prefix){ return (prefix||'z')+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
 function zikrInt(v){ v=Number(v); return Number.isSafeInteger(v)&&v>0?v:0; }
 function emptyZikrRoot(){
   return {
     schemaVersion:ZIKR_SCHEMA_VERSION,migrationVersion:ZIKR_MIGRATION_VERSION,editorialVersion:0,
-    presets:[],journeys:{},sessions:{},reflections:[],activeSession:null,
+    presets:[],journeys:{},sessions:{},reflections:[],manualEntries:[],activeSession:null,
     settings:{soundOn:false,haptic:true,autoAdvance:false,activePresetId:'',defaultMode:'hatim',keepAwake:false,reducedMotion:false,breathGuide:false,confirmReset:true,focusMode:false},
     streakDate:'',streak:0
   };
+}
+// Manuel zikir kayıtları için giriş üst sınırları — tek elle kayıt, gerçek bir
+// ibadet birikimini taşımaya yarar; tek seferde uçsuz bir sayı yazmak hem
+// yanlış dokunuş koruması hem de merge matematiğinin sinir sınırları içindir.
+var ZIKR_MANUAL_MAX=100000, ZIKR_MANUAL_KEEP=100;
+function zikrNormalizeManualEntry(raw){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)) return null;
+  if(typeof raw.date!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(raw.date)) return null;
+  if(typeof raw.presetId!=='string'||!raw.presetId) return null;
+  var amount=zikrInt(raw.amount); if(amount<=0) return null;
+  var id=(typeof raw.id==='string'&&raw.id)?raw.id.slice(0,80):zikrUid('zm');
+  var createdAt=(typeof raw.createdAt==='string'&&raw.createdAt)?raw.createdAt:'';
+  var updatedAt=(typeof raw.updatedAt==='string'&&raw.updatedAt)?raw.updatedAt:createdAt;
+  var reverted=raw.revertedAt;
+  return {id:id,date:raw.date,presetId:raw.presetId,amount:amount,
+    note:typeof raw.note==='string'?raw.note.slice(0,200):'',source:'manual',
+    createdAt:createdAt,updatedAt:updatedAt,
+    revertedAt:(typeof reverted==='string'&&reverted)?reverted:null};
+}
+function migrateZikrV5(z){
+  // ZP-10 (manuel zikir): additive ve idempotent — mevcut sayım/tur/hatim
+  // değerlerine DOKUNMAZ, yalnız manualEntries dizisini güvenceye alır.
+  if(!Array.isArray(z.manualEntries)) z.manualEntries=[];
+  var byId={}, cleaned=[];
+  z.manualEntries.forEach(function(raw){
+    var rec=zikrNormalizeManualEntry(raw); if(!rec) return;
+    var prev=byId[rec.id];
+    if(!prev||String(rec.updatedAt||rec.createdAt)>String(prev.updatedAt||prev.createdAt)) byId[rec.id]=rec;
+  });
+  Object.keys(byId).forEach(function(k){ cleaned.push(byId[k]); });
+  cleaned.sort(function(a,b){ return String(b.updatedAt||b.createdAt).localeCompare(String(a.updatedAt||a.createdAt)); });
+  if(cleaned.length>ZIKR_MANUAL_KEEP) cleaned=cleaned.slice(0,ZIKR_MANUAL_KEEP);
+  z.manualEntries=cleaned;
 }
 function emptyZikrDay(){ return {totalCount:0,completedSets:0,perPreset:{},lastAt:null}; }
 function emptyZikrPresetDay(){ return {count:0,completedCycles:0,lastAt:null}; }
@@ -481,6 +519,10 @@ function migrateZikrV2(rootData){
   }
   if(needsV3) migrateZikrV3(z);
   if(needsV4) migrateZikrV4(z);
+  // V5 manuel kayıt güvencesi: her yüklemede additive/idempotent çalışır —
+  // schemaVersion kapısına bağlı DEĞİLDİR ki eski kayıtlarla gelen veri de
+  // normalize edilsin.
+  migrateZikrV5(z);
   z.schemaVersion=ZIKR_SCHEMA_VERSION;
   return z;
 }
@@ -635,6 +677,23 @@ function syncZikrDayMirror(date,day){
     dd.zikr.totalCount=day.totalCount; dd.zikr.completedSets=day.completedSets;
     dd.zikr.perPreset=JSON.parse(JSON.stringify(day.perPreset)); dd.zikr.lastAt=day.lastAt||null;
   }catch(e){}
+}
+
+// ── ZP-10 · Manuel zikir girişi (elle sayım) ─────────────────────────────
+// Kullanıcı tespih/cemaat/kağıt gibi yöntemlerle saydığı zikirleri uygulama
+// dışında biriktirip TEK BÜTÜN olarak kaydeder. Sayım aynı kanala (sessions.
+// perPreset + journeys.lifetimeCount + hatim) işlenir; BİRDEN fazı, tur
+// tamamlanması, streak ve panel/ısı haritası otomatik tutarlı kalır. Fark:
+// her kayıt manualEntries[] içinde salt-okunur bir olay olarak da yaşar —
+// provenance dürüstlüğü ("bu sayı nereden geldi?") ve sync.js'teki yeni
+// union-temelli merge matematiği (max kuralının eşzamanlı-artış körlüğünü
+// olay günlüğüyle aşması) bu dizinin varlığına bağlıdır.
+function zikrManualActive(date,presetId){
+  var z=ensureZikrRoot(), total=0;
+  (z.manualEntries||[]).forEach(function(e){
+    if(e&&!e.revertedAt&&e.date===date&&e.presetId===presetId) total+=zikrInt(e.amount);
+  });
+  return total;
 }
 
 // Saygı koleksiyonu + seri (Faz 39) — data.saygi kalıcı arşiv
@@ -8631,7 +8690,7 @@ function zikrUnlockBodyScroll(){
 }
 App.openZikr=function(){ if(!ZIKR_V2_VISIBLE){ ui.zikrOpen=false; toast('Zikirmatik yenileniyor; çok yakında daha iyi haliyle dönecek.'); return; } ui.zikrOpen=true; ui.zikrView=ui.zikrView||'counter'; _zikrCompleteFlash=false; render(); zikrSyncWakeLock(); zikrLockBodyScroll(); try{ var shell=document.getElementById('zikr-screen'); if(shell&&shell.focus) shell.focus(); }catch(e){} };
 App.closeZikr=function(){
-  var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
+  var targetFocusId=ui.reminderTargetReturnFocusId; zikrPauseSession(); ui.zikrOpen=false; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; zikrSyncWakeLock(); zikrUnlockBodyScroll(); save(); _zikrCompleteFlash=false; ui.reminderTargetReturnFocusId=''; render();
   // ZP-07 rule 5: odak, açılışta tetikleyen elemana (bilinen giriş noktası:
   // Saygı hub'ındaki Zikirmatik önizleme kartı) döner. render() tüm #app
   // innerHTML'ini yeniden ürettiğinden eski DOM referansı tutulamaz; bu
@@ -8750,7 +8809,88 @@ App.zikrUndo=function(){
   if(!zikrPaintLive({preset:p,count:pd.count,total:day.totalCount,math:after,journey:j,hatim:h})) if(!zikrPaintView('counter',true)) render();
   zikrPaintActionNote();
 };
-App.setZikrPreset=function(id){ var z=ensureZikrRoot(), found=false; for(var i=0;i<z.presets.length;i++) if(z.presets[i].id===id){ found=true; break; } if(!found) return; zikrPauseSession(); z.settings.activePresetId=id; ui.zikrView='counter'; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrLastReset=null; ui.zikrActionNote=''; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus=''; save(); if(!zikrPaintView('counter')) render(); };
+App.setZikrPreset=function(id){ var z=ensureZikrRoot(), found=false; for(var i=0;i<z.presets.length;i++) if(z.presets[i].id===id){ found=true; break; } if(!found) return; zikrPauseSession(); z.settings.activePresetId=id; ui.zikrView='counter'; ui.zikrDetailOpen=false; ui.zikrResetPending=false; ui.zikrResetPresetId=''; ui.zikrLastReset=null; ui.zikrActionNote=''; ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId=''; ui.zikrNotePresetId=''; ui.zikrNoteDraft=null; ui.zikrNoteStatus=''; save(); if(!zikrPaintView('counter')) render(); };
+
+// ── ZP-10 · Manuel zikir: çekirdek uygulama/geri alma ──
+// zikrTouchTick ile AYNI sayaç kanallarını kullanır (tek doğruluk kaynağı
+// korunur), ama artış miktarı dokunuş sayısı değil kullanıcı girdisidir.
+// Atomik: tek çağrıda journey+hatim+gün+streak güncellenir, sonra save().
+function zikrManualApply(presetId,amount,date,note){
+  var p=zikrPreset(presetId); if(!p) return null;
+  var n=zikrInt(amount); if(n<=0) return null;
+  if(n>ZIKR_MANUAL_MAX) return null;
+  var d=/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(date||''))?date:todayStr();
+  var z=ensureZikrRoot(), day=zikrDay(d), pd=zikrPresetDay(day,p.id), jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim;
+  var now=new Date().toISOString();
+  // Esmâ: hatim hedefini aşan giriş kabul edilmez — kalanı asla geçmez.
+  if(p.kind==='esma'){
+    if(h&&h.status==='completed') return null;
+    if(!h) h=zikrActiveHatim(p,true);
+    var target=zikrHatimTarget(p), room=target-zikrInt(h.count);
+    if(room<=0) return null;
+    if(n>room) n=room;
+  }
+  var before=zikrMath(p,p.kind==='esma'?h.count:j.lifetimeCount);
+  j.lifetimeCount=zikrInt(j.lifetimeCount)+n; j.lastAt=now;
+  if(p.kind==='esma'){ h.count+=n; h.lastAt=now; }
+  pd.count+=n; pd.lastAt=now; day.totalCount+=n; day.lastAt=now;
+  var after=zikrMath(p,p.kind==='esma'?h.count:j.lifetimeCount);
+  var cyclesGained=after.completedCycles-before.completedCycles;
+  if(cyclesGained>0){ pd.completedCycles+=cyclesGained; day.completedSets+=cyclesGained; }
+  if(p.kind==='esma'&&after.complete){ h.status='completed'; h.completedAt=now; j.completedHatims++; }
+  var rec={id:zikrUid('zm'),date:d,presetId:p.id,amount:n,note:String(note||'').trim().slice(0,200),source:'manual',createdAt:now,updatedAt:now,revertedAt:null};
+  z.manualEntries.push(rec);
+  // streak: bugüne dair herhangi bir hedef dolduysa tarihi kaydet (zikrTouchTick
+  // ile aynı sözleşme).
+  if(cyclesGained>0&&z.streakDate!==d){
+    var yester=addDays(d,-1);
+    z.streak=(zikrDayCompleted(yester)||z.streakDate===yester)?(z.streak+1):1;
+    z.streakDate=d;
+  }
+  if(d===todayStr()) syncZikrDayMirror(d,day);
+  save();
+  return {rec:rec,preset:p,day:day,pd:pd,math:after,journey:j,hatim:h,applied:n,cyclesGained:cyclesGained};
+}
+function zikrManualUndoEntry(entryId){
+  var z=ensureZikrRoot(); if(!Array.isArray(z.manualEntries)) return null;
+  var e=null; for(var i=0;i<z.manualEntries.length;i++){ if(z.manualEntries[i]&&z.manualEntries[i].id===entryId&&!z.manualEntries[i].revertedAt){ e=z.manualEntries[i]; break; } }
+  if(!e) return null;
+  var p=zikrPreset(e.presetId); if(!p) return null;
+  var now=new Date().toISOString();
+  e.revertedAt=now; e.updatedAt=now;
+  var day=zikrDay(e.date), pd=zikrPresetDay(day,e.presetId), jp=zikrJourneyProgress(p), j=jp.journey, h=jp.hatim;
+  var before=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
+  if(p.kind==='esma'&&h){
+    if(h.status==='completed'&&h.count>=zikrHatimTarget(p)){ h.status='active'; h.completedAt=null; j.completedHatims=Math.max(0,j.completedHatims-1); }
+    h.count=Math.max(0,h.count-e.amount); h.lastAt=now;
+  }
+  j.lifetimeCount=Math.max(0,j.lifetimeCount-e.amount); j.lastAt=now;
+  pd.count=Math.max(0,pd.count-e.amount); pd.lastAt=now;
+  day.totalCount=Math.max(0,day.totalCount-e.amount); day.lastAt=now;
+  var after=zikrMath(p,p.kind==='esma'&&h?h.count:j.lifetimeCount);
+  if(after.completedCycles<before.completedCycles){
+    var lost=before.completedCycles-after.completedCycles;
+    pd.completedCycles=Math.max(0,pd.completedCycles-lost); day.completedSets=Math.max(0,day.completedSets-lost);
+  }
+  var active=ensureZikrRoot();
+  if(active.activeSession&&active.activeSession.presetId===p.id) active.activeSession.count=Math.max(0,zikrInt(active.activeSession.count)-e.amount);
+  if(e.date===todayStr()) syncZikrDayMirror(e.date,day);
+  save();
+  return {entry:e,preset:p,day:day,pd:pd,math:after,journey:j,hatim:h};
+}
+// Manuel kayıt + dokunuş sayımlarını birleştirir: cihaz bazında dokunuş sayımı
+// zaten sayaçta; manuel kayıtların union'ı (id bazlı, reverted hariç) üstüne
+// YENİDEN EKLENMEZ — sayaç zaten birleştirilmiş manuel kayıtları içerir.
+// (sync.js tarafındaki formül için bkz. mergeZikr — burada yalnız görünüm.)
+function zikrManualEntryCountFor(date,presetId){
+  var z=ensureZikrRoot(), out=[];
+  (z.manualEntries||[]).forEach(function(e){ if(e&&e.date===date&&e.presetId===presetId) out.push(e); });
+  return out;
+}
+// ZP-10: pure test yüzeyi — merge matematiğinin uygulama tarafı doğrudan
+// test edilebilir olsun diye App üzerinden de açılır (ZP-03 deseni).
+App.zikrManualActive=zikrManualActive;
+App.zikrManualApply=function(presetId,amount,date,note){ return zikrManualApply(presetId,amount,date,note); };
 App.setZikrPresetFilter=function(el){
   ui.zikrPresetFilter=String(el&&el.value||'');
   if(!zikrPaintLibraryResults()) render();
@@ -8811,6 +8951,60 @@ App.saveZikrNote=function(){
   save();
   if(!zikrPaintNoteRegion()) if(!zikrPaintView('counter',true)) render();
   toast('Tefekkür günlüğüne kaydedildi.');
+};
+// ── ZP-10 · Manuel zikir UI handler'ları ──
+App.toggleZikrManual=function(){
+  ui.zikrManualOpen=!ui.zikrManualOpen;
+  if(ui.zikrManualOpen){ ui.zikrManualDraft=null; ui.zikrManualPresetId=''; }
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+  if(ui.zikrManualOpen){
+    try{ var input=document.getElementById('zikr-manual-amount'); if(input&&input.focus) input.focus(); }catch(e){}
+  }
+};
+App.onZikrManualAmount=function(el){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var raw=String(el&&el.value||'').replace(/[^0-9]/g,'').slice(0,7);
+  d.amount=raw; el.value=raw;
+  try{ var prev=document.getElementById('zikr-manual-preview'); if(prev) prev.innerHTML=zikrManualPreviewHTML(p,d); }catch(e){}
+  try{ var save=document.querySelector('#zikr-manual-sheet .primary'); if(save) save.disabled=zikrManualAmountOf(d)<=0; }catch(e){}
+};
+App.onZikrManualNote=function(el){
+  var d=zikrManualDraftFor(zikrActivePreset());
+  d.note=String(el&&el.value||'').slice(0,200);
+};
+App.zikrManualStep=function(dir){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var n=zikrManualAmountOf(d)+dir*10;
+  if(n<0) n=0; if(n>ZIKR_MANUAL_MAX) n=ZIKR_MANUAL_MAX;
+  d.amount=String(n);
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+};
+App.zikrManualChip=function(v){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var n=zikrInt(parseInt(v,10)); if(n<=0) return;
+  d.amount=String(n);
+  if(!zikrPaintManualRegion()) if(!zikrPaintView('counter',true)) render();
+};
+App.saveZikrManual=function(){
+  var p=zikrActivePreset(), d=zikrManualDraftFor(p);
+  var amount=zikrManualAmountOf(d);
+  if(amount<=0){ toast('Önce bir miktar yaz.'); return; }
+  var r=zikrManualApply(p.id,amount,todayStr(),d.note);
+  if(!r){ toast('Bu miktar eklenemedi. Hatim tamamlanmış ya da sınır aşılı olabilir.'); return; }
+  ui.zikrManualOpen=false; ui.zikrManualDraft=null; ui.zikrManualPresetId='';
+  ui.zikrActionNote='Elle eklendi · '+r.applied.toLocaleString('tr-TR')+' '+p.name+' sayımı işlendi. Geri al ile kurtarabilirsin.';
+  if(r.cyclesGained>0&&window.SeyAudio&&typeof window.SeyAudio.bell==='function'){ try{ window.SeyAudio.bell(); }catch(e){} }
+  var paintOK=zikrPaintView('counter',true);
+  if(!paintOK) render(); else zikrPaintActionNote();
+  toast('Mâşallah · '+r.applied.toLocaleString('tr-TR')+' zikir sayıma eklendi.');
+};
+App.undoZikrManual=function(entryId){
+  var r=zikrManualUndoEntry(entryId);
+  if(!r){ toast('Bu kayıt geri alınamadı.'); return; }
+  ui.zikrActionNote='Elle eklenen '+zikrInt(r.entry.amount).toLocaleString('tr-TR')+' sayım geri alındı.';
+  if(!zikrPaintView('history',true)&&!zikrPaintView('counter',true)) render();
+  zikrPaintActionNote();
+  toast('Elle eklenen sayım geri alındı.');
 };
 App.toggleZikrSetting=function(k){
   var allowed={soundOn:'Ses',haptic:'Titreşim',focusMode:'Odak modu',breathGuide:'Nefes ritmi',reducedMotion:'Hareketi azalt',keepAwake:'Ekranı uyanık tut',autoAdvance:'Otomatik sıradaki zikir'};
@@ -14504,6 +14698,75 @@ function zikrNoteEditorHTML(p){
   }
   h+='</section>'; return h;
 }
+// ── ZP-10 · Manuel zikir sheet'i — sayaç ekranı İÇİNDE açılan alt panel.
+// Ayrı bir modal DEĞİL: zikr-v2 overlay'inin kendi onZikrKeydown sözleşmesi
+// aynen geçerli kalır (Tab/Shift+Tab/Escape), backdrop odaklanamaz, içeriği
+// tam ekranın parçası olduğu için modal-focus testleri etkilenmez.
+function zikrManualDraftFor(p){
+  if(ui.zikrManualPresetId===p.id&&ui.zikrManualDraft) return ui.zikrManualDraft;
+  ui.zikrManualPresetId=p.id;
+  ui.zikrManualDraft={presetId:p.id,amount:'',note:''};
+  return ui.zikrManualDraft;
+}
+function zikrManualAmountOf(d){
+  var raw=String(d&&d.amount||'').trim();
+  if(!/^[0-9]+$/.test(raw)) return 0;
+  return zikrInt(parseInt(raw,10));
+}
+function zikrManualQuickChips(p){
+  // Hızlı çipler: temel/core zikirlerde klasik turlar; Esmâ'da hatme kalanını
+  // bir dokunuşla dolduran tek çip — hedef aşımı fiziksel olarak imkânsız.
+  if(p.kind==='esma'){
+    var jp=zikrJourneyProgress(p), h=jp.hatim, remaining=h?Math.max(0,zikrHatimTarget(p)-zikrInt(h.count)):zikrHatimTarget(p);
+    return remaining>0?[[String(remaining),'Kalan '+(remaining.toLocaleString('tr-TR'))]]:[];
+  }
+  return [[String(p.target||33),(p.target||33)+' bir tur'],['100','+100'],['500','+500']];
+}
+function zikrManualPreviewHTML(p,d){
+  var amount=zikrManualAmountOf(d);
+  if(amount<=0) return '';
+  var jp=zikrJourneyProgress(p), m=jp.math;
+  var date=todayStr();
+  var day=zikrDay(date), pd=zikrPresetDay(day,p.id);
+  var todayAfter=pd.count+amount, totalAfter=day.totalCount+amount;
+  var h='';
+  h+='<div class="zikr-v2-manual-preview" role="status" aria-live="polite">';
+  h+='<span>Bugün '+pd.count.toLocaleString('tr-TR')+' → <b>'+todayAfter.toLocaleString('tr-TR')+'</b>';
+  h+=' · Ömürlük '+zikrInt(jp.journey.lifetimeCount).toLocaleString('tr-TR')+' → <b>'+(zikrInt(jp.journey.lifetimeCount)+amount).toLocaleString('tr-TR')+'</b>';
+  if(p.kind==='esma'&&jp.hatim){
+    var room=zikrHatimTarget(p)-zikrInt(jp.hatim.count);
+    var capped=Math.min(amount,Math.max(0,room));
+    h+=' · Hatim '+(zikrInt(jp.hatim.count)+capped).toLocaleString('tr-TR')+'/'+zikrHatimTarget(p).toLocaleString('tr-TR');
+  }
+  h+='</span></div>';
+  return h;
+}
+function zikrManualSheetHTML(p){
+  if(!ui.zikrManualOpen) return '';
+  var d=zikrManualDraftFor(p);
+  var chips=zikrManualQuickChips(p);
+  var amount=zikrManualAmountOf(d);
+  var todayManual=zikrManualActive(todayStr(),p.id);
+  var h='<section id="zikr-manual-sheet" class="zikr-v2-manual'+(ui.zikrManualOpen?' is-open':'')+'" aria-label="Elle zikir ekle">';
+  h+='<div class="zikr-v2-manual-head"><span class="icon">'+icon('pencil',17)+'</span><div><small>ELLE SAYIM EKLE</small><strong>'+esc(p.name)+'</strong></div><button class="close" onclick="App.toggleZikrManual()" aria-label="El eklemeyi kapat">'+icon('x',15)+'</button></div>';
+  h+='<p class="zikr-v2-manual-lead">Tespihle, cemaatle ya da sayfa üzerinde saydığın zikirleri tek bütünde ekle. Sayacın ilerlemesiyle birlikte kaydedilir.</p>';
+  h+='<div class="zikr-v2-manual-stepper" role="group" aria-label="Miktar">';
+  h+='<button class="step" onclick="App.zikrManualStep(-1)" aria-label="On azalt">−</button>';
+  h+='<input id="zikr-manual-amount" type="text" inputmode="numeric" pattern="[0-9]*" value="'+esc(d.amount||'')+'" oninput="App.onZikrManualAmount(this)" placeholder="0" aria-label="Miktar">';
+  h+='<button class="step" onclick="App.zikrManualStep(1)" aria-label="On artır">+</button>';
+  h+='</div>';
+  if(chips.length){
+    h+='<div class="zikr-v2-manual-chips" role="group" aria-label="Hızlı miktar">';
+    chips.forEach(function(c){ h+='<button onclick="App.zikrManualChip('+c[0]+')">'+esc(c[1])+'</button>'; });
+    h+='</div>';
+  }
+  h+='<div id="zikr-manual-preview">'+zikrManualPreviewHTML(p,d)+'</div>';
+  h+='<label class="zikr-v2-manual-note"><span>Nasıl? <em>(isteğe bağlı)</em></span><input type="text" maxlength="200" value="'+esc(d.note||'')+'" oninput="App.onZikrManualNote(this)" placeholder="Tespihle, cemaatle…"></label>';
+  if(todayManual>0) h+='<div class="zikr-v2-manual-today">'+icon('feather',13)+' Bugün elle eklenen: <b>'+todayManual.toLocaleString('tr-TR')+'</b></div>';
+  h+='<div class="zikr-v2-manual-actions"><button class="ghost" onclick="App.toggleZikrManual()">Vazgeç</button><button class="primary" onclick="App.saveZikrManual()"'+(amount<=0?' disabled':'')+'>'+icon('check',15)+' Sayıma ekle</button></div>';
+  h+='</section>';
+  return h;
+}
 function zikrCounterViewHTML(p,z){
   var jp=zikrJourneyProgress(p), m=jp.math, day=zikrDay(todayStr()), pd=zikrPresetDay(day,p.id);
   var session=z.activeSession&&z.activeSession.presetId===p.id?z.activeSession:null;
@@ -14548,12 +14811,14 @@ function zikrCounterViewHTML(p,z){
   h+='</div>';
   h+='<div id="zikr-action-region">'+zikrActionNoteHTML()+'</div>';
   h+='<div id="zikr-reset-region">'+zikrResetConfirmHTML(p,pd)+'</div>';
+  h+='<div id="zikr-manual-region">'+zikrManualSheetHTML(p)+'</div>';
   // Alt eylem bölgesi: sırasında gereken geri al / duraklat ve kullanıcının
   // açıkça istediği, onay korumalı "bugünü sıfırla". Ses/titreşim/odak/nefes/
   // hareket ayarları Ayarlar sekmesinde kalır.
   h+='<div class="zikr-v2-dock" role="toolbar" aria-label="Sayaç araçları">';
   h+='<button id="zikr-undo-button" onclick="App.zikrUndo()" aria-label="Son sayaç işlemini geri al">'+icon('rotate-ccw',17)+'<span>Geri al</span></button>';
   h+='<button id="zikr-pause-button" class="pause '+sessionState+'" onclick="App.toggleZikrPause()" aria-label="'+pauseLabel+'">'+icon(sessionState==='active'?'pause':'play',17)+'<span>'+pauseLabel+'</span></button>';
+  h+='<button id="zikr-manual-button" class="manual'+(ui.zikrManualOpen?' is-open':'')+'" onclick="App.toggleZikrManual()" aria-expanded="'+(!!ui.zikrManualOpen)+'" aria-controls="zikr-manual-region" aria-label="Elle zikir sayımı ekle">'+icon('pencil',17)+'<span>Elle ekle</span></button>';
   h+='<button id="zikr-reset-button" class="reset'+(ui.zikrResetPending&&ui.zikrResetPresetId===p.id?' is-armed':'')+'" onclick="App.zikrResetToday()" aria-label="Bugünkü '+esc(p.name)+' sayımını sıfırla">'+icon('trash-2',17)+'<span>'+(ui.zikrResetPending&&ui.zikrResetPresetId===p.id?'Onay bekliyor':'Sıfırla')+'</span></button>';
   h+='</div>';
   h+='<div id="zikr-note-host">'+zikrNoteEditorHTML(p)+'</div>';
@@ -14681,6 +14946,19 @@ function zikrHistoryViewHTML(z){
     h+='<footer>'+n.wordCount+' kelime · '+esc((n.updatedAt||'').slice(11,16))+'</footer></article>';
   }); else h+='<div class="zikr-v2-empty"><strong>Henüz tefekkür kaydı yok.</strong><span>Sayaç ekranında ilk notunu yazdığında burada tarih ve zikir adına göre arşivlenecek.</span></div>';
   h+='</div>';
+  // ZP-10: elle sayım defteri — provenance dürüstlüğü. Her kayıt salt-okunur
+  // bir olaydır; geri alınanlar (revertedAt) soluk tonla "geri alındı" yazar.
+  var manuals=(Array.isArray(z.manualEntries)?z.manualEntries:[]).slice().sort(function(a,b){ return String(b.updatedAt||b.createdAt||'').localeCompare(String(a.updatedAt||a.createdAt||'')); }).slice(0,30);
+  h+='<div class="zikr-v2-manual-archive"><div class="title"><div><span>ELLE SAYIM DEFTERİ</span><h3>Sayaç dışı eklenenler</h3></div><b>'+manuals.length+' kayıt</b></div>';
+  if(manuals.length) manuals.forEach(function(e){
+    var done=!e.revertedAt;
+    h+='<article'+(done?'':' class="is-reverted"')+'><div class="head"><div><time>'+esc(dateLabelTR(e.date))+'</time><strong>'+esc((zikrPreset(e.presetId)||{}).name||e.presetId)+'</strong></div><b class="amount">'+zikrInt(e.amount).toLocaleString('tr-TR')+'</b></div>';
+    if(e.note) h+='<p>'+esc(e.note)+'</p>';
+    h+='<footer>'+(done?'Elle eklendi':'Geri alındı · '+esc((e.revertedAt||'').slice(11,16)))+' · '+esc((e.updatedAt||e.createdAt||'').slice(11,16))+'</footer>';
+    if(done) h+='<div class="undo-row"><button onclick="App.undoZikrManual(\''+esc(e.id)+'\')">'+icon('rotate-ccw',13)+' Bu kaydı geri al</button></div>';
+    h+='</article>';
+  }); else h+='<div class="zikr-v2-empty"><strong>Henüz elle sayım eklenmedi.</strong><span>Sayaçta "Elle ekle" ile tespih ya da cemaat zikirlerini kaydettiğinde defter burada tutulur.</span></div>';
+  h+='</div>';
   h+='</section>'; return h;
 }
 function zikrSettingsViewHTML(z){
@@ -14788,6 +15066,18 @@ function zikrPaintNoteRegion(){
   try{
     var el=document.getElementById('zikr-note-host'); if(!el) return false;
     el.innerHTML=zikrNoteEditorHTML(zikrActivePreset());
+    return true;
+  }catch(e){ return false; }
+}
+function zikrPaintManualRegion(){
+  try{
+    var el=document.getElementById('zikr-manual-region'); if(!el) return false;
+    el.innerHTML=zikrManualSheetHTML(zikrActivePreset());
+    var button=document.getElementById('zikr-manual-button');
+    if(button){
+      button.classList.toggle('is-open',!!ui.zikrManualOpen);
+      button.setAttribute('aria-expanded',ui.zikrManualOpen?'true':'false');
+    }
     return true;
   }catch(e){ return false; }
 }

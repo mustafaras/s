@@ -80,15 +80,18 @@
       <label for="cloud-voice" style="font-size:13px;font-weight:700;color:#6A5A5E;flex-shrink:0;">Ses:</label>
       <select id="cloud-voice" onchange="setCloudVoice(this.value)" style="flex:1;padding:10px;border-radius:12px;border:1px solid rgba(180,150,160,.4);background:#fff;font-size:13.5px;color:#4A3A3E;">
         <option value="shimmer">Shimmer · sıcak & parlak (kadın)</option>
-        <option value="nova">Nova · canlı & genç (kadın)</option>
         <option value="coral">Coral · samimi & yumuşak (kadın)</option>
+        <option value="nova">Nova · canlı & genç (kadın)</option>
         <option value="sage">Sage · sakin & bilge (kadın)</option>
-        <option value="juniper">Juniper · açık & samimi (kadın)</option>
+        <option value="marin">Marin · modern & net (kadın)</option>
+        <option value="cedar">Cedar · sıcak (kadın)</option>
         <option value="verse">Verse · dengeli (erkek)</option>
+        <option value="ballad">Ballad · duygusal (erkek)</option>
         <option value="alloy">Alloy · nötr (erkek)</option>
         <option value="ash">Ash · derin (erkek)</option>
-        <option value="ballad">Ballad · duygusal (erkek)</option>
         <option value="onyx">Onyx · otoriter (erkek)</option>
+        <option value="echo">Echo · yumuşak (erkek)</option>
+        <option value="fable">Fable · anlatıcı (erkek)</option>
       </select>
     </div>
     <input type="password" id="oai-key" placeholder="sk-… (OpenAI anahtarı — yalnız bu oturumda)" style="border:1px solid rgba(180,150,160,.4);border-radius:12px;padding:10px;font-size:13px;outline:none;color:#4A3A3E;background:#fff;" oninput="setKey(this.value)">
@@ -154,6 +157,7 @@
     if (on && !k.value.trim()){ k.focus(); document.getElementById('cloud-state').textContent = '⚠️ önce OpenAI anahtarını gir (sk-…)'; setTimeout(function(){ document.getElementById('cloud').checked = false; }, 100); }
   }
   function setCloudVoice(v){ window.SeymaState.data.settings.voiceCloudVoice = v; }
+  function setKey(v){ window.SeymaState.data.settings.openaiKey = String(v || '').trim(); window.SeymaState.data.settings.voiceCloudTts = true; }
   // ── Ses & prosodi seçimi ──
   var _voice = null, _rate = 0.92, _pitch = 1.05;
   function fillVoices(){
@@ -183,7 +187,9 @@
     // anahtar yoksa/ağ hatasıysa yerel TTS'e düş.
     try{
       if (document.getElementById('cloud').checked && document.getElementById('oai-key').value.trim()){
+        // Demo: anahtar + voiceCloudTts ayarını canlı senkronla (setKey oninput'i de var).
         window.SeymaState.data.settings.openaiKey = document.getElementById('oai-key').value.trim();
+        window.SeymaState.data.settings.voiceCloudTts = true;
         var st = document.getElementById('cloud-state');
         st.textContent = '☁️ bulut sesi üretiliyor… (' + document.getElementById('cloud-voice').value + ')';
         var ok = window.SeyAudio.cloudTtsSpeak(text, { cloudVoice: document.getElementById('cloud-voice').value, rate: _rate, volume: 0.9 }, function(success){

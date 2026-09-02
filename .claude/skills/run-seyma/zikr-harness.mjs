@@ -128,7 +128,52 @@ function ok(name, cond, detail) {
 console.log('== İlham & İbadet · Zikirmatik v2 headless test ==');
 // REM-54: index.html ile ayni boot seti; reminder modulleri de yuklenir ki
 // zikir / Saygi deep-link hedefleri uretimdeki gercek modul yolunda olculsun.
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/content/saygiPeople.js', 'app/content/hijriCalendar.js', 'app/content/esmaulHusnaV1.js', 'app/content/esmaulHusnaV2.js', 'app/content/zikirCoreContentV1.js', 'app/core/constants.js', 'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js', 'app/core/reminderDelivery.js', 'app/core/state.js', 'app/core/mediaFx.js', 'app.js'];
+// MON-04: FILES artık index.html 43–71 sırasının birebir paritesi; sync.js
+// kasıtlı olarak YOK (ağ sıfır kalır). Dizi sırası index.html'e karşı
+// assertLoadOrder ile denetlenir; sırayı elle değiştirmek fixture FAIL üretir.
+const FILES = [
+  'app/content/motivationProgramV2.js',
+  'app/content/motivationNarratives.js',
+  'app/content/saygiPeople.js',
+  'app/content/profileAssessmentV1.js',
+  'app/content/hijriCalendar.js',
+  'app/content/quranRevelationOrderV1.js',
+  'app/content/quranTransportV1.js',
+  'app/content/quranStrikingVersesV1.js',
+  'app/content/esmaulHusnaV1.js',
+  'app/content/esmaulHusnaV2.js',
+  'app/content/zikirCoreContentV1.js',
+  'app/core/constants.js',
+  'app/core/dateUtils.js',
+  'app/core/state.js',
+  'app/core/syncGlue.js',
+  'app/core/helpers.js',
+  'app/core/mediaFx.js',
+  'app/core/timeTheme.js',
+  'app/core/reminderCatalog.js',
+  'app/core/reminderEngine.js',
+  'app/core/reminderScheduler.js',
+  'app/core/reminderDelivery.js',
+  'app.js'
+];
+
+// MON-04 load-order assertion (driver.mjs ile aynı sözleşme): FILES, index.html
+// üretim sırasının app.js'e kadarki önekiyle birebir eşit olmalıdır.
+function assertLoadOrder(files, repoRoot) {
+  const html = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+  const idxOrder = [...html.matchAll(/<script src="([^"?]+)/g)].map((m) => m[1]);
+  const bootOrder = idxOrder.filter((s) => s.startsWith('app/') || s === 'app.js');
+  const head = files.indexOf('app.js');
+  if (head === -1) throw new Error('MON-04 load-order: FILES içinde app.js yok');
+  const filesPrefix = files.slice(0, head);
+  const prodPrefix = bootOrder.slice(0, bootOrder.indexOf('app.js'));
+  if (JSON.stringify(filesPrefix) !== JSON.stringify(prodPrefix)) {
+    throw new Error('MON-04 load-order FAILED: harness FILES ≠ index.html sırası\n' +
+      'harness: ' + JSON.stringify(filesPrefix) + '\n' +
+      'index:   ' + JSON.stringify(prodPrefix));
+  }
+}
+assertLoadOrder(FILES, REPO);
 const styles = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
 let sb = buildSandbox(seed);

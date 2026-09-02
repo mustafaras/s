@@ -9,16 +9,16 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-03 tamamlandı |
+| Durum | `in_progress` — MON-04 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-03` / `MON-04` |
-| Dalga / ilerleme | 1 / 3/60 |
+| Son / sıradaki | `MON-04` / `MON-05` |
+| Dalga / ilerleme | 1 / 4/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-02 |
 
-**Bağlayıcı durak:** `MON-03` yalnız sahiplik matrisi promptu olarak
-tamamlandı; üretim kodu taşınmadı. `MON-04` yeni açık kullanıcı onayı
-olmadan başlamaz.
+**Bağlayıcı durak:** `MON-04` harness FILES paritesi olarak tamamlandı;
+üretim kodu taşınmadı (yalnız iki harness dosyası). `MON-05` yeni açık
+kullanıcı onayı olmadan başlamaz.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -84,10 +84,12 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
   timeTheme → reminder×4 → inline SW → coverage manifest → app.js → sync.js.
   Yeni core satırları reminderDelivery sonrasına, inline SW önüne eklenir;
   cache-bust aynı committe artar.
-- `driver.mjs` şu an motivation/profile + constants + reminder×4 + app.js
-  yükler. `zikr-harness.mjs` daha geniş content seti ile state/mediaFx yükler;
-  dateUtils/syncGlue/helpers/timeTheme eksiktir. MON-04 bunları üretim sırasına
-  eşitlemeden hiçbir gövde taşınmaz.
+- **MON-S4 kararı:** driver.mjs ve zikr-harness.mjs FILES dizileri artık
+  index 43–71 sırasının birebir paritesi (23 dosya, app.js dahil; sync.js ve
+  panel coverage kasıtlı dışarıda). Fail-fast `assertLoadOrder()` iki
+  harness'ta da çalışır: sıra ihlali throw üretir. Kural: yeni core dosyası
+  önce index'e, sonra FILES'a aynı konuma; sync.js hiç FILES'a eklenmez.
+  Kaynak: [`../deliverables/MON-S4-HARNESS-PARITE-KARARI.md`](../deliverables/MON-S4-HARNESS-PARITE-KARARI.md).
 - `SeymaState`, `SeymaSave`, `SeymaDateUtils`, `SeymaHelpers` için app.js'te
   bugün doğrudan referans yoktur. Bu B1 skeleton durumudur; MON-07 sonrası
   yalnız hedefli değişir.
@@ -142,6 +144,6 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-Kullanıcı uygulamaya açıkça onay verirse `MON-04`: driver/zikr-harness FILES
-paritesi ve load-order kanıtı (`deliverables/MON-S4-HARNESS-PARITE-KARARI.md`).
-Aksi halde bu durum değişmez.
+Kullanıcı uygulamaya açıkça onay verirse `MON-05`: boundary fixture geçiş
+matrisi (`deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md`). Aksi halde bu
+durum değişmez.

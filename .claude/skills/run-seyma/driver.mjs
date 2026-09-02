@@ -220,9 +220,55 @@ function assert(name, cond) {
 // REM-54: index.html'in gercek boot sirasi. Reminder modulleri uzun sure
 // diskte durup index.html'e hic baglanmamisti; harness da onlarsiz boot
 // ederek bunu gizliyordu. Artik uretimle ayni seti yukluyoruz.
-const FILES = ['app/content/motivationProgramV2.js', 'app/content/profileAssessmentV1.js', 'app/core/constants.js',
-  'app/core/reminderCatalog.js', 'app/core/reminderEngine.js', 'app/core/reminderScheduler.js',
-  'app/core/reminderDelivery.js', 'app.js'];
+// MON-04: FILES artık index.html 43–71 sırasının birebir paritesi; sync.js
+// kasıtlı olarak YOK (ağ sıfır kalır), panel/coverage manifest de kasıtlı YOK.
+// Bu dizinin sırası `node .claude/skills/run-seyma/verify-load-order.mjs`
+// ile index.html'e karşı denetlenir; sırayı elle değiştirmek fixture FAIL üretir.
+const FILES = [
+  'app/content/motivationProgramV2.js',
+  'app/content/motivationNarratives.js',
+  'app/content/saygiPeople.js',
+  'app/content/profileAssessmentV1.js',
+  'app/content/hijriCalendar.js',
+  'app/content/quranRevelationOrderV1.js',
+  'app/content/quranTransportV1.js',
+  'app/content/quranStrikingVersesV1.js',
+  'app/content/esmaulHusnaV1.js',
+  'app/content/esmaulHusnaV2.js',
+  'app/content/zikirCoreContentV1.js',
+  'app/core/constants.js',
+  'app/core/dateUtils.js',
+  'app/core/state.js',
+  'app/core/syncGlue.js',
+  'app/core/helpers.js',
+  'app/core/mediaFx.js',
+  'app/core/timeTheme.js',
+  'app/core/reminderCatalog.js',
+  'app/core/reminderEngine.js',
+  'app/core/reminderScheduler.js',
+  'app/core/reminderDelivery.js',
+  'app.js'
+];
+
+// MON-04 load-order assertion: FILES dizisi index.html üretim sırasına eşit olmalı.
+// (Sıra dışı ekleme gelecek MON kartlarında ancak index sırasıyla birlikte olur.)
+function assertLoadOrder(files, repoRoot) {
+  const html = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+  const idxOrder = [...html.matchAll(/<script src="([^"?]+)/g)].map((m) => m[1]);
+  const bootOrder = idxOrder.filter((s) => s.startsWith('app/') || s === 'app.js');
+  // coverage manifest (panel/...) boot setinin dışıdır; app.js ve öncesi karşılaştırılır.
+  const filesNoApp = files.slice(0, files.length);
+  const head = filesNoApp.indexOf('app.js');
+  if (head === -1) throw new Error('MON-04 load-order: FILES içinde app.js yok');
+  const filesPrefix = filesNoApp.slice(0, head);
+  const prodPrefix = bootOrder.slice(0, bootOrder.indexOf('app.js'));
+  if (JSON.stringify(filesPrefix) !== JSON.stringify(prodPrefix)) {
+    throw new Error('MON-04 load-order FAILED: harness FILES ≠ index.html sırası\n' +
+      'harness: ' + JSON.stringify(filesPrefix) + '\n' +
+      'index:   ' + JSON.stringify(prodPrefix));
+  }
+}
+assertLoadOrder(FILES, REPO);
 
 console.log('== boot: onboarding (no saved data) ==');
 appHTML = '';

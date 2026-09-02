@@ -9,15 +9,16 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-02 tamamlandı |
+| Durum | `in_progress` — MON-03 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-02` / `MON-03` |
-| Dalga / ilerleme | 1 / 2/60 |
+| Son / sıradaki | `MON-03` / `MON-04` |
+| Dalga / ilerleme | 1 / 3/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-02 |
 
-**Bağlayıcı durak:** `MON-02` yalnız ölçüm/manifest promptu olarak tamamlandı;
-üretim kodu taşınmadı. `MON-03` yeni açık kullanıcı onayı olmadan başlamaz.
+**Bağlayıcı durak:** `MON-03` yalnız sahiplik matrisi promptu olarak
+tamamlandı; üretim kodu taşınmadı. `MON-04` yeni açık kullanıcı onayı
+olmadan başlamaz.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -93,14 +94,30 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 
 ## 24 hedef modül ve ilerleme matrisi
 
+Sahiplik kaynağı artık [`../deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md`](../deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md)'dir:
+24 benzersiz hedef (6 KORU + 18 YENİ) + frozen reminder dörtlüsü, registry
+adları, bağımlılık yönleri, forbidden reverse dependency ve index ekleme
+noktası (reminderDelivery'den sonra, coverage manifest'ten önce) sabit.
+Özet:
+
 | Sınıf | Hedefler | Plan durumu |
 |---|---|---|
-| Var/korunacak altyapı | constants, mediaFx, timeTheme, reminderCatalog/Engine/Scheduler/Delivery | API/load-safe koruma |
-| Saf çekirdek | dateUtils, helpers | MON-07..10 |
-| Mutable çekirdek | state | MON-11..15 |
-| Senkron köprü | syncGlue | MON-16..18 |
-| Domain | prayer, zikir, quran, saygi, motivation, crisis, journal, health, library, report, map, profile, settings, reminders, messaging | MON-19..43; domain kartı tek core modül |
-| Birleştirme | render, appSurface | MON-44..54 |
+| Var/korunacak altyapı (6) | constants, dateUtils, helpers, syncGlue, mediaFx, timeTheme | KORU; dateUtils/helpers/syncGlue sonradan genişletilir |
+| Saf çekirdek | (dateUtils/helpers genişletmesi) | MON-07..10 |
+| Mutable çekirdek (1) | state | MON-11..15 |
+| Senkron köprü (1) | syncGlue genişletmesi | MON-16..18 |
+| Domain (12) | prayer, zikir, quran, saygi, motivation, crisis, journal, health, library, report, map, profile, settings | MON-19..35 |
+| Reminder UI + messaging (2) | reminders, messaging | MON-40..43 |
+| Birleştirme (2) | render, appSurface | MON-44..54 |
+
+## MON-03 kapanışı — sahiplik matrisi
+
+- Matris: [`../deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md`](../deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md).
+- 24 benzersiz hedef doğrulandı; index core sırası (54–64) kaynakla birebir.
+- Kural: registry yalnız kendi üyelerini kurar (yan etkisiz); app.js shim
+  fail-closed; hiçbir modül sync.js/panel/data-rebind'e yazamaz; cycle yok.
+- Manuel zikir serbest fonksiyonları (a) saf sınıfına MON-S5 matrisi için
+  işaretlendi. Halt tetiklenmedi.
 
 ## Premium FX mirası
 
@@ -125,6 +142,6 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-Kullanıcı uygulamaya açıkça onay verirse `MON-03`: 24 modül sahiplik ve
-yükleme matrisi (`deliverables/MON-S3-MODUL-SAHIPLIK-MATRISI.md`). Aksi
-halde bu durum değişmez.
+Kullanıcı uygulamaya açıkça onay verirse `MON-04`: driver/zikr-harness FILES
+paritesi ve load-order kanıtı (`deliverables/MON-S4-HARNESS-PARITE-KARARI.md`).
+Aksi halde bu durum değişmez.

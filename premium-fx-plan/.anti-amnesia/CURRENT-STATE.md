@@ -1,12 +1,33 @@
-# Anti-amnesi: Şeyma Premium FX Planı — Mevcut Durum
+# Premium FX — Implementation Tamamlandı (LOCAL ONLY)
 
-**Tarih:** 2026-09-01
-**Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme Planı
-**Kaynak uygulama:** `/Users/m_ras/Desktop/seyma` (kod değiştirilmiyor)
+**Tarih:** 2026-09-02
+**Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme
+**Kaynak uygulama:** `/Users/m_ras/Desktop/seyma`
 **Plan sürümü:** 2.3
-**Uygulama kuralı:** Uygulama aşamasında tüm commitler sadece yerel kalır. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
+**Uygulama kuralı:** Tüm commitler `premium-fx-local` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
+
+## Son Durum (FX-P-74 — FINAL)
+
+- **Son tamamlanan prompt:** FX-P-74 (final kapanış)
+- **Uygulama:** ✅ TAMAMLANDI — Dalga −1 (modüler çekirdek), 0 (master switch iskeleti), 1 (Audio), 2 (Haptics), 3 (Visual micro-FX), 4 (Time theme), 5 (Voice guidance + bulut TTS), 6 (Ayarlar master switch + panel + a11y) tamamlandı; FX-P-70 tam denetimi **DEPLOY-A-HAZIR** kararı verdi; Dalga 7 (71–74) kapatma tamamlandı.
+- **Testler:** ~70 headless fixture (app/panel/panel-v2/quran/reminders) + driver + zikr + 9 syntax — tamamı PASS; tam regression FX-P-65 ve FX-P-70'te iki kez koşuldu.
+- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı, App.* 705 yalnız-ekleme, tek app.js).
+- **Bulut TTS:** `voiceCloudTts=true` (varsayılan), `voiceLocalFallback=false` — robotik yerel sene asla düşülmez; anahtar `settings.openaiKey` (Luna ile paylaşımlı, sanitize ile repoya gitmez).
+- **Branch:** `premium-fx-local` — push edilmemiş; `main`'e merge kullanıcı onayı + son regression ile.
+
+## Known Blockers
+
+- YOK.
+
+## Sonraki Adımlar
+
+1. Kullanıcı gözden geçirmesi (UI/UX + sesler).
+2. İstenirse FX-P-66/67 ertelenen zenginleştirmeleri.
+3. Merge kararı: `premium-fx-local` → `main` (kullanıcı onayı + son regression). Push/deploy onaysız yasak.
 
 ## Durum
+
+> **GÜNCEL (FX-P-74, 2026-09-02):** Aşağıdaki bölüm tarihseldir. Güncel durum dosyanın başındaki "Implementation Tamamlandı" bölümündedir — tüm dalgalar (−1…6), FX-P-70 denetimi ve Dalga 7 kapanışı tamamlandı; push/merge/deploy kullanıcı onayı bekliyor.
 
 Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tutarsızlıklar giderildi. **Plan belgeleri ve promptlar gerçek koda karşı denetlendi ve düzeltildi** (seq 22). **Mimari karar B1 alındı** (seq 23): `data` mutable bir bağlama olduğu için Faz 0'da (FX-P-05) `app.js`'e **canlı getter** eklenir; I2/I3/I4 "davranış değiştirmez" olarak yeniden tanımlandı. **Kapsamlı denetimde 3 kırık fonksiyon bulundu** (seq 24): `dateUtils.js` `dayIndexFor`/`activeDate`/`curDay` closure bağımlılıklarını (`data`, `ui`, `getDay`) kaybetti. **FX-P-03'te bu 3 fonksiyon B1 canlı-getter yüzeyine hizalandı** (seq 25): `dayIndexFor` → `SeymaState.data.startDate`, `activeDate` → `SeymaState.ui.editDate`, `curDay` → `SeymaState.getDay(SeymaState.data, d, idx)`; `state.js` yorumu B1'e göre güncellendi; `test_date_utils_boundary.js` (58/58) ve `test_helpers_boundary.js` (30/30) genişletildi. **FX-P-04'te Faz -1.1 kapanışı tamamlandı** (seq 26): `test_modularization_boundary.js` (42/42) güncellendi. **FX-P-05'te Dalga 0 başladı** (seq 27): `migrate()`'e 6 premium FX settings alanı eklendi (premiumAtmosphere/uiSounds/voiceGuidance/ambientSounds/richHaptics/launchRitual) ve B1 canlı getter'ları `app.js`'e eklendi (`window.data`/`ui`/`dark`/`migrate`/`getDay`/`createDefaultData`/`save`). **FX-P-06'da Dalga 0 tamamlandı** (seq 28): `mediaFx.js` API yüzeyi ve master gating fonksiyonları tanımlandı (`SeyAudio.ctx` lazy init, `SeyHaptics` gating, `SeyFx` master gating). **FX-P-11'de Dalga 1 başladı** (seq 29): `SeyAudio` temel UI sesleri implemente edildi (`tap`/`success`/`warning`/`bell` + vibrato, `premiumAtmosphere`+`uiSounds`+`prefers-reduced-motion` gating). S5/S6 geçti. **FX-P-12'de ilk `app.js` değişikliği yapıldı** (seq 30): `zikrTickSound` içindeki AudioContext/osilatör kodu kaldırılıp `window.SeyAudio.tap()`'e yönlendirildi (SeyAudio yoksa no-op); ölü `_zikrAudio` temizlendi; `zikr-harness.mjs` boot setine `state.js`+`mediaFx.js` eklendi (üretim yükleme sırasıyla hizalı). **Kullanıcı geri bildirimiyle FX-P-12 tamamlandı** (seq 31): tıklama sesi "Sıcak" (523Hz triangle 180ms) yapıldı ve reduce-motion erişilebilirlik düzeltmesi uygulandı — `allowed(allowReducedMotion)` opsiyonel parametresi; `tap()` gibi kullanıcının bilinçli tetiklediği kısa etkileşim sesleri reduce-motion altında da çalıyor, diğer sesler sessiz kalıyor. S5 geçti. **FX-P-13'te başarı/kutlama sesleri entegre edildi** (seq 32): `app.js` içinde 3 olumlu eylem noktasına güvenli wrapper ile `SeyAudio.success()` eklendi — kart toggle tamamlandığında, streak kilometre taşında ve tüm hedefler tamamlandığında (confetti ile eşzamanlı). **FX-P-14'te uyarı sesleri entegre edildi** (seq 34): `app.js` içinde 4 uyarı noktasına güvenli wrapper ile `SeyAudio.warning()` eklendi — günlük soru limiti, kafein limiti, geçersiz giriş (kitap/alıntı) ve boş reflection. **FX-P-15'te zil `bell` entegre edildi** (seq 35): `app.js` içinde 3 ritüel noktasına güvenli wrapper ile `SeyAudio.bell()` eklendi — zikir tur/hatim tamamlama, motivasyon görevi tamamlama ve hatırlatma kapanışı. **Faz 1 devam ediyor; sıradaki FX-P-16.** **FX-P-21'de Dalga 2 (Haptics) başladı** (seq 37): `SeyHaptics` desenleri FX-LIBRARY.md §2'ye hizalandı (`tap`/`success`/`error`/`refresh`/`streak`/`water`), `haptic()` helper'ına legacy `settings.haptics === false` kapısı eklendi; `app.js`/`index.html`/`sync.js` dokunulmadı. S5/S6 geçti. **FX-P-22'de temel etkileşimlere `SeyHaptics.tap()` entegre edildi** (seq 38): 17 nokta (setMood, setEnergy, setStress, toggleHabit, waterAdd, saveToday, overlay aç/kapa, yıldız puanlama, segmented tab, toggleTheme) güvenli guard ile sarıldı; `App.*` yüzeyi, onclick imzaları ve `data/settings` şekli değişmedi. S5/S6 geçti. **FX-P-23'te streak/water haptics entegre edildi** (seq 39): `SeyHaptics.streak()` 3 noktaya (maybeStreak, zikir tur/hatim, motivasyon görevi), `App.waterAdd` pozitif delta'da `tap()` yerine `SeyHaptics.water()` eklendi. S5/S6 geçti. **FX-P-24'te Dalga 2 kapatıldı** (seq 40): haptics test fixture gerçek `mediaFx.js` üzerinden yeniden yazıldı (25/25), REVIEW-CHECKLIST'e "Dalga 2 Haptics" kapsamı eklendi. S5/S6 geçti. **FX-P-31'de Dalga 3 (Visual micro-FX) başladı** (seq 41): `SeyFx` master gating utility'leri implemente edildi (isPremiumFxEnabled/prefersReducedMotion/shouldAnimate/ambientAllowed/isSoundAllowed); `settings()` helper'ı gerçek kaynak olarak kullanıldı. S5/S6 geçti. **FX-P-32'de ripple efekti implemente edildi** (seq 42): `.sey-ripple` CSS + `SeyFx.ripple(event,color)` (dokunma koordinatlarına göre dalga, isPremiumFxEnabled gating, reduced-motion'a saygılı); cache-busting `app/styles.css?v=20260901a`. S5/S6 geçti. **FX-P-33..38'te Dalga 3 (Visual micro-FX) tamamlandı** (seq 43-48): shimmer (FX-P-33), count-up (FX-P-34), micro-FX entegrasyonu (FX-P-35), test+kapsam (FX-P-36, fx_utils 26/26), enter/transition (FX-P-37), performans audit (FX-P-38, will-change + katalog + VISUAL-FX-AUDIT.md). Cache-busting: `app/styles.css?v=20260901b`, `mediaFx.js?v=20260901a`. S5/S6 geçti.
 
@@ -69,7 +90,7 @@ Plan/spec/test/prompt senkronizasyonu tamamlandı; plan belgeleri arasındaki tu
   - `test_modularization_boundary.js` (16/16) ← Faz -1 sınır fixture'ı
   - `test_faz_minus11_boundary.js` (13/13) ← PR -1.1 öncesi expose sınır fixture'ı
 
-## Devam Eden
+## Devam Eden (kapandı — tarihsel)
 
 - **Dalga 5 (Sesli Rehberlik) TAMAMLANDI.** FX-P-52: sesli rehberlik entegrasyonu (isQuietTime 23:00–07:00; onboarding tek seferlik karşılama, streak günde 1 kez, zikir tamamlama günde 1 kez; hatırlatma sesli özeti adımı donmuş REM programına dokunmama gerekçesiyle atlandı). FX-P-53: ambiyans ses motoru (SeyAudio.ambient start/stop/isSupported/isEnabled, rain/wave/ney/nakar/birds/breeze/crickets, <audio> fallback, .ambient-control CSS). FX-P-54: tests/app/test_premium_voice.js fixture'ı (FX-P-54 kapsamı PASS). FX-P-55: SeyAudio.guides (zikirStart/zikirHalf/zikirComplete/suraOpen/suraBookmark) + app.js zikrTap entegrasyonu (start: oturum başına 1, half: oturum başına 1, complete: günde 1). FX-P-56: SeyAudio.greeting() zaman dilimi selamlaması (boot 2.2sn gecikmeli + foreground, 4h throttle, günde max 2; settings.lastVoiceGreetingAt/voiceGreetingDate/Count). FX-P-57: sesli rehberlik ayarları UI (Ayarlar > "🎙️ Sesli rehberlik" kartı; voiceGuidance toggle, voiceLang tr-TR/en-US/ar-SA, voiceRate 0.75–1.5; App.setVoiceGuidance/setVoiceLang/setVoiceRate; SeyAudio.voice settings defaults). FX-P-58: son denetim — FX-LIBRARY.md §3.9 ses/sesli rehberlik kataloğu + sessiz zaman matrisi; REVIEW-CHECKLIST Faz 5 kapanış satırları; tüm regression PASS. Sıradaki **Dalga 6 / FX-P-61** (Ayarlar & ana anahtar arayüzü) — ayrı kullanıcı onayı bekliyor.
 

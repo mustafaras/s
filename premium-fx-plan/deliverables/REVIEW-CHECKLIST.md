@@ -83,6 +83,14 @@ Bu liste, planın uygulanmaya başlamadan önce ve her faz sonrası gözden geç
 - [x] Mevsimsel renk fonksiyonu uygulandı (`seasonalClass(d)` dört mevsim + özel günler; `applySeasonal(d)` root sınıfını günceller)
 - [x] Zaman teması test fixture PASS (`tests/app/test_premium_time_theme.js` — gerçek `timeTheme.js` VM'de yüklenir, classForHour/apply/seasonalClass/applySeasonal + CSS tanımları doğrulanır, 49/49)
 
+## Dalga 5 Voice (FX-P-54 ara kapsam; kapanış FX-P-58'de)
+
+- [x] `SeyAudio.voice` API uygulandı (FX-P-51: gating + clamp + force/cancel + voiceNames)
+- [x] Sesli rehberlik uygulama noktalarına entegre edildi (FX-P-52: onboarding tek seferlik, streak günde 1 kez, zikir tamamlama günde 1 kez)
+- [x] Ambiyans ses motoru iskeleti uygulandı (FX-P-53: `SeyAudio.ambient` start/stop/isSupported/isEnabled, Web Audio + `<audio>` fallback, `.ambient-control` CSS)
+- [x] `SeyAudio.isQuietTime()` uygulandı (23:00–07:00; voice ve ambient bu pencerede sessiz)
+- [x] Voice test fixture oluşturuldu (`tests/app/test_premium_voice.js` — FX-P-54 kapsamı PASS; guides/greeting/settings satırları FX-P-55/56/57 ile yeşillenir)
+
 ## Dokümantasyon
 
 - [ ] `docs/GELISTIRME-PLANI.md` güncelleme planı var; şu an için güncelleme yalnızca plan/spec/test aşamasında, canlı `app.js` dokümanı bu aşamada değiştirilmiyor.

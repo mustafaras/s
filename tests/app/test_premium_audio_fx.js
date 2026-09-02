@@ -110,7 +110,8 @@ console.log('[1] SeyAudio API yüzeyi tanımlı');
   ok('SeyAudio.warning fonksiyonu var', typeof window.SeyAudio.warning === 'function');
   ok('SeyAudio.bell fonksiyonu var', typeof window.SeyAudio.bell === 'function');
   ok('SeyAudio.voice fonksiyonu var', typeof window.SeyAudio.voice === 'function');
-  ok('SeyAudio.ambient fonksiyonu var', typeof window.SeyAudio.ambient === 'function');
+  // FX-P-53: ambient artık motor nesnesidir (start/stop/isSupported/isEnabled).
+  ok('SeyAudio.ambient motor yüzeyi var', !!window.SeyAudio.ambient && typeof window.SeyAudio.ambient.start === 'function' && typeof window.SeyAudio.ambient.stop === 'function');
   ok('SeyAudio.ctx getter var', typeof Object.getOwnPropertyDescriptor(window.SeyAudio, 'ctx') === 'object');
 })();
 

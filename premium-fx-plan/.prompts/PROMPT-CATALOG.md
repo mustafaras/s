@@ -148,6 +148,12 @@ Her prompt şunları içermeli:
 
 ## 3. Prompt Indexi
 
+### Dalga 6.5: Dalga 7 Öncesi Tam Denetim
+
+| Kod | Ad | Ajan | Çıktı Dosyaları | Kısa Amaç |
+| --- | --- | --- | --- | --- |
+| FX-P-70 | Dalga −1…6 tam uygulama denetimi | QA lead | `premium-fx-plan/deliverables/FX-VERIFY-RAPORU.md` | Tüm dalgaların uygulandığını, değişmezlerin korunduğunu ve tam regression'ın geçtiğini bağımsız kanıtlarla doğrula; dalga 7'ye geçiş kararı üret. |
+
 ### Dalga -1: Modülerleştirme Altyapısı
 
 | Kod | Ad | Ajan | Çıktı Dosyaları | Kısa Amaç |

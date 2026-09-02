@@ -1,11 +1,12 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-02 · **Durum:** `ready` · **Uygulanan prompt:** 0/60
+**Sürüm:** 2.1 · **Tarih:** 2026-09-02 · **Durum:** `in_progress` · **Uygulanan prompt:** 1/60 (`MON-01`)
 
 Bu klasör, Şeyma'nın 18.957 satırlık `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kod uygulama paketi değildir**: hiçbir `MON-*` promptu uygulanmadı.
-Uygulama, kullanıcının ayrı ve açık onayıyla, sırayla başlar.
+bir **kademeli kod uygulama paketidir**: yalnız `MON-01` (baseline + karar)
+tamamlandı; üretim kodu taşınmadı. Sonraki promptlar ayrı ve açık kullanıcı
+onayıyla, sırayla yürür.
 
 ## Sınır ve otorite
 

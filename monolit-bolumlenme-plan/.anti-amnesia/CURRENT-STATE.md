@@ -9,20 +9,34 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `ready` — plan v2.1 ayrıntılı, uygulama başlamadı |
+| Durum | `in_progress` — MON-01 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | yok / `MON-01` |
-| Dalga / ilerleme | 1 / 0/60 |
+| Son / sıradaki | `MON-01` / `MON-02` |
+| Dalga / ilerleme | 1 / 1/60 |
 | Dal | `premium-fx-local` — LOCAL-ONLY |
 | Güncellendi | 2026-09-02 |
 
-**Bağlayıcı durak:** Kullanıcı yeni ve açık uygulama onayı vermeden `MON-01`
-çalıştırılmaz. Bu klasörün planlama commit'i uygulama değildir.
+**Bağlayıcı durak:** `MON-01` yalnız karar/baseline promptu olarak tamamlandı;
+üretim kodu taşınmadı. `MON-02` yeni açık kullanıcı onayı olmadan başlamaz.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
 taşıma dizisi, registry/yükleme sınırı, kapı paketi ve fail-closed handoff
-sunmaktadır. Bu ek, uygulama durumu değildir; `0/60` değişmeden kalır.
+sunmaktadır. Bu ek tek başına uygulama durumu değildir; ilerleme yalnız
+tamamlanan promptların gerçek kaydıyla güncellenir.
+
+## MON-01 kapanışı — canlı karar kaydı
+
+- Karar belgesi: [`MON-S1-DELEGASYON-KARARI.md`](../deliverables/MON-S1-DELEGASYON-KARARI.md).
+- Kabul edilen yol: load-safe `window.Seyma<Module>` registry + app.js'te
+  imza-koruyan shim; yalnız özgür fonksiyon ve açık dependency rotası varsa.
+- Retler: snapshot global state, modülün `data=` yazması, event bus/bundler,
+  sync callback'lerini taşımak ve monoliti tek seferde kaldırmak.
+- Ölçüm düzeltmesi: 9 `data` kaynak satırı; aynı satırdaki çift yazımlar
+  nedeniyle 11 token (başlangıç bildirimi dâhil), 10 rebind tokenı. App
+  function-ataması 545, tüm App ataması 704, inline onclick 415/321.
+- Kod/harness/index/sync/panel/content/veri değişmedi. Bu yalnız yerel,
+  başsız kaynak kanıtıdır; deploy veya cihaz kabulü değildir.
 
 ## Canlı baseline (2026-09-02)
 

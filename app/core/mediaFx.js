@@ -124,6 +124,21 @@
       suraOpen: function(name){ return window.SeyAudio.voice(String(name || 'Sure') + ' açıldı. Huşuyla oku.', { lang: 'tr-TR', rate: 1 }); },
       suraBookmark: function(){ return window.SeyAudio.voice('Yer işareti koydun.', { lang: 'tr-TR', rate: 1 }); }
     },
+    // FX-P-56: mevcut zaman dilimine göre kısa, samimi selamlama. SeyTimeTheme
+    // yoksa veya premiumAtmosphere/voiceGuidance/quiet-time kapalıysa sessizce
+    // false döner (tüm gating SeyAudio.voice içinde).
+    greeting: function(){
+      if (!window.SeyTimeTheme || typeof window.SeyTimeTheme.classForHour !== 'function') return false;
+      var cls = window.SeyTimeTheme.classForHour();
+      var map = {
+        'theme-time-dawn': 'Günaydın, Sevgili Günışığı. Yeni bir gün, yeni bir başlangıç.',
+        'theme-time-day': 'Merhaba, Günışığı. Günün ortasında ne hissediyorsun?',
+        'theme-time-dusk': 'İyi akşamlar, Günışığı. Günü yavaşça kapatma vakti.',
+        'theme-time-night': 'İyi geceler, Sevgili Günışığı. Huzurla dinlen.'
+      };
+      var text = map[cls] || map['theme-time-day'];
+      return window.SeyAudio.voice(text, { lang: 'tr-TR', rate: 1 });
+    },
     voice: function(text, opts){
       opts = opts || {};
       if (!isPremiumFxEnabled() || !window.SeyAudio.isVoiceEnabled()) return false;

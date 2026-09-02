@@ -18824,6 +18824,24 @@ function maybePullQuranForeground(force){
 var appPollInitialTimerId=setTimeout(pollRemote,1500);
 var appPollTimerId=setInterval(pollRemote,30000); // ÆON + sağlık + Kur’an teslimleri; reminder timer'ından ayrı
 var reminderLifecycleTimerId=setInterval(reminderLifecycleTick,REMINDER_LIFECYCLE_INTERVAL_MS); // yalnız yerel reminder checkpoint'i; ağ polling'i değişmez
+// FX-P-56: zaman dilimi selamlaması — boot ve foreground dönüşünde; günde en
+// fazla 2 kez ve son selamlamadan 4 saat geçmediyse tekrar çalmaz (throttle
+// damgaları settings.* altında: lastVoiceGreetingAt/voiceGreetingDate/Count).
+function maybeVoiceGreeting(){
+  try{
+    if(!data || !data.settings) return;
+    if(window.SeyAudio && typeof window.SeyAudio.isQuietTime==='function' && window.SeyAudio.isQuietTime()) return;
+    var s=data.settings, now=Date.now(), today=todayStr();
+    if(s.voiceGreetingDate!==today){ s.voiceGreetingDate=today; s.voiceGreetingCount=0; }
+    if(s.voiceGreetingCount>=2) return;
+    var last=Date.parse(s.lastVoiceGreetingAt||'')||0;
+    if(last && (now-last)<4*60*60*1000) return;
+    s.lastVoiceGreetingAt=new Date().toISOString();
+    s.voiceGreetingCount=(s.voiceGreetingCount||0)+1;
+    if(window.SeyAudio && typeof window.SeyAudio.greeting==='function') window.SeyAudio.greeting();
+    save(false);
+  }catch(e){}
+}
 function onAppForeground(source){
   // iOS PWA / tarayıcı: arka plandan dönüşte soğuk açılış sayılmaz;
   // yine de panelde "Son açılış" ve "Canlı takip" hemen güncellensin.
@@ -18839,6 +18857,7 @@ function onAppForeground(source){
   pollRemote(true);
   maybePullQuranForeground(true);
   maybeFetchDailyPhoto();
+  maybeVoiceGreeting(); // FX-P-56
   return lifecycle;
 }
 function reconcileReminderStorageEvent(event){
@@ -18863,6 +18882,7 @@ window.addEventListener('offline',function(){ var lifecycle=reminderSchedulerDis
 render();
 if(data){ reminderSchedulerDispatch('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
+setTimeout(maybeVoiceGreeting,2200); // FX-P-56: açılış selamlaması (gecikmeli — speech engine boot'u için)
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
 
 // ÆON permission yalnızca mevcut banner üzerindeki açık kullanıcı eyleminden

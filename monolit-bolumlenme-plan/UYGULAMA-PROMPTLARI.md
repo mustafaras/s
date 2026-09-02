@@ -1278,3 +1278,3874 @@ ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yaza
 **Kabul kriteri:** Kapanış belgesi uygulama/yerel PASS/deploy/device sınırlarını ayrıştırır; next safe action user approvala bağlıdır.
 
 **Halt ve LEDGER protokolü:** Her prompt/kanıt eksikse status completed yapılmaz; blockedPrompt=MON-60. Başarısız/eksik kanıtı append-only LEDGERa yaz; stateyi gerçeğe göre blocked yap; kullanıcı yönü olmadan sonraki karta geçme.
+
+
+## Uygulama çalışma sayfaları — ayrıntılı yürütme standardı
+
+Aşağıdaki 60 sayfa, katalog kartlarının kısa kabul ifadelerini yürütülebilir
+bir operasyon protokolüne çevirir. Bunlar uygulama izni değildir. Her sayfanın
+başında canlı kaynak okunur; kaynak satırı ile bu plan çelişirse kaynak
+üstündür ve sapma aynı promptun LEDGER satırına yazılır.
+
+### Çalışma sayfası kullanım sırası
+
+Çalışma sayfaları, yalnızca kaynak başlıklarının teknik düzeni nedeniyle bu
+dosyada bir toplu ek olarak yer alır; **uygulama sırası aşağıdaki tablodur** ve
+ana MON kartlarının sayısal sırasıyla bire birdir. Ajan, ilgili karttan sonra
+aynı numaralı çalışma sayfasını arar; fiziksel sayfa konumu sıra atlamaya izin
+vermez.
+
+| Dalga | Çalışma sayfaları |
+|---|---|
+| 1 | MON-01, MON-02, MON-03, MON-04, MON-05, MON-06 |
+| 2 | MON-07, MON-08, MON-09, MON-10 |
+| 3 | MON-11, MON-12, MON-13, MON-14, MON-15 |
+| 4 | MON-16, MON-17, MON-18 |
+| 5 | MON-19, MON-20, MON-21, MON-22, MON-23, MON-24, MON-25 |
+| 6 | MON-26, MON-27, MON-28, MON-29, MON-30, MON-31, MON-32 |
+| 7 | MON-33, MON-34, MON-35, MON-36, MON-37, MON-38, MON-39 |
+| 8 | MON-40, MON-41, MON-42, MON-43 |
+| 9 | MON-44, MON-45, MON-46, MON-47, MON-48, MON-49 |
+| 10 | MON-50, MON-51, MON-52, MON-53, MON-54 |
+| 11 | MON-55, MON-56, MON-57 |
+| 12 | MON-58, MON-59, MON-60 |
+
+### Çalışma sayfası MON-10 — helpers etkileşim
+
+Bu çalışma sayfası üstteki MON-10 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-09 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | saf çekirdek |
+| Kaynaklar | app.js 6417,6437,6448; helpers/mediaFx |
+| Çıktı / kanıt dosyası | MON-D2-CEKIRDEK-RAPORU.md |
+| İzinli değişim | app.js shim + registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (haptic|toast|confetti)\\(' app.js; rg -n 'Sey(Haptics|Fx)' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** timer DOM effectleri lazy kalır; legacy haptic FX haptic yerine geçirilmez. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-11 — state keşif
+
+Bu çalışma sayfası üstteki MON-11 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-10 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js state bölümü, B1 getters, state fixturelar |
+| Çıktı / kanıt dosyası | MON-S6-STATE-MUTASYON-KARARI.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (migrate|getDay|createDefaultData)\\(|data\\s*=\\s*[^=]|Object.defineProperty\\(window' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** migrate/getDay/default içindeki read/write/rebind/callback fonksiyon grafiği kaydedilir. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-12 — migrate
+
+Bu çalışma sayfası üstteki MON-12 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-11 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js 4431, state.js, migrate fixture |
+| Çıktı / kanıt dosyası | migrate before-after sentetik JSON manifesti |
+| İzinli değişim | app.js shim + state registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function migrate\\(|return .*future|version' app.js app/core/state.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** old/malformed/normal/future root için tüm sonuç alanları karşılaştırılır; unknown alan korunumu ayrı satırdır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-13 — getDay
+
+Bu çalışma sayfası üstteki MON-13 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-12 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js 4964 ve çağırdığı empty* fonksiyonları |
+| Çıktı / kanıt dosyası | getDay normalizasyon tablosu |
+| İzinli değişim | app.js shim + state registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function getDay\\(|empty[A-Z]|HABITS|WIND_DOWN_STEPS' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** yeni gün ve var gün pathleri; aynı object reference, nested defaults ve idempotence ayrı test edilir. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-14 — createDefaultData
+
+Bu çalışma sayfası üstteki MON-14 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-13 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js 6726, start/late boot pathleri |
+| Çıktı / kanıt dosyası | default-root snapshot manifesti |
+| İzinli değişim | app.js shim + state registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function createDefaultData|App.start|if\\(!data\\).*createDefaultData' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** onboarding/root/settings defaults byte-safe snapshotla; reset handlerdaki data= app.jste kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-15 — state kapanışı
+
+Bu çalışma sayfası üstteki MON-15 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-14 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | state.js, app.js dokuz rebind, verify-state dosyaları |
+| Çıktı / kanıt dosyası | MON-D3-STATE-RAPORU.md |
+| İzinli değişim | yalnız state/fixture/ledger |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'data\\s*=\\s*[^=]' app.js; rg -n 'data\\s*=' app/core/state.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** registryde sıfır data=; 6079 try/finally, import/reset/unlock/late boot tazelik senaryoları kanıtlanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-16 — syncGlue karar
+
+Bu çalışma sayfası üstteki MON-16 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-15 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js sync callbacks/save, syncGlue.js, sync.js |
+| Çıktı / kanıt dosyası | MON-S7-SYNCGLUE-KARARI.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'SeyOnSyncState|SeyOnSynced|function save\\(' app.js app/core/syncGlue.js sync.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** callback atamalarının app.js sahipliği, strict-mode hata modu, save dependency graphı yazılır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-17 — save
+
+Bu çalışma sayfası üstteki MON-17 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-16 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | app.js 6271 save, syncGlue.js, header save paths |
+| Çıktı / kanıt dosyası | save sequence manifesti |
+| İzinli değişim | app.js save shim + syncGlue registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function save\\(|SeySync\\.schedule|updateHeaderSave|saveActionPending' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** localStorage→header→schedule sırası, try/catch return ve callback ilişkisinde değişiklik yok. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-18 — syncGlue kapanışı
+
+Bu çalışma sayfası üstteki MON-18 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-17 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | state-senkron |
+| Kaynaklar | state/syncGlue delilleri |
+| Çıktı / kanıt dosyası | MON-D4-STATE-SYNC-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    node tests/app/test_faz10_sync.js; node .claude/skills/run-seyma/verify-state-migration-boundary.mjs
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** ağsız mock kanıtı, async callback sınırı ve sync.js hash/koruma denetimi kapatılır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-19 — prayer
+
+Bu çalışma sayfası üstteki MON-19 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-18 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | prayer fonksiyonları, constants/dateUtils/state |
+| Çıktı / kanıt dosyası | prayer function inventory |
+| İzinli değişim | prayer registry + app.js shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'PRAYER_NAMES|PRAYER_CITIES|fetchAladhan|Prayer|prayer' app.js | head -100
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** load-time fetch/GPS yok; cache/permission yalnız user action ve failure pathler ayrık. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-20 — zikir motor
+
+Bu çalışma sayfası üstteki MON-20 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-19 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | ZIKR_SEED, zikr motor, mediaFx |
+| Çıktı / kanıt dosyası | zikir motor inventory |
+| İzinli değişim | zikir registry + app.js shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'ZIKR_SEED|function zikr|App\\.zikr|SeyAudio|SeyHaptics' app.js | head -180
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** sayım/tur/hatim identity ve FX çağrılarını viewdan ayır; state rebind app.jste kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-21 — zikir görünüm
+
+Bu çalışma sayfası üstteki MON-21 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-20 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | zikir viewleri, content/esma |
+| Çıktı / kanıt dosyası | zikir dump manifesti |
+| İzinli değişim | zikir registry + app.js shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'zikr.*HTML|Zikir.*HTML|hatim|preset' app.js | head -180
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** HTML builder, inline handler, overlay focus ve reduced-motion çıktısı ayrı kanıtlanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-22 — quran
+
+Bu çalışma sayfası üstteki MON-22 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-21 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | quran app helpers, quranTransportV1, Quran tests |
+| Çıktı / kanıt dosyası | quran state-machine inventory |
+| İzinli değişim | quran registry + app.js shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'quranJourney|QuranJourney|quranRandom|requestId|surah' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** outbox/delivery/responses dosyaları ve sync workflow frozen kalır; read/apply idempotence eşiği yazılır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-23 — saygi
+
+Bu çalışma sayfası üstteki MON-23 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-22 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | saygi, hijri, qibla, prayer/library interfaces |
+| Çıktı / kanıt dosyası | saygi modal/focus manifesti |
+| İzinli değişim | saygi registry + app.js shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'saygi|Saygi|qibla|Kıble|hijri|kandil|wireSaygi' app.js | head -220
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** article content lazy; modal focus/Okudum pathi ve prayer boundary aynen kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-24 — manevi regression
+
+Bu çalışma sayfası üstteki MON-24 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-23 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | prayer/zikir/quran/saygi registryleri |
+| Çıktı / kanıt dosyası | MON-D5-MANEVI-DOMAIN-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Seyma(Prayer|Zikir|Quran|Saygi)' app.js app/core/*.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** topolojik dependency graph, all dumps, Quran transport and FX results tek tabloda kapanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-25 — Dalga 5 kabulü
+
+Bu çalışma sayfası üstteki MON-25 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-24 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | Dalga 5 tüm kanıtları |
+| Çıktı / kanıt dosyası | MON-D5-ACCEPTANCE.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -c 'App\\.[a-zA-Z0-9_]*\\s*=\\s*function' app.js; rg -n 'onclick="App\\.' app.js | wc -l
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** before/after App, onclick, FX manifestleri; deployment/device hariç tutulur. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-26 — motivation
+
+Bu çalışma sayfası üstteki MON-26 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-25 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | roomOverlay/roomBody/motivation content |
+| Çıktı / kanıt dosyası | motivation function+focus inventory |
+| İzinli değişim | motivation registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'roomOverlayHTML|roomBodyHTML|Motivation|completeMotivation' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** task completion save/render sırası, narrative content read-only resolver ve focus restore korunur. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-27 — crisis
+
+Bu çalışma sayfası üstteki MON-27 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-26 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | CRISES/craving/openCrisis |
+| Çıktı / kanıt dosyası | crisis safety-copy manifesti |
+| İzinli değişim | crisis registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'CRISES|openCrisis|crisisModal|craving' app.js | head -160
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** safety copy, SOS route, no clinical/new network rule ve handler visibility kanıtlanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-28 — journal
+
+Bu çalışma sayfası üstteki MON-28 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-27 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | journal helper/modal/save |
+| Çıktı / kanıt dosyası | journal state transition table |
+| İzinli değişim | journal registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'journalLightCardHTML|journalModalHTML|saveJournal|journal' app.js | head -160
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** word/char/streak/savedAt, textarea focus, save order ve data path snapshotlanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-29 — health hesaplama
+
+Bu çalışma sayfası üstteki MON-29 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-28 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | health calculations/default helpers |
+| Çıktı / kanıt dosyası | health calculation vectors |
+| İzinli değişim | health registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'caffeine|magnesium|waterGoal|sleepReadiness|BMR|TDEE|emptyHealth' app.js | head -240
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** her hesap için sentetik input/output vector; mutation yapan callers app.js kabuğunda kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-30 — health görünüm
+
+Bu çalışma sayfası üstteki MON-30 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-29 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | health cards/saglikHTML dependencies |
+| Çıktı / kanıt dosyası | saglik dump manifesti |
+| İzinli değişim | health registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'waterCard|caffeineBlock|magnesiumCard|saglikHTML|health.*HTML' app.js | head -240
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** token/inline handler/dark-mode output aynı; style ve panel değişmez. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-31 — health denetim
+
+Bu çalışma sayfası üstteki MON-31 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-30 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | health + migrate/getDay/panel missing paths |
+| Çıktı / kanıt dosyası | MON-D6-HEALTH-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'health|magnesium|caffeine' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** absent/malformed/normal health state, migration and panel no-break proof ayrı kaydedilir. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-32 — Dalga 6 kabulü
+
+Bu çalışma sayfası üstteki MON-32 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-31 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | motivation/crisis/journal/health |
+| Çıktı / kanıt dosyası | MON-D6-TERAPI-BAKIM-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Seyma(Motivation|Crisis|Journal|Health)' app.js app/core/*.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** modal focus/save/migration/FX dependency graphı; user device acceptance ayrık kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-33 — library
+
+Bu çalışma sayfası üstteki MON-33 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-32 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | reading/watching/listening/learning/soul archive |
+| Çıktı / kanıt dosyası | library archive identity manifesti |
+| İzinli değişim | library registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'reading|watching|listening|learning|soulArchive|Library|Watchlist|Music' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** entry identity/archive sync and 6079 backfill boundary; overlay focus/scroll state korunur. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-34 — report
+
+Bu çalışma sayfası üstteki MON-34 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-33 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | report helpers/raporHTML |
+| Çıktı / kanıt dosyası | report metric vector manifesti |
+| İzinli değişim | report registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'raporHTML|lastNDays|moodDist|heatmap|report' app.js | head -220
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** registry read-only; KPI/heatmap outputs sentetik vectors and dump ile kıyaslanır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-35 — map
+
+Bu çalışma sayfası üstteki MON-35 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-34 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | harita/location/weather |
+| Çıktı / kanıt dosyası | map load-side-effect manifesti |
+| İzinli değişim | map registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'haritaHTML|locationCardHTML|weatherHeaderHTML|geolocation|watchPosition|weather' app.js | head -220
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** load no-op; permission/fetch only named user path; code 1/2/3 error UI korunur. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-36 — profile
+
+Bu çalışma sayfası üstteki MON-36 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-35 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | profile assessment UI/content/sync boundary |
+| Çıktı / kanıt dosyası | profile consent/progress manifesti |
+| İzinli değişim | profile registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'profile|psychHTML|ProfileAssessment|consent|renderProfile' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** 174 item content and sync merge frozen; consent/progress privacy outputs unaltered. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-37 — settings
+
+Bu çalışma sayfası üstteki MON-37 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-36 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | ayarlarHTML and FX/prayer/hijri toggles |
+| Çıktı / kanıt dosyası | settings render/handler boundary table |
+| İzinli değişim | settings registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'ayarlarHTML|toggleSetting|setVoice|hijriOffset|settings' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** render/read only registry; setting writes/App handlers/migrate/sanitize app.js/sync boundaries stay. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-38 — Dalga 7 regression
+
+Bu çalışma sayfası üstteki MON-38 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-37 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | library/report/map/profile/settings |
+| Çıktı / kanıt dosyası | MON-D7-ANALIZ-ARSIV-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Seyma(Library|Report|Map|Profile|Settings)' app.js app/core/*.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** registry graph, privacy, lazy load and settings FX manifest all need PASS. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-39 — domain envanteri
+
+Bu çalışma sayfası üstteki MON-39 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-38 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | all 15 domain registries |
+| Çıktı / kanıt dosyası | MON-D7-DOMAIN-ENVANTERI.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'window\\.Seyma|Seyma[A-Z]' app/core/*.js app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** owner/shim/resolver/test/dump/open-risk tuple mandatory for each domain. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-40 — reminders runtime
+
+Bu çalışma sayfası üstteki MON-40 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-39 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | reminder docs/state/approval + app runtime |
+| Çıktı / kanıt dosyası | reminder runtime inventory |
+| İzinli değişim | reminders registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Reminder|reminder' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** frozen four modules untouched; releaseApproval, privacy/no-write and native permission boundaries copied into evidence. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-41 — reminders UI
+
+Bu çalışma sayfası üstteki MON-41 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-40 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | Reminder Center UI/catalog/focus |
+| Çıktı / kanıt dosyası | reminder UI privacy manifest |
+| İzinli değişim | reminders registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Reminder Center|reminder.*HTML|openReminder|ReminderCatalog' app.js | head -240
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** catalog text never duplicated; no Notification.requestPermission/new scheduler/delivery. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-42 — messaging
+
+Bu çalışma sayfası üstteki MON-42 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-41 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | mesajHTML/bubble/expand/scroll |
+| Çıktı / kanıt dosyası | messaging chronology manifest |
+| İzinli değişim | messaging registry + shim |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'mesajHTML|Aeon|Luna|expand|replyNotification|answerTs' app.js | tail -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** answer ordering, expanded bubble identity, scroll persistence and notification dedupe each have a test row. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-43 — Dalga 8 kabulü
+
+Bu çalışma sayfası üstteki MON-43 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-42 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | domain |
+| Kaynaklar | reminders/messaging evidence |
+| Çıktı / kanıt dosyası | MON-D8-REMINDER-MESAJ-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    node tests/reminders/run-reminder-smoke.mjs; node tests/app/test_aeon_message_expand.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** privacy scanner, no write/no network and channel disjointness separated from UI success. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-44 — render onboarding/Bugün
+
+Bu çalışma sayfası üstteki MON-44 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-43 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | onboardingHTML/bugunHTML/render consumers |
+| Çıktı / kanıt dosyası | onboarding/bugun dump manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (onboardingHTML|bugunHTML)\\(|function render\\(' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** root/app update stays render core; domain registries only provide builders; no App handler movement. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-45 — render sağlık/rapor/harita
+
+Bu çalışma sayfası üstteki MON-45 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-44 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | saglikHTML/raporHTML/haritaHTML |
+| Çıktı / kanıt dosyası | three-tab dump manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (saglikHTML|raporHTML|haritaHTML)\\(' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** tab selection and map lazy side effect remain same; domain registry call direction only render→domain. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-46 — render saygı/terapi
+
+Bu çalışma sayfası üstteki MON-46 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-45 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | saygiHTML and therapy entry |
+| Çıktı / kanıt dosyası | spiritual/therapy focus manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function saygiHTML|roomOverlay|roomBody|openRoom' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** dialog ownership remains app/render path; content/domain registry never own root focus. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-47 — render library/settings/mesaj
+
+Bu çalışma sayfası üstteki MON-47 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-46 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | library/settings/mesaj render entries |
+| Çıktı / kanıt dosyası | three-tab dump/handler manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (ayarlarHTML|mesajHTML)\\(|reading.*HTML|watching.*HTML' app.js | head -220
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** message state/settings writers remain appSurface; render is string/read-only. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-48 — render header/nav/overlay
+
+Bu çalışma sayfası üstteki MON-48 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-47 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | appHeaderHTML/navHTML/overlay shells |
+| Çıktı / kanıt dosyası | shell keyboard manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (appHeaderHTML|navHTML|modalsHTML)\\(' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** header save indicator, nav semantics, focus return and backdrop nonfocusability retained. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-49 — render modal/core
+
+Bu çalışma sayfası üstteki MON-49 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-48 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | modalsHTML/render/SeyTimeTheme |
+| Çıktı / kanıt dosyası | render call-graph manifesti |
+| İzinli değişim | render registry + shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (modalsHTML|render)\\(|SeyTimeTheme' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** render recursion, #root/#app ownership and guarded time theme call must stay byte/behavior equivalent. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-50 — appSurface günlük
+
+Bu çalışma sayfası üstteki MON-50 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-49 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | App daily handlers |
+| Çıktı / kanıt dosyası | daily App handler map |
+| İzinli değişim | appSurface registry + App shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n '^App\\.(setMood|toggle|saveToday|addWater|set.*Health|.*Habit)\\s*=' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** App object and handler names remain app.js; mutation/save/render order snapshot mandatory. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-51 — appSurface domain
+
+Bu çalışma sayfası üstteki MON-51 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-50 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | App domain handlers |
+| Çıktı / kanıt dosyası | domain App handler map |
+| İzinli değişim | appSurface registry + App shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n '^App\\.(zikr|quran|saygi|prayer|completeMotivation|openCrisis|saveJournal)' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** each handler points to exactly one domain registry; aliases and inline caller strings preserved. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-52 — appSurface overlay
+
+Bu çalışma sayfası üstteki MON-52 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-51 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | overlay/archive/settings/message App handlers |
+| Çıktı / kanıt dosyası | overlay lifecycle handler map |
+| İzinli değişim | appSurface registry + App shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n '^App\\.(open|close|setVoice|toggleSetting|.*Archive|.*Message)' app.js | head -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** open/close focus, scroll and settings preview/FX behavior are separate acceptance rows. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-53 — appSurface timer/listener
+
+Bu çalışma sayfası üstteki MON-53 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-52 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | timer/listener/foreground logic |
+| Çıktı / kanıt dosyası | timer/listener ownership manifest |
+| İzinli değişim | appSurface registry + app.js registrations |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'setInterval|setTimeout|addEventListener|pageshow|online|foreground|poll' app.js | tail -260
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** registration/teardown remain app.js; registry callbacks no eager execution; no duplicate listener. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-54 — appSurface boot
+
+Bu çalışma sayfası üstteki MON-54 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-53 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | birleştirme |
+| Kaynaklar | boot/window.App/late guard |
+| Çıktı / kanıt dosyası | boot order manifest |
+| İzinli değişim | appSurface registry + app.js expose/boot shims |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'window\\.App=App|App\\.start|onAppForeground|if\\(!data\\)' app.js | tail -220
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** all App assignments after 17021 are inventoryed; window.App and B1 getters expose order intact. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-55 — index/harness final
+
+Bu çalışma sayfası üstteki MON-55 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-54 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | index.html and both harness FILES |
+| Çıktı / kanıt dosyası | MON-D11-LOAD-SIRASI-RAPORU.md |
+| İzinli değişim | index/harness only |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'app/core/|app.js|sync.js' index.html .claude/skills/run-seyma/{driver,zikr-harness}.mjs
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** core tags only between reminderDelivery and inline SW; content/reminder/SW/panel/sync orders untouched. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-56 — delege envanteri
+
+Bu çalışma sayfası üstteki MON-56 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-55 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | all core registries and app.js shims |
+| Çıktı / kanıt dosyası | MON-D11-DELEGE-ENVANTERI.md |
+| İzinli değişim | no code except missing documentation test if needed |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'window\\.Seyma|return window\\.Seyma' app.js app/core/*.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** every moved function has owner/shim/test; app-owned exceptions and no duplicate bodies explicit. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-57 — tam regression
+
+Bu çalışma sayfası üstteki MON-57 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-56 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | all committed safe fixtures |
+| Çıktı / kanıt dosyası | MON-D11-TAM-REGRESSION-RAPORU.md |
+| İzinli değişim | no code |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg --files tests/app tests/panel tests/panel-v2 tests/quran tests/reminders | sort
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** commands/results/exclusions grouped by source, VM, panel, Quran, reminder, device/deploy separate. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-58 — docs/roadmap
+
+Bu çalışma sayfası üstteki MON-58 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-57 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | roadmap/readme/current state |
+| Çıktı / kanıt dosyası | docs synchronization checklist |
+| İzinli değişim | docs only |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'monolit|bölüm|MODULARIZATION|MON-' README.md docs/GELISTIRME-PLANI.md monolit-bolumlenme-plan/*.md
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** historical facts stay historical; no deployment claim, no stale prompt count or wrong branch. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-59 — karar konsolidasyonu
+
+Bu çalışma sayfası üstteki MON-59 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-58 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | all MON-S documents/state/ledger |
+| Çıktı / kanıt dosyası | MON-KARAR-KONSOLIDASYONU.md |
+| İzinli değişim | docs only |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'MON-S[0-9]|M[1-4]|I[1-6]|MON-K' monolit-bolumlenme-plan
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** each decision includes options, chosen/red, evidence, consequence, owner and reopen condition. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-60 — seri kapanışı
+
+Bu çalışma sayfası üstteki MON-60 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-59 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | kapanış |
+| Kaynaklar | all program documents and regression report |
+| Çıktı / kanıt dosyası | MON-SERI-KAPANIS-BELGESI.md |
+| İzinli değişim | docs/state only |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -c '^## MON-' monolit-bolumlenme-plan/UYGULAMA-PROMPTLARI.md; node -e "const s=require('./monolit-bolumlenme-plan/MON-STATE.json'); console.log(s.totalPrompts,s.waves.reduce((n,w)=>n+w.total,0))"
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** 60 cards/state/waves/ledger/commit history and evidence must agree; deploy/device/data write remain separately gated. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-01 — Baseline ve MON-S1
+
+Bu çalışma sayfası üstteki MON-01 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | yok tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | app.js, index.html, driver.mjs, zikr-harness.mjs, state/LEDGER |
+| Çıktı / kanıt dosyası | MON-S1-DELEGASYON-KARARI.md |
+| İzinli değişim | kod yok; yalnız kaynak çizelgesi |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    wc -l app.js; rg -n 'function migrate|function getDay|function save|function createDefaultData|var App=|window.App=App|Object.defineProperty\\(window' app.js; rg -n 'data\\s*=\\s*[^=]' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** B1, dokuz rebind, 6079 finally, post-window.App atamalarını tek baseline tablosuna koy. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-02 — FX/handler manifesti
+
+Bu çalışma sayfası üstteki MON-02 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-01 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | app.js, Premium FX fixture ailesi |
+| Çıktı / kanıt dosyası | MON-S2-FX-HANDLER-MANIFESTI.md |
+| İzinli değişim | kod yok; FX satırları yalnız okunur |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'Sey(Audio|Haptics|Fx|TimeTheme)\\.' app.js; rg -c 'App\\.[a-zA-Z0-9_]*\\s*=\\s*function' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** her çağrıda fonksiyon bağlamı, guard biçimi, çağrı türü ve test sahibi kaydedilir. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-03 — Sahiplik matrisi
+
+Bu çalışma sayfası üstteki MON-03 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-02 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | MODULARIZATION.md, monolit haritası, index.html |
+| Çıktı / kanıt dosyası | MON-S3-MODUL-SAHIPLIK-MATRISI.md |
+| İzinli değişim | kod yok; hedefler 24 satır |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n '^<script src="app/core|^<script src="app.js' index.html; rg -n '^\| [0-9]+ \|' premium-fx-plan/MODULARIZATION.md
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** her satır owner, registry, read-set, app.js exception, test ve yükleme öncülü taşır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-04 — Harness paritesi
+
+Bu çalışma sayfası üstteki MON-04 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-03 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | index.html, driver.mjs, zikr-harness.mjs |
+| Çıktı / kanıt dosyası | MON-S4-HARNESS-PARITE-KARARI.md |
+| İzinli değişim | yalnız FILES ve load-order kanıtı |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'const FILES|app/core/' .claude/skills/run-seyma/driver.mjs .claude/skills/run-seyma/zikr-harness.mjs index.html
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** fetch çözülmez, timer no-op kalır; sync.js kesinlikle FILES'e eklenmez. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-05 — Fixture geçişi
+
+Bu çalışma sayfası üstteki MON-05 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-04 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | tests/app/test_modularization_boundary.js, test_faz_minus11_boundary.js, test_date_utils_boundary.js, test_helpers_boundary.js |
+| Çıktı / kanıt dosyası | MON-S5-FIXTURE-GECIS-MATRISI.md |
+| İzinli değişim | kod/fixture değişmez |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'ok\\(|assert\\(|Seyma|henüz|Faz' tests/app/test_{modularization_boundary,faz_minus11_boundary,date_utils_boundary,helpers_boundary}.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** her assertion için eski anlam, eşik MON, yeni anlam, aynı-commit test değişimi ve geri alma kanıtı yazılır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-06 — Dalga 1 kabulü
+
+Bu çalışma sayfası üstteki MON-06 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-05 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | karar/kanıt |
+| Kaynaklar | MON-S1..S5, state zinciri |
+| Çıktı / kanıt dosyası | MON-D1-ON-UCUS-RAPORU.md |
+| İzinli değişim | kod yok |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    node --check app.js && node --check sync.js; node .claude/skills/run-seyma/driver.mjs; node .claude/skills/run-seyma/zikr-harness.mjs
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** 0 uygulama değişikliğinin kanıtı, kapı sonuçları ve sonraki ayrı onay kaydedilir. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-07 — dateUtils saf fonksiyonlar
+
+Bu çalışma sayfası üstteki MON-07 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-06 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | saf çekirdek |
+| Kaynaklar | app.js 4768–4773, app/core/dateUtils.js, index.html, iki harness |
+| Çıktı / kanıt dosyası | yeni deliverable yok; kartın ledger kaydı |
+| İzinli değişim | app.js shim + dateUtils gövdesi |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (pad|fmt|todayStr|addDays|diffDays|shortDate)\\(' app.js app/core/dateUtils.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** altı fonksiyon saf olmalı; timezone/Date constructor semantiği ve çıktı strings'i snapshotla karşılaştırılır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-08 — dateUtils state-okur fonksiyonlar
+
+Bu çalışma sayfası üstteki MON-08 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-07 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | saf çekirdek |
+| Kaynaklar | app.js 4774–4780, 6230; dateUtils/state |
+| Çıktı / kanıt dosyası | yeni deliverable yok |
+| İzinli değişim | app.js shim + registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (dayIndexFor|activeDate|curDay|dateLabelTR)\\(' app.js; rg -n 'SeymaState' app/core/{dateUtils,state}.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** B1 read yalnız; ui.editDate önceliği, getDay parametre aktarımı ve dateLabelTR kopyası aynı kalır. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
+
+### Çalışma sayfası MON-09 — helpers görünüm
+
+Bu çalışma sayfası üstteki MON-09 kartının ayrılmaz parçasıdır; kartın dokuz
+zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
+
+| Alan | Operasyonel cevap |
+|---|---|
+| Ön koşul | MON-08 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf | saf çekirdek |
+| Kaynaklar | app.js 6107–6111, 6195; helpers |
+| Çıktı / kanıt dosyası | HTML-dump delil eki |
+| İzinli değişim | app.js shim + registry |
+
+**1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
+fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
+ipuçlarıyla kaydet:
+
+    rg -n 'function (segTabs|progBar|starRow|miniBars|statTile|collapsibleCardHTML)\\(' app.js
+
+**2. Bağımlılık çizelgesi.** Her aday gövdeyi (a) saf, (b) B1 üzerinden salt
+okur, (c) app.js kabuğunda kalması gereken mutasyon/rebind, (d) DOM/timer/ağ
+yan etkisi olarak etiketle. Hiçbir kapanım (closure) bağımlılığı görünmez
+bırakılmaz; görünür bir resolver veya app.js kabuğu gerekir.
+
+**3. Taşıma sınırı.** icon/esc gibi closure bağımlılıkları açık resolver olmadan gizlice yakalanmaz. Çekirdek/domain kartında önce IIFE registry
+iskeleti yükleme anında yan etkisiz kurulur; sonra tek fonksiyon grubu taşınır;
+son olarak app.js'te aynı ad/imza/return ile imza-koruyan shim bırakılır.
+Karar/kapanış kartında bu sıra yalnız denetlenir, üretim gövdesi taşınmaz.
+
+**4. Yükleme ve test güncellemesi.** Yeni bir app/core dosyası varsa aynı
+commit içinde index script sırası, kendi cache-bust sürümü, driver FILES ve
+zikr-harness FILES paritesi güncellenir. Fixture, yalnız MON-S5 geçiş
+matrisinin bu MON için açıkça izin verdiği assertionda değiştirilir; aksi halde
+fixture FAIL bir bulgudur, "eski test" diye bastırılmaz.
+
+**5. Değişmezlik kanıtı.** Değişiklikten önce ve sonra şunları karşılaştır:
+App function-ataması; tüm App ataması; inline onclick sayımı/örnekleri; FX
+manifesti; dokuz data rebind satırı; ilgili driver dumpı. State kartlarında
+migrate/getDay/default için sentetik before-after snapshot; render kartlarında
+aynı tabın HTML ve keyboard pathi zorunludur.
+
+**6. Zorunlu kapı paketi.** En az şunlar exit 0 vermelidir:
+
+    node --check app.js
+    node --check sync.js
+    node .claude/skills/run-seyma/driver.mjs
+    node .claude/skills/run-seyma/zikr-harness.mjs
+    node tests/app/test_modularization_boundary.js
+    for f in tests/app/test_premium_*.js; do node "$f" || exit $?; done
+
+Kartın alanına göre üst kartta yazılı Quran/reminder/state/panel fixture'ı da
+bu sete eklenir. Harness fetch/timer sınırı değiştirilemez; browser açılmaz.
+
+**7. Kanıt paketi ve kabul.** Committen önce kaynak diffini, kayıtlı baseline
+ile delta tablosunu, komut/exit sonucunu ve açık kalanı kartın deliverable'ına
+yaz. Kabul, yalnız şu dört cümle birlikte doğruysa verilir: tek sahip; doğru
+yükleme sırası; hedef suite PASS; I1–I6/M1–M4 farkı yok.
+
+**8. Fail-closed/handoff.** Bir aykırılıkta sonraki MON'a geçme, otomatik
+checkout/reset yapma veya unrelated dosyaya dokunma. active/blocked durumunu
+gerçeğe göre yaz, append-only LEDGERa kanıtı ekle ve karar gereken noktayı
+kullanıcıya bırak. Başarıda ilgili kod, state JSON, CURRENT-STATE, LEDGER,
+cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.

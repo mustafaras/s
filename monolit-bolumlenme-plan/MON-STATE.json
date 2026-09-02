@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "planningRevision": "2.1",
   "programId": "MONOLIT-BOLUMLENME",
   "status": "ready",
   "activePrompt": null,
@@ -10,7 +11,7 @@
   "totalPrompts": 60,
   "completedPrompts": 0,
   "updatedAt": "2026-09-02",
-  "nextSafeAction": "Program planlamasi tamamlandi; hicbir MON promptu uygulanmadi. Kullanici onayi olmadan MON-01 dahil kod uygulamasina baslama. Onay gelirse MON-01 yalniz baseline on-ucusunu ve karar dosyasini ele alir; veri, tarayici, remote veya deploy yoktur.",
+  "nextSafeAction": "Program planlamasi 2.1 ayrintisinda tamamlandi; hicbir MON promptu uygulanmadi. Kullanici onayi olmadan MON-01 dahil kod uygulamasina baslama. Onay gelirse MON-01 yalniz baseline on-ucusunu ve MON-S1 karar dosyasini ele alir; her kartin ayrintili calisma sayfasi UYGULAMA-PROMPTLARI.md altindadir. Veri, tarayici, remote veya deploy yoktur.",
   "codeTouched": false,
   "authority": ["AGENTS.md", "CLAUDE.md", "docs/GELISTIRME-PLANI.md", "docs/monolit-bolumlenme-haritasi.md", "premium-fx-plan/MODULARIZATION.md", "premium-fx-plan/deliverables/FX-SERI-KAPANIS-BELGESI.md", ".claude/skills/run-seyma/SKILL.md", "monolit-bolumlenme-plan/UYGULAMA-PROMPTLARI.md", "monolit-bolumlenme-plan/.anti-amnesia/CURRENT-STATE.md", "monolit-bolumlenme-plan/.anti-amnesia/LEDGER.md"],
   "invariants": {

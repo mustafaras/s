@@ -1,6 +1,6 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.0 · **Tarih:** 2026-09-02 · **Durum:** `ready` · **Uygulanan prompt:** 0/60
+**Sürüm:** 2.1 · **Tarih:** 2026-09-02 · **Durum:** `ready` · **Uygulanan prompt:** 0/60
 
 Bu klasör, Şeyma'nın 18.957 satırlık `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
@@ -24,7 +24,7 @@ Uygulama, kullanıcının ayrı ve açık onayıyla, sırayla başlar.
 
 | Yol | Rol |
 |---|---|
-| [`UYGULAMA-PROMPTLARI.md`](UYGULAMA-PROMPTLARI.md) | 60 sıralı, ölçülebilir uygulama kartı ve ortak sözleşme |
+| [`UYGULAMA-PROMPTLARI.md`](UYGULAMA-PROMPTLARI.md) | 60 sıralı kart, ortak sözleşme ve her kartın sekiz aşamalı çalışma sayfası |
 | [`MON-STATE.json`](MON-STATE.json) | Makine-okur durum, dalgalar, kapılar ve ayrı onaylar |
 | [`.anti-amnesia/CURRENT-STATE.md`](.anti-amnesia/CURRENT-STATE.md) | İnsan-okur durum, canlı baseline ve FX mirası |
 | [`.anti-amnesia/LEDGER.md`](.anti-amnesia/LEDGER.md) | Sekiz kolonlu, yalnız-eklemeli uygulama kaydı |
@@ -41,6 +41,11 @@ Uygulama, kullanıcının ayrı ve açık onayıyla, sırayla başlar.
    yapma. Başarılıysa kod + durum zinciri aynı **yerel** commit'tedir.
 5. Her dalga kapanışında tam regression çalışır. Yerel PASS, deploy veya cihaz
    kabulü değildir.
+
+Her kartın aynı numaralı **Çalışma sayfası** uygulanacak şeyin sahibini, canlı
+arama komutunu, değişiklik sırasını, allowed/forbidden sınırını, test paketini
+ve fail-closed el değiştirme biçimini verir. Kart ile çalışma sayfası çelişirse
+çalışma sayfası değil canlı kaynak ve karar kayıtları üstündür.
 
 ## Güvenli komutlar
 

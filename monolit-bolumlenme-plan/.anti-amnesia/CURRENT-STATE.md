@@ -9,7 +9,7 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `ready` — plan hazır, uygulama başlamadı |
+| Durum | `ready` — plan v2.1 ayrıntılı, uygulama başlamadı |
 | Aktif / bloke | yok / yok |
 | Son / sıradaki | yok / `MON-01` |
 | Dalga / ilerleme | 1 / 0/60 |
@@ -18,6 +18,11 @@
 
 **Bağlayıcı durak:** Kullanıcı yeni ve açık uygulama onayı vermeden `MON-01`
 çalıştırılmaz. Bu klasörün planlama commit'i uygulama değildir.
+
+**Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
+olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
+taşıma dizisi, registry/yükleme sınırı, kapı paketi ve fail-closed handoff
+sunmaktadır. Bu ek, uygulama durumu değildir; `0/60` değişmeden kalır.
 
 ## Canlı baseline (2026-09-02)
 

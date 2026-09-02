@@ -12,8 +12,9 @@
 - For the frozen reminder / notification UX program, read [`docs/reminders/README.md`](docs/reminders/README.md) and [`docs/reminders/APP-REMINDER-WORK-SUMMARY.md`](docs/reminders/APP-REMINDER-WORK-SUMMARY.md). `APP-REMINDER-STATE.json` is the machine-readable status; do not revive the retired REM-00..REM-72 prompt chain from chat history or old Git files.
 - For reminder app / panel work, use [`docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md`](docs/reminders/APP-REMINDER-APP-PANEL-SURFACE-MAP.md): REM-44–54 are app runtime, REM-55–66 are current panel, REM-67–72 are integration; Panel-v2 remains a separate regression surface.
 - For any reminder release or live action, read [`docs/reminders/APP-REMINDER-APPROVAL-GATE.md`](docs/reminders/APP-REMINDER-APPROVAL-GATE.md). `releaseApproval` remains `NOT_APPROVED`; this frozen program has no active prompt delivery. Push, deploy, tag, force-push, other remotes, external writes and `mustafaras/seyma-data` remain separately gated.
-- For any UI/design work on either surface, start at [`docs/apple-design/APPLE-DESIGN-STATE.json`](docs/apple-design/APPLE-DESIGN-STATE.json) — it names the next prompt and whether anything is blocked. The audit and the binding functionality contract (I1–I6: no design change may alter `data`, `migrate()`, or the `App.<name>` handler surface) live in [`docs/apple-design/IOS27-TASARIM-PLANI.md`](docs/apple-design/IOS27-TASARIM-PLANI.md); the 52 sequential prompts in [`docs/apple-design/UYGULAMA-PROMPTLARI.md`](docs/apple-design/UYGULAMA-PROMPTLARI.md). Run prompts strictly in order and update `.anti-amnesia/LEDGER.md`, `.anti-amnesia/CURRENT-STATE.md` and the state JSON in the same commit. Nothing is applied yet; waves 6–9 need explicit user approval.
-- **For modularization / monolith-splitting work** (splitting the ~18.8k-line `app.js` into `app/core/*` + `app/content/*` modules, e.g. after the premium-FX waves finish): start from [`docs/monolit-bolumlenme-haritasi.md`](docs/monolit-bolumlenme-haritasi.md) — it is the graphify-derived evidence base (true business-domain split of app.js, why graphify community labels are misleading there) and the target-module map. Treat [`premium-fx-plan/MODULARIZATION.md`](premium-fx-plan/MODULARIZATION.md) as the execution strategy. **Trigger:** whenever a task plans to move code out of `app.js`, touch `migrate()`, or add a new `app/core/*` / `app/content/*` module, first read the monolith map and confirm the move follows the recorded domain split (and I1–I6). When premium-FX waves are fully complete, the graphify map is the ready-made input for the FX→modularization handoff.
+- For any UI/design work on either surface, start at [`docs/apple-design/APPLE-DESIGN-STATE.json`](docs/apple-design/APPLE-DESIGN-STATE.json) — it names the next prompt and whether anything is blocked. The audit and the binding functionality contract (I1–I6: no design change may alter `data`, `migrate()`, or the `App.<name>` handler surface) live in [`docs/apple-design/IOS27-TASARIM-PLANI.md`](docs/apple-design/IOS27-TASARIM-PLANI.md); the 52 sequential prompts in [`docs/apple-design/UYGULAMA-PROMPTLARI.md`](docs/apple-design/UYGULAMA-PROMPTLARI.md). Run prompts strictly in order and update `.anti-amnesia/LEDGER.md`, `.anti-amnesia/CURRENT-STATE.md` and the state JSON in the same commit. The series is complete (AD-52 done); push/deploy/device acceptance remain separately gated.
+- **For modularization / monolith-splitting work** (splitting the ~18.8k-line `app.js` into `app/core/*` + `app/content/*` modules, e.g. after the premium-FX waves finish): start from [`docs/monolit-bolumlenme-haritasi.md`](docs/monolit-bolumlenme-haritasi.md) — it is the graphify-derived evidence base (true business-domain split of app.js, why graphify community labels are misleading there) and the target-module map. Treat [`premium-fx-plan/MODULARIZATION.md`](premium-fx-plan/MODULARIZATION.md) as the execution strategy. **Trigger:** whenever a task plans to move code out of `app.js`, touch `migrate()`, or add a new `app/core/*` / `app/content/*` module, first read the monolith map and confirm the move follows the recorded domain split (and I1–I6). The premium-FX series is now complete (70 prompts applied, LOCAL-ONLY on `premium-fx-local`); the graphify map is the ready-made input for the FX→modularization handoff.
+- For premium FX work (ses/hareket/tema in `app/core/mediaFx.js` + `app/core/timeTheme.js`): start at [`premium-fx-plan/deliverables/FX-SERI-KAPANIS-BELGESI.md`](premium-fx-plan/deliverables/FX-SERI-KAPANIS-BELGESI.md) (official closure record + final API surface), then [`premium-fx-plan/NEXT-STEPS.md`](premium-fx-plan/NEXT-STEPS.md) (before-merge checklist) and [`premium-fx-plan/SAFEGUARDS.md`](premium-fx-plan/SAFEGUARDS.md) / [`premium-fx-plan/LOCAL-ONLY-IMPLEMENTATION.md`](premium-fx-plan/LOCAL-ONLY-IMPLEMENTATION.md). **No push, no merge to `main`, no tag, no deploy without explicit user approval**; the deferred pair FX-P-66/67 is only picked up on user request.
 - Keep this file operational and concise; link to canonical documents instead of copying their full contents into new instructions.
 
 ---
@@ -114,22 +115,39 @@ When working with multiple AI agents in parallel:
 ## Project Structure
 
 ```
-index.html      Thin HTML shell. Loads app/styles.css, data modules,
-                 app/core/constants.js, app.js, sync.js with cache-busting
-                 `?v=YYYYMMDDx` query strings. Registers sw.js.
-app/core/constants.js  Classic script loaded immediately before app.js;
-                 owns the extracted icon map and boot constants through
-                 `window.SeymaConstants`.
-app.js           The Şeyma runtime (single IIFE). It keeps the existing state,
-                 rendering, feature logic, and `App` surface while the L2
-                 extraction proceeds incrementally.
+index.html      Thin HTML shell. Loads app/styles.css, all app/content/*.js
+                 data modules, all app/core/*.js modules, app.js, sync.js with
+                 cache-busting `?v=YYYYMMDDx` query strings. Registers sw.js.
+app/core/constants.js  First app/core script; owns the extracted icon map and
+                 boot constants through `window.SeymaConstants`.
+app/core/mediaFx.js    Premium FX runtime: `window.SeyAudio` (WebAudio taps,
+                 voice guidance incl. cloud TTS, quiet-time 23–07 gating),
+                 `window.SeyHaptics` (vibration patterns) and `window.SeyFx`
+                 (gating + countUp/ripple/shimmer). Heavily consumed by app.js.
+app/core/timeTheme.js  `window.SeyTimeTheme` — hour class (dawn/day/dusk/night)
+                 + seasonal overlay applied to `#root` (guarded call in app.js).
+app/core/state.js · syncGlue.js · dateUtils.js · helpers.js
+                 B1 boundary skeletons for the planned app.js split: they
+                 expose soft-bind live getters (`window.SeymaState`,
+                 `window.SeymaSave`, `window.SeymaDateUtils`,
+                 `window.SeymaHelpers`) that resolve back to app.js's IIFE
+                 scope. app.js still owns the real bodies — extraction has
+                 not started.
+app/core/reminder*.js  Frozen REM program modules (`ReminderCatalogV1`,
+                 `ReminderEngineV1`, `ReminderSchedulerV1`,
+                 `ReminderDeliveryV1`): pure engine/scheduler/delivery
+                 boundaries consumed by app.js; copy lexicon in
+                 reminderCatalog.js.
+app.js           The Şeyma runtime (single IIFE, ~18.8k lines). Still the owner
+                 of `data`/`ui`/`dark`, `migrate()`, `getDay()`, `save()`,
+                 rendering, feature logic and the ~705-entry `App` surface;
+                 consumes every module above.
 app/content/motivationProgramV2.js  Standalone IIFE data module: 120-day "motivation
                  program" content (per-day Faz/task objects) plus helpers,
-                 exposed as `window.MotivationProgramV2`. Loaded before
-                 app.js but not yet consumed by it — UI/data-model
-                 integration into app.js and panel.html is still in
-                 progress (rollout plan lives in the untracked, local-only
-                 `seyma_motivation_v2_package/` directory — don't commit it).
+                 exposed as `window.MotivationProgramV2`; consumed by app.js
+                 (Terapi Odası engine) and narrated by motivationNarratives.js.
+                 Rollout plans live in the untracked, local-only
+                 `seyma_motivation_v2_package/` directory — don't commit it.
 app/content/motivationNarratives.js Standalone narrative content module
                  (`window.MotivationNarratives`) for the motivation program.
 app/content/saygiPeople.js   Frozen data module of 100 "günün öncüsü" inspirational
@@ -149,6 +167,18 @@ app/content/hijriCalendar.js Standalone Hicri (Islamic) calendar module
                  app.js's `hijriTodayStr`/`kandilBadgeFor`. User-adjustable
                  ±2 day offset via `settings.prayer.hijriOffset` for local
                  hilal (crescent) variance.
+app/content/quranRevelationOrderV1.js  Frozen 114-sûre nüzul (revelation) order
+                 catalog (`window.QuranRevelationOrderV1`) for the Kur'an
+                 Yolculuğu.
+app/content/quranStrikingVersesV1.js  Frozen 100 human-verified âyet rotating
+                 showcase (`window.QuranStrikingVersesV1`).
+app/content/esmaulHusnaV1.js / esmaulHusnaV2.js  Frozen 99 Esmâü'l-Hüsnâ
+                 catalogs (`window.EsmaulHusnaV1` Diyanet order + ebced
+                 targets; V2 = meaning/reflection content layer keyed by
+                 `order`).
+app/content/zikirCoreContentV1.js  Frozen content layer
+                 (`window.ZikirCoreContentV1`) for the 5 core zikr presets,
+                 keyed to `ZIKR_SEED[i].id`.
 sync.js          Separate IIFE. Debounced push of `data` to the GitHub
                  Contents API (data/latest.json + data/gunluk/<date>.json).
                  Also owns conflict-merge helpers (e.g.
@@ -189,6 +219,21 @@ panel/panel.js         Panel observer IIFE extracted from panel.html; preserves 
                  existing helper names, inline App-free handlers and API flow.
 panel/v2/panel-v2.js   Premium observer runtime; independent from current panel.
 panel/v2/panel-v2.css  Premium observer design tokens, components and responsive rules.
+panel-v2.html    Premium ÆON observer shell (repo root); loads only
+                 quranRevelationOrderV1.js, panelCoverageManifest.js and
+                 panel/v2/panel-v2.js — a third, separate regression surface.
+premium-fx-plan/ Premium FX program docs: PLAN.md / ROADMAP.md (wave plan),
+                 MODULARIZATION.md (module-split strategy — first input for
+                 the FX→modularization handoff), SAFEGUARDS.md +
+                 LOCAL-ONLY-IMPLEMENTATION.md (no-push/no-deploy gates),
+                 NEXT-STEPS.md (merge checklist), deliverables/
+                 (FX-SERI-KAPANIS-BELGESI.md + specs), .anti-amnesia/
+                 (FX-PROMPT-STATE.json + LEDGER.md).
+files/           Local maintenance area (yedek/ JSON backups, bakim/ scripts).
+graphify-out/    graphify knowledge-graph output for app.js — evidence base
+                 behind docs/monolit-bolumlenme-haritasi.md.
+archive/         Frozen program archives (Panel-v2 Premium design, panel
+                 denetim merkezi, demos) with their own .anti-amnesia/ states.
 app/styles.css       Shared CSS variables (light/dark theme) + small set of
                  global rules/keyframes used by index.html's app.
 assets/aeon-icon-*.png PWA and ÆON panel icon assets referenced by manifest.json.
@@ -241,8 +286,19 @@ tests/panel/test_panel_boot_resilience.js Headless Node fixture guarding the pan
                  consecutive-error backoff, and the "stuck on Çekirdek
                  başlatılıyor…" regression. Run:
                  `node tests/panel/test_panel_boot_resilience.js`.
-tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixture);
+tests/panel-v2/           ÆON Panel-v2 Premium test suite (27 fixtures);
                          see `tests/panel-v2/README.md` and its `helpers/`.
+tests/quran/              9 fixtures for the Kur'an modules (catalog,
+                 transport, merge, outbox sync, striking verses, panel parity).
+tests/reminders/          20 frozen-program maintenance fixtures; run the
+                 whole family via `node tests/reminders/run-reminder-smoke.mjs`.
+tests/app/ + tests/panel/ Remaining families: modularization/B1 boundary
+                 fixtures (test_modularization_boundary.js,
+                 test_faz_minus11_boundary.js, test_date_utils_boundary.js,
+                 test_helpers_boundary.js), premium FX fixtures
+                 (test_premium_*.js), modal focus + accessibility fixtures,
+                 and the PANEL-01..06 observer regression family. See
+                 `tests/README.md`.
 .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                  L2-b/B1 read-only empty/normalizer helper fixture; no app boot,
                  localStorage, sync.js or network. Run from repo root.
@@ -281,6 +337,17 @@ JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px design).
   when adding a new field**, never assume it exists on old data.
 - `save()` persists `data` to `localStorage` and calls
   `window.SeySync.schedule(data)` if sync.js is loaded.
+- **B1 live-getter boundary (Faz 0):** app.js defines
+  `Object.defineProperty(window, 'data'|'ui'|'dark'|'migrate'|'getDay'|
+  'createDefaultData'|'save', {get: ...})` so external modules
+  (`window.SeymaState`, `window.SeymaSave`) always read the fresh closure
+  value even after `data` is reassigned (reset/import/lock). Never replace
+  these with one-shot references — `data` is rebound 6+ times during boot.
+- **Premium FX modules:** UI sounds/haptics/visual micro-FX go through
+  `window.SeyAudio` / `SeyHaptics` / `SeyFx` (`app/core/mediaFx.js`) and the
+  hour/season theme through `window.SeyTimeTheme` (`app/core/timeTheme.js`);
+  they self-gate on settings + reduced motion + quiet time (23–07), so call
+  them instead of hand-rolling WebAudio/vibrate code.
 - `render()` rebuilds the visible tab's HTML as a big string and sets
   `#app.innerHTML`. There is no virtual DOM/diffing — UI functions like
   `bugunHTML()`, `raporHTML()`, `mesajHTML()` etc. return HTML strings.
@@ -315,9 +382,11 @@ JS/HTML/CSS targeting mobile Safari/Chrome (viewport ≤460px design).
 4. **Panel mirror** — any new persistent user record should also render
    somewhere in `panel.html` (a bento card or a day-detail row), since the
    observer only ever sees what's reflected there.
-5. **Cache busting** — bump the `?v=` query string on `app/styles.css`,
-   `app.js`, and/or `sync.js` in `index.html` on every deploy that changes
-   them, or the PWA/Pages CDN can serve stale assets.
+5. **Cache busting** — bump the `?v=` query string in `index.html` (and
+   `panel-v2.html` for panel files) for **every** asset you change —
+   `app/styles.css`, `app.js`, `sync.js`, and each `app/core/*` /
+   `app/content/*` module carries its own version — or the PWA/Pages CDN
+   can serve stale assets.
 6. **Privacy** — secrets (`ghToken`, `openaiKey`, `syncUrl`) must stay out
    of anything written to the (public-ish) data repo; `sync.js`'s
    `sanitize()` strips them before every push — keep that in sync if you
@@ -340,7 +409,11 @@ There's no automated test suite or linter, but `node --check app.js` (or
 `sync.js`, `app/content/hijriCalendar.js`, etc.) catches JS syntax errors first. Beyond
 that, **do not serve+open the app in a browser** (see "DATA SAFETY" above) —
 use the `run-seyma` skill's headless Node `vm` harnesses instead (also see
-"Development Commands" below):
+"Development Commands" below). Committed fixture families: `tests/app/`
+(sync, modularization/B1 boundaries, premium FX, modal focus), `tests/panel/`
+(PANEL-01..06 + observer regressions), `tests/panel-v2/` (27 premium-observer
+fixtures), `tests/quran/` and `tests/reminders/` (`run-reminder-smoke.mjs`);
+`tests/README.md` is the authoritative inventory:
 
 - `node .claude/skills/run-seyma/driver.mjs` — boots constants + `app.js` twice
   (onboarding + seeded state) and drives real interactions (tab switch,
@@ -381,6 +454,9 @@ node --check sync.js
 ```bash
 node tests/app/test_faz10_sync.js   # sync.js conflict-merge harness (mocked fetch)
 node tests/app/test_aeon_message_expand.js  # ÆON/Luna uzun mesaj okuma kalıcılığı
+node tests/app/test_modularization_boundary.js # Faz -1 modül sınırı + App.* yüzeyi
+node tests/app/test_faz_minus11_boundary.js    # Faz -1.1 modül varlık/yükleme sırası
+for f in tests/app/test_premium_*.js; do node "$f"; done # premium FX (8 fixture)
 node tests/panel/test_faz11_panel.js  # panel.html helper/render harness
 node tests/panel/test_panel_p0_sync.js # PANEL-01 receipt/revision + anti-clobber fixture
 node tests/panel/test_panel_p1_projection.js # PANEL-02 coverage/redaction/projection fixture
@@ -390,9 +466,11 @@ node tests/panel/test_panel_p2_event_log.js # PANEL-05 event contract/panel time
 node tests/panel/test_panel_p2_sync.js # PANEL-05 daily event-file sync fixture
 node tests/panel/test_panel_p2_polling.js # PANEL-06 ETag/polling/draft-safety fixture
 node tests/panel/test_panel_boot_resilience.js # panel boot/poll dayanıklılık fixture
-for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done # ÆON Panel-v2 Premium (27 fixture)
+for f in tests/panel-v2/test_panel_v2_*.js; do node "$f"; done # ÆON Panel-v2 Premium (27 fixtures)
 node tests/quran/test_quran_catalog.js # app/content/quranRevelationOrderV1.js katalog doğrulaması
 node tests/quran/test_quran_transport.js # app/content/quranTransportV1.js taşıma sözleşmeleri
+for f in tests/quran/test_quran_*.js; do node "$f"; done # tüm Kur'an ailesi (9 fixture)
+node tests/reminders/run-reminder-smoke.mjs             # donmuş reminder programı smoke
 node .claude/skills/run-seyma/verify-state-helper-boundary.mjs
                             # L2-b/B1 isolated helper boundary fixture
 node .claude/skills/run-seyma/verify-state-migration-boundary.mjs
@@ -449,7 +527,8 @@ Get-Process -Name python* | Stop-Process      # Windows PowerShell
 - See `seyma_motivation_v2_package/` for integration plans, schemas, agent prompts
 - **DO NOT COMMIT** this directory (local-only planning)
 - Use `DETAILED_AGENT_PROMPT_PACK.md` for 30-step implementation workflow
-- Data lives in `window.MotivationProgramV2` (exposed globally, not yet consumed by app.js)
+- Data lives in `window.MotivationProgramV2` + `window.MotivationNarratives`
+  (loaded before app.js; consumed by the Terapi Odası engine)
 
 ---
 

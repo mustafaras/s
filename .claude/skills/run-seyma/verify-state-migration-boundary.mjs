@@ -4,8 +4,8 @@
 // The real app boots only inside a node:vm sandbox with synthetic fixtures. The
 // harness observes the migrated object through an in-memory localStorage stub;
 // it never reads a device profile, loads sync.js, resolves fetch, or writes the
-// private seyma-data repository. This is evidence for the existing migrate()
-// behavior, not permission to extract it into app/core/state.js.
+// private seyma-data repository. This fixture covers the MON-12 registry/shim
+// parity and is not permission to touch sync, data rebind, or live state.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -117,8 +117,8 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 
-// MON-07: app.js saf tarih shimlerini üretimdeki gibi registryden çözer.
-const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app.js'];
+// MON-12: migration registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
+const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app.js'];
 
 function defaultSettings() {
   return {
@@ -146,6 +146,21 @@ function boot(seedData) {
   } catch (error) {
     return { data: null, counters, error };
   }
+}
+
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function migrationPair(seedData) {
+  const { sandbox, counters } = buildSandbox(null);
+  loadInto(sandbox, FILES);
+  const registryInput = clone(seedData);
+  const shimInput = clone(seedData);
+  const before = clone(seedData);
+  const registryResult = sandbox.SeymaState.migrate(registryInput);
+  const shimResult = sandbox.migrate(shimInput);
+  return { before, registryInput, shimInput, registryResult, shimResult, counters };
 }
 
 function stable(value) {
@@ -295,7 +310,31 @@ console.log('\n== B2-4 bozuk tipler / fail-safe ==');
   ok('malformed top-level sentinel korunuyor', d && d.malformedFuture.keep === true);
 }
 
-console.log('\n== B2-5 idempotence / deep parity ==');
+console.log('\n== B2-5 legacy/normal/future kök before-after parity ==');
+{
+  const legacy = migrationPair(baseSeed({ version: 1, legacyRootField: { keep: 'legacy' } }));
+  const normal = migrationPair(baseSeed({ version: 2, normalRootField: { keep: 'normal' } }));
+  const futureSeed = baseSeed({
+    version: 3,
+    futureRootField: { keep: 'future' },
+    settings: null,
+    days: { [Y]: { futureDayField: { keep: true } } },
+  });
+  const future = migrationPair(futureSeed);
+
+  ok('legacy registry/shim snapshot eşdeğer', same(legacy.registryResult, legacy.shimResult));
+  ok('legacy root unknown alanı korunuyor', legacy.registryResult.legacyRootField.keep === 'legacy');
+  ok('legacy kök güncel sürüme normalize oluyor', legacy.registryResult.version === 2);
+  ok('normal registry/shim snapshot eşdeğer', same(normal.registryResult, normal.shimResult));
+  ok('normal root unknown alanı korunuyor', normal.registryResult.normalRootField.keep === 'normal');
+  ok('normal kök sürümü değişmeden 2 kalıyor', normal.registryResult.version === 2);
+  ok('future registry/shim snapshot eşdeğer', same(future.registryResult, future.shimResult));
+  ok('future root fail-closed ve before-after bit eşit', future.registryResult === future.registryInput && same(future.before, future.registryResult));
+  ok('future root sürümü ve unknown nested alanları açılmıyor', future.registryResult.version === 3 && future.registryResult.futureRootField.keep === 'future' && future.registryResult.days[Y].futureDayField.keep === true && future.registryResult.settings === null);
+  ok('future migration dependency çağrısı/ağ yok', future.counters.fetches === 0);
+}
+
+console.log('\n== B2-6 idempotence / deep parity ==');
 {
   const first = boot(richSeed);
   const second = first.data ? boot(first.data) : { data: null, counters: { fetches: 0 }, error: new Error('first boot failed') };

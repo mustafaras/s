@@ -9,18 +9,19 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 3 başladı (MON-11 tamamlandı) |
+| Durum | `in_progress` — Dalga 3 sürüyor (MON-12 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-11` / `MON-12` |
-| Dalga / ilerleme | 3 sırada / 11/60 |
+| Son / sıradaki | `MON-12` / `MON-13` |
+| Dalga / ilerleme | 3 sırada / 12/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-11` tamamlandı: `SeymaState` yalnız B1 canlı getter
-okur; `data` rebindleri app.js/App sahipliğinde kaldı ve dış modül `data=`
-yazamaz. L6140 archive backfill `try/finally` geri yüklemesi taşınamaz state
-adapteri olarak kilitlendi. Sonraki kart `MON-12` için yeni açık kullanıcı
-onayı gerekir.
+**Bağlayıcı durak:** `MON-12` tamamlandı: migrate gövdesi `SeymaState`
+registry'ye taşındı; app.js `function migrate(d)` imzasını koruyan shim olarak
+kaldı. Legacy/normal/future sentetik köklerinde registry/shim parity, future
+fail-closed ve unknown-field korunumu PASS'tir. `data` rebindleri ile L5955
+archive backfill `try/finally` geri yüklemesi app.js/App sahipliğinde kaldı.
+Sonraki kart `MON-13` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -50,17 +51,17 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 
 | Çıpa | Canlı değer | Koruma |
 |---|---:|---|
-| `app.js` | 19.203 satır, IIFE sonu 19.203 | tek IIFE geçiş boyunca korunur |
+| `app.js` | 19.018 satır, IIFE sonu 19.018 | tek IIFE geçiş boyunca korunur |
 | `var data=null` | 2772 | M2, app.js sahibi |
-| yükleme / migrate | 4474 / 4475 | M2, app.js sahibi |
-| B1 getter'ları | 4483 civarı, yedi getter | canlı bağ köprüsü |
-| `migrate` / `getDay` | 4490 / 5025 | MON-11..15 yüksek risk |
-| geçici `data=d` + finally | 6140 | `finally{data=savedData}` zinciri korunur |
-| `SeyOnSyncState` / `SeyOnSynced` | 6270 / 6280 | M3, app.js sahipliği |
-| `save` / `var App` | 6301 / 6471 | MON-16..18 / MON-50..54 |
-| `createDefaultData` / `App.start` | 6741 / 6745 | MON-13..15 |
-| import / reset / late-boot data= | 9416 / 9420 / 9446 / 19103 | M2prime, app.js'te kalır |
-| `window.App=App` | 17267; atamalar sonra da sürer | I2, erken taşınmaz |
+| yükleme / migrate registry+shim | 4503 / 4519 | M2, registry gövdesi + app.js sahibi shim |
+| B1 getter'ları | 4512 civarı, yedi getter | canlı bağ köprüsü |
+| `state migrate` / `getDay` | state.js:46 / app.js:4840 | MON-12 / MON-13..15 yüksek risk |
+| geçici `data=d` + finally | 5955 | `finally{data=savedData}` zinciri korunur |
+| `SeyOnSyncState` / `SeyOnSynced` | 6085 / 6095 | M3, app.js sahipliği |
+| `save` / `var App` | 6116 / 6286 | MON-16..18 / MON-50..54 |
+| `createDefaultData` / `App.start` | 6556 / 6560 | MON-13..15 |
+| import / reset / late-boot data= | 9231 / 9235 / 9261 / 18918 | M2prime, app.js'te kalır |
+| `window.App=App` | 17082; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
 | inline onclick | satır 382 / occurrence 420 / eşsiz 325 | I2 için üç ayrı görünüm ölçüsü |
 | FX satır / occurrence | SeyAudio 27/53, SeyHaptics 21/42, SeyFx 2/4, SeyTimeTheme 2/2 | M4, 48 satır tablo MANIFESTI.md §4.2 |
@@ -185,12 +186,6 @@ serinin kapsamı değildir.
   PASS; eski-yeni dört fonksiyon ve B1 rebind eşitliği PASS; bugun dump
   SHA-256 değişmedi. Dokuz `data` atama çıpası app.js'te kaldı.
 
-## Sonraki güvenli adım
-
-`MON-12`: migrate bağımlılık manifesti ve taşıma öncesi karar. Yüksek riskli
-state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz; MON-11 kararı
-tek başına kod taşıma izni değildir.
-
 ## MON-09 kapanışı — helpers saf görünüm üreticileri
 
 - Altı app.js gövdesi `SeymaHelpers` registrysine taşındı; app.js'te aynı
@@ -237,3 +232,26 @@ tek başına kod taşıma izni değildir.
 - B1/B2/B3 state üçlüsü (0 failure; 32/32; 20/20), `test_faz10_sync`, driver,
   zikr ve tam yerel S1–S8, I1–I6, M1–M4 kapıları PASS verdi. Yerel PASS deploy
   veya cihaz kabulü değildir.
+
+## MON-12 kapanışı — migrate registry ve sentetik parity
+
+- Kanıt/manifeste: [`MON-12-MIGRATE-SENTETIK-PARITY.md`](../deliverables/MON-12-MIGRATE-SENTETIK-PARITY.md).
+- `migrate` alt yardımcıları açık bir dependency bag ile registryye bağlandı;
+  `registerMigrate` eksik/ikinci kaydı reddeder. Registryde DOM, timer, ağ,
+  localStorage veya `data` rebind yoktur.
+- `version > 2` olan sonlu sayısal future kökleri opak bırakılır: aynı nesne
+  döner, nested migration/default/version rewrite çalışmaz. Legacy/normal
+  köklerde bilinmeyen alan korunumu ayrıca fixture assertion'ına bağlıdır.
+- `index.html` cache-bust state `20260903c`, app `20260903a` oldu. Üretim
+  driver/zikr FILES sırası değişmedi; B2 ve app/reminder boot fixture'ları
+  state.js'yi app.js'ten önce yükler.
+- Kanıt: B1 `0 failures`, B2 `42/42`, B3 `20/20`; sync `69/69`; modularization
+  `44/44`; driver, zikr `95/95`, app/panel/panel-v2/Quran fixture aileleri,
+  reminder smoke `20/20` ve `git diff --check` PASS. Push/merge/tag/deploy,
+  browser/device ve gerçek veri yazımı yok.
+
+## Sonraki güvenli adım
+
+`MON-13`: getDay gövde aktarımı. Yüksek riskli state sınırı için yeni açık
+kullanıcı onayı olmadan başlanmaz; MON-12 parity kararı tek başına sonraki kod
+taşıma izni değildir.

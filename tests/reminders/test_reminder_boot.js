@@ -11,6 +11,7 @@ const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
 const CATALOG_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminderCatalog.js"), "utf8");
 const CONSTANTS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/constants.js"), "utf8");
 const DATE_UTILS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/dateUtils.js"), "utf8");
+const STATE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/state.js"), "utf8");
 const HELPERS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/helpers.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
@@ -110,8 +111,9 @@ function boot({ catalog = true, seed = null } = {}) {
   ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js"].forEach((file) => {
     vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file });
   });
-  // MON-07: app.js saf tarih shimlerini yükleme sırasındaki registryden çözer.
+  // MON-12: app.js migrate shim'i state registryden çözer.
   vm.runInContext(DATE_UTILS_SOURCE, context, { filename: "app/core/dateUtils.js" });
+  vm.runInContext(STATE_SOURCE, context, { filename: "app/core/state.js" });
   vm.runInContext(HELPERS_SOURCE, context, { filename: "app/core/helpers.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });

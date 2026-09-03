@@ -9,6 +9,7 @@ var path=require('path');
 var vm=require('node:vm');
 var repoRoot=require('../repo-root');
 var source=fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+var stateSource=fs.readFileSync(path.join(repoRoot,'app/core/state.js'),'utf8');
 var passes=0,failures=0;
 
 function assert(name,condition,detail){
@@ -40,7 +41,8 @@ assert('fotoğraf kartında kapalı önizleme veya aç-kapa yüzeyi yoktur',dail
 assert('fotoğraf tarih ve yenileme kontrolleri 44 px dokunma alanındadır',(dailyPhoto.match(/width:44px;height:44px/g)||[]).length>=3);
 
 var migration=between('function migrate(d){','// ── Tema: üç durumlu tercih');
-assert('eski kayıtlara Tatil Modu kart görünürlük tercihi eklenir',migration.indexOf("if(typeof d.settings.hideVacationCard!=='boolean') d.settings.hideVacationCard=false;")>=0);
+assert('app.js migrate shim imzasını korur',migration.indexOf('return window.SeymaState.migrate(d);')>=0);
+assert('eski kayıtlara Tatil Modu kart görünürlük tercihi eklenir',stateSource.indexOf("if(typeof d.settings.hideVacationCard!=='boolean') d.settings.hideVacationCard=false;")>=0);
 
 var vacation=between('function vacationCardHTML(rec){','CARD_BUILDERS[\'vacation\']=vacationCardHTML;');
 assert('Tatil Modu kartında erişilebilir Gizle düğmesi vardır',/App\.hideBugunCard\([^)]*vacation/.test(vacation)&&vacation.indexOf('Tatil Modu kartını gizle')>=0&&vacation.indexOf('min-height:44px')>=0);

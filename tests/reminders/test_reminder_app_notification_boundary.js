@@ -118,7 +118,7 @@ function boot(permission, options) {
   if (notification) sandbox.Notification = notification.Notification;
   sandbox.window = sandbox; sandbox.self = sandbox; sandbox.globalThis = sandbox;
   const context = vm.createContext(sandbox);
-  const files = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/helpers.js", "app/core/reminderCatalog.js"];
+  const files = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/state.js", "app/core/helpers.js", "app/core/reminderCatalog.js"];
   // The boundary module is optional in production today (REM-54 owns the
   // script wiring), so both the module path and the inline fallback must
   // produce identical behavior.

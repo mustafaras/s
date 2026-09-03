@@ -9,17 +9,17 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 2 kapandı (MON-10 tamamlandı) |
+| Durum | `in_progress` — Dalga 3 başladı (MON-11 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-10` / `MON-11` |
-| Dalga / ilerleme | 3 sırada / 10/60 |
+| Son / sıradaki | `MON-11` / `MON-12` |
+| Dalga / ilerleme | 3 sırada / 11/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-10` tamamlandı: `window.SeymaHelpers` 12 üyeli
-tam registrydir; `toast`, `confetti` ve legacy `haptic` gövdeleri tek sahibine
-taşındı, app.js aynı imza/dönüşle shim taşır. DOM/timer lazy, legacy haptic ve
-Premium `SeyHaptics` ayrık kaldı. Sonraki kart `MON-11` için yeni açık kullanıcı
+**Bağlayıcı durak:** `MON-11` tamamlandı: `SeymaState` yalnız B1 canlı getter
+okur; `data` rebindleri app.js/App sahipliğinde kaldı ve dış modül `data=`
+yazamaz. L6140 archive backfill `try/finally` geri yüklemesi taşınamaz state
+adapteri olarak kilitlendi. Sonraki kart `MON-12` için yeni açık kullanıcı
 onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
@@ -50,19 +50,19 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 
 | Çıpa | Canlı değer | Koruma |
 |---|---:|---|
-| `app.js` | 19.247 satır, IIFE sonu 19.247 | tek IIFE geçiş boyunca korunur |
+| `app.js` | 19.203 satır, IIFE sonu 19.203 | tek IIFE geçiş boyunca korunur |
 | `var data=null` | 2772 | M2, app.js sahibi |
 | yükleme / migrate | 4474 / 4475 | M2, app.js sahibi |
 | B1 getter'ları | 4483 civarı, yedi getter | canlı bağ köprüsü |
-| `migrate` / `getDay` | 4490 / 5023 | MON-11..15 yüksek risk |
-| geçici `data=d` + finally | 6138 | `finally{data=savedData}` zinciri korunur |
-| `SeyOnSyncState` / `SeyOnSynced` | 6299 / 6309 | M3, app.js sahipliği |
-| `save` / `var App` | 6330 / 6515 | MON-16..18 / MON-50..54 |
-| `createDefaultData` / `App.start` | 6785 / 6789 | MON-13..15 |
-| import / reset / late-boot data= | 9460 / 9464 / 19147 | M2prime, app.js'te kalır |
-| `window.App=App` | 17311; atamalar sonra da sürer | I2, erken taşınmaz |
+| `migrate` / `getDay` | 4490 / 5025 | MON-11..15 yüksek risk |
+| geçici `data=d` + finally | 6140 | `finally{data=savedData}` zinciri korunur |
+| `SeyOnSyncState` / `SeyOnSynced` | 6270 / 6280 | M3, app.js sahipliği |
+| `save` / `var App` | 6301 / 6471 | MON-16..18 / MON-50..54 |
+| `createDefaultData` / `App.start` | 6741 / 6745 | MON-13..15 |
+| import / reset / late-boot data= | 9416 / 9420 / 9446 / 19103 | M2prime, app.js'te kalır |
+| `window.App=App` | 17267; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
-| inline onclick | satır 385 / occurrence 423 / eşsiz 326 | I2 için üç ayrı görünüm ölçüsü |
+| inline onclick | satır 382 / occurrence 420 / eşsiz 325 | I2 için üç ayrı görünüm ölçüsü |
 | FX satır / occurrence | SeyAudio 27/53, SeyHaptics 21/42, SeyFx 2/4, SeyTimeTheme 2/2 | M4, 48 satır tablo MANIFESTI.md §4.2 |
 
 ## MON-02 kapanışı — FX/handler manifesti
@@ -187,8 +187,9 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-`MON-11`: state bağımlılık keşfi ve MON-S6 mutasyon kararı. Yüksek riskli
-state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz.
+`MON-12`: migrate bağımlılık manifesti ve taşıma öncesi karar. Yüksek riskli
+state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz; MON-11 kararı
+tek başına kod taşıma izni değildir.
 
 ## MON-09 kapanışı — helpers saf görünüm üreticileri
 
@@ -219,3 +220,20 @@ state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz.
   Yeni efekt, timer, notification veya gesture eklenmedi. Tam 12 üyelik
   manifesti [`MON-D2-CEKIRDEK-RAPORU.md`](../deliverables/MON-D2-CEKIRDEK-RAPORU.md)
   içindedir; helpers cache-bust `20260903b`, FILES sırası değişmedi.
+
+## MON-11 kapanışı — state bağımlılık keşfi ve MON-S6
+
+- Karar belgesi: [`MON-S6-STATE-MUTASYON-KARARI.md`](../deliverables/MON-S6-STATE-MUTASYON-KARARI.md).
+  `migrate`, `getDay` ve `createDefaultData` için okuma/yazma, closure ve App
+  handler ilişkileri; `data`nın dokuz rebind kaynağı; M2/M2prime sahipliği ve
+  tarihsel L6079’un canlı L6140 `try/finally` geri yükleme davranışı kanıtlandı.
+- Karar: `SeymaState` yalnız B1 canlı getter okur; dış modül `data=` yazmaz.
+  Snapshot, setter/store ve event-bus registry kabul edilmez. Migrate
+  bağımlılıkları çözümsüz değildir; L6140 adaptörü app.js sahipliğinde kalır.
+- Canlı ölçüm yenilemesi, önceki tarihsel MON-S2 kayıtlarından drift gösterdi:
+  19.247→19.203 satır ve inline `onclick` 385/423/326→382/420/325. Eski ledger
+  satırları tarihsel makbuz olarak değiştirilmedi. Kod, B1 getter,
+  `migrate()` semantiği, `index.html`, cache-bust ve FILES manifesti değişmedi.
+- B1/B2/B3 state üçlüsü (0 failure; 32/32; 20/20), `test_faz10_sync`, driver,
+  zikr ve tam yerel S1–S8, I1–I6, M1–M4 kapıları PASS verdi. Yerel PASS deploy
+  veya cihaz kabulü değildir.

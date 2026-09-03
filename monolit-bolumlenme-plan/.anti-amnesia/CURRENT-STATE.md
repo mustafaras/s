@@ -136,7 +136,7 @@ serinin kapsamı değildir.
 ## Değişmez kararlar ve tuzaklar
 
 0. **MON-S5 fixture geçiş sözleşmesi** ([`../deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md`](../deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md)):
-   4 fixture'ın ~151 assertion'ı 15 geçiş grubuna ayrıldı. Daima-değişmez:
+   4 fixture'ın 138 assertion'ı 15 geçiş grubuna ayrıldı. Daima-değişmez:
    I2 App yüzeyi, IIFE+`window.App`, M3/B1 (`window.data/ui/save=` yasak),
    saf davranış testleri, helpers FX yasağı, `assertLoadOrder`. Kasıtlı
    geçişler: modularization [1] satır eşiği (MON-50..54), [4] sayaç tersine

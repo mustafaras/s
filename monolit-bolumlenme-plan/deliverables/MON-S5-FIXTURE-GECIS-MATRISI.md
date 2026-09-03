@@ -16,15 +16,20 @@ commit "fixture geçişi" olarak LEDGER'a işlenir. **"Eski test" diye bastırma
 yasaktır** — bir assertion artık anlamsızsa bu matriste karşılığı yoksa
 o MON bloke olur.
 
+> **Öz-denetim düzeltmesi (2026-09-03):** envanter sayısı ilk yazımda
+> "~151" idi; bağımsız yeniden sayım gerçek değeri **138** (35+13+59+31)
+> verdi; tablo ve MON-STATE karar anahtarı bu doğru değerle hizalandı.
+> Satır sayısı 579 ilk ölçümle birebir doğrulandı.
+
 ## 2. Envanter (canlı sayım, 2026-09-03)
 
 | Fixture | Satır | ok() assertion | Grup |
 |---|---:|---:|---|
-| `tests/app/test_modularization_boundary.js` | 232 | ~48 | [0]–[10] |
-| `tests/app/test_faz_minus11_boundary.js` | 65 | ~13 | modül varlık + FX çağrı + B1 erken |
+| `tests/app/test_modularization_boundary.js` | 232 | 35 | [0]–[10] |
+| `tests/app/test_faz_minus11_boundary.js` | 65 | 13 | modül varlık + FX çağrı + B1 erken |
 | `tests/app/test_date_utils_boundary.js` | 178 | 59 | expose + fonksiyon varlığı + davranış + B1 |
 | `tests/app/test_helpers_boundary.js` | 104 | 31 | expose + fonksiyon varlığı + davranış + B1 + negatif FX |
-| **Toplam** | **579** | **~151** | 4 dosya |
+| **Toplam** | **579** | **138** | 4 dosya |
 
 ## 3. Geçiş matrisi
 

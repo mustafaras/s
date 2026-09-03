@@ -9,20 +9,20 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 3 sürüyor (MON-14 tamamlandı) |
+| Durum | `in_progress` — Dalga 3 kapandı (MON-15 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-14` / `MON-15` |
-| Dalga / ilerleme | 3 sırada / 14/60 |
+| Son / sıradaki | `MON-15` / `MON-16` |
+| Dalga / ilerleme | 3 kapandı / 15/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-14` tamamlandı: `createDefaultData` gövdesi
-`SeymaState` registry'ye taşındı; app.js aynı çağrı yüzeyini koruyan shim olarak
-kaldı. Default root/settings/tarih tam sentetik snapshotı ve hash parity, fresh
-root/nested referansları, app.js `data` bağlamı korunumu ve onboarding/start/
-late-boot yolları PASS'tir. `data` rebindleri, reset/import/auth sahipliği ve
-`save()` app.js/App'te kaldı. Sonraki kart `MON-15` için yeni açık kullanıcı
-onayı gerekir.
+**Bağlayıcı durak:** `MON-15` tamamlandı: MON-11..14 state aktarımının canlı
+getter, rebind ve strict-mode sınırı bağımsız sentetik VM fixture'ı ile kapatıldı.
+Dokuz `app.js` data atama kaynak satırı (11 token), registryde sıfır gerçek
+`data=` yazımı, import/reset/location/auth late-boot ve tarihsel 6079
+`try/finally` geri-bind kanıtlandı. `data`, `ui`, `dark` ve App/boot sahipliği
+app.js'te; `SeymaState` yalnız getter-only canlı okuma sunuyor. Sonraki kart
+`MON-16` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -60,7 +60,7 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 | geçici `data=d` + finally | 5975 | `finally{data=savedData}` zinciri korunur |
 | `SeyOnSyncState` / `SeyOnSynced` | 6118 / 6128 | M3, app.js sahipliği |
 | `save` / `var App` | 6149 / 6319 | MON-16..18 / MON-50..54 |
-| `createDefaultData` / `App.start` | 6589 / 6590 | MON-14..15 / boot sahipliği |
+| `createDefaultData` / `App.start` | 6589 / 6590 | MON-14 aktarımı / boot sahipliği; MON-15 denetimi |
 | import / reset / late-boot data= | canlı grep ile yenilenir | M2prime, app.js'te kalır |
 | `window.App=App` | 17102; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
@@ -291,8 +291,33 @@ serinin kapsamı değildir.
   `sync.js`, `data/`, panel ve deploy yüzeyi dokunulmadı. Push/merge/tag/deploy,
   browser/device ve gerçek veri deposu yazımı yok.
 
+## MON-15 kapanışı — state Dalga 3 ve B1 yeniden-atama denetimi
+
+- Kanıt/manifeste: [`MON-D3-STATE-RAPORU.md`](../deliverables/MON-D3-STATE-RAPORU.md).
+- Özel fixture: [`tests/app/test_state_rebind_boundary.js`](../../tests/app/test_state_rebind_boundary.js).
+  Tam üretim script sırasını sentetik `node:vm` içinde yükler; gerçek browser,
+  token, sync.js veya çözülen fetch kullanmaz.
+- Canlı kaynak envanteri: `app.js`te dokuz data atama kaynak satırı ve 11 token;
+  `app/core/state.js` gerçek kodunda sıfır `data=` yazımı. `ui` ve `dark`
+  initialization/rebind sahipliği de app.js'te kaldı; `syncGlue` callback setterı
+  yoktur.
+- Yedi app B1 getterı (`data`, `ui`, `dark`, `migrate`, `getDay`,
+  `createDefaultData`, `save`) ve `SeymaState` state getterları setter'sızdır.
+  Strict-mode descriptor probe, dış yazmayı `TypeError` ile reddeder; canlı
+  getter `ui`/`dark` değişimini ve `data` closure kimliğini taze okur.
+- Sentetik import, iki adımlı reset, location late-boot, gerçek auth handlerının
+  sandbox hash'iyle auth unlock late-boot yolu ve 6079 `try/finally` geçici
+  takası PASS. `App.start`, `data=null`, import ve tüm rebind kaynakları app.js
+  sahibinde kaldı. Acceptance: `37/37`.
+- B1 `0 failures`, B2 `60/60`, B3 `20/20`; sync `69/69`, driver, zikr `95/95`,
+  syntax ve premium PASS. Tam app/panel/Panel-v2/Quran/reminder aileleri ve
+  diff/cache kontrolleri exit 0 verdi. Index cache-bust (`state 20260903e`,
+  `app 20260903c`) ve driver/zikr FILES değişmedi; yeni production modülü yok.
+  `sync.js`, `data/`, panel, push/merge/tag/deploy/browser/device ve gerçek veri
+  deposu yazımı yok.
+
 ## Sonraki güvenli adım
 
-`MON-15`: state dalga 3 kapanışı ve B1 yeniden-atama denetimi. Yüksek riskli
-state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz; MON-14 parity
-kararı tek başına sonraki kod taşıma izni değildir.
+`MON-16`: syncGlue callback sahipliği envanteri ve strict-mode sınırı. Dalga 3
+kapandı; yeni syncGlue kodu için yeni açık kullanıcı onayı gerekir. MON-15
+kanıtı tek başına sonraki karta uygulama izni değildir.

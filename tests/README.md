@@ -26,6 +26,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_local_visual_qa_guard.js` — Ajanın ekran görüntüsü alabilen yerel
   QA istisnasının Guard 1, force-sync ve gerçek profil sınırlarını kaynak
   düzeyinde ağsız doğrular.
+- `app/test_state_rebind_boundary.js` — MON-15 state Dalga 3 kapanışı: canlı
+  B1 getter tazeliği, dokuz `app.js` data atama satırı, registryde sıfır
+  `data=` yazımı, import/reset/location/auth late-boot ve 6079 try/finally
+  geri-bind sınırı; sentetik `node:vm`, ağsız.
 - `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
   ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
   doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,

@@ -4824,12 +4824,14 @@ function flushFieldTimers(){
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function clone(o){ return JSON.parse(JSON.stringify(o)); }
 function normalizeToken(v){ return String(v||'').replace(/[^\x20-\x7E]/g,'').trim(); }
-function pad(n){ return String(n).padStart(2,'0'); }
-function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
-function todayStr(){ return fmt(new Date()); }
-function addDays(s,n){ var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); dt.setDate(dt.getDate()+n); return fmt(dt); }
-function diffDays(a,b){ var pa=a.split('-').map(Number),pb=b.split('-').map(Number); var da=new Date(pa[0],pa[1]-1,pa[2]),db=new Date(pb[0],pb[1]-1,pb[2]); return Math.round((db-da)/86400000); }
-function shortDate(s){ var p=s.split('-'); return p[2]+'.'+p[1]; }
+// MON-07: saf tarih gövdeleri dateUtils registry'sinin tek sahibidir.
+// İmzalar ve dönüşler app.js çağrı noktaları için aynen korunur.
+function pad(n){ return window.SeymaDateUtils.pad.apply(null,arguments); }
+function fmt(d){ return window.SeymaDateUtils.fmt.apply(null,arguments); }
+function todayStr(){ return window.SeymaDateUtils.todayStr.apply(null,arguments); }
+function addDays(s,n){ return window.SeymaDateUtils.addDays.apply(null,arguments); }
+function diffDays(a,b){ return window.SeymaDateUtils.diffDays.apply(null,arguments); }
+function shortDate(s){ return window.SeymaDateUtils.shortDate.apply(null,arguments); }
 function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
 // ---- geçmiş gün düzenleme: aktif tarih ayrımı ----
 // activeDate() = düzenlenen gün varsa o, yoksa bugün. Yalnızca MANUEL day-record

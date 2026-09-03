@@ -117,7 +117,8 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 
-const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app.js'];
+// MON-07: app.js saf tarih shimlerini üretimdeki gibi registryden çözer.
+const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app.js'];
 
 function defaultSettings() {
   return {

@@ -1,7 +1,8 @@
 'use strict';
 // Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, mediaFx, timeTheme)
-// sadece window.* üzerinde expose edilmiş durumda olmalı; hiçbir App.* handler
-// bunları kullanmamalı çünkü PR -1.1 davranış değiştirmez.
+// sadece window.* üzerinde expose edilmiş durumda olmalıydı. MON-07 ile
+// dateUtils'nin altı saf gövdesi app.js'te imza-koruyan shim üzerinden registry
+// sahibi olur; helpers henüz tüketilmez.
 // Çalıştırma: node tests/app/test_faz_minus11_boundary.js
 
 var fs = require('fs');
@@ -56,7 +57,15 @@ var expectedModules = [
   // FX-P-42: SeyTimeTheme artık app.js render() sonunda güvenli guard ile
   // çağrılıyor (onaylı entegrasyon); eski "henüz çağrılmıyor" kontratı bayat.
   ok('SeyTimeTheme guard\'lı çağrı noktası var (FX-P-42)', appSrc.indexOf('window.SeyTimeTheme && typeof window.SeyTimeTheme.apply') >= 0);
-  ok('SeymaDateUtils henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaDateUtils') < 0);
+  var dateUtilsShims = [
+    'function pad(n){ return window.SeymaDateUtils.pad.apply(null,arguments); }',
+    'function fmt(d){ return window.SeymaDateUtils.fmt.apply(null,arguments); }',
+    'function todayStr(){ return window.SeymaDateUtils.todayStr.apply(null,arguments); }',
+    'function addDays(s,n){ return window.SeymaDateUtils.addDays.apply(null,arguments); }',
+    'function diffDays(a,b){ return window.SeymaDateUtils.diffDays.apply(null,arguments); }',
+    'function shortDate(s){ return window.SeymaDateUtils.shortDate.apply(null,arguments); }'
+  ];
+  ok('SeymaDateUtils altı saf fonksiyon shim üzerinden çağrılıyor (MON-07)', dateUtilsShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
   ok('SeymaHelpers henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaHelpers') < 0);
 })();
 

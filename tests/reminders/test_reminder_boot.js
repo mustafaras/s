@@ -10,6 +10,7 @@ const INDEX = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
 const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
 const CATALOG_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminderCatalog.js"), "utf8");
 const CONSTANTS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/constants.js"), "utf8");
+const DATE_UTILS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/dateUtils.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
   const attrs = {};
@@ -108,6 +109,8 @@ function boot({ catalog = true, seed = null } = {}) {
   ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js"].forEach((file) => {
     vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), context, { filename: file });
   });
+  // MON-07: app.js saf tarih shimlerini yükleme sırasındaki registryden çözer.
+  vm.runInContext(DATE_UTILS_SOURCE, context, { filename: "app/core/dateUtils.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
   return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls };
@@ -122,18 +125,21 @@ const cases = [
     const scripts = scriptSources();
     const indexOf = (needle) => scripts.findIndex((src) => src.startsWith(needle));
     const constantsIndex = indexOf("app/core/constants.js?");
+    const dateUtilsIndex = indexOf("app/core/dateUtils.js?");
     const catalogIndex = indexOf("app/core/reminderCatalog.js?");
     const appIndex = indexOf("app.js?");
     const syncIndex = indexOf("sync.js?");
-    assert(constantsIndex >= 0 && catalogIndex >= 0 && appIndex >= 0 && syncIndex >= 0);
+    assert(constantsIndex >= 0 && dateUtilsIndex >= 0 && catalogIndex >= 0 && appIndex >= 0 && syncIndex >= 0);
     assert(constantsIndex < appIndex);
+    assert(dateUtilsIndex < appIndex);
     assert(catalogIndex < appIndex);
     assert(appIndex < syncIndex);
     assertEqual(scripts[constantsIndex].split("?")[0], "app/core/constants.js");
+    assertEqual(scripts[dateUtilsIndex].split("?")[0], "app/core/dateUtils.js");
     assertEqual(scripts[catalogIndex].split("?")[0], "app/core/reminderCatalog.js");
     assertEqual(scripts[appIndex].split("?")[0], "app.js");
     assertEqual(scripts[syncIndex].split("?")[0], "sync.js");
-    [scripts[constantsIndex], scripts[catalogIndex], scripts[appIndex], scripts[syncIndex]].forEach((src) => assert(/\?v=[^&\s]+$/.test(src)));
+    [scripts[constantsIndex], scripts[dateUtilsIndex], scripts[catalogIndex], scripts[appIndex], scripts[syncIndex]].forEach((src) => assert(/\?v=[^&\s]+$/.test(src)));
   }],
   ["clean boot exposes isolated constants, catalog and App adapters", () => {
     const out = boot();

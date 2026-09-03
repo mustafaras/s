@@ -9,16 +9,18 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 1 kapandı (MON-06) |
+| Durum | `in_progress` — Dalga 2 başladı (MON-07 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-06` / `MON-07` |
-| Dalga / ilerleme | 2 başlıyor / 6/60 |
+| Son / sıradaki | `MON-07` / `MON-08` |
+| Dalga / ilerleme | 2 aktif / 7/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** Dalga 1 (MON-01..06) tam kanıtla kapatıldı; 0 kod
-taşınması. `MON-07` ilk gövde taşımadır ve **yeni açık kullanıcı onayı
-olmadan başlamaz** (Dalga 2 approvalRequired: true).
+**Bağlayıcı durak:** `MON-07` tamamlandı: `pad`, `fmt`, `todayStr`,
+`addDays`, `diffDays` ve `shortDate` saf gövdelerinin tek sahibi
+`window.SeymaDateUtils`; app.js aynı imza/dönüşle registry shimleri taşır.
+`dayIndexFor`/`activeDate`/`curDay`, `data`/`ui` ve tarih algoritması
+dokunulmadı. Sonraki kart `MON-08` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -152,8 +154,26 @@ serinin kapsamı değildir.
 4. `sync.js`, panel, `app/content/*`, frozen reminder motorları, SW ve gerçek
    veri bu programın kod kapsamı dışındadır.
 
+## MON-07 kapanışı — dateUtils saf gövdeleri
+
+- Altı saf gövde zaten yükleme-güvenli `app/core/dateUtils.js` registry'sinde
+  bulunuyordu; MON-07 app.js kopyalarını aynı isim/imza/dönüşlü registry
+  shimlerine indirdi. Registry dışında ikinci gövde kalmadı.
+- `index.html`de dateUtils cache-bust `20260903a` yapıldı. Dosya önceden
+  index ve iki headless FILES dizisinde doğru sırada olduğundan script sırası
+  veya FILES dizisi değişmedi; `assertLoadOrder` korundu. Tam kapı setinin
+  bulduğu reminder-smoke ve B2 state-migration VM yükleme eksikleri de yalnız
+  fixture listelerinde aynı `constants → dateUtils → app.js` sırasıyla
+  giderildi.
+- Kanıt: syntax×2; `test_date_utils_boundary` 58/58; modularization 42/42;
+  Faz−1.1 18/18 (F-3 artık altı shim'i doğrular); B1/B2/B3 state sınırları
+  (B2 32/32) PASS; driver/zikr PASS; bugun dump SHA-256 değişmedi
+  (`e43a604594a0da91d78978eb3b13844281cf19a08630073415f615ec990b1695`).
+  Saat dilimi/string çıktısı sapması yoktur. Yerel PASS deploy veya cihaz
+  kabulü değildir.
+
 ## Sonraki güvenli adım
 
-Dalga 1 kapanış raporu: [`../deliverables/MON-D1-ON-UCUS-RAPORU.md`](../deliverables/MON-D1-ON-UCUS-RAPORU.md).
-Kullanıcı uygulamaya açıkça onay verirse `MON-07`: dateUtils saf tarih
- gövdeleri (ilk gövde taşıma, Dalga 2). Aksi halde bu durum değişmez.
+`MON-08`: dateUtils state-okur yardımcıları. `dayIndexFor`/`activeDate`/
+`curDay` yalnız B1 taze getter üzerinden ele alınabilir; yeni açık kullanıcı
+onayı olmadan başlanmaz.

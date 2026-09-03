@@ -9,18 +9,19 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 2 sürüyor (MON-08 tamamlandı) |
+| Durum | `in_progress` — Dalga 2 sürüyor (MON-09 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-08` / `MON-09` |
-| Dalga / ilerleme | 2 aktif / 8/60 |
+| Son / sıradaki | `MON-09` / `MON-10` |
+| Dalga / ilerleme | 2 aktif / 9/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-08` tamamlandı: `dayIndexFor`, `activeDate`,
-`curDay` ve `dateLabelTR` gövdelerinin tek sahibi `window.SeymaDateUtils`;
-app.js aynı imza/dönüşle registry shimleri taşır. B1 tazeliği, `editDate`
-önceliği, `getDay(data,date,index)` aktarımı ve tarih metni korunur.
-Sonraki kart `MON-09` için yeni açık kullanıcı onayı gerekir.
+**Bağlayıcı durak:** `MON-09` tamamlandı: `segTabs`, `progBar`, `starRow`,
+`miniBars`, `statTile` ve `collapsibleCardHTML` gövdelerinin tek sahibi
+`window.SeymaHelpers`; app.js aynı imza/dönüşle registry shimleri taşır.
+`esc` ve SVG icon bağı registryde görünür constants resolverıyla çözülür;
+stil, ARIA metni, HTML sırası ve inline `onclick` dizeleri korunur. Sonraki
+kart `MON-10` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -187,5 +188,24 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-`MON-09`: helpers saf görünüm üreticileri. Stil, aria metni, HTML sırası ve
-inline `onclick` metinleri için yeni açık kullanıcı onayı olmadan başlanmaz.
+`MON-10`: helpers yan etkili UI yardımcıları. DOM/timer/haptic sınırı için
+yeni açık kullanıcı onayı olmadan başlanmaz.
+
+## MON-09 kapanışı — helpers saf görünüm üreticileri
+
+- Altı app.js gövdesi `SeymaHelpers` registrysine taşındı; app.js'te aynı
+  isim/imza/dönüşlü shimler kaldı. `miniBars` canlı tarihini DateUtils
+  registryden, `starRow`/`statTile`/`collapsibleCardHTML` escaping ve SVG
+  üretimini helpers içindeki açık resolverlardan alır; `data`/`ui`, DOM,
+  timer, ağ ve App mutasyonu taşınmadı.
+- Registryde önceden kalmış farklı ARIA/stil/onclick varyantları app.js'in
+  gerçek çıktılarına hizalandı. Constants registry yalnız `ICONS` verdiği
+  için SVG resolver, app.js icon sözleşmesiyle eşdeğer biçimde tamamlandı.
+  `helpers.js` cache-bust `20260903a`; dosya önceden index ve ana FILES
+  dizilerinde doğru sırada olduğundan sıra değişmedi.
+- Kanıt: eski-yeni altı üretici eşit çıktı; `bugun` dump SHA-256
+  `dc7af3b89b87f669b78d4c8895d965ebe98a3b34f722c70ebd2183dd83e90099`,
+  `rapor` `5ceeffe4d0d7a7396f4b909c7249d18aa3f40c5ea6f6bcaa1da0ba28d8d0e334`.
+  Helpers 30/30, date-utils 58/58, driver/zikr, state sınırları,
+  modularization/Faz−1.1, sync/panel/premium ve reminder smoke 20/20 PASS.
+  Yerel PASS deploy veya cihaz kabulü değildir.

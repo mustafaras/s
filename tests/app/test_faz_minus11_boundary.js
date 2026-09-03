@@ -1,8 +1,8 @@
 'use strict';
 // Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, mediaFx, timeTheme)
 // sadece window.* üzerinde expose edilmiş durumda olmalıydı. MON-07 ile
-// dateUtils'nin altı saf gövdesi app.js'te imza-koruyan shim üzerinden registry
-// sahibi olur; helpers henüz tüketilmez.
+// dateUtils'nin on gövdesi ve helpers'ın altı saf görünüm üreticisi app.js'te
+// imza-koruyan shim üzerinden registry sahibi olur.
 // Çalıştırma: node tests/app/test_faz_minus11_boundary.js
 
 var fs = require('fs');
@@ -70,7 +70,15 @@ var expectedModules = [
     'function dateLabelTR(s){ return window.SeymaDateUtils.dateLabelTR.apply(null,arguments); }'
   ];
   ok('SeymaDateUtils on tarih fonksiyonu shim üzerinden çağrılıyor (MON-07/08)', dateUtilsShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
-  ok('SeymaHelpers henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaHelpers') < 0);
+  var helperShims = [
+    'function segTabs(defs,active,fn,accent){ return window.SeymaHelpers.segTabs.apply(null,arguments); }',
+    'function progBar(pct,col){ return window.SeymaHelpers.progBar.apply(null,arguments); }',
+    'function starRow(rating,fn,id,size){ return window.SeymaHelpers.starRow.apply(null,arguments); }',
+    'function miniBars(rows,valKey,unit,col){ return window.SeymaHelpers.miniBars.apply(null,arguments); }',
+    'function statTile(label,val,sub){ return window.SeymaHelpers.statTile.apply(null,arguments); }',
+    'function collapsibleCardHTML(o){ return window.SeymaHelpers.collapsibleCardHTML.apply(null,arguments); }'
+  ];
+  ok('SeymaHelpers altı görünüm üreticisi shim üzerinden çağrılıyor (MON-09)', helperShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
 })();
 
 console.log('\n=== Özet ===');

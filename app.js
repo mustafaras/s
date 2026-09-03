@@ -6165,11 +6165,11 @@ function musicStats(){ var M=ensureMusic(); var byKind={sarki:0,album:0,podcast:
 function allLyrics(){ var M=ensureMusic(),out=[]; M.items.forEach(function(x){ (x.quotes||[]).forEach(function(q){ out.push({itemId:x.id,title:x.title,emoji:x.emoji,artist:x.artist,q:q}); }); }); out.sort(function(a,b){ return String(b.q.ts||'').localeCompare(String(a.q.ts||'')); }); return out; }
 function fmtDur(min){ min=Math.max(0,Math.round(Number(min)||0)); if(min<60) return min+' dk'; var h=Math.floor(min/60),m=min%60; return h+' sa'+(m?' '+m+' dk':''); }
 // ---------- ortak UI parçaları ----------
-function segTabs(defs,active,fn,accent){ var grad=(accent==='watch')?'linear-gradient(135deg,var(--watch),color-mix(in srgb,var(--watch) 72%,#E0B080))':(accent==='listen')?'linear-gradient(135deg,#0E9AA7,var(--listen))':(accent==='zikr')?'linear-gradient(135deg,var(--zikr),var(--zikr2))':'linear-gradient(135deg,#6E55BF,#9B7FC9)'; var glow=(accent==='watch')?'0 6px 14px rgba(200,143,76,0.30)':(accent==='listen')?'0 6px 14px rgba(14,154,167,0.30)':(accent==='zikr')?'0 6px 14px var(--zikr-glow)':'0 6px 14px rgba(110,85,191,0.32)'; var h='<div style="display:flex;gap:4px;background:var(--icon);border-radius:14px;padding:4px;">'; defs.forEach(function(d){ var on=active===d[0]; h+='<button onclick="'+fn+'(\''+d[0]+'\')" style="flex:1;border:none;cursor:pointer;padding:8px 4px;border-radius:11px;font-size:var(--f-caption1);font-weight:800;white-space:nowrap;color:'+(on?'#fff':'var(--muted)')+';background:'+(on?grad:'transparent')+';box-shadow:'+(on?glow:'none')+';transition:all .18s;">'+d[1]+'</button>'; }); h+='</div>'; return h; }
-function progBar(pct,col){ pct=Math.max(0,Math.min(100,Number(pct)||0)); col=col||'linear-gradient(90deg,#6E55BF,#E9AFC1)'; return '<div style="height:8px;border-radius:999px;background:var(--icon);overflow:hidden;"><div style="height:100%;width:'+pct+'%;border-radius:999px;background:'+col+';transition:width .4s;"></div></div>'; }
-function starRow(rating,fn,id,size){ size=size||16; var h='<div style="display:flex;gap:3px;">'; for(var s=1;s<=5;s++){ var on=rating!=null&&s<=rating; h+='<button onclick="'+fn+'(\''+esc(id)+'\','+s+')" aria-label="'+s+' yıldız" style="border:none;background:none;cursor:pointer;padding:0;line-height:1;color:'+(on?'#F2B65A':'var(--faint)')+';opacity:'+(on?'1':'0.45')+';display:inline-flex;">'+icon('star',size)+'</button>'; } h+='</div>'; return h; }
-function miniBars(rows,valKey,unit,col){ var max=1; rows.forEach(function(r){ if(r[valKey]>max) max=r[valKey]; }); var h='<div style="display:flex;align-items:flex-end;gap:6px;height:88px;">'; rows.forEach(function(r){ var v=r[valKey]||0; var hp=Math.round((v/max)*72)+4; var today=r.date===todayStr(); h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;"><div style="font-size:var(--f-caption2);color:var(--faint);font-weight:700;">'+(v>0?v:'')+'</div><div style="width:100%;max-width:26px;height:'+hp+'px;border-radius:7px;background:'+(v>0?(col||'linear-gradient(180deg,#9B7FC9,#6E55BF)'):'var(--icon)')+';'+(today?'outline:2px solid #E9AFC1;outline-offset:1px;':'')+'"></div><div style="font-size:var(--f-caption2);color:'+(today?'var(--accent)':'var(--faint)')+';font-weight:'+(today?'800':'600')+';">'+esc(r.label)+'</div></div>'; }); h+='</div>'; return h; }
-function statTile(label,val,sub){ return '<div style="flex:1;min-width:0;background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:12px 10px;text-align:center;"><div style="font-size:var(--f-title2);font-weight:800;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;">'+val+'</div><div style="font-size:var(--f-caption2);color:var(--muted);font-weight:700;margin-top:3px;">'+esc(label)+'</div>'+(sub?'<div style="font-size:var(--f-caption2);color:var(--faint);margin-top:1px;">'+esc(sub)+'</div>':'')+'</div>'; }
+function segTabs(defs,active,fn,accent){ return window.SeymaHelpers.segTabs.apply(null,arguments); }
+function progBar(pct,col){ return window.SeymaHelpers.progBar.apply(null,arguments); }
+function starRow(rating,fn,id,size){ return window.SeymaHelpers.starRow.apply(null,arguments); }
+function miniBars(rows,valKey,unit,col){ return window.SeymaHelpers.miniBars.apply(null,arguments); }
+function statTile(label,val,sub){ return window.SeymaHelpers.statTile.apply(null,arguments); }
 function spanEnd(){ var end=todayStr(); for(var d in data.days){ if(diffDays(d,end)<0) end=d; } return end; }
 function allDays(){ var out=[],s=data.startDate; var n=Math.max(1,diffDays(s,spanEnd())+1); if(n>3000) n=3000; for(var i=0;i<n;i++){ var date=addDays(s,i); out.push({i:i+1,date:date,rec:data.days[date]||null}); } return out; }
 function bestStreak(days){ var b=0,c=0; days.forEach(function(d){ if(countRec(d.rec)>=4){c++;b=Math.max(b,c);} else if(isVacationDay(d.date)){ /* seri dondur; sayaç artmaz, kırılmaz */ } else c=0; }); return b; }
@@ -6253,38 +6253,7 @@ function updateCardByKey(key){
 }
 // Ortak açılır/kapanır kart kabuğu (hava/terapi kartı deseni).
 // title/subtitle/badge/body HTML olarak gelir; dinamik metni çağıran esc'ler.
-function collapsibleCardHTML(o){
-  var open=!!o.open, accent=o.accent||'var(--accent)';
-  // iOS 26 liquid-glass: hafif renk çerçeve (color-mix) + açık/kapalı hâl farkı (yükseklik/gölge).
-  var frame=open
-    ? 'border:1px solid color-mix(in srgb,'+accent+' 40%, var(--card-bd));box-shadow:0 16px 40px rgba(108,74,58,0.11),inset 0 1px 0 rgba(255,255,255,0.45);'
-    : 'border:1px solid color-mix(in srgb,'+accent+' 16%, var(--card-bd));box-shadow:0 5px 16px rgba(108,74,58,0.05),inset 0 1px 0 rgba(255,255,255,0.28);';
-  var h='<div id="'+esc(o.id||('card-'+o.key))+'" class="surface sey-ccard" data-cardkey="'+esc(o.key)+'" data-open="'+(open?'1':'0')+'" style="border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;'+frame+(o.cardStyle||'')+'">';
-  h+='<span class="sey-ccard-sheen" style="background:linear-gradient(90deg,transparent,'+accent+',transparent);"></span>';
-  // Başlık satırı: aç/kapa butonu rozeti SARMAZ. Rozet kendi içinde buton
-  // taşıyabiliyor (ör. konum kartındaki "Gizle" + açma anahtarı); buton içinde
-  // buton HTML5'te geçersizdir, ayrıştırıcı dış butonu erken kapatıp açık
-  // div'leri de yutuyor ve kart yığını kaydırma kabının dışına düşüyordu.
-  h+='<div class="sey-ccard-head" style="display:flex;align-items:center;gap:11px;">';
-  h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" aria-expanded="'+(open?'true':'false')+'" style="cursor:pointer;display:flex;align-items:center;gap:11px;flex:1;min-width:0;width:auto;">';
-  if(o.icon) h+='<span style="width:36px;height:36px;border-radius:12px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:'+accent+';background:color-mix(in srgb,'+accent+' 14%, var(--icon));box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);">'+o.icon+'</span>';
-  h+='<div style="flex:1;min-width:0;"><div style="font-size:var(--f-callout);font-weight:800;color:var(--text);line-height:1.15;">'+o.title+'</div>'+(o.subtitle?'<div style="font-size:var(--f-caption1);color:var(--faint);margin-top:2px;line-height:1.3;">'+o.subtitle+'</div>':'')+'</div>';
-  h+='</button>';
-  if(o.badge) h+='<div style="flex-shrink:0;">'+o.badge+'</div>';
-  // Chevron da dokunulabilir kalsın diye buton; klavye/ekran okuyucu için tek
-  // kontrol yeterli olduğundan sıradan çıkarılır (tabindex=-1 + aria-hidden).
-  h+='<button type="button" class="sey-asbtn" tabindex="-1" aria-hidden="true" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;display:flex;align-items:center;flex-shrink:0;width:auto;">';
-  h+='<span class="sey-collchev" style="color:'+accent+';display:inline-flex;flex-shrink:0;transition:transform .25s var(--ease-premium,ease);transform:rotate('+(open?'180deg':'0deg')+');">'+icon('chevron-down',16)+'</span>';
-  h+='</button>';
-  h+='</div>';
-  if(open){
-    h+='<div class="sey-collbody" style="display:flex;flex-direction:column;gap:12px;">'+(o.body||'')+'</div>';
-  } else if(o.hint!==false){
-    h+='<button type="button" class="sey-asbtn" onclick="App.toggleCard(\''+esc(o.key)+'\')" style="cursor:pointer;text-align:center;font-size:var(--f-caption2);font-weight:700;letter-spacing:.3px;color:var(--faint);display:flex;align-items:center;justify-content:center;gap:4px;">'+(o.hint||'detaylar için dokun')+' '+icon('chevron-down',11)+'</button>';
-  }
-  h+='</div>';
-  return h;
-}
+function collapsibleCardHTML(o){ return window.SeymaHelpers.collapsibleCardHTML.apply(null,arguments); }
 // Sağlık bölümü başlığında glance-edilen metrik rozeti (iOS-27: kapalıyken bile değer görünür).
 function hBadge(txt,col){ col=col||'var(--muted)'; return '<span style="font-size:var(--f-caption2);font-weight:800;color:'+col+';background:color-mix(in srgb,'+col+' 13%, var(--card));border:1px solid color-mix(in srgb,'+col+' 28%, var(--card-bd));border-radius:999px;padding:3px 9px;white-space:nowrap;">'+txt+'</span>'; }
 // ---- geçmiş gün düzenleme: tarih etiketi + kalıcı uyarı şeridi ----

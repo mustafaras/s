@@ -31,7 +31,7 @@ const RUNTIME_MODULES = [
   { global: "ReminderSchedulerV1", file: "app/core/reminderScheduler.js" }
 ];
 
-const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js"];
+const BASE_FILES = ["app/content/profileAssessmentV1.js", "app/content/esmaulHusnaV1.js", "app/core/constants.js", "app/core/dateUtils.js", "app/core/helpers.js"];
 
 function readSource(file) {
   return fs.readFileSync(path.join(ROOT, file), "utf8");

@@ -11,6 +11,7 @@ const APP_SOURCE = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
 const CATALOG_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminderCatalog.js"), "utf8");
 const CONSTANTS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/constants.js"), "utf8");
 const DATE_UTILS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/dateUtils.js"), "utf8");
+const HELPERS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/helpers.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
   const attrs = {};
@@ -111,6 +112,7 @@ function boot({ catalog = true, seed = null } = {}) {
   });
   // MON-07: app.js saf tarih shimlerini yükleme sırasındaki registryden çözer.
   vm.runInContext(DATE_UTILS_SOURCE, context, { filename: "app/core/dateUtils.js" });
+  vm.runInContext(HELPERS_SOURCE, context, { filename: "app/core/helpers.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
   return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls };

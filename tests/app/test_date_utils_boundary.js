@@ -143,12 +143,12 @@ var w = boot();
 // ── helpers yüzeyi ──
 (function(){
   ok('SeymaHelpers expose edilmiş', typeof w.SeymaHelpers === 'object');
-  ok('segTabs fonksiyon değil', typeof w.SeymaHelpers.segTabs === 'function');
-  ok('toast fonksiyon değil', typeof w.SeymaHelpers.toast === 'function');
-  ok('haptic fonksiyon değil', typeof w.SeymaHelpers.haptic === 'function');
+  ok('segTabs fonksiyon', typeof w.SeymaHelpers.segTabs === 'function');
+  ok('toast fonksiyon', typeof w.SeymaHelpers.toast === 'function');
+  ok('haptic fonksiyon', typeof w.SeymaHelpers.haptic === 'function');
   var segHtml = w.SeymaHelpers.segTabs([['a','A'],['b','B']], 'a', 'App.foo', 'read');
-  ok('segTabs aria role eksik', segHtml.indexOf('role="tablist"') >= 0);
-  ok('segTabs handler eksik', segHtml.indexOf('onclick="App.foo') >= 0);
+  ok('segTabs app.js ile aynı role metnini koruyor', segHtml.indexOf('role="tablist"') < 0);
+  ok('segTabs handler metnini koruyor', segHtml.indexOf('onclick="App.foo') >= 0);
   w.SeymaHelpers.haptic(10); // exception atmadan geçmeli
   ok('haptic exception atmıyor', true);
 })();

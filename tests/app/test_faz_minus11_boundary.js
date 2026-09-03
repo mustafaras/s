@@ -1,7 +1,7 @@
 'use strict';
 // Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, mediaFx, timeTheme)
 // sadece window.* üzerinde expose edilmiş durumda olmalıydı. MON-07 ile
-// dateUtils'nin on gövdesi ve helpers'ın altı saf görünüm üreticisi app.js'te
+// dateUtils'nin on gövdesi ve helpers'ın on iki üyesi app.js'te
 // imza-koruyan shim üzerinden registry sahibi olur.
 // Çalıştırma: node tests/app/test_faz_minus11_boundary.js
 
@@ -76,9 +76,12 @@ var expectedModules = [
     'function starRow(rating,fn,id,size){ return window.SeymaHelpers.starRow.apply(null,arguments); }',
     'function miniBars(rows,valKey,unit,col){ return window.SeymaHelpers.miniBars.apply(null,arguments); }',
     'function statTile(label,val,sub){ return window.SeymaHelpers.statTile.apply(null,arguments); }',
-    'function collapsibleCardHTML(o){ return window.SeymaHelpers.collapsibleCardHTML.apply(null,arguments); }'
+    'function collapsibleCardHTML(o){ return window.SeymaHelpers.collapsibleCardHTML.apply(null,arguments); }',
+    'function toast(msg,ms){ return window.SeymaHelpers.toast.apply(null,arguments); }',
+    'function confetti(){ return window.SeymaHelpers.confetti.apply(null,arguments); }',
+    'function haptic(p){ return window.SeymaHelpers.haptic.apply(null,arguments); }'
   ];
-  ok('SeymaHelpers altı görünüm üreticisi shim üzerinden çağrılıyor (MON-09)', helperShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
+  ok('SeymaHelpers on iki üyesi shim üzerinden çağrılıyor (MON-09/10)', helperShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
 })();
 
 console.log('\n=== Özet ===');

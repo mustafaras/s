@@ -1,6 +1,7 @@
 'use strict';
 // Faz -1.1 sınır testi: helpers modülü window.SeymaHelpers üzerinde expose edilmiş
-// ve temel yardımcı fonksiyonlar çalışıyor. Hiçbir App.* handler bu modülü çağırmıyor.
+// ve 12 üyelik yüzeyi çalışıyor. MON-10 sonrası app.js, üç etkileşim
+// yardımcısına imza-koruyan shim üzerinden delege eder.
 // Çalıştırma: node tests/app/test_helpers_boundary.js
 
 var fs = require('fs');

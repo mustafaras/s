@@ -6444,7 +6444,7 @@ function reminderPrivacyReport(schemaId,value,samples){
 }
 function commit(msg,meta){ save(undefined,{message:msg,meta:meta}); render(); if(msg) toast(msg); }
 // Haptik geri bildirim (destekleyen cihazlarda); Ayarlar'dan kapatılabilir
-function haptic(p){ try{ if(navigator.vibrate && !(data&&data.settings&&data.settings.haptics===false)) navigator.vibrate(p); }catch(e){} }
+function haptic(p){ return window.SeymaHelpers.haptic.apply(null,arguments); }
 
 function interp(sweet,walk,evening){
   if(sweet>=5) return 'Tatlı kontrolünde ritim oluşuyor. Kavga değil, yönetim.';
@@ -6464,23 +6464,8 @@ function weekBlock(w,days){
 }
 
 // ---------- toast & confetti ----------
-function toast(msg,ms){
-  var ex=document.getElementById('sey-toast'); if(ex) ex.remove();
-  var t=document.createElement('div'); t.id='sey-toast';
-  // QY-17: rol/aria-live yoktu — bu tek fonksiyon uygulama genelindeki TÜM
-  // toast'ları (Kur'an Yolculuğu'nun "İsteğin kaydedildi.", "WhatsApp açıldı.",
-  // güncelleme sonucu dahil) besler; ekran okuyucu hiçbirini duyurmuyordu.
-  t.setAttribute('role','status'); t.setAttribute('aria-live','polite');
-  t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:10000;display:flex;align-items:center;justify-content:center;max-width:88vw;padding:12px 19px;border-radius:17px;background:rgba(28,22,30,0.88);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,0.22);color:#fff;font:700 14px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;box-shadow:0 16px 42px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.14);text-align:center;letter-spacing:.1px;animation:seyToast .32s cubic-bezier(.16,1,.3,1);';
-  t.textContent=msg; document.body.appendChild(t);
-  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ if(t&&t.parentNode){ t.style.transition='opacity .28s ease,transform .28s ease'; t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px) scale(.97)'; setTimeout(function(){ if(t.parentNode) t.remove(); },300); } }, ms||1800);
-}
-function confetti(){
-  var colors=['#E9AFC1','#C9B8FF','#FFE8A3','#F7DDE5','#6B4A3A'];
-  var wrap=document.createElement('div'); wrap.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
-  for(var i=0;i<48;i++){ var p=document.createElement('div'); var c=colors[i%colors.length]; var sz=6+Math.random()*8; p.style.cssText='position:absolute;top:-16px;left:'+(Math.random()*100)+'%;width:'+sz+'px;height:'+(sz*0.6)+'px;background:'+c+';border-radius:2px;opacity:0.9;animation:seyConfetti '+(2+Math.random()*1.6)+'s '+(Math.random()*0.35)+'s ease-in forwards;'; wrap.appendChild(p); }
-  document.body.appendChild(wrap); setTimeout(function(){ wrap.remove(); },4400);
-}
+function toast(msg,ms){ return window.SeymaHelpers.toast.apply(null,arguments); }
+function confetti(){ return window.SeymaHelpers.confetti.apply(null,arguments); }
 
 // ---------- actions (exposed) ----------
 var App={};

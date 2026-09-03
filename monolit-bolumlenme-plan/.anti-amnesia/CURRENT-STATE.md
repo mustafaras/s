@@ -9,19 +9,18 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 2 sürüyor (MON-09 tamamlandı) |
+| Durum | `in_progress` — Dalga 2 kapandı (MON-10 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-09` / `MON-10` |
-| Dalga / ilerleme | 2 aktif / 9/60 |
+| Son / sıradaki | `MON-10` / `MON-11` |
+| Dalga / ilerleme | 3 sırada / 10/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-09` tamamlandı: `segTabs`, `progBar`, `starRow`,
-`miniBars`, `statTile` ve `collapsibleCardHTML` gövdelerinin tek sahibi
-`window.SeymaHelpers`; app.js aynı imza/dönüşle registry shimleri taşır.
-`esc` ve SVG icon bağı registryde görünür constants resolverıyla çözülür;
-stil, ARIA metni, HTML sırası ve inline `onclick` dizeleri korunur. Sonraki
-kart `MON-10` için yeni açık kullanıcı onayı gerekir.
+**Bağlayıcı durak:** `MON-10` tamamlandı: `window.SeymaHelpers` 12 üyeli
+tam registrydir; `toast`, `confetti` ve legacy `haptic` gövdeleri tek sahibine
+taşındı, app.js aynı imza/dönüşle shim taşır. DOM/timer lazy, legacy haptic ve
+Premium `SeyHaptics` ayrık kaldı. Sonraki kart `MON-11` için yeni açık kullanıcı
+onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -188,8 +187,8 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-`MON-10`: helpers yan etkili UI yardımcıları. DOM/timer/haptic sınırı için
-yeni açık kullanıcı onayı olmadan başlanmaz.
+`MON-11`: state bağımlılık keşfi ve MON-S6 mutasyon kararı. Yüksek riskli
+state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz.
 
 ## MON-09 kapanışı — helpers saf görünüm üreticileri
 
@@ -209,3 +208,14 @@ yeni açık kullanıcı onayı olmadan başlanmaz.
   Helpers 30/30, date-utils 58/58, driver/zikr, state sınırları,
   modularization/Faz−1.1, sync/panel/premium ve reminder smoke 20/20 PASS.
   Yerel PASS deploy veya cihaz kabulü değildir.
+
+## MON-10 kapanışı — helpers etkileşim yardımcıları ve saf çekirdek
+
+- `toast`/`confetti` lazy DOM+timer gövdeleri ve legacy `haptic` B1-okur
+  titreşim gövdesi registryye taşındı; app.js üç ince shim taşır. Toast timer
+  slotu görünür `window.__seyToastTimer` resolverıyla sürer; registry yükleme
+  anında DOM/timer/ağ/storage yan etkisi yoktur.
+- Premium `SeyHaptics` çağrıları (42 occurrence) legacy hapticten ayrı kaldı.
+  Yeni efekt, timer, notification veya gesture eklenmedi. Tam 12 üyelik
+  manifesti [`MON-D2-CEKIRDEK-RAPORU.md`](../deliverables/MON-D2-CEKIRDEK-RAPORU.md)
+  içindedir; helpers cache-bust `20260903b`, FILES sırası değişmedi.

@@ -87,7 +87,7 @@ var w = boot();
   ok('pad tek haneli', w.SeymaDateUtils.pad(3) === '03');
   ok('pad çift haneli', w.SeymaDateUtils.pad(12) === '12');
   ok('shortDate formatı', w.SeymaDateUtils.shortDate('2026-08-31') === '31.08');
-  ok('dateLabelTR Türkçe ay', w.SeymaDateUtils.dateLabelTR('2026-08-31') === '31 Ağustos 2026');
+  ok('dateLabelTR app.js metniyle aynı', w.SeymaDateUtils.dateLabelTR('2026-08-31') === '31 Ağustos Pazartesi');
 })();
 
 // ── state.js / syncGlue.js yüzeyleri (Faz -1.1: window.data/ui henüz yok) ──
@@ -116,7 +116,8 @@ var w = boot();
   w.ui = {};
   w.getDay = function(d,date,idx){ return d && d.days ? (d.days[date] || null) : null; };
   ok('dayIndexFor startDate üzerinden hesaplıyor', w.SeymaDateUtils.dayIndexFor('2026-01-01') === 1);
-  ok('dayIndexFor gün farkı +1', w.SeymaDateUtils.dayIndexFor('2026-01-02') === 2);
+  w.data = { startDate: '2026-08-14', settings: w.data.settings, days: {} };
+  ok('dayIndexFor gün farkı +1 ve rebind sonrası taze', w.SeymaDateUtils.dayIndexFor('2026-08-15') === 2);
 
   // activeDate: ui.editDate yoksa bugün
   w.ui = {};

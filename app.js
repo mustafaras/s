@@ -4832,13 +4832,13 @@ function todayStr(){ return window.SeymaDateUtils.todayStr.apply(null,arguments)
 function addDays(s,n){ return window.SeymaDateUtils.addDays.apply(null,arguments); }
 function diffDays(a,b){ return window.SeymaDateUtils.diffDays.apply(null,arguments); }
 function shortDate(s){ return window.SeymaDateUtils.shortDate.apply(null,arguments); }
-function dayIndexFor(date){ return diffDays(data.startDate,date)+1; }
+function dayIndexFor(date){ return window.SeymaDateUtils.dayIndexFor.apply(null,arguments); }
 // ---- geçmiş gün düzenleme: aktif tarih ayrımı ----
 // activeDate() = düzenlenen gün varsa o, yoksa bugün. Yalnızca MANUEL day-record
 // yazımları burayı kullanır; otomatik/canlı yazımlar (konum, oturum, SOS) todayStr()'de kalır.
-function activeDate(){ return (ui.editDate)?ui.editDate:todayStr(); }
+function activeDate(){ return window.SeymaDateUtils.activeDate.apply(null,arguments); }
 function editing(){ return !!ui.editDate; }
-function curDay(){ var d=activeDate(); return getDay(data,d,dayIndexFor(d)); }
+function curDay(){ return window.SeymaDateUtils.curDay.apply(null,arguments); }
 function emptyHabits(){ var out={}; HABITS.forEach(function(h){ out[h.key]=false; }); return out; }
 function countRec(rec){ return rec&&rec.habits?HABITS.reduce(function(a,h){return a+(rec.habits[h.key]?1:0);},0):0; }
 function emptyMeals(){ return {breakfast:'',lunch:'',dinner:'',snack:''}; }
@@ -6288,7 +6288,7 @@ function collapsibleCardHTML(o){
 // Sağlık bölümü başlığında glance-edilen metrik rozeti (iOS-27: kapalıyken bile değer görünür).
 function hBadge(txt,col){ col=col||'var(--muted)'; return '<span style="font-size:var(--f-caption2);font-weight:800;color:'+col+';background:color-mix(in srgb,'+col+' 13%, var(--card));border:1px solid color-mix(in srgb,'+col+' 28%, var(--card-bd));border-radius:999px;padding:3px 9px;white-space:nowrap;">'+txt+'</span>'; }
 // ---- geçmiş gün düzenleme: tarih etiketi + kalıcı uyarı şeridi ----
-function dateLabelTR(s){ if(!s) return ''; var p=s.split('-').map(Number); var dt=new Date(p[0],p[1]-1,p[2]); var mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']; var wd=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']; return p[2]+' '+mo[p[1]-1]+' '+wd[dt.getDay()]; }
+function dateLabelTR(s){ return window.SeymaDateUtils.dateLabelTR.apply(null,arguments); }
 function editBanner(){
   var d=ui.editDate; if(!d) return '';
   var idx=dayIndexFor(d);

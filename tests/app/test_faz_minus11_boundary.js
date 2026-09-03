@@ -63,9 +63,13 @@ var expectedModules = [
     'function todayStr(){ return window.SeymaDateUtils.todayStr.apply(null,arguments); }',
     'function addDays(s,n){ return window.SeymaDateUtils.addDays.apply(null,arguments); }',
     'function diffDays(a,b){ return window.SeymaDateUtils.diffDays.apply(null,arguments); }',
-    'function shortDate(s){ return window.SeymaDateUtils.shortDate.apply(null,arguments); }'
+    'function shortDate(s){ return window.SeymaDateUtils.shortDate.apply(null,arguments); }',
+    'function dayIndexFor(date){ return window.SeymaDateUtils.dayIndexFor.apply(null,arguments); }',
+    'function activeDate(){ return window.SeymaDateUtils.activeDate.apply(null,arguments); }',
+    'function curDay(){ return window.SeymaDateUtils.curDay.apply(null,arguments); }',
+    'function dateLabelTR(s){ return window.SeymaDateUtils.dateLabelTR.apply(null,arguments); }'
   ];
-  ok('SeymaDateUtils altı saf fonksiyon shim üzerinden çağrılıyor (MON-07)', dateUtilsShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
+  ok('SeymaDateUtils on tarih fonksiyonu shim üzerinden çağrılıyor (MON-07/08)', dateUtilsShims.every(function(shim){ return appSrc.indexOf(shim) >= 0; }));
   ok('SeymaHelpers henüz App.* içinde çağrılmıyor', appSrc.indexOf('SeymaHelpers') < 0);
 })();
 

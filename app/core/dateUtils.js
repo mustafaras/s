@@ -16,10 +16,12 @@
   }
   function shortDate(s){ var p=s.split('-'); return p[2]+'.'+p[1]; }
   function dateLabelTR(s){
+    if(!s) return '';
     var p=s.split('-').map(Number);
-    var d=new Date(p[0],p[1]-1,p[2]);
-    var aylar=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-    return d.getDate()+' '+aylar[d.getMonth()]+' '+d.getFullYear();
+    var dt=new Date(p[0],p[1]-1,p[2]);
+    var mo=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+    var wd=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    return p[2]+' '+mo[p[1]-1]+' '+wd[dt.getDay()];
   }
   // seq 24 düzeltmesi (B1): Bu üç fonksiyon app.js orijinallerine hizalanır ve
   // `window.SeymaState` merkezi yüzeyine bağımlı hale getirilir. `SeymaState`

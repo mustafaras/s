@@ -9,18 +9,18 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 2 başladı (MON-07 tamamlandı) |
+| Durum | `in_progress` — Dalga 2 sürüyor (MON-08 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-07` / `MON-08` |
-| Dalga / ilerleme | 2 aktif / 7/60 |
+| Son / sıradaki | `MON-08` / `MON-09` |
+| Dalga / ilerleme | 2 aktif / 8/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-07` tamamlandı: `pad`, `fmt`, `todayStr`,
-`addDays`, `diffDays` ve `shortDate` saf gövdelerinin tek sahibi
-`window.SeymaDateUtils`; app.js aynı imza/dönüşle registry shimleri taşır.
-`dayIndexFor`/`activeDate`/`curDay`, `data`/`ui` ve tarih algoritması
-dokunulmadı. Sonraki kart `MON-08` için yeni açık kullanıcı onayı gerekir.
+**Bağlayıcı durak:** `MON-08` tamamlandı: `dayIndexFor`, `activeDate`,
+`curDay` ve `dateLabelTR` gövdelerinin tek sahibi `window.SeymaDateUtils`;
+app.js aynı imza/dönüşle registry shimleri taşır. B1 tazeliği, `editDate`
+önceliği, `getDay(data,date,index)` aktarımı ve tarih metni korunur.
+Sonraki kart `MON-09` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -172,8 +172,20 @@ serinin kapsamı değildir.
   Saat dilimi/string çıktısı sapması yoktur. Yerel PASS deploy veya cihaz
   kabulü değildir.
 
+## MON-08 kapanışı — dateUtils state-okur yardımcıları
+
+- `app/core/dateUtils.js` artık `dayIndexFor`/`activeDate`/`curDay` için
+  yalnız B1 `SeymaState` getter'larını okur; `data`/`ui` rebind ya da
+  `getDay` sahipliği registry'ye taşınmadı. `dateLabelTR`, app.js'in önceki
+  hafta-günü metnine birebir hizalandı (`31 Ağustos Pazartesi`).
+- app.js dört ince shim taşır. dateUtils zaten index ve iki ana harness FILES
+  dizisinde doğru sırada olduğundan FILES değişmedi; cache-bust `20260903b`.
+- Kanıt: date-utils 58/58 (rebind tazeliği dahil), B1/B2/B3 state sınırları,
+  driver/zikr, modularization/Faz−1.1, sync/panel/premium/reminder kapıları
+  PASS; eski-yeni dört fonksiyon ve B1 rebind eşitliği PASS; bugun dump
+  SHA-256 değişmedi. Dokuz `data` atama çıpası app.js'te kaldı.
+
 ## Sonraki güvenli adım
 
-`MON-08`: dateUtils state-okur yardımcıları. `dayIndexFor`/`activeDate`/
-`curDay` yalnız B1 taze getter üzerinden ele alınabilir; yeni açık kullanıcı
-onayı olmadan başlanmaz.
+`MON-09`: helpers saf görünüm üreticileri. Stil, aria metni, HTML sırası ve
+inline `onclick` metinleri için yeni açık kullanıcı onayı olmadan başlanmaz.

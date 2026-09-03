@@ -9,16 +9,16 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-05 tamamlandı |
+| Durum | `in_progress` — Dalga 1 kapandı (MON-06) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-05` / `MON-06` |
-| Dalga / ilerleme | 1 / 5/60 |
+| Son / sıradaki | `MON-06` / `MON-07` |
+| Dalga / ilerleme | 2 başlıyor / 6/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-05` fixture geçiş sözleşmesi olarak tamamlandı;
-hiçbir fixture/kod değişmedi. `MON-06` yeni açık kullanıcı onayı olmadan
-başlamaz.
+**Bağlayıcı durak:** Dalga 1 (MON-01..06) tam kanıtla kapatıldı; 0 kod
+taşınması. `MON-07` ilk gövde taşımadır ve **yeni açık kullanıcı onayı
+olmadan başlamaz** (Dalga 2 approvalRequired: true).
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -154,5 +154,6 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-Kullanıcı uygulamaya açıkça onay verirse `MON-06`: Dalga 1 kapanışı —
-ön-uçuş bütünlüğü. Aksi halde bu durum değişmez.
+Dalga 1 kapanış raporu: [`../deliverables/MON-D1-ON-UCUS-RAPORU.md`](../deliverables/MON-D1-ON-UCUS-RAPORU.md).
+Kullanıcı uygulamaya açıkça onay verirse `MON-07`: dateUtils saf tarih
+ gövdeleri (ilk gövde taşıma, Dalga 2). Aksi halde bu durum değişmez.

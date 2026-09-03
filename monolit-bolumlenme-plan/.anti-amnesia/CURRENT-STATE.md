@@ -9,16 +9,16 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — MON-04 tamamlandı |
+| Durum | `in_progress` — MON-05 tamamlandı |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-04` / `MON-05` |
-| Dalga / ilerleme | 1 / 4/60 |
+| Son / sıradaki | `MON-05` / `MON-06` |
+| Dalga / ilerleme | 1 / 5/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
-| Güncellendi | 2026-09-02 |
+| Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-04` harness FILES paritesi olarak tamamlandı;
-üretim kodu taşınmadı (yalnız iki harness dosyası). `MON-05` yeni açık
-kullanıcı onayı olmadan başlamaz.
+**Bağlayıcı durak:** `MON-05` fixture geçiş sözleşmesi olarak tamamlandı;
+hiçbir fixture/kod değişmedi. `MON-06` yeni açık kullanıcı onayı olmadan
+başlamaz.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -135,8 +135,18 @@ serinin kapsamı değildir.
 
 ## Değişmez kararlar ve tuzaklar
 
+0. **MON-S5 fixture geçiş sözleşmesi** ([`../deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md`](../deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md)):
+   4 fixture'ın ~151 assertion'ı 15 geçiş grubuna ayrıldı. Daima-değişmez:
+   I2 App yüzeyi, IIFE+`window.App`, M3/B1 (`window.data/ui/save=` yasak),
+   saf davranış testleri, helpers FX yasağı, `assertLoadOrder`. Kasıtlı
+   geçişler: modularization [1] satır eşiği (MON-50..54), [4] sayaç tersine
+   dönüş (MON-19), [8] migrate/save shim kabulü (MON-12/17), F-2 FX çağrı
+   dosya-çifti kabulü (domain taşımaları, MON-S2 manifestiyle eşitlenir),
+   F-3 ilk tüketim shim deseni (MON-07), D-3/H-4 iki-mod assertion
+   (MON-11/17). Kural: eski PASS ≠ yeni semantik; fixture güncellemesi
+   yalnız ilgili MON'un kendi commit'inde; tarif edilemeyen semantik = halt.
 1. B1 getter'ları taze değer döndürür; snapshot/one-shot referans yasaktır.
-2. 6079 geçici data takası ve dokuz yeniden atama app.js'te kalır.
+2. 6138 geçici data takası ve dokuz yeniden atama app.js'te kalır.
 3. `SeyOnSyncState` / `SeyOnSynced` app.js'e atanabilir kalır; getter-only
    accessor strict-mode boot throw eder.
 4. `sync.js`, panel, `app/content/*`, frozen reminder motorları, SW ve gerçek
@@ -144,6 +154,5 @@ serinin kapsamı değildir.
 
 ## Sonraki güvenli adım
 
-Kullanıcı uygulamaya açıkça onay verirse `MON-05`: boundary fixture geçiş
-matrisi (`deliverables/MON-S5-FIXTURE-GECIS-MATRISI.md`). Aksi halde bu
-durum değişmez.
+Kullanıcı uygulamaya açıkça onay verirse `MON-06`: Dalga 1 kapanışı —
+ön-uçuş bütünlüğü. Aksi halde bu durum değişmez.

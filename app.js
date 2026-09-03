@@ -4523,6 +4523,19 @@ if(!window.SeymaState||typeof window.SeymaState.registerGetDay!=='function'||!wi
   ensurePrayerDay:ensurePrayerDay,
   caffeineLastTime:caffeineLastTime
 })) throw new Error('MON-13: SeymaState getDay registry kurulamadı');
+// MON-14: createDefaultData gövdesi state registry'sinde yaşar; tarih ve boş
+// root üreticileri açık bag ile bağlanır. start/late-boot data= atamaları ve
+// reset/import sahipliği app.js'te kalır.
+if(!window.SeymaState||typeof window.SeymaState.registerCreateDefaultData!=='function'||!window.SeymaState.registerCreateDefaultData({
+  todayStr:todayStr,
+  nowIso:function(){ return new Date().toISOString(); },
+  emptySyncReceipt:emptySyncReceipt,
+  emptyEventLog:emptyEventLog,
+  emptyReminderState:emptyReminderState,
+  emptyLibrary:emptyLibrary,
+  emptyWatchlist:emptyWatchlist,
+  emptyMusic:emptyMusic
+})) throw new Error('MON-14: SeymaState createDefaultData registry kurulamadı');
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
@@ -6573,10 +6586,7 @@ App.profileAnswer=function(itemId,value){
   },120);
 };
 
-function createDefaultData(){
-  var t=todayStr(), nowIso=new Date().toISOString();
-  return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:emptySyncReceipt(),eventLog:emptyEventLog(),days:{},notifications:[],reminders:emptyReminderState(),luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:emptyLibrary(),watchlist:emptyWatchlist(),music:emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
-}
+function createDefaultData(){ return window.SeymaState.createDefaultData.apply(null,arguments); }
 App.start=function(){
   // Karşılama ekranı artık yalnızca Ayarlar > "Başlangıç ekranına dön" veya ilk kurulumda açılır.
   // Veriyi yeniden kurmak veya save() çağırmak geçmiş günleri silip gereksiz senkron başlatabilirdi.

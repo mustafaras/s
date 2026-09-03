@@ -9,19 +9,20 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 3 sürüyor (MON-13 tamamlandı) |
+| Durum | `in_progress` — Dalga 3 sürüyor (MON-14 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-13` / `MON-14` |
-| Dalga / ilerleme | 3 sırada / 13/60 |
+| Son / sıradaki | `MON-14` / `MON-15` |
+| Dalga / ilerleme | 3 sırada / 14/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-03 |
 
-**Bağlayıcı durak:** `MON-13` tamamlandı: getDay gövdesi `SeymaState`
-registry'ye taşındı; app.js `function getDay(d,date,idx)` imzasını koruyan shim
-olarak kaldı. Yeni/var gün sentetik parity, exact default alan envanteri,
-nested normalization, bilinmeyen alan ve mutable day/nested referans korunumu
-PASS'tir. `data` rebindleri, archive backfill ve `save()` app.js/App
-sahipliğinde kaldı. Sonraki kart `MON-14` için yeni açık kullanıcı onayı gerekir.
+**Bağlayıcı durak:** `MON-14` tamamlandı: `createDefaultData` gövdesi
+`SeymaState` registry'ye taşındı; app.js aynı çağrı yüzeyini koruyan shim olarak
+kaldı. Default root/settings/tarih tam sentetik snapshotı ve hash parity, fresh
+root/nested referansları, app.js `data` bağlamı korunumu ve onboarding/start/
+late-boot yolları PASS'tir. `data` rebindleri, reset/import/auth sahipliği ve
+`save()` app.js/App'te kaldı. Sonraki kart `MON-15` için yeni açık kullanıcı
+onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -51,15 +52,15 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 
 | Çıpa | Canlı değer | Koruma |
 |---|---:|---|
-| `app.js` | 19.038 satır, IIFE sonu 19.038 | tek IIFE geçiş boyunca korunur |
+| `app.js` | 19.048 satır, IIFE sonu 19.048 | tek IIFE geçiş boyunca korunur |
 | `var data=null` | 2772 | M2, app.js sahibi |
-| yükleme / migrate registry+shim | 4477 / 4542 | M2, registry gövdesi + app.js sahibi shim |
+| yükleme / migrate shim | 4539 / 4555 | M2, registry gövdesi + app.js sahibi shim |
 | B1 getter'ları | 4535 civarı, yedi getter | canlı bağ köprüsü |
-| `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4863 | MON-12 / MON-13..15 yüksek risk |
+| `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4555 / 4876 | MON-12 / MON-13..15 yüksek risk |
 | geçici `data=d` + finally | 5975 | `finally{data=savedData}` zinciri korunur |
-| `SeyOnSyncState` / `SeyOnSynced` | 6105 / 6115 | M3, app.js sahipliği |
-| `save` / `var App` | 6136 / 6306 | MON-16..18 / MON-50..54 |
-| `createDefaultData` / `App.start` | 6576 / 6580 | MON-14..15 / boot sahipliği |
+| `SeyOnSyncState` / `SeyOnSynced` | 6118 / 6128 | M3, app.js sahipliği |
+| `save` / `var App` | 6149 / 6319 | MON-16..18 / MON-50..54 |
+| `createDefaultData` / `App.start` | 6589 / 6590 | MON-14..15 / boot sahipliği |
 | import / reset / late-boot data= | canlı grep ile yenilenir | M2prime, app.js'te kalır |
 | `window.App=App` | 17102; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
@@ -270,8 +271,28 @@ serinin kapsamı değildir.
   date-utils `58/58`, helpers `30/30`, tüm fixture aileleri ve reminder
   smoke exit 0, `git diff --check` PASS.
 
+## MON-14 kapanışı — createDefaultData registry ve sentetik boot parity
+
+- Kanıt/manifeste: [`MON-14-DEFAULT-ROOT-SENTETIK-PARITY.md`](../deliverables/MON-14-DEFAULT-ROOT-SENTETIK-PARITY.md).
+- `createDefaultData()` gövdesi `app/core/state.js:456-484` içinde tek sahibi
+  oldu; app.js shim'i `app.js:6589` aynı `apply(null,arguments)` yüzeyini korur.
+  `todayStr`/`nowIso` ve altı empty-root üreticisi açık named bag ile bağlandı;
+  registry yükleme anında çağrı yapmaz.
+- Sabit sentetik saat/rasgelelikte tam default root JSON SHA-256
+  `5294f6a84f99d7a7d135f784ce13a9a956984b383417745141945a7da7f48000` olarak
+  MON-13 öncesi/sonrası eşittir. 19 root alanı, settings/tarih snapshotı,
+  fresh nested referanslar ve app.js `data` bağlamının yeniden bağlanmaması PASS.
+- `App.start`, location/auth late-boot, import/reset ve `data=null` sahipliği
+  app.js'te kaldı. B2 MON-14 dahil `60/60`; B1 `0 failures`, B3 `20/20`; syntax,
+  driver onboarding+location+seeded, zikr `95/95`, sync `69/69`, core/app/panel/
+  Panel-v2/Quran fixture aileleri, reminder freeze/smoke ve diff check PASS.
+- `app/core/state.js` zaten index + driver + zikr FILES sırasındaydı; yeni dosya
+  yok, FILES değişmedi. Cache-bust state `20260903e`, app `20260903c`.
+  `sync.js`, `data/`, panel ve deploy yüzeyi dokunulmadı. Push/merge/tag/deploy,
+  browser/device ve gerçek veri deposu yazımı yok.
+
 ## Sonraki güvenli adım
 
-`MON-14`: createDefaultData gövde aktarımı. Yüksek riskli state sınırı için
-yeni açık kullanıcı onayı olmadan başlanmaz; MON-13 parity kararı tek başına
-sonraki kod taşıma izni değildir.
+`MON-15`: state dalga 3 kapanışı ve B1 yeniden-atama denetimi. Yüksek riskli
+state sınırı için yeni açık kullanıcı onayı olmadan başlanmaz; MON-14 parity
+kararı tek başına sonraki kod taşıma izni değildir.

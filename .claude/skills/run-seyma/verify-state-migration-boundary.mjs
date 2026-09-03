@@ -9,6 +9,7 @@
 // rebind, or live state.
 
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
@@ -77,7 +78,28 @@ function makeLocalStorage(seed, counters) {
   };
 }
 
-function buildSandbox(seedData) {
+function fixedDate(nowIso) {
+  const RealDate = Date;
+  const fixedMs = RealDate.parse(nowIso);
+  function FixedDate(...args) {
+    return new.target
+      ? (args.length ? new RealDate(...args) : new RealDate(fixedMs))
+      : new RealDate(fixedMs).toString();
+  }
+  FixedDate.now = () => fixedMs;
+  FixedDate.parse = RealDate.parse;
+  FixedDate.UTC = RealDate.UTC;
+  FixedDate.prototype = RealDate.prototype;
+  return FixedDate;
+}
+
+function fixedMath() {
+  const out = Object.create(Math);
+  out.random = () => 0.123456789;
+  return out;
+}
+
+function buildSandbox(seedData, options = {}) {
   const counters = { sets: 0, fetches: 0 };
   const seed = seedData ? { 'seyma-reset-v1': JSON.stringify(seedData) } : {};
   const localStorage = makeLocalStorage(seed, counters);
@@ -99,7 +121,9 @@ function buildSandbox(seedData) {
     TextDecoder, TextEncoder, atob, btoa,
     alert() {}, confirm() { return true; }, prompt() { return null; },
     addEventListener() {}, removeEventListener() {},
-    Date, Math, JSON, Object, Array, String, Number, Boolean, RegExp, Error,
+    Date: options.nowIso ? fixedDate(options.nowIso) : Date,
+    Math: options.deterministicRandom ? fixedMath() : Math,
+    JSON, Object, Array, String, Number, Boolean, RegExp, Error,
     parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent,
     Promise, Set, Map, Symbol, Intl,
   };
@@ -174,6 +198,17 @@ function getDayPair(seedData, date, idx) {
   const registryResult = sandbox.SeymaState.getDay(registryInput, date, idx);
   const shimResult = sandbox.getDay(shimInput, date, idx);
   return { registryInput, shimInput, registryBefore, shimBefore, registryResult, shimResult, counters };
+}
+
+function defaultDataPair() {
+  const { sandbox, counters } = buildSandbox(null, {
+    nowIso: '2026-09-03T10:20:30.000Z',
+    deterministicRandom: true,
+  });
+  loadInto(sandbox, FILES);
+  const registryResult = sandbox.SeymaState.createDefaultData();
+  const shimResult = sandbox.createDefaultData();
+  return { sandbox, counters, registryResult, shimResult };
 }
 
 function stable(value) {
@@ -456,6 +491,38 @@ console.log('\n== B2-7 MON-13 getDay yeni/var gün parity ==');
   ok('var gün nested defaults normalize ediliyor', existing.registryResult.caffeine.drinks.length === 2 &&
     existing.registryResult.caffeine.cups === 2 && existing.registryResult.journal.wordCount === 0 &&
     existing.registryResult.therapy && existing.registryResult.prayer);
+}
+
+console.log('\n== B2-8 MON-14 createDefaultData root/settings/tarih parity ==');
+{
+  const defaults = defaultDataPair();
+  const registryJson = JSON.stringify(defaults.registryResult);
+  const expectedRootKeys = [
+    'version', 'startDate', 'lastOpenedDate', 'lastOpenedAt', 'savedAt',
+    'syncReceipt', 'eventLog', 'days', 'notifications', 'reminders', 'luna',
+    'aeon', 'settings', 'cycle', 'library', 'watchlist', 'music', 'body',
+    'labResults',
+  ];
+  const expectedSettings = {
+    nickname: 'Sevgili Günışığı', notificationsWanted: false, haptics: true,
+    ghToken: '', ghRepo: 'mustafaras/seyma-data', ghBranch: 'main',
+    healthGistId: '', openaiKey: '', locationEnabled: false,
+    locationMode: 'auto', lunaConnected: false,
+  };
+  const fixedNow = '2026-09-03T10:20:30.000Z';
+
+  ok('createDefaultData registry kaydı erişilebilir', typeof defaults.sandbox.SeymaState.createDefaultData === 'function');
+  ok('registry/shim default root JSON eşdeğer', registryJson === JSON.stringify(defaults.shimResult));
+  ok('default root tam snapshot hash değişmedi', crypto.createHash('sha256').update(registryJson).digest('hex') === '5294f6a84f99d7a7d135f784ce13a9a956984b383417745141945a7da7f48000');
+  ok('default root alan sırası ve kapsamı korunuyor', defaults.registryResult && Object.keys(defaults.registryResult).join('|') === expectedRootKeys.join('|'));
+  ok('default settings alan/değerleri korunuyor', same(defaults.registryResult.settings, expectedSettings));
+  ok('default tarih bağımlılıkları aynı ISO damgasını kullanıyor', defaults.registryResult.startDate === '2026-09-03' &&
+    defaults.registryResult.lastOpenedDate === '2026-09-03' && defaults.registryResult.lastOpenedAt === fixedNow &&
+    defaults.registryResult.savedAt === fixedNow);
+  ok('default çağrıları fresh root/nested referans üretiyor', defaults.registryResult !== defaults.shimResult &&
+    defaults.registryResult.days !== defaults.shimResult.days && defaults.registryResult.settings !== defaults.shimResult.settings);
+  ok('default üretimi app.js data bağlamını yeniden bağlamıyor', defaults.sandbox.SeymaState.data === null);
+  ok('default üretimi ağ çağrısı yapmıyor', defaults.counters.fetches === 0);
 }
 
 console.log('\n== B2 güvenlik yüzeyi ==');

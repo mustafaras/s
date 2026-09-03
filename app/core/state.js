@@ -453,6 +453,35 @@
     return d.days[date];
   }
 
+  // MON-14 · createDefaultData gövde aktarımı
+  // ---------------------------------------------------------------------------
+  // Başlangıç root'u registryde üretilir; app.js yalnızca aynı imzayı koruyan
+  // shim'i ve data=migrate(...) kabuk atamalarını taşır. Tarih ve boş-root
+  // üreticileri açık bag ile gelir; registry yüklenirken hiçbir fonksiyon
+  // çağrılmaz, localStorage/DOM/ağ erişimi oluşmaz.
+  var createDefaultDataDeps=null;
+  var CREATE_DEFAULT_DATA_DEPENDENCIES=[
+    'todayStr','nowIso','emptySyncReceipt','emptyEventLog','emptyReminderState',
+    'emptyLibrary','emptyWatchlist','emptyMusic'
+  ];
+
+  function registerCreateDefaultData(deps){
+    if(createDefaultDataDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<CREATE_DEFAULT_DATA_DEPENDENCIES.length;i++){
+      if(typeof deps[CREATE_DEFAULT_DATA_DEPENDENCIES[i]]!=='function') return false;
+    }
+    createDefaultDataDeps=deps;
+    return true;
+  }
+
+  function createDefaultData(){
+    // app.js kaydı olmadan kısmi/uydurma bir root üretme.
+    if(!createDefaultDataDeps) return null;
+    var dep=createDefaultDataDeps;
+    var t=dep.todayStr(), nowIso=dep.nowIso();
+    return {version:2,startDate:t,lastOpenedDate:t,lastOpenedAt:nowIso,savedAt:nowIso,syncReceipt:dep.emptySyncReceipt(),eventLog:dep.emptyEventLog(),days:{},notifications:[],reminders:dep.emptyReminderState(),luna:{qa:[],lastAskDate:null},aeon:{qa:[],lastAskDate:null},settings:{nickname:'Sevgili Günışığı',notificationsWanted:false,haptics:true,ghToken:'',ghRepo:'mustafaras/seyma-data',ghBranch:'main',healthGistId:'',openaiKey:'',locationEnabled:false,locationMode:'auto',lunaConnected:false},cycle:{periods:[],avgCycle:28,avgPeriod:5},library:dep.emptyLibrary(),watchlist:dep.emptyWatchlist(),music:dep.emptyMusic(),body:{heightCm:null,heightSetAt:null,weights:[]},labResults:[]};
+  }
+
   window.SeymaState = {
     get data(){ return soft('data')(); },
     get ui(){ return soft('ui')(); },
@@ -461,8 +490,9 @@
     // Faz -1.1 izolasyonunda eski kırılmaz fallback korunur; app.js kaydı
     // tamamlandığında getter artık registry gövdesini verir.
     get getDay(){ return getDayDeps ? getDay : soft('getDay')(); },
-    get createDefaultData(){ return soft('createDefaultData')(); },
+    get createDefaultData(){ return createDefaultDataDeps ? createDefaultData : soft('createDefaultData')(); },
     registerMigrate: registerMigrate,
-    registerGetDay: registerGetDay
+    registerGetDay: registerGetDay,
+    registerCreateDefaultData: registerCreateDefaultData
   };
 })();

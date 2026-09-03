@@ -160,13 +160,16 @@ var expectedNewModules = [
   ok('MODULARIZATION.md 24 modül listesi', txt.indexOf('| 24 |') >= 0);
 })();
 
-// [8] MON-12: migrate() app.js imza-koruyan shim + state registry; save() app.js'te
+// [8] MON-12/13: state gövdeleri registryde; app.js imza-koruyan shim + save()
 (function(){
   var src = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
   var stateSrc = fs.readFileSync(path.join(repoRoot,'app/core/state.js'),'utf8');
   ok('migrate(d) app.js imza-koruyan shim olarak kaldı', /function migrate\(d\)\{\s*return window\.SeymaState\.migrate\(d\);\s*\}/.test(src));
   ok('migrate gövdesi state registryde', /function migrate\(d\)\{/.test(stateSrc) && /registerMigrate/.test(src));
   ok('app.js migrate gövdesini yeniden taşımıyor', !/function migrate\(d\)\{[\s\S]*migrateReminderState\(d\)/.test(src));
+  ok('getDay(d,date,idx) app.js imza-koruyan shim olarak kaldı', /function getDay\(d,date,idx\)\{\s*return window\.SeymaState\.getDay\.apply\(null,arguments\);\s*\}/.test(src));
+  ok('getDay gövdesi state registryde', /function getDay\(d,date,idx\)\{/.test(stateSrc) && /registerGetDay/.test(src));
+  ok('app.js getDay gövdesini yeniden taşımıyor', !/function getDay\(d,date,idx\)\{[\s\S]*emptyHabits\(\)/.test(src));
   ok('save() hâlâ app.js içinde', /function save\(touchSource,eventSpec\)\{/.test(src));
 })();
 

@@ -286,13 +286,183 @@
     return d;
   }
 
+  // MON-13 · getDay gövde aktarımı
+  // ---------------------------------------------------------------------------
+  // getDay, verilen root içindeki gün kaydını yerinde normalleştirir. Registry
+  // gün nesnesini veya nested alanlarını kopyalamaz; app.js sahipliğindeki
+  // mutable `data` bağlamına da hiç yazmaz. Tüm closure bağımlılıkları isimli
+  // bag üzerinden çözülür; eksik kayıtla kısmi normalizasyon yapılmaz.
+  var getDayDeps=null;
+  var GET_DAY_DEPENDENCIES=[
+    'emptyHabits','emptyMeals','emptyMealItems','emptyWindDown','emptyPrayerDay',
+    'emptyDiscomfort','emptyMovement','emptyReading','emptyWatching',
+    'emptyListening','emptyLearning','emptyHealth','emptyMagnesium',
+    'emptyTherapy','ensureTherapyDay','ensurePrayerDay','caffeineLastTime'
+  ];
+
+  function registerGetDay(deps){
+    if(getDayDeps||!deps||typeof deps!=='object'||Array.isArray(deps)) return false;
+    for(var i=0;i<GET_DAY_DEPENDENCIES.length;i++){
+      if(typeof deps[GET_DAY_DEPENDENCIES[i]]!=='function') return false;
+    }
+    if(!Array.isArray(deps.habits)||!Array.isArray(deps.windDownSteps)) return false;
+    getDayDeps=deps;
+    return true;
+  }
+
+  function getDay(d,date,idx){
+    if(!getDayDeps) return null;
+    var dep=getDayDeps;
+    var emptyHabits=dep.emptyHabits;
+    var emptyMeals=dep.emptyMeals;
+    var emptyMealItems=dep.emptyMealItems;
+    var emptyWindDown=dep.emptyWindDown;
+    var emptyPrayerDay=dep.emptyPrayerDay;
+    var emptyDiscomfort=dep.emptyDiscomfort;
+    var emptyMovement=dep.emptyMovement;
+    var emptyReading=dep.emptyReading;
+    var emptyWatching=dep.emptyWatching;
+    var emptyListening=dep.emptyListening;
+    var emptyLearning=dep.emptyLearning;
+    var emptyHealth=dep.emptyHealth;
+    var emptyMagnesium=dep.emptyMagnesium;
+    var emptyTherapy=dep.emptyTherapy;
+    var ensureTherapyDay=dep.ensureTherapyDay;
+    var ensurePrayerDay=dep.ensurePrayerDay;
+    var caffeineLastTime=dep.caffeineLastTime;
+    var HABITS=dep.habits;
+    var WIND_DOWN_STEPS=dep.windDownSteps;
+
+    if(!d.days[date]){
+      d.days[date]={
+        dayIndex:idx,
+        habits:emptyHabits(),
+        mood:null,
+        cravingSOSCount:0,
+        cravingOptionsUsed:[],
+        cravingTriggers:[],
+        craving10MinDone:false,
+        foodCravingDone:false,
+        coffeeCravingDone:false,
+        cravingTriggerNote:'',
+        note:'',
+        intention:'',
+        journal:{text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false},
+        savedAt:null,
+        meals:emptyMeals(),
+        mealItems:emptyMealItems(),
+        water:0,
+        caffeine:{last:null,cups:null},
+        energy:null,
+        stress:null,
+        sleep:{hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()},
+        walk:{steps:null,minutes:null},
+        flow:null,
+        symptoms:[],
+        discomfort:emptyDiscomfort(),
+        sessions:[],
+        movement:emptyMovement(),
+        reading:emptyReading(),
+        watching:emptyWatching(),
+        listening:emptyListening(),
+        learning:emptyLearning(),
+        gratitude:[],
+        health:emptyHealth(),
+        nutri:null,
+        magnesium:emptyMagnesium(),
+        therapy:emptyTherapy(),
+        prayer:emptyPrayerDay()
+      };
+    }else{
+      var r=d.days[date];
+      if(!r.habits) r.habits=emptyHabits();
+      HABITS.forEach(function(h){ if(!(h.key in r.habits)) r.habits[h.key]=false; });
+      if(!r.meals) r.meals=emptyMeals();
+      if(!r.mealItems||typeof r.mealItems!=='object') r.mealItems=emptyMealItems();
+      ['breakfast','lunch','dinner','snack'].forEach(function(k){ if(!Array.isArray(r.mealItems[k])) r.mealItems[k]=[]; });
+      if(typeof r.water!=='number'||isNaN(r.water)) r.water=0;
+      if(!r.caffeine||typeof r.caffeine!=='object') r.caffeine={last:null,cups:null,drinks:[]};
+      if(!Array.isArray(r.caffeine.drinks)){
+        r.caffeine.drinks=[];
+        var lc=Number(r.caffeine.cups)||0, ll=r.caffeine.last;
+        if(lc>0){ for(var ci=0;ci<lc;ci++){ r.caffeine.drinks.push({type:'turk',time:(ci===lc-1&&ll)?ll:'09:00',qty:1}); } }
+      }
+      if(r.caffeine.drinks.length&&!r.caffeine.last) r.caffeine.last=caffeineLastTime({caffeine:r.caffeine});
+      r.caffeine.cups=r.caffeine.drinks.length;
+      if(!('energy' in r)) r.energy=null;
+      if(!('stress' in r)) r.stress=null;
+      if(!Array.isArray(r.cravingTriggers)) r.cravingTriggers=[];
+      if(typeof r.craving10MinDone!=='boolean') r.craving10MinDone=false;
+      if(typeof r.foodCravingDone!=='boolean') r.foodCravingDone=false;
+      if(typeof r.coffeeCravingDone!=='boolean') r.coffeeCravingDone=false;
+      if(typeof r.cravingTriggerNote!=='string') r.cravingTriggerNote='';
+      if(!r.sleep) r.sleep={hours:null,quality:null,med:{type:null,note:''},windDown:emptyWindDown()};
+      if(!r.sleep.med||typeof r.sleep.med!=='object') r.sleep.med={type:null,note:''};
+      if(typeof r.sleep.med.note!=='string') r.sleep.med.note='';
+      if(!r.sleep.windDown) r.sleep.windDown=emptyWindDown();
+      if(!r.sleep.windDown.steps) r.sleep.windDown.steps=emptyWindDown().steps;
+      WIND_DOWN_STEPS.forEach(function(s){ if(!(s.key in r.sleep.windDown.steps)) r.sleep.windDown.steps[s.key]=false; });
+      if(typeof r.sleep.windDown.offloadNote!=='string') r.sleep.windDown.offloadNote='';
+      if(!Array.isArray(r.sleep.windDown.events)) r.sleep.windDown.events=[];
+      if(!Array.isArray(r.sleep.windDown.sessions)) r.sleep.windDown.sessions=[];
+      if(!r.walk) r.walk={steps:null,minutes:null};
+      if(!('flow' in r)) r.flow=null;
+      if(!Array.isArray(r.symptoms)) r.symptoms=[];
+      if(!r.discomfort||typeof r.discomfort!=='object') r.discomfort=emptyDiscomfort();
+      if(!r.discomfort.regions||typeof r.discomfort.regions!=='object') r.discomfort.regions={};
+      if(typeof r.discomfort.note!=='string') r.discomfort.note='';
+      if(!Array.isArray(r.discomfort.meds)) r.discomfort.meds=[];
+      if(!Array.isArray(r.sessions)) r.sessions=[];
+      if(!r.movement||typeof r.movement!=='object') r.movement=emptyMovement();
+      if(!Array.isArray(r.movement.track)) r.movement.track=[];
+      ['walkM','vehicleM','totalM','maxSpeed','samples','walkSec','vehicleSec'].forEach(function(k){ if(typeof r.movement[k]!=='number'||isNaN(r.movement[k])) r.movement[k]=0; });
+      if(!r.reading||typeof r.reading!=='object') r.reading=emptyReading();
+      if(!Array.isArray(r.reading.entries)) r.reading.entries=[];
+      if(!r.watching||typeof r.watching!=='object') r.watching=emptyWatching();
+      if(!Array.isArray(r.watching.entries)) r.watching.entries=[];
+      if(!r.listening||typeof r.listening!=='object') r.listening=emptyListening();
+      if(!Array.isArray(r.listening.entries)) r.listening.entries=[];
+      if(!r.learning||typeof r.learning!=='object') r.learning=emptyLearning();
+      if(!Array.isArray(r.learning.entries)) r.learning.entries=[];
+      if(!Array.isArray(r.gratitude)) r.gratitude=[];
+      if(typeof r.intention!=='string') r.intention='';
+      if(!r.health||typeof r.health!=='object') r.health=emptyHealth();
+      if(!('nutri' in r)) r.nutri=null;
+      if(!r.magnesium||typeof r.magnesium!=='object') r.magnesium=emptyMagnesium();
+      if(typeof r.magnesium.taken!=='boolean') r.magnesium.taken=false;
+      if(typeof r.magnesium.form!=='string') r.magnesium.form='';
+      if(typeof r.magnesium.mg!=='number'&&r.magnesium.mg!==null) r.magnesium.mg=null;
+      if(typeof r.magnesium.time!=='string') r.magnesium.time='';
+      if(!Array.isArray(r.magnesium.reason)) r.magnesium.reason=[];
+      if(typeof r.magnesium.effectNote!=='string') r.magnesium.effectNote='';
+      if(typeof r.magnesium.skipped!=='boolean') r.magnesium.skipped=false;
+      if(r.magnesium.feedback!==null&&r.magnesium.feedback!==true&&r.magnesium.feedback!==false) r.magnesium.feedback=null;
+      if(!r.journal||typeof r.journal!=='object') r.journal={text:'',mode:'free',promptUsed:'',wordCount:0,charCount:0,savedAt:null,streakAtSave:0,metGoal:false};
+      var jn=r.journal;
+      if(typeof jn.text!=='string') jn.text='';
+      if(typeof jn.mode!=='string') jn.mode='free';
+      if(typeof jn.promptUsed!=='string') jn.promptUsed='';
+      if(typeof jn.wordCount!=='number'||isNaN(jn.wordCount)) jn.wordCount=0;
+      if(typeof jn.charCount!=='number'||isNaN(jn.charCount)) jn.charCount=0;
+      if(typeof jn.savedAt!=='string'&&jn.savedAt!==null) jn.savedAt=null;
+      if(typeof jn.streakAtSave!=='number'||isNaN(jn.streakAtSave)) jn.streakAtSave=0;
+      if(typeof jn.metGoal!=='boolean') jn.metGoal=false;
+      ensureTherapyDay(r);
+      ensurePrayerDay(r);
+    }
+    return d.days[date];
+  }
+
   window.SeymaState = {
     get data(){ return soft('data')(); },
     get ui(){ return soft('ui')(); },
     get dark(){ return soft('dark')(); },
     get migrate(){ return migrate; },
-    get getDay(){ return soft('getDay')(); },
+    // Faz -1.1 izolasyonunda eski kırılmaz fallback korunur; app.js kaydı
+    // tamamlandığında getter artık registry gövdesini verir.
+    get getDay(){ return getDayDeps ? getDay : soft('getDay')(); },
     get createDefaultData(){ return soft('createDefaultData')(); },
-    registerMigrate: registerMigrate
+    registerMigrate: registerMigrate,
+    registerGetDay: registerGetDay
   };
 })();

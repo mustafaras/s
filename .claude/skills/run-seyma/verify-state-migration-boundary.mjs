@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// verify-state-migration-boundary.mjs — L2-b/B2 black-box migration parity.
+// verify-state-migration-boundary.mjs — L2-b/B2 black-box state parity.
 //
 // The real app boots only inside a node:vm sandbox with synthetic fixtures. The
 // harness observes the migrated object through an in-memory localStorage stub;
 // it never reads a device profile, loads sync.js, resolves fetch, or writes the
 // private seyma-data repository. This fixture covers the MON-12 registry/shim
-// parity and is not permission to touch sync, data rebind, or live state.
+// parity and MON-13 getDay parity; it is not permission to touch sync, data
+// rebind, or live state.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -117,7 +118,7 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 
-// MON-12: migration registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
+// MON-12/13: state registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
 const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app.js'];
 
 function defaultSettings() {
@@ -163,6 +164,18 @@ function migrationPair(seedData) {
   return { before, registryInput, shimInput, registryResult, shimResult, counters };
 }
 
+function getDayPair(seedData, date, idx) {
+  const { sandbox, counters } = buildSandbox(null);
+  loadInto(sandbox, FILES);
+  const registryInput = clone(seedData);
+  const shimInput = clone(seedData);
+  const registryBefore = registryInput.days[date];
+  const shimBefore = shimInput.days[date];
+  const registryResult = sandbox.SeymaState.getDay(registryInput, date, idx);
+  const shimResult = sandbox.getDay(shimInput, date, idx);
+  return { registryInput, shimInput, registryBefore, shimBefore, registryResult, shimResult, counters };
+}
+
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === 'object') {
@@ -202,6 +215,69 @@ function firstDiff(a, b, pathName = '$') {
     if (diff) return diff;
   }
   return null;
+}
+
+const DAY_DEFAULT_KEYS = [
+  'dayIndex', 'habits', 'mood', 'cravingSOSCount', 'cravingOptionsUsed',
+  'cravingTriggers', 'craving10MinDone', 'foodCravingDone', 'coffeeCravingDone',
+  'cravingTriggerNote', 'note', 'intention', 'journal', 'savedAt', 'meals',
+  'mealItems', 'water', 'caffeine', 'energy', 'stress', 'sleep', 'walk', 'flow',
+  'symptoms', 'discomfort', 'sessions', 'movement', 'reading', 'watching',
+  'listening', 'learning', 'gratitude', 'health', 'nutri', 'magnesium', 'therapy',
+  'prayer',
+];
+
+const DAY_HABIT_KEYS = [
+  'sweetManaged', 'foodManaged', 'coffeeManaged', 'eveningControl', 'walked20',
+  'protein', 'water', 'vitaminD', 'sleepReg', 'journaled', 'mediaFed', 'freshAir',
+  'selfKind', 'caffeineOk', 'magnesium',
+];
+
+function expectedEmptyPrayerDay() {
+  const entry = {
+    time: '', performed: false, inCongregation: false, late: false, madeUp: false,
+    nafile: 0, note: '', savedAt: '',
+  };
+  return {
+    fajr: clone(entry), sunrise: clone(entry), dhuhr: clone(entry), asr: clone(entry),
+    maghrib: clone(entry), isha: clone(entry),
+    fetchedAt: '', fetchedFor: '', fetchedMethod: '', fetchError: '',
+  };
+}
+
+function expectedNewDay(idx) {
+  const habits = {};
+  DAY_HABIT_KEYS.forEach((key) => { habits[key] = false; });
+  return {
+    dayIndex: idx, habits, mood: null, cravingSOSCount: 0, cravingOptionsUsed: [],
+    cravingTriggers: [], craving10MinDone: false, foodCravingDone: false,
+    coffeeCravingDone: false, cravingTriggerNote: '', note: '', intention: '',
+    journal: { text: '', mode: 'free', promptUsed: '', wordCount: 0, charCount: 0,
+      savedAt: null, streakAtSave: 0, metGoal: false },
+    savedAt: null, meals: { breakfast: '', lunch: '', dinner: '', snack: '' },
+    mealItems: { breakfast: [], lunch: [], dinner: [], snack: [] }, water: 0,
+    caffeine: { last: null, cups: null }, energy: null, stress: null,
+    sleep: { hours: null, quality: null, med: { type: null, note: '' },
+      windDown: { steps: { light: false, breath: false, dump: false, cool: false },
+        lastMinutes: null, lastDoneAt: null, offloadNote: '', events: [], sessions: [] } },
+    walk: { steps: null, minutes: null }, flow: null, symptoms: [],
+    discomfort: { regions: {}, note: '', meds: [] }, sessions: [],
+    movement: { walkM: 0, vehicleM: 0, totalM: 0, maxSpeed: 0, samples: 0,
+      walkSec: 0, vehicleSec: 0, track: [] }, reading: { entries: [] },
+    watching: { entries: [] }, listening: { entries: [] }, learning: { entries: [] },
+    gratitude: [], health: { steps: 0, walkM: 0, updatedAt: null }, nutri: null,
+    magnesium: { taken: false, form: '', mg: null, time: '', reason: [],
+      effectNote: '', skipped: false, feedback: null },
+    therapy: {
+      firstStep: { text: '', startedAt: null, completedAt: null },
+      selfCompassion: { prompt: '', note: '', completedAt: null },
+      breath: { pattern: '4-7-8', seconds: 0, completedAt: null },
+      decision: { optionA: '', optionB: '', choice: '', note: '', completedAt: null },
+      thoughts: [], dailyWin: { text: '', completedAt: null },
+      share: { sentAt: null, note: '' },
+    },
+    prayer: expectedEmptyPrayerDay(),
+  };
 }
 
 const dayPartial = {
@@ -345,6 +421,41 @@ console.log('\n== B2-6 idempotence / deep parity ==');
   if (!parity && first.data && second.data) console.log(`INFO  ilk fark: ${firstDiff(stable(migrationComparable(first.data)), stable(migrationComparable(second.data)))}`);
   ok('idempotence turunda psych/profile sentinel duruyor', second.data && second.data.psych.responses.psych_future.marker === 'psych-sentinel' && second.data.profileAssessment.responses.future_item.marker === 'profile-sentinel');
   ok('idempotence turunda video/not/tefekkür duruyor', second.data && second.data.quranJourney.requests.alak.notes[0].text === 'video note sentinel' && second.data.zikr.reflections[0].intention === 'keep intention');
+}
+
+console.log('\n== B2-7 MON-13 getDay yeni/var gün parity ==');
+{
+  const fresh = getDayPair({ days: {} }, T, 17);
+  ok('yeni gün registry/shim snapshot eşdeğer', same(fresh.registryResult, fresh.shimResult));
+  ok('yeni gün alan envanteri değişmemiş', Object.keys(fresh.registryResult).sort().join('|') === DAY_DEFAULT_KEYS.slice().sort().join('|'));
+  ok('yeni gün template varsayılanları sabit', same(fresh.registryResult, expectedNewDay(17)));
+  ok('yeni gün day referansı kopyalanmıyor', fresh.registryResult === fresh.registryInput.days[T] && fresh.shimResult === fresh.shimInput.days[T]);
+  ok('yeni gün root dışına yazılmıyor', Object.keys(fresh.registryInput).length === 1 && Object.keys(fresh.registryInput)[0] === 'days');
+
+  const nested = { marker: 'nested-day-sentinel' };
+  const existingSeed = {
+    days: {
+      [Y]: {
+        mood: 'calm', note: 'DAY_NOTE_SENTINEL', customDayField: nested,
+        habits: { water: true, customHabit: 'keep-me' },
+        caffeine: { cups: 2, last: '11:20' },
+        sleep: { med: { type: 'none' }, windDown: { steps: { light: true } } },
+        journal: { text: 'keep journal', wordCount: 'bad' },
+      },
+    },
+  };
+  const existing = getDayPair(existingSeed, Y, 4);
+  ok('var gün registry/shim snapshot eşdeğer', same(existing.registryResult, existing.shimResult));
+  ok('var gün referansı ve nested referans korunuyor', existing.registryResult === existing.registryBefore &&
+    existing.shimResult === existing.shimBefore &&
+    existing.registryResult.customDayField === existing.registryInput.days[Y].customDayField &&
+    existing.registryResult.customDayField.marker === 'nested-day-sentinel');
+  ok('var gün bilinmeyen alan ve kayıt korunuyor', existing.registryResult.mood === 'calm' &&
+    existing.registryResult.note === 'DAY_NOTE_SENTINEL' &&
+    existing.registryResult.habits.customHabit === 'keep-me');
+  ok('var gün nested defaults normalize ediliyor', existing.registryResult.caffeine.drinks.length === 2 &&
+    existing.registryResult.caffeine.cups === 2 && existing.registryResult.journal.wordCount === 0 &&
+    existing.registryResult.therapy && existing.registryResult.prayer);
 }
 
 console.log('\n== B2 güvenlik yüzeyi ==');

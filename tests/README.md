@@ -44,6 +44,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   requestId/sûre normalizasyonu, reducer geçişleri, outbox çözümleyicisi,
   read-only delivery/response apply idempotensi, 200→304→200 tekrar sınırı
   ve app.js shim/UI kabuğu; browser, gerçek ağ ve veri yoktur.
+- `app/test_saygi_boundary.js` — MON-23 `SeymaSaygi` registry sınırı:
+  SaygiPeople/HijriCalendar lazy çözümleme, kıble saf metrikleri, Saygı/İman/
+  Kıble modal focus sözleşmesi, Okudum eylemi ve deterministic preview dump;
+  browser, gerçek ağ ve veri yoktur.
 - `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
   ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
   doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,

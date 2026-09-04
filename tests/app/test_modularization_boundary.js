@@ -26,6 +26,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/prayer.js',
     'app/core/zikir.js',
     'app/core/quran.js',
+    'app/core/saygi.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -233,6 +234,7 @@ var expectedNewModules = [
   vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
   vm.runInContext(load('app/core/zikir.js'), ctx, { filename:'zikir.js' });
   vm.runInContext(load('app/core/quran.js'), ctx, { filename:'quran.js' });
+  vm.runInContext(load('app/core/saygi.js'), ctx, { filename:'saygi.js' });
   vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
   vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
 
@@ -247,6 +249,7 @@ var expectedNewModules = [
   ok('window.SeyTimeTheme expose edilmiş', typeof win.SeyTimeTheme === 'object');
   ok('window.SeymaZikr expose edilmiş', typeof win.SeymaZikr === 'object');
   ok('window.SeymaQuran expose edilmiş', typeof win.SeymaQuran === 'object');
+  ok('window.SeymaSaygi expose edilmiş', typeof win.SeymaSaygi === 'object' && typeof win.SeymaSaygi.registerSaygi === 'function');
   ok('SeymaZikr yüklemede state/DOM/timer çağrısı yok', win.SeymaZikr && win.SeymaZikr.ZIKR_SEED && win.SeymaZikr.ZIKR_SEED.length === 5 && timers.length === 0);
   // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
   ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);

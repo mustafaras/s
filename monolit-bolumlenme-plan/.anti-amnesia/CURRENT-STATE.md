@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 devam ediyor (MON-22 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 devam ediyor (MON-23 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-22` / `MON-23` |
-| Dalga / ilerleme | 5 devam ediyor (4/7) / 22/60 |
+| Son / sıradaki | `MON-23` / `MON-24` |
+| Dalga / ilerleme | 5 devam ediyor (5/7) / 23/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -33,6 +33,38 @@ delivery/response read-only apply gövdelerini `SeymaQuran` registry'sine aldı;
 request/outbox helper shimleri registryye bağlandı, UI handler/render/save
 kabukları app.js'te kaldı. `quranTransportV1`, `sync.js`, panel, workflow,
 Gmail/App Script, data repo ve remote yazma yüzeyleri bu kartta değişmedi.
+
+## MON-23 kapanışı — Saygı domain registry ve modal focus parity
+
+- Karar/kanıt: [`MON-23-SAYGI-MODAL-FOCUS-MANIFESTI.md`](../deliverables/MON-23-SAYGI-MODAL-FOCUS-MANIFESTI.md).
+- [`app/core/saygi.js:1-269`](../../app/core/saygi.js) `SeymaSaygi` registry'si
+  Saygı/Öncü içerik yardımcılarını, İman kart/overlay gövdelerini, kıble saf
+  metrik/overlay yardımcılarını, Hicri/Kandil shimleri ve `wireSaygiReadGate`
+  sözleşmesini taşır. `SaygiPeople` ve `HijriCalendarV1` çağrı anında çözülür;
+  registry yüklemesi DOM, storage, timer veya ağ açmaz.
+- [`app.js:270-341`](../../app.js) aynı isim/imza ile delegeleri, [`app.js:386-403`](../../app.js)
+  canlı `data/ui/date/render/content` dependency bag kaydını korur. App
+  handlerları, gerçek state rebind'i, ortak modal focus altyapısı ve kıble
+  permission/sensör DOM akışı app.js'te kaldı; `qiblaSmoothAngle` de sensör
+  kabuğunda tutuldu. SaygiPeople/Hijri content, prayer.js, panel ve modal
+  altyapısı değişmedi.
+- Yükleme/FILES paritesi [`index.html:55-76`](../../index.html),
+  [`driver.mjs:227-261`](../../.claude/skills/run-seyma/driver.mjs) ve
+  [`zikr-harness.mjs:134-162`](../../.claude/skills/run-seyma/zikr-harness.mjs)
+  içinde `zikir → quran → saygi → mediaFx` sırasına hizalandı; yeni asset
+  `app/core/saygi.js?v=20260904a`, app cache-bust `v=20260904f` oldu. Full-app
+  reminder/helper/rebind fixture'ları da registryyi boot sırasına ekledi.
+- [`test_saygi_boundary.js`](../../tests/app/test_saygi_boundary.js) `20/20`
+  ile lazy content, root/read state, kıble metrikleri, üç modalın
+  `role=dialog`/`aria-modal`/`tabindex`/`App.onModalKeydown` contractı, sabit
+  Okudum eylemi ve parent/current synthetic preview dump parity'sini kanıtlar;
+  dump 1219 byte / SHA-256
+  `c69bee63eadfd109b8daa51b438e580ea6e88e7339356b21bfd534e0a853cf86`.
+  Modal fixture 39/39, zikr-harness 95/95 ve driver exit 0'dır.
+- Syntax, state B1/B2/rebind, app/premium/reminder regression kapıları PASS;
+  `sync.js`, Guard 1/2, data, content, prayer, panel, browser/device, remote,
+  push, merge, tag ve deploy değişmedi. Başarılı kapanıştan sonra sıradaki
+  `MON-24` olup yeni açık kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-22 kapanışı — Kur'an domain registry ve idempotent uzak apply
 

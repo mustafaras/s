@@ -8,17 +8,18 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 const source = fs.readFileSync('app.js', 'utf8');
+const saygiSource = fs.readFileSync('app/core/saygi.js', 'utf8');
 
 function ok(name, condition) {
   assert.equal(condition, true, name);
   console.log('PASS  ' + name);
 }
 
-function section(startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  const end = source.indexOf(endMarker, start);
+function section(startMarker, endMarker, text = source) {
+  const start = text.indexOf(startMarker);
+  const end = text.indexOf(endMarker, start);
   assert(start >= 0 && end > start, startMarker + ' kaynak bölümü bulunamadı');
-  return source.slice(start, end);
+  return text.slice(start, end);
 }
 
 console.log('== Modal odak hapsi regresyonu ==\n');
@@ -40,9 +41,9 @@ ok('ortak handler Tab olayını iç modala sınırlandırıyor',
 const modalSections = [
   ['Günlük Işığı', section('function journalModalHTML(){', '\nfunction updateJournalUI(){')],
   ['Kriz Odası', section('function crisisModalHTML(){', '\nfunction haritaHTML')],
-  ['İman Köşesi', section('function faithCornerOverlayHTML(){', '\nfunction saygiPreviewHubHTML')],
-  ['Kıble Pusulası', section('function qiblaOverlayHTML(){', '\nApp.openQibla=')],
-  ['Günün Öncüsü', section('function saygiPersonModalHTML(){', '\nfunction saygiFloatingReadHTML')],
+  ['İman Köşesi', section('function faithCornerOverlayHTML(){', 'function qiblaOverlayHTML', saygiSource)],
+  ['Kıble Pusulası', section('function qiblaOverlayHTML(){', '  function saygiPreviewHubHTML', saygiSource)],
+  ['Günün Öncüsü', section('function saygiPersonModalHTML(){', '  function saygiFloatingReadHTML', saygiSource)],
   ['Ortak hub kabuğu', section('function overlayShell(', '\nfunction soulOverlayShell(')],
   ['Zihin-beden hub kabuğu', section('function soulOverlayShell(', '\nfunction bookStatusChip')],
   ['Kısa düzenleme kabuğu', section('function compactModalShell(', '\nfunction bookEditModal')],

@@ -151,6 +151,7 @@ const FILES = [
   'app/core/prayer.js',
   'app/core/zikir.js',
   'app/core/quran.js',
+  'app/core/saygi.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/reminderCatalog.js',
@@ -179,6 +180,7 @@ function assertLoadOrder(files, repoRoot) {
 assertLoadOrder(FILES, REPO);
 const styles = fs.readFileSync(path.join(REPO, 'app/styles.css'), 'utf8');
 const appSource = fs.readFileSync(path.join(REPO, 'app.js'), 'utf8');
+const saygiSource = fs.readFileSync(path.join(REPO, 'app/core/saygi.js'), 'utf8');
 let sb = buildSandbox(seed);
 let ctx = loadInto(sb, FILES);
 if (sb.App && typeof sb.App.start === 'function') sb.App.start();
@@ -447,9 +449,9 @@ ok('Üst kıble kartı bilimsel hesap özetini gösterir', (function () {
 })());
 
 ok('Eski İman Köşesi kıble düğmesi kaldırıldı', (function () {
-  const start=appSource.indexOf('function faithCornerOverlayHTML');
-  const end=appSource.indexOf('function saygiPreviewHubHTML',start);
-  return start>=0 && end>start && !/App\.openQibla/.test(appSource.slice(start,end));
+  const start=saygiSource.indexOf('function faithCornerOverlayHTML');
+  const end=saygiSource.indexOf('\n}\n',start)+2;
+  return start>=0 && end>start && !/App\.openQibla/.test(saygiSource.slice(start,end));
 })());
 
 ok('Kıble overlay gelişmiş pusula ve yöntem açıklamasıyla render olur', (function () {
@@ -515,8 +517,7 @@ ok('İlham & İbadet koyu tema raporu render', (function () {
 })());
 
 ok('Günün öncüsü modalında sabit Okudum eylemi kod yolu var', (function () {
-  const src=fs.readFileSync(path.join(REPO,'app.js'),'utf8');
-  return /function saygiFloatingReadHTML\(\)/.test(src)&&/z-index:2147483640!important/.test(src)&&/h\+=saygiPersonModalHTML\(\); h\+=saygiFloatingReadHTML\(\)/.test(src);
+  return /function saygiFloatingReadHTML\(\)/.test(saygiSource)&&/z-index:2147483640!important/.test(saygiSource)&&/h\+=saygiPersonModalHTML\(\); h\+=saygiFloatingReadHTML\(\)/.test(appSource);
 })());
 
 ok('Okudum, Zihnimi Besledim türetilmiş tikini günceller', (function () {

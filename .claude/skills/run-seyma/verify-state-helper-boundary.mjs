@@ -19,9 +19,11 @@ const REPO = process.env.SEYMA_REPO ||
 const APP_PATH = path.join(REPO, 'app.js');
 const ZIKIR_PATH = path.join(REPO, 'app/core/zikir.js');
 const QURAN_PATH = path.join(REPO, 'app/core/quran.js');
+const SAYGI_PATH = path.join(REPO, 'app/core/saygi.js');
 const appSrc = fs.readFileSync(APP_PATH, 'utf8');
 const zikirSrc = fs.readFileSync(ZIKIR_PATH, 'utf8');
 const quranSrc = fs.readFileSync(QURAN_PATH, 'utf8');
+const saygiSrc = fs.readFileSync(SAYGI_PATH, 'utf8');
 let failures = 0;
 
 function assert(name, condition) {
@@ -133,6 +135,9 @@ function loadHelper(name) {
   }
   if (name === 'emptyQuranJourney') {
     vm.runInContext(quranSrc, ctx, { filename: 'app/core/quran.js' });
+  }
+  if (name === 'emptySaygiRoot') {
+    vm.runInContext(saygiSrc, ctx, { filename: 'app/core/saygi.js' });
   }
   vm.runInContext(`this.__helper = (${source});`, ctx, { filename: `app.js#${name}` });
   return { source, helper: ctx.__helper, ctx };

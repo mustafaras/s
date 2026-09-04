@@ -30,6 +30,9 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   B1 getter tazeliği, dokuz `app.js` data atama satırı, registryde sıfır
   `data=` yazımı, import/reset/location/auth late-boot ve 6079 try/finally
   geri-bind sınırı; sentetik `node:vm`, ağsız.
+- `app/test_prayer_boundary.js` — MON-19 `SeymaPrayer` registry sınırı:
+  load-safe expose, canlı state/date resolver, cache hit, explicit mock fetch,
+  no-op timer ve normalizer davranışı; gerçek ağ/GPS/browser yoktur.
 - `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
   ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
   doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,

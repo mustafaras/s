@@ -23,6 +23,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/dateUtils.js',
     'app/core/state.js',
     'app/core/helpers.js',
+    'app/core/prayer.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -61,7 +62,8 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'constIdx='+constIdx+' appIdx='+appIdx);
 })();
 
-// [4] Yeni modül dosyaları beklenen yollarıyla var veya yok (henüz kod değişmedi)
+// [4] Yeni modül dosyaları: MON-19 ilk domain taşımasıyla sayaç artık gerçek
+// taşınan modülleri raporlar; ileri kartlar bu upper-bound iddiasını kullanmaz.
 var expectedNewModules = [
   'app/core/dateUtils.js',
   'app/core/state.js',
@@ -95,10 +97,11 @@ var expectedNewModules = [
     var exists = fs.existsSync(p);
     if (exists) existing++;
   });
-  ok('planlanan 24 yeni modül için ' + existing + ' tanesi mevcut', true,
+  ok('planlanan ' + expectedNewModules.length + ' modülden ' + existing + ' tanesi taşındı', existing > 0,
     'mevcut: '+existing+' / '+expectedNewModules.length);
-  ok('modüllerin çoğu henüz oluşturulmadı (plan aşaması)', existing < expectedNewModules.length,
-    'mevcut: '+existing);
+  ok('MON-19 prayer modülü taşınmış ve registry hedefinde',
+    fs.existsSync(path.join(repoRoot,'app/core/prayer.js')) &&
+    fs.readFileSync(path.join(repoRoot,'app/core/prayer.js'),'utf8').indexOf('window.SeymaPrayer') >= 0);
 })();
 
 // [5] app.js App.* yüzeyi korunuyor (inline onclick handler referansları)

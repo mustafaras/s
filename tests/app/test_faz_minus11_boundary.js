@@ -1,5 +1,5 @@
 'use strict';
-// Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, mediaFx, timeTheme)
+// Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, prayer, mediaFx, timeTheme)
 // sadece window.* üzerinde expose edilmiş durumda olmalıydı. MON-07 ile
 // dateUtils'nin on gövdesi ve helpers'ın on iki üyesi app.js'te
 // imza-koruyan shim üzerinden registry sahibi olur.
@@ -20,6 +20,7 @@ console.log('\n=== Faz -1.1 — Yeni Modül Expose Sınır Testleri ===\n');
 var expectedModules = [
   'app/core/dateUtils.js',
   'app/core/helpers.js',
+  'app/core/prayer.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js'
 ];

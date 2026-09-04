@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 4 tamamlandı (MON-18 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 başladı (MON-19 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-18` / `MON-19` |
-| Dalga / ilerleme | 4 tamamlandı (3/3) / 18/60 |
+| Son / sıradaki | `MON-19` / `MON-20` |
+| Dalga / ilerleme | 5 başladı (1/7) / 19/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -26,7 +26,9 @@ callback sahipliğini app.js'te kilitledi; `MON-17` save gövdesini syncGlue
 registry'sine aldı, app.js shim/callback atamalarını ve schedule sırasını korudu.
 `data`/`ui` ile storage/`SeySync` çağrı anında çözülen resolver'lardır. MON-18
 state+sync çekirdeğini tüm resolver manifesti ve sentetik no-network kanıtıyla
-kapattı; sıradaki kart `MON-19` için yeni açık kullanıcı onayı gerekir.
+kapattı. MON-19 prayer domain gövdelerini `SeymaPrayer` registry'sine aldı;
+app.js canlı resolver bag'i ve 25 imza-koruyan shim korunurken cache/fetch yalnız
+açık çağrıda çalışır, GPS app.js'te kalır.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -93,10 +95,11 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
   Yeni core satırları reminderDelivery sonrasına, inline SW önüne eklenir;
   cache-bust aynı committe artar.
 - **MON-S4 kararı:** driver.mjs ve zikr-harness.mjs FILES dizileri artık
-  index 43–71 sırasının birebir paritesi (23 dosya, app.js dahil; sync.js ve
-  panel coverage kasıtlı dışarıda). Fail-fast `assertLoadOrder()` iki
-  harness'ta da çalışır: sıra ihlali throw üretir. Kural: yeni core dosyası
-  önce index'e, sonra FILES'a aynı konuma; sync.js hiç FILES'a eklenmez.
+  index üretim sırasının birebir paritesidir. Başlangıçta 23 olan liste
+  MON-19 prayer eklemesiyle 24 dosyaya (app.js dahil) çıktı; sync.js ve panel
+  coverage kasıtlı dışarıdadır. Fail-fast `assertLoadOrder()` iki harness'ta
+  da çalışır: sıra ihlali throw üretir. Kural: yeni core dosyası önce index'e,
+  sonra FILES'a aynı konuma; sync.js hiç FILES'a eklenmez.
   Kaynak: [`../deliverables/MON-S4-HARNESS-PARITE-KARARI.md`](../deliverables/MON-S4-HARNESS-PARITE-KARARI.md).
 - `SeymaState`, `SeymaDateUtils`, `SeymaHelpers` shimleri ve `SeymaSave` kayıt
   çağrısı app.js'te; `SeymaSave` save gövdesi syncGlue'tadır. Registryler
@@ -389,9 +392,42 @@ serinin kapsamı değildir.
   push/merge/tag/deploy ve gerçek veri deposu yazımıdır. Bunlar bu yerel
   headless kapanışın sonucu değildir.
 
-## Sonraki güvenli adım
+## MON-19 kapanışı — prayer domain registry
 
-`MON-19`: prayer domain modülü. Dalga 4 `3/3` tamamlandı; state ve syncGlue
-çekirdeği app.js shim/callback sahipliği ve sync.js/Guard değişmeden kapandı.
-Yeni açık kullanıcı onayı gerekir; MON-18 kararı sonraki karta geçiş izni
-değildir.
+- Kapanış kanıtı: [`MON-19-PRAYER-FUNCTION-INVENTORY.md`](../deliverables/MON-19-PRAYER-FUNCTION-INVENTORY.md).
+- `app/core/prayer.js:1-217`, `window.SeymaPrayer` altında 6 isim, 6 sıra,
+  81 şehir, 9 yöntem ve 25 prayer fonksiyonunu taşır. `PRAYER_DEPENDENCIES`
+  on named resolver bag'i `data`, `getDay`, `dayIndexFor`, `todayStr`,
+  `addDays`, `pad`, `esc`, `save`, `storage`, `fetch` olarak açıktır.
+- App.js `:76-107` aynı 25 fonksiyon için `apply(null,arguments)` shimlerini;
+  `:4390-4404` canlı state/date/save/storage/fetch bag kaydını taşır.
+  `App.fetchPrayerLocationGPS` `app.js`te kalmıştır; prayer modülünde GPS,
+  permission, DOM veya production network yoktur.
+- Registry load-safe kanıtı: `test_prayer_boundary.js` `19/19`; yüklemede
+  fetch/timer/cache-localStorage çağrısı `0`, eksik/ikinci kayıt fail-closed,
+  root rebind ve explicit mock fetch/cache hit/apply-save yolu PASS.
+- Cache-bust/index/FILES aynı sırada güncellendi: `index.html:59`
+  `prayer.js?v=20260904a`, app `v=20260904b`; driver ve zikr FILES paritesi
+  `prayer.js`i helpers sonrasında taşır. `sync.js` hash'i
+  `89255c22ecbbae484667abfd47bf5ee8e6d407bcac09d246edc82b5513ecb5d8`
+  olarak değişmemiştir.
+- MON-S5 izinli fixture geçişi yalnız modularization [0]/[4] ve Faz−1.1 F-1
+  listelerine prayer eklenmesidir; ayrıca yeni prayer boundary yazılmıştır.
+  Tam app boot yapan ilgili sentetik listeler yeni scripti production sırasıyla
+  yükler. Eski anlamı bastıran başka assertion yoktur.
+- `saygi` içindeki `<button id="faith-preview-card">` dump alt yüzeyi eski/yeni
+  `1582` byte ve SHA-256 `a3a5c2c65d7fb74bf4f27dce3920f1802b54229019a0f8cb2ce222159684dcd9`
+  olarak eşittir. Tüm saygi dump'ı random içerik taşıdığı için kapsamlı parite
+  iddiası bu sabit alt yüzeyle sınırlıdır.
+- App/onclick/FX ölçümleri değişmez: `App` assignment `715`, ref `1530`,
+  inline onclick `462`, handler attribute `459`, `SeyAudio/SeyHaptics/SeyFx/
+  SeyTimeTheme` `76/63/6/4`; state rebind kanıtı 9 source-line/11 token ve
+  state executable `data=` `0` olarak kalır.
+- Canlı tam kapı seti exit 0: syntax, B1 `0 failure`, B2 `60/60`, B3 `20/20`,
+  driver, zikr `95/95`, modularization `52/52`, Faz−1.1 `20/20`, date-utils,
+  helpers, state rebind, syncGlue save, Faz10, large-file, app/panel/
+  Panel-v2/Quran aileleri, premium ve reminder smoke. `git diff --check` temiz.
+
+`MON-19` tamamlandı; Dalga 5 `1/7`, toplam `19/60`. Sıradaki güvenli adım
+`MON-20`: zikir motoru. Yeni açık kullanıcı onayı gerekir; MON-19 kararı
+sonraki karta geçiş izni değildir.

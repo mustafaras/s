@@ -1,15 +1,16 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 17/60 (`MON-17`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 19/60 (`MON-19`)
 
-Bu klasör, Şeyma'nın 19.037 satırlık `app.js` IIFE monolitini davranışı
+Bu klasör, Şeyma'nın `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kademeli kod uygulama paketidir**: Dalga 1–3 (`MON-01..MON-15`)
+bir **kademeli kod uygulama paketidir**: Dalga 1–4 (`MON-01..MON-18`)
 tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
 taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
 sahipliğini app.js'te kilitledi, `MON-17` save gövdesini syncGlue registry'sine
-aldı ve app.js shim/callback/schedule sınırlarını korudu; sıradaki `MON-18`
-Dalga 4 kapanışıdır ve yeni açık kullanıcı onayıyla yürür.
+aldı, `MON-18` state+sync Dalga 4 kapanışını no-network kanıtıyla tamamladı.
+`MON-19` Dalga 5'in ilk domain taşıması olarak prayer gövdesini `SeymaPrayer` registry'sine aldı; app.js
+shimleri, lazy cache/fetch sınırı ve `faith-preview-card` dump paritesi korundu.
 
 ## Sınır ve otorite
 
@@ -61,6 +62,7 @@ node tests/app/test_modularization_boundary.js
 node tests/app/test_faz_minus11_boundary.js
 node tests/app/test_date_utils_boundary.js
 node tests/app/test_helpers_boundary.js
+node tests/app/test_prayer_boundary.js
 node tests/app/test_faz10_sync.js
 node tests/app/test_syncGlue_save_boundary.js
 node tests/panel/test_faz11_panel.js

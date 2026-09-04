@@ -73,122 +73,38 @@ function fmtDuration(min){
   return r===0?h+' saat':h+' saat '+r+' dk';
 }
 
-// ── İman Köşesi — vakit isimleri, Diyanet hesap yöntemi, fallback şehirleri ──
-var PRAYER_NAMES={fajr:'İmsak',sunrise:'Güneş',dhuhr:'Öğle',asr:'İkindi',maghrib:'Akşam',isha:'Yatsı'};
-var PRAYER_ORDER=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
-var PRAYER_CITIES=[
-  {name:'Adana',lat:37.0,lon:35.3213},{name:'Adıyaman',lat:37.7644,lon:38.2763},{name:'Afyonkarahisar',lat:38.7507,lon:30.5567},{name:'Ağrı',lat:39.7191,lon:43.0503},{name:'Amasya',lat:40.6499,lon:35.8353},{name:'Ankara',lat:39.9334,lon:32.8597},{name:'Antalya',lat:36.8969,lon:30.7133},{name:'Artvin',lat:41.1800,lon:41.8200},{name:'Aydın',lat:37.8380,lon:27.8456},{name:'Balıkesir',lat:39.6492,lon:27.8861},{name:'Bilecik',lat:40.1457,lon:29.9794},{name:'Bingöl',lat:38.8845,lon:40.4939},{name:'Bitlis',lat:38.4000,lon:42.1200},{name:'Bolu',lat:40.7350,lon:31.6061},{name:'Burdur',lat:37.7203,lon:30.2908},{name:'Bursa',lat:40.1826,lon:29.0665},{name:'Çanakkale',lat:40.1553,lon:26.4142},{name:'Çankırı',lat:40.6013,lon:33.6134},{name:'Çorum',lat:40.5506,lon:34.9556},{name:'Denizli',lat:37.7765,lon:29.0864},{name:'Diyarbakır',lat:37.9143,lon:40.2306},{name:'Edirne',lat:41.6772,lon:26.5557},{name:'Elazığ',lat:38.6748,lon:39.2225},{name:'Erzincan',lat:39.7463,lon:39.4911},{name:'Erzurum',lat:39.9043,lon:41.2679},{name:'Eskişehir',lat:39.7667,lon:30.5256},{name:'Gaziantep',lat:37.0662,lon:37.3833},{name:'Giresun',lat:40.9128,lon:38.3895},{name:'Gümüşhane',lat:40.4608,lon:39.4814},{name:'Hakkari',lat:37.5833,lon:43.7333},{name:'Hatay',lat:36.2026,lon:36.1604},{name:'Isparta',lat:37.7644,lon:30.5522},{name:'Mersin',lat:36.8121,lon:34.6415},{name:'İstanbul',lat:41.0082,lon:28.9784},{name:'İzmir',lat:38.4192,lon:27.1287},{name:'Kars',lat:40.6013,lon:43.0945},{name:'Kastamonu',lat:41.3887,lon:33.7827},{name:'Kayseri',lat:38.7205,lon:35.4826},{name:'Kırklareli',lat:41.7333,lon:27.2167},{name:'Kırşehir',lat:39.1425,lon:34.1709},{name:'Kocaeli',lat:40.7654,lon:29.9408},{name:'Konya',lat:37.8667,lon:32.4833},{name:'Kütahya',lat:39.4167,lon:29.9833},{name:'Malatya',lat:38.3552,lon:38.3095},{name:'Manisa',lat:38.6191,lon:27.4289},{name:'Kahramanmaraş',lat:37.5858,lon:36.9371},{name:'Mardin',lat:37.3212,lon:40.7245},{name:'Muğla',lat:37.2153,lon:28.3636},{name:'Muş',lat:38.7432,lon:41.5064},{name:'Nevşehir',lat:38.6247,lon:34.7142},{name:'Niğde',lat:37.9667,lon:34.6833},{name:'Ordu',lat:40.9839,lon:37.8764},{name:'Rize',lat:41.0201,lon:40.5235},{name:'Sakarya',lat:40.7563,lon:30.3783},{name:'Samsun',lat:41.2928,lon:36.3313},{name:'Siirt',lat:37.9293,lon:41.9420},{name:'Sinop',lat:42.0265,lon:35.1511},{name:'Sivas',lat:39.7477,lon:37.0179},{name:'Tekirdağ',lat:40.9780,lon:27.5111},{name:'Tokat',lat:40.3167,lon:36.5544},{name:'Trabzon',lat:41.0015,lon:39.7178},{name:'Tunceli',lat:39.1079,lon:39.5401},{name:'Şanlıurfa',lat:37.1591,lon:38.7969},{name:'Uşak',lat:38.6823,lon:29.4082},{name:'Van',lat:38.5012,lon:43.3727},{name:'Yozgat',lat:39.8181,lon:34.8147},{name:'Zonguldak',lat:41.4564,lon:31.7987},{name:'Aksaray',lat:38.3687,lon:34.0360},{name:'Bayburt',lat:40.2552,lon:40.2249},{name:'Karaman',lat:37.1811,lon:33.2150},{name:'Kırıkkale',lat:39.8508,lon:33.5063},{name:'Batman',lat:37.8812,lon:41.1301},{name:'Şırnak',lat:37.4187,lon:42.4918},{name:'Bartın',lat:41.6358,lon:32.3375},{name:'Ardahan',lat:41.1105,lon:42.7022},{name:'Iğdır',lat:39.9208,lon:44.0450},{name:'Yalova',lat:40.6500,lon:29.2667},{name:'Karabük',lat:41.2000,lon:32.6333},{name:'Kilis',lat:36.7184,lon:37.1212},{name:'Osmaniye',lat:37.0741,lon:36.2462},{name:'Düzce',lat:40.8438,lon:31.1565}
-];
-var PRAYER_METHODS={diyanet:13,mwl:3,isna:2,karachi:1,makkah:4,egypt:5,tehran:7,ghana:8,kosovo:9};
-function prayerCityByName(name){ if(!name) return null; var n=String(name).trim().toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c'); for(var i=0;i<PRAYER_CITIES.length;i++){ var c=PRAYER_CITIES[i]; var cn=String(c.name).toLowerCase().replace(/ş/g,'s').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c'); if(cn===n) return c; } return null; }
-function prayerCityOptionsHTML(selected){
-  var s=selected||'';
-  return PRAYER_CITIES.map(function(c){ var sel=c.name===s?' selected':''; return '<option value="'+esc(c.name)+'"'+sel+'>'+esc(c.name)+'</option>'; }).join('');
-}
-
-// ── İman Köşesi veri modeli ──
-function emptyPrayerEntry(time){
-  return {time:time||'',performed:false,inCongregation:false,late:false,madeUp:false,nafile:0,note:'',savedAt:''};
-}
-function emptyPrayerDay(){
-  var p={};
-  PRAYER_ORDER.forEach(function(k){ p[k]=emptyPrayerEntry(); });
-  p.fetchedAt=''; p.fetchedFor=''; p.fetchedMethod=''; p.fetchError='';
-  return p;
-}
-function ensurePrayerDay(day){
-  if(!day) return null;
-  if(!day.prayer||typeof day.prayer!=='object') day.prayer=emptyPrayerDay();
-  var p=day.prayer;
-  PRAYER_ORDER.forEach(function(k){ if(!p[k]||typeof p[k]!=='object') p[k]=emptyPrayerEntry(); var e=p[k]; if(typeof e.time!=='string') e.time=''; if(typeof e.performed!=='boolean') e.performed=false; if(typeof e.inCongregation!=='boolean') e.inCongregation=false; if(typeof e.late!=='boolean') e.late=false; if(typeof e.madeUp!=='boolean') e.madeUp=false; if(typeof e.nafile!=='number'||isNaN(e.nafile)) e.nafile=0; if(typeof e.note!=='string') e.note=''; if(typeof e.savedAt!=='string') e.savedAt=''; });
-  if(typeof p.fetchedAt!=='string') p.fetchedAt=''; if(typeof p.fetchedFor!=='string') p.fetchedFor=''; if(typeof p.fetchedMethod!=='string') p.fetchedMethod=''; if(typeof p.fetchError!=='string') p.fetchError='';
-  return p;
-}
-function prayerSettings(){ return (data&&data.settings&&data.settings.prayer)||{}; }
-function prayerLocation(){ var s=prayerSettings(); return s.location||null; }
-function prayerLocationHash(){ var loc=prayerLocation(); if(!loc||typeof loc!=='object') return ''; return String(loc.lat||'')+','+String(loc.lon||'')+','+String(loc.cityName||''); }
-function prayerMethod(){ var s=prayerSettings(); var m=String(s.method||'diyanet').toLowerCase(); return PRAYER_METHODS.hasOwnProperty(m)?m:'diyanet'; }
-function prayerAdjustments(){ var s=prayerSettings(); var a=s.adjustments||{}; var out={}; PRAYER_ORDER.forEach(function(k){ var v=Number(a[k]); out[k]=!isNaN(v)?Math.max(-90,Math.min(90,v)):0; }); return out; }
-
-// ── İman Köşesi — vakit çekme, cache, formatting, yardımcılar ──
-function fmtPrayerTime(d){ if(!d||isNaN(d.getTime())) return ''; return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
-function parsePrayerTime(t){ if(!t||typeof t!=='string') return null; var m=t.match(/^(\d{1,2}):(\d{2})$/); if(!m) return null; return {h:+m[1],m:+m[2]}; }
-function prayerCacheKey(date,locHash){ return 'seyma-prayer-cache-v1:'+String(date||'')+':'+String(locHash||prayerLocationHash()); }
-function prayerReadCache(date,locHash){
-  try{ var raw=localStorage.getItem(prayerCacheKey(date,locHash)); if(raw){ var v=JSON.parse(raw); if(v&&typeof v==='object'&&v.times) return v; } }catch(e){}
-  return null;
-}
-function prayerWriteCache(date,locHash,method,val){
-  try{ localStorage.setItem(prayerCacheKey(date,locHash), JSON.stringify({date:date,locHash:locHash,method:method||'',times:val,fetchedAt:new Date().toISOString()})); }catch(e){}
-}
-function prayerTimesFromDay(p){
-  var out={}; PRAYER_ORDER.forEach(function(k){ out[k]=(p[k]&&p[k].time)||''; }); return out;
-}
-function currentPrayerIndex(times){
-  var now=new Date(), curMin=now.getHours()*60+now.getMinutes(), best=-1;
-  for(var i=PRAYER_ORDER.length-1;i>=0;i--){ var k=PRAYER_ORDER[i]; var pt=parsePrayerTime(times&&times[k]); if(pt){ var m=pt.h*60+pt.m; if(curMin>=m-1){ best=i; break; } } }
-  return best;
-}
-function fetchAladhanTimes(date,lat,lon,method){
-  if(typeof fetch!=='function') return Promise.reject(new Error('fetch yok'));
-  var d=date||todayStr();
-  var url='https://api.aladhan.com/v1/timings/'+d+'?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&method='+encodeURIComponent(PRAYER_METHODS[method]||13)+'&timezonestring=Europe/Istanbul';
-  var ctrl=(typeof AbortController==='function')?new AbortController():null, timer=null;
-  if(ctrl) timer=setTimeout(function(){ try{ ctrl.abort(); }catch(e){} },16000);
-  var opts={headers:{'Accept':'application/json'},credentials:'omit'}; if(ctrl) opts.signal=ctrl.signal;
-  function clear(){ if(timer) clearTimeout(timer); }
-  return fetch(url,opts).then(function(res){ clear(); if(!res.ok){ var e=new Error('Vakit API '+res.status); e.status=res.status; return Promise.reject(e); } return res.json(); },function(err){ clear(); return Promise.reject(err); });
-}
-function fetchPrayerTimes(date, force){
-  var loc=prayerLocation();
-  if(!loc||typeof loc!=='object'||isNaN(+loc.lat)||isNaN(+loc.lon)) return Promise.reject(new Error('Konum ayarlanmamış'));
-  var locHash=prayerLocationHash();
-  var method=prayerMethod();
-  if(!force){
-    var cached=prayerReadCache(date,locHash);
-    if(cached&&cached.times&&cached.fetchedAt&&String(cached.method||'')===method){ var ageH=(Date.now()-new Date(cached.fetchedAt).getTime())/3600000; if(ageH<48) return Promise.resolve(cached.times); }
-    var day=getDay(data,date,dayIndexFor(date)); var p=(day&&day.prayer)||{};
-    if(p.fetchedAt&&p.fetchedFor===locHash&&String(p.fetchedMethod||'')===method){ var age2=(Date.now()-new Date(p.fetchedAt).getTime())/3600000; if(age2<48) return Promise.resolve(prayerTimesFromDay(p)); }
-  }
-  return fetchAladhanTimes(date, loc.lat, loc.lon, prayerMethod()).then(function(j){
-    if(!j||!j.data||!j.data.timings) return Promise.reject(new Error('Vakit verisi boş'));
-    var t=j.data.timings; var map={fajr:t.Fajr, sunrise:t.Sunrise, dhuhr:t.Dhuhr, asr:t.Asr, maghrib:t.Maghrib, isha:t.Isha};
-    prayerWriteCache(date,locHash,method,map); return map;
-  });
-}
-function applyPrayerTimesToDay(date,times){
-  var day=getDay(data,date,dayIndexFor(date)); var p=ensurePrayerDay(day);
-  PRAYER_ORDER.forEach(function(k){ p[k].time=String(times[k]||''); });
-  p.fetchedAt=new Date().toISOString(); p.fetchedFor=prayerLocationHash(); p.fetchedMethod=prayerMethod(); p.fetchError='';
-  day.savedAt=new Date().toISOString(); save();
-}
-function prayerDaySummary(p){
-  var total=0, performed=0, congregation=0, late=0, madeUp=0, nafile=0;
-  PRAYER_ORDER.forEach(function(k){ var e=p&&p[k]; if(!e) return; total++; if(e.performed){ performed++; if(e.inCongregation) congregation++; if(e.late) late++; if(e.madeUp) madeUp++; } nafile+=Math.max(0,Number(e.nafile)||0); });
-  return {total:total,performed:performed,congregation:congregation,late:late,madeUp:madeUp,nafile:nafile};
-}
-function prayerPerformedCount(p){ var n=0; PRAYER_ORDER.forEach(function(k){ if(p&&p[k]&&p[k].performed) n++; }); return n; }
-function prayerAllDone(p){ return prayerPerformedCount(p)>=5; }
-function prayerStreak(){
-  var streak=0, d=todayStr();
-  while(true){ var day=data.days[d]; var p=day&&day.prayer; if(!p||!prayerAllDone(p)) break; streak++; d=addDays(d,-1); if(d<data.startDate&&streak>0) break; if(d<data.startDate) break; }
-  return streak;
-}
+// ── İman Köşesi — prayer registry sabitleri ve imza-koruyan shimler ──
+var SEYMA_PRAYER=window.SeymaPrayer||{};
+var PRAYER_NAMES=SEYMA_PRAYER.PRAYER_NAMES||{};
+var PRAYER_ORDER=SEYMA_PRAYER.PRAYER_ORDER||[];
+var PRAYER_CITIES=SEYMA_PRAYER.PRAYER_CITIES||[];
+var PRAYER_METHODS=SEYMA_PRAYER.PRAYER_METHODS||{};
+function prayerCityByName(name){ return window.SeymaPrayer.prayerCityByName.apply(null,arguments); }
+function prayerCityOptionsHTML(selected){ return window.SeymaPrayer.prayerCityOptionsHTML.apply(null,arguments); }
+function emptyPrayerEntry(time){ return window.SeymaPrayer.emptyPrayerEntry.apply(null,arguments); }
+function emptyPrayerDay(){ return window.SeymaPrayer.emptyPrayerDay.apply(null,arguments); }
+function ensurePrayerDay(day){ return window.SeymaPrayer.ensurePrayerDay.apply(null,arguments); }
+function prayerSettings(){ return window.SeymaPrayer.prayerSettings.apply(null,arguments); }
+function prayerLocation(){ return window.SeymaPrayer.prayerLocation.apply(null,arguments); }
+function prayerLocationHash(){ return window.SeymaPrayer.prayerLocationHash.apply(null,arguments); }
+function prayerMethod(){ return window.SeymaPrayer.prayerMethod.apply(null,arguments); }
+function prayerAdjustments(){ return window.SeymaPrayer.prayerAdjustments.apply(null,arguments); }
+function fmtPrayerTime(d){ return window.SeymaPrayer.fmtPrayerTime.apply(null,arguments); }
+function parsePrayerTime(t){ return window.SeymaPrayer.parsePrayerTime.apply(null,arguments); }
+function prayerCacheKey(date,locHash){ return window.SeymaPrayer.prayerCacheKey.apply(null,arguments); }
+function prayerReadCache(date,locHash){ return window.SeymaPrayer.prayerReadCache.apply(null,arguments); }
+function prayerWriteCache(date,locHash,method,val){ return window.SeymaPrayer.prayerWriteCache.apply(null,arguments); }
+function prayerTimesFromDay(p){ return window.SeymaPrayer.prayerTimesFromDay.apply(null,arguments); }
+function currentPrayerIndex(times){ return window.SeymaPrayer.currentPrayerIndex.apply(null,arguments); }
+function fetchAladhanTimes(date,lat,lon,method){ return window.SeymaPrayer.fetchAladhanTimes.apply(null,arguments); }
+function fetchPrayerTimes(date,force){ return window.SeymaPrayer.fetchPrayerTimes.apply(null,arguments); }
+function applyPrayerTimesToDay(date,times){ return window.SeymaPrayer.applyPrayerTimesToDay.apply(null,arguments); }
+function prayerDaySummary(p){ return window.SeymaPrayer.prayerDaySummary.apply(null,arguments); }
+function prayerPerformedCount(p){ return window.SeymaPrayer.prayerPerformedCount.apply(null,arguments); }
+function prayerAllDone(p){ return window.SeymaPrayer.prayerAllDone.apply(null,arguments); }
+function prayerStreak(){ return window.SeymaPrayer.prayerStreak.apply(null,arguments); }
 // Sıradaki vakit + geri sayım (Faz 36) — render bazlı dakikalık hesap; interval yok.
-function nextPrayerInfo(times){
-  times=times||{};
-  var now=new Date(), curMin=now.getHours()*60+now.getMinutes();
-  var name='—', key=null, remMin=null, nextMin=null;
-  for(var i=0;i<PRAYER_ORDER.length;i++){
-    var k=PRAYER_ORDER[i], pt=parsePrayerTime(times[k]);
-    if(!pt) continue;
-    var m=pt.h*60+pt.m;
-    if(m>curMin){ key=k; name=PRAYER_NAMES[k]||k; nextMin=m; break; }
-  }
-  if(!key){ key=PRAYER_ORDER[0]; name=PRAYER_NAMES[PRAYER_ORDER[0]]; var pt2=parsePrayerTime(times[PRAYER_ORDER[0]]); if(pt2){ nextMin=(pt2.h*60+pt2.m)+24*60; } }
-  if(nextMin!=null){ var diff=nextMin-curMin; remMin=diff<=0?24*60+diff:diff; }
-  return {key:key,name:name,remMin:remMin,label:remMin!=null?remMin+' dk':''};
-}
+function nextPrayerInfo(times){ return window.SeymaPrayer.nextPrayerInfo.apply(null,arguments); }
 
 // ── İlham & İbadet: Zikirmatik · Saygı koleksiyonu · Rapor (Faz 35–40) ─────
 var ZIKR_SEED=[
@@ -4471,6 +4387,21 @@ function reminderSchedulerEnsure(){
 function reminderSchedulerDispatch(source,input){ return reminderSchedulerEnsure().trigger(source,input); }
 function reminderSchedulerSnapshot(){ return reminderSchedulerEnsure().snapshot(); }
 function reminderLifecycleTick(){ return reminderSchedulerDispatch('timer'); }
+// MON-19: prayer registry, app.js'in canlı state/date/save resolver bag'i ile
+// bağlanır. Registry gövdeleri kendi başına load-time fetch/GPS/localStorage
+// çağrısı yapmaz; dış yan etkiler yalnız kullanıcı eyleminin çağrı yolunda açılır.
+if(!window.SeymaPrayer||typeof window.SeymaPrayer.registerPrayer!=='function'||!window.SeymaPrayer.registerPrayer({
+  data:function(){ return data; },
+  getDay:getDay,
+  dayIndexFor:dayIndexFor,
+  todayStr:todayStr,
+  addDays:addDays,
+  pad:pad,
+  esc:esc,
+  save:save,
+  storage:function(){ return localStorage; },
+  fetch:function(){ return window.fetch; }
+})) throw new Error('MON-19: SeymaPrayer registry kurulamadı');
 // MON-12: migrate gövdesi state registry'sinde yaşar; tüm kapanış bağımlılıkları
 // burada açıkça bağlanır. `data` rebind'i ve archive backfill adaptörü app.js'te
 // kalır; registry yalnızca bu fonksiyonları çağırır.

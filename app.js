@@ -4536,6 +4536,22 @@ if(!window.SeymaState||typeof window.SeymaState.registerCreateDefaultData!=='fun
   emptyWatchlist:emptyWatchlist,
   emptyMusic:emptyMusic
 })) throw new Error('MON-14: SeymaState createDefaultData registry kurulamadı');
+// MON-17: save gövdesi syncGlue registry'sinde yaşar; data/ui resolverları
+// canlı closure bağını korur, storage ve SeySync çağrı anında çözülür.
+if(!window.SeymaSave||typeof window.SeymaSave.registerSave!=='function'||!window.SeymaSave.registerSave({
+  data:function(){ return data; },
+  ui:function(){ return ui; },
+  activeDate:activeDate,
+  syncDerivedHabits:syncDerivedHabits,
+  normalizeSyncReceipt:normalizeSyncReceipt,
+  appendEvent:appendEvent,
+  mergePersistedReminderState:mergePersistedReminderState,
+  reminderSyncPayload:reminderSyncPayload,
+  updateHeaderSave:updateHeaderSave,
+  storage:function(){ return localStorage; },
+  key:KEY,
+  sync:function(){ return window.SeySync; }
+})) throw new Error('MON-17: SeymaSave save registry kurulamadı');
 try{ var raw=localStorage.getItem(KEY); data=raw?JSON.parse(raw):null; }catch(e){ data=null; }
 if(data) data=migrate(data);
 if(window.MotivationProgramV2 && data && featuresLive()) window.MotivationProgramV2.ensureMotivationRoot(data);
@@ -6146,34 +6162,7 @@ window.SeyOnSynced=function(receipt){
   updateHeaderSave();
   updateSaveBanner(); if(ui.tab==='ayarlar') render();
 };
-function save(touchSource,eventSpec){
-  // save(false) canlı oturum/boot metadata'sı içindir; eventSpec veya normal
-  // save() ise kullanıcı değişikliğidir ve header hatırlatıcısını uyandırır.
-  if(touchSource!==false||eventSpec) { ui.saveState='dirty'; updateHeaderSave(); }
-  try{ var _a=activeDate(); var _d=data&&data.days&&data.days[_a]; if(_d&&_d.habits) syncDerivedHabits(_d,_a); }catch(e){}
-  try{
-    var _now=new Date().toISOString();
-    data.syncReceipt=normalizeSyncReceipt(data.syncReceipt);
-    if(touchSource!==false&&eventSpec) appendEvent(data,eventSpec.message,eventSpec.meta);
-    if(touchSource!==false){
-      data.savedAt=_now;
-      data.syncReceipt.sourceUpdatedAt=_now;
-      data.syncReceipt.status=data.syncReceipt.status==='accepted'?'local_saved':data.syncReceipt.status;
-      data.syncReceipt.submittedAt=null; data.syncReceipt.lastErrorCode=null;
-    }
-    // Two tabs may hold different in-memory snapshots. Merge the local-only
-    // reminder owner immediately before the full local write so an older tab
-    // cannot erase a newer preference from shared localStorage. The remote
-    // sync projection remains reminder-free below.
-    mergePersistedReminderState(_now);
-    localStorage.setItem(KEY,JSON.stringify(data));
-  }catch(e){}
-  // REM-04: canonical preferences remain local app state until the dedicated
-  // sync sanitize contract is implemented. Fail closed if a JSON projection
-  // cannot be produced; never hand the private reminders subtree to sync.
-  var syncData=reminderSyncPayload(data);
-  if(window.SeySync&&syncData){ try{ window.SeySync.schedule(syncData); }catch(e){} }
-}
+function save(touchSource,eventSpec){ return window.SeymaSave.save.apply(null,arguments); }
 function reminderSyncPayload(source){
   var out;
   if(!source||typeof source!=='object'||Array.isArray(source)) return null;

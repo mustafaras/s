@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 4 sürüyor (MON-16 tamamlandı) |
+| Durum | `in_progress` — Dalga 4 sürüyor (MON-17 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-16` / `MON-17` |
-| Dalga / ilerleme | 4 sürüyor (1/3) / 16/60 |
+| Son / sıradaki | `MON-17` / `MON-18` |
+| Dalga / ilerleme | 4 sürüyor (2/3) / 17/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -21,10 +21,11 @@ getter, rebind ve strict-mode sınırı bağımsız sentetik VM fixture'ı ile k
 Dokuz `app.js` data atama kaynak satırı (11 token), registryde sıfır gerçek
 `data=` yazımı, import/reset/location/auth late-boot ve tarihsel 6079
 `try/finally` geri-bind kanıtlandı. `data`, `ui`, `dark` ve App/boot sahipliği
-app.js'te; `SeymaState` yalnız getter-only canlı okuma sunuyor. Sonraki kart
-`MON-16` syncGlue callback sahipliğini app.js'te kilitledi; `SeymaSave` canlı
-getter sınırı korundu ve yeni callback registry'si açılmadı. Sonraki kart
-`MON-17` için yeni açık kullanıcı onayı gerekir.
+app.js'te; `SeymaState` yalnız getter-only canlı okuma sunuyor. `MON-16` syncGlue
+callback sahipliğini app.js'te kilitledi; `MON-17` save gövdesini syncGlue
+registry'sine aldı, app.js shim/callback atamalarını ve schedule sırasını korudu.
+`data`/`ui` ile storage/`SeySync` çağrı anında çözülen resolver'lardır. Sonraki
+kart `MON-18` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -54,17 +55,17 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 
 | Çıpa | Canlı değer | Koruma |
 |---|---:|---|
-| `app.js` | 19.048 satır, IIFE sonu 19.048 | tek IIFE geçiş boyunca korunur |
+| `app.js` | 19.037 satır, IIFE sonu 19.037 | tek IIFE; MON-17 save shim'i korunur |
 | `var data=null` | 2772 | M2, app.js sahibi |
-| yükleme / migrate shim | 4539 / 4555 | M2, registry gövdesi + app.js sahibi shim |
-| B1 getter'ları | 4535 civarı, yedi getter | canlı bağ köprüsü |
-| `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4555 / 4876 | MON-12 / MON-13..15 yüksek risk |
-| geçici `data=d` + finally | 5988 | `finally{data=savedData}` zinciri korunur |
-| `SeyOnSyncState` / `SeyOnSynced` | 6118 / 6128 | M3, app.js sahipliği |
-| `save` / `var App` | 6149 / 6319 | MON-16..18 / MON-50..54 |
-| `createDefaultData` / `App.start` | 6589 / 6590 | MON-14 aktarımı / boot sahipliği; MON-15 denetimi |
+| yükleme / migrate shim | 4555 / 4571 | M2, registry gövdesi + app.js sahibi shim |
+| B1 getter'ları | 4564–4570, yedi getter | canlı bağ köprüsü |
+| `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4571 / 4892 | MON-12 / MON-13..15 yüksek risk |
+| geçici `data=d` + finally | 6004 | `finally{data=savedData}` zinciri korunur |
+| `SeyOnSyncState` / `SeyOnSynced` | 6134 / 6144 | M3, app.js sahipliği |
+| `save` / `var App` | 6165 / 6308 | MON-17 shim / MON-50..54 |
+| `createDefaultData` / `App.start` | 6578 / 6579 | MON-14 aktarımı / boot sahipliği; MON-15 denetimi |
 | import / reset / late-boot data= | canlı grep ile yenilenir | M2prime, app.js'te kalır |
-| `window.App=App` | 17102; atamalar sonra da sürer | I2, erken taşınmaz |
+| `window.App=App` | 17101; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
 | inline onclick | satır 382 / occurrence 420 / eşsiz 325 | I2 için üç ayrı görünüm ölçüsü |
 | FX satır / occurrence | SeyAudio 27/53, SeyHaptics 21/42, SeyFx 2/4, SeyTimeTheme 2/2 | M4, 48 satır tablo MANIFESTI.md §4.2 |
@@ -96,9 +97,10 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
   harness'ta da çalışır: sıra ihlali throw üretir. Kural: yeni core dosyası
   önce index'e, sonra FILES'a aynı konuma; sync.js hiç FILES'a eklenmez.
   Kaynak: [`../deliverables/MON-S4-HARNESS-PARITE-KARARI.md`](../deliverables/MON-S4-HARNESS-PARITE-KARARI.md).
-- `SeymaState`, `SeymaSave`, `SeymaDateUtils`, `SeymaHelpers` için app.js'te
-  bugün doğrudan referans yoktur. Bu B1 skeleton durumudur; MON-07 sonrası
-  yalnız hedefli değişir.
+- `SeymaState`, `SeymaDateUtils`, `SeymaHelpers` shimleri ve `SeymaSave` kayıt
+  çağrısı app.js'te; `SeymaSave` save gövdesi syncGlue'tadır. Registryler
+  app.js'ten önce yüklenir ve B1'de save kaydı yokken `SeymaSave.save` undefined
+  kalır.
 
 ## 24 hedef modül ve ilerleme matrisi
 
@@ -339,8 +341,30 @@ serinin kapsamı değildir.
   reminder smoke ve `git diff --check` exit 0. Push/merge/tag/deploy,
   browser/device ve gerçek veri deposu yazımı yok.
 
+## MON-17 kapanışı — syncGlue save gövde aktarımı
+
+- Karar/manifeste: [`MON-S8-SYNCGLUE-SAVE-KARARI.md`](../deliverables/MON-S8-SYNCGLUE-SAVE-KARARI.md).
+- `save(touchSource,eventSpec)` gövdesi `app/core/syncGlue.js:39` içindeki
+  `SeymaSave.save` registry üyesine taşındı; app.js `:6165` aynı imzayı koruyan
+  shim olarak kaldı. `data`/`ui` canlı resolver, storage/`SeySync` lazy resolver
+  ile bağlandı; local persistence → privacy projection → schedule sırası,
+  `save(false)` davranışı ve `undefined` dönüşü korundu.
+- `SeyOnSyncState`/`SeyOnSynced` gövdeleri ve atamaları app.js'te kaldı:
+  `:6134/:6144`, callback ataması 2; syncGlue executable callback ataması 0.
+  `sync.js` ve Guard hash'i `89255c22ecbbae484667abfd47bf5ee8e6d407bcac09d246edc82b5513ecb5d8`
+  olarak değişmedi. Index cache-bust app/syncGlue `20260904a`; production FILES
+  zaten doğru sıradaydı.
+- İlk tam preflight'ta yeni registryyi yüklemeyen sentetik fixture listeleri
+  yakalandı; üretim failure'ı oluşmadan `state → syncGlue → helpers/app.js`
+  sırasına hizalandı. Etkilenen fixturelerin tekrar koşusu ve tam app/panel/
+  Panel-v2/Quran/premium/reminder kapıları exit 0 verdi: B2 `60/60`, B3 `20/20`,
+  save boundary `19/19`, zikr `95/95`, sync `69/69`, large-file `15/15`,
+  reminder smoke `20` curated.
+- Yerel PASS deploy veya cihaz kabulü değildir. Push, merge, tag, deploy,
+  browser, device ve gerçek veri deposu yazımı yapılmadı.
+
 ## Sonraki güvenli adım
 
-`MON-17`: syncGlue save gövde aktarımı. Callbackler app.js’te kalacak; save
-taşıması yalnız MON-17’nin açık kapsamıyla yapılacak. Yeni açık kullanıcı onayı
-gerekir; MON-16 kararı tek başına save taşıma izni değildir.
+`MON-18`: Dalga 4 state+sync kapanışı. MON-17 save gövdesi syncGlue'ta,
+callbackler app.js'te ve sync.js/Guard değişmeden tamamlandı. Yeni açık kullanıcı
+onayı gerekir; MON-17 kararı sonraki karta geçiş izni değildir.

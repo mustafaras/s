@@ -1,14 +1,15 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 16/60 (`MON-16`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 17/60 (`MON-17`)
 
-Bu klasör, Şeyma'nın 19.048 satırlık `app.js` IIFE monolitini davranışı
+Bu klasör, Şeyma'nın 19.037 satırlık `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
 bir **kademeli kod uygulama paketidir**: Dalga 1–3 (`MON-01..MON-15`)
 tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
 taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
-sahipliğini app.js'te kilitledi; sıradaki `MON-17` save gövde aktarımıdır ve
-yeni açık kullanıcı onayıyla sırayla yürür.
+sahipliğini app.js'te kilitledi, `MON-17` save gövdesini syncGlue registry'sine
+aldı ve app.js shim/callback/schedule sınırlarını korudu; sıradaki `MON-18`
+Dalga 4 kapanışıdır ve yeni açık kullanıcı onayıyla yürür.
 
 ## Sınır ve otorite
 
@@ -61,6 +62,7 @@ node tests/app/test_faz_minus11_boundary.js
 node tests/app/test_date_utils_boundary.js
 node tests/app/test_helpers_boundary.js
 node tests/app/test_faz10_sync.js
+node tests/app/test_syncGlue_save_boundary.js
 node tests/panel/test_faz11_panel.js
 for f in tests/app/test_premium_*.js; do node "$f"; done
 node tests/reminders/run-reminder-smoke.mjs

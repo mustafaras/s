@@ -101,9 +101,10 @@ var w = boot();
   ok('SeymaState.createDefaultData getter tanımlı', 'createDefaultData' in w.SeymaState);
   // Faz -1.1'de window.data/ui henüz yok → getter undefined döner (B1)
   ok('SeymaState.data henüz undefined (Faz -1.1)', w.SeymaState.data === undefined);
-  // SeymaSave getter tanımlı (syncGlue)
-  ok('SeymaSave getter tanımlı', 'SeymaSave' in w);
-  ok('SeymaSave henüz undefined (save window\'da değil)', w.SeymaSave === undefined);
+  // MON-17: save registry tanımlı, gövde app.js kaydını bekler.
+  ok('SeymaSave registry tanımlı', typeof w.SeymaSave === 'object');
+  ok('SeymaSave registerSave hazır', typeof w.SeymaSave.registerSave === 'function');
+  ok('SeymaSave.save henüz kayıtlı değil (B1)', w.SeymaSave.save === undefined);
 })();
 
 // ── seq 24: 3 kırık fonksiyon B1 yüzeyine hizalandı ──

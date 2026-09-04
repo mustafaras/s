@@ -96,8 +96,9 @@ vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
   ok('SeymaState.getDay getter tanımlı', 'getDay' in w.SeymaState);
   ok('SeymaState.createDefaultData getter tanımlı', 'createDefaultData' in w.SeymaState);
   ok('SeymaState.data henüz undefined (Faz -1.1)', w.SeymaState.data === undefined);
-  ok('SeymaSave getter tanımlı', 'SeymaSave' in w);
-  ok('SeymaSave henüz undefined (save window\'da değil)', w.SeymaSave === undefined);
+  ok('SeymaSave registry tanımlı', typeof w.SeymaSave === 'object');
+  ok('SeymaSave registerSave hazır', typeof w.SeymaSave.registerSave === 'function');
+  ok('SeymaSave.save henüz kayıtlı değil (B1)', w.SeymaSave.save === undefined);
 })();
 
 console.log('\n=== Özet ===');

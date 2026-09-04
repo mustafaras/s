@@ -142,8 +142,8 @@ function loadInto(sandbox, files) {
   return ctx;
 }
 
-// MON-12/13: state registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
-const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app.js'];
+// MON-12/13/17: state + save registry üretimdeki yükleme sırasıyla app.js'ten önce gelir.
+const FILES = ['app/content/profileAssessmentV1.js', 'app/content/esmaulHusnaV1.js', 'app/core/constants.js', 'app/core/dateUtils.js', 'app/core/state.js', 'app/core/syncGlue.js', 'app.js'];
 
 function defaultSettings() {
   return {

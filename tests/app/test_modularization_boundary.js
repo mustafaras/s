@@ -160,17 +160,20 @@ var expectedNewModules = [
   ok('MODULARIZATION.md 24 modül listesi', txt.indexOf('| 24 |') >= 0);
 })();
 
-// [8] MON-12/13: state gövdeleri registryde; app.js imza-koruyan shim + save()
+// [8] MON-12/13/17: state + save gövdeleri registryde; app.js shimleri
 (function(){
   var src = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
   var stateSrc = fs.readFileSync(path.join(repoRoot,'app/core/state.js'),'utf8');
+  var syncGlueSrc = fs.readFileSync(path.join(repoRoot,'app/core/syncGlue.js'),'utf8');
   ok('migrate(d) app.js imza-koruyan shim olarak kaldı', /function migrate\(d\)\{\s*return window\.SeymaState\.migrate\(d\);\s*\}/.test(src));
   ok('migrate gövdesi state registryde', /function migrate\(d\)\{/.test(stateSrc) && /registerMigrate/.test(src));
   ok('app.js migrate gövdesini yeniden taşımıyor', !/function migrate\(d\)\{[\s\S]*migrateReminderState\(d\)/.test(src));
   ok('getDay(d,date,idx) app.js imza-koruyan shim olarak kaldı', /function getDay\(d,date,idx\)\{\s*return window\.SeymaState\.getDay\.apply\(null,arguments\);\s*\}/.test(src));
   ok('getDay gövdesi state registryde', /function getDay\(d,date,idx\)\{/.test(stateSrc) && /registerGetDay/.test(src));
   ok('app.js getDay gövdesini yeniden taşımıyor', !/function getDay\(d,date,idx\)\{[\s\S]*emptyHabits\(\)/.test(src));
-  ok('save() hâlâ app.js içinde', /function save\(touchSource,eventSpec\)\{/.test(src));
+  ok('save(touchSource,eventSpec) app.js imza-koruyan shim olarak kaldı', /function save\(touchSource,eventSpec\)\{\s*return window\.SeymaSave\.save\.apply\(null,arguments\);\s*\}/.test(src));
+  ok('save gövdesi syncGlue registryde', /function save\(touchSource,eventSpec\)\{/.test(syncGlueSrc) && /registerSave/.test(syncGlueSrc));
+  ok('app.js save shim local persistence gövdesini taşımıyor', !/function save\(touchSource,eventSpec\)\{[^}]*localStorage\.setItem/.test(src));
 })();
 
 // [9] FX-P-04: app.js hâlâ window.App ve SeyOnSyncState/SeyOnSynced'i expose ediyor
@@ -188,7 +191,7 @@ var expectedNewModules = [
 
 // [10] FX-P-04: yeni modüller window.* yüzeylerini expose ediyor (VM boot)
 // app.js YÜKLENMEZ; yalnızca Faz -1.1 modülleri boot edilir. SeymaState/SeymaSave
-// getter'ları tanımlı olmalı; data/ui henüz undefined (B1).
+// registryleri tanımlı olmalı; save gövdesi app.js kaydını beklemeli (B1).
 (function(){
   var vm = require('vm');
   var timers = [];
@@ -223,14 +226,15 @@ var expectedNewModules = [
   ok('window.SeymaDateUtils expose edilmiş', typeof win.SeymaDateUtils === 'object');
   ok('window.SeymaHelpers expose edilmiş', typeof win.SeymaHelpers === 'object');
   ok('window.SeymaState expose edilmiş', typeof win.SeymaState === 'object');
-  ok('window.SeymaSave getter tanımlı', 'SeymaSave' in win);
+  ok('window.SeymaSave registry tanımlı', typeof win.SeymaSave === 'object');
+  ok('window.SeymaSave registerSave hazır', typeof win.SeymaSave.registerSave === 'function');
   ok('window.SeyAudio expose edilmiş', typeof win.SeyAudio === 'object');
   ok('window.SeyHaptics expose edilmiş', typeof win.SeyHaptics === 'object');
   ok('window.SeyFx expose edilmiş', typeof win.SeyFx === 'object');
   ok('window.SeyTimeTheme expose edilmiş', typeof win.SeyTimeTheme === 'object');
   // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
   ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);
-  ok('window.SeymaSave henüz undefined (B1)', win.SeymaSave === undefined);
+  ok('window.SeymaSave.save henüz kayıtlı değil (B1)', win.SeymaSave.save === undefined);
 })();
 
 console.log('\n=== Özet ===');

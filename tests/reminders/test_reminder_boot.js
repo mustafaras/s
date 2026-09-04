@@ -12,6 +12,7 @@ const CATALOG_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/reminderCatalog
 const CONSTANTS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/constants.js"), "utf8");
 const DATE_UTILS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/dateUtils.js"), "utf8");
 const STATE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/state.js"), "utf8");
+const SYNC_GLUE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/syncGlue.js"), "utf8");
 const HELPERS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/helpers.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
@@ -114,6 +115,7 @@ function boot({ catalog = true, seed = null } = {}) {
   // MON-12: app.js migrate shim'i state registryden çözer.
   vm.runInContext(DATE_UTILS_SOURCE, context, { filename: "app/core/dateUtils.js" });
   vm.runInContext(STATE_SOURCE, context, { filename: "app/core/state.js" });
+  vm.runInContext(SYNC_GLUE_SOURCE, context, { filename: "app/core/syncGlue.js" });
   vm.runInContext(HELPERS_SOURCE, context, { filename: "app/core/helpers.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });

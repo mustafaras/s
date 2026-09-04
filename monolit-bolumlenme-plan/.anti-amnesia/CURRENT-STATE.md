@@ -9,12 +9,12 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 3 kapandı (MON-15 tamamlandı) |
+| Durum | `in_progress` — Dalga 4 sürüyor (MON-16 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-15` / `MON-16` |
-| Dalga / ilerleme | 3 kapandı / 15/60 |
+| Son / sıradaki | `MON-16` / `MON-17` |
+| Dalga / ilerleme | 4 sürüyor (1/3) / 16/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
-| Güncellendi | 2026-09-03 |
+| Güncellendi | 2026-09-04 |
 
 **Bağlayıcı durak:** `MON-15` tamamlandı: MON-11..14 state aktarımının canlı
 getter, rebind ve strict-mode sınırı bağımsız sentetik VM fixture'ı ile kapatıldı.
@@ -22,7 +22,9 @@ Dokuz `app.js` data atama kaynak satırı (11 token), registryde sıfır gerçek
 `data=` yazımı, import/reset/location/auth late-boot ve tarihsel 6079
 `try/finally` geri-bind kanıtlandı. `data`, `ui`, `dark` ve App/boot sahipliği
 app.js'te; `SeymaState` yalnız getter-only canlı okuma sunuyor. Sonraki kart
-`MON-16` için yeni açık kullanıcı onayı gerekir.
+`MON-16` syncGlue callback sahipliğini app.js'te kilitledi; `SeymaSave` canlı
+getter sınırı korundu ve yeni callback registry'si açılmadı. Sonraki kart
+`MON-17` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -316,8 +318,29 @@ serinin kapsamı değildir.
   `sync.js`, `data/`, panel, push/merge/tag/deploy/browser/device ve gerçek veri
   deposu yazımı yok.
 
+## MON-16 kapanışı — syncGlue callback sahipliği ve strict-mode kararı
+
+- Karar/manifeste: [`MON-S7-SYNCGLUE-KARARI.md`](../deliverables/MON-S7-SYNCGLUE-KARARI.md).
+- Canlı kaynak: `app.js:6118` `SeyOnSyncState`, `app.js:6128`
+  `SeyOnSynced`, `app.js:6149` `save`; syncGlue `SeymaSave` getter’ı
+  `app/core/syncGlue.js:32-35`; `sync.js` çağrıları `:74` ve `:1000`.
+- Karar: callback gövdeleri app.js’te kalır. `syncGlue` callback setter/getter
+  registry’si kurmaz; yalnız `SeymaSave` canlı getter’ını sunar. Çünkü syncGlue
+  app.js’ten önce yüklenir ve getter-only callback property’si app.js strict-mode
+  global atamasını `TypeError` ile kırar.
+- `save()` closure state, DOM, timer/persistence yardımcıları ve
+  `SeySync.schedule` sırasına bağlıdır; MON-16’da taşınmadı. `sync.js` yalnız
+  queued/saving/retrying/accepted/error receipt geçişlerinde callbackleri çağırır.
+- Callback ataması: app.js `2`, syncGlue executable `0`, sync.js `0`; retry
+  kaynakları sync.js online listener + app.js’in 5 dakikalık foreground watchdog’u
+  olarak kaydedildi. Index/FILES/cache-bust ve Guard 1/2 değişmedi.
+- Kanıt: MON-S7 strict-mode probe PASS; sync `69/69`, syntax, driver, zikr
+  `95/95`, state/B1/B2/B3, core/app/panel/Panel-v2/Quran fixture aileleri,
+  reminder smoke ve `git diff --check` exit 0. Push/merge/tag/deploy,
+  browser/device ve gerçek veri deposu yazımı yok.
+
 ## Sonraki güvenli adım
 
-`MON-16`: syncGlue callback sahipliği envanteri ve strict-mode sınırı. Dalga 3
-kapandı; yeni syncGlue kodu için yeni açık kullanıcı onayı gerekir. MON-15
-kanıtı tek başına sonraki karta uygulama izni değildir.
+`MON-17`: syncGlue save gövde aktarımı. Callbackler app.js’te kalacak; save
+taşıması yalnız MON-17’nin açık kapsamıyla yapılacak. Yeni açık kullanıcı onayı
+gerekir; MON-16 kararı tek başına save taşıma izni değildir.

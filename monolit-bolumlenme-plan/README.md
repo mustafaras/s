@@ -1,14 +1,14 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 15/60 (`MON-15`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 16/60 (`MON-16`)
 
 Bu klasör, Şeyma'nın 19.048 satırlık `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
 bir **kademeli kod uygulama paketidir**: Dalga 1–3 (`MON-01..MON-15`)
 tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
-taşındı, canlı rebind sahipliği app.js'te bırakıldı. Sıradaki `MON-16`
-syncGlue callback sahipliği envanteridir ve yeni açık kullanıcı onayıyla,
-sırayla yürür.
+taşındı, canlı rebind sahipliği app.js'te bırakıldı. `MON-16` syncGlue callback
+sahipliğini app.js'te kilitledi; sıradaki `MON-17` save gövde aktarımıdır ve
+yeni açık kullanıcı onayıyla sırayla yürür.
 
 ## Sınır ve otorite
 

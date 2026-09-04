@@ -110,6 +110,23 @@
     if(typeof d.settings.hideRepoBanner!=='boolean') d.settings.hideRepoBanner=false;
     if(typeof d.settings.hideVacationCard!=='boolean') d.settings.hideVacationCard=false;
     if(typeof d.settings.profileAssessmentInactive!=='boolean') d.settings.profileAssessmentInactive=true;
+    // Premium FX gate varsayılanları. mediaFx/timeTheme `!s.premiumAtmosphere`
+    // ile kapanır; bu alan hiç yazılmadığı için ayarlar kartı "Açık" gösterirken
+    // ses/titreşim/saat teması sessiz kalıyordu (alt anahtarlar açılsa bile).
+    // Yalnızca eksikse doldurulur; kullanıcının bilinçli kapatma tercihi korunur.
+    if(typeof d.settings.premiumAtmosphere!=='boolean') d.settings.premiumAtmosphere=true;
+    if(typeof d.settings.uiSounds!=='boolean') d.settings.uiSounds=true;
+    if(typeof d.settings.richHaptics!=='boolean') d.settings.richHaptics=true;
+    // Kapalı kalanlar: sesli rehberlik ve ambiyans kendiliğinden ses çıkardığı için
+    // opt-in; launchRitual'ın ise runtime karşılığı (splash) henüz yazılmadı.
+    if(typeof d.settings.launchRitual!=='boolean') d.settings.launchRitual=false;
+    if(typeof d.settings.voiceGuidance!=='boolean') d.settings.voiceGuidance=false;
+    if(typeof d.settings.ambientSounds!=='boolean') d.settings.ambientSounds=false;
+    // FX kapanış kararı D4 (kullanıcı kararı): bulut TTS varsayılan açık, yerel
+    // sese düşüş kapalı. voiceGuidance kapalıyken ikisi de atıl; kullanıcı sesi
+    // açtığında robotik yerel ses yerine sinirsel ses devreye girer.
+    if(typeof d.settings.voiceCloudTts!=='boolean') d.settings.voiceCloudTts=true;
+    if(typeof d.settings.voiceLocalFallback!=='boolean') d.settings.voiceLocalFallback=false;
     if(d.settings.caffeineMode!=='standard'&&d.settings.caffeineMode!=='sensitive'&&d.settings.caffeineMode!=='pregnant') d.settings.caffeineMode='standard';
     if(typeof d.settings.targetBed!=='string'||!/^\d{2}:\d{2}$/.test(d.settings.targetBed)) d.settings.targetBed=CAFFEINE_DEFAULT_BED;
     if(!d.settings.ghBranch) d.settings.ghBranch='main';

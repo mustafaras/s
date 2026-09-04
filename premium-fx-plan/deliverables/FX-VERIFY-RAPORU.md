@@ -1,5 +1,17 @@
 # FX-VERIFY RAPOR — 2026-09-02
 
+> **⚠️ SONRADAN DÜZELTME — 2026-09-04 (LEDGER seq 72).** Bu raporun
+> "DEPLOY-A-HAZIR" kararı **hatalıydı**. Rapor, fixture'ların yeşil olmasına
+> dayandı; ancak premium fixture ailesinin tamamı gate'i kendisi enjekte ediyordu
+> (`setSettings({premiumAtmosphere:true, …})`). Gerçekte `migrate()`
+> `settings.premiumAtmosphere` alanını hiç yazmıyordu, bu yüzden kullanıcının
+> cihazında ses, titreşim ve saat teması **tamamen sessizdi** — ayarlar kartı ise
+> "Açık" gösteriyordu. Onarım ve yeni koruma fixture'ı için
+> [`.anti-amnesia/CURRENT-STATE.md`](../.anti-amnesia/CURRENT-STATE.md)
+> "Kapanış Sonrası Onarım" bölümüne bakın. Ders: yeşil fixture, gerçek
+> `migrate()` çıktısını doğrulamıyorsa çalışma kanıtı değildir.
+
+
 **Denetleyen:** FX-P-70 (Dalga 7 öncesi tam uygulama denetimi)
 **Dal:** `premium-fx-local` · **Son prompt:** FX-P-65 (Faz 6 tamamlandı)
 **Yöntem:** Salt-okur denetim — kaynak kod değiştirilmedi; yalnızca bu rapor oluşturuldu.

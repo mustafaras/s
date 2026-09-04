@@ -7470,10 +7470,13 @@ App.setVoiceRate=function(rate){ var v=Number(rate); if(isNaN(v)) return; v=Math
 // settings.* anahtarlarını çevirir; data şekli değişmez (I1), App.* yüzeyine
 // EKLEME (I2 uyumlu). Master switch kapatıldığında alt FX'ler gating'te otomatik
 // sessizleşir (mediaFx/timeTheme), alanları tek tek sıfırlamaya gerek yok.
-App.toggleSetting=function(key){
+App.toggleSetting=function(key,value){
   var allowed={premiumAtmosphere:1,uiSounds:1,richHaptics:1,launchRitual:1,voiceGuidance:1,ambientSounds:1,voiceCloudTts:1};
   if(!allowed[key]||!data.settings) return;
-  data.settings[key]=!data.settings[key];
+  // `value` verilirse idempotent atama yapılır: segmentli Açık/Kapalı çiftinde her
+  // iki düğme de aynı toggle'ı çağırdığı için "Kapalı"ya basmak anahtarı açabiliyordu.
+  // Tek düğmeli alt satırlar `value` geçmez ve eskisi gibi çevirmeye devam eder.
+  data.settings[key]=(value===undefined)?!data.settings[key]:!!value;
   if(window.SeyHaptics&&typeof window.SeyHaptics.tap==='function'&&data.settings.premiumAtmosphere) window.SeyHaptics.tap();
   save();
   render();
@@ -9070,6 +9073,12 @@ function render(){
   // senkronize olur. SeyTimeTheme yoksa veya premiumAtmosphere kapalıysa no-op.
   if(window.SeyTimeTheme && typeof window.SeyTimeTheme.apply==='function'){
     try{ window.SeyTimeTheme.apply(); }catch(e){}
+  }
+  // Mevsim/mübarek gün vurgusu: app/styles.css'teki `#root.theme-season-*` blokları
+  // yalnızca applySeasonal() ile takılır; çağrı yazılmadığı için o CSS ölü kalıyordu.
+  // apply() ile aynı premiumAtmosphere gating'ini paylaşır.
+  if(window.SeyTimeTheme && typeof window.SeyTimeTheme.applySeasonal==='function'){
+    try{ window.SeyTimeTheme.applySeasonal(); }catch(e){}
   }
   // iOS/PWA durum çubuğu rengini mevcut tema ile senkronize tut; açık/koyu geçişlerinde flaş azalır.
   // Yalnızca gerçekten tema değiştiğinde meta tag'i güncelle, her render'da değil.
@@ -12460,8 +12469,8 @@ function ayarlarHTML(){
   ];
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">✨ Premium Atmosfer</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">Tüm premium efektleri tek anahtarla yönet. Kapattığında uygulama sade modda çalışır.</div>';
   h+='<div style="display:flex;gap:8px;">';
-  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\')" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
-  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\')" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
+  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',true)" aria-pressed="'+paOn+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?onS:offS)+'">'+icon('sparkles',14)+' Açık</button>';
+  h+='<button onclick="App.toggleSetting(\'premiumAtmosphere\',false)" aria-pressed="'+(!paOn)+'" style="flex:1;padding:11px;border-radius:13px;cursor:pointer;font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;'+(paOn?offS:onS)+'">'+icon('bell-off',14)+' Kapalı</button></div>';
   fxRows.forEach(function(row){
     var on=!!(data.settings&&data.settings[row[0]]);
     var lockStyle=paOn?'':'opacity:.45;pointer-events:none;';

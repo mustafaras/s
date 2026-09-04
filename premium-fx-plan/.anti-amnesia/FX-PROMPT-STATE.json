@@ -4,9 +4,34 @@
   "blockedPrompt": null,
   "currentPhase": "Faz 7 tamamlandı",
   "lastCompletedFaz": "Faz 7",
-  "updatedAt": "2026-09-02",
+  "updatedAt": "2026-09-04",
   "localBranch": "premium-fx-local",
   "planVersion": "2.3",
-  "implementationComplete": true,
-  "pushedToRemote": false
+  "implementationComplete": false,
+  "pushedToRemote": false,
+  "postClosureFixes": [
+    {
+      "date": "2026-09-04",
+      "agent": "Claude Code",
+      "ledgerSeq": 72,
+      "branch": "zikirmatik-manuel-zikir",
+      "defect": "settings.premiumAtmosphere/uiSounds/richHaptics migrate() tarafindan hic yazilmiyordu; ayarlar karti \"Acik\" gosterirken mediaFx/timeTheme gate kapaliydi.",
+      "whyMissed": "Tum premium fixturelar gate i kendisi enjekte ediyordu; hicbiri gercek migrate() ciktisini dogrulamiyordu.",
+      "fixed": [
+        "migrate() FX gate backfill (D4 uyumlu)",
+        "SeyTimeTheme.applySeasonal() cagrisi baglandi",
+        "App.toggleSetting(key,value) idempotent master switch"
+      ],
+      "newFixture": "tests/app/test_premium_fx_gate_defaults.js",
+      "stillMissing": [
+        "launchRitual runtime (#sey-splash + hideSplash)",
+        "SeyFx.ripple cagri noktalari",
+        "SeyFx.enter cagri noktalari",
+        "SeyFx.transition cagri noktalari"
+      ],
+      "regression": "fail=0 (syntax, driver, zikr 95/95, tests/app, 23 panel, 27 panel-v2, 9 quran, 20 reminders, 3 boundary verifier)",
+      "pushed": false
+    }
+  ],
+  "implementationCompleteNote": "Motor katmani tamamlandi ve calisiyor; launchRitual splash ile SeyFx.ripple/enter/transition cagri noktalari hala yazilmadi (bkz. postClosureFixes[0].stillMissing)."
 }

@@ -164,8 +164,15 @@ console.log('\n[7] app.js ayarlar yüzeyi (statik)');
   ok('App.toggleSetting handler tanımlı (FX-P-61)', appSrc.indexOf('App.toggleSetting=function') >= 0);
   ok('toggleSetting beyaz listesi premium alanları içeriyor', appSrc.indexOf("allowed={premiumAtmosphere:1,uiSounds:1,richHaptics:1,launchRitual:1,voiceGuidance:1,ambientSounds:1") >= 0);
   ok('ayarlar ekranında Premium Atmosfer kartı var', appSrc.indexOf('✨ Premium Atmosfer') >= 0);
-  // HTML string içindeki onclick escape'li: App.toggleSetting(\'key\')
-  ok('master switch onclick bağlı', appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\')") >= 0);
+  // HTML string içindeki onclick escape'li: App.toggleSetting(\'key\',deger)
+  // Segmentli Açık/Kapalı çifti AÇIK DEĞER geçmek zorundadır: her iki düğme de
+  // değersiz toggle çağırdığında "Kapalı"ya basmak anahtarı açıyordu.
+  ok('master switch "Açık" segmenti açık değer geçiyor',
+     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',true)") >= 0);
+  ok('master switch "Kapalı" segmenti açık değer geçiyor',
+     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\',false)") >= 0);
+  ok('master switch değersiz toggle\'a geri dönmedi',
+     appSrc.indexOf("App.toggleSetting(\\'premiumAtmosphere\\')") < 0);
   // Alt FX satırları dinamik olarak row[0] ile üretiliyor (fxRows dizisi);
   // statik kontrol: fxRows tanımı tüm 5 anahtarı içeriyor + dinamik onclick şablonu mevcut.
   var fxRowsOk = ['uiSounds','richHaptics','launchRitual','voiceGuidance','ambientSounds'].every(function(k){

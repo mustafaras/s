@@ -1,4 +1,4 @@
-# Premium FX — Implementation Tamamlandı (LOCAL ONLY)
+# Premium FX — Motor Tamamlandı, Görsel Yüzeyler Eksik (LOCAL ONLY)
 
 **Tarih:** 2026-09-02
 **Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme
@@ -15,9 +15,54 @@
 - **Bulut TTS:** `voiceCloudTts=true` (varsayılan), `voiceLocalFallback=false` — robotik yerel sene asla düşülmez; anahtar `settings.openaiKey` (Luna ile paylaşımlı, sanitize ile repoya gitmez).
 - **Branch:** `premium-fx-local` — push edilmemiş; `main`'e merge kullanıcı onayı + son regression ile.
 
+## Kapanış Sonrası Onarım — 2026-09-04 (LEDGER seq 72)
+
+Seri "tamamlandı" ilan edildikten sonra kullanıcı FX'in uygulamada **hiç
+görünmediğini** bildirdi. Doğrulandı ve onarıldı.
+
+**Kök neden:** `settings.premiumAtmosphere` (ve `uiSounds`/`richHaptics`)
+`migrate()`/`createDefaultData()` tarafından hiç yazılmıyordu. mediaFx ve
+timeTheme `!s.premiumAtmosphere` ile kapanıyor, ayarlar kartı ise
+`!(x === false)` okuduğu için **"Açık" gösteriyordu** — UI açık, motor kapalı.
+Alt anahtarları açmak da kurtarmıyordu, çünkü master hâlâ `undefined` kalıyordu.
+
+**Neden fark edilmedi:** premium fixture ailesinin tamamı gate'i kendisi
+enjekte ediyordu (`setSettings({premiumAtmosphere:true, …})`). Hiçbir test
+gerçek `migrate()` çıktısını doğrulamadığı için ~70 fixture yeşilken uygulama
+sessizdi. FX-P-70 denetimi bu yüzden hatalı olarak "DEPLOY-A-HAZIR" dedi.
+
+**Onarılanlar:**
+
+1. `app/core/state.js` → `migrate()`'e additive + idempotent FX gate backfill'i.
+   `premiumAtmosphere`/`uiSounds`/`richHaptics` = `true`;
+   `launchRitual`/`voiceGuidance`/`ambientSounds` = `false`;
+   `voiceCloudTts` = `true`, `voiceLocalFallback` = `false` (**karar D4**).
+   Kullanıcının bilinçli kapatma tercihi hiçbir koşulda ezilmez.
+2. `SeyTimeTheme.applySeasonal()` render sonunda bağlandı. FX-P-43 fonksiyonu ve
+   `#root.theme-season-*` CSS'ini yazmış, ancak "app.js değişmedi (yasak liste)"
+   denip bağlama adımı hiç gelmemişti; o CSS ölü duruyordu.
+3. `App.toggleSetting(key, value)` opsiyonel açık değer alıyor. Master switch'in
+   iki segmenti de değersiz toggle çağırdığı için "Kapalı"ya basmak anahtarı
+   açabiliyordu; artık idempotent.
+
+**Yeni koruma:** `tests/app/test_premium_fx_gate_defaults.js` (26/26) — gerçek
+`migrate()` çıktısını gerçek `mediaFx.js`/`timeTheme.js` gövdelerine verip
+ses/titreşim/tema üretildiğini doğrular. Spec kopyası değil, sevk edilen kod.
+
+**Regression:** fail=0 — 7 syntax, driver, zikr 95/95, tüm `tests/app`,
+23 panel, 27 panel-v2, 9 quran, 20 reminder fixture, 3 boundary verifier.
+
 ## Known Blockers
 
-- YOK.
+- **Uygulanmamış FX yüzeyleri (eksik özellik, hata değil):**
+  - `launchRitual` → `#sey-splash` ve `hideSplash()` hiç yazılmadı; ayar bu
+    yüzden varsayılan `false`. `test_premium_launch_splash.js` splash yokluğunu
+    açıkça "placeholder geçerli" sayıyor, dolayısıyla 11/11 PASS görsel uygulama
+    kanıtı değildir.
+  - `SeyFx.ripple` / `SeyFx.enter` / `SeyFx.transition` → motor mevcut, app.js'te
+    çağrı noktası yok (`VISUAL-FX-AUDIT.md` bunu zaten kaydetmişti).
+  - Bunlar ayrı ve açık kapsamlı bir uygulama kartı gerektirir; kullanıcı
+    yönlendirmesi olmadan başlanmaz.
 
 ## Sonraki Adımlar
 

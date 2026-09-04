@@ -67,6 +67,26 @@ metodun kullanıldığı ayrıca yazılır.
 **Sayım:** satır 27/21/2/2 (SeyAudio/SeyHaptics/SeyFx/SeyTimeTheme);
 occurrence 53/42/4/2. Toplam 48 satır, 101 occurrence.
 
+### 4.0-D · Delta kaydı — 2026-09-04 (FX gate onarımı)
+
+Yukarıdaki sayım **ZP-10 sonrası baseline**dır ve tarihsel kayıt olarak
+değiştirilmemiştir. Aynı tarama komutuyla ölçülen **canlı** değerler:
+
+| Yüzey | Baseline (satır/occ) | Canlı (satır/occ) | Fark ve nedeni |
+|---|---|---|---|
+| SeyAudio | 27 / 53 | 24 / 50 | **Bu kartla ilgisiz.** MON-20'de `zikrTickSound` gövdesi `window.SeymaZikr` registry'sine taşındı; içindeki `SeyAudio.tap ×3` app.js'ten çıktı. Baseline MON-20'den önce yazıldığı için kaymıştı. |
+| SeyHaptics | 21 / 42 | 21 / 42 | değişmedi |
+| SeyFx | 2 / 4 | 2 / 4 | değişmedi |
+| SeyTimeTheme | 2 / 2 | 4 / 4 | **Bu kartın deltası:** `SeyTimeTheme.applySeasonal()` çağrısı eklendi (typeof-guard + çağrı). Gerekçe: `app/styles.css`'teki `#root.theme-season-*` blokları yalnızca bu fonksiyonla takılıyor, çağrı hiç yazılmadığı için o CSS ölüydü. |
+
+**Canlı toplam:** 51 satır, 100 occurrence, 13 metot
+(`SeyAudio.guides ×12`, `warning ×10`, `voice ×8`, `success ×8`, `bell ×8`,
+`isQuietTime ×2`, `greeting ×2`; `SeyHaptics.tap ×34`, `streak ×6`, `water ×2`;
+`SeyFx.shimmer ×2`, `countUp ×2`; `SeyTimeTheme.apply ×2`, `applySeasonal ×2`).
+
+I5/I6 etkisi yok: eklenen çağrı `premiumAtmosphere` gating'ini `apply()` ile
+paylaşır, `data` şemasına dokunmaz, `App.*` yüzeyine isim eklemez.
+
 ### 4.1 Sahiplik fonksiyonu bağlama yöntemi
 
 Her çağrı satırı, o satıra kadar son görülen satır-başlangıçlı

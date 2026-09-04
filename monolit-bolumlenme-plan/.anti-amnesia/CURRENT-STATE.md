@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 devam ediyor (MON-20 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 devam ediyor (MON-21 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-20` / `MON-21` |
-| Dalga / ilerleme | 5 devam ediyor (2/7) / 20/60 |
+| Son / sıradaki | `MON-21` / `MON-22` |
+| Dalga / ilerleme | 5 devam ediyor (3/7) / 21/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -29,6 +29,37 @@ state+sync çekirdeğini tüm resolver manifesti ve sentetik no-network kanıtı
 kapattı. MON-19 prayer domain gövdelerini `SeymaPrayer` registry'sine aldı;
 app.js canlı resolver bag'i ve 25 imza-koruyan shim korunurken cache/fetch yalnız
 açık çağrıda çalışır, GPS app.js'te kalır.
+
+## MON-21 kapanışı — zikir görünüm ve hatim yüzeyleri
+
+- Karar/kanıt: [`MON-21-ZIKIR-GORUNUM-DUMP-MANIFESTI.md`](../deliverables/MON-21-ZIKIR-GORUNUM-DUMP-MANIFESTI.md).
+- `app/core/zikir.js:561-990` aynı `SeymaZikr` registry'sinde 16 saf zikir
+  view/helper üreticisini taşır: counter, preset/results, hatim, history,
+  settings, note/manual alt yüzeyleri ve body resolver. Resolver bag'i
+  app.js'teki canlı `ui/content/icon/esc/date/topic/niyet/ring/flash` okurlarına
+  bağlanır; registry load-safe kalır.
+- `app.js:238-261` canlı bag'i, `app.js:13907-13921` 15 imza-koruyan shim'i ve
+  `app.js:13959` body resolver shim'ini
+  taşır. `zikrNoteDraftFor`/`zikrManualDraftFor` mutation gövdeleri
+  `app.js:13923-13938`'de; overlay/focus ve yerinde `zikrPaintView`
+  `app.js:13939-13972`'de app-owned kalır. Inline `onclick`/`oninput` ve modal
+  sözleşmesinde değişiklik yoktur.
+- Parent/current sentetik dump parity: counter `8670` byte / SHA-256
+  `7b5889d77a927463efe0aab16ad76b88384908fee0090a277f0ea4168e6a16a3`,
+  presets `8067` / `dc1a3175dc54733001d67a9b8f147f36569c5827e60e938a446350102dbdef4b`,
+  hatims `1557` / `7eebfdbfe2eafeda2518cc098b3d7f7c74b582d33deaea0eecf6e59bc9851c4d`,
+  history `2207` / `60e0b7cd7cc21a4b21e33f97899103385f23e1d21d34661254883213d03a4755`,
+  settings `2260` / `80dfd44d0225f18e32589f2e36154a08529e507779e80935e23b173bf9d47a26`;
+  her satır önce/sonra eşit ve handler dizisi `29/29`, `29/29`, `4/4`, `1/1`,
+  `7/7` eşittir. Fixture `17/17` PASS.
+- `index.html` yalnız değişen zikir/app assetleri için `zikir.js?v=20260904b`
+  ve `app.js?v=20260904d` cache-bust aldı; production FILES listesine yeni
+  giriş gerekmedi.
+- Syntax, driver, zikr-harness `95/95`, premium audio/haptics/voice ve tam
+  regression kapıları PASS. `sync.js`, Guard 1/2, data, frozen zikir content,
+  render çekirdeği, motor/FX çağrıları, panel, browser/device, remote ve
+  deploy değişmedi. Sonraki sıradaki kart MON-22'dir ve yeni açık kullanıcı
+  yönü olmadan başlatılmaz.
 
 ## MON-20 kapanışı — zikir motoru
 

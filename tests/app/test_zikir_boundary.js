@@ -1,6 +1,6 @@
 'use strict';
 
-// MON-20 · SeymaZikr motor registry sınırı.
+// MON-20/21 · SeymaZikr motor + görünüm registry sınırı.
 // Yalnız sentetik root ve resolverlar kullanır; browser, gerçek localStorage,
 // ağ veya seyma-data yazımı yoktur.
 
@@ -67,7 +67,13 @@ ok('pause motoru aktif oturumu duraklatıyor',!!root.activeSession&&typeof root.
 var appTap=appSource.slice(appSource.indexOf('App.zikrTap=function'),appSource.indexOf('App.zikrUndo=function'));
 ok('guide başlangıç/tamamlanma/yarı-hedef çağrıları app-owned kabukta',appTap.indexOf('guides.zikirStart')>=0&&appTap.indexOf('guides.zikirComplete')>=0&&appTap.indexOf('guides.zikirHalf')>=0);
 ok('streak haptic ve bell çağrıları app-owned kabukta',appTap.indexOf('SeyHaptics.streak')>=0&&appTap.indexOf('SeyAudio.bell')>=0);
-ok('view/render motoru module taşınmamış',appSource.indexOf('function zikrHistoryViewHTML')>=0&&appSource.indexOf('function zikrSettingsViewHTML')>=0&&source.indexOf('zikrHistoryViewHTML')<0&&source.indexOf('zikrSettingsViewHTML')<0);
+ok('view gövdeleri registryde, overlay/paint kabuğu app-owned',
+  typeof z.zikrCounterViewHTML==='function'&&typeof z.zikrPresetsViewHTML==='function'&&
+  typeof z.zikrHatimsViewHTML==='function'&&typeof z.zikrHistoryViewHTML==='function'&&
+  typeof z.zikrSettingsViewHTML==='function'&&
+  /function zikrHistoryViewHTML\(z\)\{ return window\.SeymaZikr\.zikrHistoryViewHTML\.apply\(null,arguments\); \}/.test(appSource)&&
+  /function zikrSettingsViewHTML\(z\)\{ return window\.SeymaZikr\.zikrSettingsViewHTML\.apply\(null,arguments\); \}/.test(appSource)&&
+  /function zikroverlayHTML\(/.test(appSource)&&/function zikrPaintView\(/.test(appSource));
 ok('motor save resolverı explicit manual çağrıda çalışıyor',!!z.zikrManualApply('subhanallah',2,'2026-09-04','boundary')&&saveCalls===1);
 
 console.log('\n=== Özet ===');

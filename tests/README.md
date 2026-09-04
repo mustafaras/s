@@ -33,9 +33,13 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
 - `app/test_prayer_boundary.js` — MON-19 `SeymaPrayer` registry sınırı:
   load-safe expose, canlı state/date resolver, cache hit, explicit mock fetch,
   no-op timer ve normalizer davranışı; gerçek ağ/GPS/browser yoktur.
-- `app/test_zikir_boundary.js` — MON-20 `SeymaZikr` motor/FX/view sınırı:
+- `app/test_zikir_boundary.js` — MON-20 `SeymaZikr` motor/FX sınırı:
   load-safe registry, beş seed, canlı root/tap/pause/manual resolverları,
-  `SeyAudio.tap` guardı ve guide/haptic/view sahipliği; browser ve gerçek ağ yoktur.
+  `SeyAudio.tap` guardı ve guide/haptic sahipliği; browser ve gerçek ağ yoktur.
+- `app/test_zikir_view_boundary.js` — MON-21 görünüm registry sınırı ve
+  sentetik zikir dump parity: 16 view üyesi, app-owned draft mutation,
+  overlay/paint kabuğu, inline handler sayıları ve sabit SHA-256 çıktıları;
+  browser, gerçek ağ ve veri yoktur.
 - `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
   ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
   doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,

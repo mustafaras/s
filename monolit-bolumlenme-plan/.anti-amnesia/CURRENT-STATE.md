@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 4 sürüyor (MON-17 tamamlandı) |
+| Durum | `in_progress` — Dalga 4 tamamlandı (MON-18 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-17` / `MON-18` |
-| Dalga / ilerleme | 4 sürüyor (2/3) / 17/60 |
+| Son / sıradaki | `MON-18` / `MON-19` |
+| Dalga / ilerleme | 4 tamamlandı (3/3) / 18/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -24,8 +24,9 @@ Dokuz `app.js` data atama kaynak satırı (11 token), registryde sıfır gerçek
 app.js'te; `SeymaState` yalnız getter-only canlı okuma sunuyor. `MON-16` syncGlue
 callback sahipliğini app.js'te kilitledi; `MON-17` save gövdesini syncGlue
 registry'sine aldı, app.js shim/callback atamalarını ve schedule sırasını korudu.
-`data`/`ui` ile storage/`SeySync` çağrı anında çözülen resolver'lardır. Sonraki
-kart `MON-18` için yeni açık kullanıcı onayı gerekir.
+`data`/`ui` ile storage/`SeySync` çağrı anında çözülen resolver'lardır. MON-18
+state+sync çekirdeğini tüm resolver manifesti ve sentetik no-network kanıtıyla
+kapattı; sıradaki kart `MON-19` için yeni açık kullanıcı onayı gerekir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı
@@ -59,7 +60,7 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 | `var data=null` | 2772 | M2, app.js sahibi |
 | yükleme / migrate shim | 4555 / 4571 | M2, registry gövdesi + app.js sahibi shim |
 | B1 getter'ları | 4564–4570, yedi getter | canlı bağ köprüsü |
-| `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4571 / 4892 | MON-12 / MON-13..15 yüksek risk |
+| `state migrate` / `getDay` | state.js:47 / state.js:313; app.js shim:4571 / 4892 | MON-12 / MON-13..15 yüksek risk |
 | geçici `data=d` + finally | 6004 | `finally{data=savedData}` zinciri korunur |
 | `SeyOnSyncState` / `SeyOnSynced` | 6134 / 6144 | M3, app.js sahipliği |
 | `save` / `var App` | 6165 / 6308 | MON-17 shim / MON-50..54 |
@@ -67,7 +68,7 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 | import / reset / late-boot data= | canlı grep ile yenilenir | M2prime, app.js'te kalır |
 | `window.App=App` | 17101; atamalar sonra da sürer | I2, erken taşınmaz |
 | `App.x=function` | 553 (ZP-10: 9 ekleme − setZikrPreset yeniden yazım) | baseline, her promptta değişmezlik kanıtı |
-| inline onclick | satır 382 / occurrence 420 / eşsiz 325 | I2 için üç ayrı görünüm ölçüsü |
+| inline onclick | source occurrence 423 / eşsiz handler 326 | I2 için üç ayrı görünüm ölçüsü |
 | FX satır / occurrence | SeyAudio 27/53, SeyHaptics 21/42, SeyFx 2/4, SeyTimeTheme 2/2 | M4, 48 satır tablo MANIFESTI.md §4.2 |
 
 ## MON-02 kapanışı — FX/handler manifesti
@@ -363,8 +364,34 @@ serinin kapsamı değildir.
 - Yerel PASS deploy veya cihaz kabulü değildir. Push, merge, tag, deploy,
   browser, device ve gerçek veri deposu yazımı yapılmadı.
 
+## MON-18 kapanışı — state + syncGlue Dalga 4 no-network raporu
+
+- Kapanış raporu: [`MON-D4-STATE-SYNC-RAPORU.md`](../deliverables/MON-D4-STATE-SYNC-RAPORU.md).
+- Kod değişmedi. Canlı manifest: `migrate` state.js `47-285` (23 function
+  resolver + `caffeineDefaultBed`), `getDay` `313-453` (17 function resolver +
+  `habits`/`windDownSteps` dizileri), `createDefaultData` `477-483` (8
+  resolver), `save` syncGlue `39-70` (11 resolver + `key`). App.js shimleri
+  `4571/4892/6165/6578`, registry kayıtları `4477/4505/4529/4541` olarak
+  canlı kaynakla yeniden ölçüldü.
+- `data=` sahipliği değişmedi: yorum dışı taramada app.js 9 kaynak satırı / 11
+  token; state.js 0 executable atama. `SeyOnSyncState`/`SeyOnSynced` app.js'te
+  `6134/6144`; syncGlue setter/wrapper kurmuyor.
+- No-network: state üçlüsü B1 `0 failure`, B2 `60/60`, B3 `20/20`; state
+  rebind `37/37`, save boundary `19/19`, sync `69/69`, büyük dosya `15/15`;
+  fetch çözülmüyor veya hiç çağrılmıyor, timerlar no-op, sync.js state/app
+  boot fixture'larına yüklenmiyor. Driver PASS, zikr `95/95`; zikr'in dış
+  provenance vakaları açık finite mock ile sınırlıdır, canlı ağ kanıtı değildir.
+- MON-18 fixture değişimi yoktur. MON-S5 gereği yalnız semantik taşıma olsaydı
+  fixture güncellenirdi; mevcut state/save parity ve no-network fixture'ları
+  aynı anlamla yeniden çalıştırıldı. Index cache-bust, production FILES,
+  `sync.js`/Guard hash'i (`89255c22…`) değişmedi.
+- I1-I6 ve M1-M4 farkı yok; açık kalan tek konular canlı sync, browser/device,
+  push/merge/tag/deploy ve gerçek veri deposu yazımıdır. Bunlar bu yerel
+  headless kapanışın sonucu değildir.
+
 ## Sonraki güvenli adım
 
-`MON-18`: Dalga 4 state+sync kapanışı. MON-17 save gövdesi syncGlue'ta,
-callbackler app.js'te ve sync.js/Guard değişmeden tamamlandı. Yeni açık kullanıcı
-onayı gerekir; MON-17 kararı sonraki karta geçiş izni değildir.
+`MON-19`: prayer domain modülü. Dalga 4 `3/3` tamamlandı; state ve syncGlue
+çekirdeği app.js shim/callback sahipliği ve sync.js/Guard değişmeden kapandı.
+Yeni açık kullanıcı onayı gerekir; MON-18 kararı sonraki karta geçiş izni
+değildir.

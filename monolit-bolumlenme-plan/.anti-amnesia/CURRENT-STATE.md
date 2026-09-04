@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 devam ediyor (MON-23 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 devam ediyor (MON-24 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-23` / `MON-24` |
-| Dalga / ilerleme | 5 devam ediyor (5/7) / 23/60 |
+| Son / sıradaki | `MON-24` / `MON-25` |
+| Dalga / ilerleme | 5 devam ediyor (6/7) / 24/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -33,6 +33,41 @@ delivery/response read-only apply gövdelerini `SeymaQuran` registry'sine aldı;
 request/outbox helper shimleri registryye bağlandı, UI handler/render/save
 kabukları app.js'te kaldı. `quranTransportV1`, `sync.js`, panel, workflow,
 Gmail/App Script, data repo ve remote yazma yüzeyleri bu kartta değişmedi.
+
+## MON-24 kapanışı — manevi domainler çapraz regression
+
+- Karar/kanıt: [`MON-D5-MANEVI-DOMAIN-RAPORU.md`](../deliverables/MON-D5-MANEVI-DOMAIN-RAPORU.md).
+- Bu kapanış kartı yalnız kanıt ve durum zinciridir; Prayer, Zikir, Quran ve
+  Saygı kaynaklarında, `app.js`te, fixture semantiğinde veya render/App
+  yüzeyinde değişiklik yapılmadı. Dört registry için yönlü dependency grafiği
+  Saygı → Prayer/Zikir ve Saygı → Quran (app.js kabuğu üzerinden) kenarlarını;
+  önkoşul yükleme sırası ise Prayer → Zikir → Quran → Saygı sırasını kaydeder.
+  Komşu `window.Seyma*` registry nesnesine atama,
+  circular dependency veya load-time DOM/storage/network/timer side-effect
+  bulunmadı. Saygı'nın mevcut additive day/root normalizer çağrıları raporda
+  görünür tutuldu; domain sınırını değiştiren yeni yazım değildir.
+- Aynı seeded driver dump'ında `#zikr-preview-card` `1879` byte /
+  `7aad7c7858bf254fded2cac0a42310dc2a0a67076d994000325eacbfdf3d37eb`,
+  `#quran-journey-card` `1834` byte /
+  `aeb3ac22336660eeab164a6cdb37ed5c4e7337e6eca4274a9d7b3c623dbc94ae` ve
+  `#saygi-preview-card` `2175` byte /
+  `3d2257924c9bdf52d1ee2f9dc5a5042cd4f53381a307484711db67e08ec59a44`
+  ayrıştırıldı. Quran striking-verse başlangıcı random olduğu için Quran
+  değeri tek koşum snapshot'ıdır; deterministik Saygı fixture'ı
+  `1219` byte / `c69bee63eadfd109b8daa51b438e580ea6e88e7339356b21bfd534e0a853cf86`
+  olarak ayrıca korundu.
+- MON-S2 FX manifestine göre canlı app.js ölçümü `SeyAudio/SeyHaptics/SeyFx/
+  SeyTimeTheme` için sırasıyla `24/50`, `21/42`, `2/4`, `2/2` satır/occurrence;
+  yalnız MON-20'nin zikr ses gövdesi aktarımından gelen `SeyAudio -3/-3`
+  farkı vardır. `mediaFx.js`, yeni FX çağrısı ve guard semantiği değişmedi.
+- Kapılar yeniden PASS: Prayer `19/19`, Zikir `17/17`, Quran `20/20`, Saygı
+  `20/20`, modal focus `39/39`, zikr-harness `95/95`, Quran ailesi `512/512`,
+  premium ailesi `249/249`, B1/B2/B3 `0 failure`/`60/60`/`20/20`, driver ve
+  syntax/diff check exit `0`; diğer MON-STATE gate grupları da exit `0`.
+  Cache-bust, production FILES ve yükleme listelerinde etkisi yoktur.
+- Browser/device acceptance, remote push, merge, tag, deploy ve
+  `mustafaras/seyma-data` yazımı yapılmadı. Sıradaki `MON-25`tir; yeni açık
+  kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-23 kapanışı — Saygı domain registry ve modal focus parity
 

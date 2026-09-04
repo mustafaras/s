@@ -17,7 +17,9 @@ import { fileURLToPath } from 'node:url';
 const REPO = process.env.SEYMA_REPO ||
   path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const APP_PATH = path.join(REPO, 'app.js');
+const ZIKIR_PATH = path.join(REPO, 'app/core/zikir.js');
 const appSrc = fs.readFileSync(APP_PATH, 'utf8');
+const zikirSrc = fs.readFileSync(ZIKIR_PATH, 'utf8');
 let failures = 0;
 
 function assert(name, condition) {
@@ -124,12 +126,15 @@ function makeContext() {
 function loadHelper(name) {
   const source = extractFunction(appSrc, name);
   const ctx = makeContext();
+  if (name === 'emptyZikrRoot') {
+    vm.runInContext(zikirSrc, ctx, { filename: 'app/core/zikir.js' });
+  }
   vm.runInContext(`this.__helper = (${source});`, ctx, { filename: `app.js#${name}` });
   return { source, helper: ctx.__helper, ctx };
 }
 
 const EMPTY_HELPERS = [
-  ['emptyZikrRoot', (x) => x && x.schemaVersion === 4 && Array.isArray(x.presets) && x.settings && x.settings.haptic === true],
+  ['emptyZikrRoot', (x) => x && x.schemaVersion === 5 && Array.isArray(x.presets) && x.settings && x.settings.haptic === true],
   ['emptySaygiRoot', (x) => x && x.streak === 0 && x.lastReadDate === '' && x.collection && typeof x.collection === 'object'],
   ['emptyQuranJourney', (x) => x && x.schemaVersion === 1 && x.activeSurahId === 'alak' && x.requests && typeof x.requests === 'object'],
   ['emptyLibrary', (x) => x && Array.isArray(x.books) && x.goal && x.goal.dailyPages === 20],

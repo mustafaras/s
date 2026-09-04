@@ -24,6 +24,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
     'app/core/state.js',
     'app/core/helpers.js',
     'app/core/prayer.js',
+    'app/core/zikir.js',
     'app/core/mediaFx.js',
     'app/core/timeTheme.js'
   ];
@@ -41,7 +42,7 @@ console.log('\n=== Faz -1 — Modülerleştirme Sınır Testleri ===\n');
   var appPath = path.join(repoRoot,'app.js');
   ok('app.js mevcut', fs.existsSync(appPath));
   var lines = fs.readFileSync(appPath,'utf8').split(/\r?\n/);
-  ok('app.js 18.000+ satır (monolit hâlâ var)', lines.length > 18000,
+  ok('app.js 10.000+ satır (monolit hâlâ var)', lines.length > 10000,
     'satır: '+lines.length);
 })();
 
@@ -102,6 +103,9 @@ var expectedNewModules = [
   ok('MON-19 prayer modülü taşınmış ve registry hedefinde',
     fs.existsSync(path.join(repoRoot,'app/core/prayer.js')) &&
     fs.readFileSync(path.join(repoRoot,'app/core/prayer.js'),'utf8').indexOf('window.SeymaPrayer') >= 0);
+  ok('MON-20 zikir modülü taşınmış ve registry hedefinde',
+    fs.existsSync(path.join(repoRoot,'app/core/zikir.js')) &&
+    fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8').indexOf('window.SeymaZikr') >= 0);
 })();
 
 // [5] app.js App.* yüzeyi korunuyor (inline onclick handler referansları)
@@ -223,6 +227,7 @@ var expectedNewModules = [
   vm.runInContext(load('app/core/state.js'), ctx, { filename:'state.js' });
   vm.runInContext(load('app/core/syncGlue.js'), ctx, { filename:'syncGlue.js' });
   vm.runInContext(load('app/core/helpers.js'), ctx, { filename:'helpers.js' });
+  vm.runInContext(load('app/core/zikir.js'), ctx, { filename:'zikir.js' });
   vm.runInContext(load('app/core/mediaFx.js'), ctx, { filename:'mediaFx.js' });
   vm.runInContext(load('app/core/timeTheme.js'), ctx, { filename:'timeTheme.js' });
 
@@ -235,6 +240,8 @@ var expectedNewModules = [
   ok('window.SeyHaptics expose edilmiş', typeof win.SeyHaptics === 'object');
   ok('window.SeyFx expose edilmiş', typeof win.SeyFx === 'object');
   ok('window.SeyTimeTheme expose edilmiş', typeof win.SeyTimeTheme === 'object');
+  ok('window.SeymaZikr expose edilmiş', typeof win.SeymaZikr === 'object');
+  ok('SeymaZikr yüklemede state/DOM/timer çağrısı yok', win.SeymaZikr && win.SeymaZikr.ZIKR_SEED && win.SeymaZikr.ZIKR_SEED.length === 5 && timers.length === 0);
   // B1: Faz -1.1'de data/ui henüz window'da değil → getter undefined
   ok('window.SeymaState.data henüz undefined (B1)', win.SeymaState.data === undefined);
   ok('window.SeymaSave.save henüz kayıtlı değil (B1)', win.SeymaSave.save === undefined);

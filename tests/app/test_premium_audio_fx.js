@@ -234,11 +234,13 @@ console.log('\n[9] AudioContext yoksa graceful no-op');
 console.log('\n[10] app.js SeyAudio çağrı noktaları');
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
-  var tap = appSrc.indexOf('SeyAudio.tap') >= 0;
+  var zikirSrc = fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
+  var fxSrc = appSrc+'\n'+zikirSrc;
+  var tap = fxSrc.indexOf('SeyAudio.tap') >= 0;
   var success = appSrc.indexOf('SeyAudio.success') >= 0;
   var warning = appSrc.indexOf('SeyAudio.warning') >= 0;
   var bell = appSrc.indexOf('SeyAudio.bell') >= 0;
-  ok('app.js SeyAudio.tap çağrı noktası var', tap);
+  ok('Zikirmatik/app SeyAudio.tap çağrı noktası var', tap);
   ok('app.js SeyAudio.success çağrı noktası var', success);
   ok('app.js SeyAudio.warning çağrı noktası var', warning);
   ok('app.js SeyAudio.bell çağrı noktası var', bell);

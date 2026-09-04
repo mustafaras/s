@@ -15,6 +15,7 @@ const STATE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/state.js"), "utf8
 const SYNC_GLUE_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/syncGlue.js"), "utf8");
 const HELPERS_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/helpers.js"), "utf8");
 const PRAYER_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/prayer.js"), "utf8");
+const ZIKIR_SOURCE = fs.readFileSync(path.join(ROOT, "app/core/zikir.js"), "utf8");
 
 function fixtureElement(id, htmlState) {
   const attrs = {};
@@ -119,6 +120,7 @@ function boot({ catalog = true, seed = null } = {}) {
   vm.runInContext(SYNC_GLUE_SOURCE, context, { filename: "app/core/syncGlue.js" });
   vm.runInContext(HELPERS_SOURCE, context, { filename: "app/core/helpers.js" });
   vm.runInContext(PRAYER_SOURCE, context, { filename: "app/core/prayer.js" });
+  vm.runInContext(ZIKIR_SOURCE, context, { filename: "app/core/zikir.js" });
   if (catalog) vm.runInContext(CATALOG_SOURCE, context, { filename: "app/core/reminderCatalog.js" });
   vm.runInContext(APP_SOURCE, context, { filename: "app.js" });
   return { sandbox, app, html: () => htmlState.value, fetchCalls: () => fetchCalls };

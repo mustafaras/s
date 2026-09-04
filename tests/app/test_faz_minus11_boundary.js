@@ -1,5 +1,5 @@
 'use strict';
-// Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, prayer, mediaFx, timeTheme)
+// Faz -1.1 sınır testi: yeni modüller (dateUtils, helpers, prayer, zikir, mediaFx, timeTheme)
 // sadece window.* üzerinde expose edilmiş durumda olmalıydı. MON-07 ile
 // dateUtils'nin on gövdesi ve helpers'ın on iki üyesi app.js'te
 // imza-koruyan shim üzerinden registry sahibi olur.
@@ -21,6 +21,7 @@ var expectedModules = [
   'app/core/dateUtils.js',
   'app/core/helpers.js',
   'app/core/prayer.js',
+  'app/core/zikir.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js'
 ];
@@ -42,10 +43,13 @@ var expectedModules = [
 
 (function(){
   var appSrc = fs.readFileSync(path.join(repoRoot,'app.js'),'utf8');
+  var zikirSrc = fs.readFileSync(path.join(repoRoot,'app/core/zikir.js'),'utf8');
+  var fxSrc = appSrc+'\n'+zikirSrc;
   // FX-P-12..15: SeyAudio artık app.js içinde çağrılıyor (zikr tap, success,
   // warning, bell). "henüz çağrılmıyor" testi kalktı; yerine çağrı noktalarının
   // varlığı ve güvenli wrapper deseni doğrulanır.
-  ok('SeyAudio.tap çağrı noktası var (FX-P-12)', appSrc.indexOf('SeyAudio.tap') >= 0);
+  ok('SeyAudio.tap çağrı noktası var (FX-P-12)', fxSrc.indexOf('SeyAudio.tap') >= 0);
+  ok('zikir tap FX guardı korunuyor (MON-20/M4)', /if\(window\.SeyAudio && typeof window\.SeyAudio\.tap === 'function'\)/.test(zikirSrc));
   ok('SeyAudio.success çağrı noktası var (FX-P-13)', appSrc.indexOf('SeyAudio.success') >= 0);
   ok('SeyAudio.warning çağrı noktası var (FX-P-14)', appSrc.indexOf('SeyAudio.warning') >= 0);
   ok('SeyAudio.bell çağrı noktası var (FX-P-15)', appSrc.indexOf('SeyAudio.bell') >= 0);

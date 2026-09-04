@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 başladı (MON-19 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 devam ediyor (MON-20 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-19` / `MON-20` |
-| Dalga / ilerleme | 5 başladı (1/7) / 19/60 |
+| Son / sıradaki | `MON-20` / `MON-21` |
+| Dalga / ilerleme | 5 devam ediyor (2/7) / 20/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -29,6 +29,25 @@ state+sync çekirdeğini tüm resolver manifesti ve sentetik no-network kanıtı
 kapattı. MON-19 prayer domain gövdelerini `SeymaPrayer` registry'sine aldı;
 app.js canlı resolver bag'i ve 25 imza-koruyan shim korunurken cache/fetch yalnız
 açık çağrıda çalışır, GPS app.js'te kalır.
+
+## MON-20 kapanışı — zikir motoru
+
+- Karar/kanıt: [`MON-20-ZIKIR-MOTOR-ENVANTERI.md`](../deliverables/MON-20-ZIKIR-MOTOR-ENVANTERI.md).
+- `app/core/zikir.js:1-612` `SeymaZikr` registry'si seed, hedef/hatim,
+  oturum, tarihçe/ayar ve manuel motor gövdelerini taşır. app.js'te canlı
+  `data/getDay/tarih/save` bag'i, imza-koruyan shimler, root rebind, render,
+  App handler ve guide/haptic/bell kabuğu kalır; zikir viewleri taşınmaz.
+- `index.html` zikir modülünü prayer'dan sonra `v=20260904a` ile yükler;
+  app cache-bust `v=20260904c` olur. Driver/zikr-harness ve ilgili sentetik
+  fixture FILES listeleri aynı sıraya hizalıdır.
+- Zikir boundary `17/17`, zikr-harness `95/95`, manuel zikir `21/21`,
+  modularization `57/57`, Faz−1.1 `23/23`, premium `26/26`; tam app/panel/
+  Panel-v2/Quran/reminder aileleri exit 0 verdi. `#zikr-preview-card` old/new
+  dump parçası `1879/1879` byte-eşittir; aggregate dump random Qur'an içeriği
+  nedeniyle zikir parity kanıtı olarak kullanılmaz.
+- `sync.js`, Guard 1/2, data, panel, frozen zikir content, browser/device,
+  remote, push, merge, tag ve deploy değişmedi. MON-21 yalnız yeni açık
+  kullanıcı onayıyla başlatılabilir.
 
 **Planlama derinliği:** `UYGULAMA-PROMPTLARI.md`, 60 kısa kabul kartına ek
 olarak 60 çalışma sayfası içerir. Her sayfa kaynak grep'i, sekiz aşamalı

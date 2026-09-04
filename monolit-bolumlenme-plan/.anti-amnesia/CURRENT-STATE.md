@@ -57,7 +57,7 @@ Satır numaraları yalnız yol göstericidir; her taşımada yeniden grep yapıl
 | yükleme / migrate shim | 4539 / 4555 | M2, registry gövdesi + app.js sahibi shim |
 | B1 getter'ları | 4535 civarı, yedi getter | canlı bağ köprüsü |
 | `state migrate` / `getDay` | state.js:46 / state.js:313; app.js shim:4555 / 4876 | MON-12 / MON-13..15 yüksek risk |
-| geçici `data=d` + finally | 5975 | `finally{data=savedData}` zinciri korunur |
+| geçici `data=d` + finally | 5988 | `finally{data=savedData}` zinciri korunur |
 | `SeyOnSyncState` / `SeyOnSynced` | 6118 / 6128 | M3, app.js sahipliği |
 | `save` / `var App` | 6149 / 6319 | MON-16..18 / MON-50..54 |
 | `createDefaultData` / `App.start` | 6589 / 6590 | MON-14 aktarımı / boot sahipliği; MON-15 denetimi |

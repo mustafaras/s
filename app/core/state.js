@@ -456,7 +456,7 @@
   // MON-14 · createDefaultData gövde aktarımı
   // ---------------------------------------------------------------------------
   // Başlangıç root'u registryde üretilir; app.js yalnızca aynı imzayı koruyan
-  // shim'i ve data=migrate(...) kabuk atamalarını taşır. Tarih ve boş-root
+  // shim'i ve root rebind kabuk atamalarını taşır. Tarih ve boş-root
   // üreticileri açık bag ile gelir; registry yüklenirken hiçbir fonksiyon
   // çağrılmaz, localStorage/DOM/ağ erişimi oluşmaz.
   var createDefaultDataDeps=null;

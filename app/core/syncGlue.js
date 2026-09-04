@@ -8,12 +8,12 @@
   // `sync.js` içeriği DEĞİŞMEZ.
   //
   // Yüzey sahipliği:
-  // - `SeyOnSyncState` (6198) ve `SeyOnSynced` (6208) ZATEN `app.js` tarafından
+  // - `SeyOnSyncState` (6118) ve `SeyOnSynced` (6128) ZATEN `app.js` tarafından
   //   `window`'a atanır. Burada yeniden tanımlanmaz — getter-only accessor
-  //   yapılırsa `app.js`'in `"use strict"` IIFE'sindeki `window.SeyOnSynced = ...`
-  //   ataması setter olmadığı için THROW eder ve boot kırılır. Bu yüzden bu
+  //   yapılırsa `app.js`'in `"use strict"` IIFE'sindeki strict-mode ataması
+  //   setter olmadığı için THROW eder ve boot kırılır. Bu yüzden bu
   //   iki yüzey `app.js`'e bırakılır.
-  // - `save()` (6229) closure-scoped'tır, `window`'da değildir. `SeymaSave`
+  // - `save()` (6149) closure-scoped'tır, `window`'da değildir. `SeymaSave`
   //   YENİ bir isimdir (app.js onu atamaz), bu yüzden güvenle getter olarak
   //   tanımlanabilir. `save()` Faz 0'da `window.save` olarak expose edildiğinde
   //   `SeymaSave` getter'ı otomatik olarak gerçek fonksiyonu döndürür; henüz

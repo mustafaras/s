@@ -1,12 +1,14 @@
 # Şeyma — `app.js` Monolit Bölümleme Programı
 
-**Sürüm:** 2.1 · **Tarih:** 2026-09-02 · **Durum:** `in_progress` · **Uygulanan prompt:** 1/60 (`MON-01`)
+**Sürüm:** 2.1 · **Tarih:** 2026-09-04 · **Durum:** `in_progress` · **Uygulanan prompt:** 15/60 (`MON-15`)
 
-Bu klasör, Şeyma'nın 18.957 satırlık `app.js` IIFE monolitini davranışı
+Bu klasör, Şeyma'nın 19.048 satırlık `app.js` IIFE monolitini davranışı
 koruyarak `app/core/*` modüllerine ayırmak için tek planlama otoritesidir. Bu
-bir **kademeli kod uygulama paketidir**: yalnız `MON-01` (baseline + karar)
-tamamlandı; üretim kodu taşınmadı. Sonraki promptlar ayrı ve açık kullanıcı
-onayıyla, sırayla yürür.
+bir **kademeli kod uygulama paketidir**: Dalga 1–3 (`MON-01..MON-15`)
+tamamlandı; `migrate`, `getDay` ve `createDefaultData` state registry'sine
+taşındı, canlı rebind sahipliği app.js'te bırakıldı. Sıradaki `MON-16`
+syncGlue callback sahipliği envanteridir ve yeni açık kullanıcı onayıyla,
+sırayla yürür.
 
 ## Sınır ve otorite
 
@@ -16,7 +18,7 @@ onayıyla, sırayla yürür.
 - 24-hedef-modül haritası `MODULARIZATION.md` v2.1; gerçek iş alanı kanıtı
   `docs/monolit-bolumlenme-haritasi.md`dir. Graphify topluluk etiketi modül
   sınırı değildir.
-- Dal `premium-fx-local` **LOCAL-ONLY**dir. Push, merge, tag, deploy ve
+- Dal `zikirmatik-manuel-zikir` **LOCAL-ONLY**dir. Push, merge, tag, deploy ve
   `mustafaras/seyma-data` yazımı ayrı kullanıcı onayı gerektirir.
 - Tarayıcı, gerçek profil, token, gerçek localStorage ve canlı veri yoktur.
   Doğrulama yalnız `run-seyma` Node/VM harness'leri ve sentetik fixture'lardır.

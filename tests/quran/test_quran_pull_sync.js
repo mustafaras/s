@@ -5,7 +5,8 @@
 // Kapsam (QY-11 doğrulama listesinden birebir):
 //   · cache-busting  — her GET'te `&t=` parametresi var.
 //   · bozuk/eksik    — 404/boş/bozuk JSON asla throw etmez, boş sözleşme döner.
-//   · 200→304        — ETag cache gövdesi korunur; cache'siz 304 başarı sayılmaz.
+//   · 200→304→200     — ETag cache gövdesi korunur; yeni 200 gövdesi cache'i
+//                      tazeler; cache'siz 304 başarı sayılmaz.
 //   · salt-okunur    — hiçbir PUT/POST çağrısı yapılmaz (yalnız GET).
 //   · izolasyon      — localhost'ta bile OKUMA engellenmez (Guard 1 yalnız
 //                      YAZMAya özgüdür; okumak veri kaybı riski taşımaz).
@@ -135,6 +136,12 @@ function run(name, opts) {
     var second = await pullEnv();
     ok('200 sonrası 304 cached body ile güncel sözleşmeyi koruyor', first.err === null && second.err === null && second.result.delivery && second.result.responses);
     ok('304 isteklerinde If-None-Match gönderiliyor', env.calls.slice(2).every(function (x) { return x.opts.headers && x.opts.headers['If-None-Match']; }));
+    byPath.delivery = Object.assign(ghContentBody({ schemaVersion: 1, requests: {
+      qr_abc12345: { status: 'sent', sentAt: '2026-07-31T12:00:00.000Z', providerMessageId: 'm2', error: null }
+    } }), { headers: { get: function () { return '"delivery-v2"'; } } });
+    byPath.responses = Object.assign(ghContentBody({ schemaVersion: 1, responses: {} }), { headers: { get: function () { return '"response-v2"'; } } });
+    var third = await pullEnv();
+    ok('304 sonrası 200 yeni gövdeyi alıp cache etiketini yeniliyor', third.err === null && third.result.delivery.requests.qr_abc12345.status === 'sent' && env.calls[4].opts.headers['If-None-Match'] === '"delivery-v1"' && env.calls[5].opts.headers['If-None-Match'] === '"response-v1"');
   }
   {
     var miss = await run('304-cache-miss', { byPath: { delivery: { status: 304, ok: false }, responses: { status: 304, ok: false } } });

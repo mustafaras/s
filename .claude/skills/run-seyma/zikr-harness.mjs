@@ -150,6 +150,7 @@ const FILES = [
   'app/core/helpers.js',
   'app/core/prayer.js',
   'app/core/zikir.js',
+  'app/core/quran.js',
   'app/core/mediaFx.js',
   'app/core/timeTheme.js',
   'app/core/reminderCatalog.js',

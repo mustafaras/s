@@ -240,24 +240,24 @@ section('10. İdempotens — aynı durumu kendisiyle birleştirmek veri üretmez
   ok(merged.requests.alak.videoHistory.length === 1, 'kendisiyle birleşince video geçmişi çoğalmaz (dedupe çalışıyor)', merged.requests.alak.videoHistory);
 })();
 
-// ── 11. Rütbe tablosu app.js ile sürüklenmemiş (drift denetimi) ────────────
-// sync.js kasıtlı olarak app.js'e bağımlı değil (ayrı modül), bu yüzden
-// QURAN_RANK app.js'te, QURAN_RANK_S sync.js'te AYRI AYRI tanımlı. Bu test
-// ikisinin metinden çıkarılan halinin birebir aynı kaldığını kanıtlar — biri
-// güncellenip diğeri unutulursa (örn. yeni bir durum eklenirse) burada patlar.
-section('11. QURAN_RANK (app.js) ile QURAN_RANK_S (sync.js) sürüklenmemiş');
+// ── 11. Rütbe tablosu quran.js ile sürüklenmemiş (drift denetimi) ──────────
+// sync.js kasıtlı olarak quran.js'e bağımlı değil (ayrı transport/merge modülü),
+// bu yüzden QURAN_RANK quran.js'te, QURAN_RANK_S sync.js'te AYRI tanımlı. Bu
+// test ikisinin metinden çıkarılan halinin birebir aynı kaldığını kanıtlar —
+// biri güncellenip diğeri unutulursa (örn. yeni bir durum eklenirse) patlar.
+section('11. QURAN_RANK (quran.js) ile QURAN_RANK_S (sync.js) sürüklenmemiş');
 (function () {
-  var appSrc = fs.readFileSync(path.join(repoRoot, 'app.js'), 'utf8');
+  var quranSrc = fs.readFileSync(path.join(repoRoot, 'app/core/quran.js'), 'utf8');
   var syncSrc = fs.readFileSync(path.join(repoRoot, 'sync.js'), 'utf8');
-  var appMatch = appSrc.match(/var QURAN_RANK=(\{[^}]*\});/);
+  var quranMatch = quranSrc.match(/var QURAN_RANK=(\{[^}]*\});/);
   var syncMatch = syncSrc.match(/var QURAN_RANK_S=(\{[^}]*\});/);
-  ok(!!appMatch, 'app.js içinde QURAN_RANK bulunuyor');
+  ok(!!quranMatch, 'app/core/quran.js içinde QURAN_RANK bulunuyor');
   ok(!!syncMatch, 'sync.js içinde QURAN_RANK_S bulunuyor');
-  if (appMatch && syncMatch) {
+  if (quranMatch && syncMatch) {
     /* eslint-disable no-eval */
-    var appRank = eval('(' + appMatch[1] + ')');
+    var quranRank = eval('(' + quranMatch[1] + ')');
     var syncRank = eval('(' + syncMatch[1] + ')');
-    ok(JSON.stringify(appRank) === JSON.stringify(syncRank), 'iki tablo birebir aynı — biri güncellenip diğeri unutulmamış', { app: appRank, sync: syncRank });
+    ok(JSON.stringify(quranRank) === JSON.stringify(syncRank), 'iki tablo birebir aynı — biri güncellenip diğeri unutulmamış', { quran: quranRank, sync: syncRank });
   }
 })();
 

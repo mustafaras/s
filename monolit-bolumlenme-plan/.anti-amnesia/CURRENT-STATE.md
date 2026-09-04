@@ -9,10 +9,10 @@
 | Alan | Değer |
 |---|---|
 | Program | `MONOLIT-BOLUMLENME` |
-| Durum | `in_progress` — Dalga 5 devam ediyor (MON-21 tamamlandı) |
+| Durum | `in_progress` — Dalga 5 devam ediyor (MON-22 tamamlandı) |
 | Aktif / bloke | yok / yok |
-| Son / sıradaki | `MON-21` / `MON-22` |
-| Dalga / ilerleme | 5 devam ediyor (3/7) / 21/60 |
+| Son / sıradaki | `MON-22` / `MON-23` |
+| Dalga / ilerleme | 5 devam ediyor (4/7) / 22/60 |
 | Dal | `zikirmatik-manuel-zikir` (ZP-10 HEAD) — LOCAL-ONLY |
 | Güncellendi | 2026-09-04 |
 
@@ -28,7 +28,45 @@ registry'sine aldı, app.js shim/callback atamalarını ve schedule sırasını 
 state+sync çekirdeğini tüm resolver manifesti ve sentetik no-network kanıtıyla
 kapattı. MON-19 prayer domain gövdelerini `SeymaPrayer` registry'sine aldı;
 app.js canlı resolver bag'i ve 25 imza-koruyan shim korunurken cache/fetch yalnız
-açık çağrıda çalışır, GPS app.js'te kalır.
+açık çağrıda çalışır, GPS app.js'te kalır. MON-22 quran state machine ve
+delivery/response read-only apply gövdelerini `SeymaQuran` registry'sine aldı;
+request/outbox helper shimleri registryye bağlandı, UI handler/render/save
+kabukları app.js'te kaldı. `quranTransportV1`, `sync.js`, panel, workflow,
+Gmail/App Script, data repo ve remote yazma yüzeyleri bu kartta değişmedi.
+
+## MON-22 kapanışı — Kur'an domain registry ve idempotent uzak apply
+
+- Karar/kanıt: [`MON-22-QURAN-DOMAIN-ENVANTERI.md`](../deliverables/MON-22-QURAN-DOMAIN-ENVANTERI.md).
+- [`app/core/quran.js:1-363`](../../app/core/quran.js) `SeymaQuran` registry'si
+  şema/normalizer, durum rank/transition/reducer, requestId üretimi, outbox
+  writer/error label ve read-only delivery/response apply üyelerini taşır.
+  `registerQuran` yalnız canlı `data` resolver kabul eder; yüklemede DOM,
+  storage, timer veya ağ çalıştırmaz.
+- [`app.js:272-312`](../../app.js) sabitleri ve imza-koruyan quran shimlerini,
+  [`app.js:13913-13922`](../../app.js) katalog/UI okuma yardımcılarını,
+  [`app.js:14570-14817`](../../app.js) save/render ve `App.*` handler kabuğunu
+  korur. `quranRandomVerseStart` yalnız UI başlangıç durumudur; kalıcı state'e
+  yazılmaz. Uzak apply reducer üzerinden monotonic/idempotent çalışır; `save`
+  veya fetch çağrısı registry içinde yoktur.
+- Yükleme/FILES paritesi [`index.html:55-75`](../../index.html),
+  [`driver.mjs:227-260`](../../.claude/skills/run-seyma/driver.mjs) ve
+  [`zikr-harness.mjs:134-161`](../../.claude/skills/run-seyma/zikr-harness.mjs)
+  içinde `zikir → quran → mediaFx` sırasındadır. Yeni asset
+  `app/core/quran.js?v=20260904a`; app cache-bust `v=20260904e` oldu. Quran
+  boot eden reminder fixture'ları da aynı dosyayı yükler.
+- Yeni [`test_quran_boundary.js`](../../tests/app/test_quran_boundary.js)
+  `20/20` ile requestId/sûre normalize, reducer akışı, live resolver,
+  read-only apply ve app shim/UI kabuğunu doğrular. Quran ailesinin 9 fixture'ı
+  toplam `512` assertion ile PASS: a11y `66/66`, catalog `70/70`, demo `9/9`,
+  merge `38/38`, outbox `55/55`, panel parity `9/9`, pull `17/17`, striking
+  verses `41/41`, transport `207/207`. Pull fixture'ı `200 → 304 → 200`,
+  cache-miss 304 ve hata sınırlarını; merge/outbox fixture'ları duplicate
+  request/response davranışını kanıtlar.
+- Syntax, driver, zikr-harness `95/95`, Faz10 sync `69/69`, app/panel/
+  Panel-v2/reminder regression aileleri ve `git diff --check` exit `0` verdi.
+  Browser/device, deploy, push, merge, tag, workflow, Gmail/App Script,
+  `mustafaras/seyma-data` ve başka remote yazımı yapılmadı. Başarılı kapanıştan
+  sonra sıradaki `MON-23` olup yeni açık kullanıcı yönü olmadan başlatılmaz.
 
 ## MON-21 kapanışı — zikir görünüm ve hatim yüzeyleri
 

@@ -40,6 +40,10 @@ runtime’ına yüklenmez; `repo-root.js` sayesinde root’tan veya `tests/` iç
   sentetik zikir dump parity: 16 view üyesi, app-owned draft mutation,
   overlay/paint kabuğu, inline handler sayıları ve sabit SHA-256 çıktıları;
   browser, gerçek ağ ve veri yoktur.
+- `app/test_quran_boundary.js` — MON-22 `SeymaQuran` registry sınırı:
+  requestId/sûre normalizasyonu, reducer geçişleri, outbox çözümleyicisi,
+  read-only delivery/response apply idempotensi, 200→304→200 tekrar sınırı
+  ve app.js shim/UI kabuğu; browser, gerçek ağ ve veri yoktur.
 - `app/test_zikr_manual_entry.js` — ZP-10 · Manuel zikir girişi (elle sayım)
   ağırlıklı ağsız sentetik fixture: sheet aç/kapa, gün/perPreset/lifetime işleme,
   doğrulama (0/negatif/ondalıklı/sınır), Esmâ hedef kırpma + tamamlanma engeli,

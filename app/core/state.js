@@ -281,7 +281,11 @@
     if(d.settings.voiceGuidance==null) d.settings.voiceGuidance=false;
     if(d.settings.ambientSounds==null) d.settings.ambientSounds=false;
     if(d.settings.richHaptics==null) d.settings.richHaptics=true;
-    if(d.settings.launchRitual==null) d.settings.launchRitual=true;
+    // FX-P-55: launchRitual opt-in'dir (splash her açılışta görünür). migrate()
+    // ile aynı varsayılan (false) kullanılır — yeni kullanıcı splash'i yalnız
+    // açıkça isterse görür; mevcut kullanıcıların aniden splash görmesi sürpriz
+    // olmaz. Splash uygulandı (index.html #sey-splash + app.js hideSplash).
+    if(d.settings.launchRitual==null) d.settings.launchRitual=false;
     // FX-P-52/56 (Faz 5): sesli rehberlik state alanları — additive backfill,
     // idempotent. Yalnızca settings.* altına eklenir; data şekli değişmez (I1/I3).
     if(d.settings.voiceOnboardedAt==null) d.settings.voiceOnboardedAt='';

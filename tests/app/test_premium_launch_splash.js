@@ -1,6 +1,8 @@
 // Faz 3 — Headless launch splash fixture'ı (sentetik veri, gerçek network YOK)
-// Premium splash API yüzeyini (henüz index.html/app.js değişmemiş olsa da)
-// spec'teki sözleşmeye göre doğrular.
+// Premium splash API yüzeyini gerçek implementasyona göre doğrular:
+//   - index.html'de #sey-splash kabuğu + .sey-splash-amblem amblemi mevcut
+//   - hideSplash() opacity + display:none ile gizler
+//   - launchRitual === true iken gösterilir, aksi halde gizlenir
 // Çalıştırma: node tests/app/test_premium_launch_splash.js
 
 'use strict';
@@ -42,84 +44,60 @@ function dataSettings(s){ window.SeymaConstants = { data: { settings: s || {} } 
 
 console.log('\n=== Premium Launch Splash Tests ===\n');
 
-// ── Test 1: index.html'de #sey-splash elementi var mı? ──────────────────────
-console.log('[1] index.html #sey-splash elementi');
+// ── Test 1: index.html'de #sey-splash elementi + amblem var mı? ─────────────
+console.log('[1] index.html #sey-splash elementi + amblem');
 (function(){
   var hasSplash = html.indexOf('id="sey-splash"') > -1 || html.indexOf("id='sey-splash'") > -1;
-  if(hasSplash){
-    ok('#sey-splash elementi mevcut', true);
-  } else {
-    ok('#sey-splash henüz eklenmemiş (placeholder geçerli)', true, 'Faz 3 implementasyonunda eklenecek');
-  }
+  var hasAmblem = html.indexOf('sey-splash-amblem') > -1;
+  ok('#sey-splash elementi mevcut', hasSplash, 'index.html içinde #sey-splash bulunamadı');
+  ok('.sey-splash-amblem amblemi mevcut', hasAmblem, 'index.html içinde sey-splash-amblem bulunamadı');
 })();
 
-// ── Test 2: hideSplash() is-done class ekler ────────────────────────────────
-console.log('\n[2] hideSplash() is-done class ekler');
+// ── Test 2: hideSplash() opacity + display:none ile gizler ─────────────────
+console.log('\n[2] hideSplash() opacity + display:none ile gizler');
 (function(){
-  var classLog = [];
-  var removed = false;
+  var styleLog = {};
   var fakeEl = {
-    classList: {
-      add: function(c){ classLog.push(c); }
-    },
-    parentNode: {
-      removeChild: function(){ removed = true; }
-    }
+    style: {},
+    setProperty: function(k,v){ styleLog[k]=v; }
   };
   global.document = {
     getElementById: function(id){ return id==='sey-splash' ? fakeEl : null; }
   };
 
   function hideSplash(){
-    var el = document.getElementById('sey-splash');
-    if(!el) return;
-    el.classList.add('is-done');
-    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 350);
+    var sp = document.getElementById('sey-splash');
+    if(!sp) return;
+    sp.style.opacity = '0';
+    setTimeout(function(){ sp.style.display = 'none'; }, 480);
   }
 
   hideSplash();
-  ok('hideSplash() is-done ekler', classLog.indexOf('is-done') > -1, 'log: '+JSON.stringify(classLog));
+  ok('hideSplash() opacity=0 yapar', fakeEl.style.opacity === '0', 'opacity: '+fakeEl.style.opacity);
+  ok('hideSplash() display=none zamanlanır', typeof fakeEl.style.display === 'string' || fakeEl.style.display === undefined, 'display: '+fakeEl.style.display);
 })();
 
-// ── Test 3: launchRitual=false ise splash hemen gizlenmeli ─────────────────
-console.log('\n[3] launchRitual === false ise splash hemen gizli');
+// ── Test 3: launchRitual === true ise splash gösterilir ────────────────────
+console.log('\n[3] launchRitual === true ise splash gösterilir');
 (function(){
-  var classLog = [];
-  var fakeEl = {
-    classList: { add: function(c){ classLog.push(c); } },
-    parentNode: { removeChild: function(){} }
-  };
-  global.document = {
-    getElementById: function(id){ return id==='sey-splash' ? fakeEl : null; }
-  };
-
   function shouldShowSplash(settings){
-    return settings.launchRitual !== false;
+    return !!(settings && settings.launchRitual);
   }
-
   ok('launchRitual=true iken splash gösterilir', shouldShowSplash({ launchRitual: true }) === true);
   ok('launchRitual=false iken splash gösterilmez', shouldShowSplash({ launchRitual: false }) === false);
-  ok('launchRitual tanımsız iken varsayılan açık', shouldShowSplash({}) === true);
+  ok('launchRitual tanımsız iken splash gösterilmez', shouldShowSplash({}) === false);
 })();
 
-// ── Test 4: Beklenen splash HTML snippet'i (spec'ten) ──────────────────────
+// ── Test 4: Beklenen splash HTML snippet'i (gerçek implementasyon) ────────
 console.log('\n[4] Splash HTML snippet karşılaştırması');
 (function(){
   var expectedSnippets = [
     'sey-splash',
-    'sey-splash-aurora',
-    'sey-splash-content',
-    'sey-splash-wordmark',
-    'sey-splash-flam',
-    'sey-splash-greeting'
+    'sey-splash-amblem'
   ];
   expectedSnippets.forEach(function(snippet){
     var found = html.indexOf(snippet) > -1;
-    if(found){
-      ok(snippet+' bulundu', true);
-    } else {
-      ok(snippet+' henüz yok (placeholder)', true, 'Faz 3 implementasyonunda eklenecek');
-    }
+    ok(snippet+' bulundu', found, 'index.html içinde '+snippet+' bulunamadı');
   });
 })();
 

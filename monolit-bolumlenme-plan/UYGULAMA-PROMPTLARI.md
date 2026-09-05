@@ -21,16 +21,16 @@ taşır. Yerel commit push/merge/deploy yetkisi vermez.
 
 ## Ortak sözleşme S1–S8
 
-| Sözleşme | Bağlayıcı kural |
-|---|---|
-| S1 — Ön koşul | Önceki prompt tamamdır, state zinciri tutarlıdır, canlı çıpalar ölçülmüştür. |
-| S2 — I1–I6 | data, App yüzeyi, migrate, render grafiği, sync Guard 1/2 korunur; bir prompt bir geri alınabilir yerel commit'tir. |
-| S3 — M1–M4 | app.js imza-koruyan delegeyi tutar; data/ui/dark ve dokuz atama app.js'tedir; sync callbackleri app.js sahibidir; FX korunur. |
-| S4 — Veri güvenliği | Tarayıcı/gerçek profil/token/canlı localStorage yoktur; seyma-data yazılmaz; yalnız Node/VM ve sentetik fixture kullanılır. |
-| S5 — Load güvenliği | Yeni IIFE yüklemede DOM, ağ, timer callbacki veya başka modül verisi okumaz; yalnız registry kurar. |
-| S6 — Kanıt | Önce/sonra grep sayımları, hedef fixture ve driver dump karşılaştırması kayda geçer; PASS olmayan kart commit edilmez. |
-| S7 — Yükleme | Her yeni app/core dosyası indexte reminderDelivery sonrası/SW inline öncesi, cache-bust ve iki harness FILES dizisinde aynı committe yer alır. |
-| S8 — Handoff | State + CURRENT-STATE + append-only LEDGER aynı committe güncellenir; sapma/red/risk yazılır. |
+| Sözleşme             | Bağlayıcı kural                                                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1 — Ön koşul       | Önceki prompt tamamdır, state zinciri tutarlıdır, canlı çıpalar ölçülmüştür.                                                           |
+| S2 — I1–I6           | data, App yüzeyi, migrate, render grafiği, sync Guard 1/2 korunur; bir prompt bir geri alınabilir yerel commit'tir.                              |
+| S3 — M1–M4           | app.js imza-koruyan delegeyi tutar; data/ui/dark ve dokuz atama app.js'tedir; sync callbackleri app.js sahibidir; FX korunur.                       |
+| S4 — Veri güvenliği | Tarayıcı/gerçek profil/token/canlı localStorage yoktur; seyma-data yazılmaz; yalnız Node/VM ve sentetik fixture kullanılır.                 |
+| S5 — Load güvenliği | Yeni IIFE yüklemede DOM, ağ, timer callbacki veya başka modül verisi okumaz; yalnız registry kurar.                                            |
+| S6 — Kanıt           | Önce/sonra grep sayımları, hedef fixture ve driver dump karşılaştırması kayda geçer; PASS olmayan kart commit edilmez.                     |
+| S7 — Yükleme         | Her yeni app/core dosyası indexte reminderDelivery sonrası/SW inline öncesi, cache-bust ve iki harness FILES dizisinde aynı committe yer alır. |
+| S8 — Handoff          | State + CURRENT-STATE + append-only LEDGER aynı committe güncellenir; sapma/red/risk yazılır.                                                   |
 
 ### Kırmızı çizgiler MON-K1…K8
 
@@ -49,7 +49,7 @@ Taşınan çağrılabilir gövde için app.js imza-koruyan shim bırakır:
 
     function example(a, b){ return window.SeymaExample.example.apply(null, arguments); }
 
-Registry window.Seyma<Module>dir; app.js öncesi yüklenir ve yalnız fonksiyon
+Registry window.Seyma<Module></module>dir; app.js öncesi yüklenir ve yalnız fonksiyon
 isimlerini kurar. Fonksiyon adı/imzası, this ve return korunur. Closure state
 gerektiğinde modül yalnız B1 getterdan okur; mutasyon/rebind/app-owned handler
 ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yazar.
@@ -64,20 +64,20 @@ ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yaza
 
 ## Dalga haritası
 
-| Dalga | Promptlar | Risk | Ayrı onay |
-|---|---|---|---|
-| 1 | MON-01..MON-06 | kanıt/karar | evet |
-| 2 | MON-07..MON-10 | saf çekirdek | evet |
-| 3 | MON-11..MON-15 | mutable state | evet |
-| 4 | MON-16..MON-18 | sync köprüsü | evet |
-| 5 | MON-19..MON-25 | manevi domain | evet |
-| 6 | MON-26..MON-32 | bakım/terapi | evet |
-| 7 | MON-33..MON-39 | arşiv/analiz/ayar | evet |
-| 8 | MON-40..MON-43 | reminder/mesaj | evet |
-| 9 | MON-44..MON-49 | render | evet |
-| 10 | MON-50..MON-54 | App/boot | evet |
-| 11 | MON-55..MON-57 | geçiş/regression | evet |
-| 12 | MON-58..MON-60 | dokümantasyon/kapanış | evet |
+| Dalga | Promptlar      | Risk                     | Ayrı onay |
+| ----- | -------------- | ------------------------ | ---------- |
+| 1     | MON-01..MON-06 | kanıt/karar             | evet       |
+| 2     | MON-07..MON-10 | saf çekirdek            | evet       |
+| 3     | MON-11..MON-15 | mutable state            | evet       |
+| 4     | MON-16..MON-18 | sync köprüsü          | evet       |
+| 5     | MON-19..MON-25 | manevi domain            | evet       |
+| 6     | MON-26..MON-32 | bakım/terapi            | evet       |
+| 7     | MON-33..MON-39 | arşiv/analiz/ayar       | evet       |
+| 8     | MON-40..MON-43 | reminder/mesaj           | evet       |
+| 9     | MON-44..MON-49 | render                   | evet       |
+| 10    | MON-50..MON-54 | App/boot                 | evet       |
+| 11    | MON-55..MON-57 | geçiş/regression       | evet       |
+| 12    | MON-58..MON-60 | dokümantasyon/kapanış | evet       |
 
 ## MON-01 · Soğuk başlangıç, baseline ve MON-S1 kararı
 
@@ -91,7 +91,7 @@ ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yaza
 
 **Yasaklar:** app.js, index.html, harness, test veya production kodu değişmez.
 
-**Delege / registry erişimi:** Henüz registry yok; karar §M1 imza-koruyan Seyma<Module> standardını kilitler.
+**Delege / registry erişimi:** Henüz registry yok; karar §M1 imza-koruyan Seyma<Module></module> standardını kilitler.
 
 **Doğrulama:** wc -l app.js = 18957; B1 getter rg sonucu 7; App function sayımı 545; JSON parse ve git diff --check PASS.
 
@@ -131,7 +131,7 @@ ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yaza
 
 **Yasaklar:** Yeni dosya veya script tag ekleme.
 
-**Delege / registry erişimi:** window.Seyma<Module>; shim return window.Seyma<Module>.x.apply(null, arguments).
+**Delege / registry erişimi:** window.Seyma<Module></module>; shim return window.Seyma<Module></module>.x.apply(null, arguments).
 
 **Doğrulama:** Matris 24 benzersiz hedef içerir; index core sırası kaynakla karşılaştırılır; git diff --check PASS.
 
@@ -1279,7 +1279,6 @@ ince kabukta kalır. Karar net değilse durulur ve deliverable seçenekleri yaza
 
 **Halt ve LEDGER protokolü:** Her prompt/kanıt eksikse status completed yapılmaz; blockedPrompt=MON-60. Başarısız/eksik kanıtı append-only LEDGERa yaz; stateyi gerçeğe göre blocked yap; kullanıcı yönü olmadan sonraki karta geçme.
 
-
 ## Uygulama çalışma sayfaları — ayrıntılı yürütme standardı
 
 Aşağıdaki 60 sayfa, katalog kartlarının kısa kabul ifadelerini yürütülebilir
@@ -1295,33 +1294,33 @@ ana MON kartlarının sayısal sırasıyla bire birdir. Ajan, ilgili karttan son
 aynı numaralı çalışma sayfasını arar; fiziksel sayfa konumu sıra atlamaya izin
 vermez.
 
-| Dalga | Çalışma sayfaları |
-|---|---|
-| 1 | MON-01, MON-02, MON-03, MON-04, MON-05, MON-06 |
-| 2 | MON-07, MON-08, MON-09, MON-10 |
-| 3 | MON-11, MON-12, MON-13, MON-14, MON-15 |
-| 4 | MON-16, MON-17, MON-18 |
-| 5 | MON-19, MON-20, MON-21, MON-22, MON-23, MON-24, MON-25 |
-| 6 | MON-26, MON-27, MON-28, MON-29, MON-30, MON-31, MON-32 |
-| 7 | MON-33, MON-34, MON-35, MON-36, MON-37, MON-38, MON-39 |
-| 8 | MON-40, MON-41, MON-42, MON-43 |
-| 9 | MON-44, MON-45, MON-46, MON-47, MON-48, MON-49 |
-| 10 | MON-50, MON-51, MON-52, MON-53, MON-54 |
-| 11 | MON-55, MON-56, MON-57 |
-| 12 | MON-58, MON-59, MON-60 |
+| Dalga | Çalışma sayfaları                                  |
+| ----- | ------------------------------------------------------ |
+| 1     | MON-01, MON-02, MON-03, MON-04, MON-05, MON-06         |
+| 2     | MON-07, MON-08, MON-09, MON-10                         |
+| 3     | MON-11, MON-12, MON-13, MON-14, MON-15                 |
+| 4     | MON-16, MON-17, MON-18                                 |
+| 5     | MON-19, MON-20, MON-21, MON-22, MON-23, MON-24, MON-25 |
+| 6     | MON-26, MON-27, MON-28, MON-29, MON-30, MON-31, MON-32 |
+| 7     | MON-33, MON-34, MON-35, MON-36, MON-37, MON-38, MON-39 |
+| 8     | MON-40, MON-41, MON-42, MON-43                         |
+| 9     | MON-44, MON-45, MON-46, MON-47, MON-48, MON-49         |
+| 10    | MON-50, MON-51, MON-52, MON-53, MON-54                 |
+| 11    | MON-55, MON-56, MON-57                                 |
+| 12    | MON-58, MON-59, MON-60                                 |
 
 ### Çalışma sayfası MON-10 — helpers etkileşim
 
 Bu çalışma sayfası üstteki MON-10 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-09 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | saf çekirdek |
-| Kaynaklar | app.js 6417,6437,6448; helpers/mediaFx |
-| Çıktı / kanıt dosyası | MON-D2-CEKIRDEK-RAPORU.md |
-| İzinli değişim | app.js shim + registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-09 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | saf çekirdek                                                                                       |
+| Kaynaklar                  | app.js 6417,6437,6448; helpers/mediaFx                                                              |
+| Çıktı / kanıt dosyası | MON-D2-CEKIRDEK-RAPORU.md                                                                           |
+| İzinli değişim          | app.js shim + registry                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1379,13 +1378,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-11 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-10 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js state bölümü, B1 getters, state fixturelar |
-| Çıktı / kanıt dosyası | MON-S6-STATE-MUTASYON-KARARI.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-10 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js state bölümü, B1 getters, state fixturelar                                                |
+| Çıktı / kanıt dosyası | MON-S6-STATE-MUTASYON-KARARI.md                                                                     |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1443,13 +1442,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-12 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-11 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js 4431, state.js, migrate fixture |
-| Çıktı / kanıt dosyası | migrate before-after sentetik JSON manifesti |
-| İzinli değişim | app.js shim + state registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-11 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js 4431, state.js, migrate fixture                                                              |
+| Çıktı / kanıt dosyası | migrate before-after sentetik JSON manifesti                                                        |
+| İzinli değişim          | app.js shim + state registry                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1507,13 +1506,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-13 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-12 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js 4964 ve çağırdığı empty* fonksiyonları |
-| Çıktı / kanıt dosyası | getDay normalizasyon tablosu |
-| İzinli değişim | app.js shim + state registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-12 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js 4964 ve çağırdığı empty* fonksiyonları                                                |
+| Çıktı / kanıt dosyası | getDay normalizasyon tablosu                                                                        |
+| İzinli değişim          | app.js shim + state registry                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1571,13 +1570,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-14 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-13 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js 6726, start/late boot pathleri |
-| Çıktı / kanıt dosyası | default-root snapshot manifesti |
-| İzinli değişim | app.js shim + state registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-13 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js 6726, start/late boot pathleri                                                               |
+| Çıktı / kanıt dosyası | default-root snapshot manifesti                                                                     |
+| İzinli değişim          | app.js shim + state registry                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1635,13 +1634,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-15 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-14 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | state.js, app.js dokuz rebind, verify-state dosyaları |
-| Çıktı / kanıt dosyası | MON-D3-STATE-RAPORU.md |
-| İzinli değişim | yalnız state/fixture/ledger |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-14 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | state.js, app.js dokuz rebind, verify-state dosyaları                                              |
+| Çıktı / kanıt dosyası | MON-D3-STATE-RAPORU.md                                                                              |
+| İzinli değişim          | yalnız state/fixture/ledger                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1699,13 +1698,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-16 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-15 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js sync callbacks/save, syncGlue.js, sync.js |
-| Çıktı / kanıt dosyası | MON-S7-SYNCGLUE-KARARI.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-15 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js sync callbacks/save, syncGlue.js, sync.js                                                    |
+| Çıktı / kanıt dosyası | MON-S7-SYNCGLUE-KARARI.md                                                                           |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1763,13 +1762,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-17 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-16 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | app.js 6271 save, syncGlue.js, header save paths |
-| Çıktı / kanıt dosyası | save sequence manifesti |
-| İzinli değişim | app.js save shim + syncGlue registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-16 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | app.js 6271 save, syncGlue.js, header save paths                                                    |
+| Çıktı / kanıt dosyası | save sequence manifesti                                                                             |
+| İzinli değişim          | app.js save shim + syncGlue registry                                                                |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1827,13 +1826,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-18 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-17 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | state-senkron |
-| Kaynaklar | state/syncGlue delilleri |
-| Çıktı / kanıt dosyası | MON-D4-STATE-SYNC-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-17 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | state-senkron                                                                                       |
+| Kaynaklar                  | state/syncGlue delilleri                                                                            |
+| Çıktı / kanıt dosyası | MON-D4-STATE-SYNC-RAPORU.md                                                                         |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1891,13 +1890,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-19 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-18 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | prayer fonksiyonları, constants/dateUtils/state |
-| Çıktı / kanıt dosyası | prayer function inventory |
-| İzinli değişim | prayer registry + app.js shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-18 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | prayer fonksiyonları, constants/dateUtils/state                                                    |
+| Çıktı / kanıt dosyası | prayer function inventory                                                                           |
+| İzinli değişim          | prayer registry + app.js shim                                                                       |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -1955,13 +1954,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-20 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-19 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | ZIKR_SEED, zikr motor, mediaFx |
-| Çıktı / kanıt dosyası | zikir motor inventory |
-| İzinli değişim | zikir registry + app.js shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-19 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | ZIKR_SEED, zikr motor, mediaFx                                                                      |
+| Çıktı / kanıt dosyası | zikir motor inventory                                                                               |
+| İzinli değişim          | zikir registry + app.js shim                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2019,13 +2018,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-21 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-20 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | zikir viewleri, content/esma |
-| Çıktı / kanıt dosyası | zikir dump manifesti |
-| İzinli değişim | zikir registry + app.js shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-20 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | zikir viewleri, content/esma                                                                        |
+| Çıktı / kanıt dosyası | zikir dump manifesti                                                                                |
+| İzinli değişim          | zikir registry + app.js shim                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2083,13 +2082,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-22 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-21 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | quran app helpers, quranTransportV1, Quran tests |
-| Çıktı / kanıt dosyası | quran state-machine inventory |
-| İzinli değişim | quran registry + app.js shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-21 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | quran app helpers, quranTransportV1, Quran tests                                                    |
+| Çıktı / kanıt dosyası | quran state-machine inventory                                                                       |
+| İzinli değişim          | quran registry + app.js shim                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2147,13 +2146,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-23 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-22 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | saygi, hijri, qibla, prayer/library interfaces |
-| Çıktı / kanıt dosyası | saygi modal/focus manifesti |
-| İzinli değişim | saygi registry + app.js shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-22 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | saygi, hijri, qibla, prayer/library interfaces                                                      |
+| Çıktı / kanıt dosyası | saygi modal/focus manifesti                                                                         |
+| İzinli değişim          | saygi registry + app.js shim                                                                        |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2211,13 +2210,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-24 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-23 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | prayer/zikir/quran/saygi registryleri |
-| Çıktı / kanıt dosyası | MON-D5-MANEVI-DOMAIN-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-23 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | prayer/zikir/quran/saygi registryleri                                                               |
+| Çıktı / kanıt dosyası | MON-D5-MANEVI-DOMAIN-RAPORU.md                                                                      |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2275,13 +2274,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-25 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-24 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | Dalga 5 tüm kanıtları |
-| Çıktı / kanıt dosyası | MON-D5-ACCEPTANCE.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-24 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | Dalga 5 tüm kanıtları                                                                            |
+| Çıktı / kanıt dosyası | MON-D5-ACCEPTANCE.md                                                                                |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2339,13 +2338,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-26 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-25 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | roomOverlay/roomBody/motivation content |
-| Çıktı / kanıt dosyası | motivation function+focus inventory |
-| İzinli değişim | motivation registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-25 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | roomOverlay/roomBody/motivation content                                                             |
+| Çıktı / kanıt dosyası | motivation function+focus inventory                                                                 |
+| İzinli değişim          | motivation registry + shim                                                                          |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2403,13 +2402,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-27 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-26 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | CRISES/craving/openCrisis |
-| Çıktı / kanıt dosyası | crisis safety-copy manifesti |
-| İzinli değişim | crisis registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-26 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | CRISES/craving/openCrisis                                                                           |
+| Çıktı / kanıt dosyası | crisis safety-copy manifesti                                                                        |
+| İzinli değişim          | crisis registry + shim                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2467,13 +2466,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-28 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-27 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | journal helper/modal/save |
-| Çıktı / kanıt dosyası | journal state transition table |
-| İzinli değişim | journal registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-27 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | journal helper/modal/save                                                                           |
+| Çıktı / kanıt dosyası | journal state transition table                                                                      |
+| İzinli değişim          | journal registry + shim                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2531,13 +2530,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-29 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-28 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | health calculations/default helpers |
-| Çıktı / kanıt dosyası | health calculation vectors |
-| İzinli değişim | health registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-28 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | health calculations/default helpers                                                                 |
+| Çıktı / kanıt dosyası | health calculation vectors                                                                          |
+| İzinli değişim          | health registry + shim                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2595,13 +2594,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-30 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-29 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | health cards/saglikHTML dependencies |
-| Çıktı / kanıt dosyası | saglik dump manifesti |
-| İzinli değişim | health registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-29 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | health cards/saglikHTML dependencies                                                                |
+| Çıktı / kanıt dosyası | saglik dump manifesti                                                                               |
+| İzinli değişim          | health registry + shim                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2659,13 +2658,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-31 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-30 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | health + migrate/getDay/panel missing paths |
-| Çıktı / kanıt dosyası | MON-D6-HEALTH-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-30 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | health + migrate/getDay/panel missing paths                                                         |
+| Çıktı / kanıt dosyası | MON-D6-HEALTH-RAPORU.md                                                                             |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2723,13 +2722,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-32 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-31 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | motivation/crisis/journal/health |
-| Çıktı / kanıt dosyası | MON-D6-TERAPI-BAKIM-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-31 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | motivation/crisis/journal/health                                                                    |
+| Çıktı / kanıt dosyası | MON-D6-TERAPI-BAKIM-RAPORU.md                                                                       |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2787,13 +2786,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-33 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-32 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | reading/watching/listening/learning/soul archive |
-| Çıktı / kanıt dosyası | library archive identity manifesti |
-| İzinli değişim | library registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-32 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | reading/watching/listening/learning/soul archive                                                    |
+| Çıktı / kanıt dosyası | library archive identity manifesti                                                                  |
+| İzinli değişim          | library registry + shim                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2851,13 +2850,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-34 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-33 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | report helpers/raporHTML |
-| Çıktı / kanıt dosyası | report metric vector manifesti |
-| İzinli değişim | report registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-33 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | report helpers/raporHTML                                                                            |
+| Çıktı / kanıt dosyası | report metric vector manifesti                                                                      |
+| İzinli değişim          | report registry + shim                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2915,13 +2914,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-35 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-34 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | harita/location/weather |
-| Çıktı / kanıt dosyası | map load-side-effect manifesti |
-| İzinli değişim | map registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-34 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | harita/location/weather                                                                             |
+| Çıktı / kanıt dosyası | map load-side-effect manifesti                                                                      |
+| İzinli değişim          | map registry + shim                                                                                 |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -2979,13 +2978,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-36 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-35 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | profile assessment UI/content/sync boundary |
-| Çıktı / kanıt dosyası | profile consent/progress manifesti |
-| İzinli değişim | profile registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-35 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | profile assessment UI/content/sync boundary                                                         |
+| Çıktı / kanıt dosyası | profile consent/progress manifesti                                                                  |
+| İzinli değişim          | profile registry + shim                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3043,13 +3042,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-37 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-36 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | ayarlarHTML and FX/prayer/hijri toggles |
-| Çıktı / kanıt dosyası | settings render/handler boundary table |
-| İzinli değişim | settings registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-36 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | ayarlarHTML and FX/prayer/hijri toggles                                                             |
+| Çıktı / kanıt dosyası | settings render/handler boundary table                                                              |
+| İzinli değişim          | settings registry + shim                                                                            |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3107,13 +3106,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-38 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-37 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | library/report/map/profile/settings |
-| Çıktı / kanıt dosyası | MON-D7-ANALIZ-ARSIV-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-37 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | library/report/map/profile/settings                                                                 |
+| Çıktı / kanıt dosyası | MON-D7-ANALIZ-ARSIV-RAPORU.md                                                                       |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3171,13 +3170,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-39 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-38 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | all 15 domain registries |
-| Çıktı / kanıt dosyası | MON-D7-DOMAIN-ENVANTERI.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-38 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | all 15 domain registries                                                                            |
+| Çıktı / kanıt dosyası | MON-D7-DOMAIN-ENVANTERI.md                                                                          |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3235,13 +3234,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-40 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-39 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | reminder docs/state/approval + app runtime |
-| Çıktı / kanıt dosyası | reminder runtime inventory |
-| İzinli değişim | reminders registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-39 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | reminder docs/state/approval + app runtime                                                          |
+| Çıktı / kanıt dosyası | reminder runtime inventory                                                                          |
+| İzinli değişim          | reminders registry + shim                                                                           |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3299,13 +3298,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-41 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-40 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | Reminder Center UI/catalog/focus |
-| Çıktı / kanıt dosyası | reminder UI privacy manifest |
-| İzinli değişim | reminders registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-40 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | Reminder Center UI/catalog/focus                                                                    |
+| Çıktı / kanıt dosyası | reminder UI privacy manifest                                                                        |
+| İzinli değişim          | reminders registry + shim                                                                           |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3363,13 +3362,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-42 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-41 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | mesajHTML/bubble/expand/scroll |
-| Çıktı / kanıt dosyası | messaging chronology manifest |
-| İzinli değişim | messaging registry + shim |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-41 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | mesajHTML/bubble/expand/scroll                                                                      |
+| Çıktı / kanıt dosyası | messaging chronology manifest                                                                       |
+| İzinli değişim          | messaging registry + shim                                                                           |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3427,13 +3426,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-43 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-42 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | domain |
-| Kaynaklar | reminders/messaging evidence |
-| Çıktı / kanıt dosyası | MON-D8-REMINDER-MESAJ-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-42 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | domain                                                                                              |
+| Kaynaklar                  | reminders/messaging evidence                                                                        |
+| Çıktı / kanıt dosyası | MON-D8-REMINDER-MESAJ-RAPORU.md                                                                     |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3491,13 +3490,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-44 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-43 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | onboardingHTML/bugunHTML/render consumers |
-| Çıktı / kanıt dosyası | onboarding/bugun dump manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-43 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | onboardingHTML/bugunHTML/render consumers                                                           |
+| Çıktı / kanıt dosyası | onboarding/bugun dump manifesti                                                                     |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3555,13 +3554,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-45 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-44 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | saglikHTML/raporHTML/haritaHTML |
-| Çıktı / kanıt dosyası | three-tab dump manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-44 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | saglikHTML/raporHTML/haritaHTML                                                                     |
+| Çıktı / kanıt dosyası | three-tab dump manifesti                                                                            |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3619,13 +3618,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-46 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-45 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | saygiHTML and therapy entry |
-| Çıktı / kanıt dosyası | spiritual/therapy focus manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-45 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | saygiHTML and therapy entry                                                                         |
+| Çıktı / kanıt dosyası | spiritual/therapy focus manifesti                                                                   |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3683,13 +3682,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-47 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-46 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | library/settings/mesaj render entries |
-| Çıktı / kanıt dosyası | three-tab dump/handler manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-46 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | library/settings/mesaj render entries                                                               |
+| Çıktı / kanıt dosyası | three-tab dump/handler manifesti                                                                    |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3747,13 +3746,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-48 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-47 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | appHeaderHTML/navHTML/overlay shells |
-| Çıktı / kanıt dosyası | shell keyboard manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-47 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | appHeaderHTML/navHTML/overlay shells                                                                |
+| Çıktı / kanıt dosyası | shell keyboard manifesti                                                                            |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3811,13 +3810,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-49 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-48 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | modalsHTML/render/SeyTimeTheme |
-| Çıktı / kanıt dosyası | render call-graph manifesti |
-| İzinli değişim | render registry + shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-48 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | modalsHTML/render/SeyTimeTheme                                                                      |
+| Çıktı / kanıt dosyası | render call-graph manifesti                                                                         |
+| İzinli değişim          | render registry + shims                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3875,13 +3874,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-50 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-49 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | App daily handlers |
-| Çıktı / kanıt dosyası | daily App handler map |
-| İzinli değişim | appSurface registry + App shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-49 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | App daily handlers                                                                                  |
+| Çıktı / kanıt dosyası | daily App handler map                                                                               |
+| İzinli değişim          | appSurface registry + App shims                                                                     |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -3939,13 +3938,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-51 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-50 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | App domain handlers |
-| Çıktı / kanıt dosyası | domain App handler map |
-| İzinli değişim | appSurface registry + App shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-50 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | App domain handlers                                                                                 |
+| Çıktı / kanıt dosyası | domain App handler map                                                                              |
+| İzinli değişim          | appSurface registry + App shims                                                                     |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4003,13 +4002,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-52 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-51 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | overlay/archive/settings/message App handlers |
-| Çıktı / kanıt dosyası | overlay lifecycle handler map |
-| İzinli değişim | appSurface registry + App shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-51 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | overlay/archive/settings/message App handlers                                                       |
+| Çıktı / kanıt dosyası | overlay lifecycle handler map                                                                       |
+| İzinli değişim          | appSurface registry + App shims                                                                     |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4067,13 +4066,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-53 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-52 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | timer/listener/foreground logic |
-| Çıktı / kanıt dosyası | timer/listener ownership manifest |
-| İzinli değişim | appSurface registry + app.js registrations |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-52 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | timer/listener/foreground logic                                                                     |
+| Çıktı / kanıt dosyası | timer/listener ownership manifest                                                                   |
+| İzinli değişim          | appSurface registry + app.js registrations                                                          |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4131,13 +4130,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-54 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-53 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | birleştirme |
-| Kaynaklar | boot/window.App/late guard |
-| Çıktı / kanıt dosyası | boot order manifest |
-| İzinli değişim | appSurface registry + app.js expose/boot shims |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-53 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | birleştirme                                                                                        |
+| Kaynaklar                  | boot/window.App/late guard                                                                          |
+| Çıktı / kanıt dosyası | boot order manifest                                                                                 |
+| İzinli değişim          | appSurface registry + app.js expose/boot shims                                                      |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4195,13 +4194,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-55 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-54 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | index.html and both harness FILES |
-| Çıktı / kanıt dosyası | MON-D11-LOAD-SIRASI-RAPORU.md |
-| İzinli değişim | index/harness only |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-54 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | index.html and both harness FILES                                                                   |
+| Çıktı / kanıt dosyası | MON-D11-LOAD-SIRASI-RAPORU.md                                                                       |
+| İzinli değişim          | index/harness only                                                                                  |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4259,13 +4258,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-56 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-55 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | all core registries and app.js shims |
-| Çıktı / kanıt dosyası | MON-D11-DELEGE-ENVANTERI.md |
-| İzinli değişim | no code except missing documentation test if needed |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-55 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | all core registries and app.js shims                                                                |
+| Çıktı / kanıt dosyası | MON-D11-DELEGE-ENVANTERI.md                                                                         |
+| İzinli değişim          | no code except missing documentation test if needed                                                 |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4323,13 +4322,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-57 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-56 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | all committed safe fixtures |
-| Çıktı / kanıt dosyası | MON-D11-TAM-REGRESSION-RAPORU.md |
-| İzinli değişim | no code |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-56 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | all committed safe fixtures                                                                         |
+| Çıktı / kanıt dosyası | MON-D11-TAM-REGRESSION-RAPORU.md                                                                    |
+| İzinli değişim          | no code                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4387,13 +4386,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-58 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-57 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | roadmap/readme/current state |
-| Çıktı / kanıt dosyası | docs synchronization checklist |
-| İzinli değişim | docs only |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-57 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | roadmap/readme/current state                                                                        |
+| Çıktı / kanıt dosyası | docs synchronization checklist                                                                      |
+| İzinli değişim          | docs only                                                                                           |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4451,13 +4450,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-59 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-58 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | all MON-S documents/state/ledger |
-| Çıktı / kanıt dosyası | MON-KARAR-KONSOLIDASYONU.md |
-| İzinli değişim | docs only |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-58 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | all MON-S documents/state/ledger                                                                    |
+| Çıktı / kanıt dosyası | MON-KARAR-KONSOLIDASYONU.md                                                                         |
+| İzinli değişim          | docs only                                                                                           |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4515,13 +4514,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-60 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-59 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | kapanış |
-| Kaynaklar | all program documents and regression report |
-| Çıktı / kanıt dosyası | MON-SERI-KAPANIS-BELGESI.md |
-| İzinli değişim | docs/state only |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-59 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | kapanış                                                                                           |
+| Kaynaklar                  | all program documents and regression report                                                         |
+| Çıktı / kanıt dosyası | MON-SERI-KAPANIS-BELGESI.md                                                                         |
+| İzinli değişim          | docs/state only                                                                                     |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4579,13 +4578,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-01 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | yok tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | app.js, index.html, driver.mjs, zikr-harness.mjs, state/LEDGER |
-| Çıktı / kanıt dosyası | MON-S1-DELEGASYON-KARARI.md |
-| İzinli değişim | kod yok; yalnız kaynak çizelgesi |
+| Alan                       | Operasyonel cevap                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| Ön koşul                 | yok tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | karar/kanıt                                                                                     |
+| Kaynaklar                  | app.js, index.html, driver.mjs, zikr-harness.mjs, state/LEDGER                                   |
+| Çıktı / kanıt dosyası | MON-S1-DELEGASYON-KARARI.md                                                                      |
+| İzinli değişim          | kod yok; yalnız kaynak çizelgesi                                                               |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4643,13 +4642,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-02 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-01 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | app.js, Premium FX fixture ailesi |
-| Çıktı / kanıt dosyası | MON-S2-FX-HANDLER-MANIFESTI.md |
-| İzinli değişim | kod yok; FX satırları yalnız okunur |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-01 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | karar/kanıt                                                                                        |
+| Kaynaklar                  | app.js, Premium FX fixture ailesi                                                                   |
+| Çıktı / kanıt dosyası | MON-S2-FX-HANDLER-MANIFESTI.md                                                                      |
+| İzinli değişim          | kod yok; FX satırları yalnız okunur                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4707,13 +4706,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-03 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-02 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | MODULARIZATION.md, monolit haritası, index.html |
-| Çıktı / kanıt dosyası | MON-S3-MODUL-SAHIPLIK-MATRISI.md |
-| İzinli değişim | kod yok; hedefler 24 satır |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-02 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | karar/kanıt                                                                                        |
+| Kaynaklar                  | MODULARIZATION.md, monolit haritası, index.html                                                    |
+| Çıktı / kanıt dosyası | MON-S3-MODUL-SAHIPLIK-MATRISI.md                                                                    |
+| İzinli değişim          | kod yok; hedefler 24 satır                                                                         |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4771,13 +4770,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-04 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-03 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | index.html, driver.mjs, zikr-harness.mjs |
-| Çıktı / kanıt dosyası | MON-S4-HARNESS-PARITE-KARARI.md |
-| İzinli değişim | yalnız FILES ve load-order kanıtı |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-03 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | karar/kanıt                                                                                        |
+| Kaynaklar                  | index.html, driver.mjs, zikr-harness.mjs                                                            |
+| Çıktı / kanıt dosyası | MON-S4-HARNESS-PARITE-KARARI.md                                                                     |
+| İzinli değişim          | yalnız FILES ve load-order kanıtı                                                                |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4835,13 +4834,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-05 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-04 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | tests/app/test_modularization_boundary.js, test_faz_minus11_boundary.js, test_date_utils_boundary.js, test_helpers_boundary.js |
-| Çıktı / kanıt dosyası | MON-S5-FIXTURE-GECIS-MATRISI.md |
-| İzinli değişim | kod/fixture değişmez |
+| Alan                       | Operasyonel cevap                                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Ön koşul                 | MON-04 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı.                            |
+| Sınıf                    | karar/kanıt                                                                                                                   |
+| Kaynaklar                  | tests/app/test_modularization_boundary.js, test_faz_minus11_boundary.js, test_date_utils_boundary.js, test_helpers_boundary.js |
+| Çıktı / kanıt dosyası | MON-S5-FIXTURE-GECIS-MATRISI.md                                                                                                |
+| İzinli değişim          | kod/fixture değişmez                                                                                                         |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4899,13 +4898,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-06 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-05 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | karar/kanıt |
-| Kaynaklar | MON-S1..S5, state zinciri |
-| Çıktı / kanıt dosyası | MON-D1-ON-UCUS-RAPORU.md |
-| İzinli değişim | kod yok |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-05 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | karar/kanıt                                                                                        |
+| Kaynaklar                  | MON-S1..S5, state zinciri                                                                           |
+| Çıktı / kanıt dosyası | MON-D1-ON-UCUS-RAPORU.md                                                                            |
+| İzinli değişim          | kod yok                                                                                             |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -4963,13 +4962,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-07 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-06 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | saf çekirdek |
-| Kaynaklar | app.js 4768–4773, app/core/dateUtils.js, index.html, iki harness |
-| Çıktı / kanıt dosyası | yeni deliverable yok; kartın ledger kaydı |
-| İzinli değişim | app.js shim + dateUtils gövdesi |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-06 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | saf çekirdek                                                                                       |
+| Kaynaklar                  | app.js 4768–4773, app/core/dateUtils.js, index.html, iki harness                                   |
+| Çıktı / kanıt dosyası | yeni deliverable yok; kartın ledger kaydı                                                         |
+| İzinli değişim          | app.js shim + dateUtils gövdesi                                                                    |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -5027,13 +5026,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-08 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-07 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | saf çekirdek |
-| Kaynaklar | app.js 4774–4780, 6230; dateUtils/state |
-| Çıktı / kanıt dosyası | yeni deliverable yok |
-| İzinli değişim | app.js shim + registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-07 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | saf çekirdek                                                                                       |
+| Kaynaklar                  | app.js 4774–4780, 6230; dateUtils/state                                                            |
+| Çıktı / kanıt dosyası | yeni deliverable yok                                                                                |
+| İzinli değişim          | app.js shim + registry                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır
@@ -5091,13 +5090,13 @@ cache-bust ve gerekiyorsa fixture tek yerel committe bulunur.
 Bu çalışma sayfası üstteki MON-09 kartının ayrılmaz parçasıdır; kartın dokuz
 zorunlu alanını uygulama sırasına, kaynak çıpasına ve kanıt paketine açar.
 
-| Alan | Operasyonel cevap |
-|---|---|
-| Ön koşul | MON-08 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
-| Sınıf | saf çekirdek |
-| Kaynaklar | app.js 6107–6111, 6195; helpers |
-| Çıktı / kanıt dosyası | HTML-dump delil eki |
-| İzinli değişim | app.js shim + registry |
+| Alan                       | Operasyonel cevap                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Ön koşul                 | MON-08 tamamlanmış, state zinciri tutarlı, ilgili olmayan dirty dosyalar dokunulmamış olmalı. |
+| Sınıf                    | saf çekirdek                                                                                       |
+| Kaynaklar                  | app.js 6107–6111, 6195; helpers                                                                    |
+| Çıktı / kanıt dosyası | HTML-dump delil eki                                                                                 |
+| İzinli değişim          | app.js shim + registry                                                                              |
 
 **1. Envanter ve baseline.** İlk önce şu sorguyu çalıştır ve sonuçtaki her
 fonksiyon/atama/çağrı noktasını aktif LEDGER satırına sayı + dosya + satır

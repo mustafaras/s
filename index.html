@@ -20,6 +20,16 @@
        timeTheme.js root'a `theme-aurora` sınıfı ekler; kapalıyken katman
        tamamen görünmez. Emoji/dekorasyon yok; pointer-events kapalı. -->
   <div id="sey-aurora" aria-hidden="true"></div>
+  <!-- FX-P-55: Açılış ritüeli kabuğu. `launchRitual` açıkken app.js boot'ta
+       görünür tutar, kısa animasyon sonrası hideSplash() ile gizler; kapalıyken
+       anında gizlenir. Emoji yerine premium CSS amblem kullanılır. -->
+  <div id="sey-splash" aria-hidden="true" style="position:absolute;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .45s ease;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <div class="sey-splash-amblem" role="img" aria-label="Şeyma"></div>
+      <div style="font-size:var(--f-title2);font-weight:800;color:var(--text);letter-spacing:.02em;">Şeyma</div>
+      <div style="font-size:var(--f-footnote);color:var(--text2);">Günışığına hoş geldin</div>
+    </div>
+  </div>
 </div>
 <script>
 /* AD-31-FIX-2: ilk boyamadan ÖNCE temayı çöz.
@@ -57,7 +67,7 @@
 <script src="app/content/zikirCoreContentV1.js?v=20260730p"></script>
 <script src="app/core/constants.js?v=20260824a"></script>
 <script src="app/core/dateUtils.js?v=20260903b"></script>
-<script src="app/core/state.js?v=20260904a"></script>
+<script src="app/core/state.js?v=20260905a"></script>
 <script src="app/core/syncGlue.js?v=20260904a"></script>
 <script src="app/core/helpers.js?v=20260903b"></script>
 <script src="app/core/prayer.js?v=20260904a"></script>
@@ -76,7 +86,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script src="panel/panelCoverageManifest.js?v=20260820d"></script>
-<script src="app.js?v=20260904g"></script>
+<script src="app.js?v=20260905a"></script>
 <script src="sync.js?v=20260902a"></script>
 </body>
 </html>

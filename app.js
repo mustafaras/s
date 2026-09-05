@@ -5859,13 +5859,27 @@ App.start=function(){
     }
   }catch(e){}
 };
-App.go=function(id){
+App.go=function(id,event){
   // İY-B: İlham & İbadet hub'ına her GERÇEK girişte (başka sekmeden gelince —
   // aynı sekmedeyken tetiklenen alakasız re-render'larda DEĞİL) Kur'an
   // Yolculuğu kartının âyet vitrini bir sonrakine geçer.
   if(id==='saygi'&&ui.tab!=='saygi'&&typeof quranAdvanceVerseIndex==='function') quranAdvanceVerseIndex();
   if(id==='mesaj'&&ui.tab!=='mesaj') ui.aeonScrollBottom=true;
+  var tabChanged = ui.tab !== id;
   ui.tab=id; render(); var sc=document.querySelector('[data-scroll]'); if(sc&&id!=='mesaj') sc.scrollTop=0; tryLocNudge('tab');
+  // FX-P-32/37 bağlantısı: gerçek sekme geçişinde kartlara staggered fade-in
+  // (enter) + tab içeriğine yumuşak transition uygula. `ripple` yalnız event
+  // geçilirse (dokunma noktası) çalışır; mevcut onclick'ler event geçmediği
+  // için güvenle atlanır. Tümü SeyFx gating'ine (premiumAtmosphere +
+  // reduced-motion) tabidir.
+  if(tabChanged && window.SeyFx){
+    if(typeof window.SeyFx.enter==='function') window.SeyFx.enter('#app .surface, #app .card, #app .bento', 40);
+    if(typeof window.SeyFx.transition==='function'){
+      var appEl=document.getElementById('app');
+      if(appEl) window.SeyFx.transition(appEl, 'opacity', 180);
+    }
+    if(event && typeof window.SeyFx.ripple==='function') window.SeyFx.ripple(event);
+  }
 };
 
 // ── REM-05 Reminder Center: yalnız ephemeral shell durumu ──
@@ -7463,9 +7477,28 @@ App.onIntention=function(el){ var v=el.value; debounceSave('intention',function(
 App.toggleHaptic=function(on){ if(!data.settings) data.settings={}; data.settings.haptics=!!on; if(on) haptic(18); save(); render(); };
 // FX-P-57: sesli rehberlik ayar handler'ları — yalnız mevcut settings.* alanlarını
 // yönetir; data şekli değişmez (I1). Konuşma hızı 0.75–1.5 aralığına kelepçelenir.
-App.setVoiceGuidance=function(on){ if(!data.settings) data.settings={}; data.settings.voiceGuidance=!!on; save(); render(); };
+App.setVoiceGuidance=function(on){
+  if(!data.settings) data.settings={};
+  data.settings.voiceGuidance=!!on;
+  // FX-P-57 sessiz-fail bildirimi: kullanıcı sesli rehberliği açtığında bulut
+  // TTS açık ama OpenAI anahtarı yoksa, sesin neden çıkmayacağını nazikçe
+  // söyle (yerel sese düşüş kapalı — D4). Tek seferlik, rahatsız etmez.
+  if(on && data.settings.voiceCloudTts && !(data.settings.openaiKey&&String(data.settings.openaiKey).trim())){
+    toast('Sesli rehberlik için Ayarlar → OpenAI anahtarı gerekli');
+  }
+  save(); render();
+};
 App.setVoiceLang=function(lang){ if(['tr-TR','en-US','ar-SA'].indexOf(lang)<0) return; if(!data.settings) data.settings={}; data.settings.voiceLang=lang; save(); render(); };
 App.setVoiceRate=function(rate){ var v=Number(rate); if(isNaN(v)) return; v=Math.max(0.75,Math.min(1.5,v)); if(!data.settings) data.settings={}; data.settings.voiceRate=v; var lbl=document.getElementById('voice-rate-val'); if(lbl) lbl.textContent=(v===1?'1x':v+'x'); save(false); };
+// FX-P-57: bulut TTS sinirsel ses seçimi. OpenAI gpt-4o-mini-tts'in desteklediği
+// 13 ses; yalnız beyaz listeli değerleri kabul eder (I1: data şekli değişmez).
+App.setVoiceCloudVoice=function(voice){
+  var allowed=['alloy','ash','ballad','coral','echo','fable','juniper','marble','nova','onyx','sage','shimmer','verse'];
+  if(allowed.indexOf(voice)<0) return;
+  if(!data.settings) data.settings={};
+  data.settings.voiceCloudVoice=voice;
+  save(); render();
+};
 // FX-P-61: Premium FX boolean alanları için ortak toggle. Yalnız beyaz listeli
 // settings.* anahtarlarını çevirir; data şekli değişmez (I1), App.* yüzeyine
 // EKLEME (I2 uyumlu). Master switch kapatıldığında alt FX'ler gating'te otomatik
@@ -7478,6 +7511,30 @@ App.toggleSetting=function(key,value){
   // Tek düğmeli alt satırlar `value` geçmez ve eskisi gibi çevirmeye devam eder.
   data.settings[key]=(value===undefined)?!data.settings[key]:!!value;
   if(window.SeyHaptics&&typeof window.SeyHaptics.tap==='function'&&data.settings.premiumAtmosphere) window.SeyHaptics.tap();
+  // FX-P-53 bağlantısı: ambiyans toggle'ı çevrildiğinde motoru başlat/durdur.
+  // `ambient.start()` kendi gating'ini (premiumAtmosphere + ambientSounds +
+  // quiet-time + voiceBusy) uygular; burada yalnızca çağrı noktası sağlanır.
+  if(key==='ambientSounds'){
+    var amb=window.SeyAudio&&window.SeyAudio.ambient;
+    if(amb){
+      if(data.settings.ambientSounds) amb.start('rain');
+      else amb.stop();
+    }
+  }
+  // FX-P-55: launchRitual açıldığında splash'i anında göster (kullanıcıya
+  // özelliğin canlı olduğunu hissettir); kapatıldığında gizle.
+  if(key==='launchRitual'){
+    var sp=document.getElementById('sey-splash');
+    if(sp){
+      if(data.settings.launchRitual){
+        sp.style.display='flex';
+        sp.style.opacity='1';
+        setTimeout(hideSplash, 900);
+      } else {
+        sp.style.display='none';
+      }
+    }
+  }
   save();
   render();
 };
@@ -12490,6 +12547,13 @@ function ayarlarHTML(){
   [['tr-TR','Türkçe'],['en-US','English'],['ar-SA','العربية']].forEach(function(o){ h+='<option value="'+o[0]+'"'+(vLang===o[0]?' selected':'')+'>'+o[1]+'</option>'; });
   h+='</select></div>';
   h+='<div style="display:flex;align-items:center;gap:10px;"><label for="sey-voice-rate" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Hız</label><input id="sey-voice-rate" type="range" min="0.75" max="1.5" step="0.25" value="'+vRate+'" oninput="App.setVoiceRate(this.value)" style="flex:1;accent-color:var(--accent-ink);"><span id="voice-rate-val" style="font-size:var(--f-caption1);font-weight:800;color:var(--text);min-width:44px;text-align:right;font-variant-numeric:tabular-nums;">'+vRate.toFixed(2).replace(/0$/,'').replace(/\.$/,'')+'x</span></div>';
+  // FX-P-57: bulut TTS sinirsel ses seçici. Yalnız voiceCloudTts açıkken anlamlı;
+  // yine de her zaman gösterilir (kullanıcı sesi sonradan açabilir). Emoji yok.
+  var vVoice=(data.settings&&data.settings.voiceCloudVoice)||'shimmer';
+  var voiceNames={alloy:'Alloy',ash:'Ash',ballad:'Ballad',coral:'Coral',echo:'Echo',fable:'Fable',juniper:'Juniper',marble:'Marble',nova:'Nova',onyx:'Onyx',sage:'Sage',shimmer:'Shimmer',verse:'Verse'};
+  h+='<div style="display:flex;align-items:center;gap:10px;"><label for="sey-voice-cloud" style="font-size:var(--f-footnote);color:var(--text2);flex-shrink:0;">Ses</label><select id="sey-voice-cloud" onchange="App.setVoiceCloudVoice(this.value)" style="flex:1;border:1px solid var(--field-bd);background:var(--field);border-radius:12px;padding:10px;font-size:var(--f-footnote);outline:none;color:var(--text);">';
+  ['alloy','ash','ballad','coral','echo','fable','juniper','marble','nova','onyx','sage','shimmer','verse'].forEach(function(v){ h+='<option value="'+v+'"'+(vVoice===v?' selected':'')+'>'+(voiceNames[v]||v)+'</option>'; });
+  h+='</select></div>';
   h+='</div>';
   // D vitamini takviyesi — 20 Temmuz 2026 Pazartesi itibarıyla D₃K₂ damla.
   h+='<div class="surface" style="border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;"><div style="font-size:var(--f-subhead);font-weight:700;display:flex;align-items:center;gap:6px;">'+icon('sun',15)+' D vitamini takviyesi</div><div style="font-size:var(--f-footnote);color:var(--text2);line-height:1.5;">20 Temmuz 2026 Pazartesi’den itibaren yeni forma geçiyoruz.</div>';
@@ -15569,6 +15633,10 @@ function updateLiveSession(){
 }
 function finalizeSession(){
   flushFieldTimers();
+  // FX-P-53: sekme kapanırken/gizlenirken ambiyans sesini durdur (arka planda
+  // ses çalmasın). `ambient.stop()` güvenli no-op'tur; motor yoksa sessizce geçer.
+  var amb=window.SeyAudio&&window.SeyAudio.ambient;
+  if(amb&&typeof amb.stop==='function') amb.stop();
   if(!data || sessionState.closed) return;
   var today=todayStr();
   var rec=getDay(data,today,diffDays(data.startDate,today));
@@ -17328,6 +17396,25 @@ if(data){ reminderSchedulerDispatch('boot'); }
 if(data){ save(false); } // migrate() sonrası oluşan arşiv backfill'ini timestamp değiştirmeden kalıcılaştır
 setTimeout(maybeVoiceGreeting,2200); // FX-P-56: açılış selamlaması (gecikmeli — speech engine boot'u için)
 setTimeout(replayAnswerPopup,900); // açılışta: önceki oturumda inmiş yanıtları popup yap + "görüldü" işaretle
+
+// FX-P-55: Açılış ritüeli — `launchRitual` açıkken splash'i kısa animasyonla
+// göster, sonra hideSplash() ile gizle; kapalıyken anında gizle. Emoji yok;
+// premium CSS amblem (index.html #sey-splash). Reduced-motion'da anında gizle.
+function hideSplash(){
+  var sp=document.getElementById('sey-splash');
+  if(!sp) return;
+  sp.style.opacity='0';
+  setTimeout(function(){ sp.style.display='none'; }, 480);
+}
+(function(){
+  var sp=document.getElementById('sey-splash');
+  if(!sp) return;
+  var on=!!(data&&data.settings&&data.settings.launchRitual);
+  var reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!on||reduced){ sp.style.display='none'; return; }
+  // Kısa ritüel: 900ms görünür, sonra fade-out.
+  setTimeout(hideSplash, 900);
+})();
 
 // ÆON permission yalnızca mevcut banner üzerindeki açık kullanıcı eyleminden
 // sonra istenir; boot sırasında sessiz permission loop çalıştırılmaz.

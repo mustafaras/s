@@ -1705,8 +1705,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sey-enter, .sey-enter * {
     animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1 !important;    transform: none !important;
   }
 }
 
@@ -1761,4 +1760,41 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* FX-P-55: Açılış ritüeli — premium CSS amblem (emoji yok). `launchRitual`
+   açıkken boot'ta görünür; hideSplash() ile fade-out + gizleme. */
+.sey-splash-amblem {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  position: relative;
+  background:
+    radial-gradient(circle at 30% 28%, color-mix(in srgb, var(--accent-ink, #E8A87C) 22%, transparent), transparent 60%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent, #F2B8A0) 26%, var(--bg)) 0%, var(--bg) 100%);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--accent, #F2B8A0) 22%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--accent, #F2B8A0) 18%, transparent);
+  animation: sey-splash-breathe 1.6s ease-in-out infinite;
+}
+.sey-splash-amblem::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent, #F2B8A0), var(--accent-ink, #E8A87C));
+  opacity: .9;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-ink, #E8A87C) 30%, transparent);
+}
+.sey-splash-amblem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  background: radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--accent, #F2B8A0) 30%, transparent), transparent 70%);
+}
+@keyframes sey-splash-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+#root[data-theme="dark"] .sey-splash-amblem {
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--accent, #F2B8A0) 30%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--accent, #F2B8A0) 26%, transparent);
 }

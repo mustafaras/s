@@ -17413,6 +17413,16 @@ function hideSplash(){
   var on=!!(data&&data.settings&&data.settings.launchRitual);
   var reduced=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!on||reduced){ sp.style.display='none'; return; }
+  // FX-P-85: dün kaydedilmemişse nazik hatırlatma (splash görünürken; ses yok,
+  // emoji yok — K1: düz metin, splash'ın premium diline uygun).
+  // Gün kaydı yapısı (migrate/getDay): mood tek string, habits object, water
+  // number, savedAt ISO — `yd.ticks` diye bir alan yok; kartın ydone koşulu
+  // gerçek alanlara göre yazıldı. Dün = addDays(todayStr(),-1) (dateUtils zinciri).
+  try{
+    var yd=data&&data.days?data.days[addDays(todayStr(),-1)]:null;
+    var ydone=yd&&!!(yd.savedAt||yd.mood||(yd.habits&&Object.keys(yd.habits).some(function(k){return yd.habits[k];}))||(typeof yd.water==='number'&&yd.water>0));
+    if(!ydone){ var nt=document.getElementById('sey-splash-note'); if(nt) nt.textContent='Dünü de kaydetmeyi unutma'; }
+  }catch(e){}
   // Kısa ritüel: 900ms görünür, sonra fade-out.
   setTimeout(hideSplash, 900);
 })();

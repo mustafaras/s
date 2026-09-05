@@ -28,6 +28,9 @@
       <div class="sey-splash-amblem" role="img" aria-label="Şeyma"></div>
       <div style="font-size:var(--f-title2);font-weight:800;color:var(--text);letter-spacing:.02em;">Şeyma</div>
       <div style="font-size:var(--f-footnote);color:var(--text2);">Günışığına hoş geldin</div>
+      <!-- FX-P-85: veri-durumu hatırlatması — dün kaydedilmemişse app.js boot
+           IIFE'si doldurur; tamamsa boş kalır. Ses yok, emoji yok. -->
+      <div id="sey-splash-note" style="min-height:18px;font-size:var(--f-caption1);color:var(--text2);"></div>
     </div>
   </div>
 </div>
@@ -86,7 +89,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script src="panel/panelCoverageManifest.js?v=20260820d"></script>
-<script src="app.js?v=20260906a"></script>
+<script src="app.js?v=20260906b"></script>
 <script src="sync.js?v=20260902a"></script>
 </body>
 </html>

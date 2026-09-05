@@ -6,6 +6,29 @@
 **Plan sürümü:** 2.3
 **Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
 
+## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-85 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-85 (splash veri-durumu hatırlatması — integration)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı.
+  Sıradaki kart: **FX-P-86** (ring + motivation bar shimmer).
+- **FX-P-85 uygulaması:** `index.html` `#sey-splash` içinde karşılama satırının
+  altına boş `#sey-splash-note` div'i; `app.js` boot IIFE'sinde
+  `setTimeout(hideSplash,900)` satırının hemen üstüne try/catch'li not bloğu —
+  dün (`addDays(todayStr(),-1)`, dateUtils zinciri — yeni yesterdayStr
+  helper'ı YOK, mevcut zincir kullanıldı) kaydedilmemişse not doldurulur.
+  **Yapı doğrulaması karttaki ydone koşulunu değiştirdi:** gerçek gün kaydında
+  `yd.ticks` alanı YOK — `mood` tek string (null/'' değil), `habits` object,
+  `water` number, `savedAt` ISO; ydone = savedAt || mood || habits.any-true ||
+  water>0. `!on||reduced` erken-dönüş dalı değişmedi; hideSplash gövdesi,
+  launchRitual varsayılanı (false), settings alanları dokunulmadı; ses yok.
+  Cache-bump: `app.js?v=20260906a`→`?v=20260906b` (a sürümünü FX-P-84 tüketmişti).
+- **Testler:** syntax OK; driver fail=0; zikr 95/95; splash fixture 9→16
+  (+7 FX-P-85 assertion: 3 senaryo + K1 düz-metin + habits varyantı + index
+  elemanı + kaynak işareti); premium ailesi 9/9 yeşil.
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
+
 ## Son Durum (FX-WAVE-2 Dalga 9 — FX-P-84 tamamlandı)
 
 - **Son tamamlanan prompt:** FX-P-84 (SeyOnSynced kristal bell — integration)

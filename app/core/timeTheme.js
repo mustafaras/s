@@ -13,11 +13,14 @@
     var root = document.getElementById('root');
     if (!root) return;
     var s = settings();
-    if (!s.premiumAtmosphere) return;
+    // FX-P-81: premium kapalıysa aurora sınıfı da kaldırılır — sınıf root'ta
+    // asılı kalmaz, katman tamamen söner.
+    if (!s.premiumAtmosphere){ root.classList.remove('theme-aurora'); return; }
     var now = new Date();
     var cls = classForHour(now.getHours());
     root.classList.remove('theme-time-dawn','theme-time-day','theme-time-dusk','theme-time-night');
     root.classList.add(cls);
+    root.classList.add('theme-aurora');
   }
   function seasonalClass(d){
     var date = d || new Date();

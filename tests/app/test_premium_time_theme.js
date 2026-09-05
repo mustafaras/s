@@ -219,6 +219,48 @@ console.log('\n[5] Gerçek timeTheme.js — classForHour / apply / seasonalClass
   ok('premiumAtmosphere=false iken mevsim sınıfı eklenmez', classes.length === 0);
 })();
 
+// ── Test 5b: FX-P-81 — aurora arka plan katmanı sözleşmesi ─────────────────
+console.log('\n[5b] FX-P-81 — aurora katmanı (theme-aurora + #sey-aurora)');
+(function(){
+  var vm = require('vm');
+  var src = fs.readFileSync(path.join(repoRoot, 'app/core/timeTheme.js'), 'utf8');
+  var sandbox = { window: {}, document: null, console: console };
+  sandbox.window.SeymaState = { data: { settings: { premiumAtmosphere: true } } };
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox);
+  var ST = sandbox.window.SeyTimeTheme;
+
+  var classes = [];
+  var root = { classList: {
+    add: function(c){ if(classes.indexOf(c)===-1) classes.push(c); },
+    remove: function(){ for(var i=0;i<arguments.length;i++){ classes = classes.filter(function(x){ return x!==arguments[i]; }); } },
+    contains: function(c){ return classes.indexOf(c) > -1; }
+  }};
+  sandbox.document = { getElementById: function(id){ return id==='root' ? root : null; } };
+
+  // (1) premium açıkken apply() → root classList'inde 'theme-aurora' var
+  classes = [];
+  ST.apply();
+  ok('premium açıkken apply() theme-aurora ekler', root.classList.contains('theme-aurora'));
+
+  // (2) premium kapalıyken apply() → 'theme-aurora' yok (remove dalı çalışıyor)
+  sandbox.window.SeymaState.data.settings.premiumAtmosphere = false;
+  ST.apply();
+  ok('premium kapalıyken apply() theme-aurora kaldırır', !root.classList.contains('theme-aurora'));
+  sandbox.window.SeymaState.data.settings.premiumAtmosphere = true;
+
+  // (3) index.html metninde 'id="sey-aurora"' geçiyor
+  var idxHtml = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf8');
+  ok('index.html sey-aurora katmanını içeriyor', idxHtml.indexOf('id="sey-aurora"') > -1);
+
+  // (4) styles.css'te 'prefers-reduced-motion: reduce' bloğunda
+  //     '#root.theme-aurora #sey-aurora' kuralı var
+  var css = fs.readFileSync(path.join(repoRoot, 'app/styles.css'), 'utf8');
+  var rmBlocks = css.match(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\}/g) || [];
+  var auroraRmFound = rmBlocks.some(function(b){ return b.indexOf('#root.theme-aurora #sey-aurora') > -1; });
+  ok('reduced-motion bloğunda aurora kuralı var', auroraRmFound, 'blok sayısı: '+rmBlocks.length);
+})();
+
 // ── Test 6: CSS'te mevsimsel class tanımları ────────────────────────────────
 console.log('\n[6] CSS’te theme-season-* class tanımları');
 (function(){

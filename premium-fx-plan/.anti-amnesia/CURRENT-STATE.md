@@ -1,10 +1,30 @@
-# Premium FX — Motor Tamamlandı, Görsel Yüzeyler Eksik (LOCAL ONLY)
+# Premium FX — FX-WAVE-2 Dalga 8 Sürüyor (LOCAL ONLY)
 
-**Tarih:** 2026-09-02
+**Tarih:** 2026-09-05
 **Proje:** Şeyma Premium Görsel & İşitsel Efekt Yükseltme
 **Kaynak uygulama:** `/Users/m_ras/Desktop/seyma`
 **Plan sürümü:** 2.3
-**Uygulama kuralı:** Tüm commitler `premium-fx-local` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
+**Uygulama kuralı:** Tüm commitler `premium-fx-gorsel-yuzey` dalında **sadece yerel**; push/merge/deploy kullanıcı onayı gerektirir. Bkz. [LOCAL-ONLY-IMPLEMENTATION.md](../LOCAL-ONLY-IMPLEMENTATION.md).
+
+## Son Durum (FX-WAVE-2 Dalga 8 — FX-P-81 tamamlandı)
+
+- **Son tamamlanan prompt:** FX-P-81 (aurora arka plan katmanı)
+- **Seri açılışı:** Dal `premium-fx-gorsel-yuzey` mevcut HEAD'den açıldı
+  (`zikirmatik-manuel-zikir` üzerinde; ağaçtaki önceden var olan çalışma korunarak).
+  Sıradaki kart: **FX-P-82** (nav bounce + badge pop).
+- **FX-P-81 uygulaması:** `index.html` `#sey-aurora` katman div'i (`#app`
+  kardeşi, aria-hidden, pointer-events yok) + cache-bump (`styles.css?v=20260906a`,
+  `timeTheme.js?v=20260906a`); `app/styles.css` aurora kuralları (mevcut
+  `seyAurora` keyframes, token tabanlı, reduced-motion'a saygılı); `app/core/timeTheme.js`
+  `apply()` artık premium kapalıyken `theme-aurora` sınıfını kaldırıyor, açıkken
+  ekliyor. `app.js`/settings/`migrate()`/`sync.js` dokunulmadı.
+- **Testler:** syntax OK; driver fail=0; premium ailesi 9/9 fixture yeşil
+  (time-theme 49→53: +4 FX-P-81 assertion); kontrast 30 token 4.5:1 altı 0.
+- **S6 değişmezler:** App.* yüzeyi 715 (değişmedi), tek `app.js` (`src` sayısı 1).
+- **Değişmezler:** I1–I6 korundu (data şekli, migrate/save/sync davranışı,
+  App.* yalnız-ekleme, tek app.js).
+- **Branch:** `premium-fx-gorsel-yuzey` — push edilmemiş; `main`'e merge
+  kullanıcı onayı + son regression ile.
 
 ## Son Durum (FX-P-74 — FINAL)
 

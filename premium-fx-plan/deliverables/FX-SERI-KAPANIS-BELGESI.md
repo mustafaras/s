@@ -116,3 +116,43 @@ Bilinen engel:         YOK
 ```
 
 > **Bu seri kapanmıştır.** İleride yeni bir FX dalı (örn. FX-P-66/67 veya yeni efekt fikirleri) açılacaksa, `premium-fx-plan/.prompts/PROMPT-CATALOG.md`'ye yeni prompt eklenip `FX-PROMPT-STATE.json` sıfırlanarak aynı sözleşme (S1–S10, I1–I6) altında sürdürülür. Bu belge o noktaya kadar geçerli tek resmi kapanış kaydıdır.
+---
+
+## 8. Dalga 8–10 Ek Kapanışı (FX-WAVE-2, 2026-09-05)
+
+> Bu bölüm FX-WAVE-2 serisinin (FX-P-81…87, 89, 90) ek kapanış kaydıdır; yukarıdaki
+> orijinal kapanış metni değiştirilmedi. Ayrıntılı denetim: `FX-VERIFY-RAPORU-2.md`.
+
+### Uygulanan kartlar (10 yerel commit)
+
+| Kart | Özellik | Commit |
+|------|---------|--------|
+| FX-P-81 | Aurora arka plan katmanı (`#sey-aurora`, `theme-aurora` gating) | `85eda51` |
+| FX-P-82 | Nav bounce + badge pop (`seyNavBounce`, `seyBadgePop`) | `080dfeb` |
+| FX-P-83 | Surface hover/active derinliği + glass genişlemesi | `b3df096` |
+| FX-P-84 | SeyOnSynced başarı bell (yalnız manuel eşitleme) | `4350eea` |
+| FX-P-85 | Splash veri-durumu hatırlatması (`#sey-splash-note`) | `34ab84b` |
+| FX-P-86 | Habits ring + motivation bar shimmer bağlama | `57b8a55` |
+| FX-P-87 | voicePitch + voiceVoiceName UI ve backfill | `9dbabdc` |
+| FX-P-89 | `#app{contain:layout style;}` denemesi — **BAŞARILI** (kullanıcı onaylı) | `fe2291a` |
+| FX-P-90 | Bağımsız denetim + seri kapanışı (bu belge) | (bu commit) |
+
+**Ek:** FX-P-55 launchRitual splash uygulaması seri sırasında ağaçta bekleyen çalışma olarak
+ayrı commit'e alındı (`577453f`). **FX-P-88 (hava modu):** bu seride bloklu — kart yok.
+**FX-P-91 (emoji-ikon temizliği):** kullanıcı onayıyla FX-P-89 önceliğinden çıkartıldı;
+bekleyen ayrı kart olarak kayıtlı.
+
+### Dalga 8–10 denetim sonucu (FX-P-90)
+
+- Denetim matrisi: **11/12 ✅**, 1 ⚠️ (K1 emoji temizliği = FX-P-91, bekleyen kart — uyumsuzluk değil)
+- Uçtan uca ders: gerçek `migrate()` çıktısı gerçek `timeTheme.js`/`mediaFx.js`'e verildi →
+  `theme-aurora` ✓ + ses üretimi ✓ (2026-09-04 hatasının kalıcı panzehiri)
+- Tam regression: **0 FAIL** (syntax 5/5, driver, zikr 95/95, premium 9/9, tests/app 29/29,
+  panel 23/23, panel-v2 27/27, quran 9/9, reminders 73+20, B2 60/60, kontrast, tristate)
+
+### Nihai durum
+
+- `App.*` yüzeyi: 717 (FX-P-87 ile +2: setVoicePitch, setVoiceVoiceName)
+- Yeni settings alanları: `voicePitch` (1), `voiceVoiceName` ('') — migrate+createDefaultData backfill'li
+- `#app{contain:layout style;}` — denendi, başarılı, kalıcı
+- **Push/merge/deploy yok** — `premium-fx-gorsel-yuzey` dalında kullanıcı onayı bekliyor

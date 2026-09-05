@@ -28,6 +28,8 @@
 | 6 Ayarlar & panel | FX-P-61…65 | ✅ | master switch + 5 alt FX + reduced-motion ağı; settings 33/33 |
 | 6.5 Bağımsız denetim | FX-P-70 | ✅ | `FX-VERIFY-RAPORU.md` (başlangıçta hatalı "HAZIR", 2026-09-04/05 onarımlarıyla geçerli) |
 | 7 Kapanış | FX-P-71…74 | ✅ | doküman senkronu + final regression |
+| **FX-WAVE-2 Görsel yüzey** | FX-P-81…87, 89 | ✅ | aurora/nav-bounce/badge-pop/surface/glass/sync-bell/splash-notu/ring-bar-shimmer/pitch-UI/contain; denetim `FX-VERIFY-RAPORU-2.md` (11/12 ✅, 0 FAIL); 10 yerel commit |
+| FX-WAVE-2 emoji temizliği | FX-P-91 | 🟡 | bekleyen kart — kullanıcı onayıyla FX-P-89 önceliğinden çıkartıldı; seride uygulanmadı |
 | **Ertelenen** | FX-P-66/67 | 🟡 | A/B toggle kopya deneyi + launch-ritual genişletmesi (kapsam 61–65'te karşılandı; istenirse uygulanır) |
 
 Kapanış sonrası onarım (2026-09-04, LEDGER seq 72): `migrate()` FX gate backfill + `SeyTimeTheme.applySeasonal()` bağlama + idempotent `App.toggleSetting` — ✅ (`test_premium_fx_gate_defaults.js` 26/26).
@@ -64,14 +66,14 @@ Kapanış sonrası 6 eksik düzeltmesi (2026-09-05, `EKSIKLER-ONCELIKLI.md` ledg
 |---|---------|-------|-----------------|
 | 1 | **Liquid Glass Splash** | ✅ | `index.html` `#sey-splash` + `.sey-splash-amblem` (premium CSS, emoji yok) + `app.js` `hideSplash()` + boot'ta `launchRitual` gating + reduced-motion anında gizleme (2026-09-05 P0-2; test gerçek doğrulamaya güncellendi, 9/9) |
 | 2 | **Gün Işığı Karşılama** (saate göre selam) | ✅ | `SeyAudio.greeting()` — boot + 2.2s gecikmeli, 4 saat dilimi, 4h throttle, günde max 2 |
-| 3 | Veri durumuna göre nazik hatırlatma (dün kaydedilmemişse) | ❌ | Splash/greeting'te "dün kaydedilmemiş" koşullu mesajı yok — yalnız sabit "Günışığına hoş geldin" |
+| 3 | Veri durumuna göre nazik hatırlatma (dün kaydedilmemişse) | ✅ | FX-P-85: `#sey-splash-note` + boot IIFE'de koşullu doldurma (`app.js:17455`); `test_premium_launch_splash.js` 16/16 |
 
 ## 5. PLAN.md §4.4 — Canlı Duvar & Atmosferik Arka Plan
 
 | # | Özellik | Durum | Uygulama kanıtı |
 |---|---------|-------|-----------------|
 | 1 | **Saat bazlı gradient** | ✅ | `SeyTimeTheme.apply()` render sonunda; `#root.theme-time-*` + `--surface-dawn/day/dusk/night` tokenları (açık+koyu) |
-| 2 | **Aurora + particles arka plan katmanı** | ❌ | `seyAurora` keyframes `app/styles.css`'te zaten var (eski kod) ama plandaki gibi `premiumAtmosphere` açıkken **body/arka plan katmanına uygulanmadı** |
+| 2 | **Aurora + particles arka plan katmanı** | ✅ (particles hariç ⚠️) | FX-P-81: `#sey-aurora` + `theme-aurora` gating (`timeTheme.js:18-23`); particles alt-özellik uygulanmadı |
 | 3 | Yağmur/bulut modu (hava API'si) | ❌ | Planda da "gelecek" olarak işaretli; uygulanmadı |
 | 4 | **Seasonal Theme** (Ramazan, mevsimler) | ✅ | `SeyTimeTheme.applySeasonal()` render sonunda bağlı; `--season-accent` tokenları (4 mevsim + newyear + ramazan, açık+koyu) |
 
@@ -84,16 +86,16 @@ Kapanış sonrası 6 eksik düzeltmesi (2026-09-05, `EKSIKLER-ONCELIKLI.md` ledg
 | 3 | Progress shimmer genişlemesi (habits ring, motivation bar) | ⚠️ | `.sey-shimmer` CSS + `maybeStreak` çağrısı çalışıyor; plandaki **habits SVG ring** ve **motivation bar** shimmer noktaları bağlanmadı |
 | 4 | Typography motion — fade-up başlıklar | ⚠️ | `SeyFx.enter` + `.sey-enter`/`sey-fade-in` + stagger delay'ler tab geçişinde (`App.go`) çalışıyor; başlık-bazlı özel fade-up yok |
 | 5 | Count-up sayılar | ✅ | `SeyFx.countUp` — su sayacı bağlı (reduced-motion'da animasyonsuz hedef yazımı) |
-| 6 | Glass & Blur genişlemesi (backdrop-filter, color-mix kenar ışığı) | ❌ | Mevcut glass stil korunuyor; plandaki ek genişleme uygulanmadı |
+| 6 | Glass & Blur genişlemesi (backdrop-filter, color-mix kenar ışığı) | ✅ | FX-P-83: `@supports` içinde `.sey-appheader,.sey-bottomnav` blur(14px) saturate(1.1) + kenar ışığı (`styles.css:1639`) |
 
 ## 7. PLAN.md §4.6 — Bottom Navigation & Header Premium İnce Ayar
 
 | # | Özellik | Durum | Uygulama kanıtı |
 |---|---------|-------|-----------------|
 | 1 | Sekme geçişi fade + floatIn | ✅ | `App.go` → `SeyFx.enter('#app .surface, #app .card, #app .bento', 40)` + `SeyFx.transition(appEl,'opacity',180)` (2026-09-05 P1-3) |
-| 2 | Aktif ikon hafif bounce | ❌ | Bottom nav indikatör/geçiş transition'ları var; **bounce keyframe/animasyonu yok** |
+| 2 | Aktif ikon hafif bounce | ✅ | FX-P-82: `seyNavBounce` keyframe + `.is-active .sey-bottomnav-glyph` animasyonu (`styles.css:1616-1617`) + reduce |
 | 3 | Header sync check morph + kristal bell | ⚠️ | Header `is-synced` görsel morph animasyonu var (styles.css); **`SeyOnSynced()` içine `SeyAudio.bell()` bağlanmadı** (bkz. §2.3) |
-| 4 | ÆON unread badge pop animasyonu | ❌ | `.sey-bottomnav-badge` statik görünüyor; **pop/scale animasyonu yok** |
+| 4 | ÆON unread badge pop animasyonu | ✅ | FX-P-82: `seyBadgePop` keyframe + `.sey-bottomnav-badge` giriş animasyonu (`styles.css:1620-1621`) + reduce |
 
 ## 8. PLAN.md §5–6 — Master Switch & Settings Alanları
 
@@ -119,7 +121,7 @@ Kapanış sonrası 6 eksik düzeltmesi (2026-09-05, `EKSIKLER-ONCELIKLI.md` ledg
 | 2 | Sessiz zaman (23:00–07:00) ses/sesli rehberlik kapısı | ✅ | `isQuietTime` — voice + greeting + ambient gating |
 | 3 | Secret sanitization (`openaiKey` repoya sızmaz) | ✅ | `sync.js sanitize()` + test kanıtı |
 | 4 | Will-change / performans disiplini | ✅ | `VISUAL-FX-AUDIT.md` — transform/opacity yalnız, geçici element temizliği |
-| 5 | `#app`'e `contain: layout paint` | ❌ | Modal/fixed render regresyonu riski nedeniyle bilinçli atlandı (audit'te belgelendi) |
+| 5 | `#app`'e `contain` izolasyonu | ✅ (varyant) | FX-P-89: `#app{contain:layout style;}` — kullanıcı onaylı deneme BAŞARILI (paint yerine style; dump diff yapısal sıfır; `styles.css:1646`) |
 
 ## 10. Kullanıcı Turunda Eklenenler (katalog dışı)
 
@@ -132,24 +134,20 @@ Kapanış sonrası 6 eksik düzeltmesi (2026-09-05, `EKSIKLER-ONCELIKLI.md` ledg
 
 ---
 
-## 11. Uygulanmayan Maddelerin Özet Listesi (Yeni Uygulama Kartı Gerektirir)
+## 11. Uygulanmayan Maddelerin Özet Listesi (FX-WAVE-2 sonrası güncel)
 
-Planda vaat edilen ama koddaki karşılığı olmayan/eksik olanlar — öncelik sırasıyla:
+> **2026-09-05 güncellemesi:** Aşağıdaki listede FX-P-81…87, 89 kartlarıyla kapanan maddeler ✅'a çevrildi; denetim kanıtı `FX-VERIFY-RAPORU-2.md`'de (uçtan uca migrate→motor zinciri dahil). Ayrıntılı satır-bazlı durum: yukarıdaki §2–§9 tabloları.
 
-1. **❌ Aurora arka plan katmanı** (§4.4.2) — `seyAurora` keyframes hazır; `premiumAtmosphere` açıkken body/background'a bağlama + particles yok.
-2. **❌ `SeyOnSynced()` kristal bell** (§4.1.3 / §4.6.3) — sync başarısında çan sesi; planın en açık vaatlerinden biri, hâlâ boş.
-3. **❌ Bottom nav aktif ikon bounce** (§4.6.2) — keyframe yazılıp `.is-active` durumuna bağlanmalı.
-4. **❌ ÆON unread badge pop animasyonu** (§4.6.4) — badge pop keyframe'i yok.
-5. **❌ Genel `.surface` hover/active derinlik** (§4.5.1) — yalnız belirli bileşenlerde var.
-6. **❌ Splash veri-durumu hatırlatması** (§4.3.3) — "dün kaydedilmemiş" koşullu mesaj.
-7. **❌ Habits SVG ring + motivation bar shimmer** (§4.5.3) — shimmer motoru hazır, bu iki nokta bağlanmadı.
-8. **❌ Glass & Blur genişlemesi** (§4.5.6) — backdrop-filter/color-mix derinleştirme.
-9. **❌ Yağmur/bulut hava-API modu** (§4.4.3) — planda "gelecek"; hava API'si gelmeden uygulanamaz.
-10. **❌ `#app` contain optimizasyonu** — bilinçli erteleme (audit), izole deneme gerekir.
-11. **🟡 FX-P-66/67** — A/B toggle kopya deneyi + launch-ritual genişletmesi (isteğe bağlı).
-12. **🟡 `voicePitch`/`voiceVoiceName` UI** — settings alanları var, arayüz yok.
+**Kalan maddeler:**
 
-> **Kural:** Bu maddelerin her biri `premium-fx-plan/.prompts/` altına yeni bir FX-P prompt kartı isteyerek başlar; mevcut 74'lük seri kapanmıştır (`FX-PROMPT-STATE.json` sıfırlanır). Tüm iş LOCAL-ONLY'dir; push/merge/deploy yalnız kullanıcı onayıyla.
+1. **⛔ Yağmur/bulut hava-API modu (FX-P-88)** (§4.4.3) — bu seride **bloklu**; kart yazılmadı. Hava API'si gelmeden uygulanamaz.
+2. **🟡 Emoji-ikon temizliği (FX-P-91)** — bekleyen kart; kullanıcı onayıyla FX-P-89 önceliğinden çıkartıldı, ayrı kart olarak uygulanmayı bekliyor.
+3. **🟡 FX-P-66/67** — A/B toggle kopya deneyi + launch-ritual genişletmesi (isteğe bağlı; FX-P-90 denetim raporu §6'daki soruya bağlı).
+4. **🟡 Particles alt-özellik** — aurora katmanı FX-P-81 ile ✅; particles parçacık sistemi plandaki kapsamda yok.
+
+**Kapananlar (✅, kanıt referanslarıyla):** Aurora (FX-P-81), SeyOnSynced bell (FX-P-84), nav bounce (FX-P-82), badge pop (FX-P-82), genel .surface derinliği (FX-P-83), splash hatırlatması (FX-P-85), ring/bar shimmer (FX-P-86), glass genişlemesi (FX-P-83), `#app` contain (FX-P-89, BAŞARILI), voicePitch/voiceVoiceName UI+backfill (FX-P-87).
+
+> **Kural:** Yeni bir FX dalı istenirse `premium-fx-plan/.prompts/` altına yeni FX-P prompt kartı ile başlar; FX-WAVE-2 kapanmıştır (`FX-PROMPT-STATE.json` `implementationComplete: true`). Tüm iş LOCAL-ONLY'dir; push/merge/deploy yalnız kullanıcı onayıyla.
 
 ## 12. Doğrulama Kanıtı Özeti (2026-09-05)
 
